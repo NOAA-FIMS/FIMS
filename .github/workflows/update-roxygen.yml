@@ -1,0 +1,12 @@
+
+# run devtools::document and open any changes as a pull request to the branch that started the workflow
+name: call-update-docs
+on:
+# workflow_dispatch requires pushing a button to run the workflow manually. uncomment the following line to add:
+  #workflow_dispatch:
+  # Runs the workflow on each push to the main or master branch:
+  push:
+    branches: [main, master]
+jobs:
+  call-workflow:
+    uses: nmfs-fish-tools/ghactions4r/.github/workflows/update-roxygen-docs.yml@main
