@@ -1,9 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
+title: "[FEATURE]"
+labels: enhancement, triage_needed
+assignees: ChristineStawitz-NOAA
 
 ---
 
@@ -15,6 +15,12 @@ A clear and concise description of what you want to happen.
 
 **Describe alternatives you've considered**
 A clear and concise description of any alternative solutions or features you've considered.
+
+**Describe a reference describing the statistical validity of this approach**
+Please link to a paper or reference that describes how this approach improves accuracy or statistical power.
+
+**Describe if this is needed for a management application**
+If this feature is necessary to satisfy the Terms of Reference for your fishery management body, please explain why here and describe which management body.
 
 **Additional context**
 Add any other context or screenshots about the feature request here.
