@@ -1,0 +1,12 @@
+citHeader("To cite FIMS in publications use:")
+
+citEntry(
+  entry    = "Manual",
+  title    = "{NOAA-FIMS}: The NOAA Fisheries Integrated Modeling System",
+  author   = "FIMS Implementation Team",
+  year     = "2022",
+  url      = "https://github.com/NOAA-FIMS/FIMS",
+  textVersion = paste("FIMS Implementation Team. 2022. NOAA-FIMS: The NOAA Fisheries Integrated Modeling System. R package version 0.0.0.9000. https://github.com/NOAA-FIMS/FIMS"
+
+  )
+)
