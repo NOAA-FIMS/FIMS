@@ -1,0 +1,4 @@
+CXX_STD = CXX11
+PKG_CXXFLAGS =  -DTMB_MODEL -w -O3
+CXX17STD = -std=c++11
+
