@@ -6,8 +6,14 @@ Authors@R:
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
-Depends: TMB
-LinkingTo: TMB, RcppEigen
+Imports: 
+        Rcpp, 
+        TMB, 
+        RcppEigen
+LinkingTo: 
+    Rcpp,
+    TMB,
+    RcppEigen
 SystemRequirements: GNU make
 NeedsCompilation: yes
 Encoding: UTF-8
