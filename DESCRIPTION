@@ -6,6 +6,16 @@ Authors@R:
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
+Imports: 
+        Rcpp, 
+        TMB, 
+        RcppEigen
+LinkingTo: 
+    Rcpp,
+    TMB,
+    RcppEigen
+SystemRequirements: GNU make
+NeedsCompilation: yes
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
