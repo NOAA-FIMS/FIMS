@@ -43,3 +43,6 @@ vignettes/*.pdf
 *.o
 *.so
 *.dll
+
+# CMake build files
+/build
