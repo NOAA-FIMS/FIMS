@@ -30,8 +30,8 @@
  *
  */
 
-#ifndef FIMS_INTERFACE_HPP
-#define FIMS_INTERFACE_HPP
+#ifndef FIMS_INTERFACE_INTERFACE_HPP
+#define FIMS_INTERFACE_INTERFACE_HPP
 /*
 * Interface file. Uses pre-processing macros
 * to interface with multiple modeling platforms.
@@ -44,6 +44,12 @@
 #define TMB_LIB_INIT R_init_FIMS
 #include <TMB.hpp>
 
+template<typename Type>
+struct model_traits{
+  typedef typename CppAD::vector<Type> data_vector;
+  typedef typename CppAD::vector<Type> parameter_vector;
+};
+
 #endif /* TMB_MODEL */
 
-#endif /* FIMS_INTERFACE */
+#endif /* FIMS_INTERFACE_INTERFACE_HPP */
