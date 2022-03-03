@@ -32,7 +32,7 @@
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_FLEET_HPP
 
-#include "../common/model_object.hpp"
+#include "../../common/model_object.hpp"
 
 namespace fims{
 
