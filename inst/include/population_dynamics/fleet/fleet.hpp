@@ -42,11 +42,6 @@ namespace fims{
 
     };
 
-    template<typename T>
-    struct Survey{
-
-
-    };
 }
 
 
