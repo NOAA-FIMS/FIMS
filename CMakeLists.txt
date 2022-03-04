@@ -39,4 +39,4 @@ target_compile_definitions(fims_test
     STD_LIB
 )
 
-add_subdirectory(gtest)
+add_subdirectory(tests/gtest)
