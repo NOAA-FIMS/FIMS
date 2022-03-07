@@ -1,0 +1,33 @@
+# Run C++ tests using GoogleTest
+name: run-googletest
+# on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
+on:
+# The default build trigger is to run the action on every push and pull request, for any branch
+  push:
+  pull_request:
+  # To run the default repository branch weekly on sunday, uncomment the following 2 lines
+  #schedule:
+    #- cron: '0 0 * * 0'
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: seanmiddleditch/gha-setup-ninja@master # https://github.com/seanmiddleditch/gha-setup-ninja
+
+    - name: Configure
+      run: |
+        cmake -S . -B build -G Ninja
+        
+    - name: Build
+      run: |  
+        cmake --build build
+        
+    - name: Test
+      run: |
+        ctest --test-dir build
