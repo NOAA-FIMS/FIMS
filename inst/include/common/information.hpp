@@ -49,7 +49,7 @@ class Information {
     typedef fims::FIMSTrait<T>::real_t real_t;
     std::vector<variable_t*> parameters; //list of all estimated parameters
     std::vector<variable_t*> random_effects_parameters; //list of all estimated random effects
-    std::vector<variable_t*> fixed_effects_parameters; //list of all fixed parameters
+    std::vector<variable_t*> fixed_effects_parameters; //list of all fixed effects parameters
 
     bool CreateModel(){
 
