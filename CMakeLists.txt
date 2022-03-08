@@ -95,10 +95,10 @@ include_directories("${EIGEN_INCLUDE}")
 include(GenerateExportHeader)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}") # FIMS_export.h
 
-add_library(FIMS SHARED src/FIMS.cpp)
+add_library(FIMS SHARED src/fims_tmb_objective_function.cpp)
 generate_export_header(FIMS)
 
-install(TARGETS FIMS DESTINATION lib)
+install(TARGETS FIMS DESTINATION libs)
 
 
 target_link_libraries(FIMS R)
@@ -141,3 +141,7 @@ target_compile_definitions(fims_test
 )
 
 add_subdirectory(tests/gtest)
+
+
+
+

@@ -7,7 +7,7 @@ which cmake
 
 rm -rf builds
 
-cmake -H. -B_builds \
+cmake -H. -B src/builds \
     -DCMAKE_VERBOSE_MAKEFILE=ON \
     -DCMAKE_INSTALL_PREFIX=_install \
     -DCMAKE_SHARED_LIBRARY_PREFIX_CXX=""
@@ -31,10 +31,24 @@ cmake ..
 
 cd ..
 
-cmake --build builds --target install --config Release
+cmake --build src/builds --target install --config Release
 
 # Linux
-cp src/builds/FIMS.so libs/src/FIMS.so || echo "Failed: FIMS.so -> src"
+cp src/builds/FIMS.so libs/FIMS.so || echo "Failed: FIMS.so -> src"
 
 # Mac
-cp src/builds/libFIMS.dylib libs/FIMS.so || echo "Failed: FIMS.dylib -> src"
+cp src/builds/FIMS.dylib libs/FIMS.so || echo "Failed: FIMS.dylib -> src"
+
+cp -r src/tests tests
+
+#clean up src directory
+rm -r src/_deps
+rm -r src/builds
+rm -r src/bin
+rm -r src/CMakeFiles
+rm -r src/lib
+rm src/CMakeLists.txt
+rm src/CMakeCache.txt
+rm src/CTestTestfile.cmake
+rm src/cmake_install.cmake
+rm src/Makefile
