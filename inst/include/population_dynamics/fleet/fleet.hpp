@@ -28,8 +28,8 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-#ifndef FIMS_POPULATION_DYNAMICS_FLEET_FLEET_HPP
-#define FIMS_POPULATION_DYNAMICS_FLEET_FLEET_HPP
+#ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
+#define FIMS_POPULATION_DYNAMICS_FLEET_HPP
 
 #include "../../common/model_object.hpp"
 
@@ -44,4 +44,4 @@ namespace fims{
 }
 
 
-#endif /* FIMS_POPULATION_DYNAMICS_FLEET_FLEET_HPP */
+#endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

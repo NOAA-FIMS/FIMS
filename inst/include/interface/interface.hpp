@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef FIMS_INTERFACE_INTERFACE_HPP
-#define FIMS_INTERFACE_INTERFACE_HPP
+#ifndef FIMS_INTERFACE_HPP
+#define FIMS_INTERFACE_HPP
 /*
 * Interface file. Uses pre-processing macros
 * to interface with multiple modeling platforms.
@@ -51,4 +51,4 @@ struct ModelTraits{
 
 #endif /* TMB_MODEL */
 
-#endif /* FIMS_INTERFACE_INTERFACE_HPP */
+#endif /* FIMS_INTERFACE_HPP */

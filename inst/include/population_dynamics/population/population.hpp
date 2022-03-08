@@ -28,8 +28,8 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-#ifndef FIMS_POPULATION_DYNAMICS_POPULATION_POPULATION_HPP
-#define FIMS_POPULATION_DYNAMICS_POPULATION_POPULATION_HPP
+#ifndef FIMS_POPULATION_DYNAMICS_POPULATION_HPP
+#define FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 
 #include "../../common/model_object.hpp"
 #include "subpopulation.hpp"
@@ -46,5 +46,5 @@ namespace fims {
 }
 
 
-#endif /* FIMS_POPULATION_DYNAMICS_POPULATION_POPULATION_HPP */
+#endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */
 
