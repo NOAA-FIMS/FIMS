@@ -36,18 +36,18 @@
 
 namespace fims{
 
-    template<typename T>
-    struct FIMSObject{
-        uint32_t id;//unique identifier assigned for all fims objects
-        std::vector<T*> parameters;//list of estimable parameters
-        std::vector<T*> random_effects_parameters;//list of random effects
-        std::vector<T*> fixed_effects_parameters;//list of random effects
+template<typename T>
+struct FIMSObject{
+    uint32_t id;//unique identifier assigned for all fims objects
+    std::vector<T*> parameters;//list of estimable parameters
+    std::vector<T*> random_effects_parameters;//list of random effects
+    std::vector<T*> fixed_effects_parameters;//list of random effects
 
-        uint32_t GetId() const {
-            return id;
-        }
+    uint32_t GetId() const {
+        return id;
+    }
 
-    };
+};
 
 
 }

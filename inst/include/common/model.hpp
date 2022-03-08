@@ -39,16 +39,16 @@
 
 namespace fims{
 
-    /**
-     * Model base
-     */
-    template<typename T>
-    class Model{
+/**
+ * Model base
+ */
+template<typename T>
+class Model{
 
-        std::vector<std::shared_ptr<Population<T> > populations;
-        std::vector<std::shared_ptr<Fleet<T> > fleets;
+    std::vector<std::shared_ptr<Population<T> > populations;
+    std::vector<std::shared_ptr<Fleet<T> > fleets;
 
-    };
+};
 
 
 }
