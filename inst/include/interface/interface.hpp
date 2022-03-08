@@ -4,7 +4,6 @@
  * Author: Andrea Havron
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Sustainable Fisheries Division
  * Email: andrea.havron@noaa.gov
  *
  * Created on February 23, 2022
