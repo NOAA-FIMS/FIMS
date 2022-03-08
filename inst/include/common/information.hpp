@@ -4,7 +4,6 @@
  * Author: Matthew Supernaw, Andrea Havron
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Sustainable Fisheries Division
  * Email: matthew.supernaw@noaa.gov, andrea.havron@noaa.gov
  *
  * Created on September 30, 2021, 11:47 PM
