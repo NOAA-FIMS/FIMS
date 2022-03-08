@@ -80,3 +80,6 @@ vignettes/*.pdf
 *.exe
 *.out
 *.app
+
+#Mac stuff 
+.DS_Store
