@@ -40,8 +40,8 @@ template<typename T>
 struct FIMSObject{
     uint32_t id;//unique identifier assigned for all fims objects
     std::vector<T*> parameters;//list of estimable parameters
-    std::vector<T*> random_effects_parameters;//list of random effects
-    std::vector<T*> fixed_effects_parameters;//list of random effects
+    std::vector<T*> random_effects_parameters;//list of all random effects parameters
+    std::vector<T*> fixed_effects_parameters;//list of fixed effects parameters
 
     uint32_t GetId() const {
         return id;
