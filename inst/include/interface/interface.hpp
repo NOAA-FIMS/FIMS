@@ -44,9 +44,9 @@
 #include <TMB.hpp>
 
 template<typename Type>
-struct model_traits{
-  typedef typename CppAD::vector<Type> data_vector;
-  typedef typename CppAD::vector<Type> parameter_vector;
+struct ModelTraits{
+  typedef typename CppAD::vector<Type> DataVector;
+  typedef typename CppAD::vector<Type> ParameterVector;
 };
 
 #endif /* TMB_MODEL */

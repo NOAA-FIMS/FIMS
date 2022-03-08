@@ -51,7 +51,7 @@ namespace fims {
         std::vector<variable_t*> random_effects_parameters; //list of all estimated random effects
         std::vector<variable_t*> fixed_effects_parameters; //list of all fixed parameters
 
-        bool create_model(){
+        bool CreateModel(){
 
         }
 
