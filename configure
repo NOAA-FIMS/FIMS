@@ -1,0 +1,40 @@
+set -x
+set -e
+
+which cmake
+
+
+
+rm -rf builds
+
+cmake -H. -B_builds \
+    -DCMAKE_VERBOSE_MAKEFILE=ON \
+    -DCMAKE_INSTALL_PREFIX=_install \
+    -DCMAKE_SHARED_LIBRARY_PREFIX_CXX=""
+ 
+
+: ${R_HOME=`R RHOME`}
+if test -z "${R_HOME}"; then
+  echo "could not determine R_HOME"
+  exit 1
+fi
+CC=`"${R_HOME}/bin/R" CMD config CC`
+CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
+CPPFLAGS=`"${R_HOME}/bin/R" CMD config CPPFLAGS`
+LDFLAGS=`"${R_HOME}/bin/R" CMD config LDFLAGS`
+
+cd src
+mkdir builds && cd builds
+cmake ..
+
+
+
+cd ..
+
+cmake --build builds --target install --config Release
+
+# Linux
+cp src/builds/FIMS.so libs/src/FIMS.so || echo "Failed: FIMS.so -> src"
+
+# Mac
+cp src/builds/libFIMS.dylib libs/FIMS.so || echo "Failed: FIMS.dylib -> src"
