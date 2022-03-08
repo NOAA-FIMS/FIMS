@@ -43,7 +43,7 @@ namespace fims{
         std::vector<T*> random_effects_parameters;//list of random effects
         std::vector<T*> fixed_effects_parameters;//list of random effects
 
-        uint32_t getId() const {
+        uint32_t GetId() const {
             return id;
         }
 
