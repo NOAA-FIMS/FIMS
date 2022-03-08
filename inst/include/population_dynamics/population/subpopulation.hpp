@@ -33,13 +33,13 @@
 
 namespace fims {
 
-    /**
-     * Subpopulation class. This class represents a generic partition
-     * of a population (eg., sex, area).
-     */
-    template<typename T>
-    class Subpopulation {
-    };
+/**
+ * Subpopulation class. This class represents a generic partition
+ * of a population (eg., sex, area).
+ */
+template<typename T>
+class Subpopulation {
+};
 
 }
 
