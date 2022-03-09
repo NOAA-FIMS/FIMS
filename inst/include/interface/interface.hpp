@@ -5,7 +5,7 @@
 * to interface with multiple modeling platforms.
 */
 
-#define TMB_MODEL
+//#define TMB_MODEL
 
 //traits for interfacing with TMB
 #ifdef TMB_MODEL
