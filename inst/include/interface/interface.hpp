@@ -44,7 +44,9 @@
 #include <TMB.hpp>
 
 template<typename Type>
-struct ModelTraits{
+struct FIMSTraits{
+  typedef double RealT;
+  typedef Type VariableT;
   typedef typename CppAD::vector<Type> DataVector;
   typedef typename CppAD::vector<Type> ParameterVector;
 };
