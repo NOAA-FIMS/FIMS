@@ -1,5 +1,5 @@
 # Top level CMakeLists.txt: setting up top level project dependencies and options
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.14)
 project(FIMS
   CXX
 ) # CXX is the language name
