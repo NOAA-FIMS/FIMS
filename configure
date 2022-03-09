@@ -41,14 +41,19 @@ cp src/builds/FIMS.dylib libs/FIMS.so || echo "Failed: FIMS.dylib -> src"
 
 cp -r src/tests tests
 
+
+echo "Cleaning build files..."
+
 #clean up src directory
 rm -r src/_deps
 rm -r src/builds
 rm -r src/bin
 rm -r src/CMakeFiles
 rm -r src/lib
-rm src/CMakeLists.txt
+
 rm src/CMakeCache.txt
 rm src/CTestTestfile.cmake
 rm src/cmake_install.cmake
 rm src/Makefile
+
+echo "Done."
