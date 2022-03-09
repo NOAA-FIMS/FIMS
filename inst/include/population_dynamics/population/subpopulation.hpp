@@ -1,12 +1,12 @@
 /*
- * File:   interface.hpp
+ * File:   subpopulation.hpp
  *
- * Author: Andrea Havron
+ * Author: Matthew Supernaw, Andrea Havron
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Email: andrea.havron@noaa.gov
+ * Email: matthew.supernaw@noaa.gov, andrea.havron@noaa.gov
  *
- * Created on February 23, 2022
+ * Created on September 30, 2021, 1:07 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,27 +28,20 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
+#ifndef FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP
+#define FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP
 
-#ifndef FIMS_INTERFACE_HPP
-#define FIMS_INTERFACE_HPP
-/*
-* Interface file. Uses pre-processing macros
-* to interface with multiple modeling platforms.
-*/
+namespace fims {
 
-
-//traits for interfacing with TMB
-#ifdef TMB_MODEL
-
-#define TMB_LIB_INIT R_init_FIMS
-#include <TMB.hpp>
-
-template<typename Type>
-struct ModelTraits{
-  typedef typename CppAD::vector<Type> DataVector;
-  typedef typename CppAD::vector<Type> ParameterVector;
+/**
+ * Subpopulation class. This class represents a generic partition
+ * of a population (eg., sex, area).
+ */
+template<typename T>
+class Subpopulation {
 };
 
-#endif /* TMB_MODEL */
+}
 
-#endif /* FIMS_INTERFACE_HPP */
+#endif /* FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP */
+

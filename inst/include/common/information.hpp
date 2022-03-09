@@ -1,12 +1,12 @@
 /*
- * File:   interface.hpp
+ * File:   information.hpp
  *
- * Author: Andrea Havron
+ * Author: Matthew Supernaw, Andrea Havron
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Email: andrea.havron@noaa.gov
+ * Email: matthew.supernaw@noaa.gov, andrea.havron@noaa.gov
  *
- * Created on February 23, 2022
+ * Created on September 30, 2021, 11:47 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,27 +28,37 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
+#ifndef FIMS_COMMON_INFORMATION_HPP
+#define FIMS_COMMON_INFORMATION_HPP
 
-#ifndef FIMS_INTERFACE_HPP
-#define FIMS_INTERFACE_HPP
-/*
-* Interface file. Uses pre-processing macros
-* to interface with multiple modeling platforms.
-*/
+#include <map>
+#include <memory>
+#include <vector>
+#include "model_object.hpp"
+#include "../interface/interface.hpp"
 
 
-//traits for interfacing with TMB
-#ifdef TMB_MODEL
+namespace fims {
 
-#define TMB_LIB_INIT R_init_FIMS
-#include <TMB.hpp>
+/**
+ * Contains all objects and data pre-model construction
+ */
+template<typename T>
+class Information {
+    typedef fims::FIMSTrait<T>::variable_t variable_t;
+    typedef fims::FIMSTrait<T>::real_t real_t;
+    std::vector<variable_t*> parameters; //list of all estimated parameters
+    std::vector<variable_t*> random_effects_parameters; //list of all random effects parameters
+    std::vector<variable_t*> fixed_effects_parameters; //list of all fixed effects parameters
 
-template<typename Type>
-struct ModelTraits{
-  typedef typename CppAD::vector<Type> DataVector;
-  typedef typename CppAD::vector<Type> ParameterVector;
+    bool CreateModel(){
+
+    }
+
 };
+}
 
-#endif /* TMB_MODEL */
 
-#endif /* FIMS_INTERFACE_HPP */
+
+#endif /* FIMS_COMMON_INFORMATION_HPP */
+
