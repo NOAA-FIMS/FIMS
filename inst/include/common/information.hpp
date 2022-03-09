@@ -45,6 +45,7 @@ namespace fims {
  */
 template<typename T>
 class Information {
+    public:
     typedef fims::FIMSTraits<T>::VariableT variable_t;
     typedef fims::FIMSTraits<T>::RealT real_t;
     std::vector<variable_t*> parameters; //list of all estimated parameters
