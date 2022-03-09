@@ -1,12 +1,12 @@
 /*
- * File:   interface.hpp
+ * File:   model.hpp
  *
- * Author: Andrea Havron
+ * Author: Matthew Supernaw, Andrea Havron
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Email: andrea.havron@noaa.gov
+ * Email: matthew.supernaw@noaa.gov, andrea.havron@noaa.gov
  *
- * Created on February 23, 2022
+ * Created on September 30, 2021, 1:08 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,27 +28,32 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
+#ifndef FIMS_COMMON_MODEL_HPP
+#define FIMS_COMMON_MODEL_HPP
 
-#ifndef FIMS_INTERFACE_HPP
-#define FIMS_INTERFACE_HPP
-/*
-* Interface file. Uses pre-processing macros
-* to interface with multiple modeling platforms.
-*/
+#include <memory>
+
+#include "../population_dynamics/population/population.hpp"
+#include "../population_dynamics/fleet/fleet.hpp"
 
 
-//traits for interfacing with TMB
-#ifdef TMB_MODEL
+namespace fims{
 
-#define TMB_LIB_INIT R_init_FIMS
-#include <TMB.hpp>
+/**
+ * Model base
+ */
+template<typename T>
+class Model{
 
-template<typename Type>
-struct ModelTraits{
-  typedef typename CppAD::vector<Type> DataVector;
-  typedef typename CppAD::vector<Type> ParameterVector;
+    std::vector<std::shared_ptr<Population<T> > populations;
+    std::vector<std::shared_ptr<Fleet<T> > fleets;
+
 };
 
-#endif /* TMB_MODEL */
 
-#endif /* FIMS_INTERFACE_HPP */
+}
+
+
+
+#endif /* FIMS_COMMON_MODEL_HPP */
+

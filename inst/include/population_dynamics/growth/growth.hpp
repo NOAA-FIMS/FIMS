@@ -1,12 +1,12 @@
 /*
- * File:   interface.hpp
+ * File:   growth.hpp
  *
- * Author: Andrea Havron
+ * Author: Matthew Supernaw
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Email: andrea.havron@noaa.gov
+ * Email: matthew.supernaw@noaa.gov
  *
- * Created on February 23, 2022
+ * Created on September 30, 2021, 12:50 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -29,26 +29,10 @@
  *
  */
 
-#ifndef FIMS_INTERFACE_HPP
-#define FIMS_INTERFACE_HPP
-/*
-* Interface file. Uses pre-processing macros
-* to interface with multiple modeling platforms.
-*/
+#ifndef FIMS_POPULATION_DYNAMICS_GROWTH_HPP
+#define FIMS_POPULATION_DYNAMICS_GROWTH_HPP
 
 
-//traits for interfacing with TMB
-#ifdef TMB_MODEL
 
-#define TMB_LIB_INIT R_init_FIMS
-#include <TMB.hpp>
+#endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */
 
-template<typename Type>
-struct ModelTraits{
-  typedef typename CppAD::vector<Type> DataVector;
-  typedef typename CppAD::vector<Type> ParameterVector;
-};
-
-#endif /* TMB_MODEL */
-
-#endif /* FIMS_INTERFACE_HPP */
