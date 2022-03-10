@@ -36,7 +36,7 @@ jobs:
       uses: actions/upload-artifact@v3
       if: failure()
       with:
-        name: log
+        name: googletest-log ${{ matrix.os }}
         path: |
           build/Testing/Temporary/LastTest.log
           build/CMakeFiles/CMakeOutput.log
