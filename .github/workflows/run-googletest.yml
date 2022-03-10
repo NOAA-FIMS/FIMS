@@ -31,3 +31,12 @@ jobs:
     - name: Test
       run: |
         ctest --test-dir build
+    
+    - name: Upload log when tests failed
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: log
+        path: |
+          build/Testing/Temporary/LastTest.log
+          build/CMakeFiles/CMakeOutput.log
