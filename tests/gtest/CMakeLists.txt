@@ -1,4 +1,4 @@
-# Third level CMakeLists.txt: register individual tests
+# Second level CMakeLists.txt: register individual tests
 
 include(GoogleTest)
 
@@ -24,11 +24,6 @@ target_link_libraries(test_place_holder2
   gtest_main
   fims_test
 )
-
-# target_compile_definitions(test_place_holder2 
-#   PUBLIC
-#     STD_LIB
-# )
 
 gtest_discover_tests(test_place_holder2)
 

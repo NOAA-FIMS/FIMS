@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "place_holder1.hpp"
+#include "interface/place_holder1.hpp"
 
 // # R code that generates true values for the test
 // dlnorm(1.0, 0.0, 1.0, TRUE): -0.9189385
