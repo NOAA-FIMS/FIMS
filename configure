@@ -39,21 +39,41 @@ cp src/builds/FIMS.so libs/FIMS.so || echo "Failed: FIMS.so -> src"
 # Mac
 cp src/builds/FIMS.dylib libs/FIMS.so || echo "Failed: FIMS.dylib -> src"
 
-cp -r src/tests tests
+# Mac
+cp src/builds/FIMS.dylib lib/FIMS.so || echo "Failed: FIMS.dylib -> src"
+
+#cp -r src/tests tests
+
+
+
+cd tests
+mkdir builds && cd builds
+cmake ..
+
+
+
+cd ..
+cd ..
+
+
+
+pwd
+
+
+
+cmake --build tests/builds --target all --config Release
 
 
 echo "Cleaning build files..."
-
 #clean up src directory
-rm -r src/_deps
-rm -r src/builds
-rm -r src/bin
-rm -r src/CMakeFiles
-rm -r src/lib
+#rm -r src/_deps
+#rm -r src/builds
+#rm -r src/bin
+#rm -r src/CMakeFiles
+#rm -r src/lib
+#rm src/CMakeLists.txt
+#rm src/CMakeCache.txt
+#rm src/cmake_install.cmake
+#rm src/Makefile
 
-rm src/CMakeCache.txt
-rm src/CTestTestfile.cmake
-rm src/cmake_install.cmake
-rm src/Makefile
-
-echo "Done."
+echo "Cleaning build files..."

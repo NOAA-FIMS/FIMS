@@ -1,0 +1,5 @@
+if(EXISTS "/Users/mattadmin/FIMS-Testing/FIMS/src/tests/gtest/test_place_holder2[1]_tests.cmake")
+  include("/Users/mattadmin/FIMS-Testing/FIMS/src/tests/gtest/test_place_holder2[1]_tests.cmake")
+else()
+  add_test(test_place_holder2_NOT_BUILT test_place_holder2_NOT_BUILT)
+endif()
