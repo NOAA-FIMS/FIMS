@@ -31,7 +31,7 @@ add_library(fims_test INTERFACE)
 
 target_include_directories(fims_test
   INTERFACE
-    inst/include/interface
+    inst/include
 )
 
 target_compile_definitions(fims_test 
