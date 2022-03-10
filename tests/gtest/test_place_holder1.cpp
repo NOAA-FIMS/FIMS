@@ -22,8 +22,7 @@ namespace
   TEST(dlognorm, use_int_inputs)
   {
     // expect not equal (look up arguments)
-    // EXPECT_NE(dlognorm(1, 0, 1), -0.9189385);
-    EXPECT_NEAR(dlognorm(1, 0, 1), -0.9189385, 0.0001);
+    EXPECT_NE(dlognorm(1, 0, 1), -0.9189385);
   }
 
 }
