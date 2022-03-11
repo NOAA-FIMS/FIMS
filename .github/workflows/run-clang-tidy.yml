@@ -1,0 +1,46 @@
+# Run clang-tidy
+# This workflow runs Clang-tidy checks (https://clang.llvm.org/extra/clang-tidy/index.html) on C++ code. It is for diagnosing typical programming errors (e.g., interface misuse or bugs that can be detected via static analysis).  
+# Please see details of each Clang-tidy Check from this website: https://clang.llvm.org/extra/clang-tidy/checks/list.html
+# This workflow checks code through valid CMakeLists.txt files. It only checks .cpp files and their associated .hpp files that are used for compilation. If the workflow fails after pushing commits to the repo, please check the GitHub Actions log and fix programming errors.
+name: run-clang-tidy
+
+on:
+  # The default build trigger is to run the action on every push and pull request, for any branch
+  push:
+  pull_request:
+  # To run the default repository branch weekly on sunday, uncomment the following 2 lines
+  #schedule:
+    #- cron: '0 0 * * 0'
+
+jobs:
+  job:
+    name: run-clang-tidy
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: install clang-tidy
+      run: sudo apt update && sudo apt -y install clang-tidy
+
+    - name: create build environment
+      run: cmake -E make_directory ${{ runner.workspace }}/_build
+
+    - name: configure cmake
+      shell: bash
+      working-directory: ${{ runner.workspace }}/_build
+      run: >
+        cmake $GITHUB_WORKSPACE
+        -DBENCHMARK_ENABLE_ASSEMBLY_TESTS=OFF
+        -DBENCHMARK_ENABLE_LIBPFM=OFF
+        -DBENCHMARK_DOWNLOAD_DEPENDENCIES=ON
+        -DCMAKE_C_COMPILER=clang
+        -DCMAKE_CXX_COMPILER=clang++
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        -DGTEST_COMPILE_COMMANDS=OFF
+
+    - name: run
+      shell: bash
+      working-directory: ${{ runner.workspace }}/_build
+      run: run-clang-tidy
