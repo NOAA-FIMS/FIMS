@@ -11,7 +11,7 @@ namespace
   TEST(exp, use_double_inputs)
   {
     EXPECT_NEAR(fims::exp(3.0), 20.08554, 0.0001);
-    EXPECT_EQ(fims::exp(-2.5), std::log(-2.5));
+    EXPECT_EQ(fims::exp(-2.5), std::exp(-2.5));
     EXPECT_NEAR(fims::exp(-2.5), 0.082085, 0.0001);
   }
 
