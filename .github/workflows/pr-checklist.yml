@@ -33,7 +33,7 @@ jobs:
             - [ ] The code is well-designed.
             - [ ] The functionality is good for the users of the code.
             - [ ] Any User Interface changes are sensible and look good.
-            - [ ] Any parallel programming is done safely.
+            - [ ] Parallel computing remains functional.
             - [ ] The code isn’t more complex than it needs to be.
             - [ ] The developer isn’t implementing things they might need in the future but don’t know they need now.
             - [ ] Code has appropriate [unit tests](https://noaa-fims.github.io/collaborative_workflow/testing.html#testing).
