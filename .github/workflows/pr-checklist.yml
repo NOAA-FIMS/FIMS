@@ -1,7 +1,9 @@
 # This workflow automatically adds a comment containing a reviewer checklist
 # when a new pull request is opened.
 name: Add a comment with reviewer checklist when PR opened
-on: pull_request
+on:
+  pull_request:
+    types: [opened]
 
 jobs:
   pr-checklist:
