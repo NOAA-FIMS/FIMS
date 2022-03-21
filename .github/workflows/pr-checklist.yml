@@ -21,7 +21,7 @@ jobs:
             Hello reviewer, thanks for taking the time to review this PR!
 
             - Please use this checklist during your review, checking off items that you have verified are complete!
-            - Then, comment comment on the pull request with your review indicating where you have questions or changes need to be made before merging.
+            - Then, comment on the pull request with your review indicating where you have questions or changes need to be made before merging.
             - Remember to review **every line of code** you’ve been asked to review, look at the context, make sure you’re improving code health, and compliment developers on good things that they do.
             - PR reviews are a great way to learn, so feel free to share your tips and tricks. However for changes not required to make, please include \`nit:\` (for nitpicking) before making the suggestion. For example, \`nit:\` I prefer using a \`data.frame()\` instead of a \`matrix\` because...
             - Engage with the developer when they respond to comments and check off additional boxes as they become complete so the PR can be merged in when all the tasks are fulfilled.
@@ -34,7 +34,7 @@ jobs:
             - [ ] Any parallel programming is done safely.
             - [ ] The code isn’t more complex than it needs to be.
             - [ ] The developer isn’t implementing things they might need in the future but don’t know they need now.
-            - [ ] Code has appropriate unit tests.
+            - [ ] Code has appropriate [unit tests](https://noaa-fims.github.io/collaborative_workflow/testing.html#testing).
             - [ ] Tests are well-designed.
             - [ ] The developer used clear names for everything.
             - [ ] Comments are clear and useful, and mostly explain why instead of what.
