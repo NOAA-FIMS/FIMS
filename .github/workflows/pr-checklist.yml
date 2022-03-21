@@ -1,0 +1,49 @@
+# This workflow automatically adds a comment containing a reviewer checklist
+# when a new pull request is opened.
+name: Add a comment with reviewer checklist when PR opened
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  pr-checklist:
+    runs-on: ubuntu-latest
+    name: pr-checklist
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: 'Comment PR'
+        uses: actions/github-script@0.3.0
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            var msg = `# Instructions for code reviewer
+
+            Hello reviewer, thanks for taking the time to review this PR!
+
+            - Please use this checklist during your review, checking off items that you have verified are complete!
+            - For PRs that don't make changes to code (e.g., changes to README.md or Github actions workflows), feel free to skip over items on the checklist that are not relevant. Remember it is still important to do a thorough review.
+            - Then, comment on the pull request with your review indicating where you have questions or changes need to be made before merging.
+            - Remember to review **every line of code** you’ve been asked to review, look at the context, make sure you’re improving code health, and compliment developers on good things that they do.
+            - PR reviews are a great way to learn, so feel free to share your tips and tricks. However, for optional changes (i.e., not required for merging), please include \`nit:\` (for nitpicking) before making the suggestion. For example, \`nit:\` I prefer using a \`data.frame()\` instead of a \`matrix\` because...
+            - Engage with the developer when they respond to comments and check off additional boxes as they become complete so the PR can be merged in when all the tasks are fulfilled. Make it clear when this has been reached by commenting on the PR with something like \`This PR is now ready to be merged, no changes needed\`.
+
+            ## Checklist
+
+            - [ ] The PR is requested to be merged into the appropriate branch (typically main)
+            - [ ] The code is well-designed.
+            - [ ] The functionality is good for the users of the code.
+            - [ ] Any User Interface changes are sensible and look good.
+            - [ ] Parallel computing remains functional.
+            - [ ] The code isn’t more complex than it needs to be.
+            - [ ] The developer isn’t implementing things they might need in the future but don’t know they need now.
+            - [ ] Code has appropriate [unit tests](https://noaa-fims.github.io/collaborative_workflow/testing.html#testing).
+            - [ ] Tests are well-designed.
+            - [ ] The developer used clear names for everything.
+            - [ ] Comments are clear and useful, and mostly explain why instead of what.
+            - [ ] Code is appropriately documented (doxygen and roxygen).
+            - [ ] The code conforms to our [style guides](https://noaa-fims.github.io/collaborative_workflow/contributor-guidelines.html#style-guide).
+            `
+            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+            github.issues.createComment({ issue_number, owner, repo, body: msg });
