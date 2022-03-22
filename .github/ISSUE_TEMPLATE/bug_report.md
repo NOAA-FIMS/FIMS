@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report a bug that causes the existing functionality to differ from what is described in the development plan.
 title: "[BUG]"
 labels: bug, triage_needed
 assignees: ChristineStawitz-NOAA
