@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Request new features or changes to features, such that the described functionality differs from what is currently in the development plan.
 title: "[FEATURE]"
 labels: enhancement, triage_needed
 assignees: ChristineStawitz-NOAA
