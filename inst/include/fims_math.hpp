@@ -58,7 +58,9 @@ inline const T logistic(const T& mean, const T& slope, const T& x) {
     return (1.0) / (1.0 + exp(-1.0 * (x - mean) / slope));
 }
 
+#endif
 
+}
 
 #endif /* FIMS_MATH_HPP */
 
