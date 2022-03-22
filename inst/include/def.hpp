@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
  * File:   def.hpp
  *
  * Author: Matthew Supernaw
@@ -34,4 +35,3 @@
 #define USE_STANDARD_LIB
 
 #endif /* DEF_HPP */
-

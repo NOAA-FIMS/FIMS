@@ -60,11 +60,5 @@ inline const T logistic(const T& mean, const T& slope, const T& x) {
 
 
 
-#endif
-
-
-}
-
-
 #endif /* FIMS_MATH_HPP */
 
