@@ -53,4 +53,25 @@ struct FIMSTraits{
 
 #endif /* TMB_MODEL */
 
+#include <Rcpp.h>
+
+using namespace Rcpp;
+
+RCPP_MODULE(LogisticSelectivity) {
+  class_<LogisticSelectivity>("LogisticSelectivity")
+  .constructor<LogisticSelectivity>()
+  .field("a50", &LogisticSelectivity::a50)
+  .field("slope", &LogisticSelectivity::slope)
+  .method("evaluate", &LogisticSelectivity::evaluate)
+  ;
+}
+
+
+
 #endif /* FIMS_INTERFACE_HPP */
+
+
+
+
+
+
