@@ -28,9 +28,27 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-#ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP
-#define FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP
+#ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP
+#define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP
 
+#include "../../../common/model_object.hpp"
 
-#endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP */
+namespace fims{
+
+    template<class Type>
+    struct RecruitmentBase : public FIMSObject<Type>{
+        static uint32_t id_g;
+
+        RecruitmentBase(){
+            this->id = RecruitmentBase::id_g++;
+        }
+
+        virtual const Type evaluate() = 0; //need to add input parameter values
+    } ; 
+
+    template<class Type>
+    uint32_t RecruitmentBase<Type>::id_g = 0;
+}
+
+#endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP */
 
