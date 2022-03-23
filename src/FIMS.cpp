@@ -2,6 +2,21 @@
 #include "init.hpp"
 
 
+
+
+
+
+
+void hello_fims(){
+std::cout<<"hello fims";
+}
+
+RCPP_MODULE(fims) {
+    //place holder for module elements
+    Rcpp::function("hello_fims", hello_fims);
+};
+
+
 /*
  * @brief TMB objective function
  *
