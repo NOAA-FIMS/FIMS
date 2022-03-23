@@ -35,18 +35,33 @@
 
 namespace fims {
 
+/* @brief Base class for all selectivity functors.
+ *
+ * @tparam T The type of the selectivity functor.
+ * */
 template<typename T>
 struct SelectivityBase : public FIMSObject<T> {
+    
+    // id_g is the ID of the instance of the SelectivityBase class.
+    // this is like a memory tracker. 
+    // Assigning each one its own ID is a way to keept track of
+    // all the instances of the SelectivityBase class.
     static uint32_t id_g;
-
+    
+    /* @brief Constructor.
+    */
     SelectivityBase() {
         this->id = SelectivityBase::id_g++;
     }
 
+    /*
+    * @brief Calculates the selectivity at age.
+    * @param age The age of the individual.
+    */
     virtual const T evaluate(const T& age) = 0;
 
-
 };
+
 template<typename T>
 uint32_t SelectivityBase<T>::id_g = 0;
 
