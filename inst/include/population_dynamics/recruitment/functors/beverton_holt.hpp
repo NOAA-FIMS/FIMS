@@ -31,6 +31,24 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP
 
+#include "../../../interface/interface.hpp"
+#include "../../../fims_math.hpp"
+#include "recruitment_base.hpp"
+
+namespace fims{
+
+  template<typename Type>
+  struct BevertonHolt :public RecruitmentBase<>{
+
+    BevertonHolt():RecruitmentBase<Type>(){
+    }
+
+    virtual const Type evaluate(){
+        return fims::beverton_holt_sr();
+    }
+  }
+
+}
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP */
 
