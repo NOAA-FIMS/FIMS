@@ -40,7 +40,7 @@
 //traits for interfacing with TMB
 #ifdef TMB_MODEL
 
-#define TMB_LIB_INIT R_init_FIMS
+//#define TMB_LIB_INIT R_init_FIMS
 #include <TMB.hpp>
 
 template<typename Type>
