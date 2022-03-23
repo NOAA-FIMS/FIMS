@@ -1,12 +1,12 @@
 /*
  * File:   recruitment.hpp
  *
- * Author: Matthew Supernaw
+ * Author: Andrea Havron, Chris Legault, Kyle Shertzer, Nathan Vaughan
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Email: matthew.supernaw@noaa.gov
+ * Email: fims@noaa.gov
  *
- * Created on September 30, 2021, 12:50 PM
+ * Created on March 22, 2021, 12:50 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,10 +28,9 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-#ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP
-#define FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP
+#ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP
+#define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP
 
-#include "functors/recruitment_base.hpp"
 
-#endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP */
+#endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP */
 
