@@ -1,4 +1,23 @@
 #include "../inst/include/interface/interface.hpp"
+#include "init.hpp"
+
+#define RCPP_NO_SUGAR
+#include <Rcpp.h>
+
+
+
+
+
+
+void hello_fims(){
+std::cout<<"hello fims";
+}
+
+RCPP_MODULE(fims) {
+    //place holder for module elements
+    Rcpp::function("hello_fims", hello_fims);
+};
+
 
 /*
  * @brief TMB objective function
