@@ -76,8 +76,6 @@ RCPP_MODULE(LogisticSelectivity) {
   ;
 }
 
-
-
 #endif /* FIMS_INTERFACE_HPP */
 
 

@@ -1,3 +1,4 @@
+#include <cmath>
 #include "../inst/include/interface/interface.hpp"
 #include "init.hpp"
 =
