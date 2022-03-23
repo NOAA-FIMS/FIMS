@@ -2,7 +2,7 @@
 #include "init.hpp"
 
 #define RCPP_NO_SUGAR
-#include <Rcpp.h>≈y
+#include <Rcpp.h>
 
 
 
