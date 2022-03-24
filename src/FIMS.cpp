@@ -1,5 +1,5 @@
 #include "../inst/include/interface/interface.hpp"
-#include "init.hpp"
+//#include "init.hpp"
 
 // #define RCPP_NO_SUGAR
 // #include <Rcpp.h>
