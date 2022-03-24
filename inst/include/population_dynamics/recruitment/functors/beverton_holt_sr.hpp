@@ -10,8 +10,8 @@
  * Inherits from recruitment base. 
  * 
  */
-#ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP
-#define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP
+#ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_SR_HPP
+#define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_SR_HPP
 
 #include "../../../interface/interface.hpp"
 #include "../../../fims_math.hpp"
@@ -27,12 +27,12 @@ namespace fims{
  * @param rzero Unexploited recruitment. 
  */ 
   template<typename Type>
-  struct BevertonHolt :public RecruitmentBase<Type>{
+  struct BevertonHoltSR :public RecruitmentBase<Type>{
 
     Type steep;
     Type rzero;
 
-    BevertonHolt():RecruitmentBase<Type>(){
+    BevertonHoltSR():RecruitmentBase<Type>(){
     }
 
 /* @brief Beverton Holt implementation of the stock recruitment function.
@@ -50,5 +50,5 @@ namespace fims{
 
 }
 
-#endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP */
+#endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_SR_HPP */
 
