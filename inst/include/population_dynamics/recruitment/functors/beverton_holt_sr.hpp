@@ -1,32 +1,14 @@
 /*
- * File:   recruitment.hpp
- *
- * Author: Andrea Havron, Chris Legault, Kyle Shertzer, Nathan Vaughan
- * National Oceanic and Atmospheric Administration
- * National Marine Fisheries Service
- * Email: fims@noaa.gov
- *
- * Created on March 22, 2021, 12:50 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project.
+ * Fisheries Integrated Modeling System project. See LICENSE in the 
+ * source folder for reuse information.
  *
- * This software is a "United States Government Work" under the terms of the
- * United States Copyright Act.  It was written as part of the author's official
- * duties as a United States Government employee and thus cannot be copyrighted.
- * This software is freely available to the public for use. The National Oceanic
- * And Atmospheric Administration and the U.S. Government have not placed any
- * restriction on its use or reproduction.  Although all reasonable efforts have
- * been taken to ensure the accuracy and reliability of the software and data,
- * the National Oceanic And Atmospheric Administration and the U.S. Government
- * do not and cannot warrant the performance or results that may be obtained by
- * using this  software or data. The National Oceanic And Atmospheric
- * Administration and the U.S. Government disclaim all warranties, express or
- * implied, including warranties of performance, merchantability or fitness
- * for any particular purpose.
- *
- * Please cite the author(s) in any work or product based on this material.
- *
+ * Beverton Holt stock recruitment function
+ * The purpose of this file is to call the Beverton Holt stock
+ * recruitment function from fims_math and does the calculation. 
+ * Inherits from recruitment base. 
+ * 
  */
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_HPP
@@ -37,10 +19,15 @@
 
 namespace fims{
 
+ /* @brief BevertonHolt class that returns the Beverton Holt SR
+ * from fims_math.
+ *
+ * @param steep Recruitment relative to unfished recruitment at 
+ * 20% of unfished spawning biomass.
+ * @param rzero Unexploited recruitment. 
+ */ 
   template<typename Type>
   struct BevertonHolt :public RecruitmentBase<>{
-
-// steep, const Type& rzero, const Type& phizero, const Type& spawners) {
 
     Type steep;
     Type rzero;
@@ -48,6 +35,14 @@ namespace fims{
     BevertonHolt():RecruitmentBase<Type>(){
     }
 
+/* @brief Beverton Holt implementation of the stock recruitment function.
+*
+* The Beverton Holt stock recruitment implementation:
+* \f$ \frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h - 0.2)} \f$
+*
+* @param phizero Unexploited spawners per recruit.
+* @param spawners A measure of spawning output.
+*/
     virtual const Type evaluate(const Type& phizero, const Type& spawners){
         return fims::beverton_holt_sr(steep, rzero, phizero, spawners);
     }
