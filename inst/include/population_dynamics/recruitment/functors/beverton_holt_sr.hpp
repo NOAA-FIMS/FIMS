@@ -31,6 +31,7 @@ namespace fims{
 
     Type steep;
     Type rzero;
+    Type phizero;
 
     BevertonHoltSR():RecruitmentBase<Type>(){
     }
@@ -43,7 +44,7 @@ namespace fims{
 * @param phizero Unexploited spawners per recruit.
 * @param spawners A measure of spawning output.
 */
-    virtual const Type evaluate(const Type& phizero, const Type& spawners){
+    virtual const Type evaluate(const Type& spawners){
         return fims::beverton_holt_sr(steep, rzero, phizero, spawners);
     }
   }
