@@ -27,7 +27,7 @@ namespace fims{
  * @param rzero Unexploited recruitment. 
  */ 
   template<typename Type>
-  struct BevertonHolt :public RecruitmentBase<>{
+  struct BevertonHolt :public RecruitmentBase<Type>{
 
     Type steep;
     Type rzero;
