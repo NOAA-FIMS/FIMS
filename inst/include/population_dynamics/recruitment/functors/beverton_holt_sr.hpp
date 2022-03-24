@@ -41,7 +41,6 @@ namespace fims{
 * The Beverton Holt stock recruitment implementation:
 * \f$ \frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h - 0.2)} \f$
 *
-* @param phizero Unexploited spawners per recruit.
 * @param spawners A measure of spawning output.
 */
     virtual const Type evaluate(const Type& spawners){
