@@ -40,11 +40,16 @@ namespace fims{
   template<typename Type>
   struct BevertonHolt :public RecruitmentBase<>{
 
+// steep, const Type& rzero, const Type& phizero, const Type& spawners) {
+
+    Type steep;
+    Type rzero;
+
     BevertonHolt():RecruitmentBase<Type>(){
     }
 
-    virtual const Type evaluate(){
-        return fims::beverton_holt_sr();
+    virtual const Type evaluate(const Type& phizero, const Type& spawners){
+        return fims::beverton_holt_sr(steep, rzero, phizero, spawners);
     }
   }
 
