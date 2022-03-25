@@ -10,7 +10,7 @@
 #define POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP
 
 
-#include "../../../interface/interface.hpp"
+//#include "../../../interface/interface.hpp"
 #include "../../../fims_math.hpp"
 #include "selectivity_base.hpp"
 
