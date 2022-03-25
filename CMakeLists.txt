@@ -25,6 +25,29 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googlebenchmark)
 
+FetchContent_Declare(
+  rcpp
+  URL https://github.com/RcppCore/Rcpp/archive/refs/tags/1.0.8.zip
+)
+FetchContent_MakeAvailable(rcpp)
+
+# Add R
+MESSAGE(STATUS "Looking for R executable")
+
+		EXECUTE_PROCESS(
+			COMMAND which R 
+			OUTPUT_VARIABLE R_EXECUTABLE)
+
+MESSAGE(STATUS "R_EXECUTABLE is ${R_EXECUTABLE}") 
+
+
+EXECUTE_PROCESS(
+		COMMAND R "--slave" "--no-save" "-e" "cat(R.home())"
+		OUTPUT_VARIABLE R_HOME)
+
+MESSAGE(STATUS "R_HOME is ${R_HOME}")
+
+
 enable_testing()
 
 add_library(fims_test INTERFACE)
@@ -32,7 +55,14 @@ add_library(fims_test INTERFACE)
 target_include_directories(fims_test
   INTERFACE
     inst/include
+    ${rcpp_SOURCE_DIR}/inst/include
+    ${R_HOME}/include
 )
+
+
+#SET(R_LIB ${R_HOME}/lib/libR)
+
+add_definitions(-DSTD_LIB)
 
 target_compile_definitions(fims_test 
   INTERFACE
