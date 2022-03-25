@@ -8,7 +8,7 @@ The test case documentation below is a general case to apply to many functions/m
 - Feature to be tested
     - The function/module returns correct output values given different input values
     - The function/module returns error messages when users give wrong types of inputs
-    - The function/module notifies an error if the input value is outside the bound of the input parameter
+    - The function/module notifies with an error if the input value is outside the bound of the input parameter
 
 - Approach
     - Prepare expected true values using R
@@ -17,7 +17,7 @@ The test case documentation below is a general case to apply to many functions/m
     - Submit pull request for code review
 
 - Evaluation criteria
-    - The tests pass if the output values equal to the expected true values
+    - The tests pass if the output values equal to the expected true values or the difference between an output value and an expected true value does not exceed an tolerance value (i.e., absolute error) 
     - The tests pass if the function/module returns error messages when users give wrong types of inputs
     - The tests pass if the function/module returns error messages when users provides an input value that is outside the bound of the input parameter
 
