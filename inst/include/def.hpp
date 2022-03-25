@@ -32,6 +32,32 @@
 #ifndef DEF_HPP
 #define DEF_HPP
 
-#define USE_STANDARD_LIB
+#include <vector>
 
-#endif /* DEF_HPP */
+namespace fims {
+
+
+#ifdef STD_LIB
+
+    /**
+     * Default trait. These are "T" specific
+     * traits that depend on modeling platform.
+     */
+    template<typename T>
+    struct FIMSTrait {
+        typedef double real_t;
+        typedef double variable_t;
+        typedef typename std::vector<double> data_vector;
+        typedef typename std::vector<double> variable_vector;
+        typedef typename std::vector<std::vector<double> > data_matrix;
+        typedef typename std::vector<std::vector<double> > variable_matrix;
+
+
+    };
+
+#endif
+}
+
+
+
+#endif /* TRAITS_HPP */
