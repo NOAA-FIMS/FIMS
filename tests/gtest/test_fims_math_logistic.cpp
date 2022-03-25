@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "fims_math.hpp"
+#include "../../inst/include/fims_math.hpp"
 
 namespace
 {

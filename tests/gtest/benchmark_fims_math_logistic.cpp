@@ -1,5 +1,5 @@
 #include "benchmark/benchmark.h"
-#include "fims_math.hpp"
+#include "../../inst/include/fims_math.hpp"
 
 void BM_fims_math_logistic(benchmark::State &state)
 {

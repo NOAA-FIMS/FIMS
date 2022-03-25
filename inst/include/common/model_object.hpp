@@ -40,8 +40,8 @@ namespace fims{
 template<typename T>
 struct FIMSObject{
     uint32_t id;//unique identifier assigned for all fims objects
-    typedef fims::FIMSTraits<T>::VariableT variable_t;
-    typedef fims::FIMSTraits<T>::RealT real_t;
+    typedef typename fims::FIMSTraits<T>::VariableT variable_t;
+    typedef typename fims::FIMSTraits<T>::RealT real_t;
     std::vector<variable_t*> parameters; //list of all estimated parameters
     std::vector<variable_t*> random_effects_parameters; //list of all random effects parameters
     std::vector<variable_t*> fixed_effects_parameters; //list of all fixed effects parameters

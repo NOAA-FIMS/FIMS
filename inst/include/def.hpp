@@ -34,6 +34,8 @@
 
 #include <vector>
 
+
+
 namespace fims {
 
 
@@ -44,9 +46,9 @@ namespace fims {
      * traits that depend on modeling platform.
      */
     template<typename T>
-    struct FIMSTrait {
-        typedef double real_t;
-        typedef double variable_t;
+    struct FIMSTraits {
+        typedef double RealT;
+        typedef double VariableT;
         typedef typename std::vector<double> data_vector;
         typedef typename std::vector<double> variable_vector;
         typedef typename std::vector<std::vector<double> > data_matrix;
@@ -56,6 +58,8 @@ namespace fims {
     };
 
 #endif
+    
+    
 }
 
 
