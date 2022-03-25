@@ -32,7 +32,7 @@ namespace fims {
 /**
  * @brief The exponential function.
  * 
- * @param x value to exponentiate
+ * @param x value to exponentiate. Please use fims::exp<double>(x) if x is an integer.
  * @return the exponentiated value
  */
 template <class T>
@@ -42,7 +42,7 @@ inline const T exp(const T& x) {
 
 /**
  * @brief The natural log function (base e)
- * @param x the value to take the log of
+ * @param x the value to take the log of. Please use fims::log<double>(x) if x is an integer.
  * @return
  */
 template <class T>
