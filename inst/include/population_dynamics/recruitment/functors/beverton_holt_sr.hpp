@@ -46,7 +46,7 @@ namespace fims{
     virtual const Type evaluate(const Type& spawners){
         return fims::beverton_holt_sr(steep, rzero, phizero, spawners);
     }
-  }
+  };
 
 }
 
