@@ -25,6 +25,7 @@ namespace fims{
  * @param steep Recruitment relative to unfished recruitment at 
  * 20% of unfished spawning biomass.
  * @param rzero Unexploited recruitment. 
+ * @param phizero the unfished spawning biomass per recruit.
  */ 
   template<typename Type>
   struct BevertonHoltSR :public RecruitmentBase<Type>{
