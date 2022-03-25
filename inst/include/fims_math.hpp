@@ -20,13 +20,13 @@
 
 //note: this is modeling platform specific, must be controlled by
 //preprocessing macros
-#include "def.hpp"
+//#include "def.hpp"
 #include <cmath>
 
 namespace fims {
 
 
-#ifdef USE_STANDARD_LIB
+#ifdef STD_LIB
 
 
 /**
