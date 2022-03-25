@@ -33,6 +33,7 @@
 #define FIMS_COMMON_MODEL_OBJECT_HPP
 
 #include <vector>
+#include <stdint.h>
 
 namespace fims{
 
