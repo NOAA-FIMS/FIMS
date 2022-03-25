@@ -23,11 +23,11 @@ namespace
   {
     // Test log using large positive integer value
     int large_int = 1000000;
-    EXPECT_EQ(fims::log(large_int), std::log(large_int));
+    EXPECT_EQ(fims::log<double>(large_int), std::log(large_int));
 
     // log(3.0): 1.098612
     int small_int = 3;
-    EXPECT_EQ(fims::log(small_int), 1);
+    EXPECT_EQ(fims::log<double>(small_int), std::log(small_int));
   }
 
   // log(-2.5): NaN

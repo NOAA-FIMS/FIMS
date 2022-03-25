@@ -29,7 +29,7 @@ namespace
 
         // Test exp using large positive integer value
         int input_value = 1000000;
-        EXPECT_EQ(fims::exp(input_value), std::exp(input_value));
+        EXPECT_EQ(fims::exp<double>(input_value), std::exp(input_value));
 
         // Test exp using integer value 3
         // For fims::exp(3): the output value will be an integer if the input value is an integer
