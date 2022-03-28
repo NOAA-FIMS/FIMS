@@ -41,7 +41,7 @@ namespace fims{
     } ; 
 
     template<class Type>
-    uint32_t RecruitmentBase::id_g = 0;
+    uint32_t RecruitmentBase<Type>::id_g = 0;
 }
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP */
