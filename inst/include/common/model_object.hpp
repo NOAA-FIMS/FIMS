@@ -34,6 +34,7 @@
 
 #include <vector>
 #include "../def.hpp"
+#include <stdint.h>
 
 namespace fims{
 

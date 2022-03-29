@@ -1,5 +1,4 @@
 /*
-<<<<<<< HEAD
  * File:   def.hpp
  *
  * Author: Matthew Supernaw
@@ -31,13 +30,9 @@
  */
 #ifndef DEF_HPP
 #define DEF_HPP
-
 #include <vector>
 
-
-
 namespace fims {
-
 
 #ifdef STD_LIB
 
@@ -46,9 +41,9 @@ namespace fims {
      * traits that depend on modeling platform.
      */
     template<typename T>
-    struct FIMSTraits {
-        typedef double RealT;
-        typedef double VariableT;
+    struct FIMSTrait {
+        typedef double real_t;
+        typedef double variable_t;
         typedef typename std::vector<double> data_vector;
         typedef typename std::vector<double> variable_vector;
         typedef typename std::vector<std::vector<double> > data_matrix;
@@ -58,10 +53,5 @@ namespace fims {
     };
 
 #endif
-    
-    
 }
-
-
-
 #endif /* TRAITS_HPP */
