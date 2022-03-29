@@ -52,14 +52,14 @@ inline const T log(const T& x) {
 
 /**
  * @brief The general logistic function
- * @param mean the mean (inflection point) of the logistic function
+ * @param median the median (inflection point) of the logistic function
  * @param slope the slope of the logistic function
  * @param x the index the logistic function should be evaluated at
  * @return
  */
 template <class T>
-inline const T logistic(const T& mean, const T& slope, const T& x) {
-    return (1.0) / (1.0 + exp(-1.0 * (x - mean) / slope));
+inline const T logistic(const T& median, const T& slope, const T& x) {
+    return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
 }
 
 #endif
