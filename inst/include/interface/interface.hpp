@@ -67,14 +67,14 @@ RCPP_MODULE(fims) {
     Rcpp::function("hello_fims", hello_fims);
 };
 
-RCPP_MODULE(LogisticSelectivity) {
-  class_<LogisticSelectivity>("LogisticSelectivity")
-  .constructor<LogisticSelectivity>()
-  .field("a50", &LogisticSelectivity::a50)
-  .field("slope", &LogisticSelectivity::slope)
-  .method("evaluate", &LogisticSelectivity::evaluate)
-  ;
-}
+// RCPP_MODULE(LogisticSelectivity) {
+//   class_<LogisticSelectivity>("LogisticSelectivity")
+//   .constructor<LogisticSelectivity>()
+//   .field("a50", &LogisticSelectivity::a50)
+//   .field("slope", &LogisticSelectivity::slope)
+//   .method("evaluate", &LogisticSelectivity::evaluate)
+//   ;
+// }
 
 #endif /* FIMS_INTERFACE_HPP */
 
