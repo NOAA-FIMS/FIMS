@@ -45,7 +45,7 @@ vignettes/*.pdf
 *.dll
 
 # CMake build files
-/build
+/tests/gtest/build
 
 # C++ ignore files
 # Prerequisites
