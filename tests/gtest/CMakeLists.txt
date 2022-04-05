@@ -3,7 +3,7 @@
 include(GoogleTest)
 
 # Add tests: specify add_executable and target_link_libraries 
-# test_fims_math_exp.cpp
+# test_population_dynamics_selectivity_logistic
 add_executable(population_dynamics_selectivity_logistic
   test_population_dynamics_selectivity_logistic.cpp
 )
