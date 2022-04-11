@@ -29,19 +29,24 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googlebenchmark)
 
 # Set up doxygen: download doxygen 1.9.3 and add it to the PATH
-find_package(Doxygen)
+option(BUILD_DOC "Build documentation" OFF)
+IF(BUILD_DOC)
+  find_package(Doxygen)
 
-# Disable all preprocessing so doxygen will read all statements 
-# when evaluating conditional compilation statements (e.g., #ifdef in fims_math.h)
-set(DOXYGEN_ENABLE_PREPROCESSING NO) 
-set(DOXYGEN_QUIET YES)
+  # Disable all preprocessing so doxygen will read all statements 
+  # when evaluating conditional compilation statements (e.g., #ifdef in fims_math.h)
+  set(DOXYGEN_ENABLE_PREPROCESSING NO) 
+  set(DOXYGEN_QUIET YES)
 
-doxygen_add_docs(fims_doxygen
-  inst/include
-  src
-  ALL
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  COMMENT "Building documentation with Doxygen.")
+  doxygen_add_docs(fims_doxygen
+    inst/include
+    src
+    ALL
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+    COMMENT "Building documentation with Doxygen.")
+ENDIF()
+  
+
 
 # Set up Rcpp
 FetchContent_Declare(
