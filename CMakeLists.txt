@@ -29,7 +29,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googlebenchmark)
 
 # Set up doxygen: download doxygen 1.9.3 and add it to the PATH
-option(BUILD_DOC "Build documentation" OFF)
+option(BUILD_DOC "Build documentation" ON)
 IF(BUILD_DOC)
   find_package(Doxygen)
 

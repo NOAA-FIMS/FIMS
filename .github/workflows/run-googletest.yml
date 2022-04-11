@@ -21,7 +21,7 @@ jobs:
 
     - name: Configure
       run: |
-        cmake -S . -B build -G Ninja
+        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja
         
     - name: Build
       run: |  

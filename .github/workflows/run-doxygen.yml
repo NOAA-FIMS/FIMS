@@ -32,7 +32,7 @@ jobs:
     
     - name: Building HTML documentation with Doxygen
       run: |
-        cmake -S . -B build -DBUILD_DOC=ON -G Ninja
+        cmake -S . -B build -G Ninja
         cmake --build build --parallel 16
         mkdir docs
         mv build/html docs
