@@ -22,20 +22,22 @@ jobs:
       run: |
         sudo apt update
         sudo apt install cmake doxygen gcc git
-    
-    - name: Building HTML documentation with Doxygen
-      run: |
-        cmake -S . -B build -G Ninja
-        cmake --build build --parallel 16
-        mkdir docs/doxygen
-        mv build/html docs/doxygen
-
+  
     - name: get last commit msg
         id: commit-msg
         run: |
           git tag
           last_commit_msg=$(git log -1 --pretty=%B)
           echo "::set-output name=msg::${last_commit_msg}"
+    
+    - name: Building HTML documentation with Doxygen
+      run: |
+        cmake -S . -B build -DBUILD_DOC=ON -G Ninja
+        cmake --build build --parallel 16
+        mkdir docs/doxygen
+        mv build/html docs/doxygen
+
+    
     
     - name: Create Pull Request
           if: ${{ !contains(steps.commit-msg.outputs.msg, 'document') }}
