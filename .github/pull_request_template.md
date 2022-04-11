@@ -17,7 +17,7 @@ Please include a test file and/or Github workflow.
 
 # Developer pre-PR Checklist
 
-Please do these steps locally for big changes. Note github actions does all of these checks automatically when pushing to the repository.
+Please do these steps locally for big changes. Note GitHub Actions does all of these checks automatically when pushing to the repository. Please see [code development section in the contributor guide](https://noaa-fims.github.io/collaborative_workflow/contributor-guidelines.html#code-development) for details.
 
 - [ ] Run [cmake build and ctest locally](https://noaa-fims.github.io/collaborative_workflow/testing.html#c-unit-testing-and-benchmarking) and make sure the C++ tests pass
 - [ ] Run `devtools::document()` locally and push changes to the remote feature branch
