@@ -24,11 +24,11 @@ jobs:
         sudo apt install cmake doxygen gcc git
   
     - name: get last commit msg
-        id: commit-msg
-        run: |
-          git tag
-          last_commit_msg=$(git log -1 --pretty=%B)
-          echo "::set-output name=msg::${last_commit_msg}"
+      id: commit-msg
+      run: |
+        git tag
+        last_commit_msg=$(git log -1 --pretty=%B)
+        echo "::set-output name=msg::${last_commit_msg}"
     
     - name: Building HTML documentation with Doxygen
       run: |
@@ -37,8 +37,6 @@ jobs:
         mkdir docs/doxygen
         mv build/html docs/doxygen
 
-    
-    
     - name: Create Pull Request
           if: ${{ !contains(steps.commit-msg.outputs.msg, 'document') }}
           uses: peter-evans/create-pull-request@v3
