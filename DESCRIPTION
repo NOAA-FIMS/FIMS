@@ -29,7 +29,7 @@ Authors@R:
       person(c("Edward", "J."), "Dick", role = "aut",
            comment = c(ORCID = "0000-0001-7681-9176")),
       person("Jon", "Brodziak", role = "aut"),
-      person("Kristan", "Blackhart", role = "aut"),
+      person("Kristan", "Blackhart", role = "aut")
      )
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
