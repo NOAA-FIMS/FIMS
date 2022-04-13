@@ -98,13 +98,13 @@ om_bias_cor <- FALSE
 bias_cor_method <- "none" # Options: "none", "median_unbiased", and "mean_unbiased"
 em_bias_cor <- FALSE
 
-
 # Case 1 : null case -----------------------------------------------------------
 
 null_case_input <- ASSAMC::save_initial_input(base_case = TRUE, case_name = "C1")
 
 ## Run OM
 ASSAMC::run_om(input_list = null_case_input, show_iter_num = T)
+
 
 # Case 2 : change logR_sd from 0.4 to 0.6 --------------------------------------
 
@@ -115,3 +115,46 @@ ASSAMC::run_om(input_list = null_case_input, show_iter_num = T)
 #   logR_sd = 0.6
 # )
 # run_om(input_list = updated_input, show_iter_num = F)
+
+# modfy the generated data set
+rm(list = ls()) # to get rid of all the other obj cluttering workspace
+load("OM1.RData")
+
+# from the output we need:
+om_output$survey_index
+om_output$survey_age_comp
+om_output$L.mt # landings in mt (there are also landings at age from the OM)
+
+# In addition, we need:
+om_input$cv.L
+om_input$cv.survey
+om_input$n.survey
+
+trend_data <- data.frame(
+    type = "trend",
+    name = "Survey",
+    age = NA, # The inputs are not by age in this case.
+    year = om_input$year, # may want to add fractional components to this to indicate timing.
+    value = om_output$survey_index
+    unit = "numbers", # I think?
+    SE = om_input$cv.survey # Is this ok?
+)
+
+matrix_convert_comp_data <- as.data.frame(om_output$survey_age_comp)
+colnames(matrix_convert_comp_data)  <- om_input$ages
+matrix_convert_comp_data$year <- om_input$year
+age_comp_data <- tidyr::pivot_longer(matrix_convert_comp_data, 
+  cols = om_input$ages, 
+  names_to = "age",
+  values_to = "value")
+
+age_comp_data$name <- "Survey"
+age_comp_data$type <- "agecomp"
+age_comp_data$unit <- "numbers"
+age_comp_data$samp_size <- om_input$n.survey # or should this be SE col?
+
+# order the same as trend data.
+age_comp_data <- age_comp_data[,c("type", "name", "age", "year", "value", "unit", "SE" )]
+
+# From the paper it sounds like there should be agecomp for the fishery, but I don't
+# see this in the om_output.
