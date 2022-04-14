@@ -116,31 +116,37 @@ ASSAMC::run_om(input_list = null_case_input, show_iter_num = T)
 # )
 # run_om(input_list = updated_input, show_iter_num = F)
 
-# modfy the generated data set
+# modfy the generated data set ------
+
 rm(list = ls()) # to get rid of all the other obj cluttering workspace
-load("OM1.RData")
+load("C1/output/OM/OM1.RData")
 
-# from the output we need:
-om_output$survey_index
-om_output$survey_age_comp
-om_output$L.mt # landings in mt (there are also landings at age from the OM)
+# landings 
 
-# In addition, we need:
-om_input$cv.L
-om_input$cv.survey
-om_input$n.survey
+landings_data <- data.frame(
+    type = "landings", # cor catch?
+    name = names(om_output$L.mt)[1],
+    age = NA, # The inputs are not by age in this case, but there is a by age option.
+    year = om_input$year, # may want to add fractional components to this to indicate timing.
+    value = om_output$L.mt[[1]], # note only 1 fleet in this case tho
+    unit = "mt", # metric tons
+    SE_or_nsamp = om_input$cv.L[[1]] # Is this ok?
+)
+
+# survey trend (index of abundance)
 
 trend_data <- data.frame(
     type = "trend",
-    name = "Survey",
+    name = names(om_output$survey_index)[1],
     age = NA, # The inputs are not by age in this case.
     year = om_input$year, # may want to add fractional components to this to indicate timing.
-    value = om_output$survey_index
+    value = om_output$survey_index[[1]],
     unit = "numbers", # I think?
-    SE = om_input$cv.survey # Is this ok?
+    SE_or_nsamp = om_input$cv.survey[[1]] # Is this ok?
 )
 
-matrix_convert_comp_data <- as.data.frame(om_output$survey_age_comp)
+# survey comp data
+matrix_convert_comp_data <- as.data.frame(om_output$survey_age_comp[[1]])
 colnames(matrix_convert_comp_data)  <- om_input$ages
 matrix_convert_comp_data$year <- om_input$year
 age_comp_data <- tidyr::pivot_longer(matrix_convert_comp_data, 
@@ -148,13 +154,28 @@ age_comp_data <- tidyr::pivot_longer(matrix_convert_comp_data,
   names_to = "age",
   values_to = "value")
 
-age_comp_data$name <- "Survey"
-age_comp_data$type <- "agecomp"
+age_comp_data$name <- names(om_output$survey_age_comp)[1]
+age_comp_data$type <- "agecomp" # or rather agefrequency???
 age_comp_data$unit <- "numbers"
-age_comp_data$samp_size <- om_input$n.survey # or should this be SE col?
+age_comp_data$SE_or_nsamp <- om_input$n.survey[[1]] # or should this be SE col?
 
 # order the same as trend data.
-age_comp_data <- age_comp_data[,c("type", "name", "age", "year", "value", "unit", "SE" )]
+age_comp_data <- 
+  age_comp_data[,c("type", "name", "age", "year", "value", "unit", "SE_or_nsamp" )]
 
 # From the paper it sounds like there should be agecomp for the fishery, but I don't
 # see this in the om_output.
+
+# bind together into a single data frame
+
+data_df <- rbind(landings_data, trend_data, age_comp_data)
+data_df <- type.convert(data_df, as.is = TRUE)
+write.csv(data_df, 
+  file.path("C1", "output", "OM", "FIMS_input_data.csv"),
+  row.names = FALSE)
+
+# check csv can be read into r well ----
+test_read <- read.csv(file.path("C1", "output", "OM", "FIMS_input_data.csv"))
+
+# TODO: need to add in timing? (maybe as fractional component of year??)
+# go over questions in script
