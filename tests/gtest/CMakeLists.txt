@@ -36,3 +36,16 @@ target_link_libraries(benchmark_place_holder1
   fims_test
   benchmark_main
 )
+
+# test_sr_beverton_holt.cpp
+add_executable(test_sr_beverton_holt
+  test_sr_beverton_holt.cpp
+)
+
+target_link_libraries(test_sr_beverton_holt
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(test_sr_beverton_holt)
+

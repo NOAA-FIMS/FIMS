@@ -10,11 +10,11 @@
  * Inherits from recruitment base. 
  * 
  */
-#ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_SR_HPP
-#define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_SR_HPP
+#ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
+#define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 
 #include "../../../interface/interface.hpp"
-#include "../../../fims_math.hpp"
+#include "../../../common/fims_math.hpp"
 #include "recruitment_base.hpp"
 
 namespace fims{
@@ -28,13 +28,16 @@ namespace fims{
  * @param phizero the unfished spawning biomass per recruit.
  */ 
   template<typename Type>
-  struct BevertonHoltSR :public RecruitmentBase<Type>{
+  struct SRBevertonHolt :public RecruitmentBase<Type>{
 
+    //Here we define the members that will be used in the Beverton Holt SR function.
+    //These members are needed by Beverton Holt but will not be common to all 
+    //recruitment functions like spawners is below.
     Type steep;
     Type rzero;
     Type phizero;
 
-    BevertonHoltSR():RecruitmentBase<Type>(){
+    SRBevertonHolt():RecruitmentBase<Type>(){
     }
 
 /* @brief Beverton Holt implementation of the stock recruitment function.
@@ -45,11 +48,14 @@ namespace fims{
 * @param spawners A measure of spawning output.
 */
     virtual const Type evaluate(const Type& spawners){
-        return fims::beverton_holt_sr(steep, rzero, phizero, spawners);
+        
+              Type recruits;
+              recruits = (0.8 * rzero * steep * spawners)/(0.2 * rzero * phizero * (1.0 - steep) + spawners * (steep - 0.2));
+              return recruits;
     }
   };
 
 }
 
-#endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BEVERTON_HOLT_SR_HPP */
+#endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP */
 

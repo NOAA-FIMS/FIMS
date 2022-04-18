@@ -37,15 +37,7 @@
 #include <cmath>
 
 namespace fims {
-    template<class Type>
-    inline const Type beverton_holt_sr(const Type& steep, const Type& rzero, const Type& phizero, const Type& spawners) {
-        Type recruits;
-        recruits = (0.8 * rzero * steep * spawners)/(0.2 * rzero * phizero * (1.0 - steep) + spawners * (steep - 0.2));
-        return recruits;
-    }
-
-
-
+    
 }
 
 
