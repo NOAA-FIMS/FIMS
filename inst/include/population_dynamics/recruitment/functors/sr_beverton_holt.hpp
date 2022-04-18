@@ -14,7 +14,6 @@
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 
 #include "../../../interface/interface.hpp"
-#include "../../../common/fims_math.hpp"
 #include "recruitment_base.hpp"
 
 namespace fims{
@@ -23,9 +22,9 @@ namespace fims{
  * from fims_math.
  *
  * @param steep Recruitment relative to unfished recruitment at 
- * 20% of unfished spawning biomass.
- * @param rzero Unexploited recruitment. 
- * @param phizero the unfished spawning biomass per recruit.
+ * 20% of unfished spawning biomass. Should be a value between 0.2 and 1.0.
+ * @param rzero Unexploited recruitment. Should be a positive value.
+ * @param phizero the unfished spawning biomass per recruit. Should be a positive value.
  */ 
   template<typename Type>
   struct SRBevertonHolt :public RecruitmentBase<Type>{
