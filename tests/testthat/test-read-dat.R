@@ -130,7 +130,7 @@ landings_data <- data.frame(
     year = om_input$year, # may want to add fractional components to this to indicate timing.
     value = om_output$L.mt[[1]], # note only 1 fleet in this case tho
     unit = "mt", # metric tons
-    SE_or_nsamp = om_input$cv.L[[1]] # Is this ok?
+    family = paste0("ilnorm(CV=", om_input$cv.L[[1]], ")")
 )
 
 # survey trend (index of abundance)
@@ -142,7 +142,7 @@ trend_data <- data.frame(
     year = om_input$year, # may want to add fractional components to this to indicate timing.
     value = om_output$survey_index[[1]],
     unit = "numbers", # I think?
-    SE_or_nsamp = om_input$cv.survey[[1]] # Is this ok?
+    family = paste0("ilnorm(CV=", om_input$cv.survey[[1]], ")") # Is this ok?
 )
 
 # survey comp data
@@ -157,11 +157,11 @@ age_comp_data <- tidyr::pivot_longer(matrix_convert_comp_data,
 age_comp_data$name <- names(om_output$survey_age_comp)[1]
 age_comp_data$type <- "agecomp" # or rather agefrequency???
 age_comp_data$unit <- "numbers"
-age_comp_data$SE_or_nsamp <- om_input$n.survey[[1]] # or should this be SE col?
+age_comp_data$family <- paste0("imultinom(size=", om_input$n.survey[[1]], ")") # I think size is consistent with r function??
 
 # order the same as trend data.
 age_comp_data <- 
-  age_comp_data[,c("type", "name", "age", "year", "value", "unit", "SE_or_nsamp" )]
+  age_comp_data[,c("type", "name", "age", "year", "value", "unit", "family" )]
 
 # From the paper it sounds like there should be agecomp for the fishery, but I don't
 # see this in the om_output.
@@ -179,3 +179,7 @@ test_read <- read.csv(file.path("C1", "output", "OM", "FIMS_input_data.csv"))
 
 # TODO: need to add in timing? (maybe as fractional component of year??)
 # go over questions in script
+
+# Add in Distribution to the error distribution column
+# family
+# 
