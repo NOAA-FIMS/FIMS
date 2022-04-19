@@ -56,9 +56,9 @@ struct SelectivityBase : public FIMSObject<T> {
 
     /*
     * @brief Calculates the selectivity at age.
-    * @param age The age of the individual.
+    * @param x The independent variable in the logistic function (e.g., age or size in selectivity).
     */
-    virtual const T evaluate(const T& age) = 0;
+    virtual const T evaluate(const T& x) = 0;
 
 };
 

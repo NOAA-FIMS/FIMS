@@ -11,7 +11,7 @@
 
 
 //#include "../../../interface/interface.hpp"
-#include "../../../fims_math.hpp"
+#include "../../../common/fims_math.hpp"
 #include "selectivity_base.hpp"
 
 namespace fims {
