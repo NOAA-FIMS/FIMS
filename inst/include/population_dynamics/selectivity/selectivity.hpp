@@ -15,6 +15,7 @@
 #define FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP
 
 #include "functors/selectivity_base.hpp"
+#include "functors/logistic.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP */
 
