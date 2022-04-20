@@ -30,9 +30,11 @@ struct LogisticSelectivity : public SelectivityBase<T> {
     }
 
     /**
-    * @brief 
+    * @brief Method of the logistic selectivity class that implements the logistic function from FIMS math.
     * 
-    * @param x  description
+    * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - median))} \f$
+    * 
+    * @param x  The independent variable in the logistic function (e.g., age or size in selectivity).
     */
     virtual const T evaluate(const T& x) {
         return fims::logistic<T>(median, slope, x);

@@ -52,6 +52,9 @@ inline const T log(const T& x) {
 
 /**
  * @brief The general logistic function
+ * 
+ * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - median))} \f$
+ * 
  * @param median the median (inflection point) of the logistic function
  * @param slope the slope of the logistic function
  * @param x the index the logistic function should be evaluated at
