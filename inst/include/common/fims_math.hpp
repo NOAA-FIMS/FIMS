@@ -9,7 +9,7 @@
  * Created on September 30, 2021, 1:43 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the 
+ * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
  * Please cite the author(s) in any work or product based on this material.
@@ -26,12 +26,12 @@
 namespace fims {
 
 
-#ifdef STD_LIB
+
 
 
 /**
  * @brief The exponential function.
- * 
+ *
  * @param x value to exponentiate. Please use fims::exp<double>(x) if x is an integer.
  * @return the exponentiated value
  */
@@ -52,9 +52,9 @@ inline const T log(const T& x) {
 
 /**
  * @brief The general logistic function
- * 
+ *
  * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - median))} \f$
- * 
+ *
  * @param median the median (inflection point) of the logistic function
  * @param slope the slope of the logistic function
  * @param x the index the logistic function should be evaluated at
@@ -65,7 +65,7 @@ inline const T logistic(const T& median, const T& slope, const T& x) {
     return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
 }
 
-#endif
+
 
 }
 
