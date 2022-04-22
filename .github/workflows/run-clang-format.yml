@@ -1,0 +1,35 @@
+# Run clang-format
+# This workflow runs clang-format to format C++ code and then commit the
+# changed files to the branch. More details about clang-format can be
+# found here: https://clang.llvm.org/docs/ClangFormat.html. The website 
+# also provides instructions on how to use clang-format in VS Code.
+
+name: run-clang-format
+
+on:
+# Runs the workflow on each push to the main or master branch
+  push:
+    # branches: [main, master]
+
+jobs:
+  job:
+    name: run-clang-format
+    runs-on: ubuntu-latest
+
+    # Format hpp and cpp files under inst/include, src/, and test/gtest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: DoozyX/clang-format-lint-action@v0.13
+      with:
+        source: './inst/include ./src ./test/gtest'
+        extensions: 'hpp, cpp'
+        clangFormatVersion: 13.0.0
+        style: Google
+    # Commit the changed files    
+    - uses: EndBug/add-and-commit@v4
+      with:
+        author_name: Clang Robot
+        author_email: robot@example.com
+        message: 'Committing clang-format changes'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
