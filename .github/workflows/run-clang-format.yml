@@ -9,9 +9,8 @@
 name: run-clang-format
 
 on:
-# Runs the workflow on each push to the main or master branch
-  push:
-    # branches: [main, master]
+# Runs the workflow on a pull request
+  pull_request:
 
 jobs:
   job:
