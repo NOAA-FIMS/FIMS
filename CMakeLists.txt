@@ -1,4 +1,6 @@
-# Top level CMakeLists.txt: setting up top level project dependencies and options
+# Top level CMakeLists.txt: setting up top level project dependencies 
+# and options. CMake Referecen documentation can be found here:
+# https://cmake.org/cmake/help/v3.22/
 cmake_minimum_required(VERSION 3.14)
 project(FIMS
   CXX
@@ -15,7 +17,8 @@ FetchContent_Declare(
   URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip
 )
 
-# For Windows: Prevent overriding the parent project's compiler/linker settings
+# For Windows: Prevent overriding the parent project's compiler/linker 
+# settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
@@ -34,7 +37,8 @@ IF(BUILD_DOC)
   find_package(Doxygen)
 
   # Disable all preprocessing so doxygen will read all statements 
-  # when evaluating conditional compilation statements (e.g., #ifdef in fims_math.h)
+  # when evaluating conditional compilation statements 
+  # (e.g., #ifdef in fims_math.h)
   set(DOXYGEN_ENABLE_PREPROCESSING NO) 
   set(DOXYGEN_QUIET YES)
 
@@ -46,8 +50,6 @@ IF(BUILD_DOC)
     COMMENT "Building documentation with Doxygen.")
 ENDIF()
   
-
-
 # Set up Rcpp
 FetchContent_Declare(
   rcpp
@@ -70,10 +72,13 @@ EXECUTE_PROCESS(
 
 MESSAGE(STATUS "R_HOME is ${R_HOME}")
 
+# Enable testing for current directory and below
 enable_testing()
 
+# Creates an interface library fims_test
 add_library(fims_test INTERFACE)
 
+# Add include directories to the fims_test target
 target_include_directories(fims_test
   INTERFACE
     inst/include
@@ -81,14 +86,11 @@ target_include_directories(fims_test
     ${R_HOME}/include
 )
 
-
-#SET(R_LIB ${R_HOME}/lib/libR)
-
-add_definitions(-DSTD_LIB)
-
+# Add compile definition STD_LIB to the fims_test target.
 target_compile_definitions(fims_test 
   INTERFACE
     STD_LIB
 )
 
+# Add a subdirectory to the build
 add_subdirectory(tests/gtest)
