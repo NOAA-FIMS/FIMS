@@ -31,15 +31,11 @@
 #ifndef FIMS_MATH_HPP
 #define FIMS_MATH_HPP
 
-//note: this is modeling platform specific, must be controlled by
-//preprocessing macros
+// note: this is modeling platform specific, must be controlled by
+// preprocessing macros
 //#include "def.hpp"
 #include <cmath>
 
-namespace fims {
-
-}
-
+namespace fims {}
 
 #endif /* FIMS_MATH_HPP */
-
