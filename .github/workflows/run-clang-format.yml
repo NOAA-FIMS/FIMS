@@ -25,6 +25,8 @@ jobs:
         extensions: 'hpp, cpp'
         clangFormatVersion: 13.0.0
         style: Google
+        inplace: True
+        
     # Commit the changed files    
     - uses: EndBug/add-and-commit@v4
       with:
