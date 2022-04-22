@@ -22,8 +22,8 @@ namespace fims {
  */ 
 template<typename T>
 struct sub_modulemodule_name : public module_nameBase<T> {
-    T median;/*!< 50% quantile of the value of the quantity of interest (x); e.g. age at which 50% of the fish are selected */
-    T slope; /*!<scalar multiplier of difference between quantity of interest value (x) and median */
+    //add submodule class members here
+    //these include parameters of the submodule
 
     sub_modulemodule_name(): module_nameBase<T>(){
 
@@ -35,7 +35,8 @@ struct sub_modulemodule_name : public module_nameBase<T> {
     * @param x  description
     */
     virtual const T evaluate(const T& x) {
-        return fims::sub_module<T>(median, slope, x);
+        //you will need to add class members as arguments to the function below
+        return fims::sub_module<T>(x);
     }
 };
 
