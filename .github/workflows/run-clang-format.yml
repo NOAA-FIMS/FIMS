@@ -11,6 +11,7 @@ name: run-clang-format
 on:
 # Runs the workflow on a pull request
   pull_request:
+    types: [opened, reopened, edited, synchronize]
 
 jobs:
   job:
