@@ -33,23 +33,20 @@
 
 #include <memory>
 
-#include "../population_dynamics/population/population.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
+#include "../population_dynamics/population/population.hpp"
 
-namespace fims
-{
+namespace fims {
 
-    /**
-     * Model base
-     */
-    template <typename T>
-    class Model
-    {
+/**
+ * Model base
+ */
+template <typename T>
+class Model {
+  std::vector < std::shared_ptr<Population<T>> populations;
+  std::vector < std::shared_ptr<Fleet<T>> fleets;
+};
 
-        std::vector < std::shared_ptr<Population<T>> populations;
-        std::vector < std::shared_ptr<Fleet<T>> fleets;
-    };
-
-}
+}  // namespace fims
 
 #endif /* FIMS_COMMON_MODEL_HPP */

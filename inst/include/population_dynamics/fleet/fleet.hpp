@@ -1,18 +1,18 @@
 /*
-  * File:   fleet.hpp
-*
-  * Author: Matthew Supernaw
-* National Oceanic and Atmospheric Administration
-* National Marine Fisheries Service
-* Email: matthew.supernaw@noaa.gov
-*
-  * Created on September 30, 2021, 1:12 PM
-*
-  * This File is part of the NOAA, National Marine Fisheries Service
-* Fisheries Integrated Modeling System project.
-*
-  * This software is a "United States Government Work" under the terms of the
-* United States Copyright Act.  It was written as part of the author's official
+ * File:   fleet.hpp
+ *
+ * Author: Matthew Supernaw
+ * National Oceanic and Atmospheric Administration
+ * National Marine Fisheries Service
+ * Email: matthew.supernaw@noaa.gov
+ *
+ * Created on September 30, 2021, 1:12 PM
+ *
+ * This File is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project.
+ *
+ * This software is a "United States Government Work" under the terms of the
+ * United States Copyright Act.  It was written as part of the author's official
  * duties as a United States Government employee and thus cannot be copyrighted.
  * This software is freely available to the public for use. The National Oceanic
  * And Atmospheric Administration and the U.S. Government have not placed any
@@ -33,15 +33,11 @@
 
 #include "../../common/model_object.hpp"
 
-namespace fims{
+namespace fims {
 
-template<typename T>
-struct Fleet{
+template <typename T>
+struct Fleet {};
 
-
-};
-
-}
-
+}  // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */
