@@ -2,6 +2,4 @@
 
 export(mkObj)
 importFrom(TMB,MakeADFun)
-useDynLib(FIMS, .registration=TRUE)
-#required for module loading
-importFrom(Rcpp, evalCpp)
+useDynLib(FIMS)
