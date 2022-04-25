@@ -38,12 +38,14 @@
 
 // traits for interfacing with TMB
 #ifdef TMB_MODEL
-
+// use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check issue
+#include <math.h>
 //#define TMB_LIB_INIT R_init_FIMS
 #include <TMB.hpp>
 
 template <typename Type>
-struct ModelTraits {
+struct ModelTraits
+{
   typedef typename CppAD::vector<Type> DataVector;
   typedef typename CppAD::vector<Type> ParameterVector;
 };
