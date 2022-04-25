@@ -18,4 +18,3 @@
 #include "functors/sr_beverton_holt.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP */
-
