@@ -18,7 +18,7 @@
 
 namespace fims{
 
- /* @brief BevertonHolt class that returns the Beverton Holt SR
+ /** @brief BevertonHolt class that returns the Beverton Holt SR
  * from fims_math.
  *
  * @param steep Recruitment relative to unfished recruitment at 
@@ -39,7 +39,7 @@ namespace fims{
     SRBevertonHolt():RecruitmentBase<Type>(){
     }
 
-/* @brief Beverton Holt implementation of the stock recruitment function.
+/** @brief Beverton Holt implementation of the stock recruitment function.
 *
 * The Beverton Holt stock recruitment implementation:
 * \f$ \frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h - 0.2)} \f$

@@ -18,7 +18,7 @@
 
 namespace fims{
 
-/* @brief Base class for all recruitment functors.
+/** @brief Base class for all recruitment functors.
 * 
 * @tparam Type The type of the recruitment functor.
 * 
@@ -27,13 +27,13 @@ namespace fims{
     struct RecruitmentBase : public FIMSObject<Type>{
         static uint32_t id_g;
 
-/* @brief Constructor.
+/** @brief Constructor.
 */
         RecruitmentBase(){
             this->id = RecruitmentBase::id_g++;
         }
 
-/* @brief Calculates the expected recruitment for a given spawning input.
+/** @brief Calculates the expected recruitment for a given spawning input.
 *
 * @param spawners A measure for spawning output.
 */
