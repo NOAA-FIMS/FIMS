@@ -32,9 +32,9 @@ namespace fims{
     //Here we define the members that will be used in the Beverton Holt SR function.
     //These members are needed by Beverton Holt but will not be common to all 
     //recruitment functions like spawners is below.
-    Type steep;
-    Type rzero;
-    Type phizero;
+    Type steep;/*!< Recruitment relative to unfished recruitment at 20% of unfished spawning biomass. Should be a value between 0.2 and 1.0.*/
+    Type rzero; /*!< Unexploited recruitment. Should be a positive value.*/
+    Type phizero;/*!< The unfished spawning biomass per recruit. Should be a positive value.*/
 
     SRBevertonHolt():RecruitmentBase<Type>(){
     }
