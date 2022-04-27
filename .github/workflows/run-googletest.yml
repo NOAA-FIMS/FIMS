@@ -4,7 +4,6 @@ name: run-googletest
 on:
 # The default build trigger is to run the action on every push and pull request, for any branch
   push:
-  pull_request:
   # To run the default repository branch weekly on sunday, uncomment the following 2 lines
   #schedule:
     #- cron: '0 0 * * 0'
@@ -22,7 +21,7 @@ jobs:
 
     - name: Configure
       run: |
-        cmake -S . -B build -G Ninja
+        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja
         
     - name: Build
       run: |  

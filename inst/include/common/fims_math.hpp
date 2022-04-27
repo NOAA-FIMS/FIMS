@@ -18,8 +18,8 @@
 #ifndef FIMS_MATH_HPP
 #define FIMS_MATH_HPP
 
-//note: this is modeling platform specific, must be controlled by
-//preprocessing macros
+// note: this is modeling platform specific, must be controlled by
+// preprocessing macros
 //#include "def.hpp"
 #include <cmath>
 
@@ -70,4 +70,3 @@ inline const T logistic(const T& median, const T& slope, const T& x) {
 }
 
 #endif /* FIMS_MATH_HPP */
-

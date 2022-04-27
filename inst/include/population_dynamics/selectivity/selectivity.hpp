@@ -18,4 +18,3 @@
 #include "functors/logistic.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP */
-

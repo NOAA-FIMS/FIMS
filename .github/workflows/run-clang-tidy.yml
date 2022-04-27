@@ -7,7 +7,6 @@ name: run-clang-tidy
 on:
   # The default build trigger is to run the action on every push and pull request, for any branch
   push:
-  pull_request:
   # To run the default repository branch weekly on sunday, uncomment the following 2 lines
   #schedule:
     #- cron: '0 0 * * 0'
@@ -39,6 +38,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=clang++
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         -DGTEST_COMPILE_COMMANDS=OFF
+        -DBUILD_DOC=OFF
 
     - name: run
       shell: bash

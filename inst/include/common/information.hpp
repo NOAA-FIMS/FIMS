@@ -34,38 +34,27 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include "model_object.hpp"
-#include "../interface/interface.hpp"
 
+#include "../interface/interface.hpp"
+#include "model_object.hpp"
 
 namespace fims {
 
 /**
  * Contains all objects and data pre-model construction
  */
-template<typename T>
+template <typename T>
 class Information {
-    public:
-    typedef fims::FIMSTraits<T>::VariableT variable_t;
-    typedef fims::FIMSTraits<T>::RealT real_t;
-    std::vector<variable_t*> parameters; //list of all estimated parameters
-    std::vector<variable_t*> random_effects_parameters; //list of all random effects parameters
-    std::vector<variable_t*> fixed_effects_parameters; //list of all fixed effects parameters
+  typedef fims::FIMSTrait<T>::variable_t variable_t;
+  typedef fims::FIMSTrait<T>::real_t real_t;
+  std::vector<variable_t*> parameters;  // list of all estimated parameters
+  std::vector<variable_t*>
+      random_effects_parameters;  // list of all random effects parameters
+  std::vector<variable_t*>
+      fixed_effects_parameters;  // list of all fixed effects parameters
 
-/**
- * @brief Create a Model object
- * 
- * @return true if sucessful
- * @return false on failure
- */
-    bool CreateModel(){
-
-    }
-
+  bool CreateModel() {}
 };
-}
-
-
+}  // namespace fims
 
 #endif /* FIMS_COMMON_INFORMATION_HPP */
-

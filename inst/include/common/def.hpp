@@ -36,22 +36,21 @@ namespace fims {
 
 #ifdef STD_LIB
 
-    /**
-     * Default trait. These are "T" specific
-     * traits that depend on modeling platform.
-     */
-    template<typename T>
-    struct FIMSTraits {
-        typedef double real_t;
-        typedef double variable_t;
-        typedef typename std::vector<double> data_vector;
-        typedef typename std::vector<double> variable_vector;
-        typedef typename std::vector<std::vector<double> > data_matrix;
-        typedef typename std::vector<std::vector<double> > variable_matrix;
-
-
-    };
+/**
+ * Default trait. These are "T" specific
+ * traits that depend on modeling platform.
+ */
+template <typename T>
+struct FIMSTraits {
+  typedef double real_t;
+  typedef double variable_t;
+  typedef typename std::vector<double> data_vector;
+  typedef typename std::vector<double> variable_vector;
+  typedef typename std::vector<std::vector<double> > data_matrix;
+  typedef typename std::vector<std::vector<double> > variable_matrix;
+};
 
 #endif
-}
+}  // namespace fims
+
 #endif /* TRAITS_HPP */
