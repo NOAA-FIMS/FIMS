@@ -21,7 +21,8 @@ namespace fims {
 /** @brief Base class for all selectivity functors.
  *
  * @tparam T The type of the selectivity functor.
- * /
+ */
+
 template<typename T>
 struct SelectivityBase : public FIMSObject<T> {
     
@@ -32,7 +33,7 @@ struct SelectivityBase : public FIMSObject<T> {
     static uint32_t id_g;
     
     /** @brief Constructor.
-    **/
+    */
     SelectivityBase() {
         // increment id of the singleton selectivity class
         this->id = SelectivityBase::id_g++;
