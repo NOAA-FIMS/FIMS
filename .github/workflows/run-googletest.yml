@@ -20,6 +20,7 @@ jobs:
     - uses: seanmiddleditch/gha-setup-ninja@master # https://github.com/seanmiddleditch/gha-setup-ninja
 
     - name: Configure
+    # Do not run -DBUILD_DOC=OFF locally. Only run cmake -S . -B build -G Ninja locally.
       run: |
         cmake -S . -B build -DBUILD_DOC=OFF -G Ninja
         
