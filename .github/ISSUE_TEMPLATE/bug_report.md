@@ -2,7 +2,7 @@
 name: Bug report
 about: Report a bug that causes the existing functionality to differ from what is described in the development plan.
 title: "[BUG]"
-labels: kind:bug, triage_needed
+labels: ["kind: bug", "status: triage_needed"]
 assignees: ChristineStawitz-NOAA
 
 ---
