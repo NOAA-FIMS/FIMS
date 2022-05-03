@@ -30,7 +30,7 @@ struct SelectivityBase : public FIMSObject<T> {
     // this is like a memory tracker. 
     // Assigning each one its own ID is a way to keep track of
     // all the instances of the SelectivityBase class.
-    static uint32_t id_g;
+    static uint32_t id_g; /*!< The ID of the instance of the SelectivityBase class */
     
     /** @brief Constructor.
     */
