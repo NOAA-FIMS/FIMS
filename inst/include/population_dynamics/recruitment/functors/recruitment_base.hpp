@@ -25,7 +25,7 @@ namespace fims{
 */
     template<class Type>
     struct RecruitmentBase : public FIMSObject<Type>{
-        static uint32_t id_g;
+        static uint32_t id_g; /*!< reference id for recruitment object*/
 
 /** @brief Constructor.
 */

@@ -13,7 +13,6 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 
-#include "../../../interface/interface.hpp"
 #include "recruitment_base.hpp"
 
 namespace fims{
