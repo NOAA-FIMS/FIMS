@@ -22,7 +22,7 @@ jobs:
     - name: Installing build dependencies
       run: |
         sudo apt update
-        sudo apt install cmake doxygen gcc git ninja-build dot
+        sudo apt install cmake doxygen gcc git ninja-build graphviz
   
     - name: get last commit msg
       id: commit-msg
