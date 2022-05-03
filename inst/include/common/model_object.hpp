@@ -1,13 +1,6 @@
 /*
  * File:   model_object.hpp
  *
- * Author: Matthew Supernaw, Andrea Havron
- * National Oceanic and Atmospheric Administration
- * National Marine Fisheries Service
- * Email: matthew.supernaw@noaa.gov, andrea.havron@noaa.gov
- *
- * Created on March 2, 2022
- *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the 
  * source folder for reuse information.
