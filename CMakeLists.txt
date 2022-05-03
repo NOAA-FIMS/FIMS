@@ -31,12 +31,14 @@ FetchContent_MakeAvailable(googlebenchmark)
 # Set up doxygen: download doxygen 1.9.3 and add it to the PATH
 option(BUILD_DOC "Build documentation" ON)
 IF(BUILD_DOC)
-  find_package(Doxygen)
+  find_package(Doxygen
+               REQUIRED dot)
 
   # Disable all preprocessing so doxygen will read all statements 
   # when evaluating conditional compilation statements (e.g., #ifdef in fims_math.h)
   set(DOXYGEN_ENABLE_PREPROCESSING NO) 
   set(DOXYGEN_QUIET YES)
+  set(DOXYGEN_HAVE_DOT YES)
 
   doxygen_add_docs(fims_doxygen
     inst/include
