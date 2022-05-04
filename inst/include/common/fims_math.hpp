@@ -25,29 +25,27 @@
 
 namespace fims {
 
-
-
-
-
 /**
  * @brief The exponential function.
  *
- * @param x value to exponentiate. Please use fims::exp<double>(x) if x is an integer.
+ * @param x value to exponentiate. Please use fims::exp<double>(x) if x is an
+ * integer.
  * @return the exponentiated value
  */
 template <class T>
 inline const T exp(const T& x) {
-    return std::exp(x);
+  return std::exp(x);
 }
 
 /**
  * @brief The natural log function (base e)
- * @param x the value to take the log of. Please use fims::log<double>(x) if x is an integer.
+ * @param x the value to take the log of. Please use fims::log<double>(x) if x
+ * is an integer.
  * @return
  */
 template <class T>
 inline const T log(const T& x) {
-    return std::log(x);
+  return std::log(x);
 }
 
 /**
@@ -62,11 +60,9 @@ inline const T log(const T& x) {
  */
 template <class T>
 inline const T logistic(const T& median, const T& slope, const T& x) {
-    return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
+  return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
 }
 
-
-
-}
+}  // namespace fims
 
 #endif /* FIMS_MATH_HPP */
