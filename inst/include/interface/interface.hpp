@@ -44,6 +44,7 @@
 //#define TMB_LIB_INIT R_init_FIMS
 #include <TMB.hpp>
 
+
 template <typename Type>
 struct ModelTraits {
   typedef typename CppAD::vector<Type> DataVector;
@@ -52,4 +53,33 @@ struct ModelTraits {
 
 #endif /* TMB_MODEL */
 
+#define RCPP_NO_SUGAR
+#include <Rcpp.h>
+
+using namespace Rcpp;
+
+void hello_fims(){
+std::cout<<"hello fims";
+}
+
+RCPP_MODULE(fims) {
+    //place holder for module elements
+    Rcpp::function("hello_fims", hello_fims);
+};
+
+// RCPP_MODULE(LogisticSelectivity) {
+//   class_<LogisticSelectivity>("LogisticSelectivity")
+//   .constructor<LogisticSelectivity>()
+//   .field("a50", &LogisticSelectivity::a50)
+//   .field("slope", &LogisticSelectivity::slope)
+//   .method("evaluate", &LogisticSelectivity::evaluate)
+//   ;
+// }
+
 #endif /* FIMS_INTERFACE_HPP */
+
+
+
+
+
+
