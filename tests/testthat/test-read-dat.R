@@ -121,25 +121,29 @@ ASSAMC::run_om(input_list = null_case_input, show_iter_num = T)
 rm(list = ls()) # to get rid of all the other obj cluttering workspace
 load("C1/output/OM/OM1.RData")
 
-# landings 
+# landings - assume fishery occurs continuously over the whole year.
 
 landings_data <- data.frame(
     type = "landings", # cor catch?
     name = names(om_output$L.mt)[1],
     age = NA, # The inputs are not by age in this case, but there is a by age option.
-    year = om_input$year, # may want to add fractional components to this to indicate timing.
+    year = om_input$year, #keep this column if we add timing start and end?
+    timingstart = 0,
+    timingend = 1, #how to indicate end of the year?
     value = om_output$L.mt[[1]], # note only 1 fleet in this case tho
     unit = "mt", # metric tons
     family = paste0("ilnorm(CV=", om_input$cv.L[[1]], ")")
 )
 
-# survey trend (index of abundance)
+# survey trend (index of abundance) - assume occurs instantaneously at the beginning of the year.
 
 trend_data <- data.frame(
     type = "trend",
     name = names(om_output$survey_index)[1],
     age = NA, # The inputs are not by age in this case.
     year = om_input$year, # may want to add fractional components to this to indicate timing.
+    timingstart = 0,
+    timingend = 0,
     value = om_output$survey_index[[1]],
     unit = "numbers", # I think?
     family = paste0("ilnorm(CV=", om_input$cv.survey[[1]], ")") # Is this ok?
@@ -158,10 +162,12 @@ age_comp_data$name <- names(om_output$survey_age_comp)[1]
 age_comp_data$type <- "agecomp" # or rather agefrequency???
 age_comp_data$unit <- "numbers"
 age_comp_data$family <- paste0("imultinom(size=", om_input$n.survey[[1]], ")") # I think size is consistent with r function??
+age_comp_data$timingstart <- 0
+age_comp_data$timingend <- 0
 
 # order the same as trend data.
 age_comp_data <- 
-  age_comp_data[,c("type", "name", "age", "year", "value", "unit", "family" )]
+  age_comp_data[,c("type", "name", "age", "year", "timingstart", "timingend", "value", "unit", "family" )]
 
 # From the paper it sounds like there should be agecomp for the fishery, but I don't
 # see this in the om_output.
@@ -177,9 +183,4 @@ write.csv(data_df,
 # check csv can be read into r well ----
 test_read <- read.csv(file.path("C1", "output", "OM", "FIMS_input_data.csv"))
 
-# TODO: need to add in timing? (maybe as fractional component of year??)
-# go over questions in script
-
-# Add in Distribution to the error distribution column
-# family
-# 
+# TODO: need any adjustments to timing?
