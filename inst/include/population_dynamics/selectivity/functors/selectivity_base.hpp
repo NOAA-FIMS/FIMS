@@ -1,14 +1,14 @@
 /*
  *
  * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the 
+ * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
  * Selectivity module file
- * The purpose of this file is to include any .hpp files within the 
+ * The purpose of this file is to include any .hpp files within the
  * subfolders so that only this file needs to included in the model.hpp file.
- * 
- * DEFINE guards for selectivity module outline to define the 
+ *
+ * DEFINE guards for selectivity module outline to define the
  * selectivity hpp file if not already defined.
  */
 #ifndef POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP
@@ -23,35 +23,34 @@ namespace fims {
  * @tparam T The type of the selectivity functor.
  */
 
-template<typename T>
+template <typename T>
 struct SelectivityBase : public FIMSObject<T> {
-    
-    // id_g is the ID of the instance of the SelectivityBase class.
-    // this is like a memory tracker. 
-    // Assigning each one its own ID is a way to keep track of
-    // all the instances of the SelectivityBase class.
-    static uint32_t id_g; /*!< The ID of the instance of the SelectivityBase class */
-    
-    /** @brief Constructor.
-    */
-    SelectivityBase() {
-        // increment id of the singleton selectivity class
-        this->id = SelectivityBase::id_g++;
-    }
+  // id_g is the ID of the instance of the SelectivityBase class.
+  // this is like a memory tracker.
+  // Assigning each one its own ID is a way to keep track of
+  // all the instances of the SelectivityBase class.
+  static uint32_t
+      id_g; /*!< The ID of the instance of the SelectivityBase class */
 
-    /**
-    * @brief Calculates the selectivity.
-    * @param x The independent variable in the logistic function (e.g., age or size in selectivity).
-    */
-    virtual const T evaluate(const T& x) = 0;
+  /** @brief Constructor.
+   */
+  SelectivityBase() {
+    // increment id of the singleton selectivity class
+    this->id = SelectivityBase::id_g++;
+  }
 
+  /**
+   * @brief Calculates the selectivity.
+   * @param x The independent variable in the logistic function (e.g., age or
+   * size in selectivity).
+   */
+  virtual const T evaluate(const T& x) = 0;
 };
 
 // default id of the singleton selectivity class
-template<typename T>
+template <typename T>
 uint32_t SelectivityBase<T>::id_g = 0;
 
-}
+}  // namespace fims
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP */
-
