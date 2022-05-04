@@ -36,6 +36,39 @@
 //#include "def.hpp"
 #include <cmath>
 
-namespace fims {}
+namespace fims
+{
+#ifdef TMB_MODEL
+#include <TMB.hpp>
+
+    /**
+     * @brief The exponential function.
+     * The code cannot be tested using the compilation flag
+     * -DTMB_MODEL through CMake and Google Test
+     * @param x value to exponentiate. Please use fims::exp<double>(x) if x is an integer.
+     * @return the exponentiated value
+     */
+    template <class T>
+    inline const T exp(const T &x)
+    {
+        return exp(x);
+    }
+
+    /**
+     * @brief The natural log function (base e)
+     * The code cannot be tested using the compilation flag
+     * -DTMB_MODEL through CMake and Google Test.
+     * @param x the value to take the log of. Please use fims::log<double>(x) if x is an integer.
+     * @return the log of the value
+     */
+    template <class T>
+    inline const T log(const T &x)
+    {
+        return log(x);
+    }
+
+#endif
+
+}
 
 #endif /* FIMS_MATH_HPP */
