@@ -30,7 +30,6 @@
  */
 #ifndef DEF_HPP
 #define DEF_HPP
-
 #include <vector>
 
 namespace fims {
