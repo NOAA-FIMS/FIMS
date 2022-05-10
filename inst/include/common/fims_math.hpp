@@ -25,7 +25,7 @@
 
 namespace fims
 {
-#ifdef STD_MODEL
+#ifdef STD_LIB
   /**
    * @brief The exponential function.
    *
