@@ -51,30 +51,6 @@ target_link_libraries(fims_math_logistic
 
 gtest_discover_tests(fims_math_logistic)
 
-# test_place_holder1.cpp
-add_executable(test_place_holder1
-  test_place_holder1.cpp
-)
-
-target_link_libraries(test_place_holder1
-  gtest_main
-  fims_test
-)
-
-gtest_discover_tests(test_place_holder1)
-
-# test_place_holder.cpp
-add_executable(test_place_holder2
-  test_place_holder2.cpp
-)
-
-target_link_libraries(test_place_holder2
-  gtest_main
-  fims_test
-)
-
-gtest_discover_tests(test_place_holder2)
-
 # benchmark_fims_math_logistic.cpp
 add_executable(benchmark_fims_math_logistic
   benchmark_fims_math_logistic.cpp
@@ -84,26 +60,3 @@ target_link_libraries(benchmark_fims_math_logistic
   fims_test
   benchmark_main
 )
-
-# benchmark_place_holder1.cpp
-add_executable(benchmark_place_holder1
-  benchmark_place_holder1.cpp
-)
-
-target_link_libraries(benchmark_place_holder1
-  fims_test
-  benchmark_main
-)
-
-# test_sr_beverton_holt.cpp
-add_executable(test_sr_beverton_holt
-  test_sr_beverton_holt.cpp
-)
-
-target_link_libraries(test_sr_beverton_holt
-  gtest_main
-  fims_test
-)
-
-gtest_discover_tests(test_sr_beverton_holt)
-
