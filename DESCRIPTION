@@ -34,6 +34,8 @@ Authors@R: c(person(give = "Christine", family = "Stawitz",
       person("Kristan", "Blackhart", role = "aut")
      )
 Description: The Fisheries Integrated Modeling System is a next-generation framework of stock assessment models, assisting fishery managers with the goal of achieving sustainable fisheries. This system, when completed in a few years, offers the NOAA Fisheries and global fisheries science communities an advanced set of stock assessment models. These tools can be used separately or in combination to incorporate ecosystem and socioeconomic data and models, as well as climate effects and other drivers within the marine environment, into stock assessment models.
+URL: https://github.com/noaa-fims/fims,  https://noaa-fims.github.io
+BugReports: https://github.com/noaa-fims/fims/issues
 License: GPL (>= 3)
 Depends:
     R (>= 3.4)
