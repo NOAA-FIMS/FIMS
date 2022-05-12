@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['id_5fg_26',['id_g',['../structfims_1_1SelectivityBase.html#ad798ab79131a2ce7128b6b041da0dee3',1,'fims::SelectivityBase']]]
+  ['fixed_5feffects_5fparameters_32',['fixed_effects_parameters',['../structfims_1_1FIMSObject.html#a55787c34a989c76c5ae35883b2f333e5',1,'fims::FIMSObject']]]
 ];
