@@ -1,18 +1,18 @@
 /*
-  * File:   def.hpp
-*
-  * Author: Matthew Supernaw
-* National Oceanic and Atmospheric Administration
-* National Marine Fisheries Service
-* Email: matthew.supernaw@noaa.gov
-*
-  * Created on September 30, 2021, 3:59 PM
-*
-  * This File is part of the NOAA, National Marine Fisheries Service
-* Fisheries Integrated Modeling System project.
-*
-  * This software is a "United States Government Work" under the terms of the
-* United States Copyright Act.  It was written as part of the author's official
+ * File:   def.hpp
+ *
+ * Author: Matthew Supernaw
+ * National Oceanic and Atmospheric Administration
+ * National Marine Fisheries Service
+ * Email: matthew.supernaw@noaa.gov
+ *
+ * Created on September 30, 2021, 3:59 PM
+ *
+ * This File is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project.
+ *
+ * This software is a "United States Government Work" under the terms of the
+ * United States Copyright Act.  It was written as part of the author's official
  * duties as a United States Government employee and thus cannot be copyrighted.
  * This software is freely available to the public for use. The National Oceanic
  * And Atmospheric Administration and the U.S. Government have not placed any
@@ -30,33 +30,27 @@
  */
 #ifndef DEF_HPP
 #define DEF_HPP
-
 #include <vector>
 
 namespace fims {
 
-
 #ifdef STD_LIB
 
-    /**
-     * Default trait. These are "T" specific
-     * traits that depend on modeling platform.
-     */
-    template<typename T>
-    struct FIMSTraits {
-        typedef double real_t;
-        typedef double variable_t;
-        typedef typename std::vector<double> data_vector;
-        typedef typename std::vector<double> variable_vector;
-        typedef typename std::vector<std::vector<double> > data_matrix;
-        typedef typename std::vector<std::vector<double> > variable_matrix;
-
-
-    };
+/**
+ * Default trait. These are "T" specific
+ * traits that depend on modeling platform.
+ */
+template <typename T>
+struct FIMSTraits {
+  typedef double real_t;
+  typedef double variable_t;
+  typedef typename std::vector<double> data_vector;
+  typedef typename std::vector<double> variable_vector;
+  typedef typename std::vector<std::vector<double> > data_matrix;
+  typedef typename std::vector<std::vector<double> > variable_matrix;
+};
 
 #endif
-}
-
-
+}  // namespace fims
 
 #endif /* TRAITS_HPP */
