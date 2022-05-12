@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['logisticgrowth_14',['logisticGrowth',['../classlogisticGrowth.html',1,'']]]
+  ['logisticselectivity_18',['LogisticSelectivity',['../structfims_1_1LogisticSelectivity.html',1,'fims']]]
 ];

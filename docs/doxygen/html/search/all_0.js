@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['fimsobject_0',['FIMSObject',['../structfims_1_1FIMSObject.html',1,'fims']]],
-  ['fimstraits_1',['FIMSTraits',['../structfims_1_1FIMSTraits.html',1,'fims']]],
-  ['fleet_2',['Fleet',['../structfims_1_1Fleet.html',1,'fims']]]
+  ['evaluate_0',['evaluate',['../structfims_1_1LogisticSelectivity.html#a9632051bd495ee11d583d2f1d8a53a9a',1,'fims::LogisticSelectivity::evaluate()'],['../structfims_1_1SelectivityBase.html#aeefea019d125a982549da482f3f3071e',1,'fims::SelectivityBase::evaluate()']]]
 ];
