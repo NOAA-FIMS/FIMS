@@ -2,7 +2,7 @@
  * File:   information.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the 
+ * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
  */
