@@ -1,6 +1,6 @@
 #include <cmath>
 #include "../inst/include/interface/interface.hpp"
-#include "init.hpp"
+#include "init.h"
 
 /*
  * @brief TMB objective function
