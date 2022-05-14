@@ -24,7 +24,7 @@
 #include <cmath>
 
 namespace fims {
-
+#ifdef STD_LIB
 /**
  * @brief The exponential function.
  *
@@ -33,7 +33,7 @@ namespace fims {
  * @return the exponentiated value
  */
 template <class T>
-inline const T exp(const T& x) {
+inline const T exp(const T &x) {
   return std::exp(x);
 }
 
@@ -44,9 +44,41 @@ inline const T exp(const T& x) {
  * @return
  */
 template <class T>
-inline const T log(const T& x) {
+inline const T log(const T &x) {
   return std::log(x);
 }
+#endif
+
+#ifdef TMB_MODEL
+#include <TMB.hpp>
+
+/**
+ * @brief The exponential function.
+ * The code cannot be tested using the compilation flag
+ * -DTMB_MODEL through CMake and Google Test
+ * @param x value to exponentiate. Please use fims::exp<double>(x) if x is an
+ * integer.
+ * @return the exponentiated value
+ */
+template <class T>
+inline const T exp(const T &x) {
+  return exp(x);
+}
+
+/**
+ * @brief The natural log function (base e)
+ * The code cannot be tested using the compilation flag
+ * -DTMB_MODEL through CMake and Google Test.
+ * @param x the value to take the log of. Please use fims::log<double>(x) if x
+ * is an integer.
+ * @return the log of the value
+ */
+template <class T>
+inline const T log(const T &x) {
+  return log(x);
+}
+
+#endif
 
 /**
  * @brief The general logistic function
@@ -59,7 +91,7 @@ inline const T log(const T& x) {
  * @return
  */
 template <class T>
-inline const T logistic(const T& median, const T& slope, const T& x) {
+inline const T logistic(const T &median, const T &slope, const T &x) {
   return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
 }
 
