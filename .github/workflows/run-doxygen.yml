@@ -36,8 +36,9 @@ jobs:
       run: |
         cmake -S . -B build -G Ninja
         cmake --build build --parallel 16
-        mkdir docs
-        mv build/html docs
+        rm -r docs/doxygen
+        mkdir docs/doxygen
+        mv build/html docs/doxygen
 
     - name: Create Pull Request
       if: ${{ !contains(steps.commit-msg.outputs.msg, 'document') }}
