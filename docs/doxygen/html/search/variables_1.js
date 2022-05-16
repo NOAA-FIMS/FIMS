@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['median_27',['median',['../structfims_1_1LogisticSelectivity.html#a125a146a56820b8f3bc83179ff070f0e',1,'fims::LogisticSelectivity']]]
+  ['id_33',['id',['../structfims_1_1FIMSObject.html#a971b2bf344a2662e578407b324b831bc',1,'fims::FIMSObject']]],
+  ['id_5fg_34',['id_g',['../structfims_1_1SelectivityBase.html#ad798ab79131a2ce7128b6b041da0dee3',1,'fims::SelectivityBase']]]
 ];
