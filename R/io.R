@@ -1,7 +1,8 @@
 #' fit: example function demonstrating TMB specific Roxygen comments
 #'
 #' @importFrom TMB MakeADFun
-#' @useDynLib FIMS
+#' @useDynLib FIMS, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
 #' @return TMB object
 #' @export
 #'
