@@ -3,5 +3,4 @@
 export(mkObj)
 importFrom(Rcpp,sourceCpp)
 importFrom(TMB,MakeADFun)
-useDynLib(FIMS)
 useDynLib(FIMS, .registration = TRUE)
