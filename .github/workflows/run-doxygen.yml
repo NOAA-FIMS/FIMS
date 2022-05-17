@@ -41,7 +41,7 @@ jobs:
         mv build/html docs/doxygen
 
     - name: Push docs to FIMS-docs repo
-        uses: dmnemec/copy_file_to_another_repo_action@main
+      uses: dmnemec/copy_file_to_another_repo_action@main
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }} 
       with:
