@@ -5,3 +5,5 @@ CMakeLists.txt
 tests/gtest
 tests/milestone1_test_cases.md
 build
+^codecov\.yml$
+.vscode
