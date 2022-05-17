@@ -40,10 +40,16 @@ jobs:
         mkdir docs/doxygen
         mv build/html docs/doxygen
 
-    - name: Create Pull Request
-      if: ${{ !contains(steps.commit-msg.outputs.msg, 'document') }}
-      uses: peter-evans/create-pull-request@v3
+    - name: Push docs to FIMS-docs repo
+        uses: dmnemec/copy_file_to_another_repo_action@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }} 
       with:
+        source_file: 'docs'
+        destination_repo: 'FIMS/FIMS-docs'
+        destination_folder: 'docs' # optional
+        user_email: 'christine.stawitz@noaa.gov'# your email
+        user_name: 'ChristineStawitz-NOAA'           # your login
         commit-message: 'Docs: run Doxygen'
         branch: update-Doxygen-docs
         title: 'Update Doxygen documentation'
