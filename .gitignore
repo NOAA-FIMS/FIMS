@@ -80,3 +80,6 @@ vignettes/*.pdf
 *.exe
 *.out
 *.app
+
+# IDE specific files
+*.vscode
