@@ -6,26 +6,28 @@
  * The purpose of this file is to declare the module_name functor class
  * which is the base class for all module_name functors.
  */
-#ifndef POPULATION_DYNAMICS_module_name_sub_module_HPP
-#define POPULATION_DYNAMICS_module_name_sub_module_HPP
+#ifndef POPULATION_DYNAMICS_{{{module_name}}}_{{{sub_module}}}_HPP
+#define POPULATION_DYNAMICS_{{{module_name}}}_{{{sub_module}}}_HPP
 
 
 //#include "../../../interface/interface.hpp"
+// The fims_math.hpp file is only needed if you are using a function 
+// programmed in fims_math
 #include "../../../common/fims_math.hpp"
-#include "module_name_base.hpp"
+#include "{{{module_name}}}_base.hpp"
 
 namespace fims {
 
  /**
-  *  @brief sub_modulemodule_name class that returns the sub_module function value
+  *  @brief {{{sub_module}}}{{{module_name}}} class that returns the sub_module function value
  * from fims_math.
  */ 
 template<typename T>
-struct sub_modulemodule_name : public module_nameBase<T> {
+struct {{{sub_module}}}{{{module_name}}} : public {{{module_name}}}Base<T> {
     //add submodule class members here
     //these include parameters of the submodule
 
-    sub_modulemodule_name(): module_nameBase<T>(){
+    {{{sub_module}}}{{{module_name}}}(): {{{module_name}}}Base<T>(){
 
     }
 
@@ -36,10 +38,10 @@ struct sub_modulemodule_name : public module_nameBase<T> {
     */
     virtual const T evaluate(const T& x) {
         //you will need to add class members as arguments to the function below
-        return fims::sub_module<T>(x);
+        return fims::{{{sub_module}}}<T>(x);
     }
 };
 
 }
 
-#endif /* POPULATION_DYNAMICS_module_name_sub_module_HPP */
+#endif /* POPULATION_DYNAMICS_{{{module_name}}}_{{{sub_module}}}_HPP */
