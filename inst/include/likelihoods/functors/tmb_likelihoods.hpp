@@ -9,6 +9,7 @@
   #ifndef LIKELIHOODS_TMB_LIKELIHOODS_HPP
   #define LIKELIHOODS_TMB_LIKELIHOODS_HPP
 
+  #ifdef TMB_MODEL
 
   //#include "../../../interface/interface.hpp"
   #include "../../../common/fims_math.hpp"
@@ -16,30 +17,23 @@
 
   namespace fims {
 
-    /**
-      *  @brief sub_modulemodule_name class that returns the sub_module function value
-    * from fims_math.
-    */
-      template<typename T>
-      struct sub_modulemodule_name : public module_nameBase<T> {
-        //add submodule class members here
-        //these include parameters of the submodule
-
-        sub_modulemodule_name(): module_nameBase<T>(){
-
+  
+      template< class T > //typename or class?
+      inline dnorm(T x, T mean, T sd, bool do_log){ //bool or int?
+        virtual const T evaluate(const T& x){
+            return dnorm(x, mean, sd, do_log);
         }
+      }
 
-        /**
-          * @brief
-        *
-          * @param x  description
-        */
-          virtual const T evaluate(const T& x) {
-            //you will need to add class members as arguments to the function below
-            return fims::sub_module<T>(x);
-          }
-      };
+      template< class T > //typename or class?
+      inline dmultinom(vector<T> x, vector<T> p, bool do_log){ //bool or int?
+        virtual const T evaluate(const T& x){
+            return dmultinom(x, p, do_log);
+        }
+      }
 
   }
+
+#endif
 
 #endif /* LIKELIHOODS_TMB_LIKELIHOODS_HPP */
