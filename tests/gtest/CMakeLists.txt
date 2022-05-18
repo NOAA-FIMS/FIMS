@@ -60,3 +60,14 @@ target_link_libraries(benchmark_fims_math_logistic
   fims_test
   benchmark_main
 )
+
+
+add_executable(tmb_likelihoods_dnorm
+  test_tmb_likelihoods_dnorm.cpp
+)
+
+target_link_libraries(tmb_likelihoods_dnorm
+  gtest_main
+)
+
+gtest_discover_tests(tmb_likelihoods_dnorm)
