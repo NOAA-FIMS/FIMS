@@ -14,7 +14,7 @@
   #ifndef LIKELIHOODS_BASE_HPP
   #define LIKELIHOODS_BASE_HPP
 
-  #include "../../../common/model_object.hpp"
+  #include "../../common/model_object.hpp"
 
   namespace fims {
 
