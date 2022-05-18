@@ -32,23 +32,45 @@
 #ifndef FIMS_INTERFACE_HPP
 #define FIMS_INTERFACE_HPP
 /*
-* Interface file. Uses pre-processing macros
-* to interface with multiple modeling platforms.
-*/
+ * Interface file. Uses pre-processing macros
+ * to interface with multiple modeling platforms.
+ */
 
-
-//traits for interfacing with TMB
+// traits for interfacing with TMB
 #ifdef TMB_MODEL
-
+// use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
+// issue
+#include <math.h>
 //#define TMB_LIB_INIT R_init_FIMS
 #include <TMB.hpp>
 
-template<typename Type>
-struct ModelTraits{
+template <typename Type>
+struct ModelTraits {
   typedef typename CppAD::vector<Type> DataVector;
   typedef typename CppAD::vector<Type> ParameterVector;
 };
 
 #endif /* TMB_MODEL */
+
+#define RCPP_NO_SUGAR
+#include <Rcpp.h>
+
+using namespace Rcpp;
+
+void hello_fims() { std::cout << "hello fims"; }
+
+RCPP_MODULE(fims) {
+  // place holder for module elements
+  Rcpp::function("hello_fims", hello_fims);
+};
+
+  // RCPP_MODULE(LogisticSelectivity) {
+  //   class_<LogisticSelectivity>("LogisticSelectivity")
+  //   .constructor<LogisticSelectivity>()
+  //   .field("a50", &LogisticSelectivity::a50)
+  //   .field("slope", &LogisticSelectivity::slope)
+  //   .method("evaluate", &LogisticSelectivity::evaluate)
+  //   ;
+  // }
 
 #endif /* FIMS_INTERFACE_HPP */
