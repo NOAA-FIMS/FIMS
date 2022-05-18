@@ -4,50 +4,50 @@
 * source folder for reuse information.
 *
 *
-* {{{ module_name }}} module file
+* {{{ module_type }}} module file
 * The purpose of this file is to include any .hpp files within the 
 * subfolders so that only this file needs to included in the model.hpp file.
 * 
-* DEFINE guards for {{{ module_name }}} module outline to define the 
-* module_name_base hpp file if not already defined.
+* DEFINE guards for {{{ module_type }}} module outline to define the 
+* module_type_base hpp file if not already defined.
 */
-#ifndef POPULATION_DYNAMICS_{{{ module_name }}}_HPP
-#define POPULATION_DYNAMICS_{{{ module_name }}}_HPP
+#ifndef POPULATION_DYNAMICS_{{{ module_type }}}_HPP
+#define POPULATION_DYNAMICS_{{{ module_type }}}_HPP
 
 #include "../../../common/model_object.hpp"
 
 namespace fims {
 
-/* @brief Base class for all {{{ module_name }}} functors.
+/* @brief Base class for all {{{ module_type }}} functors.
  *
- * @tparam T The type of the {{{ module_name }}} functor.
+ * @tparam T The type of the {{{ module_type }}} functor.
  * */
 template<typename T>
-struct {{{ module_name }}}Base : public FIMSObject<T> {
+struct {{{ module_type }}}Base : public FIMSObject<T> {
     
-    // id_g is the ID of the instance of the {{{ module_name }}}Base class.
+    // id_g is the ID of the instance of the {{{ module_type }}}Base class.
     // this is like a memory tracker. 
     // Assigning each one its own ID is a way to keep track of
-    // all the instances of the {{{ module_name }}}Base class.
+    // all the instances of the {{{ module_type }}}Base class.
     static uint32_t id_g;
     
     /* @brief Constructor.
     */
-    {{{ module_name }}}Base() {
-        this->id =  {{{ module_name }}}Base::id_g++;
+    {{{ module_type }}}Base() {
+        this->id =  {{{ module_type }}}Base::id_g++;
     }
 
     /*
-    * @brief Calculates the {{{ module_name }}} at the independent variable value.
-    * @param x The independent variable in the logistic function (e.g., age or size in  {{{ module_name }}}).
+    * @brief Calculates the {{{ module_type }}} at the independent variable value.
+    * @param x The independent variable in the logistic function (e.g., age or size in  {{{ module_type }}}).
     */
     virtual const T evaluate(const T& x) = 0;
 
 };
 
 template<typename T>
-uint32_t {{{ module_name }}}Base<T>::id_g = 0;
+uint32_t {{{ module_type }}}Base<T>::id_g = 0;
 
 }
 
-#endif /* POPULATION_DYNAMICS_{{{ module_name }}}_HPP */
+#endif /* POPULATION_DYNAMICS_{{{ module_type }}}_HPP */
