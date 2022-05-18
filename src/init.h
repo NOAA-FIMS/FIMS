@@ -1,5 +1,5 @@
-#ifndef INIT_HPP
-#define INIT_HPP
+#ifndef INIT_H
+#define INIT_H
 #include <R_ext/Rdynload.h>
 #include <stdlib.h>
 
