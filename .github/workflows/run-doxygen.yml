@@ -44,7 +44,7 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }} 
       with:
-        source_file: 'docs'
+        source_file: 'docs/.'
         destination_repo: 'NOAA-FIMS/FIMS-docs'
         # destination_folder: 'docs' # optional
         # destination_branch: 'main'
