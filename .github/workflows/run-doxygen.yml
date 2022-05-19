@@ -50,4 +50,4 @@ jobs:
         # destination_branch: 'main'
         user_email: 'christine.stawitz@noaa.gov' # your email
         user_name: 'ChristineStawitz-NOAA'       # your login
-        commit-message: 'Docs: run Doxygen'
+        commit_message: 'Docs: run Doxygen'
