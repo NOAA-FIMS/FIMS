@@ -31,6 +31,26 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googlebenchmark)
 
+# Set up Gcov to get coverage results with Google Test
+set(CMAKE_CXX_FLAGS --coverage)
+# # Code Coverage Configuration
+# add_library(coverage_config INTERFACE)
+
+# option(CODE_COVERAGE "Enable coverage reporting" OFF)
+# if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+#   # Add required flags (GCC & LLVM/Clang)
+#   target_compile_options(coverage_config INTERFACE
+#     -O0        # no optimization
+#     -g         # generate debug info
+#     --coverage # sets all required flags
+#   )
+#   if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
+#     target_link_options(coverage_config INTERFACE --coverage)
+#   else()
+#     target_link_libraries(coverage_config INTERFACE --coverage)
+#   endif()
+# endif(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+
 # Set up doxygen: download doxygen 1.9.3 and add it to the PATH
 option(BUILD_DOC "Build documentation" ON)
 IF(BUILD_DOC)
