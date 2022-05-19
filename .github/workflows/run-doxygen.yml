@@ -36,7 +36,7 @@ jobs:
       run: |
         cmake -S . -B build -G Ninja
         cmake --build build --parallel 16
-        mkdir docs
+        mkdir -p docs
         mv build/html docs
 
     - name: Push docs to FIMS-docs repo
