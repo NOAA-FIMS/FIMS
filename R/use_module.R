@@ -7,17 +7,14 @@
 #' @param module_name the name of the module. This creates a subfolder in
 #' \code{inst/include} of this name with folders \code{functors} and 
 #' \code{module_name.hpp}.
-#' @param module_type the folder of \code{inst/include} to put the files in
-#' @param sub_module_name optional, the name of the submodule. This is used
-#'  to create submodules of a type, for example, a logistic submodule for a 
-#' selectivity module.
+#' @param module_type the folder of \code{inst/include/population_dynamics} to put the files in
 #' @param global_equation = TRUE if the module should export
 #' a function from fims_math, FALSE otherwise.
 #' @return
 #' @export
 #'
 #' @examples
-use_module <- function(path, module_name, module_type, sub_module_name = NA) {
+use_module <- function(path, module_name, module_type) {
 
   if (typeof(module_name) != "character") {
    usethis::ui_stop(paste("The module name, ", module_name, " is not of the
@@ -33,49 +30,48 @@ use_module <- function(path, module_name, module_type, sub_module_name = NA) {
   subdir <- file.path(path, "inst", "include", "population_dynamics")
   setwd(subdir)
 
-  #Create subfolder in inst/include if it does not exist
+  #Create subfolder in inst/include/population_dynamics if it does not exist
   if (!file.exists(module_type)) {
      try(dir.create(module_type))
   }
 
-  #Create subfolder named module_name in inst/include if it does not exist
+  #Create subfolder named module_name/functors in inst/include/population_dynamics
+  # if it does not exist
  if (!file.exists(file.path(module_type, "functors"))) {
      try(dir.create(file.path(module_type, "functors")))
 }
 
+#create a module_name.hpp file in inst/include/population_dynamics/module_type/functors
 if (!file.exists(file.path(module_type, "functors",
-   paste(module_name, ".hpp", sep = "")))) {
+   paste(module_type, ".hpp", sep = "")))) {
      try(usethis::use_template(save_as = file.path(subdir, module_type,
       "functors", paste(module_name, ".hpp", sep = "")),
-     template = "module_template.hpp",
-     package = "FIMS", data = list(module_name = module_name)))
+     template = "module_functor_template.hpp",
+     package = "FIMS", data = list(module_type = module_type, 
+     module_name = module_name), open = TRUE))
   }
 
-  # create module_name_base.hpp in
-  # the folder inst/include/module_type/module_name/functors
+  # create module_type_base.hpp in
+  # the folder inst/include/population_dynamics/module_type/functors
   if (!file.exists(file.path(module_type, "functors",
-    paste(module_name, "_base.hpp", sep = "")))) {
+    paste(module_type, "_base.hpp", sep = "")))) {
      try(usethis::use_template(save_as = file.path(subdir, module_type,
-      "functors", paste(module_name, "_base.hpp", sep = "")),
-      template = "module_base_template.hpp", package = "FIMS"))
+      "functors", paste(module_type, "_base.hpp", sep = "")),
+      template = "module_base_template.hpp", package = "FIMS",
+     data = list(module_type = module_type), open = TRUE))
   }
 
-  if (!is.na(sub_module_name)){
-    if(!file.exists(file.path(module_type, module_name, "functors",
-      paste(sub_module_name, ".hpp", sep = "")))) {
+#create a module_type.hpp file in inst/include/population_dynamics/module_type if it doesn't already exist
+  if (!is.na(module_type)){
+    if(!file.exists(file.path(subdir, module_type,
+      paste(module_type, ".hpp", sep = "")))) {
       try(usethis::use_template(
-          save_as = file.path(subdir, module_type, module_name, "functors",
-        paste(sub_module_name, ".hpp", sep = "")),
-        template = "module_functor_template.hpp", package = "FIMS"))
+          save_as = file.path(subdir, module_type,
+        paste(module_type, ".hpp", sep = "")),
+        template = "module_template.hpp", package = "FIMS",
+        data = list(module_type = module_type, module_name = module_name),
+        open = TRUE))
     }
-  }
-
-  # create module_name.hpp in inst/include/module_type/module_name/
-  if (!file.exists(file.path(module_type, module_name,
-    paste(module_name, ".hpp", sep = "")))) {
-     try(usethis::use_template(save_as = file.path(subdir, module_type,
-     module_name, paste(module_name, ".hpp", sep = "")),
-      template = "module_template.hpp", package = "FIMS"))
   }
 
   setwd(old_wd)

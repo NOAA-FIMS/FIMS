@@ -27,7 +27,7 @@ struct {{{module_name}}}{{{module_type}}} : public {{{module_type}}}Base<T> {
     //add submodule class members here
     //these include parameters of the submodule
 
-    {{{module_name}}}{{{module_type}}}(): {{{module_name}}}Base<T>(){
+    {{{module_name}}}{{{module_type}}}(): {{{module_type}}}Base<T>(){
 
     }
 
