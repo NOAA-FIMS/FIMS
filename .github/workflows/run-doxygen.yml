@@ -38,7 +38,7 @@ jobs:
         cmake --build build --parallel 16
         mv build/html ./
         mv ./html ./docs
-        
+
     - name: Push docs to FIMS-docs repo
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
@@ -46,7 +46,6 @@ jobs:
       with:
         source_file: 'docs'
         destination_repo: 'NOAA-FIMS/FIMS-docs'
-        destination_folder: 'docs' # optional
         destination_branch: 'main'
         user_email: 'christine.stawitz@noaa.gov' # your email
         user_name: 'Christine Stawitz'       # your login
