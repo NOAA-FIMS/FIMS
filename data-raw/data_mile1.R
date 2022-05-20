@@ -15,6 +15,8 @@
 # remotes::install_github(
 #   "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison@feat_eg-data"
 # )
+library(ASSAMC)
+library(dplyr)
 returnedom <- ASSAMC::save_om_example()
 
 ###############################################################################
@@ -138,15 +140,18 @@ empiricalweight_data <- merge(timingfishery, weightsfishery)
 ###############################################################################
 # {FIMS} data
 ###############################################################################
-data_df <- type.convert(
+data_mile1 <- type.convert(
   rbind(landings_data, trend_data, age_comp_data, empiricalweight_data),
   as.is = TRUE
 )
-write.csv(data_df,
+write.csv(data_mile1,
   file.path("FIMS_input_data.csv"),
   row.names = FALSE
 )
 
 # check csv can be read into r well ----
 test_read <- read.csv(file.path("FIMS_input_data.csv"))
-all(test_read == data_df, na.rm = TRUE)
+testthat::expect_equal(test_read, data_mile1)
+unlink("FIMS_input_data.csv")
+
+usethis::use_data(data_mile1)
