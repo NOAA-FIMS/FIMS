@@ -41,8 +41,7 @@
           * @brief Calculates the likelihoods at the independent variable value.
         * @param x The observed value.
         */
-          virtual const T evaluate(const T& x) = 0;
-
+          virtual const T evaluate(const T& observed, const T& expected, const bool& do_log) = 0;
       };
 
     template<typename T>

@@ -68,6 +68,7 @@ add_executable(tmb_likelihoods_dnorm
 
 target_link_libraries(tmb_likelihoods_dnorm
   gtest_main
+  fims_test
 )
 
 gtest_discover_tests(tmb_likelihoods_dnorm)

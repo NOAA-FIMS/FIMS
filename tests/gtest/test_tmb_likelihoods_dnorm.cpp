@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "likelihoods/likelihoods.hpp"
+#include "likelihoods/functors/tmb_likelihoods.hpp"
 
 namespace
 {
@@ -7,8 +7,9 @@ namespace
   // Test dnorm using multiple input values
   TEST(dnorm, use_multiple_input_values)
   {
-    std::vector<double> x = {0, -10.0, 10.0};
-    std::vector<double> mean = {0, 0, 5};
+    //EXPECT_EQ(1.0, 1.0);
+    std::vector<double> observed = {0, -10.0, 10.0};
+    std::vector<double> expected = {0, 0, 5};
     std::vector<double> sd = {1, 1, 3};
 
     // R code that generates true values for the test
@@ -19,7 +20,7 @@ namespace
 
     for (int i = 0; i < expect_value.size(); ++i)
     {
-      EXPECT_NEAR(fims::dnorm(x[i], mean[i], sd[i], 1), expect_value[i]);
+      EXPECT_NEAR(fims::dnorm(observed[i], expected[i], sd[i], 1), expect_value[i], 0.0001);
     }
   }
 
