@@ -14,8 +14,4 @@
 #define POPULATION_DYNAMICS_GROWTH_HPP
 #define POPULATION_DYNAMICS_GROWTH_HPP
 
-
-#include "functors/growth_base.hpp"
-#include "functors/ewaa.hpp"
-
 #endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */
