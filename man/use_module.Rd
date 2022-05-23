@@ -4,10 +4,10 @@
 \alias{use_module}
 \title{use_module}
 \usage{
-use_module(path, module_name, module_type)
+use_module(path = "./inst", module_name, module_type)
 }
 \arguments{
-\item{path}{The path to the FIMS project directory.}
+\item{path}{The path to the FIMS project directory \code{inst} folder.}
 
 \item{module_name}{the name of the module. This creates a subfolder in
 \code{inst/include} of this name with folders \code{functors} and
@@ -26,5 +26,5 @@ modules under the \code{population_dynamics} folder of FIMS.
 }
 \examples{
 # create a new empirical weight-at-age module (EWAA) under growth
-use_module(., "ewaa", "growth")
+use_module(system.file(package = 'FIMS'), module_name = "ewaa", module_type = "growth")
 }

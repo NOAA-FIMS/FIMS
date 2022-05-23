@@ -4,7 +4,7 @@
 #' add a new module to the FIMS system. For now, this only works for
 #' modules under the \code{population_dynamics} folder of FIMS.
 #'
-#' @param path The path to the FIMS project directory.
+#' @param path The path to the FIMS project directory \code{inst} folder.
 #' @param module_name the name of the module. This creates a subfolder in
 #' \code{inst/include} of this name with folders \code{functors} and 
 #' \code{module_name.hpp}.
@@ -14,10 +14,10 @@
 #' @return TRUE
 #' @examples 
 #' # create a new empirical weight-at-age module (EWAA) under growth
-#' use_module(., "ewaa", "growth")
+#' use_module(system.file(package = 'FIMS'), module_name = "ewaa", module_type = "growth")
 #' @export
 #'
-use_module <- function(path, module_name, module_type) {
+use_module <- function(path = "./inst", module_name, module_type) {
 
   if (typeof(module_name) != "character") {
    usethis::ui_stop(paste("The module name, ", module_name, " is not of the
@@ -30,7 +30,7 @@ use_module <- function(path, module_name, module_type) {
   }
 
   old_wd <- getwd()
-  subdir <- file.path(path, "inst", "include", "population_dynamics")
+  subdir <- file.path(path, "include", "population_dynamics")
   setwd(subdir)
 
   #Create subfolder in inst/include/population_dynamics if it does not exist
