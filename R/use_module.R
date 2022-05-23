@@ -1,19 +1,22 @@
 #' use_module
 #'
 #' @description This function will generate the necessary files to
-#' add a new module to the FIMS system.
+#' add a new module to the FIMS system. For now, this only works for
+#' modules under the \code{population_dynamics} folder of FIMS.
 #'
 #' @param path The path to the FIMS project directory.
 #' @param module_name the name of the module. This creates a subfolder in
 #' \code{inst/include} of this name with folders \code{functors} and 
 #' \code{module_name.hpp}.
-#' @param module_type the folder of \code{inst/include/population_dynamics} to put the files in
-#' @param global_equation = TRUE if the module should export
-#' a function from fims_math, FALSE otherwise.
-#' @return
+#' @param module_type the folder of
+#' \code{inst/include/population_dynamics} to put the files in
+#' @importFrom usethis use_template ui_stop
+#' @return TRUE
+#' @examples 
+#' # create a new empirical weight-at-age module (EWAA) under growth
+#' use_module(., "ewaa", "growth")
 #' @export
 #'
-#' @examples
 use_module <- function(path, module_name, module_type) {
 
   if (typeof(module_name) != "character") {
