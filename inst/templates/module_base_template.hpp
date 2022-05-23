@@ -10,6 +10,7 @@
 * 
 * DEFINE guards for {{{ module_type }}} module outline to define the 
 * module_type_base hpp file if not already defined.
+* Change {{{ module_type }}} to ALL CAPS in the define guards below
 */
 #ifndef POPULATION_DYNAMICS_{{{ module_type }}}_BASE_HPP
 #define POPULATION_DYNAMICS_{{{ module_type }}}_BASE_HPP
@@ -23,6 +24,7 @@ namespace fims {
  * @tparam T The type of the {{{ module_type }}} functor.
  * */
 template<typename T>
+// Change {{{ module_type }}} to CamelCase in the class definition below. 
 struct {{{ module_type }}}Base : public FIMSObject<T> {
     
     // id_g is the ID of the instance of the {{{ module_type }}}Base class.
@@ -33,6 +35,7 @@ struct {{{ module_type }}}Base : public FIMSObject<T> {
     
     /* @brief Constructor.
     */
+    // CamelCase {{{ module_type }}} below
     {{{ module_type }}}Base() {
         this->id =  {{{ module_type }}}Base::id_g++;
     }
@@ -46,8 +49,10 @@ struct {{{ module_type }}}Base : public FIMSObject<T> {
 };
 
 template<typename T>
+// {{{module_type}}} should be CamelCase below
 uint32_t {{{ module_type }}}Base<T>::id_g = 0;
 
 }
 
+// Change {{{module_type}}} to ALL CAPS below.
 #endif /* POPULATION_DYNAMICS_{{{ module_type }}}_BASE_HPP */
