@@ -34,7 +34,7 @@ use_module <- function(path = "inst", module_name, module_type) {
   old_wd <- getwd()
   subdir <- file.path(path, "include", "population_dynamics")
   setwd(subdir)
-  on.exit(setwd(old_wd))
+  on.exit(setwd(old_wd), add = TRUE)
 
   #Create subfolder in inst/include/population_dynamics if it does not exist
   if (!file.exists(module_type)) {
