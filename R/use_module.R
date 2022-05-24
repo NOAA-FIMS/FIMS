@@ -13,11 +13,13 @@
 #' @importFrom usethis use_template ui_stop
 #' @return TRUE
 #' @examples 
+#' \dontrun{
 #' # create a new empirical weight-at-age module (EWAA) under growth
 #' use_module(system.file(package = 'FIMS'), module_name = "ewaa", module_type = "growth")
+#' }
 #' @export
 #'
-use_module <- function(path = "./inst", module_name, module_type) {
+use_module <- function(path = "inst", module_name, module_type) {
 
   if (typeof(module_name) != "character") {
    usethis::ui_stop(paste("The module name, ", module_name, " is not of the
@@ -32,6 +34,7 @@ use_module <- function(path = "./inst", module_name, module_type) {
   old_wd <- getwd()
   subdir <- file.path(path, "include", "population_dynamics")
   setwd(subdir)
+  on.exit(setwd(old_wd))
 
   #Create subfolder in inst/include/population_dynamics if it does not exist
   if (!file.exists(module_type)) {
