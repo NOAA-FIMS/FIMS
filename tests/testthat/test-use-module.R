@@ -1,12 +1,37 @@
-# test_that("use_model creates subfolders correctly", {
-#   library(usethis)
-#   create_local_package()
-#   desc_lines_before <- read_utf8(proj_path("DESCRIPTION"))
-#   dir.create("inst/include/population_dynamics/")
-#   expect_error_free(
-#     use_module(path = "inst/include/population_dynamics",
-#       module_name = "test_module", module_type = "test_type")
-#   )
-#   desc_lines_after <- read_utf8(proj_path("DESCRIPTION"))
-#   expect_identical(desc_lines_before, desc_lines_after)
-# })
+test_that("use_module() works", {
+  original_wd <- getwd()
+  path <- find.package("FIMS")
+  setwd(path)
+  on.exit(setwd(original_wd), add = TRUE)
+
+  module_name <- "test_module_name"
+  module_type <- "test_module_type"
+
+  FIMS::use_module(
+    path = "inst",
+    module_name = module_name,
+    module_type = module_type
+  )
+
+  expect_true(file.exists(file.path(
+    "inst", "include",
+    "population_dynamics", module_type, paste0(module_type, ".hpp")
+  )))
+
+  expect_true(file.exists(file.path(
+    "inst", "include",
+    "population_dynamics", module_type, "functors",
+    paste0(module_name, ".hpp")
+  )))
+
+  expect_true(file.exists(file.path(
+    "inst", "include",
+    "population_dynamics", module_type, "functors",
+    paste0(module_type, "_base.hpp")
+  )))
+
+  unlink(file.path(
+    "inst", "include",
+    "population_dynamics", module_type
+  ), recursive = TRUE)
+})
