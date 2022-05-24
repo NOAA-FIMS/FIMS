@@ -34,7 +34,6 @@ use_module <- function(path = "inst", module_name, module_type) {
 
   old_wd <- getwd()
   subdir <- file.path(path, "include", "population_dynamics")
-  cat(subdir)
   setwd(subdir)
   on.exit(setwd(old_wd), add = TRUE)
 
