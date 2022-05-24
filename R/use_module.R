@@ -15,24 +15,26 @@
 #' @examples 
 #' \dontrun{
 #' # create a new empirical weight-at-age module (EWAA) under growth
-#' use_module(system.file(package = 'FIMS'), module_name = "ewaa", module_type = "growth")
+#' use_module(system.file(package = 'FIMS'), module_name = "ewaa", 
+#' module_type = "growth")
 #' }
 #' @export
 #'
 use_module <- function(path = "inst", module_name, module_type) {
 
   if (typeof(module_name) != "character") {
-   usethis::ui_stop(paste("The module name, ", module_name, " is not of the
-   correct type, please enter a string.", sep = ""))
+   usethis::ui_stop(paste("The module name, ", module_name, " is not of 
+   the correct type, please enter a string.", sep = ""))
   }
 
   if (typeof(module_type) != "character") {
-   usethis::ui_stop(paste("The subfolder name, ", module_type, " is not of
-   the correct type, please enter a string.", sep = ""))
+   usethis::ui_stop(paste("The subfolder name, ", module_type, " is not 
+   of the correct type, please enter a string.", sep = ))
   }
 
   old_wd <- getwd()
   subdir <- file.path(path, "include", "population_dynamics")
+  cat(subdir)
   setwd(subdir)
   on.exit(setwd(old_wd), add = TRUE)
 
