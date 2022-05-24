@@ -93,8 +93,7 @@ age_data <- rbind(
   data.frame(
     name = names(returnedom[["om_output"]]$survey_age_comp)[1],
     returnedom[["em_input"]]$survey.age.obs[[1]],
-# TODO: @Bai-Li-NOAA confirm unit b/c I am not sure why there are decimals
-    unit = "numbers",
+    unit = "",
     uncertainty = returnedom[["om_input"]][["n.survey"]][["survey1"]],
     datestart = as.Date(
       paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
