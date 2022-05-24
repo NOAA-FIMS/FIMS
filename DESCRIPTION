@@ -48,7 +48,8 @@ Depends:
     R (>= 3.4)
 Imports: 
     Rcpp, 
-    TMB (>= 1.8.0)
+    TMB (>= 1.8.0),
+    usethis
 LinkingTo: 
     Rcpp,
     TMB,
