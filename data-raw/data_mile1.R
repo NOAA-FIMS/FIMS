@@ -52,11 +52,10 @@ landings_data <- data.frame(
 )
 
 ###############################################################################
-# Survey trend
+# Survey index
 ###############################################################################
-trend_data <- data.frame(
-# TODO: check with data_dictionary on term for trend/index
-  type = "trend",
+index_data <- data.frame(
+  type = "index",
   name = names(returnedom[["om_output"]]$survey_index)[1],
   age = NA, # Not by age in this case, but there is a by age option.
   datestart = as.Date(
@@ -142,7 +141,7 @@ weightatage_data <- merge(timingfishery, weightsfishery)
 # {FIMS} data
 ###############################################################################
 data_mile1 <- type.convert(
-  rbind(landings_data, trend_data, age_data, weightatage_data),
+  rbind(landings_data, index_data, age_data, weightatage_data),
   as.is = TRUE
 )
 write.csv(data_mile1,
@@ -157,7 +156,7 @@ testthat::expect_equal(test_read, data_mile1)
 
 usethis::use_data(data_mile1, overwrite = TRUE)
 rm(
-  age_data, landings_data, trend_data, weightatage_data,
+  age_data, landings_data, index_data, weightatage_data,
   timingfishery, weightsfishery,
   data_mile1, returnedom,
   test_read
