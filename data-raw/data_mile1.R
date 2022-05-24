@@ -8,7 +8,7 @@
 #'   one one fleet or one survey.
 #' * Timing:
 #'   * Fishery is assumed to operate over the entire year
-#'   * Survey occurs instantaneously at the start of the year 
+#'   * Survey occurs instantaneously at the start of the year
 #'
 #' @author Kathryn L. Doering and Kelli F. Johnson
 #'
@@ -42,13 +42,13 @@ landings_data <- data.frame(
     paste(returnedom[["om_input"]]$year, 12, 31, sep = "-"),
     format = "%Y-%m-%d"
   ),
-  value = returnedom[["om_output"]]$L.mt[[1]],
+  value = returnedom[["em_input"]]$L.obs[[1]],
   unit = "mt", # metric tons
 # TODO: discuss if CV the appropriate input here given that landings will be
 #       modeled with a lognormal or similar likelihood. Just because previous
 #       models have used CV doesn't mean we have to continue to use it.
 #       E.g., `dlnorm(sdlog = )` uses a standard deviation on the log scale.
-  uncertainty = returnedom[["om_input"]]$cv.L[[1]]
+  uncertainty = returnedom[["em_input"]]$cv.L[[1]]
 )
 
 ###############################################################################
@@ -67,9 +67,9 @@ trend_data <- data.frame(
     paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
     format = "%Y-%m-%d"
   ),
-  value = returnedom[["om_output"]]$survey_index[[1]],
+  value = returnedom[["em_input"]]$survey.obs[[1]],
   unit = "", # yearly sum of number-at-age / mean(sum of number-at-age)
-  uncertainty = returnedom[["om_input"]]$cv.survey[[1]]
+  uncertainty = returnedom[["em_input"]]$cv.survey[[1]]
 )
 
 ###############################################################################
@@ -92,7 +92,7 @@ age_data <- rbind(
   ),
   data.frame(
     name = names(returnedom[["om_output"]]$survey_age_comp)[1],
-    returnedom[["om_output"]]$survey_age_comp[[1]],
+    returnedom[["em_input"]]$survey.age.obs[[1]],
 # TODO: @Bai-Li-NOAA confirm unit b/c I am not sure why there are decimals
     unit = "numbers",
     uncertainty = returnedom[["om_input"]][["n.survey"]][["survey1"]],
@@ -163,3 +163,4 @@ rm(
   data_mile1, returnedom,
   test_read
 )
+
