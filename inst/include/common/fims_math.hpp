@@ -95,6 +95,24 @@ inline const T logistic(const T &median, const T &slope, const T &x) {
   return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
 }
 
+/**
+ * @brief The general double logistic function
+ *
+ * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{1} (x - median_{1}))} \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{2} (x - median_{2}))}  \right)\f$
+ *
+ * @param median1 the median (inflection point) of the ascending limb of the double double logistic function
+ * @param slope1 the slope of the aascending limb of e double hlogistic function
+ * @param median2 the median (inflection point) of the descending limb double descending limb of the double logistic function
+ * @param slope2 the slope of the descending limb of the double logistic function
+ * @param x the index the logistic function should be evaluated at
+ * @return
+ */
+
+template <class T>
+inline const T double_logistic(const T &median1, const T &slope1, const T &median2, const T &slope2, const T &x) {
+  return (1.0) / (1.0 + exp(-1.0 * slope1 * (x - median1))) * (1.0 - (1.0) / (1.0 + exp(-1.0 * slope2 * (x - median2))));
+}
+
 }  // namespace fims
 
 #endif /* FIMS_MATH_HPP */
