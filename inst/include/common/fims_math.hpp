@@ -1,18 +1,9 @@
 /*
  * File:   fims_math.hpp
  *
- * Author: Matthew Supernaw
- * National Oceanic and Atmospheric Administration
- * National Marine Fisheries Service
- * Email: matthew.supernaw@noaa.gov
- *
- * Created on September 30, 2021, 1:43 PM
- *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
- *
- * Please cite the author(s) in any work or product based on this material.
  *
  */
 #ifndef FIMS_MATH_HPP
