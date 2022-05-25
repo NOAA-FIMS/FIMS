@@ -27,6 +27,9 @@ modules under the \code{population_dynamics} folder of FIMS.
 \examples{
 \dontrun{
 # create a new empirical weight-at-age module (EWAA) under growth
-use_module(system.file(package = 'FIMS'), module_name = "ewaa", module_type = "growth")
+use_module(system.file(package = "FIMS"),
+  module_name = "ewaa",
+  module_type = "growth"
+)
 }
 }
