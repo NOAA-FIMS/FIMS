@@ -22,20 +22,22 @@ template<typename T>
 struct EWAAgrowth : public GrowthBase<T> {
     //add submodule class members here
     //these include parameters of the submodule
-
+    T ewaa;  /*!<vector of doubles for EWAA values by age, where age 
+             starts at zero > */
+    
     EWAAgrowth(): GrowthBase<T>(){
 
     }
 
     /**
-    * @brief 
+    * @brief Returns the weight at age a from the input vector.
     * 
-    * @param x  description
+    * @param a  age of the fish, the age vector must start at zero
     */
-    virtual const T evaluate(const T& x) {
-        //you will need to add class members as arguments to the function below
-        return fims::EWAA<T>(x);
+    virtual const T evaluate(const T& a) {
+        return ewaa[a];
     }
+
 };
 
 }
