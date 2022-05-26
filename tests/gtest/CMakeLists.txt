@@ -60,3 +60,19 @@ target_link_libraries(benchmark_fims_math_logistic
   fims_test
   benchmark_main
 )
+
+# test growth module (initially empirical weight at age)
+add_executable(growth_evaluate
+  test_growth.cpp
+)
+
+target_include_directories(growth_evaluate
+  PUBLIC
+    ${CMAKE_SOURCE_DIR}/../
+)
+
+target_link_libraries(growth_evaluate
+  gtest_main
+)
+
+gtest_discover_tests(growth_evaluate)
