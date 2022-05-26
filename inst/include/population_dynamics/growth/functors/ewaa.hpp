@@ -30,7 +30,7 @@ struct EWAAgrowth : public GrowthBase<T> {
     }
 
     /**
-    * @brief Returns the weight at age a from the input vector.
+    * @brief Returns the weight at age a (in kg) from the input vector.
     * 
     * @param a  age of the fish, the age vector must start at zero
     */
