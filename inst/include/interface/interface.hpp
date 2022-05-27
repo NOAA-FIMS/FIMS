@@ -38,6 +38,7 @@ void hello_fims() { std::cout << "hello fims"; }
 
 RCPP_EXPOSED_CLASS(GrowthBase)
 RCPP_EXPOSED_CLASS(GrowthEWAA)
+RCPP_EXPOSED_CLASS(FIMSObject)
 
 RCPP_MODULE(fims) {
   // place holder for module elements
@@ -53,11 +54,19 @@ RCPP_MODULE(fims) {
   //   ;
   // }
   RCPP_MODULE(GrowthEWAA) {
-    Rcpp::class_<GrowthBase>("GrowthBase")
+    class_<FIMSObject>("FIMSObject")
+    .field("id", &FIMSObject::id)
+    .field("parameters", &FIMSObject::parameters)
+    .field("random_effects_parameters", &FIMSObject::random_effects_parameters)
+    .field("fixed_effects_parameters", &FIMSObject::fixed_effects_parameters)
+    .method("GetID", &FIMSObject::GetId);
+
+    class_<GrowthBase>("GrowthBase")
+    .derives<FIMSObject>("FIMSObject")
     .constructor()
     //not sure whether we need to set .field for id_g?
     //.field("id_g", &GrowthBase::id_g, "growth class id")
-    .method("evaluate", &GrowthBase::evaluate)
+   .method("evaluate", &GrowthBase::evaluate)
     ;
 
     Rcpp::class_<GrowthEWAA>("GrowthEWAA")
