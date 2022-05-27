@@ -37,7 +37,7 @@ using namespace Rcpp;
 void hello_fims() { std::cout << "hello fims"; }
 
 RCPP_EXPOSED_CLASS(GrowthBase)
-RCPP_EXPOSED_CLASS(GrowthEWAA)
+RCPP_EXPOSED_CLASS(EWAAgrowth)
 RCPP_EXPOSED_CLASS(FIMSObject)
 
 RCPP_MODULE(fims) {
@@ -53,7 +53,7 @@ RCPP_MODULE(fims) {
   //   .method("evaluate", &LogisticSelectivity::evaluate)
   //   ;
   // }
-  RCPP_MODULE(GrowthEWAA) {
+  RCPP_MODULE(EWAAgrowth) {
     class_<FIMSObject>("FIMSObject")
     .field("id", &FIMSObject::id)
     .field("parameters", &FIMSObject::parameters)
