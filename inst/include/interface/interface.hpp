@@ -52,16 +52,15 @@ RCPP_MODULE(fims) {
   //   .method("evaluate", &LogisticSelectivity::evaluate)
   //   ;
   // }
-
-  RCPP_MODULE(GrowthBase) {
-    class_<GrowthBase>("GrowthBase")
+  RCPP_MODULE(GrowthEWAA) {
+    Rcpp::class_<GrowthBase>("GrowthBase")
     .constructor()
     //not sure whether we need to set .field for id_g?
     //.field("id_g", &GrowthBase::id_g, "growth class id")
     .method("evaluate", &GrowthBase::evaluate)
     ;
 
-     class_<GrowthEWAA>("GrowthEWAA")
+    Rcpp::class_<GrowthEWAA>("GrowthEWAA")
     .derives<GrowthBase>("GrowthBase")
     .constructor()
     //not sure whether we need to set .field for id_g?
@@ -69,6 +68,6 @@ RCPP_MODULE(fims) {
     .field("ewaa", &GrowthEWAA::ewaa)
     .method("evaluate", &GrowthEWAA::evaluate)
     ;
-}
+};
 
 #endif /* FIMS_INTERFACE_HPP */
