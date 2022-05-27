@@ -25,6 +25,9 @@ struct EWAAgrowth : public GrowthBase<T> {
     std::vector<T> ewaa;  /*!<vector of doubles for EWAA values by age, where age 
              starts at zero > */
     
+
+  static EWAAgrowth<T>* instance;
+
     EWAAgrowth(): GrowthBase<T>(){
 
     }
@@ -39,6 +42,9 @@ struct EWAAgrowth : public GrowthBase<T> {
     }
 
 };
+
+template<class T>
+EWAAgrowth<T>* EWAAgrowth<T>::instance = new EWAAgrowth<T>();
 
 }
 
