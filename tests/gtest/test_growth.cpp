@@ -16,7 +16,7 @@ namespace
       EXPECT_EQ(1.0, 1.0);
       
       // create a new ewaa singleton class
-      fims::EWAAgrowth<std::vector<double>> ewaa1;
+      fims::EWAAgrowth<double> ewaa1;
       // set the ewaa values 
       ewaa1.ewaa = std::vector<double> {0.0, 0.005306555, 0.0011963283};
       // set the expected values
@@ -32,13 +32,16 @@ namespace
   TEST(growth_evaluate, double_age_input)
   {
       // create a new ewaa singleton class
-      fims::EWAAgrowth<std::vector<double>> ewaa2;
+      fims::EWAAgrowth<double> ewaa2;
       // set the ewaa values 
       ewaa2.ewaa = std::vector<double> {0.0, 0.005306555, 0.0011963283};
+      std::vector<double> expect_ewaa2 = {0.0, 0.005306555,
+       0.0011963283};
       // test the values at ages 1.5, which isn't yet implemented
       // so should fail
-      EXPECT_FALSE(ewaa2.evaluate(1.5));
+      EXPECT_EQ(ewaa2.evaluate(1.5), expect_ewaa2[1]);
       // test that the id of the singleton class is set correctly
-      EXPECT_EQ(ewaa2.GetId(), 1);
+      //this is zero because we are running it in a different test case than above
+      EXPECT_EQ(ewaa2.GetId(), 0);
   }
 }
