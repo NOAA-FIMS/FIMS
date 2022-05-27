@@ -22,7 +22,7 @@ template<typename T>
 struct EWAAgrowth : public GrowthBase<T> {
     //add submodule class members here
     //these include parameters of the submodule
-    std::vector<double> ewaa;  /*!<vector of doubles for EWAA values by age, where age 
+    std::vector<T> ewaa;  /*!<vector of doubles for EWAA values by age, where age 
              starts at zero > */
     
     EWAAgrowth(): GrowthBase<T>(){

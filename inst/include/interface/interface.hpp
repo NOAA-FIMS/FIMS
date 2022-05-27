@@ -36,6 +36,8 @@ using namespace Rcpp;
 
 void hello_fims() { std::cout << "hello fims"; }
 
+RCPP_EXPOSED_CLASS(GrowthBase)
+
 RCPP_MODULE(fims) {
   // place holder for module elements
   Rcpp::function("hello_fims", hello_fims);
