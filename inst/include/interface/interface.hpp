@@ -64,18 +64,14 @@ RCPP_MODULE(fims) {
     class_<GrowthBase>("GrowthBase")
     .derives<FIMSObject>("FIMSObject")
     .constructor()
-    //not sure whether we need to set .field for id_g?
-    //.field("id_g", &GrowthBase::id_g, "growth class id")
-   .method("evaluate", &GrowthBase::evaluate)
+    .method("evaluate", &GrowthBase::evaluate)
     ;
 
-    Rcpp::class_<GrowthEWAA>("GrowthEWAA")
+    Rcpp::class_<EWAAgrowth>("EWAAgrowth")
     .derives<GrowthBase>("GrowthBase")
     .constructor()
-    //not sure whether we need to set .field for id_g?
-    //.field("id_g", &GrowthBase::y)
-    .field("ewaa", &GrowthEWAA::ewaa)
-    .method("evaluate", &GrowthEWAA::evaluate)
+    .field("ewaa", &EWAAgrowth::ewaa)
+    .method("evaluate", &EWAAgrowth::evaluate)
     ;
 };
 
