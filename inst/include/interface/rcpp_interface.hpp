@@ -1,8 +1,10 @@
 #ifndef RCPP_INTERFACE_HPP
 #define RCPP_INTERFACE_HPP
-
-#include <Rcpp.h>
 #include "interface.hpp"
+
+#define RCPP_NO_SUGAR
+#include <Rcpp.h>
+
 
 /**
  * @brief RcppInterface class that defines 
@@ -31,15 +33,16 @@ class Parameter{
     }
 };
 
-RCPP_MODULE(rmas) {
-    class_<Parameter>("Parameter")
+RCPP_EXPOSED_CLASS(Parameter)
+RCPP_MODULE(fims) {
+    Rcpp::class_<Parameter>("Parameter")
             .constructor()
             .constructor<double>()
             .constructor<Parameter>()
             .field("value", &Parameter::value)
             .field("min", &Parameter::min)
             .field("max", &Parameter::max)
-            .field("estimated", &Parameter::estimated)
+            .field("estimated", &Parameter::estimated);
 }
 
 
