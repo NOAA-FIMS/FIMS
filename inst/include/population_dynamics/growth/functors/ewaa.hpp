@@ -43,9 +43,4 @@ struct EWAAgrowth : public GrowthBase<T> {
 
 };
 
-template<class T>
-EWAAgrowth<T>* EWAAgrowth<T>::instance = new EWAAgrowth<T>();
-
-}
-
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */

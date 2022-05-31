@@ -14,6 +14,8 @@
  */
 
 // traits for interfacing with TMB
+#include "../population_dynamics/growth/growth.hpp"
+
 #ifdef TMB_MODEL
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
 // issue
@@ -31,7 +33,6 @@ struct ModelTraits {
 
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
-
 using namespace Rcpp;
 
 void hello_fims() { std::cout << "hello fims"; }
