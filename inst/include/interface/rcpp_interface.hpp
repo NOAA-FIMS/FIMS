@@ -13,39 +13,55 @@
  * @brief RcppInterface class that defines 
  * the interface between R and C++.
  */
-class Parameter{
+class parameter{
     public:
     double value;
     double min = std::numeric_limits<double>::min();
     double max = std::numeric_limits<double>::max();
     bool estimated = false;
 
-    Parameter(double value, double min, 
+    parameter(double value, double min, 
     double max, bool estimated) : 
     value(value), min(min), max(max),
     estimated(estimated){
 
      }
    
-    Parameter(double value){
+    parameter(double value){
         this->value = value;
     }
 
-    Parameter(){
+    parameter(){
         this->value = 0;
     }
 };
 
-RCPP_EXPOSED_CLASS(Parameter)
+//Recruitment Rcpp interface
+
+//Selectivity Rcpp interface
+
+
+bool create_model(){
+
+
+return true;
+}
+
+
+
+
+RCPP_EXPOSED_CLASS(parameter)
 RCPP_MODULE(fims) {
-    Rcpp::class_<Parameter>("Parameter")
+    Rcpp::function("create_model", &create_model);
+
+    Rcpp::class_<parameter>("parameter")
             .constructor()
             .constructor<double>()
-            .constructor<Parameter>()
-            .field("value", &Parameter::value)
-            .field("min", &Parameter::min)
-            .field("max", &Parameter::max)
-            .field("estimated", &Parameter::estimated);
+            .constructor<parameter>()
+            .field("value", &parameter::value)
+            .field("min", &parameter::min)
+            .field("max", &parameter::max)
+            .field("estimated", &parameter::estimated);
 }
 
 
