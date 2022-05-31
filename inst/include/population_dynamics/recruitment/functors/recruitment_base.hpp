@@ -27,6 +27,9 @@ template <class Type>
 struct RecruitmentBase : public FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for recruitment object*/
 
+  std::vector<Type> rec_deviations; /*!< A vector of recruitment deviations */
+  bool constrain_deviations = true;  /*!< A flag to indicate if recruitment deviations are summing to zero or not */
+
   /** @brief Constructor.
    */
   RecruitmentBase() { this->id = RecruitmentBase::id_g++; }
@@ -37,6 +40,28 @@ struct RecruitmentBase : public FIMSObject<Type> {
    */
   virtual const Type evaluate(
       const Type& spawners) = 0;  // need to add input parameter values
+
+  /** @brief Calculate constrained recruitment deviations.
+   *
+   */
+
+  void prepare_constrained_deviations(){
+    if (!this->constrain_deviations) {
+      return;
+    }
+    
+    Type sum = 0.0;
+
+    for (int i = 0; i < this->rec_deviations.size(); i++) {
+        sum += this->rec_deviations[i];
+    }
+
+    for (int i = 0; i < this->rec_deviations.size(); i++) {
+        this->rec_deviations[i] -= sum / (this->rec_deviations.size());
+    }
+  }
+
+  
 };
 
 template <class Type>
