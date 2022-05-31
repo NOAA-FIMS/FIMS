@@ -3,10 +3,15 @@
 #include "interface.hpp"
 #include "../common/model.hpp"
 
-
-
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
+
+#define REAL_TYPE    double
+#define FIRST_ORDER  AD<REAL_TYPE> 
+#define SECOND_ORDER AD<FIRST_ORDER >
+#define THIRD_ORDER  AD<SECOND_ORDER >
+
+
 
 
 /**
