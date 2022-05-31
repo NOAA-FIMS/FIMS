@@ -1,34 +1,20 @@
 /*
- * File:   recruitment.hpp
- *
- * Author: Matthew Supernaw
- * National Oceanic and Atmospheric Administration
- * National Marine Fisheries Service
- * Email: matthew.supernaw@noaa.gov
- *
- * Created on September 30, 2021, 12:50 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project.
+ * Fisheries Integrated Modeling System project. See LICENSE in the
+ * source folder for reuse information.
  *
- * This software is a "United States Government Work" under the terms of the
- * United States Copyright Act.  It was written as part of the author's official
- * duties as a United States Government employee and thus cannot be copyrighted.
- * This software is freely available to the public for use. The National Oceanic
- * And Atmospheric Administration and the U.S. Government have not placed any
- * restriction on its use or reproduction.  Although all reasonable efforts have
- * been taken to ensure the accuracy and reliability of the software and data,
- * the National Oceanic And Atmospheric Administration and the U.S. Government
- * do not and cannot warrant the performance or results that may be obtained by
- * using this  software or data. The National Oceanic And Atmospheric
- * Administration and the U.S. Government disclaim all warranties, express or
- * implied, including warranties of performance, merchantability or fitness
- * for any particular purpose.
+ * Recruitment module file
+ * The purpose of this file is to include any .hpp files within the
+ * subfolders so that only this file needs to included in the model.hpp file.
  *
- * Please cite the author(s) in any work or product based on this material.
- *
+ * DEFINE guards for recruitment module outline to define the
+ * recruitment hpp file if not already defined.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP
+
+#include "functors/recruitment_base.hpp"
+#include "functors/sr_beverton_holt.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP */
