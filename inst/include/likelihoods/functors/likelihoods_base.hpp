@@ -15,6 +15,7 @@
   #define LIKELIHOODS_BASE_HPP
 
   #include "../../common/model_object.hpp"
+  #include "../../interface/interface.hpp"
 
   namespace fims {
 

@@ -52,6 +52,7 @@ struct ModelTraits {
 
 #endif /* TMB_MODEL */
 
+#ifdef RCPP_MODEL
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
 
@@ -72,5 +73,5 @@ RCPP_MODULE(fims) {
   //   .method("evaluate", &LogisticSelectivity::evaluate)
   //   ;
   // }
-
+#endif /* RCPP_MODEL */
 #endif /* FIMS_INTERFACE_HPP */

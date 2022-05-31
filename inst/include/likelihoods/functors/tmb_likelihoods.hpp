@@ -11,18 +11,18 @@
 
   #ifdef TMB_MODEL
 
-  #include "../../../interface/interface.hpp"
+  //#include "../../../interface/interface.hpp"
   //#include "../../../common/fims_math.hpp"
   #include "likelihoods_base.hpp"
 
   namespace fims {
 
   template <typename T>
-  struct dnorm : public LikelihoodsBase<T> {
+  struct Dnorm : public LikelihoodsBase<T> {
     T sd; /*!< standard deviation of the distribution.;
                 */
 
-    dnorm() : LikelihoodsBase<T>() {}
+    Dnorm() : LikelihoodsBase<T>() {}
 
     /**
      * @brief return the (log) probability density function at x.
@@ -33,9 +33,7 @@
      * @param x  The independent variable
      */
     virtual const T evaluate(const T& observed, const T& expected, const bool& do_log) {
-      inline dnorm(T x, T mean, T sd, bool do_log){ //bool or int?
-        return dnorm(observed, expected, sd, do_log);
-      }
+      return dnorm(observed, expected, sd, do_log);
     }
   };
 }
