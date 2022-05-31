@@ -60,3 +60,15 @@ target_link_libraries(benchmark_fims_math_logistic
   fims_test
   benchmark_main
 )
+
+# test_population_dynamics_recruitment_base.cpp
+add_executable(recruitment_base_deviations
+test_population_dynamics_recruitment_base.cpp
+)
+
+target_link_libraries(recruitment_base_deviations
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(recruitment_base_deviations)
