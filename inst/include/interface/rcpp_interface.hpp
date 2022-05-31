@@ -1,0 +1,5 @@
+#ifndef RCPP_INTERFACE_HPP
+#define RCPP_INTERFACE_HPP
+
+
+#endif
