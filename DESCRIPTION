@@ -1,30 +1,38 @@
 Package: FIMS
 Title: The Fisheries Integrated Modeling System
-Version: 0.0.0.9000
+Version: 0.0.0.9
 Authors@R: c(person(give = "Christine", family = "Stawitz",
                  email = "christine.stawitz@noaa.gov", 
                  role = c("aut", "cre"),
                  comment = c(ORCID = "0000-0003-3122-4501")),
       person("Nathan", "Vaughan", role = "aut"),
       person("Howard", "Townsend", role = "aut"),
-      person("Ian", "Taylor", role = "aut"),
+      person(c("Ian", "G."), "Taylor", role = "aut", 
+           comment = c(ORCID = "0000-0002-4232-5669")),
       person("Matthew", "Supernaw", role = "aut"),
       person("Jane", "Sullivan", role = "aut"),
-      person("Kyle", "Shertzer", role = "aut"),
+      person("Kyle", "Shertzer", role = "aut",
+            comment = c(ORCID = "0000-0001-7196-5959")),
       person("Megumi", "Oshima", role = "aut"),
       person(c("Cole", "C."), "Monnahan", role = "aut",
            comment = c(ORCID = "0000-0003-0871-6700")),
-      person("Tim", "Miller", role = "aut"),
+      person(c("Timothy", "J."), "Miller", role = "aut",
+           comment = c(ORCID = "0000-0003-1411-1206")),
       person("Richard", "Methot", role = "aut"),
-      person("Patrick", "Lynch", role = "aut"),
-      person("Bai", "Li", role = "aut"),
+      person("Patrick", "Lynch", role = "aut",
+        comment = c(ORCID = "0000-0001-7121-6181")),
+      person("Bai", "Li", role = "aut",
+		   comment = c(ORCID = "0000-0002-8249-1442")),
       person("Huihua", "Lee", role = "aut"),
-      person("Chris", "Legault", role = "aut"),
-      person("Kelli", "Johnson", role = "aut"),
+      person(c("Christopher", "M."), "Legault", role = "aut",
+           comment = c(ORCID = "0000-0002-0328-1376")),
+      person(c("Kelli", "F."), "Johnson", role = "aut",
+           comment = c(ORCID = "0000-0002-5149-451X")),
       person(c("James", "N."), "Ianelli", role = "aut",
            comment = c(ORCID = "0000-0002-7170-8677")),
       person("Alan", "Haynie", role = "aut"),
-      person("Andrea", "Havron", role = "aut"),
+      person(c("Andrea", "M."), "Havron", role = "aut",
+           comment = c(ORCID = "0000-0002-4080-448X")),
       person(c("Kathryn", "L."), "Doering", role = "aut",
            comment = c(ORCID = "0000-0002-0396-7044")),
       person(c("Edward", "J."), "Dick", role = "aut",
@@ -33,13 +41,15 @@ Authors@R: c(person(give = "Christine", family = "Stawitz",
       person("Kristan", "Blackhart", role = "aut")
      )
 Description: The Fisheries Integrated Modeling System is a next-generation framework of stock assessment models, assisting fishery managers with the goal of achieving sustainable fisheries. This system, when completed in a few years, offers the NOAA Fisheries and global fisheries science communities an advanced set of stock assessment models. These tools can be used separately or in combination to incorporate ecosystem and socioeconomic data and models, as well as climate effects and other drivers within the marine environment, into stock assessment models.
-License: GPL (>= 3)
+URL: https://github.com/noaa-fims/fims,  https://noaa-fims.github.io
+BugReports: https://github.com/noaa-fims/fims/issues
+License: GPL (>= 3) | file LICENSE
 Depends:
     R (>= 3.4)
 Imports: 
-        Rcpp, 
-        TMB (>= 1.7.14),
-        RcppEigen
+    Rcpp, 
+    TMB (>= 1.8.0),
+    usethis
 LinkingTo: 
     Rcpp,
     TMB,
@@ -48,8 +58,9 @@ SystemRequirements: GNU make
 NeedsCompilation: yes
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Suggests: 
+    covr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
