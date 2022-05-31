@@ -52,17 +52,17 @@ struct ModelTraits {
 
 #endif /* TMB_MODEL */
 
-#define RCPP_NO_SUGAR
-#include <Rcpp.h>
+// #define RCPP_NO_SUGAR
+// #include <Rcpp.h>
 
-using namespace Rcpp;
+// using namespace Rcpp;
 
-void hello_fims() { std::cout << "hello fims"; }
+// void hello_fims() { std::cout << "hello fims"; }
 
-RCPP_MODULE(fims) {
-  // place holder for module elements
-  Rcpp::function("hello_fims", hello_fims);
-};
+// RCPP_MODULE(fims) {
+//   // place holder for module elements
+//   Rcpp::function("hello_fims", hello_fims);
+// };
 
   // RCPP_MODULE(LogisticSelectivity) {
   //   class_<LogisticSelectivity>("LogisticSelectivity")

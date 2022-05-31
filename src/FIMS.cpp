@@ -25,7 +25,7 @@
 
 #include <cmath>
 #include "../inst/include/interface/interface.hpp"
-#include "init.h"
+#include "init.hpp"
 
 
 /*

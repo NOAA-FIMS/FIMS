@@ -1,6 +1,9 @@
-#ifndef RCPP_INTERFACE_HPP
-#define RCPP_INTERFACE_HPP
+#ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
+#define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #include "interface.hpp"
+#include "../common/model.hpp"
+
+
 
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>

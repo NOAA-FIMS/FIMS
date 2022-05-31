@@ -13,6 +13,7 @@
 // preprocessing macros
 //#include "def.hpp"
 #include <cmath>
+#include "../interface/interface.hpp"
 
 namespace fims {
 #ifdef STD_LIB
@@ -41,7 +42,7 @@ inline const T log(const T &x) {
 #endif
 
 #ifdef TMB_MODEL
-#include <TMB.hpp>
+//#include <TMB.hpp>
 
 /**
  * @brief The exponential function.
