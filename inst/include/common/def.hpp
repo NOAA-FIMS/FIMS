@@ -32,7 +32,16 @@
 #define DEF_HPP
 #include <vector>
 
+#ifdef TMB_MODEL
+//simplify access to singletons
+#define FIMS_REAL_TYPE    double
+#define FIMS_FIRST_ORDER  AD<FIMS_REAL_TYPE> 
+#define FIMS_SECOND_ORDER AD<FIMS_FIRST_ORDER >
+#define FIMS_THIRD_ORDER  AD<FIMS_SECOND_ORDER >
+#endif
+
 namespace fims {
+
 
 #ifdef STD_LIB
 

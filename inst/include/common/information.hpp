@@ -14,7 +14,8 @@
 #include <memory>
 #include <vector>
 
-#include "../interface/interface.hpp"
+#include "def.hpp"
+// #include "../interface/interface.hpp"
 #include "model_object.hpp"
 
 namespace fims {
@@ -23,17 +24,30 @@ namespace fims {
  * Contains all objects and data pre-model construction
  */
 template <typename T>
-class Information {
-  typedef fims::FIMSTrait<T>::variable_t variable_t;
-  typedef fims::FIMSTrait<T>::real_t real_t;
-  std::vector<variable_t*> parameters;  // list of all estimated parameters
-  std::vector<variable_t*>
+class information {
+  public:
+  static std::shared_ptr<information<T> > fims_information;
+  // typedef fims::FIMSTraits<T>::variable_t variable_t;
+  // typedef fims::FIMSTraits<T>::real_t real_t;
+  std::vector<T*> parameters;  // list of all estimated parameters
+  std::vector<T*>
       random_effects_parameters;  // list of all random effects parameters
-  std::vector<variable_t*>
+  std::vector<T*>
       fixed_effects_parameters;  // list of all fixed effects parameters
 
-  bool CreateModel() {}
+static std::shared_ptr<information<T> > get_instance(){
+   if(information<T>::fims_information == nullptr){
+       information<T>::fims_information =  std::make_shared<fims::information<T> >();
+   }  
+   return information<T>::fims_information;
+
+}
+ bool CreateModel() {}
 };
+
+template<typename T>
+std::shared_ptr<information<T> > information<T>::fims_information = nullptr;
+
 }  // namespace fims
 
 #endif /* FIMS_COMMON_INFORMATION_HPP */

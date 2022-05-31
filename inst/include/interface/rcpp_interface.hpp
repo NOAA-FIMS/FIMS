@@ -2,14 +2,11 @@
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #include "interface.hpp"
 #include "../common/model.hpp"
+#include "../common/information.hpp"
 
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
 
-#define REAL_TYPE    double
-#define FIRST_ORDER  AD<REAL_TYPE> 
-#define SECOND_ORDER AD<FIRST_ORDER >
-#define THIRD_ORDER  AD<SECOND_ORDER >
 
 
 
@@ -48,6 +45,22 @@ class parameter{
 
 bool create_model(){
 
+std::shared_ptr<fims::information<FIMS_REAL_TYPE> >  a = 
+fims::information<FIMS_REAL_TYPE>::get_instance();
+
+std::shared_ptr<fims::information<FIMS_FIRST_ORDER> >  b = 
+fims::information<FIMS_FIRST_ORDER>::get_instance();
+
+std::shared_ptr<fims::information<FIMS_SECOND_ORDER> >  c = 
+fims::information<FIMS_SECOND_ORDER>::get_instance();
+
+std::shared_ptr<fims::information<FIMS_THIRD_ORDER> >  d = 
+fims::information<FIMS_THIRD_ORDER>::get_instance();
+
+std::cout<<a->parameters.size()<<std::endl;
+std::cout<<b->parameters.size()<<std::endl;
+std::cout<<c->parameters.size()<<std::endl;
+std::cout<<d->parameters.size()<<std::endl;
 
 return true;
 }
