@@ -83,12 +83,41 @@ public:
 
 
 //Selectivity Rcpp interface
+class selectivity_interface_base : public fims_rcpp_interface_base{
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, selectivity_interface_base*> selectivity_objects;
 
-class logistic_selectivity {
+    selectivity_interface_base() {
+
+    }
+
+
+};
+
+uint32_t selectivity_interface_base::id_g = 1;
+std::map<uint32_t, selectivity_interface_base* > selectivity_interface_base::selectivity_objects;
+
+
+class logistic_selectivity: public selectivity_interface_base {
 public:
 };
 
 //Growth Rcpp interface
+class growth_interface_base : public fims_rcpp_interface_base{
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, growth_interface_base*> growth_objects;
+
+    growth_interface_base() {
+
+    }
+
+
+};
+
+uint32_t growth_interface_base::id_g = 1;
+std::map<uint32_t, growth_interface_base* > growth_interface_base::growth_objects;
 
 //Maturity Rcpp interface
 
