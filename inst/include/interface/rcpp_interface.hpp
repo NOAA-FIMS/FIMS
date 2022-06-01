@@ -134,7 +134,6 @@ uint32_t growth_interface_base::id_g = 1;
 std::map<uint32_t, growth_interface_base* > growth_interface_base::growth_objects;
 
 //Maturity Rcpp interface
-
 class maturity_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -151,17 +150,107 @@ uint32_t maturity_interface_base::id_g = 1;
 std::map<uint32_t, maturity_interface_base* > maturity_interface_base::maturity_objects;
 
 //Natural Mortality Rcpp interface
+class natural_mortality_base : public fims_rcpp_interface_base {
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, natural_mortality_base*> natural_mortality_objects;
+
+    natural_mortality_base() {
+
+    }
+
+
+};
+
+uint32_t natural_mortality_base::id_g = 1;
+std::map<uint32_t, natural_mortality_base* > natural_mortality_base::natural_mortality_objects;
 
 //Population Rcpp interface
+class population : public fims_rcpp_interface_base {
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, population*> population_objects;
+
+    population() {
+
+    }
+
+
+};
+
+uint32_t population::id_g = 1;
+std::map<uint32_t, population* > population::population_objects;
 
 //Data Rcpp interface
+class data_base : public fims_rcpp_interface_base {
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, data_base*> data_objects;
+
+    data_base() {
+
+    }
+
+
+};
+
+uint32_t data_base::id_g = 1;
+std::map<uint32_t, data_base* > data_base::data_objects;
+
 
 //Likelihood Rcpp interface
+class likelihood_base : public fims_rcpp_interface_base {
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, likelihood_base*> likelihood_objects;
+
+    likelihood_base() {
+
+    }
+
+
+};
+
+uint32_t likelihood_base::id_g = 1;
+std::map<uint32_t, likelihood_base* > likelihood_base::likelihood_objects;
 
 //Fleet Rcpp interface
+class fleet : public fims_rcpp_interface_base {
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, fleet*> fleet_objects;
+
+    fleet() {
+
+    }
+
+
+};
+
+uint32_t fleet::id_g = 1;
+std::map<uint32_t, fleet* > fleet::fleet_objects;
 
 //Survey Rcpp interface
+class survey : public fims_rcpp_interface_base {
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, survey*> survey_objects;
 
+    survey() {
+
+    }
+
+
+};
+
+uint32_t survey::id_g = 1;
+std::map<uint32_t, survey* > survey::survey_objects;
+
+
+
+/**
+ *
+ */
 bool create_model() {
 
     for (int i = 0; i < fims_rcpp_interface_base::fims_interface_objects.size(); i++) {
