@@ -47,8 +47,8 @@ class fims_rcpp_interface_base {
 public:
     static std::vector<fims_rcpp_interface_base*> fims_interface_objects;
 
-    virtual bool add_to_fims() {
-        std::cout << "fims_rcpp_interface_base::add_to_fims(): Not yet implemented.\n";
+    virtual bool add_to_fims_tmb() {
+        std::cout << "fims_rcpp_interface_base::add_to_fims_tmb(): Not yet implemented.\n";
         return false;
     }
 };
@@ -90,9 +90,10 @@ public:
     virtual ~beverton_holt() {
     }
 
-    //    virtual bool add_to_fims(){
-    //        return false;
-    //    }
+        virtual bool add_to_fims_tmb(){
+            std::cout<<"beverton_holt::add_to_fims_tmb() : Not yet implemented.\n";
+            return false;
+        }
 };
 
 
@@ -289,28 +290,28 @@ std::map<uint32_t, survey* > survey::survey_objects;
 /**
  *
  */
-bool create_model() {
+bool create_tmb_model() {
 
     for (int i = 0; i < fims_rcpp_interface_base::fims_interface_objects.size(); i++) {
-        fims_rcpp_interface_base::fims_interface_objects[i]->add_to_fims();
+        fims_rcpp_interface_base::fims_interface_objects[i]->add_to_fims_tmb();
     }
 
 
 
-    std::shared_ptr<fims::information<FIMS_REAL_TYPE> > a =
-            fims::information<FIMS_REAL_TYPE>::get_instance();
+    std::shared_ptr<fims::information<TMB_FIMS_REAL_TYPE> > a =
+            fims::information<TMB_FIMS_REAL_TYPE>::get_instance();
     a->creat_model();
 
-    std::shared_ptr<fims::information<FIMS_FIRST_ORDER> > b =
-            fims::information<FIMS_FIRST_ORDER>::get_instance();
+    std::shared_ptr<fims::information<TMB_FIMS_FIRST_ORDER> > b =
+            fims::information<TMB_FIMS_FIRST_ORDER>::get_instance();
     b->creat_model();
 
-    std::shared_ptr<fims::information<FIMS_SECOND_ORDER> > c =
-            fims::information<FIMS_SECOND_ORDER>::get_instance();
+    std::shared_ptr<fims::information<TMB_FIMS_SECOND_ORDER> > c =
+            fims::information<TMB_FIMS_SECOND_ORDER>::get_instance();
     c->creat_model();
 
-    std::shared_ptr<fims::information<FIMS_THIRD_ORDER> > d =
-            fims::information<FIMS_THIRD_ORDER>::get_instance();
+    std::shared_ptr<fims::information<TMB_FIMS_THIRD_ORDER> > d =
+            fims::information<TMB_FIMS_THIRD_ORDER>::get_instance();
     d->creat_model();
 
 
@@ -319,7 +320,7 @@ bool create_model() {
 
 RCPP_EXPOSED_CLASS(parameter)
 RCPP_MODULE(fims) {
-    Rcpp::function("create_model", &create_model);
+    Rcpp::function("create_tmb_model", &create_tmb_model);
 
     Rcpp::class_<parameter>("parameter")
             .constructor()
