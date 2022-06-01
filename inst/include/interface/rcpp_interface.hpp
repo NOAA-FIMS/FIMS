@@ -280,23 +280,23 @@ bool create_tmb_model() {
 
 
     //base model 
-    std::shared_ptr<fims::information<TMB_FIMS_REAL_TYPE> > d0 =
-            fims::information<TMB_FIMS_REAL_TYPE>::get_instance();
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+            fims::Information<TMB_FIMS_REAL_TYPE>::get_instance();
     d0->creat_model();
 
     //first-order derivative
-    std::shared_ptr<fims::information<TMB_FIMS_FIRST_ORDER> > d1 =
-            fims::information<TMB_FIMS_FIRST_ORDER>::get_instance();
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+            fims::Information<TMB_FIMS_FIRST_ORDER>::get_instance();
     d1->creat_model();
     
     //second-order derivative
-    std::shared_ptr<fims::information<TMB_FIMS_SECOND_ORDER> > d2 =
-            fims::information<TMB_FIMS_SECOND_ORDER>::get_instance();
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+            fims::Information<TMB_FIMS_SECOND_ORDER>::get_instance();
     d2->creat_model();
 
     //third-order derivative
-    std::shared_ptr<fims::information<TMB_FIMS_THIRD_ORDER> > d3 =
-            fims::information<TMB_FIMS_THIRD_ORDER>::get_instance();
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+            fims::Information<TMB_FIMS_THIRD_ORDER>::get_instance();
     d3->creat_model();
 
 
