@@ -61,7 +61,7 @@ public:
 };
 
 uint32_t recruitment_interface_base::id_g = 1;
-std::map<uint32_t, std::shared_ptr<recruitment_interface_base> recruitment_interface_base::recruitment_objects;
+std::map<uint32_t, recruitment_interface_base* > recruitment_interface_base::recruitment_objects;
 
 
 /**
@@ -73,11 +73,11 @@ public:
 
     beverton_holt() {
         this->id = recruitment_interface_base::id_g++;
-        recruitment_interface_base[this->id] = this;
+        recruitment_interface_base::recruitment_objects[this->id] = this;
     }
     
     virtual bool add_to_fims(){
-        
+        return false;
     }
 };
 
@@ -96,6 +96,8 @@ public:
 
 //Population Rcpp interface
 
+//Data Rcpp interface
+
 //Likelihood Rcpp interface
 
 //Fleet Rcpp interface
@@ -105,22 +107,24 @@ public:
 
 bool create_model() {
 
+    
+    
     std::shared_ptr<fims::information<FIMS_REAL_TYPE> > a =
             fims::information<FIMS_REAL_TYPE>::get_instance();
+    a->CreateModel();
 
     std::shared_ptr<fims::information<FIMS_FIRST_ORDER> > b =
             fims::information<FIMS_FIRST_ORDER>::get_instance();
+    b->CreateModel();
 
     std::shared_ptr<fims::information<FIMS_SECOND_ORDER> > c =
             fims::information<FIMS_SECOND_ORDER>::get_instance();
-
+    c->CreateModel();
+    
     std::shared_ptr<fims::information<FIMS_THIRD_ORDER> > d =
             fims::information<FIMS_THIRD_ORDER>::get_instance();
+    d->CreateModel();
 
-    std::cout << a->parameters.size() << std::endl;
-    std::cout << b->parameters.size() << std::endl;
-    std::cout << c->parameters.size() << std::endl;
-    std::cout << d->parameters.size() << std::endl;
 
     return true;
 }

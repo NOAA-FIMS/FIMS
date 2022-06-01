@@ -42,7 +42,11 @@ static std::shared_ptr<information<T> > get_instance(){
    return information<T>::fims_information;
 
 }
- bool CreateModel() {}
+ bool CreateModel() {
+     std::cout<<"Not yet implemented.\n";
+     return false;
+ }
+ 
 };
 
 template<typename T>
