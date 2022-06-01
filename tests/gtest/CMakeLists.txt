@@ -15,6 +15,18 @@ target_link_libraries(population_dynamics_selectivity_logistic
 
 gtest_discover_tests(population_dynamics_selectivity_logistic)
 
+# test_population_dynamics_maturity_logistic
+add_executable(population_dynamics_maturity_logistic
+  test_population_dynamics_maturity_logistic.cpp
+)
+
+target_link_libraries(population_dynamics_maturity_logistic
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_dynamics_maturity_logistic)
+
 # test_fims_math_exp.cpp
 add_executable(fims_math_exp
   test_fims_math_exp.cpp
