@@ -90,12 +90,11 @@ public:
     virtual ~beverton_holt() {
     }
 
-        virtual bool add_to_fims_tmb(){
-            std::cout<<"beverton_holt::add_to_fims_tmb() : Not yet implemented.\n";
-            return false;
-        }
+    virtual bool add_to_fims_tmb() {
+        std::cout << "beverton_holt::add_to_fims_tmb() : Not yet implemented.\n";
+        return false;
+    }
 };
-
 
 /****************************************************************
  * Selectivity Rcpp interface                                   *
@@ -136,7 +135,6 @@ public:
 
 uint32_t growth_interface_base::id_g = 1;
 std::map<uint32_t, growth_interface_base* > growth_interface_base::growth_objects;
-
 
 /****************************************************************
  * Maturity Rcpp interface                                      *
@@ -192,7 +190,6 @@ public:
 uint32_t population::id_g = 1;
 std::map<uint32_t, population* > population::population_objects;
 
-
 /****************************************************************
  * Data Rcpp interface                                          *
  ***************************************************************/
@@ -210,7 +207,6 @@ public:
 
 uint32_t data_base::id_g = 1;
 std::map<uint32_t, data_base* > data_base::data_objects;
-
 
 /****************************************************************
  * Likelihood Rcpp interface                                    *
@@ -230,7 +226,6 @@ public:
 uint32_t likelihood_base::id_g = 1;
 std::map<uint32_t, likelihood_base* > likelihood_base::likelihood_objects;
 
-
 /****************************************************************
  * Fishing Mortality Rcpp interface                             *
  ***************************************************************/
@@ -247,7 +242,6 @@ public:
 };
 uint32_t fishing_mortality::id_g = 1;
 std::map<uint32_t, fishing_mortality* > fishing_mortality::fishing_mortality_objects;
-
 
 /****************************************************************
  * Fleet Rcpp interface                                         *
@@ -266,7 +260,6 @@ public:
 
 uint32_t fleet::id_g = 1;
 std::map<uint32_t, fleet* > fleet::fleet_objects;
-
 
 /**
  *
@@ -288,7 +281,7 @@ bool create_tmb_model() {
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
             fims::Information<TMB_FIMS_FIRST_ORDER>::get_instance();
     d1->creat_model();
-    
+
     //second-order derivative
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
             fims::Information<TMB_FIMS_SECOND_ORDER>::get_instance();
