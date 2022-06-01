@@ -44,6 +44,15 @@ static std::shared_ptr<Information<T> > get_instance(){
    return Information<T>::fims_information;
 
 }
+
+void register_parameter( T& p){
+    this->parameters.push_back(&p);
+}
+
+void register_random_effect( T& re){
+    this->random_effects_parameters.push_back(&re);
+}
+
  bool creat_model() {
      std::cout<<"Information::creat_model(): Not yet implemented.\n";
      return false;

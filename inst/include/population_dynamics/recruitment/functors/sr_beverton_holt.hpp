@@ -40,7 +40,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
 
   SRBevertonHolt() : RecruitmentBase<Type>() {}
 
-  ~SRBevertonHolt() {}
+  virtual ~SRBevertonHolt() {}
   
   /** @brief Beverton Holt implementation of the stock recruitment function.
    *
