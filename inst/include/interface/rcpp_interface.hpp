@@ -9,7 +9,7 @@
 
 /**
  * @brief RcppInterface class that defines 
- * the interface between R and C++.
+ * the interface between R and C++ for parameter types.
  */
 class parameter {
 public:
@@ -34,9 +34,59 @@ public:
     }
 };
 
+/**
+ *@brief Base class for all interface objects
+ */
+class fims_rcpp_interface_base{
+public:
+   
+    virtual bool add_to_fims(){
+        std::cout <<"Not yet implemented!";
+        return false;
+    }
+};
+
 //Recruitment Rcpp interface
 
+class recruitment_interface_base : public fims_rcpp_interface_base{
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, recruitment_interface_base*> recruitment_objects;
+
+    recruitment_interface_base() {
+
+    }
+
+
+};
+
+uint32_t recruitment_interface_base::id_g = 1;
+std::map<uint32_t, std::shared_ptr<recruitment_interface_base> recruitment_interface_base::recruitment_objects;
+
+
+/**
+ * @brief Interface class for Beverton-Holt recruitment. 
+ */
+class beverton_holt : public recruitment_interface_base {
+public:
+    uint32_t id;
+
+    beverton_holt() {
+        this->id = recruitment_interface_base::id_g++;
+        recruitment_interface_base[this->id] = this;
+    }
+    
+    virtual bool add_to_fims(){
+        
+    }
+};
+
+
 //Selectivity Rcpp interface
+
+class logistic_selectivity {
+public:
+};
 
 //Growth Rcpp interface
 
