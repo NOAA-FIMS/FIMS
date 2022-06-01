@@ -4,15 +4,14 @@
 namespace
 {
 
-
   TEST(double_logistic_selectivity, create_object)
   {
     
     fims::DoubleLogisticSelectivity<double> fishery_selectivity;
-    fishery_selectivity.median1 = 10.5;
-    fishery_selectivity.slope1 = 0.2;
-    fishery_selectivity.median2 = 15.0;
-    fishery_selectivity.slope2 = 0.05;
+    fishery_selectivity.median_asc = 10.5;
+    fishery_selectivity.slope_asc = 0.2;
+    fishery_selectivity.median_desc = 15.0;
+    fishery_selectivity.slope_desc = 0.05;
     double fishery_x = 34.5;
     // 1.0/(1.0+exp(-(34.5-10.5)*0.2)) * (1.0 - 1.0/(1.0+exp(-(34.5-15.0)*0.05))) = 0.2716494
     double expect_fishery = 0.2716494;

@@ -3,14 +3,13 @@
 
 namespace
 {
-
   // Test double logistic using multiple input values
   TEST(double_logistic, use_multiple_input_values)
   {
-    std::vector<double> median1_value = {1.0, 10.0, 20.5};
-    std::vector<double> slope1_value = {0.0, 0.2, 0.05};
-    std::vector<double> median2_value = {6.0, 15.0, 23.5};
-    std::vector<double> slope2_value = {0.0, 0.2, 0.05};
+    std::vector<double> median_asc_value = {1.0, 10.0, 20.5};
+    std::vector<double> slope_asc_value = {0.0, 0.2, 0.05};
+    std::vector<double> median_desc_value = {6.0, 15.0, 23.5};
+    std::vector<double> slope_desc_value = {0.0, 0.2, 0.05};
     std::vector<double> x_value = {2.0, 20.0, 40.5};
 
     // R code that generates true values for the test
@@ -22,7 +21,7 @@ namespace
 
     for (int i = 0; i < expect_value.size(); ++i)
     {
-      EXPECT_NEAR(fims::double_logistic(median1_value[i], slope1_value[i], median2_value[i], slope2_value[i], x_value[i]), expect_value[i], 0.0001);
+      EXPECT_NEAR(fims::double_logistic(median_asc_value[i], slope_asc_value[i], median_desc_value[i], slope_desc_value[i], x_value[i]), expect_value[i], 0.0001);
     }
   }
 
