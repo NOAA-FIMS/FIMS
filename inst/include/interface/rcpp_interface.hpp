@@ -90,6 +90,19 @@ public:
 
 //Growth Rcpp interface
 
+//Maturity Rcpp interface
+
+//Natural Mortality Rcpp interface
+
+//Population Rcpp interface
+
+//Likelihood Rcpp interface
+
+//Fleet Rcpp interface
+
+//Survey Rcpp interface
+
+
 bool create_model() {
 
     std::shared_ptr<fims::information<FIMS_REAL_TYPE> > a =
