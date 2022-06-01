@@ -42,8 +42,8 @@ static std::shared_ptr<information<T> > get_instance(){
    return information<T>::fims_information;
 
 }
- bool CreateModel() {
-     std::cout<<"Not yet implemented.\n";
+ bool creat_model() {
+     std::cout<<"information::creat_model(): Not yet implemented.\n";
      return false;
  }
  

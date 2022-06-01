@@ -21,6 +21,7 @@ public:
     double value;
     double min = std::numeric_limits<double>::min();
     double max = std::numeric_limits<double>::max();
+    bool is_random_effect = false;
     bool estimated = false;
 
     parameter(double value, double min,
@@ -42,12 +43,12 @@ public:
 /**
  *@brief Base class for all interface objects
  */
-class fims_rcpp_interface_base{
+class fims_rcpp_interface_base {
 public:
     static std::vector<fims_rcpp_interface_base*> fims_interface_objects;
-    
-    virtual bool add_to_fims(){
-        std::cout <<"Not yet implemented!";
+
+    virtual bool add_to_fims() {
+        std::cout << "fims_rcpp_interface_base::add_to_fims(): Not yet implemented.\n";
         return false;
     }
 };
@@ -55,7 +56,7 @@ std::vector<fims_rcpp_interface_base*> fims_rcpp_interface_base::fims_interface_
 
 //Recruitment Rcpp interface
 
-class recruitment_interface_base : public fims_rcpp_interface_base{
+class recruitment_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
     static std::map<uint32_t, recruitment_interface_base*> recruitment_objects;
@@ -64,12 +65,13 @@ public:
 
     }
 
+    virtual ~recruitment_interface_base() {
+    }
 
 };
 
 uint32_t recruitment_interface_base::id_g = 1;
 std::map<uint32_t, recruitment_interface_base* > recruitment_interface_base::recruitment_objects;
-
 
 /**
  * @brief Interface class for Beverton-Holt recruitment. 
@@ -83,15 +85,19 @@ public:
         recruitment_interface_base::recruitment_objects[this->id] = this;
         fims_rcpp_interface_base::fims_interface_objects.push_back(this);
     }
-    
-    virtual bool add_to_fims(){
-        return false;
+
+    virtual ~beverton_holt() {
     }
+
+    //    virtual bool add_to_fims(){
+    //        return false;
+    //    }
 };
 
 
 //Selectivity Rcpp interface
-class selectivity_interface_base : public fims_rcpp_interface_base{
+
+class selectivity_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
     static std::map<uint32_t, selectivity_interface_base*> selectivity_objects;
@@ -106,13 +112,13 @@ public:
 uint32_t selectivity_interface_base::id_g = 1;
 std::map<uint32_t, selectivity_interface_base* > selectivity_interface_base::selectivity_objects;
 
-
-class logistic_selectivity: public selectivity_interface_base {
+class logistic_selectivity : public selectivity_interface_base {
 public:
 };
 
 //Growth Rcpp interface
-class growth_interface_base : public fims_rcpp_interface_base{
+
+class growth_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
     static std::map<uint32_t, growth_interface_base*> growth_objects;
@@ -128,7 +134,8 @@ uint32_t growth_interface_base::id_g = 1;
 std::map<uint32_t, growth_interface_base* > growth_interface_base::growth_objects;
 
 //Maturity Rcpp interface
-class maturity_interface_base : public fims_rcpp_interface_base{
+
+class maturity_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
     static std::map<uint32_t, maturity_interface_base*> maturity_objects;
@@ -155,30 +162,29 @@ std::map<uint32_t, maturity_interface_base* > maturity_interface_base::maturity_
 
 //Survey Rcpp interface
 
-
 bool create_model() {
-    
-    for(int i =0; i < fims_rcpp_interface_base::fims_interface_objects.size(); i++){
+
+    for (int i = 0; i < fims_rcpp_interface_base::fims_interface_objects.size(); i++) {
         fims_rcpp_interface_base::fims_interface_objects[i]->add_to_fims();
     }
 
-    
-    
+
+
     std::shared_ptr<fims::information<FIMS_REAL_TYPE> > a =
             fims::information<FIMS_REAL_TYPE>::get_instance();
-    a->CreateModel();
+    a->creat_model();
 
     std::shared_ptr<fims::information<FIMS_FIRST_ORDER> > b =
             fims::information<FIMS_FIRST_ORDER>::get_instance();
-    b->CreateModel();
+    b->creat_model();
 
     std::shared_ptr<fims::information<FIMS_SECOND_ORDER> > c =
             fims::information<FIMS_SECOND_ORDER>::get_instance();
-    c->CreateModel();
-    
+    c->creat_model();
+
     std::shared_ptr<fims::information<FIMS_THIRD_ORDER> > d =
             fims::information<FIMS_THIRD_ORDER>::get_instance();
-    d->CreateModel();
+    d->creat_model();
 
 
     return true;
@@ -195,7 +201,11 @@ RCPP_MODULE(fims) {
             .field("value", &parameter::value)
             .field("min", &parameter::min)
             .field("max", &parameter::max)
+            .field("is_random_effect", &parameter::is_random_effect)
             .field("estimated", &parameter::estimated);
+
+    Rcpp::class_<beverton_holt>("beverton_holt")
+            .constructor();
 }
 
 
