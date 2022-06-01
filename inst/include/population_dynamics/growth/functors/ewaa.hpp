@@ -22,7 +22,10 @@ template<typename T>
 struct EWAAgrowth : public GrowthBase<T> {
     //add submodule class members here
     //these include parameters of the submodule
-    std::vector<T> ewaa;  /*!<vector of doubles for EWAA values by age, where age 
+    //a map looks up values based on a reference key
+    //in this case, our key is age (first double), and 
+    // the value is the weight at that age (second double)
+    std::map<double, double> ewaa;  /*!<map of doubles for EWAA values by age, where age 
              starts at zero > */
     
 
@@ -37,10 +40,10 @@ struct EWAAgrowth : public GrowthBase<T> {
     * 
     * @param a  age of the fish, the age vector must start at zero
     */
-    virtual const T evaluate(const T& a) {
+    virtual const T evaluate(const double& a) {
         return ewaa[a];
     }
 
 };
-
+}
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */
