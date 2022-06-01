@@ -54,8 +54,9 @@ public:
 };
 std::vector<fims_rcpp_interface_base*> fims_rcpp_interface_base::fims_interface_objects;
 
-//Recruitment Rcpp interface
-
+/****************************************************************
+ * Recruitment Rcpp interface                                   *
+ ***************************************************************/
 class recruitment_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -95,8 +96,9 @@ public:
 };
 
 
-//Selectivity Rcpp interface
-
+/****************************************************************
+ * Selectivity Rcpp interface                                   *
+ ***************************************************************/
 class selectivity_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -116,8 +118,9 @@ class logistic_selectivity : public selectivity_interface_base {
 public:
 };
 
-//Growth Rcpp interface
-
+/****************************************************************
+ * Growth Rcpp interface                                        *
+ ***************************************************************/
 class growth_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -133,7 +136,10 @@ public:
 uint32_t growth_interface_base::id_g = 1;
 std::map<uint32_t, growth_interface_base* > growth_interface_base::growth_objects;
 
-//Maturity Rcpp interface
+
+/****************************************************************
+ * Maturity Rcpp interface                                      *
+ ***************************************************************/
 class maturity_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -149,7 +155,9 @@ public:
 uint32_t maturity_interface_base::id_g = 1;
 std::map<uint32_t, maturity_interface_base* > maturity_interface_base::maturity_objects;
 
-//Natural Mortality Rcpp interface
+/****************************************************************
+ * Natural Mortality Rcpp interface                             *
+ ***************************************************************/
 class natural_mortality_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -165,7 +173,9 @@ public:
 uint32_t natural_mortality_base::id_g = 1;
 std::map<uint32_t, natural_mortality_base* > natural_mortality_base::natural_mortality_objects;
 
-//Population Rcpp interface
+/****************************************************************
+ * Population Rcpp interface                                    *
+ ***************************************************************/
 class population : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -181,7 +191,10 @@ public:
 uint32_t population::id_g = 1;
 std::map<uint32_t, population* > population::population_objects;
 
-//Data Rcpp interface
+
+/****************************************************************
+ * Data Rcpp interface                                          *
+ ***************************************************************/
 class data_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -198,7 +211,9 @@ uint32_t data_base::id_g = 1;
 std::map<uint32_t, data_base* > data_base::data_objects;
 
 
-//Likelihood Rcpp interface
+/****************************************************************
+ * Likelihood Rcpp interface                                    *
+ ***************************************************************/
 class likelihood_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -214,7 +229,28 @@ public:
 uint32_t likelihood_base::id_g = 1;
 std::map<uint32_t, likelihood_base* > likelihood_base::likelihood_objects;
 
-//Fleet Rcpp interface
+
+/****************************************************************
+ * Fishing Mortality Rcpp interface                             *
+ ***************************************************************/
+class fishing_mortality : public fims_rcpp_interface_base {
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, fishing_mortality*> fishing_mortality_objects;
+
+    fishing_mortality() {
+
+    }
+
+
+};
+uint32_t fishing_mortality::id_g = 1;
+std::map<uint32_t, fishing_mortality* > fishing_mortality::fishing_mortality_objects;
+
+
+/****************************************************************
+ * Fleet Rcpp interface                                         *
+ ***************************************************************/
 class fleet : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
@@ -230,7 +266,9 @@ public:
 uint32_t fleet::id_g = 1;
 std::map<uint32_t, fleet* > fleet::fleet_objects;
 
-//Survey Rcpp interface
+/****************************************************************
+ * Survey Rcpp interface                  v                     *
+ ***************************************************************/
 class survey : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
