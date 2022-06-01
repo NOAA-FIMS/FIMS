@@ -1,8 +1,13 @@
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
+
+#include <vector>
+#include <map>
+
 #include "interface.hpp"
 #include "../common/model.hpp"
 #include "../common/information.hpp"
+
 
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
@@ -39,12 +44,14 @@ public:
  */
 class fims_rcpp_interface_base{
 public:
-   
+    static std::vector<fims_rcpp_interface_base*> fims_interface_objects;
+    
     virtual bool add_to_fims(){
         std::cout <<"Not yet implemented!";
         return false;
     }
 };
+std::vector<fims_rcpp_interface_base*> fims_rcpp_interface_base::fims_interface_objects;
 
 //Recruitment Rcpp interface
 
@@ -74,6 +81,7 @@ public:
     beverton_holt() {
         this->id = recruitment_interface_base::id_g++;
         recruitment_interface_base::recruitment_objects[this->id] = this;
+        fims_rcpp_interface_base::fims_interface_objects.push_back(this);
     }
     
     virtual bool add_to_fims(){
@@ -120,6 +128,20 @@ uint32_t growth_interface_base::id_g = 1;
 std::map<uint32_t, growth_interface_base* > growth_interface_base::growth_objects;
 
 //Maturity Rcpp interface
+class maturity_interface_base : public fims_rcpp_interface_base{
+public:
+    static uint32_t id_g;
+    static std::map<uint32_t, maturity_interface_base*> maturity_objects;
+
+    maturity_interface_base() {
+
+    }
+
+
+};
+
+uint32_t maturity_interface_base::id_g = 1;
+std::map<uint32_t, maturity_interface_base* > maturity_interface_base::maturity_objects;
 
 //Natural Mortality Rcpp interface
 
@@ -135,6 +157,10 @@ std::map<uint32_t, growth_interface_base* > growth_interface_base::growth_object
 
 
 bool create_model() {
+    
+    for(int i =0; i < fims_rcpp_interface_base::fims_interface_objects.size(); i++){
+        fims_rcpp_interface_base::fims_interface_objects[i]->add_to_fims();
+    }
 
     
     
