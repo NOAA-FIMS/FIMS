@@ -34,6 +34,8 @@ class Information {
       random_effects_parameters;  // list of all random effects parameters
   std::vector<T*>
       fixed_effects_parameters;  // list of all fixed effects parameters
+  
+  std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;
 
 static std::shared_ptr<Information<T> > get_instance(){
    if(Information<T>::fims_information == nullptr){
