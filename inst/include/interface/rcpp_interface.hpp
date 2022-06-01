@@ -38,6 +38,8 @@ public:
 
 //Selectivity Rcpp interface
 
+//Growth Rcpp interface
+
 bool create_model() {
 
     std::shared_ptr<fims::information<FIMS_REAL_TYPE> > a =
