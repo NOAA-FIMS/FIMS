@@ -267,25 +267,6 @@ public:
 uint32_t fleet::id_g = 1;
 std::map<uint32_t, fleet* > fleet::fleet_objects;
 
-/****************************************************************
- * Survey Rcpp interface                  v                     *
- ***************************************************************/
-class survey : public fims_rcpp_interface_base {
-public:
-    static uint32_t id_g;
-    static std::map<uint32_t, survey*> survey_objects;
-
-    survey() {
-
-    }
-
-
-};
-
-uint32_t survey::id_g = 1;
-std::map<uint32_t, survey* > survey::survey_objects;
-
-
 
 /**
  *
@@ -298,21 +279,25 @@ bool create_tmb_model() {
 
 
 
-    std::shared_ptr<fims::information<TMB_FIMS_REAL_TYPE> > a =
+    //base model 
+    std::shared_ptr<fims::information<TMB_FIMS_REAL_TYPE> > d0 =
             fims::information<TMB_FIMS_REAL_TYPE>::get_instance();
-    a->creat_model();
+    d0->creat_model();
 
-    std::shared_ptr<fims::information<TMB_FIMS_FIRST_ORDER> > b =
+    //first-order derivative
+    std::shared_ptr<fims::information<TMB_FIMS_FIRST_ORDER> > d1 =
             fims::information<TMB_FIMS_FIRST_ORDER>::get_instance();
-    b->creat_model();
-
-    std::shared_ptr<fims::information<TMB_FIMS_SECOND_ORDER> > c =
+    d1->creat_model();
+    
+    //second-order derivative
+    std::shared_ptr<fims::information<TMB_FIMS_SECOND_ORDER> > d2 =
             fims::information<TMB_FIMS_SECOND_ORDER>::get_instance();
-    c->creat_model();
+    d2->creat_model();
 
-    std::shared_ptr<fims::information<TMB_FIMS_THIRD_ORDER> > d =
+    //third-order derivative
+    std::shared_ptr<fims::information<TMB_FIMS_THIRD_ORDER> > d3 =
             fims::information<TMB_FIMS_THIRD_ORDER>::get_instance();
-    d->creat_model();
+    d3->creat_model();
 
 
     return true;
