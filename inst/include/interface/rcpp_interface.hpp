@@ -301,11 +301,140 @@ std::map<uint32_t, selectivity_interface_base* > selectivity_interface_base::sel
 
 class logistic_selectivity : public selectivity_interface_base {
 public:
-      logistic_selectivity(){
+    uint32_t id;
+    parameter median;
+    parameter slope;
+
+    logistic_selectivity() {
         this->id = selectivity_interface_base::id_g++;
         selectivity_interface_base::selectivity_objects[this->id] = this;
-      }
-     
+    }
+    
+    virtual ~logistic_selectivity(){}
+
+    virtual bool add_to_fims_tmb() {
+        
+        std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+                fims::Information<TMB_FIMS_REAL_TYPE>::get_instance();
+
+        std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> > ls0 =
+                std::make_shared<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> >();
+
+
+        //set relative info
+        ls0->id = this->id;
+        ls0->median = this->median.value;
+        if (this->median.estimated) {
+            if (this->median.is_random_effect) {
+                d0->register_random_effect(ls0->median);
+            } else {
+                d0->register_parameter(ls0->median);
+            }
+        }
+        ls0->slope = this->slope.value;
+        if (this->slope.estimated) {
+            if (this->slope.is_random_effect) {
+                d0->register_random_effect(ls0->slope);
+            } else {
+                d0->register_parameter(ls0->slope);
+            }
+        }
+
+        //add to Information
+        d0->selectivity_models[ls0->id] = ls0;
+
+        std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+                fims::Information<TMB_FIMS_FIRST_ORDER>::get_instance();
+
+        std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> > ls1 =
+                std::make_shared<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> >();
+
+
+        //set relative info
+        ls1->id = this->id;
+        ls1->median = this->median.value;
+        if (this->median.estimated) {
+            if (this->median.is_random_effect) {
+                d1->register_random_effect(ls1->median);
+            } else {
+                d1->register_parameter(ls1->median);
+            }
+        }
+        ls1->slope = this->slope.value;
+        if (this->slope.estimated) {
+            if (this->slope.is_random_effect) {
+                d1->register_random_effect(ls1->slope);
+            } else {
+                d1->register_parameter(ls1->slope);
+            }
+        }
+
+        //add to Information
+        d1->selectivity_models[ls1->id] = ls1;
+
+        std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+                fims::Information<TMB_FIMS_SECOND_ORDER>::get_instance();
+
+        std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> > ls2 =
+                std::make_shared<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> >();
+
+
+        //set relative info
+        ls2->id = this->id;
+        ls2->median = this->median.value;
+        if (this->median.estimated) {
+            if (this->median.is_random_effect) {
+                d2->register_random_effect(ls2->median);
+            } else {
+                d2->register_parameter(ls2->median);
+            }
+        }
+        ls2->slope = this->slope.value;
+        if (this->slope.estimated) {
+            if (this->slope.is_random_effect) {
+                d2->register_random_effect(ls2->slope);
+            } else {
+                d2->register_parameter(ls2->slope);
+            }
+        }
+
+        //add to Information
+        d2->selectivity_models[ls2->id] = ls2;
+        
+        
+            std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+                fims::Information<TMB_FIMS_THIRD_ORDER>::get_instance();
+
+        std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> > ls3 =
+                std::make_shared<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> >();
+
+
+        //set relative info
+        ls3->id = this->id;
+        ls3->median = this->median.value;
+        if (this->median.estimated) {
+            if (this->median.is_random_effect) {
+                d3->register_random_effect(ls3->median);
+            } else {
+                d3->register_parameter(ls3->median);
+            }
+        }
+        ls3->slope = this->slope.value;
+        if (this->slope.estimated) {
+            if (this->slope.is_random_effect) {
+                d3->register_random_effect(ls3->slope);
+            } else {
+                d3->register_parameter(ls3->slope);
+            }
+        }
+
+        //add to Information
+        d3->selectivity_models[ls3->id] = ls3;
+
+        
+        return true;
+    }
+
 };
 
 /****************************************************************
@@ -505,6 +634,10 @@ RCPP_MODULE(fims) {
             .field("steep", &beverton_holt::steep)
             .field("rzero", &beverton_holt::rzero)
             .field("phizero", &beverton_holt::phizero);
+Rcpp::class_<logistic_selectivity>("logistic_selectivity")
+.constructor()
+.field("median", &logistic_selectivity::median)
+.field("slope", &logistic_selectivity::slope);
 
 }
 

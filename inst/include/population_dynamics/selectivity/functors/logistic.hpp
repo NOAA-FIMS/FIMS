@@ -28,6 +28,8 @@ struct LogisticSelectivity : public SelectivityBase<T> {
 
   LogisticSelectivity() : SelectivityBase<T>() {}
 
+virtual ~LogisticSelectivity(){}
+
   /**
    * @brief Method of the logistic selectivity class that implements the
    * logistic function from FIMS math.

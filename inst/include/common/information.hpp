@@ -36,7 +36,8 @@ class Information {
       fixed_effects_parameters;  // list of all fixed effects parameters
   
   std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;
-
+  std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
+  
 static std::shared_ptr<Information<T> > get_instance(){
    if(Information<T>::fims_information == nullptr){
        Information<T>::fims_information =  std::make_shared<fims::Information<T> >();
