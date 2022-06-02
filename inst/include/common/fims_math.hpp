@@ -89,19 +89,28 @@ inline const T logistic(const T &median, const T &slope, const T &x) {
 /**
  * @brief The general double logistic function
  *
- * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - median_{asc}))} \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x - median_{desc}))}  \right)\f$
+ * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - median_{asc}))}
+ * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x - median_{desc}))}
+ * \right)\f$
  *
- * @param median_asc the median (inflection point) of the ascending limb of the double logistic function
- * @param slope_asc the slope of the ascending limb of the double logistic function
- * @param median_desc the median (inflection point) of the descending limb of the double logistic function, where median_desc > median_asc
- * @param slope_desc the slope of the descending limb of the double logistic function
+ * @param median_asc the median (inflection point) of the ascending limb of the
+ * double logistic function
+ * @param slope_asc the slope of the ascending limb of the double logistic
+ * function
+ * @param median_desc the median (inflection point) of the descending limb of
+ * the double logistic function, where median_desc > median_asc
+ * @param slope_desc the slope of the descending limb of the double logistic
+ * function
  * @param x the index the logistic function should be evaluated at
  * @return
  */
 
 template <class T>
-inline const T double_logistic(const T &median_asc, const T &slope_asc, const T &median_desc, const T &slope_desc, const T &x) {
-  return (1.0) / (1.0 + exp(-1.0 * slope_asc * (x - median_asc))) * (1.0 - (1.0) / (1.0 + exp(-1.0 * slope_desc * (x - median_desc))));
+inline const T double_logistic(const T &median_asc, const T &slope_asc,
+                               const T &median_desc, const T &slope_desc,
+                               const T &x) {
+  return (1.0) / (1.0 + exp(-1.0 * slope_asc * (x - median_asc))) *
+         (1.0 - (1.0) / (1.0 + exp(-1.0 * slope_desc * (x - median_desc))));
 }
 
 }  // namespace fims
