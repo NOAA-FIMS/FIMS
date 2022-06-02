@@ -128,7 +128,7 @@ inline const T double_logistic(const T &median_asc, const T &slope_asc,
    */
   template<class T>
   const T ad_fabs(const T& x, T C = 1e-5) {
-      return atl::sqrt((x * x) + C); //, .5);
+      return sqrt((x * x) + C); //, .5);
   }
 
 /**
