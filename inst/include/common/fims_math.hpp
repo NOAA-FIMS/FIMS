@@ -144,7 +144,7 @@ inline const T double_logistic(const T &median_asc, const T &slope_asc,
    * @return
    */
   template <typename T>
-  inline const T ad_min(const T& a, constT& b,  T C = 1e-5) {
+  inline const T ad_min(const T& a, const T& b,  T C = 1e-5) {
       return  (a + b - fims::ad_fabs(a - b,C))*.5;
   }
 
