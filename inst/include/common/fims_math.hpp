@@ -114,39 +114,39 @@ inline const T double_logistic(const T &median_asc, const T &slope_asc,
 }
 
 /**
-   *
-   * Used when x could evaluate to zero, which will result in a NaN for
-   * derivative values.
-   *
-   * Evaluates:
-   *
-   * \f$ (expr^2+C)^.5 \f$
-   *
-   * @param expr
-   * @param C default = 1e-5
-   * @return
-   */
-  template<class T>
-  const T ad_fabs(const T& x, T C = 1e-5) {
-      return sqrt((x * x) + C); //, .5);
-  }
+ *
+ * Used when x could evaluate to zero, which will result in a NaN for
+ * derivative values.
+ *
+ * Evaluates:
+ *
+ * \f$ (expr^2+C)^.5 \f$
+ *
+ * @param expr
+ * @param C default = 1e-5
+ * @return
+ */
+template <class T>
+const T ad_fabs(const T &x, T C = 1e-5) {
+  return sqrt((x * x) + C);  //, .5);
+}
 
 /**
-   * Returns the minimum between a and b in a continuous manner using:
-   *
-   * (a + b - \ref fims::ad_fabs(a - b))*.5;
-   *
-   * This is an approximation with minimal error.
-   *
-   * @param a
-   * @param b
-   * @param C default = 1e-5
-   * @return
-   */
-  template <typename T>
-  inline const T ad_min(const T& a, const T& b,  T C = 1e-5) {
-      return  (a + b - fims::ad_fabs(a - b,C))*.5;
-  }
+ * Returns the minimum between a and b in a continuous manner using:
+ *
+ * (a + b - \ref fims::ad_fabs(a - b))*.5;
+ *
+ * This is an approximation with minimal error.
+ *
+ * @param a
+ * @param b
+ * @param C default = 1e-5
+ * @return
+ */
+template <typename T>
+inline const T ad_min(const T &a, const T &b, T C = 1e-5) {
+  return (a + b - fims::ad_fabs(a - b, C)) * .5;
+}
 
 /**
  * Returns the maximum between a and b in a continuous manner using:
@@ -161,10 +161,9 @@ inline const T double_logistic(const T &median_asc, const T &slope_asc,
  * @return
  */
 template <typename T>
-inline const T ad_max(const T& a, const T& b, T C = 1e-5) {
-    return (a + b + fims::ad_fabs(a-b,C))*static_cast<T>(.5);
+inline const T ad_max(const T &a, const T &b, T C = 1e-5) {
+  return (a + b + fims::ad_fabs(a - b, C)) * static_cast<T>(.5);
 }
-
 
 }  // namespace fims
 
