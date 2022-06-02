@@ -8,7 +8,7 @@
  * @return Returns a joint negative log likelihood
  */
 template<class Type>
-Type objective_function<Type>::operator() ()
+Type objective_function<Type>::operator() () 
 {
 
 
