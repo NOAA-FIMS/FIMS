@@ -29,13 +29,9 @@ template <typename T>
 class Information {
   public:
   static std::shared_ptr<Information<T> > fims_information;
-  // typedef fims::FIMSTraits<T>::variable_t variable_t;
-  // typedef fims::FIMSTraits<T>::real_t real_t;
-  std::vector<T*> parameters;  // list of all estimated parameters
-  std::vector<T*>
-      random_effects_parameters;  // list of all random effects parameters
-  std::vector<T*>
-      fixed_effects_parameters;  // list of all fixed effects parameters
+  std::vector<T*> parameters;                // list of all estimated parameters
+  std::vector<T*> random_effects_parameters; // list of all random effects parameters
+  std::vector<T*> fixed_effects_parameters;  // list of all fixed effects parameters
   
   std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;
   std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
@@ -57,7 +53,7 @@ void RegisterRandomEffect( T& re){
 }
 
  bool CreateModel() {
-     std::cout<<"Information::creat_model(): Not yet implemented.\n";
+     std::cout<<"Information::CreateModel(): Not yet implemented.\n";
      return false;
  }
  
