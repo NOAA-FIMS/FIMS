@@ -31,49 +31,4 @@ struct ModelTraits {
 
 #endif /* TMB_MODEL */
 
-#define RCPP_NO_SUGAR
-#include <Rcpp.h>
-using namespace Rcpp;
-
-void hello_fims() { std::cout << "hello fims"; }
-
-RCPP_EXPOSED_CLASS(GrowthBase)
-RCPP_EXPOSED_CLASS(EWAAgrowth)
-RCPP_EXPOSED_CLASS(FIMSObject)
-
-RCPP_MODULE(fims) {
-  // place holder for module elements
-  Rcpp::function("hello_fims", hello_fims);
-};
-
-  // RCPP_MODULE(LogisticSelectivity) {
-  //   class_<LogisticSelectivity>("LogisticSelectivity")
-  //   .constructor<LogisticSelectivity>()
-  //   .field("median", &LogisticSelectivity::median)
-  //   .field("slope", &LogisticSelectivity::slope)
-  //   .method("evaluate", &LogisticSelectivity::evaluate)
-  //   ;
-  // }
-  RCPP_MODULE(EWAAgrowth) {
-    class_<FIMSObject>("FIMSObject")
-    .field("id", &FIMSObject::id)
-    .field("parameters", &FIMSObject::parameters)
-    .field("random_effects_parameters", &FIMSObject::random_effects_parameters)
-    .field("fixed_effects_parameters", &FIMSObject::fixed_effects_parameters)
-    .method("GetID", &FIMSObject::GetId);
-
-    class_<GrowthBase>("GrowthBase")
-    .derives<FIMSObject>("FIMSObject")
-    .constructor()
-    .method("evaluate", &GrowthBase::evaluate)
-    ;
-
-    Rcpp::class_<EWAAgrowth>("EWAAgrowth")
-    .derives<GrowthBase>("GrowthBase")
-    .constructor()
-    .field("ewaa", &EWAAgrowth::ewaa)
-    .method("evaluate", &EWAAgrowth::evaluate)
-    ;
-};
-
 #endif /* FIMS_INTERFACE_HPP */
