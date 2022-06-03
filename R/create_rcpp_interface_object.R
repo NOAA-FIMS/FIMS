@@ -103,11 +103,37 @@ create_fims_rcpp_interface <- function(
     cat(";\n\n\n")
   }
   cat("}\n\n};")
+  
+  cat("//Add the following to the RCpp module definition\n\n")
+  
+  cat("Rcpp::class_<")
+      cat(interface_name)
+  cat(">(\"")
+  cat(interface_name)
+  cat("\"")
+  cat(")\n.constructor()\n")
+  cat(".method(\"get_id\",  &")
+  cat(interface_name)
+  cat("::get_id)\n")
+  for(i in 1:length(parameters)){
+    cat(".field(\"")
+    cat(parameters[i])
+    cat("\", &")
+    cat(interface_name)
+    cat("::")
+    cat(parameters[i])
+    cat(")")
+    if(i<length(parameters)){
+      cat("\n")
+    }
+  }
+  cat(";")
+  
 }
 
 
-#create_fims_rcpp_interface("logistic_selectivity",
-#                "LogisticSelectivity",
-#                "selectivity_interface_base",
-#                "selectivity_models",
-#                c("slope", "median"))
+create_fims_rcpp_interface("logistic_selectivity",
+               "LogisticSelectivity",
+               "selectivity_interface_base",
+               "selectivity_models",
+               c("slope", "median"))
