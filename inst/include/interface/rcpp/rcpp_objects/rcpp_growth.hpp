@@ -1,12 +1,12 @@
 /*
- * File:   interface.hpp
+ * File:   rcpp_growth.hpp
  *
- * Author: Andrea Havron
+ * Author: Matthew Supernaw
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Email: andrea.havron@noaa.gov
+ * Email: matthew.supernaw@noaa.gov
  *
- * Created on February 23, 2022
+ * Created on May 31, 2022 at 12:04 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,30 +28,9 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-
-#ifndef FIMS_INTERFACE_HPP
-#define FIMS_INTERFACE_HPP
-/*
- * Interface file. Uses pre-processing macros
- * to interface with multiple modeling platforms.
- */
-
-// traits for interfacing with TMB
-#ifdef TMB_MODEL
-// use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
-// issue
-#include <math.h>
-//#define TMB_LIB_INIT R_init_FIMS
-#include <TMB.hpp>
-
-template <typename Type>
-struct ModelTraits {
-  typedef typename CppAD::vector<Type> DataVector;
-  typedef typename CppAD::vector<Type> ParameterVector;
-};
-
-#endif /* TMB_MODEL */
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
 
 
 
-#endif /* FIMS_INTERFACE_HPP */
+#endif

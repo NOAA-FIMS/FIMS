@@ -1,12 +1,12 @@
 /*
- * File:   interface.hpp
+ * File:   rcpp_population.hpp
  *
- * Author: Andrea Havron
+ * Author: Matthew Supernaw
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Email: andrea.havron@noaa.gov
+ * Email: matthew.supernaw@noaa.gov
  *
- * Created on February 23, 2022
+ * Created on May 31, 2022 at 12:04 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,30 +28,34 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
-#ifndef FIMS_INTERFACE_HPP
-#define FIMS_INTERFACE_HPP
-/*
- * Interface file. Uses pre-processing macros
- * to interface with multiple modeling platforms.
- */
+#include "rcpp_interface_base.hpp"
+#include "../../../population_dynamics/population/population.hpp"
 
-// traits for interfacing with TMB
-#ifdef TMB_MODEL
-// use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
-// issue
-#include <math.h>
-//#define TMB_LIB_INIT R_init_FIMS
-#include <TMB.hpp>
+/****************************************************************
+ * Selectivity Rcpp interface                                   *
+ ***************************************************************/
+class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
+public:
+    static uint32_t id_g;
+    uint32_t id;
+    static std::map<uint32_t, PopulationInterfaceBase*> live_objects;
 
-template <typename Type>
-struct ModelTraits {
-  typedef typename CppAD::vector<Type> DataVector;
-  typedef typename CppAD::vector<Type> ParameterVector;
+    PopulationInterfaceBase() {
+        this->id = PopulationInterfaceBase::id_g++;
+        PopulationInterfaceBase::live_objects[this->id] = this;
+        PopulationInterfaceBase::fims_interface_objects.push_back(this);
+    }
+
+    virtual uint32_t get_id() = 0;
+
 };
 
-#endif /* TMB_MODEL */
+uint32_t PopulationInterfaceBase::id_g = 1;
+std::map<uint32_t, PopulationInterfaceBase* > PopulationInterfaceBase::live_objects;
 
 
 
-#endif /* FIMS_INTERFACE_HPP */
+#endif
