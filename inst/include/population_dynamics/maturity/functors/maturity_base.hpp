@@ -29,8 +29,7 @@ struct MaturityBase : public FIMSObject<T> {
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the MaturityBase class.
-  static uint32_t
-      id_g; /*!< The ID of the instance of the MaturityBase class */
+  static uint32_t id_g; /*!< The ID of the instance of the MaturityBase class */
 
   /** @brief Constructor.
    */
@@ -41,8 +40,8 @@ struct MaturityBase : public FIMSObject<T> {
 
   /**
    * @brief Calculates the maturity.
-   * @param x The independent variable in the maturity function (e.g., logistic maturity at age or
-   * size).
+   * @param x The independent variable in the maturity function (e.g., logistic
+   * maturity at age or size).
    */
   virtual const T evaluate(const T& x) = 0;
 };

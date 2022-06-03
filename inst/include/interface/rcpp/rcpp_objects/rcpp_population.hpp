@@ -31,31 +31,29 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
-#include "rcpp_interface_base.hpp"
 #include "../../../population_dynamics/population/population.hpp"
+#include "rcpp_interface_base.hpp"
 
 /****************************************************************
  * Selectivity Rcpp interface                                   *
  ***************************************************************/
 class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
-public:
-    static uint32_t id_g;
-    uint32_t id;
-    static std::map<uint32_t, PopulationInterfaceBase*> live_objects;
+ public:
+  static uint32_t id_g;
+  uint32_t id;
+  static std::map<uint32_t, PopulationInterfaceBase*> live_objects;
 
-    PopulationInterfaceBase() {
-        this->id = PopulationInterfaceBase::id_g++;
-        PopulationInterfaceBase::live_objects[this->id] = this;
-        PopulationInterfaceBase::fims_interface_objects.push_back(this);
-    }
+  PopulationInterfaceBase() {
+    this->id = PopulationInterfaceBase::id_g++;
+    PopulationInterfaceBase::live_objects[this->id] = this;
+    PopulationInterfaceBase::fims_interface_objects.push_back(this);
+  }
 
-    virtual uint32_t get_id() = 0;
-
+  virtual uint32_t get_id() = 0;
 };
 
 uint32_t PopulationInterfaceBase::id_g = 1;
-std::map<uint32_t, PopulationInterfaceBase* > PopulationInterfaceBase::live_objects;
-
-
+std::map<uint32_t, PopulationInterfaceBase*>
+    PopulationInterfaceBase::live_objects;
 
 #endif

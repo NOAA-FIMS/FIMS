@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 /**
- * 
+ *
  * Callback definition for TMB C++ functions.
- * 
+ *
  */
 #ifndef TMB_CALLDEFS
 #define TMB_CALLDEFS                                             \
@@ -33,11 +33,10 @@ SEXP omp_check();
 SEXP omp_num_threads(SEXP);
 SEXP _rcpp_module_boot_fims();
 
-
 /**
- * 
+ *
  *Callback definition to load the FIMS module.
- * 
+ *
  */
 static const R_CallMethodDef CallEntries[] = {
     TMB_CALLDEFS,
@@ -45,10 +44,10 @@ static const R_CallMethodDef CallEntries[] = {
     {NULL, NULL, 0}};
 
 /**
- * 
+ *
  * FIMS shared object initializer.
  * @param dll
- * 
+ *
  */
 void R_init_FIMS(DllInfo *dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);

@@ -52,6 +52,4 @@ struct ModelTraits {
 
 #endif /* TMB_MODEL */
 
-
-
 #endif /* FIMS_INTERFACE_HPP */
