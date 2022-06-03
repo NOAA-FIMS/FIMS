@@ -1,12 +1,11 @@
-#Function to create the Rcpp interface classes
-#for FIMS model objects. 
-create_fims_rcpp_interface <- function(
-                            interface_name = character(), #class name
-                            model = character(),          #fims model (i.e. LogisticSelectivity) without "fims" namespace
-                            base_class = character(),     #interface base class
-                            container = character(),      #information container
-                            parameters = vector()) {      #fims model parameters
-  
+# Function to create the Rcpp interface classes
+# for FIMS model objects.
+create_fims_rcpp_interface <- function(interface_name = character(), # class name
+                                       model = character(), # fims model (i.e. LogisticSelectivity) without "fims" namespace
+                                       base_class = character(), # interface base class
+                                       container = character(), # information container
+                                       parameters = vector()) { # fims model parameters
+
   types <- c(
     "TMB_FIMS_REAL_TYPE",
     "TMB_FIMS_FIRST_ORDER",
@@ -15,7 +14,7 @@ create_fims_rcpp_interface <- function(
   )
   itypes <- c("d0", "d1", "d2", "d3")
   mtypes <- c("model0", "model1", "model2", "model3")
-  
+
   cat("class ")
   cat(interface_name)
   cat(" : public ")
@@ -23,21 +22,20 @@ create_fims_rcpp_interface <- function(
   cat(" {\n")
   cat("public:\n\n")
   # cat("     ")
-  for(i in 1:length(parameters)){
+  for (i in 1:length(parameters)) {
     cat("   parameter ")
     cat(parameters[i])
     cat(";\n")
-    
   }
   cat("\n\n   ")
   cat(interface_name)
   cat("() : ")
   cat(base_class)
   cat("() {}\n\n")
-  
+
   cat("uint32_t get_id(){return this->id}\n\n\n")
-  
- 
+
+
   cat("bool add_to_fims_tmb(){\n")
   for (i in 1:4) {
     cat(paste0("    std::shared_ptr<fims::Information<", types[i]))
@@ -59,9 +57,9 @@ create_fims_rcpp_interface <- function(
     cat(types[i])
     cat("> >();")
     cat("\n\n")
-    
+
     for (j in 1:length(parameters)) {
-     cat("\n   ")
+      cat("\n   ")
       cat(mtypes[i])
       cat("->id = this->id;\n   ")
       cat(mtypes[i])
@@ -90,7 +88,6 @@ create_fims_rcpp_interface <- function(
       cat(parameters[j])
       cat(");\n")
       cat("   }\n")
-      
     }
     cat("   ")
     cat(itypes[i])
@@ -103,11 +100,11 @@ create_fims_rcpp_interface <- function(
     cat(";\n\n\n")
   }
   cat("}\n\n};")
-  
+
   cat("//Add the following to the RCpp module definition\n\n")
-  
+
   cat("Rcpp::class_<")
-      cat(interface_name)
+  cat(interface_name)
   cat(">(\"")
   cat(interface_name)
   cat("\"")
@@ -115,7 +112,7 @@ create_fims_rcpp_interface <- function(
   cat(".method(\"get_id\",  &")
   cat(interface_name)
   cat("::get_id)\n")
-  for(i in 1:length(parameters)){
+  for (i in 1:length(parameters)) {
     cat(".field(\"")
     cat(parameters[i])
     cat("\", &")
@@ -123,17 +120,18 @@ create_fims_rcpp_interface <- function(
     cat("::")
     cat(parameters[i])
     cat(")")
-    if(i<length(parameters)){
+    if (i < length(parameters)) {
       cat("\n")
     }
   }
   cat(";")
-  
 }
 
 
-create_fims_rcpp_interface("logistic_selectivity",
-               "LogisticSelectivity",
-               "selectivity_interface_base",
-               "selectivity_models",
-               c("slope", "median"))
+create_fims_rcpp_interface(
+  "logistic_selectivity",
+  "LogisticSelectivity",
+  "selectivity_interface_base",
+  "selectivity_models",
+  c("slope", "median")
+)
