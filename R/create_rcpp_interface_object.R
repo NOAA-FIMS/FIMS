@@ -21,7 +21,6 @@ create_fims_rcpp_interface <- function(
   itypes <- c("d0", "d1", "d2", "d3")
   mtypes <- c("model0", "model1", "model2", "model3")
   
-  
   cat("class ")
   cat(interface_name)
   cat(" : public ")
