@@ -1,6 +1,3 @@
-#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_SELECTIVITY_HPP
-#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_SELECTIVITY_HPP
-
 /*
  * File:   rcpp_selectivity.hpp
  *
@@ -31,6 +28,8 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_SELECTIVITY_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_SELECTIVITY_HPP
 
 #include "rcpp_interface_base.hpp"
 #include "../../../population_dynamics/selectivity/selectivity.hpp"

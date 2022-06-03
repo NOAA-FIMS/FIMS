@@ -1,6 +1,3 @@
-#ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
-#define FIMS_INTERFACE_RCPP_INTERFACE_HPP
-
 /*
  * File:   rcpp_interface.hpp
  *
@@ -31,6 +28,9 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
+#ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
+#define FIMS_INTERFACE_RCPP_INTERFACE_HPP
+
 
 
 #include "rcpp_objects/rcpp_recruitment.hpp"

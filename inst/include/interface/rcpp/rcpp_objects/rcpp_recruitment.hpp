@@ -1,6 +1,3 @@
-#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_RECRUITMENT_HPP
-#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_RECRUITMENT_HPP
-
 /*
  * File:   rcpp_recruitment.hpp
  *
@@ -31,6 +28,10 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_RECRUITMENT_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_RECRUITMENT_HPP
+
+
 #include "rcpp_interface_base.hpp"
 #include "../../../population_dynamics/recruitment/recruitment.hpp"
 
@@ -41,11 +42,11 @@ class recruitment_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
     uint32_t id;
-    static std::map<uint32_t, recruitment_interface_base*> recruitment_objects;
+    static std::map<uint32_t, recruitment_interface_base*> live_objects;
 
     recruitment_interface_base() {
         this->id = recruitment_interface_base::id_g++;
-        recruitment_interface_base::recruitment_objects[this->id] = this;
+        recruitment_interface_base::live_objects[this->id] = this;
         fims_rcpp_interface_base::fims_interface_objects.push_back(this);
     }
 
@@ -56,7 +57,7 @@ public:
 };
 
 uint32_t recruitment_interface_base::id_g = 1;
-std::map<uint32_t, recruitment_interface_base* > recruitment_interface_base::recruitment_objects;
+std::map<uint32_t, recruitment_interface_base* > recruitment_interface_base::live_objects;
 
 /**
  * @brief Rcpp interface for Beverton-Holt as a S4 object. To instantiate from R:

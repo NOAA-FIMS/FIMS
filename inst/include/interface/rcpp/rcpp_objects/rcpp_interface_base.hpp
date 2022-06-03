@@ -1,6 +1,3 @@
-#ifndef RCPP_INTERFACE_BASE
-#define RCPP_INTERFACE_BASE
-
 /*
  * File:   rcpp_interface_base.hpp
  *
@@ -31,7 +28,8 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 
 #include <vector>
 #include <map>
