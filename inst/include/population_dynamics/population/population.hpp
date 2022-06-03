@@ -41,7 +41,7 @@ namespace fims {
  * that are divided into generic partitions (eg. sex, area).
  */
 template <typename T>
-struct Population<T> : FIMSObject<T> {};
+struct Population : FIMSObject<T> {};
 }  // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */

@@ -1,12 +1,12 @@
 /*
- * File:   def.hpp
+ * File:   rcpp_fishing_mortality.hpp
  *
  * Author: Matthew Supernaw
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
  * Email: matthew.supernaw@noaa.gov
  *
- * Created on September 30, 2021, 3:59 PM
+ * Created on May 31, 2022 at 12:04 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,37 +28,7 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-#ifndef DEF_HPP
-#define DEF_HPP
-#include <vector>
-
-#ifdef TMB_MODEL
-// simplify access to singletons
-#define TMB_FIMS_REAL_TYPE double
-#define TMB_FIMS_FIRST_ORDER AD<TMB_FIMS_REAL_TYPE>
-#define TMB_FIMS_SECOND_ORDER AD<TMB_FIMS_FIRST_ORDER>
-#define TMB_FIMS_THIRD_ORDER AD<TMB_FIMS_SECOND_ORDER>
-#endif
-
-namespace fims {
-
-#ifdef STD_LIB
-
-/**
- * Default trait. These are "T" specific
- * traits that depend on modeling platform.
- */
-template <typename T>
-struct FIMSTraits {
-  typedef double real_t;
-  typedef double variable_t;
-  typedef typename std::vector<double> data_vector;
-  typedef typename std::vector<double> variable_vector;
-  typedef typename std::vector<std::vector<double> > data_matrix;
-  typedef typename std::vector<std::vector<double> > variable_matrix;
-};
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FISHING_MORTALITY_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FISHING_MORTALITY_HPP
 
 #endif
-}  // namespace fims
-
-#endif /* TRAITS_HPP */

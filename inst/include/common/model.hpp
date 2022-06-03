@@ -20,6 +20,8 @@
 
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/population/population.hpp"
+#include "../population_dynamics/recruitment/recruitment.hpp"
+#include "../population_dynamics/selectivity/selectivity.hpp"
 
 namespace fims {
 
@@ -28,9 +30,13 @@ namespace fims {
  */
 template <typename T>
 class Model {
-  std::vector < std::shared_ptr<Population<T>> populations;
-  std::vector < std::shared_ptr<Fleet<T>> fleets;
+ public:
+  static std::shared_ptr<Model<T> > fims_model;
+  std::vector<std::shared_ptr<Population<T> > > populations;
+  std::vector<std::shared_ptr<Fleet<T> > > fleets;
 };
+template <typename T>
+std::shared_ptr<Model<T> > Model<T>::fims_model = nullptr;
 
 }  // namespace fims
 

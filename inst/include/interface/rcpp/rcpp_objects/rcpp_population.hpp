@@ -1,12 +1,12 @@
 /*
- * File:   def.hpp
+ * File:   rcpp_population.hpp
  *
  * Author: Matthew Supernaw
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
  * Email: matthew.supernaw@noaa.gov
  *
- * Created on September 30, 2021, 3:59 PM
+ * Created on May 31, 2022 at 12:04 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,37 +28,32 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-#ifndef DEF_HPP
-#define DEF_HPP
-#include <vector>
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
-#ifdef TMB_MODEL
-// simplify access to singletons
-#define TMB_FIMS_REAL_TYPE double
-#define TMB_FIMS_FIRST_ORDER AD<TMB_FIMS_REAL_TYPE>
-#define TMB_FIMS_SECOND_ORDER AD<TMB_FIMS_FIRST_ORDER>
-#define TMB_FIMS_THIRD_ORDER AD<TMB_FIMS_SECOND_ORDER>
-#endif
+#include "../../../population_dynamics/population/population.hpp"
+#include "rcpp_interface_base.hpp"
 
-namespace fims {
+/****************************************************************
+ * Selectivity Rcpp interface                                   *
+ ***************************************************************/
+class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
+ public:
+  static uint32_t id_g;
+  uint32_t id;
+  static std::map<uint32_t, PopulationInterfaceBase*> live_objects;
 
-#ifdef STD_LIB
+  PopulationInterfaceBase() {
+    this->id = PopulationInterfaceBase::id_g++;
+    PopulationInterfaceBase::live_objects[this->id] = this;
+    PopulationInterfaceBase::fims_interface_objects.push_back(this);
+  }
 
-/**
- * Default trait. These are "T" specific
- * traits that depend on modeling platform.
- */
-template <typename T>
-struct FIMSTraits {
-  typedef double real_t;
-  typedef double variable_t;
-  typedef typename std::vector<double> data_vector;
-  typedef typename std::vector<double> variable_vector;
-  typedef typename std::vector<std::vector<double> > data_matrix;
-  typedef typename std::vector<std::vector<double> > variable_matrix;
+  virtual uint32_t get_id() = 0;
 };
 
-#endif
-}  // namespace fims
+uint32_t PopulationInterfaceBase::id_g = 1;
+std::map<uint32_t, PopulationInterfaceBase*>
+    PopulationInterfaceBase::live_objects;
 
-#endif /* TRAITS_HPP */
+#endif

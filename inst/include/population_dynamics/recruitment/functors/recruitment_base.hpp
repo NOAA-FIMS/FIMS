@@ -1,4 +1,4 @@
-/*
+/*! \file recruitment_base.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the
@@ -45,7 +45,7 @@ struct RecruitmentBase : public FIMSObject<Type> {
    *
    */
 
-  void prepare_constrained_deviations(){
+  void PrepareConstrainedDeviations(){
     if (!this->constrain_deviations) {
       return;
     }

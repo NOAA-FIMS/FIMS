@@ -1,12 +1,12 @@
 /*
- * File:   def.hpp
+ * File:   rcpp_interface_base.hpp
  *
  * Author: Matthew Supernaw
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
  * Email: matthew.supernaw@noaa.gov
  *
- * Created on September 30, 2021, 3:59 PM
+ * Created on May 31, 2022 at 12:04 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,37 +28,53 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-#ifndef DEF_HPP
-#define DEF_HPP
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
+
+#include <map>
 #include <vector>
 
-#ifdef TMB_MODEL
-// simplify access to singletons
-#define TMB_FIMS_REAL_TYPE double
-#define TMB_FIMS_FIRST_ORDER AD<TMB_FIMS_REAL_TYPE>
-#define TMB_FIMS_SECOND_ORDER AD<TMB_FIMS_FIRST_ORDER>
-#define TMB_FIMS_THIRD_ORDER AD<TMB_FIMS_SECOND_ORDER>
-#endif
+#include "../../../common/def.hpp"
+#include "../../../common/information.hpp"
+#include "../../interface.hpp"
 
-namespace fims {
-
-#ifdef STD_LIB
+#define RCPP_NO_SUGAR
+#include <Rcpp.h>
 
 /**
- * Default trait. These are "T" specific
- * traits that depend on modeling platform.
+ * @brief RcppInterface class that defines
+ * the interface between R and C++ for parameter types.
  */
-template <typename T>
-struct FIMSTraits {
-  typedef double real_t;
-  typedef double variable_t;
-  typedef typename std::vector<double> data_vector;
-  typedef typename std::vector<double> variable_vector;
-  typedef typename std::vector<std::vector<double> > data_matrix;
-  typedef typename std::vector<std::vector<double> > variable_matrix;
+class Parameter {
+ public:
+  double value;
+  double min = std::numeric_limits<double>::min();
+  double max = std::numeric_limits<double>::max();
+  bool is_random_effect = false;
+  bool estimated = false;
+
+  Parameter(double value, double min, double max, bool estimated)
+      : value(value), min(min), max(max), estimated(estimated) {}
+
+  Parameter(double value) { this->value = value; }
+
+  Parameter() { this->value = 0; }
 };
 
-#endif
-}  // namespace fims
+/**
+ *@brief Base class for all interface objects
+ */
+class FIMSRcppInterfaceBase {
+ public:
+  static std::vector<FIMSRcppInterfaceBase*> fims_interface_objects;
 
-#endif /* TRAITS_HPP */
+  virtual bool add_to_fims_tmb() {
+    std::cout << "fims_rcpp_interface_base::add_to_fims_tmb(): Not yet "
+                 "implemented.\n";
+    return false;
+  }
+};
+std::vector<FIMSRcppInterfaceBase*>
+    FIMSRcppInterfaceBase::fims_interface_objects;
+
+#endif
