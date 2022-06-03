@@ -1,8 +1,13 @@
-#ifndef INIT_H
-#define INIT_H
+#ifndef INTERFACE_INIT_HPP
+#define INTERFACE_INIT_HPP
 #include <R_ext/Rdynload.h>
 #include <stdlib.h>
 
+/**
+ * 
+ * Callback definition for TMB C++ functions.
+ * 
+ */
 #ifndef TMB_CALLDEFS
 #define TMB_CALLDEFS                                             \
   {"MakeADFunObject", (DL_FUNC)&MakeADFunObject, 4},             \
@@ -28,11 +33,23 @@ SEXP omp_check();
 SEXP omp_num_threads(SEXP);
 SEXP _rcpp_module_boot_fims();
 
+
+/**
+ * 
+ *Callback definition to load the FIMS module.
+ * 
+ */
 static const R_CallMethodDef CallEntries[] = {
     TMB_CALLDEFS,
     {"_rcpp_module_boot_fims", (DL_FUNC)&_rcpp_module_boot_fims, 0},
     {NULL, NULL, 0}};
 
+/**
+ * 
+ * FIMS shared object initializer.
+ * @param dll
+ * 
+ */
 void R_init_FIMS(DllInfo *dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);

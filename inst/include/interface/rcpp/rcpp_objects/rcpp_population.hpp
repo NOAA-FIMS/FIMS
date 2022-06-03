@@ -41,7 +41,7 @@ class population_interface_base : public fims_rcpp_interface_base {
 public:
     static uint32_t id_g;
     uint32_t id;
-    static std::map<uint32_t, selectivity_interface_base*> live_objects;
+    static std::map<uint32_t, population_interface_base*> live_objects;
 
     population_interface_base() {
         this->id = population_interface_base::id_g++;
