@@ -36,6 +36,11 @@ class Information {
   std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;
   std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
   
+/**
+ * Returns a single Information object for type T.
+ * 
+ * @return singleton for type T
+ */  
 static std::shared_ptr<Information<T> > GetInstance(){
    if(Information<T>::fims_information == nullptr){
        Information<T>::fims_information =  std::make_shared<fims::Information<T> >();
@@ -44,14 +49,31 @@ static std::shared_ptr<Information<T> > GetInstance(){
 
 }
 
+
+/**
+ * Register a parameter as estimable.
+ * 
+ * @param p
+ */
 void RegisterRarameter( T& p){
     this->parameters.push_back(&p);
 }
 
+/**
+ * Register a random effect as estimable.
+ * 
+ * @param p
+ */
 void RegisterRandomEffect( T& re){
     this->random_effects_parameters.push_back(&re);
 }
 
+/**
+ * Create the generalized stock assessment model that will evaluate the
+ * objective function.
+ *  
+ * @return 
+ */
  bool CreateModel() {
      std::cout<<"Information::CreateModel(): Not yet implemented.\n";
      return false;
@@ -60,7 +82,7 @@ void RegisterRandomEffect( T& re){
 };
 
 template<typename T>
-std::shared_ptr<Information<T> > Information<T>::fims_information = nullptr;
+std::shared_ptr<Information<T> > Information<T>::fims_information = nullptr;//singleton instance
 
 }  // namespace fims
 
