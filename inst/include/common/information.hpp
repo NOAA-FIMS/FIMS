@@ -58,7 +58,7 @@ class Information {
    *
    * @param p
    */
-  void RegisterRarameter(T& p) { this->parameters.push_back(&p); }
+  void RegisterParameter(T& p) { this->parameters.push_back(&p); }
 
   /**
    * Register a random effect as estimable.
