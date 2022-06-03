@@ -57,7 +57,8 @@ uint32_t selectivity_interface_base::id_g = 1;
 std::map<uint32_t, selectivity_interface_base* > selectivity_interface_base::selectivity_objects;
 
 /**
- * @brief Rcpp interface for logistic selectivity as a S4 object. To instantiate from R:
+ * @brief Rcpp interface for logistic selectivity as an S4 object. To instantiate
+ * from R:
  * logistic_selectivity <- new(fims$logistic_selectivity) 
  */
 class logistic_selectivity : public selectivity_interface_base {

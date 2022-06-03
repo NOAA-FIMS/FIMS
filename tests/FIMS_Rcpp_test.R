@@ -17,3 +17,6 @@ logistic_selectivity$median$value<- 5.0
 
 print(logistic_selectivity$slope$value)
 print(logistic_selectivity$get_id())
+
+logistic_selectivity2<-new(fims$logistic_selectivity)
+print(logistic_selectivity2$get_id())

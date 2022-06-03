@@ -60,7 +60,8 @@ uint32_t recruitment_interface_base::id_g = 1;
 std::map<uint32_t, recruitment_interface_base* > recruitment_interface_base::live_objects;
 
 /**
- * @brief Rcpp interface for Beverton-Holt as a S4 object. To instantiate from R:
+ * @brief Rcpp interface for Beverton-Holt as an S4 object. To instantiate 
+ * from R:
  * beverton_holt <- new(fims$beverton_holt) 
  */
 class beverton_holt : public recruitment_interface_base {
