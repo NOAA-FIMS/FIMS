@@ -1,5 +1,5 @@
 #ifndef RCPP_INTERFACE_BASE
-#denine RCPP_INTERFACE_BASE
+#define RCPP_INTERFACE_BASE
 
 /*
  * File:   rcpp_interface_base.hpp
@@ -36,7 +36,7 @@
 #include <vector>
 #include <map>
 
-#include "interface.hpp"
+#include "../../interface.hpp"
 #include "../../../common/def.hpp"
 #include "../../../common/information.hpp"
 

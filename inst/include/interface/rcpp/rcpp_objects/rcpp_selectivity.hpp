@@ -2,6 +2,7 @@
 #define RCPP_SELECTIVITY_HPP
 
 #include "rcpp_interface_base.hpp"
+#include "../../../population_dynamics/selectivity/selectivity.hpp"
 
 /****************************************************************
  * Selectivity Rcpp interface                                   *

@@ -2,6 +2,7 @@
 #define RCPP_RECRUITMENT
 
 #include "rcpp_interface_base.hpp"
+#include "../../../population_dynamics/recruitment/recruitment.hpp"
 
 /****************************************************************
  * Recruitment Rcpp interface                                   *
@@ -12,7 +13,7 @@ public:
     uint32_t id;
     static std::map<uint32_t, recruitment_interface_base*> recruitment_objects;
 
-    recruitment_interface_base() : selectivity_interface_base() {
+    recruitment_interface_base() {
         this->id = recruitment_interface_base::id_g++;
         recruitment_interface_base::recruitment_objects[this->id] = this;
         fims_rcpp_interface_base::fims_interface_objects.push_back(this);
@@ -36,10 +37,8 @@ public:
     parameter rzero;
     parameter phizero;
 
-    beverton_holt() {
-        this->id = recruitment_interface_base::id_g++;
-        recruitment_interface_base::recruitment_objects[this->id] = this;
-        fims_rcpp_interface_base::fims_interface_objects.push_back(this);
+    beverton_holt() : recruitment_interface_base() {
+
     }
 
     virtual ~beverton_holt() {
