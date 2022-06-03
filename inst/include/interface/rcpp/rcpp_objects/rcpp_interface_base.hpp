@@ -37,8 +37,8 @@
 #include <map>
 
 #include "interface.hpp"
-#include "../common/model.hpp"
-#include "../common/information.hpp"
+#include "../../../common/def.hpp"
+#include "../../../common/information.hpp"
 
 
 #define RCPP_NO_SUGAR
