@@ -1,16 +1,11 @@
-
-
-
-
-
-
-
+#Function to create the Rcpp interface classes
+#for FIMS model objects. 
 create_fims_rcpp_interface <- function(
-                            interface_name = character(), 
-                            model = character(),
-                            base_class = character(),
-                            container = character(), 
-                            parameters = vector()) {
+                            interface_name = character(), #class name
+                            model = character(),          #fims model (i.e. LogisticSelectivity) without "fims" namespace
+                            base_class = character(),     #interface base class
+                            container = character(),      #information container
+                            parameters = vector()) {      #fims model parameters
   
   types <- c(
     "TMB_FIMS_REAL_TYPE",
