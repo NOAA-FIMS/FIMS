@@ -5,8 +5,10 @@
 
 
 
-add_to_fims_tmb <- function(interface_name = character, 
+create_fims_rcpp_interface <- function(
+                            interface_name = character(), 
                             model = character(),
+                            base_class = character(),
                             container = character(), 
                             parameters = vector()) {
   
@@ -22,7 +24,9 @@ add_to_fims_tmb <- function(interface_name = character,
   
   cat("class ")
   cat(interface_name)
-  cat("{\n")
+  cat(" : public ")
+  cat(base_class)
+  cat(" {\n")
   cat("public:\n\n")
   # cat("     ")
   for(i in 1:length(parameters)){
@@ -33,7 +37,10 @@ add_to_fims_tmb <- function(interface_name = character,
   }
   cat("\n\n   ")
   cat(interface_name)
-  cat("(){}\n\n")
+  cat("() : ")
+  cat(base_class)
+  cat("() {}\n\n")
+  
 
   
  
@@ -105,6 +112,8 @@ add_to_fims_tmb <- function(interface_name = character,
 }
 
 
-add_to_fims_tmb("logistic_selectivity","LogisticSelectivity",
+create_fims_rcpp_interface("logistic_selectivity",
+                "LogisticSelectivity",
+                "selectivity_interface_base",
                 "selectivity_models",
                 c("slope", "median"))
