@@ -56,23 +56,23 @@ bool create_tmb_model() {
 
     //base model 
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-            fims::Information<TMB_FIMS_REAL_TYPE>::get_instance();
-    d0->creat_model();
+            fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    d0->CreateModel();
 
     //first-order derivative
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-            fims::Information<TMB_FIMS_FIRST_ORDER>::get_instance();
-    d1->creat_model();
+            fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    d1->CreateModel();
 
     //second-order derivative
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-            fims::Information<TMB_FIMS_SECOND_ORDER>::get_instance();
-    d2->creat_model();
+            fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    d2->CreateModel();
 
     //third-order derivative
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-            fims::Information<TMB_FIMS_THIRD_ORDER>::get_instance();
-    d3->creat_model();
+            fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    d3->CreateModel();
 
 
     return true;
@@ -98,6 +98,7 @@ RCPP_MODULE(fims) {
             .field("rzero", &beverton_holt::rzero)
             .field("phizero", &beverton_holt::phizero)
             .method("id", &beverton_holt::get_id);
+    
     Rcpp::class_<logistic_selectivity>("logistic_selectivity")
             .constructor()
             .field("median", &logistic_selectivity::median)

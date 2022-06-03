@@ -48,7 +48,7 @@ public:
     virtual bool add_to_fims_tmb() {
 
         std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-                fims::Information<TMB_FIMS_REAL_TYPE>::get_instance();
+                fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
         std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> > ls0 =
                 std::make_shared<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> >();
@@ -59,17 +59,17 @@ public:
         ls0->median = this->median.value;
         if (this->median.estimated) {
             if (this->median.is_random_effect) {
-                d0->register_random_effect(ls0->median);
+                d0->RegisterRandomEffect(ls0->median);
             } else {
-                d0->register_parameter(ls0->median);
+                d0->RegisterRarameter(ls0->median);
             }
         }
         ls0->slope = this->slope.value;
         if (this->slope.estimated) {
             if (this->slope.is_random_effect) {
-                d0->register_random_effect(ls0->slope);
+                d0->RegisterRandomEffect(ls0->slope);
             } else {
-                d0->register_parameter(ls0->slope);
+                d0->RegisterRarameter(ls0->slope);
             }
         }
 
@@ -77,7 +77,7 @@ public:
         d0->selectivity_models[ls0->id] = ls0;
 
         std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-                fims::Information<TMB_FIMS_FIRST_ORDER>::get_instance();
+                fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
         std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> > ls1 =
                 std::make_shared<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> >();
@@ -88,17 +88,17 @@ public:
         ls1->median = this->median.value;
         if (this->median.estimated) {
             if (this->median.is_random_effect) {
-                d1->register_random_effect(ls1->median);
+                d1->RegisterRandomEffect(ls1->median);
             } else {
-                d1->register_parameter(ls1->median);
+                d1->RegisterRarameter(ls1->median);
             }
         }
         ls1->slope = this->slope.value;
         if (this->slope.estimated) {
             if (this->slope.is_random_effect) {
-                d1->register_random_effect(ls1->slope);
+                d1->RegisterRandomEffect(ls1->slope);
             } else {
-                d1->register_parameter(ls1->slope);
+                d1->RegisterRarameter(ls1->slope);
             }
         }
 
@@ -106,7 +106,7 @@ public:
         d1->selectivity_models[ls1->id] = ls1;
 
         std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-                fims::Information<TMB_FIMS_SECOND_ORDER>::get_instance();
+                fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
         std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> > ls2 =
                 std::make_shared<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> >();
@@ -117,17 +117,17 @@ public:
         ls2->median = this->median.value;
         if (this->median.estimated) {
             if (this->median.is_random_effect) {
-                d2->register_random_effect(ls2->median);
+                d2->RegisterRandomEffect(ls2->median);
             } else {
-                d2->register_parameter(ls2->median);
+                d2->RegisterRarameter(ls2->median);
             }
         }
         ls2->slope = this->slope.value;
         if (this->slope.estimated) {
             if (this->slope.is_random_effect) {
-                d2->register_random_effect(ls2->slope);
+                d2->RegisterRandomEffect(ls2->slope);
             } else {
-                d2->register_parameter(ls2->slope);
+                d2->RegisterRarameter(ls2->slope);
             }
         }
 
@@ -136,7 +136,7 @@ public:
 
 
         std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-                fims::Information<TMB_FIMS_THIRD_ORDER>::get_instance();
+                fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
         std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> > ls3 =
                 std::make_shared<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> >();
@@ -147,17 +147,17 @@ public:
         ls3->median = this->median.value;
         if (this->median.estimated) {
             if (this->median.is_random_effect) {
-                d3->register_random_effect(ls3->median);
+                d3->RegisterRandomEffect(ls3->median);
             } else {
-                d3->register_parameter(ls3->median);
+                d3->RegisterRarameter(ls3->median);
             }
         }
         ls3->slope = this->slope.value;
         if (this->slope.estimated) {
             if (this->slope.is_random_effect) {
-                d3->register_random_effect(ls3->slope);
+                d3->RegisterRandomEffect(ls3->slope);
             } else {
-                d3->register_parameter(ls3->slope);
+                d3->RegisterRarameter(ls3->slope);
             }
         }
 

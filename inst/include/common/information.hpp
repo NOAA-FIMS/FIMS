@@ -40,7 +40,7 @@ class Information {
   std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;
   std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
   
-static std::shared_ptr<Information<T> > get_instance(){
+static std::shared_ptr<Information<T> > GetInstance(){
    if(Information<T>::fims_information == nullptr){
        Information<T>::fims_information =  std::make_shared<fims::Information<T> >();
    }  
@@ -48,15 +48,15 @@ static std::shared_ptr<Information<T> > get_instance(){
 
 }
 
-void register_parameter( T& p){
+void RegisterRarameter( T& p){
     this->parameters.push_back(&p);
 }
 
-void register_random_effect( T& re){
+void RegisterRandomEffect( T& re){
     this->random_effects_parameters.push_back(&re);
 }
 
- bool creat_model() {
+ bool CreateModel() {
      std::cout<<"Information::creat_model(): Not yet implemented.\n";
      return false;
  }

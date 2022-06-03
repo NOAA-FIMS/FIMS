@@ -52,7 +52,7 @@ public:
     virtual bool add_to_fims_tmb() {
         //base model 
         std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-                fims::Information<TMB_FIMS_REAL_TYPE>::get_instance();
+                fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
         std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE> > b0 =
                 std::make_shared<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE> >();
@@ -63,25 +63,25 @@ public:
         b0->steep = this->steep.value;
         if (this->steep.estimated) {
             if (this->steep.is_random_effect) {
-                d0->register_random_effect(b0->steep);
+                d0->RegisterRandomEffect(b0->steep);
             } else {
-                d0->register_parameter(b0->steep);
+                d0->RegisterRarameter(b0->steep);
             }
         }
         b0->rzero = this->rzero.value;
         if (this->rzero.estimated) {
             if (this->rzero.is_random_effect) {
-                d0->register_random_effect(b0->rzero);
+                d0->RegisterRandomEffect(b0->rzero);
             } else {
-                d0->register_parameter(b0->rzero);
+                d0->RegisterRarameter(b0->rzero);
             }
         }
         b0->phizero = this->phizero.value;
         if (this->phizero.estimated) {
             if (this->phizero.is_random_effect) {
-                d0->register_random_effect(b0->phizero);
+                d0->RegisterRandomEffect(b0->phizero);
             } else {
-                d0->register_parameter(b0->phizero);
+                d0->RegisterRarameter(b0->phizero);
             }
         }
         //add to Information
@@ -90,7 +90,7 @@ public:
 
         //first-order derivative
         std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-                fims::Information<TMB_FIMS_FIRST_ORDER>::get_instance();
+                fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
         std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> > b1 =
                 std::make_shared<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> >();
@@ -101,25 +101,25 @@ public:
         b1->steep = this->steep.value;
         if (this->steep.estimated) {
             if (this->steep.is_random_effect) {
-                d1->register_random_effect(b1->steep);
+                d1->RegisterRandomEffect(b1->steep);
             } else {
-                d1->register_parameter(b1->steep);
+                d1->RegisterRarameter(b1->steep);
             }
         }
         b1->rzero = this->rzero.value;
         if (this->rzero.estimated) {
             if (this->rzero.is_random_effect) {
-                d1->register_random_effect(b1->rzero);
+                d1->RegisterRandomEffect(b1->rzero);
             } else {
-                d1->register_parameter(b1->rzero);
+                d1->RegisterRarameter(b1->rzero);
             }
         }
         b1->phizero = this->phizero.value;
         if (this->phizero.estimated) {
             if (this->phizero.is_random_effect) {
-                d1->register_random_effect(b1->phizero);
+                d1->RegisterRandomEffect(b1->phizero);
             } else {
-                d1->register_parameter(b1->phizero);
+                d1->RegisterRarameter(b1->phizero);
             }
         }
         //add to Information
@@ -127,7 +127,7 @@ public:
 
         //second-order derivative
         std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-                fims::Information<TMB_FIMS_SECOND_ORDER>::get_instance();
+                fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
         std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> > b2 =
                 std::make_shared<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> >();
@@ -138,25 +138,25 @@ public:
         b2->steep = this->steep.value;
         if (this->steep.estimated) {
             if (this->steep.is_random_effect) {
-                d2->register_random_effect(b2->steep);
+                d2->RegisterRandomEffect(b2->steep);
             } else {
-                d2->register_parameter(b2->steep);
+                d2->RegisterRarameter(b2->steep);
             }
         }
         b2->rzero = this->rzero.value;
         if (this->rzero.estimated) {
             if (this->rzero.is_random_effect) {
-                d2->register_random_effect(b2->rzero);
+                d2->RegisterRandomEffect(b2->rzero);
             } else {
-                d2->register_parameter(b2->rzero);
+                d2->RegisterRarameter(b2->rzero);
             }
         }
         b2->phizero = this->phizero.value;
         if (this->phizero.estimated) {
             if (this->phizero.is_random_effect) {
-                d2->register_random_effect(b2->phizero);
+                d2->RegisterRandomEffect(b2->phizero);
             } else {
-                d2->register_parameter(b2->phizero);
+                d2->RegisterRarameter(b2->phizero);
             }
         }
         //add to Information
@@ -165,7 +165,7 @@ public:
 
         //third-order derivative
         std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-                fims::Information<TMB_FIMS_THIRD_ORDER>::get_instance();
+                fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
 
         std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> > b3 =
@@ -177,25 +177,25 @@ public:
         b3->steep = this->steep.value;
         if (this->steep.estimated) {
             if (this->steep.is_random_effect) {
-                d3->register_random_effect(b3->steep);
+                d3->RegisterRandomEffect(b3->steep);
             } else {
-                d3->register_parameter(b3->steep);
+                d3->RegisterRarameter(b3->steep);
             }
         }
         b3->rzero = this->rzero.value;
         if (this->rzero.estimated) {
             if (this->rzero.is_random_effect) {
-                d3->register_random_effect(b3->rzero);
+                d3->RegisterRandomEffect(b3->rzero);
             } else {
-                d3->register_parameter(b3->rzero);
+                d3->RegisterRarameter(b3->rzero);
             }
         }
         b3->phizero = this->phizero.value;
         if (this->phizero.estimated) {
             if (this->phizero.is_random_effect) {
-                d3->register_random_effect(b3->phizero);
+                d3->RegisterRandomEffect(b3->phizero);
             } else {
-                d3->register_parameter(b3->phizero);
+                d3->RegisterRarameter(b3->phizero);
             }
         }
         //add to Information
