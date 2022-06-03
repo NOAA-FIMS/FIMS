@@ -11,4 +11,4 @@ logistic_selectivity$median$value <- 5.0
 
 expect_equal(logistic_selectivity$slope$value, 0.7)
 expect_equal(logistic_selectivity$get_id(), 0)
-}
+})
