@@ -41,10 +41,9 @@ struct RecruitmentBase : public FIMSObject<Type> {
   virtual const Type evaluate(
       const Type& spawners) = 0;  // need to add input parameter values
 
-  /** @brief Calculate constrained recruitment deviations.
+  /** @brief Prepare constrained recruitment deviations.
    *
    */
-
   void PrepareConstrainedDeviations(){
     if (!this->constrain_deviations) {
       return;
