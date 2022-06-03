@@ -31,58 +31,50 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 
-#include <vector>
 #include <map>
+#include <vector>
 
-#include "../../interface.hpp"
 #include "../../../common/def.hpp"
 #include "../../../common/information.hpp"
-
+#include "../../interface.hpp"
 
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
 
 /**
- * @brief RcppInterface class that defines 
+ * @brief RcppInterface class that defines
  * the interface between R and C++ for parameter types.
  */
 class Parameter {
-public:
-    double value;
-    double min = std::numeric_limits<double>::min();
-    double max = std::numeric_limits<double>::max();
-    bool is_random_effect = false;
-    bool estimated = false;
+ public:
+  double value;
+  double min = std::numeric_limits<double>::min();
+  double max = std::numeric_limits<double>::max();
+  bool is_random_effect = false;
+  bool estimated = false;
 
-    Parameter(double value, double min,
-            double max, bool estimated) :
-    value(value), min(min), max(max),
-    estimated(estimated) {
+  Parameter(double value, double min, double max, bool estimated)
+      : value(value), min(min), max(max), estimated(estimated) {}
 
-    }
+  Parameter(double value) { this->value = value; }
 
-    Parameter(double value) {
-        this->value = value;
-    }
-
-    Parameter() {
-        this->value = 0;
-    }
+  Parameter() { this->value = 0; }
 };
 
 /**
  *@brief Base class for all interface objects
  */
 class FIMSRcppInterfaceBase {
-public:
-    static std::vector<FIMSRcppInterfaceBase*> fims_interface_objects;
+ public:
+  static std::vector<FIMSRcppInterfaceBase*> fims_interface_objects;
 
-    virtual bool add_to_fims_tmb() {
-        std::cout << "fims_rcpp_interface_base::add_to_fims_tmb(): Not yet implemented.\n";
-        return false;
-    }
+  virtual bool add_to_fims_tmb() {
+    std::cout << "fims_rcpp_interface_base::add_to_fims_tmb(): Not yet "
+                 "implemented.\n";
+    return false;
+  }
 };
-std::vector<FIMSRcppInterfaceBase*> FIMSRcppInterfaceBase::fims_interface_objects;
-
+std::vector<FIMSRcppInterfaceBase*>
+    FIMSRcppInterfaceBase::fims_interface_objects;
 
 #endif
