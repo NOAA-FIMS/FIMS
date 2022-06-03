@@ -37,39 +37,39 @@
 /****************************************************************
  * Selectivity Rcpp interface                                   *
  ***************************************************************/
-class selectivity_interface_base : public fims_rcpp_interface_base {
+class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 public:
     static uint32_t id_g;
     uint32_t id;
-    static std::map<uint32_t, selectivity_interface_base*> selectivity_objects;
+    static std::map<uint32_t, SelectivityInterfaceBase*> selectivity_objects;
 
-    selectivity_interface_base() {
-        this->id = selectivity_interface_base::id_g++;
-        selectivity_interface_base::selectivity_objects[this->id] = this;
-        fims_rcpp_interface_base::fims_interface_objects.push_back(this);
+    SelectivityInterfaceBase() {
+        this->id = SelectivityInterfaceBase::id_g++;
+        SelectivityInterfaceBase::selectivity_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }
 
     virtual uint32_t get_id() = 0;
 
 };
 
-uint32_t selectivity_interface_base::id_g = 1;
-std::map<uint32_t, selectivity_interface_base* > selectivity_interface_base::selectivity_objects;
+uint32_t SelectivityInterfaceBase::id_g = 1;
+std::map<uint32_t, SelectivityInterfaceBase* > SelectivityInterfaceBase::selectivity_objects;
 
 /**
  * @brief Rcpp interface for logistic selectivity as an S4 object. To instantiate
  * from R:
  * logistic_selectivity <- new(fims$logistic_selectivity) 
  */
-class logistic_selectivity : public selectivity_interface_base {
+class LogisticSelectivity : public SelectivityInterfaceBase {
 public:
-    parameter median;
-    parameter slope;
+    Parameter median;
+    Parameter slope;
 
-    logistic_selectivity() : selectivity_interface_base() {
+    LogisticSelectivity() : SelectivityInterfaceBase() {
     }
 
-    virtual ~logistic_selectivity() {
+    virtual ~LogisticSelectivity() {
     }
 
     virtual uint32_t get_id() {

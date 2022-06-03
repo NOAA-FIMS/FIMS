@@ -37,24 +37,24 @@
 /****************************************************************
  * Selectivity Rcpp interface                                   *
  ***************************************************************/
-class population_interface_base : public fims_rcpp_interface_base {
+class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
 public:
     static uint32_t id_g;
     uint32_t id;
-    static std::map<uint32_t, population_interface_base*> live_objects;
+    static std::map<uint32_t, PopulationInterfaceBase*> live_objects;
 
-    population_interface_base() {
-        this->id = population_interface_base::id_g++;
-        population_interface_base::live_objects[this->id] = this;
-        population_interface_base::fims_interface_objects.push_back(this);
+    PopulationInterfaceBase() {
+        this->id = PopulationInterfaceBase::id_g++;
+        PopulationInterfaceBase::live_objects[this->id] = this;
+        PopulationInterfaceBase::fims_interface_objects.push_back(this);
     }
 
     virtual uint32_t get_id() = 0;
 
 };
 
-uint32_t population_interface_base::id_g = 1;
-std::map<uint32_t, population_interface_base* > population_interface_base::live_objects;
+uint32_t PopulationInterfaceBase::id_g = 1;
+std::map<uint32_t, PopulationInterfaceBase* > PopulationInterfaceBase::live_objects;
 
 
 

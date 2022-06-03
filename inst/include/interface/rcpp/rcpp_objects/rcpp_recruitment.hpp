@@ -38,43 +38,43 @@
 /****************************************************************
  * Recruitment Rcpp interface                                   *
  ***************************************************************/
-class recruitment_interface_base : public fims_rcpp_interface_base {
+class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 public:
     static uint32_t id_g;
     uint32_t id;
-    static std::map<uint32_t, recruitment_interface_base*> live_objects;
+    static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
 
-    recruitment_interface_base() {
-        this->id = recruitment_interface_base::id_g++;
-        recruitment_interface_base::live_objects[this->id] = this;
-        fims_rcpp_interface_base::fims_interface_objects.push_back(this);
+    RecruitmentInterfaceBase() {
+        this->id = RecruitmentInterfaceBase::id_g++;
+        RecruitmentInterfaceBase::live_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }
 
-    virtual ~recruitment_interface_base() {
+    virtual ~RecruitmentInterfaceBase() {
     }
 
     virtual uint32_t get_id() = 0;
 };
 
-uint32_t recruitment_interface_base::id_g = 1;
-std::map<uint32_t, recruitment_interface_base* > recruitment_interface_base::live_objects;
+uint32_t RecruitmentInterfaceBase::id_g = 1;
+std::map<uint32_t, RecruitmentInterfaceBase* > RecruitmentInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for Beverton-Holt as an S4 object. To instantiate 
  * from R:
  * beverton_holt <- new(fims$beverton_holt) 
  */
-class beverton_holt : public recruitment_interface_base {
+class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
 public:
-    parameter steep;
-    parameter rzero;
-    parameter phizero;
+    Parameter steep;
+    Parameter rzero;
+    Parameter phizero;
 
-    beverton_holt() : recruitment_interface_base() {
+    BevertonHoltRecruitment() : RecruitmentInterfaceBase() {
 
     }
 
-    virtual ~beverton_holt() {
+    virtual ~BevertonHoltRecruitment() {
     }
 
     virtual uint32_t get_id() {

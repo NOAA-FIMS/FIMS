@@ -46,7 +46,7 @@
  * @brief RcppInterface class that defines 
  * the interface between R and C++ for parameter types.
  */
-class parameter {
+class Parameter {
 public:
     double value;
     double min = std::numeric_limits<double>::min();
@@ -54,18 +54,18 @@ public:
     bool is_random_effect = false;
     bool estimated = false;
 
-    parameter(double value, double min,
+    Parameter(double value, double min,
             double max, bool estimated) :
     value(value), min(min), max(max),
     estimated(estimated) {
 
     }
 
-    parameter(double value) {
+    Parameter(double value) {
         this->value = value;
     }
 
-    parameter() {
+    Parameter() {
         this->value = 0;
     }
 };
@@ -73,16 +73,16 @@ public:
 /**
  *@brief Base class for all interface objects
  */
-class fims_rcpp_interface_base {
+class FIMSRcppInterfaceBase {
 public:
-    static std::vector<fims_rcpp_interface_base*> fims_interface_objects;
+    static std::vector<FIMSRcppInterfaceBase*> fims_interface_objects;
 
     virtual bool add_to_fims_tmb() {
         std::cout << "fims_rcpp_interface_base::add_to_fims_tmb(): Not yet implemented.\n";
         return false;
     }
 };
-std::vector<fims_rcpp_interface_base*> fims_rcpp_interface_base::fims_interface_objects;
+std::vector<FIMSRcppInterfaceBase*> FIMSRcppInterfaceBase::fims_interface_objects;
 
 
 #endif

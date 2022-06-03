@@ -46,10 +46,10 @@
 /**
  *
  */
-bool create_tmb_model() {
+bool CreateTMBModel() {
 
-    for (int i = 0; i < fims_rcpp_interface_base::fims_interface_objects.size(); i++) {
-        fims_rcpp_interface_base::fims_interface_objects[i]->add_to_fims_tmb();
+    for (int i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size(); i++) {
+        FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
     }
 
 
@@ -78,32 +78,32 @@ bool create_tmb_model() {
     return true;
 }
 
-RCPP_EXPOSED_CLASS(parameter)
+RCPP_EXPOSED_CLASS(Parameter)
 RCPP_MODULE(fims) {
-    Rcpp::function("create_tmb_model", &create_tmb_model);
+    Rcpp::function("CreateTMBModel", &CreateTMBModel);
 
-    Rcpp::class_<parameter>("parameter")
+    Rcpp::class_<Parameter>("Parameter")
             .constructor()
             .constructor<double>()
-            .constructor<parameter>()
-            .field("value", &parameter::value)
-            .field("min", &parameter::min)
-            .field("max", &parameter::max)
-            .field("is_random_effect", &parameter::is_random_effect)
-            .field("estimated", &parameter::estimated);
+            .constructor<Parameter>()
+            .field("value", &Parameter::value)
+            .field("min", &Parameter::min)
+            .field("max", &Parameter::max)
+            .field("is_random_effect", &Parameter::is_random_effect)
+            .field("estimated", &Parameter::estimated);
 
-    Rcpp::class_<beverton_holt>("beverton_holt")
+    Rcpp::class_<BevertonHoltRecruitment>("BevertonHoltRecruitment")
             .constructor()
-            .field("steep", &beverton_holt::steep)
-            .field("rzero", &beverton_holt::rzero)
-            .field("phizero", &beverton_holt::phizero)
-            .method("get_id", &beverton_holt::get_id);
+            .field("steep", &BevertonHoltRecruitment::steep)
+            .field("rzero", &BevertonHoltRecruitment::rzero)
+            .field("phizero", &BevertonHoltRecruitment::phizero)
+            .method("get_id", &BevertonHoltRecruitment::get_id);
     
-    Rcpp::class_<logistic_selectivity>("logistic_selectivity")
+    Rcpp::class_<LogisticSelectivity>("LogisticSelectivity")
             .constructor()
-            .field("median", &logistic_selectivity::median)
-            .field("slope", &logistic_selectivity::slope)
-            .method("get_id", &logistic_selectivity::get_id);
+            .field("median", &LogisticSelectivity::median)
+            .field("slope", &LogisticSelectivity::slope)
+            .method("get_id", &LogisticSelectivity::get_id);
 
 }
 
