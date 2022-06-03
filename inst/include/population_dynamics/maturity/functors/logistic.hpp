@@ -3,7 +3,7 @@
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
  *
- * The purpose of this file is to define the LogisticMaturity class, which 
+ * The purpose of this file is to define the LogisticMaturity class, which
  * inherits from the MaturityBase class
  */
 #ifndef POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP

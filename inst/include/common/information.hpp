@@ -16,73 +16,75 @@
 
 #include "def.hpp"
 // #include "../interface/interface.hpp"
-#include "model_object.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
+#include "model_object.hpp"
 
 namespace fims {
 
-    /**
-     * Contains all objects and data pre-model construction
-     */
-    template <typename T>
-    class Information {
-    public:
-        static std::shared_ptr<Information<T> > fims_information;
-        std::vector<T*> parameters; // list of all estimated parameters
-        std::vector<T*> random_effects_parameters; // list of all random effects parameters
-        std::vector<T*> fixed_effects_parameters; // list of all fixed effects parameters
+/**
+ * Contains all objects and data pre-model construction
+ */
+template <typename T>
+class Information {
+ public:
+  static std::shared_ptr<Information<T> > fims_information;
+  std::vector<T*> parameters;  // list of all estimated parameters
+  std::vector<T*>
+      random_effects_parameters;  // list of all random effects parameters
+  std::vector<T*>
+      fixed_effects_parameters;  // list of all fixed effects parameters
 
-        std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;
-        std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
+  std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >
+      recruitment_models;
+  std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >
+      selectivity_models;
 
-        /**
-         * Returns a single Information object for type T.
-         * 
-         * @return singleton for type T
-         */
-        static std::shared_ptr<Information<T> > GetInstance() {
-            if (Information<T>::fims_information == nullptr) {
-                Information<T>::fims_information = std::make_shared<fims::Information<T> >();
-            }
-            return Information<T>::fims_information;
+  /**
+   * Returns a single Information object for type T.
+   *
+   * @return singleton for type T
+   */
+  static std::shared_ptr<Information<T> > GetInstance() {
+    if (Information<T>::fims_information == nullptr) {
+      Information<T>::fims_information =
+          std::make_shared<fims::Information<T> >();
+    }
+    return Information<T>::fims_information;
+  }
 
-        }
+  /**
+   * Register a parameter as estimable.
+   *
+   * @param p
+   */
+  void RegisterRarameter(T& p) { this->parameters.push_back(&p); }
 
-        /**
-         * Register a parameter as estimable.
-         * 
-         * @param p
-         */
-        void RegisterRarameter(T& p) {
-            this->parameters.push_back(&p);
-        }
+  /**
+   * Register a random effect as estimable.
+   *
+   * @param p
+   */
+  void RegisterRandomEffect(T& re) {
+    this->random_effects_parameters.push_back(&re);
+  }
 
-        /**
-         * Register a random effect as estimable.
-         * 
-         * @param p
-         */
-        void RegisterRandomEffect(T& re) {
-            this->random_effects_parameters.push_back(&re);
-        }
+  /**
+   * Create the generalized stock assessment model that will evaluate the
+   * objective function.
+   *
+   * @return
+   */
+  bool CreateModel() {
+    std::cout << "Information::CreateModel(): Not yet implemented.\n";
+    return false;
+  }
+};
 
-                /**
-         * Create the generalized stock assessment model that will evaluate the
-         * objective function.
-         *  
-         * @return 
-         */
-        bool CreateModel() {
-            std::cout << "Information::CreateModel(): Not yet implemented.\n";
-            return false;
-        }
+template <typename T>
+std::shared_ptr<Information<T> > Information<T>::fims_information =
+    nullptr;  // singleton instance
 
-    };
-
-    template<typename T>
-    std::shared_ptr<Information<T> > Information<T>::fims_information = nullptr; //singleton instance
-
-} // namespace fims
+}  // namespace fims
 
 #endif /* FIMS_COMMON_INFORMATION_HPP */
