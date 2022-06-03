@@ -35,7 +35,7 @@ create_fims_rcpp_interface <- function(
   cat(base_class)
   cat("() {}\n\n")
   
-
+  cat("uint32_t get_id(){return this->id}\n\n\n")
   
  
   cat("bool add_to_fims_tmb(){\n")

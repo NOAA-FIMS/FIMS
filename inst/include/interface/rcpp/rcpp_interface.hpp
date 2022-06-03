@@ -97,13 +97,13 @@ RCPP_MODULE(fims) {
             .field("steep", &beverton_holt::steep)
             .field("rzero", &beverton_holt::rzero)
             .field("phizero", &beverton_holt::phizero)
-            .method("id", &beverton_holt::get_id);
+            .method("get_id", &beverton_holt::get_id);
     
     Rcpp::class_<logistic_selectivity>("logistic_selectivity")
             .constructor()
             .field("median", &logistic_selectivity::median)
             .field("slope", &logistic_selectivity::slope)
-            .method("id", &logistic_selectivity::get_id);
+            .method("get_id", &logistic_selectivity::get_id);
 
 }
 
