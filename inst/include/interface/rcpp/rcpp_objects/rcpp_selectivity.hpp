@@ -19,12 +19,12 @@ public:
         fims_rcpp_interface_base::fims_interface_objects.push_back(this);
     }
 
+    virtual uint32_t get_id() = 0;
 
 };
 
 uint32_t selectivity_interface_base::id_g = 1;
 std::map<uint32_t, selectivity_interface_base* > selectivity_interface_base::selectivity_objects;
-
 
 /**
  * @brief Rcpp interface for logistic selectivity as a S4 object. To instantiate from R:
@@ -39,6 +39,10 @@ public:
     }
 
     virtual ~logistic_selectivity() {
+    }
+
+    virtual uint32_t get_id() {
+        return this->id;
     }
 
     virtual bool add_to_fims_tmb() {

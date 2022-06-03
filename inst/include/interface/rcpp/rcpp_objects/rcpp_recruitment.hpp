@@ -22,6 +22,7 @@ public:
     virtual ~recruitment_interface_base() {
     }
 
+    virtual uint32_t get_id() = 0;
 };
 
 uint32_t recruitment_interface_base::id_g = 1;
@@ -42,6 +43,10 @@ public:
     }
 
     virtual ~beverton_holt() {
+    }
+
+    virtual uint32_t get_id() {
+        return this->id;
     }
 
     virtual bool add_to_fims_tmb() {

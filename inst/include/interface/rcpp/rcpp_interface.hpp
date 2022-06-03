@@ -43,8 +43,6 @@
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_likelihoods.hpp"
 
-
-
 /**
  *
  */
@@ -80,7 +78,6 @@ bool create_tmb_model() {
     return true;
 }
 
-
 RCPP_EXPOSED_CLASS(parameter)
 RCPP_MODULE(fims) {
     Rcpp::function("create_tmb_model", &create_tmb_model);
@@ -99,11 +96,13 @@ RCPP_MODULE(fims) {
             .constructor()
             .field("steep", &beverton_holt::steep)
             .field("rzero", &beverton_holt::rzero)
-            .field("phizero", &beverton_holt::phizero);
-Rcpp::class_<logistic_selectivity>("logistic_selectivity")
-.constructor()
-.field("median", &logistic_selectivity::median)
-.field("slope", &logistic_selectivity::slope);
+            .field("phizero", &beverton_holt::phizero)
+            .method("id", &beverton_holt::get_id);
+    Rcpp::class_<logistic_selectivity>("logistic_selectivity")
+            .constructor()
+            .field("median", &logistic_selectivity::median)
+            .field("slope", &logistic_selectivity::slope)
+            .method("id", &logistic_selectivity::get_id);
 
 }
 

@@ -16,3 +16,4 @@ logistic_selectivity$slope$value <- .7
 logistic_selectivity$median$value<- 5.0
 
 print(logistic_selectivity$slope$value)
+print(logistic_selectivity$id())

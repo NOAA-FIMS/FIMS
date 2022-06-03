@@ -1,0 +1,4 @@
+#ifndef RCPP_LIKELIHOODS_HPP
+#define RCPP_LIKELIHOODS_HPP
+
+#endif 
