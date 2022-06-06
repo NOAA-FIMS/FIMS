@@ -12,6 +12,5 @@
  * module_type hpp file if not already defined.
  */
 #define POPULATION_DYNAMICS_GROWTH_HPP
-#define POPULATION_DYNAMICS_GROWTH_HPP
 
 #endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */
