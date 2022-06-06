@@ -86,7 +86,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     b0->ewaa = this->ewaa;
    
     // add to Information
-    d0->Growth_models[b0->id] = b0;
+    d0->growth_models[b0->id] = b0;
 
     return true;
   }
