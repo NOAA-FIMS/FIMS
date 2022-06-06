@@ -142,5 +142,3 @@ create_fims_rcpp_interface <- function(interface_name = character(),
   cat(";")
 }
 
-}
-
