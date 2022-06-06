@@ -19,5 +19,13 @@ RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
 # RUN su vscode -c "${VCPKG_ROOT}/vcpkg install <your-port-name-here>"
 
 # [Optional] Uncomment this section to install additional packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+RUN apt-get update && apt-get -y upgrade
+
+#add git
+RUN apt-get -y install git
+
+#add build compiler stuff
+RUN apt-get -y install build-essential cmake clang-tidy clang-format clang
+
+#get doxygen and ninja
+RUN apt-get -y install doxygen ninja-build
