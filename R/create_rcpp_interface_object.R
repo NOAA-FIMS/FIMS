@@ -128,10 +128,10 @@ create_fims_rcpp_interface <- function(interface_name = character(), # class nam
 }
 
 
-create_fims_rcpp_interface(
-  "logistic_selectivity",
-  "LogisticSelectivity",
-  "selectivity_interface_base",
-  "selectivity_models",
-  c("slope", "median")
-)
+#create_fims_rcpp_interface(
+#  "logistic_selectivity",
+#"LogisticSelectivity",
+# "selectivity_interface_base",
+# "selectivity_models",
+# c("slope", "median")
+#)
