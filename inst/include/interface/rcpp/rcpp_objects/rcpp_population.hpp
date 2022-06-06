@@ -1,12 +1,12 @@
 /*
- * File:   population.hpp
+ * File:   rcpp_population.hpp
  *
- * Author: Matthew Supernaw, Andrea Havron
+ * Author: Matthew Supernaw
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Email: matthew.supernaw@noaa.gov, andrea.havron@noaa.gov
+ * Email: matthew.supernaw@noaa.gov
  *
- * Created on September 30, 2021, 1:07 PM
+ * Created on May 31, 2022 at 12:04 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,20 +28,32 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-#ifndef FIMS_POPULATION_DYNAMICS_POPULATION_HPP
-#define FIMS_POPULATION_DYNAMICS_POPULATION_HPP
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
-#include "../../common/model_object.hpp"
-#include "subpopulation.hpp"
+#include "../../../population_dynamics/population/population.hpp"
+#include "rcpp_interface_base.hpp"
 
-namespace fims {
+/****************************************************************
+ * Selectivity Rcpp interface                                   *
+ ***************************************************************/
+class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
+ public:
+  static uint32_t id_g;
+  uint32_t id;
+  static std::map<uint32_t, PopulationInterfaceBase*> live_objects;
 
-/**
- * Population class. Contains subpopulations
- * that are divided into generic partitions (eg. sex, area).
- */
-template <typename T>
-struct Population : FIMSObject<T> {};
-}  // namespace fims
+  PopulationInterfaceBase() {
+    this->id = PopulationInterfaceBase::id_g++;
+    PopulationInterfaceBase::live_objects[this->id] = this;
+    PopulationInterfaceBase::fims_interface_objects.push_back(this);
+  }
 
-#endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */
+  virtual uint32_t get_id() = 0;
+};
+
+uint32_t PopulationInterfaceBase::id_g = 1;
+std::map<uint32_t, PopulationInterfaceBase*>
+    PopulationInterfaceBase::live_objects;
+
+#endif
