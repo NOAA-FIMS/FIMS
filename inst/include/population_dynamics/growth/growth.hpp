@@ -11,6 +11,7 @@
  * DEFINE guards for module_type module outline to define the
  * module_type hpp file if not already defined.
  */
+#ifndef FIMS_POPULATION_DYNAMICS_GROWTH_GROWTH_HPP
 #define POPULATION_DYNAMICS_GROWTH_HPP
 
-#endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */
+#endif /* FIMS_POPULATION_DYNAMICS_GROWTH_GROWTH_HPP */
