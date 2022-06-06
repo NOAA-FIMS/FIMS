@@ -3,7 +3,7 @@
 name: Add a comment with reviewer checklist when PR opened
 on:
   pull_request:
-    types: [opened]
+    types: [review_requested]
 
 jobs:
   pr-checklist:
