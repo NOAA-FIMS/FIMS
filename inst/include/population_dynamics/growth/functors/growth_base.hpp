@@ -49,6 +49,5 @@ template<typename T>
 uint32_t GrowthBase<T>::id_g = 0;
 
 }
-}
 
 #endif /* POPULATION_DYNAMICS_GROWTH_BASE_HPP */
