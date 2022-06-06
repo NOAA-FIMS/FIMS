@@ -18,6 +18,7 @@
 // #include "../interface/interface.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
+#include "../population_dynamics/growth/growth.hpp"
 #include "model_object.hpp"
 
 namespace fims {
