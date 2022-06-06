@@ -13,24 +13,43 @@
 #' @author Kathryn L. Doering and Kelli F. Johnson
 #'
 ###############################################################################
+# Helper functions and load packages
+###############################################################################
+check_version_ASSAMC <- function() {
+  packages_all <- .packages(all.available = TRUE)
+  if ("ASSAMC" %in% packages_all) {
+    library("ASSAMC")
+  }
+  info <- sessionInfo()
+  if (
+    info[["otherPkgs"]][["ASSAMC"]][["GithubRef"]] !=
+    "feat_eg-data"
+  ) {
+    devtools::unload(package = "ASSAMC")
+  }
+  if (!"package:ASSAMC" %in% search()) {
+    remotes::install_github(
+      "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison",
+      ref = "feat_eg-data"
+    )
+    library("ASSAMC")
+  }
+  return(TRUE)
+}
+check_version_ASSAMC()
+library(dplyr)
+
+###############################################################################
 # Simulate the data
 ###############################################################################
-# Install {ASSAMC}, which is not a dependency of {FIMS}
-if (!"ASSAMC" %in% installed.packages()[, 1]) {
-  remotes::install_github(
-    "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison@feat_eg-data"
-  )
-}
-
-# Load the necessary packages manually
-library(ASSAMC)
-library(dplyr)
 returnedom <- ASSAMC::save_om_example()
 
 ###############################################################################
 # Landings
 ###############################################################################
 landings_data <- data.frame(
+# TODO: Should there be a type that are not removed but just noted,
+#       where obviously in this instance they are removed.
   type = "landings",
   name = names(returnedom[["om_output"]]$L.mt)[1],
   age = NA, # Not by age in this case, but there is a by age option.
@@ -149,16 +168,16 @@ write.csv(data_mile1,
   row.names = FALSE
 )
 
-# check csv can be read into r well
+# check csv can be read into R well
 test_read <- read.csv(file.path("FIMS_input_data.csv"))
 testthat::expect_equal(test_read, data_mile1)
-# unlink("FIMS_input_data.csv")
+unlink("FIMS_input_data.csv")
 
 usethis::use_data(data_mile1, overwrite = TRUE)
 rm(
+  check_version_ASSAMC,
   age_data, landings_data, index_data, weightatage_data,
   timingfishery, weightsfishery,
   data_mile1, returnedom,
   test_read
 )
-
