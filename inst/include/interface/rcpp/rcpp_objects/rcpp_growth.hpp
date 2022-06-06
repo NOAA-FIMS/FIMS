@@ -83,7 +83,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     // set relative info
     b0->id = this->id;
-    b0->ewaa = this->ewaa.value;
+    b0->ewaa = this->ewaa;
    
     // add to Information
     d0->Growth_models[b0->id] = b0;
