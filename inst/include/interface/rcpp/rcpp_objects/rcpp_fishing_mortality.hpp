@@ -1,12 +1,12 @@
 /*
- * File:   population.hpp
+ * File:   rcpp_fishing_mortality.hpp
  *
- * Author: Matthew Supernaw, Andrea Havron
+ * Author: Matthew Supernaw
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
- * Email: matthew.supernaw@noaa.gov, andrea.havron@noaa.gov
+ * Email: matthew.supernaw@noaa.gov
  *
- * Created on September 30, 2021, 1:07 PM
+ * Created on May 31, 2022 at 12:04 PM
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -28,20 +28,7 @@
  * Please cite the author(s) in any work or product based on this material.
  *
  */
-#ifndef FIMS_POPULATION_DYNAMICS_POPULATION_HPP
-#define FIMS_POPULATION_DYNAMICS_POPULATION_HPP
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FISHING_MORTALITY_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FISHING_MORTALITY_HPP
 
-#include "../../common/model_object.hpp"
-#include "subpopulation.hpp"
-
-namespace fims {
-
-/**
- * Population class. Contains subpopulations
- * that are divided into generic partitions (eg. sex, area).
- */
-template <typename T>
-struct Population : FIMSObject<T> {};
-}  // namespace fims
-
-#endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */
+#endif
