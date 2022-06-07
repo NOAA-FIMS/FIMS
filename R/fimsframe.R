@@ -6,8 +6,18 @@
 # the validation functions in another file.
 #' @export
 validFIMSFrame <- function(object) {
- # validation code goes here
- TRUE
+  errors <- character()
+
+  NROW(object@data) -> n
+  if (n == 0) {
+    errors <- c(errors, "data must have at least one row")
+  }
+
+  if (length(errors) == 0) {
+    TRUE
+  } else {
+    errors
+  }
 }
 
 #' @export
