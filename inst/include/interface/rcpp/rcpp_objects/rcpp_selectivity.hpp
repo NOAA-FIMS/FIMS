@@ -60,14 +60,14 @@ std::map<uint32_t, SelectivityInterfaceBase*>
  * @brief Rcpp interface for logistic selectivity as an S4 object. To
  * instantiate from R: logistic_selectivity <- new(fims$logistic_selectivity)
  */
-class LogisticSelectivity : public SelectivityInterfaceBase {
+class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   Parameter median;
   Parameter slope;
 
-  LogisticSelectivity() : SelectivityInterfaceBase() {}
+  LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
-  virtual ~LogisticSelectivity() {}
+  virtual ~LogisticSelectivityInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
 
