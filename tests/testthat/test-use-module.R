@@ -1,37 +1,40 @@
-# test_that("use_module() works", {
-#   original_wd <- getwd()
-#   path <- find.package("FIMS")
-#   setwd(path)
-#   on.exit(setwd(original_wd), add = TRUE)
+test_that("use_module() works", {
+  project_path <- find.package("FIMS")
+  old_wd <- getwd()
+  setwd(project_path)
+  on.exit(setwd(old_wd), add = TRUE)
+  
 
-#   module_name <- "test_module_name"
-#   module_type <- "test_module_type"
+  if (!file.exists(file.path(project_path, "inst"))){
+      path <- file.path("include", "population_dynamics")
+  } else {
+      path <- file.path("inst", "include", "population_dynamics")
+  }
 
-#   FIMS::use_module(
-#     path = "inst",
-#     module_name = module_name,
-#     module_type = module_type
-#   )
+  module_name <- "test_module_name"
+  module_type <- "test_module_type"
 
-#   expect_true(file.exists(file.path(
-#     "inst", "include",
-#     "population_dynamics", module_type, paste0(module_type, ".hpp")
-#   )))
+  FIMS::use_module(
+    path = path,
+    module_name = module_name,
+    module_type = module_type
+  )
 
-#   expect_true(file.exists(file.path(
-#     "inst", "include",
-#     "population_dynamics", module_type, "functors",
-#     paste0(module_name, ".hpp")
-#   )))
+  expect_true(file.exists(file.path(
+    project_path, path, module_type, paste0(module_type, ".hpp")
+  )))
 
-#   expect_true(file.exists(file.path(
-#     "inst", "include",
-#     "population_dynamics", module_type, "functors",
-#     paste0(module_type, "_base.hpp")
-#   )))
+  expect_true(file.exists(file.path(
+    project_path, path, module_type, "functors",
+    paste0(module_name, ".hpp")
+  )))
 
-#   unlink(file.path(
-#     "inst", "include",
-#     "population_dynamics", module_type
-#   ), recursive = TRUE)
-# })
+  expect_true(file.exists(file.path(
+    project_path, path, module_type, "functors",
+    paste0(module_type, "_base.hpp")
+  )))
+
+  unlink(file.path(
+    project_path, path, module_type
+  ), recursive = TRUE)
+})
