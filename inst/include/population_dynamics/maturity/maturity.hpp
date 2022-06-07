@@ -4,18 +4,17 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
- * Selectivity module file
+ * Maturity module file
  * The purpose of this file is to include any .hpp files within the
  * subfolders so that only this file needs to included in the model.hpp file.
  *
- * DEFINE guards for selectivity module outline to define the
- * selectivity hpp file if not already defined.
+ * DEFINE guards for module_type module outline to define the
+ * module_type hpp file if not already defined.
  */
-#ifndef FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP
-#define FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP
+#ifndef FIMS_POPULATION_DYNAMICS_MATURITY_HPP
+#define FIMS_POPULATION_DYNAMICS_MATURITY_HPP
 
-#include "functors/double_logistic.hpp"
 #include "functors/logistic.hpp"
-#include "functors/selectivity_base.hpp"
+#include "functors/maturity_base.hpp"
 
-#endif /* FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP */
+#endif /* FIMS_POPULATION_DYNAMICS_MATURITY_HPP */

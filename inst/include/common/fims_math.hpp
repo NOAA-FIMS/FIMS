@@ -14,6 +14,8 @@
 //#include "def.hpp"
 #include <cmath>
 
+#include "../interface/interface.hpp"
+
 namespace fims {
 #ifdef STD_LIB
 /**
@@ -41,7 +43,7 @@ inline const T log(const T &x) {
 #endif
 
 #ifdef TMB_MODEL
-#include <TMB.hpp>
+//#include <TMB.hpp>
 
 /**
  * @brief The exponential function.
@@ -84,6 +86,85 @@ inline const T log(const T &x) {
 template <class T>
 inline const T logistic(const T &median, const T &slope, const T &x) {
   return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
+}
+
+/**
+ * @brief The general double logistic function
+ *
+ * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - median_{asc}))}
+ * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x - median_{desc}))}
+ * \right)\f$
+ *
+ * @param median_asc the median (inflection point) of the ascending limb of the
+ * double logistic function
+ * @param slope_asc the slope of the ascending limb of the double logistic
+ * function
+ * @param median_desc the median (inflection point) of the descending limb of
+ * the double logistic function, where median_desc > median_asc
+ * @param slope_desc the slope of the descending limb of the double logistic
+ * function
+ * @param x the index the logistic function should be evaluated at
+ * @return
+ */
+
+template <class T>
+inline const T double_logistic(const T &median_asc, const T &slope_asc,
+                               const T &median_desc, const T &slope_desc,
+                               const T &x) {
+  return (1.0) / (1.0 + exp(-1.0 * slope_asc * (x - median_asc))) *
+         (1.0 - (1.0) / (1.0 + exp(-1.0 * slope_desc * (x - median_desc))));
+}
+
+/**
+ *
+ * Used when x could evaluate to zero, which will result in a NaN for
+ * derivative values.
+ *
+ * Evaluates:
+ *
+ * \f$ (expr^2+C)^.5 \f$
+ *
+ * @param expr
+ * @param C default = 1e-5
+ * @return
+ */
+template <class T>
+const T ad_fabs(const T &x, T C = 1e-5) {
+  return sqrt((x * x) + C);  //, .5);
+}
+
+/**
+ * Returns the minimum between a and b in a continuous manner using:
+ *
+ * (a + b - \ref fims::ad_fabs(a - b))*.5;
+ *
+ * This is an approximation with minimal error.
+ *
+ * @param a
+ * @param b
+ * @param C default = 1e-5
+ * @return
+ */
+template <typename T>
+inline const T ad_min(const T &a, const T &b, T C = 1e-5) {
+  return (a + b - fims::ad_fabs(a - b, C)) * .5;
+}
+
+/**
+ * Returns the maximum between a and b in a continuous manner using:
+ *
+ * (a + b + \ref fims::ad_fabs(a - b)) *.5;
+ *
+ * This is an approximation with minimal error.
+ *
+ * @param a
+ * @param b
+ * @param C default = 1e-5
+ * @return
+ */
+template <typename T>
+inline const T ad_max(const T &a, const T &b, T C = 1e-5) {
+  return (a + b + fims::ad_fabs(a - b, C)) * static_cast<T>(.5);
 }
 
 }  // namespace fims
