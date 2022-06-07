@@ -3,12 +3,12 @@ test_that("use_module() works", {
   old_wd <- getwd()
   setwd(project_path)
   on.exit(setwd(old_wd), add = TRUE)
-  
 
-  if (!file.exists(file.path(project_path, "inst"))){
-      path <- file.path("include", "population_dynamics")
+
+  if (!file.exists(file.path(project_path, "inst"))) {
+    path <- file.path("include", "population_dynamics")
   } else {
-      path <- file.path("inst", "include", "population_dynamics")
+    path <- file.path("inst", "include", "population_dynamics")
   }
 
   module_name <- "test_module_name"
