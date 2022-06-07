@@ -98,18 +98,6 @@ target_link_libraries(benchmark_fims_math_logistic
 )
 
 
-
-add_executable(tmb_likelihoods_dnorm
-  test_tmb_likelihoods_dnorm.cpp
-)
-
-target_link_libraries(tmb_likelihoods_dnorm
-  gtest_main
-  fims_test
-)
-
-gtest_discover_tests(tmb_likelihoods_dnorm)
-
 # benchmark_fims_math_double_logistic.cpp
 add_executable(benchmark_fims_math_double_logistic
   benchmark_fims_math_double_logistic.cpp
