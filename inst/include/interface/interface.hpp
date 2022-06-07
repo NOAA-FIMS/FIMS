@@ -26,10 +26,9 @@
  */
 template <typename T>
 struct ModelTraits {
-
-  typedef typename CppAD::vector<T> DataVector; /**< This is a vector
-   of the data that is differentiable */
-  typedef typename CppAD::vector<T> ParameterVector; /**< This is a 
+  typedef typename CppAD::vector<T> DataVector;      /**< This is a vector
+        of the data that is differentiable */
+  typedef typename CppAD::vector<T> ParameterVector; /**< This is a
   vector of the parameters that is differentiable */
 };
 
