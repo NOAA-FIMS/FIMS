@@ -99,6 +99,10 @@ RCPP_MODULE(fims) {
       .field("median", &LogisticSelectivity::median)
       .field("slope", &LogisticSelectivity::slope)
       .method("get_id", &LogisticSelectivity::get_id);
+
+  Rcpp::class_<EWAAgrowth>("EWAAgrowth")
+        .constructor()
+        .field("ewaa", &EWAAgrowth::ewaa)
 }
 
 #endif /* RCPP_INTERFACE_HPP */
