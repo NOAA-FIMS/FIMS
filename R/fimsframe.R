@@ -80,10 +80,36 @@ FIMSFrameAge <- function(data) {
     ages = ages,
     weightatage = weightatage
   )
-s
   return(out)
 }
 
 # SELECTORS -------------------------------------------------------------------
+# these can define for e.g., subsetting functions. This could 
+# be helpful for example if you want to take out all data for a fleet
+# across multiple slots in the object.
 
-# Plotting Function ------
+# Accessors -----
+# Methods for accessing info in the slots
+# e.g., something like name.
+
+# Show and plot methods ----
+
+# show method
+setMethod("show", "FIMSFrame", function(object) 
+{
+  dat_types <- unique(object@data[["type"]])
+  beg_of_obj <- head(object@data)
+  cat("This is a FIMSFrameAge data.frame", "\n", "\n",
+      "Data includes types: ", paste0(dat_types, collapse = ", "),
+      "\n", "\n"
+      )
+      print(beg_of_obj)
+})
+
+# plot method
+setMethod("plot", "FIMSFrameAge", function(x) {
+  y <- x@weightatage[["value"]]
+  x_axis <- x@weightatage[["age"]]
+  plot(x_axis, y, xlab = "Age", ylab = "Weight")
+})
+
