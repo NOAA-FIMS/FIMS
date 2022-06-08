@@ -42,7 +42,10 @@ std::map<uint32_t, GrowthInterfaceBase*>
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
-  std::map<double, double> ewaa;
+  double ages;
+  double weights;
+  
+  std::map<double, double> ewaa = fims::make_map(ages, weights);
 
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
 
