@@ -82,8 +82,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> > b1 =
-        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> >();
+    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> > b1 =
+        std::make_shared<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> >();
 
     // set relative info
     b1->id = this->id;
@@ -96,8 +96,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> > b2 =
-        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> >();
+    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> > b2 =
+        std::make_shared<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> >();
 
     // set relative info
     b2->id = this->id;
@@ -109,8 +109,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> > b3 =
-        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> >();
+    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> > b3 =
+        std::make_shared<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> >();
 
     // set relative info
     b3->id = this->id;
