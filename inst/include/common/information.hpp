@@ -71,9 +71,9 @@ class Information {
     this->random_effects_parameters.push_back(&re);
   }
 
-  inline std::map<double, double> make_map(double x, double y){
-    std::map<double, double> mymap;
-    mymap.insert(std::pair<double, double>(x,y));
+  inline std::map<T, T> make_map(T x, T y){
+    std::map<T, T> mymap;
+    mymap.insert(std::pair<T, T>(x,y));
     return mymap;
   }
 
