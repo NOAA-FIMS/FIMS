@@ -46,7 +46,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   double weights;
   
   std::map<double, double> ewaa = 
-  fims::Information<std::map>::make_map(ages, weights);
+  fims::Information<TMB_FIMS_REAL_TYPE>::make_map(ages, weights);
 
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
 
