@@ -38,15 +38,20 @@ std::map<uint32_t, GrowthInterfaceBase*>
 /**
  * @brief Rcpp interface for EWAAgrowth as an S4 object. To instantiate
  * from R:
- * beverton_holt <- new(fims$beverton_holt)
+ * ewaa <- new(fims$EWAAgrowth)
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
   double ages;
   double weights;
+
+  inline std::map<T, T> make_map(T x, T y){
+    std::map<T, T> mymap;
+    mymap.insert(std::pair<T, T>(x,y));
+    return mymap;
+  }
   
-  std::map<double, double> ewaa = 
-  fims::Information<TMB_FIMS_REAL_TYPE>::make_map(ages, weights);
+  std::map<double, double> ewaa = make_map(ages, weights);
 
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
 

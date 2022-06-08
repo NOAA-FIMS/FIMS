@@ -71,12 +71,6 @@ class Information {
     this->random_effects_parameters.push_back(&re);
   }
 
-  inline std::map<T, T> make_map(T x, T y){
-    std::map<T, T> mymap;
-    mymap.insert(std::pair<T, T>(x,y));
-    return mymap;
-  }
-
 
   /**
    * Create the generalized stock assessment model that will evaluate the
