@@ -51,7 +51,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     return mymap;
   }
   
-  std::map<double, double> ewaa = make_map(ages, weights);
+  std::map<double, double> ewaa = make_map(this->ages, this->weights);
 
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
 
