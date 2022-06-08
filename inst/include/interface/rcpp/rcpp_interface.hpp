@@ -79,9 +79,9 @@ RCPP_MODULE(fims) {
       .field("slope", &LogisticSelectivityInterface::slope)
       .method("get_id", &LogisticSelectivityInterface::get_id);
 
-  Rcpp::class_<EWAAgrowth>("EWAAgrowth")
+  Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
         .constructor()
-        .field("ewaa", &EWAAgrowth::ewaa);
+        .field("ewaa", &EWAAGrowthInterface::ewaa);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
