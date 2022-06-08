@@ -1,8 +1,8 @@
   #ifndef TEST_DNORM_LIKELIHOOD_HPP
   #define TEST_DNORM_LIKELIHOOD_HPP
 
-  #include "../../../inst/include/likelihoods/likelihoods.hpp"
-  #include "../../../inst/include/interface/interface.hpp"
+  #include "../../../include/likelihoods/likelihoods.hpp"
+  #include "../../../include/interface/interface.hpp"
 
   namespace fims {
     template <typename T>

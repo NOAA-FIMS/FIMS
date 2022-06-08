@@ -3,9 +3,20 @@ library(TMB)
 
 test_that("dnorm unit test", {
 
+  project_path <- find.package("FIMS")
+  old_wd <- getwd()
+  setwd(project_path)
+
+
+  if (!file.exists(file.path(project_path, "inst"))) {
+    path <- file.path("extdata", "TMB_tests", "likelihoods")
+  } else {
+    path <- file.path("inst", "extdata", "TMB_tests", "likelihoods")
+  }
+
   #compile and load test
-  TMB::compile("likelihoods/test_dnorm_likelihood.cpp", flags = "-DTMB_MODEL")
-  dynlib(dyn.load("likelihoods/test_dnorm_likelihood"))
+  TMB::compile(paste0(path, "/test_dnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
+  dynlib(dyn.load(paste0(path, "/test_dnorm_likelihood")))
   set.seed(123)
   #Simulate new data with R
   y = rnorm(10, 5, 3)
@@ -19,7 +30,8 @@ test_that("dnorm unit test", {
   expect_equal(nll, mod$fn())
 
   #cleanup
-  on.exit(dynlib(dyn.unload("likelihoods/test_dnorm_likelihood")), add = TRUE)
-  on.exit(file.remove("likelihoods/test_dnorm_likelihood.dll"), add = TRUE)
-  on.exit(file.remove( "likelihoods/test_dnorm_likelihood.o"), add = TRUE)
+  on.exit(dynlib(dyn.unload(paste0(path, "/test_dnorm_likelihood"))), add = TRUE)
+  on.exit(file.remove(paste0(path, "/test_dnorm_likelihood.dll")), add = TRUE)
+  on.exit(file.remove( paste0(path, "/test_dnorm_likelihood.o")), add = TRUE)
+  on.exit(setwd(old_wd), add = TRUE)
 })
