@@ -27,13 +27,58 @@
     /**
      * @brief return the (log) probability density function at x.
      *
+     * @param x The observed value
+     * @param mean The expected value
+     * @param do_log Boolean, if true returns the log of the likelihood 
+     */
+    virtual const T evaluate(const T& x, const T& mean, const bool& do_log) {
+      return dnorm(x, mean, sd, do_log);
+    }
+  };
+
+template <typename T>
+  struct Dmultinom : public LikelihoodsBase<T> {
+                
+
+    Dmultinom() : LikelihoodsBase<T>() {}
+
+    /**
+     * @brief return the (log) probability density function at x.
+     *    
+     * @param x The observed values (frequencies)
+     * @param p probabilities
+     * @param do_log Boolean, if true returns the log of the likelihood 
+     */
+    virtual const T evaluate(const T& x, const T& p, const bool& do_log) {
+      return dmultinom(observed, p, do_log);
+    }
+  };
+
+template <typename T>
+  struct Dlnorm : public LikelihoodsBase<T> {
+    T sdlog; /*!< standard deviation of the distribution of log(x) */
+
+    Dlnorm() : LikelihoodsBase<T>() {}
+
+    /**
+     * @brief return the (log) probability density function at x.
+     *
      *
      * 
      *
      * @param x  The independent variable
+     * @param meanlog expected value of log(x) 
+     * @param do_log Boolean, if true returns the log of the likelihood 
      */
-    virtual const T evaluate(const T& observed, const T& expected, const bool& do_log) {
-      return dnorm(observed, expected, sd, do_log);
+    
+    virtual const T evaluate(const T& observed, const T& meanlog, const bool& do_log) {
+      Type logx = log(observed):
+      Type nll = dnorm(logx, meanlog, sdlog, true) - logx;
+      if(do_log) {
+        return nll;
+      } else {
+        return exp(nll);
+      }
     }
   };
 }
