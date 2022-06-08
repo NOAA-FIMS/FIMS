@@ -63,15 +63,15 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  * from R:
  * beverton_holt <- new(fims$beverton_holt)
  */
-class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
+class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
   Parameter steep;
   Parameter rzero;
   Parameter phizero;
 
-  BevertonHoltRecruitment() : RecruitmentInterfaceBase() {}
+  BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
-  virtual ~BevertonHoltRecruitment() {}
+  virtual ~BevertonHoltRecruitmentInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
 
