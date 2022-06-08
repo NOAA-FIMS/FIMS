@@ -16,11 +16,10 @@
 #'   c("slope", "median")
 #' )
 create_fims_rcpp_interface <- function(interface_name = character(),
-                                       model = character(), 
-                                       base_class = character(), 
-                                       container = character(), 
-                                       parameters = vector()) { 
-
+                                       model = character(),
+                                       base_class = character(),
+                                       container = character(),
+                                       parameters = vector()) {
   types <- c(
     "TMB_FIMS_REAL_TYPE",
     "TMB_FIMS_FIRST_ORDER",
@@ -141,4 +140,3 @@ create_fims_rcpp_interface <- function(interface_name = character(),
   }
   cat(";")
 }
-
