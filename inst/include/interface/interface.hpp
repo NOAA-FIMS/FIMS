@@ -1,9 +1,10 @@
 /*
- * File:   interface.hpp
+ * File: interface.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
+ *
  */
 
 #ifndef FIMS_INTERFACE_HPP
@@ -23,10 +24,16 @@
 //#define TMB_LIB_INIT R_init_FIMS
 #include <TMB.hpp>
 
-template <typename Type>
+/**
+ *  @brief ModelTraits class that contains the DataVector
+ * and ParameterVector types.
+ */
+template <typename T>
 struct ModelTraits {
-  typedef typename CppAD::vector<Type> DataVector;
-  typedef typename CppAD::vector<Type> ParameterVector;
+  typedef typename CppAD::vector<T> DataVector;      /**< This is a vector
+        of the data that is differentiable */
+  typedef typename CppAD::vector<T> ParameterVector; /**< This is a
+  vector of the parameters that is differentiable */
 };
 
 #endif /* TMB_MODEL */
