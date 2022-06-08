@@ -17,7 +17,7 @@ test_that("dnorm unit test", {
 
   #compile and load test
   TMB::compile(paste0(path, "/test_dnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
-  dyn.load(dyn.lib(paste0(path, "/test_dnorm_likelihood")))
+  dyn.load(dynlib(paste0(path, "/test_dnorm_likelihood")))
   set.seed(123)
   #Simulate new data with R
   y = rnorm(10, 5, 3)
