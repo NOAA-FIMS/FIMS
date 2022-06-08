@@ -14,9 +14,10 @@ test_that("dnorm unit test", {
     path <- file.path("inst", "extdata", "TMB_tests", "likelihoods")
   }
 
+
   #compile and load test
   TMB::compile(paste0(path, "/test_dnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
-  dynlib(dyn.load(paste0(path, "/test_dnorm_likelihood")))
+  dyn.load(dyn.lib(paste0(path, "/test_dnorm_likelihood")))
   set.seed(123)
   #Simulate new data with R
   y = rnorm(10, 5, 3)
@@ -30,8 +31,10 @@ test_that("dnorm unit test", {
   expect_equal(nll, mod$fn())
 
   #cleanup
-  on.exit(dynlib(dyn.unload(paste0(path, "/test_dnorm_likelihood"))), add = TRUE)
-  on.exit(file.remove(paste0(path, "/test_dnorm_likelihood.dll")), add = TRUE)
+  on.exit(dyn.unload(dynlib(paste0(path, "/test_dnorm_likelihood"))), add = TRUE)
+  on.exit(
+    file.remove(paste0(path, "/", dynlib("test_dnorm_likelihood")), add = TRUE)
+  )
   on.exit(file.remove( paste0(path, "/test_dnorm_likelihood.o")), add = TRUE)
   on.exit(setwd(old_wd), add = TRUE)
 })
