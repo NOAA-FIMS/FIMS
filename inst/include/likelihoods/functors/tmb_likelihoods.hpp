@@ -50,7 +50,7 @@ template <typename T>
      * @param do_log Boolean, if true returns the log of the likelihood 
      */
     virtual const T evaluate(const T& x, const T& p, const bool& do_log) {
-      return dmultinom(observed, p, do_log);
+      return dmultinom(x, p, do_log);
     }
   };
 
@@ -71,9 +71,9 @@ template <typename T>
      * @param do_log Boolean, if true returns the log of the likelihood 
      */
     
-    virtual const T evaluate(const T& observed, const T& meanlog, const bool& do_log) {
-      Type logx = log(observed):
-      Type nll = dnorm(logx, meanlog, sdlog, true) - logx;
+    virtual const T evaluate(const T& x, const T& meanlog, const bool& do_log) {
+      T logx = log(x);
+      T nll = dnorm(logx, meanlog, sdlog, true) - logx;
       if(do_log) {
         return nll;
       } else {
