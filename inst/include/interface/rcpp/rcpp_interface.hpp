@@ -81,7 +81,8 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
         .constructor()
-        .field("ewaa", &EWAAGrowthInterface::ewaa);
+        .field("ages", &EWAAGrowthInterface::ages);
+        .field("weights", &EWAAGrowthInterface::weights);
 }
 
 #endif /* RCPP_INTERFACE_HPP */

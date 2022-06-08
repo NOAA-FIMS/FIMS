@@ -71,6 +71,13 @@ class Information {
     this->random_effects_parameters.push_back(&re);
   }
 
+  inline std::map<double, double> make_map(double x, double y){
+    std::map<double, double> mymap;
+    mymap.insert(std::pair<double, double>(x,y));
+    return mymap;
+  }
+
+
   /**
    * Create the generalized stock assessment model that will evaluate the
    * objective function.
