@@ -42,8 +42,14 @@ std::map<uint32_t, GrowthInterfaceBase*>
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
-  double ages;
   double weights;
+  double ages;
+
+  EWAAGrowthInterface() : GrowthInterfaceBase() {}
+
+  virtual ~EWAAGrowthInterface() {}
+
+  virtual uint32_t get_id() { return this->id; }
 
   inline std::map<double, double> make_map(double x, double y){
     std::map<double, double> mymap;
@@ -52,12 +58,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   }
   
   std::map<double, double> ewaa = make_map(this->ages, this->weights);
-
-  EWAAGrowthInterface() : GrowthInterfaceBase() {}
-
-  virtual ~EWAAGrowthInterface() {}
-
-  virtual uint32_t get_id() { return this->id; }
 
   virtual bool add_to_fims_tmb() {
     // base model
@@ -74,8 +74,52 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // add to Information
     d0->growth_models[b0->id] = b0;
 
+        }
+    // add to Information
+    d0->growth_models[b0->id] = b0;
+
+    // first-order derivative
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+
+    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> > b1 =
+        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> >();
+
+    // set relative info
+    b1->id = this->id;
+    b1->ewaa = this->ewaa;
+     
+    // add to Information
+    d1->growth_models[b1->id] = b1;
+
+    // second-order derivative
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+
+    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> > b2 =
+        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> >();
+
+    // set relative info
+    b2->id = this->id;
+    b2->ewaa = this->ewaa;
+    // add to Information
+    d2->growth_models[b2->id] = b2;
+
+    // third-order derivative
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+
+    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> > b3 =
+        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> >();
+
+    // set relative info
+    b3->id = this->id;
+    b3->ewaa = this->ewaa;
+
+    // add to Information
+    d3->growth_models[b3->id] = b3;
+
     return true;
-  }
-};
+  };
 
 #endif
