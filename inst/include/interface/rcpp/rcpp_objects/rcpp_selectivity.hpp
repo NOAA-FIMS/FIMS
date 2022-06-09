@@ -60,14 +60,14 @@ std::map<uint32_t, SelectivityInterfaceBase*>
  * @brief Rcpp interface for logistic selectivity as an S4 object. To
  * instantiate from R: logistic_selectivity <- new(fims$logistic_selectivity)
  */
-class LogisticSelectivity : public SelectivityInterfaceBase {
+class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   Parameter median;
   Parameter slope;
 
-  LogisticSelectivity() : SelectivityInterfaceBase() {}
+  LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
-  virtual ~LogisticSelectivity() {}
+  virtual ~LogisticSelectivityInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
 
@@ -85,7 +85,7 @@ class LogisticSelectivity : public SelectivityInterfaceBase {
       if (this->median.is_random_effect) {
         d0->RegisterRandomEffect(ls0->median);
       } else {
-        d0->RegisterRarameter(ls0->median);
+        d0->RegisterParameter(ls0->median);
       }
     }
     ls0->slope = this->slope.value;
@@ -93,7 +93,7 @@ class LogisticSelectivity : public SelectivityInterfaceBase {
       if (this->slope.is_random_effect) {
         d0->RegisterRandomEffect(ls0->slope);
       } else {
-        d0->RegisterRarameter(ls0->slope);
+        d0->RegisterParameter(ls0->slope);
       }
     }
 
@@ -113,7 +113,7 @@ class LogisticSelectivity : public SelectivityInterfaceBase {
       if (this->median.is_random_effect) {
         d1->RegisterRandomEffect(ls1->median);
       } else {
-        d1->RegisterRarameter(ls1->median);
+        d1->RegisterParameter(ls1->median);
       }
     }
     ls1->slope = this->slope.value;
@@ -121,7 +121,7 @@ class LogisticSelectivity : public SelectivityInterfaceBase {
       if (this->slope.is_random_effect) {
         d1->RegisterRandomEffect(ls1->slope);
       } else {
-        d1->RegisterRarameter(ls1->slope);
+        d1->RegisterParameter(ls1->slope);
       }
     }
 
@@ -141,7 +141,7 @@ class LogisticSelectivity : public SelectivityInterfaceBase {
       if (this->median.is_random_effect) {
         d2->RegisterRandomEffect(ls2->median);
       } else {
-        d2->RegisterRarameter(ls2->median);
+        d2->RegisterParameter(ls2->median);
       }
     }
     ls2->slope = this->slope.value;
@@ -149,7 +149,7 @@ class LogisticSelectivity : public SelectivityInterfaceBase {
       if (this->slope.is_random_effect) {
         d2->RegisterRandomEffect(ls2->slope);
       } else {
-        d2->RegisterRarameter(ls2->slope);
+        d2->RegisterParameter(ls2->slope);
       }
     }
 
@@ -169,7 +169,7 @@ class LogisticSelectivity : public SelectivityInterfaceBase {
       if (this->median.is_random_effect) {
         d3->RegisterRandomEffect(ls3->median);
       } else {
-        d3->RegisterRarameter(ls3->median);
+        d3->RegisterParameter(ls3->median);
       }
     }
     ls3->slope = this->slope.value;
@@ -177,7 +177,7 @@ class LogisticSelectivity : public SelectivityInterfaceBase {
       if (this->slope.is_random_effect) {
         d3->RegisterRandomEffect(ls3->slope);
       } else {
-        d3->RegisterRarameter(ls3->slope);
+        d3->RegisterParameter(ls3->slope);
       }
     }
 
