@@ -29,50 +29,30 @@ RUN apt-get -y install build-essential cmake clang-tidy clang-format clang
 
 #get doxygen and ninja
 RUN apt-get -y install doxygen ninja-build
+ENV R_BASE_VERSION 4.2.0
 
-#add R stuff
-# [Choice] R version: 4, 4.2, 4.1, 4.0
-ARG VARIANT=4.2
-# [Choice] Base image. Minimal (r-ver), tidyverse installed (tidyverse), or full image (binder): rocker/r-ver, rocker/tidyverse, rocker/binder
-ARG BASE_IMAGE=rocker/r-ver
-FROM ${BASE_IMAGE}:${VARIANT}
+## During the freeze, new (source) packages are in experimental and we place the binaries in our PPA
+#RUN echo "deb http://deb.debian.org/debian experimental main" > /etc/apt/sources.list.d/experimental.list \
+#    && echo "deb [trusted=yes] https://eddelbuettel.github.io/ppaR400 ./" > /etc/apt/sources.list.d/edd-r4.list
 
-# [Option] Install zsh
-ARG INSTALL_ZSH="true"
-# [Option] Upgrade OS packages to their latest versions
-ARG UPGRADE_PACKAGES="false"
+## Now install R and littler, and create a link for littler in /usr/local/bin
+RUN apt-get update \
+        && apt-get install -y --no-install-recommends \
+                libopenblas0-pthread \
+		littler \
+                r-cran-docopt \
+                r-cran-littler \
+		r-base=${R_BASE_VERSION}-* \
+		r-base-dev=${R_BASE_VERSION}-* \
+                r-base-core=${R_BASE_VERSION}-* \
+		r-recommended=${R_BASE_VERSION}-* \
+	&& ln -s /usr/lib/R/site-library/littler/examples/install.r /usr/local/bin/install.r \
+	&& ln -s /usr/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r \
+	&& ln -s /usr/lib/R/site-library/littler/examples/installBioc.r /usr/local/bin/installBioc.r \
+	&& ln -s /usr/lib/R/site-library/littler/examples/installDeps.r /usr/local/bin/installDeps.r \
+	&& ln -s /usr/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r \
+	&& ln -s /usr/lib/R/site-library/littler/examples/testInstalled.r /usr/local/bin/testInstalled.r \
+	&& rm -rf /tmp/downloaded_packages/ /tmp/*.rds \
+	&& rm -rf /var/lib/apt/lists/*
 
-# Install needed packages and setup non-root user. Use a separate RUN statement to add your own dependencies.
-ARG USERNAME=rstudio
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-USER root
-COPY library-scripts/*.sh /tmp/library-scripts/
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && /bin/bash /tmp/library-scripts/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \
-    && usermod -a -G staff ${USERNAME} \
-    && apt-get -y install \
-        python3-pip \
-        libgit2-dev \
-        libcurl4-openssl-dev \
-        libssl-dev \
-        libxml2-dev \
-        libxt-dev \
-        libfontconfig1-dev \
-        libcairo2-dev \
-    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts \
-    && python3 -m pip --no-cache-dir install radian \
-    && install2.r --error --skipinstalled --ncpus -1 \
-        devtools \
-        languageserver \
-        httpgd \
-    && rm -rf /tmp/downloaded_packages
-
-# VSCode R Debugger dependency. Install the latest release version from GitHub without using GitHub API.
-# See https://github.com/microsoft/vscode-dev-containers/issues/1032
-RUN export TAG=$(git ls-remote --tags --refs --sort='version:refname' https://github.com/ManuelHentschel/vscDebugger v\* | tail -n 1 | cut --delimiter='/' --fields=3) \
-    && Rscript -e "remotes::install_git('https://github.com/ManuelHentschel/vscDebugger.git', ref = '"${TAG}"', dependencies = FALSE)"
-
-# R Session watcher settings.
-# See more details: https://github.com/REditorSupport/vscode-R/wiki/R-Session-watcher
-RUN echo 'if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' >>"${R_HOME}/etc/Rprofile.site"
+CMD ["R"]
