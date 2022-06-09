@@ -38,7 +38,7 @@ struct EWAAgrowth : public GrowthBase<T> {
     * 
     * @param a  age of the fish, the age vector must start at zero
     */
-    virtual const T evaluate(const double& a) {
+    virtual const T evaluate(const T& a) {
         return ewaa[a];
     }
 
