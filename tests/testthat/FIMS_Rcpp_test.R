@@ -1,7 +1,7 @@
 testthat("Rcpp interface works for modules", {
-library(Rcpp)
+  library(Rcpp)
 
-fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
+  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
 a <- new(fims$Parameter, .1)
 expect_success(beverton_holt <- new(fims$BevertonHoltRecruitment))
