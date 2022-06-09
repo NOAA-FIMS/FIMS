@@ -74,7 +74,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // add to Information
     d0->growth_models[b0->id] = b0;
 
-        }
+        
     // add to Information
     d0->growth_models[b0->id] = b0;
 
@@ -118,8 +118,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     // add to Information
     d3->growth_models[b3->id] = b3;
-
     return true;
+  }
   };
 
 #endif
