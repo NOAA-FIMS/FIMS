@@ -109,7 +109,7 @@ setMethod("show", "FIMSFrame", function(object)
 {
   dat_types <- unique(object@data[["type"]])
   beg_of_obj <- head(object@data)
-  cat("This is a FIMSFrameAge data.frame", "\n", "\n",
+  cat("This is a FIMSFrame data.frame", "\n", "\n",
       "Data includes types: ", paste0(dat_types, collapse = ", "),
       "\n", "\n"
       )
