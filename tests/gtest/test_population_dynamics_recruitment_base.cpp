@@ -34,4 +34,38 @@ namespace
     }
   }
 
+  TEST(recruitment_bias_adjustment, PrepareBiasAdjustment_works)
+  {
+    fims::SRBevertonHolt<double> recruit;
+    recruit.sigma_recruit = 0.7;
+
+    // Test if use_recruit_bias_adjustment = false works
+    recruit.use_recruit_bias_adjustment = false;
+    recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
+    recruit.PrepareBiasAdjustment();
+
+    std::vector<double> expected_bias_adjustment_false = {0.0, 0.0, 0.0};
+    for (int i = 0; i < recruit.recruit_bias_adjustment.size(); i++)
+    {
+      EXPECT_EQ(recruit.recruit_bias_adjustment[i],
+                expected_bias_adjustment_false[i]);
+    }
+
+    //Test if use_recruit_bias_adjustment = true works
+    recruit.use_recruit_bias_adjustment = true;
+    recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
+    recruit.recruit_bias_adjustment_fraction = {1.0, 1.0, 1.0};
+    recruit.PrepareBiasAdjustment();
+
+    // R code to generate true values: 0.5 * 0.7^2 * c(1, 1, 1) 
+    // 0.245 0.245 0.245
+    std::vector<double> expected_bias_adjustment_true = {0.245, 0.245, 0.245};
+    for (int i = 0; i < recruit.recruit_bias_adjustment.size(); i++)
+    {
+      EXPECT_NEAR(recruit.recruit_bias_adjustment[i],
+                expected_bias_adjustment_true[i], 0.001);
+    }
+  }
+
+
 }

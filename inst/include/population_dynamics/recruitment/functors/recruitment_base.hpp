@@ -29,7 +29,11 @@ struct RecruitmentBase : public FIMSObject<Type> {
 
   std::vector<Type> rec_deviations; /*!< A vector of recruitment deviations */
   bool constrain_deviations = true;  /*!< A flag to indicate if recruitment deviations are summing to zero or not */
-
+  std::vector<Type> recruit_bias_adjustment; /*!< A vector of bias adj values (incorporating sigma_recruit)*/
+  std::vector<Type> recruit_bias_adjustment_fraction; /*!< A vector of bias adjustment fractions (on the 0 to 1 range)*/
+  bool use_recruit_bias_adjustment = true;  /*!< A flag to indicate if recruitment deviations are bias adjusted */
+  Type sigma_recruit; /*!< Standard deviation of log recruitment deviations */
+  
   /** @brief Constructor.
    */
   RecruitmentBase() { this->id = RecruitmentBase::id_g++; }
@@ -60,6 +64,26 @@ struct RecruitmentBase : public FIMSObject<Type> {
     }
   }
 
+  /** @brief Prepare recruitment bias adjustment.
+   *
+   */
+  void PrepareBiasAdjustment(){
+    Type recruit_bias_adjustment_size = this->recruit_bias_adjustment.size();
+
+    if (!this->use_recruit_bias_adjustment) {
+      for (int i = 0; i < recruit_bias_adjustment_size; i++) {
+        this->recruit_bias_adjustment[i] = 0.0;
+      }
+    } else {
+      for (int i = 0; i < recruit_bias_adjustment_size; i++) {
+        // Initially fixing bias adjustment (b_y in collobarative workflow specification) to 1.0.
+        // In the future, this would be set by the user.
+        this->recruit_bias_adjustment[i] = 0.5 * this->sigma_recruit * this->sigma_recruit * this->recruit_bias_adjustment_fraction[i]; // Could also use pow from math.h
+      }
+    }
+      
+  }
+  
   
 };
 
