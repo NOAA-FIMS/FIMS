@@ -29,13 +29,10 @@ struct EWAAgrowth : public GrowthBase<T> {
     std::map<double, double> ewaa;  /*!<map of doubles for EWAA values by age, where age 
              starts at zero > */
     
+  EWAAgrowth(): GrowthBase<T>(){}
 
-  static EWAAgrowth<T>* instance;
-
-    EWAAgrowth(): GrowthBase<T>(){
-
-    }
-
+    virtual ~EWAAgrowth() {}
+    
     /**
     * @brief Returns the weight at age a (in kg) from the input vector.
     * 
