@@ -39,11 +39,12 @@ std::map<uint32_t, GrowthInterfaceBase*>
  * @brief Rcpp interface for EWAAgrowth as an S4 object. To instantiate
  * from R:
  * ewaa <- new(fims$EWAAgrowth)
+ * 
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
-  double weights;
-  double ages;
+  std::vector<double> weights; /**< weights for each age class */
+  std::vector<double> ages; /**< ages for each age class */
 
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
 
@@ -51,9 +52,19 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
   virtual uint32_t get_id() { return this->id; }
 
-  inline std::map<double, double> make_map(double x, double y){
+  /** 
+   * @brief Create a map of input numeric vectors
+   * @param weights_ std::double vector of weights
+   * @param ages_ std::double vector of ages 
+   * @return std::map<double, double>
+   * 
+   * */
+  inline std::map<double, double> make_map(std::vector<double> ages,
+   std::vector<double> weights){
     std::map<double, double> mymap;
-    mymap.insert(std::pair<double, double>(x, y));
+    for (uint32_t i = 0; i < ages.size(); i++) {
+        mymap.insert(std::pair<double, double>(ages[i], weights[i]));
+    }
     return mymap;
   }
   
@@ -74,50 +85,9 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // add to Information
     d0->growth_models[b0->id] = b0;
 
-        
     // add to Information
     d0->growth_models[b0->id] = b0;
 
-    // // first-order derivative
-    // std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-    //     fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-
-    // std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> > b1 =
-    //     std::make_shared<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> >();
-
-    // // set relative info
-    // b1->id = this->id;
-    // b1->ewaa = this->ewaa;
-     
-    // // add to Information
-    // d1->growth_models[b1->id] = b1;
-
-    // // second-order derivative
-    // std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-    //     fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-
-    // std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> > b2 =
-    //     std::make_shared<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> >();
-
-    // // set relative info
-    // b2->id = this->id;
-    // b2->ewaa = this->ewaa;
-    // // add to Information
-    // d2->growth_models[b2->id] = b2;
-
-    // // third-order derivative
-    // std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-    //     fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-
-    // std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> > b3 =
-    //     std::make_shared<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> >();
-
-    // // set relative info
-    // b3->id = this->id;
-    // b3->ewaa = this->ewaa;
-
-    // // add to Information
-    // d3->growth_models[b3->id] = b3;
     return true;
   }
   };
