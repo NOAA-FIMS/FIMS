@@ -10,7 +10,7 @@
       using DataVector = typename ModelTraits<T>::DataVector;
       public:
       DataVector x;
-      T p;
+      DataVector p;
 
       static Model<T>* instance;
 

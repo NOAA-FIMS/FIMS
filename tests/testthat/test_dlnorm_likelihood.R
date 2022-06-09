@@ -24,7 +24,7 @@ test_that("dlnorm unit test", {
   #Calculate negative log-likelihood with R stats::dlnorm
   nll = -sum(dlnorm(y, 2, 1, TRUE))
   #Initialize TMB model object with true values
-  mod = MakeADFun(data = list(y = y),
+  mod = MakeADFun(data = list(logy = y),
                   parameters = list(p = c(2, log(1))),
                   DLL = "test_dlnorm_likelihood")
   #Compare R nll to TMB nll

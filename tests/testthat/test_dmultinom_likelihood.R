@@ -23,7 +23,7 @@ test_that("dmultinom unit test", {
   p = (1:10)/sum(1:10)
   x = rmultinom(1, 100, p)
   #Calculate negative log-likelihood with R stats::dnmultinom
-  nll = -dmultinom(y, 100,p, TRUE)
+  nll = -dmultinom(x, 100,p, TRUE)
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(x =x),
                   parameters = list(p = p),
