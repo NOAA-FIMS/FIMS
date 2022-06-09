@@ -49,7 +49,9 @@ Depends:
 Imports: 
     Rcpp, 
     TMB (>= 1.8.0),
-    usethis
+    usethis,
+    dplyr,
+    methods
 LinkingTo: 
     Rcpp,
     TMB,
