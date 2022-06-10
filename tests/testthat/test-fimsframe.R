@@ -21,10 +21,9 @@ test_that("Can create the s4 FIMSFrame classes", {
 test_that("Validators work as expected", {
   bad_input <- data.frame(test = 1, test2 = 2)
   bad_input_no_rows <- bad_input[-1, , drop = FALSE]
+
   expect_error(FIMSFrame(bad_input_no_rows), "data must have at least one row")
- # Note: would probably want the following test to error, but right now 
- # there is no validator that checks for appropriate col names
- # expect_error(FIMSFrame(bad_input))
+  expect_error(FIMSFrame(bad_input), "data must contain")
 })
 
 test_that("Show and plot methods work", {
