@@ -41,7 +41,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         languageserver \
         httpgd \
         RcppEigen \
-        TMB
+        TMB \
     && rm -rf /tmp/downloaded_packages
 
 # VSCode R Debugger dependency. Install the latest release version from GitHub without using GitHub API.
