@@ -4,9 +4,9 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
- * Selectivity module file
- * The purpose of this file is to include any .hpp files within the
- * subfolders so that only this file needs to included in the model.hpp file.
+ * SelectivityBase  file
+ * The purpose of this file is to declare the SelectivityBase class
+ * which is the base class for all selectivity functors.
  *
  * DEFINE guards for selectivity module outline to define the
  * selectivity hpp file if not already defined.

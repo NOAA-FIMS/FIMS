@@ -3,8 +3,9 @@
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
  *
- * The purpose of this file is to declare the SelectivityBase class
- * which is the base class for all selectivity functors.
+ * The purpose of this file is to declare the LogisticSelectivity class
+ * which implements the logistic function from fims_math in the selectivity
+ * module.
  */
 #ifndef POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP
 #define POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP

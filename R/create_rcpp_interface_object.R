@@ -1,11 +1,25 @@
-# Function to create the Rcpp interface classes
-# for FIMS model objects.
-create_fims_rcpp_interface <- function(interface_name = character(), # class name
-                                       model = character(), # fims model (i.e. LogisticSelectivity) without "fims" namespace
-                                       base_class = character(), # interface base class
-                                       container = character(), # information container
-                                       parameters = vector()) { # fims model parameters
-
+#' Function to create the Rcpp interface classes
+#' for FIMS model objects.
+#' @param interface_name class name
+#' @param model fims model (i.e. LogisticSelectivity) without "fims" namespace
+#' @param base_class The interface base class
+#' @param container The information model container
+#' @param parameters The parameters of the model object
+#' @return Text string with the code for the new Rcpp interface class
+#' @export
+#' @examples
+#' create_fims_rcpp_interface(
+#'   "logistic_selectivity",
+#'   "LogisticSelectivity",
+#'   "selectivity_interface_base",
+#'   "selectivity_models",
+#'   c("slope", "median")
+#' )
+create_fims_rcpp_interface <- function(interface_name = character(),
+                                       model = character(),
+                                       base_class = character(),
+                                       container = character(),
+                                       parameters = vector()) {
   types <- c(
     "TMB_FIMS_REAL_TYPE",
     "TMB_FIMS_FIRST_ORDER",
@@ -126,12 +140,3 @@ create_fims_rcpp_interface <- function(interface_name = character(), # class nam
   }
   cat(";")
 }
-
-
-create_fims_rcpp_interface(
-  "logistic_selectivity",
-  "LogisticSelectivity",
-  "selectivity_interface_base",
-  "selectivity_models",
-  c("slope", "median")
-)

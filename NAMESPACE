@@ -2,6 +2,7 @@
 
 export(FIMSFrame)
 export(FIMSFrameAge)
+export(create_fims_rcpp_interface)
 export(mkObj)
 export(use_module)
 exportClasses(FIMSFrameAge)
