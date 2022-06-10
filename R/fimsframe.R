@@ -4,6 +4,8 @@
 # [document()] will not work.
 # Another option is to use @include in the documentation of the class and put
 # the validation functions in another file.
+# valid* functions are not exported, i.e., internal functions,
+# because they should not be used outside of the class constructors.
 validFIMSFrame <- function(object) {
   errors <- character()
 
@@ -52,15 +54,17 @@ validFIMSFrameAge <- function(object) {
 
 #' FIMSFrame class
 #'
-#' The FIMSFrame class has just one slot for a `data.frame`.
-#' The class is extended by other classes specific to certain model types`.
+#' The parent class FIMSFrame has just one slot that holds a `data.frame`.
+#' This class is extended to other classes that have additional slots, where
+#' the slots hold data specific to model types. For example, the class
+#' `FIMSFrameAge` stores data specific to an age-structured assessment.
 #'
-#' @aliases FIMSFrame
-#' @rdname FIMSFrame
-#' @slot data A `data.frame` that stores data used to fit a FIMS model.
-#'   `data` can contain as many columns as you want and in any order.
+#' @name FIMSFrame-class
+#' @rdname FIMSFrame-class
+#' @slot data A `data.frame` that stores data used to fit a \pkg{FIMS} model.
+#'   `data` can contain an infinite number of columns in any order.
 #'   But, the following columns are mandatory:
-#'   `type`, `datestart`, `dateend`, value, unit, and uncertainty.
+#'   `type`, `datestart`, `dateend`, `value`, `unit`, and `uncertainty`.
 
 setClass("FIMSFrame",
     slots = list(
@@ -73,6 +77,9 @@ setClass("FIMSFrame",
 #' Some details about this class and my plans for it in the body.
 #' @name FIMSFrameAge-class
 #' @rdname FIMSFrame-class
+#' @slot weightatage A `data.frame` of weight-at-age data.
+#' @slot ages A vector of ages from age zero to the maximum age observed
+#'   in the data.
 #' @exportClass FIMSFrameAge
 setClass("FIMSFrameAge",
     slots = list(
@@ -83,15 +90,20 @@ setClass("FIMSFrameAge",
     validity = validFIMSFrameAge
 )
 
-
 # CONSTRUCTORS ----
-#' Base class constructor for FIMSFrame
+#' Class constructors for FIMSFrame, and associated child, classes
 #'
-#' @param data A `data.frame` that contains the necessary columns
-#'   to construct a data frame of a given `FIMSFrame-class`, which are useable
-#'   by models supported within the \pkg{FIMS} package.
-#' @export
+#' All constructor functions take a single input and build an object specific to
+#' the needs of each model type within \pkg{FIMS}. `FIMSFrame` is the
+#' parent class and the associated child classes have additional slots needed
+#' for each model type.
 #' @rdname FIMSFrame
+#' @param data A `data.frame` that contains the necessary columns
+#'   to construct a data frame of a given `FIMSFrame-class`.
+#' @export
+#' @return An object of the S4 class `FIMSFrame` or one of its child classes
+#' is first validated using the appropriate `valid*()` functions and
+#' then returned.
 FIMSFrame <- function(data) {
   stopifnot(inherits(data, "data.frame"))
 
@@ -114,6 +126,8 @@ FIMSFrameAge <- function(data) {
     data,
     type == "weight-at-age"
   )
+  # TODO: decide if weightatage info should be removed
+  #       from data because it is in weightatage?
   out <- new("FIMSFrameAge",
     data = data,
     ages = ages,
@@ -134,7 +148,7 @@ FIMSFrameAge <- function(data) {
 # Show and plot methods ----
 
 # show method
-setMethod("show", "FIMSFrame", function(object) 
+setMethod("show", "FIMSFrame", function(object)
 {
   dat_types <- unique(object@data[["type"]])
   beg_of_obj <- head(object@data)
@@ -151,4 +165,3 @@ setMethod("plot", "FIMSFrameAge", function(x) {
   x_axis <- x@weightatage[["age"]]
   plot(x_axis, y, xlab = "Age", ylab = "Weight")
 })
-
