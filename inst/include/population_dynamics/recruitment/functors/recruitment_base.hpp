@@ -15,6 +15,7 @@
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP
 
 #include "../../../common/model_object.hpp"
+#include <cmath> // for using std::pow
 
 namespace fims {
 
@@ -30,6 +31,9 @@ struct RecruitmentBase : public FIMSObject<Type> {
   std::vector<Type> rec_deviations; /*!< A vector of recruitment deviations */
   bool constrain_deviations = true;  /*!< A flag to indicate if recruitment deviations are summing to zero or not */
   std::vector<Type> recruit_bias_adjustment; /*!< A vector of bias adj values (incorporating sigma_recruit)*/
+  // Initially fixing bias adjustment (b_y in collobarative 
+  // workflow specification) to 1.0.
+  // In the future, this would be set by the user.
   std::vector<Type> recruit_bias_adjustment_fraction; /*!< A vector of bias adjustment fractions (on the 0 to 1 range)*/
   bool use_recruit_bias_adjustment = true;  /*!< A flag to indicate if recruitment deviations are bias adjusted */
   Type sigma_recruit; /*!< Standard deviation of log recruitment deviations */
@@ -76,14 +80,34 @@ struct RecruitmentBase : public FIMSObject<Type> {
       }
     } else {
       for (int i = 0; i < recruit_bias_adjustment_size; i++) {
-        // Initially fixing bias adjustment (b_y in collobarative workflow specification) to 1.0.
+        // Initially fixing bias adjustment (b_y in collobarative 
+        // workflow specification) to 1.0.
         // In the future, this would be set by the user.
-        this->recruit_bias_adjustment[i] = 0.5 * this->sigma_recruit * this->sigma_recruit * this->recruit_bias_adjustment_fraction[i]; // Could also use pow from math.h
+        this->recruit_bias_adjustment_fraction[i] = 1.0;
+        this->recruit_bias_adjustment[i] = 0.5 * std::pow(this->sigma_recruit, 2)
+         * this->recruit_bias_adjustment_fraction[i]; 
       }
     }
       
   }
   
+  void PrepareBiasAdjustmentBenchmark(){
+    Type recruit_bias_adjustment_size = this->recruit_bias_adjustment.size();
+
+    for (int i = 0; i < recruit_bias_adjustment_size; i++){
+      if (!this->use_recruit_bias_adjustment) {
+        this->recruit_bias_adjustment[i] = 0.0;
+      } else {
+        // Initially fixing bias adjustment (b_y in collobarative 
+        // workflow specification) to 1.0.
+        // In the future, this would be set by the user.
+        this->recruit_bias_adjustment_fraction[i] = 1.0;
+        this->recruit_bias_adjustment[i] = 0.5 * std::pow(this->sigma_recruit, 2)
+         * this->recruit_bias_adjustment_fraction[i]; 
+      }
+    }
+      
+  }
   
 };
 

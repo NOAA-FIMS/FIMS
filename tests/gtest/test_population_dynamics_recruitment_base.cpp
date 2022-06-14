@@ -10,7 +10,7 @@ namespace
     fims::SRBevertonHolt<double> recruit;
     recruit.rec_deviations = {-1.0, 2.0, 3.0};
 
-    // Test that the constrain_deviations = false works
+    // Test if constrain_deviations = false works
     recruit.constrain_deviations = false;
     recruit.PrepareConstrainedDeviations();
     
@@ -21,7 +21,7 @@ namespace
                 expected_deviations_false[i]);
     }
 
-    // Test that the constrain_deviations = true works
+    // Test if constrain_deviations = true works
     recruit.constrain_deviations = true;
     recruit.PrepareConstrainedDeviations();
     // c(-1.0, 2.0, 3.0)-sum(c(-1.0, 2.0, 3.0))/3 = -2.3333333  0.6666667  1.6666667
@@ -54,7 +54,7 @@ namespace
     //Test if use_recruit_bias_adjustment = true works
     recruit.use_recruit_bias_adjustment = true;
     recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
-    recruit.recruit_bias_adjustment_fraction = {1.0, 1.0, 1.0};
+    recruit.recruit_bias_adjustment_fraction = {2.0, 2.0, 2.0};
     recruit.PrepareBiasAdjustment();
 
     // R code to generate true values: 0.5 * 0.7^2 * c(1, 1, 1) 
