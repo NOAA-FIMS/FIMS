@@ -68,7 +68,7 @@ namespace
     }
   }
 
-  TEST(recruitment_likelihood, likelihood_component_works)
+  TEST(recruitment_nll, nll_component_works)
   {
 
     fims::SRBevertonHolt<double> recruit;
@@ -78,13 +78,14 @@ namespace
     recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
     recruit.recruit_bias_adjustment_fraction = {0.0, 0.5, 1.0};
     recruit.use_recruit_bias_adjustment = false;
+    recruit.estimate_recruit_deviations = true;
     recruit.PrepareConstrainedDeviations();
     recruit.PrepareBiasAdjustment();
     
-    //R: 0.5 * sum((c(-1.0, 2.0, 3.0)/0.7)^2+c(1.0, 1.0, 1.0)*log(0.7)) = 13.7507
-    double expected_likelihood = 13.7507;
-    EXPECT_NEAR(recruit.recruit_likelihood(),
-               expected_likelihood, 0.00001);
+    //R: -sum(0.5*(c(-1.0, 2.0, 3.0)/0.7)^2+c(1.0, 1.0, 1.0)*log(0.7) - log(0.7) - log(sqrt(2*pi))) = -11.5289
+    double expected_nll =  -11.5289;
+    EXPECT_NEAR(recruit.recruit_nll(),
+               expected_nll, 0.0001);
 
   }
 
