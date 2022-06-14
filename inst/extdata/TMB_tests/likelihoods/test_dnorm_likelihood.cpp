@@ -2,7 +2,7 @@
 
 template<class Type>
 Type objective_function<Type>::operator()(){
-  
+
   fims::Model<Type>* inst = fims::Model<Type>::getInstance();
 
   DATA_VECTOR(y);

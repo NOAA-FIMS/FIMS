@@ -27,9 +27,11 @@
         int i;
         int n = y.size();
         fims::Dnorm<T> nll_dnorm;
+        nll_dnorm.mean = mean;
         nll_dnorm.sd = sd;
         for(i =0; i < n; i++){
-          nll -= nll_dnorm.evaluate(y[i],mean,true);
+          nll_dnorm.x = y[i];
+          nll -= nll_dnorm.evaluate(true);
         }
         return nll;
       }

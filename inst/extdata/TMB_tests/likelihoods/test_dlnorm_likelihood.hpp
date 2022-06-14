@@ -27,9 +27,11 @@
         int i;
         int n = logy.size();
         fims::Dlnorm<T> nll_dlnorm;
+        nll_dlnorm.meanlog = meanlog;
         nll_dlnorm.sdlog = sdlog;
         for(i =0; i < n; i++){
-          nll -= nll_dlnorm.evaluate(logy[i],meanlog,true);
+          nll_dlnorm.x = logy[i];
+          nll -= nll_dlnorm.evaluate(true);
         }
         return nll;
       }

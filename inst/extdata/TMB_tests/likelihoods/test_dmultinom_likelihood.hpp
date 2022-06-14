@@ -7,10 +7,10 @@
   namespace fims {
     template <typename T>
     class Model {
-      using DataVector = typename ModelTraits<T>::DataVector;
+      using Vector = typename ModelTraits<T>::EigenVector;
       public:
-      DataVector x;
-      DataVector p;
+      Vector x;
+      Vector p;
 
       static Model<T>* instance;
 
@@ -24,7 +24,9 @@
 
         T nll = 0;
         fims::Dmultinom<T> nll_dmultinom;
-        nll -= nll_dmultinom.evaluate(x,p,true);
+        nll_dmultinom.x = x;
+        nll_dmultinom.p = p;
+        nll -= nll_dmultinom.evaluate(true);
         return nll;
       }
     };

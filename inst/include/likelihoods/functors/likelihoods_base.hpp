@@ -1,14 +1,14 @@
 /*
-  * This File is part of the NOAA, National Marine Fisheries Service
+* This File is part of the NOAA, National Marine Fisheries Service
 * Fisheries Integrated Modeling System project. See LICENSE in the
 * source folder for reuse information.
 *
-  *
-  * likelihoods_base file
+*
+* likelihoods_base file
 * The purpose of this file is to include any .hpp files within the
 * subfolders so that only this file needs to included in the model.hpp file.
 *
-  * DEFINE guards for module_name module outline to define the
+* DEFINE guards for module_name module outline to define the
 * module_name_base hpp file if not already defined.
 */
   #ifndef LIKELIHOODS_BASE_HPP
@@ -21,8 +21,9 @@
 
     /* @brief Base class for all module_name functors.
     *
-      * @tparam T The type of the module_name functor.
-    * */
+    * @tparam T The type of the module_name functor.
+    *
+    */
       template<typename T>
       struct LikelihoodsBase : public FIMSObject<T> {
 
@@ -39,10 +40,10 @@
           }
 
         /*
-          * @brief Calculates the likelihoods at the independent variable value.
+        * @brief Calculates the likelihoods at the independent variable value.
         * @param x The observed value.
         */
-          virtual const T evaluate(const T& observed, const T& expected, const bool& do_log) = 0;
+          virtual const T evaluate(const bool& do_log) = 0;
       };
 
     template<typename T>
