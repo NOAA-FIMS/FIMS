@@ -70,6 +70,12 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
   std::map<double, double> ewaa = make_map(this->ages, this->weights);
 
+  double evaluate(double age){
+    double EWAAGrowth = fims::EWAAGrowth<double>();
+    EWAAGrowth.ewaa = this->ewaa;
+    return EWAAGrowth.evaluate(age);
+  }
+
   virtual bool add_to_fims_tmb() {
     // base model
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
