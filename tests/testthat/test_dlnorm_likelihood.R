@@ -6,6 +6,7 @@ test_that("dlnorm unit test", {
   project_path <- find.package("FIMS")
   old_wd <- getwd()
   setwd(project_path)
+  on.exit(setwd(old_wd), add = TRUE)
 
 
   if (!file.exists(file.path(project_path, "inst"))) {
@@ -30,11 +31,12 @@ test_that("dlnorm unit test", {
   #Compare R nll to TMB nll
   expect_equal(nll, mod$fn())
 
-  #cleanup
-  on.exit(dyn.unload(dynlib(paste0(path, "/test_dlnorm_likelihood"))), add = TRUE)
-  on.exit(
-    file.remove(paste0(path, "/", dynlib("test_dlnorm_likelihood")), add = TRUE)
-  )
-  on.exit(file.remove( paste0(path, "/test_dlnorm_likelihood.o")), add = TRUE)
-  on.exit(setwd(old_wd), add = TRUE)
+  dyn.unload(dynlib(paste0(path, "/test_dlnorm_likelihood")))
+  if(file.exists(paste0(path, "/", dynlib("test_dlnorm_likelihood")))){
+    file.remove(paste0(path, "/", dynlib("test_dlnorm_likelihood")))
+  }
+  if(file.exists(paste0(path, "/", dynlib("test_dlnorm_likelihood.o")))){
+    file.remove(paste0(path, "/", dynlib("test_dlnorm_likelihood.o")))
+  }
+
 })
