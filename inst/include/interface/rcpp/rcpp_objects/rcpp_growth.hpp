@@ -71,7 +71,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   std::map<double, double> ewaa = make_map(this->ages, this->weights);
 
   double evaluate(double age){
-    double EWAAGrowth = fims::EWAAGrowth<double>();
+    double EWAAGrowth = fims::EWAAgrowth<double>();
     EWAAGrowth.ewaa = this->ewaa;
     return EWAAGrowth.evaluate(age);
   }
