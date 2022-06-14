@@ -68,7 +68,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     return mymap;
   }
   
-  std::map<double, double> ewaa = make_map(this->ages, this->weights);
 
   virtual bool add_to_fims_tmb() {
     // base model
@@ -77,6 +76,9 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_REAL_TYPE> > b0 =
         std::make_shared<fims::EWAAgrowth<TMB_FIMS_REAL_TYPE> >();
+
+    
+    std::map<double, double> ewaa = make_map(this->ages, this->weights);
 
     // set relative info
     b0->id = this->id;
