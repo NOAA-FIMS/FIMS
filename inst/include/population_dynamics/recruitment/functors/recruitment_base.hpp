@@ -16,6 +16,7 @@
 
 #include "../../../common/model_object.hpp"
 #include <cmath> // for using std::pow
+#include "../../../common/fims_math.hpp" //for using fims::log()
 
 namespace fims {
 
@@ -28,7 +29,7 @@ template <class Type>
 struct RecruitmentBase : public FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for recruitment object*/
 
-  std::vector<Type> rec_deviations; /*!< A vector of recruitment deviations */
+  std::vector<Type> recruit_deviations; /*!< A vector of recruitment deviations */
   bool constrain_deviations = true;  /*!< A flag to indicate if recruitment deviations are summing to zero or not */
   std::vector<Type> recruit_bias_adjustment; /*!< A vector of bias adj values (incorporating sigma_recruit)*/
   // Initially fixing bias adjustment (b_y in collobarative 
@@ -59,12 +60,12 @@ struct RecruitmentBase : public FIMSObject<Type> {
     
     Type sum = 0.0;
 
-    for (int i = 0; i < this->rec_deviations.size(); i++) {
-        sum += this->rec_deviations[i];
+    for (int i = 0; i < this->recruit_deviations.size(); i++) {
+        sum += this->recruit_deviations[i];
     }
 
-    for (int i = 0; i < this->rec_deviations.size(); i++) {
-        this->rec_deviations[i] -= sum / (this->rec_deviations.size());
+    for (int i = 0; i < this->recruit_deviations.size(); i++) {
+        this->recruit_deviations[i] -= sum / (this->recruit_deviations.size());
     }
   }
 
@@ -76,6 +77,7 @@ struct RecruitmentBase : public FIMSObject<Type> {
 
     if (!this->use_recruit_bias_adjustment) {
       for (int i = 0; i < recruit_bias_adjustment_size; i++) {
+        this->recruit_bias_adjustment_fraction[i] = 1.0;
         this->recruit_bias_adjustment[i] = 0.0;
       }
     } else {
@@ -91,11 +93,15 @@ struct RecruitmentBase : public FIMSObject<Type> {
       
   }
   
+  /** @brief Prepare recruitment bias adjustment for benchmarking.
+   *
+   */
   void PrepareBiasAdjustmentBenchmark(){
     Type recruit_bias_adjustment_size = this->recruit_bias_adjustment.size();
 
     for (int i = 0; i < recruit_bias_adjustment_size; i++){
       if (!this->use_recruit_bias_adjustment) {
+        this->recruit_bias_adjustment_fraction[i] = 1.0;
         this->recruit_bias_adjustment[i] = 0.0;
       } else {
         // Initially fixing bias adjustment (b_y in collobarative 
@@ -109,6 +115,23 @@ struct RecruitmentBase : public FIMSObject<Type> {
       
   }
   
+  /** @brief Likelihood component function.
+     */
+    Type recruit_likelihood()
+    {
+      Type likelihood;
+      Type initial_likelihood;
+
+      for (int i = 0; i < this->recruit_deviations.size(); i++)
+      {
+        initial_likelihood += pow((this->recruit_deviations[i] / this->sigma_recruit), 2) +
+               this->recruit_bias_adjustment_fraction[i] * fims::log(this->sigma_recruit);
+      }
+
+      likelihood = 0.5 * initial_likelihood;
+      return likelihood;
+    }
+
 };
 
 template <class Type>

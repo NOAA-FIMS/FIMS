@@ -8,16 +8,16 @@ namespace
   TEST(recruitment_deviations, constraint_works)
   {
     fims::SRBevertonHolt<double> recruit;
-    recruit.rec_deviations = {-1.0, 2.0, 3.0};
+    recruit.recruit_deviations = {-1.0, 2.0, 3.0};
 
     // Test if constrain_deviations = false works
     recruit.constrain_deviations = false;
     recruit.PrepareConstrainedDeviations();
     
     std::vector<double> expected_deviations_false = {-1.0, 2.0, 3.0};
-    for (int i = 0; i < recruit.rec_deviations.size(); i++)
+    for (int i = 0; i < recruit.recruit_deviations.size(); i++)
     {
-      EXPECT_EQ(recruit.rec_deviations[i],
+      EXPECT_EQ(recruit.recruit_deviations[i],
                 expected_deviations_false[i]);
     }
 
@@ -27,9 +27,9 @@ namespace
     // c(-1.0, 2.0, 3.0)-sum(c(-1.0, 2.0, 3.0))/3 = -2.3333333  0.6666667  1.6666667
     std::vector<double> expected_deviations_true = {-2.3333333, 0.6666667, 1.6666667};
 
-    for (int i = 0; i < recruit.rec_deviations.size(); i++)
+    for (int i = 0; i < recruit.recruit_deviations.size(); i++)
     {
-      EXPECT_NEAR(recruit.rec_deviations[i],
+      EXPECT_NEAR(recruit.recruit_deviations[i],
                 expected_deviations_true[i], 0.0000001);
     }
   }
@@ -42,6 +42,7 @@ namespace
     // Test if use_recruit_bias_adjustment = false works
     recruit.use_recruit_bias_adjustment = false;
     recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
+    recruit.recruit_bias_adjustment_fraction = {2.0, 2.0, 2.0};
     recruit.PrepareBiasAdjustment();
 
     std::vector<double> expected_bias_adjustment_false = {0.0, 0.0, 0.0};
@@ -67,5 +68,24 @@ namespace
     }
   }
 
+  TEST(recruitment_likelihood, likelihood_component_works)
+  {
+
+    fims::SRBevertonHolt<double> recruit;
+    recruit.recruit_deviations = {-1.0, 2.0, 3.0};
+    recruit.constrain_deviations = false;
+    recruit.sigma_recruit = 0.7;
+    recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
+    recruit.recruit_bias_adjustment_fraction = {0.0, 0.5, 1.0};
+    recruit.use_recruit_bias_adjustment = false;
+    recruit.PrepareConstrainedDeviations();
+    recruit.PrepareBiasAdjustment();
+    
+    //R: 0.5 * sum((c(-1.0, 2.0, 3.0)/0.7)^2+c(1.0, 1.0, 1.0)*log(0.7)) = 13.7507
+    double expected_likelihood = 13.7507;
+    EXPECT_NEAR(recruit.recruit_likelihood(),
+               expected_likelihood, 0.00001);
+
+  }
 
 }
