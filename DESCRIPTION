@@ -49,7 +49,9 @@ Depends:
 Imports: 
     Rcpp, 
     TMB (>= 1.8.0),
-    usethis
+    usethis,
+    dplyr,
+    methods
 LinkingTo: 
     Rcpp,
     TMB,
@@ -64,3 +66,4 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
+LazyData: true
