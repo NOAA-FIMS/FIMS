@@ -62,13 +62,22 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   inline std::map<double, double> make_map(std::vector<double> ages,
    std::vector<double> weights){
     std::map<double, double> mymap;
+    if(ages.size() != weights.size()){
+      Rcpp::stop("ages and weights must be the same length");
+    }
     for (uint32_t i = 0; i < ages.size(); i++) {
         mymap.insert(std::pair<double, double>(ages[i], weights[i]));
     }
     return mymap;
   }
-  
+
   std::map<double, double> ewaa = make_map(this->ages, this->weights);
+
+  double evaluate(double age){
+    fims::EWAAgrowth<double> EWAAGrowth = fims::EWAAgrowth<double>();
+    EWAAGrowth.ewaa = this->ewaa;
+    return EWAAGrowth.evaluate(age);
+  }
 
   virtual bool add_to_fims_tmb() {
     // base model
