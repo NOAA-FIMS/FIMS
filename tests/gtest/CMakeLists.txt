@@ -118,13 +118,3 @@ target_link_libraries(population_dynamics_recruitment_base
 )
 
 gtest_discover_tests(population_dynamics_recruitment_base)
-
-# benchmark_population_dynamics_recruitment_base.cpp
-add_executable(benchmark_population_dynamics_recruitment_base
-  benchmark_population_dynamics_recruitment_base.cpp
-)
-
-target_link_libraries(benchmark_population_dynamics_recruitment_base
-  fims_test
-  benchmark_main
-)
