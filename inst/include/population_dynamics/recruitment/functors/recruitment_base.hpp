@@ -127,7 +127,7 @@ namespace fims
         for (int i = 0; i < this->recruit_deviations.size(); i++)
         {
           
-          nll -= 0.5 * (pow((this->recruit_deviations[i] / 
+          nll += 0.5 * (pow((this->recruit_deviations[i] / 
             this->sigma_recruit),2) + this->recruit_bias_adjustment_fraction[i] 
             * fims::log(pow(this->sigma_recruit, 2)) + 
             fims::log(2.0 * M_PI) );

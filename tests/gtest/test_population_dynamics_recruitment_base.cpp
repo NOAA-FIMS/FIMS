@@ -82,8 +82,8 @@ namespace
     recruit.PrepareConstrainedDeviations();
     recruit.PrepareBiasAdjustment();
     
-    //R: -sum(0.5*((c(-1.0, 2.0, 3.0)/0.7)^2+c(1.0, 1.0, 1.0)*log(0.7^2)+log(2*pi))) = -15.97251
-    double expected_nll =  -15.97251;
+    //R: sum(0.5*((c(-1.0, 2.0, 3.0)/0.7)^2+c(1.0, 1.0, 1.0)*log(0.7^2)+log(2*pi))) = 15.97251
+    double expected_nll =  15.97251;
     EXPECT_NEAR(recruit.recruit_nll(),
                expected_nll, 0.00001);
 
@@ -103,8 +103,8 @@ namespace
     recruit.PrepareConstrainedDeviations();
     recruit.PrepareBiasAdjustment();
     
-    //R: -sum(-log(dnorm(x = c(-1, 0.5, 3), mean = 0, sd = 0.3))) = -56.08934
-    double expected_nll =  -56.08934;
+    //R: sum(-log(dnorm(x = c(-1, 0.5, 3), mean = 0, sd = 0.3))) = -56.08934
+    double expected_nll =  56.08934;
     EXPECT_NEAR(recruit.recruit_nll(),
                expected_nll, 0.00001);
 
