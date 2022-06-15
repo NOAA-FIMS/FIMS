@@ -15,8 +15,8 @@
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP
 
 #include "../../../common/model_object.hpp"
-#include <cmath>                         // for using std::pow
-#include "../../../common/fims_math.hpp" //for using fims::log()
+#include <cmath>                         // for using std::pow and M_PI
+#include "../../../common/fims_math.hpp" // for using fims::log()
 
 namespace fims
 {
@@ -54,7 +54,10 @@ namespace fims
         const Type &spawners) = 0; // need to add input parameter values
 
     /** @brief Prepare constrained recruitment deviations.
-     *
+     *  Based on ADMB sum-to-zero constraint implementation. We still 
+     *  need to adde an additional penalty to the PrepareConstrainedDeviations 
+     *  method. More discussion can be found here: 
+     *  https://groups.google.com/a/admb-project.org/g/users/c/63YJmYGEPuE
      */
     void PrepareConstrainedDeviations()
     {
@@ -77,7 +80,7 @@ namespace fims
     }
 
     /** @brief Prepare recruitment bias adjustment.
-     *
+     *  Based on Methot & Taylor (2011).
      */
     void PrepareBiasAdjustment()
     {
@@ -104,36 +107,11 @@ namespace fims
       }
     }
 
-    /** @brief Prepare recruitment bias adjustment for benchmarking.
-     *
-     */
-    void PrepareBiasAdjustmentBenchmark()
-    {
-      Type recruit_bias_adjustment_size = this->recruit_bias_adjustment.size();
-
-      for (int i = 0; i < recruit_bias_adjustment_size; i++)
-      {
-        if (!this->use_recruit_bias_adjustment)
-        {
-          this->recruit_bias_adjustment_fraction[i] = 1.0;
-          this->recruit_bias_adjustment[i] = 0.0;
-        }
-        else
-        {
-          // Initially fixing bias adjustment (b_y in collobarative
-          // workflow specification) to 1.0.
-          // In the future, this would be set by the user.
-          this->recruit_bias_adjustment_fraction[i] = 1.0;
-          this->recruit_bias_adjustment[i] = 0.5 * std::pow(this->sigma_recruit, 2) * this->recruit_bias_adjustment_fraction[i];
-        }
-      }
-    }
-
     /** @brief likelihood component function.
-    Returns the negative log likelihood (nll).
-    Initially based on equation (13) in Methot & Taylor (2011) but with the
-    addition of the constant terms.
-       */
+     * Returns the negative log likelihood (nll).
+     * Based on equation (A.3.10) in Methot and Wetzel (2013) 
+     * but with the addition of the constant terms.
+     */
     Type recruit_nll()
     {
       Type nll;
@@ -148,11 +126,13 @@ namespace fims
       {
         for (int i = 0; i < this->recruit_deviations.size(); i++)
         {
-          // did we include sigma twice?
-          // are we sure it's not sigma^2
-          nll -= 0.5 * pow((this->recruit_deviations[i] / this->sigma_recruit), 2) +
-                         this->recruit_bias_adjustment_fraction[i] * fims::log(this->sigma_recruit) -
-                         fims::log(sigma_recruit) - fims::log(sqrt(2 * M_PI));
+          
+          nll -= 0.5 * (pow((this->recruit_deviations[i] / 
+            this->sigma_recruit),2) + this->recruit_bias_adjustment_fraction[i] 
+            * fims::log(pow(this->sigma_recruit, 2)) + 
+            fims::log(2.0 * M_PI) );
+
+
         }
         return nll;
       }

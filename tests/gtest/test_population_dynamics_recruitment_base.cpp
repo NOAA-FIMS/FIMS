@@ -58,7 +58,7 @@ namespace
     recruit.recruit_bias_adjustment_fraction = {2.0, 2.0, 2.0};
     recruit.PrepareBiasAdjustment();
 
-    // R code to generate true values: 0.5 * 0.7^2 * c(1, 1, 1) 
+    // R code to generate true values: 0.5 * 0.7^2 * c(1.0, 1.0, 1.0) 
     // 0.245 0.245 0.245
     std::vector<double> expected_bias_adjustment_true = {0.245, 0.245, 0.245};
     for (int i = 0; i < recruit.recruit_bias_adjustment.size(); i++)
@@ -82,10 +82,31 @@ namespace
     recruit.PrepareConstrainedDeviations();
     recruit.PrepareBiasAdjustment();
     
-    //R: -sum(0.5*(c(-1.0, 2.0, 3.0)/0.7)^2+c(1.0, 1.0, 1.0)*log(0.7) - log(0.7) - log(sqrt(2*pi))) = -11.5289
-    double expected_nll =  -11.5289;
+    //R: -sum(0.5*((c(-1.0, 2.0, 3.0)/0.7)^2+c(1.0, 1.0, 1.0)*log(0.7^2)+log(2*pi))) = -15.97251
+    double expected_nll =  -15.97251;
     EXPECT_NEAR(recruit.recruit_nll(),
-               expected_nll, 0.0001);
+               expected_nll, 0.00001);
+
+  }
+
+  TEST(recruitment_nll, compare_to_r_dnorm_works)
+  {
+
+    fims::SRBevertonHolt<double> recruit;
+    recruit.recruit_deviations = {-1, 0.5, 3};
+    recruit.constrain_deviations = false;
+    recruit.sigma_recruit = 0.3;
+    recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
+    recruit.recruit_bias_adjustment_fraction = {0.0, 0.5, 1.0};
+    recruit.use_recruit_bias_adjustment = false;
+    recruit.estimate_recruit_deviations = true;
+    recruit.PrepareConstrainedDeviations();
+    recruit.PrepareBiasAdjustment();
+    
+    //R: -sum(-log(dnorm(x = c(-1, 0.5, 3), mean = 0, sd = 0.3))) = -56.08934
+    double expected_nll =  -56.08934;
+    EXPECT_NEAR(recruit.recruit_nll(),
+               expected_nll, 0.00001);
 
   }
 
