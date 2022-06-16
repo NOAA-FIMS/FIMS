@@ -5,7 +5,8 @@
 #' the `ASSAMC` package written for the
 #' [model comparison project](www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison).
 #'
-#' @format A data frame with 1140 observations of  8 variables:
+#' @format A data frame with `r NROW(data_mile1)` observations of
+#' `r NCOL(data_mile1)` variables:
 #' \describe{
 #'   \item{type}{The type of data the row contains.}
 #'   \item{name}{A character string providing the name of the information source

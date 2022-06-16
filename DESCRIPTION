@@ -51,7 +51,9 @@ Imports:
     TMB (>= 1.8.0),
     usethis,
     dplyr,
-    methods
+    ggplot2,
+    methods,
+    scales
 LinkingTo: 
     Rcpp,
     TMB,
