@@ -1,125 +1,180 @@
 
-# VALIDATION FUNCTIONS ----
-# These validate functions must be the first entries of this file otherwise
-# [document()] will not work.
-# Another option is to use @include in the documentation of the class and put
-# the validation functions in another file.
-# valid* functions are not exported, i.e., internal functions,
-# because they should not be used outside of the class constructors.
-validFIMSFrame <- function(object) {
-  errors <- character()
+# This file defines a parent class and its children by
+# (1) setting the class;
+# (2) defining methods, using methods::setMethod();
+# (3) setting the validators; and
+# (4) establishing the constructors (i.e., functions called by users)
+# where only the constructors are documented using roxygen.
 
-  if (NROW(object@data) == 0) {
-    errors <- c(errors, "data must have at least one row")
-  }
+# setClass: ----
+# Classes are not currently exported, and therefore, do not need documentation.
+# See the following link if we do want to document them in the future:
+# https://stackoverflow.com/questions/7368262/how-to-properly-document-s4-class-slots-using-roxygen2
 
-  # Check columns
-  if (!"type" %in% colnames(object@data)) {
-    errors <- c(errors, "data must contain 'type'")
-  }
-  if (!"datestart" %in% colnames(object@data)) {
-    errors <- c(errors, "data must contain 'datestart'")
-  }
-  if (!"dateend" %in% colnames(object@data)) {
-    errors <- c(errors, "data must contain 'dateend'")
-  }
-
-  # Return
-  if (length(errors) == 0) {
-    return(TRUE)
-  } else {
-    return(errors)
-  }
-}
-
-validFIMSFrameAge <- function(object) {
-  errors <- character()
-
-  # Check columns
-  if (!"age" %in% colnames(object@data)) {
-    errors <- c(errors, "data must contain 'age'")
-  }
-
-  # Return
-  if (length(errors) == 0) {
-    return(TRUE)
-  } else {
-    return(errors)
-  }
-}
-
-# DATA CLASSES ----
-# example: https://github.com/rbchan/unmarked/blob/master/R/unmarkedFrame.R
-# Note that the reference is a little outdated. Check Advanced R and R pkgs.
-
-#' FIMSFrame class
-#'
-#' The parent class FIMSFrame has just one slot that holds a `data.frame`.
-#' This class is extended to other classes that have additional slots, where
-#' the slots hold data specific to model types. For example, the class
-#' `FIMSFrameAge` stores data specific to an age-structured assessment.
-#'
-#' @name FIMSFrame-class
-#' @rdname FIMSFrame-class
-#' @slot data A `data.frame` that stores data used to fit a \pkg{FIMS} model.
-#'   `data` can contain an infinite number of columns in any order.
-#'   But, the following columns are mandatory:
-#'   `type`, `datestart`, `dateend`, `value`, `unit`, and `uncertainty`.
-
-setClass("FIMSFrame",
-    slots = list(
-        data = "data.frame"
-    ),
-    validity = validFIMSFrame
+methods::setClass(
+  Class = "FIMSFrame",
+  slots = c(data = "data.frame")
 )
-#' `FIMSFrameAge` is an S4 class that extends the `FIMSFrame` class
-#'
-#' Some details about this class and my plans for it in the body.
-#' @name FIMSFrameAge-class
-#' @rdname FIMSFrame-class
-#' @slot weightatage A `data.frame` of weight-at-age data.
-#' @slot ages A vector of ages from age zero to the maximum age observed
-#'   in the data.
-#' @exportClass FIMSFrameAge
-setClass("FIMSFrameAge",
+
+methods::setClass("FIMSFrameAge",
     slots = list(
         weightatage = "data.frame",
         ages = "numeric"
     ),
-    contains = "FIMSFrame",
-    validity = validFIMSFrameAge
+    contains = "FIMSFrame"
 )
 
-# CONSTRUCTORS ----
-#' Class constructors for FIMSFrame, and associated child, classes
+# setMethod: accessors ----
+# Methods for accessing info in the slots
+
+# setMethod: initialize ----
+# Not currently using methods::setMethod(f = "initialize")
+# because @kellijohnson-NOAA did not quite understand how they actually work.
+
+# setMethod: plot ----
+methods::setMethod(
+  f = "plot",
+  signature = "FIMSFrame",
+  definition = function(x) {
+    ggplot2::ggplot(
+      data = x@data,
+      mapping = ggplot2::aes(
+        x = as.Date(datestart),
+        y = value,
+        col = name
+      )
+    ) +
+      # Using Set3 b/c it is the palette with the largest number of colors
+      # and not {nmfspalette} b/c didn't want to depend on GitHub package
+      ggplot2::scale_color_brewer(palette = "Set3") +
+      ggplot2::facet_wrap("type", scales = "free_y") +
+      ggplot2::geom_point() +
+      ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d")) +
+      ggplot2::xlab("Start date (Year-Month-Day)") +
+      ggplot2::ylab("Value") +
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(angle = 15)
+      )
+  }
+)
+
+methods::setMethod(
+  f = "plot",
+  signature = "FIMSFrameAge", 
+  definition = function(x) {
+    y <- x@weightatage[["value"]]
+    x_axis <- x@weightatage[["age"]]
+    plot(x_axis, y, xlab = "Age", ylab = "Weight")
+  }
+)
+
+# setMethod: show ----
+methods::setMethod(
+  f = "show",
+  signature = "FIMSFrame",
+  definition = function(object) {
+    message("data.frame of class '", class(object), "'")
+    if (length(object@data) == 0) return()
+    dat_types <- unique(object@data[[which(colnames(object@data) == "type")]])
+    message("with the following 'types': ", paste0(dat_types, collapse = ", "))
+    snames <- slotNames(object)
+    ordinnames <- !snames %in% c(
+      "data",
+      ".S3Class",
+      "row.names",
+      "names"
+    )
+    print(head(object@data))
+    for (nm in snames[ordinnames]) {
+      cat("+@", nm, ":\n", sep = "")
+      print(slot(object, nm))
+    }
+  }
+)
+
+# setValidity ----
+methods::setValidity(
+  Class = "FIMSFrame",
+  method = function(object) {
+    errors <- character()
+
+    if (NROW(object@data) == 0) {
+      errors <- c(errors, "data must have at least one row")
+    }
+
+    # Check columns
+    if (!"type" %in% colnames(object@data)) {
+      errors <- c(errors, "data must contain 'type'")
+    }
+    if (!"datestart" %in% colnames(object@data)) {
+      errors <- c(errors, "data must contain 'datestart'")
+    }
+    if (!"dateend" %in% colnames(object@data)) {
+      errors <- c(errors, "data must contain 'dateend'")
+    }
+    if (!"dateend" %in% colnames(object@data)) {
+      errors <- c(errors, "data must contain 'value'")
+    }
+    if (!"dateend" %in% colnames(object@data)) {
+      errors <- c(errors, "data must contain 'unit'")
+    }
+    if (!"dateend" %in% colnames(object@data)) {
+      errors <- c(errors, "data must contain 'uncertainty'")
+    }
+
+    # Return
+    if (length(errors) == 0) {
+      return(TRUE)
+    } else {
+      return(errors)
+    }
+  }
+)
+
+methods::setValidity(
+  Class = "FIMSFrameAge",
+  method = function(object) {
+    errors <- character()
+
+    # Check columns
+    if (!"age" %in% colnames(object@data)) {
+      errors <- c(errors, "data must contain 'age'")
+    }
+
+    # Return
+    if (length(errors) == 0) {
+      return(TRUE)
+    } else {
+      return(errors)
+    }
+  }
+)
+
+# Constructors ----
+# All constructors in this file are documented in 1 roxygen file via @rdname.
+
+#' Class constructors for `FIMSFrame` and associated child classes
 #'
 #' All constructor functions take a single input and build an object specific to
 #' the needs of each model type within \pkg{FIMS}. `FIMSFrame` is the
 #' parent class and the associated child classes have additional slots needed
 #' for each model type.
+#' @export
 #' @rdname FIMSFrame
 #' @param data A `data.frame` that contains the necessary columns
 #'   to construct a data frame of a given `FIMSFrame-class`.
-#' @export
 #' @return An object of the S4 class `FIMSFrame` or one of its child classes
-#' is first validated using the appropriate `valid*()` functions and
-#' then returned.
+#' is validated and then returned. All objects will at a minimum have a slot
+#' called `data` to store the input data frame. Additional slots are dependent
+#' on the child class. Use [methods::showClass()] to see all available slots.
 FIMSFrame <- function(data) {
-  stopifnot(inherits(data, "data.frame"))
-
-  # Calculate information based on input data
-  out <- new("FIMSFrame",
-    data = data
-  )
-
+  out <- new("FIMSFrame", data = data)
   return(out)
 }
 #' FIMSFrameAge
 #' @export
 #' @rdname FIMSFrame
 FIMSFrameAge <- function(data) {
-  stopifnot(inherits(data, "data.frame"))
-
   # Calculate information based on input data
   ages <- 0:max(data[["age"]], na.rm = TRUE)
   weightatage <- dplyr::filter(
@@ -135,33 +190,3 @@ FIMSFrameAge <- function(data) {
   )
   return(out)
 }
-
-# SELECTORS ----
-# these can define for e.g., subsetting functions. This could 
-# be helpful for example if you want to take out all data for a fleet
-# across multiple slots in the object.
-
-# Accessors ----
-# Methods for accessing info in the slots
-# e.g., something like name.
-
-# Show and plot methods ----
-
-# show method
-setMethod("show", "FIMSFrame", function(object)
-{
-  dat_types <- unique(object@data[["type"]])
-  beg_of_obj <- head(object@data)
-  cat("This is a FIMSFrame data.frame", "\n", "\n",
-      "Data includes types: ", paste0(dat_types, collapse = ", "),
-      "\n", "\n"
-      )
-      print(beg_of_obj)
-})
-
-# plot method
-setMethod("plot", "FIMSFrameAge", function(x) {
-  y <- x@weightatage[["value"]]
-  x_axis <- x@weightatage[["age"]]
-  plot(x_axis, y, xlab = "Age", ylab = "Weight")
-})
