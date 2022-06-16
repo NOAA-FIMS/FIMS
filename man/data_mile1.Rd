@@ -5,7 +5,8 @@
 \alias{data_mile1}
 \title{{FIMS} input data frame for milestone 1}
 \format{
-A data frame with 1140 observations of  8 variables:
+A data frame with 1140 observations of
+8 variables:
 \describe{
 \item{type}{The type of data the row contains.}
 \item{name}{A character string providing the name of the information source

@@ -15,28 +15,17 @@
 ###############################################################################
 # Helper functions and load packages
 ###############################################################################
-check_version_ASSAMC <- function() {
+check_ASSAMC <- function() {
   packages_all <- .packages(all.available = TRUE)
-  if ("ASSAMC" %in% packages_all) {
-    library("ASSAMC")
-  }
-  info <- sessionInfo()
-  if (
-    info[["otherPkgs"]][["ASSAMC"]][["GithubRef"]] !=
-    "feat_eg-data"
-  ) {
-    devtools::unload(package = "ASSAMC")
-  }
-  if (!"package:ASSAMC" %in% search()) {
+  if (!"ASSAMC" %in% packages_all) {
     remotes::install_github(
-      "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison",
-      ref = "feat_eg-data"
+      "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison"
     )
-    library("ASSAMC")
   }
+  library("ASSAMC")
   return(TRUE)
 }
-check_version_ASSAMC()
+check_ASSAMC()
 library(dplyr)
 
 ###############################################################################
