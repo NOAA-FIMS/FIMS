@@ -31,6 +31,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googlebenchmark)
 
+# Set up Gcov to get coverage results with Google Test
+set(CMAKE_CXX_FLAGS --coverage)
+
 # Set up doxygen: download doxygen 1.9.3 and add it to the PATH
 option(BUILD_DOC "Build documentation" ON)
 IF(BUILD_DOC)
