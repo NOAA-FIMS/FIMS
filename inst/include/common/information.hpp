@@ -53,6 +53,14 @@ class Information {
     return Information<T>::fims_information;
   }
 
+  T InitialFDummyFunction(){
+      T ret = 0.0;
+      for(int i = 0; i < 10; i++){
+          ret++;
+      }
+      return ret;
+  }
+  
   /**
    * Register a parameter as estimable.
    *
