@@ -1,3 +1,6 @@
+/*! \file def.hpp
+ */
+
 /*
  * File:   def.hpp
  *
