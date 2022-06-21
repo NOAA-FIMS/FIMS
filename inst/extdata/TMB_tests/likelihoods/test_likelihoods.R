@@ -11,12 +11,10 @@ if (!file.exists(file.path(project_path, "inst"))) {
   path <- file.path("inst", "extdata", "TMB_tests", "likelihoods")
 }
 
-#compile test .cpp files from inst/extdata/TMB_tests/likelihoods
+# compile test .cpp files from inst/extdata/TMB_tests/likelihoods
 TMB::compile(paste0(path, "/test_dnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
 TMB::compile(paste0(path, "/test_dlnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
 TMB::compile(paste0(path, "/test_dmultinom_likelihood.cpp"), flags = "-DTMB_MODEL")
-
-setwd(old_wd)
 
 test_that("dnorm unit test", {
 
