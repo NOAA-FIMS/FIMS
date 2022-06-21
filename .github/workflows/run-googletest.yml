@@ -40,3 +40,9 @@ jobs:
         path: |
           build/Testing/Temporary/LastTest.log
           build/CMakeFiles/CMakeOutput.log
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      
+    - run: bash <(curl -s https://codecov.io/bash)
+      shell: bash

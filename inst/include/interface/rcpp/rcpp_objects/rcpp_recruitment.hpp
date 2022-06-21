@@ -63,15 +63,15 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  * from R:
  * beverton_holt <- new(fims$beverton_holt)
  */
-class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
+class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
   Parameter steep;
   Parameter rzero;
   Parameter phizero;
 
-  BevertonHoltRecruitment() : RecruitmentInterfaceBase() {}
+  BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
-  virtual ~BevertonHoltRecruitment() {}
+  virtual ~BevertonHoltRecruitmentInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
 
@@ -90,7 +90,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->steep.is_random_effect) {
         d0->RegisterRandomEffect(b0->steep);
       } else {
-        d0->RegisterRarameter(b0->steep);
+        d0->RegisterParameter(b0->steep);
       }
     }
     b0->rzero = this->rzero.value;
@@ -98,7 +98,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->rzero.is_random_effect) {
         d0->RegisterRandomEffect(b0->rzero);
       } else {
-        d0->RegisterRarameter(b0->rzero);
+        d0->RegisterParameter(b0->rzero);
       }
     }
     b0->phizero = this->phizero.value;
@@ -106,7 +106,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->phizero.is_random_effect) {
         d0->RegisterRandomEffect(b0->phizero);
       } else {
-        d0->RegisterRarameter(b0->phizero);
+        d0->RegisterParameter(b0->phizero);
       }
     }
     // add to Information
@@ -126,7 +126,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->steep.is_random_effect) {
         d1->RegisterRandomEffect(b1->steep);
       } else {
-        d1->RegisterRarameter(b1->steep);
+        d1->RegisterParameter(b1->steep);
       }
     }
     b1->rzero = this->rzero.value;
@@ -134,7 +134,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->rzero.is_random_effect) {
         d1->RegisterRandomEffect(b1->rzero);
       } else {
-        d1->RegisterRarameter(b1->rzero);
+        d1->RegisterParameter(b1->rzero);
       }
     }
     b1->phizero = this->phizero.value;
@@ -142,7 +142,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->phizero.is_random_effect) {
         d1->RegisterRandomEffect(b1->phizero);
       } else {
-        d1->RegisterRarameter(b1->phizero);
+        d1->RegisterParameter(b1->phizero);
       }
     }
     // add to Information
@@ -162,7 +162,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->steep.is_random_effect) {
         d2->RegisterRandomEffect(b2->steep);
       } else {
-        d2->RegisterRarameter(b2->steep);
+        d2->RegisterParameter(b2->steep);
       }
     }
     b2->rzero = this->rzero.value;
@@ -170,7 +170,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->rzero.is_random_effect) {
         d2->RegisterRandomEffect(b2->rzero);
       } else {
-        d2->RegisterRarameter(b2->rzero);
+        d2->RegisterParameter(b2->rzero);
       }
     }
     b2->phizero = this->phizero.value;
@@ -178,7 +178,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->phizero.is_random_effect) {
         d2->RegisterRandomEffect(b2->phizero);
       } else {
-        d2->RegisterRarameter(b2->phizero);
+        d2->RegisterParameter(b2->phizero);
       }
     }
     // add to Information
@@ -198,7 +198,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->steep.is_random_effect) {
         d3->RegisterRandomEffect(b3->steep);
       } else {
-        d3->RegisterRarameter(b3->steep);
+        d3->RegisterParameter(b3->steep);
       }
     }
     b3->rzero = this->rzero.value;
@@ -206,7 +206,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->rzero.is_random_effect) {
         d3->RegisterRandomEffect(b3->rzero);
       } else {
-        d3->RegisterRarameter(b3->rzero);
+        d3->RegisterParameter(b3->rzero);
       }
     }
     b3->phizero = this->phizero.value;
@@ -214,7 +214,7 @@ class BevertonHoltRecruitment : public RecruitmentInterfaceBase {
       if (this->phizero.is_random_effect) {
         d3->RegisterRandomEffect(b3->phizero);
       } else {
-        d3->RegisterRarameter(b3->phizero);
+        d3->RegisterParameter(b3->phizero);
       }
     }
     // add to Information

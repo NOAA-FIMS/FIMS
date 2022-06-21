@@ -87,18 +87,18 @@ RCPP_MODULE(fims) {
       .field("is_random_effect", &Parameter::is_random_effect)
       .field("estimated", &Parameter::estimated);
 
-  Rcpp::class_<BevertonHoltRecruitment>("BevertonHoltRecruitment")
+  Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()
-      .field("steep", &BevertonHoltRecruitment::steep)
-      .field("rzero", &BevertonHoltRecruitment::rzero)
-      .field("phizero", &BevertonHoltRecruitment::phizero)
-      .method("get_id", &BevertonHoltRecruitment::get_id);
+      .field("steep", &BevertonHoltRecruitmentInterface::steep)
+      .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
+      .field("phizero", &BevertonHoltRecruitmentInterface::phizero)
+      .method("get_id", &BevertonHoltRecruitmentInterface::get_id);
 
-  Rcpp::class_<LogisticSelectivity>("LogisticSelectivity")
+  Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
       .constructor()
-      .field("median", &LogisticSelectivity::median)
-      .field("slope", &LogisticSelectivity::slope)
-      .method("get_id", &LogisticSelectivity::get_id);
+      .field("median", &LogisticSelectivityInterface::median)
+      .field("slope", &LogisticSelectivityInterface::slope)
+      .method("get_id", &LogisticSelectivityInterface::get_id);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
