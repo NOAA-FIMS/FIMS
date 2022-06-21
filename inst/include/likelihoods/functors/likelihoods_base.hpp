@@ -19,11 +19,11 @@
 
   namespace fims {
 
-    /* @brief Base class for all module_name functors.
-    *
-    * @tparam T The type of the module_name functor.
-    *
-    */
+    /** @brief Base class for all module_name functors.
+     *
+     * @tparam T The type of the module_name functor.
+     *
+     */
       template<typename T>
       struct LikelihoodsBase : public FIMSObject<T> {
 
@@ -33,19 +33,21 @@
         // all the instances of the LikelihoodsBase class.
         static uint32_t id_g;
 
-        /* @brief Constructor.
-        */
+        /** @brief Constructor.
+         */
           LikelihoodsBase() {
             this->id = LikelihoodsBase::id_g++;
           }
 
-        /*
-        * @brief Calculates the likelihoods at the independent variable value.
-        * @param x The observed value.
-        */
+        /**
+         * @brief Generic probability density function. Calculates the likelihood at the independent variable value.
+         * @param do_log Boolean; if true, log-likelihoods are returned
+         */
           virtual const T evaluate(const bool& do_log) = 0;
       };
 
+    /** @brief Default id of the singleton likelihood class
+     */
     template<typename T>
       uint32_t LikelihoodsBase<T>::id_g = 0;
 
