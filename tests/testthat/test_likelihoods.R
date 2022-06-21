@@ -3,11 +3,20 @@ library(TMB)
 
 project_path <- find.package("FIMS")
 old_wd <- getwd()
+setwd(project_path)
+
 if (!file.exists(file.path(project_path, "inst"))) {
   path <- file.path("extdata", "TMB_tests", "likelihoods")
 } else {
   path <- file.path("inst", "extdata", "TMB_tests", "likelihoods")
 }
+
+#compile test .cpp files from inst/extdata/TMB_tests/likelihoods
+TMB::compile(paste0(path, "/test_dnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
+TMB::compile(paste0(path, "/test_dlnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
+TMB::compile(paste0(path, "/test_dmultinom_likelihood.cpp"), flags = "-DTMB_MODEL")
+
+setwd(old_wd)
 
 test_that("dnorm unit test", {
 
@@ -15,8 +24,7 @@ test_that("dnorm unit test", {
   on.exit(setwd(old_wd), add = TRUE)
 
   # dnorm unit test
-  # compile and load test
-  TMB::compile(paste0(path, "/test_dnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
+  # load test
   dyn.load(dynlib(paste0(path, "/test_dnorm_likelihood")))
   set.seed(123)
   #Simulate new data with R
@@ -42,8 +50,7 @@ test_that("dlnorm unit test", {
   on.exit(setwd(old_wd), add = TRUE)
 
   # dlnorm unit test
-  # compile and load test
-  TMB::compile(paste0(path, "/test_dlnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
+  # load test
   dyn.load(dynlib(paste0(path, "/test_dlnorm_likelihood")))
   set.seed(123)
   #Simulate new data with R
@@ -68,8 +75,7 @@ test_that("dmultinom unit test", {
   on.exit(setwd(old_wd), add = TRUE)
 
   # # dmultinom unit test
-  # #compile and load test
-  TMB::compile(paste0(path, "/test_dmultinom_likelihood.cpp"), flags = "-DTMB_MODEL")
+  # # load test
   dyn.load(dynlib(paste0(path, "/test_dmultinom_likelihood")))
   set.seed(123)
   #Simulate new data with R
