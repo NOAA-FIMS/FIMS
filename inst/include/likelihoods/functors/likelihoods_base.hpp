@@ -5,11 +5,11 @@
 *
 *
 * likelihoods_base file
-* The purpose of this file is to include any .hpp files within the
-* subfolders so that only this file needs to included in the model.hpp file.
+* The purpose of this file is to declare the LikelihoodsBase class
+* which is the base class for all likelihood functors.
 *
-* DEFINE guards for module_name module outline to define the
-* module_name_base hpp file if not already defined.
+* DEFINE guards for likelihoods module outline to define the
+* likelihoods_base hpp file if not already defined.
 */
   #ifndef LIKELIHOODS_BASE_HPP
   #define LIKELIHOODS_BASE_HPP
