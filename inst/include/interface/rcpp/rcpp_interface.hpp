@@ -34,7 +34,7 @@
 #include "rcpp_objects/rcpp_fishing_mortality.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
-#include "rcpp_objects/rcpp_likelihoods.hpp"
+#include "rcpp_objects/rcpp_tmb_dnorm_likelihood.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
@@ -99,6 +99,14 @@ RCPP_MODULE(fims) {
       .field("median", &LogisticSelectivityInterface::median)
       .field("slope", &LogisticSelectivityInterface::slope)
       .method("get_id", &LogisticSelectivityInterface::get_id);
+
+   Rcpp::class_<DnormLikelihoodsInterface>("TMBDnormLikelihood")
+    .constructor()
+    .method("get_id",  &DnormLikelihoodsInterface::get_id)
+    //.method("evaluate",  &DnormLikelihoodsInterface::evaluate<T>)
+    .field("x", &DnormLikelihoodsInterface::x)
+    .field("mean", &DnormLikelihoodsInterface::mean)
+    .field("sd", &DnormLikelihoodsInterface::sd);
 }
 
 #endif /* RCPP_INTERFACE_HPP */

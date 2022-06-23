@@ -1,4 +1,4 @@
-/*
+/*! \file information.hpp
  * File:   information.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
@@ -18,6 +18,7 @@
 // #include "../interface/interface.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
+#include "../likelihoods/likelihoods.hpp"
 #include "model_object.hpp"
 
 namespace fims {
@@ -39,6 +40,8 @@ class Information {
       recruitment_models;
   std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >
       selectivity_models;
+  std::map<uint32_t, std::shared_ptr<fims::LikelihoodsBase<T> > >
+      likelihoods_models;
 
   /**
    * Returns a single Information object for type T.
