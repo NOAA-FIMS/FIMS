@@ -16,7 +16,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
         - os: windows-latest
-          compiler: gcc
+          compiler: g++
           gcc: 8
 
     steps:
