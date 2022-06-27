@@ -16,9 +16,9 @@
 
 #include "def.hpp"
 // #include "../interface/interface.hpp"
+#include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
-#include "../population_dynamics/growth/growth.hpp"
 #include "model_object.hpp"
 
 namespace fims {
@@ -70,7 +70,6 @@ class Information {
   void RegisterRandomEffect(T& re) {
     this->random_effects_parameters.push_back(&re);
   }
-
 
   /**
    * Create the generalized stock assessment model that will evaluate the
