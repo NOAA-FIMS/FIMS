@@ -26,7 +26,7 @@ jobs:
     - name: Configure
     # Do not run -DBUILD_DOC=OFF locally. Only run cmake -S . -B build -G Ninja locally.
       run: |
-        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja
+        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja -DHAVE_POSIX_REGEX=OFF
         
     - name: Build
       run: |  
