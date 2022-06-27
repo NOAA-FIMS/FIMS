@@ -3,7 +3,8 @@
  *
  *
  * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE file for reuse information.
+ * Fisheries Integrated Modeling System project. See LICENSE file for reuse
+ * information.
  *
  *
  */
@@ -80,10 +81,10 @@ RCPP_MODULE(fims) {
       .method("get_id", &LogisticSelectivityInterface::get_id);
 
   Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
-        .constructor()
-        .field("ages", &EWAAGrowthInterface::ages)
-        .field("weights", &EWAAGrowthInterface::weights)
-        .method("evaluate", &EWAAGrowthInterface::evaluate);
+      .constructor()
+      .field("ages", &EWAAGrowthInterface::ages)
+      .field("weights", &EWAAGrowthInterface::weights)
+      .method("evaluate", &EWAAGrowthInterface::evaluate);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
