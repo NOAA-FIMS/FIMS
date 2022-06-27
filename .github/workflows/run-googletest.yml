@@ -17,7 +17,7 @@ jobs:
         include:
         - os: windows-latest
           compiler: gcc
-          gcc: 8.3.0
+          gcc: 8
 
     steps:
     - uses: actions/checkout@v2
