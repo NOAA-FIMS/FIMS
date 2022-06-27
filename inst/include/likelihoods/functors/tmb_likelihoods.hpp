@@ -27,6 +27,9 @@
 
 
     Dnorm() : LikelihoodsBase<T>() {}
+    
+    virtual ~Dnorm(){}
+    
 
     /**
      * @brief Probability mass function of the normal distribution.

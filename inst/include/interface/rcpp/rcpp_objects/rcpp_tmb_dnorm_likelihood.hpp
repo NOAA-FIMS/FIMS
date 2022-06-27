@@ -45,22 +45,24 @@ class DnormLikelihoodsInterface : public LikelihoodsInterfaceBase {
     
     uint32_t get_id(){return this->id;}
 
+    virtual ~DnormLikelihoodsInterface(){}
+
 
     template <class T>
     T evaluate(){
         fims::Dnorm<T> Dnorm = fims::Dnorm<T>();
-        Dnorm.x = this-> x;
-        Dnorm.mean = this-> mean;
-        Dnorm.sd = this-> sd;
+        Dnorm.x = this-> x.value;
+        Dnorm.mean = this-> mean.value;
+        Dnorm.sd = this-> sd.value;
         return Dnorm.evaluate(true);
     };
 
 /*
     double evaluate(bool do_log){
         fims::Dnorm<double> Dnorm;
-        Dnorm.x = this-> x;
-        Dnorm.mean = this-> mean;
-        Dnorm.sd = this-> sd;
+        Dnorm.x = this-> x.value;
+        Dnorm.mean = this-> mean.value;
+        Dnorm.sd = this-> sd.value;
         return Dnorm.evaluate(true);
         }
    

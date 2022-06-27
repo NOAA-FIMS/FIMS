@@ -103,7 +103,7 @@ RCPP_MODULE(fims) {
    Rcpp::class_<DnormLikelihoodsInterface>("TMBDnormLikelihood")
     .constructor()
     .method("get_id",  &DnormLikelihoodsInterface::get_id)
-    //.method("evaluate",  &DnormLikelihoodsInterface::evaluate<T>)
+    .method("evaluate",  &DnormLikelihoodsInterface::evaluate<double>)
     .field("x", &DnormLikelihoodsInterface::x)
     .field("mean", &DnormLikelihoodsInterface::mean)
     .field("sd", &DnormLikelihoodsInterface::sd);
