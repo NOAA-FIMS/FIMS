@@ -9,15 +9,12 @@ on:
     #- cron: '0 0 * * 0'
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on: [ubuntu-latest, macos-latest, windows-latest]
-        include:
-          - runs-on: windows-latest
-            compiler: gcc
-            gcc: 8.3.0
-
+    matrix:
+      runs-on: [ubuntu-latest, macos-latest, windows-latest]
+      include:
+        - runs-on: windows-latest
+          compiler: gcc
+          gcc: 8.3.0
 
     steps:
     - uses: actions/checkout@v2
