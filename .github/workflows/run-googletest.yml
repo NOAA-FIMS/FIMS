@@ -17,7 +17,7 @@ jobs:
         include:
         - os: windows-latest
           compiler: gcc
-          version: 8.3.0
+          gcc: 8.3.0
 
     steps:
     - uses: actions/checkout@v2
@@ -26,7 +26,7 @@ jobs:
     - name: Configure
     # Do not run -DBUILD_DOC=OFF locally. Only run cmake -S . -B build -G Ninja locally.
       run: |
-        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja -DHAVE_POSIX_REGEX=OFF -DHAVE_STD_REGEX=OFF -DHAVE_GNU_POSIX_REGEX=OFF 
+        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja 
         
     - name: Build
       run: |  
