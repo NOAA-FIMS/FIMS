@@ -23,7 +23,7 @@ jobs:
     - name: Configure
     # Do not run -DBUILD_DOC=OFF locally. Only run cmake -S . -B build -G Ninja locally.
       run: |
-        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja -DCMAKE_CROSSCOMPILING=1 -DRUN_HAVE_STD_REGEX=0 -DRUN_HAVE_POSIX_REGEX=0
+        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja -DCMAKE_CROSSCOMPILING=1 -DRUN_HAVE_STD_REGEX=0 -DRUN_HAVE_POSIX_REGEX=0 -DRUN_GNU_POSIX_REGEX=0 
         
     - name: Build
       run: |  
