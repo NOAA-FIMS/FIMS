@@ -25,13 +25,6 @@ FetchContent_MakeAvailable(googletest)
 # Set up Google benchmark
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
-set(CMAKE_CROSSCOMPILING ON CACHE BOOL "" FORCE)
-# The settings below help run cmake when it failed to determine 
-# the source files for the regular expression backend
-set(HAVE_STD_REGEX OFF CACHE BOOL "" FORCE)
-set(HAVE_GNU_POSIX_REGEX OFF CACHE BOOL "" FORCE)
-set(HAVE_POSIX_REGEX OFF CACHE BOOL "" FORCE)
-set(HAVE_STEADY_CLOCK OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
   googlebenchmark
   URL https://github.com/google/benchmark/archive/refs/tags/v1.6.0.zip
