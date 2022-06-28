@@ -97,6 +97,17 @@ target_link_libraries(benchmark_fims_math_logistic
   benchmark_main
 )
 
+# test_growth.cpp
+add_executable(growth_evaluate
+  test_growth.cpp
+)
+
+target_link_libraries(growth_evaluate
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(growth_evaluate)
 
 # benchmark_fims_math_double_logistic.cpp
 add_executable(benchmark_fims_math_double_logistic
@@ -108,3 +119,14 @@ target_link_libraries(benchmark_fims_math_double_logistic
   benchmark_main
 )
 
+# test_population_dynamics_recruitment_base.cpp
+add_executable(population_dynamics_recruitment_base
+test_population_dynamics_recruitment_base.cpp
+)
+
+target_link_libraries(population_dynamics_recruitment_base
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_dynamics_recruitment_base)

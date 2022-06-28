@@ -16,6 +16,7 @@
 
 #include "def.hpp"
 // #include "../interface/interface.hpp"
+#include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
 #include "../likelihoods/likelihoods.hpp"
@@ -42,6 +43,7 @@ class Information {
       selectivity_models;
   std::map<uint32_t, std::shared_ptr<fims::LikelihoodsBase<T> > >
       likelihoods_models;
+  std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
 
   /**
    * Returns a single Information object for type T.
