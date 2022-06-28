@@ -1,4 +1,6 @@
 /*
+ * File: interface.hpp
+ *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
@@ -13,6 +15,8 @@
  */
 
 // traits for interfacing with TMB
+#include "../population_dynamics/growth/growth.hpp"
+
 #ifdef TMB_MODEL
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
 // issue

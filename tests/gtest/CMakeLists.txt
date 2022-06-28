@@ -97,6 +97,18 @@ target_link_libraries(benchmark_fims_math_logistic
   benchmark_main
 )
 
+# test_growth.cpp
+add_executable(growth_evaluate
+  test_growth.cpp
+)
+
+target_link_libraries(growth_evaluate
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(growth_evaluate)
+
 # benchmark_fims_math_double_logistic.cpp
 add_executable(benchmark_fims_math_double_logistic
   benchmark_fims_math_double_logistic.cpp
