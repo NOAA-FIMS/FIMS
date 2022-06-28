@@ -54,9 +54,9 @@ namespace fims
         const Type &spawners) = 0; // need to add input parameter values
 
     /** @brief Prepare constrained recruitment deviations.
-     *  Based on ADMB sum-to-zero constraint implementation. We still 
-     *  need to adde an additional penalty to the PrepareConstrainedDeviations 
-     *  method. More discussion can be found here: 
+     *  Based on ADMB sum-to-zero constraint implementation. We still
+     *  need to adde an additional penalty to the PrepareConstrainedDeviations
+     *  method. More discussion can be found here:
      *  https://groups.google.com/a/admb-project.org/g/users/c/63YJmYGEPuE
      */
     void PrepareConstrainedDeviations()
@@ -109,7 +109,7 @@ namespace fims
 
     /** @brief likelihood component function.
      * Returns the negative log likelihood (nll).
-     * Based on equation (A.3.10) in Methot and Wetzel (2013) 
+     * Based on equation (A.3.10) in Methot and Wetzel (2013)
      * but with the addition of the constant terms.
      */
     Type recruit_nll()
@@ -126,13 +126,12 @@ namespace fims
       {
         for (int i = 0; i < this->recruit_deviations.size(); i++)
         {
-          
-          nll += 0.5 * (pow((this->recruit_deviations[i] / 
-            this->sigma_recruit),2) + this->recruit_bias_adjustment_fraction[i] 
-            * fims::log(pow(this->sigma_recruit, 2)) + 
-            fims::log(2.0 * M_PI) );
 
-
+          nll += 0.5 * (pow((this->recruit_deviations[i] /
+                             this->sigma_recruit),
+                            2) +
+                        fims::log(pow(this->sigma_recruit, 2)) +
+                        fims::log(2.0 * M_PI));
         }
         return nll;
       }
