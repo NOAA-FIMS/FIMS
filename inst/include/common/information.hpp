@@ -124,11 +124,27 @@ namespace fims {
                 //set age composition data
                 if (f->observed_agecomp_data_id != -999) {
 
-                    uint32_t index_id = static_cast<uint32_t> (f->observed_agecomp_data_id);
-                    data_iterator it = this->data_objects.find(index_id);
+                    uint32_t agecomp_id = static_cast<uint32_t> (f->observed_agecomp_data_id);
+                    data_iterator it = this->data_objects.find(agecomp_id);
 
                     if (it != this->data_objects.end()) {
                         f->observed_agecomp_data = (*it).second;
+                    } else {
+                        //log error
+                    }
+
+                } else {
+                    //log error
+                }
+
+                //set selectivity model
+                if (f->selectivity_id != -999) {
+
+                    uint32_t sel_id = static_cast<uint32_t> (f->selectivity_id);
+                    data_iterator it = this->data_objects.find(sel_id);
+
+                    if (it != this->selectivity_models.end()) {
+                        f->selectivity = (*it).second;
                     } else {
                         //log error
                     }
