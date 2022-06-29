@@ -39,7 +39,8 @@ namespace fims {
 
         //data objects
         std::map<uint32_t, std::shared_ptr<fims::DataObject<double> > data_objects;
-
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::DataObject<double> >::iterator data_iterator;
+        
         //life history modules
         std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >::iterator recruitment_model_iterator;
@@ -103,6 +104,23 @@ namespace fims {
                     it != this->fleets.end(); ++it) {
 
                 std::shared_ptr<fims::Fleet<T> > f = (*it).second;
+                
+                //set index data
+                if(f->observed_index_data_id != -999){
+                    
+                     uint32_t index_id = static_cast<uint32_t>(f->observed_index_data_id);
+                     data_iterator it = this->data_objects.find(index_id);
+                     
+                     if(it != this->data_objects.end()){
+                         f->observed_inedx_data = (*it).second;
+                     }else{
+                         //log error
+                     }
+                     
+                }else{
+                    //log error
+                }
+               
                 //error check and set fleet elements here
             }
 
