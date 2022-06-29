@@ -24,66 +24,74 @@
  *
  */
 bool CreateTMBModel() {
-  for (int i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
-       i++) {
-    FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
-  }
+    for (int i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
+            i++) {
+        FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
+    }
 
-  // base model
-  std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-      fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-  d0->CreateModel();
+    // base model
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+            fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    d0->CreateModel();
 
-  // first-order derivative
-  std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-      fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-  d1->CreateModel();
+    // first-order derivative
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+            fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    d1->CreateModel();
 
-  // second-order derivative
-  std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-      fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-  d2->CreateModel();
+    // second-order derivative
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+            fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    d2->CreateModel();
 
-  // third-order derivative
-  std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-      fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-  d3->CreateModel();
+    // third-order derivative
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+            fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    d3->CreateModel();
 
-  return true;
+    return true;
 }
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_MODULE(fims) {
-  Rcpp::function("CreateTMBModel", &CreateTMBModel);
+    Rcpp::function("CreateTMBModel", &CreateTMBModel);
 
-  Rcpp::class_<Parameter>("Parameter")
-      .constructor()
-      .constructor<double>()
-      .constructor<Parameter>()
-      .field("value", &Parameter::value)
-      .field("min", &Parameter::min)
-      .field("max", &Parameter::max)
-      .field("is_random_effect", &Parameter::is_random_effect)
-      .field("estimated", &Parameter::estimated);
+    Rcpp::class_<Parameter>("Parameter")
+            .constructor()
+            .constructor<double>()
+            .constructor<Parameter>()
+            .field("value", &Parameter::value)
+            .field("min", &Parameter::min)
+            .field("max", &Parameter::max)
+            .field("is_random_effect", &Parameter::is_random_effect)
+            .field("estimated", &Parameter::estimated);
 
-  Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
-      .constructor()
-      .field("steep", &BevertonHoltRecruitmentInterface::steep)
-      .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
-      .field("phizero", &BevertonHoltRecruitmentInterface::phizero)
-      .method("get_id", &BevertonHoltRecruitmentInterface::get_id);
+    Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
+            .constructor()
+            .field("steep", &BevertonHoltRecruitmentInterface::steep)
+            .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
+            .field("phizero", &BevertonHoltRecruitmentInterface::phizero)
+            .method("get_id", &BevertonHoltRecruitmentInterface::get_id);
 
-  Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
-      .constructor()
-      .field("median", &LogisticSelectivityInterface::median)
-      .field("slope", &LogisticSelectivityInterface::slope)
-      .method("get_id", &LogisticSelectivityInterface::get_id);
+    Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
+            .constructor()
+            .field("median", &LogisticSelectivityInterface::median)
+            .field("slope", &LogisticSelectivityInterface::slope)
+            .method("get_id", &LogisticSelectivityInterface::get_id);
 
-  Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
-        .constructor()
-        .field("ages", &EWAAGrowthInterface::ages)
-        .field("weights", &EWAAGrowthInterface::weights)
-        .method("evaluate", &EWAAGrowthInterface::evaluate);
+    Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
+            .constructor()
+            .field("ages", &EWAAGrowthInterface::ages)
+            .field("weights", &EWAAGrowthInterface::weights)
+            .method("evaluate", &EWAAGrowthInterface::evaluate);
+
+    Rcpp::class_<FleetInterface>("Fleet")
+            .constructor()
+            .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
+            .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
+            .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
+            .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
+            .method("SetSelectivity", &FleetInterface::SetSelectivity);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
