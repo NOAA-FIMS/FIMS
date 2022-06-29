@@ -33,7 +33,8 @@ namespace fims {
     class Information {
     public:
 
-        fims::Model<T> fims_model;
+        
+        fims::Model<T> fims_model; //resulting model 
 
         static std::shared_ptr<Information<T> > fims_information;
         std::vector<T*> parameters; // list of all estimated parameters
