@@ -31,4 +31,35 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 
+class FleetInterface {
+    int observed_index_data_id = -999;
+    int observed_agecomp_data_id = -999;
+    int index_likelihood_id = -999;
+    int agecomp_likelihood_id = -999;
+    int selectivity_id = -999;
+public:
+
+    void SetAgeCompLikelihood(int agecomp_likelihood_id) {
+        this->agecomp_likelihood_id = agecomp_likelihood_id;
+    }
+
+    void SetIndexLikelihood(int index_likelihood_id) {
+        this->index_likelihood_id = index_likelihood_id;
+    }
+
+    void SetObservedAgeCompData(int observed_agecomp_data_id) {
+        this->observed_agecomp_data_id = observed_agecomp_data_id;
+    }
+
+    void SetObservedIndexData(int observed_index_data_id) {
+        this->observed_index_data_id = observed_index_data_id;
+    }
+
+    void SetSelectivity(int selectivity_id) {
+        this->selectivity_id = selectivity_id;
+    }
+
+
+};
+
 #endif
