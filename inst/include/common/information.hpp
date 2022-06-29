@@ -22,7 +22,7 @@
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/population/population.hpp"
 
-#include "model_object.hpp"
+
 
 namespace fims {
 
@@ -33,8 +33,9 @@ namespace fims {
     class Information {
     public:
 
-        
-        fims::Model<T> fims_model; //resulting model 
+        size_t nyears;
+        size_t nseasons = 1;
+        size_t nages;
 
         static std::shared_ptr<Information<T> > fims_information;
         std::vector<T*> parameters; // list of all estimated parameters
@@ -64,12 +65,10 @@ namespace fims {
         std::map<uint32_t, std::shared_ptr<fims::Population<T> > > populations;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Population<T> > >::iterator population_iterator;
 
-        size_t nyears;
-        size_t nseasons = 1;
-        size_t nages;
+
 
         Information() {
-            this->fims_model = std::make_shared<fims::Model<T> >();
+
         }
 
         /**
