@@ -60,6 +60,10 @@ namespace fims {
         std::map<uint32_t, std::shared_ptr<fims::Population<T> > > populations;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Population<T> > >::iterator population_iterator;
 
+        size_t nyears;
+        size_t nseasons = 1;
+        size_t nages;
+
         /**
          * Returns a single Information object for type T.
          *
@@ -98,8 +102,10 @@ namespace fims {
          * @return
          */
         bool CreateModel() {
-            std::cout << "Information::CreateModel(): Not yet implemented.\n";
 
+            bool valid_model = true;
+
+            std::cout << "Information: Initializing fleet objects.\n";
             for (fleet_iterator it = this->fleets.begin();
                     it != this->fleets.end(); ++it) {
 
@@ -114,10 +120,12 @@ namespace fims {
                     if (it != this->data_objects.end()) {
                         f->observed_inedx_data = (*it).second;
                     } else {
+                        valid_model = false;
                         //log error
                     }
 
                 } else {
+                    valid_model = false;
                     //log error
                 }
 
@@ -130,10 +138,12 @@ namespace fims {
                     if (it != this->data_objects.end()) {
                         f->observed_agecomp_data = (*it).second;
                     } else {
+                        valid_model = false;
                         //log error
                     }
 
                 } else {
+                    valid_model = false;
                     //log error
                 }
 
@@ -146,23 +156,30 @@ namespace fims {
                     if (it != this->selectivity_models.end()) {
                         f->selectivity = (*it).second;
                     } else {
+                        valid_model = false;
                         //log error
                     }
 
                 } else {
+                    valid_model = false;
                     //log error
                 }
 
+                //initialize derived quantities containers
+                f->catch_at_age.resize(nyears * nseasons * nages);
+                f->catch_at_age.resize(nyears * nseasons * nages);
+                f->age_composition.resize(nyears * nseasons);
                 //error check and set fleet elements here
             }
 
+            std::cout << "Information: Initializing population objects.\n";
             for (population_iterator it = this->populations.begin();
                     it != this->populations.end(); ++it) {
 
                 std::shared_ptr<fims::Population<T> > p = (*it).second;
                 //error check and set population elements here
             }
-            return false;
+            return valid_model;
         }
     };
 
