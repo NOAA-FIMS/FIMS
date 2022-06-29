@@ -32,6 +32,9 @@ namespace fims {
     template <typename T>
     class Information {
     public:
+
+        fims::Model<T> fims_model;
+
         static std::shared_ptr<Information<T> > fims_information;
         std::vector<T*> parameters; // list of all estimated parameters
         std::vector<T*> random_effects_parameters; // list of all random effects parameters
@@ -63,6 +66,10 @@ namespace fims {
         size_t nyears;
         size_t nseasons = 1;
         size_t nages;
+
+        Information() {
+            this->fims_model = std::make_shared<fims::Model<T> >();
+        }
 
         /**
          * Returns a single Information object for type T.
