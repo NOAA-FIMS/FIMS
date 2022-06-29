@@ -11,7 +11,7 @@
 
 #include "../../common/model_object.hpp"
 #include "../../common/data_object.hpp"
-//#include "../../common/likelihood.hpp"
+#include "../../common/likelihood.hpp"
 #include "../selectivity/selectivity.hpp"
 
 namespace fims {
