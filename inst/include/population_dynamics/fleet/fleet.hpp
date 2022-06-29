@@ -26,49 +26,48 @@ namespace fims {
 
 
         //data objects
-        uint32_t observed_index_data_id;
+        int observed_index_data_id = -999;
         std::shared_ptr<fims::DataObject<double> observed_index_data;
 
-        uint32_t observed_agecomp_data_id;
+        int observed_agecomp_data_id = -999;
         std::shared_ptr<fims::DataObject<double> observed_agecomp_data;
 
         //likelihood components
-        uint32_t index_likelihood_id;
+        int index_likelihood_id = -999;
         std::shared_ptr<fims::LikelihoodBase> index_likelihood;
-        
-        uint32_t agecomp_likelihood_id;
+
+        int agecomp_likelihood_id = -999;
         std::shared_ptr<fims::LikelihoodBase> agecomp_likelihood;
-        
+
         //selectivity
-        uint32_t selectivity_id;
+        int selectivity_id = -999;
         std::shared_ptr<fims::SelectivityBase> selectivity;
-        
+
         //derived quantities
         std::vector<T> catch_at_age;
         std::vector<T> catch_index;
         std::vector<T> age_composition;
-        
 
         /** @brief Constructor.
          */
         Fleet() {
             this->id = Fleet::id_g++;
         }
-        
- 
 
-//        void SetNormalIndexLikelihood(T mean, T sd) {
-//            this->index_likelihood& = fims::Dnorm<T>();
-//            this->index_likelihood.mean = mean;
-//            this->index_likelihood.sd = sd;
-//        }
-//
-//        void SetMultinomAgeCompLikelihood(ModelTraits<T>::EigenVector x,
-//                ModelTraits<T>::EigenVector p) {
-//            this->agecomp_likelihood& = fims::Dmultinom<T>();
-//            this->agecomp_likelihood.x = x;
-//            this->agecomp_likelihood.p = p;
-//        }
+
+
+        //        void SetNormalIndexLikelihood(T mean, T sd) {
+        //            this->index_likelihood& = fims::Dnorm<T>();
+        //            this->index_likelihood.mean = mean;
+        //            this->index_likelihood.sd = sd;
+        //        }
+        //
+        //        void SetMultinomAgeCompLikelihood(ModelTraits<T>::EigenVector x,
+        //                ModelTraits<T>::EigenVector p) {
+        //            this->agecomp_likelihood& = fims::Dmultinom<T>();
+        //            this->agecomp_likelihood.x = x;
+        //            this->agecomp_likelihood.p = p;
+        //        }
 
         T likelihood() {
             return this->index_likelihood->evaluate(do_log = true)
