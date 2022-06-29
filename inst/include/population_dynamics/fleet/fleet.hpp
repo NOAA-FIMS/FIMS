@@ -62,7 +62,6 @@ namespace fims {
         }
 
     };
-
     template <class T>
     uint32_t Fleet<T>::id_g = 0;
 
