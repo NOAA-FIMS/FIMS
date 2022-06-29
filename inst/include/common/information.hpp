@@ -103,14 +103,14 @@ namespace fims {
                     it != this->fleets.end(); ++it) {
 
                 std::shared_ptr<fims::Fleet<T> > f = (*it).second;
-                //set fleet elements here
+                //error check and set fleet elements here
             }
 
             for (population_iterator it = this->populations.begin();
                     it != this->populations.end(); ++it) {
 
                 std::shared_ptr<fims::Population<T> > p = (*it).second;
-                //set population elements here
+                //error check and set population elements here
             }
             return false;
         }
