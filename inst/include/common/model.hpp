@@ -31,7 +31,6 @@ namespace fims {
 template <typename T>
 class Model {
  public:
-
   std::vector<std::shared_ptr<Population<T> > > populations;
   std::vector<std::shared_ptr<Fleet<T> > > fleets;
 };
