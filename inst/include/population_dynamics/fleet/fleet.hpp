@@ -56,7 +56,6 @@ namespace fims {
         }
 
         const T likelihood() {
-#warning this needs review
             return this->index_likelihood->evaluate(do_log = true)
                     + this->agecomp_likelihood->evaluate(do_log = true);
         }
