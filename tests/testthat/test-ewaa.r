@@ -1,7 +1,7 @@
-  library(Rcpp)
+library(Rcpp)
 data(package = "FIMS")
 
-testthat("ewaa data can be added to model",{
+test_that("ewaa data can be added to model",{
   
 
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
