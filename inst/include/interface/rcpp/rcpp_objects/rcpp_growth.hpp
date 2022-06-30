@@ -49,12 +49,14 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
   virtual ~EWAAGrowthInterface() {}
 
+
+
   virtual uint32_t get_id() { return this->id; }
 
   /**
    * @brief Create a map of input numeric vectors
-   * @param weights_ std::double vector of weights
-   * @param ages_ std::double vector of ages
+   * @param weights std::double vector of weights
+   * @param ages std::double vector of ages
    * @return std::map<double, double>
    *
    * */
@@ -70,11 +72,9 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     return mymap;
   }
 
-  std::map<double, double> ewaa = make_map(this->ages, this->weights);
-
   double evaluate(double age) {
     fims::EWAAgrowth<double> EWAAGrowth = fims::EWAAgrowth<double>();
-    EWAAGrowth.ewaa = this->ewaa;
+    EWAAGrowth.ewaa = make_map(this->ages, this->weights);
     return EWAAGrowth.evaluate(age);
   }
 
