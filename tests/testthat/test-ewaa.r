@@ -11,5 +11,6 @@ test_that("ewaa data can be added to model",{
   ewaa_growth$ages <- unique(ewaa_data$age)
   ewaa_growth$weights <- unique(ewaa_data$value)
   expect_equal(ewaa_growth$evaluate(1), 0.0005306555)
-
-})
+  ewaa_growth$ages <- c(1,0)
+  ewaa_growth$weights <- c(1)
+  testthat::expect_failure(ewaa_growth$evaluate(1))
