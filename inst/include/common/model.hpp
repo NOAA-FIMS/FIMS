@@ -27,7 +27,7 @@ namespace fims {
  * Model base
  */
 template <typename T>
-class Model {
+class Model {//may need singleton
  public:
   std::shared_ptr<fims::Information<T> > information;
   std::vector<std::shared_ptr<Population<T> > > populations;

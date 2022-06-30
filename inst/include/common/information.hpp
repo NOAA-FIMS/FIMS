@@ -65,8 +65,6 @@ namespace fims {
         std::map<uint32_t, std::shared_ptr<fims::Population<T> > > populations;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Population<T> > >::iterator population_iterator;
 
-
-
         Information() {
 
         }
@@ -188,6 +186,44 @@ namespace fims {
             }
             return valid_model;
         }
+
+        size_t GetNages() const {
+            return nages;
+        }
+
+        void SetNages(size_t nages) {
+            this->nages = nages;
+        }
+
+        size_t GetNseasons() const {
+            return nseasons;
+        }
+
+        void SetNseasons(size_t nseasons) {
+            this->nseasons = nseasons;
+        }
+
+        size_t GetNyears() const {
+            return nyears;
+        }
+
+        void SetNyears(size_t nyears) {
+            this->nyears = nyears;
+        }
+
+        std::vector<T*>& GetParameters() {
+            return parameters;
+        }
+
+        std::vector<T*>& GetFixedEffectsParameters() {
+            return fixed_effects_parameters;
+        }
+
+        std::vector<T*>& GetRandomEffectsParameters() {
+            return random_effects_parameters;
+        }
+
+
     };
 
     template <typename T>
