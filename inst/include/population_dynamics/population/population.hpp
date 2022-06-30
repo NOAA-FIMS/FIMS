@@ -33,6 +33,9 @@
 
 #include "../../common/model_object.hpp"
 #include "subpopulation.hpp"
+#include "../recruitment/recruitment.hpp"
+#include "../growth/growth.hpp"
+#include "../fleet/fleet.hpp"
 
 namespace fims {
 
@@ -46,6 +49,16 @@ namespace fims {
         size_t nseasons;
         size_t nages;
         std::vector<T> ages;
+
+        std::vector<T> mortality;
+        std::vector<T> maturity;
+
+
+        std::shared_ptr<fims::RecruitmentBase> recruitment_model;
+        std::shared_ptr<fims::GrowthBase> growth_model;
+
+        std::vector<std::shared_ptr<fims::Fleet> > fleets;
+        std::vector<std::shared_ptr<fims::Fleet> > surveys;
 
         //derived quantities
         std::vector<T> weight_at_age;
