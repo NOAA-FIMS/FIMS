@@ -50,6 +50,7 @@ namespace fims {
         size_t nages;
         std::vector<T> ages;
 
+
         std::vector<T> mortality;
         std::vector<T> maturity;
 
@@ -61,6 +62,7 @@ namespace fims {
         std::vector<std::shared_ptr<fims::Fleet> > surveys;
 
         //derived quantities
+        std::vector<T> initial_numbers;
         std::vector<T> weight_at_age;
         std::vector<T> fecundity;
         std::vector<T> numbers_at_age;
