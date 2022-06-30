@@ -36,12 +36,57 @@
 
 namespace fims {
 
-/**
- * Population class. Contains subpopulations
- * that are divided into generic partitions (eg. sex, area).
- */
-template <typename T>
-struct Population : FIMSObject<T> {};
-}  // namespace fims
+    /**
+     * Population class. Contains subpopulations
+     * that are divided into generic partitions (eg. sex, area).
+     */
+    template <typename T>
+    struct Population : public FIMSObject<T> {
+        size_t nyears;
+        size_t nseasons;
+        size_t nages;
+        std::vector<T> ages;
+
+        //derived quantities
+        std::vector<T> weight_at_age;
+        std::vector<T> fecundity;
+        std::vector<T> numbers_at_age;
+        std::vector<T> catch_at_age;
+        std::vector<T> biomass;
+
+        void Initialize() {
+        }
+
+        void Prepare() {
+        }
+
+        /**
+         * life history calculations
+         */
+
+        void CalculateMortality() {
+        }
+
+        void CalculateNumbersAtAge() {
+        }
+
+        void CalculateSpawningBiomass() {
+        }
+
+        void CalculateRecruitment() {
+        }
+
+        void CalculateCatchAtAge() {
+        }
+
+        void CalculateSurveyNumbersAtAge() {
+        }
+
+        void Evaluate() {
+        }
+
+
+    };
+} // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */
