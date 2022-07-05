@@ -1,15 +1,21 @@
+# open FIMS.proj and run locally from console using:
+# source('inst/extdata/TMB_tests/distributions/test_distributions.R')
+
 library(testthat)
 library(TMB)
 
-project_path <- find.package("FIMS")
-old_wd <- getwd()
-setwd(project_path)
+# project_path <- find.package("FIMS")
+# old_wd <- getwd()
+# setwd(project_path)
 
-if (!file.exists(file.path(project_path, "inst"))) {
-  path <- file.path("extdata", "TMB_tests", "distributions")
-} else {
-  path <- file.path("inst", "extdata", "TMB_tests", "distributions")
-}
+project_path <- getwd()
+
+# if (!file.exists(file.path(project_path, "inst"))) {
+#   path <- file.path("extdata", "TMB_tests", "distributions")
+# } else {
+   path <- file.path("inst", "extdata", "TMB_tests", "distributions")
+# }
+
 
 # compile test .cpp files from inst/extdata/TMB_tests/distributions
 TMB::compile(paste0(path, "/test_dnorm_distribution.cpp"), flags = "-DTMB_MODEL")
@@ -18,8 +24,8 @@ TMB::compile(paste0(path, "/test_dmultinom_distribution.cpp"), flags = "-DTMB_MO
 
 test_that("dnorm unit test", {
 
-  setwd(project_path)
-  on.exit(setwd(old_wd), add = TRUE)
+  # setwd(project_path)
+  # on.exit(setwd(old_wd), add = TRUE)
 
   # dnorm unit test
   # load test
@@ -44,8 +50,8 @@ test_that("dnorm unit test", {
 
 test_that("dlnorm unit test", {
 
-  setwd(project_path)
-  on.exit(setwd(old_wd), add = TRUE)
+  # setwd(project_path)
+  # on.exit(setwd(old_wd), add = TRUE)
 
   # dlnorm unit test
   # load test
@@ -69,8 +75,8 @@ test_that("dlnorm unit test", {
 
 test_that("dmultinom unit test", {
 
-  setwd(project_path)
-  on.exit(setwd(old_wd), add = TRUE)
+  # setwd(project_path)
+  # on.exit(setwd(old_wd), add = TRUE)
 
   # # dmultinom unit test
   # # load test
