@@ -13,7 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+      # Use windows-2019 instead of windows-latest to avoid using Mingw-w64 
+        os: [ubuntu-latest, macos-latest, windows-2019]
 
     steps:
     - uses: actions/checkout@v2
@@ -22,15 +23,15 @@ jobs:
     - name: Configure
     # Do not run -DBUILD_DOC=OFF locally. Only run cmake -S . -B build -G Ninja locally.
       run: |
-        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja
+        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja 
         
     - name: Build
       run: |  
-        cmake --build build
+        cmake --build build --parallel 16
         
     - name: Test
       run: |
-        ctest --test-dir build
+        ctest --test-dir build --parallel 16
     
     - name: Upload log when tests failed
       uses: actions/upload-artifact@v3
