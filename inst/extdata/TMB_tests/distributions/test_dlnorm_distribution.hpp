@@ -1,13 +1,13 @@
-  /*! \file test_dlnorm_likelihood.hpp 
+  /*! \file test_dlnorm_distribution.hpp 
    * Specifies the negative log-likelihood of 
    * the dlnorm distribution given data and parameters. 
    * Creates singleton class that links this .hpp with 
-   * the test_dlnorm_likelihood.cpp TMB verison of the model
+   * the test_dlnorm_distribution.cpp TMB verison of the model
    */
-  #ifndef TEST_DLNORM_LIKELIHOOD_HPP
-  #define TEST_DLNORM_LIKELIHOOD_HPP
+  #ifndef TEST_DLNORM_DISTRIBUTION_HPP
+  #define TEST_DLNORM_DISTRIBUTION_HPP
 
-  #include "../../../include/likelihoods/likelihoods.hpp"
+  #include "../../../include/distributions/distributions.hpp"
   #include "../../../include/interface/interface.hpp"
 
   namespace fims {
@@ -72,6 +72,6 @@
   }
 
 
-  #endif  /* TEST_DLNORM_LIKELIHOOD_HPP */
+  #endif  /* TEST_DLNORM_DISTRIBUTION_HPP */
 
 

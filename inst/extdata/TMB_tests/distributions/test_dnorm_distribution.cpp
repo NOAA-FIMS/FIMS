@@ -1,14 +1,14 @@
-/*! \file test_dnorm_likelihood.cpp 
- * links TMB to test_dnorm_likelihood.hpp
+/*! \file test_dnorm_distribution.cpp 
+ * links TMB to test_dnorm_distribution.hpp
  */
 
-#include "test_dnorm_likelihood.hpp"
+#include "test_dnorm_distribution.hpp"
 
 template<class Type>
 Type objective_function<Type>::operator()(){
   /*
-   * create pointer, inst, that points to singleton class of Model in test_dnorm_likelihood.hpp
-   * getinstance is defined in test_dnorm_likelihood.hpp
+   * create pointer, inst, that points to singleton class of Model in test_dnorm_distribution.hpp
+   * getinstance is defined in test_dnorm_distribution.hpp
    */ 
   fims::Model<Type>* inst = fims::Model<Type>::getInstance();
 
@@ -26,7 +26,7 @@ Type objective_function<Type>::operator()(){
 
   /*
    *   create Type nll and assign value to the return of the 
-   *   evaluate() function defined in test_dnorm_likelihood.hpp
+   *   evaluate() function defined in test_dnorm_distribution.hpp
    */  
   Type nll = inst -> evaluate();
   return nll;

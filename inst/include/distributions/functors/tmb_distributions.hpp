@@ -1,17 +1,17 @@
-/*! \file tmb_likelihoods.hpp
+/*! \file tmb_distributions.hpp
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
  *
- * The purpose of this file is to declare likelihood classes
- * which implement likelihood functions from TMB.
+ * The purpose of this file is to declare distribution classes
+ * which implement distribution functions from TMB.
  */
-  #ifndef LIKELIHOODS_TMB_LIKELIHOODS_HPP
-  #define LIKELIHOODS_TMB_LIKELIHOODS_HPP
+  #ifndef DISTRIBUTIONS_TMB_DISTRIBUTIONS_HPP
+  #define DISTRIBUTIONS_TMB_DISTRIBUTIONS_HPP
 
   #ifdef TMB_MODEL
 
-  #include "likelihoods_base.hpp"
+  #include "distributions_base.hpp"
 
   namespace fims {
 
@@ -19,14 +19,14 @@
  * @brief Dnorm class returns the TMB dnorm function
  */
   template <typename T>
-  struct Dnorm : public LikelihoodsBase<T> {
+  struct Dnorm : public DistributionsBase<T> {
 
     T x; /*!< observation */
     T mean; /*!< mean of the normal distribution */
     T sd; /*!< standard deviation of the normal distribution, must be strictly positive.*/
 
 
-    Dnorm() : LikelihoodsBase<T>() {}
+    Dnorm() : DistributionsBase<T>() {}
     
     virtual ~Dnorm(){}
     
@@ -36,7 +36,7 @@
      *
      * \f[ \frac{1.0}{ sd\sqrt{2\pi} }exp(-\frac{(x - mean)^{2}}{2sd^{2}}) \f]
      * 
-     * @param do_log Boolean; if true, log-likelihoods are returned
+     * @param do_log Boolean; if true, log densities are returned
      */
     virtual const T evaluate(const bool& do_log) {
       return dnorm(x, mean, sd, do_log);
@@ -47,7 +47,7 @@
  * @brief Dmultinom class returns the TMB dmultinom function
  */
 template <typename T>
-  struct Dmultinom : public LikelihoodsBase<T> {
+  struct Dmultinom : public DistributionsBase<T> {
 
     /** EigenVector defined in interface.hpp */
     using Vector = typename ModelTraits<T>::EigenVector;
@@ -55,7 +55,7 @@ template <typename T>
     Vector p; /*!< Vector of length K, specifying the probability for the K classes (note, unlike in R these must sum to 1). */
 
 
-    Dmultinom() : LikelihoodsBase<T>() {}
+    Dmultinom() : DistributionsBase<T>() {}
 
     /**
      * @brief Probability mass function of the multinomial distribution.
@@ -65,7 +65,7 @@ template <typename T>
      * \text{ with } \sum_{i}x_{i} = n 
      * \text{ and } \sum^{K}_{k=1}p_{k}=1 \f]
      * 
-     * @param do_log Boolean; if true, log-likelihoods are returned
+     * @param do_log Boolean; if true, log densities are returned
      */
       virtual const T evaluate(const bool& do_log) {
       return dmultinom(x, p, do_log);
@@ -76,20 +76,20 @@ template <typename T>
  * @brief Dlnorm uses the TMB dnorm function to construct the lognormal density function
  */
 template <typename T>
-  struct Dlnorm : public LikelihoodsBase<T> {
+  struct Dlnorm : public DistributionsBase<T> {
 
     T x; /*!< observation */
     T meanlog; /*!< mean of the distribution of log(x) */
     T sdlog; /*!< standard deviation of the distribution of log(x) */
 
-    Dlnorm() : LikelihoodsBase<T>() {}
+    Dlnorm() : DistributionsBase<T>() {}
 
     /**
      * @brief Probability mass function of the lognormal distribution.
      *
      * \f[ \frac{1.0}{ xsd\sqrt{2\pi} }exp(-\frac{(ln(x) - mean)^{2}}{2sd^{2}}) \f]
      * 
-     * @param do_log Boolean, if true returns the log of the likelihood
+     * @param do_log Boolean; if true, log densities are returned
      */
 
     virtual const T evaluate(const bool& do_log) {
@@ -106,4 +106,4 @@ template <typename T>
 
 #endif
 
-#endif /* LIKELIHOODS_TMB_LIKELIHOODS_HPP */
+#endif /* DISTRIBUTIONS_TMB_DISTRIBUTIONS_HPP */

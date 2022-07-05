@@ -6,15 +6,15 @@ old_wd <- getwd()
 setwd(project_path)
 
 if (!file.exists(file.path(project_path, "inst"))) {
-  path <- file.path("extdata", "TMB_tests", "likelihoods")
+  path <- file.path("extdata", "TMB_tests", "distributions")
 } else {
-  path <- file.path("inst", "extdata", "TMB_tests", "likelihoods")
+  path <- file.path("inst", "extdata", "TMB_tests", "distributions")
 }
 
-# compile test .cpp files from inst/extdata/TMB_tests/likelihoods
-TMB::compile(paste0(path, "/test_dnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
-TMB::compile(paste0(path, "/test_dlnorm_likelihood.cpp"), flags = "-DTMB_MODEL")
-TMB::compile(paste0(path, "/test_dmultinom_likelihood.cpp"), flags = "-DTMB_MODEL")
+# compile test .cpp files from inst/extdata/TMB_tests/distributions
+TMB::compile(paste0(path, "/test_dnorm_distribution.cpp"), flags = "-DTMB_MODEL")
+TMB::compile(paste0(path, "/test_dlnorm_distribution.cpp"), flags = "-DTMB_MODEL")
+TMB::compile(paste0(path, "/test_dmultinom_distribution.cpp"), flags = "-DTMB_MODEL")
 
 test_that("dnorm unit test", {
 
@@ -23,7 +23,7 @@ test_that("dnorm unit test", {
 
   # dnorm unit test
   # load test
-  dyn.load(dynlib(paste0(path, "/test_dnorm_likelihood")))
+  dyn.load(dynlib(paste0(path, "/test_dnorm_distribution")))
   set.seed(123)
   #Simulate new data with R
   y = rnorm(10, 5, 3)
@@ -32,13 +32,13 @@ test_that("dnorm unit test", {
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(y =y),
                   parameters = list(p = c(5, log(3))),
-                  DLL = "test_dnorm_likelihood")
+                  DLL = "test_dnorm_distribution")
   #Compare R nll to TMB nll
   expect_equal(nll, mod$fn())
 
-  dyn.unload(dynlib(paste0(path, "/test_dnorm_likelihood")))
-  file.remove(paste0(path, "/", dynlib("test_dnorm_likelihood")))
-  file.remove( paste0(path, "/test_dnorm_likelihood.o"))
+  dyn.unload(dynlib(paste0(path, "/test_dnorm_distribution")))
+  file.remove(paste0(path, "/", dynlib("test_dnorm_distribution")))
+  file.remove( paste0(path, "/test_dnorm_distribution.o"))
 
 })
 
@@ -49,7 +49,7 @@ test_that("dlnorm unit test", {
 
   # dlnorm unit test
   # load test
-  dyn.load(dynlib(paste0(path, "/test_dlnorm_likelihood")))
+  dyn.load(dynlib(paste0(path, "/test_dlnorm_distribution")))
   set.seed(123)
   #Simulate new data with R
   y = rlnorm(10, 2, 1)
@@ -58,13 +58,13 @@ test_that("dlnorm unit test", {
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(logy = y),
                   parameters = list(p = c(2, log(1))),
-                  DLL = "test_dlnorm_likelihood")
+                  DLL = "test_dlnorm_distribution")
   #Compare R nll to TMB nll
   expect_equal(nll, mod$fn())
 
-  dyn.unload(dynlib(paste0(path, "/test_dlnorm_likelihood")))
-  file.remove(paste0(path, "/", dynlib("test_dlnorm_likelihood")))
-  file.remove( paste0(path, "/test_dlnorm_likelihood.o"))
+  dyn.unload(dynlib(paste0(path, "/test_dlnorm_distribution")))
+  file.remove(paste0(path, "/", dynlib("test_dlnorm_distribution")))
+  file.remove( paste0(path, "/test_dlnorm_distribution.o"))
 })
 
 test_that("dmultinom unit test", {
@@ -74,7 +74,7 @@ test_that("dmultinom unit test", {
 
   # # dmultinom unit test
   # # load test
-  dyn.load(dynlib(paste0(path, "/test_dmultinom_likelihood")))
+  dyn.load(dynlib(paste0(path, "/test_dmultinom_distribution")))
   set.seed(123)
   #Simulate new data with R
   p = (1:10)/sum(1:10)
@@ -84,11 +84,11 @@ test_that("dmultinom unit test", {
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(x =x),
                   parameters = list(p = p),
-                  DLL = "test_dmultinom_likelihood")
+                  DLL = "test_dmultinom_distribution")
   #Compare R nll to TMB nll
   expect_equal(nll, mod$fn())
 
-  dyn.unload(dynlib(paste0(path, "/test_dmultinom_likelihood")))
-  file.remove(paste0(path, "/", dynlib("test_dmultinom_likelihood")))
-  file.remove( paste0(path, "/test_dmultinom_likelihood.o"))
+  dyn.unload(dynlib(paste0(path, "/test_dmultinom_distribution")))
+  file.remove(paste0(path, "/", dynlib("test_dmultinom_distribution")))
+  file.remove( paste0(path, "/test_dmultinom_distribution.o"))
 })

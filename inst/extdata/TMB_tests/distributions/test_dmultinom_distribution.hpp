@@ -1,13 +1,13 @@
-  /*! \file test_dmultinom_likelihood.hpp 
+  /*! \file test_dmultinom_distribution.hpp 
    * Specifies the negative log-likelihood of 
    * the dmultinom distribution given data and parameters. 
    * Creates singleton class that links this .hpp with 
-   * the test_dmultinom_likelihood.cpp TMB verison of the model
+   * the test_dmultinom_distribution.cpp TMB verison of the model
    */
-  #ifndef TEST_DMULTINOM_LIKELIHOOD_HPP
-  #define TEST_DMULTINOM_LIKELIHOOD_HPP
+  #ifndef TEST_DMULTINOM_DISTRIBUTION_HPP
+  #define TEST_DMULTINOM_DISTRIBUTION_HPP
 
-  #include "../../../include/likelihoods/likelihoods.hpp"
+  #include "../../../include/distributions/distributions.hpp"
   #include "../../../include/interface/interface.hpp"
 
   namespace fims {
@@ -66,6 +66,6 @@
   }
 
 
-  #endif  /* TEST_DMULTINOM_LIKELIHOOD_HPP */
+  #endif  /* TEST_DMULTINOM_DISTRIBUTION_HPP */
 
 

@@ -4,17 +4,17 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
- * Likelihoods module file
+ * Distributions module file
  * The purpose of this file is to include any .hpp files within the
  * subfolders so that only this file needs to included in the model.hpp file.
  *
- * DEFINE guards for likelihoods module outline to define the
- * likelihoods hpp file if not already defined.
+ * DEFINE guards for distributions module outline to define the
+ * distributions hpp file if not already defined.
  */
-#ifndef FIMS_LIKELIHOODS_HPP
-#define FIMS_LIKELIHOODS_HPP
+#ifndef FIMS_DISTRIBUTIONS_HPP
+#define FIMS_DISTRIBUTIONS_HPP
 
-#include "functors/likelihoods_base.hpp"
-#include "functors/tmb_likelihoods.hpp"
+#include "functors/distributions_base.hpp"
+#include "functors/tmb_distributions.hpp"
 
-#endif /* FIMS_LIKELIHOODS_HPP */
+#endif /* FIMS_DISTRIBUTIONS_HPP */
