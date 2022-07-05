@@ -47,6 +47,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
   std::vector<double> weights; /**< weights for each age class */
   std::vector<double> ages;    /**< ages for each age class */
+  std::map<double, double> ewaa; /**< map of ewaa values */
 
   bool initialized = false;
 
@@ -79,7 +80,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     fims::EWAAgrowth<double> EWAAGrowth = fims::EWAAgrowth<double>();
     
     if(initialized == false){
-      std::map<double, double> ewaa = make_map(this->ages, this->weights);
+      this->ewaa = make_map(this->ages, this->weights);
       initialized = true;
     }
     
