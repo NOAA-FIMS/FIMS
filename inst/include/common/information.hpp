@@ -41,7 +41,7 @@ class Information {
       recruitment_models;
   std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >
       selectivity_models;
-  std::map<uint32_t, std::shared_ptr<fims::DistributionBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >
       distribution_models;
   std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
 

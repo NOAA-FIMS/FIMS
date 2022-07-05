@@ -173,7 +173,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        } else {
           d2->RegisterParameter(model2->sd);
        }}
-       d2->distribution_model[model2->id]=model2;
+       d2->distribution_models[model2->id]=model2;
     
     
         std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
@@ -210,7 +210,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
           d3->RegisterParameter(model3->sd);
        }
        }
-       d3->distribution_model[model3->id]=model3;
+       d3->distribution_models[model3->id]=model3;
     
        return true;
     }
