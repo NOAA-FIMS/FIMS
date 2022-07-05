@@ -29,6 +29,9 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~GrowthInterfaceBase() {}
 
   virtual uint32_t get_id() = 0;
+
+  virtual double evaluate(double age) = 0;
+
 };
 
 uint32_t GrowthInterfaceBase::id_g = 1;
@@ -44,6 +47,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
   std::vector<double> weights; /**< weights for each age class */
   std::vector<double> ages;    /**< ages for each age class */
+
+  bool initialized = false;
 
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
 
@@ -70,10 +75,14 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     return mymap;
   }
 
-  std::map<double, double> ewaa = make_map(this->ages, this->weights);
-
   double evaluate(double age) {
     fims::EWAAgrowth<double> EWAAGrowth = fims::EWAAgrowth<double>();
+    
+    if(initialized == false){
+      std::map<double, double> ewaa = make_map(this->ages, this->weights);
+      initialized = true;
+    }
+    
     EWAAGrowth.ewaa = this->ewaa;
     return EWAAGrowth.evaluate(age);
   }
