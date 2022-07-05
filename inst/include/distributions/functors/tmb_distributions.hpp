@@ -32,7 +32,7 @@
     
 
     /**
-     * @brief Probability mass function of the normal distribution.
+     * @brief Probability density function of the normal distribution.
      *
      * \f[ \frac{1.0}{ sd\sqrt{2\pi} }exp(-\frac{(x - mean)^{2}}{2sd^{2}}) \f]
      * 
@@ -85,7 +85,7 @@ template <typename T>
     Dlnorm() : DistributionsBase<T>() {}
 
     /**
-     * @brief Probability mass function of the lognormal distribution.
+     * @brief Probability density function of the lognormal distribution.
      *
      * \f[ \frac{1.0}{ xsd\sqrt{2\pi} }exp(-\frac{(ln(x) - mean)^{2}}{2sd^{2}}) \f]
      * 
