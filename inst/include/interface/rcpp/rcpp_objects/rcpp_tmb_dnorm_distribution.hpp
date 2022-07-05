@@ -1,39 +1,39 @@
 /*
- * File:   rcpp_likelihoods.hpp
+ * File:   rcpp_distributions.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
  */
-#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_TMB_DNORM_LIKELIHOODS_HPP
-#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_TMB_DNORM_LIKELIHOODS_HPP
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_TMB_DNORM_DISTRIBUTION_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_TMB_DNORM_DISTRIBUTION_HPP
 
-#include "../../../likelihoods/likelihoods.hpp"
+#include "../../../distributions/distributions.hpp"
 #include "rcpp_interface_base.hpp"
 
-class LikelihoodsInterfaceBase : public FIMSRcppInterfaceBase {
+class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g;
   uint32_t id;
-  static std::map<uint32_t, LikelihoodsInterfaceBase*> live_objects;
+  static std::map<uint32_t, DistributionsInterfaceBase*> live_objects;
 
-  LikelihoodsInterfaceBase() {
-    this->id = LikelihoodsInterfaceBase::id_g++;
-    LikelihoodsInterfaceBase::live_objects[this->id] = this;
+  DistributionsInterfaceBase() {
+    this->id = DistributionsInterfaceBase::id_g++;
+    DistributionsInterfaceBase::live_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
 
-  virtual ~LikelihoodsInterfaceBase() {}
+  virtual ~DistributionsInterfaceBase() {}
 
   virtual uint32_t get_id() = 0;
 };
 
-uint32_t LikelihoodsInterfaceBase::id_g = 1;
-std::map<uint32_t, LikelihoodsInterfaceBase*>
-    LikelihoodsInterfaceBase::live_objects;
+uint32_t DistributionsInterfaceBase::id_g = 1;
+std::map<uint32_t, DistributionsInterfaceBase*>
+    DistributionsInterfaceBase::live_objects;
 
-class DnormLikelihoodsInterface : public LikelihoodsInterfaceBase {
+class DnormDistributionsInterface : public DistributionsInterfaceBase {
     public:
     
        Parameter x;
@@ -41,11 +41,11 @@ class DnormLikelihoodsInterface : public LikelihoodsInterfaceBase {
        Parameter sd;
     
     
-       DnormLikelihoodsInterface() : LikelihoodsInterfaceBase() {}     
+       DnormDistributionsInterface() : DistributionsInterfaceBase() {}     
     
     uint32_t get_id(){return this->id;}
 
-    virtual ~DnormLikelihoodsInterface(){}
+    virtual ~DnormDistributionsInterface(){}
 
 
     template <class T>
@@ -101,7 +101,7 @@ class DnormLikelihoodsInterface : public LikelihoodsInterfaceBase {
        } else {
           d0->RegisterParameter(model0->sd);
        }}
-       d0->likelihoods_models[model0->id]=model0;
+       d0->distribution_models[model0->id]=model0;
     
     
         std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
@@ -137,7 +137,7 @@ class DnormLikelihoodsInterface : public LikelihoodsInterfaceBase {
        } else {
           d1->RegisterParameter(model1->sd);
        }}
-       d1->likelihoods_models[model1->id]=model1;
+       d1->distribution_models[model1->id]=model1;
     
     
         std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
@@ -173,7 +173,7 @@ class DnormLikelihoodsInterface : public LikelihoodsInterfaceBase {
        } else {
           d2->RegisterParameter(model2->sd);
        }}
-       d2->likelihoods_models[model2->id]=model2;
+       d2->distribution_model[model2->id]=model2;
     
     
         std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
@@ -210,7 +210,7 @@ class DnormLikelihoodsInterface : public LikelihoodsInterfaceBase {
           d3->RegisterParameter(model3->sd);
        }
        }
-       d3->likelihoods_models[model3->id]=model3;
+       d3->distribution_model[model3->id]=model3;
     
        return true;
     }

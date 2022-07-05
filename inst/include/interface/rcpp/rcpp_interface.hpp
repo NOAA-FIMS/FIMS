@@ -14,7 +14,7 @@
 #include "rcpp_objects/rcpp_fishing_mortality.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
-#include "rcpp_objects/rcpp_tmb_dnorm_likelihood.hpp"
+#include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
@@ -80,13 +80,13 @@ RCPP_MODULE(fims) {
       .field("slope", &LogisticSelectivityInterface::slope)
       .method("get_id", &LogisticSelectivityInterface::get_id);
 
-   Rcpp::class_<DnormLikelihoodsInterface>("TMBDnormLikelihood")
+   Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
     .constructor()
-    .method("get_id",  &DnormLikelihoodsInterface::get_id)
-    .method("evaluate",  &DnormLikelihoodsInterface::evaluate<double>)
-    .field("x", &DnormLikelihoodsInterface::x)
-    .field("mean", &DnormLikelihoodsInterface::mean)
-    .field("sd", &DnormLikelihoodsInterface::sd);
+    .method("get_id",  &DnormDistributionsInterface::get_id)
+    .method("evaluate",  &DnormDistributionsInterface::evaluate<double>)
+    .field("x", &DnormDistributionsInterface::x)
+    .field("mean", &DnormDistributionsInterface::mean)
+    .field("sd", &DnormDistributionsInterface::sd);
 
   Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
       .constructor()
