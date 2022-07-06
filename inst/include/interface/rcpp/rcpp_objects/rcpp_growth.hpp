@@ -67,9 +67,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   inline std::map<double, double> make_map(std::vector<double> ages,
                                            std::vector<double> weights) {
     std::map<double, double> mymap;
-    if (ages.size() != weights.size()) {
-      Rcpp::stop("ages and weights must be the same length");
-    }
     for (uint32_t i = 0; i < ages.size(); i++) {
       mymap.insert(std::pair<double, double>(ages[i], weights[i]));
     }
@@ -81,9 +78,12 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     
     if(initialized == false){
       this->ewaa = make_map(this->ages, this->weights);
+      //Check that ages and weights vector are the same length
+      if (this->ages.size() != this->weights.size()) {
+        Rcpp::stop("ages and weights must be the same length");
+      }
       initialized = true;
     }
-    
     EWAAGrowth.ewaa = this->ewaa;
     return EWAAGrowth.evaluate(age);
   }
