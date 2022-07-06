@@ -12,6 +12,10 @@
 #include "../../../distributions/distributions.hpp"
 #include "rcpp_interface_base.hpp"
 
+/**
+ * @brief Distributions Rcpp Interface
+ *
+ */
 class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g;
@@ -33,16 +37,22 @@ uint32_t DistributionsInterfaceBase::id_g = 1;
 std::map<uint32_t, DistributionsInterfaceBase*>
     DistributionsInterfaceBase::live_objects;
 
+/**
+ * @brief Rcpp interface for Dnorm as an S4 object. To instantiate
+ * from R:
+ * ewaa <- new(fims$EWAAgrowth)
+ *
+ */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
     public:
-    
+
        Parameter x;
        Parameter mean;
        Parameter sd;
-    
-    
-       DnormDistributionsInterface() : DistributionsInterfaceBase() {}     
-    
+
+
+       DnormDistributionsInterface() : DistributionsInterfaceBase() {}
+
     uint32_t get_id(){return this->id;}
 
     virtual ~DnormDistributionsInterface(){}
@@ -55,26 +65,16 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         Dnorm.mean = this-> mean.value;
         Dnorm.sd = this-> sd.value;
         return Dnorm.evaluate(true);
-    };
+    }
 
-/*
-    double evaluate(bool do_log){
-        fims::Dnorm<double> Dnorm;
-        Dnorm.x = this-> x.value;
-        Dnorm.mean = this-> mean.value;
-        Dnorm.sd = this-> sd.value;
-        return Dnorm.evaluate(true);
-        }
-   
-  */  
     bool add_to_fims_tmb(){
         std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-    
+
        std::shared_ptr<fims::Dnorm<TMB_FIMS_REAL_TYPE> > model0 =
        std::make_shared<fims::Dnorm<TMB_FIMS_REAL_TYPE> >();
-    
-    
+
+
        model0->id = this->id;
        model0->x= this->x.value;
        if (this->x.estimated) {
@@ -83,7 +83,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        } else {
           d0->RegisterParameter(model0->x);
        }}
-    
+
        model0->id = this->id;
        model0->mean= this->mean.value;
        if (this->mean.estimated) {
@@ -92,7 +92,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        } else {
           d0->RegisterParameter(model0->mean);
        }}
-    
+
        model0->id = this->id;
        model0->sd= this->sd.value;
        if (this->sd.estimated) {
@@ -102,15 +102,15 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
           d0->RegisterParameter(model0->sd);
        }}
        d0->distribution_models[model0->id]=model0;
-    
-    
+
+
         std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-    
+
        std::shared_ptr<fims::Dnorm<TMB_FIMS_FIRST_ORDER> > model1 =
        std::make_shared<fims::Dnorm<TMB_FIMS_FIRST_ORDER> >();
-    
-    
+
+
        model1->id = this->id;
        model1->x= this->x.value;
        if (this->x.estimated) {
@@ -119,7 +119,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        } else {
           d1->RegisterParameter(model1->x);
        }}
-    
+
        model1->id = this->id;
        model1->mean= this->mean.value;
        if (this->mean.estimated) {
@@ -128,7 +128,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        } else {
           d1->RegisterParameter(model1->mean);
        }}
-    
+
        model1->id = this->id;
        model1->sd= this->sd.value;
        if (this->sd.estimated) {
@@ -138,15 +138,15 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
           d1->RegisterParameter(model1->sd);
        }}
        d1->distribution_models[model1->id]=model1;
-    
-    
+
+
         std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-    
+
        std::shared_ptr<fims::Dnorm<TMB_FIMS_SECOND_ORDER> > model2 =
        std::make_shared<fims::Dnorm<TMB_FIMS_SECOND_ORDER> >();
-    
-    
+
+
        model2->id = this->id;
        model2->x= this->x.value;
        if (this->x.estimated) {
@@ -155,7 +155,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        } else {
           d2->RegisterParameter(model2->x);
        }}
-    
+
        model2->id = this->id;
        model2->mean= this->mean.value;
        if (this->mean.estimated) {
@@ -164,7 +164,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        } else {
           d2->RegisterParameter(model2->mean);
        }}
-    
+
        model2->id = this->id;
        model2->sd= this->sd.value;
        if (this->sd.estimated) {
@@ -174,15 +174,15 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
           d2->RegisterParameter(model2->sd);
        }}
        d2->distribution_models[model2->id]=model2;
-    
-    
+
+
         std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-    
+
        std::shared_ptr<fims::Dnorm<TMB_FIMS_THIRD_ORDER> > model3 =
        std::make_shared<fims::Dnorm<TMB_FIMS_THIRD_ORDER> >();
-    
-    
+
+
        model3->id = this->id;
        model3->x= this->x.value;
        if (this->x.estimated) {
@@ -191,7 +191,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        } else {
           d3->RegisterParameter(model3->x);
        }}
-    
+
        model3->id = this->id;
        model3->mean= this->mean.value;
        if (this->mean.estimated) {
@@ -200,7 +200,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        } else {
           d3->RegisterParameter(model3->mean);
        }}
-    
+
        model3->id = this->id;
        model3->sd= this->sd.value;
        if (this->sd.estimated) {
@@ -211,10 +211,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        }
        }
        d3->distribution_models[model3->id]=model3;
-    
+
        return true;
     }
-    
+
     };
 
 #endif
