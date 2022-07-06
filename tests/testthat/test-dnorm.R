@@ -1,6 +1,6 @@
 library(Rcpp)
 
-testthat("dnorm",{
+test_that("dnorm",{
 
   #generate data using R stats:rnorm
   set.seed(123)

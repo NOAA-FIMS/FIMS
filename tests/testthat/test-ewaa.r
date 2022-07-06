@@ -1,8 +1,7 @@
   library(Rcpp)
 data(package = "FIMS")
 
-testthat("ewaa data can be added to model",{
-  
+test_that("ewaa data can be added to model",{
 
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   ewaa_growth <- new(fims$EWAAgrowth)
@@ -12,4 +11,4 @@ testthat("ewaa data can be added to model",{
   ewaa_growth$weights <- unique(ewaa_data$value)
   expect_equal(ewaa_growth$evaluate(1), 0.005306555)
 
-}
+})
