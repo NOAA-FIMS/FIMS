@@ -40,7 +40,7 @@ std::map<uint32_t, DistributionsInterfaceBase*>
 /**
  * @brief Rcpp interface for Dnorm as an S4 object. To instantiate
  * from R:
- * ewaa <- new(fims$EWAAgrowth)
+ * dnorm_ <- new(fims$TMBDnormDistribution)
  *
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
@@ -57,7 +57,12 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     virtual ~DnormDistributionsInterface(){}
 
-
+   /**
+    * @brief Evaluate normal probability density function, default returns the log of the pdf
+    * 
+    * @tparam T 
+    * @return log pdf
+    */
     template <class T>
     T evaluate(){
         fims::Dnorm<T> Dnorm = fims::Dnorm<T>();
@@ -74,7 +79,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        std::shared_ptr<fims::Dnorm<TMB_FIMS_REAL_TYPE> > model0 =
        std::make_shared<fims::Dnorm<TMB_FIMS_REAL_TYPE> >();
 
-
+      //interface to data/parameter value
        model0->id = this->id;
        model0->x= this->x.value;
        if (this->x.estimated) {
@@ -110,7 +115,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        std::shared_ptr<fims::Dnorm<TMB_FIMS_FIRST_ORDER> > model1 =
        std::make_shared<fims::Dnorm<TMB_FIMS_FIRST_ORDER> >();
 
-
+      //interface to data/parameter first derivative
        model1->id = this->id;
        model1->x= this->x.value;
        if (this->x.estimated) {
@@ -147,6 +152,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        std::make_shared<fims::Dnorm<TMB_FIMS_SECOND_ORDER> >();
 
 
+      //interface to data/parameter second derivative
        model2->id = this->id;
        model2->x= this->x.value;
        if (this->x.estimated) {
@@ -183,6 +189,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        std::make_shared<fims::Dnorm<TMB_FIMS_THIRD_ORDER> >();
 
 
+      //interface to data/parameter third derivative
        model3->id = this->id;
        model3->x= this->x.value;
        if (this->x.estimated) {
