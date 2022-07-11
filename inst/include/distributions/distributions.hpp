@@ -4,19 +4,17 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
- * Growth module file
+ * Distributions module file
  * The purpose of this file is to include any .hpp files within the
  * subfolders so that only this file needs to included in the model.hpp file.
  *
- * DEFINE guards for growth module outline to define the
- * growth hpp file if not already defined.
+ * DEFINE guards for distributions module outline to define the
+ * distributions hpp file if not already defined.
  */
+#ifndef FIMS_DISTRIBUTIONS_HPP
+#define FIMS_DISTRIBUTIONS_HPP
 
-#ifndef FIMS_POPULATION_DYNAMICS_GROWTH_HPP
-#define FIMS_POPULATION_DYNAMICS_GROWTH_HPP
+#include "functors/distributions_base.hpp"
+#include "functors/tmb_distributions.hpp"
 
-#include "functors/ewaa.hpp"
-#include "functors/growth_base.hpp"
-
-#endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */
-
+#endif /* FIMS_DISTRIBUTIONS_HPP */
