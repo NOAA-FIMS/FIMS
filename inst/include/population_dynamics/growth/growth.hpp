@@ -19,4 +19,3 @@
 #include "functors/growth_base.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */
-
