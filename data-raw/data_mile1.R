@@ -37,8 +37,8 @@ returnedom <- ASSAMC::save_om_example()
 # Landings
 ###############################################################################
 landings_data <- data.frame(
-# TODO: Should there be a type that are not removed but just noted,
-#       where obviously in this instance they are removed.
+  # TODO: Should there be a type that are not removed but just noted,
+  #       where obviously in this instance they are removed.
   type = "landings",
   name = names(returnedom[["om_output"]]$L.mt)[1],
   age = NA, # Not by age in this case, but there is a by age option.
@@ -52,10 +52,10 @@ landings_data <- data.frame(
   ),
   value = returnedom[["em_input"]]$L.obs[[1]],
   unit = "mt", # metric tons
-# TODO: discuss if CV the appropriate input here given that landings will be
-#       modeled with a lognormal or similar likelihood. Just because previous
-#       models have used CV doesn't mean we have to continue to use it.
-#       E.g., `dlnorm(sdlog = )` uses a standard deviation on the log scale.
+  # TODO: discuss if CV the appropriate input here given that landings will be
+  #       modeled with a lognormal or similar likelihood. Just because previous
+  #       models have used CV doesn't mean we have to continue to use it.
+  #       E.g., `dlnorm(sdlog = )` uses a standard deviation on the log scale.
   uncertainty = returnedom[["em_input"]]$cv.L[[1]]
 )
 
@@ -127,9 +127,9 @@ age_data <- rbind(
 ###############################################################################
 timingfishery <- data.frame(
   datestart = as.Date(
-      paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
-      "%Y-%m-%d"
-    ),
+    paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+    "%Y-%m-%d"
+  ),
   dateend = as.Date(
     paste(returnedom[["om_input"]][["year"]], 12, 31, sep = "-"),
     "%Y-%m-%d"

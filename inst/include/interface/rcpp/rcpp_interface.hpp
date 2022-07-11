@@ -14,12 +14,12 @@
 #include "rcpp_objects/rcpp_fishing_mortality.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
-#include "rcpp_objects/rcpp_likelihoods.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
+#include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
 
 /**
  *
@@ -79,6 +79,14 @@ RCPP_MODULE(fims) {
       .field("median", &LogisticSelectivityInterface::median)
       .field("slope", &LogisticSelectivityInterface::slope)
       .method("get_id", &LogisticSelectivityInterface::get_id);
+
+  Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
+      .constructor()
+      .method("get_id", &DnormDistributionsInterface::get_id)
+      .method("evaluate", &DnormDistributionsInterface::evaluate<double>)
+      .field("x", &DnormDistributionsInterface::x)
+      .field("mean", &DnormDistributionsInterface::mean)
+      .field("sd", &DnormDistributionsInterface::sd);
 
   Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
       .constructor()

@@ -1,4 +1,4 @@
-/*
+/*! \file information.hpp
  * File:   information.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
@@ -16,6 +16,7 @@
 
 #include "def.hpp"
 // #include "../interface/interface.hpp"
+#include "../distributions/distributions.hpp"
 #include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
@@ -40,6 +41,8 @@ class Information {
       recruitment_models;
   std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >
       selectivity_models;
+  std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >
+      distribution_models;
   std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
 
   /**

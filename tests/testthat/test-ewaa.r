@@ -1,4 +1,3 @@
-library(Rcpp)
 data(package = "FIMS")
 
 test_that("ewaa data can be added to model", {
@@ -19,3 +18,4 @@ test_that("ewaa data can be added to model", {
     ignore.case = FALSE
   )
 })
+

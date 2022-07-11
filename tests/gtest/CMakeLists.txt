@@ -2,7 +2,7 @@
 
 include(GoogleTest)
 
-# Add tests: specify add_executable and target_link_libraries 
+# Add tests: specify add_executable and target_link_libraries
 
 # test_population_dynamics_selectivity_logistic
 add_executable(population_dynamics_selectivity_logistic
@@ -23,7 +23,7 @@ add_executable(population_dynamics_maturity_logistic
 
 target_link_libraries(population_dynamics_maturity_logistic
 gtest_main
-fims_test 
+fims_test
 )
 
 # test_population_dynamics_selectivity_double_logistic
