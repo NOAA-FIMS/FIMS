@@ -16,10 +16,10 @@
 
 #include "def.hpp"
 // #include "../interface/interface.hpp"
+#include "../distributions/distributions.hpp"
 #include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
-#include "../distributions/distributions.hpp"
 #include "model_object.hpp"
 
 namespace fims {

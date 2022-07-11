@@ -34,7 +34,8 @@ struct ModelTraits {
         of the data that is differentiable */
   typedef typename CppAD::vector<T> ParameterVector; /**< This is a
   vector of the parameters that is differentiable */
-  typedef typename tmbutils::vector<T> EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
+  typedef typename tmbutils::vector<T>
+      EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
 };
 
 #endif /* TMB_MODEL */
