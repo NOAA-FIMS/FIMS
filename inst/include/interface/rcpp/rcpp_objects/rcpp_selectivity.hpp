@@ -37,6 +37,10 @@
 /****************************************************************
  * Selectivity Rcpp interface                                   *
  ***************************************************************/
+/**
+ * @brief SelectivityInterfaceBase class should be inherited to
+ * define different Rcpp interfaces for each possible Selectivity function
+ * */
 class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g;
@@ -71,6 +75,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   virtual uint32_t get_id() { return this->id; }
 
+  /** @brief this adds the parameter values and derivatives to the TMB model object */
   virtual bool add_to_fims_tmb() {
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();

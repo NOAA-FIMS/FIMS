@@ -18,7 +18,8 @@
 
 namespace fims {
 
-/* @brief Base class for all growth functors.
+/**
+ *  @brief Base class for all growth functors.
  *
  * @tparam T The type of the growth functor.
  * */
