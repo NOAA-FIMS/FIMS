@@ -39,7 +39,7 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
   virtual uint32_t get_id() = 0;
   
   /** @brief evaluate method for child growth interface objects to inherit **/ 
-  virtual double evaluate(double age) = 0;
+  virtual T evaluate(T age) = 0;
 
 };
 
@@ -54,9 +54,9 @@ std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
-  std::vector<double> weights; /**< weights for each age class */
-  std::vector<double> ages;    /**< ages for each age class */
-  std::map<double, double> ewaa; /**< map of ewaa values */
+  std::vector<T> weights; /**< weights for each age class */
+  std::vector<T> ages;    /**< ages for each age class */
+  std::map<T, T> ewaa; /**< map of ewaa values */
 
   bool initialized = false; /**< boolean tracking if weights and ages 
   vectors have been set */
@@ -69,16 +69,16 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
   /**
    * @brief Create a map of input numeric vectors
-   * @param weights std::double vector of weights
-   * @param ages std::double vector of ages
-   * @return std::map<double, double>
+   * @param weights T vector of weights
+   * @param ages T vector of ages
+   * @return std::map<T, T>
    *
    * */
-  inline std::map<double, double> make_map(std::vector<double> ages,
-                                           std::vector<double> weights) {
-    std::map<double, double> mymap;
+  inline std::map<T, T> make_map(std::vector<T> ages,
+                                           std::vector<T> weights) {
+    std::map<T, T> mymap;
     for (uint32_t i = 0; i < ages.size(); i++) {
-      mymap.insert(std::pair<double, double>(ages[i], weights[i]));
+      mymap.insert(std::pair<T, T>(ages[i], weights[i]));
     }
     return mymap;
   }
@@ -87,8 +87,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
  * you can call from R using
  * ewaagrowth.evaluate(age)
  * */
-  double evaluate(double age) {
-    fims::EWAAgrowth<double> EWAAGrowth = fims::EWAAgrowth<double>();
+  T evaluate(T age) {
+    fims::EWAAgrowth<T> EWAAGrowth = fims::EWAAgrowth<T>();
     
 
     if(initialized == false){
