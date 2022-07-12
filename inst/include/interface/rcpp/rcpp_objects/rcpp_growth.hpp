@@ -2,7 +2,7 @@
  * File:   rcpp_growth.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE file 
+ * Fisheries Integrated Modeling System project. See LICENSE file
  * for reuse information.
  */
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
@@ -32,19 +32,18 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 uint32_t GrowthInterfaceBase::id_g = 1;
-std::map<uint32_t, GrowthInterfaceBase*>
-    GrowthInterfaceBase::live_objects;
+std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for EWAAgrowth as an S4 object. To instantiate
  * from R:
  * ewaa <- new(fims$EWAAgrowth)
- * 
+ *
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
   std::vector<double> weights; /**< weights for each age class */
-  std::vector<double> ages; /**< ages for each age class */
+  std::vector<double> ages;    /**< ages for each age class */
 
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
 
@@ -52,28 +51,28 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
   virtual uint32_t get_id() { return this->id; }
 
-  /** 
+  /**
    * @brief Create a map of input numeric vectors
    * @param weights_ std::double vector of weights
-   * @param ages_ std::double vector of ages 
+   * @param ages_ std::double vector of ages
    * @return std::map<double, double>
-   * 
+   *
    * */
   inline std::map<double, double> make_map(std::vector<double> ages,
-   std::vector<double> weights){
+                                           std::vector<double> weights) {
     std::map<double, double> mymap;
-    if(ages.size() != weights.size()){
+    if (ages.size() != weights.size()) {
       Rcpp::stop("ages and weights must be the same length");
     }
     for (uint32_t i = 0; i < ages.size(); i++) {
-        mymap.insert(std::pair<double, double>(ages[i], weights[i]));
+      mymap.insert(std::pair<double, double>(ages[i], weights[i]));
     }
     return mymap;
   }
 
   std::map<double, double> ewaa = make_map(this->ages, this->weights);
 
-  double evaluate(double age){
+  double evaluate(double age) {
     fims::EWAAgrowth<double> EWAAGrowth = fims::EWAAgrowth<double>();
     EWAAGrowth.ewaa = this->ewaa;
     return EWAAGrowth.evaluate(age);
@@ -90,7 +89,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // set relative info
     b0->id = this->id;
     b0->ewaa = this->ewaa;
-   
     // add to Information
     d0->growth_models[b0->id] = b0;
 
@@ -99,6 +97,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     return true;
   }
-  };
+};
 
 #endif

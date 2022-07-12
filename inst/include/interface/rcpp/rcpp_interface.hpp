@@ -3,7 +3,8 @@
  *
  *
  * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE file for reuse information.
+ * Fisheries Integrated Modeling System project. See LICENSE file for reuse
+ * information.
  *
  *
  */
@@ -13,7 +14,7 @@
 #include "rcpp_objects/rcpp_fishing_mortality.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
-#include "rcpp_objects/rcpp_likelihoods.hpp"
+#include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
@@ -92,6 +93,15 @@ RCPP_MODULE(fims) {
             .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
             .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
             .method("SetSelectivity", &FleetInterface::SetSelectivity);
+ 
+    Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
+            .constructor()
+            .method("get_id",  &DnormDistributionsInterface::get_id)
+            .method("evaluate",  &DnormDistributionsInterface::evaluate<double>)
+            .field("x", &DnormDistributionsInterface::x)
+            .field("mean", &DnormDistributionsInterface::mean)
+            .field("sd", &DnormDistributionsInterface::sd);
+
 }
 
 #endif /* RCPP_INTERFACE_HPP */

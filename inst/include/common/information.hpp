@@ -1,5 +1,4 @@
-/*
- * File:   information.hpp
+/*! \file information.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the
@@ -16,9 +15,11 @@
 
 #include "def.hpp"
 // #include "../interface/interface.hpp"
+#include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
-#include "../population_dynamics/growth/growth.hpp"
+#include "../distributions/distributions.hpp"
+#include "model_object.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/population/population.hpp"
 
@@ -155,11 +156,11 @@ namespace fims {
                 //set selectivity model
                 if (f->selectivity_id != -999) {
 
-                    uint32_t sel_id = static_cast<uint32_t> (f->selectivity_id);
-                    data_iterator it = this->data_objects.find(sel_id);
+                    uint32_t sel_id = static_cast<uint32_t> (f->selectivity_id); //cast as unsigned integer
+                    data_iterator it = this->data_objects.find(sel_id); //if find, set it, otherwise invalid
 
                     if (it != this->selectivity_models.end()) {
-                        f->selectivity = (*it).second;
+                        f->selectivity = (*it).second; //elements in container held in pair (first is id, second is object - shared pointer to distribution)
                     } else {
                         valid_model = false;
                         //log error
