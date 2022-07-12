@@ -9,7 +9,7 @@
 #' @export
 #' @examples
 #' create_fims_rcpp_interface(
-#'   "logistic_selectivity",
+#'   "LogisticSelectivityInterface",
 #'   "LogisticSelectivity",
 #'   "selectivity_interface_base",
 #'   "selectivity_models",
@@ -37,7 +37,7 @@ create_fims_rcpp_interface <- function(interface_name = character(),
   cat("public:\n\n")
   # cat("     ")
   for (i in 1:length(parameters)) {
-    cat("   parameter ")
+    cat("   Parameter ")
     cat(parameters[i])
     cat(";\n")
   }
@@ -57,7 +57,7 @@ create_fims_rcpp_interface <- function(interface_name = character(),
     cat(" =\n")
     cat("    fims::Information<")
     cat(types[i])
-    cat(">::get_instance();\n\n")
+    cat(">::GetInstance();\n\n")
     cat("   std::shared_ptr<fims::")
     cat(model)
     cat("<")
@@ -89,19 +89,19 @@ create_fims_rcpp_interface <- function(interface_name = character(),
       cat(parameters[j])
       cat(".is_random_effect) {\n          ")
       cat(mtypes[i])
-      cat("->register_random_effect(")
+      cat("->RegisterRandomEffect(")
       cat(mtypes[i])
       cat("->")
       cat(parameters[j])
       cat(");\n")
       cat("   } else {\n      ")
       cat(mtypes[i])
-      cat("->register_parameter(")
+      cat("->RegisterParameter(")
       cat(mtypes[i])
       cat("->")
       cat(parameters[j])
       cat(");\n")
-      cat("   }\n")
+      cat("   }\n} \n")
     }
     cat("   ")
     cat(itypes[i])
