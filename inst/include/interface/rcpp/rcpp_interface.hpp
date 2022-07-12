@@ -14,12 +14,12 @@
 #include "rcpp_objects/rcpp_fishing_mortality.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
-#include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
+#include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
 
 /**
  *
@@ -80,12 +80,6 @@ RCPP_MODULE(fims) {
             .field("slope", &LogisticSelectivityInterface::slope)
             .method("get_id", &LogisticSelectivityInterface::get_id);
 
-    Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
-            .constructor()
-            .field("ages", &EWAAGrowthInterface::ages)
-            .field("weights", &EWAAGrowthInterface::weights)
-            .method("evaluate", &EWAAGrowthInterface::evaluate);
-
     Rcpp::class_<FleetInterface>("Fleet")
             .constructor()
             .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
@@ -101,6 +95,13 @@ RCPP_MODULE(fims) {
             .field("x", &DnormDistributionsInterface::x)
             .field("mean", &DnormDistributionsInterface::mean)
             .field("sd", &DnormDistributionsInterface::sd);
+
+
+    Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
+            .constructor()
+            .field("ages", &EWAAGrowthInterface::ages)
+            .field("weights", &EWAAGrowthInterface::weights)
+            .method("evaluate", &EWAAGrowthInterface::evaluate);
 
 }
 
