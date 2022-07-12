@@ -55,7 +55,8 @@ namespace fims {
         Fleet() {
             this->id = Fleet::id_g++;
         }
-
+        //likelihood is a log likelihood. To do: figure out if these should be
+        // negative log likelihood here or in the population loop...Andrea will think about this.
         const T likelihood() {
             return this->index_likelihood->evaluate(do_log = true)
                     + this->agecomp_likelihood->evaluate(do_log = true);

@@ -57,7 +57,6 @@ namespace fims {
         std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > >::iterator growth_models_iterator;
 
-
         //fleet modules
         std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > > fleets;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > >::iterator fleet_iterator;
@@ -65,6 +64,10 @@ namespace fims {
         //populations
         std::map<uint32_t, std::shared_ptr<fims::Population<T> > > populations;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Population<T> > >::iterator population_iterator;
+
+        //distributions
+        std::map<uint32_t, std::shared_ptr<fims::DistributionsBase> > distribution_models;
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::DistributionsBase> >::iterator distribution_models_iterator;
 
         Information() {
 
@@ -115,6 +118,7 @@ namespace fims {
             for (fleet_iterator it = this->fleets.begin();
                     it != this->fleets.end(); ++it) {
 
+                //Initialize fleet object 
                 std::shared_ptr<fims::Fleet<T> > f = (*it).second;
 
                 //set index data
@@ -124,7 +128,7 @@ namespace fims {
                     data_iterator it = this->data_objects.find(index_id);
 
                     if (it != this->data_objects.end()) {
-                        f->observed_inedx_data = (*it).second;
+                        f->observed_index_data = (*it).second;
                     } else {
                         valid_model = false;
                         //log error
@@ -157,10 +161,46 @@ namespace fims {
                 if (f->selectivity_id != -999) {
 
                     uint32_t sel_id = static_cast<uint32_t> (f->selectivity_id); //cast as unsigned integer
-                    data_iterator it = this->data_objects.find(sel_id); //if find, set it, otherwise invalid
+                    selectivity_models_iterator it = this->selectivity_models.find(sel_id); //if find, set it, otherwise invalid
 
                     if (it != this->selectivity_models.end()) {
                         f->selectivity = (*it).second; //elements in container held in pair (first is id, second is object - shared pointer to distribution)
+                    } else {
+                        valid_model = false;
+                        //log error
+                    }
+
+                } else {
+                    valid_model = false;
+                    //log error
+                }
+
+                //set index likelihood 
+                if (f->index_likelihood_id != -999) {
+
+                    uint32_t ind_like_id = static_cast<uint32_t> (f->index_likelihood_id); //cast as unsigned integer
+                    distribution_models_iterator it = this->distribution_models.find(ind_like_id); //if find, set it, otherwise invalid
+                    
+                    if (it != this->distribution_models.end()) {
+                        f->index_likelihood = (*it).second; //elements in container held in pair (first is id, second is object - shared pointer to distribution)
+                    } else {
+                        valid_model = false;
+                        //log error
+                    }
+
+                } else {
+                    valid_model = false;
+                    //log error
+                }
+
+                //set agecomp likelihood 
+                if (f->agecomp_likelihood_id != -999) {
+
+                    uint32_t ac_like_id = static_cast<uint32_t> (f->agecomp_likelihood_id); //cast as unsigned integer
+                    distribution_models_iterator it = this->distribution_models.find(ac_like_id); //if find, set it, otherwise invalid
+
+                    if (it != this->distribution_models.end()) {
+                        f->agecomp_likelihood = (*it).second; //elements in container held in pair (first is id, second is object - shared pointer to distribution)
                     } else {
                         valid_model = false;
                         //log error
