@@ -20,6 +20,7 @@
  * called from R directly.
  *
  */
+template <typename T>
 class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
@@ -52,6 +53,7 @@ std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
  * ewaa <- new(fims$EWAAgrowth)
  *
  */
+template <typename T>
 class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
   std::vector<T> weights; /**< weights for each age class */
