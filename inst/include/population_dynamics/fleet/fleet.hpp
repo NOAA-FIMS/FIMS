@@ -1,4 +1,5 @@
-/*
+/*! \file fleet.hpp
+ *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
@@ -11,7 +12,7 @@
 
 #include "../../common/model_object.hpp"
 #include "../../common/data_object.hpp"
-#include "../../common/likelihood.hpp"
+#include "../../distributions/distributions.hpp"
 #include "../selectivity/selectivity.hpp"
 
 namespace fims {
@@ -34,10 +35,10 @@ namespace fims {
 
         //likelihood components
         int index_likelihood_id = -999;
-        std::shared_ptr<fims::LikelihoodBase<T> > index_likelihood;
+        std::shared_ptr<fims::DistributionsBase<T> > index_likelihood;
 
         int agecomp_likelihood_id = -999;
-        std::shared_ptr<fims::LikelihoodBase<T> > agecomp_likelihood;
+        std::shared_ptr<fims::DistributionsBase<T> > agecomp_likelihood;
 
         //selectivity
         int selectivity_id = -999;
