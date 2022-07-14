@@ -88,7 +88,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
  * ewaagrowth.evaluate(age)
  * */
   double evaluate(double age) {
-    fims::EWAAgrowth<T> EWAAGrowth = fims::EWAAgrowth<T>();
+    fims::EWAAgrowth<double> EWAAGrowth = fims::EWAAgrowth<double>();
     
 
     if(initialized == false){
