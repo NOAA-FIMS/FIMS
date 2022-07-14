@@ -20,7 +20,6 @@
  * called from R directly.
  *
  */
-template <typename T>
 class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
@@ -75,12 +74,11 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @return std::map<T, T>
    *
    * */
-  templte <typename T>
-  inline std::map<T, T> make_map(std::vector<T> ages,
-                                           std::vector<T> weights) {
-    std::map<T, T> mymap;
+  inline std::map<double, double> make_map(std::vector<double> ages,
+                                           std::vector<double> weights) {
+    std::map<double, double> mymap;
     for (uint32_t i = 0; i < ages.size(); i++) {
-      mymap.insert(std::pair<T, T>(ages[i], weights[i]));
+      mymap.insert(std::pair<double, double>(ages[i], weights[i]));
     }
     return mymap;
   }
@@ -89,8 +87,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
  * you can call from R using
  * ewaagrowth.evaluate(age)
  * */
-  template <typename T>
-  T evaluate(T age) {
+  double evaluate(double age) {
     fims::EWAAgrowth<T> EWAAGrowth = fims::EWAAgrowth<T>();
     
 
