@@ -53,12 +53,11 @@ std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
  * ewaa <- new(fims$EWAAgrowth)
  *
  */
-template <typename T>
 class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
-  std::vector<T> weights; /**< weights for each age class */
-  std::vector<T> ages;    /**< ages for each age class */
-  std::map<T, T> ewaa; /**< map of ewaa values */
+  std::vector<double> weights; /**< weights for each age class */
+  std::vector<double> ages;    /**< ages for each age class */
+  std::map<double, double> ewaa; /**< map of ewaa values */
 
   bool initialized = false; /**< boolean tracking if weights and ages 
   vectors have been set */
@@ -76,6 +75,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @return std::map<T, T>
    *
    * */
+  templte <typename T>
   inline std::map<T, T> make_map(std::vector<T> ages,
                                            std::vector<T> weights) {
     std::map<T, T> mymap;
@@ -89,6 +89,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
  * you can call from R using
  * ewaagrowth.evaluate(age)
  * */
+  template <typename T>
   T evaluate(T age) {
     fims::EWAAgrowth<T> EWAAGrowth = fims::EWAAgrowth<T>();
     
