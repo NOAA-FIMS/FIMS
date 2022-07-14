@@ -28,10 +28,10 @@ namespace fims {
 
         //data objects
         int observed_index_data_id = -999;
-        std::shared_ptr<fims::DataObject<double> observed_index_data;
+        std::shared_ptr<fims::DataObject<double> > observed_index_data;
 
         int observed_agecomp_data_id = -999;
-        std::shared_ptr<fims::DataObject<double> observed_agecomp_data;
+        std::shared_ptr<fims::DataObject<double> > observed_agecomp_data;
 
         //likelihood components
         int index_likelihood_id = -999;

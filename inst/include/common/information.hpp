@@ -48,7 +48,7 @@ namespace fims {
         typedef typename std::map<uint32_t, std::shared_ptr<fims::DataObject<double> >::iterator data_iterator;
 
         //life history modules
-        std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >;
+        std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >;//hash map to link each object to its shared location in memory
         typedef typename std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >::iterator recruitment_model_iterator;
 
         std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
