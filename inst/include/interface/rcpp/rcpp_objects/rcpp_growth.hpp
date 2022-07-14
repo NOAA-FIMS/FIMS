@@ -38,7 +38,7 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
   /** @brief get_id method for child growth interface objects to inherit **/
   virtual uint32_t get_id() = 0;
   
-  ** @brief evaluate method for child growth interface objects to inherit **/ 
+  /** @brief evaluate method for child growth interface objects to inherit **/ 
   template <typename T>
   virtual T evaluate(T age) = 0;
 
