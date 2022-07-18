@@ -20,6 +20,7 @@
  * called from R directly.
  *
  */
+template <typename T>
 class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
@@ -39,7 +40,6 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
   virtual uint32_t get_id() = 0;
   
   /** @brief evaluate method for child growth interface objects to inherit **/ 
-  template <typename T>
   virtual T evaluate(T age) = 0;
 
 };
