@@ -31,6 +31,8 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~DistributionsInterfaceBase() {}
 
   virtual uint32_t get_id() = 0;
+
+  virtual double evaluate(bool do_log) = 0;
 };
 
 uint32_t DistributionsInterfaceBase::id_g = 1;
@@ -62,13 +64,12 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @tparam T
    * @return log pdf
    */
-  template <class T>
-  T evaluate() {
-    fims::Dnorm<T> Dnorm = fims::Dnorm<T>();
-    Dnorm.x = this->x.value;
-    Dnorm.mean = this->mean.value;
-    Dnorm.sd = this->sd.value;
-    return Dnorm.evaluate(true);
+  double evaluate(bool do_log) {
+    fims::Dnorm<double> dnorm;
+    dnorm.x = this->x.value;
+    dnorm.mean = this->mean.value;
+    dnorm.sd = this->sd.value;
+    return dnorm.evaluate(true);
   }
 
   bool add_to_fims_tmb() {
