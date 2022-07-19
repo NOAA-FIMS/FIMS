@@ -16,16 +16,17 @@
  ***************************************************************/
 /**
  * @brief Rcpp interface that serves as the parent class for
- * Rcpp growth interfaces. This type should be inherited and not 
+ * Rcpp growth interfaces. This type should be inherited and not
  * called from R directly.
  *
  */
 class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
-  uint32_t id; /**< local id of the GrowthInterfaceBase object */
+  uint32_t id;          /**< local id of the GrowthInterfaceBase object */
   static std::map<uint32_t, GrowthInterfaceBase*> live_objects; /**<
-  map relating the ID of the GrowthInterfaceBase to the GrowthInterfaceBase objects */
+  map relating the ID of the GrowthInterfaceBase to the GrowthInterfaceBase
+  objects */
 
   GrowthInterfaceBase() {
     this->id = GrowthInterfaceBase::id_g++;
@@ -37,10 +38,9 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
 
   /** @brief get_id method for child growth interface objects to inherit **/
   virtual uint32_t get_id() = 0;
-  
-  /** @brief evaluate method for child growth interface objects to inherit **/ 
-  virtual double evaluate(double age) = 0;
 
+  /** @brief evaluate method for child growth interface objects to inherit **/
+  virtual double evaluate(double age) = 0;
 };
 
 uint32_t GrowthInterfaceBase::id_g = 1;
@@ -54,11 +54,11 @@ std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
  public:
-  std::vector<double> weights; /**< weights for each age class */
-  std::vector<double> ages;    /**< ages for each age class */
+  std::vector<double> weights;   /**< weights for each age class */
+  std::vector<double> ages;      /**< ages for each age class */
   std::map<double, double> ewaa; /**< map of ewaa values */
 
-  bool initialized = false; /**< boolean tracking if weights and ages 
+  bool initialized = false; /**< boolean tracking if weights and ages
   vectors have been set */
 
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
@@ -83,29 +83,28 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     return mymap;
   }
 
-/** @brief Rcpp interface to the EWAAgrowth evaluate method
- * you can call from R using
- * ewaagrowth.evaluate(age)
- * */
+  /** @brief Rcpp interface to the EWAAgrowth evaluate method
+   * you can call from R using
+   * ewaagrowth.evaluate(age)
+   * */
   double evaluate(double age) {
     fims::EWAAgrowth<double> EWAAGrowth;
-    
 
-    if(initialized == false){
+    if (initialized == false) {
       this->ewaa = make_map(this->ages, this->weights);
-      //Check that ages and weights vector are the same length
+      // Check that ages and weights vector are the same length
       if (this->ages.size() != this->weights.size()) {
         Rcpp::stop("ages and weights must be the same length");
       }
       initialized = true;
-    } else{
+    } else {
       Rcpp::stop("this empirical weight at age object is already initialized");
     }
     EWAAGrowth.ewaa = this->ewaa;
     return EWAAGrowth.evaluate(age);
   }
 
- /** @brief this adds the values to the TMB model object */
+  /** @brief this adds the values to the TMB model object */
   virtual bool add_to_fims_tmb() {
     // base model
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
@@ -124,7 +123,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // add to Information
     d0->growth_models[b0->id] = b0;
 
-     // base model
+    // base model
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
@@ -141,7 +140,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // add to Information
     d1->growth_models[b0->id] = b1;
 
-     // base model
+    // base model
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
@@ -158,7 +157,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // add to Information
     d2->growth_models[b2->id] = b2;
 
-     // base model
+    // base model
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 

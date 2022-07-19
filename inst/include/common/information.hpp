@@ -14,11 +14,11 @@
 #include <memory>
 #include <vector>
 
-#include "def.hpp"
 #include "../distributions/distributions.hpp"
 #include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
+#include "def.hpp"
 #include "model_object.hpp"
 
 namespace fims {
