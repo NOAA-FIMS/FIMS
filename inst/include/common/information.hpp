@@ -18,11 +18,7 @@
 #include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
-<<<<<<< HEAD
-#include "../population_dynamics/growth/growth.hpp"
-=======
 #include "def.hpp"
->>>>>>> main
 #include "model_object.hpp"
 
 namespace fims {
@@ -44,11 +40,8 @@ class Information {
       recruitment_models;
   std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >
       selectivity_models;
-<<<<<<< HEAD
-=======
   std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >
       distribution_models;
->>>>>>> main
   std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
 
   /**

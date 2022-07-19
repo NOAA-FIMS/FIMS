@@ -3,12 +3,8 @@
  *
  *
  * This File is part of the NOAA, National Marine Fisheries Service
-<<<<<<< HEAD
- * Fisheries Integrated Modeling System project. See LICENSE file for reuse information.
-=======
  * Fisheries Integrated Modeling System project. See LICENSE file for reuse
  * information.
->>>>>>> main
  *
  *
  */
