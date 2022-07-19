@@ -67,7 +67,7 @@ std::map<uint32_t, SelectivityInterfaceBase*>
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   Parameter median; /**< the index value at which the response reaches .5 */
-  Parameter slope; /**< the width of the curve at the median */
+  Parameter slope;  /**< the width of the curve at the median */
 
   LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
@@ -76,7 +76,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   /** @brief returns the id for the logistic selectivity interface */
   virtual uint32_t get_id() { return this->id; }
 
-  /** @brief this adds the parameter values and derivatives to the TMB model object */
+  /** @brief this adds the parameter values and derivatives to the TMB model
+   * object */
   virtual bool add_to_fims_tmb() {
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
