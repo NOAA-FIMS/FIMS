@@ -39,7 +39,7 @@ struct GrowthBase : public FIMSObject<T> {
    * @brief Calculates the  growth at the independent variable value.
    * @param a The age at which to return weight of the fish (in kg).
    */
-  virtual const T evaluate(const T& a) = 0;
+  virtual const T evaluate(const double& a) = 0;
 };
 
 template <typename T>

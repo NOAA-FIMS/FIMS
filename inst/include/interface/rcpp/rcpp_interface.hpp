@@ -22,10 +22,10 @@
 #include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
 
 /**
- *
+ * @brief Create the TMB model object and add interface objects to it.
  */
 bool CreateTMBModel() {
-  for (int i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
+  for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
        i++) {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
   }

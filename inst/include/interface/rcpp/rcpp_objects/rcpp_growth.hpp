@@ -20,7 +20,6 @@
  * called from R directly.
  *
  */
-template <typename T>
 class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
@@ -40,7 +39,7 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
   virtual uint32_t get_id() = 0;
   
   /** @brief evaluate method for child growth interface objects to inherit **/ 
-  virtual T evaluate(T age) = 0;
+  virtual double evaluate(double age) = 0;
 
 };
 
@@ -88,9 +87,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
  * you can call from R using
  * ewaagrowth.evaluate(age)
  * */
-  template <class T>
-  T evaluate(double age) {
-    fims::EWAAgrowth<T> EWAAGrowth = fims::EWAAgrowth<T>();
+  double evaluate(double age) {
+    fims::EWAAgrowth<double> EWAAGrowth;
     
 
     if(initialized == false){
