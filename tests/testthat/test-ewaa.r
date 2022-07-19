@@ -8,7 +8,7 @@ test_that("ewaa data can be added to model", {
   ewaa_growth$ages <- unique(ewaa_data$age)
   ewaa_growth$weights <- unique(ewaa_data$value)
   expect_equal(ewaa_growth$evaluate(1), 0.00053065552)
-  
+
   ewaa_growth2 <- new(fims$EWAAgrowth)
   ewaa_growth2$ages <- c(unique(ewaa_data$age), 12)
   ewaa_growth2$weights <- unique(ewaa_data$value)
@@ -18,4 +18,3 @@ test_that("ewaa data can be added to model", {
     ignore.case = FALSE
   )
 })
-
