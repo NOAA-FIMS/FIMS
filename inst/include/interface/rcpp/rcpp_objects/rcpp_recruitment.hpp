@@ -15,11 +15,16 @@
 /****************************************************************
  * Recruitment Rcpp interface                                   *
  ***************************************************************/
+/**
+ * @brief RecruitmentInterfaceBase class should be inherited to
+ * define different Rcpp interfaces for each possible Recruitment function
+ * */
 class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
  public:
-  static uint32_t id_g;
-  uint32_t id;
+  static uint32_t id_g; /**< static id of the recruitment interface base*/
+  uint32_t id; /**< id of the recruitment interface base */
   static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
+  /**< map associating the ids of RecruitmentInterfaceBase to the objects */
 
   RecruitmentInterfaceBase() {
     this->id = RecruitmentInterfaceBase::id_g++;
@@ -28,7 +33,9 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   virtual ~RecruitmentInterfaceBase() {}
-
+  
+  /** @brief get the ID of the interface base object
+   **/
   virtual uint32_t get_id() = 0;
 };
 
@@ -43,9 +50,9 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
-  Parameter steep;
-  Parameter rzero;
-  Parameter phizero;
+  Parameter steep; /**< steepness or the productivity of the stock*/
+  Parameter rzero; /**< recruitment at unfished biomass */
+  Parameter phizero; /**< unfished spawning biomass per recruit */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
@@ -53,6 +60,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   virtual uint32_t get_id() { return this->id; }
 
+/** @brief this adds the parameter values and derivatives to the TMB model object */
   virtual bool add_to_fims_tmb() {
     // base model
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
