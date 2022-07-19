@@ -68,6 +68,7 @@ class FIMSRcppInterfaceBase {
  public:
   static std::vector<FIMSRcppInterfaceBase*> fims_interface_objects;
 
+  /** @brief virtual method to inherit to add objects to the TMB model */
   virtual bool add_to_fims_tmb() {
     std::cout << "fims_rcpp_interface_base::add_to_fims_tmb(): Not yet "
                  "implemented.\n";

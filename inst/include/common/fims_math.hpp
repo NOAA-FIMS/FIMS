@@ -127,9 +127,9 @@ inline const T double_logistic(const T &median_asc, const T &slope_asc,
  *
  * Evaluates:
  *
- * \f$ (expr^2+C)^.5 \f$
+ * \f$ (x^2+C)^.5 \f$
  *
- * @param expr
+ * @param x value to keep positive
  * @param C default = 1e-5
  * @return
  */
