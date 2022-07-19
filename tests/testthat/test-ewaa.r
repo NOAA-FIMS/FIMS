@@ -1,26 +1,12 @@
-<<<<<<< HEAD
-  library(Rcpp)
-data(package = "FIMS")
-
-testthat("ewaa data can be added to model",{
-  
-
-=======
 data(package = "FIMS")
 
 test_that("ewaa data can be added to model", {
->>>>>>> main
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   ewaa_growth <- new(fims$EWAAgrowth)
   age_frame <- FIMSFrameAge(data_mile1)
   ewaa_data <- age_frame@weightatage
   ewaa_growth$ages <- unique(ewaa_data$age)
   ewaa_growth$weights <- unique(ewaa_data$value)
-<<<<<<< HEAD
-  expect_equal(ewaa_growth$evaluate(1), 0.005306555)
-
-}
-=======
   expect_equal(ewaa_growth$evaluate(1), 0.00053065552)
 
   ewaa_growth2 <- new(fims$EWAAgrowth)
@@ -32,4 +18,3 @@ test_that("ewaa data can be added to model", {
     ignore.case = FALSE
   )
 })
->>>>>>> main
