@@ -17,11 +17,19 @@ methods::setClass(
 )
 
 methods::setClass("FIMSFrameAge",
+<<<<<<< HEAD
     slots = list(
         weightatage = "data.frame",
         ages = "numeric"
     ),
     contains = "FIMSFrame"
+=======
+  slots = list(
+    weightatage = "data.frame",
+    ages = "numeric"
+  ),
+  contains = "FIMSFrame"
+>>>>>>> main
 )
 
 # setMethod: accessors ----
@@ -60,7 +68,11 @@ methods::setMethod(
 
 methods::setMethod(
   f = "plot",
+<<<<<<< HEAD
   signature = "FIMSFrameAge", 
+=======
+  signature = "FIMSFrameAge",
+>>>>>>> main
   definition = function(x) {
     y <- x@weightatage[["value"]]
     x_axis <- x@weightatage[["age"]]
@@ -74,7 +86,13 @@ methods::setMethod(
   signature = "FIMSFrame",
   definition = function(object) {
     message("data.frame of class '", class(object), "'")
+<<<<<<< HEAD
     if (length(object@data) == 0) return()
+=======
+    if (length(object@data) == 0) {
+      return()
+    }
+>>>>>>> main
     dat_types <- unique(object@data[[which(colnames(object@data) == "type")]])
     message("with the following 'types': ", paste0(dat_types, collapse = ", "))
     snames <- slotNames(object)

@@ -3,7 +3,12 @@
  *
  *
  * This File is part of the NOAA, National Marine Fisheries Service
+<<<<<<< HEAD
  * Fisheries Integrated Modeling System project. See LICENSE file for reuse information.
+=======
+ * Fisheries Integrated Modeling System project. See LICENSE file for reuse
+ * information.
+>>>>>>> main
  *
  *
  */
@@ -13,18 +18,18 @@
 #include "rcpp_objects/rcpp_fishing_mortality.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
-#include "rcpp_objects/rcpp_likelihoods.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
+#include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
 
 /**
- *
+ * @brief Create the TMB model object and add interface objects to it.
  */
 bool CreateTMBModel() {
-  for (int i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
+  for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
        i++) {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
   }
@@ -79,11 +84,19 @@ RCPP_MODULE(fims) {
       .field("slope", &LogisticSelectivityInterface::slope)
       .method("get_id", &LogisticSelectivityInterface::get_id);
 
+  Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
+      .constructor()
+      .method("get_id", &DnormDistributionsInterface::get_id)
+      .method("evaluate", &DnormDistributionsInterface::evaluate)
+      .field("x", &DnormDistributionsInterface::x)
+      .field("mean", &DnormDistributionsInterface::mean)
+      .field("sd", &DnormDistributionsInterface::sd);
+
   Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
-        .constructor()
-        .field("ages", &EWAAGrowthInterface::ages)
-        .field("weights", &EWAAGrowthInterface::weights)
-        .method("evaluate", &EWAAGrowthInterface::evaluate);
+      .constructor()
+      .field("ages", &EWAAGrowthInterface::ages)
+      .field("weights", &EWAAGrowthInterface::weights)
+      .method("evaluate", &EWAAGrowthInterface::evaluate);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
