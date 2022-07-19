@@ -33,39 +33,6 @@
 
 namespace fims {
 
-<<<<<<< HEAD
-/* @brief Base class for all growth functors.
- *
- * @tparam T The type of the growth functor.
- * */
-template<typename T>
-struct GrowthBase : public FIMSObject<T> {
-    
-    // id_g is the ID of the instance of the  growthBase class.
-    // this is like a memory tracker. 
-    // Assigning each one its own ID is a way to keep track of
-    // all the instances of the  growthBase class.
-    static uint32_t id_g;
-    
-    /* @brief Constructor.
-    */
-    GrowthBase() {
-        this->id = GrowthBase::id_g++;
-    }
-
-    /*
-    * @brief Calculates the  growth at the independent variable value.
-    * @param a The age at which to return weight of the fish (in kg).
-    */
-    virtual const T evaluate(const T& a) = 0;
-
-};
-
-template<typename T>
-uint32_t GrowthBase<T>::id_g = 0;
-
-}
-=======
 /**
  *  @brief Base class for all growth functors.
  *
@@ -94,6 +61,5 @@ template <typename T>
 uint32_t GrowthBase<T>::id_g = 0;
 
 }  // namespace fims
->>>>>>> main
 
 #endif /* POPULATION_DYNAMICS_GROWTH_BASE_HPP */

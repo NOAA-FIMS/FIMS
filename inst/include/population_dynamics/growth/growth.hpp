@@ -11,16 +11,10 @@
  * DEFINE guards for growth module outline to define the
  * growth hpp file if not already defined.
  */
-<<<<<<< HEAD
-#ifndef FIMS_POPULATION_DYNAMICS_GROWTH_HPP
-#define FIMS_POPULATION_DYNAMICS_GROWTH_HPP
-
-=======
 
 #ifndef FIMS_POPULATION_DYNAMICS_GROWTH_HPP
 #define FIMS_POPULATION_DYNAMICS_GROWTH_HPP
 
->>>>>>> main
 #include "functors/ewaa.hpp"
 #include "functors/growth_base.hpp"
 
