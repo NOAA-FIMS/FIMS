@@ -69,7 +69,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     dnorm.x = this->x.value;
     dnorm.mean = this->mean.value;
     dnorm.sd = this->sd.value;
-    return dnorm.evaluate(true);
+    return dnorm.evaluate(do_log);
   }
 
   bool add_to_fims_tmb() {
