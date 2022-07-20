@@ -13,33 +13,6 @@
 #include "rcpp_interface_base.hpp"
 
 /**
- * @brief Distributions Rcpp Interface
- *
- */
-class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
- public:
-  static uint32_t id_g;
-  uint32_t id;
-  static std::map<uint32_t, DistributionsInterfaceBase*> live_objects;
-
-  DistributionsInterfaceBase() {
-    this->id = DistributionsInterfaceBase::id_g++;
-    DistributionsInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
-
-  virtual ~DistributionsInterfaceBase() {}
-
-  virtual uint32_t get_id() = 0;
-
-  virtual double evaluate(bool do_log) = 0;
-};
-
-uint32_t DistributionsInterfaceBase::id_g = 1;
-std::map<uint32_t, DistributionsInterfaceBase*>
-    DistributionsInterfaceBase::live_objects;
-
-/**
  * @brief Rcpp interface for Dnorm as an S4 object. To instantiate
  * from R:
  * dnorm_ <- new(fims$TMBDnormDistribution)

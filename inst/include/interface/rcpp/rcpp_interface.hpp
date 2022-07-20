@@ -13,7 +13,7 @@
 
 #include "rcpp_objects/rcpp_fishing_mortality.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
-#include "rcpp_objects/rcpp_growth.hpp"
+#include "rcpp_objects/rcpp_ewaa.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"

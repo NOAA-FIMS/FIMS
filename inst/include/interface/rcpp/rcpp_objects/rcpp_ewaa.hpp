@@ -5,47 +5,15 @@
  * Fisheries Integrated Modeling System project. See LICENSE file
  * for reuse information.
  */
-#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
-#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_EWAA_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_EWAA_HPP
 
 #include "../../../population_dynamics/growth/growth.hpp"
 #include "rcpp_interface_base.hpp"
 
 /****************************************************************
- * Growth Rcpp interface                                   *
+ * EWAA Rcpp interface                                   *
  ***************************************************************/
-/**
- * @brief Rcpp interface that serves as the parent class for
- * Rcpp growth interfaces. This type should be inherited and not
- * called from R directly.
- *
- */
-class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
- public:
-  static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
-  uint32_t id;          /**< local id of the GrowthInterfaceBase object */
-  static std::map<uint32_t, GrowthInterfaceBase*> live_objects; /**<
-  map relating the ID of the GrowthInterfaceBase to the GrowthInterfaceBase
-  objects */
-
-  GrowthInterfaceBase() {
-    this->id = GrowthInterfaceBase::id_g++;
-    GrowthInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
-
-  virtual ~GrowthInterfaceBase() {}
-
-  /** @brief get_id method for child growth interface objects to inherit **/
-  virtual uint32_t get_id() = 0;
-
-  /** @brief evaluate method for child growth interface objects to inherit **/
-  virtual double evaluate(double age) = 0;
-};
-
-uint32_t GrowthInterfaceBase::id_g = 1;
-std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
-
 /**
  * @brief Rcpp interface for EWAAgrowth as an S4 object. To instantiate
  * from R:

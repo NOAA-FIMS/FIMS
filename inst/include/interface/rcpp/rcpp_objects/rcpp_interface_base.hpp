@@ -75,7 +75,71 @@ class FIMSRcppInterfaceBase {
     return false;
   }
 };
+
+
+/****************************************************************
+ * Growth Rcpp interface                                   *
+ ***************************************************************/
+/**
+ * @brief Rcpp interface that serves as the parent class for
+ * Rcpp growth interfaces. This type should be inherited and not
+ * called from R directly.
+ *
+ */
+class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
+ public:
+  static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
+  uint32_t id;          /**< local id of the GrowthInterfaceBase object */
+  static std::map<uint32_t, GrowthInterfaceBase*> live_objects; /**<
+  map relating the ID of the GrowthInterfaceBase to the GrowthInterfaceBase
+  objects */
+
+  GrowthInterfaceBase() {
+    this->id = GrowthInterfaceBase::id_g++;
+    GrowthInterfaceBase::live_objects[this->id] = this;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+  }
+
+  virtual ~GrowthInterfaceBase() {}
+
+  /** @brief get_id method for child growth interface objects to inherit **/
+  virtual uint32_t get_id() = 0;
+
+  /** @brief evaluate method for child growth interface objects to inherit **/
+  virtual double evaluate(double age) = 0;
+};
+
+/**
+ * @brief Distributions Rcpp Interface
+ *
+ */
+class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
+ public:
+  static uint32_t id_g;
+  uint32_t id;
+  static std::map<uint32_t, DistributionsInterfaceBase*> live_objects;
+
+  DistributionsInterfaceBase() {
+    this->id = DistributionsInterfaceBase::id_g++;
+    DistributionsInterfaceBase::live_objects[this->id] = this;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+  }
+
+  virtual ~DistributionsInterfaceBase() {}
+
+  virtual uint32_t get_id() = 0;
+
+  virtual double evaluate(bool do_log) = 0;
+};
+
 std::vector<FIMSRcppInterfaceBase*>
     FIMSRcppInterfaceBase::fims_interface_objects;
+
+uint32_t GrowthInterfaceBase::id_g = 1;
+std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
+
+uint32_t DistributionsInterfaceBase::id_g = 1;
+std::map<uint32_t, DistributionsInterfaceBase*>
+    DistributionsInterfaceBase::live_objects;
 
 #endif
