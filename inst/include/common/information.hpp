@@ -43,11 +43,11 @@ namespace fims {
         std::vector<T*> fixed_effects_parameters; // list of all fixed effects parameters
 
         //data objects
-        std::map<uint32_t, std::shared_ptr<fims::DataObject<double> > data_objects;
-        typedef typename std::map<uint32_t, std::shared_ptr<fims::DataObject<double> >::iterator data_iterator;
+        std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > > data_objects;
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >::iterator data_iterator;
 
         //life history modules
-        std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >;//hash map to link each object to its shared location in memory
+        std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;//hash map to link each object to its shared location in memory
         typedef typename std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >::iterator recruitment_model_iterator;
 
         std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
@@ -65,8 +65,8 @@ namespace fims {
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Population<T> > >::iterator population_iterator;
 
         //distributions
-        std::map<uint32_t, std::shared_ptr<fims::DistributionsBase> > distribution_models;
-        typedef typename std::map<uint32_t, std::shared_ptr<fims::DistributionsBase> >::iterator distribution_models_iterator;
+        std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >  distribution_models;
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >::iterator distribution_models_iterator;
 
         Information() {
 
@@ -118,7 +118,7 @@ namespace fims {
                     it != this->fleets.end(); ++it) {
 
                 //Initialize fleet object 
-                std::shared_ptr<fims::Fleet<T> > f = (*it).second;
+                std::shared_ptr<fims::Fleet<T> > f = (*it).second; //fleet object pointer initialized to second field in map
 
                 //set index data
                 if (f->observed_index_data_id != -999) {
@@ -211,6 +211,7 @@ namespace fims {
                 }
 
                 //initialize derived quantities containers
+                //TODO: make these generic indices instead of specific to age/year/season
                 f->catch_at_age.resize(nyears * nseasons * nages);
                 f->catch_at_age.resize(nyears * nseasons * nages);
                 f->age_composition.resize(nyears * nseasons);
