@@ -13,12 +13,11 @@
 #include <memory>
 #include <vector>
 
-#include "def.hpp"
-// #include "../interface/interface.hpp"
 #include "../distributions/distributions.hpp"
 #include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
+#include "def.hpp"
 #include "model_object.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/population/population.hpp"
@@ -44,11 +43,11 @@ namespace fims {
         std::vector<T*> fixed_effects_parameters; // list of all fixed effects parameters
 
         //data objects
-        std::map<uint32_t, std::shared_ptr<fims::DataObject<double> > data_objects;
-        typedef typename std::map<uint32_t, std::shared_ptr<fims::DataObject<double> >::iterator data_iterator;
+        std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > > data_objects;
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >::iterator data_iterator;
 
         //life history modules
-        std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >;//hash map to link each object to its shared location in memory
+        std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;//hash map to link each object to its shared location in memory
         typedef typename std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >::iterator recruitment_model_iterator;
 
         std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
@@ -66,8 +65,8 @@ namespace fims {
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Population<T> > >::iterator population_iterator;
 
         //distributions
-        std::map<uint32_t, std::shared_ptr<fims::DistributionsBase> > distribution_models;
-        typedef typename std::map<uint32_t, std::shared_ptr<fims::DistributionsBase> >::iterator distribution_models_iterator;
+        std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >  distribution_models;
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >::iterator distribution_models_iterator;
 
         Information() {
 
