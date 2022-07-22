@@ -34,7 +34,7 @@
 #include "../../common/model_object.hpp"
 #include "subpopulation.hpp"
 #include "../recruitment/recruitment.hpp"
-#include "../../maturity/maturity.hpp"
+#include "../maturity/maturity.hpp"
 #include "../growth/growth.hpp"
 #include "../fleet/fleet.hpp"
 
