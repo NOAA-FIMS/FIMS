@@ -91,7 +91,7 @@ RCPP_MODULE(fims) {
     Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
             .constructor()
             .method("get_id",  &DnormDistributionsInterface::get_id)
-            .method("evaluate",  &DnormDistributionsInterface::evaluate<double>)
+            .method("evaluate",  &DnormDistributionsInterface::evaluate)
             .field("x", &DnormDistributionsInterface::x)
             .field("mean", &DnormDistributionsInterface::mean)
             .field("sd", &DnormDistributionsInterface::sd);

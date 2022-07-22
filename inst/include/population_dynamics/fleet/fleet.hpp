@@ -19,35 +19,35 @@ namespace fims {
 
     /* @brief Base class for all fleets.
      *
-     * @tparam T The type of the fleet object.
+     * @tparam Type The type of the fleet object.
      * */
-    template<typename T>
-    struct Fleet : public FIMSObject<T> {
+    template<typename Type>
+    struct Fleet : public FIMSObject<Type> {
         static uint32_t id_g; /*!< reference id for fleet object*/
 
 
         //data objects
         int observed_index_data_id = -999;
-        std::shared_ptr<fims::DataObject<double> > observed_index_data;
+        std::shared_ptr<fims::DataObject<Type> > observed_index_data;
 
         int observed_agecomp_data_id = -999;
-        std::shared_ptr<fims::DataObject<double> > observed_agecomp_data;
+        std::shared_ptr<fims::DataObject<Type> > observed_agecomp_data;
 
         //likelihood components
         int index_likelihood_id = -999;
-        std::shared_ptr<fims::DistributionsBase<T> > index_likelihood;
+        std::shared_ptr<fims::DistributionsBase<Type> > index_likelihood;
 
         int agecomp_likelihood_id = -999;
-        std::shared_ptr<fims::DistributionsBase<T> > agecomp_likelihood;
+        std::shared_ptr<fims::DistributionsBase<Type> > agecomp_likelihood;
 
         //selectivity
         int selectivity_id = -999;
-        std::shared_ptr<fims::SelectivityBase<T> > selectivity;
+        std::shared_ptr<fims::SelectivityBase<Type> > selectivity;
 
         //derived quantities
-        std::vector<T> catch_at_age;
-        std::vector<T> catch_index;
-        std::vector<T> age_composition;
+        std::vector<Type> catch_at_age;
+        std::vector<Type> catch_index;
+        std::vector<Type> age_composition;
 
         /** 
          * @brief Constructor.
@@ -57,14 +57,14 @@ namespace fims {
         }
         //likelihood is a log likelihood. To do: figure out if these should be
         // negative log likelihood here or in the population loop...Andrea will think about this.
-        const T likelihood() {
-            return this->index_likelihood->evaluate(do_log = true)
-                    + this->agecomp_likelihood->evaluate(do_log = true);
+        const Type likelihood(bool do_log) {
+            return this->index_likelihood->evaluate(do_log)
+                    + this->agecomp_likelihood->evaluate(do_log);
         }
 
     };
-    template <class T>
-    uint32_t Fleet<T>::id_g = 0;
+    template <class Type>
+    uint32_t Fleet<Type>::id_g = 0;
 
 } // namespace fims
 
