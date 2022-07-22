@@ -43,7 +43,7 @@ namespace fims {
      * Container to hold user supplied data.
      */
     template<typename Type>
-    struct DataObject : public fims::ModelObject<Type> {
+    struct DataObject {
         static uint32_t id_g;
         std::vector<Type> data;
         size_t dimensions;
