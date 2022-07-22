@@ -34,6 +34,7 @@
 #include "../../common/model_object.hpp"
 #include "subpopulation.hpp"
 #include "../recruitment/recruitment.hpp"
+#include "../../maturity/maturity.hpp"
 #include "../growth/growth.hpp"
 #include "../fleet/fleet.hpp"
 
@@ -45,6 +46,7 @@ namespace fims {
      */
     template <typename Type>
     struct Population : public FIMSObject<Type> {
+        uint32_t id_g;
         size_t nyears;
         size_t nseasons;
         size_t nages;
@@ -53,12 +55,12 @@ namespace fims {
         std::vector<Type> mortality;
         std::vector<Type> maturity;
 
-        std::shared_ptr<fims::RecruitmentBase> recruitment_model;
-        std::shared_ptr<fims::GrowthBase> growth_model;
-        std::shared_ptr<fims::MaturityBase> maturity_model;
+        std::shared_ptr<fims::RecruitmentBase<Type>> recruitment_model;
+        std::shared_ptr<fims::GrowthBase<Type>> growth_model;
+        std::shared_ptr<fims::MaturityBase<Type>> maturity_model;
 
-        std::vector<std::shared_ptr<fims::Fleet> > fleets;
-        std::vector<std::shared_ptr<fims::Fleet> > surveys;
+        std::vector<std::shared_ptr<fims::Fleet<Type>> > fleets;
+        std::vector<std::shared_ptr<fims::Fleet<Type>> > surveys;
 
         Population() {
             this->id = Population::id_g++;
