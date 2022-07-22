@@ -22,35 +22,35 @@
 #include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
 
 /**
- *
+ * @brief Create the TMB model object and add interface objects to it.
  */
 bool CreateTMBModel() {
-    for (int i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
-            i++) {
-        FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
-    }
+  for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
+       i++) {
+    FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
+  }
 
-    // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-            fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-    d0->CreateModel();
+  // base model
+  std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+      fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  d0->CreateModel();
 
-    // first-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-            fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-    d1->CreateModel();
+  // first-order derivative
+  std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+      fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+  d1->CreateModel();
 
-    // second-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-            fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-    d2->CreateModel();
+  // second-order derivative
+  std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+      fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+  d2->CreateModel();
 
-    // third-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-            fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-    d3->CreateModel();
+  // third-order derivative
+  std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+      fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+  d3->CreateModel();
 
-    return true;
+  return true;
 }
 
 RCPP_EXPOSED_CLASS(Parameter)

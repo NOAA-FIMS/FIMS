@@ -16,5 +16,5 @@ test_that("dnorm", {
   dnorm_$mean$value <- 0
   dnorm_$sd$value <- 1
   # evaluate the density and compare with R
-  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
+  expect_equal(dnorm_$evaluate(TRUE), stats::dnorm(y, 0, 1, TRUE))
 })
