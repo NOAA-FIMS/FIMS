@@ -28,10 +28,10 @@ namespace fims {
 
         //data objects
         int observed_index_data_id = -999;
-        std::shared_ptr<fims::DataObject<double> observed_index_data;
+        std::shared_ptr<fims::DataObject<double> > observed_index_data;
 
         int observed_agecomp_data_id = -999;
-        std::shared_ptr<fims::DataObject<double> observed_agecomp_data;
+        std::shared_ptr<fims::DataObject<double> > observed_agecomp_data;
 
         //likelihood components
         int index_likelihood_id = -999;
@@ -55,7 +55,8 @@ namespace fims {
         Fleet() {
             this->id = Fleet::id_g++;
         }
-
+        //likelihood is a log likelihood. To do: figure out if these should be
+        // negative log likelihood here or in the population loop...Andrea will think about this.
         const T likelihood() {
             return this->index_likelihood->evaluate(do_log = true)
                     + this->agecomp_likelihood->evaluate(do_log = true);
