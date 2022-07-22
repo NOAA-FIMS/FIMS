@@ -46,7 +46,7 @@ namespace fims {
      */
     template <typename Type>
     struct Population : public FIMSObject<Type> {
-        uint32_t id_g;
+        static uint32_t id_g; /*!< reference id for population object*/
         size_t nyears;
         size_t nseasons;
         size_t nages;
