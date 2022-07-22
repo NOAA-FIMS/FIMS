@@ -118,7 +118,7 @@ namespace fims {
                     it != this->fleets.end(); ++it) {
 
                 //Initialize fleet object 
-                std::shared_ptr<fims::Fleet<T> > f = (*it).second;
+                std::shared_ptr<fims::Fleet<T> > f = (*it).second; //fleet object pointer initialized to second field in map
 
                 //set index data
                 if (f->observed_index_data_id != -999) {
@@ -211,6 +211,7 @@ namespace fims {
                 }
 
                 //initialize derived quantities containers
+                //TODO: make these generic indices instead of specific to age/year/season
                 f->catch_at_age.resize(nyears * nseasons * nages);
                 f->catch_at_age.resize(nyears * nseasons * nages);
                 f->age_composition.resize(nyears * nseasons);
