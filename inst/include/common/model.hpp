@@ -17,11 +17,9 @@
 #define FIMS_COMMON_MODEL_HPP
 
 #include <memory>
+#include <future>
 
-#include "../population_dynamics/fleet/fleet.hpp"
-#include "../population_dynamics/population/population.hpp"
-#include "../population_dynamics/recruitment/recruitment.hpp"
-#include "../population_dynamics/selectivity/selectivity.hpp"
+#include "information.hpp"
 
 namespace fims {
 
@@ -29,14 +27,13 @@ namespace fims {
  * Model base
  */
 template <typename T>
-class Model {
+class Model {//may need singleton
  public:
-  static std::shared_ptr<Model<T> > fims_model;
+  std::shared_ptr<fims::Information<T> > information;
   std::vector<std::shared_ptr<Population<T> > > populations;
   std::vector<std::shared_ptr<Fleet<T> > > fleets;
 };
-template <typename T>
-std::shared_ptr<Model<T> > Model<T>::fims_model = nullptr;
+
 
 }  // namespace fims
 

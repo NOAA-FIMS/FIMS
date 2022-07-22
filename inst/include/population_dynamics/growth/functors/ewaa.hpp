@@ -38,7 +38,10 @@ struct EWAAgrowth : public GrowthBase<T> {
    *
    * @param a  age of the fish, the age vector must start at zero
    */
-  virtual const T evaluate(const T& a) { return ewaa[a]; }
+  virtual const T evaluate(const double& a) {
+    T ret = ewaa[a];
+    return ret;
+  }
 };
 }  // namespace fims
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */

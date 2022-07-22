@@ -1,43 +1,71 @@
-/*
- * File:   fleet.hpp
- *
- * Author: Matthew Supernaw
- * National Oceanic and Atmospheric Administration
- * National Marine Fisheries Service
- * Email: matthew.supernaw@noaa.gov
- *
- * Created on September 30, 2021, 1:12 PM
+/*! \file fleet.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
- *
- * This software is a "United States Government Work" under the terms of the
- * United States Copyright Act.  It was written as part of the author's official
- * duties as a United States Government employee and thus cannot be copyrighted.
- * This software is freely available to the public for use. The National Oceanic
- * And Atmospheric Administration and the U.S. Government have not placed any
- * restriction on its use or reproduction.  Although all reasonable efforts have
- * been taken to ensure the accuracy and reliability of the software and data,
- * the National Oceanic And Atmospheric Administration and the U.S. Government
- * do not and cannot warrant the performance or results that may be obtained by
- * using this  software or data. The National Oceanic And Atmospheric
- * Administration and the U.S. Government disclaim all warranties, express or
- * implied, including warranties of performance, merchantability or fitness
- * for any particular purpose.
- *
- * Please cite the author(s) in any work or product based on this material.
- *
+ * Refer to the LICENSE file for reuse information.
+ * 
+ * The purpose of this file is to declare the growth functor class
+ * which is the base class for all growth functors.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP
 
 #include "../../common/model_object.hpp"
+#include "../../common/data_object.hpp"
+#include "../../distributions/distributions.hpp"
+#include "../selectivity/selectivity.hpp"
 
 namespace fims {
 
-template <typename T>
-struct Fleet {};
+    /* @brief Base class for all fleets.
+     *
+     * @tparam T The type of the fleet object.
+     * */
+    template<typename T>
+    struct Fleet : public FIMSObject<T> {
+        static uint32_t id_g; /*!< reference id for fleet object*/
 
-}  // namespace fims
+
+        //data objects
+        int observed_index_data_id = -999;
+        std::shared_ptr<fims::DataObject<double> > observed_index_data;
+
+        int observed_agecomp_data_id = -999;
+        std::shared_ptr<fims::DataObject<double> > observed_agecomp_data;
+
+        //likelihood components
+        int index_likelihood_id = -999;
+        std::shared_ptr<fims::DistributionsBase<T> > index_likelihood;
+
+        int agecomp_likelihood_id = -999;
+        std::shared_ptr<fims::DistributionsBase<T> > agecomp_likelihood;
+
+        //selectivity
+        int selectivity_id = -999;
+        std::shared_ptr<fims::SelectivityBase<T> > selectivity;
+
+        //derived quantities
+        std::vector<T> catch_at_age;
+        std::vector<T> catch_index;
+        std::vector<T> age_composition;
+
+        /** 
+         * @brief Constructor.
+         */
+        Fleet() {
+            this->id = Fleet::id_g++;
+        }
+        //likelihood is a log likelihood. To do: figure out if these should be
+        // negative log likelihood here or in the population loop...Andrea will think about this.
+        const T likelihood() {
+            return this->index_likelihood->evaluate(do_log = true)
+                    + this->agecomp_likelihood->evaluate(do_log = true);
+        }
+
+    };
+    template <class T>
+    uint32_t Fleet<T>::id_g = 0;
+
+} // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

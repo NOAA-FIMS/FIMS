@@ -33,7 +33,7 @@ for FIMS model objects.
 }
 \examples{
 create_fims_rcpp_interface(
-  "logistic_selectivity",
+  "LogisticSelectivityInterface",
   "LogisticSelectivity",
   "selectivity_interface_base",
   "selectivity_models",
