@@ -21,51 +21,70 @@ namespace fims {
      *
      * @tparam Type The type of the fleet object.
      * */
-    template<typename Type>
-    struct Fleet : public FIMSObject<Type> {
+    template<class Type>
+    struct Fleet : public FIMSObject<Type> { 
         static uint32_t id_g; /*!< reference id for fleet object*/
 
 
         //data objects
-        int observed_index_data_id = -999;
-        std::shared_ptr<fims::DataObject<Type> > observed_index_data;
+        int observed_index_data_id = -999; /*!< id of observed index data object*/
+        std::shared_ptr<fims::DataObject<Type> > observed_index_data; /*!< observed index data object*/
 
-        int observed_agecomp_data_id = -999;
-        std::shared_ptr<fims::DataObject<Type> > observed_agecomp_data;
+        int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
+        std::shared_ptr<fims::DataObject<Type> > observed_agecomp_data; /*!< observed agecomp data object*/
 
         //likelihood components
-        int index_likelihood_id = -999;
-        std::shared_ptr<fims::DistributionsBase<Type> > index_likelihood;
+        int index_likelihood_id = -999; /*!< id of index likelihood component*/
+        std::shared_ptr<fims::DistributionsBase<Type> > index_likelihood; /*!< index likelihood component*/
 
-        int agecomp_likelihood_id = -999;
-        std::shared_ptr<fims::DistributionsBase<Type> > agecomp_likelihood;
+        int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
+        std::shared_ptr<fims::DistributionsBase<Type> > agecomp_likelihood; /*!< agecomp likelihood component*/
 
         //selectivity
-        int selectivity_id = -999;
-        std::shared_ptr<fims::SelectivityBase<Type> > selectivity;
+        int selectivity_id = -999;  /*!< id of selectivity component*/
+        std::shared_ptr<fims::SelectivityBase<Type> > selectivity; /*!< selectivity component*/
 
         //derived quantities
-        std::vector<Type> catch_at_age;
-        std::vector<Type> catch_index;
-        std::vector<Type> age_composition;
+        std::vector<Type> catch_at_age; /*!<derived quantity catch at age*/
+        std::vector<Type> catch_index; /*!<derived quantity catch index*/
+        std::vector<Type> age_composition; /*!<derived quantity age composition*/
 
         /** 
          * @brief Constructor.
          */
         Fleet() {
-            this->id = Fleet::id_g++;
+            this->id = Fleet::id_g++; 
         }
-        //likelihood is a log likelihood. To do: figure out if these should be
-        // negative log likelihood here or in the population loop...Andrea will think about this.
+
+        /**
+         * @brief Intialize Fleet Class
+         * @param nyears The number of years in the model.
+         * @param nages The number of ages in the model.
+        */
+        void Initialize(int nyears, int nages) {
+            this -> nyears = nyears; 
+            this -> nages = nages; 
+
+            catch_at_age.resize(nyears * nages);
+            catch_index.resize(nyears); // assume index is for all ages.
+            age_composition.resize(nyears * nages);
+        }
+
+        /**
+         * @brief Sum of index and agecomp likelihoods
+         * @param do_log Whether to take the log of the likelihood.
+         */
         const Type likelihood(bool do_log) {
             return this->index_likelihood->evaluate(do_log)
                     + this->agecomp_likelihood->evaluate(do_log);
         }
 
     };
+
+    // default id of the singleton fleet class
     template <class Type>
     uint32_t Fleet<Type>::id_g = 0;
 
-} // namespace fims
+} // end namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */
