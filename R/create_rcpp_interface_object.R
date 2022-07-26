@@ -28,6 +28,7 @@ create_fims_rcpp_interface <- function(interface_name = character(),
   )
   itypes <- c("d0", "d1", "d2", "d3")
   mtypes <- c("model0", "model1", "model2", "model3")
+  # mtypes <- paste0(model, c("_model0", "_model1", "_model2", "_model3"))
 
   cat("class ")
   cat(interface_name)
@@ -51,11 +52,11 @@ create_fims_rcpp_interface <- function(interface_name = character(),
   cat("virtual ~")
   cat(paste0(interface_name, "() {}\n\n\n"))
 
-  cat("virtual ~")
-  cat("uint32_t get_id(){return this->id}\n\n\n")
+  cat("virtual ")
+  cat("uint32_t get_id(){return this->id;}\n\n\n")
 
 
-  cat("virtual ~")
+  cat("virtual ")
   cat("bool add_to_fims_tmb(){\n")
   for (i in 1:4) {
     cat(paste0("    std::shared_ptr<fims::Information<", types[i]))
