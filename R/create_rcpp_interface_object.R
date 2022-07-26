@@ -47,9 +47,15 @@ create_fims_rcpp_interface <- function(interface_name = character(),
   cat(base_class)
   cat("() {}\n\n")
 
+
+  cat("virtual ~")
+  cat(paste0(interface_name, "() {}\n\n\n"))
+
+  cat("virtual ~")
   cat("uint32_t get_id(){return this->id}\n\n\n")
 
 
+  cat("virtual ~")
   cat("bool add_to_fims_tmb(){\n")
   for (i in 1:4) {
     cat(paste0("    std::shared_ptr<fims::Information<", types[i]))
@@ -72,10 +78,11 @@ create_fims_rcpp_interface <- function(interface_name = character(),
     cat("> >();")
     cat("\n\n")
 
+    cat("\n   ")
+    cat(mtypes[i])
+    cat("->id = this->id;\n   ")
+
     for (j in 1:length(parameters)) {
-      cat("\n   ")
-      cat(mtypes[i])
-      cat("->id = this->id;\n   ")
       cat(mtypes[i])
       cat("->")
       cat(parameters[j])
@@ -88,14 +95,14 @@ create_fims_rcpp_interface <- function(interface_name = character(),
       cat("      if (this->")
       cat(parameters[j])
       cat(".is_random_effect) {\n          ")
-      cat(mtypes[i])
+      cat(itypes[i])
       cat("->RegisterRandomEffect(")
       cat(mtypes[i])
       cat("->")
       cat(parameters[j])
       cat(");\n")
       cat("   } else {\n      ")
-      cat(mtypes[i])
+      cat(itypes[i])
       cat("->RegisterParameter(")
       cat(mtypes[i])
       cat("->")
@@ -113,14 +120,17 @@ create_fims_rcpp_interface <- function(interface_name = character(),
     cat(mtypes[i])
     cat(";\n\n\n")
   }
+
+  cat("return true;\n\n\n")
+
   cat("}\n\n};")
 
-  cat("//Add the following to the RCpp module definition\n\n")
+  cat("\n//Add the following to the RCpp module definition: rcpp_interface.hpp\n\n")
 
   cat("Rcpp::class_<")
   cat(interface_name)
   cat(">(\"")
-  cat(interface_name)
+  cat(sub("Interface", "", interface_name))
   cat("\"")
   cat(")\n.constructor()\n")
   cat(".method(\"get_id\",  &")
