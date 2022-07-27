@@ -3,7 +3,8 @@ name: run-doxygen
 # The default build trigger is to run the action on every push for any branch
 on:
   push:
-    branches: [main, master]
+    # pull_request:
+    #   branches: [main, master]
   # To run the default repository branch weekly on sunday, uncomment the following 2 lines
   #schedule:
     #- cron: '0 0 * * 0'
@@ -14,23 +15,23 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    
+
     steps:
     - name: Fetching sources
       uses: actions/checkout@v2
-    
+
     - name: Installing build dependencies
       run: |
         sudo apt update
         sudo apt install cmake doxygen gcc git ninja-build
-  
+
     - name: get last commit msg
       id: commit-msg
       run: |
         git tag
         last_commit_msg=$(git log -1 --pretty=%B)
         echo "::set-output name=msg::${last_commit_msg}"
-    
+
     - name: Building HTML documentation with Doxygen
     # Do not run mkdir docs and mv build/html docs locally
       run: |
@@ -42,7 +43,7 @@ jobs:
     - name: Push docs to FIMS-docs repo
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
-        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }} 
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
         source_file: 'docs'
         destination_repo: 'NOAA-FIMS/FIMS-docs'
