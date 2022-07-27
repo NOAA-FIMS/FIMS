@@ -23,7 +23,7 @@ jobs:
     - name: Installing build dependencies
       run: |
         sudo apt update
-        sudo apt install cmake doxygen-1.9.3 gcc git ninja-build
+        sudo apt install cmake doxygen gcc git ninja-build
 
     - name: get last commit msg
       id: commit-msg
