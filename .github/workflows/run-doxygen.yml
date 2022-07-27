@@ -33,6 +33,7 @@ jobs:
         echo "::set-output name=msg::${last_commit_msg}"
 
     - name: Building HTML documentation with Doxygen
+      failure-mode: warnings
     # Do not run mkdir docs and mv build/html docs locally
       run: |
         cmake -S . -B build -G Ninja
