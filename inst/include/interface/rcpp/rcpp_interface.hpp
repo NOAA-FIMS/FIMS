@@ -19,7 +19,7 @@
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
-#include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
+#include "rcpp_objects/rcpp_tmb_distribution.hpp"
 
 /**
  * @brief Create the TMB model object and add interface objects to it.
@@ -93,6 +93,14 @@ RCPP_MODULE(fims) {
       .field("ages", &EWAAGrowthInterface::ages)
       .field("weights", &EWAAGrowthInterface::weights)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
+
+  Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")
+      .constructor()
+      .method("get_id",  &DlnormDistributionsInterface::get_id)
+      .method("evaluate", &DlnormDistributionsInterface::evaluate)
+      .field("x", &DlnormDistributionsInterface::x)
+      .field("meanlog", &DlnormDistributionsInterface::meanlog)
+      .field("sdlog", &DlnormDistributionsInterface::sdlog);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
