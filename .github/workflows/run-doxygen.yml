@@ -34,8 +34,9 @@ jobs:
 
     - name: Building HTML documentation with Doxygen
     # Do not run mkdir docs and mv build/html docs locally
+    # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
       run: |
-        cmake -S . -B build -G Ninja
+        cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=YES
         cmake --build build --parallel 16
         mv build/html ./
         mv ./html ./docs

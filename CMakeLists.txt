@@ -45,7 +45,6 @@ IF(BUILD_DOC)
   # set(DOXYGEN_ENABLE_PREPROCESSING NO)
   set(DOXYGEN_QUIET YES)
   set(DOXYGEN_USE_MATHJAX YES)
-  set(DOXYGEN_WARN_AS_ERROR YES)
 
   doxygen_add_docs(fims_doxygen
     inst/include
