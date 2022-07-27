@@ -11,10 +11,10 @@ public:
 virtual ~BevertonHoltRecruitmentInterface() {}
 
 
-virtual ~uint32_t get_id(){return this->id}
+virtual uint32_t get_id(){return this->id;}
 
 
-virtual ~bool add_to_fims_tmb(){
+virtual bool add_to_fims_tmb(){
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
     fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
