@@ -400,6 +400,67 @@ T lgamma(T x) {// x must be positive
     T logGamma = (x - 0.5) * log(x) - x + halfLogTwoPi + series;
     return logGamma;
 }
+  
+  
+template<typename T>
+T LogGammaLanczos(T x) {
+    // Log of Gamma from Lanczos with g=5, n=6/7
+    // not in A & S 
+    static const T coef[6] = {76.18009172947146,
+        -86.50532032941677, 24.01409824083091,
+        -1.231739572450155, 0.1208650973866179E-2,
+        -0.5395239384953E-5};
+    T LogSqrtTwoPi = 0.91893853320467274178;
+    T denom = x + 1;
+    T y = x + 5.5;
+    T series = 1.000000000190015;
+    for (int i = 0; i < 6; ++i) {
+        series += coef[i] / denom;
+        denom += 1.0;
+    }
+    return (LogSqrtTwoPi + (x + 0.5) * log(y) -
+            y + log(series / x));
+}
+
+template<typename T>
+ T LogGammaContinued(T x) {
+    // A & S eq. 6.1.48 (continuing fraction)
+    T a0 = 1.0 / 12;
+    T a1 = 1.0 / 30;
+    T a2 = 53.0 / 210;
+    T a3 = 195.0 / 371;
+    T a4 = 22999.0 / 22737;
+    T a5 = 29944523.0 / 19733142;
+    T a6 = 109535241009.0 / 48264275462;
+
+    T t6 = a6 / x;
+    T t5 = a5 / (x + t6);
+    T t4 = a4 / (x + t5);
+    T t3 = a3 / (x + t4);
+    T t2 = a2 / (x + t3);
+    T t1 = a1 / (x + t2);
+    T t0 = a0 / (x + t1);
+
+    T result = t0 - x + ((x - 0.5) *
+            log(x)) +
+            (0.5 * log(2 * M_PI));
+
+    return result;
+}
+
+template<typename T>
+T LogGammaSeries(T z) {
+    // A & S 6.1.41 (Stirling's approximation)
+    T x1 = (z - 0.5) * log(z);
+    T x3 = 0.5 * log(2 * M_PI);
+
+    T x4 = 1 / (12 * z);
+    T x5 = 1 / (360 * z * z * z);
+    T x6 = 1 / (1260 * z * z * z * z * z);
+    T x7 = 1 / (1680 * z * z * z * z * z * z * z);
+    // more terms possible
+    return x1 - z + x3 + x4 - x5 + x6 - x7;
+}
 
 template<typename T>
 std::vector<T> lgamma(const std::vector<T>& v) {
