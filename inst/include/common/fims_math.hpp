@@ -419,19 +419,33 @@ T sum(const std::vector<T>& v) {
     return ret;
 }
 
+/**
+ * Multinomial Probability Density function. p is internally normalized to sum 1.
+ * 
+ * @brief 
+ * 
+ * @param x
+ * @param p
+ * @param ret_log
+ * @return 
+ */
 template <class T>
 T dmultinom(std::vector<T> x, std::vector<T> p, bool ret_log = false) {
 
 
     std::vector<T> ret2(x.size());
     std::vector<T> xp1(x.size());
+    T sum_p = 0.0;
+    //normalize p
     for (int i = 0; i < x.size(); i++) {
-        if (p[i] > 1.0) {
-            std::cout << "Probabilty vector contains values greater than 1.\n";
-            return 0;
-        }
+        sum_p += p[i];
+    }
+
+    for (int i = 0; i < x.size(); i++) {
+        p[i] /= sum_p;
         xp1[i] = x[i] + 1.0;
         ret2[i] = x[i] * std::log(p[i]);
+
     }
 
 
