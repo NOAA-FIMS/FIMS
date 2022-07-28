@@ -422,31 +422,7 @@ T LogGammaLanczos(T x) {
             y + log(series / x));
 }
 
-template<typename T>
- T LogGammaContinued(T x) {
-    // A & S eq. 6.1.48 (continuing fraction)
-    T a0 = 1.0 / 12;
-    T a1 = 1.0 / 30;
-    T a2 = 53.0 / 210;
-    T a3 = 195.0 / 371;
-    T a4 = 22999.0 / 22737;
-    T a5 = 29944523.0 / 19733142;
-    T a6 = 109535241009.0 / 48264275462;
 
-    T t6 = a6 / x;
-    T t5 = a5 / (x + t6);
-    T t4 = a4 / (x + t5);
-    T t3 = a3 / (x + t4);
-    T t2 = a2 / (x + t3);
-    T t1 = a1 / (x + t2);
-    T t0 = a0 / (x + t1);
-
-    T result = t0 - x + ((x - 0.5) *
-            log(x)) +
-            (0.5 * log(2 * M_PI));
-
-    return result;
-}
 
 template<typename T>
 T LogGammaSeries(T z) {
