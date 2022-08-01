@@ -117,10 +117,10 @@ namespace fims {
             for (fleet_iterator it = this->fleets.begin();
                     it != this->fleets.end(); ++it) {
 
-                //Initialize fleet object 
+                //Initialize fleet object
                 std::shared_ptr<fims::Fleet<T> > f = (*it).second;
 
-                f -> Initialize();
+                f -> Initialize(nyears, nages);
 
                 //set index data
                 if (f->observed_index_data_id != -999) {
@@ -176,12 +176,12 @@ namespace fims {
                     //log error
                 }
 
-                //set index likelihood 
+                //set index likelihood
                 if (f->index_likelihood_id != -999) {
 
                     uint32_t ind_like_id = static_cast<uint32_t> (f->index_likelihood_id); //cast as unsigned integer
                     distribution_models_iterator it = this->distribution_models.find(ind_like_id); //if find, set it, otherwise invalid
-                    
+
                     if (it != this->distribution_models.end()) {
                         f->index_likelihood = (*it).second; //elements in container held in pair (first is id, second is object - shared pointer to distribution)
                     } else {
@@ -194,7 +194,7 @@ namespace fims {
                     //log error
                 }
 
-                //set agecomp likelihood 
+                //set agecomp likelihood
                 if (f->agecomp_likelihood_id != -999) {
 
                     uint32_t ac_like_id = static_cast<uint32_t> (f->agecomp_likelihood_id); //cast as unsigned integer
