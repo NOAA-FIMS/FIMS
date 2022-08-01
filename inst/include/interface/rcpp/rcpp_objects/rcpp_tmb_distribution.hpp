@@ -521,4 +521,149 @@ public:
     return true;
   }
 };
+
+class DMultinomInterface : public DistributionsInterfaceBase {
+public:
+
+   std::vector<double> x;
+   std::vector<double> p;
+
+
+   DMultinomInterface() : DistributionsInterfaceBase() {}
+
+virtual ~DMultinomInterface() {}
+
+
+virtual uint32_t get_id(){return this->id;}
+
+  /**
+   * @brief Evaluate multinomial probability density function, default returns the
+   * log of the pdf
+   *
+   * @tparam T
+   * @return log pdf
+   */
+  double evaluate(bool do_log)
+  {
+    fims::DMultinom<double> dmultinom;
+    dmultinom.x = this->x.value;
+    dmultinom.p = this->p.value;
+    return dmultinom.evaluate(do_log);
+  }
+
+virtual bool add_to_fims_tmb(){
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+    fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+   std::shared_ptr<fims::DMultinom<TMB_FIMS_REAL_TYPE> > model0 =
+   std::make_shared<fims::DMultinom<TMB_FIMS_REAL_TYPE> >();
+
+
+   model0->id = this->id;
+   model0->x= this->x.value;
+   if (this->x.estimated) {
+        if (this->x.is_random_effect) {
+          d0->RegisterRandomEffect(model0->x);
+   } else {
+      d0->RegisterParameter(model0->x);
+   }
+}
+model0->p= this->p.value;
+   if (this->p.estimated) {
+        if (this->p.is_random_effect) {
+          d0->RegisterRandomEffect(model0->p);
+   } else {
+      d0->RegisterParameter(model0->p);
+   }
+}
+   d0->distribution_models[model0->id]=model0;
+
+
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+    fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+
+   std::shared_ptr<fims::DMultinom<TMB_FIMS_FIRST_ORDER> > model1 =
+   std::make_shared<fims::DMultinom<TMB_FIMS_FIRST_ORDER> >();
+
+
+   model1->id = this->id;
+   model1->x= this->x.value;
+   if (this->x.estimated) {
+        if (this->x.is_random_effect) {
+          d1->RegisterRandomEffect(model1->x);
+   } else {
+      d1->RegisterParameter(model1->x);
+   }
+}
+model1->p= this->p.value;
+   if (this->p.estimated) {
+        if (this->p.is_random_effect) {
+          d1->RegisterRandomEffect(model1->p);
+   } else {
+      d1->RegisterParameter(model1->p);
+   }
+}
+   d1->distribution_models[model1->id]=model1;
+
+
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+    fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+
+   std::shared_ptr<fims::DMultinom<TMB_FIMS_SECOND_ORDER> > model2 =
+   std::make_shared<fims::DMultinom<TMB_FIMS_SECOND_ORDER> >();
+
+
+   model2->id = this->id;
+   model2->x= this->x.value;
+   if (this->x.estimated) {
+        if (this->x.is_random_effect) {
+          d2->RegisterRandomEffect(model2->x);
+   } else {
+      d2->RegisterParameter(model2->x);
+   }
+}
+model2->p= this->p.value;
+   if (this->p.estimated) {
+        if (this->p.is_random_effect) {
+          d2->RegisterRandomEffect(model2->p);
+   } else {
+      d2->RegisterParameter(model2->p);
+   }
+}
+   d2->distribution_models[model2->id]=model2;
+
+
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+    fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+
+   std::shared_ptr<fims::DMultinom<TMB_FIMS_THIRD_ORDER> > model3 =
+   std::make_shared<fims::DMultinom<TMB_FIMS_THIRD_ORDER> >();
+
+
+   model3->id = this->id;
+   model3->x= this->x.value;
+   if (this->x.estimated) {
+        if (this->x.is_random_effect) {
+          d3->RegisterRandomEffect(model3->x);
+   } else {
+      d3->RegisterParameter(model3->x);
+   }
+}
+model3->p= this->p.value;
+   if (this->p.estimated) {
+        if (this->p.is_random_effect) {
+          d3->RegisterRandomEffect(model3->p);
+   } else {
+      d3->RegisterParameter(model3->p);
+   }
+}
+   d3->distribution_models[model3->id]=model3;
+
+
+return true;
+
+
+}
+
+};
 #endif
