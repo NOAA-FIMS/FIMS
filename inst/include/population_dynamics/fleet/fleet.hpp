@@ -3,7 +3,7 @@
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
- * 
+ *
  * The purpose of this file is to declare the growth functor class
  * which is the base class for all growth functors.
  */
@@ -22,8 +22,10 @@ namespace fims {
      * @tparam Type The type of the fleet object.
      * */
     template<class Type>
-    struct Fleet : public FIMSObject<Type> { 
+    struct Fleet : public FIMSObject<Type> {
         static uint32_t id_g; /*!< reference id for fleet object*/
+        size_t nyears; /*!< the number of years in the model*/
+        size_t nages; /*!< the number of ages in the model*/
 
 
         //data objects
@@ -49,11 +51,11 @@ namespace fims {
         std::vector<Type> catch_index; /*!<derived quantity catch index*/
         std::vector<Type> age_composition; /*!<derived quantity age composition*/
 
-        /** 
+        /**
          * @brief Constructor.
          */
         Fleet() {
-            this->id = Fleet::id_g++; 
+            this->id = Fleet::id_g++;
         }
 
         /**
@@ -62,8 +64,8 @@ namespace fims {
          * @param nages The number of ages in the model.
         */
         void Initialize(int nyears, int nages) {
-            this -> nyears = nyears; 
-            this -> nages = nages; 
+            this -> nyears = nyears;
+            this -> nages = nages;
 
             catch_at_age.resize(nyears * nages);
             catch_index.resize(nyears); // assume index is for all ages.
