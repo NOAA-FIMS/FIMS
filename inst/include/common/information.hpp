@@ -48,7 +48,7 @@ namespace fims {
 
         //life history modules
         std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;//hash map to link each object to its shared location in memory
-        typedef typename std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >::iterator recruitment_model_iterator;
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >::iterator recruitment_models_iterator;
 
         std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >::iterator selectivity_models_iterator;
@@ -226,6 +226,29 @@ namespace fims {
 
                 std::shared_ptr<fims::Population<T> > p = (*it).second;
                 //error check and set population elements here
+            
+                p -> Initialize(nyears, nseasons, nages);
+
+                //set recruitment
+               if (p->recruitment_id != -999) {
+
+                    uint32_t recruit_id = static_cast<uint32_t> (p->recruitment_id);
+                    recruitment_model_iterator it = this->recruitment_models.find(recruit_id);
+
+                    if (it != this->recruitment_models.end()) {
+                        f->recruitment = (*it).second;
+                    } else {
+                        valid_model = false;
+                        //log error
+                    }
+
+                } else {
+                    valid_model = false;
+                    //log error
+                }
+                //set growth
+
+                //set maturity
             }
             return valid_model;
         }
