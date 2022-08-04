@@ -50,18 +50,31 @@ namespace fims {
         size_t nyears;
         size_t nseasons;
         size_t nages;
-        std::vector<Type> ages;
 
-        std::vector<Type> mortality;
+        std::vector<Type> ages;
+        std::vector<Type> mortality_M;
+        std::vector<Type> mortality_F;
+        std::vector<Type> mortality_Z;
         std::vector<Type> maturity;
 
-        std::shared_ptr<fims::RecruitmentBase<Type>> recruitment_model;
-        std::shared_ptr<fims::GrowthBase<Type>> growth_model;
-        std::shared_ptr<fims::MaturityBase<Type>> maturity_model;
+        ///recruitment
+        int recruitment_id = -999; /*!< id of recruitment model object*/
+        std::shared_ptr<fims::RecruitmentBase<Type>> recruitment;
 
+        //growth
+        int growth_id = -999; /*!< id of growth model object*/
+        std::shared_ptr<fims::GrowthBase<Type>> growth;
+
+        //maturity
+        int maturity_id = -999; /*!< id of maturity model object*/
+        std::shared_ptr<fims::MaturityBase<Type>> maturity;
+
+        //fleet
+        int fleet_id = -999; /*!< id of fleet model object*/
         std::vector<std::shared_ptr<fims::Fleet<Type>> > fleets;
-        std::vector<std::shared_ptr<fims::Fleet<Type>> > surveys;
-
+        
+        //std::vector<std::shared_ptr<fims::Fleet<Type>> > surveys;
+//
         Population() {
             this->id = Population::id_g++;
 
