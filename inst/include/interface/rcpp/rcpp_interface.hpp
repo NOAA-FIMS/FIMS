@@ -102,11 +102,13 @@ RCPP_MODULE(fims) {
       .field("meanlog", &DlnormDistributionsInterface::meanlog)
       .field("sdlog", &DlnormDistributionsInterface::sdlog);
 
-  Rcpp::class_<DMultinomInterface>("DMultinom")
+  Rcpp::class_<DmultinomInterface>("TMBDmultinomDistribution")
       .constructor()
-      .method("get_id",  &DMultinomInterface::get_id)
-      .field("x", &DMultinomInterface::x)
-      .field("p", &DMultinomInterface::p);
+      .method("evaluate", &DmultinomInterface::evaluate)
+      .method("get_id",  &DmultinomInterface::get_id)
+      .field("x", &DmultinomInterface::x)
+      .field("p", &DmultinomInterface::p);
+
 }
 
 #endif /* RCPP_INTERFACE_HPP */
