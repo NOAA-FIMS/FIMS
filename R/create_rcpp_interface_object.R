@@ -9,7 +9,7 @@
 #' @export
 #' @examples
 #' create_fims_rcpp_interface(
-#' "DmultinomInterface",
+#' "DmultinomDistributionsInterface",
 #' "Dmultinom",
 #' "DistributionsInterfaceBase",
 #' "distribution_models",
