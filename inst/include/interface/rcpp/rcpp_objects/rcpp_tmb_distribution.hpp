@@ -530,7 +530,7 @@ public:
  *
  */
 template <typename T>
-class DmultinomInterface : public DistributionsInterfaceBase
+class DmultinomDistributionsInterface : public DistributionsInterfaceBase
 {
   using Vector = typename ModelTraits<T>::EigenVector;
 public:
@@ -539,29 +539,12 @@ public:
   Vector x; /*!< Vector of length K of integers */
   Vector p; /*!< Vector of length K, specifying the probability for the K classes (note, unlike in R these must sum to 1). */                  
 
-  DmultinomInterface() : DistributionsInterfaceBase() {}
+  DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
 
-  virtual ~DmultinomInterface() {}
+  virtual ~DmultinomDistributionsInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
-
-  /**
-   * @brief Create a map of input numeric vectors
-   * @param x T vector of length K of integers in dmultinom
-   * @param p T vector of length K, specifying the probability for the K
-              classes (note, unlike in R these must sum to 1)
-   * @return std::map<T, T>
-   *
-   * */
-  // inline std::map<double, double> make_map(std::vector<double> x,
-  //                                          std::vector<double> p) {
-  //   std::map<double, double> dmultinom_map;
-  //   for (uint32_t i = 0; i < x.size(); i++) {
-  //     dmultinom_map.insert(std::pair<double, double>(x[i], p[i]));
-  //   }
-  //   return dmultinom_map;
-  // }
-
+  
   /**
    * @brief Evaluate multinom probability density function, default returns the
    * log of the pdf
