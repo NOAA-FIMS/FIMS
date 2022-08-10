@@ -1,4 +1,4 @@
-# Top level CMakeLists.txt: setting up top level project dependencies 
+# Top level CMakeLists.txt: setting up top level project dependencies
 # and options. CMake Referecen documentation can be found here:
 # https://cmake.org/cmake/help/v3.22/
 cmake_minimum_required(VERSION 3.14)
@@ -17,7 +17,7 @@ FetchContent_Declare(
   URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip
 )
 
-# For Windows: Prevent overriding the parent project's compiler/linker 
+# For Windows: Prevent overriding the parent project's compiler/linker
 # settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
@@ -39,10 +39,10 @@ option(BUILD_DOC "Build documentation" ON)
 IF(BUILD_DOC)
   find_package(Doxygen)
 
-  # Disable all preprocessing so doxygen will read all statements 
-  # when evaluating conditional compilation statements 
+  # Disable all preprocessing so doxygen will read all statements
+  # when evaluating conditional compilation statements
   # (e.g., #ifdef in fims_math.h)
-  set(DOXYGEN_ENABLE_PREPROCESSING NO) 
+  # set(DOXYGEN_ENABLE_PREPROCESSING NO)
   set(DOXYGEN_QUIET YES)
   set(DOXYGEN_USE_MATHJAX YES)
 
@@ -53,7 +53,7 @@ IF(BUILD_DOC)
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Building documentation with Doxygen.")
 ENDIF()
-  
+
 # Set up Rcpp
 FetchContent_Declare(
   rcpp
@@ -65,10 +65,10 @@ FetchContent_MakeAvailable(rcpp)
 MESSAGE(STATUS "Looking for R executable")
 
 EXECUTE_PROCESS(
-  COMMAND which R 
+  COMMAND which R
   OUTPUT_VARIABLE R_EXECUTABLE)
 
-MESSAGE(STATUS "R_EXECUTABLE is ${R_EXECUTABLE}") 
+MESSAGE(STATUS "R_EXECUTABLE is ${R_EXECUTABLE}")
 
 EXECUTE_PROCESS(
 		COMMAND R "--slave" "--no-save" "-e" "cat(R.home())"
@@ -91,7 +91,7 @@ target_include_directories(fims_test
 )
 
 # Add compile definition STD_LIB to the fims_test target.
-target_compile_definitions(fims_test 
+target_compile_definitions(fims_test
   INTERFACE
     STD_LIB
 )
