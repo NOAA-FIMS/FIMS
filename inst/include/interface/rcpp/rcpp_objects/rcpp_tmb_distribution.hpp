@@ -602,7 +602,7 @@ public:
 
     d1->distribution_models[model1->id] = model1;
 
-    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector2;
+    typedef typename ModelTraits<TMB_FIMS_SECOND_ORDER>::EigenVector Vector2;
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
@@ -612,6 +612,7 @@ public:
     model2->id = this->id;
     model2->x = Vector2(x.size()); 
     model2->p = Vector2(p.size());
+    
 
     for(int i =0; i < x.size(); i++){
         model2->x[i] = x[i];
@@ -620,7 +621,7 @@ public:
 
     d2->distribution_models[model2->id] = model2;
 
-    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector3;
+    typedef typename ModelTraits<TMB_FIMS_THIRD_ORDER>::EigenVector Vector3;
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
