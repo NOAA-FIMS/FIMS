@@ -529,15 +529,13 @@ public:
  * dmultinom_ <- new(fims$TMBDmultinomDistribution)
  *
  */
-template <typename T>
+// template <typename T>
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase
 {
-  using Vector = typename ModelTraits<T>::EigenVector;
 public:
-  // std::vector<double> x;
-  // std::vector<double> p;
-  Vector x; /*!< Vector of length K of integers */
-  Vector p; /*!< Vector of length K, specifying the probability for the K classes (note, unlike in R these must sum to 1). */                  
+  Rcpp::NumericVector x; /*!< Vector of length K of integers */
+  Rcpp::NumericVector p; /*!< Vector of length K, specifying the probability
+   for the K classes (note, unlike in R these must sum to 1). */
 
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -555,16 +553,20 @@ public:
   double evaluate(bool do_log)
   {
     fims::Dmultinom<double> dmultinom;
-
-    // this->dmultinom_xp = make_map(this->x, this->p);
-    dmultinom.x = this->x;
-    dmultinom.p = this->p;
-    // dmultinom.dmultinom_xp = this->dmultinom_xp;
+    // Decale TMBVector in this scope
+    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector; 
+    dmultinom.x = TMBVector(x.size()); //Vector from TMB
+    dmultinom.p = TMBVector(p.size()); //Vector from TMB
+    for(int i =0; i < x.size(); i++){
+        dmultinom.x[i] = x[i];
+        dmultinom.p[i] = p[i];
+    }
     return dmultinom.evaluate(do_log);
   }
 
   virtual bool add_to_fims_tmb()
   {
+    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector0;
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
@@ -572,11 +574,17 @@ public:
         std::make_shared<fims::Dmultinom<TMB_FIMS_REAL_TYPE>>();
 
     model0->id = this->id;
-    model0->x = this->x;
-    model0->p = this->p;
-    // model0->dmultinom_xp = this->dmultinom_xp;
+    model0->x = Vector0(x.size()); 
+    model0->p = Vector0(p.size());
+
+    for(int i =0; i < x.size(); i++){
+        model0->x[i] = x[i];
+        model0->p[i] = p[i];
+    }
+    
     d0->distribution_models[model0->id] = model0;
 
+    typedef typename ModelTraits<TMB_FIMS_FIRST_ORDER>::EigenVector Vector1;
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
@@ -584,11 +592,17 @@ public:
         std::make_shared<fims::Dmultinom<TMB_FIMS_FIRST_ORDER>>();
 
     model1->id = this->id;
-    model1->x = this->x;
-    model1->p = this->p;
-    // model1->dmultinom_xp = this->dmultinom_xp;
+    model1->x = Vector1(x.size()); 
+    model1->p = Vector1(p.size());
+
+    for(int i =0; i < x.size(); i++){
+        model1->x[i] = x[i];
+        model1->p[i] = p[i];
+    }
+
     d1->distribution_models[model1->id] = model1;
 
+    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector2;
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
@@ -596,11 +610,17 @@ public:
         std::make_shared<fims::Dmultinom<TMB_FIMS_SECOND_ORDER>>();
 
     model2->id = this->id;
-    model2->x = this->x;
-    model2->p = this->p;
-    // model2->dmultinom_xp = this->dmultinom_xp;
+    model2->x = Vector2(x.size()); 
+    model2->p = Vector2(p.size());
+
+    for(int i =0; i < x.size(); i++){
+        model2->x[i] = x[i];
+        model2->p[i] = p[i];
+    }
+
     d2->distribution_models[model2->id] = model2;
 
+    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector3;
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
@@ -608,9 +628,14 @@ public:
         std::make_shared<fims::Dmultinom<TMB_FIMS_THIRD_ORDER>>();
 
     model3->id = this->id;
-    model3->x = this->x;
-    model3->p = this->p;
-    // model3->dmultinom_xp = this->dmultinom_xp;
+    model3->x = Vector3(x.size()); 
+    model3->p = Vector3(p.size());
+
+    for(int i =0; i < x.size(); i++){
+        model3->x[i] = x[i];
+        model3->p[i] = p[i];
+    }
+
     d3->distribution_models[model3->id] = model3;
 
     return true;
