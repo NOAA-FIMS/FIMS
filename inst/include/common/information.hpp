@@ -41,6 +41,7 @@ namespace fims {
         std::vector<T*> parameters; // list of all estimated parameters
         std::vector<T*> random_effects_parameters; // list of all random effects parameters
         std::vector<T*> fixed_effects_parameters; // list of all fixed effects parameters
+        std::vector<T*> ages; // ages in model
 
         //data objects
         std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > > data_objects;
@@ -97,7 +98,7 @@ namespace fims {
         /**
          * Register a random effect as estimable.
          *
-         * @param p
+         * @param re
          */
         void RegisterRandomEffect(T& re) {
             this->random_effects_parameters.push_back(&re);
@@ -232,11 +233,11 @@ namespace fims {
                 //set recruitment
                if (p->recruitment_id != -999) {
 
-                    uint32_t recruit_id = static_cast<uint32_t> (p->recruitment_id);
-                    recruitment_model_iterator it = this->recruitment_models.find(recruit_id);
+                    uint32_t recruitment_uint = static_cast<uint32_t> (p->recruitment_id);
+                    recruitment_models_iterator it = this->recruitment_models.find(recruitment_uint);
 
                     if (it != this->recruitment_models.end()) {
-                        f->recruitment = (*it).second;
+                        p->recruitment = (*it).second; //recruitment defined in population.hpp
                     } else {
                         valid_model = false;
                         //log error
@@ -247,12 +248,55 @@ namespace fims {
                     //log error
                 }
                 //set growth
+               if (p->growth_id != -999) {
+
+                    uint32_t growth_uint = static_cast<uint32_t> (p->growth_id);
+                    growth_models_iterator it = this->growth_models.find(growth_uint); // growth_models is specified in information.hpp and used in rcpp
+                    p->ages = this->ages; // check me, ages defined as an std::vector at the head of information.hpp; are the dimensions of ages defined in rcpp or where?
+                    if (it != this->growth_models.end()) {
+                        p->growth = (*it).second; // growth defined in population.hpp (the object is called p, growth is within p)
+                    } else {
+                        valid_model = false;
+                        //log error
+                    }
+
+                } else {
+                    valid_model = false;
+                    //log error
+                }
 
                 //set maturity
+                if (p->maturity_id != -999) {
+
+                    uint32_t maturity_uint = static_cast<uint32_t> (p->maturity_id);
+                    maturity_models_iterator it = this->maturity_models.find(maturity_uint); // >maturity_models is specified in information.hpp and used in rcpp
+
+                    if (it != this->maturity_models.end()) {
+                        p->maturity = (*it).second; // >maturity defined in population.hpp
+                    } else {
+                        valid_model = false;
+                        //log error
+                    }
+
+                } else {
+                    valid_model = false;
+                    //log error
+                }
+
+                // check me - add another fleet iterator to push information from population to the individual fleets
+                // This is to pass catch at age from population to fleets?
+                for (fleet_iterator it = this->fleets.begin();
+                    it != this->fleets.end(); ++it) {
+
+                    //Initialize fleet object 
+                    std::shared_ptr<fims::Fleet<T> > f = (*it).second; //fleet object pointer initialized to second field in map
+
+                    // f->Initialize(nyears, nages); // probably don't want to initialize here, since it's been initialized already in the fleet loop
+                    f->catch_at_age = (p->catch_at_age); // should we use = or push.back, depends on whether or not you're inside your vector capacity? pushes catch-at-age from population back into the fleets
+                }
             }
             return valid_model;
         }
-
         size_t GetNages() const {
             return nages;
         }
