@@ -11,6 +11,7 @@
 
 #include "../../../distributions/distributions.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../interface.hpp"
 
 /**
  * @brief Distributions Rcpp Interface
@@ -19,8 +20,8 @@
 class DistributionsInterfaceBase : public FIMSRcppInterfaceBase
 {
 public:
-  static uint32_t id_g; /**< static id of the DistributionsInterfaceBase object */
-  uint32_t id; /**< local id of the DistributionsInterfaceBase object */
+  static uint32_t id_g;                                                 /**< static id of the DistributionsInterfaceBase object */
+  uint32_t id;                                                          /**< local id of the DistributionsInterfaceBase object */
   static std::map<uint32_t, DistributionsInterfaceBase *> live_objects; /**<
   map relating the ID of the DistributionsInterfaceBase to the DistributionsInterfaceBase
   objects */
@@ -34,9 +35,9 @@ public:
 
   virtual ~DistributionsInterfaceBase() {}
 
- /** @brief get_id method for child distribution interface objects to inherit **/
+  /** @brief get_id method for child distribution interface objects to inherit **/
   virtual uint32_t get_id() = 0;
-  
+
   /** @brief evaluate method for child distribution interface objects to inherit **/
   virtual double evaluate(bool do_log) = 0;
 };
@@ -522,22 +523,28 @@ public:
   }
 };
 
-class DMultinomInterface : public DistributionsInterfaceBase {
+/**
+ * @brief Rcpp interface for Dmultinom as an S4 object. To instantiate
+ * from R:
+ * dmultinom_ <- new(fims$TMBDmultinomDistribution)
+ *
+ */
+// template <typename T>
+class DmultinomDistributionsInterface : public DistributionsInterfaceBase
+{
 public:
+  Rcpp::NumericVector x; /*!< Vector of length K of integers */
+  Rcpp::NumericVector p; /*!< Vector of length K, specifying the probability
+   for the K classes (note, unlike in R these must sum to 1). */
 
-   std::vector<double> x;
-   std::vector<double> p;
+  DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
 
+  virtual ~DmultinomDistributionsInterface() {}
 
-   DMultinomInterface() : DistributionsInterfaceBase() {}
-
-virtual ~DMultinomInterface() {}
-
-
-virtual uint32_t get_id(){return this->id;}
-
+  virtual uint32_t get_id() { return this->id; }
+  
   /**
-   * @brief Evaluate multinomial probability density function, default returns the
+   * @brief Evaluate multinom probability density function, default returns the
    * log of the pdf
    *
    * @tparam T
@@ -545,125 +552,94 @@ virtual uint32_t get_id(){return this->id;}
    */
   double evaluate(bool do_log)
   {
-    fims::DMultinom<double> dmultinom;
-    dmultinom.x = this->x.value;
-    dmultinom.p = this->p.value;
+    fims::Dmultinom<double> dmultinom;
+    // Decale TMBVector in this scope
+    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector; 
+    dmultinom.x = TMBVector(x.size()); //Vector from TMB
+    dmultinom.p = TMBVector(p.size()); //Vector from TMB
+    for(int i =0; i < x.size(); i++){
+        dmultinom.x[i] = x[i];
+        dmultinom.p[i] = p[i];
+    }
     return dmultinom.evaluate(do_log);
   }
 
-virtual bool add_to_fims_tmb(){
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-    fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  virtual bool add_to_fims_tmb()
+  {
+    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector0;
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-   std::shared_ptr<fims::DMultinom<TMB_FIMS_REAL_TYPE> > model0 =
-   std::make_shared<fims::DMultinom<TMB_FIMS_REAL_TYPE> >();
+    std::shared_ptr<fims::Dmultinom<TMB_FIMS_REAL_TYPE>> model0 =
+        std::make_shared<fims::Dmultinom<TMB_FIMS_REAL_TYPE>>();
 
+    model0->id = this->id;
+    model0->x = Vector0(x.size()); 
+    model0->p = Vector0(p.size());
 
-   model0->id = this->id;
-   model0->x= this->x.value;
-   if (this->x.estimated) {
-        if (this->x.is_random_effect) {
-          d0->RegisterRandomEffect(model0->x);
-   } else {
-      d0->RegisterParameter(model0->x);
-   }
-}
-model0->p= this->p.value;
-   if (this->p.estimated) {
-        if (this->p.is_random_effect) {
-          d0->RegisterRandomEffect(model0->p);
-   } else {
-      d0->RegisterParameter(model0->p);
-   }
-}
-   d0->distribution_models[model0->id]=model0;
+    for(int i =0; i < x.size(); i++){
+        model0->x[i] = x[i];
+        model0->p[i] = p[i];
+    }
+    
+    d0->distribution_models[model0->id] = model0;
 
+    typedef typename ModelTraits<TMB_FIMS_FIRST_ORDER>::EigenVector Vector1;
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
+        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-    fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims::Dmultinom<TMB_FIMS_FIRST_ORDER>> model1 =
+        std::make_shared<fims::Dmultinom<TMB_FIMS_FIRST_ORDER>>();
 
-   std::shared_ptr<fims::DMultinom<TMB_FIMS_FIRST_ORDER> > model1 =
-   std::make_shared<fims::DMultinom<TMB_FIMS_FIRST_ORDER> >();
+    model1->id = this->id;
+    model1->x = Vector1(x.size()); 
+    model1->p = Vector1(p.size());
 
+    for(int i =0; i < x.size(); i++){
+        model1->x[i] = x[i];
+        model1->p[i] = p[i];
+    }
 
-   model1->id = this->id;
-   model1->x= this->x.value;
-   if (this->x.estimated) {
-        if (this->x.is_random_effect) {
-          d1->RegisterRandomEffect(model1->x);
-   } else {
-      d1->RegisterParameter(model1->x);
-   }
-}
-model1->p= this->p.value;
-   if (this->p.estimated) {
-        if (this->p.is_random_effect) {
-          d1->RegisterRandomEffect(model1->p);
-   } else {
-      d1->RegisterParameter(model1->p);
-   }
-}
-   d1->distribution_models[model1->id]=model1;
+    d1->distribution_models[model1->id] = model1;
 
+    typedef typename ModelTraits<TMB_FIMS_SECOND_ORDER>::EigenVector Vector2;
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
+        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-    fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims::Dmultinom<TMB_FIMS_SECOND_ORDER>> model2 =
+        std::make_shared<fims::Dmultinom<TMB_FIMS_SECOND_ORDER>>();
 
-   std::shared_ptr<fims::DMultinom<TMB_FIMS_SECOND_ORDER> > model2 =
-   std::make_shared<fims::DMultinom<TMB_FIMS_SECOND_ORDER> >();
+    model2->id = this->id;
+    model2->x = Vector2(x.size()); 
+    model2->p = Vector2(p.size());
+    
 
+    for(int i =0; i < x.size(); i++){
+        model2->x[i] = x[i];
+        model2->p[i] = p[i];
+    }
 
-   model2->id = this->id;
-   model2->x= this->x.value;
-   if (this->x.estimated) {
-        if (this->x.is_random_effect) {
-          d2->RegisterRandomEffect(model2->x);
-   } else {
-      d2->RegisterParameter(model2->x);
-   }
-}
-model2->p= this->p.value;
-   if (this->p.estimated) {
-        if (this->p.is_random_effect) {
-          d2->RegisterRandomEffect(model2->p);
-   } else {
-      d2->RegisterParameter(model2->p);
-   }
-}
-   d2->distribution_models[model2->id]=model2;
+    d2->distribution_models[model2->id] = model2;
 
+    typedef typename ModelTraits<TMB_FIMS_THIRD_ORDER>::EigenVector Vector3;
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
+        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-    fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims::Dmultinom<TMB_FIMS_THIRD_ORDER>> model3 =
+        std::make_shared<fims::Dmultinom<TMB_FIMS_THIRD_ORDER>>();
 
-   std::shared_ptr<fims::DMultinom<TMB_FIMS_THIRD_ORDER> > model3 =
-   std::make_shared<fims::DMultinom<TMB_FIMS_THIRD_ORDER> >();
+    model3->id = this->id;
+    model3->x = Vector3(x.size()); 
+    model3->p = Vector3(p.size());
 
+    for(int i =0; i < x.size(); i++){
+        model3->x[i] = x[i];
+        model3->p[i] = p[i];
+    }
 
-   model3->id = this->id;
-   model3->x= this->x.value;
-   if (this->x.estimated) {
-        if (this->x.is_random_effect) {
-          d3->RegisterRandomEffect(model3->x);
-   } else {
-      d3->RegisterParameter(model3->x);
-   }
-}
-model3->p= this->p.value;
-   if (this->p.estimated) {
-        if (this->p.is_random_effect) {
-          d3->RegisterRandomEffect(model3->p);
-   } else {
-      d3->RegisterParameter(model3->p);
-   }
-}
-   d3->distribution_models[model3->id]=model3;
+    d3->distribution_models[model3->id] = model3;
 
-
-return true;
-
-
-}
-
+    return true;
+  }
 };
 #endif
