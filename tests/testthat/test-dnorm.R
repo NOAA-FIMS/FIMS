@@ -10,7 +10,7 @@ test_that("dnorm", {
   # create a fims Rcpp object
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   # initialize the Dnorm module
-  dnorm_ <- new(fims$TMBDnormDistribution)
+  dnorm_ <- methods::new(fims$TMBDnormDistribution)
   # populate class members
   dnorm_$x$value <- y
   dnorm_$mean$value <- 0

@@ -39,9 +39,9 @@ methods::setMethod(
     ggplot2::ggplot(
       data = x@data,
       mapping = ggplot2::aes(
-        x = as.Date(datestart),
-        y = value,
-        col = name
+        x = as.Date(.data[["datestart"]]),
+        y = .data[["value"]],
+        col = .data[["name"]]
       )
     ) +
       # Using Set3 b/c it is the palette with the largest number of colors
@@ -79,17 +79,17 @@ methods::setMethod(
     }
     dat_types <- unique(object@data[[which(colnames(object@data) == "type")]])
     message("with the following 'types': ", paste0(dat_types, collapse = ", "))
-    snames <- slotNames(object)
+    snames <- methods::slotNames(object)
     ordinnames <- !snames %in% c(
       "data",
       ".S3Class",
       "row.names",
       "names"
     )
-    print(head(object@data))
+    print(utils::head(object@data))
     for (nm in snames[ordinnames]) {
       cat("+@", nm, ":\n", sep = "")
-      print(slot(object, nm))
+      print(methods::slot(object, nm))
     }
   }
 )
@@ -170,22 +170,23 @@ methods::setValidity(
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [methods::showClass()] to see all available slots.
 FIMSFrame <- function(data) {
-  out <- new("FIMSFrame", data = data)
+  out <- methods::new("FIMSFrame", data = data)
   return(out)
 }
 #' FIMSFrameAge
 #' @export
 #' @rdname FIMSFrame
+#' @importFrom ggplot2 .data
 FIMSFrameAge <- function(data) {
   # Calculate information based on input data
   ages <- 0:max(data[["age"]], na.rm = TRUE)
   weightatage <- dplyr::filter(
     data,
-    type == "weight-at-age"
+    .data[["type"]] == "weight-at-age"
   )
   # TODO: decide if weightatage info should be removed
   #       from data because it is in weightatage?
-  out <- new("FIMSFrameAge",
+  out <- methods::new("FIMSFrameAge",
     data = data,
     ages = ages,
     weightatage = weightatage
