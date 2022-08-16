@@ -42,6 +42,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         httpgd \
         RcppEigen \
         TMB \
+        ggplot2 \
+        dplyr \
+        scales \
     && rm -rf /tmp/downloaded_packages
 
 # VSCode R Debugger dependency. Install the latest release version from GitHub without using GitHub API.
