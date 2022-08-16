@@ -85,21 +85,25 @@ namespace fims {
             std::vector<Type> numbers_at_age;
             std::vector<Type> catch_at_age;
             std::vector<Type> biomass;
-
+            std::vector<Type> spawning_biomass;
+            
             //size all the vectors to length of nages
             ages.resize(nages);
-            mortality.resize(nages);
-            maturity.resize(nages);
+            mortality_M.resize(nages);
+            mortality_F.resize(nyears*nages*nfleets);
+            mortality_Z.resize(nages);
+            mature.resize(nages);
             initial_numbers.resize(nages);
             weight_at_age.resize(nages);
             fecundity.resize(nages);
-            numbers_at_age.resize(nages);
+            numbers_at_age.resize(nyears*nages);
             catch_at_age.resize(nages);
             biomass.resize(nyears);
+            spawning_biomass.resize(nyears);
         
         }
 
-        void Initialize() {
+        void Initialize(int nyears, int nseasons, int nages) {
         }
 
         void Prepare() {
@@ -127,7 +131,40 @@ namespace fims {
         void CalculateSurveyNumbersAtAge() {
         }
 
-        void Evaluate() {
+        void Evaluate() { // for loop for everything, call functions above.
+         // In progress, jotting down rough code for the population loop.
+         //Set the initial equilibrium numbers at age vector (could be independent or y=0?)
+         // This will be set in initial_numbers vector (for year 0, age 0)
+         initial_numbers = initialize(R0, Z_equil)
+         for (int y = 1; y < this->nyears; y++) { // What is the this pointer doing here???
+            CalculateSpawningBiomass()
+            //Set the nrecruits for age a=0 year y (use pointers instead of functional returns)
+            CalculateRecruitment(y,numbers_at_age -> numbers_at_age[(y-1)*nages],fecundity)
+            //numbers_at_age[(y)*nages] = CalculateRecruitment(y,numbers_at_age,fecundity);
+            for (int a = 1; a < this->nages; a++) {
+                int index = y * nages + a;
+                int index2 = (y-1) * nages + a;
+                
+              // mortality_M is fixed, so we may want to set  it in the initialized
+              // mortality_F needs to either be a parameter vector or approximated from catch data.
+              // where do we tally mortality_F over all fleets?
+              CalculateMortality(f -> mortality_Z[index]);
+              // fleet loop (move to within the CalculateMortality function body)
+              // do we need a separate total F or is total Z fine?
+              mortality_Z[index] = mortality_M[index];
+              for (int ff = 0; ff < this->nfleets; ff++) {
+                sub_index = y*nages + ff*nfleets + ff;
+                mortality_Z[index] += fleet_F[sub_index]; 
+              }
+              
+              //calculate numbers at age for the given y and age: CalculateNumbersAtAge
+              CalculateNumbersAtAge(numbers_at_age -> numbers_at_age[index], Z -> mortality_Z[a]);
+              numbers_at_age[(y)*nages+a] = numbers_at_age[(y-1)*nages+a-1]*(1-exp(-Z[a]));
+              
+              //TODO: continue calculating. WHAM and SAM could be good refs
+            }
+         
+         }
         }
 
 
