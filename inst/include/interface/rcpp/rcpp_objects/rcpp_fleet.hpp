@@ -140,7 +140,7 @@ public:
 
         // add to Information
         d3->fleets[f3->id] = f3;
-
+        return 0;
     }
 
 
