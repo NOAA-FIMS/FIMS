@@ -20,9 +20,9 @@
  * */
 class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
  public:
-  static uint32_t id_g;
-  uint32_t id;
-  static std::map<uint32_t, PopulationInterfaceBase*> live_objects;
+  static uint32_t id_g; /**< static id of the population interface base*/
+  uint32_t id; /**< id of the population interface base */
+  static std::map<uint32_t, PopulationInterfaceBase*> live_objects; /**< map associating the ids of PopulationInterfaceBase to the objects */
 
   PopulationInterfaceBase() {
     this->id = PopulationInterfaceBase::id_g++;
