@@ -55,7 +55,7 @@ namespace fims {
         std::vector<Type> mortality_M;
         std::vector<Type> mortality_F;
         std::vector<Type> mortality_Z;
-        std::vector<Type> maturity;
+        std::vector<Type> mature; // Binary mature or not vector
 
         ///recruitment
         int recruitment_id = -999; /*!< id of recruitment model object*/
