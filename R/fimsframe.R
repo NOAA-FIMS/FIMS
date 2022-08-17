@@ -1,7 +1,7 @@
 
 # This file defines a parent class and its children by
 # (1) setting the class;
-# (2) defining methods, using methods::setMethod();
+# (2) defining methods, using setMethod();
 # (3) setting the validators; and
 # (4) establishing the constructors (i.e., functions called by users)
 # where only the constructors are documented using roxygen.
@@ -11,12 +11,12 @@
 # See the following link if we do want to document them in the future:
 # https://stackoverflow.com/questions/7368262/how-to-properly-document-s4-class-slots-using-roxygen2
 
-methods::setClass(
+setClass(
   Class = "FIMSFrame",
   slots = c(data = "data.frame")
 )
 
-methods::setClass("FIMSFrameAge",
+setClass("FIMSFrameAge",
   slots = list(
     weightatage = "data.frame",
     ages = "numeric"
@@ -28,17 +28,17 @@ methods::setClass("FIMSFrameAge",
 # Methods for accessing info in the slots
 
 # setMethod: initialize ----
-# Not currently using methods::setMethod(f = "initialize")
+# Not currently using setMethod(f = "initialize")
 # because @kellijohnson-NOAA did not quite understand how they actually work.
 
 # setMethod: plot ----
-methods::setMethod(
+setMethod(
   f = "plot",
   signature = "FIMSFrame",
   definition = function(x) {
-    ggplot2::ggplot(
+    ggplot(
       data = x@data,
-      mapping = ggplot2::aes(
+      mapping = aes(
         x = as.Date(.data[["datestart"]]),
         y = .data[["value"]],
         col = .data[["name"]]
@@ -46,19 +46,19 @@ methods::setMethod(
     ) +
       # Using Set3 b/c it is the palette with the largest number of colors
       # and not {nmfspalette} b/c didn't want to depend on GitHub package
-      ggplot2::scale_color_brewer(palette = "Set3") +
-      ggplot2::facet_wrap("type", scales = "free_y") +
-      ggplot2::geom_point() +
-      ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d")) +
-      ggplot2::xlab("Start date (Year-Month-Day)") +
-      ggplot2::ylab("Value") +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_text(angle = 15)
+      scale_color_brewer(palette = "Set3") +
+      facet_wrap("type", scales = "free_y") +
+      geom_point() +
+      scale_x_date(labels = scales::date_format("%Y-%m-%d")) +
+      xlab("Start date (Year-Month-Day)") +
+      ylab("Value") +
+      theme(
+        axis.text.x = element_text(angle = 15)
       )
   }
 )
 
-methods::setMethod(
+setMethod(
   f = "plot",
   signature = "FIMSFrameAge",
   definition = function(x) {
@@ -69,7 +69,7 @@ methods::setMethod(
 )
 
 # setMethod: show ----
-methods::setMethod(
+setMethod(
   f = "show",
   signature = "FIMSFrame",
   definition = function(object) {
@@ -79,23 +79,23 @@ methods::setMethod(
     }
     dat_types <- unique(object@data[[which(colnames(object@data) == "type")]])
     message("with the following 'types': ", paste0(dat_types, collapse = ", "))
-    snames <- methods::slotNames(object)
+    snames <- slotNames(object)
     ordinnames <- !snames %in% c(
       "data",
       ".S3Class",
       "row.names",
       "names"
     )
-    print(utils::head(object@data))
+    print(head(object@data))
     for (nm in snames[ordinnames]) {
       cat("+@", nm, ":\n", sep = "")
-      print(methods::slot(object, nm))
+      print(slot(object, nm))
     }
   }
 )
 
 # setValidity ----
-methods::setValidity(
+setValidity(
   Class = "FIMSFrame",
   method = function(object) {
     errors <- character()
@@ -133,7 +133,7 @@ methods::setValidity(
   }
 )
 
-methods::setValidity(
+setValidity(
   Class = "FIMSFrameAge",
   method = function(object) {
     errors <- character()
@@ -168,15 +168,14 @@ methods::setValidity(
 #' @return An object of the S4 class `FIMSFrame` or one of its child classes
 #' is validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
-#' on the child class. Use [methods::showClass()] to see all available slots.
+#' on the child class. Use [showClass()] to see all available slots.
 FIMSFrame <- function(data) {
-  out <- methods::new("FIMSFrame", data = data)
+  out <- new("FIMSFrame", data = data)
   return(out)
 }
 #' FIMSFrameAge
 #' @export
 #' @rdname FIMSFrame
-#' @importFrom ggplot2 .data
 FIMSFrameAge <- function(data) {
   # Calculate information based on input data
   ages <- 0:max(data[["age"]], na.rm = TRUE)
@@ -186,7 +185,7 @@ FIMSFrameAge <- function(data) {
   )
   # TODO: decide if weightatage info should be removed
   #       from data because it is in weightatage?
-  out <- methods::new("FIMSFrameAge",
+  out <- new("FIMSFrameAge",
     data = data,
     ages = ages,
     weightatage = weightatage

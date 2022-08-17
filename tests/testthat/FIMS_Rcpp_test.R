@@ -3,10 +3,10 @@ testthat("Rcpp interface works for modules", {
 
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
-  a <- methods::new(fims$Parameter, .1)
-  expect_success(beverton_holt <- methods::new(fims$BevertonHoltRecruitment))
-  expect_success(logistic_selectivity <- methods::new(fims$LogisticSelectivity))
-  expect_success(ewaa_growth <- methods::new(fims$EWAAgrowth))
+  a <- new(fims$Parameter, .1)
+  expect_success(beverton_holt <- new(fims$BevertonHoltRecruitment))
+  expect_success(logistic_selectivity <- new(fims$LogisticSelectivity))
+  expect_success(ewaa_growth <- new(fims$EWAAgrowth))
   logistic_selectivity$slope$value <- .7
   logistic_selectivity$median$value <- 5.0
 

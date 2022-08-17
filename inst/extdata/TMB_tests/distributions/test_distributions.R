@@ -33,7 +33,7 @@ test_that("dnorm unit test", {
   set.seed(123)
   #Simulate new data with R
   y = rnorm(10, 5, 3)
-  #Calculate negative log-likelihood with R stats::dnorm
+  #Calculate negative log-likelihood with R dnorm
   nll = -sum(dnorm(y, 5,3, TRUE))
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(y =y),
@@ -59,7 +59,7 @@ test_that("dlnorm unit test", {
   set.seed(123)
   #Simulate new data with R
   y = rlnorm(10, 2, 1)
-  #Calculate negative log-likelihood with R stats::dlnorm
+  #Calculate negative log-likelihood with R dlnorm
   nll = -sum(dlnorm(y, 2, 1, TRUE))
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(logy = y),
@@ -85,7 +85,7 @@ test_that("dmultinom unit test", {
   #Simulate new data with R
   p = (1:10)/sum(1:10)
   x = rmultinom(1, 100, p)
-  #Calculate negative log-likelihood with R stats::dnmultinom
+  #Calculate negative log-likelihood with R dnmultinom
   nll = -dmultinom(x, 100,p, TRUE)
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(x =x),
