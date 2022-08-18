@@ -36,9 +36,9 @@ setMethod(
   f = "plot",
   signature = "FIMSFrame",
   definition = function(x) {
-    ggplot(
+    ggplot2::ggplot(
       data = x@data,
-      mapping = aes(
+      mapping = ggplot2::aes(
         x = as.Date(.data[["datestart"]]),
         y = .data[["value"]],
         col = .data[["name"]]
@@ -46,14 +46,14 @@ setMethod(
     ) +
       # Using Set3 b/c it is the palette with the largest number of colors
       # and not {nmfspalette} b/c didn't want to depend on GitHub package
-      scale_color_brewer(palette = "Set3") +
-      facet_wrap("type", scales = "free_y") +
-      geom_point() +
-      scale_x_date(labels = scales::date_format("%Y-%m-%d")) +
-      xlab("Start date (Year-Month-Day)") +
-      ylab("Value") +
-      theme(
-        axis.text.x = element_text(angle = 15)
+      ggplot2::scale_color_brewer(palette = "Set3") +
+      ggplot2::facet_wrap("type", scales = "free_y") +
+      ggplot2::geom_point() +
+      ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d")) +
+      ggplot2::xlab("Start date (Year-Month-Day)") +
+      ggplot2::ylab("Value") +
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(angle = 15)
       )
   }
 )

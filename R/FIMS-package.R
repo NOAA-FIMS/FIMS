@@ -4,7 +4,7 @@
 #' @importFrom utils head
 #' @import stats
 #' @import methods
-#' @import ggplot2
+#' @importFrom ggplot2 .data
 #' @importFrom usethis use_template ui_stop
 ## usethis namespace: end
 NULL
