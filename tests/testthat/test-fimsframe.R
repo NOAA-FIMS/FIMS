@@ -11,9 +11,18 @@ test_that("Can create the S4 FIMSFrame classes", {
   expect_vector(age_frame@ages, ptype = integer())
   expect_s3_class(age_frame@weightatage, "data.frame")
   expect_s3_class(fims_frame@data, "data.frame")
-  expect_silent(plot(fims_frame))
-  expect_silent(plot(age_frame))
-  dev.off()
+
+  # A helper function that creates a figure from code
+  save_png <- function(code, width = 400, height = 400) {
+    path <- tempfile(fileext = ".png")
+    png(path, width = width, height = height)
+    on.exit(dev.off())
+    code
+  }
+
+  expect_silent(save_png(plot(fims_frame)))
+  expect_silent(save_png(plot(age_frame)))
+
 })
 
 test_that("Validators work as expected", {
