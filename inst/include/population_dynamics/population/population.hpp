@@ -51,11 +51,22 @@ namespace fims {
         size_t nseasons;
         size_t nages;
 
+        std::vector<Type> log_naa; // this is estimated; after initialize in create_model, push_back to parameter list - in information.hpp (same for initial F in fleet)
+
         std::vector<Type> ages;
         std::vector<Type> mortality_M;
         std::vector<Type> mortality_F;
         std::vector<Type> mortality_Z;
         std::vector<Type> mature; // Binary mature or not vector
+
+        //derived quantities
+        std::vector<Type> initial_numbers;
+        std::vector<Type> weight_at_age;
+        std::vector<Type> fecundity;
+        std::vector<Type> numbers_at_age;
+        std::vector<Type> catch_at_age;
+        std::vector<Type> biomass;
+        std::vector<Type> spawning_biomass;
 
         ///recruitment
         int recruitment_id = -999; /*!< id of recruitment model object*/
@@ -78,14 +89,13 @@ namespace fims {
         Population() {
             this->id = Population::id_g++;
 
-             //derived quantities
-            std::vector<Type> initial_numbers;
-            std::vector<Type> weight_at_age;
-            std::vector<Type> fecundity;
-            std::vector<Type> numbers_at_age;
-            std::vector<Type> catch_at_age;
-            std::vector<Type> biomass;
-            std::vector<Type> spawning_biomass;
+             
+        
+        }
+
+        //gets called when Initialize() function called in Information - just once at start of model run
+        void Initialize(int nyears, int nseasons, int nages) {
+          
             
             //size all the vectors to length of nages
             ages.resize(nages);
@@ -100,18 +110,26 @@ namespace fims {
             catch_at_age.resize(nages);
             biomass.resize(nyears);
             spawning_biomass.resize(nyears);
-        
+            log_naa.resize(nages);
+
+            
+            
         }
 
-        void Initialize(int nyears, int nseasons, int nages) {
-        }
-
+        //gets called at each model iteration (used to zero out derived quantities, values summed with +=, etc.)
         void Prepare() {
         }
 
         /**
          * life history calculations
          */
+        //delete std::vector<Type> because already declared; function has access to log_naa
+        //exp(this ->log_naa[a]) on line 130 - more explicit that we are reference member
+        inline void CalculateInitialNAA(std::vector<Type> log_naa){ //inline all function unless complicated
+            for(int a = 0; a < nages; a++){
+              numbers_at_ages[0,a] = exp(log_naa[a]);
+            }
+        }
 
         void CalculateMortality() {
         }
@@ -135,8 +153,16 @@ namespace fims {
          // In progress, jotting down rough code for the population loop.
          //Set the initial equilibrium numbers at age vector (could be independent or y=0?)
          // This will be set in initial_numbers vector (for year 0, age 0)
-         initial_numbers = initialize(R0, Z_equil)
-         for (int y = 1; y < this->nyears; y++) { // What is the this pointer doing here???
+
+         //calculate mortality
+         //change to this -> log_naa (this -> means you're referring to a class member (member of self))
+         CalculateInitialNAA(log_naa -> log_naa);
+      
+         //start at y=0; if y == 0 CalculateInitialNAA else CalculateNAA 
+         for (int y = 1; y < this->nyears; y++) {
+           Prepare()
+          
+           // What is the this pointer doing here???
             CalculateSpawningBiomass()
             //Set the nrecruits for age a=0 year y (use pointers instead of functional returns)
             CalculateRecruitment(y,numbers_at_age -> numbers_at_age[(y-1)*nages],fecundity)
