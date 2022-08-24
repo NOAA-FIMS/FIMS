@@ -63,7 +63,7 @@ public:
 
   DnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
-  uint32_t get_id() { return this->id; }
+  virtual uint32_t get_id() { return this->id; }
 
   virtual ~DnormDistributionsInterface() {}
 
@@ -74,7 +74,7 @@ public:
    * @tparam T
    * @return log pdf
    */
-  double evaluate(bool do_log)
+  virtual double evaluate(bool do_log)
   {
     fims::Dnorm<double> dnorm;
     dnorm.x = this->x.value;
@@ -86,7 +86,7 @@ public:
   /**
    * @brief adds the dnorm distribution and its parameters to the TMB model
    */
-  bool add_to_fims_tmb()
+  virtual bool add_to_fims_tmb()
   {
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
@@ -178,7 +178,7 @@ public:
    * @tparam T
    * @return log pdf
    */
-  double evaluate(bool do_log)
+  virtual double evaluate(bool do_log)
   {
     fims::Dlnorm<double> dlnorm;
     dlnorm.x = this->x.value;
@@ -282,7 +282,7 @@ public:
    * @tparam T
    * @return log pdf
    */
-  double evaluate(bool do_log)
+  virtual double evaluate(bool do_log)
   {
     fims::Dmultinom<double> dmultinom;
     // Decale TMBVector in this scope

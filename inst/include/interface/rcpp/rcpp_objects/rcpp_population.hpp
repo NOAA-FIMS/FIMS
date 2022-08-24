@@ -30,6 +30,8 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
     PopulationInterfaceBase::fims_interface_objects.push_back(this);
   }
 
+  virtual ~PopulationInterfaceBase() {}
+
   /** @brief get_id method for child classes to inherit */
   virtual uint32_t get_id() = 0;
 };
