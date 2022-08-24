@@ -97,44 +97,10 @@ public:
     // interface to data/parameter value
     model0->id = this->id;
     model0->x = this->x.value;
-    if (this->x.estimated)
-    {
-      if (this->x.is_random_effect)
-      {
-        d0->RegisterRandomEffect(model0->x);
-      }
-      else
-      {
-        d0->RegisterParameter(model0->x);
-      }
-    }
-
     // set relative info
     model0->mean = this->mean.value;
-    if (this->mean.estimated)
-    {
-      if (this->mean.is_random_effect)
-      {
-        d0->RegisterRandomEffect(model0->mean);
-      }
-      else
-      {
-        d0->RegisterParameter(model0->mean);
-      }
-    }
-
     model0->sd = this->sd.value;
-    if (this->sd.estimated)
-    {
-      if (this->sd.is_random_effect)
-      {
-        d0->RegisterRandomEffect(model0->sd);
-      }
-      else
-      {
-        d0->RegisterParameter(model0->sd);
-      }
-    }
+    
     d0->distribution_models[model0->id] = model0;
 
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
@@ -146,43 +112,9 @@ public:
     // interface to data/parameter first derivative
     model1->id = this->id;
     model1->x = this->x.value;
-    if (this->x.estimated)
-    {
-      if (this->x.is_random_effect)
-      {
-        d1->RegisterRandomEffect(model1->x);
-      }
-      else
-      {
-        d1->RegisterParameter(model1->x);
-      }
-    }
-
     model1->mean = this->mean.value;
-    if (this->mean.estimated)
-    {
-      if (this->mean.is_random_effect)
-      {
-        d1->RegisterRandomEffect(model1->mean);
-      }
-      else
-      {
-        d1->RegisterParameter(model1->mean);
-      }
-    }
-
     model1->sd = this->sd.value;
-    if (this->sd.estimated)
-    {
-      if (this->sd.is_random_effect)
-      {
-        d1->RegisterRandomEffect(model1->sd);
-      }
-      else
-      {
-        d1->RegisterParameter(model1->sd);
-      }
-    }
+    
     d1->distribution_models[model1->id] = model1;
 
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
@@ -194,43 +126,9 @@ public:
     // interface to data/parameter second derivative
     model2->id = this->id;
     model2->x = this->x.value;
-    if (this->x.estimated)
-    {
-      if (this->x.is_random_effect)
-      {
-        d2->RegisterRandomEffect(model2->x);
-      }
-      else
-      {
-        d2->RegisterParameter(model2->x);
-      }
-    }
-
     model2->mean = this->mean.value;
-    if (this->mean.estimated)
-    {
-      if (this->mean.is_random_effect)
-      {
-        d2->RegisterRandomEffect(model2->mean);
-      }
-      else
-      {
-        d2->RegisterParameter(model2->mean);
-      }
-    }
-
     model2->sd = this->sd.value;
-    if (this->sd.estimated)
-    {
-      if (this->sd.is_random_effect)
-      {
-        d2->RegisterRandomEffect(model2->sd);
-      }
-      else
-      {
-        d2->RegisterParameter(model2->sd);
-      }
-    }
+    
     d2->distribution_models[model2->id] = model2;
 
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
@@ -242,43 +140,9 @@ public:
     // interface to data/parameter third derivative
     model3->id = this->id;
     model3->x = this->x.value;
-    if (this->x.estimated)
-    {
-      if (this->x.is_random_effect)
-      {
-        d3->RegisterRandomEffect(model3->x);
-      }
-      else
-      {
-        d3->RegisterParameter(model3->x);
-      }
-    }
-
     model3->mean = this->mean.value;
-    if (this->mean.estimated)
-    {
-      if (this->mean.is_random_effect)
-      {
-        d3->RegisterRandomEffect(model3->mean);
-      }
-      else
-      {
-        d3->RegisterParameter(model3->mean);
-      }
-    }
-
     model3->sd = this->sd.value;
-    if (this->sd.estimated)
-    {
-      if (this->sd.is_random_effect)
-      {
-        d3->RegisterRandomEffect(model3->sd);
-      }
-      else
-      {
-        d3->RegisterParameter(model3->sd);
-      }
-    }
+   
     d3->distribution_models[model3->id] = model3;
 
     return true;
@@ -337,42 +201,9 @@ public:
     // set relative info
     model0->id = this->id;
     model0->x = this->x.value;
-    if (this->x.estimated)
-    {
-      if (this->x.is_random_effect)
-      {
-        d0->RegisterRandomEffect(model0->x);
-      }
-      else
-      {
-        d0->RegisterParameter(model0->x);
-      }
-    }
     model0->meanlog = this->meanlog.value;
-    if (this->meanlog.estimated)
-    {
-      if (this->meanlog.is_random_effect)
-      {
-        d0->RegisterRandomEffect(model0->meanlog);
-      }
-      else
-      {
-        d0->RegisterParameter(model0->meanlog);
-      }
-    }
     model0->sdlog = this->sdlog.value;
-    if (this->sdlog.estimated)
-    {
-      if (this->sdlog.is_random_effect)
-      {
-        d0->RegisterRandomEffect(model0->sdlog);
-      }
-      else
-      {
-        d0->RegisterParameter(model0->sdlog);
-      }
-    }
-    // add to Information
+    
     d0->distribution_models[model0->id] = model0;
 
     // base model
@@ -385,42 +216,9 @@ public:
     // set relative info
     model1->id = this->id;
     model1->x = this->x.value;
-    if (this->x.estimated)
-    {
-      if (this->x.is_random_effect)
-      {
-        d1->RegisterRandomEffect(model1->x);
-      }
-      else
-      {
-        d1->RegisterParameter(model1->x);
-      }
-    }
     model1->meanlog = this->meanlog.value;
-    if (this->meanlog.estimated)
-    {
-      if (this->meanlog.is_random_effect)
-      {
-        d1->RegisterRandomEffect(model1->meanlog);
-      }
-      else
-      {
-        d1->RegisterParameter(model1->meanlog);
-      }
-    }
     model1->sdlog = this->sdlog.value;
-    if (this->sdlog.estimated)
-    {
-      if (this->sdlog.is_random_effect)
-      {
-        d1->RegisterRandomEffect(model1->sdlog);
-      }
-      else
-      {
-        d1->RegisterParameter(model1->sdlog);
-      }
-    }
-    // add to Information
+    
     d1->distribution_models[model1->id] = model1;
 
     // base model
@@ -433,42 +231,9 @@ public:
     // set relative info
     model2->id = this->id;
     model2->x = this->x.value;
-    if (this->x.estimated)
-    {
-      if (this->x.is_random_effect)
-      {
-        d2->RegisterRandomEffect(model2->x);
-      }
-      else
-      {
-        d2->RegisterParameter(model2->x);
-      }
-    }
     model2->meanlog = this->meanlog.value;
-    if (this->meanlog.estimated)
-    {
-      if (this->meanlog.is_random_effect)
-      {
-        d2->RegisterRandomEffect(model2->meanlog);
-      }
-      else
-      {
-        d2->RegisterParameter(model2->meanlog);
-      }
-    }
     model2->sdlog = this->sdlog.value;
-    if (this->sdlog.estimated)
-    {
-      if (this->sdlog.is_random_effect)
-      {
-        d2->RegisterRandomEffect(model2->sdlog);
-      }
-      else
-      {
-        d2->RegisterParameter(model2->sdlog);
-      }
-    }
-    // add to Information
+    
     d2->distribution_models[model2->id] = model2;
 
     // base model
@@ -481,42 +246,9 @@ public:
     // set relative info
     model3->id = this->id;
     model3->x = this->x.value;
-    if (this->x.estimated)
-    {
-      if (this->x.is_random_effect)
-      {
-        d3->RegisterRandomEffect(model3->x);
-      }
-      else
-      {
-        d3->RegisterParameter(model3->x);
-      }
-    }
     model3->meanlog = this->meanlog.value;
-    if (this->meanlog.estimated)
-    {
-      if (this->meanlog.is_random_effect)
-      {
-        d3->RegisterRandomEffect(model3->meanlog);
-      }
-      else
-      {
-        d3->RegisterParameter(model3->meanlog);
-      }
-    }
     model3->sdlog = this->sdlog.value;
-    if (this->sdlog.estimated)
-    {
-      if (this->sdlog.is_random_effect)
-      {
-        d3->RegisterRandomEffect(model3->sdlog);
-      }
-      else
-      {
-        d3->RegisterParameter(model3->sdlog);
-      }
-    }
-    // add to Information
+    
     d3->distribution_models[model3->id] = model3;
 
     return true;
