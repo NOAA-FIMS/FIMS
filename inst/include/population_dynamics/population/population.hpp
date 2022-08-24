@@ -50,8 +50,10 @@ namespace fims {
         size_t nyears;
         size_t nseasons;
         size_t nages;
+        size_t nfleets;
 
         std::vector<Type> log_naa; // this is estimated; after initialize in create_model, push_back to parameter list - in information.hpp (same for initial F in fleet)
+        std::vector<Type> log_F;
 
         std::vector<Type> ages;
         std::vector<Type> mortality_M;
@@ -85,7 +87,6 @@ namespace fims {
         std::vector<std::shared_ptr<fims::Fleet<Type>> > fleets;
         
         //std::vector<std::shared_ptr<fims::Fleet<Type>> > surveys;
-//
         Population() {
             this->id = Population::id_g++;
 
@@ -98,6 +99,7 @@ namespace fims {
           
             
             //size all the vectors to length of nages
+            nfleets = fleets.size();
             ages.resize(nages);
             mortality_M.resize(nages);
             mortality_F.resize(nyears*nages*nfleets);
@@ -111,6 +113,7 @@ namespace fims {
             biomass.resize(nyears);
             spawning_biomass.resize(nyears);
             log_naa.resize(nages);
+            log_Fmort.resize(nfleets*nyears);
 
             
             
@@ -125,16 +128,21 @@ namespace fims {
          */
         //delete std::vector<Type> because already declared; function has access to log_naa
         //exp(this ->log_naa[a]) on line 130 - more explicit that we are reference member
-        inline void CalculateInitialNAA(std::vector<Type> log_naa){ //inline all function unless complicated
-            for(int a = 0; a < nages; a++){
-              numbers_at_ages[0,a] = exp(log_naa[a]);
-            }
+        inline void CalculateInitialNumbersAA(int index, int a) { //inline all function unless complicated
+          this -> numbers_at_ages[index] = exp(this -> log_naa[a]);  
+        }
+        //where should nfleets be defined? initialize or as a member of the class?
+        void CalculateMortality(int index, int year) {
+          for(int nf; nf < this -> nfleets; nf++){
+            // calculate apical F by  
+            //How do we reference fleet objects, eg. fleets.Selectivity[index]? 
+            this -> F[index] =+ F[year]*fleets.nf.Selectivity[index];
+          }
+          this -> Z[index] = this -> M[index] + this -> F[index];
         }
 
-        void CalculateMortality() {
-        }
-
-        void CalculateNumbersAtAge() {
+        inline void CalculateNumbersAA(int index, int index2) {
+          this -> numbers_at_ages[index] = this -> numbers_at_ages[index2]*(1-exp(- this -> Z[index]));
         }
 
         void CalculateSpawningBiomass() {
@@ -143,10 +151,10 @@ namespace fims {
         void CalculateRecruitment() {
         }
 
-        void CalculateCatchAtAge() {
+        void CalculateCatchAA() {
         }
 
-        void CalculateSurveyNumbersAtAge() {
+        void CalculateSurveyNumbersAA() {
         }
 
         void Evaluate() { // for loop for everything, call functions above.
@@ -154,22 +162,34 @@ namespace fims {
          //Set the initial equilibrium numbers at age vector (could be independent or y=0?)
          // This will be set in initial_numbers vector (for year 0, age 0)
 
-         //calculate mortality
-         //change to this -> log_naa (this -> means you're referring to a class member (member of self))
-         CalculateInitialNAA(log_naa -> log_naa);
-      
-         //start at y=0; if y == 0 CalculateInitialNAA else CalculateNAA 
-         for (int y = 1; y < this->nyears; y++) {
-           Prepare()
+        
+         //this -> means you're referring to a class member (member of self)
+         
+         //start at y=0; if y == 0 CalculateInitialNumbersAA else CalculateNAA 
+         for (int y = 0; y < this->nyears; y++) {
+           
           
            // What is the this pointer doing here???
-            CalculateSpawningBiomass()
-            //Set the nrecruits for age a=0 year y (use pointers instead of functional returns)
-            CalculateRecruitment(y,numbers_at_age -> numbers_at_age[(y-1)*nages],fecundity)
+            CalculateSpawningBiomass();
+
             //numbers_at_age[(y)*nages] = CalculateRecruitment(y,numbers_at_age,fecundity);
-            for (int a = 1; a < this->nages; a++) {
-                int index = y * nages + a;
-                int index2 = (y-1) * nages + a;
+            
+            for (int a = 0; a < this->nages; a++) {
+              int index = y * nages + a;
+              int index2 = (y-1) * nages + a;
+              CalculateMortality(index)
+              if (y == 0) {
+                CalculateInitialNumbersAA(index, a);
+              } else {
+                if (a == 0) {
+                  //Set the nrecruits for age a=0 year y (use pointers instead of functional returns)
+                  CalculateRecruitment(y, numbers_at_age -> numbers_at_age[(y-1)*nages], fecundity);
+                } else {
+                  CalculateNumbersAA(index, index2);
+                }
+                
+              }
+                
                 
               // mortality_M is fixed, so we may want to set  it in the initialized
               // mortality_F needs to either be a parameter vector or approximated from catch data.
@@ -183,8 +203,8 @@ namespace fims {
                 mortality_Z[index] += fleet_F[sub_index]; 
               }
               
-              //calculate numbers at age for the given y and age: CalculateNumbersAtAge
-              CalculateNumbersAtAge(numbers_at_age -> numbers_at_age[index], Z -> mortality_Z[a]);
+              //calculate numbers at age for the given y and age: CalculateNumbersAA (numbers at age)
+              CalculateNumbersAA(numbers_at_age -> numbers_at_age[index], Z -> mortality_Z[a]);
               numbers_at_age[(y)*nages+a] = numbers_at_age[(y-1)*nages+a-1]*(1-exp(-Z[a]));
               
               //TODO: continue calculating. WHAM and SAM could be good refs
