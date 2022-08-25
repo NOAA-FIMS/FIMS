@@ -132,11 +132,11 @@ namespace fims {
           this -> numbers_at_ages[index] = exp(this -> log_naa[a]);  
         }
         //where should nfleets be defined? initialize or as a member of the class?
-        void CalculateMortality(int index, int year) {
+        void CalculateMortality(int index, int year, int age) {
           for(int nf; nf < this -> nfleets; nf++){
             // calculate apical F by  
             //How do we reference fleet objects, eg. fleets.Selectivity[index]? 
-            this -> F[index] =+ F[year]*fleets.nf.Selectivity[index];
+            this -> F[index] =+ fleets[nf].selectivity->evaluate(age);
           }
           this -> Z[index] = this -> M[index] + this -> F[index];
         }
