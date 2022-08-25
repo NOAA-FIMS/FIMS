@@ -27,7 +27,7 @@
 namespace fims {
 
     /**
-     * Contains all objects and data pre-model construction
+    * @brief Stores FIMS model information and creates model. Contains all objects and data pre-model construction
      */
     template <typename T>
     class Information {
@@ -43,8 +43,8 @@ namespace fims {
         std::vector<T*> fixed_effects_parameters; // list of all fixed effects parameters
 
         //data objects
-        std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > > data_objects;
-        typedef typename std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >::iterator data_iterator;
+        std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > > data_objects; //map that holds data objects
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >::iterator data_iterator;  
 
         //life history modules
         std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;//hash map to link each object to its shared location in memory
@@ -105,7 +105,9 @@ namespace fims {
 
         /**
          * Create the generalized stock assessment model that will evaluate the
-         * objective function.
+         * objective function. Does error checking to make sure the program has 
+         * all necessary components for the model and that they're in the right 
+         * dimensions.
          *
          * @return
          */
@@ -133,6 +135,7 @@ namespace fims {
                     } else {
                         valid_model = false;
                         //log error
+                        FIMS_LOG << "Error: observed index data not defined for fleet" << f->id << std::endl;
                     }
 
                 } else {
