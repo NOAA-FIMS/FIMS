@@ -130,3 +130,15 @@ target_link_libraries(population_dynamics_recruitment_base
 )
 
 gtest_discover_tests(population_dynamics_recruitment_base)
+
+# test_fims_math_ad_fab_min_max.cpp
+add_executable(fims_math_fabs_min_max
+  test_fims_math_ad_fabs_min_max.cpp
+)
+
+target_link_libraries(fims_math_fabs_min_max
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_math_fabs_min_max)
