@@ -16,6 +16,11 @@ test_that("Can create the S4 FIMSFrame classes", {
   dev.off()
 })
 
+test_that("Show method works as expected", {
+  expect_message(show(fims_frame))
+})
+
+
 test_that("Validators work as expected", {
   bad_input <- data.frame(test = 1, test2 = 2)
   expect_error(FIMSFrame(bad_input))
