@@ -56,7 +56,7 @@ namespace fims {
 
         std::vector<Type> log_naa; // this is estimated; after initialize in create_model, push_back to parameter list - in information.hpp (same for initial F in fleet)
         std::vector<Type> log_Fmort;
-        sdt::vector<Type> log_M;
+        std::vector<Type> log_M;
 
         std::vector<Type> ages;
         std::vector<Type> mortality_M;
@@ -156,7 +156,7 @@ namespace fims {
         inline void CalculateNumbersAA(int index, int index2) {
           this -> numbers_at_ages[index] = this -> numbers_at_ages[index2]*(1-exp(- this -> Z[index]));
         }
-
+//need to declare unfished_numbers_at_age
         inline void CalculateUnfishedNumbersAA(int index, int age) {
           this -> unfished_numbers_at_age[age] = this -> unfished_numbers_at_age[age-1]*(1-exp(- this -> exp(log_M[index])));
         }
@@ -167,7 +167,7 @@ namespace fims {
             this -> weight_at_age[age];
 
         }
-
+//need to declare unfished_spawning_biomass
         void CalculateUnfishedSpawningBiomass(int index, int year, int age) {
           this -> unfished_spawning_biomass[year] += this -> proportion_female * 
             this -> numbers_at_age[index] * this -> proportion_mature_at_age[age] * 
