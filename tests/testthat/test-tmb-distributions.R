@@ -44,7 +44,7 @@ test_that("dmultinom", {
   # generate data using R stats:rnorm
   set.seed(123)
   p <- (1:10) / sum(1:10)
-  x <- rmultinom(1, 100, p)
+  x <- stats::rmultinom(1, 100, p)
 
   # create a fims Rcpp object
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
