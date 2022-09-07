@@ -9,11 +9,11 @@
 #' @export
 #' @examples
 #' create_fims_rcpp_interface(
-#' "DmultinomDistributionsInterface",
-#' "Dmultinom",
-#' "DistributionsInterfaceBase",
-#' "distribution_models",
-#' c("x", "p")
+#'   "DmultinomDistributionsInterface",
+#'   "Dmultinom",
+#'   "DistributionsInterfaceBase",
+#'   "distribution_models",
+#'   c("x", "p")
 #' )
 #' create_fims_rcpp_interface(
 #'   "LogisticSelectivityInterface",
@@ -22,7 +22,7 @@
 #'   "selectivity_models",
 #'   c("slope", "median")
 #' )
-#' 
+#'
 create_fims_rcpp_interface <- function(interface_name = character(),
                                        model = character(),
                                        base_class = character(),
