@@ -185,6 +185,7 @@ namespace fims {
         void CalculateCatchAA() {
         }
 
+//don't need separate function for survey - both survey and fishery treated as 'fleet'
         void CalculateSurveyNumbersAA() {
         }
 
