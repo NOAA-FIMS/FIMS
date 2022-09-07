@@ -10,7 +10,6 @@
 #' \code{module_name.hpp}.
 #' @param module_type the folder of
 #' \code{inst/include/population_dynamics} to put the files in
-#' @importFrom usethis use_template ui_stop
 #' @return TRUE
 #' @examples
 #' \dontrun{
