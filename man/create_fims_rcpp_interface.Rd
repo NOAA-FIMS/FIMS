@@ -33,10 +33,18 @@ for FIMS model objects.
 }
 \examples{
 create_fims_rcpp_interface(
+  "DmultinomDistributionsInterface",
+  "Dmultinom",
+  "DistributionsInterfaceBase",
+  "distribution_models",
+  c("x", "p")
+)
+create_fims_rcpp_interface(
   "LogisticSelectivityInterface",
   "LogisticSelectivity",
   "selectivity_interface_base",
   "selectivity_models",
   c("slope", "median")
 )
+
 }
