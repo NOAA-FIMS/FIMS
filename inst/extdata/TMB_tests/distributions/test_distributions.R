@@ -34,7 +34,7 @@ test_that("dnorm unit test", {
   #Simulate new data with R
   y = rnorm(10, 5, 3)
   #Calculate negative log-likelihood with R dnorm
-  nll = -sum(dnorm(y, 5,3, TRUE))
+  nll = -sum(stats::dnorm(y, 5,3, TRUE))
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(y =y),
                   parameters = list(p = c(5, log(3))),
@@ -58,9 +58,9 @@ test_that("dlnorm unit test", {
   dyn.load(dynlib(paste0(path, "/test_dlnorm_distribution")))
   set.seed(123)
   #Simulate new data with R
-  y = rlnorm(10, 2, 1)
+  y = stats::rlnorm(10, 2, 1)
   #Calculate negative log-likelihood with R dlnorm
-  nll = -sum(dlnorm(y, 2, 1, TRUE))
+  nll = -sum(stats::dlnorm(y, 2, 1, TRUE))
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(logy = y),
                   parameters = list(p = c(2, log(1))),
@@ -84,9 +84,9 @@ test_that("dmultinom unit test", {
   set.seed(123)
   #Simulate new data with R
   p = (1:10)/sum(1:10)
-  x = rmultinom(1, 100, p)
+  x = stats::rmultinom(1, 100, p)
   #Calculate negative log-likelihood with R dnmultinom
-  nll = -dmultinom(x, 100,p, TRUE)
+  nll = -stats::dmultinom(x, 100,p, TRUE)
   #Initialize TMB model object with true values
   mod = MakeADFun(data = list(x =x),
                   parameters = list(p = p),
