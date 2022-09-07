@@ -12,7 +12,7 @@ test_that("create_fims_rcpp_interface() works with recruitment rcpp", {
   object_text <- capture.output(
     FIMS::create_fims_rcpp_interface(
       interface_name = "BevertonHoltRecruitmentInterface",
-      model= "SRBevertonHolt",
+      model = "SRBevertonHolt",
       base_class = "RecruitmentInterfaceBase",
       container = "recruitment_models",
       parameters = c("steep", "rzero", "phizero")
@@ -20,5 +20,4 @@ test_that("create_fims_rcpp_interface() works with recruitment rcpp", {
   )
 
   expect_true(all.equal(expect_text, object_text))
-
 })
