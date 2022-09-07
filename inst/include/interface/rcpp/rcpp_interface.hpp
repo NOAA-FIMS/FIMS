@@ -96,7 +96,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")
       .constructor()
-      .method("get_id",  &DlnormDistributionsInterface::get_id)
+      .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
       .field("x", &DlnormDistributionsInterface::x)
       .field("meanlog", &DlnormDistributionsInterface::meanlog)
@@ -105,10 +105,9 @@ RCPP_MODULE(fims) {
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
-      .method("get_id",  &DmultinomDistributionsInterface::get_id)
+      .method("get_id", &DmultinomDistributionsInterface::get_id)
       .field("x", &DmultinomDistributionsInterface::x)
       .field("p", &DmultinomDistributionsInterface::p);
-
 }
 
 #endif /* RCPP_INTERFACE_HPP */
