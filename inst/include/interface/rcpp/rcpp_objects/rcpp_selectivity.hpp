@@ -52,6 +52,9 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
     SelectivityInterfaceBase::selectivity_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
+
+  virtual ~SelectivityInterfaceBase() {}
+
   /** @brief get the ID of the interface base object
    **/
   virtual uint32_t get_id() = 0;
