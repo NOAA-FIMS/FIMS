@@ -43,9 +43,11 @@
  * */
 class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
  public:
-  static uint32_t id_g;
-  uint32_t id;
-  static std::map<uint32_t, SelectivityInterfaceBase*> selectivity_objects;
+  static uint32_t id_g; /**< static id of the recruitment interface base*/
+  uint32_t id;          /**< id of the recruitment interface base */
+  static std::map<uint32_t, SelectivityInterfaceBase*>
+      selectivity_objects; /**< map associating the ids of
+                              SelectivityInterfaceBase to the objects */
 
   SelectivityInterfaceBase() {
     this->id = SelectivityInterfaceBase::id_g++;
@@ -53,6 +55,10 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
 
+  virtual ~SelectivityInterfaceBase() {}
+
+  /** @brief get the ID of the interface base object
+   **/
   virtual uint32_t get_id() = 0;
 };
 
