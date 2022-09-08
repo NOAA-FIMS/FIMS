@@ -36,7 +36,10 @@
 namespace fims {
 
 template <typename T>
-struct Fleet {};
+struct Fleet {
+    
+    
+};
 
 }  // namespace fims
 

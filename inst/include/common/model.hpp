@@ -34,6 +34,10 @@ class Model {
   static std::shared_ptr<Model<T> > fims_model;
   std::vector<std::shared_ptr<Population<T> > > populations;
   std::vector<std::shared_ptr<Fleet<T> > > fleets;
+    
+    virtual ~Model(){
+        
+    }
 };
 template <typename T>
 std::shared_ptr<Model<T> > Model<T>::fims_model = nullptr;
