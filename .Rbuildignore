@@ -8,3 +8,4 @@ build
 ^codecov\.yml$
 .vscode
 ^data-raw$
+^\.devcontainer$
