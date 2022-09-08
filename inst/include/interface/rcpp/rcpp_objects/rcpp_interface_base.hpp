@@ -47,17 +47,33 @@
  */
 class Parameter {
  public:
-  double value;
-  double min = std::numeric_limits<double>::min();
-  double max = std::numeric_limits<double>::max();
-  bool is_random_effect = false;
-  bool estimated = false;
+  double value; /**< initial value of the parameter*/
+  double min =
+      std::numeric_limits<double>::min(); /**< min value of the parameter*/
+  double max =
+      std::numeric_limits<double>::max(); /**< max value of the parameter*/
+  bool is_random_effect = false;          /**< Is the parameter a random effect
+                                             parameter? Default value is false.*/
+  bool estimated =
+      false; /**< Is the parameter estimated? Default value is false.*/
 
+  /**
+   * @brief Constructor for initializing Parameter.
+   * @details Inputs include value, min, max, estimated.
+   */
   Parameter(double value, double min, double max, bool estimated)
       : value(value), min(min), max(max), estimated(estimated) {}
 
+  /**
+   * @brief Constructor for initializing Parameter.
+   * @details Inputs include value.
+   */
   Parameter(double value) { this->value = value; }
 
+  /**
+   * @brief Constructor for initializing Parameter.
+   * @details Set value to 0 when there is no input value.
+   */
   Parameter() { this->value = 0; }
 };
 
@@ -66,7 +82,8 @@ class Parameter {
  */
 class FIMSRcppInterfaceBase {
  public:
-  static std::vector<FIMSRcppInterfaceBase*> fims_interface_objects;
+  /**< FIMS interface object vectors */
+  static std::vector<FIMSRcppInterfaceBase *> fims_interface_objects;
 
   /** @brief virtual method to inherit to add objects to the TMB model */
   virtual bool add_to_fims_tmb() {
@@ -75,7 +92,7 @@ class FIMSRcppInterfaceBase {
     return false;
   }
 };
-std::vector<FIMSRcppInterfaceBase*>
+std::vector<FIMSRcppInterfaceBase *>
     FIMSRcppInterfaceBase::fims_interface_objects;
 
 #endif
