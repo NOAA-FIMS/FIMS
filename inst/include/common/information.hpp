@@ -29,20 +29,20 @@ namespace fims {
 template <typename T>
 class Information {
  public:
-  static std::shared_ptr<Information<T> > fims_information;
-  std::vector<T*> parameters;  // list of all estimated parameters
+  static std::shared_ptr<Information<T> > fims_information; /*!< Create a shared fims_information as a pointer to Information*/
+  std::vector<T*> parameters;  /*!< list of all estimated parameters*/
   std::vector<T*>
-      random_effects_parameters;  // list of all random effects parameters
+      random_effects_parameters;  /*!<  list of all random effects parameters*/
   std::vector<T*>
-      fixed_effects_parameters;  // list of all fixed effects parameters
+      fixed_effects_parameters;  /*!<  list of all fixed effects parameters*/
 
   std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >
-      recruitment_models;
+      recruitment_models; /*!< map associating the ids of RecruitmentBase to the recruitment models */
   std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >
-      selectivity_models;
+      selectivity_models; /*!< map associating the ids of SelectivityBase to the selectivity models */
   std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >
-      distribution_models;
-  std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
+      distribution_models; /*!< map associating the ids of DistributionsBase to the distribution models */
+  std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models; /*!< map associating the ids of GrowthBase to the growth models */
 
   /**
    * Returns a single Information object for type T.
@@ -67,7 +67,7 @@ class Information {
   /**
    * Register a random effect as estimable.
    *
-   * @param p
+   * @param re
    */
   void RegisterRandomEffect(T& re) {
     this->random_effects_parameters.push_back(&re);
