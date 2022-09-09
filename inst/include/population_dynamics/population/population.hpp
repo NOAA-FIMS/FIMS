@@ -47,14 +47,15 @@ namespace fims {
     template <typename Type>
     struct Population : public FIMSObject<Type> {
         static uint32_t id_g; /*!< reference id for population object*/
-        size_t nyears;
-        size_t nseasons;
-        size_t nages;
-        size_t nfleets;
+        size_t nyears; /*!< total number of years in the fishery*/
+        size_t nseasons; /*!< total number of seasons in the fishery*/
+        size_t nages; /*!< total number of ages in the population*/
+        size_t nfleets; /*!< total number of fleets in the fishery*/
         //constants
         const double proportion_female = 0.5;
 
-        std::vector<Type> log_naa; // this is estimated; after initialize in create_model, push_back to parameter list - in information.hpp (same for initial F in fleet)
+// parameters are estimated; after initialize in create_model, push_back to parameter list - in information.hpp (same for initial F in fleet)
+        std::vector<Type> log_naa; 
         std::vector<Type> log_Fmort;
         std::vector<Type> log_M;
 
@@ -68,10 +69,13 @@ namespace fims {
         std::vector<Type> weight_at_age;
         // fecundity removed because we don't  need it yet?
         std::vector<Type> numbers_at_age;
+        std::vector<Type> unfished_numbers_at_age;
         std::vector<Type> catch_at_age;
         std::vector<Type> biomass;
         std::vector<Type> spawning_biomass;
+        std::vector<Type> unfished_spawning_biomass;
         std::vector<Type> proportion_mature_at_age;
+        std::vector<Type> expected_numbers_at_age;
 
         ///recruitment
         int recruitment_id = -999; /*!< id of recruitment model object*/
@@ -108,15 +112,16 @@ namespace fims {
             ages.resize(nages);
             mortality_F.resize(nyears*nages);
             mortality_Z.resize(nages);
-            proportion_mature_at_age.resize(nyears*nages);
+            proportion_mature_at_age.resize((nyears+1)*nages);
             initial_numbers.resize(nages);
             weight_at_age.resize(nages);
-            unfished_numbers_at_age.resize(nyears*nages);
-            numbers_at_age.resize(nyears*nages);
+            unfished_numbers_at_age.resize((nyears+1)*nages);
+            numbers_at_age.resize((nyears+1)*nages);
+            expected_numbers_at_age.resize((nyears+1)*nages*nfleets);
             catch_at_age.resize(nages);
-            biomass.resize(nyears);
-            unfished_spawning_biomass.resize(nyears);
-            spawning_biomass.resize(nyears);
+            biomass.resize((nyears+1));
+            unfished_spawning_biomass.resize((nyears+1));
+            spawning_biomass.resize((nyears+1));
             log_naa.resize(nages);
             log_Fmort.resize(nfleets*nyears);
             log_M.resize(nyears*nages);
@@ -154,11 +159,13 @@ namespace fims {
         }
 
         inline void CalculateNumbersAA(int index, int index2) {
-          this -> numbers_at_ages[index] = this -> numbers_at_ages[index2]*(1-exp(- this -> Z[index]));
+          //using Z from previous age/year - is this correct?
+          this -> numbers_at_ages[index] = this -> numbers_at_ages[index2]*(exp(- this -> mortality_Z[index2]));
         }
-//need to declare unfished_numbers_at_age
-        inline void CalculateUnfishedNumbersAA(int index, int age) {
-          this -> unfished_numbers_at_age[age] = this -> unfished_numbers_at_age[age-1]*(1-exp(- this -> exp(log_M[index])));
+
+        inline void CalculateUnfishedNumbersAA(int index, int index2, int age) {
+          //using M from previous age/year - is this correct?
+          this -> unfished_numbers_at_age[age] = this -> unfished_numbers_at_age[age-1]*(exp(- this -> exp(log_M[index2])));
         }
         
         void CalculateSpawningBiomass(int index, int year, int age) {
@@ -167,7 +174,7 @@ namespace fims {
             this -> weight_at_age[age];
 
         }
-//need to declare unfished_spawning_biomass
+
         void CalculateUnfishedSpawningBiomass(int index, int year, int age) {
           this -> unfished_spawning_biomass[year] += this -> proportion_female * 
             this -> numbers_at_age[index] * this -> proportion_mature_at_age[age] * 
@@ -183,10 +190,18 @@ namespace fims {
         }
 
         void CalculateCatchAA() {
+          
         }
 
-//don't need separate function for survey - both survey and fishery treated as 'fleet'
-        void CalculateSurveyNumbersAA() {
+        //don't need separate function for survey - both survey and fishery treated as 'fleet'
+        void CalculateExpectedNumbersAA(int index, int year, int age) {
+          for (int nf=0; nf < this -> nfleets; nf++) {
+            int index3 = year*nages*nfleets + age*nfleets + nf;
+            int index2 = year*nfleets + nf //index by fleet and years to dimension fold
+            //Baranov Catch Equation
+            expected_numbers_at_age[index3] = ( (exp(this -> log_Fmort[index2]) * fleets[nf].selectivity->evaluate(age) )/
+              this -> mortality_Z[index] ) * this -> numbers_at_ages[index] * ( 1 - exp(- this -> mortality_Z[index]) );;
+          }
         }
 
         void CalculateMaturityAA(int index, int age) {
@@ -196,22 +211,19 @@ namespace fims {
         }
 
         void Evaluate() { // for loop for everything, call functions above.
-         // In progress, jotting down rough code for the population loop.
-         //Set the initial equilibrium numbers at age vector (could be independent or y=0?)
-         // This will be set in initial_numbers vector (for year 0, age 0)
-
         
          //this -> means you're referring to a class member (member of self)
          
-         //start at y=0; if y == 0 CalculateInitialNumbersAA else CalculateNAA 
-         for (int y = 0; y < this->nyears; y++) {
-           
-            //numbers_at_age[(y)*nages] = CalculateRecruitment(y,numbers_at_age,fecundity);
-            
+         //start at year=0, age=0; 
+         for (int y = 0; y <= this->nyears; y++) {
             for (int a = 0; a < this->nages; a++) {
               int index = y * nages + a;
-              CalculateMortality(index, y, a);
+              if(y < this->nyears){
+                CalculateMortality(index, y, a);
+                
+              }
               CalculateMaturityAA(index, a);
+              // if y == 0 CalculateInitialNumbersAA else CalculateNAA 
               if (y == 0) {
                 CalculateInitialNumbersAA(index, a);
                 if(a == 0) {
@@ -228,11 +240,15 @@ namespace fims {
                   CalculateRecruitment(index, y); 
                   this -> unfished_numbers_at_age[index] = this -> recruitment.rzero;
                 } else {
+                  int index2 = (y-1) * nages + (a-1);
                   CalculateNumbersAA(index, index2);
                   CalculateUnfishedNumbersAA(index, a);
                 }
                 CalculateSpawningBiomass(index, y, a)
                 CalculateUnfishedSpawningBiomass(index, y, a)
+              }
+              if(y < this->nyears){
+                CalculateExpectedNumbersAA(index, y, a);
               }
             }
           }
