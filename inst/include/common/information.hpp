@@ -44,6 +44,13 @@ class Information {
       distribution_models;
   std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
 
+    Information(){
+        
+    }
+    
+    virtual ~Information(){
+        
+    }
   /**
    * Returns a single Information object for type T.
    *
