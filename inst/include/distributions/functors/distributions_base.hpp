@@ -34,8 +34,10 @@ struct DistributionsBase : public FIMSObject<T> {
 
   /** @brief Constructor.
    */
-  DistributionsBase() { this->id = DistributionsBase::id_g++; }
+  DistributionsBase() { this->id =
+      DistributionsBase::id_g++; }
 
+    virtual ~DistributionsBase(){}
   /**
    * @brief Generic probability density function. Calculates the pdf at the
    * independent variable value.

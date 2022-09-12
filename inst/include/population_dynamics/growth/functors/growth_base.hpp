@@ -35,6 +35,9 @@ struct GrowthBase : public FIMSObject<T> {
    */
   GrowthBase() { this->id = GrowthBase::id_g++; }
 
+    virtual ~GrowthBase(){
+        
+    }
   /*
    * @brief Calculates the  growth at the independent variable value.
    * @param a The age at which to return weight of the fish (in kg).

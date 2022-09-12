@@ -53,6 +53,8 @@ struct RecruitmentBase : public FIMSObject<Type> {
   /** @brief Constructor.
    */
   RecruitmentBase() { this->id = RecruitmentBase::id_g++; }
+    
+    virtual ~RecruitmentBase(){}
 
   /** @brief Calculates the expected recruitment for a given spawning input.
    *
