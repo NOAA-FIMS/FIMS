@@ -34,7 +34,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<T> {
 
   DoubleLogisticSelectivity() : SelectivityBase<T>() {}
 
-  virtual ~DoubleLogisticSelectivity(){}
+  virtual ~DoubleLogisticSelectivity() {}
   /**
    * @brief Method of the double logistic selectivity class that implements the
    * double logistic function from FIMS math.

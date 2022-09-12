@@ -38,8 +38,8 @@ struct SelectivityBase : public FIMSObject<T> {
     // increment id of the singleton selectivity class
     this->id = SelectivityBase::id_g++;
   }
-    
-    virtual ~SelectivityBase(){}
+
+  virtual ~SelectivityBase() {}
 
   /**
    * @brief Calculates the selectivity.
