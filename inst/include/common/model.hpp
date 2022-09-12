@@ -31,9 +31,12 @@ namespace fims {
 template <typename T>
 class Model {
  public:
+
   static std::shared_ptr<Model<T> > fims_model; /*!< Create a shared fims_model as a pointer to Model*/
   std::vector<std::shared_ptr<Population<T> > > populations; /*!< list of all population*/
   std::vector<std::shared_ptr<Fleet<T> > > fleets; /*!< list of all fleets*/
+  virtual ~Model() {}
+
 };
 template <typename T>
 std::shared_ptr<Model<T> > Model<T>::fims_model = nullptr;
