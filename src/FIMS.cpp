@@ -4,7 +4,7 @@
 #include "../inst/include/interface/interface.hpp"
 #include "../inst/include/interface/init.hpp"
 
-/// @cond DEV
+/// @cond 
 /**
  * @brief TMB objective function
  *
