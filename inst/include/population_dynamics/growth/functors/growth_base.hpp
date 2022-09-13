@@ -19,7 +19,7 @@
 namespace fims {
 
 /**
- *  @brief Base class for all growth functors.
+ * @brief Base class for all growth functors.
  *
  * @tparam T The type of the growth functor.
  * */
@@ -29,14 +29,16 @@ struct GrowthBase : public FIMSObject<T> {
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the  growthBase class.
-  static uint32_t id_g;
+  static uint32_t id_g; /*!< reference id for growth object*/
 
-  /* @brief Constructor.
+  /**
+   * @brief Constructor.
    */
   GrowthBase() { this->id = GrowthBase::id_g++; }
-
+  
   virtual ~GrowthBase() {}
-  /*
+
+  /**
    * @brief Calculates the  growth at the independent variable value.
    * @param a The age at which to return weight of the fish (in kg).
    */
