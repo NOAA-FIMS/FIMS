@@ -87,7 +87,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * you can call from R using
    * ewaagrowth.evaluate(age)
    * */
-  double evaluate(double age) {
+  virtual double evaluate(double age) {
     fims::EWAAgrowth<double> EWAAGrowth;
 
     if (initialized == false) {
