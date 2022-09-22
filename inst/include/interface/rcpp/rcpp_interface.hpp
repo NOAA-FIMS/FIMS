@@ -19,7 +19,7 @@
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
-#include "rcpp_objects/rcpp_tmb_dnorm_distribution.hpp"
+#include "rcpp_objects/rcpp_tmb_distribution.hpp"
 
 /**
  * @brief Create the TMB model object and add interface objects to it.
@@ -103,6 +103,26 @@ RCPP_MODULE(fims) {
             .field("weights", &EWAAGrowthInterface::weights)
             .method("evaluate", &EWAAGrowthInterface::evaluate);
 
+  Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
+      .constructor()
+      .field("ages", &EWAAGrowthInterface::ages)
+      .field("weights", &EWAAGrowthInterface::weights)
+      .method("evaluate", &EWAAGrowthInterface::evaluate);
+
+  Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")
+      .constructor()
+      .method("get_id", &DlnormDistributionsInterface::get_id)
+      .method("evaluate", &DlnormDistributionsInterface::evaluate)
+      .field("x", &DlnormDistributionsInterface::x)
+      .field("meanlog", &DlnormDistributionsInterface::meanlog)
+      .field("sdlog", &DlnormDistributionsInterface::sdlog);
+
+  Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
+      .constructor()
+      .method("evaluate", &DmultinomDistributionsInterface::evaluate)
+      .method("get_id", &DmultinomDistributionsInterface::get_id)
+      .field("x", &DmultinomDistributionsInterface::x)
+      .field("p", &DmultinomDistributionsInterface::p);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
