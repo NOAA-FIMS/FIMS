@@ -37,25 +37,25 @@ namespace fims {
         size_t nseasons = 1;
         size_t nages;
 
-        static std::shared_ptr<Information<T> > fims_information;
+        static std::shared_ptr<Information<T> > fims_information; //! singleton instance
         std::vector<T*> parameters; // list of all estimated parameters
         std::vector<T*> random_effects_parameters; // list of all random effects parameters
         std::vector<T*> fixed_effects_parameters; // list of all fixed effects parameters
 
-        //data objects
+         //data objects
         std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > > data_objects; //map that holds data objects
         typedef typename std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >::iterator data_iterator;  
 
-        //life history modules
+         //life history modules
         std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;//hash map to link each object to its shared location in memory
         typedef typename std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >::iterator recruitment_model_iterator;
-
+  
         std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >::iterator selectivity_models_iterator;
-
+  
         std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > >::iterator growth_models_iterator;
-
+  
         //fleet modules
         std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > > fleets;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > >::iterator fleet_iterator;
@@ -68,10 +68,10 @@ namespace fims {
         std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >  distribution_models;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >::iterator distribution_models_iterator;
 
-        Information() {
+        Information() {}
 
-        }
-
+        virtual ~Information() {}
+        
         /**
          * Returns a single Information object for type T.
          *
@@ -79,8 +79,8 @@ namespace fims {
          */
         static std::shared_ptr<Information<T> > GetInstance() {
             if (Information<T>::fims_information == nullptr) {
-                Information<T>::fims_information =
-                        std::make_shared<fims::Information<T> >();
+            Information<T>::fims_information =
+                std::make_shared<fims::Information<T> >();
             }
             return Information<T>::fims_information;
         }
@@ -93,11 +93,11 @@ namespace fims {
         void RegisterParameter(T& p) {
             this->parameters.push_back(&p);
         }
-
+            
         /**
          * Register a random effect as estimable.
          *
-         * @param p
+         * @param re
          */
         void RegisterRandomEffect(T& re) {
             this->random_effects_parameters.push_back(&re);

@@ -39,6 +39,8 @@ struct SelectivityBase : public FIMSObject<T> {
     this->id = SelectivityBase::id_g++;
   }
 
+  virtual ~SelectivityBase() {}
+
   /**
    * @brief Calculates the selectivity.
    * @param x The independent variable in the logistic function (e.g., age or
