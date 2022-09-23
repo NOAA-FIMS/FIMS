@@ -35,7 +35,7 @@ struct GrowthBase : public FIMSObject<T> {
    * @brief Constructor.
    */
   GrowthBase() { this->id = GrowthBase::id_g++; }
-  
+
   virtual ~GrowthBase() {}
 
   /**
