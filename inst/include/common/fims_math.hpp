@@ -142,7 +142,7 @@ const T ad_fabs(const T &x, T C = 1e-5) {
  *
  * Returns the minimum between a and b in a continuous manner using:
  *
- * (a + b - fims::ad_fabs(a - b))*.5; 
+ * (a + b - fims::ad_fabs(a - b))*.5;
  * Reference: \ref fims::ad_fabs()
  *
  * This is an approximation with minimal error.
