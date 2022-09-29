@@ -296,25 +296,40 @@ namespace fims {
          //this -> means you're referring to a class member (member of self)
          
          //start at year=0, age=0; 
+         //here year 0 is the estimated initial stock structure and age 0 are recruits
+         //loops start at zero with if statements inside to specify unique code for 
+         //initial structure and recruitment 0 loops. Could also have started loops at
+         //1 with initial structure and recruitment setup outside the loops.
          for (int y = 0; y <= this->nyears; y++) {
             for (int a = 0; a < this->nages; a++) {
-              
+              //index naming defines the dimensional folding structure 
+              //i.e. index_ya is referencing folding over years and ages.
               int index_ya = y * nages + a;
+              //Mortality rates are not estimated in the final year which is 
+              //used to show expected stock structure at the end of the model period.
+              //This is because biomass in year i represents biomass at the start of 
+              //the year. 
+              //Should we add complexity to track more values such as start, 
+              //mid, and end biomass in all years where, start biomass=end biomass of the 
+              //previous year? 
               if(y < this->nyears){
+                //First thing we need is total mortality aggregated across all fleets
                 CalculateMortality(index_ya, y, a);
-                
               }
               CalculateMaturityAA(index_ya, a);
               // if y == 0 CalculateInitialNumbersAA else CalculateNAA 
               if (y == 0) {
+                //Initial numbers at age is a user input or estimated parameter vector.
                 CalculateInitialNumbersAA(index_ya, a);
                 if(a == 0) {
                   this -> unfished_numbers_at_age[index_ya] = this -> recruitment.rzero;
                 } else {
                   CalculateUnfishedNumbersAA(index_ya, a);
                 }
-                CalculateSpawningBiomass(index_ya, y, a)
-                CalculateUnfishedSpawningBiomass(index_ya, y, a)
+                //Fished and unfished spawning biomass vectors are summing biomass at age
+                //across ages to allow calculation of recruitment in the next year.
+                CalculateSpawningBiomass(index_ya, y, a);
+                CalculateUnfishedSpawningBiomass(index_ya, y, a);
               } else {
                 if (a == 0) {
                   //Set the nrecruits for age a=0 year y (use pointers instead of functional returns)
