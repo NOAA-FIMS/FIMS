@@ -29,6 +29,9 @@ namespace fims {
 
 
         //data objects
+        int observed_catch_data_id = -999; /*!< id of observed catch data object*/
+        std::shared_ptr<fims::DataObject<Type> > observed_catch_data; /*!< observed catch data object*/
+
         int observed_index_data_id = -999; /*!< id of observed index data object*/
         std::shared_ptr<fims::DataObject<Type> > observed_index_data; /*!< observed index data object*/
 
@@ -36,6 +39,9 @@ namespace fims {
         std::shared_ptr<fims::DataObject<Type> > observed_agecomp_data; /*!< observed agecomp data object*/
 
         //likelihood components
+        int catch_likelihood_id = -999; /*!< id of catch likelihood component*/
+        std::shared_ptr<fims::DistributionsBase<Type> > catch_likelihood; /*!< catch likelihood component*/
+
         int index_likelihood_id = -999; /*!< id of index likelihood component*/
         std::shared_ptr<fims::DistributionsBase<Type> > index_likelihood; /*!< index likelihood component*/
 
@@ -47,9 +53,10 @@ namespace fims {
         std::shared_ptr<fims::SelectivityBase<Type> > selectivity; /*!< selectivity component*/
 
         //derived quantities
-        std::vector<Type> catch_at_age; /*!<derived quantity catch at age*/
-        std::vector<Type> catch_index; /*!<derived quantity catch index*/
-        std::vector<Type> age_composition; /*!<derived quantity age composition*/
+        std::vector<Type> expected_catch; /*!<model expected total catch*/
+        std::vector<Type> expected_index; /*!<model expected index of abundance*/
+        std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
+        
 
         /**
          * @brief Constructor.
@@ -67,9 +74,9 @@ namespace fims {
             this -> nyears = nyears;
             this -> nages = nages;
 
-            catch_at_age.resize(nyears * nages);
-            catch_index.resize(nyears); // assume index is for all ages.
-            age_composition.resize(nyears * nages);
+            expected_catch.resize(nyears);
+            expected_index.resize(nyears); // assume index is for all ages.
+            catch_numbers_at_age.resize(nyears * nages);
         }
 
         /**
@@ -77,8 +84,9 @@ namespace fims {
          * @param do_log Whether to take the log of the likelihood.
          */
         const Type likelihood(bool do_log) {
-            return this->index_likelihood->evaluate(do_log)
-                    + this->agecomp_likelihood->evaluate(do_log);
+            return this -> catch_likelihood -> evaluate(do_log) 
+                    + this -> index_likelihood->evaluate(do_log)
+                    + this -> agecomp_likelihood->evaluate(do_log);
         }
 
     };

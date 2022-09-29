@@ -219,12 +219,7 @@ namespace fims {
                     //log error
                 }
 
-                //initialize derived quantities containers
-                //TODO: make these generic indices instead of specific to age/year/season
-                f->catch_at_age.resize(nyears * nseasons * nages);
-                f->catch_at_age.resize(nyears * nseasons * nages);
-                f->age_composition.resize(nyears * nseasons);
-                //error check and set fleet elements here
+           
             }
 
             std::cout << "Information: Initializing population objects.\n";
