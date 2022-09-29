@@ -36,8 +36,10 @@
 
 class FleetInterface : public FIMSRcppInterfaceBase
 {
+    int observed_catch_data_id = -999;
     int observed_index_data_id = -999;
     int observed_agecomp_data_id = -999;
+    int catch_likelihood_id = -999;
     int index_likelihood_id = -999;
     int agecomp_likelihood_id = -999;
     int selectivity_id = -999;
@@ -63,6 +65,19 @@ public:
         }
 
         this->agecomp_likelihood_id = agecomp_likelihood_id;
+    }
+
+    void SetCatchLikelihood(int catch_likelihood_id)
+    {
+        // Check if catch likelihood has been set already
+        if (this->catch_likelihood_id != -999)
+        {
+            warning("Catch likelihood has been set already.");
+            Rcout << "Now you are resetting catch likelihood with catch likelihood ID of "
+                  << catch_likelihood_id << std::endl;
+        }
+
+        this->catch_likelihood_id = catch_likelihood_id;
     }
 
     void SetIndexLikelihood(int index_likelihood_id)
@@ -107,6 +122,20 @@ public:
         this->observed_index_data_id = observed_index_data_id;
     }
 
+    void SetObservedCatchData(int observed_catch_data_id)
+    {
+
+        // Check if observed catch data have been set already
+        if (this->observed_catch_data_id != -999)
+        {
+            warning("Observed catch data have been set already.");
+            Rcout << "Now you are resetting observed catch data with observed catch data ID of "
+                  << observed_catch_data_id << std::endl;
+        }
+
+        this->observed_catch_data_id = observed_catch_data_id;
+    }
+    
     void SetSelectivity(int selectivity_id)
     {
 
@@ -135,8 +164,10 @@ public:
         f0->id = this->id;
         f0->agecomp_likelihood_id = this->agecomp_likelihood_id;
         f0->index_likelihood_id = this->index_likelihood_id;
+        f0->catch_likelihood_id = this->catch_likelihood_id;
         f0->observed_agecomp_data_id = this->observed_agecomp_data_id;
         f0->observed_index_data_id = this->observed_index_data_id;
+        f0->observed_catch_data_id = this->observed_catch_data_id;
         f0->selectivity_id = this->selectivity_id;
 
         // add to Information
@@ -152,8 +183,10 @@ public:
         f1->id = this->id;
         f1->agecomp_likelihood_id = this->agecomp_likelihood_id;
         f1->index_likelihood_id = this->index_likelihood_id;
+        f1->catch_likelihood_id = this->catch_likelihood_id;
         f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
         f1->observed_index_data_id = this->observed_index_data_id;
+        f1->observed_catch_data_id = this->observed_catch_data_id;
         f1->selectivity_id = this->selectivity_id;
 
         // add to Information
@@ -169,8 +202,10 @@ public:
         f2->id = this->id;
         f2->agecomp_likelihood_id = this->agecomp_likelihood_id;
         f2->index_likelihood_id = this->index_likelihood_id;
+        f2->catch_likelihood_id = this->catch_likelihood_id;
         f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
         f2->observed_index_data_id = this->observed_index_data_id;
+        f2->observed_catch_data_id = this->observed_catch_data_id;
         f2->selectivity_id = this->selectivity_id;
 
         // add to Information
@@ -186,8 +221,10 @@ public:
         f3->id = this->id;
         f3->agecomp_likelihood_id = this->agecomp_likelihood_id;
         f3->index_likelihood_id = this->index_likelihood_id;
+        f3->catch_likelihood_id = this->catch_likelihood_id;
         f3->observed_agecomp_data_id = this->observed_agecomp_data_id;
         f3->observed_index_data_id = this->observed_index_data_id;
+        f3->observed_catch_data_id = this->observed_catch_data_id;
         f3->selectivity_id = this->selectivity_id;
 
         // add to Information

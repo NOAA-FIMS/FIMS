@@ -130,7 +130,7 @@ namespace fims {
             proportion_mature_at_age.resize((nyears+1)*nages);
             initial_numbers.resize(nages);
             weight_at_age.resize(nages);
-            catch_weight_at_age.resize(nyears, nages, nfleets);
+            catch_weight_at_age.resize(nyears*nages*nfleets);
             unfished_numbers_at_age.resize((nyears+1)*nages);
             numbers_at_age.resize((nyears+1)*nages);
             expected_catch.resize(nyears*nfleets);
@@ -248,7 +248,7 @@ namespace fims {
             this -> expected_catch[index_yf] += 
               this -> catch_weight_at_age[index_yaf];
 
-            fleet -> expected_catch[index_yf] += 
+            fleets -> expected_catch[index_yf] += 
               this -> catch_weight_at_age[index_yaf];
           }
         }
@@ -268,7 +268,7 @@ namespace fims {
               this -> weight_at_age[age];
               
             this -> expected_index[index_yf] += index_;
-            fleet -> expected_index[index_yf] += index_;
+            fleets -> expected_index[index_yf] += index_;
           }
         }
 
@@ -288,7 +288,7 @@ namespace fims {
               this -> numbers_at_ages[index_ya] * 
               (1 - exp(-(this->mortality_Z[index_ya])));
             this -> catch_numbers_at_age[index_yaf] = catch_;
-            fleet -> catch_numbers_at_age[index_yaf] = catch_;
+            fleets -> catch_numbers_at_age[index_yaf] = catch_;
           }
         }
 

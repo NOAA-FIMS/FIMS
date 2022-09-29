@@ -82,10 +82,12 @@ RCPP_MODULE(fims) {
 
     Rcpp::class_<FleetInterface>("Fleet")
             .constructor()
+            .method("SetCatchLikelihood", &FleetInterface::SetCatchLikelihood)
             .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
             .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
             .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
             .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
+            .method("SetObservedCatchData", &FleetInterface::SetObservedCatchData)
             .method("SetSelectivity", &FleetInterface::SetSelectivity);
  
     Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
