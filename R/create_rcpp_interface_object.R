@@ -24,7 +24,7 @@
 #'   model = "LogisticSelectivity",
 #'   base_class = "SelectivityInterfaceBase",
 #'   container = "selectivity_models",
-#'   parameters = c("slope", "median"), 
+#'   parameters = c("slope", "median"),
 #'   evaluate_parameter = "x",
 #'   evaluate_parameter_type = "double"
 #' )
@@ -32,7 +32,7 @@ create_fims_rcpp_interface <- function(interface_name = character(),
                                        model = character(),
                                        base_class = character(),
                                        container = character(),
-                                       parameters = vector(), 
+                                       parameters = vector(),
                                        evaluate_parameter = vector(),
                                        evaluate_parameter_type = vector()) {
   types <- c(
@@ -67,7 +67,7 @@ create_fims_rcpp_interface <- function(interface_name = character(),
 
   cat("  virtual uint32_t get_id() { return this->id; }\n\n\n")
 
-  if (!is.null(evaluate_parameter)){
+  if (!is.null(evaluate_parameter)) {
     cat(paste0("  virtual double evaluate(", evaluate_parameter_type, " ", evaluate_parameter, ") {\n"))
     cat(paste0("    fims::", model, "<double> object;\n"))
     for (i in 1:length(parameters)) {
@@ -75,7 +75,7 @@ create_fims_rcpp_interface <- function(interface_name = character(),
     }
     cat(paste0("    return object.evaluate(", evaluate_parameter_type, ");\n  }\n\n\n"))
   }
-  
+
   cat("  virtual bool add_to_fims_tmb(){\n")
   for (i in 1:4) {
     cat(paste0("   std::shared_ptr<fims::Information<", types[i]))
@@ -156,7 +156,7 @@ create_fims_rcpp_interface <- function(interface_name = character(),
   cat(".method(\"get_id\",  &")
   cat(interface_name)
   cat("::get_id)\n")
-  if (!is.null(evaluate_parameter)){
+  if (!is.null(evaluate_parameter)) {
     cat(".method(\"evaluate\", &", interface_name, "::evaluate)\n")
   }
   for (i in 1:length(parameters)) {
