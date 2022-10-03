@@ -10,7 +10,9 @@ create_fims_rcpp_interface(
   model = character(),
   base_class = character(),
   container = character(),
-  parameters = vector()
+  parameters = vector(),
+  evaluate_parameter = vector(),
+  evaluate_parameter_type = vector()
 )
 }
 \arguments{
@@ -23,6 +25,10 @@ create_fims_rcpp_interface(
 \item{container}{The information model container}
 
 \item{parameters}{The parameters of the model object}
+
+\item{evaluate_parameter}{The parameter of the evaluate method}
+
+\item{evaluate_parameter_type}{The type of the parameter of the evaluate method}
 }
 \value{
 Text string with the code for the new Rcpp interface class
@@ -33,18 +39,21 @@ for FIMS model objects.
 }
 \examples{
 create_fims_rcpp_interface(
-  "DmultinomDistributionsInterface",
-  "Dmultinom",
-  "DistributionsInterfaceBase",
-  "distribution_models",
-  c("x", "p")
+  interface_name = "DnormDistributionsInterface",
+  model = "Dnorm",
+  base_class = "DistributionsInterfaceBase",
+  container = "distribution_models",
+  parameters = c("x", "mean", "sd"),
+  evaluate_parameter = "do_log",
+  evaluate_parameter_type = "bool"
 )
 create_fims_rcpp_interface(
-  "LogisticSelectivityInterface",
-  "LogisticSelectivity",
-  "selectivity_interface_base",
-  "selectivity_models",
-  c("slope", "median")
+  interface_name = "LogisticSelectivityInterface",
+  model = "LogisticSelectivity",
+  base_class = "SelectivityInterfaceBase",
+  container = "selectivity_models",
+  parameters = c("slope", "median"), 
+  evaluate_parameter = "x",
+  evaluate_parameter_type = "double"
 )
-
 }
