@@ -25,7 +25,7 @@ test_that("create_fims_rcpp_interface() works when evaluate_parameter is null", 
       evaluate_parameter = NULL,
       evaluate_parameter_type = NULL
     ),
-    cran = FALSE, 
+    cran = FALSE,
     variant = NULL
   )
 })
