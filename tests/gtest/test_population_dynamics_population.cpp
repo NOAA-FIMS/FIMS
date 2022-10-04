@@ -54,32 +54,26 @@ namespace
 
     TEST_F(PopulationTestData, initialize_function_works)
     {
-
+        
+        // Initialize is not called in evaluate()
         population.Initialize(nyears, nseasons, nages);
 
         // test failed: population.nfleets equals to 0 not nfleets
         // change nfleets = fleets.size(); to fleets.resize(nfleets);?
         EXPECT_EQ(population.nfleets, nfleets);
-        EXPECT_NE(population.nfleets, nfleets + 1);
 
         EXPECT_EQ(population.ages.size(), nages);
-        EXPECT_NE(population.ages.size(), nages + 1);
 
         // What is catch_at_age? Is it used anywhere?
         // It is not catch_numbers_at_age or catch_weight_at_age
         EXPECT_EQ(population.catch_at_age.size(), nages);
-        EXPECT_NE(population.catch_at_age.size(), nages + 1);
-
+    
         // test failed: population.nfleets equals to 0 not nfleets
         EXPECT_EQ(
             population.catch_numbers_at_age.size(),
             (nyears + 1) * nages * nfleets);
-        EXPECT_NE(
-            population.catch_numbers_at_age.size(),
-            (nyears + 1) * nages * nfleets + 1);
 
         EXPECT_EQ(population.mortality_F.size(), nyears * nages);
-        EXPECT_NE(population.mortality_F.size(), nyears * nages + 1);
     }
 
 } // namespace
