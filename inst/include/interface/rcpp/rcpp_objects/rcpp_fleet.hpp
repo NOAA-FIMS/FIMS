@@ -34,23 +34,34 @@
 #include "../../../population_dynamics/fleet/fleet.hpp"
 #include "rcpp_interface_base.hpp"
 
+/**
+ * @brief Rcpp interface for Fleet as an S4 object. To instantiate
+ * from R:
+ * fleet <- new(fims$Fleet)
+ * 
+ */
 class FleetInterface : public FIMSRcppInterfaceBase
 {
-    int observed_index_data_id = -999;
-    int observed_agecomp_data_id = -999;
-    int index_likelihood_id = -999;
-    int agecomp_likelihood_id = -999;
-    int selectivity_id = -999;
+    int observed_index_data_id = -999; /*!< id of observed index data object*/
+    int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
+    int index_likelihood_id = -999; /*!< id of index likelihood component*/
+    int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
+    int selectivity_id = -999; /*!< id of selectivity component*/
 
 public:
-    static uint32_t id_g;
-    uint32_t id;
+    static uint32_t id_g; /**< static id of the FleetInterface object */
+    uint32_t id; /**< local id of the FleetInterface object */
 
     FleetInterface()
     {
         this->id = FleetInterface::id_g++;
     }
 
+    /**
+     * @brief Set the unique id for the Age Comp Likelihood object
+     * 
+     * @param agecomp_likelihood_id Unique id for the Age Comp Likelihood object
+     */
     void SetAgeCompLikelihood(int agecomp_likelihood_id)
     {
 
@@ -65,6 +76,11 @@ public:
         this->agecomp_likelihood_id = agecomp_likelihood_id;
     }
 
+    /**
+     * @brief Set the unique id for the Index Likelihood object
+     * 
+     * @param index_likelihood_id Unique id for the Index Likelihood object
+     */
     void SetIndexLikelihood(int index_likelihood_id)
     {
 
@@ -79,6 +95,11 @@ public:
         this->index_likelihood_id = index_likelihood_id;
     }
 
+    /**
+     * @brief Set the unique id for the Observed Age Comp Data object
+     * 
+     * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data object
+     */
     void SetObservedAgeCompData(int observed_agecomp_data_id)
     {
 
@@ -93,6 +114,11 @@ public:
         this->observed_agecomp_data_id = observed_agecomp_data_id;
     }
 
+    /**
+     * @brief Set the unique id for the Observed Index Data object
+     * 
+     * @param observed_index_data_id Unique id for the Observed Index Data object
+     */
     void SetObservedIndexData(int observed_index_data_id)
     {
 
@@ -107,6 +133,11 @@ public:
         this->observed_index_data_id = observed_index_data_id;
     }
 
+    /**
+     * @brief Set the unique id for the Selectivity object
+     * 
+     * @param selectivity_id Unique id for the Selectivity object
+     */
     void SetSelectivity(int selectivity_id)
     {
 
@@ -122,6 +153,7 @@ public:
         this->selectivity_id = selectivity_id;
     }
 
+    /** @brief this adds the values to the TMB model object */
     virtual bool add_to_fims_tmb()
     {
 
@@ -132,6 +164,7 @@ public:
         std::shared_ptr<fims::Fleet<TMB_FIMS_REAL_TYPE>> f0 =
             std::make_shared<fims::Fleet<TMB_FIMS_REAL_TYPE>>();
 
+        // set relative info
         f0->id = this->id;
         f0->agecomp_likelihood_id = this->agecomp_likelihood_id;
         f0->index_likelihood_id = this->index_likelihood_id;

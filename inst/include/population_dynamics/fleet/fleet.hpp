@@ -17,7 +17,8 @@
 
 namespace fims {
 
-    /* @brief Base class for all fleets.
+    /**
+     *  @brief Base class for all fleets.
      *
      * @tparam Type The type of the fleet object.
      * */
