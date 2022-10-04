@@ -130,3 +130,15 @@ target_link_libraries(population_dynamics_recruitment_base
 )
 
 gtest_discover_tests(population_dynamics_recruitment_base)
+
+# test_population_dynamics_population.cpp
+add_executable(population_dynamics_population
+  test_population_dynamics_population.cpp
+)
+
+target_link_libraries(population_dynamics_population
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_dynamics_population)
