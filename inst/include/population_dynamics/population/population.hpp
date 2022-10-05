@@ -283,7 +283,7 @@ namespace fims {
             //Baranov Catch Equation
             catch_ = 
               (this -> Fmort[index_yf] * 
-              this -> fleets[fleet_].selectivity->evaluate(age) )/
+              this -> fleets[fleet_] -> selectivity -> evaluate(age) ) /
               this -> mortality_Z[index_ya] * 
               this -> numbers_at_ages[index_ya] * 
               (1 - exp(-(this->mortality_Z[index_ya])));
