@@ -248,7 +248,7 @@ namespace fims {
             this -> expected_catch[index_yf] += 
               this -> catch_weight_at_age[index_yaf];
 
-            fleets -> expected_catch[index_yf] += 
+            fleets[fleet_] -> expected_catch[index_yf] += 
               this -> catch_weight_at_age[index_yaf];
           }
         }
@@ -262,13 +262,13 @@ namespace fims {
             // I = qN (N is total numbers), I is an index in numbers
             Type index_;
             
-            index_ = this -> q * 
-              this -> fleets[fleet_].selectivity->evaluate(age) * 
-              this -> numbers_at_ages[index_ya] *
+            index_ = this -> q[fleet_] * 
+              this -> fleets[fleet_] -> selectivity -> evaluate(age) * 
+              this -> numbers_at_age[index_ya] *
               this -> weight_at_age[age];
               
             this -> expected_index[index_yf] += index_;
-            fleets -> expected_index[index_yf] += index_;
+            fleets[fleet_] -> expected_index[index_yf] += index_;
           }
         }
 
@@ -288,7 +288,7 @@ namespace fims {
               this -> numbers_at_ages[index_ya] * 
               (1 - exp(-(this->mortality_Z[index_ya])));
             this -> catch_numbers_at_age[index_yaf] = catch_;
-            fleets -> catch_numbers_at_age[index_yaf] = catch_;
+            fleets[fleet_] -> catch_numbers_at_age[index_yaf] = catch_;
           }
         }
 
