@@ -16,6 +16,10 @@ Type objective_function<Type>::operator()() {
 
     PARAMETER_VECTOR(p);
 
+    fims::Population<Type> population;
+    population.Evaluate();
+    
+
     Type nll = 0;
 
     return nll;
