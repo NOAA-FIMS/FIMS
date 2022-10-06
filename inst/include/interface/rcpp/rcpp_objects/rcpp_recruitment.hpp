@@ -52,7 +52,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
   Parameter steep;   /**< steepness or the productivity of the stock*/
   Parameter rzero;   /**< recruitment at unfished biomass */
-  Parameter phizero; /**< unfished spawning biomass per recruit */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
@@ -88,14 +87,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d0->RegisterParameter(b0->rzero);
       }
     }
-    b0->phizero = this->phizero.value;
-    if (this->phizero.estimated) {
-      if (this->phizero.is_random_effect) {
-        d0->RegisterRandomEffect(b0->phizero);
-      } else {
-        d0->RegisterParameter(b0->phizero);
-      }
-    }
     // add to Information
     d0->recruitment_models[b0->id] = b0;
 
@@ -124,14 +115,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d1->RegisterParameter(b1->rzero);
       }
     }
-    b1->phizero = this->phizero.value;
-    if (this->phizero.estimated) {
-      if (this->phizero.is_random_effect) {
-        d1->RegisterRandomEffect(b1->phizero);
-      } else {
-        d1->RegisterParameter(b1->phizero);
-      }
-    }
+    
     // add to Information
     d1->recruitment_models[b1->id] = b1;
 
@@ -160,14 +144,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d2->RegisterParameter(b2->rzero);
       }
     }
-    b2->phizero = this->phizero.value;
-    if (this->phizero.estimated) {
-      if (this->phizero.is_random_effect) {
-        d2->RegisterRandomEffect(b2->phizero);
-      } else {
-        d2->RegisterParameter(b2->phizero);
-      }
-    }
+    
     // add to Information
     d2->recruitment_models[b2->id] = b2;
 
@@ -196,14 +173,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d3->RegisterParameter(b3->rzero);
       }
     }
-    b3->phizero = this->phizero.value;
-    if (this->phizero.estimated) {
-      if (this->phizero.is_random_effect) {
-        d3->RegisterRandomEffect(b3->phizero);
-      } else {
-        d3->RegisterParameter(b3->phizero);
-      }
-    }
+   
     // add to Information
     d3->recruitment_models[b3->id] = b3;
 
