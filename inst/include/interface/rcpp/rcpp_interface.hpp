@@ -71,7 +71,6 @@ RCPP_MODULE(fims) {
             .constructor()
             .field("steep", &BevertonHoltRecruitmentInterface::steep)
             .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
-            .field("phizero", &BevertonHoltRecruitmentInterface::phizero)
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id);
 
     Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")

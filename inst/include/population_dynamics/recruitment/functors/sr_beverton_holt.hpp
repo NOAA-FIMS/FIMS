@@ -22,9 +22,6 @@ namespace fims {
  *
  * @param steep Recruitment relative to unfished recruitment at
  * 20% of unfished spawning biomass. Should be a value between 0.2 and 1.0.
- * @param rzero Unexploited recruitment. Should be a positive value.
- * @param phizero the unfished spawning biomass per recruit. Should be a
- * positive value.
  */
 template <typename Type>
 struct SRBevertonHolt : public RecruitmentBase<Type> {
@@ -34,9 +31,6 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   Type steep;   /*!< Recruitment relative to unfished recruitment at 20% of
                    unfished spawning biomass. Should be a value between 0.2
                    and 1.0.*/
-  Type rzero;   /*!< Unexploited recruitment. Should be a positive value.*/
-  Type phizero; /*!< The unfished spawning biomass per recruit. Should be a
-                   positive value.*/
 
   SRBevertonHolt() : RecruitmentBase<Type>() {}
 
@@ -50,11 +44,11 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
    *
    * @param spawners A measure of spawning output.
    */
-  virtual const Type evaluate(const Type& spawners) {
+  virtual const Type evaluate(const Type& spawners, const Type& ssbzero) {
     Type recruits;
     recruits =
-        (0.8 * rzero * steep * spawners) /
-        (0.2 * rzero * phizero * (1.0 - steep) + spawners * (steep - 0.2));
+        (0.8 * this -> rzero * steep * spawners) /
+        (0.2 * ssbzero * (1.0 - steep) + spawners * (steep - 0.2));
     return recruits;
   }
 };
