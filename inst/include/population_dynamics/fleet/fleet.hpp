@@ -17,10 +17,10 @@
 
 namespace fims {
 
-    /* @brief Base class for all fleets.
+    /** @brief Base class for all fleets.
      *
      * @tparam Type The type of the fleet object.
-     * */
+     **/
     template<class Type>
     struct Fleet : public FIMSObject<Type> {
         static uint32_t id_g; /*!< reference id for fleet object*/
@@ -64,6 +64,11 @@ namespace fims {
         Fleet() {
             this->id = Fleet::id_g++;
         }
+
+        /**
+        * @brief Destructor.
+        */
+        virtual ~Fleet() {}
 
         /**
          * @brief Intialize Fleet Class
