@@ -24,7 +24,6 @@ test_that("Can create the S4 FIMSFrame classes", {
 
   expect_silent(save_png(plot(fims_frame)))
   expect_silent(save_png(plot(age_frame)))
-
 })
 
 test_that("Show method works as expected", {

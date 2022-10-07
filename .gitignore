@@ -83,3 +83,9 @@ vignettes/*.pdf
 
 # IDE specific files
 *.vscode
+
+# mac OS files
+*.DS_Store
+
+# FIMS log file
+fims.log

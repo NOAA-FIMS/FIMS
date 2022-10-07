@@ -5,29 +5,36 @@
 #' @param base_class The interface base class
 #' @param container The information model container
 #' @param parameters The parameters of the model object
+#' @param evaluate_parameter The parameter of the evaluate method
+#' @param evaluate_parameter_type The type of the parameter of the evaluate method
 #' @return Text string with the code for the new Rcpp interface class
 #' @export
 #' @examples
 #' create_fims_rcpp_interface(
-#'   "DmultinomDistributionsInterface",
-#'   "Dmultinom",
-#'   "DistributionsInterfaceBase",
-#'   "distribution_models",
-#'   c("x", "p")
+#'   interface_name = "DnormDistributionsInterface",
+#'   model = "Dnorm",
+#'   base_class = "DistributionsInterfaceBase",
+#'   container = "distribution_models",
+#'   parameters = c("x", "mean", "sd"),
+#'   evaluate_parameter = "do_log",
+#'   evaluate_parameter_type = "bool"
 #' )
 #' create_fims_rcpp_interface(
-#'   "LogisticSelectivityInterface",
-#'   "LogisticSelectivity",
-#'   "selectivity_interface_base",
-#'   "selectivity_models",
-#'   c("slope", "median")
+#'   interface_name = "LogisticSelectivityInterface",
+#'   model = "LogisticSelectivity",
+#'   base_class = "SelectivityInterfaceBase",
+#'   container = "selectivity_models",
+#'   parameters = c("slope", "median"),
+#'   evaluate_parameter = "x",
+#'   evaluate_parameter_type = "double"
 #' )
-#'
 create_fims_rcpp_interface <- function(interface_name = character(),
                                        model = character(),
                                        base_class = character(),
                                        container = character(),
-                                       parameters = vector()) {
+                                       parameters = vector(),
+                                       evaluate_parameter = vector(),
+                                       evaluate_parameter_type = vector()) {
   types <- c(
     "TMB_FIMS_REAL_TYPE",
     "TMB_FIMS_FIRST_ORDER",
@@ -36,38 +43,42 @@ create_fims_rcpp_interface <- function(interface_name = character(),
   )
   itypes <- c("d0", "d1", "d2", "d3")
   mtypes <- c("model0", "model1", "model2", "model3")
-  # mtypes <- paste0(model, c("_model0", "_model1", "_model2", "_model3"))
 
   cat("class ")
   cat(interface_name)
   cat(" : public ")
   cat(base_class)
   cat(" {\n")
-  cat("public:\n\n")
-  # cat("     ")
+  cat(" public:\n\n")
   for (i in 1:length(parameters)) {
-    cat("   Parameter ")
+    cat("  Parameter ")
     cat(parameters[i])
     cat(";\n")
   }
-  cat("\n\n   ")
+  cat("\n\n  ")
   cat(interface_name)
   cat("() : ")
   cat(base_class)
   cat("() {}\n\n")
 
 
-  cat("virtual ~")
+  cat("  virtual ~")
   cat(paste0(interface_name, "() {}\n\n\n"))
 
-  cat("virtual ")
-  cat("uint32_t get_id(){return this->id;}\n\n\n")
+  cat("  virtual uint32_t get_id() { return this->id; }\n\n\n")
 
+  if (!is.null(evaluate_parameter)) {
+    cat(paste0("  virtual double evaluate(", evaluate_parameter_type, " ", evaluate_parameter, ") {\n"))
+    cat(paste0("    fims::", model, "<double> object;\n"))
+    for (i in 1:length(parameters)) {
+      cat(paste0("    object.", parameters[i], " = this->", parameters[i], ".value;\n"))
+    }
+    cat(paste0("    return object.evaluate(", evaluate_parameter_type, ");\n  }\n\n\n"))
+  }
 
-  cat("virtual ")
-  cat("bool add_to_fims_tmb(){\n")
+  cat("  virtual bool add_to_fims_tmb(){\n")
   for (i in 1:4) {
-    cat(paste0("    std::shared_ptr<fims::Information<", types[i]))
+    cat(paste0("   std::shared_ptr<fims::Information<", types[i]))
     cat(paste("> >", itypes[i]))
     cat(" =\n")
     cat("    fims::Information<")
@@ -134,7 +145,7 @@ create_fims_rcpp_interface <- function(interface_name = character(),
 
   cat("}\n\n};")
 
-  cat("\n//Add the following to the RCpp module definition: rcpp_interface.hpp\n\n")
+  cat("\n\n//Add the following to the RCpp module definition: rcpp_interface.hpp\n\n")
 
   cat("Rcpp::class_<")
   cat(interface_name)
@@ -145,6 +156,9 @@ create_fims_rcpp_interface <- function(interface_name = character(),
   cat(".method(\"get_id\",  &")
   cat(interface_name)
   cat("::get_id)\n")
+  if (!is.null(evaluate_parameter)) {
+    cat(".method(\"evaluate\", &", interface_name, "::evaluate)\n")
+  }
   for (i in 1:length(parameters)) {
     cat(".field(\"")
     cat(parameters[i])
