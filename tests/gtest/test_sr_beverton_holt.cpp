@@ -18,7 +18,7 @@ namespace
       fims::SRBevertonHolt<double> recruit1;
       recruit1.steep = 0.7500;
       recruit1.rzero = 1000.000;
-      recruit1.phizero = 0.100;
+      double ssbzero =  100.000;
       double spawners = 30.000;
       // # R code that generates true values for testing
       // BH_fcn <- function(R0, h, phi0, x) {
@@ -26,31 +26,31 @@ namespace
       //  # h = steepness
       //  # phi0 = unfished spawners per recruit
       //  # x = spawners
-      //  recruits <- (0.8 * R0 * h * x) / (0.2 * R0 * phi0 * (1.0 - h) + x * (h //  - 0.2))
+      //  recruits <- (0.8 * R0 * h * x) / (0.2 * 100.0 * (1.0 - h) + x * (h //  - 0.2))
       //  return(recruits)
       // }
-      // (0.8 * 1000.0 * 0.75 * 30.0) / (0.2 * 1000.0 * 0.1 * (1.0 - 0.75) + 30.0 * (0.75 - 0.2)) = 837.2093
+      // (0.8 * 1000.0 * 0.75 * 30.0) / (0.2 * 100.0 * (1.0 - 0.75) + 30.0 * (0.75 - 0.2)) = 837.2093
       double expect_recruit1 = 837.209300;
-      EXPECT_NEAR(recruit1.evaluate(spawners), expect_recruit1, 0.0001);
+      EXPECT_NEAR(recruit1.evaluate(spawners,ssbzero), expect_recruit1, 0.0001);
       EXPECT_EQ(recruit1.GetId(), 0);
       
       fims::SRBevertonHolt<double> recruit2;
       recruit2.steep = 0.200;
       recruit2.rzero = 1000.000;
-      recruit2.phizero = 0.100;
       double spawners2 = 30.000;
+      double ssbzero2 = 100.000;
       // # R code that generates true values for testing
       // BH_fcn <- function(R0, h, phi0, x) {
       //  # R0 = unfished recruitment
       //  # h = steepness
       //  # phi0 = unfished spawners per recruit
       //  # x = spawners
-      //  recruits <- (0.8 * R0 * h * x) / (0.2 * R0 * phi0 * (1.0 - h) + x * (h //  - 0.2))
+      //  recruits <- (0.8 * R0 * h * x) / (0.2 * ssb0 * (1.0 - h) + x * (h //  - 0.2))
       //  return(recruits)
       // }
-      // (0.8 * 1000.0 * 0.2 * 30.0) / (0.2 * 1000.0 * 0.1 * (1.0 - 0.2) + 30.0 * (0.2 - 0.2)) = 300
+      // (0.8 * 1000.0 * 0.2 * 30.0) / (0.2 * 100.0 * (1.0 - 0.2) + 30.0 * (0.2 - 0.2)) = 300
       double expect_recruit2 = 300.0;
-      EXPECT_NEAR(recruit2.evaluate(spawners2), expect_recruit2, 0.0001);
+      EXPECT_NEAR(recruit2.evaluate(spawners2, ssbzero2), expect_recruit2, 0.0001);
       EXPECT_EQ(recruit2.GetId(), 1);
   }
 
