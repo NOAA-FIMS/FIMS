@@ -155,17 +155,18 @@ namespace
 
         std::vector<double> Mortality_F(nyears*nages, 0);
         
-        fims::LogisticSelectivity<double> fishery_selectivity;
-        fishery_selectivity.median = 20.5;
-        fishery_selectivity.slope = 0.2;
-        fishery_selectivity.evaluate(age);
-        
         // Not sure about the output of this -> fleets[fleet_] 
         
         population.Prepare();
         int index_ya = 2;
         int year = 3;
         int age = 4;
+
+        fims::LogisticSelectivity<double> fishery_selectivity;
+        fishery_selectivity.median = 20.5;
+        fishery_selectivity.slope = 0.2;
+        fishery_selectivity.evaluate(age);
+
         population.CalculateMortality(index_ya, year, age);
 
     }
