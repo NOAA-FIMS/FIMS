@@ -158,24 +158,27 @@ namespace fims {
           std::fill(expected_catch.begin(), expected_catch.end(), 0);
 
           //Transformation Section
-          for (size_t age = 0; age <= this->nages; age++) {
-            this -> naa[age] = exp(this -> log_naa[age]);
+          for (size_t age = 0; age < this->nages; age++) {
+          // for (size_t age = 0; age <= this->nages; age++) {
+            this -> naa[age] = fims::exp(this -> log_naa[age]);
+            // this -> naa[age] = exp(this -> log_naa[age]);
             for(size_t year = 0; year < this->nyears; year++) {
               int index_ya = year * this -> nages + age;
-              this -> M[index_ya] = exp(this -> log_M[index_ya]);
+              this -> M[index_ya] = fims::exp(this -> log_M[index_ya]);
+              // this -> M[index_ya] = exp(this -> log_M[index_ya]);
             }
           }
 
-          for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
-            this -> Fmort[fleet_] = exp(this -> log_Fmort[fleet_]);
-            for(size_t year = 0; year < this->nyears; year++) {
-              int index_yf = year * this -> nfleets + fleet_;
-              this -> q[index_yf] = exp(this -> log_q[index_yf]);
-            }
-          }
+          // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
+          //   this -> Fmort[fleet_] = exp(this -> log_Fmort[fleet_]);
+          //   for(size_t year = 0; year < this->nyears; year++) {
+          //     int index_yf = year * this -> nfleets + fleet_;
+          //     this -> q[index_yf] = exp(this -> log_q[index_yf]);
+          //   }
+          // }
           // call functions to set up recruitment deviations.
-          this -> recruitment -> PrepareConstrainedDeviations();
-          this -> recruitment -> PrepareBiasAdjustment();
+          // this -> recruitment -> PrepareConstrainedDeviations();
+          // this -> recruitment -> PrepareBiasAdjustment();
         }
 
         /**
