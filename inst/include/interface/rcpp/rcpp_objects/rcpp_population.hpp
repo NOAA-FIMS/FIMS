@@ -42,4 +42,148 @@ uint32_t PopulationInterfaceBase::id_g = 1;
 std::map<uint32_t, PopulationInterfaceBase*>
     PopulationInterfaceBase::live_objects;
 
+/**
+ * @brief Rcpp interface for a new Population. To instantiate
+ * from R:
+ * population <- new(fims$population)
+ */
+class PopulationInterface : public PopulationInterfaceBase {
+ public:
+  uint32_t nages; /**< number of ages */
+  uint32_t nfleets; /**< number of fleets */
+  uint32_t nseasons; /**< number of seasons */
+  uint32_t nyears; /**< number of years */
+  Parameter log_M;   /**< log of the natural mortality of the stock*/
+  Parameter log_q; /**< log of the catchability of the stock*/
+
+  PopulationInterface() : PopulationInterfaceBase() {} 
+
+  virtual ~PopulationInterface() {}
+
+  virtual uint32_t get_id() { return this->id; }
+
+  virtual void evaluate = 0;
+
+  /** @brief this adds the parameter values and derivatives to the TMB model
+   * object */
+  virtual bool add_to_fims_tmb() {
+    // base model
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+    std::shared_ptr<fims::Population<TMB_FIMS_REAL_TYPE> > b0 =
+        std::make_shared<fims::Population<TMB_FIMS_REAL_TYPE> >();
+
+    // set relative info
+    b0->id = this->id;
+    b0->log_M = this->log_M.value;
+    if (this->log_M.estimated) {
+      if (this->log_M.is_random_effect) {
+        d0->RegisterRandomEffect(b0->log_M);
+      } else {
+        d0->RegisterParameter(b0->log_M);
+      }
+    }
+    b0->log_q = this->log_q.value;
+    if (this->log_q.estimated) {
+      if (this->log_q.is_random_effect) {
+        d0->RegisterRandomEffect(b0->log_q);
+      } else {
+        d0->RegisterParameter(b0->log_q);
+      }
+    }
+    // add to Information
+    d0->populations[b0->id] = b0;
+
+    // first-order derivative
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+
+    std::shared_ptr<fims::Population<TMB_FIMS_FIRST_ORDER> > b1 =
+        std::make_shared<fims::Population<TMB_FIMS_FIRST_ORDER> >();
+
+    // set relative info
+    b1->id = this->id;
+    b1->log_M = this->log_M.value;
+    if (this->log_M.estimated) {
+      if (this->log_M.is_random_effect) {
+        d1->RegisterRandomEffect(b1->log_M);
+      } else {
+        d1->RegisterParameter(b1->log_M);
+      }
+    }
+    b1->log_q = this->log_q.value;
+    if (this->log_q.estimated) {
+      if (this->log_q.is_random_effect) {
+        d1->RegisterRandomEffect(b1->log_q);
+      } else {
+        d1->RegisterParameter(b1->log_q);
+      }
+    }
+    
+    // add to Information
+    d1->populations[b1->id] = b1;
+
+    // second-order derivative
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+
+    std::shared_ptr<fims::Population<TMB_FIMS_SECOND_ORDER> > b2 =
+        std::make_shared<fims::Population<TMB_FIMS_SECOND_ORDER> >();
+
+    // set relative info
+    b2->id = this->id;
+    b2->log_M = this->log_M.value;
+    if (this->log_M.estimated) {
+      if (this->log_M.is_random_effect) {
+        d2->RegisterRandomEffect(b2->log_M);
+      } else {
+        d2->RegisterParameter(b2->log_M);
+      }
+    }
+    b2->log_q = this->log_q.value;
+    if (this->log_q.estimated) {
+      if (this->log_q.is_random_effect) {
+        d2->RegisterRandomEffect(b2->log_q);
+      } else {
+        d2->RegisterParameter(b2->log_q);
+      }
+    }
+    
+    // add to Information
+    d2->populations[b2->id] = b2;
+
+    // third-order derivative
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+
+    std::shared_ptr<fims::Population<TMB_FIMS_THIRD_ORDER> > b3 =
+        std::make_shared<fims::Population<TMB_FIMS_THIRD_ORDER> >();
+
+    // set relative info
+    b3->id = this->id;
+    b3->log_M = this->log_M.value;
+    if (this->log_M.estimated) {
+      if (this->log_M.is_random_effect) {
+        d3->RegisterRandomEffect(b3->log_M);
+      } else {
+        d3->RegisterParameter(b3->log_M);
+      }
+    }
+    b3->log_q = this->log_q.value;
+    if (this->log_q.estimated) {
+      if (this->log_q.is_random_effect) {
+        d3->RegisterRandomEffect(b3->log_q);
+      } else {
+        d3->RegisterParameter(b3->log_q);
+      }
+    }
+   
+    // add to Information
+    d3->populations[b3->id] = b3;
+
+    return true;
+  }
+};
+
 #endif
