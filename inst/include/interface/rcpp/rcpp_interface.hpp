@@ -88,7 +88,18 @@ RCPP_MODULE(fims) {
             .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
             .method("SetObservedCatchData", &FleetInterface::SetObservedCatchData)
             .method("SetSelectivity", &FleetInterface::SetSelectivity);
- 
+    
+    Rcpp::class_<PopulationInterface>("Population")
+        .constructor()
+        .method("get_id", &PopulationInterface::get_id)
+        .field("nages", &PopulationInterface::nages)
+        .field("nfleets",  &PopulationInterface::nfleets)
+        .field("nseasons", &PopulationInterface::nseasons)
+        .field("nyears", &PopulationInterface::nyears)
+        .field("log_M",    &PopulationInterface::log_M)
+        .field("log_q", &PopulationInterface::log_q)
+        .method("evaluate", &PopulationInterface::evaluate);
+    
     Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
             .constructor()
             .method("get_id",  &DnormDistributionsInterface::get_id)
