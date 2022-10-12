@@ -240,6 +240,13 @@ namespace fims {
             (exp(- this -> M[index_ya2]));
         }
         
+        /**
+         * @brief Calculates spawning biomass
+         * 
+         * @param index_ya dimension folded index for year and age
+         * @param year the year spawning biomass is being aggregated for
+         * @param age the age who's biomass is being added into total spawning biomass 
+         */
         void CalculateSpawningBiomass(int index_ya, int year, int age) {
           this -> spawning_biomass[year] += this -> proportion_female * 
             this -> numbers_at_age[index_ya] * 
@@ -247,6 +254,13 @@ namespace fims {
             this -> weight_at_age[age];
         }
 
+        /**
+         * @brief Calculates unfished spawning biomass
+         * 
+         * @param index_ya dimension folded index for year and age
+         * @param year the year unfished spawning biomass is being aggregated for
+         * @param age the age who's biomass is being added into total unfished spawning biomass 
+         */
         void CalculateUnfishedSpawningBiomass(int index_ya, int year, int age) {
           this -> unfished_spawning_biomass[year] += this -> proportion_female * 
             this -> unfished_numbers_at_age[index_ya] * 
@@ -255,6 +269,12 @@ namespace fims {
 
         }
 
+        /**
+         * @brief Calculates expected recruitment for a given year
+         * 
+         * @param index_ya dimension folded index for year and age
+         * @param year the year recruitment is being calculated for
+         */
         void CalculateRecruitment(int index_ya, int year) {
           this -> numbers_at_age[index_ya] = 
             this -> recruitment -> evaluate(this -> spawning_biomass[year-1], 
@@ -262,7 +282,12 @@ namespace fims {
             this -> recruitment -> recruit_deviations[year];
         }
 
-        //calculate expeted total catch by fleet
+        /**
+         * @brief Calculates expected total catch by fleet in weight
+         * 
+         * @param year the year catch is being calculated for
+         * @param age the age who's yeild is being added into total catch 
+         */
         void CalculateCatch(int year, int age) {
           for (size_t fleet_=0; fleet_ < this -> nfleets; fleet_++) {
             int index_yaf = year * this -> nages * this->nfleets + 
@@ -277,7 +302,13 @@ namespace fims {
           }
         }
 
-        //calculate the index by fleet
+        /**
+         * @brief Calculates population biomass indices by fleet
+         * 
+         * @param index_ya dimension folded index for year and age
+         * @param year the year the abundance index is being calculated for
+         * @param age the age who's biomass is being added into the index calculation
+         */
         void CalculateIndex(int index_ya, int year, int age) {
           for (size_t fleet_=0; fleet_ < this -> nfleets; fleet_++) {
              //index by fleet and years to dimension fold
@@ -295,6 +326,13 @@ namespace fims {
           }
         }
 
+        /**
+         * @brief Calculates expected composition of fleet landings in numbers at age
+         * 
+         * @param index_ya dimension folded index for year and age
+         * @param year the year composition is being calculated for
+         * @param age the age composition is being calculated for
+         */
         //don't need separate function for survey - both survey and fishery treated as 'fleet'
         void CalculateCatchNumbersAA(int index_ya, int year, int age) {
           for (size_t fleet_=0; fleet_ < this -> nfleets; fleet_++) {
@@ -315,6 +353,12 @@ namespace fims {
           }
         }
 
+        /**
+         * @brief Calculates expected composition of fleet landings in weight at age
+         * 
+         * @param year the year composition is being calculated for
+         * @param age the age composition is being calculated for
+         */
         void CalculateCatchWeightAA(int year, int age) {
           for (size_t fleet_=0; fleet_ < this -> nfleets; fleet_++) {
             int index_yaf = year * this -> nages * this -> nfleets + age * this -> nfleets + fleet_;
@@ -324,6 +368,12 @@ namespace fims {
           }
         }
 
+        /**
+         * @brief Calculates expected expected proportion of individuals mature at age
+         * 
+         * @param index_ya dimension folded index for year and age
+         * @param age the age maturity is being calculated for
+         */
         void CalculateMaturityAA(int index_ya, int age) {
           //this->maturity is pointing to the maturity module, which has
           // an evaluate function. -> can be nested.
@@ -345,6 +395,15 @@ namespace fims {
           loops start at zero with if statements inside to specify unique code for 
           initial structure and recruitment 0 loops. Could also have started loops at
           1 with initial structure and recruitment setup outside the loops.
+
+          year loop is extended to <= nyears because SSB is calculted as the start of the year 
+          value and by extending one extra year we get estimates of the population structure
+          at the end of the final year. An alternative approach would be to keep initial numbers
+          at age in it's own vector and each year to include the population structure at the end of
+          the year. This is likely a null point given that we are planning to modify to an event/stanza
+          based structure in later milestones which will elimitate this confusion by explicity
+          referencing the exact date (or period of averaging) at which any calculation or output is 
+          being made. 
          */
          for (size_t y = 0; y <= this->nyears; y++) {
             for (size_t a = 0; a < this->nages; a++) {
@@ -360,12 +419,16 @@ namespace fims {
                the year. 
                Should we add complexity to track more values such as start, 
                mid, and end biomass in all years where, start biomass=end biomass of the 
-               previous year? 
+               previous year? Referenced above, this is probably not worth exploring as 
+               later milestone changes will eliminate this confusion.
               */
               if (y < this-> nyears) {
                 /*
                  First thing we need is total mortality aggregated across all fleets
                  to inform the subsequent catch and change in numbers at age calculations.
+                 This is only calculated for years < nyears as these are the model estimated
+                 years with data. The year loop extends to y=nyears so that population numbers
+                 at age and SSB can be calculated at the end of the last year of the model
                 */
                 CalculateMortality(index_ya, y, a);
               }
@@ -404,6 +467,11 @@ namespace fims {
                 CalculateUnfishedSpawningBiomass(index_ya, y, a);
               }
               
+              /*
+              Here composition, total catch, and index values are calculated for all years with reference
+              data. They are not calculated for y=nyears as there is this is just to get final population 
+              structure at the end of the terminal year.
+              */
               if (y < this->nyears) {
                 CalculateCatchNumbersAA(index_ya, y, a);
                 CalculateCatchWeightAA(y, a);
