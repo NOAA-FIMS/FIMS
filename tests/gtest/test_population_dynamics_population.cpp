@@ -56,7 +56,7 @@ namespace
     TEST_F(PopulationTestData, Initialize_works)
     {
 
-        // Initialize is not called in evaluate()
+        // Does initialize need to be called in evaluate()?
         population.Initialize(nyears, nseasons, nages);
 
         // test failed: population.nfleets equals to 0 not nfleets
