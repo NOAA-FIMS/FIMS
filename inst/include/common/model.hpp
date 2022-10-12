@@ -29,9 +29,12 @@ namespace fims {
 template <typename T>
 class Model {//may need singleton
  public:
-  std::shared_ptr<fims::Information<T> > information;
-  std::vector<std::shared_ptr<Population<T> > > populations;
-  std::vector<std::shared_ptr<Fleet<T> > > fleets;
+  static std::shared_ptr<Model<T> >
+      fims_model; /*!< Create a shared fims_model as a pointer to Model*/
+  std::vector<std::shared_ptr<Population<T> > >
+      populations;                                 /*!< list of all population*/
+  std::vector<std::shared_ptr<Fleet<T> > > fleets; /*!< list of all fleets*/
+  virtual ~Model() {}
 };
 
 
