@@ -159,7 +159,7 @@ namespace fims {
           std::fill(expected_catch.begin(), expected_catch.end(), 0);
 
           //Transformation Section
-          for (size_t age = 0; age <= this->nages; age++) {
+          for (size_t age = 0; age < this->nages; age++) {
             this -> naa[age] = exp(this -> log_naa[age]);
             for(size_t year = 0; year < this->nyears; year++) {
               int index_ya = year * this -> nages + age;
@@ -167,7 +167,7 @@ namespace fims {
             }
           }
 
-          for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
+          for(size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
             this -> Fmort[fleet_] = exp(this -> log_Fmort[fleet_]);
             for(size_t year = 0; year < this->nyears; year++) {
               int index_yf = year * this -> nfleets + fleet_;
@@ -376,7 +376,11 @@ namespace fims {
             this -> maturity -> evaluate(age);
         }
 
-        void Evaluate() { // for loop for everything, call functions above.
+        /**
+         * @brief Executes the population loop
+         * 
+         */
+        void Evaluate() { 
         
         /*
           Sets derived vectors to zero
