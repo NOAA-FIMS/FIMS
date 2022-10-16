@@ -1,7 +1,7 @@
 /*
  * File:   population.hpp
  *
- * Author: Matthew Supernaw, Andrea Havron
+ * Author: Matthew Supernaw, Andrea Havron, Nathan Vaughan, Jane Sullivan, Kathryn Doering
  * National Oceanic and Atmospheric Administration
  * National Marine Fisheries Service
  * Email: matthew.supernaw@noaa.gov, andrea.havron@noaa.gov
@@ -75,7 +75,7 @@ namespace fims {
 
         //derived quantities
         std::vector<Type> weight_at_age; /*!< Derived quantity: expected weight at age */
-        // fecundity removed because we don't  need it yet?
+        // fecundity removed because we don't need it yet
         std::vector<Type> numbers_at_age; /*!< Derived quantity: population expected numbers at age in each year*/
         std::vector<Type> unfished_numbers_at_age; /*!< Derived quantity: population expected unfished numbers at age in each year*/
         std::vector<Type> catch_at_age;/*!< Derived quantity: catch at age*/
@@ -111,15 +111,15 @@ namespace fims {
         //std::vector<std::shared_ptr<fims::Fleet<Type>> > surveys;
         Population() {
             this->id = Population::id_g++;
-
-             
-        
         }
 
-        //gets called when Initialize() function called in Information - just once at start of model run
+        /**
+         * @brief Initialize values. Called once at the start of model run.
+         * 
+         * @param index_ya dimension folded index for year and age
+         * @param age age index
+         */
         void Initialize(int nyears, int nseasons, int nages) {
-          
-            
             //size all the vectors to length of nages
             nfleets = fleets.size();
             ages.resize(nages);
@@ -145,12 +145,13 @@ namespace fims {
             Fmort.resize(nfleets*nyears);
             M.resize(nyears*nages);
             q.resize(nfleets);
-
-            
-            
         }
 
-        //gets called at each model iteration (used to zero out derived quantities, values summed with +=, etc.)
+        /**
+         * @brief Prepare to run the population loop. Called at each model itartion, and used
+         *  to zero out derived quantities, values that were summed, etc.
+         * 
+         */
         void Prepare() {
           std::fill(unfished_spawning_biomass.begin(), unfished_spawning_biomass.end(), 0);
           std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
@@ -158,10 +159,8 @@ namespace fims {
           std::fill(expected_catch.begin(), expected_catch.end(), 0);
 
           //Transformation Section
-          for (size_t age = 0; age < this->nages; age++) {
-          // for (size_t age = 0; age <= this->nages; age++) {
+          for (size_t age = 0; age <= this->nages; age++) {
             this -> naa[age] = fims::exp(this -> log_naa[age]);
-            // this -> naa[age] = exp(this -> log_naa[age]);
             for(size_t year = 0; year < this->nyears; year++) {
               int index_ya = year * this -> nages + age;
               this -> M[index_ya] = fims::exp(this -> log_M[index_ya]);
@@ -169,13 +168,13 @@ namespace fims {
             }
           }
 
-          // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
-          //   this -> Fmort[fleet_] = exp(this -> log_Fmort[fleet_]);
-          //   for(size_t year = 0; year < this->nyears; year++) {
-          //     int index_yf = year * this -> nfleets + fleet_;
-          //     this -> q[index_yf] = exp(this -> log_q[index_yf]);
-          //   }
-          // }
+          for(size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+            this -> Fmort[fleet_] = exp(this -> log_Fmort[fleet_]);
+            for(size_t year = 0; year < this->nyears; year++) {
+              int index_yf = year * this -> nfleets + fleet_;
+              this -> q[index_yf] = exp(this -> log_q[index_yf]);
+            }
+          }
           // call functions to set up recruitment deviations.
           // this -> recruitment -> PrepareConstrainedDeviations();
           // this -> recruitment -> PrepareBiasAdjustment();
@@ -196,7 +195,7 @@ namespace fims {
         }
         
         /**
-         * @brief Calculates mortality at an index, year, and age
+         * @brief Calculates total mortality at an index, year, and age
          * 
          * @param index_ya dimension folded index for year and age
          * @param year year index
@@ -224,9 +223,6 @@ namespace fims {
             (exp(- this -> mortality_Z[index_ya2]));
         }
 
-        
-        //used to calculate derived values; not currently used in the model
-        
         /**
          * @brief Calculates unfished numbers at age at year and age specific indices
          * 
@@ -255,18 +251,18 @@ namespace fims {
         }
 
         /**
-         * @brief Calculates unfished spawning biomass
+         * @brief Adds to existing yearly unfished spawning biomass estimates the 
+         *  biomass for a specified year and age
          * 
          * @param index_ya dimension folded index for year and age
-         * @param year the year unfished spawning biomass is being aggregated for
-         * @param age the age who's biomass is being added into total unfished spawning biomass 
+         * @param year the year of unfished spawning biomass to add
+         * @param age the age of unfished spawning biomass to add
          */
         void CalculateUnfishedSpawningBiomass(int index_ya, int year, int age) {
           this -> unfished_spawning_biomass[year] += this -> proportion_female * 
             this -> unfished_numbers_at_age[index_ya] * 
             this -> proportion_mature_at_age[age] * 
             this -> weight_at_age[age];
-
         }
 
         /**
@@ -283,10 +279,10 @@ namespace fims {
         }
 
         /**
-         * @brief Calculates expected total catch by fleet in weight
+         * @brief Adds to exiting expected total catch by fleet in weight
          * 
-         * @param year the year catch is being calculated for
-         * @param age the age who's yeild is being added into total catch 
+         * @param year the year of expected total catch
+         * @param age the age of catch that is being added into total catch 
          */
         void CalculateCatch(int year, int age) {
           for (size_t fleet_=0; fleet_ < this -> nfleets; fleet_++) {
@@ -303,11 +299,11 @@ namespace fims {
         }
 
         /**
-         * @brief Calculates population biomass indices by fleet
+         * @brief Adds to the expected population indices by fleet
          * 
          * @param index_ya dimension folded index for year and age
-         * @param year the year the abundance index is being calculated for
-         * @param age the age who's biomass is being added into the index calculation
+         * @param year the year of the population index
+         * @param age the age of the index that is added into population index
          */
         void CalculateIndex(int index_ya, int year, int age) {
           for (size_t fleet_=0; fleet_ < this -> nfleets; fleet_++) {
@@ -327,13 +323,13 @@ namespace fims {
         }
 
         /**
-         * @brief Calculates expected composition of fleet landings in numbers at age
+         * @brief Calculates catch in numbers at age for each fleet for a given year and age,
+         *  then adds the value to the expected catch in numbers at age for each fleet
          * 
          * @param index_ya dimension folded index for year and age
-         * @param year the year composition is being calculated for
+         * @param year the year of expected catch composition is being calculated for
          * @param age the age composition is being calculated for
          */
-        //don't need separate function for survey - both survey and fishery treated as 'fleet'
         void CalculateCatchNumbersAA(int index_ya, int year, int age) {
           for (size_t fleet_=0; fleet_ < this -> nfleets; fleet_++) {
             int index_yaf = year * this -> nages * this -> nfleets + age * this -> nfleets + fleet_;
@@ -354,10 +350,10 @@ namespace fims {
         }
 
         /**
-         * @brief Calculates expected composition of fleet landings in weight at age
+         * @brief Calculates expected catch weight at age for each fleet for a given year and age
          * 
-         * @param year the year composition is being calculated for
-         * @param age the age composition is being calculated for
+         * @param year the year of expected catch weight at age
+         * @param age the age of expected catch weight at age
          */
         void CalculateCatchWeightAA(int year, int age) {
           for (size_t fleet_=0; fleet_ < this -> nfleets; fleet_++) {
@@ -369,10 +365,10 @@ namespace fims {
         }
 
         /**
-         * @brief Calculates expected expected proportion of individuals mature at age
+         * @brief Calculates expected proportion of individuals mature at a selected ageage
          * 
          * @param index_ya dimension folded index for year and age
-         * @param age the age maturity is being calculated for
+         * @param age the age of maturity
          */
         void CalculateMaturityAA(int index_ya, int age) {
           //this->maturity is pointing to the maturity module, which has
@@ -381,7 +377,11 @@ namespace fims {
             this -> maturity -> evaluate(age);
         }
 
-        void Evaluate() { // for loop for everything, call functions above.
+        /**
+         * @brief Executes the population loop
+         * 
+         */
+        void Evaluate() { 
         
         /*
           Sets derived vectors to zero
