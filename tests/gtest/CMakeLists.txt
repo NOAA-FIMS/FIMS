@@ -132,13 +132,25 @@ target_link_libraries(population_dynamics_recruitment_base
 gtest_discover_tests(population_dynamics_recruitment_base)
 
 # test_population_dynamics_population.cpp
-add_executable(population_dynamics_population
-  test_population_dynamics_population.cpp
+add_executable(population_dynamics_population_initialize_prepare
+  test_population_dynamics_population_initialize_prepare.cpp
 )
 
-target_link_libraries(population_dynamics_population
+target_link_libraries(population_dynamics_population_initialize_prepare
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_dynamics_population)
+gtest_discover_tests(population_dynamics_population_initialize_prepare)
+
+# test_population_Li.cpp
+add_executable(population_Li
+  test_population_Li.cpp
+)
+
+target_link_libraries(population_Li
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_Li)
