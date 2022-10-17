@@ -67,13 +67,11 @@ namespace
         EXPECT_EQ(population.log_M.size(), nyears * nages);
         // Is the dimention of log_q nfleets or nfleets * nyears?
         // Prepare() uses nfleets * nyears?
-        EXPECT_EQ(population.log_q.size(), nfleets * nyears);
+        EXPECT_EQ(population.log_q.size(), nfleets);
         EXPECT_EQ(population.naa.size(), nages);
         EXPECT_EQ(population.Fmort.size(), nfleets * nyears);
-
-        //////////////////////////////////////////////////////////////////
-        // Task: write a test for M.resize(nyears*nages); and q.resize(nfleets);
-        //////////////////////////////////////////////////////////////////
+        EXPECT_EQ(population.M.size(), nyears * nages);
+        EXPECT_EQ(population.q.size(), nfleets);
     }
 
     TEST_F(PopulationPrepareTestFixture, Prepare_works)

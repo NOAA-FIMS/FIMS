@@ -130,7 +130,7 @@ namespace fims
       catch_at_age.resize(nages);
       catch_numbers_at_age.resize((nyears + 1) * nages * nfleets);
       mortality_F.resize(nyears * nages);
-      mortality_Z.resize(nages);
+      mortality_Z.resize(nyears * nages);
       proportion_mature_at_age.resize((nyears + 1) * nages);
       weight_at_age.resize(nages);
       catch_weight_at_age.resize(nyears * nages * nfleets);
