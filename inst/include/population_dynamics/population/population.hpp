@@ -124,8 +124,8 @@ namespace fims
     void Initialize(int nyears, int nseasons, int nages)
     {
       // size all the vectors to length of nages
-      fleets.resize(nfleets);
-      // nfleets = fleets.size();
+      // fleets.resize(nfleets);
+      nfleets = fleets.size();
       ages.resize(nages);
       catch_at_age.resize(nages);
       catch_numbers_at_age.resize((nyears + 1) * nages * nfleets);

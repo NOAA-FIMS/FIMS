@@ -16,6 +16,11 @@ namespace
     TEST_F(PopulationInitializeTestFixture, Initialize_works)
     {
 
+        for (int i = 0; i < nfleets; i++)
+        {
+            auto fleet = std::make_shared<fims::Fleet<double>>();
+            population.fleets.push_back(fleet);
+        }
         population.Initialize(nyears, nseasons, nages);
 
         // test failed: population.nfleets equals to 0 not nfleets
@@ -102,7 +107,7 @@ namespace
         ///////////////////////////////////////////////////////////////////////////////
         // Task: Write a test for std::fill(expected_catch.begin(), expected_catch.end(), 0);
         ///////////////////////////////////////////////////////////////////////////////
-        
+
         // Test population.naa
         std::vector<double> naa(nages, 0);
         for (int i = 0; i < nages; i++)

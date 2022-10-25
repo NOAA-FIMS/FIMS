@@ -24,7 +24,8 @@ namespace
             population.nyears = nyears;
             population.nseasons = nseasons;
             population.nages = nages;
-            population.nfleets = nfleets;
+            // population.nfleets = nfleets;
+            
         }
 
         // Virtual void TearDown() will be called after each test is
