@@ -124,7 +124,6 @@ namespace fims
     void Initialize(int nyears, int nseasons, int nages)
     {
       // size all the vectors to length of nages
-      // fleets.resize(nfleets);
       nfleets = fleets.size();
       ages.resize(nages);
       catch_at_age.resize(nages);
@@ -176,12 +175,14 @@ namespace fims
         }
       }
 
-      for(size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
+      for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
+      {
+        // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
         // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
-        for(size_t year = 0; year < this->nyears; year++) {
-          int index_yf = year * this -> nfleets + fleet_;
-          this -> Fmort[index_yf] = fims::exp(this -> log_Fmort[index_yf]);
+        for (size_t year = 0; year < this->nyears; year++)
+        {
+          int index_yf = year * this->nfleets + fleet_;
+          this->Fmort[index_yf] = fims::exp(this->log_Fmort[index_yf]);
           // this -> q[index_yf] = fims::exp(this -> log_q[index_yf]);
         }
       }

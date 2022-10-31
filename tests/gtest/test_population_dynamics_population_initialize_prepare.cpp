@@ -16,15 +16,9 @@ namespace
     TEST_F(PopulationInitializeTestFixture, Initialize_works)
     {
 
-        for (int i = 0; i < nfleets; i++)
-        {
-            auto fleet = std::make_shared<fims::Fleet<double>>();
-            population.fleets.push_back(fleet);
-        }
         population.Initialize(nyears, nseasons, nages);
 
-        // test failed: population.nfleets equals to 0 not nfleets
-        // change nfleets = fleets.size(); to fleets.resize(nfleets);?
+        // Need to call population.nfleets = nfleets in test fixture?
         EXPECT_EQ(population.nfleets, nfleets);
         EXPECT_EQ(population.ages.size(), nages);
         // What is catch_at_age? Is it used anywhere?
@@ -38,13 +32,10 @@ namespace
             (nyears + 1) * nages * nfleets);
         // Resize mortality_M in the population.hpp?
         EXPECT_EQ(population.mortality_F.size(), nyears * nages);
-        // Use nages or nyears * nages for mortality_Z?
-        // CalculateMortality() uses nyears * nages for mortality_Z
         EXPECT_EQ(population.mortality_Z.size(), nyears * nages);
         // Will input values be nyears + 1 or nyears?
         EXPECT_EQ(population.proportion_mature_at_age.size(), (nyears + 1) * nages);
-        // Error: 'struct fims::Population<double>' has no member named 'initial_numbers'
-        // EXPECT_EQ(population.initial_numbers.size(), nages);
+        // Do we need to consider years for weight_at_age?
         EXPECT_EQ(population.weight_at_age.size(), nages);
         // Use nyears*nages*nfleets or (nyears + 1) * nages * nfleets?
         // The size of catch_numbers_at_age is (nyears + 1) * nages * nfleets)
@@ -70,8 +61,6 @@ namespace
         EXPECT_EQ(population.log_naa.size(), nages);
         EXPECT_EQ(population.log_Fmort.size(), nfleets * nyears);
         EXPECT_EQ(population.log_M.size(), nyears * nages);
-        // Is the dimention of log_q nfleets or nfleets * nyears?
-        // Prepare() uses nfleets * nyears?
         EXPECT_EQ(population.log_q.size(), nfleets);
         EXPECT_EQ(population.naa.size(), nages);
         EXPECT_EQ(population.Fmort.size(), nfleets * nyears);
@@ -107,6 +96,8 @@ namespace
         ///////////////////////////////////////////////////////////////////////////////
         // Task: Write a test for std::fill(expected_catch.begin(), expected_catch.end(), 0);
         ///////////////////////////////////////////////////////////////////////////////
+
+        // Do we need to use std::fill() for catchability q and log_q?
 
         // Test population.naa
         std::vector<double> naa(nages, 0);

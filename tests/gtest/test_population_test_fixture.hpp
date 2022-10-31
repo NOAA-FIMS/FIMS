@@ -24,8 +24,12 @@ namespace
             population.nyears = nyears;
             population.nseasons = nseasons;
             population.nages = nages;
-            // population.nfleets = nfleets;
-            
+            population.nfleets = nfleets;
+            for (int i = 0; i < nfleets; i++)
+            {
+                auto fleet = std::make_shared<fims::Fleet<double>>();
+                population.fleets.push_back(fleet);
+            }
         }
 
         // Virtual void TearDown() will be called after each test is
@@ -43,10 +47,10 @@ namespace
         int nseasons = 1;
         int nages = 12;
         int nfleets = 2;
-
     };
 
-    class PopulationPrepareTestFixture : public testing::Test {
+    class PopulationPrepareTestFixture : public testing::Test
+    {
     protected:
         void SetUp() override
         {
@@ -55,19 +59,25 @@ namespace
             population.nseasons = nseasons;
             population.nages = nages;
             population.nfleets = nfleets;
+            for (int i = 0; i < nfleets; i++)
+            {
+                auto fleet = std::make_shared<fims::Fleet<double>>();
+                population.fleets.push_back(fleet);
+            }
 
             population.Initialize(nyears, nseasons, nages);
 
-            // C++ code to set up true values for log_naa, log_M, 
+            // C++ code to set up true values for log_naa, log_M,
             // log_Fmort, and log_q:
             int seed = 1234;
-            std::default_random_engine generator (seed);
+            std::default_random_engine generator(seed);
 
             // log_naa
             double log_naa_min = 10.0;
             double log_naa_max = 12.0;
             std::uniform_real_distribution<double> log_naa_distribution(log_naa_min, log_naa_max);
-            for (int i = 0; i < nages; i++) {
+            for (int i = 0; i < nages; i++)
+            {
                 population.log_naa[i] = log_naa_distribution(generator);
             }
 
@@ -75,27 +85,30 @@ namespace
             double log_M_min = fims::log(0.1);
             double log_M_max = fims::log(0.3);
             std::uniform_real_distribution<double> log_M_distribution(log_M_min, log_M_max);
-            for (int i = 0; i < nyears*nages; i++) {
+            for (int i = 0; i < nyears * nages; i++)
+            {
                 population.log_M[i] = log_M_distribution(generator);
             }
-            
+
             // log_Fmort
             double log_Fmort_min = fims::log(0.1);
             double log_Fmort_max = fims::log(2.3);
             std::uniform_real_distribution<double> log_Fmort_distribution(log_Fmort_min, log_Fmort_max);
             // Does Fmort need to be in side of the year loop like log_q?
-            for (int i = 0; i < nfleets*nyears; i++) {
+            for (int i = 0; i < nfleets * nyears; i++)
+            {
                 population.log_Fmort[i] = log_Fmort_distribution(generator);
             }
 
             population.Prepare();
-            
-            // Make a shared pointer to selectivity and fleet because 
-            // fleet object needs a shared pointer in fleet.hpp 
-            // (std::shared_ptr<fims::SelectivityBase<Type> > selectivity;) 
+
+            // Make a shared pointer to selectivity and fleet because
+            // fleet object needs a shared pointer in fleet.hpp
+            // (std::shared_ptr<fims::SelectivityBase<Type> > selectivity;)
             // and population object needs a shared pointer in population.hpp
-            // (std::vector<std::shared_ptr<fims::Fleet<Type> > > fleets;) 
-            for (int i=0; i < population.nfleets; i++){
+            // (std::vector<std::shared_ptr<fims::Fleet<Type> > > fleets;)
+            for (int i = 0; i < population.nfleets; i++)
+            {
                 auto selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
                 selectivity->median = 7;
                 selectivity->slope = 0.5;
@@ -104,8 +117,6 @@ namespace
                 fleet->selectivity = selectivity;
                 population.fleets[i] = fleet;
             }
-            
-            
         }
 
         virtual void TearDown()
@@ -118,6 +129,5 @@ namespace
         int nseasons = 1;
         int nages = 12;
         int nfleets = 2;
-
     };
 }
