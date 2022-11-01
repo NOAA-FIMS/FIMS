@@ -11,3 +11,6 @@ jobs:
   call-workflow:
     timeout-minutes: 60
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/r-cmd-check.yml@main
+    with: 
+      gha_timeout_minutes: 30
+      
