@@ -71,7 +71,6 @@ namespace fims
     std::vector<Type> q;     /*!< transformed parameter: catchability*/
 
     std::vector<Type> ages;        /*!< vector of the ages for referencing*/
-    std::vector<Type> mortality_M; /*!< vector of natural mortality by year and age*/
     std::vector<Type> mortality_F; /*!< vector of fishing mortality by year and age*/
     std::vector<Type> mortality_Z; /*!< vector of total mortality by year and age*/
 
@@ -80,7 +79,6 @@ namespace fims
     // fecundity removed because we don't need it yet
     std::vector<Type> numbers_at_age;            /*!< Derived quantity: population expected numbers at age in each year*/
     std::vector<Type> unfished_numbers_at_age;   /*!< Derived quantity: population expected unfished numbers at age in each year*/
-    std::vector<Type> catch_at_age;              /*!< Derived quantity: catch at age*/
     std::vector<Type> biomass;                   /*!< Derived quantity: total population biomass in each year*/
     std::vector<Type> spawning_biomass;          /*!< Derived quantity: Spawning_biomass*/
     std::vector<Type> unfished_spawning_biomass; /*!< Derived quanity Spawning biomass assuming unfished*/
@@ -126,11 +124,10 @@ namespace fims
       // size all the vectors to length of nages
       nfleets = fleets.size();
       ages.resize(nages);
-      catch_at_age.resize(nages);
-      catch_numbers_at_age.resize((nyears + 1) * nages * nfleets);
+      catch_numbers_at_age.resize(nyears * nages * nfleets);
       mortality_F.resize(nyears * nages);
       mortality_Z.resize(nyears * nages);
-      proportion_mature_at_age.resize((nyears + 1) * nages);
+      proportion_mature_at_age.resize(nyears * nages);
       weight_at_age.resize(nages);
       catch_weight_at_age.resize(nyears * nages * nfleets);
       unfished_numbers_at_age.resize((nyears + 1) * nages);

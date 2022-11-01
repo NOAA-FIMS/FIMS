@@ -16,7 +16,7 @@ namespace
         population.CalculateMortality(index_ya, year, age);
 
         std::vector<double> mortality_F(nyears * nages, 0);
-        // nfleets includes surveys, but survey does not need mortality_F?
+        
         for (int fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
         {
             int index_yf = year * population.nfleets + fleet_index;

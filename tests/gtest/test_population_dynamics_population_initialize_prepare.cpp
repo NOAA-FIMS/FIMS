@@ -21,42 +21,27 @@ namespace
         // Need to call population.nfleets = nfleets in test fixture?
         EXPECT_EQ(population.nfleets, nfleets);
         EXPECT_EQ(population.ages.size(), nages);
-        // What is catch_at_age? Is it used anywhere?
-        // It is not catch_numbers_at_age or catch_weight_at_age
-        EXPECT_EQ(population.catch_at_age.size(), nages);
-        // test failed: population.nfleets equals to 0 not nfleets
-        // Use (nyears + 1) * nages * nfleets or nyears * nages * nfleets?
-        // Is catch numbers-at-age in year nyears+1 known?
         EXPECT_EQ(
             population.catch_numbers_at_age.size(),
-            (nyears + 1) * nages * nfleets);
-        // Resize mortality_M in the population.hpp?
+            nyears* nages * nfleets);
         EXPECT_EQ(population.mortality_F.size(), nyears * nages);
         EXPECT_EQ(population.mortality_Z.size(), nyears * nages);
-        // Will input values be nyears + 1 or nyears?
-        EXPECT_EQ(population.proportion_mature_at_age.size(), (nyears + 1) * nages);
-        // Do we need to consider years for weight_at_age?
+        EXPECT_EQ(population.proportion_mature_at_age.size(), nyears * nages);
         EXPECT_EQ(population.weight_at_age.size(), nages);
-        // Use nyears*nages*nfleets or (nyears + 1) * nages * nfleets?
-        // The size of catch_numbers_at_age is (nyears + 1) * nages * nfleets)
         EXPECT_EQ(
             population.catch_weight_at_age.size(),
-            (nyears + 1) * nages * nfleets);
+            nyears * nages * nfleets);
         // What is unfished number at age? A vector of values before
         // model start year or a vector of values for each model year?
         // Is unfished biomass_at_age needed?
-        EXPECT_EQ(population.unfished_numbers_at_age.size(), nages);
+        EXPECT_EQ(population.unfished_numbers_at_age.size(), (nyears + 1) * nages);
         EXPECT_EQ(population.numbers_at_age.size(), (nyears + 1) * nages);
-        // Does nfleets include both fishery and survey fleets?
-        // How to distinguish between catch and survey indices?
-        // Can expected_catch and expected_index be combined into one
-        // vector like log_q?
         EXPECT_EQ(population.expected_catch.size(), nyears * nfleets);
         EXPECT_EQ(population.expected_index.size(), nyears * nfleets);
         EXPECT_EQ(population.biomass.size(), (nyears + 1));
         // What is unfished spawning biomass? A single value before
         // model start year or a vector of values for each year?
-        EXPECT_EQ(population.unfished_spawning_biomass.size(), 1);
+        EXPECT_EQ(population.unfished_spawning_biomass.size(), (nyears + 1));
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
         EXPECT_EQ(population.log_naa.size(), nages);
         EXPECT_EQ(population.log_Fmort.size(), nfleets * nyears);
@@ -74,7 +59,7 @@ namespace
         // size of unfished_spawning_biomsss need to be 1 or nyears+1?
         EXPECT_EQ(
             population.unfished_spawning_biomass,
-            std::vector<double>(1, 0) // vector size type = 1 and vector value = 0
+            std::vector<double>(nyears + 1, 0) // vector size type = 1 and vector value = 0
         );
 
         for (int i = 0; i < population.spawning_biomass.size(); i++)
@@ -93,9 +78,13 @@ namespace
             );
         };
 
-        ///////////////////////////////////////////////////////////////////////////////
-        // Task: Write a test for std::fill(expected_catch.begin(), expected_catch.end(), 0);
-        ///////////////////////////////////////////////////////////////////////////////
+        for (int i = 0; i < population.expected_catch.size(); i++)
+        {
+            EXPECT_EQ(
+                population.expected_catch,
+                std::vector<double>(nyears * nfleets, 0)
+            );
+        };
 
         // Do we need to use std::fill() for catchability q and log_q?
 
