@@ -12,4 +12,5 @@ on:
       - main
 jobs:
   call-workflow:
+    timeout-minutes: 60
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/calc-coverage.yml@main
