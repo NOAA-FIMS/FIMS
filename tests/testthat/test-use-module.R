@@ -37,4 +37,23 @@ test_that("use_module() works", {
   unlink(file.path(
     project_path, path, module_type
   ), recursive = TRUE)
+
+  # Expect use_module throws an error if module_name is not a string
+  expect_error(
+    FIMS::use_module(
+      path = path,
+      module_name = 1,
+      module_type = "growth"
+    )
+  )
+
+  # Expect use_module throws an error if module_type is not a string
+  expect_error(
+    FIMS::use_module(
+      path = path,
+      module_name = "ewaa",
+      module_type = c(1, 2)
+    )
+  )
+
 })
