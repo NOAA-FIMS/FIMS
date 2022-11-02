@@ -4,7 +4,6 @@ age_frame <- FIMSFrameAge(data_mile1)
 fims_frame <- FIMSFrame(data_mile1)
 
 test_that("Can create the S4 FIMSFrame classes", {
-  
   expect_s4_class(age_frame, "FIMSFrameAge")
   expect_s4_class(fims_frame, "FIMSFrame")
   # A data frame is an S3 object with class data.frame
