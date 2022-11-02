@@ -91,6 +91,14 @@ namespace
     recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
     recruit.recruit_bias_adjustment_fraction = {1.0, 1.0, 1.0};
     recruit.use_recruit_bias_adjustment = false;
+
+    // If estimate_recruit_deviations = false
+    recruit.estimate_recruit_deviations = false;
+    recruit.PrepareConstrainedDeviations();
+    recruit.PrepareBiasAdjustment();
+    EXPECT_EQ(recruit.recruit_nll(), 0.0);
+
+    // If estimate_recruit_deviations = true
     recruit.estimate_recruit_deviations = true;
     recruit.PrepareConstrainedDeviations();
     recruit.PrepareBiasAdjustment();
