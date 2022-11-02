@@ -55,5 +55,4 @@ test_that("use_module() works", {
       module_type = c(1, 2)
     )
   )
-
 })
