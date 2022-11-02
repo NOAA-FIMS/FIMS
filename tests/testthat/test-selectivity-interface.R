@@ -22,5 +22,4 @@ test_that("Selectivity input settings work as expected", {
   # Create selectivity2
   selectivity2 <- new(fims$LogisticSelectivity)
   expect_equal((selectivity2$get_id()), 2)
-  
 })

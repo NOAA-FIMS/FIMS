@@ -20,5 +20,4 @@ test_that("Recruitment input settings work as expected", {
   expect_true(recruitment$steep$estimated)
   expect_equal(recruitment$rzero$value, 1000.0)
   expect_equal(recruitment$phizero$value, 0.2)
-
 })
