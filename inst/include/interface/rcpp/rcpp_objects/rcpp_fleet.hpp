@@ -42,10 +42,10 @@
  */
 class FleetInterface : public FIMSRcppInterfaceBase
 {
-    int observed_index_data_id = -999; /*!< id of observed index data object*/
-    int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
-    int index_likelihood_id = -999; /*!< id of index likelihood component*/
     int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
+    int index_likelihood_id = -999; /*!< id of index likelihood component*/
+    int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
+    int observed_index_data_id = -999; /*!< id of observed index data object*/
     int selectivity_id = -999; /*!< id of selectivity component*/
 
 public:

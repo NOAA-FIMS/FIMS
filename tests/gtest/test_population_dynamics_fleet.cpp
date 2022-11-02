@@ -33,7 +33,7 @@ namespace
     
     fims::Fleet<T> f;
     f.selectivity = fishery_selectivity
-    f.observed_index_data = 2.356247;
+    f.observed_index_data = nll_dlnorm.logy;
     f.observed_agecomp_data = {2,3,7}
     f.index_likelihood = nll_dlnorm.evaluate(log=true);
     f.agecomp_likelihood = nll_dmultinom.evaluate(log=true);
