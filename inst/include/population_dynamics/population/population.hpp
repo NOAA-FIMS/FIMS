@@ -36,13 +36,12 @@
 
 namespace fims {
 
-    /**
-     * Population class. Contains subpopulations
-     * that are divided into generic partitions (eg. sex, area).
-     */
-    template <typename T>
-    struct Population : public fims::FIMSObject<T> {
-    };
-} // namespace fims
+/**
+ * Population class. Contains subpopulations
+ * that are divided into generic partitions (eg. sex, area).
+ */
+template <typename T>
+struct Population : public fims::FIMSObject<T> {};
+}  // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */
