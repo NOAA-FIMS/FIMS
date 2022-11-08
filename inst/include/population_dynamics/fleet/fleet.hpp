@@ -1,43 +1,93 @@
-/*
- * File:   fleet.hpp
- *
- * Author: Matthew Supernaw
- * National Oceanic and Atmospheric Administration
- * National Marine Fisheries Service
- * Email: matthew.supernaw@noaa.gov
- *
- * Created on September 30, 2021, 1:12 PM
+/*! \file fleet.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
+ * Refer to the LICENSE file for reuse information.
  *
- * This software is a "United States Government Work" under the terms of the
- * United States Copyright Act.  It was written as part of the author's official
- * duties as a United States Government employee and thus cannot be copyrighted.
- * This software is freely available to the public for use. The National Oceanic
- * And Atmospheric Administration and the U.S. Government have not placed any
- * restriction on its use or reproduction.  Although all reasonable efforts have
- * been taken to ensure the accuracy and reliability of the software and data,
- * the National Oceanic And Atmospheric Administration and the U.S. Government
- * do not and cannot warrant the performance or results that may be obtained by
- * using this  software or data. The National Oceanic And Atmospheric
- * Administration and the U.S. Government disclaim all warranties, express or
- * implied, including warranties of performance, merchantability or fitness
- * for any particular purpose.
- *
- * Please cite the author(s) in any work or product based on this material.
- *
+ * The purpose of this file is to declare the growth functor class
+ * which is the base class for all growth functors.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP
 
 #include "../../common/model_object.hpp"
+#include "../../common/data_object.hpp"
+#include "../../distributions/distributions.hpp"
+#include "../selectivity/selectivity.hpp"
 
 namespace fims {
 
-template <typename T>
-struct Fleet {};
+    /**
+     *  @brief Base class for all fleets.
+     *
+     * @tparam Type The type of the fleet object.
+     * */
+    template<class Type>
+    struct Fleet : public FIMSObject<Type> {
+        static uint32_t id_g; /*!< reference id for fleet object*/
+        size_t nyears; /*!< the number of years in the model*/
+        size_t nages; /*!< the number of ages in the model*/
 
-}  // namespace fims
+
+        //data objects
+        int observed_index_data_id = -999; /*!< id of observed index data object*/
+        std::shared_ptr<fims::DataObject<Type> > observed_index_data; /*!< observed index data object*/
+
+        int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
+        std::shared_ptr<fims::DataObject<Type> > observed_agecomp_data; /*!< observed agecomp data object*/
+
+        //likelihood components
+        int index_likelihood_id = -999; /*!< id of index likelihood component*/
+        std::shared_ptr<fims::DistributionsBase<Type> > index_likelihood; /*!< index likelihood component*/
+
+        int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
+        std::shared_ptr<fims::DistributionsBase<Type> > agecomp_likelihood; /*!< agecomp likelihood component*/
+
+        //selectivity
+        int selectivity_id = -999;  /*!< id of selectivity component*/
+        std::shared_ptr<fims::SelectivityBase<Type> > selectivity; /*!< selectivity component*/
+
+        //derived quantities
+        std::vector<Type> catch_at_age; /*!<derived quantity catch at age*/
+        std::vector<Type> catch_index; /*!<derived quantity catch index*/
+        std::vector<Type> age_composition; /*!<derived quantity age composition*/
+
+        /**
+         * @brief Constructor.
+         */
+        Fleet() {
+            this->id = Fleet::id_g++;
+        }
+
+        /**
+         * @brief Intialize Fleet Class
+         * @param nyears The number of years in the model.
+         * @param nages The number of ages in the model.
+        */
+        void Initialize(int nyears, int nages) {
+            this -> nyears = nyears;
+            this -> nages = nages;
+
+            catch_at_age.resize(nyears * nages);
+            catch_index.resize(nyears); // assume index is for all ages.
+            age_composition.resize(nyears * nages);
+        }
+
+        /**
+         * @brief Sum of index and agecomp likelihoods
+         * @param do_log Whether to take the log of the likelihood.
+         */
+        const Type likelihood(bool do_log) {
+            return this->index_likelihood->evaluate(do_log)
+                    + this->agecomp_likelihood->evaluate(do_log);
+        }
+
+    };
+
+    // default id of the singleton fleet class
+    template <class Type>
+    uint32_t Fleet<Type>::id_g = 0;
+
+} // end namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

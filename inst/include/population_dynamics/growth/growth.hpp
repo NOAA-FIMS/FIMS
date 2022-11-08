@@ -11,7 +11,6 @@
  * DEFINE guards for growth module outline to define the
  * growth hpp file if not already defined.
  */
-
 #ifndef FIMS_POPULATION_DYNAMICS_GROWTH_HPP
 #define FIMS_POPULATION_DYNAMICS_GROWTH_HPP
 
