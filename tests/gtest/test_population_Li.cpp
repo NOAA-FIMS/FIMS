@@ -8,7 +8,6 @@ namespace
     {
 
         // Change Fmort[index_yf] to this->Fmort[index_yf] in population.hpp?
-
         int year = 4;
         int age = 6;
         int index_ya = year * population.nages + age;
