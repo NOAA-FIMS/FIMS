@@ -215,7 +215,7 @@ namespace fims
       for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
       {
         int index_yf = year * this->nfleets + fleet_; // index by fleet and years to dimension fold
-        this->mortality_F[index_ya] += Fmort[index_yf] * this->fleets[fleet_]->selectivity->evaluate(age);
+        this->mortality_F[index_ya] += this->Fmort[index_yf] * this->fleets[fleet_]->selectivity->evaluate(age);
       }
       this->mortality_Z[index_ya] = this->M[index_ya] + this->mortality_F[index_ya];
     }
