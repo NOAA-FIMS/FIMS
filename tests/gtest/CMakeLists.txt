@@ -156,13 +156,13 @@ target_link_libraries(population_Li
 gtest_discover_tests(population_Li)
 
 #test_population_stawitz.cpp
-add_executable(population_Stawitz
-  test_population_Stawitz.cpp
+add_executable(population_NumbersAtAge
+  test_population_NumbersAtAge.cpp
 )
 
-target_link_libraries(population_Stawitz
+target_link_libraries(population_NumbersAtAge
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_Stawitz)
+gtest_discover_tests(population_NumbersAtAge)
