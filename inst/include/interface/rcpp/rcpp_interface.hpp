@@ -55,17 +55,17 @@ bool CreateTMBModel() {
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_MODULE(fims) {
-    Rcpp::function("CreateTMBModel", &CreateTMBModel);
+  Rcpp::function("CreateTMBModel", &CreateTMBModel);
 
-    Rcpp::class_<Parameter>("Parameter")
-            .constructor()
-            .constructor<double>()
-            .constructor<Parameter>()
-            .field("value", &Parameter::value)
-            .field("min", &Parameter::min)
-            .field("max", &Parameter::max)
-            .field("is_random_effect", &Parameter::is_random_effect)
-            .field("estimated", &Parameter::estimated);
+  Rcpp::class_<Parameter>("Parameter")
+      .constructor()
+      .constructor<double>()
+      .constructor<Parameter>()
+      .field("value", &Parameter::value)
+      .field("min", &Parameter::min)
+      .field("max", &Parameter::max)
+      .field("is_random_effect", &Parameter::is_random_effect)
+      .field("estimated", &Parameter::estimated);
 
     Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
             .constructor()
@@ -73,11 +73,11 @@ RCPP_MODULE(fims) {
             .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id);
 
-    Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
-            .constructor()
-            .field("median", &LogisticSelectivityInterface::median)
-            .field("slope", &LogisticSelectivityInterface::slope)
-            .method("get_id", &LogisticSelectivityInterface::get_id);
+  Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
+      .constructor()
+      .field("median", &LogisticSelectivityInterface::median)
+      .field("slope", &LogisticSelectivityInterface::slope)
+      .method("get_id", &LogisticSelectivityInterface::get_id);
 
     Rcpp::class_<FleetInterface>("Fleet")
             .constructor()
@@ -97,12 +97,19 @@ RCPP_MODULE(fims) {
             .field("mean", &DnormDistributionsInterface::mean)
             .field("sd", &DnormDistributionsInterface::sd);
 
+  Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
+      .constructor()
+      .method("get_id", &DnormDistributionsInterface::get_id)
+      .method("evaluate", &DnormDistributionsInterface::evaluate)
+      .field("x", &DnormDistributionsInterface::x)
+      .field("mean", &DnormDistributionsInterface::mean)
+      .field("sd", &DnormDistributionsInterface::sd);
 
-    Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
-            .constructor()
-            .field("ages", &EWAAGrowthInterface::ages)
-            .field("weights", &EWAAGrowthInterface::weights)
-            .method("evaluate", &EWAAGrowthInterface::evaluate);
+  Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
+      .constructor()
+      .field("ages", &EWAAGrowthInterface::ages)
+      .field("weights", &EWAAGrowthInterface::weights)
+      .method("evaluate", &EWAAGrowthInterface::evaluate);
 
   Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
       .constructor()

@@ -44,27 +44,41 @@ class FleetInterface : public FIMSRcppInterfaceBase
     int agecomp_likelihood_id = -999;
     int selectivity_id = -999;
 
-public:
-    static uint32_t id_g;
-    uint32_t id;
+ public:
+  static uint32_t id_g; /**< static id of the FleetInterface object */
+  uint32_t id;          /**< local id of the FleetInterface object */
 
-    FleetInterface()
-    {
-        this->id = FleetInterface::id_g++;
+  FleetInterface() { this->id = FleetInterface::id_g++; }
+
+  /**
+   * @brief Set the unique id for the Age Comp Likelihood object
+   *
+   * @param agecomp_likelihood_id Unique id for the Age Comp Likelihood object
+   */
+  void SetAgeCompLikelihood(int agecomp_likelihood_id) {
+    // Check if agecom likelihood has been set already
+    if (this->agecomp_likelihood_id != -999) {
+      warning("Age composition likelihood has been set already.");
+      Rcout << "Now you are resetting age composition likelihood with age "
+               "composition likelihood ID of "
+            << agecomp_likelihood_id << std::endl;
     }
 
-    void SetAgeCompLikelihood(int agecomp_likelihood_id)
-    {
+    this->agecomp_likelihood_id = agecomp_likelihood_id;
+  }
 
-        // Check if agecom likelihood has been set already
-        if (this->agecomp_likelihood_id != -999)
-        {
-            warning("Age composition likelihood has been set already.");
-            Rcout << "Now you are resetting age composition likelihood with age composition likelihood ID of "
-                  << agecomp_likelihood_id << std::endl;
-        }
-
-        this->agecomp_likelihood_id = agecomp_likelihood_id;
+  /**
+   * @brief Set the unique id for the Index Likelihood object
+   *
+   * @param index_likelihood_id Unique id for the Index Likelihood object
+   */
+  void SetIndexLikelihood(int index_likelihood_id) {
+    // Check if index likelihood has been set already
+    if (this->index_likelihood_id != -999) {
+      warning("Index likelihood has been set already.");
+      Rcout << "Now you are resetting index likelihood with index likelihood "
+               "ID of "
+            << index_likelihood_id << std::endl;
     }
 
     void SetCatchLikelihood(int catch_likelihood_id)
@@ -83,43 +97,52 @@ public:
     void SetIndexLikelihood(int index_likelihood_id)
     {
 
-        // Check if index likelihood has been set already
-        if (this->index_likelihood_id != -999)
-        {
-            warning("Index likelihood has been set already.");
-            Rcout << "Now you are resetting index likelihood with index likelihood ID of "
-                  << index_likelihood_id << std::endl;
-        }
-
-        this->index_likelihood_id = index_likelihood_id;
+  /**
+   * @brief Set the unique id for the Observed Age Comp Data object
+   *
+   * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
+   * object
+   */
+  void SetObservedAgeCompData(int observed_agecomp_data_id) {
+    // Check if observed age composition data have been set already
+    if (this->observed_agecomp_data_id != -999) {
+      warning("Observed age composition data have been set already.");
+      Rcout << "Now you are resetting observed age composition data with "
+               "observed age composition ID of "
+            << observed_agecomp_data_id << std::endl;
     }
 
-    void SetObservedAgeCompData(int observed_agecomp_data_id)
-    {
+    this->observed_agecomp_data_id = observed_agecomp_data_id;
+  }
 
-        // Check if observed age composition data have been set already
-        if (this->observed_agecomp_data_id != -999)
-        {
-            warning("Observed age composition data have been set already.");
-            Rcout << "Now you are resetting observed age composition data with observed age composition ID of "
-                  << observed_agecomp_data_id << std::endl;
-        }
-
-        this->observed_agecomp_data_id = observed_agecomp_data_id;
+  /**
+   * @brief Set the unique id for the Observed Index Data object
+   *
+   * @param observed_index_data_id Unique id for the Observed Index Data object
+   */
+  void SetObservedIndexData(int observed_index_data_id) {
+    // Check if observed index data have been set already
+    if (this->observed_index_data_id != -999) {
+      warning("Observed index data have been set already.");
+      Rcout << "Now you are resetting observed index data with observed index "
+               "data ID of "
+            << observed_index_data_id << std::endl;
     }
 
-    void SetObservedIndexData(int observed_index_data_id)
-    {
+    this->observed_index_data_id = observed_index_data_id;
+  }
 
-        // Check if observed index data have been set already
-        if (this->observed_index_data_id != -999)
-        {
-            warning("Observed index data have been set already.");
-            Rcout << "Now you are resetting observed index data with observed index data ID of "
-                  << observed_index_data_id << std::endl;
-        }
-
-        this->observed_index_data_id = observed_index_data_id;
+  /**
+   * @brief Set the unique id for the Selectivity object
+   *
+   * @param selectivity_id Unique id for the Selectivity object
+   */
+  void SetSelectivity(int selectivity_id) {
+    // Check if selectivity has been set already
+    if (this->selectivity_id != -999) {
+      warning("Selectivity has been set already.");
+      Rcout << "Now you are resetting selectivity with selectivity ID of "
+            << selectivity_id << std::endl;
     }
 
     void SetObservedCatchData(int observed_catch_data_id)
@@ -139,27 +162,32 @@ public:
     void SetSelectivity(int selectivity_id)
     {
 
-        // Check if selectivity has been set already
-        if (this->selectivity_id != -999)
-        {
+  /** @brief this adds the values to the TMB model object */
+  virtual bool add_to_fims_tmb() {
+    // base model
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-            warning("Selectivity has been set already.");
-            Rcout << "Now you are resetting selectivity with selectivity ID of "
-                  << selectivity_id << std::endl;
-        }
+    std::shared_ptr<fims::Fleet<TMB_FIMS_REAL_TYPE>> f0 =
+        std::make_shared<fims::Fleet<TMB_FIMS_REAL_TYPE>>();
 
-        this->selectivity_id = selectivity_id;
-    }
+    // set relative info
+    f0->id = this->id;
+    f0->agecomp_likelihood_id = this->agecomp_likelihood_id;
+    f0->index_likelihood_id = this->index_likelihood_id;
+    f0->observed_agecomp_data_id = this->observed_agecomp_data_id;
+    f0->observed_index_data_id = this->observed_index_data_id;
+    f0->selectivity_id = this->selectivity_id;
 
-    virtual bool add_to_fims_tmb()
-    {
+    // add to Information
+    d0->fleets[f0->id] = f0;
 
-        // base model
-        std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-            fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    // 1st derivative model
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
+        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-        std::shared_ptr<fims::Fleet<TMB_FIMS_REAL_TYPE>> f0 =
-            std::make_shared<fims::Fleet<TMB_FIMS_REAL_TYPE>>();
+    std::shared_ptr<fims::Fleet<TMB_FIMS_FIRST_ORDER>> f1 =
+        std::make_shared<fims::Fleet<TMB_FIMS_FIRST_ORDER>>();
 
         f0->id = this->id;
         f0->agecomp_likelihood_id = this->agecomp_likelihood_id;
@@ -170,15 +198,15 @@ public:
         f0->observed_catch_data_id = this->observed_catch_data_id;
         f0->selectivity_id = this->selectivity_id;
 
-        // add to Information
-        d0->fleets[f0->id] = f0;
+    // add to Information
+    d1->fleets[f1->id] = f1;
 
-        // 1st derivative model
-        std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-            fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    // 2nd derivative model
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
+        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-        std::shared_ptr<fims::Fleet<TMB_FIMS_FIRST_ORDER>> f1 =
-            std::make_shared<fims::Fleet<TMB_FIMS_FIRST_ORDER>>();
+    std::shared_ptr<fims::Fleet<TMB_FIMS_SECOND_ORDER>> f2 =
+        std::make_shared<fims::Fleet<TMB_FIMS_SECOND_ORDER>>();
 
         f1->id = this->id;
         f1->agecomp_likelihood_id = this->agecomp_likelihood_id;
@@ -189,15 +217,15 @@ public:
         f1->observed_catch_data_id = this->observed_catch_data_id;
         f1->selectivity_id = this->selectivity_id;
 
-        // add to Information
-        d1->fleets[f1->id] = f1;
+    // add to Information
+    d2->fleets[f2->id] = f2;
 
-        // 2nd derivative model
-        std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-            fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    // 3rd derivative model
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
+        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-        std::shared_ptr<fims::Fleet<TMB_FIMS_SECOND_ORDER>> f2 =
-            std::make_shared<fims::Fleet<TMB_FIMS_SECOND_ORDER>>();
+    std::shared_ptr<fims::Fleet<TMB_FIMS_THIRD_ORDER>> f3 =
+        std::make_shared<fims::Fleet<TMB_FIMS_THIRD_ORDER>>();
 
         f2->id = this->id;
         f2->agecomp_likelihood_id = this->agecomp_likelihood_id;
