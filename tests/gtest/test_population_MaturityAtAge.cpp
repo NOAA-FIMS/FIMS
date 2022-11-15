@@ -5,24 +5,19 @@
 namespace
 {
     TEST_F(PopulationPrepareTestFixture, CalculateMaturityAA_works)
-    {
+    {        
+        double median = 6;
+        double slope = 0.15;
+        std::vector<double> expect_maturity(nyears * nages, 0);
+
         for (size_t year = 0; year < nyears; year++) {
            for (size_t age = 0; age < nages; age++){
                int index_ya = year * population.nages + age;
                population.CalculateMaturityAA(index_ya, age);
+               expect_maturity[index_ya] = 1.0/(1.0+exp(-(age-median)*slope));
            }
         }
 
-        fims::LogisticMaturity<double> maturity;
-        maturity.median = 6;
-        maturity.slope = 0.15;
-        double age_test = 10;
-        // 1.0/(1.0+exp(-(10-6)*0.15)) = 0.0.6456563
-
-        double expect_maturity = 0.6456563;
-
-
-    
-        EXPECT_NEAR(population.proportion_mature_at_age[age_test], expect_maturity, 0.0001);
+        EXPECT_NEAR(population.proportion_mature_at_age[10], expect_maturity[10], 0.0001);
    }
 }
