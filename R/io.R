@@ -6,7 +6,7 @@
 #' @return TMB object
 #' @export
 #'
-#' @examples mkObj()
+#' @examples \dontrun{mkObj()}
 mkObj <- function() {
   obj <- MakeADFun(data = list(), parameters = list(p = 1), DLL = "FIMS")
   return(obj)
