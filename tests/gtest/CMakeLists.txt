@@ -166,3 +166,15 @@ target_link_libraries(population_NumbersAtAge
 )
 
 gtest_discover_tests(population_NumbersAtAge)
+
+#test_maturityAA.cpp
+add_executable(population_MaturityAtAge
+  test_population_MaturityAtAge.cpp
+)
+
+target_link_libraries(population_MaturityAtAge
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_MaturityAtAge)
