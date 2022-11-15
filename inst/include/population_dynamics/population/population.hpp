@@ -91,19 +91,19 @@ namespace fims
 
     /// recruitment
     int recruitment_id = -999;                                /*!< id of recruitment model object*/
-    std::shared_ptr<fims::RecruitmentBase<Type>> recruitment; /*!< shared pointer to recruitment module */
+    std::shared_ptr<fims::RecruitmentBase<Type> > recruitment; /*!< shared pointer to recruitment module */
 
     // growth
     int growth_id = -999;                           /*!< id of growth model object*/
-    std::shared_ptr<fims::GrowthBase<Type>> growth; /*!< shared pointer to growth module */
+    std::shared_ptr<fims::GrowthBase<Type> > growth; /*!< shared pointer to growth module */
 
     // maturity
     int maturity_id = -999;                             /*!< id of maturity model object*/
-    std::shared_ptr<fims::MaturityBase<Type>> maturity; /*!< shared pointer to maturity module */
+    std::shared_ptr<fims::MaturityBase<Type> > maturity; /*!< shared pointer to maturity module */
 
     // fleet
     int fleet_id = -999;                                    /*!< id of fleet model object*/
-    std::vector<std::shared_ptr<fims::Fleet<Type>>> fleets; /*!< shared pointer to fleet module */
+    std::vector<std::shared_ptr<fims::Fleet<Type> > > fleets; /*!< shared pointer to fleet module */
 
     // this -> means you're referring to a class member (member of self)
 
