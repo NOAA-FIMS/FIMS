@@ -28,9 +28,6 @@ namespace fims {
         size_t nages; /*!< the number of ages in the model*/
 
   // data objects
-  int observed_index_data_id = -999; /*!< id of observed index data object*/
-  std::shared_ptr<fims::DataObject<Type> >
-      observed_index_data; /*!< observed index data object*/
 
         //data objects
         int observed_catch_data_id = -999; /*!< id of observed catch data object*/
@@ -39,10 +36,6 @@ namespace fims {
         int observed_index_data_id = -999; /*!< id of observed index data object*/
         std::shared_ptr<fims::DataObject<Type> > observed_index_data; /*!< observed index data object*/
 
-  // likelihood components
-  int index_likelihood_id = -999; /*!< id of index likelihood component*/
-  std::shared_ptr<fims::DistributionsBase<Type> >
-      index_likelihood; /*!< index likelihood component*/
 
         //likelihood components
         int catch_likelihood_id = -999; /*!< id of catch likelihood component*/
@@ -66,20 +59,11 @@ namespace fims {
         std::vector<Type> expected_index; /*!<model expected index of abundance*/
         std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
         
-
-  /**
-   * @brief Intialize Fleet Class
-   * @param nyears The number of years in the model.
-   * @param nages The number of ages in the model.
-   */
-  void Initialize(int nyears, int nages) {
-    this->nyears = nyears;
-    this->nages = nages;
-
         /**
         * @brief Destructor.
         */
         virtual ~Fleet() {}
+
 
         /**
          * @brief Intialize Fleet Class
@@ -104,7 +88,7 @@ namespace fims {
                     + this -> index_likelihood->evaluate(do_log)
                     + this -> agecomp_likelihood->evaluate(do_log);
         }
-
+  };
 }  // end namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */
