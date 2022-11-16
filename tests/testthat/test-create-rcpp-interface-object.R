@@ -1,23 +1,31 @@
-test_that("create_fims_rcpp_interface() works with recruitment rcpp", {
-  project_path <- find.package("FIMS")
-
-  if (!file.exists(file.path(project_path, "inst"))) {
-    path <- file.path(project_path, "extdata", "testthat_data", "create_rcpp_interface_object_data.txt")
-  } else {
-    path <- file.path(project_path, "inst", "extdata", "testthat_data", "create_rcpp_interface_object_data.txt")
-  }
-
-  expect_text <- readLines(path)
-
-  object_text <- capture.output(
+test_that("create_fims_rcpp_interface() works when evaluate_parameter is not null", {
+  expect_snapshot_output(
     FIMS::create_fims_rcpp_interface(
-      interface_name = "BevertonHoltRecruitmentInterface",
-      model = "SRBevertonHolt",
-      base_class = "RecruitmentInterfaceBase",
-      container = "recruitment_models",
-      parameters = c("steep", "rzero", "phizero")
-    )
+      interface_name = "DnormDistributionsInterface",
+      model = "Dnorm",
+      base_class = "DistributionsInterfaceBase",
+      container = "distribution_models",
+      parameters = c("x", "mean", "sd"),
+      evaluate_parameter = "do_log",
+      evaluate_parameter_type = "bool"
+    ),
+    cran = FALSE,
+    variant = NULL
   )
+})
 
-  expect_true(all.equal(expect_text, object_text))
+test_that("create_fims_rcpp_interface() works when evaluate_parameter is null", {
+  expect_snapshot_output(
+    FIMS::create_fims_rcpp_interface(
+      interface_name = "LogisticSelectivityInterface",
+      model = "LogisticSelectivity",
+      base_class = "SelectivityInterfaceBase",
+      container = "selectivity_models",
+      parameters = c("slope", "median"),
+      evaluate_parameter = NULL,
+      evaluate_parameter_type = NULL
+    ),
+    cran = FALSE,
+    variant = NULL
+  )
 })
