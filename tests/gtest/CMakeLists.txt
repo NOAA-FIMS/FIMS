@@ -128,7 +128,10 @@ add_executable(population_dynamics_population_initialize_prepare
   test_population_dynamics_population_initialize_prepare.cpp
 )
 
-target_link_libraries(population_dynamics_population_initialize_prepare)
+target_link_libraries(population_dynamics_population_initialize_prepare
+  gtest_main
+  fims_test
+)
 
 gtest_discover_tests(population_dynamics_population_initialize_prepare)
 
