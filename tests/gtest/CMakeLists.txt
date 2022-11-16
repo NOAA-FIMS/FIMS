@@ -87,15 +87,17 @@ target_link_libraries(fims_math_double_logistic
 
 gtest_discover_tests(fims_math_double_logistic)
 
-# benchmark_fims_math_logistic.cpp
-add_executable(benchmark_fims_math_logistic
-  benchmark_fims_math_logistic.cpp
+# test_fims_math_ad_fab_min_max.cpp
+add_executable(fims_math_fabs_min_max
+  test_fims_math_ad_fabs_min_max.cpp
 )
 
-target_link_libraries(benchmark_fims_math_logistic
+target_link_libraries(fims_math_fabs_min_max
+  gtest_main
   fims_test
-  benchmark_main
 )
+
+gtest_discover_tests(fims_math_fabs_min_max)
 
 # test_growth.cpp
 add_executable(growth_evaluate
@@ -108,16 +110,6 @@ target_link_libraries(growth_evaluate
 )
 
 gtest_discover_tests(growth_evaluate)
-
-# benchmark_fims_math_double_logistic.cpp
-add_executable(benchmark_fims_math_double_logistic
-  benchmark_fims_math_double_logistic.cpp
-)
-
-target_link_libraries(benchmark_fims_math_double_logistic
-  fims_test
-  benchmark_main
-)
 
 # test_population_dynamics_recruitment_base.cpp
 add_executable(population_dynamics_recruitment_base
@@ -136,10 +128,7 @@ add_executable(population_dynamics_population_initialize_prepare
   test_population_dynamics_population_initialize_prepare.cpp
 )
 
-target_link_libraries(population_dynamics_population_initialize_prepare
-  gtest_main
-  fims_test
-)
+target_link_libraries(population_dynamics_population_initialize_prepare)
 
 gtest_discover_tests(population_dynamics_population_initialize_prepare)
 
@@ -166,3 +155,4 @@ target_link_libraries(population_NumbersAtAge
 )
 
 gtest_discover_tests(population_NumbersAtAge)
+

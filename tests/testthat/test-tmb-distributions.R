@@ -1,7 +1,6 @@
 library(Rcpp)
 
 test_that("dnorm", {
-
   # generate data using R stats:rnorm
   set.seed(123)
   # simulate normal data
@@ -20,7 +19,6 @@ test_that("dnorm", {
 })
 
 test_that("dlnorm", {
-
   # generate data using R stats:rnorm
   set.seed(123)
   # simulate lognormal data
@@ -40,7 +38,6 @@ test_that("dlnorm", {
 })
 
 test_that("dmultinom", {
-
   # generate data using R stats:rnorm
   set.seed(123)
   p <- (1:10) / sum(1:10)
