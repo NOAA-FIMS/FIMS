@@ -10,7 +10,6 @@ test_that("Recruitment input settings work as expected", {
   recruitment$steep$is_random_effect <- TRUE
   recruitment$steep$estimated <- TRUE
   recruitment$rzero$value <- 1000.0
-  recruitment$phizero$value <- 0.2
 
   expect_equal(recruitment$get_id(), 1)
   expect_equal(recruitment$steep$value, 0.75)
@@ -19,5 +18,4 @@ test_that("Recruitment input settings work as expected", {
   expect_true(recruitment$steep$is_random_effect)
   expect_true(recruitment$steep$estimated)
   expect_equal(recruitment$rzero$value, 1000.0)
-  expect_equal(recruitment$phizero$value, 0.2)
 })
