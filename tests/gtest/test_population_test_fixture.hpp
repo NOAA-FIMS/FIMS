@@ -100,10 +100,6 @@ namespace
                 population.log_Fmort[i] = log_Fmort_distribution(generator);
             }
 
-            auto maturity = std::make_shared<fims::LogisticMaturity<double>>();
-                maturity->median = 6;
-                maturity->slope = 0.15;
-
             population.Prepare();
 
             // Make a shared pointer to selectivity and fleet because
@@ -121,6 +117,14 @@ namespace
                 fleet->selectivity = selectivity;
                 population.fleets[i] = fleet;
             }
+
+            auto maturity = std::make_shared<fims::LogisticMaturity<double>>();
+            maturity->median = 6;
+            maturity->slope = 0.15;
+
+            population.maturity = maturity;
+            
+
         }
 
         virtual void TearDown()
