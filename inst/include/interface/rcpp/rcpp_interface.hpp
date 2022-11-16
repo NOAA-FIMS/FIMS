@@ -71,7 +71,8 @@ RCPP_MODULE(fims) {
             .constructor()
             .field("steep", &BevertonHoltRecruitmentInterface::steep)
             .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
-            .method("get_id", &BevertonHoltRecruitmentInterface::get_id);
+            .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
+            .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
   Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
       .constructor()
@@ -94,12 +95,6 @@ RCPP_MODULE(fims) {
       .field("x", &DnormDistributionsInterface::x)
       .field("mean", &DnormDistributionsInterface::mean)
       .field("sd", &DnormDistributionsInterface::sd);
-
-  Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
-      .constructor()
-      .field("ages", &EWAAGrowthInterface::ages)
-      .field("weights", &EWAAGrowthInterface::weights)
-      .method("evaluate", &EWAAGrowthInterface::evaluate);
 
   Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
       .constructor()

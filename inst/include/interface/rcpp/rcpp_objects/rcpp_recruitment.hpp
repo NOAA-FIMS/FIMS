@@ -37,6 +37,9 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   /** @brief get the ID of the interface base object
    **/
   virtual uint32_t get_id() = 0;
+
+   /** @brief evaluate method for child recruitment interface objects to inherit **/
+  virtual double evaluate(double spawners, double ssbzero) = 0;
 };
 
 uint32_t RecruitmentInterfaceBase::id_g = 1;
@@ -58,6 +61,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual ~BevertonHoltRecruitmentInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
+
+  virtual double evaluate(double spawners, double ssbzero){
+    fims::SRBevertonHolt<double> BevHolt;
+
+    BevHolt.steep = this->steep.value;
+    BevHolt.rzero = this->rzero.value;
+    return BevHolt.evaluate(spawners, ssbzero);
+  }
 
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
