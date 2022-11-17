@@ -1,5 +1,3 @@
-#include "gtest/gtest.h"
-#include "population_dynamics/population/population.hpp"
 #include <random>
 
 namespace
@@ -85,7 +83,8 @@ namespace
             std::uniform_real_distribution<double> log_M_distribution(log_M_min, log_M_max);
             for (int i = 0; i < nyears * nages; i++)
             {
-                population.log_M[i] = log_M_distribution(generator);
+                // population.log_M[i] = log_M_distribution(generator);
+                population.log_M[i] = fims::log(0.2);
             }
 
             // log_Fmort
@@ -119,8 +118,12 @@ namespace
             auto maturity = std::make_shared<fims::LogisticMaturity<double>>();
             maturity->median = 6;
             maturity->slope = 0.15;
-
             population.maturity = maturity;
+            
+            auto recruitment = std::make_shared<fims::SRBevertonHolt<double>>();
+            recruitment->steep = 0.75;
+            recruitment->rzero = 1000000.0;
+            population.recruitment = recruitment;
             
 
         }
