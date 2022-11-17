@@ -89,3 +89,6 @@ vignettes/*.pdf
 
 # FIMS log file
 fims.log
+
+#TMB tmp.def file
+tmp.def
