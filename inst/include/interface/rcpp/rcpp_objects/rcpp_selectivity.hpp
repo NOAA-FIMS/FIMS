@@ -65,7 +65,7 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief evaluate the function
    * 
   */
-  virtual double evaluate() = 0.0;
+  virtual double evaluate(double x) = 0;
 };
 
 uint32_t SelectivityInterfaceBase::id_g = 1;

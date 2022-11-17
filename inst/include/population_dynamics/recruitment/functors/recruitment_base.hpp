@@ -125,11 +125,18 @@ struct RecruitmentBase : public FIMSObject<Type> {
     if (!this->estimate_recruit_deviations) {
       return nll;
     } else {
+          
+      fims::Dlnorm<Type> dlnorm;
+      dlnorm.meanlog = 1.0;
+      dlnorm.sdlog = sigma_recruit;
+
       for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
         // check this is correct
-        nll += 0.5 *
-               (pow((this->recruit_deviations[i] / this->sigma_recruit), 2) +
-                fims::log(pow(this->sigma_recruit, 2)) + fims::log(2.0 * M_PI));
+        dlnorm.x = recruit_deviations[i];
+        nll += dlnorm.evaluate(true);
+        //0.5 *
+        //       (pow((this->recruit_deviations[i] / this->sigma_recruit), 2) +
+        //        fims::log(pow(this->sigma_recruit, 2)) + fims::log(2.0 * M_PI));
       }
       return nll;
     }

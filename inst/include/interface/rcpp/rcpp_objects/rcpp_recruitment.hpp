@@ -25,9 +25,10 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   uint32_t id;          /**< id of the recruitment interface base */
   static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
   /**< map associating the ids of RecruitmentInterfaceBase to the objects */
-  std::vector<double> recruit_deviations; /**< vector of recruitment deviations*/
-  bool constrain_deviations; /**< whether or not the rec devs are constrained*/
-  std::vector<double> rec_bias_adj; /**< a vector of bias adjustment values*/
+
+  //static std::vector<double> recruit_deviations; /**< vector of recruitment deviations*/
+  ///static bool constrain_deviations; /**< whether or not the rec devs are constrained*/
+  //static std::vector<double> rec_bias_adj; /**< a vector of bias adjustment values*/
 
   RecruitmentInterfaceBase() {
     this->id = RecruitmentInterfaceBase::id_g++;

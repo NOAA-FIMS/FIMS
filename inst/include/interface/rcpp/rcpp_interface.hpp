@@ -71,8 +71,6 @@ RCPP_MODULE(fims) {
             .constructor()
             .field("steep", &BevertonHoltRecruitmentInterface::steep)
             .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
-            .field("recruit_deviations", &BevertonHoltRecruitmentInterface::recruit_deviations)
-            .field("recruitment_bias_adjustment", &BevertonHoltRecruitmentInterface::rec_bias_adj)
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
             .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
