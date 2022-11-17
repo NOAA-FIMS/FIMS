@@ -18,6 +18,8 @@ test_that("Selectivity input settings work as expected", {
   expect_true(selectivity1$median$is_random_effect)
   expect_true(selectivity1$median$estimated)
   expect_equal(selectivity1$slope$value, 0.2)
+  expect_equal(selectivity1$evaluate(10.0), 0.5)
+
 
   # Create selectivity2
   selectivity2 <- new(fims$LogisticSelectivity)
