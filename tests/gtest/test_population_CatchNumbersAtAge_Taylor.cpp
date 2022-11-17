@@ -16,7 +16,12 @@ namespace
         // Ian: not sure which of these are needed
         population.CalculateMortality(index_ya, year, age);
         population.CalculateNumbersAA(index_ya, index_ya2);
-        population.CalculateCatchNumbersAA(index_ya, index_ya2);
+// temporary debugging
+std::ofstream out("debug.txt");
+out <<" index_ya: "<<index_ya<<" year: "<<year<<" age: "<<age<<"\n";      
+
+// including the line below causes SEGFAULT
+        //population.CalculateCatchNumbersAA(index_ya, year, age);
 
         std::vector<double> mortality_F(nyears * nages, 0);
         std::vector<double> test_catch_naa(nyears * nages, 0);
@@ -29,16 +34,23 @@ namespace
             int index_yaf = year * population.nages * population.nfleets + 
               age * population.nfleets + fleet_index;
             int index_yf = year * population.nfleets + fleet_index;
+out <<" fleet_index: "<<fleet_index<<" index_yaf: "<<index_yaf<<" index_yf: "<<index_yf<<"\n";
+out <<" population.Fmort[index_yf]: "<<population.Fmort[index_yf]<<"\n";
+out <<" population.fleets[fleet_index]->selectivity->evaluate(age): "<<population.fleets[fleet_index]->selectivity->evaluate(age)<<"\n";
+out <<" population.mortality_Z[index_ya]: "<<population.mortality_Z[index_ya]<<"\n";
+out <<" population.numbers_at_age[index_ya]: "<<population.numbers_at_age[index_ya]<<"\n";
             // Baranov Catch Equation adapted from 
             //   \inst\include\population_dynamics\population\population.hpp
             test_catch_naa[index_ya] += 
               (population.Fmort[index_yf] *
-              // Ian: not sure about getting selectivity in the same way as population.hpp
-              fleets[fleet_index]->selectivity->evaluate(age)) / 
+              population.fleets[fleet_index]->selectivity->evaluate(age)) / 
               population.mortality_Z[index_ya] *
               population.numbers_at_age[index_ya] *
               (1 - exp(-(population.mortality_Z[index_ya])));
         }
+out <<" population.catch_numbers_at_age[index_ya]: "<<population.catch_numbers_at_age[index_ya]<<"\n";
+out <<" test_catch_naa[index_ya]: "<<test_catch_naa[index_ya]<<"\n";      
+        
         // test value
         EXPECT_EQ(population.catch_numbers_at_age[index_ya], test_catch_naa[index_ya]);
     }
