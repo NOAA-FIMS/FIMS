@@ -71,6 +71,8 @@ RCPP_MODULE(fims) {
             .constructor()
             .field("steep", &BevertonHoltRecruitmentInterface::steep)
             .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
+            .field("recruit_deviations", &BevertonHoltRecruitmentInterface::recruit_deviations)
+            .field("recruitment_bias_adjustment", &BevertonHoltRecruitmentInterface::rec_bias_adj)
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
             .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
@@ -78,7 +80,8 @@ RCPP_MODULE(fims) {
       .constructor()
       .field("median", &LogisticSelectivityInterface::median)
       .field("slope", &LogisticSelectivityInterface::slope)
-      .method("get_id", &LogisticSelectivityInterface::get_id);
+      .method("get_id", &LogisticSelectivityInterface::get_id)
+      .method("evaluate", &LogisticSelectivityInterface::evaluate);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()

@@ -60,6 +60,12 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
   /** @brief get the ID of the interface base object
    **/
   virtual uint32_t get_id() = 0;
+
+  /** 
+   * @brief evaluate the function
+   * 
+  */
+  virtual double evaluate() = 0.0;
 };
 
 uint32_t SelectivityInterfaceBase::id_g = 1;
@@ -81,6 +87,18 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   /** @brief returns the id for the logistic selectivity interface */
   virtual uint32_t get_id() { return this->id; }
+
+   /** @brief evaluate the logistic selectivity function
+   *   @param x  The independent variable in the logistic function (e.g., age or
+   * size in selectivity).
+  */
+  virtual double evaluate(double x){
+    fims::LogisticSelectivity<double> LogisticSel;
+
+    LogisticSel.median = this->median.value;
+    LogisticSel.slope = this->slope.value;
+    return LogisticSel.evaluate(x);
+  }
 
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
