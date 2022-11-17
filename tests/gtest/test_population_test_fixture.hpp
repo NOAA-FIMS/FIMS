@@ -11,7 +11,7 @@ namespace
     class PopulationInitializeTestFixture : public testing::Test
     {
 
-        // Make members protected otherwise they can be accessed from
+        // Make members protected and they can be accessed from
         // sub-classes.
     protected:
         // Use SetUp function to prepare the objects for each test.
@@ -24,7 +24,6 @@ namespace
             population.nyears = nyears;
             population.nseasons = nseasons;
             population.nages = nages;
-            population.nfleets = nfleets;
             for (int i = 0; i < nfleets; i++)
             {
                 auto fleet = std::make_shared<fims::Fleet<double>>();
@@ -58,7 +57,6 @@ namespace
             population.nyears = nyears;
             population.nseasons = nseasons;
             population.nages = nages;
-            population.nfleets = nfleets;
             for (int i = 0; i < nfleets; i++)
             {
                 auto fleet = std::make_shared<fims::Fleet<double>>();

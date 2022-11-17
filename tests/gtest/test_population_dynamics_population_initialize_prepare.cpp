@@ -10,7 +10,7 @@ namespace
         EXPECT_EQ(population.nyears, nyears);
         EXPECT_EQ(population.nseasons, nseasons);
         EXPECT_EQ(population.nages, nages);
-        EXPECT_EQ(population.nfleets, nfleets);
+        EXPECT_EQ(population.fleets.size(), nfleets);
     }
 
     TEST_F(PopulationInitializeTestFixture, Initialize_works)
@@ -18,7 +18,6 @@ namespace
 
         population.Initialize(nyears, nseasons, nages);
 
-        // Need to call population.nfleets = nfleets in test fixture?
         EXPECT_EQ(population.nfleets, nfleets);
         EXPECT_EQ(population.ages.size(), nages);
         EXPECT_EQ(
