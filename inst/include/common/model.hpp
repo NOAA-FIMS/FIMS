@@ -16,10 +16,10 @@
 #ifndef FIMS_COMMON_MODEL_HPP
 #define FIMS_COMMON_MODEL_HPP
 
+#include <future>
 #include <memory>
 
-#include "../population_dynamics/fleet/fleet.hpp"
-#include "../population_dynamics/population/population.hpp"
+#include "information.hpp"
 
 namespace fims {
 
@@ -27,9 +27,14 @@ namespace fims {
  * Model base
  */
 template <typename T>
-class Model {
-  std::vector < std::shared_ptr<Population<T>> populations;
-  std::vector < std::shared_ptr<Fleet<T>> fleets;
+class Model {  // may need singleton
+ public:
+  static std::shared_ptr<Model<T> >
+      fims_model; /*!< Create a shared fims_model as a pointer to Model*/
+  std::vector<std::shared_ptr<Population<T> > >
+      populations;                                 /*!< list of all population*/
+  std::vector<std::shared_ptr<Fleet<T> > > fleets; /*!< list of all fleets*/
+  virtual ~Model() {}
 };
 
 }  // namespace fims

@@ -10,19 +10,18 @@
 #' \code{module_name.hpp}.
 #' @param module_type the folder of
 #' \code{inst/include/population_dynamics} to put the files in
-#' @importFrom usethis use_template ui_stop
 #' @return TRUE
 #' @examples
 #' \dontrun{
 #' # create a new empirical weight-at-age module (EWAA) under growth
-#' use_module(system.file(package = "FIMS"),
+#' use_module(file.path("inst", "include", "population_dynamics"),
 #'   module_name = "ewaa",
 #'   module_type = "growth"
 #' )
 #' }
 #' @export
 #'
-use_module <- function(path = "inst", module_name, module_type) {
+use_module <- function(path = file.path("inst", "include", "population_dynamics"), module_name, module_type) {
   if (typeof(module_name) != "character") {
     usethis::ui_stop(paste("The module name, ", module_name, " is not of
    the correct type, please enter a string.", sep = ""))
@@ -30,28 +29,27 @@ use_module <- function(path = "inst", module_name, module_type) {
 
   if (typeof(module_type) != "character") {
     usethis::ui_stop(paste("The subfolder name, ", module_type, " is not
-   of the correct type, please enter a string.", sep = ))
+   of the correct type, please enter a string.", sep = ""))
   }
 
-  old_wd <- getwd()
-  subdir <- file.path(path, "include", "population_dynamics")
-  setwd(subdir)
-  on.exit(setwd(old_wd), add = TRUE)
+  project_path <- find.package("FIMS")
+  subdir <- path
+  full_subdir <- file.path(project_path, subdir)
 
   # Create subfolder in inst/include/population_dynamics if it does not exist
-  if (!file.exists(module_type)) {
-    try(dir.create(module_type))
+  if (!file.exists(file.path(full_subdir, module_type))) {
+    try(dir.create(file.path(full_subdir, module_type)))
   }
 
   # Create subfolder named module_name/functors in inst/include/population_dynamics
   # if it does not exist
-  if (!file.exists(file.path(module_type, "functors"))) {
-    try(dir.create(file.path(module_type, "functors")))
+  if (!file.exists(file.path(full_subdir, module_type, "functors"))) {
+    try(dir.create(file.path(full_subdir, module_type, "functors")))
   }
 
   # create a module_name.hpp file in inst/include/population_dynamics/module_type/functors
   if (!file.exists(file.path(
-    module_type, "functors",
+    full_subdir, module_type, "functors",
     paste(module_type, ".hpp", sep = "")
   ))) {
     try(usethis::use_template(
@@ -101,6 +99,5 @@ use_module <- function(path = "inst", module_name, module_type) {
     }
   }
 
-  setwd(old_wd)
   return(TRUE)
 }

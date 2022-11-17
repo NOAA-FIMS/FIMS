@@ -7,3 +7,5 @@ tests/milestone1_test_cases.md
 build
 ^codecov\.yml$
 .vscode
+^data-raw$
+^\.devcontainer$

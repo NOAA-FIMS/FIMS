@@ -49,7 +49,11 @@ Depends:
 Imports: 
     Rcpp, 
     TMB (>= 1.8.0),
-    usethis
+    usethis,
+    dplyr,
+    ggplot2,
+    methods,
+    scales
 LinkingTo: 
     Rcpp,
     TMB,
@@ -58,9 +62,10 @@ SystemRequirements: GNU make
 NeedsCompilation: yes
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.2
 Suggests: 
     covr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
+LazyData: true
