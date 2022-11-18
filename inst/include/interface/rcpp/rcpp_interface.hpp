@@ -81,6 +81,15 @@ RCPP_MODULE(fims) {
       .method("get_id", &LogisticSelectivityInterface::get_id)
       .method("evaluate", &LogisticSelectivityInterface::evaluate);
 
+    Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
+    .constructor()
+    .field("median_asc", &DoubleLogisticSelectivityInterface::median_asc)
+    .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc)
+    .field("median_desc", &DoubleLogisticSelectivityInterface::median_desc)
+    .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
+    .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
+    .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
+
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
       .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
