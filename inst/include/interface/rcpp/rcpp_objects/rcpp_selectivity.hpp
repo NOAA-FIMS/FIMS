@@ -234,7 +234,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   virtual ~DoubleLogisticSelectivityInterface() {}
 
-  /** @brief returns the id for the logistic selectivity interface */
+  /** @brief returns the id for the double logistic selectivity interface */
   virtual uint32_t get_id() { return this->id; }
 
    /** @brief evaluate the double logistic selectivity function
