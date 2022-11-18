@@ -16,6 +16,7 @@
 
 #include <cmath>  // for using std::pow and M_PI
 
+#include "../../../distributions/distributions.hpp"
 #include "../../../common/fims_math.hpp"  // for using fims::log()
 #include "../../../common/model_object.hpp"
 
