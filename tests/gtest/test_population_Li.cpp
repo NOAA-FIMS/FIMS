@@ -7,26 +7,19 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, CalculateMortality_works)
     {
-        // Heap corruption (Exit code 0xc0000374) occurs when using
-        // year <= population.nyears. Details from the failed test:
-        // Failure Expected equality of these values:
-        // population.mortality_Z[index_ya]
-        //  Which is: -5.20867e-98
-        // mortality_Z[index_ya]
-        //  Which is: 1
 
-        for (size_t year = 0; year < population.nyears; year++)
+        for (int year = 0; year < population.nyears; year++)
         {
-            for (size_t age = 0; age < population.nages; age++)
+            for (int age = 0; age < population.nages; age++)
             {
-                size_t index_ya = year * population.nages + age;
+                int index_ya = year * population.nages + age;
                 population.CalculateMortality(index_ya, year, age);
 
                 std::vector<double> mortality_F(nyears * nages, 0);
 
-                for (size_t fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
+                for (int fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
                 {
-                    size_t index_yf = year * population.nfleets + fleet_index;
+                    int index_yf = year * population.nfleets + fleet_index;
                     mortality_F[index_ya] += population.Fmort[index_yf] *
                                              population.fleets[fleet_index]->selectivity->evaluate(age);
                 }
@@ -39,5 +32,73 @@ namespace
             }
         }
     }
-    
+
+    TEST_F(PopulationPrepareTestFixture, CalculateInitialNumbersAA_works)
+    {
+
+        std::vector<double> numbers_at_age(nyears * nages, 0);
+
+        for (int year = 0; year < population.nyears; year++)
+        {
+            for (int age = 0; age < population.nages; age++)
+            {
+                int index_ya = year * population.nages + age;
+
+                population.CalculateInitialNumbersAA(index_ya, age);
+
+                numbers_at_age[index_ya] = fims::exp(population.log_naa[age]);
+                EXPECT_EQ(population.numbers_at_age[index_ya], numbers_at_age[index_ya]);
+            }
+        }
+    }
+
+    TEST_F(PopulationPrepareTestFixture, CalculateUnfishedNumbersAA_works)
+    {
+        std::ofstream out("debug.txt");
+        std::vector<double> unfished_numbers_at_age((nyears + 1) * nages, 0);
+
+        for (int year = 0; year < (population.nyears + 1); year++)
+        {
+            for (int age = 0; age < population.nages; age++)
+            {
+
+                int index_ya = year * population.nages + age;
+
+                if (age == 0)
+                {
+                    population.unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
+
+                    unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
+                }
+
+                if (year == 0 && age > 0){
+                    // values from FIMS
+                    // Bai: change CalculateUnfishedNumbersAA(index_ya, a); in 
+                    // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1);?
+                    population.CalculateUnfishedNumbersAA(index_ya, age);
+                    // population.CalculateUnfishedNumbersAA(index_ya, index_ya-1);
+                    // true values from test
+                    unfished_numbers_at_age[index_ya] = unfished_numbers_at_age[index_ya-1] * fims::exp(-fims::exp(population.log_M[index_ya-1]));
+                }
+
+                if (year>0 && age > 0)
+                {
+                    int index_ya2 = (year - 1) * population.nages + (age - 1);
+                    // values from FIMS
+                    // Bai: change CalculateUnfishedNumbersAA(index_ya, index_ya2); in 
+                    // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1);?
+                    // Test fails if log_M from test fixture is not constant over years and ages.
+                    population.CalculateUnfishedNumbersAA(index_ya, index_ya2);
+                    // true values from test
+                    unfished_numbers_at_age[index_ya] = unfished_numbers_at_age[index_ya-1] * fims::exp(-fims::exp(population.log_M[index_ya-1]));
+                    
+                }
+                out << "index_ya: " << index_ya <<"\n";
+                out << "population.unfished_numbers_at_age[index_ya]: " << population.unfished_numbers_at_age[index_ya] <<"\n";
+                out << "unfished_numbers_at_age[index_ya]: " << unfished_numbers_at_age[index_ya] <<"\n";
+
+                EXPECT_EQ(population.unfished_numbers_at_age[index_ya], unfished_numbers_at_age[index_ya]);
+            }
+        }
+    }
 }

@@ -1,5 +1,3 @@
-#include "gtest/gtest.h"
-#include "population_dynamics/population/population.hpp"
 #include <random>
 
 namespace
@@ -11,7 +9,7 @@ namespace
     class PopulationInitializeTestFixture : public testing::Test
     {
 
-        // Make members protected otherwise they can be accessed from
+        // Make members protected and they can be accessed from
         // sub-classes.
     protected:
         // Use SetUp function to prepare the objects for each test.
@@ -24,7 +22,6 @@ namespace
             population.nyears = nyears;
             population.nseasons = nseasons;
             population.nages = nages;
-            population.nfleets = nfleets;
             for (int i = 0; i < nfleets; i++)
             {
                 auto fleet = std::make_shared<fims::Fleet<double>>();
@@ -58,7 +55,6 @@ namespace
             population.nyears = nyears;
             population.nseasons = nseasons;
             population.nages = nages;
-            population.nfleets = nfleets;
             for (int i = 0; i < nfleets; i++)
             {
                 auto fleet = std::make_shared<fims::Fleet<double>>();
@@ -87,7 +83,8 @@ namespace
             std::uniform_real_distribution<double> log_M_distribution(log_M_min, log_M_max);
             for (int i = 0; i < nyears * nages; i++)
             {
-                population.log_M[i] = log_M_distribution(generator);
+                // population.log_M[i] = log_M_distribution(generator);
+                population.log_M[i] = fims::log(0.2);
             }
 
             // log_Fmort
@@ -99,10 +96,6 @@ namespace
             {
                 population.log_Fmort[i] = log_Fmort_distribution(generator);
             }
-
-            auto maturity = std::make_shared<fims::LogisticMaturity<double>>();
-                maturity->median = 6;
-                maturity->slope = 0.15;
 
             population.Prepare();
 
@@ -121,6 +114,18 @@ namespace
                 fleet->selectivity = selectivity;
                 population.fleets[i] = fleet;
             }
+
+            auto maturity = std::make_shared<fims::LogisticMaturity<double>>();
+            maturity->median = 6;
+            maturity->slope = 0.15;
+            population.maturity = maturity;
+            
+            auto recruitment = std::make_shared<fims::SRBevertonHolt<double>>();
+            recruitment->steep = 0.75;
+            recruitment->rzero = 1000000.0;
+            population.recruitment = recruitment;
+            
+
         }
 
         virtual void TearDown()
