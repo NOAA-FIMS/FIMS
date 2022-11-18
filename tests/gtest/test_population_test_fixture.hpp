@@ -97,6 +97,25 @@ namespace
                 population.log_Fmort[i] = log_Fmort_distribution(generator);
             }
 
+            // numbers_at_age
+            double numbers_at_age_min = fims::exp(10.0);
+            double numbers_at_age_max = fims::exp(12.0);
+            std::uniform_real_distribution<double> numbers_at_age_distribution(numbers_at_age_min, numbers_at_age_max);
+            for (int i = 0; i < (nyears + 1) * nages; i++)
+            {
+                population.numbers_at_age[i] = numbers_at_age_distribution(generator);
+            }
+
+            // weight_at_age
+            double weight_at_age_min = 0.5;
+            double weight_at_age_max = 12.0;
+            std::uniform_real_distribution<double> weight_at_age_distribution(weight_at_age_min, weight_at_age_max);
+            for (int i = 0; i < nages; i++)
+            {
+                population.weight_at_age[i] = weight_at_age_distribution(generator);
+            }
+
+
             population.Prepare();
 
             // Make a shared pointer to selectivity and fleet because
@@ -111,6 +130,7 @@ namespace
                 selectivity->slope = 0.5;
 
                 auto fleet = std::make_shared<fims::Fleet<double>>();
+                fleet->Initialize(nyears, nages);
                 fleet->selectivity = selectivity;
                 population.fleets[i] = fleet;
             }

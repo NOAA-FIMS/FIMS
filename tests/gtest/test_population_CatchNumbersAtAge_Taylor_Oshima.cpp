@@ -4,7 +4,7 @@
 
 namespace
 {
-    TEST_F(PopulationPrepareTestFixture, CalculateCatchNumbersAA_works)
+    TEST_F(PopulationPrepareTestFixture, CalculateCatchNumbersAA_CalculateCatchWeightAA_works)
     {
         // set up an arbitrary year/age combo to test
         int year = 4;
@@ -16,16 +16,25 @@ namespace
         // Ian: not sure which of these are needed
         population.CalculateMortality(index_ya, year, age);
         population.CalculateNumbersAA(index_ya, index_ya2);
-// temporary debugging
-std::ofstream out("debug.txt");
-out <<" index_ya: "<<index_ya<<" year: "<<year<<" age: "<<age<<"\n";      
 
-// including the line below causes SEGFAULT
-        //population.CalculateCatchNumbersAA(index_ya, year, age);
+        population.CalculateCatchNumbersAA(index_ya, year, age);
+        population.CalculateCatchWeightAA(year, age);
 
         std::vector<double> mortality_F(nyears * nages, 0);
-        std::vector<double> test_catch_naa(nyears * nages, 0);
+        // dimension of test_catch_naa matches population module, not
+        // fleet module
+        std::vector<double> test_catch_naa(nyears * nages * nfleets, 0);
+        std::vector<double> test_catch_waa(nyears * nages * nfleets, 0);
+        std::vector<double> test_naa((nyears + 1) * nages, 0);
         
+        double catch_temp;
+
+        for (int i = 0; i < (nyears + 1) * nages; i++)
+        {
+          test_naa[i] = population.numbers_at_age[i];
+        }
+        test_naa[index_ya] = test_naa[index_ya2] * exp(-population.mortality_Z[index_ya2]);
+
         // loop over fleets to get catch numbers at age for each fleet
         for (size_t fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
         {
@@ -34,24 +43,25 @@ out <<" index_ya: "<<index_ya<<" year: "<<year<<" age: "<<age<<"\n";
             int index_yaf = year * population.nages * population.nfleets + 
               age * population.nfleets + fleet_index;
             int index_yf = year * population.nfleets + fleet_index;
-out <<" fleet_index: "<<fleet_index<<" index_yaf: "<<index_yaf<<" index_yf: "<<index_yf<<"\n";
-out <<" population.Fmort[index_yf]: "<<population.Fmort[index_yf]<<"\n";
-out <<" population.fleets[fleet_index]->selectivity->evaluate(age): "<<population.fleets[fleet_index]->selectivity->evaluate(age)<<"\n";
-out <<" population.mortality_Z[index_ya]: "<<population.mortality_Z[index_ya]<<"\n";
-out <<" population.numbers_at_age[index_ya]: "<<population.numbers_at_age[index_ya]<<"\n";
+
             // Baranov Catch Equation adapted from 
-            //   \inst\include\population_dynamics\population\population.hpp
-            test_catch_naa[index_ya] += 
+            // \inst\include\population_dynamics\population\population.hpp
+            catch_temp =
               (population.Fmort[index_yf] *
               population.fleets[fleet_index]->selectivity->evaluate(age)) / 
               population.mortality_Z[index_ya] *
-              population.numbers_at_age[index_ya] *
+              test_naa[index_ya] *
               (1 - exp(-(population.mortality_Z[index_ya])));
+            test_catch_naa[index_yaf] += catch_temp;
+            test_catch_waa[index_yaf] += catch_temp * population.weight_at_age[age];
+
+            // test value
+          EXPECT_EQ(population.catch_numbers_at_age[index_yaf], test_catch_naa[index_yaf]);
+          EXPECT_EQ(population.catch_weight_at_age[index_yaf], test_catch_waa[index_yaf]);
+          EXPECT_GT(population.catch_numbers_at_age[index_yaf], 0);
+          EXPECT_GT(population.catch_weight_at_age[index_yaf], 0);
         }
-out <<" population.catch_numbers_at_age[index_ya]: "<<population.catch_numbers_at_age[index_ya]<<"\n";
-out <<" test_catch_naa[index_ya]: "<<test_catch_naa[index_ya]<<"\n";      
         
-        // test value
-        EXPECT_EQ(population.catch_numbers_at_age[index_ya], test_catch_naa[index_ya]);
+        
     }
 }
