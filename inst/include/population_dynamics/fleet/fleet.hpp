@@ -60,6 +60,15 @@ namespace fims
     std::shared_ptr<fims::SelectivityBase<Type>>
         selectivity; /*!< selectivity component*/
 
+        //Mortality and catchability
+            std::vector<Type> log_Fmort; /*!< estimated parameter: log Fishing mortality*/
+    
+    std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
+    
+    std::vector<Type> q; /*!< the catchability of the fleet */
+    std::vector<Type> log_q; /*!< log transformed catchability of the fleet/;
+
+
     // derived quantities
     std::vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
     std::vector<Type> catch_index;     /*!<derived quantity catch index*/
@@ -93,6 +102,21 @@ namespace fims
       catch_at_age.resize(nyears * nages);
       catch_index.resize(nyears); // assume index is for all ages.
       age_composition.resize(nyears * nages);
+      log_Fmort.resize(nyears);
+      Fmort.resize(nyears);
+      log_q.resize(nyears);
+      q.resize(nyears);
+    }
+
+    void Prepare(){
+        // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
+        // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
+        for (size_t year = 0; year < this->nyears; year++)
+        {
+          this->fleets[fleet]->Fmort[year] = fims::exp(this->fleets[fleet]->log_Fmort[year]);
+          this -> q[year] = fims::exp(this -> log_q[year]);
+        }
+      }
     }
 
     /**
