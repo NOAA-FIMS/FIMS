@@ -366,7 +366,9 @@ namespace fims
             this->numbers_at_age[index_ya] *
             (1 - exp(-(this->mortality_Z[index_ya])));
         this->catch_numbers_at_age[index_yaf] += catch_;
-        fleets[fleet_]->catch_numbers_at_age[index_yaf] += catch_;
+        // catch_numbers_at_age for the fleet module has different
+        // dimensions (year/age, not year/fleet/age)
+        fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
       }
     }
 

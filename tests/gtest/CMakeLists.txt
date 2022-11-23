@@ -159,9 +159,9 @@ target_link_libraries(population_MaturityAtAge
 
 gtest_discover_tests(population_MaturityAtAge)
 
-#test_population_CatchNumbersAtAge_Taylor.cpp
+#test_population_CatchNumbersAtAge_Taylor_Oshima.cpp
 add_executable(population_CatchNumbersAtAge
-  test_population_CatchNumbersAtAge_Taylor.cpp
+  test_population_CatchNumbersAtAge_Taylor_Oshima.cpp
 )
 
 target_link_libraries(population_CatchNumbersAtAge
