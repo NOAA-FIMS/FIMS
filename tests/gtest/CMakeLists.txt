@@ -170,3 +170,15 @@ target_link_libraries(population_CatchNumbersAtAge
 )
 
 gtest_discover_tests(population_CatchNumbersAtAge)
+
+#test_CalculateCatch.cpp
+add_executable(population_Catch
+  test_population_Catch.cpp
+)
+
+target_link_libraries(population_Catch
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_Catch)
