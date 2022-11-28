@@ -210,7 +210,7 @@ namespace fims
       for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
       {
         int index_yf = year * this->nfleets + fleet_; // index by fleet and years to dimension fold
-        this->mortality_F[index_ya] += this->fleets[fleet]->Fmort[year] * this->fleets[fleet_]->selectivity->evaluate(age);
+        this->mortality_F[index_ya] += this->fleets[fleet_]->Fmort[year] * this->fleets[fleet_]->selectivity->evaluate(age);
       }
       this->mortality_Z[index_ya] = this->M[index_ya] + this->mortality_F[index_ya];
     }
@@ -326,7 +326,7 @@ namespace fims
         // I = qN (N is total numbers), I is an index in numbers
         Type index_;
 
-        index_ = this->fleets[fleet]->q[fleet_] *
+        index_ = this->fleets[fleet_]->q[year] *
                  this->fleets[fleet_]->selectivity->evaluate(age) *
                  this->numbers_at_age[index_ya] *
                  this->weight_at_age[age];
@@ -355,7 +355,7 @@ namespace fims
         Type catch_; // catch_ is used to avoid using the c++ keyword catch
         // Baranov Catch Equation
         catch_ =
-            (this->fleets[fleet]->Fmort[year] *
+            (this->fleets[fleet_]->Fmort[year] *
              this->fleets[fleet_]->selectivity->evaluate(age)) /
             this->mortality_Z[index_ya] *
             this->numbers_at_age[index_ya] *
