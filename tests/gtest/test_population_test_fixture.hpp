@@ -95,9 +95,13 @@ namespace
             double log_Fmort_max = fims::log(2.3);
             std::uniform_real_distribution<double> log_Fmort_distribution(log_Fmort_min, log_Fmort_max);
             // Does Fmort need to be in side of the year loop like log_q?
-            for (int i = 0; i < nfleets * nyears; i++)
+            for (int i = 0; i < nfleets; i++)
             {
-                population.log_Fmort[i] = log_Fmort_distribution(generator);
+                for(int year = 0; year < nyears; year++)
+                {
+                    fleet[i].log_Fmort[year] = log_Fmort_distribution(generator);
+                }
+                
             }
 
             population.Prepare();
