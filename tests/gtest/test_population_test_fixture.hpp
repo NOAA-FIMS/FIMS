@@ -59,18 +59,30 @@ namespace
             population.nseasons = nseasons;
             population.nages = nages;
             population.nfleets = nfleets;
-            for (int i = 0; i < nfleets; i++)
-            {
-                auto fleet = std::make_shared<fims::Fleet<double>>();
-                population.fleets.push_back(fleet);
-            }
-
-            population.Initialize(nyears, nseasons, nages);
 
             // C++ code to set up true values for log_naa, log_M,
             // log_Fmort, and log_q:
             int seed = 1234;
             std::default_random_engine generator(seed);
+
+             // log_Fmort
+            double log_Fmort_min = fims::log(0.1);
+            double log_Fmort_max = fims::log(2.3);
+            std::uniform_real_distribution<double> log_Fmort_distribution(log_Fmort_min, log_Fmort_max);
+            // Does Fmort need to be in side of the year loop like log_q?
+            for (int i = 0; i < nfleets; i++)
+            {
+                auto fleet = std::make_shared<fims::Fleet<double>>();
+                for(int year = 0; year < nyears; year++)
+                {
+                    fleet->log_Fmort[year] = log_Fmort_distribution(generator);
+                }
+                population.fleets.push_back(fleet);
+            }
+
+            population.Initialize(nyears, nseasons, nages);
+
+         
 
             // log_naa
             double log_naa_min = 10.0;
@@ -88,21 +100,7 @@ namespace
             for (int i = 0; i < nyears * nages; i++)
             {
                 population.log_M[i] = log_M_distribution(generator);
-            }
-
-            // log_Fmort
-            double log_Fmort_min = fims::log(0.1);
-            double log_Fmort_max = fims::log(2.3);
-            std::uniform_real_distribution<double> log_Fmort_distribution(log_Fmort_min, log_Fmort_max);
-            // Does Fmort need to be in side of the year loop like log_q?
-            for (int i = 0; i < nfleets; i++)
-            {
-                for(int year = 0; year < nyears; year++)
-                {
-                    fleet[i].log_Fmort[year] = log_Fmort_distribution(generator);
-                }
-                
-            }
+            }      
 
             population.Prepare();
 
