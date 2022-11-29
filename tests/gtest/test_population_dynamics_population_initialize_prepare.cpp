@@ -44,11 +44,11 @@ namespace
         EXPECT_EQ(population.unfished_spawning_biomass.size(), (nyears + 1));
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
         EXPECT_EQ(population.log_naa.size(), nages);
-        EXPECT_EQ(population.log_Fmort.size(), nfleets * nyears);
+        EXPECT_EQ(population.fleets.log_Fmort.size(), nfleets * nyears);
         EXPECT_EQ(population.log_M.size(), nyears * nages);
-        EXPECT_EQ(population.log_q.size(), nfleets);
+        EXPECT_EQ(population.fleets.log_q.size(), nfleets);
         EXPECT_EQ(population.naa.size(), nages);
-        EXPECT_EQ(population.Fmort.size(), nfleets * nyears);
+        EXPECT_EQ(population.fleets.Fmort.size(), nfleets * nyears);
         EXPECT_EQ(population.M.size(), nyears * nages);
         EXPECT_EQ(population.q.size(), nfleets);
     }
@@ -110,9 +110,9 @@ namespace
         std::vector<double> Fmort(nfleets * nyears, 0);
         for (int i = 0; i < nfleets * nyears; i++)
         {
-            Fmort[i] = fims::exp(population.log_Fmort[i]);
-            EXPECT_EQ(population.Fmort[i], Fmort[i]);
+            Fmort[i] = fims::exp(population.fleets[i].log_Fmort);
+            EXPECT_EQ(population.fleets[i].Fmort, Fmort[i]);
         }
-        EXPECT_EQ(population.Fmort.size(), nyears * nfleets);
+        EXPECT_EQ(population.fleets[i].Fmort.size(), nyears * nfleets);
     }
 } // namespace
