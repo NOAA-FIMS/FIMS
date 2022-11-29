@@ -477,7 +477,9 @@ namespace fims
             }
             else
             {
-              CalculateUnfishedNumbersAA(index_ya, a);
+              // CalculateUnfishedNumbersAA(index_ya, a);
+              // CalculateUnfishedNumbersAA(index_ya, index_ya-1);
+              CalculateUnfishedNumbersAA(index_ya, a-1);
             }
             /*
              Fished and unfished spawning biomass vectors are summing biomass at age

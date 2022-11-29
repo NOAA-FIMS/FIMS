@@ -83,8 +83,8 @@ namespace
             std::uniform_real_distribution<double> log_M_distribution(log_M_min, log_M_max);
             for (int i = 0; i < nyears * nages; i++)
             {
-                // population.log_M[i] = log_M_distribution(generator);
-                population.log_M[i] = fims::log(0.2);
+                population.log_M[i] = log_M_distribution(generator);
+                // population.log_M[i] = fims::log(0.2);
             }
 
             // log_Fmort
