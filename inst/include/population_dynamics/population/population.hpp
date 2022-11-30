@@ -140,11 +140,10 @@ namespace fims
 
       M.resize(nyears * nages);
 
-           for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
+      for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
       {
-        this->fleets[fleet_].Initialize();   
-        
-        }
+        this->fleets[fleet_]->Initialize(nyears, nages);   
+      }
    
     }
 
@@ -174,7 +173,7 @@ namespace fims
       }
       for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
       {
-        this->fleets[fleet_].Prepare();   
+        this->fleets[fleet_]->Prepare();   
         
         }
 

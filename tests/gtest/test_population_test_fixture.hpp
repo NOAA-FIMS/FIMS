@@ -40,6 +40,7 @@ namespace
         }
 
         fims::Population<double> population;
+
         // Use default values from the Li et al., 2021
         // https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/blob/master/R/save_initial_input.R
         int id_g = 0;
@@ -73,6 +74,7 @@ namespace
             for (int i = 0; i < nfleets; i++)
             {
                 auto fleet = std::make_shared<fims::Fleet<double>>();
+                fleet->Initialize(nyears, nages);
                 for(int year = 0; year < nyears; year++)
                 {
                     fleet->log_Fmort[year] = log_Fmort_distribution(generator);
@@ -81,7 +83,6 @@ namespace
             }
 
             population.Initialize(nyears, nseasons, nages);
-
          
 
             // log_naa
@@ -116,6 +117,7 @@ namespace
                 selectivity->slope = 0.5;
 
                 auto fleet = std::make_shared<fims::Fleet<double>>();
+                fleet->Initialize(nyears, nages);
                 fleet->selectivity = selectivity;
                 population.fleets[i] = fleet;
             }

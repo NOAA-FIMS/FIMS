@@ -1,35 +1,43 @@
 #include "gtest/gtest.h"
 #include "population_dynamics/fleet/fleet.hpp"
-#include "../../tests/gtest/test_population_test_fixture.hpp"
+#include <random>
 
 namespace
 {
 
-    TEST_F(PopulationInitializeTestFixture, input_data_are_specified)
+    TEST(fleet_tests, Fleet_Initialize_works)
     {
-        EXPECT_EQ(population.id_g, id_g);
-        EXPECT_EQ(population.nyears, nyears);
-        EXPECT_EQ(population.nseasons, nseasons);
-        EXPECT_EQ(population.nages, nages);
-        EXPECT_EQ(population.nfleets, nfleets);
-    }
-
-    TEST_F(PopulationInitializeTestFixture, Fleet_Initialize_works)
-    {
-        
         fims::Fleet<double> fleet;
+        int nyears = 30;
+        int nages = 12;
         fleet.Initialize(nyears, nages);
-
+        fleet.Prepare();
+        
+      
         EXPECT_EQ(fleet.log_Fmort.size(), nyears);
         EXPECT_EQ(fleet.log_q.size(), nyears);
         EXPECT_EQ(fleet.Fmort.size(), nyears);
         EXPECT_EQ(fleet.q.size(), nyears);
     }
 
-    TEST_F(PopulationPrepareTestFixture, Fleet_Prepare_works)
+    TEST(fleet_tests, Fleet_Prepare_works)
     {
         fims::Fleet<double> fleet;
+        int nyears = 30;
+        int nages = 12;
         fleet.Initialize(nyears, nages);
+
+        int seed = 1234;
+        std::default_random_engine generator(seed);
+
+          // log_Fmort
+        double log_Fmort_min = fims::log(0.1);
+        double log_Fmort_max = fims::log(2.3);
+        std::uniform_real_distribution<double> log_Fmort_distribution(log_Fmort_min, log_Fmort_max);
+        for(int i = 0; i < nyears; i++)
+        {
+            fleet.log_Fmort[i] = log_Fmort_distribution(generator);
+        }
         fleet.Prepare();
 
         // Test fleet.Fmort
