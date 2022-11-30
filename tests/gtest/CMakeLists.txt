@@ -123,7 +123,18 @@ target_link_libraries(population_dynamics_recruitment_base
 
 gtest_discover_tests(population_dynamics_recruitment_base)
 
+# test_population_dynamics_fleet.cpp
+add_executable(population_dynamics_fleet_initialize_prepare
+  test_population_dynamics_fleet_initialize_prepare.cpp
+)
 
+target_link_libraries(population_dynamics_fleet_initialize_prepare
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_dynamics_fleet_initialize_prepare)
+#[[
 # test_population_dynamics_population.cpp
 add_executable(population_dynamics_population_initialize_prepare
   test_population_dynamics_population_initialize_prepare.cpp
@@ -135,7 +146,7 @@ target_link_libraries(population_dynamics_population_initialize_prepare
 )
 
 gtest_discover_tests(population_dynamics_population_initialize_prepare)
-#[[
+
 # test_population_Li.cpp
 add_executable(population_Li
   test_population_Li.cpp

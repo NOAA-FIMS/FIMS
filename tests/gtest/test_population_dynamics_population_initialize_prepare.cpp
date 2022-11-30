@@ -4,6 +4,7 @@
 
 namespace
 {
+
     TEST_F(PopulationInitializeTestFixture, input_data_are_specified)
     {
         EXPECT_EQ(population.id_g, id_g);
@@ -15,6 +16,10 @@ namespace
 
     TEST_F(PopulationInitializeTestFixture, Initialize_works)
     {
+        
+        fims::Fleet<double> fleet;
+        fleet.Initialize(nyears, nages);
+        fleet.Prepare();
 
         population.Initialize(nyears, nseasons, nages);
 
@@ -44,17 +49,21 @@ namespace
         EXPECT_EQ(population.unfished_spawning_biomass.size(), (nyears + 1));
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
         EXPECT_EQ(population.log_naa.size(), nages);
-        EXPECT_EQ(population.fleets.log_Fmort.size(), nfleets * nyears);
+        EXPECT_EQ(fleet.log_Fmort.size(), nfleets * nyears);
         EXPECT_EQ(population.log_M.size(), nyears * nages);
-        EXPECT_EQ(population.fleets.log_q.size(), nfleets);
+        EXPECT_EQ(fleet.log_q.size(), nfleets);
         EXPECT_EQ(population.naa.size(), nages);
-        EXPECT_EQ(population.fleets.Fmort.size(), nfleets * nyears);
+        EXPECT_EQ(fleet.Fmort.size(), nfleets * nyears);
         EXPECT_EQ(population.M.size(), nyears * nages);
-        EXPECT_EQ(population.q.size(), nfleets);
+        EXPECT_EQ(fleet.q.size(), nfleets);
     }
 
     TEST_F(PopulationPrepareTestFixture, Prepare_works)
     {
+        fims::Fleet<double> fleet;
+        fleet.Initialize(nyears, nages);
+        fleet.Prepare();
+
 
         // size of unfished_spawning_biomsss need to be 1 or nyears+1?
         EXPECT_EQ(
@@ -110,9 +119,9 @@ namespace
         std::vector<double> Fmort(nfleets * nyears, 0);
         for (int i = 0; i < nfleets * nyears; i++)
         {
-            Fmort[i] = fims::exp(population.fleets[i].log_Fmort);
-            EXPECT_EQ(population.fleets[i].Fmort, Fmort[i]);
+            Fmort[i] = fims::exp(fleet[i].log_Fmort);
+            EXPECT_EQ(fleet[i].Fmort, Fmort[i]);
         }
-        EXPECT_EQ(population.fleets[i].Fmort.size(), nyears * nfleets);
+        EXPECT_EQ(fleet.Fmort.size(), nyears * nfleets);
     }
 } // namespace
