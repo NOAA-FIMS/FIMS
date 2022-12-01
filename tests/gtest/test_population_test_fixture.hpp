@@ -61,6 +61,8 @@ namespace
             population.nages = nages;
             population.nfleets = nfleets;
 
+            population.Initialize(nyears, nseasons, nages);
+
             // C++ code to set up true values for log_naa, log_M,
             // log_Fmort, and log_q:
             int seed = 1234;
@@ -79,11 +81,9 @@ namespace
                 {
                     fleet->log_Fmort[year] = log_Fmort_distribution(generator);
                 }
+                //fleet->Prepare();
                 population.fleets.push_back(fleet);
             }
-
-            population.Initialize(nyears, nseasons, nages);
-         
 
             // log_naa
             double log_naa_min = 10.0;

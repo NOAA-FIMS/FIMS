@@ -134,7 +134,7 @@ target_link_libraries(population_dynamics_fleet_initialize_prepare
 )
 
 gtest_discover_tests(population_dynamics_fleet_initialize_prepare)
-#[[
+
 # test_population_dynamics_population.cpp
 add_executable(population_dynamics_population_initialize_prepare
   test_population_dynamics_population_initialize_prepare.cpp
@@ -170,5 +170,3 @@ target_link_libraries(population_NumbersAtAge
 )
 
 gtest_discover_tests(population_NumbersAtAge)
-
-]]

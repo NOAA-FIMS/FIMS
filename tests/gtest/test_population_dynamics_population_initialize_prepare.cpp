@@ -103,13 +103,17 @@ namespace
         }
         EXPECT_EQ(population.M.size(), nyears * nages);
 
-        // Test population.Fmort
+        // Test population.fleet->Fmort 
+        // fmort and logfmort are vectors of length year
         std::vector<double> Fmort(nfleets * nyears, 0);
-        for (int i = 0; i < nfleets * nyears; i++)
-        {
-            Fmort[i] = fims::exp(population.fleets[i].log_Fmort);
-            EXPECT_EQ(population.fleets[i].Fmort, Fmort[i]);
+        for(size_t i = 0; i < nfleets; i++){
+            for(size_t y = 0; y < nyears; y++){
+                size_t index_yf = y * population.nfleets + i;
+                Fmort[index_yf] = fims::exp(population.fleets[i]->log_Fmort[y]);
+                EXPECT_EQ(population.fleets[i]->Fmort[y], Fmort[index_yf]);
+            }
+            EXPECT_EQ(population.fleets[i]->Fmort.size(), nyears);
         }
-        EXPECT_EQ(fleet.Fmort.size(), nyears * nfleets);
+        
     }
 } // namespace

@@ -175,7 +175,7 @@ namespace fims
       {
         this->fleets[fleet_]->Prepare();   
         
-        }
+      }
 
       // call functions to set up recruitment deviations.
       // this -> recruitment -> PrepareConstrainedDeviations();
