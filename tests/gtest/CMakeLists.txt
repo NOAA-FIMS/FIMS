@@ -194,3 +194,15 @@ target_link_libraries(population_Recruitment
 )
 
 gtest_discover_tests(population_Recruitment)
+
+#test_CalculateSSB.cpp
+add_executable(population_SSB
+  test_population_SSB.cpp
+)
+
+target_link_libraries(population_SSB
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_SSB)
