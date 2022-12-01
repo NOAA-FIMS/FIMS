@@ -81,7 +81,7 @@ namespace
                 {
                     fleet->log_Fmort[year] = log_Fmort_distribution(generator);
                 }
-                //fleet->Prepare();
+                fleet->Prepare();
                 population.fleets.push_back(fleet);
             }
 
