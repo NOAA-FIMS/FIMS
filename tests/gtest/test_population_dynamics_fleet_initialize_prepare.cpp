@@ -45,7 +45,7 @@ namespace
         for (int i = 0; i < nyears; i++)
         {
             Fmort[i] = fims::exp(fleet.log_Fmort[i]);
-            EXPECT_EQ(fleet.Fmort, Fmort[i]);
+            EXPECT_EQ(fleet.Fmort[i], Fmort[i]);
         }
         EXPECT_EQ(fleet.Fmort.size(), nyears);
     }
