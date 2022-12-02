@@ -32,6 +32,7 @@ test_that("dlnorm", {
   dlnorm_$x$value <- y
   dlnorm_$meanlog$value <- 0
   dlnorm_$sdlog$value <- 1
+  dlnorm_$do_bias_correction <- FALSE
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(TRUE), stats::dlnorm(y, 0, 1, TRUE))
   expect_equal(dlnorm_$evaluate(FALSE), stats::dlnorm(y, 0, 1, FALSE))

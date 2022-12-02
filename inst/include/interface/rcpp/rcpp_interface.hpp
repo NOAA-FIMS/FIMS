@@ -118,7 +118,8 @@ RCPP_MODULE(fims) {
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
       .field("x", &DlnormDistributionsInterface::x)
       .field("meanlog", &DlnormDistributionsInterface::meanlog)
-      .field("sdlog", &DlnormDistributionsInterface::sdlog);
+      .field("sdlog", &DlnormDistributionsInterface::sdlog)
+      .field("do_bias_correction", &DlnormDistributionsInterface::do_bias_correction);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
