@@ -200,8 +200,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  class RecruitmentNLLInterface : public RecruitmentInterfaceBase {
  public:
   Parameter log_sigma_recruit;   /**< log of the sd recruitment*/
-  std::vector<double> recruit_deviations; /**< vector of recruitment devs*/
-  std::vector<double> recruit_bias_adjustment; /**<vector bias adjustment*/
+  Rcpp::NumericVector recruit_deviations; /**< vector of recruitment devs*/
+  Rcpp::NumericVector recruit_bias_adjustment; /**<vector bias adjustment*/
   bool use_recruit_bias_adjustment;   /**< should the lognormal be bias corrected */
 
   RecruitmentNLLInterface() : RecruitmentInterfaceBase() {}
@@ -214,8 +214,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     fims::RecruitmentNLL<double> NLL;
 
     NLL.log_sigma_recruit = this->log_sigma_recruit.value;
-    NLL.recruit_deviations = this->recruit_deviations;
-    NLL.recruit_bias_adjustment = this->recruit_bias_adjustment;
+    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
+    NLL.recruit_deviations = TMBVector(recruit_deviations.size());  // Vector from TMB
+    NLL.recruit_bias_adjustment = TMBVector(recruit_bias_adjustment.size());  // Vector from TMB
+    for (int i = 0; i < x.size(); i++) {
+      NLL.recruit_deviations[i] = recruit_deviations[i];
+      NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
+    }
+    
     NLL.use_recruit_bias_adjustment = this->use_recruit_bias_adjustment;
     return NLL.evaluate();
   }
