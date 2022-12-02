@@ -195,6 +195,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     return true;
   }
+}
 
  class RecruitmentNLLInterface : public RecruitmentInterfaceBase {
  public:
