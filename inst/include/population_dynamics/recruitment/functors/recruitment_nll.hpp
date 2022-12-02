@@ -32,7 +32,7 @@ namespace fims {
 template <class Type>
 struct RecruitmentNLL : public RecruitmentBase<Type> {
     static uint32_t id_g; /*!< reference id for recruitment nll object*/
-    Type nll = 0.0; /*!< The negative log likelihood value */
+
 
   /** @brief Constructor.
    */
@@ -46,7 +46,7 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
    * but with the addition of the constant terms.
    */
   Type evaluate() {
-
+    Type nll = 0.0; /*!< The negative log likelihood value */
     if (!this->estimate_recruit_deviations) {
       return nll;
     } else {
