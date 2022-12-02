@@ -40,12 +40,17 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
 
   virtual ~RecruitmentNLL() {}
 
+  virtual const Type evaluate(const Type &spawners, const Type &ssbzero) {
+    Type recruits;
+    return recruits;
+  }
+
   /** @brief likelihood component function.
    * Returns the negative log likelihood (nll).
    * Based on equation (A.3.10) in Methot and Wetzel (2013)
    * but with the addition of the constant terms.
    */
-  Type evaluate() {
+  Type evaluate_nll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
     if (!this->estimate_recruit_deviations) {
       return nll;

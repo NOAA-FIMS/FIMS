@@ -81,7 +81,7 @@ RCPP_MODULE(fims) {
             .field("recruitment_devs", &RecruitmentNLLInterface::recruit_deviations)
             .field("recruitment_bias_adj", &RecruitmentNLLInterface::recruit_bias_adjustment)
             .field("do_bias_correction", &RecruitmentNLLInterface::use_recruit_bias_adjustment)
-            .method("evaluate", &RecruitmentNLLInterface::evaluate);
+            .method("evaluate", &RecruitmentNLLInterface::evaluate_nll);
 
   Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
       .constructor()

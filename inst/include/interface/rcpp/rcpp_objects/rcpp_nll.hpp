@@ -33,7 +33,7 @@
   virtual uint32_t get_id() = 0;
 
    /** @brief evaluate method for child nll interface objects to inherit **/
-  virtual double evaluate() = 0;
+  virtual double evaluate_nll() = 0;
 };
 
 uint32_t NLLInterfaceBase::id_g = 1;
@@ -47,13 +47,13 @@ std::map<uint32_t, NLLInterfaceBase*>
   Rcpp::NumericVector recruit_bias_adjustment; /**<vector bias adjustment*/
   bool use_recruit_bias_adjustment;   /**< should the lognormal be bias corrected */
 
-  RecruitmentNLLInterface() : FIMSRcppInterfaceBase() {}
+  RecruitmentNLLInterface() : NLLInterfaceBase() {}
 
   virtual ~RecruitmentNLLInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
 
-  virtual double evaluate(){
+  virtual double evaluate_nll(){
     fims::RecruitmentNLL<double> NLL;
 
     NLL.log_sigma_recruit = this->log_sigma_recruit.value;
@@ -66,7 +66,7 @@ std::map<uint32_t, NLLInterfaceBase*>
     }
     
     NLL.use_recruit_bias_adjustment = this->use_recruit_bias_adjustment;
-    return NLL.evaluate();
+    return NLL.evaluate_nll();
   }
 
    /** @brief this adds the parameter values and derivatives to the TMB model
