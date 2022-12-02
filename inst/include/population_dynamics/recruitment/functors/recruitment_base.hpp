@@ -45,7 +45,7 @@ struct RecruitmentBase : public FIMSObject<Type> {
   bool use_recruit_bias_adjustment =
       true; /*!< A flag to indicate if recruitment deviations are bias adjusted
              */
-  Type sigma_recruit; /*!< Standard deviation of log recruitment deviations */
+  Type log_sigma_recruit; /*!< Log standard deviation of log recruitment deviations */
   Type rzero;   /*!< Unexploited recruitment. Should be a positive value.*/
   bool estimate_recruit_deviations =
       true; /*!< A flag to indicate if recruitment deviations are estimated or
@@ -106,39 +106,9 @@ struct RecruitmentBase : public FIMSObject<Type> {
         // In the future, this would be set by the user.
         this->recruit_bias_adjustment_fraction[i] = 1.0;
         this->recruit_bias_adjustment[i] =
-            0.5 * this->sigma_recruit * this->sigma_recruit *
+            0.5 * fims::exp(this->log_sigma_recruit) * fims::exp(this->log_sigma_recruit) *
             this->recruit_bias_adjustment_fraction[i];
       }
-    }
-  }
-
-  /** @brief likelihood component function.
-   * Returns the negative log likelihood (nll).
-   * Based on equation (A.3.10) in Methot and Wetzel (2013)
-   * but with the addition of the constant terms.
-   */
-  Type recruit_nll() {
-    Type nll;
-
-    nll = 0.0;
-
-    if (!this->estimate_recruit_deviations) {
-      return nll;
-    } else {
-          
-      fims::Dlnorm<Type> dlnorm;
-      dlnorm.meanlog = 1.0;
-      dlnorm.sdlog = sigma_recruit;
-
-      for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
-        // check this is correct
-        dlnorm.x = recruit_deviations[i];
-        nll += dlnorm.evaluate(true);
-        //0.5 *
-        //       (pow((this->recruit_deviations[i] / this->sigma_recruit), 2) +
-        //        fims::log(pow(this->sigma_recruit, 2)) + fims::log(2.0 * M_PI));
-      }
-      return nll;
     }
   }
 };
