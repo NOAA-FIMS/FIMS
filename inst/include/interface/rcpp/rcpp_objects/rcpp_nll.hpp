@@ -36,9 +36,9 @@
   virtual double evaluate() = 0;
 };
 
-uint32_t RecruitmentInterfaceBase::id_g = 1;
-std::map<uint32_t, RecruitmentInterfaceBase*>
-    RecruitmentInterfaceBase::live_objects;
+uint32_t NLLInterfaceBase::id_g = 1;
+std::map<uint32_t, NLLInterfaceBase*>
+    NLLInterfaceBase::live_objects;
 
  class RecruitmentNLLInterface : public NLLInterfaceBase {
  public:
