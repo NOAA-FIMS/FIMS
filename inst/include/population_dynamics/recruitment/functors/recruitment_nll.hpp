@@ -45,7 +45,7 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
    * Based on equation (A.3.10) in Methot and Wetzel (2013)
    * but with the addition of the constant terms.
    */
-  Type evaluate_nll() {
+  Type evaluate() {
 
     if (!this->estimate_recruit_deviations) {
       return nll;

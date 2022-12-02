@@ -74,6 +74,14 @@ RCPP_MODULE(fims) {
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
             .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
+  Rcpp::class_<RecruitmentNLLInterface>("RecruitmentNLL")
+            .constructor()
+            .field("log_sigma", &RecruitmentNLLInterface::log_sigma_recruit)
+            .field("recruitment_devs", &RecruitmentNLLInterface::recruit_deviations)
+            .field("recruitment_bias_adj", &RecruitmentNLLInterface::recruit_bias_adjustment)
+            .field("do_bias_correction", &RecruitmentNLLInterface::use_bias_correction)
+            .method("evaluate", &RecruitmentNLLInterface::evaluate);
+
   Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
       .constructor()
       .field("median", &LogisticSelectivityInterface::median)

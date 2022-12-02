@@ -195,6 +195,29 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     return true;
   }
+
+ class RecruitmentNLLInterface : public RecruitmentInterfaceBase {
+ public:
+  Parameter log_sigma_recruit;   /**< log of the sd recruitment*/
+  std::vector<double> recruit_deviations; /**< vector of recruitment devs*/
+  std::vector<double> recruit_bias_adjustment; /**<vector bias adjustment*/
+  bool use_bias_correction;   /**< should the lognormal be bias corrected */
+
+  RecruitmentNLLInterface() : RecruitmentInterfaceBase() {}
+
+  virtual ~RecruitmentNLLInterface() {}
+
+  virtual uint32_t get_id() { return this->id; }
+
+  virtual double evaluate(double spawners, double ssbzero){
+    fims::RecruitmentNLL<double> NLL;
+
+    NLL.log_sigma_recruit = this->log_sigma_recruit.value;
+    NLL.recruit_deviations = this->recruit_deviations;
+    NLL.recruit_bias_adjustment = this->recruit_bias_adjustment;
+    NLL.use_bias_correction = this->use_bias_correction;
+    return NLL.evaluate();
+  }
 };
 
 #endif
