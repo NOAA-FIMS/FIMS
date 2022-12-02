@@ -218,6 +218,12 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     NLL.use_bias_correction = this->use_bias_correction;
     return NLL.evaluate();
   }
+
+   /** @brief this adds the parameter values and derivatives to the TMB model
+   * object */
+  virtual bool add_to_fims_tmb() {
+    return true;
+  }
 };
 
 #endif
