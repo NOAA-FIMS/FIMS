@@ -77,7 +77,7 @@ struct Dlnorm : public DistributionsBase<T> {
   T x;       /*!< observation */
   T meanlog; /*!< mean of the distribution of log(x) */
   T sdlog;   /*!< standard deviation of the distribution of log(x) */
-  bool do_bias_correction = true; /*!< whether or not to bias correct the distribution */
+  bool do_bias_correction = false; /*!< whether or not to bias correct the distribution */
 
   Dlnorm() : DistributionsBase<T>() {}
 
