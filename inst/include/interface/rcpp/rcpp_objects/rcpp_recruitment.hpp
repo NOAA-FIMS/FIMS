@@ -197,40 +197,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   }
 };
 
- class RecruitmentNLLInterface : public RecruitmentInterfaceBase {
- public:
-  Parameter log_sigma_recruit;   /**< log of the sd recruitment*/
-  Rcpp::NumericVector recruit_deviations; /**< vector of recruitment devs*/
-  Rcpp::NumericVector recruit_bias_adjustment; /**<vector bias adjustment*/
-  bool use_recruit_bias_adjustment;   /**< should the lognormal be bias corrected */
 
-  RecruitmentNLLInterface() : RecruitmentInterfaceBase() {}
-
-  virtual ~RecruitmentNLLInterface() {}
-
-  virtual uint32_t get_id() { return this->id; }
-
-  virtual double evaluate(){
-    fims::RecruitmentNLL<double> NLL;
-
-    NLL.log_sigma_recruit = this->log_sigma_recruit.value;
-    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
-    NLL.recruit_deviations = TMBVector(recruit_deviations.size());  // Vector from TMB
-    NLL.recruit_bias_adjustment = TMBVector(recruit_bias_adjustment.size());  // Vector from TMB
-    for (int i = 0; i < x.size(); i++) {
-      NLL.recruit_deviations[i] = recruit_deviations[i];
-      NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
-    }
-    
-    NLL.use_recruit_bias_adjustment = this->use_recruit_bias_adjustment;
-    return NLL.evaluate();
-  }
-
-   /** @brief this adds the parameter values and derivatives to the TMB model
-   * object */
-  virtual bool add_to_fims_tmb() {
-    return true;
-  }
-};
 
 #endif

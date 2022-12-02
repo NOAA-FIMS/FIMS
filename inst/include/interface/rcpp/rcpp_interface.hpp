@@ -18,6 +18,7 @@
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
+#include "rcpp_objects/rcpp_nll.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
 #include "rcpp_objects/rcpp_tmb_distribution.hpp"
 
