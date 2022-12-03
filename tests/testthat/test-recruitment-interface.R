@@ -31,11 +31,11 @@ test_that("Recruitment input settings work as expected", {
   expected_nll <- 15.97251
 
   recnll <- new(fims$RecruitmentNLL)
-  recnll$log_sigma_recruit = log(0.7)
-  recnll$recruit_bias_adjustment = rep(1.0,3)
-  recnll$recruit_deviations = devs1
-  recnll$use_recruit_bias_adjustment = false
+  recnll$log_sigma_recruit$value = log(0.7)
+  recnll$recruitment_bias_adj = rep(1.0,3)
+  recnll$recruitment_devs = devs1
+  recnll$do_bias_correction = FALSE
 
-  expect_equal(recnll$evaluate, expected = 15.97251)
+  expect_equal(recnll$evaluate(), expected = 15.97251)
 
 })
