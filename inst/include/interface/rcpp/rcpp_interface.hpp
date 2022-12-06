@@ -71,7 +71,8 @@ RCPP_MODULE(fims) {
             .constructor()
             .field("steep", &BevertonHoltRecruitmentInterface::steep)
             .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
-            .method("get_id", &BevertonHoltRecruitmentInterface::get_id);
+            .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
+            .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
   Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
       .constructor()
@@ -79,23 +80,13 @@ RCPP_MODULE(fims) {
       .field("slope", &LogisticSelectivityInterface::slope)
       .method("get_id", &LogisticSelectivityInterface::get_id);
 
-    Rcpp::class_<FleetInterface>("Fleet")
-            .constructor()
-            .method("SetCatchLikelihood", &FleetInterface::SetCatchLikelihood)
-            .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
-            .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
-            .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
-            .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
-            .method("SetObservedCatchData", &FleetInterface::SetObservedCatchData)
-            .method("SetSelectivity", &FleetInterface::SetSelectivity);
- 
-    Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
-            .constructor()
-            .method("get_id",  &DnormDistributionsInterface::get_id)
-            .method("evaluate",  &DnormDistributionsInterface::evaluate)
-            .field("x", &DnormDistributionsInterface::x)
-            .field("mean", &DnormDistributionsInterface::mean)
-            .field("sd", &DnormDistributionsInterface::sd);
+  Rcpp::class_<FleetInterface>("Fleet")
+      .constructor()
+      .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
+      .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
+      .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
+      .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
+      .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
   Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
       .constructor()
@@ -104,12 +95,6 @@ RCPP_MODULE(fims) {
       .field("x", &DnormDistributionsInterface::x)
       .field("mean", &DnormDistributionsInterface::mean)
       .field("sd", &DnormDistributionsInterface::sd);
-
-  Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
-      .constructor()
-      .field("ages", &EWAAGrowthInterface::ages)
-      .field("weights", &EWAAGrowthInterface::weights)
-      .method("evaluate", &EWAAGrowthInterface::evaluate);
 
   Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
       .constructor()

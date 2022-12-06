@@ -87,6 +87,18 @@ target_link_libraries(fims_math_double_logistic
 
 gtest_discover_tests(fims_math_double_logistic)
 
+# test_fims_math_ad_fab_min_max.cpp
+add_executable(fims_math_fabs_min_max
+  test_fims_math_ad_fabs_min_max.cpp
+)
+
+target_link_libraries(fims_math_fabs_min_max
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_math_fabs_min_max)
+
 # test_growth.cpp
 add_executable(growth_evaluate
   test_growth.cpp

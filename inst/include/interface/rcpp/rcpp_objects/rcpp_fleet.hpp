@@ -34,15 +34,18 @@
 #include "../../../population_dynamics/fleet/fleet.hpp"
 #include "rcpp_interface_base.hpp"
 
-class FleetInterface : public FIMSRcppInterfaceBase
-{
-    int observed_catch_data_id = -999;
-    int observed_index_data_id = -999;
-    int observed_agecomp_data_id = -999;
-    int catch_likelihood_id = -999;
-    int index_likelihood_id = -999;
-    int agecomp_likelihood_id = -999;
-    int selectivity_id = -999;
+/**
+ * @brief Rcpp interface for Fleet as an S4 object. To instantiate
+ * from R:
+ * fleet <- new(fims$Fleet)
+ *
+ */
+class FleetInterface : public FIMSRcppInterfaceBase {
+  int agecomp_likelihood_id = -999;    /*!< id of agecomp likelihood component*/
+  int index_likelihood_id = -999;      /*!< id of index likelihood component*/
+  int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
+  int observed_index_data_id = -999;   /*!< id of observed index data object*/
+  int selectivity_id = -999;           /*!< id of selectivity component*/
 
  public:
   static uint32_t id_g; /**< static id of the FleetInterface object */
@@ -81,21 +84,8 @@ class FleetInterface : public FIMSRcppInterfaceBase
             << index_likelihood_id << std::endl;
     }
 
-    void SetCatchLikelihood(int catch_likelihood_id)
-    {
-        // Check if catch likelihood has been set already
-        if (this->catch_likelihood_id != -999)
-        {
-            warning("Catch likelihood has been set already.");
-            Rcout << "Now you are resetting catch likelihood with catch likelihood ID of "
-                  << catch_likelihood_id << std::endl;
-        }
-
-        this->catch_likelihood_id = catch_likelihood_id;
-    }
-
-    void SetIndexLikelihood(int index_likelihood_id)
-    {
+    this->index_likelihood_id = index_likelihood_id;
+  }
 
   /**
    * @brief Set the unique id for the Observed Age Comp Data object
@@ -145,22 +135,8 @@ class FleetInterface : public FIMSRcppInterfaceBase
             << selectivity_id << std::endl;
     }
 
-    void SetObservedCatchData(int observed_catch_data_id)
-    {
-
-        // Check if observed catch data have been set already
-        if (this->observed_catch_data_id != -999)
-        {
-            warning("Observed catch data have been set already.");
-            Rcout << "Now you are resetting observed catch data with observed catch data ID of "
-                  << observed_catch_data_id << std::endl;
-        }
-
-        this->observed_catch_data_id = observed_catch_data_id;
-    }
-    
-    void SetSelectivity(int selectivity_id)
-    {
+    this->selectivity_id = selectivity_id;
+  }
 
   /** @brief this adds the values to the TMB model object */
   virtual bool add_to_fims_tmb() {
@@ -189,14 +165,13 @@ class FleetInterface : public FIMSRcppInterfaceBase
     std::shared_ptr<fims::Fleet<TMB_FIMS_FIRST_ORDER>> f1 =
         std::make_shared<fims::Fleet<TMB_FIMS_FIRST_ORDER>>();
 
-        f0->id = this->id;
-        f0->agecomp_likelihood_id = this->agecomp_likelihood_id;
-        f0->index_likelihood_id = this->index_likelihood_id;
-        f0->catch_likelihood_id = this->catch_likelihood_id;
-        f0->observed_agecomp_data_id = this->observed_agecomp_data_id;
-        f0->observed_index_data_id = this->observed_index_data_id;
-        f0->observed_catch_data_id = this->observed_catch_data_id;
-        f0->selectivity_id = this->selectivity_id;
+
+    f1->id = this->id;
+    f1->agecomp_likelihood_id = this->agecomp_likelihood_id;
+    f1->index_likelihood_id = this->index_likelihood_id;
+    f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
+    f1->observed_index_data_id = this->observed_index_data_id;
+    f1->selectivity_id = this->selectivity_id;
 
     // add to Information
     d1->fleets[f1->id] = f1;
@@ -208,15 +183,13 @@ class FleetInterface : public FIMSRcppInterfaceBase
     std::shared_ptr<fims::Fleet<TMB_FIMS_SECOND_ORDER>> f2 =
         std::make_shared<fims::Fleet<TMB_FIMS_SECOND_ORDER>>();
 
-        f1->id = this->id;
-        f1->agecomp_likelihood_id = this->agecomp_likelihood_id;
-        f1->index_likelihood_id = this->index_likelihood_id;
-        f1->catch_likelihood_id = this->catch_likelihood_id;
-        f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
-        f1->observed_index_data_id = this->observed_index_data_id;
-        f1->observed_catch_data_id = this->observed_catch_data_id;
-        f1->selectivity_id = this->selectivity_id;
-
+    f2->id = this->id;
+    f2->agecomp_likelihood_id = this->agecomp_likelihood_id;
+    f2->index_likelihood_id = this->index_likelihood_id;
+    f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
+    f2->observed_index_data_id = this->observed_index_data_id;
+    f2->selectivity_id = this->selectivity_id;
+    
     // add to Information
     d2->fleets[f2->id] = f2;
 
@@ -227,38 +200,17 @@ class FleetInterface : public FIMSRcppInterfaceBase
     std::shared_ptr<fims::Fleet<TMB_FIMS_THIRD_ORDER>> f3 =
         std::make_shared<fims::Fleet<TMB_FIMS_THIRD_ORDER>>();
 
-        f2->id = this->id;
-        f2->agecomp_likelihood_id = this->agecomp_likelihood_id;
-        f2->index_likelihood_id = this->index_likelihood_id;
-        f2->catch_likelihood_id = this->catch_likelihood_id;
-        f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
-        f2->observed_index_data_id = this->observed_index_data_id;
-        f2->observed_catch_data_id = this->observed_catch_data_id;
-        f2->selectivity_id = this->selectivity_id;
+    f3->id = this->id;
+    f3->agecomp_likelihood_id = this->agecomp_likelihood_id;
+    f3->index_likelihood_id = this->index_likelihood_id;
+    f3->observed_agecomp_data_id = this->observed_agecomp_data_id;
+    f3->observed_index_data_id = this->observed_index_data_id;
+    f3->selectivity_id = this->selectivity_id;
 
-        // add to Information
-        d2->fleets[f2->id] = f2;
-
-        // 3rd derivative model
-        std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-            fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-
-        std::shared_ptr<fims::Fleet<TMB_FIMS_THIRD_ORDER>> f3 =
-            std::make_shared<fims::Fleet<TMB_FIMS_THIRD_ORDER>>();
-
-        f3->id = this->id;
-        f3->agecomp_likelihood_id = this->agecomp_likelihood_id;
-        f3->index_likelihood_id = this->index_likelihood_id;
-        f3->catch_likelihood_id = this->catch_likelihood_id;
-        f3->observed_agecomp_data_id = this->observed_agecomp_data_id;
-        f3->observed_index_data_id = this->observed_index_data_id;
-        f3->observed_catch_data_id = this->observed_catch_data_id;
-        f3->selectivity_id = this->selectivity_id;
-
-        // add to Information
-        d3->fleets[f3->id] = f3;
-        return 0;
-    }
+    // add to Information
+    d3->fleets[f3->id] = f3;
+    return true;
+  }
 };
 
 uint32_t FleetInterface::id_g = 1;
