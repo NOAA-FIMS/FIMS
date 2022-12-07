@@ -41,7 +41,7 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
   virtual ~RecruitmentNLL() {}
 
   virtual const Type evaluate(const Type &spawners, const Type &ssbzero) {
-    Type recruits;
+    Type recruits = 0.0;
     return recruits;
   }
 
