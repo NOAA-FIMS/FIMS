@@ -69,7 +69,7 @@ std::map<uint32_t, NLLInterfaceBase*>
     NLL.use_recruit_bias_adjustment = this->use_recruit_bias_adjustment;
     NLL.estimate_recruit_deviations = this->estimate_recruit_deviations;
     //NLL.PrepareConstrainedDeviations();
-    NLL.PrepareBiasAdjustment();
+    //NLL.PrepareBiasAdjustment();
     return NLL.evaluate_nll();
   }
 
