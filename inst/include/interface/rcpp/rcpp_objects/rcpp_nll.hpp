@@ -46,6 +46,7 @@ std::map<uint32_t, NLLInterfaceBase*>
   Rcpp::NumericVector recruit_deviations; /**< vector of recruitment devs*/
   Rcpp::NumericVector recruit_bias_adjustment; /**<vector bias adjustment*/
   bool use_recruit_bias_adjustment;   /**< should the lognormal be bias corrected */
+  bool estimate_recruit_deviations;   /**< should the lognormal be bias corrected */
 
   RecruitmentNLLInterface() : NLLInterfaceBase() {}
 
@@ -66,6 +67,7 @@ std::map<uint32_t, NLLInterfaceBase*>
     }
     
     NLL.use_recruit_bias_adjustment = this->use_recruit_bias_adjustment;
+    NLL.estimate_recruit_deviations = this->estimate_recruit_deviations;
     NLL.PrepareConstrainedDeviations();
     NLL.PrepareBiasAdjustment();
     return NLL.evaluate_nll();

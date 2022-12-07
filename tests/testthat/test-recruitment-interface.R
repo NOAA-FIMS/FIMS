@@ -35,7 +35,12 @@ test_that("Recruitment input settings work as expected", {
   recnll$recruitment_bias_adj = rep(1.0,3)
   recnll$recruitment_devs = devs1
   recnll$do_bias_correction = FALSE
+  recnll$use_recruit_bias_adjustment = FALSE
 
+  recnll$estimate_recruit_deviations = FALSE
+  EXPECT_EQ(recnll$evaluate(), 0.0);
+
+  recnll$estimate_recruit_deviations = FALSE
   expect_equal(recnll$evaluate(), expected = 15.97251)
 
 })
