@@ -37,6 +37,7 @@ namespace
         }
 
         fims::Population<double> population;
+
         // Use default values from the Li et al., 2021
         // https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/blob/master/R/save_initial_input.R
         int id_g = 0;
@@ -55,11 +56,7 @@ namespace
             population.nyears = nyears;
             population.nseasons = nseasons;
             population.nages = nages;
-            for (int i = 0; i < nfleets; i++)
-            {
-                auto fleet = std::make_shared<fims::Fleet<double>>();
-                population.fleets.push_back(fleet);
-            }
+            population.nfleets = nfleets;
 
             population.Initialize(nyears, nseasons, nages);
 
@@ -67,6 +64,29 @@ namespace
             // log_Fmort, and log_q:
             int seed = 1234;
             std::default_random_engine generator(seed);
+
+             // log_Fmort
+            double log_Fmort_min = fims::log(0.1);
+            double log_Fmort_max = fims::log(2.3);
+            std::uniform_real_distribution<double> log_Fmort_distribution(log_Fmort_min, log_Fmort_max);
+
+            // log_q
+            double log_q_min = fims::log(0.1);
+            double log_q_max = fims::log(1);
+            std::uniform_real_distribution<double> log_q_distribution(log_q_min, log_q_max);
+            // Does Fmort need to be in side of the year loop like log_q?
+            for (int i = 0; i < nfleets; i++)
+            {
+                auto fleet = std::make_shared<fims::Fleet<double>>();
+                fleet->Initialize(nyears, nages);
+                for(int year = 0; year < nyears; year++)
+                {
+                    fleet->log_Fmort[year] = log_Fmort_distribution(generator);
+                    fleet->log_q[year] = log_q_distribution(generator);
+                }
+                fleet->Prepare();
+                population.fleets.push_back(fleet);
+            }
 
             // log_naa
             double log_naa_min = 10.0;
@@ -84,18 +104,7 @@ namespace
             for (int i = 0; i < nyears * nages; i++)
             {
                 population.log_M[i] = log_M_distribution(generator);
-                // population.log_M[i] = fims::log(0.2);
-            }
-
-            // log_Fmort
-            double log_Fmort_min = fims::log(0.1);
-            double log_Fmort_max = fims::log(2.3);
-            std::uniform_real_distribution<double> log_Fmort_distribution(log_Fmort_min, log_Fmort_max);
-            // Does Fmort need to be in side of the year loop like log_q?
-            for (int i = 0; i < nfleets * nyears; i++)
-            {
-                population.log_Fmort[i] = log_Fmort_distribution(generator);
-            }
+            }      
 
             // numbers_at_age
             double numbers_at_age_min = fims::exp(10.0);

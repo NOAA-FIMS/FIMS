@@ -19,8 +19,8 @@ namespace
 
                 for (int fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
                 {
-                    int index_yf = year * population.nfleets + fleet_index;
-                    mortality_F[index_ya] += population.Fmort[index_yf] *
+                    size_t index_yf = year * population.nfleets + fleet_index;
+                    mortality_F[index_ya] += population.fleets[fleet_index]->Fmort[index_yf] *
                                              population.fleets[fleet_index]->selectivity->evaluate(age);
                 }
                 EXPECT_EQ(population.mortality_F[index_ya], mortality_F[index_ya]);

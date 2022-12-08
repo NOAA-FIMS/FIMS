@@ -60,7 +60,14 @@ namespace fims
     std::shared_ptr<fims::SelectivityBase<Type>>
         selectivity; /*!< selectivity component*/
 
-    // derived quantities
+    //Mortality and catchability
+    std::vector<Type> log_Fmort; /*!< estimated parameter: log Fishing mortality*/
+    std::vector<Type> log_q; /*!< estimated parameter: catchability of the fleet */
+    
+    std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
+    std::vector<Type> q; /*!< transofrmed parameter: the catchability of the fleet */
+
+    // derived quantities 
     std::vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
     std::vector<Type> catch_index;     /*!<derived quantity catch index*/
     std::vector<Type> age_composition; /*!<derived quantity age composition*/
@@ -93,18 +100,32 @@ namespace fims
       catch_at_age.resize(nyears * nages);
       catch_index.resize(nyears); // assume index is for all ages.
       age_composition.resize(nyears * nages);
-
       expected_catch.resize(nyears);
       expected_index.resize(nyears); // assume index is for all ages.
       catch_numbers_at_age.resize(nyears * nages);
+      
+      log_Fmort.resize(nyears);
+      Fmort.resize(nyears);
+      log_q.resize(nyears);
+      q.resize(nyears);
+
     }
 
+    void Prepare(){
+      // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
+      // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
+      for (size_t year = 0; year < this->nyears; year++)
+      {
+        this->Fmort[year] = fims::exp(this->log_Fmort[year]);
+        this->q[year] = fims::exp(this->log_q[year]);
+      }
+    }
+       
     /**
      * @brief Sum of index and agecomp likelihoods
      * @param do_log Whether to take the log of the likelihood.
      */
-    const Type likelihood(bool do_log)
-    {
+    const Type likelihood(bool do_log) {
       return this->index_likelihood->evaluate(do_log) +
              this->agecomp_likelihood->evaluate(do_log);
     }
