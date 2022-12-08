@@ -60,14 +60,12 @@ namespace fims
     std::shared_ptr<fims::SelectivityBase<Type>>
         selectivity; /*!< selectivity component*/
 
-        //Mortality and catchability
-            std::vector<Type> log_Fmort; /*!< estimated parameter: log Fishing mortality*/
+    //Mortality and catchability
+    std::vector<Type> log_Fmort; /*!< estimated parameter: log Fishing mortality*/
+    std::vector<Type> log_q; /*!< estimated parameter: catchability of the fleet */
     
     std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
-    
-    std::vector<Type> q; /*!< the catchability of the fleet */
-    std::vector<Type> log_q; /*!< log transformed catchability of the fleet */
-
+    std::vector<Type> q; /*!< transofrmed parameter: the catchability of the fleet */
 
     // derived quantities 
     std::vector<Type> catch_at_age;    /*!<derived quantity catch at age*/

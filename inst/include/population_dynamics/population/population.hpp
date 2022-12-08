@@ -68,7 +68,7 @@ namespace fims
     std::vector<Type> M;     /*!< transformed parameter: Natural Mortality*/
 
     std::vector<Type> ages;        /*!< vector of the ages for referencing*/
-    std::vector<Type> mortality_F; /*!< vector of fishing mortality by year and age*/
+    std::vector<Type> mortality_F; /*!< vector of fishing mortality summed across fleet by year and age*/
     std::vector<Type> mortality_Z; /*!< vector of total mortality by year and age*/
 
     // derived quantities
