@@ -13,7 +13,7 @@ namespace
         int index_ya2 = (year - 1) * population.nages + age - 1;
 
         population.CalculateMortality(index_ya, year, age);
-        population.CalculateNumbersAA(index_ya, index_ya2);
+        population.CalculateNumbersAA(index_ya, index_ya2, age);
         population.CalculateMaturityAA(index_ya, age);
         population.CalculateSpawningBiomass(index_ya, year, age);
 
@@ -42,7 +42,7 @@ namespace
 
         population.CalculateMortality(index_ya2, year-1, age-1);
         population.CalculateMaturityAA(index_ya, age);
-        population.CalculateNumbersAA(index_ya, index_ya2);
+        population.CalculateNumbersAA(index_ya, index_ya2, age);
         population.CalculateSpawningBiomass(index_ya, year, age);
 
         std::vector<double> test_SSB(nyears + 1, 0);

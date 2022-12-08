@@ -226,13 +226,22 @@ namespace fims
      *
      * @param index_ya dimension folded index for year and age
      * @param index_ya2 dimension folded index for year-1 and age-1
+     * @param age age index
      */
-    inline void CalculateNumbersAA(int index_ya, int index_ya2)
+    inline void CalculateNumbersAA(int index_ya, int index_ya2, int age)
     {
       // using Z from previous age/year - is this correct?
       this->numbers_at_age[index_ya] =
           this->numbers_at_age[index_ya2] *
           (exp(-this->mortality_Z[index_ya2]));
+      
+      // Plus group calculation
+      if (age == (this->nages - 1)) {
+        this->numbers_at_age[index_ya] =
+          this->numbers_at_age[index_ya] + 
+          this->numbers_at_age[index_ya2 + 1] *
+          (exp(-this->mortality_Z[index_ya2 + 1]));
+      }
     }
 
     /**
@@ -503,7 +512,7 @@ namespace fims
             else
             {
               int index_ya2 = (y - 1) * nages + (a - 1);
-              CalculateNumbersAA(index_ya, index_ya2);
+              CalculateNumbersAA(index_ya, index_ya2, a);
               CalculateUnfishedNumbersAA(index_ya, index_ya2);
             }
             CalculateSpawningBiomass(index_ya, y, a);
