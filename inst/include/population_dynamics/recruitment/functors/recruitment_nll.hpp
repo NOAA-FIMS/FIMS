@@ -55,17 +55,20 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
     if (!this->estimate_recruit_deviations) {
       return nll;
     } else {
-      //Rcout << "Rec devs being passed to C++ are "
-      //      << recruit_deviations << std::endl;
+
       fims::Dnorm<Type> dnorm;
       dnorm.sd = this->log_sigma_recruit;
-
+      Rcout << "Rec devs being passed to C++ are "
+            << recruit_deviations << std::endl;
       for (size_t i = 0; i < this->recruit_deviations.size(); i++) { 
         dnorm.mean = 0.0;
         if(this->use_recruit_bias_adjustment){
           dnorm.mean -= this->recruit_bias_adjustment[i];
+          Rcout << "mean" << dnorm.mean << std::endl;
         } 
           dnorm.x = log(this->recruit_deviations[i]);
+          
+          Rcout << "x" << dnorm.x << std::endl;
           nll += dnorm.evaluate(true);
         }
       return nll;
