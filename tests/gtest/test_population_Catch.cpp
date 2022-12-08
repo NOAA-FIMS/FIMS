@@ -35,8 +35,7 @@ namespace
             EXPECT_EQ(population.expected_catch[index_yf], expected_catch[index_yf]);
             EXPECT_GT(population.expected_catch[index_yf], 0);
             EXPECT_GT(expected_catch[index_yf], 0);
-            //should work after pulling in changes from move_to_fleet PR
-            //EXPECT_EQ(expected_catch[index_yf], population.fleets[fleet_]->expected_catch[year]);
+            EXPECT_EQ(expected_catch[index_yf], population.fleets[fleet_]->expected_catch[year]);
         }
     }
 }
