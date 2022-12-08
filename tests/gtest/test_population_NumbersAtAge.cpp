@@ -22,7 +22,7 @@ namespace
 
         for (int i = 0; i < (nyears + 1) * nages; i++)
         {
-          test_naa[i] = population.numbers_at_age[i];
+            test_naa[i] = population.numbers_at_age[i];
         }
         test_naa[index_ya] = test_naa[index_ya2] * exp(-population.mortality_Z[index_ya2]);
 

@@ -47,7 +47,7 @@ namespace
             // Baranov Catch Equation adapted from 
             // \inst\include\population_dynamics\population\population.hpp
             catch_temp =
-              (population.Fmort[index_yf] *
+              (population.fleets[fleet_index]->Fmort[year] *
               population.fleets[fleet_index]->selectivity->evaluate(age)) / 
               population.mortality_Z[index_ya] *
               test_naa[index_ya] *

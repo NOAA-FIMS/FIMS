@@ -60,18 +60,15 @@ namespace fims
 
     // parameters are estimated; after initialize in create_model, push_back to parameter list - in information.hpp (same for initial F in fleet)
     std::vector<Type> log_naa;   /*!< estimated parameter: log numbers at age*/
-    std::vector<Type> log_Fmort; /*!< estimated parameter: log Fishing mortality*/
     std::vector<Type> log_M;     /*!< estimated parameter: log Natural Mortality*/
-    std::vector<Type> log_q;     /*!< estimated parameter: log catchability*/
+ 
 
     // Transformed values
     std::vector<Type> naa;   /*!< transformed parameter: numbers at age*/
-    std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
     std::vector<Type> M;     /*!< transformed parameter: Natural Mortality*/
-    std::vector<Type> q;     /*!< transformed parameter: catchability*/
 
     std::vector<Type> ages;        /*!< vector of the ages for referencing*/
-    std::vector<Type> mortality_F; /*!< vector of fishing mortality by year and age*/
+    std::vector<Type> mortality_F; /*!< vector of fishing mortality summed across fleet by year and age*/
     std::vector<Type> mortality_Z; /*!< vector of total mortality by year and age*/
 
     // derived quantities
@@ -138,13 +135,16 @@ namespace fims
       unfished_spawning_biomass.resize((nyears + 1));
       spawning_biomass.resize((nyears + 1));
       log_naa.resize(nages);
-      log_Fmort.resize(nfleets * nyears);
       log_M.resize(nyears * nages);
-      log_q.resize(nfleets);
       naa.resize(nages);
-      Fmort.resize(nfleets * nyears);
+
       M.resize(nyears * nages);
-      q.resize(nfleets);
+
+      for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
+      {
+        this->fleets[fleet_]->Initialize(nyears, nages);   
+      }
+   
     }
 
     /**
@@ -171,18 +171,12 @@ namespace fims
           this->M[index_ya] = fims::exp(this->log_M[index_ya]);
         }
       }
-
       for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
       {
-        // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
-        // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
-        for (size_t year = 0; year < this->nyears; year++)
-        {
-          int index_yf = year * this->nfleets + fleet_;
-          this->Fmort[index_yf] = fims::exp(this->log_Fmort[index_yf]);
-          // this -> q[index_yf] = fims::exp(this -> log_q[index_yf]);
-        }
+        this->fleets[fleet_]->Prepare();   
+        
       }
+
       // call functions to set up recruitment deviations.
       // this -> recruitment -> PrepareConstrainedDeviations();
       // this -> recruitment -> PrepareBiasAdjustment();
@@ -215,7 +209,7 @@ namespace fims
       for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
       {
         int index_yf = year * this->nfleets + fleet_; // index by fleet and years to dimension fold
-        this->mortality_F[index_ya] += this->Fmort[index_yf] * this->fleets[fleet_]->selectivity->evaluate(age);
+        this->mortality_F[index_ya] += this->fleets[fleet_]->Fmort[year] * this->fleets[fleet_]->selectivity->evaluate(age);
       }
       this->mortality_Z[index_ya] = this->M[index_ya] + this->mortality_F[index_ya];
     }
@@ -331,7 +325,7 @@ namespace fims
         // I = qN (N is total numbers), I is an index in numbers
         Type index_;
 
-        index_ = this->q[fleet_] *
+        index_ = this->fleets[fleet_]->q[year] *
                  this->fleets[fleet_]->selectivity->evaluate(age) *
                  this->numbers_at_age[index_ya] *
                  this->weight_at_age[age];
@@ -360,7 +354,7 @@ namespace fims
         Type catch_; // catch_ is used to avoid using the c++ keyword catch
         // Baranov Catch Equation
         catch_ =
-            (this->Fmort[index_yf] *
+            (this->fleets[fleet_]->Fmort[year] *
              this->fleets[fleet_]->selectivity->evaluate(age)) /
             this->mortality_Z[index_ya] *
             this->numbers_at_age[index_ya] *

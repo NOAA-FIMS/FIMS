@@ -4,6 +4,7 @@
 
 namespace
 {
+
     TEST_F(PopulationInitializeTestFixture, input_data_are_specified)
     {
         EXPECT_EQ(population.id_g, id_g);
@@ -43,13 +44,9 @@ namespace
         EXPECT_EQ(population.unfished_spawning_biomass.size(), (nyears + 1));
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
         EXPECT_EQ(population.log_naa.size(), nages);
-        EXPECT_EQ(population.log_Fmort.size(), nfleets * nyears);
         EXPECT_EQ(population.log_M.size(), nyears * nages);
-        EXPECT_EQ(population.log_q.size(), nfleets);
         EXPECT_EQ(population.naa.size(), nages);
-        EXPECT_EQ(population.Fmort.size(), nfleets * nyears);
         EXPECT_EQ(population.M.size(), nyears * nages);
-        EXPECT_EQ(population.q.size(), nfleets);
     }
 
     TEST_F(PopulationPrepareTestFixture, Prepare_works)
@@ -105,13 +102,18 @@ namespace
         }
         EXPECT_EQ(population.M.size(), nyears * nages);
 
-        // Test population.Fmort
+        // Test population.fleet->Fmort 
+        // fmort and logfmort are vectors of length year
         std::vector<double> Fmort(nfleets * nyears, 0);
-        for (int i = 0; i < nfleets * nyears; i++)
-        {
-            Fmort[i] = fims::exp(population.log_Fmort[i]);
-            EXPECT_EQ(population.Fmort[i], Fmort[i]);
+        for(size_t i = 0; i < nfleets; i++){
+            for(size_t y = 0; y < nyears; y++){
+                size_t index_yf = y * population.nfleets + i;
+                Fmort[index_yf] = fims::exp(population.fleets[i]->log_Fmort[y]);
+                EXPECT_EQ(population.fleets[i]->Fmort[y], Fmort[index_yf]);
+            }
+            EXPECT_EQ(population.fleets[i]->Fmort.size(), nyears);
         }
-        EXPECT_EQ(population.Fmort.size(), nyears * nfleets);
+        
     }
 } // namespace
+
