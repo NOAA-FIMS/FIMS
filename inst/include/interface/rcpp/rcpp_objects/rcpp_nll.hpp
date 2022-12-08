@@ -56,7 +56,12 @@ std::map<uint32_t, NLLInterfaceBase*>
 
   virtual double evaluate_nll(){
     fims::RecruitmentNLL<double> NLL;
+    
+      Rcout << "Rec devs being passed to C++ are "
+            << recruit_deviations << std::endl;
 
+      Rcout << "Rec bias adj being passed to C++ are "
+            << recruit_bias_adjustment << std::endl;
     NLL.log_sigma_recruit = this->log_sigma_recruit.value;
     typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
     NLL.recruit_deviations = TMBVector(recruit_deviations.size());  // Vector from TMB

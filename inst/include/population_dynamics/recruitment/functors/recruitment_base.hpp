@@ -93,7 +93,7 @@ struct RecruitmentBase : public FIMSObject<Type> {
    */
   void PrepareBiasAdjustment() {
     Type recruit_bias_adjustment_size = this->recruit_bias_adjustment.size();
-
+    
     if (!this->use_recruit_bias_adjustment) {
       for (size_t i = 0; i < recruit_bias_adjustment_size; i++) {
         this->recruit_bias_adjustment_fraction[i] = 1.0;

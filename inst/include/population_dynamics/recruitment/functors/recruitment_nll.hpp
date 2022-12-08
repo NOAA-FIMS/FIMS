@@ -55,7 +55,8 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
     if (!this->estimate_recruit_deviations) {
       return nll;
     } else {
-          
+      //Rcout << "Rec devs being passed to C++ are "
+      //      << recruit_deviations << std::endl;
       fims::Dnorm<Type> dnorm;
       dnorm.sd = this->log_sigma_recruit;
 
