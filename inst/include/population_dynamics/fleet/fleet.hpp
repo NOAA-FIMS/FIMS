@@ -93,6 +93,10 @@ namespace fims
       catch_at_age.resize(nyears * nages);
       catch_index.resize(nyears); // assume index is for all ages.
       age_composition.resize(nyears * nages);
+
+      expected_catch.resize(nyears);
+      expected_index.resize(nyears); // assume index is for all ages.
+      catch_numbers_at_age.resize(nyears * nages);
     }
 
     /**
