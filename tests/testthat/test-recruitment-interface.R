@@ -18,4 +18,5 @@ test_that("Recruitment input settings work as expected", {
   expect_true(recruitment$steep$is_random_effect)
   expect_true(recruitment$steep$estimated)
   expect_equal(recruitment$rzero$value, 1000.0)
+
 })

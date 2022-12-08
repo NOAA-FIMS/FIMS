@@ -88,19 +88,19 @@ namespace fims
 
     /// recruitment
     int recruitment_id = -999;                                /*!< id of recruitment model object*/
-    std::shared_ptr<fims::RecruitmentBase<Type>> recruitment; /*!< shared pointer to recruitment module */
+    std::shared_ptr<fims::RecruitmentBase<Type> > recruitment; /*!< shared pointer to recruitment module */
 
     // growth
     int growth_id = -999;                           /*!< id of growth model object*/
-    std::shared_ptr<fims::GrowthBase<Type>> growth; /*!< shared pointer to growth module */
+    std::shared_ptr<fims::GrowthBase<Type> > growth; /*!< shared pointer to growth module */
 
     // maturity
     int maturity_id = -999;                             /*!< id of maturity model object*/
-    std::shared_ptr<fims::MaturityBase<Type>> maturity; /*!< shared pointer to maturity module */
+    std::shared_ptr<fims::MaturityBase<Type> > maturity; /*!< shared pointer to maturity module */
 
     // fleet
     int fleet_id = -999;                                    /*!< id of fleet model object*/
-    std::vector<std::shared_ptr<fims::Fleet<Type>>> fleets; /*!< shared pointer to fleet module */
+    std::vector<std::shared_ptr<fims::Fleet<Type> > > fleets; /*!< shared pointer to fleet module */
 
     // this -> means you're referring to a class member (member of self)
 
@@ -360,7 +360,9 @@ namespace fims
             this->numbers_at_age[index_ya] *
             (1 - exp(-(this->mortality_Z[index_ya])));
         this->catch_numbers_at_age[index_yaf] += catch_;
-        fleets[fleet_]->catch_numbers_at_age[index_yaf] += catch_;
+        // catch_numbers_at_age for the fleet module has different
+        // dimensions (year/age, not year/fleet/age)
+        fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
       }
     }
 
@@ -469,7 +471,9 @@ namespace fims
             }
             else
             {
-              CalculateUnfishedNumbersAA(index_ya, a);
+              // CalculateUnfishedNumbersAA(index_ya, a);
+              // CalculateUnfishedNumbersAA(index_ya, index_ya-1);
+              CalculateUnfishedNumbersAA(index_ya, a-1);
             }
             /*
              Fished and unfished spawning biomass vectors are summing biomass at age

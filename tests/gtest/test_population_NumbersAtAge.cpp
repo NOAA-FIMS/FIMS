@@ -18,23 +18,16 @@ namespace
         population.CalculateNumbersAA(index_ya, index_ya2);
 
         std::vector<double> mortality_F(nyears * nages, 0);
-        std::vector<double> test_naa(nyears * nages, 0);
-        
-        for (size_t fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
+        std::vector<double> test_naa((nyears + 1) * nages, 0);
+
+        for (int i = 0; i < (nyears + 1) * nages; i++)
         {
-            int index_yf = year * population.nfleets + fleet_index;
-            mortality_F[index_ya] += population.fleets[fleet_index]->Fmort[index_yf] *
-                                     population.fleets[fleet_index]->selectivity->evaluate(age);
+            test_naa[i] = population.numbers_at_age[i];
         }
-        EXPECT_EQ(population.mortality_F[index_ya], mortality_F[index_ya]);
+        test_naa[index_ya] = test_naa[index_ya2] * exp(-population.mortality_Z[index_ya2]);
 
-        std::vector<double> mortality_Z(nyears * nages, 0);
-        mortality_Z[index_ya] = fims::exp(population.log_M[index_ya]) +
-                                mortality_F[index_ya];
 
-        //should this be <=? Are we calculating NYY in terminal year + 1?
-        test_naa[index_ya] = test_naa[index_ya2]*exp(-population.mortality_Z[index_ya2]);
-
-        EXPECT_EQ(population.numbers_at_age[index_ya], test_naa[index_ya]);                                
+        EXPECT_EQ(population.numbers_at_age[index_ya], test_naa[index_ya]);     
+        EXPECT_GT(population.numbers_at_age[index_ya], 0);                           
     }
 }
