@@ -127,7 +127,8 @@ namespace fims
       catch_numbers_at_age.resize(nyears * nages * nfleets);
       mortality_F.resize(nyears * nages);
       mortality_Z.resize(nyears * nages);
-      proportion_mature_at_age.resize(nyears * nages);
+      // proportion_mature_at_age.resize(nyears * nages);
+      proportion_mature_at_age.resize((nyears + 1) * nages);
       weight_at_age.resize(nages);
       catch_weight_at_age.resize(nyears * nages * nfleets);
       unfished_numbers_at_age.resize((nyears + 1) * nages);
@@ -259,7 +260,8 @@ namespace fims
     {
       this->spawning_biomass[year] += this->proportion_female *
                                       this->numbers_at_age[index_ya] *
-                                      this->proportion_mature_at_age[age] *
+                                      // this->proportion_mature_at_age[age] *
+                                      this->proportion_mature_at_age[index_ya] *
                                       this->weight_at_age[age];
     }
 
