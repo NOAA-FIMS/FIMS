@@ -17,12 +17,14 @@ public:
         std::stringstream ss;
         for (uint32_t i = 0; i < this->ncases; i++) {
             for (uint32_t j = 0; j < this->ninput_files; j++) {
-                ss << "inputs/C"<<i<<"/om_input" << j << ".json";
+                ss.str("");
+                ss << "inputs/C"<<i<<"/om_input" << j+1 << ".json";
                 rapidjson::Document input;
                 rapidjson::Document output;
                 this->ReadJson(ss.str(), input);
+                
                 ss.str("");
-                ss << "inputs/C"<<i<<"/om_output" << j << ".json";
+                ss << "inputs/C"<<i<<"/om_output" << j+1 << ".json";
                 this->ReadJson(ss.str(), output);
                 
                 fims::Population<double> pop;
@@ -51,6 +53,7 @@ public:
             std::getline(infile, line);
             ss << line << "\n";
         }
+        std::cout<<path<<"\n";
         std::cout<<ss.str()<<"\n";
         json_.Parse(ss.str().c_str());
     }
