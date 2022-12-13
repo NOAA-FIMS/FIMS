@@ -52,13 +52,17 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
    */
   Type evaluate_nll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
+    
+    std::cout << "estimate_recruit_deviations" <<
+    this->estimate_recruitment_deviations;
+    
     if (!this->estimate_recruit_deviations) {
       return nll;
     } else {
 
       fims::Dnorm<Type> dnorm;
       dnorm.sd = this->log_sigma_recruit;
-      Rcout << "Rec devs being passed to C++ are "
+      std::cout << "Rec devs being passed to C++ are "
             << this->recruit_deviations << std::endl;
       for (size_t i = 0; i < this->recruit_deviations.size(); i++) { 
         dnorm.mean = 0.0;
