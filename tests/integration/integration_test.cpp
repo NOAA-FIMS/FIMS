@@ -5,6 +5,9 @@
 #include "../../inst/include/population_dynamics/population/population.hpp"
 #include "third_party/rapidjson/document.h"
 
+std::ofstream test_log("integration_test.log");
+
+
 class IntegrationTest {
 public:
     
@@ -56,21 +59,24 @@ public:
         std::cout<<path<<"\n";
         std::cout<<ss.str()<<"\n";
         json_.Parse(ss.str().c_str());
+        
+        return true;
     }
     
     bool RunModelLoop(fims::Population<double>& pop,
                       rapidjson::Document& input){
         
+        return true;
     }
     
     bool ConfigureModel(fims::Population<double>& pop,
                         rapidjson::Document& input){
-        
+        return true;
     }
     
     bool CheckModelOutput(fims::Population<double>& pop,
                           rapidjson::Document& output){
-        
+        return true;
     }
     
     
@@ -79,7 +85,7 @@ public:
     
 };
 
-int main() {
+int main(int argc, char** argv) {
     
     IntegrationTest t;
     t.Run();
