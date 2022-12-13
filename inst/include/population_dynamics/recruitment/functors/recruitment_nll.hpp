@@ -68,11 +68,11 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
         dnorm.mean = 0.0;
         if(this->use_recruit_bias_adjustment){
           dnorm.mean -= this->recruit_bias_adjustment[i];
-          Rcout << "mean" << dnorm.mean << std::endl;
+        //  std::cout << "mean" << dnorm.mean << std::endl;
         } 
           dnorm.x = log(this->recruit_deviations[i]);
           
-          Rcout << "x" << dnorm.x << std::endl;
+          //std::cout << "x" << dnorm.x << std::endl;
           nll += dnorm.evaluate(true);
         }
       return nll;
