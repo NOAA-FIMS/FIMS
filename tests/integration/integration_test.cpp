@@ -20,7 +20,7 @@ public:
             rapidjson::Document output;
             this->ReadJson(ss.str(), input)
             ss.str("");
-            ss << "inputs/om_out" << i << ".json";
+            ss << "inputs/om_output" << i << ".json";
             this->ReadJson(ss.str(), output)
             
             fims::Population<double> pop;
