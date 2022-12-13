@@ -11,15 +11,19 @@ std::ofstream test_log("integration_test.log");
 class IntegrationTest {
 public:
     
-    uint32_t ncases = 10;
-    uint32_t ninput_files = 160;
+    uint32_t ncases_m = 10;
+    uint32_t ninput_files_m = 160;
+    
+    IntegrationTest(uint32_t ncases,uint32_t ninput_files)
+    :ncases_m(ncases),ninput_files_m(ninput_files){
+    }
     
     bool Run() {
         
         bool good = true;
         std::stringstream ss;
-        for (uint32_t i = 0; i < this->ncases; i++) {
-            for (uint32_t j = 0; j < this->ninput_files; j++) {
+        for (uint32_t i = 0; i < this->ncases_m; i++) {
+            for (uint32_t j = 0; j < this->ninput_files_m; j++) {
                 ss.str("");
                 ss << "inputs/C"<<i<<"/om_input" << j+1 << ".json";
                 rapidjson::Document input;
@@ -32,7 +36,7 @@ public:
                 
                 fims::Population<double> pop;
                 
-                if(!this->ConfigureModel(pop, input)){good = false;};
+                if(!this->ConfigurePopulationModel(pop, input)){good = false;};
                 if(!this->RunModelLoop(pop, input)){good = false;};
                 if(!this->CheckModelOutput(pop, output)){good = false;};
                 
@@ -40,7 +44,7 @@ public:
         }
         
         
-        return true;
+        return good;
     }
     
     bool ReadJson(const std::string& path,
@@ -63,14 +67,14 @@ public:
         return true;
     }
     
-    bool RunModelLoop(fims::Population<double>& pop,
-                      rapidjson::Document& input){
-        
+    bool ConfigurePopulationModel(fims::Population<double>& pop,
+                                  rapidjson::Document& input){
         return true;
     }
     
-    bool ConfigureModel(fims::Population<double>& pop,
-                        rapidjson::Document& input){
+    bool RunModelLoop(fims::Population<double>& pop,
+                      rapidjson::Document& input){
+        
         return true;
     }
     
