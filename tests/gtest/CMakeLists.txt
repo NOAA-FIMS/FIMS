@@ -230,3 +230,15 @@ target_link_libraries(population_SSB
 )
 
 gtest_discover_tests(population_SSB)
+
+#test_CalculateIndex_works.cpp
+add_executable(population_Index
+  test_population_Index_Chris.cpp
+)
+
+target_link_libraries(population_Index
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_Index)
