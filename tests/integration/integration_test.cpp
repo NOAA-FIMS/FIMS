@@ -14,6 +14,8 @@ public:
     uint32_t ncases_m = 10;
     uint32_t ninput_files_m = 160;
     
+    IntegrationTest(){}
+    
     IntegrationTest(uint32_t ncases,uint32_t ninput_files)
     :ncases_m(ncases),ninput_files_m(ninput_files){
     }
@@ -91,7 +93,7 @@ public:
 
 int main(int argc, char** argv) {
     
-    IntegrationTest t;
+    IntegrationTest t(10,160);
     t.Run();
     return 0;
 }
