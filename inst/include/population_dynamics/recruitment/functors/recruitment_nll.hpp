@@ -54,7 +54,7 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
     Type nll = 0.0; /*!< The negative log likelihood value */
     
     std::cout << "estimate_recruit_deviations" <<
-    this->estimate_recruitment_deviations;
+    this->estimate_recruit_deviations;
     
     if (!this->estimate_recruit_deviations) {
       return nll;
