@@ -51,34 +51,22 @@ struct RecruitmentNLL : public RecruitmentBase<Type> {
    * but with the addition of the constant terms.
    */
   Type evaluate_nll() {
-    Type nll = 0.0; /*!< The negative log likelihood value */
-
-   // std::cout << "estimate_recruit_deviations" << this->estimate_recruit_deviations;
+  Type nll = 0.0; /*!< The negative log likelihood value */
 
     if (!this->estimate_recruit_deviations) {
       return nll;
     } else {
 
       fims::Dnorm<Type> dnorm;
-      dnorm.sd = fims::exp(this->log_sigma_recruit);
-       //std::cout << "x: " << dnorm.sd << std::endl;
+      dnorm.sd = std::exp(this->log_sigma_recruit);
       for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
+        dnorm.x = std::log(this->recruit_deviations[i]);
         dnorm.mean = 0.0;
-        //std::cout << "Rec devs being passed to C++ are "
-        //    << this->recruit_deviations[i] << std::endl;
-
         if(this->use_recruit_bias_adjustment){
           dnorm.mean -= this->recruit_bias_adjustment[i];
-        //  std::cout << "mean" << dnorm.mean << std::endl;
         }
-          //std::cout << "x: " << dnorm.x << std::endl;
-
-          dnorm.x = log(this->recruit_deviations[i]);
-
-          //std::cout << "x: " << dnorm.x << std::endl;
-          nll += dnorm.evaluate(true);
-          //std::cout << "nll: " << nll << std::endl;
-        }
+        nll -= dnorm.evaluate(true);
+      }
       return nll;
     }
   }
