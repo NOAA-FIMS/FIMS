@@ -244,12 +244,20 @@ namespace fims
      * @param index_ya dimension folded index for year and age
      * @param index_ya2 dimension folded index for year-1 and age-1
      */
-    inline void CalculateUnfishedNumbersAA(int index_ya, int index_ya2)
+    inline void CalculateUnfishedNumbersAA(int index_ya, int index_ya2, int age)
     {
       // using M from previous age/year - is this correct?
       this->unfished_numbers_at_age[index_ya] =
           this->unfished_numbers_at_age[index_ya2] *
           (exp(-this->M[index_ya2]));
+
+           // Plus group calculation
+      if (age == (this->nages - 1)) {
+        this->unfished_numbers_at_age[index_ya] =
+          this->unfished_numbers_at_age[index_ya] + 
+          this->unfished_numbers_at_age[index_ya2 + 1] *
+          (exp(-this->M[index_ya2 + 1]));
+      }
     }
 
     /**
@@ -484,7 +492,7 @@ namespace fims
             {
               // CalculateUnfishedNumbersAA(index_ya, a);
               // CalculateUnfishedNumbersAA(index_ya, index_ya-1);
-              CalculateUnfishedNumbersAA(index_ya, a-1);
+              CalculateUnfishedNumbersAA(index_ya, a-1, a);
             }
             /*
              Fished and unfished spawning biomass vectors are summing biomass at age
@@ -507,7 +515,7 @@ namespace fims
             {
               int index_ya2 = (y - 1) * nages + (a - 1);
               CalculateNumbersAA(index_ya, index_ya2, a);
-              CalculateUnfishedNumbersAA(index_ya, index_ya2);
+              CalculateUnfishedNumbersAA(index_ya, index_ya2, a);
             }
             CalculateSpawningBiomass(index_ya, y, a);
             CalculateUnfishedSpawningBiomass(index_ya, y, a);
