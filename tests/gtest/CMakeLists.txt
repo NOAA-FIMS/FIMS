@@ -190,7 +190,7 @@ add_executable(population_Recruitment
 
 target_link_libraries(population_Recruitment
   gtest_main
-  fmis_test
+  fims_test
 )
 
 gtest_discover_tests(population_Recruitment)

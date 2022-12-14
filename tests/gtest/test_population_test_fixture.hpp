@@ -115,6 +115,15 @@ namespace
                 population.weight_at_age[i] = weight_at_age_distribution(generator);
             }
 
+            // recruitment deviations
+            //double recruitment_deviations_min = 0.0; 
+            //double recruitment_deviations_max = 0.7;
+            //std::uniform_real_distribution<double> recruitment_deviations_distribution(recruitment_deviations_min,recruitment_deviations_max);
+            //for (int i = 0; i < (nyears + 1) * nages; i++)
+            //{
+              //  population.recruitment_deviations[i] = recruitment_deviations_distribution(generator);
+            //}
+
 
             population.Prepare();
 

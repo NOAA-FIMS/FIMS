@@ -14,7 +14,7 @@ namespace
         double steep = 0.75;
         double rzero = 1000000.0;
         double rec_dev = 0.2;
-        // vector for storing expeceted recruitment 
+        // vector for storing expected recruitment 
         // check dims on this
         std::vector<double> expect_recruitment(year * population.nages, 0);
         // temporary storage for recruitment to use in loop 
@@ -27,7 +27,7 @@ namespace
         // calculate recruitment in population module
         population.CalculateRecruitment(index_ya, year);
         
-// for each age, age 0 to max age
+        // for each age, age 0 to max age
         for (size_t age = 0; age < nages; age++){
               // create index for year 4, and age
               // Why do we need to do this in the loop?
