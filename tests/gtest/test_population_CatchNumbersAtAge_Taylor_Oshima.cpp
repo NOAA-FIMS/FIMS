@@ -15,7 +15,7 @@ namespace
         // calculate catch numbers at age in population module
         // Ian: not sure which of these are needed
         population.CalculateMortality(index_ya, year, age);
-        population.CalculateNumbersAA(index_ya, index_ya2);
+        population.CalculateNumbersAA(index_ya, index_ya2, age);
 
         population.CalculateCatchNumbersAA(index_ya, year, age);
         population.CalculateCatchWeightAA(year, age);
@@ -47,7 +47,7 @@ namespace
             // Baranov Catch Equation adapted from 
             // \inst\include\population_dynamics\population\population.hpp
             catch_temp =
-              (population.Fmort[index_yf] *
+              (population.fleets[fleet_index]->Fmort[year] *
               population.fleets[fleet_index]->selectivity->evaluate(age)) / 
               population.mortality_Z[index_ya] *
               test_naa[index_ya] *

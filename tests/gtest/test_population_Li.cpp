@@ -19,8 +19,8 @@ namespace
 
                 for (int fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
                 {
-                    int index_yf = year * population.nfleets + fleet_index;
-                    mortality_F[index_ya] += population.Fmort[index_yf] *
+                    size_t index_yf = year * population.nfleets + fleet_index;
+                    mortality_F[index_ya] += population.fleets[fleet_index]->Fmort[index_yf] *
                                              population.fleets[fleet_index]->selectivity->evaluate(age);
                 }
                 EXPECT_EQ(population.mortality_F[index_ya], mortality_F[index_ya]);
@@ -52,53 +52,83 @@ namespace
         }
     }
 
-    TEST_F(PopulationPrepareTestFixture, CalculateUnfishedNumbersAA_works)
+    TEST_F(PopulationPrepareTestFixture, CalculateUnfishedNumbersAAandUnfishedSpawningBiomass_works)
     {
-        std::ofstream out("debug.txt");
-        std::vector<double> unfished_numbers_at_age((nyears + 1) * nages, 0);
+        std::vector<double> test_unfished_numbers_at_age((nyears + 1) * nages, 0);
+        std::vector<double> test_unfished_spawning_biomass(nyears+1, 0);
 
         for (int year = 0; year < (population.nyears + 1); year++)
         {
             for (int age = 0; age < population.nages; age++)
             {
-
+                
                 int index_ya = year * population.nages + age;
-
+ 
                 if (age == 0)
                 {
                     population.unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
 
-                    unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
+                    test_unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
                 }
 
                 if (year == 0 && age > 0){
                     // values from FIMS
                     // Bai: change CalculateUnfishedNumbersAA(index_ya, a); in 
-                    // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1);?
-                    population.CalculateUnfishedNumbersAA(index_ya, age);
+                    // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1);
+                    // or to CalculateUnfishedNumbersAA(index_ya, a-1);?
+                    // population.CalculateUnfishedNumbersAA(index_ya, age);
                     // population.CalculateUnfishedNumbersAA(index_ya, index_ya-1);
+                    population.CalculateUnfishedNumbersAA(index_ya, age-1, age);
                     // true values from test
-                    unfished_numbers_at_age[index_ya] = unfished_numbers_at_age[index_ya-1] * fims::exp(-fims::exp(population.log_M[index_ya-1]));
+                    test_unfished_numbers_at_age[index_ya] = 
+                        test_unfished_numbers_at_age[index_ya-1] * 
+                        fims::exp(-fims::exp(population.log_M[index_ya-1]));
                 }
 
                 if (year>0 && age > 0)
                 {
                     int index_ya2 = (year - 1) * population.nages + (age - 1);
+                    EXPECT_GT(population.M[index_ya2], 0.0);
                     // values from FIMS
                     // Bai: change CalculateUnfishedNumbersAA(index_ya, index_ya2); in 
-                    // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1);?
+                    // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1); ?
                     // Test fails if log_M from test fixture is not constant over years and ages.
-                    population.CalculateUnfishedNumbersAA(index_ya, index_ya2);
+                    population.CalculateUnfishedNumbersAA(index_ya, index_ya2, age);
                     // true values from test
-                    unfished_numbers_at_age[index_ya] = unfished_numbers_at_age[index_ya-1] * fims::exp(-fims::exp(population.log_M[index_ya-1]));
-                    
+                    // unfished_numbers_at_age[index_ya] = unfished_numbers_at_age[index_ya-1] * fims::exp(-fims::exp(population.log_M[index_ya-1]));
+                    test_unfished_numbers_at_age[index_ya] = 
+                        test_unfished_numbers_at_age[index_ya2] * 
+                        fims::exp(-fims::exp(population.log_M[index_ya2]));
                 }
-                out << "index_ya: " << index_ya <<"\n";
-                out << "population.unfished_numbers_at_age[index_ya]: " << population.unfished_numbers_at_age[index_ya] <<"\n";
-                out << "unfished_numbers_at_age[index_ya]: " << unfished_numbers_at_age[index_ya] <<"\n";
 
-                EXPECT_EQ(population.unfished_numbers_at_age[index_ya], unfished_numbers_at_age[index_ya]);
+                if(age==(population.nages-1)){
+                    int index_ya2 = 0;
+                    if(year == 0){
+                        index_ya2 = (age - 1);
+                    } else{
+                        index_ya2 = (year - 1) * population.nages + (age - 1);
+                    }
+                        test_unfished_numbers_at_age[index_ya] = 
+                        test_unfished_numbers_at_age[index_ya] +
+                        test_unfished_numbers_at_age[index_ya2 + 1] *
+                        fims::exp(-fims::exp(population.log_M[index_ya2 + 1]));
+
+                }
+                
+                population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
+                test_unfished_spawning_biomass[year] += population.proportion_mature_at_age[index_ya] *
+                                                        population.proportion_female *
+                                                        test_unfished_numbers_at_age[index_ya] *
+                                                        population.weight_at_age[age];
+
+
+                EXPECT_EQ(population.unfished_numbers_at_age[index_ya], test_unfished_numbers_at_age[index_ya]);
+                EXPECT_GT(population.unfished_numbers_at_age[index_ya], 0.0);
+
             }
+            
+            EXPECT_EQ(population.unfished_spawning_biomass[year], test_unfished_spawning_biomass[year]);
+            EXPECT_GT(population.unfished_spawning_biomass[year], 0.0);
         }
     }
 }

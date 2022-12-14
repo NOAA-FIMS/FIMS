@@ -42,21 +42,13 @@ class Information {
       random_effects_parameters;  // list of all random effects parameters
   std::vector<T*>
       fixed_effects_parameters;  // list of all fixed effects parameters
-
-        static std::shared_ptr<Information<T> > fims_information; //! singleton instance
-        std::vector<T*> parameters; // list of all estimated parameters
-        std::vector<T*> random_effects_parameters; // list of all random effects parameters
-        std::vector<T*> fixed_effects_parameters; // list of all fixed effects parameters
-        std::vector<T> ages; // ages in model
-
-  // life history modules
-  std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >
-      recruitment_models;  // hash map to link each object to its shared
-                           // location in memory
-  typedef
-      typename std::map<uint32_t,
-                        std::shared_ptr<fims::RecruitmentBase<T> > >::iterator
-          recruitment_model_iterator;
+   std::vector<T> ages; // ages in model
+   
+  // data objects
+  std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >
+      data_objects;  // map that holds data objects
+  typedef typename std::map<
+      uint32_t, std::shared_ptr<fims::DataObject<T> > >::iterator data_iterator;
 
          //life history modules
         std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;//hash map to link each object to its shared location in memory
@@ -74,17 +66,6 @@ class Information {
         //fleet modules
         std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > > fleets;
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > >::iterator fleet_iterator;
-
-  std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
-  typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims::GrowthBase<T> > >::iterator
-      growth_models_iterator;
-
-  // fleet modules
-  std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > > fleets;
-  typedef
-      typename std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > >::iterator
-          fleet_iterator;
 
   // populations
   std::map<uint32_t, std::shared_ptr<fims::Population<T> > > populations;
@@ -411,10 +392,6 @@ class Information {
                 }
             }
             return valid_model;
-        }
-        size_t GetNages() const {
-            return nages;
-        }
 
       } else {
         valid_model = false;
