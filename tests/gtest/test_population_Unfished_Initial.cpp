@@ -7,6 +7,7 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, CalculateMortality_works)
     {
+        
 
         for (int year = 0; year < population.nyears; year++)
         {
@@ -54,6 +55,7 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, CalculateUnfishedNumbersAAandUnfishedSpawningBiomass_works)
     {
+
         std::vector<double> test_unfished_numbers_at_age((nyears + 1) * nages, 0);
         std::vector<double> test_unfished_spawning_biomass(nyears+1, 0);
 
@@ -114,7 +116,7 @@ namespace
                         fims::exp(-fims::exp(population.log_M[index_ya2 + 1]));
 
                 }
-                
+                population.CalculateMaturityAA(index_ya, age);
                 population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
                 test_unfished_spawning_biomass[year] += population.proportion_mature_at_age[index_ya] *
                                                         population.proportion_female *
