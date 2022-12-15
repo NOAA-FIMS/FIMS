@@ -37,7 +37,7 @@ out <<" index_ya: "<<index_ya<<" index_ya2: "<<index_ya2<<" steepness: "<<steep<
         out <<" SSB zero = "<<population.numbers_at_age[index_ya]<<" * "<<population.weight_at_age[age];
         //population.CalculateUnfishedNumbersAA(index_ya, index_ya2, age);
         //population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
-        population.CalculateInitialNumbersAA(index_ya,age);
+        //population.CalculateInitialNumbersAA(index_ya,age);
         // calculate recruitment in population module
         //population.CalculateRecruitment(index_ya, year);
         
