@@ -35,11 +35,11 @@ out <<" index_ya: "<<index_ya<<" index_ya2: "<<index_ya2<<" steepness: "<<steep<
         population.CalculateSpawningBiomass(index_ya, year, age);
 
         out <<" SSB zero = "<<population.numbers_at_age[index_ya]<<" * "<<population.weight_at_age[age];
-        //population.CalculateUnfishedNumbersAA(index_ya, index_ya2, age);
-        //population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
+        population.CalculateUnfishedNumbersAA(index_ya, index_ya2, age);
+        population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
         population.CalculateInitialNumbersAA(index_ya,age);
         // calculate recruitment in population module
-        //population.CalculateRecruitment(index_ya, year);
+        population.CalculateRecruitment(index_ya, year);
         
         // for each age, age 0 to max age
         //for (size_t age = 0; age < nages; age++){
