@@ -35,7 +35,8 @@
 		"matepek.vscode-catch2-text-adapter",
 		"hbenl.vscode-test-explorer",
 		"reditorsupport.r",
-		"rdebugger.r-debugger"
+		"rdebugger.r-debugger",
+		"ms-vsliveshare.vsliveshare"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
