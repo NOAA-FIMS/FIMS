@@ -288,7 +288,8 @@ namespace fims
     {
       this->unfished_spawning_biomass[year] += this->proportion_female *
                                                this->unfished_numbers_at_age[index_ya] *
-                                               this->proportion_mature_at_age[age] *
+                                               // this->proportion_mature_at_age[age] * Meg O made this change to match change in CalculateSpawningBiomass
+                                               this->proportion_mature_at_age[index_ya] *
                                                this->weight_at_age[age];
     }
 
