@@ -3,7 +3,8 @@ name: build-deploy-doxygen
 # The default build trigger is to run the action on every push for any branch
 on:
   push:
-    branches: main
+    branches: 
+      - main
   # To run the default repository branch weekly on sunday, uncomment the following 2 lines
   #schedule:
     #- cron: '0 0 * * 0'
