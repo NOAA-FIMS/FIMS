@@ -148,16 +148,16 @@ target_link_libraries(population_dynamics_population_initialize_prepare
 gtest_discover_tests(population_dynamics_population_initialize_prepare)
 
 # test_population_Li.cpp
-add_executable(population_Li
-  test_population_Li.cpp
+add_executable(population_unfished
+  test_population_Unfished_Initial.cpp
 )
 
-target_link_libraries(population_Li
+target_link_libraries(population_unfished
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_Li)
+gtest_discover_tests(population_unfished)
 
 #test_population_stawitz.cpp
 add_executable(population_NumbersAtAge
