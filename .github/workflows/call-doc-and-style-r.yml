@@ -4,11 +4,15 @@
 name: call-doc-and-style-r
 # on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
-# workflow_dispatch requires pushing a button to run the workflow manually. uncomment the following line to add:
-  #workflow_dispatch:
-  # Runs the workflow on each push to the main or master branch:
-  push:
-    branches: [main, master]
+  # to run manually
+  workflow_dispatch:
+  # to run on pull requests to main
+  pull_request:
+    branches:
+      - main
+  # run on a schedule to ensure the main branch styling stays up to date.
+  schedule:
+    - cron: '30 2 * * 1'
 jobs:
   call-workflow:
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/doc-and-style-r.yml@main

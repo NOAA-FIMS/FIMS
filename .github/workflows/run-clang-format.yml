@@ -10,10 +10,15 @@
 name: run-clang-format
 
 on:
-
-# Runs the workflow on each push to the main or master branch:
-  push:
-    branches: [main, master]
+  # to run manually
+  workflow_dispatch:
+  # to run on pull requests to main
+  pull_request:
+    branches:
+      - main
+  # run on a schedule to ensure the main branch styling stays up to date.
+  schedule:
+    - cron: '45 2 * * 1'
 
 jobs:
   job:
