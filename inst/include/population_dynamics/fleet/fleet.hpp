@@ -111,6 +111,11 @@ namespace fims
 
     }
 
+    /**
+     * @brief Prepare to run the fleet module. Called at each model itartion, and used
+     *  to exponentiate the log q and Fmort parameters prior to evaluation.
+     * 
+     */
     void Prepare(){
       // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
       // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);

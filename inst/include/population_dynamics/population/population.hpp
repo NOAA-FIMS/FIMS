@@ -113,8 +113,9 @@ namespace fims
     /**
      * @brief Initialize values. Called once at the start of model run.
      *
-     * @param index_ya dimension folded index for year and age
-     * @param age age index
+     * @param nyears number of years in the population
+     * @param nseasons number of seasons in the population
+     * @param nages number of ages in the population
      */
     void Initialize(int nyears, int nseasons, int nages)
     {
@@ -149,7 +150,7 @@ namespace fims
     }
 
     /**
-     * @brief Prepare to run the population loop. Called at each model itartion, and used
+     * @brief Prepare to run the population loop. Called at each model iteration, and used
      *  to zero out derived quantities, values that were summed, etc.
      *
      */
@@ -191,7 +192,7 @@ namespace fims
      * @brief Calculates initial numbers at age for index and age
      *
      * @param index_ya dimension folded index for year and age
-     * @param age age index
+     * @param a age index
      */
     inline void CalculateInitialNumbersAA(int index_ya, int a)
     { // inline all function unless complicated
@@ -243,6 +244,7 @@ namespace fims
      *
      * @param index_ya dimension folded index for year and age
      * @param index_ya2 dimension folded index for year-1 and age-1
+     * @param age age index
      */
     inline void CalculateUnfishedNumbersAA(int index_ya, int index_ya2, int age)
     {
