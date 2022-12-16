@@ -1,23 +1,23 @@
 # Run doxygen to generate documentation from C++ code
-name: run-doxygen
+name: build-deploy-doxygen
 # The default build trigger is to run the action on every push for any branch
 on:
-  pull_request:
   push:
-    branches: [main, master]
+    branches: 
+      - main
   # To run the default repository branch weekly on sunday, uncomment the following 2 lines
   #schedule:
     #- cron: '0 0 * * 0'
 
 jobs:
-  build-and-deploy:
+  build-and-deploy-doxygen:
     name: Build HTML documentation from C++ code
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-    - name: Fetching sources
+    - name: Get repository
       uses: actions/checkout@v3
 
     - name: Installing build dependencies
@@ -25,18 +25,9 @@ jobs:
         sudo apt update
         sudo apt install cmake doxygen gcc git ninja-build
 
-    - name: get last commit msg
-      id: commit-msg
-      run: |
-        git tag
-        last_commit_msg=$(git log -1 --pretty=%B)
-        echo "::set-output name=msg::${last_commit_msg}"
-
     - name: Building HTML documentation with Doxygen
-    # Do not run mkdir docs and mv build/html docs locally
-    # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
       run: |
-        cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=YES
+        cmake -S . -B build -G Ninja
         cmake --build build --parallel 16
         mv build/html ./
         mv ./html ./docs
