@@ -13,7 +13,8 @@ on:
 
 # Runs the workflow on each push to the main or master branch:
   push:
-    branches: [main, master]
+    branches:
+      - main
 
 jobs:
   job:
