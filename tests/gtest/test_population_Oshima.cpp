@@ -23,9 +23,10 @@ std::ofstream out("debug_Oshima.txt");
         std::vector<double> recruit_deviations(population.nyears, 1);
         // temporary storage for recruitment to use in loop 
         int index_ya = year * population.nages + age;
+        int index_ya1 = (year + 1) * population.nages + age;
         int index_ya2 = (year - 1) * population.nages + (age - 1);
          
-        out <<" index_ya: "<<index_ya<<" index_ya2: "<<index_ya2<<" steepness: "<<steep<<"\n";
+        out <<" index_ya: "<<index_ya<<" index_ya2: "<<index_ya2<<" index_ya1: "<<index_ya1<<"\n";
         
         //population.CalculateInitialNumbersAA(index_ya,age);
         //out <<" NAA initial= "<<population.numbers_at_age[index_ya]<<"\n";
@@ -46,17 +47,17 @@ std::ofstream out("debug_Oshima.txt");
         out <<" SB= "<<population.spawning_biomass[year]<<"\n";
         out <<" SB= "<<population.spawning_biomass[index_ya]<<"\n";
 
-        //population.CalculateUnfishedNumbersAA(index_ya, index_ya2, age);
+        population.CalculateUnfishedNumbersAA(index_ya, index_ya2, age);
         out <<" M= "<<population.M[index_ya2]<<"\n";
         //out <<" proportion mature = "<<population.proportion_mature_at_age[index_ya]<<"\n";
         //out <<" prop mature age= "<<population.proportion_mature_at_age[age]<<"\n";
         //out <<" UFNAA= "<<population.unfished_numbers_at_age[index_ya2]<<"\n";
         //out <<" UFNAA= "<<population.unfished_numbers_at_age[0]<<"\n";
-        //population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
+        population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
         //out <<" UFSB= "<<population.unfished_spawning_biomass[index_ya]<<"\n";
 
         // calculate recruitment in population module
-        population.CalculateRecruitment(index_ya, year);
+        population.CalculateRecruitment(index_ya, year+1);
         out<<"pop numbers at age = "<<population.numbers_at_age[index_ya]<<"\n";
        //double ssbzero = population.numbers_at_age[index_ya] * population.weight_at_age[age];
        
@@ -66,6 +67,8 @@ std::ofstream out("debug_Oshima.txt");
         (0.8 * rzero * steep * population.spawning_biomass[index_ya]) / 
         (0.2 * ssbzero * (1.0 - steep) + population.spawning_biomass[index_ya] * (steep - 0.2)) * recruit_deviations[year]; 
         out<<"expected rec = "<<expect_recruitment[index_ya]<<"\n";
+        out<<"expected numbers in year+1 = "<<population.numbers_at_age[year+1]<<"\n";
+        out<<"expected numbers aa = "<<population.numbers_at_age[index_ya1]<<"\n";
       
 
         EXPECT_EQ(population.numbers_at_age[index_ya], expect_recruitment[index_ya]);
