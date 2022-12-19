@@ -24,7 +24,6 @@ test_that("Recruitment input settings work as expected", {
   expect_true(recruitment$steep$is_random_effect)
   expect_true(recruitment$steep$estimated)
   expect_equal(recruitment$rzero$value, 1000.0)
-
   expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 837.209300)
 
   devs <- c(1.0,2.0,3.0)
@@ -54,6 +53,5 @@ test_that("Recruitment input settings work as expected", {
   recnll$recruitment_bias_adj = c(0.245,0.2, 0.1)
   expected_nll <- -sum(log(stats::dnorm(log(devs), c(-0.245,-0.2,-0.1), 0.7)))
   expect_equal(recnll$evaluate(), expected = expected_nll)
-
 
 })

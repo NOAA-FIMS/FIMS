@@ -144,6 +144,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     std::shared_ptr<fims::Fleet<TMB_FIMS_FIRST_ORDER>> f1 =
         std::make_shared<fims::Fleet<TMB_FIMS_FIRST_ORDER>>();
 
+
     f1->id = this->id;
     f1->agecomp_likelihood_id = this->agecomp_likelihood_id;
     f1->index_likelihood_id = this->index_likelihood_id;
@@ -167,7 +168,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f2->observed_index_data_id = this->observed_index_data_id;
     f2->selectivity_id = this->selectivity_id;
-
+    
     // add to Information
     d2->fleets[f2->id] = f2;
 
