@@ -31,55 +31,62 @@ namespace fims {
 template <typename T>
 class Information {
  public:
-  size_t nyears;
-  size_t nseasons = 1;
-  size_t nages;
+  size_t nyears; /**< number of years >*/
+  size_t nseasons = 1; /**< number of seasons >*/
+  size_t nages; /**< number of ages>*/
 
   static std::shared_ptr<Information<T> >
-      fims_information;        //! singleton instance
-  std::vector<T*> parameters;  // list of all estimated parameters
+      fims_information;        /**< singleton instance >*/
+  std::vector<T*> parameters;  /**< list of all estimated parameters >*/
   std::vector<T*>
-      random_effects_parameters;  // list of all random effects parameters
+      random_effects_parameters;  /**< list of all random effects parameters >*/
   std::vector<T*>
-      fixed_effects_parameters;  // list of all fixed effects parameters
-   std::vector<T> ages; // ages in model
+      fixed_effects_parameters;  /**< list of all fixed effects parameters >*/
+   std::vector<T> ages; /**< ages in model >*/
    
   // data objects
   std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >
-      data_objects;  // map that holds data objects
+      data_objects;  /*!< map that holds data objects >*/
   typedef typename std::map<
-      uint32_t, std::shared_ptr<fims::DataObject<T> > >::iterator data_iterator;
+      uint32_t, std::shared_ptr<fims::DataObject<T> > >::iterator data_iterator; /**< iterator for the data objects */
 
          //life history modules
-        std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;//hash map to link each object to its shared location in memory
-        typedef typename std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >::iterator recruitment_models_iterator;
+        std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > > recruitment_models;/*!<hash map to link each object to its shared location in memory*/
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >::iterator recruitment_models_iterator; 
+        /**< iterator for recruitment objects>*/
 
-        std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;
+        std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > > selectivity_models;/*!<hash map to link each object to its shared location in memory*/
         typedef typename std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >::iterator selectivity_models_iterator;
-  
-        std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;
-        typedef typename std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > >::iterator growth_models_iterator;
+        /**< iterator for selectivity objects>*/
 
-        std::map<uint32_t, std::shared_ptr<fims::MaturityBase<T> > > maturity_models;//hash map to link each object to its shared location in memory
+        std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > > growth_models;/*!<hash map to link each object to its shared location in memory*/
+        typedef typename std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > >::iterator growth_models_iterator;
+        /**< iterator for growth objects>*/
+
+        std::map<uint32_t, std::shared_ptr<fims::MaturityBase<T> > > maturity_models;/*!<hash map to link each object to its shared location in memory*/
         typedef typename std::map<uint32_t, std::shared_ptr<fims::MaturityBase<T> > >::iterator maturity_models_iterator;
+        /**< iterator for maturity objects>*/
 
         //fleet modules
-        std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > > fleets;
+        std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > > fleets;/*!<hash map to link each object to its shared location in memory*/
         typedef typename std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > >::iterator fleet_iterator;
+        /**< iterator for fleet objects>*/
 
   // populations
-  std::map<uint32_t, std::shared_ptr<fims::Population<T> > > populations;
+  std::map<uint32_t, std::shared_ptr<fims::Population<T> > > populations;/*!<hash map to link each object to its shared location in memory*/
   typedef typename std::map<uint32_t,
                             std::shared_ptr<fims::Population<T> > >::iterator
       population_iterator;
+      /**< iterator for population objects>*/
 
   // distributions
   std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >
-      distribution_models;
+      distribution_models;/*!<hash map to link each object to its shared location in memory*/
   typedef
       typename std::map<uint32_t,
                         std::shared_ptr<fims::DistributionsBase<T> > >::iterator
           distribution_models_iterator;
+          /**< iterator for distribution objects>*/
 
   Information() {}
 
@@ -430,24 +437,69 @@ class Information {
     return valid_model;
   }
 
+    /**
+     * @brief Get the Nages object
+     * 
+     * @return size_t 
+     */
   size_t GetNages() const { return nages; }
 
+/**
+ * @brief Set the Nages object
+ * 
+ * @param nages 
+ */
   void SetNages(size_t nages) { this->nages = nages; }
 
+/**
+ * @brief Get the Nseasons object
+ * 
+ * @return size_t 
+ */
   size_t GetNseasons() const { return nseasons; }
 
+/**
+ * @brief Set the Nseasons object
+ * 
+ * @param nseasons 
+ */
   void SetNseasons(size_t nseasons) { this->nseasons = nseasons; }
 
+/**
+ * @brief Get the Nyears object
+ * 
+ * @return size_t 
+ */
   size_t GetNyears() const { return nyears; }
 
+/**
+ * @brief Set the Nyears object
+ * 
+ * @param nyears 
+ */
   void SetNyears(size_t nyears) { this->nyears = nyears; }
 
+/**
+ * @brief Get the Parameters object
+ * 
+ * @return std::vector<T*>& 
+ */
   std::vector<T*>& GetParameters() { return parameters; }
 
+/**
+ * @brief Get the Fixed Effects Parameters object
+ * 
+ * @return std::vector<T*>& 
+ */
   std::vector<T*>& GetFixedEffectsParameters() {
     return fixed_effects_parameters;
   }
 
+/**
+ * @brief Get the Random Effects Parameters object
+ * 
+ * @return std::vector<T*>& 
+ */
   std::vector<T*>& GetRandomEffectsParameters() {
     return random_effects_parameters;
   }
