@@ -58,9 +58,8 @@ std::map<uint32_t, NLLInterfaceBase*>
     fims::RecruitmentNLL<double> NLL;
     
     NLL.log_sigma_recruit = this->log_sigma_recruit.value;
-    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
-    NLL.recruit_deviations = TMBVector(recruit_deviations.size());  // Vector from TMB
-    NLL.recruit_bias_adjustment = TMBVector(recruit_bias_adjustment.size());  // Vector from TMB
+    NLL.recruit_deviations.resize(recruit_deviations.size());  // Vector from TMB
+    NLL.recruit_bias_adjustment.resize(recruit_bias_adjustment.size());  // Vector from TMB
     for (int i = 0; i < recruit_deviations.size(); i++) {
       NLL.recruit_deviations[i] = recruit_deviations[i];
       NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
