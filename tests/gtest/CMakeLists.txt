@@ -207,19 +207,6 @@ target_link_libraries(population_Catch
 
 gtest_discover_tests(population_Catch)
 
-#test_CalculateRecruitment.cpp
-add_executable(population_Recruitment
-  test_population_Oshima.cpp
-)
-
-target_link_libraries(population_Recruitment
-  gtest_main
-  fims_test
-)
-
-gtest_discover_tests(population_Recruitment)
-
-
 #test_CalculateSSB.cpp
 add_executable(population_SSB
   test_population_SSB.cpp
