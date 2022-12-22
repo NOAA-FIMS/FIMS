@@ -43,6 +43,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
    * 0.2)} \f$
    *
    * @param spawners A measure of spawning output.
+   * @param ssbzero Spawning biomass at no fishing
    */
   virtual const Type evaluate(const Type& spawners, const Type& ssbzero) {
     Type recruits;

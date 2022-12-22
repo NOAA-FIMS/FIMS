@@ -113,8 +113,9 @@ namespace fims
     /**
      * @brief Initialize values. Called once at the start of model run.
      *
-     * @param index_ya dimension folded index for year and age
-     * @param age age index
+     * @param nyears number of years in the population
+     * @param nseasons number of seasons in the population
+     * @param nages number of ages in the population
      */
     void Initialize(int nyears, int nseasons, int nages)
     {
@@ -149,7 +150,7 @@ namespace fims
     }
 
     /**
-     * @brief Prepare to run the population loop. Called at each model itartion, and used
+     * @brief Prepare to run the population loop. Called at each model iteration, and used
      *  to zero out derived quantities, values that were summed, etc.
      *
      */
@@ -191,7 +192,7 @@ namespace fims
      * @brief Calculates initial numbers at age for index and age
      *
      * @param index_ya dimension folded index for year and age
-     * @param age age index
+     * @param a age index
      */
     inline void CalculateInitialNumbersAA(int index_ya, int a)
     { // inline all function unless complicated
@@ -243,13 +244,22 @@ namespace fims
      *
      * @param index_ya dimension folded index for year and age
      * @param index_ya2 dimension folded index for year-1 and age-1
+     * @param age age index
      */
-    inline void CalculateUnfishedNumbersAA(int index_ya, int index_ya2)
+    inline void CalculateUnfishedNumbersAA(int index_ya, int index_ya2, int age)
     {
       // using M from previous age/year - is this correct?
       this->unfished_numbers_at_age[index_ya] =
           this->unfished_numbers_at_age[index_ya2] *
           (exp(-this->M[index_ya2]));
+
+           // Plus group calculation
+      if (age == (this->nages - 1)) {
+        this->unfished_numbers_at_age[index_ya] =
+          this->unfished_numbers_at_age[index_ya] + 
+          this->unfished_numbers_at_age[index_ya2 + 1] *
+          (exp(-this->M[index_ya2 + 1]));
+      }
     }
 
     /**
@@ -280,7 +290,8 @@ namespace fims
     {
       this->unfished_spawning_biomass[year] += this->proportion_female *
                                                this->unfished_numbers_at_age[index_ya] *
-                                               this->proportion_mature_at_age[age] *
+                                               // this->proportion_mature_at_age[age] * Meg O made this change to match change in CalculateSpawningBiomass
+                                               this->proportion_mature_at_age[index_ya] *
                                                this->weight_at_age[age];
     }
 
@@ -484,7 +495,7 @@ namespace fims
             {
               // CalculateUnfishedNumbersAA(index_ya, a);
               // CalculateUnfishedNumbersAA(index_ya, index_ya-1);
-              CalculateUnfishedNumbersAA(index_ya, a-1);
+              CalculateUnfishedNumbersAA(index_ya, a-1, a);
             }
             /*
              Fished and unfished spawning biomass vectors are summing biomass at age
@@ -507,7 +518,7 @@ namespace fims
             {
               int index_ya2 = (y - 1) * nages + (a - 1);
               CalculateNumbersAA(index_ya, index_ya2, a);
-              CalculateUnfishedNumbersAA(index_ya, index_ya2);
+              CalculateUnfishedNumbersAA(index_ya, index_ya2, a);
             }
             CalculateSpawningBiomass(index_ya, y, a);
             CalculateUnfishedSpawningBiomass(index_ya, y, a);

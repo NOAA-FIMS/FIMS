@@ -127,6 +127,8 @@ namespace
                 population.weight_at_age[i] = weight_at_age_distribution(generator);
             }
 
+           
+
 
             population.Prepare();
 
@@ -155,6 +157,7 @@ namespace
             auto recruitment = std::make_shared<fims::SRBevertonHolt<double>>();
             recruitment->steep = 0.75;
             recruitment->rzero = 1000000.0;
+            recruitment->recruit_deviations.resize(nyears); 
             population.recruitment = recruitment;
             
 

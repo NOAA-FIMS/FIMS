@@ -24,6 +24,7 @@ test_that("Recruitment input settings work as expected", {
   expect_true(recruitment$steep$is_random_effect)
   expect_true(recruitment$steep$estimated)
   expect_equal(recruitment$rzero$value, 1000.0)
+
   expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 837.209300)
 
   devs <- c(1.0,2.0,3.0)

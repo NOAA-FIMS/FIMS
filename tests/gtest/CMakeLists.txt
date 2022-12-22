@@ -148,16 +148,16 @@ target_link_libraries(population_dynamics_population_initialize_prepare
 gtest_discover_tests(population_dynamics_population_initialize_prepare)
 
 # test_population_Li.cpp
-add_executable(population_Li
-  test_population_Li.cpp
+add_executable(population_unfished
+  test_population_Unfished_Initial.cpp
 )
 
-target_link_libraries(population_Li
+target_link_libraries(population_unfished
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_Li)
+gtest_discover_tests(population_unfished)
 
 #test_population_stawitz.cpp
 add_executable(population_NumbersAtAge
@@ -183,9 +183,9 @@ target_link_libraries(population_MaturityAtAge
 
 gtest_discover_tests(population_MaturityAtAge)
 
-#test_population_CatchNumbersAtAge_Taylor_Oshima.cpp
+#test_population_CatchNumbersAtAge.cpp
 add_executable(population_CatchNumbersAtAge
-  test_population_CatchNumbersAtAge_Taylor_Oshima.cpp
+  test_population_CatchNumbersAtAge.cpp
 )
 
 target_link_libraries(population_CatchNumbersAtAge
@@ -207,18 +207,6 @@ target_link_libraries(population_Catch
 
 gtest_discover_tests(population_Catch)
 
-#test_CalculateRecruitment.cpp
-add_executable(population_Recruitment
-  test_population_Oshima.cpp
-)
-
-target_link_libraries(population_Recruitment
-  gtest_main
-  fims_test
-)
-
-gtest_discover_tests(population_Recruitment)
-
 #test_CalculateSSB.cpp
 add_executable(population_SSB
   test_population_SSB.cpp
@@ -230,3 +218,15 @@ target_link_libraries(population_SSB
 )
 
 gtest_discover_tests(population_SSB)
+
+#test_CalculateIndex_works.cpp
+add_executable(population_Index
+  test_population_Index.cpp
+)
+
+target_link_libraries(population_Index
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_Index)

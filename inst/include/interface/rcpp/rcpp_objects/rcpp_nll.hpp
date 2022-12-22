@@ -13,6 +13,10 @@
 #include "../../../population_dynamics/recruitment/recruitment.hpp"
 #include "rcpp_interface_base.hpp"
 
+ /**
+ * @brief NLLInterfaceBase class should be inherited to
+ * define different Rcpp interfaces for each possible negative log-likelihood function
+ * */
  class NLLInterfaceBase : public FIMSRcppInterfaceBase {
     public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
@@ -40,6 +44,11 @@ uint32_t NLLInterfaceBase::id_g = 1;
 std::map<uint32_t, NLLInterfaceBase*>
     NLLInterfaceBase::live_objects;
 
+ /**
+  * @brief RecruitmentNLLInterface class should be inherited to
+ * define different Rcpp interfaces for each possible recruitment negative log-likelihood
+  * 
+  */
  class RecruitmentNLLInterface : public NLLInterfaceBase {
  public:
   Parameter log_sigma_recruit;   /**< log of the sd recruitment*/
