@@ -122,3 +122,15 @@ target_link_libraries(fims_math_fabs_min_max
 )
 
 gtest_discover_tests(fims_math_fabs_min_max)
+
+# test_fims_math_ad_fab_min_max.cpp
+add_executable(fims_math_logit
+  test_fims_math_logit.cpp
+)
+
+target_link_libraries(fims_math_logit
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_math_logit)
