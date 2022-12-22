@@ -34,6 +34,7 @@ namespace
         EXPECT_EQ(population.expected_index[index_yf], expected_index[index_yf]);
         EXPECT_GT(population.expected_index[index_yf], 0);
         EXPECT_GT(expected_index[index_yf], 0);
+        EXPECT_EQ(expected_index[index_yf], population.fleets[fleet_]->expected_index[year]);
         }
     }
 }
