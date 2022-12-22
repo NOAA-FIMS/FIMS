@@ -96,7 +96,7 @@ inline const T logistic(const T &median, const T &slope, const T &x) {
 /**
  * @brief A logit function for bounding of parameters
  * 
- * \f$ \mathrm{log}(b-x) + \mathrm{log}(x-a) \f$
+ * \f$ -\mathrm{log}(b-x) + \mathrm{log}(x-a) \f$
  * @param a lower bound
  * @param b upper bound
  * @param x the parameter in bounded space
@@ -111,7 +111,7 @@ inline const T logit(const T &a, const T &b, const T &x){
 /**
  * @brief An inverse logit function for bounding of parameters
  * 
- * \f$ a-\frac{b-a}{1+\mathrm{exp}(-\mathrm{logit}(x))}\f$
+ * \f$ a+\frac{b-a}{1+\mathrm{exp}(-\mathrm{logit}(x))}\f$
  * @param a lower bound
  * @param b upper bound
  * @param logit_x the parameter in real space

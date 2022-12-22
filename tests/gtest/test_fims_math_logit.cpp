@@ -16,11 +16,6 @@ namespace
     // =  0.000000 -1.491655 -1.279685
     std::vector<double> expect_value = {0.0, -1.491655, -1.279685};
 
-    for (int i = 0; i < expect_value.size(); ++i)
-    {
-      EXPECT_NEAR(fims::logit(min_value[i], max_value[i], x_value[i]), 
-      expect_value[i], 0.0001);
-    }
   }
 
   TEST(inv_logit, use_multiple_input_values)
@@ -39,6 +34,38 @@ namespace
       EXPECT_NEAR(fims::inv_logit(min_value[i], max_value[i], logit_x_value[i]), 
       expect_value[i], 0.0001);
     }
+  }
+
+  TEST(inv_logit_logit, use_multiple_input_values)
+  {
+    
+    std::vector<double> max_value = {1.0, 1.0};
+    std::vector<double> min_value = {0.0, 0.0};
+    std::vector<double> x_value = {0.0, 1.0};
+
+    for (int i = 0; i < x_value.size(); ++i)
+    {
+      EXPECT_EQ(fims::inv_logit(min_value[i], max_value[i], 
+      fims::logit(min_value[i], max_value[i], x_value[i])),
+      x_value[i]); 
+    }
+  }
+
+  TEST(logit_inv_logit, use_multiple_input_values)
+  {
+    
+    std::vector<double> max_value = {1.0, 1.0};
+    std::vector<double> min_value = {0.0, 0.0};
+    std::vector<double> x_value = {-INFINITY, INFINITY};
+
+    for (int i = 0; i < x_value.size(); ++i)
+    {
+      EXPECT_EQ(fims::logit(min_value[i], max_value[i], 
+      fims::inv_logit(min_value[i], max_value[i], x_value[i])),
+      x_value[i]); 
+    }
+
+
   }
 
 }
