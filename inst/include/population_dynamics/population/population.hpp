@@ -303,7 +303,6 @@ namespace fims
      */
     void CalculateRecruitment(int index_ya, int year)
     {
-      Type T= unfished_spawning_biomass[year - 1];
       this->numbers_at_age[index_ya] =
           this->recruitment->evaluate(this->spawning_biomass[year - 1],
                                       this->unfished_spawning_biomass[year - 1]) *
