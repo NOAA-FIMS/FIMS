@@ -183,9 +183,9 @@ target_link_libraries(population_MaturityAtAge
 
 gtest_discover_tests(population_MaturityAtAge)
 
-#test_population_CatchNumbersAtAge_Taylor_Oshima.cpp
+#test_population_CatchNumbersAtAge.cpp
 add_executable(population_CatchNumbersAtAge
-  test_population_CatchNumbersAtAge_Taylor_Oshima.cpp
+  test_population_CatchNumbersAtAge.cpp
 )
 
 target_link_libraries(population_CatchNumbersAtAge
@@ -221,7 +221,7 @@ gtest_discover_tests(population_SSB)
 
 #test_CalculateIndex_works.cpp
 add_executable(population_Index
-  test_population_Index_Chris.cpp
+  test_population_Index.cpp
 )
 
 target_link_libraries(population_Index
