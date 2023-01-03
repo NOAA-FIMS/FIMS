@@ -61,10 +61,10 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
    **/
   virtual uint32_t get_id() = 0;
 
-  /** 
+  /**
    * @brief evaluate the function
-   * 
-  */
+   *
+   */
   virtual double evaluate(double x) = 0;
 };
 
@@ -88,11 +88,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   /** @brief returns the id for the logistic selectivity interface */
   virtual uint32_t get_id() { return this->id; }
 
-   /** @brief evaluate the logistic selectivity function
+  /** @brief evaluate the logistic selectivity function
    *   @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
-  */
-  virtual double evaluate(double x){
+   */
+  virtual double evaluate(double x) {
     fims::LogisticSelectivity<double> LogisticSel;
 
     LogisticSel.median = this->median.value;
@@ -219,7 +219,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   }
 };
 
-  /**
+/**
  * @brief Rcpp interface for logistic selectivity as an S4 object. To
  * instantiate from R: logistic_selectivity <- new(fims$logistic_selectivity)
  */
@@ -227,8 +227,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   Parameter median_asc; /**< the index value at which the response reaches .5 */
   Parameter slope_asc;  /**< the width of the curve at the median */
-  Parameter median_desc; /**< the index value at which the response reaches .5 */
-  Parameter slope_desc;  /**< the width of the curve at the median */
+  Parameter
+      median_desc;      /**< the index value at which the response reaches .5 */
+  Parameter slope_desc; /**< the width of the curve at the median */
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
@@ -237,11 +238,11 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   /** @brief returns the id for the double logistic selectivity interface */
   virtual uint32_t get_id() { return this->id; }
 
-   /** @brief evaluate the double logistic selectivity function
+  /** @brief evaluate the double logistic selectivity function
    *   @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
-  */
-  virtual double evaluate(double x){
+   */
+  virtual double evaluate(double x) {
     fims::DoubleLogisticSelectivity<double> DoubleLogisticSel;
 
     DoubleLogisticSel.median_asc = this->median_asc.value;
@@ -258,7 +259,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
     std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_REAL_TYPE> > ls0 =
-        std::make_shared<fims::DoubleLogisticSelectivity<TMB_FIMS_REAL_TYPE> >();
+        std::make_shared<
+            fims::DoubleLogisticSelectivity<TMB_FIMS_REAL_TYPE> >();
 
     // set relative info
     ls0->id = this->id;
@@ -301,8 +303,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_FIRST_ORDER> > ls1 =
-        std::make_shared<fims::DoubleLogisticSelectivity<TMB_FIMS_FIRST_ORDER> >();
+    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_FIRST_ORDER> >
+        ls1 = std::make_shared<
+            fims::DoubleLogisticSelectivity<TMB_FIMS_FIRST_ORDER> >();
 
     // set relative info
     ls1->id = this->id;
@@ -345,8 +348,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_SECOND_ORDER> > ls2 =
-        std::make_shared<fims::DoubleLogisticSelectivity<TMB_FIMS_SECOND_ORDER> >();
+    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_SECOND_ORDER> >
+        ls2 = std::make_shared<
+            fims::DoubleLogisticSelectivity<TMB_FIMS_SECOND_ORDER> >();
 
     // set relative info
     ls2->id = this->id;
@@ -366,7 +370,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         d2->RegisterParameter(ls2->slope_asc);
       }
     }
-    
+
     ls2->median_desc = this->median_desc.value;
     if (this->median_desc.estimated) {
       if (this->median_desc.is_random_effect) {
@@ -390,8 +394,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_THIRD_ORDER> > ls3 =
-        std::make_shared<fims::DoubleLogisticSelectivity<TMB_FIMS_THIRD_ORDER> >();
+    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_THIRD_ORDER> >
+        ls3 = std::make_shared<
+            fims::DoubleLogisticSelectivity<TMB_FIMS_THIRD_ORDER> >();
 
     // set relative info
     ls3->id = this->id;
