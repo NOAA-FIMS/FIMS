@@ -1,0 +1,35 @@
+# Run doxygen to generate documentation from C++ code
+# build doxygen, error on warnings.
+name: run-doxygen
+# The default build trigger is to run the action on every push for any branch
+on:
+  pull_request:
+  push:
+    branches: 
+      - main
+  # To run the default repository branch weekly on sunday, uncomment the following 2 lines
+  #schedule:
+    #- cron: '0 0 * * 0'
+
+jobs:
+  build-doxygen:
+    name: Build HTML documentation from C++ code
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+    - name: Get repository
+      uses: actions/checkout@v3
+
+    - name: Installing build dependencies
+      run: |
+        sudo apt update
+        sudo apt install cmake doxygen gcc git ninja-build
+
+    - name: Building HTML documentation with Doxygen
+    # Do not run mkdir docs and mv build/html docs locally
+    # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
+      run: |
+        cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=YES
+        cmake --build build
