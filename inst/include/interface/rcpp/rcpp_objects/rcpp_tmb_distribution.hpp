@@ -63,7 +63,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   Parameter x;    /**< observed data */
   Parameter mean; /**< mean of x for the normal distribution **/
   Parameter sd;   /**< sd of x for the normal distribution **/
-  
 
   DnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -162,7 +161,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   Parameter x;       /*!< observation */
   Parameter meanlog; /*!< mean of the distribution of log(x) */
   Parameter sdlog;   /*!< standard deviation of the distribution of log(x) */
-  bool do_bias_correction; /*!< true if the lognormal should be bias corrected, default FALSE */
+  bool do_bias_correction; /*!< true if the lognormal should be bias corrected,
+                              default FALSE */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 

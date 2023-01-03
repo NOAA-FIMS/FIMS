@@ -45,8 +45,9 @@ struct RecruitmentBase : public FIMSObject<Type> {
   bool use_recruit_bias_adjustment =
       true; /*!< A flag to indicate if recruitment deviations are bias adjusted
              */
-  Type log_sigma_recruit; /*!< Log standard deviation of log recruitment deviations */
-  Type rzero;   /*!< Unexploited recruitment. Should be a positive value.*/
+  Type log_sigma_recruit; /*!< Log standard deviation of log recruitment
+                             deviations */
+  Type rzero; /*!< Unexploited recruitment. Should be a positive value.*/
   bool estimate_recruit_deviations =
       true; /*!< A flag to indicate if recruitment deviations are estimated or
                not */
@@ -61,10 +62,11 @@ struct RecruitmentBase : public FIMSObject<Type> {
    *
    * @param spawners A measure for spawning output.
    * @param ssbzero A measure for spawning output in unfished population.
-   * 
+   *
    */
   virtual const Type evaluate(
-      const Type &spawners, const Type &ssbzero) = 0;  // need to add input parameter values
+      const Type &spawners,
+      const Type &ssbzero) = 0;  // need to add input parameter values
 
   /** @brief Prepare constrained recruitment deviations.
    *  Based on ADMB sum-to-zero constraint implementation. We still
@@ -93,7 +95,7 @@ struct RecruitmentBase : public FIMSObject<Type> {
    */
   void PrepareBiasAdjustment() {
     Type recruit_bias_adjustment_size = this->recruit_bias_adjustment.size();
-    
+
     if (!this->use_recruit_bias_adjustment) {
       for (size_t i = 0; i < recruit_bias_adjustment_size; i++) {
         this->recruit_bias_adjustment_fraction[i] = 1.0;
@@ -106,7 +108,8 @@ struct RecruitmentBase : public FIMSObject<Type> {
         // In the future, this would be set by the user.
         this->recruit_bias_adjustment_fraction[i] = 1.0;
         this->recruit_bias_adjustment[i] =
-            0.5 * fims::exp(this->log_sigma_recruit) * fims::exp(this->log_sigma_recruit) *
+            0.5 * fims::exp(this->log_sigma_recruit) *
+            fims::exp(this->log_sigma_recruit) *
             this->recruit_bias_adjustment_fraction[i];
       }
     }
