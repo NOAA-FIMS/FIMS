@@ -139,11 +139,6 @@ namespace fims
       naa.resize(nages);
 
       M.resize(nyears * nages);
-
-      for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
-      {
-        this->fleets[fleet_]->Initialize(nyears, nages);   
-      }
    
     }
 
@@ -168,11 +163,6 @@ namespace fims
           int index_ya = year * this->nages + age;
           this->M[index_ya] = fims::exp(this->log_M[index_ya]);
         }
-      }
-      for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++)
-      {
-        this->fleets[fleet_]->Prepare();   
-        
       }
     }
 
