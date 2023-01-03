@@ -104,7 +104,6 @@ namespace fims
 
     // this -> means you're referring to a class member (member of self)
 
-    // std::vector<std::shared_ptr<fims::Fleet<Type>> > surveys;
     Population()
     {
       this->id = Population::id_g++;
@@ -125,7 +124,6 @@ namespace fims
       catch_numbers_at_age.resize(nyears * nages * nfleets);
       mortality_F.resize(nyears * nages);
       mortality_Z.resize(nyears * nages);
-      // proportion_mature_at_age.resize(nyears * nages);
       proportion_mature_at_age.resize((nyears + 1) * nages);
       weight_at_age.resize(nages);
       catch_weight_at_age.resize(nyears * nages * nfleets);
@@ -164,8 +162,6 @@ namespace fims
       // Transformation Section
       for (size_t age = 0; age < this->nages; age++)
       {
-        // for (size_t age = 0; age <= this->nages; age++) {
-        // Use fims::exp?
         this->naa[age] = fims::exp(this->log_naa[age]);
         for (size_t year = 0; year < this->nyears; year++)
         {
@@ -178,10 +174,6 @@ namespace fims
         this->fleets[fleet_]->Prepare();   
         
       }
-
-      // call functions to set up recruitment deviations.
-      // this -> recruitment -> PrepareConstrainedDeviations();
-      // this -> recruitment -> PrepareBiasAdjustment();
     }
 
     /**
@@ -225,7 +217,7 @@ namespace fims
      */
     inline void CalculateNumbersAA(int index_ya, int index_ya2, int age)
     {
-      // using Z from previous age/year - is this correct?
+      // using Z from previous age/year
       this->numbers_at_age[index_ya] =
           this->numbers_at_age[index_ya2] *
           (exp(-this->mortality_Z[index_ya2]));
@@ -248,12 +240,12 @@ namespace fims
      */
     inline void CalculateUnfishedNumbersAA(int index_ya, int index_ya2, int age)
     {
-      // using M from previous age/year - is this correct?
+      // using M from previous age/year 
       this->unfished_numbers_at_age[index_ya] =
           this->unfished_numbers_at_age[index_ya2] *
           (exp(-this->M[index_ya2]));
 
-           // Plus group calculation
+      // Plus group calculation
       if (age == (this->nages - 1)) {
         this->unfished_numbers_at_age[index_ya] =
           this->unfished_numbers_at_age[index_ya] + 
@@ -273,7 +265,6 @@ namespace fims
     {
       this->spawning_biomass[year] += this->proportion_female *
                                       this->numbers_at_age[index_ya] *
-                                      // this->proportion_mature_at_age[age] *
                                       this->proportion_mature_at_age[index_ya] *
                                       this->weight_at_age[age];
     }
@@ -290,7 +281,6 @@ namespace fims
     {
       this->unfished_spawning_biomass[year] += this->proportion_female *
                                                this->unfished_numbers_at_age[index_ya] *
-                                               // this->proportion_mature_at_age[age] * Meg O made this change to match change in CalculateSpawningBiomass
                                                this->proportion_mature_at_age[index_ya] *
                                                this->weight_at_age[age];
     }
@@ -493,8 +483,6 @@ namespace fims
             }
             else
             {
-              // CalculateUnfishedNumbersAA(index_ya, a);
-              // CalculateUnfishedNumbersAA(index_ya, index_ya-1);
               CalculateUnfishedNumbersAA(index_ya, a-1, a);
             }
             /*
