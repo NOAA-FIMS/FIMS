@@ -25,7 +25,7 @@ public:
         bool good = true;
         std::stringstream ss;
         for (uint32_t i = 0; i < this->ncases_m; i++) {
-            for (uint32_t j = 0; j < this->ninput_files_m; j++) {
+            for (uint32_t j = 0; j < 10;/*this->ninput_files_m;*/ j++) {
                 ss.str("");
                 ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
                 rapidjson::Document input;
@@ -35,11 +35,11 @@ public:
 
                 ss.str("");
                 ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
-                this->ReadJson(ss.str(), output);
+               // this->ReadJson(ss.str(), output);
 
                 fims::Population<double> pop;
-                
-                
+
+
 
                 if (!this->ConfigurePopulationModel(pop, input)) {
                     good = false;
@@ -52,6 +52,8 @@ public:
                 };
 
             }
+            
+        exit(0);
         }
 
 
@@ -83,19 +85,80 @@ public:
 
         typename rapidjson::Document::MemberIterator it;
 
-        std::cout << ss.str() << "\n";
-        for (it = input.MemberBegin(); it != input.MemberEnd(); ++it) {
-            std::cout << std::string(it->name.GetString()) << " = ";
-            if(std::string(it->name.GetString()) == "fleet_num"){
-                 rapidjson::Value &e = (*it).value;
-                 pop.
-            }
-           
-           
+        size_t nfleets, nsurveys, nages, nyears;
 
+
+        //get number of years
+        it = input.FindMember("nyr");
+        if (it != input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+            nyears = e[0].GetInt();
+            std::cout << "nyr " << nyears << std::endl;
+        } else {
+            std::cout << "nyr not found in input\n";
         }
 
-        exit(0);
+        //get number of ages
+        it = input.FindMember("nages");
+        if (it != input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+            nages = e[0].GetInt();
+            std::cout << "nages " << nages << std::endl;
+        } else {
+            std::cout << "nages not found in input\n";
+        }
+
+        //initialize population
+        pop.Initialize(nyears, 1, nages);
+        
+        //temporary container for fleets and surveys
+        std::map<uint32_t, std::shared_ptr<fims::Fleet<double> > > fleets; 
+        
+        //get number of surveys
+        it = input.FindMember("ages");
+        if (it != input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+            std::cout << "ages ";
+            for (int i = 0; i < e.Size(); i++) {
+                pop.ages[i] = e[i].GetDouble();
+                std::cout << pop.ages[i] << " ";
+            }
+            std::cout << std::endl;
+
+
+        } else {
+            std::cout << "ages not found in input\n";
+        }
+
+        //get number of fleets
+        it = input.FindMember("fleet_num");
+        if (it != input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+            nfleets = e[0].GetInt();
+            std::cout << "nfleets " << nfleets << std::endl;
+            for(int i =0; i < nfleets; i++){
+                std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
+                f->Initialize(nyears, nages);
+                fleets[f->GetId()] = f;
+            }
+        } else {
+            std::cout << "fleet_num not found in input\n";
+        }
+
+        //get number of surveys
+        it = input.FindMember("survey_num");
+        if (it != input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+            nsurveys = e[0].GetInt();
+            std::cout << "survey_num " << nfleets << std::endl;
+        } else {
+            std::cout << "survey_num not found in input\n";
+        }
+
+
+
+
+
 
 
         return true;
