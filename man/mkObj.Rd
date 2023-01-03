@@ -13,5 +13,7 @@ TMB object
 fit: example function demonstrating TMB specific Roxygen comments
 }
 \examples{
-\dontrun{mkObj()}
+\dontrun{
+mkObj()
+}
 }
