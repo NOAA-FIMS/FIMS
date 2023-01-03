@@ -139,6 +139,8 @@ public:
             for(int i =0; i < nfleets; i++){
                 std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
                 f->Initialize(nyears, nages);
+                f->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
+                f->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
                 fleets[f->GetId()] = f;
             }
         } else {
