@@ -91,4 +91,4 @@ vignettes/*.pdf
 fims.log
 
 #TMB tmp.def file
-tmp.def
+src/tmp.def

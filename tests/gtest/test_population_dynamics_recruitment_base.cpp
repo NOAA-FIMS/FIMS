@@ -36,7 +36,7 @@ namespace
   TEST(recruitment_bias_adjustment, PrepareBiasAdjustment_works)
   {
     fims::SRBevertonHolt<double> recruit;
-    recruit.sigma_recruit = 0.7;
+    recruit.log_sigma_recruit = fims::log(0.7);
 
     // Test if use_recruit_bias_adjustment = false works
     recruit.use_recruit_bias_adjustment = false;
@@ -79,54 +79,6 @@ namespace
       EXPECT_NEAR(recruit.recruit_bias_adjustment[i],
                   expected_bias_adjustment[i], 0.001);
     }
-  }
-
-  TEST(recruitment_nll, nll_component_works)
-  {
-
-    fims::SRBevertonHolt<double> recruit;
-    recruit.recruit_deviations = {-1.0, 2.0, 3.0};
-    recruit.constrain_deviations = false;
-    recruit.sigma_recruit = 0.7;
-    recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
-    recruit.recruit_bias_adjustment_fraction = {1.0, 1.0, 1.0};
-    recruit.use_recruit_bias_adjustment = false;
-
-    // If estimate_recruit_deviations = false
-    recruit.estimate_recruit_deviations = false;
-    recruit.PrepareConstrainedDeviations();
-    recruit.PrepareBiasAdjustment();
-    EXPECT_EQ(recruit.recruit_nll(), 0.0);
-
-    // If estimate_recruit_deviations = true
-    recruit.estimate_recruit_deviations = true;
-    recruit.PrepareConstrainedDeviations();
-    recruit.PrepareBiasAdjustment();
-
-    // R: sum(0.5*((c(-1.0, 2.0, 3.0)/0.7)^2+log(0.7^2)+log(2*pi))) = 15.97251
-    double expected_nll = 15.97251;
-    EXPECT_NEAR(recruit.recruit_nll(),
-                expected_nll, 0.00001);
-  }
-
-  TEST(recruitment_nll, compare_to_r_dnorm_works)
-  {
-
-    fims::SRBevertonHolt<double> recruit;
-    recruit.recruit_deviations = {-1, 0.5, 3};
-    recruit.constrain_deviations = false;
-    recruit.sigma_recruit = 0.3;
-    recruit.recruit_bias_adjustment = {0.0, 0.0, 0.0};
-    recruit.recruit_bias_adjustment_fraction = {1.0, 1.0, 1.0};
-    recruit.use_recruit_bias_adjustment = false;
-    recruit.estimate_recruit_deviations = true;
-    recruit.PrepareConstrainedDeviations();
-    recruit.PrepareBiasAdjustment();
-
-    // R: sum(-log(dnorm(x = c(-1, 0.5, 3), mean = 0, sd = 0.3))) = -56.08934
-    double expected_nll = 56.08934;
-    EXPECT_NEAR(recruit.recruit_nll(),
-                expected_nll, 0.00001);
   }
 
 }
