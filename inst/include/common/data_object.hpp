@@ -44,30 +44,42 @@ namespace fims {
  */
 template <typename Type>
 struct DataObject : public fims::FIMSObject<Type> {
-  static uint32_t id_g;
-  std::vector<Type> data;
-  size_t dimensions;
-  size_t imax;
-  size_t jmax;
-  size_t kmax;
-  size_t lmax;
+  static uint32_t id_g; /*!< id of the Data Object >*/
+  std::vector<Type> data; /*!< vector of the data >*/
+  size_t dimensions; /*!< dimension of the Data object >*/
+  size_t imax; /*!<1st dimension of data object >*/
+  size_t jmax;/*!< 2nd dimension of data object>*/
+  size_t kmax;/*!< 3rd dimension of data object>*/
+  size_t lmax;/*!< 4th dimension of data object>*/
 
+/**
+ * Constructs a one-dimensional data object.
+ */
   DataObject(size_t imax) : imax(imax), dimensions(1) {
     data.resize(imax);
     this->id = DataObject<Type>::id_g++;
   }
 
+/**
+ * Constructs a two-dimensional data object.
+ */
   DataObject(size_t imax, size_t jmax) : imax(imax), jmax(jmax), dimensions(2) {
     data.resize(imax * jmax);
     this->id = DataObject<Type>::id_g++;
   }
 
+/**
+ *  Constructs a three-dimensional data object.
+ */
   DataObject(size_t imax, size_t jmax, size_t kmax)
       : imax(imax), jmax(jmax), kmax(kmax), dimensions(3) {
     data.resize(imax * jmax * kmax);
     this->id = DataObject<Type>::id_g++;
   }
 
+/**
+ * Constructs a four-dimensional data object.
+ */
   DataObject(size_t imax, size_t jmax, size_t kmax, size_t lmax)
       : imax(imax), jmax(jmax), kmax(kmax), lmax(lmax), dimensions(4) {
     data.resize(imax * jmax * kmax * lmax);
@@ -76,7 +88,7 @@ struct DataObject : public fims::FIMSObject<Type> {
 
   /**
    * Retrieve element from 1d data set.
-   * @param i
+   * @param i dimension of 1d data set
    * @return
    */
   inline Type operator()(size_t i) { return data[i]; }
@@ -84,7 +96,7 @@ struct DataObject : public fims::FIMSObject<Type> {
   /**
    * Retrieve element from 1d data set.
    * Throws an exception if index is out of bounds.
-   * @param i
+   * @param i dimension of 1d data set
    * @return reference type
    */
   inline Type& at(size_t i) {
@@ -96,8 +108,8 @@ struct DataObject : public fims::FIMSObject<Type> {
 
   /**
    * Retrieve element from 2d data set.
-   * @param i
-   * @param j
+   * @param i 1st dimension of 2d data set
+   * @param j 2nd dimension of 2d data set
    * @return
    */
   inline const Type operator()(size_t i, size_t j) {
@@ -173,14 +185,39 @@ struct DataObject : public fims::FIMSObject<Type> {
     return data[i * jmax * kmax * lmax + j * kmax * lmax + k * lmax + l];
   }
 
+  /**
+   * @brief Get the dimensions object
+   * 
+   * @return size_t 
+   */
   size_t get_dimensions() const { return dimensions; }
 
+  /**
+   * @brief Get the imax object
+   * 
+   * @return size_t 
+   */
   size_t get_imax() const { return imax; }
 
+/**
+ * @brief Get the jmax object
+ * 
+ * @return size_t 
+ */
   size_t get_jmax() const { return jmax; }
 
+/**
+ * @brief Get the kmax object
+ * 
+ * @return size_t 
+ */
   size_t get_kmax() const { return kmax; }
 
+/**
+ * @brief Get the lmax object
+ * 
+ * @return size_t 
+ */
   size_t get_lmax() const { return lmax; }
 };
 
