@@ -18,6 +18,7 @@
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
+#include "rcpp_objects/rcpp_nll.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
 #include "rcpp_objects/rcpp_tmb_distribution.hpp"
 
@@ -67,18 +68,37 @@ RCPP_MODULE(fims) {
       .field("is_random_effect", &Parameter::is_random_effect)
       .field("estimated", &Parameter::estimated);
 
-  Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
-      .constructor()
-      .field("steep", &BevertonHoltRecruitmentInterface::steep)
-      .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
-      .field("phizero", &BevertonHoltRecruitmentInterface::phizero)
-      .method("get_id", &BevertonHoltRecruitmentInterface::get_id);
+    Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
+            .constructor()
+            .field("steep", &BevertonHoltRecruitmentInterface::steep)
+            .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
+            .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
+            .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
+
+  Rcpp::class_<RecruitmentNLLInterface>("RecruitmentNLL")
+            .constructor()
+            .field("log_sigma_recruit", &RecruitmentNLLInterface::log_sigma_recruit)
+            .field("recruitment_devs", &RecruitmentNLLInterface::recruit_deviations)
+            .field("recruitment_bias_adj", &RecruitmentNLLInterface::recruit_bias_adjustment)
+            .field("do_bias_correction", &RecruitmentNLLInterface::use_recruit_bias_adjustment)
+            .field("estimate_recruit_deviations", &RecruitmentNLLInterface::estimate_recruit_deviations)
+            .method("evaluate", &RecruitmentNLLInterface::evaluate_nll);
 
   Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
       .constructor()
       .field("median", &LogisticSelectivityInterface::median)
       .field("slope", &LogisticSelectivityInterface::slope)
-      .method("get_id", &LogisticSelectivityInterface::get_id);
+      .method("get_id", &LogisticSelectivityInterface::get_id)
+      .method("evaluate", &LogisticSelectivityInterface::evaluate);
+
+    Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
+    .constructor()
+    .field("median_asc", &DoubleLogisticSelectivityInterface::median_asc)
+    .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc)
+    .field("median_desc", &DoubleLogisticSelectivityInterface::median_desc)
+    .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
+    .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
+    .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
@@ -102,19 +122,14 @@ RCPP_MODULE(fims) {
       .field("weights", &EWAAGrowthInterface::weights)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
-  Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
-      .constructor()
-      .field("ages", &EWAAGrowthInterface::ages)
-      .field("weights", &EWAAGrowthInterface::weights)
-      .method("evaluate", &EWAAGrowthInterface::evaluate);
-
   Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
       .field("x", &DlnormDistributionsInterface::x)
       .field("meanlog", &DlnormDistributionsInterface::meanlog)
-      .field("sdlog", &DlnormDistributionsInterface::sdlog);
+      .field("sdlog", &DlnormDistributionsInterface::sdlog)
+      .field("do_bias_correction", &DlnormDistributionsInterface::do_bias_correction);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
