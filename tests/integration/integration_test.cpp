@@ -31,22 +31,15 @@ public:
                 rapidjson::Document input;
                 rapidjson::Document output;
                 this->ReadJson(ss.str(), input);
-                typename rapidjson::Document::MemberIterator it;
-                std::cout<<ss.str()<<"\n";
-                for (it = input.MemberBegin(); it != input.MemberEnd(); ++it) {
-                    std::cout <<std::string(it->name.GetString())<<" = ";
-                    rapidjson::Value &e = (*it).value;
-                    std::cout<< e[0].GetInt()<<"\n";
-                    
-                }
-                
-                exit(0);
+
 
                 ss.str("");
                 ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
                 this->ReadJson(ss.str(), output);
 
                 fims::Population<double> pop;
+                
+                
 
                 if (!this->ConfigurePopulationModel(pop, input)) {
                     good = false;
@@ -87,6 +80,24 @@ public:
 
     bool ConfigurePopulationModel(fims::Population<double>& pop,
             rapidjson::Document& input) {
+
+        typename rapidjson::Document::MemberIterator it;
+
+        std::cout << ss.str() << "\n";
+        for (it = input.MemberBegin(); it != input.MemberEnd(); ++it) {
+            std::cout << std::string(it->name.GetString()) << " = ";
+            if(std::string(it->name.GetString()) == "fleet_num"){
+                 rapidjson::Value &e = (*it).value;
+                 pop.
+            }
+           
+           
+
+        }
+
+        exit(0);
+
+
         return true;
     }
 
