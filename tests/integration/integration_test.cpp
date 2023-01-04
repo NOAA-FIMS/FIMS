@@ -182,10 +182,10 @@ public:
             rapidjson::Value &e = (*it).value;
             nsurveys = e[0].GetInt();
             for (int i = 0; i < nsurveys; i++) {
-                std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
-                f->Initialize(nyears, nages);
-                f->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
-                f->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
+                std::shared_ptr<fims::Fleet<double> > s = std::make_shared<fims::Fleet<double> >();
+                s->Initialize(nyears, nages);
+                s->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
+                s->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
                 std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
                         = std::make_shared<fims::LogisticSelectivity<double> >();
                 std::stringstream strs;
@@ -204,7 +204,7 @@ public:
                 rapidjson::Value &slope = (*sel_slope).value;
                 selectivity->slope = slope[0].GetDouble();
                 std::cout << selectivity->median << " " << selectivity->slope << "\n";
-                f->selectivity = selectivity;
+                s->selectivity = selectivity;
             }
                 std::cout << "survey_num " << nfleets << std::endl;
             } else {
