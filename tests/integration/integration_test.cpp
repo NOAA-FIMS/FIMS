@@ -25,7 +25,7 @@ public:
         bool good = true;
         std::stringstream ss;
         for (uint32_t i = 0; i < this->ncases_m; i++) {
-            for (uint32_t j = 0; j < 10;/*this->ninput_files_m;*/ j++) {
+            for (uint32_t j = 0; j < 10; /*this->ninput_files_m;*/ j++) {
                 ss.str("");
                 ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
                 rapidjson::Document input;
@@ -35,7 +35,7 @@ public:
 
                 ss.str("");
                 ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
-               // this->ReadJson(ss.str(), output);
+                // this->ReadJson(ss.str(), output);
 
                 fims::Population<double> pop;
 
@@ -52,8 +52,8 @@ public:
                 };
 
             }
-            
-        exit(0);
+
+            exit(0);
         }
 
 
@@ -110,10 +110,10 @@ public:
 
         //initialize population
         pop.Initialize(nyears, 1, nages);
-        
+
         //temporary container for fleets and surveys
-        std::map<uint32_t, std::shared_ptr<fims::Fleet<double> > > fleets; 
-        
+        std::map<uint32_t, std::shared_ptr<fims::Fleet<double> > > fleets;
+
         //get number of surveys
         it = input.FindMember("ages");
         if (it != input.MemberEnd()) {
@@ -136,11 +136,32 @@ public:
             rapidjson::Value &e = (*it).value;
             nfleets = e[0].GetInt();
             std::cout << "nfleets " << nfleets << std::endl;
-            for(int i =0; i < nfleets; i++){
+            for (int i = 0; i < nfleets; i++) {
                 std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
                 f->Initialize(nyears, nages);
                 f->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
                 f->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
+                std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
+                        = std::make_shared<fims::LogisticSelectivity<double> >();
+                std::stringstream strs;
+                strs << "fleet" << i + 1;
+
+                it = input.FindMember("sel_fleet");
+                typename rapidjson::Document::MemberIterator fsel;
+                fsel = it->value.FindMember(strs.str().c_str());
+                typename rapidjson::Document::MemberIterator sel_a50;
+                sel_a50 = fsel->value.FindMember("A50.sel");
+                rapidjson::Value &a50 = (*sel_a50).value;
+                selectivity->median = a50[0].GetDouble();
+
+                typename rapidjson::Document::MemberIterator sel_slope;
+                sel_slope = fsel->value.FindMember("slope.sel");
+                rapidjson::Value &slope = (*sel_slope).value;
+                selectivity->slope = slope[0].GetDouble();
+                std::cout << selectivity->median << " " << selectivity->slope << "\n";
+                f->selectivity = selectivity;
+
+
                 fleets[f->GetId()] = f;
             }
         } else {
