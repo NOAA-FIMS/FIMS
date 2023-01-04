@@ -111,6 +111,55 @@ public:
         //initialize population
         pop.Initialize(nyears, 1, nages);
 
+        it = input.FindMember("ages");
+        rapidjson::Value &e = (*it).value;
+        for (int i = 0; i < e.Size(); i++) {
+            pop.ages[i] = e[i].GetDouble();
+        }
+
+
+        it = input.FindMember("M");
+        e = (*it).value;
+        std::fill(pop.M.begin(), pop.M.end(), e[0].GetDouble());
+
+        std::shared_ptr<fims::SRBevertonHolt<double> > rec =
+                std::make_shared<fims::SRBevertonHolt<double> >();
+        it = input.FindMember("R0");
+        e = (*it).value;
+        rec->rzero = e[0].GetDouble();
+
+        it = input.FindMember("h");
+        e = (*it).value;
+        rec->steep = e[0].GetDouble();
+
+        it = input.FindMember("logR_sd");
+        e = (*it).value;
+        rec->log_sigma_recruit = e[0].GetDouble();
+        pop.recruitment = rec;
+
+        std::shared_ptr<fims::LogisticMaturity<double > > mat =
+                std::make_shared<fims::LogisticMaturity<double> >();
+        it = input.FindMember("A50.mat");
+        e = (*it).value;
+        mat->median = e[0].GetDouble();
+
+        it = input.FindMember("slope.mat");
+        e = (*it).value;
+        mat->slope = e[0].GetDouble();
+        pop.maturity = mat;
+
+        std::shared_ptr<fims::EWAAgrowth<double> > growth
+                = std::make_shared<fims::EWAAgrowth<double> > ();
+        it = input.FindMember("W.kg");
+        e = (*it).value;
+        for(int i =0; i < e.Size(); i++){
+            growth->ewaa[static_cast<double>(pop.ages[i])] = e[i].GetDouble();
+        }
+        pop.growth = growth;
+
+
+
+
         //temporary container for fleets and surveys
         std::map<uint32_t, std::shared_ptr<fims::Fleet<double> > > fleets;
 
@@ -171,6 +220,7 @@ public:
                 }
                 std::cout << "\n";
                 fleets[f->GetId()] = f;
+                pop.fleets.push_back(f);
             }
         } else {
             std::cout << "fleet_num not found in input\n";
@@ -205,41 +255,42 @@ public:
                 selectivity->slope = slope[0].GetDouble();
                 std::cout << selectivity->median << " " << selectivity->slope << "\n";
                 s->selectivity = selectivity;
+                pop.fleets.push_back(s);
             }
-                std::cout << "survey_num " << nfleets << std::endl;
-            } else {
-                std::cout << "survey_num not found in input\n";
-            }
-
-
-
-
-
-
-
-            return true;
-        }
-
-        bool RunModelLoop(fims::Population<double>& pop,
-                rapidjson::Document & input) {
-
-            return true;
-        }
-
-        bool CheckModelOutput(fims::Population<double>& pop,
-                rapidjson::Document & output) {
-            return true;
+            std::cout << "survey_num " << nfleets << std::endl;
+        } else {
+            std::cout << "survey_num not found in input\n";
         }
 
 
 
 
 
-    };
 
-    int main(int argc, char** argv) {
 
-        IntegrationTest t(10, 160);
-        t.Run();
-        return 0;
+        return true;
     }
+
+    bool RunModelLoop(fims::Population<double>& pop,
+            rapidjson::Document & input) {
+
+        return true;
+    }
+
+    bool CheckModelOutput(fims::Population<double>& pop,
+            rapidjson::Document & output) {
+        return true;
+    }
+
+
+
+
+
+};
+
+int main(int argc, char** argv) {
+
+    IntegrationTest t(10, 160);
+    t.Run();
+    return 0;
+}
