@@ -161,7 +161,15 @@ public:
                 std::cout << selectivity->median << " " << selectivity->slope << "\n";
                 f->selectivity = selectivity;
 
-
+                std::cout<<"f ";
+                it = input.FindMember("f");
+                for(int i = 0; i < it->value.Size(); i++){
+                    rapidjson::Value &e = (*it).value;
+                    f->Fmort[i] = e[i].GetDouble();
+                    f->log_Fmort[i] = std::log(e[i].GetDouble());
+                    std::cout<< f->log_Fmort[i]<<" ";
+                }
+                std::cout<<"\n";
                 fleets[f->GetId()] = f;
             }
         } else {
