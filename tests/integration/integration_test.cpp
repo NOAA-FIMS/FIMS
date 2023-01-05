@@ -7,10 +7,6 @@
 
 std::ofstream test_log("integration_test.log");
 
-
-
-
-
 class IntegrationTest {
 public:
 
@@ -116,17 +112,32 @@ public:
         //initialize population
         pop.Initialize(nyears, 1, nages);
 
+
+        //set ages vector
         it = input.FindMember("ages");
         rapidjson::Value &e = (*it).value;
-        for (int i = 0; i < e.Size(); i++) {
-            pop.ages[i] = e[i].GetDouble();
+        if (it != input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+            std::cout << "ages ";
+            for (int i = 0; i < e.Size(); i++) {
+                pop.ages[i] = e[i].GetDouble();
+                std::cout << pop.ages[i] << " ";
+            }
+            std::cout << std::endl;
+
+
+        } else {
+            std::cout << "ages not found in input\n";
         }
 
 
+        //set mortality vector
         it = input.FindMember("M");
         e = (*it).value;
         std::fill(pop.M.begin(), pop.M.end(), e[0].GetDouble());
 
+
+        //set recruitment
         std::shared_ptr<fims::SRBevertonHolt<double> > rec =
                 std::make_shared<fims::SRBevertonHolt<double> >();
         it = input.FindMember("R0");
@@ -142,6 +153,7 @@ public:
         rec->log_sigma_recruit = e[0].GetDouble();
         pop.recruitment = rec;
 
+        //set maturity
         std::shared_ptr<fims::LogisticMaturity<double > > mat =
                 std::make_shared<fims::LogisticMaturity<double> >();
         it = input.FindMember("A50.mat");
@@ -153,6 +165,7 @@ public:
         mat->slope = e[0].GetDouble();
         pop.maturity = mat;
 
+        //set empirical growth
         std::shared_ptr<fims::EWAAgrowth<double> > growth
                 = std::make_shared<fims::EWAAgrowth<double> > ();
         it = input.FindMember("W.kg");
@@ -162,24 +175,6 @@ public:
         }
         pop.growth = growth;
 
-        //temporary container for fleets and surveys
-        std::map<uint32_t, std::shared_ptr<fims::Fleet<double> > > fleets;
-
-        //get number of surveys
-        it = input.FindMember("ages");
-        if (it != input.MemberEnd()) {
-            rapidjson::Value &e = (*it).value;
-            std::cout << "ages ";
-            for (int i = 0; i < e.Size(); i++) {
-                pop.ages[i] = e[i].GetDouble();
-                std::cout << pop.ages[i] << " ";
-            }
-            std::cout << std::endl;
-
-
-        } else {
-            std::cout << "ages not found in input\n";
-        }
 
         //get number of fleets
         it = input.FindMember("fleet_num");
@@ -187,7 +182,8 @@ public:
             rapidjson::Value &e = (*it).value;
             nfleets = e[0].GetInt();
             bool parse_alternate_name = false;
-            
+
+            //instantiate fleets
             std::cout << "nfleets " << nfleets << std::endl;
             for (int i = 0; i < nfleets; i++) {
                 std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
@@ -198,12 +194,13 @@ public:
                 std::stringstream strs;
                 strs << "fleet" << i + 1;
 
+                //set fleet selectivity
                 it = input.FindMember("sel_fleet");
-
                 typename rapidjson::Document::MemberIterator fsel;
                 fsel = it->value.FindMember(strs.str().c_str());
                 rapidjson::Value &ss = (*fsel).value;
-                if (ss.MemberCount() == 2) {
+                
+                if (ss.MemberCount() == 2) {//logistic
                     std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
                             = std::make_shared<fims::LogisticSelectivity<double> >();
                     typename rapidjson::Document::MemberIterator sel_a50;
@@ -220,7 +217,7 @@ public:
                     std::cout << selectivity->median << " " << selectivity->slope << "\n";
                     f->selectivity = selectivity;
 
-                } else if (ss.MemberCount() == 4) {
+                } else if (ss.MemberCount() == 4) {//double logistic
                     std::shared_ptr<fims::DoubleLogisticSelectivity<double> > selectivity
                             = std::make_shared<fims::DoubleLogisticSelectivity<double> >();
 
@@ -245,9 +242,7 @@ public:
                     f->selectivity = selectivity;
                 }
 
-
-
-
+                //set fleet fishing mortality
                 std::cout << "f ";
                 it = input.FindMember("f");
                 for (int i = 0; i < it->value.Size(); i++) {
@@ -257,7 +252,6 @@ public:
                     std::cout << f->log_Fmort[i] << " ";
                 }
                 std::cout << "\n";
-                fleets[f->GetId()] = f;
                 pop.fleets.push_back(f);
             }
         } else {
@@ -279,11 +273,13 @@ public:
                 std::stringstream strs;
                 strs << "survey" << i + 1;
 
+                //set survey selectivity
                 it = input.FindMember("sel_survey");
                 typename rapidjson::Document::MemberIterator fsel;
                 fsel = it->value.FindMember(strs.str().c_str());
                 rapidjson::Value &ss = (*fsel).value;
-                if (ss.MemberCount() == 2) {
+                
+                if (ss.MemberCount() == 2) {//logistic
                     std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
                             = std::make_shared<fims::LogisticSelectivity<double> >();
                     typename rapidjson::Document::MemberIterator sel_a50;
@@ -300,7 +296,7 @@ public:
                     std::cout << selectivity->median << " " << selectivity->slope << "\n";
                     s->selectivity = selectivity;
 
-                } else if (ss.MemberCount() == 4) {
+                } else if (ss.MemberCount() == 4) {//double logistic
                     std::shared_ptr<fims::DoubleLogisticSelectivity<double> > selectivity
                             = std::make_shared<fims::DoubleLogisticSelectivity<double> >();
 
@@ -353,10 +349,10 @@ public:
         return true;
     }
 
-    bool AlmostEqual(const double& a, const double& b, double tolerance = 1e-4){
-        if(std::fabs(a-b) <= tolerance){
+    bool AlmostEqual(const double& a, const double& b, double tolerance = 1e-4) {
+        if (std::fabs(a - b) <= tolerance) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
