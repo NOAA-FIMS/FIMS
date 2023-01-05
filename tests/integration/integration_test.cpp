@@ -7,6 +7,10 @@
 
 std::ofstream test_log("integration_test.log");
 
+
+
+
+
 class IntegrationTest {
 public:
 
@@ -25,7 +29,7 @@ public:
         bool good = true;
         std::stringstream ss;
         for (uint32_t i = 0; i < this->ncases_m; i++) {
-            for (uint32_t j = 0; j < 10; /*this->ninput_files_m;*/ j++) {
+            for (uint32_t j = 0; j < this->ninput_files_m; j++) {
                 ss.str("");
                 ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
                 rapidjson::Document input;
@@ -43,17 +47,18 @@ public:
 
                 if (!this->ConfigurePopulationModel(pop, input)) {
                     good = false;
-                };
+                }
+
                 if (!this->RunModelLoop(pop, input)) {
                     good = false;
-                };
+                }
                 if (!this->CheckModelOutput(pop, output)) {
                     good = false;
-                };
-
+                }
             }
 
-            exit(0);
+
+
         }
 
 
@@ -152,13 +157,10 @@ public:
                 = std::make_shared<fims::EWAAgrowth<double> > ();
         it = input.FindMember("W.kg");
         e = (*it).value;
-        for(int i =0; i < e.Size(); i++){
-            growth->ewaa[static_cast<double>(pop.ages[i])] = e[i].GetDouble();
+        for (int i = 0; i < e.Size(); i++) {
+            growth->ewaa[static_cast<double> (pop.ages[i])] = e[i].GetDouble();
         }
         pop.growth = growth;
-
-
-
 
         //temporary container for fleets and surveys
         std::map<uint32_t, std::shared_ptr<fims::Fleet<double> > > fleets;
@@ -184,31 +186,67 @@ public:
         if (it != input.MemberEnd()) {
             rapidjson::Value &e = (*it).value;
             nfleets = e[0].GetInt();
+            bool parse_alternate_name = false;
+            
             std::cout << "nfleets " << nfleets << std::endl;
             for (int i = 0; i < nfleets; i++) {
                 std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
                 f->Initialize(nyears, nages);
                 f->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
                 f->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
-                std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
-                        = std::make_shared<fims::LogisticSelectivity<double> >();
+
                 std::stringstream strs;
                 strs << "fleet" << i + 1;
 
                 it = input.FindMember("sel_fleet");
+
                 typename rapidjson::Document::MemberIterator fsel;
                 fsel = it->value.FindMember(strs.str().c_str());
-                typename rapidjson::Document::MemberIterator sel_a50;
-                sel_a50 = fsel->value.FindMember("A50.sel");
-                rapidjson::Value &a50 = (*sel_a50).value;
-                selectivity->median = a50[0].GetDouble();
+                rapidjson::Value &ss = (*fsel).value;
+                if (ss.MemberCount() == 2) {
+                    std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
+                            = std::make_shared<fims::LogisticSelectivity<double> >();
+                    typename rapidjson::Document::MemberIterator sel_a50;
+                    sel_a50 = fsel->value.FindMember("A50.sel");
 
-                typename rapidjson::Document::MemberIterator sel_slope;
-                sel_slope = fsel->value.FindMember("slope.sel");
-                rapidjson::Value &slope = (*sel_slope).value;
-                selectivity->slope = slope[0].GetDouble();
-                std::cout << selectivity->median << " " << selectivity->slope << "\n";
-                f->selectivity = selectivity;
+
+                    rapidjson::Value &a50 = (*sel_a50).value;
+                    selectivity->median = a50[0].GetDouble();
+
+                    typename rapidjson::Document::MemberIterator sel_slope;
+                    sel_slope = fsel->value.FindMember("slope.sel");
+                    rapidjson::Value &slope = (*sel_slope).value;
+                    selectivity->slope = slope[0].GetDouble();
+                    std::cout << selectivity->median << " " << selectivity->slope << "\n";
+                    f->selectivity = selectivity;
+
+                } else if (ss.MemberCount() == 4) {
+                    std::shared_ptr<fims::DoubleLogisticSelectivity<double> > selectivity
+                            = std::make_shared<fims::DoubleLogisticSelectivity<double> >();
+
+                    typename rapidjson::Document::MemberIterator sel_a50;
+                    sel_a50 = fsel->value.FindMember("A50.sel1");
+                    rapidjson::Value &a501 = (*sel_a50).value;
+                    selectivity->median_asc = a501[0].GetDouble();
+
+                    typename rapidjson::Document::MemberIterator sel_slope;
+                    sel_slope = fsel->value.FindMember("slope.sel1");
+                    rapidjson::Value &slope1 = (*sel_slope).value;
+                    selectivity->slope_asc = slope1[0].GetDouble();
+
+                    sel_a50 = fsel->value.FindMember("A50.sel2");
+                    rapidjson::Value &a502 = (*sel_a50).value;
+                    selectivity->median_desc = a502[0].GetDouble();
+
+                    sel_slope = fsel->value.FindMember("slope.sel2");
+                    rapidjson::Value &slope2 = (*sel_slope).value;
+                    selectivity->slope_desc = slope2[0].GetDouble();
+                    std::cout << selectivity->median_asc << " " << selectivity->slope_asc << "\n";
+                    f->selectivity = selectivity;
+                }
+
+
+
 
                 std::cout << "f ";
                 it = input.FindMember("f");
@@ -244,17 +282,50 @@ public:
                 it = input.FindMember("sel_survey");
                 typename rapidjson::Document::MemberIterator fsel;
                 fsel = it->value.FindMember(strs.str().c_str());
-                typename rapidjson::Document::MemberIterator sel_a50;
-                sel_a50 = fsel->value.FindMember("A50.sel");
-                rapidjson::Value &a50 = (*sel_a50).value;
-                selectivity->median = a50[0].GetDouble();
+                rapidjson::Value &ss = (*fsel).value;
+                if (ss.MemberCount() == 2) {
+                    std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
+                            = std::make_shared<fims::LogisticSelectivity<double> >();
+                    typename rapidjson::Document::MemberIterator sel_a50;
+                    sel_a50 = fsel->value.FindMember("A50.sel");
 
-                typename rapidjson::Document::MemberIterator sel_slope;
-                sel_slope = fsel->value.FindMember("slope.sel");
-                rapidjson::Value &slope = (*sel_slope).value;
-                selectivity->slope = slope[0].GetDouble();
-                std::cout << selectivity->median << " " << selectivity->slope << "\n";
-                s->selectivity = selectivity;
+
+                    rapidjson::Value &a50 = (*sel_a50).value;
+                    selectivity->median = a50[0].GetDouble();
+
+                    typename rapidjson::Document::MemberIterator sel_slope;
+                    sel_slope = fsel->value.FindMember("slope.sel");
+                    rapidjson::Value &slope = (*sel_slope).value;
+                    selectivity->slope = slope[0].GetDouble();
+                    std::cout << selectivity->median << " " << selectivity->slope << "\n";
+                    s->selectivity = selectivity;
+
+                } else if (ss.MemberCount() == 4) {
+                    std::shared_ptr<fims::DoubleLogisticSelectivity<double> > selectivity
+                            = std::make_shared<fims::DoubleLogisticSelectivity<double> >();
+
+                    typename rapidjson::Document::MemberIterator sel_a50;
+                    sel_a50 = fsel->value.FindMember("A50.sel1");
+                    rapidjson::Value &a501 = (*sel_a50).value;
+                    selectivity->median_asc = a501[0].GetDouble();
+
+                    typename rapidjson::Document::MemberIterator sel_slope;
+                    sel_slope = fsel->value.FindMember("slope.sel1");
+                    rapidjson::Value &slope1 = (*sel_slope).value;
+                    selectivity->slope_asc = slope1[0].GetDouble();
+
+                    sel_a50 = fsel->value.FindMember("A50.sel2");
+                    rapidjson::Value &a502 = (*sel_a50).value;
+                    selectivity->median_desc = a502[0].GetDouble();
+
+                    sel_slope = fsel->value.FindMember("slope.sel2");
+                    rapidjson::Value &slope2 = (*sel_slope).value;
+                    selectivity->slope_desc = slope2[0].GetDouble();
+                    std::cout << selectivity->median_asc << " " << selectivity->slope_asc << "\n";
+                    s->selectivity = selectivity;
+                }
+
+
                 pop.fleets.push_back(s);
             }
             std::cout << "survey_num " << nfleets << std::endl;
@@ -273,7 +344,7 @@ public:
 
     bool RunModelLoop(fims::Population<double>& pop,
             rapidjson::Document & input) {
-
+        pop.Evaluate();
         return true;
     }
 
@@ -282,6 +353,13 @@ public:
         return true;
     }
 
+    bool AlmostEqual(const double& a, const double& b, double tolerance = 1e-4){
+        if(std::fabs(a-b) <= tolerance){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
 
 
