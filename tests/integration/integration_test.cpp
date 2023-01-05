@@ -151,6 +151,8 @@ public:
         it = input.FindMember("logR_sd");
         e = (*it).value;
         rec->log_sigma_recruit = e[0].GetDouble();
+        rec->recruit_deviations.resize(nyears);
+        std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
         pop.recruitment = rec;
 
         //set maturity
@@ -199,7 +201,7 @@ public:
                 typename rapidjson::Document::MemberIterator fsel;
                 fsel = it->value.FindMember(strs.str().c_str());
                 rapidjson::Value &ss = (*fsel).value;
-                
+
                 if (ss.MemberCount() == 2) {//logistic
                     std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
                             = std::make_shared<fims::LogisticSelectivity<double> >();
@@ -278,7 +280,7 @@ public:
                 typename rapidjson::Document::MemberIterator fsel;
                 fsel = it->value.FindMember(strs.str().c_str());
                 rapidjson::Value &ss = (*fsel).value;
-                
+
                 if (ss.MemberCount() == 2) {//logistic
                     std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
                             = std::make_shared<fims::LogisticSelectivity<double> >();
@@ -340,7 +342,18 @@ public:
 
     bool RunModelLoop(fims::Population<double>& pop,
             rapidjson::Document & input) {
+
         pop.Evaluate();
+
+        std::cout << "Numbers at age:\n";
+        for (int i = 0; i < pop.nyears; i++) {
+            for (int j = 0; j < pop.nages; j++) {
+                std::cout << pop.numbers_at_age[i * pop.nages + j] << " ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "\n\n" << std::endl;
+
         return true;
     }
 
