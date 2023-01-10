@@ -282,7 +282,7 @@ namespace fims {
         void CalculateUnfishedSpawningBiomass(int index_ya, int year, int age) {
             this->unfished_spawning_biomass[year] +=
                     this->proportion_female * this->unfished_numbers_at_age[index_ya] *
-                    this->proportion_mature_at_age[index_ya] * this->weight_at_age[age];
+                    this->proportion_mature_at_age[index_ya] * this->growth->evaluate(static_cast<double>(age));
         }
 
         /**
@@ -481,6 +481,7 @@ namespace fims {
                             // functional returns) assuming fecundity = 1 and 50:50 sex ratio
                             CalculateRecruitment(index_ya, y);
                             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
+                             this->numbers_at_age[index_ya] = this->recruitment->rzero;
                         } else {
                             int index_ya2 = (y - 1) * nages + (a - 1);
                             CalculateNumbersAA(index_ya, index_ya2, a);

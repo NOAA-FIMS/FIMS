@@ -111,7 +111,7 @@ public:
 
         //initialize population
         pop.Initialize(nyears, 1, nages);
-
+        std::fill(pop.log_naa.begin(), pop.log_naa.end(), std::log(10000));
 
         //set ages vector
         it = input.FindMember("ages");
@@ -216,7 +216,6 @@ public:
                     sel_slope = fsel->value.FindMember("slope.sel");
                     rapidjson::Value &slope = (*sel_slope).value;
                     selectivity->slope = slope[0].GetDouble();
-                    std::cout << selectivity->median << " " << selectivity->slope << "\n";
                     f->selectivity = selectivity;
 
                 } else if (ss.MemberCount() == 4) {//double logistic
@@ -240,7 +239,6 @@ public:
                     sel_slope = fsel->value.FindMember("slope.sel2");
                     rapidjson::Value &slope2 = (*sel_slope).value;
                     selectivity->slope_desc = slope2[0].GetDouble();
-                    std::cout << selectivity->median_asc << " " << selectivity->slope_asc << "\n";
                     f->selectivity = selectivity;
                 }
 
@@ -295,7 +293,6 @@ public:
                     sel_slope = fsel->value.FindMember("slope.sel");
                     rapidjson::Value &slope = (*sel_slope).value;
                     selectivity->slope = slope[0].GetDouble();
-                    std::cout << selectivity->median << " " << selectivity->slope << "\n";
                     s->selectivity = selectivity;
 
                 } else if (ss.MemberCount() == 4) {//double logistic
@@ -319,7 +316,6 @@ public:
                     sel_slope = fsel->value.FindMember("slope.sel2");
                     rapidjson::Value &slope2 = (*sel_slope).value;
                     selectivity->slope_desc = slope2[0].GetDouble();
-                    std::cout << selectivity->median_asc << " " << selectivity->slope_asc << "\n";
                     s->selectivity = selectivity;
                 }
 
