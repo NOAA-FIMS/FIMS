@@ -3,6 +3,8 @@
 #include <iostream>
 #include "../../inst/include/population_dynamics/population/population.hpp"
 #include "third_party/rapidjson/document.h"
+#include "third_party/rapidjson/writer.h"
+#include "third_party/rapidjson/stringbuffer.h"
 
 class IntegrationTest {
 public:
