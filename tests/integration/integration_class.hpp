@@ -331,8 +331,8 @@ public:
 
     bool RunModelLoop(fims::Population<double>& pop,
             rapidjson::Document & input) {
-        StringBuffer buffer;
-        Writer<StringBuffer> writer(buffer);
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 
         rapidjson::Document output;
  
@@ -362,11 +362,9 @@ public:
         std::cout << "\n\n" << std::endl;
 
 
-	StringBuffer strbuf;
-	Writer<StringBuffer> writer(strbuf);
 	output.Accept(writer);
 
-	std::cout << strbuf.GetString() << std::endl;
+	std::cout << buffer.GetString() << std::endl;
 
         return true;
     }
