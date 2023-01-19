@@ -1,6 +1,11 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+
+#ifndef STD_LIB
+#define STD_LIB
+#endif
+
 #include "../../inst/include/population_dynamics/population/population.hpp"
 #include "third_party/rapidjson/document.h"
 #include "third_party/rapidjson/writer.h"
@@ -38,15 +43,12 @@ public:
 
                 fims::Population<double> pop;
 
-
-
-                if (!this->ConfigurePopulationModel(pop, input)) {
+                if(!this->ConfigurePopulationModel(pop, input)) {
                     good = false;
                 }
 
-                if (!this->RunModelLoop(pop, input)) {
-                    good = false;
-                }
+                this->RunModelLoop(pop, input);
+                
                 if (!this->CheckModelOutput(pop, output)) {
                     good = false;
                 }
@@ -329,7 +331,7 @@ public:
         return true;
     }
 
-    bool RunModelLoop(fims::Population<double>& pop,
+    std::vector<double> RunModelLoop(fims::Population<double>& pop,
             rapidjson::Document & input) {
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -366,7 +368,7 @@ public:
 
 	std::cout << buffer.GetString() << std::endl;
 
-        return true;
+        return pop.numbers_at_age;
     }
 
     bool CheckModelOutput(fims::Population<double>& pop,

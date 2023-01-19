@@ -9,11 +9,35 @@ namespace
     {
       
 
-    IntegrationTest t(10, 160);
-    t.Run();
+    IntegrationTest t(1, 1);
+        std::stringstream ss;
+        typename rapidjson::Document::MemberIterator it;
+        int i = 1;
+        int j = 1;
+        bool good = true;
+        ss.str("");
+        ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
+        rapidjson::Document input;
+        rapidjson::Document output;
+        t.ReadJson(ss.str(), input);
+        ss.str("");
+        ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
+        t.ReadJson(ss.str(), output);
+        fims::Population<double> pop;
+        good = t.ConfigurePopulationModel(pop, input);
+        pop.numbers_at_age = t.RunModelLoop(pop, input);
+        good = t.CheckModelOutput(pop, output);
 
-        
-        //EXPECT_EQ(population.numbers_at_age[index_ya], test_numbers_at_age[index_ya]);
+        std::vector<double> test_numbers_at_age;
+        it = output.FindMember("N.age");
+        if (it != input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+            test_numbers_at_age[0]  = e[0].GetDouble();
+            //std::cout << "N.age " << test_numbers_at_age << std::endl;
+        } else {
+            //std::cout << "N.age not found in output\n";
+        }
+        EXPECT_EQ(pop.numbers_at_age[0], test_numbers_at_age[0]);
     }
 
     // TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_forloop_works)
