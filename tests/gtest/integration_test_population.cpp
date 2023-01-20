@@ -8,49 +8,60 @@ namespace
 {
     TEST(Integrated_test_works, run_all)
     {
-      
-    std::ofstream out("debug_integrated.txt");
 
+    //Declare IntegrationTest object
     IntegrationTest t(1, 1);
-        std::stringstream ss;
-        typename rapidjson::Document::MemberIterator it;
-        int i = 1;
-        int j = 1;
-        bool good = true;
-        ss.str("");
-        ss << "../../../tests/integration/inputs/C" << i << "/om_input" << j + 1 << ".json";
-        rapidjson::Document input;
-        rapidjson::Document output;
-        t.ReadJson(ss.str(), input);
-        ss.str("");
+    std::stringstream ss;
+    typename rapidjson::Document::MemberIterator it;
 
-        ss << "../../../tests/integration/inputs/C" << i << "/om_output" << j + 1 << ".json";
+    bool good = true;
 
-        t.ReadJson(ss.str(), output);
+    //Read in input and output json files
+    rapidjson::Document input;
+    rapidjson::Document output;
+    
+    //Read inputs
+    ss.str("");
+    //GoogleTest operates in the folder with executables "build/tests/gtest"
+    //so we have to go up three directories to get into FIMS folder
+    ss << "../../../tests/integration/inputs/C" << 0 << "/om_input" << 1 << ".json";
+    t.ReadJson(ss.str(), input);
+    ss.str("");
+    
+    //Read in outputs
+    ss << "../../../tests/integration/inputs/C" << 0 << "/om_output" << 1 << ".json";
+    t.ReadJson(ss.str(), output);
 
+    //Declare singleton of population class
+    fims::Population<double> pop;
 
-        fims::Population<double> pop;
-        good = t.ConfigurePopulationModel(pop, input);
-        pop.numbers_at_age = t.RunModelLoop(pop, input);
-        good = t.CheckModelOutput(pop, output);
-        std::vector<double> test_numbers_at_age;
-        it = output.FindMember("N.age");
+    //ConfigurePopulationModel, RunModelLoop, and CheckModelOutput 
+    // methods are in integration_class.hpp
+    good = t.ConfigurePopulationModel(pop, input);
+    pop.numbers_at_age = t.RunModelLoop(pop, input);
+    good = t.CheckModelOutput(pop, output);
 
-        if (it != output.MemberEnd()) {
-            rapidjson::Value &e = (*it).value;
-            out << e.IsArray() << std::endl;
-             for (int i = 0; i < e.Size(); i++) {
-                for(int j = 0; j < e[i].Size(); j++){
-                    out << e[i].Size() << std::endl;
-                    out << i << "," << j << std::endl;
-                    test_numbers_at_age[i] = e[i][j].GetDouble();
-                }
-             }
-            //std::cout << "N.age " << test_numbers_at_age << std::endl;
-        } else {
-            //std::cout << "N.age not found in output\n";
+    //declare vector of doubles to hold
+    //dimension folded numbers at age vector
+    //resize to nyears * nages
+    std::vector<double> test_numbers_at_age;
+    test_numbers_at_age.resize(pop.nages*pop.nyears);
+
+    //find the json member called "N.age"
+    it = output.FindMember("N.age");
+
+    if (it != output.MemberEnd()) {
+    rapidjson::Value &e = (*it).value;
+    for (int year = 0; year < e.Size(); year++) {
+        for(int age = 0; age < e[year].Size(); age++){
+            int index_ya = year * pop.nages + age;
+            test_numbers_at_age[index_ya] = e[year][age].GetDouble();    
+            EXPECT_EQ(pop.numbers_at_age[index_ya], test_numbers_at_age[index_ya]);
         }
-        EXPECT_EQ(pop.numbers_at_age[0], test_numbers_at_age[0]);
+    }
+    } else {
+            std::cout << "N.age not found in output\n";
+    }
     }
 
     // TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_forloop_works)
