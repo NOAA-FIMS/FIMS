@@ -12,6 +12,7 @@
 #define DEF_HPP
 #include <fstream>
 #include <vector>
+#include <memory>
 
 std::ofstream FIMS_LOG("fims.log"); /**< Log file */
 
