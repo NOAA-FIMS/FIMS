@@ -1,13 +1,12 @@
 #include "gtest/gtest.h"
 #include "population_dynamics/population/population.hpp"
-#include "../../tests/gtest/test_population_test_fixture.hpp"
 #include "../../tests/integration/integration_class.hpp"
 
 namespace
 {
     TEST(Integrated_test_works, run_all)
     {
-
+    
     //Declare IntegrationTest object
     IntegrationTest t(1, 1);
     std::stringstream ss;
@@ -23,12 +22,12 @@ namespace
     ss.str("");
     //GoogleTest operates in the folder with executables "build/tests/gtest"
     //so we have to go up three directories to get into FIMS folder
-    ss << "../../../tests/integration/inputs/FIMS-deterministic/om_input" << 1 << ".json";
+    ss << "../../../tests/integration/inputs/fims-deterministic/om_input" << 1 << ".json";
     t.ReadJson(ss.str(), input);
     ss.str("");
     
     //Read in outputs
-    ss << "../../../tests/integration/inputs/FIMS-deterministic/om_output" << 1 << ".json";
+    ss << "../../../tests/integration/inputs/fims-deterministic/om_output" << 1 << ".json";
     t.ReadJson(ss.str(), output);
 
     //Declare singleton of population class
@@ -37,9 +36,9 @@ namespace
     //ConfigurePopulationModel, RunModelLoop, and CheckModelOutput 
     // methods are in integration_class.hpp
     good = t.ConfigurePopulationModel(pop, input);
+
     pop.numbers_at_age = t.RunModelLoop(pop, input);
     good = t.CheckModelOutput(pop, output);
-
     //declare vector of doubles to hold
     //dimension folded numbers at age vector
     //resize to nyears * nages
@@ -58,9 +57,7 @@ namespace
             EXPECT_EQ(pop.numbers_at_age[index_ya], test_numbers_at_age[index_ya]);
         }
     }
-    } else {
-            std::cout << "N.age not found in output\n";
-    }
+    } 
     }
 
     // TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_forloop_works)
