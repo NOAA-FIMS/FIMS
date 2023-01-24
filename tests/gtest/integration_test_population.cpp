@@ -24,12 +24,12 @@ namespace
     ss.str("");
     //GoogleTest operates in the folder with executables "build/tests/gtest"
     //so we have to go up three directories to get into FIMS folder
-    ss << "../../../tests/integration/inputs/C" << 0 << "/om_input" << 1 << ".json";
+    ss << "../../../tests/integration/inputs/FIMS-deterministic/om_input" << 1 << ".json";
     t.ReadJson(ss.str(), input);
     ss.str("");
     
     //Read in outputs
-    ss << "../../../tests/integration/inputs/C" << 0 << "/om_output" << 1 << ".json";
+    ss << "../../../tests/integration/inputs/FIMS-deterministic/om_output" << 1 << ".json";
     t.ReadJson(ss.str(), output);
 
     //Declare singleton of population class
