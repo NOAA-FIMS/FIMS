@@ -9,7 +9,7 @@ setup_gtest <- function(){
     #github_dir <- "https://github.com/JaneSullivan-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/raw/spatial-structure/example/FIMS-C0/output/OM/"
     #temporarily use a scenario from the model comparison project that is
     # not deterministic
-    github_dir <- "https://github.com/Bai-Li-NOAA/Model_Comparison_Paper/raw/master/om/C0/"
+    github_dir <- "https://github.com/JaneSullivan-NOAA/Model_Comparison_Paper/raw/FIMS-C0/code/FIMS-C0/output/OM/"
     Rdata_file <- paste0("OM", i_iter, ".RData") # e.g. OM1.Rdata
     # this loads the file directly from github 
     # (which was easier to figure out than downloading the Rdata first)

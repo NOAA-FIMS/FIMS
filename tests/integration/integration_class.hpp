@@ -112,7 +112,13 @@ public:
 
         //initialize population
         pop.Initialize(nyears, 1, nages);
-        std::fill(pop.log_naa.begin(), pop.log_naa.end(), std::log(10000));
+        std::vector<double> naa = {993947.488, 811707.7933, 661434.4148, 537804.7782,
+         436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219, 
+         153328.4354, 124353.2448, 533681.2692};
+         for(int i=0; i < pop.nages; i++) {
+             pop.log_naa[i] = fims::log(naa[i]);
+         }
+        //std::fill(pop.log_naa.begin(), pop.log_naa.end(), std::log(10000));
 
         //set ages vector
         it = input.FindMember("ages");
