@@ -27,7 +27,7 @@ jobs:
       run: remotes::install_local(upgrade = "always")
       shell: Rscript {0}
     - name: setup for gtest
-      run: FIMS::setup_gtest()
+      run: FIMS:::setup_gtest()
       shell: Rscript {0}
      #note: the following configure, build and test steps could instead
      # be run from r using FIMS::setup_and_run_gtest()
