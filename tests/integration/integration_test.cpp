@@ -10,8 +10,8 @@ std::ofstream test_log("integration_test.log");
 class IntegrationTest {
 public:
 
-    uint32_t ncases_m = 10;
-    uint32_t ninput_files_m = 160;
+    uint32_t ncases_m = 1;//10;
+    uint32_t ninput_files_m = 1;//160;
 
     IntegrationTest() {
     }

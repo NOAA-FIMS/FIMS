@@ -268,7 +268,9 @@ namespace fims {
         void CalculateSpawningBiomass(int index_ya, int year, int age) {
             this->spawning_biomass[year] +=
                     this->proportion_female * this->numbers_at_age[index_ya] *
-                    this->proportion_mature_at_age[index_ya] * this->weight_at_age[age];
+                    this->proportion_mature_at_age[index_ya] * growth->evaluate(age);
+                    std::cout<<      this->proportion_female << " " <<
+                    this->proportion_mature_at_age[index_ya]<< " " << growth->evaluate(age) << " spawning biomass inputs----- +++\n";
         }
 
         /**
@@ -296,6 +298,10 @@ namespace fims {
                     this->recruitment->evaluate(this->spawning_biomass[year - 1],
                     this->unfished_spawning_biomass[year - 1]) *
                     this->recruitment->recruit_deviations[year];
+                    std::cout<<      this->spawning_biomass[year - 1] << " " <<
+                    this->unfished_spawning_biomass[year - 1]<<" ----- +++\n";
+//                    std::cout<<      this->recruitment->evaluate(this->spawning_biomass[year - 1],
+//                    this->unfished_spawning_biomass[year - 1])<<" ----- +++\n";
         }
 
         /**
@@ -334,7 +340,7 @@ namespace fims {
 
                 index_ = this->fleets[fleet_]->q[year] *
                         this->fleets[fleet_]->selectivity->evaluate(age) *
-                        this->numbers_at_age[index_ya] * this->weight_at_age[age];
+                        this->numbers_at_age[index_ya] * growth->evaluate(age);//this->weight_at_age[age];
 
                 this->expected_index[index_yf] += index_;
                 fleets[fleet_]->expected_index[index_yf] += index_;
@@ -383,7 +389,7 @@ namespace fims {
                 int index_yaf =
                         year * this->nages * this->nfleets + age * this->nfleets + fleet_;
                 this->catch_weight_at_age[index_yaf] =
-                        this->catch_numbers_at_age[index_yaf] * this->weight_at_age[age];
+                        this->catch_numbers_at_age[index_yaf] * growth->evaluate(age);//this->weight_at_age[age];
             }
         }
 
@@ -465,6 +471,7 @@ namespace fims {
                         // vector.
                         CalculateInitialNumbersAA(index_ya, a);
                         if (a == 0) {
+                            this->numbers_at_age[index_ya] = this->recruitment->rzero;
                             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
                         } else {
                             CalculateUnfishedNumbersAA(index_ya, a - 1, a);
@@ -481,6 +488,7 @@ namespace fims {
                             // functional returns) assuming fecundity = 1 and 50:50 sex ratio
                             CalculateRecruitment(index_ya, y);
                             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
+                            //this->numbers_at_age[index_ya] = this->recruitment->rzero;
                         } else {
                             int index_ya2 = (y - 1) * nages + (a - 1);
                             CalculateNumbersAA(index_ya, index_ya2, a);
