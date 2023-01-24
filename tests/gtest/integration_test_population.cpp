@@ -54,7 +54,8 @@ namespace
         for(int age = 0; age < e[year].Size(); age++){
             int index_ya = year * pop.nages + age;
             test_numbers_at_age[index_ya] = e[year][age].GetDouble();    
-            EXPECT_EQ(pop.numbers_at_age[index_ya], test_numbers_at_age[index_ya]);
+            EXPECT_NEAR(pop.numbers_at_age[index_ya], 
+            test_numbers_at_age[index_ya], .001) << "differ at index " << index_ya;
         }
     }
     } 

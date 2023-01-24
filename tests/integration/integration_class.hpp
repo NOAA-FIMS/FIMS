@@ -112,12 +112,15 @@ public:
 
         //initialize population
         pop.Initialize(nyears, 1, nages);
+
+        //Set initial size to value from MCP
         std::vector<double> naa = {993947.488, 811707.7933, 661434.4148, 537804.7782,
          436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219, 
          153328.4354, 124353.2448, 533681.2692};
          for(int i=0; i < pop.nages; i++) {
-             pop.log_naa[i] = fims::log(naa[i]);
+             pop.log_naa[i] = std::log(naa[i]);
          }
+
         //std::fill(pop.log_naa.begin(), pop.log_naa.end(), std::log(10000));
 
         //set ages vector
@@ -141,8 +144,9 @@ public:
         //set mortality vector
         it = input.FindMember("M");
         e = (*it).value;
-        std::fill(pop.M.begin(), pop.M.end(), e[0].GetDouble());
-
+        double log_M = std::log(e[0].GetDouble());
+        std::fill(pop.log_M.begin(), pop.log_M.end(), log_M);
+        std::cout << "mortality: " << e[0].GetDouble() << std::endl;
 
         //set recruitment
         std::shared_ptr<fims::SRBevertonHolt<double> > rec =
@@ -259,6 +263,7 @@ public:
                     std::cout << f->log_Fmort[i] << " ";
                 }
                 std::cout << "\n";
+
                 pop.fleets.push_back(f);
             }
         } else {
