@@ -138,25 +138,20 @@ namespace fims {
             this->nages = nages;
 
             // size all the vectors to length of nages
-            nfleets = fleets.size();
+            
             ages.resize(nages);
-            catch_numbers_at_age.resize(nyears * nages * nfleets);
             mortality_F.resize(nyears * nages);
             mortality_Z.resize(nyears * nages);
             proportion_mature_at_age.resize((nyears + 1) * nages);
             weight_at_age.resize(nages);
-            catch_weight_at_age.resize(nyears * nages * nfleets);
             unfished_numbers_at_age.resize((nyears + 1) * nages);
             numbers_at_age.resize((nyears + 1) * nages);
-            expected_catch.resize(nyears * nfleets);
-            expected_index.resize(nyears * nfleets);
             biomass.resize((nyears + 1));
             unfished_spawning_biomass.resize((nyears + 1));
             spawning_biomass.resize((nyears + 1));
             log_naa.resize(nages);
             log_M.resize(nyears * nages);
             naa.resize(nages);
-
             M.resize(nyears * nages);
         }
 
@@ -169,6 +164,13 @@ namespace fims {
             std::fill(unfished_spawning_biomass.begin(),
                     unfished_spawning_biomass.end(), 0);
             std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
+
+            
+            nfleets = fleets.size();
+            catch_numbers_at_age.resize(nyears * nages * nfleets);
+            catch_weight_at_age.resize(nyears * nages * nfleets);
+            expected_catch.resize(nyears * nfleets);
+            expected_index.resize(nyears * nfleets);
             std::fill(mortality_F.begin(), mortality_F.end(), 0);
             std::fill(expected_catch.begin(), expected_catch.end(), 0);
 
@@ -214,6 +216,9 @@ namespace fims {
             }
             this->mortality_Z[index_ya] =
                     this->M[index_ya] + this->mortality_F[index_ya];
+            if(verbose){
+                std::cout << "F: " << this->mortality_F[index_ya] << std::endl;
+            }
         }
 
         /**
@@ -266,11 +271,16 @@ namespace fims {
          * @param age the age who's biomass is being added into total spawning biomass
          */
         void CalculateSpawningBiomass(int index_ya, int year, int age) {
+            std::cout << index_ya << " year " << year << " age " << age << 
+             this->numbers_at_age.size() <<  
+            this->proportion_mature_at_age.size() << 
+            " spawning_vector_size " << this->spawning_biomass.size() << std::endl;
+            
             this->spawning_biomass[year] +=
                     this->proportion_female * this->numbers_at_age[index_ya] *
                     this->proportion_mature_at_age[index_ya] * growth->evaluate(age);
                     std::cout<<      this->proportion_female << " " <<
-                    this->proportion_mature_at_age[index_ya]<< " " << growth->evaluate(age) << " spawning biomass inputs----- +++\n";
+                    this->proportion_mature_at_age[index_ya] << " " << growth->evaluate(age) << " spawning biomass inputs----- +++\n";
         }
 
         /**
@@ -337,7 +347,6 @@ namespace fims {
                 int index_yf = year * this->nfleets + fleet_;
                 // I = qN (N is total numbers), I is an index in numbers
                 Type index_;
-
                 index_ = this->fleets[fleet_]->q[year] *
                         this->fleets[fleet_]->selectivity->evaluate(age) *
                         this->numbers_at_age[index_ya] * growth->evaluate(age);//this->weight_at_age[age];
@@ -345,6 +354,7 @@ namespace fims {
                 this->expected_index[index_yf] += index_;
                 fleets[fleet_]->expected_index[index_yf] += index_;
             }
+            std::cout << "nfleets: "<< this->nfleets << std::endl;
         }
 
         /**
@@ -362,6 +372,7 @@ namespace fims {
                         year * this->nages * this->nfleets + age * this->nfleets + fleet_;
                 int index_yf = year * this->nfleets +
                         fleet_; // index by fleet and years to dimension fold
+
                 // make an intermediate value in order to set multiple members (of
                 // current and fleet objects) to that value.
                 Type catch_; // catch_ is used to avoid using the c++ keyword catch
@@ -470,6 +481,7 @@ namespace fims {
                         // Initial numbers at age is a user input or estimated parameter
                         // vector.
                         CalculateInitialNumbersAA(index_ya, a);
+                        
                         if (a == 0) {
                             this->numbers_at_age[index_ya] = this->recruitment->rzero;
                             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
@@ -480,7 +492,9 @@ namespace fims {
                          Fished and unfished spawning biomass vectors are summing biomass at
                          age across ages to allow calculation of recruitment in the next year.
                          */
+                        
                         CalculateSpawningBiomass(index_ya, y, a);
+            
                         CalculateUnfishedSpawningBiomass(index_ya, y, a);
                     } else {
                         if (a == 0) {
@@ -505,6 +519,7 @@ namespace fims {
                     terminal year.
                      */
                     if (y < this->nyears) {
+                        
                         CalculateCatchNumbersAA(index_ya, y, a);
                         CalculateCatchWeightAA(y, a);
                         CalculateCatch(y, a);

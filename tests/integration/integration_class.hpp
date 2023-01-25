@@ -338,6 +338,7 @@ public:
         } else {
             std::cout << "survey_num not found in input\n";
         }
+        pop.nfleets = pop.fleets.size();
 
         return true;
     }
