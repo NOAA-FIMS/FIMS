@@ -16,6 +16,7 @@ public:
 
     uint32_t ncases_m = 10;
     uint32_t ninput_files_m = 160;
+    bool print_statements = false;
 
     IntegrationTest() {
     }
@@ -75,8 +76,10 @@ public:
             std::getline(infile, line);
             ss << line << "\n";
         }
+          if(print_statements) {
         std::cout << path << "\n";
         std::cout << ss.str() << "\n";
+          }
         json_.Parse(ss.str().c_str());
 
         return true;
@@ -95,9 +98,13 @@ public:
         if (it != input.MemberEnd()) {
             rapidjson::Value &e = (*it).value;
             nyears = e[0].GetInt();
+            if(print_statements) {
             std::cout << "nyr " << nyears << std::endl;
+            }
         } else {
+              if(print_statements) {
             std::cout << "nyr not found in input\n";
+              }
         }
 
         //get number of ages
@@ -105,90 +112,16 @@ public:
         if (it != input.MemberEnd()) {
             rapidjson::Value &e = (*it).value;
             nages = e[0].GetInt();
+            if(print_statements) {
             std::cout << "nages " << nages << std::endl;
-        } else {
-            std::cout << "nages not found in input\n";
-        }
-
-        //initialize population
-        pop.Initialize(nyears, 1, nages);
-
-        //Set initial size to value from MCP
-        std::vector<double> naa = {993947.488, 811707.7933, 661434.4148, 537804.7782,
-         436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219, 
-         153328.4354, 124353.2448, 533681.2692};
-         for(int i=0; i < pop.nages; i++) {
-             pop.log_naa[i] = std::log(naa[i]);
-         }
-
-        //std::fill(pop.log_naa.begin(), pop.log_naa.end(), std::log(10000));
-
-        //set ages vector
-        it = input.FindMember("ages");
-        rapidjson::Value &e = (*it).value;
-        if (it != input.MemberEnd()) {
-            rapidjson::Value &e = (*it).value;
-            std::cout << "ages ";
-            for (int i = 0; i < e.Size(); i++) {
-                pop.ages[i] = e[i].GetDouble();
-                std::cout << pop.ages[i] << " ";
             }
-            std::cout << std::endl;
-
-
         } else {
-            std::cout << "ages not found in input\n";
+              if(print_statements) {
+            std::cout << "nages not found in input\n";
+              }
         }
 
-
-        //set mortality vector
-        it = input.FindMember("M");
-        e = (*it).value;
-        double log_M = std::log(e[0].GetDouble());
-        std::fill(pop.log_M.begin(), pop.log_M.end(), log_M);
-        std::cout << "mortality: " << e[0].GetDouble() << std::endl;
-
-        //set recruitment
-        std::shared_ptr<fims::SRBevertonHolt<double> > rec =
-                std::make_shared<fims::SRBevertonHolt<double> >();
-        it = input.FindMember("R0");
-        e = (*it).value;
-        rec->rzero = e[0].GetDouble();
-
-        it = input.FindMember("h");
-        e = (*it).value;
-        rec->steep = e[0].GetDouble();
-
-        it = input.FindMember("logR_sd");
-        e = (*it).value;
-        rec->log_sigma_recruit = e[0].GetDouble();
-        rec->recruit_deviations.resize(nyears);
-        std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
-        pop.recruitment = rec;
-
-        //set maturity
-        std::shared_ptr<fims::LogisticMaturity<double > > mat =
-                std::make_shared<fims::LogisticMaturity<double> >();
-        it = input.FindMember("A50.mat");
-        e = (*it).value;
-        mat->median = e[0].GetDouble();
-
-        it = input.FindMember("slope.mat");
-        e = (*it).value;
-        mat->slope = e[0].GetDouble();
-        pop.maturity = mat;
-
-        //set empirical growth
-        std::shared_ptr<fims::EWAAgrowth<double> > growth
-                = std::make_shared<fims::EWAAgrowth<double> > ();
-        it = input.FindMember("W.kg");
-        e = (*it).value;
-        for (int i = 0; i < e.Size(); i++) {
-            growth->ewaa[static_cast<double> (pop.ages[i])] = e[i].GetDouble();
-        }
-        pop.growth = growth;
-
-
+        
         //get number of fleets
         it = input.FindMember("fleet_num");
         if (it != input.MemberEnd()) {
@@ -197,7 +130,9 @@ public:
             bool parse_alternate_name = false;
 
             //instantiate fleets
+              if(print_statements) {
             std::cout << "nfleets " << nfleets << std::endl;
+              }
             for (int i = 0; i < nfleets; i++) {
                 std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
                 f->Initialize(nyears, nages);
@@ -254,20 +189,30 @@ public:
                 }
 
                 //set fleet fishing mortality
+                  if(print_statements) {
                 std::cout << "f ";
+                  }
                 it = input.FindMember("f");
                 for (int i = 0; i < it->value.Size(); i++) {
                     rapidjson::Value &e = (*it).value;
                     f->Fmort[i] = e[i].GetDouble();
                     f->log_Fmort[i] = std::log(e[i].GetDouble());
+                    std::fill(f->log_q.begin(),
+                     f->log_q.end(), 0.0);
+                       if(print_statements) {
                     std::cout << f->log_Fmort[i] << " ";
+                       }
                 }
+                  if(print_statements) {
                 std::cout << "\n";
+                  }
 
                 pop.fleets.push_back(f);
             }
         } else {
+              if(print_statements) {
             std::cout << "fleet_num not found in input\n";
+              }
         }
 
         //get number of surveys
@@ -331,14 +276,129 @@ public:
                     s->selectivity = selectivity;
                 }
 
-
+                std::fill(s->log_q.begin(), s->log_q.end(), 3.4613e-07);
                 pop.fleets.push_back(s);
             }
+              if(print_statements) {
             std::cout << "survey_num " << nfleets << std::endl;
+              }
         } else {
+              if(print_statements) {
             std::cout << "survey_num not found in input\n";
+              }
         }
         pop.nfleets = pop.fleets.size();
+
+                //initialize population
+        pop.Initialize(nyears, 1, nages);
+
+        //Set initial size to value from MCP
+        std::vector<double> naa = {993947.488, 811707.7933, 661434.4148, 537804.7782,
+         436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219, 
+         153328.4354, 124353.2448, 533681.2692};
+         for(int i=0; i < pop.nages; i++) {
+             pop.log_naa[i] = std::log(naa[i]);
+         }
+
+        //std::fill(pop.log_naa.begin(), pop.log_naa.end(), std::log(10000));
+
+        //set ages vector
+        it = input.FindMember("ages");
+        rapidjson::Value &e = (*it).value;
+        if (it != input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+              if(print_statements) {
+            std::cout << "ages ";
+              }
+            for (int i = 0; i < e.Size(); i++) {
+                pop.ages[i] = e[i].GetDouble();
+                  if(print_statements) {
+                std::cout << pop.ages[i] << " ";
+                 }
+            }
+              if(print_statements) {
+            std::cout << std::endl;
+              }
+
+
+        } else {
+              if(print_statements) {
+            std::cout << "ages not found in input\n";
+              }
+        }
+
+        //set ages vector
+        it = input.FindMember("yrs");
+        e = (*it).value;
+        if (it != input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+              if(print_statements) {
+            std::cout << "yrs ";
+              }
+            for (int i = 0; i < e.Size(); i++) {
+                pop.years[i] = e[i].GetDouble();
+                  if(print_statements) {
+                std::cout << pop.years[i] << " ";
+                  }
+            }
+              if(print_statements) {
+            std::cout << std::endl;
+              }
+
+        } else {
+              if(print_statements) {
+            std::cout << "yrs not found in input\n";
+              }
+        }
+
+
+        //set mortality vector
+        it = input.FindMember("M");
+        e = (*it).value;
+        double log_M = std::log(e[0].GetDouble());
+        std::fill(pop.log_M.begin(), pop.log_M.end(), log_M);
+          if(print_statements) {
+        std::cout << "mortality: " << e[0].GetDouble() << std::endl;
+          }
+        //set recruitment
+        std::shared_ptr<fims::SRBevertonHolt<double> > rec =
+                std::make_shared<fims::SRBevertonHolt<double> >();
+        it = input.FindMember("R0");
+        e = (*it).value;
+        rec->rzero = e[0].GetDouble();
+
+        it = input.FindMember("h");
+        e = (*it).value;
+        rec->steep = e[0].GetDouble();
+
+        it = input.FindMember("logR_sd");
+        e = (*it).value;
+        rec->log_sigma_recruit = e[0].GetDouble();
+        rec->recruit_deviations.resize(nyears);
+        std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
+        pop.recruitment = rec;
+
+        //set maturity
+        std::shared_ptr<fims::LogisticMaturity<double > > mat =
+                std::make_shared<fims::LogisticMaturity<double> >();
+        it = input.FindMember("A50.mat");
+        e = (*it).value;
+        mat->median = e[0].GetDouble();
+
+        it = input.FindMember("slope.mat");
+        e = (*it).value;
+        mat->slope = e[0].GetDouble();
+        pop.maturity = mat;
+
+        //set empirical growth
+        std::shared_ptr<fims::EWAAgrowth<double> > growth
+                = std::make_shared<fims::EWAAgrowth<double> > ();
+        it = input.FindMember("W.kg");
+        e = (*it).value;
+        for (int i = 0; i < e.Size(); i++) {
+            growth->ewaa[static_cast<double> (pop.ages[i])] = e[i].GetDouble();
+        }
+        pop.growth = growth;
 
         return true;
     }
@@ -364,22 +424,28 @@ public:
     //object.AddMember("NumbersAtAge", "50", allocator);
 
         pop.Evaluate();
-
+  if(print_statements) {
         std::cout << "Numbers at age:\n";
+  }
         for (int i = 0; i < pop.nyears; i++) {
             for (int j = 0; j < pop.nages; j++) {
+                  if(print_statements) {
                 std::cout << pop.numbers_at_age[i * pop.nages + j] << " ";
+                  }
                 array.PushBack(pop.numbers_at_age[i * pop.nages + j], allocator);
             }
+              if(print_statements) {
             std::cout << std::endl;
+              }
         }
+          if(print_statements) {
         std::cout << "\n\n" << std::endl;
-
+          }
 
 	output.Accept(writer);
-
+  if(print_statements) {
 	std::cout << buffer.GetString() << std::endl;
-
+  }
         return pop.numbers_at_age;
     }
 
