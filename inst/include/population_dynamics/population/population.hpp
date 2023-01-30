@@ -166,6 +166,7 @@ namespace fims {
          *
          */
         void Prepare() {
+            this->nfleets = this->fleets.size();
             std::fill(unfished_spawning_biomass.begin(),
                     unfished_spawning_biomass.end(), 0);
             std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
@@ -268,7 +269,7 @@ namespace fims {
         void CalculateSpawningBiomass(int index_ya, int year, int age) {
             this->spawning_biomass[year] +=
                     this->proportion_female * this->numbers_at_age[index_ya] *
-                    this->proportion_mature_at_age[index_ya] * growth->evaluate(age);
+                    this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
                     std::cout<<      this->proportion_female << " " <<
                     this->proportion_mature_at_age[index_ya]<< " " << growth->evaluate(age) << " spawning biomass inputs----- +++\n";
         }
@@ -370,7 +371,7 @@ namespace fims {
                         this->fleets[fleet_]->selectivity->evaluate(age)) /
                         this->mortality_Z[index_ya] * this->numbers_at_age[index_ya] *
                         (1 - exp(-(this->mortality_Z[index_ya])));
-                this->catch_numbers_at_age[index_yaf] += catch_;
+               // this->catch_numbers_at_age[index_yaf] += catch_;
                 // catch_numbers_at_age for the fleet module has different
                 // dimensions (year/age, not year/fleet/age)
                 fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
@@ -388,8 +389,8 @@ namespace fims {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
                 int index_yaf =
                         year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-                this->catch_weight_at_age[index_yaf] =
-                        this->catch_numbers_at_age[index_yaf] * growth->evaluate(age);//this->weight_at_age[age];
+                //this->catch_weight_at_age[index_yaf] =
+                  //      this->catch_numbers_at_age[index_yaf] * growth->evaluate(age);//this->weight_at_age[age];
             }
         }
 
@@ -403,7 +404,7 @@ namespace fims {
         void CalculateMaturityAA(int index_ya, int age) {
             // this->maturity is pointing to the maturity module, which has
             //  an evaluate function. -> can be nested.
-            this->proportion_mature_at_age[index_ya] = this->maturity->evaluate(age);
+            this->proportion_mature_at_age[index_ya] = this->maturity->evaluate(ages[age]);
         }
 
         /**

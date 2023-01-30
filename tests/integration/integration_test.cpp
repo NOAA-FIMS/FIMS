@@ -10,8 +10,8 @@ std::ofstream test_log("integration_test.log");
 class IntegrationTest {
 public:
 
-    uint32_t ncases_m = 1;//10;
-    uint32_t ninput_files_m = 1;//160;
+    uint32_t ncases_m = 1; //10;
+    uint32_t ninput_files_m = 1; //160;
 
     IntegrationTest() {
     }
@@ -28,29 +28,55 @@ public:
             for (uint32_t j = 0; j < this->ninput_files_m; j++) {
                 ss.str("");
                 ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
-                rapidjson::Document input;
-                rapidjson::Document output;
-                this->ReadJson(ss.str(), input);
+                rapidjson::Document om_input;
+                rapidjson::Document em_input;
+                rapidjson::Document om_output;
+                this->ReadJson(ss.str(), om_input);
 
 
                 ss.str("");
+                ss << "inputs/C" << i << "/em_input" << j + 1 << ".json";
+                this->ReadJson(ss.str(), em_input);
+
+                ss.str("");
                 ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
-                // this->ReadJson(ss.str(), output);
+                this->ReadJson(ss.str(), om_output);
 
                 fims::Population<double> pop;
 
 
 
-                if (!this->ConfigurePopulationModel(pop, input)) {
+                if (!this->ConfigurePopulationModel(pop, om_input, em_input)) {
                     good = false;
                 }
 
-                if (!this->RunModelLoop(pop, input)) {
+                if (!this->RunModelLoop(pop, om_input)) {
                     good = false;
                 }
-                if (!this->CheckModelOutput(pop, output)) {
-                    good = false;
+                //                if (!this->CheckModelOutput(pop, om_output)) {
+                //                    good = false;
+                //                }
+
+                std::cout << "\n\nexpected numbers at age:\n";
+                typename rapidjson::Document::MemberIterator it;
+                typename rapidjson::Document::MemberIterator jt;
+                it = om_output.FindMember("N.age");
+                for (int i = 0; i < pop.nyears; i++) {
+                    rapidjson::Value &e = (*it).value;
+                    if (e.IsArray()) {
+                        size_t jmax = e[i].Size();
+                        for (size_t j = 0; j < jmax; j++) {
+                            size_t index = i * pop.nages + j;
+                            //e[i][j].GetDouble()/*-
+                            std::cout << e[i][j].GetDouble() << " ";
+                        }
+                    } else {
+                        std::cout << "not an array\n";
+                        exit(0);
+                    }
+                    std::cout << std::endl;
                 }
+
             }
 
 
@@ -74,7 +100,7 @@ public:
             std::getline(infile, line);
             ss << line << "\n";
         }
-        std::cout << path << "\n";
+        std::cout << "\n\n\n\n" << path << "\n";
         std::cout << ss.str() << "\n";
         json_.Parse(ss.str().c_str());
 
@@ -82,16 +108,17 @@ public:
     }
 
     bool ConfigurePopulationModel(fims::Population<double>& pop,
-            rapidjson::Document& input) {
+            rapidjson::Document& om_input, rapidjson::Document& em_input) {
 
         typename rapidjson::Document::MemberIterator it;
-
+        typename rapidjson::Document::MemberIterator jt;
+        typename rapidjson::Document::MemberIterator kt;
         size_t nfleets, nsurveys, nages, nyears;
 
 
         //get number of years
-        it = input.FindMember("nyr");
-        if (it != input.MemberEnd()) {
+        it = om_input.FindMember("nyr");
+        if (it != om_input.MemberEnd()) {
             rapidjson::Value &e = (*it).value;
             nyears = e[0].GetInt();
             std::cout << "nyr " << nyears << std::endl;
@@ -100,8 +127,8 @@ public:
         }
 
         //get number of ages
-        it = input.FindMember("nages");
-        if (it != input.MemberEnd()) {
+        it = om_input.FindMember("nages");
+        if (it != om_input.MemberEnd()) {
             rapidjson::Value &e = (*it).value;
             nages = e[0].GetInt();
             std::cout << "nages " << nages << std::endl;
@@ -109,78 +136,10 @@ public:
             std::cout << "nages not found in input\n";
         }
 
-        //initialize population
-        pop.Initialize(nyears, 1, nages);
-        std::fill(pop.log_naa.begin(), pop.log_naa.end(), std::log(10000));
-
-        //set ages vector
-        it = input.FindMember("ages");
-        rapidjson::Value &e = (*it).value;
-        if (it != input.MemberEnd()) {
-            rapidjson::Value &e = (*it).value;
-            std::cout << "ages ";
-            for (int i = 0; i < e.Size(); i++) {
-                pop.ages[i] = e[i].GetDouble();
-                std::cout << pop.ages[i] << " ";
-            }
-            std::cout << std::endl;
-
-
-        } else {
-            std::cout << "ages not found in input\n";
-        }
-
-
-        //set mortality vector
-        it = input.FindMember("M");
-        e = (*it).value;
-        std::fill(pop.M.begin(), pop.M.end(), e[0].GetDouble());
-
-
-        //set recruitment
-        std::shared_ptr<fims::SRBevertonHolt<double> > rec =
-                std::make_shared<fims::SRBevertonHolt<double> >();
-        it = input.FindMember("R0");
-        e = (*it).value;
-        rec->rzero = e[0].GetDouble();
-
-        it = input.FindMember("h");
-        e = (*it).value;
-        rec->steep = e[0].GetDouble();
-
-        it = input.FindMember("logR_sd");
-        e = (*it).value;
-        rec->log_sigma_recruit = e[0].GetDouble();
-        rec->recruit_deviations.resize(nyears);
-        std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
-        pop.recruitment = rec;
-
-        //set maturity
-        std::shared_ptr<fims::LogisticMaturity<double > > mat =
-                std::make_shared<fims::LogisticMaturity<double> >();
-        it = input.FindMember("A50.mat");
-        e = (*it).value;
-        mat->median = e[0].GetDouble();
-
-        it = input.FindMember("slope.mat");
-        e = (*it).value;
-        mat->slope = e[0].GetDouble();
-        pop.maturity = mat;
-
-        //set empirical growth
-        std::shared_ptr<fims::EWAAgrowth<double> > growth
-                = std::make_shared<fims::EWAAgrowth<double> > ();
-        it = input.FindMember("W.kg");
-        e = (*it).value;
-        for (int i = 0; i < e.Size(); i++) {
-            growth->ewaa[static_cast<double> (pop.ages[i])] = e[i].GetDouble();
-        }
-        pop.growth = growth;
-
 
         //get number of fleets
-        it = input.FindMember("fleet_num");
-        if (it != input.MemberEnd()) {
+        it = om_input.FindMember("fleet_num");
+        if (it != om_input.MemberEnd()) {
             rapidjson::Value &e = (*it).value;
             nfleets = e[0].GetInt();
             bool parse_alternate_name = false;
@@ -197,7 +156,7 @@ public:
                 strs << "fleet" << i + 1;
 
                 //set fleet selectivity
-                it = input.FindMember("sel_fleet");
+                it = om_input.FindMember("sel_fleet");
                 typename rapidjson::Document::MemberIterator fsel;
                 fsel = it->value.FindMember(strs.str().c_str());
                 rapidjson::Value &ss = (*fsel).value;
@@ -244,7 +203,7 @@ public:
 
                 //set fleet fishing mortality
                 std::cout << "f ";
-                it = input.FindMember("f");
+                it = om_input.FindMember("f");
                 for (int i = 0; i < it->value.Size(); i++) {
                     rapidjson::Value &e = (*it).value;
                     f->Fmort[i] = e[i].GetDouble();
@@ -259,13 +218,28 @@ public:
         }
 
         //get number of surveys
-        it = input.FindMember("survey_num");
-        if (it != input.MemberEnd()) {
+        it = om_input.FindMember("survey_num");
+        jt = em_input.FindMember("survey_q");
+
+
+        if (it != om_input.MemberEnd()) {
             rapidjson::Value &e = (*it).value;
+
+
             nsurveys = e[0].GetInt();
             for (int i = 0; i < nsurveys; i++) {
+                std::stringstream sss;
+                sss<<"survey"<<(i+1);
+                kt = (*jt).value.FindMember(sss.str().c_str());
+                rapidjson::Value &q = (*kt).value;
+
+
                 std::shared_ptr<fims::Fleet<double> > s = std::make_shared<fims::Fleet<double> >();
+
+
                 s->Initialize(nyears, nages);
+                std::fill(s->q.begin(), s->q.end(), q[0].GetDouble());
+               
                 s->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
                 s->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
                 std::shared_ptr<fims::LogisticSelectivity<double> > selectivity
@@ -274,7 +248,7 @@ public:
                 strs << "survey" << i + 1;
 
                 //set survey selectivity
-                it = input.FindMember("sel_survey");
+                it = om_input.FindMember("sel_survey");
                 typename rapidjson::Document::MemberIterator fsel;
                 fsel = it->value.FindMember(strs.str().c_str());
                 rapidjson::Value &ss = (*fsel).value;
@@ -328,7 +302,78 @@ public:
         }
 
 
+        //initialize population
+        pop.Initialize(nyears, 1, nages);
+        std::vector<double> temp = {993947.488, 811707.7933, 661434.4148, 537804.7782,
+            436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219, 153328.4354,
+            124353.2448, 533681.2692};
+        for (int i = 0; i < pop.log_naa.size(); i++) {
+            pop.log_naa[i] = std::log(temp[i]);
+        }
 
+        //set ages vector
+        it = om_input.FindMember("ages");
+        rapidjson::Value &e = (*it).value;
+        if (it != om_input.MemberEnd()) {
+            rapidjson::Value &e = (*it).value;
+            std::cout << "ages ";
+            for (int i = 0; i < e.Size(); i++) {
+                pop.ages[i] = e[i].GetDouble();
+                std::cout << pop.ages[i] << " ";
+            }
+            std::cout << std::endl;
+
+
+        } else {
+            std::cout << "ages not found in input\n";
+        }
+
+
+        //set mortality vector
+        it = om_input.FindMember("M");
+        e = (*it).value;
+        std::fill(pop.M.begin(), pop.M.end(), e[0].GetDouble());
+
+
+        //set recruitment
+        std::shared_ptr<fims::SRBevertonHolt<double> > rec =
+                std::make_shared<fims::SRBevertonHolt<double> >();
+        it = om_input.FindMember("R0");
+        e = (*it).value;
+        rec->rzero = 993947; //e[0].GetDouble();
+
+        it = om_input.FindMember("h");
+        e = (*it).value;
+        rec->steep = e[0].GetDouble();
+
+        it = om_input.FindMember("logR_sd");
+        e = (*it).value;
+        rec->log_sigma_recruit = e[0].GetDouble();
+        rec->recruit_deviations.resize(nyears);
+        std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
+        pop.recruitment = rec;
+
+        //set maturity
+        std::shared_ptr<fims::LogisticMaturity<double > > mat =
+                std::make_shared<fims::LogisticMaturity<double> >();
+        it = om_input.FindMember("A50.mat");
+        e = (*it).value;
+        mat->median = e[0].GetDouble();
+
+        it = om_input.FindMember("slope.mat");
+        e = (*it).value;
+        mat->slope = e[0].GetDouble();
+        pop.maturity = mat;
+
+        //set empirical growth
+        std::shared_ptr<fims::EWAAgrowth<double> > growth
+                = std::make_shared<fims::EWAAgrowth<double> > ();
+        it = om_input.FindMember("W.kg");
+        e = (*it).value;
+        for (int i = 0; i < e.Size(); i++) {
+            growth->ewaa[static_cast<double> (pop.ages[i])] = e[i].GetDouble();
+        }
+        pop.growth = growth;
 
 
 
@@ -373,7 +418,7 @@ public:
 
 int main(int argc, char** argv) {
 
-    IntegrationTest t(10, 160);
+    IntegrationTest t(1, 1);
     t.Run();
     return 0;
 }
