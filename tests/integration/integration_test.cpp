@@ -340,7 +340,7 @@ public:
                 std::make_shared<fims::SRBevertonHolt<double> >();
         it = om_input.FindMember("R0");
         e = (*it).value;
-        rec->rzero = 993947; //e[0].GetDouble();
+        rec->rzero = e[0].GetDouble();
 
         it = om_input.FindMember("h");
         e = (*it).value;
