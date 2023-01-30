@@ -213,7 +213,7 @@ namespace fims {
                 this->mortality_F[index_ya] +=
                         this->fleets[fleet_]->Fmort[year] *
                         this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-                         std::cout << " sel " << this->fleets[fleet_]->selectivity->evaluate(ages[age]) << 
+                        FIMS_LOG << " sel " << this->fleets[fleet_]->selectivity->evaluate(ages[age]) << 
                           " F " << this->fleets[fleet_]->Fmort[year] << std::endl;
             }
             this->mortality_Z[index_ya] =
@@ -270,15 +270,11 @@ namespace fims {
          * @param age the age who's biomass is being added into total spawning biomass
          */
         void CalculateSpawningBiomass(int index_ya, int year, int age) {
-            std::cout << index_ya << " year " << year << " age " << ages[age] << 
-            " spawning_vector_size " << this->spawning_biomass.size() << std::endl;
-            
+
             this->spawning_biomass[year] +=
                     this->proportion_female * this->numbers_at_age[index_ya] *
                     this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
-                    std::cout<<      this->proportion_female << " " <<
-                    this->proportion_mature_at_age[index_ya] << " " << growth->evaluate(ages[age]) << " spawning biomass inputs----- +++\n";
-        }
+      }
 
         /**
          * @brief Adds to existing yearly unfished spawning biomass estimates the
@@ -305,9 +301,10 @@ namespace fims {
                     this->recruitment->evaluate(this->spawning_biomass[year - 1],
                     this->unfished_spawning_biomass[year - 1]) *
                     this->recruitment->recruit_deviations[year];
-                    std::cout<<      this->spawning_biomass[year - 1] << " " <<
+
+                    FIMS_LOG <<      this->spawning_biomass[year - 1] << " " <<
                     this->unfished_spawning_biomass[year - 1]<<" ----- +++\n" << std::endl;
-                    std::cout<<      this->recruitment->evaluate(this->spawning_biomass[year - 1],
+                    FIMS_LOG <<      this->recruitment->evaluate(this->spawning_biomass[year - 1],
                     this->unfished_spawning_biomass[year - 1])<<" ----- +++\n" << std::endl;
         }
 
@@ -347,11 +344,11 @@ namespace fims {
                 index_ = this->fleets[fleet_]->q[year] *
                         this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
                         this->numbers_at_age[index_ya] * growth->evaluate(ages[age]);//this->weight_at_age[age];
-                std::cout << " q: " << this->fleets[fleet_]->q[year] << std::endl;
+                FIMS_LOG << " q: " << this->fleets[fleet_]->q[year] << std::endl;
                 this->expected_index[index_yf] += index_;
                 fleets[fleet_]->expected_index[index_yf] += index_;
             }
-            std::cout << "nfleets: "<< this->nfleets << std::endl;
+            FIMS_LOG << "nfleets: "<< this->nfleets << std::endl;
         }
 
         /**
@@ -480,7 +477,7 @@ namespace fims {
                         CalculateInitialNumbersAA(index_ya, a);
                         
                         if (a == 0) {
-                            this->numbers_at_age[index_ya] = this->recruitment->rzero;
+                            //this->numbers_at_age[index_ya] = this->recruitment->rzero;
                             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
                         } else {
                             CalculateUnfishedNumbersAA(index_ya, a - 1, a);
@@ -497,6 +494,7 @@ namespace fims {
                         if (a == 0) {
                             // Set the nrecruits for age a=0 year y (use pointers instead of
                             // functional returns) assuming fecundity = 1 and 50:50 sex ratio
+                            FIMS_LOG << "Recruitment: " << std::endl;
                             CalculateRecruitment(index_ya, y);
                             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
                             //this->numbers_at_age[index_ya] = this->recruitment->rzero;
@@ -507,11 +505,11 @@ namespace fims {
                         }
                         CalculateSpawningBiomass(index_ya, y, a);
                         
-                        std::cout << index_ya << std::endl;
+                        FIMS_LOG << index_ya << std::endl;
                         CalculateUnfishedSpawningBiomass(index_ya, y, a);
 
                         
-                        std::cout << index_ya << std::endl;
+                        FIMS_LOG << index_ya << std::endl;
                     }
 
                     /*
@@ -521,10 +519,10 @@ namespace fims {
                     terminal year.
                      */
                     if (y < this->nyears) {
-                        std::cout << index_ya << std::endl;
+                        FIMS_LOG << index_ya << std::endl;
                         CalculateCatchNumbersAA(index_ya, y, a);
 
-                        std::cout << index_ya << std::endl;
+                        FIMS_LOG << index_ya << std::endl;
                         CalculateCatchWeightAA(y, a);
                         CalculateCatch(y, a);
                         CalculateIndex(index_ya, y, a);
