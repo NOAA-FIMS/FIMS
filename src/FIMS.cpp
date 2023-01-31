@@ -16,11 +16,19 @@ Type objective_function<Type>::operator()() {
 
     PARAMETER_VECTOR(p);
 
-    fims::Population<Type> population;
-    population.Evaluate();
-    
+    // code below copied from ModularTMBExample/src/tmb_objective_function.cpp
 
-    Type nll = 0;
+    // get the singleton instance for type Type
+    std::shared_ptr<fims::Model> model =
+    fims::Model<Type>::GetInstance();
+
+    //update the parameter values for type Type
+    for(int i =0; i < model->parameters.size(); i++){
+        *model->parameters[i] = p[i];
+    }
+    
+    //evaluate the model objective function value
+    Type nll = model->evaluate();
 
     return nll;
 
