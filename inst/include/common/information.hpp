@@ -1,4 +1,4 @@
- /*! \file information.hpp
+/*! \file information.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the
@@ -164,7 +164,7 @@ class Information {
       // Initialize fleet object
       std::shared_ptr<fims::Fleet<T> > f = (*it).second;
 
-                f -> Initialize(nyears, nages);
+      f->Initialize(nyears, nages);
 
       // set index data
       if (f->observed_index_data_id != -999) {
@@ -339,12 +339,33 @@ class Information {
               // log error
             }
 
-                } else {
-                    valid_model = false;
-                    //log error
-                }
+          } else {
+            valid_model = false;
+            // log error
+          }
 
+          // set agecomp likelihood
+          if (f->agecomp_likelihood_id != -999) {
+            uint32_t ac_like_id = static_cast<uint32_t>(
+                f->agecomp_likelihood_id);  // cast as unsigned integer
+            distribution_models_iterator it = this->distribution_models.find(
+                ac_like_id);  // if find, set it, otherwise invalid
+
+            if (it != this->distribution_models.end()) {
+              f->agecomp_likelihood =
+                  (*it).second;  // elements in container held in pair (first is
+                                 // id, second is object - shared pointer to
+                                 // distribution)
+            } else {
+              valid_model = false;
+              // log error
             }
+
+          } else {
+            valid_model = false;
+            // log error
+          }
+        }
 
         std::cout << "Information: Initializing population objects.\n";
         for (population_iterator it = this->populations.begin();
@@ -368,12 +389,34 @@ class Information {
               valid_model = false;
               // log error
             }
-            return valid_model;
-        }
 
-        size_t GetNages() const {
-            return nages;
-        }
+          } else {
+            valid_model = false;
+            // log error
+          }
+          // set growth
+          if (p->growth_id != -999) {
+            uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
+            growth_models_iterator it = this->growth_models.find(
+                growth_uint);  // growth_models is specified in information.hpp
+                               // and used in rcpp
+            p->ages =
+                this->ages;  // check me re dims. ages defined as an std::vector
+                             // at the head of information.hpp; are the
+                             // dimensions of ages defined in rcpp or where?
+            if (it != this->growth_models.end()) {
+              p->growth =
+                  (*it).second;  // growth defined in population.hpp (the object
+                                 // is called p, growth is within p)
+            } else {
+              valid_model = false;
+              // log error
+            }
+
+          } else {
+            valid_model = false;
+            // log error
+          }
 
           // set maturity
           if (p->maturity_id != -999) {
