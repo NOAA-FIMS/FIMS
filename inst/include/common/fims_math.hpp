@@ -94,6 +94,36 @@ inline const T logistic(const T &median, const T &slope, const T &x) {
 }
 
 /**
+ * @brief A logit function for bounding of parameters
+ *
+ * \f$ -\mathrm{log}(b-x) + \mathrm{log}(x-a) \f$
+ * @param a lower bound
+ * @param b upper bound
+ * @param x the parameter in bounded space
+ * @return the parameter in real space
+ *
+ */
+template <class T>
+inline const T logit(const T &a, const T &b, const T &x) {
+  return -fims::log(b - x) + fims::log(x - a);
+}
+
+/**
+ * @brief An inverse logit function for bounding of parameters
+ *
+ * \f$ a+\frac{b-a}{1+\mathrm{exp}(-\mathrm{logit}(x))}\f$
+ * @param a lower bound
+ * @param b upper bound
+ * @param logit_x the parameter in real space
+ * @return the parameter in bounded space
+ *
+ */
+template <class T>
+inline const T inv_logit(const T &a, const T &b, const T &logit_x) {
+  return a + (b - a) / (1 + fims::exp(-logit_x));
+}
+
+/**
  * @brief The general double logistic function
  *
  * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - median_{asc}))}

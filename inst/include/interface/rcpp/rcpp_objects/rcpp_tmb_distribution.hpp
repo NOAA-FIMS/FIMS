@@ -55,7 +55,7 @@ std::map<uint32_t,
 /**
  * @brief Rcpp interface for Dnorm as an S4 object. To instantiate
  * from R:
- * dnorm_ <- new(fims$TMBDlnormDistribution)
+ * dnorm_ <- new(fims$TMBDnormDistribution)
  *
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
@@ -153,7 +153,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 /**
  * @brief Rcpp interface for Dlnorm as an S4 object. To instantiate
  * from R:
- * dlnorm_ <- new(fims$TMBDnormDistribution)
+ * dlnorm_ <- new(fims$TMBDlnormDistribution)
  *
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
@@ -161,6 +161,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   Parameter x;       /*!< observation */
   Parameter meanlog; /*!< mean of the distribution of log(x) */
   Parameter sdlog;   /*!< standard deviation of the distribution of log(x) */
+  bool do_bias_correction; /*!< true if the lognormal should be bias corrected,
+                              default FALSE */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -183,6 +185,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     dlnorm.x = this->x.value;
     dlnorm.meanlog = this->meanlog.value;
     dlnorm.sdlog = this->sdlog.value;
+    dlnorm.do_bias_correction = this->do_bias_correction;
     return dlnorm.evaluate(do_log);
   }
 

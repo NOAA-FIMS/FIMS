@@ -77,6 +77,8 @@ struct Dlnorm : public DistributionsBase<T> {
   T x;       /*!< observation */
   T meanlog; /*!< mean of the distribution of log(x) */
   T sdlog;   /*!< standard deviation of the distribution of log(x) */
+  bool do_bias_correction =
+      false; /*!< whether or not to bias correct the distribution */
 
   Dlnorm() : DistributionsBase<T>() {}
 
@@ -91,7 +93,12 @@ struct Dlnorm : public DistributionsBase<T> {
 
   virtual const T evaluate(const bool& do_log) {
     T logx = log(x);
-    T nll = dnorm(logx, meanlog, sdlog, true) - logx;
+    T nll;
+    if (do_bias_correction) {
+      nll = dnorm(logx, meanlog - pow(sdlog, 2) / 2, sdlog, true) - logx;
+    } else {
+      nll = dnorm(logx, meanlog, sdlog, true) - logx;
+    }
     if (do_log) {
       return nll;
     } else {

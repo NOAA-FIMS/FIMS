@@ -1,7 +1,6 @@
 library(Rcpp)
 
 test_that("dnorm", {
-
   # generate data using R stats:rnorm
   set.seed(123)
   # simulate normal data
@@ -20,7 +19,6 @@ test_that("dnorm", {
 })
 
 test_that("dlnorm", {
-
   # generate data using R stats:rnorm
   set.seed(123)
   # simulate lognormal data
@@ -34,13 +32,13 @@ test_that("dlnorm", {
   dlnorm_$x$value <- y
   dlnorm_$meanlog$value <- 0
   dlnorm_$sdlog$value <- 1
+  dlnorm_$do_bias_correction <- FALSE
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(TRUE), stats::dlnorm(y, 0, 1, TRUE))
   expect_equal(dlnorm_$evaluate(FALSE), stats::dlnorm(y, 0, 1, FALSE))
 })
 
 test_that("dmultinom", {
-
   # generate data using R stats:rnorm
   set.seed(123)
   p <- (1:10) / sum(1:10)

@@ -84,5 +84,11 @@ vignettes/*.pdf
 # IDE specific files
 *.vscode
 
-#mac OS files
+# mac OS files
 *.DS_Store
+
+# FIMS log file
+fims.log
+
+#TMB tmp.def file
+src/tmp.def
