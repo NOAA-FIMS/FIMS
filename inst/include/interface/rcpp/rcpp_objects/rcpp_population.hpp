@@ -62,6 +62,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
   virtual uint32_t get_id() { return this->id; }
 
+  /** @brief evaluate the population function */
   virtual void evaluate = 0;
 
   /** @brief this adds the parameter values and derivatives to the TMB model
