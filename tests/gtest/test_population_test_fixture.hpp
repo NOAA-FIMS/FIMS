@@ -53,6 +53,10 @@ class PopulationPrepareTestFixture : public testing::Test {
 
     population.Initialize(nyears, nseasons, nages);
 
+    for(int i = 0; i < nages; i++){
+      population.ages[i] = i+1;
+    }
+
     // C++ code to set up true values for log_naa, log_M,
     // log_Fmort, and log_q:
     int seed = 1234;
@@ -111,11 +115,17 @@ class PopulationPrepareTestFixture : public testing::Test {
     // weight_at_age
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
+
+    
+    std::shared_ptr<fims::EWAAgrowth<double> > growth
+                = std::make_shared<fims::EWAAgrowth<double> > ();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
     for (int i = 0; i < nages; i++) {
-      population.weight_at_age[i] = weight_at_age_distribution(generator);
+        growth->ewaa[static_cast<double> (population.ages[i])] = weight_at_age_distribution(generator);
     }
+    
+    population.growth = growth;
 
     population.Prepare();
 
