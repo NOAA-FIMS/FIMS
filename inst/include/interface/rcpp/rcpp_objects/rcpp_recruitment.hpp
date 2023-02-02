@@ -26,6 +26,13 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
   /**< map associating the ids of RecruitmentInterfaceBase to the objects */
 
+  // static std::vector<double> recruit_deviations; /**< vector of recruitment
+  // deviations*/
+  /// static bool constrain_deviations; /**< whether or not the rec devs are
+  /// constrained*/
+  // static std::vector<double> rec_bias_adj; /**< a vector of bias adjustment
+  // values*/
+
   RecruitmentInterfaceBase() {
     this->id = RecruitmentInterfaceBase::id_g++;
     RecruitmentInterfaceBase::live_objects[this->id] = this;
@@ -37,6 +44,10 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   /** @brief get the ID of the interface base object
    **/
   virtual uint32_t get_id() = 0;
+
+  /** @brief evaluate method for child recruitment interface objects to inherit
+   * **/
+  virtual double evaluate(double spawners, double ssbzero) = 0;
 };
 
 uint32_t RecruitmentInterfaceBase::id_g = 1;
@@ -52,12 +63,21 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
   Parameter steep;   /**< steepness or the productivity of the stock*/
   Parameter rzero;   /**< recruitment at unfished biomass */
+  Parameter phizero; /**< unfished spawning biomass per recruit */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
   virtual ~BevertonHoltRecruitmentInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
+
+  virtual double evaluate(double spawners, double ssbzero) {
+    fims::SRBevertonHolt<double> BevHolt;
+
+    BevHolt.steep = this->steep.value;
+    BevHolt.rzero = this->rzero.value;
+    return BevHolt.evaluate(spawners, ssbzero);
+  }
 
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
@@ -115,7 +135,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d1->RegisterParameter(b1->rzero);
       }
     }
-    
+    b1->phizero = this->phizero.value;
+    if (this->phizero.estimated) {
+      if (this->phizero.is_random_effect) {
+        d1->RegisterRandomEffect(b1->phizero);
+      } else {
+        d1->RegisterParameter(b1->phizero);
+      }
+    }
     // add to Information
     d1->recruitment_models[b1->id] = b1;
 
@@ -144,7 +171,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d2->RegisterParameter(b2->rzero);
       }
     }
-    
+    b2->phizero = this->phizero.value;
+    if (this->phizero.estimated) {
+      if (this->phizero.is_random_effect) {
+        d2->RegisterRandomEffect(b2->phizero);
+      } else {
+        d2->RegisterParameter(b2->phizero);
+      }
+    }
     // add to Information
     d2->recruitment_models[b2->id] = b2;
 
@@ -173,7 +207,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d3->RegisterParameter(b3->rzero);
       }
     }
-   
+    b3->phizero = this->phizero.value;
+    if (this->phizero.estimated) {
+      if (this->phizero.is_random_effect) {
+        d3->RegisterRandomEffect(b3->phizero);
+      } else {
+        d3->RegisterParameter(b3->phizero);
+      }
+    }
     // add to Information
     d3->recruitment_models[b3->id] = b3;
 

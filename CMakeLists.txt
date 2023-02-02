@@ -98,3 +98,4 @@ target_compile_definitions(fims_test
 
 # Add a subdirectory to the build
 add_subdirectory(tests/gtest)
+add_subdirectory(tests/google_benchmark)

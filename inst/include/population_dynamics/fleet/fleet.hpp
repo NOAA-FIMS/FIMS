@@ -10,96 +10,104 @@
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP
 
-#include "../../common/model_object.hpp"
 #include "../../common/data_object.hpp"
+#include "../../common/model_object.hpp"
 #include "../../distributions/distributions.hpp"
 #include "../selectivity/selectivity.hpp"
 
 namespace fims {
 
-    /** @brief Base class for all fleets.
-     *
-     * @tparam Type The type of the fleet object.
-     **/
-    template<class Type>
-    struct Fleet : public FIMSObject<Type> {
-        static uint32_t id_g; /*!< reference id for fleet object*/
-        size_t nyears; /*!< the number of years in the model*/
-        size_t nages; /*!< the number of ages in the model*/
+  std::shared_ptr<fims::DistributionsBase<Type>>
+      index_likelihood; /*!< index likelihood component*/
 
+  int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
+  std::shared_ptr<fims::DistributionsBase<Type>>
+      agecomp_likelihood; /*!< agecomp likelihood component*/
 
-        //data objects
-        int observed_catch_data_id = -999; /*!< id of observed catch data object*/
-        std::shared_ptr<fims::DataObject<Type> > observed_catch_data; /*!< observed catch data object*/
+  // selectivity
+  int selectivity_id = -999; /*!< id of selectivity component*/
+  std::shared_ptr<fims::SelectivityBase<Type>>
+      selectivity; /*!< selectivity component*/
 
-        int observed_index_data_id = -999; /*!< id of observed index data object*/
-        std::shared_ptr<fims::DataObject<Type> > observed_index_data; /*!< observed index data object*/
+  // Mortality and catchability
+  std::vector<Type> log_Fmort; /*!< estimated parameter: log Fishing mortality*/
+  std::vector<Type>
+      log_q; /*!< estimated parameter: catchability of the fleet */
 
-        int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
-        std::shared_ptr<fims::DataObject<Type> > observed_agecomp_data; /*!< observed agecomp data object*/
+  std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
+  std::vector<Type>
+      q; /*!< transofrmed parameter: the catchability of the fleet */
 
-        //likelihood components
-        int catch_likelihood_id = -999; /*!< id of catch likelihood component*/
-        std::shared_ptr<fims::DistributionsBase<Type> > catch_likelihood; /*!< catch likelihood component*/
+  // derived quantities
+  std::vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
+  std::vector<Type> catch_index;     /*!<derived quantity catch index*/
+  std::vector<Type> age_composition; /*!<derived quantity age composition*/
 
-        int index_likelihood_id = -999; /*!< id of index likelihood component*/
-        std::shared_ptr<fims::DistributionsBase<Type> > index_likelihood; /*!< index likelihood component*/
+  // derived quantities
+  std::vector<Type> expected_catch; /*!<model expected total catch*/
+  std::vector<Type> expected_index; /*!<model expected index of abundance*/
+  std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
 
-        int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
-        std::shared_ptr<fims::DistributionsBase<Type> > agecomp_likelihood; /*!< agecomp likelihood component*/
+  /**
+   * @brief Constructor.
+   */
+  Fleet() { this->id = Fleet::id_g++; }
 
-        //selectivity
-        int selectivity_id = -999;  /*!< id of selectivity component*/
-        std::shared_ptr<fims::SelectivityBase<Type> > selectivity; /*!< selectivity component*/
+  /**
+   * @brief Destructor.
+   */
+  virtual ~Fleet() {}
 
-        //derived quantities
-        std::vector<Type> expected_catch; /*!<model expected total catch*/
-        std::vector<Type> expected_index; /*!<model expected index of abundance*/
-        std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
-        
+  /**
+   * @brief Intialize Fleet Class
+   * @param nyears The number of years in the model.
+   * @param nages The number of ages in the model.
+   */
+  void Initialize(int nyears, int nages) {
+    this->nyears = nyears;
+    this->nages = nages;
 
-        /**
-         * @brief Constructor.
-         */
-        Fleet() {
-            this->id = Fleet::id_g++;
-        }
+    catch_at_age.resize(nyears * nages);
+    catch_index.resize(nyears);  // assume index is for all ages.
+    age_composition.resize(nyears * nages);
+    expected_catch.resize(nyears);
+    expected_index.resize(nyears);  // assume index is for all ages.
+    catch_numbers_at_age.resize(nyears * nages);
 
-        /**
-        * @brief Destructor.
-        */
-        virtual ~Fleet() {}
+    log_Fmort.resize(nyears);
+    Fmort.resize(nyears);
+    log_q.resize(nyears);
+    q.resize(nyears);
+  }
 
-        /**
-         * @brief Intialize Fleet Class
-         * @param nyears The number of years in the model.
-         * @param nages The number of ages in the model.
-        */
-        void Initialize(int nyears, int nages) {
-            this -> nyears = nyears;
-            this -> nages = nages;
+  /**
+   * @brief Prepare to run the fleet module. Called at each model itartion, and
+   * used to exponentiate the log q and Fmort parameters prior to evaluation.
+   *
+   */
+  void Prepare() {
+    // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
+    // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
+    for (size_t year = 0; year < this->nyears; year++) {
+      this->Fmort[year] = fims::exp(this->log_Fmort[year]);
+      this->q[year] = fims::exp(this->log_q[year]);
+    }
+  }
 
-            expected_catch.resize(nyears);
-            expected_index.resize(nyears); // assume index is for all ages.
-            catch_numbers_at_age.resize(nyears * nages);
-        }
+  /**
+   * @brief Sum of index and agecomp likelihoods
+   * @param do_log Whether to take the log of the likelihood.
+   */
+  const Type likelihood(bool do_log) {
+    return this->index_likelihood->evaluate(do_log) +
+           this->agecomp_likelihood->evaluate(do_log);
+  }
+};
 
-        /**
-         * @brief Sum of index and agecomp likelihoods
-         * @param do_log Whether to take the log of the likelihood.
-         */
-        const Type likelihood(bool do_log) {
-            return this -> catch_likelihood -> evaluate(do_log) 
-                    + this -> index_likelihood->evaluate(do_log)
-                    + this -> agecomp_likelihood->evaluate(do_log);
-        }
+// default id of the singleton fleet class
+template <class Type>
+uint32_t Fleet<Type>::id_g = 0;
 
-    };
-
-    // default id of the singleton fleet class
-    template <class Type>
-    uint32_t Fleet<Type>::id_g = 0;
-
-} // end namespace fims
+}  // end namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

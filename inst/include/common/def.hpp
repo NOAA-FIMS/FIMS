@@ -10,11 +10,10 @@
  */
 #ifndef DEF_HPP
 #define DEF_HPP
-#include <vector>
 #include <fstream>
+#include <vector>
 
-std::ofstream FIMS_LOG("fims.log");
-
+std::ofstream FIMS_LOG("fims.log"); /**< Log file */
 
 #ifdef TMB_MODEL
 // simplify access to singletons

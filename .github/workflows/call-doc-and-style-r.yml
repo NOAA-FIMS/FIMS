@@ -8,7 +8,8 @@ on:
   #workflow_dispatch:
   # Runs the workflow on each push to the main or master branch:
   push:
-    branches: [main, master]
+    branches: 
+      - main
 jobs:
   call-workflow:
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/doc-and-style-r.yml@main
