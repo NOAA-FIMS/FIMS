@@ -92,13 +92,13 @@ RCPP_MODULE(fims)
 
     Rcpp::class_<FleetInterface>("Fleet")
         .constructor()
-        .method("SetCatchLikelihood", &FleetInterface::SetCatchLikelihood)
+        .field("log_q", &FleetInterface::log_q)
+        .field("log_Fmort", &FleetInterface::log_Fmort)
         .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
         .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
         .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
         .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
-        .method("SetObservedCatchData", &FleetInterface::SetObservedCatchData)
-        .method("SetSelectivity", &FleetInterface::SetSelectivity);
+       .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
     Rcpp::class_<PopulationInterface>("Population")
         .constructor()
@@ -108,7 +108,6 @@ RCPP_MODULE(fims)
         .field("nseasons", &PopulationInterface::nseasons)
         .field("nyears", &PopulationInterface::nyears)
         .field("log_M", &PopulationInterface::log_M)
-        .field("log_q", &PopulationInterface::log_q)
         .method("evaluate", &PopulationInterface::evaluate);
 
     Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")

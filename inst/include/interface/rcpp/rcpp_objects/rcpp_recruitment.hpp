@@ -63,7 +63,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
   Parameter steep;   /**< steepness or the productivity of the stock*/
   Parameter rzero;   /**< recruitment at unfished biomass */
-  Parameter phizero; /**< unfished spawning biomass per recruit */
+  Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
@@ -107,6 +107,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d0->RegisterParameter(b0->rzero);
       }
     }
+       b0->log_sigma_recruit = this->log_sigma_recruit.value;
+    if (this->log_sigma_recruit.estimated) {
+      if (this->log_sigma_recruit.is_random_effect) {
+        d0->RegisterRandomEffect(b0->log_sigma_recruit);
+      } else {
+        d0->RegisterParameter(b0->log_sigma_recruit);
+      }
+    }
     // add to Information
     d0->recruitment_models[b0->id] = b0;
 
@@ -135,12 +143,12 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d1->RegisterParameter(b1->rzero);
       }
     }
-    b1->phizero = this->phizero.value;
-    if (this->phizero.estimated) {
-      if (this->phizero.is_random_effect) {
-        d1->RegisterRandomEffect(b1->phizero);
+    b1->log_sigma_recruit = this->log_sigma_recruit.value;
+    if (this->log_sigma_recruit.estimated) {
+      if (this->log_sigma_recruit.is_random_effect) {
+        d1->RegisterRandomEffect(b1->log_sigma_recruit);
       } else {
-        d1->RegisterParameter(b1->phizero);
+        d1->RegisterParameter(b1->log_sigma_recruit);
       }
     }
     // add to Information
@@ -171,12 +179,12 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d2->RegisterParameter(b2->rzero);
       }
     }
-    b2->phizero = this->phizero.value;
-    if (this->phizero.estimated) {
-      if (this->phizero.is_random_effect) {
-        d2->RegisterRandomEffect(b2->phizero);
+    b2->log_sigma_recruit = this->log_sigma_recruit.value;
+    if (this->log_sigma_recruit.estimated) {
+      if (this->log_sigma_recruit.is_random_effect) {
+        d2->RegisterRandomEffect(b2->log_sigma_recruit);
       } else {
-        d2->RegisterParameter(b2->phizero);
+        d2->RegisterParameter(b2->log_sigma_recruit);
       }
     }
     // add to Information
@@ -207,12 +215,12 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d3->RegisterParameter(b3->rzero);
       }
     }
-    b3->phizero = this->phizero.value;
-    if (this->phizero.estimated) {
-      if (this->phizero.is_random_effect) {
-        d3->RegisterRandomEffect(b3->phizero);
+    b3->log_sigma_recruit = this->log_sigma_recruit.value;
+    if (this->log_sigma_recruit.estimated) {
+      if (this->log_sigma_recruit.is_random_effect) {
+        d3->RegisterRandomEffect(b3->log_sigma_recruit);
       } else {
-        d3->RegisterParameter(b3->phizero);
+        d3->RegisterParameter(b3->log_sigma_recruit);
       }
     }
     // add to Information
