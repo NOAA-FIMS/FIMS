@@ -170,6 +170,7 @@ namespace fims {
          *
          */
         void Prepare() {
+            this->nfleets = this->fleets.size();
             std::fill(unfished_spawning_biomass.begin(),
                     unfished_spawning_biomass.end(), 0);
             std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
@@ -274,7 +275,9 @@ namespace fims {
             this->spawning_biomass[year] +=
                     this->proportion_female * this->numbers_at_age[index_ya] *
                     this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
-      }
+                    std::cout<<      this->proportion_female << " " <<
+                    this->proportion_mature_at_age[index_ya]<< " " << growth->evaluate(age) << " spawning biomass inputs----- +++\n";
+        }
 
         /**
          * @brief Adds to existing yearly unfished spawning biomass estimates the
@@ -375,7 +378,7 @@ namespace fims {
                         this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
                         this->mortality_Z[index_ya] * this->numbers_at_age[index_ya] *
                         (1 - exp(-(this->mortality_Z[index_ya])));
-                this->catch_numbers_at_age[index_yaf] += catch_;
+               // this->catch_numbers_at_age[index_yaf] += catch_;
                 // catch_numbers_at_age for the fleet module has different
                 // dimensions (year/age, not year/fleet/age)
                 fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
