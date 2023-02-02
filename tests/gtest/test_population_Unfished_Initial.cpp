@@ -55,9 +55,6 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, CalculateUnfishedNumbersAAandUnfishedSpawningBiomass_works)
     {
-        std::ofstream out("UnfishedAADebug.txt");
-        out << "hi" << std::endl;
-
         std::vector<double> test_unfished_numbers_at_age((nyears + 1) * nages, 0);
         std::vector<double> test_unfished_spawning_biomass(nyears+1, 0);
 
@@ -65,23 +62,16 @@ namespace
         {
             for (int age = 0; age < population.nages; age++)
             {
-                out << "year" << year << std::endl;
-                out << "age" << age << std::endl;
                 int index_ya = year * population.nages + age;
  
                 if (age == 0)
-                { 
-                    out << "index_ya" << index_ya << std::endl;
-                    out << population.unfished_numbers_at_age.size() << std::endl;
-
+                {            
                     population.unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
-
                     test_unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
                 }
 
                 if (year == 0 && age > 0){
                     
-                    out << "index_ya" << index_ya << std::endl;
                     // values from FIMS
                     // Bai: change CalculateUnfishedNumbersAA(index_ya, a); in 
                     // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1);
@@ -94,12 +84,10 @@ namespace
                         test_unfished_numbers_at_age[index_ya-1] * 
                         fims::exp(-fims::exp(population.log_M[index_ya-1]));
 
-                        out << "got here 1 \n";
                 }
 
                 if (year>0 && age > 0)
                 {
-                    out << "got here 2 \n" << std::endl;
                     int index_ya2 = (year - 1) * population.nages + (age - 1);
                     EXPECT_GT(population.M[index_ya2], 0.0);
                     // values from FIMS
@@ -127,23 +115,14 @@ namespace
                         fims::exp(-fims::exp(population.log_M[index_ya2 + 1]));
 
                 }
-                out << population.proportion_mature_at_age[index_ya] << "  " <<
-                    population.proportion_female << "   " <<
-                    test_unfished_numbers_at_age[index_ya] << "   " <<
-                    population.weight_at_age[age] << "   " <<
-                    population.ages[age] << std::endl;
 
                 population.CalculateMaturityAA(index_ya, age);
-                    out << population.proportion_mature_at_age[index_ya] << std::endl;
-
-                out << population.growth->evaluate(population.ages[age]) << std::endl;
                 population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
                 
-                out << population.unfished_spawning_biomass[year] << std::endl;
                 test_unfished_spawning_biomass[year] += population.proportion_mature_at_age[index_ya] *
                                                         population.proportion_female *
                                                         test_unfished_numbers_at_age[index_ya] *
-                                                        population.weight_at_age[age];
+                                                        population.growth->evaluate(population.ages[age]);
 
 
                 EXPECT_EQ(population.unfished_numbers_at_age[index_ya], test_unfished_numbers_at_age[index_ya]);
