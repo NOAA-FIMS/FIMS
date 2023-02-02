@@ -26,12 +26,12 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
   static uint32_t id_g; /**< static id of the recruitment interface base*/
   uint32_t id;          /**< id of the recruitment interface base */
   static std::map<uint32_t, MaturityInterfaceBase*>
-      selectivity_objects; /**< map associating the ids of
+      maturity_objects; /**< map associating the ids of
                               MaturityInterfaceBase to the objects */
 
   MaturityInterfaceBase() {
     this->id = MaturityInterfaceBase::id_g++;
-    MaturityInterfaceBase::selectivity_objects[this->id] = this;
+    MaturityInterfaceBase::maturity_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
 
@@ -50,7 +50,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 
 uint32_t MaturityInterfaceBase::id_g = 1;
 std::map<uint32_t, MaturityInterfaceBase*>
-    MaturityInterfaceBase::selectivity_objects;
+    MaturityInterfaceBase::maturity_objects;
 
 /**
  * @brief Rcpp interface for logistic maturity as an S4 object. To
@@ -86,114 +86,114 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> > ls0 =
+    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> > lm0 =
         std::make_shared<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> >();
 
     // set relative info
-    ls0->id = this->id;
-    ls0->median = this->median.value;
+    lm0->id = this->id;
+    lm0->median = this->median.value;
     if (this->median.estimated) {
       if (this->median.is_random_effect) {
-        d0->RegisterRandomEffect(ls0->median);
+        d0->RegisterRandomEffect(lm0->median);
       } else {
-        d0->RegisterParameter(ls0->median);
+        d0->RegisterParameter(lm0->median);
       }
     }
-    ls0->slope = this->slope.value;
+    lm0->slope = this->slope.value;
     if (this->slope.estimated) {
       if (this->slope.is_random_effect) {
-        d0->RegisterRandomEffect(ls0->slope);
+        d0->RegisterRandomEffect(lm0->slope);
       } else {
-        d0->RegisterParameter(ls0->slope);
+        d0->RegisterParameter(lm0->slope);
       }
     }
 
     // add to Information
-    d0->selectivity_models[ls0->id] = ls0;
+    d0->maturity_models[lm0->id] = lm0;
 
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_FIRST_ORDER> > ls1 =
+    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_FIRST_ORDER> > lm1 =
         std::make_shared<fims::LogisticMaturity<TMB_FIMS_FIRST_ORDER> >();
 
     // set relative info
-    ls1->id = this->id;
-    ls1->median = this->median.value;
+    lm1->id = this->id;
+    lm1->median = this->median.value;
     if (this->median.estimated) {
       if (this->median.is_random_effect) {
-        d1->RegisterRandomEffect(ls1->median);
+        d1->RegisterRandomEffect(lm1->median);
       } else {
-        d1->RegisterParameter(ls1->median);
+        d1->RegisterParameter(lm1->median);
       }
     }
-    ls1->slope = this->slope.value;
+    lm1->slope = this->slope.value;
     if (this->slope.estimated) {
       if (this->slope.is_random_effect) {
-        d1->RegisterRandomEffect(ls1->slope);
+        d1->RegisterRandomEffect(lm1->slope);
       } else {
-        d1->RegisterParameter(ls1->slope);
+        d1->RegisterParameter(lm1->slope);
       }
     }
 
     // add to Information
-    d1->selectivity_models[ls1->id] = ls1;
+    d1->maturity_models[lm1->id] = lm1;
 
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_SECOND_ORDER> > ls2 =
+    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_SECOND_ORDER> > lm2 =
         std::make_shared<fims::LogisticMaturity<TMB_FIMS_SECOND_ORDER> >();
 
     // set relative info
-    ls2->id = this->id;
-    ls2->median = this->median.value;
+    lm2->id = this->id;
+    lm2->median = this->median.value;
     if (this->median.estimated) {
       if (this->median.is_random_effect) {
-        d2->RegisterRandomEffect(ls2->median);
+        d2->RegisterRandomEffect(lm2->median);
       } else {
-        d2->RegisterParameter(ls2->median);
+        d2->RegisterParameter(lm2->median);
       }
     }
-    ls2->slope = this->slope.value;
+    lm2->slope = this->slope.value;
     if (this->slope.estimated) {
       if (this->slope.is_random_effect) {
-        d2->RegisterRandomEffect(ls2->slope);
+        d2->RegisterRandomEffect(lm2->slope);
       } else {
-        d2->RegisterParameter(ls2->slope);
+        d2->RegisterParameter(lm2->slope);
       }
     }
 
     // add to Information
-    d2->selectivity_models[ls2->id] = ls2;
+    d2->maturity_models[lm2->id] = lm2;
 
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_THIRD_ORDER> > ls3 =
+    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_THIRD_ORDER> > lm3 =
         std::make_shared<fims::LogisticMaturity<TMB_FIMS_THIRD_ORDER> >();
 
     // set relative info
-    ls3->id = this->id;
-    ls3->median = this->median.value;
+    lm3->id = this->id;
+    lm3->median = this->median.value;
     if (this->median.estimated) {
       if (this->median.is_random_effect) {
-        d3->RegisterRandomEffect(ls3->median);
+        d3->RegisterRandomEffect(lm3->median);
       } else {
-        d3->RegisterParameter(ls3->median);
+        d3->RegisterParameter(lm3->median);
       }
     }
-    ls3->slope = this->slope.value;
+    lm3->slope = this->slope.value;
     if (this->slope.estimated) {
       if (this->slope.is_random_effect) {
-        d3->RegisterRandomEffect(ls3->slope);
+        d3->RegisterRandomEffect(lm3->slope);
       } else {
-        d3->RegisterParameter(ls3->slope);
+        d3->RegisterParameter(lm3->slope);
       }
     }
 
     // add to Information
-    d3->selectivity_models[ls3->id] = ls3;
+    d3->maturity_models[lm3->id] = lm3;
 
     return true;
   }

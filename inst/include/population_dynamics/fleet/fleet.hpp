@@ -27,8 +27,7 @@ struct Fleet : public FIMSObject<Type> {
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
 
-
-
+  int index_likelihood_id = -999; /*!<id of index likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
       index_likelihood; /*!< index likelihood component*/
 
@@ -40,6 +39,13 @@ struct Fleet : public FIMSObject<Type> {
   int selectivity_id = -999; /*!< id of selectivity component*/
   std::shared_ptr<fims::SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
+  
+  int observed_index_data_id = -999; /*!< id of index data */
+  std::shared_ptr<fims::DataObject<Type>> observed_index_data; /*!< observed index data*/
+
+  int observed_agecomp_data_id = -999; /*!< id of age comp data */
+  std::shared_ptr<fims::DataObject<Type>> 
+  observed_agecomp_data; /*< observed agecomp data*/
 
   // Mortality and catchability
   std::vector<Type> log_Fmort; /*!< estimated parameter: log Fishing mortality*/

@@ -53,8 +53,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   uint32_t nfleets; /**< number of fleets */
   uint32_t nseasons; /**< number of seasons */
   uint32_t nyears; /**< number of years */
-  Parameter log_M;   /**< log of the natural mortality of the stock*/
-  Parameter log_q; /**< log of the catchability of the stock*/
+  std::vector<Parameter> log_M;   /**< log of the natural mortality of the stock*/
 
   PopulationInterface() : PopulationInterfaceBase() {} 
 
@@ -85,14 +84,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         d0->RegisterParameter(b0->log_M);
       }
     }
-    b0->log_q = this->log_q.value;
-    if (this->log_q.estimated) {
-      if (this->log_q.is_random_effect) {
-        d0->RegisterRandomEffect(b0->log_q);
-      } else {
-        d0->RegisterParameter(b0->log_q);
-      }
-    }
+
     // add to Information
     d0->populations[b0->id] = b0;
 
@@ -111,14 +103,6 @@ class PopulationInterface : public PopulationInterfaceBase {
         d1->RegisterRandomEffect(b1->log_M);
       } else {
         d1->RegisterParameter(b1->log_M);
-      }
-    }
-    b1->log_q = this->log_q.value;
-    if (this->log_q.estimated) {
-      if (this->log_q.is_random_effect) {
-        d1->RegisterRandomEffect(b1->log_q);
-      } else {
-        d1->RegisterParameter(b1->log_q);
       }
     }
     
@@ -142,14 +126,6 @@ class PopulationInterface : public PopulationInterfaceBase {
         d2->RegisterParameter(b2->log_M);
       }
     }
-    b2->log_q = this->log_q.value;
-    if (this->log_q.estimated) {
-      if (this->log_q.is_random_effect) {
-        d2->RegisterRandomEffect(b2->log_q);
-      } else {
-        d2->RegisterParameter(b2->log_q);
-      }
-    }
     
     // add to Information
     d2->populations[b2->id] = b2;
@@ -169,14 +145,6 @@ class PopulationInterface : public PopulationInterfaceBase {
         d3->RegisterRandomEffect(b3->log_M);
       } else {
         d3->RegisterParameter(b3->log_M);
-      }
-    }
-    b3->log_q = this->log_q.value;
-    if (this->log_q.estimated) {
-      if (this->log_q.is_random_effect) {
-        d3->RegisterRandomEffect(b3->log_q);
-      } else {
-        d3->RegisterParameter(b3->log_q);
       }
     }
    
