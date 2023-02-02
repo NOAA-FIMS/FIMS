@@ -17,6 +17,18 @@
 
 namespace fims {
 
+/** @brief Base class for all fleets.
+ *
+ * @tparam Type The type of the fleet object.
+ **/
+template <class Type>
+struct Fleet : public FIMSObject<Type> {
+  static uint32_t id_g; /*!< reference id for fleet object*/
+  size_t nyears;        /*!< the number of years in the model*/
+  size_t nages;         /*!< the number of ages in the model*/
+
+
+
   std::shared_ptr<fims::DistributionsBase<Type>>
       index_likelihood; /*!< index likelihood component*/
 
