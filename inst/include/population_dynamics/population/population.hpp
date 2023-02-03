@@ -98,29 +98,34 @@ struct Population : public FIMSObject<Type> {
                                               age (thousands?? millions??) */
   std::vector<Type> expected_catch;            /*!< Expected values: Catch*/
 
-  /// recruitment
-  int recruitment_id = -999; /*!< id of recruitment model object*/
-  std::shared_ptr<fims::RecruitmentBase<Type> >
-      recruitment; /*!< shared pointer to recruitment module */
+    /// recruitment
+    int recruitment_id = -999; /*!< id of recruitment model object*/
+    std::shared_ptr<fims::RecruitmentBase<Type>>
+        recruitment; /*!< shared pointer to recruitment module */
 
-  // growth
-  int growth_id = -999; /*!< id of growth model object*/
-  std::shared_ptr<fims::GrowthBase<Type> >
-      growth; /*!< shared pointer to growth module */
+    // growth
+    int growth_id = -999; /*!< id of growth model object*/
+    std::shared_ptr<fims::GrowthBase<Type>>
+        growth; /*!< shared pointer to growth module */
 
-  // maturity
-  int maturity_id = -999; /*!< id of maturity model object*/
-  std::shared_ptr<fims::MaturityBase<Type> >
-      maturity; /*!< shared pointer to maturity module */
+    // maturity
+    int maturity_id = -999; /*!< id of maturity model object*/
+    std::shared_ptr<fims::MaturityBase<Type>>
+        maturity; /*!< shared pointer to maturity module */
 
-  // fleet
-  int fleet_id = -999; /*!< id of fleet model object*/
-  std::vector<std::shared_ptr<fims::Fleet<Type> > >
-      fleets; /*!< shared pointer to fleet module */
+    // fleet
+    int fleet_id = -999; /*!< id of fleet model object*/
+    std::vector<std::shared_ptr<fims::Fleet<Type>>>
+        fleets; /*!< shared pointer to fleet module */
 
-  // this -> means you're referring to a class member (member of self)
+    // Define objective function object to be able to REPORT and ADREPORT
+#ifdef TMB_MODEL
+    objective_function<Type> *of;
+#endif
 
-  Population() { this->id = Population::id_g++; }
+    // this -> means you're referring to a class member (member of self)
+
+    Population() { this->id = Population::id_g++; }
 
   /**
    * @brief Initialize values. Called once at the start of model run.
@@ -181,9 +186,9 @@ struct Population : public FIMSObject<Type> {
     }
   }
 
-  /**
-   * life history calculations
-   */
+    /**
+     * life history calculations
+     */
 
   /**
    * @brief Calculates initial numbers at age for index and age
@@ -229,14 +234,15 @@ struct Population : public FIMSObject<Type> {
     this->numbers_at_age[index_ya] =
         this->numbers_at_age[index_ya2] * (exp(-this->mortality_Z[index_ya2]));
 
-    // Plus group calculation
-    if (age == (this->nages - 1)) {
-      this->numbers_at_age[index_ya] =
-          this->numbers_at_age[index_ya] +
-          this->numbers_at_age[index_ya2 + 1] *
-              (exp(-this->mortality_Z[index_ya2 + 1]));
+      // Plus group calculation
+      if (age == (this->nages - 1))
+      {
+        this->numbers_at_age[index_ya] =
+            this->numbers_at_age[index_ya] +
+            this->numbers_at_age[index_ya2 + 1] *
+                (exp(-this->mortality_Z[index_ya2 + 1]));
+      }
     }
-  }
 
   /**
    * @brief Calculates unfished numbers at age at year and age specific indices
@@ -593,28 +599,43 @@ struct Population : public FIMSObject<Type> {
           FIMS_LOG << index_ya << std::endl;
         }
 
-        /*
-        Here composition, total catch, and index values are calculated for all
-        years with reference data. They are not calculated for y=nyears as there
-        is this is just to get final population structure at the end of the
-        terminal year.
-         */
-        if (y < this->nyears) {
-          FIMS_LOG << index_ya << std::endl;
+          /*
+          Here composition, total catch, and index values are calculated for all
+          years with reference data. They are not calculated for y=nyears as there
+          is this is just to get final population structure at the end of the
+          terminal year.
+           */
+          if (y < this->nyears)
+          {
+            FIMS_LOG << index_ya << std::endl;
           CalculateCatchNumbersAA(index_ya, y, a);
-
+  
           FIMS_LOG << index_ya << std::endl;
           CalculateCatchWeightAA(y, a);
-          CalculateCatch(y, a);
-          CalculateIndex(index_ya, y, a);
+            CalculateCatch(y, a);
+            CalculateIndex(index_ya, y, a);
+          }
         }
       }
+#ifdef TMB_MODEL
+      /*Report output*/
+      REPORT_F(this->nages, of);
+      REPORT_F(this->nyears, of);
+      REPORT_F(this->nfleets, of);
+      REPORT_F(this->numbers_at_age, of);
+      REPORT_F(this->recruitment->recruit_deviations, of);
+      ADREPORT_F(this->recruitment->rzero, of);
+      ADREPORT_F(this->recruitment->steep, of);
+      ADREPORT_F(this->recruitment->log_sigma_recruit, of);
+      ADREPORT_F(this->M, of);
+      ADREPORT_F(this->maturity->slope, of);
+      ADREPORT_F(this->maturity->median, of);
+#endif
     }
-  }
-};
-template <class Type>
-uint32_t Population<Type>::id_g = 0;
+  };
+  template <class Type>
+  uint32_t Population<Type>::id_g = 0;
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */
