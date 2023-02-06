@@ -28,9 +28,10 @@ Type objective_function<Type>::operator()() {
     for(int i =0; i < information->parameters.size(); i++){
         *information->parameters[i] = p[i];
     }
+    model -> of = this;
     
     //evaluate the model objective function value
-    Type nll = model->evaluate();
+    Type nll = model->Evaluate();
 
     return nll;
 
