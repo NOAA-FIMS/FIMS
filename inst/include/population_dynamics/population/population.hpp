@@ -543,17 +543,17 @@ namespace fims
       }
 #ifdef TMB_MODEL
       /*Report output*/
-      REPORT_F(this->nages, of);
-      REPORT_F(this->nyears, of);
-      REPORT_F(this->nfleets, of);
-      REPORT_F(this->numbers_at_age, of);
-      REPORT_F(this->recruitment->recruit_deviations, of);
-      ADREPORT_F(this->recruitment->rzero, of);
-      ADREPORT_F(this->recruitment->steep, of);
-      ADREPORT_F(this->recruitment->log_sigma_recruit, of);
-      ADREPORT_F(this->M, of);
-      ADREPORT_F(this->maturity->slope, of);
-      ADREPORT_F(this->maturity->median, of);
+      //REPORT_F(this->nages, of); REPORT error: call of overloaded is ambiguous
+      //REPORT_F(this->nyears, of);
+      //REPORT_F(this->nfleets, of);
+      //REPORT_F(this->numbers_at_age, of);
+      //REPORT_F(this->recruitment->recruit_deviations, of);
+      //ADREPORT_F(this->recruitment->rzero, of);
+      //ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in recruitment_base
+      //ADREPORT_F(this->recruitment->log_sigma_recruit, of);
+      //ADREPORT_F(this->M, of);
+      //ADREPORT_F(this->maturity->slope, of); can't access slope b/c not in maturity base
+      //ADREPORT_F(this->maturity->median, of); can't access median b/c not in maturity base
 #endif
     }
   };
