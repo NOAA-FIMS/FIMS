@@ -1,8 +1,7 @@
 
 #include <cmath>
-#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 #include "../inst/include/interface/interface.hpp"
-#include "../inst/include/interface/init.hpp"
+#include "../inst/include/common/model.hpp"
 
 /// @cond 
 /**
@@ -18,13 +17,16 @@ Type objective_function<Type>::operator()() {
 
     // code below copied from ModularTMBExample/src/tmb_objective_function.cpp
 
-    // get the singleton instance for type Type
+    // get the singleton instance for Model Class
     std::shared_ptr<fims::Model> model =
-    fims::Model<Type>::GetInstance();
+      fims::Model<Type>::GetInstance();
+    // get the singleton instance for Information Class
+    std::shared_ptr<fims::Information> information =
+      fims::Information<Type>::GetInstance();
 
-    //update the parameter values for type Type
-    for(int i =0; i < model->parameters.size(); i++){
-        *model->parameters[i] = p[i];
+    //update the parameter values
+    for(int i =0; i < information->parameters.size(); i++){
+        *information->parameters[i] = p[i];
     }
     
     //evaluate the model objective function value
