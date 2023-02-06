@@ -31,7 +31,7 @@ class Model {  // may need singleton
  public:
   static std::shared_ptr<Model<T> >
       fims_model; /*!< Create a shared fims_model as a pointer to Model*/
-  static std::shared_ptr<Information<T> >
+  std::shared_ptr<Information<T> >
       fims_information; /*!< Create a shared fims_information as a pointer to Information*/
  
 
