@@ -33,9 +33,15 @@ class Model {  // may need singleton
       fims_model; /*!< Create a shared fims_model as a pointer to Model*/
   static std::shared_ptr<Information<T> >
       fims_information; /*!< Create a shared fims_information as a pointer to Information*/
-  // constructor
-  virtual ~Model() {}
-  
+ 
+
+    #ifdef TMB_MODEL
+        objective_function<T> *of;
+    #endif
+
+    // constructor
+    virtual ~Model() {}
+
     /**
     * Returns a single Information object for type T.
     *
@@ -55,7 +61,10 @@ class Model {  // may need singleton
     for (it = this->fims_information->populations.begin();
       it != this->fims_information->populations.end(); ++it)
     {
-        //(*it).second points to the Population module
+      //(*it).second points to the Population module
+      #ifdef TMB_MODEL
+      (*it).second->of = this->of;
+       #endif
       (*it).second->Prepare();
       (*it).second->Evaluate();
       
@@ -63,6 +72,12 @@ class Model {  // may need singleton
     
     // nll = negative-log-likelihood (the objective function)
     T nll = 0.0;
+    //nll will loop over fleets (Fleet module does not have evaluate function yet)
+    //Sum up nlls here in model.hpp or in fleet.hpp?
+    //for(jt = this->fims_information->fleets.begin(); jt != this->fims_information->fleets.end(); ++jt ){
+        //nll += (*jt).second.Evaluate();
+    //}
+
     return nll;
   }
 };
