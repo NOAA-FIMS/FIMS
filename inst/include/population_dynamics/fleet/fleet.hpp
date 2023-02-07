@@ -26,6 +26,7 @@ struct Fleet : public FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
+  using ParameterVector = typename ModelTraits<Type>::ParameterVector;
 
   int index_likelihood_id = -999; /*!<id of index likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
@@ -48,8 +49,8 @@ struct Fleet : public FIMSObject<Type> {
   observed_agecomp_data; /*< observed agecomp data*/
 
   // Mortality and catchability
-  std::vector<Type> log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  std::vector<Type>
+  ParameterVector log_Fmort; /*!< estimated parameter: log Fishing mortality*/
+  ParameterVector
       log_q; /*!< estimated parameter: catchability of the fleet */
 
   std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/

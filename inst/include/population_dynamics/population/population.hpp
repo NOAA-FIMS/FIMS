@@ -53,6 +53,8 @@ directly?)
  */
 template <typename Type>
 struct Population : public FIMSObject<Type> {
+    
+  using ParameterVector = typename ModelTraits<Type>::ParameterVector;
   static uint32_t id_g; /*!< reference id for population object*/
   size_t nyears;        /*!< total number of years in the fishery*/
   size_t nseasons;      /*!< total number of seasons in the fishery*/
@@ -65,14 +67,14 @@ struct Population : public FIMSObject<Type> {
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
   std::vector<Type> log_naa; /*!< estimated parameter: log numbers at age*/
-  std::vector<Type> log_M;   /*!< estimated parameter: log Natural Mortality*/
+  ParameterVector log_M;   /*!< estimated parameter: log Natural Mortality*/
 
   // Transformed values
   std::vector<Type> naa; /*!< transformed parameter: numbers at age*/
   std::vector<Type> M;   /*!< transformed parameter: Natural Mortality*/
 
   std::vector<Type> ages;        /*!< vector of the ages for referencing*/
-  std::vector<Type> mortality_F; /*!< vector of fishing mortality summed across
+  ParameterVector mortality_F; /*!< vector of fishing mortality summed across
                                     fleet by year and age*/
   std::vector<Type>
       mortality_Z; /*!< vector of total mortality by year and age*/
@@ -133,7 +135,7 @@ struct Population : public FIMSObject<Type> {
    * @param nseasons number of seasons in the population
    * @param nages number of ages in the population
    */
-  void Initialize(int nyears, int nseasons, int nages) {
+  void Initialize(size_t nyears, size_t nseasons, size_t nages) {
     // size all the vectors to length of nages
     nfleets = fleets.size();
     ages.resize(nages);
@@ -166,15 +168,15 @@ struct Population : public FIMSObject<Type> {
     std::fill(unfished_spawning_biomass.begin(),
               unfished_spawning_biomass.end(), 0);
     std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
-    std::fill(mortality_F.begin(), mortality_F.end(), 0);
     std::fill(expected_catch.begin(), expected_catch.end(), 0);
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
       this->naa[age] = fims::exp(this->log_naa[age]);
       for (size_t year = 0; year < this->nyears; year++) {
-        int index_ya = year * this->nages + age;
+        size_t index_ya = year * this->nages + age;
         this->M[index_ya] = fims::exp(this->log_M[index_ya]);
+        this->mortality_F[year] = 0.0;
       }
     }
   }
@@ -190,7 +192,7 @@ struct Population : public FIMSObject<Type> {
    * @param a age index
    */
   inline void CalculateInitialNumbersAA(
-      int index_ya, int a) {  // inline all function unless complicated
+      size_t index_ya, size_t a) {  // inline all function unless complicated
     this->numbers_at_age[index_ya] = this->naa[a];
   }
 
@@ -201,9 +203,9 @@ struct Population : public FIMSObject<Type> {
    * @param year year index
    * @param age age index
    */
-  void CalculateMortality(int index_ya, int year, int age) {
+  void CalculateMortality(size_t index_ya, size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      int index_yf = year * this->nfleets +
+      size_t index_yf = year * this->nfleets +
                      fleet_;  // index by fleet and years to dimension fold
       this->mortality_F[index_ya] +=
           this->fleets[fleet_]->Fmort[year] *
@@ -220,7 +222,7 @@ struct Population : public FIMSObject<Type> {
    * @param index_ya2 dimension folded index for year-1 and age-1
    * @param age age index
    */
-  inline void CalculateNumbersAA(int index_ya, int index_ya2, int age) {
+  inline void CalculateNumbersAA(size_t index_ya, size_t index_ya2, size_t age) {
     // using Z from previous age/year
     this->numbers_at_age[index_ya] =
         this->numbers_at_age[index_ya2] * (exp(-this->mortality_Z[index_ya2]));
@@ -241,7 +243,7 @@ struct Population : public FIMSObject<Type> {
    * @param index_ya2 dimension folded index for year-1 and age-1
    * @param age age index
    */
-  inline void CalculateUnfishedNumbersAA(int index_ya, int index_ya2, int age) {
+  inline void CalculateUnfishedNumbersAA(size_t index_ya, size_t index_ya2, size_t age) {
     // using M from previous age/year
     this->unfished_numbers_at_age[index_ya] =
         this->unfished_numbers_at_age[index_ya2] * (exp(-this->M[index_ya2]));
@@ -262,7 +264,7 @@ struct Population : public FIMSObject<Type> {
    * @param year the year spawning biomass is being aggregated for
    * @param age the age who's biomass is being added into total spawning biomass
    */
-  void CalculateSpawningBiomass(int index_ya, int year, int age) {
+  void CalculateSpawningBiomass(size_t index_ya, size_t year, size_t age) {
     this->spawning_biomass[year] +=
         this->proportion_female * this->numbers_at_age[index_ya] *
         this->proportion_mature_at_age[index_ya] * this->weight_at_age[age];
@@ -276,7 +278,7 @@ struct Population : public FIMSObject<Type> {
    * @param year the year of unfished spawning biomass to add
    * @param age the age of unfished spawning biomass to add
    */
-  void CalculateUnfishedSpawningBiomass(int index_ya, int year, int age) {
+  void CalculateUnfishedSpawningBiomass(size_t index_ya, size_t year, size_t age) {
     this->unfished_spawning_biomass[year] +=
         this->proportion_female * this->unfished_numbers_at_age[index_ya] *
         this->proportion_mature_at_age[index_ya] * this->weight_at_age[age];
@@ -288,7 +290,7 @@ struct Population : public FIMSObject<Type> {
    * @param index_ya dimension folded index for year and age
    * @param year the year recruitment is being calculated for
    */
-  void CalculateRecruitment(int index_ya, int year) {
+  void CalculateRecruitment(size_t index_ya, size_t year) {
     this->numbers_at_age[index_ya] =
         this->recruitment->evaluate(this->spawning_biomass[year - 1],
                                     this->unfished_spawning_biomass[year - 1]) *
@@ -301,11 +303,11 @@ struct Population : public FIMSObject<Type> {
    * @param year the year of expected total catch
    * @param age the age of catch that is being added into total catch
    */
-  void CalculateCatch(int year, int age) {
+  void CalculateCatch(size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      int index_yaf =
+      size_t index_yaf =
           year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-      int index_yf = year * this->nfleets +
+      size_t index_yf = year * this->nfleets +
                      fleet_;  // index by fleet and years to dimension fold
 
       this->expected_catch[index_yf] += this->catch_weight_at_age[index_yaf];
@@ -322,10 +324,10 @@ struct Population : public FIMSObject<Type> {
    * @param year the year of the population index
    * @param age the age of the index that is added into population index
    */
-  void CalculateIndex(int index_ya, int year, int age) {
+  void CalculateIndex(size_t index_ya, size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
       // index by fleet and years to dimension fold
-      int index_yf = year * this->nfleets + fleet_;
+      size_t index_yf = year * this->nfleets + fleet_;
       // I = qN (N is total numbers), I is an index in numbers
       Type index_;
 
@@ -347,11 +349,11 @@ struct Population : public FIMSObject<Type> {
    * @param year the year of expected catch composition is being calculated for
    * @param age the age composition is being calculated for
    */
-  void CalculateCatchNumbersAA(int index_ya, int year, int age) {
+  void CalculateCatchNumbersAA(size_t index_ya, size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      int index_yaf =
+      size_t index_yaf =
           year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-      int index_yf = year * this->nfleets +
+      size_t index_yf = year * this->nfleets +
                      fleet_;  // index by fleet and years to dimension fold
       // make an intermediate value in order to set multiple members (of
       // current and fleet objects) to that value.
@@ -375,9 +377,9 @@ struct Population : public FIMSObject<Type> {
    * @param year the year of expected catch weight at age
    * @param age the age of expected catch weight at age
    */
-  void CalculateCatchWeightAA(int year, int age) {
+  void CalculateCatchWeightAA(size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      int index_yaf =
+      size_t index_yaf =
           year * this->nages * this->nfleets + age * this->nfleets + fleet_;
       this->catch_weight_at_age[index_yaf] =
           this->catch_numbers_at_age[index_yaf] * this->weight_at_age[age];
@@ -391,7 +393,7 @@ struct Population : public FIMSObject<Type> {
    * @param index_ya dimension folded index for year and age
    * @param age the age of maturity
    */
-  void CalculateMaturityAA(int index_ya, int age) {
+  void CalculateMaturityAA(size_t index_ya, size_t age) {
     // this->maturity is pointing to the maturity module, which has
     //  an evaluate function. -> can be nested.
     this->proportion_mature_at_age[index_ya] = this->maturity->evaluate(age);
@@ -431,7 +433,7 @@ struct Population : public FIMSObject<Type> {
          index naming defines the dimensional folding structure
          i.e. index_ya is referencing folding over years and ages.
         */
-        int index_ya = y * this->nages + a;
+        size_t index_ya = y * this->nages + a;
         /*
          Mortality rates are not estimated in the final year which is
          used to show expected stock structure at the end of the model period.
@@ -479,7 +481,7 @@ struct Population : public FIMSObject<Type> {
             CalculateRecruitment(index_ya, y);
             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
           } else {
-            int index_ya2 = (y - 1) * nages + (a - 1);
+            size_t index_ya2 = (y - 1) * nages + (a - 1);
             CalculateNumbersAA(index_ya, index_ya2, a);
             CalculateUnfishedNumbersAA(index_ya, index_ya2, a);
           }
