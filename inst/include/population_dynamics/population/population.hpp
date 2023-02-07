@@ -36,7 +36,8 @@
 #include "../growth/growth.hpp"
 #include "../maturity/maturity.hpp"
 #include "../recruitment/recruitment.hpp"
-#include "subpopulation.hpp"
+//#include "subpopulation.hpp"
+#include "../../common/information.hpp"
 
 namespace fims {
 /*TODO:
@@ -619,10 +620,10 @@ struct Population : public FIMSObject<Type> {
       }
 #ifdef TMB_MODEL
       /*Report output*/
-      REPORT_F(this->nages, of); //REPORT error: call of overloaded is ambiguous
-      //REPORT_F(this->nyears, of);
+   //   REPORT_F(this->nages, of); //REPORT error: call of overloaded is ambiguous
+//      REPORT_F(this->nyears, of);
       //REPORT_F(this->nfleets, of);
-      //REPORT_F(this->numbers_at_age, of);
+//      REPORT_F(this->numbers_at_age, of);
       //REPORT_F(this->recruitment->recruit_deviations, of);
       //ADREPORT_F(this->recruitment->rzero, of);
       //ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in recruitment_base
