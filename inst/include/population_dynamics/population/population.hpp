@@ -122,7 +122,7 @@ namespace fims
 
     // Define objective function object to be able to REPORT and ADREPORT
 #ifdef TMB_MODEL
-    objective_function<Type> *of;
+    ::objective_function<Type> *of;
 #endif
 
     // this -> means you're referring to a class member (member of self)
@@ -543,7 +543,7 @@ namespace fims
       }
 #ifdef TMB_MODEL
       /*Report output*/
-      //REPORT_F(this->nages, of); REPORT error: call of overloaded is ambiguous
+      REPORT_F(this->nages, of); //REPORT error: call of overloaded is ambiguous
       //REPORT_F(this->nyears, of);
       //REPORT_F(this->nfleets, of);
       //REPORT_F(this->numbers_at_age, of);

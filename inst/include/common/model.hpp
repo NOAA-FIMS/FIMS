@@ -36,7 +36,7 @@ class Model {  // may need singleton
  
 
     #ifdef TMB_MODEL
-        objective_function<T> *of;
+        ::objective_function<T> *of;
     #endif
 
     // constructor
