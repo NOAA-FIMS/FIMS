@@ -32,15 +32,15 @@ namespace fims {
  * traits that depend on modeling platform.
  */
 template <typename T>
-struct FIMSTraits {
+struct ModelTraits {
   typedef double real_t;                            /**< The real type */
   typedef double variable_t;                        /**< The variable type */
-  typedef typename std::vector<double> data_vector; /**< The data vector type */
-  typedef typename std::vector<double> variable_vector; /**< The variable vector
+  typedef typename std::vector<double> DataVector; /**< The data vector type */
+  typedef typename std::vector<double> ParameterVector; /**< The variable vector
    type */
-  typedef typename std::vector<std::vector<double> > data_matrix;     /**< The
+  typedef typename std::vector<std::vector<double> > DataMatrix;     /**< The
        data matrix type */
-  typedef typename std::vector<std::vector<double> > variable_matrix; /**< The
+  typedef typename std::vector<std::vector<double> > VariableMatrix; /**< The
    variable matrix type */
 };
 

@@ -19,13 +19,14 @@
  */
 class FleetInterface : public FIMSRcppInterfaceBase
 {
+  public:
   int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
   int index_likelihood_id = -999;   /*!< id of index likelihood component*/
-  // int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
-  // int observed_index_data_id = -999;   /*!< id of observed index data object*/
+  int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
+  int observed_index_data_id = -999;   /*!< id of observed index data object*/
   int selectivity_id = -999; /*!< id of selectivity component*/
-  Rcpp::NumericVector log_q;
-  Rcpp::NumericVector log_Fmort;
+  std::vector<double> log_q;
+  std::vector<double> log_Fmort;
   bool estimate_F = false;
   bool estimate_q = false;
   bool random_q = false;
@@ -151,21 +152,22 @@ public:
     // f0->observed_agecomp_data_id = this->observed_agecomp_data_id;
     // f0->observed_index_data_id = this->observed_index_data_id;
     f0->selectivity_id = this->selectivity_id;
-    f0->log_q.resize(this->log_q.length());
-    for (int i = 0; i < log_q.length(); i++)
+    f0->log_q.resize(this->log_q.size());
+    for (size_t i = 0; i < log_q.size(); i++)
     {
       f0->log_q[i] = this->log_q[i];
-    }
+    
     if (this->estimate_q)
     {
       if (this->random_q)
       {
-        d0->RegisterRandomEffect(f0->log_q);
+        d0->RegisterRandomEffect(f0->log_q[i]);
       }
       else
       {
-        d0->RegisterParameter(f0->log_q);
+        d0->RegisterParameter(f0->log_q[i]);
       }
+    }
     }
 
     // add to Information
@@ -184,21 +186,21 @@ public:
     // f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
     // f1->observed_index_data_id = this->observed_index_data_id;
     f1->selectivity_id = this->selectivity_id;
-    f1->log_q.resize(this->log_q.length());
-    for (int i = 0; i < log_q.length(); i++)
+    f1->log_q.resize(this->log_q.size());
+    for (size_t i = 0; i < log_q.size(); i++)
     {
       f1->log_q[i] = this->log_q[i];
-    }
     if (this->estimate_q)
     {
       if (this->random_q)
       {
-        d1->RegisterRandomEffect(f1->log_q);
+        d1->RegisterRandomEffect(f1->log_q[i]);
       }
       else
       {
-        d1->RegisterParameter(f1->log_q);
+        d1->RegisterParameter(f1->log_q[i]);
       }
+    }
     }
 
     // add to Information
@@ -217,21 +219,21 @@ public:
     // f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
     // f2->observed_index_data_id = this->observed_index_data_id;
     f2->selectivity_id = this->selectivity_id;
-    f2->log_q.resize(this->log_q.length());
-    for (int i = 0; i < log_q.length(); i++)
+    f2->log_q.resize(this->log_q.size());
+    for (size_t i = 0; i < log_q.size(); i++)
     {
       f2->log_q[i] = this->log_q[i];
-    }
     if (this->estimate_q)
     {
       if (this->random_q)
       {
-        d2->RegisterRandomEffect(f2->log_q);
+        d2->RegisterRandomEffect(f2->log_q[i]);
       }
       else
       {
-        d2->RegisterParameter(f2->log_q);
+        d2->RegisterParameter(f2->log_q[i]);
       }
+    }
     }
 
     // add to Information
@@ -250,21 +252,21 @@ public:
     // f3->observed_agecomp_data_id = this->observed_agecomp_data_id;
     // f3->observed_index_data_id = this->observed_index_data_id;
     f3->selectivity_id = this->selectivity_id;
-    f3->log_q.resize(this->log_q.length());
-    for (int i = 0; i < log_q.length(); i++)
+    f3->log_q.resize(this->log_q.size());
+    for (size_t i = 0; i < log_q.size(); i++)
     {
       f3->log_q[i] = this->log_q[i];
-    }
     if (this->estimate_q)
     {
       if (this->random_q)
       {
-        d3->RegisterRandomEffect(f3->log_q);
+        d3->RegisterRandomEffect(f3->log_q[i]);
       }
       else
       {
-        d3->RegisterParameter(f3->log_q);
+        d3->RegisterParameter(f3->log_q[i]);
       }
+    }
     }
 
     // add to Information
