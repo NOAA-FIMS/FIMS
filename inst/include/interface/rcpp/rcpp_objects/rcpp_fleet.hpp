@@ -20,12 +20,13 @@
  */
 class FleetInterface : public FIMSRcppInterfaceBase
 {
-  public:
   int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
   int index_likelihood_id = -999;   /*!< id of index likelihood component*/
   int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
   int observed_index_data_id = -999;   /*!< id of observed index data object*/
   int selectivity_id = -999; /*!< id of selectivity component*/
+
+  public:
   int nages;
   int nyears;
   Rcpp::NumericMatrix observed_age_composition;
@@ -89,7 +90,7 @@ public:
    * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
    * object
    */
-  void SetObservedAgeCompData(int observed_agecomp_data_id)
+  void SetObservedAgeCompData(int observed_agecomp_data_id, Rcpp::NumericMatrix agecomp_data)
   {
     // Check if observed age composition data have been set already
     if (this->observed_agecomp_data_id != -999)
@@ -100,6 +101,7 @@ public:
             << observed_agecomp_data_id << std::endl;
 
       this->observed_agecomp_data_id = observed_agecomp_data_id;
+      this->observed_age_composition = agecomp_data;
     }
   }
 
@@ -108,7 +110,7 @@ public:
    *
    * @param observed_index_data_id Unique id for the Observed Index Data object
    */
-  void SetObservedIndexData(int observed_index_data_id)
+  void SetObservedIndexData(int observed_index_data_id, Rcpp::NumericVector indexdata)
   {
     // Check if observed index data have been set already
     if (this->observed_index_data_id != -999)
@@ -119,7 +121,7 @@ public:
             << observed_index_data_id << std::endl;
     }
       this->observed_index_data_id = observed_index_data_id;
-    
+      this->observed_index = indexdata; 
   }
 
   /**

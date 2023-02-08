@@ -53,6 +53,7 @@ struct Fleet : public FIMSObject<Type> {
   ParameterVector
       log_q; /*!< estimated parameter: catchability of the fleet */
 
+  Type log_obs_error; /*!< estimated parameter: observation error associated with index */
   std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
   std::vector<Type>
       q; /*!< transofrmed parameter: the catchability of the fleet */

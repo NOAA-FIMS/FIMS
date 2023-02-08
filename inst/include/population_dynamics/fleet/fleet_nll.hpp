@@ -79,8 +79,8 @@ struct FleetAgeCompNLL : public Fleet<Type> {
     Type nll = 0.0; /*!< The negative log likelihood value */
 
       fims::Dmultinom<Type> dmultinom;
-      if(this->oberved_agecomp_data.size() != this->age_composition.size()){
-       FIMS_LOG << "Error: observed age comp is of size " <<  this->oberved_agecomp_data.size() <<
+      if(this->observed_agecomp_data.size() != this->age_composition.size()){
+       FIMS_LOG << "Error: observed age comp is of size " <<  this->observed_agecomp_data.size() <<
        " and expected is of size " << this->age_composition.size() << std::endl;
       } else{
       for (size_t i = 0; i < this->age_composition.size(); i++) {
