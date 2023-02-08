@@ -9,6 +9,7 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 
 #include "../../../population_dynamics/fleet/fleet.hpp"
+#include "../../../population_dynamics/fleet/fleet_nll.hpp"
 #include "rcpp_interface_base.hpp"
 
 /**
@@ -25,6 +26,10 @@ class FleetInterface : public FIMSRcppInterfaceBase
   int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
   int observed_index_data_id = -999;   /*!< id of observed index data object*/
   int selectivity_id = -999; /*!< id of selectivity component*/
+  int nages;
+  int nyears;
+  Rcpp::NumericMatrix observed_age_composition;
+  std::vector<double> observed_index;
   std::vector<double> log_q;
   std::vector<double> log_Fmort;
   bool estimate_F = false;
@@ -134,6 +139,39 @@ public:
 
     this->selectivity_id = selectivity_id;
   }
+
+  virtual double evaluate_index_nll() {
+    fims::FleetIndexNLL<double> NLL;
+
+    //Make observed index data from R a DataObject
+    NLL.observed_index_data = new fims::DataObject<double>(nyears);
+
+    for (int i = 0; i < observed_index.size(); i++) {
+      NLL.observed_index_data[i] = this->observed_index[i];
+    }
+
+    return NLL.evaluate();
+  }
+
+  virtual double evaluate_agecomp_nll() {
+    double nll = 0.0;
+    fims::FleetAgeCompNLL<double> NLL;
+
+    NLL.observed_agecomp_data = new fims::DataObject<double>(nages, nyears);  // Vector from TMB
+
+    for(int y = 0; y < nyears; y++){
+      for (int i = 0; i < nages; i++) {
+        NLL.observed_agecomp_data[y, i] = observed_age_composition[y, i];
+        nll -= NLL.evaluate();
+      }
+
+    }
+    Rcout << "Age composition being passed to C++ are " << observed_age_composition
+          << std::endl;
+
+    return nll;
+  }
+
 
   /** @brief this adds the values to the TMB model object */
   virtual bool add_to_fims_tmb()
