@@ -51,17 +51,12 @@ class PopulationPrepareTestFixture : public testing::Test {
     population.nages = nages;
     population.nfleets = nfleets;
 
-    population.Initialize(nyears, nseasons, nages);
-
-    for(int i = 0; i < nages; i++){
-      population.ages[i] = i+1;
-    }
 
     // C++ code to set up true values for log_naa, log_M,
     // log_Fmort, and log_q:
     int seed = 1234;
     std::default_random_engine generator(seed);
-
+    
     // log_Fmort
     double log_Fmort_min = fims::log(0.1);
     double log_Fmort_max = fims::log(2.3);
@@ -73,16 +68,34 @@ class PopulationPrepareTestFixture : public testing::Test {
     double log_q_max = fims::log(1);
     std::uniform_real_distribution<double> log_q_distribution(log_q_min,
                                                               log_q_max);
-    // Does Fmort need to be in side of the year loop like log_q?
+
+    // Make a shared pointer to selectivity and fleet because
+    // fleet object needs a shared pointer in fleet.hpp
+    // (std::shared_ptr<fims::SelectivityBase<Type> > selectivity;)
+    // and population object needs a shared pointer in population.hpp
+    // (std::vector<std::shared_ptr<fims::Fleet<Type> > > fleets;)
+
+        // Does Fmort need to be in side of the year loop like log_q?
     for (int i = 0; i < nfleets; i++) {
       auto fleet = std::make_shared<fims::Fleet<double>>();
+      auto selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
+      selectivity->median = 7;
+      selectivity->slope = 0.5;
+
       fleet->Initialize(nyears, nages);
+      fleet->selectivity = selectivity;
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
         fleet->log_q[year] = log_q_distribution(generator);
       }
       fleet->Prepare();
       population.fleets.push_back(fleet);
+    }
+
+    population.Initialize(nyears, nseasons, nages);
+
+    for(int i = 0; i < nages; i++){
+      population.ages[i] = i+1;
     }
 
     // log_naa
@@ -115,7 +128,6 @@ class PopulationPrepareTestFixture : public testing::Test {
     // weight_at_age
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
-
     
     std::shared_ptr<fims::EWAAgrowth<double> > growth
                 = std::make_shared<fims::EWAAgrowth<double> > ();
@@ -128,22 +140,6 @@ class PopulationPrepareTestFixture : public testing::Test {
     population.growth = growth;
 
     population.Prepare();
-
-    // Make a shared pointer to selectivity and fleet because
-    // fleet object needs a shared pointer in fleet.hpp
-    // (std::shared_ptr<fims::SelectivityBase<Type> > selectivity;)
-    // and population object needs a shared pointer in population.hpp
-    // (std::vector<std::shared_ptr<fims::Fleet<Type> > > fleets;)
-    for (int i = 0; i < population.nfleets; i++) {
-      auto selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
-      selectivity->median = 7;
-      selectivity->slope = 0.5;
-
-      auto fleet = std::make_shared<fims::Fleet<double>>();
-      fleet->Initialize(nyears, nages);
-      fleet->selectivity = selectivity;
-      population.fleets[i] = fleet;
-    }
 
     auto maturity = std::make_shared<fims::LogisticMaturity<double>>();
     maturity->median = 6;
