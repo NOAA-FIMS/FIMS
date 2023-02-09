@@ -7,7 +7,7 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, CalculateCatch_works)
     {
-        
+        std::ofstream out("debugCatch.txt");
         std::vector<double> expected_catch(nyears * nfleets, 0);
         // set up an arbitrary year/age combo to test
         int year = 4;

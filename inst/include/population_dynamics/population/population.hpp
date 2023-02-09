@@ -275,7 +275,7 @@ namespace fims {
             this->spawning_biomass[year] +=
                     this->proportion_female * this->numbers_at_age[index_ya] *
                     this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
-                    std::cout<<      this->proportion_female << " " <<
+                    FIMS_LOG <<      this->proportion_female << " " <<
                     this->proportion_mature_at_age[index_ya]<< " " << growth->evaluate(age) << " spawning biomass inputs----- +++\n";
         }
 
@@ -306,7 +306,7 @@ namespace fims {
                     this->recruitment->recruit_deviations[year];
 
                     FIMS_LOG <<      this->spawning_biomass[year - 1] << " " <<
-                    this->unfished_spawning_biomass[year - 1]<<" ----- +++\n" << std::endl;
+                    this->unfished_spawning_biomass[0]<<" ----- +++\n" << std::endl;
                     FIMS_LOG <<      this->recruitment->evaluate(this->spawning_biomass[year - 1],
                     this->unfished_spawning_biomass[year - 1])<<" ----- +++\n" << std::endl;
         }
