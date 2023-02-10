@@ -106,13 +106,17 @@ RCPP_MODULE(fims)
         .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
        .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
+    Rcpp::class_<DataInterface>("Data")
+        .constructor<Rcpp::NumericVector>()
+        .field("observed_data", &DataInterface::observed_data);
+
     Rcpp::class_<AgeCompDataInterface>("AgeComp")
-        .constructor<size_t, size_t>()
-        .field("age_comp_data", &AgeCompDataInterface::observed_data);
+        .constructor<size_t, size_t, Rcpp::NumericVector>()
+        .field("age_comp_data", &AgeCompDataInterface::age_comp_data);
 
     Rcpp::class_<IndexDataInterface>("Index")
         .constructor<size_t>()
-        .field("index_data", &IndexDataInterface::observed_data);
+        .field("index_data", &IndexDataInterface::index_data);
 
     Rcpp::class_<PopulationInterface>("Population")
         .constructor()
