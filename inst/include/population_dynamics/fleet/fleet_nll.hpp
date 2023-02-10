@@ -85,8 +85,10 @@ struct FleetAgeCompNLL : public Fleet<Type> {
        " and expected is of size " << this->age_composition.size() << std::endl;
       } else{
       for(size_t y = 0; y < this->nyears; y++){
-      ModelTraits<Type>::EigenVector observed_acomp;
-      ModelTraits<Type>::EigenVector expected_acomp;
+        
+      using Vector = typename ModelTraits<Type>::EigenVector;
+      Vector observed_acomp;
+      Vector expected_acomp;
 
       observed_acomp.resize(this->nages);
       expected_acomp.resize(this->nages);
@@ -103,7 +105,8 @@ struct FleetAgeCompNLL : public Fleet<Type> {
       }
       return nll;
     }
-  };
+  }
+};
 
 
 template <class Type>

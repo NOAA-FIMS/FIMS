@@ -20,12 +20,18 @@
 class DataInterface : public FIMSRcppInterfaceBase
 {
 public:
-  Rcpp::NumericVector observed_data;
+  Rcpp::NumericVector observed_data; /*!< The data */
   static uint32_t id_g; /**< static id of the DataInterface object */
   uint32_t id;          /**< local id of the DataInterface object */
 
-  DataInterface() { this->id = DataInterface::id_g++; }
+  /** @brief constructor
+  */
+  DataInterface(Rcpp::NumericVector data_) { 
+    this->id = DataInterface::id_g++; 
+  }
 
+  /** @brief destructor
+  */
   virtual ~DataInterface() {}
 };
 
@@ -36,10 +42,11 @@ class AgeCompDataInterface : public DataInterface
 public:
   size_t amax; /*!< first dimension of the data */
   size_t ymax; /*!< second dimension of the data */
+  Rcpp::NumericVector age_comp_data; /*!<the age composition data*/
 
-  AgeCompDataInterface(size_t amax = 0, size_t ymax = 0) : DataInterface()
-  {
-  }
+  AgeCompDataInterface(size_t amax = 0, size_t ymax = 0, 
+  Rcpp::NumericVector data_ = R_NilValue) : DataInterface(age_comp_data),
+   age_comp_data(data_) { }
 
   virtual ~AgeCompDataInterface() {}
 
@@ -86,10 +93,11 @@ class IndexDataInterface : public DataInterface
   {
   public:
     size_t ymax; /*!< second dimension of the data */
+    Rcpp::NumericVector index_data; /*!<the age composition data*/
 
-    IndexDataInterface(size_t ymax = 0) : DataInterface()
-    {
-    }
+    IndexDataInterface(size_t ymax = 0, 
+    Rcpp::NumericVector data_ = R_NilValue) : DataInterface(index_data),
+    index_data(data_)  { }
 
     virtual ~IndexDataInterface() {}
 
