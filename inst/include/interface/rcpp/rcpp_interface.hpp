@@ -12,6 +12,7 @@
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 
 #include "rcpp_objects/rcpp_fleet.hpp"
+#include "rcpp_objects/rcpp_data.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
@@ -103,9 +104,15 @@ RCPP_MODULE(fims)
         .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
         .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
         .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
-       .method("SetSelectivity", &FleetInterface::SetSelectivity)
-       .method("evaluate_index_nll", &FleetInterface::evaluate_index_nll)
-     .method("evaluate_agecomp_nll", &FleetInterface::evaluate_agecomp_nll);
+       .method("SetSelectivity", &FleetInterface::SetSelectivity);
+
+    Rcpp::class_<AgeCompDataInterface>("AgeComp")
+        .constructor<size_t, size_t>()
+        .field("age_comp_data", &AgeCompDataInterface::observed_data);
+
+    Rcpp::class_<IndexDataInterface>("Index")
+        .constructor<size_t>()
+        .field("index_data", &IndexDataInterface::observed_data);
 
     Rcpp::class_<PopulationInterface>("Population")
         .constructor()

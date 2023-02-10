@@ -45,10 +45,10 @@ class Information {
   std::vector<T> ages;          /**< ages in model >*/
 
   // data objects
-  std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >
+  std::map<uint32_t, std::shared_ptr<fims::DataObject<double> > >
       data_objects; /*!< map that holds data objects >*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims::DataObject<T> > >::iterator
+                            std::shared_ptr<fims::DataObject<double> > >::iterator
       data_iterator; /**< iterator for the data objects */
 
   // life history modules

@@ -29,10 +29,8 @@ class FleetInterface : public FIMSRcppInterfaceBase
   public:
   int nages;
   int nyears;
-  Rcpp::NumericMatrix observed_age_composition;
-  std::vector<double> observed_index;
-  std::vector<double> log_q;
-  std::vector<double> log_Fmort;
+  Rcpp::NumericVector log_q;
+  Rcpp::NumericVector log_Fmort;
   bool estimate_F = false;
   bool estimate_q = false;
   bool random_q = false;
@@ -101,7 +99,6 @@ public:
             << observed_agecomp_data_id << std::endl;
 
       this->observed_agecomp_data_id = observed_agecomp_data_id;
-      this->observed_age_composition = agecomp_data;
     }
   }
 
@@ -120,8 +117,7 @@ public:
                "data ID of "
             << observed_index_data_id << std::endl;
     }
-      this->observed_index_data_id = observed_index_data_id;
-      this->observed_index = indexdata; 
+      this->observed_index_data_id = observed_index_data_id; 
   }
 
   /**
@@ -142,39 +138,6 @@ public:
     this->selectivity_id = selectivity_id;
   }
 
-  virtual double evaluate_index_nll() {
-    fims::FleetIndexNLL<double> NLL;
-
-    //Make observed index data from R a DataObject
-    NLL.observed_index_data = new fims::DataObject<double>(nyears);
-
-    for (int i = 0; i < observed_index.size(); i++) {
-      NLL.observed_index_data[i] = this->observed_index[i];
-    }
-
-    return NLL.evaluate();
-  }
-
-  virtual double evaluate_agecomp_nll() {
-    double nll = 0.0;
-    fims::FleetAgeCompNLL<double> NLL;
-
-    NLL.observed_agecomp_data = new fims::DataObject<double>(nages, nyears);  // Vector from TMB
-
-    for(int y = 0; y < nyears; y++){
-      for (int i = 0; i < nages; i++) {
-        NLL.observed_agecomp_data[y, i] = observed_age_composition[y, i];
-        nll -= NLL.evaluate();
-      }
-
-    }
-    Rcout << "Age composition being passed to C++ are " << observed_age_composition
-          << std::endl;
-
-    return nll;
-  }
-
-
   /** @brief this adds the values to the TMB model object */
   virtual bool add_to_fims_tmb()
   {
@@ -193,7 +156,7 @@ public:
     // f0->observed_index_data_id = this->observed_index_data_id;
     f0->selectivity_id = this->selectivity_id;
     f0->log_q.resize(this->log_q.size());
-    for (size_t i = 0; i < log_q.size(); i++)
+    for (int i = 0; i < log_q.size(); i++)
     {
       f0->log_q[i] = this->log_q[i];
     
@@ -227,7 +190,7 @@ public:
     // f1->observed_index_data_id = this->observed_index_data_id;
     f1->selectivity_id = this->selectivity_id;
     f1->log_q.resize(this->log_q.size());
-    for (size_t i = 0; i < log_q.size(); i++)
+    for (int i = 0; i < log_q.size(); i++)
     {
       f1->log_q[i] = this->log_q[i];
     if (this->estimate_q)
@@ -260,7 +223,7 @@ public:
     // f2->observed_index_data_id = this->observed_index_data_id;
     f2->selectivity_id = this->selectivity_id;
     f2->log_q.resize(this->log_q.size());
-    for (size_t i = 0; i < log_q.size(); i++)
+    for (int i = 0; i < log_q.size(); i++)
     {
       f2->log_q[i] = this->log_q[i];
     if (this->estimate_q)
@@ -293,7 +256,7 @@ public:
     // f3->observed_index_data_id = this->observed_index_data_id;
     f3->selectivity_id = this->selectivity_id;
     f3->log_q.resize(this->log_q.size());
-    for (size_t i = 0; i < log_q.size(); i++)
+    for (int i = 0; i < log_q.size(); i++)
     {
       f3->log_q[i] = this->log_q[i];
     if (this->estimate_q)

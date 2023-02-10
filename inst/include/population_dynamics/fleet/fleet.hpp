@@ -42,10 +42,10 @@ struct Fleet : public FIMSObject<Type> {
       selectivity; /*!< selectivity component*/
   
   int observed_index_data_id = -999; /*!< id of index data */
-  std::shared_ptr<fims::DataObject<Type>> observed_index_data; /*!< observed index data*/
+  std::shared_ptr<fims::DataObject<double>> observed_index_data; /*!< observed index data*/
 
   int observed_agecomp_data_id = -999; /*!< id of age comp data */
-  std::shared_ptr<fims::DataObject<Type>> 
+  std::shared_ptr<fims::DataObject<double>> 
   observed_agecomp_data; /*< observed agecomp data*/
 
   // Mortality and catchability
@@ -67,7 +67,6 @@ struct Fleet : public FIMSObject<Type> {
   std::vector<Type> expected_catch; /*!<model expected total catch*/
   std::vector<Type> expected_index; /*!<model expected index of abundance*/
   std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
-
   /**
    * @brief Constructor.
    */
@@ -114,14 +113,6 @@ struct Fleet : public FIMSObject<Type> {
     }
   }
 
-  /**
-   * @brief Sum of index and agecomp likelihoods
-   * @param do_log Whether to take the log of the likelihood.
-   */
-  const Type likelihood(bool do_log) {
-    return this->index_likelihood->evaluate(do_log) +
-           this->agecomp_likelihood->evaluate(do_log);
-  }
 };
 
 // default id of the singleton fleet class
