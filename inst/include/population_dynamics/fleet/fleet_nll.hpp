@@ -17,6 +17,7 @@
 #include "../../common/model_object.hpp"
 #include "../../distributions/distributions.hpp"
 #include "fleet.hpp"
+#include <numeric>
 
 namespace fims {
 #ifdef TMB_MODEL
@@ -83,11 +84,22 @@ struct FleetAgeCompNLL : public Fleet<Type> {
        FIMS_LOG << "Error: observed age comp is of size " <<  this->observed_agecomp_data.size() <<
        " and expected is of size " << this->age_composition.size() << std::endl;
       } else{
-      for (size_t i = 0; i < this->age_composition.size(); i++) {
-        dmultinom.x[i] = this->observed_agecomp_data[i];
-        dmultinom.p[i] = this->age_composition[i];//probabilities for ages
+      for(size_t y = 0; y < this->nyears; y++){
+      ModelTraits<Type>::EigenVector observed_acomp;
+      ModelTraits<Type>::EigenVector expected_acomp;
+
+      observed_acomp.resize(this->nages);
+      expected_acomp.resize(this->nages);
+      double sum = std::accumulate(this->catch_numbers_at_age.begin(),
+      this->catch_numbers_at_age.end(),0.0);
+        for (size_t a = 0; a < this->nages; a++) {
+          size_t index_ya = y*this->nages + a;
+          expected_acomp[a] = this->catch_numbers_at_age[index_ya]/sum;//probabilities for ages
+          observed_acomp[a] = this->observed_agecomp_data->at(y,a);
+        }
+        dmultinom.x = observed_acomp;
+        dmultinom.p = expected_acomp;
         nll -= dmultinom.evaluate(true);
-      }
       }
       return nll;
     }
