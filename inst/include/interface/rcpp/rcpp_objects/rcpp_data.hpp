@@ -26,7 +26,7 @@ public:
 
   /** @brief constructor
   */
-  DataInterface(Rcpp::NumericVector data_) { 
+  DataInterface() { 
     this->id = DataInterface::id_g++; 
   }
 
@@ -40,13 +40,11 @@ uint32_t DataInterface::id_g = 1;
 class AgeCompDataInterface : public DataInterface
 {
 public:
-  size_t amax; /*!< first dimension of the data */
-  size_t ymax; /*!< second dimension of the data */
+  int amax; /*!< first dimension of the data */
+  int ymax; /*!< second dimension of the data */
   Rcpp::NumericVector age_comp_data; /*!<the age composition data*/
 
-  AgeCompDataInterface(size_t amax = 0, size_t ymax = 0, 
-  Rcpp::NumericVector data_ = R_NilValue) : DataInterface(age_comp_data),
-   age_comp_data(data_) { }
+  AgeCompDataInterface(int amax = 0, int ymax = 0): DataInterface() { }
 
   virtual ~AgeCompDataInterface() {}
 
@@ -57,11 +55,11 @@ public:
 
     age_comp_data->id = this->id;
 
-    for (size_t y = 0; y < ymax; y++)
+    for (int y = 0; y < ymax; y++)
     {
-      for (size_t a = 0; a < amax; a++)
+      for (int a = 0; a < amax; a++)
       {
-        size_t index_ya = y * amax + a;
+        int index_ya = y * amax + a;
         age_comp_data->at(y, a) = this->observed_data[index_ya];
       }
     }
@@ -92,12 +90,10 @@ public:
 class IndexDataInterface : public DataInterface
   {
   public:
-    size_t ymax; /*!< second dimension of the data */
+    int ymax; /*!< second dimension of the data */
     Rcpp::NumericVector index_data; /*!<the age composition data*/
 
-    IndexDataInterface(size_t ymax = 0, 
-    Rcpp::NumericVector data_ = R_NilValue) : DataInterface(index_data),
-    index_data(data_)  { }
+    IndexDataInterface(int ymax = 0) : DataInterface() { }
 
     virtual ~IndexDataInterface() {}
 
@@ -109,7 +105,7 @@ class IndexDataInterface : public DataInterface
 
     index_data->id = this->id;
 
-    for (size_t y = 0; y < ymax; y++)
+    for (int y = 0; y < ymax; y++)
     {
         index_data->at(y) = this->observed_data[y];
       }
