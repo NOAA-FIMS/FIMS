@@ -1,4 +1,3 @@
-
 # This file defines a parent class and its children by
 # (1) setting the class;
 # (2) defining methods, using setMethod();
