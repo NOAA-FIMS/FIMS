@@ -5,9 +5,9 @@ test_that("Recruitment input settings work as expected", {
   # Create recruitment
   recruitment <- new(fims$BevertonHoltRecruitment)
   h <- 0.75
-  r0 <- 1000.0
-  spawns <- 30.0
-  ssb0 <- 100.0
+  r0 <- 1000000.0
+  spawns <- 9.55784*10^6
+  ssb0 <- 0.0102562
 
 
   recruitment$steep$value <- h
@@ -23,7 +23,7 @@ test_that("Recruitment input settings work as expected", {
   expect_equal(recruitment$steep$max, 1.0)
   expect_true(recruitment$steep$is_random_effect)
   expect_true(recruitment$steep$estimated)
-  expect_equal(recruitment$rzero$value, 1000.0)
+  expect_equal(recruitment$rzero$value, 1000000.0)
 
   expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 837.209300)
 

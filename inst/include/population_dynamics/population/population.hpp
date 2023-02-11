@@ -302,13 +302,14 @@ namespace fims {
         void CalculateRecruitment(int index_ya, int year) {
             this->numbers_at_age[index_ya] =
                     this->recruitment->evaluate(this->spawning_biomass[year - 1],
-                    this->unfished_spawning_biomass[year - 1]) *
+                    0.01025625) *
                     this->recruitment->recruit_deviations[year];
 
                     FIMS_LOG <<      this->spawning_biomass[year - 1] << " " <<
-                    this->unfished_spawning_biomass[0]<<" ----- +++\n" << std::endl;
+                    this->numbers_at_age[0]<<" ----- +++\n" << std::endl;
                     FIMS_LOG <<      this->recruitment->evaluate(this->spawning_biomass[year - 1],
-                    this->unfished_spawning_biomass[year - 1])<<" ----- +++\n" << std::endl;
+                    this->unfished_spawning_biomass[0]/this->numbers_at_age[0])<< " phi0 " <<
+                    this->unfished_spawning_biomass[0]/this->numbers_at_age[0] <<" ----- +++\n" << std::endl;
         }
 
         /**
@@ -500,7 +501,7 @@ namespace fims {
                             FIMS_LOG << "Recruitment: " << std::endl;
                             CalculateRecruitment(index_ya, y);
                             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
-                            //this->numbers_at_age[index_ya] = this->recruitment->rzero;
+                    
                         } else {
                             int index_ya2 = (y - 1) * nages + (a - 1);
                             CalculateNumbersAA(index_ya, index_ya2, a);

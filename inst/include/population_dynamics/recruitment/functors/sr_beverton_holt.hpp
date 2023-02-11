@@ -47,8 +47,12 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
    */
   virtual const Type evaluate(const Type& spawners, const Type& ssbzero) {
     Type recruits;
+    FIMS_LOG << "Recruitment evaluate: " << this->rzero <<
+    " h " << steep << " ssbzero " << ssbzero << " spawners " << spawners << std::endl; 
     recruits = (0.8 * this->rzero * steep * spawners) /
                (0.2 * ssbzero * (1.0 - steep) + spawners * (steep - 0.2));
+    
+    FIMS_LOG << " recruits " << recruits << std::endl;
     return recruits;
   }
 };
