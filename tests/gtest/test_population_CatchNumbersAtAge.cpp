@@ -12,6 +12,7 @@ namespace
         int index_ya = year * population.nages + age;
         int index_ya2 = (year - 1) * population.nages + age - 1;
 
+        std::ofstream out("CatchNumbers.txt");
         // calculate catch numbers at age in population module
         // Ian: not sure which of these are needed
         population.CalculateMortality(index_ya, year, age);
@@ -32,6 +33,7 @@ namespace
         for (int i = 0; i < (nyears + 1) * nages; i++)
         {
           test_naa[i] = population.numbers_at_age[i];
+          out << population.numbers_at_age[i] << std::endl;
         }
         test_naa[index_ya] = test_naa[index_ya2] * exp(-population.mortality_Z[index_ya2]);
 
@@ -46,19 +48,20 @@ namespace
 
             // Baranov Catch Equation adapted from 
             // \inst\include\population_dynamics\population\population.hpp
+            out << "F:" << population.fleets[fleet_index]->Fmort[year]  << std::endl;
             catch_temp =
               (population.fleets[fleet_index]->Fmort[year] *
-              population.fleets[fleet_index]->selectivity->evaluate(age)) / 
+              population.fleets[fleet_index]->selectivity->evaluate(population.ages[age])) / 
               population.mortality_Z[index_ya] *
               test_naa[index_ya] *
               (1 - exp(-(population.mortality_Z[index_ya])));
             test_catch_naa[index_yaf] += catch_temp;
-            test_catch_waa[index_yaf] += catch_temp * population.weight_at_age[age];
+            test_catch_waa[index_yaf] += catch_temp * population.growth->evaluate(population.ages[age]);
 
             // test value
-          EXPECT_EQ(population.catch_numbers_at_age[index_yaf], test_catch_naa[index_yaf]);
+          EXPECT_EQ(population.fleets[fleet_index]->catch_numbers_at_age[index_ya], test_catch_naa[index_yaf]);
           EXPECT_EQ(population.catch_weight_at_age[index_yaf], test_catch_waa[index_yaf]);
-          EXPECT_GT(population.catch_numbers_at_age[index_yaf], 0);
+          EXPECT_GT(population.fleets[fleet_index]->catch_numbers_at_age[index_ya], 0);
           EXPECT_GT(population.catch_weight_at_age[index_yaf], 0);
         }
         

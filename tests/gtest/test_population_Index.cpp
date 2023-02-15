@@ -27,9 +27,9 @@ namespace
             int index_yf = year * population.nfleets + fleet_;
             
             expected_index[index_yf] += population.numbers_at_age[index_yaf]*
-                                        population.fleets[fleet_]->q[index_yf]*
-                                        population.fleets[fleet_]->selectivity->evaluate(age)*
-                                        population.weight_at_age[age];
+                                        population.fleets[fleet_]->q[year]*
+                                        population.fleets[fleet_]->selectivity->evaluate(population.ages[age])*
+                                        population.growth->evaluate(population.ages[age]);
         
         EXPECT_EQ(population.expected_index[index_yf], expected_index[index_yf]);
         EXPECT_GT(population.expected_index[index_yf], 0);

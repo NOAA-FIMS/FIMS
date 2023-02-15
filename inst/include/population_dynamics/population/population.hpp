@@ -94,8 +94,6 @@ namespace fims {
         std::vector<Type> expected_numbers_at_age; /*!< Expected values: Numbers at
                                                   age (thousands?? millions??) */
         std::vector<Type>
-        catch_numbers_at_age; /*!< Expected values???: Catch in numbers at age*/
-        std::vector<Type>
         catch_weight_at_age; /*!< Expected values???: Weight at age for catch*/
         std::vector<Type> expected_catch; /*!< Expected values: Catch*/
         std::vector<Type> expected_index; /*!< Expected values: Index (CPUE)*/
@@ -140,7 +138,6 @@ namespace fims {
 
             // size all the vectors to length of nages
             nfleets = fleets.size();
-            catch_numbers_at_age.resize(nyears * nages * nfleets);
             catch_weight_at_age.resize(nyears * nages * nfleets);
             expected_catch.resize(nyears * nfleets);
             expected_index.resize(nyears * nfleets);
@@ -276,7 +273,7 @@ namespace fims {
                     this->proportion_female * this->numbers_at_age[index_ya] *
                     this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
                     FIMS_LOG <<      this->proportion_female << " " <<
-                    this->proportion_mature_at_age[index_ya]<< " " << growth->evaluate(age) << " spawning biomass inputs----- +++\n";
+                    this->proportion_mature_at_age[index_ya]<< " " << growth->evaluate(ages[age]) << " spawning biomass inputs----- +++\n";
         }
 
         /**
@@ -397,8 +394,11 @@ namespace fims {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
                 int index_yaf =
                         year * this->nages * this->nfleets + age * this->nfleets + fleet_;
+                FIMS_LOG << " fleet "<< fleet_ << std::endl;
+                FIMS_LOG << " catchnaa "<< this->fleets[fleet_]->catch_numbers_at_age[year] << std::endl;
+                FIMS_LOG << " weight "<< this->growth->evaluate(static_cast<double>(ages[age])) << std::endl;
                 this->catch_weight_at_age[index_yaf] =
-                        this->catch_numbers_at_age[index_yaf] * growth->evaluate(ages[age]);//this->weight_at_age[age];
+                        this->fleets[fleet_]->catch_numbers_at_age[year] * this->growth->evaluate(static_cast<double>(ages[age]));//this->weight_at_age[age];
             }
         }
 

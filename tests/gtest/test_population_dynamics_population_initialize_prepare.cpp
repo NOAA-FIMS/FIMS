@@ -20,9 +20,6 @@ namespace
 
         EXPECT_EQ(population.nfleets, nfleets);
         EXPECT_EQ(population.ages.size(), nages);
-        EXPECT_EQ(
-            population.catch_numbers_at_age.size(),
-            nyears* nages * nfleets);
         EXPECT_EQ(population.mortality_F.size(), nyears * nages);
         EXPECT_EQ(population.mortality_Z.size(), nyears * nages);
         EXPECT_EQ(population.proportion_mature_at_age.size(), (nyears+1) * nages);

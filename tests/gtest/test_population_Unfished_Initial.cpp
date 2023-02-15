@@ -7,24 +7,19 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, CalculateMortality_works)
     {
-        std::ofstream out("mortality.txt");
         for (int year = 0; year < population.nyears; year++)
         {
             for (int age = 0; age < population.nages; age++)
             {
                 int index_ya = year * population.nages + age;
-                out << "F " << population.nfleets << std::endl;
                 population.CalculateMortality(index_ya, year, age);
 
                 std::vector<double> mortality_F(nyears * nages, 0);
-
                 for (int fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
                 {
                     size_t index_yf = year * population.nfleets + fleet_index;
-                    out << "F " << population.fleets[fleet_index]->Fmort[index_yf]<< std::endl;
-                    out << population.fleets[fleet_index]->selectivity->evaluate(population.ages[age]) << std::endl;
-                    mortality_F[index_ya] += population.fleets[fleet_index]->Fmort[index_yf] *
-                                             population.fleets[fleet_index]->selectivity->evaluate(age);
+                    mortality_F[index_ya] += population.fleets[fleet_index]->Fmort[year] *
+                                             population.fleets[fleet_index]->selectivity->evaluate(population.ages[age]);
                 }
                 EXPECT_EQ(population.mortality_F[index_ya], mortality_F[index_ya]);
 
