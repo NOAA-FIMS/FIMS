@@ -68,8 +68,8 @@ namespace fims {
         std::vector<Type> naa; /*!< transformed parameter: numbers at age*/
         std::vector<Type> M; /*!< transformed parameter: Natural Mortality*/
 
-        std::vector<Type> ages; /*!< vector of the ages for referencing*/
-        std::vector<Type> years; /*!< vector of years for referencing*/
+        std::vector<double> ages; /*!< vector of the ages for referencing*/
+        std::vector<double> years; /*!< vector of years for referencing*/
         std::vector<Type> mortality_F; /*!< vector of fishing mortality summed across
                                     fleet by year and age*/
         std::vector<Type>
@@ -287,7 +287,25 @@ namespace fims {
         void CalculateUnfishedSpawningBiomass(int index_ya, int year, int age) {
             this->unfished_spawning_biomass[year] +=
                     this->proportion_female * this->unfished_numbers_at_age[index_ya] *
-                    this->proportion_mature_at_age[index_ya] * this->growth->evaluate(static_cast<double>(ages[age]));
+                    this->proportion_mature_at_age[index_ya] * this->growth->evaluate(ages[age]);
+        }
+
+        /**
+         * @brief Calculates equilibrium spawning biomass per recruit
+         * 
+         * @return Type 
+         */
+        Type CalculateSBPR0(){
+            std::vector<Type> numbers_spr(this->nages, 1.0);
+            Type phi_0 = 0.0;
+            phi_0 += numbers_spr[0]*this->proportion_female*this->proportion_mature_at_age[0]*this->growth->evaluate(ages[0]);
+            for(size_t a = 1; a < (this->nages-1); a++){
+                numbers_spr[a] = numbers_spr[a-1]*std::exp(-this->M[a]);
+                phi_0 += numbers_spr[a]*this->proportion_female*this->proportion_mature_at_age[a]*this->growth->evaluate(ages[a]);
+            }
+            numbers_spr[this->nages-1]=(numbers_spr[nages-2]*std::exp(-this->M[nages-1]))/(1-exp(-this->M[this->nages-1]));
+            phi_0 += numbers_spr[this->nages-1]*this->proportion_female*this->proportion_mature_at_age[this->nages-1]*this->growth->evaluate(ages[this->nages-1]);       
+            return phi_0;        
         }
 
         /**
@@ -297,16 +315,17 @@ namespace fims {
          * @param year the year recruitment is being calculated for
          */
         void CalculateRecruitment(int index_ya, int year) {
+            Type phi0 = CalculateSBPR0();
             this->numbers_at_age[index_ya] =
                     this->recruitment->evaluate(this->spawning_biomass[year - 1],
-                    0.01025625) *
+                    phi0) *
                     this->recruitment->recruit_deviations[year];
 
                     FIMS_LOG <<      this->spawning_biomass[year - 1] << " " <<
                     this->numbers_at_age[0]<<" ----- +++\n" << std::endl;
                     FIMS_LOG <<      this->recruitment->evaluate(this->spawning_biomass[year - 1],
-                    this->unfished_spawning_biomass[0]/this->numbers_at_age[0])<< " phi0 " <<
-                    this->unfished_spawning_biomass[0]/this->numbers_at_age[0] <<" ----- +++\n" << std::endl;
+                    phi0)<< " phi0 " <<
+                    phi0 <<" ----- +++\n" << std::endl;
         }
 
         /**
@@ -396,9 +415,9 @@ namespace fims {
                         year * this->nages * this->nfleets + age * this->nfleets + fleet_;
                 FIMS_LOG << " fleet "<< fleet_ << std::endl;
                 FIMS_LOG << " catchnaa "<< this->fleets[fleet_]->catch_numbers_at_age[year] << std::endl;
-                FIMS_LOG << " weight "<< this->growth->evaluate(static_cast<double>(ages[age])) << std::endl;
+                FIMS_LOG << " weight "<< this->growth->evaluate(ages[age]) << std::endl;
                 this->catch_weight_at_age[index_yaf] =
-                        this->fleets[fleet_]->catch_numbers_at_age[year] * this->growth->evaluate(static_cast<double>(ages[age]));//this->weight_at_age[age];
+                        this->fleets[fleet_]->catch_numbers_at_age[year] * this->growth->evaluate(ages[age]);//this->weight_at_age[age];
             }
         }
 

@@ -396,7 +396,7 @@ public:
         it = input.FindMember("W.kg");
         e = (*it).value;
         for (int i = 0; i < e.Size(); i++) {
-            growth->ewaa[static_cast<double> (pop.ages[i])] = e[i].GetDouble();
+            growth->ewaa[static_cast<double> (pop.ages[i])] = e[i].GetDouble()/1000.0;
         }
         pop.growth = growth;
 
