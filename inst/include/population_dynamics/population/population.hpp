@@ -331,7 +331,7 @@ namespace fims {
             int index_ya = year * this->nages + age;
                 this->expected_catch[index_yf] += this->fleets[fleet_]->catch_weight_at_age[index_ya];
 
-                fleets[fleet_]->expected_catch[index_yf] +=
+                fleets[fleet_]->expected_catch[year] +=
                         this->fleets[fleet_]->catch_weight_at_age[index_ya];
             }
         }

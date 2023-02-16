@@ -37,7 +37,7 @@ namespace
         {
             int index_yf = year * population.nfleets + fleet_;
             
-            expected_catch[index_yf] += population.fleets[0]->catch_weight_at_age[index_ya];
+            expected_catch[index_yf] += population.fleets[fleet_]->catch_weight_at_age[index_ya];
             
             EXPECT_EQ(population.expected_catch[index_yf], expected_catch[index_yf]);
             EXPECT_GT(population.expected_catch[index_yf], 0);
