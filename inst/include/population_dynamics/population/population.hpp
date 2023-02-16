@@ -93,10 +93,7 @@ namespace fims {
                                                   matura at age */
         std::vector<Type> expected_numbers_at_age; /*!< Expected values: Numbers at
                                                   age (thousands?? millions??) */
-        std::vector<Type>
-        catch_weight_at_age; /*!< Expected values???: Weight at age for catch*/
         std::vector<Type> expected_catch; /*!< Expected values: Catch*/
-        std::vector<Type> expected_index; /*!< Expected values: Index (CPUE)*/
 
         /// recruitment
         int recruitment_id = -999; /*!< id of recruitment model object*/
@@ -138,12 +135,7 @@ namespace fims {
 
             // size all the vectors to length of nages
             nfleets = fleets.size();
-            catch_weight_at_age.resize(nyears * nages * nfleets);
             expected_catch.resize(nyears * nfleets);
-            expected_index.resize(nyears * nfleets);
-            std::fill(mortality_F.begin(), mortality_F.end(), 0);
-            std::fill(expected_catch.begin(), expected_catch.end(), 0);
-
             ages.resize(nages);
             years.resize(nyears);
             mortality_F.resize(nyears * nages);
@@ -206,9 +198,7 @@ namespace fims {
          */
         void CalculateMortality(int index_ya, int year, int age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                int index_yf = year * this->nfleets +
-                        fleet_; // index by fleet and years to dimension fold
-                this->mortality_F[index_ya] +=
+            this->mortality_F[index_ya] +=
                         this->fleets[fleet_]->Fmort[year] *
                         this->fleets[fleet_]->selectivity->evaluate(ages[age]);
                         FIMS_LOG << " sel " << this->fleets[fleet_]->selectivity->evaluate(ages[age]) << 
@@ -325,7 +315,7 @@ namespace fims {
                     this->numbers_at_age[0]<<" ----- +++\n" << std::endl;
                     FIMS_LOG <<      this->recruitment->evaluate(this->spawning_biomass[year - 1],
                     phi0)<< " phi0 " <<
-                    phi0 <<" ----- +++\n" << std::endl;
+                    phi0 <<" ----- +++\n " << this->recruitment->recruit_deviations[year] << std::endl;
         }
 
         /**
@@ -336,15 +326,13 @@ namespace fims {
          */
         void CalculateCatch(int year, int age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                int index_yaf =
-                        year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-                int index_yf = year * this->nfleets +
+             int index_yf = year * this->nfleets +
                         fleet_; // index by fleet and years to dimension fold
-
-                this->expected_catch[index_yf] += this->catch_weight_at_age[index_yaf];
+            int index_ya = year * this->nages + age;
+                this->expected_catch[index_yf] += this->fleets[fleet_]->catch_weight_at_age[index_ya];
 
                 fleets[fleet_]->expected_catch[index_yf] +=
-                        this->catch_weight_at_age[index_yaf];
+                        this->fleets[fleet_]->catch_weight_at_age[index_ya];
             }
         }
 
@@ -357,16 +345,13 @@ namespace fims {
          */
         void CalculateIndex(int index_ya, int year, int age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                // index by fleet and years to dimension fold
-                int index_yf = year * this->nfleets + fleet_;
                 // I = qN (N is total numbers), I is an index in numbers
                 Type index_;
                 index_ = this->fleets[fleet_]->q[year] *
                         this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
                         this->numbers_at_age[index_ya] * growth->evaluate(ages[age]);//this->weight_at_age[age];
                 FIMS_LOG << " q: " << this->fleets[fleet_]->q[year] << std::endl;
-                this->expected_index[index_yf] += index_;
-                fleets[fleet_]->expected_index[index_yf] += index_;
+                fleets[fleet_]->expected_index[year] += index_;
             }
             FIMS_LOG << "nfleets: "<< this->nfleets << std::endl;
         }
@@ -382,10 +367,6 @@ namespace fims {
          */
         void CalculateCatchNumbersAA(int index_ya, int year, int age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                int index_yaf =
-                        year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-                int index_yf = year * this->nfleets +
-                        fleet_; // index by fleet and years to dimension fold
 
                 // make an intermediate value in order to set multiple members (of
                 // current and fleet objects) to that value.
@@ -395,6 +376,10 @@ namespace fims {
                         this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
                         this->mortality_Z[index_ya] * this->numbers_at_age[index_ya] *
                         (1 - exp(-(this->mortality_Z[index_ya])));
+
+                FIMS_LOG << " F " << fleet_ << "  " << this->fleets[fleet_]->Fmort[year] << std::endl;
+                FIMS_LOG << " selectivity " << this->fleets[fleet_]->selectivity->evaluate(ages[age]) << std::endl;
+                FIMS_LOG << " catch " << catch_ << std::endl;
                // this->catch_numbers_at_age[index_yaf] += catch_;
                 // catch_numbers_at_age for the fleet module has different
                 // dimensions (year/age, not year/fleet/age)
@@ -411,13 +396,12 @@ namespace fims {
          */
         void CalculateCatchWeightAA(int year, int age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                int index_yaf =
-                        year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-                FIMS_LOG << " fleet "<< fleet_ << std::endl;
+                 FIMS_LOG << " fleet "<< fleet_ << std::endl;
                 FIMS_LOG << " catchnaa "<< this->fleets[fleet_]->catch_numbers_at_age[year] << std::endl;
                 FIMS_LOG << " weight "<< this->growth->evaluate(ages[age]) << std::endl;
-                this->catch_weight_at_age[index_yaf] =
+                this->fleets[fleet_]->catch_weight_at_age[index_ya] =
                         this->fleets[fleet_]->catch_numbers_at_age[year] * this->growth->evaluate(ages[age]);//this->weight_at_age[age];
+            FIMS_LOG << " catch_waa " << this->fleets[fleet_]->catch_weight_at_age[index_ya] << std::endl;
             }
         }
 

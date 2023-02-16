@@ -18,10 +18,19 @@ namespace
         // calculate catch numbers at age in population module
         // Ian: not sure which of these are needed
         population.CalculateMortality(index_ya, year, age);
+        out << population.M[age] << std::endl;
         population.CalculateNumbersAA(index_ya, index_ya2, age);
-
+        out << " naa "<< population.numbers_at_age[index_ya] << std::endl;
         population.CalculateCatchNumbersAA(index_ya, year, age);
+        
+        out << " catch_naa "<< population.fleets[0]->catch_numbers_at_age[index_ya] << std::endl;
+        
+        out << " catch_naa "<< population.fleets[1]->catch_numbers_at_age[index_ya] << std::endl;
         population.CalculateCatchWeightAA(year, age);
+
+        
+        out << " catch_waa "<< population.catch_weight_at_age[index_ya] << std::endl;
+
         population.CalculateCatch(year, age);
 
         for (int fleet_ = 0; fleet_ < population.nfleets; fleet_++)

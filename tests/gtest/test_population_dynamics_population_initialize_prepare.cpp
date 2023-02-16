@@ -24,16 +24,12 @@ namespace
         EXPECT_EQ(population.mortality_Z.size(), nyears * nages);
         EXPECT_EQ(population.proportion_mature_at_age.size(), (nyears+1) * nages);
         EXPECT_EQ(population.weight_at_age.size(), nages);
-        EXPECT_EQ(
-            population.catch_weight_at_age.size(),
-            nyears * nages * nfleets);
         // What is unfished number at age? A vector of values before
         // model start year or a vector of values for each model year?
         // Is unfished biomass_at_age needed?
         EXPECT_EQ(population.unfished_numbers_at_age.size(), (nyears + 1) * nages);
         EXPECT_EQ(population.numbers_at_age.size(), (nyears + 1) * nages);
         EXPECT_EQ(population.expected_catch.size(), nyears * nfleets);
-        EXPECT_EQ(population.expected_index.size(), nyears * nfleets);
         EXPECT_EQ(population.biomass.size(), (nyears + 1));
         // What is unfished spawning biomass? A single value before
         // model start year or a vector of values for each year?

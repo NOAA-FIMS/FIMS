@@ -44,7 +44,6 @@ namespace
             //   \inst\include\population_dynamics\population\population.hpp
             int index_yaf = year * population.nages * population.nfleets + 
               age * population.nfleets + fleet_index;
-            int index_yf = year * population.nfleets + fleet_index;
 
             // Baranov Catch Equation adapted from 
             // \inst\include\population_dynamics\population\population.hpp
@@ -60,9 +59,9 @@ namespace
 
             // test value
           EXPECT_EQ(population.fleets[fleet_index]->catch_numbers_at_age[index_ya], test_catch_naa[index_yaf]);
-          EXPECT_EQ(population.catch_weight_at_age[index_yaf], test_catch_waa[index_yaf]);
+          EXPECT_EQ(population.fleets[fleet_index]->catch_weight_at_age[index_ya], test_catch_waa[index_yaf]);
           EXPECT_GT(population.fleets[fleet_index]->catch_numbers_at_age[index_ya], 0);
-          EXPECT_GT(population.catch_weight_at_age[index_yaf], 0);
+          EXPECT_GT(population.fleets[fleet_index]->catch_weight_at_age[index_ya], 0);
         }
         
         

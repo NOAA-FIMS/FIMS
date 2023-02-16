@@ -22,17 +22,14 @@ namespace
 
         for (int fleet_ = 0; fleet_ < population.nfleets; fleet_++)
         {
-            int index_yaf = year * population.nages * population.nfleets +
-                            age * population.nfleets + fleet_;
             int index_yf = year * population.nfleets + fleet_;
             
-            expected_index[index_yf] += population.numbers_at_age[index_yaf]*
+            expected_index[index_yf] += population.numbers_at_age[index_ya]*
                                         population.fleets[fleet_]->q[year]*
                                         population.fleets[fleet_]->selectivity->evaluate(population.ages[age])*
                                         population.growth->evaluate(population.ages[age]);
-        
-        EXPECT_EQ(population.expected_index[index_yf], expected_index[index_yf]);
-        EXPECT_GT(population.expected_index[index_yf], 0);
+    
+        EXPECT_GT(population.fleets[fleet_]->expected_index[year], 0);
         EXPECT_GT(expected_index[index_yf], 0);
         EXPECT_EQ(expected_index[index_yf], population.fleets[fleet_]->expected_index[year]);
         }
