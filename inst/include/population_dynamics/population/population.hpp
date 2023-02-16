@@ -383,7 +383,8 @@ namespace fims {
                // this->catch_numbers_at_age[index_yaf] += catch_;
                 // catch_numbers_at_age for the fleet module has different
                 // dimensions (year/age, not year/fleet/age)
-                fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
+                std::cout<< "fleet " << fleet_ << " catch "<< catch_ << std::endl;
+                this->fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
             }
         }
 
@@ -395,12 +396,13 @@ namespace fims {
          * @param age the age of expected catch weight at age
          */
         void CalculateCatchWeightAA(int year, int age) {
+            int index_ya = year * this->nages + age;
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
                  FIMS_LOG << " fleet "<< fleet_ << std::endl;
                 FIMS_LOG << " catchnaa "<< this->fleets[fleet_]->catch_numbers_at_age[year] << std::endl;
                 FIMS_LOG << " weight "<< this->growth->evaluate(ages[age]) << std::endl;
-                this->fleets[fleet_]->catch_weight_at_age[index_ya] =
-                        this->fleets[fleet_]->catch_numbers_at_age[year] * this->growth->evaluate(ages[age]);//this->weight_at_age[age];
+                this->fleets[fleet_]->catch_weight_at_age[index_ya] = 
+                        this->fleets[fleet_]->catch_numbers_at_age[index_ya] * this->growth->evaluate(ages[age]);//this->weight_at_age[age];
             FIMS_LOG << " catch_waa " << this->fleets[fleet_]->catch_weight_at_age[index_ya] << std::endl;
             }
         }

@@ -40,3 +40,16 @@ setup_and_run_gtest <- function(...) {
   system(paste0("ctest --test-dir build",...))
   TRUE
 }
+
+#' run google test suite
+#' 
+#' Developer function for running google test suite from R
+#' @param /dots additional arguments to \code{ctest --test-dir build} 
+#' such as "--rerun-failed --output-on-failure"
+#' @export
+run_gtest <- function(...) {
+  system("cmake -S . -B build -G Ninja")
+  system("cmake --build build")
+  system(paste0("ctest --test-dir build",...))
+  TRUE
+}

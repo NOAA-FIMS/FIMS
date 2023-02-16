@@ -19,6 +19,7 @@ namespace
         population.CalculateNumbersAA(index_ya, index_ya2, age);
 
         population.CalculateCatchNumbersAA(index_ya, year, age);
+        
         population.CalculateCatchWeightAA(year, age);
 
         std::vector<double> mortality_F(nyears * nages, 0);

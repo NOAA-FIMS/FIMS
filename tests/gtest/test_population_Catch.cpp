@@ -29,17 +29,15 @@ namespace
         population.CalculateCatchWeightAA(year, age);
 
         
-        out << " catch_waa "<< population.catch_weight_at_age[index_ya] << std::endl;
+        out << " catch_waa "<< population.fleets[0]->catch_weight_at_age[index_ya] << std::endl;
 
         population.CalculateCatch(year, age);
 
         for (int fleet_ = 0; fleet_ < population.nfleets; fleet_++)
         {
-            int index_yaf = year * population.nages * population.nfleets +
-                            age * population.nfleets + fleet_;
             int index_yf = year * population.nfleets + fleet_;
             
-            expected_catch[index_yf] += population.catch_weight_at_age[index_yaf];
+            expected_catch[index_yf] += population.fleets[0]->catch_weight_at_age[index_ya];
             
             EXPECT_EQ(population.expected_catch[index_yf], expected_catch[index_yf]);
             EXPECT_GT(population.expected_catch[index_yf], 0);
