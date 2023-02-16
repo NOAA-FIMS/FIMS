@@ -12,14 +12,13 @@ namespace
         int index_ya = year * population.nages + age;
         int index_ya2 = (year - 1) * population.nages + age - 1;
 
-        std::ofstream out("CatchNumbers.txt");
         // calculate catch numbers at age in population module
         // Ian: not sure which of these are needed
         population.CalculateMortality(index_ya, year, age);
         population.CalculateNumbersAA(index_ya, index_ya2, age);
 
         population.CalculateCatchNumbersAA(index_ya, year, age);
-        
+
         population.CalculateCatchWeightAA(year, age);
 
         std::vector<double> mortality_F(nyears * nages, 0);
@@ -34,8 +33,7 @@ namespace
         for (int i = 0; i < (nyears + 1) * nages; i++)
         {
           test_naa[i] = population.numbers_at_age[i];
-          out << population.numbers_at_age[i] << std::endl;
-        }
+       }
         test_naa[index_ya] = test_naa[index_ya2] * exp(-population.mortality_Z[index_ya2]);
 
         // loop over fleets to get catch numbers at age for each fleet
@@ -48,8 +46,7 @@ namespace
 
             // Baranov Catch Equation adapted from 
             // \inst\include\population_dynamics\population\population.hpp
-            out << "F:" << population.fleets[fleet_index]->Fmort[year]  << std::endl;
-            catch_temp =
+           catch_temp =
               (population.fleets[fleet_index]->Fmort[year] *
               population.fleets[fleet_index]->selectivity->evaluate(population.ages[age])) / 
               population.mortality_Z[index_ya] *

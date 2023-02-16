@@ -383,8 +383,7 @@ namespace fims {
                // this->catch_numbers_at_age[index_yaf] += catch_;
                 // catch_numbers_at_age for the fleet module has different
                 // dimensions (year/age, not year/fleet/age)
-                std::cout<< "fleet " << fleet_ << " catch "<< catch_ << std::endl;
-                this->fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
+               this->fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
             }
         }
 
