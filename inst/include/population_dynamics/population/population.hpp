@@ -544,10 +544,11 @@ namespace fims
       }
 #ifdef TMB_MODEL
       /*Report output*/
-      REPORT_F(int(this->nages), of); //REPORT error: call of overloaded is ambiguous
-      REPORT_F(int(this->nyears), of);
-      REPORT_F(int(this->nfleets), of);
-      //REPORT_F(this->numbers_at_age, of);
+      REPORT_F(double(this->nages), of); //REPORT error: call of overloaded is ambiguous
+      REPORT_F(double(this->nyears), of);
+      REPORT_F(double(this->nfleets), of);
+      
+      REPORT_F(this->numbers_at_age, of);
       //REPORT_F(this->recruitment->recruit_deviations, of);
       //ADREPORT_F(this->recruitment->rzero, of);
       //ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in recruitment_base

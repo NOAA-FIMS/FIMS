@@ -48,6 +48,10 @@ struct ModelTraits {
   vector of the parameters that is differentiable */
   typedef typename tmbutils::vector<T>
       EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
+
+  static CppAD::vector<T> DataVector (std::vector<double> quantity){
+    
+  }
 };
 
 #endif /* TMB_MODEL */
