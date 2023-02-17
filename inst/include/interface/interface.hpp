@@ -103,8 +103,8 @@ struct ModelTraits<TMB_FIMS_THIRD_ORDER> {
     typedef double real_t; /**< The real type */
     typedef TMB_FIMS_THIRD_ORDER variable_t; /**< The variable type */
     typedef typename CppAd::vector<double> DataVector; /**< The data vector type */
-    typedef typename CppAd::vector<TMB_FIMS_THIRD_ORDER> VariableVector; /**< The variable vector
-   type ParameterVector
+    typedef typename CppAd::vector<TMB_FIMS_THIRD_ORDER> ParameterVector; /**< The variable vector
+  
 
     static ParameterVector MakeVariableVector(const std::vector<TMB_FIMS_THIRD_ORDER>& v) {
         ParameterVector ret(v.size());
