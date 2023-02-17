@@ -47,36 +47,12 @@
  */
 template <typename T>
 struct ModelTraits {
-    typedef T real_t; /**< The real type */
-    typedef T variable_t; /**< The variable type */
-    typedef typename std::vector<T> DataVector; /**< The data vector type */
-    typedef typename std::vector<T> VariableVector; /**< The variable vector*/
-
-    static VariableVector MakeVariableVector(const std::vector<T>& v) {
-        return v;
-    }
-};
-
-
-
-#ifdef TMB_MODEL
-
-
-template <>
-struct ModelTraits<TMB_FIMS_FIRST_ORDER> {
-    typedef double real_t; /**< The real type */
-    typedef TMB_FIMS_FIRST_ORDER variable_t; /**< The variable type */
-    typedef typename std::vector<double> DataVector; /**< The data vector type */
-    typedef typename CppAd::vector<double> VariableVector; /**< The variable vector*/
-
-    static VariableVector MakeVariableVector(const std::vector<TMB_FIMS_FIRST_ORDER>& v) {
-        VariableVector ret(v.size());
-
-        for (int i = 0; i < v.size(); i++) {
-            ret[i] = v[i];
-        }
-        return ret;
-    }
+  typedef typename CppAD::vector<T> DataVector;      /**< This is a vector
+        of the data that is differentiable */
+  typedef typename CppAD::vector<T> ParameterVector; /**< This is a
+  vector of the parameters that is differentiable */
+  typedef typename tmbutils::vector<T>
+      EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
 };
 
 template <>
