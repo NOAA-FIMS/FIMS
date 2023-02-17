@@ -17,6 +17,7 @@
 
 // traits for interfacing with TMB
 #include "../population_dynamics/growth/growth.hpp"
+#include "../common/def.hpp"
 
 #ifdef TMB_MODEL
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
@@ -47,24 +48,48 @@
  */
 template <typename T>
 struct ModelTraits {
-  typedef typename CppAD::vector<T> DataVector;      /**< This is a vector
+    typedef typename std::vector<T> DataVector; /**< This is a vector
         of the data that is differentiable */
-  typedef typename CppAD::vector<T> ParameterVector; /**< This is a
-  vector of the parameters that is differentiable */
-  typedef typename tmbutils::vector<T>
-      EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
+    typedef typename std::vector<T> ParameterVector; /**< This is a*/
+
+    static ParameterVector MakeVariableVector(const std::vector<T>& v) {
+        ParameterVector ret(v.size());
+
+        for (int i = 0; i < v.size(); i++) {
+            ret[i] = v[i];
+        }
+        return ret;
+    }
+
+};
+#ifdef TMB_MODEL
+
+template <>
+struct ModelTraits<TMB_FIMS_FIRST_ORDER> {
+    typedef double real_t; /**< The real type */
+    typedef TMB_FIMS_SECOND_ORDER variable_t; /**< The variable type */
+    typedef typename CppAd::vector<double> DataVector; /**< The data vector type */
+    typedef typename CppAd::vector<TMB_FIMS_FIRST_ORDER> ParameterVector; /**< The variable vector*/
+
+    static ParameterVector MakeVariableVector(const std::vector<TMB_FIMS_FIRST_ORDER>& v) {
+        ParameterVector ret(v.size());
+
+        for (int i = 0; i < v.size(); i++) {
+            ret[i] = v[i];
+        }
+        return ret;
+    }
 };
 
 template <>
 struct ModelTraits<TMB_FIMS_SECOND_ORDER> {
-    
     typedef double real_t; /**< The real type */
     typedef TMB_FIMS_SECOND_ORDER variable_t; /**< The variable type */
-    typedef typename std::vector<double> DataVector; /**< The data vector type */
-    typedef typename CppAd::vector<double> VariableVector; /**< The variable vector*/
+    typedef typename CppAd::vector<double> DataVector; /**< The data vector type */
+    typedef typename CppAd::vector<double> ParameterVector; /**< The variable vector*/
 
-    static VariableVector MakeVariableVector(const std::vector<TMB_FIMS_SECOND_ORDER>& v) {
-        VariableVector ret(v.size());
+    static ParameterVector MakeVariableVector(const std::vector<TMB_FIMS_SECOND_ORDER>& v) {
+        ParameterVector ret(v.size());
 
         for (int i = 0; i < v.size(); i++) {
             ret[i] = v[i];
@@ -77,12 +102,12 @@ template <>
 struct ModelTraits<TMB_FIMS_THIRD_ORDER> {
     typedef double real_t; /**< The real type */
     typedef TMB_FIMS_THIRD_ORDER variable_t; /**< The variable type */
-    typedef typename std::vector<double> DAtaVector; /**< The data vector type */
-    typedef typename std::vector<double> VariableVector; /**< The variable vector
-   type */
+    typedef typename CppAd::vector<double> DataVector; /**< The data vector type */
+    typedef typename CppAd::vector<TMB_FIMS_THIRD_ORDER> VariableVector; /**< The variable vector
+   type ParameterVector
 
-    static VariableVector MakeVariableVector(const std::vector<TMB_FIMS_THIRD_ORDER>& v) {
-        VariableVector ret(v.size());
+    static ParameterVector MakeVariableVector(const std::vector<TMB_FIMS_THIRD_ORDER>& v) {
+        ParameterVector ret(v.size());
 
         for (int i = 0; i < v.size(); i++) {
             ret[i] = v[i];
