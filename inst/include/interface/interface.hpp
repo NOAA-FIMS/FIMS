@@ -52,8 +52,11 @@ struct ModelTraits {
         of the data that is differentiable */
     typedef typename std::vector<T> ParameterVector; /**< This is a*/
 
-    static ParameterVector MakeVariableVector(const std::vector<T>& v) {
-        ParameterVector ret(v.size());
+    typedef typename std::vector<T>
+    EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
+
+    static EigenVector MakeVariableVector(const std::vector<T>& v) {
+        EigenVector ret(v.size());
 
         for (int i = 0; i < v.size(); i++) {
             ret[i] = v[i];
@@ -68,11 +71,14 @@ template <>
 struct ModelTraits<TMB_FIMS_FIRST_ORDER> {
     typedef double real_t; /**< The real type */
     typedef TMB_FIMS_SECOND_ORDER variable_t; /**< The variable type */
-    typedef typename CppAd::vector<double> DataVector; /**< The data vector type */
-    typedef typename CppAd::vector<TMB_FIMS_FIRST_ORDER> ParameterVector; /**< The variable vector*/
+    typedef typename CppAD::vector<double> DataVector; /**< The data vector type */
+    typedef typename CppAD::vector<TMB_FIMS_FIRST_ORDER> ParameterVector; /**< The variable vector*/
 
-    static ParameterVector MakeVariableVector(const std::vector<TMB_FIMS_FIRST_ORDER>& v) {
-        ParameterVector ret(v.size());
+    typedef typename tmbutils::vector<TMB_FIMS_FIRST_ORDER>
+    EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
+
+    static EigenVector MakeVariableVector(const std::vector<TMB_FIMS_FIRST_ORDER>& v) {
+        EigenVector ret(v.size());
 
         for (int i = 0; i < v.size(); i++) {
             ret[i] = v[i];
@@ -85,11 +91,13 @@ template <>
 struct ModelTraits<TMB_FIMS_SECOND_ORDER> {
     typedef double real_t; /**< The real type */
     typedef TMB_FIMS_SECOND_ORDER variable_t; /**< The variable type */
-    typedef typename CppAd::vector<double> DataVector; /**< The data vector type */
-    typedef typename CppAd::vector<double> ParameterVector; /**< The variable vector*/
+    typedef typename CppAD::vector<double> DataVector; /**< The data vector type */
+    typedef typename CppAD::vector<TMB_FIMS_SECOND_ORDER> ParameterVector; /**< The variable vector*/
+    typedef typename tmbutils::vector<TMB_FIMS_SECOND_ORDER>
+    EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
 
-    static ParameterVector MakeVariableVector(const std::vector<TMB_FIMS_SECOND_ORDER>& v) {
-        ParameterVector ret(v.size());
+    static EigenVector MakeVariableVector(const std::vector<TMB_FIMS_SECOND_ORDER>& v) {
+        EigenVector ret(v.size());
 
         for (int i = 0; i < v.size(); i++) {
             ret[i] = v[i];
@@ -102,12 +110,13 @@ template <>
 struct ModelTraits<TMB_FIMS_THIRD_ORDER> {
     typedef double real_t; /**< The real type */
     typedef TMB_FIMS_THIRD_ORDER variable_t; /**< The variable type */
-    typedef typename CppAd::vector<double> DataVector; /**< The data vector type */
-    typedef typename CppAd::vector<TMB_FIMS_THIRD_ORDER> ParameterVector; /**< The variable vector*/
-  
+    typedef typename CppAD::vector<double> DataVector; /**< The data vector type */
+    typedef typename CppAD::vector<TMB_FIMS_THIRD_ORDER> ParameterVector; /**< The variable vector*/
+    typedef typename tmbutils::vector<TMB_FIMS_THIRD_ORDER>
+    EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
 
-    static ParameterVector MakeVariableVector(const std::vector<TMB_FIMS_THIRD_ORDER>& v) {
-        ParameterVector ret(v.size());
+    static EigenVector MakeVariableVector(const std::vector<TMB_FIMS_THIRD_ORDER>& v) {
+        EigenVector ret(v.size());
 
         for (int i = 0; i < v.size(); i++) {
             ret[i] = v[i];

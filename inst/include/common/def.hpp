@@ -45,7 +45,7 @@ namespace fims {
     };
 
 
-#ifdef TMB_MODEL
+#ifdef TMB_MODEL_
 
     //template <>
     //struct FIMSTraits<TMB_FIMS_REAL_TYPE> {
