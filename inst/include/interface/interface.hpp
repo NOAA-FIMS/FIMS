@@ -51,7 +51,7 @@ struct ModelTraits {
     typedef typename std::vector<T> DataVector; /**< This is a vector
         of the data that is differentiable */
     typedef typename std::vector<T> ParameterVector; /**< This is a*/
-
+#ifdef TMB_MODEL
     typedef typename std::vector<T>
     EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
 
@@ -63,6 +63,7 @@ struct ModelTraits {
         }
         return ret;
     }
+#endif
 
 };
 #ifdef TMB_MODEL
