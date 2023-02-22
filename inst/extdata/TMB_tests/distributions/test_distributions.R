@@ -21,6 +21,7 @@ project_path <- getwd()
 TMB::compile(paste0(path, "/test_dnorm_distribution.cpp"), flags = "-DTMB_MODEL")
 TMB::compile(paste0(path, "/test_dlnorm_distribution.cpp"), flags = "-DTMB_MODEL")
 TMB::compile(paste0(path, "/test_dmultinom_distribution.cpp"), flags = "-DTMB_MODEL")
+TMB::compile(paste0(path, "/test_fleet_index_nll.cpp"), flags = "-DTMB_MODEL")
 
 test_that("dnorm unit test", {
 
@@ -97,4 +98,32 @@ test_that("dmultinom unit test", {
   dyn.unload(dynlib(paste0(path, "/test_dmultinom_distribution")))
   file.remove(paste0(path, "/", dynlib("test_dmultinom_distribution")))
   file.remove( paste0(path, "/test_dmultinom_distribution.o"))
+})
+
+
+test_that("fleet index nll unit test", {
+
+  # setwd(project_path)
+  # on.exit(setwd(old_wd), add = TRUE)
+
+  # # dmultinom unit test
+  # # load test
+  dyn.load(dynlib(paste0(path, "/test_fleet_index_nll")))
+
+  set.seed(123)
+  #Simulate new data with R
+  y = stats::rlnorm(10, 2, 1)
+  #Calculate negative log-likelihood with R dlnorm
+  nll = -sum(stats::dlnorm(y, 2, 1, TRUE))
+  #Initialize TMB model object with true values
+  mod = MakeADFun(data = list(y = y),
+                  parameters = list(p = c(2, log(1))),
+                  DLL = "test_fleet_index_nll")
+  #Compare R nll to TMB nll
+  expect_equal(nll, mod$fn())
+
+  dyn.unload(dynlib(paste0(path, "/test_fleet_index_nll")))
+  file.remove(paste0(path, "/", dynlib("test_fleet_index_nll")))
+  file.remove( paste0(path, "/test_fleet_index_nll.o"))
+  
 })
