@@ -94,6 +94,7 @@ struct FleetAgeCompNLL : public Fleet<Type> {
       expected_acomp.resize(this->nages);
       double sum = std::accumulate(this->catch_numbers_at_age.begin(),
       this->catch_numbers_at_age.end(),0.0);
+      double sum = 1.0;
         for (size_t a = 0; a < this->nages; a++) {
           size_t index_ya = y*this->nages + a;
           expected_acomp[a] = this->catch_numbers_at_age[index_ya]/sum;//probabilities for ages
