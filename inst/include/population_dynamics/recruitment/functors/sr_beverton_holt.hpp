@@ -48,7 +48,8 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   virtual const Type evaluate(const Type& spawners, const Type& ssbzero) {
     Type recruits;
     recruits = (0.8 * this->rzero * steep * spawners) /
-               (0.2 * ssbzero * (1.0 - steep) + spawners * (steep - 0.2));
+               (0.2 * ssbzero * this->rzero * (1.0 - steep) + spawners * (steep - 0.2));
+
     return recruits;
   }
 };

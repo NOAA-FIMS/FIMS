@@ -53,7 +53,8 @@ Imports:
     dplyr,
     ggplot2,
     methods,
-    scales
+    scales,
+    jsonlite
 LinkingTo: 
     Rcpp,
     TMB,

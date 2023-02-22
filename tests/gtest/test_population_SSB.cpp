@@ -25,7 +25,7 @@ namespace
         // population.weight_at_age[age];
 
         test_SSB[year] += population.numbers_at_age[index_ya] * 0.5 * population.proportion_mature_at_age[index_ya] *
-                         population.weight_at_age[age];
+                         population.growth->evaluate(population.ages[age]);
 
         // EXPECT_EQ(population.spawning_biomass[year], test_SSB);
         EXPECT_EQ(population.spawning_biomass[year], test_SSB[year]);
@@ -49,7 +49,7 @@ namespace
 
         test_SSB[nyears] += population.numbers_at_age[index_ya] * 0.5 * 
             population.proportion_mature_at_age[index_ya] * 
-            population.weight_at_age[age];
+            population.growth->evaluate(population.ages[age]);
 
         EXPECT_EQ(population.spawning_biomass[year], test_SSB[year]);
         EXPECT_GT(population.spawning_biomass[year], 0);

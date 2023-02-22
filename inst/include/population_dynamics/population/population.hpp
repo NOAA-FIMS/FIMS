@@ -68,7 +68,8 @@ namespace fims {
         std::vector<Type> naa; /*!< transformed parameter: numbers at age*/
         std::vector<Type> M; /*!< transformed parameter: Natural Mortality*/
 
-        std::vector<Type> ages; /*!< vector of the ages for referencing*/
+        std::vector<double> ages; /*!< vector of the ages for referencing*/
+        std::vector<double> years; /*!< vector of years for referencing*/
         std::vector<Type> mortality_F; /*!< vector of fishing mortality summed across
                                     fleet by year and age*/
         std::vector<Type>
@@ -92,12 +93,7 @@ namespace fims {
                                                   matura at age */
         std::vector<Type> expected_numbers_at_age; /*!< Expected values: Numbers at
                                                   age (thousands?? millions??) */
-        std::vector<Type>
-        catch_numbers_at_age; /*!< Expected values???: Catch in numbers at age*/
-        std::vector<Type>
-        catch_weight_at_age; /*!< Expected values???: Weight at age for catch*/
         std::vector<Type> expected_catch; /*!< Expected values: Catch*/
-        std::vector<Type> expected_index; /*!< Expected values: Index (CPUE)*/
 
         /// recruitment
         int recruitment_id = -999; /*!< id of recruitment model object*/
@@ -139,24 +135,21 @@ namespace fims {
 
             // size all the vectors to length of nages
             nfleets = fleets.size();
+            expected_catch.resize(nyears * nfleets);
             ages.resize(nages);
-            catch_numbers_at_age.resize(nyears * nages * nfleets);
+            years.resize(nyears);
             mortality_F.resize(nyears * nages);
             mortality_Z.resize(nyears * nages);
             proportion_mature_at_age.resize((nyears + 1) * nages);
             weight_at_age.resize(nages);
-            catch_weight_at_age.resize(nyears * nages * nfleets);
             unfished_numbers_at_age.resize((nyears + 1) * nages);
             numbers_at_age.resize((nyears + 1) * nages);
-            expected_catch.resize(nyears * nfleets);
-            expected_index.resize(nyears * nfleets);
             biomass.resize((nyears + 1));
             unfished_spawning_biomass.resize((nyears + 1));
             spawning_biomass.resize((nyears + 1));
             log_naa.resize(nages);
             log_M.resize(nyears * nages);
             naa.resize(nages);
-
             M.resize(nyears * nages);
         }
 
@@ -170,14 +163,12 @@ namespace fims {
             std::fill(unfished_spawning_biomass.begin(),
                     unfished_spawning_biomass.end(), 0);
             std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
-            std::fill(mortality_F.begin(), mortality_F.end(), 0);
-            std::fill(expected_catch.begin(), expected_catch.end(), 0);
 
             // Transformation Section
             for (size_t age = 0; age < this->nages; age++) {
                 this->naa[age] = fims::exp(this->log_naa[age]);
                 for (size_t year = 0; year < this->nyears; year++) {
-                    int index_ya = year * this->nages + age;
+                    size_t index_ya = year * this->nages + age;
                     this->M[index_ya] = fims::exp(this->log_M[index_ya]);
                 }
             }
@@ -194,7 +185,7 @@ namespace fims {
          * @param a age index
          */
         inline void CalculateInitialNumbersAA(
-                int index_ya, int a) { // inline all function unless complicated
+                size_t index_ya, size_t a) { // inline all function unless complicated
             this->numbers_at_age[index_ya] = this->naa[a];
         }
 
@@ -205,13 +196,13 @@ namespace fims {
          * @param year year index
          * @param age age index
          */
-        void CalculateMortality(int index_ya, int year, int age) {
+        void CalculateMortality(size_t index_ya, size_t year, size_t age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                int index_yf = year * this->nfleets +
-                        fleet_; // index by fleet and years to dimension fold
-                this->mortality_F[index_ya] +=
+            this->mortality_F[index_ya] +=
                         this->fleets[fleet_]->Fmort[year] *
-                        this->fleets[fleet_]->selectivity->evaluate(age);
+                        this->fleets[fleet_]->selectivity->evaluate(ages[age]);
+                        FIMS_LOG << " sel " << this->fleets[fleet_]->selectivity->evaluate(ages[age]) << 
+                          " F " << this->fleets[fleet_]->Fmort[year] << std::endl;
             }
             this->mortality_Z[index_ya] =
                     this->M[index_ya] + this->mortality_F[index_ya];
@@ -224,7 +215,7 @@ namespace fims {
          * @param index_ya2 dimension folded index for year-1 and age-1
          * @param age age index
          */
-        inline void CalculateNumbersAA(int index_ya, int index_ya2, int age) {
+        inline void CalculateNumbersAA(size_t index_ya, size_t index_ya2, size_t age) {
             // using Z from previous age/year
             this->numbers_at_age[index_ya] =
                     this->numbers_at_age[index_ya2] * (exp(-this->mortality_Z[index_ya2]));
@@ -245,7 +236,7 @@ namespace fims {
          * @param index_ya2 dimension folded index for year-1 and age-1
          * @param age age index
          */
-        inline void CalculateUnfishedNumbersAA(int index_ya, int index_ya2, int age) {
+        inline void CalculateUnfishedNumbersAA(size_t index_ya, size_t index_ya2, size_t age) {
             // using M from previous age/year
             this->unfished_numbers_at_age[index_ya] =
                     this->unfished_numbers_at_age[index_ya2] * (exp(-this->M[index_ya2]));
@@ -266,12 +257,13 @@ namespace fims {
          * @param year the year spawning biomass is being aggregated for
          * @param age the age who's biomass is being added into total spawning biomass
          */
-        void CalculateSpawningBiomass(int index_ya, int year, int age) {
+        void CalculateSpawningBiomass(size_t index_ya, size_t year, size_t age) {
+
             this->spawning_biomass[year] +=
                     this->proportion_female * this->numbers_at_age[index_ya] *
                     this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
-                    std::cout<<      this->proportion_female << " " <<
-                    this->proportion_mature_at_age[index_ya]<< " " << growth->evaluate(age) << " spawning biomass inputs----- +++\n";
+                    FIMS_LOG <<      this->proportion_female << " " <<
+                    this->proportion_mature_at_age[index_ya]<< " " << growth->evaluate(ages[age]) << " spawning biomass inputs----- +++\n";
         }
 
         /**
@@ -282,10 +274,28 @@ namespace fims {
          * @param year the year of unfished spawning biomass to add
          * @param age the age of unfished spawning biomass to add
          */
-        void CalculateUnfishedSpawningBiomass(int index_ya, int year, int age) {
+        void CalculateUnfishedSpawningBiomass(size_t index_ya, size_t year, size_t age) {
             this->unfished_spawning_biomass[year] +=
                     this->proportion_female * this->unfished_numbers_at_age[index_ya] *
-                    this->proportion_mature_at_age[index_ya] * this->growth->evaluate(static_cast<double>(age));
+                    this->proportion_mature_at_age[index_ya] * this->growth->evaluate(ages[age]);
+        }
+
+        /**
+         * @brief Calculates equilibrium spawning biomass per recruit
+         * 
+         * @return Type 
+         */
+        Type CalculateSBPR0(){
+            std::vector<Type> numbers_spr(this->nages, 1.0);
+            Type phi_0 = 0.0;
+            phi_0 += numbers_spr[0]*this->proportion_female*this->proportion_mature_at_age[0]*this->growth->evaluate(ages[0]);
+            for(size_t a = 1; a < (this->nages-1); a++){
+                numbers_spr[a] = numbers_spr[a-1]*fims::exp(-this->M[a]);
+                phi_0 += numbers_spr[a]*this->proportion_female*this->proportion_mature_at_age[a]*this->growth->evaluate(ages[a]);
+            }
+            numbers_spr[this->nages-1]=(numbers_spr[nages-2]*fims::exp(-this->M[nages-1]))/(1-exp(-this->M[this->nages-1]));
+            phi_0 += numbers_spr[this->nages-1]*this->proportion_female*this->proportion_mature_at_age[this->nages-1]*this->growth->evaluate(ages[this->nages-1]);       
+            return phi_0;        
         }
 
         /**
@@ -294,15 +304,18 @@ namespace fims {
          * @param index_ya dimension folded index for year and age
          * @param year the year recruitment is being calculated for
          */
-        void CalculateRecruitment(int index_ya, int year) {
+        void CalculateRecruitment(size_t index_ya, size_t year) {
+            Type phi0 = CalculateSBPR0();
             this->numbers_at_age[index_ya] =
                     this->recruitment->evaluate(this->spawning_biomass[year - 1],
-                    this->unfished_spawning_biomass[year - 1]) *
+                    phi0) *
                     this->recruitment->recruit_deviations[year];
-                    std::cout<<      this->spawning_biomass[year - 1] << " " <<
-                    this->unfished_spawning_biomass[year - 1]<<" ----- +++\n";
-//                    std::cout<<      this->recruitment->evaluate(this->spawning_biomass[year - 1],
-//                    this->unfished_spawning_biomass[year - 1])<<" ----- +++\n";
+
+                    FIMS_LOG <<      this->spawning_biomass[year - 1] << " " <<
+                    this->numbers_at_age[0]<<" ----- +++\n" << std::endl;
+                    FIMS_LOG <<      this->recruitment->evaluate(this->spawning_biomass[year - 1],
+                    phi0)<< " phi0 " <<
+                    phi0 <<" ----- +++\n " << this->recruitment->recruit_deviations[year] << std::endl;
         }
 
         /**
@@ -311,17 +324,15 @@ namespace fims {
          * @param year the year of expected total catch
          * @param age the age of catch that is being added into total catch
          */
-        void CalculateCatch(int year, int age) {
+        void CalculateCatch(size_t year, size_t age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                int index_yaf =
-                        year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-                int index_yf = year * this->nfleets +
+             size_t index_yf = year * this->nfleets +
                         fleet_; // index by fleet and years to dimension fold
+            size_t index_ya = year * this->nages + age;
+                this->expected_catch[index_yf] += this->fleets[fleet_]->catch_weight_at_age[index_ya];
 
-                this->expected_catch[index_yf] += this->catch_weight_at_age[index_yaf];
-
-                fleets[fleet_]->expected_catch[index_yf] +=
-                        this->catch_weight_at_age[index_yaf];
+                fleets[fleet_]->expected_catch[year] +=
+                        this->fleets[fleet_]->catch_weight_at_age[index_ya];
             }
         }
 
@@ -332,20 +343,17 @@ namespace fims {
          * @param year the year of the population index
          * @param age the age of the index that is added into population index
          */
-        void CalculateIndex(int index_ya, int year, int age) {
+        void CalculateIndex(size_t index_ya, size_t year, size_t age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                // index by fleet and years to dimension fold
-                int index_yf = year * this->nfleets + fleet_;
                 // I = qN (N is total numbers), I is an index in numbers
                 Type index_;
-
                 index_ = this->fleets[fleet_]->q[year] *
-                        this->fleets[fleet_]->selectivity->evaluate(age) *
-                        this->numbers_at_age[index_ya] * growth->evaluate(age);//this->weight_at_age[age];
-
-                this->expected_index[index_yf] += index_;
-                fleets[fleet_]->expected_index[index_yf] += index_;
+                        this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
+                        this->numbers_at_age[index_ya] * growth->evaluate(ages[age]);//this->weight_at_age[age];
+                FIMS_LOG << " q: " << this->fleets[fleet_]->q[year] << std::endl;
+                fleets[fleet_]->expected_index[year] += index_;
             }
+            FIMS_LOG << "nfleets: "<< this->nfleets << std::endl;
         }
 
         /**
@@ -357,24 +365,25 @@ namespace fims {
          * @param year the year of expected catch composition is being calculated for
          * @param age the age composition is being calculated for
          */
-        void CalculateCatchNumbersAA(int index_ya, int year, int age) {
+        void CalculateCatchNumbersAA(size_t index_ya, size_t year, size_t age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                int index_yaf =
-                        year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-                int index_yf = year * this->nfleets +
-                        fleet_; // index by fleet and years to dimension fold
+
                 // make an intermediate value in order to set multiple members (of
                 // current and fleet objects) to that value.
                 Type catch_; // catch_ is used to avoid using the c++ keyword catch
                 // Baranov Catch Equation
                 catch_ = (this->fleets[fleet_]->Fmort[year] *
-                        this->fleets[fleet_]->selectivity->evaluate(age)) /
+                        this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
                         this->mortality_Z[index_ya] * this->numbers_at_age[index_ya] *
                         (1 - exp(-(this->mortality_Z[index_ya])));
+
+                FIMS_LOG << " F " << fleet_ << "  " << this->fleets[fleet_]->Fmort[year] << std::endl;
+                FIMS_LOG << " selectivity " << this->fleets[fleet_]->selectivity->evaluate(ages[age]) << std::endl;
+                FIMS_LOG << " catch " << catch_ << std::endl;
                // this->catch_numbers_at_age[index_yaf] += catch_;
                 // catch_numbers_at_age for the fleet module has different
                 // dimensions (year/age, not year/fleet/age)
-                fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
+               this->fleets[fleet_]->catch_numbers_at_age[index_ya] += catch_;
             }
         }
 
@@ -385,12 +394,15 @@ namespace fims {
          * @param year the year of expected catch weight at age
          * @param age the age of expected catch weight at age
          */
-        void CalculateCatchWeightAA(int year, int age) {
+        void CalculateCatchWeightAA(size_t year, size_t age) {
+            int index_ya = year * this->nages + age;
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                int index_yaf =
-                        year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-                //this->catch_weight_at_age[index_yaf] =
-                  //      this->catch_numbers_at_age[index_yaf] * growth->evaluate(age);//this->weight_at_age[age];
+                 FIMS_LOG << " fleet "<< fleet_ << std::endl;
+                FIMS_LOG << " catchnaa "<< this->fleets[fleet_]->catch_numbers_at_age[year] << std::endl;
+                FIMS_LOG << " weight "<< this->growth->evaluate(ages[age]) << std::endl;
+                this->fleets[fleet_]->catch_weight_at_age[index_ya] = 
+                        this->fleets[fleet_]->catch_numbers_at_age[index_ya] * this->growth->evaluate(ages[age]);//this->weight_at_age[age];
+            FIMS_LOG << " catch_waa " << this->fleets[fleet_]->catch_weight_at_age[index_ya] << std::endl;
             }
         }
 
@@ -401,7 +413,7 @@ namespace fims {
          * @param index_ya dimension folded index for year and age
          * @param age the age of maturity
          */
-        void CalculateMaturityAA(int index_ya, int age) {
+        void CalculateMaturityAA(size_t index_ya, size_t age) {
             // this->maturity is pointing to the maturity module, which has
             //  an evaluate function. -> can be nested.
             this->proportion_mature_at_age[index_ya] = this->maturity->evaluate(ages[age]);
@@ -441,7 +453,7 @@ namespace fims {
                      index naming defines the dimensional folding structure
                      i.e. index_ya is referencing folding over years and ages.
                      */
-                    int index_ya = y * this->nages + a;
+                    size_t index_ya = y * this->nages + a;
                     /*
                      Mortality rates are not estimated in the final year which is
                      used to show expected stock structure at the end of the model period.
@@ -471,8 +483,9 @@ namespace fims {
                         // Initial numbers at age is a user input or estimated parameter
                         // vector.
                         CalculateInitialNumbersAA(index_ya, a);
+                        
                         if (a == 0) {
-                            this->numbers_at_age[index_ya] = this->recruitment->rzero;
+                            //this->numbers_at_age[index_ya] = this->recruitment->rzero;
                             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
                         } else {
                             CalculateUnfishedNumbersAA(index_ya, a - 1, a);
@@ -481,22 +494,30 @@ namespace fims {
                          Fished and unfished spawning biomass vectors are summing biomass at
                          age across ages to allow calculation of recruitment in the next year.
                          */
+                        
                         CalculateSpawningBiomass(index_ya, y, a);
+            
                         CalculateUnfishedSpawningBiomass(index_ya, y, a);
                     } else {
                         if (a == 0) {
                             // Set the nrecruits for age a=0 year y (use pointers instead of
                             // functional returns) assuming fecundity = 1 and 50:50 sex ratio
+                            FIMS_LOG << "Recruitment: " << std::endl;
                             CalculateRecruitment(index_ya, y);
                             this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
-                            //this->numbers_at_age[index_ya] = this->recruitment->rzero;
+                    
                         } else {
-                            int index_ya2 = (y - 1) * nages + (a - 1);
+                            size_t index_ya2 = (y - 1) * nages + (a - 1);
                             CalculateNumbersAA(index_ya, index_ya2, a);
                             CalculateUnfishedNumbersAA(index_ya, index_ya2, a);
                         }
                         CalculateSpawningBiomass(index_ya, y, a);
+                        
+                        FIMS_LOG << index_ya << std::endl;
                         CalculateUnfishedSpawningBiomass(index_ya, y, a);
+
+                        
+                        FIMS_LOG << index_ya << std::endl;
                     }
 
                     /*
@@ -506,7 +527,10 @@ namespace fims {
                     terminal year.
                      */
                     if (y < this->nyears) {
+                        FIMS_LOG << index_ya << std::endl;
                         CalculateCatchNumbersAA(index_ya, y, a);
+
+                        FIMS_LOG << index_ya << std::endl;
                         CalculateCatchWeightAA(y, a);
                         CalculateCatch(y, a);
                         CalculateIndex(index_ya, y, a);
