@@ -72,3 +72,29 @@ test_that("dlnorm unit test", {
   file.remove(paste0(path, "/", dynlib("test_dlnorm_distribution")))
   file.remove( paste0(path, "/test_dlnorm_distribution.o"))
 })
+
+test_that("dmultinom unit test", {
+
+  # setwd(project_path)
+  # on.exit(setwd(old_wd), add = TRUE)
+
+  # # dmultinom unit test
+  # # load test
+  dyn.load(dynlib(paste0(path, "/test_dmultinom_distribution")))
+  set.seed(123)
+  #Simulate new data with R
+  p = (1:10)/sum(1:10)
+  x = stats::rmultinom(1, 100, p)
+  #Calculate negative log-likelihood with R dnmultinom
+  nll = -stats::dmultinom(x, 100,p, TRUE)
+  #Initialize TMB model object with true values
+  mod = MakeADFun(data = list(x =x),
+                  parameters = list(p = p),
+                  DLL = "test_dmultinom_distribution")
+  #Compare R nll to TMB nll
+  expect_equal(nll, mod$fn())
+
+  dyn.unload(dynlib(paste0(path, "/test_dmultinom_distribution")))
+  file.remove(paste0(path, "/", dynlib("test_dmultinom_distribution")))
+  file.remove( paste0(path, "/test_dmultinom_distribution.o"))
+})

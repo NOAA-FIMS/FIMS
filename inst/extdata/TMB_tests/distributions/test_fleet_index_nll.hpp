@@ -1,7 +1,7 @@
-  /*! \file test_dlnorm_distribution.hpp 
-   * Specifies the negative log-likelihood of 
-   * the dlnorm distribution given data and parameters. 
-   * Creates singleton class that links this .hpp with 
+  /*! \file test_dlnorm_distribution.hpp
+   * Specifies the negative log-likelihood of
+   * the dlnorm distribution given data and parameters.
+   * Creates singleton class that links this .hpp with
    * the test_dlnorm_distribution.cpp TMB verison of the model
    */
   #ifndef TEST_FLEET_INDEX_HPP
@@ -11,11 +11,11 @@
   #include "../../../include/interface/interface.hpp"
 
   namespace fims {
-    
+
     /**
      * @brief Model class defines and returns negative log-likelihood (nll)
-     * 
-     * @tparam T 
+     *
+     * @tparam T
      */
     template <typename T>
     class Model {
@@ -35,8 +35,8 @@
 
       /**
        * @brief Create new singleton class
-       * 
-       * @return Model<T>* 
+       *
+       * @return Model<T>*
        */
       static Model<T>* getInstance(){
         return Model<T>::instance;
@@ -44,7 +44,7 @@
 
      /**
        * @brief Function that calculates the negative log-likelihood given the data and parameters
-       * 
+       *
        * @return negative log-likelihood (nll)
        */
       T evaluate(){
@@ -54,8 +54,9 @@
         int i;
         fims::FleetIndexNLL<T> nll_fleet_index;
         nll_fleet_index.log_obs_error = logsd;
-        nll_fleet_index.expected_index = mean;
         for(i =0; i < n; i++){
+
+          nll_fleet_index.expected_index[i] = mean[i];
         nll_fleet_index.observed_index_data->at(i) = y[i];
         nll -= nll_fleet_index.evaluate();
         }
@@ -66,8 +67,8 @@
 
     /**
      * @brief Create new instance of Model
-     * 
-     * @tparam T 
+     *
+     * @tparam T
      */
     template<class T>
     Model<T>* Model<T>::instance = new Model<T>();
