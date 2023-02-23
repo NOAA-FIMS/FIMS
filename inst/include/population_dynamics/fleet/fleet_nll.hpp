@@ -86,15 +86,18 @@ struct FleetAgeCompNLL : public Fleet<Type> {
        " and expected is of size " << this->age_composition.size() << std::endl;
       } else{
       for(size_t y = 0; y < this->nyears; y++){
-        
+
       using Vector = typename ModelTraits<Type>::EigenVector;
       Vector observed_acomp;
       Vector expected_acomp;
 
       observed_acomp.resize(this->nages);
       expected_acomp.resize(this->nages);
-      double sum = std::accumulate(this->catch_numbers_at_age.begin(),
-      this->catch_numbers_at_age.end(),0.0);
+      Type sum = 0.0;
+      for (size_t a = 0; a < this->nages; a++) {
+        size_t index_ya = y*this->nages + a;
+        sum+= this->catch_numbers_at_age[index_ya];
+      }
         for (size_t a = 0; a < this->nages; a++) {
           size_t index_ya = y*this->nages + a;
           expected_acomp[a] = this->catch_numbers_at_age[index_ya]/sum;//probabilities for ages
