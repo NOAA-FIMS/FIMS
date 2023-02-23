@@ -46,10 +46,10 @@ struct FleetIndexNLL : public Fleet<Type> {
     Type nll = 0.0; /*!< The negative log likelihood value */
 
       fims::Dnorm<Type> dnorm;
-      dnorm.sd = std::exp(this->log_obs_error);
+      dnorm.sd = fims::exp(this->log_obs_error);
       for (size_t i = 0; i < this->expected_index.size(); i++) {
-        dnorm.x = std::log(this->observed_index_data[i]);
-        dnorm.mean = std::log(this->expected_index[i]);
+        dnorm.x = fims::log(this->observed_index_data->at(i));
+        dnorm.mean = fims::log(this->expected_index[i]);
         nll -= dnorm.evaluate(true);
       }
       return nll;
@@ -80,8 +80,9 @@ struct FleetAgeCompNLL : public Fleet<Type> {
     Type nll = 0.0; /*!< The negative log likelihood value */
 
       fims::Dmultinom<Type> dmultinom;
-      if(this->observed_agecomp_data.size() != this->age_composition.size()){
-       FIMS_LOG << "Error: observed age comp is of size " <<  this->observed_agecomp_data.size() <<
+      size_t dims = this->observed_agecomp_data->get_imax()*this->observed_agecomp_data->get_jmax();
+      if(dims != this->age_composition.size()){
+       FIMS_LOG << "Error: observed age comp is of size " <<  dims <<
        " and expected is of size " << this->age_composition.size() << std::endl;
       } else{
       for(size_t y = 0; y < this->nyears; y++){
@@ -94,7 +95,6 @@ struct FleetAgeCompNLL : public Fleet<Type> {
       expected_acomp.resize(this->nages);
       double sum = std::accumulate(this->catch_numbers_at_age.begin(),
       this->catch_numbers_at_age.end(),0.0);
-      double sum = 1.0;
         for (size_t a = 0; a < this->nages; a++) {
           size_t index_ya = y*this->nages + a;
           expected_acomp[a] = this->catch_numbers_at_age[index_ya]/sum;//probabilities for ages
@@ -104,8 +104,8 @@ struct FleetAgeCompNLL : public Fleet<Type> {
         dmultinom.p = expected_acomp;
         nll -= dmultinom.evaluate(true);
       }
+      }
       return nll;
-    }
   }
 };
 

@@ -42,10 +42,10 @@ struct Fleet : public FIMSObject<Type> {
       selectivity; /*!< selectivity component*/
   
   int observed_index_data_id = -999; /*!< id of index data */
-  std::shared_ptr<fims::DataObject<double>> observed_index_data; /*!< observed index data*/
+  std::shared_ptr<fims::DataObject<Type>> observed_index_data; /*!< observed index data*/
 
   int observed_agecomp_data_id = -999; /*!< id of age comp data */
-  std::shared_ptr<fims::DataObject<double>> 
+  std::shared_ptr<fims::DataObject<Type>> 
   observed_agecomp_data; /*< observed agecomp data*/
 
   // Mortality and catchability
