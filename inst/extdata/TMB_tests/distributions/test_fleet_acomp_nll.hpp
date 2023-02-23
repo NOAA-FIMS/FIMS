@@ -19,9 +19,11 @@
      */
     template <typename T>
     class Model {
+      
+      using DataVector = typename ModelTraits<T>::DataVector;
       using Vector = typename ModelTraits<T>::EigenVector;
       public:
-      Vector x; /*!< Vector of length K of integers */
+      DataVector x; /*!< Vector of length K of integers */
       Vector p; /*!< Vector of length K, specifying the probability for the K classes (note, unlike in R these must sum to 1). */
 
       // Initiate pointer to link .cpp to .hpp
@@ -48,9 +50,13 @@
       T evaluate(){
 
         T nll = 0;
+        int n = x.size();
         fims::FleetAgeCompNLL<T> nll_fac;
-        nll_fac.observed_agecomp_data = x;
-        nll_fac.catch_numbers_at_age = p;
+        for(int i =0; i < n; i++){
+          nll_fac.observed_agecomp_data->at(i) = x[i];
+          nll_fac.catch_numbers_at_age[i] = p[i];
+
+        }
         nll -= nll_fac.evaluate();
         return nll;
       }

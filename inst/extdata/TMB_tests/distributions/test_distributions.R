@@ -118,7 +118,7 @@ test_that("fleet index nll unit test", {
   #Calculate negative log-likelihood with R dnmultinom
   nll = -stats::dmultinom(x, 100,p, TRUE)
   #Initialize TMB model object with true values
-  mod = MakeADFun(data = list(x =x),
+  mod = MakeADFun(data = list(y =x),
                   parameters = list(p = p),
                   DLL = "test_fleet_index_nll")
   #Compare R nll to TMB nll
@@ -151,8 +151,8 @@ test_that("fleet acomp nll unit test", {
   #Compare R nll to TMB nll
   expect_equal(nll, mod$fn())
 
-  dyn.unload(dynlib(paste0(path, "/test_fleet_acomp_nll")))
-  file.remove(paste0(path, "/", dynlib("test_fleet_acomp_nll")))
-  file.remove( paste0(path, "/test_fleet_acomp_nll.o"))
+  dyn.unload(dynlib(file.path(path, "test_fleet_acomp_nll")))
+  file.remove(file.path(path, dynlib("test_fleet_acomp_nll")))
+  file.remove( file.path(path, "test_fleet_acomp_nll.o"))
   
 })
