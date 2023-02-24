@@ -6,12 +6,11 @@ setup_gtest <- function(){
   # currently don't need, but may need once we need more than one file.
   for (i_iter in 1) {
     # read Rdata file into workspace
-    #github_dir <- "https://github.com/JaneSullivan-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/raw/spatial-structure/example/FIMS-C0/output/OM/"
-    #temporarily use a scenario from the model comparison project that is
+    # temporarily use a scenario from the model comparison project that is
     # not deterministic
-    github_dir <- "https://github.com/JaneSullivan-NOAA/Model_Comparison_Paper/raw/FIMS-C0/code/FIMS-C0/output/OM/"
+    github_dir <- "https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/raw/master/FIMS_integration_test_data/FIMS_C0/output/OM/"
     Rdata_file <- paste0("OM", i_iter, ".RData") # e.g. OM1.Rdata
-    # this loads the file directly from github 
+    # this loads the file directly from github
     # (which was easier to figure out than downloading the Rdata first)
     load(url(paste0(github_dir, Rdata_file)))
     # write json file
@@ -28,9 +27,9 @@ setup_gtest <- function(){
 }
 
 #' setup and run google test suite
-#' 
+#'
 #' Developer function for setup and running google test suite from R
-#' @param /dots additional arguments to \code{ctest --test-dir build} 
+#' @param /dots additional arguments to \code{ctest --test-dir build}
 #' such as "--rerun-failed --output-on-failure"
 #' @export
 setup_and_run_gtest <- function(...) {
@@ -42,9 +41,9 @@ setup_and_run_gtest <- function(...) {
 }
 
 #' run google test suite
-#' 
+#'
 #' Developer function for running google test suite from R
-#' @param /dots additional arguments to \code{ctest --test-dir build} 
+#' @param /dots additional arguments to \code{ctest --test-dir build}
 #' such as "--rerun-failed --output-on-failure"
 #' @export
 run_gtest <- function(...) {
