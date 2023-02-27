@@ -52,8 +52,9 @@
         T nll = 0;
         int n = x.size();
         fims::FleetAgeCompNLL<T> nll_fac;
+        nll_fac.catch_numbers_at_age.resize(n);
         for(int i =0; i < n; i++){
-          nll_fac.observed_agecomp_data->at(i) = (double) x[i];
+          nll_fac.observed_agecomp_data->at(i) = x[i];
           nll_fac.catch_numbers_at_age[i] = p[i];
         }
         nll -= nll_fac.evaluate();
