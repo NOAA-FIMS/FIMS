@@ -14,7 +14,7 @@ Type objective_function<Type>::operator()(){
 
   DATA_VECTOR(x);
   PARAMETER_VECTOR(p);
-  /*
+  /*  
    * access and assign members of Model class using inst pointer
    */
   inst -> x = x;

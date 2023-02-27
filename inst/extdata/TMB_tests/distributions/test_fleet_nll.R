@@ -19,7 +19,7 @@ project_path <- getwd()
 
 # compile test .cpp files from inst/extdata/TMB_tests/distributions
 TMB::compile(paste0(path, "/test_fleet_index_nll.cpp"), flags = "-DTMB_MODEL")
-TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-DTMB_MODEL")
+TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MODEL", DLLFLAGS="")
 
 #test_that("fleet index nll unit test", {
 
