@@ -3,7 +3,7 @@
  */
 
 #include "test_fleet_acomp_nll.hpp"
-
+ 
 template<class Type>
 Type objective_function<Type>::operator()(){
   /*
@@ -11,10 +11,10 @@ Type objective_function<Type>::operator()(){
    * getinstance is defined in test_fleet_acomp_nll.hpp
    */ 
   fims::Model<Type>* inst = fims::Model<Type>::getInstance();
-
+ 
   DATA_VECTOR(x);
   PARAMETER_VECTOR(p);
-  /*  
+  /*   
    * access and assign members of Model class using inst pointer
    */
   inst -> x = x;
