@@ -18,7 +18,7 @@ project_path <- getwd()
 
 
 # compile test .cpp files from inst/extdata/TMB_tests/distributions
-TMB::compile(paste0(path, "/test_fleet_index_nll.cpp"), flags = "-DTMB_MODEL")
+TMB::compile(paste0(path, "/test_fleet_index_nll.cpp"), flags = "-O1 -g -DTMB_MODEL", DLLFLAGS="")
 TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MODEL", DLLFLAGS="")
 
 #test_that("fleet index nll unit test", {
@@ -39,9 +39,9 @@ TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MO
   nll = -sum(stats::dlnorm(y, 2, 1, TRUE))
 
   #Initialize TMB model object with true values
-  #mod = MakeADFun(data = list(y =y),
-  #                parameters = list(p = c(rep(5,10), log(3))),
-  #                DLL = "test_fleet_index_nll")
+  mod = MakeADFun(data = list(y =y),
+                  parameters = list(p = c(rep(5,10), log(3))),
+                  DLL = "test_fleet_index_nll")
   #Compare R nll to TMB nll
   #expect_equal(nll, mod$fn())
 
