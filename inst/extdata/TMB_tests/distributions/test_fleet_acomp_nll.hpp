@@ -20,7 +20,6 @@
     template <typename T>
     class Model {
 
-      using DataVector = typename ModelTraits<T>::DataVector;
       using Vector = typename ModelTraits<T>::EigenVector;
       public:
       Vector x; /*!< Vector of length K of integers */
@@ -55,7 +54,10 @@
         nll_fac.catch_numbers_at_age.resize(n);
         nll_fac.nyears = 1;
         nll_fac.nages = 10;
-        nll_fac.observed_agecomp_data = new fims::DataObject<T>(1, 10);
+        std::shared_ptr<fims::DataObject<T>> age_comp_data =
+        std::make_shared<fims::DataObject<T>>(10, 1);
+
+        nll_fac.observed_agecomp_data = age_comp_data;
         for(int i =0; i < n; i++){
           std::cout << i << std::endl;
           std::cout << x[i] << std::endl;
