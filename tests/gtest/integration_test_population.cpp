@@ -6,7 +6,7 @@ namespace
 {
     TEST(Integrated_test_works, run_all)
     {
-    
+    std::ofstream test_log("log_integration_test.txt");
     //Declare IntegrationTest object
     IntegrationTest t(1, 1);
     std::stringstream ss;
@@ -22,12 +22,12 @@ namespace
     ss.str("");
     //GoogleTest operates in the folder with executables "build/tests/gtest"
     //so we have to go up three directories to get into FIMS folder
-    ss << "../../../tests/integration/inputs/fims-deterministic/om_input" << 1 << ".json";
+    ss << "../../../tests/integration/inputs/FIMS-deterministic/om_input" << 1 << ".json";
     t.ReadJson(ss.str(), input);
     ss.str("");
     
     //Read in outputs
-    ss << "../../../tests/integration/inputs/fims-deterministic/om_output" << 1 << ".json";
+    ss << "../../../tests/integration/inputs/FIMS-deterministic/om_output" << 1 << ".json";
     t.ReadJson(ss.str(), output);
 
     //Declare singleton of population class
@@ -53,9 +53,23 @@ namespace
     for (int year = 0; year < e.Size(); year++) {
         for(int age = 0; age < e[year].Size(); age++){
             int index_ya = year * pop.nages + age;
-            test_numbers_at_age[index_ya] = e[year][age].GetDouble();    
+            test_numbers_at_age[index_ya] = e[year][age].GetDouble(); 
+            test_log << "year " << year << std::endl;
+            test_log << "age " << age << std::endl;
+            test_log << "pop.fleets.size() " << pop.fleets.size() << std::endl;
+            test_log << "pop.fleets[0]->q[year] " << pop.fleets[0]->q[year] << std::endl;
+            test_log << "pop.fleets[0]->Fmort[year] " << pop.fleets[0]->Fmort[year] << std::endl;
+            test_log << "pop.fleets[0]->expected_index[year] " << pop.fleets[0]->expected_index[year] << std::endl;
+            test_log << "pop.fleets[1]->q[year] " << pop.fleets[1]->q[year] << std::endl;
+            test_log << "pop.fleets[1]->Fmort[year] " << pop.fleets[1]->Fmort[year] << std::endl;
+            test_log << "pop.fleets[1]->expected_index[year] " << pop.fleets[1]->expected_index[year] << std::endl;
+            test_log << "pop.spawning_biomass[year] " << pop.spawning_biomass[year] << std::endl;
+            test_log << "test_numbers_at_age[index_ya] " << test_numbers_at_age[index_ya] << std::endl;
+            test_log << "pop.numbers_at_age[index_ya] " << pop.numbers_at_age[index_ya] << "\n" << std::endl; 
             EXPECT_NEAR(pop.numbers_at_age[index_ya], 
             test_numbers_at_age[index_ya], .001) << "differ at index " << index_ya;
+
+            
         }
     }
     } 
