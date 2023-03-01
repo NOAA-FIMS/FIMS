@@ -292,8 +292,12 @@ namespace fims {
             for(size_t a = 1; a < (this->nages-1); a++){
                 numbers_spr[a] = numbers_spr[a-1]*fims::exp(-this->M[a]);
                 phi_0 += numbers_spr[a]*this->proportion_female*this->proportion_mature_at_age[a]*this->growth->evaluate(ages[a]);
-            }
-            numbers_spr[this->nages-1]=(numbers_spr[nages-2]*fims::exp(-this->M[nages-1]))/(1-exp(-this->M[this->nages-1]));
+            } // original implementation
+            // for(size_t a = 1; a < (this->nages-1); a++){
+            //     numbers_spr[a] = numbers_spr[a-1]*fims::exp(-this->M[a-1]);
+            //     phi_0 += numbers_spr[a]*this->proportion_female*this->proportion_mature_at_age[a]*this->growth->evaluate(ages[a]);
+            // }
+            numbers_spr[this->nages-1]=(numbers_spr[nages-2]*fims::exp(-this->M[nages-2]))/(1-exp(-this->M[this->nages-1]));
             phi_0 += numbers_spr[this->nages-1]*this->proportion_female*this->proportion_mature_at_age[this->nages-1]*this->growth->evaluate(ages[this->nages-1]);       
             return phi_0;        
         }
