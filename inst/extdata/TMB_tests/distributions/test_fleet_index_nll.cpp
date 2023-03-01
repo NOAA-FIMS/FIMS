@@ -14,15 +14,14 @@ Type objective_function<Type>::operator()(){
 
   DATA_VECTOR(y);
   PARAMETER_VECTOR(p);
-  for(int i = 0; i <= 9; i++){
-    inst->mean[i] = p[i];
-  }
-  Type logsd = p[10];
+  PARAMETER(log_sd)
+  
   /*
    * access and assign members of Model class using inst pointer
    */
+  inst->mean = p;
   inst -> y = y;
-  inst -> logsd = logsd;
+  inst -> logsd = log_sd;
   /*
    *   create Type nll and assign value to the return of the
    *   evaluate() function defined in test_dlnorm_distribution.hpp

@@ -51,7 +51,7 @@
 
         T nll = 0;
         int n = y.size();
-        int i;
+
         fims::FleetIndexNLL<T> nll_fleet_index;
         nll_fleet_index.log_obs_error = logsd;
         
@@ -60,8 +60,9 @@
         nll_fleet_index.observed_index_data = index_data;
 
         nll_fleet_index.expected_index.resize(n);
-        for(i =0; i < n; i++){
-          nll_fleet_index.expected_index[i] = mean[i];
+        nll_fleet_index.expected_index = mean;
+        
+        for(int i =0; i < n; i++){
           nll_fleet_index.observed_index_data->at(i) = y[i];
           nll -= nll_fleet_index.evaluate();
         }
