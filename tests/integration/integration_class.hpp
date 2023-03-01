@@ -466,6 +466,8 @@ public:
     for (int i = 0; i < e.Size(); i++)
     {
       growth->ewaa[static_cast<double>(pop.ages[i])] = e[i].GetDouble() / 1000.0;
+      debug_log << "W.mt[i] " << e[i].GetDouble() / 1000.0 << std::endl;
+      debug_log << "growth->ewaa[i] " << growth->ewaa[static_cast<double>(pop.ages[i])] << std::endl;
     }
     pop.growth = growth;
 

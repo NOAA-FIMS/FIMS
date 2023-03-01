@@ -39,6 +39,11 @@ namespace
 
     pop.numbers_at_age = t.RunModelLoop(pop, input);
     good = t.CheckModelOutput(pop, output);
+
+    for(int age = 0; age < pop.nages; age++){
+        test_log << "growth->evaluate("<< age<< ") " << pop.growth->evaluate(age) << std::endl;
+    }
+    
     //declare vector of doubles to hold
     //dimension folded numbers at age vector
     //resize to nyears * nages
@@ -63,9 +68,13 @@ namespace
             test_log << "pop.fleets[1]->q[year] " << pop.fleets[1]->q[year] << std::endl;
             test_log << "pop.fleets[1]->Fmort[year] " << pop.fleets[1]->Fmort[year] << std::endl;
             test_log << "pop.fleets[1]->expected_index[year] " << pop.fleets[1]->expected_index[year] << std::endl;
+            test_log << "pop.proportion_female " << pop.proportion_female << std::endl;
+            test_log << "pop.proportion_mature_at_age[index_ya] " << pop.proportion_mature_at_age[index_ya] << std::endl;
+            test_log << "pop.growth " << pop.spawning_biomass[year] / pop.numbers_at_age[index_ya]/ pop.proportion_female / pop.proportion_mature_at_age[index_ya] << std::endl;
             test_log << "pop.spawning_biomass[year] " << pop.spawning_biomass[year] << std::endl;
-            test_log << "test_numbers_at_age[index_ya] " << test_numbers_at_age[index_ya] << std::endl;
-            test_log << "pop.numbers_at_age[index_ya] " << pop.numbers_at_age[index_ya] << "\n" << std::endl; 
+            test_log << "pop.recruitment->recruit_deviations[year] " << pop.recruitment->recruit_deviations[year] << std::endl;
+            test_log << "pop.numbers_at_age[index_ya] " << pop.numbers_at_age[index_ya] << std::endl; 
+            test_log << "test_numbers_at_age[index_ya] " << test_numbers_at_age[index_ya] << "\n" << std::endl;
             EXPECT_NEAR(pop.numbers_at_age[index_ya], 
             test_numbers_at_age[index_ya], .001) << "differ at index " << index_ya;
 
