@@ -59,8 +59,6 @@
 
         nll_fac.observed_agecomp_data = age_comp_data;
         for(int i =0; i < n; i++){
-          std::cout << i << std::endl;
-          std::cout << x[i] << std::endl;
           nll_fac.observed_agecomp_data->at(i) = x[i];
           nll_fac.catch_numbers_at_age[i] = p[i];
         }
