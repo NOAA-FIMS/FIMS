@@ -35,9 +35,9 @@ namespace
         // model start year or a vector of values for each year?
         EXPECT_EQ(population.unfished_spawning_biomass.size(), (nyears + 1));
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
-        EXPECT_EQ(population.log_naa.size(), nages);
+        EXPECT_EQ(population.log_init_naa.size(), nages);
         EXPECT_EQ(population.log_M.size(), nyears * nages);
-        EXPECT_EQ(population.naa.size(), nages);
+        EXPECT_EQ(population.init_naa.size(), nages);
         EXPECT_EQ(population.M.size(), nyears * nages);
     }
 
@@ -80,10 +80,10 @@ namespace
         std::vector<double> naa(nages, 0);
         for (int i = 0; i < nages; i++)
         {
-            naa[i] = fims::exp(population.log_naa[i]);
-            EXPECT_EQ(population.naa[i], naa[i]);
+            naa[i] = fims::exp(population.log_init_naa[i]);
+            EXPECT_EQ(population.init_naa[i], naa[i]);
         }
-        EXPECT_EQ(population.naa.size(), nages);
+        EXPECT_EQ(population.init_naa.size(), nages);
 
         // Test population.M
         std::vector<double> M(nyears * nages, 0);
