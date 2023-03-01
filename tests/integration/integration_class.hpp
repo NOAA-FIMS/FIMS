@@ -323,8 +323,9 @@ public:
           s->selectivity = selectivity;
         }
 
-        //std::fill(s->log_q.begin(), s->log_q.end(), 3.4613e-07);
-        std::fill(s->log_q.begin(), s->log_q.end(), 3.5332e-07); // survey_q from om_output1.json; use q or log q?
+        //std::fill(s->log_q.begin(), s->log_q.end(), 3.4613e-07); // Original code
+        std::fill(s->log_q.begin(), s->log_q.end(), 3.5332e-07); // survey_q from MCP case 0 om_output1.json; use q or log q?
+        // std::fill(s->log_q.begin(), s->log_q.end(), 3.4898e-07); // value from MCP case 0noPhiF
         debug_log << "s->log_q[0] " << s->log_q[0] << std::endl;
         pop.fleets.push_back(s);
       }
@@ -345,10 +346,17 @@ public:
     // initialize population
     pop.Initialize(nyears, 1, nages);
 
-    // Set initial size to value from MCP
+    // Set initial size to value from MCP C0
     std::vector<double> naa = {993947.488, 811707.7933, 661434.4148, 537804.7782,
                                436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219,
                                153328.4354, 124353.2448, 533681.2692};
+
+    // Set initial size to value from MCP C0noPhiF
+    // std::vector<double> naa = {1000000, 818730.7531, 670320.046, 
+    //                            548811.6361, 449328.9641, 367879.4412, 
+    //                            301194.2119, 246596.9639, 201896.518, 
+    //                            165298.8882, 135335.2832, 611262.8603};
+
     debug_log << "naa " << naa[0] << std::endl;
     for (int i = 0; i < pop.nages; i++)
     {

@@ -58,6 +58,7 @@ namespace
     for (int year = 0; year < e.Size(); year++) {
         for(int age = 0; age < e[year].Size(); age++){
             int index_ya = year * pop.nages + age;
+            int index_ya2 = (year - 1) * pop.nages + (age - 1);
             test_numbers_at_age[index_ya] = e[year][age].GetDouble(); 
             test_log << "year " << year << std::endl;
             test_log << "age " << age << std::endl;
@@ -73,6 +74,8 @@ namespace
             test_log << "pop.growth " << pop.spawning_biomass[year] / pop.numbers_at_age[index_ya]/ pop.proportion_female / pop.proportion_mature_at_age[index_ya] << std::endl;
             test_log << "pop.spawning_biomass[year] " << pop.spawning_biomass[year] << std::endl;
             test_log << "pop.recruitment->recruit_deviations[year] " << pop.recruitment->recruit_deviations[year] << std::endl;
+            test_log << "pop.mortality_F[index_ya] " << pop.mortality_F[index_ya] << std::endl;
+            test_log << "pop.mortality_Z[index_ya] " << pop.mortality_Z[index_ya] << std::endl;
             test_log << "pop.numbers_at_age[index_ya] " << pop.numbers_at_age[index_ya] << std::endl; 
             test_log << "test_numbers_at_age[index_ya] " << test_numbers_at_age[index_ya] << "\n" << std::endl;
             EXPECT_NEAR(pop.numbers_at_age[index_ya], 
