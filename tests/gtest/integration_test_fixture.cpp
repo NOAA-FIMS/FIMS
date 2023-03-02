@@ -64,5 +64,5 @@ class PopulationIntegrationTestFixture : public testing::Test {
   int nyears = 30;
   int nseasons = 1;
   int nages = 12;
-  int nfleets = 2;
+  int nfleets = 2; // one survey fleet and one fishing fleet
 };
