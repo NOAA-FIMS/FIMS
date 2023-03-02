@@ -344,24 +344,24 @@ public:
     pop.Initialize(nyears, 1, nages);
 
     // Set initial size to value from MCP C0
-    std::vector<double> naa = {993947.488, 811707.7933, 661434.4148, 537804.7782,
+    std::vector<double> init_naa = {993947.488, 811707.7933, 661434.4148, 537804.7782,
                                436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219,
                                153328.4354, 124353.2448, 533681.2692};
 
     // Set initial size to value from MCP C0noPhiF
-    // std::vector<double> naa = {1000000, 818730.7531, 670320.046,
+    // std::vector<double> init_naa = {1000000, 818730.7531, 670320.046,
     //                            548811.6361, 449328.9641, 367879.4412,
     //                            301194.2119, 246596.9639, 201896.518,
     //                            165298.8882, 135335.2832, 611262.8603};
 
-    debug_log << "naa " << naa[0] << std::endl;
+    debug_log << "init_naa " << init_naa[0] << std::endl;
     for (int i = 0; i < pop.nages; i++)
     {
-      pop.log_naa[i] = std::log(naa[i]);
-      debug_log << "pop.log_naa[i] " << pop.log_naa[i] << std::endl;
+      pop.log_init_naa[i] = std::log(init_naa[i]);
+      debug_log << "pop.log_init_naa[i] " << pop.log_init_naa[i] << std::endl;
     }
 
-    // std::fill(pop.log_naa.begin(), pop.log_naa.end(), std::log(10000));
+    // std::fill(pop.log_init_naa.begin(), pop.log_init_naa.end(), std::log(10000));
 
     // set ages vector
     it = input.FindMember("ages");
