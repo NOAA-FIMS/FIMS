@@ -16,7 +16,6 @@ class IntegrationTest
 {
 
 public:
-
   uint32_t ncases_m = 10;
   uint32_t ninput_files_m = 160;
   bool print_statements = false;
@@ -108,7 +107,7 @@ public:
       rapidjson::Value &e = (*it).value;
       nyears = e[0].GetInt();
       debug_log << "nyr " << nyears << std::endl;
-      
+
       if (print_statements)
       {
         std::cout << "nyr " << nyears << std::endl;
@@ -204,7 +203,7 @@ public:
           sel_slope = fsel->value.FindMember("slope.sel1");
           rapidjson::Value &slope1 = (*sel_slope).value;
           selectivity->slope_asc = slope1[0].GetDouble();
-          debug_log << "slope.sel1 " <<  slope1[0].GetDouble() << std::endl;
+          debug_log << "slope.sel1 " << slope1[0].GetDouble() << std::endl;
 
           sel_a50 = fsel->value.FindMember("A50.sel2");
           rapidjson::Value &a502 = (*sel_a50).value;
@@ -214,10 +213,10 @@ public:
           sel_slope = fsel->value.FindMember("slope.sel2");
           rapidjson::Value &slope2 = (*sel_slope).value;
           selectivity->slope_desc = slope2[0].GetDouble();
-          debug_log << "slope.sel2 " <<  slope2[0].GetDouble() << std::endl;
+          debug_log << "slope.sel2 " << slope2[0].GetDouble() << std::endl;
           f->selectivity = selectivity;
         }
-
+        
         // set fleet fishing mortality
         if (print_statements)
         {
@@ -228,15 +227,15 @@ public:
         {
           rapidjson::Value &e = (*it).value;
           f->Fmort[i] = e[i].GetDouble();
-          debug_log << "F " <<  e[i].GetDouble() << std::endl;
+          debug_log << "F " << e[i].GetDouble() << std::endl;
           f->log_Fmort[i] = std::log(e[i].GetDouble());
-          std::fill(f->log_q.begin(),
-                    f->log_q.end(), 0.0);
+          f->log_q[i] = 2.0;
           if (print_statements)
           {
             std::cout << f->log_Fmort[i] << " ";
           }
         }
+        debug_log << "f->log_q[0] " << f->log_q[0] << std::endl;
         if (print_statements)
         {
           std::cout << "\n";
@@ -259,7 +258,7 @@ public:
     {
       rapidjson::Value &e = (*it).value;
       nsurveys = e[0].GetInt();
-      debug_log << "nsurveys " <<  e[0].GetInt() << std::endl;
+      debug_log << "nsurveys " << e[0].GetInt() << std::endl;
       for (int i = 0; i < nsurveys; i++)
       {
         std::shared_ptr<fims::Fleet<double>> s = std::make_shared<fims::Fleet<double>>();
@@ -303,13 +302,11 @@ public:
           selectivity->median_asc = a501[0].GetDouble();
           debug_log << "A50.sel1 " << a501[0].GetDouble() << std::endl;
 
-
           typename rapidjson::Document::MemberIterator sel_slope;
           sel_slope = fsel->value.FindMember("slope.sel1");
           rapidjson::Value &slope1 = (*sel_slope).value;
           selectivity->slope_asc = slope1[0].GetDouble();
           debug_log << "slope.sel1 " << slope1[0].GetDouble() << std::endl;
-
 
           sel_a50 = fsel->value.FindMember("A50.sel2");
           rapidjson::Value &a502 = (*sel_a50).value;
@@ -323,7 +320,7 @@ public:
           s->selectivity = selectivity;
         }
 
-        //std::fill(s->log_q.begin(), s->log_q.end(), 3.4613e-07); // Original code
+        // std::fill(s->log_q.begin(), s->log_q.end(), 3.4613e-07); // Original code
         std::fill(s->log_q.begin(), s->log_q.end(), 3.5332e-07); // survey_q from MCP case 0 om_output1.json; use q or log q?
         // std::fill(s->log_q.begin(), s->log_q.end(), 3.4898e-07); // value from MCP case 0noPhiF
         debug_log << "s->log_q[0] " << s->log_q[0] << std::endl;
@@ -352,9 +349,9 @@ public:
                                153328.4354, 124353.2448, 533681.2692};
 
     // Set initial size to value from MCP C0noPhiF
-    // std::vector<double> naa = {1000000, 818730.7531, 670320.046, 
-    //                            548811.6361, 449328.9641, 367879.4412, 
-    //                            301194.2119, 246596.9639, 201896.518, 
+    // std::vector<double> naa = {1000000, 818730.7531, 670320.046,
+    //                            548811.6361, 449328.9641, 367879.4412,
+    //                            301194.2119, 246596.9639, 201896.518,
     //                            165298.8882, 135335.2832, 611262.8603};
 
     debug_log << "naa " << naa[0] << std::endl;

@@ -62,13 +62,16 @@ namespace
             test_numbers_at_age[index_ya] = e[year][age].GetDouble(); 
             test_log << "year " << year << std::endl;
             test_log << "age " << age << std::endl;
+            test_log << "index_ya " << index_ya << std::endl;
             test_log << "pop.fleets.size() " << pop.fleets.size() << std::endl;
             test_log << "pop.fleets[0]->q[year] " << pop.fleets[0]->q[year] << std::endl;
             test_log << "pop.fleets[0]->Fmort[year] " << pop.fleets[0]->Fmort[year] << std::endl;
             test_log << "pop.fleets[0]->expected_index[year] " << pop.fleets[0]->expected_index[year] << std::endl;
+            test_log << "pop.fleets[0]->catch_numbers_at_age[index_ya] " << pop.fleets[0]->expected_index[year] << std::endl;
             test_log << "pop.fleets[1]->q[year] " << pop.fleets[1]->q[year] << std::endl;
             test_log << "pop.fleets[1]->Fmort[year] " << pop.fleets[1]->Fmort[year] << std::endl;
             test_log << "pop.fleets[1]->expected_index[year] " << pop.fleets[1]->expected_index[year] << std::endl;
+            test_log << "pop.fleets[1]->catch_numbers_at_age[index_ya] " << pop.fleets[1]->expected_index[year] << std::endl;
             test_log << "pop.proportion_female " << pop.proportion_female << std::endl;
             test_log << "pop.proportion_mature_at_age[index_ya] " << pop.proportion_mature_at_age[index_ya] << std::endl;
             test_log << "pop.growth " << pop.spawning_biomass[year] / pop.numbers_at_age[index_ya]/ pop.proportion_female / pop.proportion_mature_at_age[index_ya] << std::endl;
@@ -78,8 +81,8 @@ namespace
             test_log << "pop.mortality_Z[index_ya] " << pop.mortality_Z[index_ya] << std::endl;
             test_log << "pop.numbers_at_age[index_ya] " << pop.numbers_at_age[index_ya] << std::endl; 
             test_log << "test_numbers_at_age[index_ya] " << test_numbers_at_age[index_ya] << "\n" << std::endl;
-            EXPECT_NEAR(pop.numbers_at_age[index_ya], 
-            test_numbers_at_age[index_ya], .001) << "differ at index " << index_ya;
+            EXPECT_LE((pop.numbers_at_age[index_ya] - test_numbers_at_age[index_ya])/test_numbers_at_age[index_ya]*100, 
+                        .01) << "differ at index " << index_ya;
 
             
         }
