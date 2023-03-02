@@ -143,7 +143,7 @@ namespace
 
         // declare vector of doubles to hold
         // biomass, spawning biomass, unfished spawning biomass,
-        // expected catch in weight, index
+        // expected catch in weight, expected index
         std::vector<double> expected_biomass(pop.nyears, 0.0);
         std::vector<double> expected_spawning_biomass(pop.nyears, 0.0);
         std::vector<double> expected_catch(pop.nyears, 0.0);
@@ -154,11 +154,73 @@ namespace
         std::vector<double> expected_weight_at_age(pop.nages, 0.0);
 
         // declare vector of doubles to hold dimension folded
-        // numbers at age, unfished numbers at age
+        // numbers at age
         // fishing mortality at age, total mortality at age
         std::vector<double> expected_numbers_at_age(pop.nages * pop.nyears, 0.0);
         std::vector<double> expected_mortality_F(pop.nages * pop.nyears, 0.0);
         std::vector<double> expected_mortality_Z(pop.nages * pop.nyears, 0.0);
+
+        // Test spawning biomass
+        // find the OM json member called "SSB"
+        it = output.FindMember("SSB");
+
+        if (it != output.MemberEnd())
+        {
+            rapidjson::Value &e = (*it).value;
+            for (int year = 0; year < e.Size(); year++)
+            {
+                expected_spawning_biomass[year] = e[year].GetDouble();
+                // Expect the difference between FIMS value and the 
+                // expected value from the MCP OM
+                // is less than 1.0.
+                // Currently, the largest difference is 0.66 and 
+                // it happens in year 3.
+                EXPECT_NEAR(pop.spawning_biomass[year], expected_spawning_biomass[year], 1.0)
+                    << "year " << year;
+                // Expect the difference between FIMS value and the 
+                // expected value from the MCP OM
+                // is less than 0.02% of the expected value.
+                // Currently, the largest difference is 0.01 and 
+                // it happens in year 13. 
+                EXPECT_LE((pop.spawning_biomass[year] - expected_spawning_biomass[year]) / 
+                            expected_spawning_biomass[year] * 100,
+                            0.02)
+                    << "year " << year;
+                // Expect FIMS value is greater than 0.0
+                EXPECT_GT(pop.spawning_biomass[year], 0.0)
+                    << "year " << year;
+                
+            }
+        }
+
+        // Test biomass
+        // find the OM json member called "Biomass"
+        it = output.FindMember("biomass.mt");
+
+        if (it != output.MemberEnd())
+        {
+            rapidjson::Value &e = (*it).value;
+            for (int year = 0; year < e.Size(); year++)
+            {
+                expected_biomass[year] = e[year].GetDouble();
+
+                EXPECT_NEAR(pop.biomass[year], expected_biomass[year], 0.001)
+                    << "year " << year;
+                // Expect the difference between FIMS value and the 
+                // expected value from the MCP OM
+                // is less than 0.01% of the expected value.
+                // Currently, pop.biomass = 0, need to write 
+                // CalculateAbundance() and CalculateBiomass(). 
+                EXPECT_LE((pop.biomass[year] - expected_biomass[year]) / 
+                            expected_biomass[year] * 100,
+                            0.01)
+                    << "year " << year;
+                // Expect FIMS value is greater than 0.0
+                EXPECT_GT(pop.biomass[year], 0.0)
+                    << "year " << year;
+                
+            }
+        }
 
         // Test numbers_at_age
         // find the OM json member called "N.age"
@@ -221,7 +283,33 @@ namespace
                 }
             }
         }
+
+        // Test total mortality at age
+        it = output.FindMember("M.age");
+
+        if (it != output.MemberEnd())
+        {
+            rapidjson::Value &e = (*it).value;
+            for (int year = 0; year < e.Size(); year++)
+            {
+                for (int age = 0; age < e[year].Size(); age++)
+                {
+                    int index_ya = year * pop.nages + age;
+                    expected_mortality_Z[index_ya] = expected_mortality_F[index_ya] + e[age].GetDouble();
+                    // Expect the difference between FIMS value and the 
+                    // expected value from the MCP OM
+                    // is less than 0.0001.
+                    EXPECT_NEAR(pop.mortality_Z[index_ya], expected_mortality_Z[index_ya],
+                              0.0001)
+                        << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                    // Expect FIMS value is greater than 0.0
+                    EXPECT_GT(pop.mortality_Z[index_ya], 0.0)
+                        << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                }
+            }
+        }
     }
+
 
     // TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_forloop_works)
     // {
