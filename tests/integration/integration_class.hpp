@@ -229,7 +229,7 @@ public:
           f->Fmort[i] = e[i].GetDouble();
           debug_log << "F " << e[i].GetDouble() << std::endl;
           f->log_Fmort[i] = std::log(e[i].GetDouble());
-          f->log_q[i] = 2.0;
+          f->log_q[i] = 0.0;
           if (print_statements)
           {
             std::cout << f->log_Fmort[i] << " ";
