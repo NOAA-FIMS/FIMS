@@ -27,43 +27,27 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         libxt-dev \
         libfontconfig1-dev \
         libcairo2-dev \
-        build-essential \
-        cmake \
-        clang-tidy \
-        clang-format \
-        clang \
-        doxygen \
-        ninja-build \
+        build-essential 
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts \
-    && python3 -m pip --no-cache-dir install radian \
-    && install2.r --error --skipinstalled --ncpus -1 \
-        devtools \
-        languageserver \
-        httpgd \
-        RcppEigen \
-        TMB \
-        ggplot2 \
-        dplyr \
-        scales \
     && rm -rf /tmp/downloaded_packages
 
 # Install Intel MKL
-RUN cd /tmp && \
-wget -q https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB && \
-apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB && \
-sh -c 'echo deb https://apt.repos.intel.com/mkl all main > /etc/apt/sources.list.d/intel-mkl.list' && \
-apt-get update && \
-apt-get -y install intel-mkl-64bit-2020.2-108 && \
-update-alternatives --install /usr/lib/x86_64-linux-gnu/libopenblas.so libopenblas.so-x86_64-linux-gnu  /opt/intel/mkl/lib/intel64/libmkl_rt.so 150 && \
-update-alternatives --install /usr/lib/x86_64-linux-gnu/libopenblas.so.0 libopenblas.so.0-x86_64-linux-gnu  /opt/intel/mkl/lib/intel64/libmkl_rt.so 150 && \
-echo "/opt/intel/lib/intel64"     >>  /etc/ld.so.conf.d/mkl.conf && \
-echo "/opt/intel/mkl/lib/intel64" >> /etc/ld.so.conf.d/mkl.conf && \
-ldconfig
-
-RUN echo "MKL_INTERFACE_LAYER=GNU,LP64" >> /etc/environment && \
-echo "MKL_THREADING_LAYER=GNU" >> /etc/environment && \
-echo "MKL_INTERFACE_LAYER=GNU,LP64" >> /usr/local/lib/R/etc/Renviron && \
-echo "MKL_THREADING_LAYER=GNU" >> /usr/local/lib/R/etc/Renviron 
+# RUN cd /tmp && \
+# wget -q https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB && \
+# apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB && \
+# sh -c 'echo deb https://apt.repos.intel.com/mkl all main > /etc/apt/sources.list.d/intel-mkl.list' && \
+# apt-get update && \
+# apt-get -y install intel-mkl-64bit-2020.2-108 && \
+# update-alternatives --install /usr/lib/x86_64-linux-gnu/libopenblas.so libopenblas.so-x86_64-linux-gnu  /opt/intel/mkl/lib/intel64/libmkl_rt.so 150 && \
+# update-alternatives --install /usr/lib/x86_64-linux-gnu/libopenblas.so.0 libopenblas.so.0-x86_64-linux-gnu  /opt/intel/mkl/lib/intel64/libmkl_rt.so 150 && \
+# echo "/opt/intel/lib/intel64"     >>  /etc/ld.so.conf.d/mkl.conf && \
+# echo "/opt/intel/mkl/lib/intel64" >> /etc/ld.so.conf.d/mkl.conf && \
+# ldconfig
+# 
+# RUN echo "MKL_INTERFACE_LAYER=GNU,LP64" >> /etc/environment && \
+# echo "MKL_THREADING_LAYER=GNU" >> /etc/environment && \
+# echo "MKL_INTERFACE_LAYER=GNU,LP64" >> /usr/local/lib/R/etc/Renviron && \
+# echo "MKL_THREADING_LAYER=GNU" >> /usr/local/lib/R/etc/Renviron 
 
 # VSCode R Debugger dependency. Install the latest release version from GitHub without using GitHub API.
 # See https://github.com/microsoft/vscode-dev-containers/issues/1032
@@ -72,23 +56,23 @@ echo "MKL_THREADING_LAYER=GNU" >> /usr/local/lib/R/etc/Renviron
 
 # R Session watcher settings.
 # See more details: https://github.com/REditorSupport/vscode-R/wiki/R-Session-watcher
-RUN echo 'if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' >>"${R_HOME}/etc/Rprofile.site"
+# RUN echo 'if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' >>"${R_HOME}/etc/Rprofile.site"
 
 # [Option] Enable vscode-jupyter support
-ARG ENABLE_JUPYTER="false"
-RUN if [ "${ENABLE_JUPYTER}" = "true" ]; then \
-        if [ -z "$(dpkg --get-selections | grep libzmq3-dev)" ]; then \
-            apt-get update \
-            && export DEBIAN_FRONTEND=noninteractive \
-            && apt-get -y install --no-install-recommends libzmq3-dev \
-            && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*; \
-        fi \
-        && install2.r --error --skipinstalled --ncpus -1 IRkernel \
-        && rm -rf /tmp/downloaded_packages \
-        && python3 -m pip --no-cache-dir install jupyter \
-        && R --vanilla -s -e 'IRkernel::installspec(user = FALSE)'; \
-    fi
-
+#ARG ENABLE_JUPYTER="false"
+#RUN if [ "${ENABLE_JUPYTER}" = "true" ]; then \
+#        if [ -z "$(dpkg --get-selections | grep libzmq3-dev)" ]; then \
+#            apt-get update \
+#            && export DEBIAN_FRONTEND=noninteractive \
+#            && apt-get -y install --no-install-recommends libzmq3-dev \
+#            && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*; \
+#        fi \
+#        && install2.r --error --skipinstalled --ncpus -1 IRkernel \
+#        && rm -rf /tmp/downloaded_packages \
+#        && python3 -m pip --no-cache-dir install jupyter \
+#        && R --vanilla -s -e 'IRkernel::installspec(user = FALSE)'; \
+#    fi
+#
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update \
 #     && export DEBIAN_FRONTEND=noninteractive \
