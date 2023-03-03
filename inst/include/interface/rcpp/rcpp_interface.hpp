@@ -126,6 +126,7 @@ RCPP_MODULE(fims)
         .field("nseasons", &PopulationInterface::nseasons)
         .field("nyears", &PopulationInterface::nyears)
         .field("log_M", &PopulationInterface::log_M)
+        .field("log_init_naa", &PopulationInterface::log_init_naa)
         .method("evaluate", &PopulationInterface::evaluate);
 
     Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")

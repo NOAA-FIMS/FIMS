@@ -17,6 +17,7 @@
 #include "../../common/model_object.hpp"
 #include "../../distributions/distributions.hpp"
 #include "fleet.hpp"
+#include "../../common/fims_math.hpp"
 #include <numeric>
 
 namespace fims {
