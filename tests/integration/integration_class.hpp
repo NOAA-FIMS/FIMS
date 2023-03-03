@@ -11,7 +11,6 @@
 #include "third_party/rapidjson/writer.h"
 #include "third_party/rapidjson/stringbuffer.h"
 
-std::ofstream debug_log("debug_integration_test.txt");
 class IntegrationTest
 {
 
@@ -106,7 +105,6 @@ public:
     {
       rapidjson::Value &e = (*it).value;
       nyears = e[0].GetInt();
-      debug_log << "nyr " << nyears << std::endl;
 
       if (print_statements)
       {
@@ -127,7 +125,6 @@ public:
     {
       rapidjson::Value &e = (*it).value;
       nages = e[0].GetInt();
-      debug_log << "nages " << nages << std::endl;
 
       if (print_statements)
       {
@@ -148,7 +145,6 @@ public:
     {
       rapidjson::Value &e = (*it).value;
       nfleets = e[0].GetInt();
-      debug_log << "nfleets " << nfleets << std::endl;
       bool parse_alternate_name = false;
 
       // instantiate fleets
@@ -180,13 +176,11 @@ public:
 
           rapidjson::Value &a50 = (*sel_a50).value;
           selectivity->median = a50[0].GetDouble();
-          debug_log << "A50.sel1 " << a50[0].GetDouble() << std::endl;
 
           typename rapidjson::Document::MemberIterator sel_slope;
           sel_slope = fsel->value.FindMember("slope.sel1");
           rapidjson::Value &slope = (*sel_slope).value;
           selectivity->slope = slope[0].GetDouble();
-          debug_log << "slope.sel1 " << slope[0].GetDouble() << std::endl;
           f->selectivity = selectivity;
         }
         else if (ss.MemberCount() == 5)
@@ -197,23 +191,19 @@ public:
           sel_a50 = fsel->value.FindMember("A50.sel1");
           rapidjson::Value &a501 = (*sel_a50).value;
           selectivity->median_asc = a501[0].GetDouble();
-          debug_log << "A50.sel1 " << a501[0].GetDouble() << std::endl;
 
           typename rapidjson::Document::MemberIterator sel_slope;
           sel_slope = fsel->value.FindMember("slope.sel1");
           rapidjson::Value &slope1 = (*sel_slope).value;
           selectivity->slope_asc = slope1[0].GetDouble();
-          debug_log << "slope.sel1 " << slope1[0].GetDouble() << std::endl;
 
           sel_a50 = fsel->value.FindMember("A50.sel2");
           rapidjson::Value &a502 = (*sel_a50).value;
           selectivity->median_desc = a502[0].GetDouble();
-          debug_log << "A50.sel2 " << a502[0].GetDouble() << std::endl;
 
           sel_slope = fsel->value.FindMember("slope.sel2");
           rapidjson::Value &slope2 = (*sel_slope).value;
           selectivity->slope_desc = slope2[0].GetDouble();
-          debug_log << "slope.sel2 " << slope2[0].GetDouble() << std::endl;
           f->selectivity = selectivity;
         }
         
@@ -227,7 +217,6 @@ public:
         {
           rapidjson::Value &e = (*it).value;
           f->Fmort[i] = e[i].GetDouble();
-          debug_log << "F " << e[i].GetDouble() << std::endl;
           f->log_Fmort[i] = std::log(e[i].GetDouble());
           f->log_q[i] = 0.0;
           if (print_statements)
@@ -235,7 +224,7 @@ public:
             std::cout << f->log_Fmort[i] << " ";
           }
         }
-        debug_log << "f->log_q[0] " << f->log_q[0] << std::endl;
+    
         if (print_statements)
         {
           std::cout << "\n";
@@ -258,7 +247,6 @@ public:
     {
       rapidjson::Value &e = (*it).value;
       nsurveys = e[0].GetInt();
-      debug_log << "nsurveys " << e[0].GetInt() << std::endl;
       for (int i = 0; i < nsurveys; i++)
       {
         std::shared_ptr<fims::Fleet<double>> s = std::make_shared<fims::Fleet<double>>();
@@ -283,13 +271,12 @@ public:
 
           rapidjson::Value &a50 = (*sel_a50).value;
           selectivity->median = a50[0].GetDouble();
-          debug_log << "A50.sel1 " << a50[0].GetDouble() << std::endl;
 
           typename rapidjson::Document::MemberIterator sel_slope;
           sel_slope = fsel->value.FindMember("slope.sel1");
           rapidjson::Value &slope = (*sel_slope).value;
           selectivity->slope = slope[0].GetDouble();
-          debug_log << "slope.sel1 " << slope[0].GetDouble() << std::endl;
+
           s->selectivity = selectivity;
         }
         else if (ss.MemberCount() == 5)
@@ -300,30 +287,24 @@ public:
           sel_a50 = fsel->value.FindMember("A50.sel1");
           rapidjson::Value &a501 = (*sel_a50).value;
           selectivity->median_asc = a501[0].GetDouble();
-          debug_log << "A50.sel1 " << a501[0].GetDouble() << std::endl;
 
           typename rapidjson::Document::MemberIterator sel_slope;
           sel_slope = fsel->value.FindMember("slope.sel1");
           rapidjson::Value &slope1 = (*sel_slope).value;
           selectivity->slope_asc = slope1[0].GetDouble();
-          debug_log << "slope.sel1 " << slope1[0].GetDouble() << std::endl;
 
           sel_a50 = fsel->value.FindMember("A50.sel2");
           rapidjson::Value &a502 = (*sel_a50).value;
           selectivity->median_desc = a502[0].GetDouble();
-          debug_log << "A50.sel2 " << a502[0].GetDouble() << std::endl;
 
           sel_slope = fsel->value.FindMember("slope.sel2");
           rapidjson::Value &slope2 = (*sel_slope).value;
           selectivity->slope_desc = slope2[0].GetDouble();
-          debug_log << "slope.sel2 " << slope2[0].GetDouble() << std::endl;
           s->selectivity = selectivity;
         }
 
-        // std::fill(s->log_q.begin(), s->log_q.end(), 3.4613e-07); // Original code
         std::fill(s->log_q.begin(), s->log_q.end(), 3.5332e-07); // survey_q from MCP case 0 om_output1.json; use q or log q?
-        // std::fill(s->log_q.begin(), s->log_q.end(), 3.4898e-07); // value from MCP case 0noPhiF
-        debug_log << "s->log_q[0] " << s->log_q[0] << std::endl;
+        
         pop.fleets.push_back(s);
       }
       if (print_statements)
@@ -348,17 +329,9 @@ public:
                                436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219,
                                153328.4354, 124353.2448, 533681.2692};
 
-    // Set initial size to value from MCP C0noPhiF
-    // std::vector<double> init_naa = {1000000, 818730.7531, 670320.046,
-    //                            548811.6361, 449328.9641, 367879.4412,
-    //                            301194.2119, 246596.9639, 201896.518,
-    //                            165298.8882, 135335.2832, 611262.8603};
-
-    debug_log << "init_naa " << init_naa[0] << std::endl;
     for (int i = 0; i < pop.nages; i++)
     {
       pop.log_init_naa[i] = std::log(init_naa[i]);
-      debug_log << "pop.log_init_naa[i] " << pop.log_init_naa[i] << std::endl;
     }
 
     // std::fill(pop.log_init_naa.begin(), pop.log_init_naa.end(), std::log(10000));
@@ -375,7 +348,6 @@ public:
       for (int i = 0; i < e.Size(); i++)
       {
         pop.ages[i] = e[i].GetDouble();
-        debug_log << "pop.ages[i] " << pop.ages[i] << std::endl;
         if (print_statements)
         {
           std::cout << pop.ages[i] << " ";
@@ -406,7 +378,6 @@ public:
       for (int i = 0; i < e.Size(); i++)
       {
         pop.years[i] = e[i].GetDouble();
-        debug_log << "pop.years[i] " << pop.years[i] << std::endl;
         if (print_statements)
         {
           std::cout << pop.years[i] << " ";
@@ -471,8 +442,6 @@ public:
     for (int i = 0; i < e.Size(); i++)
     {
       growth->ewaa[static_cast<double>(pop.ages[i])] = e[i].GetDouble() / 1000.0;
-      debug_log << "W.mt[i] " << e[i].GetDouble() / 1000.0 << std::endl;
-      debug_log << "growth->ewaa[i] " << growth->ewaa[static_cast<double>(pop.ages[i])] << std::endl;
     }
     pop.growth = growth;
 
