@@ -219,17 +219,17 @@ target_link_libraries(population_Catch
 
 gtest_discover_tests(population_Catch)
 
-#test_CalculateSSB.cpp
-add_executable(population_SSB
-  test_population_SSB.cpp
+#test_B_and_SB.cpp
+add_executable(population_B_and_SB
+  test_population_B_and_SB.cpp
 )
 
-target_link_libraries(population_SSB
+target_link_libraries(population_B_and_SB
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_SSB)
+gtest_discover_tests(population_B_and_SB)
 
 #test_CalculateIndex_works.cpp
 add_executable(population_Index
