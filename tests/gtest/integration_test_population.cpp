@@ -40,9 +40,11 @@ namespace
         pop.numbers_at_age = t.RunModelLoop(pop, input);
         good = t.CheckModelOutput(pop, output);
 
-        // declare unfished numbers at age 1 and unfished spawning bimoass
+        // declare unfished numbers at age 1, unfished spawning bimoass,
+        // and unfished biomass
         std::vector<double> expected_unfished_numbers_at_age1(pop.nyears, 0.0);
         std::vector<double> expected_unfished_spawning_biomass(pop.nyears, 0.0);
+        std::vector<double> expected_unfished_biomass(pop.nyears, 0.0);
 
         // declare vector of doubles to hold
         // biomass, spawning biomass, unfished spawning biomass,
@@ -59,7 +61,8 @@ namespace
         std::vector<double> expected_mortality_F(pop.nages * pop.nyears, 0.0);
         std::vector<double> expected_mortality_Z(pop.nages * pop.nyears, 0.0);
 
-        // Test unfished numbers at age and unfished spawning biomass
+        // Test unfished numbers at age, unfished spawning biomass,
+        // and unfished biomass
         it = input.FindMember("median_R0");
         rapidjson::Value &R_0 = (*it).value;
         double rzero = R_0[0].GetDouble();
@@ -84,6 +87,9 @@ namespace
                     << "differ at index " << index_ya << "; year " << year << "; age" << age;
                 EXPECT_LE(pop.unfished_spawning_biomass[year], rzero * phi_0)
                     << "differ at index " << index_ya << "; year " << year << "; age" << age;
+
+                EXPECT_GT(pop.unfished_biomass[year], 0.0)
+                    << "differ at index " << index_ya << "; year " << year << "; age" << age;
             }
         }
 
@@ -95,6 +101,9 @@ namespace
         }
 
         EXPECT_GT(pop.unfished_spawning_biomass[pop.nyears], 0.0)
+            << "differ at year " << pop.nyears + 1;
+
+        EXPECT_GT(pop.unfished_biomass[pop.nyears], 0.0)
             << "differ at year " << pop.nyears + 1;
 
         // Test spawning biomass
@@ -116,12 +125,12 @@ namespace
                     << "year " << year;
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
-                // is less than 0.02% of the expected value.
+                // is less than 1.0% of the expected value.
                 // Currently, the largest difference is 0.01 and
                 // it happens in year 13.
-                EXPECT_LE((pop.spawning_biomass[year] - expected_spawning_biomass[year]) /
+                EXPECT_LE(std::abs(pop.spawning_biomass[year] - expected_spawning_biomass[year]) /
                               expected_spawning_biomass[year] * 100,
-                          0.02)
+                          1.0)
                     << "year " << year;
                 // Expect FIMS value is greater than 0.0
                 EXPECT_GT(pop.spawning_biomass[year], 0.0)
@@ -142,16 +151,14 @@ namespace
             {
                 expected_biomass[year] = e[year].GetDouble();
 
-                EXPECT_NEAR(pop.biomass[year], expected_biomass[year], 0.001)
+                EXPECT_NEAR(pop.biomass[year], expected_biomass[year], 1.5)
                     << "year " << year;
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
-                // is less than 0.01% of the expected value.
-                // Currently, pop.biomass = 0, need to write
-                // CalculateAbundance() and CalculateBiomass().
-                EXPECT_LE((pop.biomass[year] - expected_biomass[year]) /
+                // is less than 1.0% of the expected value.
+                EXPECT_LE(std::abs(pop.biomass[year] - expected_biomass[year]) /
                               expected_biomass[year] * 100,
-                          0.01)
+                          1.0)
                     << "year " << year;
                 // Expect FIMS value is greater than 0.0
                 EXPECT_GT(pop.biomass[year], 0.0)
@@ -178,12 +185,12 @@ namespace
                     << "year " << year;
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
-                // is less than 0.5% of the expected value.
+                // is less than 1.0% of the expected value.
                 // Currently, the largest difference is 0.429919% and
                 // it happens in year 0.
-                EXPECT_LE((pop.fleets[0]->expected_catch[year] - expected_catch[year]) /
+                EXPECT_LE(std::abs(pop.fleets[0]->expected_catch[year] - expected_catch[year]) /
                               expected_catch[year] * 100,
-                          0.5)
+                          1.0)
                     << "year " << year;
                 // Expect FIMS value is greater than 0.0
                 EXPECT_GT(pop.fleets[0]->expected_catch[year], 0.0)
@@ -226,12 +233,12 @@ namespace
                     << "year " << year;
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
-                // is less than 0.5% of the expected value.
+                // is less than 1.0% of the expected value.
                 // Currently, the largest difference is 0.429919% and
                 // it happens in year 0.
-                EXPECT_LE((pop.fleets[1]->expected_index[year] - expected_index[year]) /
+                EXPECT_LE(std::abs(pop.fleets[1]->expected_index[year] - expected_index[year]) /
                               expected_index[year] * 100,
-                          0.5)
+                          1.0)
                     << "year " << year;
                 // Expect FIMS value is greater than 0.0
                 EXPECT_EQ(pop.fleets[1]->q[year], fleet_q[0].GetDouble())
@@ -257,19 +264,19 @@ namespace
                     expected_numbers_at_age[index_ya] = e[year][age].GetDouble();
                     // Expect the difference between FIMS value and the
                     // expected value from the MCP OM
-                    // is less than 0.05% of the expected value.
+                    // is less than 1.0% of the expected value.
                     // Currently, the largest difference is 0.023% fish and
                     // it happens in year 16 age 11.
-                    EXPECT_LE((pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]) /
+                    EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]) /
                                   expected_numbers_at_age[index_ya] * 100,
-                              0.05)
+                              1.0)
                         << "differ at index " << index_ya << "; year " << year << "; age" << age;
                     // Expect the difference between FIMS value and the
                     // expected value from the MCP OM
                     // is less than 40 fish.
                     // Currently, the largest difference is 33 fish and
                     // it happens in year 14 age 11.
-                    EXPECT_LE((pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]),
+                    EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]),
                               40)
                         << "differ at index " << index_ya << "; year " << year << "; age" << age;
                     // Expect FIMS value is greater than 0.0

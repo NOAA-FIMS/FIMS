@@ -87,6 +87,8 @@ namespace fims {
         std::vector<Type>
         biomass; /*!< Derived quantity: total population biomass in each year*/
         std::vector<Type> spawning_biomass; /*!< Derived quantity: Spawning_biomass*/
+        std::vector<Type> unfished_biomass; /*!< Derived quanity
+                                                  biomass assuming unfished*/
         std::vector<Type> unfished_spawning_biomass; /*!< Derived quanity Spawning
                                                   biomass assuming unfished*/
         std::vector<Type> proportion_mature_at_age; /*!< Derived quantity: Proportion
@@ -145,6 +147,7 @@ namespace fims {
             unfished_numbers_at_age.resize((nyears + 1) * nages);
             numbers_at_age.resize((nyears + 1) * nages);
             biomass.resize((nyears + 1));
+            unfished_biomass.resize((nyears + 1));
             unfished_spawning_biomass.resize((nyears + 1));
             spawning_biomass.resize((nyears + 1));
             log_init_naa.resize(nages);
@@ -248,6 +251,34 @@ namespace fims {
                         this->unfished_numbers_at_age[index_ya2 + 1] *
                         (exp(-this->M[index_ya2 + 1]));
             }
+        }
+
+        /**
+         * @brief Calculates biomass
+         *
+         * @param index_ya dimension folded index for year and age
+         * @param year the year biomass is being aggregated for
+         * @param age the age who's biomass is being added into total biomass
+         */
+        void CalculateBiomass(size_t index_ya, size_t year, size_t age) {
+
+            this->biomass[year] +=
+                    this->numbers_at_age[index_ya] * growth->evaluate(ages[age]);
+                    FIMS_LOG << growth->evaluate(ages[age]) << " biomass inputs----- +++\n";
+        }
+
+        /**
+         * @brief Adds to existing yearly unfished biomass estimates the
+         *  biomass for a specified year and age
+         *
+         * @param index_ya dimension folded index for year and age
+         * @param year the year of unfished biomass to add
+         * @param age the age of unfished biomass to add
+         */
+        void CalculateUnfishedBiomass(size_t index_ya, size_t year, size_t age) {
+            this->unfished_biomass[year] +=
+                    this->unfished_numbers_at_age[index_ya] *
+                    this->growth->evaluate(ages[age]);
         }
 
         /**
@@ -494,11 +525,21 @@ namespace fims {
                         } else {
                             CalculateUnfishedNumbersAA(index_ya, a - 1, a);
                         }
+
+                        /*
+                         Fished and unfished biomass vectors are summing biomass at
+                         age across ages.
+                         */
+                        
+                        CalculateBiomass(index_ya, y, a);
+
+                        CalculateUnfishedBiomass(index_ya, y, a);
+
                         /*
                          Fished and unfished spawning biomass vectors are summing biomass at
                          age across ages to allow calculation of recruitment in the next year.
                          */
-                        
+
                         CalculateSpawningBiomass(index_ya, y, a);
             
                         CalculateUnfishedSpawningBiomass(index_ya, y, a);
@@ -515,9 +556,11 @@ namespace fims {
                             CalculateNumbersAA(index_ya, index_ya2, a);
                             CalculateUnfishedNumbersAA(index_ya, index_ya2, a);
                         }
+                        CalculateBiomass(index_ya, y, a);
                         CalculateSpawningBiomass(index_ya, y, a);
                         
                         FIMS_LOG << index_ya << std::endl;
+                        CalculateUnfishedBiomass(index_ya, y, a);
                         CalculateUnfishedSpawningBiomass(index_ya, y, a);
 
                         
