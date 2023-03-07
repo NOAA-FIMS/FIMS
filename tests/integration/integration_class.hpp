@@ -32,24 +32,26 @@ public:
   {
 
     bool good = true;
+    
     std::stringstream ss;
     for (uint32_t i = 0; i < this->ncases_m; i++)
     {
       for (uint32_t j = 0; j < this->ninput_files_m; j++)
       {
-        ss.str("");
-        ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
         rapidjson::Document input;
         rapidjson::Document output;
+
+        ss.str("");
+        ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
         this->ReadJson(ss.str(), input);
 
         ss.str("");
         ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
-        // this->ReadJson(ss.str(), output);
+        this->ReadJson(ss.str(), output);
 
         fims::Population<double> pop;
 
-        if (!this->ConfigurePopulationModel(pop, input))
+        if (!this->ConfigurePopulationModel(pop, input, output))
         {
           good = false;
         }
@@ -92,7 +94,8 @@ public:
   }
 
   bool ConfigurePopulationModel(fims::Population<double> &pop,
-                                rapidjson::Document &input)
+                                rapidjson::Document &input, 
+                                rapidjson::Document &output)
   {
 
     typename rapidjson::Document::MemberIterator it;
@@ -206,7 +209,7 @@ public:
           selectivity->slope_desc = slope2[0].GetDouble();
           f->selectivity = selectivity;
         }
-        
+
         // set fleet fishing mortality
         if (print_statements)
         {
@@ -224,13 +227,14 @@ public:
             std::cout << f->log_Fmort[i] << " ";
           }
         }
-    
+
         if (print_statements)
         {
           std::cout << "\n";
         }
 
         pop.fleets.push_back(f);
+        pop.fleets[0]->Prepare();
       }
     }
     else
@@ -303,9 +307,16 @@ public:
           s->selectivity = selectivity;
         }
 
-        std::fill(s->log_q.begin(), s->log_q.end(), 3.5332e-07); // survey_q from MCP case 0 om_output1.json; use q or log q?
+        // set survey catchability
+        it = output.FindMember("survey_q");
+        typename rapidjson::Document::MemberIterator fleet2_q;
+        fleet2_q = it->value.FindMember("survey1");
+        rapidjson::Value &fleet_q = (*fleet2_q).value;
+        std::fill(s->log_q.begin(), s->log_q.end(), fims::log(fleet_q[0].GetDouble())); // survey_q from MCP case 0 om_output1.json; use q or log q?
         
+        std::fill(s->log_Fmort.begin(), s->log_Fmort.end(), fims::log(0.0));
         pop.fleets.push_back(s);
+        pop.fleets[1]->Prepare();
       }
       if (print_statements)
       {
@@ -326,8 +337,8 @@ public:
 
     // Set initial size to value from MCP C0
     std::vector<double> init_naa = {993947.488, 811707.7933, 661434.4148, 537804.7782,
-                               436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219,
-                               153328.4354, 124353.2448, 533681.2692};
+                                    436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219,
+                                    153328.4354, 124353.2448, 533681.2692};
 
     for (int i = 0; i < pop.nages; i++)
     {
@@ -419,7 +430,7 @@ public:
     it = input.FindMember("logR_sd");
     e = (*it).value;
     rec->log_sigma_recruit = e[0].GetDouble();
-    rec->recruit_deviations.resize(nyears);
+    rec->recruit_deviations.resize(nyears+1);
     std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
     pop.recruitment = rec;
 
