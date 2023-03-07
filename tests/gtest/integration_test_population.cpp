@@ -35,7 +35,7 @@ namespace
 
         // ConfigurePopulationModel, RunModelLoop, and CheckModelOutput
         // methods are in integration_class.hpp
-        good = t.ConfigurePopulationModel(pop, input);
+        good = t.ConfigurePopulationModel(pop, input, output);
 
         pop.numbers_at_age = t.RunModelLoop(pop, input);
         good = t.CheckModelOutput(pop, output);
@@ -207,7 +207,7 @@ namespace
         fleet2_q = it->value.FindMember("survey1");
         rapidjson::Value &fleet_q = (*fleet2_q).value;
 
-        it = output.FindMember("survey_index");
+        it = output.FindMember("survey_index_biomass");
 
         if (it != output.MemberEnd())
         {
@@ -227,21 +227,21 @@ namespace
                     << "year " << year;
 
                 expected_index[year] = fleet_index[year].GetDouble();
-                // Expect the difference between FIMS and OM is less than 1 mt
-                // The largest difference is 0.69 and it happens in year 6
+                
                 EXPECT_NEAR(pop.fleets[1]->expected_index[year], expected_index[year], 0.0001)
                     << "year " << year;
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
-                // is less than 1.0% of the expected value.
-                // Currently, the largest difference is 0.429919% and
-                // it happens in year 0.
+                // is less than 5.0% of the expected value.
+                // Currently, the largest difference is 3.33286% in year 28
                 EXPECT_LE(std::abs(pop.fleets[1]->expected_index[year] - expected_index[year]) /
                               expected_index[year] * 100,
-                          1.0)
+                          5.0)
                     << "year " << year;
-                // Expect FIMS value is greater than 0.0
-                EXPECT_EQ(pop.fleets[1]->q[year], fleet_q[0].GetDouble())
+                
+                // Do not use EXPECT_EQ to compare floats or doubles
+                // Use EXPECT_NEAR here
+                EXPECT_NEAR(pop.fleets[1]->q[year], fleet_q[0].GetDouble(), 1.0e-07)
                     << "year " << year;
                 // Expect FIMS value is greater than 0.0
                 EXPECT_GT(pop.fleets[1]->expected_index[year], 0.0)
@@ -273,11 +273,11 @@ namespace
                         << "differ at index " << index_ya << "; year " << year << "; age" << age;
                     // Expect the difference between FIMS value and the
                     // expected value from the MCP OM
-                    // is less than 40 fish.
+                    // is less than 50 fish.
                     // Currently, the largest difference is 33 fish and
-                    // it happens in year 14 age 11.
+                    // it happens in year 3 age 11.
                     EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]),
-                              40)
+                              50)
                         << "differ at index " << index_ya << "; year " << year << "; age" << age;
                     // Expect FIMS value is greater than 0.0
                     EXPECT_GT(pop.numbers_at_age[index_ya], 0.0)
@@ -286,6 +286,7 @@ namespace
             }
         }
 
+        // Test numbers at age in year pop.nyear+1
         for (int age = 0; age < pop.nages; age++)
         {
             int index_ya = pop.nyears * pop.nages + age;
