@@ -55,8 +55,8 @@ namespace
         std::vector<double> expected_index(pop.nyears, 0.0);
 
         // declare vector of doubles to hold dimension folded
-        // numbers at age
-        // fishing mortality at age, total mortality at age
+        // numbers at age,
+        // fishing mortality at age, and total mortality at age
         std::vector<double> expected_numbers_at_age(pop.nages * pop.nyears, 0.0);
         std::vector<double> expected_mortality_F(pop.nages * pop.nyears, 0.0);
         std::vector<double> expected_mortality_Z(pop.nages * pop.nyears, 0.0);
@@ -118,16 +118,12 @@ namespace
                 expected_spawning_biomass[year] = e[year].GetDouble();
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
-                // is less than 1.0.
-                // Currently, the largest difference is 0.66 and
-                // it happens in year 3.
+                // is less than 1.0 mt.
                 EXPECT_NEAR(pop.spawning_biomass[year], expected_spawning_biomass[year], 1.0)
                     << "year " << year;
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
                 // is less than 1.0% of the expected value.
-                // Currently, the largest difference is 0.01 and
-                // it happens in year 13.
                 EXPECT_LE(std::abs(pop.spawning_biomass[year] - expected_spawning_biomass[year]) /
                               expected_spawning_biomass[year] * 100,
                           1.0)
@@ -180,14 +176,11 @@ namespace
             {
                 expected_catch[year] = fleet_catch[year].GetDouble();
                 // Expect the difference between FIMS and OM is less than 1 mt
-                // The largest difference is 0.69 and it happens in year 6
                 EXPECT_NEAR(pop.fleets[0]->expected_catch[year], expected_catch[year], 1)
                     << "year " << year;
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
                 // is less than 1.0% of the expected value.
-                // Currently, the largest difference is 0.429919% and
-                // it happens in year 0.
                 EXPECT_LE(std::abs(pop.fleets[0]->expected_catch[year] - expected_catch[year]) /
                               expected_catch[year] * 100,
                           1.0)
@@ -217,8 +210,7 @@ namespace
 
             for (int year = 0; year < pop.nyears; year++)
             {
-                // Expect catchability of the fishing fleet to be
-                // greater than 1.0
+                // Expect catchability of the fishing fleet = 1.0
                 EXPECT_EQ(pop.fleets[0]->q[year], 1.0)
                     << "year " << year;
                 // Expect expected index of the fishing fleet to be
@@ -233,7 +225,6 @@ namespace
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
                 // is less than 5.0% of the expected value.
-                // Currently, the largest difference is 3.33286% in year 28
                 EXPECT_LE(std::abs(pop.fleets[1]->expected_index[year] - expected_index[year]) /
                               expected_index[year] * 100,
                           5.0)
@@ -265,8 +256,6 @@ namespace
                     // Expect the difference between FIMS value and the
                     // expected value from the MCP OM
                     // is less than 1.0% of the expected value.
-                    // Currently, the largest difference is 0.023% fish and
-                    // it happens in year 16 age 11.
                     EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]) /
                                   expected_numbers_at_age[index_ya] * 100,
                               1.0)
@@ -274,8 +263,6 @@ namespace
                     // Expect the difference between FIMS value and the
                     // expected value from the MCP OM
                     // is less than 50 fish.
-                    // Currently, the largest difference is 33 fish and
-                    // it happens in year 3 age 11.
                     EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]),
                               50)
                         << "differ at index " << index_ya << "; year " << year << "; age" << age;
@@ -369,62 +356,4 @@ namespace
             }
         }
     }
-
-        // TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_forloop_works)
-    // {
-
-    //     for (size_t year = 0; year < nyears; year++)
-    //     {
-    //         for (size_t age = 0; age < nages; age++)
-    //         {
-
-    //             int index_ya = year * population.nages + age;
-    //             // Calculate mortality starts from year = 0 and age = 0
-    //             population.CalculateMortality(index_ya, year, age);
-
-    //             // loop over fleets to calculate mortality and set up
-    //             // true values for the test
-    //             std::vector<double> mortality_F(nyears * nages, 0.0);
-
-    //             for (size_t fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
-    //             {
-    //                 size_t index_yf = year * population.nfleets + fleet_index;
-    //                 mortality_F[index_ya] += population.fleets[fleet_index]->Fmort[index_yf] *
-    //                                          population.fleets[fleet_index]->selectivity->evaluate(age);
-    //             }
-
-    //             std::vector<double> mortality_Z(nyears * nages, 0.0);
-    //             mortality_Z[index_ya] = fims::exp(population.log_M[index_ya]) +
-    //                                     mortality_F[index_ya];
-    //             EXPECT_EQ(population.mortality_Z[index_ya], mortality_Z[index_ya]);
-
-    //             std::vector<double> test_numbers_at_age((nyears + 1) * nages, 0.0);
-    //             if (year == 0)
-    //             {
-    //                 // Calculate initial numbers at age when year = 0
-    //                 population.CalculateInitialNumbersAA(index_ya, age);
-    //                 // Set up true values for the test
-    //                 test_numbers_at_age[index_ya] = population.naa[age];
-    //                 EXPECT_EQ(fims::exp(population.log_naa[age]), test_numbers_at_age[index_ya]);
-    //             }
-
-    //             if (year > 0 && age == 0)
-    //             {
-    //                 population.CalculateRecruitment(index_ya, year);
-    //                 // The test will get complicated if we calculate
-    //                 // test_numbers_at_age by calling recruitment module
-    //             }
-
-    //             if (year > 0 && age > 0)
-    //             {
-    //                 int index_ya2 = (year - 1) * population.nages + age - 1;
-    //                 // this needs to be after we calculate mortality
-    //                 population.CalculateNumbersAA(index_ya, index_ya2);
-    //                 test_numbers_at_age[index_ya] = test_numbers_at_age[index_ya2] * fims::exp(-mortality_Z[index_ya2]);
-    //             }
-
-    //             EXPECT_EQ(population.numbers_at_age[index_ya], test_numbers_at_age[index_ya]);
-    //         }
-    //     }
-    // }
 }

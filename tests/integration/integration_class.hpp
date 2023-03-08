@@ -32,7 +32,7 @@ public:
   {
 
     bool good = true;
-    
+
     std::stringstream ss;
     for (uint32_t i = 0; i < this->ncases_m; i++)
     {
@@ -94,7 +94,7 @@ public:
   }
 
   bool ConfigurePopulationModel(fims::Population<double> &pop,
-                                rapidjson::Document &input, 
+                                rapidjson::Document &input,
                                 rapidjson::Document &output)
   {
 
@@ -170,8 +170,11 @@ public:
         typename rapidjson::Document::MemberIterator fsel;
         fsel = it->value.FindMember(strs.str().c_str());
         rapidjson::Value &ss = (*fsel).value;
+        typename rapidjson::Document::MemberIterator pattern;
+        pattern = fsel->value.FindMember("pattern");
+        rapidjson::Value &sel_pattern = (*pattern).value;
 
-        if (ss.MemberCount() == 3)
+        if (sel_pattern[0].GetDouble() == 1)
         { // logistic
           std::shared_ptr<fims::LogisticSelectivity<double>> selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
           typename rapidjson::Document::MemberIterator sel_a50;
@@ -186,7 +189,7 @@ public:
           selectivity->slope = slope[0].GetDouble();
           f->selectivity = selectivity;
         }
-        else if (ss.MemberCount() == 5)
+        else if (sel_pattern[0].GetDouble() == 2)
         { // double logistic
           std::shared_ptr<fims::DoubleLogisticSelectivity<double>> selectivity = std::make_shared<fims::DoubleLogisticSelectivity<double>>();
 
@@ -234,7 +237,6 @@ public:
         }
 
         pop.fleets.push_back(f);
-        pop.fleets[0]->Prepare();
       }
     }
     else
@@ -266,8 +268,11 @@ public:
         typename rapidjson::Document::MemberIterator fsel;
         fsel = it->value.FindMember(strs.str().c_str());
         rapidjson::Value &ss = (*fsel).value;
+        typename rapidjson::Document::MemberIterator pattern;
+        pattern = fsel->value.FindMember("pattern");
+        rapidjson::Value &sel_pattern = (*pattern).value;
 
-        if (ss.MemberCount() == 3)
+        if (sel_pattern[0].GetDouble() == 1)
         { // logistic
           std::shared_ptr<fims::LogisticSelectivity<double>> selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
           typename rapidjson::Document::MemberIterator sel_a50;
@@ -283,7 +288,7 @@ public:
 
           s->selectivity = selectivity;
         }
-        else if (ss.MemberCount() == 5)
+        else if (sel_pattern[0].GetDouble() == 1)
         { // double logistic
           std::shared_ptr<fims::DoubleLogisticSelectivity<double>> selectivity = std::make_shared<fims::DoubleLogisticSelectivity<double>>();
 
@@ -312,11 +317,10 @@ public:
         typename rapidjson::Document::MemberIterator fleet2_q;
         fleet2_q = it->value.FindMember("survey1");
         rapidjson::Value &fleet_q = (*fleet2_q).value;
-        std::fill(s->log_q.begin(), s->log_q.end(), fims::log(fleet_q[0].GetDouble())); // survey_q from MCP case 0 om_output1.json; use q or log q?
-        
+        std::fill(s->log_q.begin(), s->log_q.end(), fims::log(fleet_q[0].GetDouble()));
+
         std::fill(s->log_Fmort.begin(), s->log_Fmort.end(), fims::log(0.0));
         pop.fleets.push_back(s);
-        pop.fleets[1]->Prepare();
       }
       if (print_statements)
       {
@@ -336,16 +340,17 @@ public:
     pop.Initialize(nyears, 1, nages);
 
     // Set initial size to value from MCP C0
-    std::vector<double> init_naa = {993947.488, 811707.7933, 661434.4148, 537804.7782,
-                                    436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219,
-                                    153328.4354, 124353.2448, 533681.2692};
-
-    for (int i = 0; i < pop.nages; i++)
+    it = output.FindMember("N.age");
+    if (it != output.MemberEnd())
     {
-      pop.log_init_naa[i] = std::log(init_naa[i]);
+      rapidjson::Value &e = (*it).value;
+      std::vector<double> init_naa(pop.nages, 0.0);
+      for (int age = 0; age < pop.nages; age++)
+      {
+        init_naa[age] = e[0][age].GetDouble();
+        pop.log_init_naa[age] = std::log(init_naa[age]);
+      }
     }
-
-    // std::fill(pop.log_init_naa.begin(), pop.log_init_naa.end(), std::log(10000));
 
     // set ages vector
     it = input.FindMember("ages");
@@ -430,7 +435,7 @@ public:
     it = input.FindMember("logR_sd");
     e = (*it).value;
     rec->log_sigma_recruit = e[0].GetDouble();
-    rec->recruit_deviations.resize(nyears+1);
+    rec->recruit_deviations.resize(nyears + 1);
     std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
     pop.recruitment = rec;
 

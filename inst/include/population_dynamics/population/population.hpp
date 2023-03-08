@@ -163,6 +163,11 @@ namespace fims {
          */
         void Prepare() {
             this->nfleets = this->fleets.size();
+
+            for (size_t fleet = 0; fleet < this->nfleets; fleet++){
+                this->fleets[fleet]->Prepare();
+            }
+
             std::fill(unfished_spawning_biomass.begin(),
                     unfished_spawning_biomass.end(), 0);
             std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
