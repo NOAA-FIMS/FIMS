@@ -12,7 +12,7 @@ test_that("Can add index data to model",{
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   Index <- fims$Index
   indexdat <- new(Index, length(index))
-  indexdat$index_data = index$value
+  expect_silent(indexdat$index_data <- index$value)
 })
 
 test_that("Can add agecomp data to model",{
@@ -31,6 +31,6 @@ test_that("Can add agecomp data to model",{
   agecompdat <- new(fims$AgeComp, nyears, nages)
   agecompdat$age_comp_data = agecomp1$value
   agecompdat2 <- new (fims$AgeComp, nyears, nages) 
-  agecompdat2$age_comp_data = agecomp2$value
+  expect_silent(agecompdat2$age_comp_data <- agecomp2$value)
 
 })
