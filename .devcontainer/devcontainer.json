@@ -9,20 +9,13 @@
 	"features": {
 		// if we want to install r packages using pak
 		// more info: https://github.com/rocker-org/devcontainer-features/blob/main/src/r-packages/README.md
-		"ghcr.io/rocker-org/devcontainer-features/r-apt:latest": {},
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
 			"packages": "make,gcc,g++,cmake,clang-tidy,clang-format,clang,doxygen,ninja-build"			
 		},
-		"ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-           "packages": "cli,rlang,RcppEigen,TMB,ggplot2,dplyr,scales",
-            "installSystemRequirements": true
-         },
-		 "ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
-			"vscodeRSupport": "full",
-			"installDevTools": true,
-			"installRadian": true,
-			"installVscDebugger": true
-		 }
+		 "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
+			"packages": "cli,rlang,RcppEigen,TMB,ggplot2,dplyr,scales",
+			 "installSystemRequirements": true
+		  }
 		},
 	// // if we want quarto cli
 	     // more info: https://github.com/rocker-org/devcontainer-features/blob/main/src/quarto-cli/README.md
@@ -39,15 +32,6 @@
 	 "customizations": {
 	   "vscode": {
 	 		// Set *default* container specific settings.json values on container create.
-	 		"settings": { 
-					"r.rterm.linux": "/usr/local/bin/radian",
-					"r.bracketedPaste": true,
-					"r.plot.useHttpgd": true,
-					"[r]": {
-						"editor.wordSeparators": "`~!@#%$^&*()-=+[{]}\\|;:'\",<>/?"
-					}
-				}
-        		},
 	 		// Add the IDs of extensions you want installed when the container is created.
 	 		"extensions": [
 		        // if we want liveshare.
