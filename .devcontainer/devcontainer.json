@@ -26,7 +26,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "R -q -e 'renv::install()'",
+	"postCreateCommand": "sudo echo 'options(repos = c(CRAN = 'https://cloud.r-project.org'))' >>'${R_HOME}/etc/Rprofile.site'",
 
 	// Configure tool-specific properties.
 	 "customizations": {
