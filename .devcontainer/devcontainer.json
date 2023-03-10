@@ -26,7 +26,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "sudo echo 'options(repos = c(CRAN = 'https://cloud.r-project.org'))' >>'${R_HOME}/etc/Rprofile.site'",
+	"postCreateCommand": "R -q -e 'options(repos = c(CRAN = 'https://cloud.r-project.org'))'",
 
 	// Configure tool-specific properties.
 	 "customizations": {
