@@ -27,14 +27,14 @@ class FleetInterface : public FIMSRcppInterfaceBase
   int selectivity_id = -999; /*!< id of selectivity component*/
 
   public:
-  int nages;
-  int nyears;
-  Rcpp::NumericVector log_q;
-  Rcpp::NumericVector log_Fmort;
-  bool estimate_F = false;
-  bool estimate_q = false;
-  bool random_q = false;
-  bool random_F = false;
+  int nages; /*!< number of ages in the fleet data*/
+  int nyears; /*!< number of years in the fleet data */
+  Rcpp::NumericVector log_q; /*!< log of catchability for the fleet*/
+  Rcpp::NumericVector log_Fmort; /*!< log of fishing mortality rate for the fleet*/
+  bool estimate_F = false; /*!< whether the parameter F should be estimated*/
+  bool estimate_q = false;/*!< whether the parameter q should be estimated*/
+  bool random_q = false;/*!< whether q should be a random effect*/
+  bool random_F = false;/*!< whether F should be a random effect*/
 
 public:
   static uint32_t id_g; /**< static id of the FleetInterface object */
@@ -86,6 +86,7 @@ public:
    * @brief Set the unique id for the Observed Age Comp Data object
    *
    * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
+   * @param agecomp_data the age composition data 
    * object
    */
   void SetObservedAgeCompData(int observed_agecomp_data_id, Rcpp::NumericMatrix agecomp_data)
@@ -106,6 +107,7 @@ public:
    * @brief Set the unique id for the Observed Index Data object
    *
    * @param observed_index_data_id Unique id for the Observed Index Data object
+   * @param indexdata the index data
    */
   void SetObservedIndexData(int observed_index_data_id, Rcpp::NumericVector indexdata)
   {

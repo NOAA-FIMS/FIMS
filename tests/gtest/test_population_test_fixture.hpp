@@ -87,7 +87,7 @@ class PopulationPrepareTestFixture : public testing::Test {
     std::uniform_real_distribution<double> log_naa_distribution(log_naa_min,
                                                                 log_naa_max);
     for (int i = 0; i < nages; i++) {
-      population.log_naa[i] = log_naa_distribution(generator);
+      population.log_init_naa[i] = log_naa_distribution(generator);
     }
 
     // log_M
