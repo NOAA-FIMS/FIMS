@@ -8,7 +8,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
 
-#include "../../../common/Information.hpp"
+#include "../../../common/information.hpp"
 #include "rcpp_interface_base.hpp"
 
 /**
@@ -53,7 +53,7 @@ public:
 /**
  * @brief constructor
 */
-  AgeCompDataInterface(int amax = 0, int ymax = 0) : DataInterface() {} =
+  AgeCompDataInterface(int amax = 0, int ymax = 0) : DataInterface() {}
 
 /**
  * @brief destructor
