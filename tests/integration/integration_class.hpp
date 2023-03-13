@@ -435,8 +435,19 @@ public:
     it = input.FindMember("logR_sd");
     e = (*it).value;
     rec->log_sigma_recruit = e[0].GetDouble();
+    it = input.FindMember("logR.resid");
+    e = (*it).value;
     rec->recruit_deviations.resize(nyears + 1);
     std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
+    for (int i = 0; i < e.Size(); i++)
+      {
+        rec->recruit_deviations[i] = std::exp(e[i].GetDouble());
+        if (print_statements)
+        {
+          std::cout << rec->recruit_deviations[i] << " ";
+        }
+      }
+    rec->use_recruit_bias_adjustment = false;
     pop.recruitment = rec;
 
     // set maturity
