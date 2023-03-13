@@ -33,11 +33,11 @@ if (length(pkg_to_install)) install.packages(pkg_to_install)
 invisible(lapply(required_pkg, library, character.only = TRUE))
 ```
 
-# Integration test: model comparison project case 0 operating model 1
+# Integration test: model comparison project case 0-1 operating model 1
 
 ## Test ID
 
-[integration_test.mcp_c0_om1_works](https://github.com/NOAA-FIMS/FIMS/blob/debug-integration-test/tests/gtest/integration_test_population.cpp)
+[IntegrationTest.MCPC0C1Work](https://github.com/NOAA-FIMS/FIMS/blob/debug-integration-test/tests/gtest/integration_test_population.cpp)
 
 ## Test objectives
 
@@ -61,7 +61,7 @@ The objective of the integration test is to validate the FIMS C++ operation as a
 
 - Submit a pull request for code review.
 
-Currently, FIMS only runs one deterministic integration test case 0 (C0). Here the case 0 sets standard deviations of recruitment in log space to 0.0. All other operating model settings are the same as case 0 in [Li et al. (2021)](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united). 
+Currently, FIMS only runs one deterministic integration test case 0 (C0) and case 1 (C1). Here the case 0 sets standard deviations of recruitment in log space to 0.0. All other operating model settings are the same as case 0 in [Li et al. (2021)](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united). All operating model settings from C1 are the same as case 0 in [Li et al. (2021)](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united). Only one iteration run (i.e. OM1.RData) from each case has been used for testing.
 
 ```{r integration_test_current_workflow, out.height='100%',out.width = '100%', fig.align='center', fig.cap='\\label{fig:integration_test_current_workflow}FIMS integratino test workflow.'}
 DiagrammeR::grViz(
@@ -175,12 +175,12 @@ unfished_spwaning_biomass <- data.frame(
 
 numbers_at_age <- data.frame(
   Component = "Numbers at age \n (nyears + 1) x nages",
-  Test = "- Absolute relative error of inidividual elements (|FIMS - OM| / OM x 100) is less than 1.0\\% \n - Absolute error of individual elements (|FIMS - OM|) is less than 50 fish \n - Individual elements (including numbers at age from nyears + 1) are greater than 0"
+  Test = "- Absolute relative error of inidividual elements (|FIMS - OM| / OM x 100) is less than 1.0\\% \n - Absolute error of individual elements (|FIMS - OM|) is less than 65 fish \n - Individual elements (including numbers at age from nyears + 1) are greater than 0"
 )
 
 biomass <- data.frame(
   Component = "Biomass \n nyears + 1",
-  Test = "- Absolute error (|FIMS - OM|) of individual elements is less than 1.5 mt \n - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 1.0\\% \n - Individual elements (including numbers at age from nyears + 1) are greater than 0)"
+  Test = "- Absolute error (|FIMS - OM|) of individual elements is less than 2.0 mt \n - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 1.0\\% \n - Individual elements (including numbers at age from nyears + 1) are greater than 0)"
 )
 
 spawning_biomass <- data.frame(
