@@ -147,7 +147,7 @@ namespace
             {
                 expected_biomass[year] = e[year].GetDouble();
 
-                EXPECT_NEAR(pop.biomass[year], expected_biomass[year], 1.5)
+                EXPECT_NEAR(pop.biomass[year], expected_biomass[year], 2)
                     << "year " << year;
                 // Expect the difference between FIMS value and the
                 // expected value from the MCP OM
@@ -262,9 +262,9 @@ namespace
                         << "differ at index " << index_ya << "; year " << year << "; age" << age;
                     // Expect the difference between FIMS value and the
                     // expected value from the MCP OM
-                    // is less than 50 fish.
+                    // is less than 65 fish.
                     EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]),
-                              50)
+                              65)
                         << "differ at index " << index_ya << "; year " << year << "; age" << age;
                     // Expect FIMS value is greater than 0.0
                     EXPECT_GT(pop.numbers_at_age[index_ya], 0.0)

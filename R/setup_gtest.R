@@ -12,7 +12,7 @@ setup_gtest <- function() {
     # read Rdata file into workspace
     # temporarily use a scenario from the model comparison project that is
     # not deterministic
-    github_dir <- "https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/raw/master/FIMS_integration_test_data/FIMS_C0/output/OM/"
+    github_dir <- "https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/raw/master/FIMS_integration_test_data/FIMS_C1/output/OM/"
     Rdata_file <- paste0("OM", i_iter, ".RData") # e.g. OM1.Rdata
     # this loads the file directly from github
     # (which was easier to figure out than downloading the Rdata first)
