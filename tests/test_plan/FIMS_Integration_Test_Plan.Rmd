@@ -240,7 +240,7 @@ fig_svg<-cowplot::ggdraw()+cowplot::draw_image("https://codecov.io/gh/NOAA-FIMS/
 plot(fig_svg)
 ```
   
-  - FIMS modules under FIMS/inst/include have been 100% tested by either C++ unit test or itegration test.
+  - FIMS modules under FIMS/inst/include have been 100% tested by either C++ unit test or integration test.
   
   - 45.6% of code from FIMS/tests/integration has been tested. 
   
@@ -258,7 +258,7 @@ plot(fig_svg)
   
   - It is a useful technique for getting relatively large and static files out of FIMS, which is a more function-oriented package that might require more frequent updates. 
   
-  - The test data can be better documented following R data pacakge documentation guides. 
+  - The test data can be better documented following R data package documentation guides. 
   
   - The origin story of data can be preserved in the data package. The code used to make the cleaned up version of raw data can be included in the data package. This makes it easy to update or reproduce various version of the test data. 
 
