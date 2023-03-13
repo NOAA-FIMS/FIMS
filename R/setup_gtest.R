@@ -3,6 +3,9 @@
 #' @examples \dontrun{setup_gtest()}
 #' @export
 setup_gtest <- function() {
+  # bind om_output and om_input locally to the function to avoid
+  # R CMD Check note: no visible binding for global variable
+  om_output <- om_input <- NULL
   # loop over iterations within the model comparison project output
   # currently don't need, but may need once we need more than one file.
   for (i_iter in 1) {
