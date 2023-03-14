@@ -47,7 +47,7 @@ namespace
 
                 population.CalculateInitialNumbersAA(index_ya, age);
 
-                numbers_at_age[index_ya] = fims::exp(population.log_naa[age]);
+                numbers_at_age[index_ya] = fims::exp(population.log_init_naa[age]);
                 EXPECT_EQ(population.numbers_at_age[index_ya], numbers_at_age[index_ya]);
             }
         }

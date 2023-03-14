@@ -54,7 +54,7 @@ directly?)
 template <typename Type>
 struct Population : public FIMSObject<Type> {
     
-  using ParameterVector = typename ModelTraits<Type>::ParameterVector;
+  using ParameterVector = typename ModelTraits<Type>::ParameterVector; /*!< the vector of population parameters*/
   static uint32_t id_g; /*!< reference id for population object*/
   size_t nyears;        /*!< total number of years in the fishery*/
   size_t nseasons;      /*!< total number of seasons in the fishery*/
