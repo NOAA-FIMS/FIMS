@@ -1,0 +1,265 @@
+---
+title: "Fisheries Integrated Modeling System (FIMS) Test Plan"
+subtitle: Integration tests for FIMS version `r packageDescription("FIMS")$Version`
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+urlcolor: blue
+---
+\newpage
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 15,
+  fig.height = 15
+)
+```
+
+```{r}
+devtools::load_all()
+required_pkg <- c(
+  "DiagrammeR", "kableExtra", "cowplot", "magick", "rticles"
+)
+
+pkg_to_install <- required_pkg[!(required_pkg %in%
+  installed.packages()[, "Package"])]
+if (length(pkg_to_install)) install.packages(pkg_to_install)
+
+invisible(lapply(required_pkg, library, character.only = TRUE))
+```
+
+# Integration test: model comparison project case 0-1 operating model 1
+
+## Test ID
+
+[IntegrationTest.MCPC0C1Work](https://github.com/NOAA-FIMS/FIMS/blob/debug-integration-test/tests/gtest/integration_test_population.cpp)
+
+## Test objectives
+
+The objective of the integration test is to validate the FIMS C++ operation as a whole. At the conclusion of testing, the project team will have a high level of confidence that FIMS population module will work according to user requirements. The integration test of the FIMS (version `r packageDescription("FIMS")$Version`) should validate from the requirements below:
+
+- FIMS C++ modules run together correctly.
+- FIMS C++ implementation work on operating systems Windows-2019, Mac OS-latest, and Ubuntu-latest.
+- The current FIMS can replicate age-structured modeling requirements from [Li et al. (2021)](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united) operating model and FIMS deterministic run can produce reliable outputs (e.g., spawning biomass and numbers at age).  
+
+## Approach
+
+- Prepare expected values using R script [FIMS_integration_test.R](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/blob/master/FIMS_integration_test_data/FIMS_integration_test.R) from [Age Structured Stock Assessment Model Comparison repository (ASSAMC)](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/tree/master).
+
+- Run `FIMS::setup_gtest()` to create om_input1.json and om_output1.json files and save the files under `FIMS/tests/integration/inputs/` folder.
+
+- Write test cases in `FIMS/tests/gtest/integration_test_populatin.cpp` to validate components to be tested.
+
+- Run C++ tests locally using ctest executable from CMake test driver program or `FIMS::run_gtest()` in R. Make sure other existing C++ unit tests still work after making changes to FIMS code repository.
+
+- Push tests to the working branch and run tests through GitHub Actions.
+
+- Submit a pull request for code review.
+
+Currently, FIMS only runs one deterministic integration test case 0 (C0) and case 1 (C1). Here the case 0 sets standard deviations of recruitment in log space to 0.0. All other operating model settings are the same as case 0 in [Li et al. (2021)](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united). All operating model settings from C1 are the same as case 0 in [Li et al. (2021)](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united). Only one iteration run (i.e. OM1.RData) from each case has been used for testing.
+
+```{r integration_test_current_workflow, out.height='100%',out.width = '100%', fig.align='center', fig.cap='\\label{fig:integration_test_current_workflow}FIMS integratino test workflow.'}
+DiagrammeR::grViz(
+  "digraph {
+  graph [layout = dot, rankdir = TB]
+  node [shape = rect, style = filled, fillcolor = White, fontsize = 80]
+  edge [minlen = 3]
+
+  start [label = <<b>Start</b>>, 
+         shape = doubleoctagon, 
+         fillcolor = MistyRose]
+  
+  ASSAMC_RScript [label = <<b>ASSAMC GitHub Repository</b><br ALIGN = 'LEFT'/><br ALIGN = 'LEFT'/> &#8226; ASSAMC/FIMS_integration_test_data<br ALIGN = 'LEFT'/> &#8226; FIMS_integratin_test.R<br ALIGN = 'LEFT'/>>,
+                  shape = folder,
+                  fillcolor = WhiteSmoke]
+                  
+  run_om [label = <<b>run OM</b>>, shape = plaintext]
+
+  ASSAMC_C0 [label = <<b>C0</b><br ALIGN = 'LEFT'/><br ALIGN = 'LEFT'/> &#8226; OM1.RData<br ALIGN = 'LEFT'/> &#8226; OM2.RData<br ALIGN = 'LEFT'/> &#8226; ...<br ALIGN = 'LEFT'/> &#8226; OM100.RData<br ALIGN = 'LEFT'/>>,
+             shape = tab,
+             fillcolor = WhiteSmoke]
+
+  ASSAMC_C1 [label = <<b>C1</b><br ALIGN = 'LEFT'/><br ALIGN = 'LEFT'/> &#8226; OM1.RData<br ALIGN = 'LEFT'/> &#8226; OM2.RData<br ALIGN = 'LEFT'/> &#8226; ...<br ALIGN = 'LEFT'/> &#8226; OM100.RData<br ALIGN = 'LEFT'/>>,
+             shape = tab,
+             fillcolor = WhiteSmoke]
+
+  FIMS_R_function [label = <<b>FIMS GitHub Repository</b><br ALIGN = 'LEFT'/><br ALIGN = 'LEFT'/> &#8226; FIMS/R/setup_gtest.R<br ALIGN = 'LEFT'/> &#8226; setup_gtest()<br ALIGN = 'LEFT'/>>, 
+                   shape = folder, 
+                   fillcolor = AliceBlue]
+  
+  convert_datafile [label = <<b>convert .RData to .json</b>>, shape = plaintext]
+
+  FIMS_C0 [label = <<b>C0</b><br ALIGN = 'LEFT'/><br ALIGN = 'LEFT'/> &#8226; om_input1.json om_output1.json<br ALIGN = 'LEFT'/> &#8226; om_input2.json om_output2.json<br ALIGN = 'LEFT'/> &#8226; ...<br ALIGN = 'LEFT'/> &#8226; om_input100.json om_output100.json<br ALIGN = 'LEFT'/>>,
+          shape = tab,
+          fillcolor = AliceBlue]
+                      
+  FIMS_C1 [label = <<b>C1</b><br ALIGN = 'LEFT'/><br ALIGN = 'LEFT'/> &#8226; om_input1.json om_output1.json<br ALIGN = 'LEFT'/> &#8226; om_input2.json om_output2.json<br ALIGN = 'LEFT'/> &#8226; ...<br ALIGN = 'LEFT'/> &#8226; om_input100.json om_output100.json<br ALIGN = 'LEFT'/>>,
+          shape = tab,
+          fillcolor = AliceBlue]
+                      
+  run_FIMS [label = <<b>run FIMS population module</b>>, 
+            shape = plaintext]
+            
+  FIMS_comparison [label = <<b>FIMS and OM Comparison</b><br ALIGN = 'LEFT'/><br ALIGN = 'LEFT'/> &#8226; Unfished numbers at age<br ALIGN = 'LEFT'/> &#8226; Unfished biomass<br ALIGN = 'LEFT'/> &#8226; Unfished spwaning biomass<br ALIGN = 'LEFT'/> &#8226; Biomass<br ALIGN = 'LEFT'/> &#8226; Spawning biomass<br ALIGN = 'LEFT'/> &#8226; Fishing mortality at age<br ALIGN = 'LEFT'/> &#8226; Total mortality at age<br ALIGN = 'LEFT'/> &#8226; Expected catch<br ALIGN = 'LEFT'/> &#8226; Expected index<br ALIGN = 'LEFT'/> &#8226; Unfished numbers at age<br ALIGN = 'LEFT'/>>, 
+                    shape = component]
+
+  start -> ASSAMC_RScript
+  
+  edge [arrowhead='none']
+  ASSAMC_RScript -> run_om
+  
+  edge [arrowhead='normal']
+  run_om -> ASSAMC_C0 
+  run_om -> ASSAMC_C1 
+
+  ASSAMC_C0 -> FIMS_R_function
+  ASSAMC_C1 -> FIMS_R_function
+  
+  edge [arrowhead='none']
+  FIMS_R_function ->  convert_datafile
+  
+  edge [arrowhead='normal']
+  convert_datafile -> FIMS_C0
+  convert_datafile -> FIMS_C1
+
+  edge [arrowhead='none']
+  FIMS_C0 -> run_FIMS
+  FIMS_C1 -> run_FIMS
+  
+  edge [arrowhead='normal']
+  run_FIMS -> FIMS_comparison
+
+}",
+height = 1000,
+width = 1000
+)
+```
+
+This workflow (Figure \ref{fig:integration_test_current_workflow}) uses automated testing to quickly execute test cases. The workflow includes converting operating model data (.RData) from Age Structured Stock Assessment Model Comparison repository to .json files using setup_gtest() function in FIMS, running FIMS population module, and validating FIMS output values with "true" values from the operating model. 
+
+## Evaluation criteria
+
+The integration test validates following components (Table \ref{tab:evaluation_criteria_table})
+
+- Unfished numbers at age 
+- Unfished biomass
+- Unfished spawning biomass
+- Numbers at age
+- Biomass
+- Spawning biomass
+- Fishing mortality at age
+- Total mortality at age
+- Expected catch
+- Expected index
+
+```{r evaluation_criteria_table}
+unfished_numbers_at_age <- data.frame(
+  Component = "Unfished numbers at age \n (nyears + 1) x nages",
+  Test = "- Individual elements (including numbers at age from nyear + 1) are greater than 0 \n - Individual elements are less than unfished recruitment from OM \n (OM only has an unfished recruitment value)"
+)
+
+unfished_biomass <- data.frame(
+  Component = "Unfished biomass \n nyears + 1",
+  Test = "- Individual elements (including numbers at age from nyear + 1) are greater than 0 \n (No corresponding value from OM)"
+)
+
+unfished_spwaning_biomass <- data.frame(
+  Component = "Unfished spawning biomass \n nyears + 1",
+  Test = "- Individual elements (including numbers at age from nyear + 1) are greater than 0 \n  - Individual elements are less than unfished spawning biomass from OM"
+)
+
+numbers_at_age <- data.frame(
+  Component = "Numbers at age \n (nyears + 1) x nages",
+  Test = "- Absolute relative error of inidividual elements (|FIMS - OM| / OM x 100) is less than 1.0\\% \n - Absolute error of individual elements (|FIMS - OM|) is less than 65 fish \n - Individual elements (including numbers at age from nyears + 1) are greater than 0"
+)
+
+biomass <- data.frame(
+  Component = "Biomass \n nyears + 1",
+  Test = "- Absolute error (|FIMS - OM|) of individual elements is less than 2.0 mt \n - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 1.0\\% \n - Individual elements (including numbers at age from nyears + 1) are greater than 0)"
+)
+
+spawning_biomass <- data.frame(
+  Component = "Spawning biomass \n nyears + 1",
+  Test = "- Absolute error (|FIMS - OM|) of individual elements is less than 1 mt \n - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 1.0\\% \n - Individual elements (including numbers at age from nyears + 1) are greater than 0"
+)
+
+fishing_mortality_at_age <- data.frame(
+  Component = "Fishing mortality at age \n nyears x nages",
+  Test = "- Absolute error (|FIMS - OM|) of individual elements is less than 0.0001 \n - Individual elements are greater than 0"
+)
+
+total_mortality_at_age <- data.frame(
+  Component = "Total mortality at age \n nyears x nages",
+  Test = "- Absolute error (|FIMS - OM|) of individual elements is less than 0.0001 \n - Individual elements are greater than 0"
+)
+
+expected_catch <- data.frame(
+  Component = "Expected catch \n nyears",
+  Test = "Fishing fleet: \n - Absolute error (|FIMS - OM|) of individual elements is less than 1 mt - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 1.0\\% \n - Individual elements are greater than 0 \n\n Survey fleet: \n - Individual elements equal to 0"
+)
+
+expected_index <- data.frame(
+  Component = "Expected index \n nyears",
+  Test = "Fishing fleet: \n - Individual elements of catchability equal to 1 \n - Individual elements of expected index are greater than 0 \n\n Survey fleet: \n - Absolute error (|FIMS - OM|) of individual elements is less than 0.0001 - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 5.0\\% \n - Absolute error (|FIMS - OM|) of individual elements of catchability is less than 1.0e-07 \n - Individual elements of expected index equal to 0"
+)
+
+data <- rbind(
+  unfished_numbers_at_age,
+  unfished_biomass,
+  unfished_spwaning_biomass,
+  numbers_at_age,
+  biomass,
+  spawning_biomass,
+  fishing_mortality_at_age,
+  total_mortality_at_age,
+  expected_catch,
+  expected_index
+)
+
+test_case <- data
+test_case$Component <- kableExtra::linebreak(test_case$Component)
+test_case$Test <- kableExtra::linebreak(test_case$Test)
+knitr::kable(test_case, escape = FALSE, align = "l", caption = "Evalation criteria for FIMS testing components.") %>%
+  kableExtra::column_spec(1, width = "15em") %>% # Column of Item
+  kableExtra::column_spec(2, width = "28em") # Column of Test
+```
+
+## Test deliverables
+
+- Test logs can be found on [GitHub Actions page](https://github.com/NOAA-FIMS/FIMS/actions/runs/4367154114/jobs/7638102568). All tests have passed. 
+
+- C++ test coverage from codecov:
+```{r eval=TRUE,echo=FALSE,message=FALSE, error=FALSE, warning=FALSE, fig.height=0.2, fig.width=1}
+
+fig_svg<-cowplot::ggdraw()+cowplot::draw_image("https://codecov.io/gh/NOAA-FIMS/FIMS/branch/debug-integration-test/graph/badge.svg")
+plot(fig_svg)
+```
+  
+  - FIMS modules under FIMS/inst/include have been 100% tested by either C++ unit test or integration test.
+  
+  - 45.6% of code from FIMS/tests/integration has been tested. 
+  
+    - Only 39.71% of code that is from `rapidjson` has been tested. It can be removed from FIMS code coverage calculation since `rapidjson` is a third-party library.
+  
+    - `integration_class.hpp` has a code coverage of 72.02%. The test coverage can be improved by adding another integration test using the double logistic fleet data from [Li et al. (2021)](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united).
+    
+- Current integration test only covers one iteration run of one case of the operating model from [Li et al. (2021)](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united). Value-parameterized testing can be used to test FIMS code with different parameters without writing multiple copies of the same test. 
+
+- Current test data files are stored in FIMS. An R data package may need to be developed to conduct integration tests. 
+  
+  - The data package can be developed for the purpose of distributing test data, not only for FIMS, but also a broader stock assessment model development community. It can be used to share test data across multiple tools. 
+  
+  - It can store data in multiple formats (e.g., .RData and .json). 
+  
+  - It is a useful technique for getting relatively large and static files out of FIMS, which is a more function-oriented package that might require more frequent updates. 
+  
+  - The test data can be better documented following R data package documentation guides. 
+  
+  - The origin story of data can be preserved in the data package. The code used to make the cleaned up version of raw data can be included in the data package. This makes it easy to update or reproduce various version of the test data. 
+
+

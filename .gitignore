@@ -94,4 +94,4 @@ fims.log
 src/tmp.def
 
 #Testing files
-tests/integration/inputs/FIMS-deterministic
+tests/test_plan/FIMS_Integration_Test_Plan.log

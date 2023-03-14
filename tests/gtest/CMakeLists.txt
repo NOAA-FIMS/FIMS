@@ -123,6 +123,18 @@ target_link_libraries(population_dynamics_recruitment_base
 
 gtest_discover_tests(population_dynamics_recruitment_base)
 
+# test_sr_beverton_holt.cpp
+add_executable(sr_beverton_holt
+test_sr_beverton_holt.cpp
+)
+
+target_link_libraries(sr_beverton_holt
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(sr_beverton_holt)
+
 # test_population_dynamics_fleet.cpp
 add_executable(population_dynamics_fleet_initialize_prepare
   test_population_dynamics_fleet_initialize_prepare.cpp
@@ -207,17 +219,17 @@ target_link_libraries(population_Catch
 
 gtest_discover_tests(population_Catch)
 
-#test_CalculateSSB.cpp
-add_executable(population_SSB
-  test_population_SSB.cpp
+#test_B_and_SB.cpp
+add_executable(population_B_and_SB
+  test_population_B_and_SB.cpp
 )
 
-target_link_libraries(population_SSB
+target_link_libraries(population_B_and_SB
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_SSB)
+gtest_discover_tests(population_B_and_SB)
 
 #test_CalculateIndex_works.cpp
 add_executable(population_Index
