@@ -169,6 +169,25 @@ setValidity(
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [showClass()] to see all available slots.
 FIMSFrame <- function(data) {
+  #Get the earliest and latest year of data and use to calculate n years for population simulation
+  start_yr <- as.numeric(strsplit(min(data[["datestart"]],na.rm=TRUE),"-")[[1]][1])
+  end_yr <- as.numeric(strsplit(max(data[["dateend"]],na.rm=TRUE),"-")[[1]][1])
+  nyrs <- end_yr-start_yr+1
+  years <- start_yr:end_yr
+  #Get the range of ages displayed in the data to use to specify population simulation range
+  #with one extra year added to act as a plus group
+  ages <- 0:(max(data[["age"]],na.rm=TRUE)+1)
+  #Get the fleets represented in the data
+  fleets <- unique(data[["name"]])[grep("fleet",unique(data[["name"]]))]
+  fleets <- as.numeric(unlist(lapply(strsplit(fleets,"fleet"),function(x)x[2])))
+  
+  #Make empty NA data frames in the format needed to pass to FIMS
+  
+  
+  
+  #Fill the empty data frames with data extracted from the data file
+  
+  
   out <- new("FIMSFrame", data = data)
   return(out)
 }
