@@ -207,8 +207,8 @@ class Information {
       if (f->selectivity_id != -999) {
         uint32_t sel_id = static_cast<uint32_t>(
             f->selectivity_id);  // cast as unsigned integer
-        selectivity_models_iterator it = this->selectivity_models.find(
-            sel_id);  // if find, set it, otherwise invalid
+     //   selectivity_models_iterator it = this->selectivity_models.find(
+       //     sel_id);  // if find, set it, otherwise invalid
 
         std::cout << "Information: Initializing fleet objects.\n";
         for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();

@@ -205,8 +205,6 @@ struct Population : public FIMSObject<Type> {
    */
   void CalculateMortality(size_t index_ya, size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      size_t index_yf = year * this->nfleets +
-                     fleet_;  // index by fleet and years to dimension fold
       this->mortality_F[index_ya] +=
           this->fleets[fleet_]->Fmort[year] *
           this->fleets[fleet_]->selectivity->evaluate(age);
@@ -353,8 +351,6 @@ struct Population : public FIMSObject<Type> {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
       size_t index_yaf =
           year * this->nages * this->nfleets + age * this->nfleets + fleet_;
-      size_t index_yf = year * this->nfleets +
-                     fleet_;  // index by fleet and years to dimension fold
       // make an intermediate value in order to set multiple members (of
       // current and fleet objects) to that value.
       Type catch_;  // catch_ is used to avoid using the c++ keyword catch
