@@ -20,31 +20,24 @@ namespace
 
         EXPECT_EQ(population.nfleets, nfleets);
         EXPECT_EQ(population.ages.size(), nages);
-        EXPECT_EQ(
-            population.catch_numbers_at_age.size(),
-            nyears* nages * nfleets);
         EXPECT_EQ(population.mortality_F.size(), nyears * nages);
         EXPECT_EQ(population.mortality_Z.size(), nyears * nages);
         EXPECT_EQ(population.proportion_mature_at_age.size(), (nyears+1) * nages);
         EXPECT_EQ(population.weight_at_age.size(), nages);
-        EXPECT_EQ(
-            population.catch_weight_at_age.size(),
-            nyears * nages * nfleets);
         // What is unfished number at age? A vector of values before
         // model start year or a vector of values for each model year?
         // Is unfished biomass_at_age needed?
         EXPECT_EQ(population.unfished_numbers_at_age.size(), (nyears + 1) * nages);
         EXPECT_EQ(population.numbers_at_age.size(), (nyears + 1) * nages);
         EXPECT_EQ(population.expected_catch.size(), nyears * nfleets);
-        EXPECT_EQ(population.expected_index.size(), nyears * nfleets);
         EXPECT_EQ(population.biomass.size(), (nyears + 1));
         // What is unfished spawning biomass? A single value before
         // model start year or a vector of values for each year?
         EXPECT_EQ(population.unfished_spawning_biomass.size(), (nyears + 1));
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
-        EXPECT_EQ(population.log_naa.size(), nages);
+        EXPECT_EQ(population.log_init_naa.size(), nages);
         EXPECT_EQ(population.log_M.size(), nyears * nages);
-        EXPECT_EQ(population.naa.size(), nages);
+        EXPECT_EQ(population.init_naa.size(), nages);
         EXPECT_EQ(population.M.size(), nyears * nages);
     }
 
@@ -87,10 +80,10 @@ namespace
         std::vector<double> naa(nages, 0);
         for (int i = 0; i < nages; i++)
         {
-            naa[i] = fims::exp(population.log_naa[i]);
-            EXPECT_EQ(population.naa[i], naa[i]);
+            naa[i] = fims::exp(population.log_init_naa[i]);
+            EXPECT_EQ(population.init_naa[i], naa[i]);
         }
-        EXPECT_EQ(population.naa.size(), nages);
+        EXPECT_EQ(population.init_naa.size(), nages);
 
         // Test population.M
         std::vector<double> M(nyears * nages, 0);
