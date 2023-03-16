@@ -77,7 +77,7 @@ struct Fleet : public FIMSObject<Type> {
   std::vector<Type> expected_index; /*!<model expected index of abundance*/
   std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
   std::vector<Type>
-        catch_weight_at_age; /*!< Expected values???: Weight at age for catch*/
+      catch_weight_at_age; /*!< Expected values???: Weight at age for catch*/
 
   /**
    * @brief Constructor.
