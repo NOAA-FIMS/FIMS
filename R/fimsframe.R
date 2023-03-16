@@ -12,13 +12,17 @@
 
 setClass(
   Class = "FIMSFrame",
-  slots = c(data = "data.frame")
+  slots = c(data = "data.frame", 
+            ages = "numeric",
+            fleets = "numeric", 
+            nyrs = "numeric")
 )
 
-setClass("FIMSFrameAge",
+# leaving FIMSFrameAge as an example.
+setClass(
+  Class = "FIMSFrameAge",
   slots = list(
-    weightatage = "data.frame",
-    ages = "numeric"
+    weightatage = "data.frame"
   ),
   contains = "FIMSFrame"
 )
@@ -87,7 +91,7 @@ setMethod(
     )
     print(head(object@data))
     for (nm in snames[ordinnames]) {
-      cat("+@", nm, ":\n", sep = "")
+      cat("additional slots: ", nm, ":\n", sep = "")
       print(slot(object, nm))
     }
   }
@@ -122,6 +126,8 @@ setValidity(
     if (!"dateend" %in% colnames(object@data)) {
       errors <- c(errors, "data must contain 'uncertainty'")
     }
+
+    # TODO: Add checks for other slots
 
     # Return
     if (length(errors) == 0) {
@@ -176,19 +182,21 @@ FIMSFrame <- function(data) {
   years <- start_yr:end_yr
   #Get the range of ages displayed in the data to use to specify population simulation range
   #with one extra year added to act as a plus group
-  ages <- 0:(max(data[["age"]],na.rm=TRUE)+1)
+  nages <- max(data[["age"]],na.rm=TRUE)
+  ages <- 0:nages
   #Get the fleets represented in the data
   fleets <- unique(data[["name"]])[grep("fleet",unique(data[["name"]]))]
   fleets <- as.numeric(unlist(lapply(strsplit(fleets,"fleet"),function(x)x[2])))
-  
+  nfleets <- length(fleets)
   #Make empty NA data frames in the format needed to pass to FIMS
   
-  
-  
   #Fill the empty data frames with data extracted from the data file
-  
-  
-  out <- new("FIMSFrame", data = data)
+  out <- new("FIMSFrame",
+             data = data, 
+             ages = ages,
+             fleets = fleets,
+             nyrs = nyrs
+             )
   return(out)
 }
 #' FIMSFrameAge
@@ -196,16 +204,13 @@ FIMSFrame <- function(data) {
 #' @rdname FIMSFrame
 FIMSFrameAge <- function(data) {
   # Calculate information based on input data
-  ages <- 0:max(data[["age"]], na.rm = TRUE)
+  # ages <- 0:max(data[["age"]], na.rm = TRUE)
   weightatage <- dplyr::filter(
     data,
     .data[["type"]] == "weight-at-age"
   )
-  # TODO: decide if weightatage info should be removed
-  #       from data because it is in weightatage?
   out <- new("FIMSFrameAge",
     data = data,
-    ages = ages,
     weightatage = weightatage
   )
   return(out)
