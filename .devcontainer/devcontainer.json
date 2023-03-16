@@ -13,7 +13,7 @@
 			"packages": "make,gcc,g++,cmake,clang-tidy,clang-format,clang,doxygen,ninja-build"			
 		},
 		 "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "cli,rlang,RcppEigen,TMB,ggplot2,dplyr,scales",
+			"packages": "Matrix,cli,rlang,RcppEigen,TMB,ggplot2,dplyr,scales,covr",
 			 "installSystemRequirements": true
 		  }
 		},
@@ -26,8 +26,8 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "R -q -e 'options(repos = c(CRAN = 'https://cloud.r-project.org'))'",
-
+	"postCreateCommand": "echo 'options(repos = c(CRAN = \"https://cloud.r-project.org\"))' | sudo sh -c 'cat - >>\"${R_HOME}/etc/Rprofile.site\"'",
+	
 	// Configure tool-specific properties.
 	 "customizations": {
 	   "vscode": {
