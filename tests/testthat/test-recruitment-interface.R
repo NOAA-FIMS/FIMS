@@ -6,7 +6,7 @@ test_that("Recruitment input settings work as expected", {
   recruitment <- new(fims$BevertonHoltRecruitment)
   h <- 0.75
   r0 <- 1000000.0
-  spawns <- 9.55784*10^6
+  spawns <- 9.55784 * 10^6
   ssb0 <- 0.0102562
 
 
