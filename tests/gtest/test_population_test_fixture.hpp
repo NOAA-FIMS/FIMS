@@ -51,12 +51,11 @@ class PopulationPrepareTestFixture : public testing::Test {
     population.nages = nages;
     population.nfleets = nfleets;
 
-
     // C++ code to set up true values for log_naa, log_M,
     // log_Fmort, and log_q:
     int seed = 1234;
     std::default_random_engine generator(seed);
-    
+
     // log_Fmort
     double log_Fmort_min = fims::log(0.1);
     double log_Fmort_max = fims::log(2.3);
@@ -75,7 +74,7 @@ class PopulationPrepareTestFixture : public testing::Test {
     // and population object needs a shared pointer in population.hpp
     // (std::vector<std::shared_ptr<fims::Fleet<Type> > > fleets;)
 
-        // Does Fmort need to be in side of the year loop like log_q?
+    // Does Fmort need to be in side of the year loop like log_q?
     for (int i = 0; i < nfleets; i++) {
       auto fleet = std::make_shared<fims::Fleet<double>>();
       auto selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
@@ -94,15 +93,15 @@ class PopulationPrepareTestFixture : public testing::Test {
 
     population.Initialize(nyears, nseasons, nages);
 
-    for(int i = 0; i < nages; i++){
-      population.ages[i] = i+1;
+    for (int i = 0; i < nages; i++) {
+      population.ages[i] = i + 1;
     }
 
     // log_naa
     double log_init_naa_min = 10.0;
     double log_init_naa_max = 12.0;
-    std::uniform_real_distribution<double> log_naa_distribution(log_init_naa_min,
-                                                                log_init_naa_max);
+    std::uniform_real_distribution<double> log_naa_distribution(
+        log_init_naa_min, log_init_naa_max);
     for (int i = 0; i < nages; i++) {
       population.log_init_naa[i] = log_naa_distribution(generator);
     }
@@ -128,15 +127,16 @@ class PopulationPrepareTestFixture : public testing::Test {
     // weight_at_age
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
-    
-    std::shared_ptr<fims::EWAAgrowth<double> > growth
-                = std::make_shared<fims::EWAAgrowth<double> > ();
+
+    std::shared_ptr<fims::EWAAgrowth<double>> growth =
+        std::make_shared<fims::EWAAgrowth<double>>();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
     for (int i = 0; i < nages; i++) {
-        growth->ewaa[static_cast<double> (population.ages[i])] = weight_at_age_distribution(generator);
+      growth->ewaa[static_cast<double>(population.ages[i])] =
+          weight_at_age_distribution(generator);
     }
-    
+
     population.growth = growth;
 
     population.Prepare();
