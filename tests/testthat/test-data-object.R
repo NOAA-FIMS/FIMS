@@ -1,4 +1,4 @@
-git # tests for input objects
+# tests for input objects
 library(dplyr)
 library(FIMS)
 data(package = "FIMS")
