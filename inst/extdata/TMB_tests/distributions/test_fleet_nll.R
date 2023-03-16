@@ -46,6 +46,7 @@ TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MO
   #expect_equal(nll, mod$fn())
 
   dyn.unload(dynlib(paste0(path, "/test_fleet_index_nll")))
+  
   file.remove(paste0(path, "/", dynlib("test_fleet_index_nll")))
   file.remove( paste0(path, "/test_fleet_index_nll.o"))
 
