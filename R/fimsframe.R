@@ -41,8 +41,8 @@ setClass(
 
 # is it problematic to set the generic for data? not sure...
 # but it will not work without set generic
-setGeneric("data", function(x) standardGeneric("data"))
-setMethod("data", "FIMSFrame", function(x) x@data)
+# setGeneric("data", function(x) standardGeneric("data"))
+# setMethod("data", "FIMSFrame", function(x) x@data)
 
 # example: so we can call fleets(obj) instead of obj@fleets
 setGeneric("fleets", function(x) standardGeneric("fleets"))
