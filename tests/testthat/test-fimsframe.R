@@ -25,6 +25,22 @@ test_that("Can create the S4 FIMSFrame classes", {
   expect_silent(save_png(plot(age_frame)))
 })
 
+test_that("Accessors work as expected in FIMSFrame", {
+  expect_s3_class(data(fims_frame), "data.frame")
+  expect_vector(fleets(fims_frame), ptype = integer())
+  expect_vector(nyrs(fims_frame), ptype = integer())
+  expect_length(nyrs(fims_frame), 1)
+})
+
+test_that("Accessors work as expected in FIMSFrameAge", {
+  expect_s3_class(data(age_frame), "data.frame")
+  expect_vector(fleets(age_frame), ptype = integer())
+  expect_vector(nyrs(age_frame), ptype = integer())
+  expect_length(nyrs(ageframe), 1)
+  expect_vector(ages(age_frame), ptype = integer())
+  expect_s3_class(weightatage(age_frame), "data.frame")
+})
+
 test_that("Show method works as expected", {
   expect_output(show(fims_frame))
 })

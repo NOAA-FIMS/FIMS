@@ -30,6 +30,38 @@ setClass(
 # setMethod: accessors ----
 # Methods for accessing info in the slots
 
+# for now, only getters are included, not setters.
+# # setter example where ages is the slot and Person is the class
+# setGeneric("age<-", function(x, value) standardGeneric("age<-"))
+# setMethod("age<-", "Person", function(x, value) {
+#   x@age <- value
+#   x
+# })
+
+
+# is it problematic to set the generic for data? not sure...
+# but it will not work without set generic
+setGeneric("data", function(x) standardGeneric("data"))
+setMethod("data", "FIMSFrame", function(x) x@data)
+
+# example: so we can call fleets(obj) instead of obj@fleets
+setGeneric("fleets", function(x) standardGeneric("fleets"))
+setMethod("fleets", "FIMSFrame", function(x) x@fleets)
+
+setGeneric("nyrs", function(x) standardGeneric("nyrs"))
+setMethod("nyrs", "FIMSFrame", function(x) x@nyrs)
+
+# additional accessors for FIMSFrameAge
+setGeneric("ages", function(x) standardGeneric("ages"))
+setMethod("ages", "FIMSFrame", function(x) x@ages)
+
+setGeneric("weightatage", function(x) standardGeneric("weightatage"))
+setMethod("weightatage", "FIMSFrame", function(x) x@weightatage)
+
+# Note: don't include setters, because for right now, we don't want users to be
+# setting ages, fleets, etc. However, we could allow it in the future, if there 
+# is away to update the object based on changing the fleets?
+
 # setMethod: initialize ----
 # Not currently using setMethod(f = "initialize")
 # because @kellijohnson-NOAA did not quite understand how they actually work.
