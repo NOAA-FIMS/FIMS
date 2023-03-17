@@ -12,7 +12,7 @@
 
 setClass(
   Class = "FIMSFrame",
-  slots = c(data = "data.frame", 
+  slots = c(data = "data.frame", # can use c( ) or list here.
             fleets = "numeric", 
             nyrs = "numeric")
 )
@@ -20,7 +20,7 @@ setClass(
 # leaving FIMSFrameAge with just age related slots.
 setClass(
   Class = "FIMSFrameAge",
-  slots = list(
+  slots = c(
     ages = "numeric",
     weightatage = "data.frame"
   ),
@@ -96,6 +96,9 @@ setMethod(
     }
   }
 )
+
+# note: may want to add a method for FIMSFrameAge to show the additional slots
+# included in FIMSFrameAge.
 
 # setValidity ----
 setValidity(
