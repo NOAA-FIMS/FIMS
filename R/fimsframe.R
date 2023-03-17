@@ -13,15 +13,15 @@
 setClass(
   Class = "FIMSFrame",
   slots = c(data = "data.frame", 
-            ages = "numeric",
             fleets = "numeric", 
             nyrs = "numeric")
 )
 
-# leaving FIMSFrameAge as an example.
+# leaving FIMSFrameAge with just age related slots.
 setClass(
   Class = "FIMSFrameAge",
   slots = list(
+    ages = "numeric",
     weightatage = "data.frame"
   ),
   contains = "FIMSFrame"
@@ -180,10 +180,7 @@ FIMSFrame <- function(data) {
   end_yr <- as.numeric(strsplit(max(data[["dateend"]],na.rm=TRUE),"-")[[1]][1])
   nyrs <- end_yr-start_yr+1
   years <- start_yr:end_yr
-  #Get the range of ages displayed in the data to use to specify population simulation range
-  #with one extra year added to act as a plus group
-  nages <- max(data[["age"]],na.rm=TRUE)
-  ages <- 0:nages
+
   #Get the fleets represented in the data
   fleets <- unique(data[["name"]])[grep("fleet",unique(data[["name"]]))]
   fleets <- as.numeric(unlist(lapply(strsplit(fleets,"fleet"),function(x)x[2])))
@@ -192,8 +189,7 @@ FIMSFrame <- function(data) {
   
   #Fill the empty data frames with data extracted from the data file
   out <- new("FIMSFrame",
-             data = data, 
-             ages = ages,
+             data = data,
              fleets = fleets,
              nyrs = nyrs
              )
@@ -203,14 +199,29 @@ FIMSFrame <- function(data) {
 #' @export
 #' @rdname FIMSFrame
 FIMSFrameAge <- function(data) {
-  # Calculate information based on input data
-  # ages <- 0:max(data[["age"]], na.rm = TRUE)
+  #Get the earliest and latest year of data and use to calculate n years for population simulation
+  start_yr <- as.numeric(strsplit(min(data[["datestart"]],na.rm=TRUE),"-")[[1]][1])
+  end_yr <- as.numeric(strsplit(max(data[["dateend"]],na.rm=TRUE),"-")[[1]][1])
+  nyrs <- end_yr-start_yr+1
+  years <- start_yr:end_yr
+  #Get the fleets represented in the data
+  fleets <- unique(data[["name"]])[grep("fleet",unique(data[["name"]]))]
+  fleets <- as.numeric(unlist(lapply(strsplit(fleets,"fleet"),function(x)x[2])))
+  nfleets <- length(fleets)
+  #Make empty NA data frames in the format needed to pass to FIMS
+  #Get the range of ages displayed in the data to use to specify population simulation range
+  #with one extra year added to act as a plus group
+  nages <- max(data[["age"]], na.rm = TRUE)
+  ages <- 0:nages
   weightatage <- dplyr::filter(
     data,
     .data[["type"]] == "weight-at-age"
   )
   out <- new("FIMSFrameAge",
     data = data,
+    fleets = fleets,
+    nyrs = nyrs,
+    ages = ages,
     weightatage = weightatage
   )
   return(out)
