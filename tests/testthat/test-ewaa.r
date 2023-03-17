@@ -5,8 +5,8 @@ test_that("ewaa data can be added to model", {
   ewaa_growth <- new(fims$EWAAgrowth)
   age_frame <- FIMSFrameAge(data_mile1)
   ewaa_data <- age_frame@weightatage
-  ewaa_growth$ages <- unique(ewaa_data$age)
-  ewaa_growth$weights <- unique(ewaa_data$value)
+  ewaa_growth$ages <- m_ages(age_frame)
+  ewaa_growth$weights <- m_weightatage(age_frame)
   expect_equal(ewaa_growth$evaluate(1), 0.00053065552)
 
   ewaa_growth2 <- new(fims$EWAAgrowth)

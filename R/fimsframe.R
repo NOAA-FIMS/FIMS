@@ -41,8 +41,9 @@ setClass(
 
 # is it problematic to set the generic for data? not sure...
 # but it will not work without set generic
-# setGeneric("data", function(x) standardGeneric("data"))
-# setMethod("data", "FIMSFrame", function(x) x@data)
+# can't call this data because there is already a generic
+setGeneric("get_data", function(x) standardGeneric("get_data"))
+setMethod("get_data", "FIMSFrame", function(x) x@data)
 
 # example: so we can call fleets(obj) instead of obj@fleets
 setGeneric("fleets", function(x) standardGeneric("fleets"))
@@ -53,10 +54,34 @@ setMethod("nyrs", "FIMSFrame", function(x) x@nyrs)
 
 # additional accessors for FIMSFrameAge
 setGeneric("ages", function(x) standardGeneric("ages"))
-setMethod("ages", "FIMSFrame", function(x) x@ages)
+setMethod("ages", "FIMSFrameAge", function(x) x@ages)
 
 setGeneric("weightatage", function(x) standardGeneric("weightatage"))
-setMethod("weightatage", "FIMSFrame", function(x) x@weightatage)
+setMethod("weightatage", "FIMSFrameAge", function(x) x@weightatage)
+
+setGeneric("m_weightatage", function(x) standardGeneric("m_weightatage"))
+setMethod("m_weightatage", "FIMSFrameAge", 
+  function(x) {
+    dplyr::filter(
+      .data = as.data.frame(x@data),
+      type == "weight-at-age",
+      grepl(datestart[1], datestart)
+    ) %>%
+    dplyr::pull(value)
+  }
+)
+
+setGeneric("m_ages", function(x) standardGeneric("m_ages"))
+setMethod("m_ages", "FIMSFrameAge", 
+  function(x) {
+    dplyr::filter(
+      .data = as.data.frame(x@data),
+      type == "weight-at-age",
+      grepl(datestart[1], datestart)
+    ) %>%
+    dplyr::pull(age)
+  }
+)
 
 # Note: don't include setters, because for right now, we don't want users to be
 # setting ages, fleets, etc. However, we could allow it in the future, if there 
