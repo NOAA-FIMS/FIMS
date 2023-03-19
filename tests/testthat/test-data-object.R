@@ -1,36 +1,50 @@
 # tests for input objects
-library(dplyr)
-library(FIMS)
 data(package = "FIMS")
-age_frame <- FIMSFrameAge(data_mile1)
+age_frame <- FIMS::FIMSFrameAge(data_mile1)
 fims_frame <- FIMSFrame(data_mile1)
 
-test_that("Can add index data to model",{
-  index = filter(age_frame@data, type=="index") %>%
-  select(value)
-  
+nyears <- age_frame@nyrs
+nages <- max(age_frame@ages)
+
+fleet_names_agecomp <- dplyr::filter(
+  .data = as.data.frame(age_frame@data),
+  type == "age"
+) %>%
+  dplyr::distinct(name) %>%
+  dplyr::pull(name)
+nagecomp <- length(fleet_names_agecomp)
+
+fleet_names_index <- dplyr::filter(
+  .data = as.data.frame(age_frame@data),
+  type == "index"
+) %>%
+  dplyr::distinct(name) %>%
+  dplyr::pull(name)
+nindex <- length(fleet_names_index)
+
+test_that("Can add index data to model", {
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
-  Index <- fims$Index
-  indexdat <- new(Index, length(index))
-  expect_silent(indexdat$index_data <- index$value)
+
+  indexdat <- vector(mode = "list", length = nindex)
+  names(indexdat) <- fleet_names_index
+
+  for (index_i in 1:nindex) {
+    index <- fims$Index
+    indexdat[[fleet_names_index[index_i]]] <- new(index, nyears)
+    expect_silent(indexdat[[fleet_names_index[index_i]]] <- 
+      m_index(age_frame, fleet_names_index[index_i]))
+  }
 })
 
-test_that("Can add agecomp data to model",{
-  agecomp1 = dplyr::filter(age_frame@data, type=="age", 
-  name == "fleet1") %>%
-  select(value)
-
-  agecomp2 = dplyr::filter(age_frame@data, type=="age", 
-  name == "survey1") %>%
-  select(value)
-
-  nages = length(age_frame@ages)-1
-  nyears = length(agecomp2$value)/nages
-  
+test_that("Can add agecomp data to model", {
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
-  agecompdat <- new(fims$AgeComp, nyears, nages)
-  agecompdat$age_comp_data = agecomp1$value
-  agecompdat2 <- new (fims$AgeComp, nyears, nages) 
-  expect_silent(agecompdat2$age_comp_data <- agecomp2$value)
 
+  agecompdat <- vector(mode = "list", length = nfleets)
+  names(agecompdat) <- fleet_names_agecomp
+
+  for (fleet_f in 1:nfleets) {
+    agecompdat[[fleet_names[fleet_f]]] <- new(fims$AgeComp, nyears, nages)
+    expect_silent(agecompdat[[fleet_names[fleet_f]]]$age_comp_data <-
+      m_agecomp(age_frame, fleet_names[fleet_f]))
+  }
 })
