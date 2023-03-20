@@ -48,7 +48,7 @@ inline const T log(const T &x) {
 #endif
 
 #ifdef TMB_MODEL
-//#include <TMB.hpp>
+#include <TMB.hpp>
 
 /**
  * @brief The exponential function.
@@ -90,6 +90,10 @@ inline const T log(const T &x) {
  */
 template <class T>
 inline const T logistic(const T &median, const T &slope, const T &x) {
+  Rcout << "median =" << median << std::endl;
+  Rcout << "x =" << x << std::endl;
+  Rcout << "slope =" << slope << std::endl;
+  Rcout << "fims::exp()" << fims::exp(-1.0 * slope * (x - median)) << std::endl;
   return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
 }
 
