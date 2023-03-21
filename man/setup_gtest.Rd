@@ -12,5 +12,7 @@ function for setting up your local environment to run the gtest
 integration test locally. Intended for developers.
 }
 \examples{
-\dontrun{setup_gtest()}
+\dontrun{
+setup_gtest()
+}
 }
