@@ -63,6 +63,10 @@ inline const T exp(const T &x) {
   return exp(x);
 }
 
+template <>
+inline const double exp(const double &x) {
+  return std::exp(x);
+}
 /**
  * @brief The natural log function (base e)
  * The code cannot be tested using the compilation flag
@@ -74,6 +78,10 @@ inline const T exp(const T &x) {
 template <class T>
 inline const T log(const T &x) {
   return log(x);
+}
+template <>
+inline const double log(const double &x) {
+  return std::log(x);
 }
 
 #endif

@@ -11,7 +11,7 @@ Type objective_function<Type>::operator()(){
    * getinstance is defined in test_dlnorm_distribution.hpp
    */
   fims::Model<Type>* inst = fims::Model<Type>::getInstance();
-
+ 
   DATA_VECTOR(y);
   PARAMETER_VECTOR(p);
   PARAMETER(log_sd)
@@ -22,6 +22,7 @@ Type objective_function<Type>::operator()(){
   inst->mean = p;
   inst -> y = y;
   inst -> logsd = log_sd;
+  inst -> of = this; 
   /*
    *   create Type nll and assign value to the return of the
    *   evaluate() function defined in test_dlnorm_distribution.hpp

@@ -28,6 +28,8 @@
 
       // Initiate pointer to link .cpp to .hpp
       static Model<T>* instance;
+      
+      ::objective_function<T> *of;
 
       /** @brief Constructor.
        */
@@ -61,11 +63,15 @@
 
         nll_fleet_index.expected_index.resize(n);
         nll_fleet_index.expected_index = mean;
-        
+        Vector temp;
+        temp.resize(n);
         for(int i =0; i < n; i++){
-          nll_fleet_index.observed_index_data->at(i) = y[i];
+          nll_fleet_index.observed_index_data->set(i,y[i]);
+          temp[i] = nll_fleet_index.observed_index_data->at(i);
           nll = nll_fleet_index.evaluate();
         }
+        REPORT_F(mean, of);
+        REPORT_F(temp, of);
 
         return nll;
       }
