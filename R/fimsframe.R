@@ -22,6 +22,7 @@ setClass(
   Class = "FIMSFrameAge",
   slots = c(
     ages = "numeric",
+    nages = "numeric",
     weightatage = "data.frame"
   ),
   contains = "FIMSFrame"
@@ -55,6 +56,9 @@ setMethod("nyrs", "FIMSFrame", function(x) x@nyrs)
 # additional accessors for FIMSFrameAge
 setGeneric("ages", function(x) standardGeneric("ages"))
 setMethod("ages", "FIMSFrameAge", function(x) x@ages)
+
+setGeneric("nages", function(x) standardGeneric("nages"))
+setMethod("nages", "FIMSFrameAge", function(x) x@nages)
 
 setGeneric("weightatage", function(x) standardGeneric("weightatage"))
 setMethod("weightatage", "FIMSFrameAge", function(x) x@weightatage)
@@ -270,9 +274,8 @@ FIMSFrameAge <- function(data) {
   nfleets <- length(fleets)
   #Make empty NA data frames in the format needed to pass to FIMS
   #Get the range of ages displayed in the data to use to specify population simulation range
-  #with one extra year added to act as a plus group
-  nages <- max(data[["age"]], na.rm = TRUE)
-  ages <- 0:nages
+  ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
+  nages <- length(ages)
   weightatage <- dplyr::filter(
     data,
     .data[["type"]] == "weight-at-age"
@@ -282,6 +285,7 @@ FIMSFrameAge <- function(data) {
     fleets = fleets,
     nyrs = nyrs,
     ages = ages,
+    nages = nages,
     weightatage = weightatage
   )
   return(out)
