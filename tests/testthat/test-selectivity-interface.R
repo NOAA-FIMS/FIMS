@@ -18,7 +18,7 @@ test_that("Selectivity input settings work as expected", {
   expect_true(selectivity1$median$is_random_effect)
   expect_true(selectivity1$median$estimated)
   expect_equal(selectivity1$slope$value, 0.2)
-  # expect_equal(selectivity1$evaluate(10.0), 0.5)
+  expect_equal(selectivity1$evaluate(10.0), 0.5)
 
 
   # Create selectivity2
@@ -36,5 +36,7 @@ test_that("Selectivity input settings work as expected", {
   expect_equal(selectivity3$get_id(), 3)
   expect_equal(selectivity3$median_asc$value, 10.5)
   expect_equal(selectivity3$slope_asc$value, 0.2)
-  # expect_equal(selectivity3$evaluate(34.5), 0.2716494)
+  # R code that generates true value for the test
+  # 1.0/(1.0+exp(-(34.5-10.5)*0.2)) * (1.0 - 1.0/(1.0+exp(-(34.5-15)*0.05))) = 0.2716494
+  expect_equal(selectivity3$evaluate(34.5), 0.2716494, tolerance = 0.0000001)
 })
