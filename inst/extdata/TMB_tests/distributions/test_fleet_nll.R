@@ -18,7 +18,7 @@ project_path <- getwd()
 
 
 # compile test .cpp files from inst/extdata/TMB_tests/distributions
-TMB::compile(paste0(path, "/test_fleet_index_nll.cpp"), flags = "-O1 -g -DTMB_MODEL", DLLFLAGS="")
+#TMB::compile(paste0(path, "/test_fleet_index_nll.cpp"), flags = "-O1 -g -DTMB_MODEL", DLLFLAGS="")
 TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MODEL", DLLFLAGS="")
 
 #test_that("fleet index nll unit test", {
@@ -28,7 +28,7 @@ TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MO
 
   # # dmultinom unit test
   # # load test
-  dyn.load(dynlib(paste0(path, "/test_fleet_index_nll")))
+  #dyn.load(dynlib(paste0(path, "/test_fleet_index_nll")))
 
   set.seed(123)
   #Simulate new data with R
@@ -44,11 +44,9 @@ TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MO
   #                DLL = "test_fleet_index_nll")
   #Compare R nll to TMB nll
   #expect_equal(nll, mod$fn())
-
-  dyn.unload(dynlib(paste0(path, "/test_fleet_index_nll")))
-  
-  file.remove(paste0(path, "/", dynlib("test_fleet_index_nll")))
-  file.remove( paste0(path, "/test_fleet_index_nll.o"))
+  #dyn.unload(dynlib(paste0(path, "/test_fleet_index_nll")))    
+  #file.remove(paste0(path, "/", dynlib("test_fleet_index_nll")))
+  #file.remove(paste0(path, "/test_fleet_index_nll.o"))
 
 #})
 
@@ -77,6 +75,6 @@ TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MO
 
   dyn.unload(dynlib(file.path(path, "test_fleet_acomp_nll")))
   file.remove(file.path(path, dynlib("test_fleet_acomp_nll")))
-  file.remove( file.path(path, "test_fleet_acomp_nll.o"))
+  file.remove(file.path(path, "test_fleet_acomp_nll.o"))
 
 #})

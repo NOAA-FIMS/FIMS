@@ -58,9 +58,8 @@ public:
       Rcout << "Now you are resetting age composition likelihood with age "
                "composition likelihood ID of "
             << agecomp_likelihood_id << std::endl;
-
-      this->agecomp_likelihood_id = agecomp_likelihood_id;
     }
+      this->agecomp_likelihood_id = agecomp_likelihood_id;
   }
 
   /**
@@ -98,9 +97,9 @@ public:
       Rcout << "Now you are resetting observed age composition data with "
                "observed age composition ID of "
             << observed_agecomp_data_id << std::endl;
-
-      this->observed_agecomp_data_id = observed_agecomp_data_id;
     }
+      this->observed_agecomp_data_id = observed_agecomp_data_id;
+    
   }
 
   /**

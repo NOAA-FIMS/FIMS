@@ -38,6 +38,14 @@ struct ModelTraits {
       EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
 };
 
+//define REPORT, ADREPORT, and SIMULATE
+#define REPORT_F(name,F)     \
+  if(isDouble<T>::value && F->current_parallel_region<0) { \
+    Rf_defineVar(Rf_install(#name),     \
+              PROTECT(asSEXP(name)),F->report);   \
+    UNPROTECT(1);      \
+  }
+
 #endif /* TMB_MODEL */
 
 #endif /* FIMS_INTERFACE_HPP */
