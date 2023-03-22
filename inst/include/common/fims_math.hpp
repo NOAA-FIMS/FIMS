@@ -63,6 +63,11 @@ inline const T exp(const T &x) {
   return exp(x);
 }
 
+template <>
+inline const double exp(const double &x) {
+  return std::exp(x);
+}
+
 /**
  * @brief The natural log function (base e)
  * The code cannot be tested using the compilation flag
@@ -74,6 +79,11 @@ inline const T exp(const T &x) {
 template <class T>
 inline const T log(const T &x) {
   return log(x);
+}
+
+template <>
+inline const double log(const double &x) {
+  return std::log(x);
 }
 
 #endif
@@ -90,10 +100,6 @@ inline const T log(const T &x) {
  */
 template <class T>
 inline const T logistic(const T &median, const T &slope, const T &x) {
-  Rcout << "median =" << median << std::endl;
-  Rcout << "x =" << x << std::endl;
-  Rcout << "slope =" << slope << std::endl;
-  Rcout << "exp(-1.0 * slope * (x - median))" << exp(-1.0 * slope * (x - median)) << std::endl;
   return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
 }
 
