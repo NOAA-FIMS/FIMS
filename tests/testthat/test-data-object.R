@@ -39,12 +39,12 @@ test_that("Can add index data to model", {
 test_that("Can add agecomp data to model", {
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
-  agecompdat <- vector(mode = "list", length = nfleets)
+  agecompdat <- vector(mode = "list", length = nagecomp)
   names(agecompdat) <- fleet_names_agecomp
 
-  for (fleet_f in 1:nfleets) {
-    agecompdat[[fleet_names[fleet_f]]] <- new(fims$AgeComp, nyears, nages)
-    expect_silent(agecompdat[[fleet_names[fleet_f]]]$age_comp_data <-
-      m_agecomp(age_frame, fleet_names[fleet_f]))
+  for (fleet_f in 1:nagecomp) {
+    agecompdat[[fleet_names_agecomp[fleet_f]]] <- new(fims$AgeComp, nyears, nages)
+    expect_silent(agecompdat[[fleet_names_agecomp[fleet_f]]]$age_comp_data <-
+      m_agecomp(age_frame, fleet_names_agecomp[fleet_f]))
   }
 })

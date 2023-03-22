@@ -100,7 +100,7 @@ setMethod("m_index", "FIMSFrameAge",
     dplyr::filter(
       .data = x@data,
       type == "index",
-      fleet_name == name
+      name == fleet_name
     ) %>%
     dplyr::pull(value)
   }
@@ -114,7 +114,7 @@ setMethod("m_agecomp", "FIMSFrameAge",
     dplyr::filter(
       .data = x@data,
       type == "age",
-      fleet_name == name
+      name == fleet_name
     ) %>%
     dplyr::pull(value)
   }
