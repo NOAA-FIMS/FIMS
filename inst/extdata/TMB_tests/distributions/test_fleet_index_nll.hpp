@@ -64,7 +64,7 @@
         
         for(int i =0; i < n; i++){
           nll_fleet_index.observed_index_data->at(i) = y[i];
-          nll -= nll_fleet_index.evaluate();
+          nll = nll_fleet_index.evaluate();
         }
 
         return nll;

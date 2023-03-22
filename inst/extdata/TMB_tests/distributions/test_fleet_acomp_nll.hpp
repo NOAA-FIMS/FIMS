@@ -78,7 +78,7 @@
         REPORT_F(obs, of);
         REPORT_F(p_set, of);
         REPORT_F(n, of);
-        nll -= nll_fac.evaluate();
+        nll = nll_fac.evaluate();
         return nll;
       }
     };

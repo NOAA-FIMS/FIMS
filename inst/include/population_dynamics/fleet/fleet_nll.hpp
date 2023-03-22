@@ -18,6 +18,7 @@
 #include "../../distributions/distributions.hpp"
 #include "fleet.hpp"
 #include "../../common/fims_math.hpp"
+#include "../../interface/interface.hpp"
 #include <numeric>
 
 namespace fims {
@@ -82,7 +83,7 @@ struct FleetAgeCompNLL : public Fleet<Type> {
 
       fims::Dmultinom<Type> dmultinom;
       size_t dims = this->observed_agecomp_data->get_imax()*this->observed_agecomp_data->get_jmax();
-      if(dims != this->age_composition.size()){
+      if(dims != this->catch_numbers_at_age.size()){
        FIMS_LOG << "Error: observed age comp is of size " <<  dims <<
        " and expected is of size " << this->age_composition.size() << std::endl;
       } else{
@@ -98,7 +99,6 @@ struct FleetAgeCompNLL : public Fleet<Type> {
       for (size_t a = 0; a < this->nages; a++) {
         size_t index_ya = y*this->nages + a;
         sum+= this->catch_numbers_at_age[index_ya];
-        std::cout << sum << std::endl;
       }
         for (size_t a = 0; a < this->nages; a++) {
           size_t index_ya = y*this->nages + a;

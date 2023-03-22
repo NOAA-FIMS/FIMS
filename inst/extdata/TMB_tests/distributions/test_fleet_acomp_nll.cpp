@@ -17,16 +17,14 @@ Type objective_function<Type>::operator()(){
   /*   
    * access and assign members of Model class using inst pointer
    */
-  inst -> of = this;
+  inst -> of = this; 
   inst -> x = x;
   inst -> p = p;
-   
   /*
    *   create Type nll and assign value to the return of the 
    *   evaluate() function defined in test_fleet_acomp_nll.hpp
    */ 
-  Type nll = inst -> evaluate();
-
+  Type nll = inst -> evaluate(); 
 
   return nll;
 }
