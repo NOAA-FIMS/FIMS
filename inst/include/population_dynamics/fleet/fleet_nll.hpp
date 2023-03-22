@@ -98,6 +98,7 @@ struct FleetAgeCompNLL : public Fleet<Type> {
       for (size_t a = 0; a < this->nages; a++) {
         size_t index_ya = y*this->nages + a;
         sum+= this->catch_numbers_at_age[index_ya];
+        std::cout << sum << std::endl;
       }
         for (size_t a = 0; a < this->nages; a++) {
           size_t index_ya = y*this->nages + a;
