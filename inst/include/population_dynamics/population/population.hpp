@@ -37,7 +37,7 @@
 #include "../maturity/maturity.hpp"
 #include "../recruitment/recruitment.hpp"
 //#include "subpopulation.hpp"
-#include "../../common/information.hpp"
+//#include "../../common/information.hpp"
 #include "../../interface/interface.hpp"
 
 namespace fims {
@@ -611,7 +611,7 @@ struct Population : public FIMSObject<Type> {
           {
             FIMS_LOG << index_ya << std::endl;
           CalculateCatchNumbersAA(index_ya, y, a);
-  
+
           FIMS_LOG << index_ya << std::endl;
           CalculateCatchWeightAA(y, a);
             CalculateCatch(y, a);
