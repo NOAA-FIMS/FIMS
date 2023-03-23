@@ -61,7 +61,7 @@ struct Population : public FIMSObject<Type> {
   size_t nages;         /*!< total number of ages in the population*/
   size_t nfleets;       /*!< total number of fleets in the fishery*/
   // constants
-  const double proportion_female =
+  Type proportion_female =
       0.5; /*!< Sex proportion fixed at 50/50 for M1*/
 
   // parameters are estimated; after initialize in create_model, push_back to
