@@ -68,15 +68,6 @@ inline const double exp(const double &x) {
   return std::exp(x);
 }
 
-template <>
-inline const double exp(const double &x) {
-  return std::exp(x);
-}
-
-template <>
-inline const double exp(const double &x) {
-  return std::exp(x);
-}
 /**
  * @brief The natural log function (base e)
  * The code cannot be tested using the compilation flag
