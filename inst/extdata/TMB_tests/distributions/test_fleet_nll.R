@@ -21,7 +21,7 @@ project_path <- getwd()
 TMB::compile(paste0(path, "/test_fleet_index_nll.cpp"), flags = "-O1 -g -DTMB_MODEL", DLLFLAGS="")
 TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MODEL", DLLFLAGS="")
 
-#test_that("fleet index nll unit test", {
+test_that("fleet index nll unit test", {
 
   # setwd(project_path)
   # on.exit(setwd(old_wd), add = TRUE)
@@ -48,7 +48,7 @@ TMB::compile(paste0(path, "/test_fleet_acomp_nll.cpp"), flags = "-O1 -g -DTMB_MO
   file.remove(paste0(path, "/", dynlib("test_fleet_index_nll")))
   file.remove(paste0(path, "/test_fleet_index_nll.o"))
 
-#})
+})
 
 test_that("fleet acomp nll unit test", {
 
