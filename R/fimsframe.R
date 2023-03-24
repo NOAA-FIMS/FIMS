@@ -64,28 +64,20 @@ setGeneric("weightatage", function(x) standardGeneric("weightatage"))
 setMethod("weightatage", "FIMSFrameAge", function(x) x@weightatage)
 
 setGeneric("m_weightatage", function(x) standardGeneric("m_weightatage"))
-setMethod("m_weightatage", "FIMSFrameAge", 
+setMethod("m_weightatage", "FIMSFrameAge",
   function(x) {
     dplyr::filter(
       .data = as.data.frame(x@data),
-      type == "weight-at-age",
-      grepl(datestart[1], datestart)
+      type == "weight-at-age"
     ) %>%
-    dplyr::pull(value)
+    dplyr::group_by(age) %>%
+    dplyr::summarize(mean_value = mean(value)) %>%
+    dplyr::pull(mean_value)
   }
 )
 
 setGeneric("m_ages", function(x) standardGeneric("m_ages"))
-setMethod("m_ages", "FIMSFrameAge", 
-  function(x) {
-    dplyr::filter(
-      .data = as.data.frame(x@data),
-      type == "weight-at-age",
-      grepl(datestart[1], datestart)
-    ) %>%
-    dplyr::pull(age)
-  }
-)
+setMethod("m_ages", "FIMSFrameAge", function(x) {x@ages})
 
 # Note: don't include setters, because for right now, we don't want users to be
 # setting ages, fleets, etc. However, we could allow it in the future, if there 
