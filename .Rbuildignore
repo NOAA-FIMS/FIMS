@@ -3,7 +3,7 @@
 ^\.github$
 CMakeLists.txt
 tests/gtest
-tests/milestone1_test_cases.md
+tests/test_plan
 build
 ^codecov\.yml$
 .vscode

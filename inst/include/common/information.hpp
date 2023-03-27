@@ -42,7 +42,7 @@ class Information {
       random_effects_parameters; /**< list of all random effects parameters >*/
   std::vector<T*>
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
-  std::vector<T> ages;          /**< ages in model >*/
+  std::vector<double> ages;     /**< ages in model >*/
 
   // data objects
   std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >

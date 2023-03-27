@@ -67,6 +67,7 @@ struct Fleet : public FIMSObject<Type> {
   std::vector<Type> expected_catch; /*!<model expected total catch*/
   std::vector<Type> expected_index; /*!<model expected index of abundance*/
   std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
+  std::vector<Type> catch_weight_at_age; /*!<model expected weight at age*/
   /**
    * @brief Constructor.
    */
@@ -87,6 +88,7 @@ struct Fleet : public FIMSObject<Type> {
     this->nages = nages;
 
     catch_at_age.resize(nyears * nages);
+    catch_weight_at_age.resize(nyears * nages);
     catch_index.resize(nyears);  // assume index is for all ages.
     age_composition.resize(nyears * nages);
     expected_catch.resize(nyears);

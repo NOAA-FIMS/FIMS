@@ -7,8 +7,6 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, CalculateMortality_works)
     {
-        
-
         for (int year = 0; year < population.nyears; year++)
         {
             for (int age = 0; age < population.nages; age++)
@@ -17,12 +15,11 @@ namespace
                 population.CalculateMortality(index_ya, year, age);
 
                 std::vector<double> mortality_F(nyears * nages, 0);
-
                 for (int fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
                 {
                     size_t index_yf = year * population.nfleets + fleet_index;
-                    mortality_F[index_ya] += population.fleets[fleet_index]->Fmort[index_yf] *
-                                             population.fleets[fleet_index]->selectivity->evaluate(age);
+                    mortality_F[index_ya] += population.fleets[fleet_index]->Fmort[year] *
+                                             population.fleets[fleet_index]->selectivity->evaluate(population.ages[age]);
                 }
                 EXPECT_EQ(population.mortality_F[index_ya], mortality_F[index_ya]);
 
@@ -55,7 +52,6 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, CalculateUnfishedNumbersAAandUnfishedSpawningBiomass_works)
     {
-
         std::vector<double> test_unfished_numbers_at_age((nyears + 1) * nages, 0);
         std::vector<double> test_unfished_spawning_biomass(nyears+1, 0);
 
@@ -63,17 +59,16 @@ namespace
         {
             for (int age = 0; age < population.nages; age++)
             {
-                
                 int index_ya = year * population.nages + age;
  
                 if (age == 0)
-                {
+                {            
                     population.unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
-
                     test_unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
                 }
 
                 if (year == 0 && age > 0){
+                    
                     // values from FIMS
                     // Bai: change CalculateUnfishedNumbersAA(index_ya, a); in 
                     // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1);
@@ -85,6 +80,7 @@ namespace
                     test_unfished_numbers_at_age[index_ya] = 
                         test_unfished_numbers_at_age[index_ya-1] * 
                         fims::exp(-fims::exp(population.log_M[index_ya-1]));
+
                 }
 
                 if (year>0 && age > 0)
@@ -116,12 +112,14 @@ namespace
                         fims::exp(-fims::exp(population.log_M[index_ya2 + 1]));
 
                 }
+
                 population.CalculateMaturityAA(index_ya, age);
                 population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
+                
                 test_unfished_spawning_biomass[year] += population.proportion_mature_at_age[index_ya] *
                                                         population.proportion_female *
                                                         test_unfished_numbers_at_age[index_ya] *
-                                                        population.weight_at_age[age];
+                                                        population.growth->evaluate(population.ages[age]);
 
 
                 EXPECT_EQ(population.unfished_numbers_at_age[index_ya], test_unfished_numbers_at_age[index_ya]);
