@@ -24,7 +24,7 @@
 namespace fims {
 
 /**
- * Model base
+ * @brief Model class. Evaluates the negative log-likelihood function.
  */
 template <typename T>
 class Model {  // may need singleton
