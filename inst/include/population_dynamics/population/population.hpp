@@ -310,7 +310,7 @@ struct Population : public FIMSObject<Type> {
 
       this->expected_catch[index_yf] += this->catch_weight_at_age[index_yaf];
 
-      fleets[fleet_]->expected_catch[index_yf] +=
+      fleets[fleet_]->expected_catch[year] +=
           this->catch_weight_at_age[index_yaf];
     }
   }
