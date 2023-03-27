@@ -24,7 +24,7 @@
 namespace fims {
 
 /**
- * @brief Model class. Evaluates the negative log-likelihood function.
+ * @brief Model class. FIMS objective function.
  */
 template <typename T>
 class Model {  // may need singleton
@@ -33,7 +33,7 @@ class Model {  // may need singleton
       fims_model; /*!< Create a shared fims_model as a pointer to Model*/
   std::shared_ptr<Information<T> >
       fims_information; /*!< Create a shared fims_information as a pointer to Information*/
- 
+
 
     #ifdef TMB_MODEL
         ::objective_function<T> *of;
@@ -50,12 +50,14 @@ class Model {  // may need singleton
     static std::shared_ptr<Model<T> > GetInstance() {
     if (Model<T>::fims_model == nullptr) {
         Model<T>::fims_model = std::make_shared<fims::Model<T> >();
-        Model<T>::fims_model->fims_information = fims::Information<T>::GetInstance();  
+        Model<T>::fims_model->fims_information = fims::Information<T>::GetInstance();
     }
     return Model<T>::fims_model;
     }
-  
 
+  /**
+   * @brief Evaluate. Calculates the joint negative log-likelihood function.
+   */
   const T Evaluate() {
     typename fims::Information<T>::population_iterator it;
     for (it = this->fims_information->populations.begin();
@@ -67,9 +69,9 @@ class Model {  // may need singleton
        #endif
       (*it).second->Prepare();
       (*it).second->Evaluate();
-      
+
     }
-    
+
     // nll = negative-log-likelihood (the objective function)
     T nll = 0.0;
     //nll will loop over fleets (Fleet module does not have evaluate function yet)
