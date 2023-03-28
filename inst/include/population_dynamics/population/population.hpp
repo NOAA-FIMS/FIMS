@@ -20,10 +20,6 @@
 #include "../maturity/maturity.hpp"
 #include "../recruitment/recruitment.hpp"
 #include "subpopulation.hpp"
-#include "../recruitment/recruitment.hpp"
-#include "../maturity/maturity.hpp"
-#include "../growth/growth.hpp"
-#include "../fleet/fleet.hpp"
 
 namespace fims {
 /*TODO:
@@ -37,28 +33,28 @@ directly?)
  */
 template <typename Type>
 struct Population : public FIMSObject<Type> {
-    
-  using ParameterVector = typename ModelTraits<Type>::ParameterVector; /*!< the vector of population parameters*/
+  using ParameterVector =
+      typename ModelTraits<Type>::ParameterVector; /*!< the vector of population
+                                                      parameters*/
   static uint32_t id_g; /*!< reference id for population object*/
   size_t nyears;        /*!< total number of years in the fishery*/
   size_t nseasons;      /*!< total number of seasons in the fishery*/
   size_t nages;         /*!< total number of ages in the population*/
   size_t nfleets;       /*!< total number of fleets in the fishery*/
   // constants
-  Type proportion_female =
-      0.5; /*!< Sex proportion fixed at 50/50 for M1*/
+  Type proportion_female = 0.5; /*!< Sex proportion fixed at 50/50 for M1*/
 
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
   std::vector<Type> log_init_naa; /*!< estimated parameter: log numbers at age*/
-  ParameterVector log_M;   /*!< estimated parameter: log Natural Mortality*/
+  ParameterVector log_M; /*!< estimated parameter: log Natural Mortality*/
 
   // Transformed values
   std::vector<Type> init_naa; /*!< transformed parameter: numbers at age*/
-  std::vector<Type> M;   /*!< transformed parameter: Natural Mortality*/
+  std::vector<Type> M;        /*!< transformed parameter: Natural Mortality*/
 
-  std::vector<double> ages;        /*!< vector of the ages for referencing*/
-  std::vector<double> years;     /*!< vector of years for referencing*/
+  std::vector<double> ages;    /*!< vector of the ages for referencing*/
+  std::vector<double> years;   /*!< vector of years for referencing*/
   ParameterVector mortality_F; /*!< vector of fishing mortality summed across
                                     fleet by year and age*/
   std::vector<Type>
@@ -213,7 +209,8 @@ struct Population : public FIMSObject<Type> {
    * @param index_ya2 dimension folded index for year-1 and age-1
    * @param age age index
    */
-  inline void CalculateNumbersAA(size_t index_ya, size_t index_ya2, size_t age) {
+  inline void CalculateNumbersAA(size_t index_ya, size_t index_ya2,
+                                 size_t age) {
     // using Z from previous age/year
     this->numbers_at_age[index_ya] =
         this->numbers_at_age[index_ya2] * (exp(-this->mortality_Z[index_ya2]));
@@ -234,7 +231,8 @@ struct Population : public FIMSObject<Type> {
    * @param index_ya2 dimension folded index for year-1 and age-1
    * @param age age index
    */
-  inline void CalculateUnfishedNumbersAA(size_t index_ya, size_t index_ya2, size_t age) {
+  inline void CalculateUnfishedNumbersAA(size_t index_ya, size_t index_ya2,
+                                         size_t age) {
     // using M from previous age/year
     this->unfished_numbers_at_age[index_ya] =
         this->unfished_numbers_at_age[index_ya2] * (exp(-this->M[index_ya2]));
@@ -299,7 +297,8 @@ struct Population : public FIMSObject<Type> {
    * @param year the year of unfished spawning biomass to add
    * @param age the age of unfished spawning biomass to add
    */
-  void CalculateUnfishedSpawningBiomass(size_t index_ya, size_t year, size_t age) {
+  void CalculateUnfishedSpawningBiomass(size_t index_ya, size_t year,
+                                        size_t age) {
     this->unfished_spawning_biomass[year] +=
         this->proportion_female * this->unfished_numbers_at_age[index_ya] *
         this->proportion_mature_at_age[index_ya] *

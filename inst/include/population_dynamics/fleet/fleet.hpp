@@ -26,7 +26,9 @@ struct Fleet : public FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
-  using ParameterVector = typename ModelTraits<Type>::ParameterVector; /*!< vector of fleet parameters */
+  using ParameterVector =
+      typename ModelTraits<Type>::ParameterVector; /*!< vector of fleet
+                                                      parameters */
 
   int index_likelihood_id = -999; /*!<id of index likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
@@ -40,20 +42,21 @@ struct Fleet : public FIMSObject<Type> {
   int selectivity_id = -999; /*!< id of selectivity component*/
   std::shared_ptr<fims::SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
-  
+
   int observed_index_data_id = -999; /*!< id of index data */
-  std::shared_ptr<fims::DataObject<Type>> observed_index_data; /*!< observed index data*/
+  std::shared_ptr<fims::DataObject<Type>>
+      observed_index_data; /*!< observed index data*/
 
   int observed_agecomp_data_id = -999; /*!< id of age comp data */
-  std::shared_ptr<fims::DataObject<Type>> 
-  observed_agecomp_data; /*!< observed agecomp data*/
+  std::shared_ptr<fims::DataObject<Type>>
+      observed_agecomp_data; /*!< observed agecomp data*/
 
   // Mortality and catchability
   ParameterVector log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  ParameterVector
-      log_q; /*!< estimated parameter: catchability of the fleet */
+  ParameterVector log_q; /*!< estimated parameter: catchability of the fleet */
 
-  Type log_obs_error; /*!< estimated parameter: observation error associated with index */
+  Type log_obs_error; /*!< estimated parameter: observation error associated
+                         with index */
   std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
   std::vector<Type>
       q; /*!< transofrmed parameter: the catchability of the fleet */
@@ -67,7 +70,7 @@ struct Fleet : public FIMSObject<Type> {
   std::vector<Type> expected_catch; /*!<model expected total catch*/
   std::vector<Type> expected_index; /*!<model expected index of abundance*/
   std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
-  std::vector<Type> catch_weight_at_age; /*!<model expected weight at age*/
+  std::vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
   /**
    * @brief Constructor.
    */
@@ -114,7 +117,6 @@ struct Fleet : public FIMSObject<Type> {
       this->q[year] = fims::exp(this->log_q[year]);
     }
   }
-
 };
 
 // default id of the singleton fleet class

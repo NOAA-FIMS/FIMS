@@ -34,8 +34,8 @@ namespace fims {
  */
 template <typename T>
 struct ModelTraits {
-  typedef double real_t;                            /**< The real type */
-  typedef double variable_t;                        /**< The variable type */
+  typedef double real_t;                           /**< The real type */
+  typedef double variable_t;                       /**< The variable type */
   typedef typename std::vector<double> DataVector; /**< The data vector type */
   typedef typename std::vector<double> ParameterVector; /**< The variable vector
    type */
