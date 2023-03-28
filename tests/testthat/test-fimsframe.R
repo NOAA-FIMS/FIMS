@@ -32,11 +32,9 @@ test_that("Accessors work as expected in FIMSFrame", {
 
   expect_type(nyrs(fims_frame), "integer")
   expect_length(nyrs(fims_frame), 1)
-
 })
 
 test_that("Accessors work as expected in FIMSFrameAge", {
-
   expect_s3_class(get_data(age_frame), "data.frame")
 
   expect_vector(fleets(age_frame), ptype = numeric())
@@ -54,16 +52,14 @@ test_that("Accessors work as expected in FIMSFrameAge", {
   expect_vector(m_weightatage(age_frame), ptype = numeric())
 
   expect_vector(m_ages(age_frame), ptype = integer())
-
 })
 
 test_that("Show method works as expected", {
   expect_output(show(fims_frame))
 
   empty_obj <- fims_frame
-  empty_obj@data <- data.frame(matrix(nrow=0, ncol = 0))
+  empty_obj@data <- data.frame(matrix(nrow = 0, ncol = 0))
   expect_null(show(empty_obj))
-
 })
 
 
