@@ -24,5 +24,4 @@ test_that("Maturity input settings work as expected", {
   # Create selectivity2
   maturity2 <- new(fims$LogisticMaturity)
   expect_equal((maturity2$get_id()), 2)
-
 })

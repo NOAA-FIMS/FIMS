@@ -12,9 +12,11 @@
 
 setClass(
   Class = "FIMSFrame",
-  slots = c(data = "data.frame", # can use c( ) or list here.
-            fleets = "numeric", 
-            nyrs = "numeric")
+  slots = c(
+    data = "data.frame", # can use c( ) or list here.
+    fleets = "numeric",
+    nyrs = "numeric"
+  )
 )
 
 # leaving FIMSFrameAge with just age related slots.
@@ -60,68 +62,73 @@ setGeneric("weightatage", function(x) standardGeneric("weightatage"))
 setMethod("weightatage", "FIMSFrameAge", function(x) x@weightatage)
 
 setGeneric("m_weightatage", function(x) standardGeneric("m_weightatage"))
-setMethod("m_weightatage", "FIMSFrameAge", 
+setMethod(
+  "m_weightatage", "FIMSFrameAge",
   function(x) {
     dplyr::filter(
       .data = as.data.frame(x@data),
       type == "weight-at-age",
       grepl(datestart[1], datestart)
     ) %>%
-    dplyr::pull(value)
+      dplyr::pull(value)
   }
 )
 
 setGeneric("m_ages", function(x) standardGeneric("m_ages"))
-setMethod("m_ages", "FIMSFrameAge", 
+setMethod(
+  "m_ages", "FIMSFrameAge",
   function(x) {
     dplyr::filter(
       .data = as.data.frame(x@data),
       type == "weight-at-age",
       grepl(datestart[1], datestart)
     ) %>%
-    dplyr::pull(age)
+      dplyr::pull(age)
   }
 )
 
 setGeneric("m_landings", function(x) standardGeneric("m_landings"))
-setMethod("m_landings", "FIMSFrameAge", 
+setMethod(
+  "m_landings", "FIMSFrameAge",
   function(x) {
     dplyr::filter(
       .data = x@data,
       type == "landings"
     ) %>%
-    dplyr::pull(value)
+      dplyr::pull(value)
   }
 )
 
 setGeneric("m_index", function(x, fleet_name) standardGeneric("m_index"))
-setMethod("m_index", "FIMSFrameAge", 
+setMethod(
+  "m_index", "FIMSFrameAge",
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
       type == "index",
       name == fleet_name
     ) %>%
-    dplyr::pull(value)
+      dplyr::pull(value)
   }
 )
 
 # Should we add name as an argument here?
 setGeneric("m_agecomp", function(x, fleet_name) standardGeneric("m_agecomp"))
 
-setMethod("m_agecomp", "FIMSFrameAge", 
+setMethod(
+  "m_agecomp", "FIMSFrameAge",
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
       type == "age",
       name == fleet_name
     ) %>%
-    dplyr::pull(value)
+      dplyr::pull(value)
   }
 )
 
 # Note: don't include setters, because for right now, we don't want users to be
-# setting ages, fleets, etc. However, we could allow it in the future, if there 
+# setting ages, fleets, etc. However, we could allow it in the future, if there
 # is away to update the object based on changing the fleets?
 
 # setMethod: initialize ----
@@ -272,42 +279,42 @@ setValidity(
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [showClass()] to see all available slots.
 FIMSFrame <- function(data) {
-  #Get the earliest and latest year of data and use to calculate n years for population simulation
-  start_yr <- as.numeric(strsplit(min(data[["datestart"]],na.rm=TRUE),"-")[[1]][1])
-  end_yr <- as.numeric(strsplit(max(data[["dateend"]],na.rm=TRUE),"-")[[1]][1])
-  nyrs <- end_yr-start_yr+1
+  # Get the earliest and latest year of data and use to calculate n years for population simulation
+  start_yr <- as.numeric(strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1])
+  end_yr <- as.numeric(strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1])
+  nyrs <- end_yr - start_yr + 1
   years <- start_yr:end_yr
 
-  #Get the fleets represented in the data
-  fleets <- unique(data[["name"]])[grep("fleet",unique(data[["name"]]))]
-  fleets <- as.numeric(unlist(lapply(strsplit(fleets,"fleet"),function(x)x[2])))
+  # Get the fleets represented in the data
+  fleets <- unique(data[["name"]])[grep("fleet", unique(data[["name"]]))]
+  fleets <- as.numeric(unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2])))
   nfleets <- length(fleets)
-  #Make empty NA data frames in the format needed to pass to FIMS
-  
-  #Fill the empty data frames with data extracted from the data file
+  # Make empty NA data frames in the format needed to pass to FIMS
+
+  # Fill the empty data frames with data extracted from the data file
   out <- new("FIMSFrame",
-             data = data,
-             fleets = fleets,
-             nyrs = nyrs
-             )
+    data = data,
+    fleets = fleets,
+    nyrs = nyrs
+  )
   return(out)
 }
 #' FIMSFrameAge
 #' @export
 #' @rdname FIMSFrame
 FIMSFrameAge <- function(data) {
-  #Get the earliest and latest year of data and use to calculate n years for population simulation
-  start_yr <- as.numeric(strsplit(min(data[["datestart"]],na.rm=TRUE),"-")[[1]][1])
-  end_yr <- as.numeric(strsplit(max(data[["dateend"]],na.rm=TRUE),"-")[[1]][1])
-  nyrs <- end_yr-start_yr+1
+  # Get the earliest and latest year of data and use to calculate n years for population simulation
+  start_yr <- as.numeric(strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1])
+  end_yr <- as.numeric(strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1])
+  nyrs <- end_yr - start_yr + 1
   years <- start_yr:end_yr
-  #Get the fleets represented in the data
-  fleets <- unique(data[["name"]])[grep("fleet",unique(data[["name"]]))]
-  fleets <- as.numeric(unlist(lapply(strsplit(fleets,"fleet"),function(x)x[2])))
+  # Get the fleets represented in the data
+  fleets <- unique(data[["name"]])[grep("fleet", unique(data[["name"]]))]
+  fleets <- as.numeric(unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2])))
   nfleets <- length(fleets)
-  #Make empty NA data frames in the format needed to pass to FIMS
-  #Get the range of ages displayed in the data to use to specify population simulation range
-  #with one extra year added to act as a plus group
+  # Make empty NA data frames in the format needed to pass to FIMS
+  # Get the range of ages displayed in the data to use to specify population simulation range
+  # with one extra year added to act as a plus group
   nages <- max(data[["age"]], na.rm = TRUE)
   ages <- 0:nages
   weightatage <- dplyr::filter(

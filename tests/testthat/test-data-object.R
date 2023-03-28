@@ -31,7 +31,7 @@ test_that("Can add index data to model", {
   for (index_i in 1:nindex) {
     index <- fims$Index
     indexdat[[fleet_names_index[index_i]]] <- new(index, nyears)
-    expect_silent(indexdat[[fleet_names_index[index_i]]] <- 
+    expect_silent(indexdat[[fleet_names_index[index_i]]] <-
       m_index(age_frame, fleet_names_index[index_i]))
   }
 })
