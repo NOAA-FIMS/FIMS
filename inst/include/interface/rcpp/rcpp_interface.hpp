@@ -63,8 +63,8 @@ Rcpp::NumericVector get_fixed_parameters_vector(){
         
         Rcpp::NumericVector p;
 
-        for(int i = 0; i<d0->fixed_effects_parameters.size(); i++){
-            p.push_back(*d0->fixed_effects_parameters[i]);
+        for(int i = 0; i<d0->parameters.size(); i++){
+            p.push_back(*d0->parameters[i]);
         }
 
         return p;
@@ -84,12 +84,24 @@ Rcpp::NumericVector get_random_parameters_vector(){
         return p;
 }
 
+/**
+ * Clears the vector of independent variables.
+ */
+void clear()
+{
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    d0->parameters.clear();
+    d0->random_effects_parameters.clear();
+}
+
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_MODULE(fims)
 {
     Rcpp::function("CreateTMBModel", &CreateTMBModel);
     Rcpp::function("get_fixed", &get_fixed_parameters_vector);
     Rcpp::function("get_random", &get_random_parameters_vector);
+    Rcpp::function("clear", clear);
 
     Rcpp::class_<Parameter>("Parameter")
         .constructor()
