@@ -13,7 +13,7 @@
 setClass(
   Class = "FIMSFrame",
   slots = c(data = "data.frame", # can use c( ) or list here.
-            fleets = "numeric", 
+            fleets = "numeric",
             nyrs = "numeric")
 )
 
@@ -80,7 +80,7 @@ setGeneric("m_ages", function(x) standardGeneric("m_ages"))
 setMethod("m_ages", "FIMSFrameAge", function(x) {x@ages})
 
 # Note: don't include setters, because for right now, we don't want users to be
-# setting ages, fleets, etc. However, we could allow it in the future, if there 
+# setting ages, fleets, etc. However, we could allow it in the future, if there
 # is away to update the object based on changing the fleets?
 
 # setMethod: initialize ----
@@ -234,7 +234,7 @@ FIMSFrame <- function(data) {
   #Get the earliest and latest year of data and use to calculate n years for population simulation
   start_yr <- as.numeric(strsplit(min(data[["datestart"]],na.rm=TRUE),"-")[[1]][1])
   end_yr <- as.numeric(strsplit(max(data[["dateend"]],na.rm=TRUE),"-")[[1]][1])
-  nyrs <- end_yr-start_yr+1
+  nyrs <- as.integer(end_yr-start_yr+1)
   years <- start_yr:end_yr
 
   #Get the fleets represented in the data
@@ -242,7 +242,7 @@ FIMSFrame <- function(data) {
   fleets <- as.numeric(unlist(lapply(strsplit(fleets,"fleet"),function(x)x[2])))
   nfleets <- length(fleets)
   #Make empty NA data frames in the format needed to pass to FIMS
-  
+
   #Fill the empty data frames with data extracted from the data file
   out <- new("FIMSFrame",
              data = data,
@@ -258,7 +258,7 @@ FIMSFrameAge <- function(data) {
   #Get the earliest and latest year of data and use to calculate n years for population simulation
   start_yr <- as.numeric(strsplit(min(data[["datestart"]],na.rm=TRUE),"-")[[1]][1])
   end_yr <- as.numeric(strsplit(max(data[["dateend"]],na.rm=TRUE),"-")[[1]][1])
-  nyrs <- end_yr-start_yr+1
+  nyrs <- as.integer(end_yr-start_yr+1)
   years <- start_yr:end_yr
   #Get the fleets represented in the data
   fleets <- unique(data[["name"]])[grep("fleet",unique(data[["name"]]))]
