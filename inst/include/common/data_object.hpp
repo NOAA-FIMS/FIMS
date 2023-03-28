@@ -107,6 +107,20 @@ struct DataObject : public fims::FIMSObject<Type> {
   }
 
   /**
+   * @brief Set value of element
+   * @param i
+   * @param x
+   * @return void
+   * 
+   */
+  inline void set(size_t i,  Type x){
+    if (i >= this->data.size()) {
+      throw std::overflow_error("DataObject error: index out of bounds");
+    }
+    data[i] = x;
+  }
+
+  /**
    * Retrieve element from 2d data set.
    * @param i 1st dimension of 2d data set
    * @param j 2nd dimension of 2d data set
@@ -129,6 +143,22 @@ struct DataObject : public fims::FIMSObject<Type> {
     }
     return data[i * jmax + j];
   }
+
+  /**
+   * @brief Set value of element
+   * @param i
+   * @param j
+   * @param x
+   * @return void
+   * 
+   */
+  inline void set(size_t i, size_t j, Type x){
+    if ((i * jmax + j) >= this->data.size()) {
+      throw std::overflow_error("DataObject error: index out of bounds");
+    }
+    data[i*jmax + j] = x;
+  }
+
 
   /**
    * Retrieve element from 3d data set.
