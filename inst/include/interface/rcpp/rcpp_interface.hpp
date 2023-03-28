@@ -56,10 +56,40 @@ bool CreateTMBModel()
     return true;
 }
 
+Rcpp::NumericVector get_fixed_parameters_vector(){
+        // base model
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+        
+        Rcpp::NumericVector p;
+
+        for(int i = 0; i<d0->fixed_effects_parameters.size(); i++){
+            p.push_back(*d0->fixed_effects_parameters[i]);
+        }
+
+        return p;
+}
+
+Rcpp::NumericVector get_random_parameters_vector(){
+        // base model
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+        
+        Rcpp::NumericVector p;
+
+        for(int i = 0; i<d0->random_effects_parameters.size(); i++){
+            p.push_back(*d0->random_effects_parameters[i]);
+        }
+
+        return p;
+}
+
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_MODULE(fims)
 {
     Rcpp::function("CreateTMBModel", &CreateTMBModel);
+    Rcpp::function("get_fixed", &get_fixed_parameters_vector);
+    Rcpp::function("get_random", &get_random_parameters_vector);
 
     Rcpp::class_<Parameter>("Parameter")
         .constructor()
@@ -184,6 +214,7 @@ RCPP_MODULE(fims)
         .method("get_id", &DmultinomDistributionsInterface::get_id)
         .field("x", &DmultinomDistributionsInterface::x)
         .field("p", &DmultinomDistributionsInterface::p);
+
 }
 
 #endif /* RCPP_INTERFACE_HPP */
