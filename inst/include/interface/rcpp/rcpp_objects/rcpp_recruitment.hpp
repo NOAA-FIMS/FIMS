@@ -1,4 +1,4 @@
- /*
+/*
  * File:   rcpp_recruitment.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
@@ -61,8 +61,8 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
-  Parameter steep;   /**< steepness or the productivity of the stock*/
-  Parameter rzero;   /**< recruitment at unfished biomass */
+  Parameter steep;             /**< steepness or the productivity of the stock*/
+  Parameter rzero;             /**< recruitment at unfished biomass */
   Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
@@ -107,7 +107,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d0->RegisterParameter(b0->rzero);
       }
     }
-       b0->log_sigma_recruit = this->log_sigma_recruit.value;
+    b0->log_sigma_recruit = this->log_sigma_recruit.value;
     if (this->log_sigma_recruit.estimated) {
       if (this->log_sigma_recruit.is_random_effect) {
         d0->RegisterRandomEffect(b0->log_sigma_recruit);
