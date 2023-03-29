@@ -61,8 +61,9 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
-  Parameter steep; /**< steepness or the productivity of the stock*/
-  Parameter rzero; /**< recruitment at unfished biomass */
+  Parameter steep;             /**< steepness or the productivity of the stock*/
+  Parameter rzero;             /**< recruitment at unfished biomass */
+  Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
@@ -106,6 +107,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d0->RegisterParameter(b0->rzero);
       }
     }
+    b0->log_sigma_recruit = this->log_sigma_recruit.value;
+    if (this->log_sigma_recruit.estimated) {
+      if (this->log_sigma_recruit.is_random_effect) {
+        d0->RegisterRandomEffect(b0->log_sigma_recruit);
+      } else {
+        d0->RegisterParameter(b0->log_sigma_recruit);
+      }
+    }
     // add to Information
     d0->recruitment_models[b0->id] = b0;
 
@@ -134,7 +143,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d1->RegisterParameter(b1->rzero);
       }
     }
-
+    b1->log_sigma_recruit = this->log_sigma_recruit.value;
+    if (this->log_sigma_recruit.estimated) {
+      if (this->log_sigma_recruit.is_random_effect) {
+        d1->RegisterRandomEffect(b1->log_sigma_recruit);
+      } else {
+        d1->RegisterParameter(b1->log_sigma_recruit);
+      }
+    }
     // add to Information
     d1->recruitment_models[b1->id] = b1;
 
@@ -163,7 +179,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d2->RegisterParameter(b2->rzero);
       }
     }
-
+    b2->log_sigma_recruit = this->log_sigma_recruit.value;
+    if (this->log_sigma_recruit.estimated) {
+      if (this->log_sigma_recruit.is_random_effect) {
+        d2->RegisterRandomEffect(b2->log_sigma_recruit);
+      } else {
+        d2->RegisterParameter(b2->log_sigma_recruit);
+      }
+    }
     // add to Information
     d2->recruitment_models[b2->id] = b2;
 
@@ -192,7 +215,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         d3->RegisterParameter(b3->rzero);
       }
     }
-
+    b3->log_sigma_recruit = this->log_sigma_recruit.value;
+    if (this->log_sigma_recruit.estimated) {
+      if (this->log_sigma_recruit.is_random_effect) {
+        d3->RegisterRandomEffect(b3->log_sigma_recruit);
+      } else {
+        d3->RegisterParameter(b3->log_sigma_recruit);
+      }
+    }
     // add to Information
     d3->recruitment_models[b3->id] = b3;
 

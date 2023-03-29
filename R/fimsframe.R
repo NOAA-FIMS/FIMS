@@ -84,6 +84,46 @@ setMethod("m_ages", "FIMSFrameAge", function(x) {
   x@ages
 })
 
+setGeneric("m_landings", function(x) standardGeneric("m_landings"))
+setMethod(
+  "m_landings", "FIMSFrameAge",
+  function(x) {
+    dplyr::filter(
+      .data = x@data,
+      type == "landings"
+    ) %>%
+      dplyr::pull(value)
+  }
+)
+
+setGeneric("m_index", function(x, fleet_name) standardGeneric("m_index"))
+setMethod(
+  "m_index", "FIMSFrameAge",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = x@data,
+      type == "index",
+      name == fleet_name
+    ) %>%
+      dplyr::pull(value)
+  }
+)
+
+# Should we add name as an argument here?
+setGeneric("m_agecomp", function(x, fleet_name) standardGeneric("m_agecomp"))
+
+setMethod(
+  "m_agecomp", "FIMSFrameAge",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = x@data,
+      type == "age",
+      name == fleet_name
+    ) %>%
+      dplyr::pull(value)
+  }
+)
+
 # Note: don't include setters, because for right now, we don't want users to be
 # setting ages, fleets, etc. However, we could allow it in the future, if there
 # is away to update the object based on changing the fleets?

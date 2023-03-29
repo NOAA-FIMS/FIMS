@@ -207,8 +207,8 @@ class Information {
       if (f->selectivity_id != -999) {
         uint32_t sel_id = static_cast<uint32_t>(
             f->selectivity_id);  // cast as unsigned integer
-        selectivity_models_iterator it = this->selectivity_models.find(
-            sel_id);  // if find, set it, otherwise invalid
+        //   selectivity_models_iterator it = this->selectivity_models.find(
+        //     sel_id);  // if find, set it, otherwise invalid
 
         std::cout << "Information: Initializing fleet objects.\n";
         for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
@@ -221,24 +221,24 @@ class Information {
           f->Initialize(nyears, nages);
 
           // set catch data
-          if (f->observed_catch_data_id != -999) {
-            uint32_t catch_id =
-                static_cast<uint32_t>(f->observed_catch_data_id);
-            data_iterator it = this->data_objects.find(catch_id);
-
-            if (it != this->data_objects.end()) {
-              f->observed_catch_data = (*it).second;
-            } else {
-              valid_model = false;
-              // log error
-              FIMS_LOG << "Error: observed catch data not defined for fleet"
-                       << f->id << std::endl;
-            }
-
-          } else {
-            valid_model = false;
-            // log error
-          }
+          // if (f->observed_catch_data_id != -999) {
+          //   uint32_t catch_id =
+          //       static_cast<uint32_t>(f->observed_catch_data_id);
+          //   data_iterator it = this->data_objects.find(catch_id);
+          //
+          //   if (it != this->data_objects.end()) {
+          //     f->observed_catch_data = (*it).second;
+          //   } else {
+          //     valid_model = false;
+          //     // log error
+          //     FIMS_LOG << "Error: observed catch data not defined for fleet"
+          //              << f->id << std::endl;
+          //   }
+          //
+          // } else {
+          //   valid_model = false;
+          //   // log error
+          // }
 
           // set index data
           if (f->observed_index_data_id != -999) {
@@ -323,26 +323,27 @@ class Information {
           }
 
           // set catch likelihood
-          if (f->catch_likelihood_id != -999) {
-            uint32_t catch_like_id = static_cast<uint32_t>(
-                f->catch_likelihood_id);  // cast as unsigned integer
-            distribution_models_iterator it = this->distribution_models.find(
-                catch_like_id);  // if find, set it, otherwise invalid
-
-            if (it != this->distribution_models.end()) {
-              f->catch_likelihood =
-                  (*it).second;  // elements in container held in pair (first is
-                                 // id, second is object - shared pointer to
-                                 // distribution)
-            } else {
-              valid_model = false;
-              // log error
-            }
-
-          } else {
-            valid_model = false;
-            // log error
-          }
+          // if (f->catch_likelihood_id != -999) {
+          //  uint32_t catch_like_id = static_cast<uint32_t>(
+          //      f->catch_likelihood_id);  // cast as unsigned integer
+          //  distribution_models_iterator it = this->distribution_models.find(
+          //      catch_like_id);  // if find, set it, otherwise invalid
+          //
+          //  if (it != this->distribution_models.end()) {
+          //    f->catch_likelihood =
+          //        (*it).second;  // elements in container held in pair (first
+          //        is
+          //                       // id, second is object - shared pointer to
+          //                       // distribution)
+          //  } else {
+          //    valid_model = false;
+          //    // log error
+          //  }
+          //
+          //} else {
+          //  valid_model = false;
+          //  // log error
+          //}
 
           // set agecomp likelihood
           if (f->agecomp_likelihood_id != -999) {
