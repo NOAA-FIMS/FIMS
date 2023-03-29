@@ -11,7 +11,7 @@
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 
-#include "rcpp_objects/rcpp_fishing_mortality.hpp"
+#include "rcpp_objects/rcpp_data.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
@@ -32,22 +32,22 @@ bool CreateTMBModel() {
   }
 
   // base model
-  std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+  std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
       fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
   d0->CreateModel();
 
   // first-order derivative
-  std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+  std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
       fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
   d1->CreateModel();
 
   // second-order derivative
-  std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+  std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
       fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
   d2->CreateModel();
 
   // third-order derivative
-  std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+  std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
       fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
   d3->CreateModel();
 
@@ -87,6 +87,58 @@ RCPP_MODULE(fims) {
              &RecruitmentNLLInterface::estimate_recruit_deviations)
       .method("evaluate", &RecruitmentNLLInterface::evaluate_nll);
 
+  Rcpp::class_<FleetInterface>("Fleet")
+      .constructor()
+      .field("log_q", &FleetInterface::log_q)
+      .field("log_Fmort", &FleetInterface::log_Fmort)
+      .field("nages", &FleetInterface::nages)
+      .field("nyears", &FleetInterface::nyears)
+      .field("estimate_F", &FleetInterface::estimate_F)
+      .field("estimate_q", &FleetInterface::estimate_q)
+      .field("random_q", &FleetInterface::random_q)
+      .field("random_F", &FleetInterface::random_F)
+      .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
+      .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
+      .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
+      .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
+      .method("SetSelectivity", &FleetInterface::SetSelectivity);
+
+  Rcpp::class_<DataInterface>("Data").constructor().field(
+      "observed_data", &DataInterface::observed_data);
+
+  Rcpp::class_<AgeCompDataInterface>("AgeComp").constructor<int, int>().field(
+      "age_comp_data", &AgeCompDataInterface::age_comp_data);
+
+  Rcpp::class_<IndexDataInterface>("Index").constructor<int>().field(
+      "index_data", &IndexDataInterface::index_data);
+
+  Rcpp::class_<PopulationInterface>("Population")
+      .constructor()
+      .method("get_id", &PopulationInterface::get_id)
+      .field("nages", &PopulationInterface::nages)
+      .field("nfleets", &PopulationInterface::nfleets)
+      .field("nseasons", &PopulationInterface::nseasons)
+      .field("nyears", &PopulationInterface::nyears)
+      .field("log_M", &PopulationInterface::log_M)
+      .field("log_init_naa", &PopulationInterface::log_init_naa)
+      .field("prop_female", &PopulationInterface::prop_female)
+      .method("evaluate", &PopulationInterface::evaluate);
+
+  Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
+      .constructor()
+      .method("get_id", &DnormDistributionsInterface::get_id)
+      .method("evaluate", &DnormDistributionsInterface::evaluate)
+      .field("x", &DnormDistributionsInterface::x)
+      .field("mean", &DnormDistributionsInterface::mean)
+      .field("sd", &DnormDistributionsInterface::sd);
+
+  Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
+      .constructor()
+      .field("median", &LogisticMaturityInterface::median)
+      .field("slope", &LogisticMaturityInterface::slope)
+      .method("get_id", &LogisticMaturityInterface::get_id)
+      .method("evaluate", &LogisticMaturityInterface::evaluate);
+
   Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
       .constructor()
       .field("median", &LogisticSelectivityInterface::median)
@@ -102,22 +154,6 @@ RCPP_MODULE(fims) {
       .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
       .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
       .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
-
-  Rcpp::class_<FleetInterface>("Fleet")
-      .constructor()
-      .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
-      .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
-      .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
-      .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
-      .method("SetSelectivity", &FleetInterface::SetSelectivity);
-
-  Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
-      .constructor()
-      .method("get_id", &DnormDistributionsInterface::get_id)
-      .method("evaluate", &DnormDistributionsInterface::evaluate)
-      .field("x", &DnormDistributionsInterface::x)
-      .field("mean", &DnormDistributionsInterface::mean)
-      .field("sd", &DnormDistributionsInterface::sd);
 
   Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
       .constructor()
