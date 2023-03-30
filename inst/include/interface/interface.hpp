@@ -38,20 +38,23 @@
 #endif /* TMB_MODEL */
 
 namespace fims {
+  
+#ifdef TMB_MODEL
 /**
  *  @brief ModelTraits class that contains the DataVector
  * and ParameterVector types.
  */
 template <typename T>
 struct ModelTraits {
-  #ifdef TMB_MODEL
   typedef typename CppAD::vector<T> DataVector;      /**< This is a vector
         of the data that is differentiable */
   typedef typename CppAD::vector<T> ParameterVector; /**< This is a
   vector of the parameters that is differentiable */
   typedef typename tmbutils::vector<T>
       EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
-  #endif /* TMB_MODEL */
+  
 };
+#endif /* TMB_MODEL */
+}
 
 #endif /* FIMS_INTERFACE_HPP */
