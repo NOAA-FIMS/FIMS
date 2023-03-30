@@ -15,7 +15,7 @@
  */
 
 // traits for interfacing with TMB
-#include "../population_dynamics/growth/growth.hpp"
+//#include "../population_dynamics/growth/growth.hpp"
 
 #ifdef TMB_MODEL
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check

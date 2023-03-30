@@ -3,6 +3,7 @@
 #include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 #include "../inst/include/interface/interface.hpp"
 #include "../inst/include/interface/init.hpp"
+#include "../inst/include/common/model.hpp"
 
 /// @cond 
 /**

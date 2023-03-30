@@ -24,6 +24,7 @@
 #include "../maturity/maturity.hpp"
 #include "../growth/growth.hpp"
 #include "../fleet/fleet.hpp"
+#include "../../interface/interface.hpp"
 
 namespace fims {
 /*TODO:
