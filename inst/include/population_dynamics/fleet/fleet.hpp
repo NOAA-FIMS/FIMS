@@ -27,7 +27,7 @@ struct Fleet : public FIMSObject<Type> {
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
   using ParameterVector =
-      typename ::ModelTraits<Type>::ParameterVector; /*!< vector of fleet
+      typename ModelTraits<Type>::ParameterVector; /*!< vector of fleet
                                                       parameters */
 
   int index_likelihood_id = -999; /*!<id of index likelihood component*/
