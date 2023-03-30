@@ -24,7 +24,7 @@ setClass(
   Class = "FIMSFrameAge",
   slots = c(
     ages = "numeric",
-    nages = "numeric",
+    nages = "integer",
     weightatage = "data.frame"
   ),
   contains = "FIMSFrame"
