@@ -47,14 +47,15 @@ License: GPL (>= 3) | file LICENSE
 Depends:
     R (>= 3.4)
 Imports: 
-    Rcpp, 
+    Rcpp,
     TMB (>= 1.8.0),
     usethis,
     dplyr,
     ggplot2,
     methods,
     scales,
-    jsonlite
+    jsonlite,
+    magrittr
 LinkingTo: 
     Rcpp,
     TMB,
