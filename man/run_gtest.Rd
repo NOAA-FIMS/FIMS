@@ -7,7 +7,7 @@
 run_gtest(...)
 }
 \arguments{
-\item{/dots}{additional arguments to \code{ctest --test-dir build}
+\item{...}{additional arguments to \code{ctest --test-dir build}
 such as "--rerun-failed --output-on-failure"}
 }
 \description{
