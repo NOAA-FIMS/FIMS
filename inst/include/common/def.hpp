@@ -24,7 +24,7 @@ std::ofstream FIMS_LOG("fims.log"); /**< Log file */
 #define TMB_FIMS_THIRD_ORDER AD<TMB_FIMS_SECOND_ORDER>
 #endif
 
-//namespace fims {
+namespace fims {
 
 #ifdef STD_LIB
 
@@ -46,6 +46,6 @@ struct ModelTraits {
 };
 
 #endif
-//}  // namespace fims
+}  // namespace fims
 
 #endif /* TRAITS_HPP */

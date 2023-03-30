@@ -37,7 +37,7 @@
 
 #endif /* TMB_MODEL */
 
-namespace fims {
+//namespace fims {
 /**
  *  @brief ModelTraits class that contains the DataVector
  * and ParameterVector types.
@@ -53,6 +53,6 @@ struct ModelTraits {
       EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
   #endif /* TMB_MODEL */
 };
-}
+//}
 
 #endif /* FIMS_INTERFACE_HPP */

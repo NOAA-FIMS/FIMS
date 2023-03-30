@@ -285,7 +285,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual double evaluate(bool do_log) {
     fims::Dmultinom<double> dmultinom;
     // Decale TMBVector in this scope
-    typedef typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
+    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
     dmultinom.x = TMBVector(x.size());  // Vector from TMB
     dmultinom.p = TMBVector(p.size());  // Vector from TMB
     for (int i = 0; i < x.size(); i++) {
@@ -296,7 +296,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   }
 
   virtual bool add_to_fims_tmb() {
-    typedef typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector0;
+    typedef typename ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector0;
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
@@ -314,7 +314,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     d0->distribution_models[model0->id] = model0;
 
-    typedef typename fims::ModelTraits<TMB_FIMS_FIRST_ORDER>::EigenVector Vector1;
+    typedef typename ModelTraits<TMB_FIMS_FIRST_ORDER>::EigenVector Vector1;
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
@@ -332,7 +332,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     d1->distribution_models[model1->id] = model1;
 
-    typedef typename fims::ModelTraits<TMB_FIMS_SECOND_ORDER>::EigenVector Vector2;
+    typedef typename ModelTraits<TMB_FIMS_SECOND_ORDER>::EigenVector Vector2;
     std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
@@ -350,7 +350,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     d2->distribution_models[model2->id] = model2;
 
-    typedef typename fims::ModelTraits<TMB_FIMS_THIRD_ORDER>::EigenVector Vector3;
+    typedef typename ModelTraits<TMB_FIMS_THIRD_ORDER>::EigenVector Vector3;
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
