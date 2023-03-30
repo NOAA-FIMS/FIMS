@@ -61,8 +61,8 @@ Rcpp::NumericVector get_fixed_parameters_vector(){
         
         Rcpp::NumericVector p;
 
-        for(int i = 0; i<d0->parameters.size(); i++){
-            p.push_back(*d0->parameters[i]);
+        for(int i = 0; i<d0->fixed_effects_parameters.size(); i++){
+            p.push_back(*d0->fixed_effects_parameters[i]);
         }
 
         return p;
