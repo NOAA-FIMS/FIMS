@@ -17,19 +17,15 @@
  * fleet <- new(fims$Data)
  *
  */
-class DataInterface : public FIMSRcppInterfaceBase
-{
-public:
+class DataInterface : public FIMSRcppInterfaceBase {
+ public:
   Rcpp::NumericVector observed_data; /*!< The data */
-  static uint32_t id_g;              /**< static id of the DataInterface object */
-  uint32_t id;                       /**< local id of the DataInterface object */
+  static uint32_t id_g; /**< static id of the DataInterface object */
+  uint32_t id;          /**< local id of the DataInterface object */
 
   /** @brief constructor
    */
-  DataInterface()
-  {
-    this->id = DataInterface::id_g++;
-  }
+  DataInterface() { this->id = DataInterface::id_g++; }
 
   /** @brief destructor
    */
@@ -43,36 +39,38 @@ uint32_t DataInterface::id_g = 1;
  * from R:
  * acomp <- new(fims$AgeComp)
  */
-class AgeCompDataInterface : public DataInterface
-{
-public:
+class AgeCompDataInterface : public DataInterface {
+ public:
   int amax;                          /*!< first dimension of the data */
   int ymax;                          /*!< second dimension of the data */
   Rcpp::NumericVector age_comp_data; /*!<the age composition data*/
 
-/**
- * @brief constructor
-*/
+  /**
+   * @brief constructor
+   */
   AgeCompDataInterface(int amax = 0, int ymax = 0) : DataInterface() {}
 
-/**
- * @brief destructor
-*/
+  /**
+   * @brief destructor
+   */
   virtual ~AgeCompDataInterface() {}
 
-/**
- * @brief adds parameters to the model
-*/
-  virtual bool add_to_fims_tmb()
-  {
+  /**
+   * @brief adds parameters to the model
+   */
+  virtual bool add_to_fims_tmb() {
     std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data =
-        std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->amax, this->ymax);
+        std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->amax,
+                                                               this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> age_comp_data_1 =
-        std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->amax, this->ymax);
+        std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->amax,
+                                                                 this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_SECOND_ORDER>> age_comp_data_2 =
-        std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->amax, this->ymax);
+        std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->amax,
+                                                                  this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_THIRD_ORDER>> age_comp_data_3 =
-        std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->amax, this->ymax);
+        std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->amax,
+                                                                 this->ymax);
 
     age_comp_data->id = this->id;
 
@@ -82,10 +80,8 @@ public:
 
     age_comp_data_3->id = this->id;
 
-    for (int y = 0; y < ymax; y++)
-    {
-      for (int a = 0; a < amax; a++)
-      {
+    for (int y = 0; y < ymax; y++) {
+      for (int a = 0; a < amax; a++) {
         int index_ya = y * amax + a;
         age_comp_data->at(y, a) = this->observed_data[index_ya];
         age_comp_data_1->at(y, a) = this->observed_data[index_ya];
@@ -121,28 +117,25 @@ public:
  * from R:
  * fleet <- new(fims$Index)
  */
-class IndexDataInterface : public DataInterface
-{
-public:
+class IndexDataInterface : public DataInterface {
+ public:
   int ymax;                       /*!< second dimension of the data */
   Rcpp::NumericVector index_data; /*!<the age composition data*/
 
-/**
- * @brief constructor
-*/
+  /**
+   * @brief constructor
+   */
   IndexDataInterface(int ymax = 0) : DataInterface() {}
 
-/**
- * @brief destructor
-*/
+  /**
+   * @brief destructor
+   */
   virtual ~IndexDataInterface() {}
 
-/**
- *@brief function to add to TMB 
-*/
-  virtual bool add_to_fims_tmb()
-  {
-
+  /**
+   *@brief function to add to TMB
+   */
+  virtual bool add_to_fims_tmb() {
     std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> index_data =
         std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> index_data_1 =
@@ -162,8 +155,7 @@ public:
 
     index_data->id = this->id;
 
-    for (int y = 0; y < ymax; y++)
-    {
+    for (int y = 0; y < ymax; y++) {
       index_data->at(y) = this->observed_data[y];
       index_data_1->at(y) = this->observed_data[y];
       index_data_2->at(y) = this->observed_data[y];

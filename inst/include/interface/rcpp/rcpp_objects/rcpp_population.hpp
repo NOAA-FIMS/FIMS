@@ -49,15 +49,15 @@ std::map<uint32_t, PopulationInterfaceBase*>
  */
 class PopulationInterface : public PopulationInterfaceBase {
  public:
-  uint32_t nages; /**< number of ages */
-  uint32_t nfleets; /**< number of fleets */
-  uint32_t nseasons; /**< number of seasons */
-  uint32_t nyears; /**< number of years */
-  std::vector<double> log_M;   /**< log of the natural mortality of the stock*/
+  uint32_t nages;            /**< number of ages */
+  uint32_t nfleets;          /**< number of fleets */
+  uint32_t nseasons;         /**< number of seasons */
+  uint32_t nyears;           /**< number of years */
+  std::vector<double> log_M; /**< log of the natural mortality of the stock*/
   std::vector<double> log_init_naa; /**<log of the initial numbers at age*/
-  double prop_female; /**< the proportion of female fish*/
+  double prop_female;               /**< the proportion of female fish*/
 
-  PopulationInterface() : PopulationInterfaceBase() {} 
+  PopulationInterface() : PopulationInterfaceBase() {}
 
   virtual ~PopulationInterface() {}
 
@@ -84,12 +84,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     b0->log_M.resize(this->log_M.size());
     b0->log_init_naa.resize(this->log_init_naa.size());
     b0->proportion_female = this->prop_female;
-    for (size_t i = 0; i < log_M.size(); i++)
-    {
+    for (size_t i = 0; i < log_M.size(); i++) {
       b0->log_M[i] = this->log_M[i];
     }
 
-    for(size_t i = 0; i < log_init_naa.size(); i++){
+    for (size_t i = 0; i < log_init_naa.size(); i++) {
       b0->log_init_naa[i] = this->log_init_naa[i];
     }
     // if (this->log_M.estimated) {
@@ -112,25 +111,24 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     b1->id = this->id;
-    
+
     b1->log_M.resize(this->log_M.size());
     b1->log_init_naa.resize(this->log_init_naa.size());
     b1->proportion_female = this->prop_female;
-    for (size_t i = 0; i < log_M.size(); i++)
-    {
+    for (size_t i = 0; i < log_M.size(); i++) {
       b1->log_M[i] = this->log_M[i];
     }
-    for(size_t i = 0; i < log_init_naa.size(); i++){
+    for (size_t i = 0; i < log_init_naa.size(); i++) {
       b1->log_init_naa[i] = this->log_init_naa[i];
     }
     // if (this->log_M.estimated) {
-      // if (this->log_M.is_random_effect) {
-        // d1->RegisterRandomEffect(b1->log_M);
-      // } else {
-        // d1->RegisterParameter(b1->log_M);
-      // }
+    // if (this->log_M.is_random_effect) {
+    // d1->RegisterRandomEffect(b1->log_M);
+    // } else {
+    // d1->RegisterParameter(b1->log_M);
     // }
-    
+    // }
+
     // add to Information
     d1->populations[b1->id] = b1;
 
@@ -144,24 +142,23 @@ class PopulationInterface : public PopulationInterfaceBase {
     // set relative info
     b2->id = this->id;
     b2->log_M.resize(this->log_M.size());
-        
+
     b2->log_init_naa.resize(this->log_init_naa.size());
     b2->proportion_female = this->prop_female;
-    for (size_t i = 0; i < log_M.size(); i++)
-    {
+    for (size_t i = 0; i < log_M.size(); i++) {
       b2->log_M[i] = this->log_M[i];
     }
-    for(size_t i = 0; i < log_init_naa.size(); i++){
+    for (size_t i = 0; i < log_init_naa.size(); i++) {
       b2->log_init_naa[i] = this->log_init_naa[i];
     }
     // if (this->log_M.estimated) {
-      // if (this->log_M.is_random_effect) {
-        // d2->RegisterRandomEffect(b2->log_M);
-      // } else {
-        // d2->RegisterParameter(b2->log_M);
-      // }
+    // if (this->log_M.is_random_effect) {
+    // d2->RegisterRandomEffect(b2->log_M);
+    // } else {
+    // d2->RegisterParameter(b2->log_M);
     // }
-    
+    // }
+
     // add to Information
     d2->populations[b2->id] = b2;
 
@@ -177,23 +174,22 @@ class PopulationInterface : public PopulationInterfaceBase {
     b3->log_M.resize(this->log_M.size());
     b3->log_init_naa.resize(this->log_init_naa.size());
     b3->proportion_female = this->prop_female;
-    for (size_t i = 0; i < log_M.size(); i++)
-    {
+    for (size_t i = 0; i < log_M.size(); i++) {
       b3->log_M[i] = this->log_M[i];
     }
-    for(size_t i = 0; i < log_init_naa.size(); i++){
+    for (size_t i = 0; i < log_init_naa.size(); i++) {
       b3->log_init_naa[i] = this->log_init_naa[i];
     }
 
     // b3->log_M = this->log_M.value;
     // if (this->log_M.estimated) {
-      // if (this->log_M.is_random_effect) {
-        // d3->RegisterRandomEffect(b3->log_M);
-      // } else {
-        // d3->RegisterParameter(b3->log_M);
-      // }
+    // if (this->log_M.is_random_effect) {
+    // d3->RegisterRandomEffect(b3->log_M);
+    // } else {
+    // d3->RegisterParameter(b3->log_M);
     // }
-   
+    // }
+
     // add to Information
     d3->populations[b3->id] = b3;
 

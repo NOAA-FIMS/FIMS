@@ -19,7 +19,7 @@
 #include "../growth/growth.hpp"
 #include "../maturity/maturity.hpp"
 #include "../recruitment/recruitment.hpp"
-#include "subpopulation.hpp"
+//#include "subpopulation.hpp"
 #include "../recruitment/recruitment.hpp"
 #include "../maturity/maturity.hpp"
 #include "../growth/growth.hpp"
@@ -38,28 +38,28 @@ directly?)
  */
 template <typename Type>
 struct Population : public FIMSObject<Type> {
-    
-  using ParameterVector = typename ModelTraits<Type>::ParameterVector; /*!< the vector of population parameters*/
+  using ParameterVector =
+      typename ModelTraits<Type>::ParameterVector; /*!< the vector of population
+                                                      parameters*/
   static uint32_t id_g; /*!< reference id for population object*/
   size_t nyears;        /*!< total number of years in the fishery*/
   size_t nseasons;      /*!< total number of seasons in the fishery*/
   size_t nages;         /*!< total number of ages in the population*/
   size_t nfleets;       /*!< total number of fleets in the fishery*/
   // constants
-  Type proportion_female =
-      0.5; /*!< Sex proportion fixed at 50/50 for M1*/
+  Type proportion_female = 0.5; /*!< Sex proportion fixed at 50/50 for M1*/
 
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
   std::vector<Type> log_init_naa; /*!< estimated parameter: log numbers at age*/
-  ParameterVector log_M;   /*!< estimated parameter: log Natural Mortality*/
+  ParameterVector log_M; /*!< estimated parameter: log Natural Mortality*/
 
   // Transformed values
   std::vector<Type> init_naa; /*!< transformed parameter: numbers at age*/
-  std::vector<Type> M;   /*!< transformed parameter: Natural Mortality*/
+  std::vector<Type> M;        /*!< transformed parameter: Natural Mortality*/
 
-  std::vector<double> ages;        /*!< vector of the ages for referencing*/
-  std::vector<double> years;     /*!< vector of years for referencing*/
+  std::vector<double> ages;    /*!< vector of the ages for referencing*/
+  std::vector<double> years;   /*!< vector of years for referencing*/
   ParameterVector mortality_F; /*!< vector of fishing mortality summed across
                                     fleet by year and age*/
   std::vector<Type>
@@ -87,29 +87,34 @@ struct Population : public FIMSObject<Type> {
                                               age (thousands?? millions??) */
   std::vector<Type> expected_catch;            /*!< Expected values: Catch*/
 
-  /// recruitment
-  int recruitment_id = -999; /*!< id of recruitment model object*/
-  std::shared_ptr<fims::RecruitmentBase<Type> >
-      recruitment; /*!< shared pointer to recruitment module */
+    /// recruitment
+    int recruitment_id = -999; /*!< id of recruitment model object*/
+    std::shared_ptr<fims::RecruitmentBase<Type>>
+        recruitment; /*!< shared pointer to recruitment module */
 
-  // growth
-  int growth_id = -999; /*!< id of growth model object*/
-  std::shared_ptr<fims::GrowthBase<Type> >
-      growth; /*!< shared pointer to growth module */
+    // growth
+    int growth_id = -999; /*!< id of growth model object*/
+    std::shared_ptr<fims::GrowthBase<Type>>
+        growth; /*!< shared pointer to growth module */
 
-  // maturity
-  int maturity_id = -999; /*!< id of maturity model object*/
-  std::shared_ptr<fims::MaturityBase<Type> >
-      maturity; /*!< shared pointer to maturity module */
+    // maturity
+    int maturity_id = -999; /*!< id of maturity model object*/
+    std::shared_ptr<fims::MaturityBase<Type>>
+        maturity; /*!< shared pointer to maturity module */
 
-  // fleet
-  int fleet_id = -999; /*!< id of fleet model object*/
-  std::vector<std::shared_ptr<fims::Fleet<Type> > >
-      fleets; /*!< shared pointer to fleet module */
+    // fleet
+    int fleet_id = -999; /*!< id of fleet model object*/
+    std::vector<std::shared_ptr<fims::Fleet<Type>>>
+        fleets; /*!< shared pointer to fleet module */
 
-  // this -> means you're referring to a class member (member of self)
+    // Define objective function object to be able to REPORT and ADREPORT
+#ifdef TMB_MODEL
+    ::objective_function<Type> *of;
+#endif
 
-  Population() { this->id = Population::id_g++; }
+    // this -> means you're referring to a class member (member of self)
+
+    Population() { this->id = Population::id_g++; }
 
   /**
    * @brief Initialize values. Called once at the start of model run.
@@ -172,9 +177,9 @@ struct Population : public FIMSObject<Type> {
     }
   }
 
-  /**
-   * life history calculations
-   */
+    /**
+     * life history calculations
+     */
 
   /**
    * @brief Calculates initial numbers at age for index and age
@@ -214,19 +219,21 @@ struct Population : public FIMSObject<Type> {
    * @param index_ya2 dimension folded index for year-1 and age-1
    * @param age age index
    */
-  inline void CalculateNumbersAA(size_t index_ya, size_t index_ya2, size_t age) {
+  inline void CalculateNumbersAA(size_t index_ya, size_t index_ya2,
+                                 size_t age) {
     // using Z from previous age/year
     this->numbers_at_age[index_ya] =
         this->numbers_at_age[index_ya2] * (exp(-this->mortality_Z[index_ya2]));
 
-    // Plus group calculation
-    if (age == (this->nages - 1)) {
-      this->numbers_at_age[index_ya] =
-          this->numbers_at_age[index_ya] +
-          this->numbers_at_age[index_ya2 + 1] *
-              (exp(-this->mortality_Z[index_ya2 + 1]));
+      // Plus group calculation
+      if (age == (this->nages - 1))
+      {
+        this->numbers_at_age[index_ya] =
+            this->numbers_at_age[index_ya] +
+            this->numbers_at_age[index_ya2 + 1] *
+                (exp(-this->mortality_Z[index_ya2 + 1]));
+      }
     }
-  }
 
   /**
    * @brief Calculates unfished numbers at age at year and age specific indices
@@ -235,7 +242,8 @@ struct Population : public FIMSObject<Type> {
    * @param index_ya2 dimension folded index for year-1 and age-1
    * @param age age index
    */
-  inline void CalculateUnfishedNumbersAA(size_t index_ya, size_t index_ya2, size_t age) {
+  inline void CalculateUnfishedNumbersAA(size_t index_ya, size_t index_ya2,
+                                         size_t age) {
     // using M from previous age/year
     this->unfished_numbers_at_age[index_ya] =
         this->unfished_numbers_at_age[index_ya2] * (exp(-this->M[index_ya2]));
@@ -300,7 +308,8 @@ struct Population : public FIMSObject<Type> {
    * @param year the year of unfished spawning biomass to add
    * @param age the age of unfished spawning biomass to add
    */
-  void CalculateUnfishedSpawningBiomass(size_t index_ya, size_t year, size_t age) {
+  void CalculateUnfishedSpawningBiomass(size_t index_ya, size_t year,
+                                        size_t age) {
     this->unfished_spawning_biomass[year] +=
         this->proportion_female * this->unfished_numbers_at_age[index_ya] *
         this->proportion_mature_at_age[index_ya] *
@@ -581,28 +590,45 @@ struct Population : public FIMSObject<Type> {
           FIMS_LOG << index_ya << std::endl;
         }
 
-        /*
-        Here composition, total catch, and index values are calculated for all
-        years with reference data. They are not calculated for y=nyears as there
-        is this is just to get final population structure at the end of the
-        terminal year.
-         */
-        if (y < this->nyears) {
-          FIMS_LOG << index_ya << std::endl;
+          /*
+          Here composition, total catch, and index values are calculated for all
+          years with reference data. They are not calculated for y=nyears as there
+          is this is just to get final population structure at the end of the
+          terminal year.
+           */
+          if (y < this->nyears)
+          {
+            FIMS_LOG << index_ya << std::endl;
           CalculateCatchNumbersAA(index_ya, y, a);
 
           FIMS_LOG << index_ya << std::endl;
           CalculateCatchWeightAA(y, a);
-          CalculateCatch(y, a);
-          CalculateIndex(index_ya, y, a);
+            CalculateCatch(y, a);
+            CalculateIndex(index_ya, y, a);
+          }
         }
       }
+#ifdef TMB_MODEL
+      /*Report output*/
+      //REPORT_F(int(this->nages), of); //REPORT error: call of overloaded is ambiguous
+      //REPORT_F(int(this->nyears), of);
+      //REPORT_F(int(this->nfleets), of);
+      //REPORT_F(this->numbers_at_age, of);
+      typename ModelTraits<Type>::EigenVector rec_dev = this->recruitment->recruit_deviations;
+      REPORT_F(rec_dev, of);
+      ADREPORT_F(rec_dev, of);
+      //ADREPORT_F(this->recruitment->rzero, of);
+      //ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in recruitment_base
+      //ADREPORT_F(this->recruitment->log_sigma_recruit, of);
+      //ADREPORT_F(this->M, of);
+      //ADREPORT_F(this->maturity->slope, of); can't access slope b/c not in maturity base
+      //ADREPORT_F(this->maturity->median, of); can't access median b/c not in maturity base
+#endif
     }
-  }
-};
-template <class Type>
-uint32_t Population<Type>::id_g = 0;
+  };
+  template <class Type>
+  uint32_t Population<Type>::id_g = 0;
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */
