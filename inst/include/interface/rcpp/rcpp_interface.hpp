@@ -87,10 +87,18 @@ Rcpp::NumericVector get_random_parameters_vector(){
  */
 void clear()
 {
+    FIMSRcppInterfaceBase::fims_interface_objects.clear();
+    
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
     d0->fixed_effects_parameters.clear();
     d0->random_effects_parameters.clear();
+    
+    LogisticSelectivityInterface::id_g = 1;
+    LogisticSelectivityInterface::selectivity_objects.clear();
+
+    BevertonHoltRecruitmentInterface::id_g = 1;
+    BevertonHoltRecruitmentInterface::live_objects.clear();
 }
 
 RCPP_EXPOSED_CLASS(Parameter)
