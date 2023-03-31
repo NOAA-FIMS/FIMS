@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.github$
+^\.history$
 CMakeLists.txt
 tests/gtest
 tests/test_plan
@@ -9,3 +10,5 @@ build
 .vscode
 ^data-raw$
 ^\.devcontainer$
+CONTRIBUTING.md
+fims.log
