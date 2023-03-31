@@ -55,7 +55,7 @@ test_that("Fleet: SetIndexLikelihood works", {
     fleet$SetIndexLikelihood(2),
     regexp = paste0("Index likelihood has been set already.")
   )
-  
+
   fims$clear()
 })
 

@@ -1,5 +1,4 @@
-test_that("test get parameter vector",{
-
+test_that("test get parameter vector", {
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   # Create selectivity
   selectivity <- new(fims$LogisticSelectivity)
@@ -17,16 +16,16 @@ test_that("test get parameter vector",{
   sel_parm <- c(selectivity$median$value, selectivity$slope$value)
   expect_equal(sel_parm, p)
 
-  #test fims clear
+  # test fims clear
   fims$clear()
   p <- fims$get_fixed()
   expect_equal(numeric(0), p)
   fims$CreateTMBModel()
   p <- fims$get_fixed()
-  expect_equal(numeric(0), p) 
+  expect_equal(numeric(0), p)
 
-  ##Not working - fims2::CreateTMBModel() retains the defined module from fims?
-  #test multiple modules
+  ## Not working - fims2::CreateTMBModel() retains the defined module from fims?
+  # test multiple modules
   fims$clear()
   p <- fims$get_fixed()
   expect_equal(numeric(0), p)
@@ -55,12 +54,10 @@ test_that("test get parameter vector",{
   recruitment$rzero$is_random_effect <- FALSE
   recruitment$rzero$estimated <- TRUE
   rec_parm <- c(h, r0)
-  
+
   fims2$CreateTMBModel()
   p2 <- fims2$get_fixed()
-  
-  expect_equal(c(sel_parm, rec_parm), p2)
-  fims2$clear() 
 
-}
-)
+  expect_equal(c(sel_parm, rec_parm), p2)
+  fims2$clear()
+})
