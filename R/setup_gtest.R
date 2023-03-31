@@ -42,7 +42,7 @@ setup_gtest <- function() {
 #' setup and run google test suite
 #'
 #' Developer function for setup and running google test suite from R
-#' @param /dots additional arguments to \code{ctest --test-dir build}
+#' @param ... additional arguments to \code{ctest --test-dir build}
 #' such as "--rerun-failed --output-on-failure"
 #' @export
 setup_and_run_gtest <- function(...) {
@@ -56,7 +56,7 @@ setup_and_run_gtest <- function(...) {
 #' run google test suite
 #'
 #' Developer function for running google test suite from R
-#' @param /dots additional arguments to \code{ctest --test-dir build}
+#' @param ... additional arguments to \code{ctest --test-dir build}
 #' such as "--rerun-failed --output-on-failure"
 #' @export
 run_gtest <- function(...) {
