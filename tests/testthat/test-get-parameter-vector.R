@@ -1,4 +1,4 @@
-testthat("test get parameter vector",{
+test_that("test get parameter vector",{
 
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   # Create selectivity
