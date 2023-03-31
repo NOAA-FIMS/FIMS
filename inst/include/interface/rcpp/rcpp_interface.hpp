@@ -58,7 +58,7 @@ Rcpp::NumericVector get_fixed_parameters_vector(){
         // base model
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-        
+
         Rcpp::NumericVector p;
 
         for(int i = 0; i<d0->fixed_effects_parameters.size(); i++){
@@ -72,7 +72,7 @@ Rcpp::NumericVector get_random_parameters_vector(){
         // base model
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-        
+
         Rcpp::NumericVector p;
 
         for(int i = 0; i<d0->random_effects_parameters.size(); i++){
@@ -89,7 +89,7 @@ void clear()
 {
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-    d0->parameters.clear();
+    d0->fixed_effects_parameters.clear();
     d0->random_effects_parameters.clear();
 }
 
