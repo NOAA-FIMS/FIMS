@@ -26,6 +26,8 @@ fleet module", {
 
   # Expect code produces error when ID of selectivity is a character string
   expect_error(fleet1$SetSelectivity("id"))
+
+  fims$clear()
 })
 
 
@@ -39,6 +41,8 @@ test_that("Fleet: SetAgeCompLikelihood works", {
     fleet$SetAgeCompLikelihood(2),
     regexp = paste0("Age composition likelihood has been set already.")
   )
+
+  fims$clear()
 })
 
 test_that("Fleet: SetIndexLikelihood works", {
@@ -51,6 +55,8 @@ test_that("Fleet: SetIndexLikelihood works", {
     fleet$SetIndexLikelihood(2),
     regexp = paste0("Index likelihood has been set already.")
   )
+  
+  fims$clear()
 })
 
 test_that("Fleet: SetObservedAgeCompData works", {
@@ -63,6 +69,8 @@ test_that("Fleet: SetObservedAgeCompData works", {
     fleet$SetObservedAgeCompData(2, as.matrix(sample.int(100, 12))),
     regexp = paste0("Observed age composition data have been set already.")
   )
+
+  fims$clear()
 })
 
 test_that("Fleet: SetObservedIndexData works", {
@@ -75,4 +83,6 @@ test_that("Fleet: SetObservedIndexData works", {
     fleet$SetObservedIndexData(2, rnorm(30, 200, 50)),
     regexp = paste0("Observed index data have been set already.")
   )
+
+  fims$clear()
 })

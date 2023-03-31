@@ -39,4 +39,6 @@ test_that("Selectivity input settings work as expected", {
   # R code that generates true value for the test
   # 1.0/(1.0+exp(-(34.5-10.5)*0.2)) * (1.0 - 1.0/(1.0+exp(-(34.5-15)*0.05))) = 0.2716494
   expect_equal(selectivity3$evaluate(34.5), 0.2716494, tolerance = 0.0000001)
+
+  fims$clear()
 })

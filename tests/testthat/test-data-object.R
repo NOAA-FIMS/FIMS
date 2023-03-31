@@ -34,6 +34,8 @@ test_that("Can add index data to model", {
     expect_silent(indexdat[[fleet_names_index[index_i]]] <-
       m_index(age_frame, fleet_names_index[index_i]))
   }
+
+  fims$clear()
 })
 
 test_that("Can add agecomp data to model", {
@@ -47,4 +49,6 @@ test_that("Can add agecomp data to model", {
     expect_silent(agecompdat[[fleet_names_agecomp[fleet_f]]]$age_comp_data <-
       m_agecomp(age_frame, fleet_names_agecomp[fleet_f]))
   }
+
+  fims$clear()
 })

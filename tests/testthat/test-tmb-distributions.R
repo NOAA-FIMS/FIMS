@@ -16,6 +16,8 @@ test_that("dnorm", {
   dnorm_$sd$value <- 1
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(TRUE), stats::dnorm(y, 0, 1, TRUE))
+
+  fims$clear()
 })
 
 test_that("dlnorm", {
@@ -36,6 +38,8 @@ test_that("dlnorm", {
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(TRUE), stats::dlnorm(y, 0, 1, TRUE))
   expect_equal(dlnorm_$evaluate(FALSE), stats::dlnorm(y, 0, 1, FALSE))
+
+  fims$clear()
 })
 
 test_that("dmultinom", {
@@ -60,4 +64,6 @@ test_that("dmultinom", {
     dmultinom_$evaluate(FALSE),
     stats::dmultinom(x = x, prob = p, log = FALSE)
   )
+
+  fims$clear()
 })
