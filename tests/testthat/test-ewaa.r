@@ -16,4 +16,6 @@ test_that("ewaa data can be added to model", {
     regexp = "ages and weights must be the same length",
     ignore.case = FALSE
   )
+
+  fims$clear()
 })

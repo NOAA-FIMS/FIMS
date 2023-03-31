@@ -54,9 +54,60 @@ bool CreateTMBModel() {
   return true;
 }
 
+Rcpp::NumericVector get_fixed_parameters_vector(){
+        // base model
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+        Rcpp::NumericVector p;
+
+        for(int i = 0; i<d0->fixed_effects_parameters.size(); i++){
+            p.push_back(*d0->fixed_effects_parameters[i]);
+        }
+
+        return p;
+}
+
+Rcpp::NumericVector get_random_parameters_vector(){
+        // base model
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+        Rcpp::NumericVector p;
+
+        for(int i = 0; i<d0->random_effects_parameters.size(); i++){
+            p.push_back(*d0->random_effects_parameters[i]);
+        }
+
+        return p;
+}
+
+/**
+ * Clears the vector of independent variables.
+ */
+void clear()
+{
+    FIMSRcppInterfaceBase::fims_interface_objects.clear();
+    
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    d0->fixed_effects_parameters.clear();
+    d0->random_effects_parameters.clear();
+    
+    LogisticSelectivityInterface::id_g = 1;
+    LogisticSelectivityInterface::selectivity_objects.clear();
+
+    BevertonHoltRecruitmentInterface::id_g = 1;
+    BevertonHoltRecruitmentInterface::live_objects.clear();
+}
+
 RCPP_EXPOSED_CLASS(Parameter)
-RCPP_MODULE(fims) {
-  Rcpp::function("CreateTMBModel", &CreateTMBModel);
+RCPP_MODULE(fims)
+{
+    Rcpp::function("CreateTMBModel", &CreateTMBModel);
+    Rcpp::function("get_fixed", &get_fixed_parameters_vector);
+    Rcpp::function("get_random", &get_random_parameters_vector);
+    Rcpp::function("clear", clear);
 
   Rcpp::class_<Parameter>("Parameter")
       .constructor()

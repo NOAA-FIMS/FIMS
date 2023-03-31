@@ -28,8 +28,8 @@ Type objective_function<Type>::operator()() {
       fims::Information<Type>::GetInstance();
 
     //update the parameter values
-    for(int i =0; i < information->parameters.size(); i++){
-        *information->parameters[i] = p[i];
+    for(int i =0; i < information->fixed_effects_parameters.size(); i++){
+        *information->fixed_effects_parameters[i] = p[i];
     }
     model -> of = this;
 

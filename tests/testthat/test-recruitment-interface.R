@@ -54,4 +54,6 @@ test_that("Recruitment input settings work as expected", {
   recnll$recruitment_bias_adj <- c(0.245, 0.2, 0.1)
   expected_nll <- -sum(log(stats::dnorm(log(devs), c(-0.245, -0.2, -0.1), 0.7)))
   expect_equal(recnll$evaluate(), expected = expected_nll)
+
+  fims$clear()
 })

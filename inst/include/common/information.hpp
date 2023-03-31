@@ -136,7 +136,7 @@ class Information {
    *
    * @param p
    */
-  void RegisterParameter(T& p) { this->parameters.push_back(&p); }
+  void RegisterParameter(T& p) { this->fixed_effects_parameters.push_back(&p); }
 
   /**
    * Register a random effect as estimable.

@@ -20,7 +20,10 @@
 #include "../maturity/maturity.hpp"
 #include "../recruitment/recruitment.hpp"
 //#include "subpopulation.hpp"
-//#include "../../common/information.hpp"
+#include "../recruitment/recruitment.hpp"
+#include "../maturity/maturity.hpp"
+#include "../growth/growth.hpp"
+#include "../fleet/fleet.hpp"
 #include "../../interface/interface.hpp"
 
 namespace fims {
