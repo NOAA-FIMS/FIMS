@@ -34,26 +34,24 @@ fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
-recruitment$rzero$value <- om_input$R0 
+recruitment$rzero$value <- om_input$R0
 recruitment$rzero$is_random_effect <- FALSE
 recruitment$rzero$estimated <- TRUE
-recruitment$h$value <- om_input$h
-recruitment$h$is_random_effect <- FALSE
-recruitment$h$estimated <- TRUE
+recruitment$steep$value <- om_input$h
+recruitment$steep$is_random_effect <- FALSE
+recruitment$steep$estimated <- TRUE
 
-recruitment <- new(fims$RecruitmentNLL)
-recruitment$log_sigma_recruit$value <- 0.4
-recrtuitment$recruitment_devs$value <- om_input$logR.resid
-recruitment$estimate_recruit_deviations <- TRUE
+recruitment_nll <- new(fims$RecruitmentNLL)
+recruitment_nll$log_sigma_recruit$value <- log(0.4)
+recruitment_nll$recruitment_devs <- om_input$logR.resid
+recruitment_nll$estimate_recruit_deviations <- TRUE
 
 # Growth
-growth <- new(fims$VonBertalanffyModified)
-empirical_weight <- rep(om_input$W.kg, times = om_input$nyr)
-survey_empirical_weight <- replicate(nages * nyears, 1.0)
-growth$SetUndifferentiatedCatchWeight(empirical_weight)
-growth$SetUndifferentiatedWeightAtSeasonStart(empirical_weight)
-growth$SetUndifferentiatedWeightAtSpawning(empirical_weight)
-growth$SetUndifferentiatedSurveyWeight(survey_empirical_weight)
+growth <- new(fims$EWAAgrowth)
+ewaa_growth <- new(fims$EWAAgrowth)
+  age_frame <- FIMSFrameAge(data_mile1)
+  ewaa_growth$ages <- m_ages(age_frame)
+  ewaa_growth$weights <- m_weightatage(age_frame)
 
 # Maturity
 maturity <- new(fims$LogisticMaturity)
@@ -64,20 +62,20 @@ maturity <- new(fims$LogisticMaturity)
   maturity$median$estimated <- TRUE
   maturity$slope$value <- om_input$slope
 
-# Natural mortality 
+# Natural mortality
 #create new population module and set log_M directly
 population <- new(fims$Population)
 
   population$log_M <- log(om_input$M.age)
   population$log_init_naa <- log(om_output$N.age[1,])
 
-# Create the population: 
+# Create the population:
 population <- new(fims$Population)
 population$nages <- om_input$nages
 population$nfleets <- 2
 population$nseasons <- 1
 population$nyears <- om_input$nyr
-population$prop_female <- om_input$proportion.female
+population$prop_female <- om_input$proportion.female[1]
 
 # Fleet
 # Create the fleet
@@ -93,14 +91,15 @@ fleet_selectivity <- new(fims$LogisticSelectivity)
   fleet_selectivity$slope$estimated <- TRUE
 
 fleet <- new(fims$Fleet)
-fleet$SetSelectivity(fleet_selectivity$id)
+fleet$SetSelectivity(fleet_selectivity$get_id())
 
 fleet$nages <- om_input$nages
-fleet$nseasons <- 1
+#fleet$nseasons <- 1
 fleet$nyears <- om_input$nyr
 fleet$log_q <- 0
-fleet$log_Fmort$value <- log(om_output$f)
-fleet$log_Fmort$estimated <- TRUE
+#fleet$log_Fmort$value <- log(om_output$f)
+fleet$log_Fmort <- log(om_output$f)
+#not working: fleet$log_Fmort$estimated <- TRUE
 
 survey_selectivity <- new(fims$LogisticSelectivity)
   survey_selectivity$median$value <- 10.0
@@ -121,7 +120,7 @@ survey$estimate_F <- TRUE
 survey$estimate_q <- TRUE
 survey$random_q <- FALSE
 survey$random_F <- FALSE
-survey$SetSelectivity(survey_selectivity$id)
+survey$SetSelectivity(survey_selectivity$get_id())
 
 fims$CreateTMBModel()
 ## Set-up TMB
