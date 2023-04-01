@@ -168,10 +168,10 @@ struct Population : public FIMSObject<Type> {
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
-      this->init_naa[age] = fims::exp(this->log_init_naa[age]);
+      this->init_naa[age] = fims::exp(this->log_init_naa[age]); //fims::exp(11);
       for (size_t year = 0; year < this->nyears; year++) {
-        size_t index_ya = year * this->nages + age;
-        this->M[index_ya] = fims::exp(this->log_M[index_ya]);
+        size_t index_ay = age * this->nyears + year;
+        this->M[index_ay] = fims::exp(this->log_M[index_ay]);// fims::exp(-1.6);
         this->mortality_F[year] = 0.0;
       }
     }
