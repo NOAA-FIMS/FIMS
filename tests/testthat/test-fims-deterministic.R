@@ -74,8 +74,9 @@ maturity <- new(fims$LogisticMaturity)
 # Natural mortality
 #create new population module and set log_M directly
 population <- new(fims$Population)
-
-  population$log_M <- log(om_input$M.age)
+  #is it a problem these are not Parameters in the Population interface?
+  #the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
+  population$log_M <- rep(log(om_input$M.age), om_input$nyr)
   population$log_init_naa <- log(om_output$N.age[1,])
 
 # Create the population:
@@ -135,6 +136,7 @@ fims$CreateTMBModel()
 ## Set-up TMB
 # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
+#crashes at population.Prepare() and references fims_math line 70: exp()
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
 message("success!")
 #report <- obj$report()
