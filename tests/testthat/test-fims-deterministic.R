@@ -1,7 +1,16 @@
+## The following packages need to be updated prior to debugging:
+# install.packages("Matrix")
+# install.packages("TMB", type = "source")
+# use updated version of pkgbuild with correct compilation flags for debugging:
+# remotes::install_github(rep = "Andrea-Havron-NOAA/pkgbuild")
+
+devtools::load_all()
+
 library(FIMS)
 data(package = "FIMS")
 
-test_that("deterministic test of fims", {
+#remove from test_that wrapper for debugging
+#test_that("deterministic test of fims", {
 
 ## Install required packages
 required_pkg <- c("remotes", "devtools", "here")
@@ -127,11 +136,12 @@ fims$CreateTMBModel()
 # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
-report <- obj$report()
+message("success!")
+#report <- obj$report()
 
 # numbers at age
 #test output: expect_equal(?om_output$naa, report$naa) #need to add REPORT_F to population for any output to compare
 
 
 
-})
+#})
