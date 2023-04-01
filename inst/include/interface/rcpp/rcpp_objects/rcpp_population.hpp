@@ -53,8 +53,8 @@ class PopulationInterface : public PopulationInterfaceBase {
   uint32_t nfleets;          /**< number of fleets */
   uint32_t nseasons;         /**< number of seasons */
   uint32_t nyears;           /**< number of years */
-  std::vector<double> log_M; /**< log of the natural mortality of the stock*/
-  std::vector<double> log_init_naa; /**<log of the initial numbers at age*/
+  Rcpp::NumericVector log_M; /**< log of the natural mortality of the stock*/
+  Rcpp::NumericVector log_init_naa; /**<log of the initial numbers at age*/
   double prop_female;               /**< the proportion of female fish*/
 
   PopulationInterface() : PopulationInterfaceBase() {}
