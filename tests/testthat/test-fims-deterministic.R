@@ -2,15 +2,15 @@
 # install.packages("Matrix")
 # install.packages("TMB", type = "source")
 # use updated version of pkgbuild with correct compilation flags for debugging:
-# remotes::install_github(rep = "Andrea-Havron-NOAA/pkgbuild")
+# remotes::install_github(repo = "Andrea-Havron-NOAA/pkgbuild")
 
 devtools::load_all()
 
 library(FIMS)
 data(package = "FIMS")
 
-#remove from test_that wrapper for debugging
-#test_that("deterministic test of fims", {
+# remove from test_that wrapper for debugging
+# test_that("deterministic test of fims", {
 
 ## Install required packages
 required_pkg <- c("remotes", "devtools", "here")
@@ -51,99 +51,116 @@ recruitment$steep$is_random_effect <- FALSE
 recruitment$steep$estimated <- TRUE
 
 recruitment_nll <- new(fims$RecruitmentNLL)
-recruitment_nll$log_sigma_recruit$value <- log(0.4)
-recruitment_nll$recruitment_devs <- om_input$logR.resid
+recruitment_nll$do_bias_correction <- FALSE
 recruitment_nll$estimate_recruit_deviations <- TRUE
+recruitment_nll$log_sigma_recruit$value <- om_input$logR_sd
+recruitment_nll$log_sigma_recruit$is_random_effect <- FALSE
+recruitment_nll$log_sigma_recruit$estimated <- TRUE
+recruitment_nll$recruitment_bias_adj <- rep(0.0, om_input$nyr)
+recruitment_nll$recruitment_devs <- om_input$logR.resid
 
 # Growth
-growth <- new(fims$EWAAgrowth)
 ewaa_growth <- new(fims$EWAAgrowth)
-  age_frame <- FIMSFrameAge(data_mile1)
-  ewaa_growth$ages <- m_ages(age_frame)
-  ewaa_growth$weights <- m_weightatage(age_frame)
+age_frame <- FIMSFrameAge(data_mile1)
+ewaa_growth$ages <- m_ages(age_frame)
+ewaa_growth$weights <- m_weightatage(age_frame)
 
 # Maturity
 maturity <- new(fims$LogisticMaturity)
+maturity$median$value <- om_input$A50.mat
+maturity$median$is_random_effect <- FALSE
+maturity$median$estimated <- TRUE
+maturity$slope$value <- om_input$slope
+maturity$slope$is_random_effect <- FALSE
+maturity$slope$estimated <- TRUE
 
-  maturity$median$value <- om_input$A50.mat
-
-  maturity$median$is_random_effect <- FALSE
-  maturity$median$estimated <- TRUE
-  maturity$slope$value <- om_input$slope
-
-# Natural mortality
-#create new population module and set log_M directly
+# Population
 population <- new(fims$Population)
-  #is it a problem these are not Parameters in the Population interface?
-  #the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
-  population$log_M <- rep(log(om_input$M.age), om_input$nyr)
-  population$log_init_naa <- log(om_output$N.age[1,])
-
-# Create the population:
-population <- new(fims$Population)
+# is it a problem these are not Parameters in the Population interface?
+# the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
+population$log_M <- rep(log(om_input$M.age), om_input$nyr)
+population$log_init_naa <- log(om_output$N.age[1, ])
 population$nages <- om_input$nages
-population$nfleets <- 2
+population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
 population$nseasons <- 1
 population$nyears <- om_input$nyr
 population$prop_female <- om_input$proportion.female[1]
+population$Initialize(om_input$nyr, 1, om_input$nages)
 
 # Fleet
-# Create the fleet
-# Fleet selectivity settings
-fleet_selectivity <- new(fims$LogisticSelectivity)
-  fleet_selectivity$median$value <- 10.0
-  fleet_selectivity$median$min <- 8.0
-  fleet_selectivity$median$max <- 12.0
-  fleet_selectivity$median$is_random_effect <- FALSE
-  fleet_selectivity$median$estimated <- TRUE
-  fleet_selectivity$slope$value <- 0.2
-  fleet_selectivity$slope$is_random_effect <- FALSE
-  fleet_selectivity$slope$estimated <- TRUE
+# Create the fishing fleet
+fishing_fleet_selectivity <- new(fims$LogisticSelectivity)
+fishing_fleet_selectivity$median$value <- om_input$sel_fleet$fleet1$A50.sel1
+fishing_fleet_selectivity$median$is_random_effect <- FALSE
+fishing_fleet_selectivity$median$estimated <- TRUE
+fishing_fleet_selectivity$slope$value <- om_input$sel_fleet$fleet1$slope.sel1
+fishing_fleet_selectivity$slope$is_random_effect <- FALSE
+fishing_fleet_selectivity$slope$estimated <- TRUE
 
-fleet <- new(fims$Fleet)
-fleet$SetSelectivity(fleet_selectivity$get_id())
+fishing_fleet <- new(fims$Fleet)
+# Need get_id() for setting up observed agecomp and index data?
+fishing_fleet$nages <- om_input$nages
+fishing_fleet$nyears <- om_input$nyr
+fishing_fleet$log_Fmort <- log(om_output$f)
+fishing_fleet$estimate_F <- TRUE
+fishing_fleet$random_F <- FALSE
+fishing_fleet$log_q <- rep(log(1.0), om_input$nyr)
+fishing_fleet$estimate_q <- TRUE
+fishing_fleet$random_q <- FALSE
+fishing_fleet$SetAgeCompLikelihood(1)
+fishing_fleet$SetIndexLikelihood(1)
+fishing_fleet$SetObservedAgeCompData(1, as.matrix(c(t(em_input$L.age.obs$fleet1)))) 
+fishing_fleet$SetObservedIndexData(1, em_input$L.obs$fleet1)
+fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id()) 
 
-fleet$nages <- om_input$nages
-#fleet$nseasons <- 1
-fleet$nyears <- om_input$nyr
-fleet$log_q <- 0
-#fleet$log_Fmort$value <- log(om_output$f)
-fleet$log_Fmort <- log(om_output$f)
-#not working: fleet$log_Fmort$estimated <- TRUE
+# Create the survey fleet
+survey_fleet_selectivity <- new(fims$LogisticSelectivity)
+survey_fleet_selectivity$median$value <- om_input$sel_survey$survey1$A50.sel1
+survey_fleet_selectivity$median$is_random_effect <- FALSE
+survey_fleet_selectivity$median$estimated <- TRUE
+survey_fleet_selectivity$slope$value <- om_input$sel_survey$survey1$slope.sel1
+survey_fleet_selectivity$slope$is_random_effect <- FALSE
+survey_fleet_selectivity$slope$estimated <- TRUE
 
-survey_selectivity <- new(fims$LogisticSelectivity)
-  survey_selectivity$median$value <- 10.0
-  survey_selectivity$median$min <- 8.0
-  survey_selectivity$median$max <- 12.0
-  survey_selectivity$median$is_random_effect <- FALSE
-  survey_selectivity$median$estimated <- TRUE
-  survey_selectivity$slope$value <- 0.2
-  survey_selectivity$slope$is_random_effect <- FALSE
-  survey_selectivity$slope$estimated <- TRUE
+survey_fleet <- new(fims$Fleet)
+survey_fleet$nages <- om_input$nages
+survey_fleet$nyears <- om_input$nyr
+survey_fleet$log_Fmort <- rep(log(0.0), om_input$nyr) #-Inf?
+survey_fleet$estimate_F <- TRUE
+survey_fleet$random_F <- FALSE
+survey_fleet$log_q <- rep(log(om_output$survey_q$survey1), om_input$nyr)
+survey_fleet$estimate_q <- TRUE
+survey_fleet$random_q <- FALSE
+survey_fleet$SetAgeCompLikelihood(1)
+survey_fleet$SetIndexLikelihood(1)
+survey_fleet$SetObservedAgeCompData(2, as.matrix(c(t(em_input$survey.age.obs$survey1)))) 
+survey_fleet$SetObservedIndexData(2, em_input$survey.obs$survey1) 
+survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id()) 
 
-survey <- new(fims$Fleet)
-survey$log_q <- log(0.00003)
-survey$log_Fmort <- log(om_output$f)
-survey$nages <- om_input$nages
-survey$nyears <- om_input$nyr
-survey$estimate_F <- TRUE
-survey$estimate_q <- TRUE
-survey$random_q <- FALSE
-survey$random_F <- FALSE
-survey$SetSelectivity(survey_selectivity$get_id())
-
-fims$CreateTMBModel()
 ## Set-up TMB
-# Create parameter list from Rcpp modules
+fims$CreateTMBModel()
+# # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
-#crashes at population.Prepare() and references fims_math line 70: exp()
+# #crashes at population.Prepare() and references fims_math line 70: exp()
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
-message("success!")
+# message("success!")
 #report <- obj$report()
 
-# numbers at age
-#test output: expect_equal(?om_output$naa, report$naa) #need to add REPORT_F to population for any output to compare
+# Test
+# TO DO:
+# - extract TMB output
+# - use for loop to check individual values from a vector
+# - use absolute relative error later
+# - set up tolerance values later
 
-
-
-#})
+# Numbers at age
+expect_equal(report, c(t(om_output$N.age)))
+# Biomass
+expect_equal(report, om_output$biomass.mt)
+# Spawning biomass
+expect_equal(report, om_output$SSB)
+# Expected catch
+expect_equal(report, om_output$L.mt)
+# Expected index
+expect_equal(report, om_output$survey_index_biomass)
+# })
