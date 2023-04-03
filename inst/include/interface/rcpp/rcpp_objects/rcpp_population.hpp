@@ -81,6 +81,12 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     b0->id = this->id;
+    b0->nyears = this->nyears;
+    b0->nfleets = this->nfleets;
+    b0->nseasons = this->nseasons;
+    b0->nages = this->nages;
+
+    b0->id = this->id;
     b0->log_M.resize(this->log_M.size());
     b0->log_init_naa.resize(this->log_init_naa.size());
     b0->proportion_female = this->prop_female;
@@ -111,6 +117,10 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     b1->id = this->id;
+    b1->nyears = this->nyears;
+    b1->nfleets = this->nfleets;
+    b1->nseasons = this->nseasons;
+    b1->nages = this->nages;
 
     b1->log_M.resize(this->log_M.size());
     b1->log_init_naa.resize(this->log_init_naa.size());
@@ -141,6 +151,10 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     b2->id = this->id;
+    b2->nyears = this->nyears;
+    b2->nfleets = this->nfleets;
+    b2->nseasons = this->nseasons;
+    b2->nages = this->nages;
     b2->log_M.resize(this->log_M.size());
 
     b2->log_init_naa.resize(this->log_init_naa.size());
@@ -171,6 +185,10 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     b3->id = this->id;
+    b3->nyears = this->nyears;
+    b3->nfleets = this->nfleets;
+    b3->nseasons = this->nseasons;
+    b3->nages = this->nages;
     b3->log_M.resize(this->log_M.size());
     b3->log_init_naa.resize(this->log_init_naa.size());
     b3->proportion_female = this->prop_female;

@@ -31,9 +31,9 @@ namespace fims {
 template <typename T>
 class Information {
  public:
-  size_t nyears;       /**< number of years >*/
-  size_t nseasons = 1; /**< number of seasons >*/
-  size_t nages;        /**< number of ages>*/
+ // size_t nyears;       /**< number of years >*/
+//  size_t nseasons = 1; /**< number of seasons >*/
+//  size_t nages;        /**< number of ages>*/
 
   static std::shared_ptr<Information<T> >
       fims_information;       /**< singleton instance >*/
@@ -164,7 +164,7 @@ class Information {
       // Initialize fleet object
       std::shared_ptr<fims::Fleet<T> > f = (*it).second;
 
-      f->Initialize(nyears, nages);
+      f->Initialize(f->nyears, f->nages);
 
       // set index data
       if (f->observed_index_data_id != -999) {
@@ -218,7 +218,7 @@ class Information {
               (*it).second;  // fleet object pointer initialized to second field
                              // in map
 
-          f->Initialize(nyears, nages);
+          f->Initialize(f->nyears, f->nages);
 
           // set catch data
           // if (f->observed_catch_data_id != -999) {
@@ -374,7 +374,7 @@ class Information {
           std::shared_ptr<fims::Population<T> > p = (*it).second;
           // error check and set population elements here
 
-          p->Initialize(nyears, nseasons, nages);
+          p->Initialize(p->nyears, p->nseasons, p->nages);
 
           // set recruitment
           if (p->recruitment_id != -999) {
