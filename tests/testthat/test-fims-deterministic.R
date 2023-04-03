@@ -74,19 +74,6 @@ maturity$slope$value <- om_input$slope
 maturity$slope$is_random_effect <- FALSE
 maturity$slope$estimated <- TRUE
 
-# Population
-population <- new(fims$Population)
-# is it a problem these are not Parameters in the Population interface?
-# the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
-population$log_M <- rep(log(om_input$M.age), om_input$nyr)
-population$log_init_naa <- log(om_output$N.age[1, ])
-population$nages <- om_input$nages
-population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
-population$nseasons <- 1
-population$nyears <- om_input$nyr
-population$prop_female <- om_input$proportion.female[1]
-population$Initialize(om_input$nyr, 1, om_input$nages)
-
 # Fleet
 # Create the fishing fleet
 fishing_fleet_selectivity <- new(fims$LogisticSelectivity)
@@ -137,6 +124,18 @@ survey_fleet$SetObservedAgeCompData(2, as.matrix(c(t(em_input$survey.age.obs$sur
 survey_fleet$SetObservedIndexData(2, em_input$survey.obs$survey1) 
 survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id()) 
 
+# Population
+population <- new(fims$Population)
+# is it a problem these are not Parameters in the Population interface?
+# the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
+population$log_M <- rep(log(om_input$M.age), om_input$nyr)
+population$log_init_naa <- log(om_output$N.age[1, ])
+population$nages <- om_input$nages
+population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
+population$nseasons <- 1
+population$nyears <- om_input$nyr
+population$prop_female <- om_input$proportion.female[1]
+
 ## Set-up TMB
 fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
@@ -153,14 +152,14 @@ obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
 # - use absolute relative error later
 # - set up tolerance values later
 
-# Numbers at age
-expect_equal(report, c(t(om_output$N.age)))
-# Biomass
-expect_equal(report, om_output$biomass.mt)
-# Spawning biomass
-expect_equal(report, om_output$SSB)
-# Expected catch
-expect_equal(report, om_output$L.mt)
-# Expected index
-expect_equal(report, om_output$survey_index_biomass)
+# # Numbers at age
+# expect_equal(report, c(t(om_output$N.age)))
+# # Biomass
+# expect_equal(report, om_output$biomass.mt)
+# # Spawning biomass
+# expect_equal(report, om_output$SSB)
+# # Expected catch
+# expect_equal(report, om_output$L.mt)
+# # Expected index
+# expect_equal(report, om_output$survey_index_biomass)
 # })

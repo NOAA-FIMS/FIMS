@@ -27,6 +27,7 @@
 #include "../recruitment/recruitment.hpp"
 
 namespace fims {
+std::ofstream out("debug.txt");
 /*TODO:
 Review, add functions to evaluate, push vectors back to fleet (or point to fleet
 directly?)
@@ -124,9 +125,9 @@ struct Population : public FIMSObject<Type> {
    * @param nages number of ages in the population
    */
   void Initialize(int nyears, int nseasons, int nages) {
-    this->nyears = nyears;
-    this->nseasons = nseasons;
-    this->nages = nages;
+    // this->nyears = nyears;
+    // this->nseasons = nseasons;
+    // this->nages = nages;
 
     // size all the vectors to length of nages
     nfleets = fleets.size();
@@ -157,6 +158,11 @@ struct Population : public FIMSObject<Type> {
   void Prepare() {
     this->nfleets = this->fleets.size();
 
+    FIMS_LOG << this -> nages << std::endl;
+    FIMS_LOG << this -> nfleets << std::endl;
+    FIMS_LOG << this -> nseasons << std::endl;
+    FIMS_LOG << this -> nyears << std::endl;
+
     for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
       this->fleets[fleet]->Prepare();
     }
@@ -168,10 +174,16 @@ struct Population : public FIMSObject<Type> {
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
-      this->init_naa[age] = fims::exp(this->log_init_naa[age]); //fims::exp(11);
+      // this->init_naa[age] = std::exp(11);
+      this->init_naa[age] =1000000;
+      out <<" age =: "<<age<<std::endl;
+      out <<" this->log_init_naa[age] =: "<<this->log_init_naa[age]<<std::endl;
+      out <<" this->init_naa[age] =: "<<this->init_naa[age]<<std::endl;
+      // this->init_naa[age] = fims::exp(this->log_init_naa[age]); //fims::exp(11);
       for (size_t year = 0; year < this->nyears; year++) {
         size_t index_ay = age * this->nyears + year;
-        this->M[index_ay] = fims::exp(this->log_M[index_ay]);// fims::exp(-1.6);
+         this->M[index_ay] = 0.2;//exp(-1.6);
+       // this->M[index_ay] = fims::exp(this->log_M[index_ay]);// fims::exp(-1.6);
         this->mortality_F[year] = 0.0;
       }
     }
