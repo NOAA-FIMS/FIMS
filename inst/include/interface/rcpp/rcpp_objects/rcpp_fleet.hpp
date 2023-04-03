@@ -11,6 +11,7 @@
 #include "../../../population_dynamics/fleet/fleet.hpp"
 #include "../../../population_dynamics/fleet/fleet_nll.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../../common/def.hpp"
 
 /**
  * @brief Rcpp interface for Fleet as an S4 object. To instantiate
@@ -40,7 +41,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
   static uint32_t id_g; /**< static id of the FleetInterface object */
   uint32_t id;          /**< local id of the FleetInterface object */
 
-  FleetInterface() { this->id = FleetInterface::id_g++; }
+  FleetInterface() { 
+    this->id = FleetInterface::id_g++; 
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
 
   virtual ~FleetInterface() {}
 
@@ -160,9 +164,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         }
       }
     }
-
+    std::cout << " f0 id " << f0->id << std::endl;
     // add to Information
     d0->fleets[f0->id] = f0;
+    std::cout << " fleet size d0 " << d0->fleets.size() << std::endl;
 
     // 1st derivative model
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =

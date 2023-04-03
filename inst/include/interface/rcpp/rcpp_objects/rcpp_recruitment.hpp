@@ -91,6 +91,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     // set relative info
     b0->id = this->id;
+    std::cout << " recruitment id " << b0->id << std::endl;
     b0->steep = this->steep.value;
     if (this->steep.estimated) {
       if (this->steep.is_random_effect) {

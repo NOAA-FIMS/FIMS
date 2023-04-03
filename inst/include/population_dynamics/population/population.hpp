@@ -130,7 +130,7 @@ struct Population : public FIMSObject<Type> {
     // this->nages = nages;
 
     // size all the vectors to length of nages
-    nfleets = fleets.size();
+    //nfleets = fleets.size();
     expected_catch.resize(nyears * nfleets);
     ages.resize(nages);
     years.resize(nyears);
@@ -174,16 +174,11 @@ struct Population : public FIMSObject<Type> {
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
-      // this->init_naa[age] = std::exp(11);
-      this->init_naa[age] =1000000;
-      out <<" age =: "<<age<<std::endl;
-      out <<" this->log_init_naa[age] =: "<<this->log_init_naa[age]<<std::endl;
-      out <<" this->init_naa[age] =: "<<this->init_naa[age]<<std::endl;
-      // this->init_naa[age] = fims::exp(this->log_init_naa[age]); //fims::exp(11);
+      this->init_naa[age] = fims::exp(this->log_init_naa[age]);
+      FIMS_LOG << "init naa size " << this->init_naa.size() << " age " << age << std::endl;
       for (size_t year = 0; year < this->nyears; year++) {
         size_t index_ay = age * this->nyears + year;
-         this->M[index_ay] = 0.2;//exp(-1.6);
-       // this->M[index_ay] = fims::exp(this->log_M[index_ay]);// fims::exp(-1.6);
+       this->M[index_ay] = fims::exp(this->log_M[index_ay]);
         this->mortality_F[year] = 0.0;
       }
     }

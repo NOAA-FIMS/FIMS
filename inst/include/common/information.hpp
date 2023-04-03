@@ -159,6 +159,7 @@ class Information {
     bool valid_model = true;
 
     std::cout << "Information: Initializing fleet objects.\n";
+    FIMS_LOG << " fleet size "  << this->fleets.size() << std::endl;
     for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
          ++it) {
       // Initialize fleet object
@@ -219,6 +220,7 @@ class Information {
                              // in map
 
           f->Initialize(f->nyears, f->nages);
+          FIMS_LOG << "f nyears " << f->nyears << " f nages " << f->nages << std::endl;
 
           // set catch data
           // if (f->observed_catch_data_id != -999) {
@@ -368,11 +370,18 @@ class Information {
           }
         }
 
+          FIMS_LOG << "fleet size " << this->fleets.size() << std::endl;
         std::cout << "Information: Initializing population objects.\n";
         for (population_iterator it = this->populations.begin();
              it != this->populations.end(); ++it) {
           std::shared_ptr<fims::Population<T> > p = (*it).second;
-          // error check and set population elements here
+          // error check and set population elements 
+           // check me - add another fleet iterator to push information from
+          // population to the individual fleets This is to pass catch at age
+          // from population to fleets?
+          FIMS_LOG << " fleet size " << this->fleets.size() << std::endl;
+            // any shared member in p (population is pushed into fleets)
+            p->fleets.push_back(f);
 
           p->Initialize(p->nyears, p->nseasons, p->nages);
 
@@ -439,18 +448,7 @@ class Information {
             // log error
           }
 
-          // check me - add another fleet iterator to push information from
-          // population to the individual fleets This is to pass catch at age
-          // from population to fleets?
-          for (fleet_iterator it = this->fleets.begin();
-               it != this->fleets.end(); ++it) {
-            // Initialize fleet object
-            std::shared_ptr<fims::Fleet<T> > f =
-                (*it).second;  // fleet object pointer initialized to second
-                               // field in map
-            // any shared member in p (population is pushed into fleets)
-            p->fleets.push_back(f);
-          }
+         
         }
         return valid_model;
 
@@ -482,12 +480,6 @@ class Information {
       }
     }
 
-    std::cout << "Information: Initializing population objects.\n";
-    for (population_iterator it = this->populations.begin();
-         it != this->populations.end(); ++it) {
-      std::shared_ptr<fims::Population<T> > p = (*it).second;
-      // error check and set population elements here
-    }
     return valid_model;
   }
 
