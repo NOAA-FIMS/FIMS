@@ -67,7 +67,6 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       (*it).second->of = this->of;
 #endif
-      (*it).second->Prepare();
       (*it).second->Evaluate();
     }
 
