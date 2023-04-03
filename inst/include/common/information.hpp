@@ -31,9 +31,9 @@ namespace fims {
 template <typename T>
 class Information {
  public:
- // size_t nyears;       /**< number of years >*/
-//  size_t nseasons = 1; /**< number of seasons >*/
-//  size_t nages;        /**< number of ages>*/
+ size_t nyears;       /**< number of years >*/
+ size_t nseasons = 1; /**< number of seasons >*/
+ size_t nages;        /**< number of ages>*/
 
   static std::shared_ptr<Information<T> >
       fims_information;       /**< singleton instance >*/

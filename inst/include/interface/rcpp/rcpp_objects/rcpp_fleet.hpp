@@ -141,6 +141,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
 
     // set relative info
     f0->id = this->id;
+    f0->nages = this->nages;
+    f0->nyears = this-> nyears;
     f0->agecomp_likelihood_id = this->agecomp_likelihood_id;
     f0->index_likelihood_id = this->index_likelihood_id;
     // f0->observed_agecomp_data_id = this->observed_agecomp_data_id;
@@ -170,6 +172,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         std::make_shared<fims::Fleet<TMB_FIMS_FIRST_ORDER>>();
 
     f1->id = this->id;
+    f1->nages = this->nages;
+    f1->nyears = this-> nyears;
     f1->agecomp_likelihood_id = this->agecomp_likelihood_id;
     f1->index_likelihood_id = this->index_likelihood_id;
     // f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
@@ -198,6 +202,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         std::make_shared<fims::Fleet<TMB_FIMS_SECOND_ORDER>>();
 
     f2->id = this->id;
+    f2->nages = this->nages;
+    f2->nyears = this-> nyears;
     f2->agecomp_likelihood_id = this->agecomp_likelihood_id;
     f2->index_likelihood_id = this->index_likelihood_id;
     // f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
@@ -226,6 +232,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         std::make_shared<fims::Fleet<TMB_FIMS_THIRD_ORDER>>();
 
     f3->id = this->id;
+    f3->nages = this->nages;
+    f3->nyears = this-> nyears;
     f3->agecomp_likelihood_id = this->agecomp_likelihood_id;
     f3->index_likelihood_id = this->index_likelihood_id;
     // f3->observed_agecomp_data_id = this->observed_agecomp_data_id;
