@@ -213,7 +213,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .field("ages", &EWAAGrowthInterface::ages)
       .field("weights", &EWAAGrowthInterface::weights)
-      .method("get_id", &REWAAGrowthInterface::get_id)
+      .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
   Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")
