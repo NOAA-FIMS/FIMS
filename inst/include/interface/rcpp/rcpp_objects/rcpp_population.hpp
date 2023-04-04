@@ -141,7 +141,9 @@ class PopulationInterface : public PopulationInterfaceBase {
     b0->nages = this->nages;
     b0->ages.resize(this->nages);
 
-    b0->id = this->id;
+    b0->growth_id = this->growth_id;
+    b0->recruitment_id = this->recruitment_id;
+    b0->maturity_id = this->maturity_id;
     b0->log_M.resize(this->log_M.size());
     b0->log_init_naa.resize(this->log_init_naa.size());
     b0->proportion_female = this->prop_female;
@@ -178,6 +180,10 @@ class PopulationInterface : public PopulationInterfaceBase {
     b1->nseasons = this->nseasons;
     b1->nages = this->nages;
     b1->ages.resize(this->nages);
+    
+    b1->growth_id = this->growth_id;
+    b1->recruitment_id = this->recruitment_id;
+    b1->maturity_id = this->maturity_id;
 
     b1->log_M.resize(this->log_M.size());
     b1->log_init_naa.resize(this->log_init_naa.size());
@@ -209,6 +215,10 @@ class PopulationInterface : public PopulationInterfaceBase {
     b2->nages = this->nages;
     b2->log_M.resize(this->log_M.size());
     b2->ages.resize(nages);
+    
+    b2->growth_id = this->growth_id;
+    b2->recruitment_id = this->recruitment_id;
+    b2->maturity_id = this->maturity_id;
 
     b2->log_init_naa.resize(this->log_init_naa.size());
     b2->proportion_female = this->prop_female;
@@ -247,6 +257,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     b3->log_init_naa.resize(this->log_init_naa.size());
     b3->proportion_female = this->prop_female;
     b3->ages.resize(this->nages);
+
+    b3->growth_id = this->growth_id;
+    b3->recruitment_id = this->recruitment_id;
+    b3->maturity_id = this->maturity_id;
+
     for (size_t i = 0; i < log_M.size(); i++) {
       b3->log_M[i] = this->log_M[i];
     }

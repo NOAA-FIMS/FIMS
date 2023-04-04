@@ -144,7 +144,8 @@ population$SetRecruitment(recruitment$get_id())
 fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
-# #crashes at population.Prepare() and references fims_math line 70: exp()
+# #crashes at population line below with year = 1 and index_ya=12
+# 364             this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
 # message("success!")
 #report <- obj$report()

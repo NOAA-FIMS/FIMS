@@ -384,7 +384,7 @@ class Information {
             p->fleets.push_back(f);
 
           p->Initialize(p->nyears, p->nseasons, p->nages);
-
+          FIMS_LOG << "recruitment id " << p->recruitment_id << std::endl;
           // set recruitment
           if (p->recruitment_id != -999) {
             uint32_t recruitment_uint =
