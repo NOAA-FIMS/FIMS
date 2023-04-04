@@ -64,6 +64,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
 
   virtual ~EWAAGrowthInterface() {}
+  
   /** @brief get the id of the GrowthInterfaceBase object */
   virtual uint32_t get_id() { return this->id; }
 

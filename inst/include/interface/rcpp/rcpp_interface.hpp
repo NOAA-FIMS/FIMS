@@ -173,7 +173,10 @@ RCPP_MODULE(fims) {
       .field("log_init_naa", &PopulationInterface::log_init_naa)
       .field("prop_female", &PopulationInterface::prop_female)
       .field("ages", &PopulationInterface::ages)
-      .method("evaluate", &PopulationInterface::evaluate);
+      .method("evaluate", &PopulationInterface::evaluate)
+      .method("SetMaturity", &PopulationInterface::SetMaturity)
+        .method("SetGrowth", &PopulationInterface::SetGrowth)
+      .method("SetRecruitment", &PopulationInterface::SetRecruitment);
 
   Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
       .constructor()
@@ -210,6 +213,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .field("ages", &EWAAGrowthInterface::ages)
       .field("weights", &EWAAGrowthInterface::weights)
+      .method("get_id", &REWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
   Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")

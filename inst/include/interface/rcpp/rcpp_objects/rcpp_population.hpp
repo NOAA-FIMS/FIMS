@@ -53,6 +53,9 @@ class PopulationInterface : public PopulationInterfaceBase {
   uint32_t nfleets;          /**< number of fleets */
   uint32_t nseasons;         /**< number of seasons */
   uint32_t nyears;           /**< number of years */
+  uint32_t maturity_id;  /**< id of the maturity function*/
+  uint32_t growth_id;  /**< id of the growth function*/
+  uint32_t recruitment_id; /**< id of the recruitment function*/
   Rcpp::NumericVector log_M; /**< log of the natural mortality of the stock*/
   Rcpp::NumericVector log_init_naa; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
@@ -63,6 +66,56 @@ class PopulationInterface : public PopulationInterfaceBase {
   virtual ~PopulationInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Set the unique id for the Maturity object
+   *
+   * @param maturity_id Unique id for the Maturity object
+   */
+  void SetMaturity(int maturity_id) {
+    // Check if maturity has been set already
+    if (this->maturity_id != -999) {
+      warning("maturity has been set already.");
+      Rcout << "Now you are resetting maturity with maturity ID of "
+            << maturity_id << std::endl;
+    }
+
+    this->maturity_id = maturity_id;
+  }
+
+  
+  /**
+   * @brief Set the unique id for the growth object
+   *
+   * @param growth_id Unique id for the growth object
+   */
+  void SetGrowth(int growth_id) {
+    // Check if growth has been set already
+    if (this->growth_id != -999) {
+      warning("growth has been set already.");
+      Rcout << "Now you are resetting growth with growth ID of "
+            << growth_id << std::endl;
+    }
+
+    this->growth_id = growth_id;
+  }
+
+  
+  /**
+   * @brief Set the unique id for the Maturity object
+   *
+   * @param recruitment_id Unique id for the Maturity object
+   */
+  void SetRecruitment(int recruitment_id) {
+    // Check if recruitment has been set already
+    if (this->recruitment_id != -999) {
+      warning("recruitment has been set already.");
+      Rcout << "Now you are resetting recruitment with recruitment ID of "
+            << recruitment_id << std::endl;
+    }
+
+    this->recruitment_id = recruitment_id;
+  }
 
   /** @brief evaluate the population function */
   virtual void evaluate() {

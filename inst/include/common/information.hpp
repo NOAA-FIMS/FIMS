@@ -427,7 +427,8 @@ class Information {
             valid_model = false;
             // log error
           }
-
+          FIMS_LOG << "maturity models size " <<  this->maturity_models.size() << std::endl;
+          FIMS_LOG << " maturity id " << p->maturity_id << std::endl;
           // set maturity
           if (p->maturity_id != -999) {
             uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
@@ -438,9 +439,10 @@ class Information {
             if (it != this->maturity_models.end()) {
               p->maturity =
                   (*it).second;  // >maturity defined in population.hpp
+            FIMS_LOG << " set maturity " << std::endl;
             } else {
               valid_model = false;
-              // log error
+              FIMS_LOG << "Error: maturity model has not been set " << std::endl;
             }
 
           } else {
