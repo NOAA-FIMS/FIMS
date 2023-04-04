@@ -480,6 +480,11 @@ struct Population : public FIMSObject<Type> {
   void CalculateMaturityAA(size_t index_ya, size_t age) {
     // this->maturity is pointing to the maturity module, which has
     //  an evaluate function. -> can be nested.
+  FIMS_LOG << " age " << age << std::endl;
+  FIMS_LOG << " ages size " << ages.size() << std::endl;
+  FIMS_LOG << " index_ya " << index_ya << std::endl;
+  FIMS_LOG << "p mature" << this->proportion_mature_at_age.size() << std::endl;
+    FIMS_LOG << ages[age] << std::endl;
     this->proportion_mature_at_age[index_ya] =
         this->maturity->evaluate(ages[age]);
   }

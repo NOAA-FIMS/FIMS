@@ -55,6 +55,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   uint32_t nyears;           /**< number of years */
   Rcpp::NumericVector log_M; /**< log of the natural mortality of the stock*/
   Rcpp::NumericVector log_init_naa; /**<log of the initial numbers at age*/
+  Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
   double prop_female;               /**< the proportion of female fish*/
 
   PopulationInterface() : PopulationInterfaceBase() {}
@@ -85,6 +86,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     b0->nfleets = this->nfleets;
     b0->nseasons = this->nseasons;
     b0->nages = this->nages;
+    b0->ages.resize(this->nages);
 
     b0->id = this->id;
     b0->log_M.resize(this->log_M.size());
@@ -96,6 +98,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b0->log_init_naa[i] = this->log_init_naa[i];
+      b0->ages[i] = this->ages[i];
     }
     // if (this->log_M.estimated) {
     //   if (this->log_M.is_random_effect) {
@@ -121,6 +124,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     b1->nfleets = this->nfleets;
     b1->nseasons = this->nseasons;
     b1->nages = this->nages;
+    b1->ages.resize(this->nages);
 
     b1->log_M.resize(this->log_M.size());
     b1->log_init_naa.resize(this->log_init_naa.size());
@@ -130,14 +134,9 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b1->log_init_naa[i] = this->log_init_naa[i];
+      b1->ages[i] = this->ages[i];
     }
-    // if (this->log_M.estimated) {
-    // if (this->log_M.is_random_effect) {
-    // d1->RegisterRandomEffect(b1->log_M);
-    // } else {
-    // d1->RegisterParameter(b1->log_M);
-    // }
-    // }
+
 
     // add to Information
     d1->populations[b1->id] = b1;
@@ -156,6 +155,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     b2->nseasons = this->nseasons;
     b2->nages = this->nages;
     b2->log_M.resize(this->log_M.size());
+    b2->ages.resize(nages);
 
     b2->log_init_naa.resize(this->log_init_naa.size());
     b2->proportion_female = this->prop_female;
@@ -164,6 +164,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b2->log_init_naa[i] = this->log_init_naa[i];
+      b2->ages[i] = this->ages[i];
     }
     // if (this->log_M.estimated) {
     // if (this->log_M.is_random_effect) {
@@ -192,11 +193,13 @@ class PopulationInterface : public PopulationInterfaceBase {
     b3->log_M.resize(this->log_M.size());
     b3->log_init_naa.resize(this->log_init_naa.size());
     b3->proportion_female = this->prop_female;
+    b3->ages.resize(this->nages);
     for (size_t i = 0; i < log_M.size(); i++) {
       b3->log_M[i] = this->log_M[i];
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b3->log_init_naa[i] = this->log_init_naa[i];
+      b3->ages[i] = this->ages[i];
     }
 
     // b3->log_M = this->log_M.value;

@@ -131,6 +131,7 @@ population <- new(fims$Population)
 population$log_M <- rep(log(om_input$M.age), om_input$nyr)
 population$log_init_naa <- log(om_output$N.age[1, ])
 population$nages <- om_input$nages
+population$ages <- om_input$ages * 1.0
 population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
 population$nseasons <- 1
 population$nyears <- om_input$nyr
