@@ -124,9 +124,9 @@ struct Population : public FIMSObject<Type> {
    * @param nages number of ages in the population
    */
   void Initialize(int nyears, int nseasons, int nages) {
-    // this->nyears = nyears;
-    // this->nseasons = nseasons;
-    // this->nages = nages;
+    this->nyears = nyears;
+    this->nseasons = nseasons;
+    this->nages = nages;
 
     // size all the vectors to length of nages
     nfleets = fleets.size();

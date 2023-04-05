@@ -17,7 +17,7 @@ class IntegrationTest
 public:
   uint32_t ncases_m = 10;
   uint32_t ninput_files_m = 160;
-  bool print_statements = false;
+  bool print_statements = true;
 
   IntegrationTest()
   {
@@ -324,7 +324,7 @@ public:
       }
       if (print_statements)
       {
-        std::cout << "survey_num " << nfleets << std::endl;
+        std::cout << "survey_num " << nsurveys << std::endl;
       }
     }
     else
@@ -334,6 +334,7 @@ public:
         std::cout << "survey_num not found in input\n";
       }
     }
+
     pop.nfleets = pop.fleets.size();
 
     // initialize population
@@ -361,13 +362,10 @@ public:
       {
         std::cout << "ages ";
       }
+
       for (int i = 0; i < e.Size(); i++)
       {
         pop.ages[i] = e[i].GetDouble();
-        if (print_statements)
-        {
-          std::cout << pop.ages[i] << " ";
-        }
       }
       if (print_statements)
       {
