@@ -124,14 +124,17 @@ RCPP_MODULE(fims) {
             .field("deviations", &BevertonHoltRecruitmentInterface::deviations)
             .field("estimate_deviations", &BevertonHoltRecruitmentInterface::estimate_deviations)
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
+            .field("recruitment_bias_adj",
+                &BevertonHoltRecruitmentInterface::recruit_bias_adjustment)
+            .field("use_bias_correction", &BevertonHoltRecruitmentInterface::use_bias_correction)
+            .field("log_sigma_recruit", &BevertonHoltRecruitmentInterface::log_sigma_recruit)
             .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
     //    Rcpp::class_<RecruitmentNLLInterface>("RecruitmentNLL")
     //            .constructor()
     //            .field("log_sigma_recruit", &RecruitmentNLLInterface::log_sigma_recruit)
     //            .field("recruitment_devs", &RecruitmentNLLInterface::recruit_deviations)
-    //            .field("recruitment_bias_adj",
-    //            &RecruitmentNLLInterface::recruit_bias_adjustment)
+ 
     //            .field("do_bias_correction",
     //            &RecruitmentNLLInterface::use_recruit_bias_adjustment)
     //            .field("estimate_recruit_deviations",

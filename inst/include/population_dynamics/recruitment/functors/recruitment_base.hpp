@@ -50,8 +50,6 @@ namespace fims {
                              deviations */
         Type rzero; /*!< Unexploited recruitment. Should be a positive value.*/
 
-        Type biased_correction = 0.0;
-
         bool estimate_recruit_deviations =
                 true; /*!< A flag to indicate if recruitment deviations are estimated or
                not */
@@ -95,6 +93,7 @@ namespace fims {
             if (!this->estimate_recruit_deviations) {
                 return nll;
             } else {
+                #ifdef TMB_MODEL
                 fims::Dnorm<Type> dnorm;
                 dnorm.sd = fims::exp(this->log_sigma_recruit);
                 for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
@@ -105,6 +104,7 @@ namespace fims {
                     }
                     nll -= dnorm.evaluate(true);
                 }
+                #endif
                 return nll;
             }
         }

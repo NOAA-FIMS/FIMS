@@ -66,9 +66,10 @@ public:
     Parameter steep; /**< steepness or the productivity of the stock*/
     Parameter rzero; /**< recruitment at unfished biomass */
     Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
-    Rcpp::NumericVector deviations;
-    bool estimate_deviations= false;
-    bool use_bias_correction = false;
+    Rcpp::NumericVector recruit_bias_adjustment; /**<vector bias adjustment*/
+    Rcpp::NumericVector deviations; /**< recruitment deviations*/
+    bool estimate_deviations= false; /**< boolean describing whether to estimate */
+    bool use_bias_correction = false;/**< boolean describing whether to do bias correction */
 
     BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {
     }
