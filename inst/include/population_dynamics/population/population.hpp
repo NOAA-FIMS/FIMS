@@ -624,10 +624,18 @@ struct Population : public FIMSObject<Type> {
     // REPORT_F(int(this->nages), of); //REPORT error: call of overloaded is
     // ambiguous REPORT_F(int(this->nyears), of); REPORT_F(int(this->nfleets),
     // of); REPORT_F(this->numbers_at_age, of);
+    typename ModelTraits<Type>::EigenVector naa =
+      this->numbers_at_age;
+    typename ModelTraits<Type>::EigenVector ssb =
+      this->spawning_biomass;
     typename ModelTraits<Type>::EigenVector rec_dev =
         this->recruitment->recruit_deviations;
     REPORT_F(rec_dev, of);
     ADREPORT_F(rec_dev, of);
+    REPORT_F(naa, of);
+    ADREPORT_F(naa, of);
+    REPORT_F(ssb, of);
+    ADREPORT_F(ssb, of);
     // ADREPORT_F(this->recruitment->rzero, of);
     // ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in
     // recruitment_base ADREPORT_F(this->recruitment->log_sigma_recruit, of);
