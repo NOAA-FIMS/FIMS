@@ -337,14 +337,14 @@ struct Population : public FIMSObject<Type> {
       phi_0 += numbers_spr[a] * this->proportion_female *
                this->proportion_mature_at_age[a] *
                this->growth->evaluate(ages[a]);
-    } 
-    numbers_spr[this->nages - 1] =
+    }
+     numbers_spr[this->nages - 1] =
         (numbers_spr[nages - 2] * fims::exp(-this->M[nages - 2])) /
         (1 - exp(-this->M[this->nages - 1]));
     phi_0 += numbers_spr[this->nages - 1] * this->proportion_female *
              this->proportion_mature_at_age[this->nages - 1] *
              this->growth->evaluate(ages[this->nages - 1]);
-    return phi_0;
+     return phi_0;
   }
 
   /**
@@ -354,7 +354,14 @@ struct Population : public FIMSObject<Type> {
    * @param year the year recruitment is being calculated for
    */
   void CalculateRecruitment(size_t index_ya, size_t year) {
+    FIMS_LOG << "recruitment 1" << std::endl;
     Type phi0 = CalculateSBPR0();
+    FIMS_LOG << "recruitment 2" << std::endl;
+    FIMS_LOG << "phi0 = " << phi0 << std::endl;
+    FIMS_LOG << "spawning biomass = " << this->spawning_biomass[year - 1] << std::endl;
+    FIMS_LOG << "rec devs = " << this->recruitment->recruit_deviations[year] << std::endl;
+    FIMS_LOG << "rec eval = " << this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) << std::endl;
+
     this->numbers_at_age[index_ya] =
         this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
         this->recruitment->recruit_deviations[year];
