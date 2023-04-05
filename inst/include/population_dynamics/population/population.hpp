@@ -129,7 +129,7 @@ struct Population : public FIMSObject<Type> {
     // this->nages = nages;
 
     // size all the vectors to length of nages
-    //nfleets = fleets.size();
+    nfleets = fleets.size();
     expected_catch.resize(nyears * nfleets);
     ages.resize(nages);
     years.resize(nyears);
