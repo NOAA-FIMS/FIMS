@@ -35,7 +35,7 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
   case_name = "FIMS_C0_estimation"
 )
 
-ASSAMC::run_om(input_list = FIMS_C0)
+ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
 ## Set-up Rcpp modules and fix parameters to "true"
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
