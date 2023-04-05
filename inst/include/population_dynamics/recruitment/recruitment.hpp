@@ -15,7 +15,7 @@
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP
 
 #include "functors/recruitment_base.hpp"
-#include "functors/recruitment_nll.hpp"
+//#include "functors/recruitment_nll.hpp"
 #include "functors/sr_beverton_holt.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP */

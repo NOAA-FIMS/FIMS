@@ -124,6 +124,7 @@ struct Population : public FIMSObject<Type> {
    * @param nages number of ages in the population
    */
   void Initialize(int nyears, int nseasons, int nages) {
+      std::cout<<nyears<<" " << nseasons<<" "<<nages<<std::endl;
     this->nyears = nyears;
     this->nseasons = nseasons;
     this->nages = nages;
@@ -157,9 +158,9 @@ struct Population : public FIMSObject<Type> {
   void Prepare() {
     this->nfleets = this->fleets.size();
 
-    for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
-      this->fleets[fleet]->Prepare();
-    }
+//    for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
+//      this->fleets[fleet]->Prepare();
+//    }
 
     std::fill(unfished_spawning_biomass.begin(),
               unfished_spawning_biomass.end(), 0);
@@ -611,10 +612,10 @@ struct Population : public FIMSObject<Type> {
     // REPORT_F(int(this->nages), of); //REPORT error: call of overloaded is
     // ambiguous REPORT_F(int(this->nyears), of); REPORT_F(int(this->nfleets),
     // of); REPORT_F(this->numbers_at_age, of);
-    typename ModelTraits<Type>::EigenVector rec_dev =
-        this->recruitment->recruit_deviations;
-    REPORT_F(rec_dev, of);
-    ADREPORT_F(rec_dev, of);
+//    typename ModelTraits<Type>::EigenVector rec_dev =
+//        this->recruitment->recruit_deviations;
+//    REPORT_F(rec_dev, of);
+//    ADREPORT_F(rec_dev, of);
     // ADREPORT_F(this->recruitment->rzero, of);
     // ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in
     // recruitment_base ADREPORT_F(this->recruitment->log_sigma_recruit, of);
