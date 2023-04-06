@@ -378,8 +378,13 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
       size_t index_yf = year * this->nfleets +
                         fleet_;  // index by fleet and years to dimension fold
       size_t index_ya = year * this->nages + age;
+
+      FIMS_LOG << " fleet " << fleet_ << " year " << year << " age " << age <<std::endl;
       this->expected_catch[index_yf] +=
           this->fleets[fleet_]->catch_weight_at_age[index_ya];
+
+      FIMS_LOG << "expected catch: " <<  this->expected_catch[index_yf] << std::endl;
+      FIMS_LOG << "----------------------------------------------" << std::endl;
 
       fleets[fleet_]->expected_catch[year] +=
           this->fleets[fleet_]->catch_weight_at_age[index_ya];
@@ -604,6 +609,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
           CalculateCatchNumbersAA(index_ya, y, a);
 
           CalculateCatchWeightAA(y, a);
+          FIMS_LOG << "year " << y << " and age " << a <<std::endl;
           CalculateCatch(y, a);
           CalculateIndex(index_ya, y, a);
         }

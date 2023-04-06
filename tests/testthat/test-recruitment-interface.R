@@ -18,7 +18,6 @@ test_that("Recruitment input settings work as expected", {
   recruitment$rzero$value <- r0
   recruitment$log_sigma_recruit$value <- log(0.7)
   recruitment$recruitment_bias_adj <- rep(1.0, 3)
-  recruitment$deviations <- devs
   recruitment$use_bias_correction <- FALSE
 
   expect_equal(recruitment$get_id(), 1)
@@ -33,6 +32,7 @@ test_that("Recruitment input settings work as expected", {
   expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 1090802.68)
 
   devs <- c(1.0, 2.0, 3.0)
+    recruitment$deviations <- devs
 
 
   expected_nll <- -sum(log(stats::dnorm(log(devs), 0, 0.7)))
