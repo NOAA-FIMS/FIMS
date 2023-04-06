@@ -211,6 +211,7 @@ class Information {
         //   selectivity_models_iterator it = this->selectivity_models.find(
         //     sel_id);  // if find, set it, otherwise invalid
 
+       //
         std::cout << "Information: Initializing fleet objects.\n";
         for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
              ++it) {
@@ -371,87 +372,7 @@ class Information {
         }
 
           FIMS_LOG << "fleet size " << this->fleets.size() << std::endl;
-        std::cout << "Information: Initializing population objects.\n";
-        for (population_iterator it = this->populations.begin();
-             it != this->populations.end(); ++it) {
-          std::shared_ptr<fims::Population<T> > p = (*it).second;
-          // error check and set population elements 
-           // check me - add another fleet iterator to push information from
-          // population to the individual fleets This is to pass catch at age
-          // from population to fleets?
-          FIMS_LOG << " fleet size " << this->fleets.size() << std::endl;
-            // any shared member in p (population is pushed into fleets)
-            p->fleets.push_back(f);
 
-          p->Initialize(p->nyears, p->nseasons, p->nages);
-          FIMS_LOG << "recruitment id " << p->recruitment_id << std::endl;
-          // set recruitment
-          if (p->recruitment_id != -999) {
-            uint32_t recruitment_uint =
-                static_cast<uint32_t>(p->recruitment_id);
-            recruitment_models_iterator it =
-                this->recruitment_models.find(recruitment_uint);
-
-            if (it != this->recruitment_models.end()) {
-              p->recruitment =
-                  (*it).second;  // recruitment defined in population.hpp
-            } else {
-              valid_model = false;
-              // log error
-            }
-
-          } else {
-            valid_model = false;
-            // log error
-          }
-          // set growth
-          if (p->growth_id != -999) {
-            uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
-            growth_models_iterator it = this->growth_models.find(
-                growth_uint);  // growth_models is specified in information.hpp
-                               // and used in rcpp
-            p->ages =
-                this->ages;  // check me re dims. ages defined as an std::vector
-                             // at the head of information.hpp; are the
-                             // dimensions of ages defined in rcpp or where?
-            if (it != this->growth_models.end()) {
-              p->growth =
-                  (*it).second;  // growth defined in population.hpp (the object
-                                 // is called p, growth is within p)
-            } else {
-              valid_model = false;
-              // log error
-            }
-
-          } else {
-            valid_model = false;
-            // log error
-          }
-          FIMS_LOG << "maturity models size " <<  this->maturity_models.size() << std::endl;
-          FIMS_LOG << " maturity id " << p->maturity_id << std::endl;
-          // set maturity
-          if (p->maturity_id != -999) {
-            uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
-            maturity_models_iterator it = this->maturity_models.find(
-                maturity_uint);  // >maturity_models is specified in
-                                 // information.hpp and used in rcpp
-
-            if (it != this->maturity_models.end()) {
-              p->maturity =
-                  (*it).second;  // >maturity defined in population.hpp
-            FIMS_LOG << " set maturity " << std::endl;
-            } else {
-              valid_model = false;
-              FIMS_LOG << "Error: maturity model has not been set " << std::endl;
-            }
-
-          } else {
-            valid_model = false;
-            // log error
-          }
-
-         
-        }
         return valid_model;
 
       } else {
@@ -480,6 +401,93 @@ class Information {
         valid_model = false;
         // log error
       }
+    }
+
+    std::cout << "Information: Initializing population objects.\n";
+    for (population_iterator it = this->populations.begin();
+         it != this->populations.end(); ++it) {
+      std::shared_ptr<fims::Population<T> > p = (*it).second;
+
+      // error check and set population elements
+      // check me - add another fleet iterator to push information from
+      for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
+      ++it) {
+        // Initialize fleet object
+        std::shared_ptr<fims::Fleet<T> > f = (*it).second;
+        // population to the individual fleets This is to pass catch at age
+        // from population to fleets?
+        // any shared member in p (population is pushed into fleets)
+        p->fleets.push_back(f);
+      }
+
+      p->Initialize(p->nyears, p->nseasons, p->nages);
+      FIMS_LOG << "recruitment id " << p->recruitment_id << std::endl;
+      // set recruitment
+      if (p->recruitment_id != -999) {
+        uint32_t recruitment_uint =
+          static_cast<uint32_t>(p->recruitment_id);
+        recruitment_models_iterator it =
+          this->recruitment_models.find(recruitment_uint);
+
+        if (it != this->recruitment_models.end()) {
+          p->recruitment =
+            (*it).second;  // recruitment defined in population.hpp
+        } else {
+          valid_model = false;
+          // log error
+        }
+
+      } else {
+        valid_model = false;
+        // log error
+      }
+      // set growth
+      if (p->growth_id != -999) {
+        uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
+        growth_models_iterator it = this->growth_models.find(
+          growth_uint);  // growth_models is specified in information.hpp
+        // and used in rcpp
+        p->ages =
+          this->ages;  // check me re dims. ages defined as an std::vector
+        // at the head of information.hpp; are the
+        // dimensions of ages defined in rcpp or where?
+        if (it != this->growth_models.end()) {
+          p->growth =
+            (*it).second;  // growth defined in population.hpp (the object
+          // is called p, growth is within p)
+        } else {
+          valid_model = false;
+          // log error
+        }
+
+      } else {
+        valid_model = false;
+        // log error
+      }
+      FIMS_LOG << "maturity models size " <<  this->maturity_models.size() << std::endl;
+      FIMS_LOG << " maturity id " << p->maturity_id << std::endl;
+      // set maturity
+      if (p->maturity_id != -999) {
+        uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
+        maturity_models_iterator it = this->maturity_models.find(
+          maturity_uint);  // >maturity_models is specified in
+        // information.hpp and used in rcpp
+
+        if (it != this->maturity_models.end()) {
+          p->maturity =
+            (*it).second;  // >maturity defined in population.hpp
+          FIMS_LOG << " set maturity " << std::endl;
+        } else {
+          valid_model = false;
+          FIMS_LOG << "Error: maturity model has not been set " << std::endl;
+        }
+
+      } else {
+        valid_model = false;
+        // log error
+      }
+
+
     }
 
     return valid_model;
