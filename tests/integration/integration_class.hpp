@@ -439,7 +439,7 @@ public:
     std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
     for (int i = 0; i < e.Size(); i++)
       {
-        rec->recruit_deviations[i] = std::exp(e[i].GetDouble());
+        rec->recruit_deviations[i] = e[i].GetDouble();
         if (print_statements)
         {
           std::cout << rec->recruit_deviations[i] << " ";
