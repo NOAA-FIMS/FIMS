@@ -50,6 +50,13 @@ public:
     /** @brief evaluate method for child recruitment interface objects to inherit
      * **/
     virtual double evaluate(double spawners, double ssbzero) = 0;
+
+/**
+ * @brief evaluate recruitment nll
+ * 
+ * @return double 
+ */
+    virtual double evaluate_nll() = 0;
 };
 
 uint32_t RecruitmentInterfaceBase::id_g = 1;
@@ -88,6 +95,31 @@ public:
         BevHolt.rzero = this->rzero.value;
         return BevHolt.evaluate(spawners, ssbzero);
     }
+
+     virtual double evaluate_nll() {
+    fims::SRBevertonHolt<double> NLL;
+
+    NLL.log_sigma_recruit = this->log_sigma_recruit.value;
+    NLL.recruit_deviations.resize(
+        deviations.size());  // Vector from TMB
+    NLL.recruit_bias_adjustment.resize(
+        recruit_bias_adjustment.size());  // Vector from TMB
+    for (int i = 0; i < deviations.size(); i++) {
+      NLL.recruit_deviations[i] = deviations[i];
+      NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
+    }
+    Rcout << "Rec devs being passed to C++ are " << deviations
+          << std::endl;
+
+    Rcout << "Rec bias adj being passed to C++ are " << recruit_bias_adjustment
+          << std::endl;
+
+    NLL.use_recruit_bias_adjustment = this->use_bias_correction;
+    NLL.estimate_recruit_deviations = this->estimate_deviations;
+    // NLL.PrepareConstrainedDeviations();
+    // NLL.PrepareBiasAdjustment();
+    return NLL.evaluate_nll();
+  }
 
     /** @brief this adds the parameter values and derivatives to the TMB model
      * object */
@@ -128,12 +160,12 @@ public:
 
         b0->recruit_deviations.resize(this->deviations.size());
         if (this->estimate_deviations) {
-            for (int i = 0; i < b0->recruit_deviations.size(); i++) {
+            for (size_t i = 0; i < b0->recruit_deviations.size(); i++) {
                 b0->recruit_deviations[i] = this->deviations[i];
                 d0->RegisterParameter(b0->recruit_deviations[i]);
             }
         } else {
-            for (int i = 0; i < b0->recruit_deviations.size(); i++) {
+            for (size_t i = 0; i < b0->recruit_deviations.size(); i++) {
                 b0->recruit_deviations[i] = this->deviations[i];
             }
         }
@@ -178,12 +210,12 @@ public:
 
         b1->recruit_deviations.resize(this->deviations.size());
         if (this->estimate_deviations) {
-            for (int i = 0; i < b1->recruit_deviations.size(); i++) {
+            for (size_t i = 0; i < b1->recruit_deviations.size(); i++) {
                 b1->recruit_deviations[i] = this->deviations[i];
                 d1->RegisterParameter(b1->recruit_deviations[i]);
             }
         } else {
-            for (int i = 0; i < b1->recruit_deviations.size(); i++) {
+            for (size_t i = 0; i < b1->recruit_deviations.size(); i++) {
                 b1->recruit_deviations[i] = this->deviations[i];
             }
         }
@@ -228,12 +260,12 @@ public:
 
         b2->recruit_deviations.resize(this->deviations.size());
         if (this->estimate_deviations) {
-            for (int i = 0; i < b2->recruit_deviations.size(); i++) {
+            for (size_t i = 0; i < b2->recruit_deviations.size(); i++) {
                 b2->recruit_deviations[i] = this->deviations[i];
                 d2->RegisterParameter(b2->recruit_deviations[i]);
             }
         } else {
-            for (int i = 0; i < b2->recruit_deviations.size(); i++) {
+            for (size_t i = 0; i < b2->recruit_deviations.size(); i++) {
                 b2->recruit_deviations[i] = this->deviations[i];
             }
         }
@@ -278,12 +310,12 @@ public:
 
         b3->recruit_deviations.resize(this->deviations.size());
         if (this->estimate_deviations) {
-            for (int i = 3; i < b3->recruit_deviations.size(); i++) {
+            for (size_t i = 3; i < b3->recruit_deviations.size(); i++) {
                 b3->recruit_deviations[i] = this->deviations[i];
                 d3->RegisterParameter(b3->recruit_deviations[i]);
             }
         } else {
-            for (int i = 3; i < b3->recruit_deviations.size(); i++) {
+            for (size_t i = 3; i < b3->recruit_deviations.size(); i++) {
                 b3->recruit_deviations[i] = this->deviations[i];
             }
         }

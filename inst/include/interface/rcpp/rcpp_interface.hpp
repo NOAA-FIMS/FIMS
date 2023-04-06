@@ -62,7 +62,7 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
 
   Rcpp::NumericVector p;
 
-  for (int i = 0; i < d0->fixed_effects_parameters.size(); i++) {
+  for (size_t i = 0; i < d0->fixed_effects_parameters.size(); i++) {
     p.push_back(*d0->fixed_effects_parameters[i]);
   }
 
@@ -76,7 +76,7 @@ Rcpp::NumericVector get_random_parameters_vector() {
 
   Rcpp::NumericVector p;
 
-  for (int i = 0; i < d0->random_effects_parameters.size(); i++) {
+  for (size_t i = 0; i < d0->random_effects_parameters.size(); i++) {
     p.push_back(*d0->random_effects_parameters[i]);
   }
 
@@ -129,21 +129,9 @@ RCPP_MODULE(fims) {
         &BevertonHoltRecruitmentInterface::recruit_bias_adjustment)
       .field("use_bias_correction", &BevertonHoltRecruitmentInterface::use_bias_correction)
       .field("log_sigma_recruit", &BevertonHoltRecruitmentInterface::log_sigma_recruit)
-      .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
+      .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate)
+        .method("evaluate_nll", &BevertonHoltRecruitmentInterface::evaluate_nll);
 
-/*
-  Rcpp::class_<RecruitmentNLLInterface>("RecruitmentNLL")
-      .constructor()
-      .field("log_sigma_recruit", &RecruitmentNLLInterface::log_sigma_recruit)
-      .field("recruitment_devs", &RecruitmentNLLInterface::recruit_deviations)
-      .field("recruitment_bias_adj",
-             &RecruitmentNLLInterface::recruit_bias_adjustment)
-      .field("do_bias_correction",
-             &RecruitmentNLLInterface::use_recruit_bias_adjustment)
-      .field("estimate_recruit_deviations",
-             &RecruitmentNLLInterface::estimate_recruit_deviations)
-      .method("evaluate", &RecruitmentNLLInterface::evaluate_nll);
-*/
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
       .field("log_q", &FleetInterface::log_q)
