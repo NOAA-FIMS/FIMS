@@ -32,6 +32,12 @@ test_that("Accessors work as expected in FIMSFrame", {
 
   expect_type(nyrs(fims_frame), "integer")
   expect_length(nyrs(fims_frame), 1)
+
+  expect_type(start_year(fims_frame), "integer")
+  expect_length(start_year(fims_frame), 1)
+
+  expect_type(end_year(fims_frame), "integer")
+  expect_length(end_year(fims_frame), 1)
 })
 
 test_that("Accessors work as expected in FIMSFrameAge", {
@@ -41,6 +47,13 @@ test_that("Accessors work as expected in FIMSFrameAge", {
 
   expect_type(nyrs(age_frame), "integer")
   expect_length(nyrs(age_frame), 1)
+
+  expect_type(start_year(age_frame), "integer")
+  expect_length(start_year(age_frame), 1)
+
+  expect_type(end_year(age_frame), "integer")
+  expect_length(end_year(age_frame), 1)
+
 
   expect_vector(ages(age_frame), ptype = integer())
 
