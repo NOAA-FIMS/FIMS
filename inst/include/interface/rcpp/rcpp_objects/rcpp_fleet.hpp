@@ -181,8 +181,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f1->nyears = this-> nyears;
     f1->agecomp_likelihood_id = this->agecomp_likelihood_id;
     f1->index_likelihood_id = this->index_likelihood_id;
-    // f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
-    // f1->observed_index_data_id = this->observed_index_data_id;
+    f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
+    f1->observed_index_data_id = this->observed_index_data_id;
     f1->selectivity_id = this->selectivity_id;
     f1->log_q.resize(this->log_q.size());
     for (int i = 0; i < log_q.size(); i++) {
@@ -211,8 +211,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f2->nyears = this-> nyears;
     f2->agecomp_likelihood_id = this->agecomp_likelihood_id;
     f2->index_likelihood_id = this->index_likelihood_id;
-    // f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
-    // f2->observed_index_data_id = this->observed_index_data_id;
+    f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
+    f2->observed_index_data_id = this->observed_index_data_id;
     f2->selectivity_id = this->selectivity_id;
     f2->log_q.resize(this->log_q.size());
     for (int i = 0; i < log_q.size(); i++) {
@@ -241,8 +241,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f3->nyears = this-> nyears;
     f3->agecomp_likelihood_id = this->agecomp_likelihood_id;
     f3->index_likelihood_id = this->index_likelihood_id;
-    // f3->observed_agecomp_data_id = this->observed_agecomp_data_id;
-    // f3->observed_index_data_id = this->observed_index_data_id;
+    f3->observed_agecomp_data_id = this->observed_agecomp_data_id;
+    f3->observed_index_data_id = this->observed_index_data_id;
     f3->selectivity_id = this->selectivity_id;
     f3->log_q.resize(this->log_q.size());
     for (int i = 0; i < log_q.size(); i++) {

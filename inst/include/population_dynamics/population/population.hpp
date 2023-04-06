@@ -155,16 +155,15 @@ struct Population : public FIMSObject<Type> {
    *
    */
   void Prepare() {
-    this->nfleets = this->fleets.size();
 
-    FIMS_LOG << this -> nages << std::endl;
+    FIMS_LOG << " population prepare "<< this -> nages << std::endl;
     FIMS_LOG << this -> nfleets << std::endl;
     FIMS_LOG << this -> nseasons << std::endl;
     FIMS_LOG << this -> nyears << std::endl;
 
-    for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
-      this->fleets[fleet]->Prepare();
-    }
+     for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
+       this->fleets[fleet]->Prepare();
+     }
 
     std::fill(unfished_spawning_biomass.begin(),
               unfished_spawning_biomass.end(), 0);
@@ -272,6 +271,7 @@ struct Population : public FIMSObject<Type> {
   void CalculateBiomass(size_t index_ya, size_t year, size_t age) {
     this->biomass[year] +=
         this->numbers_at_age[index_ya] * growth->evaluate(ages[age]);
+    FIMS_LOG << " ages " << ages[age] << std::endl; 
     FIMS_LOG << growth->evaluate(ages[age]) << " biomass inputs----- +++\n";
   }
 

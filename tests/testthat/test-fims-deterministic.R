@@ -2,7 +2,7 @@
 # install.packages("Matrix")
 # install.packages("TMB", type = "source")
 # use updated version of pkgbuild with correct compilation flags for debugging:
-# remotes::install_github(repo = "Andrea-Havron-NOAA/pkgbuild")
+#remotes::install_github(repo = "Andrea-Havron-NOAA/pkgbuild")
 
 devtools::load_all()
 

@@ -63,6 +63,7 @@ class Model {  // may need singleton
     typename fims::Information<T>::population_iterator it;
     for (it = this->fims_information->populations.begin();
          it != this->fims_information->populations.end(); ++it) {
+          FIMS_LOG << "a population " << std::endl;
 //(*it).second points to the Population module
 #ifdef TMB_MODEL
       (*it).second->of = this->of;

@@ -113,6 +113,8 @@ struct Fleet : public FIMSObject<Type> {
     // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
     // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
     for (size_t year = 0; year < this->nyears; year++) {
+      FIMS_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
+      FIMS_LOG << "input q " << this->log_q[year] << std::endl;
       this->Fmort[year] = fims::exp(this->log_Fmort[year]);
       this->q[year] = fims::exp(this->log_q[year]);
     }

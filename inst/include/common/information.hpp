@@ -159,7 +159,7 @@ class Information {
     bool valid_model = true;
 
     std::cout << "Information: Initializing fleet objects.\n";
-    FIMS_LOG << " fleet size "  << this->fleets.size() << std::endl;
+    std::cout << " Informaton: fleet size "  << this->fleets.size() << std::endl;
     for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
          ++it) {
       // Initialize fleet object
@@ -186,12 +186,15 @@ class Information {
         // log error
       }
       //end set index data
-
+      FIMS_LOG << "age comp data id " << f->observed_agecomp_data_id << std::endl;
       // set age composition data
       if (f->observed_agecomp_data_id != -999) {
         uint32_t agecomp_id =
             static_cast<uint32_t>(f->observed_agecomp_data_id);
         data_iterator it = this->data_objects.find(agecomp_id);
+
+        
+      FIMS_LOG << "age comp id  in loop " << agecomp_id << std::endl;
 
         if (it != this->data_objects.end()) {
           f->observed_agecomp_data = (*it).second;
@@ -416,7 +419,7 @@ class Information {
     for (population_iterator it = this->populations.begin();
          it != this->populations.end(); ++it) {
       std::shared_ptr<fims::Population<T> > p = (*it).second;
-
+    FIMS_LOG << "population number " << std::endl;
       // error check and set population elements
       // check me - add another fleet iterator to push information from
       for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();

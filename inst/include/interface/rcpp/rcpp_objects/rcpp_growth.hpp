@@ -120,9 +120,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // add to Information
     d0->growth_models[b0->id] = b0;
 
-    // add to Information
-    d0->growth_models[b0->id] = b0;
-
     // base model
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
@@ -133,9 +130,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // set relative info
     b1->id = this->id;
     b1->ewaa =  make_map(this->ages, this->weights);//this->ewaa;
-
-    // add to Information
-    d1->growth_models[b0->id] = b1;
 
     // add to Information
     d1->growth_models[b0->id] = b1;
@@ -154,9 +148,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // add to Information
     d2->growth_models[b2->id] = b2;
 
-    // add to Information
-    d2->growth_models[b2->id] = b2;
-
     // base model
     std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
@@ -167,9 +158,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     // set relative info
     b3->id = this->id;
     b3->ewaa =  make_map(this->ages, this->weights);//this->ewaa;
-
-    // add to Information
-    d3->growth_models[b3->id] = b3;
 
     // add to Information
     d3->growth_models[b3->id] = b3;
