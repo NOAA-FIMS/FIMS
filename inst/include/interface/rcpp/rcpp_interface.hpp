@@ -16,7 +16,7 @@
 #include "rcpp_objects/rcpp_growth.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
-#include "rcpp_objects/rcpp_nll.hpp"
+//#include "rcpp_objects/rcpp_nll.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
@@ -122,9 +122,16 @@ RCPP_MODULE(fims) {
       .constructor()
       .field("steep", &BevertonHoltRecruitmentInterface::steep)
       .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
+      .field("deviations", &BevertonHoltRecruitmentInterface::deviations)
+      .field("estimate_deviations", &BevertonHoltRecruitmentInterface::estimate_deviations)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
+      .field("recruitment_bias_adj",
+        &BevertonHoltRecruitmentInterface::recruit_bias_adjustment)
+      .field("use_bias_correction", &BevertonHoltRecruitmentInterface::use_bias_correction)
+      .field("log_sigma_recruit", &BevertonHoltRecruitmentInterface::log_sigma_recruit)
       .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
+/*
   Rcpp::class_<RecruitmentNLLInterface>("RecruitmentNLL")
       .constructor()
       .field("log_sigma_recruit", &RecruitmentNLLInterface::log_sigma_recruit)
@@ -136,7 +143,7 @@ RCPP_MODULE(fims) {
       .field("estimate_recruit_deviations",
              &RecruitmentNLLInterface::estimate_recruit_deviations)
       .method("evaluate", &RecruitmentNLLInterface::evaluate_nll);
-
+*/
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
       .field("log_q", &FleetInterface::log_q)
@@ -175,8 +182,9 @@ RCPP_MODULE(fims) {
       .field("ages", &PopulationInterface::ages)
       .method("evaluate", &PopulationInterface::evaluate)
       .method("SetMaturity", &PopulationInterface::SetMaturity)
-        .method("SetGrowth", &PopulationInterface::SetGrowth)
-      .method("SetRecruitment", &PopulationInterface::SetRecruitment);
+      .method("SetGrowth", &PopulationInterface::SetGrowth)
+      .method("SetRecruitment", &PopulationInterface::SetRecruitment)
+      .method("evaluate", &PopulationInterface::evaluate);;
 
   Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
       .constructor()
