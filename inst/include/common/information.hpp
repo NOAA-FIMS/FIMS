@@ -185,6 +185,7 @@ class Information {
         valid_model = false;
         // log error
       }
+      //end set index data
 
       // set age composition data
       if (f->observed_agecomp_data_id != -999) {
@@ -203,15 +204,16 @@ class Information {
         valid_model = false;
         // log error
       }
+      //end set composition data
 
       // set selectivity model
       if (f->selectivity_id != -999) {
         uint32_t sel_id = static_cast<uint32_t>(
             f->selectivity_id);  // cast as unsigned integer
-        //   selectivity_models_iterator it = this->selectivity_models.find(
-        //     sel_id);  // if find, set it, otherwise invalid
+           selectivity_models_iterator it = this->selectivity_models.find(
+             sel_id);  // if find, set it, otherwise invalid
 
-       //
+       /* repetitve code?
         std::cout << "Information: Initializing fleet objects.\n";
         for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
              ++it) {
@@ -287,21 +289,25 @@ class Information {
                 f->selectivity_id);  // cast as unsigned integer
             selectivity_models_iterator it = this->selectivity_models.find(
                 sel_id);  // if find, set it, otherwise invalid
-
+      */
             if (it != this->selectivity_models.end()) {
               f->selectivity =
                   (*it).second;  // elements in container held in pair (first is
                                  // id, second is object - shared pointer to
                                  // distribution)
+
+
             } else {
               valid_model = false;
               // log error
             }
 
+
           } else {
             valid_model = false;
             // log error
           }
+          //end set selectivity
 
           // set index likelihood
           if (f->index_likelihood_id != -999) {
@@ -324,6 +330,7 @@ class Information {
             valid_model = false;
             // log error
           }
+          //end set index likelihood
 
           // set catch likelihood
           // if (f->catch_likelihood_id != -999) {
@@ -369,10 +376,11 @@ class Information {
             valid_model = false;
             // log error
           }
-        }
+        //}
+        // end set agecomp likelihood
 
           FIMS_LOG << "fleet size " << this->fleets.size() << std::endl;
-
+/* repetive code?
         return valid_model;
 
       } else {
@@ -401,7 +409,8 @@ class Information {
         valid_model = false;
         // log error
       }
-    }
+       */
+    } //close fleet iterator loop
 
     std::cout << "Information: Initializing population objects.\n";
     for (population_iterator it = this->populations.begin();
