@@ -216,83 +216,6 @@ class Information {
            selectivity_models_iterator it = this->selectivity_models.find(
              sel_id);  // if find, set it, otherwise invalid
 
-       /* repetitve code?
-        std::cout << "Information: Initializing fleet objects.\n";
-        for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
-             ++it) {
-          // Initialize fleet object
-          std::shared_ptr<fims::Fleet<T> > f =
-              (*it).second;  // fleet object pointer initialized to second field
-                             // in map
-
-          f->Initialize(f->nyears, f->nages);
-          FIMS_LOG << "f nyears " << f->nyears << " f nages " << f->nages << std::endl;
-
-          // set catch data
-          // if (f->observed_catch_data_id != -999) {
-          //   uint32_t catch_id =
-          //       static_cast<uint32_t>(f->observed_catch_data_id);
-          //   data_iterator it = this->data_objects.find(catch_id);
-          //
-          //   if (it != this->data_objects.end()) {
-          //     f->observed_catch_data = (*it).second;
-          //   } else {
-          //     valid_model = false;
-          //     // log error
-          //     FIMS_LOG << "Error: observed catch data not defined for fleet"
-          //              << f->id << std::endl;
-          //   }
-          //
-          // } else {
-          //   valid_model = false;
-          //   // log error
-          // }
-
-          // set index data
-          if (f->observed_index_data_id != -999) {
-            uint32_t index_id =
-                static_cast<uint32_t>(f->observed_index_data_id);
-            data_iterator it = this->data_objects.find(index_id);
-
-            if (it != this->data_objects.end()) {
-              f->observed_index_data = (*it).second;
-            } else {
-              valid_model = false;
-              // log error
-              FIMS_LOG << "Error: observed index data not defined for fleet"
-                       << f->id << std::endl;
-            }
-
-          } else {
-            valid_model = false;
-            // log error
-          }
-
-          // set age composition data
-          if (f->observed_agecomp_data_id != -999) {
-            uint32_t agecomp_id =
-                static_cast<uint32_t>(f->observed_agecomp_data_id);
-            data_iterator it = this->data_objects.find(agecomp_id);
-
-            if (it != this->data_objects.end()) {
-              f->observed_agecomp_data = (*it).second;
-            } else {
-              valid_model = false;
-              // log error
-            }
-
-          } else {
-            valid_model = false;
-            // log error
-          }
-
-          // set selectivity model
-          if (f->selectivity_id != -999) {
-            uint32_t sel_id = static_cast<uint32_t>(
-                f->selectivity_id);  // cast as unsigned integer
-            selectivity_models_iterator it = this->selectivity_models.find(
-                sel_id);  // if find, set it, otherwise invalid
-      */
             if (it != this->selectivity_models.end()) {
               f->selectivity =
                   (*it).second;  // elements in container held in pair (first is
@@ -335,28 +258,6 @@ class Information {
           }
           //end set index likelihood
 
-          // set catch likelihood
-          // if (f->catch_likelihood_id != -999) {
-          //  uint32_t catch_like_id = static_cast<uint32_t>(
-          //      f->catch_likelihood_id);  // cast as unsigned integer
-          //  distribution_models_iterator it = this->distribution_models.find(
-          //      catch_like_id);  // if find, set it, otherwise invalid
-          //
-          //  if (it != this->distribution_models.end()) {
-          //    f->catch_likelihood =
-          //        (*it).second;  // elements in container held in pair (first
-          //        is
-          //                       // id, second is object - shared pointer to
-          //                       // distribution)
-          //  } else {
-          //    valid_model = false;
-          //    // log error
-          //  }
-          //
-          //} else {
-          //  valid_model = false;
-          //  // log error
-          //}
 
           // set agecomp likelihood
           if (f->agecomp_likelihood_id != -999) {
@@ -383,36 +284,7 @@ class Information {
         // end set agecomp likelihood
 
           FIMS_LOG << "fleet size " << this->fleets.size() << std::endl;
-/* repetive code?
-        return valid_model;
 
-      } else {
-        valid_model = false;
-        // log error
-      }
-
-      // set agecomp likelihood
-      if (f->agecomp_likelihood_id != -999) {
-        uint32_t ac_like_id = static_cast<uint32_t>(
-            f->agecomp_likelihood_id);  // cast as unsigned integer
-        distribution_models_iterator it = this->distribution_models.find(
-            ac_like_id);  // if find, set it, otherwise invalid
-
-        if (it != this->distribution_models.end()) {
-          f->agecomp_likelihood =
-              (*it).second;  // elements in container held in pair (first is id,
-                             // second is object - shared pointer to
-                             // distribution)
-        } else {
-          valid_model = false;
-          // log error
-        }
-
-      } else {
-        valid_model = false;
-        // log error
-      }
-       */
     } //close fleet iterator loop
 
     std::cout << "Information: Initializing population objects.\n";

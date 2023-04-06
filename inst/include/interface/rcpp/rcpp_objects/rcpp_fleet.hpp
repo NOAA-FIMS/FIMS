@@ -149,13 +149,12 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f0->nyears = this-> nyears;
     f0->agecomp_likelihood_id = this->agecomp_likelihood_id;
     f0->index_likelihood_id = this->index_likelihood_id;
-    // f0->observed_agecomp_data_id = this->observed_agecomp_data_id;
-    // f0->observed_index_data_id = this->observed_index_data_id;
+    f0->observed_agecomp_data_id = this->observed_agecomp_data_id;
+    f0->observed_index_data_id = this->observed_index_data_id;
     f0->selectivity_id = this->selectivity_id;
     f0->log_q.resize(this->log_q.size());
     for (int i = 0; i < log_q.size(); i++) {
       f0->log_q[i] = this->log_q[i];
-
       if (this->estimate_q) {
         if (this->random_q) {
           d0->RegisterRandomEffect(f0->log_q[i]);
@@ -164,10 +163,20 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         }
       }
     }
-    std::cout << " f0 id " << f0->id << std::endl;
+
+    f0->log_Fmort.resize(this->log_Fmort.size());
+    for (int i = 0; i < log_q.size(); i++) {
+      f0->log_Fmort[i] = this->log_Fmort[i];
+      if (this->estimate_q) {
+        if (this->random_q) {
+          d0->RegisterRandomEffect(f0->log_Fmort[i]);
+        } else {
+          d0->RegisterParameter(f0->log_Fmort[i]);
+        }
+      }
+    }
     // add to Information
     d0->fleets[f0->id] = f0;
-    std::cout << " fleet size d0 " << d0->fleets.size() << std::endl;
 
     // 1st derivative model
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
@@ -195,6 +204,18 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         }
       }
     }
+    f1->log_Fmort.resize(this->log_Fmort.size());
+    for (int i = 0; i < log_q.size(); i++) {
+      f1->log_Fmort[i] = this->log_Fmort[i];
+      if (this->estimate_q) {
+        if (this->random_q) {
+          d1->RegisterRandomEffect(f1->log_Fmort[i]);
+        } else {
+          d1->RegisterParameter(f1->log_Fmort[i]);
+        }
+      }
+    }
+
 
     // add to Information
     d1->fleets[f1->id] = f1;
@@ -217,11 +238,24 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f2->log_q.resize(this->log_q.size());
     for (int i = 0; i < log_q.size(); i++) {
       f2->log_q[i] = this->log_q[i];
+      FIMS_LOG << "log q " << f2->log_q[i] << std::endl;
       if (this->estimate_q) {
         if (this->random_q) {
           d2->RegisterRandomEffect(f2->log_q[i]);
         } else {
           d2->RegisterParameter(f2->log_q[i]);
+        }
+      }
+    }
+
+    f2->log_Fmort.resize(this->log_Fmort.size());
+    for (int i = 0; i < log_q.size(); i++) {
+      f2->log_Fmort[i] = this->log_Fmort[i];
+      if (this->estimate_q) {
+        if (this->random_q) {
+          d2->RegisterRandomEffect(f2->log_Fmort[i]);
+        } else {
+          d2->RegisterParameter(f2->log_Fmort[i]);
         }
       }
     }
@@ -252,6 +286,18 @@ class FleetInterface : public FIMSRcppInterfaceBase {
           d3->RegisterRandomEffect(f3->log_q[i]);
         } else {
           d3->RegisterParameter(f3->log_q[i]);
+        }
+      }
+    }
+
+    f3->log_Fmort.resize(this->log_Fmort.size());
+    for (int i = 0; i < log_q.size(); i++) {
+    f3->log_Fmort[i] = this->log_Fmort[i];
+      if (this->estimate_q) {
+        if (this->random_q) {
+          d3->RegisterRandomEffect(f3->log_Fmort[i]);
+        } else {
+          d3->RegisterParameter(f3->log_Fmort[i]);
         }
       }
     }

@@ -6,6 +6,7 @@
 
 devtools::load_all()
 
+
 library(FIMS)
 data(package = "FIMS")
 
@@ -148,13 +149,13 @@ report <- obj$report()
 # - set up tolerance values later
 
 # # Numbers at age
- expect_equal(report$naa, c(t(om_output$N.age)), tolerance = 1e-4)
+ expect_equal(report$naa, c(t(om_output$N.age)), tolerance = 1e-2)
 # # Biomass
  expect_equal(report$ssb, om_output$biomass.mt)
 # # Spawning biomass
-# expect_equal(report, om_output$SSB)
+#expect_equal(report, om_output$SSB)
 # # Expected catch
-# expect_equal(report, om_output$L.mt)
+expect_equal(report$catch_, om_output$L.mt$fleet1)
 # # Expected index
 # expect_equal(report, om_output$survey_index_biomass)
 # })

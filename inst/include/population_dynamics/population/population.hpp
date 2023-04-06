@@ -20,10 +20,7 @@
 #include "../recruitment/recruitment.hpp"
 //#include "subpopulation.hpp"
 #include "../../interface/interface.hpp"
-#include "../fleet/fleet.hpp"
-#include "../growth/growth.hpp"
 #include "../maturity/maturity.hpp"
-#include "../recruitment/recruitment.hpp"
 
 namespace fims {
 std::ofstream out("debug.txt");
@@ -86,7 +83,7 @@ struct Population : public FIMSObject<Type> {
   std::vector<Type> expected_numbers_at_age;   /*!< Expected values: Numbers at
                                               age (thousands?? millions??) */
   std::vector<Type> expected_catch;            /*!< Expected values: Catch*/
-
+  std::vector<Type> expected_recruitment; /*!< Expected recruitment */
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
   std::shared_ptr<fims::RecruitmentBase<Type>>
@@ -143,6 +140,7 @@ struct Population : public FIMSObject<Type> {
     unfished_biomass.resize((nyears + 1));
     unfished_spawning_biomass.resize((nyears + 1));
     spawning_biomass.resize((nyears + 1));
+    expected_recruitment.resize((nyears+1));
     log_init_naa.resize(nages);
     log_M.resize(nyears * nages);
     init_naa.resize(nages);
@@ -157,9 +155,9 @@ struct Population : public FIMSObject<Type> {
   void Prepare() {
 
     FIMS_LOG << " population prepare "<< this -> nages << std::endl;
-    FIMS_LOG << this -> nfleets << std::endl;
-    FIMS_LOG << this -> nseasons << std::endl;
-    FIMS_LOG << this -> nyears << std::endl;
+    FIMS_LOG << "nfleets: " << this -> nfleets << std::endl;
+    FIMS_LOG << "nseasons: " << this -> nseasons << std::endl;
+    FIMS_LOG << "nyears: " << this -> nyears << std::endl;
 
      for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
        this->fleets[fleet]->Prepare();
@@ -169,12 +167,12 @@ struct Population : public FIMSObject<Type> {
               unfished_spawning_biomass.end(), 0);
     std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
     std::fill(expected_catch.begin(), expected_catch.end(), 0);
+    std::fill(expected_recruitment.begin(), expected_recruitment.end(), 0.0);
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
       this->init_naa[age] = fims::exp(this->log_init_naa[age]);
-      FIMS_LOG << "init naa size " << this->init_naa.size() << " age " << age << std::endl;
-      for (size_t year = 0; year < this->nyears; year++) {
+  for (size_t year = 0; year < this->nyears; year++) {
         size_t index_ay = age * this->nyears + year;
        this->M[index_ay] = fims::exp(this->log_M[index_ay]);
         this->mortality_F[year] = 0.0;
@@ -211,7 +209,7 @@ struct Population : public FIMSObject<Type> {
           this->fleets[fleet_]->selectivity->evaluate(ages[age]);
       FIMS_LOG << " sel "
                << this->fleets[fleet_]->selectivity->evaluate(ages[age])
-               << " F " << this->fleets[fleet_]->Fmort[year] << std::endl;
+               << " F mort year " << year << " "<< this->fleets[fleet_]->Fmort[year] << std::endl;
     }
     this->mortality_Z[index_ya] =
         this->M[index_ya] + this->mortality_F[index_ya];
@@ -271,8 +269,8 @@ struct Population : public FIMSObject<Type> {
   void CalculateBiomass(size_t index_ya, size_t year, size_t age) {
     this->biomass[year] +=
         this->numbers_at_age[index_ya] * growth->evaluate(ages[age]);
-    FIMS_LOG << " ages " << ages[age] << std::endl; 
-    FIMS_LOG << growth->evaluate(ages[age]) << " biomass inputs----- +++\n";
+    FIMS_LOG << " age " << ages[age] << std::endl; 
+    FIMS_LOG << "growth evaluate: "<< growth->evaluate(ages[age]) << " biomass inputs----- +++\n";
   }
 
   /**
@@ -299,9 +297,8 @@ struct Population : public FIMSObject<Type> {
     this->spawning_biomass[year] +=
         this->proportion_female * this->numbers_at_age[index_ya] *
         this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
-    FIMS_LOG << this->proportion_female << " "
-             << this->proportion_mature_at_age[index_ya] << " "
-             << growth->evaluate(ages[age])
+    FIMS_LOG << " proportion female " << this->proportion_female << " "
+             << " mature age " << this->proportion_mature_at_age[index_ya] << " "
              << " spawning biomass inputs----- +++\n";
   }
 
@@ -364,16 +361,11 @@ struct Population : public FIMSObject<Type> {
 
     this->numbers_at_age[index_ya] =
         this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
-        this->recruitment->recruit_deviations[year];
-
-    FIMS_LOG << this->spawning_biomass[year - 1] << " "
-             << this->numbers_at_age[0] << " ----- +++\n"
-             << std::endl;
-    FIMS_LOG << this->recruitment->evaluate(this->spawning_biomass[year - 1],
-                                            phi0)
-             << " phi0 " << phi0 << " ----- +++\n "
-             << this->recruitment->recruit_deviations[year] << std::endl;
-  }
+        fims::exp(this->recruitment->recruit_deviations[year]);
+    expected_recruitment[year] =  this->numbers_at_age[index_ya];
+FIMS_LOG << " numbers at age at indexya " << index_ya << " is " << 
+    this->numbers_at_age[index_ya] << std::endl;
+ }
 
   /**
    * @brief Adds to exiting expected total catch by fleet in weight
@@ -595,11 +587,10 @@ struct Population : public FIMSObject<Type> {
           CalculateBiomass(index_ya, y, a);
           CalculateSpawningBiomass(index_ya, y, a);
 
-          FIMS_LOG << index_ya << std::endl;
+          FIMS_LOG << "index ya: "<< index_ya << std::endl;
           CalculateUnfishedBiomass(index_ya, y, a);
           CalculateUnfishedSpawningBiomass(index_ya, y, a);
 
-          FIMS_LOG << index_ya << std::endl;
         }
 
         /*
@@ -612,7 +603,6 @@ struct Population : public FIMSObject<Type> {
           FIMS_LOG << index_ya << std::endl;
           CalculateCatchNumbersAA(index_ya, y, a);
 
-          FIMS_LOG << index_ya << std::endl;
           CalculateCatchWeightAA(y, a);
           CalculateCatch(y, a);
           CalculateIndex(index_ya, y, a);
@@ -630,12 +620,19 @@ struct Population : public FIMSObject<Type> {
       this->spawning_biomass;
     typename ModelTraits<Type>::EigenVector rec_dev =
         this->recruitment->recruit_deviations;
+    typename ModelTraits<Type>::EigenVector catch_ =
+      this->expected_catch;
+      typename ModelTraits<Type>::EigenVector recruitment =
+      this->expected_recruitment;
+
     REPORT_F(rec_dev, of);
     ADREPORT_F(rec_dev, of);
     REPORT_F(naa, of);
     ADREPORT_F(naa, of);
     REPORT_F(ssb, of);
     ADREPORT_F(ssb, of);
+    REPORT_F(catch_, of);
+    REPORT_F(recruitment, of);
     // ADREPORT_F(this->recruitment->rzero, of);
     // ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in
     // recruitment_base ADREPORT_F(this->recruitment->log_sigma_recruit, of);
