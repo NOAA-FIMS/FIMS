@@ -49,15 +49,8 @@ recruitment$rzero$estimated <- TRUE
 recruitment$steep$value <- om_input$h
 recruitment$steep$is_random_effect <- FALSE
 recruitment$steep$estimated <- TRUE
-
-recruitment_nll <- new(fims$RecruitmentNLL)
-recruitment_nll$do_bias_correction <- FALSE
-recruitment_nll$estimate_recruit_deviations <- TRUE
-recruitment_nll$log_sigma_recruit$value <- om_input$logR_sd
-recruitment_nll$log_sigma_recruit$is_random_effect <- FALSE
-recruitment_nll$log_sigma_recruit$estimated <- TRUE
-recruitment_nll$recruitment_bias_adj <- rep(0.0, om_input$nyr)
-recruitment_nll$recruitment_devs <- om_input$logR.resid
+recruitment$estimate_deviations <- TRUE
+recruitment$deviations <- om_input$logR.resid
 
 # Growth
 ewaa_growth <- new(fims$EWAAgrowth)
@@ -96,9 +89,9 @@ fishing_fleet$estimate_q <- TRUE
 fishing_fleet$random_q <- FALSE
 fishing_fleet$SetAgeCompLikelihood(1)
 fishing_fleet$SetIndexLikelihood(1)
-fishing_fleet$SetObservedAgeCompData(1, as.matrix(c(t(em_input$L.age.obs$fleet1)))) 
+fishing_fleet$SetObservedAgeCompData(1, as.matrix(c(t(em_input$L.age.obs$fleet1))))
 fishing_fleet$SetObservedIndexData(1, em_input$L.obs$fleet1)
-fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id()) 
+fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
 
 # Create the survey fleet
 survey_fleet_selectivity <- new(fims$LogisticSelectivity)
@@ -120,9 +113,9 @@ survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
 survey_fleet$SetAgeCompLikelihood(1)
 survey_fleet$SetIndexLikelihood(1)
-survey_fleet$SetObservedAgeCompData(2, as.matrix(c(t(em_input$survey.age.obs$survey1)))) 
-survey_fleet$SetObservedIndexData(2, em_input$survey.obs$survey1) 
-survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id()) 
+survey_fleet$SetObservedAgeCompData(2, as.matrix(c(t(em_input$survey.age.obs$survey1))))
+survey_fleet$SetObservedIndexData(2, em_input$survey.obs$survey1)
+survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
 
 # Population
 population <- new(fims$Population)
@@ -144,11 +137,8 @@ population$SetRecruitment(recruitment$get_id())
 fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
-# #crashes at population line below with year = 1 and index_ya=12
-# 364             this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
-# message("success!")
-#report <- obj$report()
+report <- obj$report()
 
 # Test
 # TO DO:
@@ -158,9 +148,9 @@ obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
 # - set up tolerance values later
 
 # # Numbers at age
-# expect_equal(report, c(t(om_output$N.age)))
+ expect_equal(report$naa, c(t(om_output$N.age)), tolerance = 1e-4)
 # # Biomass
-# expect_equal(report, om_output$biomass.mt)
+ expect_equal(report$ssb, om_output$biomass.mt)
 # # Spawning biomass
 # expect_equal(report, om_output$SSB)
 # # Expected catch
