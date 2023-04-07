@@ -269,7 +269,7 @@ struct Population : public FIMSObject<Type> {
   void CalculateBiomass(size_t index_ya, size_t year, size_t age) {
     this->biomass[year] +=
         this->numbers_at_age[index_ya] * growth->evaluate(ages[age]);
-    FIMS_LOG << " age " << ages[age] << std::endl; 
+    FIMS_LOG << " age " << ages[age] << std::endl;
     FIMS_LOG << "growth evaluate: "<< growth->evaluate(ages[age]) << " biomass inputs----- +++\n";
   }
 
@@ -361,9 +361,9 @@ struct Population : public FIMSObject<Type> {
 
     this->numbers_at_age[index_ya] =
         this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
-        fims::exp(this->recruitment->recruit_deviations[year]);
+          this->recruitment->recruit_deviations[year];
     expected_recruitment[year] =  this->numbers_at_age[index_ya];
-FIMS_LOG << " numbers at age at indexya " << index_ya << " is " << 
+FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     this->numbers_at_age[index_ya] << std::endl;
  }
 

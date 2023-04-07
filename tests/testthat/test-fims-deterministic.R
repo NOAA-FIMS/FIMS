@@ -51,7 +51,7 @@ recruitment$steep$value <- om_input$h
 recruitment$steep$is_random_effect <- FALSE
 recruitment$steep$estimated <- TRUE
 recruitment$estimate_deviations <- TRUE
-recruitment$deviations <- om_input$logR.resid
+recruitment$deviations <- exp(om_input$logR.resid)
 
 # Growth
 ewaa_growth <- new(fims$EWAAgrowth)
@@ -149,7 +149,7 @@ report <- obj$report()
 # - set up tolerance values later
 
 # # Numbers at age
- expect_equal(report$naa, c(t(om_output$N.age)), tolerance = 10000000)
+ expect_equal(report$naa, c(t(om_output$N.age)))
  N.age <- c(t(om_output$N.age))
  which(abs(report$naa - c(t(om_output$N.age)))>1)
 # # Biomass
