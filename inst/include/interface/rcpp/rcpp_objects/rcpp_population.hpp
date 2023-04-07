@@ -72,7 +72,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    *
    * @param maturity_id Unique id for the Maturity object
    */
-  void SetMaturity(int maturity_id) {
+  void SetMaturity(uint32_t maturity_id) {
     // Check if maturity has been set already
     if (this->maturity_id != -999) {
       warning("maturity has been set already.");
@@ -89,7 +89,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    *
    * @param growth_id Unique id for the growth object
    */
-  void SetGrowth(int growth_id) {
+  void SetGrowth(uint32_t growth_id) {
     // Check if growth has been set already
     if (this->growth_id != -999) {
       warning("growth has been set already.");
@@ -106,7 +106,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    *
    * @param recruitment_id Unique id for the Maturity object
    */
-  void SetRecruitment(int recruitment_id) {
+  void SetRecruitment(uint32_t recruitment_id) {
     // Check if recruitment has been set already
     if (this->recruitment_id != -999) {
       warning("recruitment has been set already.");

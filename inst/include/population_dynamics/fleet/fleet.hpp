@@ -112,6 +112,16 @@ struct Fleet : public FIMSObject<Type> {
   void Prepare() {
     // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
     // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
+
+  // derived quantities
+  std::fill(catch_at_age.begin(), catch_at_age.end(), 0);    /*!<derived quantity catch at age*/
+  std::fill(catch_index.begin(), catch_index.end(), 0);     /*!<derived quantity catch index*/
+  std::fill(age_composition.begin(), age_composition.end(), 0); 
+  std::fill(expected_catch.begin(), expected_catch.end(), 0); /*!<model expected total catch*/
+  std::fill(expected_index.begin(), expected_index.end(), 0); /*!<model expected index of abundance*/
+  std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(), 0); /*!<model expected catch at age*/
+  std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(), 0);  /*!<model expected weight at age*/
+
     for (size_t year = 0; year < this->nyears; year++) {
       FIMS_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
       FIMS_LOG << "input q " << this->log_q[year] << std::endl;

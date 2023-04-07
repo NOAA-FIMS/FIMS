@@ -60,6 +60,16 @@ class Model {  // may need singleton
    * @brief Evaluate. Calculates the joint negative log-likelihood function.
    */
   const T Evaluate() {
+  //for(size_t jt = 0; jt <= 1; jt ++){
+  //  this->fims_information->fleets->Prepare();
+  //}
+ // typename fims::Information<T>::fleet_iterator jt;
+ //for(jt = this->fims_information->fleets.begin(); jt !=
+ //  this->fims_information->fleets.end(); ++jt ){     
+ //   (*jt).second->Prepare();
+    //nll += (*jt).second.Evaluate();
+ // }
+
     typename fims::Information<T>::population_iterator it;
     for (it = this->fims_information->populations.begin();
          it != this->fims_information->populations.end(); ++it) {
