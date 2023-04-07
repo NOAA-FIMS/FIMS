@@ -142,6 +142,9 @@ struct Population : public FIMSObject<Type> {
     expected_recruitment.resize((nyears+1));
     init_naa.resize(nages);
     M.resize(nyears * nages);
+    ages.resize(nages);
+    log_init_naa.resize(nages);
+    log_M.resize(nyears*nages);
   }
 
   /**

@@ -42,7 +42,6 @@ class Information {
       random_effects_parameters; /**< list of all random effects parameters >*/
   std::vector<T*>
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
-  std::vector<double> ages;     /**< ages in model >*/
 
   // data objects
   std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >
@@ -331,8 +330,6 @@ class Information {
         growth_models_iterator it = this->growth_models.find(
           growth_uint);  // growth_models is specified in information.hpp
         // and used in rcpp
-        //p->ages =
-        //  this->ages;  // check me re dims. ages defined as an std::vector
         // at the head of information.hpp; are the
         // dimensions of ages defined in rcpp or where?
         if (it != this->growth_models.end()) {
