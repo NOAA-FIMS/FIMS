@@ -60,29 +60,34 @@ class Model {  // may need singleton
    * @brief Evaluate. Calculates the joint negative log-likelihood function.
    */
   const T Evaluate() {
-  //for(size_t jt = 0; jt <= 1; jt ++){
-  //  this->fims_information->fleets->Prepare();
-  //}
- // typename fims::Information<T>::fleet_iterator jt;
- //for(jt = this->fims_information->fleets.begin(); jt !=
- //  this->fims_information->fleets.end(); ++jt ){     
- //   (*jt).second->Prepare();
-    //nll += (*jt).second.Evaluate();
- // }
 
+    // jnll = negative-log-likelihood (the objective function)
+    T jnll = 0.0;
+    T rec_nll = 0.0; //recrutiment nll
+    T age_comp_nll = 0.0; //age composition nll
+    T index_nll = 0.0; //survey and fishery cacth nll
+
+    //Loop over populations, evaluate, and sum up the recruitment likelihood component
     typename fims::Information<T>::population_iterator it;
     for (it = this->fims_information->populations.begin();
-         it != this->fims_information->populations.end(); ++it) {
-          FIMS_LOG << "a population " << std::endl;
-//(*it).second points to the Population module
-#ifdef TMB_MODEL
-      (*it).second->of = this->of;
-#endif
+      it != this->fims_information->populations.end(); ++it) {
+      //(*it).second points to the Population module
+      FIMS_LOG << "inside pop loop" << std::endl;
+      //Prepare recruitment
+      (*it).second->recruitment->Prepare();
+      FIMS_LOG << "recruitment prepare works" << std::endl;
+      //link to TMB objective function
+      #ifdef TMB_MODEL
+        (*it).second->of = this->of;
+      #endif
+      //Evaluate population
       (*it).second->Evaluate();
+      //Recrtuiment negative log-likelihood
+      rec_nll -= (*it).second->recruitment->evaluate_nll();
+      FIMS_LOG << "rec nll" << rec_nll << std::endl;
     }
 
-    // nll = negative-log-likelihood (the objective function)
-    T nll = 0.0;
+
     // nll will loop over fleets (Fleet module does not have evaluate function
     // yet) Sum up nlls here in model.hpp or in fleet.hpp? for(jt =
     // this->fims_information->fleets.begin(); jt !=
@@ -90,7 +95,21 @@ class Model {  // may need singleton
     // (*jt).second.Evaluate();
     //}
 
-    return nll;
+    jnll = rec_nll;
+    /*
+    #ifdef TMB_MODEL
+      typename ModelTraits<T>::EigenVector jnll_vec;
+      jnll_vec.resize(3);
+      jnll_vec[0] = rec_nll;
+      jnll_vec[1] = 0;
+      jnll_vec[2] = 0;
+      REPORT_F(jnll_vec, of);
+    #endif
+     */
+
+
+
+    return jnll;
   }
 };
 

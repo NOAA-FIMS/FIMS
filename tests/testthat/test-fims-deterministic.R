@@ -3,7 +3,7 @@
 # install.packages("TMB", type = "source")
 # use updated version of pkgbuild with correct compilation flags for debugging:
 #remotes::install_github(repo = "Andrea-Havron-NOAA/pkgbuild")
-
+#withr::local_options(pkg.build_extra_flags = FALSE) - run outside debugger mode
 devtools::load_all()
 
 
@@ -44,6 +44,7 @@ fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
+recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
 recruitment$rzero$value <- om_input$R0
 recruitment$rzero$is_random_effect <- FALSE
 recruitment$rzero$estimated <- TRUE

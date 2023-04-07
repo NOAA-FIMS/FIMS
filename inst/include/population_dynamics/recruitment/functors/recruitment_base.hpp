@@ -31,16 +31,16 @@ namespace fims {
     struct RecruitmentBase : public FIMSObject<Type> {
         static uint32_t id_g; /*!< reference id for recruitment object*/
 
-        std::vector<Type>
-        recruit_deviations; /*!< A vector of recruitment deviations */
+        typename ModelTraits<Type>::ParameterVector
+          recruit_deviations; /*!< A vector of recruitment deviations */
         bool constrain_deviations = true; /*!< A flag to indicate if recruitment
                                        deviations are summing to zero or not */
-        std::vector<Type> recruit_bias_adjustment; /*!< A vector of bias adj values
+        typename ModelTraits<Type>::DataVector recruit_bias_adjustment; /*!< A vector of bias adj values
                                                 (incorporating sigma_recruit)*/
         // Initially fixing bias adjustment (b_y in collobarative
         // workflow specification) to 1.0.
         // In the future, this would be set by the user.
-        std::vector<Type>
+        typename ModelTraits<Type>::DataVector
         recruit_bias_adjustment_fraction; /*!< A vector of bias adjustment
                                            fractions (on the 0 to 1 range)*/
         bool use_recruit_bias_adjustment =
@@ -63,9 +63,9 @@ namespace fims {
         virtual ~RecruitmentBase() {
         }
 
-        void prepare() {
+        void Prepare() {
+          this->recruit_bias_adjustment.resize(this->recruit_deviations.size());
             if (this->use_recruit_bias_adjustment) {
-                this->recruit_bias_adjustment.resize(this->recruit_deviations.size());
                 for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
                     this->recruit_bias_adjustment[i] = -0.5 * fims::exp(this->log_sigma_recruit) * fims::exp(this->log_sigma_recruit);
                 }
