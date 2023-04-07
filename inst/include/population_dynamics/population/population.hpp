@@ -128,7 +128,6 @@ struct Population : public FIMSObject<Type> {
     // size all the vectors to length of nages
     nfleets = fleets.size();
     expected_catch.resize(nyears * nfleets);
-    ages.resize(nages);
     years.resize(nyears);
     mortality_F.resize(nyears * nages);
     mortality_Z.resize(nyears * nages);
@@ -141,8 +140,6 @@ struct Population : public FIMSObject<Type> {
     unfished_spawning_biomass.resize((nyears + 1));
     spawning_biomass.resize((nyears + 1));
     expected_recruitment.resize((nyears+1));
-    log_init_naa.resize(nages);
-    log_M.resize(nyears * nages);
     init_naa.resize(nages);
     M.resize(nyears * nages);
   }
@@ -174,7 +171,10 @@ struct Population : public FIMSObject<Type> {
       this->init_naa[age] = fims::exp(this->log_init_naa[age]);
   for (size_t year = 0; year < this->nyears; year++) {
         size_t index_ay = age * this->nyears + year;
+        FIMS_LOG << " input M is " << fims::exp(this->log_M[index_ay]) << std::endl;
        this->M[index_ay] = fims::exp(this->log_M[index_ay]);
+       
+        FIMS_LOG << " M is being set to  " << this->M[index_ay] << std::endl;
         this->mortality_F[year] = 0.0;
       }
     }
@@ -211,6 +211,7 @@ struct Population : public FIMSObject<Type> {
                << this->fleets[fleet_]->selectivity->evaluate(ages[age])
                << " F mort year " << year << " "<< this->fleets[fleet_]->Fmort[year] << std::endl;
     }
+    FIMS_LOG << "M in calculate mortality is " << this->M[index_ya] << std::endl;
     this->mortality_Z[index_ya] =
         this->M[index_ya] + this->mortality_F[index_ya];
   }
@@ -226,14 +227,14 @@ struct Population : public FIMSObject<Type> {
                                  size_t age) {
     // using Z from previous age/year
     this->numbers_at_age[index_ya] =
-        this->numbers_at_age[index_ya2] * (exp(-this->mortality_Z[index_ya2]));
-
+        this->numbers_at_age[index_ya2] * (fims::exp(-this->mortality_Z[index_ya2]));
+    FIMS_LOG << " z at index_ya2 = " << index_ya2 <<" is " << fims::exp(-(this->mortality_Z[index_ya2])) << std::endl;
     // Plus group calculation
     if (age == (this->nages - 1)) {
       this->numbers_at_age[index_ya] =
           this->numbers_at_age[index_ya] +
           this->numbers_at_age[index_ya2 + 1] *
-              (exp(-this->mortality_Z[index_ya2 + 1]));
+              (fims::exp(-this->mortality_Z[index_ya2 + 1]));
     }
   }
 
@@ -248,14 +249,14 @@ struct Population : public FIMSObject<Type> {
                                          size_t age) {
     // using M from previous age/year
     this->unfished_numbers_at_age[index_ya] =
-        this->unfished_numbers_at_age[index_ya2] * (exp(-this->M[index_ya2]));
-
+        this->unfished_numbers_at_age[index_ya2] * (fims::exp(-this->M[index_ya2]));
+    FIMS_LOG << "survival rate at index " << index_ya2 << " is " << fims::exp(-(this->M[index_ya2])) << std::endl;
     // Plus group calculation
     if (age == (this->nages - 1)) {
       this->unfished_numbers_at_age[index_ya] =
           this->unfished_numbers_at_age[index_ya] +
           this->unfished_numbers_at_age[index_ya2 + 1] *
-              (exp(-this->M[index_ya2 + 1]));
+              (fims::exp(-this->M[index_ya2 + 1]));
     }
   }
 
@@ -335,9 +336,10 @@ struct Population : public FIMSObject<Type> {
                this->proportion_mature_at_age[a] *
                this->growth->evaluate(ages[a]);
     }
+
      numbers_spr[this->nages - 1] =
         (numbers_spr[nages - 2] * fims::exp(-this->M[nages - 2])) /
-        (1 - exp(-this->M[this->nages - 1]));
+        (1 - fims::exp(-this->M[this->nages - 1]));
     phi_0 += numbers_spr[this->nages - 1] * this->proportion_female *
              this->proportion_mature_at_age[this->nages - 1] *
              this->growth->evaluate(ages[this->nages - 1]);
@@ -430,7 +432,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
       catch_ = (this->fleets[fleet_]->Fmort[year] *
                 this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
                this->mortality_Z[index_ya] * this->numbers_at_age[index_ya] *
-               (1 - exp(-(this->mortality_Z[index_ya])));
+               (1 - fims::exp(-(this->mortality_Z[index_ya])));
 
       FIMS_LOG << " F " << fleet_ << "  " << this->fleets[fleet_]->Fmort[year]
                << std::endl;
@@ -479,12 +481,14 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     // this->maturity is pointing to the maturity module, which has
     //  an evaluate function. -> can be nested.
   FIMS_LOG << " age " << age << std::endl;
-  FIMS_LOG << " ages size " << ages.size() << std::endl;
+  FIMS_LOG << " ages size " << this->ages.size() << std::endl;
   FIMS_LOG << " index_ya " << index_ya << std::endl;
-  FIMS_LOG << "p mature" << this->proportion_mature_at_age.size() << std::endl;
-    FIMS_LOG << ages[age] << std::endl;
+  FIMS_LOG << "p mature" << this->proportion_mature_at_age[index_ya] << std::endl;
+    FIMS_LOG << this->ages[age] << std::endl;
     this->proportion_mature_at_age[index_ya] =
         this->maturity->evaluate(ages[age]);
+        
+  FIMS_LOG << "p mature set to " << this->proportion_mature_at_age[index_ya] << std::endl;
   }
 
   /**

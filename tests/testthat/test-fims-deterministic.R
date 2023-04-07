@@ -37,7 +37,7 @@ FIMS_C0 <- save_initial_input(
 )
 
 run_om(input_list = FIMS_C0)
-
+setwd("../../..")
 ## Set-up Rcpp modules and fix parameters to "true"
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 # fims$clear()
@@ -122,7 +122,7 @@ survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
 population <- new(fims$Population)
 # is it a problem these are not Parameters in the Population interface?
 # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
-population$log_M <- rep(log(om_input$M.age), om_input$nyr)
+population$log_M <- rep(log(om_input$M.age), om_input$nyr*om_input$nages)
 population$log_init_naa <- log(om_output$N.age[1, ])
 population$nages <- om_input$nages
 population$ages <- om_input$ages * 1.0

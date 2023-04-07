@@ -139,7 +139,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     b0->nfleets = this->nfleets;
     b0->nseasons = this->nseasons;
     b0->nages = this->nages;
-    b0->ages.resize(this->nages);
+    if(this->nages == this->ages.size()){
+      b0->ages.resize(this->nages);
+    } else{
+        warning("The ages vector is not of size nages.");
+    }
 
     b0->growth_id = this->growth_id;
     b0->recruitment_id = this->recruitment_id;
@@ -153,15 +157,11 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b0->log_init_naa[i] = this->log_init_naa[i];
-      b0->ages[i] = this->ages[i];
+      
     }
-    // if (this->log_M.estimated) {
-    //   if (this->log_M.is_random_effect) {
-    //     d0->RegisterRandomEffect(b0->log_M);
-    //   } else {
-    //     d0->RegisterParameter(b0->log_M);
-    //   }
-    // }
+for (size_t i = 0; i < ages.size(); i++) {
+    b0->ages[i] = this->ages[i];
+}
 
     // add to Information
     d0->populations[b0->id] = b0;
@@ -193,9 +193,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b1->log_init_naa[i] = this->log_init_naa[i];
-      b1->ages[i] = this->ages[i];
+      
     }
-
+    for (size_t i = 0; i < ages.size(); i++) {
+b1->ages[i] = this->ages[i];
+    }
 
     // add to Information
     d1->populations[b1->id] = b1;
@@ -227,15 +229,13 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b2->log_init_naa[i] = this->log_init_naa[i];
-      b2->ages[i] = this->ages[i];
+
     }
-    // if (this->log_M.estimated) {
-    // if (this->log_M.is_random_effect) {
-    // d2->RegisterRandomEffect(b2->log_M);
-    // } else {
-    // d2->RegisterParameter(b2->log_M);
-    // }
-    // }
+
+    for (size_t i = 0; i < ages.size(); i++) {
+    b2->ages[i] = this->ages[i];
+    }
+
 
     // add to Information
     d2->populations[b2->id] = b2;
@@ -267,17 +267,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b3->log_init_naa[i] = this->log_init_naa[i];
-      b3->ages[i] = this->ages[i];
     }
 
-    // b3->log_M = this->log_M.value;
-    // if (this->log_M.estimated) {
-    // if (this->log_M.is_random_effect) {
-    // d3->RegisterRandomEffect(b3->log_M);
-    // } else {
-    // d3->RegisterParameter(b3->log_M);
-    // }
-    // }
+    for (size_t i = 0; i < ages.size(); i++) {
+      b3->ages[i] = this->ages[i];
+    }
 
     // add to Information
     d3->populations[b3->id] = b3;
