@@ -179,6 +179,7 @@ for (size_t i = 0; i < ages.size(); i++) {
     b1->nfleets = this->nfleets;
     b1->nseasons = this->nseasons;
     b1->nages = this->nages;
+    std::cout<< this->nages << std::endl;
     b1->ages.resize(this->nages);
     
     b1->growth_id = this->growth_id;

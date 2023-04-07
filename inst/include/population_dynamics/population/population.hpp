@@ -228,7 +228,7 @@ struct Population : public FIMSObject<Type> {
     // using Z from previous age/year
     this->numbers_at_age[index_ya] =
         this->numbers_at_age[index_ya2] * (fims::exp(-this->mortality_Z[index_ya2]));
-    FIMS_LOG << " z at index_ya2 = " << index_ya2 <<" is " << fims::exp(-(this->mortality_Z[index_ya2])) << std::endl;
+    FIMS_LOG << " z at index_ya2 = " << index_ya2 <<" is " << this->mortality_Z[index_ya2] << std::endl;
     // Plus group calculation
     if (age == (this->nages - 1)) {
       this->numbers_at_age[index_ya] =

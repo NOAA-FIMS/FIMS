@@ -331,8 +331,8 @@ class Information {
         growth_models_iterator it = this->growth_models.find(
           growth_uint);  // growth_models is specified in information.hpp
         // and used in rcpp
-        p->ages =
-          this->ages;  // check me re dims. ages defined as an std::vector
+        //p->ages =
+        //  this->ages;  // check me re dims. ages defined as an std::vector
         // at the head of information.hpp; are the
         // dimensions of ages defined in rcpp or where?
         if (it != this->growth_models.end()) {
