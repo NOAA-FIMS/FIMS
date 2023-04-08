@@ -89,13 +89,16 @@ class Model {  // may need singleton
 
 
     // nll will loop over fleets (Fleet module does not have evaluate function
-    // yet) Sum up nlls here in model.hpp or in fleet.hpp? for(jt =
-    // this->fims_information->fleets.begin(); jt !=
-    // this->fims_information->fleets.end(); ++jt ){ nll +=
-    // (*jt).second.Evaluate();
-    //}
+    // yet) Sum up nlls here in model.hpp or in fleet.hpp?
+    typename fims::Information<T>::fleet_iterator jt;
+    for(jt = this->fims_information->fleets.begin(); jt !=
+      this->fims_information->fleets.end(); ++jt ){
+      age_comp_nll -= (*jt).second->evaluate_age_comp_ll();
+      FIMS_LOG << "age comp nll" << age_comp_nll << std::endl;
+      index_nll -= (*jt).second->evaluate_index_ll();
+    }
 
-    jnll = rec_nll;
+    jnll = rec_nll + age_comp_nll + index_nll;
     /*
     #ifdef TMB_MODEL
       typename ModelTraits<T>::EigenVector jnll_vec;
@@ -106,8 +109,6 @@ class Model {  // may need singleton
       REPORT_F(jnll_vec, of);
     #endif
      */
-
-
 
     return jnll;
   }
