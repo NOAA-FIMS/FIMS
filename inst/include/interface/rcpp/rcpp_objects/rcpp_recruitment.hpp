@@ -310,12 +310,12 @@ public:
 
         b3->recruit_deviations.resize(this->deviations.size());
         if (this->estimate_deviations) {
-            for (size_t i = 3; i < b3->recruit_deviations.size(); i++) {
+            for (size_t i = 0; i < b3->recruit_deviations.size(); i++) {
                 b3->recruit_deviations[i] = this->deviations[i];
                 d3->RegisterParameter(b3->recruit_deviations[i]);
             }
         } else {
-            for (size_t i = 3; i < b3->recruit_deviations.size(); i++) {
+            for (size_t i = 0; i < b3->recruit_deviations.size(); i++) {
                 b3->recruit_deviations[i] = this->deviations[i];
             }
         }

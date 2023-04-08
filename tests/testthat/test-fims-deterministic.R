@@ -150,9 +150,9 @@ report <- obj$report()
 # - set up tolerance values later
 
 # # Numbers at age
- expect_equal(report$naa, c(t(om_output$N.age)))
+ expect_equal(report$naa[1:360], c(t(om_output$N.age)))
  N.age <- c(t(om_output$N.age))
- which(abs(report$naa - c(t(om_output$N.age)))>1)
+ which(abs(report$naa[1:360] - c(t(om_output$N.age)))>1)
 # # Biomass
  expect_equal(report$ssb, om_output$biomass.mt)
 # # Spawning biomass

@@ -210,7 +210,7 @@ struct Population : public FIMSObject<Type> {
       this->mortality_F[index_ya] +=
           this->fleets[fleet_]->Fmort[year] *
           this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-      FIMS_LOG << " sel "
+      FIMS_LOG << " sel age " << ages[age] << " is "  
                << this->fleets[fleet_]->selectivity->evaluate(ages[age])
                << " F mort year " << year << " "<< this->fleets[fleet_]->Fmort[year] << std::endl;
     }
@@ -302,7 +302,7 @@ struct Population : public FIMSObject<Type> {
         this->proportion_female * this->numbers_at_age[index_ya] *
         this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
     FIMS_LOG << " proportion female " << this->proportion_female << " "
-             << " mature age " << this->proportion_mature_at_age[index_ya] << " "
+             << " mature age " << age << " is "<< this->proportion_mature_at_age[index_ya] << " "
              << " spawning biomass inputs----- +++\n";
   }
 
