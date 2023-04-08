@@ -30,9 +30,15 @@ class DataInterface : public FIMSRcppInterfaceBase {
   /** @brief destructor
    */
   virtual ~DataInterface() {}
-};
 
+  /** @brief get the ID of the interface base object
+   **/
+  virtual uint32_t get_id() = 0;
+
+};
 uint32_t DataInterface::id_g = 1;
+
+
 
 /**
  * @brief Rcpp interface for age comp data as an S4 object. To instantiate
@@ -54,6 +60,12 @@ class AgeCompDataInterface : public DataInterface {
    * @brief destructor
    */
   virtual ~AgeCompDataInterface() {}
+
+  /** @brief get the ID of the interface base object
+   **/
+  virtual uint32_t get_id() {
+    return this->id;
+  }
 
   /**
    * @brief adds parameters to the model
@@ -131,6 +143,11 @@ class IndexDataInterface : public DataInterface {
    * @brief destructor
    */
   virtual ~IndexDataInterface() {}
+  /** @brief get the ID of the interface base object
+   **/
+  virtual uint32_t get_id() {
+    return this->id;
+  }
 
   /**
    *@brief function to add to TMB
@@ -181,6 +198,9 @@ class IndexDataInterface : public DataInterface {
     d3->data_objects[this->id] = index_data_3;
     return true;
   }
+
+
+
 };
 
 #endif
