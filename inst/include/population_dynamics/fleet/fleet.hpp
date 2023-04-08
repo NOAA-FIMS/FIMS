@@ -116,7 +116,7 @@ struct Fleet : public FIMSObject<Type> {
   // derived quantities
   std::fill(catch_at_age.begin(), catch_at_age.end(), 0);    /*!<derived quantity catch at age*/
   std::fill(catch_index.begin(), catch_index.end(), 0);     /*!<derived quantity catch index*/
-  std::fill(age_composition.begin(), age_composition.end(), 0); 
+  std::fill(age_composition.begin(), age_composition.end(), 0);
   std::fill(expected_catch.begin(), expected_catch.end(), 0); /*!<model expected total catch*/
   std::fill(expected_index.begin(), expected_index.end(), 0); /*!<model expected index of abundance*/
   std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(), 0); /*!<model expected catch at age*/
@@ -129,6 +129,64 @@ struct Fleet : public FIMSObject<Type> {
       this->q[year] = fims::exp(this->log_q[year]);
     }
   }
+
+
+  virtual const Type evaluate_age_comp_ll() {
+    Type nll = 0.0; /*!< The negative log likelihood value */
+    #ifdef TMB_MODEL
+      fims::Dmultinom<Type> dmultinom;
+      size_t dims = this->observed_agecomp_data->get_imax() *
+        this->observed_agecomp_data->get_jmax();
+      if (dims != this->catch_numbers_at_age.size()) {
+        FIMS_LOG << "Error: observed age comp is of size " << dims
+                 << " and expected is of size " << this->age_composition.size()
+                 << std::endl;
+      } else {
+        for (size_t y = 0; y < this->nyears; y++) {
+          using Vector = typename ModelTraits<Type>::EigenVector;
+          Vector observed_acomp;
+          Vector expected_acomp;
+
+          observed_acomp.resize(this->nages);
+          expected_acomp.resize(this->nages);
+          Type sum = 0.0;
+          for (size_t a = 0; a < this->nages; a++) {
+            size_t index_ya = y * this->nages + a;
+            sum += this->catch_numbers_at_age[index_ya];
+          }
+
+          FIMS_LOG << "observed and expected age comp is: " << std::endl;
+          for (size_t a = 0; a < this->nages; a++) {
+            size_t index_ya = y * this->nages + a;
+            expected_acomp[a] = this->catch_numbers_at_age[index_ya] /
+              sum;  // probabilities for ages
+            observed_acomp[a] = this->observed_agecomp_data->at(y, a);
+          }
+          dmultinom.x = observed_acomp;
+          dmultinom.p = expected_acomp;
+          nll -= dmultinom.evaluate(true);
+        }
+      }
+    #endif
+    return nll;
+  }
+
+  virtual const Type evaluate_index_ll() {
+    Type nll = 0.0; /*!< The negative log likelihood value */
+    #ifdef TMB_MODEL
+    fims::Dnorm<Type> dnorm;
+    dnorm.sd = fims::exp(this->log_obs_error);
+    for (size_t i = 0; i < this->expected_index.size(); i++) {
+      dnorm.x = fims::log(this->observed_index_data->at(i));
+      dnorm.mean = fims::log(this->expected_index[i]);
+      nll -= dnorm.evaluate(true);
+    }
+    #endif
+    return nll;
+  }
+
+
+
 };
 
 // default id of the singleton fleet class
