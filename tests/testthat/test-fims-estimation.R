@@ -37,27 +37,43 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
 
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
+age_frame <- FIMSFrameAge(data_mile1)
+fishing_fleet_dat <- dplyr::filter(age_frame@data, type == "landings")
+survey_dat <- dplyr::filter(age_frame@data, type == "index")$value
+age_comp_fleet <- dplyr::filter(age_frame@data, type == "age" & name == "fleet1")
+age_comp_survey <- dplyr::filter(age_frame@data, type == "age" & name == "survey1")
+
 ## Set-up Rcpp modules and fix parameters to "true"
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
+setwd("../../..")
 # fims$clear()
+
+#Data
+fishing_fleet_index <- new(fims$Index)
+fishing_fleet_index$index_data <-
+  dplyr::filter(age_frame@data, type == "landings")@value
+fishing_fleet_age_comp <- new(fims$AgeComp)
+fishing_fleet_age_comp$age_comp_data <-
+  dplyr::filter(age_frame@data, type == "age" & name == "fleet1")
+
+survey_fleet_index <- new(fims$Index)
+survey_fleet_index$index_data <-
+  dplyr::filter(age_frame@data, type == "index")@value
+survey_fleet_age_comp <- new(fims$AgeComp)
+survey_fleet_age_comp$age_comp_data <-
+  dplyr::filter(age_frame@data, type == "age" & name == "survey")
 
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
+recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
 recruitment$rzero$value <- om_input$R0
 recruitment$rzero$is_random_effect <- FALSE
 recruitment$rzero$estimated <- TRUE
 recruitment$steep$value <- om_input$h
 recruitment$steep$is_random_effect <- FALSE
 recruitment$steep$estimated <- TRUE
-
-recruitment_nll <- new(fims$RecruitmentNLL)
-recruitment_nll$do_bias_correction <- FALSE
-recruitment_nll$estimate_recruit_deviations <- TRUE
-recruitment_nll$log_sigma_recruit$value <- om_input$logR_sd
-recruitment_nll$log_sigma_recruit$is_random_effect <- FALSE
-recruitment_nll$log_sigma_recruit$estimated <- TRUE
-recruitment_nll$recruitment_bias_adj <- rep(0.0, om_input$nyr)
-recruitment_nll$recruitment_devs <- om_input$logR.resid
+recruitment$estimate_deviations <- TRUE
+recruitment$deviations <- exp(om_input$logR.resid)
 
 # Growth
 ewaa_growth <- new(fims$EWAAgrowth)
@@ -96,9 +112,11 @@ fishing_fleet$estimate_q <- TRUE
 fishing_fleet$random_q <- FALSE
 fishing_fleet$SetAgeCompLikelihood(1)
 fishing_fleet$SetIndexLikelihood(1)
-fishing_fleet$SetObservedAgeCompData(1, as.matrix(c(t(em_input$L.age.obs$fleet1)))) 
+fishing_fleet$SetObservedAgeCompData(1, as.matrix(c(t(em_input$L.age.obs$fleet1))))
 fishing_fleet$SetObservedIndexData(1, em_input$L.obs$fleet1)
-fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id()) 
+fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
+fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
+fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
 
 # Create the survey fleet
 survey_fleet_selectivity <- new(fims$LogisticSelectivity)
@@ -120,15 +138,17 @@ survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
 survey_fleet$SetAgeCompLikelihood(1)
 survey_fleet$SetIndexLikelihood(1)
-survey_fleet$SetObservedAgeCompData(2, as.matrix(c(t(em_input$survey.age.obs$survey1)))) 
-survey_fleet$SetObservedIndexData(2, em_input$survey.obs$survey1) 
-survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id()) 
+survey_fleet$SetObservedAgeCompData(2, as.matrix(c(t(em_input$survey.age.obs$survey1))))
+survey_fleet$SetObservedIndexData(2, em_input$survey.obs$survey1)
+survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
+survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
+survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
 
 # Population
 population <- new(fims$Population)
 # is it a problem these are not Parameters in the Population interface?
 # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
-population$log_M <- rep(log(om_input$M.age), om_input$nyr)
+population$log_M <- rep(log(om_input$M.age), om_input$nyr*om_input$nages)
 population$log_init_naa <- log(om_output$N.age[1, ])
 population$nages <- om_input$nages
 population$ages <- om_input$ages * 1.0
