@@ -303,6 +303,9 @@ struct Population : public FIMSObject<Type> {
         this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
     FIMS_LOG << " proportion female " << this->proportion_female << " "
              << " mature age " << age << " is "<< this->proportion_mature_at_age[index_ya] << " "
+             << " numbers at age " << this->numbers_at_age[index_ya] << " "
+             << " growth " << growth->evaluate(ages[age]) << " "
+             << " spawning biomass " << this->spawning_biomass[year] << " "
              << " spawning biomass inputs----- +++\n";
   }
 
@@ -360,8 +363,8 @@ struct Population : public FIMSObject<Type> {
     Type phi0 = CalculateSBPR0();
     FIMS_LOG << "recruitment 2" << std::endl;
     FIMS_LOG << "phi0 = " << phi0 << std::endl;
-    FIMS_LOG << "spawning biomass = " << this->spawning_biomass[year - 1] << std::endl;
-    FIMS_LOG << "rec devs = " << this->recruitment->recruit_deviations[year] << std::endl;
+    FIMS_LOG << "spawning biomass = " << this->spawning_biomass[year] << std::endl;
+    FIMS_LOG << "rec devs = " << this->recruitment->recruit_deviations[year-1] << std::endl;
     FIMS_LOG << "rec eval = " << this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) << std::endl;
 
     this->numbers_at_age[index_ya] =
