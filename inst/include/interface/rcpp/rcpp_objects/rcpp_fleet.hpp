@@ -85,11 +85,9 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    * @brief Set the unique id for the Observed Age Comp Data object
    *
    * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
-   * @param agecomp_data the age composition data
    * object
    */
-  void SetObservedAgeCompData(int observed_agecomp_data_id,
-                              Rcpp::NumericMatrix agecomp_data) {
+  void SetObservedAgeCompData(int observed_agecomp_data_id) {
     // Check if observed age composition data have been set already
     if (this->observed_agecomp_data_id != -999) {
       warning("Observed age composition data have been set already.");
@@ -106,8 +104,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    * @param observed_index_data_id Unique id for the Observed Index Data object
    * @param indexdata the index data
    */
-  void SetObservedIndexData(int observed_index_data_id,
-                            Rcpp::NumericVector indexdata) {
+  void SetObservedIndexData(int observed_index_data_id) {
     // Check if observed index data have been set already
     if (this->observed_index_data_id != -999) {
       warning("Observed index data have been set already.");

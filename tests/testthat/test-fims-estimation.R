@@ -220,19 +220,23 @@ setwd("../../..")
 # fims$clear()
 
 #Data
-fishing_fleet_index <- new(fims$Index)
-fishing_fleet_index$index_data <-
-  dplyr::filter(age_frame@data, type == "landings")@value
-fishing_fleet_age_comp <- new(fims$AgeComp)
-fishing_fleet_age_comp$age_comp_data <-
-  dplyr::filter(age_frame@data, type == "age" & name == "fleet1")
+catch <- dplyr::filter(age_frame@data, type == "landings")$value
+fishing_fleet_index <- new(fims$Index, length(catch))
 
-survey_fleet_index <- new(fims$Index)
-survey_fleet_index$index_data <-
-  dplyr::filter(age_frame@data, type == "index")@value
-survey_fleet_age_comp <- new(fims$AgeComp)
+fishing_fleet_index$index_data <- catch
+  
+fishing_fleet_age_comp <- new(fims$AgeComp, length(index), om_input$nages)
+fishing_fleet_age_comp$age_comp_data <-
+  dplyr::filter(age_frame@data, type == "age" & name == "fleet1")$value
+
+survey_index <-
+  dplyr::filter(age_frame@data, type == "index")$value
+
+survey_fleet_index <- new(fims$Index, length(survey_index))
+
+survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
 survey_fleet_age_comp$age_comp_data <-
-  dplyr::filter(age_frame@data, type == "age" & name == "survey")
+  dplyr::filter(age_frame@data, type == "age" & name == "survey")$value
 
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
@@ -283,8 +287,8 @@ fishing_fleet$estimate_q <- TRUE
 fishing_fleet$random_q <- FALSE
 fishing_fleet$SetAgeCompLikelihood(1)
 fishing_fleet$SetIndexLikelihood(1)
-fishing_fleet$SetObservedAgeCompData(1, as.matrix(c(t(em_input$L.age.obs$fleet1))))
-fishing_fleet$SetObservedIndexData(1, em_input$L.obs$fleet1)
+fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
+fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
 fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
 fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
 fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
@@ -309,8 +313,8 @@ survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
 survey_fleet$SetAgeCompLikelihood(1)
 survey_fleet$SetIndexLikelihood(1)
-survey_fleet$SetObservedAgeCompData(2, as.matrix(c(t(em_input$survey.age.obs$survey1))))
-survey_fleet$SetObservedIndexData(2, em_input$survey.obs$survey1)
+survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
+survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
 survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
 survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
 survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
