@@ -168,17 +168,18 @@ struct Population : public FIMSObject<Type> {
     std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
     std::fill(expected_catch.begin(), expected_catch.end(), 0);
     std::fill(expected_recruitment.begin(), expected_recruitment.end(), 0.0);
+    std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(), 0.0);
+    std::fill(mortality_Z.begin(), mortality_Z.end(), 0.0);
+    
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
       this->init_naa[age] = fims::exp(this->log_init_naa[age]);
   for (size_t year = 0; year < this->nyears; year++) {
         size_t index_ay = age * this->nyears + year;
-        FIMS_LOG << " input M is " << fims::exp(this->log_M[index_ay]) << std::endl;
        this->M[index_ay] = fims::exp(this->log_M[index_ay]);
-       
-        FIMS_LOG << " M is being set to  " << this->M[index_ay] << std::endl;
-        this->mortality_F[year] = 0.0;
+
+        this->mortality_F[index_ay] = 0.0;
       }
     }
   }
