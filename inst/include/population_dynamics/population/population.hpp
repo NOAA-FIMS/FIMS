@@ -640,8 +640,10 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
         this->recruitment->recruit_deviations;
     typename ModelTraits<Type>::EigenVector expected_catch =
       this->expected_catch;
-      typename ModelTraits<Type>::EigenVector recruitment =
+    typename ModelTraits<Type>::EigenVector recruitment =
       this->expected_recruitment;
+    typename ModelTraits<Type>::EigenVector biomass =
+      this->biomass;
       
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
       this->fleets[fleet_]->ReportFleet();

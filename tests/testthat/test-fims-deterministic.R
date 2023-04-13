@@ -4,14 +4,11 @@
 # use updated version of pkgbuild with correct compilation flags for debugging:
 #remotes::install_github(repo = "Andrea-Havron-NOAA/pkgbuild")
 #withr::local_options(pkg.build_extra_flags = FALSE) - run outside debugger mode
-# devtools::load_all()
+devtools::load_all()
 
 
 library(FIMS)
 data(package = "FIMS")
-
-# remove from test_that wrapper for debugging
-test_that("deterministic test of fims", {
 
 ## Install required packages
 required_pkg <- c("remotes", "devtools", "here")
@@ -140,6 +137,9 @@ fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
+
+# remove from test_that wrapper for debugging
+test_that("deterministic test of fims", {
 report <- obj$report()
 fims$clear()
 # Test
@@ -156,7 +156,7 @@ fims$clear()
 # # # Biomass
 #  expect_equal(report$ssb, om_output$biomass.mt)
 # # # Spawning biomass
-# #expect_equal(report, om_output$SSB)
+expect_equal(report$ssb, om_output$SSB)
 # # # Expected catch
 # out_catch <- report$catch_[seq(1,60, by = 2)]
 # out_catch / om_output$L.mt$fleet1

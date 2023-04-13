@@ -134,16 +134,17 @@ struct Fleet : public FIMSObject<Type> {
       this->q[year] = fims::exp(this->log_q[year]);
     }
   }
-};
-
-#ifdef TMB_MODEL
-template <class Type>
-void ReportFleet(){
+  #ifdef TMB_MODEL
+  //template <class Type>
+  void ReportFleet(){
   typename ModelTraits<Type>::EigenVector fleet_index =
       expected_index;
       REPORT_F(fleet_index, of);
 }
 #endif
+};
+
+
 
 // default id of the singleton fleet class
 template <class Type>
