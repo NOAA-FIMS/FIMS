@@ -163,6 +163,7 @@ struct Population : public FIMSObject<Type> {
        this->fleets[fleet]->Prepare();
      }
 
+    std::fill(biomass.begin(), biomass.end(), 0);
     std::fill(unfished_spawning_biomass.begin(),
               unfished_spawning_biomass.end(), 0);
     std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
@@ -170,7 +171,7 @@ struct Population : public FIMSObject<Type> {
     std::fill(expected_recruitment.begin(), expected_recruitment.end(), 0.0);
     std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(), 0.0);
     std::fill(mortality_Z.begin(), mortality_Z.end(), 0.0);
-    
+
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
@@ -211,7 +212,7 @@ struct Population : public FIMSObject<Type> {
       this->mortality_F[index_ya] +=
           this->fleets[fleet_]->Fmort[year] *
           this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-      FIMS_LOG << " sel age " << ages[age] << " is "  
+      FIMS_LOG << " sel age " << ages[age] << " is "
                << this->fleets[fleet_]->selectivity->evaluate(ages[age])
                << " F mort year " << year << " "<< this->fleets[fleet_]->Fmort[year] << std::endl;
     }
@@ -494,7 +495,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     FIMS_LOG << this->ages[age] << std::endl;
     this->proportion_mature_at_age[index_ya] =
         this->maturity->evaluate(ages[age]);
-        
+
   FIMS_LOG << "p mature set to " << this->proportion_mature_at_age[index_ya] << std::endl;
   }
 
