@@ -163,22 +163,24 @@ struct Population : public FIMSObject<Type> {
        this->fleets[fleet]->Prepare();
      }
 
+    std::fill(biomass.begin(), biomass.end(), 0);
     std::fill(unfished_spawning_biomass.begin(),
               unfished_spawning_biomass.end(), 0);
     std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
     std::fill(expected_catch.begin(), expected_catch.end(), 0);
     std::fill(expected_recruitment.begin(), expected_recruitment.end(), 0.0);
+    std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(), 0.0);
+    std::fill(mortality_Z.begin(), mortality_Z.end(), 0.0);
+
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
       this->init_naa[age] = fims::exp(this->log_init_naa[age]);
   for (size_t year = 0; year < this->nyears; year++) {
         size_t index_ay = age * this->nyears + year;
-        FIMS_LOG << " input M is " << fims::exp(this->log_M[index_ay]) << std::endl;
        this->M[index_ay] = fims::exp(this->log_M[index_ay]);
-       
-        FIMS_LOG << " M is being set to  " << this->M[index_ay] << std::endl;
-        this->mortality_F[year] = 0.0;
+
+        this->mortality_F[index_ay] = 0.0;
       }
     }
   }
@@ -210,7 +212,7 @@ struct Population : public FIMSObject<Type> {
       this->mortality_F[index_ya] +=
           this->fleets[fleet_]->Fmort[year] *
           this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-      FIMS_LOG << " sel age " << ages[age] << " is "  
+      FIMS_LOG << " sel age " << ages[age] << " is "
                << this->fleets[fleet_]->selectivity->evaluate(ages[age])
                << " F mort year " << year << " "<< this->fleets[fleet_]->Fmort[year] << std::endl;
     }
@@ -303,6 +305,9 @@ struct Population : public FIMSObject<Type> {
         this->proportion_mature_at_age[index_ya] * growth->evaluate(ages[age]);
     FIMS_LOG << " proportion female " << this->proportion_female << " "
              << " mature age " << age << " is "<< this->proportion_mature_at_age[index_ya] << " "
+             << " numbers at age " << this->numbers_at_age[index_ya] << " "
+             << " growth " << growth->evaluate(ages[age]) << " "
+             << " spawning biomass " << this->spawning_biomass[year] << " "
              << " spawning biomass inputs----- +++\n";
   }
 
@@ -360,8 +365,8 @@ struct Population : public FIMSObject<Type> {
     Type phi0 = CalculateSBPR0();
     FIMS_LOG << "recruitment 2" << std::endl;
     FIMS_LOG << "phi0 = " << phi0 << std::endl;
-    FIMS_LOG << "spawning biomass = " << this->spawning_biomass[year - 1] << std::endl;
-    FIMS_LOG << "rec devs = " << this->recruitment->recruit_deviations[year] << std::endl;
+    FIMS_LOG << "spawning biomass = " << this->spawning_biomass[year] << std::endl;
+    FIMS_LOG << "rec devs = " << this->recruitment->recruit_deviations[year-1] << std::endl;
     FIMS_LOG << "rec eval = " << this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) << std::endl;
 
     this->numbers_at_age[index_ya] =
@@ -490,7 +495,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     FIMS_LOG << this->ages[age] << std::endl;
     this->proportion_mature_at_age[index_ya] =
         this->maturity->evaluate(ages[age]);
-        
+
   FIMS_LOG << "p mature set to " << this->proportion_mature_at_age[index_ya] << std::endl;
   }
 
@@ -633,10 +638,16 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
       this->spawning_biomass;
     typename ModelTraits<Type>::EigenVector rec_dev =
         this->recruitment->recruit_deviations;
-    typename ModelTraits<Type>::EigenVector catch_ =
+    typename ModelTraits<Type>::EigenVector expected_catch =
       this->expected_catch;
-      typename ModelTraits<Type>::EigenVector recruitment =
+    typename ModelTraits<Type>::EigenVector recruitment =
       this->expected_recruitment;
+    typename ModelTraits<Type>::EigenVector biomass =
+      this->biomass;
+      
+    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+      this->fleets[fleet_]->ReportFleet();
+    }
 
     REPORT_F(rec_dev, of);
     ADREPORT_F(rec_dev, of);
@@ -644,8 +655,10 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     ADREPORT_F(naa, of);
     REPORT_F(ssb, of);
     ADREPORT_F(ssb, of);
-    REPORT_F(catch_, of);
+    REPORT_F(expected_catch, of);
     REPORT_F(recruitment, of);
+    REPORT_F(biomass, of);
+
     // ADREPORT_F(this->recruitment->rzero, of);
     // ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in
     // recruitment_base ADREPORT_F(this->recruitment->log_sigma_recruit, of);

@@ -10,9 +10,6 @@ devtools::load_all()
 library(FIMS)
 data(package = "FIMS")
 
-# remove from test_that wrapper for debugging
-# test_that("deterministic test of fims", {
-
 ## Install required packages
 required_pkg <- c("remotes", "devtools", "here")
 pkg_to_install <- required_pkg[!(required_pkg %in%
@@ -140,8 +137,11 @@ fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
-report <- obj$report()
 
+# remove from test_that wrapper for debugging
+test_that("deterministic test of fims", {
+report <- obj$report()
+fims$clear()
 # Test
 # TO DO:
 # - extract TMB output
@@ -149,18 +149,18 @@ report <- obj$report()
 # - use absolute relative error later
 # - set up tolerance values later
 
-# # Numbers at age
- expect_equal(report$naa[1:360], c(t(om_output$N.age)))
- N.age <- c(t(om_output$N.age))
- which(abs(report$naa[1:360] - c(t(om_output$N.age)))>1)
-# # Biomass
- expect_equal(report$ssb, om_output$biomass.mt)
-# # Spawning biomass
-#expect_equal(report, om_output$SSB)
-# # Expected catch
-out_catch <- report$catch_[seq(1,60, by = 2)]
-out_catch / om_output$L.mt$fleet1
-expect_equal(out_catch, om_output$L.mt$fleet1)
-# # Expected index
-# expect_equal(report, om_output$survey_index_biomass)
-# })
+# # # Numbers at age
+#  expect_equal(report$naa[1:360], c(t(om_output$N.age)))
+#  N.age <- c(t(om_output$N.age))
+#  which(abs(report$naa[1:360] - c(t(om_output$N.age)))>1)
+# # # Biomass
+#  expect_equal(report$ssb, om_output$biomass.mt)
+# # # Spawning biomass
+expect_equal(report$ssb, om_output$SSB)
+# # # Expected catch
+# out_catch <- report$catch_[seq(1,60, by = 2)]
+# out_catch / om_output$L.mt$fleet1
+# expect_equal(out_catch, om_output$L.mt$fleet1)
+# # # Expected index
+# # expect_equal(report, om_output$survey_index_biomass)
+})

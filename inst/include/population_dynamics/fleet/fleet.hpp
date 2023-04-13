@@ -71,6 +71,11 @@ struct Fleet : public FIMSObject<Type> {
   std::vector<Type> expected_index; /*!<model expected index of abundance*/
   std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
   std::vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
+
+  #ifdef TMB_MODEL
+  ::objective_function<Type> *of;
+#endif
+
   /**
    * @brief Constructor.
    */
@@ -129,6 +134,12 @@ struct Fleet : public FIMSObject<Type> {
       this->q[year] = fims::exp(this->log_q[year]);
     }
   }
+  #ifdef TMB_MODEL
+  void ReportFleet(){
+  typename ModelTraits<Type>::EigenVector fleet_index =
+      expected_index;
+      REPORT_F(fleet_index, of);
+}
 
 
   virtual const Type evaluate_age_comp_ll() {
@@ -185,9 +196,9 @@ struct Fleet : public FIMSObject<Type> {
     return nll;
   }
 
-
-
 };
+
+
 
 // default id of the singleton fleet class
 template <class Type>
