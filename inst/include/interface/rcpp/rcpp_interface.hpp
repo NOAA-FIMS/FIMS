@@ -203,14 +203,20 @@ RCPP_MODULE(fims) {
       .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
-  Rcpp::class_<DataInterface>("Data").constructor().field(
-      "observed_data", &DataInterface::observed_data);
+  Rcpp::class_<DataInterface>("Data")
+    .constructor()
+    .field("observed_data", &DataInterface::observed_data)
+    .method("get_id", &DataInterface::get_id);
 
-  Rcpp::class_<AgeCompDataInterface>("AgeComp").constructor<int, int>().field(
-      "age_comp_data", &AgeCompDataInterface::age_comp_data);
+  Rcpp::class_<AgeCompDataInterface>("AgeComp")
+    .constructor<int, int>()
+    .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
+    .method("get_id", &AgeCompDataInterface::get_id);
 
-  Rcpp::class_<IndexDataInterface>("Index").constructor<int>().field(
-      "index_data", &IndexDataInterface::index_data);
+  Rcpp::class_<IndexDataInterface>("Index")
+    .constructor<int>()
+    .field("index_data", &IndexDataInterface::index_data)
+    .method("get_id", &IndexDataInterface::get_id);
 
   Rcpp::class_<PopulationInterface>("Population")
       .constructor()
