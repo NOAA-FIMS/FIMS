@@ -140,6 +140,7 @@ struct Fleet : public FIMSObject<Type> {
       expected_index;
       REPORT_F(fleet_index, of);
 }
+#endif
 
 
   virtual const Type evaluate_age_comp_ll() {

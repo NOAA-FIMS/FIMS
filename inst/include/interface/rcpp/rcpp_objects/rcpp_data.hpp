@@ -33,7 +33,16 @@ class DataInterface : public FIMSRcppInterfaceBase {
 
   /** @brief get the ID of the interface base object
    **/
-  virtual uint32_t get_id() = 0;
+  virtual uint32_t get_id(){
+    return this->id;
+  }
+
+/**@brief add_to_fims_tmb dummy method
+ * 
+*/
+  virtual bool add_to_fims_tmb(){
+    return true;
+  };
 
 };
 uint32_t DataInterface::id_g = 1;
