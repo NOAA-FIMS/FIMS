@@ -134,21 +134,23 @@ struct Fleet : public FIMSObject<Type> {
       this->q[year] = fims::exp(this->log_q[year]);
     }
   }
-  #ifdef TMB_MODEL
-  void ReportFleet(){
-  typename ModelTraits<Type>::EigenVector fleet_index =
-      expected_index;
-      REPORT_F(fleet_index, of);
-}
-#endif
+  
+//  void ReportFleet(){
+//    #ifdef TMB_MODEL
+//  typename ModelTraits<Type>::EigenVector fleet_index =
+//      expected_index;
+//      REPORT_F(fleet_index, of);
+//      #endif
+//}
 
 
   virtual const Type evaluate_age_comp_ll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
     #ifdef TMB_MODEL
       fims::Dmultinom<Type> dmultinom;
-      size_t dims = this->observed_agecomp_data->get_imax() *
-        this->observed_agecomp_data->get_jmax();
+      size_t dims = 360;
+      //size_t dims = this->observed_agecomp_data->get_imax() *
+      //  this->observed_agecomp_data->get_jmax();
       if (dims != this->catch_numbers_at_age.size()) {
         FIMS_LOG << "Error: observed age comp is of size " << dims
                  << " and expected is of size " << this->age_composition.size()

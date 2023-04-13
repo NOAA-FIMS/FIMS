@@ -645,9 +645,9 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     typename ModelTraits<Type>::EigenVector biomass =
       this->biomass;
       
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      this->fleets[fleet_]->ReportFleet();
-    }
+   // for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+   //   this->fleets[fleet_]->ReportFleet();
+   // }
 
     REPORT_F(rec_dev, of);
     ADREPORT_F(rec_dev, of);

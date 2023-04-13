@@ -170,6 +170,7 @@ class Information {
       if (f->observed_index_data_id != -999) {
         uint32_t index_id = static_cast<uint32_t>(f->observed_index_data_id);
         data_iterator it = this->data_objects.find(index_id);
+        FIMS_LOG << index_id << std::endl;
 
         if (it != this->data_objects.end()) {
           f->observed_index_data = (*it).second;
