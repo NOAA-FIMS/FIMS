@@ -637,10 +637,14 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
       this->spawning_biomass;
     typename ModelTraits<Type>::EigenVector rec_dev =
         this->recruitment->recruit_deviations;
-    typename ModelTraits<Type>::EigenVector catch_ =
+    typename ModelTraits<Type>::EigenVector expected_catch =
       this->expected_catch;
       typename ModelTraits<Type>::EigenVector recruitment =
       this->expected_recruitment;
+      
+    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+      this->fleets[fleet_]->ReportFleet();
+    }
 
     REPORT_F(rec_dev, of);
     ADREPORT_F(rec_dev, of);
@@ -648,8 +652,10 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     ADREPORT_F(naa, of);
     REPORT_F(ssb, of);
     ADREPORT_F(ssb, of);
-    REPORT_F(catch_, of);
+    REPORT_F(expected_catch, of);
     REPORT_F(recruitment, of);
+    REPORT_F(biomass, of);
+
     // ADREPORT_F(this->recruitment->rzero, of);
     // ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in
     // recruitment_base ADREPORT_F(this->recruitment->log_sigma_recruit, of);
