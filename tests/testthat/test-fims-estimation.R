@@ -116,8 +116,6 @@ fishing_fleet$estimate_q <- TRUE
 fishing_fleet$random_q <- FALSE
 fishing_fleet$SetAgeCompLikelihood(1)
 fishing_fleet$SetIndexLikelihood(1)
-fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
-fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
 fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
 fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
 fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
@@ -142,8 +140,6 @@ survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
 survey_fleet$SetAgeCompLikelihood(1)
 survey_fleet$SetIndexLikelihood(1)
-survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
-survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
 survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
 survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
 survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
@@ -168,8 +164,6 @@ population$SetRecruitment(recruitment$get_id())
 fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
-# #crashes at population line below with year = 1 and index_ya=12
-# 364             this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
 # message("success!")
 #report <- obj$report()

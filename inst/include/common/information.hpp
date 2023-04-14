@@ -195,12 +195,14 @@ class Information {
 
         
       FIMS_LOG << "age comp id  in loop " << agecomp_id << std::endl;
+      FIMS_LOG << " number of data objects" << this->data_objects.size() << std::endl;
 
         if (it != this->data_objects.end()) {
           f->observed_agecomp_data = (*it).second;
         } else {
           valid_model = false;
-          // log error
+          FIMS_LOG << "Error: observed age comp data not defined for fleet"
+                   << f->id << std::endl;
         }
 
       } else {
