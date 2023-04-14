@@ -25,7 +25,10 @@ class DataInterface : public FIMSRcppInterfaceBase {
 
   /** @brief constructor
    */
-  DataInterface() { this->id = DataInterface::id_g++; }
+  DataInterface() { 
+    this->id = DataInterface::id_g++;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this); 
+    }
 
   /** @brief destructor
    */
@@ -100,6 +103,7 @@ class AgeCompDataInterface : public DataInterface {
     age_comp_data_2->id = this->id;
 
     age_comp_data_3->id = this->id;
+    std::cout << "amax = " << amax << "ymax = " << ymax << std::endl; 
 
     for (int y = 0; y < ymax; y++) {
       for (int a = 0; a < amax; a++) {
@@ -211,5 +215,6 @@ class IndexDataInterface : public DataInterface {
 
 
 };
+
 
 #endif
