@@ -56,7 +56,10 @@ struct DataObject : public fims::FIMSObject<Type> {
    * Constructs a one-dimensional data object.
    */
   DataObject(size_t imax) : imax(imax), dimensions(1) {
+    std::cout << "imax = " << imax << std::endl;
     data.resize(imax);
+    std::cout << " made it here" << std::endl;
+  
     this->id = DataObject<Type>::id_g++;
   }
 

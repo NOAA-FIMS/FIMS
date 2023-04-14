@@ -48,6 +48,19 @@ fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 setwd("../../..")
 # fims$clear()
 
+
+# Recruitment
+recruitment <- new(fims$BevertonHoltRecruitment)
+recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
+recruitment$rzero$value <- om_input$R0
+recruitment$rzero$is_random_effect <- FALSE
+recruitment$rzero$estimated <- TRUE
+recruitment$steep$value <- om_input$h
+recruitment$steep$is_random_effect <- FALSE
+recruitment$steep$estimated <- TRUE
+recruitment$estimate_deviations <- TRUE
+recruitment$deviations <- exp(om_input$logR.resid)
+
 #Data
 catch <- dplyr::filter(age_frame@data, type == "landings")$value
 fishing_fleet_index <- new(fims$Index, length(catch))
@@ -67,17 +80,6 @@ survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
 survey_fleet_age_comp$age_comp_data <-
   dplyr::filter(age_frame@data, type == "age" & name == "survey")$value
 
-# Recruitment
-recruitment <- new(fims$BevertonHoltRecruitment)
-recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-recruitment$rzero$value <- om_input$R0
-recruitment$rzero$is_random_effect <- FALSE
-recruitment$rzero$estimated <- TRUE
-recruitment$steep$value <- om_input$h
-recruitment$steep$is_random_effect <- FALSE
-recruitment$steep$estimated <- TRUE
-recruitment$estimate_deviations <- TRUE
-recruitment$deviations <- exp(om_input$logR.resid)
 
 # Growth
 ewaa_growth <- new(fims$EWAAgrowth)
