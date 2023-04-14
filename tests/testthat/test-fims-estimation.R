@@ -18,7 +18,7 @@ pkg_to_install <- required_pkg[!(required_pkg %in%
   installed.packages()[, "Package"])]
 if (length(pkg_to_install)) install.packages(pkg_to_install)
 
-remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
+#remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
 library(ASSAMC)
 
 ## Set-up OM (sigmaR = 0.4)
@@ -134,7 +134,7 @@ survey_fleet_selectivity$slope$estimated <- TRUE
 survey_fleet <- new(fims$Fleet)
 survey_fleet$nages <- om_input$nages
 survey_fleet$nyears <- om_input$nyr
-survey_fleet$log_Fmort <- rep(log(0.0), om_input$nyr) #-Inf?
+survey_fleet$log_Fmort <- rep(log(0.01), om_input$nyr) #-Inf?
 survey_fleet$estimate_F <- TRUE
 survey_fleet$random_F <- FALSE
 survey_fleet$log_q <- rep(log(om_output$survey_q$survey1), om_input$nyr)
@@ -167,6 +167,9 @@ fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
+
+opt <- with(obj, nlminb(par, fn, gr))
+TMB::sdreport(obj)
 # message("success!")
 #report <- obj$report()
 

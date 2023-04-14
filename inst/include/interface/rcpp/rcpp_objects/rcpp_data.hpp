@@ -66,7 +66,10 @@ class AgeCompDataInterface : public DataInterface {
   /**
    * @brief constructor
    */
-  AgeCompDataInterface(int amax = 0, int ymax = 0) : DataInterface() {}
+  AgeCompDataInterface(int amax = 0, int ymax = 0) : DataInterface() {
+    this->amax = amax;
+    this->ymax = ymax;
+  }
 
   /**
    * @brief destructor
@@ -84,6 +87,9 @@ class AgeCompDataInterface : public DataInterface {
    */
   virtual bool add_to_fims_tmb() {
     std::cout << " got here " << std::endl;
+    std::cout << "amax = " << this->amax << std::endl;
+    
+    std::cout << "ymax = " << this->ymax << std::endl;
     std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data =
         std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->amax,
                                                                this->ymax);
@@ -151,7 +157,9 @@ class IndexDataInterface : public DataInterface {
   /**
    * @brief constructor
    */
-  IndexDataInterface(int ymax = 0) : DataInterface() {}
+  IndexDataInterface(int ymax = 0) : DataInterface() {
+    this->ymax = ymax;
+  }
 
   /**
    * @brief destructor
@@ -169,6 +177,8 @@ class IndexDataInterface : public DataInterface {
   virtual bool add_to_fims_tmb() {
     
     std::cout << " got here index " << std::endl;
+    
+    std::cout << "ymax = " << this->ymax << std::endl;
     std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> index_data =
         std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> index_data_1 =
