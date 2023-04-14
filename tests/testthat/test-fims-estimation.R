@@ -58,8 +58,8 @@ recruitment$rzero$estimated <- TRUE
 recruitment$steep$value <- om_input$h
 recruitment$steep$is_random_effect <- FALSE
 recruitment$steep$estimated <- TRUE
-recruitment$estimate_deviations <- TRUE
-recruitment$deviations <- exp(om_input$logR.resid)
+recruitment$estimate_deviations <- FALSE
+recruitment$deviations <- rep(1,30)
 
 #Data
 catch <- dplyr::filter(age_frame@data, type == "landings")$value
@@ -169,7 +169,8 @@ parameters <- list(p = fims$get_fixed())
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
 
 opt <- with(obj, nlminb(par, fn, gr))
-TMB::sdreport(obj)
+sdr <- TMB::sdreport(obj)
+summary(sdr)
 # message("success!")
 #report <- obj$report()
 
