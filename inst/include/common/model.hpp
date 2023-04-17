@@ -83,8 +83,8 @@ class Model {  // may need singleton
       //Evaluate population
       (*it).second->Evaluate();
       //Recrtuiment negative log-likelihood
-      rec_nll -= (*it).second->recruitment->evaluate_nll();
-      FIMS_LOG << "rec nll" << rec_nll << std::endl;
+      rec_nll += (*it).second->recruitment->evaluate_nll();
+      FIMS_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
 
@@ -93,9 +93,10 @@ class Model {  // may need singleton
     typename fims::Information<T>::fleet_iterator jt;
     for(jt = this->fims_information->fleets.begin(); jt !=
       this->fims_information->fleets.end(); ++jt ){
-      age_comp_nll -= (*jt).second->evaluate_age_comp_ll();
-      FIMS_LOG << "age comp nll" << age_comp_nll << std::endl;
-      index_nll -= (*jt).second->evaluate_index_ll();
+      age_comp_nll += (*jt).second->evaluate_age_comp_ll();
+      FIMS_LOG << "age comp nll: " << age_comp_nll << std::endl;
+      index_nll += (*jt).second->evaluate_index_ll();
+      FIMS_LOG << "index nll: " << index_nll << std::endl;
     }
 
     jnll = rec_nll + age_comp_nll + index_nll;

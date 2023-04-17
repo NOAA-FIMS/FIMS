@@ -134,7 +134,7 @@ struct Fleet : public FIMSObject<Type> {
       this->q[year] = fims::exp(this->log_q[year]);
     }
   }
-  
+
 //  void ReportFleet(){
 //    #ifdef TMB_MODEL
 //  typename ModelTraits<Type>::EigenVector fleet_index =
@@ -181,6 +181,10 @@ struct Fleet : public FIMSObject<Type> {
           nll -= dmultinom.evaluate(true);
         }
       }
+      //typename ModelTraits<Type>::EigenVector acomp_nll;
+      //acomp_nll[0] = nll;
+      //REPORT_F(acomp_nll, of);
+      FIMS_LOG << " agecomp nll: " << nll << std::endl;
     #endif
     return nll;
   }
@@ -195,6 +199,7 @@ struct Fleet : public FIMSObject<Type> {
       dnorm.mean = fims::log(this->expected_index[i]);
       nll -= dnorm.evaluate(true);
     }
+    FIMS_LOG << " index nll: " << nll << std::endl;
     #endif
     return nll;
   }
