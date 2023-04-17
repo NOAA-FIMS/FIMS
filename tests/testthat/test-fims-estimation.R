@@ -54,10 +54,10 @@ recruitment <- new(fims$BevertonHoltRecruitment)
 recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
 recruitment$rzero$value <- om_input$R0
 recruitment$rzero$is_random_effect <- FALSE
-recruitment$rzero$estimated <- TRUE
+recruitment$rzero$estimated <- FALSE
 recruitment$steep$value <- om_input$h
 recruitment$steep$is_random_effect <- FALSE
-recruitment$steep$estimated <- TRUE
+recruitment$steep$estimated <- FALSE
 recruitment$estimate_deviations <- FALSE
 recruitment$deviations <- rep(1,30)
 
@@ -169,10 +169,19 @@ population$SetRecruitment(recruitment$get_id())
 fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
-obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
-
+par_list <- 1:36
+par_list[34] <- NA
+map <- list(p=factor(par_list))
+obj <- MakeADFun(data=list(), parameters, DLL="FIMS", map = map)
+obj$gr(obj$par)
+# obj$par gradient at zero indicates detached parameters
+#try just estimating F then build up
+#for loop for 
 opt <- with(obj, nlminb(par, fn, gr))
+obj$gr(opt$par)
 sdr <- TMB::sdreport(obj)
+opt$par
+opt$objective
 summary(sdr, "fixed")
 summary(sdr, "report")
 # message("success!")
