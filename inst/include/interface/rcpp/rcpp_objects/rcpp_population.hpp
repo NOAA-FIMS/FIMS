@@ -152,7 +152,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     b0->maturity_id = this->maturity_id;
     b0->log_M.resize(this->log_M.size());
     b0->log_init_naa.resize(this->log_init_naa.size());
-    b0->proportion_female = this->prop_female;
     for (size_t i = 0; i < log_M.size(); i++) {
       b0->log_M[i] = this->log_M[i];
       if(estimate_M){
@@ -196,7 +195,6 @@ for (size_t i = 0; i < ages.size(); i++) {
 
     b1->log_M.resize(this->log_M.size());
     b1->log_init_naa.resize(this->log_init_naa.size());
-    b1->proportion_female = this->prop_female;
     for (size_t i = 0; i < log_M.size(); i++) {
       b1->log_M[i] = this->log_M[i];
       if(estimate_M){
@@ -237,7 +235,6 @@ b1->ages[i] = this->ages[i];
     b2->maturity_id = this->maturity_id;
 
     b2->log_init_naa.resize(this->log_init_naa.size());
-    b2->proportion_female = this->prop_female;
     for (size_t i = 0; i < log_M.size(); i++) {
       b2->log_M[i] = this->log_M[i];
       if(estimate_M){
@@ -274,7 +271,6 @@ if(estimate_initNAA){
     b3->nages = this->nages;
     b3->log_M.resize(this->log_M.size());
     b3->log_init_naa.resize(this->log_init_naa.size());
-    b3->proportion_female = this->prop_female;
     b3->ages.resize(this->nages);
 
     b3->growth_id = this->growth_id;

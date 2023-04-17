@@ -154,7 +154,9 @@ population <- new(fims$Population)
 # is it a problem these are not Parameters in the Population interface?
 # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
 population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr*om_input$nages)
+population$estimate_M <- FALSE
 population$log_init_naa <- log(om_output$N.age[1, ])
+population$estimate_init_naa <- FALSE
 population$nages <- om_input$nages
 population$ages <- om_input$ages * 1.0
 population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
@@ -170,7 +172,7 @@ fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
 par_list <- 1:36
-par_list[34] <- NA
+par_list[c(1,2,3,4,34,35,36)] <- NA
 map <- list(p=factor(par_list))
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS", map = map)
 obj$gr(obj$par)
