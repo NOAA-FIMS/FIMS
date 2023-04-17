@@ -60,6 +60,8 @@ class PopulationInterface : public PopulationInterfaceBase {
   Rcpp::NumericVector log_init_naa; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
   double prop_female;               /**< the proportion of female fish*/
+  bool estimate_M;      /**<whether parameter should be estimated*/
+  bool estimate_initNAA;  /**<whether parameter should be estimated*/
 
   PopulationInterface() : PopulationInterfaceBase() {}
 
@@ -153,10 +155,16 @@ class PopulationInterface : public PopulationInterfaceBase {
     b0->proportion_female = this->prop_female;
     for (size_t i = 0; i < log_M.size(); i++) {
       b0->log_M[i] = this->log_M[i];
+      if(estimate_M){
+        d0->RegisterParameter(b0->log_M[i]);
+      }
     }
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b0->log_init_naa[i] = this->log_init_naa[i];
+      if(estimate_initNAA){
+        d0->RegisterParameter(b0->log_init_naa[i]);
+      }
       
     }
 for (size_t i = 0; i < ages.size(); i++) {
@@ -191,10 +199,15 @@ for (size_t i = 0; i < ages.size(); i++) {
     b1->proportion_female = this->prop_female;
     for (size_t i = 0; i < log_M.size(); i++) {
       b1->log_M[i] = this->log_M[i];
+      if(estimate_M){
+        d1->RegisterParameter(b1->log_M[i]);
+      }
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b1->log_init_naa[i] = this->log_init_naa[i];
-      
+      if(estimate_initNAA){
+        d1->RegisterParameter(b1->log_init_naa[i]);
+      }
     }
     for (size_t i = 0; i < ages.size(); i++) {
 b1->ages[i] = this->ages[i];
@@ -227,10 +240,15 @@ b1->ages[i] = this->ages[i];
     b2->proportion_female = this->prop_female;
     for (size_t i = 0; i < log_M.size(); i++) {
       b2->log_M[i] = this->log_M[i];
+      if(estimate_M){
+        d2->RegisterParameter(b2->log_M[i]);
+      }
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b2->log_init_naa[i] = this->log_init_naa[i];
-
+if(estimate_initNAA){
+  d2->RegisterParameter(b2->log_init_naa[i]);
+}
     }
 
     for (size_t i = 0; i < ages.size(); i++) {
@@ -264,10 +282,17 @@ b1->ages[i] = this->ages[i];
     b3->maturity_id = this->maturity_id;
 
     for (size_t i = 0; i < log_M.size(); i++) {
+      std::cout << "size of M vector: " << log_M.size() << std::endl;
       b3->log_M[i] = this->log_M[i];
+      if(estimate_M){
+        d3->RegisterParameter(b3->log_M[i]);
+      }
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b3->log_init_naa[i] = this->log_init_naa[i];
+      if(estimate_initNAA){
+        d3->RegisterParameter(b3->log_init_naa[i]);
+      }
     }
 
     for (size_t i = 0; i < ages.size(); i++) {

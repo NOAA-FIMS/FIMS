@@ -150,7 +150,7 @@ survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
 population <- new(fims$Population)
 # is it a problem these are not Parameters in the Population interface?
 # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
-population$log_M <- rep(log(om_input$M.age), om_input$nyr*om_input$nages)
+population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr*om_input$nages)
 population$log_init_naa <- log(om_output$N.age[1, ])
 population$nages <- om_input$nages
 population$ages <- om_input$ages * 1.0
