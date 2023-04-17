@@ -162,10 +162,11 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     }
 
     f0->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_q.size(); i++) {
+    for (int i = 0; i < log_Fmort.size(); i++) {
       f0->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_q) {
-        if (this->random_q) {
+      
+      if (this->estimate_F) {
+        if (this->random_F) {
           d0->RegisterRandomEffect(f0->log_Fmort[i]);
         } else {
           d0->RegisterParameter(f0->log_Fmort[i]);
@@ -202,10 +203,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
       }
     }
     f1->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_q.size(); i++) {
+    for (int i = 0; i < log_Fmort.size(); i++) {
       f1->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_q) {
-        if (this->random_q) {
+      if (this->estimate_F) {
+        if (this->random_F) {
           d1->RegisterRandomEffect(f1->log_Fmort[i]);
         } else {
           d1->RegisterParameter(f1->log_Fmort[i]);
@@ -246,10 +247,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     }
 
     f2->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_q.size(); i++) {
+    for (int i = 0; i < log_Fmort.size(); i++) {
       f2->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_q) {
-        if (this->random_q) {
+      if (this->estimate_F) {
+        if (this->random_F) {
           d2->RegisterRandomEffect(f2->log_Fmort[i]);
         } else {
           d2->RegisterParameter(f2->log_Fmort[i]);
@@ -288,10 +289,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     }
 
     f3->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_q.size(); i++) {
+    for (int i = 0; i < log_Fmort.size(); i++) {
     f3->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_q) {
-        if (this->random_q) {
+      if (this->estimate_F) {
+        if (this->random_F) {
           d3->RegisterRandomEffect(f3->log_Fmort[i]);
         } else {
           d3->RegisterParameter(f3->log_Fmort[i]);
