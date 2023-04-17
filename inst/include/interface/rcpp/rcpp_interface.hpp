@@ -28,7 +28,6 @@
 bool CreateTMBModel() {
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
        i++) {
-    std::cout << i << std::endl;
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
   }
 

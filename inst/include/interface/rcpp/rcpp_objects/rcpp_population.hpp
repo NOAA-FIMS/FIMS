@@ -186,7 +186,6 @@ for (size_t i = 0; i < ages.size(); i++) {
     b1->nfleets = this->nfleets;
     b1->nseasons = this->nseasons;
     b1->nages = this->nages;
-    std::cout<< this->nages << std::endl;
     b1->ages.resize(this->nages);
     
     b1->growth_id = this->growth_id;
@@ -278,8 +277,7 @@ if(estimate_initNAA){
     b3->maturity_id = this->maturity_id;
 
     for (size_t i = 0; i < log_M.size(); i++) {
-      std::cout << "size of M vector: " << log_M.size() << std::endl;
-      b3->log_M[i] = this->log_M[i];
+       b3->log_M[i] = this->log_M[i];
       if(estimate_M){
         d3->RegisterParameter(b3->log_M[i]);
       }

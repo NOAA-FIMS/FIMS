@@ -86,10 +86,6 @@ class AgeCompDataInterface : public DataInterface {
    * @brief adds parameters to the model
    */
   virtual bool add_to_fims_tmb() {
-    std::cout << " got here " << std::endl;
-    std::cout << "amax = " << this->amax << std::endl;
-    
-    std::cout << "ymax = " << this->ymax << std::endl;
     std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data_0 =
         std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->amax,
                                                                this->ymax);
@@ -110,7 +106,6 @@ class AgeCompDataInterface : public DataInterface {
     age_comp_data_2->id = this->id;
 
     age_comp_data_3->id = this->id;
-    std::cout << "amax = " << amax << "ymax = " << ymax << std::endl; 
 
     for (int y = 0; y < ymax; y++) {
       for (int a = 0; a < amax; a++) {
@@ -119,10 +114,6 @@ class AgeCompDataInterface : public DataInterface {
         age_comp_data_1->at(y, a) = this->age_comp_data[index_ya];
         age_comp_data_2->at(y, a) = this->age_comp_data[index_ya];
         age_comp_data_3->at(y, a) = this->age_comp_data[index_ya];
-       std::cout << " agecompdata " << index_ya << " is " << this->age_comp_data[index_ya] << std::endl;
-       
-       std::cout << " set to  " << age_comp_data_1->at(y,a) << std::endl;
-   
       }
     }
 
@@ -179,10 +170,6 @@ class IndexDataInterface : public DataInterface {
    *@brief function to add to TMB
    */
   virtual bool add_to_fims_tmb() {
-    
-    std::cout << " got here index " << std::endl;
-    
-    std::cout << "ymax = " << this->ymax << std::endl;
     std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> index_data_0 =
         std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> index_data_1 =
@@ -191,8 +178,7 @@ class IndexDataInterface : public DataInterface {
         std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_THIRD_ORDER>> index_data_3 =
         std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax);
-std::cout << " got here index2 " << std::endl;
-    index_data_0->id = this->id;
+  index_data_0->id = this->id;
 
     index_data_1->id = this->id;
 
@@ -200,15 +186,13 @@ std::cout << " got here index2 " << std::endl;
 
     index_data_3->id = this->id;
 
-    std::cout << "ymax = " << ymax << std::endl;
 
     for (int y = 0; y < ymax; y++) {
       index_data_0->at(y) = this->index_data[y];
       index_data_1->at(y) = this->index_data[y];
       index_data_2->at(y) = this->index_data[y];
       index_data_3->at(y) = this->index_data[y];
-      std::cout << " index data year " << y << " is " << this->index_data[y] << std::endl;
-    }
+  }
 
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();

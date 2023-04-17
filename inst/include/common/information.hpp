@@ -158,7 +158,6 @@ class Information {
     bool valid_model = true;
 
     std::cout << "Information: Initializing fleet objects.\n";
-    std::cout << " Informaton: fleet size "  << this->fleets.size() << std::endl;
     for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
          ++it) {
       // Initialize fleet object
