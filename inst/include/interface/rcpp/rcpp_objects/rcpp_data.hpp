@@ -90,7 +90,7 @@ class AgeCompDataInterface : public DataInterface {
     std::cout << "amax = " << this->amax << std::endl;
     
     std::cout << "ymax = " << this->ymax << std::endl;
-    std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data =
+    std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data_0 =
         std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->amax,
                                                                this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> age_comp_data_1 =
@@ -103,7 +103,7 @@ class AgeCompDataInterface : public DataInterface {
         std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->amax,
                                                                  this->ymax);
 
-    age_comp_data->id = this->id;
+    age_comp_data_0->id = this->id;
 
     age_comp_data_1->id = this->id;
 
@@ -115,7 +115,7 @@ class AgeCompDataInterface : public DataInterface {
     for (int y = 0; y < ymax; y++) {
       for (int a = 0; a < amax; a++) {
         int index_ya = y * amax + a;
-        age_comp_data->at(y, a) = this->age_comp_data[index_ya];
+        age_comp_data_0->at(y, a) = this->age_comp_data[index_ya];
         age_comp_data_1->at(y, a) = this->age_comp_data[index_ya];
         age_comp_data_2->at(y, a) = this->age_comp_data[index_ya];
         age_comp_data_3->at(y, a) = this->age_comp_data[index_ya];
@@ -129,7 +129,7 @@ class AgeCompDataInterface : public DataInterface {
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    d0->data_objects[this->id] = age_comp_data;
+    d0->data_objects[this->id] = age_comp_data_0;
 
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
@@ -183,7 +183,7 @@ class IndexDataInterface : public DataInterface {
     std::cout << " got here index " << std::endl;
     
     std::cout << "ymax = " << this->ymax << std::endl;
-    std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> index_data =
+    std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> index_data_0 =
         std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> index_data_1 =
         std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->ymax);
@@ -192,7 +192,7 @@ class IndexDataInterface : public DataInterface {
     std::shared_ptr<fims::DataObject<TMB_FIMS_THIRD_ORDER>> index_data_3 =
         std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax);
 std::cout << " got here index2 " << std::endl;
-    index_data->id = this->id;
+    index_data_0->id = this->id;
 
     index_data_1->id = this->id;
 
@@ -200,11 +200,10 @@ std::cout << " got here index2 " << std::endl;
 
     index_data_3->id = this->id;
 
-    index_data->id = this->id;
     std::cout << "ymax = " << ymax << std::endl;
 
     for (int y = 0; y < ymax; y++) {
-      index_data->at(y) = this->index_data[y];
+      index_data_0->at(y) = this->index_data[y];
       index_data_1->at(y) = this->index_data[y];
       index_data_2->at(y) = this->index_data[y];
       index_data_3->at(y) = this->index_data[y];
@@ -214,7 +213,7 @@ std::cout << " got here index2 " << std::endl;
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    d0->data_objects[this->id] = index_data;
+    d0->data_objects[this->id] = index_data_0;
 
     std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
