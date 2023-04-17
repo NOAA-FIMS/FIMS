@@ -78,7 +78,7 @@ survey_fleet_index <- new(fims$Index, length(survey_index))
 
 survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
 survey_fleet_age_comp$age_comp_data <-
-  dplyr::filter(age_frame@data, type == "age" & name == "survey")$value
+  dplyr::filter(age_frame@data, type == "age" & name == "survey1")$value
 
 
 # Growth
@@ -170,9 +170,10 @@ obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
 
 opt <- with(obj, nlminb(par, fn, gr))
 sdr <- TMB::sdreport(obj)
-summary(sdr)
+summary(sdr, "fixed")
+summary(sdr, "report")
 # message("success!")
-#report <- obj$report()
+report <- obj$report()
 
 # Test
 # TO DO:
