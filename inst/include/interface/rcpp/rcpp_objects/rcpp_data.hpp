@@ -115,10 +115,14 @@ class AgeCompDataInterface : public DataInterface {
     for (int y = 0; y < ymax; y++) {
       for (int a = 0; a < amax; a++) {
         int index_ya = y * amax + a;
-        age_comp_data->at(y, a) = this->observed_data[index_ya];
-        age_comp_data_1->at(y, a) = this->observed_data[index_ya];
-        age_comp_data_2->at(y, a) = this->observed_data[index_ya];
-        age_comp_data_3->at(y, a) = this->observed_data[index_ya];
+        age_comp_data->at(y, a) = this->age_comp_data[index_ya];
+        age_comp_data_1->at(y, a) = this->age_comp_data[index_ya];
+        age_comp_data_2->at(y, a) = this->age_comp_data[index_ya];
+        age_comp_data_3->at(y, a) = this->age_comp_data[index_ya];
+       std::cout << " agecompdata " << index_ya << " is " << this->age_comp_data[index_ya] << std::endl;
+       
+       std::cout << " set to  " << age_comp_data_1->at(y,a) << std::endl;
+   
       }
     }
 
@@ -200,10 +204,11 @@ std::cout << " got here index2 " << std::endl;
     std::cout << "ymax = " << ymax << std::endl;
 
     for (int y = 0; y < ymax; y++) {
-      index_data->at(y) = this->observed_data[y];
-      index_data_1->at(y) = this->observed_data[y];
-      index_data_2->at(y) = this->observed_data[y];
-      index_data_3->at(y) = this->observed_data[y];
+      index_data->at(y) = this->index_data[y];
+      index_data_1->at(y) = this->index_data[y];
+      index_data_2->at(y) = this->index_data[y];
+      index_data_3->at(y) = this->index_data[y];
+      std::cout << " index data year " << y << " is " << this->index_data[y] << std::endl;
     }
 
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
