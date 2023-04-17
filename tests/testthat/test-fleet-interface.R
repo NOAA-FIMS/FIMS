@@ -63,10 +63,10 @@ test_that("Fleet: SetObservedAgeCompData works", {
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   fleet <- new(fims$Fleet)
 
-  expect_silent(fleet$SetObservedAgeCompData(1, as.matrix(sample.int(100, 12))))
+  expect_silent(fleet$SetObservedAgeCompData(1))
 
   expect_warning(
-    fleet$SetObservedAgeCompData(2, as.matrix(sample.int(100, 12))),
+    fleet$SetObservedAgeCompData(2),
     regexp = paste0("Observed age composition data have been set already.")
   )
 
@@ -77,10 +77,10 @@ test_that("Fleet: SetObservedIndexData works", {
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   fleet <- new(fims$Fleet)
 
-  expect_silent(fleet$SetObservedIndexData(1, rnorm(30, 200, 50)))
+  expect_silent(fleet$SetObservedIndexData(1))
 
   expect_warning(
-    fleet$SetObservedIndexData(2, rnorm(30, 200, 50)),
+    fleet$SetObservedIndexData(2),
     regexp = paste0("Observed index data have been set already.")
   )
 
