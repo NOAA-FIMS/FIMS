@@ -44,7 +44,7 @@ struct Population : public FIMSObject<Type> {
   size_t nages;         /*!< total number of ages in the population*/
   size_t nfleets;       /*!< total number of fleets in the fishery*/
   // constants
-  Type proportion_female = 0.5; /*!< Sex proportion fixed at 50/50 for M1*/
+  const Type proportion_female = 0.5; /*!< Sex proportion fixed at 50/50 for M1*/
 
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
@@ -416,10 +416,10 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
                this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
                this->numbers_at_age[index_ya] *
                growth->evaluate(ages[age]);  // this->weight_at_age[age];
-      FIMS_LOG << " q: " << this->fleets[fleet_]->q[year] << std::endl;
-      fleets[fleet_]->expected_index[year] += index_;
+     fleets[fleet_]->expected_index[year] += index_;
+      FIMS_LOG << " expected index in year  " << year << " is " << fleets[fleet_]->expected_index[year] << std::endl;
+
     }
-    FIMS_LOG << "nfleets: " << this->nfleets << std::endl;
   }
 
   /**
@@ -566,7 +566,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
 
           if (a == 0) {
             // this->numbers_at_age[index_ya] = this->recruitment->rzero;
-            this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
+            this->unfished_numbers_at_age[index_ya] = fims::exp(this->recruitment->log_rzero);
           } else {
             CalculateUnfishedNumbersAA(index_ya, a - 1, a);
           }
@@ -594,7 +594,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
             // functional returns) assuming fecundity = 1 and 50:50 sex ratio
             FIMS_LOG << "Recruitment: " << std::endl;
             CalculateRecruitment(index_ya, y);
-            this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
+            this->unfished_numbers_at_age[index_ya] = fims::exp(this->recruitment->log_rzero);
 
           } else {
             size_t index_ya2 = (y - 1) * nages + (a - 1);

@@ -169,12 +169,14 @@ struct Fleet : public FIMSObject<Type> {
             sum += this->catch_numbers_at_age[index_ya];
           }
 
-          FIMS_LOG << "observed and expected age comp is: " << std::endl;
           for (size_t a = 0; a < this->nages; a++) {
             size_t index_ya = y * this->nages + a;
             expected_acomp[a] = this->catch_numbers_at_age[index_ya] /
               sum;  // probabilities for ages
+              
             observed_acomp[a] = this->observed_agecomp_data->at(y, a);
+            FIMS_LOG << " age " << a << " in year " << y << "has expected: "  <<
+            expected_acomp[a] << "  and observed: " << observed_acomp[a] << std::endl;
           }
           dmultinom.x = observed_acomp;
           dmultinom.p = expected_acomp;
@@ -198,6 +200,7 @@ struct Fleet : public FIMSObject<Type> {
       dnorm.x = fims::log(this->observed_index_data->at(i));
       dnorm.mean = fims::log(this->expected_index[i]);
       nll -= dnorm.evaluate(true);
+      FIMS_LOG << "observed likelihood component: " << i << " is " << this->observed_index_data->at(i) << std::endl;
     }
     FIMS_LOG << " index nll: " << nll << std::endl;
     #endif

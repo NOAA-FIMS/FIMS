@@ -53,14 +53,16 @@ setwd("../../..")
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
 recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-recruitment$rzero$value <- om_input$R0
-recruitment$rzero$is_random_effect <- FALSE
-recruitment$rzero$estimated <- TRUE
-recruitment$steep$value <- om_input$h
-recruitment$steep$is_random_effect <- FALSE
-recruitment$steep$estimated <- TRUE
-recruitment$estimate_deviations <- FALSE
-recruitment$deviations <- rep(1,30)
+recruitment$log_rzero$value <- log(om_input$R0)
+recruitment$log_rzero$is_random_effect <- FALSE
+recruitment$log_rzero$estimated <- TRUE
+recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
+recruitment$logit_steep$is_random_effect <- FALSE
+recruitment$logit_steep$estimated <- FALSE
+recruitment$logit_steep$min <- 0.2
+recruitment$logit_steep$max <- 1.0
+recruitment$estimate_deviations <- TRUE
+recruitment$deviations <- exp(om_input$logR.resid)
 
 #Data
 catch <- dplyr::filter(age_frame@data, type == "landings")$value
@@ -70,16 +72,19 @@ fishing_fleet_index$index_data <- catch
   
 fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
 fishing_fleet_age_comp$age_comp_data <-
-  dplyr::filter(age_frame@data, type == "age" & name == "fleet1")$value
+  dplyr::filter(age_frame@data, type == "age" & name == "fleet1")$value*200
+
 
 survey_index <-
   dplyr::filter(age_frame@data, type == "index")$value
 
 survey_fleet_index <- new(fims$Index, length(survey_index))
 
+survey_fleet_index$index_data <- survey_index
+
 survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
 survey_fleet_age_comp$age_comp_data <-
-  dplyr::filter(age_frame@data, type == "age" & name == "survey")$value
+  dplyr::filter(age_frame@data, type == "age" & name == "survey1")$value*200
 
 
 # Growth
@@ -92,10 +97,10 @@ ewaa_growth$weights <- m_weightatage(age_frame)
 maturity <- new(fims$LogisticMaturity)
 maturity$median$value <- om_input$A50.mat
 maturity$median$is_random_effect <- FALSE
-maturity$median$estimated <- TRUE
+maturity$median$estimated <- FALSE
 maturity$slope$value <- om_input$slope
 maturity$slope$is_random_effect <- FALSE
-maturity$slope$estimated <- TRUE
+maturity$slope$estimated <- FALSE
 
 # Fleet
 # Create the fishing fleet
@@ -115,8 +120,10 @@ fishing_fleet$log_Fmort <- log(om_output$f)
 fishing_fleet$estimate_F <- TRUE
 fishing_fleet$random_F <- FALSE
 fishing_fleet$log_q <- rep(log(1.0), om_input$nyr)
-fishing_fleet$estimate_q <- TRUE
+fishing_fleet$estimate_q <- FALSE
 fishing_fleet$random_q <- FALSE
+fishing_fleet$log_obs_error$value <- log(em_input$cv.L$fleet1)
+fishing_fleet$log_obs_error$estimated <- FALSE
 fishing_fleet$SetAgeCompLikelihood(1)
 fishing_fleet$SetIndexLikelihood(1)
 fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
@@ -135,11 +142,11 @@ survey_fleet_selectivity$slope$estimated <- TRUE
 survey_fleet <- new(fims$Fleet)
 survey_fleet$nages <- om_input$nages
 survey_fleet$nyears <- om_input$nyr
-survey_fleet$log_Fmort <- rep(log(0.01), om_input$nyr) #-Inf?
-survey_fleet$estimate_F <- TRUE
+survey_fleet$log_Fmort <- rep(log(0.00001), om_input$nyr) #-Inf?
+survey_fleet$estimate_F <- FALSE
 survey_fleet$random_F <- FALSE
 survey_fleet$log_q <- rep(log(om_output$survey_q$survey1), om_input$nyr)
-survey_fleet$estimate_q <- TRUE
+survey_fleet$estimate_q <- FALSE
 survey_fleet$random_q <- FALSE
 survey_fleet$SetAgeCompLikelihood(1)
 survey_fleet$SetIndexLikelihood(1)
@@ -151,8 +158,10 @@ survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
 population <- new(fims$Population)
 # is it a problem these are not Parameters in the Population interface?
 # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors, do we need a ParameterVector class?
-population$log_M <- rep(log(om_input$M.age), om_input$nyr*om_input$nages)
+population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr*om_input$nages)
+population$estimate_M <- FALSE
 population$log_init_naa <- log(om_output$N.age[1, ])
+population$estimate_init_naa <- FALSE
 population$nages <- om_input$nages
 population$ages <- om_input$ages * 1.0
 population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
@@ -167,13 +176,23 @@ population$SetRecruitment(recruitment$get_id())
 fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
-obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
-
+par_list <- 1:65
+par_list[c(32:65)] <- NA
+map <- list(p=factor(par_list))
+obj <- MakeADFun(data=list(), parameters, DLL="FIMS", map = map)
+obj$gr(obj$par)
+# obj$par gradient at zero indicates detached parameters
+#try just estimating F then build up
+#for loop for 
 opt <- with(obj, nlminb(par, fn, gr))
+obj$gr(opt$par)
 sdr <- TMB::sdreport(obj)
-summary(sdr)
+opt$par
+opt$objective
+summary(sdr, "fixed")
+summary(sdr, "report")
 # message("success!")
-#report <- obj$report()
+report <- obj$report()
 
 # Test
 # TO DO:

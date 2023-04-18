@@ -36,6 +36,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
   bool estimate_q = false; /*!< whether the parameter q should be estimated*/
   bool random_q = false;   /*!< whether q should be a random effect*/
   bool random_F = false;   /*!< whether F should be a random effect*/
+  Parameter log_obs_error; /*!< the log of the observation error */
 
  public:
   static uint32_t id_g; /**< static id of the FleetInterface object */
@@ -149,6 +150,11 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f0->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f0->observed_index_data_id = this->observed_index_data_id;
     f0->selectivity_id = this->selectivity_id;
+    
+    f0->log_obs_error = this->log_obs_error.value;
+    if(this->log_obs_error.estimated){
+      d0->RegisterParameter(f0->log_obs_error);
+    }
     f0->log_q.resize(this->log_q.size());
     for (int i = 0; i < log_q.size(); i++) {
       f0->log_q[i] = this->log_q[i];
@@ -162,10 +168,11 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     }
 
     f0->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_q.size(); i++) {
+    for (int i = 0; i < log_Fmort.size(); i++) {
       f0->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_q) {
-        if (this->random_q) {
+      
+      if (this->estimate_F) {
+        if (this->random_F) {
           d0->RegisterRandomEffect(f0->log_Fmort[i]);
         } else {
           d0->RegisterParameter(f0->log_Fmort[i]);
@@ -189,6 +196,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f1->index_likelihood_id = this->index_likelihood_id;
     f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f1->observed_index_data_id = this->observed_index_data_id;
+    f1->log_obs_error = this->log_obs_error.value;
+        if(this->log_obs_error.estimated){
+    d1->RegisterParameter(f1->log_obs_error);
+        }
     f1->selectivity_id = this->selectivity_id;
     f1->log_q.resize(this->log_q.size());
     for (int i = 0; i < log_q.size(); i++) {
@@ -202,10 +213,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
       }
     }
     f1->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_q.size(); i++) {
+    for (int i = 0; i < log_Fmort.size(); i++) {
       f1->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_q) {
-        if (this->random_q) {
+      if (this->estimate_F) {
+        if (this->random_F) {
           d1->RegisterRandomEffect(f1->log_Fmort[i]);
         } else {
           d1->RegisterParameter(f1->log_Fmort[i]);
@@ -231,6 +242,11 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f2->index_likelihood_id = this->index_likelihood_id;
     f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f2->observed_index_data_id = this->observed_index_data_id;
+    f2->log_obs_error = this->log_obs_error.value;
+        if(this->log_obs_error.estimated){
+           d2->RegisterParameter(f2->log_obs_error);
+    
+        }
     f2->selectivity_id = this->selectivity_id;
     f2->log_q.resize(this->log_q.size());
     for (int i = 0; i < log_q.size(); i++) {
@@ -246,10 +262,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     }
 
     f2->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_q.size(); i++) {
+    for (int i = 0; i < log_Fmort.size(); i++) {
       f2->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_q) {
-        if (this->random_q) {
+      if (this->estimate_F) {
+        if (this->random_F) {
           d2->RegisterRandomEffect(f2->log_Fmort[i]);
         } else {
           d2->RegisterParameter(f2->log_Fmort[i]);
@@ -275,6 +291,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f3->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f3->observed_index_data_id = this->observed_index_data_id;
     f3->selectivity_id = this->selectivity_id;
+    f3->log_obs_error = this->log_obs_error.value;
+    if(this->log_obs_error.estimated){
+          d3->RegisterParameter(f3->log_obs_error);
+    }
     f3->log_q.resize(this->log_q.size());
     for (int i = 0; i < log_q.size(); i++) {
       f3->log_q[i] = this->log_q[i];
@@ -288,10 +308,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     }
 
     f3->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_q.size(); i++) {
+    for (int i = 0; i < log_Fmort.size(); i++) {
     f3->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_q) {
-        if (this->random_q) {
+      if (this->estimate_F) {
+        if (this->random_F) {
           d3->RegisterRandomEffect(f3->log_Fmort[i]);
         } else {
           d3->RegisterParameter(f3->log_Fmort[i]);

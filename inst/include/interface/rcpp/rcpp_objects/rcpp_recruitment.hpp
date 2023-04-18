@@ -70,8 +70,8 @@ RecruitmentInterfaceBase::live_objects;
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 public:
-    Parameter steep; /**< steepness or the productivity of the stock*/
-    Parameter rzero; /**< recruitment at unfished biomass */
+    Parameter logit_steep; /**< steepness or the productivity of the stock*/
+    Parameter log_rzero; /**< recruitment at unfished biomass */
     Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
     Rcpp::NumericVector recruit_bias_adjustment; /**<vector bias adjustment*/
     Rcpp::NumericVector deviations; /**< recruitment deviations*/
@@ -91,8 +91,8 @@ public:
     virtual double evaluate(double spawners, double ssbzero) {
         fims::SRBevertonHolt<double> BevHolt;
 
-        BevHolt.steep = this->steep.value;
-        BevHolt.rzero = this->rzero.value;
+        BevHolt.logit_steep = this->logit_steep.value;
+        BevHolt.log_rzero = this->log_rzero.value;
         return BevHolt.evaluate(spawners, ssbzero);
     }
 
@@ -133,20 +133,20 @@ public:
 
         // set relative info
         b0->id = this->id;
-        b0->steep = this->steep.value;
-        if (this->steep.estimated) {
-            if (this->steep.is_random_effect) {
-                d0->RegisterRandomEffect(b0->steep);
+        b0->logit_steep = this->logit_steep.value;
+        if (this->logit_steep.estimated) {
+            if (this->logit_steep.is_random_effect) {
+                d0->RegisterRandomEffect(b0->logit_steep);
             } else {
-                d0->RegisterParameter(b0->steep);
+                d0->RegisterParameter(b0->logit_steep);
             }
         }
-        b0->rzero = this->rzero.value;
-        if (this->rzero.estimated) {
-            if (this->rzero.is_random_effect) {
-                d0->RegisterRandomEffect(b0->rzero);
+        b0->log_rzero = this->log_rzero.value;
+        if (this->log_rzero.estimated) {
+            if (this->log_rzero.is_random_effect) {
+                d0->RegisterRandomEffect(b0->log_rzero);
             } else {
-                d0->RegisterParameter(b0->rzero);
+                d0->RegisterParameter(b0->log_rzero);
             }
         }
         b0->log_sigma_recruit = this->log_sigma_recruit.value;
@@ -183,20 +183,20 @@ public:
 
         // set relative info
         b1->id = this->id;
-        b1->steep = this->steep.value;
-        if (this->steep.estimated) {
-            if (this->steep.is_random_effect) {
-                d1->RegisterRandomEffect(b1->steep);
+        b1->logit_steep = this->logit_steep.value;
+        if (this->logit_steep.estimated) {
+            if (this->logit_steep.is_random_effect) {
+                d1->RegisterRandomEffect(b1->logit_steep);
             } else {
-                d1->RegisterParameter(b1->steep);
+                d1->RegisterParameter(b1->logit_steep);
             }
         }
-        b1->rzero = this->rzero.value;
-        if (this->rzero.estimated) {
-            if (this->rzero.is_random_effect) {
-                d1->RegisterRandomEffect(b1->rzero);
+        b1->log_rzero = this->log_rzero.value;
+        if (this->log_rzero.estimated) {
+            if (this->log_rzero.is_random_effect) {
+                d1->RegisterRandomEffect(b1->log_rzero);
             } else {
-                d1->RegisterParameter(b1->rzero);
+                d1->RegisterParameter(b1->log_rzero);
             }
         }
         b1->log_sigma_recruit = this->log_sigma_recruit.value;
@@ -233,20 +233,20 @@ public:
 
         // set relative info
         b2->id = this->id;
-        b2->steep = this->steep.value;
-        if (this->steep.estimated) {
-            if (this->steep.is_random_effect) {
-                d2->RegisterRandomEffect(b2->steep);
+        b2->logit_steep = this->logit_steep.value;
+        if (this->logit_steep.estimated) {
+            if (this->logit_steep.is_random_effect) {
+                d2->RegisterRandomEffect(b2->logit_steep);
             } else {
-                d2->RegisterParameter(b2->steep);
+                d2->RegisterParameter(b2->logit_steep);
             }
         }
-        b2->rzero = this->rzero.value;
-        if (this->rzero.estimated) {
-            if (this->rzero.is_random_effect) {
-                d2->RegisterRandomEffect(b2->rzero);
+        b2->log_rzero = this->log_rzero.value;
+        if (this->log_rzero.estimated) {
+            if (this->log_rzero.is_random_effect) {
+                d2->RegisterRandomEffect(b2->log_rzero);
             } else {
-                d2->RegisterParameter(b2->rzero);
+                d2->RegisterParameter(b2->log_rzero);
             }
         }
         b2->log_sigma_recruit = this->log_sigma_recruit.value;
@@ -283,20 +283,20 @@ public:
 
         // set relative info
         b3->id = this->id;
-        b3->steep = this->steep.value;
-        if (this->steep.estimated) {
-            if (this->steep.is_random_effect) {
-                d3->RegisterRandomEffect(b3->steep);
+        b3->logit_steep = this->logit_steep.value;
+        if (this->logit_steep.estimated) {
+            if (this->logit_steep.is_random_effect) {
+                d3->RegisterRandomEffect(b3->logit_steep);
             } else {
-                d3->RegisterParameter(b3->steep);
+                d3->RegisterParameter(b3->logit_steep);
             }
         }
-        b3->rzero = this->rzero.value;
-        if (this->rzero.estimated) {
-            if (this->rzero.is_random_effect) {
-                d3->RegisterRandomEffect(b3->rzero);
+        b3->log_rzero = this->log_rzero.value;
+        if (this->log_rzero.estimated) {
+            if (this->log_rzero.is_random_effect) {
+                d3->RegisterRandomEffect(b3->log_rzero);
             } else {
-                d3->RegisterParameter(b3->rzero);
+                d3->RegisterParameter(b3->log_rzero);
             }
         }
         b3->log_sigma_recruit = this->log_sigma_recruit.value;

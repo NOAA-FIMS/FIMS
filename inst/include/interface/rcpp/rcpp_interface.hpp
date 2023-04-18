@@ -28,7 +28,6 @@
 bool CreateTMBModel() {
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
        i++) {
-    std::cout << i << std::endl;
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
   }
 
@@ -175,8 +174,8 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()
-      .field("steep", &BevertonHoltRecruitmentInterface::steep)
-      .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
+      .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
+      .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
       .field("deviations", &BevertonHoltRecruitmentInterface::deviations)
       .field("estimate_deviations", &BevertonHoltRecruitmentInterface::estimate_deviations)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
@@ -185,7 +184,7 @@ RCPP_MODULE(fims) {
       .field("use_bias_correction", &BevertonHoltRecruitmentInterface::use_bias_correction)
       .field("log_sigma_recruit", &BevertonHoltRecruitmentInterface::log_sigma_recruit)
       .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate)
-        .method("evaluate_nll", &BevertonHoltRecruitmentInterface::evaluate_nll);
+      .method("evaluate_nll", &BevertonHoltRecruitmentInterface::evaluate_nll);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
@@ -197,6 +196,7 @@ RCPP_MODULE(fims) {
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
       .field("random_F", &FleetInterface::random_F)
+      .field("log_obs_error", &FleetInterface::log_obs_error)
       .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
       .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
       .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
@@ -229,11 +229,13 @@ RCPP_MODULE(fims) {
       .field("log_init_naa", &PopulationInterface::log_init_naa)
       .field("prop_female", &PopulationInterface::prop_female)
       .field("ages", &PopulationInterface::ages)
+      .field("estimate_M", &PopulationInterface::estimate_M)
+      .field("estimate_init_naa", &PopulationInterface::estimate_initNAA)
       .method("evaluate", &PopulationInterface::evaluate)
       .method("SetMaturity", &PopulationInterface::SetMaturity)
       .method("SetGrowth", &PopulationInterface::SetGrowth)
       .method("SetRecruitment", &PopulationInterface::SetRecruitment)
-      .method("evaluate", &PopulationInterface::evaluate);;
+      .method("evaluate", &PopulationInterface::evaluate);
 
   Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
       .constructor()
