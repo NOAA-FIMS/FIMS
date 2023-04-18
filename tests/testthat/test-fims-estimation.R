@@ -53,10 +53,6 @@ setwd("../../..")
 
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
-<<<<<<< HEAD
-=======
-# recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
->>>>>>> 4d3ba9f4f30ca053c35245297b5721e8ca4a1f0a
 recruitment$log_sigma_recruit$value <- om_input$logR_sd
 recruitment$log_rzero$value <- log(om_input$R0)
 recruitment$log_rzero$is_random_effect <- FALSE
