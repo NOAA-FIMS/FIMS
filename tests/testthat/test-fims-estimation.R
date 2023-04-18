@@ -38,6 +38,7 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
 
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
+## Set-up fishing and survey fleets data
 age_frame <- FIMSFrameAge(data_mile1)
 fishing_fleet_dat <- dplyr::filter(age_frame@data, type == "landings")
 survey_dat <- dplyr::filter(age_frame@data, type == "index")$value
@@ -52,6 +53,10 @@ setwd("../../..")
 
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
+<<<<<<< HEAD
+=======
+# recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
+>>>>>>> 4d3ba9f4f30ca053c35245297b5721e8ca4a1f0a
 recruitment$log_sigma_recruit$value <- om_input$logR_sd
 recruitment$log_rzero$value <- log(om_input$R0)
 recruitment$log_rzero$is_random_effect <- FALSE
@@ -64,23 +69,36 @@ recruitment$logit_steep$max <- 1.0
 recruitment$estimate_deviations <- TRUE
 recruitment$deviations <- exp(om_input$logR.resid)
 
-#Data
-catch <- dplyr::filter(age_frame@data, type == "landings")$value
-fishing_fleet_index <- new(fims$Index, length(catch))
+# Data
+# catch <- dplyr::filter(age_frame@data, type == "landings")$value
+# fishing_fleet_index <- new(fims$Index, length(catch))
+#
+# fishing_fleet_index$index_data <- catch
+#
+# fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
+# fishing_fleet_age_comp$age_comp_data <-
+#   dplyr::filter(age_frame@data, type == "age" & name == "fleet1")$value*200
+#
+#
+# survey_index <-
+#   dplyr::filter(age_frame@data, type == "index")$value
+#
+# survey_fleet_index <- new(fims$Index, length(survey_index))
+#
+# survey_fleet_index$index_data <- survey_index
+#
+# survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
+# survey_fleet_age_comp$age_comp_data <-
+#   dplyr::filter(age_frame@data, type == "age" & name == "survey1")$value*200
 
+catch <- em_input$L.obs$fleet1
+fishing_fleet_index <- new(fims$Index, length(catch))
 fishing_fleet_index$index_data <- catch
-  
 fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
 fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * 200
 
-
-survey_index <-
-  dplyr::filter(age_frame@data, type == "index")$value
-
 survey_fleet_index <- new(fims$Index, length(survey_index))
-
-survey_fleet_index$index_data <- survey_index
-
+survey_fleet_index$index_data <- em_input$survey.obs$survey1
 survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
 survey_fleet_age_comp$age_comp_data <-c(t(em_input$survey.age.obs$survey1)) *200
 
@@ -115,7 +133,7 @@ fishing_fleet <- new(fims$Fleet)
 fishing_fleet$nages <- om_input$nages
 fishing_fleet$nyears <- om_input$nyr
 fishing_fleet$log_Fmort <- log(om_output$f)
-fishing_fleet$estimate_F <- TRUE
+fishing_fleet$estimate_F <- FALSE
 fishing_fleet$random_F <- FALSE
 fishing_fleet$log_q <- rep(log(1.0), om_input$nyr)
 fishing_fleet$estimate_q <- FALSE
@@ -140,7 +158,8 @@ survey_fleet_selectivity$slope$estimated <- TRUE
 survey_fleet <- new(fims$Fleet)
 survey_fleet$nages <- om_input$nages
 survey_fleet$nyears <- om_input$nyr
-survey_fleet$log_Fmort <- rep(log(0.00001), om_input$nyr) #-Inf?
+# survey_fleet$log_Fmort <- rep(log(0.00001), om_input$nyr) #-Inf?
+survey_fleet$log_Fmort <- rep(log(0.0), om_input$nyr) #-Inf?
 survey_fleet$estimate_F <- FALSE
 survey_fleet$random_F <- FALSE
 survey_fleet$log_q <- rep(log(om_output$survey_q$survey1), om_input$nyr)
@@ -180,17 +199,16 @@ map <- list(p=factor(par_list))
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")#, map = map)
 obj$gr(obj$par)
 # obj$par gradient at zero indicates detached parameters
-#try just estimating F then build up
-#for loop for 
-opt <- with(obj, nlminb(par, fn, gr, control = list(iter.max=10000000,eval.max=20000000)))
-#obj$gr(opt$par)
-#sdr <- TMB::sdreport(obj)
-#opt$par
-#opt$objective
-#summary(sdr, "fixed")
-#summary(sdr, "report")
-# message("success!")
-#report <- obj$report()
+#try just estimating F then build up\
+opt <- with(obj, nlminb(par, fn, gr, control = list(iter.max=1000000,eval.max=2000000)))
+obj$gr(opt$par)
+sdr <- TMB::sdreport(obj)
+opt$par
+opt$objective
+summary(sdr, "fixed")
+summary(sdr, "report")
+message("success!")
+report <- obj$report()
 
 # Test
 # TO DO:
@@ -199,14 +217,47 @@ opt <- with(obj, nlminb(par, fn, gr, control = list(iter.max=10000000,eval.max=2
 # - use absolute relative error later
 # - set up tolerance values later
 
-# # Numbers at age
-# expect_equal(report, c(t(om_output$N.age)))
-# # Biomass
-# expect_equal(report, om_output$biomass.mt)
-# # Spawning biomass
-# expect_equal(report, om_output$SSB)
-# # Expected catch
-# expect_equal(report, om_output$L.mt)
-# # Expected index
-# expect_equal(report, om_output$survey_index_biomass)
+# Numbers at age
+for (i in 1:length(c(t(om_output$N.age)))){
+  expect_lte(abs(report$naa[i] - c(t(om_output$N.age))[i])/c(t(om_output$N.age))[i], 0.05)
+}
+cbind(report$naa[1:360], c(t(om_output$N.age)))
+
+# Biomass
+for (i in 1:length(om_output$biomass.mt)){
+  expect_lte(abs(report$biomass[i] - om_output$biomass.mt[i])/om_output$biomass.mt[i], 0.05)
+}
+cbind(report$biomass[1:30], om_output$biomass.mt)
+
+# Spawning biomass
+for (i in 1:length(om_output$SSB)){
+  expect_lte(abs(report$ssb[i] - om_output$SSB[i])/om_output$SSB[i], 0.05)
+}
+cbind(report$ssb[1:30], om_output$SSB)
+
+# Expected catch
+fims_object <- report$expected_catch[seq(1, length(report$expected_catch), 2)]
+for (i in 1:length(om_output$L.mt$fleet1)){
+  expect_lte(abs(fims_object[i] - om_output$L.mt$fleet1[i])/om_output$L.mt$fleet1[i], 0.05)
+}
+cbind(fims_object[1:30], om_output$L.mt$fleet1)
+# # Expected index (need to add survey index to FIMS)
+# fims_object <- report$expected_index[seq(2, length(report$expected_index), 2)]
+# for (i in 1:length(om_output$survey_index_biomass$survey1)){
+#   expect_lte(abs(fims_object[i] - om_output$survey_index_biomass$survey1[i])/om_output$survey_index_biomass$survey1[i], 0.05)
+# }
+
+# recruitment deviations
+expect_equal(log(report$rec_dev), om_input$logR.resid, tolerance = 0.001)
+cbind(log(report$rec_dev)[1:30], om_input$logR.resid)
+# libs_path <- system.file("libs", package = "FIMS")
+# dll_name <- paste("FIMS", .Platform$dynlib.ext, sep = "")
+# if (.Platform$OS.type == "windows") {
+#   dll_path <- file.path(libs_path, .Platform$r_arch, dll_name)
+# } else {
+#   dll_path <- file.path(libs_path, dll_name)
+# }
+dll_path <- here::here("src", "FIMS.dll")
+dyn.unload(dll_path)
+dyn.load(dll_path)
 # })
