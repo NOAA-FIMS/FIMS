@@ -416,10 +416,10 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
                this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
                this->numbers_at_age[index_ya] *
                growth->evaluate(ages[age]);  // this->weight_at_age[age];
-      FIMS_LOG << " index year  " << year << std::endl;
-      fleets[fleet_]->expected_index[year] += index_;
+     fleets[fleet_]->expected_index[year] += index_;
+      FIMS_LOG << " expected index in year  " << year << " is " << fleets[fleet_]->expected_index[year] << std::endl;
+
     }
-    FIMS_LOG << "nfleets: " << this->nfleets << std::endl;
   }
 
   /**

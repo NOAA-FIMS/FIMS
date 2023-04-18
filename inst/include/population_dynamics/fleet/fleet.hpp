@@ -175,7 +175,7 @@ struct Fleet : public FIMSObject<Type> {
               sum;  // probabilities for ages
               
             observed_acomp[a] = this->observed_agecomp_data->at(y, a);
-            FIMS_LOG << " age " << a << "has expected: "  <<
+            FIMS_LOG << " age " << a << " in year " << y << "has expected: "  <<
             expected_acomp[a] << "  and observed: " << observed_acomp[a] << std::endl;
           }
           dmultinom.x = observed_acomp;

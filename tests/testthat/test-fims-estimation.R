@@ -55,7 +55,7 @@ recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
 recruitment$log_rzero$value <- log(om_input$R0)
 recruitment$log_rzero$is_random_effect <- FALSE
 recruitment$log_rzero$estimated <- TRUE
-recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2);
+recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
 recruitment$logit_steep$is_random_effect <- FALSE
 recruitment$logit_steep$estimated <- FALSE
 recruitment$logit_steep$min <- 0.2
@@ -121,6 +121,8 @@ fishing_fleet$random_F <- FALSE
 fishing_fleet$log_q <- rep(log(1.0), om_input$nyr)
 fishing_fleet$estimate_q <- FALSE
 fishing_fleet$random_q <- FALSE
+fishing_fleet$log_obs_error$value <- log(em_input$cv.L$fleet1)
+fishing_fleet$log_obs_error$estimated <- FALSE
 fishing_fleet$SetAgeCompLikelihood(1)
 fishing_fleet$SetIndexLikelihood(1)
 fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
@@ -139,7 +141,7 @@ survey_fleet_selectivity$slope$estimated <- TRUE
 survey_fleet <- new(fims$Fleet)
 survey_fleet$nages <- om_input$nages
 survey_fleet$nyears <- om_input$nyr
-survey_fleet$log_Fmort <- rep(log(0.01), om_input$nyr) #-Inf?
+survey_fleet$log_Fmort <- rep(log(0.00001), om_input$nyr) #-Inf?
 survey_fleet$estimate_F <- FALSE
 survey_fleet$random_F <- FALSE
 survey_fleet$log_q <- rep(log(om_output$survey_q$survey1), om_input$nyr)
@@ -174,7 +176,7 @@ fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
 par_list <- 1:65
-par_list[c(1,63)] <- NA
+par_list[c(32:65)] <- NA
 map <- list(p=factor(par_list))
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS", map = map)
 obj$gr(obj$par)

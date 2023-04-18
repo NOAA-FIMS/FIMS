@@ -198,6 +198,7 @@ class Information {
 
         if (it != this->data_objects.end()) {
           f->observed_agecomp_data = (*it).second;
+          FIMS_LOG << "expected input agecomp " << f->observed_agecomp_data;
         } else {
           valid_model = false;
           FIMS_LOG << "Error: observed age comp data not defined for fleet"

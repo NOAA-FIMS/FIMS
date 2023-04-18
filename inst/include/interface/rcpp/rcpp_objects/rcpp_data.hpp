@@ -66,7 +66,7 @@ class AgeCompDataInterface : public DataInterface {
   /**
    * @brief constructor
    */
-  AgeCompDataInterface(int amax = 0, int ymax = 0) : DataInterface() {
+  AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterface() {
     this->amax = amax;
     this->ymax = ymax;
   }
@@ -87,17 +87,17 @@ class AgeCompDataInterface : public DataInterface {
    */
   virtual bool add_to_fims_tmb() {
     std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data_0 =
-        std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->amax,
-                                                               this->ymax);
+        std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax,
+        this->amax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> age_comp_data_1 =
-        std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->amax,
-                                                                 this->ymax);
+        std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->ymax,
+                                                                 this->amax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_SECOND_ORDER>> age_comp_data_2 =
-        std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->amax,
-                                                                  this->ymax);
+        std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->ymax,
+                                                                  this->amax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_THIRD_ORDER>> age_comp_data_3 =
-        std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->amax,
-                                                                 this->ymax);
+        std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax,
+                                                                 this->amax);
 
     age_comp_data_0->id = this->id;
 
