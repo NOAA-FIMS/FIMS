@@ -7,6 +7,7 @@
 devtools::load_all()
 
 library(FIMS)
+library(testthat)
 data(package = "FIMS")
 
 # remove from test_that wrapper for debugging

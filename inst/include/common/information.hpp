@@ -43,6 +43,7 @@ class Information {
   std::vector<T*>
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
 
+
   // data objects
   std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >
       data_objects; /*!< map that holds data objects >*/
@@ -135,7 +136,9 @@ class Information {
    *
    * @param p
    */
-  void RegisterParameter(T& p) { this->fixed_effects_parameters.push_back(&p); }
+  void RegisterParameter(T& p) { this->fixed_effects_parameters.push_back(&p);
+
+  }
 
   /**
    * Register a random effect as estimable.
