@@ -177,10 +177,12 @@ obj$gr(obj$par)
 #try just estimating F then build up
 #for loop for
 opt <- with(obj, nlminb(par, fn, gr, control = list(iter.max=10000000,eval.max=20000000)))
-q()
+
 
 obj$gr(opt$par)
+
 sdr <- TMB::sdreport(obj)
+q()
 opt$par
 opt$objective
 summary(sdr, "fixed")
