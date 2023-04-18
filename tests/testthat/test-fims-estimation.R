@@ -52,14 +52,16 @@ setwd("../../..")
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
 recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-recruitment$rzero$value <- om_input$R0
-recruitment$rzero$is_random_effect <- FALSE
-recruitment$rzero$estimated <- FALSE
-recruitment$steep$value <- om_input$h
-recruitment$steep$is_random_effect <- FALSE
-recruitment$steep$estimated <- FALSE
-recruitment$estimate_deviations <- FALSE
-recruitment$deviations <- rep(1,30)
+recruitment$log_rzero$value <- log(om_input$R0)
+recruitment$log_rzero$is_random_effect <- FALSE
+recruitment$log_rzero$estimated <- TRUE
+recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2);
+recruitment$logit_steep$is_random_effect <- FALSE
+recruitment$logit_steep$estimated <- FALSE
+recruitment$logit_steep$min <- 0.2
+recruitment$logit_steep$max <- 1.0
+recruitment$estimate_deviations <- TRUE
+recruitment$deviations <- exp(om_input$logR.resid)
 
 #Data
 catch <- dplyr::filter(age_frame@data, type == "landings")$value
@@ -94,10 +96,10 @@ ewaa_growth$weights <- m_weightatage(age_frame)
 maturity <- new(fims$LogisticMaturity)
 maturity$median$value <- om_input$A50.mat
 maturity$median$is_random_effect <- FALSE
-maturity$median$estimated <- TRUE
+maturity$median$estimated <- FALSE
 maturity$slope$value <- om_input$slope
 maturity$slope$is_random_effect <- FALSE
-maturity$slope$estimated <- TRUE
+maturity$slope$estimated <- FALSE
 
 # Fleet
 # Create the fishing fleet
@@ -171,8 +173,8 @@ population$SetRecruitment(recruitment$get_id())
 fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
-par_list <- 1:36
-par_list[c(1,2,3,4,34,35,36)] <- NA
+par_list <- 1:65
+par_list[c(1,63)] <- NA
 map <- list(p=factor(par_list))
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS", map = map)
 obj$gr(obj$par)

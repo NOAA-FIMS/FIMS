@@ -566,7 +566,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
 
           if (a == 0) {
             // this->numbers_at_age[index_ya] = this->recruitment->rzero;
-            this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
+            this->unfished_numbers_at_age[index_ya] = fims::exp(this->recruitment->log_rzero);
           } else {
             CalculateUnfishedNumbersAA(index_ya, a - 1, a);
           }
@@ -594,7 +594,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
             // functional returns) assuming fecundity = 1 and 50:50 sex ratio
             FIMS_LOG << "Recruitment: " << std::endl;
             CalculateRecruitment(index_ya, y);
-            this->unfished_numbers_at_age[index_ya] = this->recruitment->rzero;
+            this->unfished_numbers_at_age[index_ya] = fims::exp(this->recruitment->log_rzero);
 
           } else {
             size_t index_ya2 = (y - 1) * nages + (a - 1);

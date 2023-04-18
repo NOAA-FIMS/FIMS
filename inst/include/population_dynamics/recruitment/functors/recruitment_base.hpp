@@ -48,7 +48,7 @@ namespace fims {
              */
         Type log_sigma_recruit; /*!< Log standard deviation of log recruitment
                              deviations */
-        Type rzero; /*!< Unexploited recruitment. Should be a positive value.*/
+        Type log_rzero; /*!< Unexploited recruitment. Should be a positive value.*/
 
         bool estimate_recruit_deviations =
                 true; /*!< A flag to indicate if recruitment deviations are estimated or

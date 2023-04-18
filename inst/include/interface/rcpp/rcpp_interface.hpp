@@ -174,8 +174,8 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()
-      .field("steep", &BevertonHoltRecruitmentInterface::steep)
-      .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
+      .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
+      .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
       .field("deviations", &BevertonHoltRecruitmentInterface::deviations)
       .field("estimate_deviations", &BevertonHoltRecruitmentInterface::estimate_deviations)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
