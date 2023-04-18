@@ -52,7 +52,7 @@ setwd("../../..")
 
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
-recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
+recruitment$log_sigma_recruit$value <- om_input$logR_sd
 recruitment$log_rzero$value <- log(om_input$R0)
 recruitment$log_rzero$is_random_effect <- FALSE
 recruitment$log_rzero$estimated <- TRUE
@@ -71,8 +71,7 @@ fishing_fleet_index <- new(fims$Index, length(catch))
 fishing_fleet_index$index_data <- catch
   
 fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
-fishing_fleet_age_comp$age_comp_data <-
-  dplyr::filter(age_frame@data, type == "age" & name == "fleet1")$value*200
+fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * 200
 
 
 survey_index <-
@@ -83,8 +82,7 @@ survey_fleet_index <- new(fims$Index, length(survey_index))
 survey_fleet_index$index_data <- survey_index
 
 survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
-survey_fleet_age_comp$age_comp_data <-
-  dplyr::filter(age_frame@data, type == "age" & name == "survey1")$value*200
+survey_fleet_age_comp$age_comp_data <-c(t(em_input$survey.age.obs$survey1)) *200
 
 
 # Growth
@@ -146,7 +144,7 @@ survey_fleet$log_Fmort <- rep(log(0.00001), om_input$nyr) #-Inf?
 survey_fleet$estimate_F <- FALSE
 survey_fleet$random_F <- FALSE
 survey_fleet$log_q <- rep(log(om_output$survey_q$survey1), om_input$nyr)
-survey_fleet$estimate_q <- FALSE
+survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
 survey_fleet$SetAgeCompLikelihood(1)
 survey_fleet$SetIndexLikelihood(1)
@@ -161,7 +159,7 @@ population <- new(fims$Population)
 population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr*om_input$nages)
 population$estimate_M <- FALSE
 population$log_init_naa <- log(om_output$N.age[1, ])
-population$estimate_init_naa <- FALSE
+population$estimate_init_naa <- TRUE
 population$nages <- om_input$nages
 population$ages <- om_input$ages * 1.0
 population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
@@ -179,20 +177,20 @@ parameters <- list(p = fims$get_fixed())
 par_list <- 1:65
 par_list[c(32:65)] <- NA
 map <- list(p=factor(par_list))
-obj <- MakeADFun(data=list(), parameters, DLL="FIMS", map = map)
+obj <- MakeADFun(data=list(), parameters, DLL="FIMS")#, map = map)
 obj$gr(obj$par)
 # obj$par gradient at zero indicates detached parameters
 #try just estimating F then build up
 #for loop for 
-opt <- with(obj, nlminb(par, fn, gr))
-obj$gr(opt$par)
-sdr <- TMB::sdreport(obj)
-opt$par
-opt$objective
-summary(sdr, "fixed")
-summary(sdr, "report")
+opt <- with(obj, nlminb(par, fn, gr, control = list(iter.max=10000000,eval.max=20000000)))
+#obj$gr(opt$par)
+#sdr <- TMB::sdreport(obj)
+#opt$par
+#opt$objective
+#summary(sdr, "fixed")
+#summary(sdr, "report")
 # message("success!")
-report <- obj$report()
+#report <- obj$report()
 
 # Test
 # TO DO:
