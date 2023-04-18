@@ -38,7 +38,6 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
 
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
-## Set-up fishing and survey fleets data
 age_frame <- FIMSFrameAge(data_mile1)
 fishing_fleet_dat <- dplyr::filter(age_frame@data, type == "landings")
 survey_dat <- dplyr::filter(age_frame@data, type == "index")$value
@@ -65,36 +64,17 @@ recruitment$logit_steep$max <- 1.0
 recruitment$estimate_deviations <- TRUE
 recruitment$deviations <- exp(om_input$logR.resid)
 
-# Data
-# catch <- dplyr::filter(age_frame@data, type == "landings")$value
-# fishing_fleet_index <- new(fims$Index, length(catch))
-#
-# fishing_fleet_index$index_data <- catch
-#
-# fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
-# fishing_fleet_age_comp$age_comp_data <-
-#   dplyr::filter(age_frame@data, type == "age" & name == "fleet1")$value*200
-#
-#
-# survey_index <-
-#   dplyr::filter(age_frame@data, type == "index")$value
-#
-# survey_fleet_index <- new(fims$Index, length(survey_index))
-#
-# survey_fleet_index$index_data <- survey_index
-#
-# survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
-# survey_fleet_age_comp$age_comp_data <-
-#   dplyr::filter(age_frame@data, type == "age" & name == "survey1")$value*200
-
+#Data
 catch <- em_input$L.obs$fleet1
 fishing_fleet_index <- new(fims$Index, length(catch))
 fishing_fleet_index$index_data <- catch
 fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
 fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * 200
 
+
+survey_index <-em_input$survey.obs$survey1
 survey_fleet_index <- new(fims$Index, length(survey_index))
-survey_fleet_index$index_data <- em_input$survey.obs$survey1
+survey_fleet_index$index_data <- survey_index
 survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
 survey_fleet_age_comp$age_comp_data <-c(t(em_input$survey.age.obs$survey1)) *200
 
@@ -129,7 +109,7 @@ fishing_fleet <- new(fims$Fleet)
 fishing_fleet$nages <- om_input$nages
 fishing_fleet$nyears <- om_input$nyr
 fishing_fleet$log_Fmort <- log(om_output$f)
-fishing_fleet$estimate_F <- FALSE
+fishing_fleet$estimate_F <- TRUE
 fishing_fleet$random_F <- FALSE
 fishing_fleet$log_q <- rep(log(1.0), om_input$nyr)
 fishing_fleet$estimate_q <- FALSE
@@ -154,8 +134,7 @@ survey_fleet_selectivity$slope$estimated <- TRUE
 survey_fleet <- new(fims$Fleet)
 survey_fleet$nages <- om_input$nages
 survey_fleet$nyears <- om_input$nyr
-# survey_fleet$log_Fmort <- rep(log(0.00001), om_input$nyr) #-Inf?
-survey_fleet$log_Fmort <- rep(log(0.0), om_input$nyr) #-Inf?
+survey_fleet$log_Fmort <- rep(log(0.00001), om_input$nyr) #-Inf?
 survey_fleet$estimate_F <- FALSE
 survey_fleet$random_F <- FALSE
 survey_fleet$log_q <- rep(log(om_output$survey_q$survey1), om_input$nyr)
@@ -195,8 +174,11 @@ map <- list(p=factor(par_list))
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")#, map = map)
 obj$gr(obj$par)
 # obj$par gradient at zero indicates detached parameters
-#try just estimating F then build up\
-opt <- with(obj, nlminb(par, fn, gr, control = list(iter.max=1000000,eval.max=2000000)))
+#try just estimating F then build up
+#for loop for
+opt <- with(obj, nlminb(par, fn, gr, control = list(iter.max=10000000,eval.max=20000000)))
+q()
+
 obj$gr(opt$par)
 sdr <- TMB::sdreport(obj)
 opt$par
@@ -213,7 +195,7 @@ report <- obj$report()
 # - use absolute relative error later
 # - set up tolerance values later
 
-# Numbers at age
+## Numbers at age
 for (i in 1:length(c(t(om_output$N.age)))){
   expect_lte(abs(report$naa[i] - c(t(om_output$N.age))[i])/c(t(om_output$N.age))[i], 0.05)
 }
@@ -256,4 +238,3 @@ cbind(log(report$rec_dev)[1:30], om_input$logR.resid)
 dll_path <- here::here("src", "FIMS.dll")
 dyn.unload(dll_path)
 dyn.load(dll_path)
-# })
