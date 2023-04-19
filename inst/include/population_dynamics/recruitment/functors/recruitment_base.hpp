@@ -33,7 +33,7 @@ namespace fims {
 
         typename ModelTraits<Type>::ParameterVector
           recruit_deviations; /*!< A vector of recruitment deviations */
-        bool constrain_deviations = true; /*!< A flag to indicate if recruitment
+        bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                        deviations are summing to zero or not */
         typename ModelTraits<Type>::DataVector recruit_bias_adjustment; /*!< A vector of bias adj values
                                                 (incorporating sigma_recruit)*/
@@ -64,16 +64,20 @@ namespace fims {
         }
 
         void Prepare() {
+          this->recruit_bias_adjustment_fraction.resize(this->recruit_deviations.size());
           this->recruit_bias_adjustment.resize(this->recruit_deviations.size());
-            if (this->use_recruit_bias_adjustment) {
-                for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
-                    this->recruit_bias_adjustment[i] = -0.5 * fims::exp(this->log_sigma_recruit) * fims::exp(this->log_sigma_recruit);
-                }
-            } else {
-                for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
-                    this->recruit_bias_adjustment[i] = 0.0;
-                }
-            }
+            this->PrepareConstrainedDeviations();
+//            this->PrepareBiasAdjustment();
+//            if (this->use_recruit_bias_adjustment) {
+//                for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
+//                    this->recruit_bias_adjustment[i] = -0.5 * fims::exp(this->log_sigma_recruit) * fims::exp(this->log_sigma_recruit);
+//
+//                }
+//            } else {
+//                for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
+//                    this->recruit_bias_adjustment[i] = 0.0;
+//                }
+//            }
         }
 
         /** @brief Calculates the expected recruitment for a given spawning input.
@@ -126,8 +130,10 @@ namespace fims {
                 sum += this->recruit_deviations[i];
             }
 
+            FIMS_LOG<<"recruit_deviations: \n";
             for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
                 this->recruit_deviations[i] -= sum / (this->recruit_deviations.size());
+                FIMS_LOG<<this->recruit_deviations[i]<<std::endl;
             }
         }
 

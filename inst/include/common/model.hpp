@@ -66,7 +66,6 @@ class Model {  // may need singleton
     T rec_nll = 0.0; //recrutiment nll
     T age_comp_nll = 0.0; //age composition nll
     T index_nll = 0.0; //survey and fishery cacth nll
-
     //Loop over populations, evaluate, and sum up the recruitment likelihood component
     typename fims::Information<T>::population_iterator it;
     for (it = this->fims_information->populations.begin();
@@ -83,7 +82,6 @@ class Model {  // may need singleton
       //Evaluate population
       (*it).second->Evaluate();
       //Recrtuiment negative log-likelihood
-      rec_nll += (*it).second->recruitment->evaluate_nll();
       FIMS_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
@@ -98,6 +96,13 @@ class Model {  // may need singleton
       index_nll += (*jt).second->evaluate_index_ll();
       FIMS_LOG << "index nll: " << index_nll << std::endl;
     }
+      
+      
+      //get recruitment nll after all populations are evaluated
+      for (it = this->fims_information->populations.begin();
+        it != this->fims_information->populations.end(); ++it) {
+          rec_nll += (*it).second->recruitment->evaluate_nll();
+      }
 
     jnll = rec_nll + age_comp_nll + index_nll;
     /*

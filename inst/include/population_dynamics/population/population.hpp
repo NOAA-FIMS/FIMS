@@ -43,6 +43,7 @@ struct Population : public FIMSObject<Type> {
   size_t nseasons;      /*!< total number of seasons in the fishery*/
   size_t nages;         /*!< total number of ages in the population*/
   size_t nfleets;       /*!< total number of fleets in the fishery*/
+
   // constants
   const Type proportion_female = 0.5; /*!< Sex proportion fixed at 50/50 for M1*/
 
@@ -209,12 +210,14 @@ struct Population : public FIMSObject<Type> {
    */
   void CalculateMortality(size_t index_ya, size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+        if(this->fleets[fleet_]->is_survey == false){
       this->mortality_F[index_ya] +=
           this->fleets[fleet_]->Fmort[year] *
           this->fleets[fleet_]->selectivity->evaluate(ages[age]);
       FIMS_LOG << " sel age " << ages[age] << " is "
                << this->fleets[fleet_]->selectivity->evaluate(ages[age])
                << " F mort year " << year << " "<< this->fleets[fleet_]->Fmort[year] << std::endl;
+        }
     }
     FIMS_LOG << "M in calculate mortality is " << this->M[index_ya] << std::endl;
     this->mortality_Z[index_ya] =
@@ -412,10 +415,11 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
       // I = qN (N is total numbers), I is an index in numbers
       Type index_;
-      index_ = this->fleets[fleet_]->q[year] *
-               this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
-               this->numbers_at_age[index_ya] *
-               growth->evaluate(ages[age]);  // this->weight_at_age[age];
+        index_ = this->fleets[fleet_]->catch_numbers_at_age[index_ya]* growth->evaluate(ages[age]);
+//        this->fleets[fleet_]->q*
+//               this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
+//               this->numbers_at_age[index_ya] *
+//               growth->evaluate(ages[age]);  // this->weight_at_age[age];
      fleets[fleet_]->expected_index[year] += index_;
       FIMS_LOG << " expected index in year  " << year << " is " << fleets[fleet_]->expected_index[year] << std::endl;
 
@@ -437,11 +441,17 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
       // current and fleet objects) to that value.
       Type catch_;  // catch_ is used to avoid using the c++ keyword catch
       // Baranov Catch Equation
+        if(this->fleets[fleet_]->is_survey == false){
       catch_ = (this->fleets[fleet_]->Fmort[year] *
                 this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
                this->mortality_Z[index_ya] * this->numbers_at_age[index_ya] *
                (1 - fims::exp(-(this->mortality_Z[index_ya])));
-
+        }else{
+            catch_ = (this->fleets[fleet_]->q *
+                      this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
+                     this->mortality_Z[index_ya] * this->numbers_at_age[index_ya] *
+                     (1 - fims::exp(-(this->mortality_Z[index_ya])));
+        }
       FIMS_LOG << " F " << fleet_ << "  " << this->fleets[fleet_]->Fmort[year]
                << std::endl;
       FIMS_LOG << " selectivity "

@@ -53,13 +53,12 @@ struct Fleet : public FIMSObject<Type> {
 
   // Mortality and catchability
   ParameterVector log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  ParameterVector log_q; /*!< estimated parameter: catchability of the fleet */
+    Type log_q; /*!< estimated parameter: catchability of the fleet */
 
   Type log_obs_error; /*!< estimated parameter: observation error associated
                          with index */
   std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
-  std::vector<Type>
-      q; /*!< transofrmed parameter: the catchability of the fleet */
+    Type q; /*!< transofrmed parameter: the catchability of the fleet */
 
   // derived quantities
   std::vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
@@ -71,7 +70,8 @@ struct Fleet : public FIMSObject<Type> {
   std::vector<Type> expected_index; /*!<model expected index of abundance*/
   std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
   std::vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
-
+  bool is_survey = false; /*!< is this fleet object a survey*/
+    
   #ifdef TMB_MODEL
   ::objective_function<Type> *of;
 #endif
@@ -105,8 +105,7 @@ struct Fleet : public FIMSObject<Type> {
 
     log_Fmort.resize(nyears);
     Fmort.resize(nyears);
-    log_q.resize(nyears);
-    q.resize(nyears);
+
   }
 
   /**
@@ -126,12 +125,12 @@ struct Fleet : public FIMSObject<Type> {
   std::fill(expected_index.begin(), expected_index.end(), 0); /*!<model expected index of abundance*/
   std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(), 0); /*!<model expected catch at age*/
   std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(), 0);  /*!<model expected weight at age*/
-
+      this->q = fims::exp(this->log_q);
     for (size_t year = 0; year < this->nyears; year++) {
       FIMS_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
-      FIMS_LOG << "input q " << this->log_q[year] << std::endl;
+      FIMS_LOG << "input q " << this->log_q << std::endl;
       this->Fmort[year] = fims::exp(this->log_Fmort[year]);
-      this->q[year] = fims::exp(this->log_q[year]);
+      
     }
   }
 
@@ -193,6 +192,7 @@ struct Fleet : public FIMSObject<Type> {
 
   virtual const Type evaluate_index_ll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
+      
     #ifdef TMB_MODEL
     fims::Dnorm<Type> dnorm;
     dnorm.sd = fims::exp(this->log_obs_error);

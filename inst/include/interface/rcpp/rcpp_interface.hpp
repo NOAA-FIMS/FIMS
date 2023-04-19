@@ -188,6 +188,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
+      .field("is_survey", &FleetInterface::is_survey)
       .field("log_q", &FleetInterface::log_q)
       .field("log_Fmort", &FleetInterface::log_Fmort)
       .field("nages", &FleetInterface::nages)

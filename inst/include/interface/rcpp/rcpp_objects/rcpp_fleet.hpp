@@ -27,9 +27,10 @@ class FleetInterface : public FIMSRcppInterfaceBase {
   int selectivity_id = -999;           /*!< id of selectivity component*/
 
  public:
+  bool is_survey = false;
   int nages;                 /*!< number of ages in the fleet data*/
   int nyears;                /*!< number of years in the fleet data */
-  Rcpp::NumericVector log_q; /*!< log of catchability for the fleet*/
+  double log_q; /*!< log of catchability for the fleet*/
   Rcpp::NumericVector
       log_Fmort;           /*!< log of fishing mortality rate for the fleet*/
   bool estimate_F = false; /*!< whether the parameter F should be estimated*/
@@ -143,6 +144,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
 
     // set relative info
     f0->id = this->id;
+    f0->is_survey = this->is_survey;
     f0->nages = this->nages;
     f0->nyears = this-> nyears;
     f0->agecomp_likelihood_id = this->agecomp_likelihood_id;
@@ -155,17 +157,14 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     if(this->log_obs_error.estimated){
       d0->RegisterParameter(f0->log_obs_error);
     }
-    f0->log_q.resize(this->log_q.size());
-    for (int i = 0; i < log_q.size(); i++) {
-      f0->log_q[i] = this->log_q[i];
+      f0->log_q = this->log_q;
       if (this->estimate_q) {
         if (this->random_q) {
-          d0->RegisterRandomEffect(f0->log_q[i]);
+          d0->RegisterRandomEffect(f0->log_q);
         } else {
-          d0->RegisterParameter(f0->log_q[i]);
+          d0->RegisterParameter(f0->log_q);
         }
       }
-    }
 
     f0->log_Fmort.resize(this->log_Fmort.size());
     for (int i = 0; i < log_Fmort.size(); i++) {
@@ -190,6 +189,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         std::make_shared<fims::Fleet<TMB_FIMS_FIRST_ORDER>>();
 
     f1->id = this->id;
+    f1->is_survey = this->is_survey;
     f1->nages = this->nages;
     f1->nyears = this-> nyears;
     f1->agecomp_likelihood_id = this->agecomp_likelihood_id;
@@ -201,17 +201,16 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     d1->RegisterParameter(f1->log_obs_error);
         }
     f1->selectivity_id = this->selectivity_id;
-    f1->log_q.resize(this->log_q.size());
-    for (int i = 0; i < log_q.size(); i++) {
-      f1->log_q[i] = this->log_q[i];
+    
+      f1->log_q = this->log_q;
       if (this->estimate_q) {
         if (this->random_q) {
-          d1->RegisterRandomEffect(f1->log_q[i]);
+          d1->RegisterRandomEffect(f1->log_q);
         } else {
-          d1->RegisterParameter(f1->log_q[i]);
+          d1->RegisterParameter(f1->log_q);
         }
       }
-    }
+    
     f1->log_Fmort.resize(this->log_Fmort.size());
     for (int i = 0; i < log_Fmort.size(); i++) {
       f1->log_Fmort[i] = this->log_Fmort[i];
@@ -236,6 +235,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         std::make_shared<fims::Fleet<TMB_FIMS_SECOND_ORDER>>();
 
     f2->id = this->id;
+    f2->is_survey = this->is_survey;
     f2->nages = this->nages;
     f2->nyears = this-> nyears;
     f2->agecomp_likelihood_id = this->agecomp_likelihood_id;
@@ -248,18 +248,14 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     
         }
     f2->selectivity_id = this->selectivity_id;
-    f2->log_q.resize(this->log_q.size());
-    for (int i = 0; i < log_q.size(); i++) {
-      f2->log_q[i] = this->log_q[i];
-      FIMS_LOG << "log q " << f2->log_q[i] << std::endl;
+      f2->log_q = this->log_q;
       if (this->estimate_q) {
         if (this->random_q) {
-          d2->RegisterRandomEffect(f2->log_q[i]);
+          d2->RegisterRandomEffect(f2->log_q);
         } else {
-          d2->RegisterParameter(f2->log_q[i]);
+          d2->RegisterParameter(f2->log_q);
         }
       }
-    }
 
     f2->log_Fmort.resize(this->log_Fmort.size());
     for (int i = 0; i < log_Fmort.size(); i++) {
@@ -284,6 +280,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         std::make_shared<fims::Fleet<TMB_FIMS_THIRD_ORDER>>();
 
     f3->id = this->id;
+    f3->is_survey = this->is_survey;
     f3->nages = this->nages;
     f3->nyears = this-> nyears;
     f3->agecomp_likelihood_id = this->agecomp_likelihood_id;
@@ -295,17 +292,14 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     if(this->log_obs_error.estimated){
           d3->RegisterParameter(f3->log_obs_error);
     }
-    f3->log_q.resize(this->log_q.size());
-    for (int i = 0; i < log_q.size(); i++) {
-      f3->log_q[i] = this->log_q[i];
+      f3->log_q = this->log_q;
       if (this->estimate_q) {
         if (this->random_q) {
-          d3->RegisterRandomEffect(f3->log_q[i]);
+          d3->RegisterRandomEffect(f3->log_q);
         } else {
-          d3->RegisterParameter(f3->log_q[i]);
+          d3->RegisterParameter(f3->log_q);
         }
       }
-    }
 
     f3->log_Fmort.resize(this->log_Fmort.size());
     for (int i = 0; i < log_Fmort.size(); i++) {
