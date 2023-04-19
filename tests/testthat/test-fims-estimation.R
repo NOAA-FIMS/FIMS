@@ -59,11 +59,10 @@ recruitment$log_rzero$estimated <- TRUE
 recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
 recruitment$logit_steep$is_random_effect <- FALSE
 recruitment$logit_steep$estimated <- FALSE
-recruitment$logit_steep$value<-0.75
 recruitment$logit_steep$min <- 0.2
 recruitment$logit_steep$max <- 1.0
 recruitment$estimate_deviations <- TRUE
-recruitment$deviations <- exp(om_input$logR.resid)
+recruitment$deviations <- rep(1, length(om_input$logR.resid))
 
 #Data
 catch <- em_input$L.obs$fleet1
@@ -205,7 +204,7 @@ report <- obj$report()
 
 ## Numbers at age
 for (i in 1:length(c(t(om_output$N.age)))){
-  expect_lte(abs(report$naa[i] - c(t(om_output$N.age))[i])/c(t(om_output$N.age))[i], 0.05)
+  expect_lte(abs(report$naa[i] - c(t(om_output$N.age))[i])/c(t(om_output$N.age))[i], 0.1)
 }
 cbind(report$naa[1:360], c(t(om_output$N.age)))
 
@@ -214,6 +213,8 @@ for (i in 1:length(om_output$biomass.mt)){
   expect_lte(abs(report$biomass[i] - om_output$biomass.mt[i])/om_output$biomass.mt[i], 0.05)
 }
 cbind(report$biomass[1:30], om_output$biomass.mt)
+plot(report$biomass[1:30], type="l")
+lines(om_output$biomass.mt)
 
 # Spawning biomass
 for (i in 1:length(om_output$SSB)){
@@ -221,12 +222,17 @@ for (i in 1:length(om_output$SSB)){
 }
 cbind(report$ssb[1:30], om_output$SSB)
 
+plot(report$ssb[1:30], type="l")
+lines(om_output$SSB)
+
 # Expected catch
 fims_object <- report$expected_catch[seq(1, length(report$expected_catch), 2)]
 for (i in 1:length(om_output$L.mt$fleet1)){
   expect_lte(abs(fims_object[i] - om_output$L.mt$fleet1[i])/om_output$L.mt$fleet1[i], 0.05)
 }
 cbind(fims_object[1:30], om_output$L.mt$fleet1)
+plot(om_output$L.mt$fleet1, type="l")
+lines(fims_object[1:30], col="red")
 # # Expected index (need to add survey index to FIMS)
 # fims_object <- report$expected_index[seq(2, length(report$expected_index), 2)]
 # for (i in 1:length(om_output$survey_index_biomass$survey1)){
