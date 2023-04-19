@@ -413,13 +413,19 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
    */
   void CalculateIndex(size_t index_ya, size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+            Type index_;
       // I = qN (N is total numbers), I is an index in numbers
-      Type index_;
+      if(this->fleets[fleet_]->is_survey == false){
+
         index_ = this->fleets[fleet_]->catch_numbers_at_age[index_ya]* growth->evaluate(ages[age]);
-//        this->fleets[fleet_]->q*
-//               this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
-//               this->numbers_at_age[index_ya] *
-//               growth->evaluate(ages[age]);  // this->weight_at_age[age];
+      } else{
+
+        FIMS_LOG << "fleet " << fleet_ << " is a survey" << std::endl; 
+        index_ = this->fleets[fleet_]->q*
+               this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
+               this->numbers_at_age[index_ya] *
+               growth->evaluate(ages[age]);  // this->weight_at_age[age];
+      }
      fleets[fleet_]->expected_index[year] += index_;
       FIMS_LOG << " expected index in year  " << year << " is " << fleets[fleet_]->expected_index[year] << std::endl;
 

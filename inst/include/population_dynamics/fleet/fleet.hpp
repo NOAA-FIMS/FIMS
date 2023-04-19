@@ -200,7 +200,8 @@ struct Fleet : public FIMSObject<Type> {
       dnorm.x = fims::log(this->observed_index_data->at(i));
       dnorm.mean = fims::log(this->expected_index[i]);
       nll -= dnorm.evaluate(true);
-      FIMS_LOG << "observed likelihood component: " << i << " is " << this->observed_index_data->at(i) << std::endl;
+      FIMS_LOG << "observed likelihood component: " << i << " is " << this->observed_index_data->at(i) << 
+      " and expected is: " << this->expected_index[i] << std::endl;
     }
     FIMS_LOG << " index nll: " << nll << std::endl;
     #endif
