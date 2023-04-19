@@ -92,13 +92,19 @@ class Model {  // may need singleton
     typename fims::Information<T>::fleet_iterator jt;
     for(jt = this->fims_information->fleets.begin(); jt !=
       this->fims_information->fleets.end(); ++jt ){
+      #ifdef TMB_MODEL
+        (*jt).second->of = this->of;
+      #endif
       age_comp_nll += (*jt).second->evaluate_age_comp_ll();
       FIMS_LOG << "age comp nll: " << age_comp_nll << std::endl;
       index_nll += (*jt).second->evaluate_index_ll();
       FIMS_LOG << "index nll: " << index_nll << std::endl;
+      if((*jt).second->is_survey == false){
+        (*jt).second->ReportFleet();
+      }
     }
-      
-      
+
+
       //get recruitment nll after all populations are evaluated
  //     for (it = this->fims_information->populations.begin();
  //       it != this->fims_information->populations.end(); ++it) {

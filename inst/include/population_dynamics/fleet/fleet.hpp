@@ -134,13 +134,19 @@ struct Fleet : public FIMSObject<Type> {
     }
   }
 
-//  void ReportFleet(){
-//    #ifdef TMB_MODEL
-//  typename ModelTraits<Type>::EigenVector fleet_index =
-//      expected_index;
-//      REPORT_F(fleet_index, of);
-//      #endif
-//}
+  void ReportFleet(){
+    #ifdef TMB_MODEL
+      typename ModelTraits<Type>::EigenVector exp_index =
+        expected_index;
+      REPORT_F(exp_index, of);
+      typename ModelTraits<Type>::EigenVector exp_catch =
+        expected_catch;
+      REPORT_F(exp_catch, of);
+      typename ModelTraits<Type>::EigenVector F_mort =
+        Fmort;
+      REPORT_F(F_mort, of);
+    #endif
+}
 
 
   virtual const Type evaluate_age_comp_ll() {
@@ -172,7 +178,7 @@ struct Fleet : public FIMSObject<Type> {
             size_t index_ya = y * this->nages + a;
             expected_acomp[a] = this->catch_numbers_at_age[index_ya] /
               sum;  // probabilities for ages
-              
+
             observed_acomp[a] = this->observed_agecomp_data->at(y, a);
             FIMS_LOG << " age " << a << " in year " << y << "has expected: "  <<
             expected_acomp[a] << "  and observed: " << observed_acomp[a] << std::endl;
