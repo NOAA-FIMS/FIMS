@@ -388,6 +388,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
    */
   void CalculateCatch(size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+      if(this->fleets[fleet_]->is_survey == false){
       size_t index_yf = year * this->nfleets +
                         fleet_;  // index by fleet and years to dimension fold
       size_t index_ya = year * this->nages + age;
@@ -401,6 +402,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
 
       fleets[fleet_]->expected_catch[year] +=
           this->fleets[fleet_]->catch_weight_at_age[index_ya];
+      }
     }
   }
 
