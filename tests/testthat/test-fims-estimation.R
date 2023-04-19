@@ -59,6 +59,7 @@ recruitment$log_rzero$estimated <- TRUE
 recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
 recruitment$logit_steep$is_random_effect <- FALSE
 recruitment$logit_steep$estimated <- FALSE
+# recruitment$logit_steep$value<-0.75
 recruitment$logit_steep$min <- 0.2
 recruitment$logit_steep$max <- 1.0
 recruitment$estimate_deviations <- TRUE
