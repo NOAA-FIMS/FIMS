@@ -82,6 +82,7 @@ class Model {  // may need singleton
       //Evaluate population
       (*it).second->Evaluate();
       //Recrtuiment negative log-likelihood
+      rec_nll += (*it).second->recruitment->evaluate_nll();
       FIMS_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
@@ -99,10 +100,10 @@ class Model {  // may need singleton
       
       
       //get recruitment nll after all populations are evaluated
-      for (it = this->fims_information->populations.begin();
-        it != this->fims_information->populations.end(); ++it) {
-          rec_nll += (*it).second->recruitment->evaluate_nll();
-      }
+ //     for (it = this->fims_information->populations.begin();
+ //       it != this->fims_information->populations.end(); ++it) {
+ //         rec_nll += (*it).second->recruitment->evaluate_nll();
+ //     }
 
     jnll = rec_nll + age_comp_nll + index_nll;
     /*
