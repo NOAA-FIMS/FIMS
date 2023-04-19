@@ -183,16 +183,16 @@ opt<- with(obj,optim(par, fn, gr, method = "BFGS", control = list(maxit=1000000,
 #opt <- with(obj, nlminb(par, fn, gr,
 #control = list(iter.max=100000,eval.max=200000, rel.tol = 1e-15)))
 print(opt)
-q()
+
 opt$par
 obj$gr(opt$par)
 #q()
-#sdr <- TMB::sdreport(obj)
+sdr <- TMB::sdreport(obj)
 #q()
 #opt$par
 #opt$objective
-#summary(sdr, "fixed")
-#summary(sdr, "report")
+summary(sdr, "fixed")
+summary(sdr, "report")
 message("success!")
 report <- obj$report()
 
