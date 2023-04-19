@@ -179,7 +179,9 @@ p = fims$get_fixed()
 # obj$par gradient at zero indicates detached parameters
 #try just estimating F then build up
 #for loop for
-opt <- with(obj, nlminb(par, fn, gr, control = list(iter.max=100000,eval.max=200000, rel.tol = 1e-15)))
+opt<- with(obj,optim(par, fn, gr, method = "BFGS", control = list(maxit=1000000, reltol = 1e-15)))
+#opt <- with(obj, nlminb(par, fn, gr,
+#control = list(iter.max=100000,eval.max=200000, rel.tol = 1e-15)))
 print(opt)
 q()
 opt$par
