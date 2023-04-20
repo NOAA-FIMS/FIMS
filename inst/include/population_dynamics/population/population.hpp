@@ -457,8 +457,8 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
         }else{
             catch_ = (this->fleets[fleet_]->q *
                       this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
-                     this->M[index_ya] * this->numbers_at_age[index_ya] *
-                     (1 - fims::exp(-(this->M[index_ya])));
+                     this->mortality_Z[index_ya] * this->numbers_at_age[index_ya] *
+                     (1 - fims::exp(-(this->mortality_Z[index_ya])));
         }
       FIMS_LOG << " F " << fleet_ << "  " << this->fleets[fleet_]->Fmort[year]
                << std::endl;
