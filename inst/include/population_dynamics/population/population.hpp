@@ -422,7 +422,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
         index_ = this->fleets[fleet_]->catch_numbers_at_age[index_ya]* growth->evaluate(ages[age]);
       } else{
 
-        FIMS_LOG << "fleet " << fleet_ << " is a survey" << std::endl; 
+        FIMS_LOG << "fleet " << fleet_ << " is a survey" << std::endl;
         index_ = this->fleets[fleet_]->q*
                this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
                this->numbers_at_age[index_ya] *
@@ -652,7 +652,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
           }
           FIMS_LOG<<"\n";
       }
-      
+
       FIMS_LOG<<"CAA\n";
       for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
           FIMS_LOG<< "Fleet "<<fleet_+1<<"\n";
@@ -662,7 +662,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
           }
           FIMS_LOG<<"\n";
       }
-      
+
       }
       // make an intermediate value in order to set multiple members (of
 
@@ -673,28 +673,30 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     // of); REPORT_F(this->numbers_at_age, of);
     typename ModelTraits<Type>::EigenVector naa =
       this->numbers_at_age;
+    typename ModelTraits<Type>::EigenMatrix cnaa(this->nyears*this->nages, this->nfleets);
     typename ModelTraits<Type>::EigenVector ssb =
       this->spawning_biomass;
     typename ModelTraits<Type>::EigenVector rec_dev =
         this->recruitment->recruit_deviations;
-    typename ModelTraits<Type>::EigenVector expected_catch =
-      this->expected_catch;
+    typename ModelTraits<Type>::EigenMatrix expected_index(this->nyears, this->nfleets);
     typename ModelTraits<Type>::EigenVector recruitment =
       this->expected_recruitment;
     typename ModelTraits<Type>::EigenVector biomass =
       this->biomass;
-      
-   // for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-   //   this->fleets[fleet_]->ReportFleet();
-   // }
+
+    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+      expected_index.col(fleet_) = typename ModelTraits<Type>::EigenVector(fleets[fleet_]->expected_index);
+      cnaa.col(fleet_) = typename ModelTraits<Type>::EigenVector(fleets[fleet_]->catch_numbers_at_age);
+    }
 
     REPORT_F(rec_dev, of);
     ADREPORT_F(rec_dev, of);
     REPORT_F(naa, of);
     ADREPORT_F(naa, of);
+    REPORT_F(cnaa, of);
     REPORT_F(ssb, of);
     ADREPORT_F(ssb, of);
-    REPORT_F(expected_catch, of);
+    REPORT_F(expected_index, of);
     REPORT_F(recruitment, of);
     REPORT_F(biomass, of);
 
