@@ -50,6 +50,8 @@ struct ModelTraits {
   vector of the parameters that is differentiable */
   typedef typename tmbutils::vector<T>
       EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
+  typedef typename tmbutils::matrix<T>
+      EigenMatrix; /**< This is a matrix as defined in TMB's namespace Eigen */
 };
 #endif /* TMB_MODEL */
 }  // namespace fims
