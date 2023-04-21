@@ -52,7 +52,8 @@ setwd("../../..")
 
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
-recruitment$log_sigma_recruit$value <- om_input$logR_sd
+# log_sigma_recruit is NOT logged. It needs to enter the model logged b/c the exp() is taken before the likelihood calculation
+recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
 recruitment$log_rzero$value <- 12.0#log(om_input$R0)
 recruitment$log_rzero$is_random_effect <- FALSE
 recruitment$log_rzero$estimated <- TRUE
@@ -63,6 +64,7 @@ recruitment$logit_steep$estimated <- FALSE
 recruitment$logit_steep$min <- 0.2
 recruitment$logit_steep$max <- 1.0
 recruitment$estimate_deviations <- TRUE
+#recruit deviations should enter the model in normal space. The log is taken in the likelihood calculations
 recruitment$deviations <- rep(1, length(om_input$logR.resid))
 
 #Data
@@ -142,6 +144,8 @@ survey_fleet$random_F <- FALSE
 survey_fleet$log_q <- log(om_output$survey_q$survey1)
 survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
+survey_fleet$log_obs_error$value <- log(em_input$cv.survey$survey1)
+survey_fleet$log_obs_error$estimated <- FALSE
 survey_fleet$SetAgeCompLikelihood(1)
 survey_fleet$SetIndexLikelihood(1)
 survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
@@ -175,7 +179,45 @@ par_list[c(32:65)] <- NA
 map <- list(p=factor(par_list))
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")#, map = map)
 obj$gr(obj$par)
-p = fims$get_fixed()
+p <- fims$get_fixed()
+jnll <- obj$fn()
+jnll
+report_deterministic <- obj$report()
+
+## Test deterministic
+#recruitment likelihood
+rec_nll <- -sum(dnorm(log(rep(1, om_input$nyr)), rep(0, om_input$nyr),
+                      om_input$logR_sd, TRUE))
+#correct values for index_nll_fleet and index_nll_survey?
+index_nll_fleet <- -sum(dnorm(log(catch),
+                        log(om_output$L.mt$fleet1),
+                        em_input$cv.L$fleet1, TRUE))
+index_nll_survey <- -sum(dnorm(log(survey_index),
+                            log(om_output$survey_index_biomass),
+                            em_input$cv.survey$survey1, TRUE))
+index_nll <- index_nll_fleet + index_nll_survey
+
+#correct values for observed and expected?
+fishing_acomp_observed <- em_input$L.age.obs$fleet1
+fishing_acomp_expected <- em_input$L.age.obs$fleet1
+survey_acomp_observed <- em_input$survey.age.obs$survey1
+survey_acomp_expected <- em_input$survey.age.obs$survey1
+#or should expected be: t(apply(om_output$survey_age_comp$survey1, 1 ,function(x) x/sum(x)))?
+age_comp_nll_fleet <- age_comp_nll_survey <- 0
+for(y in 1:30){
+  age_comp_nll_fleet <- age_comp_nll_fleet -
+    dmultinom(fishing_acomp_observed[y,]*200, 200,
+              fishing_acomp_expected[y,],TRUE)
+
+  age_comp_nll_survey <- age_comp_nll_survey -
+    dmultinom(survey_acomp_observed[y,]*200, 200,
+              survey_acomp_expected[y,],TRUE)
+}
+age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
+expected_jnll <- rec_nll + index_nll + age_comp_nll
+expect_equal(jnll, expected_jnll)
+
+
 # obj$par gradient at zero indicates detached parameters
 #try just estimating F then build up
 #for loop for
