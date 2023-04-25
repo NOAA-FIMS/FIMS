@@ -169,19 +169,20 @@ population$SetRecruitment(recruitment$get_id())
 ## Set-up TMB
 fims$CreateTMBModel()
 # # Create parameter list from Rcpp modules
-parameters <- list(p = fims$get_fixed())
+#parameters <- list(p = fims$get_fixed(), r=fims$get_random())
+parameters <- list(p=fims$get_fixed())
 par_list <- 1:65
 par_list[c(32:65)] <- NA
 map <- list(p=factor(par_list))
-obj <- MakeADFun(data=list(), parameters, DLL="FIMS")#, map = map)
+obj <- MakeADFun(data=list(), parameters = parameters, DLL="FIMS", silent = TRUE)#, random="r")#, map = map)
 obj$gr(obj$par)
 p = fims$get_fixed()
 # obj$par gradient at zero indicates detached parameters
 #try just estimating F then build up
 #for loop for
-opt<- with(obj,optim(par, fn, gr, method = "BFGS", control = list(maxit=1000000, reltol = 1e-15)))
-#opt <- with(obj, nlminb(par, fn, gr,
-#control = list(iter.max=100000,eval.max=200000, rel.tol = 1e-15)))
+#opt<- with(obj,optim(par, fn, gr, method = "BFGS", control = list(maxit=1000000, reltol = 1e-15)))
+opt <- with(obj, nlminb(par, fn, gr,
+control = list(iter.max=100000,eval.max=200000, rel.tol = 1e-15)))
 print(opt)
 
 opt$par
@@ -243,6 +244,8 @@ lines(fims_object[1:30], col="red")
 # recruitment deviations
 expect_equal(log(report$rec_dev), om_input$logR.resid, tolerance = 0.001)
 cbind(log(report$rec_dev)[1:30], om_input$logR.resid)
+plot(log(report$rec_dev)[1:30], type="l")
+lines(om_input$logR.resid, col = "red")
 # libs_path <- system.file("libs", package = "FIMS")
 # dll_name <- paste("FIMS", .Platform$dynlib.ext, sep = "")
 # if (.Platform$OS.type == "windows") {
