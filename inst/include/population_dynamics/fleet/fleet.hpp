@@ -71,7 +71,7 @@ struct Fleet : public FIMSObject<Type> {
   std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
   std::vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
   bool is_survey = false; /*!< is this fleet object a survey*/
-    
+
   #ifdef TMB_MODEL
   ::objective_function<Type> *of;
 #endif
@@ -130,7 +130,7 @@ struct Fleet : public FIMSObject<Type> {
       FIMS_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
       FIMS_LOG << "input q " << this->log_q << std::endl;
       this->Fmort[year] = fims::exp(this->log_Fmort[year]);
-      
+
     }
   }
 
@@ -198,7 +198,7 @@ struct Fleet : public FIMSObject<Type> {
 
   virtual const Type evaluate_index_ll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
-      
+
     #ifdef TMB_MODEL
     fims::Dnorm<Type> dnorm;
     dnorm.sd = fims::exp(this->log_obs_error);
@@ -206,9 +206,11 @@ struct Fleet : public FIMSObject<Type> {
       dnorm.x = fims::log(this->observed_index_data->at(i));
       dnorm.mean = fims::log(this->expected_index[i]);
       nll -= dnorm.evaluate(true);
-      FIMS_LOG << "observed likelihood component: " << i << " is " << this->observed_index_data->at(i) << 
+      FIMS_LOG << "observed likelihood component: " << i << " is " << this->observed_index_data->at(i) <<
       " and expected is: " << this->expected_index[i] << std::endl;
     }
+    FIMS_LOG << " log obs error is: " << this->log_obs_error << std::endl;
+    FIMS_LOG << " sd is: " << dnorm.sd << std::endl;
     FIMS_LOG << " index nll: " << nll << std::endl;
     #endif
     return nll;

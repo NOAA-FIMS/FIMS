@@ -86,9 +86,14 @@ class Model {  // may need singleton
       FIMS_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
+    #ifdef TMB_MODEL
+      typename ModelTraits<T>::EigenMatrix exp_index(30,2);
+      typename ModelTraits<T>::EigenVector F_mort;
+      F_mort.resize(30);
+      typename ModelTraits<T>::EigenMatrix exp_naa(30,2);
+    #endif
 
-    // nll will loop over fleets (Fleet module does not have evaluate function
-    // yet) Sum up nlls here in model.hpp or in fleet.hpp?
+
     typename fims::Information<T>::fleet_iterator jt;
     for(jt = this->fims_information->fleets.begin(); jt !=
       this->fims_information->fleets.end(); ++jt ){
@@ -96,12 +101,9 @@ class Model {  // may need singleton
         (*jt).second->of = this->of;
       #endif
       age_comp_nll += (*jt).second->evaluate_age_comp_ll();
-      FIMS_LOG << "age comp nll: " << age_comp_nll << std::endl;
+      FIMS_LOG << "survey and fleet age comp nll sum: " << age_comp_nll << std::endl;
       index_nll += (*jt).second->evaluate_index_ll();
-      FIMS_LOG << "index nll: " << index_nll << std::endl;
-      if((*jt).second->is_survey == false){
-        (*jt).second->ReportFleet();
-      }
+      FIMS_LOG << "survey and fleet index nll sum: " << index_nll << std::endl;
     }
 
 
@@ -112,7 +114,7 @@ class Model {  // may need singleton
  //     }
 
     jnll = rec_nll + age_comp_nll + index_nll;
-    /*
+/* REPORT_F not working from inside model.hpp
     #ifdef TMB_MODEL
       typename ModelTraits<T>::EigenVector jnll_vec;
       jnll_vec.resize(3);
@@ -121,7 +123,7 @@ class Model {  // may need singleton
       jnll_vec[2] = 0;
       REPORT_F(jnll_vec, of);
     #endif
-     */
+ */
 
     return jnll;
   }
