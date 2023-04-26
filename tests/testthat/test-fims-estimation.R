@@ -19,7 +19,7 @@ pkg_to_install <- required_pkg[!(required_pkg %in%
   installed.packages()[, "Package"])]
 if (length(pkg_to_install)) install.packages(pkg_to_install)
 
-#remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
+remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
 library(ASSAMC)
 
 ## Set-up OM (sigmaR = 0.4)
@@ -38,36 +38,28 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
 
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
-age_frame <- FIMSFrameAge(data_mile1)
-fishing_fleet_dat <- dplyr::filter(age_frame@data, type == "landings")
-survey_dat <- dplyr::filter(age_frame@data, type == "index")$value
-age_comp_fleet <- dplyr::filter(age_frame@data, type == "age" & name == "fleet1")
-age_comp_survey <- dplyr::filter(age_frame@data, type == "age" & name == "survey1")
-
 ## Set-up Rcpp modules and fix parameters to "true"
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
-setwd("../../..")
-# fims$clear()
-
 
 # Recruitment
 recruitment <- new(fims$BevertonHoltRecruitment)
 # log_sigma_recruit is NOT logged. It needs to enter the model logged b/c the exp() is taken before the likelihood calculation
 recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-recruitment$log_rzero$value <- 12.0#log(om_input$R0)
+# recruitment$log_rzero$value <- log(om_input$R0)
+recruitment$log_rzero$value <- 12
 recruitment$log_rzero$is_random_effect <- FALSE
 recruitment$log_rzero$estimated <- TRUE
 recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
 recruitment$logit_steep$is_random_effect <- FALSE
 recruitment$logit_steep$estimated <- FALSE
-# recruitment$logit_steep$value<-0.75
 recruitment$logit_steep$min <- 0.2
 recruitment$logit_steep$max <- 1.0
 recruitment$estimate_deviations <- TRUE
 #recruit deviations should enter the model in normal space. The log is taken in the likelihood calculations
-recruitment$deviations <- rep(1, length(om_input$logR.resid))
+# recruitment$deviations <- rep(1, length(om_input$logR.resid))
+recruitment$deviations <- exp(om_input$logR.resid)
 
-#Data
+# Data
 catch <- em_input$L.obs$fleet1
 fishing_fleet_index <- new(fims$Index, length(catch))
 fishing_fleet_index$index_data <- catch
@@ -75,7 +67,7 @@ fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
 fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * 200
 
 
-survey_index <-em_input$survey.obs$survey1
+survey_index <-em_input$surveyB.obs$survey1
 survey_fleet_index <- new(fims$Index, length(survey_index))
 survey_fleet_index$index_data <- survey_index
 survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
@@ -84,9 +76,8 @@ survey_fleet_age_comp$age_comp_data <-c(t(em_input$survey.age.obs$survey1)) *200
 
 # Growth
 ewaa_growth <- new(fims$EWAAgrowth)
-age_frame <- FIMSFrameAge(data_mile1)
-ewaa_growth$ages <- m_ages(age_frame)
-ewaa_growth$weights <- m_weightatage(age_frame)
+ewaa_growth$ages <- om_input$ages
+ewaa_growth$weights <- om_input$W.mt
 
 # Maturity
 maturity <- new(fims$LogisticMaturity)
@@ -108,7 +99,6 @@ fishing_fleet_selectivity$slope$is_random_effect <- FALSE
 fishing_fleet_selectivity$slope$estimated <- TRUE
 
 fishing_fleet <- new(fims$Fleet)
-# Need get_id() for setting up observed agecomp and index data?
 fishing_fleet$nages <- om_input$nages
 fishing_fleet$nyears <- om_input$nyr
 fishing_fleet$log_Fmort <- log(om_output$f)
@@ -117,8 +107,9 @@ fishing_fleet$random_F <- FALSE
 fishing_fleet$log_q <- log(1.0)
 fishing_fleet$estimate_q <- FALSE
 fishing_fleet$random_q <- FALSE
-fishing_fleet$log_obs_error$value <- log(em_input$cv.L$fleet1)
+fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2+1)))
 fishing_fleet$log_obs_error$estimated <- FALSE
+# Need get_id() for setting up observed agecomp and index data?
 fishing_fleet$SetAgeCompLikelihood(1)
 fishing_fleet$SetIndexLikelihood(1)
 fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
@@ -144,7 +135,7 @@ survey_fleet$random_F <- FALSE
 survey_fleet$log_q <- log(om_output$survey_q$survey1)
 survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
-survey_fleet$log_obs_error$value <- log(em_input$cv.survey$survey1)
+survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2+1)))
 survey_fleet$log_obs_error$estimated <- FALSE
 survey_fleet$SetAgeCompLikelihood(1)
 survey_fleet$SetIndexLikelihood(1)
@@ -172,11 +163,38 @@ population$SetRecruitment(recruitment$get_id())
 
 ## Set-up TMB
 fims$CreateTMBModel()
-# # Create parameter list from Rcpp modules
+## Create parameter list from Rcpp modules
 parameters <- list(p = fims$get_fixed())
-par_list <- 1:65
-par_list[c(32:65)] <- NA
-map <- list(p=factor(par_list))
+# par_list <- 1:65
+# par_list[c(32:65)] <- NA
+# map <- list(p=factor(par_list))
+test_that("deterministic test of fims", {
+  obj <- MakeADFun(data=list(), parameters, DLL="FIMS")
+  report_deterministic <- obj$report()
+
+  ## Numbers at age
+  for (i in 1:length(c(t(om_output$N.age)))){
+    expect_lte(abs(report_deterministic$naa[i] - c(t(om_output$N.age))[i])/c(t(om_output$N.age))[i], 0.1)
+  }
+  cbind(report_deterministic $naa[1:360], c(t(om_output$N.age)))
+
+  # Biomass
+  for (i in 1:length(om_output$biomass.mt)){
+    expect_lte(abs(report$biomass[i] - om_output$biomass.mt[i])/om_output$biomass.mt[i], 0.05)
+  }
+
+
+  sdr <- TMB::sdreport(obj)
+  summary(sdr, "fixed")
+  summary(sdr, "report")
+
+  fims$clear()
+  dll_path <- here::here("src", "FIMS.dll")
+  dyn.unload(dll_path)
+  dyn.load(dll_path)
+
+})
+
 obj <- MakeADFun(data=list(), parameters, DLL="FIMS")#, map = map)
 obj$gr(obj$par)
 p <- fims$get_fixed()
@@ -292,6 +310,4 @@ cbind(log(report$rec_dev)[1:30], om_input$logR.resid)
 # } else {
 #   dll_path <- file.path(libs_path, dll_name)
 # }
-dll_path <- here::here("src", "FIMS.dll")
-dyn.unload(dll_path)
-dyn.load(dll_path)
+
