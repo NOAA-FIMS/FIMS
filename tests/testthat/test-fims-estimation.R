@@ -45,8 +45,8 @@ fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 recruitment <- new(fims$BevertonHoltRecruitment)
 # log_sigma_recruit is NOT logged. It needs to enter the model logged b/c the exp() is taken before the likelihood calculation
 recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-# recruitment$log_rzero$value <- log(om_input$R0)
-recruitment$log_rzero$value <- 12
+recruitment$log_rzero$value <- log(om_input$R0)
+#recruitment$log_rzero$value <- 12
 recruitment$log_rzero$is_random_effect <- FALSE
 recruitment$log_rzero$estimated <- TRUE
 recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
@@ -180,7 +180,7 @@ test_that("deterministic test of fims", {
 
   # Biomass
   for (i in 1:length(om_output$biomass.mt)){
-    expect_lte(abs(report$biomass[i] - om_output$biomass.mt[i])/om_output$biomass.mt[i], 0.05)
+    expect_lte(abs(report_deterministic$biomass[i] - om_output$biomass.mt[i])/om_output$biomass.mt[i], 0.05)
   }
 
 
@@ -204,23 +204,21 @@ report_deterministic <- obj$report()
 
 ## Test deterministic
 #recruitment likelihood
-rec_nll <- -sum(dnorm(log(rep(1, om_input$nyr)), rep(0, om_input$nyr),
+rec_nll <- -sum(dnorm(log(recruitment$deviations), rep(0, om_input$nyr),
                       om_input$logR_sd, TRUE))
-#correct values for index_nll_fleet and index_nll_survey?
+#catch and survey index expected likelihoods
 index_nll_fleet <- -sum(dnorm(log(catch),
                         log(om_output$L.mt$fleet1),
                         em_input$cv.L$fleet1, TRUE))
 index_nll_survey <- -sum(dnorm(log(survey_index),
-                            log(om_output$survey_index_biomass),
-                            em_input$cv.survey$survey1, TRUE))
+                            log(om_output$survey_index_biomass$survey1),
+                            sqrt(log(em_input$cv.survey$survey1^2+1)), TRUE))
 index_nll <- index_nll_fleet + index_nll_survey
-
-#correct values for observed and expected?
+#age comp likelihoods
 fishing_acomp_observed <- em_input$L.age.obs$fleet1
-fishing_acomp_expected <- em_input$L.age.obs$fleet1
+fishing_acomp_expected <- t(apply(om_output$L.age$fleet1, 1 ,function(x) x/sum(x)))
 survey_acomp_observed <- em_input$survey.age.obs$survey1
-survey_acomp_expected <- em_input$survey.age.obs$survey1
-#or should expected be: t(apply(om_output$survey_age_comp$survey1, 1 ,function(x) x/sum(x)))?
+survey_acomp_expected <- t(apply(om_output$survey_age_comp$survey1, 1 ,function(x) x/sum(x)))
 age_comp_nll_fleet <- age_comp_nll_survey <- 0
 for(y in 1:30){
   age_comp_nll_fleet <- age_comp_nll_fleet -
