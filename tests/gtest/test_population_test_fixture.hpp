@@ -83,9 +83,12 @@ class PopulationPrepareTestFixture : public testing::Test {
 
       fleet->Initialize(nyears, nages);
       fleet->selectivity = selectivity;
+      fleet->log_q = log_q_distribution(generator);
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
-        fleet->log_q[year] = log_q_distribution(generator);
+      }
+      if(i==0){
+        fleet->is_survey = true;
       }
       fleet->Prepare();
       population.fleets.push_back(fleet);
@@ -147,8 +150,8 @@ class PopulationPrepareTestFixture : public testing::Test {
     population.maturity = maturity;
 
     auto recruitment = std::make_shared<fims::SRBevertonHolt<double>>();
-    recruitment->steep = 0.75;
-    recruitment->rzero = 1000000.0;
+    recruitment->logit_steep = fims::logit(0.2, 1.0, 0.75);
+    recruitment->log_rzero = fims::log(1000000.0);
     recruitment->recruit_deviations.resize(nyears);
     population.recruitment = recruitment;
   }

@@ -14,8 +14,9 @@ namespace
 // BH_fcn(R0 = 1000, h = 0.99, phi0 = 0.2, x = 40): 990
 
       fims::SRBevertonHolt<double> recruit1;
-      recruit1.steep = 0.7500;
-      recruit1.rzero = 1000.000;
+      
+      recruit1.logit_steep = fims::logit(0.2, 1.0, 0.7500);
+      recruit1.log_rzero = std::log(1000.000);
       double spawners = 30.000;
       double phi_0 = 0.1;
       // # R code that generates true values for testing
@@ -33,8 +34,8 @@ namespace
       EXPECT_EQ(recruit1.GetId(), 0);
       
       fims::SRBevertonHolt<double> recruit2;
-      recruit2.steep = 0.200;
-      recruit2.rzero = 1000.000;
+      recruit2.logit_steep = fims::logit(0.2, 1.0, 0.200);
+      recruit2.log_rzero = std::log(1000.000);
       double spawners2 = 40.000;
       double phi_02 = 0.2;
       // # R code that generates true values for testing

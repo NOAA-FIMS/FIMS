@@ -219,12 +219,12 @@ public:
           std::cout << "f ";
         }
         it = input.FindMember("f");
+        f->log_q = 0.0;
         for (int i = 0; i < it->value.Size(); i++)
         {
           rapidjson::Value &e = (*it).value;
           f->Fmort[i] = e[i].GetDouble();
           f->log_Fmort[i] = std::log(e[i].GetDouble());
-          f->log_q[i] = 0.0;
           if (print_statements)
           {
             std::cout << f->log_Fmort[i] << " ";
@@ -317,7 +317,7 @@ public:
         typename rapidjson::Document::MemberIterator fleet2_q;
         fleet2_q = it->value.FindMember("survey1");
         rapidjson::Value &fleet_q = (*fleet2_q).value;
-        std::fill(s->log_q.begin(), s->log_q.end(), fims::log(fleet_q[0].GetDouble()));
+        s->log_q = fims::log(fleet_q[0].GetDouble());
 
         std::fill(s->log_Fmort.begin(), s->log_Fmort.end(), fims::log(0.0));
         pop.fleets.push_back(s);
@@ -424,11 +424,11 @@ public:
         std::make_shared<fims::SRBevertonHolt<double>>();
     it = input.FindMember("R0");
     e = (*it).value;
-    rec->rzero = e[0].GetDouble();
+    rec->log_rzero = fims::log(e[0].GetDouble());
 
     it = input.FindMember("h");
     e = (*it).value;
-    rec->steep = e[0].GetDouble();
+    rec->logit_steep = fims::logit(0.2,1.0,e[0].GetDouble());
 
     it = input.FindMember("logR_sd");
     e = (*it).value;

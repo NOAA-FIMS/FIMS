@@ -15,9 +15,7 @@ namespace
         
       
         EXPECT_EQ(fleet.log_Fmort.size(), nyears);
-        EXPECT_EQ(fleet.log_q.size(), nyears);
         EXPECT_EQ(fleet.Fmort.size(), nyears);
-        EXPECT_EQ(fleet.q.size(), nyears);
         EXPECT_EQ(fleet.catch_weight_at_age.size(), nyears*nages);
         EXPECT_EQ(fleet.catch_index.size(), nyears);
     }
@@ -40,24 +38,23 @@ namespace
         double log_q_min = fims::log(0.1);
         double log_q_max = fims::log(1);
         std::uniform_real_distribution<double> log_q_distribution(log_q_min, log_q_max);
+        fleet.log_q = log_q_distribution(generator);
         for(int i = 0; i < nyears; i++)
         {
             fleet.log_Fmort[i] = log_Fmort_distribution(generator);
-            fleet.log_q[i] = log_q_distribution(generator);
         }
         fleet.Prepare();
 
         // Test fleet.Fmort and fleet.q
         std::vector<double> Fmort(nyears, 0);
-        std::vector<double> q(nyears, 0);
+        double q = fims::exp(fleet.log_q);
+        EXPECT_EQ(fleet.q, q);
         for (int i = 0; i < nyears; i++)
         {
             Fmort[i] = fims::exp(fleet.log_Fmort[i]);
             EXPECT_EQ(fleet.Fmort[i], Fmort[i]);
-            q[i] = fims::exp(fleet.log_q[i]);
-            EXPECT_EQ(fleet.q[i], q[i]);
+
         }
         EXPECT_EQ(fleet.Fmort.size(), nyears);
-        EXPECT_EQ(fleet.q.size(), nyears);
     }
 } // namespace
