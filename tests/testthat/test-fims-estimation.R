@@ -10,9 +10,10 @@ if (dir.exists(file.path(find.package("FIMS"), "src"))){
     dll_path <- file.path(libs_path, dll_name)
   }
 }
+
 install.packages("remotes")
+install.packages("here")
 remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
-library(ASSAMC)
 
 ## Set-up OM (sigmaR = 0.4)
 maindir <- file.path(here::here(), "tests", "testthat", "_snaps")
@@ -191,89 +192,89 @@ test_that("deterministic test of fims", {
     expect_lte(abs(report$naa[i] - c(t(om_output$N.age))[i])/c(t(om_output$N.age))[i], 0.001)
   }
 
-  # # Biomass
-  # for (i in 1:length(om_output$biomass.mt)){
-  #   expect_lte(abs(report$biomass[i] - om_output$biomass.mt[i])/om_output$biomass.mt[i], 0.001)
-  # }
-  #
-  # # Spawning biomass
-  # for (i in 1:length(om_output$SSB)){
-  #   expect_lte(abs(report$ssb[i] - om_output$SSB[i])/om_output$SSB[i], 0.001)
-  # }
-  #
-  # # Recruitment
-  # fims_naa <- matrix(report$naa[1:(om_input$nyr*om_input$nages)],
-  #                    nrow = om_input$nyr, byrow = TRUE)
-  #
-  # for (i in 1:length(om_output$N.age[,1])){
-  #   expect_lte(abs(fims_naa[i,1] - om_output$N.age[i,1])/
-  #                om_output$N.age[i,1], 0.001)
-  # }
-  #
-  # expect_equal(fims_naa[,1],
-  #                 report$recruitment[2:length(report$recruitment)])
-  #
-  # for (i in 1:length(om_output$N.age[,1])){
-  #   expect_lte(abs(report$recruitment[i+1] - om_output$N.age[i,1])/
-  #                om_output$N.age[i,1], 0.001)
-  # }
-  #
-  # # recruitment deviations (fixed at initial "true" values)
-  # expect_equal(log(report$rec_dev), om_input$logR.resid)
-  #
-  # # Expected catch
-  # # Should we compare expected catch from FIMS with "true" catch from OM without observation error
-  # # or with "true" catch observations with observation error
-  # fims_object <- report$expected_index[,1]
-  # for (i in 1:length(om_output$L.mt$fleet1)){
-  #   expect_lte(abs(fims_object[i] - om_output$L.mt$fleet1[i])/om_output$L.mt$fleet1[i], 0.001)
-  # }
-  # for (i in 1:length(em_input$L.obs$fleet1)){
-  #   expect_lte(abs(fims_object[i] - em_input$L.obs$fleet1[i])/em_input$L.obs$fleet1[i], 0.1)
-  # }
-  #
-  # # Expected catch number at age
-  # for (i in 1:length(c(t(om_output$L.age$fleet1)))){
-  #   expect_lte(abs(report$cnaa[i,1] - c(t(om_output$L.age$fleet1))[i])/
-  #                c(t(om_output$L.age$fleet1))[i], 0.001)
-  # }
-  #
-  # # Expected catch number at age in proportion
-  # fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 1],
-  #                     nrow = om_input$nyr, byrow = TRUE)
-  # fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
-  # for (i in 1:length(c(t(em_input$L.age.obs$fleet1)))){
-  #   print(i)
-  #   expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(em_input$L.age.obs$fleet1))[i])/
-  #                c(t(em_input$L.age.obs$fleet1))[i], 0.1)
-  # }
-  #
-  # # Expected survey index
-  # fims_object <- report$expected_index[,2]
-  # for (i in 1:length(om_output$survey_index_biomass$survey1)){
-  #   expect_lte(abs(fims_object[i] - om_output$survey_index_biomass$survey1[i])/
-  #                om_output$survey_index_biomass$survey1[i], 0.001)
-  # }
-  # for (i in 1:length(em_input$surveyB.obs$survey1)){
-  #   expect_lte(abs(fims_object[i] - em_input$surveyB.obs$survey1[i])/
-  #                em_input$surveyB.obs$survey1[i], 0.2)
-  # }
-  #
-  # # Expected survey number at age
-  # for (i in 1:length(c(t(om_output$survey_age_comp$survey1)))){
-  #   expect_lte(abs(report$cnaa[i,2] - c(t(om_output$survey_age_comp$survey1))[i])/
-  #                c(t(om_output$survey_age_comp$survey1))[i], 0.001)
-  # }
-  #
-  # # Expected catch number at age in proportion
-  # fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 2],
-  #                     nrow = om_input$nyr, byrow = TRUE)
-  # fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
-  #
-  # for (i in 1:length(c(t(em_input$survey.age.obs)))){
-  #   expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(em_input$L.age.obs$fleet1))[i])/
-  #                c(t(em_input$L.age.obs$fleet1))[i], 0.1)
-  # }
+  # Biomass
+  for (i in 1:length(om_output$biomass.mt)){
+    expect_lte(abs(report$biomass[i] - om_output$biomass.mt[i])/om_output$biomass.mt[i], 0.001)
+  }
+
+  # Spawning biomass
+  for (i in 1:length(om_output$SSB)){
+    expect_lte(abs(report$ssb[i] - om_output$SSB[i])/om_output$SSB[i], 0.001)
+  }
+
+  # Recruitment
+  fims_naa <- matrix(report$naa[1:(om_input$nyr*om_input$nages)],
+                     nrow = om_input$nyr, byrow = TRUE)
+
+  for (i in 1:length(om_output$N.age[,1])){
+    expect_lte(abs(fims_naa[i,1] - om_output$N.age[i,1])/
+                 om_output$N.age[i,1], 0.001)
+  }
+
+  expect_equal(fims_naa[,1],
+                  report$recruitment[2:length(report$recruitment)])
+
+  for (i in 1:length(om_output$N.age[,1])){
+    expect_lte(abs(report$recruitment[i+1] - om_output$N.age[i,1])/
+                 om_output$N.age[i,1], 0.001)
+  }
+
+  # recruitment deviations (fixed at initial "true" values)
+  expect_equal(log(report$rec_dev), om_input$logR.resid)
+
+  # Expected catch
+  # Should we compare expected catch from FIMS with "true" catch from OM without observation error
+  # or with "true" catch observations with observation error
+  fims_object <- report$expected_index[,1]
+  for (i in 1:length(om_output$L.mt$fleet1)){
+    expect_lte(abs(fims_object[i] - om_output$L.mt$fleet1[i])/om_output$L.mt$fleet1[i], 0.001)
+  }
+  for (i in 1:length(em_input$L.obs$fleet1)){
+    expect_lte(abs(fims_object[i] - em_input$L.obs$fleet1[i])/em_input$L.obs$fleet1[i], 0.1)
+  }
+
+  # Expected catch number at age
+  for (i in 1:length(c(t(om_output$L.age$fleet1)))){
+    expect_lte(abs(report$cnaa[i,1] - c(t(om_output$L.age$fleet1))[i])/
+                 c(t(om_output$L.age$fleet1))[i], 0.001)
+  }
+
+  # Expected catch number at age in proportion
+  fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 1],
+                      nrow = om_input$nyr, byrow = TRUE)
+  fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
+  for (i in 1:length(c(t(em_input$L.age.obs$fleet1)))){
+    print(i)
+    expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(em_input$L.age.obs$fleet1))[i])/
+                 c(t(em_input$L.age.obs$fleet1))[i], 0.1)
+  }
+
+  # Expected survey index
+  fims_object <- report$expected_index[,2]
+  for (i in 1:length(om_output$survey_index_biomass$survey1)){
+    expect_lte(abs(fims_object[i] - om_output$survey_index_biomass$survey1[i])/
+                 om_output$survey_index_biomass$survey1[i], 0.001)
+  }
+  for (i in 1:length(em_input$surveyB.obs$survey1)){
+    expect_lte(abs(fims_object[i] - em_input$surveyB.obs$survey1[i])/
+                 em_input$surveyB.obs$survey1[i], 0.2)
+  }
+
+  # Expected survey number at age
+  for (i in 1:length(c(t(om_output$survey_age_comp$survey1)))){
+    expect_lte(abs(report$cnaa[i,2] - c(t(om_output$survey_age_comp$survey1))[i])/
+                 c(t(om_output$survey_age_comp$survey1))[i], 0.001)
+  }
+
+  # Expected catch number at age in proportion
+  fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 2],
+                      nrow = om_input$nyr, byrow = TRUE)
+  fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
+
+  for (i in 1:length(c(t(em_input$survey.age.obs)))){
+    expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(em_input$L.age.obs$fleet1))[i])/
+                 c(t(em_input$L.age.obs$fleet1))[i], 0.1)
+  }
 
 
   test_env$fims$clear()
