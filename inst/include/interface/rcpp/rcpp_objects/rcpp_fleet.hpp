@@ -27,7 +27,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
   int selectivity_id = -999;           /*!< id of selectivity component*/
 
  public:
-  bool is_survey = false;
+  bool is_survey = false;     /*!< whether this is a survey fleet */
   int nages;                 /*!< number of ages in the fleet data*/
   int nyears;                /*!< number of years in the fleet data */
   double log_q; /*!< log of catchability for the fleet*/
@@ -104,7 +104,6 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    * @brief Set the unique id for the Observed Index Data object
    *
    * @param observed_index_data_id Unique id for the Observed Index Data object
-   * @param indexdata the index data
    */
   void SetObservedIndexData(int observed_index_data_id) {
     // Check if observed index data have been set already

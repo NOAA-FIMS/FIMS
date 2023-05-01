@@ -133,7 +133,10 @@ struct Fleet : public FIMSObject<Type> {
 
     }
   }
-
+  /**
+ * @brief Method to report out the fleet-specific derived quantities. 
+ * 
+ */
   void ReportFleet(){
     #ifdef TMB_MODEL
       typename ModelTraits<Type>::EigenVector exp_index =

@@ -111,7 +111,6 @@ struct DataObject : public fims::FIMSObject<Type> {
    * @brief Set value of element
    * @param i
    * @param x
-   * @return void
    *
    */
   inline void set(size_t i, Type x) {
@@ -150,7 +149,6 @@ struct DataObject : public fims::FIMSObject<Type> {
    * @param i
    * @param j
    * @param x
-   * @return void
    *
    */
   inline void set(size_t i, size_t j, Type x) {
@@ -165,7 +163,7 @@ struct DataObject : public fims::FIMSObject<Type> {
    * @param i
    * @param j
    * @param k
-   * @return
+   * @return reference type
    */
   inline const Type operator()(size_t i, size_t j, size_t k) {
     return data[i * jmax * kmax + j * kmax + k];
@@ -192,7 +190,7 @@ struct DataObject : public fims::FIMSObject<Type> {
    * @param j
    * @param k
    * @param l
-   * @return
+   * @return reference type
    */
   inline const Type operator()(size_t i, size_t j, size_t k, size_t l) {
     return data[i * jmax * kmax * lmax + j * kmax * lmax + k * lmax + l];

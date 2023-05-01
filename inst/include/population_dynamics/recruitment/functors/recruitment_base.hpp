@@ -63,6 +63,10 @@ namespace fims {
         virtual ~RecruitmentBase() {
         }
 
+/**
+ * @brief Prepares the recruitment bias adjustment vector.
+ * 
+ */
         void Prepare() {
           this->recruit_bias_adjustment_fraction.resize(this->recruit_deviations.size());
           this->recruit_bias_adjustment.resize(this->recruit_deviations.size());
