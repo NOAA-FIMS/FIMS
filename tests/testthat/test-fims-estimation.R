@@ -10,7 +10,7 @@ if (dir.exists(file.path(find.package("FIMS"), "src"))){
     dll_path <- file.path(libs_path, dll_name)
   }
 }
-
+install.packages("remotes")
 remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
 library(ASSAMC)
 
