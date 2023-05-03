@@ -98,6 +98,10 @@ class Model {  // may need singleton
       index_nll += (*jt).second->evaluate_index_ll();
       FIMS_LOG << "survey and fleet index nll sum: " << index_nll << std::endl;
       if((*jt).second->is_survey == false){
+      #ifdef TMB_MODEL
+        (*jt).second->of = this->of;
+      #endif
+        // ReportFleet() includes ifdef TMB_MODEL statement
         (*jt).second->ReportFleet();
       }
     }
