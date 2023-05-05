@@ -1,6 +1,8 @@
 remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
 
 ## Set-up OM (sigmaR = 0.4)
+working_dir <- getwd()
+message(getwd())
 maindir <- tempdir()
 model_input <- ASSAMC::save_initial_input()
 FIMS_C0_estimation <- ASSAMC::save_initial_input(
@@ -17,7 +19,10 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
 unlink(maindir, recursive = T)
+message(getwd())
 
+setwd(working_dir)
+on.exit(setwd(working_dir), add = TRUE)
 # Set-up Rcpp modules and fix parameters to "true"
 setup_fims <- function(om_input, om_output, em_input){
 
@@ -523,3 +528,5 @@ test_that("estimation test of fims", {
   dyn.load(find_dll_path("TMB"))
 
 })
+
+message(getwd())
