@@ -1,6 +1,18 @@
 data(package = "FIMS")
+dll_name <- paste("FIMS", .Platform$dynlib.ext, sep = "")
+if (dir.exists(file.path(find.package("FIMS"), "src"))){
+  dll_path <- file.path(find.package("FIMS"), "src", dll_name)
+} else {
+  libs_path <- file.path(find.package("FIMS"), "libs")
 
+  if (.Platform$OS.type == "windows") {
+    dll_path <- file.path(libs_path, .Platform$r_arch, dll_name)
+  } else {
+    dll_path <- file.path(libs_path, dll_name)
+  }
+}
 test_that("ewaa data can be added to model", {
+  dyn.load(dll_path)
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   ewaa_growth <- new(fims$EWAAgrowth)
   age_frame <- FIMSFrameAge(data_mile1)

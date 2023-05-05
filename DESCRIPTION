@@ -67,7 +67,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
     covr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    remotes
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 LazyData: true
