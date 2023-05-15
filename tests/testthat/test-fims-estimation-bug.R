@@ -18,7 +18,7 @@ find_dll_path <- function(package_name) {
   }
 }
 
-remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
+#remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
 
 ## Set-up OM (sigmaR = 0.4)
 working_dir <- getwd()
@@ -186,16 +186,15 @@ sdr_fixed <- summary(sdr, "fixed")
 report <- obj$report()
 
 deterministic_env$fims$clear()
-rm(deterministic_env)
 TMB::FreeADFun(obj)
 
 ###################################
 ## Code will cause segfault on Windows
 ## when lines 195-198 commented out
-dyn.unload(find_dll_path("FIMS"))
-dyn.unload(find_dll_path("TMB"))
-dyn.load(find_dll_path("FIMS"))
-dyn.load(find_dll_path("TMB"))
+# dyn.unload(find_dll_path("FIMS"))
+# dyn.unload(find_dll_path("TMB"))
+# dyn.load(find_dll_path("FIMS"))
+# dyn.load(find_dll_path("TMB"))
 #################################
 
 nll_env <- setup_fims(om_input = om_input,
