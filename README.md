@@ -43,7 +43,7 @@ This fix removes the debugger flag `-O0 -g` from being automatically inserted fo
 ```
 2 PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS -O1 -g
 ```
-To turn of the debugger flag, remove the `-O1 -g` flag:
+To turn off the debugger flag, remove the `-O1 -g` flag:
 ```
 2 PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS
 ```
