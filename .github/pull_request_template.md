@@ -38,7 +38,7 @@ changes.
 ## Input
 Text describing changes to the input.
 
-## Ouput
+## Output
 Text describing changes to the output.
 -->
 
