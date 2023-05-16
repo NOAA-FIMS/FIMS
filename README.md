@@ -15,7 +15,7 @@ The following software is required:
 
 - R version 4.0.0 or newer (or RStudio version 1.2.5042 or newer)
 - the `remotes` R package
-- `TMB` version 1.8.0 or newer (install instructions at are [here](https://github.com/kaskr/adcomp/wiki/Download).)
+- `TMB` version 1.8.0 or newer (install instructions are [here](https://github.com/kaskr/adcomp/wiki/Download).)
 
 #### Windows Users
 
