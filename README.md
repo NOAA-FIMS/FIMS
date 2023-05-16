@@ -30,13 +30,22 @@ library(FIMS)
 
 #### Fixing Fatal Error
 
-Users can expect to see some derivative of the following error message in their R session if they have not yet set some flags using {withr}.
+Windows users can expect to see some derivative of the following error message in their R session if they have not yet set some flags using {withr}.
 ```
 Fatal error: can't write <xxx> bytes to section .text of FIMS.o: 'file too big
 ```
 You can easily fix this by running
 ```
 withr::local_options(pkg.build_extra_flags = FALSE)
+```
+This fix removes the debugger flag `-O0 -g` from being automatically inserted for certain devtools calls (eg. `devtools::load_all()`). Windows developers wanting to compile FIMS with the debugger turned on will need to run the above script in addition to manually modifying the [Makevars.win](https://github.com/NOAA-FIMS/FIMS/blob/doc-install/src/Makevars.win) file in the src directory to the following:
+
+```
+2 PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS -O1 -g
+```
+To turn of the debugger flag, remove the `-O1 -g` flag:
+```
+2 PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS
 ```
 
 ## Getting Help
