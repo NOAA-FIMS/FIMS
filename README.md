@@ -28,6 +28,17 @@ remotes::install_github("NOAA-FIMS/FIMS")
 library(FIMS)
 ```
 
+#### Fixing Fatal Error
+
+Users can expect to see some derivative of the following error message in their R session if they have not yet set some flags using {withr}.
+```
+Fatal error: can't write <xxx> bytes to section .text of FIMS.o: 'file too big
+```
+You can easily fix this by running
+```
+withr::local_options(pkg.build_extra_flags = FALSE)
+```
+
 ## Getting Help
 Please report bugs along with a minimal reproducible example on github [issues](https://github.com/NOAA-FIMS/FIMS/issues)
 
