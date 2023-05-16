@@ -212,11 +212,11 @@ test_that("deterministic test of fims", {
   }
 
   expect_equal(
-    fims_naa[2:om_input$nyr,1],
-    report$recruitment[2:om_input$nyr]
+    fims_naa[1:om_input$nyr,1],
+    report$recruitment[1:om_input$nyr]
   )
 
-  for (i in 2:length(om_output$N.age[,1])){
+  for (i in 1:length(om_output$N.age[,1])){
     recruitment_are <- abs(report$recruitment[i] - om_output$N.age[i,1])/
       om_output$N.age[i,1]
     expect_lte(recruitment_are, 0.001)
@@ -436,8 +436,8 @@ test_that("estimation test of fims", {
     0.05*length(om_output$SSB)
   )
 
-  expect_equal(fims_naa[(2:om_input$nyr),1],
-               report$recruitment[2:om_input$nyr])
+  expect_equal(fims_naa[(1:om_input$nyr),1],
+               report$recruitment[1:om_input$nyr])
 
   # recruitment deviations
   sdr_rdev <- sdr_report[which(rownames(sdr_report) == "rec_dev"),]

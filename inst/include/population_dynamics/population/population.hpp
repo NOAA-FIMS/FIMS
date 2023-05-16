@@ -375,7 +375,7 @@ struct Population : public FIMSObject<Type> {
     this->numbers_at_age[index_ya] =
         this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
           this->recruitment->recruit_deviations[year];
-    expected_recruitment[year] =  this->numbers_at_age[index_ya];
+    this->expected_recruitment[year] =  this->numbers_at_age[index_ya];
 FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     this->numbers_at_age[index_ya] << std::endl;
  }
@@ -606,6 +606,13 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
           CalculateSpawningBiomass(index_ya, y, a);
 
           CalculateUnfishedSpawningBiomass(index_ya, y, a);
+
+          /* 
+           Expected recruitment in year 0 is numbers at age 0 in year 0.
+           */
+
+          this->expected_recruitment[index_ya] =  this->numbers_at_age[index_ya];
+
         } else {
           if (a == 0) {
             // Set the nrecruits for age a=0 year y (use pointers instead of
