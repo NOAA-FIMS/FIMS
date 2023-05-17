@@ -252,17 +252,21 @@ test_that("deterministic test of fims", {
   }
 
   # Expected catch number at age in proportion
-  # fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 1],
-  #                     nrow = om_input$nyr, byrow = TRUE)
-  # fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
-  # fims_cnaa_proportion <- round(fims_cnaa_proportion, digits = 3)
-  # for (i in 1:length(c(t(em_input$L.age.obs$fleet1)))){
-  #   expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(em_input$L.age.obs$fleet1))[i])/
-  #                c(t(em_input$L.age.obs$fleet1))[i], 0.2)
-  # }
+  fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 1],
+                      nrow = om_input$nyr, byrow = TRUE)
+  fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
+  om_cnaa_proportion <- om_output$L.age$fleet1/rowSums(om_output$L.age$fleet1)
+
+  for (i in 1:length(c(t(om_cnaa_proportion)))){
+    expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(om_cnaa_proportion))[i]), 0.001)
+  }
 
   # Expected survey index
   fims_object <- report$expected_index[,2]
+
+  cwaa <- matrix(report$cwaa[1:(om_input$nyr*om_input$nages),2], nrow = om_input$nyr, byrow = T)
+  expect_equal(fims_object, apply(cwaa, 1, sum))
+
   for (i in 1:length(om_output$survey_index_biomass$survey1)){
     fims_object_are <- abs(fims_object[i] - om_output$survey_index_biomass$survey1[i])/
       om_output$survey_index_biomass$survey1[i]
@@ -276,21 +280,15 @@ test_that("deterministic test of fims", {
   # Expect 95% of relative error to be within 2*cv
   expect_lte(sum(fims_object_are > om_input$cv.survey$survey1*2.0), length(em_input$surveyB.obs$survey1)*0.05)
 
-  # Expected survey number at age
-  # for (i in 1:length(c(t(om_output$survey_age_comp$survey1)))){
-  #   expect_lte(abs(report$cnaa[i,2] - c(t(om_output$survey_age_comp$survey1))[i])/
-  #                c(t(om_output$survey_age_comp$survey1))[i], 0.001)
-  # }
-
   # Expected catch number at age in proportion
-  # fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 2],
-  #                     nrow = om_input$nyr, byrow = TRUE)
-  # fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
-  #
-  # for (i in 1:length(c(t(em_input$survey.age.obs)))){
-  #   expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(em_input$survey.age.obs))[i])/
-  #                c(t(em_input$survey.age.obs))[i], 0.1)
-  # }
+  fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 2],
+                      nrow = om_input$nyr, byrow = TRUE)
+  fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
+  om_cnaa_proportion <- om_output$survey_age_comp$survey1/rowSums(om_output$survey_age_comp$survey1)
+
+  for (i in 1:length(c(t(om_cnaa_proportion)))){
+    expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(om_cnaa_proportion))[i]), 0.001)
+  }
 
   deterministic_env$fims$clear()
   TMB::FreeADFun(obj)
@@ -356,7 +354,7 @@ test_that("nll test of fims", {
   age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
   expected_jnll <- rec_nll + index_nll + age_comp_nll
 
-  expect_equal(jnll, expected_jnll, tolerance = 1)
+  expect_equal(jnll, expected_jnll)
 
   nll_env$fims$clear()
   TMB::FreeADFun(obj)

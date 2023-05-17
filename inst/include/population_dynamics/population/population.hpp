@@ -456,9 +456,8 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
                (1 - fims::exp(-(this->mortality_Z[index_ya])));
         }else{
             catch_ = (this->fleets[fleet_]->q *
-                      this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
-                     this->mortality_Z[index_ya] * this->numbers_at_age[index_ya] *
-                     (1 - fims::exp(-(this->mortality_Z[index_ya])));
+                      this->fleets[fleet_]->selectivity->evaluate(ages[age])) 
+                      * this->numbers_at_age[index_ya];
         }
       FIMS_LOG << " F " << fleet_ << "  " << this->fleets[fleet_]->Fmort[year]
                << std::endl;
@@ -681,6 +680,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     typename ModelTraits<Type>::EigenVector naa =
       this->numbers_at_age;
     typename ModelTraits<Type>::EigenMatrix cnaa(this->nyears*this->nages, this->nfleets);
+    typename ModelTraits<Type>::EigenMatrix cwaa(this->nyears*this->nages, this->nfleets);
     typename ModelTraits<Type>::EigenVector ssb =
       this->spawning_biomass;
     typename ModelTraits<Type>::EigenVector rec_dev =
@@ -694,6 +694,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
       expected_index.col(fleet_) = typename ModelTraits<Type>::EigenVector(fleets[fleet_]->expected_index);
       cnaa.col(fleet_) = typename ModelTraits<Type>::EigenVector(fleets[fleet_]->catch_numbers_at_age);
+      cwaa.col(fleet_) = typename ModelTraits<Type>::EigenVector(fleets[fleet_]->catch_weight_at_age);
     }
 
     REPORT_F(rec_dev, of);
@@ -701,6 +702,7 @@ FIMS_LOG << " numbers at age at indexya " << index_ya << " is " <<
     REPORT_F(naa, of);
     ADREPORT_F(naa, of);
     REPORT_F(cnaa, of);
+    REPORT_F(cwaa, of);
     REPORT_F(ssb, of);
     ADREPORT_F(ssb, of);
     REPORT_F(expected_index, of);
