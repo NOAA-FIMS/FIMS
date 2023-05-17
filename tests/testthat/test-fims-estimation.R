@@ -2,7 +2,7 @@ remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Mode
 
 ## Set-up OM (sigmaR = 0.4)
 working_dir <- getwd()
-message(getwd())
+
 maindir <- tempdir()
 model_input <- ASSAMC::save_initial_input()
 FIMS_C0_estimation <- ASSAMC::save_initial_input(
@@ -19,7 +19,6 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
 unlink(maindir, recursive = T)
-message(getwd())
 
 setwd(working_dir)
 on.exit(setwd(working_dir), add = TRUE)
@@ -265,7 +264,7 @@ test_that("deterministic test of fims", {
   fims_object <- report$expected_index[,2]
 
   cwaa <- matrix(report$cwaa[1:(om_input$nyr*om_input$nages),2], nrow = om_input$nyr, byrow = T)
-  expect_equal(fims_object, apply(cwaa, 1, sum))
+  expect_equal(fims_object, apply(cwaa, 1, sum)*om_output$survey_q$survey1)
 
   for (i in 1:length(om_output$survey_index_biomass$survey1)){
     fims_object_are <- abs(fims_object[i] - om_output$survey_index_biomass$survey1[i])/
@@ -283,6 +282,13 @@ test_that("deterministic test of fims", {
   # Expected catch number at age in proportion
   fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 2],
                       nrow = om_input$nyr, byrow = TRUE)
+
+  for (i in 1:length(c(t(om_output$survey_age_comp$survey1)))){
+    cnaa_are <- abs(report$cnaa[i,2] - c(t(om_output$survey_age_comp$survey1))[i])/
+      c(t(om_output$survey_age_comp$survey1))[i]
+    expect_lte(cnaa_are, 0.001)
+  }
+
   fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
   om_cnaa_proportion <- om_output$survey_age_comp$survey1/rowSums(om_output$survey_age_comp$survey1)
 
@@ -526,5 +532,3 @@ test_that("estimation test of fims", {
   dyn.load(find_dll_path("TMB"))
 
 })
-
-message(getwd())
