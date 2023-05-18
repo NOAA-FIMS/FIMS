@@ -82,6 +82,79 @@ Rcpp::NumericVector get_random_parameters_vector() {
   return p;
 }
 
+
+
+
+
+template<typename Type>
+void clear_internal(){
+    
+    std::shared_ptr<fims::Information<Type>> d0 =
+        fims::Information<Type>::GetInstance();
+    d0->fixed_effects_parameters.clear();
+    d0->random_effects_parameters.clear();
+
+    // rcpp_data.hpp
+  
+    DataInterface::id_g = 1;
+    DataInterface::live_objects.clear();
+    AgeCompDataInterface::id_g = 1;
+    IndexDataInterface::id_g = 1;
+    
+    // rcpp_fleets.hpp
+  //   FleetInterface::id_g = 1;
+
+    // rcpp_growth.hpp
+  //   GrowthInterfaceBase::id_g = 1;
+  //   GrowthInterfaceBase::live_objects.clear();
+
+    EWAAGrowthInterface::id_g = 1;
+    EWAAGrowthInterface::live_objects.clear();
+
+    // rcpp_maturity.hpp
+  //   MaturityInterfaceBase::id_g = 1;
+  //   MaturityInterfaceBase::maturity_objects.clear();
+
+    LogisticMaturityInterface::id_g = 1;
+    LogisticMaturityInterface::maturity_objects.clear();
+
+    // rcpp_population.hpp
+  //   PopulationInterfaceBase::id_g = 1;
+  //   PopulationInterfaceBase::live_objects.clear();
+
+    PopulationInterface::id_g = 1;
+    PopulationInterface::live_objects.clear();
+
+    // rcpp_recruitment.hpp
+  //   RecruitmentInterfaceBase::id_g = 1;
+  //   RecruitmentInterfaceBase::live_objects.clear();
+
+    BevertonHoltRecruitmentInterface::id_g = 1;
+    BevertonHoltRecruitmentInterface::live_objects.clear();
+    
+    // rcpp_selectivity.hpp
+  //   SelectivityInterfaceBase::id_g = 1;
+  //   SelectivityInterfaceBase::selectivity_objects.clear();
+
+    LogisticSelectivityInterface::id_g = 1;
+    LogisticSelectivityInterface::selectivity_objects.clear();
+
+    DoubleLogisticSelectivityInterface::id_g = 1;
+    DoubleLogisticSelectivityInterface::selectivity_objects.clear();
+    
+    // rcpp_tmb_distribution.hpp
+  //   DistributionsInterfaceBase::id_g = 1;
+  //   DistributionsInterfaceBase::live_objects.clear();
+
+    DnormDistributionsInterface::id_g = 1;
+    DnormDistributionsInterface::live_objects.clear();
+
+    DlnormDistributionsInterface::id_g = 1;
+    DlnormDistributionsInterface::live_objects.clear();
+
+    DmultinomDistributionsInterface::id_g = 1;
+    DmultinomDistributionsInterface::live_objects.clear();
+}
 /**
  * Clears the vector of independent variables.
  */
@@ -89,71 +162,11 @@ void clear() {
 
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
+    clear_internal<TMB_FIMS_REAL_TYPE>();
+    clear_internal<TMB_FIMS_FIRST_ORDER>();
+    clear_internal<TMB_FIMS_SECOND_ORDER>();
+    clear_internal<TMB_FIMS_THIRD_ORDER>();
 
-  std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-      fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-  d0->fixed_effects_parameters.clear();
-  d0->random_effects_parameters.clear();
-
-  // rcpp_data.hpp
-  DataInterface::id_g = 1;
-  DataInterface::live_objects.clear();
-  AgeCompDataInterface::id_g = 1;
-  IndexDataInterface::id_g = 1;
-
-  // rcpp_fleets.hpp
-//   FleetInterface::id_g = 1;
-
-  // rcpp_growth.hpp
-//   GrowthInterfaceBase::id_g = 1;
-//   GrowthInterfaceBase::live_objects.clear();
-
-  EWAAGrowthInterface::id_g = 1;
-  EWAAGrowthInterface::live_objects.clear();
-
-  // rcpp_maturity.hpp
-//   MaturityInterfaceBase::id_g = 1;
-//   MaturityInterfaceBase::maturity_objects.clear();
-
-  LogisticMaturityInterface::id_g = 1;
-  LogisticMaturityInterface::maturity_objects.clear();
-
-  // rcpp_population.hpp
-//   PopulationInterfaceBase::id_g = 1;
-//   PopulationInterfaceBase::live_objects.clear();
-
-  PopulationInterface::id_g = 1;
-  PopulationInterface::live_objects.clear();
-
-  // rcpp_recruitment.hpp
-//   RecruitmentInterfaceBase::id_g = 1;
-//   RecruitmentInterfaceBase::live_objects.clear();
-
-  BevertonHoltRecruitmentInterface::id_g = 1;
-  BevertonHoltRecruitmentInterface::live_objects.clear();
-
-  // rcpp_selectivity.hpp
-//   SelectivityInterfaceBase::id_g = 1;
-//   SelectivityInterfaceBase::selectivity_objects.clear();
-
-  LogisticSelectivityInterface::id_g = 1;
-  LogisticSelectivityInterface::selectivity_objects.clear();
-
-  DoubleLogisticSelectivityInterface::id_g = 1;
-  DoubleLogisticSelectivityInterface::selectivity_objects.clear();
-
-  // rcpp_tmb_distribution.hpp
-//   DistributionsInterfaceBase::id_g = 1;
-//   DistributionsInterfaceBase::live_objects.clear();
-
-  DnormDistributionsInterface::id_g = 1;
-  DnormDistributionsInterface::live_objects.clear();
-
-  DlnormDistributionsInterface::id_g = 1;
-  DlnormDistributionsInterface::live_objects.clear();
-
-  DmultinomDistributionsInterface::id_g = 1;
-  DmultinomDistributionsInterface::live_objects.clear();
 }
 
 RCPP_EXPOSED_CLASS(Parameter)
