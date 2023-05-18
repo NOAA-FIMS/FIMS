@@ -22,12 +22,16 @@ class DataInterface : public FIMSRcppInterfaceBase {
   Rcpp::NumericVector observed_data; /*!< The data */
   static uint32_t id_g; /**< static id of the DataInterface object */
   uint32_t id;          /**< local id of the DataInterface object */
+  static std::map<uint32_t, DataInterface*>
+    live_objects; /**< map associating the ids of DataInterface to
+    the objects */
 
   /** @brief constructor
    */
-  DataInterface() { 
+  DataInterface() {
     this->id = DataInterface::id_g++;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this); 
+    DataInterface::live_objects[this->id] = this;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }
 
   /** @brief destructor
@@ -41,7 +45,7 @@ class DataInterface : public FIMSRcppInterfaceBase {
   }
 
 /**@brief add_to_fims_tmb dummy method
- * 
+ *
 */
   virtual bool add_to_fims_tmb(){
     return true;
@@ -49,6 +53,8 @@ class DataInterface : public FIMSRcppInterfaceBase {
 
 };
 uint32_t DataInterface::id_g = 1;
+std::map<uint32_t, DataInterface*>
+  DataInterface::live_objects;
 
 
 

@@ -87,7 +87,7 @@ Rcpp::NumericVector get_random_parameters_vector() {
  */
 void clear() {
 
-  // rcpp_interface_base.hpp  
+  // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
   std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
@@ -96,10 +96,11 @@ void clear() {
   d0->random_effects_parameters.clear();
 
   // rcpp_data.hpp
-//   DataInterface::id_g = 1;
+  DataInterface::id_g = 1;
+  DataInterface::live_objects.clear();
   AgeCompDataInterface::id_g = 1;
   IndexDataInterface::id_g = 1;
-  
+
   // rcpp_fleets.hpp
 //   FleetInterface::id_g = 1;
 
@@ -130,7 +131,7 @@ void clear() {
 
   BevertonHoltRecruitmentInterface::id_g = 1;
   BevertonHoltRecruitmentInterface::live_objects.clear();
-  
+
   // rcpp_selectivity.hpp
 //   SelectivityInterfaceBase::id_g = 1;
 //   SelectivityInterfaceBase::selectivity_objects.clear();
@@ -140,7 +141,7 @@ void clear() {
 
   DoubleLogisticSelectivityInterface::id_g = 1;
   DoubleLogisticSelectivityInterface::selectivity_objects.clear();
-  
+
   // rcpp_tmb_distribution.hpp
 //   DistributionsInterfaceBase::id_g = 1;
 //   DistributionsInterfaceBase::live_objects.clear();
