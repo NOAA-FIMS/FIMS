@@ -1,5 +1,5 @@
-if (TRUE) skip("A standalone script to debug dll loading issue. Not include in
-                devtools::test() run")
+#if (TRUE) skip("A standalone script to debug dll loading issue. Not include in
+ #               devtools::test() run")
 
 
 library(FIMS)
@@ -212,8 +212,8 @@ obj <- TMB::MakeADFun(data=list(), parameters, DLL="FIMS")
 nll_env$fims$clear()
 TMB::FreeADFun(obj)
 
-dyn.unload(find_dll_path("FIMS"))
-dyn.unload(find_dll_path("TMB"))
+#dyn.unload(find_dll_path("FIMS"))
+#dyn.unload(find_dll_path("TMB"))
 
 
 
