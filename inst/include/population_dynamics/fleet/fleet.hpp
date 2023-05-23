@@ -152,72 +152,72 @@ struct Fleet : public FIMSObject<Type> {
 }
 
 
-  virtual const Type evaluate_age_comp_ll() {
-    Type nll = 0.0; /*!< The negative log likelihood value */
-    #ifdef TMB_MODEL
-      fims::Dmultinom<Type> dmultinom;
-      size_t dims = 360;
-      //size_t dims = this->observed_agecomp_data->get_imax() *
-      //  this->observed_agecomp_data->get_jmax();
-      if (dims != this->catch_numbers_at_age.size()) {
-        FIMS_LOG << "Error: observed age comp is of size " << dims
-                 << " and expected is of size " << this->age_composition.size()
-                 << std::endl;
-      } else {
-        for (size_t y = 0; y < this->nyears; y++) {
-          using Vector = typename ModelTraits<Type>::EigenVector;
-          Vector observed_acomp;
-          Vector expected_acomp;
+    virtual const Type evaluate_age_comp_ll() {
+      Type nll = 0.0; /*!< The negative log likelihood value */
+      #ifdef TMB_MODEL
+        fims::Dmultinom<Type> dmultinom;
+        size_t dims = 360;
+        //size_t dims = this->observed_agecomp_data->get_imax() *
+        //  this->observed_agecomp_data->get_jmax();
+        if (dims != this->catch_numbers_at_age.size()) {
+          fims_log::get("fleet.log") << "Error: observed age comp is of size " << dims
+                   << " and expected is of size " << this->age_composition.size()
+                   << std::endl;
+        } else {
+          for (size_t y = 0; y < this->nyears; y++) {
+            using Vector = typename ModelTraits<Type>::EigenVector;
+            Vector observed_acomp;
+            Vector expected_acomp;
 
-          observed_acomp.resize(this->nages);
-          expected_acomp.resize(this->nages);
-          Type sum = 0.0;
-          for (size_t a = 0; a < this->nages; a++) {
-            size_t index_ya = y * this->nages + a;
-            sum += this->catch_numbers_at_age[index_ya];
+            observed_acomp.resize(this->nages);
+            expected_acomp.resize(this->nages);
+            Type sum = 0.0;
+            for (size_t a = 0; a < this->nages; a++) {
+              size_t index_ya = y * this->nages + a;
+              sum += this->catch_numbers_at_age[index_ya];
+            }
+
+            for (size_t a = 0; a < this->nages; a++) {
+              size_t index_ya = y * this->nages + a;
+              expected_acomp[a] = this->catch_numbers_at_age[index_ya] /
+                sum;  // probabilities for ages
+
+              observed_acomp[a] = this->observed_agecomp_data->at(y, a);
+                fims_log::get("fleet.log")<< " age " << a << " in year " << y << "has expected: "  <<
+              expected_acomp[a] << "  and observed: " << observed_acomp[a] << std::endl;
+            }
+            dmultinom.x = observed_acomp;
+            dmultinom.p = expected_acomp;
+            nll -= dmultinom.evaluate(true);
           }
-
-          for (size_t a = 0; a < this->nages; a++) {
-            size_t index_ya = y * this->nages + a;
-            expected_acomp[a] = this->catch_numbers_at_age[index_ya] /
-              sum;  // probabilities for ages
-
-            observed_acomp[a] = this->observed_agecomp_data->at(y, a);
-            FIMS_LOG << " age " << a << " in year " << y << "has expected: "  <<
-            expected_acomp[a] << "  and observed: " << observed_acomp[a] << std::endl;
-          }
-          dmultinom.x = observed_acomp;
-          dmultinom.p = expected_acomp;
-          nll -= dmultinom.evaluate(true);
         }
-      }
-      //typename ModelTraits<Type>::EigenVector acomp_nll;
-      //acomp_nll[0] = nll;
-      //REPORT_F(acomp_nll, of);
-      FIMS_LOG << " agecomp nll: " << nll << std::endl;
-    #endif
-    return nll;
-  }
-
-  virtual const Type evaluate_index_ll() {
-    Type nll = 0.0; /*!< The negative log likelihood value */
-
-    #ifdef TMB_MODEL
-    fims::Dnorm<Type> dnorm;
-    dnorm.sd = fims::exp(this->log_obs_error);
-    for (size_t i = 0; i < this->expected_index.size(); i++) {
-      dnorm.x = fims::log(this->observed_index_data->at(i));
-      dnorm.mean = fims::log(this->expected_index[i]);
-      nll -= dnorm.evaluate(true);
-      FIMS_LOG << "observed likelihood component: " << i << " is " << this->observed_index_data->at(i) <<
-      " and expected is: " << this->expected_index[i] << std::endl;
+        //typename ModelTraits<Type>::EigenVector acomp_nll;
+        //acomp_nll[0] = nll;
+        //REPORT_F(acomp_nll, of);
+        fims_log::get("fleet.log") << " agecomp nll: " << nll << std::endl;
+      #endif
+      return nll;
     }
-    FIMS_LOG << " log obs error is: " << this->log_obs_error << std::endl;
-    FIMS_LOG << " sd is: " << dnorm.sd << std::endl;
-    FIMS_LOG << " index nll: " << nll << std::endl;
-    #endif
-    return nll;
-  }
+
+    virtual const Type evaluate_index_ll() {
+      Type nll = 0.0; /*!< The negative log likelihood value */
+
+      #ifdef TMB_MODEL
+      fims::Dnorm<Type> dnorm;
+      dnorm.sd = fims::exp(this->log_obs_error);
+      for (size_t i = 0; i < this->expected_index.size(); i++) {
+        dnorm.x = fims::log(this->observed_index_data->at(i));
+        dnorm.mean = fims::log(this->expected_index[i]);
+        nll -= dnorm.evaluate(true);
+          fims_log::get("fleet.log") << "observed likelihood component: " << i << " is " << this->observed_index_data->at(i) <<
+        " and expected is: " << this->expected_index[i] << std::endl;
+      }
+        fims_log::get("fleet.log") << " log obs error is: " << this->log_obs_error << std::endl;
+        fims_log::get("fleet.log")<< " sd is: " << dnorm.sd << std::endl;
+        fims_log::get("fleet.log") << " index nll: " << nll << std::endl;
+      #endif
+      return nll;
+    }
 
 };
 
