@@ -21,7 +21,7 @@
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
 #include "rcpp_objects/rcpp_tmb_distribution.hpp"
-
+#include "../../common/model.hpp"
 /**
  * @brief Create the TMB model object and add interface objects to it.
  */
@@ -154,6 +154,26 @@ void clear_internal(){
 
     DmultinomDistributionsInterface::id_g = 1;
     DmultinomDistributionsInterface::live_objects.clear();
+    
+    
+    std::shared_ptr<fims::Information<Type>> info =
+        fims::Information<Type>::GetInstance();
+    info->data_objects.clear();
+    info->recruitment_models.clear();
+    info->selectivity_models.clear();
+    info->growth_models.clear();
+    info->maturity_models.clear();
+    info->fleets.clear();
+    info->populations.clear();
+    info->distribution_models.clear();
+    info->parameters.clear();
+    info->random_effects_parameters.clear();
+    info->fixed_effects_parameters.clear();
+    
+//    std::shared_ptr<fims::Model<Type> > model =
+//       fims::Model<Type>::GetInstance();
+//    model->fims_information = nullptr;
+    
 }
 /**
  * Clears the vector of independent variables.
