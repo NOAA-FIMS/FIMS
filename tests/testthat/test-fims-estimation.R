@@ -150,9 +150,7 @@ setup_fims <- function(om_input, om_output, em_input){
 }
 
 test_that("deterministic test of fims", {
-  dyn.load(find_dll_path("FIMS"))
-  dyn.load(find_dll_path("TMB"))
-
+  
   deterministic_env <- setup_fims(om_input = om_input,
                          om_output = om_output,
                          em_input = em_input)
@@ -297,15 +295,10 @@ test_that("deterministic test of fims", {
   }
 
   deterministic_env$fims$clear()
-  TMB::FreeADFun(obj)
-  dyn.unload(find_dll_path("FIMS"))
-  dyn.unload(find_dll_path("TMB"))
 
 })
 
 test_that("nll test of fims", {
-  dyn.load(find_dll_path("FIMS"))
-  dyn.load(find_dll_path("TMB"))
 
   nll_env <- setup_fims(om_input = om_input,
                          om_output = om_output,
@@ -363,14 +356,11 @@ test_that("nll test of fims", {
   expect_equal(jnll, expected_jnll)
 
   nll_env$fims$clear()
-  TMB::FreeADFun(obj)
-  dyn.unload(find_dll_path("FIMS"))
-  dyn.unload(find_dll_path("TMB"))
+  
 })
 
 test_that("estimation test of fims", {
-  dyn.load(find_dll_path("FIMS"))
-  dyn.load(find_dll_path("TMB"))
+  
   estimation_env <- setup_fims(om_input = om_input,
                          om_output = om_output,
                          em_input = em_input)
@@ -524,11 +514,5 @@ test_that("estimation test of fims", {
 
 
   estimation_env$fims$clear()
-  TMB::FreeADFun(obj)
-  dyn.unload(find_dll_path("FIMS"))
-  dyn.unload(find_dll_path("TMB"))
-
-  dyn.load(find_dll_path("FIMS"))
-  dyn.load(find_dll_path("TMB"))
-
+  
 })
