@@ -15,7 +15,6 @@
 #include <vector>
 #include <map>
 
-std::map<std::string, std::ofstream> FIMS_LOGS;
 std::ofstream FIMS_LOG("fims.log"); /**< Log file */
 
 #ifdef TMB_MODEL
