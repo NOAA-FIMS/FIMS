@@ -13,6 +13,7 @@
 #include <fstream>
 #include <memory>
 #include <vector>
+#include <map>
 
 std::ofstream FIMS_LOG("fims.log"); /**< Log file */
 
@@ -25,6 +26,34 @@ std::ofstream FIMS_LOG("fims.log"); /**< Log file */
 #endif
 
 namespace fims {
+
+
+/**
+ * A static class for FIMS logging.
+ */
+
+class fims_log{
+public:
+
+    static std::map<std::string, std::ofstream> FIMS_LOGS;/**< Log Map of files */
+    /**
+     * Static getter for retrieving a specific log file.
+     */
+    static std::ofstream& get(const std::string& l){
+        typename std::map<std::string, std::ofstream>::iterator it;
+        it = fims_log::FIMS_LOGS.find(l);
+        if(it == fims_log::FIMS_LOGS.end()){
+            std::ofstream& of = fims_log::FIMS_LOGS[l];
+            of.open(l.c_str());
+        }
+        
+        return fims_log::FIMS_LOGS[l];
+    }
+    
+    
+};
+
+std::map<std::string, std::ofstream> fims_log::FIMS_LOGS;
 
 #ifdef STD_LIB
 
