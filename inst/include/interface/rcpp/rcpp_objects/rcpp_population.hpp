@@ -75,13 +75,6 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @param maturity_id Unique id for the Maturity object
    */
   void SetMaturity(uint32_t maturity_id) {
-    // Check if maturity has been set already
-    if (this->maturity_id != -999) {
-      warning("maturity has been set already.");
-      Rcout << "Now you are resetting maturity with maturity ID of "
-            << maturity_id << std::endl;
-    }
-
     this->maturity_id = maturity_id;
   }
 
@@ -92,13 +85,6 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @param growth_id Unique id for the growth object
    */
   void SetGrowth(uint32_t growth_id) {
-    // Check if growth has been set already
-    if (this->growth_id != -999) {
-      warning("growth has been set already.");
-      Rcout << "Now you are resetting growth with growth ID of "
-            << growth_id << std::endl;
-    }
-
     this->growth_id = growth_id;
   }
 
@@ -109,13 +95,6 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @param recruitment_id Unique id for the Maturity object
    */
   void SetRecruitment(uint32_t recruitment_id) {
-    // Check if recruitment has been set already
-    if (this->recruitment_id != -999) {
-      warning("recruitment has been set already.");
-      Rcout << "Now you are resetting recruitment with recruitment ID of "
-            << recruitment_id << std::endl;
-    }
-
     this->recruitment_id = recruitment_id;
   }
 

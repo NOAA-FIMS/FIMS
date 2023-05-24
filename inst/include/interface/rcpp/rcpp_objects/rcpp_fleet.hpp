@@ -56,13 +56,6 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    * @param agecomp_likelihood_id Unique id for the Age Comp Likelihood object
    */
   void SetAgeCompLikelihood(int agecomp_likelihood_id) {
-    // Check if agecom likelihood has been set already
-    if (this->agecomp_likelihood_id != -999) {
-      warning("Age composition likelihood has been set already.");
-      Rcout << "Now you are resetting age composition likelihood with age "
-               "composition likelihood ID of "
-            << agecomp_likelihood_id << std::endl;
-    }
     this->agecomp_likelihood_id = agecomp_likelihood_id;
   }
 
@@ -72,13 +65,6 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    * @param index_likelihood_id Unique id for the Index Likelihood object
    */
   void SetIndexLikelihood(int index_likelihood_id) {
-    // Check if index likelihood has been set already
-    if (this->index_likelihood_id != -999) {
-      warning("Index likelihood has been set already.");
-      Rcout << "Now you are resetting index likelihood with index likelihood "
-               "ID of "
-            << index_likelihood_id << std::endl;
-    }
 
     this->index_likelihood_id = index_likelihood_id;
   }
@@ -90,13 +76,6 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    * object
    */
   void SetObservedAgeCompData(int observed_agecomp_data_id) {
-    // Check if observed age composition data have been set already
-    if (this->observed_agecomp_data_id != -999) {
-      warning("Observed age composition data have been set already.");
-      Rcout << "Now you are resetting observed age composition data with "
-               "observed age composition ID of "
-            << observed_agecomp_data_id << std::endl;
-    }
     this->observed_agecomp_data_id = observed_agecomp_data_id;
   }
 
@@ -106,13 +85,6 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    * @param observed_index_data_id Unique id for the Observed Index Data object
    */
   void SetObservedIndexData(int observed_index_data_id) {
-    // Check if observed index data have been set already
-    if (this->observed_index_data_id != -999) {
-      warning("Observed index data have been set already.");
-      Rcout << "Now you are resetting observed index data with observed index "
-               "data ID of "
-            << observed_index_data_id << std::endl;
-    }
     this->observed_index_data_id = observed_index_data_id;
   }
 
@@ -122,13 +94,6 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    * @param selectivity_id Unique id for the Selectivity object
    */
   void SetSelectivity(int selectivity_id) {
-    // Check if selectivity has been set already
-    if (this->selectivity_id != -999) {
-      warning("Selectivity has been set already.");
-      Rcout << "Now you are resetting selectivity with selectivity ID of "
-            << selectivity_id << std::endl;
-    }
-
     this->selectivity_id = selectivity_id;
   }
 
