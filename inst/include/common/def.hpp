@@ -29,12 +29,17 @@ std::ofstream FIMS_LOG("fims.log"); /**< Log file */
 namespace fims {
 
 
+/**
+ * A static class for FIMS logging.
+ */
 
 class fims_log{
 public:
-    
+    //Map of logs.
     static std::map<std::string, std::ofstream> FIMS_LOGS;
-    
+    /**
+     * Static getter for retrieving a specific log file.
+     */
     static std::ofstream& get(const std::string& l){
         typename std::map<std::string, std::ofstream>::iterator it;
         it = fims_log::FIMS_LOGS.find(l);
