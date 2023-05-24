@@ -23,7 +23,6 @@
 #include "../maturity/maturity.hpp"
 
 namespace fims {
-std::ofstream out("debug.txt");
 /*TODO:
 Review, add functions to evaluate, push vectors back to fleet (or point to fleet
 directly?)
