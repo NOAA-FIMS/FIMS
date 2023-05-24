@@ -15,13 +15,33 @@ The following software is required:
 
 - R version 4.0.0 or newer (or RStudio version 1.2.5042 or newer)
 - the `remotes` R package
-- `TMB` version 1.8.0 or newer (install instructions at are [here](https://github.com/kaskr/adcomp/wiki/Download).)
+- `TMB` version 1.8.0 or newer (install instructions are [here](https://github.com/kaskr/adcomp/wiki/Download).)
 
-#### Windows Users
+### Windows Users
 
 - Rtools4 (available from [here](https://cran.r-project.org/bin/windows/Rtools/rtools40.html))
 
-#### Installing from R
+#### Fixing Fatal Error
+
+Windows users can expect to see some derivative of the following error message in their R session if they have not yet set some flags using {withr}.
+```
+Fatal error: can't write <xxx> bytes to section .text of FIMS.o: 'file too big
+```
+You can easily fix this by running the following line in your local R session. Note that this call will need to be repeated each time you open a new session.
+```
+withr::local_options(pkg.build_extra_flags = FALSE)
+```
+This fix removes the debugger flag `-O0 -g` from being automatically inserted for certain devtools calls (e.g. `devtools::load_all()`). Windows developers wanting to compile FIMS with the debugger turned on will need to run the above script in addition to manually modifying the call to PKG_CXXFLAGS in the [Makevars.win](https://github.com/NOAA-FIMS/FIMS/blob/doc-install/src/Makevars.win) file in the src directory to the following:
+
+```
+PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS -O1 -g
+```
+To turn off the debugger flag, remove the `-O1 -g` flag:
+```
+PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS
+```
+
+### Installing from R
 
 ```
 remotes::install_github("NOAA-FIMS/FIMS")
