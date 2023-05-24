@@ -34,8 +34,8 @@ namespace fims {
 
 class fims_log{
 public:
-    //Map of logs.
-    static std::map<std::string, std::ofstream> FIMS_LOGS;
+
+    static std::map<std::string, std::ofstream> FIMS_LOGS;/**< Log Map of files */
     /**
      * Static getter for retrieving a specific log file.
      */
