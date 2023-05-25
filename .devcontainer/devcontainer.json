@@ -10,7 +10,7 @@
 		// if we want to install r packages using pak
 		// more info: https://github.com/rocker-org/devcontainer-features/blob/main/src/r-packages/README.md
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "make,gcc,g++,cmake,clang-tidy,clang-format,clang,doxygen,ninja-build"			
+			"packages": "make,gcc,g++,cmake,clang-tidy,clang-format,clang,doxygen,ninja-build,libxtst6,libxt6"			
 		},
 		 "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
 			"packages": "Matrix,cli,rlang,RcppEigen,TMB,ggplot2,dplyr,scales,covr",
