@@ -17,9 +17,10 @@ This vignette describes the hierarchical structure of FIMS by describing the lin
 
 ## Setting up a module in R and linking to the Rcpp interface
 
-We'll start from R. The first step is to retrieve the FIMS module, create a new maturity module inside FIMS, and populate the maturity module with parameter values. 
+We'll start from R. The first step is to install FIMS, retrieve the FIMS module, create a new maturity module inside FIMS, and populate the maturity module with parameter values. 
 
 ```{r, eval = FALSE}
+remotes::install_github("NOAA-FIMS/FIMS")
 library(FIMS)
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 fims$maturity <- new(fims$LogisticMaturity)
@@ -32,7 +33,7 @@ fims$maturity$slope$estimated <- FALSE
 ```
 
 
-All modules from FIMS inherit from the Parameter class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects)
+All modules from FIMS contain member fields corresponding to their parameters that inherit from the Parameter class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects)
 
 ```{Rcpp, eval = FALSE}
 class Parameter {
@@ -63,6 +64,8 @@ The fields from the Parameter class that are accessible from R are defined in th
       .field("is_random_effect", &Parameter::is_random_effect)
       .field("estimated", &Parameter::estimated);
 ```
+
+You can access these from R using the `show(fims)` function.
 
 The fields specific to the maturity module that are accessible from R are defined in the 
 [rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file under [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
