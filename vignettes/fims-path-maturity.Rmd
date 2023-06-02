@@ -23,22 +23,22 @@ We'll start from R. The first step is to install FIMS, retrieve the FIMS module,
 remotes::install_github("NOAA-FIMS/FIMS")
 library(FIMS)
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
-fims$maturity <- new(fims$LogisticMaturity)
-fims$maturity$median$value <- 10
-fims$maturity$median$is_random_effect <- FALSE
-fims$maturity$median$estimated <- FALSE
-fims$maturity$slope$value <- 0.2
-fims$maturity$slope$is_random_effect <- FALSE
-fims$maturity$slope$estimated <- FALSE
+maturity <- new(fims$LogisticMaturity)
+maturity$median$value <- 10
+maturity$median$is_random_effect <- FALSE
+maturity$median$estimated <- FALSE
+maturity$slope$value <- 0.2
+maturity$slope$is_random_effect <- FALSE
+maturity$slope$estimated <- FALSE
 ```
 
 After that, we need to set up a population and link the maturity module to the population:
 ```{r, eval = FALSE}
-fims$population <- new(fims$Population)
+population <- new(fims$Population)
 #set up population specific parameters
 #...
-#set maturity for the population
-fims$population$SetMaturity(fims$maturity$get_id())
+#set maturity for the population - will throw error until PR #363 is merged into main
+population$SetMaturity(maturity$get_id())
 ```
 
 All modules from FIMS contain member fields corresponding to their parameters that inherit from the Parameter class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects)
@@ -420,7 +420,9 @@ maturity_models[[2]] <- list(id = 5, poitner = "Some Other Maturity")
 
 for(it in 1:3){
   p <- populations[[it]][2]
-  maturity_uint <- p.maturity_id
+  # comparable to C++: uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
+  maturity_uint <- p$pointer$maturity_id[it]
+  # comparable to C++: maturity_models_iterator it = this->maturity_models.find(maturity_uint)
   newit <- which(sapply(maturity_models, function(x) x$id) == maturity_uint)
   p.maturity <- maturity_models[[newit]][[2]]
 }
