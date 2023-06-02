@@ -399,33 +399,118 @@ Here, (*it) is referring to the maturity_models pointer.
 knitr::include_graphics("figures/fims-path-maturity-8.png")
 ```
 
-If we think about writing something similar in R using lists for three populations and two maturity functions, it would look like:
-```{r, eval = FALSE}
-# Example case: 
-# 3 populations where the first two have a mirrored logistic maturity function 
-# and the third has a different maturity function
-pop.class <- list(
-  pop_id = 1:3,
-  maturity_id = c(4,4,5)
+
+## Conceptualizing this path with R
+
+Let's think about writing something similar in R using lists for three populations and two maturity functions. Each R code section corresponds with C++ code taken from FIMS. These FIMS sections will be commented out to help distinguish between the two code sets. The idea is to link what is happening in FIMS to a language we're all a bit more familiar with.
+
+Example Case:
+Let's set up 3 populations where the first two have a mirrored logistic maturity function and the third has a different maturity function. This third function could be a different function all together or a logistic function with a different parameter set. For this example, we'll use a logistic function with a different parameter set.
+
+```{r}
+# For the population module, there are additional parameters
+# we are going to ignore here
+population_modules <- list(
+  "Pop 1" = list(id = 1,
+                 maturity = "MaturityBase"),
+  "Pop 2" = list(id = 2,
+                 maturity = "MaturityBase"),
+  "Pop 3" = list(id = 3,
+                 maturity = "MaturityBase")) 
+maturity_modules <- list(
+  "Logistic Maturity" = list(id = 1, median = 10, slope = 0.2), 
+  "Some Other Maturity" = list(id = 2, median = 8, slope = 0.3)
 )
-
-populations <- list()
-populations[[1]] <- list(id = 1, pointer = pop.class)
-populations[[2]] <- list(id = 2, pointer = pop.class)
-populations[[3]] <- list(id = 3, pointer = pop.class)
-
-maturity_models <- list()
-maturity_models[[1]] <- list(id = 4, poitner = "Logistic Maturity")
-maturity_models[[2]] <- list(id = 5, poitner = "Some Other Maturity")
-
-for(it in 1:3){
-  p <- populations[[it]][2]
-  # comparable to C++: uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
-  maturity_uint <- p$pointer$maturity_id[it]
-  # comparable to C++: maturity_models_iterator it = this->maturity_models.find(maturity_uint)
-  newit <- which(sapply(maturity_models, function(x) x$id) == maturity_uint)
-  p.maturity <- maturity_models[[newit]][[2]]
-}
 ```
 
+We can think of population_modules and maturity_modules above as initiated C++ classes stored in our computer's memory. This R code chunk above is comparable to the following from FIMS, which sets up modules in R:
 
+```{r, eval = FALSE}
+# fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
+# maturity1 <- new(fims$LogisticMaturity)
+# maturity1$median$value <- 10
+# maturity1$slope$value <- 0.2
+# maturity2 <- new(fims$LogisticMaturity)
+# maturity2$median$value <- 8
+# maturity2$slope$value <- 0.3
+# population1 <- new(fims$Population)
+# population2 <- new(fims$Population)
+# population3 <- new(fims$Population)
+```
+
+Next we assign which maturity will be used with each population using IDs
+```{r}
+population_modules[[1]]$maturity_id <- maturity_modules[[1]]$id
+population_modules[[2]]$maturity_id <- maturity_modules[[1]]$id
+population_modules[[3]]$maturity_id <- maturity_modules[[2]]$id
+```
+
+This R code chunk above is comparable to the following from FIMS, which sets IDs in R:
+```{r, eval = FALSE}
+# population1$SetMaturity(maturity1$get_id())
+# population2$SetMaturity(maturity1$get_id())
+# population3$SetMaturity(maturity2$get_id())
+```
+
+Now let's review what is happening in Information. We'll start by setting up an empty list in R. 
+```{r}
+information <- list(
+  populations = list(id = NULL, pointer = "Population"),
+  maturity = list(id = NULL, pointer = "MaturityBase")
+)
+```
+In FIMS, the Information class has the objects, population and maturity, which are C++ maps. The first element of the map is the ID, the second element of the map is the pointer to the Population or Maturity class:
+
+```{r, eval = FALSE} 
+# std::map<uint32_t, std::shared_ptr<fims::MaturityBase<T> > > maturity_models;
+# std::map<uint32_t, std::shared_ptr<fims::Population<T> > > populations;
+```
+  
+We can then link up the pointers in information to each respective module:
+
+```{r}          
+information$populations[[1]] <- list(id = 1, pointer = population_modules[[1]])
+information$populations[[2]] <- list(id = 2, pointer = population_modules[[2]])
+information$populations[[3]] <- list(id = 3, pointer = population_modules[[3]])
+
+information$maturity[[1]] <- list(id = 1, pointer = maturity_modules[[1]])
+information$maturity[[2]] <- list(id = 2, pointer = maturity_modules[[2]])
+```
+
+In FIMS, these definitions happen by passing information from the rcpp interface into FIMS Information. 
+```{r, eval = FALSE}
+## d0 is the pointer to information
+## lm0 is the pointer to a specific maturity module (e.g. lm0 = maturity_modules[[1]])
+# d0->maturity_models[lm0->id] = lm0;
+```
+
+We can then loop through each population module defined in information and set the maturity we're getting from the user specified in the Rcpp interface back out to the Population class used to run all the calculations in the model. After each line of code in the following chunk, corresponding C++ code from FIMS is directly below and commented out.
+
+```{r}
+for(it in 1:length(population_modules)){
+  # for (population_iterator it = this->populations.begin();
+  #            it != this->populations.end(); ++it) {
+  
+  p <- information$populations[[it]][2]
+  #std::shared_ptr<fims::Population<T> > p = (*it).second;
+  
+  maturity_uint <- p$pointer$maturity_id
+  #uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
+  
+  newit <- which(sapply(information$maturity, function(x) x$id) == maturity_uint)
+  #maturity_models_iterator it = this->maturity_models.find(maturity_uint)
+  
+  p$pointer$maturity #MaturityBase
+  p$pointer$maturity <- information$maturity[[newit]][[2]]
+  p$pointer$maturity #LogisticMaturity1
+  #p->maturity = (*it).second;
+  
+  population_modules[[it]][2]$maturity <- p$pointer$maturity
+}
+
+sapply(population_modules, function(x) x[2]$maturity)
+```
+
+In R, the above code sets up an intermediate value, p. Once we update the maturity from p to equal the correct maturity module, `p$pointer$maturity <- information$maturity[[newit]][[2]]`, the above code passes this back to population_modules, `population_modules[[it]][2]$maturity <- p$pointer$maturity`. In this context, `population_modules` is the population class held in memory that is being used to run calculations.
+
+The deeper level of abstraction happening in C++ is that in FIMS, _p is the population module_ stored in memory. An equivalent line of code to `population_modules[[it]][2]$maturity <- p$pointer$maturity` isn't needed in FIMS because when we update p, we are also updating the population class held in memory that is being used to run calculations.
