@@ -2,7 +2,7 @@
 title: "FIMS Path: Maturity"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{FIMS path: maturity}
+  %\VignetteIndexEntry{FIMS path: Maturity}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
