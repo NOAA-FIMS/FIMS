@@ -2,7 +2,7 @@
 title: "FIMS Path: Maturity"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{FIMS path: Maturity}
+  %\VignetteIndexEntry{FIMS Path: Maturity}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -396,7 +396,7 @@ In this code chunk, `(*it)` refers to a single population in the populations map
 
 Within this population loop, we then link the maturity pointer in population to equal the maturity pointer in information, passing on the information that we want to use the **LogisticMaturity** class
 
-```{r, eval = FALSE}  
+```{Rcpp, eval = FALSE}  
   // set maturity
   if (p->maturity_id != -999) {
     uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
