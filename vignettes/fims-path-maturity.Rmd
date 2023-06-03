@@ -41,7 +41,47 @@ population <- new(fims$Population)
 population$SetMaturity(maturity$get_id())
 ```
 
-All modules from FIMS contain member fields corresponding to their parameters that inherit from the Parameter class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects)
+The fields specific to the maturity module that are accessible from R are defined in the 
+[rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file under [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
+
+```{Rcpp, eval = FALSE}
+Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
+      .constructor()
+      .field("median", &LogisticMaturityInterface::median)
+      .field("slope", &LogisticMaturityInterface::slope)
+      .method("get_id", &LogisticMaturityInterface::get_id)
+      .method("evaluate", &LogisticMaturityInterface::evaluate);
+```
+
+You can access these from R using the `show(fims)` function.
+
+Shown above, the maturity module has a get_id method (i.e. function) that returns a unique ID for this specific module.
+
+The maturity module is called from R using the name in quotes from the Rcpp::class function, **LogisticMaturity** and references the maturity rcpp object, **LogisticMaturityInterface** defined in [rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects).
+
+This rcpp_maturity.hpp file consists of a **MaturityInterfaceBase** class and a **LogisticMaturityInterface** class, with the former being the **parent class** and the latter being the **child class**. We typically will reference the child class from R in order to specify the formulation of maturity we wish to use in a specific model run of FIMS. In this particular example, we are using the logistic form of maturity. 
+
+```{Rcpp, eval = FALSE}
+class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
+ public:
+  static uint32_t id_g; /**< static id of the recruitment interface base*/
+  uint32_t id;          /**< id of the recruitment interface base */
+  ...
+}
+
+class LogisticMaturityInterface : public MaturityInterfaceBase {
+ public:
+  Parameter median; /**< the index value at which the response reaches .5 */
+  Parameter slope;  /**< the width of the curve at the median */
+  ...
+}
+```
+
+```{r image-path-maturity-1, echo = FALSE, message=FALSE, out.width = '85%'}
+knitr::include_graphics("figures/fims-path-maturity-1.png")
+```
+
+All Rcpp interface classes from FIMS define parameters (e.g. median, slope) using the Parameter class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects)
 
 ```{Rcpp, eval = FALSE}
 class Parameter {
@@ -73,30 +113,7 @@ The fields from the Parameter class that are accessible from R are defined in th
       .field("estimated", &Parameter::estimated);
 ```
 
-You can access these from R using the `show(fims)` function.
-
-The fields specific to the maturity module that are accessible from R are defined in the 
-[rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file under [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
-
-```{Rcpp, eval = FALSE}
-Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
-      .constructor()
-      .field("median", &LogisticMaturityInterface::median)
-      .field("slope", &LogisticMaturityInterface::slope)
-      .method("get_id", &LogisticMaturityInterface::get_id)
-      .method("evaluate", &LogisticMaturityInterface::evaluate);
-```
-
-The hereditary structure between the maturity module and the Parameter class means that each field (i.e. parameter) from maturity will inherit the five fields defined in the Parameter class: **value**, **min**, **max**, **is_random_effect**, **estimated**. The maturity module also has a get_id method (i.e. function) that returns a unique ID for this specific module.
-
-The maturity module is called from R using the name in quotes from the Rcpp::class function, **LogisticMaturity** and references the maturity rcpp object, **LogisticMaturityInterface** defined in [rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects).
-
-```{r image-path-maturity-1, echo = FALSE, message=FALSE, out.width = '85%'}
-knitr::include_graphics("figures/fims-path-maturity-1.png")
-```
-
-This rcpp_maturity.hpp file consists of a **MaturityInterfaceBase** class and a **LogisticMaturityInterface** class, with the former being the **parent class** and the latter being the **child class**. We typically will reference the child class from R in order to specify the formulation of maturity we wish to use in a specific model run of FIMS. In this particular example, we are using the logistic form of maturity. 
-
+Each field (i.e. parameter) from maturity will therefore inherit the five fields defined in the Parameter class: **value**, **min**, **max**, **is_random_effect**, **estimated**. 
 
 ## Linking the Rcpp interface to the fims namespace.
 
@@ -514,3 +531,12 @@ sapply(population_modules, function(x) x[2]$maturity)
 In R, the above code sets up an intermediate value, p. Once we update the maturity from p to equal the correct maturity module, `p$pointer$maturity <- information$maturity[[newit]][[2]]`, the above code passes this back to population_modules, `population_modules[[it]][2]$maturity <- p$pointer$maturity`. In this context, `population_modules` is the population class held in memory that is being used to run calculations.
 
 The deeper level of abstraction happening in C++ is that in FIMS, _p is the population module_ stored in memory. An equivalent line of code to `population_modules[[it]][2]$maturity <- p$pointer$maturity` isn't needed in FIMS because when we update p, we are also updating the population class held in memory that is being used to run calculations.
+
+## Clearing FIMS
+
+Because FIMS sets up objects stored in memory, simply running `rm(fims)`, won't free this memory back up. There is a function that can be run to clear out memory:
+```{r, eval = FALSE}
+fims$clear()
+```
+Also restarting or closing out your R session will free up memory.
+
