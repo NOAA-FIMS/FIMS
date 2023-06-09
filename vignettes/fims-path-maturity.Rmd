@@ -20,10 +20,13 @@ This vignette describes the hierarchical structure of FIMS by describing the lin
 We'll start from R. The first step is to install FIMS, retrieve the FIMS module, create a new maturity module inside FIMS, and populate the maturity module with parameter values. 
 
 ```{r, eval = FALSE}
+# install and load FIMS
 remotes::install_github("NOAA-FIMS/FIMS")
 library(FIMS)
+# Create a new maturity model
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 maturity <- new(fims$LogisticMaturity)
+# Populate the maturity module with parameter values.
 maturity$median$value <- 10
 maturity$median$is_random_effect <- FALSE
 maturity$median$estimated <- FALSE
@@ -32,10 +35,10 @@ maturity$slope$is_random_effect <- FALSE
 maturity$slope$estimated <- FALSE
 ```
 
-After that, we need to set up a population and link the maturity module to the population:
+After that, we need to create and set up a population and link the maturity module to the population:
 ```{r, eval = FALSE}
 population <- new(fims$Population)
-#set up population specific parameters
+#set up population specific parameters (other modules)
 #...
 #set maturity for the population - will throw error until PR #363 is merged into main
 population$SetMaturity(maturity$get_id())
@@ -53,13 +56,13 @@ Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .method("evaluate", &LogisticMaturityInterface::evaluate);
 ```
 
-You can access these from R using the `show(fims)` function.
+The code above shows that there are two maturity module-specific fields, `median` and `slope`, and two maturity module-specific methods (i.e. functions), `get_id` and `evaluate`. You can access the fields and methods from R using the `show(fims)` function.
 
-Shown above, the maturity module has a get_id method (i.e. function) that returns a unique ID for this specific module.
+The maturity module's `get_id` method returns a unique ID for this specific module.
 
-The maturity module is called from R using the name in quotes from the Rcpp::class function, **LogisticMaturity** and references the maturity rcpp object, **LogisticMaturityInterface** defined in [rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects).
+The maturity module is called from R using the name in quotes from the `Rcpp::class` function, `LogisticMaturity` and references the maturity rcpp class, `LogisticMaturityInterface` defined in [rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects).
 
-This rcpp_maturity.hpp file consists of a **MaturityInterfaceBase** class and a **LogisticMaturityInterface** class, with the former being the **parent class** and the latter being the **child class**. We typically will reference the child class from R in order to specify the formulation of maturity we wish to use in a specific model run of FIMS. In this particular example, we are using the logistic form of maturity. 
+The rcpp_maturity.hpp file consists of a `MaturityInterfaceBase` class and a `LogisticMaturityInterface` class, with the former being the **parent class** and the latter being the **child class**:
 
 ```{Rcpp, eval = FALSE}
 class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
@@ -77,11 +80,13 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 }
 ```
 
+We typically will reference the child class from R to specify the formulation of maturity we wish to use in a specific model run of FIMS. In this particular example, we are using the logistic form of maturity. 
+
 ```{r image-path-maturity-1, echo = FALSE, message=FALSE, out.width = '85%'}
 knitr::include_graphics("figures/fims-path-maturity-1.png")
 ```
 
-All Rcpp interface classes from FIMS define parameters (e.g. median, slope) using the Parameter class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects)
+All Rcpp interface classes from FIMS define parameters (e.g. `median`, `slope`) using the `Parameter` class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects):
 
 ```{Rcpp, eval = FALSE}
 class Parameter {
@@ -98,7 +103,7 @@ class Parameter {
   ...
   }
 ```
-The fields from the Parameter class that are accessible from R are defined in the 
+The fields from the `Parameter` class that are accessible from R are defined in the 
 [rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file under [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
 
 ```{Rcpp, eval = FALSE}
@@ -113,23 +118,25 @@ The fields from the Parameter class that are accessible from R are defined in th
       .field("estimated", &Parameter::estimated);
 ```
 
-Each field (i.e. parameter) from maturity will therefore inherit the five fields defined in the Parameter class: **value**, **min**, **max**, **is_random_effect**, **estimated**. 
+Each field (i.e. parameter) from `maturity` (i.e. the maturity module we defined in R) will therefore inherit the five fields defined in the Parameter class: `value`, `min`, `max`, `is_random_effect`, `estimated`. 
 
 ## Linking the Rcpp interface to the fims namespace.
 
-### What is the fims namespace?
+### What is the `fims` namespace?
 
 A namespace in C++ is similar to what a library is in R.
 
-The core of FIMS is within the fims namespace and is a convenient way to differentiate between the part of the C++ code base that is portable, i.e. independent of statistical platform, and the part of the codebase that depends on platforms outside of base C++ (e.g. Rcpp, R, TMB). Any code written within:
+The core of FIMS is within the `fims` namespace and is a convenient way to differentiate between the part of the C++ code base that is portable, i.e. independent of statistical platform, and the part of the codebase that depends on platforms outside of base C++ (e.g. `{Rcpp}`, R, `{TMB}`). Any code written within:
 ```{Rcpp, eval = FALSE}
 namespace fims{
   
 }
 ```
-is considered to be a part of the fims namespace. Classes written within the fims namespace can be accessed using `fims::`
+is considered to be a part of the `fims` namespace. Classes written within the `fims` namespace can be accessed using `fims::`.
 
-There are some exceptions where TMB specific code is referenced within the fims namespace. In these cases, code is written within an #ifdef TMB_MODEL wrapper. Given the addition of a new platform, eg. stan, a new wrapper could be added to define platform specific code for these sections. For example, the definition of data types in [interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/interface.hpp) under [inst/include/interface](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface) will always be platform dependent as each platform has specific requirements for how the data types are defined. Whenever a new platform is added to FIMS, we will need to set up the platform specific data type definitions:
+There are some exceptions where `{TMB}` specific code is referenced within the `fims` namespace. In these cases, code is written within an `#ifdef TMB_MODEL` wrapper, which means the code is only defined if `{TMB}` is being used. Given the addition of a new platform, eg. stan, a new wrapper could be added to define platform specific code for these sections. 
+
+For example, the definition of data types in [interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/interface.hpp) under [inst/include/interface](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface) will always be platform dependent as each platform has specific requirements for how the data types are defined. Whenever a new platform is added to `{FIMS}`, we will need to set up the platform specific data type definitions:
 ```{Rcpp, eval = FALSE}
 namespace fims {
 
@@ -157,10 +164,10 @@ struct ModelTraits {
 ```
 
 ### Getting back to the maturity example...
-Each Rcpp interface object includes an `add_to_fims_tmb()` function. There are two shared pointers set up within this function, one to link each Rcpp interface object (e.g. LogisticMaturityInterface) to the **Information** class in the fims namespace defined in [information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) under [inst/include/common](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/common) and one to link to the matching class in the fims namespace. In our maturity example, this would be the **LogisticMaturity** class in the fims namespace defined in [logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) under [inst/include/population_dynamics/maturity/functors](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors).
+Each Rcpp interface object includes an `add_to_fims_tmb()` function. There are two shared pointers set up within this function, one to link each Rcpp interface object (e.g. LogisticMaturityInterface) to the `Information` class in the `fims` namespace defined in [information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) under [inst/include/common](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/common) and one to link to the matching class in the `fims` namespace. In our maturity example, this would be the `LogisticMaturity` class in the `fims` namespace defined in [logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) under [inst/include/population_dynamics/maturity/functors](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors).
 
 
-Linking to the **fims::Information** class allows us to register maturity parameters and specify whether or not they are random effects:
+Linking to the `fims::Information` class allows us to register maturity parameters and specify whether or not they are random effects:
 
 ```{Rcpp, eval = FALSE}
 //d0 is a shared pointer that points to fims::Information
@@ -185,7 +192,7 @@ std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
 ```
 
 
-Linking to the **fims::LogisticMaturity** class allows us to link the values input from R with the values used in model calculation:
+Linking to the `fims::LogisticMaturity` class allows us to link the values input from R with the values used in model calculation:
 ```{Rcpp, eval = FALSE}
 //lm0 is a shared pointer that points to fims::LogisticMaturity
 std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> > lm0 =
@@ -215,9 +222,9 @@ knitr::include_graphics("figures/fims-path-maturity-2.png")
 ```
 
 
-## Inside the fims::LogisticMaturity class
+## Inside the `fims::LogisticMaturity` class
 
-The **LogisticMaturity** class in the fims namespace defined in [logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) under [inst/include/population_dynamics/maturity/functors](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors) has an **evaluate** function that takes an input, *x* and returns the output from a logistic function (defined in [fims_math.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp) under [inst/include/common](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common)) using the class member median and slope values.  
+The `LogisticMaturity` class in the `fims` namespace defined in [logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) under [inst/include/population_dynamics/maturity/functors](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors) has an `evaluate` method (i.e., function) that takes an input, *x* and returns the output from a logistic function (defined in [fims_math.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp) under [inst/include/common](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common)) using the class member `median` and `slope` values.  
 
 ```{Rcpp, eval = FALSE}
 namespace fims {
@@ -256,9 +263,9 @@ knitr::include_graphics("figures/fims-path-maturity-3.png")
 
 ## Calling maturity from population
 
-The Population class defined in [population.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/population/population.hpp) under [inst/include/population_dynamics/population](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/population) is where all the biological calculations happen, producing expected values used in likelihood equations and derived values important for management (e.g. SSB). 
+The `Population` class defined in [population.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/population/population.hpp) under [inst/include/population_dynamics/population](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/population) is where all the biological calculations happen, producing expected values used in likelihood equations and derived values important for management (e.g. SSB). 
 
-In order to evaluate maturity within the Population class, we first need to set up a shared pointer, linking the maturity module to population.
+To evaluate maturity within the `Population` class, we first need to set up a shared pointer, linking the maturity module to population.
 
 ```{Rcpp, eval = FALSE}
 // file: inst/include/population_dynamics/population/population.hpp
@@ -268,9 +275,9 @@ std::shared_ptr<fims::MaturityBase<Type>>
       maturity; /*!< shared pointer to maturity module */
 ```
 
-The maturity_id was set from R using the SetMaturity() method from the PopulationInterface class: `fims$population$SetMaturity(fims$maturity$get_id())`
+The `maturity_id` was set from R using the `SetMaturity()` method from the `PopulationInterface` class: `fims$population$SetMaturity(fims$maturity$get_id())`
 
-Notice above that we set up the shared pointer to **MaturityBase** (parent class), not the specific maturity class we are using in this example, **LogisticMaturity** (child class). **MaturityBase** has an evaluate function with input arguments that match the inputs of each child class:
+Notice above that we set up the shared pointer to `MaturityBase` (parent class), not the specific maturity class we are using in this example, `LogisticMaturity` (child class). `MaturityBase` has an `evaluate` method with input arguments that match the inputs of each child class:
 
 ```{Rcpp, eval = FALSE}
 // file: inst/include/population_dynamics/maturity/functors/maturity_base.hpp
@@ -332,9 +339,9 @@ knitr::include_graphics("figures/fims-path-maturity-4.png")
 
 ## Linking everything together
 
-The above material demonstrates how values passed in from R get propagated into population.hpp, where they are used in biologically relevant calculations. This, however, relies on population referencing the correct child class (eg. LogisticMaturity) even though it only calls the parent class (MaturityBase). We defined the maturity_id in population for the specific logistic maturity module we wanted to use, `fims$population$SetMaturity(fims$maturity$get_id())`, but we still need to connect this ID with the actual module in memory. 
+The above material demonstrates how values passed in from R get propagated into population.hpp, where they are used in biologically relevant calculations. This, however, relies on population referencing the correct child class (eg. `LogisticMaturity`) even though it only calls the parent class (`MaturityBase`). We defined the `maturity_id` in population for the specific logistic maturity module we wanted to use, `fims$population$SetMaturity(fims$maturity$get_id())`, but we still need to connect this ID with the actual module in memory. 
 
-This *information* is managed in FIMS through the Information class in [information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) under [inst/include/common](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/common). The Information class sets up a number of [C++ maps](https://cplusplus.com/reference/map/map/) (a container with a key value and mapped value - think of named lists in R) where the key is the unique ID to the module and the mapped value is a shared pointer to the module. C++ std::maps have an iterator member for stepping through the elements of the map. This iterator is also declared in the Information class so that we can loop through all the unique maturity modules being called in FIMS. We currently only have one, but if FIMS gets extended to include multiple populations, we could have a unique maturity module for each population or subset of populations.  
+This *information* is managed in FIMS through the `Information` class in [information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) under [inst/include/common](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/common). The Information class sets up a number of [C++ maps](https://cplusplus.com/reference/map/map/) (a container with a key value and mapped value - think of named lists in R) where the key is the unique ID to the module and the mapped value is a shared pointer to the module. C++ std::maps have an iterator member for stepping through the elements of the map. This iterator is also declared in the Information class so that we can loop through all the unique maturity modules being called in FIMS. We currently only have one, but if FIMS gets extended to include multiple populations, we could have a unique maturity module for each population or subset of populations.  
 
 ```{Rcpp, eval = FALSE}
 /*
@@ -355,9 +362,9 @@ typedef typename std::map<uint32_t, std::shared_ptr<fims::MaturityBase<T> > >::i
 knitr::include_graphics("figures/fims-path-maturity-5.png")
 ```
 
-Next, let's revisit the line of code that was written in the Rcpp **LogisticMaturityInterface** class in [rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects)
+Next, let's revisit the line of code that was written in the Rcpp `LogisticMaturityInterface` class in [rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects)
 
-Here, we are setting the maturity_models pointer in **Information** to equal the lm0 pointer to the **LogisticMaturity** module
+Here, we are setting the maturity_models pointer in `Information` to equal the `lm0` pointer to the `LogisticMaturity` module
 ```{Rcpp, eval = FALSE}
 /*
  the maturity_models pointer from Information that matches the id of the 
@@ -370,7 +377,7 @@ d0->maturity_models[lm0->id] = lm0;
 knitr::include_graphics("figures/fims-path-maturity-6.png")
 ```
 
-Now we need to pass this pointer to the maturity pointer in population so that `population->maturity` points to the **LogisticMaturity** module instead of **MaturityBase**. First we set up a map in Information that points to Population. 
+Now we need to pass this pointer to the maturity pointer in population so that `population->maturity` points to the `LogisticMaturity` module instead of `MaturityBase`. First we set up a map in `Information` that points to `Population`. 
 ```{Rcpp, eval = FALSE}
 std::map<uint32_t, std::shared_ptr<fims::Population<T> > >
       populations; /*!<hash map to link each object to its shared location in
@@ -384,7 +391,7 @@ std::map<uint32_t, std::shared_ptr<fims::Population<T> > >
 knitr::include_graphics("figures/fims-path-maturity-7.png")
 ```
 
-We then loop through the populations and create a new shared pointer, p, to reference the individual population of interest.  
+We then loop through the populations and create a new shared pointer, `p`, to reference the individual population of interest.  
 
 ```{Rcpp, eval = FALSE}
  for (population_iterator it = this->populations.begin();
@@ -392,9 +399,9 @@ We then loop through the populations and create a new shared pointer, p, to refe
           std::shared_ptr<fims::Population<T> > p = (*it).second;
           ...
 ```
-In this code chunk, `(*it)` refers to a single population in the populations map. The second element of the map is the pointer, so `p = (*it).second` means we are setting the pointer to a single population to equal the pointer to populations in the map. 
+In this code chunk, `(*it)` refers to a single population in the `populations` map. The second element of the map is the pointer, so `p = (*it).second` means we are setting the pointer to a single population to equal the pointer to `populations` in the map. 
 
-Within this population loop, we then link the maturity pointer in population to equal the maturity pointer in information, passing on the information that we want to use the **LogisticMaturity** class
+Within this population loop, we then link the `maturity` pointer in `population` to equal the `maturity` pointer in information, passing on the information that we want to use the `LogisticMaturity` class:
 
 ```{Rcpp, eval = FALSE}  
   // set maturity
@@ -410,7 +417,7 @@ Within this population loop, we then link the maturity pointer in population to 
     }
 ```
 
-Here, (*it) is referring to the maturity_models pointer.
+Here, (*it) is referring to the `maturity_models` pointer.
 
 ```{r image-path-maturity-8, echo = FALSE, message=FALSE, out.width = '100%'}
 knitr::include_graphics("figures/fims-path-maturity-8.png")
