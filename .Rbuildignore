@@ -12,3 +12,5 @@ build
 ^\.devcontainer$
 CONTRIBUTING.md
 fims.log
+^doc$
+^Meta$
