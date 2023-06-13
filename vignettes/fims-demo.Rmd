@@ -15,13 +15,45 @@ The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework
 To begin, we import the FIMS library and define some important variables that describe the dimensions of our data.
 ```{r fims1}
 library(FIMS)
+library(TMB)
 
+#load the module
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
-nyears<-30  # the number of years which we have data for.
+#use FIMS data frame
+data(package = "FIMS")
+age_frame <- FIMS::FIMSFrameAge(data_mile1)
+
+nyears <- age_frame@nyrs  # the number of years which we have data for.
 nseanons<-1 # the number of seasons in each year.
-ages<-c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)   # age vector.
-nages<-12   # the number of age groups.
+ages <- age_frame@ages # age vector.
+nages <- max(age_frame@ages)   # the number of age groups.
+
+fleet_names_agecomp <- dplyr::filter(
+  .data = as.data.frame(age_frame@data),
+  type == "age"
+) %>%
+  dplyr::distinct(name) %>%
+  dplyr::pull(name)
+nagecomp <- length(fleet_names_agecomp)
+
+fleet_names_index <- dplyr::filter(
+  .data = as.data.frame(age_frame@data),
+  type == "index"
+) %>%
+  dplyr::distinct(name) %>%
+  dplyr::pull(name)
+nindex <- length(fleet_names_index)
+
+  indexdat <- vector(mode = "list", length = nindex)
+  names(indexdat) <- fleet_names_index
+
+  # for (index_i in 1:nindex) {
+  #   index <- fims$Index
+  #   indexdat[[fleet_names_index[index_i]]] <- new(index, nyears)
+  #   indexdat[[fleet_names_index[index_i]]] <-
+  #     m_index(age_frame, fleet_names_index[index_i])
+  # }
 
 ```
 
@@ -173,7 +205,7 @@ fishing_fleet_age_comp$age_comp_data <-
 0.02199718,0.01681464,0.01603673,0.01039855,0.002637544,0.007536435)
 
 ```
-### Selectivity
+### Fleet Selectivity
 ```{r fleet_selectivity}
 fishing_fleet_selectivity <- new(fims$LogisticSelectivity)
 fishing_fleet_selectivity$median$value <- 2.0
@@ -183,7 +215,7 @@ fishing_fleet_selectivity$slope$value <- 1.0
 fishing_fleet_selectivity$slope$is_random_effect <- FALSE
 fishing_fleet_selectivity$slope$estimated <- TRUE
 ```
-### Creating the Fleet
+### Creating the Fleet Object
 Now that we've created everything that a fleet needs, lets create the actual fleet object.
 
 ```{r fleet}
@@ -213,10 +245,65 @@ fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
 ## Creating a Survey
 A survey object is essentially the same as a fleet object with a catachabilty (q) variable.
 
-### Selectivity
-### Adding Data
+### Survey Selectivity
+```{r survey_selectivity}
+  # survey_fleet_selectivity <- new(fims$LogisticSelectivity)
+  # survey_fleet_selectivity$median$value <- 2.0
+  # survey_fleet_selectivity$median$is_random_effect <- FALSE
+  # survey_fleet_selectivity$median$estimated <- TRUE
+  # survey_fleet_selectivity$slope$value <- 1.0
+  # survey_fleet_selectivity$slope$is_random_effect <- FALSE
+  # survey_fleet_selectivity$slope$estimated <- TRUE
+```
+
+### Creating the Survey Object
+```{r survey}
+ # survey_fleet <- new(fims$Fleet)
+ # survey_fleet$is_survey<-TRUE
+ # #survey_fleet$nages <- om_input$nages
+ # survey_fleet$nyears <- om_input$nyr
+ #  # survey_fleet$log_Fmort <- rep(log(0.0000000000000000000000000001), om_input$nyr) #-Inf?
+ # survey_fleet$estimate_F <- FALSE
+ # survey_fleet$random_F <- FALSE
+ # survey_fleet$log_q <- log(om_output$survey_q$survey1)
+ # survey_fleet$estimate_q <- TRUE
+ # survey_fleet$random_q <- FALSE
+ # survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2+1)))
+ # survey_fleet$log_obs_error$estimated <- FALSE
+ # survey_fleet$SetAgeCompLikelihood(1)
+ # survey_fleet$SetIndexLikelihood(1)
+ # survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
+ # survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
+ # survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
+  
+```  
 ## Putting It All Together 
-## Creating a TMB Model
+## Creating the FIMS Model and Making the TMB Function
+```{r model}
+  sucess<-fims$CreateTMBModel()
+  parameters <- list(p = fims$get_fixed())
+  obj <- MakeADFun(data=list(), parameters, DLL="FIMS", silent = TRUE)
+
+```
 ## Fitting the Model
+```{r fit_model}
+  
+  opt<-nlminb(fims$get_fixed(), obj$fn, obj$gr)
+  
+  print(opt)
+```
+
+### TMB Reporting
+```{r tmb_report}
+
+  sdr <- TMB::sdreport(obj)
+  sdr_fixed <- summary(sdr, "fixed")
+  report <- obj$report()
+  
+  # print(sdr_fixed)
+  # print(report)
+  
+```
 
 
+## Plotting Results
