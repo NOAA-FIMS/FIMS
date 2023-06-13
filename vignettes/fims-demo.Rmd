@@ -1,0 +1,40 @@
+---
+title: "FIMS Demo"
+output: github_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Fisheries Integrated Modeling System
+
+
+## Creating Models in FIMS
+
+```{r min}
+library(FIMS)
+library(minimizR)
+```
+
+
+## Creating a Population
+
+### Recruitment
+
+### Growth
+
+### Maturity
+
+## Creating a Fleet
+### Selectivity
+### Adding Data
+## Creating a Survey
+### Selectivity
+### Adding Data
+## Putting It All Together 
+## Creating a TMB Model
+
+
+
