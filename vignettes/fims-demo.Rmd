@@ -19,6 +19,7 @@ library(TMB)
 
 #load the module
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
+fims$clear()
 
 #use FIMS data frame
 data(package = "FIMS")
@@ -288,22 +289,28 @@ A survey object is essentially the same as a fleet object with a catachabilty (q
 ## Fitting the Model
 ```{r fit_model}
   
-  opt<-nlminb(fims$get_fixed(), obj$fn, obj$gr)
-  
+  opt<-optim(obj$par, obj$fn, obj$gr, method = "BFGS",
+                       control = list(maxit=1000000, reltol = 1e-15))
+
   print(opt)
 ```
 
 ### TMB Reporting
 ```{r tmb_report}
 
-  sdr <- TMB::sdreport(obj)
-  sdr_fixed <- summary(sdr, "fixed")
+ # sdr <- TMB::sdreport(obj)
+  # sdr_fixed <- summary(sdr, "fixed")
   report <- obj$report()
   
   # print(sdr_fixed)
-  # print(report)
+   # print(report)
   
 ```
 
 
 ## Plotting Results
+```{r plots}
+plot(1:nyears, fishing_fleet_index$index_data, xlab="Year", ylab="Index")
+lines( report$expected_index,lty=3,lwd=2,col="blue")
+
+```
