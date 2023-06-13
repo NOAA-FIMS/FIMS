@@ -47,8 +47,29 @@ recruitment$deviations <- rep(0.01,30)
 
 ```
 ### Growth
+Now, we'll define the growth module for our population using an emprical weight at age model.
+```{r growth}
+# Growth
+ewaa_growth <- new(fims$EWAAgrowth)
+ewaa_growth$ages <- ages
+ewaa_growth$weights <- c(0.5306555, 1.1963283, 2.0582654, 
+                         3.0349873, 4.0552124, 5.0646975,
+                         6.0262262, 6.9169206,  7.7248909, 
+                         8.4461128, 9.0818532, 9.6366950)
 
+```   
 ### Maturity
+Each population will also need a maturity model. Here we define a logistic maturity model. 
+```{r maturity}
+# Maturity
+maturity <- new(fims$LogisticMaturity)
+maturity$median$value <- 2.25
+maturity$median$is_random_effect <- FALSE
+maturity$median$estimated <- FALSE
+maturity$slope$value <- 3
+maturity$slope$is_random_effect <- FALSE
+maturity$slope$estimated <- FALSE
+```
 
 ## Creating a Fleet
 ### Selectivity
