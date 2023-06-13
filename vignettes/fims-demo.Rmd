@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Fisheries Integrated Modeling System
-
+The Fisheries Integrated Modeling System (FIMS) is a modeling framework for fisheries stock assessment. It's important to note that FIMS is not a model, but rather a system for creating models. FIMS is made up of many modules that come together to create a stock assessment model that suites the needs of the enduser.
 
 ## Creating Models in FIMS
 
