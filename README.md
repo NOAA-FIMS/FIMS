@@ -31,6 +31,8 @@ You can easily fix this by running the following line in your local R session. N
 ```
 withr::local_options(pkg.build_extra_flags = FALSE)
 ```
+This fix does not work when `devtools::test()` is called and FIMS is re-compiled. The call to `devtools::test()` in this case overwrites the local options set by withr. Compile FIMS first using `devtools::load_all()` prior to running `devtools::test()`.
+
 This fix removes the debugger flag `-O0 -g` from being automatically inserted for certain devtools calls (e.g. `devtools::load_all()`). Windows developers wanting to compile FIMS with the debugger turned on will need to run the above script in addition to manually modifying the call to PKG_CXXFLAGS in the [Makevars.win](https://github.com/NOAA-FIMS/FIMS/blob/doc-install/src/Makevars.win) file in the src directory to the following:
 
 ```
