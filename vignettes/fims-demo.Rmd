@@ -71,6 +71,28 @@ maturity$slope$is_random_effect <- FALSE
 maturity$slope$estimated <- FALSE
 ```
 
+Now that our life history sub-models are defined, lets define the actual population.
+
+```{r population}
+# Population
+population <- new(fims$Population)
+population$log_M <- rep(log(0.2), nages)
+population$log_init_naa <- log(c(993947.5,811707.8, 661434.4, 
+                                 537804.8, 436664.0, 354303.4, 
+                                 287397.0, 233100.2, 189054.0, 
+                                 153328.4, 124353.2, 533681.3))
+population$estimate_init_naa <- TRUE
+population$nages <- nages
+population$ages <- ages
+population$nfleets <- 1
+population$nseasons <- 1
+population$nyears <- nyears
+population$SetMaturity(maturity$get_id())
+population$SetGrowth(ewaa_growth$get_id())
+population$SetRecruitment(recruitment$get_id())
+
+```
+
 ## Creating a Fleet
 ### Selectivity
 ### Adding Data
@@ -79,6 +101,6 @@ maturity$slope$estimated <- FALSE
 ### Adding Data
 ## Putting It All Together 
 ## Creating a TMB Model
-
+## Fitting the Model
 
 
