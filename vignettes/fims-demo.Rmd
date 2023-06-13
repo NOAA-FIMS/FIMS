@@ -25,29 +25,29 @@ fims$clear()
 data(package = "FIMS")
 age_frame <- FIMS::FIMSFrameAge(data_mile1)
 
-nyears <- age_frame@nyrs  # the number of years which we have data for.
+nyears <- 30 #age_frame@nyrs  # the number of years which we have data for.
 nseanons<-1 # the number of seasons in each year.
-ages <- age_frame@ages # age vector.
-nages <- max(age_frame@ages)   # the number of age groups.
+ages <- c(1 ,2, 3,4,5,6,7,8,9,10,11, 12) #age_frame@ages # age vector.
+nages <- 12 #max(age_frame@ages)   # the number of age groups.
 
-fleet_names_agecomp <- dplyr::filter(
-  .data = as.data.frame(age_frame@data),
-  type == "age"
-) %>%
-  dplyr::distinct(name) %>%
-  dplyr::pull(name)
-nagecomp <- length(fleet_names_agecomp)
-
-fleet_names_index <- dplyr::filter(
-  .data = as.data.frame(age_frame@data),
-  type == "index"
-) %>%
-  dplyr::distinct(name) %>%
-  dplyr::pull(name)
-nindex <- length(fleet_names_index)
-
-  indexdat <- vector(mode = "list", length = nindex)
-  names(indexdat) <- fleet_names_index
+# fleet_names_agecomp <- dplyr::filter(
+#   .data = as.data.frame(age_frame@data),
+#   type == "age"
+# ) %>%
+#   dplyr::distinct(name) %>%
+#   dplyr::pull(name)
+# nagecomp <- length(fleet_names_agecomp)
+# 
+# fleet_names_index <- dplyr::filter(
+#   .data = as.data.frame(age_frame@data),
+#   type == "index"
+# ) %>%
+#   dplyr::distinct(name) %>%
+#   dplyr::pull(name)
+# nindex <- length(fleet_names_index)
+# 
+#   indexdat <- vector(mode = "list", length = nindex)
+#   names(indexdat) <- fleet_names_index
 
   # for (index_i in 1:nindex) {
   #   index <- fims$Index
@@ -310,6 +310,9 @@ A survey object is essentially the same as a fleet object with a catachabilty (q
 
 ## Plotting Results
 ```{r plots}
+print(fishing_fleet_index$index_data)
+print(report$expected_index)
+
 plot(1:nyears, fishing_fleet_index$index_data, xlab="Year", ylab="Index")
 lines( report$expected_index,lty=3,lwd=2,col="blue")
 
