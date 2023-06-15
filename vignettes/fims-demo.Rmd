@@ -317,3 +317,8 @@ plot(1:nyears, fishing_fleet_index$index_data, xlab="Year", ylab="Index")
 lines( report$expected_index,lty=3,lwd=2,col="blue")
 
 ```
+
+## Clear C++ objects from memory
+```{r clear}
+fims$clear()
+```
