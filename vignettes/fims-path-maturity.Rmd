@@ -15,6 +15,29 @@ knitr::opts_chunk$set(
 ```
 
 
+```{css, echo=FALSE}
+
+.rchunk {
+  border: solid #2e75b6;
+}
+.rcppchunk {
+  border: solid #c55a11;
+}
+.fimschunk {
+  border: solid #548235;
+}
+.infochunk {
+  border: solid #262626;
+}
+```
+
+
+<style type="text/css">
+code span.co{
+  color: #8c8c8c; 
+}
+</style>
+
 This vignette describes the hierarchical structure of FIMS by describing the linkages, or *path* through the FIMS model using maturity as an example. The vignette is tailored to FIMS developers or others interested in understanding the FIMS core architecture. The vignette walks through how input from R is carried into the core FIMS calculations. 
 
 The vignette will build up components to the final path:
@@ -28,7 +51,7 @@ Code chunks in this vignette will be color coded similar to this diagram: R code
 
 We'll start from R. The first step is to install FIMS, retrieve the FIMS module, create a new maturity module inside FIMS, and populate the maturity module with parameter values. 
 
-```{r, eval = FALSE}
+```{r, class.source = "rchunk", eval = FALSE}
 # install and load FIMS
 remotes::install_github("NOAA-FIMS/FIMS@integration-test-estimation-R-clear-FIMS")
 library(FIMS)
@@ -45,7 +68,7 @@ maturity$slope$estimated <- FALSE
 ```
 
 After that, we need to create and set up a population and link the maturity module to the population:
-```{r, eval = FALSE}
+```{r,  class.source = "rchunk", eval = FALSE}
 population <- new(fims$Population)
 #set up population specific parameters (other modules)
 #...
@@ -54,7 +77,7 @@ population$SetMaturity(maturity$get_id())
 ```
 
 Because FIMS sets up objects stored in memory, simply running `rm(fims)`, won't free this memory back up. There is a function that can be run to clear out memory:
-```{r, eval = FALSE}
+```{r,  class.source = "rchunk", eval = FALSE}
 fims$clear()
 #Now running rm with remove objects from R's memory
 rm(fims)
@@ -68,7 +91,7 @@ Also restarting or closing out your R session will free up memory.
 The fields specific to the maturity module that are accessible from R are defined in the 
 [rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file under [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
 
-```{Rcpp, eval = FALSE}
+```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
       .field("median", &LogisticMaturityInterface::median)
@@ -85,7 +108,7 @@ The maturity module is called from R using the name in quotes from the `Rcpp::cl
 
 The rcpp_maturity.hpp file consists of a `MaturityInterfaceBase` class and a `LogisticMaturityInterface` class, with the former being the **parent class** and the latter being the **child class**:
 
-```{Rcpp, eval = FALSE}
+```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
@@ -109,7 +132,7 @@ knitr::include_graphics("figures/fims-path-maturity-1.png")
 
 All Rcpp interface classes from FIMS define parameters (e.g. `median`, `slope`) using the `Parameter` class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects):
 
-```{Rcpp, eval = FALSE}
+```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 class Parameter {
  public:
   double value; /**< initial value of the parameter*/
@@ -127,7 +150,7 @@ class Parameter {
 The fields from the `Parameter` class that are accessible from R are defined in the 
 [rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file under [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
 
-```{Rcpp, eval = FALSE}
+```{Rcpp, class.source = "rcppchunk", eval = FALSE}
  Rcpp::class_<Parameter>("Parameter")
       .constructor()
       .constructor<double>()
@@ -148,7 +171,7 @@ Each field (i.e. parameter) from `maturity` (i.e. the maturity module we defined
 A namespace in C++ is similar to what a library is in R.
 
 The core of FIMS is within the `fims` namespace and is a convenient way to differentiate between the part of the C++ code base that is portable, i.e. independent of statistical platform, and the part of the codebase that depends on platforms outside of base C++ (e.g. `{Rcpp}`, R, `{TMB}`). Any code written within:
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 namespace fims{
   
 }
@@ -158,7 +181,7 @@ is considered to be a part of the `fims` namespace. C++ classes written within t
 There are some exceptions where `{TMB}` specific code is referenced within the `fims` namespace. In these cases, code is written within an `#ifdef TMB_MODEL` wrapper, which means the code is only defined if `{TMB}` is being used. Given the addition of a new platform, eg. stan, a new wrapper could be added to define platform specific code for these sections. 
 
 For example, the definition of data types in [interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/interface.hpp) under [inst/include/interface](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface) will always be platform dependent as each platform has specific requirements for how the data types are defined. Whenever a new platform is added to `{FIMS}`, we will need to set up the platform specific data type definitions:
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 namespace fims {
 
 #ifdef TMB_MODEL
@@ -190,7 +213,7 @@ Each Rcpp interface object includes an `add_to_fims_tmb()` function. There are t
 
 Within the rcpp_maturity.hpp file, we can link to the `fims::Information` class in order to register maturity parameters and specify whether or not they are random effects:
 
-```{Rcpp, eval = FALSE}
+```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 //file: rcpp_maturity.hpp
 
 //d0 is a shared pointer that points to fims::Information
@@ -216,7 +239,7 @@ std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
 
 
 Linking to the `fims::LogisticMaturity` class allows us to link the values input from R with the values used in model calculation:
-```{Rcpp, eval = FALSE}
+```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 //file: rcpp_maturity.hpp
 
 //lm0 is a shared pointer that points to fims::LogisticMaturity
@@ -231,11 +254,13 @@ lm0->median = this->median.value;
 ```
 
 We can also link these two pointers together so that the **fims::Information** class links up with the **fims::LogisticMaturity**, but more details on this later.
-```{Rcpp, eval = FALSE}
+```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 //file: rcpp_maturity.hpp
 
 /*
- the maturity_models pointer from Information that matches the id of the fims::LogisticMaturity class is equal to the pointer to fims::LogisticMaturity 
+ the maturity_models pointer from Information that matches the 
+ id of the fims::LogisticMaturity class is equal to the pointer 
+ to fims::LogisticMaturity 
  */
 d0->maturity_models[lm0->id] = lm0;
 ```
@@ -253,7 +278,7 @@ knitr::include_graphics("figures/fims-path-maturity-2.png")
 
 The `LogisticMaturity` class in the `fims` namespace defined in [logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) under [inst/include/population_dynamics/maturity/functors](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors) has an `evaluate` method (i.e., function) that takes an input, *x* and returns the output from a logistic function (defined in [fims_math.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp) under [inst/include/common](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common)) using the class member `median` and `slope` values.  
 
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 namespace fims {
 
 /**
@@ -294,7 +319,7 @@ The `Population` class defined in [population.hpp](https://github.com/NOAA-FIMS/
 
 To evaluate maturity within the `Population` class, we first need to set up a shared pointer, linking the maturity module to population.
 
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 //file: inst/include/population_dynamics/population/population.hpp
 // maturity is a shared pointer to MaturityBase
 int maturity_id = -999; /*!< id of maturity model object*/
@@ -302,11 +327,14 @@ std::shared_ptr<fims::MaturityBase<Type>>
       maturity; /*!< shared pointer to maturity module */
 ```
 
-The `maturity_id` was set from R using the `SetMaturity()` method from the `PopulationInterface` class: `fims$population$SetMaturity(maturity$get_id())`
+The `maturity_id` was set from R using the `SetMaturity()` method from the `PopulationInterface` class:
+```{r,  class.source = "fimschunk", eval = FALSE}
+fims$population$SetMaturity(maturity$get_id())
+```
 
 Notice above that population by default declares a pointer of type `MaturityBase` (parent class), not the specific maturity class we are using in this example, `LogisticMaturity` (child class). `MaturityBase` has an `evaluate` method with input arguments that match the inputs of each child class:
 
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 //file: inst/include/population_dynamics/maturity/functors/maturity_base.hpp
 namespace fims {
 
@@ -342,7 +370,7 @@ struct MaturityBase : public FIMSObject<T> {
 This structure keeps the maturity module in population generic. We don't need any conditional statements to loop over all possible maturity formulations within population. We only need to add a new child maturity class with an Rcpp interface and we can automatically call it from population.
 
 Once we've set up the shared pointer, we can access maturity from within population:
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 //file: inst/include/population_dynamics/population/population.hpp
  /**
    * @brief Calculates expected proportion of individuals mature at a selected
@@ -370,19 +398,23 @@ The above material demonstrates how values passed in from R get propagated into 
 
 This *information* is managed in FIMS through the `Information` class in [information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) under [inst/include/common](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/common). The Information class sets up a number of [C++ maps](https://cplusplus.com/reference/map/map/) (a container with a key value and mapped value - think of named lists in R) where the key is the unique ID to the module and the mapped value is a shared pointer to the module. C++ std::maps have an iterator member for stepping through the elements of the map. This iterator is also declared in the Information class so that we can loop through all the unique maturity modules being called in FIMS. We currently only have one, but if FIMS gets extended to include multiple populations, we could have a unique maturity module for each population or subset of populations.  
 
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "infochunk", eval = FALSE}
 //file: inst/include/common/information.hpp
 /*
  uint32_t is an unsigned integer (always positive)
- The first component of the map is a uint32_t which will be used to hold the ID
- The second component of the map is the shared pointer, maturity_models, that points to fims::MaturityBase
+ The first component of the map is a uint32_t which 
+ will be used to hold the ID.
+ The second component of the map is the shared pointer, 
+ maturity_models, that points to fims::MaturityBase
  */
 std::map<uint32_t, std::shared_ptr<fims::MaturityBase<T> > >
       maturity_models; /*!<hash map to link each object to its shared location
                           in memory*/
 
-//Next we set up the iterator, which will be used to loop over all defined maturity modules
-typedef typename std::map<uint32_t, std::shared_ptr<fims::MaturityBase<T> > >::iterator
+//Next we set up the iterator, which will be used to loop 
+//over all defined maturity modules
+typedef typename std::map<uint32_t, 
+                          std::shared_ptr<fims::MaturityBase<T> > >::iterator
       maturity_models_iterator;
 ```
 
@@ -393,7 +425,7 @@ knitr::include_graphics("figures/fims-path-maturity-5.png")
 Next, let's revisit the line of code that was written in the Rcpp `LogisticMaturityInterface` class in [rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp) under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects)
 
 Here, we are setting the maturity_models pointer in `Information` to equal the `lm0` pointer to the `LogisticMaturity` module
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "rcppchunk", eval = FALSE}
 //file: rcpp_maturity.hpp
 
 /*
@@ -408,11 +440,13 @@ knitr::include_graphics("figures/fims-path-maturity-6.png")
 ```
 
 Now we need to pass this pointer to the maturity pointer in population so that `population->maturity` points to the `LogisticMaturity` module instead of `MaturityBase`. First we set up a map in `Information` that points to `Population`. 
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "infochunk", eval = FALSE}
+//file: inst/include/common/information.hpp
 std::map<uint32_t, std::shared_ptr<fims::Population<T> > >
       populations; /*!<hash map to link each object to its shared location in
                       memory*/
-  typedef typename std::map<uint32_t,std::shared_ptr<fims::Population<T> > >::iterator
+  typedef typename std::map<uint32_t,
+                            std::shared_ptr<fims::Population<T> > >::iterator
       population_iterator;
   /**< iterator for population objects>*/
 ```
@@ -423,7 +457,8 @@ knitr::include_graphics("figures/fims-path-maturity-7.png")
 
 We then loop through the populations and create a new shared pointer, `p`, to reference the individual population of interest.  
 
-```{Rcpp, eval = FALSE}
+```{Rcpp,  class.source = "infochunk", eval = FALSE}
+//file: inst/include/common/information.hpp
  for (population_iterator it = this->populations.begin();
              it != this->populations.end(); ++it) {
           std::shared_ptr<fims::Population<T> > p = (*it).second;
@@ -433,7 +468,8 @@ In this code chunk, `(*it)` refers to a single population in the `populations` m
 
 Within this population loop, we then link the `maturity` pointer in `population` to equal the `maturity` pointer in information, passing on the information that we want to use the `LogisticMaturity` class:
 
-```{Rcpp, eval = FALSE}  
+```{Rcpp,  class.source = "infochunk", eval = FALSE}  
+//file: inst/include/common/information.hpp
   // set maturity
   if (p->maturity_id != -999) {
     uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
@@ -533,9 +569,11 @@ information$maturity[[2]] <- list(id = 2, pointer = maturity_modules[[2]])
 ```
 
 In FIMS, these definitions happen by passing information from the rcpp interface into FIMS Information. 
-```{r, eval = FALSE}
+```{r,  class.source = "rcppchunk", eval = FALSE}
+## //file: rcpp_maturity.hpp
 ## d0 is the pointer to information
-## lm0 is the pointer to a specific maturity module (e.g. lm0 = maturity_modules[[1]])
+## lm0 is the pointer to a specific maturity module 
+## (e.g. lm0 = maturity_modules[[1]])
 # d0->maturity_models[lm0->id] = lm0;
 ```
 
