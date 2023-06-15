@@ -78,8 +78,9 @@ population$SetMaturity(maturity$get_id())
 
 Because FIMS sets up objects stored in memory, simply running `rm(fims)`, won't free this memory back up. There is a function that can be run to clear out memory:
 ```{r,  class.source = "rchunk", eval = FALSE}
+# Clear C++ memory
 fims$clear()
-#Now running rm with remove objects from R's memory
+#Clear R memory
 rm(fims)
 rm(maturity)
 rm(population)
@@ -368,7 +369,7 @@ struct MaturityBase : public FIMSObject<T> {
 };
 ```
 
-This structure keeps the maturity module in population generic. We don't need any conditional statements to loop over all possible maturity formulations within population. We only need to add a new child maturity class with an Rcpp interface and we can automatically call it from population.
+The evaluate function is a [virtual C++ function](https://www.geeksforgeeks.org/virtual-function-cpp/), which means the function can be overwritten by functions of the same name from a child class. This structure keeps the maturity module in population generic. We don't need any conditional statements to loop over all possible maturity formulations within population. We only need to add a new child maturity class with an Rcpp interface and we can automatically call it from population. There is a trade-off here. We are creating a nested hierarchical structure that makes the code base harder to read. In exchange, we're creating code with a lower [cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity), that is there will only ever be one independent path from the user to the maturity->evaluate() call in population, regardless of how many maturity functions are added to FIMS. Code with lower cyclomatic complexity is easier to test, maintain, and extend.  
 
 Once we've set up the shared pointer, we can access maturity from within population:
 ```{Rcpp,  class.source = "fimschunk", eval = FALSE}
