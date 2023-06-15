@@ -232,6 +232,7 @@ std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
          if median is estimated and not a random effect, 
          the median value from LogisticMaturityInterface (lm0->median)
          is passed to the Information member function RegisterParameter
+         */
         d0->RegisterParameter(lm0->median);
       }
     }
@@ -394,7 +395,7 @@ knitr::include_graphics("figures/fims-path-maturity-4.png")
 
 ## Linking everything together
 
-The above material demonstrates how values passed in from R get propagated into population.hpp, where they are used in biologically relevant calculations. This, however, relies on population referencing the correct child class (eg. `LogisticMaturity`) even though it only calls the parent class (`MaturityBase`). We defined the `maturity_id` in population for the specific logistic maturity module we wanted to use, `fims$population$SetMaturity(fims$maturity$get_id())`, but we still need to connect this ID with the actual module in memory. 
+The above material demonstrates how values passed in from R get propagated into population.hpp, where they are used in biologically relevant calculations. This, however, relies on population referencing the correct child class (eg. `LogisticMaturity`) even though it only calls the parent class (`MaturityBase`). We defined the `maturity_id` in population for the specific logistic maturity module we wanted to use, `fims$population$SetMaturity(maturity$get_id())`, but we still need to connect this ID with the actual module in memory. 
 
 This *information* is managed in FIMS through the `Information` class in [information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) under [inst/include/common](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/common). The Information class sets up a number of [C++ maps](https://cplusplus.com/reference/map/map/) (a container with a key value and mapped value - think of named lists in R) where the key is the unique ID to the module and the mapped value is a shared pointer to the module. C++ std::maps have an iterator member for stepping through the elements of the map. This iterator is also declared in the Information class so that we can loop through all the unique maturity modules being called in FIMS. We currently only have one, but if FIMS gets extended to include multiple populations, we could have a unique maturity module for each population or subset of populations.  
 
