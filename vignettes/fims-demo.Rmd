@@ -14,6 +14,8 @@ The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework
 ## Creating Models in FIMS
 To begin, we import the FIMS library and define some important variables that describe the dimensions of our data.
 ```{r fims1}
+#install from test-estimation branch
+remotes::install_github("NOAA-FIMS/FIMS@integration-test-estimation-R-clear-FIMS")
 library(FIMS)
 library(TMB)
 
