@@ -399,11 +399,24 @@ population$SetRecruitment(recruitment$get_id())
 
 ## Plotting Results
 ```{r plots}
-print(fishing_fleet_index$index_data)
-print(report$expected_index)
+library(ggplot2)
+index_results <- data.frame(observed = survey_fleet_index$index_data,
+                            expected = report$expected_index[,2])
+print(index_results)
 
-plot(1:nyears, fishing_fleet_index$index_data, xlab="Year", ylab="Index")
-lines( report$expected_index,lty=3,lwd=2,col="blue")
+ggplot(index_results, aes(x=1:nyears, y=observed)) + geom_point() +
+         xlab("Year") + ylab("Index") +
+  geom_line(aes(x=1:nyears, y=expected, col = "blue")) +
+  theme_bw()
+
+catch_results <- data.frame(observed = fishing_fleet_index$index_data,
+                            expected = report$expected_index[,1])
+print(catch_results)
+
+ggplot(catch_results, aes(x=1:nyears, y=observed)) + geom_point() +
+         xlab("Year") + ylab("Index") +
+  geom_line(aes(x=1:nyears, y=expected, col = "blue")) +
+  theme_bw()
 
 ```
 
