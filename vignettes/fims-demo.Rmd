@@ -9,11 +9,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Fisheries Integrated Modeling System
-The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. FIMS is a software system designed and architected to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It's important to note that FIMS itself is not a model, but rather a framework for creating models. The framework is made up of many modules that come together to create a "the best model" that suites the needs of the end-user. What follows is a demo of creating an assessment model using FIMS.
+The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. FIMS is a software system designed and architected to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It's important to note that FIMS itself is not a model, but rather a framework for creating models. The framework is made up of many modules that come together to create a "the best model" that suites the needs of the end-user. What follows is a demo of creating a catch-at-age assessment model using FIMS. 
 
 ## Creating Models in FIMS
-To begin, we import the FIMS library and define some important variables that describe the dimensions of our data.
-```{r fims1}
+To begin, we import the FIMS and TMB libraries. We then create a new Rcpp fims module using `Rcpp::Module` and call `fims$clear` to ensure memory from any previous fims model run is cleared out. 
+```{r fims1, warning=FALSE, message=FALSE}
 #install from test-estimation branch
 remotes::install_github("NOAA-FIMS/FIMS@integration-test-estimation-R-clear-FIMS")
 library(FIMS)
@@ -22,54 +22,95 @@ library(TMB)
 #load the module
 fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 fims$clear()
+```
 
-#use FIMS data frame
-data(package = "FIMS")
-age_frame <- FIMS::FIMSFrameAge(data_mile1)
-
-nyears <- 30 #age_frame@nyrs  # the number of years which we have data for.
-nseanons<-1 # the number of seasons in each year.
-ages <- c(1 ,2, 3,4,5,6,7,8,9,10,11, 12) #age_frame@ages # age vector.
-nages <- 12 #max(age_frame@ages)   # the number of age groups.
-
-# fleet_names_agecomp <- dplyr::filter(
-#   .data = as.data.frame(age_frame@data),
-#   type == "age"
-# ) %>%
-#   dplyr::distinct(name) %>%
-#   dplyr::pull(name)
-# nagecomp <- length(fleet_names_agecomp)
-# 
-# fleet_names_index <- dplyr::filter(
-#   .data = as.data.frame(age_frame@data),
-#   type == "index"
-# ) %>%
-#   dplyr::distinct(name) %>%
-#   dplyr::pull(name)
-# nindex <- length(fleet_names_index)
-# 
-#   indexdat <- vector(mode = "list", length = nindex)
-#   names(indexdat) <- fleet_names_index
-
-  # for (index_i in 1:nindex) {
-  #   index <- fims$Index
-  #   indexdat[[fleet_names_index[index_i]]] <- new(index, nyears)
-  #   indexdat[[fleet_names_index[index_i]]] <-
-  #     m_index(age_frame, fleet_names_index[index_i])
-  # }
-
+First let's set up the dimensions of the model based on the Model Comparison project:
+```{r fims-dims}
+nyears <- 30 # the number of years which we have data for.
+nseanons<- 1 # the number of seasons in each year. FIMS currently defaults to 1
+ages <- c(1,2,3,4,5,6,7,8,9,10,11,12) # age vector.
+nages <- 12 # the number of age groups.
 ```
 
 
+Data and variable values are taken from the Model Comparison project. See [R/data_mile1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_mile1.R) and [tests/testthat/test-fims-estimation.R](https://github.com/NOAA-FIMS/FIMS/blob/integration-test-estimation-R-clear-FIMS/tests/testthat/test-fims-estimation.R) for details on how data and variable values are read in from the Model Comparison project. We will be reading data into the model using the FIMSFrame and FIMSFrameAge S4 R classes set up in [R/fimsframe.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/fimsframe.R)
+
+```{r fimsframe}
+#use FIMS data frame
+data(package = "FIMS")
+fims_frame <- FIMSFrame(data_mile1)
+```
+
+The `fims_frame` object contains a `@data` slot that holds a long data frame with catch data for the fishery and index data for the survey:
+
+```{r ageframe}
+str(fims_frame)
+fims_frame@data %>% dplyr::filter(type == "landings") %>% head()
+fims_frame@data %>% dplyr::filter(type == "index") %>% head()
+```
+
+
+Using this data frame, we will start setting up the fims data objects. This example from the Model Comparison project sets up a single fishery fleet with age composition data and catch and a single survey with age composition data and an index. Data are read into fims as long vectors, regardless of their original dimension, hence the motivation behind the long data frames that are created with the fimsframe S4 classes. 
+
+
+```{r data}
+#fishery data
+fishery_catch <- fims_frame@data %>% 
+  dplyr::filter( type == "landings" ) %>%
+  .$value 
+fishery_agecomp <-c(
+  0.065, 0.110, 0.120, 0.115, 0.100, 0.065, 0.075, 0.065, 0.070, 0.040, 0.035, 0.140, 
+  0.130, 0.095, 0.120, 0.140, 0.080, 0.080, 0.055, 0.075, 0.030, 0.045, 0.030, 0.120, 
+  0.050, 0.175, 0.110, 0.150, 0.090, 0.090, 0.075, 0.050, 0.025, 0.025, 0.025, 0.135, 
+  0.035, 0.075, 0.215, 0.095, 0.095, 0.060, 0.065, 0.060, 0.055, 0.055, 0.045, 0.145, 
+  0.170, 0.040, 0.125, 0.190, 0.090, 0.075, 0.065, 0.060, 0.045, 0.025, 0.030, 0.085, 
+  0.085, 0.155, 0.075, 0.100, 0.155, 0.070, 0.095, 0.060, 0.035, 0.040, 0.040, 0.090, 
+  0.070, 0.190, 0.260, 0.070, 0.060, 0.110, 0.045, 0.050, 0.030, 0.035, 0.015, 0.065, 
+  0.075, 0.105, 0.190, 0.240, 0.065, 0.035, 0.065, 0.030, 0.030, 0.045, 0.025, 0.095, 
+  0.075, 0.120, 0.100, 0.170, 0.220, 0.045, 0.050, 0.055, 0.030, 0.035, 0.015, 0.085, 
+  0.120, 0.110, 0.175, 0.135, 0.145, 0.115, 0.025, 0.030, 0.030, 0.025, 0.015, 0.075, 
+  0.075, 0.130, 0.155, 0.130, 0.050, 0.130, 0.135, 0.025, 0.045, 0.050, 0.020, 0.055, 
+  0.050, 0.160, 0.175, 0.120, 0.115, 0.110, 0.050, 0.080, 0.020, 0.020, 0.025, 0.075, 
+  0.085, 0.105, 0.120, 0.185, 0.110, 0.105, 0.075, 0.050, 0.065, 0.015, 0.005, 0.080, 
+  0.090, 0.120, 0.130, 0.140, 0.150, 0.060, 0.100, 0.025, 0.050, 0.025, 0.030, 0.080, 
+  0.105, 0.200, 0.120, 0.100, 0.115, 0.100, 0.075, 0.045, 0.010, 0.035, 0.020, 0.075, 
+  0.130, 0.125, 0.195, 0.185, 0.080, 0.065, 0.020, 0.020, 0.050, 0.015, 0.050, 0.065, 
+  0.120, 0.170, 0.165, 0.160, 0.070, 0.050, 0.060, 0.045, 0.030, 0.020, 0.020, 0.090, 
+  0.075, 0.180, 0.230, 0.130, 0.095, 0.040, 0.040, 0.050, 0.045, 0.015, 0.020, 0.080, 
+  0.115, 0.095, 0.230, 0.190, 0.100, 0.090, 0.025, 0.020, 0.040, 0.035, 0.015, 0.045, 
+  0.075, 0.145, 0.130, 0.200, 0.180, 0.045, 0.045, 0.060, 0.020, 0.025, 0.010, 0.065, 
+  0.180, 0.140, 0.175, 0.085, 0.165, 0.075, 0.055, 0.035, 0.015, 0.020, 0.010, 0.045, 
+  0.130, 0.255, 0.100, 0.120, 0.050, 0.120, 0.080, 0.040, 0.030, 0.015, 0.020, 0.040, 
+  0.095, 0.255, 0.270, 0.075, 0.080, 0.040, 0.065, 0.035, 0.050, 0.005, 0.010, 0.020, 
+  0.060, 0.195, 0.290, 0.220, 0.055, 0.055, 0.015, 0.045, 0.020, 0.010, 0.010, 0.025, 
+  0.180, 0.175, 0.175, 0.205, 0.140, 0.020, 0.050, 0.020, 0.015, 0.010, 0.000, 0.010, 
+  0.100, 0.195, 0.180, 0.160, 0.170, 0.085, 0.045, 0.015, 0.015, 0.020, 0.015, 0.000, 
+  0.155, 0.170, 0.220, 0.115, 0.080, 0.085, 0.080, 0.010, 0.025, 0.020, 0.005, 0.035, 
+  0.180, 0.225, 0.125, 0.220, 0.100, 0.070, 0.040, 0.035, 0.005, 0.000, 0.000, 0.000, 
+  0.230, 0.250, 0.125, 0.085, 0.125, 0.045, 0.030, 0.025, 0.045, 0.015, 0.010, 0.015, 
+  0.155, 0.290, 0.215, 0.105, 0.085, 0.090, 0.020, 0.010, 0.010, 0.000, 0.005, 0.015)
+
+#survey data
+survey_index <- fims_frame@data %>% 
+  dplyr::filter( type == "index" ) %>%
+  .$value 
+#survey_agecomp <-  
+```
+
 ## Creating a Population
-Each module in the FIMS-R interface is made of S4 objects. These S4 objects serve as a interface between R and the underlining C++ code that defines FIMS. Let's now define a population.
+Each module in the FIMS-R interface is made of S4 objects. These S4 objects serve as a interface between R and the underlining C++ code that defines FIMS. Before setting up the population module, we first need to set up each component of the population (e.g. recruitment, growth, etc.). 
 
 ### Recruitment
-We'll start with a recruitment module.
+We'll start with setting up a Beverton Holt recruitment module. We first instantiate a module using the `methods::new()` function. We can use `methods::show()` to view all the fields (i.e. variables) and methods (i.e. functions) available in `fims$BevertonHoltRecruitment` module.
 
 ```{r recruitment}
 # Recruitment
-recruitment <- new(fims$BevertonHoltRecruitment)
+recruitment <- methods::new(fims$BevertonHoltRecruitment)
+methods::show(fims$BevertonHoltRecruitment)
+```
+There are three parameters we need to set-up: *log_sigma_recruit*, *log_rzero*, and *logit_steep*. Each variable of [Parameter class](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) has three additional fields: *value*, *is_random_effect*, and *estimated*. Currently, FIMS is not set up to run random effects. The default value for this field and the *estimate* field is currently set to `FALSE`.
+
+```{r set-up-recruitment}
 recruitment$log_sigma_recruit$value <- log(0.4)
 recruitment$log_rzero$value <- log(1e+06)
 recruitment$log_rzero$is_random_effect <- FALSE
@@ -77,15 +118,26 @@ recruitment$log_rzero$estimated <- TRUE
 recruitment$logit_steep$value <- -log(1.0 - 0.75) + log(0.75 - 0.2)
 recruitment$logit_steep$is_random_effect <- FALSE
 recruitment$logit_steep$estimated <- FALSE
-recruitment$estimate_deviations <- FALSE
-recruitment$deviations <- rep(0.01,30)
+```
 
+We also need to set up recruitment deviations. FIMS recruitment modules have a boolean, *estimate_deviations* to specify whether or not deviations are estimated; and a vector, *deviations* to set the deviation values. The *deviations* vector takes values greater than 0 as these will be logged in the likelihood.
+
+```{r rec-devs}
+recruitment$estimate_deviations <- FALSE
+recruitment$deviations <- c(1.0931337, 1.5494153, 0.8754735, 0.6488721,
+                            1.9128839, 1.6593211, 0.9327825, 1.3531871, 
+                            0.9207434, 1.2304792, 1.1652038, 0.8048559, 
+                            0.8752845, 1.1187967, 0.8989675, 1.3083559, 
+                            1.2724463, 0.5799534, 0.7891447, 0.5571984, 
+                            1.3515173, 1.2452116, 0.8002613, 0.5983474, 
+                            1.1704664, 0.5828168, 0.8223697, 1.2225558,
+                            1.4513402, 0.9308739)
 ```
 ### Growth
-Now, we'll define the growth module for our population using an emprical weight at age model.
+Now, we'll define the growth module for our population using an empirical weight at age model.
 ```{r growth}
 # Growth
-ewaa_growth <- new(fims$EWAAgrowth)
+ewaa_growth <- methods::new(fims$EWAAgrowth)
 ewaa_growth$ages <- ages
 ewaa_growth$weights <- c(0.5306555, 1.1963283, 2.0582654, 
                          3.0349873, 4.0552124, 5.0646975,
@@ -119,93 +171,34 @@ population$log_init_naa <- log(c(993947.5,811707.8, 661434.4,
 population$estimate_init_naa <- TRUE
 population$nages <- nages
 population$ages <- ages
-population$nfleets <- 1
+population$nfleets <- 1 # 1 fleet and 1 survey
 population$nseasons <- 1
 population$nyears <- nyears
+```
+
+Now we need to link up the recruitment, growth, and maturity modules we set above with this new population module. We do this by calling `get_id()` from each respective module and passing that unique ID into each respective `Set` function from population. 
+
+```{r set-pop-modules}
 population$SetMaturity(maturity$get_id())
 population$SetGrowth(ewaa_growth$get_id())
 population$SetRecruitment(recruitment$get_id())
 
 ```
 
+
 ## Creating a Fleet
 Now that we've defined our population, lets create a fleet.
 ### Fleet Data
-Each fleet is required to have data in order to evaluate the objective function. For this example, we'll create both index and age composition data for the fleet to use.
+Each fleet is required to have data in order to evaluate the objective function. For this example, we'll create both index and age composition data for the fleet to use. 
 
 ```{r fleet_data}
 #fleet index data
 fishing_fleet_index <- new(fims$Index, nyears)
-fishing_fleet_index$index_data <- c(161.0209, 462.6704, 752.5893, 990.4719, 767.5680,
-                                    1342.6760, 1320.4303, 2621.7667, 1424.2983, 1655.4339,
-                                    1762.7849, 1753.7154, 1197.6424, 1635.5958, 1596.6087,
-                                    1336.5701, 2352.9983, 1691.9737, 1526.3070, 1356.1707,
-                                    1639.3456, 1077.0756, 1642.2114, 1220.4527, 1123.7597,
-                                    961.4341, 902.1445, 1167.9457,851.6286,1277.4184)
-
+fishing_fleet_index$index_data <- fishery_catch
 #fleet age composition data
 fishing_fleet_age_comp <- new(fims$AgeComp, nyears, nages)
-fishing_fleet_age_comp$age_comp_data <- 
-  c(0.06850328,0.1038966,0.1236552,0.1210534,0.1062626,0.08887275,
-0.07291538,0.0593899,0.04824275,0.03914874,0.03175732,0.1363021,
-0.1027769,0.1004049,0.1192627,0.1166035,0.1022935,0.08553161,
-0.07016737,0.05714956,0.04642229,0.03767127,0.03055874,0.1311577,
-0.05849454,0.1556373,0.1185907,0.1153229,0.1008387,0.0841864,
-0.06902094,0.05620249,0.04564895,0.0370425,0.03004833,0.1289663,
-0.04539611,0.09154689,0.1892468,0.117668,0.1021384,0.08491672,
-0.06948834,0.05654024,0.04591004,0.03725037,0.03021575,0.1296823,
-0.1313104,0.06637682,0.1039419,0.1751528,0.09713002,0.08012914,
-0.06528608,0.05301708,0.04301555,0.03489144,0.02829916,0.1214495,
-0.1095769,0.1886934,0.07386106,0.09416401,0.1414713,0.07455554,
-0.06027489,0.04873505,0.03946391,0.03198549,0.02593452,0.1112839,
-0.06227129,0.1635249,0.2170125,0.06882838,0.07799228,0.1111902,
-0.05738959,0.04603236,0.03711024,0.030018,0.02431987,0.1043105,
-0.09325032,0.093674,0.1875435,0.2002648,0.05626676,0.0604187,
-0.08431651,0.04316854,0.03452163,0.02779966,0.02247759,0.096298,
-0.06939175,0.1459531,0.1113883,0.1782526,0.1677267,0.04453445,
-0.04675636,0.06469573,0.03301804,0.02637339,0.02122884,0.09068068,
-0.09521023,0.1050118,0.1689576,0.1038815,0.1472861,0.1313223,
-0.03413025,0.03554376,0.04903305,0.0249966,0.01995801,0.08466889,
-0.09419731,0.1442282,0.1211014,0.1563235,0.08494411,0.1139899,
-0.09943685,0.02563011,0.02660946,0.0366663,0.01868431,0.07818854,
-0.06975364,0.1460515,0.1696754,0.113967,0.1297857,0.0666933,
-0.08753313,0.07571799,0.01945552,0.02017559,0.02778896,0.07340229,
-0.08081362,0.107745,0.1717811,0.1599299,0.09482732,0.1021437,
-0.05133946,0.06681847,0.05761919,0.01478802,0.01532882,0.07686541,
-0.1063761,0.1216016,0.1234139,0.1579679,0.1300651,0.07301843,
-0.07696323,0.03836646,0.04978157,0.04287938,0.01100045,0.06856584,
-0.0908321,0.1621817,0.1400625,0.1133024,0.1276705,0.09931219,
-0.05450787,0.05696262,0.02830574,0.03668429,0.03158434,0.05859374,
-0.1326196,0.1314124,0.1773926,0.122105,0.08693333,0.09253051,
-0.07036372,0.03828884,0.03988541,0.01979637,0.02564497,0.06302738,
-0.1300496,0.1904382,0.1406887,0.1501582,0.09065881,0.06089164,
-0.06332944,0.04773776,0.02589222,0.02693941,0.01336493,0.05985115,
-0.06706301,0.2015445,0.2172311,0.1249552,0.1157245,0.06556313,
-0.04293307,0.04422426,0.03321709,0.01799261,0.01871118,0.05084044,
-0.09892782,0.1028645,0.2292159,0.1937902,0.09719547,0.0846651,
-0.04681024,0.03037065,0.03117648,0.02338706,0.01266207,0.04893445,
-0.07877254,0.1565778,0.1207959,0.2112496,0.1557747,0.07349518,
-0.06248035,0.03422709,0.0221305,0.02268888,0.01701212,0.04479543,
-0.1937409,0.1120838,0.1636893,0.09850957,0.1498394,0.1038223,
-0.0477854,0.04024404,0.02196903,0.01418638,0.01453741,0.03959238,
-0.174238,0.261354,0.1108504,0.1255238,0.06536564,0.09317049,
-0.06290467,0.02866909,0.02405635,0.01311449,0.008464387,0.03228873,
-0.1102996,0.24352,0.2663843,0.08771188,0.08618601,0.04213116,
-0.05856157,0.03916321,0.01778565,0.01490447,0.00812136,0.02523078,
-0.0956373,0.1666404,0.2648488,0.2212958,0.06249948,0.05731696,
-0.02725725,0.0374928,0.02497597,0.01132632,0.009486488,0.02122248,
-0.1891266,0.1330186,0.1684084,0.206394,0.1488462,0.0393535,
-0.03515311,0.01655112,0.02268192,0.01508892,0.006839194,0.01853843,
-0.09959471,0.2759409,0.1414871,0.1384331,0.1465926,0.09901339,
-0.02550294,0.02255612,0.01058096,0.01448057,0.009628214,0.01618933,
-0.1425202,0.1408522,0.2857294,0.1136929,0.09637288,0.09570247,
-0.06300624,0.01607167,0.01416332,0.006635076,0.009075958,0.01617776,
-0.2084918,0.1885971,0.1348439,0.2107394,0.07240976,0.05748458,
-0.05561424,0.0362534,0.009213551,0.008108497,0.003796677,0.014447,
-0.2280418,0.2563335,0.1669481,0.09112516,0.1220816,0.03913692,
-0.03022117,0.02893199,0.01878627,0.004767499,0.00419346,0.009432482,
-0.1392299,0.298398,0.2404066,0.1198067,0.05626113,0.07047664,
-0.02199718,0.01681464,0.01603673,0.01039855,0.002637544,0.007536435)
+# Effective sampling size is 200
+fishing_fleet_age_comp$age_comp_data <- fishery_agecomp * 200
 
 ```
 ### Fleet Selectivity
