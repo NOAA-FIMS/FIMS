@@ -30,7 +30,7 @@ Data and variable values are taken from the [Li et. al.](https://spo.nmfs.noaa.g
 First let's set up the dimensions of the model based on the Model Comparison project:
 ```{r fims-dims}
 nyears <- 30 # the number of years which we have data for.
-nseanons<- 1 # the number of seasons in each year. FIMS currently defaults to 1
+nseasons<- 1 # the number of seasons in each year. FIMS currently defaults to 1
 ages <- c(1,2,3,4,5,6,7,8,9,10,11,12) # age vector.
 nages <- 12 # the number of age groups.
 ```
@@ -172,7 +172,7 @@ fishing_fleet_age_comp$age_comp_data <- fishery_agecomp * 200
 ```
 
 #### Fleet Selectivity
-Now that we've passed in data for the fishing fleet, we need to set up its selectivity module. We will set this to be selecrivity function using the LogisticSelectivity module. The`methods::show()` function indicates this module has two parameter fields: *median* and *slope*, and an `evaluate()` and `get_id()` function. 
+Now that we've passed in data for the fishing fleet, we need to set up its selectivity module. We will set this to be selectivity function using the LogisticSelectivity module. The`methods::show()` function indicates this module has two parameter fields: *median* and *slope*, and an `evaluate()` and `get_id()` function. 
 
 Each variable of [Parameter class](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) has three additional fields: *value*, *is_random_effect*, and *estimated*. Currently, FIMS is not set up to run random effects. The default value for this field and the *estimate* field is currently set to `FALSE`. We can use the *value* field to input variables defined in the Model Comparison project.
  
@@ -193,7 +193,7 @@ Now that we've created everything that a fleet needs, lets create the actual fle
 ```{r show-Fleet}
 show(fims$Fleet)
 ```
-We can see that there are five boolean flags: estimate_F, estimate_q, and is_survey, random_F, and random_q. THere is a vecotr, log_Fmort, a Parameter, log_obs_error, and a double, log_q. There are two integerfields for the number of ages and years. Additionally, there are five Methods: SetAgeCompLikelihood, SetIndexLikelihood, SetObservedAgeCompData, SetObservedIndexData, and setSelectivity. The last three of these will be used to link up the AgeCOmp, Index, and Selectivity modules defined above with the fleet module defined below. 
+We can see that there are five boolean flags: estimate_F, estimate_q, and is_survey, random_F, and random_q. There is a vector, log_Fmort, a Parameter, log_obs_error, and a double, log_q. There are two integer fields for the number of ages and years. Additionally, there are five Methods: SetAgeCompLikelihood, SetIndexLikelihood, SetObservedAgeCompData, SetObservedIndexData, and setSelectivity. The last three of these will be used to link up the AgeComp, Index, and Selectivity modules defined above with the fleet module defined below. 
 
 
 ```{r fleet}
@@ -230,7 +230,7 @@ fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
 ```
 
 ### The Survey Module
-We will now repeat the steps from Fleet to set up the Survey. A survey object is essentially the same as a fleet object with a catachabilty (q) variable.
+We will now repeat the steps from Fleet to set up the Survey. A survey object is essentially the same as a fleet object with a catchability (q) variable.
 
 #### Survey Data
 
@@ -356,7 +356,7 @@ population$estimate_init_naa <- TRUE
 population$nages <- nages
 population$ages <- ages
 population$nfleets <- 2 # 1 fleet and 1 survey
-population$nseasons <- nseanons
+population$nseasons <- nseasons
 population$nyears <- nyears
 population$prop_female <- 0.5
 ```
