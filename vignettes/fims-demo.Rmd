@@ -95,9 +95,15 @@ fishery_agecomp <-c(
   0.155, 0.290, 0.215, 0.105, 0.085, 0.090, 0.020, 0.010, 0.010, 0.000, 0.005, 0.015)
 
 #survey data
-survey_index <- fims_frame@data %>% 
-  dplyr::filter( type == "index" ) %>%
-  .$value 
+# survey_index <- fims_frame@data %>% 
+#   dplyr::filter( type == "index" ) %>%
+#   .$value 
+survey_index <- c(0.006795379, 0.006170738, 0.005977854, 0.005907966, 0.007211237,
+                  0.006867264, 0.006329387, 0.006137000, 0.005279601, 0.005666829,
+                  0.004806935, 0.004374876, 0.003992211, 0.004188884, 0.003711145,
+                  0.003818704, 0.002878658, 0.002936660, 0.002972886, 0.002484963,
+                  0.001983795, 0.001738507, 0.002122178, 0.001617189, 0.001745169,
+                  0.001414111, 0.001350571, 0.001323396, 0.001069791, 0.001459411)
 
 #survey agecomp not set up in fimsframe yet
 survey_agecomp <- c(0.085, 0.115, 0.175, 0.130, 0.085, 0.055, 0.075, 0.065, 0.050, 0.025,
@@ -340,7 +346,7 @@ Now that our life history sub-models are defined, lets define the actual populat
 ```{r population}
 # Population
 population <- new(fims$Population)
-population$log_M <- rep(log(0.2), nages)
+population$log_M <- rep(log(0.2), nyears * nages)
 population$estimate_M <- FALSE
 population$log_init_naa <- log(c(993947.5,811707.8, 661434.4, 
                                  537804.8, 436664.0, 354303.4, 
@@ -350,7 +356,7 @@ population$estimate_init_naa <- TRUE
 population$nages <- nages
 population$ages <- ages
 population$nfleets <- 2 # 1 fleet and 1 survey
-population$nseasons <- 1
+population$nseasons <- nseanons
 population$nyears <- nyears
 population$prop_female <- 0.5
 ```
@@ -406,7 +412,7 @@ print(index_results)
 
 ggplot(index_results, aes(x=1:nyears, y=observed)) + geom_point() +
          xlab("Year") + ylab("Index") +
-  geom_line(aes(x=1:nyears, y=expected, col = "blue")) +
+  geom_line(aes(x=1:nyears, y=expected), color = "blue") +
   theme_bw()
 
 catch_results <- data.frame(observed = fishing_fleet_index$index_data,
@@ -415,7 +421,7 @@ print(catch_results)
 
 ggplot(catch_results, aes(x=1:nyears, y=observed)) + geom_point() +
          xlab("Year") + ylab("Index") +
-  geom_line(aes(x=1:nyears, y=expected, col = "blue")) +
+  geom_line(aes(x=1:nyears, y=expected), color = "blue") +
   theme_bw()
 
 ```
