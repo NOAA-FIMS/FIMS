@@ -94,26 +94,35 @@ void clear_internal(){
     d0->fixed_effects_parameters.clear();
     d0->random_effects_parameters.clear();
 
+   
+}
+/**
+ * Clears the vector of independent variables.
+ */
+void clear() {
+
+  // rcpp_interface_base.hpp
+  FIMSRcppInterfaceBase::fims_interface_objects.clear();
     // rcpp_data.hpp
   
     DataInterface::id_g = 1;
-    DataInterface::live_objects.clear();
+    DataInterface::fims_interface_objects.clear();
     AgeCompDataInterface::id_g = 1;
     IndexDataInterface::id_g = 1;
     
     // rcpp_fleets.hpp
-  //   FleetInterface::id_g = 1;
-
+     FleetInterface::id_g = 1;
+     FleetInterface::fims_interface_objects.clear();
     // rcpp_growth.hpp
-  //   GrowthInterfaceBase::id_g = 1;
-  //   GrowthInterfaceBase::live_objects.clear();
+     GrowthInterfaceBase::id_g = 1;
+     GrowthInterfaceBase::live_objects.clear();
 
     EWAAGrowthInterface::id_g = 1;
     EWAAGrowthInterface::live_objects.clear();
 
     // rcpp_maturity.hpp
-  //   MaturityInterfaceBase::id_g = 1;
-  //   MaturityInterfaceBase::maturity_objects.clear();
+     MaturityInterfaceBase::id_g = 1;
+     MaturityInterfaceBase::maturity_objects.clear();
 
     LogisticMaturityInterface::id_g = 1;
     LogisticMaturityInterface::maturity_objects.clear();
@@ -126,15 +135,15 @@ void clear_internal(){
     PopulationInterface::live_objects.clear();
 
     // rcpp_recruitment.hpp
-  //   RecruitmentInterfaceBase::id_g = 1;
-  //   RecruitmentInterfaceBase::live_objects.clear();
+     RecruitmentInterfaceBase::id_g = 1;
+     RecruitmentInterfaceBase::live_objects.clear();
 
     BevertonHoltRecruitmentInterface::id_g = 1;
     BevertonHoltRecruitmentInterface::live_objects.clear();
     
     // rcpp_selectivity.hpp
-  //   SelectivityInterfaceBase::id_g = 1;
-  //   SelectivityInterfaceBase::selectivity_objects.clear();
+     SelectivityInterfaceBase::id_g = 1;
+     SelectivityInterfaceBase::selectivity_objects.clear();
 
     LogisticSelectivityInterface::id_g = 1;
     LogisticSelectivityInterface::selectivity_objects.clear();
@@ -143,8 +152,8 @@ void clear_internal(){
     DoubleLogisticSelectivityInterface::selectivity_objects.clear();
     
     // rcpp_tmb_distribution.hpp
-  //   DistributionsInterfaceBase::id_g = 1;
-  //   DistributionsInterfaceBase::live_objects.clear();
+     DistributionsInterfaceBase::id_g = 1;
+     DistributionsInterfaceBase::live_objects.clear();
 
     DnormDistributionsInterface::id_g = 1;
     DnormDistributionsInterface::live_objects.clear();
@@ -155,33 +164,7 @@ void clear_internal(){
     DmultinomDistributionsInterface::id_g = 1;
     DmultinomDistributionsInterface::live_objects.clear();
     
-    
-    std::shared_ptr<fims::Information<Type>> info =
-        fims::Information<Type>::GetInstance();
-    info->data_objects.clear();
-    info->recruitment_models.clear();
-    info->selectivity_models.clear();
-    info->growth_models.clear();
-    info->maturity_models.clear();
-    info->fleets.clear();
-    info->populations.clear();
-    info->distribution_models.clear();
-    info->parameters.clear();
-    info->random_effects_parameters.clear();
-    info->fixed_effects_parameters.clear();
-    
-//    std::shared_ptr<fims::Model<Type> > model =
-//       fims::Model<Type>::GetInstance();
-//    model->fims_information = nullptr;
-    
-}
-/**
- * Clears the vector of independent variables.
- */
-void clear() {
-
-  // rcpp_interface_base.hpp
-  FIMSRcppInterfaceBase::fims_interface_objects.clear();
+    FIMSRcppInterfaceBase::fims_interface_objects.clear();
     clear_internal<TMB_FIMS_REAL_TYPE>();
     clear_internal<TMB_FIMS_FIRST_ORDER>();
     clear_internal<TMB_FIMS_SECOND_ORDER>();
