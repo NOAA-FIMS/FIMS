@@ -51,11 +51,11 @@ public:
      * **/
     virtual double evaluate(double spawners, double ssbzero) = 0;
 
-/**
- * @brief evaluate recruitment nll
- * 
- * @return double 
- */
+    /**
+     * @brief evaluate recruitment nll
+     * 
+     * @return double 
+     */
     virtual double evaluate_nll() = 0;
 };
 
@@ -75,8 +75,8 @@ public:
     Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
     Rcpp::NumericVector recruit_bias_adjustment; /**<vector bias adjustment*/
     Rcpp::NumericVector deviations; /**< recruitment deviations*/
-    bool estimate_deviations= false; /**< boolean describing whether to estimate */
-    bool use_bias_correction = false;/**< boolean describing whether to do bias correction */
+    bool estimate_deviations = false; /**< boolean describing whether to estimate */
+    bool use_bias_correction = false; /**< boolean describing whether to do bias correction */
 
     BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {
     }
@@ -96,236 +96,99 @@ public:
         return BevHolt.evaluate(spawners, ssbzero);
     }
 
-     virtual double evaluate_nll() {
-    fims::SRBevertonHolt<double> NLL;
+    virtual double evaluate_nll() {
+        fims::SRBevertonHolt<double> NLL;
 
-    NLL.log_sigma_recruit = this->log_sigma_recruit.value;
-    NLL.recruit_deviations.resize(
-        deviations.size());  // Vector from TMB
-    NLL.recruit_bias_adjustment.resize(
-        recruit_bias_adjustment.size());  // Vector from TMB
-    for (int i = 0; i < deviations.size(); i++) {
-      NLL.recruit_deviations[i] = deviations[i];
-      NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
+        NLL.log_sigma_recruit = this->log_sigma_recruit.value;
+        NLL.recruit_deviations.resize(
+                deviations.size()); // Vector from TMB
+        NLL.recruit_bias_adjustment.resize(
+                recruit_bias_adjustment.size()); // Vector from TMB
+        for (int i = 0; i < deviations.size(); i++) {
+            NLL.recruit_deviations[i] = deviations[i];
+            NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
+        }
+        Rcout << "Rec devs being passed to C++ are " << deviations
+                << std::endl;
+
+        Rcout << "Rec bias adj being passed to C++ are " << recruit_bias_adjustment
+                << std::endl;
+
+        NLL.use_recruit_bias_adjustment = this->use_bias_correction;
+        NLL.estimate_recruit_deviations = this->estimate_deviations;
+        // NLL.PrepareConstrainedDeviations();
+        // NLL.PrepareBiasAdjustment();
+        return NLL.evaluate_nll();
     }
-    Rcout << "Rec devs being passed to C++ are " << deviations
-          << std::endl;
 
-    Rcout << "Rec bias adj being passed to C++ are " << recruit_bias_adjustment
-          << std::endl;
+#ifdef TMB_MODEL
 
-    NLL.use_recruit_bias_adjustment = this->use_bias_correction;
-    NLL.estimate_recruit_deviations = this->estimate_deviations;
-    // NLL.PrepareConstrainedDeviations();
-    // NLL.PrepareBiasAdjustment();
-    return NLL.evaluate_nll();
-  }
+    template<typename T>
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims::Information<T> > info =
+                fims::Information<T>::GetInstance();
+
+        std::shared_ptr<fims::SRBevertonHolt<T> > recruitment =
+                std::make_shared<fims::SRBevertonHolt<T> >();
+
+        // set relative info
+        recruitment->id = this->id;
+        recruitment->logit_steep = this->logit_steep.value;
+        if (this->logit_steep.estimated) {
+            if (this->logit_steep.is_random_effect) {
+                info->RegisterRandomEffect(recruitment->logit_steep);
+            } else {
+                info->RegisterParameter(recruitment->logit_steep);
+            }
+        }
+        recruitment->log_rzero = this->log_rzero.value;
+        if (this->log_rzero.estimated) {
+            if (this->log_rzero.is_random_effect) {
+                info->RegisterRandomEffect(recruitment->log_rzero);
+            } else {
+                info->RegisterParameter(recruitment->log_rzero);
+            }
+        }
+        recruitment->log_sigma_recruit = this->log_sigma_recruit.value;
+        if (this->log_sigma_recruit.estimated) {
+            if (this->log_sigma_recruit.is_random_effect) {
+                info->RegisterRandomEffect(recruitment->log_sigma_recruit);
+            } else {
+                info->RegisterParameter(recruitment->log_sigma_recruit);
+            }
+        }
+
+        recruitment->recruit_deviations.resize(this->deviations.size());
+        if (this->estimate_deviations) {
+            for (size_t i = 0; i < recruitment->recruit_deviations.size(); i++) {
+                recruitment->recruit_deviations[i] = this->deviations[i];
+                info->RegisterParameter(recruitment->recruit_deviations[i]);
+            }
+        } else {
+            for (size_t i = 0; i < recruitment->recruit_deviations.size(); i++) {
+                recruitment->recruit_deviations[i] = this->deviations[i];
+            }
+        }
+
+        recruitment->use_recruit_bias_adjustment = this->use_bias_correction;
+        // add to Information
+        info->recruitment_models[recruitment->id] = recruitment;
+
+    }
 
     /** @brief this adds the parameter values and derivatives to the TMB model
      * object */
     virtual bool add_to_fims_tmb() {
-        // base model
-        std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-                fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-        std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE> > b0 =
-                std::make_shared<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE> >();
-
-        // set relative info
-        b0->id = this->id;
-        b0->logit_steep = this->logit_steep.value;
-        if (this->logit_steep.estimated) {
-            if (this->logit_steep.is_random_effect) {
-                d0->RegisterRandomEffect(b0->logit_steep);
-            } else {
-                d0->RegisterParameter(b0->logit_steep);
-            }
-        }
-        b0->log_rzero = this->log_rzero.value;
-        if (this->log_rzero.estimated) {
-            if (this->log_rzero.is_random_effect) {
-                d0->RegisterRandomEffect(b0->log_rzero);
-            } else {
-                d0->RegisterParameter(b0->log_rzero);
-            }
-        }
-        b0->log_sigma_recruit = this->log_sigma_recruit.value;
-        if (this->log_sigma_recruit.estimated) {
-            if (this->log_sigma_recruit.is_random_effect) {
-                d0->RegisterRandomEffect(b0->log_sigma_recruit);
-            } else {
-                d0->RegisterParameter(b0->log_sigma_recruit);
-            }
-        }
-
-        b0->recruit_deviations.resize(this->deviations.size());
-        if (this->estimate_deviations) {
-            for (size_t i = 0; i < b0->recruit_deviations.size(); i++) {
-                b0->recruit_deviations[i] = this->deviations[i];
-                d0->RegisterParameter(b0->recruit_deviations[i]);
-            }
-        } else {
-            for (size_t i = 0; i < b0->recruit_deviations.size(); i++) {
-                b0->recruit_deviations[i] = this->deviations[i];
-            }
-        }
-
-        b0->use_recruit_bias_adjustment = this->use_bias_correction;
-        // add to Information
-        d0->recruitment_models[b0->id] = b0;
-
-        // first-order derivative
-        std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-                fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-
-        std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> > b1 =
-                std::make_shared<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> >();
-
-        // set relative info
-        b1->id = this->id;
-        b1->logit_steep = this->logit_steep.value;
-        if (this->logit_steep.estimated) {
-            if (this->logit_steep.is_random_effect) {
-                d1->RegisterRandomEffect(b1->logit_steep);
-            } else {
-                d1->RegisterParameter(b1->logit_steep);
-            }
-        }
-        b1->log_rzero = this->log_rzero.value;
-        if (this->log_rzero.estimated) {
-            if (this->log_rzero.is_random_effect) {
-                d1->RegisterRandomEffect(b1->log_rzero);
-            } else {
-                d1->RegisterParameter(b1->log_rzero);
-            }
-        }
-        b1->log_sigma_recruit = this->log_sigma_recruit.value;
-        if (this->log_sigma_recruit.estimated) {
-            if (this->log_sigma_recruit.is_random_effect) {
-                d1->RegisterRandomEffect(b1->log_sigma_recruit);
-            } else {
-                d1->RegisterParameter(b1->log_sigma_recruit);
-            }
-        }
-
-        b1->recruit_deviations.resize(this->deviations.size());
-        if (this->estimate_deviations) {
-            for (size_t i = 0; i < b1->recruit_deviations.size(); i++) {
-                b1->recruit_deviations[i] = this->deviations[i];
-                d1->RegisterParameter(b1->recruit_deviations[i]);
-            }
-        } else {
-            for (size_t i = 0; i < b1->recruit_deviations.size(); i++) {
-                b1->recruit_deviations[i] = this->deviations[i];
-            }
-        }
-
-        b1->use_recruit_bias_adjustment = this->use_bias_correction;
-        // add to Information
-        d1->recruitment_models[b1->id] = b1;
-
-        // second-order derivative
-        std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-                fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-
-        std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> > b2 =
-                std::make_shared<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> >();
-
-        // set relative info
-        b2->id = this->id;
-        b2->logit_steep = this->logit_steep.value;
-        if (this->logit_steep.estimated) {
-            if (this->logit_steep.is_random_effect) {
-                d2->RegisterRandomEffect(b2->logit_steep);
-            } else {
-                d2->RegisterParameter(b2->logit_steep);
-            }
-        }
-        b2->log_rzero = this->log_rzero.value;
-        if (this->log_rzero.estimated) {
-            if (this->log_rzero.is_random_effect) {
-                d2->RegisterRandomEffect(b2->log_rzero);
-            } else {
-                d2->RegisterParameter(b2->log_rzero);
-            }
-        }
-        b2->log_sigma_recruit = this->log_sigma_recruit.value;
-        if (this->log_sigma_recruit.estimated) {
-            if (this->log_sigma_recruit.is_random_effect) {
-                d2->RegisterRandomEffect(b2->log_sigma_recruit);
-            } else {
-                d2->RegisterParameter(b2->log_sigma_recruit);
-            }
-        }
-
-        b2->recruit_deviations.resize(this->deviations.size());
-        if (this->estimate_deviations) {
-            for (size_t i = 0; i < b2->recruit_deviations.size(); i++) {
-                b2->recruit_deviations[i] = this->deviations[i];
-                d2->RegisterParameter(b2->recruit_deviations[i]);
-            }
-        } else {
-            for (size_t i = 0; i < b2->recruit_deviations.size(); i++) {
-                b2->recruit_deviations[i] = this->deviations[i];
-            }
-        }
-
-        b2->use_recruit_bias_adjustment = this->use_bias_correction;
-        // add to Information
-        d2->recruitment_models[b2->id] = b2;
-
-        // third-order derivative
-        std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-                fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-
-        std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> > b3 =
-                std::make_shared<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> >();
-
-        // set relative info
-        b3->id = this->id;
-        b3->logit_steep = this->logit_steep.value;
-        if (this->logit_steep.estimated) {
-            if (this->logit_steep.is_random_effect) {
-                d3->RegisterRandomEffect(b3->logit_steep);
-            } else {
-                d3->RegisterParameter(b3->logit_steep);
-            }
-        }
-        b3->log_rzero = this->log_rzero.value;
-        if (this->log_rzero.estimated) {
-            if (this->log_rzero.is_random_effect) {
-                d3->RegisterRandomEffect(b3->log_rzero);
-            } else {
-                d3->RegisterParameter(b3->log_rzero);
-            }
-        }
-        b3->log_sigma_recruit = this->log_sigma_recruit.value;
-        if (this->log_sigma_recruit.estimated) {
-            if (this->log_sigma_recruit.is_random_effect) {
-                d3->RegisterRandomEffect(b3->log_sigma_recruit);
-            } else {
-                d3->RegisterParameter(b3->log_sigma_recruit);
-            }
-        }
-
-        b3->recruit_deviations.resize(this->deviations.size());
-        if (this->estimate_deviations) {
-            for (size_t i = 0; i < b3->recruit_deviations.size(); i++) {
-                b3->recruit_deviations[i] = this->deviations[i];
-                d3->RegisterParameter(b3->recruit_deviations[i]);
-            }
-        } else {
-            for (size_t i = 0; i < b3->recruit_deviations.size(); i++) {
-                b3->recruit_deviations[i] = this->deviations[i];
-            }
-        }
-
-        b3->use_recruit_bias_adjustment = this->use_bias_correction;
-        // add to Information
-        d3->recruitment_models[b3->id] = b3;
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
 
         return true;
     }
+    
+#endif
 };
 
 #endif
