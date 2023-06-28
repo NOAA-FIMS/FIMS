@@ -17,7 +17,7 @@ The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework
 
 ## Creating Models in FIMS
 To begin, we import the FIMS and TMB libraries. We then create a new Rcpp fims module using `Rcpp::Module` and call `fims$clear` to ensure C++ memory from any previous fims model run is cleared out. 
-```{r fims1, echo = FALSE, warning=FALSE, message=FALSE}
+```{r fims1, warning=FALSE, message=FALSE}
 #install from test-estimation branch
 remotes::install_github("NOAA-FIMS/FIMS@integration-test-estimation-R-clear-FIMS")
 library(FIMS)
