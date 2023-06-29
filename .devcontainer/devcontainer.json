@@ -43,7 +43,8 @@
 				 "matepek.vscode-catch2-text-adapter",
 				 "hbenl.vscode-test-explorer",
 				 "reditorsupport.r",
-				 "rdebugger.r-debugger"
+				 "rdebugger.r-debugger",
+                 "github.vscode-pull-request-github"
 	 		]
 	     }
 	 
