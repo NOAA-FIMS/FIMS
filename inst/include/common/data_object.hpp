@@ -90,7 +90,7 @@ struct DataObject : public fims::FIMSObject<Type> {
   /**
    * Retrieve element from 1d data set.
    * @param i dimension of 1d data set
-   * @return
+   * @return the value of the vector at position i
    */
   inline Type operator()(size_t i) { return data[i]; }
 
@@ -98,7 +98,7 @@ struct DataObject : public fims::FIMSObject<Type> {
    * Retrieve element from 1d data set.
    * Throws an exception if index is out of bounds.
    * @param i dimension of 1d data set
-   * @return reference type
+   * @return the reference to the value of the vector at position i
    */
   inline Type& at(size_t i) {
     if (i >= this->data.size()) {
@@ -124,7 +124,7 @@ struct DataObject : public fims::FIMSObject<Type> {
    * Retrieve element from 2d data set.
    * @param i 1st dimension of 2d data set
    * @param j 2nd dimension of 2d data set
-   * @return
+   * @return the value of the matrix at position i, j
    */
   inline const Type operator()(size_t i, size_t j) {
     return data[i * jmax + j];
@@ -133,9 +133,9 @@ struct DataObject : public fims::FIMSObject<Type> {
   /**
    * Retrieve element from 2d data set.
    * Throws an exception if index is out of bounds.
-   * @param i
-   * @param j
-   * @return reference type
+   * @param i 1st dimension of 2d data set
+   * @param j 2nd dimension of 2d data set
+   * @return the reference to the value of the matrix at position i, j
    */
   inline Type& at(size_t i, size_t j) {
     if ((i * jmax + j) >= this->data.size()) {
@@ -160,10 +160,10 @@ struct DataObject : public fims::FIMSObject<Type> {
 
   /**
    * Retrieve element from 3d data set.
-   * @param i
-   * @param j
-   * @param k
-   * @return reference type
+   * @param i 1st dimension of 3d data set
+   * @param j 2nd dimension of 3d data set
+   * @param k 3rd dimension of 3d data set
+   * @return the value of the array at position i, j, k
    */
   inline const Type operator()(size_t i, size_t j, size_t k) {
     return data[i * jmax * kmax + j * kmax + k];
@@ -172,10 +172,10 @@ struct DataObject : public fims::FIMSObject<Type> {
   /**
    * Retrieve element from 3d data set.
    * Throws an exception if index is out of bounds.
-   * @param i
-   * @param j
-   * @param k
-   * @return reference type
+   * @param i 1st dimension of 3d data set
+   * @param j 2nd dimension of 3d data set
+   * @param k 3rd dimension of 3d data set
+   * @return the reference to the value of the array at position i, j, k
    */
   inline Type& at(size_t i, size_t j, size_t k) {
     if ((i * jmax * kmax + j * kmax + k) >= this->data.size()) {
@@ -186,11 +186,11 @@ struct DataObject : public fims::FIMSObject<Type> {
 
   /**
    * Retrieve element from 3d data set.
-   * @param i
-   * @param j
-   * @param k
-   * @param l
-   * @return reference type
+   * @param i 1st dimension of 4d data set
+   * @param j 2nd dimension of 4d data set
+   * @param k 3rd dimension of 4d data set
+   * @param l 4th dimension of 4d data set
+   * @return the value of the array at position i, j, k, l
    */
   inline const Type operator()(size_t i, size_t j, size_t k, size_t l) {
     return data[i * jmax * kmax * lmax + j * kmax * lmax + k * lmax + l];
@@ -199,11 +199,11 @@ struct DataObject : public fims::FIMSObject<Type> {
   /**
    * Retrieve element from 3d data set.
    * Throws an exception if index is out of bounds.
-   * @param i
-   * @param j
-   * @param k
-   * @param l
-   * @return reference type
+   * @param i 1st dimension of 4d data set
+   * @param j 2nd dimension of 4d data set
+   * @param k 3rd dimension of 4d data set
+   * @param l 4th dimension of 4d data set
+   * @return the reference to the value of the array at position i, j, k, l
    */
   inline Type& at(size_t i, size_t j, size_t k, size_t l) {
     if ((i * jmax * kmax * lmax + j * kmax * lmax + k * lmax + l) >=

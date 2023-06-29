@@ -93,37 +93,20 @@ class Model {  // may need singleton
       #ifdef TMB_MODEL
         (*jt).second->of = this->of;
       #endif
-      age_comp_nll += (*jt).second->evaluate_age_comp_ll();
+      age_comp_nll += (*jt).second->evaluate_age_comp_nll();
       FIMS_LOG << "survey and fleet age comp nll sum: " << age_comp_nll << std::endl;
-      index_nll += (*jt).second->evaluate_index_ll();
+      index_nll += (*jt).second->evaluate_index_nll();
       FIMS_LOG << "survey and fleet index nll sum: " << index_nll << std::endl;
       if((*jt).second->is_survey == false){
       #ifdef TMB_MODEL
         (*jt).second->of = this->of;
       #endif
-        // ReportFleet() includes ifdef TMB_MODEL statement
         (*jt).second->ReportFleet();
       }
     }
 
 
-      //get recruitment nll after all populations are evaluated
- //     for (it = this->fims_information->populations.begin();
- //       it != this->fims_information->populations.end(); ++it) {
- //         rec_nll += (*it).second->recruitment->evaluate_nll();
- //     }
-
     jnll = rec_nll + age_comp_nll + index_nll;
-/* REPORT_F not working from inside model.hpp
-    #ifdef TMB_MODEL
-      typename ModelTraits<T>::EigenVector jnll_vec;
-      jnll_vec.resize(3);
-      jnll_vec[0] = rec_nll;
-      jnll_vec[1] = 0;
-      jnll_vec[2] = 0;
-      REPORT_F(jnll_vec, of);
-    #endif
- */
 
     return jnll;
   }
