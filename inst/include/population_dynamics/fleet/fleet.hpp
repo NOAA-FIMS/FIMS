@@ -4,8 +4,8 @@
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
  *
- * The purpose of this file is to declare the growth functor class
- * which is the base class for all growth functors.
+ * The purpose of this file is to declare the fleet functor class
+ * which is the base class for all fleet functors.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP
@@ -30,10 +30,14 @@ struct Fleet : public FIMSObject<Type> {
       typename ModelTraits<Type>::ParameterVector; /*!< vector of fleet
                                                       parameters */
 
+  // This likelihood index is not currently being used as only one likelihood
+  // distribution is available. These are for a future update M2+.
   int index_likelihood_id = -999; /*!<id of index likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
       index_likelihood; /*!< index likelihood component*/
 
+  // This likelihood index is not currently being used as only one likelihood
+  // distribution is available. These are for a future update M2+.
   int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
       agecomp_likelihood; /*!< agecomp likelihood component*/
@@ -152,13 +156,12 @@ struct Fleet : public FIMSObject<Type> {
 }
 
 
-    virtual const Type evaluate_age_comp_ll() {
+    virtual const Type evaluate_age_comp_nll() {
       Type nll = 0.0; /*!< The negative log likelihood value */
       #ifdef TMB_MODEL
         fims::Dmultinom<Type> dmultinom;
-        size_t dims = 360;
-        //size_t dims = this->observed_agecomp_data->get_imax() *
-        //  this->observed_agecomp_data->get_jmax();
+        size_t dims = this->observed_agecomp_data->get_imax() *
+        this->observed_agecomp_data->get_jmax();
         if (dims != this->catch_numbers_at_age.size()) {
           fims_log::get("fleet.log") << "Error: observed age comp is of size " << dims
                    << " and expected is of size " << this->age_composition.size()
@@ -199,7 +202,7 @@ struct Fleet : public FIMSObject<Type> {
       return nll;
     }
 
-    virtual const Type evaluate_index_ll() {
+    virtual const Type evaluate_index_nll() {
       Type nll = 0.0; /*!< The negative log likelihood value */
 
       #ifdef TMB_MODEL

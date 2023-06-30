@@ -92,6 +92,10 @@ public:
         fims::SRBevertonHolt<double> BevHolt;
 
         BevHolt.logit_steep = this->logit_steep.value;
+        if((this->logit_steep.value==1.0) && (this->logit_steep.estimated)){
+            warning("Steepness is subject to a logit transformation, so it is fixed at 0.7848469. Fixing it at 1.0 is not currently possible.");
+        }
+
         BevHolt.log_rzero = this->log_rzero.value;
 
         if((this->logit_steep.value==1.0) && (this->logit_steep.estimated)){
@@ -114,7 +118,7 @@ public:
       NLL.recruit_deviations[i] = deviations[i];
       NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
     }
-    Rcout << "Rec devs being passed to C++ are " << deviations
+    FIMS_LOG << "Rec devs being passed to C++ are " << deviations
           << std::endl;
 
     Rcout << "Rec bias adj being passed to C++ are " << recruit_bias_adjustment
@@ -122,8 +126,6 @@ public:
 
     NLL.use_recruit_bias_adjustment = this->use_bias_correction;
     NLL.estimate_recruit_deviations = this->estimate_deviations;
-    // NLL.PrepareConstrainedDeviations();
-    // NLL.PrepareBiasAdjustment();
     return NLL.evaluate_nll();
   }
 
