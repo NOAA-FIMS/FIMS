@@ -64,15 +64,9 @@ inline const T exp(const T &x) {
   return exp(x);
 }
 
-// template <>
-// inline const double exp(const double &x) {
-//   using ::exp;
-//   return ::exp(x);
-// }
 
 template <>
 inline const double exp(const double &x) {
- // using ::exp;
   return std::exp(x);
 }
 

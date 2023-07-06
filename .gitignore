@@ -88,11 +88,12 @@ vignettes/*.pdf
 # mac OS files
 *.DS_Store
 
-# FIMS log file
-fims.log
+# All log file
+*.log
 
 #TMB tmp.def file
 src/tmp.def
 
 #Testing files
 tests/test_plan/FIMS_Integration_Test_Plan.log
+debug.txt

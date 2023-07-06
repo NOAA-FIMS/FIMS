@@ -143,6 +143,7 @@ struct Fleet : public FIMSObject<Type> {
  */
   void ReportFleet(){
     #ifdef TMB_MODEL
+      //EigenVector declares a vector type from the Eigen library, which is the expected type for TMB's dmultinom
       typename ModelTraits<Type>::EigenVector exp_index =
         expected_index;
       REPORT_F(exp_index, of);
@@ -168,6 +169,7 @@ struct Fleet : public FIMSObject<Type> {
                    << std::endl;
         } else {
           for (size_t y = 0; y < this->nyears; y++) {
+            //EigenVector declares a vector type from the Eigen library, which is the expected type for TMB's dmultinom
             using Vector = typename ModelTraits<Type>::EigenVector;
             Vector observed_acomp;
             Vector expected_acomp;

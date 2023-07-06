@@ -16,6 +16,8 @@ namespace
       fims::SRBevertonHolt<double> recruit1;
       
       recruit1.logit_steep = fims::logit(0.2, 1.0, 0.7500);
+      // The R0 value (1 thousand) here is for this unit test.
+      // It is different than the Model Comparison Project value (1 million). 
       recruit1.log_rzero = std::log(1000.000);
       double spawners = 30.000;
       double phi_0 = 0.1;

@@ -55,7 +55,6 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
     //Transform input parameters
     steep = fims::inv_logit(steep_lo, steep_hi, this->logit_steep);
     rzero = fims::exp(this->log_rzero);
-    FIMS_LOG << "steepness: " << steep << std::endl;
 
     recruits =
         (0.8 * rzero * steep * spawners) /

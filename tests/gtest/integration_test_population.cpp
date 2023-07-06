@@ -70,7 +70,10 @@ namespace
                 // and unfished biomass
                 it = input.FindMember("median_R0");
                 rapidjson::Value &R_0 = (*it).value;
-                double log_rzero = fims::log(R_0[0].GetDouble());
+                // When obtaining the numeric values, GetDouble() will convert internal integer representation 
+                // to a double. Note that, int and unsigned can be safely converted to double, 
+                // but int64_t and uint64_t may lose precision (since mantissa of double is only 52-bits).
+                double log_rzero = fims::log(R_0[0].GetDouble()); 
 
                 it = input.FindMember("Phi.0");
                 rapidjson::Value &Phi0 = (*it).value;

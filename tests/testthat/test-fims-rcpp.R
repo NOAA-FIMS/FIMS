@@ -15,5 +15,9 @@ test_that("Rcpp interface works for modules", {
   ewaa_growth$weights <- 2.5
   expect_equal(ewaa_growth$ages, 1.0)
 
+  # check IDs for additional modules
+  expect_equal(ewaa_growth$get_id(), 1)
+  expect_equal(beverton_holt$get_id(), 1)
+
   fims$clear()
 })

@@ -179,8 +179,8 @@ struct Population : public FIMSObject<Type> {
   for (size_t year = 0; year < this->nyears; year++) {
         size_t index_ay = age * this->nyears + year;
        this->M[index_ay] = fims::exp(this->log_M[index_ay]);
-
-        this->mortality_F[index_ay] = 0.0;
+       // mortality_F is a ParameterVector and therefore needs to be filled within a loop
+       this->mortality_F[index_ay] = 0.0;
       }
     }
   }
@@ -213,7 +213,7 @@ struct Population : public FIMSObject<Type> {
       this->mortality_F[index_ya] +=
           this->fleets[fleet_]->Fmort[year] *
           this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-      FIMS_LOG << " sel age " << ages[age] << " is "
+      FIMS_LOG << " sel age " << ages[age] <<  "for fleet " << fleet_ << " is "
                << this->fleets[fleet_]->selectivity->evaluate(ages[age])
                << " F mort year " << year << " "<< this->fleets[fleet_]->Fmort[year] << std::endl;
       }

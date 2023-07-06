@@ -9,7 +9,6 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 
 #include "../../../population_dynamics/fleet/fleet.hpp"
-#include "../../../population_dynamics/fleet/fleet_nll.hpp"
 #include "rcpp_interface_base.hpp"
 #include "../../../common/def.hpp"
 

@@ -48,7 +48,7 @@ namespace fims {
              */
         Type log_sigma_recruit; /*!< Log standard deviation of log recruitment
                              deviations */
-        Type log_rzero; /*!< Unexploited recruitment. Should be a positive value.*/
+        Type log_rzero; /*!< Log of unexploited recruitment.*/
 
         bool estimate_recruit_deviations =
                 true; /*!< A flag to indicate if recruitment deviations are estimated or
@@ -71,17 +71,6 @@ namespace fims {
           this->recruit_bias_adjustment_fraction.resize(this->recruit_deviations.size());
           this->recruit_bias_adjustment.resize(this->recruit_deviations.size());
             this->PrepareConstrainedDeviations();
-//            this->PrepareBiasAdjustment();
-//            if (this->use_recruit_bias_adjustment) {
-//                for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
-//                    this->recruit_bias_adjustment[i] = -0.5 * fims::exp(this->log_sigma_recruit) * fims::exp(this->log_sigma_recruit);
-//
-//                }
-//            } else {
-//                for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
-//                    this->recruit_bias_adjustment[i] = 0.0;
-//                }
-//            }
         }
 
         /** @brief Calculates the expected recruitment for a given spawning input.
@@ -94,6 +83,9 @@ namespace fims {
                 const Type &spawners,
                 const Type &ssbzero) = 0; // need to add input parameter values
 
+        /** @brief Calculates the negative log likelihood of recruitment deviations.
+         *
+         */
         virtual const Type evaluate_nll() {
 
             Type nll = 0.0; /*!< The negative log likelihood value */
