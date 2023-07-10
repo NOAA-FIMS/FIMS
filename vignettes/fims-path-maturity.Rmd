@@ -62,8 +62,8 @@ Next, we retrieve the FIMS module, create a new maturity module inside FIMS, and
 # load FIMS
 library(FIMS)
 # Create a new maturity model
-fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
-maturity <- new(fims$LogisticMaturity)
+Fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
+maturity <- new(Fims$LogisticMaturity)
 # Populate the maturity module with parameter values.
 maturity$median$value <- 10
 maturity$median$is_random_effect <- FALSE
@@ -75,19 +75,19 @@ maturity$slope$estimated <- FALSE
 
 After that, we need to create and set up a population and link the maturity module to the population:
 ```{r,  class.source = "rchunk", eval = FALSE}
-population <- new(fims$Population)
+population <- new(Fims$Population)
 #set up population specific parameters (other modules)
 #...
 #set maturity for the population - will throw error until PR #363 is merged into main
 population$SetMaturity(maturity$get_id())
 ```
 
-Because FIMS sets up objects stored in memory, simply running `rm(fims)`, won't free this memory back up. There is a function that can be run to clear out memory:
+Because FIMS sets up objects stored in memory, simply running `rm(Fims)`, won't free this memory back up. There is a function that can be run to clear out memory:
 ```{r,  class.source = "rchunk", eval = FALSE}
 # Clear C++ memory
-fims$clear()
+Fims$clear()
 #Clear R memory
-rm(fims)
+rm(Fims)
 rm(maturity)
 rm(population)
 ```
@@ -107,14 +107,14 @@ Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .method("evaluate", &LogisticMaturityInterface::evaluate);
 ```
 
-The code above shows that there are two maturity module-specific fields (i.e., parameters), `median` and `slope`, and two maturity module-specific methods (i.e., functions), `get_id` and `evaluate`. Defined methods are functions that can be called from R. You can access the fields and methods from R using the `show(fims)` function. 
+The code above shows that there are two maturity module-specific fields (i.e., parameters), `median` and `slope`, and two maturity module-specific methods (i.e., functions), `get_id` and `evaluate`. Defined methods are functions that can be called from R. You can access the fields and methods from R using the `show(Fims)` function. 
 
 The maturity module's `get_id` method returns a unique ID for this specific module.
 
 When creating a new module in R, users can access the module using the name in quotes from the `Rcpp::class`, `LogisticMaturity`
 
 ```{r, class.source = "rchunk", eval = FALSE}
-maturity <- new(fims$LogisticMaturity)
+maturity <- new(Fims$LogisticMaturity)
 ```
 
 This module references the maturity rcpp class, `LogisticMaturityInterface` defined in [rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp) in the directory [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects).
@@ -346,7 +346,7 @@ std::shared_ptr<fims::MaturityBase<Type>>
 
 The `maturity_id` was set from R using the `SetMaturity()` method from the `PopulationInterface` class:
 ```{r,  class.source = "rchunk", eval = FALSE}
-fims$population$SetMaturity(maturity$get_id())
+Fims$population$SetMaturity(maturity$get_id())
 ```
 
 Notice above that population by default declares a pointer of type `MaturityBase` (parent class), not the specific maturity class we are using in this example, `LogisticMaturity` (child class). `MaturityBase` has an `evaluate` method with input arguments that match the inputs of each child class:
@@ -411,7 +411,7 @@ knitr::include_graphics("figures/fims-path-maturity-4.png")
 
 ## Linking everything together
 
-The above material demonstrates how values passed in from R get propagated into population.hpp, where they are used in biologically relevant calculations. This, however, relies on population referencing the correct child class (eg. `LogisticMaturity`) even though it only calls the parent class (`MaturityBase`). We defined the `maturity_id` in population for the specific logistic maturity module we wanted to use, `fims$population$SetMaturity(maturity$get_id())`, but we still need to connect this ID with the actual module in memory. 
+The above material demonstrates how values passed in from R get propagated into population.hpp, where they are used in biologically relevant calculations. This, however, relies on population referencing the correct child class (eg. `LogisticMaturity`) even though it only calls the parent class (`MaturityBase`). We defined the `maturity_id` in population for the specific logistic maturity module we wanted to use, `Fims$population$SetMaturity(maturity$get_id())`, but we still need to connect this ID with the actual module in memory. 
 
 This *information* is managed in FIMS through the `Information` class in [information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) in the directory [inst/include/common](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/common). The Information class sets up a number of [C++ maps](https://cplusplus.com/reference/map/map/) (a container with a key value and mapped value - think of named lists in R) where the key is the unique ID to the module and the mapped value is a shared pointer to the module. C++ std::maps have an iterator member for stepping through the elements of the map. This iterator is also declared in the Information class so that we can loop through all the unique maturity modules being called in FIMS. We currently only have one, but if FIMS gets extended to include multiple populations, we could have a unique maturity module for each population or subset of populations.  
 
@@ -536,16 +536,16 @@ maturity_modules <- list(
 We can think of population_modules and maturity_modules above as instantiated C++ classes stored in our computer's memory. This R code chunk above is comparable to the following from FIMS, which sets up modules in R:
 
 ```{r, eval = FALSE}
-# fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
-# maturity1 <- new(fims$LogisticMaturity)
+# Fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
+# maturity1 <- new(Fims$LogisticMaturity)
 # maturity1$median$value <- 10
 # maturity1$slope$value <- 0.2
-# maturity2 <- new(fims$LogisticMaturity)
+# maturity2 <- new(Fims$LogisticMaturity)
 # maturity2$median$value <- 8
 # maturity2$slope$value <- 0.3
-# population1 <- new(fims$Population)
-# population2 <- new(fims$Population)
-# population3 <- new(fims$Population)
+# population1 <- new(Fims$Population)
+# population2 <- new(Fims$Population)
+# population3 <- new(Fims$Population)
 ```
 
 Next we assign which maturity will be used with each population using IDs
