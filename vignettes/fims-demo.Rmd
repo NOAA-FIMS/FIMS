@@ -1,0 +1,434 @@
+---
+title: "Introducing the Fisheries Integrated Modeling System (FIMS)"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Introducing the Fisheries Integrated Modeling System (FIMS)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Fisheries Integrated Modeling System
+The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. FIMS is a software system designed and architected to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It's important to note that FIMS itself is not a model, but rather a framework for creating models. The framework is made up of many modules that come together to create a "the best model" that suites the needs of the end-user. What follows is a demo of creating a catch-at-age assessment model using FIMS. 
+
+## Creating Models in FIMS
+To begin, we import the FIMS and TMB libraries. We then create a new Rcpp fims module using `Rcpp::Module` and call `Fims$clear` to ensure C++ memory from any previous fims model run is cleared out. 
+```{r fims1, warning=FALSE, message=FALSE}
+library(FIMS)
+library(TMB)
+
+#load the module
+Fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
+Fims$clear()
+```
+
+## Setting up Data
+Data and variable values are taken from the [Li et. al.](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united) Model Comparison project ([github site](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison)). See [R/data_mile1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_mile1.R) and [tests/testthat/test-fims-estimation.R](https://github.com/NOAA-FIMS/FIMS/blob/integration-test-estimation-R-clear-FIMS/tests/testthat/test-fims-estimation.R) for details on how data and variable values are read into FIMS from the Model Comparison project.
+
+First let's set up the dimensions of the model based on the Model Comparison project:
+```{r fims-dims}
+nyears <- 30 # the number of years which we have data for.
+nseasons<- 1 # the number of seasons in each year. FIMS currently defaults to 1
+ages <- c(1,2,3,4,5,6,7,8,9,10,11,12) # age vector.
+nages <- 12 # the number of age groups.
+```
+
+### Preparing Data using FIMSFrame
+
+ We will be reading data into the model using the FIMSFrame and FIMSFrameAge S4 R classes set up in [R/fimsframe.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/fimsframe.R)
+
+```{r fimsframe}
+#use FIMS data frame
+data(package = "FIMS")
+fims_frame <- FIMSFrame(data_mile1)
+```
+
+The `fims_frame` object contains a `@data` slot that holds a long data frame with catch data for the fishery and index data for the survey:
+
+```{r ageframe}
+str(fims_frame)
+fims_frame@data %>% dplyr::filter(type == "landings") %>% head()
+fims_frame@data %>% dplyr::filter(type == "index") %>% head()
+```
+
+
+Using this data frame, we will start setting up the FIMS data objects. This example from the Model Comparison project sets up a single fishery fleet with age composition and catch data and a single survey with age composition data and an index. Data are read into FIMS as long vectors, regardless of their original dimension, hence the motivation behind the long data frames created with the fimsframe S4 classes. 
+
+```{r data}
+#fishery data
+fishery_catch <- fims_frame@data %>% 
+  dplyr::filter( type == "landings" ) %>%
+  .$value 
+#fishery agecomp not set up in fimsframe yet
+fishery_agecomp <-c(
+  0.065, 0.110, 0.120, 0.115, 0.100, 0.065, 0.075, 0.065, 0.070, 0.040, 0.035, 0.140, 
+  0.130, 0.095, 0.120, 0.140, 0.080, 0.080, 0.055, 0.075, 0.030, 0.045, 0.030, 0.120, 
+  0.050, 0.175, 0.110, 0.150, 0.090, 0.090, 0.075, 0.050, 0.025, 0.025, 0.025, 0.135, 
+  0.035, 0.075, 0.215, 0.095, 0.095, 0.060, 0.065, 0.060, 0.055, 0.055, 0.045, 0.145, 
+  0.170, 0.040, 0.125, 0.190, 0.090, 0.075, 0.065, 0.060, 0.045, 0.025, 0.030, 0.085, 
+  0.085, 0.155, 0.075, 0.100, 0.155, 0.070, 0.095, 0.060, 0.035, 0.040, 0.040, 0.090, 
+  0.070, 0.190, 0.260, 0.070, 0.060, 0.110, 0.045, 0.050, 0.030, 0.035, 0.015, 0.065, 
+  0.075, 0.105, 0.190, 0.240, 0.065, 0.035, 0.065, 0.030, 0.030, 0.045, 0.025, 0.095, 
+  0.075, 0.120, 0.100, 0.170, 0.220, 0.045, 0.050, 0.055, 0.030, 0.035, 0.015, 0.085, 
+  0.120, 0.110, 0.175, 0.135, 0.145, 0.115, 0.025, 0.030, 0.030, 0.025, 0.015, 0.075, 
+  0.075, 0.130, 0.155, 0.130, 0.050, 0.130, 0.135, 0.025, 0.045, 0.050, 0.020, 0.055, 
+  0.050, 0.160, 0.175, 0.120, 0.115, 0.110, 0.050, 0.080, 0.020, 0.020, 0.025, 0.075, 
+  0.085, 0.105, 0.120, 0.185, 0.110, 0.105, 0.075, 0.050, 0.065, 0.015, 0.005, 0.080, 
+  0.090, 0.120, 0.130, 0.140, 0.150, 0.060, 0.100, 0.025, 0.050, 0.025, 0.030, 0.080, 
+  0.105, 0.200, 0.120, 0.100, 0.115, 0.100, 0.075, 0.045, 0.010, 0.035, 0.020, 0.075, 
+  0.130, 0.125, 0.195, 0.185, 0.080, 0.065, 0.020, 0.020, 0.050, 0.015, 0.050, 0.065, 
+  0.120, 0.170, 0.165, 0.160, 0.070, 0.050, 0.060, 0.045, 0.030, 0.020, 0.020, 0.090, 
+  0.075, 0.180, 0.230, 0.130, 0.095, 0.040, 0.040, 0.050, 0.045, 0.015, 0.020, 0.080, 
+  0.115, 0.095, 0.230, 0.190, 0.100, 0.090, 0.025, 0.020, 0.040, 0.035, 0.015, 0.045, 
+  0.075, 0.145, 0.130, 0.200, 0.180, 0.045, 0.045, 0.060, 0.020, 0.025, 0.010, 0.065, 
+  0.180, 0.140, 0.175, 0.085, 0.165, 0.075, 0.055, 0.035, 0.015, 0.020, 0.010, 0.045, 
+  0.130, 0.255, 0.100, 0.120, 0.050, 0.120, 0.080, 0.040, 0.030, 0.015, 0.020, 0.040, 
+  0.095, 0.255, 0.270, 0.075, 0.080, 0.040, 0.065, 0.035, 0.050, 0.005, 0.010, 0.020, 
+  0.060, 0.195, 0.290, 0.220, 0.055, 0.055, 0.015, 0.045, 0.020, 0.010, 0.010, 0.025, 
+  0.180, 0.175, 0.175, 0.205, 0.140, 0.020, 0.050, 0.020, 0.015, 0.010, 0.000, 0.010, 
+  0.100, 0.195, 0.180, 0.160, 0.170, 0.085, 0.045, 0.015, 0.015, 0.020, 0.015, 0.000, 
+  0.155, 0.170, 0.220, 0.115, 0.080, 0.085, 0.080, 0.010, 0.025, 0.020, 0.005, 0.035, 
+  0.180, 0.225, 0.125, 0.220, 0.100, 0.070, 0.040, 0.035, 0.005, 0.000, 0.000, 0.000, 
+  0.230, 0.250, 0.125, 0.085, 0.125, 0.045, 0.030, 0.025, 0.045, 0.015, 0.010, 0.015, 
+  0.155, 0.290, 0.215, 0.105, 0.085, 0.090, 0.020, 0.010, 0.010, 0.000, 0.005, 0.015)
+
+#survey data
+# survey_index <- fims_frame@data %>% 
+#   dplyr::filter( type == "index" ) %>%
+#   .$value 
+survey_index <- c(0.006795379, 0.006170738, 0.005977854, 0.005907966, 0.007211237,
+                  0.006867264, 0.006329387, 0.006137000, 0.005279601, 0.005666829,
+                  0.004806935, 0.004374876, 0.003992211, 0.004188884, 0.003711145,
+                  0.003818704, 0.002878658, 0.002936660, 0.002972886, 0.002484963,
+                  0.001983795, 0.001738507, 0.002122178, 0.001617189, 0.001745169,
+                  0.001414111, 0.001350571, 0.001323396, 0.001069791, 0.001459411)
+
+#survey agecomp not set up in fimsframe yet
+survey_agecomp <- c(0.085, 0.115, 0.175, 0.130, 0.085, 0.055, 0.075, 0.065, 0.050, 0.025,
+0.040, 0.100, 0.080, 0.140, 0.130, 0.135, 0.100, 0.075, 0.080, 0.060,
+0.030, 0.045, 0.015, 0.110, 0.080, 0.250, 0.100, 0.105, 0.105, 0.055,
+0.060, 0.040, 0.025, 0.030, 0.025, 0.125, 0.070, 0.105, 0.255, 0.105,
+0.085, 0.065, 0.075, 0.035, 0.040, 0.045, 0.015, 0.105, 0.115, 0.065,
+0.095, 0.230, 0.080, 0.070, 0.090, 0.025, 0.040, 0.025, 0.030, 0.135,
+0.120, 0.230, 0.075, 0.105, 0.145, 0.060, 0.075, 0.045, 0.015, 0.005,
+0.035, 0.090, 0.025, 0.190, 0.285, 0.050, 0.065, 0.085, 0.050, 0.045,
+0.040, 0.045, 0.025, 0.095, 0.115, 0.085, 0.175, 0.205, 0.075, 0.075,
+0.070, 0.025, 0.040, 0.030, 0.030, 0.075, 0.080, 0.200, 0.135, 0.195,
+0.105, 0.025, 0.045, 0.080, 0.030, 0.020, 0.010, 0.075, 0.100, 0.125,
+0.200, 0.095, 0.155, 0.095, 0.035, 0.030, 0.055, 0.015, 0.015, 0.080,
+0.070, 0.190, 0.125, 0.150, 0.100, 0.115, 0.110, 0.010, 0.025, 0.030,
+0.010, 0.065, 0.035, 0.285, 0.215, 0.110, 0.070, 0.060, 0.090, 0.050,
+0.005, 0.015, 0.020, 0.045, 0.040, 0.115, 0.195, 0.180, 0.115, 0.115,
+0.040, 0.055, 0.060, 0.005, 0.010, 0.070, 0.085, 0.160, 0.155, 0.135,
+0.170, 0.050, 0.080, 0.015, 0.055, 0.035, 0.015, 0.045, 0.045, 0.205,
+0.195, 0.145, 0.120, 0.100, 0.025, 0.045, 0.025, 0.035, 0.035, 0.025,
+0.120, 0.145, 0.210, 0.155, 0.075, 0.070, 0.065, 0.035, 0.045, 0.015,
+0.015, 0.050, 0.110, 0.210, 0.155, 0.170, 0.100, 0.075, 0.050, 0.015,
+0.045, 0.040, 0.015, 0.015, 0.060, 0.295, 0.210, 0.075, 0.115, 0.075,
+0.045, 0.045, 0.045, 0.015, 0.000, 0.020, 0.065, 0.135, 0.295, 0.210,
+0.045, 0.070, 0.050, 0.010, 0.035, 0.005, 0.005, 0.075, 0.110, 0.195,
+0.080, 0.205, 0.150, 0.045, 0.100, 0.030, 0.025, 0.020, 0.005, 0.035,
+0.190, 0.135, 0.165, 0.090, 0.155, 0.105, 0.060, 0.025, 0.015, 0.010,
+0.010, 0.040, 0.150, 0.300, 0.135, 0.090, 0.060, 0.110, 0.045, 0.020,
+0.030, 0.020, 0.015, 0.025, 0.090, 0.220, 0.295, 0.105, 0.075, 0.040,
+0.075, 0.020, 0.010, 0.030, 0.005, 0.035, 0.060, 0.185, 0.305, 0.170,
+0.080, 0.070, 0.040, 0.040, 0.005, 0.025, 0.010, 0.010, 0.155, 0.175,
+0.225, 0.190, 0.110, 0.025, 0.030, 0.005, 0.015, 0.020, 0.020, 0.030,
+0.075, 0.260, 0.140, 0.170, 0.150, 0.090, 0.020, 0.035, 0.010, 0.015,
+0.010, 0.025, 0.130, 0.145, 0.315, 0.110, 0.095, 0.085, 0.075, 0.010,
+0.005, 0.015, 0.005, 0.010, 0.195, 0.220, 0.150, 0.230, 0.040, 0.060,
+0.035, 0.045, 0.000, 0.005, 0.005, 0.015, 0.185, 0.370, 0.165, 0.060,
+0.085, 0.030, 0.035, 0.035, 0.015, 0.010, 0.010, 0.000, 0.135, 0.320,
+0.285, 0.110, 0.065, 0.035, 0.010, 0.005, 0.015, 0.015, 0.000, 0.005)
+```
+
+## Creating Modules in FIMS
+Now that we've prepared the data, let's pass it into FIMS. Each module in the FIMS-R interface is made of S4 objects. These S4 objects serve as a interface between R and the underlining C++ code that defines FIMS. Modules are instantiated using the `methods::new()` function. We can use `methods::show()` to view all the fields (i.e. variables) and methods (i.e. functions) available in a given module.
+
+### The Fleet Module
+
+#### Fleet Data
+
+Each fleet is required to have data in order to evaluate the objective function. Currently FIMS only has a fleet module that is used to set up both fleets and surveys. FIMS contains an Index module and AgeComp module to pass data objects into the fleet module. Each of these data modules require a dimension be added to indicate the dimensions of the raw data (e.g. nyears x nages matrix). Given this information, FIMS is able to correctly apply dimension folding for model output.
+
+Using the `methods::show()` function, we can see that the Index module has a vector field named *index_data* and the AgeComp module has a vector field names *age_comp_data*. 
+
+```{r fleet-show}
+show(Fims$Index)
+show(Fims$AgeComp)
+```
+
+We'll create both index and age composition modules for the fleet using the `methods::new()` function and pass in the data defined above from the Model Comparison project.
+```{r fleet-set-data}
+#fleet index data
+fishing_fleet_index <- methods::new(Fims$Index, nyears)
+#fleet age composition data
+fishing_fleet_age_comp <- methods::new(Fims$AgeComp, nyears, nages)
+fishing_fleet_index$index_data <- fishery_catch
+# Effective sampling size is 200
+fishing_fleet_age_comp$age_comp_data <- fishery_agecomp * 200
+```
+
+#### Fleet Selectivity
+Now that we've passed in data for the fishing fleet, we need to set up its selectivity module. We will set this to be selectivity function using the LogisticSelectivity module. The`methods::show()` function indicates this module has two parameter fields: *median* and *slope*, and an `evaluate()` and `get_id()` function. 
+
+Each variable of [Parameter class](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) has three additional fields: *value*, *is_random_effect*, and *estimated*. Currently, FIMS is not set up to run random effects. The default value for this field and the *estimate* field is currently set to `FALSE`. We can use the *value* field to input variables defined in the Model Comparison project.
+ 
+```{r fleet_selectivity}
+methods::show(Fims$LogisticSelectivity)
+fishing_fleet_selectivity <- methods::new(Fims$LogisticSelectivity)
+fishing_fleet_selectivity$median$value <- 2.0
+fishing_fleet_selectivity$median$is_random_effect <- FALSE
+fishing_fleet_selectivity$median$estimated <- TRUE
+fishing_fleet_selectivity$slope$value <- 1.0
+fishing_fleet_selectivity$slope$is_random_effect <- FALSE
+fishing_fleet_selectivity$slope$estimated <- TRUE
+```
+
+#### Creating the Fleet Object
+Now that we've created everything that a fleet needs, lets create the actual fleet object. First let's run `methods::show(Fims$Fleet)` to see all the fields and methods available from R. 
+
+```{r show-Fleet}
+show(Fims$Fleet)
+```
+We can see that there are five boolean flags: estimate_F, estimate_q, and is_survey, random_F, and random_q. There is a vector, log_Fmort, a Parameter, log_obs_error, and a double, log_q. There are two integer fields for the number of ages and years. Additionally, there are five Methods: SetAgeCompLikelihood, SetIndexLikelihood, SetObservedAgeCompData, SetObservedIndexData, and setSelectivity. The last three of these will be used to link up the AgeComp, Index, and Selectivity modules defined above with the fleet module defined below. 
+
+
+```{r fleet}
+#Create fleet module
+fishing_fleet <- methods::new(Fims$Fleet)
+#Set nyears and nages
+fishing_fleet$nages <- nages
+fishing_fleet$nyears <- nyears
+#Set values for log_Fmort
+fishing_fleet$log_Fmort <- log(c(0.009459165, 0.02728886, 0.04506364, 
+                                 0.06101782, 0.04860075, 0.08742055, 
+                                 0.0884472, 0.1866079, 0.109009, 0.1327043, 
+                                 0.1506155, 0.161243, 0.1166402, 0.1693461, 
+                                 0.1801919, 0.1612405, 0.3145732, 0.2572476, 
+                                 0.2548873, 0.2514621, 0.3491014, 0.2541077, 
+                                 0.4184781, 0.3457212, 0.3436855, 0.3141712, 
+                                 0.3080268, 0.4317453, 0.3280309, 0.4996754))
+#Turn on estimation for F
+fishing_fleet$estimate_F <- TRUE
+fishing_fleet$random_F <- FALSE
+# Set value for log_q
+fishing_fleet$log_q <- log(1.0)
+fishing_fleet$estimate_q <- FALSE
+fishing_fleet$random_q <- FALSE
+fishing_fleet$log_obs_error$value <- log(sqrt(log(0.01^2+1)))
+fishing_fleet$log_obs_error$estimated <- FALSE
+#Next two lines not currently used by FIMS
+fishing_fleet$SetAgeCompLikelihood(1)
+fishing_fleet$SetIndexLikelihood(1)
+#Set Index, AgeComp, and Selectivity using the IDs from the modules defined above
+fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
+fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
+fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
+```
+
+### The Survey Module
+We will now repeat the steps from Fleet to set up the Survey. A survey object is essentially the same as a fleet object with a catchability (q) variable.
+
+#### Survey Data
+
+```{r survey-set-data}
+#fleet index data
+survey_fleet_index <- methods::new(Fims$Index, nyears)
+#survey age composition data
+survey_fleet_age_comp <- methods::new(Fims$AgeComp, nyears, nages)
+survey_fleet_index$index_data <- survey_index
+# Effective sampling size is 200
+survey_fleet_age_comp$age_comp_data <- survey_agecomp * 200
+```
+
+#### Survey Selectivity
+
+```{r survey-selectivity}
+survey_fleet_selectivity <- new(Fims$LogisticSelectivity)
+survey_fleet_selectivity$median$value <- 1.5
+survey_fleet_selectivity$median$is_random_effect <- FALSE
+survey_fleet_selectivity$median$estimated <- TRUE
+survey_fleet_selectivity$slope$value <- 2.0
+survey_fleet_selectivity$slope$is_random_effect <- FALSE
+survey_fleet_selectivity$slope$estimated <- TRUE
+```
+
+#### Creating the Survey Object
+
+```{r survey}
+ survey_fleet <- methods::new(Fims$Fleet)
+ survey_fleet$is_survey<-TRUE
+ survey_fleet$nages <- nages
+ survey_fleet$nyears <- nyears
+ survey_fleet$estimate_F <- FALSE
+ survey_fleet$random_F <- FALSE
+ survey_fleet$log_q <- log(3.315143e-07)
+ survey_fleet$estimate_q <- TRUE
+ survey_fleet$random_q <- FALSE
+ #sd = sqrt(log(cv^2 + 1)), sd is log transformed
+ survey_fleet$log_obs_error$value <- log(sqrt(log(0.2^2+1)))
+ survey_fleet$log_obs_error$estimated <- FALSE
+ survey_fleet$SetAgeCompLikelihood(1)
+ survey_fleet$SetIndexLikelihood(1)
+ survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
+ survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
+ survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
+  
+```  
+
+
+### Creating a Population
+The final step is to set up the population module. Before doing so, we first need to set up each component of the population (e.g. recruitment, growth, etc.). 
+
+#### Recruitment
+We'll use a Beverton Holt recruitment module. We first instantiate a module using the `methods::new()` function. We can use `methods::show()` to view all the fields (i.e. variables) and methods (i.e. functions) available in `Fims$BevertonHoltRecruitment` module.
+
+```{r recruitment}
+# Recruitment
+recruitment <- methods::new(Fims$BevertonHoltRecruitment)
+methods::show(Fims$BevertonHoltRecruitment)
+```
+There are three parameters we need to set-up: *log_sigma_recruit*, *log_rzero*, and *logit_steep*.
+
+```{r set-up-recruitment}
+recruitment$log_sigma_recruit$value <- log(0.4)
+recruitment$log_rzero$value <- log(1e+06)
+recruitment$log_rzero$is_random_effect <- FALSE
+recruitment$log_rzero$estimated <- TRUE
+recruitment$logit_steep$value <- -log(1.0 - 0.75) + log(0.75 - 0.2)
+recruitment$logit_steep$is_random_effect <- FALSE
+recruitment$logit_steep$estimated <- FALSE
+```
+
+We also need to set up recruitment deviations. FIMS recruitment modules have a boolean, *estimate_deviations* to specify whether or not deviations are estimated; and a vector, *deviations* to set the deviation values. The *deviations* vector takes values greater than 0 as these will be logged in the likelihood.
+
+```{r rec-devs}
+recruitment$estimate_deviations <- FALSE
+recruitment$deviations <- c(1.0931337, 1.5494153, 0.8754735, 0.6488721,
+                            1.9128839, 1.6593211, 0.9327825, 1.3531871, 
+                            0.9207434, 1.2304792, 1.1652038, 0.8048559, 
+                            0.8752845, 1.1187967, 0.8989675, 1.3083559, 
+                            1.2724463, 0.5799534, 0.7891447, 0.5571984, 
+                            1.3515173, 1.2452116, 0.8002613, 0.5983474, 
+                            1.1704664, 0.5828168, 0.8223697, 1.2225558,
+                            1.4513402, 0.9308739)
+```
+#### Growth
+Now, we'll define the growth module for our population using an empirical weight at age model.
+```{r growth}
+# Growth
+ewaa_growth <- methods::new(Fims$EWAAgrowth)
+ewaa_growth$ages <- ages
+ewaa_growth$weights <- c(0.0005306555, 0.0011963283, 0.0020582654,
+                         0.0030349873, 0.0040552124, 0.0050646975,
+                         0.0060262262, 0.0069169206, 0.0077248909,
+                         0.0084461128, 0.0090818532, 0.0096366950)
+
+```   
+#### Maturity
+Each population will also need a maturity model. Here we define a logistic maturity model. 
+```{r maturity}
+# Maturity
+maturity <- new(Fims$LogisticMaturity)
+maturity$median$value <- 2.25
+maturity$median$is_random_effect <- FALSE
+maturity$median$estimated <- FALSE
+maturity$slope$value <- 3
+maturity$slope$is_random_effect <- FALSE
+maturity$slope$estimated <- FALSE
+```
+
+Now that our life history sub-models are defined, lets define the actual population.
+
+```{r population}
+# Population
+population <- new(Fims$Population)
+population$log_M <- rep(log(0.2), nyears * nages)
+population$estimate_M <- FALSE
+population$log_init_naa <- log(c(993947.5,811707.8, 661434.4, 
+                                 537804.8, 436664.0, 354303.4, 
+                                 287397.0, 233100.2, 189054.0, 
+                                 153328.4, 124353.2, 533681.3))
+population$estimate_init_naa <- TRUE
+population$nages <- nages
+population$ages <- ages
+population$nfleets <- 2 # 1 fleet and 1 survey
+population$nseasons <- nseasons
+population$nyears <- nyears
+population$prop_female <- 0.5
+```
+
+Now we need to link up the recruitment, growth, and maturity modules we set above with this new population module. We do this by calling `get_id()` from each respective module and passing that unique ID into each respective `Set` function from population. 
+
+```{r set-pop-modules}
+population$SetMaturity(maturity$get_id())
+population$SetGrowth(ewaa_growth$get_id())
+population$SetRecruitment(recruitment$get_id())
+
+```
+
+
+## Putting It All Together 
+
+### Creating the FIMS Model and Making the TMB Function
+
+```{r model}
+  sucess<-Fims$CreateTMBModel()
+  parameters <- list(p = Fims$get_fixed())
+  obj <- MakeADFun(data=list(), parameters, DLL="FIMS", silent = TRUE)
+
+```
+## Fitting the Model
+```{r fit_model}
+  
+  opt <- nlminb(obj$par, obj$fn, obj$gr,
+                control = list(eval.max = 800, iter.max = 800))#, method = "BFGS",
+                    #   control = list(maxit=1000000, reltol = 1e-15))
+
+  print(opt)
+```
+
+### TMB Reporting
+```{r tmb_report}
+
+ sdr <- TMB::sdreport(obj)
+ sdr_fixed <- summary(sdr, "fixed")
+ report <- obj$report()
+  
+ print(sdr_fixed)
+  
+```
+
+
+## Plotting Results
+```{r plots}
+library(ggplot2)
+index_results <- data.frame(observed = survey_fleet_index$index_data,
+                            expected = report$expected_index[,2])
+print(index_results)
+
+ggplot(index_results, aes(x=1:nyears, y=observed)) + geom_point() +
+         xlab("Year") + ylab("Index") +
+  geom_line(aes(x=1:nyears, y=expected), color = "blue") +
+  theme_bw()
+
+catch_results <- data.frame(observed = fishing_fleet_index$index_data,
+                            expected = report$expected_index[,1])
+print(catch_results)
+
+ggplot(catch_results, aes(x=1:nyears, y=observed)) + geom_point() +
+         xlab("Year") + ylab("Index") +
+  geom_line(aes(x=1:nyears, y=expected), color = "blue") +
+  theme_bw()
+
+```
+
+## Clear C++ objects from memory
+```{r clear}
+Fims$clear()
+```
