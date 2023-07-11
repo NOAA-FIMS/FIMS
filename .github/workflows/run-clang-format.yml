@@ -10,7 +10,7 @@
 name: run-clang-format
 
 on:
-
+  workflow_dispatch:
 # Runs the workflow on each push to the main or master branch:
   push:
     branches:

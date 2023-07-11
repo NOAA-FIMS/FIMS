@@ -3,6 +3,7 @@
 name: run-doxygen
 # The default build trigger is to run the action on every push for any branch
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches: 

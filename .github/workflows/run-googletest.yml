@@ -2,6 +2,7 @@
 name: run-googletest
 # on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
+  workflow_dispatch:
 # The default build trigger is to run the action on every push and pull request, for any branch
   push:
   # To run the default repository branch weekly on sunday, uncomment the following 2 lines
