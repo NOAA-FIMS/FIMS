@@ -4,8 +4,8 @@
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
  *
- * The purpose of this file is to declare the growth functor class
- * which is the base class for all growth functors.
+ * The purpose of this file is to declare the fleet functor class
+ * which is the base class for all fleet functors.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP
@@ -30,10 +30,14 @@ struct Fleet : public FIMSObject<Type> {
       typename ModelTraits<Type>::ParameterVector; /*!< vector of fleet
                                                       parameters */
 
+  // This likelihood index is not currently being used as only one likelihood
+  // distribution is available. These are for a future update M2+.
   int index_likelihood_id = -999; /*!<id of index likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
       index_likelihood; /*!< index likelihood component*/
 
+  // This likelihood index is not currently being used as only one likelihood
+  // distribution is available. These are for a future update M2+.
   int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
       agecomp_likelihood; /*!< agecomp likelihood component*/
@@ -53,13 +57,12 @@ struct Fleet : public FIMSObject<Type> {
 
   // Mortality and catchability
   ParameterVector log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  ParameterVector log_q; /*!< estimated parameter: catchability of the fleet */
+    Type log_q; /*!< estimated parameter: catchability of the fleet */
 
   Type log_obs_error; /*!< estimated parameter: observation error associated
                          with index */
-  std::vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
-  std::vector<Type>
-      q; /*!< transofrmed parameter: the catchability of the fleet */
+  ParameterVector Fmort; /*!< transformed parameter: Fishing mortality*/
+    Type q; /*!< transofrmed parameter: the catchability of the fleet */
 
   // derived quantities
   std::vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
@@ -71,6 +74,12 @@ struct Fleet : public FIMSObject<Type> {
   std::vector<Type> expected_index; /*!<model expected index of abundance*/
   std::vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
   std::vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
+  bool is_survey = false; /*!< is this fleet object a survey*/
+
+  #ifdef TMB_MODEL
+  ::objective_function<Type> *of;
+#endif
+
   /**
    * @brief Constructor.
    */
@@ -100,8 +109,7 @@ struct Fleet : public FIMSObject<Type> {
 
     log_Fmort.resize(nyears);
     Fmort.resize(nyears);
-    log_q.resize(nyears);
-    q.resize(nyears);
+
   }
 
   /**
@@ -112,12 +120,113 @@ struct Fleet : public FIMSObject<Type> {
   void Prepare() {
     // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
     // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
+
+  // derived quantities
+  std::fill(catch_at_age.begin(), catch_at_age.end(), 0);    /*!<derived quantity catch at age*/
+  std::fill(catch_index.begin(), catch_index.end(), 0);     /*!<derived quantity catch index*/
+  std::fill(age_composition.begin(), age_composition.end(), 0);
+  std::fill(expected_catch.begin(), expected_catch.end(), 0); /*!<model expected total catch*/
+  std::fill(expected_index.begin(), expected_index.end(), 0); /*!<model expected index of abundance*/
+  std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(), 0); /*!<model expected catch at age*/
+  std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(), 0);  /*!<model expected weight at age*/
+      this->q = fims::exp(this->log_q);
     for (size_t year = 0; year < this->nyears; year++) {
+      FIMS_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
+      FIMS_LOG << "input q " << this->log_q << std::endl;
       this->Fmort[year] = fims::exp(this->log_Fmort[year]);
-      this->q[year] = fims::exp(this->log_q[year]);
+
     }
   }
+  /**
+ * @brief Method to report out the fleet-specific derived quantities. 
+ * 
+ */
+  void ReportFleet(){
+    #ifdef TMB_MODEL
+      //EigenVector declares a vector type from the Eigen library, which is the expected type for TMB's dmultinom
+      typename ModelTraits<Type>::EigenVector exp_index =
+        expected_index;
+      REPORT_F(exp_index, of);
+      typename ModelTraits<Type>::EigenVector exp_catch =
+        expected_catch;
+      REPORT_F(exp_catch, of);
+      typename ModelTraits<Type>::EigenVector F_mort =
+        Fmort;
+      REPORT_F(F_mort, of);
+    #endif
+}
+
+
+    virtual const Type evaluate_age_comp_nll() {
+      Type nll = 0.0; /*!< The negative log likelihood value */
+      #ifdef TMB_MODEL
+        fims::Dmultinom<Type> dmultinom;
+        size_t dims = this->observed_agecomp_data->get_imax() *
+        this->observed_agecomp_data->get_jmax();
+        if (dims != this->catch_numbers_at_age.size()) {
+          fims_log::get("fleet.log") << "Error: observed age comp is of size " << dims
+                   << " and expected is of size " << this->age_composition.size()
+                   << std::endl;
+        } else {
+          for (size_t y = 0; y < this->nyears; y++) {
+            //EigenVector declares a vector type from the Eigen library, which is the expected type for TMB's dmultinom
+            using Vector = typename ModelTraits<Type>::EigenVector;
+            Vector observed_acomp;
+            Vector expected_acomp;
+
+            observed_acomp.resize(this->nages);
+            expected_acomp.resize(this->nages);
+            Type sum = 0.0;
+            for (size_t a = 0; a < this->nages; a++) {
+              size_t index_ya = y * this->nages + a;
+              sum += this->catch_numbers_at_age[index_ya];
+            }
+
+            for (size_t a = 0; a < this->nages; a++) {
+              size_t index_ya = y * this->nages + a;
+              expected_acomp[a] = this->catch_numbers_at_age[index_ya] /
+                sum;  // probabilities for ages
+
+              observed_acomp[a] = this->observed_agecomp_data->at(y, a);
+                fims_log::get("fleet.log")<< " age " << a << " in year " << y << "has expected: "  <<
+              expected_acomp[a] << "  and observed: " << observed_acomp[a] << std::endl;
+            }
+            dmultinom.x = observed_acomp;
+            dmultinom.p = expected_acomp;
+            nll -= dmultinom.evaluate(true);
+          }
+        }
+        //typename ModelTraits<Type>::EigenVector acomp_nll;
+        //acomp_nll[0] = nll;
+        //REPORT_F(acomp_nll, of);
+        fims_log::get("fleet.log") << " agecomp nll: " << nll << std::endl;
+      #endif
+      return nll;
+    }
+
+    virtual const Type evaluate_index_nll() {
+      Type nll = 0.0; /*!< The negative log likelihood value */
+
+      #ifdef TMB_MODEL
+      fims::Dnorm<Type> dnorm;
+      dnorm.sd = fims::exp(this->log_obs_error);
+      for (size_t i = 0; i < this->expected_index.size(); i++) {
+        dnorm.x = fims::log(this->observed_index_data->at(i));
+        dnorm.mean = fims::log(this->expected_index[i]);
+        nll -= dnorm.evaluate(true);
+          fims_log::get("fleet.log") << "observed likelihood component: " << i << " is " << this->observed_index_data->at(i) <<
+        " and expected is: " << this->expected_index[i] << std::endl;
+      }
+        fims_log::get("fleet.log") << " log obs error is: " << this->log_obs_error << std::endl;
+        fims_log::get("fleet.log")<< " sd is: " << dnorm.sd << std::endl;
+        fims_log::get("fleet.log") << " index nll: " << nll << std::endl;
+      #endif
+      return nll;
+    }
+
 };
+
+
 
 // default id of the singleton fleet class
 template <class Type>

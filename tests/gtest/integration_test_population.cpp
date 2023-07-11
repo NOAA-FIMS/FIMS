@@ -70,7 +70,10 @@ namespace
                 // and unfished biomass
                 it = input.FindMember("median_R0");
                 rapidjson::Value &R_0 = (*it).value;
-                double rzero = R_0[0].GetDouble();
+                // When obtaining the numeric values, GetDouble() will convert internal integer representation 
+                // to a double. Note that, int and unsigned can be safely converted to double, 
+                // but int64_t and uint64_t may lose precision (since mantissa of double is only 52-bits).
+                double log_rzero = fims::log(R_0[0].GetDouble()); 
 
                 it = input.FindMember("Phi.0");
                 rapidjson::Value &Phi0 = (*it).value;
@@ -85,12 +88,12 @@ namespace
                         // Expect FIMS value is greater than 0.0
                         EXPECT_GT(pop.unfished_numbers_at_age[index_ya], 0.0)
                             << "differ at index " << index_ya << "; year " << year << "; age" << age;
-                        EXPECT_LE(pop.unfished_numbers_at_age[index_ya], rzero)
+                        EXPECT_LE(pop.unfished_numbers_at_age[index_ya], fims::exp(log_rzero))
                             << "differ at index " << index_ya << "; year " << year << "; age" << age;
 
                         EXPECT_GT(pop.unfished_spawning_biomass[year], 0.0)
                             << "differ at index " << index_ya << "; year " << year << "; age" << age;
-                        EXPECT_LE(pop.unfished_spawning_biomass[year], rzero * phi_0)
+                        EXPECT_LE(pop.unfished_spawning_biomass[year], fims::exp(log_rzero) * phi_0)
                             << "differ at index " << index_ya << "; year " << year << "; age" << age;
 
                         EXPECT_GT(pop.unfished_biomass[year], 0.0)
@@ -212,15 +215,18 @@ namespace
                     typename rapidjson::Document::MemberIterator fleet2_index;
                     fleet2_index = it->value.FindMember("survey1");
                     rapidjson::Value &fleet_index = (*fleet2_index).value;
-
+                    EXPECT_EQ(pop.fleets[0]->q, 1.0);
+                    // Do not use EXPECT_EQ to compare floats or doubles
+                    // Use EXPECT_NEAR here
+                    EXPECT_NEAR(pop.fleets[1]->q, fleet_q[0].GetDouble(), 1.0e-07);
+                    
+                        if(pop.fleets[1]->is_survey){
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         // Expect catchability of the fishing fleet = 1.0
-                        EXPECT_EQ(pop.fleets[0]->q[year], 1.0)
-                            << "year " << year;
                         // Expect expected index of the fishing fleet to be
                         // greater than 0.0
-                        EXPECT_GT(pop.fleets[0]->expected_index[year], 0.0)
+                            EXPECT_GT(pop.fleets[0]->expected_index[year], 0.0)
                             << "year " << year;
 
                         expected_index[year] = fleet_index[year].GetDouble();
@@ -235,14 +241,11 @@ namespace
                                   5.0)
                             << "year " << year;
 
-                        // Do not use EXPECT_EQ to compare floats or doubles
-                        // Use EXPECT_NEAR here
-                        EXPECT_NEAR(pop.fleets[1]->q[year], fleet_q[0].GetDouble(), 1.0e-07)
-                            << "year " << year;
                         // Expect FIMS value is greater than 0.0
                         EXPECT_GT(pop.fleets[1]->expected_index[year], 0.0)
                             << "year " << year;
                     }
+                        }
                 }
 
                 // Test numbers at age

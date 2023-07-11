@@ -60,8 +60,10 @@ inline const T log(const T &x) {
  */
 template <class T>
 inline const T exp(const T &x) {
+  using ::exp;
   return exp(x);
 }
+
 
 template <>
 inline const double exp(const double &x) {

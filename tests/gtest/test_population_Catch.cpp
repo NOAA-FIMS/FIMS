@@ -17,7 +17,7 @@ namespace
         // calculate catch numbers at age in population module
         // Ian: not sure which of these are needed
         population.CalculateMortality(index_ya, year, age);
-          population.CalculateNumbersAA(index_ya, index_ya2, age);
+        population.CalculateNumbersAA(index_ya, index_ya2, age);
          population.CalculateCatchNumbersAA(index_ya, year, age);
         
         population.CalculateCatchWeightAA(year, age);
@@ -25,6 +25,7 @@ namespace
 
         for (int fleet_ = 0; fleet_ < population.nfleets; fleet_++)
         {
+            if(!population.fleets[fleet_]->is_survey){
             int index_yf = year * population.nfleets + fleet_;
             
             expected_catch[index_yf] += population.fleets[fleet_]->catch_weight_at_age[index_ya];
@@ -33,6 +34,7 @@ namespace
             EXPECT_GT(population.expected_catch[index_yf], 0);
             EXPECT_GT(expected_catch[index_yf], 0);
             EXPECT_EQ(expected_catch[index_yf], population.fleets[fleet_]->expected_catch[year]);
+            }
         }
     }
 }

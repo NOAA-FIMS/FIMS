@@ -1,6 +1,7 @@
 data(package = "FIMS")
 
 test_that("ewaa data can be added to model", {
+
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   ewaa_growth <- new(fims$EWAAgrowth)
   age_frame <- FIMSFrameAge(data_mile1)

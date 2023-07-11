@@ -39,6 +39,8 @@ namespace
         // loop over fleets to get catch numbers at age for each fleet
         for (size_t fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
         {
+          
+            if(!population.fleets[fleet_index]->is_survey){
             // indices for use in catch equation copied from
             //   \inst\include\population_dynamics\population\population.hpp
             int index_yaf = year * population.nages * population.nfleets + 
@@ -60,6 +62,7 @@ namespace
           EXPECT_EQ(population.fleets[fleet_index]->catch_weight_at_age[index_ya], test_catch_waa[index_yaf]);
           EXPECT_GT(population.fleets[fleet_index]->catch_numbers_at_age[index_ya], 0);
           EXPECT_GT(population.fleets[fleet_index]->catch_weight_at_age[index_ya], 0);
+            }
         }
         
         
