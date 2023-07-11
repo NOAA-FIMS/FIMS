@@ -49,14 +49,7 @@ Code chunks in this vignette will be color coded similar to this diagram: R code
 
 ## Setting up a module in R
 
-We'll start from R. The first step is to install FIMS. We currently need to install from the test estimation branch so that we have all the needed functionality.
-
-```{r, class.source = "rchunk", eval = FALSE}
-# install FIMS
-remotes::install_github("NOAA-FIMS/FIMS@integration-test-estimation-R-clear-FIMS")
-```
-
-Next, we retrieve the FIMS module, create a new maturity module inside FIMS, and populate the maturity module with parameter values. 
+We'll start from R. The first step is to retrieve the FIMS module, create a new maturity module inside FIMS, and populate the maturity module with parameter values. 
 
 ```{r, class.source = "rchunk", eval = FALSE}
 # load FIMS
