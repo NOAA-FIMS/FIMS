@@ -5,6 +5,7 @@
 name: run-clang-tidy
 
 on:
+  workflow_dispatch:
   # The default build trigger is to run the action on every push and pull request, for any branch
   push:
   # To run the default repository branch weekly on sunday, uncomment the following 2 lines

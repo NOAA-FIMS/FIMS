@@ -5,7 +5,7 @@ name: call-doc-and-style-r
 # on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
 # workflow_dispatch requires pushing a button to run the workflow manually. uncomment the following line to add:
-  #workflow_dispatch:
+  workflow_dispatch:
   # Runs the workflow on each push to the main or master branch:
   push:
     branches: 
