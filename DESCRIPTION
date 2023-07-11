@@ -70,8 +70,7 @@ Suggests:
     testthat (>= 3.0.0),
     remotes,
     knitr,
-    rmarkdown
-    
+    rmarkdown    
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 LazyData: true
