@@ -16,12 +16,12 @@
 #include "rcpp_objects/rcpp_growth.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
-#include "rcpp_objects/rcpp_nll.hpp"
+//#include "rcpp_objects/rcpp_nll.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
 #include "rcpp_objects/rcpp_tmb_distribution.hpp"
-
+#include "../../common/model.hpp"
 /**
  * @brief Create the TMB model object and add interface objects to it.
  */
@@ -61,7 +61,7 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
 
   Rcpp::NumericVector p;
 
-  for (int i = 0; i < d0->fixed_effects_parameters.size(); i++) {
+  for (size_t i = 0; i < d0->fixed_effects_parameters.size(); i++) {
     p.push_back(*d0->fixed_effects_parameters[i]);
   }
 
@@ -75,29 +75,101 @@ Rcpp::NumericVector get_random_parameters_vector() {
 
   Rcpp::NumericVector p;
 
-  for (int i = 0; i < d0->random_effects_parameters.size(); i++) {
+  for (size_t i = 0; i < d0->random_effects_parameters.size(); i++) {
     p.push_back(*d0->random_effects_parameters[i]);
   }
 
   return p;
 }
 
+
+
+
+
+template<typename Type>
+void clear_internal(){
+    
+    std::shared_ptr<fims::Information<Type>> d0 =
+        fims::Information<Type>::GetInstance();
+    d0->fixed_effects_parameters.clear();
+    d0->random_effects_parameters.clear();
+
+   
+}
 /**
  * Clears the vector of independent variables.
  */
 void clear() {
+
+  // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
+    // rcpp_data.hpp
+  
+    DataInterface::id_g = 1;
+    DataInterface::fims_interface_objects.clear();
+    AgeCompDataInterface::id_g = 1;
+    IndexDataInterface::id_g = 1;
+    
+    // rcpp_fleets.hpp
+     FleetInterface::id_g = 1;
+     FleetInterface::fims_interface_objects.clear();
+    // rcpp_growth.hpp
+     GrowthInterfaceBase::id_g = 1;
+     GrowthInterfaceBase::live_objects.clear();
 
-  std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-      fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-  d0->fixed_effects_parameters.clear();
-  d0->random_effects_parameters.clear();
+    EWAAGrowthInterface::id_g = 1;
+    EWAAGrowthInterface::live_objects.clear();
 
-  LogisticSelectivityInterface::id_g = 1;
-  LogisticSelectivityInterface::selectivity_objects.clear();
+    // rcpp_maturity.hpp
+     MaturityInterfaceBase::id_g = 1;
+     MaturityInterfaceBase::maturity_objects.clear();
 
-  BevertonHoltRecruitmentInterface::id_g = 1;
-  BevertonHoltRecruitmentInterface::live_objects.clear();
+    LogisticMaturityInterface::id_g = 1;
+    LogisticMaturityInterface::maturity_objects.clear();
+
+    // rcpp_population.hpp
+  //   PopulationInterfaceBase::id_g = 1;
+  //   PopulationInterfaceBase::live_objects.clear();
+
+    PopulationInterface::id_g = 1;
+    PopulationInterface::live_objects.clear();
+
+    // rcpp_recruitment.hpp
+     RecruitmentInterfaceBase::id_g = 1;
+     RecruitmentInterfaceBase::live_objects.clear();
+
+    BevertonHoltRecruitmentInterface::id_g = 1;
+    BevertonHoltRecruitmentInterface::live_objects.clear();
+    
+    // rcpp_selectivity.hpp
+     SelectivityInterfaceBase::id_g = 1;
+     SelectivityInterfaceBase::selectivity_objects.clear();
+
+    LogisticSelectivityInterface::id_g = 1;
+    LogisticSelectivityInterface::selectivity_objects.clear();
+
+    DoubleLogisticSelectivityInterface::id_g = 1;
+    DoubleLogisticSelectivityInterface::selectivity_objects.clear();
+    
+    // rcpp_tmb_distribution.hpp
+     DistributionsInterfaceBase::id_g = 1;
+     DistributionsInterfaceBase::live_objects.clear();
+
+    DnormDistributionsInterface::id_g = 1;
+    DnormDistributionsInterface::live_objects.clear();
+
+    DlnormDistributionsInterface::id_g = 1;
+    DlnormDistributionsInterface::live_objects.clear();
+
+    DmultinomDistributionsInterface::id_g = 1;
+    DmultinomDistributionsInterface::live_objects.clear();
+    
+    FIMSRcppInterfaceBase::fims_interface_objects.clear();
+    clear_internal<TMB_FIMS_REAL_TYPE>();
+    clear_internal<TMB_FIMS_FIRST_ORDER>();
+    clear_internal<TMB_FIMS_SECOND_ORDER>();
+    clear_internal<TMB_FIMS_THIRD_ORDER>();
+
 }
 
 RCPP_EXPOSED_CLASS(Parameter)
@@ -119,25 +191,21 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()
-      .field("steep", &BevertonHoltRecruitmentInterface::steep)
-      .field("rzero", &BevertonHoltRecruitmentInterface::rzero)
+      .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
+      .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
+      .field("deviations", &BevertonHoltRecruitmentInterface::deviations)
+      .field("estimate_deviations", &BevertonHoltRecruitmentInterface::estimate_deviations)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
-      .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
-
-  Rcpp::class_<RecruitmentNLLInterface>("RecruitmentNLL")
-      .constructor()
-      .field("log_sigma_recruit", &RecruitmentNLLInterface::log_sigma_recruit)
-      .field("recruitment_devs", &RecruitmentNLLInterface::recruit_deviations)
       .field("recruitment_bias_adj",
-             &RecruitmentNLLInterface::recruit_bias_adjustment)
-      .field("do_bias_correction",
-             &RecruitmentNLLInterface::use_recruit_bias_adjustment)
-      .field("estimate_recruit_deviations",
-             &RecruitmentNLLInterface::estimate_recruit_deviations)
-      .method("evaluate", &RecruitmentNLLInterface::evaluate_nll);
+        &BevertonHoltRecruitmentInterface::recruit_bias_adjustment)
+      .field("use_bias_correction", &BevertonHoltRecruitmentInterface::use_bias_correction)
+      .field("log_sigma_recruit", &BevertonHoltRecruitmentInterface::log_sigma_recruit)
+      .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate)
+      .method("evaluate_nll", &BevertonHoltRecruitmentInterface::evaluate_nll);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
+      .field("is_survey", &FleetInterface::is_survey)
       .field("log_q", &FleetInterface::log_q)
       .field("log_Fmort", &FleetInterface::log_Fmort)
       .field("nages", &FleetInterface::nages)
@@ -146,20 +214,27 @@ RCPP_MODULE(fims) {
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
       .field("random_F", &FleetInterface::random_F)
+      .field("log_obs_error", &FleetInterface::log_obs_error)
       .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
       .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
       .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
       .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
-  Rcpp::class_<DataInterface>("Data").constructor().field(
-      "observed_data", &DataInterface::observed_data);
+  Rcpp::class_<DataInterface>("Data")
+    .constructor()
+    .field("observed_data", &DataInterface::observed_data)
+    .method("get_id", &DataInterface::get_id);
 
-  Rcpp::class_<AgeCompDataInterface>("AgeComp").constructor<int, int>().field(
-      "age_comp_data", &AgeCompDataInterface::age_comp_data);
+  Rcpp::class_<AgeCompDataInterface>("AgeComp")
+    .constructor<int, int>()
+    .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
+    .method("get_id", &AgeCompDataInterface::get_id);
 
-  Rcpp::class_<IndexDataInterface>("Index").constructor<int>().field(
-      "index_data", &IndexDataInterface::index_data);
+  Rcpp::class_<IndexDataInterface>("Index")
+    .constructor<int>()
+    .field("index_data", &IndexDataInterface::index_data)
+    .method("get_id", &IndexDataInterface::get_id);
 
   Rcpp::class_<PopulationInterface>("Population")
       .constructor()
@@ -171,6 +246,13 @@ RCPP_MODULE(fims) {
       .field("log_M", &PopulationInterface::log_M)
       .field("log_init_naa", &PopulationInterface::log_init_naa)
       .field("prop_female", &PopulationInterface::prop_female)
+      .field("ages", &PopulationInterface::ages)
+      .field("estimate_M", &PopulationInterface::estimate_M)
+      .field("estimate_init_naa", &PopulationInterface::estimate_initNAA)
+      .method("evaluate", &PopulationInterface::evaluate)
+      .method("SetMaturity", &PopulationInterface::SetMaturity)
+      .method("SetGrowth", &PopulationInterface::SetGrowth)
+      .method("SetRecruitment", &PopulationInterface::SetRecruitment)
       .method("evaluate", &PopulationInterface::evaluate);
 
   Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
@@ -208,6 +290,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .field("ages", &EWAAGrowthInterface::ages)
       .field("weights", &EWAAGrowthInterface::weights)
+      .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
   Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")

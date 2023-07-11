@@ -45,15 +45,15 @@ test_that("test get parameter vector", {
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
   ssb0 <- 0.0102562
-  recruitment$steep$value <- h
-  recruitment$steep$min <- 0.21
-  recruitment$steep$max <- 1.0
-  recruitment$steep$is_random_effect <- FALSE
-  recruitment$steep$estimated <- TRUE
-  recruitment$rzero$value <- r0
-  recruitment$rzero$is_random_effect <- FALSE
-  recruitment$rzero$estimated <- TRUE
-  rec_parm <- c(h, r0)
+  recruitment$logit_steep$value <- -log(1.0 - h) + log(h - 0.2)
+  recruitment$logit_steep$min <- 0.21
+  recruitment$logit_steep$max <- 1.0
+  recruitment$logit_steep$is_random_effect <- FALSE
+  recruitment$logit_steep$estimated <- TRUE
+  recruitment$log_rzero$value <- log(r0)
+  recruitment$log_rzero$is_random_effect <- FALSE
+  recruitment$log_rzero$estimated <- TRUE
+  rec_parm <- c(-log(1.0 - h) + log(h - 0.2), log(r0))
 
   fims2$CreateTMBModel()
   p2 <- fims2$get_fixed()

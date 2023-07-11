@@ -64,6 +64,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   EWAAGrowthInterface() : GrowthInterfaceBase() {}
 
   virtual ~EWAAGrowthInterface() {}
+  
   /** @brief get the id of the GrowthInterfaceBase object */
   virtual uint32_t get_id() { return this->id; }
 
@@ -115,10 +116,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     // set relative info
     b0->id = this->id;
-    b0->ewaa = this->ewaa;
-    // add to Information
-    d0->growth_models[b0->id] = b0;
-
+    b0->ewaa =  make_map(this->ages, this->weights);//this->ewaa;
     // add to Information
     d0->growth_models[b0->id] = b0;
 
@@ -131,10 +129,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     // set relative info
     b1->id = this->id;
-    b1->ewaa = this->ewaa;
-
-    // add to Information
-    d1->growth_models[b0->id] = b1;
+    b1->ewaa =  make_map(this->ages, this->weights);//this->ewaa;
 
     // add to Information
     d1->growth_models[b0->id] = b1;
@@ -148,10 +143,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     // set relative info
     b2->id = this->id;
-    b2->ewaa = this->ewaa;
-
-    // add to Information
-    d2->growth_models[b2->id] = b2;
+    b2->ewaa =  make_map(this->ages, this->weights);//this->ewaa;
 
     // add to Information
     d2->growth_models[b2->id] = b2;
@@ -165,10 +157,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     // set relative info
     b3->id = this->id;
-    b3->ewaa = this->ewaa;
-
-    // add to Information
-    d3->growth_models[b3->id] = b3;
+    b3->ewaa =  make_map(this->ages, this->weights);//this->ewaa;
 
     // add to Information
     d3->growth_models[b3->id] = b3;
