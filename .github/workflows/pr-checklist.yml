@@ -2,7 +2,6 @@
 # when a new pull request is opened.
 name: Add a comment with reviewer checklist when PR opened
 on:
-  workflow_dispatch:
   pull_request:
     types: [ready_for_review]
 
