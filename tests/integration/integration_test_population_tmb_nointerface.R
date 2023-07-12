@@ -11,28 +11,31 @@ load(url(paste0(github_dir, Rdata_file)))
 
 
 library(TMB)
-#dyn.unload(dynlib(paste0(path, "integration_test_population_tmb_nointerface")))
+# dyn.unload(dynlib(paste0(path, "integration_test_population_tmb_nointerface")))
 # compile(paste0(path, "integration_test_population_tmb_nointerface.cpp"),
 #         flags = "-DTMB_MODEL")
-#compile in debugging mode (flags set for Windows machine)
+# compile in debugging mode (flags set for Windows machine)
 compile(paste0(path, "integration_test_population_tmb_nointerface.cpp"),
-        flags = "-DTMB_MODEL -O1 -g", DLLFLAGS = "")
+  flags = "-DTMB_MODEL -O1 -g", DLLFLAGS = ""
+)
 dyn.load(dynlib(paste0(path, "integration_test_population_tmb_nointerface")))
 
-#Need code chunk below to run with data:
+# Need code chunk below to run with data:
 # data(package = "FIMS")
 # age_frame <- FIMSFrameAge(data_mile1)
 # fims_frame <- FIMSFrame(data_mile1)
 
-naa = c(993947.488, 811707.7933, 661434.4148, 537804.7782,
-        436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219,
-        153328.4354, 124353.2448, 533681.2692)
+naa <- c(
+  993947.488, 811707.7933, 661434.4148, 537804.7782,
+  436664.0013, 354303.3502, 287396.9718, 233100.2412, 189054.0219,
+  153328.4354, 124353.2448, 533681.2692
+)
 
 Dat <- list(
   fleet_num = 1,
   survey_num = 1,
   yr = om_input$nyr,
-  ages = om_input$ages-1,
+  ages = om_input$ages - 1,
   W_kg = om_input$W.kg,
   ln_M = log(om_input$M),
   init_naa = naa
@@ -50,7 +53,7 @@ Par <- list(
   A50_mat = om_input$A50.mat,
   slope_mat = om_input$slope.mat
 )
-#crashes Rstudio - next step: comment out population
+# crashes Rstudio - next step: comment out population
 obj <- MakeADFun(Dat, Par, DLL = "integration_test_population_tmb_nointerface")
 rep <- obj$report()
 rep$pop_naa

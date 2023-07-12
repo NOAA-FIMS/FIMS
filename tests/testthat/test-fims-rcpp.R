@@ -1,5 +1,4 @@
 test_that("Rcpp interface works for modules", {
-
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
   expect_no_error(parameter <- new(fims$Parameter, .1))

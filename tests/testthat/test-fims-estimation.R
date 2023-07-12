@@ -23,8 +23,7 @@ on.exit(unlink(maindir, recursive = T), add = TRUE)
 setwd(working_dir)
 on.exit(setwd(working_dir), add = TRUE)
 # Set-up Rcpp modules and fix parameters to "true"
-setup_fims <- function(om_input, om_output, em_input){
-
+setup_fims <- function(om_input, om_output, em_input) {
   test_env <- new.env(parent = emptyenv())
   test_env$fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
@@ -52,11 +51,11 @@ setup_fims <- function(om_input, om_output, em_input){
   test_env$fishing_fleet_age_comp <- new(test_env$fims$AgeComp, length(test_env$catch), om_input$nages)
   test_env$fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
 
-  test_env$survey_index <-em_input$surveyB.obs$survey1
+  test_env$survey_index <- em_input$surveyB.obs$survey1
   test_env$survey_fleet_index <- new(test_env$fims$Index, length(test_env$survey_index))
   test_env$survey_fleet_index$index_data <- test_env$survey_index
   test_env$survey_fleet_age_comp <- new(test_env$fims$AgeComp, length(test_env$survey_index), om_input$nages)
-  test_env$survey_fleet_age_comp$age_comp_data <-c(t(em_input$survey.age.obs$survey1)) * em_input$n.survey$survey1
+  test_env$survey_fleet_age_comp$age_comp_data <- c(t(em_input$survey.age.obs$survey1)) * em_input$n.survey$survey1
 
   # Growth
   test_env$ewaa_growth <- new(test_env$fims$EWAAgrowth)
@@ -91,7 +90,7 @@ setup_fims <- function(om_input, om_output, em_input){
   test_env$fishing_fleet$log_q <- log(1.0)
   test_env$fishing_fleet$estimate_q <- FALSE
   test_env$fishing_fleet$random_q <- FALSE
-  test_env$fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2+1)))
+  test_env$fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
   test_env$fishing_fleet$log_obs_error$estimated <- FALSE
   # Need get_id() for setting up observed agecomp and index data?
   test_env$fishing_fleet$SetAgeCompLikelihood(1)
@@ -110,7 +109,7 @@ setup_fims <- function(om_input, om_output, em_input){
   test_env$survey_fleet_selectivity$slope$estimated <- TRUE
 
   test_env$survey_fleet <- new(test_env$fims$Fleet)
-  test_env$survey_fleet$is_survey<-TRUE
+  test_env$survey_fleet$is_survey <- TRUE
   test_env$survey_fleet$nages <- om_input$nages
   test_env$survey_fleet$nyears <- om_input$nyr
   # survey_fleet$log_Fmort <- rep(log(0.0000000000000000000000000001), om_input$nyr) #-Inf?
@@ -119,7 +118,7 @@ setup_fims <- function(om_input, om_output, em_input){
   test_env$survey_fleet$log_q <- log(om_output$survey_q$survey1)
   test_env$survey_fleet$estimate_q <- TRUE
   test_env$survey_fleet$random_q <- FALSE
-  test_env$survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2+1)))
+  test_env$survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
   test_env$survey_fleet$log_obs_error$estimated <- FALSE
   test_env$survey_fleet$SetAgeCompLikelihood(1)
   test_env$survey_fleet$SetIndexLikelihood(1)
@@ -132,7 +131,7 @@ setup_fims <- function(om_input, om_output, em_input){
   # is it a problem these are not Parameters in the Population interface?
   # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors,
   # do we need a ParameterVector class?
-  test_env$population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr*om_input$nages)
+  test_env$population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages)
   test_env$population$estimate_M <- FALSE
   test_env$population$log_init_naa <- log(om_output$N.age[1, ])
   test_env$population$estimate_init_naa <- TRUE
@@ -150,19 +149,20 @@ setup_fims <- function(om_input, om_output, em_input){
 }
 
 test_that("deterministic test of fims", {
-  
-  deterministic_env <- setup_fims(om_input = om_input,
-                         om_output = om_output,
-                         em_input = em_input)
+  deterministic_env <- setup_fims(
+    om_input = om_input,
+    om_output = om_output,
+    em_input = em_input
+  )
   # Set-up TMB
   deterministic_env$fims$CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameters <- list(p = deterministic_env$fims$get_fixed())
   par_list <- 1:length(parameters[[1]])
   par_list[2:length(par_list)] <- NA
-  map <- list(p=factor(par_list))
+  map <- list(p = factor(par_list))
 
-  obj <- MakeADFun(data=list(), parameters, DLL="FIMS", map = map)
+  obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
 
   sdr <- TMB::sdreport(obj)
   sdr_fixed <- summary(sdr, "fixed")
@@ -173,49 +173,50 @@ test_that("deterministic test of fims", {
   fims_logR0 <- sdr_fixed[1, "Estimate"]
   expect_gt(fims_logR0, 0.0)
   # absolute relative error (are)
-  fims_logR0_are <- abs(fims_logR0 - log(om_input$R0))/
+  fims_logR0_are <- abs(fims_logR0 - log(om_input$R0)) /
     log(om_input$R0)
   expect_lte(fims_logR0_are, 0.0001)
 
   # Numbers at age
-  for (i in 1:length(c(t(om_output$N.age)))){
-    naa_are <- abs(report$naa[i] - c(t(om_output$N.age))[i])/
+  for (i in 1:length(c(t(om_output$N.age)))) {
+    naa_are <- abs(report$naa[i] - c(t(om_output$N.age))[i]) /
       c(t(om_output$N.age))[i]
     expect_lte(naa_are, 0.001)
   }
 
   # Biomass
-  for (i in 1:length(om_output$biomass.mt)){
-    biomass_are <- abs(report$biomass[i] - om_output$biomass.mt[i])/
+  for (i in 1:length(om_output$biomass.mt)) {
+    biomass_are <- abs(report$biomass[i] - om_output$biomass.mt[i]) /
       om_output$biomass.mt[i]
     expect_lte(biomass_are, 0.001)
   }
 
   # Spawning biomass
-  for (i in 1:length(om_output$SSB)){
-    sb_are <- abs(report$ssb[i] - om_output$SSB[i])/
+  for (i in 1:length(om_output$SSB)) {
+    sb_are <- abs(report$ssb[i] - om_output$SSB[i]) /
       om_output$SSB[i]
     expect_lte(sb_are, 0.001)
   }
 
   # Recruitment
-  fims_naa <- matrix(report$naa[1:(om_input$nyr*om_input$nages)],
-                     nrow = om_input$nyr, byrow = TRUE)
+  fims_naa <- matrix(report$naa[1:(om_input$nyr * om_input$nages)],
+    nrow = om_input$nyr, byrow = TRUE
+  )
 
-  for (i in 1:length(om_output$N.age[,1])){
-    fims_naa1_are <- abs(fims_naa[i,1] - om_output$N.age[i,1])/
-      om_output$N.age[i,1]
+  for (i in 1:length(om_output$N.age[, 1])) {
+    fims_naa1_are <- abs(fims_naa[i, 1] - om_output$N.age[i, 1]) /
+      om_output$N.age[i, 1]
     expect_lte(fims_naa1_are, 0.001)
   }
 
   expect_equal(
-    fims_naa[1:om_input$nyr,1],
+    fims_naa[1:om_input$nyr, 1],
     report$recruitment[1:om_input$nyr]
   )
 
-  for (i in 1:length(om_output$N.age[,1])){
-    recruitment_are <- abs(report$recruitment[i] - om_output$N.age[i,1])/
-      om_output$N.age[i,1]
+  for (i in 1:length(om_output$N.age[, 1])) {
+    recruitment_are <- abs(report$recruitment[i] - om_output$N.age[i, 1]) /
+      om_output$N.age[i, 1]
     expect_lte(recruitment_are, 0.001)
   }
 
@@ -226,129 +227,141 @@ test_that("deterministic test of fims", {
   expect_equal(report$F_mort, om_output$f)
 
   # Expected catch
-  fims_object <- report$expected_index[,1]
+  fims_object <- report$expected_index[, 1]
   # Expect small relative error for deterministic test
-  for (i in 1:length(om_output$L.mt$fleet1)){
-    fims_object_are <- abs(fims_object[i] - om_output$L.mt$fleet1[i])/
+  for (i in 1:length(om_output$L.mt$fleet1)) {
+    fims_object_are <- abs(fims_object[i] - om_output$L.mt$fleet1[i]) /
       om_output$L.mt$fleet1[i]
     expect_lte(fims_object_are, 0.001)
   }
 
   fims_object_are <- rep(0, length(em_input$L.obs$fleet1))
-  for (i in 1:length(em_input$L.obs$fleet1)){
-    fims_object_are[i] <- abs(fims_object[i] - em_input$L.obs$fleet1[i])/em_input$L.obs$fleet1[i]
+  for (i in 1:length(em_input$L.obs$fleet1)) {
+    fims_object_are[i] <- abs(fims_object[i] - em_input$L.obs$fleet1[i]) / em_input$L.obs$fleet1[i]
   }
   # Expect 95% of relative error to be within 2*cv
-  expect_lte(sum(fims_object_are > om_input$cv.L$fleet1*2.0), length(em_input$L.obs$fleet1)*0.05)
+  expect_lte(sum(fims_object_are > om_input$cv.L$fleet1 * 2.0), length(em_input$L.obs$fleet1) * 0.05)
 
   # Expected catch number at age
-  for (i in 1:length(c(t(om_output$L.age$fleet1)))){
-    cnaa_are <- abs(report$cnaa[i,1] - c(t(om_output$L.age$fleet1))[i])/
+  for (i in 1:length(c(t(om_output$L.age$fleet1)))) {
+    cnaa_are <- abs(report$cnaa[i, 1] - c(t(om_output$L.age$fleet1))[i]) /
       c(t(om_output$L.age$fleet1))[i]
     expect_lte(cnaa_are, 0.001)
   }
 
   # Expected catch number at age in proportion
-  fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 1],
-                      nrow = om_input$nyr, byrow = TRUE)
-  fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
-  om_cnaa_proportion <- om_output$L.age$fleet1/rowSums(om_output$L.age$fleet1)
+  fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr * om_input$nages), 1],
+    nrow = om_input$nyr, byrow = TRUE
+  )
+  fims_cnaa_proportion <- fims_cnaa / rowSums(fims_cnaa)
+  om_cnaa_proportion <- om_output$L.age$fleet1 / rowSums(om_output$L.age$fleet1)
 
-  for (i in 1:length(c(t(om_cnaa_proportion)))){
+  for (i in 1:length(c(t(om_cnaa_proportion)))) {
     expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(om_cnaa_proportion))[i]), 0.001)
   }
 
   # Expected survey index
-  fims_object <- report$expected_index[,2]
+  fims_object <- report$expected_index[, 2]
 
-  cwaa <- matrix(report$cwaa[1:(om_input$nyr*om_input$nages),2], nrow = om_input$nyr, byrow = T)
-  expect_equal(fims_object, apply(cwaa, 1, sum)*om_output$survey_q$survey1)
+  cwaa <- matrix(report$cwaa[1:(om_input$nyr * om_input$nages), 2], nrow = om_input$nyr, byrow = T)
+  expect_equal(fims_object, apply(cwaa, 1, sum) * om_output$survey_q$survey1)
 
-  for (i in 1:length(om_output$survey_index_biomass$survey1)){
-    fims_object_are <- abs(fims_object[i] - om_output$survey_index_biomass$survey1[i])/
+  for (i in 1:length(om_output$survey_index_biomass$survey1)) {
+    fims_object_are <- abs(fims_object[i] - om_output$survey_index_biomass$survey1[i]) /
       om_output$survey_index_biomass$survey1[i]
     expect_lte(fims_object_are, 0.001)
   }
 
   fims_object_are <- rep(0, length(em_input$surveyB.obs$survey1))
-  for (i in 1:length(em_input$survey.obs$survey1)){
-    fims_object_are[i] <- abs(fims_object[i] - em_input$surveyB.obs$survey1[i])/em_input$surveyB.obs$survey1[i]
+  for (i in 1:length(em_input$survey.obs$survey1)) {
+    fims_object_are[i] <- abs(fims_object[i] - em_input$surveyB.obs$survey1[i]) / em_input$surveyB.obs$survey1[i]
   }
   # Expect 95% of relative error to be within 2*cv
-  expect_lte(sum(fims_object_are > om_input$cv.survey$survey1*2.0), length(em_input$surveyB.obs$survey1)*0.05)
+  expect_lte(sum(fims_object_are > om_input$cv.survey$survey1 * 2.0), length(em_input$surveyB.obs$survey1) * 0.05)
 
   # Expected catch number at age in proportion
-  fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 2],
-                      nrow = om_input$nyr, byrow = TRUE)
+  fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr * om_input$nages), 2],
+    nrow = om_input$nyr, byrow = TRUE
+  )
 
-  for (i in 1:length(c(t(om_output$survey_age_comp$survey1)))){
-    cnaa_are <- abs(report$cnaa[i,2] - c(t(om_output$survey_age_comp$survey1))[i])/
+  for (i in 1:length(c(t(om_output$survey_age_comp$survey1)))) {
+    cnaa_are <- abs(report$cnaa[i, 2] - c(t(om_output$survey_age_comp$survey1))[i]) /
       c(t(om_output$survey_age_comp$survey1))[i]
     expect_lte(cnaa_are, 0.001)
   }
 
-  fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
-  om_cnaa_proportion <- om_output$survey_age_comp$survey1/rowSums(om_output$survey_age_comp$survey1)
+  fims_cnaa_proportion <- fims_cnaa / rowSums(fims_cnaa)
+  om_cnaa_proportion <- om_output$survey_age_comp$survey1 / rowSums(om_output$survey_age_comp$survey1)
 
-  for (i in 1:length(c(t(om_cnaa_proportion)))){
+  for (i in 1:length(c(t(om_cnaa_proportion)))) {
     expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(om_cnaa_proportion))[i]), 0.001)
   }
 
   deterministic_env$fims$clear()
-
 })
 
 test_that("nll test of fims", {
-
-  nll_env <- setup_fims(om_input = om_input,
-                         om_output = om_output,
-                         em_input = em_input)
+  nll_env <- setup_fims(
+    om_input = om_input,
+    om_output = om_output,
+    em_input = em_input
+  )
   # Set-up TMB
   nll_env$fims$CreateTMBModel()
   parameters <- list(p = nll_env$fims$get_fixed())
   par_list <- 1:length(parameters[[1]])
   par_list[2:length(par_list)] <- NA
-  map <- list(p=factor(par_list))
+  map <- list(p = factor(par_list))
 
-  obj <- TMB::MakeADFun(data=list(), parameters, DLL="FIMS", map = map)
+  obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
 
   sdr <- TMB::sdreport(obj)
   sdr_fixed <- summary(sdr, "fixed")
 
   # log(R0)
   fims_logR0 <- sdr_fixed[1, "Estimate"]
-  expect_lte(abs(fims_logR0 - log(om_input$R0))/log(om_input$R0), 0.0001)
+  expect_lte(abs(fims_logR0 - log(om_input$R0)) / log(om_input$R0), 0.0001)
 
   report <- obj$report()
-  obj <- TMB::MakeADFun(data=list(), parameters, DLL="FIMS", map = map)
+  obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
   jnll <- obj$fn()
 
   # recruitment likelihood
-  rec_nll <- -sum(dnorm(log(nll_env$recruitment$deviations), rep(0, om_input$nyr),
-                        om_input$logR_sd, TRUE))
+  rec_nll <- -sum(dnorm(
+    log(nll_env$recruitment$deviations), rep(0, om_input$nyr),
+    om_input$logR_sd, TRUE
+  ))
 
-  #catch and survey index expected likelihoods
-  index_nll_fleet <- -sum(dnorm(log(nll_env$catch),
-                                log(om_output$L.mt$fleet1),
-                                sqrt(log(em_input$cv.L$fleet1^2+1)), TRUE))
-  index_nll_survey <- -sum(dnorm(log(nll_env$survey_index),
-                                 log(om_output$survey_index_biomass$survey1),
-                                 sqrt(log(em_input$cv.survey$survey1^2+1)), TRUE))
+  # catch and survey index expected likelihoods
+  index_nll_fleet <- -sum(dnorm(
+    log(nll_env$catch),
+    log(om_output$L.mt$fleet1),
+    sqrt(log(em_input$cv.L$fleet1^2 + 1)), TRUE
+  ))
+  index_nll_survey <- -sum(dnorm(
+    log(nll_env$survey_index),
+    log(om_output$survey_index_biomass$survey1),
+    sqrt(log(em_input$cv.survey$survey1^2 + 1)), TRUE
+  ))
   index_nll <- index_nll_fleet + index_nll_survey
   # age comp likelihoods
   fishing_acomp_observed <- em_input$L.age.obs$fleet1
-  fishing_acomp_expected <- om_output$L.age$fleet1/rowSums(om_output$L.age$fleet1)
+  fishing_acomp_expected <- om_output$L.age$fleet1 / rowSums(om_output$L.age$fleet1)
   survey_acomp_observed <- em_input$survey.age.obs$survey1
-  survey_acomp_expected <- om_output$survey_age_comp$survey1/rowSums(om_output$survey_age_comp$survey1)
+  survey_acomp_expected <- om_output$survey_age_comp$survey1 / rowSums(om_output$survey_age_comp$survey1)
   age_comp_nll_fleet <- age_comp_nll_survey <- 0
-  for(y in 1:om_input$nyr){
+  for (y in 1:om_input$nyr) {
     age_comp_nll_fleet <- age_comp_nll_fleet -
-      dmultinom(fishing_acomp_observed[y,]*em_input$n.L$fleet1, em_input$n.L$fleet1,
-                fishing_acomp_expected[y,],TRUE)
+      dmultinom(
+        fishing_acomp_observed[y, ] * em_input$n.L$fleet1, em_input$n.L$fleet1,
+        fishing_acomp_expected[y, ], TRUE
+      )
 
     age_comp_nll_survey <- age_comp_nll_survey -
-      dmultinom(survey_acomp_observed[y,]*em_input$n.survey$survey1, em_input$n.survey$survey1,
-                survey_acomp_expected[y,],TRUE)
+      dmultinom(
+        survey_acomp_observed[y, ] * em_input$n.survey$survey1, em_input$n.survey$survey1,
+        survey_acomp_expected[y, ], TRUE
+      )
   }
   age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
   expected_jnll <- rec_nll + index_nll + age_comp_nll
@@ -356,45 +369,47 @@ test_that("nll test of fims", {
   expect_equal(jnll, expected_jnll)
 
   nll_env$fims$clear()
-  
 })
 
 test_that("estimation test of fims", {
-  
-  estimation_env <- setup_fims(om_input = om_input,
-                         om_output = om_output,
-                         em_input = em_input)
+  estimation_env <- setup_fims(
+    om_input = om_input,
+    om_output = om_output,
+    em_input = em_input
+  )
 
   # Set-up TMB
   estimation_env$fims$CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameters <- list(p = estimation_env$fims$get_fixed())
-  obj <- TMB::MakeADFun(data=list(), parameters, DLL="FIMS")
+  obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS")
 
-  opt<- with(obj,optim(par, fn, gr, method = "BFGS",
-                       control = list(maxit=1000000, reltol = 1e-15)))
+  opt <- with(obj, optim(par, fn, gr,
+    method = "BFGS",
+    control = list(maxit = 1000000, reltol = 1e-15)
+  ))
 
   report <- obj$report()
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
   # Numbers at age
   # Estimates and SE for NAA
-  sdr_naa <- sdr_report[which(rownames(sdr_report) == "naa"),]
+  sdr_naa <- sdr_report[which(rownames(sdr_report) == "naa"), ]
   naa_are <- rep(0, length(c(t(om_output$N.age))))
-  for (i in 1:length(c(t(om_output$N.age)))){
-    naa_are[i] <-  abs(sdr_naa[i,1] - c(t(om_output$N.age))[i])
+  for (i in 1:length(c(t(om_output$N.age)))) {
+    naa_are[i] <- abs(sdr_naa[i, 1] - c(t(om_output$N.age))[i])
   }
   # Expect 95% of absolute error to be within 2*SE of NAA
   expect_lte(
-    sum(naa_are > 2 * sdr_naa[1:length(c(t(om_output$N.age))),2]),
-    0.05*length(c(t(om_output$N.age)))
+    sum(naa_are > 2 * sdr_naa[1:length(c(t(om_output$N.age))), 2]),
+    0.05 * length(c(t(om_output$N.age)))
   )
 
   # Biomass (needs to be updated when std.error is available)
   # sdr_biomass <- sdr_report[which(rownames(sdr_report) == "biomass"),]
   biomass_are <- rep(0, length(om_output$biomass.mt))
-  for (i in 1:length(om_output$biomass.mt)){
-    biomass_are[i] <- abs(report$biomass[i] - om_output$biomass.mt[i])/om_output$biomass.mt[i]
+  for (i in 1:length(om_output$biomass.mt)) {
+    biomass_are[i] <- abs(report$biomass[i] - om_output$biomass.mt[i]) / om_output$biomass.mt[i]
     expect_lte(biomass_are[i], 0.15)
   }
   # expect_lte(
@@ -403,70 +418,73 @@ test_that("estimation test of fims", {
   # )
 
   # Spawning biomass
-  sdr_sb <- sdr_report[which(rownames(sdr_report) == "ssb"),]
+  sdr_sb <- sdr_report[which(rownames(sdr_report) == "ssb"), ]
   sb_are <- rep(0, length(om_output$SSB))
-  for (i in 1:length(om_output$SSB)){
-    sb_are[i] <- abs(report$ssb[i] - om_output$SSB[i])/om_output$SSB[i]
+  for (i in 1:length(om_output$SSB)) {
+    sb_are[i] <- abs(report$ssb[i] - om_output$SSB[i]) / om_output$SSB[i]
     # expect_lte(sb_are[i], 0.15)
   }
   expect_lte(
-    sum(sb_are > 2 * sdr_sb[1:length(om_output$SSB),2]),
-    0.05*length(om_output$SSB)
+    sum(sb_are > 2 * sdr_sb[1:length(om_output$SSB), 2]),
+    0.05 * length(om_output$SSB)
   )
 
   # Recruitment
-  fims_naa <- matrix(report$naa[1:(om_input$nyr*om_input$nages)],
-                     nrow = om_input$nyr, byrow = TRUE)
+  fims_naa <- matrix(report$naa[1:(om_input$nyr * om_input$nages)],
+    nrow = om_input$nyr, byrow = TRUE
+  )
   sdr_naa1_vec <- sdr_report[which(rownames(sdr_report) == "naa"), 2]
   sdr_naa1 <- sdr_naa1_vec[seq(1, om_input$nyr * om_input$nages, by = om_input$nages)]
-  fims_naa1_are <- rep(0, length(om_output$N.age[,1]))
-  for (i in 1:length(om_output$N.age[,1])){
-    fims_naa1_are[i] <- abs(fims_naa[i,1] - om_output$N.age[i,1])/
-      om_output$N.age[i,1]
+  fims_naa1_are <- rep(0, length(om_output$N.age[, 1]))
+  for (i in 1:length(om_output$N.age[, 1])) {
+    fims_naa1_are[i] <- abs(fims_naa[i, 1] - om_output$N.age[i, 1]) /
+      om_output$N.age[i, 1]
     expect_lte(fims_naa1_are[i], 0.25)
   }
   expect_lte(
     sum(fims_naa1_are > 2 * sdr_naa1[1:length(om_output$SSB)]),
-    0.05*length(om_output$SSB)
+    0.05 * length(om_output$SSB)
   )
 
-  expect_equal(fims_naa[(1:om_input$nyr),1],
-               report$recruitment[1:om_input$nyr])
+  expect_equal(
+    fims_naa[(1:om_input$nyr), 1],
+    report$recruitment[1:om_input$nyr]
+  )
 
   # recruitment deviations
-  sdr_rdev <- sdr_report[which(rownames(sdr_report) == "rec_dev"),]
+  sdr_rdev <- sdr_report[which(rownames(sdr_report) == "rec_dev"), ]
   rdev_are <- rep(0, length(om_input$logR.resid))
 
-  for (i in 1:length(om_input$logR.resid)){
-    rdev_are[i] <- abs(report$rec_dev[i] - exp(om_input$logR.resid[i]))/
+  for (i in 1:length(om_input$logR.resid)) {
+    rdev_are[i] <- abs(report$rec_dev[i] - exp(om_input$logR.resid[i])) /
       exp(om_input$logR.resid[i])
     # expect_lte(rdev_are[i], 1) # 1
   }
   expect_lte(
-    sum(rdev_are > 2 * sdr_rdev[1:length(om_input$logR.resid),2]),
-    0.05*length(om_input$logR.resid)
+    sum(rdev_are > 2 * sdr_rdev[1:length(om_input$logR.resid), 2]),
+    0.05 * length(om_input$logR.resid)
   )
 
   # F (needs to be updated when std.error is available)
   f_are <- rep(0, length(om_output$f))
-  for (i in 1:length(om_output$f)){
-    f_are[i] <- abs(report$F_mort[i] - om_output$f[i])/om_output$f[i]
+  for (i in 1:length(om_output$f)) {
+    f_are[i] <- abs(report$F_mort[i] - om_output$f[i]) / om_output$f[i]
     expect_lte(f_are[i], 0.4)
   }
 
   # Expected catch (needs to be updated when std.error is available)
-  fims_object <- report$expected_index[,1]
-  for (i in 1:length(om_output$L.mt$fleet1)){
-    expect_lte(abs(fims_object[i] - om_output$L.mt$fleet1[i])/om_output$L.mt$fleet1[i], 0.01)
+  fims_object <- report$expected_index[, 1]
+  for (i in 1:length(om_output$L.mt$fleet1)) {
+    expect_lte(abs(fims_object[i] - om_output$L.mt$fleet1[i]) / om_output$L.mt$fleet1[i], 0.01)
   }
-  for (i in 1:length(em_input$L.obs$fleet1)){
-    expect_lte(abs(fims_object[i] - em_input$L.obs$fleet1[i])/em_input$L.obs$fleet1[i], 0.025)
+  for (i in 1:length(em_input$L.obs$fleet1)) {
+    expect_lte(abs(fims_object[i] - em_input$L.obs$fleet1[i]) / em_input$L.obs$fleet1[i], 0.025)
   }
 
   # Expected catch number at age (needs to be updated when std.error is available)
-  for (i in 1:length(c(t(om_output$L.age$fleet1)))){
-    expect_lte(abs(report$cnaa[i,1] - c(t(om_output$L.age$fleet1))[i])/
-                 c(t(om_output$L.age$fleet1))[i], 0.25)
+  for (i in 1:length(c(t(om_output$L.age$fleet1)))) {
+    expect_lte(abs(report$cnaa[i, 1] - c(t(om_output$L.age$fleet1))[i]) /
+      c(t(om_output$L.age$fleet1))[i], 0.25)
   }
 
   # Expected catch number at age in proportion
@@ -486,14 +504,14 @@ test_that("estimation test of fims", {
 
 
   # Expected survey index (needs to be updated when std.error is available)
-  fims_object <- report$expected_index[,2]
-  for (i in 1:length(om_output$survey_index_biomass$survey1)){
-    expect_lte(abs(fims_object[i] - om_output$survey_index_biomass$survey1[i])/
-                 om_output$survey_index_biomass$survey1[i], 0.05)
+  fims_object <- report$expected_index[, 2]
+  for (i in 1:length(om_output$survey_index_biomass$survey1)) {
+    expect_lte(abs(fims_object[i] - om_output$survey_index_biomass$survey1[i]) /
+      om_output$survey_index_biomass$survey1[i], 0.05)
   }
-  for (i in 1:length(em_input$surveyB.obs$survey1)){
-    expect_lte(abs(fims_object[i] - em_input$surveyB.obs$survey1[i])/
-                 em_input$surveyB.obs$survey1[i], 0.25)
+  for (i in 1:length(em_input$surveyB.obs$survey1)) {
+    expect_lte(abs(fims_object[i] - em_input$surveyB.obs$survey1[i]) /
+      em_input$surveyB.obs$survey1[i], 0.25)
   }
 
   # Expected survey number at age
@@ -514,13 +532,10 @@ test_that("estimation test of fims", {
 
 
   estimation_env$fims$clear()
-  
 })
 
 test_that("run FIMS in a for loop", {
-  
-  for (i in 1:5){
-
+  for (i in 1:5) {
     fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
     # Recruitment
@@ -547,11 +562,11 @@ test_that("run FIMS in a for loop", {
     fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
     fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
 
-    survey_index <-em_input$surveyB.obs$survey1
+    survey_index <- em_input$surveyB.obs$survey1
     survey_fleet_index <- new(fims$Index, length(survey_index))
     survey_fleet_index$index_data <- survey_index
     survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
-    survey_fleet_age_comp$age_comp_data <-c(t(em_input$survey.age.obs$survey1)) * em_input$n.survey$survey1
+    survey_fleet_age_comp$age_comp_data <- c(t(em_input$survey.age.obs$survey1)) * em_input$n.survey$survey1
 
     # Growth
     ewaa_growth <- new(fims$EWAAgrowth)
@@ -586,7 +601,7 @@ test_that("run FIMS in a for loop", {
     fishing_fleet$log_q <- log(1.0)
     fishing_fleet$estimate_q <- FALSE
     fishing_fleet$random_q <- FALSE
-    fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2+1)))
+    fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
     fishing_fleet$log_obs_error$estimated <- FALSE
     # Need get_id() for setting up observed agecomp and index data?
     fishing_fleet$SetAgeCompLikelihood(1)
@@ -605,7 +620,7 @@ test_that("run FIMS in a for loop", {
     survey_fleet_selectivity$slope$estimated <- TRUE
 
     survey_fleet <- new(fims$Fleet)
-    survey_fleet$is_survey<-TRUE
+    survey_fleet$is_survey <- TRUE
     survey_fleet$nages <- om_input$nages
     survey_fleet$nyears <- om_input$nyr
     # survey_fleet$log_Fmort <- rep(log(0.0000000000000000000000000001), om_input$nyr) #-Inf?
@@ -614,7 +629,7 @@ test_that("run FIMS in a for loop", {
     survey_fleet$log_q <- log(om_output$survey_q$survey1)
     survey_fleet$estimate_q <- TRUE
     survey_fleet$random_q <- FALSE
-    survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2+1)))
+    survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
     survey_fleet$log_obs_error$estimated <- FALSE
     survey_fleet$SetAgeCompLikelihood(1)
     survey_fleet$SetIndexLikelihood(1)
@@ -627,7 +642,7 @@ test_that("run FIMS in a for loop", {
     # is it a problem these are not Parameters in the Population interface?
     # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors,
     # do we need a ParameterVector class?
-    population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr*om_input$nages)
+    population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages)
     population$estimate_M <- FALSE
     population$log_init_naa <- log(om_output$N.age[1, ])
     population$estimate_init_naa <- TRUE
@@ -644,10 +659,12 @@ test_that("run FIMS in a for loop", {
     ## Set-up TMB
     fims$CreateTMBModel()
     parameters <- list(p = fims$get_fixed())
-    obj <- TMB::MakeADFun(data=list(), parameters, DLL="FIMS")
+    obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS")
 
-    opt<- with(obj,optim(par, fn, gr, method = "BFGS",
-                        control = list(maxit=1000000, reltol = 1e-15)))
+    opt <- with(obj, optim(par, fn, gr,
+      method = "BFGS",
+      control = list(maxit = 1000000, reltol = 1e-15)
+    ))
 
     report <- obj$report()
     expect_false(is.null(report))
@@ -656,7 +673,4 @@ test_that("run FIMS in a for loop", {
     expect_lte(max_gradient, 0.00001)
     fims$clear()
   }
-
 })
-
-

@@ -27,12 +27,12 @@ test_that("Recruitment input settings work as expected", {
   expect_true(recruitment$logit_steep$is_random_effect)
   expect_true(recruitment$logit_steep$estimated)
   expect_equal(recruitment$log_rzero$value, log(1000000.0))
-  
+
 
   expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 1090802.68)
 
   devs <- c(1.0, 2.0, 3.0)
-    recruitment$deviations <- devs
+  recruitment$deviations <- devs
 
 
   expected_nll <- -sum(log(stats::dnorm(log(devs), 0, 0.7)))
