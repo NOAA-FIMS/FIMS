@@ -20,7 +20,6 @@ jobs:
   job:
     name: run-clang-format
     runs-on: ubuntu-latest
-
     # Format hpp and cpp files under inst/include, src/, and test/gtest
     # We use Google style to format code.
     steps:
@@ -37,6 +36,7 @@ jobs:
       uses: peter-evans/create-pull-request@v4
       with:
         commit-message: 'style: run clang format'
+        token: ${{ secrets.PAT }}
         branch: format-c++-code
         title: 'format C++ code with clang format'
         body: |
