@@ -60,51 +60,50 @@ class Model {  // may need singleton
    * @brief Evaluate. Calculates the joint negative log-likelihood function.
    */
   const T Evaluate() {
-
     // jnll = negative-log-likelihood (the objective function)
     T jnll = 0.0;
-    T rec_nll = 0.0; //recrutiment nll
-    T age_comp_nll = 0.0; //age composition nll
-    T index_nll = 0.0; //survey and fishery cacth nll
-    //Loop over populations, evaluate, and sum up the recruitment likelihood component
+    T rec_nll = 0.0;       // recrutiment nll
+    T age_comp_nll = 0.0;  // age composition nll
+    T index_nll = 0.0;     // survey and fishery cacth nll
+    // Loop over populations, evaluate, and sum up the recruitment likelihood
+    // component
     typename fims::Information<T>::population_iterator it;
     for (it = this->fims_information->populations.begin();
-      it != this->fims_information->populations.end(); ++it) {
+         it != this->fims_information->populations.end(); ++it) {
       //(*it).second points to the Population module
       FIMS_LOG << "inside pop loop" << std::endl;
-      //Prepare recruitment
+      // Prepare recruitment
       (*it).second->recruitment->Prepare();
       FIMS_LOG << "recruitment prepare works" << std::endl;
-      //link to TMB objective function
-      #ifdef TMB_MODEL
-        (*it).second->of = this->of;
-      #endif
-      //Evaluate population
+// link to TMB objective function
+#ifdef TMB_MODEL
+      (*it).second->of = this->of;
+#endif
+      // Evaluate population
       (*it).second->Evaluate();
-      //Recrtuiment negative log-likelihood
+      // Recrtuiment negative log-likelihood
       rec_nll += (*it).second->recruitment->evaluate_nll();
       FIMS_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
-
     typename fims::Information<T>::fleet_iterator jt;
-    for(jt = this->fims_information->fleets.begin(); jt !=
-      this->fims_information->fleets.end(); ++jt ){
-      #ifdef TMB_MODEL
-        (*jt).second->of = this->of;
-      #endif
+    for (jt = this->fims_information->fleets.begin();
+         jt != this->fims_information->fleets.end(); ++jt) {
+#ifdef TMB_MODEL
+      (*jt).second->of = this->of;
+#endif
       age_comp_nll += (*jt).second->evaluate_age_comp_nll();
-      FIMS_LOG << "survey and fleet age comp nll sum: " << age_comp_nll << std::endl;
+      FIMS_LOG << "survey and fleet age comp nll sum: " << age_comp_nll
+               << std::endl;
       index_nll += (*jt).second->evaluate_index_nll();
       FIMS_LOG << "survey and fleet index nll sum: " << index_nll << std::endl;
-      if((*jt).second->is_survey == false){
-      #ifdef TMB_MODEL
+      if ((*jt).second->is_survey == false) {
+#ifdef TMB_MODEL
         (*jt).second->of = this->of;
-      #endif
+#endif
         (*jt).second->ReportFleet();
       }
     }
-
 
     jnll = rec_nll + age_comp_nll + index_nll;
 

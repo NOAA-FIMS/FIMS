@@ -23,8 +23,8 @@ class DataInterface : public FIMSRcppInterfaceBase {
   static uint32_t id_g; /**< static id of the DataInterface object */
   uint32_t id;          /**< local id of the DataInterface object */
   static std::map<uint32_t, DataInterface*>
-    live_objects; /**< map associating the ids of DataInterface to
-    the objects */
+      live_objects; /**< map associating the ids of DataInterface to
+      the objects */
 
   /** @brief constructor
    */
@@ -32,7 +32,7 @@ class DataInterface : public FIMSRcppInterfaceBase {
     this->id = DataInterface::id_g++;
     DataInterface::live_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-    }
+  }
 
   /** @brief destructor
    */
@@ -40,23 +40,15 @@ class DataInterface : public FIMSRcppInterfaceBase {
 
   /** @brief get the ID of the interface base object
    **/
-  virtual uint32_t get_id(){
-    return this->id;
-  }
+  virtual uint32_t get_id() { return this->id; }
 
-/**@brief add_to_fims_tmb dummy method
- *
-*/
-  virtual bool add_to_fims_tmb(){
-    return true;
-  };
-
+  /**@brief add_to_fims_tmb dummy method
+   *
+   */
+  virtual bool add_to_fims_tmb() { return true; };
 };
 uint32_t DataInterface::id_g = 1;
-std::map<uint32_t, DataInterface*>
-  DataInterface::live_objects;
-
-
+std::map<uint32_t, DataInterface*> DataInterface::live_objects;
 
 /**
  * @brief Rcpp interface for age comp data as an S4 object. To instantiate
@@ -84,9 +76,7 @@ class AgeCompDataInterface : public DataInterface {
 
   /** @brief get the ID of the interface base object
    **/
-  virtual uint32_t get_id() {
-    return this->id;
-  }
+  virtual uint32_t get_id() { return this->id; }
 
   /**
    * @brief adds parameters to the model
@@ -94,7 +84,7 @@ class AgeCompDataInterface : public DataInterface {
   virtual bool add_to_fims_tmb() {
     std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data_0 =
         std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax,
-        this->amax);
+                                                               this->amax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> age_comp_data_1 =
         std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->ymax,
                                                                  this->amax);
@@ -158,9 +148,7 @@ class IndexDataInterface : public DataInterface {
   /**
    * @brief constructor
    */
-  IndexDataInterface(int ymax = 0) : DataInterface() {
-    this->ymax = ymax;
-  }
+  IndexDataInterface(int ymax = 0) : DataInterface() { this->ymax = ymax; }
 
   /**
    * @brief destructor
@@ -168,9 +156,7 @@ class IndexDataInterface : public DataInterface {
   virtual ~IndexDataInterface() {}
   /** @brief get the ID of the interface base object
    **/
-  virtual uint32_t get_id() {
-    return this->id;
-  }
+  virtual uint32_t get_id() { return this->id; }
 
   /**
    *@brief function to add to TMB
@@ -184,7 +170,7 @@ class IndexDataInterface : public DataInterface {
         std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->ymax);
     std::shared_ptr<fims::DataObject<TMB_FIMS_THIRD_ORDER>> index_data_3 =
         std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax);
-  index_data_0->id = this->id;
+    index_data_0->id = this->id;
 
     index_data_1->id = this->id;
 
@@ -192,13 +178,12 @@ class IndexDataInterface : public DataInterface {
 
     index_data_3->id = this->id;
 
-
     for (int y = 0; y < ymax; y++) {
       index_data_0->at(y) = this->index_data[y];
       index_data_1->at(y) = this->index_data[y];
       index_data_2->at(y) = this->index_data[y];
       index_data_3->at(y) = this->index_data[y];
-  }
+    }
 
     std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
@@ -219,10 +204,6 @@ class IndexDataInterface : public DataInterface {
     d3->data_objects[this->id] = index_data_3;
     return true;
   }
-
-
-
 };
-
 
 #endif
