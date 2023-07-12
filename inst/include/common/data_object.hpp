@@ -57,7 +57,7 @@ struct DataObject : public fims::FIMSObject<Type> {
    */
   DataObject(size_t imax) : imax(imax), dimensions(1) {
     data.resize(imax);
-  
+
     this->id = DataObject<Type>::id_g++;
   }
 

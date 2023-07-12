@@ -53,15 +53,15 @@ class PopulationInterface : public PopulationInterfaceBase {
   uint32_t nfleets;          /**< number of fleets */
   uint32_t nseasons;         /**< number of seasons */
   uint32_t nyears;           /**< number of years */
-  uint32_t maturity_id;  /**< id of the maturity function*/
-  uint32_t growth_id;  /**< id of the growth function*/
-  uint32_t recruitment_id; /**< id of the recruitment function*/
+  uint32_t maturity_id;      /**< id of the maturity function*/
+  uint32_t growth_id;        /**< id of the growth function*/
+  uint32_t recruitment_id;   /**< id of the recruitment function*/
   Rcpp::NumericVector log_M; /**< log of the natural mortality of the stock*/
   Rcpp::NumericVector log_init_naa; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
-  double prop_female;               /**< the proportion of female fish*/
-  bool estimate_M;      /**<whether parameter should be estimated*/
-  bool estimate_initNAA;  /**<whether parameter should be estimated*/
+  double prop_female;       /**< the proportion of female fish*/
+  bool estimate_M;          /**<whether parameter should be estimated*/
+  bool estimate_initNAA;    /**<whether parameter should be estimated*/
 
   PopulationInterface() : PopulationInterfaceBase() {}
 
@@ -74,21 +74,15 @@ class PopulationInterface : public PopulationInterfaceBase {
    *
    * @param maturity_id Unique id for the Maturity object
    */
-  void SetMaturity(uint32_t maturity_id) {
-    this->maturity_id = maturity_id;
-  }
+  void SetMaturity(uint32_t maturity_id) { this->maturity_id = maturity_id; }
 
-  
   /**
    * @brief Set the unique id for the growth object
    *
    * @param growth_id Unique id for the growth object
    */
-  void SetGrowth(uint32_t growth_id) {
-    this->growth_id = growth_id;
-  }
+  void SetGrowth(uint32_t growth_id) { this->growth_id = growth_id; }
 
-  
   /**
    * @brief Set the unique id for the Maturity object
    *
@@ -120,10 +114,10 @@ class PopulationInterface : public PopulationInterfaceBase {
     b0->nfleets = this->nfleets;
     b0->nseasons = this->nseasons;
     b0->nages = this->nages;
-    if(this->nages == this->ages.size()){
+    if (this->nages == this->ages.size()) {
       b0->ages.resize(this->nages);
-    } else{
-        warning("The ages vector is not of size nages.");
+    } else {
+      warning("The ages vector is not of size nages.");
     }
 
     b0->growth_id = this->growth_id;
@@ -133,21 +127,20 @@ class PopulationInterface : public PopulationInterfaceBase {
     b0->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {
       b0->log_M[i] = this->log_M[i];
-      if(estimate_M){
+      if (estimate_M) {
         d0->RegisterParameter(b0->log_M[i]);
       }
     }
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b0->log_init_naa[i] = this->log_init_naa[i];
-      if(estimate_initNAA){
+      if (estimate_initNAA) {
         d0->RegisterParameter(b0->log_init_naa[i]);
       }
-      
     }
-for (size_t i = 0; i < ages.size(); i++) {
-    b0->ages[i] = this->ages[i];
-}
+    for (size_t i = 0; i < ages.size(); i++) {
+      b0->ages[i] = this->ages[i];
+    }
 
     // add to Information
     d0->populations[b0->id] = b0;
@@ -166,7 +159,7 @@ for (size_t i = 0; i < ages.size(); i++) {
     b1->nseasons = this->nseasons;
     b1->nages = this->nages;
     b1->ages.resize(this->nages);
-    
+
     b1->growth_id = this->growth_id;
     b1->recruitment_id = this->recruitment_id;
     b1->maturity_id = this->maturity_id;
@@ -175,18 +168,18 @@ for (size_t i = 0; i < ages.size(); i++) {
     b1->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {
       b1->log_M[i] = this->log_M[i];
-      if(estimate_M){
+      if (estimate_M) {
         d1->RegisterParameter(b1->log_M[i]);
       }
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b1->log_init_naa[i] = this->log_init_naa[i];
-      if(estimate_initNAA){
+      if (estimate_initNAA) {
         d1->RegisterParameter(b1->log_init_naa[i]);
       }
     }
     for (size_t i = 0; i < ages.size(); i++) {
-b1->ages[i] = this->ages[i];
+      b1->ages[i] = this->ages[i];
     }
 
     // add to Information
@@ -207,7 +200,7 @@ b1->ages[i] = this->ages[i];
     b2->nages = this->nages;
     b2->log_M.resize(this->log_M.size());
     b2->ages.resize(nages);
-    
+
     b2->growth_id = this->growth_id;
     b2->recruitment_id = this->recruitment_id;
     b2->maturity_id = this->maturity_id;
@@ -215,21 +208,20 @@ b1->ages[i] = this->ages[i];
     b2->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {
       b2->log_M[i] = this->log_M[i];
-      if(estimate_M){
+      if (estimate_M) {
         d2->RegisterParameter(b2->log_M[i]);
       }
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b2->log_init_naa[i] = this->log_init_naa[i];
-if(estimate_initNAA){
-  d2->RegisterParameter(b2->log_init_naa[i]);
-}
+      if (estimate_initNAA) {
+        d2->RegisterParameter(b2->log_init_naa[i]);
+      }
     }
 
     for (size_t i = 0; i < ages.size(); i++) {
-    b2->ages[i] = this->ages[i];
+      b2->ages[i] = this->ages[i];
     }
-
 
     // add to Information
     d2->populations[b2->id] = b2;
@@ -256,14 +248,14 @@ if(estimate_initNAA){
     b3->maturity_id = this->maturity_id;
 
     for (size_t i = 0; i < log_M.size(); i++) {
-       b3->log_M[i] = this->log_M[i];
-      if(estimate_M){
+      b3->log_M[i] = this->log_M[i];
+      if (estimate_M) {
         d3->RegisterParameter(b3->log_M[i]);
       }
     }
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       b3->log_init_naa[i] = this->log_init_naa[i];
-      if(estimate_initNAA){
+      if (estimate_initNAA) {
         d3->RegisterParameter(b3->log_init_naa[i]);
       }
     }

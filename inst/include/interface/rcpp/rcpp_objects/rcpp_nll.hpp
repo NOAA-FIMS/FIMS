@@ -43,5 +43,4 @@ class NLLInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t NLLInterfaceBase::id_g = 1;
 std::map<uint32_t, NLLInterfaceBase*> NLLInterfaceBase::live_objects;
 
-
 #endif

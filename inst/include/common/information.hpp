@@ -31,9 +31,9 @@ namespace fims {
 template <typename T>
 class Information {
  public:
- size_t nyears;       /**< number of years >*/
- size_t nseasons = 1; /**< number of seasons >*/
- size_t nages;        /**< number of ages>*/
+  size_t nyears;       /**< number of years >*/
+  size_t nseasons = 1; /**< number of seasons >*/
+  size_t nages;        /**< number of ages>*/
 
   static std::shared_ptr<Information<T> >
       fims_information;       /**< singleton instance >*/
@@ -42,7 +42,6 @@ class Information {
       random_effects_parameters; /**< list of all random effects parameters >*/
   std::vector<T*>
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
-
 
   // data objects
   std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >
@@ -136,9 +135,7 @@ class Information {
    *
    * @param p
    */
-  void RegisterParameter(T& p) { this->fixed_effects_parameters.push_back(&p);
-
-  }
+  void RegisterParameter(T& p) { this->fixed_effects_parameters.push_back(&p); }
 
   /**
    * Register a random effect as estimable.
@@ -187,17 +184,18 @@ class Information {
         valid_model = false;
         // log error
       }
-      //end set index data
-      FIMS_LOG << "age comp data id " << f->observed_agecomp_data_id << std::endl;
+      // end set index data
+      FIMS_LOG << "age comp data id " << f->observed_agecomp_data_id
+               << std::endl;
       // set age composition data
       if (f->observed_agecomp_data_id != -999) {
         uint32_t agecomp_id =
             static_cast<uint32_t>(f->observed_agecomp_data_id);
         data_iterator it = this->data_objects.find(agecomp_id);
 
-        
-      FIMS_LOG << "age comp id  in loop " << agecomp_id << std::endl;
-      FIMS_LOG << " number of data objects" << this->data_objects.size() << std::endl;
+        FIMS_LOG << "age comp id  in loop " << agecomp_id << std::endl;
+        FIMS_LOG << " number of data objects" << this->data_objects.size()
+                 << std::endl;
 
         if (it != this->data_objects.end()) {
           f->observed_agecomp_data = (*it).second;
@@ -212,95 +210,91 @@ class Information {
         valid_model = false;
         // log error
       }
-      //end set composition data
+      // end set composition data
 
       // set selectivity model
       if (f->selectivity_id != -999) {
         uint32_t sel_id = static_cast<uint32_t>(
             f->selectivity_id);  // cast as unsigned integer
-           selectivity_models_iterator it = this->selectivity_models.find(
-             sel_id);  // if find, set it, otherwise invalid
+        selectivity_models_iterator it = this->selectivity_models.find(
+            sel_id);  // if find, set it, otherwise invalid
 
-            if (it != this->selectivity_models.end()) {
-              f->selectivity =
-                  (*it).second;  // elements in container held in pair (first is
-                                 // id, second is object - shared pointer to
-                                 // distribution)
+        if (it != this->selectivity_models.end()) {
+          f->selectivity = (*it).second;  // elements in container held in pair
+                                          // (first is id, second is object -
+                                          // shared pointer to distribution)
 
+        } else {
+          valid_model = false;
+          // log error
+        }
 
-            } else {
-              valid_model = false;
-              // log error
-            }
+      } else {
+        valid_model = false;
+        // log error
+      }
+      // end set selectivity
 
+      // set index likelihood
+      if (f->index_likelihood_id != -999) {
+        uint32_t ind_like_id = static_cast<uint32_t>(
+            f->index_likelihood_id);  // cast as unsigned integer
+        distribution_models_iterator it = this->distribution_models.find(
+            ind_like_id);  // if find, set it, otherwise invalid
 
-          } else {
-            valid_model = false;
-            // log error
-          }
-          //end set selectivity
+        if (it != this->distribution_models.end()) {
+          f->index_likelihood =
+              (*it).second;  // elements in container held in pair (first is
+                             // id, second is object - shared pointer to
+                             // distribution)
+        } else {
+          valid_model = false;
+          // log error
+        }
 
-          // set index likelihood
-          if (f->index_likelihood_id != -999) {
-            uint32_t ind_like_id = static_cast<uint32_t>(
-                f->index_likelihood_id);  // cast as unsigned integer
-            distribution_models_iterator it = this->distribution_models.find(
-                ind_like_id);  // if find, set it, otherwise invalid
+      } else {
+        valid_model = false;
+        // log error
+      }
+      // end set index likelihood
 
-            if (it != this->distribution_models.end()) {
-              f->index_likelihood =
-                  (*it).second;  // elements in container held in pair (first is
-                                 // id, second is object - shared pointer to
-                                 // distribution)
-            } else {
-              valid_model = false;
-              // log error
-            }
+      // set agecomp likelihood
+      if (f->agecomp_likelihood_id != -999) {
+        uint32_t ac_like_id = static_cast<uint32_t>(
+            f->agecomp_likelihood_id);  // cast as unsigned integer
+        distribution_models_iterator it = this->distribution_models.find(
+            ac_like_id);  // if find, set it, otherwise invalid
 
-          } else {
-            valid_model = false;
-            // log error
-          }
-          //end set index likelihood
+        if (it != this->distribution_models.end()) {
+          f->agecomp_likelihood =
+              (*it).second;  // elements in container held in pair (first is
+                             // id, second is object - shared pointer to
+                             // distribution)
+        } else {
+          valid_model = false;
+          // log error
+        }
 
+      } else {
+        valid_model = false;
+        // log error
+      }
+      //}
+      // end set agecomp likelihood
 
-          // set agecomp likelihood
-          if (f->agecomp_likelihood_id != -999) {
-            uint32_t ac_like_id = static_cast<uint32_t>(
-                f->agecomp_likelihood_id);  // cast as unsigned integer
-            distribution_models_iterator it = this->distribution_models.find(
-                ac_like_id);  // if find, set it, otherwise invalid
+      FIMS_LOG << "fleet size " << this->fleets.size() << std::endl;
 
-            if (it != this->distribution_models.end()) {
-              f->agecomp_likelihood =
-                  (*it).second;  // elements in container held in pair (first is
-                                 // id, second is object - shared pointer to
-                                 // distribution)
-            } else {
-              valid_model = false;
-              // log error
-            }
-
-          } else {
-            valid_model = false;
-            // log error
-          }
-        //}
-        // end set agecomp likelihood
-
-          FIMS_LOG << "fleet size " << this->fleets.size() << std::endl;
-
-    } //close fleet iterator loop
+    }  // close fleet iterator loop
 
     std::cout << "Information: Initializing population objects.\n";
     for (population_iterator it = this->populations.begin();
          it != this->populations.end(); ++it) {
       std::shared_ptr<fims::Population<T> > p = (*it).second;
-    FIMS_LOG << "population number " << std::endl;
+      FIMS_LOG << "population number " << std::endl;
       // error check and set population elements
       // check me - add another fleet iterator to push information from
       for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
-      ++it) {
+           ++it) {
         // Initialize fleet object
         std::shared_ptr<fims::Fleet<T> > f = (*it).second;
         // population to the individual fleets This is to pass catch at age
@@ -313,14 +307,13 @@ class Information {
       FIMS_LOG << "recruitment id " << p->recruitment_id << std::endl;
       // set recruitment
       if (p->recruitment_id != -999) {
-        uint32_t recruitment_uint =
-          static_cast<uint32_t>(p->recruitment_id);
+        uint32_t recruitment_uint = static_cast<uint32_t>(p->recruitment_id);
         recruitment_models_iterator it =
-          this->recruitment_models.find(recruitment_uint);
+            this->recruitment_models.find(recruitment_uint);
 
         if (it != this->recruitment_models.end()) {
           p->recruitment =
-            (*it).second;  // recruitment defined in population.hpp
+              (*it).second;  // recruitment defined in population.hpp
         } else {
           valid_model = false;
           // log error
@@ -334,13 +327,13 @@ class Information {
       if (p->growth_id != -999) {
         uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
         growth_models_iterator it = this->growth_models.find(
-          growth_uint);  // growth_models is specified in information.hpp
+            growth_uint);  // growth_models is specified in information.hpp
         // and used in rcpp
         // at the head of information.hpp; are the
         // dimensions of ages defined in rcpp or where?
         if (it != this->growth_models.end()) {
           p->growth =
-            (*it).second;  // growth defined in population.hpp (the object
+              (*it).second;  // growth defined in population.hpp (the object
           // is called p, growth is within p)
         } else {
           valid_model = false;
@@ -351,18 +344,18 @@ class Information {
         valid_model = false;
         // log error
       }
-      FIMS_LOG << "maturity models size " <<  this->maturity_models.size() << std::endl;
+      FIMS_LOG << "maturity models size " << this->maturity_models.size()
+               << std::endl;
       FIMS_LOG << " maturity id " << p->maturity_id << std::endl;
       // set maturity
       if (p->maturity_id != -999) {
         uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
         maturity_models_iterator it = this->maturity_models.find(
-          maturity_uint);  // >maturity_models is specified in
+            maturity_uint);  // >maturity_models is specified in
         // information.hpp and used in rcpp
 
         if (it != this->maturity_models.end()) {
-          p->maturity =
-            (*it).second;  // >maturity defined in population.hpp
+          p->maturity = (*it).second;  // >maturity defined in population.hpp
           FIMS_LOG << " set maturity " << std::endl;
         } else {
           valid_model = false;
@@ -373,8 +366,6 @@ class Information {
         valid_model = false;
         // log error
       }
-
-
     }
 
     return valid_model;
