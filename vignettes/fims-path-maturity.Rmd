@@ -69,9 +69,9 @@ maturity$slope$estimated <- FALSE
 After that, we need to create and set up a population and link the maturity module to the population:
 ```{r,  class.source = "rchunk", eval = FALSE}
 population <- new(Fims$Population)
-#set up population specific parameters (other modules)
-#...
-#set maturity for the population - will throw error until PR #363 is merged into main
+# set up population specific parameters (other modules)
+# ...
+# set maturity for the population - will throw error until PR #363 is merged into main
 population$SetMaturity(maturity$get_id())
 ```
 
@@ -79,7 +79,7 @@ Because FIMS sets up objects stored in memory, simply running `rm(Fims)`, won't 
 ```{r,  class.source = "rchunk", eval = FALSE}
 # Clear C++ memory
 Fims$clear()
-#Clear R memory
+# Clear R memory
 rm(Fims)
 rm(maturity)
 rm(population)
@@ -514,14 +514,21 @@ Let's set up 3 populations where the first two have a mirrored logistic maturity
 # For the population module, there are additional parameters
 # we are going to ignore here
 population_modules <- list(
-  "Pop 1" = list(id = 1,
-                 maturity = "MaturityBase"),
-  "Pop 2" = list(id = 2,
-                 maturity = "MaturityBase"),
-  "Pop 3" = list(id = 3,
-                 maturity = "MaturityBase")) 
+  "Pop 1" = list(
+    id = 1,
+    maturity = "MaturityBase"
+  ),
+  "Pop 2" = list(
+    id = 2,
+    maturity = "MaturityBase"
+  ),
+  "Pop 3" = list(
+    id = 3,
+    maturity = "MaturityBase"
+  )
+)
 maturity_modules <- list(
-  "Logistic Maturity" = list(id = 1, median = 10, slope = 0.2), 
+  "Logistic Maturity" = list(id = 1, median = 10, slope = 0.2),
   "Some Other Maturity" = list(id = 2, median = 8, slope = 0.3)
 )
 ```
@@ -584,7 +591,7 @@ In FIMS, these definitions happen by passing information from the rcpp interface
 ```{r,  class.source = "rcppchunk", eval = FALSE}
 ## //file: rcpp_maturity.hpp
 ## d0 is the pointer to information
-## lm0 is the pointer to a specific maturity module 
+## lm0 is the pointer to a specific maturity module
 ## (e.g., lm0 = maturity_modules[[1]])
 # d0->maturity_models[lm0->id] = lm0;
 ```
@@ -592,24 +599,24 @@ In FIMS, these definitions happen by passing information from the rcpp interface
 We can then loop through each population module defined in information and set the maturity we're getting from the user specified in the Rcpp interface back out to the Population class used to run all the calculations in the model. After each line of code in the following chunk, corresponding C++ code from FIMS is directly below and commented out.
 
 ```{r}
-for(it in 1:length(population_modules)){
+for (it in 1:length(population_modules)) {
   # for (population_iterator it = this->populations.begin();
   #            it != this->populations.end(); ++it) {
-  
+
   p <- information$populations[[it]][2]
-  #std::shared_ptr<fims::Population<T> > p = (*it).second;
-  
+  # std::shared_ptr<fims::Population<T> > p = (*it).second;
+
   maturity_uint <- p$pointer$maturity_id
-  #uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
-  
+  # uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
+
   newit <- which(sapply(information$maturity, function(x) x$id) == maturity_uint)
-  #maturity_models_iterator it = this->maturity_models.find(maturity_uint)
-  
-  p$pointer$maturity #MaturityBase
+  # maturity_models_iterator it = this->maturity_models.find(maturity_uint)
+
+  p$pointer$maturity # MaturityBase
   p$pointer$maturity <- information$maturity[[newit]][[2]]
-  p$pointer$maturity #LogisticMaturity1
-  #p->maturity = (*it).second;
-  
+  p$pointer$maturity # LogisticMaturity1
+  # p->maturity = (*it).second;
+
   population_modules[[it]][2]$maturity <- p$pointer$maturity
 }
 
