@@ -53,8 +53,7 @@ struct Population : public FIMSObject<Type> {
   ParameterVector log_M; /*!< estimated parameter: log Natural Mortality*/
 
   // Transformed values
-  std::vector<Type> init_naa; /*!< transformed parameter: numbers at age*/
-  std::vector<Type> M;        /*!< transformed parameter: Natural Mortality*/
+ std::vector<Type> M;        /*!< transformed parameter: Natural Mortality*/
 
   std::vector<double> ages;    /*!< vector of the ages for referencing*/
   std::vector<double> years;   /*!< vector of years for referencing*/
@@ -141,7 +140,6 @@ struct Population : public FIMSObject<Type> {
     unfished_spawning_biomass.resize((nyears + 1));
     spawning_biomass.resize((nyears + 1));
     expected_recruitment.resize((nyears + 1));
-    init_naa.resize(nages);
     M.resize(nyears * nages);
     ages.resize(nages);
     log_init_naa.resize(nages);
@@ -175,7 +173,6 @@ struct Population : public FIMSObject<Type> {
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
-      this->init_naa[age] = fims::exp(this->log_init_naa[age]);
       for (size_t year = 0; year < this->nyears; year++) {
         size_t index_ay = age * this->nyears + year;
         this->M[index_ay] = fims::exp(this->log_M[index_ay]);
@@ -198,7 +195,7 @@ struct Population : public FIMSObject<Type> {
    */
   inline void CalculateInitialNumbersAA(
       size_t index_ya, size_t a) {  // inline all function unless complicated
-    this->numbers_at_age[index_ya] = this->init_naa[a];
+    this->numbers_at_age[index_ya] = fims::exp(this->log_init_naa[a]);
   }
 
   /**

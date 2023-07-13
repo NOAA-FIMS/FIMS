@@ -37,7 +37,6 @@ namespace
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
         EXPECT_EQ(population.log_init_naa.size(), nages);
         EXPECT_EQ(population.log_M.size(), nyears * nages);
-        EXPECT_EQ(population.init_naa.size(), nages);
         EXPECT_EQ(population.M.size(), nyears * nages);
     }
 
@@ -81,9 +80,7 @@ namespace
         for (int i = 0; i < nages; i++)
         {
             naa[i] = fims::exp(population.log_init_naa[i]);
-            EXPECT_EQ(population.init_naa[i], naa[i]);
         }
-        EXPECT_EQ(population.init_naa.size(), nages);
 
         // Test population.M
         std::vector<double> M(nyears * nages, 0);
