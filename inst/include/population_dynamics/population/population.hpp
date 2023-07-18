@@ -53,7 +53,7 @@ struct Population : public FIMSObject<Type> {
   ParameterVector log_M; /*!< estimated parameter: log Natural Mortality*/
 
   // Transformed values
- std::vector<Type> M;        /*!< transformed parameter: Natural Mortality*/
+  std::vector<Type> M; /*!< transformed parameter: Natural Mortality*/
 
   std::vector<double> ages;    /*!< vector of the ages for referencing*/
   std::vector<double> years;   /*!< vector of years for referencing*/
