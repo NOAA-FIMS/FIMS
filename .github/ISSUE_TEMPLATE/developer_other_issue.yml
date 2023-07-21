@@ -1,20 +1,21 @@
-name: Refactor
-description: Change the current structure of the code
-title: "[Refactor]: "
-labels: ["kind: refactor", "status: triage_needed"]
+name: Developer (other issue)
+description: For FIMS implementation team members to document other types of issues
+title: "[Developer Issue]: "
+labels: ["status: triage_needed"]
 assignees:
   - ChristineStawitz-NOAA
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this refactor request! By 
+        Thanks for taking the time to fill out this issue! By 
         submitting this issue, you agree to follow our 
         [Code of Conduct](https://noaa-fims.github.io/collaborative_workflow/code-of-conduct.html#code-of-conduct).
   - type: textarea
     id: describe
     attributes:
-      label: Refactor request
-      description: Describe what needs to be refactored and why
+      label: Issue details
+      description: Describe the issue
     validations:
       required: true
+      

@@ -8,7 +8,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this feature request!
+        Thanks for taking the time to fill out this feature request! By 
+        submitting this issue, you agree to follow our 
+        [Code of Conduct](https://noaa-fims.github.io/collaborative_workflow/code-of-conduct.html#code-of-conduct).
   - type: textarea
     id: problem
     attributes:
@@ -53,11 +55,4 @@ body:
       description: Add any other context or screenshots about the feature request here.
     validations:
       required: false
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://noaa-fims.github.io/collaborative_workflow/code-of-conduct.html#code-of-conduct)
-      options:
-        - label: I agree to follow this project's Code of Conduct
-          required: true
+      
