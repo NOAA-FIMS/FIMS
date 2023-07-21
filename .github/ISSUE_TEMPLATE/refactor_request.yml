@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-                Thanks for taking the time to fill out this refactor request! By 
+        Thanks for taking the time to fill out this refactor request! By 
         submitting this issue, you agree to follow our 
         [Code of Conduct](https://noaa-fims.github.io/collaborative_workflow/code-of-conduct.html#code-of-conduct).
   - type: textarea
@@ -18,4 +18,3 @@ body:
       description: Describe what needs to be refactored and why
     validations:
       required: true
-      
