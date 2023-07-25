@@ -107,6 +107,14 @@ class Model {  // may need singleton
 
     jnll = rec_nll + age_comp_nll + index_nll;
 
+
+    #ifdef TMB_MODEL
+    int i = 1;
+    REPORT_F(i, of);
+    REPORT_F(rec_nll, of);
+    #endif
+    
+
     return jnll;
   }
 };
