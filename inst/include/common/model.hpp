@@ -26,48 +26,48 @@ namespace fims {
 /**
  * @brief Model class. FIMS objective function.
  */
-template <typename T>
+template <typename Type>
 class Model {  // may need singleton
  public:
-  static std::shared_ptr<Model<T> >
+  static std::shared_ptr<Model<Type> >
       fims_model; /*!< Create a shared fims_model as a pointer to Model*/
-  std::shared_ptr<Information<T> >
+  std::shared_ptr<Information<Type> >
       fims_information; /*!< Create a shared fims_information as a pointer to
                            Information*/
 
 #ifdef TMB_MODEL
-  ::objective_function<T> *of;
+  ::objective_function<Type> *of;
 #endif
 
   // constructor
   virtual ~Model() {}
 
   /**
-   * Returns a single Information object for type T.
+   * Returns a single Information object for type Type.
    *
-   * @return singleton for type T
+   * @return singleton for type Type
    */
-  static std::shared_ptr<Model<T> > GetInstance() {
-    if (Model<T>::fims_model == nullptr) {
-      Model<T>::fims_model = std::make_shared<fims::Model<T> >();
-      Model<T>::fims_model->fims_information =
-          fims::Information<T>::GetInstance();
+  static std::shared_ptr<Model<Type> > GetInstance() {
+    if (Model<Type>::fims_model == nullptr) {
+      Model<Type>::fims_model = std::make_shared<fims::Model<Type> >();
+      Model<Type>::fims_model->fims_information =
+          fims::Information<Type>::GetInstance();
     }
-    return Model<T>::fims_model;
+    return Model<Type>::fims_model;
   }
 
   /**
    * @brief Evaluate. Calculates the joint negative log-likelihood function.
    */
-  const T Evaluate() {
+  const Type Evaluate() {
     // jnll = negative-log-likelihood (the objective function)
-    T jnll = 0.0;
-    T rec_nll = 0.0;       // recrutiment nll
-    T age_comp_nll = 0.0;  // age composition nll
-    T index_nll = 0.0;     // survey and fishery cacth nll
+    Type jnll = 0.0;
+    Type rec_nll = 0.0;       // recrutiment nll
+    Type age_comp_nll = 0.0;  // age composition nll
+    Type index_nll = 0.0;     // survey and fishery cacth nll
     // Loop over populations, evaluate, and sum up the recruitment likelihood
     // component
-    typename fims::Information<T>::population_iterator it;
+    typename fims::Information<Type>::population_iterator it;
     for (it = this->fims_information->populations.begin();
          it != this->fims_information->populations.end(); ++it) {
       //(*it).second points to the Population module
@@ -86,7 +86,7 @@ class Model {  // may need singleton
       FIMS_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
-    typename fims::Information<T>::fleet_iterator jt;
+    typename fims::Information<Type>::fleet_iterator jt;
     for (jt = this->fims_information->fleets.begin();
          jt != this->fims_information->fleets.end(); ++jt) {
 #ifdef TMB_MODEL
@@ -120,8 +120,8 @@ class Model {  // may need singleton
 };
 
 // Create singleton instance of Model class
-template <typename T>
-std::shared_ptr<Model<T> > Model<T>::fims_model =
+template <typename Type>
+std::shared_ptr<Model<Type> > Model<Type>::fims_model =
     nullptr;  // singleton instance
 }  // namespace fims
 
