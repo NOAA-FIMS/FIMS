@@ -20,7 +20,7 @@ namespace fims {
 /** @brief BevertonHolt class that returns the Beverton Holt SR
  * from fims_math.
  *
- * @param steep Recruitment relative to unfished recruitment at
+ * @param logit_steep Recruitment relative to unfished recruitment at
  * 20% of unfished spawning biomass. Should be a value between 0.2 and 1.0.
  */
 template <typename Type>
@@ -29,8 +29,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   // function. These members are needed by Beverton Holt but will not be common
   // to all recruitment functions like spawners is below.
   Type logit_steep; /*!< Transformed value of recruitment relative to unfished
-                 recruitment at 20% of unfished spawning biomass. Should be a
-                 value between 0.2 and 1.0.*/
+                 recruitment at 20% of unfished spawning biomass.*/
 
   SRBevertonHolt() : RecruitmentBase<Type>() {}
 
