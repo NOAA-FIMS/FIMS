@@ -1,5 +1,7 @@
 #' function for setting up your local environment to run the gtest
 #' integration test locally. Intended for developers.
+#'
+#' @keywords gtest_helper
 #' @examples \dontrun{
 #' setup_gtest()
 #' }
@@ -44,6 +46,7 @@ setup_gtest <- function() {
 #' Developer function for setup and running google test suite from R
 #' @param ... additional arguments to \code{ctest --test-dir build}
 #' such as "--rerun-failed --output-on-failure"
+#' @keywords gtest_helper
 #' @export
 setup_and_run_gtest <- function(...) {
   setup_gtest()
@@ -58,6 +61,7 @@ setup_and_run_gtest <- function(...) {
 #' Developer function for running google test suite from R
 #' @param ... additional arguments to \code{ctest --test-dir build}
 #' such as "--rerun-failed --output-on-failure"
+#' @keywords gtest_helper
 #' @export
 run_gtest <- function(...) {
   system("cmake -S . -B build -G Ninja")

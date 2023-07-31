@@ -13,3 +13,4 @@ such as "--rerun-failed --output-on-failure"}
 \description{
 Developer function for running google test suite from R
 }
+\keyword{gtest_helper}
