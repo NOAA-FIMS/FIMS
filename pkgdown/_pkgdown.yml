@@ -1,0 +1,51 @@
+url: https://NOAA-FIMS.github.io/FIMS
+
+home:
+  title: Fisheries Integrated Modeling System (FIMS)
+  links:
+  - text: Documentation of C++ Code
+    href: https://noaa-fims.github.io/FIMS-docs/
+  - text: FIMS Developer Handbook
+    href: https://noaa-fims.github.io/collaborative_workflow/
+
+authors:
+  FIMS implementation team:
+    href: https://github.com/orgs/NOAA-FIMS/teams/fims
+    html: <img src='https://github.com/NOAA-FIMS/noaa-fims.github.io/blob/main/assets/img/logo.png' alt='FIMS' width='72' />
+
+template:
+  bootstrap: 5
+
+development:
+  mode: auto
+
+articles:
+- title: Fisheries Integrated Modeling System (FIMS)
+  navbar: ~
+  contents:
+  - fims-path-maturity
+- title: Developer
+  contents:
+  - fims-demo
+
+reference:
+- title: Data
+  desc: >
+      FIMS comes with a selection of built-in datasets that are used in
+      examples to illustrate various visualisation challenges.
+  contents:
+  - data_mile1
+
+- title: Package development
+  desc: Primary functions used when developing FIMS package.
+  contents:
+  - create_fims_rcpp_interface
+  - use_module
+  - mkObj
+  - has_keyword("gtest_helper")
+  - FIMSFrame
+
+news:
+  releases:
+  - text: "Version 0.1.0"
+    href: https://github.com/NOAA-FIMS/FIMS/releases/tag/v0.1.0
