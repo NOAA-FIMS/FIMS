@@ -125,20 +125,20 @@ class PopulationInterface : public PopulationInterfaceBase {
     b0->maturity_id = this->maturity_id;
     b0->log_M.resize(this->log_M.size());
     b0->log_init_naa.resize(this->log_init_naa.size());
-    for (size_t i = 0; i < log_M.size(); i++) {
+    for (int i = 0; i < log_M.size(); i++) {
       b0->log_M[i] = this->log_M[i];
       if (estimate_M) {
         d0->RegisterParameter(b0->log_M[i]);
       }
     }
 
-    for (size_t i = 0; i < log_init_naa.size(); i++) {
+    for (int i = 0; i < log_init_naa.size(); i++) {
       b0->log_init_naa[i] = this->log_init_naa[i];
       if (estimate_initNAA) {
         d0->RegisterParameter(b0->log_init_naa[i]);
       }
     }
-    for (size_t i = 0; i < ages.size(); i++) {
+    for (int i = 0; i < ages.size(); i++) {
       b0->ages[i] = this->ages[i];
     }
 
@@ -166,19 +166,19 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     b1->log_M.resize(this->log_M.size());
     b1->log_init_naa.resize(this->log_init_naa.size());
-    for (size_t i = 0; i < log_M.size(); i++) {
+    for (int i = 0; i < log_M.size(); i++) {
       b1->log_M[i] = this->log_M[i];
       if (estimate_M) {
         d1->RegisterParameter(b1->log_M[i]);
       }
     }
-    for (size_t i = 0; i < log_init_naa.size(); i++) {
+    for (int i = 0; i < log_init_naa.size(); i++) {
       b1->log_init_naa[i] = this->log_init_naa[i];
       if (estimate_initNAA) {
         d1->RegisterParameter(b1->log_init_naa[i]);
       }
     }
-    for (size_t i = 0; i < ages.size(); i++) {
+    for (int i = 0; i < ages.size(); i++) {
       b1->ages[i] = this->ages[i];
     }
 
@@ -206,20 +206,20 @@ class PopulationInterface : public PopulationInterfaceBase {
     b2->maturity_id = this->maturity_id;
 
     b2->log_init_naa.resize(this->log_init_naa.size());
-    for (size_t i = 0; i < log_M.size(); i++) {
+    for (int i = 0; i < log_M.size(); i++) {
       b2->log_M[i] = this->log_M[i];
       if (estimate_M) {
         d2->RegisterParameter(b2->log_M[i]);
       }
     }
-    for (size_t i = 0; i < log_init_naa.size(); i++) {
+    for (int i = 0; i < log_init_naa.size(); i++) {
       b2->log_init_naa[i] = this->log_init_naa[i];
       if (estimate_initNAA) {
         d2->RegisterParameter(b2->log_init_naa[i]);
       }
     }
 
-    for (size_t i = 0; i < ages.size(); i++) {
+    for (int i = 0; i < ages.size(); i++) {
       b2->ages[i] = this->ages[i];
     }
 
@@ -247,20 +247,20 @@ class PopulationInterface : public PopulationInterfaceBase {
     b3->recruitment_id = this->recruitment_id;
     b3->maturity_id = this->maturity_id;
 
-    for (size_t i = 0; i < log_M.size(); i++) {
+    for (int i = 0; i < log_M.size(); i++) {
       b3->log_M[i] = this->log_M[i];
       if (estimate_M) {
         d3->RegisterParameter(b3->log_M[i]);
       }
     }
-    for (size_t i = 0; i < log_init_naa.size(); i++) {
+    for (int i = 0; i < log_init_naa.size(); i++) {
       b3->log_init_naa[i] = this->log_init_naa[i];
       if (estimate_initNAA) {
         d3->RegisterParameter(b3->log_init_naa[i]);
       }
     }
 
-    for (size_t i = 0; i < ages.size(); i++) {
+    for (int i = 0; i < ages.size(); i++) {
       b3->ages[i] = this->ages[i];
     }
 
