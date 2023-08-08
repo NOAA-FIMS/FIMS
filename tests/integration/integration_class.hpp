@@ -677,56 +677,8 @@ public:
                     << std::endl;
         }
 
-//        if (print_statements) {
-//            JsonParser p;
-//            p.Show(output);
-//        }
 
-        //        rapidjson::StringBuffer buffer;
-        //        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-        //
-        //        rapidjson::Document output;
-        //
-        //        // define the document as an object rather than an array
-        //        output.SetObject();
-        //
-        //        // create a rapidjson array type with similar syntax to std::vector
-        //        rapidjson::Value array(rapidjson::kArrayType);
-        //
-        //        // must pass an allocator when the object may need to allocate memory
-        //        rapidjson::Document::AllocatorType &allocator = output.GetAllocator();
-        //
-        //        // create a rapidjson object type
-        //        // rapidjson::Value object(rapidjson::kObjectType);
-        //        // object.AddMember("NumbersAtAge", "50", allocator);
-        //
-        //        pop.Evaluate();
-        //        if (print_statements) {
-        //            std::cout << "Numbers at age:\n";
-        //        }
-        //        for (int i = 0; i < pop.nyears; i++) {
-        //            for (int j = 0; j < pop.nages; j++) {
-        //                if (print_statements) {
-        //                    std::cout << pop.numbers_at_age[i * pop.nages + j] << " ";
-        //                }
-        //                array.PushBack(pop.numbers_at_age[i * pop.nages + j], allocator);
-        //            }
-        //            if (print_statements) {
-        //                std::cout << std::endl;
-        //            }
-        //        }
-        //        if (print_statements) {
-        //            std::cout << "\n\n"
-        //                    << std::endl;
-        //        }
-        //
-        //        output.Accept(writer);
-        //        if (print_statements) {
-        //            std::cout << buffer.GetString() << std::endl;
-        //        }
-        //        return pop.numbers_at_age;
-
-        return std::vector<double>();
+        return pop.numbers_at_age;
     }
 
     bool CheckModelOutput(fims::Population<double> &pop,

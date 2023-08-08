@@ -45,7 +45,7 @@ namespace
                 // methods are in integration_class.hpp
                 good = t.ConfigurePopulationModel(pop, input_, output_);
 
-                pop.numbers_at_age = t.RunModelLoop(pop, input_);
+                 = t.RunModelLoop(pop, input_);
                 good = t.CheckModelOutput(pop, output_);
 
                 // declare unfished numbers at age 1, unfished spawning bimoass,
@@ -254,7 +254,7 @@ namespace
                 // Test numbers at age
                 // find the OM json member called "N.age"
                 it = output.find("N.age");
-
+                std::cout<<__LINE__<<std::endl;
                 if (it != output.end())
                 {
                     JsonArray &e = (*it).second.GetArray();
@@ -267,34 +267,37 @@ namespace
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
                             // is less than 1.0% of the expected value.
-                            EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]) /
+                            std::cout<<expected_numbers_at_age.size()<<"***"<<std::endl;
+                            std::cout<<.size()<<"***"<<std::endl;
+                            EXPECT_LE(std::abs([index_ya] - expected_numbers_at_age[index_ya]) /
                                           expected_numbers_at_age[index_ya] * 100,
                                       1.0)
                                 << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                            
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
                             // is less than 65 fish.
-                            EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]),
+                            EXPECT_LE(std::abs([index_ya] - expected_numbers_at_age[index_ya]),
                                       65)
                                 << "differ at index " << index_ya << "; year " << year << "; age" << age;
                             // Expect FIMS value is greater than 0.0
-                            EXPECT_GT(pop.numbers_at_age[index_ya], 0.0)
+                            EXPECT_GT([index_ya], 0.0)
                                 << "differ at index " << index_ya << "; year " << year << "; age" << age;
                         }
                     }
                 }
-
+                std::cout<<__LINE__<<std::endl;
                 // Test numbers at age in year pop.nyear+1
                 for (int age = 0; age < pop.nages; age++)
                 {
                     int index_ya = pop.nyears * pop.nages + age;
-                    EXPECT_GT(pop.numbers_at_age[index_ya], 0.0)
+                    EXPECT_GT([index_ya], 0.0)
                         << "differ at index " << index_ya << "; year " << pop.nyears + 1 << "; age" << age;
                 }
-
+                std::cout<<__LINE__<<std::endl;
                 // Test fishing mortality at age
                 it = output.find("FAA");
-
+                std::cout<<__LINE__<<std::endl;
                 if (it != output.end())
                 {
                     JsonArray &e = (*it).second.GetArray();
@@ -316,7 +319,7 @@ namespace
                         }
                     }
                 }
-
+                std::cout<<__LINE__<<std::endl;
                 // Test total mortality at age
                 it = input.find("M.age");
                 // integration_test_log <<"test"<<std::endl;
@@ -335,7 +338,7 @@ namespace
                             // FIMS output
                             if (age < (pop.nages - 1)) // Ignore plus group
                             {
-                                integration_test_log << "year " << year << " age " << age << " index_ya " << index_ya << " FIMS: " << pop.numbers_at_age[index_ya2] << "*exp(-" << pop.mortality_Z[index_ya2] << ")=" << pop.numbers_at_age[index_ya2] * exp(-pop.mortality_Z[index_ya2]) << " pop.numbers_at_age[index_ya] " << pop.numbers_at_age[index_ya] << " MCP OM: " << expected_numbers_at_age[index_ya2] << "*exp(-" << expected_mortality_Z[index_ya2] << ")=" << expected_numbers_at_age[index_ya2] * exp(-expected_mortality_Z[index_ya2]) << " expected_numbers_at_age[index_ya] " << expected_numbers_at_age[index_ya] << std::endl;
+                                integration_test_log << "year " << year << " age " << age << " index_ya " << index_ya << " FIMS: " << [index_ya2] << "*exp(-" << pop.mortality_Z[index_ya2] << ")=" << [index_ya2] * exp(-pop.mortality_Z[index_ya2]) << " [index_ya] " << [index_ya] << " MCP OM: " << expected_numbers_at_age[index_ya2] << "*exp(-" << expected_mortality_Z[index_ya2] << ")=" << expected_numbers_at_age[index_ya2] * exp(-expected_mortality_Z[index_ya2]) << " expected_numbers_at_age[index_ya] " << expected_numbers_at_age[index_ya] << std::endl;
                             }
 
                             // R code to print MCP OM output
