@@ -729,8 +729,8 @@ public:
         return std::vector<double>();
     }
 
-    //    bool CheckModelOutput(fims::Population<double> &pop,
-    //            rapidjson::Document &output) {
-    //        return true;
-    //    }
+    bool CheckModelOutput(fims::Population<double> &pop,
+            JsonValue &output) {
+        return true;
+    }
 };

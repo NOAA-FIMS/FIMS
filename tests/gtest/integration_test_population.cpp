@@ -15,35 +15,38 @@ namespace
                 // Declare IntegrationTest object
                 IntegrationTest t(1, 1);
                 std::stringstream ss;
-                typename rapidjson::Document::MemberIterator it;
+                typename JsonObject::iterator it;
 
                 bool good = true;
 
                 // Read in input and output json files
-                rapidjson::Document input;
-                rapidjson::Document output;
+                JsonObject input;
+                JsonObject output;
+                JsonValue input_;
+                JsonValue output_;
 
                 // Read inputs
                 ss.str("");
                 // GoogleTest operates in the folder with executables "build/tests/gtest"
                 // so we have to go up three directories to get into FIMS folder
                 ss << "../../../tests/integration/inputs/FIMS-deterministic/C" <<c_case <<"_om_input" << i_iter + 1 << ".json";
-                t.ReadJson(ss.str(), input);
+                t.ReadJson(ss.str(), input_);
                 ss.str("");
 
                 // Read in outputs
                 ss << "../../../tests/integration/inputs/FIMS-deterministic/C" <<c_case <<"_om_output" << i_iter + 1 << ".json";
-                t.ReadJson(ss.str(), output);
-
+                t.ReadJson(ss.str(), output_);
+                input = input_.GetObject();
+                output = output_.GetObject();
                 // Declare singleton of population class
                 fims::Population<double> pop;
 
                 // ConfigurePopulationModel, RunModelLoop, and CheckModelOutput
                 // methods are in integration_class.hpp
-                good = t.ConfigurePopulationModel(pop, input, output);
+                good = t.ConfigurePopulationModel(pop, input_, output_);
 
-                pop.numbers_at_age = t.RunModelLoop(pop, input);
-                good = t.CheckModelOutput(pop, output);
+                pop.numbers_at_age = t.RunModelLoop(pop, input_);
+                good = t.CheckModelOutput(pop, output_);
 
                 // declare unfished numbers at age 1, unfished spawning bimoass,
                 // and unfished biomass
@@ -68,15 +71,15 @@ namespace
 
                 // Test unfished numbers at age, unfished spawning biomass,
                 // and unfished biomass
-                it = input.FindMember("median_R0");
-                rapidjson::Value &R_0 = (*it).value;
+                it = input.find("median_R0");
+                JsonArray &R_0 = (*it).second.GetArray();
                 // When obtaining the numeric values, GetDouble() will convert internal integer representation 
                 // to a double. Note that, int and unsigned can be safely converted to double, 
                 // but int64_t and uint64_t may lose precision (since mantissa of double is only 52-bits).
                 double log_rzero = fims::log(R_0[0].GetDouble()); 
 
-                it = input.FindMember("Phi.0");
-                rapidjson::Value &Phi0 = (*it).value;
+                it = input.find("Phi.0");
+                JsonArray &Phi0 = (*it).second.GetArray();;
                 double phi_0 = Phi0[0].GetDouble();
 
                 for (int year = 0; year < pop.nyears; year++)
@@ -116,11 +119,11 @@ namespace
 
                 // Test spawning biomass
                 // find the OM json member called "SSB"
-                it = output.FindMember("SSB");
+                it = output.find("SSB");
 
-                if (it != output.MemberEnd())
+                if (it != output.end())
                 {
-                    rapidjson::Value &e = (*it).value;
+                    JsonArray &e = (*it).second.GetArray();;
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         expected_spawning_biomass[year] = e[year].GetDouble();
@@ -146,11 +149,11 @@ namespace
 
                 // Test biomass
                 // find the OM json member called "Biomass"
-                it = output.FindMember("biomass.mt");
+                it = output.find("biomass.mt");
 
-                if (it != output.MemberEnd())
+                if (it != output.end())
                 {
-                    rapidjson::Value &e = (*it).value;
+                    JsonArray &e = (*it).second.GetArray();;
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         expected_biomass[year] = e[year].GetDouble();
@@ -173,13 +176,13 @@ namespace
                     << "year " << pop.nyears + 1;
 
                 // Test expected catch
-                it = output.FindMember("L.mt");
+                it = output.find("L.mt");
 
-                if (it != output.MemberEnd())
+                if (it != output.end())
                 {
-                    typename rapidjson::Document::MemberIterator fleet1;
-                    fleet1 = it->value.FindMember("fleet1");
-                    rapidjson::Value &fleet_catch = (*fleet1).value;
+                    typename JsonObject::iterator fleet1;
+                    fleet1 = it->second.GetObject().find("fleet1");
+                    JsonArray &fleet_catch = (*fleet1).second.GetArray();
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         expected_catch[year] = fleet_catch[year].GetDouble();
@@ -203,18 +206,18 @@ namespace
                 }
 
                 // Test expected index
-                it = output.FindMember("survey_q");
-                typename rapidjson::Document::MemberIterator fleet2_q;
-                fleet2_q = it->value.FindMember("survey1");
-                rapidjson::Value &fleet_q = (*fleet2_q).value;
+                it = output.find("survey_q");
+                typename JsonObject::iterator fleet2_q;
+                fleet2_q = it->second.GetObject().find("survey1");
+                JsonArray&fleet_q = (*fleet2_q).second.GetArray();
 
-                it = output.FindMember("survey_index_biomass");
+                it = output.find("survey_index_biomass");
 
-                if (it != output.MemberEnd())
+                if (it != output.end())
                 {
-                    typename rapidjson::Document::MemberIterator fleet2_index;
-                    fleet2_index = it->value.FindMember("survey1");
-                    rapidjson::Value &fleet_index = (*fleet2_index).value;
+                    typename JsonObject::iterator fleet2_index;
+                    fleet2_index = it->second.GetObject().find("survey1");
+                    JsonArray &fleet_index = (*fleet2_index).second.GetArray();
                     EXPECT_EQ(pop.fleets[0]->q, 1.0);
                     // Do not use EXPECT_EQ to compare floats or doubles
                     // Use EXPECT_NEAR here
@@ -250,17 +253,17 @@ namespace
 
                 // Test numbers at age
                 // find the OM json member called "N.age"
-                it = output.FindMember("N.age");
+                it = output.find("N.age");
 
-                if (it != output.MemberEnd())
+                if (it != output.end())
                 {
-                    rapidjson::Value &e = (*it).value;
+                    JsonArray &e = (*it).second.GetArray();
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         for (int age = 0; age < pop.nages; age++)
                         {
                             int index_ya = year * pop.nages + age;
-                            expected_numbers_at_age[index_ya] = e[year][age].GetDouble();
+                            expected_numbers_at_age[index_ya] = e[year].GetArray()[age].GetDouble();
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
                             // is less than 1.0% of the expected value.
@@ -290,17 +293,17 @@ namespace
                 }
 
                 // Test fishing mortality at age
-                it = output.FindMember("FAA");
+                it = output.find("FAA");
 
-                if (it != output.MemberEnd())
+                if (it != output.end())
                 {
-                    rapidjson::Value &e = (*it).value;
+                    JsonArray &e = (*it).second.GetArray();
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         for (int age = 0; age < pop.nages; age++)
                         {
                             int index_ya = year * pop.nages + age;
-                            expected_mortality_F[index_ya] = e[year][age].GetDouble();
+                            expected_mortality_F[index_ya] = e[year].GetArray()[age].GetDouble();
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
                             // is less than 0.0001.
@@ -315,11 +318,11 @@ namespace
                 }
 
                 // Test total mortality at age
-                it = input.FindMember("M.age");
+                it = input.find("M.age");
                 // integration_test_log <<"test"<<std::endl;
-                if (it != input.MemberEnd())
+                if (it != input.end())
                 {
-                    rapidjson::Value &e = (*it).value;
+                    JsonArray &e = (*it).second.GetArray();
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         for (int age = 0; age < pop.nages; age++)
