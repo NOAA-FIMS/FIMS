@@ -55,7 +55,7 @@ struct DataObject : public fims::FIMSObject<Type> {
   /**
    * Constructs a one-dimensional data object.
    */
-  DataObject(size_t imax) : imax(imax), dimensions(1) {
+  DataObject(size_t imax) : dimensions(1), imax(imax) {
     data.resize(imax);
 
     this->id = DataObject<Type>::id_g++;
@@ -64,7 +64,7 @@ struct DataObject : public fims::FIMSObject<Type> {
   /**
    * Constructs a two-dimensional data object.
    */
-  DataObject(size_t imax, size_t jmax) : imax(imax), jmax(jmax), dimensions(2) {
+  DataObject(size_t imax, size_t jmax) : dimensions(2), imax(imax), jmax(jmax) {
     data.resize(imax * jmax);
     this->id = DataObject<Type>::id_g++;
   }
@@ -73,7 +73,7 @@ struct DataObject : public fims::FIMSObject<Type> {
    *  Constructs a three-dimensional data object.
    */
   DataObject(size_t imax, size_t jmax, size_t kmax)
-      : imax(imax), jmax(jmax), kmax(kmax), dimensions(3) {
+      : dimensions(3), imax(imax), jmax(jmax), kmax(kmax) {
     data.resize(imax * jmax * kmax);
     this->id = DataObject<Type>::id_g++;
   }
@@ -82,7 +82,7 @@ struct DataObject : public fims::FIMSObject<Type> {
    * Constructs a four-dimensional data object.
    */
   DataObject(size_t imax, size_t jmax, size_t kmax, size_t lmax)
-      : imax(imax), jmax(jmax), kmax(kmax), lmax(lmax), dimensions(4) {
+      : dimensions(4), imax(imax), jmax(jmax), kmax(kmax), lmax(lmax) {
     data.resize(imax * jmax * kmax * lmax);
     this->id = DataObject<Type>::id_g++;
   }

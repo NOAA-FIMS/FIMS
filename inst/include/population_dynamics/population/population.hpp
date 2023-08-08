@@ -665,8 +665,8 @@ struct Population : public FIMSObject<Type> {
       }
     }
     FIMS_LOG << "NAA\n";
-    for (int i = 0; i < nyears; i++) {
-      for (int j = 0; j < nages; j++) {
+    for (size_t i = 0; i < nyears; i++) {
+      for (size_t j = 0; j < nages; j++) {
         FIMS_LOG << numbers_at_age[i * nages + j] << "\t";
       }
       FIMS_LOG << "\n";
@@ -675,8 +675,8 @@ struct Population : public FIMSObject<Type> {
     FIMS_LOG << "CAA\n";
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
       FIMS_LOG << "Fleet " << fleet_ + 1 << "\n";
-      for (int i = 0; i < nyears; i++) {
-        for (int j = 0; j < nages; j++) {
+      for (size_t i = 0; i < nyears; i++) {
+        for (size_t j = 0; j < nages; j++) {
           FIMS_LOG << fleets[fleet_]->catch_numbers_at_age[i * nages + j]
                    << "\t";
         }
