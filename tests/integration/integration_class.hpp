@@ -549,6 +549,7 @@ public:
 
             it = obj.find("logR.resid");
             rec->recruit_deviations.resize(nyears + 1);
+            std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
             if (it != obj.end()) {
                 if ((*it).second.GetType() == JsonValueType::Array) {
                     JsonArray rdev = (*it).second.GetArray();
