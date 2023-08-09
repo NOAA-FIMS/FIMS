@@ -37,7 +37,9 @@ Authors@R: c(
     person(c("Edward", "J."), "Dick", role = "aut",
            comment = c(ORCID = "0000-0001-7681-9176")),
     person("Jon", "Brodziak", role = "aut"),
-    person("Kristan", "Blackhart", role = "aut")
+    person("Kristan", "Blackhart", role = "aut"),
+    person("Peter", "Kuriyama", role = "aut",
+      comment = c(ORCID = "0000-0002-6971-4015"))
   )
 Description: The Fisheries Integrated Modeling System is a next-generation
     framework of stock assessment models, assisting fishery managers with
@@ -52,7 +54,7 @@ License: GPL (>= 3) | file LICENSE
 URL: https://github.com/noaa-fims/fims, https://noaa-fims.github.io
 BugReports: https://github.com/noaa-fims/fims/issues
 Depends:
-    R (>= 3.4)
+    R (>= 4.0)
 Imports: 
     dplyr,
     ggplot2,
