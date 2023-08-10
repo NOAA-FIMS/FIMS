@@ -250,8 +250,9 @@ completed<-list()
 mpi.bcast.Robj2slave( all = TRUE)
 #mpi.bcast.Robj2slave(obj = run_fims)
 #mpi.bcast.Robj2slave(obj = init_fims)
+
 start<-Sys.time()
-#execute all slaves
+#execute all slaves and append the completed list
 append(completed,mpi.remote.exec(run_fims, begin, end))
 end<-Sys.time()
 
