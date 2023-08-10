@@ -43,9 +43,9 @@ on.exit(unlink(maindir, recursive = T), add = TRUE)
 
 setwd(working_dir)
 
-models<-list()
 
-CONCURRENCY<-10
+
+NUMBER_OF_MODEL_RUNS<-100
 
 
 # Fix and change R0 randomly to get different output for each
@@ -201,7 +201,7 @@ run_fims<-function(begin,end){
         }else{
             results[[index]]<-minimizR(obj$par, obj$fn, obj$gr, control = list(tolerance = 1e-8))
         }
-       
+        
         index = index+1
     }
     return(results)
@@ -214,9 +214,9 @@ run_fims<-function(begin,end){
 
 
 id <- mpi.comm.rank(comm = 0)
-ns <-  5 #mpi.universe.size() - 1
+ns <- mpi.universe.size() - 1
 
-nsims <- length(models)
+nsims <- NUMBER_OF_MODEL_RUNS
 
 begin <- rep(0, ns)
 end <- rep(0, ns)
@@ -240,7 +240,8 @@ if (id == 0) {
 
 mpi.spawn.Rslaves(nslaves = ns)
 
-print(length(models))
+
+#capture minimizer output
 completed<-list()
 
 
@@ -249,13 +250,15 @@ completed<-list()
 mpi.bcast.Robj2slave( all = TRUE)
 #mpi.bcast.Robj2slave(obj = run_fims)
 #mpi.bcast.Robj2slave(obj = init_fims)
-
+start<-Sys.time()
 #execute all slaves
-x <- mpi.remote.exec(run_fims, begin, end)
+append(completed,mpi.remote.exec(run_fims, begin, end))
+end<-Sys.time()
 
-print(x)
+print(completed)
 
-
+runtime<- (end - start)
+print(paste0(paste0(paste0(NUMBER_OF_MODEL_RUNS," model runs completed in "),runtime)," seconds."))
 
 # Tell all slaves to close down, and exit the program
 mpi.close.Rslaves(dellog = FALSE)
