@@ -74,7 +74,7 @@ index_data <- data.frame(
     paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
     format = "%Y-%m-%d"
   ),
-  value = returnedom[["em_input"]]$survey.obs[[1]],
+  value = returnedom[["em_input"]]$surveyB.obs[[1]],
   unit = "", # yearly sum of number-at-age / mean(sum of number-at-age)
   uncertainty = returnedom[["em_input"]]$cv.survey[[1]]
 )
@@ -164,7 +164,7 @@ unlink("FIMS_input_data.csv")
 
 usethis::use_data(data_mile1, overwrite = TRUE)
 rm(
-  check_version_ASSAMC,
+  check_ASSAMC,
   age_data, landings_data, index_data, weightatage_data,
   timingfishery, weightsfishery,
   data_mile1, returnedom,
