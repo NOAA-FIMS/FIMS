@@ -84,7 +84,14 @@ setMethod("m_ages", "FIMSFrameAge", function(x) {
   x@ages
 })
 
+#' Get the landings data to be used in the model
+#' @param x The object containing landings
+#' @export
 setGeneric("m_landings", function(x) standardGeneric("m_landings"))
+
+#' Get the landings data to be used in the model
+#' @param x The FIMSFrameAge object containing landings
+#' @export
 setMethod(
   "m_landings", "FIMSFrameAge",
   function(x) {
@@ -96,7 +103,16 @@ setMethod(
   }
 )
 
+#' Get the index data to be used in the model
+#' @param x The object containing index
+#' @param fleet_name The name of the fleet for the index data
+#' @export
 setGeneric("m_index", function(x, fleet_name) standardGeneric("m_index"))
+
+#' Get the index data to be used in the model
+#' @param x The FIMSFrameAge object containing index
+#' @param fleet_name The name of the fleet for the index data
+#' @export
 setMethod(
   "m_index", "FIMSFrameAge",
   function(x, fleet_name) {
@@ -109,9 +125,18 @@ setMethod(
   }
 )
 
-# Should we add name as an argument here?
-setGeneric("m_agecomp", function(x, fleet_name) standardGeneric("m_agecomp"))
 
+#' Get the agecomp data to be used in the model
+#' @param x The object containing agecomp
+#' @param fleet_name The name of the fleet for the agecomp data
+#' @export
+setGeneric("m_agecomp", function(x, fleet_name) standardGeneric("m_agecomp"))
+# Should we add name as an argument here?
+
+#' For FIMSFrameAge, Get the agecomp data to be used in the model
+#' @param x  The FIMSFrameAge containing agecomp
+#' @param fleet_name  The name of the fleet for the agecomp data
+#' @export
 setMethod(
   "m_agecomp", "FIMSFrameAge",
   function(x, fleet_name) {

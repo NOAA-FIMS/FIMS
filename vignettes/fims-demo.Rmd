@@ -72,7 +72,7 @@ age_frame <- FIMS::FIMSFrameAge(data_mile1)
 #   dplyr::filter(type == "landings") %>%
 #   .$value
 
-fishery_catch <- FIMS:::m_landings(age_frame)
+fishery_catch <- FIMS::m_landings(age_frame)
 
 # This does the same thing as the two lines below only
 # using fims_frame rather than age_frame 
@@ -82,13 +82,13 @@ fishery_catch <- FIMS:::m_landings(age_frame)
 #   .$value
 
 
-fishery_agecomp <- FIMS:::m_agecomp(age_frame, "fleet1")
+fishery_agecomp <- FIMS::m_agecomp(age_frame, "fleet1")
 
 # survey data
-survey_index <- FIMS:::m_index(age_frame, "survey1") 
+survey_index <- FIMS::m_index(age_frame, "survey1") 
 
 # survey agecomp not set up in fimsframe yet
-survey_agecomp <- FIMS:::m_agecomp(age_frame, "survey1")
+survey_agecomp <- FIMS::m_agecomp(age_frame, "survey1")
 
 ```
 
