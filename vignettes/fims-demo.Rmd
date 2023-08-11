@@ -63,34 +63,29 @@ fims_frame@data %>%
 Using this data frame, we will start setting up the FIMS data objects. This example from the Model Comparison project sets up a single fishery fleet with age composition and catch data and a single survey with age composition data and an index. Data are read into FIMS as long vectors, regardless of their original dimension, hence the motivation behind the long data frames created with the fimsframe S4 classes. 
 
 ```{r data}
-# fishery data
-fishery_catch <- fims_frame@data %>%
-  dplyr::filter(type == "landings") %>%
-  .$value
-
-# fishery agecomp not set up in fimsframe yet
-
-#This does the same thing as the two lines below only
-#using fims_frame rather than fims_frame_age 
-#fishery_agecomp <- fims_frame@data %>%
-#  dplyr::filter(type == "age") %>%
-#  dplyr::filter(name == "fleet1") %>%
-#  .$value
-
 age_frame <- FIMS::FIMSFrameAge(data_mile1)
+
+# fishery data
+# This does the same thing as the one line below only
+# using fims_frame rather than age_frame
+# fishery_catch <- fims_frame@data %>%
+#   dplyr::filter(type == "landings") %>%
+#   .$value
+
+fishery_catch <- FIMS:::m_landings(age_frame)
+
+# This does the same thing as the two lines below only
+# using fims_frame rather than age_frame 
+# fishery_agecomp <- fims_frame@data %>%
+#   dplyr::filter(type == "age") %>%
+#   dplyr::filter(name == "fleet1") %>%
+#   .$value
+
+
 fishery_agecomp <- FIMS:::m_agecomp(age_frame, "fleet1")
 
 # survey data
-
-#survey_index <- m_index(age_frame, "survey1") # Bai will update data_mile1 to get the correct survey index
-survey_index <- c(
-  0.006795379, 0.006170738, 0.005977854, 0.005907966, 0.007211237,
-  0.006867264, 0.006329387, 0.006137000, 0.005279601, 0.005666829,
-  0.004806935, 0.004374876, 0.003992211, 0.004188884, 0.003711145,
-  0.003818704, 0.002878658, 0.002936660, 0.002972886, 0.002484963,
-  0.001983795, 0.001738507, 0.002122178, 0.001617189, 0.001745169,
-  0.001414111, 0.001350571, 0.001323396, 0.001069791, 0.001459411
-)
+survey_index <- FIMS:::m_index(age_frame, "survey1") 
 
 # survey agecomp not set up in fimsframe yet
 survey_agecomp <- FIMS:::m_agecomp(age_frame, "survey1")
