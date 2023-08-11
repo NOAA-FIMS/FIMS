@@ -79,7 +79,7 @@ fishery_catch <- fims_frame@data %>%
 #  .$value
 
 age_frame <- FIMS::FIMSFrameAge(data_mile1)
-fishery_agecomp <- m_agecomp(age_frame, "fleet1")
+fishery_agecomp <- FIMS:::m_agecomp(age_frame, "fleet1")
 
 # survey data
 
@@ -94,7 +94,7 @@ survey_index <- c(
 )
 
 # survey agecomp not set up in fimsframe yet
-survey_agecomp <- m_agecomp(age_frame, "survey1")
+survey_agecomp <- FIMS:::m_agecomp(age_frame, "survey1")
 
 ```
 
