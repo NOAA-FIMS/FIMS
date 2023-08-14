@@ -76,7 +76,7 @@ age_frame <- FIMS::FIMSFrameAge(data_mile1)
 fishery_catch <- FIMS::m_landings(age_frame)
 
 # This does the same thing as the two lines below only
-# using fims_frame rather than age_frame 
+# using fims_frame rather than age_frame
 # fishery_agecomp <- fims_frame@data %>%
 #   dplyr::filter(type == "age") %>%
 #   dplyr::filter(name == "fleet1") %>%
@@ -86,11 +86,10 @@ fishery_catch <- FIMS::m_landings(age_frame)
 fishery_agecomp <- FIMS::m_agecomp(age_frame, "fleet1")
 
 # survey data
-survey_index <- FIMS::m_index(age_frame, "survey1") 
+survey_index <- FIMS::m_index(age_frame, "survey1")
 
 # survey agecomp not set up in fimsframe yet
 survey_agecomp <- FIMS::m_agecomp(age_frame, "survey1")
-
 ```
 
 ## Creating Modules in FIMS
