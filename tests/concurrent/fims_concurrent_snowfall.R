@@ -1,24 +1,6 @@
 library(FIMS)
 library(minimizR)
-
-# Load the R MPI package if it is not already loaded.
-if (!is.loaded("mpi_initialize")) {
-    library("Rmpi")
-}
-
-#
-# In case R exits unexpectedly, have it automatically clean up
-# resources taken up by Rmpi (slaves, memory, etc...)
-.Last <- function() {
-    if (is.loaded("mpi_initialize")) {
-        if (mpi.comm.size(1) > 0) {
-            print("Please use mpi.close.Rslaves() to close slaves.")
-            mpi.close.Rslaves()
-        }
-        print("Please use mpi.quit() to quit R")
-        .Call("mpi_finalize")
-    }
-}
+library(snowfall)
 
 
 ## Set-up OM (sigmaR = 0.4)
@@ -58,9 +40,9 @@ init_fims<-function(i){
     # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
     # before the likelihood calculation
     recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-    recruitment$log_rzero$value <- log(om_input$R0 + runif(1,min=0, max=1000))
+    recruitment$log_rzero$value <- log(om_input$R0)# + runif(1,min=0, max=1000))
     recruitment$log_rzero$is_random_effect <- FALSE
-    recruitment$log_rzero$estimated <- FALSE
+    recruitment$log_rzero$estimated <- TRUE
     recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
     recruitment$logit_steep$is_random_effect <- FALSE
     recruitment$logit_steep$estimated <- FALSE
@@ -183,13 +165,13 @@ init_fims<-function(i){
 
 
 
-run_fims<-function(begin,end){
+run_fims<-function(id,begin,end){
     library(FIMS)
     library(minimizR)
-    minimizer<-1
+    minimizer<-2
     results<-list()
     
-    id <- mpi.comm.rank()
+    
     index<-1
     for(i in begin[id]:end[id]){
         obj<-init_fims(i)
@@ -213,8 +195,8 @@ run_fims<-function(begin,end){
 
 
 
-id <- mpi.comm.rank(comm = 0)
-ns <- mpi.universe.size() - 1
+id <- 0
+ns <- 5
 
 nsims <- NUMBER_OF_MODEL_RUNS
 
@@ -238,30 +220,12 @@ if (id == 0) {
     print(end)
 }
 
-mpi.spawn.Rslaves(nslaves = ns)
-
-
-#capture minimizer output
 completed<-list()
 
-
-
-#pass the function to all slaves
-mpi.bcast.Robj2slave( all = TRUE)
-#mpi.bcast.Robj2slave(obj = run_fims)
-#mpi.bcast.Robj2slave(obj = init_fims)
-
+sfInit(parallel=TRUE, cpus=5)
+sfExport( "run_fims", "init_fims", "om_input","om_output", "em_input")
 start<-Sys.time()
-#execute all slaves and append the completed list
-append(completed,mpi.remote.exec(run_fims, begin, end))
+append(sfLapply(1:5, run_fims, begin, end), completed)
 end<-Sys.time()
-
-print(completed)
-
-runtime<- (end - start)
+runtime<-end-start
 print(paste0(paste0(paste0(NUMBER_OF_MODEL_RUNS," model runs completed in "),runtime)," seconds."))
-
-# Tell all slaves to close down, and exit the program
-mpi.close.Rslaves(dellog = FALSE)
-mpi.quit()
-
