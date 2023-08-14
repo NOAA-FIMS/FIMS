@@ -43,7 +43,8 @@ reference:
   - use_module
   - mkObj
   - has_keyword("gtest_helper")
-  - FIMSFrame
+  - starts_with("FIMSFrame")
+  - starts_with("m_")
 
 news:
   releases:
