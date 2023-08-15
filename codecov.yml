@@ -1,4 +1,5 @@
-comment: true
+comment:
+  behavior: default
 
 coverage:
   status:
