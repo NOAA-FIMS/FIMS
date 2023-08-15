@@ -16,9 +16,6 @@ authors:
 template:
   bootstrap: 5
 
-development:
-  mode: auto
-
 articles:
 - title: Fisheries Integrated Modeling System (FIMS)
   navbar: ~
