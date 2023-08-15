@@ -380,7 +380,6 @@ struct Population : public FIMSObject<Type> {
              << this->recruitment->evaluate(this->spawning_biomass[year - 1],
                                             phi0)
              << std::endl;
-
     this->numbers_at_age[index_ya] =
         this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
         this->recruitment->recruit_deviations[year];

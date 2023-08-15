@@ -7,530 +7,683 @@
 #endif
 
 #include "../../inst/include/population_dynamics/population/population.hpp"
-#include "third_party/rapidjson/document.h"
-#include "third_party/rapidjson/writer.h"
-#include "third_party/rapidjson/stringbuffer.h"
+#include "../../inst/include/utilities/fims_json.hpp"
 
-class IntegrationTest
-{
-
+class IntegrationTest {
 public:
-  uint32_t ncases_m = 10;
-  uint32_t ninput_files_m = 160;
-  bool print_statements = true;
+    uint32_t ncases_m = 10;
+    uint32_t ninput_files_m = 160;
+    bool print_statements = true;
 
-  IntegrationTest()
-  {
-  }
+    IntegrationTest() {
+    }
 
-  IntegrationTest(uint32_t ncases, uint32_t ninput_files)
-      : ncases_m(ncases), ninput_files_m(ninput_files)
-  {
-  }
+    IntegrationTest(uint32_t ncases, uint32_t ninput_files)
+    : ncases_m(ncases), ninput_files_m(ninput_files) {
+    }
 
-  bool Run()
-  {
+    bool Run() {
 
-    bool good = true;
+        bool good = true;
 
-    std::stringstream ss;
-    for (uint32_t i = 0; i < this->ncases_m; i++)
-    {
-      for (uint32_t j = 0; j < this->ninput_files_m; j++)
-      {
-        rapidjson::Document input;
-        rapidjson::Document output;
+        std::stringstream ss;
+        for (uint32_t i = 0; i < this->ncases_m; i++) {
+            for (uint32_t j = 0; j < this->ninput_files_m; j++) {
+                JsonValue input;
+                JsonValue output;
+
+                ss.str("");
+                ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
+                this->ReadJson(ss.str(), input);
+
+                ss.str("");
+                ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
+                this->ReadJson(ss.str(), output);
+
+                fims::Population<double> pop;
+
+                if (!this->ConfigurePopulationModel(pop, input, output)) {
+                    good = false;
+                }
+
+                this->RunModelLoop(pop, input);
+
+                //                if (!this->CheckModelOutput(pop, output)) {
+                //                    good = false;
+                //                }
+            }
+        }
+
+        return good;
+    }
+
+    bool ReadJson(const std::string &path,
+            JsonValue &result) {
+
+        std::stringstream ss;
+        std::ifstream infile;
+        infile.open(path.c_str());
+
 
         ss.str("");
-        ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
-        this->ReadJson(ss.str(), input);
-
-        ss.str("");
-        ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
-        this->ReadJson(ss.str(), output);
-
-        fims::Population<double> pop;
-
-        if (!this->ConfigurePopulationModel(pop, input, output))
-        {
-          good = false;
+        while (infile.good()) {
+            std::string line;
+            std::getline(infile, line);
+            ss << line << "\n";
+        }
+        if (print_statements) {
+            std::cout << path << "\n";
+            //            std::cout << ss.str() << "\n";
         }
 
-        this->RunModelLoop(pop, input);
+        JsonParser parser;
+        result = parser.Parse(ss.str());
+        parser.WriteToFile("out.json", result);
+        //        json_.Parse(ss.str().c_str());
 
-        if (!this->CheckModelOutput(pop, output))
-        {
-          good = false;
+        return true;
+    }
+
+    bool ConfigurePopulationModel(fims::Population<double> &pop,
+            JsonValue &input,
+            JsonValue &output) {
+
+        std::cout << input.GetType() << "\n";
+        size_t nfleets, nsurveys, nages, nyears;
+
+        std::cout << input.GetDouble() << "\n";
+        if (input.GetType() == JsonValueType::Object && output.GetType() == JsonValueType::Object) {
+
+            JsonObject& obj = input.GetObject();
+            JsonObject& obj2 = output.GetObject();
+
+            typename JsonObject::iterator it;
+
+            it = obj.find("nyr");
+            if (it != obj.end()) {
+                JsonValue e = (*it).second;
+                if (e.GetType() == JsonValueType::Array) {
+                    JsonArray a = e.GetArray();
+                    nyears = a[0].GetInt();
+                }
+
+
+                if (print_statements) {
+                    std::cout << "nyr " << nyears << std::endl;
+                }
+            } else {
+                if (print_statements) {
+                    std::cout << "nyr not found in input\n";
+                }
+            }
+
+            //            typename JsonObject::iterator it;
+
+            it = obj.find("nages");
+            if (it != obj.end()) {
+                JsonValue e = (*it).second;
+                if (e.GetType() == JsonValueType::Array) {
+                    JsonArray a = e.GetArray();
+                    nages = a[0].GetInt();
+                }
+
+
+                if (print_statements) {
+                    std::cout << "nages " << nages << std::endl;
+                }
+            } else {
+                if (print_statements) {
+                    std::cout << "nages not found in input\n";
+                }
+            }
+
+            //get number of fleets
+            it = obj.find("fleet_num");
+            if (it != obj.end()) {
+                JsonValue e = (*it).second;
+                if (e.GetType() == JsonValueType::Array) {
+                    JsonArray a = e.GetArray();
+                    nfleets = a[0].GetInt();
+                }
+
+                if (print_statements) {
+                    std::cout << "nfleets " << nfleets << std::endl;
+                }
+
+                for (size_t i = 0; i < nfleets; i++) {
+                    std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
+                    f->Initialize(nyears, nages);
+                    f->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
+                    f->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
+
+                    std::stringstream strs;
+                    strs << "fleet" << i + 1;
+
+                    it = obj.find("sel_fleet");
+                    typename JsonObject::iterator fsel;
+                    if (it != obj.end()) {
+                        JsonValue e = (*it).second;
+                        if (e.GetType() == JsonValueType::Object) {
+                            JsonObject o = e.GetObject();
+                            fsel = o.find(strs.str().c_str());
+
+                            if ((*fsel).second.GetType() == JsonValueType::Object) {
+                                JsonObject fsel_o = (*fsel).second.GetObject();
+                                it = fsel_o.find("pattern");
+                                if ((*it).second.GetType() == JsonValueType::Array) {
+
+                                    JsonArray sel_pattern = (*it).second.GetArray();
+                                    if (print_statements) {
+                                        std::cout << "Selectivity:\n";
+                                    }
+                                    if (sel_pattern[0].GetInt() == 1) {//logistic
+                                        if (print_statements) {
+                                            std::cout << "logistic\n";
+                                        }
+                                        std::shared_ptr<fims::LogisticSelectivity<double> > selectivity = std::make_shared<fims::LogisticSelectivity<double> >();
+
+                                        it = fsel_o.find("A50.sel1");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->median = a50[0].GetDouble();
+                                            if (print_statements) {
+                                                std::cout << "A50 " << selectivity->median << "\n";
+                                            }
+                                        }
+
+                                        it = fsel_o.find("slope.sel1");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope = slope[0].GetDouble();
+                                            if (print_statements) {
+                                                std::cout << "slope " << selectivity->slope << "\n";
+                                            }
+                                        }
+
+                                        f->selectivity = selectivity;
+
+
+                                    } else if (sel_pattern[0].GetInt() == 2) {//double logistic
+                                        if (print_statements) {
+                                            std::cout << "double logistic\n";
+                                        }
+                                        std::shared_ptr<fims::DoubleLogisticSelectivity<double> > selectivity = std::make_shared<fims::DoubleLogisticSelectivity<double> >();
+
+                                        it = fsel_o.find("A50.sel1");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->median_asc = a50[0].GetDouble();
+                                            if (print_statements) {
+                                                std::cout << "A50 asc " << selectivity->median_asc << "\n";
+                                            }
+                                        }
+
+                                        it = fsel_o.find("slope.sel1");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope_asc = slope[0].GetDouble();
+                                            if (print_statements) {
+                                                std::cout << "slope asc " << selectivity->slope_asc << "\n";
+                                            }
+                                        }
+
+                                        it = fsel_o.find("A50.sel2");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->median_desc = a50[0].GetDouble();
+                                            if (print_statements) {
+                                                std::cout << "A50 desc " << selectivity->median_desc << "\n";
+                                            }
+                                        }
+
+                                        it = fsel_o.find("slope.sel2");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope_desc = slope[0].GetDouble();
+                                            if (print_statements) {
+                                                std::cout << "slope desc " << selectivity->slope_desc << "\n";
+                                            }
+                                        }
+                                        f->selectivity = selectivity;
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                    }
+
+
+                    f->log_q = 0.0;
+                    it = obj.find("f");
+                    if ((*it).second.GetType() == JsonValueType::Array) {
+                        JsonArray f_values = (*it).second.GetArray();
+                        for (int i = 0; i < f_values.size(); i++) {
+                            f->Fmort[i] = f_values[i].GetDouble();
+                            f->log_Fmort[i] = std::log(f_values[i].GetDouble());
+                            if (print_statements) {
+                                std::cout << f->Fmort[i] << " ";
+                            }
+                        }
+
+                    }
+
+                    if (print_statements) {
+                        std::cout << "\n";
+                    }
+                    pop.fleets.push_back(f);
+                }
+
+            } else {
+                if (print_statements) {
+                    std::cout << "nfleets not found in input\n";
+                }
+            }
+
+            it = obj.find("survey_num");
+            if (it != obj.end()) {
+                JsonValue e = (*it).second;
+                if (e.GetType() == JsonValueType::Array) {
+                    JsonArray a = e.GetArray();
+                    nsurveys = a[0].GetInt();
+                }
+
+                if (print_statements) {
+                    std::cout << "nsurveys " << nsurveys << std::endl;
+                }
+
+                for (size_t i = 0; i < nsurveys; i++) {
+                    std::shared_ptr<fims::Fleet<double> > s = std::make_shared<fims::Fleet<double> >();
+                    s->is_survey = true;
+                    s->Initialize(nyears, nages);
+                    s->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
+                    s->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
+
+                    std::stringstream strs;
+                    strs << "survey" << i + 1;
+
+                    it = obj.find("sel_survey");
+                    typename JsonObject::iterator fsel;
+                    if (it != obj.end()) {
+                        JsonValue e = (*it).second;
+                        if (e.GetType() == JsonValueType::Object) {
+                            JsonObject o = e.GetObject();
+                            fsel = o.find(strs.str().c_str());
+                         
+
+                            if ((*fsel).second.GetType() == JsonValueType::Object) {
+
+
+                                JsonObject fsel_o = (*fsel).second.GetObject();
+                                it = fsel_o.find("pattern");
+                                if ((*it).second.GetType() == JsonValueType::Array) {
+
+                                    JsonArray sel_pattern = (*it).second.GetArray();
+
+                                    if (sel_pattern[0].GetInt() == 1) {//logistic
+                                        std::shared_ptr<fims::LogisticSelectivity<double> > selectivity = std::make_shared<fims::LogisticSelectivity<double> >();
+
+                                        it = fsel_o.find("A50.sel1");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->median = a50[0].GetDouble();
+                                        }
+
+                                        it = fsel_o.find("slope.sel1");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope = slope[0].GetDouble();
+                                        }
+
+                                        s->selectivity = selectivity;
+
+
+
+                                    } else if (sel_pattern[0].GetInt() == 2) {//double logistic
+                                        std::shared_ptr<fims::DoubleLogisticSelectivity<double> > selectivity = std::make_shared<fims::DoubleLogisticSelectivity<double> >();
+
+                                        it = fsel_o.find("A50.sel1");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->median_asc = a50[0].GetDouble();
+                                        }
+
+                                        it = fsel_o.find("slope.sel1");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope_asc = slope[0].GetDouble();
+                                        }
+
+                                        it = fsel_o.find("A50.sel2");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->median_desc = a50[0].GetDouble();
+                                        }
+
+                                        it = fsel_o.find("slope.sel2");
+                                        if ((*it).second.GetType() == JsonValueType::Array) {
+                                            JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope_desc = slope[0].GetDouble();
+                                        }
+                                        s->selectivity = selectivity;
+                                    }
+
+                                }
+
+                            }
+                        }
+
+                    }
+
+
+                    s->log_q = 0.0;
+                    it = obj2.find("survey_q");
+
+
+                    if ((*it).second.GetType() == JsonValueType::Object) {
+                        //                        f->log_q = fims::log((*it).second.GetDouble());
+                        JsonObject qobj = (*it).second.GetObject();
+
+                        typename JsonObject::iterator qit = qobj.find("survey1");
+
+                        if ((*qit).second.GetType() == JsonValueType::Array) {
+                            JsonArray a = (*qit).second.GetArray();
+                            s->log_q = fims::log(a[0].GetDouble());
+                            if (this->print_statements) {
+                                std::cout << "q = " << a[0].GetDouble() << "\nlog(q) = " << s->log_q << "\n";
+                            }
+                        }
+                    }
+
+
+
+                    pop.fleets.push_back(s);
+
+                }
+
+            } else {
+                if (print_statements) {
+                    std::cout << "nsurveys not found in input\n";
+                }
+            }
+
+            pop.nfleets = pop.fleets.size();
+
+            // initialize population
+            pop.Initialize(nyears, 1, nages);
+
+            // Set initial size to value from MCP C0
+            it = obj2.find("N.age");
+            if (it != obj2.end()) {
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    JsonArray n = (*it).second.GetArray();
+                    if (n[0].GetType() == JsonValueType::Array) {
+                        JsonArray init_n = n[0].GetArray();
+                        for (size_t i = 0; i < pop.nages; i++) {
+                            pop.log_init_naa[i] = std::log(init_n[i].GetDouble());
+                        }
+                    }
+                }
+            }
+
+            it = obj.find("ages");
+            if (it != obj.end()) {
+
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    if (print_statements) {
+                        std::cout << "ages: ";
+                    }
+                    JsonArray ages = (*it).second.GetArray();
+                    for (int i = 0; i < ages.size(); i++) {
+                        pop.ages[i] = ages[i].GetDouble();
+                        if (print_statements) {
+                            std::cout << pop.ages[i] << " ";
+                        }
+                    }
+                    if (print_statements) {
+                        std::cout << "\n";
+                    }
+                }
+
+
+            } else {
+                if (print_statements) {
+                    std::cout << "ages not found in input\n";
+                }
+            }
+
+            it = obj.find("year");
+            if (it != obj.end()) {
+
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    if (print_statements) {
+                        std::cout << "year: ";
+                    }
+                    JsonArray years = (*it).second.GetArray();
+                    for (int i = 0; i < years.size(); i++) {
+                        pop.years[i] = years[i].GetDouble();
+                        if (print_statements) {
+                            std::cout << pop.years[i] << " ";
+                        }
+                    }
+                    if (print_statements) {
+                        std::cout << "\n";
+                    }
+                }
+
+
+            } else {
+                if (print_statements) {
+                    std::cout << "years not found in input\n";
+                }
+            }
+            if (print_statements) {
+                std::cout << "\nMortality:\n";
+            }
+            it = obj.find("M");
+            if ((*it).second.GetType() == JsonValueType::Array) {
+                JsonArray m = (*it).second.GetArray();
+                double log_M = std::log(m[0].GetDouble());
+                std::fill(pop.log_M.begin(), pop.log_M.end(), log_M);
+                if (print_statements) {
+                    std::cout << pop.log_M.size() << "\n";
+                    std::cout << "log_M ";
+                    for (size_t i = 0; i < pop.log_M.size(); i++) {
+                        std::cout << pop.log_M[i] << " ";
+                    }
+                    std::cout << std::endl;
+                }
+            }
+
+
+            // set recruitment
+            std::shared_ptr<fims::SRBevertonHolt<double> > rec =
+                    std::make_shared<fims::SRBevertonHolt<double> >();
+            if (print_statements) {
+                std::cout << "\nRecruitment:\n";
+            }
+            it = obj.find("R0");
+            if (it != obj.end()) {
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    double r0 = (*it).second.GetArray()[0].GetDouble();
+                    rec->log_rzero = std::log(r0);
+                    if (print_statements) {
+                        std::cout << "R0 " << rec->log_rzero << " \n";
+                    }
+                }
+            } else {
+                if (print_statements) {
+                    std::cout << "'R0' not found.\n";
+                }
+            }
+
+            it = obj.find("h");
+            if (it != obj.end()) {
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    rec->logit_steep = fims::logit(0.2, 1.0, (*it).second.GetArray()[0].GetDouble());
+                    if (print_statements) {
+                        std::cout << "'h' " << rec->logit_steep << " \n";
+                    }
+                }
+            } else {
+                if (print_statements) {
+                    std::cout << "'h' not found.\n";
+                }
+            }
+
+            it = obj.find("logR_sd");
+            if (it != obj.end()) {
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    rec->log_sigma_recruit = (*it).second.GetArray()[0].GetDouble();
+                    if (print_statements) {
+                        std::cout << "'SD' " << rec->log_sigma_recruit << " \n";
+                    }
+                }
+            } else {
+                if (print_statements) {
+                    std::cout << "'logR_sd' not found.\n";
+                }
+            }
+
+
+            it = obj.find("logR.resid");
+            rec->recruit_deviations.resize(nyears + 1);
+            std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
+            if (it != obj.end()) {
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    JsonArray rdev = (*it).second.GetArray();
+                    if (print_statements) {
+                        std::cout << "recruitment deviations: ";
+                    }
+                    for (size_t i = 0; i < rdev.size(); i++) {
+                        rec->recruit_deviations[i] = std::exp(rdev[i].GetDouble());
+                        if (print_statements) {
+                            std::cout << rec->recruit_deviations[i] << " ";
+                        }
+                    }
+                    if (print_statements) {
+                        std::cout << "\n";
+                    }
+                }
+            } else {
+                if (print_statements) {
+                    std::cout << "'logR.resid' not found.\n";
+                }
+            }
+            rec->use_recruit_bias_adjustment = false;
+            pop.recruitment = rec;
+
+            // set maturity
+            std::shared_ptr<fims::LogisticMaturity<double> > mat =
+                    std::make_shared<fims::LogisticMaturity<double> >();
+
+            if (print_statements) {
+                std::cout << "\nMaturity:\n";
+            }
+            it = obj.find("A50.mat");
+            if (it != obj.end()) {
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    mat->median = (*it).second.GetArray()[0].GetDouble();
+                    if (print_statements) {
+                        std::cout << "median " << mat->median << " \n";
+                    }
+                }
+            } else {
+                if (print_statements) {
+                    std::cout << "'A50.mat' not found.\n";
+                }
+            }
+            
+            pop.maturity = mat;
+
+            it = obj.find("slope.mat");
+            if (it != obj.end()) {
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    mat->slope = (*it).second.GetArray()[0].GetDouble();
+                    if (print_statements) {
+                        std::cout << "slope " << mat->slope << " \n";
+                    }
+                }
+            } else {
+                if (print_statements) {
+                    std::cout << "'slope.mat' not found.\n";
+                }
+            }
+
+            // set empirical growth
+            std::shared_ptr<fims::EWAAgrowth<double> > growth = std::make_shared<fims::EWAAgrowth<double> >();
+            std::cout << "Growth:\n";
+
+            it = obj.find("W.kg");
+            if (it != obj.end()) {
+                if ((*it).second.GetType() == JsonValueType::Array) {
+                    JsonArray wt = (*it).second.GetArray();
+                    if (print_statements) {
+                        std::cout << "W.kg: ";
+                    }
+                    for (size_t i = 0; i < pop.ages.size(); i++) {
+                        growth->ewaa[static_cast<double> (pop.ages[i])] = wt[i].GetDouble() / 1000.0;
+                        if (print_statements) {
+                            std::cout << growth->ewaa[static_cast<double> (pop.ages[i])] << " ";
+                        }
+                    }
+                    if (print_statements) {
+                        std::cout << "\n";
+                    }
+                }
+            } else {
+                if (print_statements) {
+                    std::cout << "'logR.resid' not found.\n";
+                }
+            }
+
+            pop.growth = growth;
+
+            return true;
         }
-      }
+
+        return false;
     }
 
-    return good;
-  }
+    std::vector<double> RunModelLoop(fims::Population<double> &pop,
+            const JsonValue & input) {
 
-  bool ReadJson(const std::string &path,
-                rapidjson::Document &json_)
-  {
+        JsonObject output;
+        JsonArray array;
 
-    std::stringstream ss;
-    std::ifstream infile;
-    infile.open(path.c_str());
+        
 
-    ss.str("");
-    while (infile.good())
-    {
-      std::string line;
-      std::getline(infile, line);
-      ss << line << "\n";
-    }
-    if (print_statements)
-    {
-      std::cout << path << "\n";
-      std::cout << ss.str() << "\n";
-    }
-    json_.Parse(ss.str().c_str());
+        pop.Evaluate();
 
-    return true;
-  }
-
-  bool ConfigurePopulationModel(fims::Population<double> &pop,
-                                rapidjson::Document &input,
-                                rapidjson::Document &output)
-  {
-
-    typename rapidjson::Document::MemberIterator it;
-
-    size_t nfleets, nsurveys, nages, nyears;
-
-    // get number of years
-    it = input.FindMember("nyr");
-    if (it != input.MemberEnd())
-    {
-      rapidjson::Value &e = (*it).value;
-      nyears = e[0].GetInt();
-
-      if (print_statements)
-      {
-        std::cout << "nyr " << nyears << std::endl;
-      }
-    }
-    else
-    {
-      if (print_statements)
-      {
-        std::cout << "nyr not found in input\n";
-      }
-    }
-
-    // get number of ages
-    it = input.FindMember("nages");
-    if (it != input.MemberEnd())
-    {
-      rapidjson::Value &e = (*it).value;
-      nages = e[0].GetInt();
-
-      if (print_statements)
-      {
-        std::cout << "nages " << nages << std::endl;
-      }
-    }
-    else
-    {
-      if (print_statements)
-      {
-        std::cout << "nages not found in input\n";
-      }
-    }
-
-    // get number of fleets
-    it = input.FindMember("fleet_num");
-    if (it != input.MemberEnd())
-    {
-      rapidjson::Value &e = (*it).value;
-      nfleets = e[0].GetInt();
-      bool parse_alternate_name = false;
-
-      // instantiate fleets
-      if (print_statements)
-      {
-        std::cout << "nfleets " << nfleets << std::endl;
-      }
-      for (int i = 0; i < nfleets; i++)
-      {
-        std::shared_ptr<fims::Fleet<double>> f = std::make_shared<fims::Fleet<double>>();
-        f->Initialize(nyears, nages);
-        f->observed_index_data = std::make_shared<fims::DataObject<double>>(nyears);
-        f->observed_agecomp_data = std::make_shared<fims::DataObject<double>>(nyears, nages);
-
-        std::stringstream strs;
-        strs << "fleet" << i + 1;
-
-        // set fleet selectivity
-        it = input.FindMember("sel_fleet");
-        typename rapidjson::Document::MemberIterator fsel;
-        fsel = it->value.FindMember(strs.str().c_str());
-        rapidjson::Value &ss = (*fsel).value;
-        typename rapidjson::Document::MemberIterator pattern;
-        pattern = fsel->value.FindMember("pattern");
-        rapidjson::Value &sel_pattern = (*pattern).value;
-
-        if (sel_pattern[0].GetDouble() == 1)
-        { // logistic
-          std::shared_ptr<fims::LogisticSelectivity<double>> selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
-          typename rapidjson::Document::MemberIterator sel_a50;
-          sel_a50 = fsel->value.FindMember("A50.sel1");
-
-          rapidjson::Value &a50 = (*sel_a50).value;
-          selectivity->median = a50[0].GetDouble();
-
-          typename rapidjson::Document::MemberIterator sel_slope;
-          sel_slope = fsel->value.FindMember("slope.sel1");
-          rapidjson::Value &slope = (*sel_slope).value;
-          selectivity->slope = slope[0].GetDouble();
-          f->selectivity = selectivity;
+        if (print_statements) {
+            std::cout << "Numbers at age:\n";
         }
-        else if (sel_pattern[0].GetDouble() == 2)
-        { // double logistic
-          std::shared_ptr<fims::DoubleLogisticSelectivity<double>> selectivity = std::make_shared<fims::DoubleLogisticSelectivity<double>>();
-
-          typename rapidjson::Document::MemberIterator sel_a50;
-          sel_a50 = fsel->value.FindMember("A50.sel1");
-          rapidjson::Value &a501 = (*sel_a50).value;
-          selectivity->median_asc = a501[0].GetDouble();
-
-          typename rapidjson::Document::MemberIterator sel_slope;
-          sel_slope = fsel->value.FindMember("slope.sel1");
-          rapidjson::Value &slope1 = (*sel_slope).value;
-          selectivity->slope_asc = slope1[0].GetDouble();
-
-          sel_a50 = fsel->value.FindMember("A50.sel2");
-          rapidjson::Value &a502 = (*sel_a50).value;
-          selectivity->median_desc = a502[0].GetDouble();
-
-          sel_slope = fsel->value.FindMember("slope.sel2");
-          rapidjson::Value &slope2 = (*sel_slope).value;
-          selectivity->slope_desc = slope2[0].GetDouble();
-          f->selectivity = selectivity;
+        for (int i = 0; i < pop.nyears; i++) {
+            for (int j = 0; j < pop.nages; j++) {
+                if (print_statements) {
+                    std::cout << pop.numbers_at_age[i * pop.nages + j] << " ";
+                }
+                array.push_back(pop.numbers_at_age[i * pop.nages + j]);
+            }
+            if (print_statements) {
+                std::cout << std::endl;
+            }
+        }
+        
+        output["NumbersAtAge"] = array;
+        
+        if (print_statements) {
+            std::cout << "\n\n"
+                    << std::endl;
         }
 
-        // set fleet fishing mortality
-        if (print_statements)
-        {
-          std::cout << "f ";
-        }
-        it = input.FindMember("f");
-        f->log_q = 0.0;
-        for (int i = 0; i < it->value.Size(); i++)
-        {
-          rapidjson::Value &e = (*it).value;
-          f->Fmort[i] = e[i].GetDouble();
-          f->log_Fmort[i] = std::log(e[i].GetDouble());
-          if (print_statements)
-          {
-            std::cout << f->log_Fmort[i] << " ";
-          }
-        }
 
-        if (print_statements)
-        {
-          std::cout << "\n";
-        }
-
-        pop.fleets.push_back(f);
-      }
-    }
-    else
-    {
-      if (print_statements)
-      {
-        std::cout << "fleet_num not found in input\n";
-      }
+        return pop.numbers_at_age;
     }
 
-    // get number of surveys
-    it = input.FindMember("survey_num");
-    if (it != input.MemberEnd())
-    {
-      rapidjson::Value &e = (*it).value;
-      nsurveys = e[0].GetInt();
-      for (int i = 0; i < nsurveys; i++)
-      {
-        std::shared_ptr<fims::Fleet<double>> s = std::make_shared<fims::Fleet<double>>();
-        s->Initialize(nyears, nages);
-        s->observed_index_data = std::make_shared<fims::DataObject<double>>(nyears);
-        s->observed_agecomp_data = std::make_shared<fims::DataObject<double>>(nyears, nages);
-        std::shared_ptr<fims::LogisticSelectivity<double>> selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
-        std::stringstream strs;
-        strs << "survey" << i + 1;
-
-        // set survey selectivity
-        it = input.FindMember("sel_survey");
-        typename rapidjson::Document::MemberIterator fsel;
-        fsel = it->value.FindMember(strs.str().c_str());
-        rapidjson::Value &ss = (*fsel).value;
-        typename rapidjson::Document::MemberIterator pattern;
-        pattern = fsel->value.FindMember("pattern");
-        rapidjson::Value &sel_pattern = (*pattern).value;
-
-        if (sel_pattern[0].GetDouble() == 1)
-        { // logistic
-          std::shared_ptr<fims::LogisticSelectivity<double>> selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
-          typename rapidjson::Document::MemberIterator sel_a50;
-          sel_a50 = fsel->value.FindMember("A50.sel1");
-
-          rapidjson::Value &a50 = (*sel_a50).value;
-          selectivity->median = a50[0].GetDouble();
-
-          typename rapidjson::Document::MemberIterator sel_slope;
-          sel_slope = fsel->value.FindMember("slope.sel1");
-          rapidjson::Value &slope = (*sel_slope).value;
-          selectivity->slope = slope[0].GetDouble();
-
-          s->selectivity = selectivity;
-        }
-        else if (sel_pattern[0].GetDouble() == 1)
-        { // double logistic
-          std::shared_ptr<fims::DoubleLogisticSelectivity<double>> selectivity = std::make_shared<fims::DoubleLogisticSelectivity<double>>();
-
-          typename rapidjson::Document::MemberIterator sel_a50;
-          sel_a50 = fsel->value.FindMember("A50.sel1");
-          rapidjson::Value &a501 = (*sel_a50).value;
-          selectivity->median_asc = a501[0].GetDouble();
-
-          typename rapidjson::Document::MemberIterator sel_slope;
-          sel_slope = fsel->value.FindMember("slope.sel1");
-          rapidjson::Value &slope1 = (*sel_slope).value;
-          selectivity->slope_asc = slope1[0].GetDouble();
-
-          sel_a50 = fsel->value.FindMember("A50.sel2");
-          rapidjson::Value &a502 = (*sel_a50).value;
-          selectivity->median_desc = a502[0].GetDouble();
-
-          sel_slope = fsel->value.FindMember("slope.sel2");
-          rapidjson::Value &slope2 = (*sel_slope).value;
-          selectivity->slope_desc = slope2[0].GetDouble();
-          s->selectivity = selectivity;
-        }
-
-        // set survey catchability
-        it = output.FindMember("survey_q");
-        typename rapidjson::Document::MemberIterator fleet2_q;
-        fleet2_q = it->value.FindMember("survey1");
-        rapidjson::Value &fleet_q = (*fleet2_q).value;
-        s->log_q = fims::log(fleet_q[0].GetDouble());
-
-        std::fill(s->log_Fmort.begin(), s->log_Fmort.end(), fims::log(0.0));
-        pop.fleets.push_back(s);
-      }
-      if (print_statements)
-      {
-        std::cout << "survey_num " << nsurveys << std::endl;
-      }
+    bool CheckModelOutput(fims::Population<double> &pop,
+            JsonValue &output) {
+        return true;
     }
-    else
-    {
-      if (print_statements)
-      {
-        std::cout << "survey_num not found in input\n";
-      }
-    }
-
-    pop.nfleets = pop.fleets.size();
-
-    // initialize population
-    pop.Initialize(nyears, 1, nages);
-
-    // Set initial size to value from MCP C0
-    it = output.FindMember("N.age");
-    if (it != output.MemberEnd())
-    {
-      rapidjson::Value &e = (*it).value;
-      std::vector<double> init_naa(pop.nages, 0.0);
-      for (int age = 0; age < pop.nages; age++)
-      {
-        init_naa[age] = e[0][age].GetDouble();
-        pop.log_init_naa[age] = std::log(init_naa[age]);
-      }
-    }
-
-    // set ages vector
-    it = input.FindMember("ages");
-    if (it != input.MemberEnd())
-    {
-      rapidjson::Value &e = (*it).value;
-      if (print_statements)
-      {
-        std::cout << "ages ";
-      }
-
-      for (int i = 0; i < e.Size(); i++)
-      {
-        pop.ages[i] = e[i].GetDouble();
-      }
-      if (print_statements)
-      {
-        std::cout << std::endl;
-      }
-    }
-    else
-    {
-      if (print_statements)
-      {
-        std::cout << "ages not found in input\n";
-      }
-    }
-
-    // set years vector
-    it = input.FindMember("year");
-    if (it != input.MemberEnd())
-    {
-      rapidjson::Value &e = (*it).value;
-      if (print_statements)
-      {
-        std::cout << "years ";
-      }
-      for (int i = 0; i < e.Size(); i++)
-      {
-        pop.years[i] = e[i].GetDouble();
-        if (print_statements)
-        {
-          std::cout << pop.years[i] << " ";
-        }
-      }
-      if (print_statements)
-      {
-        std::cout << std::endl;
-      }
-    }
-    else
-    {
-      if (print_statements)
-      {
-        std::cout << "years not found in input\n";
-      }
-    }
-
-    // set mortality vector
-    it = input.FindMember("M");
-    rapidjson::Value &e = (*it).value;
-    double log_M = std::log(e[0].GetDouble());
-    std::fill(pop.log_M.begin(), pop.log_M.end(), log_M);
-    if (print_statements)
-    {
-      std::cout << "mortality: " << e[0].GetDouble() << std::endl;
-    }
-    // set recruitment
-    std::shared_ptr<fims::SRBevertonHolt<double>> rec =
-        std::make_shared<fims::SRBevertonHolt<double>>();
-    it = input.FindMember("R0");
-    e = (*it).value;
-    rec->log_rzero = fims::log(e[0].GetDouble());
-
-    it = input.FindMember("h");
-    e = (*it).value;
-    rec->logit_steep = fims::logit(0.2,1.0,e[0].GetDouble());
-
-    it = input.FindMember("logR_sd");
-    e = (*it).value;
-    rec->log_sigma_recruit = e[0].GetDouble();
-    it = input.FindMember("logR.resid");
-    e = (*it).value;
-    rec->recruit_deviations.resize(nyears + 1);
-    std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
-    for (int i = 0; i < e.Size(); i++)
-      {
-        rec->recruit_deviations[i] = std::exp(e[i].GetDouble());
-        if (print_statements)
-        {
-          std::cout << rec->recruit_deviations[i] << " ";
-        }
-      }
-    rec->use_recruit_bias_adjustment = false;
-    pop.recruitment = rec;
-
-    // set maturity
-    std::shared_ptr<fims::LogisticMaturity<double>> mat =
-        std::make_shared<fims::LogisticMaturity<double>>();
-    it = input.FindMember("A50.mat");
-    e = (*it).value;
-    mat->median = e[0].GetDouble();
-
-    it = input.FindMember("slope.mat");
-    e = (*it).value;
-    mat->slope = e[0].GetDouble();
-    pop.maturity = mat;
-
-    // set empirical growth
-    std::shared_ptr<fims::EWAAgrowth<double>> growth = std::make_shared<fims::EWAAgrowth<double>>();
-    it = input.FindMember("W.kg");
-    e = (*it).value;
-    for (int i = 0; i < e.Size(); i++)
-    {
-      growth->ewaa[static_cast<double>(pop.ages[i])] = e[i].GetDouble() / 1000.0;
-    }
-    pop.growth = growth;
-
-    return true;
-  }
-
-  std::vector<double> RunModelLoop(fims::Population<double> &pop,
-                                   rapidjson::Document &input)
-  {
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-
-    rapidjson::Document output;
-
-    // define the document as an object rather than an array
-    output.SetObject();
-
-    // create a rapidjson array type with similar syntax to std::vector
-    rapidjson::Value array(rapidjson::kArrayType);
-
-    // must pass an allocator when the object may need to allocate memory
-    rapidjson::Document::AllocatorType &allocator = output.GetAllocator();
-
-    // create a rapidjson object type
-    // rapidjson::Value object(rapidjson::kObjectType);
-    // object.AddMember("NumbersAtAge", "50", allocator);
-
-    pop.Evaluate();
-    if (print_statements)
-    {
-      std::cout << "Numbers at age:\n";
-    }
-    for (int i = 0; i < pop.nyears; i++)
-    {
-      for (int j = 0; j < pop.nages; j++)
-      {
-        if (print_statements)
-        {
-          std::cout << pop.numbers_at_age[i * pop.nages + j] << " ";
-        }
-        array.PushBack(pop.numbers_at_age[i * pop.nages + j], allocator);
-      }
-      if (print_statements)
-      {
-        std::cout << std::endl;
-      }
-    }
-    if (print_statements)
-    {
-      std::cout << "\n\n"
-                << std::endl;
-    }
-
-    output.Accept(writer);
-    if (print_statements)
-    {
-      std::cout << buffer.GetString() << std::endl;
-    }
-    return pop.numbers_at_age;
-  }
-
-  bool CheckModelOutput(fims::Population<double> &pop,
-                        rapidjson::Document &output)
-  {
-    return true;
-  }
 };
