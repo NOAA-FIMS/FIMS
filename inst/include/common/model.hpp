@@ -26,12 +26,11 @@ namespace fims {
 /**
  * @brief Model class. FIMS objective function.
  */
-template <typename T>
-class Model {  // may need singleton
- public:
-  static std::shared_ptr<Model<T> >
+template <typename T> class Model { // may need singleton
+public:
+  static std::shared_ptr<Model<T>>
       fims_model; /*!< Create a shared fims_model as a pointer to Model*/
-  std::shared_ptr<Information<T> >
+  std::shared_ptr<Information<T>>
       fims_information; /*!< Create a shared fims_information as a pointer to
                            Information*/
 
@@ -47,9 +46,9 @@ class Model {  // may need singleton
    *
    * @return singleton for type T
    */
-  static std::shared_ptr<Model<T> > GetInstance() {
+  static std::shared_ptr<Model<T>> GetInstance() {
     if (Model<T>::fims_model == nullptr) {
-      Model<T>::fims_model = std::make_shared<fims::Model<T> >();
+      Model<T>::fims_model = std::make_shared<fims::Model<T>>();
       Model<T>::fims_model->fims_information =
           fims::Information<T>::GetInstance();
     }
@@ -62,9 +61,9 @@ class Model {  // may need singleton
   const T Evaluate() {
     // jnll = negative-log-likelihood (the objective function)
     T jnll = 0.0;
-    T rec_nll = 0.0;       // recrutiment nll
-    T age_comp_nll = 0.0;  // age composition nll
-    T index_nll = 0.0;     // survey and fishery cacth nll
+    T rec_nll = 0.0;      // recrutiment nll
+    T age_comp_nll = 0.0; // age composition nll
+    T index_nll = 0.0;    // survey and fishery cacth nll
     // Loop over populations, evaluate, and sum up the recruitment likelihood
     // component
     typename fims::Information<T>::population_iterator it;
@@ -113,8 +112,7 @@ class Model {  // may need singleton
 
 // Create singleton instance of Model class
 template <typename T>
-std::shared_ptr<Model<T> > Model<T>::fims_model =
-    nullptr;  // singleton instance
-}  // namespace fims
+std::shared_ptr<Model<T>> Model<T>::fims_model = nullptr; // singleton instance
+} // namespace fims
 
 #endif /* FIMS_COMMON_MODEL_HPP */

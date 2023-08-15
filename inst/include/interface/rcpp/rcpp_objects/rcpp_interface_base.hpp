@@ -24,7 +24,7 @@
  * the interface between R and C++ for parameter types.
  */
 class Parameter {
- public:
+public:
   double value; /**< initial value of the parameter*/
   double min =
       std::numeric_limits<double>::min(); /**< min value of the parameter*/
@@ -59,7 +59,7 @@ class Parameter {
  *@brief Base class for all interface objects
  */
 class FIMSRcppInterfaceBase {
- public:
+public:
   /**< FIMS interface object vectors */
   static std::vector<FIMSRcppInterfaceBase *> fims_interface_objects;
 

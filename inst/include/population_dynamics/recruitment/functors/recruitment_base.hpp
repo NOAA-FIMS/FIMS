@@ -14,9 +14,9 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP
 
-#include <cmath>  // for using std::pow and M_PI
+#include <cmath> // for using std::pow and M_PI
 
-#include "../../../common/fims_math.hpp"  // for using fims::log()
+#include "../../../common/fims_math.hpp" // for using fims::log()
 #include "../../../common/model_object.hpp"
 #include "../../../distributions/distributions.hpp"
 
@@ -27,8 +27,7 @@ namespace fims {
  * @tparam Type The type of the recruitment functor.
  *
  */
-template <class Type>
-struct RecruitmentBase : public FIMSObject<Type> {
+template <class Type> struct RecruitmentBase : public FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for recruitment object*/
 
   typename ModelTraits<Type>::ParameterVector
@@ -78,9 +77,9 @@ struct RecruitmentBase : public FIMSObject<Type> {
    * @param ssbzero A measure for spawning output in unfished population.
    *
    */
-  virtual const Type evaluate(
-      const Type &spawners,
-      const Type &ssbzero) = 0;  // need to add input parameter values
+  virtual const Type
+  evaluate(const Type &spawners,
+           const Type &ssbzero) = 0; // need to add input parameter values
 
   /** @brief Calculates the negative log likelihood of recruitment deviations.
    *
@@ -157,8 +156,7 @@ struct RecruitmentBase : public FIMSObject<Type> {
   }
 };
 
-template <class Type>
-uint32_t RecruitmentBase<Type>::id_g = 0;
-}  // namespace fims
+template <class Type> uint32_t RecruitmentBase<Type>::id_g = 0;
+} // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP */

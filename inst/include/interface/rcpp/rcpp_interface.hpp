@@ -82,8 +82,7 @@ Rcpp::NumericVector get_random_parameters_vector() {
   return p;
 }
 
-template <typename Type>
-void clear_internal() {
+template <typename Type> void clear_internal() {
   std::shared_ptr<fims::Information<Type>> d0 =
       fims::Information<Type>::GetInstance();
   d0->fixed_effects_parameters.clear();

@@ -52,6 +52,6 @@ struct DoubleLogisticSelectivity : public SelectivityBase<T> {
   }
 };
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_DOUBLE_LOGISTIC_HPP */

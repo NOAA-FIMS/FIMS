@@ -18,8 +18,7 @@ namespace fims {
 /**
  * @brief Dnorm class returns the TMB dnorm function
  */
-template <typename T>
-struct Dnorm : public DistributionsBase<T> {
+template <typename T> struct Dnorm : public DistributionsBase<T> {
   T x;    /*!< observation */
   T mean; /*!< mean of the normal distribution */
   T sd;   /*!< standard deviation of the normal distribution, must be strictly
@@ -36,7 +35,7 @@ struct Dnorm : public DistributionsBase<T> {
    *
    * @param do_log Boolean; if true, log densities are returned
    */
-  virtual const T evaluate(const bool& do_log) {
+  virtual const T evaluate(const bool &do_log) {
     return dnorm(x, mean, sd, do_log);
   }
 };
@@ -44,8 +43,7 @@ struct Dnorm : public DistributionsBase<T> {
 /**
  * @brief Dmultinom class returns the TMB dmultinom function
  */
-template <typename T>
-struct Dmultinom : public DistributionsBase<T> {
+template <typename T> struct Dmultinom : public DistributionsBase<T> {
   /** EigenVector defined in interface.hpp */
   using Vector = typename fims::ModelTraits<T>::EigenVector;
   Vector x; /*!< Vector of length K of integers */
@@ -63,7 +61,7 @@ struct Dmultinom : public DistributionsBase<T> {
    *
    * @param do_log Boolean; if true, log densities are returned
    */
-  virtual const T evaluate(const bool& do_log) {
+  virtual const T evaluate(const bool &do_log) {
     return dmultinom(x, p, do_log);
   }
 };
@@ -72,8 +70,7 @@ struct Dmultinom : public DistributionsBase<T> {
  * @brief Dlnorm uses the TMB dnorm function to construct the lognormal density
  * function
  */
-template <typename T>
-struct Dlnorm : public DistributionsBase<T> {
+template <typename T> struct Dlnorm : public DistributionsBase<T> {
   T x;       /*!< observation */
   T meanlog; /*!< mean of the distribution of log(x) */
   T sdlog;   /*!< standard deviation of the distribution of log(x) */
@@ -91,7 +88,7 @@ struct Dlnorm : public DistributionsBase<T> {
    * @param do_log Boolean; if true, log densities are returned
    */
 
-  virtual const T evaluate(const bool& do_log) {
+  virtual const T evaluate(const bool &do_log) {
     T logx = log(x);
     T nll;
     if (do_bias_correction) {
@@ -106,7 +103,7 @@ struct Dlnorm : public DistributionsBase<T> {
     }
   }
 };
-}  // namespace fims
+} // namespace fims
 
 #endif
 

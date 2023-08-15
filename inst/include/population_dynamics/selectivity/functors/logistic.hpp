@@ -20,8 +20,7 @@ namespace fims {
  *  @brief LogisticSelectivity class that returns the logistic function value
  * from fims_math.
  */
-template <typename T>
-struct LogisticSelectivity : public SelectivityBase<T> {
+template <typename T> struct LogisticSelectivity : public SelectivityBase<T> {
   T median; /*!< 50% quantile of the value of the quantity of interest (x); e.g.
                age at which 50% of the fish are selected */
   T slope;  /*!<scalar multiplier of difference between quantity of interest
@@ -40,11 +39,11 @@ struct LogisticSelectivity : public SelectivityBase<T> {
    * @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
-  virtual const T evaluate(const T& x) {
+  virtual const T evaluate(const T &x) {
     return fims::logistic<T>(median, slope, x);
   }
 };
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP */

@@ -21,10 +21,10 @@
  * define different Rcpp interfaces for each possible Recruitment function
  * */
 class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
   uint32_t id;          /**< id of the recruitment interface base */
-  static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
+  static std::map<uint32_t, RecruitmentInterfaceBase *> live_objects;
   /**< map associating the ids of RecruitmentInterfaceBase to the objects */
 
   // static std::vector<double> recruit_deviations; /**< vector of recruitment
@@ -59,7 +59,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 uint32_t RecruitmentInterfaceBase::id_g = 1;
-std::map<uint32_t, RecruitmentInterfaceBase*>
+std::map<uint32_t, RecruitmentInterfaceBase *>
     RecruitmentInterfaceBase::live_objects;
 
 /**
@@ -68,7 +68,7 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  * beverton_holt <- new(fims$beverton_holt)
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
- public:
+public:
   Parameter logit_steep;       /**< steepness or the productivity of the stock*/
   Parameter log_rzero;         /**< recruitment at unfished biomass */
   Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
@@ -90,9 +90,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     BevHolt.logit_steep = this->logit_steep.value;
     if (this->logit_steep.value == 1.0) {
-      warning(
-          "Steepness is subject to a logit transformation, so its value is "
-          "0.7848469. Fixing it at 1.0 is not currently possible.");
+      warning("Steepness is subject to a logit transformation, so its value is "
+              "0.7848469. Fixing it at 1.0 is not currently possible.");
     }
 
     BevHolt.log_rzero = this->log_rzero.value;
@@ -104,9 +103,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     fims::SRBevertonHolt<double> NLL;
 
     NLL.log_sigma_recruit = this->log_sigma_recruit.value;
-    NLL.recruit_deviations.resize(deviations.size());  // Vector from TMB
+    NLL.recruit_deviations.resize(deviations.size()); // Vector from TMB
     NLL.recruit_bias_adjustment.resize(
-        recruit_bias_adjustment.size());  // Vector from TMB
+        recruit_bias_adjustment.size()); // Vector from TMB
     for (int i = 0; i < deviations.size(); i++) {
       NLL.recruit_deviations[i] = deviations[i];
       NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
@@ -125,11 +124,11 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * object */
   virtual bool add_to_fims_tmb() {
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE> > b0 =
-        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE> >();
+    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE>> b0 =
+        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE>>();
 
     // set relative info
     b0->id = this->id;
@@ -175,11 +174,11 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     d0->recruitment_models[b0->id] = b0;
 
     // first-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> > b1 =
-        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> >();
+    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER>> b1 =
+        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER>>();
 
     // set relative info
     b1->id = this->id;
@@ -225,11 +224,11 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     d1->recruitment_models[b1->id] = b1;
 
     // second-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> > b2 =
-        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> >();
+    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER>> b2 =
+        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER>>();
 
     // set relative info
     b2->id = this->id;
@@ -275,11 +274,11 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     d2->recruitment_models[b2->id] = b2;
 
     // third-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> > b3 =
-        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> >();
+    std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER>> b3 =
+        std::make_shared<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER>>();
 
     // set relative info
     b3->id = this->id;

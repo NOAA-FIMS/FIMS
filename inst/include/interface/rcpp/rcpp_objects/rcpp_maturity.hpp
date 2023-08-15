@@ -21,10 +21,10 @@
  * define different Rcpp interfaces for each possible maturity function
  * */
 class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
   uint32_t id;          /**< id of the recruitment interface base */
-  static std::map<uint32_t, MaturityInterfaceBase*>
+  static std::map<uint32_t, MaturityInterfaceBase *>
       maturity_objects; /**< map associating the ids of
                               MaturityInterfaceBase to the objects */
 
@@ -48,7 +48,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 uint32_t MaturityInterfaceBase::id_g = 1;
-std::map<uint32_t, MaturityInterfaceBase*>
+std::map<uint32_t, MaturityInterfaceBase *>
     MaturityInterfaceBase::maturity_objects;
 
 /**
@@ -56,7 +56,7 @@ std::map<uint32_t, MaturityInterfaceBase*>
  * instantiate from R: logistic_maturity <- new(fims$logistic_maturity)
  */
 class LogisticMaturityInterface : public MaturityInterfaceBase {
- public:
+public:
   Parameter median; /**< the index value at which the response reaches .5 */
   Parameter slope;  /**< the width of the curve at the median */
 
@@ -82,11 +82,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
   virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> > lm0 =
-        std::make_shared<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> >();
+    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE>> lm0 =
+        std::make_shared<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE>>();
 
     // set relative info
     lm0->id = this->id;
@@ -110,11 +110,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     // add to Information
     d0->maturity_models[lm0->id] = lm0;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_FIRST_ORDER> > lm1 =
-        std::make_shared<fims::LogisticMaturity<TMB_FIMS_FIRST_ORDER> >();
+    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_FIRST_ORDER>> lm1 =
+        std::make_shared<fims::LogisticMaturity<TMB_FIMS_FIRST_ORDER>>();
 
     // set relative info
     lm1->id = this->id;
@@ -138,11 +138,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     // add to Information
     d1->maturity_models[lm1->id] = lm1;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_SECOND_ORDER> > lm2 =
-        std::make_shared<fims::LogisticMaturity<TMB_FIMS_SECOND_ORDER> >();
+    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_SECOND_ORDER>> lm2 =
+        std::make_shared<fims::LogisticMaturity<TMB_FIMS_SECOND_ORDER>>();
 
     // set relative info
     lm2->id = this->id;
@@ -166,11 +166,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     // add to Information
     d2->maturity_models[lm2->id] = lm2;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_THIRD_ORDER> > lm3 =
-        std::make_shared<fims::LogisticMaturity<TMB_FIMS_THIRD_ORDER> >();
+    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_THIRD_ORDER>> lm3 =
+        std::make_shared<fims::LogisticMaturity<TMB_FIMS_THIRD_ORDER>>();
 
     // set relative info
     lm3->id = this->id;

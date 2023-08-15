@@ -19,10 +19,10 @@
  * define different Rcpp interfaces for each possible Population function
  * */
 class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+public:
   static uint32_t id_g; /**< static id of the population interface base*/
   uint32_t id;          /**< id of the population interface base */
-  static std::map<uint32_t, PopulationInterfaceBase*>
+  static std::map<uint32_t, PopulationInterfaceBase *>
       live_objects; /**< map associating the ids of PopulationInterfaceBase to
                        the objects */
 
@@ -39,7 +39,7 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 uint32_t PopulationInterfaceBase::id_g = 1;
-std::map<uint32_t, PopulationInterfaceBase*>
+std::map<uint32_t, PopulationInterfaceBase *>
     PopulationInterfaceBase::live_objects;
 
 /**
@@ -48,7 +48,7 @@ std::map<uint32_t, PopulationInterfaceBase*>
  * population <- new(fims$population)
  */
 class PopulationInterface : public PopulationInterfaceBase {
- public:
+public:
   uint32_t nages;            /**< number of ages */
   uint32_t nfleets;          /**< number of fleets */
   uint32_t nseasons;         /**< number of seasons */
@@ -102,11 +102,11 @@ class PopulationInterface : public PopulationInterfaceBase {
    * object */
   virtual bool add_to_fims_tmb() {
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::Population<TMB_FIMS_REAL_TYPE> > b0 =
-        std::make_shared<fims::Population<TMB_FIMS_REAL_TYPE> >();
+    std::shared_ptr<fims::Population<TMB_FIMS_REAL_TYPE>> b0 =
+        std::make_shared<fims::Population<TMB_FIMS_REAL_TYPE>>();
 
     // set relative info
     b0->id = this->id;
@@ -146,11 +146,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     d0->populations[b0->id] = b0;
 
     // first-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Population<TMB_FIMS_FIRST_ORDER> > b1 =
-        std::make_shared<fims::Population<TMB_FIMS_FIRST_ORDER> >();
+    std::shared_ptr<fims::Population<TMB_FIMS_FIRST_ORDER>> b1 =
+        std::make_shared<fims::Population<TMB_FIMS_FIRST_ORDER>>();
 
     // set relative info
     b1->id = this->id;
@@ -186,11 +186,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     d1->populations[b1->id] = b1;
 
     // second-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Population<TMB_FIMS_SECOND_ORDER> > b2 =
-        std::make_shared<fims::Population<TMB_FIMS_SECOND_ORDER> >();
+    std::shared_ptr<fims::Population<TMB_FIMS_SECOND_ORDER>> b2 =
+        std::make_shared<fims::Population<TMB_FIMS_SECOND_ORDER>>();
 
     // set relative info
     b2->id = this->id;
@@ -227,11 +227,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     d2->populations[b2->id] = b2;
 
     // third-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Population<TMB_FIMS_THIRD_ORDER> > b3 =
-        std::make_shared<fims::Population<TMB_FIMS_THIRD_ORDER> >();
+    std::shared_ptr<fims::Population<TMB_FIMS_THIRD_ORDER>> b3 =
+        std::make_shared<fims::Population<TMB_FIMS_THIRD_ORDER>>();
 
     // set relative info
     b3->id = this->id;

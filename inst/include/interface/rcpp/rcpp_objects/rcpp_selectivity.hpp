@@ -20,10 +20,10 @@
  * define different Rcpp interfaces for each possible Selectivity function
  * */
 class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
   uint32_t id;          /**< id of the recruitment interface base */
-  static std::map<uint32_t, SelectivityInterfaceBase*>
+  static std::map<uint32_t, SelectivityInterfaceBase *>
       selectivity_objects; /**< map associating the ids of
                               SelectivityInterfaceBase to the objects */
 
@@ -47,7 +47,7 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 uint32_t SelectivityInterfaceBase::id_g = 1;
-std::map<uint32_t, SelectivityInterfaceBase*>
+std::map<uint32_t, SelectivityInterfaceBase *>
     SelectivityInterfaceBase::selectivity_objects;
 
 /**
@@ -55,7 +55,7 @@ std::map<uint32_t, SelectivityInterfaceBase*>
  * instantiate from R: logistic_selectivity <- new(fims$logistic_selectivity)
  */
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
- public:
+public:
   Parameter median; /**< the index value at which the response reaches .5 */
   Parameter slope;  /**< the width of the curve at the median */
 
@@ -81,11 +81,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
   virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> > ls0 =
-        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> >();
+    std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE>> ls0 =
+        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE>>();
 
     // set relative info
     ls0->id = this->id;
@@ -109,11 +109,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     // add to Information
     d0->selectivity_models[ls0->id] = ls0;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> > ls1 =
-        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> >();
+    std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER>> ls1 =
+        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER>>();
 
     // set relative info
     ls1->id = this->id;
@@ -137,11 +137,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     // add to Information
     d1->selectivity_models[ls1->id] = ls1;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> > ls2 =
-        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> >();
+    std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER>> ls2 =
+        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER>>();
 
     // set relative info
     ls2->id = this->id;
@@ -165,11 +165,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     // add to Information
     d2->selectivity_models[ls2->id] = ls2;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> > ls3 =
-        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> >();
+    std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER>> ls3 =
+        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER>>();
 
     // set relative info
     ls3->id = this->id;
@@ -202,7 +202,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  * instantiate from R: logistic_selectivity <- new(fims$logistic_selectivity)
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
- public:
+public:
   Parameter median_asc; /**< the index value at which the response reaches .5 */
   Parameter slope_asc;  /**< the width of the curve at the median */
   Parameter
@@ -233,12 +233,11 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
   virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
         fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_REAL_TYPE> > ls0 =
-        std::make_shared<
-            fims::DoubleLogisticSelectivity<TMB_FIMS_REAL_TYPE> >();
+    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_REAL_TYPE>> ls0 =
+        std::make_shared<fims::DoubleLogisticSelectivity<TMB_FIMS_REAL_TYPE>>();
 
     // set relative info
     ls0->id = this->id;
@@ -278,12 +277,12 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     // add to Information
     d0->selectivity_models[ls0->id] = ls0;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
         fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_FIRST_ORDER> >
-        ls1 = std::make_shared<
-            fims::DoubleLogisticSelectivity<TMB_FIMS_FIRST_ORDER> >();
+    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_FIRST_ORDER>> ls1 =
+        std::make_shared<
+            fims::DoubleLogisticSelectivity<TMB_FIMS_FIRST_ORDER>>();
 
     // set relative info
     ls1->id = this->id;
@@ -323,12 +322,12 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     // add to Information
     d1->selectivity_models[ls1->id] = ls1;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
         fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_SECOND_ORDER> >
+    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_SECOND_ORDER>>
         ls2 = std::make_shared<
-            fims::DoubleLogisticSelectivity<TMB_FIMS_SECOND_ORDER> >();
+            fims::DoubleLogisticSelectivity<TMB_FIMS_SECOND_ORDER>>();
 
     // set relative info
     ls2->id = this->id;
@@ -369,12 +368,12 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     // add to Information
     d2->selectivity_models[ls2->id] = ls2;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
         fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_THIRD_ORDER> >
-        ls3 = std::make_shared<
-            fims::DoubleLogisticSelectivity<TMB_FIMS_THIRD_ORDER> >();
+    std::shared_ptr<fims::DoubleLogisticSelectivity<TMB_FIMS_THIRD_ORDER>> ls3 =
+        std::make_shared<
+            fims::DoubleLogisticSelectivity<TMB_FIMS_THIRD_ORDER>>();
 
     // set relative info
     ls3->id = this->id;

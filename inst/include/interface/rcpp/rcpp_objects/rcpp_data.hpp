@@ -18,11 +18,11 @@
  *
  */
 class DataInterface : public FIMSRcppInterfaceBase {
- public:
+public:
   Rcpp::NumericVector observed_data; /*!< The data */
   static uint32_t id_g; /**< static id of the DataInterface object */
   uint32_t id;          /**< local id of the DataInterface object */
-  static std::map<uint32_t, DataInterface*>
+  static std::map<uint32_t, DataInterface *>
       live_objects; /**< map associating the ids of DataInterface to
       the objects */
 
@@ -48,7 +48,7 @@ class DataInterface : public FIMSRcppInterfaceBase {
   virtual bool add_to_fims_tmb() { return true; };
 };
 uint32_t DataInterface::id_g = 1;
-std::map<uint32_t, DataInterface*> DataInterface::live_objects;
+std::map<uint32_t, DataInterface *> DataInterface::live_objects;
 
 /**
  * @brief Rcpp interface for age comp data as an S4 object. To instantiate
@@ -56,7 +56,7 @@ std::map<uint32_t, DataInterface*> DataInterface::live_objects;
  * acomp <- new(fims$AgeComp)
  */
 class AgeCompDataInterface : public DataInterface {
- public:
+public:
   int amax;                          /*!< first dimension of the data */
   int ymax;                          /*!< second dimension of the data */
   Rcpp::NumericVector age_comp_data; /*!<the age composition data*/
@@ -141,7 +141,7 @@ class AgeCompDataInterface : public DataInterface {
  * fleet <- new(fims$Index)
  */
 class IndexDataInterface : public DataInterface {
- public:
+public:
   int ymax;                       /*!< second dimension of the data */
   Rcpp::NumericVector index_data; /*!<the age composition data*/
 

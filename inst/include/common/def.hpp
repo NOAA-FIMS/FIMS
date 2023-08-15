@@ -32,17 +32,17 @@ namespace fims {
  */
 
 class fims_log {
- public:
+public:
   static std::map<std::string, std::ofstream>
       FIMS_LOGS; /**< Map Log of files */
   /**
    * Static getter for retrieving a specific log file.
    */
-  static std::ofstream& get(const std::string& l) {
+  static std::ofstream &get(const std::string &l) {
     typename std::map<std::string, std::ofstream>::iterator it;
     it = fims_log::FIMS_LOGS.find(l);
     if (it == fims_log::FIMS_LOGS.end()) {
-      std::ofstream& of = fims_log::FIMS_LOGS[l];
+      std::ofstream &of = fims_log::FIMS_LOGS[l];
       of.open(l.c_str());
     }
 
@@ -58,20 +58,19 @@ std::map<std::string, std::ofstream> fims_log::FIMS_LOGS;
  * @brief Default trait. These are "T" specific
  * traits that depend on modeling platform.
  */
-template <typename T>
-struct ModelTraits {
+template <typename T> struct ModelTraits {
   typedef double real_t;                           /**< The real type */
   typedef double variable_t;                       /**< The variable type */
   typedef typename std::vector<double> DataVector; /**< The data vector type */
   typedef typename std::vector<double> ParameterVector; /**< The variable vector
    type */
-  typedef typename std::vector<std::vector<double> > DataMatrix;     /**< The
-       data matrix type */
-  typedef typename std::vector<std::vector<double> > VariableMatrix; /**< The
-   variable matrix type */
+  typedef typename std::vector<std::vector<double>> DataMatrix;     /**< The
+      data matrix type */
+  typedef typename std::vector<std::vector<double>> VariableMatrix; /**< The
+  variable matrix type */
 };
 
 #endif
-}  // namespace fims
+} // namespace fims
 
 #endif /* TRAITS_HPP */

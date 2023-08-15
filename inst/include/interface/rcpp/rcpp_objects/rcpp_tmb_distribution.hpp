@@ -18,7 +18,7 @@
  *
  */
 class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+public:
   static uint32_t
       id_g;    /**< static id of the DistributionsInterfaceBase object */
   uint32_t id; /**< local id of the DistributionsInterfaceBase object */
@@ -59,7 +59,7 @@ std::map<uint32_t,
  *
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
- public:
+public:
   Parameter x;    /**< observed data */
   Parameter mean; /**< mean of x for the normal distribution **/
   Parameter sd;   /**< sd of x for the normal distribution **/
@@ -157,7 +157,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
  *
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
- public:
+public:
   Parameter x;       /*!< observation */
   Parameter meanlog; /*!< mean of the distribution of log(x) */
   Parameter sdlog;   /*!< standard deviation of the distribution of log(x) */
@@ -264,7 +264,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  */
 // template <typename T>
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
- public:
+public:
   Rcpp::NumericVector x; /*!< Vector of length K of integers */
   Rcpp::NumericVector p; /*!< Vector of length K, specifying the probability
    for the K classes (note, unlike in R these must sum to 1). */
@@ -287,8 +287,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     // Decale TMBVector in this scope
     typedef
         typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
-    dmultinom.x = TMBVector(x.size());  // Vector from TMB
-    dmultinom.p = TMBVector(p.size());  // Vector from TMB
+    dmultinom.x = TMBVector(x.size()); // Vector from TMB
+    dmultinom.p = TMBVector(p.size()); // Vector from TMB
     for (int i = 0; i < x.size(); i++) {
       dmultinom.x[i] = x[i];
       dmultinom.p[i] = p[i];

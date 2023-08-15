@@ -23,8 +23,7 @@ namespace fims {
  * @param steep Recruitment relative to unfished recruitment at
  * 20% of unfished spawning biomass. Should be a value between 0.2 and 1.0.
  */
-template <typename Type>
-struct SRBevertonHolt : public RecruitmentBase<Type> {
+template <typename Type> struct SRBevertonHolt : public RecruitmentBase<Type> {
   // Here we define the members that will be used in the Beverton Holt SR
   // function. These members are needed by Beverton Holt but will not be common
   // to all recruitment functions like spawners is below.
@@ -45,7 +44,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
    * @param spawners A measure of spawning output.
    * @param phi_0 Number of spawners per recruit of an unfished population
    */
-  virtual const Type evaluate(const Type& spawners, const Type& phi_0) {
+  virtual const Type evaluate(const Type &spawners, const Type &phi_0) {
     Type recruits;
     Type steep;
     Type steep_lo = 0.2;
@@ -63,6 +62,6 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   }
 };
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP */

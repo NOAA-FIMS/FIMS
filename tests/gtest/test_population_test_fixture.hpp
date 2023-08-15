@@ -10,7 +10,7 @@ namespace {
 class PopulationInitializeTestFixture : public testing::Test {
   // Make members protected and they can be accessed from
   // sub-classes.
- protected:
+protected:
   // Use SetUp function to prepare the objects for each test.
   // Use override in C++11 to make sure SetUp (e.g., not Setup with
   // a lowercase u) is spelled
@@ -43,7 +43,7 @@ class PopulationInitializeTestFixture : public testing::Test {
 };
 
 class PopulationPrepareTestFixture : public testing::Test {
- protected:
+protected:
   void SetUp() override {
     population.id_g = id_g;
     population.nyears = nyears;
@@ -165,4 +165,4 @@ class PopulationPrepareTestFixture : public testing::Test {
   int nages = 12;
   int nfleets = 2;
 };
-}  // namespace
+} // namespace

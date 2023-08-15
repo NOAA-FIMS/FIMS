@@ -21,8 +21,7 @@ namespace fims {
  *
  * @tparam Type The type of the fleet object.
  **/
-template <class Type>
-struct Fleet : public FIMSObject<Type> {
+template <class Type> struct Fleet : public FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
@@ -101,10 +100,10 @@ struct Fleet : public FIMSObject<Type> {
 
     catch_at_age.resize(nyears * nages);
     catch_weight_at_age.resize(nyears * nages);
-    catch_index.resize(nyears);  // assume index is for all ages.
+    catch_index.resize(nyears); // assume index is for all ages.
     age_composition.resize(nyears * nages);
     expected_catch.resize(nyears);
-    expected_index.resize(nyears);  // assume index is for all ages.
+    expected_index.resize(nyears); // assume index is for all ages.
     catch_numbers_at_age.resize(nyears * nages);
 
     log_Fmort.resize(nyears);
@@ -187,7 +186,7 @@ struct Fleet : public FIMSObject<Type> {
         for (size_t a = 0; a < this->nages; a++) {
           size_t index_ya = y * this->nages + a;
           expected_acomp[a] = this->catch_numbers_at_age[index_ya] /
-                              sum;  // probabilities for ages
+                              sum; // probabilities for ages
 
           observed_acomp[a] = this->observed_agecomp_data->at(y, a);
           fims_log::get("fleet.log")
@@ -233,9 +232,8 @@ struct Fleet : public FIMSObject<Type> {
 };
 
 // default id of the singleton fleet class
-template <class Type>
-uint32_t Fleet<Type>::id_g = 0;
+template <class Type> uint32_t Fleet<Type>::id_g = 0;
 
-}  // end namespace fims
+} // end namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

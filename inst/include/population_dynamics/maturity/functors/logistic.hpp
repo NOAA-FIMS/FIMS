@@ -19,8 +19,7 @@ namespace fims {
  *  @brief LogisticMaturity class that returns the logistic function value
  * from fims_math.
  */
-template <typename T>
-struct LogisticMaturity : public MaturityBase<T> {
+template <typename T> struct LogisticMaturity : public MaturityBase<T> {
   T median; /*!< 50% quantile of the value of the quantity of interest (x); e.g.
                age at which 50% of the fish are mature */
   T slope;  /*!<scalar multiplier of difference between quantity of interest
@@ -37,11 +36,11 @@ struct LogisticMaturity : public MaturityBase<T> {
    * @param x  The independent variable in the logistic function (e.g., age or
    * size at maturity).
    */
-  virtual const T evaluate(const T& x) {
+  virtual const T evaluate(const T &x) {
     return fims::logistic<T>(median, slope, x);
   }
 };
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP */

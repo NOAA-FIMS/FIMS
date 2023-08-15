@@ -32,8 +32,7 @@ directly?)
  * @brief Population class. Contains subpopulations
  * that are divided into generic partitions (eg. sex, area).
  */
-template <typename Type>
-struct Population : public FIMSObject<Type> {
+template <typename Type> struct Population : public FIMSObject<Type> {
   using ParameterVector =
       typename ModelTraits<Type>::ParameterVector; /*!< the vector of population
                                                       parameters*/
@@ -194,7 +193,7 @@ struct Population : public FIMSObject<Type> {
    * @param a age index
    */
   inline void CalculateInitialNumbersAA(
-      size_t index_ya, size_t a) {  // inline all function unless complicated
+      size_t index_ya, size_t a) { // inline all function unless complicated
     this->numbers_at_age[index_ya] = fims::exp(this->log_init_naa[a]);
   }
 
@@ -398,7 +397,7 @@ struct Population : public FIMSObject<Type> {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
       if (this->fleets[fleet_]->is_survey == false) {
         size_t index_yf = year * this->nfleets +
-                          fleet_;  // index by fleet and years to dimension fold
+                          fleet_; // index by fleet and years to dimension fold
         size_t index_ya = year * this->nages + age;
 
         FIMS_LOG << " fleet " << fleet_ << " year " << year << " age " << age
@@ -436,7 +435,7 @@ struct Population : public FIMSObject<Type> {
         index_ = this->fleets[fleet_]->q *
                  this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
                  this->numbers_at_age[index_ya] *
-                 growth->evaluate(ages[age]);  // this->weight_at_age[age];
+                 growth->evaluate(ages[age]); // this->weight_at_age[age];
       }
       fleets[fleet_]->expected_index[year] += index_;
       FIMS_LOG << " expected index in year  " << year << " is "
@@ -457,8 +456,8 @@ struct Population : public FIMSObject<Type> {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
       // make an intermediate value in order to set multiple members (of
       // current and fleet objects) to that value.
-      Type catch_;  // catch_ is used to avoid using the c++ keyword catch
-                    // Baranov Catch Equation
+      Type catch_; // catch_ is used to avoid using the c++ keyword catch
+                   // Baranov Catch Equation
       if (this->fleets[fleet_]->is_survey == false) {
         catch_ = (this->fleets[fleet_]->Fmort[year] *
                   this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
@@ -497,7 +496,7 @@ struct Population : public FIMSObject<Type> {
       FIMS_LOG << " weight " << this->growth->evaluate(ages[age]) << std::endl;
       this->fleets[fleet_]->catch_weight_at_age[index_ya] =
           this->fleets[fleet_]->catch_numbers_at_age[index_ya] *
-          this->growth->evaluate(ages[age]);  // this->weight_at_age[age];
+          this->growth->evaluate(ages[age]); // this->weight_at_age[age];
       FIMS_LOG << " catch_waa "
                << this->fleets[fleet_]->catch_weight_at_age[index_ya]
                << std::endl;
@@ -734,9 +733,8 @@ struct Population : public FIMSObject<Type> {
 #endif
   }
 };
-template <class Type>
-uint32_t Population<Type>::id_g = 0;
+template <class Type> uint32_t Population<Type>::id_g = 0;
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */

@@ -30,10 +30,7 @@ namespace fims {
  * integer.
  * @return the exponentiated value
  */
-template <class T>
-inline const T exp(const T &x) {
-  return std::exp(x);
-}
+template <class T> inline const T exp(const T &x) { return std::exp(x); }
 
 /**
  * @brief The natural log function (base e)
@@ -41,10 +38,7 @@ inline const T exp(const T &x) {
  * is an integer.
  * @return
  */
-template <class T>
-inline const T log(const T &x) {
-  return std::log(x);
-}
+template <class T> inline const T log(const T &x) { return std::log(x); }
 #endif
 
 #ifdef TMB_MODEL
@@ -58,16 +52,12 @@ inline const T log(const T &x) {
  * integer.
  * @return the exponentiated value
  */
-template <class T>
-inline const T exp(const T &x) {
+template <class T> inline const T exp(const T &x) {
   using ::exp;
   return exp(x);
 }
 
-template <>
-inline const double exp(const double &x) {
-  return std::exp(x);
-}
+template <> inline const double exp(const double &x) { return std::exp(x); }
 
 /**
  * @brief The natural log function (base e)
@@ -77,15 +67,9 @@ inline const double exp(const double &x) {
  * is an integer.
  * @return the log of the value
  */
-template <class T>
-inline const T log(const T &x) {
-  return log(x);
-}
+template <class T> inline const T log(const T &x) { return log(x); }
 
-template <>
-inline const double log(const double &x) {
-  return std::log(x);
-}
+template <> inline const double log(const double &x) { return std::log(x); }
 
 #endif
 
@@ -114,8 +98,7 @@ inline const T logistic(const T &median, const T &slope, const T &x) {
  * @return the parameter in real space
  *
  */
-template <class T>
-inline const T logit(const T &a, const T &b, const T &x) {
+template <class T> inline const T logit(const T &a, const T &b, const T &x) {
   return -fims::log(b - x) + fims::log(x - a);
 }
 
@@ -174,9 +157,8 @@ inline const T double_logistic(const T &median_asc, const T &slope_asc,
  * @param C default = 1e-5
  * @return
  */
-template <class T>
-const T ad_fabs(const T &x, T C = 1e-5) {
-  return sqrt((x * x) + C);  //, .5);
+template <class T> const T ad_fabs(const T &x, T C = 1e-5) {
+  return sqrt((x * x) + C); //, .5);
 }
 
 /**
@@ -215,6 +197,6 @@ inline const T ad_max(const T &a, const T &b, T C = 1e-5) {
   return (a + b + fims::ad_fabs(a - b, C)) * static_cast<T>(.5);
 }
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* FIMS_MATH_HPP */

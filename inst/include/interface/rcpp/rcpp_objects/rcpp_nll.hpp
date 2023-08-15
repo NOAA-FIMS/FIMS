@@ -18,10 +18,10 @@
  * function
  * */
 class NLLInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
   uint32_t id;          /**< id of the recruitment interface base */
-  static std::map<uint32_t, NLLInterfaceBase*> live_objects;
+  static std::map<uint32_t, NLLInterfaceBase *> live_objects;
   /**< map associating the ids of NLLInterfaceBase to the objects */
 
   NLLInterfaceBase() {
@@ -41,6 +41,6 @@ class NLLInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 uint32_t NLLInterfaceBase::id_g = 1;
-std::map<uint32_t, NLLInterfaceBase*> NLLInterfaceBase::live_objects;
+std::map<uint32_t, NLLInterfaceBase *> NLLInterfaceBase::live_objects;
 
 #endif

@@ -24,8 +24,7 @@ namespace fims {
  * @tparam T The type of the module_name functor.
  *
  */
-template <typename T>
-struct DistributionsBase : public FIMSObject<T> {
+template <typename T> struct DistributionsBase : public FIMSObject<T> {
   // id_g is the ID of the instance of the DistributionsBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -42,14 +41,13 @@ struct DistributionsBase : public FIMSObject<T> {
    * independent variable value.
    * @param do_log Boolean; if true, log densities are returned
    */
-  virtual const T evaluate(const bool& do_log) = 0;
+  virtual const T evaluate(const bool &do_log) = 0;
 };
 
 /** @brief Default id of the singleton distribution class
  */
-template <typename T>
-uint32_t DistributionsBase<T>::id_g = 0;
+template <typename T> uint32_t DistributionsBase<T>::id_g = 0;
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* DISTRIBUTIONS_BASE_HPP */
