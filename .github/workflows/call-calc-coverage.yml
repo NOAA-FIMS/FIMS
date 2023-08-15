@@ -5,12 +5,20 @@ name: call-calc_coverage
 on:
   workflow_dispatch:
   push:
-  #schedule:
-  #  # * is a special character in YAML so you have to quote this string
-  #  - cron:  '30 5 * * *'
-  #pull_request:
-  #  branches:
-  #    - main
+    branches:    
+      - main
+    paths-ignore:
+      - .devcontainer
+      - .github
+      - 'LICENSE'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - 'Rbuildignore'
+      - '.gitignore'
+      - 'man'
+  pull_request:
+    branches:
+      - main
 jobs:
   call-workflow:
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/calc-coverage.yml@main
