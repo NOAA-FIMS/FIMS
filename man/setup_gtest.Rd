@@ -16,3 +16,4 @@ integration test locally. Intended for developers.
 setup_gtest()
 }
 }
+\keyword{gtest_helper}
