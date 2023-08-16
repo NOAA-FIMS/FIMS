@@ -29,7 +29,7 @@ jobs:
         source: './inst/include ./src ./tests/gtest'
         extensions: 'hpp, cpp'
         clangFormatVersion: 13.0.0
-        style: Google
+        style: GNU
         inplace: True
     
     - name: Create Pull Request
