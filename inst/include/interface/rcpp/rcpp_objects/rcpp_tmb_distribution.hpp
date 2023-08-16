@@ -161,8 +161,6 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   Parameter x;       /*!< observation */
   Parameter meanlog; /*!< mean of the distribution of log(x) */
   Parameter sdlog;   /*!< standard deviation of the distribution of log(x) */
-  bool do_bias_correction; /*!< true if the lognormal should be bias corrected,
-                              default FALSE */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -185,7 +183,6 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     dlnorm.x = this->x.value;
     dlnorm.meanlog = this->meanlog.value;
     dlnorm.sdlog = this->sdlog.value;
-    dlnorm.do_bias_correction = this->do_bias_correction;
     return dlnorm.evaluate(do_log);
   }
 

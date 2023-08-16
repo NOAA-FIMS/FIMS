@@ -535,7 +535,7 @@ struct Population : public FIMSObject<Type> {
     /*
       Sets derived vectors to zero
       Performs parameters transformations
-      Sets recruitment deviations to mean 0, and then adds bias adjustment.
+      Sets recruitment deviations to mean 0.
      */
     Prepare();
     /*

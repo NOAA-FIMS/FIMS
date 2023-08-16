@@ -188,10 +188,6 @@ RCPP_MODULE(fims) {
       .field("estimate_deviations",
              &BevertonHoltRecruitmentInterface::estimate_deviations)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
-      .field("recruitment_bias_adj",
-             &BevertonHoltRecruitmentInterface::recruit_bias_adjustment)
-      .field("use_bias_correction",
-             &BevertonHoltRecruitmentInterface::use_bias_correction)
       .field("log_sigma_recruit",
              &BevertonHoltRecruitmentInterface::log_sigma_recruit)
       .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate)
@@ -293,9 +289,7 @@ RCPP_MODULE(fims) {
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
       .field("x", &DlnormDistributionsInterface::x)
       .field("meanlog", &DlnormDistributionsInterface::meanlog)
-      .field("sdlog", &DlnormDistributionsInterface::sdlog)
-      .field("do_bias_correction",
-             &DlnormDistributionsInterface::do_bias_correction);
+      .field("sdlog", &DlnormDistributionsInterface::sdlog);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
