@@ -66,7 +66,7 @@
         Vector temp;
         temp.resize(n);
         for(int i =0; i < n; i++){
-          nll_fleet_index.observed_index_data->set(i,y[i]);
+          nll_fleet_index.observed_index_data->at(i);
           temp[i] = nll_fleet_index.observed_index_data->at(i);
           nll = nll_fleet_index.evaluate();
         }
