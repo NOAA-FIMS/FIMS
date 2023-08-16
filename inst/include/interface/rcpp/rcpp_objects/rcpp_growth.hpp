@@ -20,31 +20,33 @@
  * called from R directly.
  *
  */
-class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+class GrowthInterfaceBase : public FIMSRcppInterfaceBase
+{
+public:
   static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
   uint32_t id;          /**< local id of the GrowthInterfaceBase object */
-  static std::map<uint32_t, GrowthInterfaceBase*> live_objects; /**<
-  map relating the ID of the GrowthInterfaceBase to the GrowthInterfaceBase
-  objects */
+  static std::map<uint32_t, GrowthInterfaceBase *> live_objects; /**<
+   map relating the ID of the GrowthInterfaceBase to the GrowthInterfaceBase
+   objects */
 
-  GrowthInterfaceBase() {
+  GrowthInterfaceBase ()
+  {
     this->id = GrowthInterfaceBase::id_g++;
     GrowthInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back (this);
   }
 
-  virtual ~GrowthInterfaceBase() {}
+  virtual ~GrowthInterfaceBase () {}
 
   /** @brief get_id method for child growth interface objects to inherit **/
-  virtual uint32_t get_id() = 0;
+  virtual uint32_t get_id () = 0;
 
   /** @brief evaluate method for child growth interface objects to inherit **/
-  virtual double evaluate(double age) = 0;
+  virtual double evaluate (double age) = 0;
 };
 
 uint32_t GrowthInterfaceBase::id_g = 1;
-std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
+std::map<uint32_t, GrowthInterfaceBase *> GrowthInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for EWAAgrowth as an S4 object. To instantiate
@@ -52,8 +54,9 @@ std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
  * ewaa <- new(fims$EWAAgrowth)
  *
  */
-class EWAAGrowthInterface : public GrowthInterfaceBase {
- public:
+class EWAAGrowthInterface : public GrowthInterfaceBase
+{
+public:
   std::vector<double> weights;   /**< weights for each age class */
   std::vector<double> ages;      /**< ages for each age class */
   std::map<double, double> ewaa; /**< map of ewaa values */
@@ -61,12 +64,16 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   bool initialized = false; /**< boolean tracking if weights and ages
   vectors have been set */
 
-  EWAAGrowthInterface() : GrowthInterfaceBase() {}
+  EWAAGrowthInterface () : GrowthInterfaceBase () {}
 
-  virtual ~EWAAGrowthInterface() {}
+  virtual ~EWAAGrowthInterface () {}
 
   /** @brief get the id of the GrowthInterfaceBase object */
-  virtual uint32_t get_id() { return this->id; }
+  virtual uint32_t
+  get_id ()
+  {
+    return this->id;
+  }
 
   /**
    * @brief Create a map of input numeric vectors
@@ -75,12 +82,14 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @return std::map<T, T>
    *
    * */
-  inline std::map<double, double> make_map(std::vector<double> ages,
-                                           std::vector<double> weights) {
+  inline std::map<double, double>
+  make_map (std::vector<double> ages, std::vector<double> weights)
+  {
     std::map<double, double> mymap;
-    for (uint32_t i = 0; i < ages.size(); i++) {
-      mymap.insert(std::pair<double, double>(ages[i], weights[i]));
-    }
+    for (uint32_t i = 0; i < ages.size (); i++)
+      {
+        mymap.insert (std::pair<double, double> (ages[i], weights[i]));
+      }
     return mymap;
   }
 
@@ -88,76 +97,85 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * you can call from R using
    * ewaagrowth.evaluate(age)
    * */
-  virtual double evaluate(double age) {
+  virtual double
+  evaluate (double age)
+  {
     fims::EWAAgrowth<double> EWAAGrowth;
 
-    if (initialized == false) {
-      this->ewaa = make_map(this->ages, this->weights);
-      // Check that ages and weights vector are the same length
-      if (this->ages.size() != this->weights.size()) {
-        Rcpp::stop("ages and weights must be the same length");
+    if (initialized == false)
+      {
+        this->ewaa = make_map (this->ages, this->weights);
+        // Check that ages and weights vector are the same length
+        if (this->ages.size () != this->weights.size ())
+          {
+            Rcpp::stop ("ages and weights must be the same length");
+          }
+        initialized = true;
       }
-      initialized = true;
-    } else {
-      Rcpp::stop("this empirical weight at age object is already initialized");
-    }
+    else
+      {
+        Rcpp::stop (
+            "this empirical weight at age object is already initialized");
+      }
     EWAAGrowth.ewaa = this->ewaa;
-    return EWAAGrowth.evaluate(age);
+    return EWAAGrowth.evaluate (age);
   }
 
   /** @brief this adds the values to the TMB model object */
-  virtual bool add_to_fims_tmb() {
+  virtual bool
+  add_to_fims_tmb ()
+  {
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0
+        = fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance ();
 
-    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_REAL_TYPE> > b0 =
-        std::make_shared<fims::EWAAgrowth<TMB_FIMS_REAL_TYPE> >();
+    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_REAL_TYPE> > b0
+        = std::make_shared<fims::EWAAgrowth<TMB_FIMS_REAL_TYPE> > ();
 
     // set relative info
     b0->id = this->id;
-    b0->ewaa = make_map(this->ages, this->weights);  // this->ewaa;
+    b0->ewaa = make_map (this->ages, this->weights); // this->ewaa;
     // add to Information
     d0->growth_models[b0->id] = b0;
 
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1
+        = fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance ();
 
-    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> > b1 =
-        std::make_shared<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> >();
+    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> > b1
+        = std::make_shared<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> > ();
 
     // set relative info
     b1->id = this->id;
-    b1->ewaa = make_map(this->ages, this->weights);  // this->ewaa;
+    b1->ewaa = make_map (this->ages, this->weights); // this->ewaa;
 
     // add to Information
     d1->growth_models[b0->id] = b1;
 
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2
+        = fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance ();
 
-    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> > b2 =
-        std::make_shared<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> >();
+    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> > b2
+        = std::make_shared<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> > ();
 
     // set relative info
     b2->id = this->id;
-    b2->ewaa = make_map(this->ages, this->weights);  // this->ewaa;
+    b2->ewaa = make_map (this->ages, this->weights); // this->ewaa;
 
     // add to Information
     d2->growth_models[b2->id] = b2;
 
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3
+        = fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance ();
 
-    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> > b3 =
-        std::make_shared<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> >();
+    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> > b3
+        = std::make_shared<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> > ();
 
     // set relative info
     b3->id = this->id;
-    b3->ewaa = make_map(this->ages, this->weights);  // this->ewaa;
+    b3->ewaa = make_map (this->ages, this->weights); // this->ewaa;
 
     // add to Information
     d3->growth_models[b3->id] = b3;

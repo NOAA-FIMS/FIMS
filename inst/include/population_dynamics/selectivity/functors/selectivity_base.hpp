@@ -16,15 +16,16 @@
 
 #include "../../../common/model_object.hpp"
 
-namespace fims {
+namespace fims
+{
 
 /** @brief Base class for all selectivity functors.
  *
  * @tparam T The type of the selectivity functor.
  */
 
-template <typename T>
-struct SelectivityBase : public FIMSObject<T> {
+template <typename T> struct SelectivityBase : public FIMSObject<T>
+{
   // id_g is the ID of the instance of the SelectivityBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -34,25 +35,25 @@ struct SelectivityBase : public FIMSObject<T> {
 
   /** @brief Constructor.
    */
-  SelectivityBase() {
+  SelectivityBase ()
+  {
     // increment id of the singleton selectivity class
     this->id = SelectivityBase::id_g++;
   }
 
-  virtual ~SelectivityBase() {}
+  virtual ~SelectivityBase () {}
 
   /**
    * @brief Calculates the selectivity.
    * @param x The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
-  virtual const T evaluate(const T& x) = 0;
+  virtual const T evaluate (const T &x) = 0;
 };
 
 // default id of the singleton selectivity class
-template <typename T>
-uint32_t SelectivityBase<T>::id_g = 0;
+template <typename T> uint32_t SelectivityBase<T>::id_g = 0;
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP */

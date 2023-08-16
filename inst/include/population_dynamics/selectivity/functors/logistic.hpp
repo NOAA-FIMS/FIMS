@@ -14,22 +14,23 @@
 #include "../../../common/fims_math.hpp"
 #include "selectivity_base.hpp"
 
-namespace fims {
+namespace fims
+{
 
 /**
  *  @brief LogisticSelectivity class that returns the logistic function value
  * from fims_math.
  */
-template <typename T>
-struct LogisticSelectivity : public SelectivityBase<T> {
-  T median; /*!< 50% quantile of the value of the quantity of interest (x); e.g.
-               age at which 50% of the fish are selected */
+template <typename T> struct LogisticSelectivity : public SelectivityBase<T>
+{
+  T median; /*!< 50% quantile of the value of the quantity of interest (x);
+               e.g. age at which 50% of the fish are selected */
   T slope;  /*!<scalar multiplier of difference between quantity of interest
                value (x) and median */
 
-  LogisticSelectivity() : SelectivityBase<T>() {}
+  LogisticSelectivity () : SelectivityBase<T> () {}
 
-  virtual ~LogisticSelectivity() {}
+  virtual ~LogisticSelectivity () {}
 
   /**
    * @brief Method of the logistic selectivity class that implements the
@@ -40,11 +41,13 @@ struct LogisticSelectivity : public SelectivityBase<T> {
    * @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
-  virtual const T evaluate(const T& x) {
-    return fims::logistic<T>(median, slope, x);
+  virtual const T
+  evaluate (const T &x)
+  {
+    return fims::logistic<T> (median, slope, x);
   }
 };
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP */

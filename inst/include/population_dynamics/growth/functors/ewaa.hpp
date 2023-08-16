@@ -14,13 +14,14 @@
 
 #include "growth_base.hpp"
 
-namespace fims {
+namespace fims
+{
 
 /**
  *  @brief EWAAgrowth class that returns the EWAA function value.
  */
-template <typename T>
-struct EWAAgrowth : public GrowthBase<T> {
+template <typename T> struct EWAAgrowth : public GrowthBase<T>
+{
   // add submodule class members here
   // these include parameters of the submodule
   // a map looks up values based on a reference key
@@ -29,19 +30,21 @@ struct EWAAgrowth : public GrowthBase<T> {
   std::map<double, double> ewaa; /*!<map of doubles for EWAA values by age,
           where age starts at zero > */
 
-  EWAAgrowth() : GrowthBase<T>() {}
+  EWAAgrowth () : GrowthBase<T> () {}
 
-  virtual ~EWAAgrowth() {}
+  virtual ~EWAAgrowth () {}
 
   /**
    * @brief Returns the weight at age a (in kg) from the input vector.
    *
    * @param a  age of the fish, the age vector must start at zero
    */
-  virtual const T evaluate(const double& a) {
+  virtual const T
+  evaluate (const double &a)
+  {
     T ret = ewaa[a];
     return ret;
   }
 };
-}  // namespace fims
+} // namespace fims
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */

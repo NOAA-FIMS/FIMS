@@ -18,14 +18,16 @@
  * fleet <- new(fims$Fleet)
  *
  */
-class FleetInterface : public FIMSRcppInterfaceBase {
-  int agecomp_likelihood_id = -999;    /*!< id of agecomp likelihood component*/
-  int index_likelihood_id = -999;      /*!< id of index likelihood component*/
-  int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
-  int observed_index_data_id = -999;   /*!< id of observed index data object*/
-  int selectivity_id = -999;           /*!< id of selectivity component*/
+class FleetInterface : public FIMSRcppInterfaceBase
+{
+  int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
+  int index_likelihood_id = -999;   /*!< id of index likelihood component*/
+  int observed_agecomp_data_id
+      = -999;                        /*!< id of observed agecomp data object*/
+  int observed_index_data_id = -999; /*!< id of observed index data object*/
+  int selectivity_id = -999;         /*!< id of selectivity component*/
 
- public:
+public:
   bool is_survey = false; /*!< whether this is a survey fleet */
   int nages;              /*!< number of ages in the fleet data*/
   int nyears;             /*!< number of years in the fleet data */
@@ -38,23 +40,26 @@ class FleetInterface : public FIMSRcppInterfaceBase {
   bool random_F = false;   /*!< whether F should be a random effect*/
   Parameter log_obs_error; /*!< the log of the observation error */
 
- public:
+public:
   static uint32_t id_g; /**< static id of the FleetInterface object */
   uint32_t id;          /**< local id of the FleetInterface object */
 
-  FleetInterface() {
+  FleetInterface ()
+  {
     this->id = FleetInterface::id_g++;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back (this);
   }
 
-  virtual ~FleetInterface() {}
+  virtual ~FleetInterface () {}
 
   /**
    * @brief Set the unique id for the Age Comp Likelihood object
    *
    * @param agecomp_likelihood_id Unique id for the Age Comp Likelihood object
    */
-  void SetAgeCompLikelihood(int agecomp_likelihood_id) {
+  void
+  SetAgeCompLikelihood (int agecomp_likelihood_id)
+  {
     this->agecomp_likelihood_id = agecomp_likelihood_id;
   }
 
@@ -63,7 +68,9 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    *
    * @param index_likelihood_id Unique id for the Index Likelihood object
    */
-  void SetIndexLikelihood(int index_likelihood_id) {
+  void
+  SetIndexLikelihood (int index_likelihood_id)
+  {
     this->index_likelihood_id = index_likelihood_id;
   }
 
@@ -73,7 +80,9 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
    * object
    */
-  void SetObservedAgeCompData(int observed_agecomp_data_id) {
+  void
+  SetObservedAgeCompData (int observed_agecomp_data_id)
+  {
     this->observed_agecomp_data_id = observed_agecomp_data_id;
   }
 
@@ -82,7 +91,9 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    *
    * @param observed_index_data_id Unique id for the Observed Index Data object
    */
-  void SetObservedIndexData(int observed_index_data_id) {
+  void
+  SetObservedIndexData (int observed_index_data_id)
+  {
     this->observed_index_data_id = observed_index_data_id;
   }
 
@@ -91,18 +102,22 @@ class FleetInterface : public FIMSRcppInterfaceBase {
    *
    * @param selectivity_id Unique id for the Selectivity object
    */
-  void SetSelectivity(int selectivity_id) {
+  void
+  SetSelectivity (int selectivity_id)
+  {
     this->selectivity_id = selectivity_id;
   }
 
   /** @brief this adds the values to the TMB model object */
-  virtual bool add_to_fims_tmb() {
+  virtual bool
+  add_to_fims_tmb ()
+  {
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0
+        = fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance ();
 
-    std::shared_ptr<fims::Fleet<TMB_FIMS_REAL_TYPE>> f0 =
-        std::make_shared<fims::Fleet<TMB_FIMS_REAL_TYPE>>();
+    std::shared_ptr<fims::Fleet<TMB_FIMS_REAL_TYPE> > f0
+        = std::make_shared<fims::Fleet<TMB_FIMS_REAL_TYPE> > ();
 
     // set relative info
     f0->id = this->id;
@@ -116,39 +131,49 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f0->selectivity_id = this->selectivity_id;
 
     f0->log_obs_error = this->log_obs_error.value;
-    if (this->log_obs_error.estimated) {
-      d0->RegisterParameter(f0->log_obs_error);
-    }
+    if (this->log_obs_error.estimated)
+      {
+        d0->RegisterParameter (f0->log_obs_error);
+      }
     f0->log_q = this->log_q;
-    if (this->estimate_q) {
-      if (this->random_q) {
-        d0->RegisterRandomEffect(f0->log_q);
-      } else {
-        d0->RegisterParameter(f0->log_q);
+    if (this->estimate_q)
+      {
+        if (this->random_q)
+          {
+            d0->RegisterRandomEffect (f0->log_q);
+          }
+        else
+          {
+            d0->RegisterParameter (f0->log_q);
+          }
       }
-    }
 
-    f0->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_Fmort.size(); i++) {
-      f0->log_Fmort[i] = this->log_Fmort[i];
+    f0->log_Fmort.resize (this->log_Fmort.size ());
+    for (int i = 0; i < log_Fmort.size (); i++)
+      {
+        f0->log_Fmort[i] = this->log_Fmort[i];
 
-      if (this->estimate_F) {
-        if (this->random_F) {
-          d0->RegisterRandomEffect(f0->log_Fmort[i]);
-        } else {
-          d0->RegisterParameter(f0->log_Fmort[i]);
-        }
+        if (this->estimate_F)
+          {
+            if (this->random_F)
+              {
+                d0->RegisterRandomEffect (f0->log_Fmort[i]);
+              }
+            else
+              {
+                d0->RegisterParameter (f0->log_Fmort[i]);
+              }
+          }
       }
-    }
     // add to Information
     d0->fleets[f0->id] = f0;
 
     // 1st derivative model
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1
+        = fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance ();
 
-    std::shared_ptr<fims::Fleet<TMB_FIMS_FIRST_ORDER>> f1 =
-        std::make_shared<fims::Fleet<TMB_FIMS_FIRST_ORDER>>();
+    std::shared_ptr<fims::Fleet<TMB_FIMS_FIRST_ORDER> > f1
+        = std::make_shared<fims::Fleet<TMB_FIMS_FIRST_ORDER> > ();
 
     f1->id = this->id;
     f1->is_survey = this->is_survey;
@@ -159,41 +184,51 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f1->observed_index_data_id = this->observed_index_data_id;
     f1->log_obs_error = this->log_obs_error.value;
-    if (this->log_obs_error.estimated) {
-      d1->RegisterParameter(f1->log_obs_error);
-    }
+    if (this->log_obs_error.estimated)
+      {
+        d1->RegisterParameter (f1->log_obs_error);
+      }
     f1->selectivity_id = this->selectivity_id;
 
     f1->log_q = this->log_q;
-    if (this->estimate_q) {
-      if (this->random_q) {
-        d1->RegisterRandomEffect(f1->log_q);
-      } else {
-        d1->RegisterParameter(f1->log_q);
+    if (this->estimate_q)
+      {
+        if (this->random_q)
+          {
+            d1->RegisterRandomEffect (f1->log_q);
+          }
+        else
+          {
+            d1->RegisterParameter (f1->log_q);
+          }
       }
-    }
 
-    f1->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_Fmort.size(); i++) {
-      f1->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_F) {
-        if (this->random_F) {
-          d1->RegisterRandomEffect(f1->log_Fmort[i]);
-        } else {
-          d1->RegisterParameter(f1->log_Fmort[i]);
-        }
+    f1->log_Fmort.resize (this->log_Fmort.size ());
+    for (int i = 0; i < log_Fmort.size (); i++)
+      {
+        f1->log_Fmort[i] = this->log_Fmort[i];
+        if (this->estimate_F)
+          {
+            if (this->random_F)
+              {
+                d1->RegisterRandomEffect (f1->log_Fmort[i]);
+              }
+            else
+              {
+                d1->RegisterParameter (f1->log_Fmort[i]);
+              }
+          }
       }
-    }
 
     // add to Information
     d1->fleets[f1->id] = f1;
 
     // 2nd derivative model
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2
+        = fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance ();
 
-    std::shared_ptr<fims::Fleet<TMB_FIMS_SECOND_ORDER>> f2 =
-        std::make_shared<fims::Fleet<TMB_FIMS_SECOND_ORDER>>();
+    std::shared_ptr<fims::Fleet<TMB_FIMS_SECOND_ORDER> > f2
+        = std::make_shared<fims::Fleet<TMB_FIMS_SECOND_ORDER> > ();
 
     f2->id = this->id;
     f2->is_survey = this->is_survey;
@@ -204,40 +239,50 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f2->observed_index_data_id = this->observed_index_data_id;
     f2->log_obs_error = this->log_obs_error.value;
-    if (this->log_obs_error.estimated) {
-      d2->RegisterParameter(f2->log_obs_error);
-    }
+    if (this->log_obs_error.estimated)
+      {
+        d2->RegisterParameter (f2->log_obs_error);
+      }
     f2->selectivity_id = this->selectivity_id;
     f2->log_q = this->log_q;
-    if (this->estimate_q) {
-      if (this->random_q) {
-        d2->RegisterRandomEffect(f2->log_q);
-      } else {
-        d2->RegisterParameter(f2->log_q);
+    if (this->estimate_q)
+      {
+        if (this->random_q)
+          {
+            d2->RegisterRandomEffect (f2->log_q);
+          }
+        else
+          {
+            d2->RegisterParameter (f2->log_q);
+          }
       }
-    }
 
-    f2->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_Fmort.size(); i++) {
-      f2->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_F) {
-        if (this->random_F) {
-          d2->RegisterRandomEffect(f2->log_Fmort[i]);
-        } else {
-          d2->RegisterParameter(f2->log_Fmort[i]);
-        }
+    f2->log_Fmort.resize (this->log_Fmort.size ());
+    for (int i = 0; i < log_Fmort.size (); i++)
+      {
+        f2->log_Fmort[i] = this->log_Fmort[i];
+        if (this->estimate_F)
+          {
+            if (this->random_F)
+              {
+                d2->RegisterRandomEffect (f2->log_Fmort[i]);
+              }
+            else
+              {
+                d2->RegisterParameter (f2->log_Fmort[i]);
+              }
+          }
       }
-    }
 
     // add to Information
     d2->fleets[f2->id] = f2;
 
     // 3rd derivative model
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3
+        = fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance ();
 
-    std::shared_ptr<fims::Fleet<TMB_FIMS_THIRD_ORDER>> f3 =
-        std::make_shared<fims::Fleet<TMB_FIMS_THIRD_ORDER>>();
+    std::shared_ptr<fims::Fleet<TMB_FIMS_THIRD_ORDER> > f3
+        = std::make_shared<fims::Fleet<TMB_FIMS_THIRD_ORDER> > ();
 
     f3->id = this->id;
     f3->is_survey = this->is_survey;
@@ -249,29 +294,39 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f3->observed_index_data_id = this->observed_index_data_id;
     f3->selectivity_id = this->selectivity_id;
     f3->log_obs_error = this->log_obs_error.value;
-    if (this->log_obs_error.estimated) {
-      d3->RegisterParameter(f3->log_obs_error);
-    }
+    if (this->log_obs_error.estimated)
+      {
+        d3->RegisterParameter (f3->log_obs_error);
+      }
     f3->log_q = this->log_q;
-    if (this->estimate_q) {
-      if (this->random_q) {
-        d3->RegisterRandomEffect(f3->log_q);
-      } else {
-        d3->RegisterParameter(f3->log_q);
+    if (this->estimate_q)
+      {
+        if (this->random_q)
+          {
+            d3->RegisterRandomEffect (f3->log_q);
+          }
+        else
+          {
+            d3->RegisterParameter (f3->log_q);
+          }
       }
-    }
 
-    f3->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_Fmort.size(); i++) {
-      f3->log_Fmort[i] = this->log_Fmort[i];
-      if (this->estimate_F) {
-        if (this->random_F) {
-          d3->RegisterRandomEffect(f3->log_Fmort[i]);
-        } else {
-          d3->RegisterParameter(f3->log_Fmort[i]);
-        }
+    f3->log_Fmort.resize (this->log_Fmort.size ());
+    for (int i = 0; i < log_Fmort.size (); i++)
+      {
+        f3->log_Fmort[i] = this->log_Fmort[i];
+        if (this->estimate_F)
+          {
+            if (this->random_F)
+              {
+                d3->RegisterRandomEffect (f3->log_Fmort[i]);
+              }
+            else
+              {
+                d3->RegisterParameter (f3->log_Fmort[i]);
+              }
+          }
       }
-    }
 
     // add to Information
     d3->fleets[f3->id] = f3;
