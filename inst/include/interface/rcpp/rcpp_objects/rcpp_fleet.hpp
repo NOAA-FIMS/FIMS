@@ -98,11 +98,11 @@ class FleetInterface : public FIMSRcppInterfaceBase {
   /** @brief this adds the values to the TMB model object */
   virtual bool add_to_fims_tmb() {
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::Fleet<TMB_FIMS_REAL_TYPE>> f0 =
-        std::make_shared<fims::Fleet<TMB_FIMS_REAL_TYPE>>();
+    std::shared_ptr<fims_popdy::Fleet<TMB_FIMS_REAL_TYPE>> f0 =
+        std::make_shared<fims_popdy::Fleet<TMB_FIMS_REAL_TYPE>>();
 
     // set relative info
     f0->id = this->id;
@@ -144,11 +144,11 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     d0->fleets[f0->id] = f0;
 
     // 1st derivative model
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Fleet<TMB_FIMS_FIRST_ORDER>> f1 =
-        std::make_shared<fims::Fleet<TMB_FIMS_FIRST_ORDER>>();
+    std::shared_ptr<fims_popdy::Fleet<TMB_FIMS_FIRST_ORDER>> f1 =
+        std::make_shared<fims_popdy::Fleet<TMB_FIMS_FIRST_ORDER>>();
 
     f1->id = this->id;
     f1->is_survey = this->is_survey;
@@ -189,11 +189,11 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     d1->fleets[f1->id] = f1;
 
     // 2nd derivative model
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Fleet<TMB_FIMS_SECOND_ORDER>> f2 =
-        std::make_shared<fims::Fleet<TMB_FIMS_SECOND_ORDER>>();
+    std::shared_ptr<fims_popdy::Fleet<TMB_FIMS_SECOND_ORDER>> f2 =
+        std::make_shared<fims_popdy::Fleet<TMB_FIMS_SECOND_ORDER>>();
 
     f2->id = this->id;
     f2->is_survey = this->is_survey;
@@ -233,8 +233,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     d2->fleets[f2->id] = f2;
 
     // 3rd derivative model
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
     std::shared_ptr<fims::Fleet<TMB_FIMS_THIRD_ORDER>> f3 =
         std::make_shared<fims::Fleet<TMB_FIMS_THIRD_ORDER>>();

@@ -57,8 +57,8 @@
         fims::FleetIndexNLL<T> nll_fleet_index;
         nll_fleet_index.log_obs_error = logsd;
         
-        std::shared_ptr<fims::DataObject<T>> index_data =
-        std::make_shared<fims::DataObject<T>>(n);
+        std::shared_ptr<fims_data_object::DataObject<T>> index_data =
+        std::make_shared<fims_data_object::DataObject<T>>(n);
         nll_fleet_index.observed_index_data = index_data;
 
         nll_fleet_index.expected_index.resize(n);

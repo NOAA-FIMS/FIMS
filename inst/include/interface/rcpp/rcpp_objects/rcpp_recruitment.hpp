@@ -125,8 +125,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * object */
   virtual bool add_to_fims_tmb() {
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
     std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE> > b0 =
         std::make_shared<fims::SRBevertonHolt<TMB_FIMS_REAL_TYPE> >();
@@ -175,8 +175,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     d0->recruitment_models[b0->id] = b0;
 
     // first-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
     std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> > b1 =
         std::make_shared<fims::SRBevertonHolt<TMB_FIMS_FIRST_ORDER> >();
@@ -225,8 +225,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     d1->recruitment_models[b1->id] = b1;
 
     // second-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
     std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> > b2 =
         std::make_shared<fims::SRBevertonHolt<TMB_FIMS_SECOND_ORDER> >();
@@ -275,8 +275,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     d2->recruitment_models[b2->id] = b2;
 
     // third-order derivative
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
     std::shared_ptr<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> > b3 =
         std::make_shared<fims::SRBevertonHolt<TMB_FIMS_THIRD_ORDER> >();

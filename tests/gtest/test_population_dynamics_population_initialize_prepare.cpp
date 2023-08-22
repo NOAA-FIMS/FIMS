@@ -79,14 +79,14 @@ namespace
         std::vector<double> naa(nages, 0);
         for (int i = 0; i < nages; i++)
         {
-            naa[i] = fims::exp(population.log_init_naa[i]);
+            naa[i] = fims_math::exp(population.log_init_naa[i]);
         }
 
         // Test population.M
         std::vector<double> M(nyears * nages, 0);
         for (int i = 0; i < nyears * nages; i++)
         {
-            M[i] = fims::exp(population.log_M[i]);
+            M[i] = fims_math::exp(population.log_M[i]);
             EXPECT_EQ(population.M[i], M[i]);
         }
         EXPECT_EQ(population.M.size(), nyears * nages);
@@ -97,7 +97,7 @@ namespace
         for(size_t i = 0; i < nfleets; i++){
             for(size_t y = 0; y < nyears; y++){
                 size_t index_yf = y * population.nfleets + i;
-                Fmort[index_yf] = fims::exp(population.fleets[i]->log_Fmort[y]);
+                Fmort[index_yf] = fims_math::exp(population.fleets[i]->log_Fmort[y]);
                 EXPECT_EQ(population.fleets[i]->Fmort[y], Fmort[index_yf]);
             }
             EXPECT_EQ(population.fleets[i]->Fmort.size(), nyears);

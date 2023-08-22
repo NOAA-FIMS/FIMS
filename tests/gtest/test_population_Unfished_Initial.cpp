@@ -28,7 +28,7 @@ namespace
                 
 
                 std::vector<double> mortality_Z(nyears * nages, 0);
-                mortality_Z[index_ya] = fims::exp(population.log_M[index_ya]) +
+                mortality_Z[index_ya] = fims_math::exp(population.log_M[index_ya]) +
                                         mortality_F[index_ya];
                 EXPECT_EQ(population.mortality_Z[index_ya], mortality_Z[index_ya]);
                     }
@@ -50,7 +50,7 @@ namespace
 
                 population.CalculateInitialNumbersAA(index_ya, age);
 
-                numbers_at_age[index_ya] = fims::exp(population.log_init_naa[age]);
+                numbers_at_age[index_ya] = fims_math::exp(population.log_init_naa[age]);
                 EXPECT_EQ(population.numbers_at_age[index_ya], numbers_at_age[index_ya]);
             }
         }
@@ -69,8 +69,8 @@ namespace
  
                 if (age == 0)
                 {            
-                    population.unfished_numbers_at_age[index_ya] = fims::exp(population.recruitment->log_rzero);
-                    test_unfished_numbers_at_age[index_ya] = fims::exp(population.recruitment->log_rzero);
+                    population.unfished_numbers_at_age[index_ya] = fims_math::exp(population.recruitment->log_rzero);
+                    test_unfished_numbers_at_age[index_ya] = fims_math::exp(population.recruitment->log_rzero);
                 }
 
                 if (year == 0 && age > 0){
@@ -85,7 +85,7 @@ namespace
                     // true values from test
                     test_unfished_numbers_at_age[index_ya] = 
                         test_unfished_numbers_at_age[index_ya-1] * 
-                        fims::exp(-fims::exp(population.log_M[index_ya-1]));
+                        fims_math::exp(-fims_math::exp(population.log_M[index_ya-1]));
 
                 }
 
@@ -99,10 +99,10 @@ namespace
                     // Test fails if log_M from test fixture is not constant over years and ages.
                     population.CalculateUnfishedNumbersAA(index_ya, index_ya2, age);
                     // true values from test
-                    // unfished_numbers_at_age[index_ya] = unfished_numbers_at_age[index_ya-1] * fims::exp(-fims::exp(population.log_M[index_ya-1]));
+                    // unfished_numbers_at_age[index_ya] = unfished_numbers_at_age[index_ya-1] * fims_math::exp(-fims_math::exp(population.log_M[index_ya-1]));
                     test_unfished_numbers_at_age[index_ya] = 
                         test_unfished_numbers_at_age[index_ya2] * 
-                        fims::exp(-fims::exp(population.log_M[index_ya2]));
+                        fims_math::exp(-fims_math::exp(population.log_M[index_ya2]));
                 }
 
                 if(age==(population.nages-1)){
@@ -115,7 +115,7 @@ namespace
                         test_unfished_numbers_at_age[index_ya] = 
                         test_unfished_numbers_at_age[index_ya] +
                         test_unfished_numbers_at_age[index_ya2 + 1] *
-                        fims::exp(-fims::exp(population.log_M[index_ya2 + 1]));
+                        fims_math::exp(-fims_math::exp(population.log_M[index_ya2 + 1]));
 
                 }
 

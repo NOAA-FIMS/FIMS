@@ -22,7 +22,7 @@
 #include "def.hpp"
 #include "model_object.hpp"
 
-namespace fims {
+namespace fims_info {
 
 /**
  * @brief Stores FIMS model information and creates model. Contains all objects
@@ -44,10 +44,10 @@ class Information {
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
 
   // data objects
-  std::map<uint32_t, std::shared_ptr<fims::DataObject<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<T> > >
       data_objects; /*!< map that holds data objects >*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims::DataObject<T> > >::iterator
+                            std::shared_ptr<fims_data_object::DataObject<T> > >::iterator
       data_iterator; /**< iterator for the data objects */
 
   // life history modules
@@ -69,11 +69,11 @@ class Information {
           selectivity_models_iterator;
   /**< iterator for selectivity objects>*/
 
-  std::map<uint32_t, std::shared_ptr<fims::GrowthBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::GrowthBase<T> > >
       growth_models; /*!<hash map to link each object to its shared location in
                         memory*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims::GrowthBase<T> > >::iterator
+                            std::shared_ptr<fims_popdy::GrowthBase<T> > >::iterator
       growth_models_iterator;
   /**< iterator for growth objects>*/
 
@@ -86,11 +86,11 @@ class Information {
   /**< iterator for maturity objects>*/
 
   // fleet modules
-  std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<T> > >
       fleets; /*!<hash map to link each object to its shared location in
                  memory*/
   typedef
-      typename std::map<uint32_t, std::shared_ptr<fims::Fleet<T> > >::iterator
+      typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<T> > >::iterator
           fleet_iterator;
   /**< iterator for fleet objects>*/
 
@@ -125,7 +125,7 @@ class Information {
   static std::shared_ptr<Information<T> > GetInstance() {
     if (Information<T>::fims_information == nullptr) {
       Information<T>::fims_information =
-          std::make_shared<fims::Information<T> >();
+          std::make_shared<fims_info::Information<T> >();
     }
     return Information<T>::fims_information;
   }
@@ -161,7 +161,7 @@ class Information {
     for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
          ++it) {
       // Initialize fleet object
-      std::shared_ptr<fims::Fleet<T> > f = (*it).second;
+      std::shared_ptr<fims_popdy::Fleet<T> > f = (*it).second;
 
       f->Initialize(f->nyears, f->nages);
 
@@ -296,7 +296,7 @@ class Information {
       for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
            ++it) {
         // Initialize fleet object
-        std::shared_ptr<fims::Fleet<T> > f = (*it).second;
+        std::shared_ptr<fims_popdy::Fleet<T> > f = (*it).second;
         // population to the individual fleets This is to pass catch at age
         // from population to fleets?
         // any shared member in p (population is pushed into fleets)
@@ -443,6 +443,6 @@ template <typename T>
 std::shared_ptr<Information<T> > Information<T>::fims_information =
     nullptr;  // singleton instance
 
-}  // namespace fims
+}  // namespace fims_info
 
 #endif /* FIMS_COMMON_INFORMATION_HPP */

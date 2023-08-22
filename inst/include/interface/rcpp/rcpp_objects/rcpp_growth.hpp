@@ -89,7 +89,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * ewaagrowth.evaluate(age)
    * */
   virtual double evaluate(double age) {
-    fims::EWAAgrowth<double> EWAAGrowth;
+    fims_popdy::EWAAgrowth<double> EWAAGrowth;
 
     if (initialized == false) {
       this->ewaa = make_map(this->ages, this->weights);
@@ -108,11 +108,11 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   /** @brief this adds the values to the TMB model object */
   virtual bool add_to_fims_tmb() {
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_REAL_TYPE> > b0 =
-        std::make_shared<fims::EWAAgrowth<TMB_FIMS_REAL_TYPE> >();
+    std::shared_ptr<fims_popdy::EWAAgrowth<TMB_FIMS_REAL_TYPE> > b0 =
+        std::make_shared<fims_popdy::EWAAgrowth<TMB_FIMS_REAL_TYPE> >();
 
     // set relative info
     b0->id = this->id;
@@ -121,11 +121,11 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     d0->growth_models[b0->id] = b0;
 
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> > b1 =
-        std::make_shared<fims::EWAAgrowth<TMB_FIMS_FIRST_ORDER> >();
+    std::shared_ptr<fims_popdy::EWAAgrowth<TMB_FIMS_FIRST_ORDER> > b1 =
+        std::make_shared<fims_popdy::EWAAgrowth<TMB_FIMS_FIRST_ORDER> >();
 
     // set relative info
     b1->id = this->id;
@@ -135,11 +135,11 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     d1->growth_models[b0->id] = b1;
 
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> > b2 =
-        std::make_shared<fims::EWAAgrowth<TMB_FIMS_SECOND_ORDER> >();
+    std::shared_ptr<fims_popdy::EWAAgrowth<TMB_FIMS_SECOND_ORDER> > b2 =
+        std::make_shared<fims_popdy::EWAAgrowth<TMB_FIMS_SECOND_ORDER> >();
 
     // set relative info
     b2->id = this->id;
@@ -149,11 +149,11 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     d2->growth_models[b2->id] = b2;
 
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> > b3 =
-        std::make_shared<fims::EWAAgrowth<TMB_FIMS_THIRD_ORDER> >();
+    std::shared_ptr<fims_popdy::EWAAgrowth<TMB_FIMS_THIRD_ORDER> > b3 =
+        std::make_shared<fims_popdy::EWAAgrowth<TMB_FIMS_THIRD_ORDER> >();
 
     // set relative info
     b3->id = this->id;

@@ -14,7 +14,7 @@
 
 #include "growth_base.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /**
  *  @brief EWAAgrowth class that returns the EWAA function value.

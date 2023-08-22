@@ -41,7 +41,7 @@ struct LogisticSelectivity : public SelectivityBase<T> {
    * size in selectivity).
    */
   virtual const T evaluate(const T& x) {
-    return fims::logistic<T>(median, slope, x);
+    return fims_math::logistic<T>(median, slope, x);
   }
 };
 

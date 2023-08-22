@@ -10,7 +10,7 @@ Type objective_function<Type>::operator()(){
    * create pointer, inst, that points to singleton class of Model in test_dmultinom_distribution.hpp
    * getinstance is defined in test_dmultinom_distribution.hpp
    */ 
-  fims::Model<Type>* inst = fims::Model<Type>::getInstance();
+  fims_model::Model<Type>* inst = fims_model::Model<Type>::getInstance();
 
   DATA_VECTOR(x);
   PARAMETER_VECTOR(p);

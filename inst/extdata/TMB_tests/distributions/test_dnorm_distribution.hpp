@@ -51,7 +51,7 @@
         T nll = 0;
         int i;
         int n = y.size();
-        fims::Dnorm<T> nll_dnorm;
+        fims_distributions::Dnorm<T> nll_dnorm;
         nll_dnorm.mean = mean;
         nll_dnorm.sd = sd;
         for(i =0; i < n; i++){

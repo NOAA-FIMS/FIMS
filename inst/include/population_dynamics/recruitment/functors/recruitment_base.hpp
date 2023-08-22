@@ -16,7 +16,7 @@
 
 #include <cmath>  // for using std::pow and M_PI
 
-#include "../../../common/fims_math.hpp"  // for using fims::log()
+#include "../../../common/fims_math.hpp"  // for using fims_math::log()
 #include "../../../common/model_object.hpp"
 #include "../../../distributions/distributions.hpp"
 
@@ -92,10 +92,10 @@ struct RecruitmentBase : public FIMSObject<Type> {
       return nll;
     } else {
 #ifdef TMB_MODEL
-      fims::Dnorm<Type> dnorm;
-      dnorm.sd = fims::exp(this->log_sigma_recruit);
+      fims_distributions::Dnorm<Type> dnorm;
+      dnorm.sd = fims_math::exp(this->log_sigma_recruit);
       for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
-        dnorm.x = fims::log(this->recruit_deviations[i]);
+        dnorm.x = fims_math::log(this->recruit_deviations[i]);
         dnorm.mean = 0.0;
         if (this->use_recruit_bias_adjustment) {
           dnorm.mean -= this->recruit_bias_adjustment[i];
@@ -149,8 +149,8 @@ struct RecruitmentBase : public FIMSObject<Type> {
         // In the future, this would be set by the user.
         this->recruit_bias_adjustment_fraction[i] = 1.0;
         this->recruit_bias_adjustment[i] =
-            0.5 * fims::exp(this->log_sigma_recruit) *
-            fims::exp(this->log_sigma_recruit) *
+            0.5 * fims_math::exp(this->log_sigma_recruit) *
+            fims_math::exp(this->log_sigma_recruit) *
             this->recruit_bias_adjustment_fraction[i];
       }
     }

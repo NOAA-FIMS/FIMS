@@ -82,17 +82,17 @@ class AgeCompDataInterface : public DataInterface {
    * @brief adds parameters to the model
    */
   virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data_0 =
-        std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax,
+    std::shared_ptr<fims_data_object::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data_0 =
+        std::make_shared<fims_data_object::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax,
                                                                this->amax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> age_comp_data_1 =
-        std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->ymax,
+    std::shared_ptr<fims_data_object::DataObject<TMB_FIMS_FIRST_ORDER>> age_comp_data_1 =
+        std::make_shared<fims_data_object::DataObject<TMB_FIMS_FIRST_ORDER>>(this->ymax,
                                                                  this->amax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_SECOND_ORDER>> age_comp_data_2 =
-        std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->ymax,
+    std::shared_ptr<fims_data_object::DataObject<TMB_FIMS_SECOND_ORDER>> age_comp_data_2 =
+        std::make_shared<fims_data_object::DataObject<TMB_FIMS_SECOND_ORDER>>(this->ymax,
                                                                   this->amax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_THIRD_ORDER>> age_comp_data_3 =
-        std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax,
+    std::shared_ptr<fims_data_object::DataObject<TMB_FIMS_THIRD_ORDER>> age_comp_data_3 =
+        std::make_shared<fims_data_object::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax,
                                                                  this->amax);
 
     age_comp_data_0->id = this->id;
@@ -113,21 +113,21 @@ class AgeCompDataInterface : public DataInterface {
       }
     }
 
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
     d0->data_objects[this->id] = age_comp_data_0;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
     d1->data_objects[this->id] = age_comp_data_1;
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
     d2->data_objects[this->id] = age_comp_data_2;
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
     d3->data_objects[this->id] = age_comp_data_3;
 
@@ -162,14 +162,14 @@ class IndexDataInterface : public DataInterface {
    *@brief function to add to TMB
    */
   virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> index_data_0 =
-        std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> index_data_1 =
-        std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->ymax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_SECOND_ORDER>> index_data_2 =
-        std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->ymax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_THIRD_ORDER>> index_data_3 =
-        std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax);
+    std::shared_ptr<fims_data_object::DataObject<TMB_FIMS_REAL_TYPE>> index_data_0 =
+        std::make_shared<fims_data_object::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax);
+    std::shared_ptr<fims_data_object::DataObject<TMB_FIMS_FIRST_ORDER>> index_data_1 =
+        std::make_shared<fims_data_object::DataObject<TMB_FIMS_FIRST_ORDER>>(this->ymax);
+    std::shared_ptr<fims_data_object::DataObject<TMB_FIMS_SECOND_ORDER>> index_data_2 =
+        std::make_shared<fims_data_object::DataObject<TMB_FIMS_SECOND_ORDER>>(this->ymax);
+    std::shared_ptr<fims_data_object::DataObject<TMB_FIMS_THIRD_ORDER>> index_data_3 =
+        std::make_shared<fims_data_object::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax);
     index_data_0->id = this->id;
 
     index_data_1->id = this->id;
@@ -185,21 +185,21 @@ class IndexDataInterface : public DataInterface {
       index_data_3->at(y) = this->index_data[y];
     }
 
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
     d0->data_objects[this->id] = index_data_0;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
     d1->data_objects[this->id] = index_data_1;
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
     d2->data_objects[this->id] = index_data_2;
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
     d3->data_objects[this->id] = index_data_3;
     return true;

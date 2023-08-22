@@ -21,7 +21,7 @@
 
 #include "information.hpp"
 
-namespace fims {
+namespace fims_model {
 
 /**
  * @brief Model class. FIMS objective function.
@@ -49,9 +49,9 @@ class Model {  // may need singleton
    */
   static std::shared_ptr<Model<T> > GetInstance() {
     if (Model<T>::fims_model == nullptr) {
-      Model<T>::fims_model = std::make_shared<fims::Model<T> >();
+      Model<T>::fims_model = std::make_shared<fims_model::Model<T> >();
       Model<T>::fims_model->fims_information =
-          fims::Information<T>::GetInstance();
+          fims_info::Information<T>::GetInstance();
     }
     return Model<T>::fims_model;
   }
@@ -67,7 +67,7 @@ class Model {  // may need singleton
     T index_nll = 0.0;     // survey and fishery cacth nll
     // Loop over populations, evaluate, and sum up the recruitment likelihood
     // component
-    typename fims::Information<T>::population_iterator it;
+    typename fims_info::Information<T>::population_iterator it;
     for (it = this->fims_information->populations.begin();
          it != this->fims_information->populations.end(); ++it) {
       //(*it).second points to the Population module
@@ -86,7 +86,7 @@ class Model {  // may need singleton
       FIMS_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
-    typename fims::Information<T>::fleet_iterator jt;
+    typename fims_info::Information<T>::fleet_iterator jt;
     for (jt = this->fims_information->fleets.begin();
          jt != this->fims_information->fleets.end(); ++jt) {
 #ifdef TMB_MODEL
@@ -115,6 +115,6 @@ class Model {  // may need singleton
 template <typename T>
 std::shared_ptr<Model<T> > Model<T>::fims_model =
     nullptr;  // singleton instance
-}  // namespace fims
+}  // namespace fims_model
 
 #endif /* FIMS_COMMON_MODEL_HPP */

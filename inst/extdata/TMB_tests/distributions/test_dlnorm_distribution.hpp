@@ -51,7 +51,7 @@
         T nll = 0;
         int i;
         int n = logy.size();
-        fims::Dlnorm<T> nll_dlnorm;
+        fims_distributions::Dlnorm<T> nll_dlnorm;
         nll_dlnorm.meanlog = meanlog;
         nll_dlnorm.sdlog = sdlog;
         for(i =0; i < n; i++){

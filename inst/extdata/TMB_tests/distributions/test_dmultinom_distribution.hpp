@@ -48,7 +48,7 @@
       T evaluate(){
 
         T nll = 0;
-        fims::Dmultinom<T> nll_dmultinom;
+        fims_distributions::Dmultinom<T> nll_dmultinom;
         nll_dmultinom.x = x;
         nll_dmultinom.p = p;
         nll -= nll_dmultinom.evaluate(true);

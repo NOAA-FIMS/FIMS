@@ -17,7 +17,7 @@
 #include "../../common/model_object.hpp"
 #include "../../interface/interface.hpp"
 
-namespace fims {
+namespace fims_distributions {
 
 /** @brief Base class for all module_name functors.
  *
@@ -50,6 +50,6 @@ struct DistributionsBase : public FIMSObject<T> {
 template <typename T>
 uint32_t DistributionsBase<T>::id_g = 0;
 
-}  // namespace fims
+}  // namespace fims_distributions
 
 #endif /* DISTRIBUTIONS_BASE_HPP */

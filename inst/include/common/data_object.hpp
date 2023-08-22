@@ -37,13 +37,13 @@
 
 #include "model_object.hpp"
 
-namespace fims {
+namespace fims_data_object {
 
 /**
  * Container to hold user supplied data.
  */
 template <typename Type>
-struct DataObject : public fims::FIMSObject<Type> {
+struct DataObject : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g;   /*!< id of the Data Object >*/
   std::vector<Type> data; /*!< vector of the data >*/
   size_t dimensions;      /*!< dimension of the Data object >*/
@@ -226,6 +226,6 @@ struct DataObject : public fims::FIMSObject<Type> {
 template <typename Type>
 uint32_t DataObject<Type>::id_g = 0;
 
-}  // namespace fims
+}  // namespace fims_data_object
 
 #endif

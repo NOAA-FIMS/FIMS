@@ -78,7 +78,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return log pdf
    */
   virtual double evaluate(bool do_log) {
-    fims::Dnorm<double> dnorm;
+    fims_distributions::Dnorm<double> dnorm;
     dnorm.x = this->x.value;
     dnorm.mean = this->mean.value;
     dnorm.sd = this->sd.value;
@@ -89,11 +89,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief adds the dnorm distribution and its parameters to the TMB model
    */
   virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::Dnorm<TMB_FIMS_REAL_TYPE>> model0 =
-        std::make_shared<fims::Dnorm<TMB_FIMS_REAL_TYPE>>();
+    std::shared_ptr<fims_distributions::Dnorm<TMB_FIMS_REAL_TYPE>> model0 =
+        std::make_shared<fims_distributions::Dnorm<TMB_FIMS_REAL_TYPE>>();
 
     // interface to data/parameter value
     model0->id = this->id;
@@ -104,11 +104,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     d0->distribution_models[model0->id] = model0;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Dnorm<TMB_FIMS_FIRST_ORDER>> model1 =
-        std::make_shared<fims::Dnorm<TMB_FIMS_FIRST_ORDER>>();
+    std::shared_ptr<fims_distributions::Dnorm<TMB_FIMS_FIRST_ORDER>> model1 =
+        std::make_shared<fims_distributions::Dnorm<TMB_FIMS_FIRST_ORDER>>();
 
     // interface to data/parameter first derivative
     model1->id = this->id;
@@ -118,11 +118,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     d1->distribution_models[model1->id] = model1;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Dnorm<TMB_FIMS_SECOND_ORDER>> model2 =
-        std::make_shared<fims::Dnorm<TMB_FIMS_SECOND_ORDER>>();
+    std::shared_ptr<fims_distributions::Dnorm<TMB_FIMS_SECOND_ORDER>> model2 =
+        std::make_shared<fims_distributions::Dnorm<TMB_FIMS_SECOND_ORDER>>();
 
     // interface to data/parameter second derivative
     model2->id = this->id;
@@ -132,11 +132,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     d2->distribution_models[model2->id] = model2;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Dnorm<TMB_FIMS_THIRD_ORDER>> model3 =
-        std::make_shared<fims::Dnorm<TMB_FIMS_THIRD_ORDER>>();
+    std::shared_ptr<fims_distributions::Dnorm<TMB_FIMS_THIRD_ORDER>> model3 =
+        std::make_shared<fims_distributions::Dnorm<TMB_FIMS_THIRD_ORDER>>();
 
     // interface to data/parameter third derivative
     model3->id = this->id;
@@ -181,7 +181,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return log pdf
    */
   virtual double evaluate(bool do_log) {
-    fims::Dlnorm<double> dlnorm;
+    fims_distributions::Dlnorm<double> dlnorm;
     dlnorm.x = this->x.value;
     dlnorm.meanlog = this->meanlog.value;
     dlnorm.sdlog = this->sdlog.value;
@@ -193,11 +193,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief adds the dlnorm distribution and its parameters to the TMB model
    */
   virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::Dlnorm<TMB_FIMS_REAL_TYPE>> model0 =
-        std::make_shared<fims::Dlnorm<TMB_FIMS_REAL_TYPE>>();
+    std::shared_ptr<fims_distributions::Dlnorm<TMB_FIMS_REAL_TYPE>> model0 =
+        std::make_shared<fims_distributions::Dlnorm<TMB_FIMS_REAL_TYPE>>();
 
     // set relative info
     model0->id = this->id;
@@ -208,11 +208,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     d0->distribution_models[model0->id] = model0;
 
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Dlnorm<TMB_FIMS_FIRST_ORDER>> model1 =
-        std::make_shared<fims::Dlnorm<TMB_FIMS_FIRST_ORDER>>();
+    std::shared_ptr<fims_distributions::Dlnorm<TMB_FIMS_FIRST_ORDER>> model1 =
+        std::make_shared<fims_distributions::Dlnorm<TMB_FIMS_FIRST_ORDER>>();
 
     // set relative info
     model1->id = this->id;
@@ -223,11 +223,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     d1->distribution_models[model1->id] = model1;
 
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Dlnorm<TMB_FIMS_SECOND_ORDER>> model2 =
-        std::make_shared<fims::Dlnorm<TMB_FIMS_SECOND_ORDER>>();
+    std::shared_ptr<fims_distributions::Dlnorm<TMB_FIMS_SECOND_ORDER>> model2 =
+        std::make_shared<fims_distributions::Dlnorm<TMB_FIMS_SECOND_ORDER>>();
 
     // set relative info
     model2->id = this->id;
@@ -238,11 +238,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     d2->distribution_models[model2->id] = model2;
 
     // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Dlnorm<TMB_FIMS_THIRD_ORDER>> model3 =
-        std::make_shared<fims::Dlnorm<TMB_FIMS_THIRD_ORDER>>();
+    std::shared_ptr<fims_distributions::Dlnorm<TMB_FIMS_THIRD_ORDER>> model3 =
+        std::make_shared<fims_distributions::Dlnorm<TMB_FIMS_THIRD_ORDER>>();
 
     // set relative info
     model3->id = this->id;
@@ -283,7 +283,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @return log pdf
    */
   virtual double evaluate(bool do_log) {
-    fims::Dmultinom<double> dmultinom;
+    fims_distributions::Dmultinom<double> dmultinom;
     // Decale TMBVector in this scope
     typedef
         typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
@@ -298,11 +298,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   virtual bool add_to_fims_tmb() {
     typedef typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector0;
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-    std::shared_ptr<fims::Dmultinom<TMB_FIMS_REAL_TYPE>> model0 =
-        std::make_shared<fims::Dmultinom<TMB_FIMS_REAL_TYPE>>();
+    std::shared_ptr<fims_distributions::Dmultinom<TMB_FIMS_REAL_TYPE>> model0 =
+        std::make_shared<fims_distributions::Dmultinom<TMB_FIMS_REAL_TYPE>>();
 
     model0->id = this->id;
     model0->x = Vector0(x.size());
@@ -317,11 +317,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     typedef
         typename fims::ModelTraits<TMB_FIMS_FIRST_ORDER>::EigenVector Vector1;
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Dmultinom<TMB_FIMS_FIRST_ORDER>> model1 =
-        std::make_shared<fims::Dmultinom<TMB_FIMS_FIRST_ORDER>>();
+    std::shared_ptr<fims_distributions<TMB_FIMS_FIRST_ORDER>> model1 =
+        std::make_shared<fims_distributions::Dmultinom<TMB_FIMS_FIRST_ORDER>>();
 
     model1->id = this->id;
     model1->x = Vector1(x.size());
@@ -336,11 +336,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     typedef
         typename fims::ModelTraits<TMB_FIMS_SECOND_ORDER>::EigenVector Vector2;
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Dmultinom<TMB_FIMS_SECOND_ORDER>> model2 =
-        std::make_shared<fims::Dmultinom<TMB_FIMS_SECOND_ORDER>>();
+    std::shared_ptr<fims_distributions<TMB_FIMS_SECOND_ORDER>> model2 =
+        std::make_shared<fims_distributions::Dmultinom<TMB_FIMS_SECOND_ORDER>>();
 
     model2->id = this->id;
     model2->x = Vector2(x.size());
@@ -355,11 +355,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     typedef
         typename fims::ModelTraits<TMB_FIMS_THIRD_ORDER>::EigenVector Vector3;
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
 
-    std::shared_ptr<fims::Dmultinom<TMB_FIMS_THIRD_ORDER>> model3 =
-        std::make_shared<fims::Dmultinom<TMB_FIMS_THIRD_ORDER>>();
+    std::shared_ptr<fims_distributions<TMB_FIMS_THIRD_ORDER>> model3 =
+        std::make_shared<fims_distributions::Dmultinom<TMB_FIMS_THIRD_ORDER>>();
 
     model3->id = this->id;
     model3->x = Vector3(x.size());

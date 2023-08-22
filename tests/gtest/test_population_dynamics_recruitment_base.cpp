@@ -36,7 +36,7 @@ namespace
   TEST(recruitment_bias_adjustment, PrepareBiasAdjustment_works)
   {
     fims::SRBevertonHolt<double> recruit;
-    recruit.log_sigma_recruit = fims::log(0.7);
+    recruit.log_sigma_recruit = fims_math::log(0.7);
 
     // Test if use_recruit_bias_adjustment = false works
     recruit.use_recruit_bias_adjustment = false;

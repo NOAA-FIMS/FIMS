@@ -13,7 +13,7 @@
 #include "../../../common/fims_math.hpp"
 #include "maturity_base.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /**
  *  @brief LogisticMaturity class that returns the logistic function value
@@ -38,7 +38,7 @@ struct LogisticMaturity : public MaturityBase<T> {
    * size at maturity).
    */
   virtual const T evaluate(const T& x) {
-    return fims::logistic<T>(median, slope, x);
+    return fims_math::logistic<T>(median, slope, x);
   }
 };
 

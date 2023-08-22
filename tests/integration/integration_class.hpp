@@ -153,8 +153,8 @@ public:
                 for (size_t i = 0; i < nfleets; i++) {
                     std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
                     f->Initialize(nyears, nages);
-                    f->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
-                    f->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
+                    f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
+                    f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
 
                     std::stringstream strs;
                     strs << "fleet" << i + 1;
@@ -297,8 +297,8 @@ public:
                     std::shared_ptr<fims::Fleet<double> > s = std::make_shared<fims::Fleet<double> >();
                     s->is_survey = true;
                     s->Initialize(nyears, nages);
-                    s->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
-                    s->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
+                    s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
+                    s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
 
                     std::stringstream strs;
                     strs << "survey" << i + 1;
@@ -382,14 +382,14 @@ public:
 
 
                     if ((*it).second.GetType() == JsonValueType::Object) {
-                        //                        f->log_q = fims::log((*it).second.GetDouble());
+                        //                        f->log_q = fims_math::log((*it).second.GetDouble());
                         JsonObject qobj = (*it).second.GetObject();
 
                         typename JsonObject::iterator qit = qobj.find("survey1");
 
                         if ((*qit).second.GetType() == JsonValueType::Array) {
                             JsonArray a = (*qit).second.GetArray();
-                            s->log_q = fims::log(a[0].GetDouble());
+                            s->log_q = fims_math::log(a[0].GetDouble());
                             if (this->print_statements) {
                                 std::cout << "q = " << a[0].GetDouble() << "\nlog(q) = " << s->log_q << "\n";
                             }
@@ -521,7 +521,7 @@ public:
             it = obj.find("h");
             if (it != obj.end()) {
                 if ((*it).second.GetType() == JsonValueType::Array) {
-                    rec->logit_steep = fims::logit(0.2, 1.0, (*it).second.GetArray()[0].GetDouble());
+                    rec->logit_steep = fims_math::logit(0.2, 1.0, (*it).second.GetArray()[0].GetDouble());
                     if (print_statements) {
                         std::cout << "'h' " << rec->logit_steep << " \n";
                     }
@@ -575,8 +575,8 @@ public:
             pop.recruitment = rec;
 
             // set maturity
-            std::shared_ptr<fims::LogisticMaturity<double> > mat =
-                    std::make_shared<fims::LogisticMaturity<double> >();
+            std::shared_ptr<fims_popdy::LogisticMaturity<double> > mat =
+                    std::make_shared<fims_popdy::LogisticMaturity<double> >();
 
             if (print_statements) {
                 std::cout << "\nMaturity:\n";
@@ -612,7 +612,7 @@ public:
             }
 
             // set empirical growth
-            std::shared_ptr<fims::EWAAgrowth<double> > growth = std::make_shared<fims::EWAAgrowth<double> >();
+            std::shared_ptr<fims_popdy::EWAAgrowth<double> > growth = std::make_shared<fims_popdy::EWAAgrowth<double> >();
             std::cout << "Growth:\n";
 
             it = obj.find("W.kg");

@@ -47,7 +47,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<T> {
    * age or size in selectivity).
    */
   virtual const T evaluate(const T &x) {
-    return fims::double_logistic<T>(median_asc, slope_asc, median_desc,
+    return fims_math::double_logistic<T>(median_asc, slope_asc, median_desc,
                                     slope_desc, x);
   }
 };

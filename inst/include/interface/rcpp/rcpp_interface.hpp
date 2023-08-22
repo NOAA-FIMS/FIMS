@@ -32,23 +32,23 @@ bool CreateTMBModel() {
   }
 
   // base model
-  std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-      fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
   d0->CreateModel();
 
   // first-order derivative
-  std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-      fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> d1 =
+      fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
   d1->CreateModel();
 
   // second-order derivative
-  std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-      fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> d2 =
+      fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
   d2->CreateModel();
 
   // third-order derivative
-  std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-      fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> d3 =
+      fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
   d3->CreateModel();
 
   return true;
@@ -56,8 +56,8 @@ bool CreateTMBModel() {
 
 Rcpp::NumericVector get_fixed_parameters_vector() {
   // base model
-  std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-      fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   Rcpp::NumericVector p;
 
@@ -70,8 +70,8 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
 
 Rcpp::NumericVector get_random_parameters_vector() {
   // base model
-  std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-      fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   Rcpp::NumericVector p;
 
@@ -84,8 +84,8 @@ Rcpp::NumericVector get_random_parameters_vector() {
 
 template <typename Type>
 void clear_internal() {
-  std::shared_ptr<fims::Information<Type>> d0 =
-      fims::Information<Type>::GetInstance();
+  std::shared_ptr<fims_info::Information<Type>> d0 =
+      fims_info::Information<Type>::GetInstance();
   d0->fixed_effects_parameters.clear();
   d0->random_effects_parameters.clear();
 }

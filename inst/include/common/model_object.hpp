@@ -16,7 +16,7 @@
 
 #include "def.hpp"
 
-namespace fims {
+namespace fims_model_object {
 
 /**
  * @brief FIMSObject struct that defines member types and returns the unique id
@@ -37,6 +37,6 @@ struct FIMSObject {
   uint32_t GetId() const { return id; }
 };
 
-}  // namespace fims
+}  // namespace fims_model_object
 
 #endif /* FIMS_COMMON_MODEL_OBJECT_HPP */

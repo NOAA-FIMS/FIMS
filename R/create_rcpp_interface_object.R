@@ -78,10 +78,10 @@ create_fims_rcpp_interface <- function(interface_name = character(),
 
   cat("  virtual bool add_to_fims_tmb(){\n")
   for (i in 1:4) {
-    cat(paste0("   std::shared_ptr<fims::Information<", types[i]))
+    cat(paste0("   std::shared_ptr<fims_info::Information<", types[i]))
     cat(paste("> >", itypes[i]))
     cat(" =\n")
-    cat("    fims::Information<")
+    cat("    fims_info::Information<")
     cat(types[i])
     cat(">::GetInstance();\n\n")
     cat("   std::shared_ptr<fims::")

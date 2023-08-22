@@ -58,8 +58,8 @@
         nll_fac.catch_numbers_at_age.resize(n);
         nll_fac.nyears = 1;
         nll_fac.nages = 10;
-        std::shared_ptr<fims::DataObject<T>> age_comp_data =
-        std::make_shared<fims::DataObject<T>>(10, 1);
+        std::shared_ptr<fims_data_object::DataObject<T>> age_comp_data =
+        std::make_shared<fims_data_object::DataObject<T>>(10, 1);
 
         nll_fac.observed_agecomp_data = age_comp_data;
         Vector obs;
