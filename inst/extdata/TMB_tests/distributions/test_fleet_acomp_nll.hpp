@@ -67,7 +67,7 @@
         obs.resize(n);
         p_set.resize(n);
         for(int i =0; i < n; i++){
-          nll_fac.observed_agecomp_data->set(0, i, x[i]);
+          nll_fac.observed_agecomp_data->at(0, i);
           nll_fac.catch_numbers_at_age[i] = p[i];
 
           obs[i] = nll_fac.observed_agecomp_data->at(0,i);
