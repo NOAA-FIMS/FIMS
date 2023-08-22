@@ -43,7 +43,7 @@ struct Fleet : public FIMSObject<Type> {
       agecomp_likelihood; /*!< agecomp likelihood component*/
 
   // selectivity
-  int selectivity_id = -999; /*!< id of selectivity component*/
+  int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
   std::shared_ptr<fims::SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
 

@@ -55,7 +55,7 @@ class FleetInterface : public FleetInterfaceBase {
   int index_likelihood_id = -999;      /*!< id of index likelihood component*/
   int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
   int observed_index_data_id = -999;   /*!< id of observed index data object*/
-  int selectivity_id = -999;           /*!< id of selectivity component*/
+  int interface_selectivity_id_m = -999;           /*!< id of selectivity component*/
 
  public:
   bool is_survey = false; /*!< whether this is a survey fleet */
@@ -120,7 +120,7 @@ class FleetInterface : public FleetInterfaceBase {
    * @param selectivity_id Unique id for the Selectivity object
    */
   void SetSelectivity(int selectivity_id) {
-    this->selectivity_id = selectivity_id;
+    interface_selectivity_id_m = selectivity_id;
   }
 
 #ifdef TMB_MODEL
@@ -141,8 +141,7 @@ class FleetInterface : public FleetInterfaceBase {
     fleet->index_likelihood_id = this->index_likelihood_id;
     fleet->observed_agecomp_data_id = this->observed_agecomp_data_id;
     fleet->observed_index_data_id = this->observed_index_data_id;
-    fleet->selectivity_id = this->selectivity_id;
-
+    fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
     fleet->log_obs_error = this->log_obs_error.value_m;
     if (this->log_obs_error.estimated_m) {
       info->RegisterParameter(fleet->log_obs_error);
