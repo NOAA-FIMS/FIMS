@@ -17,7 +17,7 @@
     
     
       virtual double evaluate(bool do_log) {
-        fims::Dnorm<double> object;
+        fims_distributions::Dnorm<double> object;
         object.x = this->x.value;
         object.mean = this->mean.value;
         object.sd = this->sd.value;
@@ -26,11 +26,11 @@
     
     
       virtual bool add_to_fims_tmb(){
-       std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+       std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
     
-       std::shared_ptr<fims::Dnorm<TMB_FIMS_REAL_TYPE> > model0 =
-       std::make_shared<fims::Dnorm<TMB_FIMS_REAL_TYPE> >();
+       std::shared_ptr<fims_distributions::Dnorm<TMB_FIMS_REAL_TYPE> > model0 =
+       std::make_shared<fims_distributions::Dnorm<TMB_FIMS_REAL_TYPE> >();
     
     
        model0->id = this->id;
@@ -61,11 +61,11 @@
        d0->distribution_models[model0->id]=model0;
     
     
-       std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+       std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
     
-       std::shared_ptr<fims::Dnorm<TMB_FIMS_FIRST_ORDER> > model1 =
-       std::make_shared<fims::Dnorm<TMB_FIMS_FIRST_ORDER> >();
+       std::shared_ptr<fims_distributions::Dnorm<TMB_FIMS_FIRST_ORDER> > model1 =
+       std::make_shared<fims_distributions::Dnorm<TMB_FIMS_FIRST_ORDER> >();
     
     
        model1->id = this->id;
@@ -96,11 +96,11 @@
        d1->distribution_models[model1->id]=model1;
     
     
-       std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+       std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
     
-       std::shared_ptr<fims::Dnorm<TMB_FIMS_SECOND_ORDER> > model2 =
-       std::make_shared<fims::Dnorm<TMB_FIMS_SECOND_ORDER> >();
+       std::shared_ptr<fims_distributions::Dnorm<TMB_FIMS_SECOND_ORDER> > model2 =
+       std::make_shared<fims_distributions::Dnorm<TMB_FIMS_SECOND_ORDER> >();
     
     
        model2->id = this->id;
@@ -131,11 +131,11 @@
        d2->distribution_models[model2->id]=model2;
     
     
-       std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+       std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
     
-       std::shared_ptr<fims::Dnorm<TMB_FIMS_THIRD_ORDER> > model3 =
-       std::make_shared<fims::Dnorm<TMB_FIMS_THIRD_ORDER> >();
+       std::shared_ptr<fims_distributions::Dnorm<TMB_FIMS_THIRD_ORDER> > model3 =
+       std::make_shared<fims_distributions::Dnorm<TMB_FIMS_THIRD_ORDER> >();
     
     
        model3->id = this->id;
@@ -201,8 +201,8 @@
     
     
       virtual bool add_to_fims_tmb(){
-       std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+       std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
     
        std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> > model0 =
        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> >();
@@ -228,8 +228,8 @@
        d0->selectivity_models[model0->id]=model0;
     
     
-       std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+       std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER> > d1 =
+        fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
     
        std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> > model1 =
        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> >();
@@ -255,8 +255,8 @@
        d1->selectivity_models[model1->id]=model1;
     
     
-       std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+       std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER> > d2 =
+        fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
     
        std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> > model2 =
        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> >();
@@ -282,8 +282,8 @@
        d2->selectivity_models[model2->id]=model2;
     
     
-       std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+       std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER> > d3 =
+        fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
     
        std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> > model3 =
        std::make_shared<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> >();

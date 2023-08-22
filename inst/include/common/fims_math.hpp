@@ -21,12 +21,12 @@
 
 #include "../interface/interface.hpp"
 
-namespace fims {
+namespace fims_math {
 #ifdef STD_LIB
 /**
  * @brief The exponential function.
  *
- * @param x value to exponentiate. Please use fims::exp<double>(x) if x is an
+ * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is an
  * integer.
  * @return the exponentiated value
  */
@@ -37,7 +37,7 @@ inline const T exp(const T &x) {
 
 /**
  * @brief The natural log function (base e)
- * @param x the value to take the log of. Please use fims::log<double>(x) if x
+ * @param x the value to take the log of. Please use fims_math::log<double>(x) if x
  * is an integer.
  * @return
  */
@@ -54,7 +54,7 @@ inline const T log(const T &x) {
  * @brief The exponential function.
  * The code cannot be tested using the compilation flag
  * -DTMB_MODEL through CMake and Google Test
- * @param x value to exponentiate. Please use fims::exp<double>(x) if x is an
+ * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is an
  * integer.
  * @return the exponentiated value
  */
@@ -73,7 +73,7 @@ inline const double exp(const double &x) {
  * @brief The natural log function (base e)
  * The code cannot be tested using the compilation flag
  * -DTMB_MODEL through CMake and Google Test.
- * @param x the value to take the log of. Please use fims::log<double>(x) if x
+ * @param x the value to take the log of. Please use fims_math::log<double>(x) if x
  * is an integer.
  * @return the log of the value
  */
@@ -116,7 +116,7 @@ inline const T logistic(const T &median, const T &slope, const T &x) {
  */
 template <class T>
 inline const T logit(const T &a, const T &b, const T &x) {
-  return -fims::log(b - x) + fims::log(x - a);
+  return -fims_math::log(b - x) + fims_math::log(x - a);
 }
 
 /**
@@ -131,7 +131,7 @@ inline const T logit(const T &a, const T &b, const T &x) {
  */
 template <class T>
 inline const T inv_logit(const T &a, const T &b, const T &logit_x) {
-  return a + (b - a) / (1 + fims::exp(-logit_x));
+  return a + (b - a) / (1 + fims_math::exp(-logit_x));
 }
 
 /**
@@ -183,8 +183,8 @@ const T ad_fabs(const T &x, T C = 1e-5) {
  *
  * Returns the minimum between a and b in a continuous manner using:
  *
- * (a + b - fims::ad_fabs(a - b))*.5;
- * Reference: \ref fims::ad_fabs()
+ * (a + b - fims_math::ad_fabs(a - b))*.5;
+ * Reference: \ref fims_math::ad_fabs()
  *
  * This is an approximation with minimal error.
  *
@@ -195,14 +195,14 @@ const T ad_fabs(const T &x, T C = 1e-5) {
  */
 template <typename T>
 inline const T ad_min(const T &a, const T &b, T C = 1e-5) {
-  return (a + b - fims::ad_fabs(a - b, C)) * .5;
+  return (a + b - fims_math::ad_fabs(a - b, C)) * .5;
 }
 
 /**
  * Returns the maximum between a and b in a continuous manner using:
  *
- * (a + b + fims::ad_fabs(a - b)) *.5;
- * Reference: \ref fims::ad_fabs()
+ * (a + b + fims_math::ad_fabs(a - b)) *.5;
+ * Reference: \ref fims_math::ad_fabs()
  * This is an approximation with minimal error.
  *
  * @param a
@@ -212,9 +212,9 @@ inline const T ad_min(const T &a, const T &b, T C = 1e-5) {
  */
 template <typename Type>
 inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
-  return (a + b + fims::ad_fabs(a - b, C)) * static_cast<Type>(.5);
+  return (a + b + fims_math::ad_fabs(a - b, C)) * static_cast<Type>(.5);
 }
 
-}  // namespace fims
+}  // namespace fims_math
 
 #endif /* FIMS_MATH_HPP */

@@ -13,7 +13,7 @@
 
 #include "distributions_base.hpp"
 
-namespace fims {
+namespace fims_distributions {
 
 /**
  * @brief Dnorm class returns the TMB dnorm function
@@ -102,7 +102,7 @@ struct Dlnorm : public DistributionsBase<T> {
     }
   }
 };
-}  // namespace fims
+}  // namespace fims_distributions
 
 #endif
 

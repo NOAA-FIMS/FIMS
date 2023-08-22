@@ -48,8 +48,8 @@ Type objective_function<Type>::operator()(){
     f->Initialize(nyears, nages);
     //f->nyears = nyears;
 
-    //f->observed_index_data = std::make_shared<fims::DataObject<Type> >(nyears);
-    //f->observed_agecomp_data = std::make_shared<fims::DataObject<Type> >(nyears, nages);
+    //f->observed_index_data = std::make_shared<fims_data_object::DataObject<Type> >(nyears);
+    //f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<Type> >(nyears, nages);
     /*
      * To run with data, need to change 45 and 46 to:
      *     for(int y=0; y < nyears; y++){
@@ -61,7 +61,7 @@ Type objective_function<Type>::operator()(){
      }
      }
      **Note: this code chunk doesn't compile with error: no match for 'operator[]'
-     **(operand types are 'std::shared_ptr<fims::DataObject<CppAD::AD<CppAD::AD<CppAD::AD<double> > > > >' and 'int')
+     **(operand types are 'std::shared_ptr<fims_data_object::DataObject<CppAD::AD<CppAD::AD<CppAD::AD<double> > > > >' and 'int')
      */
 
 
@@ -95,8 +95,8 @@ Type objective_function<Type>::operator()(){
 
 
 
-    //s->observed_index_data = std::make_shared<fims::DataObject<Type> >(nyears);
-    //s->observed_agecomp_data = std::make_shared<fims::DataObject<Type> >(nyears, nages);
+    //s->observed_index_data = std::make_shared<fims_data_object::DataObject<Type> >(nyears);
+    //s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<Type> >(nyears, nages);
 
     //set up selectivity
 
@@ -142,15 +142,15 @@ Type objective_function<Type>::operator()(){
   pop.recruitment = rec;
 
   //Set maturity
-  std::shared_ptr<fims::LogisticMaturity<Type > > mat =
-    std::make_shared<fims::LogisticMaturity<Type> >();
+  std::shared_ptr<fims_popdy::LogisticMaturity<Type > > mat =
+    std::make_shared<fims_popdy::LogisticMaturity<Type> >();
   mat->median = A50_mat;
   mat->slope = slope_mat;
   pop.maturity = mat;
 
   //set empirical growth
-  std::shared_ptr<fims::EWAAgrowth<Type> > growth
-    = std::make_shared<fims::EWAAgrowth<Type> > ();
+  std::shared_ptr<fims_popdy::EWAAgrowth<Type> > growth
+    = std::make_shared<fims_popdy::EWAAgrowth<Type> > ();
   for (int i = 0; i < nages; i++) {
     growth->ewaa[ asDouble(ages(i))] = asDouble(W_kg(i))/1000;
   }

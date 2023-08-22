@@ -75,7 +75,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * size in maturity).
    */
   virtual double evaluate(double x) {
-    fims::LogisticMaturity<double> LogisticMat;
+    fims_popdy::LogisticMaturity<double> LogisticMat;
     LogisticMat.median = this->median.value_m;
     LogisticMat.slope = this->slope.value_m;
     return LogisticMat.evaluate(x);
@@ -85,11 +85,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<Type> > info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::LogisticMaturity<Type> > maturity =
-        std::make_shared<fims::LogisticMaturity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticMaturity<Type> > maturity =
+        std::make_shared<fims_popdy::LogisticMaturity<Type> >();
 
     // set relative info
     maturity->id = this->id;

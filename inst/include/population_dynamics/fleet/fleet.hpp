@@ -15,7 +15,7 @@
 #include "../../distributions/distributions.hpp"
 #include "../selectivity/selectivity.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /** @brief Base class for all fleets.
  *
@@ -36,14 +36,14 @@ struct Fleet : public FIMSObject<Type> {
       -999; /*!<id of index likelihood component. The "fleet_" prefix indicates
                it belongs to the Fleet struct, and the "_m" postfix signifies
                that it's a member variable.*/
-  std::shared_ptr<fims::DistributionsBase<Type>>
+  std::shared_ptr<fims_distributions::DistributionsBase<Type>>
       index_likelihood; /*!< index likelihood component*/
 
   // This likelihood index is not currently being used as only one likelihood
   // distribution is available. These are for a future update M2+.
   int fleet_agecomp_likelihood_id_m =
       -999; /*!< id of agecomp likelihood component*/
-  std::shared_ptr<fims::DistributionsBase<Type>>
+  std::shared_ptr<fims_distributions::DistributionsBase<Type>>
       agecomp_likelihood; /*!< agecomp likelihood component*/
 
   // selectivity
@@ -52,11 +52,11 @@ struct Fleet : public FIMSObject<Type> {
       selectivity; /*!< selectivity component*/
 
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
-  std::shared_ptr<fims::DataObject<Type>>
+  std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_index_data; /*!< observed index data*/
 
   int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
-  std::shared_ptr<fims::DataObject<Type>>
+  std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_agecomp_data; /*!< observed agecomp data*/
 
   // Mortality and catchability
@@ -122,7 +122,7 @@ struct Fleet : public FIMSObject<Type> {
    */
   void Prepare() {
     // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
-    // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
+    // this -> Fmort[fleet_] = fims_math::exp(this -> log_Fmort[fleet_]);
 
     // derived quantities
     std::fill(catch_at_age.begin(), catch_at_age.end(),
@@ -138,18 +138,18 @@ struct Fleet : public FIMSObject<Type> {
               0); /*!<model expected catch at age*/
     std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
               0); /*!<model expected weight at age*/
-    this->q = fims::exp(this->log_q);
+    this->q = fims_math::exp(this->log_q);
     for (size_t year = 0; year < this->nyears; year++) {
       FIMS_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
       FIMS_LOG << "input q " << this->log_q << std::endl;
-      this->Fmort[year] = fims::exp(this->log_Fmort[year]);
+      this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
     }
   }
 
   virtual const Type evaluate_age_comp_nll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
 #ifdef TMB_MODEL
-    fims::Dmultinom<Type> dmultinom;
+    fims_distributions<Type> dmultinom;
     size_t dims = this->observed_agecomp_data->get_imax() *
                   this->observed_agecomp_data->get_jmax();
     if (dims != this->catch_numbers_at_age.size()) {
@@ -197,11 +197,11 @@ struct Fleet : public FIMSObject<Type> {
     Type nll = 0.0; /*!< The negative log likelihood value */
 
 #ifdef TMB_MODEL
-    fims::Dnorm<Type> dnorm;
-    dnorm.sd = fims::exp(this->log_obs_error);
+    fims_distributions::Dnorm<Type> dnorm;
+    dnorm.sd = fims_math::exp(this->log_obs_error);
     for (size_t i = 0; i < this->expected_index.size(); i++) {
-      dnorm.x = fims::log(this->observed_index_data->at(i));
-      dnorm.mean = fims::log(this->expected_index[i]);
+      dnorm.x = fims_math::log(this->observed_index_data->at(i));
+      dnorm.mean = fims_math::log(this->expected_index[i]);
       nll -= dnorm.evaluate(true);
       fims_log::get("fleet.log")
           << "observed likelihood component: " << i << " is "
@@ -220,6 +220,6 @@ struct Fleet : public FIMSObject<Type> {
 template <class Type>
 uint32_t Fleet<Type>::id_g = 0;
 
-}  // end namespace fims
+}  // end namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

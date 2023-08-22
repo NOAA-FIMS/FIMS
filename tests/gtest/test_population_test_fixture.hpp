@@ -57,14 +57,14 @@ class PopulationPrepareTestFixture : public testing::Test {
     std::default_random_engine generator(seed);
 
     // log_Fmort
-    double log_Fmort_min = fims::log(0.1);
-    double log_Fmort_max = fims::log(2.3);
+    double log_Fmort_min = fims_math::log(0.1);
+    double log_Fmort_max = fims_math::log(2.3);
     std::uniform_real_distribution<double> log_Fmort_distribution(
         log_Fmort_min, log_Fmort_max);
 
     // log_q
-    double log_q_min = fims::log(0.1);
-    double log_q_max = fims::log(1);
+    double log_q_min = fims_math::log(0.1);
+    double log_q_max = fims_math::log(1);
     std::uniform_real_distribution<double> log_q_distribution(log_q_min,
                                                               log_q_max);
 
@@ -110,8 +110,8 @@ class PopulationPrepareTestFixture : public testing::Test {
     }
 
     // log_M
-    double log_M_min = fims::log(0.1);
-    double log_M_max = fims::log(0.3);
+    double log_M_min = fims_math::log(0.1);
+    double log_M_max = fims_math::log(0.3);
     std::uniform_real_distribution<double> log_M_distribution(log_M_min,
                                                               log_M_max);
     for (int i = 0; i < nyears * nages; i++) {
@@ -119,8 +119,8 @@ class PopulationPrepareTestFixture : public testing::Test {
     }
 
     // numbers_at_age
-    double numbers_at_age_min = fims::exp(10.0);
-    double numbers_at_age_max = fims::exp(12.0);
+    double numbers_at_age_min = fims_math::exp(10.0);
+    double numbers_at_age_max = fims_math::exp(12.0);
     std::uniform_real_distribution<double> numbers_at_age_distribution(
         numbers_at_age_min, numbers_at_age_max);
     for (int i = 0; i < (nyears + 1) * nages; i++) {
@@ -131,8 +131,8 @@ class PopulationPrepareTestFixture : public testing::Test {
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
 
-    std::shared_ptr<fims::EWAAgrowth<double>> growth =
-        std::make_shared<fims::EWAAgrowth<double>>();
+    std::shared_ptr<fims_popdy::EWAAgrowth<double>> growth =
+        std::make_shared<fims_popdy::EWAAgrowth<double>>();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
     for (int i = 0; i < nages; i++) {
@@ -144,14 +144,14 @@ class PopulationPrepareTestFixture : public testing::Test {
 
     population.Prepare();
 
-    auto maturity = std::make_shared<fims::LogisticMaturity<double>>();
+    auto maturity = std::make_shared<fims_popdy::LogisticMaturity<double>>();
     maturity->median = 6;
     maturity->slope = 0.15;
     population.maturity = maturity;
 
     auto recruitment = std::make_shared<fims::SRBevertonHolt<double>>();
-    recruitment->logit_steep = fims::logit(0.2, 1.0, 0.75);
-    recruitment->log_rzero = fims::log(1000000.0);
+    recruitment->logit_steep = fims_math::logit(0.2, 1.0, 0.75);
+    recruitment->log_rzero = fims_math::log(1000000.0);
     recruitment->recruit_deviations.resize(nyears);
     population.recruitment = recruitment;
   }

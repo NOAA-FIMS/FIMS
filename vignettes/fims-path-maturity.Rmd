@@ -220,14 +220,14 @@ struct ModelTraits {
 Each Rcpp interface object includes an `add_to_fims_tmb()` function. There are two shared pointers set up within this function, one to link each Rcpp interface object (e.g., LogisticMaturityInterface) to the `Information` class in the `fims` namespace defined in [information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) in the directory [inst/include/common](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/common) and one to link to the matching class in the `fims` namespace. In our maturity example, this would be the `LogisticMaturity` class in the `fims` namespace defined in [logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) in the directory [inst/include/population_dynamics/maturity/functors](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors).
 
 
-Within the rcpp_maturity.hpp file, we can link to the `fims::Information` class in order to register maturity parameters and specify whether or not they are random effects. We do this by setting up two pointers in the interface: d0 which points to information, and lm0, which points to the logistic maturity module. 
+Within the rcpp_maturity.hpp file, we can link to the `fims_info::Information` class in order to register maturity parameters and specify whether or not they are random effects. We do this by setting up two pointers in the interface: d0 which points to information, and lm0, which points to the logistic maturity module. 
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 //file: rcpp_maturity.hpp
 
-//d0 is a shared pointer that points to fims::Information
-std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+//d0 is a shared pointer that points to fims_info::Information
+std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > d0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
  if (this->median.estimated) {
       if (this->median.is_random_effect) {
         /*
@@ -248,13 +248,13 @@ std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
 ```
 
 
-Linking to the `fims::LogisticMaturity` class allows us to link the values input from R with the values used in model calculation:
+Linking to the `fims_popdy::LogisticMaturity` class allows us to link the values input from R with the values used in model calculation:
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 //file: rcpp_maturity.hpp
 
-//lm0 is a shared pointer that points to fims::LogisticMaturity
-std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> > lm0 =
-        std::make_shared<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> >();
+//lm0 is a shared pointer that points to fims_popdy::LogisticMaturity
+std::shared_ptr<fims_popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> > lm0 =
+        std::make_shared<fims_popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> >();
  
 /*
  the median value from LogisticMaturity (lm0->median)
@@ -263,14 +263,14 @@ std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> > lm0 =
 lm0->median = this->median.value;
 ```
 
-We can also link these two pointers together so that the **fims::Information** class links up with the **fims::LogisticMaturity**, but more details on this later.
+We can also link these two pointers together so that the **fims_info::Information** class links up with the **fims_popdy::LogisticMaturity**, but more details on this later.
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 //file: rcpp_maturity.hpp
 
 /*
  the maturity_models pointer from Information that matches the 
- id of the fims::LogisticMaturity class is equal to the pointer 
- to fims::LogisticMaturity 
+ id of the fims_popdy::LogisticMaturity class is equal to the pointer 
+ to fims_popdy::LogisticMaturity 
  */
 d0->maturity_models[lm0->id] = lm0;
 ```
@@ -284,7 +284,7 @@ knitr::include_graphics("figures/fims-path-maturity-2.png")
 ```
 
 
-## Inside the `fims::LogisticMaturity` class
+## Inside the `fims_popdy::LogisticMaturity` class
 
 The `LogisticMaturity` class in the `fims` namespace defined in [logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) in the directory [inst/include/population_dynamics/maturity/functors](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors) has an `evaluate` method (i.e., function) that takes an input, *x* and returns the output from a logistic function (defined in [fims_math.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp) in the directory [inst/include/common](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common)) using the class member `median` and `slope` values.  
 
@@ -312,7 +312,7 @@ struct LogisticMaturity : public MaturityBase<T> {
    * size at maturity).
    */
   virtual const T evaluate(const T& x) {
-    return fims::logistic<T>(median, slope, x);
+    return fims_math::logistic<T>(median, slope, x);
   }
 };
 
@@ -440,7 +440,7 @@ Here, we are setting the maturity_models pointer in `Information` to equal the `
 
 /*
  the maturity_models pointer from Information that matches the id of the 
- fims::LogisticMaturity class is equal to the pointer to fims::LogisticMaturity 
+ fims_popdy::LogisticMaturity class is equal to the pointer to fims_popdy::LogisticMaturity 
  */
 d0->maturity_models[lm0->id] = lm0;
 ```

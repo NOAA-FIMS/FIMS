@@ -98,7 +98,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
   /** @brief evaluate the population function */
   virtual void evaluate() {
-    fims::Population<double> population;
+    fims_popdy::Population<double> population;
     return population.Evaluate();
   }
 
@@ -106,11 +106,11 @@ class PopulationInterface : public PopulationInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<Type> > info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::Population<Type> > population =
-        std::make_shared<fims::Population<Type> >();
+    std::shared_ptr<fims_popdy::Population<Type> > population =
+        std::make_shared<fims_popdy::Population<Type> >();
 
     // set relative info
     population->id = this->id;

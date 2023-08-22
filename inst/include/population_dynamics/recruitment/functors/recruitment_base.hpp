@@ -16,7 +16,7 @@
 
 #include <cmath>  // for using std::pow and M_PI
 
-#include "../../../common/fims_math.hpp"  // for using fims::log()
+#include "../../../common/fims_math.hpp"  // for using fims_math::log()
 #include "../../../common/model_object.hpp"
 #include "../../../distributions/distributions.hpp"
 
@@ -76,10 +76,10 @@ struct RecruitmentBase : public FIMSObject<Type> {
       return nll;
     } else {
 #ifdef TMB_MODEL
-      fims::Dnorm<Type> dnorm;
-      dnorm.sd = fims::exp(this->log_sigma_recruit);
+      fims_distributions::Dnorm<Type> dnorm;
+      dnorm.sd = fims_math::exp(this->log_sigma_recruit);
       for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
-        dnorm.x = fims::log(this->recruit_deviations[i]);
+        dnorm.x = fims_math::log(this->recruit_deviations[i]);
         dnorm.mean = 0.0;
         nll -= dnorm.evaluate(true);
       }
