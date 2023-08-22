@@ -39,8 +39,8 @@ class Parameter {
    * @brief Constructor for initializing Parameter.
    * @details Inputs include value, min, max, estimated.
    */
-  Parameter(double value, double min, double max, bool estimated)
-      : value(value), min(min), max(max), estimated(estimated) {}
+  Parameter(double value_m, double min_m, double max_m, bool estimated_m)
+      : value(value_m), min(min_m), max(max_m), estimated(estimated_m) {}
 
   /**
    * @brief Constructor for initializing Parameter.
