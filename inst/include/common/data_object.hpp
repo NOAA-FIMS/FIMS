@@ -107,7 +107,6 @@ struct DataObject : public fims::FIMSObject<Type> {
     return data[i];
   }
 
-
   /**
    * Retrieve element from 2d data set.
    * @param i 1st dimension of 2d data set
