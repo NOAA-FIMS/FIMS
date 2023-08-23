@@ -126,6 +126,7 @@ public:
         data->ewaa = make_map(this->ages, this->weights); //this->ewaa;
         // add to Information
         info->growth_models[data->id] = data;
+        return true;
     }
 
     /** @brief this adds the values to the TMB model object */

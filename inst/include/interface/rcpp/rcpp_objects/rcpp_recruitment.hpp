@@ -174,6 +174,7 @@ public:
         // add to Information
         info->recruitment_models[recruitment->id] = recruitment;
 
+        return true;
     }
 
     /** @brief this adds the parameter values and derivatives to the TMB model

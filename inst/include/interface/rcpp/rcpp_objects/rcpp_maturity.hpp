@@ -116,6 +116,7 @@ public:
 
         // add to Information
         info->maturity_models[maturity->id] = maturity;
+        return true;
     }
 
     /** @brief this adds the parameter values and derivatives to the TMB model

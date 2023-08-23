@@ -113,11 +113,11 @@ public:
     template<typename T>
     bool add_to_fims_tmb_internal() {
         std::shared_ptr<fims::Information<T> > info =
-                fims::Information<T>::GetInstance();
-
+        fims::Information<T>::GetInstance();
+        
         std::shared_ptr<fims::Population<T> > population =
-                std::make_shared<fims::Population<T> >();
-
+        std::make_shared<fims::Population<T> >();
+        
         // set relative info
         population->id = this->id;
         population->nyears = this->nyears;
@@ -129,7 +129,7 @@ public:
         } else {
             warning("The ages vector is not of size nages.");
         }
-
+        
         population->growth_id = this->growth_id;
         population->recruitment_id = this->recruitment_id;
         population->maturity_id = this->maturity_id;
@@ -141,20 +141,21 @@ public:
                 info->RegisterParameter(population->log_M[i]);
             }
         }
-
+        
         for (size_t i = 0; i < log_init_naa.size(); i++) {
             population->log_init_naa[i] = this->log_init_naa[i];
             if (estimate_initNAA) {
                 info->RegisterParameter(population->log_init_naa[i]);
             }
-
+            
         }
         for (size_t i = 0; i < ages.size(); i++) {
             population->ages[i] = this->ages[i];
         }
-
+        
         // add to Information
         info->populations[population->id] = population;
+        return true;
     }
 
     /** @brief this adds the parameter values and derivatives to the TMB model

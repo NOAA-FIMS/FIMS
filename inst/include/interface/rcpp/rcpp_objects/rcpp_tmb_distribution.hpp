@@ -108,7 +108,7 @@ public:
         distributiion->sd = this->sd.value;
 
         info->distribution_models[distributiion->id] = distributiion;
-
+        return true;
     }
 
     /**
@@ -188,6 +188,7 @@ public:
         dist->sdlog = this->sdlog.value;
 
         info->distribution_models[dist->id] = dist;
+        return true;
     }
 
     /**

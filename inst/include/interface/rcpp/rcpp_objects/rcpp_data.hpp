@@ -108,6 +108,7 @@ public:
                 fims::Information<T>::GetInstance();
 
         info->data_objects[this->id] = age_comp_data;
+        return true;
     }
 
     /**
@@ -171,7 +172,7 @@ public:
                 fims::Information<T>::GetInstance();
 
         info->data_objects[this->id] = data;
-
+        return true;
     }
 
     /**

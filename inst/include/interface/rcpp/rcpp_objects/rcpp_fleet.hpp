@@ -146,6 +146,7 @@ public:
         }
         // add to Information
         info->fleets[f->id] = f;
+        return true;
     }
 
     /** @brief this adds the values to the TMB model object */
