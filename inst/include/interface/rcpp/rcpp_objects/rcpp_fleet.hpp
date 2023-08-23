@@ -51,11 +51,11 @@ std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
  *
  */
 class FleetInterface : public FleetInterfaceBase {
-  int agecomp_likelihood_id = -999;    /*!< id of agecomp likelihood component*/
-  int index_likelihood_id = -999;      /*!< id of index likelihood component*/
-  int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
-  int observed_index_data_id = -999;   /*!< id of observed index data object*/
-  int interface_selectivity_id_m = -999;           /*!< id of selectivity component*/
+  int interface_agecomp_likelihood_id_m    = -999;    /*!< id of agecomp likelihood component*/
+  int interface_index_likelihood_id_m      = -999;      /*!< id of index likelihood component*/
+  int interface_observed_agecomp_data_id_m = -999; /*!< id of observed agecomp data object*/
+  int interface_observed_index_data_id_m   = -999;   /*!< id of observed index data object*/
+  int interface_selectivity_id_m           = -999;           /*!< id of selectivity component*/
 
  public:
   bool is_survey = false; /*!< whether this is a survey fleet */
@@ -83,7 +83,7 @@ class FleetInterface : public FleetInterfaceBase {
    * @param agecomp_likelihood_id Unique id for the Age Comp Likelihood object
    */
   void SetAgeCompLikelihood(int agecomp_likelihood_id) {
-    this->agecomp_likelihood_id = agecomp_likelihood_id;
+    interface_agecomp_likelihood_id_m = agecomp_likelihood_id;
   }
 
   /**
@@ -92,7 +92,7 @@ class FleetInterface : public FleetInterfaceBase {
    * @param index_likelihood_id Unique id for the Index Likelihood object
    */
   void SetIndexLikelihood(int index_likelihood_id) {
-    this->index_likelihood_id = index_likelihood_id;
+    interface_index_likelihood_id_m = index_likelihood_id;
   }
 
   /**
@@ -102,16 +102,16 @@ class FleetInterface : public FleetInterfaceBase {
    * object
    */
   void SetObservedAgeCompData(int observed_agecomp_data_id) {
-    this->observed_agecomp_data_id = observed_agecomp_data_id;
+    interface_observed_agecomp_data_id_m = observed_agecomp_data_id;
   }
 
   /**
    * @brief Set the unique id for the Observed Index Data object
    *
-   * @param observed_index_data_id Unique id for the Observed Index Data object
+   * @param interface_observed_index_data_id_m Unique id for the Observed Index Data object
    */
   void SetObservedIndexData(int observed_index_data_id) {
-    this->observed_index_data_id = observed_index_data_id;
+    interface_observed_index_data_id_m = observed_index_data_id;
   }
 
   /**
@@ -137,10 +137,10 @@ class FleetInterface : public FleetInterfaceBase {
     fleet->is_survey = this->is_survey;
     fleet->nages = this->nages;
     fleet->nyears = this->nyears;
-    fleet->agecomp_likelihood_id = this->agecomp_likelihood_id;
-    fleet->index_likelihood_id = this->index_likelihood_id;
-    fleet->observed_agecomp_data_id = this->observed_agecomp_data_id;
-    fleet->observed_index_data_id = this->observed_index_data_id;
+    fleet->fleet_agecomp_likelihood_id_m = interface_agecomp_likelihood_id_m;
+    fleet->fleet_index_likelihood_id_m = interface_index_likelihood_id_m;
+    fleet->fleet_observed_agecomp_data_id_m = interface_observed_agecomp_data_id_m;
+    fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m;
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
     fleet->log_obs_error = this->log_obs_error.value_m;
     if (this->log_obs_error.estimated_m) {

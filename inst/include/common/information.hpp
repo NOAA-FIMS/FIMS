@@ -174,15 +174,15 @@ class Information {
       FIMS_LOG << "Checking for available fleet index data objects."
                << std::endl;
       // set index data
-      if (f->observed_index_data_id != -999) {
-        uint32_t index_id = static_cast<uint32_t>(f->observed_index_data_id);
-        data_iterator it = this->data_objects.find(index_id);
-        FIMS_LOG << "Input fleet index id = " << index_id << "." << std::endl;
+      if (f->fleet_observed_index_data_id_m != -999) {
+        uint32_t index_id_m = static_cast<uint32_t>(f->fleet_observed_index_data_id_m);
+        data_iterator it = this->data_objects.find(index_id_m);
+        FIMS_LOG << "Input fleet index id = " << index_id_m << "." << std::endl;
 
         if (it != this->data_objects.end()) {
-          f->observed_index_data = (*it).second;
+          f->fleet_observed_index_data_m = (*it).second;
           FIMS_LOG << "Index data successfully set." << std::endl;
-          FIMS_LOG << "Observed input index: \n " << f->observed_index_data
+          FIMS_LOG << "Observed input index: \n " << f->fleet_observed_index_data_m
                    << std::endl;
         } else {
           valid_model = false;
@@ -200,11 +200,11 @@ class Information {
       FIMS_LOG << "Checking for available fleet age comp data objects."
                << std::endl;
       // set age composition data
-      if (f->observed_agecomp_data_id != -999) {
-        uint32_t agecomp_id =
-            static_cast<uint32_t>(f->observed_agecomp_data_id);
-        data_iterator it = this->data_objects.find(agecomp_id);
-        FIMS_LOG << "Input fleet age comp id = " << agecomp_id << "."
+      if (f->fleet_observed_agecomp_data_id_m != -999) {
+        uint32_t agecomp_id_m =
+            static_cast<uint32_t>(f->fleet_observed_agecomp_data_id_m);
+        data_iterator it = this->data_objects.find(agecomp_id_m);
+        FIMS_LOG << "Input fleet age comp id = " << agecomp_id_m << "."
                  << std::endl;
 
         if (it != this->data_objects.end()) {
@@ -230,11 +230,11 @@ class Information {
                << std::endl;
       // set selectivity model
       if (f->fleet_selectivity_id_m != -999) {
-        uint32_t sel_id = static_cast<uint32_t>(
+        uint32_t sel_id_m = static_cast<uint32_t>(
             f->fleet_selectivity_id_m);  // cast as unsigned integer
         selectivity_models_iterator it = this->selectivity_models.find(
-            sel_id);  // if find, set it, otherwise invalid
-        FIMS_LOG << "Input fleet selectivity pattern id = " << sel_id << "."
+            sel_id_m);  // if find, set it, otherwise invalid
+        FIMS_LOG << "Input fleet selectivity pattern id = " << sel_id_m << "."
                  << std::endl;
 
         if (it != this->selectivity_models.end()) {
@@ -260,12 +260,12 @@ class Information {
       FIMS_LOG << "Checking for available index likelihood function."
                << std::endl;
       // set index likelihood
-      if (f->index_likelihood_id != -999) {
-        uint32_t ind_like_id = static_cast<uint32_t>(
-            f->index_likelihood_id);  // cast as unsigned integer
+      if (f->index_likelihood_id_m != -999) {
+        uint32_t ind_like_id_m = static_cast<uint32_t>(
+            f->index_likelihood_id_m);  // cast as unsigned integer
         distribution_models_iterator it = this->distribution_models.find(
-            ind_like_id);  // if find, set it, otherwise invalid
-        FIMS_LOG << "Input index likelihood function id = " << ind_like_id
+            ind_like_id_m);  // if find, set it, otherwise invalid
+        FIMS_LOG << "Input index likelihood function id = " << ind_like_id_m
                  << "." << std::endl;
 
         if (it != this->distribution_models.end()) {
@@ -295,12 +295,12 @@ class Information {
       FIMS_LOG << "Checking for available age comp likelihood function."
                << std::endl;
       // set agecomp likelihood
-      if (f->agecomp_likelihood_id != -999) {
-        uint32_t ac_like_id = static_cast<uint32_t>(
-            f->agecomp_likelihood_id);  // cast as unsigned integer
+      if (f->agecomp_likelihood_id_m != -999) {
+        uint32_t ac_like_id_m = static_cast<uint32_t>(
+            f->agecomp_likelihood_id_m);  // cast as unsigned integer
         distribution_models_iterator it = this->distribution_models.find(
-            ac_like_id);  // if find, set it, otherwise invalid
-        FIMS_LOG << "Input age comp likelihood function id = " << ac_like_id
+            ac_like_id_m);  // if find, set it, otherwise invalid
+        FIMS_LOG << "Input age comp likelihood function id = " << ac_like_id_m
                  << "." << std::endl;
 
         if (it != this->distribution_models.end()) {
@@ -361,8 +361,8 @@ class Information {
 
       FIMS_LOG << "Checking for available recruitment function." << std::endl;
       // set recruitment
-      if (p->recruitment_id != -999) {
-        uint32_t recruitment_uint = static_cast<uint32_t>(p->recruitment_id);
+      if (p->recruitment_id_m != -999) {
+        uint32_t recruitment_uint = static_cast<uint32_t>(p->recruitment_id_m);
         recruitment_models_iterator it =
             this->recruitment_models.find(recruitment_uint);
         FIMS_LOG << "Input recruitment id = " << recruitment_uint << "."
@@ -390,8 +390,8 @@ class Information {
 
       FIMS_LOG << "Checking for available growth function." << std::endl;
       // set growth
-      if (p->growth_id != -999) {
-        uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
+      if (p->growth_id_m != -999) {
+        uint32_t growth_uint = static_cast<uint32_t>(p->growth_id_m);
         growth_models_iterator it = this->growth_models.find(
             growth_uint);  // growth_models is specified in information.hpp
         // and used in rcpp
@@ -420,8 +420,8 @@ class Information {
 
       FIMS_LOG << "Checking for available maturity function." << std::endl;
       // set maturity
-      if (p->maturity_id != -999) {
-        uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
+      if (p->maturity_id_m != -999) {
+        uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id_m);
         maturity_models_iterator it = this->maturity_models.find(
             maturity_uint);  // >maturity_models is specified in
         // information.hpp and used in rcpp

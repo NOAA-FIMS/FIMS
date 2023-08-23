@@ -32,13 +32,13 @@ struct Fleet : public FIMSObject<Type> {
 
   // This likelihood index is not currently being used as only one likelihood
   // distribution is available. These are for a future update M2+.
-  int index_likelihood_id = -999; /*!<id of index likelihood component*/
+  int fleet_index_likelihood_id_m = -999; /*!<id of index likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
       index_likelihood; /*!< index likelihood component*/
 
   // This likelihood index is not currently being used as only one likelihood
   // distribution is available. These are for a future update M2+.
-  int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
+  int fleet_agecomp_likelihood_id_m = -999; /*!< id of agecomp likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
       agecomp_likelihood; /*!< agecomp likelihood component*/
 
@@ -47,11 +47,11 @@ struct Fleet : public FIMSObject<Type> {
   std::shared_ptr<fims::SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
 
-  int observed_index_data_id = -999; /*!< id of index data */
+  int fleet_observed_index_data_id_m = -999; /*!< id of index data */
   std::shared_ptr<fims::DataObject<Type>>
       observed_index_data; /*!< observed index data*/
 
-  int observed_agecomp_data_id = -999; /*!< id of age comp data */
+  int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
   std::shared_ptr<fims::DataObject<Type>>
       observed_agecomp_data; /*!< observed agecomp data*/
 
