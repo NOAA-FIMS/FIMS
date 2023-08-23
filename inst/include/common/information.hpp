@@ -238,7 +238,7 @@ class Information {
                  << std::endl;
 
         if (it != this->selectivity_models.end()) {
-          f->selectivity_id = (*it).second;  // elements in container held in pair
+          f->selectivity = (*it).second;  // elements in container held in pair
                                           // (first is id, second is object -
                                           // shared pointer to distribution)
           FIMS_LOG << "Selectivity successfully set." << std::endl;
