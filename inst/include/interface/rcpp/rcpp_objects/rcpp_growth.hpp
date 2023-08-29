@@ -14,6 +14,7 @@
 /****************************************************************
  * Growth Rcpp interface                                   *
  ***************************************************************/
+
 /**
  * @brief Rcpp interface that serves as the parent class for
  * Rcpp growth interfaces. This type should be inherited and not
@@ -21,26 +22,27 @@
  *
  */
 class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
- public:
-  static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
-  uint32_t id;          /**< local id of the GrowthInterfaceBase object */
-  static std::map<uint32_t, GrowthInterfaceBase*> live_objects; /**<
+public:
+    static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
+    uint32_t id; /**< local id of the GrowthInterfaceBase object */
+    static std::map<uint32_t, GrowthInterfaceBase*> live_objects; /**<
   map relating the ID of the GrowthInterfaceBase to the GrowthInterfaceBase
   objects */
 
-  GrowthInterfaceBase() {
-    this->id = GrowthInterfaceBase::id_g++;
-    GrowthInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
+    GrowthInterfaceBase() {
+        this->id = GrowthInterfaceBase::id_g++;
+        GrowthInterfaceBase::live_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
 
-  virtual ~GrowthInterfaceBase() {}
+    virtual ~GrowthInterfaceBase() {
+    }
 
-  /** @brief get_id method for child growth interface objects to inherit **/
-  virtual uint32_t get_id() = 0;
+    /** @brief get_id method for child growth interface objects to inherit **/
+    virtual uint32_t get_id() = 0;
 
-  /** @brief evaluate method for child growth interface objects to inherit **/
-  virtual double evaluate(double age) = 0;
+    /** @brief evaluate method for child growth interface objects to inherit **/
+    virtual double evaluate(double age) = 0;
 };
 
 uint32_t GrowthInterfaceBase::id_g = 1;
@@ -53,57 +55,61 @@ std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
  *
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
- public:
-  std::vector<double> weights;   /**< weights for each age class */
-  std::vector<double> ages;      /**< ages for each age class */
-  std::map<double, double> ewaa; /**< map of ewaa values */
+public:
+    std::vector<double> weights; /**< weights for each age class */
+    std::vector<double> ages; /**< ages for each age class */
+    std::map<double, double> ewaa; /**< map of ewaa values */
 
-  bool initialized = false; /**< boolean tracking if weights and ages
+    bool initialized = false; /**< boolean tracking if weights and ages
   vectors have been set */
 
-  EWAAGrowthInterface() : GrowthInterfaceBase() {}
-
-  virtual ~EWAAGrowthInterface() {}
-
-  /** @brief get the id of the GrowthInterfaceBase object */
-  virtual uint32_t get_id() { return this->id; }
-
-  /**
-   * @brief Create a map of input numeric vectors
-   * @param weights T vector of weights
-   * @param ages T vector of ages
-   * @return std::map<T, T>
-   *
-   * */
-  inline std::map<double, double> make_map(std::vector<double> ages,
-                                           std::vector<double> weights) {
-    std::map<double, double> mymap;
-    for (uint32_t i = 0; i < ages.size(); i++) {
-      mymap.insert(std::pair<double, double>(ages[i], weights[i]));
+    EWAAGrowthInterface() : GrowthInterfaceBase() {
     }
-    return mymap;
-  }
 
-  /** @brief Rcpp interface to the EWAAgrowth evaluate method
-   * you can call from R using
-   * ewaagrowth.evaluate(age)
-   * */
-  virtual double evaluate(double age) {
-    fims::EWAAgrowth<double> EWAAGrowth;
-
-    if (initialized == false) {
-      this->ewaa = make_map(this->ages, this->weights);
-      // Check that ages and weights vector are the same length
-      if (this->ages.size() != this->weights.size()) {
-        Rcpp::stop("ages and weights must be the same length");
-      }
-      initialized = true;
-    } else {
-      Rcpp::stop("this empirical weight at age object is already initialized");
+    virtual ~EWAAGrowthInterface() {
     }
-    EWAAGrowth.ewaa = this->ewaa;
-    return EWAAGrowth.evaluate(age);
-  }
+
+    /** @brief get the id of the GrowthInterfaceBase object */
+    virtual uint32_t get_id() {
+        return this->id;
+    }
+
+    /**
+     * @brief Create a map of input numeric vectors
+     * @param weights T vector of weights
+     * @param ages T vector of ages
+     * @return std::map<T, T>
+     *
+     * */
+    inline std::map<double, double> make_map(std::vector<double> ages,
+            std::vector<double> weights) {
+        std::map<double, double> mymap;
+        for (uint32_t i = 0; i < ages.size(); i++) {
+            mymap.insert(std::pair<double, double>(ages[i], weights[i]));
+        }
+        return mymap;
+    }
+
+    /** @brief Rcpp interface to the EWAAgrowth evaluate method
+     * you can call from R using
+     * ewaagrowth.evaluate(age)
+     * */
+    virtual double evaluate(double age) {
+        fims::EWAAgrowth<double> EWAAGrowth;
+
+        if (initialized == false) {
+            this->ewaa = make_map(this->ages, this->weights);
+            // Check that ages and weights vector are the same length
+            if (this->ages.size() != this->weights.size()) {
+                Rcpp::stop("ages and weights must be the same length");
+            }
+            initialized = true;
+        } else {
+            Rcpp::stop("this empirical weight at age object is already initialized");
+        }
+        EWAAGrowth.ewaa = this->ewaa;
+        return EWAAGrowth.evaluate(age);
+    }
 #ifdef TMB_MODEL
 
     template<typename T>
@@ -119,6 +125,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
         data->ewaa = make_map(this->ages, this->weights); //this->ewaa;
         // add to Information
         info->growth_models[data->id] = data;
+
+        return true;
     }
 
     /** @brief this adds the values to the TMB model object */

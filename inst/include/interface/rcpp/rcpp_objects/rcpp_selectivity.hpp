@@ -115,6 +115,8 @@ public:
 
         // add to Information
         info->selectivity_models[selectivity->id] = selectivity;
+
+        return true;
     }
 
     /** @brief this adds the parameter values and derivatives to the TMB model
@@ -218,6 +220,7 @@ public:
         // add to Information
         info->selectivity_models[selectivity->id] = selectivity;
 
+        return true;
     }
 
     /** @brief this adds the parameter values and derivatives to the TMB model

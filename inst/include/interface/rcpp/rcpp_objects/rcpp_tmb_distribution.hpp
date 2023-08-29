@@ -109,6 +109,8 @@ public:
 
         info->distribution_models[distributiion->id] = distributiion;
 
+        return true;
+
     }
 
     /**
@@ -186,6 +188,8 @@ public:
         distribution->sdlog = this->sdlog.value;
 
         info->distribution_models[distribution->id] = distribution;
+
+        return true;
     }
 
     /**
@@ -271,6 +275,7 @@ public:
 
         info->distribution_models[distribution->id] = distribution;
 
+        return true;
     }
 
     virtual bool add_to_fims_tmb() {

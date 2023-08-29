@@ -19,81 +19,82 @@
  *
  */
 class FleetInterface : public FIMSRcppInterfaceBase {
-  int agecomp_likelihood_id = -999;    /*!< id of agecomp likelihood component*/
-  int index_likelihood_id = -999;      /*!< id of index likelihood component*/
-  int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
-  int observed_index_data_id = -999;   /*!< id of observed index data object*/
-  int selectivity_id = -999;           /*!< id of selectivity component*/
+    int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
+    int index_likelihood_id = -999; /*!< id of index likelihood component*/
+    int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
+    int observed_index_data_id = -999; /*!< id of observed index data object*/
+    int selectivity_id = -999; /*!< id of selectivity component*/
 
- public:
-  bool is_survey = false; /*!< whether this is a survey fleet */
-  int nages;              /*!< number of ages in the fleet data*/
-  int nyears;             /*!< number of years in the fleet data */
-  double log_q;           /*!< log of catchability for the fleet*/
-  Rcpp::NumericVector
-      log_Fmort;           /*!< log of fishing mortality rate for the fleet*/
-  bool estimate_F = false; /*!< whether the parameter F should be estimated*/
-  bool estimate_q = false; /*!< whether the parameter q should be estimated*/
-  bool random_q = false;   /*!< whether q should be a random effect*/
-  bool random_F = false;   /*!< whether F should be a random effect*/
-  Parameter log_obs_error; /*!< the log of the observation error */
+public:
+    bool is_survey = false; /*!< whether this is a survey fleet */
+    int nages; /*!< number of ages in the fleet data*/
+    int nyears; /*!< number of years in the fleet data */
+    double log_q; /*!< log of catchability for the fleet*/
+    Rcpp::NumericVector
+    log_Fmort; /*!< log of fishing mortality rate for the fleet*/
+    bool estimate_F = false; /*!< whether the parameter F should be estimated*/
+    bool estimate_q = false; /*!< whether the parameter q should be estimated*/
+    bool random_q = false; /*!< whether q should be a random effect*/
+    bool random_F = false; /*!< whether F should be a random effect*/
+    Parameter log_obs_error; /*!< the log of the observation error */
 
- public:
-  static uint32_t id_g; /**< static id of the FleetInterface object */
-  uint32_t id;          /**< local id of the FleetInterface object */
+public:
+    static uint32_t id_g; /**< static id of the FleetInterface object */
+    uint32_t id; /**< local id of the FleetInterface object */
 
-  FleetInterface() {
-    this->id = FleetInterface::id_g++;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
+    FleetInterface() {
+        this->id = FleetInterface::id_g++;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
 
-  virtual ~FleetInterface() {}
+    virtual ~FleetInterface() {
+    }
 
-  /**
-   * @brief Set the unique id for the Age Comp Likelihood object
-   *
-   * @param agecomp_likelihood_id Unique id for the Age Comp Likelihood object
-   */
-  void SetAgeCompLikelihood(int agecomp_likelihood_id) {
-    this->agecomp_likelihood_id = agecomp_likelihood_id;
-  }
+    /**
+     * @brief Set the unique id for the Age Comp Likelihood object
+     *
+     * @param agecomp_likelihood_id Unique id for the Age Comp Likelihood object
+     */
+    void SetAgeCompLikelihood(int agecomp_likelihood_id) {
+        this->agecomp_likelihood_id = agecomp_likelihood_id;
+    }
 
-  /**
-   * @brief Set the unique id for the Index Likelihood object
-   *
-   * @param index_likelihood_id Unique id for the Index Likelihood object
-   */
-  void SetIndexLikelihood(int index_likelihood_id) {
-    this->index_likelihood_id = index_likelihood_id;
-  }
+    /**
+     * @brief Set the unique id for the Index Likelihood object
+     *
+     * @param index_likelihood_id Unique id for the Index Likelihood object
+     */
+    void SetIndexLikelihood(int index_likelihood_id) {
+        this->index_likelihood_id = index_likelihood_id;
+    }
 
-  /**
-   * @brief Set the unique id for the Observed Age Comp Data object
-   *
-   * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
-   * object
-   */
-  void SetObservedAgeCompData(int observed_agecomp_data_id) {
-    this->observed_agecomp_data_id = observed_agecomp_data_id;
-  }
+    /**
+     * @brief Set the unique id for the Observed Age Comp Data object
+     *
+     * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
+     * object
+     */
+    void SetObservedAgeCompData(int observed_agecomp_data_id) {
+        this->observed_agecomp_data_id = observed_agecomp_data_id;
+    }
 
-  /**
-   * @brief Set the unique id for the Observed Index Data object
-   *
-   * @param observed_index_data_id Unique id for the Observed Index Data object
-   */
-  void SetObservedIndexData(int observed_index_data_id) {
-    this->observed_index_data_id = observed_index_data_id;
-  }
+    /**
+     * @brief Set the unique id for the Observed Index Data object
+     *
+     * @param observed_index_data_id Unique id for the Observed Index Data object
+     */
+    void SetObservedIndexData(int observed_index_data_id) {
+        this->observed_index_data_id = observed_index_data_id;
+    }
 
-  /**
-   * @brief Set the unique id for the Selectivity object
-   *
-   * @param selectivity_id Unique id for the Selectivity object
-   */
-  void SetSelectivity(int selectivity_id) {
-    this->selectivity_id = selectivity_id;
-  }
+    /**
+     * @brief Set the unique id for the Selectivity object
+     *
+     * @param selectivity_id Unique id for the Selectivity object
+     */
+    void SetSelectivity(int selectivity_id) {
+        this->selectivity_id = selectivity_id;
+    }
 
 
 #ifdef TMB_MODEL
@@ -144,6 +145,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
         }
         // add to Information
         info->fleets[f->id] = f;
+
+        return true;
     }
 
     /** @brief this adds the values to the TMB model object */
@@ -155,7 +158,7 @@ class FleetInterface : public FIMSRcppInterfaceBase {
 
         return true;
     }
-    
+
 #endif
 };
 

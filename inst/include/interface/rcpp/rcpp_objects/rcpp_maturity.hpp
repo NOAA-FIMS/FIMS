@@ -16,68 +16,74 @@
 /****************************************************************
  * maturity Rcpp interface                                   *
  ***************************************************************/
+
 /**
  * @brief MaturityInterfaceBase class should be inherited to
  * define different Rcpp interfaces for each possible maturity function
  * */
 class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
- public:
-  static uint32_t id_g; /**< static id of the recruitment interface base*/
-  uint32_t id;          /**< id of the recruitment interface base */
-  static std::map<uint32_t, MaturityInterfaceBase*>
-      maturity_objects; /**< map associating the ids of
+public:
+    static uint32_t id_g; /**< static id of the recruitment interface base*/
+    uint32_t id; /**< id of the recruitment interface base */
+    static std::map<uint32_t, MaturityInterfaceBase*>
+    maturity_objects; /**< map associating the ids of
                               MaturityInterfaceBase to the objects */
 
-  MaturityInterfaceBase() {
-    this->id = MaturityInterfaceBase::id_g++;
-    MaturityInterfaceBase::maturity_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
+    MaturityInterfaceBase() {
+        this->id = MaturityInterfaceBase::id_g++;
+        MaturityInterfaceBase::maturity_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
 
-  virtual ~MaturityInterfaceBase() {}
+    virtual ~MaturityInterfaceBase() {
+    }
 
-  /** @brief get the ID of the interface base object
-   **/
-  virtual uint32_t get_id() = 0;
+    /** @brief get the ID of the interface base object
+     **/
+    virtual uint32_t get_id() = 0;
 
-  /**
-   * @brief evaluate the function
-   *
-   */
-  virtual double evaluate(double x) = 0;
+    /**
+     * @brief evaluate the function
+     *
+     */
+    virtual double evaluate(double x) = 0;
 };
 
 uint32_t MaturityInterfaceBase::id_g = 1;
 std::map<uint32_t, MaturityInterfaceBase*>
-    MaturityInterfaceBase::maturity_objects;
+MaturityInterfaceBase::maturity_objects;
 
 /**
  * @brief Rcpp interface for logistic maturity as an S4 object. To
  * instantiate from R: logistic_maturity <- new(fims$logistic_maturity)
  */
 class LogisticMaturityInterface : public MaturityInterfaceBase {
- public:
-  Parameter median; /**< the index value at which the response reaches .5 */
-  Parameter slope;  /**< the width of the curve at the median */
+public:
+    Parameter median; /**< the index value at which the response reaches .5 */
+    Parameter slope; /**< the width of the curve at the median */
 
-  LogisticMaturityInterface() : MaturityInterfaceBase() {}
+    LogisticMaturityInterface() : MaturityInterfaceBase() {
+    }
 
-  virtual ~LogisticMaturityInterface() {}
+    virtual ~LogisticMaturityInterface() {
+    }
 
-  /** @brief returns the id for the logistic maturity interface */
-  virtual uint32_t get_id() { return this->id; }
+    /** @brief returns the id for the logistic maturity interface */
+    virtual uint32_t get_id() {
+        return this->id;
+    }
 
-  /** @brief evaluate the logistic maturity function
-   *   @param x  The independent variable in the logistic function (e.g., age or
-   * size in maturity).
-   */
-  virtual double evaluate(double x) {
-    fims::LogisticMaturity<double> LogisticMat;
+    /** @brief evaluate the logistic maturity function
+     *   @param x  The independent variable in the logistic function (e.g., age or
+     * size in maturity).
+     */
+    virtual double evaluate(double x) {
+        fims::LogisticMaturity<double> LogisticMat;
 
-    LogisticMat.median = this->median.value;
-    LogisticMat.slope = this->slope.value;
-    return LogisticMat.evaluate(x);
-  }
+        LogisticMat.median = this->median.value;
+        LogisticMat.slope = this->slope.value;
+        return LogisticMat.evaluate(x);
+    }
 
 #ifdef TMB_MODEL
 
@@ -110,6 +116,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
         // add to Information
         info->maturity_models[maturity->id] = maturity;
+
+        return true;
     }
 
     /** @brief this adds the parameter values and derivatives to the TMB model

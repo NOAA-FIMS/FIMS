@@ -18,34 +18,39 @@
  *
  */
 class DataInterface : public FIMSRcppInterfaceBase {
- public:
-  Rcpp::NumericVector observed_data; /*!< The data */
-  static uint32_t id_g; /**< static id of the DataInterface object */
-  uint32_t id;          /**< local id of the DataInterface object */
-  static std::map<uint32_t, DataInterface*>
-      live_objects; /**< map associating the ids of DataInterface to
+public:
+    Rcpp::NumericVector observed_data; /*!< The data */
+    static uint32_t id_g; /**< static id of the DataInterface object */
+    uint32_t id; /**< local id of the DataInterface object */
+    static std::map<uint32_t, DataInterface*>
+    live_objects; /**< map associating the ids of DataInterface to
       the objects */
 
-  /** @brief constructor
-   */
-  DataInterface() {
-    this->id = DataInterface::id_g++;
-    DataInterface::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
+    /** @brief constructor
+     */
+    DataInterface() {
+        this->id = DataInterface::id_g++;
+        DataInterface::live_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
 
-  /** @brief destructor
-   */
-  virtual ~DataInterface() {}
+    /** @brief destructor
+     */
+    virtual ~DataInterface() {
+    }
 
-  /** @brief get the ID of the interface base object
-   **/
-  virtual uint32_t get_id() { return this->id; }
+    /** @brief get the ID of the interface base object
+     **/
+    virtual uint32_t get_id() {
+        return this->id;
+    }
 
-  /**@brief add_to_fims_tmb dummy method
-   *
-   */
-  virtual bool add_to_fims_tmb() { return true; };
+    /**@brief add_to_fims_tmb dummy method
+     *
+     */
+    virtual bool add_to_fims_tmb() {
+        return true;
+    };
 };
 uint32_t DataInterface::id_g = 1;
 std::map<uint32_t, DataInterface*> DataInterface::live_objects;
@@ -56,31 +61,34 @@ std::map<uint32_t, DataInterface*> DataInterface::live_objects;
  * acomp <- new(fims$AgeComp)
  */
 class AgeCompDataInterface : public DataInterface {
- public:
-  int amax;                          /*!< first dimension of the data */
-  int ymax;                          /*!< second dimension of the data */
-  Rcpp::NumericVector age_comp_data; /*!<the age composition data*/
+public:
+    int amax; /*!< first dimension of the data */
+    int ymax; /*!< second dimension of the data */
+    Rcpp::NumericVector age_comp_data; /*!<the age composition data*/
 
-  /**
-   * @brief constructor
-   */
-  AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterface() {
-    this->amax = amax;
-    this->ymax = ymax;
-  }
+    /**
+     * @brief constructor
+     */
+    AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterface() {
+        this->amax = amax;
+        this->ymax = ymax;
+    }
 
-  /**
-   * @brief destructor
-   */
-  virtual ~AgeCompDataInterface() {}
+    /**
+     * @brief destructor
+     */
+    virtual ~AgeCompDataInterface() {
+    }
 
-  /** @brief get the ID of the interface base object
-   **/
-  virtual uint32_t get_id() { return this->id; }
+    /** @brief get the ID of the interface base object
+     **/
+    virtual uint32_t get_id() {
+        return this->id;
+    }
 
 
 #ifdef TMB_MODEL
-    
+
     template<typename T>
     bool add_to_fims_tmb_internal() {
         std::shared_ptr<fims::DataObject < T>> age_comp_data =
@@ -99,6 +107,8 @@ class AgeCompDataInterface : public DataInterface {
                 fims::Information<T>::GetInstance();
 
         info->data_objects[this->id] = age_comp_data;
+        
+         return true;
     }
 
     /**
@@ -112,8 +122,8 @@ class AgeCompDataInterface : public DataInterface {
 
         return true;
     }
-    
-    #endif
+
+#endif
 };
 
 /**
@@ -122,26 +132,32 @@ class AgeCompDataInterface : public DataInterface {
  * fleet <- new(fims$Index)
  */
 class IndexDataInterface : public DataInterface {
- public:
-  int ymax;                       /*!< second dimension of the data */
-  Rcpp::NumericVector index_data; /*!<the age composition data*/
+public:
+    int ymax; /*!< second dimension of the data */
+    Rcpp::NumericVector index_data; /*!<the age composition data*/
 
-  /**
-   * @brief constructor
-   */
-  IndexDataInterface(int ymax = 0) : DataInterface() { this->ymax = ymax; }
+    /**
+     * @brief constructor
+     */
+    IndexDataInterface(int ymax = 0) : DataInterface() {
+        this->ymax = ymax;
+    }
 
-  /**
-   * @brief destructor
-   */
-  virtual ~IndexDataInterface() {}
-  /** @brief get the ID of the interface base object
-   **/
-  virtual uint32_t get_id() { return this->id; }
+    /**
+     * @brief destructor
+     */
+    virtual ~IndexDataInterface() {
+    }
 
- 
+    /** @brief get the ID of the interface base object
+     **/
+    virtual uint32_t get_id() {
+        return this->id;
+    }
+
+
 #ifdef TMB_MODEL
-    
+
     template<typename T>
     bool add_to_fims_tmb_internal() {
         std::shared_ptr<fims::DataObject < T>> data =
@@ -157,7 +173,7 @@ class IndexDataInterface : public DataInterface {
                 fims::Information<T>::GetInstance();
 
         info->data_objects[this->id] = data;
-
+        return true;
     }
 
     /**
