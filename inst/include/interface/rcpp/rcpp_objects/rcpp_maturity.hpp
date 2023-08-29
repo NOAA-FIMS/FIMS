@@ -79,123 +79,52 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     return LogisticMat.evaluate(x);
   }
 
-  /** @brief this adds the parameter values and derivatives to the TMB model
-   * object */
-  virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE> > d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+#ifdef TMB_MODEL
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> > lm0 =
-        std::make_shared<fims::LogisticMaturity<TMB_FIMS_REAL_TYPE> >();
+    template<typename T>
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims::Information<T> > info =
+                fims::Information<T>::GetInstance();
 
-    // set relative info
-    lm0->id = this->id;
-    lm0->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
-        d0->RegisterRandomEffect(lm0->median);
-      } else {
-        d0->RegisterParameter(lm0->median);
-      }
-    }
-    lm0->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
-        d0->RegisterRandomEffect(lm0->slope);
-      } else {
-        d0->RegisterParameter(lm0->slope);
-      }
-    }
+        std::shared_ptr<fims::LogisticMaturity<T> > maturity =
+                std::make_shared<fims::LogisticMaturity<T> >();
 
-    // add to Information
-    d0->maturity_models[lm0->id] = lm0;
+        // set relative info
+        maturity->id = this->id;
+        maturity->median = this->median.value;
+        if (this->median.estimated) {
+            if (this->median.is_random_effect) {
+                info->RegisterRandomEffect(maturity->median);
+            } else {
+                info->RegisterParameter(maturity->median);
+            }
+        }
+        maturity->slope = this->slope.value;
+        if (this->slope.estimated) {
+            if (this->slope.is_random_effect) {
+                info->RegisterRandomEffect(maturity->slope);
+            } else {
+                info->RegisterParameter(maturity->slope);
+            }
+        }
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER> > d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_FIRST_ORDER> > lm1 =
-        std::make_shared<fims::LogisticMaturity<TMB_FIMS_FIRST_ORDER> >();
-
-    // set relative info
-    lm1->id = this->id;
-    lm1->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
-        d1->RegisterRandomEffect(lm1->median);
-      } else {
-        d1->RegisterParameter(lm1->median);
-      }
-    }
-    lm1->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
-        d1->RegisterRandomEffect(lm1->slope);
-      } else {
-        d1->RegisterParameter(lm1->slope);
-      }
+        // add to Information
+        info->maturity_models[maturity->id] = maturity;
     }
 
-    // add to Information
-    d1->maturity_models[lm1->id] = lm1;
+    /** @brief this adds the parameter values and derivatives to the TMB model
+     * object */
+    virtual bool add_to_fims_tmb() {
 
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER> > d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
 
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_SECOND_ORDER> > lm2 =
-        std::make_shared<fims::LogisticMaturity<TMB_FIMS_SECOND_ORDER> >();
-
-    // set relative info
-    lm2->id = this->id;
-    lm2->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
-        d2->RegisterRandomEffect(lm2->median);
-      } else {
-        d2->RegisterParameter(lm2->median);
-      }
-    }
-    lm2->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
-        d2->RegisterRandomEffect(lm2->slope);
-      } else {
-        d2->RegisterParameter(lm2->slope);
-      }
+        return true;
     }
 
-    // add to Information
-    d2->maturity_models[lm2->id] = lm2;
-
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER> > d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-
-    std::shared_ptr<fims::LogisticMaturity<TMB_FIMS_THIRD_ORDER> > lm3 =
-        std::make_shared<fims::LogisticMaturity<TMB_FIMS_THIRD_ORDER> >();
-
-    // set relative info
-    lm3->id = this->id;
-    lm3->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
-        d3->RegisterRandomEffect(lm3->median);
-      } else {
-        d3->RegisterParameter(lm3->median);
-      }
-    }
-    lm3->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
-        d3->RegisterRandomEffect(lm3->slope);
-      } else {
-        d3->RegisterParameter(lm3->slope);
-      }
-    }
-
-    // add to Information
-    d3->maturity_models[lm3->id] = lm3;
-
-    return true;
-  }
+#endif
 };
 
 #endif

@@ -18,37 +18,38 @@
  *
  */
 class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
- public:
-  static uint32_t
-      id_g;    /**< static id of the DistributionsInterfaceBase object */
-  uint32_t id; /**< local id of the DistributionsInterfaceBase object */
-  static std::map<uint32_t, DistributionsInterfaceBase *> live_objects; /**<
+public:
+    static uint32_t
+    id_g; /**< static id of the DistributionsInterfaceBase object */
+    uint32_t id; /**< local id of the DistributionsInterfaceBase object */
+    static std::map<uint32_t, DistributionsInterfaceBase *> live_objects; /**<
   map relating the ID of the DistributionsInterfaceBase to the
   DistributionsInterfaceBase objects */
 
-  DistributionsInterfaceBase() {
-    this->id = DistributionsInterfaceBase::id_g++;
-    DistributionsInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
+    DistributionsInterfaceBase() {
+        this->id = DistributionsInterfaceBase::id_g++;
+        DistributionsInterfaceBase::live_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
 
-  virtual ~DistributionsInterfaceBase() {}
+    virtual ~DistributionsInterfaceBase() {
+    }
 
-  /** @brief get_id method for child distribution interface objects to inherit
-   * **/
-  virtual uint32_t get_id() = 0;
+    /** @brief get_id method for child distribution interface objects to inherit
+     * **/
+    virtual uint32_t get_id() = 0;
 
-  /** @brief evaluate method for child distribution interface objects to inherit
-   * **/
-  virtual double evaluate(bool do_log) = 0;
+    /** @brief evaluate method for child distribution interface objects to inherit
+     * **/
+    virtual double evaluate(bool do_log) = 0;
 };
 
 uint32_t DistributionsInterfaceBase::id_g =
-    1; /**< static id of the DistributionsInterfaceBase object */
+        1; /**< static id of the DistributionsInterfaceBase object */
 std::map<uint32_t,
-         DistributionsInterfaceBase
-             *> /**< local id of the DistributionsInterfaceBase object */
-    DistributionsInterfaceBase::live_objects; /**<
+DistributionsInterfaceBase
+*> /**< local id of the DistributionsInterfaceBase object */
+DistributionsInterfaceBase::live_objects; /**<
   map relating the ID of the DistributionsInterfaceBase to the
   DistributionsInterfaceBase objects */
 
@@ -59,95 +60,71 @@ std::map<uint32_t,
  *
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
- public:
-  Parameter x;    /**< observed data */
-  Parameter mean; /**< mean of x for the normal distribution **/
-  Parameter sd;   /**< sd of x for the normal distribution **/
+public:
+    Parameter x; /**< observed data */
+    Parameter mean; /**< mean of x for the normal distribution **/
+    Parameter sd; /**< sd of x for the normal distribution **/
 
-  DnormDistributionsInterface() : DistributionsInterfaceBase() {}
+    DnormDistributionsInterface() : DistributionsInterfaceBase() {
+    }
 
-  virtual uint32_t get_id() { return this->id; }
+    virtual uint32_t get_id() {
+        return this->id;
+    }
 
-  virtual ~DnormDistributionsInterface() {}
+    virtual ~DnormDistributionsInterface() {
+    }
 
-  /**
-   * @brief Evaluate normal probability density function, default returns the
-   * log of the pdf
-   *
-   * @tparam T
-   * @return log pdf
-   */
-  virtual double evaluate(bool do_log) {
-    fims::Dnorm<double> dnorm;
-    dnorm.x = this->x.value;
-    dnorm.mean = this->mean.value;
-    dnorm.sd = this->sd.value;
-    return dnorm.evaluate(do_log);
-  }
+    /**
+     * @brief Evaluate normal probability density function, default returns the
+     * log of the pdf
+     *
+     * @tparam T
+     * @return log pdf
+     */
+    virtual double evaluate(bool do_log) {
+        fims::Dnorm<double> dnorm;
+        dnorm.x = this->x.value;
+        dnorm.mean = this->mean.value;
+        dnorm.sd = this->sd.value;
+        return dnorm.evaluate(do_log);
+    }
 
-  /**
-   * @brief adds the dnorm distribution and its parameters to the TMB model
-   */
-  virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+#ifdef TMB_MODEL
 
-    std::shared_ptr<fims::Dnorm<TMB_FIMS_REAL_TYPE>> model0 =
-        std::make_shared<fims::Dnorm<TMB_FIMS_REAL_TYPE>>();
+    template<typename T>
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims::Information < T>> info =
+                fims::Information<T>::GetInstance();
 
-    // interface to data/parameter value
-    model0->id = this->id;
-    model0->x = this->x.value;
-    // set relative info
-    model0->mean = this->mean.value;
-    model0->sd = this->sd.value;
+        std::shared_ptr<fims::Dnorm < T>> distributiion =
+                std::make_shared<fims::Dnorm < T >> ();
 
-    d0->distribution_models[model0->id] = model0;
+        // interface to data/parameter value
+        distributiion->id = this->id;
+        distributiion->x = this->x.value;
+        // set relative info
+        distributiion->mean = this->mean.value;
+        distributiion->sd = this->sd.value;
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+        info->distribution_models[distributiion->id] = distributiion;
 
-    std::shared_ptr<fims::Dnorm<TMB_FIMS_FIRST_ORDER>> model1 =
-        std::make_shared<fims::Dnorm<TMB_FIMS_FIRST_ORDER>>();
+    }
 
-    // interface to data/parameter first derivative
-    model1->id = this->id;
-    model1->x = this->x.value;
-    model1->mean = this->mean.value;
-    model1->sd = this->sd.value;
+    /**
+     * @brief adds the dnorm distribution and its parameters to the TMB model
+     */
+    virtual bool add_to_fims_tmb() {
 
-    d1->distribution_models[model1->id] = model1;
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
 
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+        return true;
+    }
 
-    std::shared_ptr<fims::Dnorm<TMB_FIMS_SECOND_ORDER>> model2 =
-        std::make_shared<fims::Dnorm<TMB_FIMS_SECOND_ORDER>>();
-
-    // interface to data/parameter second derivative
-    model2->id = this->id;
-    model2->x = this->x.value;
-    model2->mean = this->mean.value;
-    model2->sd = this->sd.value;
-
-    d2->distribution_models[model2->id] = model2;
-
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-
-    std::shared_ptr<fims::Dnorm<TMB_FIMS_THIRD_ORDER>> model3 =
-        std::make_shared<fims::Dnorm<TMB_FIMS_THIRD_ORDER>>();
-
-    // interface to data/parameter third derivative
-    model3->id = this->id;
-    model3->x = this->x.value;
-    model3->mean = this->mean.value;
-    model3->sd = this->sd.value;
-
-    d3->distribution_models[model3->id] = model3;
-
-    return true;
-  }
+#endif
 };
 
 /**
@@ -157,103 +134,74 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
  *
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
- public:
-  Parameter x;       /*!< observation */
-  Parameter meanlog; /*!< mean of the distribution of log(x) */
-  Parameter sdlog;   /*!< standard deviation of the distribution of log(x) */
-  bool do_bias_correction; /*!< true if the lognormal should be bias corrected,
+public:
+    Parameter x; /*!< observation */
+    Parameter meanlog; /*!< mean of the distribution of log(x) */
+    Parameter sdlog; /*!< standard deviation of the distribution of log(x) */
+    bool do_bias_correction; /*!< true if the lognormal should be bias corrected,
                               default FALSE */
 
-  DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
+    DlnormDistributionsInterface() : DistributionsInterfaceBase() {
+    }
 
-  virtual ~DlnormDistributionsInterface() {}
+    virtual ~DlnormDistributionsInterface() {
+    }
 
-  /**
-   * @brief get the id of the Dlnorm distributions interface class object
-   */
-  virtual uint32_t get_id() { return this->id; }
+    /**
+     * @brief get the id of the Dlnorm distributions interface class object
+     */
+    virtual uint32_t get_id() {
+        return this->id;
+    }
 
-  /**
-   * @brief Evaluate lognormal probability density function, default returns the
-   * log of the pdf
-   *
-   * @tparam T
-   * @return log pdf
-   */
-  virtual double evaluate(bool do_log) {
-    fims::Dlnorm<double> dlnorm;
-    dlnorm.x = this->x.value;
-    dlnorm.meanlog = this->meanlog.value;
-    dlnorm.sdlog = this->sdlog.value;
-    dlnorm.do_bias_correction = this->do_bias_correction;
-    return dlnorm.evaluate(do_log);
-  }
+    /**
+     * @brief Evaluate lognormal probability density function, default returns the
+     * log of the pdf
+     *
+     * @tparam T
+     * @return log pdf
+     */
+    virtual double evaluate(bool do_log) {
+        fims::Dlnorm<double> dlnorm;
+        dlnorm.x = this->x.value;
+        dlnorm.meanlog = this->meanlog.value;
+        dlnorm.sdlog = this->sdlog.value;
+        dlnorm.do_bias_correction = this->do_bias_correction;
+        return dlnorm.evaluate(do_log);
+    }
+#ifdef TMB_MODEL
 
-  /**
-   * @brief adds the dlnorm distribution and its parameters to the TMB model
-   */
-  virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    template<typename T>
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims::Information < T> > info =
+                fims::Information<T>::GetInstance();
 
-    std::shared_ptr<fims::Dlnorm<TMB_FIMS_REAL_TYPE>> model0 =
-        std::make_shared<fims::Dlnorm<TMB_FIMS_REAL_TYPE>>();
+        std::shared_ptr < fims::Dlnorm <T> > distribution =
+                std::make_shared<fims::Dlnorm <T> > ();
 
-    // set relative info
-    model0->id = this->id;
-    model0->x = this->x.value;
-    model0->meanlog = this->meanlog.value;
-    model0->sdlog = this->sdlog.value;
+        // set relative info
+        distribution->id = this->id;
+        distribution->x = this->x.value;
+        distribution->meanlog = this->meanlog.value;
+        distribution->sdlog = this->sdlog.value;
 
-    d0->distribution_models[model0->id] = model0;
+        info->distribution_models[distribution->id] = distribution;
+    }
 
-    // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    /**
+     * @brief adds the dlnorm distribution and its parameters to the TMB model
+     */
+    virtual bool add_to_fims_tmb() {
 
-    std::shared_ptr<fims::Dlnorm<TMB_FIMS_FIRST_ORDER>> model1 =
-        std::make_shared<fims::Dlnorm<TMB_FIMS_FIRST_ORDER>>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
 
-    // set relative info
-    model1->id = this->id;
-    model1->x = this->x.value;
-    model1->meanlog = this->meanlog.value;
-    model1->sdlog = this->sdlog.value;
+        return true;
+    }
 
-    d1->distribution_models[model1->id] = model1;
-
-    // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-
-    std::shared_ptr<fims::Dlnorm<TMB_FIMS_SECOND_ORDER>> model2 =
-        std::make_shared<fims::Dlnorm<TMB_FIMS_SECOND_ORDER>>();
-
-    // set relative info
-    model2->id = this->id;
-    model2->x = this->x.value;
-    model2->meanlog = this->meanlog.value;
-    model2->sdlog = this->sdlog.value;
-
-    d2->distribution_models[model2->id] = model2;
-
-    // base model
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-
-    std::shared_ptr<fims::Dlnorm<TMB_FIMS_THIRD_ORDER>> model3 =
-        std::make_shared<fims::Dlnorm<TMB_FIMS_THIRD_ORDER>>();
-
-    // set relative info
-    model3->id = this->id;
-    model3->x = this->x.value;
-    model3->meanlog = this->meanlog.value;
-    model3->sdlog = this->sdlog.value;
-
-    d3->distribution_models[model3->id] = model3;
-
-    return true;
-  }
+#endif
 };
 
 /**
@@ -263,116 +211,78 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  *
  */
 // template <typename T>
+
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
- public:
-  Rcpp::NumericVector x; /*!< Vector of length K of integers */
-  Rcpp::NumericVector p; /*!< Vector of length K, specifying the probability
+public:
+    Rcpp::NumericVector x; /*!< Vector of length K of integers */
+    Rcpp::NumericVector p; /*!< Vector of length K, specifying the probability
    for the K classes (note, unlike in R these must sum to 1). */
 
-  DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
+    DmultinomDistributionsInterface() : DistributionsInterfaceBase() {
+    }
 
-  virtual ~DmultinomDistributionsInterface() {}
+    virtual ~DmultinomDistributionsInterface() {
+    }
 
-  virtual uint32_t get_id() { return this->id; }
+    virtual uint32_t get_id() {
+        return this->id;
+    }
 
-  /**
-   * @brief Evaluate multinom probability density function, default returns the
-   * log of the pdf
-   *
-   * @tparam T
-   * @return log pdf
-   */
-  virtual double evaluate(bool do_log) {
-    fims::Dmultinom<double> dmultinom;
-    // Decale TMBVector in this scope
-    typedef
+    /**
+     * @brief Evaluate multinom probability density function, default returns the
+     * log of the pdf
+     *
+     * @tparam T
+     * @return log pdf
+     */
+    virtual double evaluate(bool do_log) {
+        fims::Dmultinom<double> dmultinom;
+        // Decale TMBVector in this scope
+        typedef
         typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
-    dmultinom.x = TMBVector(x.size());  // Vector from TMB
-    dmultinom.p = TMBVector(p.size());  // Vector from TMB
-    for (int i = 0; i < x.size(); i++) {
-      dmultinom.x[i] = x[i];
-      dmultinom.p[i] = p[i];
-    }
-    return dmultinom.evaluate(do_log);
-  }
-
-  virtual bool add_to_fims_tmb() {
-    typedef typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector0;
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-
-    std::shared_ptr<fims::Dmultinom<TMB_FIMS_REAL_TYPE>> model0 =
-        std::make_shared<fims::Dmultinom<TMB_FIMS_REAL_TYPE>>();
-
-    model0->id = this->id;
-    model0->x = Vector0(x.size());
-    model0->p = Vector0(p.size());
-
-    for (int i = 0; i < x.size(); i++) {
-      model0->x[i] = x[i];
-      model0->p[i] = p[i];
+        dmultinom.x = TMBVector(x.size()); // Vector from TMB
+        dmultinom.p = TMBVector(p.size()); // Vector from TMB
+        for (int i = 0; i < x.size(); i++) {
+            dmultinom.x[i] = x[i];
+            dmultinom.p[i] = p[i];
+        }
+        return dmultinom.evaluate(do_log);
     }
 
-    d0->distribution_models[model0->id] = model0;
+#ifdef TMB_MODEL
 
-    typedef
-        typename fims::ModelTraits<TMB_FIMS_FIRST_ORDER>::EigenVector Vector1;
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    template<typename T>
+    bool add_to_fims_tmb_internal() {
+        typedef typename fims::ModelTraits<T>::EigenVector Vector0;
+        std::shared_ptr<fims::Information < T> > info =
+                fims::Information<T>::GetInstance();
 
-    std::shared_ptr<fims::Dmultinom<TMB_FIMS_FIRST_ORDER>> model1 =
-        std::make_shared<fims::Dmultinom<TMB_FIMS_FIRST_ORDER>>();
+        std::shared_ptr<fims::Dmultinom < T>> distribution =
+                std::make_shared<fims::Dmultinom < T > > ();
 
-    model1->id = this->id;
-    model1->x = Vector1(x.size());
-    model1->p = Vector1(p.size());
+        distribution->id = this->id;
+        distribution->x = Vector0(x.size());
+        distribution->p = Vector0(p.size());
 
-    for (int i = 0; i < x.size(); i++) {
-      model1->x[i] = x[i];
-      model1->p[i] = p[i];
+        for (int i = 0; i < x.size(); i++) {
+            distribution->x[i] = x[i];
+            distribution->p[i] = p[i];
+        }
+
+        info->distribution_models[distribution->id] = distribution;
+
     }
 
-    d1->distribution_models[model1->id] = model1;
+    virtual bool add_to_fims_tmb() {
 
-    typedef
-        typename fims::ModelTraits<TMB_FIMS_SECOND_ORDER>::EigenVector Vector2;
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
 
-    std::shared_ptr<fims::Dmultinom<TMB_FIMS_SECOND_ORDER>> model2 =
-        std::make_shared<fims::Dmultinom<TMB_FIMS_SECOND_ORDER>>();
-
-    model2->id = this->id;
-    model2->x = Vector2(x.size());
-    model2->p = Vector2(p.size());
-
-    for (int i = 0; i < x.size(); i++) {
-      model2->x[i] = x[i];
-      model2->p[i] = p[i];
+        return true;
     }
 
-    d2->distribution_models[model2->id] = model2;
-
-    typedef
-        typename fims::ModelTraits<TMB_FIMS_THIRD_ORDER>::EigenVector Vector3;
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-
-    std::shared_ptr<fims::Dmultinom<TMB_FIMS_THIRD_ORDER>> model3 =
-        std::make_shared<fims::Dmultinom<TMB_FIMS_THIRD_ORDER>>();
-
-    model3->id = this->id;
-    model3->x = Vector3(x.size());
-    model3->p = Vector3(p.size());
-
-    for (int i = 0; i < x.size(); i++) {
-      model3->x[i] = x[i];
-      model3->p[i] = p[i];
-    }
-
-    d3->distribution_models[model3->id] = model3;
-
-    return true;
-  }
+#endif
 };
 #endif
