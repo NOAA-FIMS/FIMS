@@ -17,8 +17,6 @@ test_that("Recruitment input settings work as expected", {
   recruitment$logit_steep$estimated <- TRUE
   recruitment$log_rzero$value <- log(r0)
   recruitment$log_sigma_recruit$value <- log(0.7)
-  recruitment$recruitment_bias_adj <- rep(1.0, 3)
-  recruitment$use_bias_correction <- FALSE
 
   expect_equal(recruitment$get_id(), 1)
   expect_equal(recruitment$logit_steep$value, 0.78845736)
@@ -42,16 +40,6 @@ test_that("Recruitment input settings work as expected", {
   expect_equal(recruitment$evaluate_nll(), 0.0)
 
   recruitment$estimate_deviations <- TRUE
-  expect_equal(recruitment$evaluate_nll(), expected = expected_nll)
-
-  recruitment$use_bias_correction <- TRUE
-  recruitment$recruitment_bias_adj <- rep(0.245, 3)
-  expected_nll <- -sum(log(stats::dnorm(log(devs), -0.245, 0.7)))
-  expect_equal(recruitment$evaluate_nll(), expected = expected_nll)
-
-  recruitment$use_bias_correction <- TRUE
-  recruitment$recruitment_bias_adj <- c(0.245, 0.2, 0.1)
-  expected_nll <- -sum(log(stats::dnorm(log(devs), c(-0.245, -0.2, -0.1), 0.7)))
   expect_equal(recruitment$evaluate_nll(), expected = expected_nll)
 
   fims$clear()

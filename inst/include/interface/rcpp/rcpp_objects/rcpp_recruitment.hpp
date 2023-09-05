@@ -31,8 +31,6 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   // deviations*/
   /// static bool constrain_deviations; /**< whether or not the rec devs are
   /// constrained*/
-  // static std::vector<double> rec_bias_adj; /**< a vector of bias adjustment
-  // values*/
 
   RecruitmentInterfaceBase() {
     this->id = RecruitmentInterfaceBase::id_g++;
@@ -72,12 +70,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   Parameter logit_steep;       /**< steepness or the productivity of the stock*/
   Parameter log_rzero;         /**< recruitment at unfished biomass */
   Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
-  Rcpp::NumericVector recruit_bias_adjustment; /**<vector bias adjustment*/
   Rcpp::NumericVector deviations;              /**< recruitment deviations*/
   bool estimate_deviations =
       false; /**< boolean describing whether to estimate */
-  bool use_bias_correction =
-      false; /**< boolean describing whether to do bias correction */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
@@ -105,18 +100,11 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     NLL.log_sigma_recruit = this->log_sigma_recruit.value;
     NLL.recruit_deviations.resize(deviations.size());  // Vector from TMB
-    NLL.recruit_bias_adjustment.resize(
-        recruit_bias_adjustment.size());  // Vector from TMB
     for (int i = 0; i < deviations.size(); i++) {
       NLL.recruit_deviations[i] = deviations[i];
-      NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
     }
     FIMS_LOG << "Rec devs being passed to C++ are " << deviations << std::endl;
 
-    Rcout << "Rec bias adj being passed to C++ are " << recruit_bias_adjustment
-          << std::endl;
-
-    NLL.use_recruit_bias_adjustment = this->use_bias_correction;
     NLL.estimate_recruit_deviations = this->estimate_deviations;
     return NLL.evaluate_nll();
   }
@@ -170,7 +158,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
 
-    b0->use_recruit_bias_adjustment = this->use_bias_correction;
     // add to Information
     d0->recruitment_models[b0->id] = b0;
 
@@ -220,7 +207,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
 
-    b1->use_recruit_bias_adjustment = this->use_bias_correction;
     // add to Information
     d1->recruitment_models[b1->id] = b1;
 
@@ -270,7 +256,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
 
-    b2->use_recruit_bias_adjustment = this->use_bias_correction;
     // add to Information
     d2->recruitment_models[b2->id] = b2;
 
@@ -320,7 +305,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
 
-    b3->use_recruit_bias_adjustment = this->use_bias_correction;
     // add to Information
     d3->recruitment_models[b3->id] = b3;
 
