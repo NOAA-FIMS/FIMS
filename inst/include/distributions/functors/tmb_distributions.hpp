@@ -77,7 +77,7 @@ struct Dlnorm : public DistributionsBase<T> {
   T x;       /*!< observation */
   T meanlog; /*!< mean of the distribution of log(x) */
   T sdlog;   /*!< standard deviation of the distribution of log(x) */
-  
+
   Dlnorm() : DistributionsBase<T>() {}
 
   /**
@@ -94,7 +94,7 @@ struct Dlnorm : public DistributionsBase<T> {
     T nll;
 
     nll = dnorm(logx, meanlog, sdlog, true) - logx;
-    
+
     if (do_log) {
       return nll;
     } else {
