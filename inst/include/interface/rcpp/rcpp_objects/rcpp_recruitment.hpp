@@ -70,7 +70,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   Parameter logit_steep;       /**< steepness or the productivity of the stock*/
   Parameter log_rzero;         /**< recruitment at unfished biomass */
   Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
-  Rcpp::NumericVector deviations;              /**< recruitment deviations*/
+  Rcpp::NumericVector deviations; /**< recruitment deviations*/
   bool estimate_deviations =
       false; /**< boolean describing whether to estimate */
 

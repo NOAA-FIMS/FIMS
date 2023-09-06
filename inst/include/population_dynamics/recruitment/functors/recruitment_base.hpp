@@ -35,7 +35,7 @@ struct RecruitmentBase : public FIMSObject<Type> {
       recruit_deviations;            /*!< A vector of recruitment deviations */
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                  deviations are summing to zero or not */
-  
+
   Type log_sigma_recruit; /*!< Log standard deviation of log recruitment
                        deviations */
   Type log_rzero;         /*!< Log of unexploited recruitment.*/
@@ -54,9 +54,7 @@ struct RecruitmentBase : public FIMSObject<Type> {
    * @brief Prepares the recruitment deviations vector.
    *
    */
-  void Prepare() {
-    this->PrepareConstrainedDeviations();
-  }
+  void Prepare() { this->PrepareConstrainedDeviations(); }
 
   /** @brief Calculates the expected recruitment for a given spawning input.
    *
@@ -113,7 +111,6 @@ struct RecruitmentBase : public FIMSObject<Type> {
       FIMS_LOG << this->recruit_deviations[i] << std::endl;
     }
   }
-
 };
 
 template <class Type>
