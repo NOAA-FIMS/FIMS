@@ -109,11 +109,11 @@ class Model {  // may need singleton
 
 
     #ifdef TMB_MODEL
-    int i = 1;
-    REPORT_F(i, of);
     REPORT_F(rec_nll, of);
+    REPORT_F(age_comp_nll, of);
+    REPORT_F(index_nll, of);
     #endif
-    
+
 
     return jnll;
   }
