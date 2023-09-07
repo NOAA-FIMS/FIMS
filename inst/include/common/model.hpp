@@ -65,6 +65,14 @@ class Model {  // may need singleton
     Type rec_nll = 0.0;       // recrutiment nll
     Type age_comp_nll = 0.0;  // age composition nll
     Type index_nll = 0.0;     // survey and fishery cacth nll
+
+    //Create vector lists to store output for reporting
+    #ifdef TMB_MODEL
+    //VectorOfVectors creates a nested vector structure where
+    //each vector can be a different dimension.
+    typename ModelTraits<Type>::VectorOfVectors exp_index;
+    #endif
+
     // Loop over populations, evaluate, and sum up the recruitment likelihood
     // component
     typename fims::Information<Type>::population_iterator it;
@@ -93,16 +101,20 @@ class Model {  // may need singleton
       (*jt).second->of = this->of;
 #endif
       age_comp_nll += (*jt).second->evaluate_age_comp_nll();
-      FIMS_LOG << "survey and fleet age comp nll sum: " << age_comp_nll
-               << std::endl;
       index_nll += (*jt).second->evaluate_index_nll();
-      FIMS_LOG << "survey and fleet index nll sum: " << index_nll << std::endl;
+      /*
       if ((*jt).second->is_survey == false) {
 #ifdef TMB_MODEL
         (*jt).second->of = this->of;
 #endif
         (*jt).second->ReportFleet();
       }
+       */
+      //This will not work with the current map/iterator structure but will work if
+      //fleets in information is defined as a vector of pointers instead and jt is an int
+      #ifdef TMB_MODEL
+      //  exp_index(jt) = (*jt).second->expected_index;
+      #endif
     }
 
     jnll = rec_nll + age_comp_nll + index_nll;
