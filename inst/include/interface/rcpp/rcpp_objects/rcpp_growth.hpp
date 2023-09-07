@@ -112,19 +112,19 @@ public:
     }
 #ifdef TMB_MODEL
 
-    template<typename T>
+    template<typename Type>
     bool add_to_fims_tmb_internal() {
-        std::shared_ptr<fims::Information<T> > info =
-                fims::Information<T>::GetInstance();
+        std::shared_ptr<fims::Information<Type> > info =
+                fims::Information<Type>::GetInstance();
 
-        std::shared_ptr<fims::EWAAgrowth<T> > data =
-                std::make_shared<fims::EWAAgrowth<T> >();
+        std::shared_ptr<fims::EWAAgrowth<Type> > ewaa_growth =
+                std::make_shared<fims::EWAAgrowth<Type> >();
 
         // set relative info
-        data->id = this->id;
-        data->ewaa = make_map(this->ages, this->weights); //this->ewaa;
+        ewaa_growth->id = this->id;
+        ewaa_growth->ewaa = make_map(this->ages, this->weights); //this->ewaa;
         // add to Information
-        info->growth_models[data->id] = data;
+        info->growth_models[ewaa_growth->id] = ewaa_growth;
 
         return true;
     }

@@ -92,13 +92,13 @@ public:
 
 #ifdef TMB_MODEL
 
-    template<typename T>
+    template<typename Type>
     bool add_to_fims_tmb_internal() {
-        std::shared_ptr<fims::Information < T>> info =
-                fims::Information<T>::GetInstance();
+        std::shared_ptr<fims::Information < Type>> info =
+                fims::Information<Type>::GetInstance();
 
-        std::shared_ptr<fims::Dnorm < T>> distributiion =
-                std::make_shared<fims::Dnorm < T >> ();
+        std::shared_ptr<fims::Dnorm < Type>> distributiion =
+                std::make_shared<fims::Dnorm < Type >> ();
 
         // interface to data/parameter value
         distributiion->id = this->id;

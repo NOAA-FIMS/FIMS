@@ -110,13 +110,13 @@ public:
 
 #ifdef TMB_MODEL
 
-    template<typename T>
+    template<typename Type>
     bool add_to_fims_tmb_internal() {
-        std::shared_ptr<fims::Information<T> > info =
-                fims::Information<T>::GetInstance();
+        std::shared_ptr<fims::Information<Type> > info =
+                fims::Information<Type>::GetInstance();
 
-        std::shared_ptr<fims::Population<T> > population =
-                std::make_shared<fims::Population<T> >();
+        std::shared_ptr<fims::Population<Type> > population =
+                std::make_shared<fims::Population<Type> >();
 
         // set relative info
         population->id = this->id;

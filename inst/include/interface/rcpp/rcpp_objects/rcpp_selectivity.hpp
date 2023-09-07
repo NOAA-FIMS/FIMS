@@ -173,14 +173,14 @@ public:
 
 #ifdef TMB_MODEL 
 
-    template<typename T>
+    template<typename Type>
     bool add_to_fims_tmb_internal() {
-        std::shared_ptr<fims::Information<T> > info =
-                fims::Information<T>::GetInstance();
+        std::shared_ptr<fims::Information<Type> > info =
+                fims::Information<Type>::GetInstance();
 
-        std::shared_ptr<fims::DoubleLogisticSelectivity<T> > selectivity =
+        std::shared_ptr<fims::DoubleLogisticSelectivity<Type> > selectivity =
                 std::make_shared<
-                fims::DoubleLogisticSelectivity<T> >();
+                fims::DoubleLogisticSelectivity<Type> >();
 
         // set relative info
         selectivity->id = this->id;

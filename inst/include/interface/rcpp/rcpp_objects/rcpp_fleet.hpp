@@ -99,52 +99,52 @@ public:
 
 #ifdef TMB_MODEL
 
-    template<typename T>
+    template<typename Type>
     bool add_to_fims_tmb_internal() {
-        std::shared_ptr<fims::Information < T>> info =
-                fims::Information<T>::GetInstance();
+        std::shared_ptr<fims::Information < Type> > info =
+                fims::Information<Type>::GetInstance();
 
-        std::shared_ptr<fims::Fleet < T>> f =
-                std::make_shared<fims::Fleet < T >> ();
+        std::shared_ptr<fims::Fleet < Type> > fleet =
+                std::make_shared<fims::Fleet < Type > > ();
 
         // set relative info
-        f->id = this->id;
-        f->is_survey = this->is_survey;
-        f->nages = this->nages;
-        f->nyears = this-> nyears;
-        f->agecomp_likelihood_id = this->agecomp_likelihood_id;
-        f->index_likelihood_id = this->index_likelihood_id;
-        f->observed_agecomp_data_id = this->observed_agecomp_data_id;
-        f->observed_index_data_id = this->observed_index_data_id;
-        f->selectivity_id = this->selectivity_id;
+        fleet->id = this->id;
+        fleet->is_survey = this->is_survey;
+        fleet->nages = this->nages;
+        fleet->nyears = this-> nyears;
+        fleet->agecomp_likelihood_id = this->agecomp_likelihood_id;
+        fleet->index_likelihood_id = this->index_likelihood_id;
+        fleet->observed_agecomp_data_id = this->observed_agecomp_data_id;
+        fleet->observed_index_data_id = this->observed_index_data_id;
+        fleet->selectivity_id = this->selectivity_id;
 
-        f->log_obs_error = this->log_obs_error.value;
+        fleet->log_obs_error = this->log_obs_error.value;
         if (this->log_obs_error.estimated) {
-            info->RegisterParameter(f->log_obs_error);
+            info->RegisterParameter(fleet->log_obs_error);
         }
-        f->log_q = this->log_q;
+        fleet->log_q = this->log_q;
         if (this->estimate_q) {
             if (this->random_q) {
-                info->RegisterRandomEffect(f->log_q);
+                info->RegisterRandomEffect(fleet->log_q);
             } else {
-                info->RegisterParameter(f->log_q);
+                info->RegisterParameter(fleet->log_q);
             }
         }
 
-        f->log_Fmort.resize(this->log_Fmort.size());
+        fleet->log_Fmort.resize(this->log_Fmort.size());
         for (int i = 0; i < log_Fmort.size(); i++) {
-            f->log_Fmort[i] = this->log_Fmort[i];
+            fleet->log_Fmort[i] = this->log_Fmort[i];
 
             if (this->estimate_F) {
                 if (this->random_F) {
-                    info->RegisterRandomEffect(f->log_Fmort[i]);
+                    info->RegisterRandomEffect(fleet->log_Fmort[i]);
                 } else {
-                    info->RegisterParameter(f->log_Fmort[i]);
+                    info->RegisterParameter(fleet->log_Fmort[i]);
                 }
             }
         }
         // add to Information
-        info->fleets[f->id] = f;
+        info->fleets[fleet->id] = fleet;
 
         return true;
     }
