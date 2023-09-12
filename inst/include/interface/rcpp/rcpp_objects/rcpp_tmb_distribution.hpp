@@ -258,7 +258,7 @@ public:
 
     template<typename T>
     bool add_to_fims_tmb_internal() {
-
+        typedef typename fims::ModelTraits<T>::EigenVector Vector0;
         std::shared_ptr<fims::Information < T> > info =
                 fims::Information<T>::GetInstance();
 
