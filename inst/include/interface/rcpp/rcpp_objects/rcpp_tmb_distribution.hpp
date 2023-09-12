@@ -97,17 +97,17 @@ public:
         std::shared_ptr<fims::Information < Type>> info =
                 fims::Information<Type>::GetInstance();
 
-        std::shared_ptr<fims::Dnorm < Type>> distributiion =
+        std::shared_ptr<fims::Dnorm < Type>> distribution =
                 std::make_shared<fims::Dnorm < Type >> ();
 
         // interface to data/parameter value
-        distributiion->id = this->id;
-        distributiion->x = this->x.value;
+        distribution->id = this->id;
+        distribution->x = this->x.value;
         // set relative info
-        distributiion->mean = this->mean.value;
-        distributiion->sd = this->sd.value;
+        distribution->mean = this->mean.value;
+        distribution->sd = this->sd.value;
 
-        info->distribution_models[distributiion->id] = distributiion;
+        info->distribution_models[distribution->id] = distribution;
 
         return true;
 
@@ -171,15 +171,16 @@ public:
         dlnorm.do_bias_correction = this->do_bias_correction;
         return dlnorm.evaluate(do_log);
     }
+
 #ifdef TMB_MODEL
 
-    template<typename T>
+    template<typename Type>
     bool add_to_fims_tmb_internal() {
-        std::shared_ptr<fims::Information < T> > info =
-                fims::Information<T>::GetInstance();
+        std::shared_ptr<fims::Information < Type> > info =
+                fims::Information<Type>::GetInstance();
 
-        std::shared_ptr < fims::Dlnorm <T> > distribution =
-                std::make_shared<fims::Dlnorm <T> > ();
+        std::shared_ptr < fims::Dlnorm <Type> > distribution =
+                std::make_shared<fims::Dlnorm <Type> > ();
 
         // set relative info
         distribution->id = this->id;
@@ -257,7 +258,7 @@ public:
 
     template<typename T>
     bool add_to_fims_tmb_internal() {
-        typedef typename fims::ModelTraits<T>::EigenVector Vector0;
+
         std::shared_ptr<fims::Information < T> > info =
                 fims::Information<T>::GetInstance();
 
