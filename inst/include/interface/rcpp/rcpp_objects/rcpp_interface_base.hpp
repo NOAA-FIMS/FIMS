@@ -25,34 +25,34 @@
  */
 class Parameter {
  public:
-  double value; /**< initial value of the parameter*/
-  double min =
+  double value_m; /**< initial value of the parameter*/
+  double min_m =
       std::numeric_limits<double>::min(); /**< min value of the parameter*/
-  double max =
+  double max_m =
       std::numeric_limits<double>::max(); /**< max value of the parameter*/
-  bool is_random_effect = false;          /**< Is the parameter a random effect
+  bool is_random_effect_m = false;          /**< Is the parameter a random effect
                                              parameter? Default value is false.*/
-  bool estimated =
+  bool estimated_m =
       false; /**< Is the parameter estimated? Default value is false.*/
 
   /**
    * @brief Constructor for initializing Parameter.
    * @details Inputs include value, min, max, estimated.
    */
-  Parameter(double value_m, double min_m, double max_m, bool estimated_m)
-      : value(value_m), min(min_m), max(max_m), estimated(estimated_m) {}
+  Parameter(double value, double min, double max, bool estimated)
+      : value_m(value), min_m(min), max_m(max), estimated_m(estimated) {}
 
   /**
    * @brief Constructor for initializing Parameter.
    * @details Inputs include value.
    */
-  Parameter(double value) { this->value = value; }
+  Parameter(double value) { value_m = value; }
 
   /**
    * @brief Constructor for initializing Parameter.
    * @details Set value to 0 when there is no input value.
    */
-  Parameter() { this->value = 0; }
+  Parameter() { value_m = 0; }
 };
 
 /**

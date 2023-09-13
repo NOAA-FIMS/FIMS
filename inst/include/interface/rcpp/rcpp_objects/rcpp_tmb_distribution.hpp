@@ -79,9 +79,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate(bool do_log) {
     fims::Dnorm<double> dnorm;
-    dnorm.x = this->x.value;
-    dnorm.mean = this->mean.value;
-    dnorm.sd = this->sd.value;
+    dnorm.x = this->x.value_m;
+    dnorm.mean = this->mean.value_m;
+    dnorm.sd = this->sd.value_m;
     return dnorm.evaluate(do_log);
   }
 
@@ -97,10 +97,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // interface to data/parameter value
     model0->id = this->id;
-    model0->x = this->x.value;
+    model0->x = this->x.value_m;
     // set relative info
-    model0->mean = this->mean.value;
-    model0->sd = this->sd.value;
+    model0->mean = this->mean.value_m;
+    model0->sd = this->sd.value_m;
 
     d0->distribution_models[model0->id] = model0;
 
@@ -112,9 +112,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // interface to data/parameter first derivative
     model1->id = this->id;
-    model1->x = this->x.value;
-    model1->mean = this->mean.value;
-    model1->sd = this->sd.value;
+    model1->x = this->x.value_m;
+    model1->mean = this->mean.value_m;
+    model1->sd = this->sd.value_m;
 
     d1->distribution_models[model1->id] = model1;
 
@@ -126,9 +126,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // interface to data/parameter second derivative
     model2->id = this->id;
-    model2->x = this->x.value;
-    model2->mean = this->mean.value;
-    model2->sd = this->sd.value;
+    model2->x = this->x.value_m;
+    model2->mean = this->mean.value_m;
+    model2->sd = this->sd.value_m;
 
     d2->distribution_models[model2->id] = model2;
 
@@ -140,9 +140,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // interface to data/parameter third derivative
     model3->id = this->id;
-    model3->x = this->x.value;
-    model3->mean = this->mean.value;
-    model3->sd = this->sd.value;
+    model3->x = this->x.value_m;
+    model3->mean = this->mean.value_m;
+    model3->sd = this->sd.value_m;
 
     d3->distribution_models[model3->id] = model3;
 
@@ -180,9 +180,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate(bool do_log) {
     fims::Dlnorm<double> dlnorm;
-    dlnorm.x = this->x.value;
-    dlnorm.meanlog = this->meanlog.value;
-    dlnorm.sdlog = this->sdlog.value;
+    dlnorm.x = this->x.value_m;
+    dlnorm.meanlog = this->meanlog.value_m;
+    dlnorm.sdlog = this->sdlog.value_m;
     return dlnorm.evaluate(do_log);
   }
 
@@ -198,9 +198,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     model0->id = this->id;
-    model0->x = this->x.value;
-    model0->meanlog = this->meanlog.value;
-    model0->sdlog = this->sdlog.value;
+    model0->x = this->x.value_m;
+    model0->meanlog = this->meanlog.value_m;
+    model0->sdlog = this->sdlog.value_m;
 
     d0->distribution_models[model0->id] = model0;
 
@@ -213,9 +213,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     model1->id = this->id;
-    model1->x = this->x.value;
-    model1->meanlog = this->meanlog.value;
-    model1->sdlog = this->sdlog.value;
+    model1->x = this->x.value_m;
+    model1->meanlog = this->meanlog.value_m;
+    model1->sdlog = this->sdlog.value_m;
 
     d1->distribution_models[model1->id] = model1;
 
@@ -228,9 +228,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     model2->id = this->id;
-    model2->x = this->x.value;
-    model2->meanlog = this->meanlog.value;
-    model2->sdlog = this->sdlog.value;
+    model2->x = this->x.value_m;
+    model2->meanlog = this->meanlog.value_m;
+    model2->sdlog = this->sdlog.value_m;
 
     d2->distribution_models[model2->id] = model2;
 
@@ -243,9 +243,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     model3->id = this->id;
-    model3->x = this->x.value;
-    model3->meanlog = this->meanlog.value;
-    model3->sdlog = this->sdlog.value;
+    model3->x = this->x.value_m;
+    model3->meanlog = this->meanlog.value_m;
+    model3->sdlog = this->sdlog.value_m;
 
     d3->distribution_models[model3->id] = model3;
 

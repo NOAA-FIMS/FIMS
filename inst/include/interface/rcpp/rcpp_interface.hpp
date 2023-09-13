@@ -174,11 +174,11 @@ RCPP_MODULE(fims) {
       .constructor()
       .constructor<double>()
       .constructor<Parameter>()
-      .field("value", &Parameter::value)
-      .field("min", &Parameter::min)
-      .field("max", &Parameter::max)
-      .field("is_random_effect", &Parameter::is_random_effect)
-      .field("estimated", &Parameter::estimated);
+      .field("value", &Parameter::value_m)
+      .field("min", &Parameter::min_m)
+      .field("max", &Parameter::max_m)
+      .field("is_random_effect", &Parameter::is_random_effect_m)
+      .field("estimated", &Parameter::estimated_m);
 
   Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()

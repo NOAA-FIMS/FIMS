@@ -83,14 +83,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual double evaluate(double spawners, double ssbzero) {
     fims::SRBevertonHolt<double> BevHolt;
 
-    BevHolt.logit_steep = this->logit_steep.value;
-    if (this->logit_steep.value == 1.0) {
+    BevHolt.logit_steep = this->logit_steep.value_m;
+    if (this->logit_steep.value_m == 1.0) {
       warning(
           "Steepness is subject to a logit transformation, so its value is "
           "0.7848469. Fixing it at 1.0 is not currently possible.");
     }
 
-    BevHolt.log_rzero = this->log_rzero.value;
+    BevHolt.log_rzero = this->log_rzero.value_m;
 
     return BevHolt.evaluate(spawners, ssbzero);
   }
@@ -98,7 +98,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual double evaluate_nll() {
     fims::SRBevertonHolt<double> NLL;
 
-    NLL.log_sigma_recruit = this->log_sigma_recruit.value;
+    NLL.log_sigma_recruit = this->log_sigma_recruit.value_m;
     NLL.recruit_deviations.resize(deviations.size());  // Vector from TMB
     for (int i = 0; i < deviations.size(); i++) {
       NLL.recruit_deviations[i] = deviations[i];
@@ -121,25 +121,25 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     // set relative info
     b0->id = this->id;
-    b0->logit_steep = this->logit_steep.value;
-    if (this->logit_steep.estimated) {
-      if (this->logit_steep.is_random_effect) {
+    b0->logit_steep = this->logit_steep.value_m;
+    if (this->logit_steep.estimated_m) {
+      if (this->logit_steep.is_random_effect_m) {
         d0->RegisterRandomEffect(b0->logit_steep);
       } else {
         d0->RegisterParameter(b0->logit_steep);
       }
     }
-    b0->log_rzero = this->log_rzero.value;
-    if (this->log_rzero.estimated) {
-      if (this->log_rzero.is_random_effect) {
+    b0->log_rzero = this->log_rzero.value_m;
+    if (this->log_rzero.estimated_m) {
+      if (this->log_rzero.is_random_effect_m) {
         d0->RegisterRandomEffect(b0->log_rzero);
       } else {
         d0->RegisterParameter(b0->log_rzero);
       }
     }
-    b0->log_sigma_recruit = this->log_sigma_recruit.value;
-    if (this->log_sigma_recruit.estimated) {
-      if (this->log_sigma_recruit.is_random_effect) {
+    b0->log_sigma_recruit = this->log_sigma_recruit.value_m;
+    if (this->log_sigma_recruit.estimated_m) {
+      if (this->log_sigma_recruit.is_random_effect_m) {
         d0->RegisterRandomEffect(b0->log_sigma_recruit);
       } else {
         d0->RegisterParameter(b0->log_sigma_recruit);
@@ -170,25 +170,25 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     // set relative info
     b1->id = this->id;
-    b1->logit_steep = this->logit_steep.value;
-    if (this->logit_steep.estimated) {
-      if (this->logit_steep.is_random_effect) {
+    b1->logit_steep = this->logit_steep.value_m;
+    if (this->logit_steep.estimated_m) {
+      if (this->logit_steep.is_random_effect_m) {
         d1->RegisterRandomEffect(b1->logit_steep);
       } else {
         d1->RegisterParameter(b1->logit_steep);
       }
     }
-    b1->log_rzero = this->log_rzero.value;
-    if (this->log_rzero.estimated) {
-      if (this->log_rzero.is_random_effect) {
+    b1->log_rzero = this->log_rzero.value_m;
+    if (this->log_rzero.estimated_m) {
+      if (this->log_rzero.is_random_effect_m) {
         d1->RegisterRandomEffect(b1->log_rzero);
       } else {
         d1->RegisterParameter(b1->log_rzero);
       }
     }
-    b1->log_sigma_recruit = this->log_sigma_recruit.value;
-    if (this->log_sigma_recruit.estimated) {
-      if (this->log_sigma_recruit.is_random_effect) {
+    b1->log_sigma_recruit = this->log_sigma_recruit.value_m;
+    if (this->log_sigma_recruit.estimated_m) {
+      if (this->log_sigma_recruit.is_random_effect_m) {
         d1->RegisterRandomEffect(b1->log_sigma_recruit);
       } else {
         d1->RegisterParameter(b1->log_sigma_recruit);
@@ -219,25 +219,25 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     // set relative info
     b2->id = this->id;
-    b2->logit_steep = this->logit_steep.value;
-    if (this->logit_steep.estimated) {
-      if (this->logit_steep.is_random_effect) {
+    b2->logit_steep = this->logit_steep.value_m;
+    if (this->logit_steep.estimated_m) {
+      if (this->logit_steep.is_random_effect_m) {
         d2->RegisterRandomEffect(b2->logit_steep);
       } else {
         d2->RegisterParameter(b2->logit_steep);
       }
     }
-    b2->log_rzero = this->log_rzero.value;
-    if (this->log_rzero.estimated) {
-      if (this->log_rzero.is_random_effect) {
+    b2->log_rzero = this->log_rzero.value_m;
+    if (this->log_rzero.estimated_m) {
+      if (this->log_rzero.is_random_effect_m) {
         d2->RegisterRandomEffect(b2->log_rzero);
       } else {
         d2->RegisterParameter(b2->log_rzero);
       }
     }
-    b2->log_sigma_recruit = this->log_sigma_recruit.value;
-    if (this->log_sigma_recruit.estimated) {
-      if (this->log_sigma_recruit.is_random_effect) {
+    b2->log_sigma_recruit = this->log_sigma_recruit.value_m;
+    if (this->log_sigma_recruit.estimated_m) {
+      if (this->log_sigma_recruit.is_random_effect_m) {
         d2->RegisterRandomEffect(b2->log_sigma_recruit);
       } else {
         d2->RegisterParameter(b2->log_sigma_recruit);
@@ -268,25 +268,25 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     // set relative info
     b3->id = this->id;
-    b3->logit_steep = this->logit_steep.value;
-    if (this->logit_steep.estimated) {
-      if (this->logit_steep.is_random_effect) {
+    b3->logit_steep = this->logit_steep.value_m;
+    if (this->logit_steep.estimated_m) {
+      if (this->logit_steep.is_random_effect_m) {
         d3->RegisterRandomEffect(b3->logit_steep);
       } else {
         d3->RegisterParameter(b3->logit_steep);
       }
     }
-    b3->log_rzero = this->log_rzero.value;
-    if (this->log_rzero.estimated) {
-      if (this->log_rzero.is_random_effect) {
+    b3->log_rzero = this->log_rzero.value_m;
+    if (this->log_rzero.estimated_m) {
+      if (this->log_rzero.is_random_effect_m) {
         d3->RegisterRandomEffect(b3->log_rzero);
       } else {
         d3->RegisterParameter(b3->log_rzero);
       }
     }
-    b3->log_sigma_recruit = this->log_sigma_recruit.value;
-    if (this->log_sigma_recruit.estimated) {
-      if (this->log_sigma_recruit.is_random_effect) {
+    b3->log_sigma_recruit = this->log_sigma_recruit.value_m;
+    if (this->log_sigma_recruit.estimated_m) {
+      if (this->log_sigma_recruit.is_random_effect_m) {
         d3->RegisterRandomEffect(b3->log_sigma_recruit);
       } else {
         d3->RegisterParameter(b3->log_sigma_recruit);
