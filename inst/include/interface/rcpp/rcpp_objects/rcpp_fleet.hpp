@@ -108,7 +108,7 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief Set the unique id for the Observed Index Data object
    *
-   * @param interface_observed_index_data_id_m Unique id for the Observed Index Data object
+   * @param observed_index_data_id Unique id for the Observed Index Data object
    */
   void SetObservedIndexData(int observed_index_data_id) {
     interface_observed_index_data_id_m = observed_index_data_id;
