@@ -115,8 +115,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f0->observed_index_data_id = this->observed_index_data_id;
     f0->selectivity_id = this->selectivity_id;
 
-    f0->log_obs_error = this->log_obs_error.value;
-    if (this->log_obs_error.estimated) {
+    f0->log_obs_error = this->log_obs_error.value_m;
+    if (this->log_obs_error.estimated_m) {
       d0->RegisterParameter(f0->log_obs_error);
     }
     f0->log_q = this->log_q;
@@ -158,8 +158,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f1->index_likelihood_id = this->index_likelihood_id;
     f1->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f1->observed_index_data_id = this->observed_index_data_id;
-    f1->log_obs_error = this->log_obs_error.value;
-    if (this->log_obs_error.estimated) {
+    f1->log_obs_error = this->log_obs_error.value_m;
+    if (this->log_obs_error.estimated_m) {
       d1->RegisterParameter(f1->log_obs_error);
     }
     f1->selectivity_id = this->selectivity_id;
@@ -203,8 +203,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f2->index_likelihood_id = this->index_likelihood_id;
     f2->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f2->observed_index_data_id = this->observed_index_data_id;
-    f2->log_obs_error = this->log_obs_error.value;
-    if (this->log_obs_error.estimated) {
+    f2->log_obs_error = this->log_obs_error.value_m;
+    if (this->log_obs_error.estimated_m) {
       d2->RegisterParameter(f2->log_obs_error);
     }
     f2->selectivity_id = this->selectivity_id;
@@ -248,8 +248,8 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     f3->observed_agecomp_data_id = this->observed_agecomp_data_id;
     f3->observed_index_data_id = this->observed_index_data_id;
     f3->selectivity_id = this->selectivity_id;
-    f3->log_obs_error = this->log_obs_error.value;
-    if (this->log_obs_error.estimated) {
+    f3->log_obs_error = this->log_obs_error.value_m;
+    if (this->log_obs_error.estimated_m) {
       d3->RegisterParameter(f3->log_obs_error);
     }
     f3->log_q = this->log_q;

@@ -73,8 +73,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual double evaluate(double x) {
     fims::LogisticSelectivity<double> LogisticSel;
 
-    LogisticSel.median = this->median.value;
-    LogisticSel.slope = this->slope.value;
+    LogisticSel.median = this->median.value_m;
+    LogisticSel.slope = this->slope.value_m;
     return LogisticSel.evaluate(x);
   }
 
@@ -89,17 +89,17 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     ls0->id = this->id;
-    ls0->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
+    ls0->median = this->median.value_m;
+    if (this->median.estimated_m) {
+      if (this->median.is_random_effect_m) {
         d0->RegisterRandomEffect(ls0->median);
       } else {
         d0->RegisterParameter(ls0->median);
       }
     }
-    ls0->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
+    ls0->slope = this->slope.value_m;
+    if (this->slope.estimated_m) {
+      if (this->slope.is_random_effect_m) {
         d0->RegisterRandomEffect(ls0->slope);
       } else {
         d0->RegisterParameter(ls0->slope);
@@ -117,17 +117,17 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     ls1->id = this->id;
-    ls1->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
+    ls1->median = this->median.value_m;
+    if (this->median.estimated_m) {
+      if (this->median.is_random_effect_m) {
         d1->RegisterRandomEffect(ls1->median);
       } else {
         d1->RegisterParameter(ls1->median);
       }
     }
-    ls1->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
+    ls1->slope = this->slope.value_m;
+    if (this->slope.estimated_m) {
+      if (this->slope.is_random_effect_m) {
         d1->RegisterRandomEffect(ls1->slope);
       } else {
         d1->RegisterParameter(ls1->slope);
@@ -145,17 +145,17 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     ls2->id = this->id;
-    ls2->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
+    ls2->median = this->median.value_m;
+    if (this->median.estimated_m) {
+      if (this->median.is_random_effect_m) {
         d2->RegisterRandomEffect(ls2->median);
       } else {
         d2->RegisterParameter(ls2->median);
       }
     }
-    ls2->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
+    ls2->slope = this->slope.value_m;
+    if (this->slope.estimated_m) {
+      if (this->slope.is_random_effect_m) {
         d2->RegisterRandomEffect(ls2->slope);
       } else {
         d2->RegisterParameter(ls2->slope);
@@ -173,17 +173,17 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     ls3->id = this->id;
-    ls3->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
+    ls3->median = this->median.value_m;
+    if (this->median.estimated_m) {
+      if (this->median.is_random_effect_m) {
         d3->RegisterRandomEffect(ls3->median);
       } else {
         d3->RegisterParameter(ls3->median);
       }
     }
-    ls3->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
+    ls3->slope = this->slope.value_m;
+    if (this->slope.estimated_m) {
+      if (this->slope.is_random_effect_m) {
         d3->RegisterRandomEffect(ls3->slope);
       } else {
         d3->RegisterParameter(ls3->slope);
@@ -223,10 +223,10 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual double evaluate(double x) {
     fims::DoubleLogisticSelectivity<double> DoubleLogisticSel;
 
-    DoubleLogisticSel.median_asc = this->median_asc.value;
-    DoubleLogisticSel.slope_asc = this->slope_asc.value;
-    DoubleLogisticSel.median_desc = this->median_desc.value;
-    DoubleLogisticSel.slope_desc = this->slope_desc.value;
+    DoubleLogisticSel.median_asc = this->median_asc.value_m;
+    DoubleLogisticSel.slope_asc = this->slope_asc.value_m;
+    DoubleLogisticSel.median_desc = this->median_desc.value_m;
+    DoubleLogisticSel.slope_desc = this->slope_desc.value_m;
     return DoubleLogisticSel.evaluate(x);
   }
 
@@ -242,33 +242,33 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     ls0->id = this->id;
-    ls0->median_asc = this->median_asc.value;
-    if (this->median_asc.estimated) {
-      if (this->median_asc.is_random_effect) {
+    ls0->median_asc = this->median_asc.value_m;
+    if (this->median_asc.estimated_m) {
+      if (this->median_asc.is_random_effect_m) {
         d0->RegisterRandomEffect(ls0->median_asc);
       } else {
         d0->RegisterParameter(ls0->median_asc);
       }
     }
-    ls0->slope_asc = this->slope_asc.value;
-    if (this->slope_asc.estimated) {
-      if (this->slope_asc.is_random_effect) {
+    ls0->slope_asc = this->slope_asc.value_m;
+    if (this->slope_asc.estimated_m) {
+      if (this->slope_asc.is_random_effect_m) {
         d0->RegisterRandomEffect(ls0->slope_asc);
       } else {
         d0->RegisterParameter(ls0->slope_asc);
       }
     }
-    ls0->median_desc = this->median_desc.value;
-    if (this->median_desc.estimated) {
-      if (this->median_desc.is_random_effect) {
+    ls0->median_desc = this->median_desc.value_m;
+    if (this->median_desc.estimated_m) {
+      if (this->median_desc.is_random_effect_m) {
         d0->RegisterRandomEffect(ls0->median_desc);
       } else {
         d0->RegisterParameter(ls0->median_desc);
       }
     }
-    ls0->slope_desc = this->slope_desc.value;
-    if (this->slope_desc.estimated) {
-      if (this->slope_desc.is_random_effect) {
+    ls0->slope_desc = this->slope_desc.value_m;
+    if (this->slope_desc.estimated_m) {
+      if (this->slope_desc.is_random_effect_m) {
         d0->RegisterRandomEffect(ls0->slope_desc);
       } else {
         d0->RegisterParameter(ls0->slope_desc);
@@ -287,33 +287,33 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     ls1->id = this->id;
-    ls1->median_asc = this->median_asc.value;
-    if (this->median_asc.estimated) {
-      if (this->median_asc.is_random_effect) {
+    ls1->median_asc = this->median_asc.value_m;
+    if (this->median_asc.estimated_m) {
+      if (this->median_asc.is_random_effect_m) {
         d1->RegisterRandomEffect(ls1->median_asc);
       } else {
         d1->RegisterParameter(ls1->median_asc);
       }
     }
-    ls1->slope_asc = this->slope_asc.value;
-    if (this->slope_asc.estimated) {
-      if (this->slope_asc.is_random_effect) {
+    ls1->slope_asc = this->slope_asc.value_m;
+    if (this->slope_asc.estimated_m) {
+      if (this->slope_asc.is_random_effect_m) {
         d1->RegisterRandomEffect(ls1->slope_asc);
       } else {
         d1->RegisterParameter(ls1->slope_asc);
       }
     }
-    ls1->median_desc = this->median_desc.value;
-    if (this->median_desc.estimated) {
-      if (this->median_desc.is_random_effect) {
+    ls1->median_desc = this->median_desc.value_m;
+    if (this->median_desc.estimated_m) {
+      if (this->median_desc.is_random_effect_m) {
         d1->RegisterRandomEffect(ls1->median_desc);
       } else {
         d1->RegisterParameter(ls1->median_desc);
       }
     }
-    ls1->slope_desc = this->slope_desc.value;
-    if (this->slope_desc.estimated) {
-      if (this->slope_desc.is_random_effect) {
+    ls1->slope_desc = this->slope_desc.value_m;
+    if (this->slope_desc.estimated_m) {
+      if (this->slope_desc.is_random_effect_m) {
         d1->RegisterRandomEffect(ls1->slope_desc);
       } else {
         d1->RegisterParameter(ls1->slope_desc);
@@ -332,34 +332,34 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     ls2->id = this->id;
-    ls2->median_asc = this->median_asc.value;
-    if (this->median_asc.estimated) {
-      if (this->median_asc.is_random_effect) {
+    ls2->median_asc = this->median_asc.value_m;
+    if (this->median_asc.estimated_m) {
+      if (this->median_asc.is_random_effect_m) {
         d2->RegisterRandomEffect(ls2->median_asc);
       } else {
         d2->RegisterParameter(ls2->median_asc);
       }
     }
-    ls2->slope_asc = this->slope_asc.value;
-    if (this->slope_asc.estimated) {
-      if (this->slope_asc.is_random_effect) {
+    ls2->slope_asc = this->slope_asc.value_m;
+    if (this->slope_asc.estimated_m) {
+      if (this->slope_asc.is_random_effect_m) {
         d2->RegisterRandomEffect(ls2->slope_asc);
       } else {
         d2->RegisterParameter(ls2->slope_asc);
       }
     }
 
-    ls2->median_desc = this->median_desc.value;
-    if (this->median_desc.estimated) {
-      if (this->median_desc.is_random_effect) {
+    ls2->median_desc = this->median_desc.value_m;
+    if (this->median_desc.estimated_m) {
+      if (this->median_desc.is_random_effect_m) {
         d2->RegisterRandomEffect(ls2->median_desc);
       } else {
         d2->RegisterParameter(ls2->median_desc);
       }
     }
-    ls2->slope_desc = this->slope_desc.value;
-    if (this->slope_desc.estimated) {
-      if (this->slope_desc.is_random_effect) {
+    ls2->slope_desc = this->slope_desc.value_m;
+    if (this->slope_desc.estimated_m) {
+      if (this->slope_desc.is_random_effect_m) {
         d2->RegisterRandomEffect(ls2->slope_desc);
       } else {
         d2->RegisterParameter(ls2->slope_desc);
@@ -378,34 +378,34 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     ls3->id = this->id;
-    ls3->median_asc = this->median_asc.value;
-    if (this->median_asc.estimated) {
-      if (this->median_asc.is_random_effect) {
+    ls3->median_asc = this->median_asc.value_m;
+    if (this->median_asc.estimated_m) {
+      if (this->median_asc.is_random_effect_m) {
         d3->RegisterRandomEffect(ls3->median_asc);
       } else {
         d3->RegisterParameter(ls3->median_asc);
       }
     }
-    ls3->slope_asc = this->slope_asc.value;
-    if (this->slope_asc.estimated) {
-      if (this->slope_asc.is_random_effect) {
+    ls3->slope_asc = this->slope_asc.value_m;
+    if (this->slope_asc.estimated_m) {
+      if (this->slope_asc.is_random_effect_m) {
         d3->RegisterRandomEffect(ls3->slope_asc);
       } else {
         d3->RegisterParameter(ls3->slope_asc);
       }
     }
 
-    ls3->median_desc = this->median_desc.value;
-    if (this->median_desc.estimated) {
-      if (this->median_desc.is_random_effect) {
+    ls3->median_desc = this->median_desc.value_m;
+    if (this->median_desc.estimated_m) {
+      if (this->median_desc.is_random_effect_m) {
         d3->RegisterRandomEffect(ls3->median_desc);
       } else {
         d3->RegisterParameter(ls3->median_desc);
       }
     }
-    ls3->slope_desc = this->slope_desc.value;
-    if (this->slope_desc.estimated) {
-      if (this->slope_desc.is_random_effect) {
+    ls3->slope_desc = this->slope_desc.value_m;
+    if (this->slope_desc.estimated_m) {
+      if (this->slope_desc.is_random_effect_m) {
         d3->RegisterRandomEffect(ls3->slope_desc);
       } else {
         d3->RegisterParameter(ls3->slope_desc);

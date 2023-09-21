@@ -74,8 +74,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   virtual double evaluate(double x) {
     fims::LogisticMaturity<double> LogisticMat;
 
-    LogisticMat.median = this->median.value;
-    LogisticMat.slope = this->slope.value;
+    LogisticMat.median = this->median.value_m;
+    LogisticMat.slope = this->slope.value_m;
     return LogisticMat.evaluate(x);
   }
 
@@ -90,17 +90,17 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     // set relative info
     lm0->id = this->id;
-    lm0->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
+    lm0->median = this->median.value_m;
+    if (this->median.estimated_m) {
+      if (this->median.is_random_effect_m) {
         d0->RegisterRandomEffect(lm0->median);
       } else {
         d0->RegisterParameter(lm0->median);
       }
     }
-    lm0->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
+    lm0->slope = this->slope.value_m;
+    if (this->slope.estimated_m) {
+      if (this->slope.is_random_effect_m) {
         d0->RegisterRandomEffect(lm0->slope);
       } else {
         d0->RegisterParameter(lm0->slope);
@@ -118,17 +118,17 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     // set relative info
     lm1->id = this->id;
-    lm1->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
+    lm1->median = this->median.value_m;
+    if (this->median.estimated_m) {
+      if (this->median.is_random_effect_m) {
         d1->RegisterRandomEffect(lm1->median);
       } else {
         d1->RegisterParameter(lm1->median);
       }
     }
-    lm1->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
+    lm1->slope = this->slope.value_m;
+    if (this->slope.estimated_m) {
+      if (this->slope.is_random_effect_m) {
         d1->RegisterRandomEffect(lm1->slope);
       } else {
         d1->RegisterParameter(lm1->slope);
@@ -146,17 +146,17 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     // set relative info
     lm2->id = this->id;
-    lm2->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
+    lm2->median = this->median.value_m;
+    if (this->median.estimated_m) {
+      if (this->median.is_random_effect_m) {
         d2->RegisterRandomEffect(lm2->median);
       } else {
         d2->RegisterParameter(lm2->median);
       }
     }
-    lm2->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
+    lm2->slope = this->slope.value_m;
+    if (this->slope.estimated_m) {
+      if (this->slope.is_random_effect_m) {
         d2->RegisterRandomEffect(lm2->slope);
       } else {
         d2->RegisterParameter(lm2->slope);
@@ -174,17 +174,17 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     // set relative info
     lm3->id = this->id;
-    lm3->median = this->median.value;
-    if (this->median.estimated) {
-      if (this->median.is_random_effect) {
+    lm3->median = this->median.value_m;
+    if (this->median.estimated_m) {
+      if (this->median.is_random_effect_m) {
         d3->RegisterRandomEffect(lm3->median);
       } else {
         d3->RegisterParameter(lm3->median);
       }
     }
-    lm3->slope = this->slope.value;
-    if (this->slope.estimated) {
-      if (this->slope.is_random_effect) {
+    lm3->slope = this->slope.value_m;
+    if (this->slope.estimated_m) {
+      if (this->slope.is_random_effect_m) {
         d3->RegisterRandomEffect(lm3->slope);
       } else {
         d3->RegisterParameter(lm3->slope);
