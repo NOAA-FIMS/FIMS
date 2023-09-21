@@ -30,8 +30,8 @@ class Parameter {
       std::numeric_limits<double>::min(); /**< min value of the parameter*/
   double max_m =
       std::numeric_limits<double>::max(); /**< max value of the parameter*/
-  bool is_random_effect_m = false;          /**< Is the parameter a random effect
-                                             parameter? Default value is false.*/
+  bool is_random_effect_m = false;        /**< Is the parameter a random effect
+                                           parameter? Default value is false.*/
   bool estimated_m =
       false; /**< Is the parameter estimated? Default value is false.*/
 
