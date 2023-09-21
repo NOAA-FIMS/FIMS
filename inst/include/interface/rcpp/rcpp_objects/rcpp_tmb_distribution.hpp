@@ -241,9 +241,9 @@ public:
         fims::Dmultinom<double> dmultinom;
         // Decale TMBVector in this scope
         typedef
-        typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector TMBVector;
-        dmultinom.x = TMBVector(x.size()); // Vector from TMB
-        dmultinom.p = TMBVector(p.size()); // Vector from TMB
+        typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector;
+        dmultinom.x = Vector(x.size()); // Vector from TMB
+        dmultinom.p = Vector(p.size()); // Vector from TMB
         for (int i = 0; i < x.size(); i++) {
             dmultinom.x[i] = x[i];
             dmultinom.p[i] = p[i];
@@ -255,7 +255,7 @@ public:
 
     template<typename T>
     bool add_to_fims_tmb_internal() {
-        typedef typename fims::ModelTraits<T>::EigenVector Vector0;
+        typedef typename fims::ModelTraits<T>::EigenVector Vector;
         std::shared_ptr<fims::Information < T> > info =
                 fims::Information<T>::GetInstance();
 
@@ -263,8 +263,8 @@ public:
                 std::make_shared<fims::Dmultinom < T > > ();
 
         distribution->id = this->id;
-        distribution->x = Vector0(x.size());
-        distribution->p = Vector0(p.size());
+        distribution->x = Vector(x.size());
+        distribution->p = Vector(p.size());
 
         for (int i = 0; i < x.size(); i++) {
             distribution->x[i] = x[i];
