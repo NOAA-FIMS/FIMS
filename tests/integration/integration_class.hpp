@@ -571,7 +571,6 @@ public:
                     std::cout << "'logR.resid' not found.\n";
                 }
             }
-            rec->use_recruit_bias_adjustment = false;
             pop.recruitment = rec;
 
             // set maturity

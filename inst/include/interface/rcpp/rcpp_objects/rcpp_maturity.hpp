@@ -79,9 +79,8 @@ public:
      */
     virtual double evaluate(double x) {
         fims::LogisticMaturity<double> LogisticMat;
-
-        LogisticMat.median = this->median.value;
-        LogisticMat.slope = this->slope.value;
+        LogisticMat.median = this->median.value_m;
+        LogisticMat.slope = this->slope.value_m;
         return LogisticMat.evaluate(x);
     }
 
@@ -97,17 +96,17 @@ public:
 
         // set relative info
         maturity->id = this->id;
-        maturity->median = this->median.value;
-        if (this->median.estimated) {
-            if (this->median.is_random_effect) {
+        maturity->median = this->median.value_m;
+        if (this->median.estimated_m) {
+            if (this->median.is_random_effect_m) {
                 info->RegisterRandomEffect(maturity->median);
             } else {
                 info->RegisterParameter(maturity->median);
             }
         }
-        maturity->slope = this->slope.value;
-        if (this->slope.estimated) {
-            if (this->slope.is_random_effect) {
+        maturity->slope = this->slope.value_m;
+        if (this->slope.estimated_m) {
+            if (this->slope.is_random_effect_m) {
                 info->RegisterRandomEffect(maturity->slope);
             } else {
                 info->RegisterParameter(maturity->slope);

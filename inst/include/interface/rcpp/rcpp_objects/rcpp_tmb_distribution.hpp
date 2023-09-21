@@ -84,9 +84,9 @@ public:
      */
     virtual double evaluate(bool do_log) {
         fims::Dnorm<double> dnorm;
-        dnorm.x = this->x.value;
-        dnorm.mean = this->mean.value;
-        dnorm.sd = this->sd.value;
+        dnorm.x = this->x.value_m;
+        dnorm.mean = this->mean.value_m;
+        dnorm.sd = this->sd.value_m;
         return dnorm.evaluate(do_log);
     }
 
@@ -102,10 +102,10 @@ public:
 
         // interface to data/parameter value
         distribution->id = this->id;
-        distribution->x = this->x.value;
+        distribution->x = this->x.value_m;
         // set relative info
-        distribution->mean = this->mean.value;
-        distribution->sd = this->sd.value;
+        distribution->mean = this->mean.value_m;
+        distribution->sd = this->sd.value_m;
 
         info->distribution_models[distribution->id] = distribution;
 
@@ -140,8 +140,6 @@ public:
     Parameter x; /*!< observation */
     Parameter meanlog; /*!< mean of the distribution of log(x) */
     Parameter sdlog; /*!< standard deviation of the distribution of log(x) */
-    bool do_bias_correction; /*!< true if the lognormal should be bias corrected,
-                              default FALSE */
 
     DlnormDistributionsInterface() : DistributionsInterfaceBase() {
     }
@@ -165,10 +163,9 @@ public:
      */
     virtual double evaluate(bool do_log) {
         fims::Dlnorm<double> dlnorm;
-        dlnorm.x = this->x.value;
-        dlnorm.meanlog = this->meanlog.value;
-        dlnorm.sdlog = this->sdlog.value;
-        dlnorm.do_bias_correction = this->do_bias_correction;
+        dlnorm.x = this->x.value_m;
+        dlnorm.meanlog = this->meanlog.value_m;
+        dlnorm.sdlog = this->sdlog.value_m;
         return dlnorm.evaluate(do_log);
     }
 
@@ -184,9 +181,9 @@ public:
 
         // set relative info
         distribution->id = this->id;
-        distribution->x = this->x.value;
-        distribution->meanlog = this->meanlog.value;
-        distribution->sdlog = this->sdlog.value;
+        distribution->x = this->x.value_m;
+        distribution->meanlog = this->meanlog.value_m;
+        distribution->sdlog = this->sdlog.value_m;
 
         info->distribution_models[distribution->id] = distribution;
 

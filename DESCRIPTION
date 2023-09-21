@@ -39,7 +39,7 @@ Authors@R: c(
     person("Jon", "Brodziak", role = "aut"),
     person("Kristan", "Blackhart", role = "aut"),
     person("Peter", "Kuriyama", role = "aut",
-      comment = c(ORCID = "0000-0002-6971-4015"))
+           comment = c(ORCID = "0000-0002-6971-4015"))
   )
 Description: The Fisheries Integrated Modeling System is a next-generation
     framework of stock assessment models, assisting fishery managers with

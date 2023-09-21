@@ -31,8 +31,6 @@ public:
     // deviations*/
     /// static bool constrain_deviations; /**< whether or not the rec devs are
     /// constrained*/
-    // static std::vector<double> rec_bias_adj; /**< a vector of bias adjustment
-    // values*/
 
     RecruitmentInterfaceBase() {
         this->id = RecruitmentInterfaceBase::id_g++;
@@ -73,12 +71,9 @@ public:
     Parameter logit_steep; /**< steepness or the productivity of the stock*/
     Parameter log_rzero; /**< recruitment at unfished biomass */
     Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
-    Rcpp::NumericVector recruit_bias_adjustment; /**<vector bias adjustment*/
     Rcpp::NumericVector deviations; /**< recruitment deviations*/
     bool estimate_deviations =
             false; /**< boolean describing whether to estimate */
-    bool use_bias_correction =
-            false; /**< boolean describing whether to do bias correction */
 
     BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {
     }
@@ -93,14 +88,14 @@ public:
     virtual double evaluate(double spawners, double ssbzero) {
         fims::SRBevertonHolt<double> BevHolt;
 
-        BevHolt.logit_steep = this->logit_steep.value;
-        if (this->logit_steep.value == 1.0) {
+        BevHolt.logit_steep = this->logit_steep.value_m;
+        if (this->logit_steep.value_m == 1.0) {
             warning(
                     "Steepness is subject to a logit transformation, so its value is "
                     "0.7848469. Fixing it at 1.0 is not currently possible.");
         }
 
-        BevHolt.log_rzero = this->log_rzero.value;
+        BevHolt.log_rzero = this->log_rzero.value_m;
 
         return BevHolt.evaluate(spawners, ssbzero);
     }
@@ -108,20 +103,12 @@ public:
     virtual double evaluate_nll() {
         fims::SRBevertonHolt<double> NLL;
 
-        NLL.log_sigma_recruit = this->log_sigma_recruit.value;
+        NLL.log_sigma_recruit = this->log_sigma_recruit.value_m;
         NLL.recruit_deviations.resize(deviations.size()); // Vector from TMB
-        NLL.recruit_bias_adjustment.resize(
-                recruit_bias_adjustment.size()); // Vector from TMB
         for (int i = 0; i < deviations.size(); i++) {
             NLL.recruit_deviations[i] = deviations[i];
-            NLL.recruit_bias_adjustment[i] = recruit_bias_adjustment[i];
         }
         FIMS_LOG << "Rec devs being passed to C++ are " << deviations << std::endl;
-
-        Rcout << "Rec bias adj being passed to C++ are " << recruit_bias_adjustment
-                << std::endl;
-
-        NLL.use_recruit_bias_adjustment = this->use_bias_correction;
         NLL.estimate_recruit_deviations = this->estimate_deviations;
         return NLL.evaluate_nll();
     }
@@ -138,25 +125,25 @@ public:
 
         // set relative info
         recruitment->id = this->id;
-        recruitment->logit_steep = this->logit_steep.value;
-        if (this->logit_steep.estimated) {
-            if (this->logit_steep.is_random_effect) {
+        recruitment->logit_steep = this->logit_steep.value_m;
+        if (this->logit_steep.estimated_m) {
+            if (this->logit_steep.is_random_effect_m) {
                 info->RegisterRandomEffect(recruitment->logit_steep);
             } else {
                 info->RegisterParameter(recruitment->logit_steep);
             }
         }
-        recruitment->log_rzero = this->log_rzero.value;
-        if (this->log_rzero.estimated) {
-            if (this->log_rzero.is_random_effect) {
+        recruitment->log_rzero = this->log_rzero.value_m;
+        if (this->log_rzero.estimated_m) {
+            if (this->log_rzero.is_random_effect_m) {
                 info->RegisterRandomEffect(recruitment->log_rzero);
             } else {
                 info->RegisterParameter(recruitment->log_rzero);
             }
         }
-        recruitment->log_sigma_recruit = this->log_sigma_recruit.value;
-        if (this->log_sigma_recruit.estimated) {
-            if (this->log_sigma_recruit.is_random_effect) {
+        recruitment->log_sigma_recruit = this->log_sigma_recruit.value_m;
+        if (this->log_sigma_recruit.estimated_m) {
+            if (this->log_sigma_recruit.is_random_effect_m) {
                 info->RegisterRandomEffect(recruitment->log_sigma_recruit);
             } else {
                 info->RegisterParameter(recruitment->log_sigma_recruit);
@@ -175,9 +162,9 @@ public:
             }
         }
 
-        recruitment->use_recruit_bias_adjustment = this->use_bias_correction;
         // add to Information
         info->recruitment_models[recruitment->id] = recruitment;
+
 
         return true;
     }
@@ -195,6 +182,7 @@ public:
     }
 
 #endif
+
 };
 
 #endif

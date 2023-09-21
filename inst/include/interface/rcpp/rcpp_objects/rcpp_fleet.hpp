@@ -67,8 +67,8 @@ public:
     void SetIndexLikelihood(int index_likelihood_id) {
         this->index_likelihood_id = index_likelihood_id;
     }
-
-    /**
+  
+   /**
      * @brief Set the unique id for the Observed Age Comp Data object
      *
      * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
@@ -94,16 +94,14 @@ public:
      */
     void SetSelectivity(int selectivity_id) {
         this->selectivity_id = selectivity_id;
-    }
-
+    }  
 
 #ifdef TMB_MODEL
-
     template<typename Type>
     bool add_to_fims_tmb_internal() {
         std::shared_ptr<fims::Information < Type> > info =
                 fims::Information<Type>::GetInstance();
-
+   
         std::shared_ptr<fims::Fleet < Type> > fleet =
                 std::make_shared<fims::Fleet < Type > > ();
 
@@ -118,8 +116,8 @@ public:
         fleet->observed_index_data_id = this->observed_index_data_id;
         fleet->selectivity_id = this->selectivity_id;
 
-        fleet->log_obs_error = this->log_obs_error.value;
-        if (this->log_obs_error.estimated) {
+        fleet->log_obs_error = this->log_obs_error.value_m;
+        if (this->log_obs_error.estimated_m) {
             info->RegisterParameter(fleet->log_obs_error);
         }
         fleet->log_q = this->log_q;

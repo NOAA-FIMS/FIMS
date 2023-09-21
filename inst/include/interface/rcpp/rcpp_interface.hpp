@@ -174,11 +174,11 @@ RCPP_MODULE(fims) {
       .constructor()
       .constructor<double>()
       .constructor<Parameter>()
-      .field("value", &Parameter::value)
-      .field("min", &Parameter::min)
-      .field("max", &Parameter::max)
-      .field("is_random_effect", &Parameter::is_random_effect)
-      .field("estimated", &Parameter::estimated);
+      .field("value", &Parameter::value_m)
+      .field("min", &Parameter::min_m)
+      .field("max", &Parameter::max_m)
+      .field("is_random_effect", &Parameter::is_random_effect_m)
+      .field("estimated", &Parameter::estimated_m);
 
   Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()
@@ -188,10 +188,6 @@ RCPP_MODULE(fims) {
       .field("estimate_deviations",
              &BevertonHoltRecruitmentInterface::estimate_deviations)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
-      .field("recruitment_bias_adj",
-             &BevertonHoltRecruitmentInterface::recruit_bias_adjustment)
-      .field("use_bias_correction",
-             &BevertonHoltRecruitmentInterface::use_bias_correction)
       .field("log_sigma_recruit",
              &BevertonHoltRecruitmentInterface::log_sigma_recruit)
       .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate)
@@ -293,9 +289,7 @@ RCPP_MODULE(fims) {
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
       .field("x", &DlnormDistributionsInterface::x)
       .field("meanlog", &DlnormDistributionsInterface::meanlog)
-      .field("sdlog", &DlnormDistributionsInterface::sdlog)
-      .field("do_bias_correction",
-             &DlnormDistributionsInterface::do_bias_correction);
+      .field("sdlog", &DlnormDistributionsInterface::sdlog);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
