@@ -26,6 +26,9 @@ class FleetInterface : public FIMSRcppInterfaceBase {
     int selectivity_id = -999; /*!< id of selectivity component*/
 
 public:
+    static uint32_t id_g; /**< static id of the FleetInterface object */
+    uint32_t id; /**< local id of the FleetInterface object */
+    
     bool is_survey = false; /*!< whether this is a survey fleet */
     int nages; /*!< number of ages in the fleet data*/
     int nyears; /*!< number of years in the fleet data */
@@ -37,10 +40,6 @@ public:
     bool random_q = false; /*!< whether q should be a random effect*/
     bool random_F = false; /*!< whether F should be a random effect*/
     Parameter log_obs_error; /*!< the log of the observation error */
-
-public:
-    static uint32_t id_g; /**< static id of the FleetInterface object */
-    uint32_t id; /**< local id of the FleetInterface object */
 
     FleetInterface() {
         this->id = FleetInterface::id_g++;
