@@ -141,22 +141,6 @@ struct Fleet : public FIMSObject<Type> {
       this->Fmort[year] = fims::exp(this->log_Fmort[year]);
     }
   }
-  /**
-   * @brief Method to report out the fleet-specific derived quantities.
-   *
-   */
-  void ReportFleet() {
-#ifdef TMB_MODEL
-    // EigenVector declares a vector type from the Eigen library, which is the
-    // expected type for TMB's dmultinom
-    typename ModelTraits<Type>::EigenVector exp_index = expected_index;
-    REPORT_F(exp_index, of);
-    typename ModelTraits<Type>::EigenVector exp_catch = expected_catch;
-    REPORT_F(exp_catch, of);
-    typename ModelTraits<Type>::EigenVector F_mort = Fmort;
-    REPORT_F(F_mort, of);
-#endif
-  }
 
   virtual const Type evaluate_age_comp_nll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
@@ -200,10 +184,7 @@ struct Fleet : public FIMSObject<Type> {
         nll -= dmultinom.evaluate(true);
       }
     }
-    // typename ModelTraits<Type>::EigenVector acomp_nll;
-    // acomp_nll[0] = nll;
-    // REPORT_F(acomp_nll, of);
-    fims_log::get("fleet.log") << " agecomp nll: " << nll << std::endl;
+
 #endif
     return nll;
   }
@@ -226,7 +207,6 @@ struct Fleet : public FIMSObject<Type> {
     fims_log::get("fleet.log")
         << " log obs error is: " << this->log_obs_error << std::endl;
     fims_log::get("fleet.log") << " sd is: " << dnorm.sd << std::endl;
-    fims_log::get("fleet.log") << " index nll: " << nll << std::endl;
 #endif
     return nll;
   }

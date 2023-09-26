@@ -66,11 +66,25 @@ class Model {  // may need singleton
     Type age_comp_nll = 0.0;  // age composition nll
     Type index_nll = 0.0;     // survey and fishery cacth nll
 
+    int n_fleets = fims_information->fleets.size();
+    int n_pops = fims_information->populations.size();
+
     //Create vector lists to store output for reporting
     #ifdef TMB_MODEL
-    //VectorOfVectors creates a nested vector structure where
+    //vector< vector<Type> > creates a nested vector structure where
     //each vector can be a different dimension.
-    typename ModelTraits<Type>::VectorOfVectors exp_index;
+    //fleets
+    vector< vector<Type> > exp_index(n_fleets);
+    vector< vector<Type> > exp_catch(n_fleets);
+    vector< vector<Type> > cnaa(n_fleets);
+    vector< vector<Type> > cwaa(n_fleets);
+    vector< vector<Type> > F_mort(n_fleets);
+    //populations
+    vector< vector<Type> > naa(n_pops);
+    vector< vector<Type> > ssb(n_pops);
+    vector< vector<Type> > biomass(n_pops);
+    vector< vector<Type> > rec_dev(n_pops);
+    vector< vector<Type> > M(n_pops);
     #endif
 
     // Loop over populations, evaluate, and sum up the recruitment likelihood
@@ -78,7 +92,7 @@ class Model {  // may need singleton
     typename fims::Information<Type>::population_iterator it;
     for (it = this->fims_information->populations.begin();
          it != this->fims_information->populations.end(); ++it) {
-      //(*it).second points to the Population module
+      //(*it).second points to each individual Population module
       FIMS_LOG << "inside pop loop" << std::endl;
       // Prepare recruitment
       (*it).second->recruitment->Prepare();
@@ -94,36 +108,73 @@ class Model {  // may need singleton
       FIMS_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
+    //Loop over fleets/surveys, and sum up age comp and index nlls
     typename fims::Information<Type>::fleet_iterator jt;
     for (jt = this->fims_information->fleets.begin();
          jt != this->fims_information->fleets.end(); ++jt) {
+
+      //(*jt).second points to each individual Fleet module
 #ifdef TMB_MODEL
       (*jt).second->of = this->of;
 #endif
       age_comp_nll += (*jt).second->evaluate_age_comp_nll();
       index_nll += (*jt).second->evaluate_index_nll();
-      /*
-      if ((*jt).second->is_survey == false) {
-#ifdef TMB_MODEL
-        (*jt).second->of = this->of;
-#endif
-        (*jt).second->ReportFleet();
-      }
-       */
-      //This will not work with the current map/iterator structure but will work if
-      //fleets in information is defined as a vector of pointers instead and jt is an int
+    }
+
+    //Loop over populations and fleets/surveys and fill in reporting
+
+    //initiate population index for structuring report out objects
+    int pop_idx = 0;
+    for (it = this->fims_information->populations.begin();
+         it != this->fims_information->populations.end(); ++it) {
       #ifdef TMB_MODEL
-      //  exp_index(jt) = (*jt).second->expected_index;
+        naa(pop_idx) = vector<Type>((*it).second->numbers_at_age);
+        ssb(pop_idx) = vector<Type>((*it).second->spawning_biomass);
+        rec_dev(pop_idx) = vector<Type>((*it).second->recruitment->recruit_deviations);
+        biomass(pop_idx) = vector<Type>((*it).second->biomass);
+        M(pop_idx) = vector<Type>((*it).second->M);
       #endif
+      pop_idx += 1;
+
+    }
+
+    //initiate fleet index for structuring report out objects
+    int fleet_idx = 0;
+    for (jt = this->fims_information->fleets.begin();
+         jt != this->fims_information->fleets.end(); ++jt) {
+      #ifdef TMB_MODEL
+         exp_index(fleet_idx) = vector<Type>((*jt).second->expected_index);
+         exp_catch(fleet_idx) = vector<Type>((*jt).second->expected_catch);
+         F_mort(fleet_idx) = vector<Type>((*jt).second->Fmort);
+         cnaa(fleet_idx) = vector<Type>((*jt).second->catch_numbers_at_age);
+         cwaa(fleet_idx) = vector<Type>((*jt).second->catch_weight_at_age);
+      #endif
+      fleet_idx += 1;
     }
 
     jnll = rec_nll + age_comp_nll + index_nll;
 
 
+    //Reporting
     #ifdef TMB_MODEL
     REPORT_F(rec_nll, of);
     REPORT_F(age_comp_nll, of);
     REPORT_F(index_nll, of);
+    REPORT_F(jnll, of);
+    REPORT_F(naa, of);
+    ADREPORT_F(naa, of);
+    REPORT_F(ssb, of);
+    ADREPORT_F(ssb, of);
+    REPORT_F(rec_dev, of);
+    ADREPORT_F(rec_dev, of);
+    REPORT_F(biomass, of);
+    REPORT_F(M, of);
+    ADREPORT_F(M, of);
+    REPORT_F(exp_index, of);
+    REPORT_F(exp_catch, of);
+    REPORT_F(F_mort, of);
+    REPORT_F(cnaa, of);
+    REPORT_F(cwaa, of);
     #endif
 
 

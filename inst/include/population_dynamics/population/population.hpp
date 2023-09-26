@@ -682,56 +682,6 @@ struct Population : public FIMSObject<Type> {
         FIMS_LOG << "\n";
       }
     }
-    // make an intermediate value in order to set multiple members (of
-
-#ifdef TMB_MODEL
-    /*Report output*/
-    // REPORT_F(int(this->nages), of); //REPORT error: call of overloaded is
-    // ambiguous REPORT_F(int(this->nyears), of); REPORT_F(int(this->nfleets),
-    // of); REPORT_F(this->numbers_at_age, of);
-    typename ModelTraits<Type>::EigenVector naa = this->numbers_at_age;
-    typename ModelTraits<Type>::EigenMatrix cnaa(this->nyears * this->nages,
-                                                 this->nfleets);
-    typename ModelTraits<Type>::EigenMatrix cwaa(this->nyears * this->nages,
-                                                 this->nfleets);
-    typename ModelTraits<Type>::EigenVector ssb = this->spawning_biomass;
-    typename ModelTraits<Type>::EigenVector rec_dev =
-        this->recruitment->recruit_deviations;
-    typename ModelTraits<Type>::EigenMatrix expected_index(this->nyears,
-                                                           this->nfleets);
-    typename ModelTraits<Type>::EigenVector recruitment =
-        this->expected_recruitment;
-    typename ModelTraits<Type>::EigenVector biomass = this->biomass;
-
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      expected_index.col(fleet_) = typename ModelTraits<Type>::EigenVector(
-          fleets[fleet_]->expected_index);
-      cnaa.col(fleet_) = typename ModelTraits<Type>::EigenVector(
-          fleets[fleet_]->catch_numbers_at_age);
-      cwaa.col(fleet_) = typename ModelTraits<Type>::EigenVector(
-          fleets[fleet_]->catch_weight_at_age);
-    }
-
-    REPORT_F(rec_dev, of);
-    ADREPORT_F(rec_dev, of);
-    REPORT_F(naa, of);
-    ADREPORT_F(naa, of);
-    REPORT_F(cnaa, of);
-    REPORT_F(cwaa, of);
-    REPORT_F(ssb, of);
-    ADREPORT_F(ssb, of);
-    REPORT_F(expected_index, of);
-    REPORT_F(recruitment, of);
-    REPORT_F(biomass, of);
-
-    // ADREPORT_F(this->recruitment->rzero, of);
-    // ADREPORT_F(this->recruitment->steep, of); can't access steep b/c not in
-    // recruitment_base ADREPORT_F(this->recruitment->log_sigma_recruit, of);
-    // ADREPORT_F(this->M, of);
-    // ADREPORT_F(this->maturity->slope, of); can't access slope b/c not in
-    // maturity base ADREPORT_F(this->maturity->median, of); can't access median
-    // b/c not in maturity base
-#endif
   }
 };
 template <class Type>
