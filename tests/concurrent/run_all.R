@@ -1,0 +1,5 @@
+source("fims_processR.R")
+setwd("/Users/mattadmin/FIMS-Testing/FIMS_THREAD/FIMS/tests/concurrent")
+source("fims_concurrent_snowfall.R")
+setwd("/Users/mattadmin/FIMS-Testing/FIMS_THREAD/FIMS/tests/concurrent")
+source("fims_concurrent_rmpi.R")

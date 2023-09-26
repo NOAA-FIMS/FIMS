@@ -262,6 +262,9 @@ print(completed)
 runtime<- (end - start)
 print(paste0(paste0(paste0(NUMBER_OF_MODEL_RUNS," model runs completed in "),runtime)," seconds."))
 
+line=paste("Rmpi runtime ", runtime)
+write(line,file="time.txt",append=TRUE)
+
 # Tell all slaves to close down, and exit the program
 mpi.close.Rslaves(dellog = FALSE)
 mpi.quit()

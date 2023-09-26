@@ -196,7 +196,7 @@ run_fims<-function(id,begin,end){
 
 
 id <- 0
-ns <- 5
+ns <- 11
 
 nsims <- NUMBER_OF_MODEL_RUNS
 
@@ -222,10 +222,13 @@ if (id == 0) {
 
 completed<-list()
 
-sfInit(parallel=TRUE, cpus=5)
+sfInit(parallel=TRUE, cpus=ns)
 sfExport( "run_fims", "init_fims", "om_input","om_output", "em_input")
 start<-Sys.time()
-append(sfLapply(1:5, run_fims, begin, end), completed)
+append(sfLapply(1:ns, run_fims, begin, end), completed)
 end<-Sys.time()
 runtime<-end-start
 print(paste0(paste0(paste0(NUMBER_OF_MODEL_RUNS," model runs completed in "),runtime)," seconds."))
+
+line=paste("Snowfall runtime ", runtime)    
+write(line,file="time.txt",append=TRUE)

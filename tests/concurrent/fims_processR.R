@@ -250,12 +250,12 @@ for(i in 1:processR::HardwareConcurrency()){
    pool[[i]]$wait()
    
    #get child out stream
-   message<-pool[[i]]$get_message()
+   #message<-pool[[i]]$get_message()
    
    #access the childs environment
    env<-as.environment(pool[[i]]$get_environment());
    #show minimizer results
-   print(env[["results"]])
+  # print(env[["results"]])
 }
 
 end_<-Sys.time()
@@ -268,3 +268,5 @@ print(paste0(paste0(paste0(NUMBER_OF_MODEL_RUNS," model runs completed in "),run
 print(begin)
 print(end)
 
+line=paste("processR runtime ", runtime)    
+write(line,file="time.txt",append=TRUE)

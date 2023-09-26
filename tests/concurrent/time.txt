@@ -1,0 +1,3 @@
+processR runtime  24.5368919372559
+Snowfall runtime  25.7150220870972
+Rmpi runtime  31.4304709434509
