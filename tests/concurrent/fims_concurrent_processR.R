@@ -239,7 +239,7 @@ for(i in 1:processR::HardwareConcurrency()){
   #create a new child process
   pool[[i]] <- new(p$Process)
   
-  #start the process. functionm, environment, rank
+  #start the process. pass the function, environment, and rank
   pool[[i]]$start(run_fims, environment(), i)
 }
 
