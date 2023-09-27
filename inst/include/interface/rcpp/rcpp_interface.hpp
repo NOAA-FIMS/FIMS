@@ -97,8 +97,8 @@ void clear() {
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
   // rcpp_data.hpp
 
-  DataInterface::id_g = 1;
-  DataInterface::fims_interface_objects.clear();
+  DataInterfaceBase::id_g = 1;
+  DataInterfaceBase::fims_interface_objects.clear();
   AgeCompDataInterface::id_g = 1;
   IndexDataInterface::id_g = 1;
 
@@ -211,10 +211,10 @@ RCPP_MODULE(fims) {
       .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
-  Rcpp::class_<DataInterface>("Data")
+  Rcpp::class_<DataInterfaceBase>("Data")
       .constructor()
-      .field("observed_data", &DataInterface::observed_data)
-      .method("get_id", &DataInterface::get_id);
+      .field("observed_data", &DataInterfaceBase::observed_data)
+      .method("get_id", &DataInterfaceBase::get_id);
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
       .constructor<int, int>()

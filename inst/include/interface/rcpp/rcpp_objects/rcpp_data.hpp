@@ -17,28 +17,28 @@
  * fleet <- new(fims$Data)
  *
  */
-class DataInterface : public FIMSRcppInterfaceBase {
+class DataInterfaceBase : public FIMSRcppInterfaceBase {
 public:
     Rcpp::NumericVector observed_data; /*!< The data */
-    static uint32_t id_g; /**< static id of the DataInterface object */
-    uint32_t id; /**< local id of the DataInterface object */
+    static uint32_t id_g; /**< static id of the DataInterfaceBase object */
+    uint32_t id; /**< local id of the DataInterfaceBase object */
     //live objects in C++ are objects that have been created and live in memory
-    static std::map<uint32_t, DataInterface*>
-    live_objects; /**< map associating the ids of DataInterface to
+    static std::map<uint32_t, DataInterfaceBase*>
+    live_objects; /**< map associating the ids of DataInterfaceBase to
       the objects */
 
     /** @brief constructor
      */
-    DataInterface() {
-        this->id = DataInterface::id_g++;
-        //Create instance of map: key is id and value is pointer to DataInterface
-        DataInterface::live_objects[this->id] = this;
+    DataInterfaceBase() {
+        this->id = DataInterfaceBase::id_g++;
+        //Create instance of map: key is id and value is pointer to DataInterfaceBase
+        DataInterfaceBase::live_objects[this->id] = this;
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }
 
     /** @brief destructor
      */
-    virtual ~DataInterface() {
+    virtual ~DataInterfaceBase() {
     }
 
     /** @brief get the ID of the interface base object
@@ -54,15 +54,15 @@ public:
         return true;
     };
 };
-uint32_t DataInterface::id_g = 1;
-std::map<uint32_t, DataInterface*> DataInterface::live_objects;
+uint32_t DataInterfaceBase::id_g = 1;
+std::map<uint32_t, DataInterfaceBase*> DataInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for age comp data as an S4 object. To instantiate
  * from R:
  * acomp <- new(fims$AgeComp)
  */
-class AgeCompDataInterface : public DataInterface {
+class AgeCompDataInterface : public DataInterfaceBase {
 public:
     int amax; /*!< first dimension of the data */
     int ymax; /*!< second dimension of the data */
@@ -71,7 +71,7 @@ public:
     /**
      * @brief constructor
      */
-    AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterface() {
+    AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfacBase() {
         this->amax = amax;
         this->ymax = ymax;
     }
@@ -133,7 +133,7 @@ public:
  * from R:
  * fleet <- new(fims$Index)
  */
-class IndexDataInterface : public DataInterface {
+class IndexDataInterface : public DataInterfaceBase {
 public:
     int ymax; /*!< second dimension of the data */
     Rcpp::NumericVector index_data; /*!<the age composition data*/
@@ -141,7 +141,7 @@ public:
     /**
      * @brief constructor
      */
-    IndexDataInterface(int ymax = 0) : DataInterface() {
+    IndexDataInterface(int ymax = 0) : DataInterfaceBase() {
         this->ymax = ymax;
     }
 
