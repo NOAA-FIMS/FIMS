@@ -114,10 +114,10 @@ void clear() {
 
   // rcpp_maturity.hpp
   MaturityInterfaceBase::id_g = 1;
-  MaturityInterfaceBase::maturity_objects.clear();
+  MaturityInterfaceBase::live_objects.clear();
 
   LogisticMaturityInterface::id_g = 1;
-  LogisticMaturityInterface::maturity_objects.clear();
+  LogisticMaturityInterface::live_objects.clear();
 
   // rcpp_population.hpp
   //   PopulationInterfaceBase::id_g = 1;
@@ -135,13 +135,13 @@ void clear() {
 
   // rcpp_selectivity.hpp
   SelectivityInterfaceBase::id_g = 1;
-  SelectivityInterfaceBase::selectivity_objects.clear();
+  SelectivityInterfaceBase::live_objects.clear();
 
   LogisticSelectivityInterface::id_g = 1;
-  LogisticSelectivityInterface::selectivity_objects.clear();
+  LogisticSelectivityInterface::live_objects.clear();
 
   DoubleLogisticSelectivityInterface::id_g = 1;
-  DoubleLogisticSelectivityInterface::selectivity_objects.clear();
+  DoubleLogisticSelectivityInterface::live_objects.clear();
 
   // rcpp_tmb_distribution.hpp
   DistributionsInterfaceBase::id_g = 1;

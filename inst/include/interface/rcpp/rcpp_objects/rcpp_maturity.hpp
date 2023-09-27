@@ -25,13 +25,15 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 public:
     static uint32_t id_g; /**< static id of the recruitment interface base*/
     uint32_t id; /**< id of the recruitment interface base */
+    //live objects in C++ are objects that have been created and live in memory
     static std::map<uint32_t, MaturityInterfaceBase*>
-    maturity_objects; /**< map associating the ids of
+    live_objects; /**< map associating the ids of
                               MaturityInterfaceBase to the objects */
 
     MaturityInterfaceBase() {
         this->id = MaturityInterfaceBase::id_g++;
-        MaturityInterfaceBase::maturity_objects[this->id] = this;
+        //Create instance of map: key is id and value is pointer to MaturityInterfaceBase
+        MaturityInterfaceBase::live_objects[this->id] = this;
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }
 
@@ -51,7 +53,7 @@ public:
 
 uint32_t MaturityInterfaceBase::id_g = 1;
 std::map<uint32_t, MaturityInterfaceBase*>
-MaturityInterfaceBase::maturity_objects;
+MaturityInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for logistic maturity as an S4 object. To

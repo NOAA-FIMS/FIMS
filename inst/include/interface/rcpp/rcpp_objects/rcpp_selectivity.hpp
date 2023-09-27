@@ -24,13 +24,15 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 public:
     static uint32_t id_g; /**< static id of the recruitment interface base*/
     uint32_t id; /**< id of the recruitment interface base */
+    //live objects in C++ are objects that have been created and live in memory
     static std::map<uint32_t, SelectivityInterfaceBase*>
-    selectivity_objects; /**< map associating the ids of
+    live_objects; /**< map associating the ids of
                               SelectivityInterfaceBase to the objects */
 
     SelectivityInterfaceBase() {
         this->id = SelectivityInterfaceBase::id_g++;
-        SelectivityInterfaceBase::selectivity_objects[this->id] = this;
+        //Create instance of map: key is id and value is pointer to SelectivityInterfaceBase
+        SelectivityInterfaceBase::live_objects[this->id] = this;
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }
 
@@ -50,7 +52,7 @@ public:
 
 uint32_t SelectivityInterfaceBase::id_g = 1;
 std::map<uint32_t, SelectivityInterfaceBase*>
-SelectivityInterfaceBase::selectivity_objects;
+SelectivityInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for logistic selectivity as an S4 object. To

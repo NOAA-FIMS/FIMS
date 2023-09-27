@@ -24,6 +24,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 public:
     static uint32_t id_g; /**< static id of the recruitment interface base*/
     uint32_t id; /**< id of the recruitment interface base */
+    //live objects in C++ are objects that have been created and live in memory
     static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
     /**< map associating the ids of RecruitmentInterfaceBase to the objects */
 
@@ -34,6 +35,7 @@ public:
 
     RecruitmentInterfaceBase() {
         this->id = RecruitmentInterfaceBase::id_g++;
+        //Create instance of map: key is id and value is pointer to RecruitmentInterfaceBase
         RecruitmentInterfaceBase::live_objects[this->id] = this;
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }

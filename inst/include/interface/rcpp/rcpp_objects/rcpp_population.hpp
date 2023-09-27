@@ -23,12 +23,14 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
 public:
     static uint32_t id_g; /**< static id of the population interface base*/
     uint32_t id; /**< id of the population interface base */
+    //live objects in C++ are objects that have been created and live in memory
     static std::map<uint32_t, PopulationInterfaceBase*>
     live_objects; /**< map associating the ids of PopulationInterfaceBase to
                        the objects */
 
     PopulationInterfaceBase() {
         this->id = PopulationInterfaceBase::id_g++;
+        //Create instance of map: key is id and value is pointer to PopulationInterfaceBase
         PopulationInterfaceBase::live_objects[this->id] = this;
         PopulationInterfaceBase::fims_interface_objects.push_back(this);
     }

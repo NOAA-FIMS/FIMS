@@ -22,12 +22,14 @@ public:
     static uint32_t
     id_g; /**< static id of the DistributionsInterfaceBase object */
     uint32_t id; /**< local id of the DistributionsInterfaceBase object */
+    //live objects in C++ are objects that have been created and live in memory
     static std::map<uint32_t, DistributionsInterfaceBase *> live_objects; /**<
   map relating the ID of the DistributionsInterfaceBase to the
   DistributionsInterfaceBase objects */
 
     DistributionsInterfaceBase() {
         this->id = DistributionsInterfaceBase::id_g++;
+        //Create instance of map: key is id and value is pointer to DistributionsInterfaceBase
         DistributionsInterfaceBase::live_objects[this->id] = this;
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }

@@ -25,12 +25,14 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
 public:
     static uint32_t id_g; /**< static id of the GrowthInterfaceBase object */
     uint32_t id; /**< local id of the GrowthInterfaceBase object */
+    //live objects in C++ are objects that have been created and live in memory
     static std::map<uint32_t, GrowthInterfaceBase*> live_objects; /**<
   map relating the ID of the GrowthInterfaceBase to the GrowthInterfaceBase
   objects */
 
     GrowthInterfaceBase() {
         this->id = GrowthInterfaceBase::id_g++;
+        //Create instance of map: key is id and value is pointer to GrowthInterfaceBase
         GrowthInterfaceBase::live_objects[this->id] = this;
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }

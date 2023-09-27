@@ -22,6 +22,7 @@ public:
     Rcpp::NumericVector observed_data; /*!< The data */
     static uint32_t id_g; /**< static id of the DataInterface object */
     uint32_t id; /**< local id of the DataInterface object */
+    //live objects in C++ are objects that have been created and live in memory
     static std::map<uint32_t, DataInterface*>
     live_objects; /**< map associating the ids of DataInterface to
       the objects */
@@ -30,6 +31,7 @@ public:
      */
     DataInterface() {
         this->id = DataInterface::id_g++;
+        //Create instance of map: key is id and value is pointer to DataInterface
         DataInterface::live_objects[this->id] = this;
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
     }
