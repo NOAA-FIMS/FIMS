@@ -71,7 +71,7 @@ public:
     /**
      * @brief constructor
      */
-    AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfacBase() {
+    AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase() {
         this->amax = amax;
         this->ymax = ymax;
     }

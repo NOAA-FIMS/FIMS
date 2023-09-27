@@ -13,22 +13,52 @@
 #include "rcpp_interface_base.hpp"
 
 /**
+ * @brief Rcpp interface that serves as the parent class for
+ * Rcpp fleet interfaces. This type should be inherited and not
+ * called from R directly.
+ *
+ */
+class FleetInterfaceBase : public FIMSRcppInterfaceBase {
+public:
+    static uint32_t id_g; /**< static id of the FleetInterfaceBase object */
+    uint32_t id; /**< local id of the FleetInterfaceBase object */
+    //live objects in C++ are objects that have been created and live in memory
+    static std::map<uint32_t, FleetInterfaceBase*> live_objects; /**<
+  map relating the ID of the FleetInterfaceBase to the FleetInterfaceBase
+  objects */
+
+    FleetInterfaceBase() {
+        this->id = FleetInterfaceBase::id_g++;
+        //Create instance of map: key is id and value is pointer to FleetInterfaceBase
+        FleetInterfaceBase::live_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
+
+    virtual ~FleetInterfaceBase() {
+    }
+
+    /** @brief get_id method for child fleet interface objects to inherit **/
+    virtual uint32_t get_id() = 0;
+
+};
+
+uint32_t FleetInterfaceBase::id_g = 1;
+std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
+
+/**
  * @brief Rcpp interface for Fleet as an S4 object. To instantiate
  * from R:
  * fleet <- new(fims$Fleet)
  *
  */
-class FleetInterface : public FIMSRcppInterfaceBase {
+class FleetInterface : public FleetInterfaceBase {
     int agecomp_likelihood_id = -999; /*!< id of agecomp likelihood component*/
     int index_likelihood_id = -999; /*!< id of index likelihood component*/
     int observed_agecomp_data_id = -999; /*!< id of observed agecomp data object*/
     int observed_index_data_id = -999; /*!< id of observed index data object*/
     int selectivity_id = -999; /*!< id of selectivity component*/
 
-public:
-    static uint32_t id_g; /**< static id of the FleetInterface object */
-    uint32_t id; /**< local id of the FleetInterface object */
-    
+public:    
     bool is_survey = false; /*!< whether this is a survey fleet */
     int nages; /*!< number of ages in the fleet data*/
     int nyears; /*!< number of years in the fleet data */
@@ -41,12 +71,16 @@ public:
     bool random_F = false; /*!< whether F should be a random effect*/
     Parameter log_obs_error; /*!< the log of the observation error */
 
-    FleetInterface() {
-        this->id = FleetInterface::id_g++;
-        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+     FleetInterface() : FleetInterfaceBase() {
+
     }
 
     virtual ~FleetInterface() {
+    }
+
+    /** @brief returns the id for the fleet interface */
+    virtual uint32_t get_id() {
+        return this->id;
     }
 
     /**
@@ -158,7 +192,5 @@ public:
 
 #endif
 };
-
-uint32_t FleetInterface::id_g = 1;
 
 #endif
