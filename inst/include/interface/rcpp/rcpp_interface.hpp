@@ -95,16 +95,24 @@ void clear_internal() {
 void clear() {
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
+  
   // rcpp_data.hpp
-
-  DataInterface::id_g = 1;
-  DataInterface::fims_interface_objects.clear();
+  DataInterfaceBase::id_g = 1;
+  DataInterfaceBase::live_objects.clear();
+  
   AgeCompDataInterface::id_g = 1;
+  AgeCompDataInterface::live_objects.clear();
+
   IndexDataInterface::id_g = 1;
+  IndexDataInterface::live_objects.clear();
 
   // rcpp_fleets.hpp
+  FleetInterfaceBase::id_g = 1;
+  FleetInterfaceBase::live_objects.clear(); 
+
   FleetInterface::id_g = 1;
-  FleetInterface::fims_interface_objects.clear();
+  FleetInterface::live_objects.clear();
+
   // rcpp_growth.hpp
   GrowthInterfaceBase::id_g = 1;
   GrowthInterfaceBase::live_objects.clear();
@@ -114,14 +122,14 @@ void clear() {
 
   // rcpp_maturity.hpp
   MaturityInterfaceBase::id_g = 1;
-  MaturityInterfaceBase::maturity_objects.clear();
+  MaturityInterfaceBase::live_objects.clear();
 
   LogisticMaturityInterface::id_g = 1;
-  LogisticMaturityInterface::maturity_objects.clear();
+  LogisticMaturityInterface::live_objects.clear();
 
   // rcpp_population.hpp
-  //   PopulationInterfaceBase::id_g = 1;
-  //   PopulationInterfaceBase::live_objects.clear();
+  PopulationInterfaceBase::id_g = 1;
+  PopulationInterfaceBase::live_objects.clear();
 
   PopulationInterface::id_g = 1;
   PopulationInterface::live_objects.clear();
@@ -135,13 +143,13 @@ void clear() {
 
   // rcpp_selectivity.hpp
   SelectivityInterfaceBase::id_g = 1;
-  SelectivityInterfaceBase::selectivity_objects.clear();
+  SelectivityInterfaceBase::live_objects.clear();
 
   LogisticSelectivityInterface::id_g = 1;
-  LogisticSelectivityInterface::selectivity_objects.clear();
+  LogisticSelectivityInterface::live_objects.clear();
 
   DoubleLogisticSelectivityInterface::id_g = 1;
-  DoubleLogisticSelectivityInterface::selectivity_objects.clear();
+  DoubleLogisticSelectivityInterface::live_objects.clear();
 
   // rcpp_tmb_distribution.hpp
   DistributionsInterfaceBase::id_g = 1;
@@ -156,7 +164,6 @@ void clear() {
   DmultinomDistributionsInterface::id_g = 1;
   DmultinomDistributionsInterface::live_objects.clear();
 
-  FIMSRcppInterfaceBase::fims_interface_objects.clear();
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMB_FIMS_FIRST_ORDER>();
   clear_internal<TMB_FIMS_SECOND_ORDER>();
@@ -210,11 +217,6 @@ RCPP_MODULE(fims) {
       .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
       .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
-
-  Rcpp::class_<DataInterface>("Data")
-      .constructor()
-      .field("observed_data", &DataInterface::observed_data)
-      .method("get_id", &DataInterface::get_id);
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
       .constructor<int, int>()

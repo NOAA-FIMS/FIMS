@@ -17,122 +17,115 @@
  * fleet <- new(fims$Data)
  *
  */
-class DataInterface : public FIMSRcppInterfaceBase {
- public:
-  Rcpp::NumericVector observed_data; /*!< The data */
-  static uint32_t id_g; /**< static id of the DataInterface object */
-  uint32_t id;          /**< local id of the DataInterface object */
-  static std::map<uint32_t, DataInterface*>
-      live_objects; /**< map associating the ids of DataInterface to
+class DataInterfaceBase : public FIMSRcppInterfaceBase {
+public:
+    Rcpp::NumericVector observed_data; /*!< The data */
+    static uint32_t id_g; /**< static id of the DataInterfaceBase object */
+    uint32_t id; /**< local id of the DataInterfaceBase object */
+    //live objects in C++ are objects that have been created and live in memory
+    static std::map<uint32_t, DataInterfaceBase*>
+    live_objects; /**< map associating the ids of DataInterfaceBase to
       the objects */
 
-  /** @brief constructor
-   */
-  DataInterface() {
-    this->id = DataInterface::id_g++;
-    DataInterface::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
+    /** @brief constructor
+     */
+    DataInterfaceBase() {
+        this->id = DataInterfaceBase::id_g++;
+        //Create instance of map: key is id and value is pointer to DataInterfaceBase
+        DataInterfaceBase::live_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
 
-  /** @brief destructor
-   */
-  virtual ~DataInterface() {}
+    /** @brief destructor
+     */
+    virtual ~DataInterfaceBase() {
+    }
 
-  /** @brief get the ID of the interface base object
-   **/
-  virtual uint32_t get_id() { return this->id; }
+    /** @brief get the ID of the interface base object
+     **/
+    virtual uint32_t get_id() {
+        return this->id;
+    }
 
-  /**@brief add_to_fims_tmb dummy method
-   *
-   */
-  virtual bool add_to_fims_tmb() { return true; };
+    /**@brief add_to_fims_tmb dummy method
+     *
+     */
+    virtual bool add_to_fims_tmb() {
+        return true;
+    };
 };
-uint32_t DataInterface::id_g = 1;
-std::map<uint32_t, DataInterface*> DataInterface::live_objects;
+uint32_t DataInterfaceBase::id_g = 1;
+std::map<uint32_t, DataInterfaceBase*> DataInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for age comp data as an S4 object. To instantiate
  * from R:
  * acomp <- new(fims$AgeComp)
  */
-class AgeCompDataInterface : public DataInterface {
- public:
-  int amax;                          /*!< first dimension of the data */
-  int ymax;                          /*!< second dimension of the data */
-  Rcpp::NumericVector age_comp_data; /*!<the age composition data*/
+class AgeCompDataInterface : public DataInterfaceBase {
+public:
+    int amax; /*!< first dimension of the data */
+    int ymax; /*!< second dimension of the data */
+    Rcpp::NumericVector age_comp_data; /*!<the age composition data*/
 
-  /**
-   * @brief constructor
-   */
-  AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterface() {
-    this->amax = amax;
-    this->ymax = ymax;
-  }
-
-  /**
-   * @brief destructor
-   */
-  virtual ~AgeCompDataInterface() {}
-
-  /** @brief get the ID of the interface base object
-   **/
-  virtual uint32_t get_id() { return this->id; }
-
-  /**
-   * @brief adds parameters to the model
-   */
-  virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> age_comp_data_0 =
-        std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax,
-                                                               this->amax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> age_comp_data_1 =
-        std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->ymax,
-                                                                 this->amax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_SECOND_ORDER>> age_comp_data_2 =
-        std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->ymax,
-                                                                  this->amax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_THIRD_ORDER>> age_comp_data_3 =
-        std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax,
-                                                                 this->amax);
-
-    age_comp_data_0->id = this->id;
-
-    age_comp_data_1->id = this->id;
-
-    age_comp_data_2->id = this->id;
-
-    age_comp_data_3->id = this->id;
-
-    for (int y = 0; y < ymax; y++) {
-      for (int a = 0; a < amax; a++) {
-        int index_ya = y * amax + a;
-        age_comp_data_0->at(y, a) = this->age_comp_data[index_ya];
-        age_comp_data_1->at(y, a) = this->age_comp_data[index_ya];
-        age_comp_data_2->at(y, a) = this->age_comp_data[index_ya];
-        age_comp_data_3->at(y, a) = this->age_comp_data[index_ya];
-      }
+    /**
+     * @brief constructor
+     */
+    AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase() {
+        this->amax = amax;
+        this->ymax = ymax;
     }
 
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    /**
+     * @brief destructor
+     */
+    virtual ~AgeCompDataInterface() {
+    }
 
-    d0->data_objects[this->id] = age_comp_data_0;
+    /** @brief get the ID of the interface base object
+     **/
+    virtual uint32_t get_id() {
+        return this->id;
+    }
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    d1->data_objects[this->id] = age_comp_data_1;
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+#ifdef TMB_MODEL
 
-    d2->data_objects[this->id] = age_comp_data_2;
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    template<typename Type>
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims::DataObject < Type>> age_comp_data =
+                std::make_shared<fims::DataObject < Type >> (this->ymax,
+                this->amax);
 
-    d3->data_objects[this->id] = age_comp_data_3;
+        age_comp_data->id = this->id;
+        for (int y = 0; y < ymax; y++) {
+            for (int a = 0; a < amax; a++) {
+                int index_ya = y * amax + a;
+                age_comp_data->at(y, a) = this->age_comp_data[index_ya];
+            }
+        }
 
-    return true;
-  }
+        std::shared_ptr<fims::Information < Type>> info =
+                fims::Information<Type>::GetInstance();
+
+        info->data_objects[this->id] = age_comp_data;
+        
+         return true;
+    }
+
+    /**
+     * @brief adds parameters to the model
+     */
+    virtual bool add_to_fims_tmb() {
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+        return true;
+    }
+
+#endif
 };
 
 /**
@@ -140,70 +133,65 @@ class AgeCompDataInterface : public DataInterface {
  * from R:
  * fleet <- new(fims$Index)
  */
-class IndexDataInterface : public DataInterface {
- public:
-  int ymax;                       /*!< second dimension of the data */
-  Rcpp::NumericVector index_data; /*!<the age composition data*/
+class IndexDataInterface : public DataInterfaceBase {
+public:
+    int ymax; /*!< second dimension of the data */
+    Rcpp::NumericVector index_data; /*!<the age composition data*/
 
-  /**
-   * @brief constructor
-   */
-  IndexDataInterface(int ymax = 0) : DataInterface() { this->ymax = ymax; }
-
-  /**
-   * @brief destructor
-   */
-  virtual ~IndexDataInterface() {}
-  /** @brief get the ID of the interface base object
-   **/
-  virtual uint32_t get_id() { return this->id; }
-
-  /**
-   *@brief function to add to TMB
-   */
-  virtual bool add_to_fims_tmb() {
-    std::shared_ptr<fims::DataObject<TMB_FIMS_REAL_TYPE>> index_data_0 =
-        std::make_shared<fims::DataObject<TMB_FIMS_REAL_TYPE>>(this->ymax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_FIRST_ORDER>> index_data_1 =
-        std::make_shared<fims::DataObject<TMB_FIMS_FIRST_ORDER>>(this->ymax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_SECOND_ORDER>> index_data_2 =
-        std::make_shared<fims::DataObject<TMB_FIMS_SECOND_ORDER>>(this->ymax);
-    std::shared_ptr<fims::DataObject<TMB_FIMS_THIRD_ORDER>> index_data_3 =
-        std::make_shared<fims::DataObject<TMB_FIMS_THIRD_ORDER>>(this->ymax);
-    index_data_0->id = this->id;
-
-    index_data_1->id = this->id;
-
-    index_data_2->id = this->id;
-
-    index_data_3->id = this->id;
-
-    for (int y = 0; y < ymax; y++) {
-      index_data_0->at(y) = this->index_data[y];
-      index_data_1->at(y) = this->index_data[y];
-      index_data_2->at(y) = this->index_data[y];
-      index_data_3->at(y) = this->index_data[y];
+    /**
+     * @brief constructor
+     */
+    IndexDataInterface(int ymax = 0) : DataInterfaceBase() {
+        this->ymax = ymax;
     }
 
-    std::shared_ptr<fims::Information<TMB_FIMS_REAL_TYPE>> d0 =
-        fims::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    /**
+     * @brief destructor
+     */
+    virtual ~IndexDataInterface() {
+    }
 
-    d0->data_objects[this->id] = index_data_0;
+    /** @brief get the ID of the interface base object
+     **/
+    virtual uint32_t get_id() {
+        return this->id;
+    }
 
-    std::shared_ptr<fims::Information<TMB_FIMS_FIRST_ORDER>> d1 =
-        fims::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
 
-    d1->data_objects[this->id] = index_data_1;
-    std::shared_ptr<fims::Information<TMB_FIMS_SECOND_ORDER>> d2 =
-        fims::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+#ifdef TMB_MODEL
 
-    d2->data_objects[this->id] = index_data_2;
-    std::shared_ptr<fims::Information<TMB_FIMS_THIRD_ORDER>> d3 =
-        fims::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    template<typename T>
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims::DataObject < T>> data =
+                std::make_shared<fims::DataObject < T >> (this->ymax);
 
-    d3->data_objects[this->id] = index_data_3;
-    return true;
-  }
+        data->id = this->id;
+
+        for (int y = 0; y < ymax; y++) {
+            data->at(y) = this->index_data[y];
+        }
+
+        std::shared_ptr<fims::Information < T>> info =
+                fims::Information<T>::GetInstance();
+
+        info->data_objects[this->id] = data;
+        return true;
+    }
+
+    /**
+     *@brief function to add to TMB
+     */
+    virtual bool add_to_fims_tmb() {
+
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+        return true;
+    }
+
+#endif
 };
 
 #endif
