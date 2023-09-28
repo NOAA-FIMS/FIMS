@@ -84,6 +84,7 @@ class Model {  // may need singleton
     vector< vector<Type> > ssb(n_pops);
     vector< vector<Type> > biomass(n_pops);
     vector< vector<Type> > rec_dev(n_pops);
+    vector< vector<Type> > recruitment(n_pops);
     vector< vector<Type> > M(n_pops);
     #endif
 
@@ -131,6 +132,7 @@ class Model {  // may need singleton
         naa(pop_idx) = vector<Type>((*it).second->numbers_at_age);
         ssb(pop_idx) = vector<Type>((*it).second->spawning_biomass);
         rec_dev(pop_idx) = vector<Type>((*it).second->recruitment->recruit_deviations);
+        recruitment(pop_idx) = vector<Type>((*it).second->expected_recruitment);
         biomass(pop_idx) = vector<Type>((*it).second->biomass);
         M(pop_idx) = vector<Type>((*it).second->M);
       #endif
@@ -162,14 +164,11 @@ class Model {  // may need singleton
     REPORT_F(index_nll, of);
     REPORT_F(jnll, of);
     REPORT_F(naa, of);
-    ADREPORT_F(naa, of);
     REPORT_F(ssb, of);
-    ADREPORT_F(ssb, of);
     REPORT_F(rec_dev, of);
-    ADREPORT_F(rec_dev, of);
+    REPORT_F(recruitment, of);
     REPORT_F(biomass, of);
     REPORT_F(M, of);
-    ADREPORT_F(M, of);
     REPORT_F(exp_index, of);
     REPORT_F(exp_catch, of);
     REPORT_F(F_mort, of);
