@@ -29,8 +29,8 @@ DistributionsInterfaceBase objects */
 
   DistributionsInterfaceBase() {
     this->id = DistributionsInterfaceBase::id_g++;
-    // Create instance of map: key is id and value is pointer to
-    // DistributionsInterfaceBase
+    /* Create instance of map: key is id and value is pointer to
+    DistributionsInterfaceBase */
     DistributionsInterfaceBase::live_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }

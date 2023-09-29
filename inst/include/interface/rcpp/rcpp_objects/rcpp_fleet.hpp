@@ -29,8 +29,8 @@ objects */
 
   FleetInterfaceBase() {
     this->id = FleetInterfaceBase::id_g++;
-    // Create instance of map: key is id and value is pointer to
-    // FleetInterfaceBase
+    /* Create instance of map: key is id and value is pointer to
+    FleetInterfaceBase */
     FleetInterfaceBase::live_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }

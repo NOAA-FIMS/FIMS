@@ -30,8 +30,8 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
 
   PopulationInterfaceBase() {
     this->id = PopulationInterfaceBase::id_g++;
-    // Create instance of map: key is id and value is pointer to
-    // PopulationInterfaceBase
+    /* Create instance of map: key is id and value is pointer to
+    PopulationInterfaceBase */
     PopulationInterfaceBase::live_objects[this->id] = this;
     PopulationInterfaceBase::fims_interface_objects.push_back(this);
   }

@@ -27,8 +27,8 @@ class NLLInterfaceBase : public FIMSRcppInterfaceBase {
 
   NLLInterfaceBase() {
     this->id = NLLInterfaceBase::id_g++;
-    // Create instance of map: key is id and value is pointer to
-    // NLLInterfaceBase
+    /* Create instance of map: key is id and value is pointer to
+    NLLInterfaceBase */
     NLLInterfaceBase::live_objects[this->id] = this;
     NLLInterfaceBase::fims_interface_objects.push_back(this);
   }

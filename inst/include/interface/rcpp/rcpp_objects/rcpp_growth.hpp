@@ -32,8 +32,8 @@ objects */
 
   GrowthInterfaceBase() {
     this->id = GrowthInterfaceBase::id_g++;
-    // Create instance of map: key is id and value is pointer to
-    // GrowthInterfaceBase
+    /* Create instance of map: key is id and value is pointer to
+    GrowthInterfaceBase */
     GrowthInterfaceBase::live_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }

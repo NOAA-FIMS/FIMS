@@ -35,8 +35,8 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 
   RecruitmentInterfaceBase() {
     this->id = RecruitmentInterfaceBase::id_g++;
-    // Create instance of map: key is id and value is pointer to
-    // RecruitmentInterfaceBase
+    /* Create instance of map: key is id and value is pointer to
+    RecruitmentInterfaceBase */
     RecruitmentInterfaceBase::live_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }

@@ -32,8 +32,8 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 
   MaturityInterfaceBase() {
     this->id = MaturityInterfaceBase::id_g++;
-    // Create instance of map: key is id and value is pointer to
-    // MaturityInterfaceBase
+    /* Create instance of map: key is id and value is pointer to
+    MaturityInterfaceBase */
     MaturityInterfaceBase::live_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }

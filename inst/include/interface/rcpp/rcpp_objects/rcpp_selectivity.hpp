@@ -31,8 +31,8 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 
   SelectivityInterfaceBase() {
     this->id = SelectivityInterfaceBase::id_g++;
-    // Create instance of map: key is id and value is pointer to
-    // SelectivityInterfaceBase
+    /* Create instance of map: key is id and value is pointer to
+    SelectivityInterfaceBase */
     SelectivityInterfaceBase::live_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }

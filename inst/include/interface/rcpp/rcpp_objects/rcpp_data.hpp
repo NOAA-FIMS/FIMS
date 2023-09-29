@@ -31,8 +31,8 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    */
   DataInterfaceBase() {
     this->id = DataInterfaceBase::id_g++;
-    // Create instance of map: key is id and value is pointer to
-    // DataInterfaceBase
+    /* Create instance of map: key is id and value is pointer to
+    DataInterfaceBase */
     DataInterfaceBase::live_objects[this->id] = this;
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
