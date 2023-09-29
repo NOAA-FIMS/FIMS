@@ -72,7 +72,7 @@ class Model {  // may need singleton
     //Create vector lists to store output for reporting
     #ifdef TMB_MODEL
     //vector< vector<Type> > creates a nested vector structure where
-    //each vector can be a different dimension.
+    //each vector can be a different dimension. Does not work with ADREPORT
     //fleets
     vector< vector<Type> > exp_index(n_fleets);
     vector< vector<Type> > exp_catch(n_fleets);
@@ -174,6 +174,26 @@ class Model {  // may need singleton
     REPORT_F(F_mort, of);
     REPORT_F(cnaa, of);
     REPORT_F(cwaa, of);
+
+    /*ADREPORT using ADREPORTvector defined in
+     * inst/include/interface/interface.hpp:
+     * function collapses the nested vector into a single vector
+     */
+    vector<Type> NAA = ADREPORTvector(naa);
+    vector<Type> Biomass = ADREPORTvector(biomass);
+    vector<Type> SSB = ADREPORTvector(ssb);
+    vector<Type> RecDev = ADREPORTvector(rec_dev);
+    vector<Type> FMort = ADREPORTvector(F_mort);
+    vector<Type> ExpectedIndex = ADREPORTvector(exp_index);
+    vector<Type> CNAA = ADREPORTvector(cnaa);
+
+    ADREPORT_F(NAA, of);
+    ADREPORT_F(Biomass, of);
+    ADREPORT_F(SSB, of);
+    ADREPORT_F(RecDev, of);
+    ADREPORT_F(FMort, of);
+    ADREPORT_F(ExpectedIndex, of);
+    ADREPORT_F(CNAA, of);
     #endif
 
 
