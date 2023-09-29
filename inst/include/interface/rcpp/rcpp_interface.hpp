@@ -95,11 +95,11 @@ void clear_internal() {
 void clear() {
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
-  
+
   // rcpp_data.hpp
   DataInterfaceBase::id_g = 1;
   DataInterfaceBase::live_objects.clear();
-  
+
   AgeCompDataInterface::id_g = 1;
   AgeCompDataInterface::live_objects.clear();
 
@@ -108,7 +108,7 @@ void clear() {
 
   // rcpp_fleets.hpp
   FleetInterfaceBase::id_g = 1;
-  FleetInterfaceBase::live_objects.clear(); 
+  FleetInterfaceBase::live_objects.clear();
 
   FleetInterface::id_g = 1;
   FleetInterface::live_objects.clear();
