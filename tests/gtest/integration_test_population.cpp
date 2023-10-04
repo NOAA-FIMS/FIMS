@@ -39,7 +39,7 @@ namespace
                 input = input_.GetObject();
                 output = output_.GetObject();
                 // Declare singleton of population class
-                fims::Population<double> pop;
+                fims_popdy::opdy::Population<double> pop;
 
                 // ConfigurePopulationModel, RunModelLoop, and CheckModelOutput
                 // methods are in integration_class.hpp

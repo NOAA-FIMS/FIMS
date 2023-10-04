@@ -14,7 +14,7 @@
 #include "../../../common/fims_math.hpp"
 #include "selectivity_base.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /**
  *  @brief LogisticSelectivity class that returns the logistic function value

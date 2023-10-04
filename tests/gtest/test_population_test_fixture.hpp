@@ -21,7 +21,7 @@ class PopulationInitializeTestFixture : public testing::Test {
     population.nseasons = nseasons;
     population.nages = nages;
     for (int i = 0; i < nfleets; i++) {
-      auto fleet = std::make_shared<fims::Fleet<double>>();
+      auto fleet = std::make_shared<fims_popdy::opdy::Fleet<double>>();
       population.fleets.push_back(fleet);
     }
   }
@@ -31,7 +31,7 @@ class PopulationInitializeTestFixture : public testing::Test {
   // do. Otherwise, it does not need to be provided.
   virtual void TearDown() {}
 
-  fims::Population<double> population;
+  fims_popdy::opdy::Population<double> population;
 
   // Use default values from the Li et al., 2021
   // https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/blob/master/R/save_initial_input.R
@@ -70,14 +70,14 @@ class PopulationPrepareTestFixture : public testing::Test {
 
     // Make a shared pointer to selectivity and fleet because
     // fleet object needs a shared pointer in fleet.hpp
-    // (std::shared_ptr<fims::SelectivityBase<Type> > selectivity;)
+    // (std::shared_ptr<fims_popdy::SelectivityBase<Type> > selectivity;)
     // and population object needs a shared pointer in population.hpp
-    // (std::vector<std::shared_ptr<fims::Fleet<Type> > > fleets;)
+    // (std::vector<std::shared_ptr<fims_popdy::Fleet<Type> > > fleets;)
 
     // Does Fmort need to be in side of the year loop like log_q?
     for (int i = 0; i < nfleets; i++) {
-      auto fleet = std::make_shared<fims::Fleet<double>>();
-      auto selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
+      auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+      auto selectivity = std::make_shared<fims_popdy::LogisticSelectivity<double>>();
       selectivity->median = 7;
       selectivity->slope = 0.5;
 
@@ -149,7 +149,7 @@ class PopulationPrepareTestFixture : public testing::Test {
     maturity->slope = 0.15;
     population.maturity = maturity;
 
-    auto recruitment = std::make_shared<fims::SRBevertonHolt<double>>();
+    auto recruitment = std::make_shared<fims_popdy::SRBevertonHolt<double>>();
     recruitment->logit_steep = fims_math::logit(0.2, 1.0, 0.75);
     recruitment->log_rzero = fims_math::log(1000000.0);
     recruitment->recruit_deviations.resize(nyears);
@@ -158,7 +158,7 @@ class PopulationPrepareTestFixture : public testing::Test {
 
   virtual void TearDown() {}
 
-  fims::Population<double> population;
+  fims_popdy::Population<double> population;
   int id_g = 0;
   int nyears = 30;
   int nseasons = 1;

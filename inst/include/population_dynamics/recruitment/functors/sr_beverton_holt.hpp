@@ -15,7 +15,7 @@
 
 #include "recruitment_base.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /** @brief BevertonHolt class that returns the Beverton Holt SR
  * from fims_math.

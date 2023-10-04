@@ -204,8 +204,8 @@
        std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > d0 =
         fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
     
-       std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> > model0 =
-       std::make_shared<fims::LogisticSelectivity<TMB_FIMS_REAL_TYPE> >();
+       std::shared_ptr<fims_popdy::LogisticSelectivity<TMB_FIMS_REAL_TYPE> > model0 =
+       std::make_shared<fims_popdy::LogisticSelectivity<TMB_FIMS_REAL_TYPE> >();
     
     
        model0->id = this->id;
@@ -231,8 +231,8 @@
        std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER> > d1 =
         fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
     
-       std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> > model1 =
-       std::make_shared<fims::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> >();
+       std::shared_ptr<fims_popdy::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> > model1 =
+       std::make_shared<fims_popdy::LogisticSelectivity<TMB_FIMS_FIRST_ORDER> >();
     
     
        model1->id = this->id;
@@ -258,8 +258,8 @@
        std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER> > d2 =
         fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
     
-       std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> > model2 =
-       std::make_shared<fims::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> >();
+       std::shared_ptr<fims_popdy::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> > model2 =
+       std::make_shared<fims_popdy::LogisticSelectivity<TMB_FIMS_SECOND_ORDER> >();
     
     
        model2->id = this->id;
@@ -285,8 +285,8 @@
        std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER> > d3 =
         fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
     
-       std::shared_ptr<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> > model3 =
-       std::make_shared<fims::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> >();
+       std::shared_ptr<fims_popdy::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> > model3 =
+       std::make_shared<fims_popdy::LogisticSelectivity<TMB_FIMS_THIRD_ORDER> >();
     
     
        model3->id = this->id;

@@ -11,7 +11,7 @@
 #include "../../../common/fims_math.hpp"
 #include "selectivity_base.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /**
  * @brief DoubleLogisticSelectivity class that returns the double logistic

@@ -31,7 +31,7 @@
 #ifndef FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP
 #define FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP
 
-namespace fims {
+namespace fims_popdy {
 
 /**
  * Subpopulation class. This class represents a generic partition

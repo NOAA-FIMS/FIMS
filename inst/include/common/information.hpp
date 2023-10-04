@@ -51,21 +51,21 @@ class Information {
       data_iterator; /**< iterator for the data objects */
 
   // life history modules
-  std::map<uint32_t, std::shared_ptr<fims::RecruitmentBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<T> > >
       recruitment_models; /*!<hash map to link each object to its shared
                              location in memory*/
   typedef
       typename std::map<uint32_t,
-                        std::shared_ptr<fims::RecruitmentBase<T> > >::iterator
+                        std::shared_ptr<fims_popdy::RecruitmentBase<T> > >::iterator
           recruitment_models_iterator;
   /**< iterator for recruitment objects>*/
 
-  std::map<uint32_t, std::shared_ptr<fims::SelectivityBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::SelectivityBase<T> > >
       selectivity_models; /*!<hash map to link each object to its shared
                              location in memory*/
   typedef
       typename std::map<uint32_t,
-                        std::shared_ptr<fims::SelectivityBase<T> > >::iterator
+                        std::shared_ptr<fims_popdy::SelectivityBase<T> > >::iterator
           selectivity_models_iterator;
   /**< iterator for selectivity objects>*/
 
@@ -77,11 +77,11 @@ class Information {
       growth_models_iterator;
   /**< iterator for growth objects>*/
 
-  std::map<uint32_t, std::shared_ptr<fims::MaturityBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<T> > >
       maturity_models; /*!<hash map to link each object to its shared location
                           in memory*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims::MaturityBase<T> > >::iterator
+                            std::shared_ptr<fims_popdy::MaturityBase<T> > >::iterator
       maturity_models_iterator;
   /**< iterator for maturity objects>*/
 
@@ -95,21 +95,21 @@ class Information {
   /**< iterator for fleet objects>*/
 
   // populations
-  std::map<uint32_t, std::shared_ptr<fims::Population<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::Population<T> > >
       populations; /*!<hash map to link each object to its shared location in
                       memory*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims::Population<T> > >::iterator
+                            std::shared_ptr<fims_popdy::Population<T> > >::iterator
       population_iterator;
   /**< iterator for population objects>*/
 
   // distributions
-  std::map<uint32_t, std::shared_ptr<fims::DistributionsBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::DistributionsBase<T> > >
       distribution_models; /*!<hash map to link each object to its shared
                               location in memory*/
   typedef
       typename std::map<uint32_t,
-                        std::shared_ptr<fims::DistributionsBase<T> > >::iterator
+                        std::shared_ptr<fims_popdy::DistributionsBase<T> > >::iterator
           distribution_models_iterator;
   /**< iterator for distribution objects>*/
 
@@ -340,7 +340,7 @@ class Information {
              << this->populations.size() << " populations." << std::endl;
     for (population_iterator it = this->populations.begin();
          it != this->populations.end(); ++it) {
-      std::shared_ptr<fims::Population<T> > p = (*it).second;
+      std::shared_ptr<fims_popdy::Population<T> > p = (*it).second;
 
       FIMS_LOG << "Setting up links from population " << p->id
                << " to fleets [ " << std::flush;

@@ -16,7 +16,7 @@
 
 #include "../../../common/model_object.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /** @brief Base class for all selectivity functors.
  *

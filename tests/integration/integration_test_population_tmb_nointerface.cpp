@@ -38,13 +38,13 @@ Type objective_function<Type>::operator()(){
   //Is log_q supposed to be 1 or 0?
   log_q.fill(1);
 
-  fims::Population<Type> pop;
+  fims_popdy::Population<Type> pop;
 
 
 
   for (int i = 0; i < nfleets; i++) {
 
-    std::shared_ptr<fims::Fleet<Type> > f = std::make_shared<fims::Fleet<Type> >();
+    std::shared_ptr<fims_popdy::Fleet<Type> > f = std::make_shared<fims_popdy::Fleet<Type> >();
     f->Initialize(nyears, nages);
     //f->nyears = nyears;
 
@@ -66,8 +66,8 @@ Type objective_function<Type>::operator()(){
 
 
     //set up selectivity
-    std::shared_ptr<fims::LogisticSelectivity<Type> > selectivity
-      = std::make_shared<fims::LogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity
+      = std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
 
     selectivity->median = fleet_sel_A50(i);
     selectivity->slope = fleet_sel_slope(i);
@@ -90,7 +90,7 @@ Type objective_function<Type>::operator()(){
 
   for (int i = 0; i < nsurveys; i++) {
 
-    std::shared_ptr<fims::Fleet<Type> > s = std::make_shared<fims::Fleet<Type> >();
+    std::shared_ptr<fims_popdy::Fleet<Type> > s = std::make_shared<fims_popdy::Fleet<Type> >();
     s->Initialize(nyears, nages);
 
 
@@ -101,8 +101,8 @@ Type objective_function<Type>::operator()(){
     //set up selectivity
 
 
-    std::shared_ptr<fims::LogisticSelectivity<Type> > selectivity
-      = std::make_shared<fims::LogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity
+      = std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
 
     selectivity->median = surv_sel_A50(i);
     selectivity->slope = surv_sel_slope(i);
@@ -132,8 +132,8 @@ Type objective_function<Type>::operator()(){
   }
 
   //Set recruitment
-  std::shared_ptr<fims::SRBevertonHolt<Type> > rec =
-    std::make_shared<fims::SRBevertonHolt<Type> >();
+  std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > rec =
+    std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
   rec->rzero = R0;
   rec->steep = h;
   rec->log_sigma_recruit = logR_sd;

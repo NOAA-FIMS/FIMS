@@ -27,7 +27,7 @@ struct Fleet : public FIMSObject<Type> {
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
   using ParameterVector =
-      typename ModelTraits<Type>::ParameterVector; /*!< vector of fleet
+      typename fims::ModelTraits<Type>::ParameterVector; /*!< vector of fleet
                                                       parameters */
 
   // This likelihood index is not currently being used as only one likelihood
@@ -48,7 +48,7 @@ struct Fleet : public FIMSObject<Type> {
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
-  std::shared_ptr<fims::SelectivityBase<Type>>
+  std::shared_ptr<fims_popdy::SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
 
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
@@ -160,7 +160,7 @@ struct Fleet : public FIMSObject<Type> {
       for (size_t y = 0; y < this->nyears; y++) {
         // EigenVector declares a vector type from the Eigen library, which is
         // the expected type for TMB's dmultinom
-        using Vector = typename ModelTraits<Type>::EigenVector;
+        using Vector = typename fims::ModelTraits<Type>::EigenVector;
         Vector observed_acomp;
         Vector expected_acomp;
 

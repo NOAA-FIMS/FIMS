@@ -20,7 +20,7 @@
 #include "../../../common/model_object.hpp"
 #include "../../../distributions/distributions.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /** @brief Base class for all recruitment functors.
  *
@@ -31,7 +31,7 @@ template <class Type>
 struct RecruitmentBase : public FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for recruitment object*/
 
-  typename ModelTraits<Type>::ParameterVector
+  typename fims::ModelTraits<Type>::ParameterVector
       recruit_deviations;            /*!< A vector of recruitment deviations */
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                  deviations are summing to zero or not */
