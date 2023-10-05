@@ -3,7 +3,6 @@
 name: Add a comment with reviewer checklist when PR opened
 on:
   pull_request:
-    types: [ready_for_review]
 
 jobs:
   pr-checklist:
@@ -35,15 +34,11 @@ jobs:
             - [ ] The code is well-designed.
             - [ ] The functionality is good for the users of the code.
             - [ ] Any User Interface changes are sensible and look good.
-            - [ ] Parallel computing remains functional.
             - [ ] The code isn’t more complex than it needs to be.
-            - [ ] The developer isn’t implementing things they might need in the future but don’t know they need now.
-            - [ ] Code has appropriate [unit tests](https://noaa-fims.github.io/collaborative_workflow/testing.html#testing).
-            - [ ] Tests are well-designed.
+            - [ ] Code coverage remains high, indicating the new code is tested.
             - [ ] The developer used clear names for everything.
             - [ ] Comments are clear and useful, and mostly explain why instead of what.
             - [ ] Code is appropriately documented (doxygen and roxygen).
-            - [ ] The code conforms to our [style guides](https://noaa-fims.github.io/collaborative_workflow/contributor-guidelines.html#style-guide).
             `
             const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
             github.issues.createComment({ issue_number, owner, repo, body: msg });
