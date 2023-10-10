@@ -182,12 +182,12 @@ class Information {
         if (it != this->data_objects.end()) {
           f->observed_index_data = (*it).second;
           FIMS_LOG << "Index data successfully set." << std::endl;
-          FIMS_LOG << "Observed input index: \n " << f->fleet_observed_index_data
+          FIMS_LOG << "Observed input index: \n " << f->observed_index_data
                    << std::endl;
         } else {
           valid_model = false;
           FIMS_LOG << "Error: Expected data observations not defined for fleet"
-                   << f->id << ", index " << index_id << std::endl;
+                   << f->id << ", index " << index_id_m << std::endl;
         }
 
       } else {
@@ -215,7 +215,7 @@ class Information {
         } else {
           valid_model = false;
           FIMS_LOG << "Error: Expected data observations not defined for fleet "
-                   << f->id << ", index " << agecomp_id << std::endl;
+                   << f->id << ", index " << agecomp_id_m << std::endl;
         }
 
       } else {
@@ -246,7 +246,7 @@ class Information {
           valid_model = false;
           FIMS_LOG
               << "Error: Expected selectivity pattern not defined for fleet "
-              << f->id << ", selectivity pattern " << sel_id << std::endl;
+              << f->id << ", selectivity pattern " << sel_id_m << std::endl;
         }
 
       } else {
@@ -279,7 +279,7 @@ class Information {
           valid_model = false;
           FIMS_LOG << "Error: Expected index likelihood function not defined "
                       "for fleet "
-                   << f->id << ", likelihood function " << ind_like_id
+                   << f->id << ", likelihood function " << ind_like_id_m
                    << std::endl;
         }
 
@@ -314,7 +314,7 @@ class Information {
           valid_model = false;
           FIMS_LOG << "Error: Expected age comp likelihood function not "
                       "defined for fleet "
-                   << f->id << ", likelihood function " << ac_like_id
+                   << f->id << ", likelihood function " << ac_like_id_m
                    << std::endl;
         }
 
