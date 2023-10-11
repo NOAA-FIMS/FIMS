@@ -7,7 +7,7 @@ namespace
 
     TEST(fleet_tests, Fleet_Initialize_works)
     {
-        fims_popdy::opdy::Fleet<double> fleet;
+        fims_popdy::Fleet<double> fleet;
         int nyears = 30;
         int nages = 12;
         fleet.Initialize(nyears, nages);
@@ -22,7 +22,7 @@ namespace
 
     TEST(fleet_tests, Fleet_Prepare_works)
     {
-        fims_popdy::opdy::Fleet<double> fleet;
+        fims_popdy::Fleet<double> fleet;
         int nyears = 30;
         int nages = 12;
         fleet.Initialize(nyears, nages);

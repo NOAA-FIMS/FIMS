@@ -41,7 +41,7 @@ struct {{{module_name}}}{{{module_type}}} : public {{{module_type}}}Base<Type> {
     */
     virtual const Type evaluate(const Type& x) {
         //you will need to add class members as arguments to the function below
-        return fims_popdy::opdy::{{{module_name}}}<Type>(x);
+        return fims_popdy::{{{module_name}}}<Type>(x);
     }
 };
 

@@ -21,7 +21,7 @@ class PopulationInitializeTestFixture : public testing::Test {
     population.nseasons = nseasons;
     population.nages = nages;
     for (int i = 0; i < nfleets; i++) {
-      auto fleet = std::make_shared<fims_popdy::opdy::Fleet<double>>();
+      auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
       population.fleets.push_back(fleet);
     }
   }
@@ -31,7 +31,7 @@ class PopulationInitializeTestFixture : public testing::Test {
   // do. Otherwise, it does not need to be provided.
   virtual void TearDown() {}
 
-  fims_popdy::opdy::Population<double> population;
+  fims_popdy::Population<double> population;
 
   // Use default values from the Li et al., 2021
   // https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/blob/master/R/save_initial_input.R
