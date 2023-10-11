@@ -25,7 +25,7 @@ namespace fims_distributions {
  *
  */
 template <typename Type>
-struct DistributionsBase : public FIMSObject<Type> {
+struct DistributionsBase : public fims_model_object::FIMSObject<Type> {
   // id_g is the ID of the instance of the DistributionsBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of

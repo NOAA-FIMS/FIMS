@@ -28,7 +28,7 @@ namespace fims_popdy {
  *
  */
 template <class Type>
-struct RecruitmentBase : public FIMSObject<Type> {
+struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for recruitment object*/
 
   typename fims::ModelTraits<Type>::ParameterVector

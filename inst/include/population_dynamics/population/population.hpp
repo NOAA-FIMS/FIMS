@@ -33,7 +33,7 @@ directly?)
  * that are divided into generic partitions (eg. sex, area).
  */
 template <typename Type>
-struct Population : public FIMSObject<Type> {
+struct Population : public fims_model_object::FIMSObject<Type> {
   using ParameterVector =
       typename fims::ModelTraits<Type>::ParameterVector; /*!< the vector of population
                                                       parameters*/
@@ -86,22 +86,22 @@ struct Population : public FIMSObject<Type> {
   std::vector<Type> expected_recruitment;      /*!< Expected recruitment */
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
-  std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
+  std::shared_ptr<RecruitmentBase<Type>>
       recruitment; /*!< shared pointer to recruitment module */
 
   // growth
   int growth_id = -999; /*!< id of growth model object*/
-  std::shared_ptr<fims_popdy::GrowthBase<Type>>
+  std::shared_ptr<GrowthBase<Type>>
       growth; /*!< shared pointer to growth module */
 
   // maturity
   int maturity_id = -999; /*!< id of maturity model object*/
-  std::shared_ptr<fims_popdy::MaturityBase<Type>>
+  std::shared_ptr<MaturityBase<Type>>
       maturity; /*!< shared pointer to maturity module */
 
   // fleet
   int fleet_id = -999; /*!< id of fleet model object*/
-  std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
+  std::vector<std::shared_ptr<Fleet<Type>>>
       fleets; /*!< shared pointer to fleet module */
 
   // Define objective function object to be able to REPORT and ADREPORT
@@ -111,7 +111,7 @@ struct Population : public FIMSObject<Type> {
 
   // this -> means you're referring to a class member (member of self)
 
-  Population() { this->id = fims_popdy::Population::id_g++; } // TODO: check if we need fims_popdy:: here
+  Population() { this->id = Population::id_g++; } 
 
   /**
    * @brief Initialize values. Called once at the start of model run.

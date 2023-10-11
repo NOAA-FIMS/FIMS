@@ -22,7 +22,7 @@ namespace fims_popdy {
  * @tparam Type The type of the fleet object.
  **/
 template <class Type>
-struct Fleet : public FIMSObject<Type> {
+struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
@@ -48,7 +48,7 @@ struct Fleet : public FIMSObject<Type> {
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
-  std::shared_ptr<fims_popdy::SelectivityBase<Type>>
+  std::shared_ptr<SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
 
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
@@ -149,11 +149,11 @@ struct Fleet : public FIMSObject<Type> {
   virtual const Type evaluate_age_comp_nll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
 #ifdef TMB_MODEL
-    fims_distributions<Type> dmultinom;
+    fims_distributions::Dmultinom<Type> dmultinom;
     size_t dims = this->observed_agecomp_data->get_imax() *
                   this->observed_agecomp_data->get_jmax();
     if (dims != this->catch_numbers_at_age.size()) {
-      fims_log::get("fleet.log") << "Error: observed age comp is of size "
+      fims::fims_log::get("fleet.log") << "Error: observed age comp is of size "
                                  << dims << " and expected is of size "
                                  << this->age_composition.size() << std::endl;
     } else {
@@ -178,7 +178,7 @@ struct Fleet : public FIMSObject<Type> {
                               sum;  // probabilities for ages
 
           observed_acomp[a] = this->observed_agecomp_data->at(y, a);
-          fims_log::get("fleet.log")
+          fims::fims_log::get("fleet.log")
               << " age " << a << " in year " << y
               << "has expected: " << expected_acomp[a]
               << "  and observed: " << observed_acomp[a] << std::endl;
@@ -203,14 +203,14 @@ struct Fleet : public FIMSObject<Type> {
       dnorm.x = fims_math::log(this->observed_index_data->at(i));
       dnorm.mean = fims_math::log(this->expected_index[i]);
       nll -= dnorm.evaluate(true);
-      fims_log::get("fleet.log")
+      fims::fims_log::get("fleet.log")
           << "observed likelihood component: " << i << " is "
           << this->observed_index_data->at(i)
           << " and expected is: " << this->expected_index[i] << std::endl;
     }
-    fims_log::get("fleet.log")
+    fims::fims_log::get("fleet.log")
         << " log obs error is: " << this->log_obs_error << std::endl;
-    fims_log::get("fleet.log") << " sd is: " << dnorm.sd << std::endl;
+    fims::fims_log::get("fleet.log") << " sd is: " << dnorm.sd << std::endl;
 #endif
     return nll;
   }

@@ -25,7 +25,7 @@ namespace fims_popdy {
  * */
 template<typename Type>
 // Change {{{ module_type }}} to CamelCase in the class definition below. 
-struct {{{ module_type }}}Base : public FIMSObject<Type> {
+struct {{{ module_type }}}Base : public fims_model_object::FIMSObject<Type> {
     
     // id_g is the ID of the instance of the {{{ module_type }}}Base class.
     // this is like a memory tracker. 

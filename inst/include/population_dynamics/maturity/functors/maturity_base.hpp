@@ -25,6 +25,8 @@ namespace fims_popdy {
 
 template <typename Type>
 struct MaturityBase : public FIMSObject<Type> {
+template <typename T>
+struct MaturityBase : public fims_model_object::FIMSObject<T> {
   // id_g is the ID of the instance of the MaturityBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
