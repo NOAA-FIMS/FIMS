@@ -24,14 +24,14 @@ class PopulationIntegrationTestFixture : public testing::Test {
         for (uint32_t i = 0; i < this->ncases_m; i++) {
             for (uint32_t j = 0; j < this->ninput_files_m; j++) {
                 ss.str("");
-                ss << "../integration/inputs/C" << i << "/om_input" << j + 1 << ".json";
+                ss << "../integration/FIMS-deterministic-inputs/C" << i << "/om_input" << j + 1 << ".json";
                 rapidjson::Document input;
                 rapidjson::Document output;
                 this->ReadJson(ss.str(), input);
 
 
                 ss.str("");
-                ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
+                ss << "inputs/FIMS-deterministic-inputs/C" << i << "/om_output" << j + 1 << ".json";
                 // this->ReadJson(ss.str(), output);
 
                 fims::Population<double> pop;

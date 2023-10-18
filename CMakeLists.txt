@@ -76,6 +76,12 @@ EXECUTE_PROCESS(
 
 MESSAGE(STATUS "R_HOME is ${R_HOME}")
 
+# Prepare integration test data
+EXECUTE_PROCESS(
+		COMMAND R "--slave" "--no-save" "-e" "devtools::load_all()")
+EXECUTE_PROCESS(
+		COMMAND R "--slave" "--no-save" "-e" "FIMS:::setup_gtest()")
+
 # Enable testing for current directory and below
 enable_testing()
 
