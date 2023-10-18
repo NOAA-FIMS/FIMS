@@ -27,7 +27,7 @@ jobs:
       with:
         extra-packages: any::remotes
     - name: install local version of FIMS
-      run: remotes::install_local(upgrade = "always")
+      run: remotes::install_github('NOAA-FIMS/FIMS', ref='f2b6b65b13c2b9d22b4950a141aeca6670abdbaf')
       shell: Rscript {0}
     - name: setup for gtest
       run: FIMS:::setup_gtest()
