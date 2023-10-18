@@ -167,6 +167,8 @@ test_that("deterministic test of fims", {
   sdr <- TMB::sdreport(obj)
   sdr_fixed <- summary(sdr, "fixed")
 
+  # Call report using deterministic parameter values
+  # obj$report() requires parameter list to avoid errors
   report <- obj$report(obj$par)
 
   # log(R0)
@@ -320,6 +322,8 @@ test_that("nll test of fims", {
   fims_logR0 <- sdr_fixed[1, "Estimate"]
   expect_lte(abs(fims_logR0 - log(om_input$R0)) / log(om_input$R0), 0.0001)
 
+  # Call report using deterministic parameter values
+  # obj$report() requires parameter list to avoid errors
   report <- obj$report(obj$par)
   obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
   jnll <- obj$fn()
@@ -390,6 +394,8 @@ test_that("estimation test of fims", {
     control = list(maxit = 1000000, reltol = 1e-15)
   ))
 
+  # Call report using MLE parameter values
+  # obj$report() requires parameter list to avoid errors
   report <- obj$report(obj$env$last.par.best)
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
