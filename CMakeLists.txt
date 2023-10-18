@@ -77,7 +77,7 @@ EXECUTE_PROCESS(
 MESSAGE(STATUS "R_HOME is ${R_HOME}")
 
 EXECUTE_PROCESS(
-		COMMAND R "--slave" "--no-save" "-e" "remotes::install_github('NOAA-FIMS/FIMS', ref='f2b6b65b13c2b9d22b4950a141aeca6670abdbaf')")
+		COMMAND R "--slave" "--no-save" "-e" "remotes::install_local(upgrade = 'always')")
 EXECUTE_PROCESS(
 		COMMAND R "--slave" "--no-save" "-e" "FIMS:::setup_gtest()")
 
