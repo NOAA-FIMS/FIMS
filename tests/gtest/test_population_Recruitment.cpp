@@ -25,38 +25,38 @@ namespace
          {
              for(int age = 0; age < population.nages; age++)
              {
-                 int index_ya = year * population.nages + age;
-                 population.CalculateMaturityAA(index_ya, age);
-                 population.CalculateMortality(index_ya, year, age);
+                 int i_age_year = year * population.nages + age;
+                 population.CalculateMaturityAA(i_age_year, age);
+                 population.CalculateMortality(i_age_year, year, age);
                  if(year == 0){
                     // for the first year, the population.numbers_at_age is calculated
                     // with CalculateInitialNumbersAA
-                     population.CalculateInitialNumbersAA(index_ya, age);
+                     population.CalculateInitialNumbersAA(i_age_year, age);
                      if(age == 0)
                      {
                          // if age is 0, then unfished numbers AA are rzero
-                         population.unfished_numbers_at_age[index_ya] = population.recruitment->rzero;
+                         population.unfished_numbers_at_age[i_age_year] = population.recruitment->rzero;
                      }
                      else
                      {
                          // if age is > 0 then use CalculateUnfishedNumbersAA 
-                         population.CalculateUnfishedNumbersAA(index_ya,age-1,age);
+                         population.CalculateUnfishedNumbersAA(i_age_year,age-1,age);
                          
                      }
-                     population.CalculateSpawningBiomass(index_ya, year, age);
-                     population.CalculateUnfishedSpawningBiomass(index_ya,year,age);
+                     population.CalculateSpawningBiomass(i_age_year, year, age);
+                     population.CalculateUnfishedSpawningBiomass(i_age_year,year,age);
                  }
                  else{
-                     int index_ya2 = (year -1) * population.nages + (age -1);
-                     population.CalculateNumbersAA(index_ya, index_ya2, age); 
-                     population.CalculateUnfishedNumbersAA(index_ya, index_ya2, age);
+                     int i_agem1_yearm1 = (year -1) * population.nages + (age -1);
+                     population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age); 
+                     population.CalculateUnfishedNumbersAA(i_age_year, i_agem1_yearm1, age);
                  }
 
              }
          }
         
-        int index_ya = year * population.nages + age;
-        int index_ya2 = (year - 1) * population.nages + (age - 1);
+        int i_age_year = year * population.nages + age;
+        int i_agem1_yearm1 = (year - 1) * population.nages + (age - 1);
         
         // trying to create an ssbzero variable to use in the recruitment equation by
         // multiplying the initial numbers-at-age and the population weight-at-age
@@ -64,14 +64,14 @@ namespace
         double ssbzero = population.recruitment->rzero * population.weight_at_age[age];
         
         // calculate recruitment in population module
-        population.CalculateRecruitment(index_ya, year);
+        population.CalculateRecruitment(i_age_year, year);
         
         // calculate expected recruitment based on bev-holt equation
-        expect_recruitment[index_ya] = 
-        (0.8 * rzero * steep * population.spawning_biomass[index_ya]) / 
-        (0.2 * ssbzero * (1.0 - steep) + population.spawning_biomass[index_ya] * (steep - 0.2)) * recruit_deviations[year]; 
+        expect_recruitment[i_age_year] = 
+        (0.8 * rzero * steep * population.spawning_biomass[i_age_year]) / 
+        (0.2 * ssbzero * (1.0 - steep) + population.spawning_biomass[i_age_year] * (steep - 0.2)) * recruit_deviations[year]; 
       
         // testing that expected recruitment and population.numbers_at_age match
-        EXPECT_EQ(population.numbers_at_age[index_ya], expect_recruitment[index_ya]);
+        EXPECT_EQ(population.numbers_at_age[i_age_year], expect_recruitment[i_age_year]);
     }
 }

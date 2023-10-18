@@ -386,13 +386,13 @@ Once we've set up the shared pointer, we can access maturity from within populat
    * @brief Calculates expected proportion of individuals mature at a selected
    * age
    *
-   * @param index_ya dimension folded index for year and age
+   * @param i_age_year dimension folded index for age and year
    * @param age the age of maturity
    */
-  void CalculateMaturityAA(size_t index_ya, size_t age) {
+  void CalculateMaturityAA(size_t i_age_year, size_t age) {
     // this->maturity is pointing to the maturity module, which has
     //  an evaluate function. -> can be nested.
-    this->proportion_mature_at_age[index_ya] =
+    this->proportion_mature_at_age[i_age_year] =
         this->maturity->evaluate(ages[age]);
   }
 

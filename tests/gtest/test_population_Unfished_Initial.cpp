@@ -11,9 +11,9 @@ namespace
         {
             for (int age = 0; age < population.nages; age++)
             {
-                int index_ya = year * population.nages + age;
+                int i_age_year = year * population.nages + age;
                 // Call FIMS CalculateMortality() function to compare FIMS mortality values with "true" values later
-                population.CalculateMortality(index_ya, year, age);
+                population.CalculateMortality(i_age_year, year, age);
 
                 std::vector<double> mortality_F(nyears * nages, 0);
                 for (int fleet_index = 0; fleet_index < population.nfleets; fleet_index++)
@@ -21,16 +21,16 @@ namespace
                     if(!population.fleets[fleet_index]->is_survey){
                     // Known values were used to generate "true" value and test CalculateMortality()
                     size_t index_yf = year * population.nfleets + fleet_index;
-                    mortality_F[index_ya] += population.fleets[fleet_index]->Fmort[year] *
+                    mortality_F[i_age_year] += population.fleets[fleet_index]->Fmort[year] *
                                              population.fleets[fleet_index]->selectivity->evaluate(population.ages[age]);
                 
-                    EXPECT_EQ(population.mortality_F[index_ya], mortality_F[index_ya]);
+                    EXPECT_EQ(population.mortality_F[i_age_year], mortality_F[i_age_year]);
                 
 
                 std::vector<double> mortality_Z(nyears * nages, 0);
-                mortality_Z[index_ya] = fims::exp(population.log_M[index_ya]) +
-                                        mortality_F[index_ya];
-                EXPECT_EQ(population.mortality_Z[index_ya], mortality_Z[index_ya]);
+                mortality_Z[i_age_year] = fims::exp(population.log_M[i_age_year]) +
+                                        mortality_F[i_age_year];
+                EXPECT_EQ(population.mortality_Z[i_age_year], mortality_Z[i_age_year]);
                     }
             }
         }
@@ -46,12 +46,12 @@ namespace
         {
             for (int age = 0; age < population.nages; age++)
             {
-                int index_ya = year * population.nages + age;
+                int i_age_year = year * population.nages + age;
 
-                population.CalculateInitialNumbersAA(index_ya, age);
+                population.CalculateInitialNumbersAA(i_age_year, age);
 
-                numbers_at_age[index_ya] = fims::exp(population.log_init_naa[age]);
-                EXPECT_EQ(population.numbers_at_age[index_ya], numbers_at_age[index_ya]);
+                numbers_at_age[i_age_year] = fims::exp(population.log_init_naa[age]);
+                EXPECT_EQ(population.numbers_at_age[i_age_year], numbers_at_age[i_age_year]);
             }
         }
     }
@@ -65,71 +65,71 @@ namespace
         {
             for (int age = 0; age < population.nages; age++)
             {
-                int index_ya = year * population.nages + age;
+                int i_age_year = year * population.nages + age;
  
                 if (age == 0)
                 {            
-                    population.unfished_numbers_at_age[index_ya] = fims::exp(population.recruitment->log_rzero);
-                    test_unfished_numbers_at_age[index_ya] = fims::exp(population.recruitment->log_rzero);
+                    population.unfished_numbers_at_age[i_age_year] = fims::exp(population.recruitment->log_rzero);
+                    test_unfished_numbers_at_age[i_age_year] = fims::exp(population.recruitment->log_rzero);
                 }
 
                 if (year == 0 && age > 0){
                     
                     // values from FIMS
-                    // Bai: change CalculateUnfishedNumbersAA(index_ya, a); in 
-                    // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1);
-                    // or to CalculateUnfishedNumbersAA(index_ya, a-1);?
-                    // population.CalculateUnfishedNumbersAA(index_ya, age);
-                    // population.CalculateUnfishedNumbersAA(index_ya, index_ya-1);
-                    population.CalculateUnfishedNumbersAA(index_ya, age-1, age);
+                    // Bai: change CalculateUnfishedNumbersAA(i_age_year, a); in 
+                    // population.hpp to CalculateUnfishedNumbersAA(i_age_year, i_age_year-1);
+                    // or to CalculateUnfishedNumbersAA(i_age_year, a-1);?
+                    // population.CalculateUnfishedNumbersAA(i_age_year, age);
+                    // population.CalculateUnfishedNumbersAA(i_age_year, i_age_year-1);
+                    population.CalculateUnfishedNumbersAA(i_age_year, age-1, age);
                     // true values from test
-                    test_unfished_numbers_at_age[index_ya] = 
-                        test_unfished_numbers_at_age[index_ya-1] * 
-                        fims::exp(-fims::exp(population.log_M[index_ya-1]));
+                    test_unfished_numbers_at_age[i_age_year] = 
+                        test_unfished_numbers_at_age[i_age_year-1] * 
+                        fims::exp(-fims::exp(population.log_M[i_age_year-1]));
 
                 }
 
                 if (year>0 && age > 0)
                 {
-                    int index_ya2 = (year - 1) * population.nages + (age - 1);
-                    EXPECT_GT(population.M[index_ya2], 0.0);
+                    int i_agem1_yearm1 = (year - 1) * population.nages + (age - 1);
+                    EXPECT_GT(population.M[i_agem1_yearm1], 0.0);
                     // values from FIMS
-                    // Bai: change CalculateUnfishedNumbersAA(index_ya, index_ya2); in 
-                    // population.hpp to CalculateUnfishedNumbersAA(index_ya, index_ya-1); ?
+                    // Bai: change CalculateUnfishedNumbersAA(i_age_year, i_agem1_yearm1); in 
+                    // population.hpp to CalculateUnfishedNumbersAA(i_age_year, i_age_year-1); ?
                     // Test fails if log_M from test fixture is not constant over years and ages.
-                    population.CalculateUnfishedNumbersAA(index_ya, index_ya2, age);
+                    population.CalculateUnfishedNumbersAA(i_age_year, i_agem1_yearm1, age);
                     // true values from test
-                    // unfished_numbers_at_age[index_ya] = unfished_numbers_at_age[index_ya-1] * fims::exp(-fims::exp(population.log_M[index_ya-1]));
-                    test_unfished_numbers_at_age[index_ya] = 
-                        test_unfished_numbers_at_age[index_ya2] * 
-                        fims::exp(-fims::exp(population.log_M[index_ya2]));
+                    // unfished_numbers_at_age[i_age_year] = unfished_numbers_at_age[i_age_year-1] * fims::exp(-fims::exp(population.log_M[i_age_year-1]));
+                    test_unfished_numbers_at_age[i_age_year] = 
+                        test_unfished_numbers_at_age[i_agem1_yearm1] * 
+                        fims::exp(-fims::exp(population.log_M[i_agem1_yearm1]));
                 }
 
                 if(age==(population.nages-1)){
-                    int index_ya2 = 0;
+                    int i_agem1_yearm1 = 0;
                     if(year == 0){
-                        index_ya2 = (age - 1);
+                        i_agem1_yearm1 = (age - 1);
                     } else{
-                        index_ya2 = (year - 1) * population.nages + (age - 1);
+                        i_agem1_yearm1 = (year - 1) * population.nages + (age - 1);
                     }
-                        test_unfished_numbers_at_age[index_ya] = 
-                        test_unfished_numbers_at_age[index_ya] +
-                        test_unfished_numbers_at_age[index_ya2 + 1] *
-                        fims::exp(-fims::exp(population.log_M[index_ya2 + 1]));
+                        test_unfished_numbers_at_age[i_age_year] = 
+                        test_unfished_numbers_at_age[i_age_year] +
+                        test_unfished_numbers_at_age[i_agem1_yearm1 + 1] *
+                        fims::exp(-fims::exp(population.log_M[i_agem1_yearm1 + 1]));
 
                 }
 
-                population.CalculateMaturityAA(index_ya, age);
-                population.CalculateUnfishedSpawningBiomass(index_ya, year, age);
+                population.CalculateMaturityAA(i_age_year, age);
+                population.CalculateUnfishedSpawningBiomass(i_age_year, year, age);
                 
-                test_unfished_spawning_biomass[year] += population.proportion_mature_at_age[index_ya] *
+                test_unfished_spawning_biomass[year] += population.proportion_mature_at_age[i_age_year] *
                                                         population.proportion_female *
-                                                        test_unfished_numbers_at_age[index_ya] *
+                                                        test_unfished_numbers_at_age[i_age_year] *
                                                         population.growth->evaluate(population.ages[age]);
 
 
-                EXPECT_EQ(population.unfished_numbers_at_age[index_ya], test_unfished_numbers_at_age[index_ya]);
-                EXPECT_GT(population.unfished_numbers_at_age[index_ya], 0.0);
+                EXPECT_EQ(population.unfished_numbers_at_age[i_age_year], test_unfished_numbers_at_age[i_age_year]);
+                EXPECT_GT(population.unfished_numbers_at_age[i_age_year], 0.0);
 
             }
             

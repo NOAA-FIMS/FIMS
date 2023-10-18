@@ -86,29 +86,29 @@ namespace
                 {
                     for (int age = 0; age < pop.nages; age++)
                     {
-                        int index_ya = year * pop.nages + age;
+                        int i_age_year = year * pop.nages + age;
 
                         // Expect FIMS value is greater than 0.0
-                        EXPECT_GT(pop.unfished_numbers_at_age[index_ya], 0.0)
-                            << "differ at index " << index_ya << "; year " << year << "; age" << age;
-                        EXPECT_LE(pop.unfished_numbers_at_age[index_ya], fims::exp(log_rzero))
-                            << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                        EXPECT_GT(pop.unfished_numbers_at_age[i_age_year], 0.0)
+                            << "differ at index " << i_age_year << "; year " << year << "; age" << age;
+                        EXPECT_LE(pop.unfished_numbers_at_age[i_age_year], fims::exp(log_rzero))
+                            << "differ at index " << i_age_year << "; year " << year << "; age" << age;
 
                         EXPECT_GT(pop.unfished_spawning_biomass[year], 0.0)
-                            << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                            << "differ at index " << i_age_year << "; year " << year << "; age" << age;
                         EXPECT_LE(pop.unfished_spawning_biomass[year], fims::exp(log_rzero) * phi_0)
-                            << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                            << "differ at index " << i_age_year << "; year " << year << "; age" << age;
 
                         EXPECT_GT(pop.unfished_biomass[year], 0.0)
-                            << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                            << "differ at index " << i_age_year << "; year " << year << "; age" << age;
                     }
                 }
 
                 for (int age = 0; age < pop.nages; age++)
                 {
-                    int index_ya = pop.nyears * pop.nages + age;
-                    EXPECT_GT(pop.unfished_numbers_at_age[index_ya], 0.0)
-                        << "differ at index " << index_ya << "; year " << pop.nyears + 1 << "; age" << age;
+                    int i_age_year = pop.nyears * pop.nages + age;
+                    EXPECT_GT(pop.unfished_numbers_at_age[i_age_year], 0.0)
+                        << "differ at index " << i_age_year << "; year " << pop.nyears + 1 << "; age" << age;
                 }
 
                 EXPECT_GT(pop.unfished_spawning_biomass[pop.nyears], 0.0)
@@ -261,25 +261,25 @@ namespace
                     {
                         for (int age = 0; age < pop.nages; age++)
                         {
-                            int index_ya = year * pop.nages + age;
-                            expected_numbers_at_age[index_ya] = e[year].GetArray()[age].GetDouble();
+                            int i_age_year = year * pop.nages + age;
+                            expected_numbers_at_age[i_age_year] = e[year].GetArray()[age].GetDouble();
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
                             // is less than 1.0% of the expected value.
-                            EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]) /
-                                          expected_numbers_at_age[index_ya] * 100,
+                            EXPECT_LE(std::abs(pop.numbers_at_age[i_age_year] - expected_numbers_at_age[i_age_year]) /
+                                          expected_numbers_at_age[i_age_year] * 100,
                                       1.0)
-                                << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                                << "differ at index " << i_age_year << "; year " << year << "; age" << age;
                             
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
                             // is less than 65 fish.
-                            EXPECT_LE(std::abs(pop.numbers_at_age[index_ya] - expected_numbers_at_age[index_ya]),
+                            EXPECT_LE(std::abs(pop.numbers_at_age[i_age_year] - expected_numbers_at_age[i_age_year]),
                                       65)
-                                << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                                << "differ at index " << i_age_year << "; year " << year << "; age" << age;
                             // Expect FIMS value is greater than 0.0
-                            EXPECT_GT(pop.numbers_at_age[index_ya], 0.0)
-                                << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                            EXPECT_GT(pop.numbers_at_age[i_age_year], 0.0)
+                                << "differ at index " << i_age_year << "; year " << year << "; age" << age;
                         }
                     }
                 }
@@ -287,9 +287,9 @@ namespace
                 for (int age = 0; age < pop.nages; age++)
                 {
 
-                    int index_ya = pop.nyears * pop.nages + age;
-                    EXPECT_GT(pop.numbers_at_age[index_ya], 0.0)
-                        << "differ at index " << index_ya << "; year " << pop.nyears + 1 << "; age " << age;
+                    int i_age_year = pop.nyears * pop.nages + age;
+                    EXPECT_GT(pop.numbers_at_age[i_age_year], 0.0)
+                        << "differ at index " << i_age_year << "; year " << pop.nyears + 1 << "; age " << age;
                 }
           
                 
@@ -303,17 +303,17 @@ namespace
                     {
                         for (int age = 0; age < pop.nages; age++)
                         {
-                            int index_ya = year * pop.nages + age;
-                            expected_mortality_F[index_ya] = e[year].GetArray()[age].GetDouble();
+                            int i_age_year = year * pop.nages + age;
+                            expected_mortality_F[i_age_year] = e[year].GetArray()[age].GetDouble();
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
                             // is less than 0.0001.
-                            EXPECT_NEAR(pop.mortality_F[index_ya], expected_mortality_F[index_ya],
+                            EXPECT_NEAR(pop.mortality_F[i_age_year], expected_mortality_F[i_age_year],
                                         0.0001)
-                                << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                                << "differ at index " << i_age_year << "; year " << year << "; age" << age;
                             // Expect FIMS value >= 0.0
-                            EXPECT_GE(pop.mortality_F[index_ya], 0.0)
-                                << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                            EXPECT_GE(pop.mortality_F[i_age_year], 0.0)
+                                << "differ at index " << i_age_year << "; year " << year << "; age" << age;
                         }
                     }
                 }
@@ -327,14 +327,14 @@ namespace
                     {
                         for (int age = 0; age < pop.nages; age++)
                         {
-                            int index_ya = year * pop.nages + age;
-                            int index_ya2 = (year - 1) * pop.nages + (age - 1);
-                            expected_mortality_Z[index_ya] = expected_mortality_F[index_ya] + e[age].GetDouble();
+                            int i_age_year = year * pop.nages + age;
+                            int i_agem1_yearm1 = (year - 1) * pop.nages + (age - 1);
+                            expected_mortality_Z[i_age_year] = expected_mortality_F[i_age_year] + e[age].GetDouble();
                             // Check numbers at age mismatch issue
                             // FIMS output
                             if (age < (pop.nages - 1)) // Ignore plus group
                             {
-                                    integration_test_log << "year " << year << " age " << age << " index_ya " << index_ya << " FIMS: " << pop.numbers_at_age[index_ya2] << "*exp(-" << pop.mortality_Z[index_ya2] << ")=" << pop.numbers_at_age[index_ya2] * exp(-pop.mortality_Z[index_ya2]) << " pop.numbers_at_age[index_ya] " << pop.numbers_at_age[index_ya] << " MCP OM: " << expected_numbers_at_age[index_ya2] << "*exp(-" << expected_mortality_Z[index_ya2] << ")=" << expected_numbers_at_age[index_ya2] * exp(-expected_mortality_Z[index_ya2]) << " expected_numbers_at_age[index_ya] " << expected_numbers_at_age[index_ya] << std::endl;
+                                    integration_test_log << "year " << year << " age " << age << " i_age_year " << i_age_year << " FIMS: " << pop.numbers_at_age[i_agem1_yearm1] << "*exp(-" << pop.mortality_Z[i_agem1_yearm1] << ")=" << pop.numbers_at_age[i_agem1_yearm1] * exp(-pop.mortality_Z[i_agem1_yearm1]) << " pop.numbers_at_age[i_age_year] " << pop.numbers_at_age[i_age_year] << " MCP OM: " << expected_numbers_at_age[i_agem1_yearm1] << "*exp(-" << expected_mortality_Z[i_agem1_yearm1] << ")=" << expected_numbers_at_age[i_agem1_yearm1] * exp(-expected_mortality_Z[i_agem1_yearm1]) << " expected_numbers_at_age[i_age_year] " << expected_numbers_at_age[i_age_year] << std::endl;
                                 }
 
                             // R code to print MCP OM output
@@ -356,13 +356,13 @@ namespace
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
                             // is less than 0.0001.
-                            EXPECT_NEAR(pop.mortality_Z[index_ya], expected_mortality_Z[index_ya],
+                            EXPECT_NEAR(pop.mortality_Z[i_age_year], expected_mortality_Z[i_age_year],
                                         0.0001)
-                                << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                                << "differ at index " << i_age_year << "; year " << year << "; age" << age;
                             // Expect FIMS value is greater than 0.0
                             
-                            EXPECT_GT(pop.mortality_Z[index_ya], 0.0)
-                                << "differ at index " << index_ya << "; year " << year << "; age" << age;
+                            EXPECT_GT(pop.mortality_Z[i_age_year], 0.0)
+                                << "differ at index " << i_age_year << "; year " << year << "; age" << age;
                         }
                     }
                 }
