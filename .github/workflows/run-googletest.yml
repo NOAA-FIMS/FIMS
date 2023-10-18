@@ -16,6 +16,8 @@ jobs:
       matrix:
       # Use windows-2019 instead of windows-latest to avoid using Mingw-w64 
         os: [ubuntu-latest, macos-latest, windows-2019]
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - uses: actions/checkout@v3
