@@ -12,9 +12,9 @@ namespace
 
         for (size_t year = 0; year < nyears; year++) {
            for (size_t age = 0; age < nages; age++){
-               int index_ya = year * population.nages + age;
-               population.CalculateMaturityAA(index_ya, age);
-               expect_maturity[index_ya] = 1.0/(1.0+exp(-(population.ages[age]-median)*slope));
+               int i_age_year = year * population.nages + age;
+               population.CalculateMaturityAA(i_age_year, age);
+               expect_maturity[i_age_year] = 1.0/(1.0+exp(-(population.ages[age]-median)*slope));
            }
         }
 

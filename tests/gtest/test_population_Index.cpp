@@ -12,13 +12,13 @@ namespace
         // set up an arbitrary year/age combo to test
         int year = 4;
         int age = 6;
-        int index_ya = year * population.nages + age;
-        int index_ya2 = (year - 1) * population.nages + age - 1;
+        int i_age_year = year * population.nages + age;
+        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
        
         // calculate index numbers at age in population module
-        population.CalculateMortality(index_ya, year, age);
-        population.CalculateNumbersAA(index_ya, index_ya2, age);
-        population.CalculateIndex(index_ya, year, age);
+        population.CalculateMortality(i_age_year, year, age);
+        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
+        population.CalculateIndex(i_age_year, year, age);
         
         // The test checks a single age in a single year, not an index. 
         // It was developed to test CalculateIndex() function while
@@ -32,7 +32,7 @@ namespace
             // When testing time varying q, better to test entire vector.
             // If not possible to test entire vector, test middle or second to last 
             // than earlier years (collapses to mean in early years)
-            expected_index[index_yf] += population.numbers_at_age[index_ya]*
+            expected_index[index_yf] += population.numbers_at_age[i_age_year]*
                                         population.fleets[fleet_]->q*
                                         population.fleets[fleet_]->selectivity->evaluate(population.ages[age])*
                                         population.growth->evaluate(population.ages[age]);
