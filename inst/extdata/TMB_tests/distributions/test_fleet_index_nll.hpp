@@ -15,21 +15,21 @@
     /**
      * @brief Model class defines and returns negative log-likelihood (nll)
      *
-     * @tparam T
+     * @tparam Type
      */
-    template <typename T>
+    template <typename Type>
     class Model {
-      using DataVector = typename ModelTraits<T>::DataVector;
-      using Vector = typename ModelTraits<T>::EigenVector;
+      using DataVector = typename ModelTraits<Type>::DataVector;
+      using Vector = typename ModelTraits<Type>::EigenVector;
       public:
       DataVector y; /*!< observation */
       Vector mean;  /*!< expected fleet index */
-      T logsd; /*!< standard deviation of the fleet observation error, must be strictly positive.*/
+      Type logsd; /*!< standard deviation of the fleet observation error, must be strictly positive.*/
 
       // Initiate pointer to link .cpp to .hpp
-      static Model<T>* instance;
+      static Model<Type>* instance;
       
-      ::objective_function<T> *of;
+      ::objective_function<Type> *of;
 
       /** @brief Constructor.
        */
@@ -38,10 +38,10 @@
       /**
        * @brief Create new singleton class
        *
-       * @return Model<T>*
+       * @return Model<Type>*
        */
-      static Model<T>* getInstance(){
-        return Model<T>::instance;
+      static Model<Type>* getInstance(){
+        return Model<Type>::instance;
       }
 
      /**
@@ -49,16 +49,16 @@
        *
        * @return negative log-likelihood (nll)
        */
-      T evaluate(){
+      Type evaluate(){
 
-        T nll = 0;
+        Type nll = 0;
         int n = y.size();
 
-        fims::FleetIndexNLL<T> nll_fleet_index;
+        fims::FleetIndexNLL<Type> nll_fleet_index;
         nll_fleet_index.log_obs_error = logsd;
         
-        std::shared_ptr<fims::DataObject<T>> index_data =
-        std::make_shared<fims::DataObject<T>>(n);
+        std::shared_ptr<fims::DataObject<Type>> index_data =
+        std::make_shared<fims::DataObject<Type>>(n);
         nll_fleet_index.observed_index_data = index_data;
 
         nll_fleet_index.expected_index.resize(n);
@@ -80,10 +80,10 @@
     /**
      * @brief Create new instance of Model
      *
-     * @tparam T
+     * @tparam Type
      */
-    template<class T>
-    Model<T>* Model<T>::instance = new Model<T>();
+    template<class Type>
+    Model<Type>* Model<Type>::instance = new Model<Type>();
   }
 
 

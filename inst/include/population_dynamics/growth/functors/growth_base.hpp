@@ -21,10 +21,10 @@ namespace fims {
 /**
  * @brief Base class for all growth functors.
  *
- * @tparam T The type of the growth functor.
+ * @tparam Type The type of the growth functor.
  * */
-template <typename T>
-struct GrowthBase : public FIMSObject<T> {
+template <typename Type>
+struct GrowthBase : public FIMSObject<Type> {
   // id_g is the ID of the instance of the  growthBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -42,11 +42,11 @@ struct GrowthBase : public FIMSObject<T> {
    * @brief Calculates the  growth at the independent variable value.
    * @param a The age at which to return weight of the fish (in kg).
    */
-  virtual const T evaluate(const double& a) = 0;
+  virtual const Type evaluate(const double& a) = 0;
 };
 
-template <typename T>
-uint32_t GrowthBase<T>::id_g = 0;
+template <typename Type>
+uint32_t GrowthBase<Type>::id_g = 0;
 
 }  // namespace fims
 

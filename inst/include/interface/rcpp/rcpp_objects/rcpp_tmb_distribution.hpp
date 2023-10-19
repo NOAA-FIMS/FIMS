@@ -203,7 +203,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  * dmultinom_ <- new(fims$TMBDmultinomDistribution)
  *
  */
-// template <typename T>
+// template <typename Type>
 
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
@@ -239,14 +239,14 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
 #ifdef TMB_MODEL
 
-  template <typename T>
+  template <typename Type>
   bool add_to_fims_tmb_internal() {
-    typedef typename fims::ModelTraits<T>::EigenVector Vector;
-    std::shared_ptr<fims::Information<T>> info =
-        fims::Information<T>::GetInstance();
+    typedef typename fims::ModelTraits<Type>::EigenVector Vector;
+    std::shared_ptr<fims::Information<Type>> info =
+        fims::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::Dmultinom<T>> distribution =
-        std::make_shared<fims::Dmultinom<T>>();
+    std::shared_ptr<fims::Dmultinom<Type>> distribution =
+        std::make_shared<fims::Dmultinom<Type>>();
 
     distribution->id = this->id;
     distribution->x = Vector(x.size());

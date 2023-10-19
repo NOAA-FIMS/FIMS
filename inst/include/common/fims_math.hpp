@@ -210,9 +210,9 @@ inline const T ad_min(const T &a, const T &b, T C = 1e-5) {
  * @param C default = 1e-5
  * @return
  */
-template <typename T>
-inline const T ad_max(const T &a, const T &b, T C = 1e-5) {
-  return (a + b + fims::ad_fabs(a - b, C)) * static_cast<T>(.5);
+template <typename Type>
+inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
+  return (a + b + fims::ad_fabs(a - b, C)) * static_cast<Type>(.5);
 }
 
 }  // namespace fims

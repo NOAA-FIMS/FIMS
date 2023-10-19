@@ -15,17 +15,17 @@
     /**
      * @brief Model class defines and returns negative log-likelihood (nll)
      * 
-     * @tparam T 
+     * @tparam Type 
      */
-    template <typename T>
+    template <typename Type>
     class Model {
-      using Vector = typename ModelTraits<T>::EigenVector;
+      using Vector = typename ModelTraits<Type>::EigenVector;
       public:
       Vector x; /*!< Vector of length K of integers */
       Vector p; /*!< Vector of length K, specifying the probability for the K classes (note, unlike in R these must sum to 1). */
 
       // Initiate pointer to link .cpp to .hpp
-      static Model<T>* instance;
+      static Model<Type>* instance;
       
       /** @brief Constructor.
        */
@@ -34,10 +34,10 @@
       /**
        * @brief Create new singleton class
        * 
-       * @return Model<T>* 
+       * @return Model<Type>* 
        */
-      static Model<T>* getInstance(){
-        return Model<T>::instance;
+      static Model<Type>* getInstance(){
+        return Model<Type>::instance;
       }
 
       /**
@@ -45,10 +45,10 @@
        * 
        * @return negative log-likelihood (nll)
        */
-      T evaluate(){
+      Type evaluate(){
 
-        T nll = 0;
-        fims::Dmultinom<T> nll_dmultinom;
+        Type nll = 0;
+        fims::Dmultinom<Type> nll_dmultinom;
         nll_dmultinom.x = x;
         nll_dmultinom.p = p;
         nll -= nll_dmultinom.evaluate(true);
@@ -59,10 +59,10 @@
     /**
      * @brief Create new instance of Model
      * 
-     * @tparam T 
+     * @tparam Type 
      */
-    template<class T>
-    Model<T>* Model<T>::instance = new Model<T>();
+    template<class Type>
+    Model<Type>* Model<Type>::instance = new Model<Type>();
   }
 
 
