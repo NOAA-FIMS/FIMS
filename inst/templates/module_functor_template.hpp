@@ -25,12 +25,12 @@ namespace fims {
  * from fims_math.
  */ 
  // {{{module_name}}} and {{{module_type}}} should be CamelCase below
-template<typename T>
-struct {{{module_name}}}{{{module_type}}} : public {{{module_type}}}Base<T> {
+template<typename Type>
+struct {{{module_name}}}{{{module_type}}} : public {{{module_type}}}Base<Type> {
     //add submodule class members here
     //these include parameters of the submodule
 
-    {{{module_name}}}{{{module_type}}}(): {{{module_type}}}Base<T>(){
+    {{{module_name}}}{{{module_type}}}(): {{{module_type}}}Base<Type>(){
 
     }
 
@@ -39,9 +39,9 @@ struct {{{module_name}}}{{{module_type}}} : public {{{module_type}}}Base<T> {
     * 
     * @param x  description
     */
-    virtual const T evaluate(const T& x) {
+    virtual const Type evaluate(const Type& x) {
         //you will need to add class members as arguments to the function below
-        return fims::{{{module_name}}}<T>(x);
+        return fims::{{{module_name}}}<Type>(x);
     }
 };
 

@@ -15,18 +15,18 @@
     /**
      * @brief Model class defines and returns negative log-likelihood (nll)
      * 
-     * @tparam T 
+     * @tparam Type 
      */
-    template <typename T>
+    template <typename Type>
     class Model {
-      using DataVector = typename ModelTraits<T>::DataVector;
+      using DataVector = typename ModelTraits<Type>::DataVector;
       public:
       DataVector y; /*!< observation */
-      T mean;  /*!< mean of the normal distribution */
-      T sd; /*!< standard deviation of the normal distribution, must be strictly positive.*/
+      Type mean;  /*!< mean of the normal distribution */
+      Type sd; /*!< standard deviation of the normal distribution, must be strictly positive.*/
 
       // Initiate pointer to link .cpp to .hpp
-      static Model<T>* instance;
+      static Model<Type>* instance;
 
       /** @brief Constructor.
        */
@@ -35,10 +35,10 @@
       /**
        * @brief Create new singleton class
        * 
-       * @return Model<T>* 
+       * @return Model<Type>* 
        */
-      static Model<T>* getInstance(){
-        return Model<T>::instance;
+      static Model<Type>* getInstance(){
+        return Model<Type>::instance;
       }
 
       /**
@@ -46,12 +46,12 @@
        * 
        * @return negative log-likelihood (nll)
        */
-      T evaluate(){
+      Type evaluate(){
 
-        T nll = 0;
+        Type nll = 0;
         int i;
         int n = y.size();
-        fims::Dnorm<T> nll_dnorm;
+        fims::Dnorm<Type> nll_dnorm;
         nll_dnorm.mean = mean;
         nll_dnorm.sd = sd;
         for(i =0; i < n; i++){
@@ -65,10 +65,10 @@
     /**
      * @brief Create new instance of Model
      * 
-     * @tparam T 
+     * @tparam Type 
      */
-    template<class T>
-    Model<T>* Model<T>::instance = new Model<T>();
+    template<class Type>
+    Model<Type>* Model<Type>::instance = new Model<Type>();
   }
 
 

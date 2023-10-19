@@ -15,21 +15,21 @@
     /**
      * @brief Model class defines and returns negative log-likelihood (nll)
      *
-     * @tparam T
+     * @tparam Type
      */
-    template <typename T>
+    template <typename Type>
     class Model {
 
-      using Vector = typename ModelTraits<T>::EigenVector;
+      using Vector = typename ModelTraits<Type>::EigenVector;
       public:
       Vector x; /*!< Vector of length K of integers */
       Vector p; /*!< Vector of length K, specifying the probability for the K classes (note, unlike in R these must sum to 1). */
 
       // Initiate pointer to link .cpp to .hpp
-      static Model<T>* instance;
+      static Model<Type>* instance;
 
       
-      ::objective_function<T> *of;
+      ::objective_function<Type> *of;
 
       /** @brief Constructor.
        */
@@ -38,10 +38,10 @@
       /**
        * @brief Create new singleton class
        *
-       * @return Model<T>*
+       * @return Model<Type>*
        */
-      static Model<T>* getInstance(){
-        return Model<T>::instance;
+      static Model<Type>* getInstance(){
+        return Model<Type>::instance;
       }
 
       /**
@@ -49,17 +49,17 @@
        *
        * @return negative log-likelihood (nll)
        */
-      T evaluate(){
+      Type evaluate(){
 
-        T nll = 0.0;
+        Type nll = 0.0;
         int n = x.size();
       
-        fims::FleetAgeCompNLL<T> nll_fac;
+        fims::FleetAgeCompNLL<Type> nll_fac;
         nll_fac.catch_numbers_at_age.resize(n);
         nll_fac.nyears = 1;
         nll_fac.nages = 10;
-        std::shared_ptr<fims::DataObject<T>> age_comp_data =
-        std::make_shared<fims::DataObject<T>>(10, 1);
+        std::shared_ptr<fims::DataObject<Type>> age_comp_data =
+        std::make_shared<fims::DataObject<Type>>(10, 1);
 
         nll_fac.observed_agecomp_data = age_comp_data;
         Vector obs;
@@ -86,10 +86,10 @@
     /**
      * @brief Create new instance of Model
      *
-     * @tparam T
+     * @tparam Type
      */
-    template<class T>
-    Model<T>* Model<T>::instance = new Model<T>();
+    template<class Type>
+    Model<Type>* Model<Type>::instance = new Model<Type>();
   }
 
 

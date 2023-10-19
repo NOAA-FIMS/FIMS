@@ -20,11 +20,11 @@ namespace fims {
 
 /** @brief Base class for all selectivity functors.
  *
- * @tparam T The type of the selectivity functor.
+ * @tparam Type The type of the selectivity functor.
  */
 
-template <typename T>
-struct SelectivityBase : public FIMSObject<T> {
+template <typename Type>
+struct SelectivityBase : public FIMSObject<Type> {
   // id_g is the ID of the instance of the SelectivityBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -46,12 +46,12 @@ struct SelectivityBase : public FIMSObject<T> {
    * @param x The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
-  virtual const T evaluate(const T& x) = 0;
+  virtual const Type evaluate(const Type& x) = 0;
 };
 
 // default id of the singleton selectivity class
-template <typename T>
-uint32_t SelectivityBase<T>::id_g = 0;
+template <typename Type>
+uint32_t SelectivityBase<Type>::id_g = 0;
 
 }  // namespace fims
 
