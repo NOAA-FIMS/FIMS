@@ -413,22 +413,22 @@ test_that("estimation test of fims", {
   )
 
   # Biomass
-  sdr_biomass <- sdr_report[which(rownames(sdr_report) == "Biomass"),]
+  sdr_biomass <- sdr_report[which(rownames(sdr_report) == "Biomass"), ]
   biomass_are <- rep(0, length(om_output$biomass.mt))
   for (i in 1:length(om_output$biomass.mt)) {
-    biomass_are[i] <- abs(sdr_biomass[i,1] - om_output$biomass.mt[i])# / om_output$biomass.mt[i]
-   # expect_lte(biomass_are[i], 0.15)
+    biomass_are[i] <- abs(sdr_biomass[i, 1] - om_output$biomass.mt[i]) # / om_output$biomass.mt[i]
+    # expect_lte(biomass_are[i], 0.15)
   }
   expect_lte(
-    sum(biomass_are > qnorm(.975) * sdr_biomass[1:length(om_output$biomass.mt),2]),
-    0.05*length(om_output$biomass.mt)
+    sum(biomass_are > qnorm(.975) * sdr_biomass[1:length(om_output$biomass.mt), 2]),
+    0.05 * length(om_output$biomass.mt)
   )
 
   # Spawning biomass
   sdr_sb <- sdr_report[which(rownames(sdr_report) == "SSB"), ]
   sb_are <- rep(0, length(om_output$SSB))
   for (i in 1:length(om_output$SSB)) {
-    sb_are[i] <- abs(sdr_sb[i,1] - om_output$SSB[i])# / om_output$SSB[i]
+    sb_are[i] <- abs(sdr_sb[i, 1] - om_output$SSB[i]) # / om_output$SSB[i]
     # expect_lte(sb_are[i], 0.15)
   }
   expect_lte(
@@ -444,9 +444,9 @@ test_that("estimation test of fims", {
   sdr_naa1 <- sdr_naa1_vec[seq(1, om_input$nyr * om_input$nages, by = om_input$nages)]
   fims_naa1_are <- rep(0, length(om_output$N.age[, 1]))
   for (i in 1:length(om_output$N.age[, 1])) {
-    fims_naa1_are[i] <- abs(fims_naa[i,1] - om_output$N.age[i, 1])# /
-     # om_output$N.age[i, 1]
-    #expect_lte(fims_naa1_are[i], 0.25)
+    fims_naa1_are[i] <- abs(fims_naa[i, 1] - om_output$N.age[i, 1]) # /
+    # om_output$N.age[i, 1]
+    # expect_lte(fims_naa1_are[i], 0.25)
   }
   expect_lte(
     sum(fims_naa1_are > qnorm(.975) * sdr_naa1[1:length(om_output$SSB)]),
@@ -463,8 +463,8 @@ test_that("estimation test of fims", {
   rdev_are <- rep(0, length(om_input$logR.resid))
 
   for (i in 1:length(om_input$logR.resid)) {
-    rdev_are[i] <- abs(report$rec_dev[[1]][i] - exp(om_input$logR.resid[i]))# /
-   #   exp(om_input$logR.resid[i])
+    rdev_are[i] <- abs(report$rec_dev[[1]][i] - exp(om_input$logR.resid[i])) # /
+    #   exp(om_input$logR.resid[i])
     # expect_lte(rdev_are[i], 1) # 1
   }
   expect_lte(
@@ -476,7 +476,7 @@ test_that("estimation test of fims", {
   sdr_F <- sdr_report[which(rownames(sdr_report) == "FMort"), ]
   f_are <- rep(0, length(om_output$f))
   for (i in 1:length(om_output$f)) {
-    f_are[i] <- abs(sdr_F[i,1] - om_output$f[i])
+    f_are[i] <- abs(sdr_F[i, 1] - om_output$f[i])
   }
   # Expect 95% of absolute error to be within 2*SE of Fmort
   expect_lte(
@@ -486,13 +486,13 @@ test_that("estimation test of fims", {
 
   # Expected fishery catch and survey index
   fims_index <- sdr_report[which(rownames(sdr_report) == "ExpectedIndex"), ]
-  fims_catch <- fims_index[1:om_input$nyr,]
-  fims_survey <- fims_index[(om_input$nyr+1):(om_input$nyr*2),]
+  fims_catch <- fims_index[1:om_input$nyr, ]
+  fims_survey <- fims_index[(om_input$nyr + 1):(om_input$nyr * 2), ]
 
-  #Expected fishery catch - om_output
+  # Expected fishery catch - om_output
   catch_are <- rep(0, length(om_output$L.mt$fleet1))
   for (i in 1:length(om_output$L.mt$fleet1)) {
-    catch_are[i] <- abs(fims_catch[i,1] - om_output$L.mt$fleet1[i])
+    catch_are[i] <- abs(fims_catch[i, 1] - om_output$L.mt$fleet1[i])
   }
   # Expect 95% of absolute error to be within 2*SE of fishery catch
   expect_lte(
@@ -500,10 +500,10 @@ test_that("estimation test of fims", {
     0.05 * length(om_output$L.mt$fleet1)
   )
 
-  #Expected fishery catch - em_input
+  # Expected fishery catch - em_input
   catch_are <- rep(0, length(em_input$L.obs$fleet1))
   for (i in 1:length(em_input$L.obs$fleet1)) {
-    catch_are[i] <- abs(fims_catch[i,1] - em_input$L.obs$fleet1[i])
+    catch_are[i] <- abs(fims_catch[i, 1] - em_input$L.obs$fleet1[i])
   }
   # Expect 95% of absolute error to be within 2*SE of fishery catch
   expect_lte(
@@ -516,7 +516,7 @@ test_that("estimation test of fims", {
   sdr_cnaa <- sdr_report[which(rownames(sdr_report) == "CNAA"), ]
   cnaa_are <- rep(0, length(c(t(om_output$L.age$fleet1))))
   for (i in 1:length(c(t(om_output$L.age$fleet1)))) {
-    cnaa_are[i] <- abs(sdr_cnaa[i,1] - c(t(om_output$L.age$fleet1))[i])
+    cnaa_are[i] <- abs(sdr_cnaa[i, 1] - c(t(om_output$L.age$fleet1))[i])
   }
   # Expect 95% of absolute error to be within 2*SE of CNAA
   expect_lte(
@@ -544,7 +544,7 @@ test_that("estimation test of fims", {
   # Expected survey index - om_output
   index_are <- rep(0, length(om_output$survey_index_biomass$survey1))
   for (i in 1:length(om_output$survey_index_biomass$survey1)) {
-    index_are[i] <- abs(fims_survey[i,1] - om_output$survey_index_biomass$survey1[i])
+    index_are[i] <- abs(fims_survey[i, 1] - om_output$survey_index_biomass$survey1[i])
   }
   # Expect 95% of absolute error to be within 2*SE of survey index
   expect_lte(
@@ -552,10 +552,10 @@ test_that("estimation test of fims", {
     0.05 * length(om_output$survey_index_biomass$survey1)
   )
 
-  #Expected survey index - em_input
+  # Expected survey index - em_input
   index_are <- rep(0, length(em_input$surveyB.obs$survey1))
   for (i in 1:length(em_input$surveyB.obs$survey1)) {
-    index_are[i] <- abs(fims_survey[i,1] - em_input$surveyB.obs$survey1[i])
+    index_are[i] <- abs(fims_survey[i, 1] - em_input$surveyB.obs$survey1[i])
   }
   # Expect 95% of absolute error to be within 2*SE of survey index
   # expect_lte(
@@ -564,7 +564,7 @@ test_that("estimation test of fims", {
   # )
 
   for (i in 1:length(em_input$surveyB.obs$survey1)) {
-    expect_lte(abs(fims_survey[i,1] - em_input$surveyB.obs$survey1[i]) /
+    expect_lte(abs(fims_survey[i, 1] - em_input$surveyB.obs$survey1[i]) /
       em_input$surveyB.obs$survey1[i], 0.25)
   }
 
