@@ -149,7 +149,7 @@ class Model {  // may need singleton
       naa(pop_idx) = vector<Type>((*it).second->numbers_at_age);
       ssb(pop_idx) = vector<Type>((*it).second->spawning_biomass);
       rec_dev(pop_idx) =
-          vector<Type>((*it).second->recruitment->recruit_deviations);
+          vector<Type>((*it).second->recruitment->log_recruit_devs);
       recruitment(pop_idx) = vector<Type>((*it).second->expected_recruitment);
       biomass(pop_idx) = vector<Type>((*it).second->biomass);
       M(pop_idx) = vector<Type>((*it).second->M);

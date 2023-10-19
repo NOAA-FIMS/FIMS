@@ -153,9 +153,9 @@ class PopulationPrepareTestFixture : public testing::Test {
     auto recruitment = std::make_shared<fims_popdy::SRBevertonHolt<double>>();
     recruitment->logit_steep = fims_math::logit(0.2, 1.0, 0.75);
     recruitment->log_rzero = fims_math::log(1000000.0);
-    recruitment->recruit_deviations.resize(nyears);
-    for (int i = 0; i < recruitment->recruit_deviations.size(); i++) {
-      recruitment->recruit_deviations[i] = 1.0;
+    recruitment->log_recruit_devs.resize(nyears);
+    for (int i = 0; i < recruitment->log_recruit_devs.size(); i++) {
+      recruitment->log_recruit_devs[i] = 1.0;
     }
     population.recruitment = recruitment;
   }
