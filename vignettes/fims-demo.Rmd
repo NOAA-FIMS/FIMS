@@ -358,7 +358,7 @@ print(sdr_fixed)
 library(ggplot2)
 index_results <- data.frame(
   observed = survey_fleet_index$index_data,
-  expected = report$expected_index[, 2]
+  expected = report$exp_index[[2]]
 )
 print(index_results)
 
@@ -371,7 +371,7 @@ ggplot(index_results, aes(x = 1:nyears, y = observed)) +
 
 catch_results <- data.frame(
   observed = fishing_fleet_index$index_data,
-  expected = report$expected_index[, 1]
+  expected = report$exp_index[[1]]
 )
 print(catch_results)
 

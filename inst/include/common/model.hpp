@@ -26,51 +26,74 @@ namespace fims {
 /**
  * @brief Model class. FIMS objective function.
  */
-template <typename T>
+template <typename Type>
 class Model {  // may need singleton
  public:
-  static std::shared_ptr<Model<T> >
+  static std::shared_ptr<Model<Type> >
       fims_model; /*!< Create a shared fims_model as a pointer to Model*/
-  std::shared_ptr<Information<T> >
+  std::shared_ptr<Information<Type> >
       fims_information; /*!< Create a shared fims_information as a pointer to
                            Information*/
 
 #ifdef TMB_MODEL
-  ::objective_function<T> *of;
+  ::objective_function<Type> *of;
 #endif
 
   // constructor
   virtual ~Model() {}
 
   /**
-   * Returns a single Information object for type T.
+   * Returns a single Information object for type Type.
    *
-   * @return singleton for type T
+   * @return singleton for type Type
    */
-  static std::shared_ptr<Model<T> > GetInstance() {
-    if (Model<T>::fims_model == nullptr) {
-      Model<T>::fims_model = std::make_shared<fims::Model<T> >();
-      Model<T>::fims_model->fims_information =
-          fims::Information<T>::GetInstance();
+  static std::shared_ptr<Model<Type> > GetInstance() {
+    if (Model<Type>::fims_model == nullptr) {
+      Model<Type>::fims_model = std::make_shared<fims::Model<Type> >();
+      Model<Type>::fims_model->fims_information =
+          fims::Information<Type>::GetInstance();
     }
-    return Model<T>::fims_model;
+    return Model<Type>::fims_model;
   }
 
   /**
    * @brief Evaluate. Calculates the joint negative log-likelihood function.
    */
-  const T Evaluate() {
+  const Type Evaluate() {
     // jnll = negative-log-likelihood (the objective function)
-    T jnll = 0.0;
-    T rec_nll = 0.0;       // recrutiment nll
-    T age_comp_nll = 0.0;  // age composition nll
-    T index_nll = 0.0;     // survey and fishery cacth nll
+    Type jnll = 0.0;
+    Type rec_nll = 0.0;       // recrutiment nll
+    Type age_comp_nll = 0.0;  // age composition nll
+    Type index_nll = 0.0;     // survey and fishery cacth nll
+
+    int n_fleets = fims_information->fleets.size();
+    int n_pops = fims_information->populations.size();
+
+    //Create vector lists to store output for reporting
+    #ifdef TMB_MODEL
+    //vector< vector<Type> > creates a nested vector structure where
+    //each vector can be a different dimension. Does not work with ADREPORT
+    //fleets
+    vector< vector<Type> > exp_index(n_fleets);
+    vector< vector<Type> > exp_catch(n_fleets);
+    vector< vector<Type> > cnaa(n_fleets);
+    vector< vector<Type> > cwaa(n_fleets);
+    vector< vector<Type> > F_mort(n_fleets);
+    //populations
+    vector< vector<Type> > naa(n_pops);
+    vector< vector<Type> > ssb(n_pops);
+    vector< vector<Type> > biomass(n_pops);
+    vector< vector<Type> > rec_dev(n_pops);
+    vector< vector<Type> > recruitment(n_pops);
+    vector< vector<Type> > M(n_pops);
+    #endif
+
     // Loop over populations, evaluate, and sum up the recruitment likelihood
     // component
-    typename fims::Information<T>::population_iterator it;
+    typename fims::Information<Type>::population_iterator it;
     for (it = this->fims_information->populations.begin();
          it != this->fims_information->populations.end(); ++it) {
-      //(*it).second points to the Population module
+      //(*it).second points to each individual Population module
       FIMS_LOG << "inside pop loop" << std::endl;
       // Prepare recruitment
       (*it).second->recruitment->Prepare();
@@ -86,34 +109,101 @@ class Model {  // may need singleton
       FIMS_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
-    typename fims::Information<T>::fleet_iterator jt;
+    //Loop over fleets/surveys, and sum up age comp and index nlls
+    typename fims::Information<Type>::fleet_iterator jt;
     for (jt = this->fims_information->fleets.begin();
          jt != this->fims_information->fleets.end(); ++jt) {
+
+      //(*jt).second points to each individual Fleet module
 #ifdef TMB_MODEL
       (*jt).second->of = this->of;
 #endif
       age_comp_nll += (*jt).second->evaluate_age_comp_nll();
-      FIMS_LOG << "survey and fleet age comp nll sum: " << age_comp_nll
-               << std::endl;
       index_nll += (*jt).second->evaluate_index_nll();
-      FIMS_LOG << "survey and fleet index nll sum: " << index_nll << std::endl;
-      if ((*jt).second->is_survey == false) {
-#ifdef TMB_MODEL
-        (*jt).second->of = this->of;
-#endif
-        (*jt).second->ReportFleet();
-      }
+    }
+
+    //Loop over populations and fleets/surveys and fill in reporting
+
+    //initiate population index for structuring report out objects
+    int pop_idx = 0;
+    for (it = this->fims_information->populations.begin();
+         it != this->fims_information->populations.end(); ++it) {
+      #ifdef TMB_MODEL
+        naa(pop_idx) = vector<Type>((*it).second->numbers_at_age);
+        ssb(pop_idx) = vector<Type>((*it).second->spawning_biomass);
+        rec_dev(pop_idx) = vector<Type>((*it).second->recruitment->recruit_deviations);
+        recruitment(pop_idx) = vector<Type>((*it).second->expected_recruitment);
+        biomass(pop_idx) = vector<Type>((*it).second->biomass);
+        M(pop_idx) = vector<Type>((*it).second->M);
+      #endif
+      pop_idx += 1;
+
+    }
+
+    //initiate fleet index for structuring report out objects
+    int fleet_idx = 0;
+    for (jt = this->fims_information->fleets.begin();
+         jt != this->fims_information->fleets.end(); ++jt) {
+      #ifdef TMB_MODEL
+         exp_index(fleet_idx) = vector<Type>((*jt).second->expected_index);
+         exp_catch(fleet_idx) = vector<Type>((*jt).second->expected_catch);
+         F_mort(fleet_idx) = vector<Type>((*jt).second->Fmort);
+         cnaa(fleet_idx) = vector<Type>((*jt).second->catch_numbers_at_age);
+         cwaa(fleet_idx) = vector<Type>((*jt).second->catch_weight_at_age);
+      #endif
+      fleet_idx += 1;
     }
 
     jnll = rec_nll + age_comp_nll + index_nll;
+
+
+    //Reporting
+    #ifdef TMB_MODEL
+    REPORT_F(rec_nll, of);
+    REPORT_F(age_comp_nll, of);
+    REPORT_F(index_nll, of);
+    REPORT_F(jnll, of);
+    REPORT_F(naa, of);
+    REPORT_F(ssb, of);
+    REPORT_F(rec_dev, of);
+    REPORT_F(recruitment, of);
+    REPORT_F(biomass, of);
+    REPORT_F(M, of);
+    REPORT_F(exp_index, of);
+    REPORT_F(exp_catch, of);
+    REPORT_F(F_mort, of);
+    REPORT_F(cnaa, of);
+    REPORT_F(cwaa, of);
+
+    /*ADREPORT using ADREPORTvector defined in
+     * inst/include/interface/interface.hpp:
+     * function collapses the nested vector into a single vector
+     */
+    vector<Type> NAA = ADREPORTvector(naa);
+    vector<Type> Biomass = ADREPORTvector(biomass);
+    vector<Type> SSB = ADREPORTvector(ssb);
+    vector<Type> RecDev = ADREPORTvector(rec_dev);
+    vector<Type> FMort = ADREPORTvector(F_mort);
+    vector<Type> ExpectedIndex = ADREPORTvector(exp_index);
+    vector<Type> CNAA = ADREPORTvector(cnaa);
+
+    ADREPORT_F(NAA, of);
+    ADREPORT_F(Biomass, of);
+    ADREPORT_F(SSB, of);
+    ADREPORT_F(RecDev, of);
+    ADREPORT_F(FMort, of);
+    ADREPORT_F(ExpectedIndex, of);
+    ADREPORT_F(CNAA, of);
+    #endif
+
 
     return jnll;
   }
 };
 
 // Create singleton instance of Model class
-template <typename T>
-std::shared_ptr<Model<T> > Model<T>::fims_model =
+template <typename Type>
+std::shared_ptr<Model<Type> > Model<Type>::fims_model =
     nullptr;  // singleton instance
 }  // namespace fims
 
