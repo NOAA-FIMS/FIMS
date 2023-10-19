@@ -7,16 +7,16 @@ namespace
   TEST(recruitment_deviations, constraint_works)
   {
     fims::SRBevertonHolt<double> recruit;
-    recruit.recruit_deviations = {-1.0, 2.0, 3.0};
+    recruit.log_recruit_devs = {-1.0, 2.0, 3.0};
 
     // Test if constrain_deviations = false works
     recruit.constrain_deviations = false;
     recruit.PrepareConstrainedDeviations();
 
     std::vector<double> expected_deviations_false = {-1.0, 2.0, 3.0};
-    for (int i = 0; i < recruit.recruit_deviations.size(); i++)
+    for (int i = 0; i < recruit.log_recruit_devs.size(); i++)
     {
-      EXPECT_EQ(recruit.recruit_deviations[i],
+      EXPECT_EQ(recruit.log_recruit_devs[i],
                 expected_deviations_false[i]);
     }
 
@@ -26,9 +26,9 @@ namespace
     // c(-1.0, 2.0, 3.0)-sum(c(-1.0, 2.0, 3.0))/3 = -2.3333333  0.6666667  1.6666667
     std::vector<double> expected_deviations_true = {-2.3333333, 0.6666667, 1.6666667};
 
-    for (int i = 0; i < recruit.recruit_deviations.size(); i++)
+    for (int i = 0; i < recruit.log_recruit_devs.size(); i++)
     {
-      EXPECT_NEAR(recruit.recruit_deviations[i],
+      EXPECT_NEAR(recruit.log_recruit_devs[i],
                   expected_deviations_true[i], 0.0000001);
     }
   }

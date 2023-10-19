@@ -191,9 +191,9 @@ RCPP_MODULE(fims) {
       .constructor()
       .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
       .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
-      .field("deviations", &BevertonHoltRecruitmentInterface::deviations)
-      .field("estimate_deviations",
-             &BevertonHoltRecruitmentInterface::estimate_deviations)
+      .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
+      .field("estimate_log_devs",
+             &BevertonHoltRecruitmentInterface::estimate_log_devs)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
       .field("log_sigma_recruit",
              &BevertonHoltRecruitmentInterface::log_sigma_recruit)
