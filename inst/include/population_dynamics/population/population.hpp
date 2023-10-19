@@ -384,9 +384,9 @@ struct Population : public FIMSObject<Type> {
              << std::endl;
     this->numbers_at_age[i_age_year] =
         this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
-        this->recruitment->fims::exp(log_recruit_devs[year]);
+        fims::exp(this->recruitment->log_recruit_devs[year]);
     this->expected_recruitment[year] = this->numbers_at_age[i_age_year];
-    FIMS_LOG << " numbers at age at indexya " << i_age_year << " is "
+    FIMS_LOG << " numbers at age at index i_age_year " << i_age_year << " is "
              << this->numbers_at_age[i_age_year] << std::endl;
   }
 
