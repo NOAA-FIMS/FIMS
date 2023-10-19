@@ -17,22 +17,22 @@ namespace fims {
  * @brief DoubleLogisticSelectivity class that returns the double logistic
  * function value from fims_math.
  */
-template <typename T>
-struct DoubleLogisticSelectivity : public SelectivityBase<T> {
-  T median_asc; /*!< 50% quantile of the value of the quantity of interest (x)
+template <typename Type>
+struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
+  Type median_asc; /*!< 50% quantile of the value of the quantity of interest (x)
                on the ascending limb of the double logistic curve; e.g. age at
                which 50% of the fish are selected */
-  T slope_asc;  /*!<scalar multiplier of difference between quantity of interest
+  Type slope_asc;  /*!<scalar multiplier of difference between quantity of interest
                value (x) and median on the ascending limb of the double logistic
                curve*/
-  T median_desc; /*!< 50% quantile of the value of the quantity of interest (x)
+  Type median_desc; /*!< 50% quantile of the value of the quantity of interest (x)
                on the descending limb of the double logistic curve; e.g.
                age at which 50% of the fish are selected */
-  T slope_desc; /*!<scalar multiplier of difference between quantity of interest
+  Type slope_desc; /*!<scalar multiplier of difference between quantity of interest
               value (x) and median on the descending limb of the double logistic
               curve */
 
-  DoubleLogisticSelectivity() : SelectivityBase<T>() {}
+  DoubleLogisticSelectivity() : SelectivityBase<Type>() {}
 
   virtual ~DoubleLogisticSelectivity() {}
   /**
@@ -46,8 +46,8 @@ struct DoubleLogisticSelectivity : public SelectivityBase<T> {
    * @param x  The independent variable in the double logistic function (e.g.,
    * age or size in selectivity).
    */
-  virtual const T evaluate(const T &x) {
-    return fims::double_logistic<T>(median_asc, slope_asc, median_desc,
+  virtual const Type evaluate(const Type &x) {
+    return fims::double_logistic<Type>(median_asc, slope_asc, median_desc,
                                     slope_desc, x);
   }
 };

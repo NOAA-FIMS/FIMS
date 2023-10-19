@@ -145,10 +145,10 @@ class IndexDataInterface : public DataInterfaceBase {
 
 #ifdef TMB_MODEL
 
-  template <typename T>
+  template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::DataObject<T>> data =
-        std::make_shared<fims::DataObject<T>>(this->ymax);
+    std::shared_ptr<fims::DataObject<Type>> data =
+        std::make_shared<fims::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
 
@@ -156,8 +156,8 @@ class IndexDataInterface : public DataInterfaceBase {
       data->at(y) = this->index_data[y];
     }
 
-    std::shared_ptr<fims::Information<T>> info =
-        fims::Information<T>::GetInstance();
+    std::shared_ptr<fims::Information<Type>> info =
+        fims::Information<Type>::GetInstance();
 
     info->data_objects[this->id] = data;
     return true;

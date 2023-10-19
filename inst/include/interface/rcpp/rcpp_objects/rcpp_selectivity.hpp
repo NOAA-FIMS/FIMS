@@ -83,13 +83,13 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
 #ifdef TMB_MODEL
 
-  template <typename T>
+  template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<T> > info =
-        fims::Information<T>::GetInstance();
+    std::shared_ptr<fims::Information<Type> > info =
+        fims::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::LogisticSelectivity<T> > selectivity =
-        std::make_shared<fims::LogisticSelectivity<T> >();
+    std::shared_ptr<fims::LogisticSelectivity<Type> > selectivity =
+        std::make_shared<fims::LogisticSelectivity<Type> >();
 
     // set relative info
     selectivity->id = this->id;

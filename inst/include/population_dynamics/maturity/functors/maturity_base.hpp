@@ -20,11 +20,11 @@ namespace fims {
 
 /** @brief Base class for all maturity functors.
  *
- * @tparam T The type of the maturity functor.
+ * @tparam Type The type of the maturity functor.
  */
 
-template <typename T>
-struct MaturityBase : public FIMSObject<T> {
+template <typename Type>
+struct MaturityBase : public FIMSObject<Type> {
   // id_g is the ID of the instance of the MaturityBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -43,12 +43,12 @@ struct MaturityBase : public FIMSObject<T> {
    * @param x The independent variable in the maturity function (e.g., logistic
    * maturity at age or size).
    */
-  virtual const T evaluate(const T& x) = 0;
+  virtual const Type evaluate(const Type& x) = 0;
 };
 
 // default id of the singleton maturity class
-template <typename T>
-uint32_t MaturityBase<T>::id_g = 0;
+template <typename Type>
+uint32_t MaturityBase<Type>::id_g = 0;
 
 }  // namespace fims
 

@@ -19,8 +19,8 @@ namespace fims {
 /**
  *  @brief EWAAgrowth class that returns the EWAA function value.
  */
-template <typename T>
-struct EWAAgrowth : public GrowthBase<T> {
+template <typename Type>
+struct EWAAgrowth : public GrowthBase<Type> {
   // add submodule class members here
   // these include parameters of the submodule
   // a map looks up values based on a reference key
@@ -29,7 +29,7 @@ struct EWAAgrowth : public GrowthBase<T> {
   std::map<double, double> ewaa; /*!<map of doubles for EWAA values by age,
           where age starts at zero > */
 
-  EWAAgrowth() : GrowthBase<T>() {}
+  EWAAgrowth() : GrowthBase<Type>() {}
 
   virtual ~EWAAgrowth() {}
 
@@ -38,8 +38,8 @@ struct EWAAgrowth : public GrowthBase<T> {
    *
    * @param a  age of the fish, the age vector must start at zero
    */
-  virtual const T evaluate(const double& a) {
-    T ret = ewaa[a];
+  virtual const Type evaluate(const double& a) {
+    Type ret = ewaa[a];
     return ret;
   }
 };

@@ -21,11 +21,11 @@ namespace fims {
 
 /* @brief Base class for all {{{ module_type }}} functors.
  *
- * @tparam T The type of the {{{ module_type }}} functor.
+ * @tparam Type The type of the {{{ module_type }}} functor.
  * */
-template<typename T>
+template<typename Type>
 // Change {{{ module_type }}} to CamelCase in the class definition below. 
-struct {{{ module_type }}}Base : public FIMSObject<T> {
+struct {{{ module_type }}}Base : public FIMSObject<Type> {
     
     // id_g is the ID of the instance of the {{{ module_type }}}Base class.
     // this is like a memory tracker. 
@@ -44,13 +44,13 @@ struct {{{ module_type }}}Base : public FIMSObject<T> {
     * @brief Calculates the {{{ module_type }}} at the independent variable value.
     * @param x The independent variable in the logistic function (e.g., age or size in  {{{ module_type }}}).
     */
-    virtual const T evaluate(const T& x) = 0;
+    virtual const Type evaluate(const Type& x) = 0;
 
 };
 
-template<typename T>
+template<typename Type>
 // {{{module_type}}} should be CamelCase below
-uint32_t {{{ module_type }}}Base<T>::id_g = 0;
+uint32_t {{{ module_type }}}Base<Type>::id_g = 0;
 
 }
 
