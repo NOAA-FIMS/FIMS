@@ -32,17 +32,17 @@
 #define ADREPORT_F(name, F) F->reportvector.push(name, #name);
 
 template <typename Type>
-vector<Type> ADREPORTvector(vector< vector<Type> > x){
+vector<Type> ADREPORTvector(vector<vector<Type> > x) {
   int outer_dim = x.size();
   int dim = 0;
-  for(int i=0; i<outer_dim; i++){
+  for (int i = 0; i < outer_dim; i++) {
     dim += x(i).size();
   }
   vector<Type> res(dim);
   int idx = 0;
-  for(int i=0; i<outer_dim; i++){
+  for (int i = 0; i < outer_dim; i++) {
     int inner_dim = x(i).size();
-    for(int j=0; j<inner_dim; j++){
+    for (int j = 0; j < inner_dim; j++) {
       res(idx) = x(i)(j);
       idx += 1;
     }
