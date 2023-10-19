@@ -19,7 +19,7 @@ namespace
         // vector for storing expected recruitment 
         std::vector<double> expect_recruitment(year * population.nages, 0);
         // vector for rec devs - set rec devs to 1
-        std::vector<double> recruit_deviations(population.nyears, 1);
+        std::vector<double> log_recruit_devs(population.nyears, 1);
       
          for(int year = 0; year < population.nyears; year++)
          {
@@ -69,7 +69,7 @@ namespace
         // calculate expected recruitment based on bev-holt equation
         expect_recruitment[i_age_year] = 
         (0.8 * rzero * steep * population.spawning_biomass[i_age_year]) / 
-        (0.2 * ssbzero * (1.0 - steep) + population.spawning_biomass[i_age_year] * (steep - 0.2)) * recruit_deviations[year]; 
+        (0.2 * ssbzero * (1.0 - steep) + population.spawning_biomass[i_age_year] * (steep - 0.2)) * log_recruit_devs[year]; 
       
         // testing that expected recruitment and population.numbers_at_age match
         EXPECT_EQ(population.numbers_at_age[i_age_year], expect_recruitment[i_age_year]);
