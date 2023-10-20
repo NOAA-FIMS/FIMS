@@ -51,7 +51,7 @@ std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
  *
  */
 class FleetInterface : public FleetInterfaceBase {
-  int interface_agecomp_likelihood_id_m    = -999;    /*!< id of agecomp likelihood component*/
+  int interface_agecomp_likelihood_id_m    = -999;    /*!< id of agecomp likelihood component. The "interface_" prefix indicates it belongs to the FleetInterface class, and the "_m" postfix signifies that it's a member variable. */
   int interface_index_likelihood_id_m      = -999;      /*!< id of index likelihood component*/
   int interface_observed_agecomp_data_id_m = -999; /*!< id of observed agecomp data object*/
   int interface_observed_index_data_id_m   = -999;   /*!< id of observed index data object*/
