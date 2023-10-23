@@ -174,10 +174,10 @@ class Information {
       FIMS_LOG << "Checking for available fleet index data objects."
                << std::endl;
       // set index data
-      if (f->observed_index_data_id != -999) {
-        uint32_t index_id = static_cast<uint32_t>(f->observed_index_data_id);
-        data_iterator it = this->data_objects.find(index_id);
-        FIMS_LOG << "Input fleet index id = " << index_id << "." << std::endl;
+      if (f->fleet_observed_index_data_id_m != -999) {
+        uint32_t observed_index_id = static_cast<uint32_t>(f->fleet_observed_index_data_id_m); 
+        data_iterator it = this->data_objects.find(observed_index_id);
+        FIMS_LOG << "Input fleet index id = " << observed_index_id << "." << std::endl;
 
         if (it != this->data_objects.end()) {
           f->observed_index_data = (*it).second;
@@ -187,7 +187,7 @@ class Information {
         } else {
           valid_model = false;
           FIMS_LOG << "Error: Expected data observations not defined for fleet"
-                   << f->id << ", index " << index_id << std::endl;
+                   << f->id << ", index " << observed_index_id << std::endl;
         }
 
       } else {
@@ -200,11 +200,11 @@ class Information {
       FIMS_LOG << "Checking for available fleet age comp data objects."
                << std::endl;
       // set age composition data
-      if (f->observed_agecomp_data_id != -999) {
-        uint32_t agecomp_id =
-            static_cast<uint32_t>(f->observed_agecomp_data_id);
-        data_iterator it = this->data_objects.find(agecomp_id);
-        FIMS_LOG << "Input fleet age comp id = " << agecomp_id << "."
+      if (f->fleet_observed_agecomp_data_id_m != -999) {
+        uint32_t observed_agecomp_id =
+            static_cast<uint32_t>(f->fleet_observed_agecomp_data_id_m);
+        data_iterator it = this->data_objects.find(observed_agecomp_id);
+        FIMS_LOG << "Input fleet age comp id = " << observed_agecomp_id << "."
                  << std::endl;
 
         if (it != this->data_objects.end()) {
@@ -215,7 +215,7 @@ class Information {
         } else {
           valid_model = false;
           FIMS_LOG << "Error: Expected data observations not defined for fleet "
-                   << f->id << ", index " << agecomp_id << std::endl;
+                   << f->id << ", index " << observed_agecomp_id << std::endl;
         }
 
       } else {
@@ -229,9 +229,9 @@ class Information {
       FIMS_LOG << "Checking for available fleet selectivity pattern."
                << std::endl;
       // set selectivity model
-      if (f->selectivity_id != -999) {
+      if (f->fleet_selectivity_id_m != -999) {
         uint32_t sel_id = static_cast<uint32_t>(
-            f->selectivity_id);  // cast as unsigned integer
+            f->fleet_selectivity_id_m);  // cast as unsigned integer
         selectivity_models_iterator it = this->selectivity_models.find(
             sel_id);  // if find, set it, otherwise invalid
         FIMS_LOG << "Input fleet selectivity pattern id = " << sel_id << "."
@@ -260,9 +260,9 @@ class Information {
       FIMS_LOG << "Checking for available index likelihood function."
                << std::endl;
       // set index likelihood
-      if (f->index_likelihood_id != -999) {
+      if (f->fleet_index_likelihood_id_m != -999) {
         uint32_t ind_like_id = static_cast<uint32_t>(
-            f->index_likelihood_id);  // cast as unsigned integer
+            f->fleet_index_likelihood_id_m);  // cast as unsigned integer
         distribution_models_iterator it = this->distribution_models.find(
             ind_like_id);  // if find, set it, otherwise invalid
         FIMS_LOG << "Input index likelihood function id = " << ind_like_id
@@ -295,9 +295,9 @@ class Information {
       FIMS_LOG << "Checking for available age comp likelihood function."
                << std::endl;
       // set agecomp likelihood
-      if (f->agecomp_likelihood_id != -999) {
+      if (f->fleet_agecomp_likelihood_id_m != -999) {
         uint32_t ac_like_id = static_cast<uint32_t>(
-            f->agecomp_likelihood_id);  // cast as unsigned integer
+            f->fleet_agecomp_likelihood_id_m);  // cast as unsigned integer
         distribution_models_iterator it = this->distribution_models.find(
             ac_like_id);  // if find, set it, otherwise invalid
         FIMS_LOG << "Input age comp likelihood function id = " << ac_like_id
