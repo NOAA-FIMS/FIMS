@@ -168,13 +168,13 @@ struct Fleet : public FIMSObject<Type> {
         expected_acomp.resize(this->nages);
         Type sum = 0.0;
         for (size_t a = 0; a < this->nages; a++) {
-          size_t index_ya = y * this->nages + a;
-          sum += this->catch_numbers_at_age[index_ya];
+          size_t i_age_year = y * this->nages + a;
+          sum += this->catch_numbers_at_age[i_age_year];
         }
 
         for (size_t a = 0; a < this->nages; a++) {
-          size_t index_ya = y * this->nages + a;
-          expected_acomp[a] = this->catch_numbers_at_age[index_ya] /
+          size_t i_age_year = y * this->nages + a;
+          expected_acomp[a] = this->catch_numbers_at_age[i_age_year] /
                               sum;  // probabilities for ages
 
           observed_acomp[a] = this->observed_agecomp_data->at(y, a);

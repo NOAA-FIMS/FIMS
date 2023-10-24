@@ -9,11 +9,11 @@ namespace
 
         int year = 4;
         int age = 6;
-        int index_ya = year * population.nages + age;
-        int index_ya2 = (year - 1) * population.nages + age - 1;
+        int i_age_year = year * population.nages + age;
+        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
 
-        population.CalculateMortality(index_ya, year, age);
-        population.CalculateNumbersAA(index_ya, index_ya2, age);
+        population.CalculateMortality(i_age_year, year, age);
+        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
 
         std::vector<double> mortality_F(nyears * nages, 0);
         std::vector<double> test_naa((nyears + 1) * nages, 0);
@@ -23,10 +23,10 @@ namespace
             test_naa[i] = population.numbers_at_age[i];
         }
         
-        test_naa[index_ya] = test_naa[index_ya2] * exp(-population.mortality_Z[index_ya2]);
+        test_naa[i_age_year] = test_naa[i_agem1_yearm1] * exp(-population.mortality_Z[i_agem1_yearm1]);
         
-        EXPECT_EQ(population.numbers_at_age[index_ya], test_naa[index_ya]);     
-        EXPECT_GT(population.numbers_at_age[index_ya], 0);                           
+        EXPECT_EQ(population.numbers_at_age[i_age_year], test_naa[i_age_year]);     
+        EXPECT_GT(population.numbers_at_age[i_age_year], 0);                           
     }
 
     TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_PlusGroup_works)
@@ -34,11 +34,11 @@ namespace
 
         int year = 4;
         int age = population.nages - 1;
-        int index_ya = year * population.nages + age;
-        int index_ya2 = (year - 1) * population.nages + age - 1;
+        int i_age_year = year * population.nages + age;
+        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
 
-        population.CalculateMortality(index_ya, year, age);
-        population.CalculateNumbersAA(index_ya, index_ya2, age);
+        population.CalculateMortality(i_age_year, year, age);
+        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
 
         std::vector<double> mortality_F(nyears * nages, 0);
         std::vector<double> test_naa((nyears + 1) * nages, 0);
@@ -48,15 +48,15 @@ namespace
           test_naa[i] = population.numbers_at_age[i];
         }
         
-        test_naa[index_ya] = test_naa[index_ya2] * exp(-population.mortality_Z[index_ya2]);
+        test_naa[i_age_year] = test_naa[i_agem1_yearm1] * exp(-population.mortality_Z[i_agem1_yearm1]);
 
         // plus group calculation
-        test_naa[index_ya] = 
-          test_naa[index_ya] + 
-          test_naa[index_ya2 + 1] *
-          exp(-population.mortality_Z[index_ya2 + 1]);
+        test_naa[i_age_year] = 
+          test_naa[i_age_year] + 
+          test_naa[i_agem1_yearm1 + 1] *
+          exp(-population.mortality_Z[i_agem1_yearm1 + 1]);
 
-        EXPECT_EQ(population.numbers_at_age[index_ya], test_naa[index_ya]);     
-        EXPECT_GT(population.numbers_at_age[index_ya], 0);                           
+        EXPECT_EQ(population.numbers_at_age[i_age_year], test_naa[i_age_year]);     
+        EXPECT_GT(population.numbers_at_age[i_age_year], 0);                           
     }
 }

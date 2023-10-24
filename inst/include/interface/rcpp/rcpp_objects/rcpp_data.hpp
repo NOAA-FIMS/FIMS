@@ -91,8 +91,8 @@ class AgeCompDataInterface : public DataInterfaceBase {
     age_comp_data->id = this->id;
     for (int y = 0; y < ymax; y++) {
       for (int a = 0; a < amax; a++) {
-        int index_ya = y * amax + a;
-        age_comp_data->at(y, a) = this->age_comp_data[index_ya];
+        int i_age_year = y * amax + a;
+        age_comp_data->at(y, a) = this->age_comp_data[i_age_year];
       }
     }
 

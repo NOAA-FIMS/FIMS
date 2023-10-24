@@ -11,14 +11,14 @@ namespace
         // set up an arbitrary year/age combo to test
         int year = 4;
         int age = 6;
-        int index_ya = year * population.nages + age;
-        int index_ya2 = (year - 1) * population.nages + age - 1;
+        int i_age_year = year * population.nages + age;
+        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
         
         // calculate catch numbers at age in population module
         // Ian: not sure which of these are needed
-        population.CalculateMortality(index_ya, year, age);
-        population.CalculateNumbersAA(index_ya, index_ya2, age);
-         population.CalculateCatchNumbersAA(index_ya, year, age);
+        population.CalculateMortality(i_age_year, year, age);
+        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
+         population.CalculateCatchNumbersAA(i_age_year, year, age);
         
         population.CalculateCatchWeightAA(year, age);
         population.CalculateCatch(year, age);
@@ -28,7 +28,7 @@ namespace
             if(!population.fleets[fleet_]->is_survey){
             int index_yf = year * population.nfleets + fleet_;
             
-            expected_catch[index_yf] += population.fleets[fleet_]->catch_weight_at_age[index_ya];
+            expected_catch[index_yf] += population.fleets[fleet_]->catch_weight_at_age[i_age_year];
             
             EXPECT_EQ(population.expected_catch[index_yf], expected_catch[index_yf]);
             EXPECT_GT(population.expected_catch[index_yf], 0);

@@ -9,21 +9,21 @@ namespace
 
         int year = 4;
         int age = 6;
-        int index_ya = year * population.nages + age;
-        int index_ya2 = (year - 1) * population.nages + age - 1;
+        int i_age_year = year * population.nages + age;
+        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
 
-        population.CalculateMortality(index_ya, year, age);
-        population.CalculateNumbersAA(index_ya, index_ya2, age);
-        population.CalculateMaturityAA(index_ya, age);
-        population.CalculateSpawningBiomass(index_ya, year, age);
-        population.CalculateBiomass(index_ya, year, age);
+        population.CalculateMortality(i_age_year, year, age);
+        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
+        population.CalculateMaturityAA(i_age_year, age);
+        population.CalculateSpawningBiomass(i_age_year, year, age);
+        population.CalculateBiomass(i_age_year, year, age);
 
         std::vector<double> test_SB(nyears + 1, 0);
         std::vector<double> test_B(nyears + 1, 0);
 
-        test_SB[year] += population.numbers_at_age[index_ya] * 0.5 * population.proportion_mature_at_age[index_ya] *
+        test_SB[year] += population.numbers_at_age[i_age_year] * 0.5 * population.proportion_mature_at_age[i_age_year] *
                          population.growth->evaluate(population.ages[age]);
-        test_B[year] += population.numbers_at_age[index_ya] *
+        test_B[year] += population.numbers_at_age[i_age_year] *
                          population.growth->evaluate(population.ages[age]);
 
         EXPECT_EQ(population.spawning_biomass[year], test_SB[year]);
@@ -38,18 +38,18 @@ namespace
 
         int year = population.nyears;
         int age = 6;
-        int index_ya = year * population.nages + age;
-        int index_ya2 = (year - 1) * population.nages + age - 1;
+        int i_age_year = year * population.nages + age;
+        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
 
-        population.CalculateMortality(index_ya2, year-1, age-1);
-        population.CalculateMaturityAA(index_ya, age);
-        population.CalculateNumbersAA(index_ya, index_ya2, age);
-        population.CalculateSpawningBiomass(index_ya, year, age);
+        population.CalculateMortality(i_agem1_yearm1, year-1, age-1);
+        population.CalculateMaturityAA(i_age_year, age);
+        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
+        population.CalculateSpawningBiomass(i_age_year, year, age);
 
         std::vector<double> test_SSB(nyears + 1, 0);
 
-        test_SSB[nyears] += population.numbers_at_age[index_ya] * 0.5 * 
-            population.proportion_mature_at_age[index_ya] * 
+        test_SSB[nyears] += population.numbers_at_age[i_age_year] * 0.5 * 
+            population.proportion_mature_at_age[i_age_year] * 
             population.growth->evaluate(population.ages[age]);
 
         EXPECT_EQ(population.spawning_biomass[year], test_SSB[year]);
