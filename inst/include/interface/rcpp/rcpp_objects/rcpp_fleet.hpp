@@ -123,6 +123,33 @@ class FleetInterface : public FleetInterfaceBase {
     this->selectivity_id = selectivity_id;
   }
 
+  /**
+ * @brief Evaluate index nll
+ * 
+*/
+virtual double evaluate_index_nll(){
+  fims::Fleet<double> fleet;
+  std::shared_ptr<fims::DataObject<double>> index_data =
+        std::make_shared<fims::DataObject<double>>(nyears);
+  fleet.observed_index_data = index_data;
+  fleet.log_obs_error = log_obs_error.value_m;
+  return(fleet.evaluate_index_nll());
+}
+
+
+  /**
+ * @brief Evaluate agecomp nll
+ * 
+*/
+virtual double evaluate_age_comp_nll(){
+  fims::Fleet<double> fleet;
+//  fleet.catch_numbers_at_age = 0.0;
+//  fleet.observed_agecomp_data = 0.0;
+
+  return(fleet.evaluate_age_comp_nll());
+}
+
+
 #ifdef TMB_MODEL
   template <typename Type>
   bool add_to_fims_tmb_internal() {

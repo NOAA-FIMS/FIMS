@@ -216,7 +216,9 @@ RCPP_MODULE(fims) {
       .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
       .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
       .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
-      .method("SetSelectivity", &FleetInterface::SetSelectivity);
+      .method("SetSelectivity", &FleetInterface::SetSelectivity)
+      .method("evaluate_index_nll", &FleetInterface::evaluate_index_nll)
+      .method("evaluate_age_comp_nll", &FleetInterface::evaluate_age_comp_nll);
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
       .constructor<int, int>()

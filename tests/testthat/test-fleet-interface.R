@@ -60,3 +60,21 @@ test_that("Fleet: SetObservedIndexData works", {
 
   fims$clear()
 })
+
+test_that("Fleet: evaluate_index_nll works", {
+  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
+  fleet_ <- new(fims$Fleet)
+  fleet_$SetObservedIndexData(1)
+  fleet_$nyears = 10;
+  expect_equal(0.0, fleet_$evaluate_index_nll())
+  fims$clear()
+})
+
+test_that("Fleet: evaluate_age_comp_nll works", {
+  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
+  fleet_ <- new(fims$Fleet)
+  fleet_$SetObservedAgeCompData(1)
+  expect_equal(0.0, fleet_$evaluate_age_comp_nll())
+  fims$clear()
+})
+
