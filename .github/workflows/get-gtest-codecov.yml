@@ -22,6 +22,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - uses: actions/checkout@v3
@@ -32,7 +34,7 @@ jobs:
       with:
         extra-packages: any::remotes
     - name: install local version of FIMS
-      run: remotes::install_local(upgrade = "always")
+      run: remotes::install_local(upgrade= "always", force = TRUE)
       shell: Rscript {0}
     - name: setup for gtest
       run: FIMS:::setup_gtest()
