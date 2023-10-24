@@ -29,12 +29,12 @@ namespace
                 ss.str("");
                 // GoogleTest operates in the folder with executables "build/tests/gtest"
                 // so we have to go up three directories to get into FIMS folder
-                ss << "../../../tests/integration/inputs/FIMS-deterministic/C" <<c_case <<"_om_input" << i_iter + 1 << ".json";
+                ss << "../../../tests/integration/FIMS-deterministic-inputs/C" <<c_case <<"_om_input" << i_iter + 1 << ".json";
                 t.ReadJson(ss.str(), input_);
                 ss.str("");
 
                 // Read in outputs
-                ss << "../../../tests/integration/inputs/FIMS-deterministic/C" <<c_case <<"_om_output" << i_iter + 1 << ".json";
+                ss << "../../../tests/integration/FIMS-deterministic-inputs/C" <<c_case <<"_om_output" << i_iter + 1 << ".json";
                 t.ReadJson(ss.str(), output_);
                 input = input_.GetObject();
                 output = output_.GetObject();

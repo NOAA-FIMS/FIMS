@@ -25,7 +25,7 @@ setup_gtest <- function() {
       # write json file
       outputname <- paste0("C", c_case, "_om_output", i_iter, ".json")
       inputname <- paste0("C", c_case, "_om_input", i_iter, ".json")
-      json_folder <- file.path("tests", "integration", "inputs", "FIMS-deterministic")
+      json_folder <- file.path("tests", "integration", "FIMS-deterministic-inputs")
       if (!dir.exists(json_folder)) dir.create(json_folder)
       jsonlite::write_json(
         x = om_output, path = file.path(json_folder, outputname),
