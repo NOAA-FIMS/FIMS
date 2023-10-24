@@ -19,18 +19,18 @@ namespace fims {
  */
 template <typename Type>
 struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
-  Type median_asc; /*!< 50% quantile of the value of the quantity of interest (x)
-               on the ascending limb of the double logistic curve; e.g. age at
-               which 50% of the fish are selected */
-  Type slope_asc;  /*!<scalar multiplier of difference between quantity of interest
-               value (x) and median on the ascending limb of the double logistic
-               curve*/
-  Type median_desc; /*!< 50% quantile of the value of the quantity of interest (x)
-               on the descending limb of the double logistic curve; e.g.
+  Type median_asc;  /*!< 50% quantile of the value of the quantity of interest
+                (x)  on the ascending limb of the double logistic curve; e.g. age
+                at  which 50% of the fish are selected */
+  Type slope_asc;   /*!<scalar multiplier of difference between quantity of
+                interest   value (x) and median on the ascending limb of the double
+                logistic   curve*/
+  Type median_desc; /*!< 50% quantile of the value of the quantity of interest
+               (x) on the descending limb of the double logistic curve; e.g.
                age at which 50% of the fish are selected */
-  Type slope_desc; /*!<scalar multiplier of difference between quantity of interest
-              value (x) and median on the descending limb of the double logistic
-              curve */
+  Type slope_desc;  /*!<scalar multiplier of difference between quantity of
+               interest  value (x) and median on the descending limb of the double
+               logistic  curve */
 
   DoubleLogisticSelectivity() : SelectivityBase<Type>() {}
 
@@ -48,7 +48,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    */
   virtual const Type evaluate(const Type &x) {
     return fims::double_logistic<Type>(median_asc, slope_asc, median_desc,
-                                    slope_desc, x);
+                                       slope_desc, x);
   }
 };
 
