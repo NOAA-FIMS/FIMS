@@ -233,8 +233,9 @@ struct Population : public FIMSObject<Type> {
   inline void CalculateNumbersAA(size_t i_age_year, size_t i_agem1_yearm1,
                                  size_t age) {
     // using Z from previous age/year
-    this->numbers_at_age[i_age_year] = this->numbers_at_age[i_agem1_yearm1] *
-                                     (fims::exp(-this->mortality_Z[i_agem1_yearm1]));
+    this->numbers_at_age[i_age_year] =
+        this->numbers_at_age[i_agem1_yearm1] *
+        (fims::exp(-this->mortality_Z[i_agem1_yearm1]));
     FIMS_LOG << " z at i_agem1_yearm1 = " << i_agem1_yearm1 << " is "
              << this->mortality_Z[i_agem1_yearm1] << std::endl;
     // Plus group calculation
@@ -253,8 +254,8 @@ struct Population : public FIMSObject<Type> {
    * @param i_agem1_yearm1 dimension folded index for age-1 and year-1
    * @param age age index
    */
-  inline void CalculateUnfishedNumbersAA(size_t i_age_year, size_t i_agem1_yearm1,
-                                         size_t age) {
+  inline void CalculateUnfishedNumbersAA(size_t i_age_year,
+                                         size_t i_agem1_yearm1, size_t age) {
     // using M from previous age/year
     this->unfished_numbers_at_age[i_age_year] =
         this->unfished_numbers_at_age[i_agem1_yearm1] *
@@ -306,9 +307,10 @@ struct Population : public FIMSObject<Type> {
    * @param age the age who's biomass is being added into total spawning biomass
    */
   void CalculateSpawningBiomass(size_t i_age_year, size_t year, size_t age) {
-    this->spawning_biomass[year] +=
-        this->proportion_female * this->numbers_at_age[i_age_year] *
-        this->proportion_mature_at_age[i_age_year] * growth->evaluate(ages[age]);
+    this->spawning_biomass[year] += this->proportion_female *
+                                    this->numbers_at_age[i_age_year] *
+                                    this->proportion_mature_at_age[i_age_year] *
+                                    growth->evaluate(ages[age]);
     FIMS_LOG << " proportion female " << this->proportion_female << " "
              << " mature age " << age << " is "
              << this->proportion_mature_at_age[i_age_year] << " "
@@ -462,7 +464,8 @@ struct Population : public FIMSObject<Type> {
       if (this->fleets[fleet_]->is_survey == false) {
         catch_ = (this->fleets[fleet_]->Fmort[year] *
                   this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
-                 this->mortality_Z[i_age_year] * this->numbers_at_age[i_age_year] *
+                 this->mortality_Z[i_age_year] *
+                 this->numbers_at_age[i_age_year] *
                  (1 - fims::exp(-(this->mortality_Z[i_age_year])));
       } else {
         catch_ = (this->fleets[fleet_]->selectivity->evaluate(ages[age])) *
@@ -622,7 +625,8 @@ struct Population : public FIMSObject<Type> {
            Expected recruitment in year 0 is numbers at age 0 in year 0.
            */
 
-          this->expected_recruitment[i_age_year] = this->numbers_at_age[i_age_year];
+          this->expected_recruitment[i_age_year] =
+              this->numbers_at_age[i_age_year];
 
         } else {
           if (a == 0) {
