@@ -32,13 +32,17 @@ struct Fleet : public FIMSObject<Type> {
 
   // This likelihood index is not currently being used as only one likelihood
   // distribution is available. These are for a future update M2+.
-  int fleet_index_likelihood_id_m = -999; /*!<id of index likelihood component. The "fleet_" prefix indicates it belongs to the Fleet struct, and the "_m" postfix signifies that it's a member variable.*/
+  int fleet_index_likelihood_id_m =
+      -999; /*!<id of index likelihood component. The "fleet_" prefix indicates
+               it belongs to the Fleet struct, and the "_m" postfix signifies
+               that it's a member variable.*/
   std::shared_ptr<fims::DistributionsBase<Type>>
       index_likelihood; /*!< index likelihood component*/
 
   // This likelihood index is not currently being used as only one likelihood
   // distribution is available. These are for a future update M2+.
-  int fleet_agecomp_likelihood_id_m = -999; /*!< id of agecomp likelihood component*/
+  int fleet_agecomp_likelihood_id_m =
+      -999; /*!< id of agecomp likelihood component*/
   std::shared_ptr<fims::DistributionsBase<Type>>
       agecomp_likelihood; /*!< agecomp likelihood component*/
 

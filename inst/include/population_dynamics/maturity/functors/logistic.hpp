@@ -21,8 +21,8 @@ namespace fims {
  */
 template <typename Type>
 struct LogisticMaturity : public MaturityBase<Type> {
-  Type median; /*!< 50% quantile of the value of the quantity of interest (x); e.g.
-               age at which 50% of the fish are mature */
+  Type median; /*!< 50% quantile of the value of the quantity of interest (x);
+               e.g. age at which 50% of the fish are mature */
   Type slope;  /*!<scalar multiplier of difference between quantity of interest
                value (x) and median */
 

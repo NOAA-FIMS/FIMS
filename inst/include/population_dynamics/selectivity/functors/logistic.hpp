@@ -22,8 +22,8 @@ namespace fims {
  */
 template <typename Type>
 struct LogisticSelectivity : public SelectivityBase<Type> {
-  Type median; /*!< 50% quantile of the value of the quantity of interest (x); e.g.
-               age at which 50% of the fish are selected */
+  Type median; /*!< 50% quantile of the value of the quantity of interest (x);
+               e.g. age at which 50% of the fish are selected */
   Type slope;  /*!<scalar multiplier of difference between quantity of interest
                value (x) and median */
 

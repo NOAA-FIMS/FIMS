@@ -175,9 +175,11 @@ class Information {
                << std::endl;
       // set index data
       if (f->fleet_observed_index_data_id_m != -999) {
-        uint32_t observed_index_id = static_cast<uint32_t>(f->fleet_observed_index_data_id_m); 
+        uint32_t observed_index_id =
+            static_cast<uint32_t>(f->fleet_observed_index_data_id_m);
         data_iterator it = this->data_objects.find(observed_index_id);
-        FIMS_LOG << "Input fleet index id = " << observed_index_id << "." << std::endl;
+        FIMS_LOG << "Input fleet index id = " << observed_index_id << "."
+                 << std::endl;
 
         if (it != this->data_objects.end()) {
           f->observed_index_data = (*it).second;
