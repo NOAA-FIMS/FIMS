@@ -210,11 +210,9 @@ struct Fleet : public FIMSObject<Type> {
 
   virtual const Type evaluate_index_nll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
-std::cout << "hi" << std::endl;
 #ifdef TMB_MODEL
     fims::Dnorm<Type> dnorm;
     dnorm.sd = fims::exp(this->log_obs_error);
-    std::cout << "hi" << std::endl;
     std::cout << this->expected_index.size() << std::endl;
     for (size_t i = 0; i < this->expected_index.size(); i++) {
       dnorm.x = fims::log(this->observed_index_data->at(i));

@@ -76,7 +76,7 @@ test_that("Fleet: evaluate_index_nll works", {
   fleet_$log_q <- log(1.0)
   fleet_$estimate_q <- FALSE
   fleet_$random_q <- FALSE
-  fleet_$log_obs_error$value <- log(sqrt(log(survey_index$uncertainty^2 + 1)))
+  fleet_$log_obs_error$value <- log(sqrt(log(survey_index$uncertainty[1]^2 + 1)))
   fleet_$log_obs_error$estimated <- FALSE
   
   survey_fleet_index <- new(fims$Index, nyears)
@@ -84,6 +84,8 @@ test_that("Fleet: evaluate_index_nll works", {
   fleet_$SetObservedIndexData(survey_fleet_index$get_id())
 
   survey_fleet_index$index_data <- survey_index$value
+
+  fims$CreateTMBModel() 
 
   expect_equal(0.0, fleet_$evaluate_index_nll())
   fims$clear()
