@@ -129,9 +129,6 @@ class FleetInterface : public FleetInterfaceBase {
 */
 virtual double evaluate_index_nll(){
   fims::Fleet<double> fleet;
-  std::shared_ptr<fims::DataObject<double>> index_data =
-        std::make_shared<fims::DataObject<double>>(nyears);
-  fleet.observed_index_data = index_data;
   fleet.log_obs_error = log_obs_error.value_m;
   return(fleet.evaluate_index_nll());
 }
