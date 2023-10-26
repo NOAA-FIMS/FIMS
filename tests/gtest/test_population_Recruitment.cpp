@@ -69,7 +69,7 @@ namespace
         // calculate expected recruitment based on bev-holt equation
         expect_recruitment[i_age_year] = 
         (0.8 * rzero * steep * population.spawning_biomass[i_age_year]) / 
-        (0.2 * ssbzero * (1.0 - steep) + population.spawning_biomass[i_age_year] * (steep - 0.2)) * log_recruit_devs[year]; 
+        (0.2 * ssbzero * (1.0 - steep) + population.spawning_biomass[i_age_year] * (steep - 0.2)) * fims::exp(log_recruit_devs[year]); 
       
         // testing that expected recruitment and population.numbers_at_age match
         EXPECT_EQ(population.numbers_at_age[i_age_year], expect_recruitment[i_age_year]);

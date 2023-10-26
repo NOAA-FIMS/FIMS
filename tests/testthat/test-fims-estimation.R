@@ -39,10 +39,8 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$recruitment$logit_steep$is_random_effect <- FALSE
   test_env$recruitment$logit_steep$estimated <- FALSE
   test_env$recruitment$estimate_deviations <- TRUE
-  # recruit deviations should enter the model in normal space.
-  # The log is taken in the likelihood calculations
   # alternative setting: recruitment$deviations <- rep(1, length(om_input$logR.resid))
-  test_env$recruitment$deviations <- exp(om_input$logR.resid)
+  test_env$recruitment$deviations <- om_input$logR.resid
 
   # Data
   test_env$catch <- em_input$L.obs$fleet1
@@ -330,7 +328,7 @@ test_that("nll test of fims", {
 
   # recruitment likelihood
   rec_nll <- -sum(dnorm(
-    log(nll_env$recruitment$deviations), rep(0, om_input$nyr),
+    nll_env$recruitment$deviations, rep(0, om_input$nyr),
     om_input$logR_sd, TRUE
   ))
 
@@ -604,10 +602,8 @@ test_that("run FIMS in a for loop", {
     recruitment$logit_steep$is_random_effect <- FALSE
     recruitment$logit_steep$estimated <- FALSE
     recruitment$estimate_deviations <- TRUE
-    # recruit deviations should enter the model in normal space.
-    # The log is taken in the likelihood calculations
     # alternative setting: recruitment$deviations <- rep(1, length(om_input$logR.resid))
-    recruitment$deviations <- exp(om_input$logR.resid)
+    recruitment$deviations <- om_input$logR.resid
 
     # Data
     catch <- em_input$L.obs$fleet1
