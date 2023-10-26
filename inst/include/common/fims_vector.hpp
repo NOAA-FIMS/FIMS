@@ -15,7 +15,7 @@ class Vector{
 public:
     typedef typename std::vector<Type>::iterator iterator;
     typedef Eigen::Array<Type, -1,1,0> eigen_vector;
-
+    
     Vector(){
     }
     
@@ -54,6 +54,15 @@ public:
         return this->vec_m.end();
     }
     
+    
+    size_t size() const{
+        return this->vec_m.size();
+    }
+    
+    void resize(size_t s){
+        this->vec_m.resize(s);
+    }
+    
     std::vector<Type>& get_data(){
         return this->vec_m;
     }
@@ -64,25 +73,34 @@ public:
     
 #ifdef TMB_MODEL
     
-    template<typename T>
-    operator CppAD::vector<T>() const{
-        CppAD::vector<T> ret;
+    inline operator CppAD::vector<Type>() const{
+        CppAD::vector<Type> ret;
+        ret.resize(this->vec_m.size());
+        for(int i =0; i < this->vec_m.size(); i++){
+            ret[i] = this->vec_m[i];
+        }
+        return this->get_cppad_vector();
+    }
+    
+    
+    inline operator tmbutils::vector<Type>()const{
+        //        tmbutils::vector<Type> ret;
+        //        ret.resize(this->vec_m.size());
+        //        for(int i =0; i < this->vec_m.size(); i++){
+        //            ret[i] = this->vec_m[i];
+        //        }
+        //        return ret;
+        return this->get_tmb_vector();
+    }
+    
+private:
+    CppAD::vector<Type> get_cppad_vector() const{
+        CppAD::vector<Type> ret;
         ret.resize(this->vec_m.size());
         for(int i =0; i < this->vec_m.size(); i++){
             ret[i] = this->vec_m[i];
         }
         return ret;
-    }
-    
-
-    inline operator tmbutils::vector<Type>()const{
-//        tmbutils::vector<Type> ret;
-//        ret.resize(this->vec_m.size());
-//        for(int i =0; i < this->vec_m.size(); i++){
-//            ret[i] = this->vec_m[i];
-//        }
-//        return ret;
-        return this->get_tmb_vector();
     }
     
     tmbutils::vector<Type> get_tmb_vector() const{
@@ -93,26 +111,10 @@ public:
         }
         return ret;
     }
-    
-    
-//    operator eigen_vector(){
-//        eigen_vector ret;
-//        ret.resize(this->vec_m.size());
-//        for(int i =0; i < this->vec_m.size(); i++){
-//            ret[i] = this->vec_m[i];
-//        }
-//        return ret;
-//    }
+   
     
 #endif
     
-    size_t size() const{
-        return this->vec_m.size();
-    }
-    
-    void resize(size_t s){
-        this->vec_m.resize(s);
-    }
     
 };
 
