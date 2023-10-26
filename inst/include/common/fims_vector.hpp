@@ -74,26 +74,16 @@ public:
 #ifdef TMB_MODEL
     
     inline operator CppAD::vector<Type>() const{
-        CppAD::vector<Type> ret;
-        ret.resize(this->vec_m.size());
-        for(int i =0; i < this->vec_m.size(); i++){
-            ret[i] = this->vec_m[i];
-        }
         return this->get_cppad_vector();
     }
     
     
     inline operator tmbutils::vector<Type>()const{
-        //        tmbutils::vector<Type> ret;
-        //        ret.resize(this->vec_m.size());
-        //        for(int i =0; i < this->vec_m.size(); i++){
-        //            ret[i] = this->vec_m[i];
-        //        }
-        //        return ret;
         return this->get_tmb_vector();
     }
     
 private:
+    
     CppAD::vector<Type> get_cppad_vector() const{
         CppAD::vector<Type> ret;
         ret.resize(this->vec_m.size());
