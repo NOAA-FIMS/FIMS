@@ -18,14 +18,14 @@ namespace fims_distributions {
 /**
  * @brief Dnorm class returns the TMB dnorm function
  */
-template <typename T>
-struct Dnorm : public DistributionsBase<T> {
-  T x;    /*!< observation */
-  T mean; /*!< mean of the normal distribution */
-  T sd;   /*!< standard deviation of the normal distribution, must be strictly
+template <typename Type>
+struct Dnorm : public DistributionsBase<Type> {
+  Type x;    /*!< observation */
+  Type mean; /*!< mean of the normal distribution */
+  Type sd;   /*!< standard deviation of the normal distribution, must be strictly
              positive.*/
 
-  Dnorm() : DistributionsBase<T>() {}
+  Dnorm() : DistributionsBase<Type>() {}
 
   virtual ~Dnorm() {}
 
@@ -36,7 +36,7 @@ struct Dnorm : public DistributionsBase<T> {
    *
    * @param do_log Boolean; if true, log densities are returned
    */
-  virtual const T evaluate(const bool& do_log) {
+  virtual const Type evaluate(const bool& do_log) {
     return dnorm(x, mean, sd, do_log);
   }
 };
@@ -44,15 +44,15 @@ struct Dnorm : public DistributionsBase<T> {
 /**
  * @brief Dmultinom class returns the TMB dmultinom function
  */
-template <typename T>
-struct Dmultinom : public DistributionsBase<T> {
+template <typename Type>
+struct Dmultinom : public DistributionsBase<Type> {
   /** EigenVector defined in interface.hpp */
-  using Vector = typename fims::ModelTraits<T>::EigenVector;
+  using Vector = typename fims::ModelTraits<Type>::EigenVector;
   Vector x; /*!< Vector of length K of integers */
   Vector p; /*!< Vector of length K, specifying the probability for the K
                classes (note, unlike in R these must sum to 1). */
 
-  Dmultinom() : DistributionsBase<T>() {}
+  Dmultinom() : DistributionsBase<Type>() {}
 
   /**
    * @brief Probability mass function of the multinomial distribution.
@@ -63,7 +63,7 @@ struct Dmultinom : public DistributionsBase<T> {
    *
    * @param do_log Boolean; if true, log densities are returned
    */
-  virtual const T evaluate(const bool& do_log) {
+  virtual const Type evaluate(const bool& do_log) {
     return dmultinom(x, p, do_log);
   }
 };
@@ -72,13 +72,13 @@ struct Dmultinom : public DistributionsBase<T> {
  * @brief Dlnorm uses the TMB dnorm function to construct the lognormal density
  * function
  */
-template <typename T>
-struct Dlnorm : public DistributionsBase<T> {
-  T x;       /*!< observation */
-  T meanlog; /*!< mean of the distribution of log(x) */
-  T sdlog;   /*!< standard deviation of the distribution of log(x) */
+template <typename Type>
+struct Dlnorm : public DistributionsBase<Type> {
+  Type x;       /*!< observation */
+  Type meanlog; /*!< mean of the distribution of log(x) */
+  Type sdlog;   /*!< standard deviation of the distribution of log(x) */
 
-  Dlnorm() : DistributionsBase<T>() {}
+  Dlnorm() : DistributionsBase<Type>() {}
 
   /**
    * @brief Probability density function of the lognormal distribution.
@@ -89,9 +89,9 @@ struct Dlnorm : public DistributionsBase<T> {
    * @param do_log Boolean; if true, log densities are returned
    */
 
-  virtual const T evaluate(const bool& do_log) {
-    T logx = log(x);
-    T nll;
+  virtual const Type evaluate(const bool& do_log) {
+    Type logx = log(x);
+    Type nll;
 
     nll = dnorm(logx, meanlog, sdlog, true) - logx;
 

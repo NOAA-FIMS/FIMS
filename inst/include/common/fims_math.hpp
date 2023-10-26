@@ -30,8 +30,8 @@ namespace fims_math {
  * integer.
  * @return the exponentiated value
  */
-template <class T>
-inline const T exp(const T &x) {
+template <class Type>
+inline const Type exp(const Type &x) {
   return std::exp(x);
 }
 
@@ -41,8 +41,8 @@ inline const T exp(const T &x) {
  * is an integer.
  * @return
  */
-template <class T>
-inline const T log(const T &x) {
+template <class Type>
+inline const Type log(const Type &x) {
   return std::log(x);
 }
 #endif
@@ -58,8 +58,8 @@ inline const T log(const T &x) {
  * integer.
  * @return the exponentiated value
  */
-template <class T>
-inline const T exp(const T &x) {
+template <class Type>
+inline const Type exp(const Type &x) {
   using ::exp;
   return exp(x);
 }
@@ -77,8 +77,8 @@ inline const double exp(const double &x) {
  * is an integer.
  * @return the log of the value
  */
-template <class T>
-inline const T log(const T &x) {
+template <class Type>
+inline const Type log(const Type &x) {
   return log(x);
 }
 
@@ -99,8 +99,8 @@ inline const double log(const double &x) {
  * @param x the index the logistic function should be evaluated at
  * @return
  */
-template <class T>
-inline const T logistic(const T &median, const T &slope, const T &x) {
+template <class Type>
+inline const Type logistic(const Type &median, const Type &slope, const Type &x) {
   return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
 }
 
@@ -114,8 +114,8 @@ inline const T logistic(const T &median, const T &slope, const T &x) {
  * @return the parameter in real space
  *
  */
-template <class T>
-inline const T logit(const T &a, const T &b, const T &x) {
+template <class Type>
+inline const Type logit(const Type &a, const Type &b, const Type &x) {
   return -fims_math::log(b - x) + fims_math::log(x - a);
 }
 
@@ -129,8 +129,8 @@ inline const T logit(const T &a, const T &b, const T &x) {
  * @return the parameter in bounded space
  *
  */
-template <class T>
-inline const T inv_logit(const T &a, const T &b, const T &logit_x) {
+template <class Type>
+inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
   return a + (b - a) / (1 + fims_math::exp(-logit_x));
 }
 
@@ -153,10 +153,10 @@ inline const T inv_logit(const T &a, const T &b, const T &logit_x) {
  * @return
  */
 
-template <class T>
-inline const T double_logistic(const T &median_asc, const T &slope_asc,
-                               const T &median_desc, const T &slope_desc,
-                               const T &x) {
+template <class Type>
+inline const Type double_logistic(const Type &median_asc, const Type &slope_asc,
+                               const Type &median_desc, const Type &slope_desc,
+                               const Type &x) {
   return (1.0) / (1.0 + exp(-1.0 * slope_asc * (x - median_asc))) *
          (1.0 - (1.0) / (1.0 + exp(-1.0 * slope_desc * (x - median_desc))));
 }
@@ -174,8 +174,8 @@ inline const T double_logistic(const T &median_asc, const T &slope_asc,
  * @param C default = 1e-5
  * @return
  */
-template <class T>
-const T ad_fabs(const T &x, T C = 1e-5) {
+template <class Type>
+const Type ad_fabs(const Type &x, Type C = 1e-5) {
   return sqrt((x * x) + C);  //, .5);
 }
 
@@ -193,8 +193,8 @@ const T ad_fabs(const T &x, T C = 1e-5) {
  * @param C default = 1e-5
  * @return
  */
-template <typename T>
-inline const T ad_min(const T &a, const T &b, T C = 1e-5) {
+template <typename Type>
+inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
   return (a + b - fims_math::ad_fabs(a - b, C)) * .5;
 }
 

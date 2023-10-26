@@ -74,8 +74,8 @@ vectors have been set */
 
   /**
    * @brief Create a map of input numeric vectors
-   * @param weights T vector of weights
-   * @param ages T vector of ages
+   * @param weights Type vector of weights
+   * @param ages Type vector of ages
    * @return std::map<T, T>
    *
    * */

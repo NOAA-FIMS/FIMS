@@ -198,13 +198,13 @@ namespace fims {
  *  @brief fims::ModelTraits class that contains the DataVector
  * and ParameterVector types.
  */
-template <typename T>
+template <typename Type>
 struct fims::ModelTraits {
-  typedef typename CppAD::vector<T> DataVector;      /**< This is a vector
+  typedef typename CppAD::vector<Type> DataVector;      /**< This is a vector
         of the data that is differentiable */
-  typedef typename CppAD::vector<T> ParameterVector; /**< This is a
+  typedef typename CppAD::vector<Type> ParameterVector; /**< This is a
   vector of the parameters that is differentiable */
-  typedef typename tmbutils::vector<T>
+  typedef typename tmbutils::vector<Type>
       EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
 };
 #endif /* TMB_MODEL */
@@ -295,14 +295,14 @@ namespace fims_popdy {
  *  @brief LogisticMaturity class that returns the logistic function value
  * from fims_math.
  */
-template <typename T>
-struct LogisticMaturity : public MaturityBase<T> {
-  T median; /*!< 50% quantile of the value of the quantity of interest (x); e.g.,
+template <typename Type>
+struct LogisticMaturity : public MaturityBase<Type> {
+  Type median; /*!< 50% quantile of the value of the quantity of interest (x); e.g.,
                age at which 50% of the fish are mature */
-  T slope;  /*!<scalar multiplier of difference between quantity of interest
+  Type slope;  /*!<scalar multiplier of difference between quantity of interest
                value (x) and median */
 
-  LogisticMaturity() : MaturityBase<T>() {}
+  LogisticMaturity() : MaturityBase<Type>() {}
 
   /**
    * @brief Method of the logistic maturity class that implements the
@@ -311,8 +311,8 @@ struct LogisticMaturity : public MaturityBase<T> {
    * @param x  The independent variable in the logistic function (e.g., age or
    * size at maturity).
    */
-  virtual const T evaluate(const T& x) {
-    return fims_math::logistic<T>(median, slope, x);
+  virtual const Type evaluate(const Type& x) {
+    return fims_math::logistic<Type>(median, slope, x);
   }
 };
 
@@ -350,11 +350,11 @@ namespace fims_popdy {
 
 /** @brief Base class for all maturity functors.
  *
- * @tparam T The type of the maturity functor.
+ * @tparam TypeThe type of the maturity functor.
  */
 
-template <typename T>
-struct MaturityBase : public fims_model_object::FIMSObject<T> {
+template <typename Type>
+struct MaturityBase : public fims_model_object::FIMSObject<Type> {
   // id_g is the ID of the instance of the MaturityBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -373,7 +373,7 @@ struct MaturityBase : public fims_model_object::FIMSObject<T> {
    * @param x The independent variable in the maturity function (e.g., logistic
    * maturity at age or size).
    */
-  virtual const T evaluate(const T& x) = 0;
+  virtual const Type evaluate(const Type& x) = 0;
 };
 ```
 
@@ -417,14 +417,14 @@ This *information* is managed in FIMS through the `Information` class in [inform
  The second component of the map is the shared pointer, 
  maturity_models, that points to fims_popdy::MaturityBase
  */
-std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<T> > >
+std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > >
       maturity_models; /*!<hash map to link each object to its shared location
                           in memory*/
 
 //Next we set up the iterator, which will be used to loop 
 //over all defined maturity modules
 typedef typename std::map<uint32_t, 
-                          std::shared_ptr<fims_popdy::MaturityBase<T> > >::iterator
+                          std::shared_ptr<fims_popdy::MaturityBase<Type> > >::iterator
       maturity_models_iterator;
 ```
 
@@ -452,11 +452,11 @@ knitr::include_graphics("figures/fims-path-maturity-6.png")
 Now we need to pass this pointer to the maturity pointer in population so that `population->maturity` points to the `LogisticMaturity` module instead of `MaturityBase`. First we set up a map in `Information` that points to `Population`. 
 ```{Rcpp,  class.source = "infochunk", eval = FALSE}
 //file: inst/include/common/information.hpp
-std::map<uint32_t, std::shared_ptr<fims_popdy::Population<T> > >
+std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > >
       populations; /*!<hash map to link each object to its shared location in
                       memory*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::Population<T> > >::iterator
+                            std::shared_ptr<fims_popdy::Population<Type> > >::iterator
       population_iterator;
   /**< iterator for population objects>*/
 ```
@@ -471,7 +471,7 @@ We then loop through the populations and create a new shared pointer, `p`, to re
 //file: inst/include/common/information.hpp
  for (population_iterator it = this->populations.begin();
              it != this->populations.end(); ++it) {
-          std::shared_ptr<fims_popdy::Population<T> > p = (*it).second;
+          std::shared_ptr<fims_popdy::Population<Type> > p = (*it).second;
           ...
 ```
 In this code chunk, `(*it)` refers to a single population in the `populations` map. The second element of the map is the pointer, so `p = (*it).second` means we are setting the pointer to a single population to equal the pointer to `populations` in the map. 
@@ -572,8 +572,8 @@ information <- list(
 In FIMS, the Information class has the objects, population and maturity, which are C++ maps. The first element of the map is the ID, the second element of the map is the pointer to the Population or Maturity class:
 
 ```{r, eval = FALSE} 
-# std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<T> > > maturity_models;
-# std::map<uint32_t, std::shared_ptr<fims_popdy::Population<T> > > populations;
+# std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > > maturity_models;
+# std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > > populations;
 ```
   
 We can then link up the pointers in information to each respective module:
@@ -604,7 +604,7 @@ for (it in 1:length(population_modules)) {
   #            it != this->populations.end(); ++it) {
 
   p <- information$populations[[it]][2]
-  # std::shared_ptr<fims_popdy::Population<T> > p = (*it).second;
+  # std::shared_ptr<fims_popdy::Population<Type> > p = (*it).second;
 
   maturity_uint <- p$pointer$maturity_id
   # uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);

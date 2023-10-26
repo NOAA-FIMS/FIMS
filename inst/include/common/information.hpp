@@ -28,88 +28,88 @@ namespace fims_info {
  * @brief Stores FIMS model information and creates model. Contains all objects
  * and data pre-model construction
  */
-template <typename T>
+template <typename Type>
 class Information {
  public:
   size_t nyears;       /**< number of years >*/
   size_t nseasons = 1; /**< number of seasons >*/
   size_t nages;        /**< number of ages>*/
 
-  static std::shared_ptr<Information<T> >
+  static std::shared_ptr<Information<Type> >
       fims_information;       /**< singleton instance >*/
-  std::vector<T*> parameters; /**< list of all estimated parameters >*/
-  std::vector<T*>
+  std::vector<Type*> parameters; /**< list of all estimated parameters >*/
+  std::vector<Type*>
       random_effects_parameters; /**< list of all random effects parameters >*/
-  std::vector<T*>
+  std::vector<Type*>
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
 
   // data objects
-  std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<Type> > >
       data_objects; /*!< map that holds data objects >*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_data_object::DataObject<T> > >::iterator
+                            std::shared_ptr<fims_data_object::DataObject<Type> > >::iterator
       data_iterator; /**< iterator for the data objects */
 
   // life history modules
-  std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >
       recruitment_models; /*!<hash map to link each object to its shared
                              location in memory*/
   typedef
       typename std::map<uint32_t,
-                        std::shared_ptr<fims_popdy::RecruitmentBase<T> > >::iterator
+                        std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >::iterator
           recruitment_models_iterator;
   /**< iterator for recruitment objects>*/
 
-  std::map<uint32_t, std::shared_ptr<fims_popdy::SelectivityBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::SelectivityBase<Type> > >
       selectivity_models; /*!<hash map to link each object to its shared
                              location in memory*/
   typedef
       typename std::map<uint32_t,
-                        std::shared_ptr<fims_popdy::SelectivityBase<T> > >::iterator
+                        std::shared_ptr<fims_popdy::SelectivityBase<Type> > >::iterator
           selectivity_models_iterator;
   /**< iterator for selectivity objects>*/
 
-  std::map<uint32_t, std::shared_ptr<fims_popdy::GrowthBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::GrowthBase<Type> > >
       growth_models; /*!<hash map to link each object to its shared location in
                         memory*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::GrowthBase<T> > >::iterator
+                            std::shared_ptr<fims_popdy::GrowthBase<Type> > >::iterator
       growth_models_iterator;
   /**< iterator for growth objects>*/
 
-  std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > >
       maturity_models; /*!<hash map to link each object to its shared location
                           in memory*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::MaturityBase<T> > >::iterator
+                            std::shared_ptr<fims_popdy::MaturityBase<Type> > >::iterator
       maturity_models_iterator;
   /**< iterator for maturity objects>*/
 
   // fleet modules
-  std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type> > >
       fleets; /*!<hash map to link each object to its shared location in
                  memory*/
   typedef
-      typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<T> > >::iterator
+      typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type> > >::iterator
           fleet_iterator;
   /**< iterator for fleet objects>*/
 
   // populations
-  std::map<uint32_t, std::shared_ptr<fims_popdy::Population<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > >
       populations; /*!<hash map to link each object to its shared location in
                       memory*/
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::Population<T> > >::iterator
+                            std::shared_ptr<fims_popdy::Population<Type> > >::iterator
       population_iterator;
   /**< iterator for population objects>*/
 
   // distributions
-  std::map<uint32_t, std::shared_ptr<fims_distributions::DistributionsBase<T> > >
+  std::map<uint32_t, std::shared_ptr<fims_distributions::DistributionsBase<Type> > >
       distribution_models; /*!<hash map to link each object to its shared
                               location in memory*/
   typedef
       typename std::map<uint32_t,
-                        std::shared_ptr<fims_distributions::DistributionsBase<T> > >::iterator
+                        std::shared_ptr<fims_distributions::DistributionsBase<Type> > >::iterator
           distribution_models_iterator;
   /**< iterator for distribution objects>*/
 
@@ -122,12 +122,12 @@ class Information {
    *
    * @return singleton for type T
    */
-  static std::shared_ptr<Information<T> > GetInstance() {
-    if (Information<T>::fims_information == nullptr) {
-      Information<T>::fims_information =
-          std::make_shared<fims_info::Information<T> >();
+  static std::shared_ptr<Information<Type> > GetInstance() {
+    if (Information<Type>::fims_information == nullptr) {
+      Information<Type>::fims_information =
+          std::make_shared<fims_info::Information<Type> >();
     }
-    return Information<T>::fims_information;
+    return Information<Type>::fims_information;
   }
 
   /**
@@ -135,14 +135,14 @@ class Information {
    *
    * @param p
    */
-  void RegisterParameter(T& p) { this->fixed_effects_parameters.push_back(&p); }
+  void RegisterParameter(Type& p) { this->fixed_effects_parameters.push_back(&p); }
 
   /**
    * Register a random effect as estimable.
    *
    * @param re
    */
-  void RegisterRandomEffect(T& re) {
+  void RegisterRandomEffect(Type& re) {
     this->random_effects_parameters.push_back(&re);
   }
 
@@ -164,7 +164,7 @@ class Information {
     for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
          ++it) {
       // Initialize fleet object
-      std::shared_ptr<fims_popdy::Fleet<T> > f = (*it).second;
+      std::shared_ptr<fims_popdy::Fleet<Type> > f = (*it).second;
       FIMS_LOG << "Initializing fleet " << f->id << "." << std::endl;
       f->Initialize(f->nyears, f->nages);
 
@@ -340,7 +340,7 @@ class Information {
              << this->populations.size() << " populations." << std::endl;
     for (population_iterator it = this->populations.begin();
          it != this->populations.end(); ++it) {
-      std::shared_ptr<fims_popdy::Population<T> > p = (*it).second;
+      std::shared_ptr<fims_popdy::Population<Type> > p = (*it).second;
 
       FIMS_LOG << "Setting up links from population " << p->id
                << " to fleets [ " << std::flush;
@@ -349,7 +349,7 @@ class Information {
       for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
            ++it) {
         // Initialize fleet object
-        std::shared_ptr<fims_popdy::Fleet<T> > f = (*it).second;
+        std::shared_ptr<fims_popdy::Fleet<Type> > f = (*it).second;
         // population to the individual fleets This is to pass catch at age
         // from population to fleets?
         // any shared member in p (population is pushed into fleets)
@@ -499,31 +499,31 @@ class Information {
   /**
    * @brief Get the Parameters object
    *
-   * @return std::vector<T*>&
+   * @return std::vector<Type*>&
    */
-  std::vector<T*>& GetParameters() { return parameters; }
+  std::vector<Type*>& GetParameters() { return parameters; }
 
   /**
    * @brief Get the Fixed Effects Parameters object
    *
-   * @return std::vector<T*>&
+   * @return std::vector<Type*>&
    */
-  std::vector<T*>& GetFixedEffectsParameters() {
+  std::vector<Type*>& GetFixedEffectsParameters() {
     return fixed_effects_parameters;
   }
 
   /**
    * @brief Get the Random Effects Parameters object
    *
-   * @return std::vector<T*>&
+   * @return std::vector<Type*>&
    */
-  std::vector<T*>& GetRandomEffectsParameters() {
+  std::vector<Type*>& GetRandomEffectsParameters() {
     return random_effects_parameters;
   }
 };
 
-template <typename T>
-std::shared_ptr<Information<T> > Information<T>::fims_information =
+template <typename Type>
+std::shared_ptr<Information<Type> > Information<Type>::fims_information =
     nullptr;  // singleton instance
 
 }  // namespace fims_info

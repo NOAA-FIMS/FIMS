@@ -245,10 +245,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_distributions<Type>> distribution =
+    std::shared_ptr<fims_distributions::Dmultinom<Type>> distribution =
         std::make_shared<fims_distributions::Dmultinom<Type>>();
-    std::shared_ptr<fims_distributions::Dmultinom<T>> distribution =
-        std::make_shared<fims_distributions::Dmultinom<T>>();
 
     distribution->id = this->id;
     distribution->x = Vector(x.size());

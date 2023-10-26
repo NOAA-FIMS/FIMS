@@ -24,9 +24,7 @@ namespace fims_popdy {
  * @tparam Type The type of the growth functor.
  * */
 template <typename Type>
-struct GrowthBase : public FIMSObject<Type> {
-template <typename T>
-struct GrowthBase : public fims_model_object::FIMSObject<T> {
+struct GrowthBase : public fims_model_object::FIMSObject<Type> {
   // id_g is the ID of the instance of the  growthBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
