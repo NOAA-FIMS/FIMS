@@ -21,6 +21,8 @@
 #include "../population_dynamics/selectivity/selectivity.hpp"
 #include "def.hpp"
 #include "model_object.hpp"
+#include "fims_vector.hpp"
+
 
 namespace fims_info {
 
