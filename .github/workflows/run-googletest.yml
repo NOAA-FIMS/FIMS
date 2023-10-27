@@ -14,8 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-      # Use windows-2019 instead of windows-latest to avoid using Mingw-w64 
-        os: [ubuntu-latest, macos-latest, windows-2019]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
