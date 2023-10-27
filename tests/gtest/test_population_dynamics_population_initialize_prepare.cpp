@@ -42,6 +42,14 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, Prepare_works)
     {
+        std::ofstream out("debug.txt");
+        out <<" year: "<<year<<"\n";
+        out <<" age: "<<age<<"\n";
+        out <<" i_age_year: "<<i_age_year<<"\n";
+        out <<" i_agem1_yearm1: "<<i_agem1_yearm1<<"\n";
+        out <<" nyears: "<<nyears<<"\n";
+        out <<" nages: "<<nages<<"\n";
+        
 
         // size of unfished_spawning_biomsss need to be 1 or nyears+1?
         EXPECT_EQ(
@@ -63,6 +71,8 @@ namespace
                 population.mortality_F,
                 std::vector<double>(nyears * nages, 0) // vector size type = 1 and vector value = 0)
             );
+            out <<" i: "<<i<<"\n";
+            out <<" population.mortality_F: "<<population.mortality_F[i]<<"\n";
         };
 
         for (int i = 0; i < population.expected_catch.size(); i++)
