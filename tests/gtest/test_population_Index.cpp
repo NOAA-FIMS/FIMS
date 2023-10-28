@@ -5,7 +5,7 @@
 namespace
 {
 
-    TEST_F(PopulationPrepareTestFixture, CalculateIndex_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateIndex_works)
     {
         
         std::vector<double> expected_index(nyears * nfleets, 0);

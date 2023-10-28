@@ -5,7 +5,7 @@
 namespace
 {
 
-    TEST_F(PopulationPrepareTestFixture, CalculateCatch_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateCatch_works)
     {
 
         std::vector<double> expected_catch(nyears * nfleets, 0);

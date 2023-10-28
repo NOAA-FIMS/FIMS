@@ -46,7 +46,7 @@ namespace
     int nfleets = 2;
   };
 
-  class PopulationPrepareTestFixture : public testing::Test
+  class PopulationEvaluateTestFixture : public testing::Test
   {
   protected:
     void SetUp() override
@@ -196,5 +196,75 @@ namespace
     int i_age_year = year * nages + age;
     int i_agem1_yearm1 = (year - 1) * nages + age - 1;
     
+  };
+
+  class PopulationPrepareTestFixture : public testing::Test
+  {
+  protected:
+    void SetUp() override
+    {
+      population.id_g = id_g;
+      population.nyears = nyears;
+      population.nseasons = nseasons;
+      population.nages = nages;
+      population.nfleets = nfleets;
+
+      // C++ code to set up true values for log_Fmort, and log_q:
+      int seed = 1234;
+      std::default_random_engine generator(seed);
+
+      // log_Fmort
+      double log_Fmort_min = fims::log(0.1);
+      double log_Fmort_max = fims::log(2.3);
+      std::uniform_real_distribution<double> log_Fmort_distribution(
+          log_Fmort_min, log_Fmort_max);
+
+      // log_q
+      double log_q_min = fims::log(0.1);
+      double log_q_max = fims::log(1);
+      std::uniform_real_distribution<double> log_q_distribution(log_q_min,
+                                                                log_q_max);
+
+      // Make a shared pointer to selectivity and fleet because
+      // fleet object needs a shared pointer in fleet.hpp
+      // (std::shared_ptr<fims::SelectivityBase<Type> > selectivity;)
+      // and population object needs a shared pointer in population.hpp
+      // (std::vector<std::shared_ptr<fims::Fleet<Type> > > fleets;)
+
+      for (int i = 0; i < nfleets; i++)
+      {
+        auto fleet = std::make_shared<fims::Fleet<double>>();
+        auto selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
+        selectivity->median = 7;
+        selectivity->slope = 0.5;
+
+        fleet->Initialize(nyears, nages);
+        fleet->selectivity = selectivity;
+        fleet->log_q = log_q_distribution(generator);
+        for (int year = 0; year < nyears; year++)
+        {
+          fleet->log_Fmort[year] = log_Fmort_distribution(generator);
+        }
+        if (i == 0)
+        {
+          fleet->is_survey = true;
+        }
+        fleet->Prepare();
+        population.fleets.push_back(fleet);
+      }
+
+      population.Initialize(nyears, nseasons, nages);
+
+      population.Prepare();
+    }
+
+    virtual void TearDown() {}
+
+    fims::Population<double> population;
+    int id_g = 0;
+    int nyears = 30;
+    int nseasons = 1;
+    int nages = 12;
+    int nfleets = 2;
   };
 } // namespace

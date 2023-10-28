@@ -24,15 +24,10 @@ namespace
         EXPECT_EQ(population.mortality_Z.size(), nyears * nages);
         EXPECT_EQ(population.proportion_mature_at_age.size(), (nyears+1) * nages);
         EXPECT_EQ(population.weight_at_age.size(), nages);
-        // What is unfished number at age? A vector of values before
-        // model start year or a vector of values for each model year?
-        // Is unfished biomass_at_age needed?
         EXPECT_EQ(population.unfished_numbers_at_age.size(), (nyears + 1) * nages);
         EXPECT_EQ(population.numbers_at_age.size(), (nyears + 1) * nages);
         EXPECT_EQ(population.expected_catch.size(), nyears * nfleets);
         EXPECT_EQ(population.biomass.size(), (nyears + 1));
-        // What is unfished spawning biomass? A single value before
-        // model start year or a vector of values for each year?
         EXPECT_EQ(population.unfished_spawning_biomass.size(), (nyears + 1));
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
         EXPECT_EQ(population.log_init_naa.size(), nages);
@@ -42,16 +37,7 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, Prepare_works)
     {
-        std::ofstream out("debug.txt");
-        out <<" year: "<<year<<"\n";
-        out <<" age: "<<age<<"\n";
-        out <<" i_age_year: "<<i_age_year<<"\n";
-        out <<" i_agem1_yearm1: "<<i_agem1_yearm1<<"\n";
-        out <<" nyears: "<<nyears<<"\n";
-        out <<" nages: "<<nages<<"\n";
         
-
-        // size of unfished_spawning_biomsss need to be 1 or nyears+1?
         EXPECT_EQ(
             population.unfished_spawning_biomass,
             std::vector<double>(nyears + 1, 0) // vector size type = 1 and vector value = 0
@@ -71,8 +57,6 @@ namespace
                 population.mortality_F,
                 std::vector<double>(nyears * nages, 0) // vector size type = 1 and vector value = 0)
             );
-            out <<" i: "<<i<<"\n";
-            out <<" population.mortality_F: "<<population.mortality_F[i]<<"\n";
         };
 
         for (int i = 0; i < population.expected_catch.size(); i++)
@@ -82,8 +66,6 @@ namespace
                 std::vector<double>(nyears * nfleets, 0)
             );
         };
-
-        // Do we need to use std::fill() for catchability q and log_q?
 
         // Test population.naa
         std::vector<double> naa(nages, 0);

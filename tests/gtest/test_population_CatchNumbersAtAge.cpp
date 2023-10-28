@@ -4,7 +4,7 @@
 
 namespace
 {
-    TEST_F(PopulationPrepareTestFixture, CalculateCatchNumbersAA_CalculateCatchWeightAA_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateCatchNumbersAA_CalculateCatchWeightAA_works)
     {
         // calculate catch numbers at age in population module
         population.CalculateCatchNumbersAA(i_age_year, year, age);
