@@ -37,7 +37,7 @@ namespace
     }
     }
 
-    TEST_F(PopulationPrepareTestFixture, CalculateInitialNumbersAA_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateInitialNumbersAA_works)
     {
 
         std::vector<double> numbers_at_age(nyears * nages, 0);
@@ -56,7 +56,7 @@ namespace
         }
     }
 
-    TEST_F(PopulationPrepareTestFixture, CalculateUnfishedNumbersAAandUnfishedSpawningBiomass_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateUnfishedNumbersAAandUnfishedSpawningBiomass_works)
     {
         std::vector<double> test_unfished_numbers_at_age((nyears + 1) * nages, 0);
         std::vector<double> test_unfished_spawning_biomass(nyears+1, 0);
@@ -76,11 +76,6 @@ namespace
                 if (year == 0 && age > 0){
                     
                     // values from FIMS
-                    // Bai: change CalculateUnfishedNumbersAA(i_age_year, a); in 
-                    // population.hpp to CalculateUnfishedNumbersAA(i_age_year, i_age_year-1);
-                    // or to CalculateUnfishedNumbersAA(i_age_year, a-1);?
-                    // population.CalculateUnfishedNumbersAA(i_age_year, age);
-                    // population.CalculateUnfishedNumbersAA(i_age_year, i_age_year-1);
                     population.CalculateUnfishedNumbersAA(i_age_year, age-1, age);
                     // true values from test
                     test_unfished_numbers_at_age[i_age_year] = 
@@ -94,9 +89,6 @@ namespace
                     int i_agem1_yearm1 = (year - 1) * population.nages + (age - 1);
                     EXPECT_GT(population.M[i_agem1_yearm1], 0.0);
                     // values from FIMS
-                    // Bai: change CalculateUnfishedNumbersAA(i_age_year, i_agem1_yearm1); in 
-                    // population.hpp to CalculateUnfishedNumbersAA(i_age_year, i_age_year-1); ?
-                    // Test fails if log_M from test fixture is not constant over years and ages.
                     population.CalculateUnfishedNumbersAA(i_age_year, i_agem1_yearm1, age);
                     // true values from test
                     // unfished_numbers_at_age[i_age_year] = unfished_numbers_at_age[i_age_year-1] * fims_math::exp(-fims_math::exp(population.log_M[i_age_year-1]));

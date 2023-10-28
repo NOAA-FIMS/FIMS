@@ -4,7 +4,7 @@
 
 namespace
 {
-    TEST_F(PopulationPrepareTestFixture, CalculateMaturityAA_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateMaturityAA_works)
     {        
         double inflection_point = 6;
         double slope = 0.15;

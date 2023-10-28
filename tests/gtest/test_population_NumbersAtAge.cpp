@@ -4,7 +4,7 @@
 
 namespace
 {
-    TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateNumbersAA_works)
     {
 
         std::vector<double> mortality_F(nyears * nages, 0);
@@ -21,7 +21,7 @@ namespace
         EXPECT_GT(population.numbers_at_age[i_age_year], 0);                           
     }
 
-    TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_PlusGroup_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateNumbersAA_PlusGroup_works)
     {
 
         int year = 4;
