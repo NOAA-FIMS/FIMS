@@ -15,7 +15,18 @@
 #include <memory>
 #include <vector>
 
-std::ofstream FIMS_LOG("fims.log"); /**< Log file */
+std::ofstream FIMS_LOG ("logs/fims.log");
+std::ofstream INFO_LOG("logs/info.log"); /**< Log file */
+std::ofstream ERROR_LOG("logs/error.log"); /**< Log file */
+std::ofstream DATA_LOG("logs/data.log"); /**< Log file */
+std::ofstream MODEL_LOG("logs/model.log"); /**< Log file */
+std::ofstream FLEET_LOG("logs/fleet.log"); /**< Log file */
+std::ofstream POPULATION_LOG("logs/population.log"); /**< Log file */
+std::ofstream RECRUITMENT_LOG("logs/recruitment.log"); /**< Log file */
+std::ofstream GROWTH_LOG("logs/growth.log"); /**< Log file */
+std::ofstream MATURITY_LOG("logs/maturity.log"); /**< Log file */
+std::ofstream SELECTIVITY_LOG("logs/selectivity.log"); /**< Log file */
+std::ofstream DEBUG_LOG("logs/debug/debug.log"); /**< Log file */
 
 #ifdef TMB_MODEL
 // simplify access to singletons

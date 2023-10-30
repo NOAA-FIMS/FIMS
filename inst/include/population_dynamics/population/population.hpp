@@ -152,20 +152,20 @@ struct Population : public FIMSObject<Type> {
    *
    */
   void Prepare() {
-    FIMS_LOG << " population prepare " << this->nages << std::endl;
-    FIMS_LOG << "nfleets: " << this->nfleets << std::endl;
-    FIMS_LOG << "nseasons: " << this->nseasons << std::endl;
-    FIMS_LOG << "nyears: " << this->nyears << std::endl;
+    POPULATION_LOG << " population prepare " << this->nages << std::endl;
+    POPULATION_LOG << "nfleets: " << this->nfleets << std::endl;
+    POPULATION_LOG << "nseasons: " << this->nseasons << std::endl;
+    POPULATION_LOG << "nyears: " << this->nyears << std::endl;
 
     for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
       this->fleets[fleet]->Prepare();
     }
 
-    std::fill(biomass.begin(), biomass.end(), 0);
+    std::fill(biomass.begin(), biomass.end(), 0.0);
     std::fill(unfished_spawning_biomass.begin(),
-              unfished_spawning_biomass.end(), 0);
-    std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0);
-    std::fill(expected_catch.begin(), expected_catch.end(), 0);
+              unfished_spawning_biomass.end(), 0.0);
+    std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0.0);
+    std::fill(expected_catch.begin(), expected_catch.end(), 0.0);
     std::fill(expected_recruitment.begin(), expected_recruitment.end(), 0.0);
     std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(),
               0.0);
@@ -211,7 +211,7 @@ struct Population : public FIMSObject<Type> {
         this->mortality_F[i_age_year] +=
             this->fleets[fleet_]->Fmort[year] *
             this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-        FIMS_LOG << " sel age " << ages[age] << "for fleet " << fleet_ << " is "
+        POPULATION_LOG << " sel age " << ages[age] << "for fleet " << fleet_ << " is "
                  << this->fleets[fleet_]->selectivity->evaluate(ages[age])
                  << " F mort year " << year << " "
                  << this->fleets[fleet_]->Fmort[year] << std::endl;
@@ -372,13 +372,13 @@ struct Population : public FIMSObject<Type> {
   void CalculateRecruitment(size_t i_age_year, size_t year) {
     FIMS_LOG << "recruitment 1" << std::endl;
     Type phi0 = CalculateSBPR0();
-    FIMS_LOG << "recruitment 2" << std::endl;
-    FIMS_LOG << "phi0 = " << phi0 << std::endl;
-    FIMS_LOG << "spawning biomass = " << this->spawning_biomass[year]
+    POPULATION_LOG << "recruitment 2" << std::endl;
+    POPULATION_LOG << "phi0 = " << phi0 << std::endl;
+    POPULATION_LOG << "spawning biomass = " << this->spawning_biomass[year]
              << std::endl;
-    FIMS_LOG << "rec devs = " << this->recruitment->recruit_deviations[year - 1]
+    POPULATION_LOG << "rec devs = " << this->recruitment->recruit_deviations[year - 1]
              << std::endl;
-    FIMS_LOG << "rec eval = "
+    POPULATION_LOG << "rec eval = "
              << this->recruitment->evaluate(this->spawning_biomass[year - 1],
                                             phi0)
              << std::endl;
@@ -403,14 +403,14 @@ struct Population : public FIMSObject<Type> {
                           fleet_;  // index by fleet and years to dimension fold
         size_t i_age_year = year * this->nages + age;
 
-        FIMS_LOG << " fleet " << fleet_ << " year " << year << " age " << age
+        POPULATION_LOG << " fleet " << fleet_ << " year " << year << " age " << age
                  << std::endl;
         this->expected_catch[index_yf] +=
             this->fleets[fleet_]->catch_weight_at_age[i_age_year];
 
-        FIMS_LOG << "expected catch: " << this->expected_catch[index_yf]
+        POPULATION_LOG << "expected catch: " << this->expected_catch[index_yf]
                  << std::endl;
-        FIMS_LOG << "----------------------------------------------"
+        POPULATION_LOG << "----------------------------------------------"
                  << std::endl;
 
         fleets[fleet_]->expected_catch[year] +=
@@ -434,14 +434,14 @@ struct Population : public FIMSObject<Type> {
         index_ = this->fleets[fleet_]->catch_numbers_at_age[i_age_year] *
                  growth->evaluate(ages[age]);
       } else {
-        FIMS_LOG << "fleet " << fleet_ << " is a survey" << std::endl;
+        POPULATION_LOG << "fleet " << fleet_ << " is a survey" << std::endl;
         index_ = this->fleets[fleet_]->q *
                  this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
                  this->numbers_at_age[i_age_year] *
                  growth->evaluate(ages[age]);  // this->weight_at_age[age];
       }
       fleets[fleet_]->expected_index[year] += index_;
-      FIMS_LOG << " expected index in year  " << year << " is "
+      POPULATION_LOG << " expected index in year  " << year << " is "
                << fleets[fleet_]->expected_index[year] << std::endl;
     }
   }
@@ -471,9 +471,9 @@ struct Population : public FIMSObject<Type> {
         catch_ = (this->fleets[fleet_]->selectivity->evaluate(ages[age])) *
                  this->numbers_at_age[i_age_year];
       }
-      FIMS_LOG << " F " << fleet_ << "  " << this->fleets[fleet_]->Fmort[year]
+      POPULATION_LOG << " F " << fleet_ << "  " << this->fleets[fleet_]->Fmort[year]
                << std::endl;
-      FIMS_LOG << " selectivity "
+      POPULATION_LOG << " selectivity "
                << this->fleets[fleet_]->selectivity->evaluate(ages[age])
                << std::endl;
       FIMS_LOG << " catch " << catch_ << std::endl;
@@ -494,8 +494,8 @@ struct Population : public FIMSObject<Type> {
   void CalculateCatchWeightAA(size_t year, size_t age) {
     int i_age_year = year * this->nages + age;
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      FIMS_LOG << " fleet " << fleet_ << std::endl;
-      FIMS_LOG << " catchnaa "
+      POPULATION_LOG << " fleet " << fleet_ << std::endl;
+      POPULATION_LOG << " catchnaa "
                << this->fleets[fleet_]->catch_numbers_at_age[year] << std::endl;
       FIMS_LOG << " weight " << this->growth->evaluate(ages[age]) << std::endl;
       this->fleets[fleet_]->catch_weight_at_age[i_age_year] =
@@ -661,29 +661,29 @@ struct Population : public FIMSObject<Type> {
           CalculateCatchNumbersAA(i_age_year, y, a);
 
           CalculateCatchWeightAA(y, a);
-          FIMS_LOG << "year " << y << " and age " << a << std::endl;
+          POPULATION_LOG << "year " << y << " and age " << a << std::endl;
           CalculateCatch(y, a);
           CalculateIndex(i_age_year, y, a);
         }
       }
     }
-    FIMS_LOG << "NAA\n";
+    POPULATION_LOG << "NAA\n";
+        POPULATION_LOG << numbers_at_age[i * nages + j] << "\t";
     for (size_t i = 0; i < nyears; i++) {
       for (size_t j = 0; j < nages; j++) {
-        FIMS_LOG << numbers_at_age[i * nages + j] << "\t";
       }
-      FIMS_LOG << "\n";
+      POPULATION_LOG << "\n";
     }
 
-    FIMS_LOG << "CAA\n";
+    POPULATION_LOG << "CAA\n";
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      FIMS_LOG << "Fleet " << fleet_ + 1 << "\n";
       for (size_t i = 0; i < nyears; i++) {
         for (size_t j = 0; j < nages; j++) {
-          FIMS_LOG << fleets[fleet_]->catch_numbers_at_age[i * nages + j]
+      POPULATION_LOG << "Fleet " << fleet_ + 1 << "\n";
+          POPULATION_LOG << fleets[fleet_]->catch_numbers_at_age[i * nages + j]
                    << "\t";
         }
-        FIMS_LOG << "\n";
+        POPULATION_LOG << "\n";
       }
     }
   }

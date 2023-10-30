@@ -93,11 +93,11 @@ class Model {  // may need singleton
     typename fims::Information<Type>::population_iterator it;
     for (it = this->fims_information->populations.begin();
          it != this->fims_information->populations.end(); ++it) {
-      //(*it).second points to each individual Population module
-      FIMS_LOG << "inside pop loop" << std::endl;
+      //(*it).second points to the Population module
+      MODEL_LOG << "inside pop loop" << std::endl;
       // Prepare recruitment
       (*it).second->recruitment->Prepare();
-      FIMS_LOG << "recruitment prepare works" << std::endl;
+      MODEL_LOG << "recruitment prepare works" << std::endl;
 // link to TMB objective function
 #ifdef TMB_MODEL
       (*it).second->of = this->of;
@@ -106,7 +106,7 @@ class Model {  // may need singleton
       (*it).second->Evaluate();
       // Recrtuiment negative log-likelihood
       rec_nll += (*it).second->recruitment->evaluate_nll();
-      FIMS_LOG << "rec nll: " << rec_nll << std::endl;
+      MODEL_LOG << "rec nll: " << rec_nll << std::endl;
     }
 
     // Loop over fleets/surveys, and sum up age comp and index nlls
@@ -118,6 +118,8 @@ class Model {  // may need singleton
       (*jt).second->of = this->of;
 #endif
       age_comp_nll += (*jt).second->evaluate_age_comp_nll();
+      MODEL_LOG << "survey and fleet age comp nll sum: " << age_comp_nll
+               << std::endl;
       index_nll += (*jt).second->evaluate_index_nll();
     }
 

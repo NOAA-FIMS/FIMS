@@ -131,7 +131,7 @@ inline const T logit(const T &a, const T &b, const T &x) {
  */
 template <class T>
 inline const T inv_logit(const T &a, const T &b, const T &logit_x) {
-  return a + (b - a) / (1 + fims::exp(-logit_x));
+  return a + (b - a) / (1.0 + fims::exp(-logit_x));
 }
 
 /**
@@ -195,7 +195,7 @@ const T ad_fabs(const T &x, T C = 1e-5) {
  */
 template <typename T>
 inline const T ad_min(const T &a, const T &b, T C = 1e-5) {
-  return (a + b - fims::ad_fabs(a - b, C)) * .5;
+  return (a + b - fims::ad_fabs(a - b, C)) * 0.5;
 }
 
 /**
