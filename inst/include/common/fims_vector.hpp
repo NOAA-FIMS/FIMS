@@ -204,7 +204,7 @@ public:
     
     //conversion operatrors
     
-    operator std::vector<Type>(){
+    inline operator std::vector<Type>(){
         return this->vec_m;
     }
     
@@ -220,6 +220,7 @@ public:
     }
     
 private:
+    
     
     CppAD::vector<Type> get_cppad_vector() const{
         CppAD::vector<Type> ret;
