@@ -22,10 +22,10 @@
 #include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
 
-namespace fims_popdy {
+namespace fims {
 /*TODO:
-Review, add functions to evaluate, push vectors back to fleet (or point to fleet
-directly?)
+ Review, add functions to evaluate, push vectors back to fleet (or point to fleet
+ directly?)
  */
 
 /**
@@ -34,212 +34,212 @@ directly?)
  */
 template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
-  using ParameterVector =
-      typename fims::ModelTraits<Type>::ParameterVector; /*!< the vector of
-                                                      population parameters*/
-  static uint32_t id_g; /*!< reference id for population object*/
-  size_t nyears;        /*!< total number of years in the fishery*/
-  size_t nseasons;      /*!< total number of seasons in the fishery*/
-  size_t nages;         /*!< total number of ages in the population*/
-  size_t nfleets;       /*!< total number of fleets in the fishery*/
-
-  // constants
-  const Type proportion_female =
-      0.5; /*!< Sex proportion fixed at 50/50 for M1*/
-
-  // parameters are estimated; after initialize in create_model, push_back to
-  // parameter list - in information.hpp (same for initial F in fleet)
-  std::vector<Type> log_init_naa; /*!< estimated parameter: log numbers at age*/
-  ParameterVector log_M; /*!< estimated parameter: log Natural Mortality*/
-
-  // Transformed values
-  std::vector<Type> M; /*!< transformed parameter: Natural Mortality*/
-
-  std::vector<double> ages;    /*!< vector of the ages for referencing*/
-  std::vector<double> years;   /*!< vector of years for referencing*/
-  ParameterVector mortality_F; /*!< vector of fishing mortality summed across
-                                    fleet by year and age*/
-  std::vector<Type>
-      mortality_Z; /*!< vector of total mortality by year and age*/
-
-  // derived quantities
-  std::vector<Type>
-      weight_at_age; /*!< Derived quantity: expected weight at age */
-  // fecundity removed because we don't need it yet
-  std::vector<Type> numbers_at_age; /*!< Derived quantity: population expected
-                                 numbers at age in each year*/
-  std::vector<Type>
-      unfished_numbers_at_age; /*!< Derived quantity: population expected
-                                unfished numbers at age in each year*/
-  std::vector<Type>
-      biomass; /*!< Derived quantity: total population biomass in each year*/
-  std::vector<Type> spawning_biomass; /*!< Derived quantity: Spawning_biomass*/
-  std::vector<Type> unfished_biomass; /*!< Derived quanity
-                                            biomass assuming unfished*/
-  std::vector<Type> unfished_spawning_biomass; /*!< Derived quanity Spawning
-                                            biomass assuming unfished*/
-  std::vector<Type> proportion_mature_at_age;  /*!< Derived quantity: Proportion
-                                             matura at age */
-  std::vector<Type> expected_numbers_at_age;   /*!< Expected values: Numbers at
-                                              age (thousands?? millions??) */
-  std::vector<Type> expected_catch;            /*!< Expected values: Catch*/
-  std::vector<Type> expected_recruitment;      /*!< Expected recruitment */
-  /// recruitment
-  int recruitment_id = -999; /*!< id of recruitment model object*/
-  std::shared_ptr<RecruitmentBase<Type>>
-      recruitment; /*!< shared pointer to recruitment module */
-
-  // growth
-  int growth_id = -999; /*!< id of growth model object*/
-  std::shared_ptr<GrowthBase<Type>>
-      growth; /*!< shared pointer to growth module */
-
-  // maturity
-  int maturity_id = -999; /*!< id of maturity model object*/
-  std::shared_ptr<MaturityBase<Type>>
-      maturity; /*!< shared pointer to maturity module */
-
-  // fleet
-  int fleet_id = -999; /*!< id of fleet model object*/
-  std::vector<std::shared_ptr<Fleet<Type>>>
-      fleets; /*!< shared pointer to fleet module */
-
-  // Define objective function object to be able to REPORT and ADREPORT
+    using ParameterVector =
+    typename fims::ModelTraits<Type>::ParameterVector; /*!< the vector of
+                                                  population parameters*/
+    static uint32_t id_g; /*!< reference id for population object*/
+    size_t nyears;        /*!< total number of years in the fishery*/
+    size_t nseasons;      /*!< total number of seasons in the fishery*/
+    size_t nages;         /*!< total number of ages in the population*/
+    size_t nfleets;       /*!< total number of fleets in the fishery*/
+    
+    // constants
+    const Type proportion_female =
+    0.5; /*!< Sex proportion fixed at 50/50 for M1*/
+    
+    // parameters are estimated; after initialize in create_model, push_back to
+    // parameter list - in information.hpp (same for initial F in fleet)
+    fims::Vector<Type> log_init_naa; /*!< estimated parameter: log numbers at age*/
+    fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
+    
+    // Transformed values
+    fims::Vector<Type> M; /*!< transformed parameter: Natural Mortality*/
+    
+    fims::Vector<double> ages;    /*!< vector of the ages for referencing*/
+    fims::Vector<double> years;   /*!< vector of years for referencing*/
+    fims::Vector<Type> mortality_F; /*!< vector of fishing mortality summed across
+                                     fleet by year and age*/
+    fims::Vector<Type>
+    mortality_Z; /*!< vector of total mortality by year and age*/
+    
+    // derived quantities
+    fims::Vector<Type>
+    weight_at_age; /*!< Derived quantity: expected weight at age */
+    // fecundity removed because we don't need it yet
+    fims::Vector<Type> numbers_at_age; /*!< Derived quantity: population expected
+                                        numbers at age in each year*/
+    fims::Vector<Type>
+    unfished_numbers_at_age; /*!< Derived quantity: population expected
+                              unfished numbers at age in each year*/
+    fims::Vector<Type>
+    biomass; /*!< Derived quantity: total population biomass in each year*/
+    fims::Vector<Type> spawning_biomass; /*!< Derived quantity: Spawning_biomass*/
+    fims::Vector<Type> unfished_biomass; /*!< Derived quanity
+                                          biomass assuming unfished*/
+    fims::Vector<Type> unfished_spawning_biomass; /*!< Derived quanity Spawning
+                                                   biomass assuming unfished*/
+    fims::Vector<Type> proportion_mature_at_age;  /*!< Derived quantity: Proportion
+                                                   matura at age */
+    fims::Vector<Type> expected_numbers_at_age;   /*!< Expected values: Numbers at
+                                                   age (thousands?? millions??) */
+    fims::Vector<Type> expected_catch;            /*!< Expected values: Catch*/
+    fims::Vector<Type> expected_recruitment;      /*!< Expected recruitment */
+    /// recruitment
+    int recruitment_id = -999; /*!< id of recruitment model object*/
+    std::shared_ptr<RecruitmentBase<Type>>
+    recruitment; /*!< shared pointer to recruitment module */
+    
+    // growth
+    int growth_id = -999; /*!< id of growth model object*/
+    std::shared_ptr<GrowthBase<Type>>
+    growth; /*!< shared pointer to growth module */
+    
+    // maturity
+    int maturity_id = -999; /*!< id of maturity model object*/
+    std::shared_ptr<MaturityBase<Type>>
+    maturity; /*!< shared pointer to maturity module */
+    
+    // fleet
+    int fleet_id = -999; /*!< id of fleet model object*/
+    std::vector<std::shared_ptr<Fleet<Type>>>
+    fleets; /*!< shared pointer to fleet module */
+    
+    // Define objective function object to be able to REPORT and ADREPORT
 #ifdef TMB_MODEL
   ::objective_function<Type>
       *of;  // :: references global namespace, defined in src/FIMS.cpp,
             // available anywhere in the R package
 #endif
-
-  // this -> means you're referring to a class member (member of self)
-
-  Population() { this->id = Population::id_g++; }
-
-  /**
-   * @brief Initialize values. Called once at the start of model run.
-   *
-   * @param nyears number of years in the population
-   * @param nseasons number of seasons in the population
-   * @param nages number of ages in the population
-   */
-  void Initialize(int nyears, int nseasons, int nages) {
-    this->nyears = nyears;
-    this->nseasons = nseasons;
-    this->nages = nages;
-
-    // size all the vectors to length of nages
-    nfleets = fleets.size();
-    expected_catch.resize(nyears * nfleets);
-    years.resize(nyears);
-    mortality_F.resize(nyears * nages);
-    mortality_Z.resize(nyears * nages);
-    proportion_mature_at_age.resize((nyears + 1) * nages);
-    weight_at_age.resize(nages);
-    unfished_numbers_at_age.resize((nyears + 1) * nages);
-    numbers_at_age.resize((nyears + 1) * nages);
-    biomass.resize((nyears + 1));
-    unfished_biomass.resize((nyears + 1));
-    unfished_spawning_biomass.resize((nyears + 1));
-    spawning_biomass.resize((nyears + 1));
-    expected_recruitment.resize((nyears + 1));
-    M.resize(nyears * nages);
-    ages.resize(nages);
-    log_init_naa.resize(nages);
-    log_M.resize(nyears * nages);
-  }
-
-  /**
-   * @brief Prepare to run the population loop. Called at each model iteration,
-   * and used to zero out derived quantities, values that were summed, etc.
-   *
-   */
-  void Prepare() {
-    POPULATION_LOG << " population prepare " << this->nages << std::endl;
-    POPULATION_LOG << "nfleets: " << this->nfleets << std::endl;
-    POPULATION_LOG << "nseasons: " << this->nseasons << std::endl;
-    POPULATION_LOG << "nyears: " << this->nyears << std::endl;
-
-    for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
-      this->fleets[fleet]->Prepare();
+    
+    // this -> means you're referring to a class member (member of self)
+    
+    Population() { this->id = Population::id_g++; }
+    
+    /**
+     * @brief Initialize values. Called once at the start of model run.
+     *
+     * @param nyears number of years in the population
+     * @param nseasons number of seasons in the population
+     * @param nages number of ages in the population
+     */
+    void Initialize(int nyears, int nseasons, int nages) {
+        this->nyears = nyears;
+        this->nseasons = nseasons;
+        this->nages = nages;
+        
+        // size all the vectors to length of nages
+        nfleets = fleets.size();
+        expected_catch.resize(nyears * nfleets);
+        years.resize(nyears);
+        mortality_F.resize(nyears * nages);
+        mortality_Z.resize(nyears * nages);
+        proportion_mature_at_age.resize((nyears + 1) * nages);
+        weight_at_age.resize(nages);
+        unfished_numbers_at_age.resize((nyears + 1) * nages);
+        numbers_at_age.resize((nyears + 1) * nages);
+        biomass.resize((nyears + 1));
+        unfished_biomass.resize((nyears + 1));
+        unfished_spawning_biomass.resize((nyears + 1));
+        spawning_biomass.resize((nyears + 1));
+        expected_recruitment.resize((nyears + 1));
+        M.resize(nyears * nages);
+        ages.resize(nages);
+        log_init_naa.resize(nages);
+        log_M.resize(nyears * nages);
     }
-
-    std::fill(biomass.begin(), biomass.end(), 0.0);
-    std::fill(unfished_spawning_biomass.begin(),
-              unfished_spawning_biomass.end(), 0.0);
-    std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0.0);
-    std::fill(expected_catch.begin(), expected_catch.end(), 0.0);
-    std::fill(expected_recruitment.begin(), expected_recruitment.end(), 0.0);
-    std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(),
-              0.0);
-    std::fill(mortality_Z.begin(), mortality_Z.end(), 0.0);
-
-    // Transformation Section
-    for (size_t age = 0; age < this->nages; age++) {
+    
+    /**
+     * @brief Prepare to run the population loop. Called at each model iteration,
+     * and used to zero out derived quantities, values that were summed, etc.
+     *
+     */
+    void Prepare() {
+        POPULATION_LOG << " population prepare " << this->nages << std::endl;
+        POPULATION_LOG << "nfleets: " << this->nfleets << std::endl;
+        POPULATION_LOG << "nseasons: " << this->nseasons << std::endl;
+        POPULATION_LOG << "nyears: " << this->nyears << std::endl;
+        
+        for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
+            this->fleets[fleet]->Prepare();
+        }
+        
+        std::fill(biomass.begin(), biomass.end(), 0.0);
+        std::fill(unfished_spawning_biomass.begin(),
+                  unfished_spawning_biomass.end(), 0.0);
+        std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0.0);
+        std::fill(expected_catch.begin(), expected_catch.end(), 0.0);
+        std::fill(expected_recruitment.begin(), expected_recruitment.end(), 0.0);
+        std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(),
+                  0.0);
+        std::fill(mortality_Z.begin(), mortality_Z.end(), 0.0);
+        
+        // Transformation Section
+        for (size_t age = 0; age < this->nages; age++) {
       this->weight_at_age[age] = growth->evaluate(ages[age]);
-      for (size_t year = 0; year < this->nyears; year++) {
-        size_t i_age_year = age * this->nyears + year;
-        this->M[i_age_year] = fims_math::exp(this->log_M[i_age_year]);
-        // mortality_F is a ParameterVector and therefore needs to be filled
-        // within a loop
-        this->mortality_F[i_age_year] = 0.0;
-      }
+            for (size_t year = 0; year < this->nyears; year++) {
+                size_t i_age_year = age * this->nyears + year;
+                this->M[i_age_year] = fims_math::exp(this->log_M[i_age_year]);
+                // mortality_F is a ParameterVector and therefore needs to be filled
+                // within a loop
+                this->mortality_F[i_age_year] = 0.0;
+            }
+        }
     }
-  }
-
-  /**
-   * life history calculations
-   */
-
-  /**
-   * @brief Calculates initial numbers at age for index and age
-   *
-   * @param i_age_year dimension folded index for age and year
-   * @param a age index
-   */
-  inline void CalculateInitialNumbersAA(
-      size_t i_age_year, size_t a) {  // inline all function unless complicated
-    this->numbers_at_age[i_age_year] = fims_math::exp(this->log_init_naa[a]);
-  }
-
-  /**
-   * @brief Calculates total mortality at an index, year, and age
-   *
-   * @param i_age_year dimension folded index for age and year
-   * @param year year index
-   * @param age age index
-   */
-  void CalculateMortality(size_t i_age_year, size_t year, size_t age) {
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      if (this->fleets[fleet_]->is_survey == false) {
-        this->mortality_F[i_age_year] +=
-            this->fleets[fleet_]->Fmort[year] *
+    
+    /**
+     * life history calculations
+     */
+    
+    /**
+     * @brief Calculates initial numbers at age for index and age
+     *
+     * @param i_age_year dimension folded index for age and year
+     * @param a age index
+     */
+    inline void CalculateInitialNumbersAA(
+                                          size_t i_age_year, size_t a) {  // inline all function unless complicated
+        this->numbers_at_age[i_age_year] = fims_math::exp(this->log_init_naa[a]);
+    }
+    
+    /**
+     * @brief Calculates total mortality at an index, year, and age
+     *
+     * @param i_age_year dimension folded index for age and year
+     * @param year year index
+     * @param age age index
+     */
+    void CalculateMortality(size_t i_age_year, size_t year, size_t age) {
+        for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+            if (this->fleets[fleet_]->is_survey == false) {
+                this->mortality_F[i_age_year] +=
+                this->fleets[fleet_]->Fmort[year] *
             // evaluate is a member function of the selectivity class
-            this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-        POPULATION_LOG << " selectivity at age " << ages[age] << " for fleet "
+                this->fleets[fleet_]->selectivity->evaluate(ages[age]);
+                POPULATION_LOG << " selectivity at age " << ages[age] << " for fleet "
                        << fleet_ << " is "
-                       << this->fleets[fleet_]->selectivity->evaluate(ages[age])
-                       << " apical fishing mortality F for the fleet in year "
-                       << year << " is " << this->fleets[fleet_]->Fmort[year]
+                      << this->fleets[fleet_]->selectivity->evaluate(ages[age])
+                      << " apical fishing mortality F for the fleet in year "
+                      << year << " is " << this->fleets[fleet_]->Fmort[year]
                        << std::endl;
-      }
-    }
-    POPULATION_LOG << "M in calculate mortality is " << this->M[i_age_year]
-                   << std::endl;
-    this->mortality_Z[i_age_year] =
+            }
+        }
+        POPULATION_LOG << "M in calculate mortality is " << this->M[i_age_year]
+              << std::endl;
+        this->mortality_Z[i_age_year] =
         this->M[i_age_year] + this->mortality_F[i_age_year];
-  }
-
-  /**
-   * @brief Calculates numbers at age at year and age specific indices
-   *
-   * @param i_age_year dimension folded index for age and year
-   * @param i_agem1_yearm1 dimension folded index for age-1 and year-1
-   * @param age age index
-   */
-  inline void CalculateNumbersAA(size_t i_age_year, size_t i_agem1_yearm1,
-                                 size_t age) {
-    // using Z from previous age/year
-    this->numbers_at_age[i_age_year] =
+    }
+    
+    /**
+     * @brief Calculates numbers at age at year and age specific indices
+     *
+     * @param i_age_year dimension folded index for age and year
+     * @param i_agem1_yearm1 dimension folded index for age-1 and year-1
+     * @param age age index
+     */
+    inline void CalculateNumbersAA(size_t i_age_year, size_t i_agem1_yearm1,
+                                   size_t age) {
+        // using Z from previous age/year
+        this->numbers_at_age[i_age_year] =
         this->numbers_at_age[i_agem1_yearm1] *
 
         (fims_math::exp(-this->mortality_Z[i_agem1_yearm1]));
