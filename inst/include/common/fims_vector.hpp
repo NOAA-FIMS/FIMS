@@ -141,7 +141,7 @@ public:
         this->vec_m.shrink_to_fit();
     }
     
-    //Modifiers
+    //modifiers
     
     void clear() {
         this->vec_m.clear();
@@ -202,10 +202,8 @@ public:
         this->vec_m.swap(other.vec_m);
     }
     
-    
-    
-    
     //conversion operatrors
+    
     operator std::vector<Type>(){
         return this->vec_m;
     }
