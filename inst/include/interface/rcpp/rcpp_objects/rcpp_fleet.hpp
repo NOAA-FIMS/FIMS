@@ -132,11 +132,11 @@ class FleetInterface : public FleetInterfaceBase {
 #ifdef TMB_MODEL
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<Type> > info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::Fleet<Type> > fleet =
-        std::make_shared<fims::Fleet<Type> >();
+    std::shared_ptr<fims_popdy::Fleet<Type> > fleet =
+        std::make_shared<fims_popdy::Fleet<Type> >();
 
     // set relative info
     fleet->id = this->id;

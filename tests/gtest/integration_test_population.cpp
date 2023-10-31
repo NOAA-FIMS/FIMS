@@ -39,7 +39,7 @@ namespace
                 input = input_.GetObject();
                 output = output_.GetObject();
                 // Declare singleton of population class
-                fims::Population<double> pop;
+                fims_popdy::Population<double> pop;
 
                 // ConfigurePopulationModel, RunModelLoop, and CheckModelOutput
                 // methods are in integration_class.hpp
@@ -76,7 +76,7 @@ namespace
                 // When obtaining the numeric values, GetDouble() will convert internal integer representation 
                 // to a double. Note that, int and unsigned can be safely converted to double, 
                 // but int64_t and uint64_t may lose precision (since mantissa of double is only 52-bits).
-                double log_rzero = fims::log(R_0[0].GetDouble()); 
+                double log_rzero = fims_math::log(R_0[0].GetDouble()); 
 
                 it = input.find("Phi.0");
                 JsonArray &Phi0 = (*it).second.GetArray();;
@@ -91,12 +91,12 @@ namespace
                         // Expect FIMS value is greater than 0.0
                         EXPECT_GT(pop.unfished_numbers_at_age[i_age_year], 0.0)
                             << "differ at index " << i_age_year << "; year " << year << "; age" << age;
-                        EXPECT_LE(pop.unfished_numbers_at_age[i_age_year], fims::exp(log_rzero))
+                        EXPECT_LE(pop.unfished_numbers_at_age[i_age_year], fims_math::exp(log_rzero))
                             << "differ at index " << i_age_year << "; year " << year << "; age" << age;
 
                         EXPECT_GT(pop.unfished_spawning_biomass[year], 0.0)
                             << "differ at index " << i_age_year << "; year " << year << "; age" << age;
-                        EXPECT_LE(pop.unfished_spawning_biomass[year], fims::exp(log_rzero) * phi_0)
+                        EXPECT_LE(pop.unfished_spawning_biomass[year], fims_math::exp(log_rzero) * phi_0)
                             << "differ at index " << i_age_year << "; year " << year << "; age" << age;
 
                         EXPECT_GT(pop.unfished_biomass[year], 0.0)

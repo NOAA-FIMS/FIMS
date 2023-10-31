@@ -16,7 +16,7 @@ namespace
       EXPECT_EQ(1.0, 1.0);
       
       // create a new ewaa singleton class
-      fims::EWAAgrowth<double> ewaa1;
+      fims_popdy::EWAAgrowth<double> ewaa1;
       // set the ewaa values using an initializer list
       // std::pair is a class template that provides a way to store two heterogeneous objects as a single unit
       ewaa1.ewaa = 
@@ -37,7 +37,7 @@ namespace
   TEST(growth_evaluate, double_age_input)
   {
       // create a new ewaa singleton class
-      fims::EWAAgrowth<double> ewaa2;
+      fims_popdy::EWAAgrowth<double> ewaa2;
       // set the ewaa values 
       ewaa2.ewaa = 
       std::map<double,double> 

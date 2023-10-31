@@ -84,7 +84,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   virtual double evaluate(double spawners, double ssbzero) {
-    fims::SRBevertonHolt<double> BevHolt;
+    fims_popdy::SRBevertonHolt<double> BevHolt;
 
     BevHolt.logit_steep = this->logit_steep.value_m;
     if (this->logit_steep.value_m == 1.0) {
@@ -99,7 +99,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   }
 
   virtual double evaluate_nll() {
-    fims::SRBevertonHolt<double> NLL;
+    fims_popdy::SRBevertonHolt<double> NLL;
 
     NLL.log_sigma_recruit = this->log_sigma_recruit.value_m;
     NLL.recruit_deviations.resize(deviations.size());  // Vector from TMB
@@ -115,11 +115,11 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<Type> > info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::SRBevertonHolt<Type> > recruitment =
-        std::make_shared<fims::SRBevertonHolt<Type> >();
+    std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > recruitment =
+        std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
 
     // set relative info
     recruitment->id = this->id;

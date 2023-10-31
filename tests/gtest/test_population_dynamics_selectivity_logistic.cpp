@@ -8,7 +8,7 @@ namespace
   TEST(logistic_selectivity, create_object)
   {
     
-    fims::LogisticSelectivity<double> fishery_selectivity;
+    fims_popdy::LogisticSelectivity<double> fishery_selectivity;
     fishery_selectivity.median = 20.5;
     fishery_selectivity.slope = 0.2;
     double fishery_x = 40.5;

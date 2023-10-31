@@ -21,11 +21,11 @@ Type objective_function<Type>::operator()() {
     // code below copied from ModularTMBExample/src/tmb_objective_function.cpp
 
     // get the singleton instance for Model Class
-    std::shared_ptr<fims::Model<Type>> model =
-      fims::Model<Type>::GetInstance();
+    std::shared_ptr<fims_model::Model<Type>> model =
+      fims_model::Model<Type>::GetInstance();
     // get the singleton instance for Information Class
-    std::shared_ptr<fims::Information<Type>> information =
-      fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type>> information =
+      fims_info::Information<Type>::GetInstance();
 
     //update the parameter values
     for(size_t i =0; i < information->fixed_effects_parameters.size(); i++){

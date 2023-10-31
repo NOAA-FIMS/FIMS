@@ -69,7 +69,7 @@ create_fims_rcpp_interface <- function(interface_name = character(),
 
   if (!is.null(evaluate_parameter)) {
     cat(paste0("  virtual double evaluate(", evaluate_parameter_type, " ", evaluate_parameter, ") {\n"))
-    cat(paste0("    fims::", model, "<double> object;\n"))
+    cat(paste0("    fims_popdy::", model, "<double> object;\n"))
     for (i in 1:length(parameters)) {
       cat(paste0("    object.", parameters[i], " = this->", parameters[i], ".value;\n"))
     }
@@ -78,20 +78,20 @@ create_fims_rcpp_interface <- function(interface_name = character(),
 
   cat("  virtual bool add_to_fims_tmb(){\n")
   for (i in 1:4) {
-    cat(paste0("   std::shared_ptr<fims::Information<", types[i]))
+    cat(paste0("   std::shared_ptr<fims_info::Information<", types[i]))
     cat(paste("> >", itypes[i]))
     cat(" =\n")
-    cat("    fims::Information<")
+    cat("    fims_info::Information<")
     cat(types[i])
     cat(">::GetInstance();\n\n")
-    cat("   std::shared_ptr<fims::")
+    cat("   std::shared_ptr<fims_popdy::")
     cat(model)
     cat("<")
     cat(types[i])
     cat("> > ")
     cat(mtypes[i])
     cat(" =\n")
-    cat("   std::make_shared<fims::")
+    cat("   std::make_shared<fims_popdy::")
     cat(model)
     cat("<")
     cat(types[i])

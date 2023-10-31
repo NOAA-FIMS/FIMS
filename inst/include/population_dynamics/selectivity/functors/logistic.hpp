@@ -14,7 +14,7 @@
 #include "../../../common/fims_math.hpp"
 #include "selectivity_base.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /**
  *  @brief LogisticSelectivity class that returns the logistic function value
@@ -41,7 +41,7 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
    * size in selectivity).
    */
   virtual const Type evaluate(const Type& x) {
-    return fims::logistic<Type>(median, slope, x);
+    return fims_math::logistic<Type>(median, slope, x);
   }
 };
 

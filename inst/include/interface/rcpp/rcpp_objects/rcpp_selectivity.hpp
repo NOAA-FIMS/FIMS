@@ -75,7 +75,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    * size in selectivity).
    */
   virtual double evaluate(double x) {
-    fims::LogisticSelectivity<double> LogisticSel;
+    fims_popdy::LogisticSelectivity<double> LogisticSel;
     LogisticSel.median = this->median.value_m;
     LogisticSel.slope = this->slope.value_m;
     return LogisticSel.evaluate(x);
@@ -85,11 +85,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<Type> > info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::LogisticSelectivity<Type> > selectivity =
-        std::make_shared<fims::LogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity =
+        std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
 
     // set relative info
     selectivity->id = this->id;
@@ -154,7 +154,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
    * size in selectivity).
    */
   virtual double evaluate(double x) {
-    fims::DoubleLogisticSelectivity<double> DoubleLogisticSel;
+    fims_popdy::DoubleLogisticSelectivity<double> DoubleLogisticSel;
     DoubleLogisticSel.median_asc = this->median_asc.value_m;
     DoubleLogisticSel.slope_asc = this->slope_asc.value_m;
     DoubleLogisticSel.median_desc = this->median_desc.value_m;
@@ -166,11 +166,11 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<Type> > info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::DoubleLogisticSelectivity<Type> > selectivity =
-        std::make_shared<fims::DoubleLogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<Type> > selectivity =
+        std::make_shared<fims_popdy::DoubleLogisticSelectivity<Type> >();
 
     // set relative info
     selectivity->id = this->id;

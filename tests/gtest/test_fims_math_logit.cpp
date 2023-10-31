@@ -31,7 +31,7 @@ namespace
 
     for (int i = 0; i < expect_value.size(); ++i)
     {
-      EXPECT_NEAR(fims::inv_logit(min_value[i], max_value[i], logit_x_value[i]), 
+      EXPECT_NEAR(fims_math::inv_logit(min_value[i], max_value[i], logit_x_value[i]), 
       expect_value[i], 0.0001);
     }
   }
@@ -45,8 +45,8 @@ namespace
 
     for (int i = 0; i < x_value.size(); ++i)
     {
-      EXPECT_EQ(fims::inv_logit(min_value[i], max_value[i], 
-      fims::logit(min_value[i], max_value[i], x_value[i])),
+      EXPECT_EQ(fims_math::inv_logit(min_value[i], max_value[i], 
+      fims_math::logit(min_value[i], max_value[i], x_value[i])),
       x_value[i]); 
     }
   }
@@ -60,8 +60,8 @@ namespace
 
     for (int i = 0; i < x_value.size(); ++i)
     {
-      EXPECT_EQ(fims::logit(min_value[i], max_value[i], 
-      fims::inv_logit(min_value[i], max_value[i], x_value[i])),
+      EXPECT_EQ(fims_math::logit(min_value[i], max_value[i], 
+      fims_math::inv_logit(min_value[i], max_value[i], x_value[i])),
       x_value[i]); 
     }
 

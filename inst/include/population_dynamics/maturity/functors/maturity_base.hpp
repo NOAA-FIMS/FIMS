@@ -16,7 +16,7 @@
 
 #include "../../../common/model_object.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /** @brief Base class for all maturity functors.
  *
@@ -24,7 +24,7 @@ namespace fims {
  */
 
 template <typename Type>
-struct MaturityBase : public FIMSObject<Type> {
+struct MaturityBase : public fims_model_object::FIMSObject<Type> {
   // id_g is the ID of the instance of the MaturityBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of

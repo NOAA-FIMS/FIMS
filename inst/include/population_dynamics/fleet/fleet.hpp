@@ -15,19 +15,19 @@
 #include "../../distributions/distributions.hpp"
 #include "../selectivity/selectivity.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /** @brief Base class for all fleets.
  *
  * @tparam Type The type of the fleet object.
  **/
 template <class Type>
-struct Fleet : public FIMSObject<Type> {
+struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
   using ParameterVector =
-      typename ModelTraits<Type>::ParameterVector; /*!< vector of fleet
+      typename fims::ModelTraits<Type>::ParameterVector; /*!< vector of fleet
                                                       parameters */
 
   // This likelihood index is not currently being used as only one likelihood
@@ -36,27 +36,27 @@ struct Fleet : public FIMSObject<Type> {
       -999; /*!<id of index likelihood component. The "fleet_" prefix indicates
                it belongs to the Fleet struct, and the "_m" postfix signifies
                that it's a member variable.*/
-  std::shared_ptr<fims::DistributionsBase<Type>>
+  std::shared_ptr<fims_distributions::DistributionsBase<Type>>
       index_likelihood; /*!< index likelihood component*/
 
   // This likelihood index is not currently being used as only one likelihood
   // distribution is available. These are for a future update M2+.
   int fleet_agecomp_likelihood_id_m =
       -999; /*!< id of agecomp likelihood component*/
-  std::shared_ptr<fims::DistributionsBase<Type>>
+  std::shared_ptr<fims_distributions::DistributionsBase<Type>>
       agecomp_likelihood; /*!< agecomp likelihood component*/
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
-  std::shared_ptr<fims::SelectivityBase<Type>>
+  std::shared_ptr<SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
 
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
-  std::shared_ptr<fims::DataObject<Type>>
+  std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_index_data; /*!< observed index data*/
 
   int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
-  std::shared_ptr<fims::DataObject<Type>>
+  std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_agecomp_data; /*!< observed agecomp data*/
 
   // Mortality and catchability
@@ -122,7 +122,7 @@ struct Fleet : public FIMSObject<Type> {
    */
   void Prepare() {
     // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
-    // this -> Fmort[fleet_] = fims::exp(this -> log_Fmort[fleet_]);
+    // this -> Fmort[fleet_] = fims_math::exp(this -> log_Fmort[fleet_]);
 
     // derived quantities
     std::fill(catch_at_age.begin(), catch_at_age.end(),
@@ -138,29 +138,29 @@ struct Fleet : public FIMSObject<Type> {
               0); /*!<model expected catch at age*/
     std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
               0); /*!<model expected weight at age*/
-    this->q = fims::exp(this->log_q);
+    this->q = fims_math::exp(this->log_q);
     for (size_t year = 0; year < this->nyears; year++) {
       FIMS_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
       FIMS_LOG << "input q " << this->log_q << std::endl;
-      this->Fmort[year] = fims::exp(this->log_Fmort[year]);
+      this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
     }
   }
 
   virtual const Type evaluate_age_comp_nll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
 #ifdef TMB_MODEL
-    fims::Dmultinom<Type> dmultinom;
+    fims_distributions::Dmultinom<Type> dmultinom;
     size_t dims = this->observed_agecomp_data->get_imax() *
                   this->observed_agecomp_data->get_jmax();
     if (dims != this->catch_numbers_at_age.size()) {
-      fims_log::get("fleet.log") << "Error: observed age comp is of size "
+      fims::fims_log::get("fleet.log") << "Error: observed age comp is of size "
                                  << dims << " and expected is of size "
                                  << this->age_composition.size() << std::endl;
     } else {
       for (size_t y = 0; y < this->nyears; y++) {
         // EigenVector declares a vector type from the Eigen library, which is
         // the expected type for TMB's dmultinom
-        using Vector = typename ModelTraits<Type>::EigenVector;
+        using Vector = typename fims::ModelTraits<Type>::EigenVector;
         Vector observed_acomp;
         Vector expected_acomp;
 
@@ -178,7 +178,7 @@ struct Fleet : public FIMSObject<Type> {
                               sum;  // probabilities for ages
 
           observed_acomp[a] = this->observed_agecomp_data->at(y, a);
-          fims_log::get("fleet.log")
+          fims::fims_log::get("fleet.log")
               << " age " << a << " in year " << y
               << "has expected: " << expected_acomp[a]
               << "  and observed: " << observed_acomp[a] << std::endl;
@@ -197,20 +197,20 @@ struct Fleet : public FIMSObject<Type> {
     Type nll = 0.0; /*!< The negative log likelihood value */
 
 #ifdef TMB_MODEL
-    fims::Dnorm<Type> dnorm;
-    dnorm.sd = fims::exp(this->log_obs_error);
+    fims_distributions::Dnorm<Type> dnorm;
+    dnorm.sd = fims_math::exp(this->log_obs_error);
     for (size_t i = 0; i < this->expected_index.size(); i++) {
-      dnorm.x = fims::log(this->observed_index_data->at(i));
-      dnorm.mean = fims::log(this->expected_index[i]);
+      dnorm.x = fims_math::log(this->observed_index_data->at(i));
+      dnorm.mean = fims_math::log(this->expected_index[i]);
       nll -= dnorm.evaluate(true);
-      fims_log::get("fleet.log")
+      fims::fims_log::get("fleet.log")
           << "observed likelihood component: " << i << " is "
           << this->observed_index_data->at(i)
           << " and expected is: " << this->expected_index[i] << std::endl;
     }
-    fims_log::get("fleet.log")
+    fims::fims_log::get("fleet.log")
         << " log obs error is: " << this->log_obs_error << std::endl;
-    fims_log::get("fleet.log") << " sd is: " << dnorm.sd << std::endl;
+    fims::fims_log::get("fleet.log") << " sd is: " << dnorm.sd << std::endl;
 #endif
     return nll;
   }
@@ -220,6 +220,6 @@ struct Fleet : public FIMSObject<Type> {
 template <class Type>
 uint32_t Fleet<Type>::id_g = 0;
 
-}  // end namespace fims
+}  // end namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

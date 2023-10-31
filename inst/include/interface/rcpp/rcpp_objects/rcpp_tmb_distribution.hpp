@@ -81,7 +81,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return log pdf
    */
   virtual double evaluate(bool do_log) {
-    fims::Dnorm<double> dnorm;
+    fims_distributions::Dnorm<double> dnorm;
     dnorm.x = this->x.value_m;
     dnorm.mean = this->mean.value_m;
     dnorm.sd = this->sd.value_m;
@@ -92,11 +92,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<Type>> info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::Dnorm<Type>> distribution =
-        std::make_shared<fims::Dnorm<Type>>();
+    std::shared_ptr<fims_distributions::Dnorm<Type>> distribution =
+        std::make_shared<fims_distributions::Dnorm<Type>>();
 
     // interface to data/parameter value
     distribution->id = this->id;
@@ -154,7 +154,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return log pdf
    */
   virtual double evaluate(bool do_log) {
-    fims::Dlnorm<double> dlnorm;
+    fims_distributions::Dlnorm<double> dlnorm;
     dlnorm.x = this->x.value_m;
     dlnorm.meanlog = this->meanlog.value_m;
     dlnorm.sdlog = this->sdlog.value_m;
@@ -165,11 +165,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<Type>> info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::Dlnorm<Type>> distribution =
-        std::make_shared<fims::Dlnorm<Type>>();
+    std::shared_ptr<fims_distributions::Dlnorm<Type>> distribution =
+        std::make_shared<fims_distributions::Dlnorm<Type>>();
 
     // set relative info
     distribution->id = this->id;
@@ -225,7 +225,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @return log pdf
    */
   virtual double evaluate(bool do_log) {
-    fims::Dmultinom<double> dmultinom;
+    fims_distributions::Dmultinom<double> dmultinom;
     // Decale TMBVector in this scope
     typedef typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector;
     dmultinom.x = Vector(x.size());  // Vector from TMB
@@ -242,11 +242,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     typedef typename fims::ModelTraits<Type>::EigenVector Vector;
-    std::shared_ptr<fims::Information<Type>> info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::Dmultinom<Type>> distribution =
-        std::make_shared<fims::Dmultinom<Type>>();
+    std::shared_ptr<fims_distributions::Dmultinom<Type>> distribution =
+        std::make_shared<fims_distributions::Dmultinom<Type>>();
 
     distribution->id = this->id;
     distribution->x = Vector(x.size());

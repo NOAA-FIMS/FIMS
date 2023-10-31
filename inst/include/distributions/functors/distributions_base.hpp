@@ -17,7 +17,7 @@
 #include "../../common/model_object.hpp"
 #include "../../interface/interface.hpp"
 
-namespace fims {
+namespace fims_distributions {
 
 /** @brief Base class for all module_name functors.
  *
@@ -25,7 +25,7 @@ namespace fims {
  *
  */
 template <typename Type>
-struct DistributionsBase : public FIMSObject<Type> {
+struct DistributionsBase : public fims_model_object::FIMSObject<Type> {
   // id_g is the ID of the instance of the DistributionsBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -50,6 +50,6 @@ struct DistributionsBase : public FIMSObject<Type> {
 template <typename Type>
 uint32_t DistributionsBase<Type>::id_g = 0;
 
-}  // namespace fims
+}  // namespace fims_distributions
 
 #endif /* DISTRIBUTIONS_BASE_HPP */
