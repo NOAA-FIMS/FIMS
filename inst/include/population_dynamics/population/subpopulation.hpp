@@ -40,6 +40,6 @@ namespace fims_popdy {
 template <typename Type>
 class Subpopulation {};
 
-}  // namespace fims
+}  // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP */

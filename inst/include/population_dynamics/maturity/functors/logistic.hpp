@@ -37,11 +37,11 @@ struct LogisticMaturity : public MaturityBase<Type> {
    * @param x  The independent variable in the logistic function (e.g., age or
    * size at maturity).
    */
-  virtual const Type evaluate(const Type & x) {
+  virtual const Type evaluate(const Type& x) {
     return fims_math::logistic<Type>(median, slope, x);
   }
 };
 
-}  // namespace fims
+}  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP */

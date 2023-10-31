@@ -26,8 +26,8 @@ namespace fims_math {
 /**
  * @brief The exponential function.
  *
- * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is an
- * integer.
+ * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is
+ * an integer.
  * @return the exponentiated value
  */
 template <class Type>
@@ -37,8 +37,8 @@ inline const Type exp(const Type &x) {
 
 /**
  * @brief The natural log function (base e)
- * @param x the value to take the log of. Please use fims_math::log<double>(x) if x
- * is an integer.
+ * @param x the value to take the log of. Please use fims_math::log<double>(x)
+ * if x is an integer.
  * @return
  */
 template <class Type>
@@ -54,8 +54,8 @@ inline const Type log(const Type &x) {
  * @brief The exponential function.
  * The code cannot be tested using the compilation flag
  * -DTMB_MODEL through CMake and Google Test
- * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is an
- * integer.
+ * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is
+ * an integer.
  * @return the exponentiated value
  */
 template <class Type>
@@ -73,8 +73,8 @@ inline const double exp(const double &x) {
  * @brief The natural log function (base e)
  * The code cannot be tested using the compilation flag
  * -DTMB_MODEL through CMake and Google Test.
- * @param x the value to take the log of. Please use fims_math::log<double>(x) if x
- * is an integer.
+ * @param x the value to take the log of. Please use fims_math::log<double>(x)
+ * if x is an integer.
  * @return the log of the value
  */
 template <class Type>
@@ -100,7 +100,8 @@ inline const double log(const double &x) {
  * @return
  */
 template <class Type>
-inline const Type logistic(const Type &median, const Type &slope, const Type &x) {
+inline const Type logistic(const Type &median, const Type &slope,
+                           const Type &x) {
   return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
 }
 
@@ -155,8 +156,8 @@ inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
 
 template <class Type>
 inline const Type double_logistic(const Type &median_asc, const Type &slope_asc,
-                               const Type &median_desc, const Type &slope_desc,
-                               const Type &x) {
+                                  const Type &median_desc,
+                                  const Type &slope_desc, const Type &x) {
   return (1.0) / (1.0 + exp(-1.0 * slope_asc * (x - median_asc))) *
          (1.0 - (1.0) / (1.0 + exp(-1.0 * slope_desc * (x - median_desc))));
 }
