@@ -24,20 +24,37 @@ setwd(working_dir)
 on.exit(setwd(working_dir), add = TRUE)
 # Set-up Rcpp modules and fix parameters to "true"
 setup_fims <- function(om_input, om_output, em_input) {
+  # create new R environment in which to conduct tests
   test_env <- new.env(parent = emptyenv())
+  # initialize FIMS model
   test_env$fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
   # Recruitment
-  test_env$recruitment <- new(test_env$fims$BevertonHoltRecruitment)
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
-  # before the likelihood calculation
+  # create new module in the recruitment class (specifically Beverton-Holt,
+  # when there are other option, this would be where the option would be chosen)
+  test_env$recruitment <- methods::new(test_env$fims$BevertonHoltRecruitment)
+
+  # NOTE: in first set of parameters below (for recruitment), 
+  # $is_random_effect (default is FALSE) and $estimated (default is FALSE) 
+  # are defined even if they match the defaults in order to provide an example 
+  # of how that is done. Other sections of the code below leave defaults in 
+  # place as appropriate.
+
+  # set up logR_sd
+  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
+  # taken before the likelihood calculation
   test_env$recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
+  test_env$recruitment$log_sigma$is_random_effect <- FALSE
+  test_env$recruitment$log_sigma$estimated <- FALSE
+    # set up log_rzero (equilibrium recruitment)
   test_env$recruitment$log_rzero$value <- log(om_input$R0)
   test_env$recruitment$log_rzero$is_random_effect <- FALSE
   test_env$recruitment$log_rzero$estimated <- TRUE
+  # set up logit_steep
   test_env$recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
   test_env$recruitment$logit_steep$is_random_effect <- FALSE
   test_env$recruitment$logit_steep$estimated <- FALSE
+  # turn on estimation of deviations
   test_env$recruitment$estimate_deviations <- TRUE
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
