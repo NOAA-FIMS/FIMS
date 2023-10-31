@@ -267,7 +267,7 @@ within:</p>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>is considered to be a part of the <code>fims</code> namespace. C++
 classes written within the <code>fims</code> namespace can be accessed
-within the C++ code base using <code>fims::</code>.</p>
+within the C++ code base using <code>fims_popdy::</code>.</p>
 <p>There are some exceptions where <a href="https://github.com/kaskr/adcomp/wiki" class="external-link">TMB</a> specific code is
 referenced within the <code>fims</code> namespace. In these cases, code
 is written within an <code>#ifdef TMB_MODEL</code> wrapper, which means
@@ -284,16 +284,16 @@ specific data type definitions:</p>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifdef TMB_MODEL</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"> *  </span><span class="an">@brief</span><span class="co"> ModelTraits class that contains the DataVector</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"> *  </span><span class="an">@brief</span><span class="co"> fims::ModelTraits class that contains the DataVector</span></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"> * and ParameterVector types.</span></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> T<span class="op">&gt;</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> ModelTraits <span class="op">{</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> CppAD<span class="op">::</span>vector<span class="op">&lt;</span>T<span class="op">&gt;</span> DataVector<span class="op">;</span>      <span class="co">/**&lt; This is a vector</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> Type<span class="op">&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> fims<span class="op">::</span>ModelTraits <span class="op">{</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> CppAD<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span> DataVector<span class="op">;</span>      <span class="co">/**&lt; This is a vector</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">        of the data that is differentiable */</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> CppAD<span class="op">::</span>vector<span class="op">&lt;</span>T<span class="op">&gt;</span> ParameterVector<span class="op">;</span> <span class="co">/**&lt; This is a</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> CppAD<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span> ParameterVector<span class="op">;</span> <span class="co">/**&lt; This is a</span></span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">  vector of the parameters that is differentiable */</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> tmbutils<span class="op">::</span>vector<span class="op">&lt;</span>T<span class="op">&gt;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> tmbutils<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span></span>
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>      EigenVector<span class="op">;</span> <span class="co">/**&lt; This is a vector as defined in TMB's namespace Eigen */</span></span>
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
 <span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif </span><span class="co">/* TMB_MODEL */</span></span>
@@ -319,15 +319,15 @@ namespace. In our maturity example, this would be the
 defined in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp" class="external-link">logistic.hpp</a>
 in the directory <a href="https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors" class="external-link">inst/include/population_dynamics/maturity/functors</a>.</p>
 <p>Within the rcpp_maturity.hpp file, we can link to the
-<code>fims::Information</code> class in order to register maturity
+<code>fims_info::Information</code> class in order to register maturity
 parameters and specify whether or not they are random effects. We do
 this by setting up two pointers in the interface: d0 which points to
 information, and lm0, which points to the logistic maturity module.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode cpp rcppchunk"><code class="sourceCode cpp"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">//file: rcpp_maturity.hpp</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">//d0 is a shared pointer that points to fims::Information</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims<span class="op">::</span>Information<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;</span> <span class="op">&gt;</span> d0 <span class="op">=</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        fims<span class="op">::</span>Information<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;::</span>GetInstance<span class="op">();</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">//d0 is a shared pointer that points to fims_info::Information</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_info<span class="op">::</span>Information<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;</span> <span class="op">&gt;</span> d0 <span class="op">=</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        fims_info<span class="op">::</span>Information<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;::</span>GetInstance<span class="op">();</span></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a> <span class="cf">if</span> <span class="op">(</span><span class="kw">this</span><span class="op">-&gt;</span>median<span class="op">.</span>estimated<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span><span class="kw">this</span><span class="op">-&gt;</span>median<span class="op">.</span>is_random_effect<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="co">/*</span></span>
@@ -345,14 +345,14 @@ information, and lm0, which points to the logistic maturity module.</p>
 <span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        d0<span class="op">-&gt;</span>RegisterParameter<span class="op">(</span>lm0<span class="op">-&gt;</span>median<span class="op">);</span></span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
 <span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div>
-<p>Linking to the <code>fims::LogisticMaturity</code> class allows us to
-link the values input from R with the values used in model
+<p>Linking to the <code>fims_popdy::LogisticMaturity</code> class allows
+us to link the values input from R with the values used in model
 calculation:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode cpp rcppchunk"><code class="sourceCode cpp"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">//file: rcpp_maturity.hpp</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">//lm0 is a shared pointer that points to fims::LogisticMaturity</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims<span class="op">::</span>LogisticMaturity<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;</span> <span class="op">&gt;</span> lm0 <span class="op">=</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">std::</span>make_shared<span class="op">&lt;</span>fims<span class="op">::</span>LogisticMaturity<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;</span> <span class="op">&gt;();</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">//lm0 is a shared pointer that points to fims_popdy::LogisticMaturity</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>LogisticMaturity<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;</span> <span class="op">&gt;</span> lm0 <span class="op">=</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">std::</span>make_shared<span class="op">&lt;</span>fims_popdy<span class="op">::</span>LogisticMaturity<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;</span> <span class="op">&gt;();</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a> </span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"> the median value from LogisticMaturity (lm0-&gt;median)</span></span>
@@ -360,15 +360,15 @@ calculation:</p>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>lm0<span class="op">-&gt;</span>median <span class="op">=</span> <span class="kw">this</span><span class="op">-&gt;</span>median<span class="op">.</span>value<span class="op">;</span></span></code></pre></div>
 <p>We can also link these two pointers together so that the
-<strong>fims::Information</strong> class links up with the
-<strong>fims::LogisticMaturity</strong>, but more details on this
+<strong>fims_<a href="info::Information" class="uri">info::Information</a></strong> class links up with the
+<strong>fims_popdy::LogisticMaturity</strong>, but more details on this
 later.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode cpp rcppchunk"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">//file: rcpp_maturity.hpp</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"> the maturity_models pointer from Information that matches the </span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"> id of the fims::LogisticMaturity class is equal to the pointer </span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"> to fims::LogisticMaturity </span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"> id of the fims_popdy::LogisticMaturity class is equal to the pointer </span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"> to fims_popdy::LogisticMaturity </span></span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>d0<span class="op">-&gt;</span>maturity_models<span class="op">[</span>lm0<span class="op">-&gt;</span>id<span class="op">]</span> <span class="op">=</span> lm0<span class="op">;</span></span></code></pre></div>
 <p>The <span class="math inline">\(\color{#c55a11}{\text{`add_to_fims_tmb()`}}\)</span>
@@ -378,7 +378,7 @@ parameters along with their first, second, and third derivatives.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="inside-the-fimslogisticmaturity-class">Inside the <code>fims::LogisticMaturity</code> class<a class="anchor" aria-label="anchor" href="#inside-the-fimslogisticmaturity-class"></a>
+<h2 id="inside-the-fims_popdylogisticmaturity-class">Inside the <code>fims_popdy::LogisticMaturity</code> class<a class="anchor" aria-label="anchor" href="#inside-the-fims_popdylogisticmaturity-class"></a>
 </h2>
 <p>The <code>LogisticMaturity</code> class in the <code>fims</code>
 namespace defined in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp" class="external-link">logistic.hpp</a>
@@ -389,20 +389,20 @@ input, <em>x</em> and returns the output from a logistic function
 in the directory <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common" class="external-link">inst/include/common</a>)
 using the class member <code>median</code> and <code>slope</code>
 values.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode cpp fimschunk"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> fims <span class="op">{</span></span>
+<div class="sourceCode" id="cb14"><pre class="sourceCode cpp fimschunk"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> fims_popdy <span class="op">{</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"> *  </span><span class="an">@brief</span><span class="co"> LogisticMaturity class that returns the logistic function value</span></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"> * from fims_math.</span></span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> T<span class="op">&gt;</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> LogisticMaturity <span class="op">:</span> <span class="kw">public</span> MaturityBase<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  T median<span class="op">;</span> <span class="co">/*!&lt; 50% quantile of the value of the quantity of interest (x); e.g.,</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> Type<span class="op">&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> LogisticMaturity <span class="op">:</span> <span class="kw">public</span> MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  Type median<span class="op">;</span> <span class="co">/*!&lt; 50% quantile of the value of the quantity of interest (x); e.g.,</span></span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">               age at which 50% of the fish are mature */</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  T slope<span class="op">;</span>  <span class="co">/*!&lt;scalar multiplier of difference between quantity of interest</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  Type slope<span class="op">;</span>  <span class="co">/*!&lt;scalar multiplier of difference between quantity of interest</span></span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">               value (x) and median */</span></span>
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  LogisticMaturity<span class="op">()</span> <span class="op">:</span> MaturityBase<span class="op">&lt;</span>T<span class="op">&gt;()</span> <span class="op">{}</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  LogisticMaturity<span class="op">()</span> <span class="op">:</span> MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;()</span> <span class="op">{}</span></span>
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">/**</span></span>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">   * </span><span class="an">@brief</span><span class="co"> Method of the logistic maturity class that implements the</span></span>
@@ -411,8 +411,8 @@ values.</p>
 <span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co">   * </span><span class="an">@param</span><span class="co"> </span><span class="cv">x</span><span class="co">  The independent variable in the logistic function (e.g., age or</span></span>
 <span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co">   * size at maturity).</span></span>
 <span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">   */</span></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="at">const</span> T evaluate<span class="op">(</span><span class="at">const</span> T<span class="op">&amp;</span> x<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fims<span class="op">::</span>logistic<span class="op">&lt;</span>T<span class="op">&gt;(</span>median<span class="op">,</span> slope<span class="op">,</span> x<span class="op">);</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="at">const</span> Type evaluate<span class="op">(</span><span class="at">const</span> Type<span class="op">&amp;</span> x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fims_math<span class="op">::</span>logistic<span class="op">&lt;</span>Type<span class="op">&gt;(</span>median<span class="op">,</span> slope<span class="op">,</span> x<span class="op">);</span></span>
 <span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
 <span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a></span>
@@ -433,7 +433,7 @@ population.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode cpp fimschunk"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">//file: inst/include/population_dynamics/population/population.hpp</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">// maturity is a shared pointer to MaturityBase</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> maturity_id <span class="op">=</span> <span class="op">-</span><span class="dv">999</span><span class="op">;</span> <span class="co">/*!&lt; id of maturity model object*/</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims<span class="op">::</span>MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;&gt;</span></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>      maturity<span class="op">;</span> <span class="co">/*!&lt; shared pointer to maturity module */</span></span></code></pre></div>
 <p>The <code>maturity_id</code> was set from R using the
 <code>SetMaturity()</code> method from the
@@ -446,15 +446,15 @@ class we are using in this example, <code>LogisticMaturity</code> (child
 class). <code>MaturityBase</code> has an <code>evaluate</code> method
 with input arguments that match the inputs of each child class:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode cpp fimschunk"><code class="sourceCode cpp"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">//file: inst/include/population_dynamics/maturity/functors/maturity_base.hpp</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> fims <span class="op">{</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> fims_popdy <span class="op">{</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">/** </span><span class="an">@brief</span><span class="co"> Base class for all maturity functors.</span></span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"> *</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@tparam</span><span class="co"> </span><span class="cv">T</span><span class="co"> The type of the maturity functor.</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"> * </span><span class="an">@tparam</span><span class="co"> </span><span class="cv">TypeThe</span><span class="co"> type of the maturity functor.</span></span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> T<span class="op">&gt;</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> MaturityBase <span class="op">:</span> <span class="kw">public</span> FIMSObject<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> Type<span class="op">&gt;</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> MaturityBase <span class="op">:</span> <span class="kw">public</span> fims_model_object<span class="op">::</span>FIMSObject<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">{</span></span>
 <span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// id_g is the ID of the instance of the MaturityBase class.</span></span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// this is like a memory tracker.</span></span>
 <span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Assigning each one its own ID is a way to keep track of</span></span>
@@ -473,7 +473,7 @@ with input arguments that match the inputs of each child class:</p>
 <span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="co">   * </span><span class="an">@param</span><span class="co"> </span><span class="cv">x</span><span class="co"> The independent variable in the maturity function (e.g., logistic</span></span>
 <span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="co">   * maturity at age or size).</span></span>
 <span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a><span class="co">   */</span></span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="at">const</span> T evaluate<span class="op">(</span><span class="at">const</span> T<span class="op">&amp;</span> x<span class="op">)</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="at">const</span> Type evaluate<span class="op">(</span><span class="at">const</span> Type<span class="op">&amp;</span> x<span class="op">)</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
 <span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
 <p>The evaluate function is a <a href="https://www.geeksforgeeks.org/virtual-function-cpp/" class="external-link">virtual C++
 function</a>, which means the function can be overwritten by functions
@@ -536,16 +536,16 @@ unique maturity module for each population or subset of populations.</p>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"> The first component of the map is a uint32_t which </span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"> will be used to hold the ID.</span></span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"> The second component of the map is the shared pointer, </span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"> maturity_models, that points to fims::MaturityBase</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"> maturity_models, that points to fims_popdy::MaturityBase</span></span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">uint32_t</span><span class="op">,</span> <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims<span class="op">::</span>MaturityBase<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">uint32_t</span><span class="op">,</span> <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;</span></span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>      maturity_models<span class="op">;</span> <span class="co">/*!&lt;hash map to link each object to its shared location</span></span>
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co">                          in memory*/</span></span>
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co">//Next we set up the iterator, which will be used to loop </span></span>
 <span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co">//over all defined maturity modules</span></span>
 <span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">uint32_t</span><span class="op">,</span> </span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>                          <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims<span class="op">::</span>MaturityBase<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;::</span>iterator</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>                          <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;::</span>iterator</span>
 <span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>      maturity_models_iterator<span class="op">;</span></span></code></pre></div>
 <p><img src="figures/fims-path-maturity-5.png" width="100%"></p>
 <p>Next, let’s revisit the line of code that was written in the Rcpp
@@ -558,7 +558,7 @@ in the directory <a href="https://github.com/NOAA-FIMS/FIMS/tree/main/inst/inclu
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"> the maturity_models pointer from Information that matches the id of the </span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"> fims::LogisticMaturity class is equal to the pointer to fims::LogisticMaturity </span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"> fims_popdy::LogisticMaturity class is equal to the pointer to fims_popdy::LogisticMaturity </span></span>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>d0<span class="op">-&gt;</span>maturity_models<span class="op">[</span>lm0<span class="op">-&gt;</span>id<span class="op">]</span> <span class="op">=</span> lm0<span class="op">;</span></span></code></pre></div>
 <p><img src="figures/fims-path-maturity-6.png" width="100%"></p>
@@ -568,11 +568,11 @@ population so that <code>population-&gt;maturity</code> points to the
 <code>MaturityBase</code>. First we set up a map in
 <code>Information</code> that points to <code>Population</code>.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode cpp infochunk"><code class="sourceCode cpp"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">//file: inst/include/common/information.hpp</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">uint32_t</span><span class="op">,</span> <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims<span class="op">::</span>Population<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">uint32_t</span><span class="op">,</span> <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>Population<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>      populations<span class="op">;</span> <span class="co">/*!&lt;hash map to link each object to its shared location in</span></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">                      memory*/</span></span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">uint32_t</span><span class="op">,</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                            <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims<span class="op">::</span>Population<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;::</span>iterator</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                            <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>Population<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;::</span>iterator</span>
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>      population_iterator<span class="op">;</span></span>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">/**&lt; iterator for population objects&gt;*/</span></span></code></pre></div>
 <p><img src="figures/fims-path-maturity-7.png" width="100%"></p>
@@ -581,7 +581,7 @@ population so that <code>population-&gt;maturity</code> points to the
 <div class="sourceCode" id="cb22"><pre class="sourceCode cpp infochunk"><code class="sourceCode cpp"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">//file: inst/include/common/information.hpp</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a> <span class="cf">for</span> <span class="op">(</span>population_iterator it <span class="op">=</span> <span class="kw">this</span><span class="op">-&gt;</span>populations<span class="op">.</span>begin<span class="op">();</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>             it <span class="op">!=</span> <span class="kw">this</span><span class="op">-&gt;</span>populations<span class="op">.</span>end<span class="op">();</span> <span class="op">++</span>it<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>          <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims<span class="op">::</span>Population<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">&gt;</span> p <span class="op">=</span> <span class="op">(*</span>it<span class="op">).</span>second<span class="op">;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>          <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>Population<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">&gt;</span> p <span class="op">=</span> <span class="op">(*</span>it<span class="op">).</span>second<span class="op">;</span></span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>          <span class="op">...</span></span></code></pre></div>
 <p>In this code chunk, <code>(*it)</code> refers to a single population
 in the <code>populations</code> map. The second element of the map is
@@ -688,8 +688,8 @@ maturity, which are C++ maps. The first element of the map is the ID,
 the second element of the map is the pointer to the Population or
 Maturity class:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># std::map&lt;uint32_t, std::shared_ptr&lt;fims::MaturityBase&lt;T&gt; &gt; &gt; maturity_models;</span></span>
-<span><span class="co"># std::map&lt;uint32_t, std::shared_ptr&lt;fims::Population&lt;T&gt; &gt; &gt; populations;</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># std::map&lt;uint32_t, std::shared_ptr&lt;fims_popdy::MaturityBase&lt;Type&gt; &gt; &gt; maturity_models;</span></span>
+<span><span class="co"># std::map&lt;uint32_t, std::shared_ptr&lt;fims_popdy::Population&lt;Type&gt; &gt; &gt; populations;</span></span></code></pre></div>
 <p>We can then link up the pointers in information to each respective
 module:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
@@ -719,7 +719,7 @@ out.</p>
 <span>  <span class="co">#            it != this-&gt;populations.end(); ++it) {</span></span>
 <span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">information</span><span class="op">$</span><span class="va">populations</span><span class="op">[[</span><span class="va">it</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span>  <span class="co"># std::shared_ptr&lt;fims::Population&lt;T&gt; &gt; p = (*it).second;</span></span>
+<span>  <span class="co"># std::shared_ptr&lt;fims_popdy::Population&lt;Type&gt; &gt; p = (*it).second;</span></span>
 <span></span>
 <span>  <span class="va">maturity_uint</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">$</span><span class="va">pointer</span><span class="op">$</span><span class="va">maturity_id</span></span>
 <span>  <span class="co"># uint32_t maturity_uint = static_cast&lt;uint32_t&gt;(p-&gt;maturity_id);</span></span>

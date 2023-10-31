@@ -147,7 +147,7 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   virtual double evaluate(bool do_log) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::Dnorm&lt;double&gt; object;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_popdy::Dnorm&lt;double&gt; object;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     object.x = this-&gt;x.value;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     object.mean = this-&gt;mean.value;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     object.sd = this-&gt;sd.value;</span>
@@ -156,11 +156,11 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   virtual bool add_to_fims_tmb(){</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Information&lt;TMB_FIMS_REAL_TYPE&gt; &gt; d0 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::Information&lt;TMB_FIMS_REAL_TYPE&gt;::GetInstance();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_info::Information&lt;TMB_FIMS_REAL_TYPE&gt; &gt; d0 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_info::Information&lt;TMB_FIMS_REAL_TYPE&gt;::GetInstance();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Dnorm&lt;TMB_FIMS_REAL_TYPE&gt; &gt; model0 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims::Dnorm&lt;TMB_FIMS_REAL_TYPE&gt; &gt;();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_popdy::Dnorm&lt;TMB_FIMS_REAL_TYPE&gt; &gt; model0 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims_popdy::Dnorm&lt;TMB_FIMS_REAL_TYPE&gt; &gt;();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model0-&gt;id = this-&gt;id;</span>
@@ -191,11 +191,11 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d0-&gt;distribution_models[model0-&gt;id]=model0;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Information&lt;TMB_FIMS_FIRST_ORDER&gt; &gt; d1 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::Information&lt;TMB_FIMS_FIRST_ORDER&gt;::GetInstance();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_info::Information&lt;TMB_FIMS_FIRST_ORDER&gt; &gt; d1 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_info::Information&lt;TMB_FIMS_FIRST_ORDER&gt;::GetInstance();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Dnorm&lt;TMB_FIMS_FIRST_ORDER&gt; &gt; model1 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims::Dnorm&lt;TMB_FIMS_FIRST_ORDER&gt; &gt;();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_popdy::Dnorm&lt;TMB_FIMS_FIRST_ORDER&gt; &gt; model1 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims_popdy::Dnorm&lt;TMB_FIMS_FIRST_ORDER&gt; &gt;();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model1-&gt;id = this-&gt;id;</span>
@@ -226,11 +226,11 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d1-&gt;distribution_models[model1-&gt;id]=model1;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Information&lt;TMB_FIMS_SECOND_ORDER&gt; &gt; d2 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::Information&lt;TMB_FIMS_SECOND_ORDER&gt;::GetInstance();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_info::Information&lt;TMB_FIMS_SECOND_ORDER&gt; &gt; d2 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_info::Information&lt;TMB_FIMS_SECOND_ORDER&gt;::GetInstance();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Dnorm&lt;TMB_FIMS_SECOND_ORDER&gt; &gt; model2 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims::Dnorm&lt;TMB_FIMS_SECOND_ORDER&gt; &gt;();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_popdy::Dnorm&lt;TMB_FIMS_SECOND_ORDER&gt; &gt; model2 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims_popdy::Dnorm&lt;TMB_FIMS_SECOND_ORDER&gt; &gt;();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model2-&gt;id = this-&gt;id;</span>
@@ -261,11 +261,11 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d2-&gt;distribution_models[model2-&gt;id]=model2;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Information&lt;TMB_FIMS_THIRD_ORDER&gt; &gt; d3 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::Information&lt;TMB_FIMS_THIRD_ORDER&gt;::GetInstance();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_info::Information&lt;TMB_FIMS_THIRD_ORDER&gt; &gt; d3 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_info::Information&lt;TMB_FIMS_THIRD_ORDER&gt;::GetInstance();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Dnorm&lt;TMB_FIMS_THIRD_ORDER&gt; &gt; model3 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims::Dnorm&lt;TMB_FIMS_THIRD_ORDER&gt; &gt;();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_popdy::Dnorm&lt;TMB_FIMS_THIRD_ORDER&gt; &gt; model3 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims_popdy::Dnorm&lt;TMB_FIMS_THIRD_ORDER&gt; &gt;();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model3-&gt;id = this-&gt;id;</span>
@@ -337,7 +337,7 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   virtual double evaluate(double x) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::LogisticSelectivity&lt;double&gt; object;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_popdy::LogisticSelectivity&lt;double&gt; object;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     object.slope = this-&gt;slope.value;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     object.median = this-&gt;median.value;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     return object.evaluate(double);</span>
@@ -345,11 +345,11 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   virtual bool add_to_fims_tmb(){</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Information&lt;TMB_FIMS_REAL_TYPE&gt; &gt; d0 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::Information&lt;TMB_FIMS_REAL_TYPE&gt;::GetInstance();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_info::Information&lt;TMB_FIMS_REAL_TYPE&gt; &gt; d0 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_info::Information&lt;TMB_FIMS_REAL_TYPE&gt;::GetInstance();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::LogisticSelectivity&lt;TMB_FIMS_REAL_TYPE&gt; &gt; model0 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims::LogisticSelectivity&lt;TMB_FIMS_REAL_TYPE&gt; &gt;();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_popdy::LogisticSelectivity&lt;TMB_FIMS_REAL_TYPE&gt; &gt; model0 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims_popdy::LogisticSelectivity&lt;TMB_FIMS_REAL_TYPE&gt; &gt;();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model0-&gt;id = this-&gt;id;</span>
@@ -372,11 +372,11 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d0-&gt;selectivity_models[model0-&gt;id]=model0;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Information&lt;TMB_FIMS_FIRST_ORDER&gt; &gt; d1 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::Information&lt;TMB_FIMS_FIRST_ORDER&gt;::GetInstance();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_info::Information&lt;TMB_FIMS_FIRST_ORDER&gt; &gt; d1 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_info::Information&lt;TMB_FIMS_FIRST_ORDER&gt;::GetInstance();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::LogisticSelectivity&lt;TMB_FIMS_FIRST_ORDER&gt; &gt; model1 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims::LogisticSelectivity&lt;TMB_FIMS_FIRST_ORDER&gt; &gt;();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_popdy::LogisticSelectivity&lt;TMB_FIMS_FIRST_ORDER&gt; &gt; model1 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims_popdy::LogisticSelectivity&lt;TMB_FIMS_FIRST_ORDER&gt; &gt;();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model1-&gt;id = this-&gt;id;</span>
@@ -399,11 +399,11 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d1-&gt;selectivity_models[model1-&gt;id]=model1;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Information&lt;TMB_FIMS_SECOND_ORDER&gt; &gt; d2 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::Information&lt;TMB_FIMS_SECOND_ORDER&gt;::GetInstance();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_info::Information&lt;TMB_FIMS_SECOND_ORDER&gt; &gt; d2 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_info::Information&lt;TMB_FIMS_SECOND_ORDER&gt;::GetInstance();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::LogisticSelectivity&lt;TMB_FIMS_SECOND_ORDER&gt; &gt; model2 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims::LogisticSelectivity&lt;TMB_FIMS_SECOND_ORDER&gt; &gt;();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_popdy::LogisticSelectivity&lt;TMB_FIMS_SECOND_ORDER&gt; &gt; model2 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims_popdy::LogisticSelectivity&lt;TMB_FIMS_SECOND_ORDER&gt; &gt;();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model2-&gt;id = this-&gt;id;</span>
@@ -426,11 +426,11 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d2-&gt;selectivity_models[model2-&gt;id]=model2;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::Information&lt;TMB_FIMS_THIRD_ORDER&gt; &gt; d3 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     fims::Information&lt;TMB_FIMS_THIRD_ORDER&gt;::GetInstance();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_info::Information&lt;TMB_FIMS_THIRD_ORDER&gt; &gt; d3 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     fims_info::Information&lt;TMB_FIMS_THIRD_ORDER&gt;::GetInstance();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims::LogisticSelectivity&lt;TMB_FIMS_THIRD_ORDER&gt; &gt; model3 =</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims::LogisticSelectivity&lt;TMB_FIMS_THIRD_ORDER&gt; &gt;();</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::shared_ptr&lt;fims_popdy::LogisticSelectivity&lt;TMB_FIMS_THIRD_ORDER&gt; &gt; model3 =</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    std::make_shared&lt;fims_popdy::LogisticSelectivity&lt;TMB_FIMS_THIRD_ORDER&gt; &gt;();</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model3-&gt;id = this-&gt;id;</span>
