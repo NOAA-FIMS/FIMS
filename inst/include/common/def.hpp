@@ -15,7 +15,7 @@
 #include <memory>
 #include <vector>
 
-std::ofstream FIMS_LOG ("logs/fims.log");
+std::ofstream FIMS_LOG ("logs/fims.log"); /**< Log file */
 std::ofstream INFO_LOG("logs/info.log"); /**< Log file */
 std::ofstream ERROR_LOG("logs/error.log"); /**< Log file */
 std::ofstream DATA_LOG("logs/data.log"); /**< Log file */
