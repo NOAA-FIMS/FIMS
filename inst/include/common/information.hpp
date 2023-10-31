@@ -176,14 +176,14 @@ class Information {
         uint32_t observed_index_id =
             static_cast<uint32_t>(f->fleet_observed_index_data_id_m);
         data_iterator it = this->data_objects.find(observed_index_id);
-        FIMS_LOG << "Input fleet index id = " << observed_index_id << "."
+        INFO_LOG << "Input fleet index id = " << observed_index_id << "."
                  << std::endl;
 
         if (it != this->data_objects.end()) {
           f->observed_index_data = (*it).second;
           INFO_LOG << "Index data successfully set." << std::endl;
           DATA_LOG << "" << std::endl;
-          DATA_LOG << "Observed input for fleet " << f->id << ", index " << index_id << ": \n " << f->observed_index_data->at(1)
+          DATA_LOG << "Observed input for fleet " << f->id << ", index " << observed_index_id << ": \n " << f->observed_index_data->at(1)
           << std::endl;
         } else {
           valid_model = false;
@@ -206,14 +206,14 @@ class Information {
         uint32_t observed_agecomp_id =
             static_cast<uint32_t>(f->fleet_observed_agecomp_data_id_m);
         data_iterator it = this->data_objects.find(observed_agecomp_id);
-        FIMS_LOG << "Input fleet age comp id = " << observed_agecomp_id << "."
+        INFO_LOG << "Input fleet age comp id = " << observed_agecomp_id << "."
                  << std::endl;
 
         if (it != this->data_objects.end()) {
           f->observed_agecomp_data = (*it).second;
           INFO_LOG << "Age comp data successfully set." << std::endl;
           DATA_LOG << "" << std::endl;
-          DATA_LOG << "Observed input age comp for fleet " << f->id << ", comp " << agecomp_id << ": \n " << f->observed_agecomp_data->at(1)
+          DATA_LOG << "Observed input age comp for fleet " << f->id << ", comp " << observed_agecomp_id << ": \n " << f->observed_agecomp_data->at(1)
           << std::endl;
         } else {
           valid_model = false;

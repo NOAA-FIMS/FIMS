@@ -217,7 +217,7 @@ struct Population : public FIMSObject<Type> {
                  << this->fleets[fleet_]->Fmort[year] << std::endl;
       }
     }
-    FIMS_LOG << "M in calculate mortality is " << this->M[i_age_year]
+    POPULATION_LOG << "M in calculate mortality is " << this->M[i_age_year]
              << std::endl;
     this->mortality_Z[i_age_year] =
         this->M[i_age_year] + this->mortality_F[i_age_year];
@@ -236,7 +236,7 @@ struct Population : public FIMSObject<Type> {
     this->numbers_at_age[i_age_year] =
         this->numbers_at_age[i_agem1_yearm1] *
         (fims::exp(-this->mortality_Z[i_agem1_yearm1]));
-    FIMS_LOG << " z at i_agem1_yearm1 = " << i_agem1_yearm1 << " is "
+    POPULATION_LOG << " z at i_agem1_yearm1 = " << i_agem1_yearm1 << " is "
              << this->mortality_Z[i_agem1_yearm1] << std::endl;
     // Plus group calculation
     if (age == (this->nages - 1)) {
@@ -260,7 +260,7 @@ struct Population : public FIMSObject<Type> {
     this->unfished_numbers_at_age[i_age_year] =
         this->unfished_numbers_at_age[i_agem1_yearm1] *
         (fims::exp(-this->M[i_agem1_yearm1]));
-    FIMS_LOG << "survival rate at index " << i_agem1_yearm1 << " is "
+    POPULATION_LOG << "survival rate at index " << i_agem1_yearm1 << " is "
              << fims::exp(-(this->M[i_agem1_yearm1])) << std::endl;
     // Plus group calculation
     if (age == (this->nages - 1)) {
@@ -281,8 +281,8 @@ struct Population : public FIMSObject<Type> {
   void CalculateBiomass(size_t i_age_year, size_t year, size_t age) {
     this->biomass[year] +=
         this->numbers_at_age[i_age_year] * growth->evaluate(ages[age]);
-    FIMS_LOG << " age " << ages[age] << std::endl;
-    FIMS_LOG << "growth evaluate: " << growth->evaluate(ages[age])
+    POPULATION_LOG << " age " << ages[age] << std::endl;
+    POPULATION_LOG << "growth evaluate: " << growth->evaluate(ages[age])
              << " biomass inputs----- +++\n";
   }
 
@@ -311,7 +311,7 @@ struct Population : public FIMSObject<Type> {
                                     this->numbers_at_age[i_age_year] *
                                     this->proportion_mature_at_age[i_age_year] *
                                     growth->evaluate(ages[age]);
-    FIMS_LOG << " proportion female " << this->proportion_female << " "
+    POPULATION_LOG << " proportion female " << this->proportion_female << " "
              << " mature age " << age << " is "
              << this->proportion_mature_at_age[i_age_year] << " "
              << " numbers at age " << this->numbers_at_age[i_age_year] << " "
@@ -370,7 +370,7 @@ struct Population : public FIMSObject<Type> {
    * @param year the year recruitment is being calculated for
    */
   void CalculateRecruitment(size_t i_age_year, size_t year) {
-    FIMS_LOG << "recruitment 1" << std::endl;
+    POPULATION_LOG << "recruitment 1" << std::endl;
     Type phi0 = CalculateSBPR0();
     POPULATION_LOG << "recruitment 2" << std::endl;
     POPULATION_LOG << "phi0 = " << phi0 << std::endl;
@@ -386,7 +386,7 @@ struct Population : public FIMSObject<Type> {
         this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
         this->recruitment->recruit_deviations[year];
     this->expected_recruitment[year] = this->numbers_at_age[i_age_year];
-    FIMS_LOG << " numbers at age at indexya " << i_age_year << " is "
+    POPULATION_LOG << " numbers at age at indexya " << i_age_year << " is "
              << this->numbers_at_age[i_age_year] << std::endl;
   }
 
@@ -476,7 +476,7 @@ struct Population : public FIMSObject<Type> {
       POPULATION_LOG << " selectivity "
                << this->fleets[fleet_]->selectivity->evaluate(ages[age])
                << std::endl;
-      FIMS_LOG << " catch " << catch_ << std::endl;
+      POPULATION_LOG << " catch " << catch_ << std::endl;
       // this->catch_numbers_at_age[i_age_yearf] += catch_;
       // catch_numbers_at_age for the fleet module has different
       // dimensions (year/age, not year/fleet/age)
@@ -497,11 +497,11 @@ struct Population : public FIMSObject<Type> {
       POPULATION_LOG << " fleet " << fleet_ << std::endl;
       POPULATION_LOG << " catchnaa "
                << this->fleets[fleet_]->catch_numbers_at_age[year] << std::endl;
-      FIMS_LOG << " weight " << this->growth->evaluate(ages[age]) << std::endl;
+      POPULATION_LOG << " weight " << this->growth->evaluate(ages[age]) << std::endl;
       this->fleets[fleet_]->catch_weight_at_age[i_age_year] =
           this->fleets[fleet_]->catch_numbers_at_age[i_age_year] *
           this->growth->evaluate(ages[age]);  // this->weight_at_age[age];
-      FIMS_LOG << " catch_waa "
+      POPULATION_LOG << " catch_waa "
                << this->fleets[fleet_]->catch_weight_at_age[i_age_year]
                << std::endl;
     }
@@ -517,16 +517,16 @@ struct Population : public FIMSObject<Type> {
   void CalculateMaturityAA(size_t i_age_year, size_t age) {
     // this->maturity is pointing to the maturity module, which has
     //  an evaluate function. -> can be nested.
-    FIMS_LOG << " age " << age << std::endl;
-    FIMS_LOG << " ages size " << this->ages.size() << std::endl;
-    FIMS_LOG << " i_age_year " << i_age_year << std::endl;
-    FIMS_LOG << "p mature" << this->proportion_mature_at_age[i_age_year]
+    POPULATION_LOG << " age " << age << std::endl;
+    POPULATION_LOG << " ages size " << this->ages.size() << std::endl;
+    POPULATION_LOG << " i_age_year " << i_age_year << std::endl;
+    POPULATION_LOG << "p mature" << this->proportion_mature_at_age[i_age_year]
              << std::endl;
-    FIMS_LOG << this->ages[age] << std::endl;
+    POPULATION_LOG << this->ages[age] << std::endl;
     this->proportion_mature_at_age[i_age_year] =
         this->maturity->evaluate(ages[age]);
 
-    FIMS_LOG << "p mature set to " << this->proportion_mature_at_age[i_age_year]
+    POPULATION_LOG << "p mature set to " << this->proportion_mature_at_age[i_age_year]
              << std::endl;
   }
 
@@ -632,7 +632,7 @@ struct Population : public FIMSObject<Type> {
           if (a == 0) {
             // Set the nrecruits for age a=0 year y (use pointers instead of
             // functional returns) assuming fecundity = 1 and 50:50 sex ratio
-            FIMS_LOG << "Recruitment: " << std::endl;
+            POPULATION_LOG << "Recruitment: " << std::endl;
             CalculateRecruitment(i_age_year, y);
             this->unfished_numbers_at_age[i_age_year] =
                 fims::exp(this->recruitment->log_rzero);
@@ -645,7 +645,7 @@ struct Population : public FIMSObject<Type> {
           CalculateBiomass(i_age_year, y, a);
           CalculateSpawningBiomass(i_age_year, y, a);
 
-          FIMS_LOG << "index ya: " << i_age_year << std::endl;
+          POPULATION_LOG << "index age year: " << i_age_year << std::endl;
           CalculateUnfishedBiomass(i_age_year, y, a);
           CalculateUnfishedSpawningBiomass(i_age_year, y, a);
         }
@@ -657,7 +657,7 @@ struct Population : public FIMSObject<Type> {
         terminal year.
          */
         if (y < this->nyears) {
-          FIMS_LOG << i_age_year << std::endl;
+          POPULATION_LOG << i_age_year << std::endl;
           CalculateCatchNumbersAA(i_age_year, y, a);
 
           CalculateCatchWeightAA(y, a);
@@ -667,10 +667,11 @@ struct Population : public FIMSObject<Type> {
         }
       }
     }
+
     POPULATION_LOG << "NAA\n";
-        POPULATION_LOG << numbers_at_age[i * nages + j] << "\t";
     for (size_t i = 0; i < nyears; i++) {
       for (size_t j = 0; j < nages; j++) {
+        POPULATION_LOG << numbers_at_age[i * nages + j] << "\t";
       }
       POPULATION_LOG << "\n";
     }
