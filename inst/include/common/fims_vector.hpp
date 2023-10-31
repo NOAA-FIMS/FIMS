@@ -31,10 +31,10 @@ public:
     Vector(){
     }
     
-    Vector(size_t size){
-        this->vec_m.resize(size);
+    Vector(size_t size, const Type& value = Type()){
+        this->vec_m.resize(size, value = Type());
     }
-    
+
     Vector(const Vector<Type>& other){
         this->vec_m.resize(other.size());
         for(int i =0; i < this->vec_m.size(); i++){
