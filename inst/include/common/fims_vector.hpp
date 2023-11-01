@@ -50,6 +50,20 @@ public:
         this->vec_m = other;
     }
     
+#ifdef TMB_MODEL
+    
+    Vector(const tmbutils::vector<Type>& other){
+        this->vec_m.resize(other.size());
+        for(size_t i =0; i < this->vec_m.size(); i++){
+            this->vec_m[i] = other[i];
+        }
+    }
+    
+    
+#endif
+    
+    
+    
     inline Type& operator[](size_t n){
         return this->vec_m[n];
     }
@@ -234,7 +248,7 @@ private:
     CppAD::vector<Type> get_cppad_vector() const{
         CppAD::vector<Type> ret;
         ret.resize(this->vec_m.size());
-        for(int i =0; i < this->vec_m.size(); i++){
+        for(size_t i =0; i < this->vec_m.size(); i++){
             ret[i] = this->vec_m[i];
         }
         return ret;
@@ -243,7 +257,7 @@ private:
     tmbutils::vector<Type> get_tmb_vector() const{
         tmbutils::vector<Type> ret;
         ret.resize(this->vec_m.size());
-        for(int i =0; i < this->vec_m.size(); i++){
+        for(size_t i =0; i < this->vec_m.size(); i++){
             ret[i] = this->vec_m[i];
         }
         return ret;
