@@ -175,7 +175,7 @@ test_that("deterministic test of fims", {
   fims_logR0 <- sdr_fixed[1, "Estimate"]
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input$R0))
-  
+
   # Numbers at age
   for (i in 1:length(c(t(om_output$N.age)))) {
     expect_equal(report$naa[[1]][i], c(t(om_output$N.age))[i])
@@ -197,7 +197,7 @@ test_that("deterministic test of fims", {
   )
 
   for (i in 1:length(om_output$N.age[, 1])) {
-     expect_equal(fims_naa[i, 1], om_output$N.age[i, 1])
+    expect_equal(fims_naa[i, 1], om_output$N.age[i, 1])
   }
 
   expect_equal(
@@ -219,7 +219,7 @@ test_that("deterministic test of fims", {
   fims_index <- report$exp_index
   # Expect small relative error for deterministic test
   for (i in 1:length(om_output$L.mt$fleet1)) {
-    expect_equal(fims_index[[1]][i],om_output$L.mt$fleet1[i])
+    expect_equal(fims_index[[1]][i], om_output$L.mt$fleet1[i])
   }
 
   # Expect small relative error for deterministic test
@@ -227,7 +227,7 @@ test_that("deterministic test of fims", {
   for (i in 1:length(em_input$L.obs$fleet1)) {
     fims_object_are[i] <- abs(fims_index[[1]][i] - em_input$L.obs$fleet1[i]) / em_input$L.obs$fleet1[i]
   }
-  
+
   # Expect 95% of relative error to be within 2*cv
   expect_lte(sum(fims_object_are > om_input$cv.L$fleet1 * 2.0), length(em_input$L.obs$fleet1) * 0.05)
 
@@ -261,7 +261,7 @@ test_that("deterministic test of fims", {
   }
   # Expect 95% of relative error to be within 2*cv
   expect_lte(sum(fims_object_are > om_input$cv.survey$survey1 * 2.0), length(em_input$surveyB.obs$survey1) * 0.05)
- 
+
   # Expected catch number at age in proportion
   fims_cnaa <- matrix(report$cnaa[[2]][1:(om_input$nyr * om_input$nages)],
     nrow = om_input$nyr, byrow = TRUE
