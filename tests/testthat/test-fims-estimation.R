@@ -174,30 +174,21 @@ test_that("deterministic test of fims", {
   # log(R0)
   fims_logR0 <- sdr_fixed[1, "Estimate"]
   expect_gt(fims_logR0, 0.0)
-  # absolute relative error (are)
-  fims_logR0_are <- abs(fims_logR0 - log(om_input$R0)) /
-    log(om_input$R0)
-  expect_lte(fims_logR0_are, 0.0001)
-
+  expect_equal(fims_logR0, log(om_input$R0))
+  
   # Numbers at age
   for (i in 1:length(c(t(om_output$N.age)))) {
-    naa_are <- abs(report$naa[[1]][i] - c(t(om_output$N.age))[i]) /
-      c(t(om_output$N.age))[i]
-    expect_lte(naa_are, 0.001)
+    expect_equal(report$naa[[1]][i], c(t(om_output$N.age))[i])
   }
 
   # Biomass
   for (i in 1:length(om_output$biomass.mt)) {
-    biomass_are <- abs(report$biomass[[1]][i] - om_output$biomass.mt[i]) /
-      om_output$biomass.mt[i]
-    expect_lte(biomass_are, 0.001)
+    expect_equal(report$biomass[[1]][i], om_output$biomass.mt[i])
   }
 
   # Spawning biomass
   for (i in 1:length(om_output$SSB)) {
-    sb_are <- abs(report$ssb[[1]][i] - om_output$SSB[i]) /
-      om_output$SSB[i]
-    expect_lte(sb_are, 0.001)
+    expect_equal(report$ssb[[1]][i], om_output$SSB[i])
   }
 
   # Recruitment
@@ -206,9 +197,7 @@ test_that("deterministic test of fims", {
   )
 
   for (i in 1:length(om_output$N.age[, 1])) {
-    fims_naa1_are <- abs(fims_naa[i, 1] - om_output$N.age[i, 1]) /
-      om_output$N.age[i, 1]
-    expect_lte(fims_naa1_are, 0.001)
+     expect_equal(fims_naa[i, 1], om_output$N.age[i, 1])
   }
 
   expect_equal(
@@ -217,9 +206,7 @@ test_that("deterministic test of fims", {
   )
 
   for (i in 1:length(om_output$N.age[, 1])) {
-    recruitment_are <- abs(report$recruitment[[1]][i] - om_output$N.age[i, 1]) /
-      om_output$N.age[i, 1]
-    expect_lte(recruitment_are, 0.001)
+    expect_equal(report$recruitment[[1]][i], om_output$N.age[i, 1])
   }
 
   # recruitment deviations (fixed at initial "true" values)
@@ -232,23 +219,21 @@ test_that("deterministic test of fims", {
   fims_index <- report$exp_index
   # Expect small relative error for deterministic test
   for (i in 1:length(om_output$L.mt$fleet1)) {
-    fims_object_are <- abs(fims_index[[1]][i] - om_output$L.mt$fleet1[i]) /
-      om_output$L.mt$fleet1[i]
-    expect_lte(fims_object_are, 0.001)
+    expect_equal(fims_index[[1]][i],om_output$L.mt$fleet1[i])
   }
 
+  # Expect small relative error for deterministic test
   fims_object_are <- rep(0, length(em_input$L.obs$fleet1))
   for (i in 1:length(em_input$L.obs$fleet1)) {
     fims_object_are[i] <- abs(fims_index[[1]][i] - em_input$L.obs$fleet1[i]) / em_input$L.obs$fleet1[i]
   }
+  
   # Expect 95% of relative error to be within 2*cv
   expect_lte(sum(fims_object_are > om_input$cv.L$fleet1 * 2.0), length(em_input$L.obs$fleet1) * 0.05)
 
   # Expected catch number at age
   for (i in 1:length(c(t(om_output$L.age$fleet1)))) {
-    cnaa_are <- abs(report$cnaa[[1]][i] - c(t(om_output$L.age$fleet1))[i]) /
-      c(t(om_output$L.age$fleet1))[i]
-    expect_lte(cnaa_are, 0.001)
+    expect_equal(report$cnaa[[1]][i], c(t(om_output$L.age$fleet1))[i])
   }
 
   # Expected catch number at age in proportion
@@ -259,7 +244,7 @@ test_that("deterministic test of fims", {
   om_cnaa_proportion <- om_output$L.age$fleet1 / rowSums(om_output$L.age$fleet1)
 
   for (i in 1:length(c(t(om_cnaa_proportion)))) {
-    expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(om_cnaa_proportion))[i]), 0.001)
+    expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
 
   # Expected survey index
@@ -267,9 +252,7 @@ test_that("deterministic test of fims", {
   expect_equal(fims_index[[2]], apply(cwaa, 1, sum) * om_output$survey_q$survey1)
 
   for (i in 1:length(om_output$survey_index_biomass$survey1)) {
-    fims_object_are <- abs(fims_index[[2]][i] - om_output$survey_index_biomass$survey1[i]) /
-      om_output$survey_index_biomass$survey1[i]
-    expect_lte(fims_object_are, 0.001)
+    expect_equal(fims_index[[2]][i], om_output$survey_index_biomass$survey1[i])
   }
 
   fims_object_are <- rep(0, length(em_input$surveyB.obs$survey1))
@@ -278,23 +261,21 @@ test_that("deterministic test of fims", {
   }
   # Expect 95% of relative error to be within 2*cv
   expect_lte(sum(fims_object_are > om_input$cv.survey$survey1 * 2.0), length(em_input$surveyB.obs$survey1) * 0.05)
-
+ 
   # Expected catch number at age in proportion
   fims_cnaa <- matrix(report$cnaa[[2]][1:(om_input$nyr * om_input$nages)],
     nrow = om_input$nyr, byrow = TRUE
   )
 
   for (i in 1:length(c(t(om_output$survey_age_comp$survey1)))) {
-    cnaa_are <- abs(report$cnaa[[2]][i] - c(t(om_output$survey_age_comp$survey1))[i]) /
-      c(t(om_output$survey_age_comp$survey1))[i]
-    expect_lte(cnaa_are, 0.001)
+    expect_equal(report$cnaa[[2]][i], c(t(om_output$survey_age_comp$survey1))[i])
   }
 
   fims_cnaa_proportion <- fims_cnaa / rowSums(fims_cnaa)
   om_cnaa_proportion <- om_output$survey_age_comp$survey1 / rowSums(om_output$survey_age_comp$survey1)
 
   for (i in 1:length(c(t(om_cnaa_proportion)))) {
-    expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(om_cnaa_proportion))[i]), 0.001)
+    expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
 
   deterministic_env$fims$clear()
@@ -320,7 +301,8 @@ test_that("nll test of fims", {
 
   # log(R0)
   fims_logR0 <- sdr_fixed[1, "Estimate"]
-  expect_lte(abs(fims_logR0 - log(om_input$R0)) / log(om_input$R0), 0.0001)
+  # expect_lte(abs(fims_logR0 - log(om_input$R0)) / log(om_input$R0), 0.0001)
+  expect_equal(fims_logR0, log(om_input$R0))
 
   # Call report using deterministic parameter values
   # obj$report() requires parameter list to avoid errors
@@ -720,7 +702,7 @@ test_that("run FIMS in a for loop", {
       control = list(maxit = 1000000, reltol = 1e-15)
     ))
 
-    report <- obj$report()
+    report <- obj$report(obj$par)
     expect_false(is.null(report))
 
     max_gradient <- max(abs(obj$gr(opt$par)))
