@@ -62,6 +62,6 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   }
 };
 
-}  // namespace fims
+}  // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP */

@@ -48,10 +48,10 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    */
   virtual const Type evaluate(const Type &x) {
     return fims_math::double_logistic<Type>(median_asc, slope_asc, median_desc,
-                                       slope_desc, x);
+                                            slope_desc, x);
   }
 };
 
-}  // namespace fims
+}  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_DOUBLE_LOGISTIC_HPP */

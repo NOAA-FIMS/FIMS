@@ -153,9 +153,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     size_t dims = this->observed_agecomp_data->get_imax() *
                   this->observed_agecomp_data->get_jmax();
     if (dims != this->catch_numbers_at_age.size()) {
-      fims::fims_log::get("fleet.log") << "Error: observed age comp is of size "
-                                 << dims << " and expected is of size "
-                                 << this->age_composition.size() << std::endl;
+      fims::fims_log::get("fleet.log")
+          << "Error: observed age comp is of size " << dims
+          << " and expected is of size " << this->age_composition.size()
+          << std::endl;
     } else {
       for (size_t y = 0; y < this->nyears; y++) {
         // EigenVector declares a vector type from the Eigen library, which is

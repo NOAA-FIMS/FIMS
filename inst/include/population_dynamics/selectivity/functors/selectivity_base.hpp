@@ -53,6 +53,6 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
 template <typename Type>
 uint32_t SelectivityBase<Type>::id_g = 0;
 
-}  // namespace fims
+}  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP */
