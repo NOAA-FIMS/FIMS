@@ -206,6 +206,7 @@ public:
         this->vec_m.swap(other.vec_m);
     }
     
+
     //conversion operatrors
     
     inline operator std::vector<Type>(){
@@ -249,6 +250,12 @@ private:
     
     
 };// end fims::Vector class
+
+template< class T>
+bool operator==( const fims::Vector<T>& lhs,
+                const fims::Vector<T>& rhs ){
+    return lhs.vec_m == rhs_vec_m;
+}
 
 
 } //end fims namespace
