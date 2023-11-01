@@ -173,6 +173,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
+      this->weight_at_age[age] = growth->evaluate(ages[age]);
       for (size_t year = 0; year < this->nyears; year++) {
         size_t i_age_year = age * this->nyears + year;
         this->M[i_age_year] = fims_math::exp(this->log_M[i_age_year]);
@@ -281,9 +282,9 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    */
   void CalculateBiomass(size_t i_age_year, size_t year, size_t age) {
     this->biomass[year] +=
-        this->numbers_at_age[i_age_year] * growth->evaluate(ages[age]);
+        this->numbers_at_age[i_age_year] * this->weight_at_age[age];
     FIMS_LOG << " age " << ages[age] << std::endl;
-    FIMS_LOG << "growth evaluate: " << growth->evaluate(ages[age])
+    FIMS_LOG << "growth evaluate: " << this->weight_at_age[age]
              << " biomass inputs----- +++\n";
   }
 
@@ -297,7 +298,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    */
   void CalculateUnfishedBiomass(size_t i_age_year, size_t year, size_t age) {
     this->unfished_biomass[year] += this->unfished_numbers_at_age[i_age_year] *
-                                    this->growth->evaluate(ages[age]);
+                                    this->weight_at_age[age];
   }
 
   /**
@@ -311,12 +312,12 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     this->spawning_biomass[year] += this->proportion_female *
                                     this->numbers_at_age[i_age_year] *
                                     this->proportion_mature_at_age[i_age_year] *
-                                    growth->evaluate(ages[age]);
+                                    this->weight_at_age[age];
     FIMS_LOG << " proportion female " << this->proportion_female << " "
              << " mature age " << age << " is "
              << this->proportion_mature_at_age[i_age_year] << " "
              << " numbers at age " << this->numbers_at_age[i_age_year] << " "
-             << " growth " << growth->evaluate(ages[age]) << " "
+             << " growth " << this->weight_at_age[age] << " "
              << " spawning biomass " << this->spawning_biomass[year] << " "
              << " spawning biomass inputs----- +++\n";
   }
@@ -334,7 +335,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     this->unfished_spawning_biomass[year] +=
         this->proportion_female * this->unfished_numbers_at_age[i_age_year] *
         this->proportion_mature_at_age[i_age_year] *
-        this->growth->evaluate(ages[age]);
+        this->weight_at_age[age];
   }
 
   /**
@@ -433,13 +434,13 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       // I = qN (N is total numbers), I is an index in numbers
       if (this->fleets[fleet_]->is_survey == false) {
         index_ = this->fleets[fleet_]->catch_numbers_at_age[i_age_year] *
-                 growth->evaluate(ages[age]);
+                 this->weight_at_age[age];
       } else {
         FIMS_LOG << "fleet " << fleet_ << " is a survey" << std::endl;
         index_ = this->fleets[fleet_]->q *
                  this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
                  this->numbers_at_age[i_age_year] *
-                 growth->evaluate(ages[age]);  // this->weight_at_age[age];
+                 this->weight_at_age[age];  // this->weight_at_age[age];
       }
       fleets[fleet_]->expected_index[year] += index_;
       FIMS_LOG << " expected index in year  " << year << " is "
@@ -498,10 +499,10 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       FIMS_LOG << " fleet " << fleet_ << std::endl;
       FIMS_LOG << " catchnaa "
                << this->fleets[fleet_]->catch_numbers_at_age[year] << std::endl;
-      FIMS_LOG << " weight " << this->growth->evaluate(ages[age]) << std::endl;
+      FIMS_LOG << " weight " << this->weight_at_age[age] << std::endl;
       this->fleets[fleet_]->catch_weight_at_age[i_age_year] =
           this->fleets[fleet_]->catch_numbers_at_age[i_age_year] *
-          this->growth->evaluate(ages[age]);  // this->weight_at_age[age];
+          this->weight_at_age[age];  
       FIMS_LOG << " catch_waa "
                << this->fleets[fleet_]->catch_weight_at_age[i_age_year]
                << std::endl;
