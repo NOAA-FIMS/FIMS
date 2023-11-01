@@ -42,6 +42,10 @@ public:
         }
     }
     
+    Vector(const std::vector<Type>& other){
+        this->vec_m = other;
+    }
+    
     inline Type& operator[](size_t n){
         return this->vec_m[n];
     }
