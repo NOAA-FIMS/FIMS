@@ -13,7 +13,7 @@ template<typename Type>
 class Vector{
     std::vector<Type> vec_m;
     
-    friend bool operator==( const fims::Vector<T>& lhs,
+    friend template<typename T> bool operator==( const fims::Vector<T>& lhs,
                            const fims::Vector<T>& rhs );
 public:
     //Member Types
