@@ -32,7 +32,7 @@ public:
     }
     
     Vector(size_t size, const Type& value = Type()){
-        this->vec_m.resize(size, value = Type());
+        this->vec_m.resize(size, value);
     }
 
     Vector(const Vector<Type>& other){
