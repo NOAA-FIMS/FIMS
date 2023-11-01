@@ -4,7 +4,7 @@
  
 namespace
 {
-  TEST(sr_beverton_holt_evaluate, use_multiple_inputs)
+  TEST(SrBevertonHoltEvaluate, UseMultipleInputs)
   {
 // BH_fcn(R0 = 1000, h = 0.75, phi0 = 0.1, x = 30): 837.2093 
 // BH_fcn(R0 = 1000, h = 0.99, phi0 = 0.1, x = 30): 994.1423

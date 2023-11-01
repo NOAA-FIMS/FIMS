@@ -5,7 +5,7 @@
 namespace
 {
 
-    TEST(fleet_tests, Fleet_Initialize_works)
+    TEST(FleetTests, FleetInitializeWorks)
     {
         fims_popdy::Fleet<double> fleet;
         int nyears = 30;
@@ -20,7 +20,7 @@ namespace
         EXPECT_EQ(fleet.catch_index.size(), nyears);
     }
 
-    TEST(fleet_tests, Fleet_Prepare_works)
+    TEST(FleetTests, FleetPrepareWorks)
     {
         fims_popdy::Fleet<double> fleet;
         int nyears = 30;

@@ -4,7 +4,7 @@
  
 namespace
 {
-  TEST(growth_evaluate, integer_age_input)
+  TEST(GrowthEvaluate, IntegerAgeInput)
   {
 // empirical weight-at-age values from the model comparison project
 // (via the Rdata object being used by the data group)
@@ -34,7 +34,7 @@ namespace
       EXPECT_EQ(ewaa1.GetId(), 0);
   }
 
-  TEST(growth_evaluate, double_age_input)
+  TEST(GrowthEvaluate, DoubleAgeInput)
   {
       // create a new ewaa singleton class
       fims_popdy::EWAAgrowth<double> ewaa2;

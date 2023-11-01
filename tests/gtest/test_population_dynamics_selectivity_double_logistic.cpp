@@ -4,7 +4,7 @@
 namespace
 {
 
-  TEST(double_logistic_selectivity, create_object)
+  TEST(DoubleLogisticSelectivity, CreateObject)
   {
     
     fims_popdy::DoubleLogisticSelectivity<double> fishery_selectivity;

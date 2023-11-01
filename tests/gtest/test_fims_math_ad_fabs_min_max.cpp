@@ -5,7 +5,7 @@ namespace
 {
 
   // Test ad_fabs
-  TEST(ad_fabs, use_double_values)
+  TEST(AdFabs, UseDoubleValues)
   {
     // Expected value from R: x=2; sqrt(x*x+1e-5) = 2.000002
     EXPECT_NEAR(fims_math::ad_fabs(2.0), 2.000002, 0.000001);
@@ -17,7 +17,7 @@ namespace
   }
 
   // Test ad_min
-  TEST(ad_min, use_double_values)
+  TEST(AdMin, UseDoubleValues)
   {
     // Expected value from R: a=2.0; b=1.0; c=1e-5; 
     // (a+b-sqrt((a-b)^2+c))*0.5 = 0.9999975
@@ -30,7 +30,7 @@ namespace
   }
 
   // Test ad_max
-  TEST(ad_max, use_double_values)
+  TEST(AdMax, UseDoubleValues)
   {
     // Expected value from R: a=2.0; b=1.0; c=1e-5; 
     // (a+b+sqrt((a-b)^2+c))*0.5 = 2.000002

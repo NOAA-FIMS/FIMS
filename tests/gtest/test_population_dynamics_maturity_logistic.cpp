@@ -5,7 +5,7 @@ namespace
 {
 
   
-  TEST(logistic_maturity, create_object)
+  TEST(LogisticMaturity, CreateObject)
   {
     
     fims_popdy::LogisticMaturity<double> maturity;

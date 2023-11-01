@@ -5,7 +5,7 @@ namespace
 {
 
   // Test logistic using multiple input values
-  TEST(logistic, use_multiple_input_values)
+  TEST(Logistic, UseMultipleInputValues)
   {
     std::vector<double> inflection_point_value = {1.0, 10.0, 20.5};
     std::vector<double> slope_value = {0.0, 0.2, 0.05};

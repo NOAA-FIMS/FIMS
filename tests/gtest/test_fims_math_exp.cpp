@@ -8,7 +8,7 @@ namespace
     // Not worth to write many tests when testing thin database wrappers,
     // third-party libraries, or basic variable assignments.
 
-    TEST(exp, use_multiple_double_values)
+    TEST(Exp, UseMultipleDoubleValues)
     {
         // Test exp using large negative input value
         EXPECT_EQ(fims_math::exp(-1000000.0), std::exp(-1000000.0));
@@ -24,7 +24,7 @@ namespace
         EXPECT_NEAR(fims_math::exp(-2.5), 0.082085, 0.0001);
     }
 
-    TEST(exp, use_integer_values)
+    TEST(Exp, UseIntegerValues)
     {
 
         // Test exp using large positive integer value
