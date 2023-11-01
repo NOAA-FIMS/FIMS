@@ -64,9 +64,9 @@ setup_fims <- function(om_input, om_output, em_input) {
 
   # Maturity
   test_env$maturity <- new(test_env$fims$LogisticMaturity)
-  test_env$maturity$median$value <- om_input$A50.mat
-  test_env$maturity$median$is_random_effect <- FALSE
-  test_env$maturity$median$estimated <- FALSE
+  test_env$maturity$inflection_point$value <- om_input$A50.mat
+  test_env$maturity$inflection_point$is_random_effect <- FALSE
+  test_env$maturity$inflection_point$estimated <- FALSE
   test_env$maturity$slope$value <- om_input$slope
   test_env$maturity$slope$is_random_effect <- FALSE
   test_env$maturity$slope$estimated <- FALSE
@@ -74,9 +74,9 @@ setup_fims <- function(om_input, om_output, em_input) {
   # Fleet
   # Create the fishing fleet
   test_env$fishing_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
-  test_env$fishing_fleet_selectivity$median$value <- om_input$sel_fleet$fleet1$A50.sel1
-  test_env$fishing_fleet_selectivity$median$is_random_effect <- FALSE
-  test_env$fishing_fleet_selectivity$median$estimated <- TRUE
+  test_env$fishing_fleet_selectivity$inflection_point$value <- om_input$sel_fleet$fleet1$A50.sel1
+  test_env$fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+  test_env$fishing_fleet_selectivity$inflection_point$estimated <- TRUE
   test_env$fishing_fleet_selectivity$slope$value <- om_input$sel_fleet$fleet1$slope.sel1
   test_env$fishing_fleet_selectivity$slope$is_random_effect <- FALSE
   test_env$fishing_fleet_selectivity$slope$estimated <- TRUE
@@ -101,9 +101,9 @@ setup_fims <- function(om_input, om_output, em_input) {
 
   # Create the survey fleet
   test_env$survey_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
-  test_env$survey_fleet_selectivity$median$value <- om_input$sel_survey$survey1$A50.sel1
-  test_env$survey_fleet_selectivity$median$is_random_effect <- FALSE
-  test_env$survey_fleet_selectivity$median$estimated <- TRUE
+  test_env$survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
+  test_env$survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+  test_env$survey_fleet_selectivity$inflection_point$estimated <- TRUE
   test_env$survey_fleet_selectivity$slope$value <- om_input$sel_survey$survey1$slope.sel1
   test_env$survey_fleet_selectivity$slope$is_random_effect <- FALSE
   test_env$survey_fleet_selectivity$slope$estimated <- TRUE
@@ -629,9 +629,9 @@ test_that("run FIMS in a for loop", {
 
     # Maturity
     maturity <- new(fims$LogisticMaturity)
-    maturity$median$value <- om_input$A50.mat
-    maturity$median$is_random_effect <- FALSE
-    maturity$median$estimated <- FALSE
+    maturity$inflection_point$value <- om_input$A50.mat
+    maturity$inflection_point$is_random_effect <- FALSE
+    maturity$inflection_point$estimated <- FALSE
     maturity$slope$value <- om_input$slope
     maturity$slope$is_random_effect <- FALSE
     maturity$slope$estimated <- FALSE
@@ -639,9 +639,9 @@ test_that("run FIMS in a for loop", {
     # Fleet
     # Create the fishing fleet
     fishing_fleet_selectivity <- new(fims$LogisticSelectivity)
-    fishing_fleet_selectivity$median$value <- om_input$sel_fleet$fleet1$A50.sel1
-    fishing_fleet_selectivity$median$is_random_effect <- FALSE
-    fishing_fleet_selectivity$median$estimated <- TRUE
+    fishing_fleet_selectivity$inflection_point$value <- om_input$sel_fleet$fleet1$A50.sel1
+    fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+    fishing_fleet_selectivity$inflection_point$estimated <- TRUE
     fishing_fleet_selectivity$slope$value <- om_input$sel_fleet$fleet1$slope.sel1
     fishing_fleet_selectivity$slope$is_random_effect <- FALSE
     fishing_fleet_selectivity$slope$estimated <- TRUE
@@ -666,9 +666,9 @@ test_that("run FIMS in a for loop", {
 
     # Create the survey fleet
     survey_fleet_selectivity <- new(fims$LogisticSelectivity)
-    survey_fleet_selectivity$median$value <- om_input$sel_survey$survey1$A50.sel1
-    survey_fleet_selectivity$median$is_random_effect <- FALSE
-    survey_fleet_selectivity$median$estimated <- TRUE
+    survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
+    survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+    survey_fleet_selectivity$inflection_point$estimated <- TRUE
     survey_fleet_selectivity$slope$value <- om_input$sel_survey$survey1$slope.sel1
     survey_fleet_selectivity$slope$is_random_effect <- FALSE
     survey_fleet_selectivity$slope$estimated <- TRUE

@@ -120,16 +120,16 @@ fishing_fleet_age_comp$age_comp_data <- fishery_agecomp * 200
 ```
 
 #### Fleet Selectivity
-Now that we've passed in data for the fishing fleet, we need to set up its selectivity module. We will set this to be selectivity function using the LogisticSelectivity module. The`methods::show()` function indicates this module has two parameter fields: *median* and *slope*, and an `evaluate()` and `get_id()` function. 
+Now that we've passed in data for the fishing fleet, we need to set up its selectivity module. We will set this to be selectivity function using the LogisticSelectivity module. The`methods::show()` function indicates this module has two parameter fields: *inflection_point* and *slope*, and an `evaluate()` and `get_id()` function. 
 
 Each variable of [Parameter class](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) has three additional fields: *value*, *is_random_effect*, and *estimated*. Currently, FIMS is not set up to run random effects. The default value for this field and the *estimate* field is currently set to `FALSE`. We can use the *value* field to input variables defined in the Model Comparison project.
  
 ```{r fleet_selectivity}
 methods::show(Fims$LogisticSelectivity)
 fishing_fleet_selectivity <- methods::new(Fims$LogisticSelectivity)
-fishing_fleet_selectivity$median$value <- 2.0
-fishing_fleet_selectivity$median$is_random_effect <- FALSE
-fishing_fleet_selectivity$median$estimated <- TRUE
+fishing_fleet_selectivity$inflection_point$value <- 2.0
+fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+fishing_fleet_selectivity$inflection_point$estimated <- TRUE
 fishing_fleet_selectivity$slope$value <- 1.0
 fishing_fleet_selectivity$slope$is_random_effect <- FALSE
 fishing_fleet_selectivity$slope$estimated <- TRUE
@@ -198,9 +198,9 @@ survey_fleet_age_comp$age_comp_data <- survey_agecomp * 200
 
 ```{r survey-selectivity}
 survey_fleet_selectivity <- new(Fims$LogisticSelectivity)
-survey_fleet_selectivity$median$value <- 1.5
-survey_fleet_selectivity$median$is_random_effect <- FALSE
-survey_fleet_selectivity$median$estimated <- TRUE
+survey_fleet_selectivity$inflection_point$value <- 1.5
+survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+survey_fleet_selectivity$inflection_point$estimated <- TRUE
 survey_fleet_selectivity$slope$value <- 2.0
 survey_fleet_selectivity$slope$is_random_effect <- FALSE
 survey_fleet_selectivity$slope$estimated <- TRUE
@@ -285,9 +285,9 @@ Each population will also need a maturity model. Here we define a logistic matur
 ```{r maturity}
 # Maturity
 maturity <- new(Fims$LogisticMaturity)
-maturity$median$value <- 2.25
-maturity$median$is_random_effect <- FALSE
-maturity$median$estimated <- FALSE
+maturity$inflection_point$value <- 2.25
+maturity$inflection_point$is_random_effect <- FALSE
+maturity$inflection_point$estimated <- FALSE
 maturity$slope$value <- 3
 maturity$slope$is_random_effect <- FALSE
 maturity$slope$estimated <- FALSE

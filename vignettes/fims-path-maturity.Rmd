@@ -58,9 +58,9 @@ library(FIMS)
 Fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 maturity <- new(Fims$LogisticMaturity)
 # Populate the maturity module with parameter values.
-maturity$median$value <- 10
-maturity$median$is_random_effect <- FALSE
-maturity$median$estimated <- FALSE
+maturity$inflection_point$value <- 10
+maturity$inflection_point$is_random_effect <- FALSE
+maturity$inflection_point$estimated <- FALSE
 maturity$slope$value <- 0.2
 maturity$slope$is_random_effect <- FALSE
 maturity$slope$estimated <- FALSE
@@ -94,13 +94,13 @@ The fields specific to the maturity module that are accessible from R are define
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
-      .field("median", &LogisticMaturityInterface::median)
+      .field("inflection_point", &LogisticMaturityInterface::inflection_point)
       .field("slope", &LogisticMaturityInterface::slope)
       .method("get_id", &LogisticMaturityInterface::get_id)
       .method("evaluate", &LogisticMaturityInterface::evaluate);
 ```
 
-The code above shows that there are two maturity module-specific fields (i.e., parameters), `median` and `slope`, and two maturity module-specific methods (i.e., functions), `get_id` and `evaluate`. Defined methods are functions that can be called from R. You can access the fields and methods from R using the `show(Fims)` function. 
+The code above shows that there are two maturity module-specific fields (i.e., parameters), `inflection_point` and `slope`, and two maturity module-specific methods (i.e., functions), `get_id` and `evaluate`. Defined methods are functions that can be called from R. You can access the fields and methods from R using the `show(Fims)` function. 
 
 The maturity module's `get_id` method returns a unique ID for this specific module.
 
@@ -124,8 +124,8 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 
 class LogisticMaturityInterface : public MaturityInterfaceBase {
  public:
-  Parameter median; /**< the index value at which the response reaches .5 */
-  Parameter slope;  /**< the width of the curve at the median */
+  Parameter inflection_point; /**< the index value at which the response reaches .5 */
+  Parameter slope;  /**< the width of the curve at the inflection_point */
   ...
 }
 ```
@@ -136,7 +136,7 @@ We typically will reference the child class from R to specify the formulation of
 knitr::include_graphics("figures/fims-path-maturity-1.png")
 ```
 
-All Rcpp interface classes from FIMS define parameters (e.g., `median`, `slope`) using the `Parameter` class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) in the directory [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects):
+All Rcpp interface classes from FIMS define parameters (e.g., `inflection_point`, `slope`) using the `Parameter` class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) in the directory [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects):
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 class Parameter {
@@ -228,21 +228,21 @@ Within the rcpp_maturity.hpp file, we can link to the `fims_info::Information` c
 //d0 is a shared pointer that points to fims_info::Information
 std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > d0 =
         fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
- if (this->median.estimated) {
-      if (this->median.is_random_effect) {
+ if (this->inflection_point.estimated) {
+      if (this->inflection_point.is_random_effect) {
         /*
-         if median is estimated and a random effect, 
-         the median value from LogisticMaturityInterface (lm0->median) 
+         if inflection_point is estimated and a random effect, 
+         the inflection_point value from LogisticMaturityInterface (lm0->inflection_point) 
          is passed to the Information member function RegisterRandomEffect
         */
-        d0->RegisterRandomEffect(lm0->median);
+        d0->RegisterRandomEffect(lm0->inflection_point);
       } else {
         /*
-         if median is estimated and not a random effect, 
-         the median value from LogisticMaturityInterface (lm0->median)
+         if inflection_point is estimated and not a random effect, 
+         the inflection_point value from LogisticMaturityInterface (lm0->inflection_point)
          is passed to the Information member function RegisterParameter
          */
-        d0->RegisterParameter(lm0->median);
+        d0->RegisterParameter(lm0->inflection_point);
       }
     }
 ```
@@ -257,10 +257,10 @@ std::shared_ptr<fims_popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> > lm0 =
         std::make_shared<fims_popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> >();
  
 /*
- the median value from LogisticMaturity (lm0->median)
- equals the median value from LogisticMaturityInterface (this->median.value)
+ the inflection_point value from LogisticMaturity (lm0->inflection_point)
+ equals the inflection_point value from LogisticMaturityInterface (this->inflection_point.value)
  */
-lm0->median = this->median.value;
+lm0->inflection_point = this->inflection_point.value;
 ```
 
 We can also link these two pointers together so that the **fims_info::Information** class links up with the **fims_popdy::LogisticMaturity**, but more details on this later.
@@ -286,7 +286,7 @@ knitr::include_graphics("figures/fims-path-maturity-2.png")
 
 ## Inside the `fims_popdy::LogisticMaturity` class
 
-The `LogisticMaturity` class in the `fims` namespace defined in [logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) in the directory [inst/include/population_dynamics/maturity/functors](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors) has an `evaluate` method (i.e., function) that takes an input, *x* and returns the output from a logistic function (defined in [fims_math.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp) in the directory [inst/include/common](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common)) using the class member `median` and `slope` values.  
+The `LogisticMaturity` class in the `fims` namespace defined in [logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) in the directory [inst/include/population_dynamics/maturity/functors](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity/functors) has an `evaluate` method (i.e., function) that takes an input, *x* and returns the output from a logistic function (defined in [fims_math.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp) in the directory [inst/include/common](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common)) using the class member `inflection_point` and `slope` values.  
 
 ```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 namespace fims_popdy {
@@ -297,10 +297,10 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct LogisticMaturity : public MaturityBase<Type> {
-  Type median; /*!< 50% quantile of the value of the quantity of interest (x); e.g.,
+  Type inflection_point; /*!< 50% quantile of the value of the quantity of interest (x); e.g.,
                age at which 50% of the fish are mature */
   Type slope;  /*!<scalar multiplier of difference between quantity of interest
-               value (x) and median */
+               value (x) and inflection_point */
 
   LogisticMaturity() : MaturityBase<Type>() {}
 
@@ -312,7 +312,7 @@ struct LogisticMaturity : public MaturityBase<Type> {
    * size at maturity).
    */
   virtual const Type evaluate(const Type& x) {
-    return fims_math::logistic<Type>(median, slope, x);
+    return fims_math::logistic<Type>(inflection_point, slope, x);
   }
 };
 
@@ -528,8 +528,8 @@ population_modules <- list(
   )
 )
 maturity_modules <- list(
-  "Logistic Maturity" = list(id = 1, median = 10, slope = 0.2),
-  "Some Other Maturity" = list(id = 2, median = 8, slope = 0.3)
+  "Logistic Maturity" = list(id = 1, inflection_point = 10, slope = 0.2),
+  "Some Other Maturity" = list(id = 2, inflection_point = 8, slope = 0.3)
 )
 ```
 
@@ -538,10 +538,10 @@ We can think of population_modules and maturity_modules above as instantiated C+
 ```{r, eval = FALSE}
 # Fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 # maturity1 <- new(Fims$LogisticMaturity)
-# maturity1$median$value <- 10
+# maturity1$inflection_point$value <- 10
 # maturity1$slope$value <- 0.2
 # maturity2 <- new(Fims$LogisticMaturity)
-# maturity2$median$value <- 8
+# maturity2$inflection_point$value <- 8
 # maturity2$slope$value <- 0.3
 # population1 <- new(Fims$Population)
 # population2 <- new(Fims$Population)

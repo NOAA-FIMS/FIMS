@@ -257,23 +257,23 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
-      .field("median", &LogisticMaturityInterface::median)
+      .field("inflection_point", &LogisticMaturityInterface::inflection_point)
       .field("slope", &LogisticMaturityInterface::slope)
       .method("get_id", &LogisticMaturityInterface::get_id)
       .method("evaluate", &LogisticMaturityInterface::evaluate);
 
   Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
       .constructor()
-      .field("median", &LogisticSelectivityInterface::median)
+      .field("inflection_point", &LogisticSelectivityInterface::inflection_point)
       .field("slope", &LogisticSelectivityInterface::slope)
       .method("get_id", &LogisticSelectivityInterface::get_id)
       .method("evaluate", &LogisticSelectivityInterface::evaluate);
 
   Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
       .constructor()
-      .field("median_asc", &DoubleLogisticSelectivityInterface::median_asc)
+      .field("inflection_point_asc", &DoubleLogisticSelectivityInterface::inflection_point_asc)
       .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc)
-      .field("median_desc", &DoubleLogisticSelectivityInterface::median_desc)
+      .field("inflection_point_desc", &DoubleLogisticSelectivityInterface::inflection_point_desc)
       .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
       .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
       .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);

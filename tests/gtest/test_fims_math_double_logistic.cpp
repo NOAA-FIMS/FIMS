@@ -6,9 +6,9 @@ namespace
   // Test double logistic using multiple input values
   TEST(double_logistic, use_multiple_input_values)
   {
-    std::vector<double> median_asc_value = {1.0, 10.0, 20.5};
+    std::vector<double> inflection_point_asc_value = {1.0, 10.0, 20.5};
     std::vector<double> slope_asc_value = {0.0, 0.2, 0.05};
-    std::vector<double> median_desc_value = {6.0, 15.0, 23.5};
+    std::vector<double> inflection_point_desc_value = {6.0, 15.0, 23.5};
     std::vector<double> slope_desc_value = {0.0, 0.2, 0.05};
     std::vector<double> x_value = {2.0, 20.0, 40.5};
 
@@ -21,7 +21,7 @@ namespace
 
     for (int i = 0; i < expect_value.size(); ++i)
     {
-      EXPECT_NEAR(fims_math::double_logistic(median_asc_value[i], slope_asc_value[i], median_desc_value[i], slope_desc_value[i], x_value[i]), expect_value[i], 0.0001);
+      EXPECT_NEAR(fims_math::double_logistic(inflection_point_asc_value[i], slope_asc_value[i], inflection_point_desc_value[i], slope_desc_value[i], x_value[i]), expect_value[i], 0.0001);
     }
   }
 

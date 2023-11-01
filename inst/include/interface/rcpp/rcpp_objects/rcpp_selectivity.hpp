@@ -60,8 +60,8 @@ std::map<uint32_t, SelectivityInterfaceBase*>
  */
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
-  Parameter median; /**< the index value at which the response reaches .5 */
-  Parameter slope;  /**< the width of the curve at the median */
+  Parameter inflection_point; /**< the index value at which the response reaches .5 */
+  Parameter slope;  /**< the width of the curve at the inflection_point */
 
   LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
@@ -76,7 +76,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual double evaluate(double x) {
     fims_popdy::LogisticSelectivity<double> LogisticSel;
-    LogisticSel.median = this->median.value_m;
+    LogisticSel.inflection_point = this->inflection_point.value_m;
     LogisticSel.slope = this->slope.value_m;
     return LogisticSel.evaluate(x);
   }
@@ -93,12 +93,12 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     selectivity->id = this->id;
-    selectivity->median = this->median.value_m;
-    if (this->median.estimated_m) {
-      if (this->median.is_random_effect_m) {
-        info->RegisterRandomEffect(selectivity->median);
+    selectivity->inflection_point = this->inflection_point.value_m;
+    if (this->inflection_point.estimated_m) {
+      if (this->inflection_point.is_random_effect_m) {
+        info->RegisterRandomEffect(selectivity->inflection_point);
       } else {
-        info->RegisterParameter(selectivity->median);
+        info->RegisterParameter(selectivity->inflection_point);
       }
     }
     selectivity->slope = this->slope.value_m;
@@ -136,11 +136,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
-  Parameter median_asc; /**< the index value at which the response reaches .5 */
-  Parameter slope_asc;  /**< the width of the curve at the median */
+  Parameter inflection_point_asc; /**< the index value at which the response reaches .5 */
+  Parameter slope_asc;  /**< the width of the curve at the inflection_point */
   Parameter
-      median_desc;      /**< the index value at which the response reaches .5 */
-  Parameter slope_desc; /**< the width of the curve at the median */
+      inflection_point_desc;      /**< the index value at which the response reaches .5 */
+  Parameter slope_desc; /**< the width of the curve at the inflection_point */
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
@@ -155,9 +155,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual double evaluate(double x) {
     fims_popdy::DoubleLogisticSelectivity<double> DoubleLogisticSel;
-    DoubleLogisticSel.median_asc = this->median_asc.value_m;
+    DoubleLogisticSel.inflection_point_asc = this->inflection_point_asc.value_m;
     DoubleLogisticSel.slope_asc = this->slope_asc.value_m;
-    DoubleLogisticSel.median_desc = this->median_desc.value_m;
+    DoubleLogisticSel.inflection_point_desc = this->inflection_point_desc.value_m;
     DoubleLogisticSel.slope_desc = this->slope_desc.value_m;
     return DoubleLogisticSel.evaluate(x);
   }
@@ -174,12 +174,12 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     selectivity->id = this->id;
-    selectivity->median_asc = this->median_asc.value_m;
-    if (this->median_asc.estimated_m) {
-      if (this->median_asc.is_random_effect_m) {
-        info->RegisterRandomEffect(selectivity->median_asc);
+    selectivity->inflection_point_asc = this->inflection_point_asc.value_m;
+    if (this->inflection_point_asc.estimated_m) {
+      if (this->inflection_point_asc.is_random_effect_m) {
+        info->RegisterRandomEffect(selectivity->inflection_point_asc);
       } else {
-        info->RegisterParameter(selectivity->median_asc);
+        info->RegisterParameter(selectivity->inflection_point_asc);
       }
     }
     selectivity->slope_asc = this->slope_asc.value_m;
@@ -190,12 +190,12 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterParameter(selectivity->slope_asc);
       }
     }
-    selectivity->median_desc = this->median_desc.value_m;
-    if (this->median_desc.estimated_m) {
-      if (this->median_desc.is_random_effect_m) {
-        info->RegisterRandomEffect(selectivity->median_desc);
+    selectivity->inflection_point_desc = this->inflection_point_desc.value_m;
+    if (this->inflection_point_desc.estimated_m) {
+      if (this->inflection_point_desc.is_random_effect_m) {
+        info->RegisterRandomEffect(selectivity->inflection_point_desc);
       } else {
-        info->RegisterParameter(selectivity->median_desc);
+        info->RegisterParameter(selectivity->inflection_point_desc);
       }
     }
     selectivity->slope_desc = this->slope_desc.value_m;

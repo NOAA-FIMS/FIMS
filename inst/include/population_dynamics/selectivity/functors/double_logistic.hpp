@@ -19,17 +19,17 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
-  Type median_asc;  /*!< 50% quantile of the value of the quantity of interest
+  Type inflection_point_asc;  /*!< 50% quantile of the value of the quantity of interest
                 (x)  on the ascending limb of the double logistic curve; e.g. age
                 at  which 50% of the fish are selected */
   Type slope_asc;   /*!<scalar multiplier of difference between quantity of
-                interest   value (x) and median on the ascending limb of the
+                interest   value (x) and inflection_point on the ascending limb of the
                 double   logistic   curve*/
-  Type median_desc; /*!< 50% quantile of the value of the quantity of interest
+  Type inflection_point_desc; /*!< 50% quantile of the value of the quantity of interest
                (x) on the descending limb of the double logistic curve; e.g.
                age at which 50% of the fish are selected */
   Type slope_desc;  /*!<scalar multiplier of difference between quantity of
-               interest  value (x) and median on the descending limb of the
+               interest  value (x) and inflection_point on the descending limb of the
                double  logistic  curve */
 
   DoubleLogisticSelectivity() : SelectivityBase<Type>() {}
@@ -39,15 +39,15 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    * @brief Method of the double logistic selectivity class that implements the
    * double logistic function from FIMS math.
    *
-   * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - median_{asc}))}
-   * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x - median_{desc}))}
+   * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - inflection_point_{asc}))}
+   * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x - inflection_point_{desc}))}
    * \right)\f$
    *
    * @param x  The independent variable in the double logistic function (e.g.,
    * age or size in selectivity).
    */
   virtual const Type evaluate(const Type &x) {
-    return fims_math::double_logistic<Type>(median_asc, slope_asc, median_desc,
+    return fims_math::double_logistic<Type>(inflection_point_asc, slope_asc, inflection_point_desc,
                                        slope_desc, x);
   }
 };

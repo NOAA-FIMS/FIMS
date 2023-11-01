@@ -6,7 +6,7 @@ namespace
 {
     TEST_F(PopulationPrepareTestFixture, CalculateMaturityAA_works)
     {        
-        double median = 6;
+        double inflection_point = 6;
         double slope = 0.15;
         std::vector<double> expect_maturity(nyears * nages, 0);
 
@@ -14,7 +14,7 @@ namespace
            for (size_t age = 0; age < nages; age++){
                int i_age_year = year * population.nages + age;
                population.CalculateMaturityAA(i_age_year, age);
-               expect_maturity[i_age_year] = 1.0/(1.0+exp(-(population.ages[age]-median)*slope));
+               expect_maturity[i_age_year] = 1.0/(1.0+exp(-(population.ages[age]-inflection_point)*slope));
            }
         }
 
