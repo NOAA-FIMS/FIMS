@@ -35,8 +35,8 @@ directly?)
 template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
   using ParameterVector =
-      typename fims::ModelTraits<Type>::ParameterVector; /*!< the vector of population
-                                                      parameters*/
+      typename fims::ModelTraits<Type>::ParameterVector; /*!< the vector of
+                                                      population parameters*/
   static uint32_t id_g; /*!< reference id for population object*/
   size_t nyears;        /*!< total number of years in the fishery*/
   size_t nseasons;      /*!< total number of seasons in the fishery*/
@@ -106,12 +106,14 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   // Define objective function object to be able to REPORT and ADREPORT
 #ifdef TMB_MODEL
-  ::objective_function<Type> *of; // :: references global namespace, defined in src/FIMS.cpp, available anywhere in the R package
+  ::objective_function<Type>
+      *of;  // :: references global namespace, defined in src/FIMS.cpp,
+            // available anywhere in the R package
 #endif
 
   // this -> means you're referring to a class member (member of self)
 
-  Population() { this->id = Population::id_g++; } 
+  Population() { this->id = Population::id_g++; }
 
   /**
    * @brief Initialize values. Called once at the start of model run.
@@ -693,6 +695,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 template <class Type>
 uint32_t Population<Type>::id_g = 0;
 
-}  // namespace fims
+}  // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */

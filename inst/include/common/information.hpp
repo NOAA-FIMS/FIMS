@@ -36,7 +36,7 @@ class Information {
   size_t nages;        /**< number of ages>*/
 
   static std::shared_ptr<Information<Type> >
-      fims_information;       /**< singleton instance >*/
+      fims_information;          /**< singleton instance >*/
   std::vector<Type*> parameters; /**< list of all estimated parameters >*/
   std::vector<Type*>
       random_effects_parameters; /**< list of all random effects parameters >*/
@@ -46,42 +46,40 @@ class Information {
   // data objects
   std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<Type> > >
       data_objects; /*!< map that holds data objects >*/
-  typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_data_object::DataObject<Type> > >::iterator
+  typedef typename std::map<
+      uint32_t, std::shared_ptr<fims_data_object::DataObject<Type> > >::iterator
       data_iterator; /**< iterator for the data objects */
 
   // life history modules
   std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >
       recruitment_models; /*!<hash map to link each object to its shared
                              location in memory*/
-  typedef
-      typename std::map<uint32_t,
-                        std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >::iterator
-          recruitment_models_iterator;
+  typedef typename std::map<
+      uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >::iterator
+      recruitment_models_iterator;
   /**< iterator for recruitment objects>*/
 
   std::map<uint32_t, std::shared_ptr<fims_popdy::SelectivityBase<Type> > >
       selectivity_models; /*!<hash map to link each object to its shared
                              location in memory*/
-  typedef
-      typename std::map<uint32_t,
-                        std::shared_ptr<fims_popdy::SelectivityBase<Type> > >::iterator
-          selectivity_models_iterator;
+  typedef typename std::map<
+      uint32_t, std::shared_ptr<fims_popdy::SelectivityBase<Type> > >::iterator
+      selectivity_models_iterator;
   /**< iterator for selectivity objects>*/
 
   std::map<uint32_t, std::shared_ptr<fims_popdy::GrowthBase<Type> > >
       growth_models; /*!<hash map to link each object to its shared location in
                         memory*/
-  typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::GrowthBase<Type> > >::iterator
+  typedef typename std::map<
+      uint32_t, std::shared_ptr<fims_popdy::GrowthBase<Type> > >::iterator
       growth_models_iterator;
   /**< iterator for growth objects>*/
 
   std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > >
       maturity_models; /*!<hash map to link each object to its shared location
                           in memory*/
-  typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::MaturityBase<Type> > >::iterator
+  typedef typename std::map<
+      uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > >::iterator
       maturity_models_iterator;
   /**< iterator for maturity objects>*/
 
@@ -90,7 +88,8 @@ class Information {
       fleets; /*!<hash map to link each object to its shared location in
                  memory*/
   typedef
-      typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type> > >::iterator
+      typename std::map<uint32_t,
+                        std::shared_ptr<fims_popdy::Fleet<Type> > >::iterator
           fleet_iterator;
   /**< iterator for fleet objects>*/
 
@@ -98,19 +97,20 @@ class Information {
   std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > >
       populations; /*!<hash map to link each object to its shared location in
                       memory*/
-  typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::Population<Type> > >::iterator
+  typedef typename std::map<
+      uint32_t, std::shared_ptr<fims_popdy::Population<Type> > >::iterator
       population_iterator;
   /**< iterator for population objects>*/
 
   // distributions
-  std::map<uint32_t, std::shared_ptr<fims_distributions::DistributionsBase<Type> > >
+  std::map<uint32_t,
+           std::shared_ptr<fims_distributions::DistributionsBase<Type> > >
       distribution_models; /*!<hash map to link each object to its shared
                               location in memory*/
-  typedef
-      typename std::map<uint32_t,
-                        std::shared_ptr<fims_distributions::DistributionsBase<Type> > >::iterator
-          distribution_models_iterator;
+  typedef typename std::map<
+      uint32_t,
+      std::shared_ptr<fims_distributions::DistributionsBase<Type> > >::iterator
+      distribution_models_iterator;
   /**< iterator for distribution objects>*/
 
   Information() {}
@@ -135,7 +135,9 @@ class Information {
    *
    * @param p
    */
-  void RegisterParameter(Type& p) { this->fixed_effects_parameters.push_back(&p); }
+  void RegisterParameter(Type& p) {
+    this->fixed_effects_parameters.push_back(&p);
+  }
 
   /**
    * Register a random effect as estimable.

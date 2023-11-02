@@ -22,8 +22,8 @@ template <typename Type>
 struct Dnorm : public DistributionsBase<Type> {
   Type x;    /*!< observation */
   Type mean; /*!< mean of the normal distribution */
-  Type sd;   /*!< standard deviation of the normal distribution, must be strictly
-             positive.*/
+  Type sd; /*!< standard deviation of the normal distribution, must be strictly
+           positive.*/
 
   Dnorm() : DistributionsBase<Type>() {}
 

@@ -45,6 +45,6 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
   }
 };
 
-}  // namespace fims
+}  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP */

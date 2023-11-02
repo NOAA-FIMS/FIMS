@@ -48,6 +48,6 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
 template <typename Type>
 uint32_t GrowthBase<Type>::id_g = 0;
 
-}  // namespace fims
+}  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_GROWTH_BASE_HPP */

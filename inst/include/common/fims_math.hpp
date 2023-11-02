@@ -26,8 +26,8 @@ namespace fims_math {
 /**
  * @brief The exponential function.
  *
- * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is an
- * integer.
+ * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is
+ * an integer.
  * @return the exponentiated value
  */
 template <class Type>
@@ -37,8 +37,8 @@ inline const Type exp(const Type &x) {
 
 /**
  * @brief The natural log function (base e)
- * @param x the value to take the log of. Please use fims_math::log<double>(x) if x
- * is an integer.
+ * @param x the value to take the log of. Please use fims_math::log<double>(x)
+ * if x is an integer.
  * @return
  */
 template <class Type>
@@ -54,8 +54,8 @@ inline const Type log(const Type &x) {
  * @brief The exponential function.
  * The code cannot be tested using the compilation flag
  * -DTMB_MODEL through CMake and Google Test
- * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is an
- * integer.
+ * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is
+ * an integer.
  * @return the exponentiated value
  */
 template <class Type>
@@ -73,8 +73,8 @@ inline const double exp(const double &x) {
  * @brief The natural log function (base e)
  * The code cannot be tested using the compilation flag
  * -DTMB_MODEL through CMake and Google Test.
- * @param x the value to take the log of. Please use fims_math::log<double>(x) if x
- * is an integer.
+ * @param x the value to take the log of. Please use fims_math::log<double>(x)
+ * if x is an integer.
  * @return the log of the value
  */
 template <class Type>

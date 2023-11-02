@@ -43,5 +43,5 @@ struct EWAAgrowth : public GrowthBase<Type> {
     return ret;
   }
 };
-}  // namespace fims
+}  // namespace fims_popdy
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */
