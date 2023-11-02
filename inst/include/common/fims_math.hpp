@@ -132,7 +132,7 @@ inline const Type logit(const Type &a, const Type &b, const Type &x) {
  */
 template <class Type>
 inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
-  return a + (b - a) / (1 + fims_math::exp(-logit_x));
+  return a + (b - a) / (1.0 + fims_math::exp(-logit_x));
 }
 
 /**
@@ -194,9 +194,10 @@ const Type ad_fabs(const Type &x, Type C = 1e-5) {
  * @param C default = 1e-5
  * @return
  */
+
 template <typename Type>
 inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
-  return (a + b - fims_math::ad_fabs(a - b, C)) * .5;
+  return (a + b - fims_math::ad_fabs(a - b, C)) * 0.5;
 }
 
 /**

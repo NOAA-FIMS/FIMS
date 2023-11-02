@@ -40,7 +40,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    * double logistic function from FIMS math.
    *
    * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - median_{asc}))}
-   * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x - median_{desc}))}
+   * \left(1.0-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x - median_{desc}))}
    * \right)\f$
    *
    * @param x  The independent variable in the double logistic function (e.g.,
