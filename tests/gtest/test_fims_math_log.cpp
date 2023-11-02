@@ -8,7 +8,7 @@ namespace
   // Not worth to write many tests when testing thin database wrappers,
   // third-party libraries, or basic variable assignments.
 
-  TEST(log, use_multiple_double_values)
+  TEST(Log, UseMultipleDoubleValues)
   {
     // Test log using large double value
     EXPECT_EQ(fims_math::log(1000000.0), std::log(1000000.0));
@@ -19,7 +19,7 @@ namespace
     EXPECT_NEAR(fims_math::log(3.0), 1.098612, 0.0001);
   }
 
-  TEST(log, use_integer_values)
+  TEST(Log, UseIntegerValues)
   {
     // Test log using large positive integer value
     int large_int = 1000000;
@@ -31,7 +31,7 @@ namespace
   }
 
   // log(-2.5): NaN
-  TEST(log, use_negative_double_values)
+  TEST(Log, UseNegativeDoubleValues)
   {
     // Test log using negative value -2.5 and expect return of NaN
     EXPECT_TRUE(std::isnan(fims_math::log(-2.5)));

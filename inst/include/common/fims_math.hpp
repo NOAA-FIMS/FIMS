@@ -92,17 +92,16 @@ inline const double log(const double &x) {
 /**
  * @brief The general logistic function
  *
- * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - median))} \f$
+ * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection_point))} \f$
  *
- * @param median the median (inflection point) of the logistic function
+ * @param inflection_point the inflection point of the logistic function
  * @param slope the slope of the logistic function
  * @param x the index the logistic function should be evaluated at
  * @return
  */
 template <class Type>
-inline const Type logistic(const Type &median, const Type &slope,
-                           const Type &x) {
-  return (1.0) / (1.0 + exp(-1.0 * slope * (x - median)));
+inline const Type logistic(const Type &inflection_point, const Type &slope, const Type &x) {
+  return (1.0) / (1.0 + exp(-1.0 * slope * (x - inflection_point)));
 }
 
 /**
@@ -138,16 +137,16 @@ inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
 /**
  * @brief The general double logistic function
  *
- * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - median_{asc}))}
- * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x - median_{desc}))}
+ * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - inflection_point_{asc}))}
+ * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x - inflection_point_{desc}))}
  * \right)\f$
  *
- * @param median_asc the median (inflection point) of the ascending limb of the
+ * @param inflection_point_asc the inflection point of the ascending limb of the
  * double logistic function
  * @param slope_asc the slope of the ascending limb of the double logistic
  * function
- * @param median_desc the median (inflection point) of the descending limb of
- * the double logistic function, where median_desc > median_asc
+ * @param inflection_point_desc the inflection point of the descending limb of
+ * the double logistic function, where inflection_point_desc > inflection_point_asc
  * @param slope_desc the slope of the descending limb of the double logistic
  * function
  * @param x the index the logistic function should be evaluated at
@@ -155,11 +154,11 @@ inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
  */
 
 template <class Type>
-inline const Type double_logistic(const Type &median_asc, const Type &slope_asc,
-                                  const Type &median_desc,
-                                  const Type &slope_desc, const Type &x) {
-  return (1.0) / (1.0 + exp(-1.0 * slope_asc * (x - median_asc))) *
-         (1.0 - (1.0) / (1.0 + exp(-1.0 * slope_desc * (x - median_desc))));
+inline const Type double_logistic(const Type &inflection_point_asc, const Type &slope_asc,
+                               const Type &inflection_point_desc, const Type &slope_desc,
+                               const Type &x) {
+  return (1.0) / (1.0 + exp(-1.0 * slope_asc * (x - inflection_point_asc))) *
+         (1.0 - (1.0) / (1.0 + exp(-1.0 * slope_desc * (x - inflection_point_desc))));
 }
 
 /**

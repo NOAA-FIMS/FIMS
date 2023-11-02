@@ -21,10 +21,10 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct LogisticMaturity : public MaturityBase<Type> {
-  Type median; /*!< 50% quantile of the value of the quantity of interest (x);
+  Type inflection_point; /*!< 50% quantile of the value of the quantity of interest (x);
                e.g. age at which 50% of the fish are mature */
   Type slope;  /*!<scalar multiplier of difference between quantity of interest
-               value (x) and median */
+               value (x) and inflection_point */
 
   LogisticMaturity() : MaturityBase<Type>() {}
 
@@ -32,13 +32,14 @@ struct LogisticMaturity : public MaturityBase<Type> {
    * @brief Method of the logistic maturity class that implements the
    * logistic function from FIMS math.
    *
-   * \f[ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - median))} \f]
+   * \f[ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection_point))} \f]
    *
    * @param x  The independent variable in the logistic function (e.g., age or
    * size at maturity).
    */
-  virtual const Type evaluate(const Type& x) {
-    return fims_math::logistic<Type>(median, slope, x);
+
+  virtual const Type evaluate(const Type & x) {
+    return fims_math::logistic<Type>(inflection_point, slope, x);
   }
 };
 

@@ -2,18 +2,18 @@ test_that("test get parameter vector", {
   fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   # Create selectivity
   selectivity <- new(fims$LogisticSelectivity)
-  selectivity$median$value <- 10.0
-  selectivity$median$min <- 8.0
-  selectivity$median$max <- 12.0
-  selectivity$median$is_random_effect <- FALSE
-  selectivity$median$estimated <- TRUE
+  selectivity$inflection_point$value <- 10.0
+  selectivity$inflection_point$min <- 8.0
+  selectivity$inflection_point$max <- 12.0
+  selectivity$inflection_point$is_random_effect <- FALSE
+  selectivity$inflection_point$estimated <- TRUE
   selectivity$slope$value <- 0.2
   selectivity$slope$is_random_effect <- FALSE
   selectivity$slope$estimated <- TRUE
 
   fims$CreateTMBModel()
   p <- fims$get_fixed()
-  sel_parm <- c(selectivity$median$value, selectivity$slope$value)
+  sel_parm <- c(selectivity$inflection_point$value, selectivity$slope$value)
   expect_equal(sel_parm, p)
 
   # test fims clear
@@ -31,15 +31,15 @@ test_that("test get parameter vector", {
   expect_equal(numeric(0), p)
   fims2 <- Rcpp::Module("fims", PACKAGE = "FIMS")
   selectivity <- new(fims2$LogisticSelectivity)
-  selectivity$median$value <- 11.0
-  selectivity$median$min <- 8.0
-  selectivity$median$max <- 12.0
-  selectivity$median$is_random_effect <- FALSE
-  selectivity$median$estimated <- TRUE
+  selectivity$inflection_point$value <- 11.0
+  selectivity$inflection_point$min <- 8.0
+  selectivity$inflection_point$max <- 12.0
+  selectivity$inflection_point$is_random_effect <- FALSE
+  selectivity$inflection_point$estimated <- TRUE
   selectivity$slope$value <- 0.5
   selectivity$slope$is_random_effect <- FALSE
   selectivity$slope$estimated <- TRUE
-  sel_parm <- c(selectivity$median$value, selectivity$slope$value)
+  sel_parm <- c(selectivity$inflection_point$value, selectivity$slope$value)
   recruitment <- new(fims2$BevertonHoltRecruitment)
   h <- 0.75
   r0 <- 1000000.0

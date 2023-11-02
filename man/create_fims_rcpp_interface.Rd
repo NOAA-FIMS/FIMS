@@ -52,7 +52,7 @@ create_fims_rcpp_interface(
   model = "LogisticSelectivity",
   base_class = "SelectivityInterfaceBase",
   container = "selectivity_models",
-  parameters = c("slope", "median"),
+  parameters = c("slope", "inflection_point"),
   evaluate_parameter = "x",
   evaluate_parameter_type = "double"
 )

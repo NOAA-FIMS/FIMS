@@ -4,7 +4,7 @@
 
 namespace
 {
-  TEST(recruitment_deviations, constraint_works)
+  TEST(RecruitmentDeviations, ConstraintWorks)
   {
     fims_popdy::SRBevertonHolt<double> recruit;
     recruit.recruit_deviations = {-1.0, 2.0, 3.0};

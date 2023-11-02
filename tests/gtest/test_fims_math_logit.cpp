@@ -5,7 +5,7 @@ namespace
 {
 
   // Test logit using multiple input values
-  TEST(logit, use_multiple_input_values)
+  TEST(Logit, UseMultipleInputValues)
   {
     std::vector<double> max_value = {1.0, 10.0, 20.5};
     std::vector<double> min_value = {0.0, 0.2, 0.05};
@@ -18,7 +18,7 @@ namespace
 
   }
 
-  TEST(inv_logit, use_multiple_input_values)
+  TEST(InvLogit, UseMultipleInputValues)
   {
     std::vector<double> max_value = {1.0, 10.0, 20.5};
     std::vector<double> min_value = {0.0, 0.2, 0.05};
@@ -36,7 +36,7 @@ namespace
     }
   }
 
-  TEST(inv_logit_logit, use_multiple_input_values)
+  TEST(InvLogitLogit, UseMultipleInputValues)
   {
     
     std::vector<double> max_value = {1.0, 1.0};
@@ -51,7 +51,7 @@ namespace
     }
   }
 
-  TEST(logit_inv_logit, use_multiple_input_values)
+  TEST(LogitInvLogit, UseMultipleInputValues)
   {
     
     std::vector<double> max_value = {1.0, 1.0};

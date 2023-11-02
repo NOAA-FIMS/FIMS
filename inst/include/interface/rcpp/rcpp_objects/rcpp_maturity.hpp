@@ -60,8 +60,8 @@ std::map<uint32_t, MaturityInterfaceBase*> MaturityInterfaceBase::live_objects;
  */
 class LogisticMaturityInterface : public MaturityInterfaceBase {
  public:
-  Parameter median; /**< the index value at which the response reaches .5 */
-  Parameter slope;  /**< the width of the curve at the median */
+  Parameter inflection_point; /**< the index value at which the response reaches .5 */
+  Parameter slope;  /**< the width of the curve at the inflection_point */
 
   LogisticMaturityInterface() : MaturityInterfaceBase() {}
 
@@ -76,7 +76,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    */
   virtual double evaluate(double x) {
     fims_popdy::LogisticMaturity<double> LogisticMat;
-    LogisticMat.median = this->median.value_m;
+    LogisticMat.inflection_point = this->inflection_point.value_m;
     LogisticMat.slope = this->slope.value_m;
     return LogisticMat.evaluate(x);
   }
@@ -93,12 +93,12 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     // set relative info
     maturity->id = this->id;
-    maturity->median = this->median.value_m;
-    if (this->median.estimated_m) {
-      if (this->median.is_random_effect_m) {
-        info->RegisterRandomEffect(maturity->median);
+    maturity->inflection_point = this->inflection_point.value_m;
+    if (this->inflection_point.estimated_m) {
+      if (this->inflection_point.is_random_effect_m) {
+        info->RegisterRandomEffect(maturity->inflection_point);
       } else {
-        info->RegisterParameter(maturity->median);
+        info->RegisterParameter(maturity->inflection_point);
       }
     }
     maturity->slope = this->slope.value_m;

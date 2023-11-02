@@ -185,9 +185,9 @@ public:
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->median = a50[0].GetDouble();
+                                            selectivity->inflection_point = a50[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "A50 " << selectivity->median << "\n";
+                                                std::cout << "A50 " << selectivity->inflection_point << "\n";
                                             }
                                         }
 
@@ -212,9 +212,9 @@ public:
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->median_asc = a50[0].GetDouble();
+                                            selectivity->inflection_point_asc = a50[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "A50 asc " << selectivity->median_asc << "\n";
+                                                std::cout << "A50 asc " << selectivity->inflection_point_asc << "\n";
                                             }
                                         }
 
@@ -230,9 +230,9 @@ public:
                                         it = fsel_o.find("A50.sel2");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->median_desc = a50[0].GetDouble();
+                                            selectivity->inflection_point_desc = a50[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "A50 desc " << selectivity->median_desc << "\n";
+                                                std::cout << "A50 desc " << selectivity->inflection_point_desc << "\n";
                                             }
                                         }
 
@@ -327,7 +327,7 @@ public:
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->median = a50[0].GetDouble();
+                                            selectivity->inflection_point = a50[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("slope.sel1");
@@ -346,7 +346,7 @@ public:
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->median_asc = a50[0].GetDouble();
+                                            selectivity->inflection_point_asc = a50[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("slope.sel1");
@@ -358,7 +358,7 @@ public:
                                         it = fsel_o.find("A50.sel2");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->median_desc = a50[0].GetDouble();
+                                            selectivity->inflection_point_desc = a50[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("slope.sel2");
@@ -583,9 +583,9 @@ public:
             it = obj.find("A50.mat");
             if (it != obj.end()) {
                 if ((*it).second.GetType() == JsonValueType::Array) {
-                    mat->median = (*it).second.GetArray()[0].GetDouble();
+                    mat->inflection_point = (*it).second.GetArray()[0].GetDouble();
                     if (print_statements) {
-                        std::cout << "median " << mat->median << " \n";
+                        std::cout << "inflection_point " << mat->inflection_point << " \n";
                     }
                 }
             } else {

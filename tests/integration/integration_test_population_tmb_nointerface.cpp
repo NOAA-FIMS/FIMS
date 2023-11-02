@@ -69,7 +69,7 @@ Type objective_function<Type>::operator()(){
     std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity
       = std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
 
-    selectivity->median = fleet_sel_A50(i);
+    selectivity->inflection_point = fleet_sel_A50(i);
     selectivity->slope = fleet_sel_slope(i);
     f->selectivity = selectivity;
 
@@ -104,7 +104,7 @@ Type objective_function<Type>::operator()(){
     std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity
       = std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
 
-    selectivity->median = surv_sel_A50(i);
+    selectivity->inflection_point = surv_sel_A50(i);
     selectivity->slope = surv_sel_slope(i);
     s->selectivity = selectivity;
     for(int y = 0; y<nyears; y++){
@@ -144,7 +144,7 @@ Type objective_function<Type>::operator()(){
   //Set maturity
   std::shared_ptr<fims_popdy::LogisticMaturity<Type > > mat =
     std::make_shared<fims_popdy::LogisticMaturity<Type> >();
-  mat->median = A50_mat;
+  mat->inflection_point = A50_mat;
   mat->slope = slope_mat;
   pop.maturity = mat;
 

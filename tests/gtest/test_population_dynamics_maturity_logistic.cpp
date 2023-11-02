@@ -5,11 +5,11 @@ namespace
 {
 
   
-  TEST(logistic_maturity, create_object)
+  TEST(LogisticMaturity, CreateObject)
   {
     
     fims_popdy::LogisticMaturity<double> maturity;
-    maturity.median = 20.5;
+    maturity.inflection_point = 20.5;
     maturity.slope = 0.15;
     double maturity_x = 40.5;
     // 1.0/(1.0+exp(-(40.5-20.5)*0.15)) = 0.9525741
