@@ -21,10 +21,10 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct LogisticMaturity : public MaturityBase<Type> {
-  Type inflection_point; /*!< 50% quantile of the value of the quantity of interest (x);
-               e.g. age at which 50% of the fish are mature */
-  Type slope;  /*!<scalar multiplier of difference between quantity of interest
-               value (x) and inflection_point */
+  Type inflection_point; /*!< 50% quantile of the value of the quantity of
+               interest (x); e.g. age at which 50% of the fish are mature */
+  Type slope; /*!<scalar multiplier of difference between quantity of interest
+              value (x) and inflection_point */
 
   LogisticMaturity() : MaturityBase<Type>() {}
 
@@ -38,7 +38,7 @@ struct LogisticMaturity : public MaturityBase<Type> {
    * size at maturity).
    */
 
-  virtual const Type evaluate(const Type & x) {
+  virtual const Type evaluate(const Type& x) {
     return fims_math::logistic<Type>(inflection_point, slope, x);
   }
 };

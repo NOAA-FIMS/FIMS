@@ -60,8 +60,9 @@ std::map<uint32_t, MaturityInterfaceBase*> MaturityInterfaceBase::live_objects;
  */
 class LogisticMaturityInterface : public MaturityInterfaceBase {
  public:
-  Parameter inflection_point; /**< the index value at which the response reaches .5 */
-  Parameter slope;  /**< the width of the curve at the inflection_point */
+  Parameter
+      inflection_point; /**< the index value at which the response reaches .5 */
+  Parameter slope;      /**< the width of the curve at the inflection_point */
 
   LogisticMaturityInterface() : MaturityInterfaceBase() {}
 

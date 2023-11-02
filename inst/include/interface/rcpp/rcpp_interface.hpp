@@ -82,152 +82,150 @@ Rcpp::NumericVector get_random_parameters_vector() {
   return p;
 }
 
-
 /**
  * Clears the contents of info log file.
  */
 void clear_info_log() {
-    //First flush the output stream to make sure nothing
-    //is left in the stream memory bufffer.
-    INFO_LOG.flush();
-    
-    //Next an new stream is opened and closed to
-    //overwrite the file.
-    std::ofstream CLEAR_LOG("logs/info.log");
-    CLEAR_LOG.close();
-    
-    //Finally the stream output location is reset back to the start
-    //of the file.
-    INFO_LOG.seekp(0);
+  // First flush the output stream to make sure nothing
+  // is left in the stream memory bufffer.
+  INFO_LOG.flush();
+
+  // Next an new stream is opened and closed to
+  // overwrite the file.
+  std::ofstream CLEAR_LOG("logs/info.log");
+  CLEAR_LOG.close();
+
+  // Finally the stream output location is reset back to the start
+  // of the file.
+  INFO_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of fims log file.
  */
 void clear_fims_log() {
-    FIMS_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/fims.log");
-    CLEAR_LOG.close();
-    FIMS_LOG.seekp(0);
+  FIMS_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/fims.log");
+  CLEAR_LOG.close();
+  FIMS_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of data log file.
  */
 void clear_data_log() {
-    DATA_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/data.log");
-    CLEAR_LOG.close();
-    DATA_LOG.seekp(0);
+  DATA_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/data.log");
+  CLEAR_LOG.close();
+  DATA_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of error log file.
  */
 void clear_error_log() {
-    ERROR_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/error.log");
-    CLEAR_LOG.close();
-    ERROR_LOG.seekp(0);
+  ERROR_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/error.log");
+  CLEAR_LOG.close();
+  ERROR_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of model log file.
  */
 void clear_model_log() {
-    MODEL_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/model.log");
-    CLEAR_LOG.close();
-    MODEL_LOG.seekp(0);
+  MODEL_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/model.log");
+  CLEAR_LOG.close();
+  MODEL_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of fleet log file.
  */
 void clear_fleet_log() {
-    FLEET_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/fleet.log");
-    CLEAR_LOG.close();
-    FLEET_LOG.seekp(0);
+  FLEET_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/fleet.log");
+  CLEAR_LOG.close();
+  FLEET_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of population log file.
  */
 void clear_population_log() {
-    POPULATION_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/population.log");
-    CLEAR_LOG.close();
-    POPULATION_LOG.seekp(0);
+  POPULATION_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/population.log");
+  CLEAR_LOG.close();
+  POPULATION_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of maturity log file.
  */
 void clear_maturity_log() {
-    MATURITY_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/maturity.log");
-    CLEAR_LOG.close();
-    MATURITY_LOG.seekp(0);
+  MATURITY_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/maturity.log");
+  CLEAR_LOG.close();
+  MATURITY_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of recruitment log file.
  */
 void clear_recruitment_log() {
-    RECRUITMENT_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/recruitment.log");
-    CLEAR_LOG.close();
-    RECRUITMENT_LOG.seekp(0);
+  RECRUITMENT_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/recruitment.log");
+  CLEAR_LOG.close();
+  RECRUITMENT_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of growth log file.
  */
 void clear_growth_log() {
-    GROWTH_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/growth.log");
-    CLEAR_LOG.close();
-    GROWTH_LOG.seekp(0);
+  GROWTH_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/growth.log");
+  CLEAR_LOG.close();
+  GROWTH_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of selectivity log file.
  */
 void clear_selectivity_log() {
-    SELECTIVITY_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/selectivity.log");
-    CLEAR_LOG.close();
-    SELECTIVITY_LOG.seekp(0);
+  SELECTIVITY_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/selectivity.log");
+  CLEAR_LOG.close();
+  SELECTIVITY_LOG.seekp(0);
 }
 
 /**
  * Clears the contents of debug log file.
  */
 void clear_debug_log() {
-    DEBUG_LOG.flush();
-    std::ofstream CLEAR_LOG("logs/debug/debug.log");
-    CLEAR_LOG.close();
-    DEBUG_LOG.seekp(0);
+  DEBUG_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/debug/debug.log");
+  CLEAR_LOG.close();
+  DEBUG_LOG.seekp(0);
 }
-
 
 /**
  * Clears the contents of log files.
  */
 void clear_logs() {
-    clear_fims_log(); 
-    clear_info_log();
-    clear_data_log();
-    clear_error_log();
-    clear_model_log();
-    clear_fleet_log();
-    clear_population_log();
-    clear_recruitment_log();
-    clear_growth_log();
-    clear_maturity_log();
-    clear_selectivity_log();
-    clear_debug_log();
+  clear_fims_log();
+  clear_info_log();
+  clear_data_log();
+  clear_error_log();
+  clear_model_log();
+  clear_fleet_log();
+  clear_population_log();
+  clear_recruitment_log();
+  clear_growth_log();
+  clear_maturity_log();
+  clear_selectivity_log();
+  clear_debug_log();
 }
 
 template <typename Type>
@@ -425,16 +423,19 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
       .constructor()
-      .field("inflection_point", &LogisticSelectivityInterface::inflection_point)
+      .field("inflection_point",
+             &LogisticSelectivityInterface::inflection_point)
       .field("slope", &LogisticSelectivityInterface::slope)
       .method("get_id", &LogisticSelectivityInterface::get_id)
       .method("evaluate", &LogisticSelectivityInterface::evaluate);
 
   Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
       .constructor()
-      .field("inflection_point_asc", &DoubleLogisticSelectivityInterface::inflection_point_asc)
+      .field("inflection_point_asc",
+             &DoubleLogisticSelectivityInterface::inflection_point_asc)
       .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc)
-      .field("inflection_point_desc", &DoubleLogisticSelectivityInterface::inflection_point_desc)
+      .field("inflection_point_desc",
+             &DoubleLogisticSelectivityInterface::inflection_point_desc)
       .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
       .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
       .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);

@@ -83,8 +83,8 @@ struct Dlnorm : public DistributionsBase<Type> {
   /**
    * @brief Probability density function of the lognormal distribution.
    *
-   * \f[ \frac{1.0}{ xsd\sqrt{2.0\pi} }exp(-\frac{(ln(x) - mean)^{2.0}}{2.0sd^{2.0}})
-   * \f]
+   * \f[ \frac{1.0}{ xsd\sqrt{2.0\pi} }exp(-\frac{(ln(x) -
+   * mean)^{2.0}}{2.0sd^{2.0}}) \f]
    *
    * @param do_log Boolean; if true, log densities are returned
    */

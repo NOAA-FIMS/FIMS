@@ -152,16 +152,20 @@ class Information {
    * Create the generalized stock assessment model that will evaluate the
    * objective function. Does error checking to make sure the program has
    * all necessary components for the model and that they're in the right
-   * dimensions. This sets up pointers to all memory objects and initializes 
+   * dimensions. This sets up pointers to all memory objects and initializes
    * fleet and population objects.
    *
-   * @return True if valid model, False if invalid model, check fims.log for errors.
+   * @return True if valid model, False if invalid model, check fims.log for
+   * errors.
    */
   bool CreateModel() {
     bool valid_model = true;
     INFO_LOG << "" << std::endl;
-    INFO_LOG << "Beginning to create FIMS model in information.hpp CreateModel(). " << std::endl;
-    INFO_LOG << "Initializing fleet objects for " << this->fleets.size() << " fleets." << std::endl;
+    INFO_LOG
+        << "Beginning to create FIMS model in information.hpp CreateModel(). "
+        << std::endl;
+    INFO_LOG << "Initializing fleet objects for " << this->fleets.size()
+             << " fleets." << std::endl;
     for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
          ++it) {
       // Initialize fleet object
@@ -170,11 +174,12 @@ class Information {
       INFO_LOG << "Initializing fleet " << f->id << "." << std::endl;
 
       f->Initialize(f->nyears, f->nages);
-       
-      INFO_LOG << "Expecting to import " << this->data_objects.size()
-                 << " data objects." << std::endl;
 
-      INFO_LOG << "Checking for available fleet index data objects." << std::endl;
+      INFO_LOG << "Expecting to import " << this->data_objects.size()
+               << " data objects." << std::endl;
+
+      INFO_LOG << "Checking for available fleet index data objects."
+               << std::endl;
       // set index data
       if (f->fleet_observed_index_data_id_m != -999) {
         uint32_t observed_index_id =
@@ -187,24 +192,26 @@ class Information {
           f->observed_index_data = (*it).second;
           INFO_LOG << "Index data successfully set." << std::endl;
           DATA_LOG << "" << std::endl;
-          DATA_LOG << "Observed input for fleet " << f->id << ", index " << observed_index_id << ": \n " << f->observed_index_data->at(1)
-          << std::endl;
+          DATA_LOG << "Observed input for fleet " << f->id << ", index "
+                   << observed_index_id << ": \n "
+                   << f->observed_index_data->at(1) << std::endl;
         } else {
           valid_model = false;
           ERROR_LOG << "Error: Expected data observations not defined for fleet"
-                   << f->id << ", index " << observed_index_id << std::endl;
+                    << f->id << ", index " << observed_index_id << std::endl;
           exit(1);
         }
 
       } else {
         valid_model = false;
-        ERROR_LOG << "Error: No index data observed for fleet " << f->id 
-                 << ". FIMS requires index data for all fleets." << std::endl;
+        ERROR_LOG << "Error: No index data observed for fleet " << f->id
+                  << ". FIMS requires index data for all fleets." << std::endl;
         exit(1);
       }
       // end set index data
-      
-      INFO_LOG << "Checking for available fleet age comp data objects." << std::endl;
+
+      INFO_LOG << "Checking for available fleet age comp data objects."
+               << std::endl;
       // set age composition data
       if (f->fleet_observed_agecomp_data_id_m != -999) {
         uint32_t observed_agecomp_id =
@@ -217,32 +224,36 @@ class Information {
           f->observed_agecomp_data = (*it).second;
           INFO_LOG << "Age comp data successfully set." << std::endl;
           DATA_LOG << "" << std::endl;
-          DATA_LOG << "Observed input age comp for fleet " << f->id << ", comp " << observed_agecomp_id << ": \n " << f->observed_agecomp_data->at(1)
-          << std::endl;
+          DATA_LOG << "Observed input age comp for fleet " << f->id << ", comp "
+                   << observed_agecomp_id << ": \n "
+                   << f->observed_agecomp_data->at(1) << std::endl;
         } else {
           valid_model = false;
-          ERROR_LOG << "Error: Expected age comp data observations not defined for fleet "
-                   << f->id << ", index " << observed_agecomp_id << std::endl;
+          ERROR_LOG << "Error: Expected age comp data observations not defined "
+                       "for fleet "
+                    << f->id << ", index " << observed_agecomp_id << std::endl;
           exit(1);
         }
 
       } else {
         valid_model = false;
-        ERROR_LOG << "Error: No age comp data observed for fleet " << f->id 
-                 << ". FIMS requires age comp data for all fleets." << std::endl;
+        ERROR_LOG << "Error: No age comp data observed for fleet " << f->id
+                  << ". FIMS requires age comp data for all fleets."
+                  << std::endl;
         exit(1);
       }
       // end set composition data
 
-      INFO_LOG << "Checking for available fleet selectivity pattern." << std::endl;
+      INFO_LOG << "Checking for available fleet selectivity pattern."
+               << std::endl;
       // set selectivity model
       if (f->fleet_selectivity_id_m != -999) {
         uint32_t sel_id = static_cast<uint32_t>(
             f->fleet_selectivity_id_m);  // cast as unsigned integer
         selectivity_models_iterator it = this->selectivity_models.find(
             sel_id);  // if find, set it, otherwise invalid
-        INFO_LOG << "Input fleet selectivity pattern id = " << sel_id
-               << "." << std::endl;
+        INFO_LOG << "Input fleet selectivity pattern id = " << sel_id << "."
+                 << std::endl;
 
         if (it != this->selectivity_models.end()) {
           f->selectivity = (*it).second;  // elements in container held in pair
@@ -251,20 +262,23 @@ class Information {
           INFO_LOG << "Selectivity successfully set." << std::endl;
         } else {
           valid_model = false;
-          ERROR_LOG << "Error: Expected selectivity pattern not defined for fleet "
-                   << f->id << ", selectivity pattern " << sel_id << std::endl;
+          ERROR_LOG
+              << "Error: Expected selectivity pattern not defined for fleet "
+              << f->id << ", selectivity pattern " << sel_id << std::endl;
           exit(1);
         }
 
       } else {
         valid_model = false;
-        ERROR_LOG << "Error: No selectivity pattern defined for fleet " << f->id 
-                 << ". FIMS requires selectivity be defined for all fleets." << std::endl;
+        ERROR_LOG << "Error: No selectivity pattern defined for fleet " << f->id
+                  << ". FIMS requires selectivity be defined for all fleets."
+                  << std::endl;
         exit(1);
       }
       // end set selectivity
 
-      INFO_LOG << "Checking for available index likelihood function." << std::endl;
+      INFO_LOG << "Checking for available index likelihood function."
+               << std::endl;
       // set index likelihood
       if (f->fleet_index_likelihood_id_m != -999) {
         uint32_t ind_like_id = static_cast<uint32_t>(
@@ -272,32 +286,36 @@ class Information {
         distribution_models_iterator it = this->distribution_models.find(
             ind_like_id);  // if find, set it, otherwise invalid
         INFO_LOG << "Input index likelihood function id = " << ind_like_id
-               << "." << std::endl;
+                 << "." << std::endl;
 
         if (it != this->distribution_models.end()) {
           f->index_likelihood =
               (*it).second;  // elements in container held in pair (first is
                              // id, second is object - shared pointer to
                              // distribution)
-          INFO_LOG << "Index likelihood function successfully set." << std::endl;
+          INFO_LOG << "Index likelihood function successfully set."
+                   << std::endl;
         } else {
-          //Commented out for now as code uses single likelihood function making this fail
-          //valid_model = false;
-          //ERROR_LOG << "Error: Expected index likelihood function not defined for fleet "
-          //         << f->id << ", likelihood function " << ind_like_id << std::endl;
-          //exit(1);
+          // Commented out for now as code uses single likelihood function
+          // making this fail valid_model = false; ERROR_LOG << "Error: Expected
+          // index likelihood function not defined for fleet "
+          //          << f->id << ", likelihood function " << ind_like_id <<
+          //          std::endl;
+          // exit(1);
         }
 
       } else {
-        //Commented out for now as code uses single likelihood function making this fail
-        //valid_model = false;
-        //ERROR_LOG << "Error: No index likelihood function defined for fleet " << f->id 
-        //         << ". FIMS requires likelihood functions be defined for all data." << std::endl;
-        //exit(1);
+        // Commented out for now as code uses single likelihood function making
+        // this fail valid_model = false; ERROR_LOG << "Error: No index
+        // likelihood function defined for fleet " << f->id
+        //          << ". FIMS requires likelihood functions be defined for all
+        //          data." << std::endl;
+        // exit(1);
       }
       // end set index likelihood
 
-      INFO_LOG << "Checking for available age comp likelihood function." << std::endl;
+      INFO_LOG << "Checking for available age comp likelihood function."
+               << std::endl;
       // set agecomp likelihood
       if (f->fleet_agecomp_likelihood_id_m != -999) {
         uint32_t ac_like_id = static_cast<uint32_t>(
@@ -305,40 +323,44 @@ class Information {
         distribution_models_iterator it = this->distribution_models.find(
             ac_like_id);  // if find, set it, otherwise invalid
         INFO_LOG << "Input age comp likelihood function id = " << ac_like_id
-               << "." << std::endl;
+                 << "." << std::endl;
 
         if (it != this->distribution_models.end()) {
           f->agecomp_likelihood =
               (*it).second;  // elements in container held in pair (first is
                              // id, second is object - shared pointer to
                              // distribution)
-          INFO_LOG << "Age comp likelihood function successfully set." << std::endl;
+          INFO_LOG << "Age comp likelihood function successfully set."
+                   << std::endl;
         } else {
-          //Commented out for now as code uses single likelihood function making this fail
-          //valid_model = false;
-          //ERROR_LOG << "Error: Expected age comp likelihood function not defined for fleet "
-          //        << f->id << ", likelihood function " << ac_like_id << std::endl;
-          //exit(1);
+          // Commented out for now as code uses single likelihood function
+          // making this fail valid_model = false; ERROR_LOG << "Error: Expected
+          // age comp likelihood function not defined for fleet "
+          //         << f->id << ", likelihood function " << ac_like_id <<
+          //         std::endl;
+          // exit(1);
         }
 
       } else {
-        //Commented out for now as code uses single likelihood function making this fail
-        //valid_model = false;
-        //ERROR_LOG << "Error: No age comp likelihood function defined for fleet " << f->id 
-        //         << ". FIMS requires likelihood functions be defined for all data." << std::endl;
-        //exit(1);
+        // Commented out for now as code uses single likelihood function making
+        // this fail valid_model = false; ERROR_LOG << "Error: No age comp
+        // likelihood function defined for fleet " << f->id
+        //          << ". FIMS requires likelihood functions be defined for all
+        //          data." << std::endl;
+        // exit(1);
       }
       // end set agecomp likelihood
 
-      INFO_LOG << "Completed initialization for fleet " << f->id << "." << std::endl;
+      INFO_LOG << "Completed initialization for fleet " << f->id << "."
+               << std::endl;
 
     }  // close fleet iterator loop
     INFO_LOG << "Completed initialization of all fleets." << std::endl;
-    
-    INFO_LOG << "Initializing population objects for " << this->populations.size() << " populations." << std::endl;
+
+    INFO_LOG << "Initializing population objects for "
+             << this->populations.size() << " populations." << std::endl;
     for (population_iterator it = this->populations.begin();
          it != this->populations.end(); ++it) {
-
       std::shared_ptr<fims_popdy::Population<Type> > p = (*it).second;
 
       INFO_LOG << "Setting up links from population " << p->id
@@ -355,34 +377,39 @@ class Information {
         p->fleets.push_back(f);
         INFO_LOG << f->id << " " << std::flush;
       }
-      INFO_LOG << "]" <<  std::endl;
+      INFO_LOG << "]" << std::endl;
 
       INFO_LOG << "Initializing population " << p->id << "." << std::endl;
       p->Initialize(p->nyears, p->nseasons, p->nages);
-      
+
       INFO_LOG << "Checking for available recruitment function." << std::endl;
       // set recruitment
       if (p->recruitment_id != -999) {
         uint32_t recruitment_uint = static_cast<uint32_t>(p->recruitment_id);
         recruitment_models_iterator it =
             this->recruitment_models.find(recruitment_uint);
-      INFO_LOG << "Input recruitment id = " << recruitment_uint << "." << std::endl;
+        INFO_LOG << "Input recruitment id = " << recruitment_uint << "."
+                 << std::endl;
         if (it != this->recruitment_models.end()) {
           p->recruitment =
               (*it).second;  // recruitment defined in population.hpp
           INFO_LOG << "Recruitment function successfully set." << std::endl;
         } else {
           valid_model = false;
-          ERROR_LOG << "Error: Expected recruitment function not defined for population "
-                   << p->id << ", recruitment function " << recruitment_uint << std::endl;
+          ERROR_LOG << "Error: Expected recruitment function not defined for "
+                       "population "
+                    << p->id << ", recruitment function " << recruitment_uint
+                    << std::endl;
           exit(1);
         }
 
       } else {
         valid_model = false;
-        ERROR_LOG << "Error: No recruitment function defined for population " << p->id 
-                 << ". FIMS requires recruitment functions be defined for all populations." 
-                 << std::endl;
+        ERROR_LOG << "Error: No recruitment function defined for population "
+                  << p->id
+                  << ". FIMS requires recruitment functions be defined for all "
+                     "populations."
+                  << std::endl;
         exit(1);
       }
 
@@ -403,16 +430,19 @@ class Information {
           INFO_LOG << "Growth function successfully set." << std::endl;
         } else {
           valid_model = false;
-          ERROR_LOG << "Error: Expected growth function not defined for population "
-                   << p->id << ", growth function " << growth_uint << std::endl;
+          ERROR_LOG
+              << "Error: Expected growth function not defined for population "
+              << p->id << ", growth function " << growth_uint << std::endl;
           exit(1);
         }
 
       } else {
         valid_model = false;
-        ERROR_LOG << "Error: No growth function defined for population " << p->id 
-                 << ". FIMS requires growth functions be defined for all populations." 
-                 << std::endl;
+        ERROR_LOG << "Error: No growth function defined for population "
+                  << p->id
+                  << ". FIMS requires growth functions be defined for all "
+                     "populations."
+                  << std::endl;
         exit(1);
       }
 
@@ -429,19 +459,23 @@ class Information {
           INFO_LOG << "Maturity function successfully set." << std::endl;
         } else {
           valid_model = false;
-          ERROR_LOG << "Error: Expected maturity function not defined for population "
-                   << p->id << ", maturity function " << maturity_uint << std::endl;
+          ERROR_LOG
+              << "Error: Expected maturity function not defined for population "
+              << p->id << ", maturity function " << maturity_uint << std::endl;
           exit(1);
         }
 
       } else {
         valid_model = false;
-        ERROR_LOG << "Error: No maturity function defined for population " << p->id 
-                 << ". FIMS requires maturity functions be defined for all populations." 
-                 << std::endl;
+        ERROR_LOG << "Error: No maturity function defined for population "
+                  << p->id
+                  << ". FIMS requires maturity functions be defined for all "
+                     "populations."
+                  << std::endl;
         exit(1);
       }
-      INFO_LOG << "Completed initialization for population " << p->id << "." << std::endl;
+      INFO_LOG << "Completed initialization for population " << p->id << "."
+               << std::endl;
     }
     INFO_LOG << "Completed initialization of all populations." << std::endl;
     INFO_LOG << "Completed FIMS model creation." << std::endl;

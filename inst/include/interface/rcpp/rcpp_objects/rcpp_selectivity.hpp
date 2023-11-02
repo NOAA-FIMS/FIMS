@@ -60,8 +60,9 @@ std::map<uint32_t, SelectivityInterfaceBase*>
  */
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
-  Parameter inflection_point; /**< the index value at which the response reaches .5 */
-  Parameter slope;  /**< the width of the curve at the inflection_point */
+  Parameter
+      inflection_point; /**< the index value at which the response reaches .5 */
+  Parameter slope;      /**< the width of the curve at the inflection_point */
 
   LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
@@ -136,10 +137,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
-  Parameter inflection_point_asc; /**< the index value at which the response reaches .5 */
-  Parameter slope_asc;  /**< the width of the curve at the inflection_point */
-  Parameter
-      inflection_point_desc;      /**< the index value at which the response reaches .5 */
+  Parameter inflection_point_asc; /**< the index value at which the response
+                                     reaches .5 */
+  Parameter slope_asc; /**< the width of the curve at the inflection_point */
+  Parameter inflection_point_desc; /**< the index value at which the response
+                                      reaches .5 */
   Parameter slope_desc; /**< the width of the curve at the inflection_point */
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {}
@@ -157,7 +159,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     fims_popdy::DoubleLogisticSelectivity<double> DoubleLogisticSel;
     DoubleLogisticSel.inflection_point_asc = this->inflection_point_asc.value_m;
     DoubleLogisticSel.slope_asc = this->slope_asc.value_m;
-    DoubleLogisticSel.inflection_point_desc = this->inflection_point_desc.value_m;
+    DoubleLogisticSel.inflection_point_desc =
+        this->inflection_point_desc.value_m;
     DoubleLogisticSel.slope_desc = this->slope_desc.value_m;
     return DoubleLogisticSel.evaluate(x);
   }
