@@ -91,13 +91,14 @@ class Model {  // may need singleton
     // Loop over populations, evaluate, and sum up the recruitment likelihood
     // component
     typename fims::Information<Type>::population_iterator it;
+    MODEL_LOG << "Evaluating expected values and summing recruitment nlls for " << this->fims_information->populations.size() << " populations." << std::endl;
     for (it = this->fims_information->populations.begin();
          it != this->fims_information->populations.end(); ++it) {
       //(*it).second points to the Population module
-      MODEL_LOG << "inside pop loop" << std::endl;
+      MODEL_LOG << "Setting up pointer to population " << (*it).second->id << "." << std::endl;
       // Prepare recruitment
       (*it).second->recruitment->Prepare();
-      MODEL_LOG << "recruitment prepare works" << std::endl;
+      MODEL_LOG << "Recruitment for population successfully prepared" << std::endl;
 // link to TMB objective function
 #ifdef TMB_MODEL
       (*it).second->of = this->of;
@@ -106,23 +107,26 @@ class Model {  // may need singleton
       (*it).second->Evaluate();
       // Recrtuiment negative log-likelihood
       rec_nll += (*it).second->recruitment->evaluate_nll();
-      MODEL_LOG << "rec nll: " << rec_nll << std::endl;
+      MODEL_LOG << "Recruitment negative log-likelihood is: " << rec_nll << std::endl;
     }
+    MODEL_LOG << "All populations successfully evaluated." << std::endl;
 
     // Loop over fleets/surveys, and sum up age comp and index nlls
     typename fims::Information<Type>::fleet_iterator jt;
+    MODEL_LOG << "Evaluating expected values and summing nlls for " << this->fims_information->fleets.size() << " fleets." << std::endl;
     for (jt = this->fims_information->fleets.begin();
          jt != this->fims_information->fleets.end(); ++jt) {
       //(*jt).second points to each individual Fleet module
 #ifdef TMB_MODEL
       (*jt).second->of = this->of;
 #endif
+      MODEL_LOG << "Setting up pointer to fleet " << (*jt).second->id << "." << std::endl; 
       age_comp_nll += (*jt).second->evaluate_age_comp_nll();
-      MODEL_LOG << "survey and fleet age comp nll sum: " << age_comp_nll
+      MODEL_LOG << "Sum of survey and age comp negative log-likelihood is: " << age_comp_nll
                << std::endl;
       index_nll += (*jt).second->evaluate_index_nll();
     }
-
+    MODEL_LOG << "All fleets successfully evaluated." << std::endl;
     // Loop over populations and fleets/surveys and fill in reporting
 
     // initiate population index for structuring report out objects

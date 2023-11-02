@@ -211,9 +211,9 @@ struct Population : public FIMSObject<Type> {
         this->mortality_F[i_age_year] +=
             this->fleets[fleet_]->Fmort[year] *
             this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-        POPULATION_LOG << " sel age " << ages[age] << "for fleet " << fleet_ << " is "
+        POPULATION_LOG << " selectivity at age " << ages[age] << " for fleet " << fleet_ << " is "
                  << this->fleets[fleet_]->selectivity->evaluate(ages[age])
-                 << " F mort year " << year << " "
+                 << " apical fishing mortality F for the fleet in year " << year << " is "
                  << this->fleets[fleet_]->Fmort[year] << std::endl;
       }
     }

@@ -153,9 +153,10 @@ struct Fleet : public FIMSObject<Type> {
     size_t dims = this->observed_agecomp_data->get_imax() *
                   this->observed_agecomp_data->get_jmax();
     if (dims != this->catch_numbers_at_age.size()) {
-      FLEET_LOG << "Error: observed age comp is of size "
+      ERROR_LOG << "Error: observed age comp is of size "
                                  << dims << " and expected is of size "
                                  << this->age_composition.size() << std::endl;
+                                 exit(1);
     } else {
       for (size_t y = 0; y < this->nyears; y++) {
         // EigenVector declares a vector type from the Eigen library, which is
@@ -188,7 +189,7 @@ struct Fleet : public FIMSObject<Type> {
         nll -= dmultinom.evaluate(true);
       }
     }
-    FLEET_LOG << " agecomp nll: " << nll << std::endl;
+    FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id << nll << std::endl;
 #endif
     return nll;
   }
@@ -204,7 +205,7 @@ struct Fleet : public FIMSObject<Type> {
       dnorm.mean = fims::log(this->expected_index[i]);
       nll -= dnorm.evaluate(true);
       FLEET_LOG
-          << "observed likelihood component: " << i << " is "
+          << "observed index data: " << i << " is "
           << this->observed_index_data->at(i)
           << " and expected is: " << this->expected_index[i] << std::endl;
     }
