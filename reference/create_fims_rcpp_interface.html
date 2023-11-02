@@ -317,7 +317,7 @@ for FIMS model objects.</p>
 <span class="r-in"><span>  model <span class="op">=</span> <span class="st">"LogisticSelectivity"</span>,</span></span>
 <span class="r-in"><span>  base_class <span class="op">=</span> <span class="st">"SelectivityInterfaceBase"</span>,</span></span>
 <span class="r-in"><span>  container <span class="op">=</span> <span class="st">"selectivity_models"</span>,</span></span>
-<span class="r-in"><span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"slope"</span>, <span class="st">"median"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"slope"</span>, <span class="st">"inflection_point"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  evaluate_parameter <span class="op">=</span> <span class="st">"x"</span>,</span></span>
 <span class="r-in"><span>  evaluate_parameter_type <span class="op">=</span> <span class="st">"double"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
@@ -325,7 +325,7 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  public:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Parameter slope;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Parameter median;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Parameter inflection_point;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   LogisticSelectivityInterface() : SelectivityInterfaceBase() {}</span>
@@ -339,7 +339,7 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   virtual double evaluate(double x) {</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     fims_popdy::LogisticSelectivity&lt;double&gt; object;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     object.slope = this-&gt;slope.value;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     object.median = this-&gt;median.value;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     object.inflection_point = this-&gt;inflection_point.value;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     return object.evaluate(double);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -361,12 +361,12 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       d0-&gt;RegisterParameter(model0-&gt;slope);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> } </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model0-&gt;median= this-&gt;median.value;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    if (this-&gt;median.estimated) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         if (this-&gt;median.is_random_effect) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           d0-&gt;RegisterRandomEffect(model0-&gt;median);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model0-&gt;inflection_point= this-&gt;inflection_point.value;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    if (this-&gt;inflection_point.estimated) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (this-&gt;inflection_point.is_random_effect) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           d0-&gt;RegisterRandomEffect(model0-&gt;inflection_point);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    } else {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       d0-&gt;RegisterParameter(model0-&gt;median);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       d0-&gt;RegisterParameter(model0-&gt;inflection_point);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> } </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d0-&gt;selectivity_models[model0-&gt;id]=model0;</span>
@@ -388,12 +388,12 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       d1-&gt;RegisterParameter(model1-&gt;slope);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> } </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model1-&gt;median= this-&gt;median.value;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    if (this-&gt;median.estimated) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         if (this-&gt;median.is_random_effect) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           d1-&gt;RegisterRandomEffect(model1-&gt;median);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model1-&gt;inflection_point= this-&gt;inflection_point.value;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    if (this-&gt;inflection_point.estimated) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (this-&gt;inflection_point.is_random_effect) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           d1-&gt;RegisterRandomEffect(model1-&gt;inflection_point);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    } else {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       d1-&gt;RegisterParameter(model1-&gt;median);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       d1-&gt;RegisterParameter(model1-&gt;inflection_point);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> } </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d1-&gt;selectivity_models[model1-&gt;id]=model1;</span>
@@ -415,12 +415,12 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       d2-&gt;RegisterParameter(model2-&gt;slope);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> } </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model2-&gt;median= this-&gt;median.value;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    if (this-&gt;median.estimated) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         if (this-&gt;median.is_random_effect) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           d2-&gt;RegisterRandomEffect(model2-&gt;median);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model2-&gt;inflection_point= this-&gt;inflection_point.value;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    if (this-&gt;inflection_point.estimated) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (this-&gt;inflection_point.is_random_effect) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           d2-&gt;RegisterRandomEffect(model2-&gt;inflection_point);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    } else {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       d2-&gt;RegisterParameter(model2-&gt;median);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       d2-&gt;RegisterParameter(model2-&gt;inflection_point);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> } </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d2-&gt;selectivity_models[model2-&gt;id]=model2;</span>
@@ -442,12 +442,12 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       d3-&gt;RegisterParameter(model3-&gt;slope);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> } </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model3-&gt;median= this-&gt;median.value;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    if (this-&gt;median.estimated) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         if (this-&gt;median.is_random_effect) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           d3-&gt;RegisterRandomEffect(model3-&gt;median);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model3-&gt;inflection_point= this-&gt;inflection_point.value;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    if (this-&gt;inflection_point.estimated) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (this-&gt;inflection_point.is_random_effect) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           d3-&gt;RegisterRandomEffect(model3-&gt;inflection_point);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    } else {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       d3-&gt;RegisterParameter(model3-&gt;median);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       d3-&gt;RegisterParameter(model3-&gt;inflection_point);</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> } </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    d3-&gt;selectivity_models[model3-&gt;id]=model3;</span>
@@ -467,7 +467,7 @@ for FIMS model objects.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> .method("get_id",  &amp;LogisticSelectivityInterface::get_id)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> .method("evaluate", &amp; LogisticSelectivityInterface ::evaluate)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> .field("slope", &amp;LogisticSelectivityInterface::slope)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> .field("median", &amp;LogisticSelectivityInterface::median);</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> .field("inflection_point", &amp;LogisticSelectivityInterface::inflection_point);</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

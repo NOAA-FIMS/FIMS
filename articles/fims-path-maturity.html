@@ -133,9 +133,9 @@ module with parameter values.</p>
 <span><span class="va">Fims</span> <span class="op">&lt;-</span> <span class="fu">Rcpp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/Module.html" class="external-link">Module</a></span><span class="op">(</span><span class="st">"fims"</span>, PACKAGE <span class="op">=</span> <span class="st">"FIMS"</span><span class="op">)</span></span>
 <span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">LogisticMaturity</span><span class="op">)</span></span>
 <span><span class="co"># Populate the maturity module with parameter values.</span></span>
-<span><span class="va">maturity</span><span class="op">$</span><span class="va">median</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
-<span><span class="va">maturity</span><span class="op">$</span><span class="va">median</span><span class="op">$</span><span class="va">is_random_effect</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
-<span><span class="va">maturity</span><span class="op">$</span><span class="va">median</span><span class="op">$</span><span class="va">estimated</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
+<span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">is_random_effect</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">estimated</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">slope</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">0.2</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">slope</span><span class="op">$</span><span class="va">is_random_effect</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">slope</span><span class="op">$</span><span class="va">estimated</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span></code></pre></div>
@@ -168,16 +168,17 @@ are defined in the <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/inc
 file in the directory <a href="https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp" class="external-link">inst/include/interface/rcpp</a>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode cpp rcppchunk"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="op">::</span><span class="va">class_</span><span class="op">&lt;</span>LogisticMaturityInterface<span class="op">&gt;(</span><span class="st">"LogisticMaturity"</span><span class="op">)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>constructor<span class="op">()</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>field<span class="op">(</span><span class="st">"median"</span><span class="op">,</span> <span class="op">&amp;</span>LogisticMaturityInterface<span class="op">::</span>median<span class="op">)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>field<span class="op">(</span><span class="st">"inflection_point"</span><span class="op">,</span> <span class="op">&amp;</span>LogisticMaturityInterface<span class="op">::</span>inflection_point<span class="op">)</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>field<span class="op">(</span><span class="st">"slope"</span><span class="op">,</span> <span class="op">&amp;</span>LogisticMaturityInterface<span class="op">::</span>slope<span class="op">)</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>method<span class="op">(</span><span class="st">"get_id"</span><span class="op">,</span> <span class="op">&amp;</span>LogisticMaturityInterface<span class="op">::</span>get_id<span class="op">)</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span>method<span class="op">(</span><span class="st">"evaluate"</span><span class="op">,</span> <span class="op">&amp;</span>LogisticMaturityInterface<span class="op">::</span>evaluate<span class="op">);</span></span></code></pre></div>
 <p>The code above shows that there are two maturity module-specific
-fields (i.e., parameters), <code>median</code> and <code>slope</code>,
-and two maturity module-specific methods (i.e., functions),
-<code>get_id</code> and <code>evaluate</code>. Defined methods are
-functions that can be called from R. You can access the fields and
-methods from R using the <code>show(Fims)</code> function.</p>
+fields (i.e., parameters), <code>inflection_point</code> and
+<code>slope</code>, and two maturity module-specific methods (i.e.,
+functions), <code>get_id</code> and <code>evaluate</code>. Defined
+methods are functions that can be called from R. You can access the
+fields and methods from R using the <code>show(Fims)</code>
+function.</p>
 <p>The maturity module’s <code>get_id</code> method returns a unique ID
 for this specific module.</p>
 <p>When creating a new module in R, users can access the module using
@@ -202,8 +203,8 @@ class</strong>:</p>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LogisticMaturityInterface <span class="op">:</span> <span class="kw">public</span> MaturityInterfaceBase <span class="op">{</span></span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a> <span class="kw">public</span><span class="op">:</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  Parameter median<span class="op">;</span> <span class="co">/**&lt; the index value at which the response reaches .5 */</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  Parameter slope<span class="op">;</span>  <span class="co">/**&lt; the width of the curve at the median */</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  Parameter inflection_point<span class="op">;</span> <span class="co">/**&lt; the index value at which the response reaches .5 */</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  Parameter slope<span class="op">;</span>  <span class="co">/**&lt; the width of the curve at the inflection_point */</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>We typically will reference the child class from R to specify the
@@ -212,7 +213,7 @@ In this particular example, we are using the logistic form of
 maturity.</p>
 <p><img src="figures/fims-path-maturity-1.png" width="85%"></p>
 <p>All Rcpp interface classes from FIMS define parameters (e.g.,
-<code>median</code>, <code>slope</code>) using the
+<code>inflection_point</code>, <code>slope</code>) using the
 <code>Parameter</code> class defined in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp" class="external-link">rcpp_interface_base.hpp</a>
 in the directory <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects" class="external-link">inst/include/interface/rcpp/rcpp_objects</a>:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode cpp rcppchunk"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Parameter <span class="op">{</span></span>
@@ -328,21 +329,21 @@ information, and lm0, which points to the logistic maturity module.</p>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">//d0 is a shared pointer that points to fims_info::Information</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_info<span class="op">::</span>Information<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;</span> <span class="op">&gt;</span> d0 <span class="op">=</span></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        fims_info<span class="op">::</span>Information<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;::</span>GetInstance<span class="op">();</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a> <span class="cf">if</span> <span class="op">(</span><span class="kw">this</span><span class="op">-&gt;</span>median<span class="op">.</span>estimated<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span><span class="kw">this</span><span class="op">-&gt;</span>median<span class="op">.</span>is_random_effect<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a> <span class="cf">if</span> <span class="op">(</span><span class="kw">this</span><span class="op">-&gt;</span>inflection_point<span class="op">.</span>estimated<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span><span class="kw">this</span><span class="op">-&gt;</span>inflection_point<span class="op">.</span>is_random_effect<span class="op">)</span> <span class="op">{</span></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="co">/*</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">         if median is estimated and a random effect, </span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">         the median value from LogisticMaturityInterface (lm0-&gt;median) </span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">         if inflection_point is estimated and a random effect, </span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">         the inflection_point value from LogisticMaturityInterface (lm0-&gt;inflection_point) </span></span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">         is passed to the Information member function RegisterRandomEffect</span></span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">        */</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        d0<span class="op">-&gt;</span>RegisterRandomEffect<span class="op">(</span>lm0<span class="op">-&gt;</span>median<span class="op">);</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        d0<span class="op">-&gt;</span>RegisterRandomEffect<span class="op">(</span>lm0<span class="op">-&gt;</span>inflection_point<span class="op">);</span></span>
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">/*</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">         if median is estimated and not a random effect, </span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">         the median value from LogisticMaturityInterface (lm0-&gt;median)</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">         if inflection_point is estimated and not a random effect, </span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">         the inflection_point value from LogisticMaturityInterface (lm0-&gt;inflection_point)</span></span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">         is passed to the Information member function RegisterParameter</span></span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">         */</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        d0<span class="op">-&gt;</span>RegisterParameter<span class="op">(</span>lm0<span class="op">-&gt;</span>median<span class="op">);</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        d0<span class="op">-&gt;</span>RegisterParameter<span class="op">(</span>lm0<span class="op">-&gt;</span>inflection_point<span class="op">);</span></span>
 <span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
 <span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span></code></pre></div>
 <p>Linking to the <code>fims_popdy::LogisticMaturity</code> class allows
@@ -355,10 +356,10 @@ calculation:</p>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">std::</span>make_shared<span class="op">&lt;</span>fims_popdy<span class="op">::</span>LogisticMaturity<span class="op">&lt;</span>TMB_FIMS_REAL_TYPE<span class="op">&gt;</span> <span class="op">&gt;();</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a> </span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">/*</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"> the median value from LogisticMaturity (lm0-&gt;median)</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"> equals the median value from LogisticMaturityInterface (this-&gt;median.value)</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"> the inflection_point value from LogisticMaturity (lm0-&gt;inflection_point)</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"> equals the inflection_point value from LogisticMaturityInterface (this-&gt;inflection_point.value)</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>lm0<span class="op">-&gt;</span>median <span class="op">=</span> <span class="kw">this</span><span class="op">-&gt;</span>median<span class="op">.</span>value<span class="op">;</span></span></code></pre></div>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>lm0<span class="op">-&gt;</span>inflection_point <span class="op">=</span> <span class="kw">this</span><span class="op">-&gt;</span>inflection_point<span class="op">.</span>value<span class="op">;</span></span></code></pre></div>
 <p>We can also link these two pointers together so that the
 <strong>fims_<a href="info::Information" class="uri">info::Information</a></strong> class links up with the
 <strong>fims_popdy::LogisticMaturity</strong>, but more details on this
@@ -387,8 +388,8 @@ has an <code>evaluate</code> method (i.e., function) that takes an
 input, <em>x</em> and returns the output from a logistic function
 (defined in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp" class="external-link">fims_math.hpp</a>
 in the directory <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common" class="external-link">inst/include/common</a>)
-using the class member <code>median</code> and <code>slope</code>
-values.</p>
+using the class member <code>inflection_point</code> and
+<code>slope</code> values.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode cpp fimschunk"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> fims_popdy <span class="op">{</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">/**</span></span>
@@ -397,10 +398,10 @@ values.</p>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"> */</span></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> Type<span class="op">&gt;</span></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> LogisticMaturity <span class="op">:</span> <span class="kw">public</span> MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">{</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  Type median<span class="op">;</span> <span class="co">/*!&lt; 50% quantile of the value of the quantity of interest (x); e.g.,</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  Type inflection_point<span class="op">;</span> <span class="co">/*!&lt; 50% quantile of the value of the quantity of interest (x); e.g.,</span></span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">               age at which 50% of the fish are mature */</span></span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  Type slope<span class="op">;</span>  <span class="co">/*!&lt;scalar multiplier of difference between quantity of interest</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">               value (x) and median */</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">               value (x) and inflection_point */</span></span>
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  LogisticMaturity<span class="op">()</span> <span class="op">:</span> MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;()</span> <span class="op">{}</span></span>
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
@@ -412,7 +413,7 @@ values.</p>
 <span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co">   * size at maturity).</span></span>
 <span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">   */</span></span>
 <span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">virtual</span> <span class="at">const</span> Type evaluate<span class="op">(</span><span class="at">const</span> Type<span class="op">&amp;</span> x<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fims_math<span class="op">::</span>logistic<span class="op">&lt;</span>Type<span class="op">&gt;(</span>median<span class="op">,</span> slope<span class="op">,</span> x<span class="op">);</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fims_math<span class="op">::</span>logistic<span class="op">&lt;</span>Type<span class="op">&gt;(</span>inflection_point<span class="op">,</span> slope<span class="op">,</span> x<span class="op">);</span></span>
 <span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
 <span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
 <span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a></span>
@@ -646,8 +647,8 @@ set.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">maturity_modules</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="st">"Logistic Maturity"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span>, median <span class="op">=</span> <span class="fl">10</span>, slope <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>,</span>
-<span>  <span class="st">"Some Other Maturity"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">2</span>, median <span class="op">=</span> <span class="fl">8</span>, slope <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
+<span>  <span class="st">"Logistic Maturity"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span>, inflection_point <span class="op">=</span> <span class="fl">10</span>, slope <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span>,</span>
+<span>  <span class="st">"Some Other Maturity"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">2</span>, inflection_point <span class="op">=</span> <span class="fl">8</span>, slope <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>We can think of population_modules and maturity_modules above as
 instantiated C++ classes stored in our computer’s memory. This R code
@@ -656,10 +657,10 @@ modules in R:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Fims &lt;- Rcpp::Module("fims", PACKAGE = "FIMS")</span></span>
 <span><span class="co"># maturity1 &lt;- new(Fims$LogisticMaturity)</span></span>
-<span><span class="co"># maturity1$median$value &lt;- 10</span></span>
+<span><span class="co"># maturity1$inflection_point$value &lt;- 10</span></span>
 <span><span class="co"># maturity1$slope$value &lt;- 0.2</span></span>
 <span><span class="co"># maturity2 &lt;- new(Fims$LogisticMaturity)</span></span>
-<span><span class="co"># maturity2$median$value &lt;- 8</span></span>
+<span><span class="co"># maturity2$inflection_point$value &lt;- 8</span></span>
 <span><span class="co"># maturity2$slope$value &lt;- 0.3</span></span>
 <span><span class="co"># population1 &lt;- new(Fims$Population)</span></span>
 <span><span class="co"># population2 &lt;- new(Fims$Population)</span></span>
@@ -736,10 +737,10 @@ out.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">population_modules</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">$</span><span class="va">maturity</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        Pop 1 Pop 2 Pop 3</span></span>
-<span><span class="co">#&gt; id     1     1     2    </span></span>
-<span><span class="co">#&gt; median 10    10    8    </span></span>
-<span><span class="co">#&gt; slope  0.2   0.2   0.3</span></span></code></pre></div>
+<span><span class="co">#&gt;                  Pop 1 Pop 2 Pop 3</span></span>
+<span><span class="co">#&gt; id               1     1     2    </span></span>
+<span><span class="co">#&gt; inflection_point 10    10    8    </span></span>
+<span><span class="co">#&gt; slope            0.2   0.2   0.3</span></span></code></pre></div>
 <p>In R, the above code sets up an intermediate value, p. Once we update
 the maturity from p to equal the correct maturity module,
 <code>p$pointer$maturity &lt;- information$maturity[[newit]][[2]]</code>,
