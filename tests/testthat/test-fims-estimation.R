@@ -38,9 +38,9 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
   test_env$recruitment$logit_steep$is_random_effect <- FALSE
   test_env$recruitment$logit_steep$estimated <- FALSE
-  test_env$recruitment$estimate_deviations <- TRUE
-  # alternative setting: recruitment$deviations <- rep(1, length(om_input$logR.resid))
-  test_env$recruitment$deviations <- om_input$logR.resid
+  test_env$recruitment$estimate_log_devs <- TRUE
+  # alternative setting: recruitment$log_devs <- rep(1, length(om_input$logR.resid))
+  test_env$recruitment$log_devs <- om_input$logR.resid
 
   # Data
   test_env$catch <- em_input$L.obs$fleet1
@@ -207,8 +207,8 @@ test_that("deterministic test of fims", {
     expect_equal(report$recruitment[[1]][i], om_output$N.age[i, 1])
   }
 
-  # recruitment deviations (fixed at initial "true" values)
-  expect_equal(log(report$rec_dev[[1]]), om_input$logR.resid)
+  # recruitment log_devs (fixed at initial "true" values)
+  expect_equal(report$rec_dev[[1]], om_input$logR.resid)
 
   # F (fixed at initial "true" values)
   expect_equal(report$F_mort[[1]], om_output$f)
@@ -310,7 +310,7 @@ test_that("nll test of fims", {
 
   # recruitment likelihood
   rec_nll <- -sum(dnorm(
-    nll_env$recruitment$deviations, rep(0, om_input$nyr),
+    nll_env$recruitment$log_devs, rep(0, om_input$nyr),
     om_input$logR_sd, TRUE
   ))
 
@@ -438,12 +438,12 @@ test_that("estimation test of fims", {
     report$recruitment[[1]][1:om_input$nyr]
   )
 
-  # recruitment deviations
+  # recruitment log_devs
   sdr_rdev <- sdr_report[which(rownames(sdr_report) == "RecDev"), ]
   rdev_are <- rep(0, length(om_input$logR.resid))
 
   for (i in 1:length(om_input$logR.resid)) {
-    rdev_are[i] <- abs(report$rec_dev[[1]][i] - exp(om_input$logR.resid[i])) # /
+    rdev_are[i] <- abs(report$rec_dev[[1]][i] - om_input$logR.resid[i]) # /
     #   exp(om_input$logR.resid[i])
     # expect_lte(rdev_are[i], 1) # 1
   }
@@ -583,9 +583,9 @@ test_that("run FIMS in a for loop", {
     recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
     recruitment$logit_steep$is_random_effect <- FALSE
     recruitment$logit_steep$estimated <- FALSE
-    recruitment$estimate_deviations <- TRUE
-    # alternative setting: recruitment$deviations <- rep(1, length(om_input$logR.resid))
-    recruitment$deviations <- om_input$logR.resid
+    recruitment$estimate_log_devs <- TRUE
+    # alternative setting: recruitment$log_devs <- rep(1, length(om_input$logR.resid))
+    recruitment$log_devs <- om_input$logR.resid
 
     # Data
     catch <- em_input$L.obs$fleet1
