@@ -19,7 +19,7 @@ namespace
 
     for (int i = 0; i < expect_value.size(); ++i)
     {
-      EXPECT_NEAR(fims::logistic(median_value[i], slope_value[i], x_value[i]), expect_value[i], 0.0001);
+      EXPECT_NEAR(fims_math::logistic(median_value[i], slope_value[i], x_value[i]), expect_value[i], 0.0001);
     }
   }
 

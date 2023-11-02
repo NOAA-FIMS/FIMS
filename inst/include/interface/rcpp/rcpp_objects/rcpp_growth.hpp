@@ -74,8 +74,8 @@ vectors have been set */
 
   /**
    * @brief Create a map of input numeric vectors
-   * @param weights T vector of weights
-   * @param ages T vector of ages
+   * @param weights Type vector of weights
+   * @param ages Type vector of ages
    * @return std::map<T, T>
    *
    * */
@@ -93,7 +93,7 @@ vectors have been set */
    * ewaagrowth.evaluate(age)
    * */
   virtual double evaluate(double age) {
-    fims::EWAAgrowth<double> EWAAGrowth;
+    fims_popdy::EWAAgrowth<double> EWAAGrowth;
 
     if (initialized == false) {
       this->ewaa = make_map(this->ages, this->weights);
@@ -112,11 +112,11 @@ vectors have been set */
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::Information<Type> > info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims::EWAAgrowth<Type> > ewaa_growth =
-        std::make_shared<fims::EWAAgrowth<Type> >();
+    std::shared_ptr<fims_popdy::EWAAgrowth<Type> > ewaa_growth =
+        std::make_shared<fims_popdy::EWAAgrowth<Type> >();
 
     // set relative info
     ewaa_growth->id = this->id;

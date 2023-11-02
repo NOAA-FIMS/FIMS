@@ -40,7 +40,7 @@ public:
                 ss << "inputs/C" << i << "/om_output" << j + 1 << ".json";
                 this->ReadJson(ss.str(), output);
 
-                fims::Population<double> pop;
+                fims_popdy::Population<double> pop;
 
                 if (!this->ConfigurePopulationModel(pop, input, output)) {
                     good = false;
@@ -84,7 +84,7 @@ public:
         return true;
     }
 
-    bool ConfigurePopulationModel(fims::Population<double> &pop,
+    bool ConfigurePopulationModel(fims_popdy::Population<double> &pop,
             JsonValue &input,
             JsonValue &output) {
 
@@ -151,10 +151,10 @@ public:
                 }
 
                 for (size_t i = 0; i < nfleets; i++) {
-                    std::shared_ptr<fims::Fleet<double> > f = std::make_shared<fims::Fleet<double> >();
+                    std::shared_ptr<fims_popdy::Fleet<double> > f = std::make_shared<fims_popdy::Fleet<double> >();
                     f->Initialize(nyears, nages);
-                    f->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
-                    f->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
+                    f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
+                    f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
 
                     std::stringstream strs;
                     strs << "fleet" << i + 1;
@@ -180,7 +180,7 @@ public:
                                         if (print_statements) {
                                             std::cout << "logistic\n";
                                         }
-                                        std::shared_ptr<fims::LogisticSelectivity<double> > selectivity = std::make_shared<fims::LogisticSelectivity<double> >();
+                                        std::shared_ptr<fims_popdy::LogisticSelectivity<double> > selectivity = std::make_shared<fims_popdy::LogisticSelectivity<double> >();
 
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
@@ -207,7 +207,7 @@ public:
                                         if (print_statements) {
                                             std::cout << "double logistic\n";
                                         }
-                                        std::shared_ptr<fims::DoubleLogisticSelectivity<double> > selectivity = std::make_shared<fims::DoubleLogisticSelectivity<double> >();
+                                        std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double> > selectivity = std::make_shared<fims_popdy::DoubleLogisticSelectivity<double> >();
 
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
@@ -294,11 +294,11 @@ public:
                 }
 
                 for (size_t i = 0; i < nsurveys; i++) {
-                    std::shared_ptr<fims::Fleet<double> > s = std::make_shared<fims::Fleet<double> >();
+                    std::shared_ptr<fims_popdy::Fleet<double> > s = std::make_shared<fims_popdy::Fleet<double> >();
                     s->is_survey = true;
                     s->Initialize(nyears, nages);
-                    s->observed_index_data = std::make_shared<fims::DataObject<double> >(nyears);
-                    s->observed_agecomp_data = std::make_shared<fims::DataObject<double> >(nyears, nages);
+                    s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
+                    s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
 
                     std::stringstream strs;
                     strs << "survey" << i + 1;
@@ -322,7 +322,7 @@ public:
                                     JsonArray sel_pattern = (*it).second.GetArray();
 
                                     if (sel_pattern[0].GetInt() == 1) {//logistic
-                                        std::shared_ptr<fims::LogisticSelectivity<double> > selectivity = std::make_shared<fims::LogisticSelectivity<double> >();
+                                        std::shared_ptr<fims_popdy::LogisticSelectivity<double> > selectivity = std::make_shared<fims_popdy::LogisticSelectivity<double> >();
 
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
@@ -341,7 +341,7 @@ public:
 
 
                                     } else if (sel_pattern[0].GetInt() == 2) {//double logistic
-                                        std::shared_ptr<fims::DoubleLogisticSelectivity<double> > selectivity = std::make_shared<fims::DoubleLogisticSelectivity<double> >();
+                                        std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double> > selectivity = std::make_shared<fims_popdy::DoubleLogisticSelectivity<double> >();
 
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
@@ -382,14 +382,14 @@ public:
 
 
                     if ((*it).second.GetType() == JsonValueType::Object) {
-                        //                        f->log_q = fims::log((*it).second.GetDouble());
+                        //                        f->log_q = fims_math::log((*it).second.GetDouble());
                         JsonObject qobj = (*it).second.GetObject();
 
                         typename JsonObject::iterator qit = qobj.find("survey1");
 
                         if ((*qit).second.GetType() == JsonValueType::Array) {
                             JsonArray a = (*qit).second.GetArray();
-                            s->log_q = fims::log(a[0].GetDouble());
+                            s->log_q = fims_math::log(a[0].GetDouble());
                             if (this->print_statements) {
                                 std::cout << "q = " << a[0].GetDouble() << "\nlog(q) = " << s->log_q << "\n";
                             }
@@ -498,8 +498,8 @@ public:
 
 
             // set recruitment
-            std::shared_ptr<fims::SRBevertonHolt<double> > rec =
-                    std::make_shared<fims::SRBevertonHolt<double> >();
+            std::shared_ptr<fims_popdy::SRBevertonHolt<double> > rec =
+                    std::make_shared<fims_popdy::SRBevertonHolt<double> >();
             if (print_statements) {
                 std::cout << "\nRecruitment:\n";
             }
@@ -521,7 +521,7 @@ public:
             it = obj.find("h");
             if (it != obj.end()) {
                 if ((*it).second.GetType() == JsonValueType::Array) {
-                    rec->logit_steep = fims::logit(0.2, 1.0, (*it).second.GetArray()[0].GetDouble());
+                    rec->logit_steep = fims_math::logit(0.2, 1.0, (*it).second.GetArray()[0].GetDouble());
                     if (print_statements) {
                         std::cout << "'h' " << rec->logit_steep << " \n";
                     }
@@ -574,8 +574,8 @@ public:
             pop.recruitment = rec;
 
             // set maturity
-            std::shared_ptr<fims::LogisticMaturity<double> > mat =
-                    std::make_shared<fims::LogisticMaturity<double> >();
+            std::shared_ptr<fims_popdy::LogisticMaturity<double> > mat =
+                    std::make_shared<fims_popdy::LogisticMaturity<double> >();
 
             if (print_statements) {
                 std::cout << "\nMaturity:\n";
@@ -611,7 +611,7 @@ public:
             }
 
             // set empirical growth
-            std::shared_ptr<fims::EWAAgrowth<double> > growth = std::make_shared<fims::EWAAgrowth<double> >();
+            std::shared_ptr<fims_popdy::EWAAgrowth<double> > growth = std::make_shared<fims_popdy::EWAAgrowth<double> >();
             std::cout << "Growth:\n";
 
             it = obj.find("W.kg");
@@ -645,7 +645,7 @@ public:
         return false;
     }
 
-    std::vector<double> RunModelLoop(fims::Population<double> &pop,
+    std::vector<double> RunModelLoop(fims_popdy::Population<double> &pop,
             const JsonValue & input) {
 
         JsonObject output;
@@ -681,7 +681,7 @@ public:
         return pop.numbers_at_age;
     }
 
-    bool CheckModelOutput(fims::Population<double> &pop,
+    bool CheckModelOutput(fims_popdy::Population<double> &pop,
             JsonValue &output) {
         return true;
     }

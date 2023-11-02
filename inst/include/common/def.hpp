@@ -72,7 +72,7 @@ std::map<std::string, std::ofstream> fims_log::FIMS_LOGS;
  * @brief Default trait. These are "T" specific
  * traits that depend on modeling platform.
  */
-template <typename T>
+template <typename Type>
 struct ModelTraits {
   typedef double real_t;                           /**< The real type */
   typedef double variable_t;                       /**< The variable type */

@@ -85,8 +85,9 @@ class AgeCompDataInterface : public DataInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::DataObject<Type>> age_comp_data =
-        std::make_shared<fims::DataObject<Type>>(this->ymax, this->amax);
+    std::shared_ptr<fims_data_object::DataObject<Type>> age_comp_data =
+        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
+                                                             this->amax);
 
     age_comp_data->id = this->id;
     for (int y = 0; y < ymax; y++) {
@@ -96,8 +97,8 @@ class AgeCompDataInterface : public DataInterfaceBase {
       }
     }
 
-    std::shared_ptr<fims::Information<Type>> info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
 
     info->data_objects[this->id] = age_comp_data;
 
@@ -147,8 +148,8 @@ class IndexDataInterface : public DataInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims::DataObject<Type>> data =
-        std::make_shared<fims::DataObject<Type>>(this->ymax);
+    std::shared_ptr<fims_data_object::DataObject<Type>> data =
+        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
 
@@ -156,8 +157,8 @@ class IndexDataInterface : public DataInterfaceBase {
       data->at(y) = this->index_data[y];
     }
 
-    std::shared_ptr<fims::Information<Type>> info =
-        fims::Information<Type>::GetInstance();
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
 
     info->data_objects[this->id] = data;
     return true;

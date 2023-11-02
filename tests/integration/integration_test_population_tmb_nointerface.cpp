@@ -38,18 +38,18 @@ Type objective_function<Type>::operator()(){
   //Is log_q supposed to be 1 or 0?
   log_q.fill(1);
 
-  fims::Population<Type> pop;
+  fims_popdy::Population<Type> pop;
 
 
 
   for (int i = 0; i < nfleets; i++) {
 
-    std::shared_ptr<fims::Fleet<Type> > f = std::make_shared<fims::Fleet<Type> >();
+    std::shared_ptr<fims_popdy::Fleet<Type> > f = std::make_shared<fims_popdy::Fleet<Type> >();
     f->Initialize(nyears, nages);
     //f->nyears = nyears;
 
-    //f->observed_index_data = std::make_shared<fims::DataObject<Type> >(nyears);
-    //f->observed_agecomp_data = std::make_shared<fims::DataObject<Type> >(nyears, nages);
+    //f->observed_index_data = std::make_shared<fims_data_object::DataObject<Type> >(nyears);
+    //f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<Type> >(nyears, nages);
     /*
      * To run with data, need to change 45 and 46 to:
      *     for(int y=0; y < nyears; y++){
@@ -61,13 +61,13 @@ Type objective_function<Type>::operator()(){
      }
      }
      **Note: this code chunk doesn't compile with error: no match for 'operator[]'
-     **(operand types are 'std::shared_ptr<fims::DataObject<CppAD::AD<CppAD::AD<CppAD::AD<double> > > > >' and 'int')
+     **(operand types are 'std::shared_ptr<fims_data_object::DataObject<CppAD::AD<CppAD::AD<CppAD::AD<double> > > > >' and 'int')
      */
 
 
     //set up selectivity
-    std::shared_ptr<fims::LogisticSelectivity<Type> > selectivity
-      = std::make_shared<fims::LogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity
+      = std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
 
     selectivity->median = fleet_sel_A50(i);
     selectivity->slope = fleet_sel_slope(i);
@@ -90,19 +90,19 @@ Type objective_function<Type>::operator()(){
 
   for (int i = 0; i < nsurveys; i++) {
 
-    std::shared_ptr<fims::Fleet<Type> > s = std::make_shared<fims::Fleet<Type> >();
+    std::shared_ptr<fims_popdy::Fleet<Type> > s = std::make_shared<fims_popdy::Fleet<Type> >();
     s->Initialize(nyears, nages);
 
 
 
-    //s->observed_index_data = std::make_shared<fims::DataObject<Type> >(nyears);
-    //s->observed_agecomp_data = std::make_shared<fims::DataObject<Type> >(nyears, nages);
+    //s->observed_index_data = std::make_shared<fims_data_object::DataObject<Type> >(nyears);
+    //s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<Type> >(nyears, nages);
 
     //set up selectivity
 
 
-    std::shared_ptr<fims::LogisticSelectivity<Type> > selectivity
-      = std::make_shared<fims::LogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity
+      = std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
 
     selectivity->median = surv_sel_A50(i);
     selectivity->slope = surv_sel_slope(i);
@@ -132,8 +132,8 @@ Type objective_function<Type>::operator()(){
   }
 
   //Set recruitment
-  std::shared_ptr<fims::SRBevertonHolt<Type> > rec =
-    std::make_shared<fims::SRBevertonHolt<Type> >();
+  std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > rec =
+    std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
   rec->rzero = R0;
   rec->steep = h;
   rec->log_sigma_recruit = logR_sd;
@@ -142,15 +142,15 @@ Type objective_function<Type>::operator()(){
   pop.recruitment = rec;
 
   //Set maturity
-  std::shared_ptr<fims::LogisticMaturity<Type > > mat =
-    std::make_shared<fims::LogisticMaturity<Type> >();
+  std::shared_ptr<fims_popdy::LogisticMaturity<Type > > mat =
+    std::make_shared<fims_popdy::LogisticMaturity<Type> >();
   mat->median = A50_mat;
   mat->slope = slope_mat;
   pop.maturity = mat;
 
   //set empirical growth
-  std::shared_ptr<fims::EWAAgrowth<Type> > growth
-    = std::make_shared<fims::EWAAgrowth<Type> > ();
+  std::shared_ptr<fims_popdy::EWAAgrowth<Type> > growth
+    = std::make_shared<fims_popdy::EWAAgrowth<Type> > ();
   for (int i = 0; i < nages; i++) {
     growth->ewaa[ asDouble(ages(i))] = asDouble(W_kg(i))/1000;
   }

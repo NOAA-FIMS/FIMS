@@ -21,7 +21,7 @@
 
 #include "information.hpp"
 
-namespace fims {
+namespace fims_model {
 
 /**
  * @brief Model class. FIMS objective function.
@@ -31,7 +31,7 @@ class Model {  // may need singleton
  public:
   static std::shared_ptr<Model<Type> >
       fims_model; /*!< Create a shared fims_model as a pointer to Model*/
-  std::shared_ptr<Information<Type> >
+  std::shared_ptr<fims_info::Information<Type> >
       fims_information; /*!< Create a shared fims_information as a pointer to
                            Information*/
 
@@ -49,9 +49,9 @@ class Model {  // may need singleton
    */
   static std::shared_ptr<Model<Type> > GetInstance() {
     if (Model<Type>::fims_model == nullptr) {
-      Model<Type>::fims_model = std::make_shared<fims::Model<Type> >();
+      Model<Type>::fims_model = std::make_shared<fims_model::Model<Type> >();
       Model<Type>::fims_model->fims_information =
-          fims::Information<Type>::GetInstance();
+          fims_info::Information<Type>::GetInstance();
     }
     return Model<Type>::fims_model;
   }
@@ -90,8 +90,11 @@ class Model {  // may need singleton
 
     // Loop over populations, evaluate, and sum up the recruitment likelihood
     // component
-    typename fims::Information<Type>::population_iterator it;
+
+
+    typename fims_info::Information<Type>::population_iterator it;
     MODEL_LOG << "Evaluating expected values and summing recruitment nlls for " << this->fims_information->populations.size() << " populations." << std::endl;
+
     for (it = this->fims_information->populations.begin();
          it != this->fims_information->populations.end(); ++it) {
       //(*it).second points to the Population module
@@ -112,8 +115,10 @@ class Model {  // may need singleton
     MODEL_LOG << "All populations successfully evaluated." << std::endl;
 
     // Loop over fleets/surveys, and sum up age comp and index nlls
-    typename fims::Information<Type>::fleet_iterator jt;
+
+    typename fims_info::Information<Type>::fleet_iterator jt;
     MODEL_LOG << "Evaluating expected values and summing nlls for " << this->fims_information->fleets.size() << " fleets." << std::endl;
+
     for (jt = this->fims_information->fleets.begin();
          jt != this->fims_information->fleets.end(); ++jt) {
       //(*jt).second points to each individual Fleet module
@@ -208,6 +213,6 @@ class Model {  // may need singleton
 template <typename Type>
 std::shared_ptr<Model<Type> > Model<Type>::fims_model =
     nullptr;  // singleton instance
-}  // namespace fims
+}  // namespace fims_model
 
 #endif /* FIMS_COMMON_MODEL_HPP */

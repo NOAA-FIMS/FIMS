@@ -18,7 +18,7 @@
 #include "../../../common/fims_math.hpp"
 #include "{{{module_type}}}_base.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
  /**
   *  @brief {{{module_name}}}{{{module_type}}} class that returns the sub_module function value
@@ -41,7 +41,7 @@ struct {{{module_name}}}{{{module_type}}} : public {{{module_type}}}Base<Type> {
     */
     virtual const Type evaluate(const Type& x) {
         //you will need to add class members as arguments to the function below
-        return fims::{{{module_name}}}<Type>(x);
+        return fims_popdy::{{{module_name}}}<Type>(x);
     }
 };
 

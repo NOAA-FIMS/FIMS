@@ -8,7 +8,7 @@ namespace
   TEST(logistic_maturity, create_object)
   {
     
-    fims::LogisticMaturity<double> maturity;
+    fims_popdy::LogisticMaturity<double> maturity;
     maturity.median = 20.5;
     maturity.slope = 0.15;
     double maturity_x = 40.5;

@@ -21,7 +21,7 @@ namespace
 
     for (int i = 0; i < expect_value.size(); ++i)
     {
-      EXPECT_NEAR(fims::double_logistic(median_asc_value[i], slope_asc_value[i], median_desc_value[i], slope_desc_value[i], x_value[i]), expect_value[i], 0.0001);
+      EXPECT_NEAR(fims_math::double_logistic(median_asc_value[i], slope_asc_value[i], median_desc_value[i], slope_desc_value[i], x_value[i]), expect_value[i], 0.0001);
     }
   }
 

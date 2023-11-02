@@ -16,11 +16,11 @@
 
 #include <cmath>  // for using std::pow and M_PI
 
-#include "../../../common/fims_math.hpp"  // for using fims::log()
+#include "../../../common/fims_math.hpp"  // for using fims_math::log()
 #include "../../../common/model_object.hpp"
 #include "../../../distributions/distributions.hpp"
 
-namespace fims {
+namespace fims_popdy {
 
 /** @brief Base class for all recruitment functors.
  *
@@ -28,10 +28,10 @@ namespace fims {
  *
  */
 template <class Type>
-struct RecruitmentBase : public FIMSObject<Type> {
+struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for recruitment object*/
 
-  typename ModelTraits<Type>::ParameterVector
+  typename fims::ModelTraits<Type>::ParameterVector
       recruit_deviations;            /*!< A vector of recruitment deviations */
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                  deviations are summing to zero or not */
@@ -76,10 +76,10 @@ struct RecruitmentBase : public FIMSObject<Type> {
       return nll;
     } else {
 #ifdef TMB_MODEL
-      fims::Dnorm<Type> dnorm;
-      dnorm.sd = fims::exp(this->log_sigma_recruit);
+      fims_distributions::Dnorm<Type> dnorm;
+      dnorm.sd = fims_math::exp(this->log_sigma_recruit);
       for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
-        dnorm.x = fims::log(this->recruit_deviations[i]);
+        dnorm.x = fims_math::log(this->recruit_deviations[i]);
         dnorm.mean = 0.0;
         nll -= dnorm.evaluate(true);
       }
@@ -115,6 +115,6 @@ struct RecruitmentBase : public FIMSObject<Type> {
 
 template <class Type>
 uint32_t RecruitmentBase<Type>::id_g = 0;
-}  // namespace fims
+}  // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP */
