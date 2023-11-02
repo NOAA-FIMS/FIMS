@@ -77,7 +77,8 @@ class PopulationPrepareTestFixture : public testing::Test {
     // Does Fmort need to be in side of the year loop like log_q?
     for (int i = 0; i < nfleets; i++) {
       auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
-      auto selectivity = std::make_shared<fims_popdy::LogisticSelectivity<double>>();
+      auto selectivity =
+          std::make_shared<fims_popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point = 7;
       selectivity->slope = 0.5;
 

@@ -140,11 +140,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
               0); /*!<model expected weight at age*/
     this->q = fims_math::exp(this->log_q);
     for (size_t year = 0; year < this->nyears; year++) {
-
       FLEET_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
       FLEET_LOG << "input q " << this->log_q << std::endl;
       this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
-
     }
   }
 
@@ -155,11 +153,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     size_t dims = this->observed_agecomp_data->get_imax() *
                   this->observed_agecomp_data->get_jmax();
     if (dims != this->catch_numbers_at_age.size()) {
-
-      ERROR_LOG << "Error: observed age comp is of size "
-                                 << dims << " and expected is of size "
-                                 << this->age_composition.size() << std::endl;
-                                 exit(1);
+      ERROR_LOG << "Error: observed age comp is of size " << dims
+                << " and expected is of size " << this->age_composition.size()
+                << std::endl;
+      exit(1);
 
     } else {
       for (size_t y = 0; y < this->nyears; y++) {
@@ -185,15 +182,16 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
           observed_acomp[a] = this->observed_agecomp_data->at(y, a);
 
           FLEET_LOG << " age " << a << " in year " << y
-              << "has expected: " << expected_acomp[a]
-              << "  and observed: " << observed_acomp[a] << std::endl;
+                    << "has expected: " << expected_acomp[a]
+                    << "  and observed: " << observed_acomp[a] << std::endl;
         }
         dmultinom.x = observed_acomp;
         dmultinom.p = expected_acomp;
         nll -= dmultinom.evaluate(true);
       }
     }
-    FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id << nll << std::endl;
+    FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id
+              << nll << std::endl;
 #endif
     return nll;
   }
@@ -209,13 +207,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       dnorm.mean = fims_math::log(this->expected_index[i]);
       nll -= dnorm.evaluate(true);
 
-      FLEET_LOG
-          << "observed index data: " << i << " is "
-          << this->observed_index_data->at(i)
-          << " and expected is: " << this->expected_index[i] << std::endl;
+      FLEET_LOG << "observed index data: " << i << " is "
+                << this->observed_index_data->at(i)
+                << " and expected is: " << this->expected_index[i] << std::endl;
     }
-    FLEET_LOG
-        << " log obs error is: " << this->log_obs_error << std::endl;
+    FLEET_LOG << " log obs error is: " << this->log_obs_error << std::endl;
     FLEET_LOG << " sd is: " << dnorm.sd << std::endl;
     FLEET_LOG << " index nll: " << nll << std::endl;
 

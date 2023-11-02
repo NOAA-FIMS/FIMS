@@ -106,7 +106,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     for (int i = 0; i < deviations.size(); i++) {
       NLL.recruit_deviations[i] = deviations[i];
     }
-    RECRUITMENT_LOG << "Rec devs being passed to C++ are " << deviations << std::endl;
+    RECRUITMENT_LOG << "Rec devs being passed to C++ are " << deviations
+                    << std::endl;
     NLL.estimate_recruit_deviations = this->estimate_deviations;
     return NLL.evaluate_nll();
   }

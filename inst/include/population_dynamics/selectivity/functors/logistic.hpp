@@ -22,10 +22,10 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct LogisticSelectivity : public SelectivityBase<Type> {
-  Type inflection_point; /*!< 50% quantile of the value of the quantity of interest (x);
-               e.g. age at which 50% of the fish are selected */
-  Type slope;  /*!<scalar multiplier of difference between quantity of interest
-               value (x) and inflection_point */
+  Type inflection_point; /*!< 50% quantile of the value of the quantity of
+               interest (x); e.g. age at which 50% of the fish are selected */
+  Type slope; /*!<scalar multiplier of difference between quantity of interest
+              value (x) and inflection_point */
 
   LogisticSelectivity() : SelectivityBase<Type>() {}
 
