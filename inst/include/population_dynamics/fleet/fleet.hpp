@@ -157,6 +157,7 @@ struct Fleet : public FIMSObject<Type> {
                                  << dims << " and expected is of size "
                                  << this->age_composition.size() << std::endl;
                                  exit(1);
+                                 
     } else {
       for (size_t y = 0; y < this->nyears; y++) {
         // EigenVector declares a vector type from the Eigen library, which is
