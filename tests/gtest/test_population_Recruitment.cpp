@@ -8,70 +8,48 @@ namespace
 
     TEST_F(PopulationPrepareTestFixture, CalculateRecruitment_works)
     {
-        // calculating recruitment for year 4
-        int year = 4;
-        int age = 0; // just calculating for age 0 
+        // calculating spawning biomass for year 4
+        int sb_year = 4;
+        int sb_age = 0;
+        int sb_i_age_year = sb_year * population.nages + sb_age;
+        int sb_i_agem1_yearm1 = (sb_year - 1) * population.nages + sb_age - 1;
+
+        population.CalculateMortality(sb_i_age_year, sb_year, sb_age);
+        population.CalculateNumbersAA(sb_i_age_year, sb_i_agem1_yearm1, sb_age);
+        for (size_t year = 0; year < nyears; year++) {
+           for (size_t age = 0; age < nages; age++){
+               int i_age_year = year * population.nages + age;
+               population.CalculateMaturityAA(i_age_year, age);
+           }
+        }
+        population.CalculateSpawningBiomass(sb_i_age_year, sb_year, sb_age);
+
+        // calculating phi0
+        double phi0 = population.CalculateSBPR0();
+    
+        // calculating recruitment for year 5
+        int r_year = 5;
+        int r_age = 0; // just calculating for age 0 
+        int r_i_age_year = r_year * population.nages + r_age;
         // specifying steepness and rzero values for calculations
         // values from test_population_test_fixture.hpp 
         double steep = 0.75;
-        double rzero = 1000000.0;
-        
+        double rzero = 1000000;
+    
         // vector for storing expected recruitment 
-        std::vector<double> expect_recruitment(year * population.nages, 0);
-        // vector for rec devs - set rec devs to 1
-        std::vector<double> recruit_deviations(population.nyears, 1);
+        std::vector<double> expect_recruitment(population.nyears * population.nages, 0.0);
+        
+        expect_recruitment[r_i_age_year] = 
+        (0.8 * rzero * steep * population.spawning_biomass[sb_year]) / 
+        (0.2 * phi0 * rzero * (1.0 - steep) + population.spawning_biomass[sb_year] * (steep - 0.2)) * population.recruitment->recruit_deviations[r_year]; 
       
-         for(int year = 0; year < population.nyears; year++)
-         {
-             for(int age = 0; age < population.nages; age++)
-             {
-                 int i_age_year = year * population.nages + age;
-                 population.CalculateMaturityAA(i_age_year, age);
-                 population.CalculateMortality(i_age_year, year, age);
-                 if(year == 0){
-                    // for the first year, the population.numbers_at_age is calculated
-                    // with CalculateInitialNumbersAA
-                     population.CalculateInitialNumbersAA(i_age_year, age);
-                     if(age == 0)
-                     {
-                         // if age is 0, then unfished numbers AA are rzero
-                         population.unfished_numbers_at_age[i_age_year] = population.recruitment->rzero;
-                     }
-                     else
-                     {
-                         // if age is > 0 then use CalculateUnfishedNumbersAA 
-                         population.CalculateUnfishedNumbersAA(i_age_year,age-1,age);
-                         
-                     }
-                     population.CalculateSpawningBiomass(i_age_year, year, age);
-                     population.CalculateUnfishedSpawningBiomass(i_age_year,year,age);
-                 }
-                 else{
-                     int i_agem1_yearm1 = (year -1) * population.nages + (age -1);
-                     population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age); 
-                     population.CalculateUnfishedNumbersAA(i_age_year, i_agem1_yearm1, age);
-                 }
-
-             }
-         }
-        
-        int i_age_year = year * population.nages + age;
-        int i_agem1_yearm1 = (year - 1) * population.nages + (age - 1);
-        
-        // trying to create an ssbzero variable to use in the recruitment equation by
-        // multiplying the initial numbers-at-age and the population weight-at-age
-        // not sure if this will work for age 0 (don't know what weight-at-age for age 0 is)
-        double ssbzero = population.recruitment->rzero * population.weight_at_age[age];
-        
         // calculate recruitment in population module
-        population.CalculateRecruitment(i_age_year, year);
+        population.CalculateRecruitment(r_i_age_year, r_year);
         
-        // calculate expected recruitment based on bev-holt equation
-        expect_recruitment[i_age_year] = 
-        (0.8 * rzero * steep * population.spawning_biomass[i_age_year]) / 
-        (0.2 * ssbzero * (1.0 - steep) + population.spawning_biomass[i_age_year] * (steep - 0.2)) * recruit_deviations[year]; 
-      
         // testing that expected recruitment and population.numbers_at_age match
-        EXPECT_EQ(population.numbers_at_age[i_age_year], expect_recruitment[i_age_year]);
+        // EXPECT_DOUBLE_EQ() verifies that the two double values are approximately equal, to within 4 ULPs from each other.
+        EXPECT_DOUBLE_EQ(population.numbers_at_age[r_i_age_year], expect_recruitment[r_i_age_year]);
+        // testing that population.numbers_at_age > 0.0
+        EXPECT_GT(population.numbers_at_age[r_i_age_year], 0.0);
     }
 }

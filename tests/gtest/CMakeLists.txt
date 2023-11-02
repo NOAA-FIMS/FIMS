@@ -243,6 +243,18 @@ target_link_libraries(population_Index
 
 gtest_discover_tests(population_Index)
 
+# test_population_Recruitment.cpp
+add_executable(population_Recruitment
+  test_population_Recruitment.cpp
+)
+
+target_link_libraries(population_Recruitment
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_Recruitment)
+
 gtest_discover_tests(fims_math_fabs_min_max)
 
 # test_fims_math_ad_fab_min_max.cpp
