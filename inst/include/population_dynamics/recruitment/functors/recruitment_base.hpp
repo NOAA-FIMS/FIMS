@@ -105,10 +105,10 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
       sum += this->recruit_deviations[i];
     }
 
-    FIMS_LOG << "recruit_deviations: \n";
+    RECRUITMENT_LOG << "recruit_deviations: \n";
     for (size_t i = 0; i < this->recruit_deviations.size(); i++) {
       this->recruit_deviations[i] -= sum / (this->recruit_deviations.size());
-      FIMS_LOG << this->recruit_deviations[i] << std::endl;
+      RECRUITMENT_LOG << this->recruit_deviations[i] << std::endl;
     }
   }
 };
