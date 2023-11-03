@@ -383,8 +383,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     Type phi0 = CalculateSBPR0();
     POPULATION_LOG << "recruitment 2" << std::endl;
     POPULATION_LOG << "phi0 = " << phi0 << std::endl;
-    POPULATION_LOG << "spawning_biomass[year - 1] = " << this->spawning_biomass[year - 1]
-                   << std::endl;
+    POPULATION_LOG << "spawning_biomass[year - 1] = "
+                   << this->spawning_biomass[year - 1] << std::endl;
     POPULATION_LOG << "rec devs = "
                    << this->recruitment->recruit_deviations[year - 1]
                    << std::endl;
