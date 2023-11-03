@@ -137,8 +137,8 @@ Type objective_function<Type>::operator()(){
   rec->rzero = R0;
   rec->steep = h;
   rec->log_sigma_recruit = logR_sd;
-  rec->recruit_deviations.resize(nyears);
-  std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
+  rec->log_recruit_devs.resize(nyears);
+  std::fill(rec->log_recruit_devs.begin(), rec->log_recruit_devs.end(), 0.0);
   pop.recruitment = rec;
 
   //Set maturity

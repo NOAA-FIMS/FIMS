@@ -548,8 +548,8 @@ public:
 
 
             it = obj.find("logR.resid");
-            rec->recruit_deviations.resize(nyears + 1);
-            std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
+            rec->log_recruit_devs.resize(nyears + 1);
+            std::fill(rec->log_recruit_devs.begin(), rec->log_recruit_devs.end(), 0.0);
             if (it != obj.end()) {
                 if ((*it).second.GetType() == JsonValueType::Array) {
                     JsonArray rdev = (*it).second.GetArray();
@@ -557,9 +557,9 @@ public:
                         std::cout << "recruitment deviations: ";
                     }
                     for (size_t i = 0; i < rdev.size(); i++) {
-                        rec->recruit_deviations[i] = std::exp(rdev[i].GetDouble());
+                        rec->log_recruit_devs[i] = rdev[i].GetDouble();
                         if (print_statements) {
-                            std::cout << rec->recruit_deviations[i] << " ";
+                            std::cout << rec->log_recruit_devs[i] << " ";
                         }
                     }
                     if (print_statements) {
