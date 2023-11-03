@@ -41,7 +41,7 @@ namespace
         
         expect_recruitment[r_i_age_year] = 
         (0.8 * rzero * steep * population.spawning_biomass[sb_year]) / 
-        (0.2 * phi0 * rzero * (1.0 - steep) + population.spawning_biomass[sb_year] * (steep - 0.2)) * fims::exp(population.recruitment->log_recruit_devs[r_year]); 
+        (0.2 * phi0 * rzero * (1.0 - steep) + population.spawning_biomass[sb_year] * (steep - 0.2)) * fims_math::exp(population.recruitment->log_recruit_devs[r_year]); 
       
         // calculate recruitment in population module
         population.CalculateRecruitment(r_i_age_year, r_year);
