@@ -22,7 +22,7 @@
 #include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
 
-namespace fims {
+namespace fims_popdy {
 /*TODO:
  Review, add functions to evaluate, push vectors back to fleet (or point to fleet
  directly?)
@@ -86,22 +86,22 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     fims::Vector<Type> expected_recruitment;      /*!< Expected recruitment */
     /// recruitment
     int recruitment_id = -999; /*!< id of recruitment model object*/
-    std::shared_ptr<RecruitmentBase<Type>>
+    std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
     recruitment; /*!< shared pointer to recruitment module */
     
     // growth
     int growth_id = -999; /*!< id of growth model object*/
-    std::shared_ptr<GrowthBase<Type>>
+    std::shared_ptr<fims_popdy::GrowthBase<Type>>
     growth; /*!< shared pointer to growth module */
     
     // maturity
     int maturity_id = -999; /*!< id of maturity model object*/
-    std::shared_ptr<MaturityBase<Type>>
+    std::shared_ptr<fims_popdy::MaturityBase<Type>>
     maturity; /*!< shared pointer to maturity module */
     
     // fleet
     int fleet_id = -999; /*!< id of fleet model object*/
-    std::vector<std::shared_ptr<Fleet<Type>>>
+    std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
     fleets; /*!< shared pointer to fleet module */
     
     // Define objective function object to be able to REPORT and ADREPORT

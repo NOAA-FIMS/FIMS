@@ -163,7 +163,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       for (size_t y = 0; y < this->nyears; y++) {
         // EigenVector declares a vector type from the Eigen library, which is
         // the expected type for TMB's dmultinom
-        using Vector = typename fims::fims::Vector<Type>;
+        using Vector = typename fims::Vector<Type>;
         Vector observed_acomp;
         Vector expected_acomp;
 
