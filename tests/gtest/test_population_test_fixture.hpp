@@ -214,14 +214,14 @@ namespace
       std::default_random_engine generator(seed);
 
       // log_Fmort
-      double log_Fmort_min = fims::log(0.1);
-      double log_Fmort_max = fims::log(2.3);
+      double log_Fmort_min = fims_math::log(0.1);
+      double log_Fmort_max = fims_math::log(2.3);
       std::uniform_real_distribution<double> log_Fmort_distribution(
           log_Fmort_min, log_Fmort_max);
 
       // log_q
-      double log_q_min = fims::log(0.1);
-      double log_q_max = fims::log(1);
+      double log_q_min = fims_math::log(0.1);
+      double log_q_max = fims_math::log(1);
       std::uniform_real_distribution<double> log_q_distribution(log_q_min,
                                                                 log_q_max);
 
@@ -233,9 +233,9 @@ namespace
 
       for (int i = 0; i < nfleets; i++)
       {
-        auto fleet = std::make_shared<fims::Fleet<double>>();
-        auto selectivity = std::make_shared<fims::LogisticSelectivity<double>>();
-        selectivity->median = 7;
+        auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+        auto selectivity = std::make_shared<fims_popdy::LogisticSelectivity<double>>();
+        selectivity->inflection_point = 7;
         selectivity->slope = 0.5;
 
         fleet->Initialize(nyears, nages);
@@ -255,12 +255,63 @@ namespace
 
       population.Initialize(nyears, nseasons, nages);
 
+      for (int i = 0; i < nages; i++)
+      {
+        population.ages[i] = i + 1;
+      }
+
+      // log_naa
+      double log_init_naa_min = 10.0;
+      double log_init_naa_max = 12.0;
+      std::uniform_real_distribution<double> log_naa_distribution(
+          log_init_naa_min, log_init_naa_max);
+      for (int i = 0; i < nages; i++)
+      {
+        population.log_init_naa[i] = log_naa_distribution(generator);
+      }
+
+      // log_M
+      double log_M_min = fims_math::log(0.1);
+      double log_M_max = fims_math::log(0.3);
+      std::uniform_real_distribution<double> log_M_distribution(log_M_min,
+                                                                log_M_max);
+      for (int i = 0; i < nyears * nages; i++)
+      {
+        population.log_M[i] = log_M_distribution(generator);
+      }
+
+      // numbers_at_age
+      double numbers_at_age_min = fims_math::exp(10.0);
+      double numbers_at_age_max = fims_math::exp(12.0);
+      std::uniform_real_distribution<double> numbers_at_age_distribution(
+          numbers_at_age_min, numbers_at_age_max);
+      for (int i = 0; i < (nyears + 1) * nages; i++)
+      {
+        population.numbers_at_age[i] = numbers_at_age_distribution(generator);
+      }
+
+      // weight_at_age
+      double weight_at_age_min = 0.5;
+      double weight_at_age_max = 12.0;
+
+      std::shared_ptr<fims_popdy::EWAAgrowth<double>> growth =
+          std::make_shared<fims_popdy::EWAAgrowth<double>>();
+      std::uniform_real_distribution<double> weight_at_age_distribution(
+          weight_at_age_min, weight_at_age_max);
+      for (int i = 0; i < nages; i++)
+      {
+        growth->ewaa[static_cast<double>(population.ages[i])] =
+            weight_at_age_distribution(generator);
+      }
+
+      population.growth = growth;
+
       population.Prepare();
     }
 
     virtual void TearDown() {}
 
-    fims::Population<double> population;
+    fims_popdy::Population<double> population;
     int id_g = 0;
     int nyears = 30;
     int nseasons = 1;
