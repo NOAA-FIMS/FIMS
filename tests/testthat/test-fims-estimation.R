@@ -577,15 +577,15 @@ test_that("run FIMS in a for loop", {
     # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
     # before the likelihood calculation
     recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-    recruitment$log_rzero$value <- log(om_input$R0)
+    recruitment$log_rzero$value <- 13 #log(om_input$R0)
     recruitment$log_rzero$is_random_effect <- FALSE
     recruitment$log_rzero$estimated <- TRUE
     recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
     recruitment$logit_steep$is_random_effect <- FALSE
     recruitment$logit_steep$estimated <- FALSE
     recruitment$estimate_log_devs <- TRUE
-    # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-    recruitment$log_devs <- om_input$logR.resid
+    recruitment$log_devs <- rep(0, length(om_input$logR.resid)-1)
+    #recruitment$log_devs <- om_input$logR.resid[-1]
 
     # Data
     catch <- em_input$L.obs$fleet1
@@ -692,16 +692,16 @@ test_that("run FIMS in a for loop", {
     fims$CreateTMBModel()
     parameters <- list(p = fims$get_fixed())
     obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS")
-
+   
     opt <- with(obj, optim(par, fn, gr,
       method = "BFGS",
       control = list(maxit = 1000000, reltol = 1e-15)
     ))
-
+    
     report <- obj$report(obj$par)
     expect_false(is.null(report))
 
-    max_gradient <- max(abs(obj$gr(opt$par)))
+    max_gradient <- max(abs(obj$gr(obj$env$last.par.best)))
     expect_lte(max_gradient, 0.00001)
     fims$clear()
   }
