@@ -6,7 +6,7 @@
 namespace
 {
 
-    TEST_F(PopulationPrepareTestFixture, CalculateRecruitment_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateRecruitment_works)
     {
         // calculating spawning biomass for year 4
         int sb_year = 4;

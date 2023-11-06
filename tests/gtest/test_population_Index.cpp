@@ -5,19 +5,12 @@
 namespace
 {
 
-    TEST_F(PopulationPrepareTestFixture, CalculateIndex_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateIndex_works)
     {
         
         std::vector<double> expected_index(nyears * nfleets, 0);
-        // set up an arbitrary year/age combo to test
-        int year = 4;
-        int age = 6;
-        int i_age_year = year * population.nages + age;
-        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
        
         // calculate index numbers at age in population module
-        population.CalculateMortality(i_age_year, year, age);
-        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
         population.CalculateIndex(i_age_year, year, age);
         
         // The test checks a single age in a single year, not an index. 

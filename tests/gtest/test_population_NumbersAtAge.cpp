@@ -4,16 +4,8 @@
 
 namespace
 {
-    TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateNumbersAA_works)
     {
-
-        int year = 4;
-        int age = 6;
-        int i_age_year = year * population.nages + age;
-        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
-
-        population.CalculateMortality(i_age_year, year, age);
-        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
 
         std::vector<double> mortality_F(nyears * nages, 0);
         std::vector<double> test_naa((nyears + 1) * nages, 0);
@@ -29,7 +21,7 @@ namespace
         EXPECT_GT(population.numbers_at_age[i_age_year], 0);                           
     }
 
-    TEST_F(PopulationPrepareTestFixture, CalculateNumbersAA_PlusGroup_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateNumbersAA_PlusGroup_works)
     {
 
         int year = 4;

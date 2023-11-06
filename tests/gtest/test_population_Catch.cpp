@@ -5,19 +5,11 @@
 namespace
 {
 
-    TEST_F(PopulationPrepareTestFixture, CalculateCatch_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateCatch_works)
     {
+
         std::vector<double> expected_catch(nyears * nfleets, 0);
-        // set up an arbitrary year/age combo to test
-        int year = 4;
-        int age = 6;
-        int i_age_year = year * population.nages + age;
-        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
-        
         // calculate catch numbers at age in population module
-        // Ian: not sure which of these are needed
-        population.CalculateMortality(i_age_year, year, age);
-        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
          population.CalculateCatchNumbersAA(i_age_year, year, age);
         
         population.CalculateCatchWeightAA(year, age);

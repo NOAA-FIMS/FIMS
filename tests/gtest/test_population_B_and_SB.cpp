@@ -4,16 +4,8 @@
 
 namespace
 {
-    TEST_F(PopulationPrepareTestFixture, CalculateB_and_SB_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateB_and_SB_works)
     {
-
-        int year = 4;
-        int age = 6;
-        int i_age_year = year * population.nages + age;
-        int i_agem1_yearm1 = (year - 1) * population.nages + age - 1;
-
-        population.CalculateMortality(i_age_year, year, age);
-        population.CalculateNumbersAA(i_age_year, i_agem1_yearm1, age);
         population.CalculateMaturityAA(i_age_year, age);
         population.CalculateSpawningBiomass(i_age_year, year, age);
         population.CalculateBiomass(i_age_year, year, age);
@@ -33,7 +25,7 @@ namespace
         EXPECT_GT(population.biomass[year], 0);
     }
 
-    TEST_F(PopulationPrepareTestFixture, CalculateSpawningBiomass_ExtraYear_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateSpawningBiomass_ExtraYear_works)
     {
 
         int year = population.nyears;
