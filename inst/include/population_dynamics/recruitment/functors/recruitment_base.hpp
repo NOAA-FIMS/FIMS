@@ -31,7 +31,7 @@ template <class Type>
 struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for recruitment object*/
 
-  typename fims::ModelTraits<Type>::ParameterVector
+  fims::Vector<Type>
       recruit_deviations;            /*!< A vector of recruitment deviations */
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                  deviations are summing to zero or not */
