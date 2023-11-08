@@ -16,7 +16,7 @@
  * @brief NLLInterfaceBase class should be inherited to
  * define different Rcpp interfaces for each possible negative log-likelihood
  * function
- * */
+ */
 class NLLInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/

@@ -13,14 +13,14 @@
 #include "../../../population_dynamics/maturity/maturity.hpp"
 #include "rcpp_interface_base.hpp"
 
-/****************************************************************
- * maturity Rcpp interface                                   *
- ***************************************************************/
+/**
+ * maturity Rcpp interface
+ */
 
 /**
  * @brief MaturityInterfaceBase class should be inherited to
  * define different Rcpp interfaces for each possible maturity function
- * */
+ */
 class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/

@@ -12,14 +12,14 @@
 #include "../../../population_dynamics/selectivity/selectivity.hpp"
 #include "rcpp_interface_base.hpp"
 
-/****************************************************************
- * Selectivity Rcpp interface                                   *
- ***************************************************************/
+/**
+ * Selectivity Rcpp interface
+ */
 
 /**
  * @brief SelectivityInterfaceBase class should be inherited to
  * define different Rcpp interfaces for each possible Selectivity function
- * */
+ */
 class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
