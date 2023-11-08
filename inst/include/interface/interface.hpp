@@ -59,14 +59,12 @@ namespace fims {
 #ifdef TMB_MODEL
 /**
  *  @brief ModelTraits class that contains the DataVector
- * and ParameterVector types.
+ * type.
  */
 template <typename Type>
 struct ModelTraits {
   typedef typename CppAD::vector<Type> DataVector;      /**< This is a vector
         of the data that is differentiable */
-  typedef typename CppAD::vector<Type> ParameterVector; /**< This is a
-  vector of the parameters that is differentiable */
   typedef typename tmbutils::vector<Type>
       EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
   typedef typename tmbutils::matrix<Type>
