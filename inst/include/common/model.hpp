@@ -215,11 +215,6 @@ class Model {  // may need singleton
     return jnll;
   }
     
-    void GenerateReport(){
-        
-        
-        
-    }
 };
 
 // Create singleton instance of Model class
