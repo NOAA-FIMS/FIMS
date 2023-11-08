@@ -23,18 +23,18 @@ class Vector{
 public:
     //Member Types
     
-    typedef typename std::vector<Type>::value_type value_type; /*<!Member type Type>*/
-    typedef typename std::vector<Type>::allocator_type allocator_type; /*<!Allocator for type Type>*/
+    typedef typename std::vector<Type>::value_type value_type; /*!<Member type Type>*/
+    typedef typename std::vector<Type>::allocator_type allocator_type; /*!<Allocator for type Type>*/
     typedef typename std::vector<Type>::size_type size_type; /*<!Size type>*/
-    typedef typename std::vector<Type>::difference_type difference_type; /*<!Difference type>*/
-    typedef typename std::vector<Type>::reference reference;/*<!Reference type &Type>*/
-    typedef typename std::vector<Type>::const_reference const_reference; /*<!Constant eference type const &Type>*/
-    typedef typename std::vector<Type>::pointer pointer; /*<!Pointer type Type*>*/
-    typedef typename std::vector<Type>::const_pointer const_pointer; /*<!Constant ointer type const Type*>*/
-    typedef typename std::vector<Type>::iterator iterator; /*<!Iterator>*/
-    typedef typename std::vector<Type>::const_iterator const_iterator;/*<!Constant iterator>*/
-    typedef typename std::vector<Type>::reverse_iterator reverse_iterator;/*<!Reverse iterator>*/
-    typedef typename std::vector<Type>::const_reverse_iterator const_reverse_iterator; /*<!Constant reverse iterator>*/
+    typedef typename std::vector<Type>::difference_type difference_type; /*!<Difference type>*/
+    typedef typename std::vector<Type>::reference reference;/*!<Reference type &Type>*/
+    typedef typename std::vector<Type>::const_reference const_reference; /*!<Constant eference type const &Type>*/
+    typedef typename std::vector<Type>::pointer pointer; /*!<Pointer type Type*>*/
+    typedef typename std::vector<Type>::const_pointer const_pointer; /*!<Constant ointer type const Type*>*/
+    typedef typename std::vector<Type>::iterator iterator; /*!<Iterator>*/
+    typedef typename std::vector<Type>::const_iterator const_iterator;/*!<Constant iterator>*/
+    typedef typename std::vector<Type>::reverse_iterator reverse_iterator;/*!<Reverse iterator>*/
+    typedef typename std::vector<Type>::const_reverse_iterator const_reverse_iterator; /*!<Constant reverse iterator>*/
     
     /**
      * Default constructor.
