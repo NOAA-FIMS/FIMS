@@ -16,6 +16,8 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
   case_name = "FIMS_C0_estimation"
 )
 
+# generate om_input, om_output, and em_input 
+# using function from the model comparison project
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
 on.exit(unlink(maindir, recursive = T), add = TRUE)
@@ -23,6 +25,7 @@ on.exit(unlink(maindir, recursive = T), add = TRUE)
 setwd(working_dir)
 on.exit(setwd(working_dir), add = TRUE)
 # Set-up Rcpp modules and fix parameters to "true"
+# om_input, om_output, and em_input generated from ASSAMC::run_om
 setup_fims <- function(om_input, om_output, em_input) {
   # create new R environment in which to conduct tests
   test_env <- new.env(parent = emptyenv())
@@ -31,7 +34,7 @@ setup_fims <- function(om_input, om_output, em_input) {
 
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
-  # when there are other option, this would be where the option would be chosen)
+  # when there are other options, this would be where the option would be chosen)
   test_env$recruitment <- methods::new(test_env$fims$BevertonHoltRecruitment)
 
   # NOTE: in first set of parameters below (for recruitment), 
@@ -46,7 +49,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
   test_env$recruitment$log_sigma$is_random_effect <- FALSE
   test_env$recruitment$log_sigma$estimated <- FALSE
-    # set up log_rzero (equilibrium recruitment)
+  # set up log_rzero (equilibrium recruitment)
   test_env$recruitment$log_rzero$value <- log(om_input$R0)
   test_env$recruitment$log_rzero$is_random_effect <- FALSE
   test_env$recruitment$log_rzero$estimated <- TRUE
@@ -63,11 +66,15 @@ setup_fims <- function(om_input, om_output, em_input) {
 
   # Data
   test_env$catch <- em_input$L.obs$fleet1
+  # set fishing fleet catch data, need to set dimensions of data index
+  # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
   test_env$fishing_fleet_index <- new(test_env$fims$Index, length(test_env$catch))
   test_env$fishing_fleet_index$index_data <- test_env$catch
+  # set fishing fleet age comp data, need to set dimensions of age comps
   test_env$fishing_fleet_age_comp <- new(test_env$fims$AgeComp, length(test_env$catch), om_input$nages)
   test_env$fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
 
+  # repeat for surveys
   test_env$survey_index <- em_input$surveyB.obs$survey1
   test_env$survey_fleet_index <- new(test_env$fims$Index, length(test_env$survey_index))
   test_env$survey_fleet_index$index_data <- test_env$survey_index
@@ -93,8 +100,10 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
   test_env$fishing_fleet_selectivity$inflection_point$value <- om_input$sel_fleet$fleet1$A50.sel1
   test_env$fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+  # turn on estimation of inflection_point
   test_env$fishing_fleet_selectivity$inflection_point$estimated <- TRUE
   test_env$fishing_fleet_selectivity$slope$value <- om_input$sel_fleet$fleet1$slope.sel1
+  # turn on estimation of slope
   test_env$fishing_fleet_selectivity$slope$is_random_effect <- FALSE
   test_env$fishing_fleet_selectivity$slope$estimated <- TRUE
 
@@ -109,7 +118,10 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet$random_q <- FALSE
   test_env$fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
   test_env$fishing_fleet$log_obs_error$estimated <- FALSE
-  # Need get_id() for setting up observed agecomp and index data?
+  # Modules are linked together using module IDs
+  # Each module has a get_id() function that returns the unique ID for that module
+  # Each fleet uses the module IDs to link up the correct module to the correct fleet
+  # Note: Likelihoods not yet set up as a stand-alone modules, so no get_id()
   test_env$fishing_fleet$SetAgeCompLikelihood(1)
   test_env$fishing_fleet$SetIndexLikelihood(1)
   test_env$fishing_fleet$SetSelectivity(test_env$fishing_fleet_selectivity$get_id())
@@ -120,9 +132,11 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$survey_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
   test_env$survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
   test_env$survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+  # turn on estimation of inflection_point
   test_env$survey_fleet_selectivity$inflection_point$estimated <- TRUE
   test_env$survey_fleet_selectivity$slope$value <- om_input$sel_survey$survey1$slope.sel1
   test_env$survey_fleet_selectivity$slope$is_random_effect <- FALSE
+  # turn on estimation of slope
   test_env$survey_fleet_selectivity$slope$estimated <- TRUE
 
   test_env$survey_fleet <- new(test_env$fims$Fleet)
