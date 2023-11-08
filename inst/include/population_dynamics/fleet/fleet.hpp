@@ -27,9 +27,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     static uint32_t id_g; /*!< reference id for fleet object*/
     size_t nyears;        /*!< the number of years in the model*/
     size_t nages;         /*!< the number of ages in the model*/
-    using ParameterVector =
-    typename fims::ModelTraits<Type>::ParameterVector; /*!< vector of fleet
-                                                  parameters */
     
     // This likelihood index is not currently being used as only one likelihood
     // distribution is available. These are for a future update M2+.

@@ -34,9 +34,6 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
-    using ParameterVector =
-    typename fims::ModelTraits<Type>::ParameterVector; /*!< the vector of
-                                                  population parameters*/
     static uint32_t id_g; /*!< reference id for population object*/
     size_t nyears;        /*!< total number of years in the fishery*/
     size_t nseasons;      /*!< total number of seasons in the fishery*/
@@ -179,7 +176,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
             for (size_t year = 0; year < this->nyears; year++) {
                 size_t i_age_year = age * this->nyears + year;
                 this->M[i_age_year] = fims_math::exp(this->log_M[i_age_year]);
-                // mortality_F is a ParameterVector and therefore needs to be filled
+                // mortality_F is a fims::Vector and therefore needs to be filled
                 // within a loop
                 this->mortality_F[i_age_year] = 0.0;
             }
