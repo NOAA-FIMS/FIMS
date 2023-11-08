@@ -47,8 +47,8 @@ setup_fims <- function(om_input, om_output, em_input) {
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
   test_env$recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-  test_env$recruitment$log_sigma$is_random_effect <- FALSE
-  test_env$recruitment$log_sigma$estimated <- FALSE
+  test_env$recruitment$log_sigma_recruit$is_random_effect <- FALSE
+  test_env$recruitment$log_sigma_recruit$estimated <- FALSE
   # set up log_rzero (equilibrium recruitment)
   test_env$recruitment$log_rzero$value <- log(om_input$R0)
   test_env$recruitment$log_rzero$is_random_effect <- FALSE
