@@ -19,6 +19,7 @@
 #include "../../../common/fims_math.hpp"  // for using fims_math::log()
 #include "../../../common/model_object.hpp"
 #include "../../../distributions/distributions.hpp"
+#include "../../../common/fims_vector.hpp"
 
 namespace fims_popdy {
 
@@ -49,6 +50,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   RecruitmentBase() { this->id = RecruitmentBase::id_g++; }
 
   virtual ~RecruitmentBase() {}
+
 
   /**
    * @brief Prepares the recruitment deviations vector.
