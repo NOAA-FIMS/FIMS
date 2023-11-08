@@ -29,7 +29,7 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the  growthBase class.
-  static uint32_t id_g; /*!< reference id for growth object*/
+  static uint32_t id_g; /**< reference id for growth object*/
 
   /**
    * @brief Constructor.

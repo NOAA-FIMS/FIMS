@@ -30,8 +30,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 
   // static std::vector<double> recruit_deviations; /**< vector of recruitment
   // deviations*/
-  /// static bool constrain_deviations; /**< whether or not the rec devs are
-  /// constrained*/
+  // static bool constrain_deviations; /**< whether or not the rec devs are constrained*/
 
   RecruitmentInterfaceBase() {
     this->id = RecruitmentInterfaceBase::id_g++;

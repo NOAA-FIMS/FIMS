@@ -52,29 +52,29 @@ std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
  */
 class FleetInterface : public FleetInterfaceBase {
   int interface_agecomp_likelihood_id_m =
-      -999; /*!< id of agecomp likelihood component. The "interface_" prefix
+      -999; /**< id of agecomp likelihood component. The "interface_" prefix
                indicates it belongs to the FleetInterface class, and the "_m"
                postfix signifies that it's a member variable. */
   int interface_index_likelihood_id_m =
-      -999; /*!< id of index likelihood component*/
+      -999; /**< id of index likelihood component*/
   int interface_observed_agecomp_data_id_m =
-      -999; /*!< id of observed agecomp data object*/
+      -999; /**< id of observed agecomp data object*/
   int interface_observed_index_data_id_m =
-      -999;                              /*!< id of observed index data object*/
-  int interface_selectivity_id_m = -999; /*!< id of selectivity component*/
+      -999;                              /**< id of observed index data object*/
+  int interface_selectivity_id_m = -999; /**< id of selectivity component*/
 
  public:
-  bool is_survey = false; /*!< whether this is a survey fleet */
-  int nages;              /*!< number of ages in the fleet data*/
-  int nyears;             /*!< number of years in the fleet data */
-  double log_q;           /*!< log of catchability for the fleet*/
+  bool is_survey = false; /**< whether this is a survey fleet */
+  int nages;              /**< number of ages in the fleet data*/
+  int nyears;             /**< number of years in the fleet data */
+  double log_q;           /**< log of catchability for the fleet*/
   Rcpp::NumericVector
-      log_Fmort;           /*!< log of fishing mortality rate for the fleet*/
-  bool estimate_F = false; /*!< whether the parameter F should be estimated*/
-  bool estimate_q = false; /*!< whether the parameter q should be estimated*/
-  bool random_q = false;   /*!< whether q should be a random effect*/
-  bool random_F = false;   /*!< whether F should be a random effect*/
-  Parameter log_obs_error; /*!< the log of the observation error */
+      log_Fmort;           /**< log of fishing mortality rate for the fleet*/
+  bool estimate_F = false; /**< whether the parameter F should be estimated*/
+  bool estimate_q = false; /**< whether the parameter q should be estimated*/
+  bool random_q = false;   /**< whether q should be a random effect*/
+  bool random_F = false;   /**< whether F should be a random effect*/
+  Parameter log_obs_error; /**< the log of the observation error */
 
   FleetInterface() : FleetInterfaceBase() {}
 

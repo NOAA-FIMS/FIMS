@@ -1,4 +1,4 @@
-/*! \file tmb_distributions.hpp
+/** \file tmb_distributions.hpp
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
@@ -20,9 +20,9 @@ namespace fims_distributions {
  */
 template <typename Type>
 struct Dnorm : public DistributionsBase<Type> {
-  Type x;    /*!< observation */
-  Type mean; /*!< mean of the normal distribution */
-  Type sd; /*!< standard deviation of the normal distribution, must be strictly
+  Type x;    /**< observation */
+  Type mean; /**< mean of the normal distribution */
+  Type sd; /**< standard deviation of the normal distribution, must be strictly
            positive.*/
 
   Dnorm() : DistributionsBase<Type>() {}
@@ -48,8 +48,8 @@ template <typename Type>
 struct Dmultinom : public DistributionsBase<Type> {
   /** EigenVector defined in interface.hpp */
   using Vector = typename fims::ModelTraits<Type>::EigenVector;
-  Vector x; /*!< Vector of length K of integers */
-  Vector p; /*!< Vector of length K, specifying the probability for the K
+  Vector x; /**< Vector of length K of integers */
+  Vector p; /**< Vector of length K, specifying the probability for the K
                classes (note, unlike in R these must sum to 1). */
 
   Dmultinom() : DistributionsBase<Type>() {}
@@ -74,9 +74,9 @@ struct Dmultinom : public DistributionsBase<Type> {
  */
 template <typename Type>
 struct Dlnorm : public DistributionsBase<Type> {
-  Type x;       /*!< observation */
-  Type meanlog; /*!< mean of the distribution of log(x) */
-  Type sdlog;   /*!< standard deviation of the distribution of log(x) */
+  Type x;       /**< observation */
+  Type meanlog; /**< mean of the distribution of log(x) */
+  Type sdlog;   /**< standard deviation of the distribution of log(x) */
 
   Dlnorm() : DistributionsBase<Type>() {}
 

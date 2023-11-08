@@ -19,16 +19,16 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
-  Type inflection_point_asc; /*!< 50% quantile of the value of the quantity of
+  Type inflection_point_asc; /**< 50% quantile of the value of the quantity of
                interest (x)  on the ascending limb of the double logistic curve;
                e.g. age at  which 50% of the fish are selected */
-  Type slope_asc; /*!<scalar multiplier of difference between quantity of
+  Type slope_asc; /**<scalar multiplier of difference between quantity of
               interest   value (x) and inflection_point on the ascending limb of
               the double   logistic   curve*/
-  Type inflection_point_desc; /*!< 50% quantile of the value of the quantity of
+  Type inflection_point_desc; /**< 50% quantile of the value of the quantity of
                interest (x) on the descending limb of the double logistic curve;
                e.g. age at which 50% of the fish are selected */
-  Type slope_desc; /*!<scalar multiplier of difference between quantity of
+  Type slope_desc; /**<scalar multiplier of difference between quantity of
               interest  value (x) and inflection_point on the descending limb of
               the double  logistic  curve */
 

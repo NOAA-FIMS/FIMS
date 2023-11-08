@@ -133,9 +133,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Parameter x;       /*!< observation */
-  Parameter meanlog; /*!< mean of the distribution of log(x) */
-  Parameter sdlog;   /*!< standard deviation of the distribution of log(x) */
+  Parameter x;       /**< observation */
+  Parameter meanlog; /**< mean of the distribution of log(x) */
+  Parameter sdlog;   /**< standard deviation of the distribution of log(x) */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -207,8 +207,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Rcpp::NumericVector x; /*!< Vector of length K of integers */
-  Rcpp::NumericVector p; /*!< Vector of length K, specifying the probability
+  Rcpp::NumericVector x; /**< Vector of length K of integers */
+  Rcpp::NumericVector p; /**< Vector of length K, specifying the probability
  for the K classes (note, unlike in R these must sum to 1). */
 
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
