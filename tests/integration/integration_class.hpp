@@ -548,7 +548,10 @@ public:
 
 
             it = obj.find("logR.resid");
-            rec->log_recruit_devs.resize(nyears + 1);
+            /*the log_recruit_dev vector does not include a value for year == 0
+              and is of length nyears - 1 where the first position of the vector
+              corresponds to the second year of the time series.*/
+            rec->log_recruit_devs.resize(nyears);
             std::fill(rec->log_recruit_devs.begin(), rec->log_recruit_devs.end(), 0.0);
             if (it != obj.end()) {
                 if ((*it).second.GetType() == JsonValueType::Array) {
@@ -556,8 +559,8 @@ public:
                     if (print_statements) {
                         std::cout << "recruitment deviations: ";
                     }
-                    for (size_t i = 0; i < rdev.size(); i++) {
-                        rec->log_recruit_devs[i] = rdev[i].GetDouble();
+                    for (size_t i = 0; i < rec->log_recruit_devs.size(); i++) {
+                        rec->log_recruit_devs[i] = rdev[i+1].GetDouble();
                         if (print_statements) {
                             std::cout << rec->log_recruit_devs[i] << " ";
                         }

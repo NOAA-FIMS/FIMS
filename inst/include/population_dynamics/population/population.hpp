@@ -377,8 +377,9 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    *
    * @param i_age_year dimension folded index for age and year
    * @param year the year recruitment is being calculated for
+   * @param i_dev index to log_recruit_dev of vector length nyears-1
    */
-  void CalculateRecruitment(size_t i_age_year, size_t year) {
+  void CalculateRecruitment(size_t i_age_year, size_t year, size_t i_dev) {
     POPULATION_LOG << "recruitment 1" << std::endl;
     Type phi0 = CalculateSBPR0();
     POPULATION_LOG << "recruitment 2" << std::endl;
@@ -386,7 +387,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     POPULATION_LOG << "spawning_biomass[year - 1] = "
                    << this->spawning_biomass[year - 1] << std::endl;
     POPULATION_LOG << "log recruit devs = "
-                   << this->recruitment->log_recruit_devs[year - 1]
+                   << this->recruitment->log_recruit_devs[i_dev - 1]
                    << std::endl;
     POPULATION_LOG << "rec eval = "
                    << this->recruitment->evaluate(
@@ -394,7 +395,10 @@ struct Population : public fims_model_object::FIMSObject<Type> {
                    << std::endl;
     this->numbers_at_age[i_age_year] =
         this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
-        fims_math::exp(this->recruitment->log_recruit_devs[year-1]);
+        /*the log_recruit_dev vector does not include a value for year == 0
+        and is of length nyears - 1 where the first position of the vector
+        corresponds to the second year of the time series.*/
+        fims_math::exp(this->recruitment->log_recruit_devs[i_dev-1]);
     this->expected_recruitment[year] = this->numbers_at_age[i_age_year];
     POPULATION_LOG << " numbers at age at index i_age_year " << i_age_year << " is "
                    << this->numbers_at_age[i_age_year] << std::endl;
@@ -644,7 +648,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
             // Set the nrecruits for age a=0 year y (use pointers instead of
             // functional returns) assuming fecundity = 1 and 50:50 sex ratio
             POPULATION_LOG << "Recruitment: " << std::endl;
-            CalculateRecruitment(i_age_year, y);
+            CalculateRecruitment(i_age_year, y, y);
             this->unfished_numbers_at_age[i_age_year] =
                 fims_math::exp(this->recruitment->log_rzero);
 

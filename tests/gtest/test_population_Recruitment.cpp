@@ -41,10 +41,13 @@ namespace
         
         expect_recruitment[r_i_age_year] = 
         (0.8 * rzero * steep * population.spawning_biomass[sb_year]) / 
-        (0.2 * phi0 * rzero * (1.0 - steep) + population.spawning_biomass[sb_year] * (steep - 0.2)) * fims_math::exp(population.recruitment->log_recruit_devs[r_year]); 
+        /*the log_recruit_dev vector does not include a value for year == 0
+        and is of length nyears - 1 where the first position of the vector
+        corresponds to the second year of the time series.*/
+        (0.2 * phi0 * rzero * (1.0 - steep) + population.spawning_biomass[sb_year] * (steep - 0.2)) * fims_math::exp(population.recruitment->log_recruit_devs[r_year-1]); 
       
         // calculate recruitment in population module
-        population.CalculateRecruitment(r_i_age_year, r_year);
+        population.CalculateRecruitment(r_i_age_year, r_year, r_year);
         
         // testing that expected recruitment and population.numbers_at_age match
         // EXPECT_DOUBLE_EQ() verifies that the two double values are approximately equal, to within 4 ULPs from each other.
