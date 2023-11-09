@@ -54,7 +54,7 @@ public:
      */
     Vector(const Vector<Type>& other){
         this->vec_m.resize(other.size());
-        for(int i =0; i < this->vec_m.size(); i++){
+        for(size_t i =0; i < this->vec_m.size(); i++){
             this->vec_m[i] = other[i];
         }
     }
