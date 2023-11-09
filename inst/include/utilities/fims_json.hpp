@@ -1,7 +1,9 @@
-/// @file fims_json.hpp
-/// @brief A simple JSON parsing and generation library.
-/// @details This library provides classes and functions for parsing JSON
-/// strings and generating JSON data structures.
+/** 
+ * @file fims_json.hpp
+ *  @brief A simple JSON parsing and generation library.
+ * @details This library provides classes and functions for parsing JSON
+ * strings and generating JSON data structures.
+ */
 #include <cctype>
 #include <iostream>
 #include <map>
@@ -11,119 +13,131 @@
 
 class JsonValue;
 
-/// Alias for a JSON object, mapping strings to JSON values.
+/** 
+ * Alias for a JSON object, mapping strings to JSON values.
+ */
 using JsonObject = std::map<std::string, JsonValue>;
 
-/// Alias for a JSON array, containing a sequence of JSON values.
+/** 
+ * Alias for a JSON array, containing a sequence of JSON values.
+ */
 using JsonArray = std::vector<JsonValue>;
 
-/// Represents different types of JSON values.
+/** 
+ * Represents different types of JSON values.
+ */
 enum JsonValueType {
-  Null = 0,  ///< Null JSON value.
-  Number,    ///< Numeric JSON value.
-  String,    ///< String JSON value.
-  Bool,      ///< Boolean JSON value.
-  Object,    ///< JSON object.
-  Array      ///< JSON array.
+  Null = 0,  /**< Null JSON value. */
+  Number,    /**< Numeric JSON value. */
+  String,    /**< String JSON value. */
+  Bool,      /**< Boolean JSON value. */
+  Object,    /**< JSON object. */
+  Array      /**< JSON array. */
 };
 
-/// Represents a JSON value.
+/** 
+ * Represents a JSON value.
+ */
 class JsonValue {
  public:
-  /// Default constructor, initializes to Null value.
+  /** Default constructor, initializes to Null value. */
   JsonValue() : type(JsonValueType::Null) {}
 
-  /// Constructor for numeric JSON value (i.e., integer).
+  /** Constructor for numeric JSON value (i.e., integer). */
   JsonValue(int num) : type(JsonValueType::Number), number(num) {}
 
-  /// Constructor for numeric JSON value (i.e., double).
+  /** Constructor for numeric JSON value (i.e., double). */
   JsonValue(double num) : type(JsonValueType::Number), number(num) {}
 
-  /// Constructor for string JSON value.
+  /** Constructor for string JSON value. */
   JsonValue(const std::string& str) : type(JsonValueType::String), str(str) {}
 
-  /// Constructor for boolean JSON value.
+  /** Constructor for boolean JSON value. */
   JsonValue(bool b) : type(JsonValueType::Bool), boolean(b) {}
 
-  /// Constructor for JSON object value.
+  /** Constructor for JSON object value. */
   JsonValue(const JsonObject& obj) : type(JsonValueType::Object), object(obj) {}
 
-  /// Constructor for JSON array value.
+  /** Constructor for JSON array value. */
   JsonValue(const JsonArray& arr) : type(JsonValueType::Array), array(arr) {}
 
-  /// Get the type of the JSON value.
+  /** Get the type of the JSON value. */
   JsonValueType GetType() const { return type; }
 
-  /// Get the numeric value as an integer.
+  /** Get the numeric value as an integer. */
   int GetInt() const { return static_cast<int>(number); }
 
-  /// Get the numeric value as a double.
+  /** Get the numeric value as a double. */
   double GetDouble() const { return number; }
 
-  /// Get the string value.
+  /** Get the string value. */
   const std::string& GetString() const { return str; }
 
-  /// Get the boolean value.
+  /** Get the boolean value. */
   bool GetBool() const { return boolean; }
 
-  /// Get the JSON object.
+  /** Get the JSON object. */
   JsonObject& GetObject() { return object; }
 
-  /// Get the JSON array.
+  /** Get the JSON array. */
   JsonArray& GetArray() { return array; }
 
  private:
-  JsonValueType type;  ///< Type of the JSON value.
-  double number;       ///< Numeric value.
-  std::string str;     ///< String value.
-  bool boolean;        ///< Boolean value.
-  JsonObject object;   ///< JSON object.
-  JsonArray array;     ///< JSON array.
+  JsonValueType type;  /**< Type of the JSON value. */
+  double number;       /**< Numeric value. */
+  std::string str;     /**< String value. */
+  bool boolean;        /**< Boolean value. */
+  JsonObject object;   /**< JSON object. */
+  JsonArray array;     /**< JSON array. */
 };
 
-/// Parses JSON strings and generates JSON values.
+/** 
+ * Parses JSON strings and generates JSON values.
+ */
 class JsonParser {
  public:
-  /// Parse a JSON string and return the corresponding JSON value.
+  /** Parse a JSON string and return the corresponding JSON value. */
   JsonValue Parse(const std::string& json);
-  /// Write a JSON value to a file.
+  /** Write a JSON value to a file. */
   void WriteToFile(const std::string& filename, JsonValue jsonValue);
-  /// Display a JSON value to the standard output.
+  /** Display a JSON value to the standard output. */
   void Show(JsonValue jsonValue);
 
  private:
-  /// Skip whitespace characters in the input string.
+  /** Skip whitespace characters in the input string. */
   void SkipWhitespace();
-  /// Parse a JSON value.
+  /** Parse a JSON value. */
   JsonValue ParseValue();
-  /// Parse a numeric JSON value.
+  /** Parse a numeric JSON value. */
   JsonValue ParseNumber();
-  /// Parse a string JSON value.
+  /** Parse a string JSON value. */
   JsonValue ParseString();
-  /// Parse a boolean JSON value.
+  /** Parse a boolean JSON value. */
   JsonValue ParseBool();
-  /// Parse a null JSON value.
+  /** Parse a null JSON value. */
   JsonValue ParseNull();
-  /// Parse a JSON object.
+  /** Parse a JSON object. */
   JsonValue ParseObject();
-  /// Parse a JSON array.
+  /** Parse a JSON array. */
   JsonValue ParseArray();
-  /// Write a JSON value to an output file stream.
+  /** Write a JSON value to an output file stream. */
   void WriteJsonValue(std::ofstream& outputFile, JsonValue jsonValue);
-  /// Display a JSON value to an output stream.
+  /** Display a JSON value to an output stream. */
   void PrintJsonValue(std::ostream& outputFile, JsonValue jsonValue);
-  /// Indentation helper for printing JSON values in an output file stream.
+  /** Indentation helper for printing JSON values in an output file stream. */
   void Indent(std::ostream& outputFile, int level);
-  /// Indentation helper for printing JSON values in an output stream.
+  /** Indentation helper for printing JSON values in an output stream. */
   void Indent(std::ofstream& outputFile, int level);
 
-  std::string data;  ///< Input JSON data.
-  size_t position;   ///< Current position in the data.
+  std::string data;  /**< Input JSON data. */
+  size_t position;   /**< Current position in the data. */
 };
 
-/// Parse a JSON string and return the corresponding JSON value.
-/// @param json The JSON string to parse.
-/// @return The parsed JSON value.
+/** 
+ * Parse a JSON string and return the corresponding JSON value.
+ * @param json The JSON string to parse.
+ * @return The parsed JSON value.
+ */
 JsonValue JsonParser::Parse(const std::string& json) {
   data = json;
   position = 0;
@@ -136,10 +150,12 @@ void JsonParser::SkipWhitespace() {
   }
 }
 
-/// Parse a JSON value.
-/// @return The parsed JSON value.
+/** 
+ * Parse a JSON value.
+ *  @return The parsed JSON value.
+ */
 JsonValue JsonParser::ParseValue() {
-  /// Skip whitespace characters in the input string.
+  /** Skip whitespace characters in the input string. */
   SkipWhitespace();
   char current = data[position];
   if (current == '{') {
@@ -157,8 +173,10 @@ JsonValue JsonParser::ParseValue() {
   }
 }
 
-/// Parse a numeric JSON value.
-/// @return The parsed JSON value.
+/** 
+ * Parse a numeric JSON value.
+ * @return The parsed JSON value.
+ */
 JsonValue JsonParser::ParseNumber() {
   size_t end_pos = position;
   bool is_float = false;
@@ -186,8 +204,10 @@ JsonValue JsonParser::ParseNumber() {
   }
 }
 
-/// Parse a string JSON value.
-/// @return The parsed JSON value.
+/** 
+ * Parse a string JSON value.
+ * @return The parsed JSON value.
+ */
 JsonValue JsonParser::ParseString() {
   position++;  // Skip the initial '"'
   size_t end_pos = data.find('"', position);
@@ -196,8 +216,10 @@ JsonValue JsonParser::ParseString() {
   return JsonValue(str);
 }
 
-/// Parse a boolean JSON value.
-/// @return The parsed JSON value.
+/**
+ * Parse a boolean JSON value.
+ * @return The parsed JSON value.
+ */
 JsonValue JsonParser::ParseBool() {
   if (data.compare(position, 4, "true") == 0) {
     position += 4;
@@ -211,8 +233,10 @@ JsonValue JsonParser::ParseBool() {
   }
 }
 
-/// Parse a null JSON value.
-/// @return The parsed JSON value.
+/**
+ * Parse a null JSON value.
+ * @return The parsed JSON value.
+ */
 JsonValue JsonParser::ParseNull() {
   if (data.compare(position, 4, "null") == 0) {
     position += 4;
@@ -223,8 +247,10 @@ JsonValue JsonParser::ParseNull() {
   }
 }
 
-/// Parse a JSON object.
-/// @return The parsed JSON value representing the object.
+/**
+ * Parse a JSON object.
+ * @return The parsed JSON value representing the object.
+ */
 JsonValue JsonParser::ParseObject() {
   JsonObject obj;
   position++;  // Skip the initial '{'
@@ -248,8 +274,10 @@ JsonValue JsonParser::ParseObject() {
   return JsonValue(obj);
 }
 
-/// Parse a JSON array.
-/// @return The parsed JSON value representing the array.
+/**
+ * Parse a JSON array.
+ * @return The parsed JSON value representing the array.
+ */
 JsonValue JsonParser::ParseArray() {
   JsonArray arr;
   position++;  // Skip the initial '['
@@ -269,9 +297,11 @@ JsonValue JsonParser::ParseArray() {
   return JsonValue(arr);
 }
 
-/// Write a JSON value to an output file.
-/// @param filename The name of the output file.
-/// @param jsonValue The JSON value to write.
+/**
+ *  Write a JSON value to an output file.
+ * @param filename The name of the output file.
+ * @param jsonValue The JSON value to write.
+ */
 void JsonParser::WriteToFile(const std::string& filename, JsonValue jsonValue) {
   std::ofstream outputFile(filename);
   if (!outputFile) {
@@ -280,14 +310,16 @@ void JsonParser::WriteToFile(const std::string& filename, JsonValue jsonValue) {
     return;
   }
 
-  // Call a private helper function to write JSON values recursively
+  /** Call a private helper function to write JSON values recursively */
   WriteJsonValue(outputFile, jsonValue);
 }
 
-/// Write a JSON value to an output file.
-// Private helper function to write JSON values recursively
-/// @param outputFile The output file stream.
-/// @param jsonValue The JSON value to write.
+/**
+ * Write a JSON value to an output file.
+ * Private helper function to write JSON values recursively
+ * @param outputFile The output file stream.
+ *  @param jsonValue The JSON value to write.
+ */
 void JsonParser::WriteJsonValue(std::ofstream& outputFile,
                                 JsonValue jsonValue) {
   switch (jsonValue.GetType()) {
@@ -333,16 +365,20 @@ void JsonParser::WriteJsonValue(std::ofstream& outputFile,
   }
 }
 
-/// Display a JSON value to the standard output.
-/// @param jsonValue The JSON value to display.
+/**
+ * Display a JSON value to the standard output.
+ * @param jsonValue The JSON value to display.
+ */
 void JsonParser::Show(JsonValue jsonValue) {
   this->PrintJsonValue(std::cout, jsonValue);
   std::cout << std::endl;
 }
 
-/// Display a JSON value to an output stream.
-/// @param output The output stream.
-/// @param jsonValue The JSON value to display.
+/**
+ * Display a JSON value to an output stream.
+ * @param output The output stream.
+ * @param jsonValue The JSON value to display.
+ */
 void JsonParser::PrintJsonValue(std::ostream& output, JsonValue jsonValue) {
   switch (jsonValue.GetType()) {
     case JsonValueType::Null:
