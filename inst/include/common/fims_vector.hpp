@@ -393,7 +393,22 @@ public:
         return this->get_tmb_vector();
     }
     
-private:
+    /**
+     * @brief Converts this vector a CppAd::vector<Type>
+     */
+    inline operator CppAD::vector<Type>() {
+        return this->get_cppad_vector();
+    }
+    
+    
+    /**
+     * @brief Converts this vector a tmbutils::vector<Type>
+     */
+    inline operator tmbutils::vector<Type>(){
+        return this->get_tmb_vector();
+    }
+    
+
     
     
     /**
@@ -421,9 +436,35 @@ private:
         return ret;
     }
     
+    /**
+     * @brief Converts this vector a CppAd::vector<Type>
+     */
+    CppAD::vector<Type> get_cppad_vector() {
+        CppAD::vector<Type> ret;
+        ret.resize(this->vec_m.size());
+        for(size_t i =0; i < this->vec_m.size(); i++){
+            ret[i] = this->vec_m[i];
+        }
+        return ret;
+    }
+    
+    
+    /**
+     * @brief Converts this vector a tmbutils::vector<Type>
+     */
+    tmbutils::vector<Type> get_tmb_vector() {
+        tmbutils::vector<Type> ret;
+        ret.resize(this->vec_m.size());
+        for(size_t i =0; i < this->vec_m.size(); i++){
+            ret[i] = this->vec_m[i];
+        }
+        return ret;
+    }
+    
     
 #endif
     
+private:
     
 };// end fims::Vector class
 
