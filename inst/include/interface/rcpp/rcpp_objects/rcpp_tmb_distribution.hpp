@@ -226,8 +226,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate(bool do_log) {
     fims_distributions::Dmultinom<double> dmultinom;
-    // Decale TMBVector in this scope
-//    typedef typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector;
+    // Declare TMBVector in this scope
     dmultinom.x.resize(x.size());  // Vector from TMB
     dmultinom.p.resize(p.size());  // Vector from TMB
     for (int i = 0; i < x.size(); i++) {

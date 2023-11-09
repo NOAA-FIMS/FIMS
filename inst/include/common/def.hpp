@@ -72,24 +72,6 @@ class fims_log {
 
 std::map<std::string, std::ofstream> fims_log::FIMS_LOGS;
 
-#ifdef STD_LIB
-
-/**
- * @brief Default trait. These are "T" specific
- * traits that depend on modeling platform.
- */
-template <typename Type>
-struct ModelTraits {
-  typedef double real_t;                           /**< The real type */
-  typedef double variable_t;                       /**< The variable type */
-  typedef typename std::vector<double> DataVector; /**< The data vector type */
-  typedef typename std::vector<std::vector<double> > DataMatrix;     /**< The
-       data matrix type */
-  typedef typename std::vector<std::vector<double> > VariableMatrix; /**< The
-   variable matrix type */
-};
-
-#endif
 }  // namespace fims
 
 #endif /* TRAITS_HPP */

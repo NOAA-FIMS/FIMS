@@ -54,23 +54,4 @@ vector<Type> ADREPORTvector(vector<vector<Type> > x) {
 
 #endif /* TMB_MODEL */
 
-namespace fims {
-
-#ifdef TMB_MODEL
-/**
- *  @brief ModelTraits class that contains the DataVector
- * type.
- */
-template <typename Type>
-struct ModelTraits {
-  typedef typename CppAD::vector<Type> DataVector;      /**< This is a vector
-        of the data that is differentiable */
-  typedef typename tmbutils::vector<Type>
-      EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
-  typedef typename tmbutils::matrix<Type>
-      EigenMatrix; /**< This is a matrix as defined in TMB's namespace Eigen */
-};
-#endif /* TMB_MODEL */
-}  // namespace fims
-
 #endif /* FIMS_INTERFACE_HPP */

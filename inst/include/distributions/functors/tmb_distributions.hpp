@@ -47,8 +47,6 @@ struct Dnorm : public DistributionsBase<Type> {
  */
 template <typename Type>
 struct Dmultinom : public DistributionsBase<Type> {
-  /** EigenVector defined in interface.hpp */
-  using Vector = typename fims::ModelTraits<Type>::EigenVector;
   fims::Vector<Type> x; /*!< Vector of length K of integers */
   fims::Vector<Type> p; /*!< Vector of length K, specifying the probability for the K
                classes (note, unlike in R these must sum to 1). */
