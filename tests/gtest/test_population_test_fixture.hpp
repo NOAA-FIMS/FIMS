@@ -167,9 +167,12 @@ namespace
       auto recruitment = std::make_shared<fims_popdy::SRBevertonHolt<double>>();
       recruitment->logit_steep = fims_math::logit(0.2, 1.0, 0.75);
       recruitment->log_rzero = fims_math::log(1000000.0);
-      recruitment->recruit_deviations.resize(nyears);
-      for (int i = 0; i < recruitment->recruit_deviations.size(); i++) {
-        recruitment->recruit_deviations[i] = 1.0;
+      /*the log_recruit_dev vector does not include a value for year == 0
+      and is of length nyears - 1 where the first position of the vector
+      corresponds to the second year of the time series.*/
+      recruitment->log_recruit_devs.resize(nyears-1);
+      for (int i = 0; i < recruitment->log_recruit_devs.size(); i++) {
+        recruitment->log_recruit_devs[i] = 0.0;
       }
       population.recruitment = recruitment;
 
