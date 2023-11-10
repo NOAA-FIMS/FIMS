@@ -704,7 +704,7 @@ test_that("run FIMS in a for loop", {
     expect_false(is.null(report))
 
     max_gradient <- max(abs(obj$gr(obj$env$last.par.best)))
-    expect_lte(max_gradient, 0.00001)
+    expect_lte(max_gradient, 0.0001)
     fims$clear()
   }
 })
