@@ -89,7 +89,7 @@ Also restarting or closing out your R session will free up memory.
 ## The Rcpp Interface
 
 The fields specific to the maturity module that are accessible from R are defined in the 
-[rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file in the directory [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
+[rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/src/rcpp_interface.hpp) file in the directory [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
@@ -157,7 +157,7 @@ class Parameter {
   }
 ```
 The fields from the `Parameter` class that are accessible from R are defined in the 
-[rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file in the directory [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
+[rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/src/rcpp_interface.hpp) file in the directory [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp):
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
  Rcpp::class_<Parameter>("Parameter")

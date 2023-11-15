@@ -38,10 +38,12 @@ SEXP _rcpp_module_boot_fims();
  *Callback definition to load the FIMS module.
  *
  */
+/*
 static const R_CallMethodDef CallEntries[] = {
     TMB_CALLDEFS,
     {"_rcpp_module_boot_fims", (DL_FUNC)&_rcpp_module_boot_fims, 0},
     {NULL, NULL, 0}};
+*/
 
 /**
  *

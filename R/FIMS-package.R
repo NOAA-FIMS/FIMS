@@ -6,5 +6,8 @@
 #' @import methods
 #' @importFrom ggplot2 .data
 #' @importFrom usethis use_template ui_stop
+#' @export Population
+#' @export clear
+#' @export get_fixed
 ## usethis namespace: end
 NULL
