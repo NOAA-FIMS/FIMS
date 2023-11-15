@@ -83,7 +83,7 @@ class Model {  // may need singleton
     vector<vector<Type> > naa(n_pops);
     vector<vector<Type> > ssb(n_pops);
     vector<vector<Type> > biomass(n_pops);
-    vector<vector<Type> > rec_dev(n_pops);
+    vector<vector<Type> > log_recruit_dev(n_pops);
     vector<vector<Type> > recruitment(n_pops);
     vector<vector<Type> > M(n_pops);
 #endif
@@ -148,8 +148,8 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       naa(pop_idx) = vector<Type>((*it).second->numbers_at_age);
       ssb(pop_idx) = vector<Type>((*it).second->spawning_biomass);
-      rec_dev(pop_idx) =
-          vector<Type>((*it).second->recruitment->recruit_deviations);
+      log_recruit_dev(pop_idx) =
+          vector<Type>((*it).second->recruitment->log_recruit_devs);
       recruitment(pop_idx) = vector<Type>((*it).second->expected_recruitment);
       biomass(pop_idx) = vector<Type>((*it).second->biomass);
       M(pop_idx) = vector<Type>((*it).second->M);
@@ -181,7 +181,7 @@ class Model {  // may need singleton
     REPORT_F(jnll, of);
     REPORT_F(naa, of);
     REPORT_F(ssb, of);
-    REPORT_F(rec_dev, of);
+    REPORT_F(log_recruit_dev, of);
     REPORT_F(recruitment, of);
     REPORT_F(biomass, of);
     REPORT_F(M, of);
@@ -198,7 +198,7 @@ class Model {  // may need singleton
     vector<Type> NAA = ADREPORTvector(naa);
     vector<Type> Biomass = ADREPORTvector(biomass);
     vector<Type> SSB = ADREPORTvector(ssb);
-    vector<Type> RecDev = ADREPORTvector(rec_dev);
+    vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
     vector<Type> FMort = ADREPORTvector(F_mort);
     vector<Type> ExpectedIndex = ADREPORTvector(exp_index);
     vector<Type> CNAA = ADREPORTvector(cnaa);
@@ -206,7 +206,7 @@ class Model {  // may need singleton
     ADREPORT_F(NAA, of);
     ADREPORT_F(Biomass, of);
     ADREPORT_F(SSB, of);
-    ADREPORT_F(RecDev, of);
+    ADREPORT_F(LogRecDev, of);
     ADREPORT_F(FMort, of);
     ADREPORT_F(ExpectedIndex, of);
     ADREPORT_F(CNAA, of);

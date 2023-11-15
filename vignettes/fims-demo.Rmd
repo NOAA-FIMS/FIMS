@@ -252,19 +252,19 @@ recruitment$logit_steep$is_random_effect <- FALSE
 recruitment$logit_steep$estimated <- FALSE
 ```
 
-We also need to set up recruitment deviations. FIMS recruitment modules have a boolean, *estimate_deviations* to specify whether or not deviations are estimated; and a vector, *deviations* to set the deviation values. The *deviations* vector takes values greater than 0 as these will be logged in the likelihood.
+We also need to set up log recruitment deviations. FIMS recruitment modules have a boolean, *estimate_log_devs* to specify whether or not log deviations are estimated; and a vector, *log_devs* to set the log deviation values. 
 
 ```{r rec-devs}
-recruitment$estimate_deviations <- FALSE
-recruitment$deviations <- c(
-  1.0931337, 1.5494153, 0.8754735, 0.6488721,
-  1.9128839, 1.6593211, 0.9327825, 1.3531871,
-  0.9207434, 1.2304792, 1.1652038, 0.8048559,
-  0.8752845, 1.1187967, 0.8989675, 1.3083559,
-  1.2724463, 0.5799534, 0.7891447, 0.5571984,
-  1.3515173, 1.2452116, 0.8002613, 0.5983474,
-  1.1704664, 0.5828168, 0.8223697, 1.2225558,
-  1.4513402, 0.9308739
+recruitment$estimate_log_devs <- FALSE
+recruitment$log_devs <- c(
+  0.08904850,  0.43787763, -0.13299042, -0.43251973,
+  0.64861200,  0.50640852, -0.06958319,  0.30246260,
+  -0.08257384,  0.20740372,  0.15289604, -0.21709207,       
+  -0.13320626,  0.11225374, -0.10650836,  0.26877132,
+  0.24094126, -0.54480751, -0.23680557, -0.58483386,  
+  0.30122785,  0.21930545, -0.22281699, -0.51358369,       
+  0.15740234, -0.53988240, -0.19556523,  0.20094360,  
+  0.37248740, -0.07163145
 )
 ```
 #### Growth
