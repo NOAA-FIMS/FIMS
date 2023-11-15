@@ -20,7 +20,7 @@ namespace
     expected_deviations_false[0] = -1.0;
     expected_deviations_false[1] = 2.0;
     expected_deviations_false[2] = 3.0;
-    for (int i = 0; i < recruit.recruit_deviations.size(); i++)
+    for (int i = 0; i < recruit.log_recruit_devs.size(); i++)
     {
       EXPECT_EQ(recruit.log_recruit_devs[i],
                 expected_deviations_false[i]);
