@@ -1,4 +1,4 @@
-/*! \file fims_math.hpp
+/** \file fims_math.hpp
  */
 // note: To document a global C function, typedef, enum or preprocessor
 // definition you must first document the file that contains it

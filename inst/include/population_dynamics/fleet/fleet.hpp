@@ -1,4 +1,4 @@
-/*! \file fleet.hpp
+/** \file fleet.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
@@ -21,7 +21,7 @@ namespace fims_popdy {
 /** @brief Base class for all fleets.
  *
  * @tparam Type The type of the fleet object.
- **/
+ */
 template <class Type>
 struct Fleet : public fims_model_object::FIMSObject<Type> {
     static uint32_t id_g; /*!< reference id for fleet object*/
@@ -124,18 +124,18 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
     // derived quantities
     std::fill(catch_at_age.begin(), catch_at_age.end(),
-              0); /*!<derived quantity catch at age*/
+              0); /**<derived quantity catch at age*/
     std::fill(catch_index.begin(), catch_index.end(),
-              0); /*!<derived quantity catch index*/
+              0); /**<derived quantity catch index*/
     std::fill(age_composition.begin(), age_composition.end(), 0);
     std::fill(expected_catch.begin(), expected_catch.end(),
-              0); /*!<model expected total catch*/
+              0); /**<model expected total catch*/
     std::fill(expected_index.begin(), expected_index.end(),
-              0); /*!<model expected index of abundance*/
+              0); /**<model expected index of abundance*/
     std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(),
-              0); /*!<model expected catch at age*/
+              0); /**<model expected catch at age*/
     std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
-              0); /*!<model expected weight at age*/
+              0); /**<model expected weight at age*/
     this->q = fims_math::exp(this->log_q);
     for (size_t year = 0; year < this->nyears; year++) {
       FLEET_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
@@ -145,7 +145,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   }
 
   virtual const Type evaluate_age_comp_nll() {
-    Type nll = 0.0; /*!< The negative log likelihood value */
+    Type nll = 0.0; /**< The negative log likelihood value */
 #ifdef TMB_MODEL
     fims_distributions::Dmultinom<Type> dmultinom;
     size_t dims = this->observed_agecomp_data->get_imax() *

@@ -29,17 +29,17 @@ test_that("Recruitment input settings work as expected", {
 
   expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 1090802.68)
 
-  devs <- c(1.0, 2.0, 3.0)
-  recruitment$deviations <- devs
+  log_devs <- c(-1.0, 2.0, 3.0)
+  recruitment$log_devs <- log_devs
 
 
-  expected_nll <- -sum(log(stats::dnorm(log(devs), 0, 0.7)))
+  expected_nll <- -sum(log(stats::dnorm(log_devs, 0, 0.7)))
 
 
-  recruitment$estimate_deviations <- FALSE
+  recruitment$estimate_log_devs <- FALSE
   expect_equal(recruitment$evaluate_nll(), 0.0)
 
-  recruitment$estimate_deviations <- TRUE
+  recruitment$estimate_log_devs <- TRUE
   expect_equal(recruitment$evaluate_nll(), expected = expected_nll)
 
   fims$clear()
