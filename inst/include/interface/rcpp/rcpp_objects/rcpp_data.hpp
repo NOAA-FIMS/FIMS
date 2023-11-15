@@ -19,7 +19,7 @@
  */
 class DataInterfaceBase : public FIMSRcppInterfaceBase {
  public:
-  Rcpp::NumericVector observed_data; /*!< The data */
+  Rcpp::NumericVector observed_data; /**< The data */
   static uint32_t id_g; /**< static id of the DataInterfaceBase object */
   uint32_t id;          /**< local id of the DataInterfaceBase object */
   // live objects in C++ are objects that have been created and live in memory
@@ -42,7 +42,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~DataInterfaceBase() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() { return this->id; }
 
   /**@brief add_to_fims_tmb dummy method
@@ -60,9 +60,9 @@ std::map<uint32_t, DataInterfaceBase*> DataInterfaceBase::live_objects;
  */
 class AgeCompDataInterface : public DataInterfaceBase {
  public:
-  int amax;                          /*!< first dimension of the data */
-  int ymax;                          /*!< second dimension of the data */
-  Rcpp::NumericVector age_comp_data; /*!<the age composition data*/
+  int amax;                          /**< first dimension of the data */
+  int ymax;                          /**< second dimension of the data */
+  Rcpp::NumericVector age_comp_data; /**<the age composition data*/
 
   /**
    * @brief constructor
@@ -78,7 +78,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
   virtual ~AgeCompDataInterface() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() { return this->id; }
 
 #ifdef TMB_MODEL
@@ -127,8 +127,8 @@ class AgeCompDataInterface : public DataInterfaceBase {
  */
 class IndexDataInterface : public DataInterfaceBase {
  public:
-  int ymax;                       /*!< second dimension of the data */
-  Rcpp::NumericVector index_data; /*!<the age composition data*/
+  int ymax;                       /**< second dimension of the data */
+  Rcpp::NumericVector index_data; /**<the age composition data*/
 
   /**
    * @brief constructor
@@ -141,7 +141,7 @@ class IndexDataInterface : public DataInterfaceBase {
   virtual ~IndexDataInterface() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() { return this->id; }
 
 #ifdef TMB_MODEL

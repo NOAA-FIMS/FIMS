@@ -26,7 +26,7 @@ struct EWAAgrowth : public GrowthBase<Type> {
   // a map looks up values based on a reference key
   // in this case, our key is age (first double), and
   //  the value is the weight at that age (second double)
-  std::map<double, double> ewaa; /*!<map of doubles for EWAA values by age,
+  std::map<double, double> ewaa; /**<map of doubles for EWAA values by age,
           where age starts at zero > */
 
   EWAAgrowth() : GrowthBase<Type>() {}
