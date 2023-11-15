@@ -11,20 +11,10 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// clear
-void clear();
-RcppExport SEXP _FIMS_clear() {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    clear();
-    return R_NilValue;
-END_RCPP
-}
 
 RcppExport SEXP _rcpp_module_boot_fims();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_FIMS_clear", (DL_FUNC) &_FIMS_clear, 0},
     {"_rcpp_module_boot_fims", (DL_FUNC) &_rcpp_module_boot_fims, 0},
     {NULL, NULL, 0}
 };
