@@ -11,9 +11,9 @@
 #include "../../../population_dynamics/growth/growth.hpp"
 #include "rcpp_interface_base.hpp"
 
-/****************************************************************
+/**
  * Growth Rcpp interface                                   *
- ***************************************************************/
+ */
 
 /**
  * @brief Rcpp interface that serves as the parent class for
@@ -40,10 +40,10 @@ objects */
 
   virtual ~GrowthInterfaceBase() {}
 
-  /** @brief get_id method for child growth interface objects to inherit **/
+  /** @brief get_id method for child growth interface objects to inherit */
   virtual uint32_t get_id() = 0;
 
-  /** @brief evaluate method for child growth interface objects to inherit **/
+  /** @brief evaluate method for child growth interface objects to inherit */
   virtual double evaluate(double age) = 0;
 };
 
@@ -78,7 +78,7 @@ vectors have been set */
    * @param ages Type vector of ages
    * @return std::map<T, T>
    *
-   * */
+   */
   inline std::map<double, double> make_map(std::vector<double> ages,
                                            std::vector<double> weights) {
     std::map<double, double> mymap;
@@ -91,7 +91,7 @@ vectors have been set */
   /** @brief Rcpp interface to the EWAAgrowth evaluate method
    * you can call from R using
    * ewaagrowth.evaluate(age)
-   * */
+   */
   virtual double evaluate(double age) {
     fims_popdy::EWAAgrowth<double> EWAAGrowth;
 

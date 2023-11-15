@@ -12,14 +12,14 @@
 #include "../../../population_dynamics/recruitment/recruitment.hpp"
 #include "rcpp_interface_base.hpp"
 
-/****************************************************************
- * Recruitment Rcpp interface                                   *
- ***************************************************************/
+/**
+ * Recruitment Rcpp interface
+ */
 
 /**
  * @brief RecruitmentInterfaceBase class should be inherited to
  * define different Rcpp interfaces for each possible Recruitment function
- * */
+ */
 class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
@@ -30,8 +30,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 
   // static std::vector<double> log_recruit_devs; /**< vector of log recruitment
   // deviations*/
-  /// static bool constrain_deviations; /**< whether or not the rec devs are
-  /// constrained*/
+  // static bool constrain_deviations; /**< whether or not the rec devs are constrained*/
 
   RecruitmentInterfaceBase() {
     this->id = RecruitmentInterfaceBase::id_g++;
@@ -44,11 +43,11 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~RecruitmentInterfaceBase() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() = 0;
 
   /** @brief evaluate method for child recruitment interface objects to inherit
-   * **/
+   */
   virtual double evaluate(double spawners, double ssbzero) = 0;
 
   /**

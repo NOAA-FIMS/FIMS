@@ -1,4 +1,4 @@
-/*! \file def.hpp
+/** \file def.hpp
  */
 
 /*

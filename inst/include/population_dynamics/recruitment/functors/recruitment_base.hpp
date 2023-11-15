@@ -1,4 +1,4 @@
-/*! \file recruitment_base.hpp
+/** \file recruitment_base.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the
@@ -29,16 +29,16 @@ namespace fims_popdy {
  */
 template <class Type>
 struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
-  static uint32_t id_g; /*!< reference id for recruitment object*/
+  static uint32_t id_g; /**< reference id for recruitment object*/
 
   typename fims::ModelTraits<Type>::ParameterVector
-      log_recruit_devs;            /*!< A vector of recruitment deviations */
+      log_recruit_devs;            /*!< A vector of log recruitment deviations */
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                  deviations are summing to zero or not */
 
-  Type log_sigma_recruit; /*!< Log standard deviation of log recruitment
+  Type log_sigma_recruit; /**< Log standard deviation of log recruitment
                        deviations */
-  Type log_rzero;         /*!< Log of unexploited recruitment.*/
+  Type log_rzero;         /**< Log of unexploited recruitment.*/
 
   bool estimate_log_recruit_devs =
       true; /*!< A flag to indicate if recruitment deviations are estimated or
@@ -70,7 +70,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    *
    */
   virtual const Type evaluate_nll() {
-    Type nll = 0.0; /*!< The negative log likelihood value */
+    Type nll = 0.0; /**< The negative log likelihood value */
 
     if (!this->estimate_log_recruit_devs) {
       return nll;

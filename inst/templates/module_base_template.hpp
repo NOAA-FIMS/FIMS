@@ -22,7 +22,7 @@ namespace fims_popdy {
 /* @brief Base class for all {{{ module_type }}} functors.
  *
  * @tparam Type The type of the {{{ module_type }}} functor.
- * */
+ */
 template<typename Type>
 // Change {{{ module_type }}} to CamelCase in the class definition below. 
 struct {{{ module_type }}}Base : public fims_model_object::FIMSObject<Type> {

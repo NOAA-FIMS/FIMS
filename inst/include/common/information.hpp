@@ -1,4 +1,4 @@
-/*! \file information.hpp
+/** \file information.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the
@@ -45,14 +45,14 @@ class Information {
 
   // data objects
   std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<Type> > >
-      data_objects; /*!< map that holds data objects >*/
+      data_objects; /**< map that holds data objects >*/
   typedef typename std::map<
       uint32_t, std::shared_ptr<fims_data_object::DataObject<Type> > >::iterator
       data_iterator; /**< iterator for the data objects */
 
   // life history modules
   std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >
-      recruitment_models; /*!<hash map to link each object to its shared
+      recruitment_models; /**<hash map to link each object to its shared
                              location in memory*/
   typedef typename std::map<
       uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >::iterator
@@ -60,7 +60,7 @@ class Information {
   /**< iterator for recruitment objects>*/
 
   std::map<uint32_t, std::shared_ptr<fims_popdy::SelectivityBase<Type> > >
-      selectivity_models; /*!<hash map to link each object to its shared
+      selectivity_models; /**<hash map to link each object to its shared
                              location in memory*/
   typedef typename std::map<
       uint32_t, std::shared_ptr<fims_popdy::SelectivityBase<Type> > >::iterator
@@ -68,7 +68,7 @@ class Information {
   /**< iterator for selectivity objects>*/
 
   std::map<uint32_t, std::shared_ptr<fims_popdy::GrowthBase<Type> > >
-      growth_models; /*!<hash map to link each object to its shared location in
+      growth_models; /**<hash map to link each object to its shared location in
                         memory*/
   typedef typename std::map<
       uint32_t, std::shared_ptr<fims_popdy::GrowthBase<Type> > >::iterator
@@ -76,7 +76,7 @@ class Information {
   /**< iterator for growth objects>*/
 
   std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > >
-      maturity_models; /*!<hash map to link each object to its shared location
+      maturity_models; /**<hash map to link each object to its shared location
                           in memory*/
   typedef typename std::map<
       uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > >::iterator
@@ -85,7 +85,7 @@ class Information {
 
   // fleet modules
   std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type> > >
-      fleets; /*!<hash map to link each object to its shared location in
+      fleets; /**<hash map to link each object to its shared location in
                  memory*/
   typedef
       typename std::map<uint32_t,
@@ -95,7 +95,7 @@ class Information {
 
   // populations
   std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > >
-      populations; /*!<hash map to link each object to its shared location in
+      populations; /**<hash map to link each object to its shared location in
                       memory*/
   typedef typename std::map<
       uint32_t, std::shared_ptr<fims_popdy::Population<Type> > >::iterator
@@ -105,7 +105,7 @@ class Information {
   // distributions
   std::map<uint32_t,
            std::shared_ptr<fims_distributions::DistributionsBase<Type> > >
-      distribution_models; /*!<hash map to link each object to its shared
+      distribution_models; /**<hash map to link each object to its shared
                               location in memory*/
   typedef typename std::map<
       uint32_t,
