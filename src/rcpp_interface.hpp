@@ -238,7 +238,6 @@ void clear_internal() {
 /*
  * Clears the vector of independent variables
  */
-// [[Rcpp::export]]
 void clear() {
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
@@ -322,7 +321,7 @@ RCPP_MODULE(fims) {
   Rcpp::function("CreateTMBModel", &CreateTMBModel);
   Rcpp::function("get_fixed", &get_fixed_parameters_vector);
   Rcpp::function("get_random", &get_random_parameters_vector);
-  //Rcpp::function("clear", clear);
+  Rcpp::function("clear", clear);
   Rcpp::function("clear_logs", clear_logs);
   Rcpp::function("clear_fims_log", clear_fims_log);
   Rcpp::function("clear_info_log", clear_info_log);
