@@ -42,7 +42,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~DataInterfaceBase() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() { return this->id; }
 
   /**@brief add_to_fims_tmb dummy method
@@ -78,7 +78,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
   virtual ~AgeCompDataInterface() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() { return this->id; }
 
 #ifdef TMB_MODEL
@@ -141,7 +141,7 @@ class IndexDataInterface : public DataInterfaceBase {
   virtual ~IndexDataInterface() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() { return this->id; }
 
 #ifdef TMB_MODEL

@@ -37,7 +37,7 @@ objects */
 
   virtual ~FleetInterfaceBase() {}
 
-  /** @brief get_id method for child fleet interface objects to inherit **/
+  /** @brief get_id method for child fleet interface objects to inherit */
   virtual uint32_t get_id() = 0;
 };
 

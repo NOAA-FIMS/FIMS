@@ -38,11 +38,11 @@ DistributionsInterfaceBase objects */
   virtual ~DistributionsInterfaceBase() {}
 
   /** @brief get_id method for child distribution interface objects to inherit
-   * **/
+   */
   virtual uint32_t get_id() = 0;
 
   /** @brief evaluate method for child distribution interface objects to inherit
-   * **/
+   */
   virtual double evaluate(bool do_log) = 0;
 };
 
@@ -64,8 +64,8 @@ std::map<uint32_t,
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
   Parameter x;    /**< observed data */
-  Parameter mean; /**< mean of x for the normal distribution **/
-  Parameter sd;   /**< sd of x for the normal distribution **/
+  Parameter mean; /**< mean of x for the normal distribution */
+  Parameter sd;   /**< sd of x for the normal distribution */
 
   DnormDistributionsInterface() : DistributionsInterfaceBase() {}
 

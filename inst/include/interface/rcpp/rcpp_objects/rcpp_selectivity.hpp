@@ -40,7 +40,7 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~SelectivityInterfaceBase() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() = 0;
 
   /**

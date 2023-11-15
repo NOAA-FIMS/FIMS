@@ -36,10 +36,10 @@ class NLLInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~NLLInterfaceBase() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() = 0;
 
-  /** @brief evaluate method for child nll interface objects to inherit **/
+  /** @brief evaluate method for child nll interface objects to inherit */
   virtual double evaluate_nll() = 0;
 };
 

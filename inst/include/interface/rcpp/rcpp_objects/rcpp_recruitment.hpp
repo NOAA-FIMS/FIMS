@@ -43,11 +43,11 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~RecruitmentInterfaceBase() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() = 0;
 
   /** @brief evaluate method for child recruitment interface objects to inherit
-   * **/
+   */
   virtual double evaluate(double spawners, double ssbzero) = 0;
 
   /**

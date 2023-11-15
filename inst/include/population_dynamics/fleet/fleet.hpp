@@ -20,7 +20,7 @@ namespace fims_popdy {
 /** @brief Base class for all fleets.
  *
  * @tparam Type The type of the fleet object.
- **/
+ */
 template <class Type>
 struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /**< reference id for fleet object*/
