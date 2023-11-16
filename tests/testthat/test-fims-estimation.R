@@ -39,7 +39,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$recruitment$logit_steep$estimated <- FALSE
   test_env$recruitment$estimate_log_devs <- TRUE
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  test_env$recruitment$log_devs <- c(om_input$logR.resid[-1], 0)
+  test_env$recruitment$log_devs <- om_input$logR.resid[-1]
 
   # Data
   test_env$catch <- em_input$L.obs$fleet1
