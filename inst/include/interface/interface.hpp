@@ -20,7 +20,6 @@
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
 // issue
 #include <math.h>
-//#define TMB_LIB_INIT R_init_FIMS
 #include <TMB.hpp>
 
 // define REPORT, ADREPORT, and SIMULATE
