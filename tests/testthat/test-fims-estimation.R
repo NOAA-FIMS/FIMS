@@ -137,7 +137,6 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
   test_env$population$nseasons <- 1
   test_env$population$nyears <- om_input$nyr
-  test_env$population$prop_female <- om_input$proportion.female[1]
   test_env$population$SetMaturity(test_env$maturity$get_id())
   test_env$population$SetGrowth(test_env$ewaa_growth$get_id())
   test_env$population$SetRecruitment(test_env$recruitment$get_id())
@@ -684,7 +683,6 @@ test_that("run FIMS in a for loop", {
     population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
     population$nseasons <- 1
     population$nyears <- om_input$nyr
-    population$prop_female <- om_input$proportion.female[1]
     population$SetMaturity(maturity$get_id())
     population$SetGrowth(ewaa_growth$get_id())
     population$SetRecruitment(recruitment$get_id())
@@ -707,3 +705,4 @@ test_that("run FIMS in a for loop", {
     fims$clear()
   }
 })
+

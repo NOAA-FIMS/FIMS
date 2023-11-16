@@ -312,7 +312,6 @@ population$ages <- ages
 population$nfleets <- 2 # 1 fleet and 1 survey
 population$nseasons <- nseasons
 population$nyears <- nyears
-population$prop_female <- 0.5
 ```
 
 Now we need to link up the recruitment, growth, and maturity modules we set above with this new population module. We do this by calling `get_id()` from each respective module and passing that unique ID into each respective `Set` function from population. 
