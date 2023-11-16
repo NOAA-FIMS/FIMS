@@ -33,7 +33,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /**< reference id for recruitment object*/
 
   fims::Vector<Type>
-      log_recruit_devs;            /*!< A vector of recruitment deviations */
+      log_recruit_devs;            /*!< A vector of log recruitment deviations */
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                  deviations are summing to zero or not */
 
