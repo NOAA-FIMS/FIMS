@@ -12,14 +12,14 @@
 #include "../../../population_dynamics/recruitment/recruitment.hpp"
 #include "rcpp_interface_base.hpp"
 
-/****************************************************************
- * Recruitment Rcpp interface                                   *
- ***************************************************************/
+/**
+ * Recruitment Rcpp interface
+ */
 
 /**
  * @brief RecruitmentInterfaceBase class should be inherited to
  * define different Rcpp interfaces for each possible Recruitment function
- * */
+ */
 class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
@@ -28,10 +28,9 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
   /**< map associating the ids of RecruitmentInterfaceBase to the objects */
 
-  // static std::vector<double> recruit_deviations; /**< vector of recruitment
+  // static std::vector<double> log_recruit_devs; /**< vector of log recruitment
   // deviations*/
-  /// static bool constrain_deviations; /**< whether or not the rec devs are
-  /// constrained*/
+  // static bool constrain_deviations; /**< whether or not the rec devs are constrained*/
 
   RecruitmentInterfaceBase() {
     this->id = RecruitmentInterfaceBase::id_g++;
@@ -44,11 +43,11 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~RecruitmentInterfaceBase() {}
 
   /** @brief get the ID of the interface base object
-   **/
+   */
   virtual uint32_t get_id() = 0;
 
   /** @brief evaluate method for child recruitment interface objects to inherit
-   * **/
+   */
   virtual double evaluate(double spawners, double ssbzero) = 0;
 
   /**
@@ -72,9 +71,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
   Parameter logit_steep;       /**< steepness or the productivity of the stock*/
   Parameter log_rzero;         /**< recruitment at unfished biomass */
-  Parameter log_sigma_recruit; /**< the log of the stock recruit deviations */
-  Rcpp::NumericVector deviations; /**< recruitment deviations*/
-  bool estimate_deviations =
+  Parameter log_sigma_recruit; /**< the log of the stock recruit standard deviation */
+  Rcpp::NumericVector log_devs; /**< log recruitment deviations*/
+  bool estimate_log_devs =
       false; /**< boolean describing whether to estimate */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
@@ -102,13 +101,13 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     fims_popdy::SRBevertonHolt<double> NLL;
 
     NLL.log_sigma_recruit = this->log_sigma_recruit.value_m;
-    NLL.recruit_deviations.resize(deviations.size());  // Vector from TMB
-    for (int i = 0; i < deviations.size(); i++) {
-      NLL.recruit_deviations[i] = deviations[i];
+    NLL.log_recruit_devs.resize(log_devs.size());  // Vector from TMB
+    for (int i = 0; i < log_devs.size(); i++) {
+      NLL.log_recruit_devs[i] = log_devs[i];
     }
-    RECRUITMENT_LOG << "Rec devs being passed to C++ are " << deviations
+    RECRUITMENT_LOG << "Log recruit devs being passed to C++ are " << log_devs
                     << std::endl;
-    NLL.estimate_recruit_deviations = this->estimate_deviations;
+    NLL.estimate_log_recruit_devs = this->estimate_log_devs;
     return NLL.evaluate_nll();
   }
 
@@ -149,15 +148,15 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
 
-    recruitment->recruit_deviations.resize(this->deviations.size());
-    if (this->estimate_deviations) {
-      for (size_t i = 0; i < recruitment->recruit_deviations.size(); i++) {
-        recruitment->recruit_deviations[i] = this->deviations[i];
-        info->RegisterParameter(recruitment->recruit_deviations[i]);
+    recruitment->log_recruit_devs.resize(this->log_devs.size());
+    if (this->estimate_log_devs) {
+      for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
+        recruitment->log_recruit_devs[i] = this->log_devs[i];
+        info->RegisterParameter(recruitment->log_recruit_devs[i]);
       }
     } else {
-      for (size_t i = 0; i < recruitment->recruit_deviations.size(); i++) {
-        recruitment->recruit_deviations[i] = this->deviations[i];
+      for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
+        recruitment->log_recruit_devs[i] = this->log_devs[i];
       }
     }
 

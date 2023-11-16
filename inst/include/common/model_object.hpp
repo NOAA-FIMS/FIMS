@@ -23,12 +23,12 @@ namespace fims_model_object {
  */
 template <typename Type>
 struct FIMSObject {
-  uint32_t id; /*!< unique identifier assigned for all fims objects */
-  std::vector<Type*> parameters; /*!< list of estimable parameters */
+  uint32_t id; /**< unique identifier assigned for all fims objects */
+  std::vector<Type*> parameters; /**< list of estimable parameters */
   std::vector<Type*>
-      random_effects_parameters; /*!< list of all random effects parameters */
+      random_effects_parameters; /**< list of all random effects parameters */
   std::vector<Type*>
-      fixed_effects_parameters; /*!< list of fixed effects parameters */
+      fixed_effects_parameters; /**< list of fixed effects parameters */
 
   virtual ~FIMSObject() {}
   /**

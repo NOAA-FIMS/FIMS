@@ -297,9 +297,9 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct LogisticMaturity : public MaturityBase<Type> {
-  Type inflection_point; /*!< 50% quantile of the value of the quantity of interest (x); e.g.,
+  Type inflection_point; /**< 50% quantile of the value of the quantity of interest (x); e.g.,
                age at which 50% of the fish are mature */
-  Type slope;  /*!<scalar multiplier of difference between quantity of interest
+  Type slope;  /**<scalar multiplier of difference between quantity of interest
                value (x) and inflection_point */
 
   LogisticMaturity() : MaturityBase<Type>() {}
@@ -332,9 +332,9 @@ To evaluate maturity within the `Population` class, we first need to set up a sh
 ```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 //file: inst/include/population_dynamics/population/population.hpp
 // maturity is a shared pointer to MaturityBase
-int maturity_id = -999; /*!< id of maturity model object*/
+int maturity_id = -999; /**< id of maturity model object*/
 std::shared_ptr<fims_popdy::MaturityBase<Type>>
-      maturity; /*!< shared pointer to maturity module */
+      maturity; /**< shared pointer to maturity module */
 ```
 
 The `maturity_id` was set from R using the `SetMaturity()` method from the `PopulationInterface` class:
@@ -359,7 +359,7 @@ struct MaturityBase : public fims_model_object::FIMSObject<Type> {
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the MaturityBase class.
-  static uint32_t id_g; /*!< The ID of the instance of the MaturityBase class */
+  static uint32_t id_g; /**< The ID of the instance of the MaturityBase class */
 
   /** @brief Constructor.
    */
@@ -418,7 +418,7 @@ This *information* is managed in FIMS through the `Information` class in [inform
  maturity_models, that points to fims_popdy::MaturityBase
  */
 std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > >
-      maturity_models; /*!<hash map to link each object to its shared location
+      maturity_models; /**<hash map to link each object to its shared location
                           in memory*/
 
 //Next we set up the iterator, which will be used to loop 
@@ -453,7 +453,7 @@ Now we need to pass this pointer to the maturity pointer in population so that `
 ```{Rcpp,  class.source = "infochunk", eval = FALSE}
 //file: inst/include/common/information.hpp
 std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > >
-      populations; /*!<hash map to link each object to its shared location in
+      populations; /**<hash map to link each object to its shared location in
                       memory*/
   typedef typename std::map<uint32_t,
                             std::shared_ptr<fims_popdy::Population<Type> > >::iterator

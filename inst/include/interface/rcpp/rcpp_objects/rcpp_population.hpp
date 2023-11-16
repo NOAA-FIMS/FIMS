@@ -11,14 +11,14 @@
 #include "../../../population_dynamics/population/population.hpp"
 #include "rcpp_interface_base.hpp"
 
-/****************************************************************
- * Population Rcpp interface                                   *
- ***************************************************************/
+/**
+ * Population Rcpp interface
+ */
 
 /**
  * @brief PopulationInterfaceBase class should be inherited to
  * define different Rcpp interfaces for each possible Population function
- * */
+ */
 class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g; /**< static id of the population interface base*/

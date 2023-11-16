@@ -137,8 +137,11 @@ Type objective_function<Type>::operator()(){
   rec->rzero = R0;
   rec->steep = h;
   rec->log_sigma_recruit = logR_sd;
-  rec->recruit_deviations.resize(nyears);
-  std::fill(rec->recruit_deviations.begin(), rec->recruit_deviations.end(), 1.0);
+  /*the log_recruit_dev vector does not include a value for year == 0
+    and is of length nyears - 1 where the first position of the vector
+    corresponds to the second year of the time series.*/
+  rec->log_recruit_devs.resize(nyears-1);
+  std::fill(rec->log_recruit_devs.begin(), rec->log_recruit_devs.end(), 0.0);
   pop.recruitment = rec;
 
   //Set maturity
