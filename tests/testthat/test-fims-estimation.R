@@ -19,7 +19,6 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
 on.exit(unlink(maindir, recursive = T), add = TRUE)
-
 setwd(working_dir)
 on.exit(setwd(working_dir), add = TRUE)
 # Set-up Rcpp modules and fix parameters to "true"
@@ -40,7 +39,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$recruitment$logit_steep$estimated <- FALSE
   test_env$recruitment$estimate_log_devs <- TRUE
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  test_env$recruitment$log_devs <- om_input$logR.resid[-1]
+  test_env$recruitment$log_devs <- c(om_input$logR.resid[-1], 0)
 
   # Data
   test_env$catch <- em_input$L.obs$fleet1
@@ -209,7 +208,7 @@ test_that("deterministic test of fims", {
 
   # recruitment log_devs (fixed at initial "true" values)
   # the initial value of om_input$logR.resid is dropped from the model
-  expect_equal(report$log_recruit_dev[[1]], om_input$logR.resid[-1])
+  expect_equal(report$log_recruit_dev[[1]], c(om_input$logR.resid[-1],0))
 
   # F (fixed at initial "true" values)
   expect_equal(report$F_mort[[1]], om_output$f)
@@ -445,7 +444,7 @@ test_that("estimation test of fims", {
   sdr_rdev <- sdr_report[which(rownames(sdr_report) == "LogRecDev"), ]
   rdev_are <- rep(0, length(om_input$logR.resid)-1)
 
-  for (i in 1:length(report$log_recruit_dev[[1]]) ){
+  for (i in 1:(length(report$log_recruit_dev[[1]])-1)){
     rdev_are[i] <- abs(report$log_recruit_dev[[1]][i] - om_input$logR.resid[i+1]) # /
     #   exp(om_input$logR.resid[i])
     # expect_lte(rdev_are[i], 1) # 1
