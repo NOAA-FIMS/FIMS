@@ -7,9 +7,8 @@ test_that("dnorm", {
   y <- stats::rnorm(1)
 
   # create a fims Rcpp object
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   # initialize the Dnorm module
-  dnorm_ <- new(fims$TMBDnormDistribution)
+  dnorm_ <- new(TMBDnormDistribution)
   # populate class members
   dnorm_$x$value <- y
   dnorm_$mean$value <- 0
@@ -17,7 +16,7 @@ test_that("dnorm", {
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(TRUE), stats::dnorm(y, 0, 1, TRUE))
 
-  fims$clear()
+  clear()
 })
 
 test_that("dlnorm", {
@@ -27,9 +26,8 @@ test_that("dlnorm", {
   y <- stats::rlnorm(n = 1, meanlog = 0, sdlog = 1)
 
   # create a fims Rcpp object
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   # initialize the Dnorm module
-  dlnorm_ <- new(fims$TMBDlnormDistribution)
+  dlnorm_ <- new(TMBDlnormDistribution)
   # populate class members
   dlnorm_$x$value <- y
   dlnorm_$meanlog$value <- 0
@@ -38,7 +36,7 @@ test_that("dlnorm", {
   expect_equal(dlnorm_$evaluate(TRUE), stats::dlnorm(y, 0, 1, TRUE))
   expect_equal(dlnorm_$evaluate(FALSE), stats::dlnorm(y, 0, 1, FALSE))
 
-  fims$clear()
+  clear()
 })
 
 test_that("dmultinom", {
@@ -48,9 +46,8 @@ test_that("dmultinom", {
   x <- stats::rmultinom(1, 100, p)
 
   # create a fims Rcpp object
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   # initialize the Dmultinom module
-  dmultinom_ <- new(fims$TMBDmultinomDistribution)
+  dmultinom_ <- new(TMBDmultinomDistribution)
   # populate class members
   dmultinom_$x <- x
   dmultinom_$p <- p
@@ -64,5 +61,5 @@ test_that("dmultinom", {
     stats::dmultinom(x = x, prob = p, log = FALSE)
   )
 
-  fims$clear()
+  clear()
 })
