@@ -11,17 +11,17 @@
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
+#include "rcpp_objects/rcpp_data.hpp"
+#include "rcpp_objects/rcpp_fleet.hpp"
+#include "rcpp_objects/rcpp_growth.hpp"
+#include "rcpp_objects/rcpp_maturity.hpp"
+#include "rcpp_objects/rcpp_natural_mortality.hpp"
 //#include "rcpp_objects/rcpp_nll.hpp"
-#include "../inst/include/common/model.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_tmb_distribution.hpp"
+#include "../../common/model.hpp"
+#include "rcpp_objects/rcpp_population.hpp"
+#include "rcpp_objects/rcpp_recruitment.hpp"
+#include "rcpp_objects/rcpp_selectivity.hpp"
+#include "rcpp_objects/rcpp_tmb_distribution.hpp"
 /**
  * @brief Create the TMB model object and add interface objects to it.
  */
@@ -235,8 +235,8 @@ void clear_internal() {
   d0->fixed_effects_parameters.clear();
   d0->random_effects_parameters.clear();
 }
-/*
- * Clears the vector of independent variables
+/**
+ * Clears the vector of independent variables.
  */
 void clear() {
   // rcpp_interface_base.hpp
