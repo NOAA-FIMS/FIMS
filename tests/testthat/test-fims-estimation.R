@@ -16,39 +16,66 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
   case_name = "FIMS_C0_estimation"
 )
 
+# generate om_input, om_output, and em_input 
+# using function from the model comparison project
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
-on.exit(unlink(maindir, recursive = T), add = TRUE)
+on.exit(unlink(maindir, recursive = TRUE), add = TRUE)
 
 setwd(working_dir)
 on.exit(setwd(working_dir), add = TRUE)
 # Set-up Rcpp modules and fix parameters to "true"
+# om_input, om_output, and em_input generated from ASSAMC::run_om
 setup_fims <- function(om_input, om_output, em_input) {
+  # create new R environment in which to conduct tests
   test_env <- new.env(parent = emptyenv())
+  # initialize FIMS model
   test_env$fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
   # Recruitment
-  test_env$recruitment <- new(test_env$fims$BevertonHoltRecruitment)
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
-  # before the likelihood calculation
+  # create new module in the recruitment class (specifically Beverton-Holt,
+  # when there are other options, this would be where the option would be chosen)
+  test_env$recruitment <- methods::new(test_env$fims$BevertonHoltRecruitment)
+
+  # NOTE: in first set of parameters below (for recruitment), 
+  # $is_random_effect (default is FALSE) and $estimated (default is FALSE) 
+  # are defined even if they match the defaults in order to provide an example 
+  # of how that is done. Other sections of the code below leave defaults in 
+  # place as appropriate.
+
+  # set up logR_sd
+  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
+  # taken before the likelihood calculation
   test_env$recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
+  test_env$recruitment$log_sigma_recruit$is_random_effect <- FALSE
+  test_env$recruitment$log_sigma_recruit$estimated <- FALSE
+  # set up log_rzero (equilibrium recruitment)
   test_env$recruitment$log_rzero$value <- log(om_input$R0)
   test_env$recruitment$log_rzero$is_random_effect <- FALSE
   test_env$recruitment$log_rzero$estimated <- TRUE
+  # set up logit_steep
   test_env$recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
   test_env$recruitment$logit_steep$is_random_effect <- FALSE
   test_env$recruitment$logit_steep$estimated <- FALSE
+  # turn on estimation of deviations
   test_env$recruitment$estimate_log_devs <- TRUE
+  # recruit deviations should enter the model in normal space.
+  # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
   test_env$recruitment$log_devs <- om_input$logR.resid[-1]
 
+
   # Data
   test_env$catch <- em_input$L.obs$fleet1
+  # set fishing fleet catch data, need to set dimensions of data index
+  # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
   test_env$fishing_fleet_index <- new(test_env$fims$Index, length(test_env$catch))
   test_env$fishing_fleet_index$index_data <- test_env$catch
+  # set fishing fleet age comp data, need to set dimensions of age comps
   test_env$fishing_fleet_age_comp <- new(test_env$fims$AgeComp, length(test_env$catch), om_input$nages)
   test_env$fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
 
+  # repeat for surveys
   test_env$survey_index <- em_input$surveyB.obs$survey1
   test_env$survey_fleet_index <- new(test_env$fims$Index, length(test_env$survey_index))
   test_env$survey_fleet_index$index_data <- test_env$survey_index
@@ -74,8 +101,10 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
   test_env$fishing_fleet_selectivity$inflection_point$value <- om_input$sel_fleet$fleet1$A50.sel1
   test_env$fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+  # turn on estimation of inflection_point
   test_env$fishing_fleet_selectivity$inflection_point$estimated <- TRUE
   test_env$fishing_fleet_selectivity$slope$value <- om_input$sel_fleet$fleet1$slope.sel1
+  # turn on estimation of slope
   test_env$fishing_fleet_selectivity$slope$is_random_effect <- FALSE
   test_env$fishing_fleet_selectivity$slope$estimated <- TRUE
 
@@ -90,7 +119,10 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet$random_q <- FALSE
   test_env$fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
   test_env$fishing_fleet$log_obs_error$estimated <- FALSE
-  # Need get_id() for setting up observed agecomp and index data?
+  # Modules are linked together using module IDs
+  # Each module has a get_id() function that returns the unique ID for that module
+  # Each fleet uses the module IDs to link up the correct module to the correct fleet
+  # Note: Likelihoods not yet set up as a stand-alone modules, so no get_id()
   test_env$fishing_fleet$SetAgeCompLikelihood(1)
   test_env$fishing_fleet$SetIndexLikelihood(1)
   test_env$fishing_fleet$SetSelectivity(test_env$fishing_fleet_selectivity$get_id())
@@ -101,16 +133,17 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$survey_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
   test_env$survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
   test_env$survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+  # turn on estimation of inflection_point
   test_env$survey_fleet_selectivity$inflection_point$estimated <- TRUE
   test_env$survey_fleet_selectivity$slope$value <- om_input$sel_survey$survey1$slope.sel1
   test_env$survey_fleet_selectivity$slope$is_random_effect <- FALSE
+  # turn on estimation of slope
   test_env$survey_fleet_selectivity$slope$estimated <- TRUE
 
   test_env$survey_fleet <- new(test_env$fims$Fleet)
   test_env$survey_fleet$is_survey <- TRUE
   test_env$survey_fleet$nages <- om_input$nages
   test_env$survey_fleet$nyears <- om_input$nyr
-  # survey_fleet$log_Fmort <- rep(log(0.0000000000000000000000000001), om_input$nyr) #-Inf?
   test_env$survey_fleet$estimate_F <- FALSE
   test_env$survey_fleet$random_F <- FALSE
   test_env$survey_fleet$log_q <- log(om_output$survey_q$survey1)
@@ -126,9 +159,6 @@ setup_fims <- function(om_input, om_output, em_input) {
 
   # Population
   test_env$population <- new(test_env$fims$Population)
-  # is it a problem these are not Parameters in the Population interface?
-  # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors,
-  # do we need a ParameterVector class?
   test_env$population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages)
   test_env$population$estimate_M <- FALSE
   test_env$population$log_init_naa <- log(om_output$N.age[1, ])
@@ -138,30 +168,36 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
   test_env$population$nseasons <- 1
   test_env$population$nyears <- om_input$nyr
+  # following line is related to issue #521, may be modified in the future
+  # https://github.com/NOAA-FIMS/FIMS/issues/521
   test_env$population$prop_female <- om_input$proportion.female[1]
   test_env$population$SetMaturity(test_env$maturity$get_id())
   test_env$population$SetGrowth(test_env$ewaa_growth$get_id())
   test_env$population$SetRecruitment(test_env$recruitment$get_id())
 
+  # end of setup_fims function, returning test_env
   return(test_env)
 }
 
 test_that("deterministic test of fims", {
+  # run function defined above to set up the test environment
   deterministic_env <- setup_fims(
     om_input = om_input,
     om_output = om_output,
     em_input = em_input
   )
-  # Set-up TMB
+  # Set-up 
   deterministic_env$fims$CreateTMBModel()
-  # Create parameter list from Rcpp modules
+  # CreateTMBModel calls a function in information that loops
+  # over all the populations and fleets and sets all the pointers
   parameters <- list(p = deterministic_env$fims$get_fixed())
-  par_list <- 1:length(parameters[[1]])
-  par_list[2:length(par_list)] <- NA
-  map <- list(p = factor(par_list))
+  # get_fixed function is an Rcpp function that loops over all Rcpp
+  # modules and returned a vector of parameters being estimated
+ 
+  # Set up TMB's computational graph
+  obj <- MakeADFun(data = list(), parameters, DLL = "FIMS")
 
-  obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
-
+  # Calculate standard errors
   sdr <- TMB::sdreport(obj)
   sdr_fixed <- summary(sdr, "fixed")
 
@@ -169,41 +205,46 @@ test_that("deterministic test of fims", {
   # obj$report() requires parameter list to avoid errors
   report <- obj$report(obj$par)
 
-  # log(R0)
+  # Compare log(R0) to true value
   fims_logR0 <- sdr_fixed[1, "Estimate"]
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input$R0))
 
-  # Numbers at age
+  # Compare numbers at age to true value
   for (i in 1:length(c(t(om_output$N.age)))) {
     expect_equal(report$naa[[1]][i], c(t(om_output$N.age))[i])
   }
 
-  # Biomass
+  # Compare biomass to true value
   for (i in 1:length(om_output$biomass.mt)) {
     expect_equal(report$biomass[[1]][i], om_output$biomass.mt[i])
   }
 
-  # Spawning biomass
+  # Compare spawning biomass to true value
   for (i in 1:length(om_output$SSB)) {
     expect_equal(report$ssb[[1]][i], om_output$SSB[i])
   }
 
-  # Recruitment
+  # Compare recruitment to true value
   fims_naa <- matrix(report$naa[[1]][1:(om_input$nyr * om_input$nages)],
     nrow = om_input$nyr, byrow = TRUE
   )
 
-  for (i in 1:length(om_output$N.age[, 1])) {
+  # loop over years to compare recruitment by year
+  for (i in 1:om_input$nyr) {
     expect_equal(fims_naa[i, 1], om_output$N.age[i, 1])
   }
 
+  # confirm that recruitment matches the numbers in the first age
+  # by comparing to fims_naa (what's reported from FIMS)
   expect_equal(
     fims_naa[1:om_input$nyr, 1],
     report$recruitment[[1]][1:om_input$nyr]
   )
 
-  for (i in 1:length(om_output$N.age[, 1])) {
+  # confirm that recruitment matches the numbers in the first age
+  # by comparing to the true values from the OM
+  for (i in 1:om_input$nyr) {
     expect_equal(report$recruitment[[1]][i], om_output$N.age[i, 1])
   }
 
@@ -216,7 +257,6 @@ test_that("deterministic test of fims", {
 
   # Expected catch
   fims_index <- report$exp_index
-  # Expect small relative error for deterministic test
   for (i in 1:length(om_output$L.mt$fleet1)) {
     expect_equal(fims_index[[1]][i], om_output$L.mt$fleet1[i])
   }
@@ -230,12 +270,13 @@ test_that("deterministic test of fims", {
   # Expect 95% of relative error to be within 2*cv
   expect_lte(sum(fims_object_are > om_input$cv.L$fleet1 * 2.0), length(em_input$L.obs$fleet1) * 0.05)
 
-  # Expected catch number at age
+  # Compare expected catch number at age to true values
   for (i in 1:length(c(t(om_output$L.age$fleet1)))) {
     expect_equal(report$cnaa[[1]][i], c(t(om_output$L.age$fleet1))[i])
   }
 
   # Expected catch number at age in proportion
+  # QUESTION: Isn't this redundant with the non-proportion test above?
   fims_cnaa <- matrix(report$cnaa[[1]][1:(om_input$nyr * om_input$nages)],
     nrow = om_input$nyr, byrow = TRUE
   )
@@ -246,8 +287,9 @@ test_that("deterministic test of fims", {
     expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
 
-  # Expected survey index
-  cwaa <- matrix(report$cwaa[[2]][1:(om_input$nyr * om_input$nages)], nrow = om_input$nyr, byrow = T)
+  # Expected survey index.
+  # Using [[2]] because the survey is the 2nd fleet.
+  cwaa <- matrix(report$cwaa[[2]][1:(om_input$nyr * om_input$nages)], nrow = om_input$nyr, byrow = TRUE)
   expect_equal(fims_index[[2]], apply(cwaa, 1, sum) * om_output$survey_q$survey1)
 
   for (i in 1:length(om_output$survey_index_biomass$survey1)) {
@@ -276,7 +318,7 @@ test_that("deterministic test of fims", {
   for (i in 1:length(c(t(om_cnaa_proportion)))) {
     expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
-
+  # clear memory
   deterministic_env$fims$clear()
 })
 
@@ -424,8 +466,8 @@ test_that("estimation test of fims", {
   )
   sdr_naa1_vec <- sdr_report[which(rownames(sdr_report) == "NAA"), 2]
   sdr_naa1 <- sdr_naa1_vec[seq(1, om_input$nyr * om_input$nages, by = om_input$nages)]
-  fims_naa1_are <- rep(0, length(om_output$N.age[, 1]))
-  for (i in 1:length(om_output$N.age[, 1])) {
+  fims_naa1_are <- rep(0, om_input$nyr)
+  for (i in 1:om_input$nyr) {
     fims_naa1_are[i] <- abs(fims_naa[i, 1] - om_output$N.age[i, 1]) # /
     # om_output$N.age[i, 1]
     # expect_lte(fims_naa1_are[i], 0.25)
