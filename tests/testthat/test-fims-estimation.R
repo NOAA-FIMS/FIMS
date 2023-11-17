@@ -25,9 +25,10 @@ on.exit(setwd(working_dir), add = TRUE)
 # Set-up Rcpp modules and fix parameters to "true"
 setup_fims <- function(om_input, om_output, em_input) {
   test_env <- new.env(parent = emptyenv())
+  test_env$fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
   # Recruitment
-  test_env$recruitment <- new(BevertonHoltRecruitment)
+  test_env$recruitment <- new(test_env$fims$BevertonHoltRecruitment)
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
   # before the likelihood calculation
   test_env$recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
@@ -43,24 +44,24 @@ setup_fims <- function(om_input, om_output, em_input) {
 
   # Data
   test_env$catch <- em_input$L.obs$fleet1
-  test_env$fishing_fleet_index <- new(Index, length(test_env$catch))
+  test_env$fishing_fleet_index <- new(test_env$fims$Index, length(test_env$catch))
   test_env$fishing_fleet_index$index_data <- test_env$catch
-  test_env$fishing_fleet_age_comp <- new(AgeComp, length(test_env$catch), om_input$nages)
+  test_env$fishing_fleet_age_comp <- new(test_env$fims$AgeComp, length(test_env$catch), om_input$nages)
   test_env$fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
 
   test_env$survey_index <- em_input$surveyB.obs$survey1
-  test_env$survey_fleet_index <- new(Index, length(test_env$survey_index))
+  test_env$survey_fleet_index <- new(test_env$fims$Index, length(test_env$survey_index))
   test_env$survey_fleet_index$index_data <- test_env$survey_index
-  test_env$survey_fleet_age_comp <- new(AgeComp, length(test_env$survey_index), om_input$nages)
+  test_env$survey_fleet_age_comp <- new(test_env$fims$AgeComp, length(test_env$survey_index), om_input$nages)
   test_env$survey_fleet_age_comp$age_comp_data <- c(t(em_input$survey.age.obs$survey1)) * em_input$n.survey$survey1
 
   # Growth
-  test_env$ewaa_growth <- new(EWAAgrowth)
+  test_env$ewaa_growth <- new(test_env$fims$EWAAgrowth)
   test_env$ewaa_growth$ages <- om_input$ages
   test_env$ewaa_growth$weights <- om_input$W.mt
 
   # Maturity
-  test_env$maturity <- new(LogisticMaturity)
+  test_env$maturity <- new(test_env$fims$LogisticMaturity)
   test_env$maturity$inflection_point$value <- om_input$A50.mat
   test_env$maturity$inflection_point$is_random_effect <- FALSE
   test_env$maturity$inflection_point$estimated <- FALSE
@@ -70,7 +71,7 @@ setup_fims <- function(om_input, om_output, em_input) {
 
   # Fleet
   # Create the fishing fleet
-  test_env$fishing_fleet_selectivity <- new(LogisticSelectivity)
+  test_env$fishing_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
   test_env$fishing_fleet_selectivity$inflection_point$value <- om_input$sel_fleet$fleet1$A50.sel1
   test_env$fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
   test_env$fishing_fleet_selectivity$inflection_point$estimated <- TRUE
@@ -78,7 +79,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet_selectivity$slope$is_random_effect <- FALSE
   test_env$fishing_fleet_selectivity$slope$estimated <- TRUE
 
-  test_env$fishing_fleet <- new(Fleet)
+  test_env$fishing_fleet <- new(test_env$fims$Fleet)
   test_env$fishing_fleet$nages <- om_input$nages
   test_env$fishing_fleet$nyears <- om_input$nyr
   test_env$fishing_fleet$log_Fmort <- log(om_output$f)
@@ -97,7 +98,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet$SetObservedAgeCompData(test_env$fishing_fleet_age_comp$get_id())
 
   # Create the survey fleet
-  test_env$survey_fleet_selectivity <- new(LogisticSelectivity)
+  test_env$survey_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
   test_env$survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
   test_env$survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
   test_env$survey_fleet_selectivity$inflection_point$estimated <- TRUE
@@ -105,7 +106,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$survey_fleet_selectivity$slope$is_random_effect <- FALSE
   test_env$survey_fleet_selectivity$slope$estimated <- TRUE
 
-  test_env$survey_fleet <- new(Fleet)
+  test_env$survey_fleet <- new(test_env$fims$Fleet)
   test_env$survey_fleet$is_survey <- TRUE
   test_env$survey_fleet$nages <- om_input$nages
   test_env$survey_fleet$nyears <- om_input$nyr
@@ -124,7 +125,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$survey_fleet$SetObservedAgeCompData(test_env$survey_fleet_age_comp$get_id())
 
   # Population
-  test_env$population <- new(Population)
+  test_env$population <- new(test_env$fims$Population)
   # is it a problem these are not Parameters in the Population interface?
   # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors,
   # do we need a ParameterVector class?
@@ -152,9 +153,9 @@ test_that("deterministic test of fims", {
     em_input = em_input
   )
   # Set-up TMB
-  deterministic_env$CreateTMBModel()
+  deterministic_env$fims$CreateTMBModel()
   # Create parameter list from Rcpp modules
-  parameters <- list(p = deterministic_env$get_fixed())
+  parameters <- list(p = deterministic_env$fims$get_fixed())
   par_list <- 1:length(parameters[[1]])
   par_list[2:length(par_list)] <- NA
   map <- list(p = factor(par_list))
@@ -276,7 +277,7 @@ test_that("deterministic test of fims", {
     expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
 
-  deterministic_env$clear()
+  deterministic_env$fims$clear()
 })
 
 test_that("nll test of fims", {
@@ -286,8 +287,8 @@ test_that("nll test of fims", {
     em_input = em_input
   )
   # Set-up TMB
-  nll_env$CreateTMBModel()
-  parameters <- list(p = nll_env$get_fixed())
+  nll_env$fims$CreateTMBModel()
+  parameters <- list(p = nll_env$fims$get_fixed())
   par_list <- 1:length(parameters[[1]])
   par_list[2:length(par_list)] <- NA
   map <- list(p = factor(par_list))
@@ -354,7 +355,7 @@ test_that("nll test of fims", {
   expect_equal(report$index_nll, index_nll)
   expect_equal(jnll, expected_jnll)
 
-  nll_env$clear()
+  nll_env$fims$clear()
 })
 
 test_that("estimation test of fims", {
@@ -365,9 +366,9 @@ test_that("estimation test of fims", {
   )
 
   # Set-up TMB
-  estimation_env$CreateTMBModel()
+  estimation_env$fims$CreateTMBModel()
   # Create parameter list from Rcpp modules
-  parameters <- list(p = estimation_env$get_fixed())
+  parameters <- list(p = estimation_env$fims$get_fixed())
   obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS")
 
   opt <- with(obj, optim(par, fn, gr,
@@ -567,14 +568,15 @@ test_that("estimation test of fims", {
   # }
 
 
-  estimation_env$clear()
+  estimation_env$fims$clear()
 })
 
 test_that("run FIMS in a for loop", {
   for (i in 1:5) {
+    fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
     # Recruitment
-    recruitment <- new(BevertonHoltRecruitment)
+    recruitment <- new(fims$BevertonHoltRecruitment)
     # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
     # before the likelihood calculation
     recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
@@ -589,24 +591,24 @@ test_that("run FIMS in a for loop", {
 
     # Data
     catch <- em_input$L.obs$fleet1
-    fishing_fleet_index <- new(Index, length(catch))
+    fishing_fleet_index <- new(fims$Index, length(catch))
     fishing_fleet_index$index_data <- catch
-    fishing_fleet_age_comp <- new(AgeComp, length(catch), om_input$nages)
+    fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
     fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
 
     survey_index <- em_input$surveyB.obs$survey1
-    survey_fleet_index <- new(Index, length(survey_index))
+    survey_fleet_index <- new(fims$Index, length(survey_index))
     survey_fleet_index$index_data <- survey_index
-    survey_fleet_age_comp <- new(AgeComp, length(survey_index), om_input$nages)
+    survey_fleet_age_comp <- new(fims$AgeComp, length(survey_index), om_input$nages)
     survey_fleet_age_comp$age_comp_data <- c(t(em_input$survey.age.obs$survey1)) * em_input$n.survey$survey1
 
     # Growth
-    ewaa_growth <- new(EWAAgrowth)
+    ewaa_growth <- new(fims$EWAAgrowth)
     ewaa_growth$ages <- om_input$ages
     ewaa_growth$weights <- om_input$W.mt
 
     # Maturity
-    maturity <- new(LogisticMaturity)
+    maturity <- new(fims$LogisticMaturity)
     maturity$inflection_point$value <- om_input$A50.mat
     maturity$inflection_point$is_random_effect <- FALSE
     maturity$inflection_point$estimated <- FALSE
@@ -616,7 +618,7 @@ test_that("run FIMS in a for loop", {
 
     # Fleet
     # Create the fishing fleet
-    fishing_fleet_selectivity <- new(LogisticSelectivity)
+    fishing_fleet_selectivity <- new(fims$LogisticSelectivity)
     fishing_fleet_selectivity$inflection_point$value <- om_input$sel_fleet$fleet1$A50.sel1
     fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
     fishing_fleet_selectivity$inflection_point$estimated <- TRUE
@@ -624,7 +626,7 @@ test_that("run FIMS in a for loop", {
     fishing_fleet_selectivity$slope$is_random_effect <- FALSE
     fishing_fleet_selectivity$slope$estimated <- TRUE
 
-    fishing_fleet <- new(Fleet)
+    fishing_fleet <- new(fims$Fleet)
     fishing_fleet$nages <- om_input$nages
     fishing_fleet$nyears <- om_input$nyr
     fishing_fleet$log_Fmort <- log(om_output$f)
@@ -643,7 +645,7 @@ test_that("run FIMS in a for loop", {
     fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
 
     # Create the survey fleet
-    survey_fleet_selectivity <- new(LogisticSelectivity)
+    survey_fleet_selectivity <- new(fims$LogisticSelectivity)
     survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
     survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
     survey_fleet_selectivity$inflection_point$estimated <- TRUE
@@ -651,7 +653,7 @@ test_that("run FIMS in a for loop", {
     survey_fleet_selectivity$slope$is_random_effect <- FALSE
     survey_fleet_selectivity$slope$estimated <- TRUE
 
-    survey_fleet <- new(Fleet)
+    survey_fleet <- new(fims$Fleet)
     survey_fleet$is_survey <- TRUE
     survey_fleet$nages <- om_input$nages
     survey_fleet$nyears <- om_input$nyr
@@ -670,7 +672,7 @@ test_that("run FIMS in a for loop", {
     survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
 
     # Population
-    population <- new(Population)
+    population <- new(fims$Population)
     # is it a problem these are not Parameters in the Population interface?
     # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors,
     # do we need a ParameterVector class?
@@ -689,8 +691,8 @@ test_that("run FIMS in a for loop", {
     population$SetRecruitment(recruitment$get_id())
 
     ## Set-up TMB
-    CreateTMBModel()
-    parameters <- list(p = get_fixed())
+    fims$CreateTMBModel()
+    parameters <- list(p = fims$get_fixed())
     obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS")
    
     opt <- with(obj, optim(par, fn, gr,
@@ -703,6 +705,6 @@ test_that("run FIMS in a for loop", {
 
     max_gradient <- max(abs(obj$gr(obj$env$last.par.best)))
     expect_lte(max_gradient, 0.0001)
-    clear()
+    fims$clear()
   }
 })
