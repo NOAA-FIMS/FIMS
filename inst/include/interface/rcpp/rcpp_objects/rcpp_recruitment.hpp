@@ -148,7 +148,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
 
-    recruitment->log_recruit_devs.resize(this->log_devs.size()+1);
+    recruitment->log_recruit_devs.resize(this->log_devs.size());
     if (this->estimate_log_devs) {
       for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
         recruitment->log_recruit_devs[i] = this->log_devs[i];

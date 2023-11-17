@@ -691,12 +691,12 @@ test_that("run FIMS in a for loop", {
     fims$CreateTMBModel()
     parameters <- list(p = fims$get_fixed())
     obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS")
-   
+
     opt <- with(obj, optim(par, fn, gr,
       method = "BFGS",
       control = list(maxit = 1000000, reltol = 1e-15)
     ))
-    
+
     report <- obj$report(obj$par)
     expect_false(is.null(report))
 

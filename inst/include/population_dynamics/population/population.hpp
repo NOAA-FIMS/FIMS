@@ -391,6 +391,12 @@ struct Population : public fims_model_object::FIMSObject<Type> {
                    << this->recruitment->evaluate(
                           this->spawning_biomass[year - 1], phi0)
                    << std::endl;
+    if(i_dev==this->nyears){
+          this->numbers_at_age[i_age_year] =
+        this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0);
+        /*the final year of the time series has no data to inform recruitment devs,
+        so this value is set to the mean recruitment.*/
+    } else{
     this->numbers_at_age[i_age_year] =
         this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
         /*the log_recruit_dev vector does not include a value for year == 0
@@ -398,6 +404,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
         corresponds to the second year of the time series.*/
         fims_math::exp(this->recruitment->log_recruit_devs[i_dev-1]);
     this->expected_recruitment[year] = this->numbers_at_age[i_age_year];
+    }
     POPULATION_LOG << " numbers at age at index i_age_year " << i_age_year << " is "
                    << this->numbers_at_age[i_age_year] << std::endl;
   }
