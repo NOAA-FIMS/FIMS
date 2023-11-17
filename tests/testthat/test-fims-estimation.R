@@ -1,6 +1,3 @@
-require(testthat)
-devtools::load_all("C:\\Users\\chris\\noaa-git\\FIMS")
-
 remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
 
 ## Set-up OM (sigmaR = 0.4)
