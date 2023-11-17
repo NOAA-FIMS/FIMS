@@ -1,3 +1,6 @@
+require(testthat)
+devtools::load_all("C:\\Users\\chris\\noaa-git\\FIMS")
+
 remotes::install_github(repo = "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison")
 
 ## Set-up OM (sigmaR = 0.4)
@@ -207,7 +210,7 @@ test_that("deterministic test of fims", {
 
   # recruitment log_devs (fixed at initial "true" values)
   # the initial value of om_input$logR.resid is dropped from the model
-  expect_equal(report$log_recruit_dev[[1]], c(om_input$logR.resid[-1],0))
+  expect_equal(report$log_recruit_dev[[1]], om_input$logR.resid[-1])
 
   # F (fixed at initial "true" values)
   expect_equal(report$F_mort[[1]], om_output$f)
