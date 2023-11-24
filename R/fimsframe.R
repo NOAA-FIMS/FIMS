@@ -15,7 +15,9 @@ setClass(
   slots = c(
     data = "data.frame", # can use c( ) or list here.
     fleets = "numeric",
-    nyrs = "integer"
+    nyrs = "integer",
+    start_year = "integer", 
+    end_year = "integer"
   )
 )
 
@@ -54,6 +56,12 @@ setMethod("fleets", "FIMSFrame", function(x) x@fleets)
 
 setGeneric("nyrs", function(x) standardGeneric("nyrs"))
 setMethod("nyrs", "FIMSFrame", function(x) x@nyrs)
+
+setGeneric("start_year", function(x) standardGeneric("start_year"))
+setMethod("start_year", "FIMSFrame", function(x) x@start_year)
+
+setGeneric("end_year", function(x) standardGeneric("end_year"))
+setMethod("end_year", "FIMSFrame", function(x) x@end_year)
 
 # additional accessors for FIMSFrameAge
 setGeneric("ages", function(x) standardGeneric("ages"))
@@ -252,6 +260,7 @@ setValidity(
     if (!"dateend" %in% colnames(object@data)) {
       errors <- c(errors, "data must contain 'uncertainty'")
     }
+      
 
     # TODO: Add checks for other slots
 
@@ -302,10 +311,10 @@ setValidity(
 #' on the child class. Use [showClass()] to see all available slots.
 FIMSFrame <- function(data) {
   # Get the earliest and latest year of data and use to calculate n years for population simulation
-  start_yr <- as.numeric(strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1])
-  end_yr <- as.numeric(strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1])
-  nyrs <- as.integer(end_yr - start_yr + 1)
-  years <- start_yr:end_yr
+  start_year <- as.integer(strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1])
+  end_year <- as.integer(strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1])
+  nyrs <- as.integer(end_year - start_year + 1)
+  years <- start_year:end_year
 
   # Get the fleets represented in the data
   fleets <- unique(data[["name"]])[grep("fleet", unique(data[["name"]]))]
@@ -317,7 +326,9 @@ FIMSFrame <- function(data) {
   out <- new("FIMSFrame",
     data = data,
     fleets = fleets,
-    nyrs = nyrs
+    nyrs = nyrs,
+    start_year = start_year, 
+    end_year = end_year
   )
   return(out)
 }
@@ -326,10 +337,10 @@ FIMSFrame <- function(data) {
 #' @rdname FIMSFrame
 FIMSFrameAge <- function(data) {
   # Get the earliest and latest year of data and use to calculate n years for population simulation
-  start_yr <- as.numeric(strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1])
-  end_yr <- as.numeric(strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1])
-  nyrs <- as.integer(end_yr - start_yr + 1)
-  years <- start_yr:end_yr
+  start_year <- as.integer(strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1])
+  end_year <- as.integer(strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1])
+  nyrs <- as.integer(end_year - start_year + 1)
+  years <- start_year:end_year
   # Get the fleets represented in the data
   fleets <- unique(data[["name"]])[grep("fleet", unique(data[["name"]]))]
   fleets <- as.numeric(unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2])))
@@ -346,6 +357,8 @@ FIMSFrameAge <- function(data) {
     data = data,
     fleets = fleets,
     nyrs = nyrs,
+    start_year = start_year, 
+    end_year = end_year,
     ages = ages,
     nages = nages,
     weightatage = weightatage
