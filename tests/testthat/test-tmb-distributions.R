@@ -1,5 +1,3 @@
-library(Rcpp)
-
 test_that("dnorm", {
   # generate data using R stats:rnorm
   set.seed(123)
