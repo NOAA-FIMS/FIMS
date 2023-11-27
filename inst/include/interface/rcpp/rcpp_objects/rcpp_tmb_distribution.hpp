@@ -207,7 +207,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Rcpp::NumericVector x; /**< Vector of length K of integers */
+  Rcpp::IntegerVector x; /**< Vector of length K of integers */
   Rcpp::NumericVector p; /**< Vector of length K, specifying the probability
  for the K classes (note, unlike in R these must sum to 1). */
 
