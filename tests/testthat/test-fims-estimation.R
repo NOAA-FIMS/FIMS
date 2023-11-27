@@ -620,6 +620,7 @@ test_that("run FIMS in a for loop", {
     # before the likelihood calculation
     recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
     recruitment$log_rzero$value <- 13 #log(om_input$R0)
+    # this change moves the starting value away from its true value
     recruitment$log_rzero$is_random_effect <- FALSE
     recruitment$log_rzero$estimated <- TRUE
     recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
@@ -739,9 +740,12 @@ test_that("run FIMS in a for loop", {
     ))
 
     report <- obj$report(obj$par)
+    g <- as.numeric(obj$gr(opt$par))
+    h <- optimHess(opt$par, fn = obj$fn, gr = obj$gr)
+    opt$par <- opt$par - solve(h, g)
     expect_false(is.null(report))
 
-    max_gradient <- max(abs(obj$gr(obj$env$last.par.best)))
+    max_gradient <- max(abs(obj$gr(opt$par)))
     expect_lte(max_gradient, 0.0001)
     fims$clear()
   }
