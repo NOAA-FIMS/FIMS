@@ -14,7 +14,7 @@
 /**
  * @brief Rcpp interface for Data as an S4 object. To instantiate
  * from R:
- * fleet <- new(fims$Data)
+ * fleet <- new(Data)
  *
  */
 class DataInterfaceBase : public FIMSRcppInterfaceBase {
@@ -56,7 +56,7 @@ std::map<uint32_t, DataInterfaceBase*> DataInterfaceBase::live_objects;
 /**
  * @brief Rcpp interface for age comp data as an S4 object. To instantiate
  * from R:
- * acomp <- new(fims$AgeComp)
+ * acomp <- new(AgeComp)
  */
 class AgeCompDataInterface : public DataInterfaceBase {
  public:
@@ -123,7 +123,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
 /**
  * @brief Rcpp interface for data as an S4 object. To instantiate
  * from R:
- * fleet <- new(fims$Index)
+ * fleet <- new(Index)
  */
 class IndexDataInterface : public DataInterfaceBase {
  public:

@@ -53,7 +53,7 @@ std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
 /**
  * @brief Rcpp interface for EWAAgrowth as an S4 object. To instantiate
  * from R:
- * ewaa <- new(fims$EWAAgrowth)
+ * ewaa <- new(EWAAgrowth)
  *
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {

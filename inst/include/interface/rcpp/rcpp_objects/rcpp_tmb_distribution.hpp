@@ -58,7 +58,7 @@ std::map<uint32_t,
 /**
  * @brief Rcpp interface for Dnorm as an S4 object. To instantiate
  * from R:
- * dnorm_ <- new(fims$TMBDnormDistribution)
+ * dnorm_ <- new(TMBDnormDistribution)
  *
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
@@ -128,7 +128,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 /**
  * @brief Rcpp interface for Dlnorm as an S4 object. To instantiate
  * from R:
- * dlnorm_ <- new(fims$TMBDlnormDistribution)
+ * dlnorm_ <- new(TMBDlnormDistribution)
  *
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
@@ -200,7 +200,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 /**
  * @brief Rcpp interface for Dmultinom as an S4 object. To instantiate
  * from R:
- * dmultinom_ <- new(fims$TMBDmultinomDistribution)
+ * dmultinom_ <- new(TMBDmultinomDistribution)
  *
  */
 // template <typename Type>

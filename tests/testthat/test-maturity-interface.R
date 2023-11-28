@@ -1,8 +1,7 @@
 test_that("Maturity input settings work as expected", {
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
   # Create maturity1
-  maturity1 <- new(fims$LogisticMaturity)
+  maturity1 <- new(LogisticMaturity)
 
   maturity1$inflection_point$value <- 10.0
   maturity1$inflection_point$min <- 8.0
@@ -22,8 +21,8 @@ test_that("Maturity input settings work as expected", {
 
 
   # Create selectivity2
-  maturity2 <- new(fims$LogisticMaturity)
+  maturity2 <- new(LogisticMaturity)
   expect_equal((maturity2$get_id()), 2)
 
-  fims$clear()
+  clear()
 })
