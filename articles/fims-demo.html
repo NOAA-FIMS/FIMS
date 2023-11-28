@@ -8,8 +8,8 @@
 <meta name="description" content="FIMS">
 <title>Introducing the Fisheries Integrated Modeling System (FIMS) • FIMS</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Introducing the Fisheries Integrated Modeling System (FIMS)">
@@ -105,17 +105,17 @@ model using FIMS.</p>
 <div class="section level2">
 <h2 id="creating-models-in-fims">Creating Models in FIMS<a class="anchor" aria-label="anchor" href="#creating-models-in-fims"></a>
 </h2>
-<p>To begin, we import the FIMS and TMB libraries. We then create a new
-Rcpp fims module using <code><a href="https://rdrr.io/pkg/Rcpp/man/Module.html" class="external-link">Rcpp::Module</a></code> and call
-<code>Fims$clear</code> to ensure C++ memory from any previous fims
-model run is cleared out.</p>
+<p>To begin, we import the FIMS and TMB libraries. Calling
+<code><a href="https://github.com/noaa-fims/fims" class="external-link">library(FIMS)</a></code> automatically loads the Rcpp functions and
+modules into the R environment. The function call, <code>clear()</code>,
+ensures C++ memory from any previous fims model run is cleared out.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/noaa-fims/fims" class="external-link">FIMS</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># automatically loads fims Rcpp module</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/noaa-fims/fims" class="external-link">FIMS</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/kaskr/adcomp/wiki" class="external-link">TMB</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># load the module</span></span>
-<span><span class="va">Fims</span> <span class="op">&lt;-</span> <span class="fu">Rcpp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/Module.html" class="external-link">Module</a></span><span class="op">(</span><span class="st">"fims"</span>, PACKAGE <span class="op">=</span> <span class="st">"FIMS"</span><span class="op">)</span></span>
-<span><span class="va">Fims</span><span class="op">$</span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># clear memory</span></span>
+<span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="setting-up-data">Setting up Data<a class="anchor" aria-label="anchor" href="#setting-up-data"></a>
@@ -245,8 +245,8 @@ is able to correctly apply dimension folding for model output.</p>
 Index module has a vector field named <em>index_data</em> and the
 AgeComp module has a vector field names <em>age_comp_data</em>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">Index</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'Index' &lt;0x55e48f800e20&gt;</span></span>
+<code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Index</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## C++ class 'Index' &lt;0x55623ca5b010&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     Index(int)</span></span>
 <span><span class="co">## </span></span>
@@ -257,8 +257,8 @@ AgeComp module has a vector field names <em>age_comp_data</em>.</p>
 <span><span class="co">##      unsigned int get_id()  </span></span>
 <span><span class="co">## </span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">AgeComp</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'AgeComp' &lt;0x55e48f800cc0&gt;</span></span>
+<code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">AgeComp</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## C++ class 'AgeComp' &lt;0x55623ca5aeb0&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     AgeComp(int, int)</span></span>
 <span><span class="co">## </span></span>
@@ -273,9 +273,9 @@ using the <code><a href="https://rdrr.io/r/methods/new.html" class="external-lin
 defined above from the Model Comparison project.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># fleet index data</span></span>
-<span><span class="va">fishing_fleet_index</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">Index</span>, <span class="va">nyears</span><span class="op">)</span></span>
+<span><span class="va">fishing_fleet_index</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Index</span>, <span class="va">nyears</span><span class="op">)</span></span>
 <span><span class="co"># fleet age composition data</span></span>
-<span><span class="va">fishing_fleet_age_comp</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">AgeComp</span>, <span class="va">nyears</span>, <span class="va">nages</span><span class="op">)</span></span>
+<span><span class="va">fishing_fleet_age_comp</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">AgeComp</span>, <span class="va">nyears</span>, <span class="va">nages</span><span class="op">)</span></span>
 <span><span class="va">fishing_fleet_index</span><span class="op">$</span><span class="va">index_data</span> <span class="op">&lt;-</span> <span class="va">fishery_catch</span></span>
 <span><span class="co"># Effective sampling size is 200</span></span>
 <span><span class="va">fishing_fleet_age_comp</span><span class="op">$</span><span class="va">age_comp_data</span> <span class="op">&lt;-</span> <span class="va">fishery_agecomp</span> <span class="op">*</span> <span class="fl">200</span></span></code></pre></div>
@@ -297,8 +297,8 @@ the <em>estimate</em> field is currently set to <code>FALSE</code>. We
 can use the <em>value</em> field to input variables defined in the Model
 Comparison project.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">LogisticSelectivity</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'LogisticSelectivity' &lt;0x55e48f8013a0&gt;</span></span>
+<code class="sourceCode R"><span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">LogisticSelectivity</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## C++ class 'LogisticSelectivity' &lt;0x55623ca5b590&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     LogisticSelectivity()</span></span>
 <span><span class="co">## </span></span>
@@ -312,7 +312,7 @@ Comparison project.</p>
 <span><span class="co">##      unsigned int get_id()  </span></span>
 <span><span class="co">## </span></span></code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fishing_fleet_selectivity</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">LogisticSelectivity</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fishing_fleet_selectivity</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">LogisticSelectivity</span><span class="op">)</span></span>
 <span><span class="va">fishing_fleet_selectivity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">2.0</span></span>
 <span><span class="va">fishing_fleet_selectivity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">is_random_effect</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="va">fishing_fleet_selectivity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">estimated</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
@@ -324,12 +324,11 @@ Comparison project.</p>
 <h4 id="creating-the-fleet-object">Creating the Fleet Object<a class="anchor" aria-label="anchor" href="#creating-the-fleet-object"></a>
 </h4>
 <p>Now that we’ve created everything that a fleet needs, lets create the
-actual fleet object. First let’s run
-<code>methods::show(Fims$Fleet)</code> to see all the fields and methods
-available from R.</p>
+actual fleet object. First let’s run <code>methods::show(Fleet)</code>
+to see all the fields and methods available from R.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">Fleet</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'Fleet' &lt;0x55e48f800b60&gt;</span></span>
+<code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Fleet</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## C++ class 'Fleet' &lt;0x55623ca5ad50&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     Fleet()</span></span>
 <span><span class="co">## </span></span>
@@ -367,7 +366,7 @@ Selectivity modules defined above with the fleet module defined
 below.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create fleet module</span></span>
-<span><span class="va">fishing_fleet</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">Fleet</span><span class="op">)</span></span>
+<span><span class="va">fishing_fleet</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fleet</span><span class="op">)</span></span>
 <span><span class="co"># Set nyears and nages</span></span>
 <span><span class="va">fishing_fleet</span><span class="op">$</span><span class="va">nages</span> <span class="op">&lt;-</span> <span class="va">nages</span></span>
 <span><span class="va">fishing_fleet</span><span class="op">$</span><span class="va">nyears</span> <span class="op">&lt;-</span> <span class="va">nyears</span></span>
@@ -411,9 +410,9 @@ catchability (q) variable.</p>
 </h4>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># fleet index data</span></span>
-<span><span class="va">survey_fleet_index</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">Index</span>, <span class="va">nyears</span><span class="op">)</span></span>
+<span><span class="va">survey_fleet_index</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Index</span>, <span class="va">nyears</span><span class="op">)</span></span>
 <span><span class="co"># survey age composition data</span></span>
-<span><span class="va">survey_fleet_age_comp</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">AgeComp</span>, <span class="va">nyears</span>, <span class="va">nages</span><span class="op">)</span></span>
+<span><span class="va">survey_fleet_age_comp</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">AgeComp</span>, <span class="va">nyears</span>, <span class="va">nages</span><span class="op">)</span></span>
 <span><span class="va">survey_fleet_index</span><span class="op">$</span><span class="va">index_data</span> <span class="op">&lt;-</span> <span class="va">survey_index</span></span>
 <span><span class="co"># Effective sampling size is 200</span></span>
 <span><span class="va">survey_fleet_age_comp</span><span class="op">$</span><span class="va">age_comp_data</span> <span class="op">&lt;-</span> <span class="va">survey_agecomp</span> <span class="op">*</span> <span class="fl">200</span></span></code></pre></div>
@@ -422,7 +421,7 @@ catchability (q) variable.</p>
 <h4 id="survey-selectivity">Survey Selectivity<a class="anchor" aria-label="anchor" href="#survey-selectivity"></a>
 </h4>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_fleet_selectivity</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">LogisticSelectivity</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">survey_fleet_selectivity</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">LogisticSelectivity</span><span class="op">)</span></span>
 <span><span class="va">survey_fleet_selectivity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">1.5</span></span>
 <span><span class="va">survey_fleet_selectivity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">is_random_effect</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="va">survey_fleet_selectivity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">estimated</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
@@ -434,7 +433,7 @@ catchability (q) variable.</p>
 <h4 id="creating-the-survey-object">Creating the Survey Object<a class="anchor" aria-label="anchor" href="#creating-the-survey-object"></a>
 </h4>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">survey_fleet</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">Fleet</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">survey_fleet</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fleet</span><span class="op">)</span></span>
 <span><span class="va">survey_fleet</span><span class="op">$</span><span class="va">is_survey</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="va">survey_fleet</span><span class="op">$</span><span class="va">nages</span> <span class="op">&lt;-</span> <span class="va">nages</span></span>
 <span><span class="va">survey_fleet</span><span class="op">$</span><span class="va">nyears</span> <span class="op">&lt;-</span> <span class="va">nyears</span></span>
@@ -466,12 +465,12 @@ we first need to set up each component of the population
 module using the <code><a href="https://rdrr.io/r/methods/new.html" class="external-link">methods::new()</a></code> function. We can use
 <code><a href="https://rdrr.io/r/methods/show.html" class="external-link">methods::show()</a></code> to view all the fields (i.e. variables) and
 methods (i.e. functions) available in
-<code>Fims$BevertonHoltRecruitment</code> module.</p>
+<code>BevertonHoltRecruitment</code> module.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Recruitment</span></span>
-<span><span class="va">recruitment</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span>
-<span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'BevertonHoltRecruitment' &lt;0x55e48f800a00&gt;</span></span>
+<span><span class="va">recruitment</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span>
+<span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## C++ class 'BevertonHoltRecruitment' &lt;0x55623ca5abf0&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     BevertonHoltRecruitment()</span></span>
 <span><span class="co">## </span></span>
@@ -524,7 +523,7 @@ the log deviation values.</p>
 empirical weight at age model.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Growth</span></span>
-<span><span class="va">ewaa_growth</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">EWAAgrowth</span><span class="op">)</span></span>
+<span><span class="va">ewaa_growth</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">EWAAgrowth</span><span class="op">)</span></span>
 <span><span class="va">ewaa_growth</span><span class="op">$</span><span class="va">ages</span> <span class="op">&lt;-</span> <span class="va">ages</span></span>
 <span><span class="va">ewaa_growth</span><span class="op">$</span><span class="va">weights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="fl">0.0005306555</span>, <span class="fl">0.0011963283</span>, <span class="fl">0.0020582654</span>,</span>
@@ -540,7 +539,7 @@ empirical weight at age model.</p>
 logistic maturity model.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Maturity</span></span>
-<span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">LogisticMaturity</span><span class="op">)</span></span>
+<span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">LogisticMaturity</span><span class="op">)</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">2.25</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">is_random_effect</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">estimated</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
@@ -551,7 +550,7 @@ logistic maturity model.</p>
 actual population.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Population</span></span>
-<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">Population</span><span class="op">)</span></span>
+<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Population</span><span class="op">)</span></span>
 <span><span class="va">population</span><span class="op">$</span><span class="va">log_M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span>, <span class="va">nyears</span> <span class="op">*</span> <span class="va">nages</span><span class="op">)</span></span>
 <span><span class="va">population</span><span class="op">$</span><span class="va">estimate_M</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="va">population</span><span class="op">$</span><span class="va">log_init_naa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -586,8 +585,8 @@ population.</p>
 <h3 id="creating-the-fims-model-and-making-the-tmb-function">Creating the FIMS Model and Making the TMB Function<a class="anchor" aria-label="anchor" href="#creating-the-fims-model-and-making-the-tmb-function"></a>
 </h3>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sucess</span> <span class="op">&lt;-</span> <span class="va">Fims</span><span class="op">$</span><span class="fu">CreateTMBModel</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>p <span class="op">=</span> <span class="va">Fims</span><span class="op">$</span><span class="fu">get_fixed</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">sucess</span> <span class="op">&lt;-</span> <span class="fu">CreateTMBModel</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>p <span class="op">=</span> <span class="fu">get_fixed</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/TMB/man/MakeADFun.html" class="external-link">MakeADFun</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">parameters</span>, DLL <span class="op">=</span> <span class="st">"FIMS"</span>, silent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -793,7 +792,7 @@ population.</p>
 <h2 id="clear-c-objects-from-memory">Clear C++ objects from memory<a class="anchor" aria-label="anchor" href="#clear-c-objects-from-memory"></a>
 </h2>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Fims</span><span class="op">$</span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

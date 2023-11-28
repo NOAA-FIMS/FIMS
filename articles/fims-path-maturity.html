@@ -8,8 +8,8 @@
 <meta name="description" content="FIMS">
 <title>FIMS Path: Maturity • FIMS</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="FIMS Path: Maturity">
@@ -130,8 +130,7 @@ module with parameter values.</p>
 <code class="sourceCode R"><span><span class="co"># load FIMS</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/noaa-fims/fims" class="external-link">FIMS</a></span><span class="op">)</span></span>
 <span><span class="co"># Create a new maturity model</span></span>
-<span><span class="va">Fims</span> <span class="op">&lt;-</span> <span class="fu">Rcpp</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/Module.html" class="external-link">Module</a></span><span class="op">(</span><span class="st">"fims"</span>, PACKAGE <span class="op">=</span> <span class="st">"FIMS"</span><span class="op">)</span></span>
-<span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">LogisticMaturity</span><span class="op">)</span></span>
+<span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">LogisticMaturity</span><span class="op">)</span></span>
 <span><span class="co"># Populate the maturity module with parameter values.</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">$</span><span class="va">is_random_effect</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
@@ -142,7 +141,7 @@ module with parameter values.</p>
 <p>After that, we need to create and set up a population and link the
 maturity module to the population:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">Population</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Population</span><span class="op">)</span></span>
 <span><span class="co"># set up population specific parameters (other modules)</span></span>
 <span><span class="co"># ...</span></span>
 <span><span class="co"># set maturity for the population - will throw error until PR #363 is merged into main</span></span>
@@ -152,7 +151,7 @@ maturity module to the population:</p>
 function that can be run to clear out memory:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Clear C++ memory</span></span>
-<span><span class="va">Fims</span><span class="op">$</span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># Clear R memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">Fims</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">maturity</span><span class="op">)</span></span>
@@ -185,7 +184,7 @@ for this specific module.</p>
 the name in quotes from the <code>Rcpp::class</code>,
 <code>LogisticMaturity</code></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Fims</span><span class="op">$</span><span class="va">LogisticMaturity</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">LogisticMaturity</span><span class="op">)</span></span></code></pre></div>
 <p>This module references the maturity rcpp class,
 <code>LogisticMaturityInterface</code> defined in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp" class="external-link">rcpp_maturity.hpp</a>
 in the directory <a href="https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects" class="external-link">inst/include/interface/rcpp/rcpp_objects</a>.</p>
@@ -440,7 +439,7 @@ population.</p>
 <code>SetMaturity()</code> method from the
 <code>PopulationInterface</code> class:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Fims</span><span class="op">$</span><span class="va">population</span><span class="op">$</span><span class="fu">SetMaturity</span><span class="op">(</span><span class="va">maturity</span><span class="op">$</span><span class="fu">get_id</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">population</span><span class="op">$</span><span class="fu">SetMaturity</span><span class="op">(</span><span class="va">maturity</span><span class="op">$</span><span class="fu">get_id</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Notice above that population by default declares a pointer of type
 <code>MaturityBase</code> (parent class), not the specific maturity
 class we are using in this example, <code>LogisticMaturity</code> (child
@@ -517,8 +516,8 @@ the correct child class (eg. <code>LogisticMaturity</code>) even though
 it only calls the parent class (<code>MaturityBase</code>). We defined
 the <code>maturity_id</code> in population for the specific logistic
 maturity module we wanted to use,
-<code>Fims$population$SetMaturity(maturity$get_id())</code>, but we
-still need to connect this ID with the actual module in memory.</p>
+<code>population$SetMaturity(maturity$get_id())</code>, but we still
+need to connect this ID with the actual module in memory.</p>
 <p>This <em>information</em> is managed in FIMS through the
 <code>Information</code> class in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp" class="external-link">information.hpp</a>
 in the directory <a href="https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/common" class="external-link">inst/include/common</a>.
@@ -655,16 +654,15 @@ instantiated C++ classes stored in our computer’s memory. This R code
 chunk above is comparable to the following from FIMS, which sets up
 modules in R:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Fims &lt;- Rcpp::Module("fims", PACKAGE = "FIMS")</span></span>
-<span><span class="co"># maturity1 &lt;- new(Fims$LogisticMaturity)</span></span>
+<code class="sourceCode R"><span><span class="co"># maturity1 &lt;- new(LogisticMaturity)</span></span>
 <span><span class="co"># maturity1$inflection_point$value &lt;- 10</span></span>
 <span><span class="co"># maturity1$slope$value &lt;- 0.2</span></span>
-<span><span class="co"># maturity2 &lt;- new(Fims$LogisticMaturity)</span></span>
+<span><span class="co"># maturity2 &lt;- new(LogisticMaturity)</span></span>
 <span><span class="co"># maturity2$inflection_point$value &lt;- 8</span></span>
 <span><span class="co"># maturity2$slope$value &lt;- 0.3</span></span>
-<span><span class="co"># population1 &lt;- new(Fims$Population)</span></span>
-<span><span class="co"># population2 &lt;- new(Fims$Population)</span></span>
-<span><span class="co"># population3 &lt;- new(Fims$Population)</span></span></code></pre></div>
+<span><span class="co"># population1 &lt;- new(Population)</span></span>
+<span><span class="co"># population2 &lt;- new(Population)</span></span>
+<span><span class="co"># population3 &lt;- new(Population)</span></span></code></pre></div>
 <p>Next we assign which maturity will be used with each population using
 IDs</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
