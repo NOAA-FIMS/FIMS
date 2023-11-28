@@ -47,7 +47,7 @@ std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
 /**
  * @brief Rcpp interface for Fleet as an S4 object. To instantiate
  * from R:
- * fleet <- new(fims$Fleet)
+ * fleet <- new(Fleet)
  *
  */
 class FleetInterface : public FleetInterfaceBase {

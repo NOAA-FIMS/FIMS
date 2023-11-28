@@ -136,7 +136,7 @@ fishing_fleet_selectivity$slope$estimated <- TRUE
 ```
 
 #### Creating the Fleet Object
-Now that we've created everything that a fleet needs, lets create the actual fleet object. First let's run `methods::show(Fims$Fleet)` to see all the fields and methods available from R. 
+Now that we've created everything that a fleet needs, lets create the actual fleet object. First let's run `methods::show(Fleet)` to see all the fields and methods available from R. 
 
 ```{r show-Fleet}
 show(Fleet)
@@ -233,7 +233,7 @@ survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
 The final step is to set up the population module. Before doing so, we first need to set up each component of the population (e.g. recruitment, growth, etc.). 
 
 #### Recruitment
-We'll use a Beverton Holt recruitment module. We first instantiate a module using the `methods::new()` function. We can use `methods::show()` to view all the fields (i.e. variables) and methods (i.e. functions) available in `Fims$BevertonHoltRecruitment` module.
+We'll use a Beverton Holt recruitment module. We first instantiate a module using the `methods::new()` function. We can use `methods::show()` to view all the fields (i.e. variables) and methods (i.e. functions) available in `BevertonHoltRecruitment` module.
 
 ```{r recruitment}
 # Recruitment
