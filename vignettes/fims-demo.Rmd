@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. FIMS is a software system designed and architected to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It's important to note that FIMS itself is not a model, but rather a framework for creating models. The framework is made up of many modules that come together to create a "the best model" that suites the needs of the end-user. What follows is a demo of creating a catch-at-age assessment model using FIMS. 
 
 ## Creating Models in FIMS
-To begin, we import the FIMS and TMB libraries. We then create a new Rcpp fims module using `Rcpp::Module` and call `Fims$clear` to ensure C++ memory from any previous fims model run is cleared out. 
+To begin, we import the FIMS and TMB libraries. Calling `library(FIMS)` automatically loads the Rcpp functions and modules into the R environment. The function call, `clear()`, ensures C++ memory from any previous fims model run is cleared out. 
 ```{r fims1, warning=FALSE, message=FALSE}
 # automatically loads fims Rcpp module
 library(FIMS)

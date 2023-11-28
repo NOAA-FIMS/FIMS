@@ -25,7 +25,6 @@ fleet module", {
 
 
 test_that("Fleet: SetAgeCompLikelihood works", {
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   fleet <- new(Fleet)
 
   expect_silent(fleet$SetAgeCompLikelihood(1))
@@ -34,7 +33,6 @@ test_that("Fleet: SetAgeCompLikelihood works", {
 })
 
 test_that("Fleet: SetIndexLikelihood works", {
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   fleet <- new(Fleet)
 
   expect_silent(fleet$SetIndexLikelihood(1))
@@ -43,7 +41,6 @@ test_that("Fleet: SetIndexLikelihood works", {
 })
 
 test_that("Fleet: SetObservedAgeCompData works", {
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   fleet <- new(Fleet)
 
   expect_silent(fleet$SetObservedAgeCompData(1))
@@ -52,7 +49,6 @@ test_that("Fleet: SetObservedAgeCompData works", {
 })
 
 test_that("Fleet: SetObservedIndexData works", {
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
   fleet <- new(Fleet)
 
   expect_silent(fleet$SetObservedIndexData(1))
