@@ -1,6 +1,5 @@
 library(testthat)
 test_that("Recruitment input settings work as expected", {
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
   # Create recruitment
   recruitment <- new(BevertonHoltRecruitment)
