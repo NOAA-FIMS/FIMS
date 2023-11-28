@@ -65,7 +65,7 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
 /**
  * @brief Rcpp interface for Beverton-Holt as an S4 object. To instantiate
  * from R:
- * beverton_holt <- new(fims$beverton_holt)
+ * beverton_holt <- new(beverton_holt)
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:

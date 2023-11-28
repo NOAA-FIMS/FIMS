@@ -56,7 +56,7 @@ std::map<uint32_t, SelectivityInterfaceBase*>
 
 /**
  * @brief Rcpp interface for logistic selectivity as an S4 object. To
- * instantiate from R: logistic_selectivity <- new(fims$logistic_selectivity)
+ * instantiate from R: logistic_selectivity <- new(logistic_selectivity)
  */
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
@@ -133,7 +133,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
 /**
  * @brief Rcpp interface for logistic selectivity as an S4 object. To
- * instantiate from R: logistic_selectivity <- new(fims$logistic_selectivity)
+ * instantiate from R: logistic_selectivity <- new(logistic_selectivity)
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
