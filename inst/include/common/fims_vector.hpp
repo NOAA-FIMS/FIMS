@@ -376,58 +376,11 @@ public:
         return this->vec_m;
     }
     
-#ifdef TMB_MODEL
-    
-    /**
-     * @brief Converts this vector a CppAd::vector<Type>
-     */
-    inline operator CppAD::vector<Type>() const{
-        return this->get_cppad_vector();
-    }
-    
-    
+#ifdef TMB_MODEL  
     /**
      * @brief Converts this vector a tmbutils::vector<Type>
      */
-    inline operator tmbutils::vector<Type>()const{
-        return this->get_tmb_vector();
-    }
-    
-    /**
-     * @brief Converts this vector a CppAd::vector<Type>
-     */
-    inline operator CppAD::vector<Type>() {
-        return this->get_cppad_vector();
-    }
-    
-    
-    /**
-     * @brief Converts this vector a tmbutils::vector<Type>
-     */
-    inline operator tmbutils::vector<Type>(){
-        return this->get_tmb_vector();
-    }
-    
-
-    
-    
-    /**
-     * @brief Converts this vector a CppAd::vector<Type>
-     */
-    CppAD::vector<Type> get_cppad_vector() const{
-        CppAD::vector<Type> ret;
-        ret.resize(this->vec_m.size());
-        for(size_t i =0; i < this->vec_m.size(); i++){
-            ret[i] = this->vec_m[i];
-        }
-        return ret;
-    }
-    
-    
-    /**
-     * @brief Converts this vector a tmbutils::vector<Type>
-     */
-    tmbutils::vector<Type> get_tmb_vector() const{
+    operator tmbutils::vector<Type>()const{
         tmbutils::vector<Type> ret;
         ret.resize(this->vec_m.size());
         for(size_t i =0; i < this->vec_m.size(); i++){
@@ -436,23 +389,11 @@ public:
         return ret;
     }
     
-    /**
-     * @brief Converts this vector a CppAd::vector<Type>
-     */
-    CppAD::vector<Type> get_cppad_vector() {
-        CppAD::vector<Type> ret;
-        ret.resize(this->vec_m.size());
-        for(size_t i =0; i < this->vec_m.size(); i++){
-            ret[i] = this->vec_m[i];
-        }
-        return ret;
-    }
-    
     
     /**
      * @brief Converts this vector a tmbutils::vector<Type>
      */
-    tmbutils::vector<Type> get_tmb_vector() {
+    operator tmbutils::vector<Type>(){
         tmbutils::vector<Type> ret;
         ret.resize(this->vec_m.size());
         for(size_t i =0; i < this->vec_m.size(); i++){
