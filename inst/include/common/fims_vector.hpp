@@ -9,13 +9,17 @@ namespace  fims {
 /**
  * Wrapper class for std::vector types. If this file is compiled with -DTMB_MODEL,
  * conversion operators are defined for TMB vector types.
+ * 
+ * All std::vector functions are copied over from the std library. While some of these may
+ * not be called explicitly in FIMS, they may be required to run other std library functions.
+ * 
  */
 template<typename Type>
 class Vector{
     std::vector<Type> vec_m;
     
     /**
-     * @brief friiend comparison operator.
+     * @brief friend comparison operator.
      */
     template<typename T>
     friend bool operator==( const fims::Vector<T>& lhs,
@@ -36,6 +40,7 @@ public:
     typedef typename std::vector<Type>::reverse_iterator reverse_iterator;/*!<Reverse iterator>*/
     typedef typename std::vector<Type>::const_reverse_iterator const_reverse_iterator; /*!<Constant reverse iterator>*/
     
+    //Constructors
     /**
      * Default constructor.
      */
@@ -60,12 +65,13 @@ public:
     }
     
     /**
-     * @brief Initialization constructor with std::vector type..
+     * @brief Initialization constructor with std::vector type.
      */
     Vector(const std::vector<Type>& other){
         this->vec_m = other;
     }
-    
+
+    //TMB specific constructor    
 #ifdef TMB_MODEL
     
     /**
@@ -81,6 +87,10 @@ public:
     
 #endif
     
+    /**
+     * The following are std::vector functions copied over from the standard library. While some of these may
+     * not be called explicitly in FIMS, they may be required to run other std library functions.
+    */
     
     /**
      * @brief Returns a reference to the element at specified location pos. No bounds checking is performed.
@@ -366,11 +376,14 @@ public:
         this->vec_m.swap(other.vec_m);
     }
     
-    
-    //conversion operatrors
+    // end std::vector functions
+
+    /**
+     * Conversion operators
+    */
     
     /**
-     * @brief Converts this vector a std::vector<Type>
+     * @brief Converts fims::Vector to std::vector<Type>
      */
     inline operator std::vector<Type>(){
         return this->vec_m;
@@ -378,7 +391,7 @@ public:
     
 #ifdef TMB_MODEL  
     /**
-     * @brief Converts this vector a tmbutils::vector<Type>
+     * @brief Converts fims::Vector to tmbutils::vector<Type>const
      */
     operator tmbutils::vector<Type>()const{
         tmbutils::vector<Type> ret;
@@ -391,7 +404,7 @@ public:
     
     
     /**
-     * @brief Converts this vector a tmbutils::vector<Type>
+     * @brief Converts fims::Vector to tmbutils::vector<Type>
      */
     operator tmbutils::vector<Type>(){
         tmbutils::vector<Type> ret;
