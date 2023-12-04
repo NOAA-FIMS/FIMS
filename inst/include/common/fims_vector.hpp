@@ -19,7 +19,8 @@ class Vector{
     std::vector<Type> vec_m;
     
     /**
-     * @brief friend comparison operator.
+     * @brief friend comparison operator. Allows the operartor to see private 
+     * members of fims::Vector<Type>.
      */
     template<typename T>
     friend bool operator==( const fims::Vector<T>& lhs,
