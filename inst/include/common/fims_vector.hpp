@@ -49,7 +49,7 @@ public:
     }
     
     /**
-     * @brief Constructs the container of size copies of elements with value value.
+     * @brief Constructs a Vector of length "size" and sets the elements with the value from input "value".
      */
     Vector(size_t size, const Type& value = Type()){
         this->vec_m.resize(size, value);
@@ -76,7 +76,7 @@ public:
 #ifdef TMB_MODEL
     
     /**
-     * @brief Initialization constructor with tmbutils::vector type..
+     * @brief Initialization constructor with tmbutils::vector type.
      */
     Vector(const tmbutils::vector<Type>& other){
         this->vec_m.resize(other.size());
@@ -125,21 +125,21 @@ public:
     /**
      * @brief  Returns a reference to the first element in the container.
      */
-    reference front() {
+   inline reference front() {
         return this->vec_m.front();
     }
     
     /**
      * @brief  Returns a constant reference to the first element in the container.
      */
-    const_reference front() const {
+    inline const_reference front() const {
         return this->vec_m.front();
     }
     
     /**
      * @brief  Returns a reference to the last element in the container.
      */
-    reference back() {
+    inline reference back() {
         return this->vec_m.back();
     }
     
@@ -147,7 +147,7 @@ public:
     /**
      * @brief  Returns a constant reference to the last element in the container.
      */
-    const_reference back() const {
+    inline const_reference back() const {
         return this->vec_m.back();
     }
     
@@ -155,7 +155,7 @@ public:
     /**
      * @brief Returns a pointer to the underlying data array.
      */
-    pointer data() {
+    inline pointer data() {
         return this->vec_m.data();
     }
     
@@ -163,7 +163,7 @@ public:
     /**
      * @brief Returns a constant pointer to the underlying data array.
      */
-    const_pointer data() const {
+    inline const_pointer data() const {
         return this->vec_m.data();
     }
     
@@ -173,14 +173,14 @@ public:
     /**
      * @brief Returns an iterator to the first element of the vector.
      */
-    iterator begin() {
+    inline iterator begin() {
         return this->vec_m.begin();
     }
     
     /**
      * @brief Returns an iterator to the element following the last element of the vector.
      */
-    iterator end() {
+    inline iterator end() {
         return this->vec_m.end();
     }
     
@@ -188,28 +188,28 @@ public:
     /**
      * @brief Returns an constant iterator to the first element of the vector.
      */
-    const_iterator begin() const {
+    inline const_iterator begin() const {
         return this->vec_m.begin();
     }
     
     /**
      * @brief Returns an const iterator to the element following the last element of the vector.
      */
-    const_iterator end() const {
+    inline const_iterator end() const {
         return this->vec_m.end();
     }
     
     /**
      * @brief Returns a reverse iterator to the first element of the reversed vector. It corresponds to the last element of the non-reversed vector.
      */
-    reverse_iterator rbegin() {
+    inline reverse_iterator rbegin() {
         return this->vec_m.rbegin();
     }
     
     /**
      * @brief Returns a reverse iterator to the element following the last element of the reversed vector. It corresponds to the element preceding the first element of the non-reversed vector.
      */
-    reverse_iterator rend() {
+    inline reverse_iterator rend() {
         return this->vec_m.rend();
     }
     
@@ -217,7 +217,7 @@ public:
     /**
      * @brief Returns a constant reverse iterator to the first element of the reversed vector. It corresponds to the last element of the non-reversed vector.
      */
-    const_reverse_iterator rbegin() const {
+    inline const_reverse_iterator rbegin() const {
         return this->vec_m.rbegin();
     }
     
@@ -225,7 +225,7 @@ public:
     /**
      * @brief Returns a constant reverse iterator to the element following the last element of the reversed vector. It corresponds to the element preceding the first element of the non-reversed vector.
      */
-    const_reverse_iterator rend() const {
+    inline const_reverse_iterator rend() const {
         return this->vec_m.rend();
     }
     
@@ -235,28 +235,28 @@ public:
     /**
      * @brief Checks whether the container is empty.
      */
-    bool empty() {
+    inline bool empty() {
         return this->vec_m.empty();
     }
     
     /**
      * @brief Returns the number of elements.
      */
-    size_type size() const {
+    inline size_type size() const {
         return this->vec_m.size();
     }
     
     /**
      * @brief Returns the maximum possible number of elements.
      */
-    size_type max_size() const {
+    inline size_type max_size() const {
         return this->vec_m.max_size();
     }
     
     /**
      * @brief Reserves storage.
      */
-    void reserve(size_type cap) {
+    inline void reserve(size_type cap) {
         this->vec_m.reserve(cap);
     }
     
@@ -264,14 +264,14 @@ public:
     /**
      * @brief Returns the number of elements that can be held in currently allocated storage.
      */
-    size_type capacity() {
+    inline size_type capacity() {
         return this->vec_m.capacity();
     }
     
     /**
      *  @brief Reduces memory usage by freeing unused memory.
      */
-    void shrink_to_fit() {
+    inline void shrink_to_fit() {
         this->vec_m.shrink_to_fit();
     }
     
@@ -280,7 +280,7 @@ public:
     /**
      * @brief Clears the contents.
      */
-    void clear() {
+    inline void clear() {
         this->vec_m.clear();
     }
     
@@ -288,14 +288,14 @@ public:
     /**
      * @brief Inserts value before pos.
      */
-    iterator insert(const_iterator pos, const Type& value) {
+    inline iterator insert(const_iterator pos, const Type& value) {
         return this->vec_m.insert(pos, value);
     }
     
     /**
      * @brief Inserts count copies of the value before pos.
      */
-    iterator insert(const_iterator pos, size_type count, const Type& value) {
+    inline iterator insert(const_iterator pos, size_type count, const Type& value) {
         return this->vec_m.insert(pos, count, value);
     }
     
@@ -328,14 +328,14 @@ public:
     /**
      * @brief Removes the element at pos.
      */
-    iterator erase(iterator pos) {
+    inline iterator erase(iterator pos) {
         return this->vec_m.erase(pos);
     }
     
     /**
      * @brief Removes the elements in the range [first, last).
      */
-    iterator erase(iterator first, iterator last) {
+    inline iterator erase(iterator first, iterator last) {
         return this->vec_m.erase(first, last);
     }
     
@@ -343,7 +343,7 @@ public:
     /**
      * @brief Adds an element to the end.
      */
-    void push_back(const Type&& value) {
+   inline void push_back(const Type&& value) {
         this->vec_m.push_back(value);
     }
     
@@ -358,7 +358,7 @@ public:
     /**
      * @brief Removes the last element.
      */
-    void pop_back() {
+    inline void pop_back() {
         this->vec_m.pop_back();
     }
     
@@ -366,14 +366,14 @@ public:
     /**
      * @brief Changes the number of elements stored.
      */
-    void resize(size_t s) {
+    inline void resize(size_t s) {
         this->vec_m.resize(s);
     }
     
     /**
      * @brief Swaps the contents.
      */
-    void swap( Vector& other ){
+    inline void swap( Vector& other ){
         this->vec_m.swap(other.vec_m);
     }
     
