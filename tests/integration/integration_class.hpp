@@ -509,7 +509,7 @@ public:
                     double r0 = (*it).second.GetArray()[0].GetDouble();
                     rec->log_rzero = std::log(r0);
                     if (print_statements) {
-                        std::cout << "R0 " << rec->log_rzero << " \n";
+                        std::cout << "R0 " << rec->log_rzero << "| \n";
                     }
                 }
             } else {
