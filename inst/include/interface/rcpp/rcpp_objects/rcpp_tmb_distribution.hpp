@@ -240,7 +240,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-//    typedef typename fims::ModelTraits<Type>::EigenVector Vector;
+
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
