@@ -384,7 +384,7 @@ public:
     */
     
     /**
-     * @brief Converts fims::Vector to std::vector<Type>
+     * @brief Converts fims::Vector<Type> to std::vector<Type>
      */
     inline operator std::vector<Type>(){
         return this->vec_m;
@@ -392,7 +392,7 @@ public:
     
 #ifdef TMB_MODEL  
     /**
-     * @brief Converts fims::Vector to tmbutils::vector<Type>const
+     * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>const
      */
     operator tmbutils::vector<Type>()const{
         tmbutils::vector<Type> ret;
@@ -405,7 +405,7 @@ public:
     
     
     /**
-     * @brief Converts fims::Vector to tmbutils::vector<Type>
+     * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>
      */
     operator tmbutils::vector<Type>(){
         tmbutils::vector<Type> ret;
