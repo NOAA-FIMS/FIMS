@@ -562,7 +562,7 @@ public:
                     for (size_t i = 0; i < rec->log_recruit_devs.size(); i++) {
                         rec->log_recruit_devs[i] = rdev[i+1].GetDouble();
                         if (print_statements) {
-                            std::cout << rec->log_recruit_devs[i] << " ";
+                            std::cout << rec->log_recruit_devs[i] << "| ";
                         }
                     }
                     if (print_statements) {
