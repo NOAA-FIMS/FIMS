@@ -557,8 +557,8 @@ public:
                 if ((*it).second.GetType() == JsonValueType::Array) {
                     JsonArray rdev = (*it).second.GetArray();
                     if (print_statements) {
-                        std::cout<<"rec->log_recruit_devs.size() = "<<rec->log_recruit_devs.size()<<" --- "<<
-                            "rdev.Size() = " <<rdev.Size()<<std::endl;
+                        std::cout<< "rec->log_recruit_devs.size() = "<< rec->log_recruit_devs.size() << " --- " <<
+                            "rdev.Size() = " << rdev.Size() << std::endl;
                         std::cout << "recruitment deviations: ";
                     }
                     for (size_t i = 0; i < rec->log_recruit_devs.size(); i++) {
