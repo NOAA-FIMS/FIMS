@@ -66,7 +66,7 @@ public:
     }
     
     /**
-     * @brief Initialization constructor with std::vector type.
+     * @brief Initialization constructor from std::vector<Type> type.
      */
     Vector(const std::vector<Type>& other){
         this->vec_m = other;
@@ -76,7 +76,7 @@ public:
 #ifdef TMB_MODEL
     
     /**
-     * @brief Initialization constructor with tmbutils::vector type.
+     * @brief Initialization constructor from tmbutils::vector<Type> type.
      */
     Vector(const tmbutils::vector<Type>& other){
         this->vec_m.resize(other.size());
