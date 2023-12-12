@@ -184,21 +184,6 @@ public:
         return this->vec_m.end();
     }
     
-    
-    /**
-     * @brief Returns a constant iterator to the first element of the vector.
-     */
-    inline const_iterator begin() const {
-        return this->vec_m.begin();
-    }
-    
-    /**
-     * @brief Returns a const iterator to the element following the last element of the vector.
-     */
-    inline const_iterator end() const {
-        return this->vec_m.end();
-    }
-    
     /**
      * @brief Returns a reverse iterator to the first element of the reversed vector. It corresponds to the last element of the non-reversed vector.
      */
