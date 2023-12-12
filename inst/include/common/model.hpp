@@ -163,11 +163,11 @@ class Model {  // may need singleton
     for (jt = this->fims_information->fleets.begin();
          jt != this->fims_information->fleets.end(); ++jt) {
 #ifdef TMB_MODEL
-        exp_index(fleet_idx) = (*jt).second->expected_index;//vector<Type>((*jt).second->expected_index);
-        exp_catch(fleet_idx) = (*jt).second->expected_catch; //vector<Type>((*jt).second->expected_catch);
-        F_mort(fleet_idx) = (*jt).second->Fmort; // vector<Type>((*jt).second->Fmort);
-        cnaa(fleet_idx) = (*jt).second->catch_numbers_at_age; // vector<Type>((*jt).second->catch_numbers_at_age);
-        cwaa(fleet_idx) = (*jt).second->catch_weight_at_age; // vector<Type>((*jt).second->catch_weight_at_age);
+        exp_index(fleet_idx) = (*jt).second->expected_index;
+        exp_catch(fleet_idx) = (*jt).second->expected_catch;
+        F_mort(fleet_idx) = (*jt).second->Fmort;
+        cnaa(fleet_idx) = (*jt).second->catch_numbers_at_age;
+        cwaa(fleet_idx) = (*jt).second->catch_weight_at_age;
 #endif
       fleet_idx += 1;
     }
