@@ -56,7 +56,7 @@ std::map<uint32_t, MaturityInterfaceBase*> MaturityInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for logistic maturity as an S4 object. To
- * instantiate from R: logistic_maturity <- new(fims$logistic_maturity)
+ * instantiate from R: logistic_maturity <- new(logistic_maturity)
  */
 class LogisticMaturityInterface : public MaturityInterfaceBase {
  public:

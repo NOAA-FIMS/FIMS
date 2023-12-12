@@ -1,8 +1,7 @@
 test_that("Selectivity input settings work as expected", {
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
   # Create selectivity1
-  selectivity1 <- new(fims$LogisticSelectivity)
+  selectivity1 <- new(LogisticSelectivity)
 
   selectivity1$inflection_point$value <- 10.0
   selectivity1$inflection_point$min <- 8.0
@@ -22,11 +21,11 @@ test_that("Selectivity input settings work as expected", {
 
 
   # Create selectivity2
-  selectivity2 <- new(fims$LogisticSelectivity)
+  selectivity2 <- new(LogisticSelectivity)
   expect_equal((selectivity2$get_id()), 2)
 
   # Test double logistic
-  selectivity3 <- new(fims$DoubleLogisticSelectivity)
+  selectivity3 <- new(DoubleLogisticSelectivity)
 
   selectivity3$inflection_point_asc$value <- 10.5
   selectivity3$slope_asc$value <- 0.2
@@ -40,5 +39,5 @@ test_that("Selectivity input settings work as expected", {
   # 1.0/(1.0+exp(-(34.5-10.5)*0.2)) * (1.0 - 1.0/(1.0+exp(-(34.5-15)*0.05))) = 0.2716494
   expect_equal(selectivity3$evaluate(34.5), 0.2716494, tolerance = 0.0000001)
 
-  fims$clear()
+  clear()
 })

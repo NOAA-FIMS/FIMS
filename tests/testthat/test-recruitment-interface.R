@@ -1,9 +1,8 @@
 library(testthat)
 test_that("Recruitment input settings work as expected", {
-  fims <- Rcpp::Module("fims", PACKAGE = "FIMS")
 
   # Create recruitment
-  recruitment <- new(fims$BevertonHoltRecruitment)
+  recruitment <- new(BevertonHoltRecruitment)
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
@@ -42,5 +41,5 @@ test_that("Recruitment input settings work as expected", {
   recruitment$estimate_log_devs <- TRUE
   expect_equal(recruitment$evaluate_nll(), expected = expected_nll)
 
-  fims$clear()
+  clear()
 })

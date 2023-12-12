@@ -49,7 +49,7 @@ std::map<uint32_t, PopulationInterfaceBase*>
 /**
  * @brief Rcpp interface for a new Population. To instantiate
  * from R:
- * population <- new(fims$population)
+ * population <- new(population)
  */
 class PopulationInterface : public PopulationInterfaceBase {
  public:
