@@ -117,8 +117,8 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet$log_q <- log(1.0)
   test_env$fishing_fleet$estimate_q <- FALSE
   test_env$fishing_fleet$random_q <- FALSE
-  test_env$fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
-  test_env$fishing_fleet$log_obs_error$estimated <- FALSE
+  test_env$fishing_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.L$fleet1^2 + 1))), om_input$nyr)
+  test_env$fishing_fleet$estimate_obs_error <- FALSE
   # Modules are linked together using module IDs
   # Each module has a get_id() function that returns the unique ID for that module
   # Each fleet uses the module IDs to link up the correct module to the correct fleet
@@ -149,8 +149,8 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$survey_fleet$log_q <- log(om_output$survey_q$survey1)
   test_env$survey_fleet$estimate_q <- TRUE
   test_env$survey_fleet$random_q <- FALSE
-  test_env$survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
-  test_env$survey_fleet$log_obs_error$estimated <- FALSE
+  test_env$survey_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.survey$survey1^2 + 1))), om_input$nyr)
+  test_env$survey_fleet$estimate_obs_error <- FALSE
   test_env$survey_fleet$SetAgeCompLikelihood(1)
   test_env$survey_fleet$SetIndexLikelihood(1)
   test_env$survey_fleet$SetSelectivity(test_env$survey_fleet_selectivity$get_id())
@@ -675,8 +675,8 @@ test_that("run FIMS in a for loop", {
     fishing_fleet$log_q <- log(1.0)
     fishing_fleet$estimate_q <- FALSE
     fishing_fleet$random_q <- FALSE
-    fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
-    fishing_fleet$log_obs_error$estimated <- FALSE
+    fishing_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.L$fleet1^2 + 1))), om_input$nyr)
+    fishing_fleet$estimate_obs_error <- FALSE
     # Need get_id() for setting up observed agecomp and index data?
     fishing_fleet$SetAgeCompLikelihood(1)
     fishing_fleet$SetIndexLikelihood(1)
@@ -703,8 +703,8 @@ test_that("run FIMS in a for loop", {
     survey_fleet$log_q <- log(om_output$survey_q$survey1)
     survey_fleet$estimate_q <- TRUE
     survey_fleet$random_q <- FALSE
-    survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
-    survey_fleet$log_obs_error$estimated <- FALSE
+    survey_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.survey$survey1^2 + 1))), om_input$nyr)
+    survey_fleet$estimate_obs_error <- FALSE
     survey_fleet$SetAgeCompLikelihood(1)
     survey_fleet$SetIndexLikelihood(1)
     survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())

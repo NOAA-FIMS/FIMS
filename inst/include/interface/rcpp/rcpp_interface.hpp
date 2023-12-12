@@ -368,6 +368,7 @@ RCPP_MODULE(fims) {
       .field("nyears", &FleetInterface::nyears)
       .field("estimate_F", &FleetInterface::estimate_F)
       .field("estimate_q", &FleetInterface::estimate_q)
+      .field("estimate_obs_error", &FleetInterface::estimate_obs_error)
       .field("random_q", &FleetInterface::random_q)
       .field("random_F", &FleetInterface::random_F)
       .field("log_obs_error", &FleetInterface::log_obs_error)

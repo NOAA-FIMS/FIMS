@@ -61,7 +61,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     fims::Vector<Type> log_Fmort; /*!< estimated parameter: log Fishing mortality*/
     Type log_q; /*!< estimated parameter: catchability of the fleet */
     
-    Type log_obs_error;    /*!< estimated parameter: observation error associated
+    fims::Vector<Type> log_obs_error;    /*!< estimated parameters: observation error associated
                             with index */
     fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
     Type q; /*!< transofrmed parameter: the catchability of the fleet */
@@ -108,7 +108,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     expected_catch.resize(nyears);
     expected_index.resize(nyears);  // assume index is for all ages.
     catch_numbers_at_age.resize(nyears * nages);
-
+    
+    log_obs_error.resize(nyears);
     log_Fmort.resize(nyears);
     Fmort.resize(nyears);
   }
@@ -140,6 +141,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     for (size_t year = 0; year < this->nyears; year++) {
       FLEET_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
       FLEET_LOG << "input q " << this->log_q << std::endl;
+      FLEET_LOG << "input log_obs_error " << this->log_obs_error[year] << std::endl;
       this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
     }
   }
@@ -197,17 +199,17 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         
 #ifdef TMB_MODEL
         fims_distributions::Dnorm<Type> dnorm;
-        dnorm.sd = fims_math::exp(this->log_obs_error);
         for (size_t i = 0; i < this->expected_index.size(); i++) {
             dnorm.x = fims_math::log(this->observed_index_data->at(i));
             dnorm.mean = fims_math::log(this->expected_index[i]);
+            dnorm.sd = fims_math::exp(this->log_obs_error[i]);
             nll -= dnorm.evaluate(true);
       
         FLEET_LOG << "observed index data: " << i << " is "
                   << this->observed_index_data->at(i)
                   << " and expected is: " << this->expected_index[i] << std::endl;
+        FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
         }
-        FLEET_LOG << " log obs error is: " << this->log_obs_error << std::endl;
         FLEET_LOG << " sd is: " << dnorm.sd << std::endl;
     FLEET_LOG << " index nll: " << nll << std::endl;
 
