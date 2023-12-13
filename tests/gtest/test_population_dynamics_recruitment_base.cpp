@@ -7,13 +7,19 @@ namespace
   TEST(RecruitmentDeviations, ConstraintWorks)
   {
     fims_popdy::SRBevertonHolt<double> recruit;
-    recruit.log_recruit_devs = {-1.0, 2.0, 3.0};
+    recruit.log_recruit_devs.resize(3);
+    recruit.log_recruit_devs[0] = -1.0;
+    recruit.log_recruit_devs[1] = 2.0;
+    recruit.log_recruit_devs[2] = 3.0;
 
     // Test if constrain_deviations = false works
     recruit.constrain_deviations = false;
     recruit.PrepareConstrainedDeviations();
 
-    std::vector<double> expected_deviations_false = {-1.0, 2.0, 3.0};
+    fims::Vector<double> expected_deviations_false(3, 0);
+    expected_deviations_false[0] = -1.0;
+    expected_deviations_false[1] = 2.0;
+    expected_deviations_false[2] = 3.0;
     for (int i = 0; i < recruit.log_recruit_devs.size(); i++)
     {
       EXPECT_EQ(recruit.log_recruit_devs[i],

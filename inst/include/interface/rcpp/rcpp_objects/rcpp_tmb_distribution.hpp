@@ -207,7 +207,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Rcpp::NumericVector x; /**< Vector of length K of integers */
+  Rcpp::IntegerVector x; /**< Vector of length K of integers */
   Rcpp::NumericVector p; /**< Vector of length K, specifying the probability
  for the K classes (note, unlike in R these must sum to 1). */
 
@@ -226,10 +226,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate(bool do_log) {
     fims_distributions::Dmultinom<double> dmultinom;
-    // Decale TMBVector in this scope
-    typedef typename fims::ModelTraits<TMB_FIMS_REAL_TYPE>::EigenVector Vector;
-    dmultinom.x = Vector(x.size());  // Vector from TMB
-    dmultinom.p = Vector(p.size());  // Vector from TMB
+    // Declare TMBVector in this scope
+    dmultinom.x.resize(x.size());  // Vector from TMB
+    dmultinom.p.resize(p.size());  // Vector from TMB
     for (int i = 0; i < x.size(); i++) {
       dmultinom.x[i] = x[i];
       dmultinom.p[i] = p[i];
@@ -241,7 +240,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    typedef typename fims::ModelTraits<Type>::EigenVector Vector;
+
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -249,8 +248,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         std::make_shared<fims_distributions::Dmultinom<Type>>();
 
     distribution->id = this->id;
-    distribution->x = Vector(x.size());
-    distribution->p = Vector(p.size());
+    distribution->x.resize(x.size());
+    distribution->p.resize(p.size());
 
     for (int i = 0; i < x.size(); i++) {
       distribution->x[i] = x[i];

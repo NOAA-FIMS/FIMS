@@ -74,11 +74,11 @@ class Model {  // may need singleton
     // vector< vector<Type> > creates a nested vector structure where
     // each vector can be a different dimension. Does not work with ADREPORT
     // fleets
-    vector<vector<Type> > exp_index(n_fleets);
-    vector<vector<Type> > exp_catch(n_fleets);
-    vector<vector<Type> > cnaa(n_fleets);
-    vector<vector<Type> > cwaa(n_fleets);
-    vector<vector<Type> > F_mort(n_fleets);
+      vector<vector<Type> > exp_index(n_fleets);
+      vector<vector<Type> > exp_catch(n_fleets);
+      vector<vector<Type> > cnaa(n_fleets);
+      vector<vector<Type> > cwaa(n_fleets);
+      vector<vector<Type> > F_mort(n_fleets);
     // populations
     vector<vector<Type> > naa(n_pops);
     vector<vector<Type> > ssb(n_pops);
@@ -86,6 +86,7 @@ class Model {  // may need singleton
     vector<vector<Type> > log_recruit_dev(n_pops);
     vector<vector<Type> > recruitment(n_pops);
     vector<vector<Type> > M(n_pops);
+
 #endif
 
     // Loop over populations, evaluate, and sum up the recruitment likelihood
@@ -162,11 +163,11 @@ class Model {  // may need singleton
     for (jt = this->fims_information->fleets.begin();
          jt != this->fims_information->fleets.end(); ++jt) {
 #ifdef TMB_MODEL
-      exp_index(fleet_idx) = vector<Type>((*jt).second->expected_index);
-      exp_catch(fleet_idx) = vector<Type>((*jt).second->expected_catch);
-      F_mort(fleet_idx) = vector<Type>((*jt).second->Fmort);
-      cnaa(fleet_idx) = vector<Type>((*jt).second->catch_numbers_at_age);
-      cwaa(fleet_idx) = vector<Type>((*jt).second->catch_weight_at_age);
+        exp_index(fleet_idx) = (*jt).second->expected_index;
+        exp_catch(fleet_idx) = (*jt).second->expected_catch;
+        F_mort(fleet_idx) = (*jt).second->Fmort;
+        cnaa(fleet_idx) = (*jt).second->catch_numbers_at_age;
+        cwaa(fleet_idx) = (*jt).second->catch_weight_at_age;
 #endif
       fleet_idx += 1;
     }
@@ -214,6 +215,7 @@ class Model {  // may need singleton
 
     return jnll;
   }
+    
 };
 
 // Create singleton instance of Model class

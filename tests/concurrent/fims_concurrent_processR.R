@@ -153,7 +153,6 @@ init_fims<-function(i){
   population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
   population$nseasons <- 1
   population$nyears <- om_input$nyr
-  population$prop_female <- om_input$proportion.female[1]
   population$SetMaturity(maturity$get_id())
   population$SetGrowth(ewaa_growth$get_id())
   population$SetRecruitment(recruitment$get_id())

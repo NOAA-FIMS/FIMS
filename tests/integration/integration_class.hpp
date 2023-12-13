@@ -509,7 +509,7 @@ public:
                     double r0 = (*it).second.GetArray()[0].GetDouble();
                     rec->log_rzero = std::log(r0);
                     if (print_statements) {
-                        std::cout << "R0 " << rec->log_rzero << " \n";
+                        std::cout << "R0 " << rec->log_rzero << "| \n";
                     }
                 }
             } else {
@@ -559,7 +559,7 @@ public:
                     if (print_statements) {
                         std::cout << "recruitment deviations: ";
                     }
-                    for (size_t i = 0; i < rec->log_recruit_devs.size(); i++) {
+                    for (size_t i = 0; i < rec->log_recruit_devs.size()-1; i++) {
                         rec->log_recruit_devs[i] = rdev[i+1].GetDouble();
                         if (print_statements) {
                             std::cout << rec->log_recruit_devs[i] << " ";

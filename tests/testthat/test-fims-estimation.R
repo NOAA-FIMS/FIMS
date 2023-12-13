@@ -117,8 +117,8 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet$log_q <- log(1.0)
   test_env$fishing_fleet$estimate_q <- FALSE
   test_env$fishing_fleet$random_q <- FALSE
-  test_env$fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
-  test_env$fishing_fleet$log_obs_error$estimated <- FALSE
+  test_env$fishing_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.L$fleet1^2 + 1))), om_input$nyr)
+  test_env$fishing_fleet$estimate_obs_error <- FALSE
   # Modules are linked together using module IDs
   # Each module has a get_id() function that returns the unique ID for that module
   # Each fleet uses the module IDs to link up the correct module to the correct fleet
@@ -149,8 +149,8 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$survey_fleet$log_q <- log(om_output$survey_q$survey1)
   test_env$survey_fleet$estimate_q <- TRUE
   test_env$survey_fleet$random_q <- FALSE
-  test_env$survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
-  test_env$survey_fleet$log_obs_error$estimated <- FALSE
+  test_env$survey_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.survey$survey1^2 + 1))), om_input$nyr)
+  test_env$survey_fleet$estimate_obs_error <- FALSE
   test_env$survey_fleet$SetAgeCompLikelihood(1)
   test_env$survey_fleet$SetIndexLikelihood(1)
   test_env$survey_fleet$SetSelectivity(test_env$survey_fleet_selectivity$get_id())
@@ -168,9 +168,6 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
   test_env$population$nseasons <- 1
   test_env$population$nyears <- om_input$nyr
-  # following line is related to issue #521, may be modified in the future
-  # https://github.com/NOAA-FIMS/FIMS/issues/521
-  test_env$population$prop_female <- om_input$proportion.female[1]
   test_env$population$SetMaturity(test_env$maturity$get_id())
   test_env$population$SetGrowth(test_env$ewaa_growth$get_id())
   test_env$population$SetRecruitment(test_env$recruitment$get_id())
@@ -487,7 +484,7 @@ test_that("estimation test of fims", {
   sdr_rdev <- sdr_report[which(rownames(sdr_report) == "LogRecDev"), ]
   rdev_are <- rep(0, length(om_input$logR.resid)-1)
 
-  for (i in 1:length(report$log_recruit_dev[[1]]) ){
+  for (i in 1:(length(report$log_recruit_dev[[1]])-1)){
     rdev_are[i] <- abs(report$log_recruit_dev[[1]][i] - om_input$logR.resid[i+1]) # /
     #   exp(om_input$logR.resid[i])
     # expect_lte(rdev_are[i], 1) # 1
@@ -623,6 +620,7 @@ test_that("run FIMS in a for loop", {
     # before the likelihood calculation
     recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
     recruitment$log_rzero$value <- 13 #log(om_input$R0)
+    # this change moves the starting value away from its true value
     recruitment$log_rzero$is_random_effect <- FALSE
     recruitment$log_rzero$estimated <- TRUE
     recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
@@ -677,8 +675,8 @@ test_that("run FIMS in a for loop", {
     fishing_fleet$log_q <- log(1.0)
     fishing_fleet$estimate_q <- FALSE
     fishing_fleet$random_q <- FALSE
-    fishing_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
-    fishing_fleet$log_obs_error$estimated <- FALSE
+    fishing_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.L$fleet1^2 + 1))), om_input$nyr)
+    fishing_fleet$estimate_obs_error <- FALSE
     # Need get_id() for setting up observed agecomp and index data?
     fishing_fleet$SetAgeCompLikelihood(1)
     fishing_fleet$SetIndexLikelihood(1)
@@ -705,8 +703,8 @@ test_that("run FIMS in a for loop", {
     survey_fleet$log_q <- log(om_output$survey_q$survey1)
     survey_fleet$estimate_q <- TRUE
     survey_fleet$random_q <- FALSE
-    survey_fleet$log_obs_error$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
-    survey_fleet$log_obs_error$estimated <- FALSE
+    survey_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.survey$survey1^2 + 1))), om_input$nyr)
+    survey_fleet$estimate_obs_error <- FALSE
     survey_fleet$SetAgeCompLikelihood(1)
     survey_fleet$SetIndexLikelihood(1)
     survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
@@ -727,7 +725,6 @@ test_that("run FIMS in a for loop", {
     population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
     population$nseasons <- 1
     population$nyears <- om_input$nyr
-    population$prop_female <- om_input$proportion.female[1]
     population$SetMaturity(maturity$get_id())
     population$SetGrowth(ewaa_growth$get_id())
     population$SetRecruitment(recruitment$get_id())
@@ -736,17 +733,21 @@ test_that("run FIMS in a for loop", {
     fims$CreateTMBModel()
     parameters <- list(p = fims$get_fixed())
     obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS")
-   
+
     opt <- with(obj, optim(par, fn, gr,
       method = "BFGS",
       control = list(maxit = 1000000, reltol = 1e-15)
     ))
-    
+
     report <- obj$report(obj$par)
+    g <- as.numeric(obj$gr(opt$par))
+    h <- optimHess(opt$par, fn = obj$fn, gr = obj$gr)
+    opt$par <- opt$par - solve(h, g)
     expect_false(is.null(report))
 
-    max_gradient <- max(abs(obj$gr(obj$env$last.par.best)))
+    max_gradient <- max(abs(obj$gr(opt$par)))
     expect_lte(max_gradient, 0.0001)
     fims$clear()
   }
 })
+

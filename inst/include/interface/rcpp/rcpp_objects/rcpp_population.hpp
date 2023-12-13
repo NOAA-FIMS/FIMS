@@ -63,7 +63,6 @@ class PopulationInterface : public PopulationInterfaceBase {
   Rcpp::NumericVector log_M; /**< log of the natural mortality of the stock*/
   Rcpp::NumericVector log_init_naa; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
-  double prop_female;       /**< the proportion of female fish*/
   bool estimate_M;          /**<whether parameter should be estimated*/
   bool estimate_initNAA;    /**<whether parameter should be estimated*/
 
@@ -129,20 +128,20 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->maturity_id = this->maturity_id;
     population->log_M.resize(this->log_M.size());
     population->log_init_naa.resize(this->log_init_naa.size());
-    for (size_t i = 0; i < log_M.size(); i++) {
+    for (int i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i];
       if (estimate_M) {
         info->RegisterParameter(population->log_M[i]);
       }
     }
 
-    for (size_t i = 0; i < log_init_naa.size(); i++) {
+    for (int i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i];
       if (estimate_initNAA) {
         info->RegisterParameter(population->log_init_naa[i]);
       }
     }
-    for (size_t i = 0; i < ages.size(); i++) {
+    for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
 
