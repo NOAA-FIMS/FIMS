@@ -246,7 +246,7 @@ Index module has a vector field named <em>index_data</em> and the
 AgeComp module has a vector field names <em>age_comp_data</em>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Index</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'Index' &lt;0x55623ca5b010&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'Index' &lt;0x55a524a590d0&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     Index(int)</span></span>
 <span><span class="co">## </span></span>
@@ -258,7 +258,7 @@ AgeComp module has a vector field names <em>age_comp_data</em>.</p>
 <span><span class="co">## </span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">AgeComp</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'AgeComp' &lt;0x55623ca5aeb0&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'AgeComp' &lt;0x55a524a58f70&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     AgeComp(int, int)</span></span>
 <span><span class="co">## </span></span>
@@ -298,7 +298,7 @@ can use the <em>value</em> field to input variables defined in the Model
 Comparison project.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">LogisticSelectivity</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'LogisticSelectivity' &lt;0x55623ca5b590&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'LogisticSelectivity' &lt;0x55a524a59650&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     LogisticSelectivity()</span></span>
 <span><span class="co">## </span></span>
@@ -328,16 +328,17 @@ actual fleet object. First let’s run <code>methods::show(Fleet)</code>
 to see all the fields and methods available from R.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Fleet</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'Fleet' &lt;0x55623ca5ad50&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'Fleet' &lt;0x55a524a58e10&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     Fleet()</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Fields: </span></span>
 <span><span class="co">##     bool estimate_F</span></span>
+<span><span class="co">##     bool estimate_obs_error</span></span>
 <span><span class="co">##     bool estimate_q</span></span>
 <span><span class="co">##     bool is_survey</span></span>
 <span><span class="co">##     Rcpp::Vector&lt;14, Rcpp::PreserveStorage&gt; log_Fmort</span></span>
-<span><span class="co">##     Parameter log_obs_error</span></span>
+<span><span class="co">##     Rcpp::Vector&lt;14, Rcpp::PreserveStorage&gt; log_obs_error</span></span>
 <span><span class="co">##     double log_q</span></span>
 <span><span class="co">##     int nages</span></span>
 <span><span class="co">##     int nyears</span></span>
@@ -356,14 +357,13 @@ to see all the fields and methods available from R.</p>
 <span><span class="co">##      void SetSelectivity(int)  </span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>We can see that there are five boolean flags: estimate_F, estimate_q,
-and is_survey, random_F, and random_q. There is a vector, log_Fmort, a
-Parameter, log_obs_error, and a double, log_q. There are two integer
-fields for the number of ages and years. Additionally, there are five
-Methods: SetAgeCompLikelihood, SetIndexLikelihood,
-SetObservedAgeCompData, SetObservedIndexData, and setSelectivity. The
-last three of these will be used to link up the AgeComp, Index, and
-Selectivity modules defined above with the fleet module defined
-below.</p>
+and is_survey, random_F, and random_q. There are two vectors, log_Fmort
+and log_obs_error, and a double, log_q. There are two integer fields for
+the number of ages and years. Additionally, there are five Methods:
+SetAgeCompLikelihood, SetIndexLikelihood, SetObservedAgeCompData,
+SetObservedIndexData, and setSelectivity. The last three of these will
+be used to link up the AgeComp, Index, and Selectivity modules defined
+above with the fleet module defined below.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create fleet module</span></span>
 <span><span class="va">fishing_fleet</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">Fleet</span><span class="op">)</span></span>
@@ -388,8 +388,8 @@ below.</p>
 <span><span class="va">fishing_fleet</span><span class="op">$</span><span class="va">log_q</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1.0</span><span class="op">)</span></span>
 <span><span class="va">fishing_fleet</span><span class="op">$</span><span class="va">estimate_q</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="va">fishing_fleet</span><span class="op">$</span><span class="va">random_q</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
-<span><span class="va">fishing_fleet</span><span class="op">$</span><span class="va">log_obs_error</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.01</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">fishing_fleet</span><span class="op">$</span><span class="va">log_obs_error</span><span class="op">$</span><span class="va">estimated</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">fishing_fleet</span><span class="op">$</span><span class="va">log_obs_error</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.01</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,<span class="va">nyears</span><span class="op">)</span></span>
+<span><span class="va">fishing_fleet</span><span class="op">$</span><span class="va">estimate_obs_error</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="co"># Next two lines not currently used by FIMS</span></span>
 <span><span class="va">fishing_fleet</span><span class="op">$</span><span class="fu">SetAgeCompLikelihood</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">fishing_fleet</span><span class="op">$</span><span class="fu">SetIndexLikelihood</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
@@ -443,8 +443,8 @@ catchability (q) variable.</p>
 <span><span class="va">survey_fleet</span><span class="op">$</span><span class="va">estimate_q</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="va">survey_fleet</span><span class="op">$</span><span class="va">random_q</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="co"># sd = sqrt(log(cv^2 + 1)), sd is log transformed</span></span>
-<span><span class="va">survey_fleet</span><span class="op">$</span><span class="va">log_obs_error</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">survey_fleet</span><span class="op">$</span><span class="va">log_obs_error</span><span class="op">$</span><span class="va">estimated</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">survey_fleet</span><span class="op">$</span><span class="va">log_obs_error</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,<span class="va">nyears</span><span class="op">)</span></span>
+<span><span class="va">survey_fleet</span><span class="op">$</span><span class="va">estimate_obs_error</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
 <span><span class="va">survey_fleet</span><span class="op">$</span><span class="fu">SetAgeCompLikelihood</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">survey_fleet</span><span class="op">$</span><span class="fu">SetIndexLikelihood</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">survey_fleet</span><span class="op">$</span><span class="fu">SetSelectivity</span><span class="op">(</span><span class="va">survey_fleet_selectivity</span><span class="op">$</span><span class="fu">get_id</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
@@ -470,7 +470,7 @@ methods (i.e. functions) available in
 <code class="sourceCode R"><span><span class="co"># Recruitment</span></span>
 <span><span class="va">recruitment</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span>
 <span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'BevertonHoltRecruitment' &lt;0x55623ca5abf0&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'BevertonHoltRecruitment' &lt;0x55a524a58cb0&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     BevertonHoltRecruitment()</span></span>
 <span><span class="co">## </span></span>
@@ -564,8 +564,7 @@ actual population.</p>
 <span><span class="va">population</span><span class="op">$</span><span class="va">ages</span> <span class="op">&lt;-</span> <span class="va">ages</span></span>
 <span><span class="va">population</span><span class="op">$</span><span class="va">nfleets</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="co"># 1 fleet and 1 survey</span></span>
 <span><span class="va">population</span><span class="op">$</span><span class="va">nseasons</span> <span class="op">&lt;-</span> <span class="va">nseasons</span></span>
-<span><span class="va">population</span><span class="op">$</span><span class="va">nyears</span> <span class="op">&lt;-</span> <span class="va">nyears</span></span>
-<span><span class="va">population</span><span class="op">$</span><span class="va">prop_female</span> <span class="op">&lt;-</span> <span class="fl">0.5</span></span></code></pre></div>
+<span><span class="va">population</span><span class="op">$</span><span class="va">nyears</span> <span class="op">&lt;-</span> <span class="va">nyears</span></span></code></pre></div>
 <p>Now we need to link up the recruitment, growth, and maturity modules
 we set above with this new population module. We do this by calling
 <code>get_id()</code> from each respective module and passing that
