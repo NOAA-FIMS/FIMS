@@ -72,10 +72,10 @@ class FleetInterface : public FleetInterfaceBase {
       log_Fmort;           /**< log of fishing mortality rate for the fleet*/
   bool estimate_F = false; /**< whether the parameter F should be estimated*/
   bool estimate_q = false; /**< whether the parameter q should be estimated*/
-  bool estimate_obs_error = false; /**< whether the parameter log_obs_error 
-                                        should be estimated*/
-  bool random_q = false;   /**< whether q should be a random effect*/
-  bool random_F = false;   /**< whether F should be a random effect*/
+  bool estimate_obs_error = false;   /**< whether the parameter log_obs_error
+                                          should be estimated*/
+  bool random_q = false;             /**< whether q should be a random effect*/
+  bool random_F = false;             /**< whether F should be a random effect*/
   Rcpp::NumericVector log_obs_error; /**< the log of the observation error */
 
   FleetInterface() : FleetInterfaceBase() {}

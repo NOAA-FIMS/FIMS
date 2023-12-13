@@ -11,8 +11,8 @@
 
 #ifdef TMB_MODEL
 
-#include "distributions_base.hpp"
 #include "../../common/fims_vector.hpp"
+#include "distributions_base.hpp"
 
 namespace fims_distributions {
 
@@ -48,8 +48,8 @@ struct Dnorm : public DistributionsBase<Type> {
 template <typename Type>
 struct Dmultinom : public DistributionsBase<Type> {
   fims::Vector<Type> x; /*!< Vector of length K of integers */
-  fims::Vector<Type> p; /*!< Vector of length K, specifying the probability for the K
-               classes (note, unlike in R these must sum to 1). */
+  fims::Vector<Type> p; /*!< Vector of length K, specifying the probability for
+               the K classes (note, unlike in R these must sum to 1). */
 
   Dmultinom() : DistributionsBase<Type>() {}
 

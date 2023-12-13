@@ -20,9 +20,8 @@
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
 #include "def.hpp"
-#include "model_object.hpp"
 #include "fims_vector.hpp"
-
+#include "model_object.hpp"
 
 namespace fims_info {
 

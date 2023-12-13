@@ -17,9 +17,9 @@
 #include <cmath>  // for using std::pow and M_PI
 
 #include "../../../common/fims_math.hpp"  // for using fims_math::log()
+#include "../../../common/fims_vector.hpp"
 #include "../../../common/model_object.hpp"
 #include "../../../distributions/distributions.hpp"
-#include "../../../common/fims_vector.hpp"
 
 namespace fims_popdy {
 
@@ -33,7 +33,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /**< reference id for recruitment object*/
 
   fims::Vector<Type>
-      log_recruit_devs;            /*!< A vector of log recruitment deviations */
+      log_recruit_devs; /*!< A vector of log recruitment deviations */
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                  deviations are summing to zero or not */
 
@@ -41,16 +41,14 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
                        deviations */
   Type log_rzero;         /**< Log of unexploited recruitment.*/
 
-  bool estimate_log_recruit_devs =
-      true; /*!< A flag to indicate if recruitment deviations are estimated or
-     not */
+  bool estimate_log_recruit_devs = true; /*!< A flag to indicate if recruitment
+                                  deviations are estimated or not */
 
   /** @brief Constructor.
    */
   RecruitmentBase() { this->id = RecruitmentBase::id_g++; }
 
   virtual ~RecruitmentBase() {}
-
 
   /**
    * @brief Prepares the recruitment deviations vector.
