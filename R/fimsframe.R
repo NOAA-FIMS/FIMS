@@ -16,7 +16,7 @@ setClass(
     data = "data.frame", # can use c( ) or list here.
     fleets = "numeric",
     nyrs = "integer",
-    start_year = "integer", 
+    start_year = "integer",
     end_year = "integer"
   )
 )
@@ -260,7 +260,7 @@ setValidity(
     if (!"dateend" %in% colnames(object@data)) {
       errors <- c(errors, "data must contain 'uncertainty'")
     }
-      
+
 
     # TODO: Add checks for other slots
 
@@ -327,7 +327,7 @@ FIMSFrame <- function(data) {
     data = data,
     fleets = fleets,
     nyrs = nyrs,
-    start_year = start_year, 
+    start_year = start_year,
     end_year = end_year
   )
   return(out)
@@ -357,7 +357,7 @@ FIMSFrameAge <- function(data) {
     data = data,
     fleets = fleets,
     nyrs = nyrs,
-    start_year = start_year, 
+    start_year = start_year,
     end_year = end_year,
     ages = ages,
     nages = nages,

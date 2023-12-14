@@ -16,7 +16,7 @@ FIMS_C0_estimation <- ASSAMC::save_initial_input(
   case_name = "FIMS_C0_estimation"
 )
 
-# generate om_input, om_output, and em_input 
+# generate om_input, om_output, and em_input
 # using function from the model comparison project
 ASSAMC::run_om(input_list = FIMS_C0_estimation)
 
@@ -37,10 +37,10 @@ setup_fims <- function(om_input, om_output, em_input) {
   # when there are other options, this would be where the option would be chosen)
   test_env$recruitment <- methods::new(test_env$fims$BevertonHoltRecruitment)
 
-  # NOTE: in first set of parameters below (for recruitment), 
-  # $is_random_effect (default is FALSE) and $estimated (default is FALSE) 
-  # are defined even if they match the defaults in order to provide an example 
-  # of how that is done. Other sections of the code below leave defaults in 
+  # NOTE: in first set of parameters below (for recruitment),
+  # $is_random_effect (default is FALSE) and $estimated (default is FALSE)
+  # are defined even if they match the defaults in order to provide an example
+  # of how that is done. Other sections of the code below leave defaults in
   # place as appropriate.
 
   # set up logR_sd
@@ -183,14 +183,14 @@ test_that("deterministic test of fims", {
     om_output = om_output,
     em_input = em_input
   )
-  # Set-up 
+  # Set-up
   deterministic_env$fims$CreateTMBModel()
   # CreateTMBModel calls a function in information that loops
   # over all the populations and fleets and sets all the pointers
   parameters <- list(p = deterministic_env$fims$get_fixed())
   # get_fixed function is an Rcpp function that loops over all Rcpp
   # modules and returned a vector of parameters being estimated
- 
+
   # Set up TMB's computational graph
   obj <- MakeADFun(data = list(), parameters, DLL = "FIMS")
 
@@ -351,7 +351,7 @@ test_that("nll test of fims", {
   # recruitment likelihood
   # log_devs is of length nyr-1
   rec_nll <- -sum(dnorm(
-    nll_env$recruitment$log_devs, rep(0, om_input$nyr-1),
+    nll_env$recruitment$log_devs, rep(0, om_input$nyr - 1),
     om_input$logR_sd, TRUE
   ))
 
@@ -482,15 +482,15 @@ test_that("estimation test of fims", {
   # recruitment log deviations
   # the initial value of om_input$logR.resid is dropped from the model
   sdr_rdev <- sdr_report[which(rownames(sdr_report) == "LogRecDev"), ]
-  rdev_are <- rep(0, length(om_input$logR.resid)-1)
+  rdev_are <- rep(0, length(om_input$logR.resid) - 1)
 
-  for (i in 1:(length(report$log_recruit_dev[[1]])-1)){
-    rdev_are[i] <- abs(report$log_recruit_dev[[1]][i] - om_input$logR.resid[i+1]) # /
+  for (i in 1:(length(report$log_recruit_dev[[1]]) - 1)) {
+    rdev_are[i] <- abs(report$log_recruit_dev[[1]][i] - om_input$logR.resid[i + 1]) # /
     #   exp(om_input$logR.resid[i])
     # expect_lte(rdev_are[i], 1) # 1
   }
   expect_lte(
-    sum(rdev_are > qnorm(.975) * sdr_rdev[1:length(om_input$logR.resid)-1, 2]),
+    sum(rdev_are > qnorm(.975) * sdr_rdev[1:length(om_input$logR.resid) - 1, 2]),
     0.05 * length(om_input$logR.resid)
   )
 
@@ -619,7 +619,7 @@ test_that("run FIMS in a for loop", {
     # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
     # before the likelihood calculation
     recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-    recruitment$log_rzero$value <- 13 #log(om_input$R0)
+    recruitment$log_rzero$value <- 13 # log(om_input$R0)
     # this change moves the starting value away from its true value
     recruitment$log_rzero$is_random_effect <- FALSE
     recruitment$log_rzero$estimated <- TRUE
@@ -627,7 +627,7 @@ test_that("run FIMS in a for loop", {
     recruitment$logit_steep$is_random_effect <- FALSE
     recruitment$logit_steep$estimated <- FALSE
     recruitment$estimate_log_devs <- TRUE
-    recruitment$log_devs <- rep(0, length(om_input$logR.resid)-1)
+    recruitment$log_devs <- rep(0, length(om_input$logR.resid) - 1)
 
     # Data
     catch <- em_input$L.obs$fleet1
@@ -750,4 +750,3 @@ test_that("run FIMS in a for loop", {
     fims$clear()
   }
 })
-

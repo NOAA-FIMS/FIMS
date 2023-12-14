@@ -1,5 +1,4 @@
 test_that("Maturity input settings work as expected", {
-
   # Create maturity1
   maturity1 <- new(LogisticMaturity)
 
