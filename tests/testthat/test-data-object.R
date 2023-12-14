@@ -23,7 +23,6 @@ fleet_names_index <- dplyr::filter(
 nindex <- length(fleet_names_index)
 
 test_that("Can add index data to model", {
-
   indexdat <- vector(mode = "list", length = nindex)
   names(indexdat) <- fleet_names_index
 
@@ -38,7 +37,6 @@ test_that("Can add index data to model", {
 })
 
 test_that("Can add agecomp data to model", {
-
   agecompdat <- vector(mode = "list", length = nagecomp)
   names(agecompdat) <- fleet_names_agecomp
 

@@ -1,5 +1,4 @@
 test_that("Selectivity input settings work as expected", {
-
   # Create selectivity1
   selectivity1 <- new(LogisticSelectivity)
 

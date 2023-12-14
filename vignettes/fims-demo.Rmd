@@ -168,7 +168,7 @@ fishing_fleet$random_F <- FALSE
 fishing_fleet$log_q <- log(1.0)
 fishing_fleet$estimate_q <- FALSE
 fishing_fleet$random_q <- FALSE
-fishing_fleet$log_obs_error <- rep(log(sqrt(log(0.01^2 + 1))),nyears)
+fishing_fleet$log_obs_error <- rep(log(sqrt(log(0.01^2 + 1))), nyears)
 fishing_fleet$estimate_obs_error <- FALSE
 # Next two lines not currently used by FIMS
 fishing_fleet$SetAgeCompLikelihood(1)
@@ -219,7 +219,7 @@ survey_fleet$log_q <- log(3.315143e-07)
 survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
 # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-survey_fleet$log_obs_error <- rep(log(sqrt(log(0.2^2 + 1))),nyears)
+survey_fleet$log_obs_error <- rep(log(sqrt(log(0.2^2 + 1))), nyears)
 survey_fleet$estimate_obs_error <- FALSE
 survey_fleet$SetAgeCompLikelihood(1)
 survey_fleet$SetIndexLikelihood(1)
@@ -257,13 +257,13 @@ We also need to set up log recruitment deviations. FIMS recruitment modules have
 ```{r rec-devs}
 recruitment$estimate_log_devs <- FALSE
 recruitment$log_devs <- c(
-  0.08904850,  0.43787763, -0.13299042, -0.43251973,
-  0.64861200,  0.50640852, -0.06958319,  0.30246260,
-  -0.08257384,  0.20740372,  0.15289604, -0.21709207,       
-  -0.13320626,  0.11225374, -0.10650836,  0.26877132,
-  0.24094126, -0.54480751, -0.23680557, -0.58483386,  
-  0.30122785,  0.21930545, -0.22281699, -0.51358369,       
-  0.15740234, -0.53988240, -0.19556523,  0.20094360,  
+  0.08904850, 0.43787763, -0.13299042, -0.43251973,
+  0.64861200, 0.50640852, -0.06958319, 0.30246260,
+  -0.08257384, 0.20740372, 0.15289604, -0.21709207,
+  -0.13320626, 0.11225374, -0.10650836, 0.26877132,
+  0.24094126, -0.54480751, -0.23680557, -0.58483386,
+  0.30122785, 0.21930545, -0.22281699, -0.51358369,
+  0.15740234, -0.53988240, -0.19556523, 0.20094360,
   0.37248740, -0.07163145
 )
 ```

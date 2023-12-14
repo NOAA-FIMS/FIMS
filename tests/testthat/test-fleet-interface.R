@@ -1,6 +1,5 @@
 test_that("Fleet: selectivity IDs can be added to the
 fleet module", {
-
   # Create selectivity for fleet 1
   selectivity_fleet1 <- new(LogisticSelectivity)
   expect_equal((selectivity_fleet1$get_id()), 1)
