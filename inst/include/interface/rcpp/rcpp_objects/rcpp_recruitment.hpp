@@ -30,7 +30,8 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 
   // static std::vector<double> log_recruit_devs; /**< vector of log recruitment
   // deviations*/
-  // static bool constrain_deviations; /**< whether or not the rec devs are constrained*/
+  // static bool constrain_deviations; /**< whether or not the rec devs are
+  // constrained*/
 
   RecruitmentInterfaceBase() {
     this->id = RecruitmentInterfaceBase::id_g++;
@@ -69,12 +70,12 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
-  Parameter logit_steep;       /**< steepness or the productivity of the stock*/
-  Parameter log_rzero;         /**< recruitment at unfished biomass */
-  Parameter log_sigma_recruit; /**< the log of the stock recruit standard deviation */
-  Rcpp::NumericVector log_devs; /**< log recruitment deviations*/
-  bool estimate_log_devs =
-      false; /**< boolean describing whether to estimate */
+  Parameter logit_steep; /**< steepness or the productivity of the stock*/
+  Parameter log_rzero;   /**< recruitment at unfished biomass */
+  Parameter
+      log_sigma_recruit; /**< the log of the stock recruit standard deviation */
+  Rcpp::NumericVector log_devs;   /**< log recruitment deviations*/
+  bool estimate_log_devs = false; /**< boolean describing whether to estimate */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
