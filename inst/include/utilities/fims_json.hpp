@@ -1,4 +1,4 @@
-/** 
+/**
  * @file fims_json.hpp
  *  @brief A simple JSON parsing and generation library.
  * @details This library provides classes and functions for parsing JSON
@@ -13,29 +13,29 @@
 
 class JsonValue;
 
-/** 
+/**
  * Alias for a JSON object, mapping strings to JSON values.
  */
 using JsonObject = std::map<std::string, JsonValue>;
 
-/** 
+/**
  * Alias for a JSON array, containing a sequence of JSON values.
  */
 using JsonArray = std::vector<JsonValue>;
 
-/** 
+/**
  * Represents different types of JSON values.
  */
 enum JsonValueType {
-  Null = 0,  /**< Null JSON value. */
-  Number,    /**< Numeric JSON value. */
-  String,    /**< String JSON value. */
-  Bool,      /**< Boolean JSON value. */
-  Object,    /**< JSON object. */
-  Array      /**< JSON array. */
+  Null = 0, /**< Null JSON value. */
+  Number,   /**< Numeric JSON value. */
+  String,   /**< String JSON value. */
+  Bool,     /**< Boolean JSON value. */
+  Object,   /**< JSON object. */
+  Array     /**< JSON array. */
 };
 
-/** 
+/**
  * Represents a JSON value.
  */
 class JsonValue {
@@ -83,15 +83,15 @@ class JsonValue {
   JsonArray& GetArray() { return array; }
 
  private:
-  JsonValueType type;  /**< Type of the JSON value. */
-  double number;       /**< Numeric value. */
-  std::string str;     /**< String value. */
-  bool boolean;        /**< Boolean value. */
-  JsonObject object;   /**< JSON object. */
-  JsonArray array;     /**< JSON array. */
+  JsonValueType type; /**< Type of the JSON value. */
+  double number;      /**< Numeric value. */
+  std::string str;    /**< String value. */
+  bool boolean;       /**< Boolean value. */
+  JsonObject object;  /**< JSON object. */
+  JsonArray array;    /**< JSON array. */
 };
 
-/** 
+/**
  * Parses JSON strings and generates JSON values.
  */
 class JsonParser {
@@ -129,11 +129,11 @@ class JsonParser {
   /** Indentation helper for printing JSON values in an output stream. */
   void Indent(std::ofstream& outputFile, int level);
 
-  std::string data;  /**< Input JSON data. */
-  size_t position;   /**< Current position in the data. */
+  std::string data; /**< Input JSON data. */
+  size_t position;  /**< Current position in the data. */
 };
 
-/** 
+/**
  * Parse a JSON string and return the corresponding JSON value.
  * @param json The JSON string to parse.
  * @return The parsed JSON value.
@@ -150,7 +150,7 @@ void JsonParser::SkipWhitespace() {
   }
 }
 
-/** 
+/**
  * Parse a JSON value.
  *  @return The parsed JSON value.
  */
@@ -173,7 +173,7 @@ JsonValue JsonParser::ParseValue() {
   }
 }
 
-/** 
+/**
  * Parse a numeric JSON value.
  * @return The parsed JSON value.
  */
@@ -204,7 +204,7 @@ JsonValue JsonParser::ParseNumber() {
   }
 }
 
-/** 
+/**
  * Parse a string JSON value.
  * @return The parsed JSON value.
  */

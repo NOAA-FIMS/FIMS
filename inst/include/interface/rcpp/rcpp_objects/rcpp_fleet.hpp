@@ -72,9 +72,11 @@ class FleetInterface : public FleetInterfaceBase {
       log_Fmort;           /**< log of fishing mortality rate for the fleet*/
   bool estimate_F = false; /**< whether the parameter F should be estimated*/
   bool estimate_q = false; /**< whether the parameter q should be estimated*/
-  bool random_q = false;   /**< whether q should be a random effect*/
-  bool random_F = false;   /**< whether F should be a random effect*/
-  Parameter log_obs_error; /**< the log of the observation error */
+  bool estimate_obs_error = false;   /**< whether the parameter log_obs_error
+                                          should be estimated*/
+  bool random_q = false;             /**< whether q should be a random effect*/
+  bool random_F = false;             /**< whether F should be a random effect*/
+  Rcpp::NumericVector log_obs_error; /**< the log of the observation error */
 
   FleetInterface() : FleetInterfaceBase() {}
 
@@ -149,10 +151,15 @@ class FleetInterface : public FleetInterfaceBase {
         interface_observed_agecomp_data_id_m;
     fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m;
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
-    fleet->log_obs_error = this->log_obs_error.value_m;
-    if (this->log_obs_error.estimated_m) {
-      info->RegisterParameter(fleet->log_obs_error);
+
+    fleet->log_obs_error.resize(this->log_obs_error.size());
+    for (int i = 0; i < log_obs_error.size(); i++) {
+      fleet->log_obs_error[i] = this->log_obs_error[i];
+      if (this->estimate_obs_error) {
+        info->RegisterParameter(fleet->log_obs_error[i]);
+      }
     }
+
     fleet->log_q = this->log_q;
     if (this->estimate_q) {
       if (this->random_q) {

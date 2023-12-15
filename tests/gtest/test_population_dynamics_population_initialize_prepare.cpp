@@ -40,14 +40,14 @@ namespace
         
         EXPECT_EQ(
             population.unfished_spawning_biomass,
-            std::vector<double>(nyears + 1, 0) // vector size type = 1 and vector value = 0
+            fims::Vector<double>(nyears + 1, 0) // vector size type = 1 and vector value = 0
         );
 
         for (int i = 0; i < population.spawning_biomass.size(); i++)
         {
             EXPECT_EQ(
                 population.spawning_biomass,
-                std::vector<double>(nyears + 1, 0) // vector size type = 1 and vector value = 0)
+                fims::Vector<double>(nyears + 1, 0) // vector size type = 1 and vector value = 0)
             );
         };
 
@@ -55,7 +55,7 @@ namespace
         {
             EXPECT_EQ(
                 population.mortality_F,
-                std::vector<double>(nyears * nages, 0) // vector size type = 1 and vector value = 0)
+                fims::Vector<double>(nyears * nages, 0) // vector size type = 1 and vector value = 0)
             );
         };
 
@@ -63,19 +63,19 @@ namespace
         {
             EXPECT_EQ(
                 population.expected_catch,
-                std::vector<double>(nyears * nfleets, 0)
+                fims::Vector<double>(nyears * nfleets, 0)
             );
         };
 
         // Test population.naa
-        std::vector<double> naa(nages, 0);
+        fims::Vector<double> naa(nages, 0);
         for (int i = 0; i < nages; i++)
         {
             naa[i] = fims_math::exp(population.log_init_naa[i]);
         }
 
         // Test population.M
-        std::vector<double> M(nyears * nages, 0);
+        fims::Vector<double> M(nyears * nages, 0);
         for (int i = 0; i < nyears * nages; i++)
         {
             M[i] = fims_math::exp(population.log_M[i]);
@@ -85,7 +85,7 @@ namespace
 
         // Test population.fleet->Fmort 
         // fmort and logfmort are vectors of length year
-        std::vector<double> Fmort(nfleets * nyears, 0);
+        fims::Vector<double> Fmort(nfleets * nyears, 0);
         for(size_t i = 0; i < nfleets; i++){
             for(size_t y = 0; y < nyears; y++){
                 size_t index_yf = y * population.nfleets + i;

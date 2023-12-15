@@ -20,6 +20,7 @@
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
 // issue
 #include <math.h>
+
 #include <TMB.hpp>
 
 // define REPORT, ADREPORT, and SIMULATE
@@ -52,26 +53,5 @@ vector<Type> ADREPORTvector(vector<vector<Type> > x) {
 #define SIMULATE_F(F) if (isDouble<Type>::value && F->do_simulate)
 
 #endif /* TMB_MODEL */
-
-namespace fims {
-
-#ifdef TMB_MODEL
-/**
- *  @brief ModelTraits class that contains the DataVector
- * and ParameterVector types.
- */
-template <typename Type>
-struct ModelTraits {
-  typedef typename CppAD::vector<Type> DataVector;      /**< This is a vector
-        of the data that is differentiable */
-  typedef typename CppAD::vector<Type> ParameterVector; /**< This is a
-  vector of the parameters that is differentiable */
-  typedef typename tmbutils::vector<Type>
-      EigenVector; /**< This is a vector as defined in TMB's namespace Eigen */
-  typedef typename tmbutils::matrix<Type>
-      EigenMatrix; /**< This is a matrix as defined in TMB's namespace Eigen */
-};
-#endif /* TMB_MODEL */
-}  // namespace fims
 
 #endif /* FIMS_INTERFACE_HPP */

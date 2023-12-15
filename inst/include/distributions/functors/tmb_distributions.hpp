@@ -11,6 +11,7 @@
 
 #ifdef TMB_MODEL
 
+#include "../../common/fims_vector.hpp"
 #include "distributions_base.hpp"
 
 namespace fims_distributions {
@@ -46,11 +47,9 @@ struct Dnorm : public DistributionsBase<Type> {
  */
 template <typename Type>
 struct Dmultinom : public DistributionsBase<Type> {
-  /** EigenVector defined in interface.hpp */
-  using Vector = typename fims::ModelTraits<Type>::EigenVector;
-  Vector x; /**< Vector of length K of integers */
-  Vector p; /**< Vector of length K, specifying the probability for the K
-               classes (note, unlike in R these must sum to 1). */
+  fims::Vector<Type> x; /*!< Vector of length K of integers */
+  fims::Vector<Type> p; /*!< Vector of length K, specifying the probability for
+               the K classes (note, unlike in R these must sum to 1). */
 
   Dmultinom() : DistributionsBase<Type>() {}
 
@@ -64,7 +63,7 @@ struct Dmultinom : public DistributionsBase<Type> {
    * @param do_log Boolean; if true, log densities are returned
    */
   virtual const Type evaluate(const bool& do_log) {
-    return dmultinom(x, p, do_log);
+    return dmultinom<Type>(x, p, do_log);
   }
 };
 

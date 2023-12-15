@@ -24,8 +24,8 @@
 
 namespace fims_popdy {
 /*TODO:
-Review, add functions to evaluate, push vectors back to fleet (or point to fleet
-directly?)
+ Review, add functions to evaluate, push vectors back to fleet (or point to
+ fleet directly?)
  */
 
 /**
@@ -34,77 +34,76 @@ directly?)
  */
 template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
-  using ParameterVector =
-      typename fims::ModelTraits<Type>::ParameterVector; /**< the vector of
-                                                      population parameters*/
-  static uint32_t id_g; /**< reference id for population object*/
-  size_t nyears;        /**< total number of years in the fishery*/
-  size_t nseasons;      /**< total number of seasons in the fishery*/
-  size_t nages;         /**< total number of ages in the population*/
-  size_t nfleets;       /**< total number of fleets in the fishery*/
+  static uint32_t id_g; /*!< reference id for population object*/
+  size_t nyears;        /*!< total number of years in the fishery*/
+  size_t nseasons;      /*!< total number of seasons in the fishery*/
+  size_t nages;         /*!< total number of ages in the population*/
+  size_t nfleets;       /*!< total number of fleets in the fishery*/
 
   // constants
   const Type proportion_female =
-      0.5; /**< Sex proportion fixed at 50/50 for M1*/
+      0.5; /*!< Sex proportion fixed at 50/50 for M1*/
 
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
-  std::vector<Type> log_init_naa; /**< estimated parameter: log numbers at age*/
-  ParameterVector log_M; /**< estimated parameter: log Natural Mortality*/
+  fims::Vector<Type>
+      log_init_naa;         /*!< estimated parameter: log numbers at age*/
+  fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
 
   // Transformed values
-  std::vector<Type> M; /**< transformed parameter: Natural Mortality*/
+  fims::Vector<Type> M; /*!< transformed parameter: Natural Mortality*/
 
-  std::vector<double> ages;    /**< vector of the ages for referencing*/
-  std::vector<double> years;   /**< vector of years for referencing*/
-  ParameterVector mortality_F; /**< vector of fishing mortality summed across
-                                    fleet by year and age*/
-  std::vector<Type>
-      mortality_Z; /**< vector of total mortality by year and age*/
+  fims::Vector<double> ages;      /*!< vector of the ages for referencing*/
+  fims::Vector<double> years;     /*!< vector of years for referencing*/
+  fims::Vector<Type> mortality_F; /*!< vector of fishing mortality summed across
+                                   fleet by year and age*/
+  fims::Vector<Type>
+      mortality_Z; /*!< vector of total mortality by year and age*/
 
   // derived quantities
-  std::vector<Type>
-      weight_at_age; /**< Derived quantity: expected weight at age */
+  fims::Vector<Type>
+      weight_at_age; /*!< Derived quantity: expected weight at age */
   // fecundity removed because we don't need it yet
-  std::vector<Type> numbers_at_age; /**< Derived quantity: population expected
-                                 numbers at age in each year*/
-  std::vector<Type>
-      unfished_numbers_at_age; /**< Derived quantity: population expected
+  fims::Vector<Type> numbers_at_age; /*!< Derived quantity: population expected
+                                      numbers at age in each year*/
+  fims::Vector<Type>
+      unfished_numbers_at_age; /*!< Derived quantity: population expected
                                 unfished numbers at age in each year*/
-  std::vector<Type>
-      biomass; /**< Derived quantity: total population biomass in each year*/
-  std::vector<Type> spawning_biomass; /**< Derived quantity: Spawning_biomass*/
-  std::vector<Type> unfished_biomass; /**< Derived quanity
-                                            biomass assuming unfished*/
-  std::vector<Type> unfished_spawning_biomass; /**< Derived quanity Spawning
-                                            biomass assuming unfished*/
-  std::vector<Type> proportion_mature_at_age;  /**< Derived quantity: Proportion
-                                             matura at age */
-  std::vector<Type> expected_numbers_at_age;   /**< Expected values: Numbers at
-                                              age (thousands?? millions??) */
-  std::vector<Type> expected_catch;            /**< Expected values: Catch*/
-  std::vector<Type> expected_recruitment;      /**< Expected recruitment */
-  // recruitment
-  int recruitment_id = -999; /**< id of recruitment model object*/
-  std::shared_ptr<RecruitmentBase<Type>>
-      recruitment; /**< shared pointer to recruitment module */
+  fims::Vector<Type>
+      biomass; /*!< Derived quantity: total population biomass in each year*/
+  fims::Vector<Type> spawning_biomass; /*!< Derived quantity: Spawning_biomass*/
+  fims::Vector<Type> unfished_biomass; /*!< Derived quanity
+                                        biomass assuming unfished*/
+  fims::Vector<Type> unfished_spawning_biomass; /*!< Derived quanity Spawning
+                                                 biomass assuming unfished*/
+  fims::Vector<Type> proportion_mature_at_age; /*!< Derived quantity: Proportion
+                                                matura at age */
+  fims::Vector<Type> expected_numbers_at_age;  /*!< Expected values: Numbers at
+                                                age (thousands?? millions??) */
+  fims::Vector<Type> expected_catch;           /*!< Expected values: Catch*/
+  fims::Vector<Type> expected_recruitment;     /*!< Expected recruitment */
+  /// recruitment
+  int recruitment_id = -999; /*!< id of recruitment model object*/
+  std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
+      recruitment; /*!< shared pointer to recruitment module */
 
   // growth
-  int growth_id = -999; /**< id of growth model object*/
-  std::shared_ptr<GrowthBase<Type>>
-      growth; /**< shared pointer to growth module */
+  int growth_id = -999; /*!< id of growth model object*/
+  std::shared_ptr<fims_popdy::GrowthBase<Type>>
+      growth; /*!< shared pointer to growth module */
 
   // maturity
-  int maturity_id = -999; /**< id of maturity model object*/
-  std::shared_ptr<MaturityBase<Type>>
-      maturity; /**< shared pointer to maturity module */
+  int maturity_id = -999; /*!< id of maturity model object*/
+  std::shared_ptr<fims_popdy::MaturityBase<Type>>
+      maturity; /*!< shared pointer to maturity module */
 
   // fleet
-  int fleet_id = -999; /**< id of fleet model object*/
-  std::vector<std::shared_ptr<Fleet<Type>>>
-      fleets; /**< shared pointer to fleet module */
+  int fleet_id = -999; /*!< id of fleet model object*/
+  std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
+      fleets; /*!< shared pointer to fleet module */
 
   // Define objective function object to be able to REPORT and ADREPORT
+
 #ifdef TMB_MODEL
   ::objective_function<Type>
       *of;  // :: references global namespace, defined in src/FIMS.cpp,
@@ -179,7 +178,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       for (size_t year = 0; year < this->nyears; year++) {
         size_t i_age_year = age * this->nyears + year;
         this->M[i_age_year] = fims_math::exp(this->log_M[i_age_year]);
-        // mortality_F is a ParameterVector and therefore needs to be filled
+        // mortality_F is a fims::Vector and therefore needs to be filled
         // within a loop
         this->mortality_F[i_age_year] = 0.0;
       }
@@ -393,15 +392,22 @@ struct Population : public fims_model_object::FIMSObject<Type> {
                    << this->recruitment->evaluate(
                           this->spawning_biomass[year - 1], phi0)
                    << std::endl;
-    this->numbers_at_age[i_age_year] =
-        this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
-        /*the log_recruit_dev vector does not include a value for year == 0
-        and is of length nyears - 1 where the first position of the vector
-        corresponds to the second year of the time series.*/
-        fims_math::exp(this->recruitment->log_recruit_devs[i_dev-1]);
-    this->expected_recruitment[year] = this->numbers_at_age[i_age_year];
-    POPULATION_LOG << " numbers at age at index i_age_year " << i_age_year << " is "
-                   << this->numbers_at_age[i_age_year] << std::endl;
+    if (i_dev == this->nyears) {
+      this->numbers_at_age[i_age_year] =
+          this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0);
+      /*the final year of the time series has no data to inform recruitment
+      devs, so this value is set to the mean recruitment.*/
+    } else {
+      this->numbers_at_age[i_age_year] =
+          this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
+          /*the log_recruit_dev vector does not include a value for year == 0
+          and is of length nyears - 1 where the first position of the vector
+          corresponds to the second year of the time series.*/
+          fims_math::exp(this->recruitment->log_recruit_devs[i_dev - 1]);
+      this->expected_recruitment[year] = this->numbers_at_age[i_age_year];
+    }
+    POPULATION_LOG << " numbers at age at index i_age_year " << i_age_year
+                   << " is " << this->numbers_at_age[i_age_year] << std::endl;
   }
 
   /**

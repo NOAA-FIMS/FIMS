@@ -1,5 +1,4 @@
 test_that("Rcpp interface works for modules", {
-
   expect_no_error(parameter <- new(Parameter, .1))
   expect_no_error(beverton_holt <- new(BevertonHoltRecruitment))
   expect_no_error(logistic_selectivity <- new(LogisticSelectivity))
