@@ -40,15 +40,12 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   size_t nages;         /*!< total number of ages in the population*/
   size_t nfleets;       /*!< total number of fleets in the fishery*/
 
-  // constants
-  const Type proportion_female =
-      0.5; /*!< Sex proportion fixed at 50/50 for M1*/
-
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
   fims::Vector<Type>
       log_init_naa;         /*!< estimated parameter: log numbers at age*/
   fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
+  fims::Vector<Type> proportion_female; /*!< estimated parameter: proportion female by year or age */
 
   // Transformed values
   fims::Vector<Type> M; /*!< transformed parameter: Natural Mortality*/
@@ -316,9 +313,9 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    */
   void CalculateSpawningBiomass(size_t i_age_year, size_t year, size_t age) {
     this->spawning_biomass[year] +=
-        this->proportion_female * this->numbers_at_age[i_age_year] *
+        this->proportion_female[i_age_year] * this->numbers_at_age[i_age_year] *
         this->proportion_mature_at_age[i_age_year] * this->weight_at_age[age];
-    POPULATION_LOG << " proportion female " << this->proportion_female << " "
+    POPULATION_LOG << " proportion female " << this->proportion_female[i_age_year] << " "
                    << " mature age " << age << " is "
                    << this->proportion_mature_at_age[i_age_year] << " "
                    << " numbers at age " << this->numbers_at_age[i_age_year]
