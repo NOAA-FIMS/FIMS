@@ -63,9 +63,10 @@ class PopulationInterface : public PopulationInterfaceBase {
   Rcpp::NumericVector log_M; /**< log of the natural mortality of the stock*/
   Rcpp::NumericVector log_init_naa; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
-  double proportion_female; /**<doule representing the proportion of female individuals */
+  Rcpp::NumericVector proportion_female; /**<doule representing the proportion of female individuals */
   bool estimate_M;          /**<whether parameter should be estimated*/
   bool estimate_initNAA;    /**<whether parameter should be estimated*/
+  bool estimate_prop_female; /**<whether proportion female should be estimated*/
 
   PopulationInterface() : PopulationInterfaceBase() {}
 
@@ -129,8 +130,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->maturity_id = this->maturity_id;
     population->log_M.resize(this->log_M.size());
     population->log_init_naa.resize(this->log_init_naa.size());
-    population->proportion_female = this->proportion_female;
-    info->RegisterParameter(population->proportion_female);
     for (int i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i];
       if (estimate_M) {
@@ -147,6 +146,13 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
+    for (int i = 0; i < proportion_female.size(); i++) {
+      population->proportion_female[i] = this->proportion_female[i];
+      if(estimate_prop_female){
+        info->RegisterParameter(population->proportion_female[i]);
+      }
+    }
+
 
     // add to Information
     info->populations[population->id] = population;
