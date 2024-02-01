@@ -397,7 +397,7 @@ RCPP_MODULE(fims) {
       .field("nyears", &PopulationInterface::nyears)
       .field("log_M", &PopulationInterface::log_M)
       .field("log_init_naa", &PopulationInterface::log_init_naa)
-      .field("prop_female", &PopulationInterface::prop_female)
+      .field("proportion_female", &PopulationInterface::proportion_female)
       .field("ages", &PopulationInterface::ages)
       .field("estimate_M", &PopulationInterface::estimate_M)
       .field("estimate_init_naa", &PopulationInterface::estimate_initNAA)
