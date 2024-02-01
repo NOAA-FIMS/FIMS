@@ -31,6 +31,7 @@ namespace
         EXPECT_EQ(population.unfished_spawning_biomass.size(), (nyears + 1));
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
         EXPECT_EQ(population.log_init_naa.size(), nages);
+        EXPECT_EQ(population.proportion_female.size(), nages);
         EXPECT_EQ(population.log_M.size(), nyears * nages);
         EXPECT_EQ(population.M.size(), nyears * nages);
     }
@@ -82,6 +83,13 @@ namespace
             EXPECT_EQ(population.M[i], M[i]);
         }
         EXPECT_EQ(population.M.size(), nyears * nages);
+
+        // Test population.proportion_female
+        fims::Vector<double> p_female(nages, 0.5);
+        for(int i = 0; i < nages; i++)
+        {
+            EXPECT_EQ(population.proportion_female[i], p_female[i]);
+        }
 
         // Test population.fleet->Fmort 
         // fmort and logfmort are vectors of length year
