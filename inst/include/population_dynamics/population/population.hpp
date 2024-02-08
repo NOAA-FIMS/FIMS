@@ -45,7 +45,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       log_init_naa;         /*!< estimated parameter: log numbers at age*/
   fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
-  fims::Vector<Type> proportion_female; /*!< estimated parameter: proportion female by year or age */
+  fims::Vector<Type> proportion_female; /*!< estimated parameter: proportion female by age */
 
   // Transformed values
   fims::Vector<Type> M; /*!< transformed parameter: Natural Mortality*/
@@ -74,7 +74,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> unfished_spawning_biomass; /*!< Derived quanity Spawning
                                                  biomass assuming unfished*/
   fims::Vector<Type> proportion_mature_at_age; /*!< Derived quantity: Proportion
-                                                matura at age */
+                                                mature at age */
   fims::Vector<Type> expected_numbers_at_age;  /*!< Expected values: Numbers at
                                                 age (thousands?? millions??) */
   fims::Vector<Type> expected_catch;           /*!< Expected values: Catch*/
