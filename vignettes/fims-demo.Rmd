@@ -99,7 +99,7 @@ Now that we've prepared the data, let's pass it into FIMS. Each module in the FI
 
 #### Fleet Data
 
-Each fleet is required to have data in order to evaluate the objective function. Currently FIMS only has a fleet module that is used to set up both fleets and surveys. FIMS contains an Index module and AgeComp module to pass data objects into the fleet module. Each of these data modules require a dimension be added to indicate the dimensions of the raw data (e.g. nyears x nages matrix). Given this information, FIMS is able to correctly apply dimension folding for model output.
+Each fleet is required to have data in order to evaluate the objective function. Currently FIMS only has a fleet module that is used to set up both fleets and surveys. FIMS contains an Index module and AgeComp module to pass data objects into the fleet module. Each of these data modules require a dimension be added to indicate the dimensions of the raw data (e.g. nyears x nages matrix). Any years with missing data should be specified with a value set to -999. Given this information, FIMS is able to correctly apply dimension folding for model output.
 
 Using the `methods::show()` function, we can see that the Index module has a vector field named *index_data* and the AgeComp module has a vector field names *age_comp_data*. 
 
