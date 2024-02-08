@@ -13,7 +13,7 @@ namespace
         std::vector<double> test_SB(nyears + 1, 0);
         std::vector<double> test_B(nyears + 1, 0);
 
-        test_SB[year] += population.numbers_at_age[i_age_year] * 0.5 * population.proportion_mature_at_age[i_age_year] *
+        test_SB[year] += population.numbers_at_age[i_age_year] * population.proportion_female[age] * population.proportion_mature_at_age[i_age_year] *
                          population.growth->evaluate(population.ages[age]);
         test_B[year] += population.numbers_at_age[i_age_year] *
                          population.growth->evaluate(population.ages[age]);
@@ -40,7 +40,7 @@ namespace
 
         std::vector<double> test_SSB(nyears + 1, 0);
 
-        test_SSB[nyears] += population.numbers_at_age[i_age_year] * 0.5 * 
+        test_SSB[nyears] += population.numbers_at_age[i_age_year] * population.proportion_female[age] * 
             population.proportion_mature_at_age[i_age_year] * 
             population.growth->evaluate(population.ages[age]);
 
