@@ -635,12 +635,12 @@ test_that("run FIMS in a for loop", {
     fishing_fleet_index$index_data <- catch
     testindex <- 2
     na_value <- -999
-    if(i==4){
+    if (i == 4) {
       fishing_fleet_index$index_data[testindex] <- na_value
     }
     fishing_fleet_age_comp <- new(fims$AgeComp, length(catch), om_input$nages)
     fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
-    if(i==5){
+    if (i == 5) {
       fishing_fleet_age_comp$age_comp_data[testindex] <- na_value
     }
 
