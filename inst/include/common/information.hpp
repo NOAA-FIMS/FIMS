@@ -379,6 +379,7 @@ class Information {
         INFO_LOG << f->id << " " << std::flush;
       }
       INFO_LOG << "]" << std::endl;
+      
 
       INFO_LOG << "Initializing population " << p->id << "." << std::endl;
       p->Initialize(p->nyears, p->nseasons, p->nages);

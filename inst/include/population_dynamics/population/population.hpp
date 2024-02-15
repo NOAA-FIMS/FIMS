@@ -46,6 +46,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       log_init_naa;         /*!< estimated parameter: log numbers at age*/
   fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
   fims::Vector<Type> proportion_female; /*!< estimated parameter: proportion female by age */
+  fims::Vector<Type> linked_populations; /*!< vector of population objects that affect this population */
 
   // Transformed values
   fims::Vector<Type> M; /*!< transformed parameter: Natural Mortality*/
@@ -155,10 +156,12 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     POPULATION_LOG << "nfleets: " << this->nfleets << std::endl;
     POPULATION_LOG << "nseasons: " << this->nseasons << std::endl;
     POPULATION_LOG << "nyears: " << this->nyears << std::endl;
+    POPULATION_LOG << "linked populations: " << this->linked_populations[0] << std::endl;
 
     for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
       this->fleets[fleet]->Prepare();
     }
+
 
     std::fill(biomass.begin(), biomass.end(), 0.0);
     std::fill(unfished_spawning_biomass.begin(),
@@ -223,6 +226,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     }
     POPULATION_LOG << "M in calculate mortality is " << this->M[i_age_year]
                    << std::endl;
+
     this->mortality_Z[i_age_year] =
         this->M[i_age_year] + this->mortality_F[i_age_year];
   }
