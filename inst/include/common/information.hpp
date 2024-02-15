@@ -383,8 +383,8 @@ class Information {
       INFO_LOG << "Checking for available population links." << std::endl;
       for(size_t i = 0; i<p->linked_population_ids.size(); i++){
         // set recruitment
-      if (p->linked_population_id[i] != -999) {
-        uint32_t population_link_uint = static_cast<uint32_t>(p->linked_population_id[i]);
+      if (p->linked_population_ids[i] != -999) {
+        uint32_t population_link_uint = static_cast<uint32_t>(p->linked_population_ids[i]);
         population_iterator it =
             this->populations.find(population_link_uint);
         INFO_LOG << "Input population link id = " << population_link_uint << "."
@@ -397,7 +397,7 @@ class Information {
           valid_model = false;
           ERROR_LOG << "Error: Expected linked population function not defined for "
                        "population "
-                    << p->id << ", linked population " << linked_population_uint
+                    << p->id << ", linked population " << population_link_uint
                     << std::endl;
           exit(1);
         }

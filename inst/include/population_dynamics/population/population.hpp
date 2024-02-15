@@ -47,7 +47,9 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
   fims::Vector<Type> proportion_female; /*!< estimated parameter: proportion female by age */
   fims::Vector<Type> linked_population_ids; /*!< vector of population ids of population objects that affect this population */
-  fims::Vector<Type> linked_populations; /*!< vector of population objects that affect this population */
+  std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > >
+      linked_populations; /**<hash map to link each object to its shared location in
+                 memory*/
 
   // Transformed values
   fims::Vector<Type> M; /*!< transformed parameter: Natural Mortality*/
@@ -157,7 +159,10 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     POPULATION_LOG << "nfleets: " << this->nfleets << std::endl;
     POPULATION_LOG << "nseasons: " << this->nseasons << std::endl;
     POPULATION_LOG << "nyears: " << this->nyears << std::endl;
-    POPULATION_LOG << "linked populations: " << this->linked_populations[0] << std::endl;
+
+    uint32_t link_pop_id = static_cast<uint32_t>(linked_population_ids[0]);  // cast as unsigned integer 
+
+    POPULATION_LOG << "linked populations: " << this->linked_populations.find(link_pop_id) << std::endl;
 
     for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
       this->fleets[fleet]->Prepare();
