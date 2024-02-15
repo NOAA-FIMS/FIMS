@@ -385,7 +385,7 @@ class Information {
         // set recruitment
       if (p->linked_population_id[i] != -999) {
         uint32_t population_link_uint = static_cast<uint32_t>(p->linked_population_id[i]);
-        linked_population_iterator it =
+        population_iterator it =
             this->populations.find(population_link_uint);
         INFO_LOG << "Input population link id = " << population_link_uint << "."
                  << std::endl;
