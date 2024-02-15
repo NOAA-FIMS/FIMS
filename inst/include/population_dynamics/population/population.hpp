@@ -46,6 +46,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       log_init_naa;         /*!< estimated parameter: log numbers at age*/
   fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
   fims::Vector<Type> proportion_female; /*!< estimated parameter: proportion female by age */
+  fims::Vector<Type> linked_population_ids; /*!< vector of population ids of population objects that affect this population */
   fims::Vector<Type> linked_populations; /*!< vector of population objects that affect this population */
 
   // Transformed values
