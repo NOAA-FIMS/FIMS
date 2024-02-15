@@ -391,7 +391,7 @@ class Information {
                  << std::endl;
         if (it != this->populations.end()) {
           p->linked_populations[i] =
-              (*it).second;  // recruitment defined in population.hpp
+              (*it).second;  // population links defined in population.hpp
           INFO_LOG << "Linked population successfully set." << std::endl;
         } else {
           valid_model = false;
@@ -401,6 +401,7 @@ class Information {
                     << std::endl;
           exit(1);
         }
+      }
       }
       
 
