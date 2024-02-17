@@ -402,10 +402,12 @@ RCPP_MODULE(fims) {
       .field("estimate_M", &PopulationInterface::estimate_M)
       .field("estimate_init_naa", &PopulationInterface::estimate_initNAA)
       .field("estimate_prop_female", &PopulationInterface::estimate_prop_female)
+      .field("linked_population_id", &PopulationInterface::linked_population_id)
       .method("evaluate", &PopulationInterface::evaluate)
       .method("SetMaturity", &PopulationInterface::SetMaturity)
       .method("SetGrowth", &PopulationInterface::SetGrowth)
       .method("SetRecruitment", &PopulationInterface::SetRecruitment)
+      .method("SetLinkedPopulations", &PopulationInterface::SetLinkedPopulations)
       .method("evaluate", &PopulationInterface::evaluate);
 
   Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")

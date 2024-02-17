@@ -1,6 +1,7 @@
 library(testthat)
 test_that("Population input settings work as expected", {
   population <- new(Population)
+  population2 <- new(Population)
   nyears <- 10
   nages <- 10
   population$log_M <- rep(-1, nyears*nages)
@@ -25,4 +26,25 @@ test_that("Population input settings work as expected", {
 
   clear()
 
+})
+
+test_that("You can create and link multiple populations",{
+  population <- new(Population)
+  population2 <- new(Population)
+  nyears <- 10
+  nages <- 10
+  population$log_M <- rep(-1, nyears*nages)
+  population$estimate_M <- FALSE
+  population$log_init_naa <- log(rep(1, nages))
+  population$estimate_init_naa <- TRUE
+  population$nages <- nages
+  population$ages <- 1:nages
+  population$nfleets <- 2
+  population$nseasons <- 1
+  population$nyears <- nyears
+  population$proportion_female <- rep(0.5, nages)
+  population$estimate_prop_female <- FALSE
+  population$linked_population_id <- c(2)
+
+  expect_equal(population$get_id(), 1)
 })

@@ -171,6 +171,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$population$SetMaturity(test_env$maturity$get_id())
   test_env$population$SetGrowth(test_env$ewaa_growth$get_id())
   test_env$population$SetRecruitment(test_env$recruitment$get_id())
+  test_env$population$SetLinkedPopulations(2)
 
   # end of setup_fims function, returning test_env
   return(test_env)

@@ -60,7 +60,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   uint32_t maturity_id;      /**< id of the maturity function*/
   uint32_t growth_id;        /**< id of the growth function*/
   uint32_t recruitment_id;   /**< id of the recruitment function*/
-  Rcpp::NumericVector linked_population_ids; /**< vector of IDs of populations that affect this one */
+  uint32_t linked_population_id; /**< id of a population that affects this one */
   Rcpp::NumericVector log_M; /**< log of the natural mortality of the stock*/
   Rcpp::NumericVector log_init_naa; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
@@ -98,6 +98,10 @@ class PopulationInterface : public PopulationInterfaceBase {
     this->recruitment_id = recruitment_id;
   }
 
+  void SetLinkedPopulations(uint32_t population_id){
+    this->linked_population_id = population_id;
+  }
+
   /** @brief evaluate the population function */
   virtual void evaluate() {
     fims_popdy::Population<double> population;
@@ -120,10 +124,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->nfleets = this->nfleets;
     population->nseasons = this->nseasons;
     population->nages = this->nages;
-    population->linked_population_ids.resize(this->linked_population_ids.size());
-    for(int i = 0; i <- linked_population_ids.size(); i++){
-      population->linked_population_ids[i] = this->linked_population_ids[i];
-    }
+    population->linked_population_id = this->linked_population_id;
     if (this->nages == this->ages.size()) {
       population->ages.resize(this->nages);
     } else {
