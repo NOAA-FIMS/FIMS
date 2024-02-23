@@ -16,6 +16,7 @@
 
 template<typename Type>
 class Area {
+    
 public:
     std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > area_specific_recruitment;
     typedef typename std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> >::iterator recruitment_iterator;
