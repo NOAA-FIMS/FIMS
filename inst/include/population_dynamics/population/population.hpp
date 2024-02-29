@@ -45,7 +45,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       log_init_naa;         /*!< estimated parameter: log numbers at age*/
   fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
-  fims::Vector<Type> proportion_female; /*!< estimated parameter: proportion female by age */
+  fims::Vector<Type>
+      proportion_female; /*!< estimated parameter: proportion female by age */
 
   // Transformed values
   fims::Vector<Type> M; /*!< transformed parameter: Natural Mortality*/
@@ -317,7 +318,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     this->spawning_biomass[year] +=
         this->proportion_female[age] * this->numbers_at_age[i_age_year] *
         this->proportion_mature_at_age[i_age_year] * this->weight_at_age[age];
-    POPULATION_LOG << " proportion female " << this->proportion_female[age] << " "
+    POPULATION_LOG << " proportion female " << this->proportion_female[age]
+                   << " "
                    << " mature age " << age << " is "
                    << this->proportion_mature_at_age[i_age_year] << " "
                    << " numbers at age " << this->numbers_at_age[i_age_year]
@@ -339,7 +341,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   void CalculateUnfishedSpawningBiomass(size_t i_age_year, size_t year,
                                         size_t age) {
     this->unfished_spawning_biomass[year] +=
-        this->proportion_female[age] * this->unfished_numbers_at_age[i_age_year] *
+        this->proportion_female[age] *
+        this->unfished_numbers_at_age[i_age_year] *
         this->proportion_mature_at_age[i_age_year] * this->weight_at_age[age];
   }
 
@@ -364,7 +367,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     numbers_spr[this->nages - 1] =
         (numbers_spr[nages - 2] * fims_math::exp(-this->M[nages - 2])) /
         (1 - fims_math::exp(-this->M[this->nages - 1]));
-    phi_0 += numbers_spr[this->nages - 1] * this->proportion_female[this->nages - 1] *
+    phi_0 += numbers_spr[this->nages - 1] *
+             this->proportion_female[this->nages - 1] *
              this->proportion_mature_at_age[this->nages - 1] *
              this->growth->evaluate(ages[this->nages - 1]);
     return phi_0;
