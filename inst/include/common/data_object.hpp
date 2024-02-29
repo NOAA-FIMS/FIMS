@@ -51,7 +51,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
   size_t jmax;            /**< 2nd dimension of data object>*/
   size_t kmax;            /**< 3rd dimension of data object>*/
   size_t lmax;            /**< 4th dimension of data object>*/
-  Type na_value = -999;    /**< specifying the NA value >*/
+  Type na_value = -999;   /**< specifying the NA value >*/
 
   /**
    * Constructs a one-dimensional data object.

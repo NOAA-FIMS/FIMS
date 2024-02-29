@@ -168,28 +168,30 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         observed_acomp.resize(this->nages);
         expected_acomp.resize(this->nages);
         Type sum = 0.0;
-        bool containsNA = false; /**< skips the entire year if any values are NA */
+        bool containsNA =
+            false; /**< skips the entire year if any values are NA */
         for (size_t a = 0; a < this->nages; a++) {
-          if(this->observed_agecomp_data->at(y,a) != this->observed_agecomp_data->na_value){
+          if (this->observed_agecomp_data->at(y, a) !=
+              this->observed_agecomp_data->na_value) {
             size_t i_age_year = y * this->nages + a;
             sum += this->catch_numbers_at_age[i_age_year];
-          } else{
+          } else {
             containsNA = true; /**< sets to true if any values are NA >*/
             break;
           }
         }
-        if(!containsNA){
-        for (size_t a = 0; a < this->nages; a++) {
-          size_t i_age_year = y * this->nages + a;
-          expected_acomp[a] = this->catch_numbers_at_age[i_age_year] /
-                              sum;  // probabilities for ages
+        if (!containsNA) {
+          for (size_t a = 0; a < this->nages; a++) {
+            size_t i_age_year = y * this->nages + a;
+            expected_acomp[a] = this->catch_numbers_at_age[i_age_year] /
+                                sum;  // probabilities for ages
 
-          observed_acomp[a] = this->observed_agecomp_data->at(y, a);
+            observed_acomp[a] = this->observed_agecomp_data->at(y, a);
 
-          FLEET_LOG << " age " << a << " in year " << y
-                    << "has expected: " << expected_acomp[a]
-                    << "  and observed: " << observed_acomp[a] << std::endl;
-        }
+            FLEET_LOG << " age " << a << " in year " << y
+                      << "has expected: " << expected_acomp[a]
+                      << "  and observed: " << observed_acomp[a] << std::endl;
+          }
           dmultinom.x = observed_acomp;
           dmultinom.p = expected_acomp;
           nll -= dmultinom.evaluate(true);
@@ -208,7 +210,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 #ifdef TMB_MODEL
     fims_distributions::Dnorm<Type> dnorm;
     for (size_t i = 0; i < this->expected_index.size(); i++) {
-      if(this->observed_index_data->at(i) != this->observed_index_data->na_value){
+      if (this->observed_index_data->at(i) !=
+          this->observed_index_data->na_value) {
         dnorm.x = fims_math::log(this->observed_index_data->at(i));
         dnorm.mean = fims_math::log(this->expected_index[i]);
         dnorm.sd = fims_math::exp(this->log_obs_error[i]);
@@ -219,7 +222,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                 << this->observed_index_data->at(i)
                 << " and expected is: " << this->expected_index[i] << std::endl;
       FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
-
     }
     FLEET_LOG << " sd is: " << dnorm.sd << std::endl;
     FLEET_LOG << " index nll: " << nll << std::endl;
