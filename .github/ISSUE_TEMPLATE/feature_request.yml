@@ -2,8 +2,6 @@ name: Feature Request
 description: Request new features or changes to features, such that the described functionality differs from what is currently in the development plan
 title: "[Feature]: "
 labels: ["kind: enhancement", "status: triage_needed"]
-assignees:
-  - ChristineStawitz-NOAA
 body:
   - type: markdown
     attributes:

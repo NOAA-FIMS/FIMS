@@ -2,8 +2,6 @@ name: Developer (other issue)
 description: For FIMS implementation team members to document other types of issues
 title: "[Developer Issue]: "
 labels: ["status: triage_needed"]
-assignees:
-  - ChristineStawitz-NOAA
 body:
   - type: markdown
     attributes:
