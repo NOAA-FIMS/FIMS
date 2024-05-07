@@ -15,7 +15,12 @@
 		 "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
 			"packages": "RcppEigen,dplyr,ggplot2,jsonlite,magrittr,methods,Rcpp,scales,TMB,usethis,devtools",
 			"installSystemRequirements": true
-		  }
+		  },
+		 // option to run rstudio. you can type rserver into the command line to
+		 // get an session going (opens on a port, that you can open as a 
+		 // separate browser window).
+		 // more details: https://github.com/rocker-org/devcontainer-features/blob/main/src/rstudio-server/README.md
+		 "ghcr.io/rocker-org/devcontainer-features/rstudio-server:0": {}
 		},
 	// // if we want quarto cli
 	     // more info: https://github.com/rocker-org/devcontainer-features/blob/main/src/quarto-cli/README.md
