@@ -1,9 +1,9 @@
-#' {FIMS} input data frame for milestone 1
+#' FIMS input data frame for milestone 1
 #'
 #' A dataset containing information necessary to run an age-structured stock
-#' assessment model in {FIMS} for milestone 1. This data was generated using
-#' the `ASSAMC` package written for the
-#' [model comparison project](www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison).
+#' assessment model in FIMS for milestone 1. This data was generated using
+#' the `ASSAMC` package written for the [model comparison project](
+#' www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison).
 #'
 #' @format A data frame with `r NROW(data_mile1)` observations of
 #' `r NCOL(data_mile1)` variables:

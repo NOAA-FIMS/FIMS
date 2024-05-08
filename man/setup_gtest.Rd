@@ -2,14 +2,13 @@
 % Please edit documentation in R/setup_gtest.R
 \name{setup_gtest}
 \alias{setup_gtest}
-\title{function for setting up your local environment to run the gtest
-integration test locally. Intended for developers.}
+\title{Set up your local environment to run the google tests locally}
 \usage{
 setup_gtest()
 }
 \description{
-function for setting up your local environment to run the gtest
-integration test locally. Intended for developers.
+Intended for developers to set up their local environment prior to running
+the integration tests.
 }
 \examples{
 \dontrun{

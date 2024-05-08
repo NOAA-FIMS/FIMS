@@ -3,7 +3,7 @@
 \docType{data}
 \name{data_mile1}
 \alias{data_mile1}
-\title{{FIMS} input data frame for milestone 1}
+\title{FIMS input data frame for milestone 1}
 \format{
 A data frame with 1140 observations of
 8 variables:
@@ -30,8 +30,7 @@ data_mile1
 }
 \description{
 A dataset containing information necessary to run an age-structured stock
-assessment model in {FIMS} for milestone 1. This data was generated using
-the \code{ASSAMC} package written for the
-\href{www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison}{model comparison project}.
+assessment model in FIMS for milestone 1. This data was generated using
+the \code{ASSAMC} package written for the \href{www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison}{model comparison project}.
 }
 \keyword{datasets}
