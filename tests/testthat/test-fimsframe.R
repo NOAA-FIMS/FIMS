@@ -1,14 +1,12 @@
 # tests for input objects
 data(package = "FIMS")
-age_frame <- FIMSFrameAge(data_mile1)
 fims_frame <- FIMSFrame(data_mile1)
 
 test_that("Can create the S4 FIMSFrame classes", {
-  expect_s4_class(age_frame, "FIMSFrameAge")
   expect_s4_class(fims_frame, "FIMSFrame")
   # A data frame is an S3 object with class data.frame
-  expect_s3_class(age_frame@weightatage, "data.frame")
-  expect_s3_class(age_frame@data, "data.frame")
+  expect_s3_class(fims_frame@weight_at_age, "data.frame")
+  expect_s3_class(fims_frame@data, "data.frame")
 
   expect_s3_class(fims_frame@data, "data.frame")
 
@@ -22,7 +20,6 @@ test_that("Can create the S4 FIMSFrame classes", {
   }
 
   expect_silent(save_png(plot(fims_frame)))
-  expect_silent(save_png(plot(age_frame)))
 })
 
 test_that("Accessors work as expected in FIMSFrame", {
@@ -30,41 +27,39 @@ test_that("Accessors work as expected in FIMSFrame", {
 
   expect_vector(fleets(fims_frame), ptype = numeric())
 
-  expect_type(nyrs(fims_frame), "integer")
-  expect_length(nyrs(fims_frame), 1)
+  expect_type(n_years(fims_frame), "integer")
+  expect_length(n_years(fims_frame), 1)
 
   expect_type(start_year(fims_frame), "integer")
   expect_length(start_year(fims_frame), 1)
 
   expect_type(end_year(fims_frame), "integer")
   expect_length(end_year(fims_frame), 1)
-})
 
-test_that("Accessors work as expected in FIMSFrameAge", {
-  expect_s3_class(get_data(age_frame), "data.frame")
+  expect_s3_class(get_data(fims_frame), "data.frame")
 
-  expect_vector(fleets(age_frame), ptype = numeric())
+  expect_vector(fleets(fims_frame), ptype = numeric())
 
-  expect_type(nyrs(age_frame), "integer")
-  expect_length(nyrs(age_frame), 1)
+  expect_type(n_years(fims_frame), "integer")
+  expect_length(n_years(fims_frame), 1)
 
-  expect_type(start_year(age_frame), "integer")
-  expect_length(start_year(age_frame), 1)
+  expect_type(start_year(fims_frame), "integer")
+  expect_length(start_year(fims_frame), 1)
 
-  expect_type(end_year(age_frame), "integer")
-  expect_length(end_year(age_frame), 1)
+  expect_type(end_year(fims_frame), "integer")
+  expect_length(end_year(fims_frame), 1)
 
 
-  expect_vector(ages(age_frame), ptype = integer())
+  expect_vector(ages(fims_frame), ptype = integer())
 
-  expect_type(nages(age_frame), "integer")
-  expect_length(nages(age_frame), 1)
+  expect_type(n_ages(fims_frame), "integer")
+  expect_length(n_ages(fims_frame), 1)
 
-  expect_s3_class(weightatage(age_frame), "data.frame")
+  expect_s3_class(weight_at_age(fims_frame), "data.frame")
 
-  expect_vector(m_weightatage(age_frame), ptype = numeric())
+  expect_vector(m_weight_at_age(fims_frame), ptype = numeric())
 
-  expect_vector(m_ages(age_frame), ptype = integer())
+  expect_vector(m_ages(fims_frame), ptype = integer())
 })
 
 test_that("Show method works as expected", {
@@ -81,47 +76,47 @@ test_that("Validators work as expected", {
   expect_warning(expect_error(FIMSFrame(bad_input)))
 })
 
-nyears <- age_frame@nyrs
-nages <- max(age_frame@ages)
+n_years <- fims_frame@n_years
+n_ages <- max(fims_frame@ages)
 
-fleet_names_agecomp <- dplyr::filter(
-  .data = as.data.frame(age_frame@data),
+fleet_names_age_comp <- dplyr::filter(
+  .data = as.data.frame(fims_frame@data),
   type == "age"
-) %>%
-  dplyr::distinct(name) %>%
+) |>
+  dplyr::distinct(name) |>
   dplyr::pull(name)
-nagecomp <- length(fleet_names_agecomp)
+n_age_comp <- length(fleet_names_age_comp)
 
 fleet_names_index <- dplyr::filter(
-  .data = as.data.frame(age_frame@data),
+  .data = as.data.frame(fims_frame@data),
   type == "index"
-) %>%
-  dplyr::distinct(name) %>%
+) |>
+  dplyr::distinct(name) |>
   dplyr::pull(name)
-nindex <- length(fleet_names_index)
+n_index <- length(fleet_names_index)
 
 test_that("Can add index data to model", {
-  indexdat <- vector(mode = "list", length = nindex)
-  names(indexdat) <- fleet_names_index
+  index_dat <- vector(mode = "list", length = n_index)
+  names(index_dat) <- fleet_names_index
 
-  for (index_i in 1:nindex) {
+  for (index_i in 1:n_index) {
     index <- Index
-    indexdat[[fleet_names_index[index_i]]] <- new(index, nyears)
-    expect_silent(indexdat[[fleet_names_index[index_i]]] <-
-      m_index(age_frame, fleet_names_index[index_i]))
+    index_dat[[fleet_names_index[index_i]]] <- new(index, n_years)
+    expect_silent(index_dat[[fleet_names_index[index_i]]] <-
+      m_index(fims_frame, fleet_names_index[index_i]))
   }
 
   clear()
 })
 
 test_that("Can add agecomp data to model", {
-  agecompdat <- vector(mode = "list", length = nagecomp)
-  names(agecompdat) <- fleet_names_agecomp
+  age_comp_dat <- vector(mode = "list", length = n_age_comp)
+  names(age_comp_dat) <- fleet_names_age_comp
 
-  for (fleet_f in 1:nagecomp) {
-    agecompdat[[fleet_names_agecomp[fleet_f]]] <- new(AgeComp, nyears, nages)
-    expect_silent(agecompdat[[fleet_names_agecomp[fleet_f]]]$age_comp_data <-
-      m_agecomp(age_frame, fleet_names_agecomp[fleet_f]))
+  for (fleet_f in 1:n_age_comp) {
+    age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- new(AgeComp, n_years, n_ages)
+    expect_silent(age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data <-
+      m_agecomp(fims_frame, fleet_names_age_comp[fleet_f]))
   }
 
   clear()
