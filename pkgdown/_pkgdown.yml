@@ -38,7 +38,6 @@ reference:
   contents:
   - create_fims_rcpp_interface
   - use_module
-  - mkObj
   - has_keyword("gtest_helper")
   - starts_with("FIMSFrame")
   - starts_with("m_")
