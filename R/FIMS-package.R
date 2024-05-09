@@ -6,7 +6,6 @@
 #' @import stats
 #' @import methods
 #' @importFrom ggplot2 .data
-#' @importFrom usethis use_template ui_stop
 #' @export CreateTMBModel
 #' @export get_fixed
 #' @export get_random
