@@ -54,10 +54,10 @@ The `fims_frame` object contains a `@data` slot that holds a long data frame wit
 str(fims_frame)
 fims_frame@data |>
   dplyr::filter(type == "landings") |>
-  head()
+  utils::head()
 fims_frame@data |>
   dplyr::filter(type == "index") |>
-  head()
+  utils::head()
 ```
 
 

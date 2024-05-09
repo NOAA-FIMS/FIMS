@@ -1,7 +1,6 @@
 ## usethis namespace: start
 #' @useDynLib FIMS, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-#' @importFrom utils head
 #' @importFrom TMB MakeADFun
 #' @import stats
 #' @import methods

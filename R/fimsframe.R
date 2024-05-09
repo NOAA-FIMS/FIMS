@@ -226,7 +226,7 @@ setMethod(
       "row.names",
       "names"
     )
-    print(head(object@data))
+    print(utils::head(object@data))
     for (nm in snames[ordinnames]) {
       cat("additional slots: ", nm, ":\n", sep = "")
       print(slot(object, nm))
