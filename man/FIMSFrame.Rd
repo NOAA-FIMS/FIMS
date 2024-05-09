@@ -10,12 +10,12 @@ FIMSFrame(data)
 FIMSFrameAge(data)
 }
 \arguments{
-\item{data}{A \code{data.frame} that contains the necessary columns
-to construct a data frame of a given \code{FIMSFrame-class}.}
+\item{data}{A \code{data.frame} that contains the necessary columns to construct
+a data frame of a given \code{FIMSFrame-class}.}
 }
 \value{
-An object of the S4 class \code{FIMSFrame} or one of its child classes
-is validated and then returned. All objects will at a minimum have a slot
+An object of the S4 class \code{FIMSFrame} or one of its child classes is
+validated and then returned. All objects will at a minimum have a slot
 called \code{data} to store the input data frame. Additional slots are dependent
 on the child class. Use \code{\link[=showClass]{showClass()}} to see all available slots.
 }

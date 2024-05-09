@@ -36,7 +36,7 @@ setClass(
 # Methods for accessing info in the slots
 
 # for now, only getters are included, not setters.
-# # setter example where ages is the slot and Person is the class
+# setter example where ages is the slot and Person is the class
 # setGeneric("age<-", function(x, value) standardGeneric("age<-"))
 # setMethod("age<-", "Person", function(x, value) {
 #   x@age <- value
@@ -93,12 +93,14 @@ setMethod("m_ages", "FIMSFrameAge", function(x) {
 })
 
 #' Get the landings data to be used in the model
-#' @param x The object containing landings
+#'
+#' @param x The object containing landings.
 #' @export
 setGeneric("m_landings", function(x) standardGeneric("m_landings"))
 
 #' Get the landings data to be used in the model
-#' @param x The FIMSFrameAge object containing landings
+#'
+#' @param x The FIMSFrameAge object containing landings.
 #' @export
 setMethod(
   "m_landings", "FIMSFrameAge",
@@ -112,14 +114,16 @@ setMethod(
 )
 
 #' Get the index data to be used in the model
-#' @param x The object containing index
-#' @param fleet_name The name of the fleet for the index data
+#'
+#' @param x The object containing index.
+#' @param fleet_name The name of the fleet for the index data.
 #' @export
 setGeneric("m_index", function(x, fleet_name) standardGeneric("m_index"))
 
 #' Get the index data to be used in the model
-#' @param x The FIMSFrameAge object containing index
-#' @param fleet_name The name of the fleet for the index data
+#'
+#' @param x The FIMSFrameAge object containing index.
+#' @param fleet_name The name of the fleet for the index data.
 #' @export
 setMethod(
   "m_index", "FIMSFrameAge",
@@ -134,16 +138,18 @@ setMethod(
 )
 
 
-#' Get the agecomp data to be used in the model
-#' @param x The object containing agecomp
-#' @param fleet_name The name of the fleet for the agecomp data
+#' Get the age-composition data to be used in the model
+#'
+#' @param x The object containing the age-composition data.
+#' @param fleet_name The name of the fleet for the age-composition data.
 #' @export
 setGeneric("m_agecomp", function(x, fleet_name) standardGeneric("m_agecomp"))
 # Should we add name as an argument here?
 
-#' For FIMSFrameAge, Get the agecomp data to be used in the model
-#' @param x  The FIMSFrameAge containing agecomp
-#' @param fleet_name  The name of the fleet for the agecomp data
+#' For FIMSFrameAge, get the age-composition data data to be used in the model
+#'
+#' @param x  The FIMSFrameAge containing age-composition data.
+#' @param fleet_name  The name of the fleet for the age-composition data.
 #' @export
 setMethod(
   "m_agecomp", "FIMSFrameAge",
@@ -301,24 +307,35 @@ setValidity(
 #' the needs of each model type within \pkg{FIMS}. `FIMSFrame` is the
 #' parent class and the associated child classes have additional slots needed
 #' for each model type.
-#' @export
+#'
 #' @rdname FIMSFrame
-#' @param data A `data.frame` that contains the necessary columns
-#'   to construct a data frame of a given `FIMSFrame-class`.
-#' @return An object of the S4 class `FIMSFrame` or one of its child classes
-#' is validated and then returned. All objects will at a minimum have a slot
+#'
+#' @param data A `data.frame` that contains the necessary columns to construct
+#'   a data frame of a given `FIMSFrame-class`.
+#'
+#' @return
+#' An object of the S4 class `FIMSFrame` or one of its child classes is 
+#' validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [showClass()] to see all available slots.
+#' @export
 FIMSFrame <- function(data) {
-  # Get the earliest and latest year of data and use to calculate n years for population simulation
-  start_year <- as.integer(strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1])
-  end_year <- as.integer(strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1])
+  # Get the earliest and latest year of data and use to calculate n years for
+  # population simulation
+  start_year <- as.integer(
+    strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1]
+  )
+  end_year <- as.integer(
+    strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1]
+  )
   nyrs <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
 
   # Get the fleets represented in the data
   fleets <- unique(data[["name"]])[grep("fleet", unique(data[["name"]]))]
-  fleets <- as.numeric(unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2])))
+  fleets <- as.numeric(
+    unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2]))
+  )
   nfleets <- length(fleets)
   # Make empty NA data frames in the format needed to pass to FIMS
 
@@ -336,17 +353,25 @@ FIMSFrame <- function(data) {
 #' @export
 #' @rdname FIMSFrame
 FIMSFrameAge <- function(data) {
-  # Get the earliest and latest year of data and use to calculate n years for population simulation
-  start_year <- as.integer(strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1])
-  end_year <- as.integer(strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1])
+  # Get the earliest and latest year of data and use to calculate n years for
+  # population simulation
+  start_year <- as.integer(
+    strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1]
+  )
+  end_year <- as.integer(
+    strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1]
+  )
   nyrs <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
   # Get the fleets represented in the data
   fleets <- unique(data[["name"]])[grep("fleet", unique(data[["name"]]))]
-  fleets <- as.numeric(unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2])))
+  fleets <- as.numeric(
+    unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2]))
+  )
   nfleets <- length(fleets)
   # Make empty NA data frames in the format needed to pass to FIMS
-  # Get the range of ages displayed in the data to use to specify population simulation range
+  # Get the range of ages displayed in the data to use to specify population
+  # simulation range
   ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
   nages <- length(ages)
   weightatage <- dplyr::filter(

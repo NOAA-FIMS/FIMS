@@ -2,15 +2,15 @@
 % Please edit documentation in R/fimsframe.R
 \name{m_agecomp,FIMSFrameAge-method}
 \alias{m_agecomp,FIMSFrameAge-method}
-\title{For FIMSFrameAge, Get the agecomp data to be used in the model}
+\title{For FIMSFrameAge, get the age-composition data data to be used in the model}
 \usage{
 \S4method{m_agecomp}{FIMSFrameAge}(x, fleet_name)
 }
 \arguments{
-\item{x}{The FIMSFrameAge containing agecomp}
+\item{x}{The FIMSFrameAge containing age-composition data.}
 
-\item{fleet_name}{The name of the fleet for the agecomp data}
+\item{fleet_name}{The name of the fleet for the age-composition data.}
 }
 \description{
-For FIMSFrameAge, Get the agecomp data to be used in the model
+For FIMSFrameAge, get the age-composition data data to be used in the model
 }

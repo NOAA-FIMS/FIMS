@@ -7,7 +7,7 @@
 \S4method{m_landings}{FIMSFrameAge}(x)
 }
 \arguments{
-\item{x}{The FIMSFrameAge object containing landings}
+\item{x}{The FIMSFrameAge object containing landings.}
 }
 \description{
 Get the landings data to be used in the model
