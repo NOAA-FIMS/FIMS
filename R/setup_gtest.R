@@ -84,6 +84,6 @@ setup_and_run_gtest <- function(...) {
 run_gtest <- function(...) {
   system("cmake -S . -B build -G Ninja")
   system("cmake --build build")
-  system(paste0("ctest --test-dir build", ...))
+  system(paste("ctest --test-dir build", ...))
   TRUE
 }
