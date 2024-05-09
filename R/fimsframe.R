@@ -80,9 +80,9 @@ setMethod(
     dplyr::filter(
       .data = as.data.frame(x@data),
       .data[["type"]] == "weight-at-age"
-    ) %>%
-      dplyr::group_by(.data[["age"]]) %>%
-      dplyr::summarize(mean_value = mean(.data[["value"]])) %>%
+    ) |>
+      dplyr::group_by(.data[["age"]]) |>
+      dplyr::summarize(mean_value = mean(.data[["value"]])) |>
       dplyr::pull(.data[["mean_value"]])
   }
 )
@@ -108,7 +108,7 @@ setMethod(
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "landings"
-    ) %>%
+    ) |>
       dplyr::pull(.data[["value"]])
   }
 )
@@ -132,7 +132,7 @@ setMethod(
       .data = x@data,
       .data[["type"]] == "index",
       .data[["name"]] == fleet_name
-    ) %>%
+    ) |>
       dplyr::pull(.data[["value"]])
   }
 )
@@ -158,7 +158,7 @@ setMethod(
       .data = x@data,
       .data[["type"]] == "age",
       .data[["name"]] == fleet_name
-    ) %>%
+    ) |>
       dplyr::pull(.data[["value"]])
   }
 )

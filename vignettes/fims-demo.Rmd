@@ -52,11 +52,11 @@ The `fims_frame` object contains a `@data` slot that holds a long data frame wit
 
 ```{r ageframe}
 str(fims_frame)
-fims_frame@data %>%
-  dplyr::filter(type == "landings") %>%
+fims_frame@data |>
+  dplyr::filter(type == "landings") |>
   head()
-fims_frame@data %>%
-  dplyr::filter(type == "index") %>%
+fims_frame@data |>
+  dplyr::filter(type == "index") |>
   head()
 ```
 
@@ -69,17 +69,17 @@ age_frame <- FIMS::FIMSFrameAge(data_mile1)
 # fishery data
 # This does the same thing as the one line below only
 # using fims_frame rather than age_frame
-# fishery_catch <- fims_frame@data %>%
-#   dplyr::filter(type == "landings") %>%
+# fishery_catch <- fims_frame@data |>
+#   dplyr::filter(type == "landings") |>
 #   .$value
 
 fishery_catch <- FIMS::m_landings(age_frame)
 
 # This does the same thing as the two lines below only
 # using fims_frame rather than age_frame
-# fishery_agecomp <- fims_frame@data %>%
-#   dplyr::filter(type == "age") %>%
-#   dplyr::filter(name == "fleet1") %>%
+# fishery_agecomp <- fims_frame@data |>
+#   dplyr::filter(type == "age") |>
+#   dplyr::filter(name == "fleet1") |>
 #   .$value
 
 

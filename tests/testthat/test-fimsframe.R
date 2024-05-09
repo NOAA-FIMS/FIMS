@@ -87,16 +87,16 @@ nages <- max(age_frame@ages)
 fleet_names_agecomp <- dplyr::filter(
   .data = as.data.frame(age_frame@data),
   type == "age"
-) %>%
-  dplyr::distinct(name) %>%
+) |>
+  dplyr::distinct(name) |>
   dplyr::pull(name)
 nagecomp <- length(fleet_names_agecomp)
 
 fleet_names_index <- dplyr::filter(
   .data = as.data.frame(age_frame@data),
   type == "index"
-) %>%
-  dplyr::distinct(name) %>%
+) |>
+  dplyr::distinct(name) |>
   dplyr::pull(name)
 nindex <- length(fleet_names_index)
 
