@@ -62,7 +62,7 @@ setup_gtest <- function() {
 #' Intended for developers to set up their local environment and run the google
 #' test suite from R.
 #'
-#' @inheritParams setup_and_run_gtest
+#' @inheritParams run_gtest
 #'
 #' @keywords gtest_helper
 #' @export
@@ -84,6 +84,6 @@ setup_and_run_gtest <- function(...) {
 run_gtest <- function(...) {
   system("cmake -S . -B build -G Ninja")
   system("cmake --build build")
-  system(paste0("ctest --test-dir build", ...))
+  system(paste("ctest --test-dir build", ...))
   TRUE
 }
