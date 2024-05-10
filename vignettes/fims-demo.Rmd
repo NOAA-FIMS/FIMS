@@ -40,7 +40,7 @@ nages <- 12 # the number of age groups.
 
 ### Preparing Data using FIMSFrame
 
- We will be reading data into the model using the FIMSFrame and FIMSFrameAge S4 R classes set up in [R/fimsframe.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/fimsframe.R)
+ We will be reading data into the model using the FIMSFrame S4 R class set up in [R/fimsframe.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/fimsframe.R)
 
 ```{r fimsframe}
 # use FIMS data frame
@@ -64,32 +64,15 @@ fims_frame@data |>
 Using this data frame, we will start setting up the FIMS data objects. This example from the Model Comparison project sets up a single fishery fleet with age composition and catch data and a single survey with age composition data and an index. Data are read into FIMS as long vectors, regardless of their original dimension, hence the motivation behind the long data frames created with the fimsframe S4 classes. 
 
 ```{r data}
-age_frame <- FIMS::FIMSFrameAge(data_mile1)
-
 # fishery data
-# This does the same thing as the one line below only
-# using fims_frame rather than age_frame
-# fishery_catch <- fims_frame@data |>
-#   dplyr::filter(type == "landings") |>
-#   .$value
-
-fishery_catch <- FIMS::m_landings(age_frame)
-
-# This does the same thing as the two lines below only
-# using fims_frame rather than age_frame
-# fishery_agecomp <- fims_frame@data |>
-#   dplyr::filter(type == "age") |>
-#   dplyr::filter(name == "fleet1") |>
-#   .$value
-
-
-fishery_agecomp <- FIMS::m_agecomp(age_frame, "fleet1")
+fishery_catch <- FIMS::m_landings(fims_frame)
+fishery_agecomp <- FIMS::m_agecomp(fims_frame, "fleet1")
 
 # survey data
-survey_index <- FIMS::m_index(age_frame, "survey1")
+survey_index <- FIMS::m_index(fims_frame, "survey1")
 
 # survey agecomp not set up in fimsframe yet
-survey_agecomp <- FIMS::m_agecomp(age_frame, "survey1")
+survey_agecomp <- FIMS::m_agecomp(fims_frame, "survey1")
 ```
 
 ## Creating Modules in FIMS

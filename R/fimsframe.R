@@ -16,20 +16,12 @@ setClass(
     data = "data.frame", # can use c( ) or list here.
     fleets = "numeric",
     nyrs = "integer",
+    ages = "numeric",
+    nages = "integer",
+    weightatage = "data.frame",
     start_year = "integer",
     end_year = "integer"
   )
-)
-
-# leaving FIMSFrameAge with just age related slots.
-setClass(
-  Class = "FIMSFrameAge",
-  slots = c(
-    ages = "numeric",
-    nages = "integer",
-    weightatage = "data.frame"
-  ),
-  contains = "FIMSFrame"
 )
 
 # setMethod: accessors ----
@@ -63,19 +55,18 @@ setMethod("start_year", "FIMSFrame", function(x) x@start_year)
 setGeneric("end_year", function(x) standardGeneric("end_year"))
 setMethod("end_year", "FIMSFrame", function(x) x@end_year)
 
-# additional accessors for FIMSFrameAge
 setGeneric("ages", function(x) standardGeneric("ages"))
-setMethod("ages", "FIMSFrameAge", function(x) x@ages)
+setMethod("ages", "FIMSFrame", function(x) x@ages)
 
 setGeneric("nages", function(x) standardGeneric("nages"))
-setMethod("nages", "FIMSFrameAge", function(x) x@nages)
+setMethod("nages", "FIMSFrame", function(x) x@nages)
 
 setGeneric("weightatage", function(x) standardGeneric("weightatage"))
-setMethod("weightatage", "FIMSFrameAge", function(x) x@weightatage)
+setMethod("weightatage", "FIMSFrame", function(x) x@weightatage)
 
 setGeneric("m_weightatage", function(x) standardGeneric("m_weightatage"))
 setMethod(
-  "m_weightatage", "FIMSFrameAge",
+  "m_weightatage", "FIMSFrame",
   function(x) {
     dplyr::filter(
       .data = as.data.frame(x@data),
@@ -88,7 +79,7 @@ setMethod(
 )
 
 setGeneric("m_ages", function(x) standardGeneric("m_ages"))
-setMethod("m_ages", "FIMSFrameAge", function(x) {
+setMethod("m_ages", "FIMSFrame", function(x) {
   x@ages
 })
 
@@ -100,10 +91,10 @@ setGeneric("m_landings", function(x) standardGeneric("m_landings"))
 
 #' Get the landings data to be used in the model
 #'
-#' @param x The FIMSFrameAge object containing landings.
+#' @param x The FIMSFrame object containing landings.
 #' @export
 setMethod(
-  "m_landings", "FIMSFrameAge",
+  "m_landings", "FIMSFrame",
   function(x) {
     dplyr::filter(
       .data = x@data,
@@ -122,11 +113,11 @@ setGeneric("m_index", function(x, fleet_name) standardGeneric("m_index"))
 
 #' Get the index data to be used in the model
 #'
-#' @param x The FIMSFrameAge object containing index.
+#' @param x The FIMSFrame object containing index.
 #' @param fleet_name The name of the fleet for the index data.
 #' @export
 setMethod(
-  "m_index", "FIMSFrameAge",
+  "m_index", "FIMSFrame",
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
@@ -146,13 +137,13 @@ setMethod(
 setGeneric("m_agecomp", function(x, fleet_name) standardGeneric("m_agecomp"))
 # Should we add name as an argument here?
 
-#' For FIMSFrameAge, get the age-composition data data to be used in the model
+#' Get the age-composition data data to be used in the model
 #'
-#' @param x  The FIMSFrameAge containing age-composition data.
+#' @param x  The FIMSFrame containing age-composition data.
 #' @param fleet_name  The name of the fleet for the age-composition data.
 #' @export
 setMethod(
-  "m_agecomp", "FIMSFrameAge",
+  "m_agecomp", "FIMSFrame",
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
@@ -198,16 +189,6 @@ setMethod(
   }
 )
 
-setMethod(
-  f = "plot",
-  signature = "FIMSFrameAge",
-  definition = function(x) {
-    y <- x@weightatage[["value"]]
-    x_axis <- x@weightatage[["age"]]
-    plot(x_axis, y, xlab = "Age", ylab = "Weight")
-  }
-)
-
 # setMethod: show ----
 setMethod(
   f = "show",
@@ -233,9 +214,6 @@ setMethod(
     }
   }
 )
-
-# note: may want to add a method for FIMSFrameAge to show the additional slots
-# included in FIMSFrameAge.
 
 # setValidity ----
 setValidity(
@@ -266,28 +244,11 @@ setValidity(
     if (!"dateend" %in% colnames(object@data)) {
       errors <- c(errors, "data must contain 'uncertainty'")
     }
-
-
-    # TODO: Add checks for other slots
-
-    # Return
-    if (length(errors) == 0) {
-      return(TRUE)
-    } else {
-      return(errors)
-    }
-  }
-)
-
-setValidity(
-  Class = "FIMSFrameAge",
-  method = function(object) {
-    errors <- character()
-
-    # Check columns
     if (!"age" %in% colnames(object@data)) {
       errors <- c(errors, "data must contain 'age'")
     }
+
+    # TODO: Add checks for other slots
 
     # Return
     if (length(errors) == 0) {
@@ -338,38 +299,6 @@ FIMSFrame <- function(data) {
   )
   nfleets <- length(fleets)
   # Make empty NA data frames in the format needed to pass to FIMS
-
-  # Fill the empty data frames with data extracted from the data file
-  out <- new("FIMSFrame",
-    data = data,
-    fleets = fleets,
-    nyrs = nyrs,
-    start_year = start_year,
-    end_year = end_year
-  )
-  return(out)
-}
-#' FIMSFrameAge
-#' @export
-#' @rdname FIMSFrame
-FIMSFrameAge <- function(data) {
-  # Get the earliest and latest year of data and use to calculate n years for
-  # population simulation
-  start_year <- as.integer(
-    strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1]
-  )
-  end_year <- as.integer(
-    strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1]
-  )
-  nyrs <- as.integer(end_year - start_year + 1)
-  years <- start_year:end_year
-  # Get the fleets represented in the data
-  fleets <- unique(data[["name"]])[grep("fleet", unique(data[["name"]]))]
-  fleets <- as.numeric(
-    unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2]))
-  )
-  nfleets <- length(fleets)
-  # Make empty NA data frames in the format needed to pass to FIMS
   # Get the range of ages displayed in the data to use to specify population
   # simulation range
   ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
@@ -378,7 +307,9 @@ FIMSFrameAge <- function(data) {
     data,
     .data[["type"]] == "weight-at-age"
   )
-  out <- new("FIMSFrameAge",
+
+  # Fill the empty data frames with data extracted from the data file
+  out <- new("FIMSFrame",
     data = data,
     fleets = fleets,
     nyrs = nyrs,
