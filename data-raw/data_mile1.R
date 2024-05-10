@@ -75,7 +75,7 @@ index_data <- data.frame(
     format = "%Y-%m-%d"
   ),
   value = returnedom[["em_input"]]$surveyB.obs[[1]],
-  unit = "", # yearly sum of number-at-age / mean(sum of number-at-age)
+  unit = "mt",
   uncertainty = returnedom[["em_input"]]$cv.survey[[1]]
 )
 
@@ -86,7 +86,7 @@ age_data <- rbind(
   data.frame(
     name = names(returnedom[["em_input"]]$n.L),
     returnedom[["em_input"]]$L.age.obs$fleet1,
-    unit = "", # unit less values
+    unit = "proportion",
     uncertainty = returnedom[["em_input"]]$n.L$fleet1,
     datestart = as.Date(
       paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
@@ -100,7 +100,7 @@ age_data <- rbind(
   data.frame(
     name = names(returnedom[["om_output"]]$survey_age_comp)[1],
     returnedom[["em_input"]]$survey.age.obs[[1]],
-    unit = "",
+    unit = "number of fish in proportion",
     uncertainty = returnedom[["om_input"]][["n.survey"]][["survey1"]],
     datestart = as.Date(
       paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),

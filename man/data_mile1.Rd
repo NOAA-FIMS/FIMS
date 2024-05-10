@@ -8,7 +8,8 @@
 A data frame with 1140 observations of
 8 variables:
 \describe{
-\item{type}{The type of data the row contains.}
+\item{type}{The type of data the row contains. Allowed types include
+\code{age}, \code{index}, \code{landings}, and \code{weight-at-age} data.}
 \item{name}{A character string providing the name of the information source
 that the data was collected from, e.g., \code{"Trawl fishery"}}
 \item{age}{An integer age. Entry can be \code{NA} if information pertains to
@@ -17,7 +18,11 @@ multiple ages, e.g., total catch rather than catch of age-4 fish.}
 Format all dates using \code{yyyy-mm-dd}, which can accommodate fake years
 such as \code{0001-01-01}.}
 \item{value}{The measurement of interest.}
-\item{unit}{A character string specifying the units of \code{value}.}
+\item{unit}{A character string specifying the units of \code{value}. Allowed
+units for each data type are as follows. \code{mt} is used for \code{index},
+\code{landings}, and \code{weight-at-age} data. \code{number} or \code{proportion} are each
+viable units for the composition data, where the former is the preferred
+unit of measurement.}
 \item{uncertainty}{A real value providing a measurement of uncertainty
 for value.}
 }
