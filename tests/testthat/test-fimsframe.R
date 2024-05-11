@@ -5,7 +5,7 @@ fims_frame <- FIMSFrame(data_mile1)
 test_that("Can create the S4 FIMSFrame classes", {
   expect_s4_class(fims_frame, "FIMSFrame")
   # A data frame is an S3 object with class data.frame
-  expect_s3_class(fims_frame@weightatage, "data.frame")
+  expect_s3_class(fims_frame@weight_at_age, "data.frame")
   expect_s3_class(fims_frame@data, "data.frame")
 
   expect_s3_class(fims_frame@data, "data.frame")
@@ -55,9 +55,9 @@ test_that("Accessors work as expected in FIMSFrame", {
   expect_type(n_ages(fims_frame), "integer")
   expect_length(n_ages(fims_frame), 1)
 
-  expect_s3_class(weightatage(fims_frame), "data.frame")
+  expect_s3_class(weight_at_age(fims_frame), "data.frame")
 
-  expect_vector(m_weightatage(fims_frame), ptype = numeric())
+  expect_vector(m_weight_at_age(fims_frame), ptype = numeric())
 
   expect_vector(m_ages(fims_frame), ptype = integer())
 })

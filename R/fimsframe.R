@@ -18,7 +18,7 @@ setClass(
     n_yrs = "integer",
     ages = "numeric",
     n_ages = "integer",
-    weightatage = "data.frame",
+    weight_at_age = "data.frame",
     start_year = "integer",
     end_year = "integer"
   )
@@ -61,12 +61,12 @@ setMethod("ages", "FIMSFrame", function(x) x@ages)
 setGeneric("n_ages", function(x) standardGeneric("n_ages"))
 setMethod("n_ages", "FIMSFrame", function(x) x@n_ages)
 
-setGeneric("weightatage", function(x) standardGeneric("weightatage"))
-setMethod("weightatage", "FIMSFrame", function(x) x@weightatage)
+setGeneric("weight_at_age", function(x) standardGeneric("weight_at_age"))
+setMethod("weight_at_age", "FIMSFrame", function(x) x@weight_at_age)
 
-setGeneric("m_weightatage", function(x) standardGeneric("m_weightatage"))
+setGeneric("m_weight_at_age", function(x) standardGeneric("m_weight_at_age"))
 setMethod(
-  "m_weightatage", "FIMSFrame",
+  "m_weight_at_age", "FIMSFrame",
   function(x) {
     dplyr::filter(
       .data = as.data.frame(x@data),
@@ -303,7 +303,7 @@ FIMSFrame <- function(data) {
   # simulation range
   ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
   n_ages <- length(ages)
-  weightatage <- dplyr::filter(
+  weight_at_age <- dplyr::filter(
     data,
     .data[["type"]] == "weight-at-age"
   )
@@ -317,7 +317,7 @@ FIMSFrame <- function(data) {
     end_year = end_year,
     ages = ages,
     n_ages = n_ages,
-    weightatage = weightatage
+    weight_at_age = weight_at_age
   )
   return(out)
 }
