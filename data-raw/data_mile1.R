@@ -111,10 +111,10 @@ age_data <- rbind(
       "%Y-%m-%d"
     )
   )
-) %>%
+) |>
   dplyr::mutate(
     type = "age"
-  ) %>%
+  ) |>
   tidyr::pivot_longer(
     cols = dplyr::starts_with("X"),
     names_prefix = "X",

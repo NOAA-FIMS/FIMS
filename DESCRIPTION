@@ -59,7 +59,6 @@ Imports:
     dplyr,
     ggplot2,
     jsonlite,
-    magrittr,
     methods,
     Rcpp,
     scales,
