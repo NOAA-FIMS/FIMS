@@ -15,9 +15,9 @@ setClass(
   slots = c(
     data = "data.frame", # can use c( ) or list here.
     fleets = "numeric",
-    nyrs = "integer",
+    n_yrs = "integer",
     ages = "numeric",
-    nages = "integer",
+    n_ages = "integer",
     weightatage = "data.frame",
     start_year = "integer",
     end_year = "integer"
@@ -46,8 +46,8 @@ setMethod("get_data", "FIMSFrame", function(x) x@data)
 setGeneric("fleets", function(x) standardGeneric("fleets"))
 setMethod("fleets", "FIMSFrame", function(x) x@fleets)
 
-setGeneric("nyrs", function(x) standardGeneric("nyrs"))
-setMethod("nyrs", "FIMSFrame", function(x) x@nyrs)
+setGeneric("n_yrs", function(x) standardGeneric("n_yrs"))
+setMethod("n_yrs", "FIMSFrame", function(x) x@n_yrs)
 
 setGeneric("start_year", function(x) standardGeneric("start_year"))
 setMethod("start_year", "FIMSFrame", function(x) x@start_year)
@@ -58,8 +58,8 @@ setMethod("end_year", "FIMSFrame", function(x) x@end_year)
 setGeneric("ages", function(x) standardGeneric("ages"))
 setMethod("ages", "FIMSFrame", function(x) x@ages)
 
-setGeneric("nages", function(x) standardGeneric("nages"))
-setMethod("nages", "FIMSFrame", function(x) x@nages)
+setGeneric("n_ages", function(x) standardGeneric("n_ages"))
+setMethod("n_ages", "FIMSFrame", function(x) x@n_ages)
 
 setGeneric("weightatage", function(x) standardGeneric("weightatage"))
 setMethod("weightatage", "FIMSFrame", function(x) x@weightatage)
@@ -289,7 +289,7 @@ FIMSFrame <- function(data) {
   end_year <- as.integer(
     strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1]
   )
-  nyrs <- as.integer(end_year - start_year + 1)
+  n_yrs <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
 
   # Get the fleets represented in the data
@@ -297,12 +297,12 @@ FIMSFrame <- function(data) {
   fleets <- as.numeric(
     unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2]))
   )
-  nfleets <- length(fleets)
+  n_fleets <- length(fleets)
   # Make empty NA data frames in the format needed to pass to FIMS
   # Get the range of ages displayed in the data to use to specify population
   # simulation range
   ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
-  nages <- length(ages)
+  n_ages <- length(ages)
   weightatage <- dplyr::filter(
     data,
     .data[["type"]] == "weight-at-age"
@@ -312,11 +312,11 @@ FIMSFrame <- function(data) {
   out <- new("FIMSFrame",
     data = data,
     fleets = fleets,
-    nyrs = nyrs,
+    n_yrs = n_yrs,
     start_year = start_year,
     end_year = end_year,
     ages = ages,
-    nages = nages,
+    n_ages = n_ages,
     weightatage = weightatage
   )
   return(out)
