@@ -27,8 +27,8 @@ test_that("Accessors work as expected in FIMSFrame", {
 
   expect_vector(fleets(fims_frame), ptype = numeric())
 
-  expect_type(n_yrs(fims_frame), "integer")
-  expect_length(n_yrs(fims_frame), 1)
+  expect_type(n_years(fims_frame), "integer")
+  expect_length(n_years(fims_frame), 1)
 
   expect_type(start_year(fims_frame), "integer")
   expect_length(start_year(fims_frame), 1)
@@ -40,8 +40,8 @@ test_that("Accessors work as expected in FIMSFrame", {
 
   expect_vector(fleets(fims_frame), ptype = numeric())
 
-  expect_type(n_yrs(fims_frame), "integer")
-  expect_length(n_yrs(fims_frame), 1)
+  expect_type(n_years(fims_frame), "integer")
+  expect_length(n_years(fims_frame), 1)
 
   expect_type(start_year(fims_frame), "integer")
   expect_length(start_year(fims_frame), 1)
@@ -76,7 +76,7 @@ test_that("Validators work as expected", {
   expect_warning(expect_error(FIMSFrame(bad_input)))
 })
 
-n_years <- fims_frame@n_yrs
+n_years <- fims_frame@n_years
 n_ages <- max(fims_frame@ages)
 
 fleet_names_age_comp <- dplyr::filter(

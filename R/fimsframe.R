@@ -15,7 +15,7 @@ setClass(
   slots = c(
     data = "data.frame", # can use c( ) or list here.
     fleets = "numeric",
-    n_yrs = "integer",
+    n_years = "integer",
     ages = "numeric",
     n_ages = "integer",
     weight_at_age = "data.frame",
@@ -46,8 +46,8 @@ setMethod("get_data", "FIMSFrame", function(x) x@data)
 setGeneric("fleets", function(x) standardGeneric("fleets"))
 setMethod("fleets", "FIMSFrame", function(x) x@fleets)
 
-setGeneric("n_yrs", function(x) standardGeneric("n_yrs"))
-setMethod("n_yrs", "FIMSFrame", function(x) x@n_yrs)
+setGeneric("n_years", function(x) standardGeneric("n_years"))
+setMethod("n_years", "FIMSFrame", function(x) x@n_years)
 
 setGeneric("start_year", function(x) standardGeneric("start_year"))
 setMethod("start_year", "FIMSFrame", function(x) x@start_year)
@@ -289,7 +289,7 @@ FIMSFrame <- function(data) {
   end_year <- as.integer(
     strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1]
   )
-  n_yrs <- as.integer(end_year - start_year + 1)
+  n_years <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
 
   # Get the fleets represented in the data
@@ -312,7 +312,7 @@ FIMSFrame <- function(data) {
   out <- new("FIMSFrame",
     data = data,
     fleets = fleets,
-    n_yrs = n_yrs,
+    n_years = n_years,
     start_year = start_year,
     end_year = end_year,
     ages = ages,
