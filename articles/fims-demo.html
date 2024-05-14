@@ -136,8 +136,8 @@ Comparison project:</p>
 <div class="section level3">
 <h3 id="preparing-data-using-fimsframe">Preparing Data using FIMSFrame<a class="anchor" aria-label="anchor" href="#preparing-data-using-fimsframe"></a>
 </h3>
-<p>We will be reading data into the model using the FIMSFrame and
-FIMSFrameAge S4 R classes set up in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/R/fimsframe.R" class="external-link">R/fimsframe.R</a></p>
+<p>We will be reading data into the model using the FIMSFrame S4 R class
+set up in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/R/fimsframe.R" class="external-link">R/fimsframe.R</a></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># use FIMS data frame</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span>package <span class="op">=</span> <span class="st">"FIMS"</span><span class="op">)</span></span>
@@ -147,8 +147,8 @@ that holds a long data frame with catch data for the fishery and index
 data for the survey:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Formal class 'FIMSFrame' [package "FIMS"] with 5 slots</span></span>
-<span><span class="co">##   ..@ data      :'data.frame':   1140 obs. of  8 variables:</span></span>
+<pre><code><span><span class="co">## Formal class 'FIMSFrame' [package "FIMS"] with 8 slots</span></span>
+<span><span class="co">##   ..@ data         :'data.frame':    1140 obs. of  8 variables:</span></span>
 <span><span class="co">##   .. ..$ type       : chr [1:1140] "landings" "landings" "landings" "landings" ...</span></span>
 <span><span class="co">##   .. ..$ name       : chr [1:1140] "fleet1" "fleet1" "fleet1" "fleet1" ...</span></span>
 <span><span class="co">##   .. ..$ age        : int [1:1140] NA NA NA NA NA NA NA NA NA NA ...</span></span>
@@ -157,14 +157,25 @@ data for the survey:</p>
 <span><span class="co">##   .. ..$ value      : num [1:1140] 160 461 752 997 770 ...</span></span>
 <span><span class="co">##   .. ..$ unit       : chr [1:1140] "mt" "mt" "mt" "mt" ...</span></span>
 <span><span class="co">##   .. ..$ uncertainty: num [1:1140] 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 0.01 ...</span></span>
-<span><span class="co">##   ..@ fleets    : num 1</span></span>
-<span><span class="co">##   ..@ nyrs      : int 30</span></span>
-<span><span class="co">##   ..@ start_year: int 1</span></span>
-<span><span class="co">##   ..@ end_year  : int 30</span></span></code></pre>
+<span><span class="co">##   ..@ fleets       : num 1</span></span>
+<span><span class="co">##   ..@ n_years      : int 30</span></span>
+<span><span class="co">##   ..@ ages         : int [1:12] 1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span><span class="co">##   ..@ n_ages       : int 12</span></span>
+<span><span class="co">##   ..@ weight_at_age:'data.frame':    360 obs. of  8 variables:</span></span>
+<span><span class="co">##   .. ..$ type       : chr [1:360] "weight-at-age" "weight-at-age" "weight-at-age" "weight-at-age" ...</span></span>
+<span><span class="co">##   .. ..$ name       : chr [1:360] "fleet1" "fleet1" "fleet1" "fleet1" ...</span></span>
+<span><span class="co">##   .. ..$ age        : int [1:360] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
+<span><span class="co">##   .. ..$ datestart  : chr [1:360] "0001-01-01" "0002-01-01" "0003-01-01" "0004-01-01" ...</span></span>
+<span><span class="co">##   .. ..$ dateend    : chr [1:360] "0001-12-31" "0002-12-31" "0003-12-31" "0004-12-31" ...</span></span>
+<span><span class="co">##   .. ..$ value      : num [1:360] 0.000531 0.000531 0.000531 0.000531 0.000531 ...</span></span>
+<span><span class="co">##   .. ..$ unit       : chr [1:360] "mt" "mt" "mt" "mt" ...</span></span>
+<span><span class="co">##   .. ..$ uncertainty: num [1:360] NA NA NA NA NA NA NA NA NA NA ...</span></span>
+<span><span class="co">##   ..@ start_year   : int 1</span></span>
+<span><span class="co">##   ..@ end_year     : int 30</span></span></code></pre>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fims_frame</span><span class="op">@</span><span class="va">data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"landings"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">fims_frame</span><span class="op">@</span><span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"landings"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##       type   name age  datestart    dateend     value unit uncertainty</span></span>
 <span><span class="co">## 1 landings fleet1  NA 0001-01-01 0001-12-31  160.2363   mt        0.01</span></span>
 <span><span class="co">## 2 landings fleet1  NA 0002-01-01 0002-12-31  460.6336   mt        0.01</span></span>
@@ -173,9 +184,9 @@ data for the survey:</p>
 <span><span class="co">## 5 landings fleet1  NA 0005-01-01 0005-12-31  769.6972   mt        0.01</span></span>
 <span><span class="co">## 6 landings fleet1  NA 0006-01-01 0006-12-31 1352.7309   mt        0.01</span></span></code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fims_frame</span><span class="op">@</span><span class="va">data</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"index"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">fims_frame</span><span class="op">@</span><span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"index"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    type    name age  datestart    dateend       value unit uncertainty</span></span>
 <span><span class="co">## 1 index survey1  NA 0001-01-01 0001-01-01 0.006795379              0.2</span></span>
 <span><span class="co">## 2 index survey1  NA 0002-01-01 0002-01-01 0.006170738              0.2</span></span>
@@ -190,32 +201,15 @@ with age composition data and an index. Data are read into FIMS as long
 vectors, regardless of their original dimension, hence the motivation
 behind the long data frames created with the fimsframe S4 classes.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">age_frame</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrameAge</a></span><span class="op">(</span><span class="va">data_mile1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># fishery data</span></span>
-<span><span class="co"># This does the same thing as the one line below only</span></span>
-<span><span class="co"># using fims_frame rather than age_frame</span></span>
-<span><span class="co"># fishery_catch &lt;- fims_frame@data %&gt;%</span></span>
-<span><span class="co">#   dplyr::filter(type == "landings") %&gt;%</span></span>
-<span><span class="co">#   .$value</span></span>
-<span></span>
-<span><span class="va">fishery_catch</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/m_landings.html">m_landings</a></span><span class="op">(</span><span class="va">age_frame</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># This does the same thing as the two lines below only</span></span>
-<span><span class="co"># using fims_frame rather than age_frame</span></span>
-<span><span class="co"># fishery_agecomp &lt;- fims_frame@data %&gt;%</span></span>
-<span><span class="co">#   dplyr::filter(type == "age") %&gt;%</span></span>
-<span><span class="co">#   dplyr::filter(name == "fleet1") %&gt;%</span></span>
-<span><span class="co">#   .$value</span></span>
-<span></span>
-<span></span>
-<span><span class="va">fishery_agecomp</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/m_agecomp.html">m_agecomp</a></span><span class="op">(</span><span class="va">age_frame</span>, <span class="st">"fleet1"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># fishery data</span></span>
+<span><span class="va">fishery_catch</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/m_landings.html">m_landings</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span></span>
+<span><span class="va">fishery_agecomp</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/m_agecomp.html">m_agecomp</a></span><span class="op">(</span><span class="va">fims_frame</span>, <span class="st">"fleet1"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># survey data</span></span>
-<span><span class="va">survey_index</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/m_index.html">m_index</a></span><span class="op">(</span><span class="va">age_frame</span>, <span class="st">"survey1"</span><span class="op">)</span></span>
+<span><span class="va">survey_index</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/m_index.html">m_index</a></span><span class="op">(</span><span class="va">fims_frame</span>, <span class="st">"survey1"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># survey agecomp not set up in fimsframe yet</span></span>
-<span><span class="va">survey_agecomp</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/m_agecomp.html">m_agecomp</a></span><span class="op">(</span><span class="va">age_frame</span>, <span class="st">"survey1"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">survey_agecomp</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/m_agecomp.html">m_agecomp</a></span><span class="op">(</span><span class="va">fims_frame</span>, <span class="st">"survey1"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -247,7 +241,7 @@ Index module has a vector field named <em>index_data</em> and the
 AgeComp module has a vector field names <em>age_comp_data</em>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Index</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'Index' &lt;0x55d058018ed0&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'Index' &lt;0x5654c75a7e00&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     Index(int)</span></span>
 <span><span class="co">## </span></span>
@@ -259,7 +253,7 @@ AgeComp module has a vector field names <em>age_comp_data</em>.</p>
 <span><span class="co">## </span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">AgeComp</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'AgeComp' &lt;0x55d058018d70&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'AgeComp' &lt;0x5654c75216f0&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     AgeComp(int, int)</span></span>
 <span><span class="co">## </span></span>
@@ -299,7 +293,7 @@ can use the <em>value</em> field to input variables defined in the Model
 Comparison project.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">LogisticSelectivity</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'LogisticSelectivity' &lt;0x55d05800cde0&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'LogisticSelectivity' &lt;0x5654c60e7670&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     LogisticSelectivity()</span></span>
 <span><span class="co">## </span></span>
@@ -329,7 +323,7 @@ actual fleet object. First let’s run <code>methods::show(Fleet)</code>
 to see all the fields and methods available from R.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Fleet</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'Fleet' &lt;0x55d058018c10&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'Fleet' &lt;0x5654c7ac9140&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     Fleet()</span></span>
 <span><span class="co">## </span></span>
@@ -471,7 +465,7 @@ methods (i.e. functions) available in
 <code class="sourceCode R"><span><span class="co"># Recruitment</span></span>
 <span><span class="va">recruitment</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span>
 <span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'BevertonHoltRecruitment' &lt;0x55d058018ab0&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'BevertonHoltRecruitment' &lt;0x5654c6ee38f0&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     BevertonHoltRecruitment()</span></span>
 <span><span class="co">## </span></span>

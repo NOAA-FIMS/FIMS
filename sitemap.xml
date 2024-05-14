@@ -31,37 +31,28 @@
     <loc>https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.html</loc>
   </url>
   <url>
-    <loc>https://NOAA-FIMS.github.io/FIMS/reference/create_fims_rcpp_interface.html</loc>
-  </url>
-  <url>
     <loc>https://NOAA-FIMS.github.io/FIMS/reference/data_mile1.html</loc>
   </url>
   <url>
     <loc>https://NOAA-FIMS.github.io/FIMS/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://NOAA-FIMS.github.io/FIMS/reference/m_agecomp-FIMSFrameAge-method.html</loc>
+    <loc>https://NOAA-FIMS.github.io/FIMS/reference/m_agecomp-FIMSFrame-method.html</loc>
   </url>
   <url>
     <loc>https://NOAA-FIMS.github.io/FIMS/reference/m_agecomp.html</loc>
   </url>
   <url>
-    <loc>https://NOAA-FIMS.github.io/FIMS/reference/m_index-FIMSFrameAge-method.html</loc>
+    <loc>https://NOAA-FIMS.github.io/FIMS/reference/m_index-FIMSFrame-method.html</loc>
   </url>
   <url>
     <loc>https://NOAA-FIMS.github.io/FIMS/reference/m_index.html</loc>
   </url>
   <url>
-    <loc>https://NOAA-FIMS.github.io/FIMS/reference/m_landings-FIMSFrameAge-method.html</loc>
+    <loc>https://NOAA-FIMS.github.io/FIMS/reference/m_landings-FIMSFrame-method.html</loc>
   </url>
   <url>
     <loc>https://NOAA-FIMS.github.io/FIMS/reference/m_landings.html</loc>
-  </url>
-  <url>
-    <loc>https://NOAA-FIMS.github.io/FIMS/reference/mkObj.html</loc>
-  </url>
-  <url>
-    <loc>https://NOAA-FIMS.github.io/FIMS/reference/pipe.html</loc>
   </url>
   <url>
     <loc>https://NOAA-FIMS.github.io/FIMS/reference/run_gtest.html</loc>
@@ -71,8 +62,5 @@
   </url>
   <url>
     <loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_gtest.html</loc>
-  </url>
-  <url>
-    <loc>https://NOAA-FIMS.github.io/FIMS/reference/use_module.html</loc>
   </url>
 </urlset>
