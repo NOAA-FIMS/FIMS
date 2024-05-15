@@ -275,7 +275,7 @@ setValidity(
 #'   a data frame of a given `FIMSFrame-class`.
 #'
 #' @return
-#' An object of the S4 class `FIMSFrame` or one of its child classes is 
+#' An object of the S4 class `FIMSFrame` or one of its child classes is
 #' validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [showClass()] to see all available slots.
