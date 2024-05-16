@@ -18,12 +18,13 @@ template:
 
 articles:
 - title: Fisheries Integrated Modeling System (FIMS)
-  navbar: ~
   contents:
-  - fims-path-maturity
+  - fims-documentation
+  - fims-demo
+
 - title: Developer
   contents:
-  - fims-demo
+  - fims-path-maturity
 
 reference:
 - title: Data
