@@ -318,6 +318,7 @@ void clear() {
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
+
 RCPP_MODULE(fims) {
   Rcpp::function("CreateTMBModel", &CreateTMBModel);
   Rcpp::function("get_fixed", &get_fixed_parameters_vector);
@@ -336,7 +337,7 @@ RCPP_MODULE(fims) {
   Rcpp::function("clear_maturity_log", clear_maturity_log);
   Rcpp::function("clear_selectivity_log", clear_selectivity_log);
   Rcpp::function("clear_debug_log", clear_debug_log);
-  Rcpp::function("create_vector", &CreateVector);
+  Rcpp::function("create_vector", CreateVector);
 
   Rcpp::class_<Parameter>("Parameter")
       .constructor()
