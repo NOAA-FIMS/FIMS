@@ -83,7 +83,7 @@ print(p[1]$value)
 print(p[2]$value)
 print(cos(p[2]$value))
 #str(var)
-par$value<-3.1459
+#par$value<-3.1459
 #str(var)
 #a<-apply(X = v, MARGIN = 1, FUN = sum)
 cc<-c(1,2,3)
