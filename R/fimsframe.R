@@ -1,172 +1,476 @@
-# This file defines a parent class and its children by
-# (1) setting the class;
-# (2) defining methods, using setMethod();
-# (3) setting the validators; and
-# (4) establishing the constructors (i.e., functions called by users)
-# where only the constructors are documented using roxygen.
+# Developers: ----
 
-# setClass: ----
+# This file defines the parent class FIMSFrame and its potential children. The
+# class is an S4 class with accessors and validators but no setters.
+#
+# The top of this file contains the declaration of the FIMSFrame class, which
+# is the controller of everything. Then the function FIMSFrame() is how objects
+# of that class are created, i.e., the constructor, and how users will interact
+# with the class the most. When the returned object from that constructor are
+# changed, the call to methods::setClass() that defines the class must also be
+# changed. The remainder of the file is set up to help you easily augment this
+# class. Follow the step-by-step instructions in order or at least know that
+# the functions are present in this order:
+#
+# 1. Add or remove the slot of interest in the call to `methods::setClass()`,
+#    e.g., if you are adding a new slot you must declare the slot and the type
+#    of object that should be expected in that slot; to remove an object from
+#    the FIMSFrame class you must remove the slot here.
+# 2. Add an accessor function, e.g., get_*(), to allow users to access the
+#    object stored in the new slot; or, remove the accessor function if you
+#    remove a slot. Some internal accessors are also available, e.g., m_*(),
+#    and should be used to provide data to a model but should not be used by
+#    average users.
+# 3. If we had setter functions for FIMSFrame, you would add or delete the
+#    appropriate setter functions next but we do not. Instead, we want users to
+#    re-run FIMSFrame() when they make any changes to their data, that way all
+#    of the slots will be updated simultaneously. @nathanvaughan-NOAA mentioned
+#    during Code club 2024-12-17 that this may be a problem for future use of
+#    FIMSFrame objects, especially when doing MSE or simulation when there is a
+#    large overhead in running FIMSFrame and you just want to change a small,
+#    simple thing in your data and re-run the model. We will cross that bridge
+#    later. @msupernaw also informed us about the ability to lock an R object
+#    so it cannot be altered. See https://rdrr.io/r/base/bindenv.html.
+# 4. Augment the validator functions to ensure that users do not pass
+#    incompatible information to FIMSFrame().
+# 5. Augment FIMSFrame() to ensure that the slot is created if you are adding a
+#    new object or remove the object from the returned object if you are
+#    removing a slot.
+
+# TODO: ----
+
+# TODO: remove or change get_fleets to return fleet names in alphabetized order
+# TODO: n_fleets should store total number of fleets, i.e., fishing + survey
+# TODO: make date_formats a local variable
+# TODO: document sorting of information in terms of alphabetized fleet order
+# TODO: test implement addition of -999
+# TODO: validate that all length-age combinations exist in the conversion matrix
+
+# methods::setClass: ----
+
 # Classes are not currently exported, and therefore, do not need documentation.
 # See the following link if we do want to document them in the future:
 # https://stackoverflow.com/questions/7368262/how-to-properly-document-s4-class-slots-using-roxygen2
 
-setClass(
+methods::setClass(
   Class = "FIMSFrame",
   slots = c(
-    data = "data.frame", # can use c( ) or list here.
+    data = "tbl_df",
     fleets = "numeric",
     n_years = "integer",
     ages = "numeric",
     n_ages = "integer",
-    weight_at_age = "data.frame",
+    lengths = "numeric",
+    n_lengths = "integer",
     start_year = "integer",
     end_year = "integer"
   )
 )
 
-# setMethod: accessors ----
-# Methods for accessing info in the slots
+# methods::setMethod: accessors ----
 
-# for now, only getters are included, not setters.
-# setter example where ages is the slot and Person is the class
-# setGeneric("age<-", function(x, value) standardGeneric("age<-"))
-# setMethod("age<-", "Person", function(x, value) {
-#   x@age <- value
-#   x
-# })
+# Methods for accessing info in the slots using get_*() or m_*()
 
+#' Get a slot in a FIMSFrame object
+#'
+#' There is an accessor function for each slot in the S4 class `FIMSFrame`,
+#' where the function is named `get_*()` and the star can be replaced with the
+#' slot name, e.g., [get_data()]. These accessor functions are the preferred
+#' way to access objects stored in the available slots.
+#'
+#' @param x An object returned from [FIMSFrame()].
+#' @name get_FIMSFrame
+#' @keywords FIMSFrame
+NULL
 
-# is it problematic to set the generic for data? not sure...
-# but it will not work without set generic
-# can't call this data because there is already a generic
-setGeneric("get_data", function(x) standardGeneric("get_data"))
-setMethod("get_data", "FIMSFrame", function(x) x@data)
+#' @return
+#' [get_data()] returns a data frame of the class `tbl_df` containing data for
+#' a FIMS model in a long format. The tibble will potentially have the
+#' following columns depending if it fits to ages and lengths or just one of
+#' them:
+#' `r glue::glue_collapse(colnames(data1), sep = ", ", last = ", and ")`.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric("get_data", function(x) standardGeneric("get_data"))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_data", "FIMSFrame", function(x) x@data)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_data",
+  "data.frame",
+  function(x) FIMSFrame(x)@data
+)
 
-# example: so we can call fleets(obj) instead of obj@fleets
-setGeneric("fleets", function(x) standardGeneric("fleets"))
-setMethod("fleets", "FIMSFrame", function(x) x@fleets)
+#' @return
+#' [get_fleets()] returns a vector of integer values specifying which fleets in
+#' the model are fishing fleets.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric("get_fleets", function(x) standardGeneric("get_fleets"))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_fleets", "FIMSFrame", function(x) x@fleets)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_fleets",
+  "data.frame",
+  function(x) FIMSFrame(x)@fleets
+)
 
-setGeneric("n_years", function(x) standardGeneric("n_years"))
-setMethod("n_years", "FIMSFrame", function(x) x@n_years)
+#' @return
+#' [get_n_years()] returns an integer specifying the number of years in the
+#' model.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric("get_n_years", function(x) standardGeneric("get_n_years"))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_n_years", "FIMSFrame", function(x) x@n_years)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_n_years",
+  "data.frame",
+  function(x) FIMSFrame(x)@n_years
+)
 
-setGeneric("start_year", function(x) standardGeneric("start_year"))
-setMethod("start_year", "FIMSFrame", function(x) x@start_year)
+#' @return
+#' [get_start_year()] returns an integer specifying the start year of the
+#' model.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "get_start_year",
+  function(x) standardGeneric("get_start_year")
+)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_start_year", "FIMSFrame", function(x) x@start_year)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_start_year",
+  "data.frame",
+  function(x) FIMSFrame(x)@start_year
+)
 
-setGeneric("end_year", function(x) standardGeneric("end_year"))
-setMethod("end_year", "FIMSFrame", function(x) x@end_year)
+#' @return
+#' [get_end_year()] returns an integer specifying the end year of the
+#' model.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric("get_end_year", function(x) standardGeneric("get_end_year"))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_end_year", "FIMSFrame", function(x) x@end_year)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_end_year",
+  "data.frame",
+  function(x) FIMSFrame(x)@end_year
+)
 
-setGeneric("ages", function(x) standardGeneric("ages"))
-setMethod("ages", "FIMSFrame", function(x) x@ages)
+#' @return
+#' [get_ages()] returns a vector of age bins used in the model.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric("get_ages", function(x) standardGeneric("get_ages"))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_ages", "FIMSFrame", function(x) x@ages)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_ages",
+  "data.frame",
+  function(x) FIMSFrame(x)@ages
+)
 
-setGeneric("n_ages", function(x) standardGeneric("n_ages"))
-setMethod("n_ages", "FIMSFrame", function(x) x@n_ages)
+#' @return
+#' [get_n_ages()] returns an integer specifying the number of age bins used in
+#' the model.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric("get_n_ages", function(x) standardGeneric("get_n_ages"))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_n_ages", "FIMSFrame", function(x) x@n_ages)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_n_ages",
+  "data.frame",
+  function(x) FIMSFrame(x)@n_ages
+)
 
-setGeneric("weight_at_age", function(x) standardGeneric("weight_at_age"))
-setMethod("weight_at_age", "FIMSFrame", function(x) x@weight_at_age)
+#' @return
+#' [get_lengths()] returns a vector of length bins used in the model.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric("get_lengths", function(x) standardGeneric("get_lengths"))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_lengths", "FIMSFrame", function(x) x@lengths)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_lengths",
+  "data.frame",
+  function(x) FIMSFrame(x)@lengths
+)
 
-setGeneric("m_weight_at_age", function(x) standardGeneric("m_weight_at_age"))
-setMethod(
-  "m_weight_at_age", "FIMSFrame",
+#' @return
+#' [get_n_lengths()] returns an integer specifying the number of length bins
+#' used in the model.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "get_n_lengths",
+  function(x) standardGeneric("get_n_lengths")
+)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_n_lengths", "FIMSFrame", function(x) x@n_lengths)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_n_lengths",
+  "data.frame",
+  function(x) FIMSFrame(x)@n_lengths
+)
+
+#' Get a vector of data to be passed to a FIMS module from a FIMSFrame object
+#'
+#' There is an accessor function for each data type needed to run a FIMS model.
+#' A FIMS model accepts vectors of data and thus each of the `m_*()` functions,
+#' where the star can be replaced with the data type separated by underscores,
+#' e.g., weight_at_age. These accessor functions are the preferred way to pass
+#' data to a FIMS module because the data will have the appropriate indexing.
+#'
+#' @details
+#' Age-to-length-conversion data, i.e., the proportion of age "a" that are
+#' length "l", are used to convert lengths (input data) to ages (modeled) as
+#' a way to fit length data without estimating growth.
+#'
+#' @inheritParams get_data
+#' @param fleet_name A string, or vector of strings, specifying the name of the
+#'   fleet(s) of interest that you want landings data for. The strings must
+#'   exactly match strings in the column `"name"` of `get_data(x)`.
+#' @return
+#' All of the `m_*()` functions return vectors of data. Currently, the order of
+#' the data is the same order as the data frame because no arranging is done in
+#' [FIMSFrame()] and the function just extracts the appropriate column.
+#' @name m_
+#' @keywords FIMSFrame
+NULL
+
+#' @export
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "m_landings",
+  function(x, fleet_name) standardGeneric("m_landings")
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_landings", "FIMSFrame",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "landings",
+      .data[["name"]] %in% fleet_name
+    ) |>
+      dplyr::pull(.data[["value"]])
+  }
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_landings",
+  "data.frame",
+  function(x, fleet_name) m_landings(FIMSFrame(x), fleet_name)
+)
+
+#' @export
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "m_index",
+  function(x, fleet_name) standardGeneric("m_index")
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_index", "FIMSFrame",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "index",
+      .data[["name"]] %in% fleet_name
+    ) |>
+      dplyr::pull(.data[["value"]])
+  }
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_index",
+  "data.frame",
+  function(x, fleet_name) m_index(FIMSFrame(x), fleet_name)
+)
+
+#' @export
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "m_agecomp",
+  function(x, fleet_name) standardGeneric("m_agecomp")
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_agecomp", "FIMSFrame",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "age",
+      .data[["name"]] %in% fleet_name
+    ) |>
+      dplyr::pull(.data[["value"]])
+  }
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_agecomp",
+  "data.frame",
+  function(x, fleet_name) m_agecomp(FIMSFrame(x), fleet_name)
+)
+
+#' @export
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "m_lengthcomp",
+  function(x, fleet_name) standardGeneric("m_lengthcomp")
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_lengthcomp",
+  "FIMSFrame",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "length",
+      .data[["name"]] %in% fleet_name
+    ) |>
+      dplyr::pull(.data[["value"]])
+  }
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_lengthcomp",
+  "data.frame",
+  function(x, fleet_name) m_lengthcomp(FIMSFrame(x), fleet_name)
+)
+
+#' @export
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "m_weight_at_age",
+  function(x) standardGeneric("m_weight_at_age")
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_weight_at_age",
+  "FIMSFrame",
   function(x) {
     dplyr::filter(
       .data = as.data.frame(x@data),
       .data[["type"]] == "weight-at-age"
     ) |>
       dplyr::group_by(.data[["age"]]) |>
-      dplyr::summarize(mean_value = mean(.data[["value"]])) |>
+      dplyr::mutate(
+        value = ifelse(value == -999, NA, value)
+      ) |>
+      dplyr::summarize(mean_value = mean(.data[["value"]], na.rm = TRUE)) |>
       dplyr::pull(.data[["mean_value"]])
   }
 )
-
-setGeneric("m_ages", function(x) standardGeneric("m_ages"))
-setMethod("m_ages", "FIMSFrame", function(x) {
-  x@ages
-})
-
-#' Get the landings data to be used in the model
-#'
-#' @param x The object containing landings.
-#' @export
-setGeneric("m_landings", function(x) standardGeneric("m_landings"))
-
-#' Get the landings data to be used in the model
-#'
-#' @param x The FIMSFrame object containing landings.
-#' @export
-setMethod(
-  "m_landings", "FIMSFrame",
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_weight_at_age",
+  "data.frame",
   function(x) {
-    dplyr::filter(
-      .data = x@data,
-      .data[["type"]] == "landings"
-    ) |>
-      dplyr::pull(.data[["value"]])
+    m_weight_at_age(FIMSFrame(x))
   }
 )
 
-#' Get the index data to be used in the model
-#'
-#' @param x The object containing index.
-#' @param fleet_name The name of the fleet for the index data.
 #' @export
-setGeneric("m_index", function(x, fleet_name) standardGeneric("m_index"))
-
-#' Get the index data to be used in the model
-#'
-#' @param x The FIMSFrame object containing index.
-#' @param fleet_name The name of the fleet for the index data.
-#' @export
-setMethod(
-  "m_index", "FIMSFrame",
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "m_age_to_length_conversion",
+  function(x, fleet_name) standardGeneric("m_age_to_length_conversion")
+)
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_age_to_length_conversion",
+  "FIMSFrame",
   function(x, fleet_name) {
-    dplyr::filter(
-      .data = x@data,
-      .data[["type"]] == "index",
-      .data[["name"]] == fleet_name
-    ) |>
-      dplyr::pull(.data[["value"]])
+    if ("length" %in% colnames(x@data)) {
+      dplyr::filter(
+        .data = as.data.frame(x@data),
+        .data[["type"]] == "age-to-length-conversion",
+        .data[["name"]] %in% fleet_name
+      ) |>
+        dplyr::group_by(.data[["age"]], .data[["length"]]) |>
+        dplyr::summarize(
+          mean_value = mean(as.numeric(.data[["value"]]), na.rm = TRUE)
+        ) |>
+        dplyr::pull(as.numeric(.data[["mean_value"]]))
+    }
   }
 )
-
-
-#' Get the age-composition data to be used in the model
-#'
-#' @param x The object containing the age-composition data.
-#' @param fleet_name The name of the fleet for the age-composition data.
-#' @export
-setGeneric("m_agecomp", function(x, fleet_name) standardGeneric("m_agecomp"))
-# Should we add name as an argument here?
-
-#' Get the age-composition data data to be used in the model
-#'
-#' @param x  The FIMSFrame containing age-composition data.
-#' @param fleet_name  The name of the fleet for the age-composition data.
-#' @export
-setMethod(
-  "m_agecomp", "FIMSFrame",
-  function(x, fleet_name) {
-    dplyr::filter(
-      .data = x@data,
-      .data[["type"]] == "age",
-      .data[["name"]] == fleet_name
-    ) |>
-      dplyr::pull(.data[["value"]])
-  }
+#' @rdname m_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "m_age_to_length_conversion",
+  "data.frame",
+  function(x, fleet_name) m_age_to_length_conversion(FIMSFrame(x), fleet_name)
 )
 
-# Note: don't include setters, because for right now, we don't want users to be
-# setting ages, fleets, etc. However, we could allow it in the future, if there
-# is away to update the object based on changing the fleets?
+# methods::setMethod: initialize ----
 
-# setMethod: initialize ----
-# Not currently using setMethod(f = "initialize")
+# Not currently using methods::setMethod(f = "initialize")
 # because @kellijohnson-NOAA did not quite understand how they actually work.
 
-# setMethod: plot ----
-setMethod(
+# methods::setMethod: plot ----
+
+methods::setMethod(
   f = "plot",
   signature = "FIMSFrame",
-  definition = function(x) {
+  definition = function(x, y, ...) {
     ggplot2::ggplot(
       data = x@data,
       mapping = ggplot2::aes(
@@ -189,12 +493,13 @@ setMethod(
   }
 )
 
-# setMethod: show ----
-setMethod(
+# methods::setMethod: show ----
+
+methods::setMethod(
   f = "show",
   signature = "FIMSFrame",
   definition = function(object) {
-    message("data.frame of class '", class(object), "'")
+    message("tbl_df of class '", class(object), "'")
     if (length(object@data) == 0) {
       return()
     }
@@ -208,15 +513,21 @@ setMethod(
       "names"
     )
     print(utils::head(object@data))
+    cat("additional slots include the following:")
     for (nm in snames[ordinnames]) {
-      cat("additional slots: ", nm, ":\n", sep = "")
+      cat(nm, ":\n", sep = "")
       print(slot(object, nm))
     }
   }
 )
 
-# setValidity ----
-setValidity(
+is.FIMSFrame <- function(x) {
+  inherits(x, "FIMSFrame")
+}
+
+# methods::setValidity ----
+
+methods::setValidity(
   Class = "FIMSFrame",
   method = function(object) {
     errors <- character()
@@ -225,17 +536,23 @@ setValidity(
       errors <- c(errors, "data must have at least one row")
     }
 
+    # FIMS models currently cannot run without weight-at-age data
+    weight_at_age_data <- dplyr::filter(object@data, type == "weight-at-age")
+    if (NROW(weight_at_age_data) == 0) {
+      errors <- c(errors, "data must contain data of the type weight-at-age")
+    }
+
     errors <- c(errors, validate_data_colnames(object@data))
 
     # Add checks for other slots
     # Check the format for acceptable variants of the ideal yyyy-mm-dd
     grepl_datestart <- grepl(
       "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      data_mile1[["datestart"]]
+      object@data[["datestart"]]
     )
     grepl_dateend <- grepl(
       "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      data_mile1[["dateend"]]
+      object@data[["dateend"]]
     )
     if (!all(grepl_datestart)) {
       errors <- c(errors, "datestart must be in 'yyyy-mm-dd' format")
@@ -277,33 +594,71 @@ validate_data_colnames <- function(data) {
   if (!"dateend" %in% the_column_names) {
     errors <- c(errors, "data must contain 'uncertainty'")
   }
-  if (!"age" %in% the_column_names) {
-    errors <- c(errors, "data must contain 'age'")
+  if (!any(c("age", "length") %in% the_column_names)) {
+    errors <- c(errors, "data must contain 'ages' and/or 'lengths'")
   }
   return(errors)
 }
 
 # Constructors ----
+
 # All constructors in this file are documented in 1 roxygen file via @rdname.
 
 #' Class constructors for `FIMSFrame` and associated child classes
 #'
-#' All constructor functions take a single input and build an object specific to
-#' the needs of each model type within \pkg{FIMS}. `FIMSFrame` is the
-#' parent class and the associated child classes have additional slots needed
-#' for each model type.
+#' All constructor functions take a single input and build an object specific
+#' to the needs of each model type within \pkg{FIMS}. `FIMSFrame` is the parent
+#' class. Future, associated child classes will have the additional slots
+#' needed for different types of models.
+#'
+#' @details
+#' ## data
+#' The input data are both sorted and expanded before returning them in the
+#' data slot.
+#' ### Sorting
+#' It is important that the order of the rows in the data are correct but it is
+#' not expected that the user will do this. Instead, the returned data are
+#' sorted using [dplyr::arrange()] before placing them in the data slot. Data
+#' are first sorted by data type, placing all weight-at-age data next to other
+#' weight-at-age data and all landings data next to landings data. Thus,
+#' age-composition data will come first because their type is "age" and "a" is
+#' first in the alphabet. All other types will follow according to their order
+#' in the alphabet.
+#' Next, within each type, data are organized by fleet. So, age-composition
+#' information for fleet1 will come before survey1. Next, all data within type
+#' and fleet are arranged by datestart, e.g., by year. That is the end of the
+#' sorting for time series data like landings and indices.
+#' The biological data are further sorted by bin. Thus, age-composition
+#' information will be arranged as follows:
+#' 
+#' | type | name     | datestart  | age  | value  |
+#' |:---- |:--------:|:----------:|:----:|-------:|
+#' | age  | fleet1   | 2022-01-01 | 1    | 0.3    |
+#' | age  | fleet1   | 2022-01-01 | 2    | 0.7    |
+#' | age  | fleet1   | 2023-01-01 | 1    | 0.5    |
+#'
+#' Length composition-data are sorted the same way but by length bin instead of
+#' by age bin. It becomes more complicated for the age-to-length-conversion
+#' data, which are sorted by type, name, datestart, age, and then length. So, a
+#' full set of length, e.g., length 10, length 20, length 30, etc., is placed
+#' together for a given age. After that age, another entire set of length
+#' information will be provided for that next age. Once the year is complete
+#' for a given fleet then the next year will begin.
 #'
 #' @rdname FIMSFrame
 #'
 #' @param data A `data.frame` that contains the necessary columns to construct
-#'   a data frame of a given `FIMSFrame-class`.
+#'   a `FIMSFrame-class` object. Currently, those columns are
+#'   `r glue::glue_collapse(colnames(data1), sep = ", ", last = ", and ")`. See
+#'   the data1 object in FIMS, e.g., `data(data1, package = "FIMS")`.
 #'
 #' @return
-#' An object of the S4 class `FIMSFrame` or one of its child classes is
+#' An object of the S4 class `FIMSFrame` class, or one of its child classes, is
 #' validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
-#' on the child class. Use [showClass()] to see all available slots.
+#' on the child class. Use [methods::showClass()] to see all available slots.
 #' @export
+#' @keywords FIMSFrame
 FIMSFrame <- function(data) {
   errors <- validate_data_colnames(data)
   if (length(errors) > 0) {
@@ -338,26 +693,151 @@ FIMSFrame <- function(data) {
     unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2]))
   )
   n_fleets <- length(fleets)
-  # Make empty NA data frames in the format needed to pass to FIMS
-  # Get the range of ages displayed in the data to use to specify population
-  # simulation range
-  ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
+
+  if ("age" %in% colnames(data)) {
+    # Forced to use annual age bins because the model is on an annual time step
+    # FUTURE: allow for different age bins rather than 1 year increment
+    ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
+  } else {
+    ages <- numeric()
+  }
   n_ages <- length(ages)
-  weight_at_age <- dplyr::filter(
-    data,
-    .data[["type"]] == "weight-at-age"
+
+  if ("length" %in% colnames(data)) {
+    if (all(is.na(data[["length"]]))) {
+      lengths <- numeric()
+    } else {
+      lengths <- sort(unique(data[["length"]]))
+      lengths <- lengths[!is.na(lengths)]
+    }
+  } else {
+    lengths <- numeric()
+  }
+  n_lengths <- length(lengths)
+
+  # Work on filling in missing data with -999 and arrange in the correct
+  # order so that getting information out with m_*() are correct.
+  formatted_data <- tibble::as_tibble(data) |>
+    dplyr::mutate(
+      year = as.numeric(format(datestart, "%Y"))
+    )
+  missing_time_series <- create_missing_data(
+    data = formatted_data,
+    years = years
   )
+  if ("age" %in% colnames(formatted_data)) {
+    missing_ages <- create_missing_data(
+      data = formatted_data,
+      bins = ages,
+      years = years,
+      column = age,
+      types = c("weight-at-age", "age")
+    )
+  } else {
+    missing_ages <- missing_time_series[0, ]
+  }
+  if ("length" %in% colnames(formatted_data)) {
+    missing_lengths <- create_missing_data(
+      data = formatted_data,
+      bins = lengths,
+      years = years,
+      column = length,
+      types = "length"
+    )
+  } else {
+    missing_lengths <- missing_time_series[0, ]
+  }
+  if ("age-to-length-conversion" %in% formatted_data[["type"]]) {
+    # Must do this by hand because it is across two dimensions
+    temp_age_to_length_data <- formatted_data |>
+      dplyr::group_by(type, name)
+    missing_age_to_length <- temp_age_to_length_data |>
+      dplyr::group_by(type, name) |>
+      dplyr::filter(type %in% "age-to-length-conversion") |>
+      tidyr::expand(unit, year = years, age = ages, length = lengths) |>
+      dplyr::anti_join(
+        y = dplyr::select(
+          temp_age_to_length_data,
+          type, name, unit, year, age, length
+        ),
+        by = dplyr::join_by(type, name, unit, year, age, length)
+      ) |>
+      dplyr::mutate(
+        value = 0,
+        datestart = as.Date(sprintf("%04.0f-01-01", year), date_formats),
+        dateend = as.Date(sprintf("%04.0f-12-31", year), date_formats)
+      ) |>
+      dplyr::ungroup()
+  } else {
+    missing_age_to_length <- missing_time_series[0, ]
+  }
+  missing_data <- dplyr::bind_rows(
+    missing_time_series,
+    missing_ages,
+    missing_lengths,
+    missing_age_to_length
+  )
+  sort_order <- intersect(
+    c("name", "type", "datestart", "age", "length"),
+    colnames(formatted_data)
+  )
+  complete_data <- dplyr::full_join(
+    formatted_data,
+    missing_data,
+    by = colnames(missing_data)
+  ) |>
+    dplyr::arrange(!!!rlang::parse_exprs(sort_order))
 
   # Fill the empty data frames with data extracted from the data file
-  out <- new("FIMSFrame",
-    data = data,
+  out <- methods::new("FIMSFrame",
+    data = complete_data,
     fleets = fleets,
     n_years = n_years,
     start_year = start_year,
     end_year = end_year,
     ages = ages,
     n_ages = n_ages,
-    weight_at_age = weight_at_age
+    lengths = lengths,
+    n_lengths = n_lengths
   )
   return(out)
+}
+
+# Unexported functions ----
+create_missing_data <- function(
+  data,
+  bins,
+  years,
+  column,
+  types = c("landings", "index")
+) {
+  use_this_data <- data |>
+    dplyr::group_by(type, name)
+  out_data <- if (missing(bins)) {
+    # This only pertains to annual data without bins
+    use_this_data |>
+      dplyr::filter(type %in% types) |>
+      tidyr::expand(unit, year = years) |>
+      dplyr::anti_join(
+        y = dplyr::select(use_this_data, type, name, unit, year),
+        by = dplyr::join_by(type, name, unit, year)
+      )
+  } else {
+    use_this_data |>
+      dplyr::group_by(type, name) |>
+      dplyr::filter(type %in% types) |>
+      tidyr::expand(unit, year = years, {{ column }} := bins) |>
+      dplyr::anti_join(
+        y = dplyr::select(use_this_data, type, name, unit, year, {{ column }}),
+        by = dplyr::join_by(type, name, unit, year, {{ column }})
+      )
+  }
+  date_formats <- c("%Y-%m-%d")
+  out_data |>
+    dplyr::mutate(
+      value = -999,
+      datestart = as.Date(sprintf("%04.0f-01-01", year), date_formats),
+      dateend = as.Date(sprintf("%04.0f-12-31", year), date_formats)
+    ) |>
+    dplyr::ungroup()
 }

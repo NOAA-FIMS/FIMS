@@ -29,8 +29,8 @@ public:
         std::stringstream ss;
         for (uint32_t i = 0; i < this->ncases_m; i++) {
             for (uint32_t j = 0; j < this->ninput_files_m; j++) {
-                JsonValue input;
-                JsonValue output;
+                fims::JsonValue input;
+                fims::JsonValue output;
 
                 ss.str("");
                 ss << "inputs/C" << i << "/om_input" << j + 1 << ".json";
@@ -46,7 +46,11 @@ public:
                     good = false;
                 }
 
+                if(good){
                 this->RunModelLoop(pop, input);
+                }else{
+                  throw std::invalid_argument("model not good!");
+                }
 
                 //                if (!this->CheckModelOutput(pop, output)) {
                 //                    good = false;
@@ -58,7 +62,7 @@ public:
     }
 
     bool ReadJson(const std::string &path,
-            JsonValue &result) {
+            fims::JsonValue &result) {
 
         std::stringstream ss;
         std::ifstream infile;
@@ -76,7 +80,7 @@ public:
             //            std::cout << ss.str() << "\n";
         }
 
-        JsonParser parser;
+        fims::JsonParser parser;
         result = parser.Parse(ss.str());
         parser.WriteToFile("out.json", result);
         //        json_.Parse(ss.str().c_str());
@@ -85,25 +89,25 @@ public:
     }
 
     bool ConfigurePopulationModel(fims_popdy::Population<double> &pop,
-            JsonValue &input,
-            JsonValue &output) {
+            fims::JsonValue &input,
+            fims::JsonValue &output) {
 
         std::cout << input.GetType() << "\n";
         size_t nfleets, nsurveys, nages, nyears;
 
         std::cout << input.GetDouble() << "\n";
-        if (input.GetType() == JsonValueType::Object && output.GetType() == JsonValueType::Object) {
+        if (input.GetType() == fims::JsonValueType::Object && output.GetType() == fims::JsonValueType::Object) {
 
-            JsonObject& obj = input.GetObject();
-            JsonObject& obj2 = output.GetObject();
+            fims::JsonObject& obj = input.GetObject();
+            fims::JsonObject& obj2 = output.GetObject();
 
-            typename JsonObject::iterator it;
+            typename fims::JsonObject::iterator it;
 
             it = obj.find("nyr");
             if (it != obj.end()) {
-                JsonValue e = (*it).second;
-                if (e.GetType() == JsonValueType::Array) {
-                    JsonArray a = e.GetArray();
+                fims::JsonValue e = (*it).second;
+                if (e.GetType() == fims::JsonValueType::JArray) {
+                    fims::JsonArray a = e.GetArray();
                     nyears = a[0].GetInt();
                 }
 
@@ -121,9 +125,9 @@ public:
 
             it = obj.find("nages");
             if (it != obj.end()) {
-                JsonValue e = (*it).second;
-                if (e.GetType() == JsonValueType::Array) {
-                    JsonArray a = e.GetArray();
+                fims::JsonValue e = (*it).second;
+                if (e.GetType() == fims::JsonValueType::JArray) {
+                    fims::JsonArray a = e.GetArray();
                     nages = a[0].GetInt();
                 }
 
@@ -140,9 +144,9 @@ public:
             //get number of fleets
             it = obj.find("fleet_num");
             if (it != obj.end()) {
-                JsonValue e = (*it).second;
-                if (e.GetType() == JsonValueType::Array) {
-                    JsonArray a = e.GetArray();
+                fims::JsonValue e = (*it).second;
+                if (e.GetType() == fims::JsonValueType::JArray) {
+                    fims::JsonArray a = e.GetArray();
                     nfleets = a[0].GetInt();
                 }
 
@@ -152,27 +156,28 @@ public:
 
                 for (size_t i = 0; i < nfleets; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > f = std::make_shared<fims_popdy::Fleet<double> >();
+                    f->log_q.resize(1);
                     f->Initialize(nyears, nages);
-                    f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
-                    f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
+                  //  f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
+                  //  f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
 
                     std::stringstream strs;
                     strs << "fleet" << i + 1;
 
                     it = obj.find("sel_fleet");
-                    typename JsonObject::iterator fsel;
+                    typename fims::JsonObject::iterator fsel;
                     if (it != obj.end()) {
-                        JsonValue e = (*it).second;
-                        if (e.GetType() == JsonValueType::Object) {
-                            JsonObject o = e.GetObject();
+                        fims::JsonValue e = (*it).second;
+                        if (e.GetType() == fims::JsonValueType::Object) {
+                            fims::JsonObject o = e.GetObject();
                             fsel = o.find(strs.str().c_str());
 
-                            if ((*fsel).second.GetType() == JsonValueType::Object) {
-                                JsonObject fsel_o = (*fsel).second.GetObject();
+                            if ((*fsel).second.GetType() == fims::JsonValueType::Object) {
+                                fims::JsonObject fsel_o = (*fsel).second.GetObject();
                                 it = fsel_o.find("pattern");
-                                if ((*it).second.GetType() == JsonValueType::Array) {
+                                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
 
-                                    JsonArray sel_pattern = (*it).second.GetArray();
+                                    fims::JsonArray sel_pattern = (*it).second.GetArray();
                                     if (print_statements) {
                                         std::cout << "Selectivity:\n";
                                     }
@@ -183,20 +188,22 @@ public:
                                         std::shared_ptr<fims_popdy::LogisticSelectivity<double> > selectivity = std::make_shared<fims_popdy::LogisticSelectivity<double> >();
 
                                         it = fsel_o.find("A50.sel1");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->inflection_point = a50[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->inflection_point.resize(1);
+                                            selectivity->inflection_point[0] = a50[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "A50 " << selectivity->inflection_point << "\n";
+                                                std::cout << "A50 " << selectivity->inflection_point[0] << "\n";
                                             }
                                         }
 
                                         it = fsel_o.find("slope.sel1");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray slope = (*it).second.GetArray();
-                                            selectivity->slope = slope[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope.resize(1);
+                                            selectivity->slope[0] = slope[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "slope " << selectivity->slope << "\n";
+                                                std::cout << "slope " << selectivity->slope[0] << "\n";
                                             }
                                         }
 
@@ -210,38 +217,42 @@ public:
                                         std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double> > selectivity = std::make_shared<fims_popdy::DoubleLogisticSelectivity<double> >();
 
                                         it = fsel_o.find("A50.sel1");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->inflection_point_asc = a50[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->inflection_point_asc.resize(1);
+                                            selectivity->inflection_point_asc[0] = a50[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "A50 asc " << selectivity->inflection_point_asc << "\n";
+                                                std::cout << "A50 asc " << selectivity->inflection_point_asc[0] << "\n";
                                             }
                                         }
 
                                         it = fsel_o.find("slope.sel1");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray slope = (*it).second.GetArray();
-                                            selectivity->slope_asc = slope[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope_asc.resize(1);
+                                            selectivity->slope_asc[0] = slope[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "slope asc " << selectivity->slope_asc << "\n";
+                                                std::cout << "slope asc " << selectivity->slope_asc[0] << "\n";
                                             }
                                         }
 
                                         it = fsel_o.find("A50.sel2");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->inflection_point_desc = a50[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->inflection_point_desc.resize(1);
+                                            selectivity->inflection_point_desc[0] = a50[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "A50 desc " << selectivity->inflection_point_desc << "\n";
+                                                std::cout << "A50 desc " << selectivity->inflection_point_desc[0] << "\n";
                                             }
                                         }
 
                                         it = fsel_o.find("slope.sel2");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray slope = (*it).second.GetArray();
-                                            selectivity->slope_desc = slope[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope_desc.resize(1);
+                                            selectivity->slope_desc[0] = slope[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "slope desc " << selectivity->slope_desc << "\n";
+                                                std::cout << "slope desc " << selectivity->slope_desc[0] << "\n";
                                             }
                                         }
                                         f->selectivity = selectivity;
@@ -255,10 +266,10 @@ public:
                     }
 
 
-                    f->log_q = 0.0;
+                    f->log_q[0] = 0.0;
                     it = obj.find("f");
-                    if ((*it).second.GetType() == JsonValueType::Array) {
-                        JsonArray f_values = (*it).second.GetArray();
+                    if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                        fims::JsonArray f_values = (*it).second.GetArray();
                         for (int i = 0; i < f_values.size(); i++) {
                             f->Fmort[i] = f_values[i].GetDouble();
                             f->log_Fmort[i] = std::log(f_values[i].GetDouble());
@@ -283,9 +294,9 @@ public:
 
             it = obj.find("survey_num");
             if (it != obj.end()) {
-                JsonValue e = (*it).second;
-                if (e.GetType() == JsonValueType::Array) {
-                    JsonArray a = e.GetArray();
+                fims::JsonValue e = (*it).second;
+                if (e.GetType() == fims::JsonValueType::JArray) {
+                    fims::JsonArray a = e.GetArray();
                     nsurveys = a[0].GetInt();
                 }
 
@@ -296,44 +307,47 @@ public:
                 for (size_t i = 0; i < nsurveys; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > s = std::make_shared<fims_popdy::Fleet<double> >();
                     s->is_survey = true;
+                    s->log_q.resize(1);
                     s->Initialize(nyears, nages);
-                    s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
-                    s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
+                 //   s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
+                  //  s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
 
                     std::stringstream strs;
                     strs << "survey" << i + 1;
 
                     it = obj.find("sel_survey");
-                    typename JsonObject::iterator fsel;
+                    typename fims::JsonObject::iterator fsel;
                     if (it != obj.end()) {
-                        JsonValue e = (*it).second;
-                        if (e.GetType() == JsonValueType::Object) {
-                            JsonObject o = e.GetObject();
+                        fims::JsonValue e = (*it).second;
+                        if (e.GetType() == fims::JsonValueType::Object) {
+                            fims::JsonObject o = e.GetObject();
                             fsel = o.find(strs.str().c_str());
-                         
-
-                            if ((*fsel).second.GetType() == JsonValueType::Object) {
 
 
-                                JsonObject fsel_o = (*fsel).second.GetObject();
+                            if ((*fsel).second.GetType() == fims::JsonValueType::Object) {
+
+
+                                fims::JsonObject fsel_o = (*fsel).second.GetObject();
                                 it = fsel_o.find("pattern");
-                                if ((*it).second.GetType() == JsonValueType::Array) {
+                                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
 
-                                    JsonArray sel_pattern = (*it).second.GetArray();
+                                    fims::JsonArray sel_pattern = (*it).second.GetArray();
 
                                     if (sel_pattern[0].GetInt() == 1) {//logistic
                                         std::shared_ptr<fims_popdy::LogisticSelectivity<double> > selectivity = std::make_shared<fims_popdy::LogisticSelectivity<double> >();
 
                                         it = fsel_o.find("A50.sel1");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->inflection_point = a50[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->inflection_point.resize(1);
+                                            selectivity->inflection_point[0] = a50[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("slope.sel1");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray slope = (*it).second.GetArray();
-                                            selectivity->slope = slope[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope.resize(1);
+                                            selectivity->slope[0] = slope[0].GetDouble();
                                         }
 
                                         s->selectivity = selectivity;
@@ -344,27 +358,31 @@ public:
                                         std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double> > selectivity = std::make_shared<fims_popdy::DoubleLogisticSelectivity<double> >();
 
                                         it = fsel_o.find("A50.sel1");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->inflection_point_asc = a50[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->inflection_point_asc.resize(1);
+                                            selectivity->inflection_point_asc[0] = a50[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("slope.sel1");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray slope = (*it).second.GetArray();
-                                            selectivity->slope_asc = slope[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope_asc.resize(1);
+                                            selectivity->slope_asc[0] = slope[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("A50.sel2");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->inflection_point_desc = a50[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray a50 = (*it).second.GetArray();
+                                            selectivity->inflection_point_desc.resize(1);
+                                            selectivity->inflection_point_desc[0] = a50[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("slope.sel2");
-                                        if ((*it).second.GetType() == JsonValueType::Array) {
-                                            JsonArray slope = (*it).second.GetArray();
-                                            selectivity->slope_desc = slope[0].GetDouble();
+                                        if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                                            fims::JsonArray slope = (*it).second.GetArray();
+                                            selectivity->slope_desc.resize(1);
+                                            selectivity->slope_desc[0] = slope[0].GetDouble();
                                         }
                                         s->selectivity = selectivity;
                                     }
@@ -377,19 +395,19 @@ public:
                     }
 
 
-                    s->log_q = 0.0;
+                    s->log_q[0] = 0.0;
                     it = obj2.find("survey_q");
 
 
-                    if ((*it).second.GetType() == JsonValueType::Object) {
+                    if ((*it).second.GetType() == fims::JsonValueType::Object) {
                         //                        f->log_q = fims_math::log((*it).second.GetDouble());
-                        JsonObject qobj = (*it).second.GetObject();
+                        fims::JsonObject qobj = (*it).second.GetObject();
 
-                        typename JsonObject::iterator qit = qobj.find("survey1");
+                        typename fims::JsonObject::iterator qit = qobj.find("survey1");
 
-                        if ((*qit).second.GetType() == JsonValueType::Array) {
-                            JsonArray a = (*qit).second.GetArray();
-                            s->log_q = fims_math::log(a[0].GetDouble());
+                        if ((*qit).second.GetType() == fims::JsonValueType::JArray) {
+                            fims::JsonArray a = (*qit).second.GetArray();
+                            s->log_q[0] = fims_math::log(a[0].GetDouble());
                             if (this->print_statements) {
                                 std::cout << "q = " << a[0].GetDouble() << "\nlog(q) = " << s->log_q << "\n";
                             }
@@ -411,15 +429,16 @@ public:
             pop.nfleets = pop.fleets.size();
 
             // initialize population
+            pop.numbers_at_age.resize((nyears + 1) * nages);
             pop.Initialize(nyears, 1, nages);
 
             // Set initial size to value from MCP C0
             it = obj2.find("N.age");
             if (it != obj2.end()) {
-                if ((*it).second.GetType() == JsonValueType::Array) {
-                    JsonArray n = (*it).second.GetArray();
-                    if (n[0].GetType() == JsonValueType::Array) {
-                        JsonArray init_n = n[0].GetArray();
+                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                    fims::JsonArray n = (*it).second.GetArray();
+                    if (n[0].GetType() == fims::JsonValueType::JArray) {
+                        fims::JsonArray init_n = n[0].GetArray();
                         for (size_t i = 0; i < pop.nages; i++) {
                             pop.log_init_naa[i] = std::log(init_n[i].GetDouble());
                         }
@@ -430,11 +449,11 @@ public:
             it = obj.find("ages");
             if (it != obj.end()) {
 
-                if ((*it).second.GetType() == JsonValueType::Array) {
+                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
                     if (print_statements) {
                         std::cout << "ages: ";
                     }
-                    JsonArray ages = (*it).second.GetArray();
+                    fims::JsonArray ages = (*it).second.GetArray();
                     for (int i = 0; i < ages.size(); i++) {
                         pop.ages[i] = ages[i].GetDouble();
                         if (print_statements) {
@@ -456,11 +475,11 @@ public:
             it = obj.find("year");
             if (it != obj.end()) {
 
-                if ((*it).second.GetType() == JsonValueType::Array) {
+                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
                     if (print_statements) {
                         std::cout << "year: ";
                     }
-                    JsonArray years = (*it).second.GetArray();
+                    fims::JsonArray years = (*it).second.GetArray();
                     for (int i = 0; i < years.size(); i++) {
                         pop.years[i] = years[i].GetDouble();
                         if (print_statements) {
@@ -482,8 +501,8 @@ public:
                 std::cout << "\nMortality:\n";
             }
             it = obj.find("M");
-            if ((*it).second.GetType() == JsonValueType::Array) {
-                JsonArray m = (*it).second.GetArray();
+            if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                fims::JsonArray m = (*it).second.GetArray();
                 double log_M = std::log(m[0].GetDouble());
                 std::fill(pop.log_M.begin(), pop.log_M.end(), log_M);
                 if (print_statements) {
@@ -505,11 +524,12 @@ public:
             }
             it = obj.find("R0");
             if (it != obj.end()) {
-                if ((*it).second.GetType() == JsonValueType::Array) {
+                if ((*it).second.GetType() ==fims::JsonValueType::JArray) {
                     double r0 = (*it).second.GetArray()[0].GetDouble();
-                    rec->log_rzero = std::log(r0);
+                    rec->log_rzero.resize(1);
+                    rec->log_rzero[0] = std::log(r0);
                     if (print_statements) {
-                        std::cout << "R0 " << rec->log_rzero << "| \n";
+                        std::cout << "R0 " << rec->log_rzero[0] << "| \n";
                     }
                 }
             } else {
@@ -520,10 +540,11 @@ public:
 
             it = obj.find("h");
             if (it != obj.end()) {
-                if ((*it).second.GetType() == JsonValueType::Array) {
-                    rec->logit_steep = fims_math::logit(0.2, 1.0, (*it).second.GetArray()[0].GetDouble());
+                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                    rec->logit_steep.resize(1);
+                    rec->logit_steep[0] = fims_math::logit(0.2, 1.0, (*it).second.GetArray()[0].GetDouble());
                     if (print_statements) {
-                        std::cout << "'h' " << rec->logit_steep << " \n";
+                        std::cout << "'h' " << rec->logit_steep[0] << " \n";
                     }
                 }
             } else {
@@ -532,21 +553,6 @@ public:
                 }
             }
 
-            it = obj.find("logR_sd");
-            if (it != obj.end()) {
-                if ((*it).second.GetType() == JsonValueType::Array) {
-                    rec->log_sigma_recruit = (*it).second.GetArray()[0].GetDouble();
-                    if (print_statements) {
-                        std::cout << "'SD' " << rec->log_sigma_recruit << " \n";
-                    }
-                }
-            } else {
-                if (print_statements) {
-                    std::cout << "'logR_sd' not found.\n";
-                }
-            }
-
-
             it = obj.find("logR.resid");
             /*the log_recruit_dev vector does not include a value for year == 0
               and is of length nyears - 1 where the first position of the vector
@@ -554,8 +560,8 @@ public:
             rec->log_recruit_devs.resize(nyears);
             std::fill(rec->log_recruit_devs.begin(), rec->log_recruit_devs.end(), 0.0);
             if (it != obj.end()) {
-                if ((*it).second.GetType() == JsonValueType::Array) {
-                    JsonArray rdev = (*it).second.GetArray();
+                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                    fims::JsonArray rdev = (*it).second.GetArray();
                     if (print_statements) {
                         std::cout << "recruitment deviations: ";
                     }
@@ -585,10 +591,11 @@ public:
             }
             it = obj.find("A50.mat");
             if (it != obj.end()) {
-                if ((*it).second.GetType() == JsonValueType::Array) {
-                    mat->inflection_point = (*it).second.GetArray()[0].GetDouble();
+                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                    mat->inflection_point.resize(1);
+                    mat->inflection_point[0] = (*it).second.GetArray()[0].GetDouble();
                     if (print_statements) {
-                        std::cout << "inflection_point " << mat->inflection_point << " \n";
+                        std::cout << "inflection_point.mat " << mat->inflection_point[0] << " \n";
                     }
                 }
             } else {
@@ -596,15 +603,16 @@ public:
                     std::cout << "'A50.mat' not found.\n";
                 }
             }
-            
+
             pop.maturity = mat;
 
             it = obj.find("slope.mat");
             if (it != obj.end()) {
-                if ((*it).second.GetType() == JsonValueType::Array) {
-                    mat->slope = (*it).second.GetArray()[0].GetDouble();
+                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                    mat->slope.resize(1);
+                    mat->slope[0] = (*it).second.GetArray()[0].GetDouble();
                     if (print_statements) {
-                        std::cout << "slope " << mat->slope << " \n";
+                        std::cout << "slope.mat " << mat->slope[0] << " \n";
                     }
                 }
             } else {
@@ -619,8 +627,8 @@ public:
 
             it = obj.find("W.kg");
             if (it != obj.end()) {
-                if ((*it).second.GetType() == JsonValueType::Array) {
-                    JsonArray wt = (*it).second.GetArray();
+                if ((*it).second.GetType() == fims::JsonValueType::JArray) {
+                    fims::JsonArray wt = (*it).second.GetArray();
                     if (print_statements) {
                         std::cout << "W.kg: ";
                     }
@@ -649,12 +657,12 @@ public:
     }
 
     std::vector<double> RunModelLoop(fims_popdy::Population<double> &pop,
-            const JsonValue & input) {
+            const fims::JsonValue & input) {
 
-        JsonObject output;
-        JsonArray array;
+        fims::JsonObject output;
+        fims::JsonArray array;
 
-        
+
 
         pop.Evaluate();
 
@@ -672,9 +680,9 @@ public:
                 std::cout << std::endl;
             }
         }
-        
+
         output["NumbersAtAge"] = array;
-        
+
         if (print_statements) {
             std::cout << "\n\n"
                     << std::endl;
@@ -685,7 +693,7 @@ public:
     }
 
     bool CheckModelOutput(fims_popdy::Population<double> &pop,
-            JsonValue &output) {
+            fims::JsonValue &output) {
         return true;
     }
 };

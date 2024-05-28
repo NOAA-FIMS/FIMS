@@ -1,27 +1,39 @@
 ## usethis namespace: start
-#' @useDynLib FIMS, .registration = TRUE
-#' @importFrom Rcpp sourceCpp
-#' @importFrom TMB MakeADFun
-#' @import stats
-#' @import methods
-#' @importFrom ggplot2 .data
-#' @export CreateTMBModel
-#' @export get_fixed
-#' @export get_random
-#' @export clear
-#' @export clear_logs
-#' @export Parameter
-#' @export BevertonHoltRecruitment
-#' @export Fleet
 #' @export AgeComp
-#' @export Index
-#' @export Population
-#' @export TMBDnormDistribution
-#' @export LogisticMaturity
-#' @export LogisticSelectivity
+#' @export BevertonHoltRecruitment
+#' @export clear
+#' @export CreateTMBModel
+#' @export DlnormDistribution
+#' @export DmultinomDistribution
+#' @export DnormDistribution
 #' @export DoubleLogisticSelectivity
 #' @export EWAAgrowth
-#' @export TMBDlnormDistribution
-#' @export TMBDmultinomDistribution
+#' @export finalize
+#' @export Fleet
+#' @export get_fixed
+#' @export get_log
+#' @export get_log_errors
+#' @export get_log_module
+#' @export get_log_warnings
+#' @export get_output
+#' @export get_random
+#' @export Index
+#' @export LengthComp
+#' @export log_error
+#' @export log_info
+#' @export log_warning
+#' @export LogisticMaturity
+#' @export LogisticSelectivity
+#' @export Parameter
+#' @export ParameterVector
+#' @export Population
+#' @export set_log_throw_on_error
+#' @import methods
+#' @import stats
+#' @importFrom ggplot2 .data
+#' @importFrom Rcpp sourceCpp
+#' @importFrom rlang :=
+#' @importFrom TMB MakeADFun
+#' @useDynLib FIMS, .registration = TRUE
 ## usethis namespace: end
 NULL

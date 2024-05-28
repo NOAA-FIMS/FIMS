@@ -20,7 +20,6 @@ namespace
                 { 
                     if(!population.fleets[fleet_index]->is_survey){
                     // Known values were used to generate "true" value and test CalculateMortality()
-                    size_t index_yf = year * population.nfleets + fleet_index;
                     mortality_F[i_age_year] += population.fleets[fleet_index]->Fmort[year] *
                                              population.fleets[fleet_index]->selectivity->evaluate(population.ages[age]);
                 
@@ -69,8 +68,8 @@ namespace
  
                 if (age == 0)
                 {            
-                    population.unfished_numbers_at_age[i_age_year] = fims_math::exp(population.recruitment->log_rzero);
-                    test_unfished_numbers_at_age[i_age_year] = fims_math::exp(population.recruitment->log_rzero);
+                    population.unfished_numbers_at_age[i_age_year] = fims_math::exp(population.recruitment->log_rzero[0]);
+                    test_unfished_numbers_at_age[i_age_year] = fims_math::exp(population.recruitment->log_rzero[0]);
                 }
 
                 if (year == 0 && age > 0){

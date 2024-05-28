@@ -2,6 +2,9 @@
 
 #include "population_dynamics/population/population.hpp"
 
+
+
+
 namespace {
 
 // Use test fixture to reuse the same configuration of objects for
@@ -22,6 +25,7 @@ class PopulationInitializeTestFixture : public testing::Test {
     population.nages = nages;
     for (int i = 0; i < nfleets; i++) {
       auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+      fleet->log_q.resize(1);
       population.fleets.push_back(fleet);
     }
   }
@@ -79,12 +83,18 @@ class PopulationEvaluateTestFixture : public testing::Test {
       auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
       auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
-      selectivity->inflection_point = 7;
-      selectivity->slope = 0.5;
+      selectivity->inflection_point.resize(1);
+      selectivity->inflection_point[0] = 7;
+      selectivity->slope.resize(1);
+      selectivity->slope[0] = 0.5;
 
+      fleet->expected_catch.resize(nyears);
+      fleet->expected_index.resize(nyears);  
+      fleet->catch_numbers_at_age.resize(nyears * nages);
+      fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
       fleet->selectivity = selectivity;
-      fleet->log_q = log_q_distribution(generator);
+      fleet->log_q[0] = log_q_distribution(generator);
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
@@ -94,8 +104,12 @@ class PopulationEvaluateTestFixture : public testing::Test {
       fleet->Prepare();
       population.fleets.push_back(fleet);
     }
-
-    population.Initialize(nyears, nseasons, nages);
+    population.numbers_at_age.resize((nyears + 1) * nages);
+    try {
+        population.Initialize(nyears, nseasons, nages);
+    } catch (std::exception& e) {
+        std::cout << e.what() << "\n";
+    }
 
     for (int i = 0; i < nages; i++) {
       population.ages[i] = i + 1;
@@ -154,13 +168,17 @@ class PopulationEvaluateTestFixture : public testing::Test {
     population.Prepare();
 
     auto maturity = std::make_shared<fims_popdy::LogisticMaturity<double>>();
-    maturity->inflection_point = 6;
-    maturity->slope = 0.15;
+    maturity->inflection_point.resize(1);
+    maturity->inflection_point[0] = 6;
+    maturity->slope.resize(1);
+    maturity->slope[0] = 0.15;
     population.maturity = maturity;
 
     auto recruitment = std::make_shared<fims_popdy::SRBevertonHolt<double>>();
-    recruitment->logit_steep = fims_math::logit(0.2, 1.0, 0.75);
-    recruitment->log_rzero = fims_math::log(1000000.0);
+    recruitment->logit_steep.resize(1);
+    recruitment->log_rzero.resize(1);
+    recruitment->logit_steep[0] = fims_math::logit(0.2, 1.0, 0.75);
+    recruitment->log_rzero[0] = fims_math::log(1000000.0);
     /*the log_recruit_dev vector does not include a value for year == 0
     and is of length nyears - 1 where the first position of the vector
     corresponds to the second year of the time series.*/
@@ -229,12 +247,18 @@ class PopulationPrepareTestFixture : public testing::Test {
       auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
       auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
-      selectivity->inflection_point = 7;
-      selectivity->slope = 0.5;
-
+      selectivity->inflection_point.resize(1);
+      selectivity->slope.resize(1);
+      selectivity->inflection_point[0] = 7;
+      selectivity->slope[0] = 0.5;
+      
+      fleet->expected_catch.resize(nyears);
+      fleet->expected_index.resize(nyears);  
+      fleet->catch_numbers_at_age.resize(nyears * nages);
+      fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
       fleet->selectivity = selectivity;
-      fleet->log_q = log_q_distribution(generator);
+      fleet->log_q[0] = log_q_distribution(generator);
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
@@ -245,6 +269,7 @@ class PopulationPrepareTestFixture : public testing::Test {
       population.fleets.push_back(fleet);
     }
 
+    population.numbers_at_age.resize((nyears + 1) * nages);
     population.Initialize(nyears, nseasons, nages);
 
     for (int i = 0; i < nages; i++) {
