@@ -186,7 +186,7 @@ uint32_t ParameterVector::id_g = 0;
 
 
 
-ParameterVector CreateVector(size_t size){
+ParameterVector create_vector(size_t size){
     return ParameterVector(size);
 }
 
