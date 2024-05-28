@@ -335,6 +335,7 @@ RCPP_MODULE(fims) {
   Rcpp::function("clear_maturity_log", clear_maturity_log);
   Rcpp::function("clear_selectivity_log", clear_selectivity_log);
   Rcpp::function("clear_debug_log", clear_debug_log);
+  Rcpp::function("create_vector", &CreateVector);
 
   Rcpp::class_<Parameter>("Parameter")
       .constructor()
@@ -345,6 +346,18 @@ RCPP_MODULE(fims) {
       .field("max", &Parameter::max_m)
       .field("is_random_effect", &Parameter::is_random_effect_m)
       .field("estimated", &Parameter::estimated_m);
+
+   Rcpp::class_<ParameterVector>("ParameterVector")
+      .constructor()
+      .constructor<size_t>()
+      .constructor<Rcpp::NumericVector, size_t>()
+      .field("data", &ParameterVector::storage_m)
+      .method("at", &ParameterVector::at)
+      .method("size", &ParameterVector::size)
+      .method("resize", &ParameterVector::resize)
+      .method("set_all_estimable", &ParameterVector::set_all_estimable)
+      .method("set_all_random", &ParameterVector::set_all_random)
+      .method("fill", &ParameterVector::fill);
 
   Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()
