@@ -317,6 +317,7 @@ void clear() {
 }
 
 RCPP_EXPOSED_CLASS(Parameter)
+RCPP_EXPOSED_CLASS(ParameterVector)
 RCPP_MODULE(fims) {
   Rcpp::function("CreateTMBModel", &CreateTMBModel);
   Rcpp::function("get_fixed", &get_fixed_parameters_vector);
@@ -343,8 +344,21 @@ RCPP_MODULE(fims) {
       .field("value", &Parameter::value_m)
       .field("min", &Parameter::min_m)
       .field("max", &Parameter::max_m)
+      .field("id", &Parameter::id_m)
       .field("is_random_effect", &Parameter::is_random_effect_m)
       .field("estimated", &Parameter::estimated_m);
+
+   Rcpp::class_<ParameterVector>("ParameterVector")
+      .constructor()
+      .constructor<size_t>()
+      .constructor<Rcpp::NumericVector, size_t>()
+      .field("data", &ParameterVector::storage_m)
+      .method("at", &ParameterVector::at)
+      .method("size", &ParameterVector::size)
+      .method("resize", &ParameterVector::resize)
+      .method("set_all_estimable", &ParameterVector::set_all_estimable)
+      .method("set_all_random", &ParameterVector::set_all_random)
+      .method("fill", &ParameterVector::fill);
 
   Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()
