@@ -25,6 +25,8 @@
  */
 class Parameter {
  public:
+ static uint32_t id_g;
+    uint32_t id_m; /**< id of the parameter */
   double value_m; /**< initial value of the parameter*/
   double min_m =
       std::numeric_limits<double>::min(); /**< min value of the parameter*/
@@ -43,20 +45,28 @@ class Parameter {
    * @details Inputs include value, min, max, estimated.
    */
   Parameter(double value, double min, double max, bool estimated)
-      : value_m(value), min_m(min), max_m(max), estimated_m(estimated) {}
+      : value_m(value), min_m(min), max_m(max), estimated_m(estimated),id_m(Parameter::id_g++) {}
 
   /**
    * @brief Constructor for initializing Parameter.
    * @details Inputs include value.
    */
-  Parameter(double value) { value_m = value; }
+  Parameter(double value) { 
+    value_m = value; 
+    id_m = Parameter::id_g++;
+  }
 
   /**
    * @brief Constructor for initializing Parameter.
    * @details Set value to 0 when there is no input value.
    */
-  Parameter() { value_m = 0; }
+  Parameter() { 
+    value_m = 0; 
+    id_m = Parameter::id_g++;}
 };
+
+uint32_t Parameter::id_g = 0;
+
 
 /**
  * @brief Rcpp representation of a Parameter vector
