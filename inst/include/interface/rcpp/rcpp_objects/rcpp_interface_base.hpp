@@ -185,12 +185,6 @@ public:
 uint32_t ParameterVector::id_g = 0;
 
 
-
-ParameterVector create_vector(size_t size){
-    return ParameterVector(size);
-}
-
-
 /**
  *@brief Base class for all interface objects
  */
