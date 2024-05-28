@@ -337,7 +337,7 @@ RCPP_MODULE(fims) {
   Rcpp::function("clear_maturity_log", clear_maturity_log);
   Rcpp::function("clear_selectivity_log", clear_selectivity_log);
   Rcpp::function("clear_debug_log", clear_debug_log);
-  Rcpp::function("create_vector", CreateVector);
+  Rcpp::function("create_vector", create_vector);
 
   Rcpp::class_<Parameter>("Parameter")
       .constructor()
