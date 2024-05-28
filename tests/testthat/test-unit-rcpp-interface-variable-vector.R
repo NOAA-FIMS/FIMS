@@ -49,7 +49,7 @@ p[1]$value
 p[1]$value<-1
 p[1]$value
 
-for( i in 1:length(v)){
+for( i in 1:length(p)){
 print(p[i]$id)
 }
 
