@@ -75,7 +75,7 @@ setMethod("acos", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,a
 
 setMethod("+", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), function (e1, e2){
     
-    if(e1$size() != e$size()){
+    if(e1$size() != e2$size()){
         stop("Call to operator \"+\", vectors not equal length")
     }
     ret<-new(ParameterVector, e1$size())
@@ -127,7 +127,7 @@ setMethod("+", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"), function 
 
 setMethod("-", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), function (e1, e2){
     
-    if(e1$size() != e$size()){
+    if(e1$size() != e2$size()){
         stop("Call to operator \"-\", vectors not equal length")
     }
     ret<-new(ParameterVector, e1$size())
@@ -179,7 +179,7 @@ setMethod("-", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"), function 
 
 setMethod("*", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), function (e1, e2){
     
-    if(e1$size() != e$size()){
+    if(e1$size() != e2$size()){
         stop("Call to operator \"*\", vectors not equal length")
     }
     ret<-new(ParameterVector, e1$size())
@@ -231,7 +231,7 @@ setMethod("*", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"), function 
 
 setMethod("/", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), function (e1, e2){
     
-    if(e1$size() != e$size()){
+    if(e1$size() != e2$size()){
         stop("Call to operator \"/\", vectors not equal length")
     }
     ret<-new(ParameterVector, e1$size())
