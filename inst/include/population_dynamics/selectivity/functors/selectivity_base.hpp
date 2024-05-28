@@ -1,15 +1,12 @@
-/*
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- * SelectivityBase  file
- * The purpose of this file is to declare the SelectivityBase class
- * which is the base class for all selectivity functors.
- *
- * DEFINE guards for selectivity module outline to define the
+/**
+ * @file selectivity_base.hpp
+ * @brief Declares the SelectivityBase class which is the base class for all
+ * selectivity functors.
+ * @details Defines guards for selectivity module outline to define the
  * selectivity hpp file if not already defined.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP
 #define POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP
@@ -47,6 +44,14 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
    * size in selectivity).
    */
   virtual const Type evaluate(const Type& x) = 0;
+  
+    /**
+   * @brief Calculates the selectivity.
+   * @param x The independent variable in the logistic function (e.g., age or
+   * size in selectivity).
+   * @param pos Position index, e.g., which year.
+   */
+  virtual const Type evaluate(const Type& x, size_t pos) = 0;
 };
 
 // default id of the singleton selectivity class

@@ -14,11 +14,12 @@ namespace
 // BH_fcn(R0 = 1000, h = 0.99, phi0 = 0.2, x = 40): 990
 
       fims_popdy::SRBevertonHolt<double> recruit1;
-      
-      recruit1.logit_steep = fims_math::logit(0.2, 1.0, 0.7500);
+      recruit1.logit_steep.resize(1);
+      recruit1.logit_steep[0] = fims_math::logit(0.2, 1.0, 0.7500);
       // The R0 value (1 thousand) here is for this unit test.
       // It is different than the Model Comparison Project value (1 million). 
-      recruit1.log_rzero = std::log(1000.000);
+      recruit1.log_rzero.resize(1);
+      recruit1.log_rzero[0] = std::log(1000.000);
       double spawners = 30.000;
       double phi_0 = 0.1;
       // # R code that generates true values for testing
@@ -36,8 +37,10 @@ namespace
       EXPECT_EQ(recruit1.GetId(), 0);
       
       fims_popdy::SRBevertonHolt<double> recruit2;
-      recruit2.logit_steep = fims_math::logit(0.2, 1.0, 0.200);
-      recruit2.log_rzero = std::log(1000.000);
+      recruit2.logit_steep.resize(1);
+      recruit2.logit_steep[0] = fims_math::logit(0.2, 1.0, 0.200);
+      recruit2.log_rzero.resize(1);
+      recruit2.log_rzero[0] = std::log(1000.000);
       double spawners2 = 40.000;
       double phi_02 = 0.2;
       // # R code that generates true values for testing

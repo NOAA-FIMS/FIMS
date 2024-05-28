@@ -21,6 +21,7 @@ articles:
   contents:
   - fims-documentation
   - fims-demo
+  - fims-logging
 
 - title: Developer
   contents:
@@ -30,16 +31,28 @@ reference:
 - title: Data
   desc: >
       FIMS comes with a selection of built-in datasets that are used in
-      examples to illustrate various visualisation challenges.
+      examples to illustrate various visualization challenges.
   contents:
-  - data_mile1
+  - data1
+
+- title: Run FIMS
+  desc: Primary functions used when setting up or running a FIMS model.
+  contents:
+  - starts_with("FIMSFrame")
+  - starts_with("get_FIMSFrame")
+  - starts_with("m_")
+  - starts_with("create_default_")
+  - update_parameters
+  - has_keyword("distribution")
+  - starts_with("initialize_")
+  - has_keyword("fit_fims")
+  - is_fims_verbose
 
 - title: Package development
   desc: Primary functions used when developing FIMS package.
   contents:
   - has_keyword("gtest_helper")
-  - starts_with("FIMSFrame")
-  - starts_with("m_")
+  - has_keyword("set_methods")
 
 news:
   releases:

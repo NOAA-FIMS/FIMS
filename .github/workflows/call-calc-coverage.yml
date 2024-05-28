@@ -5,8 +5,7 @@ name: call-calc_coverage
 on:
   workflow_dispatch:
   push:
-    branches:    
-      - main
+    on: workflow_dispatch
     paths-ignore:
       - .devcontainer
       - .github
@@ -16,9 +15,6 @@ on:
       - 'Rbuildignore'
       - '.gitignore'
       - 'man'
-  pull_request:
-    branches:
-      - main
 jobs:
   call-workflow:
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/calc-coverage.yml@main

@@ -159,7 +159,8 @@ doc_list <- list(
 ```
 
 ```{r list-to-markdown, echo=FALSE, warning=FALSE, message=FALSE}
-library(tidyverse)
+library(dplyr)
+library(tibble)
 
 list2markdown <- function(list) {
   enframe(list) |>

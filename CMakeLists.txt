@@ -7,7 +7,7 @@ project(FIMS
 ) # CXX is the language name
 
 # GoogleTest requires at least C++11
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 

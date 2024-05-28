@@ -55,9 +55,6 @@ init_fims <- function(i) {
 
   # Recruitment
   recruitment <- new(fims$BevertonHoltRecruitment)
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
-  # before the likelihood calculation
-  recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
   recruitment$log_rzero$value <- log(om_input$R0 + runif(1, min = 0, max = 1000))
   recruitment$log_rzero$is_random_effect <- FALSE
   recruitment$log_rzero$estimated <- FALSE
@@ -110,7 +107,7 @@ init_fims <- function(i) {
   fishing_fleet <- new(fims$Fleet)
   fishing_fleet$nages <- om_input$nages
   fishing_fleet$nyears <- om_input$nyr
-  fishing_fleet$log_Fmort <- log(om_output$f)
+  fishing_fleet$log_Fmort <- new(VariableVector, log(om_output$f), om_input$nyr)
   fishing_fleet$estimate_F <- TRUE
   fishing_fleet$random_F <- FALSE
   fishing_fleet$log_q <- log(1.0)
