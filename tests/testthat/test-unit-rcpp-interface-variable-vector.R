@@ -11,7 +11,7 @@ expect_equal(length(v0), 1)
 expect_equal(v0$at(1)$value, 0)
 
 # Test that constructor that initializes based on size works.
-v1 <- create_vector(v_size)
+v1 <- new(ParameterVector, v_size)
 v1$fill(v1_value)
 for(i in 1:v_size){
    expect_equal(v1$at(i)$value, v1_value)
@@ -23,13 +23,14 @@ for(i in 1:v_size){
    expect_equal(v2$at(i)$value, v2_value)
 }
 
+#Test that plus operator works
 v3 <- v1+v2
 v3_value<-v1_value+v2_value
-
 for(i in 1:v_size){
    expect_equal(v3$at(i)$value, v3_value)
 }
 
+#Test that minus operator works
 v3 <- v1-v2
 v3_value <- v1_value-v2_value
 
@@ -37,6 +38,7 @@ for(i in 1:v_size){
    expect_equal(v3$at(i)$value, v3_value)
 }
 
+#Test that multiply operator works
 v3 <- v1*v2
 v3_value <- v1_value*v2_value
 
@@ -44,6 +46,7 @@ for(i in 1:v_size){
    expect_equal(v3$at(i)$value, v3_value)
 }
 
+#Test that divide operator works
 v3<- v1/v2
 v3_value<-v1_value/v2_value
 
@@ -52,22 +55,22 @@ for(i in 1:v_size){
 }
 
 
-p<-create_vector(100) #new(ParameterVector, 100)
-
-
+#Test that created IDs are unique
+p<-new(ParameterVector, 100)
 
 p[1]$value
-p[1]$value<-1
+p[1]$value <- 1
 p[1]$value
-
-for( i in 1:length(p)){
-print(p[i]$id)
+k <- p[1]$id
+for(i in 2:length(p)){
+   expect_equal(p[i]$id, k + 1)
+   k <- p[i]$id
 }
 
+#Test that resize works
 p$resize(5)
-
 for( i in 1:length(p)){
-print(p[i]$id)
+   print(p[i]$id)
 }
 
 p$resize(10)
@@ -98,12 +101,4 @@ x <- vector("numeric",   length = 10)
 
 
 typeof(x)
-
-
-
-p1<-new(ParameterVector, 10)
-#str(fill)
-#fill(v1,3.1459)
-
-p2<-new(ParameterVector, 10)
 })
