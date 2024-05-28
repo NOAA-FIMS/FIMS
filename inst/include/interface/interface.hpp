@@ -1,16 +1,16 @@
-/*
- * File: interface.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project.
- * Refer to the LICENSE file for reuse information.
- *
+/**
+ * @file interface.hpp
+ * @brief An interface to the modeling platforms, e.g., TMB.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 
 #ifndef FIMS_INTERFACE_HPP
 #define FIMS_INTERFACE_HPP
+
 /*
- * Interface file. Uses pre-processing macros
+ * @brief Interface file. Uses pre-processing macros
  * to interface with multiple modeling platforms.
  */
 
@@ -24,7 +24,7 @@
 #include <TMB.hpp>
 
 // define REPORT, ADREPORT, and SIMULATE
-#define REPORT_F(name, F)                                              \
+#define FIMS_REPORT_F(name, F)                                              \
   if (isDouble<Type>::value && F->current_parallel_region < 0) {       \
     Rf_defineVar(Rf_install(#name), PROTECT(asSEXP(name)), F->report); \
     UNPROTECT(1);                                                      \
@@ -50,8 +50,25 @@ vector<Type> ADREPORTvector(vector<vector<Type> > x) {
   return res;
 }
 
-#define SIMULATE_F(F) if (isDouble<Type>::value && F->do_simulate)
+
+
+#define FIMS_SIMULATE_F(F) if (isDouble<Type>::value && F->do_simulate)
 
 #endif /* TMB_MODEL */
+
+#ifndef TMB_MODEL
+ /**
+  * @brief TODO: provide a brief description.
+  */
+ #define FIMS_SIMULATE_F(F)
+ /**
+  * @brief TODO: provide a brief description.
+  */
+ #define FIMS_REPORT_F(name, F)
+ /**
+  * @brief TODO: provide a brief description.
+  */
+ #define ADREPORT_F(name, F)
+#endif
 
 #endif /* FIMS_INTERFACE_HPP */

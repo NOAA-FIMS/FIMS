@@ -8,7 +8,6 @@
 #       base_class = "DistributionsInterfaceBase",
 #       container = "distribution_models",
 #       parameters = c("x", "mean", "sd"),
-#       evaluate_parameter = "do_log",
 #       evaluate_parameter_type = "bool"
 #     ),
 #     cran = FALSE,

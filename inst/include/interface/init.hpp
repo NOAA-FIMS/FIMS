@@ -1,12 +1,17 @@
+/**
+ * @file init.hpp
+ * @brief An interface to dynamically load the functions.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
+ */
 #ifndef INTERFACE_INIT_HPP
 #define INTERFACE_INIT_HPP
 #include <R_ext/Rdynload.h>
 #include <stdlib.h>
 
 /**
- *
- * Callback definition for TMB C++ functions.
- *
+ * @brief Callback definition for TMB C++ functions.
  */
 #ifndef TMB_CALLDEFS
 #define TMB_CALLDEFS                                             \
@@ -23,20 +28,44 @@
   }
 #endif
 
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ */
 #define CALLDEF(name, n) \
   { #name, (DL_FUNC)&name, n }
 
 extern "C" {
 
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ * @param mean 
+ * @param nu 
+ * @return SEXP 
+ */
 SEXP compois_calc_var(SEXP mean, SEXP nu);
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ * @return SEXP 
+ */
 SEXP omp_check();
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ * @return SEXP 
+ */
 SEXP omp_num_threads(SEXP);
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ * @return SEXP 
+ */
 SEXP _rcpp_module_boot_fims();
 
 /**
- *
- *Callback definition to load the FIMS module.
- *
+ * @brief Callback definition to load the FIMS module.
  */
 static const R_CallMethodDef CallEntries[] = {
     TMB_CALLDEFS,
@@ -44,9 +73,8 @@ static const R_CallMethodDef CallEntries[] = {
     {NULL, NULL, 0}};
 
 /**
- *
- * FIMS shared object initializer.
- * @param dll
+ * @brief FIMS shared object initializer.
+ * @param dll TODO: provide a brief description.
  *
  */
 void R_init_FIMS(DllInfo *dll) {

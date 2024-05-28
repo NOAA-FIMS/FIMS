@@ -1,15 +1,12 @@
-/*
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- *
- * growth module_base file
- * The purpose of this file is to include any .hpp files within the
- * subfolders so that only this file needs to included in the model.hpp file.
- *
- * DEFINE guards for growth module outline to define the
+/**
+ * @file growth_base.hpp
+ * @brief Includes any .hpp files within the subfolders so that only this file
+ * needs to included in the model.hpp file.
+ * @details Defines guards for growth module outline to define the
  * module_name_base hpp file if not already defined.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef POPULATION_DYNAMICS_GROWTH_BASE_HPP
 #define POPULATION_DYNAMICS_GROWTH_BASE_HPP

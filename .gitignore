@@ -21,11 +21,6 @@
 # RStudio files
 .Rproj.user/
 
-# produced vignettes and libraries
-vignettes/*.html
-vignettes/*.pdf
-vignettes/*/libs/
-
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
 .httr-oauth
 
@@ -85,12 +80,14 @@ vignettes/*/libs/
 
 # IDE specific files
 *.vscode
+**/.vscode/
 
 # mac OS files
 *.DS_Store
 
-# All log file
+# All log files and json output
 *.log
+*.json
 
 #TMB tmp.def file
 src/tmp.def

@@ -6,22 +6,33 @@
 #' @import methods
 #' @importFrom ggplot2 .data
 #' @export CreateTMBModel
+#' @export finalize
 #' @export get_fixed
+#' @export get_log
+#' @export get_log_errors
+#' @export get_log_module
+#' @export get_log_warnings
+#' @export get_output
 #' @export get_random
+#' @export log_error
+#' @export log_info
+#' @export log_warning
+#' @export set_log_throw_on_error
 #' @export clear
-#' @export clear_logs
 #' @export Parameter
 #' @export BevertonHoltRecruitment
 #' @export Fleet
 #' @export AgeComp
 #' @export Index
+#' @export LengthComp
 #' @export Population
-#' @export TMBDnormDistribution
+#' @export ParameterVector
+#' @export DnormDistribution
 #' @export LogisticMaturity
 #' @export LogisticSelectivity
 #' @export DoubleLogisticSelectivity
 #' @export EWAAgrowth
-#' @export TMBDlnormDistribution
-#' @export TMBDmultinomDistribution
+#' @export DlnormDistribution
+#' @export DmultinomDistribution
 ## usethis namespace: end
 NULL

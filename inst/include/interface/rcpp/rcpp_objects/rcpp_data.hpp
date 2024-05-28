@@ -1,9 +1,10 @@
-/*
- * File:   rcpp_fleet.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE file
- * for reuse information.
+/**
+ * @file rcpp_fleet.hpp
+ * @brief The Rcpp interface to declare different types of data, e.g.,
+ * age-composition and index data. Allows for the use of methods::new() in R.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
@@ -12,22 +13,33 @@
 #include "rcpp_interface_base.hpp"
 
 /**
- * @brief Rcpp interface for Data as an S4 object. To instantiate
- * from R:
- * fleet <- new(Data)
- *
+ * @brief Rcpp interface that serves as the parent class for Rcpp data
+ * interfaces. This type should be inherited and not called from R directly.
  */
 class DataInterfaceBase : public FIMSRcppInterfaceBase {
  public:
-  Rcpp::NumericVector observed_data; /**< The data */
-  static uint32_t id_g; /**< static id of the DataInterfaceBase object */
-  uint32_t id;          /**< local id of the DataInterfaceBase object */
-  // live objects in C++ are objects that have been created and live in memory
-  static std::map<uint32_t, DataInterfaceBase*>
-      live_objects; /**< map associating the ids of DataInterfaceBase to
-        the objects */
+  /**
+   * @brief The vector of data that is being passed from R.
+   */
+  Rcpp::NumericVector observed_data;
+  /**
+   * @brief The static id of the DataInterfaceBase object.
+   */
+  static uint32_t id_g;
+  /**
+   * @brief The local id of the DataInterfaceBase object.
+   * 
+   */
+  uint32_t id;
+  /**
+   * @brief The map associating the IDs of DataInterfaceBase to the objects.
+   * This is a live object, which is an object that has been created and lives
+   * in memory.
+   */
+  static std::map<uint32_t, DataInterfaceBase*> live_objects;
 
-  /** @brief constructor
+  /**
+   * @brief The constructor.
    */
   DataInterfaceBase() {
     this->id = DataInterfaceBase::id_g++;
@@ -37,35 +49,50 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
 
-  /** @brief destructor
+  /**
+   * @brief The destructor.
    */
   virtual ~DataInterfaceBase() {}
 
-  /** @brief get the ID of the interface base object
+  /**
+   * @brief Get the ID for the child data interface objects to inherit.
    */
   virtual uint32_t get_id() { return this->id; }
 
-  /**@brief add_to_fims_tmb dummy method
-   *
+  /**
+   * @brief Adds the parameters to the TMB model.
    */
   virtual bool add_to_fims_tmb() { return true; };
 };
+// static id of the DataInterfaceBase object
 uint32_t DataInterfaceBase::id_g = 1;
+// local id of the DataInterfaceBase object map relating the ID of the
+// DataInterfaceBase to the DataInterfaceBase objects
 std::map<uint32_t, DataInterfaceBase*> DataInterfaceBase::live_objects;
 
 /**
- * @brief Rcpp interface for age comp data as an S4 object. To instantiate
- * from R:
- * acomp <- new(AgeComp)
+ * @brief  The Rcpp interface for AgeComp to instantiate the object from R:
+ * acomp <- methods::new(AgeComp).
  */
 class AgeCompDataInterface : public DataInterfaceBase {
  public:
-  int amax;                          /**< first dimension of the data */
-  int ymax;                          /**< second dimension of the data */
-  Rcpp::NumericVector age_comp_data; /**<the age composition data*/
+  /**
+   * @brief The first dimension of the data, which relates to the number of age
+   * bins.
+   */
+  int amax;
+  /**
+   * @brief The second dimension of the data, which relates to the number of
+   * time steps or years.
+   */
+  int ymax;
+  /**
+   * @brief The vector of age-composition data that is being passed from R.
+   */
+  Rcpp::NumericVector age_comp_data;
 
   /**
-   * @brief constructor
+   * @brief The constructor.
    */
   AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase() {
     this->amax = amax;
@@ -73,13 +100,41 @@ class AgeCompDataInterface : public DataInterfaceBase {
   }
 
   /**
-   * @brief destructor
+   * @brief The destructor.
    */
   virtual ~AgeCompDataInterface() {}
 
-  /** @brief get the ID of the interface base object
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+  
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * data interface with age-composition data. It also returns the ID, the rank
+   * of 2, the dimensions by printing ymax and amax, followed by the data values
+   * themselves. This string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+    
+    ss << "\"module\" : {\n";
+    ss << " \"name\": \"data\",\n";
+    ss << " \"type\" : \"AgeComp\",\n";
+    ss << " \"id\":" << this->id << ",\n";
+    ss << " \"rank\": " << 2 << ",\n";
+    ss << " \"dimensions\": [" << this->ymax << "," << this->amax << "],\n";
+    ss << " \"values\": [";
+    for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++) {
+      ss << age_comp_data[i] << ", ";
+    }
+    ss << age_comp_data[age_comp_data.size() - 1] << "]\n";
+    ss << "}";
+    return ss.str();
+  }
+  
 
 #ifdef TMB_MODEL
 
@@ -106,7 +161,8 @@ class AgeCompDataInterface : public DataInterfaceBase {
   }
 
   /**
-   * @brief adds parameters to the model
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
@@ -121,28 +177,158 @@ class AgeCompDataInterface : public DataInterfaceBase {
 };
 
 /**
- * @brief Rcpp interface for data as an S4 object. To instantiate
- * from R:
- * fleet <- new(Index)
+ * @brief The Rcpp interface for LengthComp to instantiate the object from R:
+ * lcomp <- methods::new(LengthComp).
+ */
+class LengthCompDataInterface : public DataInterfaceBase {
+ public:
+  /**
+   * @brief The first dimension of the data, which relates to the number of
+   * length bins.
+   */
+  int lmax;
+  /**
+   * @brief The second dimension of the data, which relates to the number of
+   * time steps or years.
+   */
+  int ymax;
+  /**
+   * @brief The vector of length-composition data that is being passed from R.
+   */
+  Rcpp::NumericVector length_comp_data;
+
+  /**
+   * @brief The constructor.
+   */
+  LengthCompDataInterface(int ymax = 0, int lmax = 0) : DataInterfaceBase() {
+    this->lmax = lmax;
+    this->ymax = ymax;
+  }
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~LengthCompDataInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
+  
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * data interface with length-composition data. It also returns the ID, the
+   * rank of 2, the dimensions by printing ymax and lmax, followed by the data
+   * values themselves. This string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+    
+    ss << "\"module\" : {\n";
+    ss << " \"name\": \"data\",\n";
+    ss << " \"type\" : \"LengthComp\",\n";
+    ss << " \"id\":" << this->id << ",\n";
+    ss << " \"rank\": " << 2 << ",\n";
+    ss << " \"dimensions\": [" << this->ymax << "," << this->lmax << "],\n";
+    ss << " \"values\": [";
+    for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++) {
+      ss << length_comp_data[i] << ", ";
+    }
+    ss << length_comp_data[length_comp_data.size() - 1] << "]\n";
+    ss << "}";
+    return ss.str();
+  }
+  
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_data_object::DataObject<Type>> length_comp_data =
+        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
+                                                             this->lmax);
+    length_comp_data->id = this->id;
+    for (int y = 0; y < ymax; y++) {
+      for (int l = 0; l < lmax; l++) {
+        int i_length_year = y * lmax + l;
+        length_comp_data->at(y, l) = this->length_comp_data[i_length_year];
+      }
+    }
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+    info->data_objects[this->id] = length_comp_data;
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+    return true;
+  }
+#endif
+};
+
+/**
+ * @brief  The Rcpp interface for Index to instantiate the object from R:
+ * fleet <- methods::new(Index).
  */
 class IndexDataInterface : public DataInterfaceBase {
  public:
-  int ymax;                       /**< second dimension of the data */
-  Rcpp::NumericVector index_data; /**<the age composition data*/
+  /**
+   * @brief An integer that specifies the second dimension of the data.
+   */
+  int ymax;
+  /**
+   * @brief The vector of index data that is being passed from R.
+   */
+  Rcpp::NumericVector index_data;
 
   /**
-   * @brief constructor
+   * @brief The constructor.
    */
   IndexDataInterface(int ymax = 0) : DataInterfaceBase() { this->ymax = ymax; }
 
   /**
-   * @brief destructor
+   * @brief The destructor.
    */
   virtual ~IndexDataInterface() {}
 
-  /** @brief get the ID of the interface base object
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+  
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * data interface with index data. It also returns the ID, the rank of 1, the
+   * dimensions by printing ymax, followed by the data values themselves. This
+   * string is formatted for a json file.
+   */ 
+  virtual std::string to_json() {
+    std::stringstream ss;
+    
+    ss << "\"module\" : {\n";
+    ss << " \"name\": \"data\",\n";
+    ss << " \"type\": \"Index\",\n";
+    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"rank\": " << 1 << ",\n";
+    ss << " \"dimensions\": [" << this->ymax << "],\n";
+    ss << " \"values\": [";
+    for (R_xlen_t i = 0; i < index_data.size() - 1; i++) {
+      ss << index_data[i] << ", ";
+    }
+    ss << index_data[index_data.size() - 1] << "]\n";
+    ss << "}";
+    return ss.str();
+  }
 
 #ifdef TMB_MODEL
 
@@ -165,7 +351,8 @@ class IndexDataInterface : public DataInterfaceBase {
   }
 
   /**
-   *@brief function to add to TMB
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();

@@ -1,0 +1,116 @@
+---
+title: "Introducing the FIMS Logging System"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Introducing the FIMS Logging System}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r fims1, warning=FALSE, message=FALSE, include = FALSE}
+# automatically loads fims Rcpp module
+library(FIMS)
+
+# clear memory
+clear()
+```
+
+```{r set-up-model, include=FALSE}
+# use FIMS data frame
+data_4_model <- FIMSFrame(data1)
+fleet1 <- survey1 <- list(
+  selectivity = list(form = "LogisticSelectivity"),
+  data_distribution = c(
+    Index = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution"
+  )
+)
+
+# Create default parameters
+default_parameters <- data_4_model |>
+  create_default_parameters(fleets = list(fleet1 = fleet1, survey1 = survey1))
+```
+
+## Importance of Logging 
+
+Logging in FIMS is important because it allows developers to understand what is happening within a model. It is especially useful when problems arise. The FIMS logging system has been designed to handle common issues, such as undefined modules, dimension issues, and software errors that may occur when a model is not properly defined. This logging system is accessible from both R and C++ and messages are provided using a JSON format.
+
+## How FIMS Logging works
+
+At run time, logging messages are stored in a C++ structure called LogEntry in
+inst/include/common/def.hpp. This structure contains useful information, such as information regarding when the LogEntry was created and what portion of the code initiated its creation. For details regarding the contents of a LogEntry see the doxygen documentation. All of the LogEntry(s) are stored in a log file that can be accessed from within your R environment or written to the disk. Additionally, this file can automatically be written to the disk when R fails to successfully communicate with C++.
+
+## Backend C++ Specification
+
+The logging system (specified in inst/include/common/def.hpp) provides three useful macro functions for creating log entries, `FIMS_INFO_LOG`, `FIMS_WARNING_LOG`, and `FIMS_ERROR_LOG`. These macros take a single string value as an argument, the rest is handled internally. Therefore, the developer only needs to worry about specifying the message and the macros take care of capturing all the other elements of the log entry. For example, `FIMS_INFO_LOG` is used quite a bit in information.hpp to let the user know that items were initialized appropriately. Developers can specify the information contained within the string passed to the macro to be generic or specific to values stored inside the C++ code. See below for an example of a generic message that is completely specified by the user and a more specific message that uses information stored within C++ for part of the message. Also, note that the C++ function `fims::to_string` converts a numeric value to a string, making it additive to the message.
+
+```{Rcpp, eval = FALSE}
+FIMS_INFO_LOG("Starting to initialize the fleet structures")
+FIMS_INFO_LOG("Initializing fleet " + fims::to_string(f->id))
+```
+
+Below is a real-world example of a log entry that was created while running a FIMS model due to `FIMS_INFO_LOG` within [selectivity in information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp#L371). The log entry specifies the line of the file with the macro that led to the log entry. The screenshot below shows what the user would see if this log entry were invoked.
+
+![](figures/selectivity_logging_entry.png)
+
+
+Additionally, if FIMS has been compiled with the `-DFIMS_DEBUG` pre-processing macro, output from the `FIMS_DEBUG_LOG` macro will also be available in the log file, allowing developers a more interactive developing experience. The output from this macro is turned off in the main branch, and thus, the macro is not available to the typical user to stop debugging statements from polluting the log file.
+
+## Using the Logging System in R
+
+The FIMS Logging System is also available from R, with a caveat! Logging from R gives less information than logging from C++. When a log entry originates from R, file, routine, and line information are absent. Further implementations may rectify this issue. Below are examples of adding log entries from R.
+
+```{r rlogging_info, eval=FALSE}
+log_info("info entry from R script")
+log_warning("warning entry from R script")
+```
+```{r rlogging_error, eval=TRUE}
+error <- log_error("error entry from R script")
+get_log_errors()
+```
+
+In the above example of an error level log entry, notice the R stack trace in the routine field. Sometimes this may contain useful information, but most of the time the stack trace is to large to capture the root cause of the error. For that reason, it's advised to make the error message as detailed as possible when calling `log_error(x)` from R. Note that the formatting is better when written to a file rather than printed to the screen as is done here.
+
+### **FIMS Logging Functions in R**
+
+There are several exported logging functions in the FIMS packages. To find out more about each of the following functions, use `methods::show()` to view the documentation.
+
+```{r}
+ls("package:FIMS") |> 
+  grep(pattern = "_log|log_", value = TRUE) |>
+  cli::cli_bullets()
+
+# Get documentation for log_error
+methods::show(log_error)
+```
+
+## Example of FIMS logging from R
+
+Assuming a model has already been defined in the object `default_parameters`, below is an example of using the logging system with FIMS in R.
+
+```{r example_code, eval = TRUE}
+fit <- default_parameters |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+
+# get the log as a string in JSON format and parse into a list
+log_str <- as.character(get_log())
+write(log_str, "log.json")
+log_json <- jsonlite::fromJSON(log_str)
+
+# get log warnings only
+log_warnings_str <- get_log_warnings()
+
+# get log errors only
+log_errors_str <- get_log_errors()
+
+# get log entries from the information module
+information_log <- get_log_module("information")
+```
+
+Another useful option is `set_throw_on_error()`. If this option is set to TRUE, FIMS will abort immediately when an error occurs and if `write_log(TRUE)` was previously called, the log file will be written before FIMS terminates the session. Below is an example of how to throw on error.
+
+```{r throw, eval = FALSE}
+set_log_throw_on_error(TRUE)
+log_error("throwing now!")
+```

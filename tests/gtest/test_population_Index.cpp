@@ -26,7 +26,7 @@ namespace
             // If not possible to test entire vector, test middle or second to last 
             // than earlier years (collapses to mean in early years)
             expected_index[index_yf] += population.numbers_at_age[i_age_year]*
-                                        population.fleets[fleet_]->q*
+                                        population.fleets[fleet_]->q[0]*
                                         population.fleets[fleet_]->selectivity->evaluate(population.ages[age])*
                                         population.growth->evaluate(population.ages[age]);
     

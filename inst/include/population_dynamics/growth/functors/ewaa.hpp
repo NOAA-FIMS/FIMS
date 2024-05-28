@@ -1,10 +1,10 @@
-/*
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project.
- * Refer to the LICENSE file for reuse information.
- *
- * The purpose of this file is to declare the growth functor class
- * which is the base class for all growth functors.
+/**
+ * @file ewaa.hpp
+ * @brief Declares the growth functor class which is the base class for all
+ * growth functors.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef POPULATION_DYNAMICS_GROWTH_EWAA_HPP
 #define POPULATION_DYNAMICS_GROWTH_EWAA_HPP
@@ -28,6 +28,7 @@ struct EWAAgrowth : public GrowthBase<Type> {
   //  the value is the weight at that age (second double)
   std::map<double, double> ewaa; /**<map of doubles for EWAA values by age,
           where age starts at zero > */
+        typedef typename std::map<double, double>::iterator weight_iterator; /**< Iterator for ewaa map object > */
 
   EWAAgrowth() : GrowthBase<Type>() {}
 
@@ -39,7 +40,11 @@ struct EWAAgrowth : public GrowthBase<Type> {
    * @param a  age of the fish, the age vector must start at zero
    */
   virtual const Type evaluate(const double& a) {
-    Type ret = ewaa[a];
+      weight_iterator it = this->ewaa.find(a);
+      if(it == this->ewaa.end() ){
+          return 0.0;
+      }
+    Type ret = (*it).second;//itewaa[a];
     return ret;
   }
 };
