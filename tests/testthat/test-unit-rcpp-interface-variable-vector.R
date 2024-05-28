@@ -5,12 +5,23 @@ v_size <- 10
 v1_value <- 1.0
 v2_value <- 2.0
 
+#Test that default constructor works
+v0 <- create_vector()
+expect_equal(length(v0), 1)
+expect_equal(v0$at(1), 0)
+
+# Test that constructor that initializes based on size works.
 v1 <- create_vector(v_size)
 v1$fill(v1_value)
+for(i in 1:v_size){
+   expect_equal(v1$at(i), v1_value)
+}
 
-v2 <- create_vector(v_size)
-v2$fill(v2_value)
-
+# Test that constructor that takes vector and size works.
+v2 <- create_vector(v_size, rep(v2_value, v_size))
+for(i in 1:v_size){
+   expect_equal(v2$at(i), v2_value)
+}
 
 v3 <- v1+v2
 v3_value<-v1_value+v2_value
