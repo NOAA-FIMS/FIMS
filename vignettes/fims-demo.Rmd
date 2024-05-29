@@ -97,9 +97,9 @@ We'll create both index and age composition modules for the fleet using the `met
 fishing_fleet_index <- methods::new(Index, nyears)
 # fleet age composition data
 fishing_fleet_age_comp <- methods::new(AgeComp, nyears, nages)
-fishing_fleet_index$index_data <- fishery_catch
+fishing_fleet_index$index_data <- fishery_catch # unit: mt
 # Effective sampling size is 200
-fishing_fleet_age_comp$age_comp_data <- fishery_agecomp * 200
+fishing_fleet_age_comp$age_comp_data <- fishery_agecomp * 200 # unit: number at age; proportion at age also works
 ```
 
 #### Fleet Selectivity
@@ -172,9 +172,9 @@ We will now repeat the steps from Fleet to set up the Survey. A survey object is
 survey_fleet_index <- methods::new(Index, nyears)
 # survey age composition data
 survey_fleet_age_comp <- methods::new(AgeComp, nyears, nages)
-survey_fleet_index$index_data <- survey_index
+survey_fleet_index$index_data <- survey_index # unit: mt; it's possible to use other units as long as the index is assumed to be proportional to biomass
 # Effective sampling size is 200
-survey_fleet_age_comp$age_comp_data <- survey_agecomp * 200
+survey_fleet_age_comp$age_comp_data <- survey_agecomp * 200 # unit: number at age; proportion at age also works
 ```
 
 #### Survey Selectivity
@@ -227,7 +227,7 @@ There are three parameters we need to set-up: *log_sigma_recruit*, *log_rzero*, 
 
 ```{r set-up-recruitment}
 recruitment$log_sigma_recruit$value <- log(0.4)
-recruitment$log_rzero$value <- log(1e+06)
+recruitment$log_rzero$value <- log(1e+06) # unit: log(number)
 recruitment$log_rzero$is_random_effect <- FALSE
 recruitment$log_rzero$estimated <- TRUE
 recruitment$logit_steep$value <- -log(1.0 - 0.75) + log(0.75 - 0.2)
@@ -261,7 +261,7 @@ ewaa_growth$weights <- c(
   0.0030349873, 0.0040552124, 0.0050646975,
   0.0060262262, 0.0069169206, 0.0077248909,
   0.0084461128, 0.0090818532, 0.0096366950
-)
+) # unit: mt
 ```   
 #### Maturity
 Each population will also need a maturity model. Here we define a logistic maturity model. 
@@ -288,7 +288,7 @@ population$log_init_naa <- log(c(
   537804.8, 436664.0, 354303.4,
   287397.0, 233100.2, 189054.0,
   153328.4, 124353.2, 533681.3
-))
+)) # unit: in number
 population$estimate_init_naa <- TRUE
 population$nages <- nages
 population$ages <- ages
@@ -347,7 +347,7 @@ print(index_results)
 ggplot(index_results, aes(x = 1:nyears, y = observed)) +
   geom_point() +
   xlab("Year") +
-  ylab("Index") +
+  ylab("Index (mt)") +
   geom_line(aes(x = 1:nyears, y = expected), color = "blue") +
   theme_bw()
 
@@ -360,7 +360,7 @@ print(catch_results)
 ggplot(catch_results, aes(x = 1:nyears, y = observed)) +
   geom_point() +
   xlab("Year") +
-  ylab("Index") +
+  ylab("Index (mt)") +
   geom_line(aes(x = 1:nyears, y = expected), color = "blue") +
   theme_bw()
 ```
