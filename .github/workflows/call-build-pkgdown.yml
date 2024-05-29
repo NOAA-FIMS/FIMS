@@ -1,0 +1,12 @@
+# Checks that the pkgdown site builds for a repository.
+# this assumes pkgdown is already set up.
+name: call-build-pkgdown
+# on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+jobs:
+  call-workflow:
+    uses: nmfs-fish-tools/ghactions4r/.github/workflows/build-pkgdown.yml@main
