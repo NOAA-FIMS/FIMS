@@ -157,6 +157,11 @@ public:
         
     }
     
+    /**
+     * @brief Sets all parameters within a vector as estimable
+     * 
+     * @param estimable A true value indicates the parameters are estimated in the model
+     */
     void set_all_estimable(bool estimable){
         for(size_t i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
@@ -165,6 +170,11 @@ public:
         }
     }
 
+    /**
+     * @brief Sets all parameters within a vector as random
+     * 
+     * @param random A true value indicates the parameters are random effects
+     */
     void set_all_random(bool random){
         for(size_t i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
@@ -173,6 +183,11 @@ public:
         }
     }
     
+    /**
+     * @brief Assigns the given values to all elements in the vector
+     * 
+     * @param value The value to be assigned
+     */
     void fill(double value){
         for(size_t i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
