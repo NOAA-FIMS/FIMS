@@ -759,7 +759,7 @@ test_that("run FIMS in a for loop with missing values", {
   }
 })
 
-test_that("agecomp in proportion works",{
+test_that("agecomp in proportion works", {
   n.L_original <- om_input$n.L$fleet1
   n.survey_original <- om_input$n.survey$survey1
   om_input$n.L$fleet1 <- 1
@@ -780,8 +780,8 @@ test_that("agecomp in proportion works",{
   obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS")
 
   opt <- with(obj, optim(par, fn, gr,
-                         method = "BFGS",
-                         control = list(maxit = 1000000, reltol = 1e-15)
+    method = "BFGS",
+    control = list(maxit = 1000000, reltol = 1e-15)
   ))
 
   # Call report using MLE parameter values
@@ -828,7 +828,7 @@ test_that("agecomp in proportion works",{
 
   # Recruitment
   fims_naa <- matrix(report$naa[[1]][1:(om_input$nyr * om_input$nages)],
-                     nrow = om_input$nyr, byrow = TRUE
+    nrow = om_input$nyr, byrow = TRUE
   )
   sdr_naa1_vec <- sdr_report[which(rownames(sdr_report) == "NAA"), 2]
   sdr_naa1 <- sdr_naa1_vec[seq(1, om_input$nyr * om_input$nages, by = om_input$nages)]
@@ -940,9 +940,8 @@ test_that("agecomp in proportion works",{
 
   for (i in 1:length(em_input$surveyB.obs$survey1)) {
     expect_lte(abs(fims_survey[i, 1] - em_input$surveyB.obs$survey1[i]) /
-                 em_input$surveyB.obs$survey1[i], 0.25)
+      em_input$surveyB.obs$survey1[i], 0.25)
   }
 
   agecomp_in_proportion_env$fims$clear()
-
 })
