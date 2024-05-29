@@ -32,8 +32,8 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
   static uint32_t id_g;
- fims::Vector observed_values;
- fims::Vector expected_values;
+ fims::Vector<Type> observed_values;
+ fims::Vector<Type>  expected_values;
  std::string:: nll_type; //prior, re, data
  bool osa_flag = FALSE;
  bool simulate_flag = FALSE;
