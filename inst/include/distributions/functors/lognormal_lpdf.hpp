@@ -14,7 +14,6 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     fims::Vector<Type> log_sd;
     fims::Vector<Type> mu;
     fims::Vector<Type> sd;
-    bool osa_flag;
     Type nll = 0.0;
     //data_indicator<tmbutils::vector<Type> , Type> keep;
    
@@ -48,6 +47,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
             nll += this->nll_vec[i];
             if(this->simulate_flag){
                 FIMS_SIMULATE_F(this->of){ //preprocessor definition in interface.hpp
+                //this simulates data that is mean biased
                     this->observed_value[i] = exp(rnorm(mu[i], sd[i]));
                 }
                 
@@ -63,8 +63,8 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
            
             
         }
-        vector<Type> LogNormal_observed_value = this->observed_value;
-        FIMS_REPORT_F(LogNormal_observed_value, this->of);
+        vector<Type> observed_value = this->observed_value;
+        FIMS_REPORT_F(observed_value, this->of);
     
         return(nll);
     }
