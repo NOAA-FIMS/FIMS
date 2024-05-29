@@ -64,7 +64,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
             
         }
         vector<Type> LogNormal_observed_value = this->observed_value;
-        FIMSREPORT_F(LogNormal_observed_value, this->of);
+        FIMS_REPORT_F(LogNormal_observed_value, this->of);
     
         return(nll);
     }
