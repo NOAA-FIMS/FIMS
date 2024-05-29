@@ -25,9 +25,9 @@
  */
 class Parameter {
  public:
- static uint32_t id_g;
+ static uint32_t id_g; /**< global id of the parameter */
     uint32_t id_m; /**< id of the parameter */
-  double value_m; /**< initial value of the parameter*/
+  double value_m; /**< initial value of the parameter */
   double min_m =
       std::numeric_limits<double>::min(); /**< min value of the parameter*/
   double max_m =
