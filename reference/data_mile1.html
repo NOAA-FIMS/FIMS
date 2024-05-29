@@ -78,7 +78,8 @@ the <code>ASSAMC</code> package written for the <a href="www.github.com/Bai-Li-N
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>A data frame with 1140 observations of
 8 variables:</p><dl><dt>type</dt>
-<dd><p>The type of data the row contains.</p></dd>
+<dd><p>The type of data the row contains. Allowed types include
+<code>age</code>, <code>index</code>, <code>landings</code>, and <code>weight-at-age</code> data.</p></dd>
 
 <dt>name</dt>
 <dd><p>A character string providing the name of the information source
@@ -97,7 +98,11 @@ such as <code>0001-01-01</code>.</p></dd>
 <dd><p>The measurement of interest.</p></dd>
 
 <dt>unit</dt>
-<dd><p>A character string specifying the units of <code>value</code>.</p></dd>
+<dd><p>A character string specifying the units of <code>value</code>. Allowed
+units for each data type are as follows. <code>mt</code> is used for <code>index</code>,
+<code>landings</code>, and <code>weight-at-age</code> data. <code>number</code> or <code>proportion</code> are each
+viable units for the composition data, where the former is the preferred
+unit of measurement.</p></dd>
 
 <dt>uncertainty</dt>
 <dd><p>A real value providing a measurement of uncertainty
