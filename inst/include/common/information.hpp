@@ -105,12 +105,12 @@ class Information {
 
   // distributions
   std::map<uint32_t,
-           std::shared_ptr<fims_distributions::DistributionsBase<Type> > >
+           std::shared_ptr<fims_distributions::DensityComponentBase<Type> > >
       distribution_models; /**<hash map to link each object to its shared
                               location in memory*/
   typedef typename std::map<
       uint32_t,
-      std::shared_ptr<fims_distributions::DistributionsBase<Type> > >::iterator
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > >::iterator
       distribution_models_iterator;
   /**< iterator for distribution objects>*/
 

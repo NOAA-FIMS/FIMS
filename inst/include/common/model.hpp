@@ -176,21 +176,21 @@ class Model {  // may need singleton
 
 // Reporting
 #ifdef TMB_MODEL
-    REPORT_F(rec_nll, of);
-    REPORT_F(age_comp_nll, of);
-    REPORT_F(index_nll, of);
-    REPORT_F(jnll, of);
-    REPORT_F(naa, of);
-    REPORT_F(ssb, of);
-    REPORT_F(log_recruit_dev, of);
-    REPORT_F(recruitment, of);
-    REPORT_F(biomass, of);
-    REPORT_F(M, of);
-    REPORT_F(exp_index, of);
-    REPORT_F(exp_catch, of);
-    REPORT_F(F_mort, of);
-    REPORT_F(cnaa, of);
-    REPORT_F(cwaa, of);
+    FIMS_REPORT_F(rec_nll, of);
+    FIMS_REPORT_F(age_comp_nll, of);
+    FIMS_REPORT_F(index_nll, of);
+    FIMS_REPORT_F(jnll, of);
+    FIMS_REPORT_F(naa, of);
+    FIMS_REPORT_F(ssb, of);
+    FIMS_REPORT_F(log_recruit_dev, of);
+    FIMS_REPORT_F(recruitment, of);
+    FIMS_REPORT_F(biomass, of);
+    FIMS_REPORT_F(M, of);
+    FIMS_REPORT_F(exp_index, of);
+    FIMS_REPORT_F(exp_catch, of);
+    FIMS_REPORT_F(F_mort, of);
+    FIMS_REPORT_F(cnaa, of);
+    FIMS_REPORT_F(cwaa, of);
 
     /*ADREPORT using ADREPORTvector defined in
      * inst/include/interface/interface.hpp:

@@ -14,6 +14,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <string>
 
 // The following rows initialize default log files for outputing model progress
 // comments used to assist in diagnosing model issues and tracking progress.

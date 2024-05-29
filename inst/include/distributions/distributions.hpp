@@ -14,7 +14,7 @@
 #ifndef FIMS_DISTRIBUTIONS_HPP
 #define FIMS_DISTRIBUTIONS_HPP
 
-#include "functors/distributions_base.hpp"
+#include "functors/density_components_base.hpp"
 #include "functors/tmb_distributions.hpp"
 
 #endif /* FIMS_DISTRIBUTIONS_HPP */

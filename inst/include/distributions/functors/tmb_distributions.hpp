@@ -12,7 +12,7 @@
 #ifdef TMB_MODEL
 
 #include "../../common/fims_vector.hpp"
-#include "distributions_base.hpp"
+#include "density_components_base.hpp"
 
 namespace fims_distributions {
 
@@ -20,13 +20,13 @@ namespace fims_distributions {
  * @brief Dnorm class returns the TMB dnorm function
  */
 template <typename Type>
-struct Dnorm : public DistributionsBase<Type> {
+struct Dnorm : public DensityComponentBase<Type> {
   Type x;    /**< observation */
   Type mean; /**< mean of the normal distribution */
   Type sd; /**< standard deviation of the normal distribution, must be strictly
            positive.*/
 
-  Dnorm() : DistributionsBase<Type>() {}
+  Dnorm() : DensityComponentBase<Type>() {}
 
   virtual ~Dnorm() {}
 
@@ -46,12 +46,12 @@ struct Dnorm : public DistributionsBase<Type> {
  * @brief Dmultinom class returns the TMB dmultinom function
  */
 template <typename Type>
-struct Dmultinom : public DistributionsBase<Type> {
+struct Dmultinom : public DensityComponentBase<Type> {
   fims::Vector<Type> x; /*!< Vector of length K of integers */
   fims::Vector<Type> p; /*!< Vector of length K, specifying the probability for
                the K classes (note, unlike in R these must sum to 1). */
 
-  Dmultinom() : DistributionsBase<Type>() {}
+  Dmultinom() : DensityComponentBase<Type>() {}
 
   /**
    * @brief Probability mass function of the multinomial distribution.
@@ -72,12 +72,12 @@ struct Dmultinom : public DistributionsBase<Type> {
  * function
  */
 template <typename Type>
-struct Dlnorm : public DistributionsBase<Type> {
+struct Dlnorm : public DensityComponentBase<Type> {
   Type x;       /**< observation */
   Type meanlog; /**< mean of the distribution of log(x) */
   Type sdlog;   /**< standard deviation of the distribution of log(x) */
 
-  Dlnorm() : DistributionsBase<Type>() {}
+  Dlnorm() : DensityComponentBase<Type>() {}
 
   /**
    * @brief Probability density function of the lognormal distribution.
