@@ -1,18 +1,18 @@
-/** \file distributions_base.hpp
+/** \file density_components_base.hpp
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
  *
- * distributions_base file
+ * density_components_base file
  * The purpose of this file is to declare the DensityComponentBase class
  * which is the base class for all distribution functors.
  *
  * DEFINE guards for distributions module outline to define the
- * distributions_base hpp file if not already defined.
+ * density_components_base hpp file if not already defined.
  */
-#ifndef DISTRIBUTIONS_BASE_HPP
-#define DISTRIBUTIONS_BASE_HPP
+#ifndef DENSITY_COMPONENT_BASE_HPP
+#define DENSITY_COMPONENT_BASE_HPP
 
 #include "../../common/model_object.hpp"
 #include "../../interface/interface.hpp"
@@ -34,7 +34,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g;
  fims::Vector<Type> observed_values;
  fims::Vector<Type> expected_values;
- std::string:: nll_type; //prior, re, data
+ std::string  nll_type; //prior, re, data
  bool osa_flag = FALSE;
  bool simulate_flag = FALSE;
 
@@ -54,8 +54,8 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
 /** @brief Default id of the singleton distribution class
  */
 template <typename Type>
-uint32_t DensityComponent<Type>::id_g = 0; 
+uint32_t DensityComponentBase<Type>::id_g = 0; 
 
 }  // namespace fims_distributions
 
-#endif /* DISTRIBUTIONS_BASE_HPP */
+#endif /* DENSITY_COMPONENT_BASE_HPP */
