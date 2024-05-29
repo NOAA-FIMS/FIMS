@@ -50,8 +50,14 @@ vector<Type> ADREPORTvector(vector<vector<Type> > x) {
   return res;
 }
 
-#define SIMULATE_F(F) if (isDouble<Type>::value && F->do_simulate)
+
+
+#define FIMS_SIMULATE_F(F) if (isDouble<Type>::value && F->do_simulate)
 
 #endif /* TMB_MODEL */
+
+#ifndef TMB_MODEL
+ #define FIMS_SIMULATE_F(F)
+#endif
 
 #endif /* FIMS_INTERFACE_HPP */
