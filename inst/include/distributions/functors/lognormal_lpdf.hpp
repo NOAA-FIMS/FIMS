@@ -1,7 +1,7 @@
 #ifndef LOGLogNormal_LPDF 
 #define LOGLogNormal_LPDF 
 
-#include "distributions_base.hpp"
+#include "density_components_base.hpp"
 #include "../common/fims_vector.hpp"
 #include "../common/def.hpp"
 
