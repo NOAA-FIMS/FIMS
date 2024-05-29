@@ -14,7 +14,6 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     fims::Vector<Type> log_sd;
     fims::Vector<Type> mu;
     fims::Vector<Type> sd;
-    bool osa_flag;
     Type nll = 0.0;
     //data_indicator<tmbutils::vector<Type> , Type> keep;
    
@@ -63,8 +62,9 @@ struct NormalLPDF : public DensityComponentBase<Type> {
            
             
         }
-        vector<Type> normal_observed_value = this->observed_value;
-        FIMS_REPORT_F(normal_observed_value, this->of);
+        
+        vector<Type> observed_value = this->observed_value;
+        FIMS_REPORT_F(observed_value, this->of);
   
         return(nll);
     }
