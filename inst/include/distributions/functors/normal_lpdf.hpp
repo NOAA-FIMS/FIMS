@@ -63,10 +63,9 @@ struct NormalLPDF : public DensityComponentBase<Type> {
            
             
         }
-        #ifdef TMB_MODEL
-            vector<Type> normal_observed_value = this->observed_value;
-            REPORT_F(normal_observed_value, this->of);
-        #endif
+        vector<Type> normal_observed_value = this->observed_value;
+        FIMS_REPORT_F(normal_observed_value, this->of);
+  
         return(nll);
     }
 } // namespace fims_distributions

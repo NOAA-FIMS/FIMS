@@ -63,10 +63,9 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
            
             
         }
-        #ifdef TMB_MODEL
-            vector<Type> LogNormal_observed_value = this->observed_value;
-            REPORT_F(LogNormal_observed_value, this->of);
-        #endif
+        vector<Type> LogNormal_observed_value = this->observed_value;
+        FIMSREPORT_F(LogNormal_observed_value, this->of);
+    
         return(nll);
     }
 } // namespace fims_distributions
