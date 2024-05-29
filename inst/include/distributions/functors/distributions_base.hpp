@@ -5,7 +5,7 @@
  *
  *
  * distributions_base file
- * The purpose of this file is to declare the DistributionsBase class
+ * The purpose of this file is to declare the DensityComponentBase class
  * which is the base class for all distribution functors.
  *
  * DEFINE guards for distributions module outline to define the
@@ -16,6 +16,7 @@
 
 #include "../../common/model_object.hpp"
 #include "../../interface/interface.hpp"
+#include "../../common/fims_vector.hpp"
 
 namespace fims_distributions {
 
@@ -25,18 +26,23 @@ namespace fims_distributions {
  *
  */
 template <typename Type>
-struct DistributionsBase : public fims_model_object::FIMSObject<Type> {
-  // id_g is the ID of the instance of the DistributionsBase class.
+struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
+  // id_g is the ID of the instance of the DensityComponentBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
-  // all the instances of the DistributionsBase class.
+  // all the instances of the DensityComponentBase class.
   static uint32_t id_g;
+ fims::Vector observed_values;
+ fims::Vector expected_values;
+ std::string:: nll_type; //prior, re, data
+ bool osa_flag = FALSE;
+ bool simulate_flag = FALSE;
 
   /** @brief Constructor.
    */
-  DistributionsBase() { this->id = DistributionsBase::id_g++; }
+  DensityComponentBase() { this->id = DensityComponentBase::id_g++; }
 
-  virtual ~DistributionsBase() {}
+  virtual ~DensityComponentBase() {}
   /**
    * @brief Generic probability density function. Calculates the pdf at the
    * independent variable value.
@@ -48,7 +54,7 @@ struct DistributionsBase : public fims_model_object::FIMSObject<Type> {
 /** @brief Default id of the singleton distribution class
  */
 template <typename Type>
-uint32_t DistributionsBase<Type>::id_g = 0;
+uint32_t DensityComponent<Type>::id_g = 0; 
 
 }  // namespace fims_distributions
 
