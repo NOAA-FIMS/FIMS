@@ -35,8 +35,8 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
  fims::Vector<Type> observed_values;
  fims::Vector<Type> expected_values;
  std::string  nll_type; //prior, re, data
- bool osa_flag = FALSE;
- bool simulate_flag = FALSE;
+ bool osa_flag = false;
+ bool simulate_flag = false;
 
   /** @brief Constructor.
    */
