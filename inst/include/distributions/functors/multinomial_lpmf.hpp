@@ -41,7 +41,7 @@ namespace fims_distributions
                     observed_vector[j] = this->observed_values[idx];
                     expected_vector[j] = this->expected_values[idx];
                 }
-                this->nll_vec[i] = -dmultinom(observed_vector, expected_vector, do_log);
+                this->nll_vec[i] = -dmultinom((vector<Type>)observed_vectors, (vector<Type>)expected_vector, do_log);
                 nll += this->nll_vec[i];
                 /*
                 if (this->simulate_flag)
@@ -51,7 +51,7 @@ namespace fims_distributions
                         fims::Vector<Type> sim_observed;
                         sim_observed.resize(dims[1]);
                         sim_observed = rmultinom(expected_vector);
-                        sim_observed.resize(this->observed_value); 
+                        sim_observed.resize(this->observed_values); 
                         for (int j = 0; j < dims[1]; j++)
                         {
                             idx = (i * dims[1]) + j;
@@ -70,5 +70,5 @@ namespace fims_distributions
    
 
 };
- } // namespace fims_distributions
+} // namespace fims_distributions
 #endif;
