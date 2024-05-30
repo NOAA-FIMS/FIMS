@@ -1,4 +1,4 @@
-test_that("dnorm", {
+test_that("normal_lpdf", {
   # generate data using R stats:rnorm
   set.seed(123)
   # simulate normal data
@@ -8,16 +8,16 @@ test_that("dnorm", {
   # initialize the Dnorm module
   dnorm_ <- new(TMBDnormDistribution)
   # populate class members
-  dnorm_$x$value <- y
-  dnorm_$mean$value <- 0
-  dnorm_$sd$value <- 1
+  dnorm_$observed_values$value <- y
+  dnorm_$expected_values$value <- 0
+  dnorm_$log_sd$value <- 1
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(TRUE), stats::dnorm(y, 0, 1, TRUE))
 
   clear()
 })
 
-test_that("dlnorm", {
+test_that("normal_lpdf", {
   # generate data using R stats:rnorm
   set.seed(123)
   # simulate lognormal data
@@ -27,9 +27,9 @@ test_that("dlnorm", {
   # initialize the Dnorm module
   dlnorm_ <- new(TMBDlnormDistribution)
   # populate class members
-  dlnorm_$x$value <- y
-  dlnorm_$meanlog$value <- 0
-  dlnorm_$sdlog$value <- 1
+  dlnorm_$observed_values$value <- y
+  dlnorm_$expected_valueslog$value <- 0
+  dlnorm_$log_sd$value <- 1
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(TRUE), stats::dlnorm(y, 0, 1, TRUE))
   expect_equal(dlnorm_$evaluate(FALSE), stats::dlnorm(y, 0, 1, FALSE))
@@ -37,7 +37,7 @@ test_that("dlnorm", {
   clear()
 })
 
-test_that("dmultinom", {
+test_that("multinomial_lpdf", {
   # generate data using R stats:rnorm
   set.seed(123)
   p <- (1:10) / sum(1:10)
@@ -47,8 +47,8 @@ test_that("dmultinom", {
   # initialize the Dmultinom module
   dmultinom_ <- new(TMBDmultinomDistribution)
   # populate class members
-  dmultinom_$x <- x
-  dmultinom_$p <- p
+  dmultinom_$observed_values <- x
+  dmultinom_$expected_values <- p
   # evaluate the density and compare with R
   expect_equal(
     dmultinom_$evaluate(TRUE),
