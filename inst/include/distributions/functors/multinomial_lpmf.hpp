@@ -38,7 +38,7 @@ namespace fims_distributions
                     observed_vector[j] = this->observed_value[idx];
                     expected_vector[j] = this->expected_value[idx];
                 }
-                this->nll_vec[i] = dmultinom(observed_vector, expected_vector);
+                this->nll_vec[i] = -dmultinom(observed_vector, expected_vector, true);
                 nll += this->nll_vec[i];
                 if (this->simulate_flag)
                 {
