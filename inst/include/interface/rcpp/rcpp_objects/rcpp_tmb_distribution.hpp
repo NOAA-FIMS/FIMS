@@ -63,9 +63,9 @@ std::map<uint32_t,
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Parameter x;    /**< observed data */
-  Parameter mean; /**< mean of x for the normal distribution */
-  Parameter sd;   /**< sd of x for the normal distribution */
+  Parameter observed_value;    /**< observed data */
+  Parameter expected_value; /**< mean of x for the normal distribution */
+  Parameter log_sd;   /**< sd of x for the normal distribution */
 
   DnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -81,10 +81,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return log pdf
    */
   virtual double evaluate(bool do_log) {
-    fims_distributions::Dnorm<double> dnorm;
-    dnorm.x = this->x.value_m;
-    dnorm.mean = this->mean.value_m;
-    dnorm.sd = this->sd.value_m;
+    fims_distributions::NormalLPDF<double> dnorm;
+    dnorm.observed_value = this->observed_value.value_m;
+    dnorm.expected_value = this->observed_value.value_m;
+    dnorm.log_sd = this->log_sd.value_m;
     return dnorm.evaluate(do_log);
   }
 
@@ -95,15 +95,15 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_distributions::Dnorm<Type>> distribution =
-        std::make_shared<fims_distributions::Dnorm<Type>>();
+    std::shared_ptr<fims_distributions::NormalLPDF<Type>> distribution =
+        std::make_shared<fims_distributions::NormalLPDF<Type>>();
 
     // interface to data/parameter value
     distribution->id = this->id;
-    distribution->x = this->x.value_m;
+    distribution->observed_value = this->observed_value.value_m;
     // set relative info
-    distribution->mean = this->mean.value_m;
-    distribution->sd = this->sd.value_m;
+    distribution->expected_value = this->expected_value.value_m;
+    distribution->log_sd = this->log_sd.value_m;
 
     info->distribution_models[distribution->id] = distribution;
 
@@ -133,9 +133,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Parameter x;       /**< observation */
-  Parameter meanlog; /**< mean of the distribution of log(x) */
-  Parameter sdlog;   /**< standard deviation of the distribution of log(x) */
+  Parameter observed_value;       /**< observation */
+  Parameter expected_value; /**< mean of the distribution of log(x) */
+  Parameter log_sd;   /**< standard deviation of the distribution of log(x) */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -155,9 +155,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate(bool do_log) {
     fims_distributions::Dlnorm<double> dlnorm;
-    dlnorm.x = this->x.value_m;
-    dlnorm.meanlog = this->meanlog.value_m;
-    dlnorm.sdlog = this->sdlog.value_m;
+    dlnorm.observed_value = this->observed_value.value_m;
+    dlnorm.expected_value = this->expected_valuelog.value_m;
+    dlnorm.log_sd = this->log_sdlog.value_m;
     return dlnorm.evaluate(do_log);
   }
 
@@ -168,14 +168,14 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_distributions::Dlnorm<Type>> distribution =
-        std::make_shared<fims_distributions::Dlnorm<Type>>();
+    std::shared_ptr<fims_distributions::LogNormalLPDF<Type>> distribution =
+        std::make_shared<fims_distributions::LogNormalLPDF<Type>>();
 
     // set relative info
     distribution->id = this->id;
-    distribution->x = this->x.value_m;
-    distribution->meanlog = this->meanlog.value_m;
-    distribution->sdlog = this->sdlog.value_m;
+    distribution->observed_value = this->observed_value.value_m;
+    distribution->expected_valuelog = this->expected_valuelog.value_m;
+    distribution->log_sd = this->log_sd.value_m;
 
     info->distribution_models[distribution->id] = distribution;
 
@@ -207,8 +207,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Rcpp::IntegerVector x; /**< Vector of length K of integers */
-  Rcpp::NumericVector p; /**< Vector of length K, specifying the probability
+  Rcpp::IntegerVector observed_value; /**< Vector of length K of integers */
+  Rcpp::NumericVector expected_value; /**< Vector of length K, specifying the probability
  for the K classes (note, unlike in R these must sum to 1). */
 
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
@@ -225,13 +225,13 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @return log pdf
    */
   virtual double evaluate(bool do_log) {
-    fims_distributions::Dmultinom<double> dmultinom;
+    fims_distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
-    dmultinom.x.resize(x.size());  // Vector from TMB
-    dmultinom.p.resize(p.size());  // Vector from TMB
+    dmultinom.observed_value.resize(observed_value.size());  // Vector from TMB
+    dmultinom.expected_value.resize(expected_value.size());  // Vector from TMB
     for (int i = 0; i < x.size(); i++) {
-      dmultinom.x[i] = x[i];
-      dmultinom.p[i] = p[i];
+      dmultinom.observed_value[i] = x[i];
+      dmultinom.expected_value[i] = p[i];
     }
     return dmultinom.evaluate(do_log);
   }
@@ -243,16 +243,16 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_distributions::Dmultinom<Type>> distribution =
-        std::make_shared<fims_distributions::Dmultinom<Type>>();
+    std::shared_ptr<fims_distributions::MultinomialLPMF<Type>> distribution =
+        std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
 
     distribution->id = this->id;
-    distribution->x.resize(x.size());
-    distribution->p.resize(p.size());
+    distribution->observed_value.resize(observed_value.size());
+    distribution->expected_value.resize(expected_value.size());
 
     for (int i = 0; i < x.size(); i++) {
-      distribution->x[i] = x[i];
-      distribution->p[i] = p[i];
+      distribution->observed_value[i] = observed_value[i];
+      distribution->expected_value[i] = expected_value[i];
     }
 
     info->distribution_models[distribution->id] = distribution;
