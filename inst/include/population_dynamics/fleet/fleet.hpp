@@ -28,6 +28,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
 
+
   // This likelihood index is not currently being used as only one likelihood
   // distribution is available. These are for a future update M2+.
   int fleet_index_likelihood_id_m =
@@ -151,9 +152,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   virtual const Type evaluate_age_comp_nll() {
     Type nll = 0.0; /**< The negative log likelihood value */
 #ifdef TMB_MODEL
-    fims_distributions::Dmultinom<Type> dmultinom;
-    size_t dims = this->observed_agecomp_data->get_imax() *
-                  this->observed_agecomp_data->get_jmax();
+    fims_distributions::MultinomialLPMF<Type> dmultinom;
+    size_t dims = this->observed_agecomp_data->data.size();
     if (dims != this->catch_numbers_at_age.size()) {
       ERROR_LOG << "Error: observed age comp is of size " << dims
                 << " and expected is of size " << this->age_composition.size()
@@ -161,6 +161,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       exit(1);
 
     } else {
+      dmultinom.dims[0] = this -> nyears;
+      dmultinom.dims[1] = this - > nages;
+      dmultinom.of = this -> of
       for (size_t y = 0; y < this->nyears; y++) {
         fims::Vector<Type> observed_acomp;
         fims::Vector<Type> expected_acomp;
@@ -186,14 +189,13 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
             expected_acomp[a] = this->catch_numbers_at_age[i_age_year] /
                                 sum;  // probabilities for ages
 
-            observed_acomp[a] = this->observed_agecomp_data->at(y, a);
-
-            FLEET_LOG << " age " << a << " in year " << y
+                        FLEET_LOG << " age " << a << " in year " << y
                       << "has expected: " << expected_acomp[a]
                       << "  and observed: " << observed_acomp[a] << std::endl;
+            
+            dmultinom.expected_value[i_age_year] = expected_acomp[a];
           }
-          dmultinom.x = observed_acomp;
-          dmultinom.p = expected_acomp;
+          dmultinom.observed_vector = observed_acomp_data->data;
           nll -= dmultinom.evaluate(true);
         }
       }
@@ -208,13 +210,16 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     Type nll = 0.0; /*!< The negative log likelihood value */
 
 #ifdef TMB_MODEL
-    fims_distributions::Dnorm<Type> dnorm;
+    fims_distributions::NormalLPDF<Type> dnorm;
+      dnorm.observed_values.resize(this->observed_index_data.size());
+      dnorm.expected_values.resize(this->expected_index.size());
+      dnorm.of = this->of;
     for (size_t i = 0; i < this->expected_index.size(); i++) {
       if (this->observed_index_data->at(i) !=
           this->observed_index_data->na_value) {
-        dnorm.x = fims_math::log(this->observed_index_data->at(i));
-        dnorm.mean = fims_math::log(this->expected_index[i]);
-        dnorm.sd = fims_math::exp(this->log_obs_error[i]);
+        dnorm.observed_values[i] = fims_math::log(this->observed_index_data->at(i));
+        dnorm.expected_values[i] = fims_math::log(this->expected_index[i]);
+        dnorm.log_sd[i] = this->log_obs_error[i];
         nll -= dnorm.evaluate(true);
       }
 
@@ -223,7 +228,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                 << " and expected is: " << this->expected_index[i] << std::endl;
       FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
     }
-    FLEET_LOG << " sd is: " << dnorm.sd << std::endl;
+    FLEET_LOG << " log_sd is: " << dnorm.log_sd[0] << std::endl;
     FLEET_LOG << " index nll: " << nll << std::endl;
 
 #endif

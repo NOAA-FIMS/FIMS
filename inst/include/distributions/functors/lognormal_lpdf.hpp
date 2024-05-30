@@ -2,8 +2,8 @@
 #define LOGLogNormal_LPDF 
 
 #include "density_components_base.hpp"
-#include "../common/fims_vector.hpp"
-#include "../common/def.hpp"
+#include "../../common/fims_vector.hpp"
+#include "../../common/def.hpp"
 
 namespace fims_distributions {
 /**
@@ -15,16 +15,19 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     fims::Vector<Type> mu;
     fims::Vector<Type> sd;
     Type nll = 0.0;
+    #ifdef TMB_MODEL
+    ::objective_function<Type> *of;
+    #endif
     //data_indicator<tmbutils::vector<Type> , Type> keep;
    
 
-    LogNormalLPDF() : DistributionComponentBase<Type>() {
+    LogNormalLPDF() : DensityComponentBase<Type>() {
 
     }
 
     virtual ~LogNormalLPDF() {}
 
-    virtual const Type evaluate(){
+    virtual const Type evaluate(const bool& do_log){
         this->mu.resize(this->observed_value.size());
         this->sd.resize(this->observed_value.size());
         for(int i=0; i<this->expected_value.size(); i++){
@@ -42,8 +45,8 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         }
         this->nll_vec.resize(this->observed_value.size());
         for(int i=0; i<this->observed_value.size(); i++){
-           // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_value[i], mu[i], sd[i], true);
-            this->nll_vec[i] = -dnorm(log(this->observed_value[i]), mu[i], sd[i], true) - log(this->observed_value[i]);
+           // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_value[i], mu[i], sd[i], do_log);
+            this->nll_vec[i] = -dnorm(log(this->observed_value[i]), mu[i], sd[i], do_log) - log(this->observed_value[i]);
             nll += this->nll_vec[i];
             if(this->simulate_flag){
                 FIMS_SIMULATE_F(this->of){ //preprocessor definition in interface.hpp
@@ -67,7 +70,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         FIMS_REPORT_F(observed_value, this->of);
     
         return(nll);
-    }
+
 } // namespace fims_distributions
 
 };
