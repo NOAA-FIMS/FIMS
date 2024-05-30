@@ -77,15 +77,19 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
     } else {
 #ifdef TMB_MODEL
       fims_distributions::NormalLPDF<Type> dnorm;
-      dnorm.observed_values.resize(this->log_recruit_devs.size());
+      RECRUITMENT_LOG << "log_recruit_devs size is: " << this->log_recruit_devs.size() << std::endl;
+      dnorm.observed_values = this->log_recruit_devs;
+      RECRUITMENT_LOG << "dnorm.observed_values size is: " << dnorm.observed_values.size() << std::endl;
       dnorm.expected_values.resize(this->log_recruit_devs.size());
+      RECRUITMENT_LOG << "dnorm.expected_values size is: " << dnorm.expected_values.size() << std::endl;
       dnorm.log_sd.resize(this->log_recruit_devs.size());
+      RECRUITMENT_LOG << "dnorm.log_sd size is: " << dnorm.log_sd.size() << std::endl;
+      RECRUITMENT_LOG << "log_sigma_recruit is: " << this-> log_sigma_recruit << std::endl;
       for (size_t i = 0; i < this->log_recruit_devs.size(); i++) {
-        dnorm.observed_values[i] = this->log_recruit_devs[i];
         dnorm.expected_values[i] = 0.0;
         dnorm.log_sd[i] = this->log_sigma_recruit;
-        nll -= dnorm.evaluate(true);
       }
+      nll -= dnorm.evaluate(true);
 #endif
       return nll;
     }
