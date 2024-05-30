@@ -195,7 +195,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
             
             dmultinom.expected_values[i_age_year] = expected_acomp[a];
           }
-          dmultinom.observed_vector = observed_agecomp_data->data;
+          dmultinom.observed_values = observed_agecomp_data->data;
           nll -= dmultinom.evaluate(true);
         }
       }
@@ -211,7 +211,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
 #ifdef TMB_MODEL
     fims_distributions::NormalLPDF<Type> dnorm;
-      dnorm.observed_values.resize(this->observed_index_data.size());
+      dnorm.observed_values.resize(this->observed_index_data->data.size());
       dnorm.expected_values.resize(this->expected_index.size());
       dnorm.of = this->of;
     for (size_t i = 0; i < this->expected_index.size(); i++) {

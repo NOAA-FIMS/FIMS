@@ -154,7 +154,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return log pdf
    */
   virtual double evaluate(bool do_log) {
-    fims_distributions::Dlnorm<double> dlnorm;
+    fims_distributions::LogNormalLPDF<double> dlnorm;
     dlnorm.observed_values = this->observed_values.value_m;
     dlnorm.expected_values = this->expected_values.value_m;
     dlnorm.log_sd = this->log_sd.value_m;
@@ -229,7 +229,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     // Declare TMBVector in this scope
     dmultinom.observed_values.resize(observed_values.size());  // Vector from TMB
     dmultinom.expected_values.resize(expected_values.size());  // Vector from TMB
-    for (int i = 0; i < x.size(); i++) {
+    for (int i = 0; i < observed_values.size(); i++) {
       dmultinom.observed_values[i] = observed_values[i];
       dmultinom.expected_values[i] = expected_values[i];
     }
