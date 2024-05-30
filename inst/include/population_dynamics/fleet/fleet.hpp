@@ -162,8 +162,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
     } else {
       dmultinom.dims[0] = this -> nyears;
-      dmultinom.dims[1] = this - > nages;
-      dmultinom.of = this -> of
+      dmultinom.dims[1] = this -> nages;
+      dmultinom.of = this -> of;
       for (size_t y = 0; y < this->nyears; y++) {
         fims::Vector<Type> observed_acomp;
         fims::Vector<Type> expected_acomp;
@@ -193,9 +193,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                       << "has expected: " << expected_acomp[a]
                       << "  and observed: " << observed_acomp[a] << std::endl;
             
-            dmultinom.expected_value[i_age_year] = expected_acomp[a];
+            dmultinom.expected_values[i_age_year] = expected_acomp[a];
           }
-          dmultinom.observed_vector = observed_acomp_data->data;
+          dmultinom.observed_vector = observed_agecomp_data->data;
           nll -= dmultinom.evaluate(true);
         }
       }

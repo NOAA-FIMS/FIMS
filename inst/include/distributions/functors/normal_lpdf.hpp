@@ -58,8 +58,8 @@ struct NormalLPDF : public DensityComponentBase<Type> {
           /* osa not working yet
             if(osa_flag){//data observation type implements osa residuals
                 //code for osa cdf method
-                this->nll_vec[i] = this->keep.cdf_lower[i] * -log( pnorm(this->observed_value[i], mu[i], sd[i]) );
-                this->nll_vec[i] = this->keep.cdf_upper[i] * -log( 1.0 - pnorm(this->observed_value[i], mu[i], sd[i]) );
+                this->nll_vec[i] = this->keep.cdf_lower[i] * -log( pnorm(this->observed_values[i], mu[i], sd[i]) );
+                this->nll_vec[i] = this->keep.cdf_upper[i] * -log( 1.0 - pnorm(this->observed_values[i], mu[i], sd[i]) );
             } */
 
            
@@ -71,7 +71,8 @@ struct NormalLPDF : public DensityComponentBase<Type> {
   
         return(nll);
     }
-} // namespace fims_distributions
 
 };
+
+} // namespace fims_distributions
 #endif;
