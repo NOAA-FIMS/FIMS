@@ -76,11 +76,11 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
       return nll;
     } else {
 #ifdef TMB_MODEL
-      fims_distributions::Dnorm<Type> dnorm;
-      dnorm.sd = fims_math::exp(this->log_sigma_recruit);
+      fims_distributions::NormalLPDF<Type> dnorm;
+      dnorm.log_sd = this->log_sigma_recruit;
       for (size_t i = 0; i < this->log_recruit_devs.size(); i++) {
-        dnorm.x = this->log_recruit_devs[i];
-        dnorm.mean = 0.0;
+        dnorm.observed_values = this->log_recruit_devs[i];
+        dnorm.expected_values = 0.0;
         nll -= dnorm.evaluate(true);
       }
 #endif
