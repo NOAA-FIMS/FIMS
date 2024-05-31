@@ -37,7 +37,7 @@ class Parameter {
   bool estimated_m =
       false; /**< Is the parameter estimated? Default value is false.*/
 
-  bool random_m = 
+  bool random_m =
     false; /**< is the parameter random? Default value is false.*/
 
   /**
@@ -51,8 +51,8 @@ class Parameter {
    * @brief Constructor for initializing Parameter.
    * @details Inputs include value.
    */
-  Parameter(double value) { 
-    value_m = value; 
+  Parameter(double value) {
+    value_m = value;
     id_m = Parameter::id_g++;
   }
 
@@ -60,8 +60,8 @@ class Parameter {
    * @brief Constructor for initializing Parameter.
    * @details Set value to 0 when there is no input value.
    */
-  Parameter() { 
-    value_m = 0; 
+  Parameter() {
+    value_m = 0;
     id_m = Parameter::id_g++;}
 };
 
@@ -74,12 +74,12 @@ uint32_t Parameter::id_g = 0;
  */
 class ParameterVector{
     static uint32_t id_g;
-   
+
 public:
     Rcpp::List storage_m; //use a list because it's easier
     uint32_t id;
-    
-    
+
+
     /**
      * default constructor
      */
@@ -108,40 +108,40 @@ public:
             this->storage_m.push_back(Rcpp::wrap(p));
         }
     }
-    
+
     /**
      * Accessor. First index starts is zero.
      */
-    inline Parameter operator[](size_t pos) {
+    inline Parameter operator[](R_xlen_t pos) {
         return this->storage_m[pos]; }
-    
+
     /**
      * Accessor. First index is one. For calling from R.
      */
-    SEXP at(size_t pos){
+    SEXP at(R_xlen_t pos){
         if(pos == 0 || pos > this->storage_m.size()){
             Rcpp::Rcout <<"Index out of range.\n";
             return NULL;
         }
         return this->storage_m[pos-1];
     }
-    
+
     /**
      * returns vector length
      */
     size_t size(){
         return this->storage_m.size();
     }
-    
+
     /**
      * resize to length "size"
      */
     void resize(size_t size){
         size_t n = this->storage_m.size();
-        
+
         if(size > n){
             size_t m = size - n;
-            
+
             for(size_t i = 0; i < m; i++){
                 Parameter p;
                 this->storage_m.push_back(Rcpp::wrap(p));
@@ -154,16 +154,16 @@ public:
             }
             this->storage_m = l;
         }
-        
+
     }
-    
+
     /**
      * @brief Sets all parameters within a vector as estimable
-     * 
+     *
      * @param estimable A true value indicates the parameters are estimated in the model
      */
     void set_all_estimable(bool estimable){
-        for(size_t i = 0; i < this->storage_m.size(); i++){
+        for(R_xlen_t i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
             p.estimated_m = estimable;
             this->storage_m[i] = Rcpp::wrap(p);
@@ -172,30 +172,30 @@ public:
 
     /**
      * @brief Sets all parameters within a vector as random
-     * 
+     *
      * @param random A true value indicates the parameters are random effects
      */
     void set_all_random(bool random){
-        for(size_t i = 0; i < this->storage_m.size(); i++){
+        for(R_xlen_t i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
             p.random_m = random;
             this->storage_m[i] = Rcpp::wrap(p);
         }
     }
-    
+
     /**
      * @brief Assigns the given values to all elements in the vector
-     * 
+     *
      * @param value The value to be assigned
      */
     void fill(double value){
-        for(size_t i = 0; i < this->storage_m.size(); i++){
+        for(R_xlen_t i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
             p.value_m = value;
             this->storage_m[i] = Rcpp::wrap(p);
         }
     }
-    
+
 };
 uint32_t ParameterVector::id_g = 0;
 
