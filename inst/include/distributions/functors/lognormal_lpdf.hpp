@@ -1,5 +1,5 @@
-#ifndef LOGNormal_LPDF
-#define LOGNormal_LPDF
+#ifndef LOGNORMALl_LPDF
+#define LOGNORMAL_LPDF
 
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
@@ -16,10 +16,8 @@ namespace fims_distributions
         fims::Vector<Type> log_sd;
         fims::Vector<Type> mu;
         fims::Vector<Type> sd;
+        std::vector<bool> is_na;
         Type nll = 0.0;
-#ifdef TMB_MODEL
-        ::objective_function<Type> *of;
-#endif
         // data_indicator<tmbutils::vector<Type> , Type> keep;
 
         LogNormalLPDF() : DensityComponentBase<Type>()
@@ -32,7 +30,8 @@ namespace fims_distributions
         {
             this->mu.resize(this->observed_values.size());
             this->sd.resize(this->observed_values.size());
-            for (int i = 0; i < this->expected_values.size(); i++)
+            is_na.resize(this->observed_values.size());
+            for (size_t i = 0; i < this->expected_values.size(); i++)
             {
                 if (this->expected_values.size() == 1)
                 {
@@ -53,8 +52,9 @@ namespace fims_distributions
                 }
             }
             this->nll_vec.resize(this->observed_values.size());
-            for (int i = 0; i < this->observed_values.size(); i++)
+            for (size_t i = 0; i < this->observed_values.size(); i++)
             {
+              if(!is_na[i]){
                 // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
                 this->nll_vec[i] = -dnorm(log(this->observed_values[i]), mu[i], sd[i], do_log) - log(this->observed_values[i]);
                 nll += this->nll_vec[i];
@@ -73,12 +73,13 @@ namespace fims_distributions
                       this->nll_vec[i] = this->keep.cdf_lower[i] * -log( pnorm(this->observed_values[i], mu[i], sd[i]) );
                       this->nll_vec[i] = this->keep.cdf_upper[i] * -log( 1.0 - pnorm(this->observed_values[i], mu[i], sd[i]) );
                   } */
+              }
             }
-            vector<Type> observed_values = this->observed_values;
-            FIMS_REPORT_F(observed_values, this->of);
+            vector<Type> lognormal_observed_values = this->observed_values;
+          //  FIMS_REPORT_F(lognormal_observed_values, this->of);
 
             return (nll);
         }
     };
 } // namespace fims_distributions
-#endif;
+#endif
