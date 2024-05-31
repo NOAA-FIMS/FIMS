@@ -167,8 +167,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       dmultinom.is_na.resize(nyears);
       dmultinom.observed_values.resize(nyears*nages);
       dmultinom.expected_values.resize(nyears*nages);
+      #ifdef TMB_MODEL
       dmultinom.of = this -> of;
-
+      #endif
       for (size_t y = 0; y < this->nyears; y++) {
         Type sum = 0.0;
         bool containsNA =
@@ -213,7 +214,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     dnorm.is_na.resize(this->observed_index_data->data.size());
     dnorm.expected_values.resize(this->observed_index_data->data.size());
     dnorm.log_sd.resize(this->observed_index_data->data.size());
+    #ifdef TMB_MODEL
     dnorm.of = this->of;
+    #endif
     for (size_t i = 0; i < this->observed_index_data->data.size(); i++) {
       if (this->observed_index_data->at(i) !=
           this->observed_index_data->na_value) {
