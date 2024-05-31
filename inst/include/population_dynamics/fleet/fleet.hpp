@@ -151,9 +151,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   virtual const Type evaluate_age_comp_nll() {
     Type nll = 0.0; /**< The negative log likelihood value */
-#ifdef TMB_MODEL
     fims_distributions::MultinomialLPMF<Type> dmultinom;
     size_t dims = this->observed_agecomp_data->data.size();
+
     if (dims != this->catch_numbers_at_age.size()) {
       ERROR_LOG << "Error: observed age comp is of size " << dims
                 << " and expected is of size " << this->age_composition.size()
@@ -161,14 +161,16 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       exit(1);
 
     } else {
+      dmultinom.dims.resize(2);
       dmultinom.dims[0] = this -> nyears;
       dmultinom.dims[1] = this -> nages;
+      dmultinom.is_na.resize(nyears);
+      dmultinom.observed_values.resize(nyears*nages);
+      dmultinom.expected_values.resize(nyears*nages);
       dmultinom.of = this -> of;
-      for (size_t y = 0; y < this->nyears; y++) {
-        fims::Vector<Type> observed_acomp;
-        fims::Vector<Type> expected_acomp;
 
-        observed_acomp.resize(this->nages);
+      for (size_t y = 0; y < this->nyears; y++) {
+        fims::Vector<Type> expected_acomp;
         expected_acomp.resize(this->nages);
         Type sum = 0.0;
         bool containsNA =
@@ -176,10 +178,13 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         for (size_t a = 0; a < this->nages; a++) {
           if (this->observed_agecomp_data->at(y, a) !=
               this->observed_agecomp_data->na_value) {
+            dmultinom.is_na[y] = false;
             size_t i_age_year = y * this->nages + a;
+
             sum += this->catch_numbers_at_age[i_age_year];
           } else {
             containsNA = true; /**< sets to true if any values are NA >*/
+            dmultinom.is_na[y] = true;
             break;
           }
         }
@@ -188,50 +193,49 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
             size_t i_age_year = y * this->nages + a;
             expected_acomp[a] = this->catch_numbers_at_age[i_age_year] /
                                 sum;  // probabilities for ages
+            dmultinom.observed_values[i_age_year] = this->observed_agecomp_data->at(y, a);
+            dmultinom.expected_values[i_age_year] = expected_acomp[a];
 
                         FLEET_LOG << " age " << a << " in year " << y
                       << "has expected: " << expected_acomp[a]
-                      << "  and observed: " << observed_acomp[a] << std::endl;
-            
-            dmultinom.expected_values[i_age_year] = expected_acomp[a];
-          }
-          dmultinom.observed_values = observed_agecomp_data->data;
-          nll -= dmultinom.evaluate(true);
+                      << "  and observed: " << dmultinom.observed_values[i_age_year] << std::endl;        }
         }
       }
+      nll -= dmultinom.evaluate(true);
     }
     FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id
               << nll << std::endl;
-#endif
     return nll;
   }
 
   virtual const Type evaluate_index_nll() {
     Type nll = 0.0; /*!< The negative log likelihood value */
-
-#ifdef TMB_MODEL
     fims_distributions::NormalLPDF<Type> dnorm;
-      dnorm.observed_values.resize(this->observed_index_data->data.size());
-      dnorm.expected_values.resize(this->expected_index.size());
-      dnorm.of = this->of;
-    for (size_t i = 0; i < this->expected_index.size(); i++) {
+    dnorm.observed_values.resize(this->observed_index_data->data.size());
+    dnorm.is_na.resize(this->observed_index_data->data.size());
+    dnorm.expected_values.resize(this->observed_index_data->data.size());
+    dnorm.log_sd.resize(this->observed_index_data->data.size());
+    dnorm.of = this->of;
+    for (size_t i = 0; i < this->observed_index_data->data.size(); i++) {
       if (this->observed_index_data->at(i) !=
           this->observed_index_data->na_value) {
+        dnorm.is_na[i] = false;
         dnorm.observed_values[i] = fims_math::log(this->observed_index_data->at(i));
         dnorm.expected_values[i] = fims_math::log(this->expected_index[i]);
         dnorm.log_sd[i] = this->log_obs_error[i];
-        nll -= dnorm.evaluate(true);
-      }
 
+      } else {
+        dnorm.is_na[i] = true;
+      }
       FLEET_LOG << "observed index data: " << i << " is "
                 << this->observed_index_data->at(i)
                 << " and expected is: " << this->expected_index[i] << std::endl;
       FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
     }
+    nll -= dnorm.evaluate(true);
     FLEET_LOG << " log_sd is: " << dnorm.log_sd[0] << std::endl;
     FLEET_LOG << " index nll: " << nll << std::endl;
 
-#endif
     return nll;
   }
 };
