@@ -170,8 +170,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       dmultinom.of = this -> of;
 
       for (size_t y = 0; y < this->nyears; y++) {
-        fims::Vector<Type> expected_acomp;
-        expected_acomp.resize(this->nages);
         Type sum = 0.0;
         bool containsNA =
             false; /**< skips the entire year if any values are NA */
@@ -191,21 +189,21 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         if (!containsNA) {
           for (size_t a = 0; a < this->nages; a++) {
             size_t i_age_year = y * this->nages + a;
-            expected_acomp[a] = this->catch_numbers_at_age[i_age_year] /
-                                sum;  // probabilities for ages
             dmultinom.observed_values[i_age_year] = this->observed_agecomp_data->at(y, a);
-            dmultinom.expected_values[i_age_year] = expected_acomp[a];
+            dmultinom.expected_values[i_age_year] = this->catch_numbers_at_age[i_age_year] /
+                                sum;
 
-                        FLEET_LOG << " age " << a << " in year " << y
+            FLEET_LOG << " age " << a << " in year " << y
                       << "has expected: " << expected_acomp[a]
                       << "  and observed: " << dmultinom.observed_values[i_age_year] << std::endl;        }
+          }
         }
       }
-      nll -= dmultinom.evaluate(true);
+      nll += dmultinom.evaluate(true);
+      FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id
+                << nll << std::endl;
+      return nll;
     }
-    FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id
-              << nll << std::endl;
-    return nll;
   }
 
   virtual const Type evaluate_index_nll() {
@@ -232,7 +230,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                 << " and expected is: " << this->expected_index[i] << std::endl;
       FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
     }
-    nll -= dnorm.evaluate(true);
+    nll += dnorm.evaluate(true);
     FLEET_LOG << " log_sd is: " << dnorm.log_sd[0] << std::endl;
     FLEET_LOG << " index nll: " << nll << std::endl;
 
