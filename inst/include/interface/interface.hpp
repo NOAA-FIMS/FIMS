@@ -58,7 +58,7 @@ vector<Type> ADREPORTvector(vector<vector<Type> > x) {
 
 #ifndef TMB_MODEL
  #define FIMS_SIMULATE_F(F)
- #define REPORT_F(name, F)
+ #define FIMS_REPORT_F(name, F)
  #define ADREPORT_F(name, F)
 #endif
 
