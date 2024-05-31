@@ -39,6 +39,9 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
  std::string  nll_type; //prior, re, data
  bool osa_flag = false;
  bool simulate_flag = false;
+  #ifdef TMB_MODEL
+   ::objective_function<Type> *of;
+  #endif
 
   /** @brief Constructor.
    */
@@ -56,7 +59,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
 /** @brief Default id of the singleton distribution class
  */
 template <typename Type>
-uint32_t DensityComponentBase<Type>::id_g = 0; 
+uint32_t DensityComponentBase<Type>::id_g = 0;
 
 }  // namespace fims_distributions
 
