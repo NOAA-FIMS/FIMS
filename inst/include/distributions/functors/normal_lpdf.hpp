@@ -16,6 +16,9 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     fims::Vector<Type> sd;
     Type nll = 0.0;
     std::vector<bool> is_na;
+    #ifdef TMB_MODEL
+    ::objective_function<Type> *of;
+    #endif
     //data_indicator<tmbutils::vector<Type> , Type> keep;
 
     NormalLPDF() : DensityComponentBase<Type>() {
@@ -43,13 +46,16 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         for(size_t i=0; i<this->observed_values.size(); i++){
           if(!is_na[i]){
             // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
+            #ifdef TMB_MODEL
             this->nll_vec[i] = -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
+            
             nll += this->nll_vec[i];
             if(this->simulate_flag){
                 FIMS_SIMULATE_F(this->of){
                     this->observed_values[i] = rnorm(mu[i], sd[i]);
                 }
             }
+            #endif
           /* osa not working yet
             if(osa_flag){//data observation type implements osa residuals
                 //code for osa cdf method
