@@ -1,4 +1,4 @@
-#ifndef LOGNORMALl_LPDF
+#ifndef LOGNORMAL_LPDF
 #define LOGNORMAL_LPDF
 
 #include "density_components_base.hpp"
@@ -55,8 +55,10 @@ namespace fims_distributions
             for (size_t i = 0; i < this->observed_values.size(); i++)
             {
               if(!is_na[i]){
+                #ifdef TMB_MODEL
                 // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
                 this->nll_vec[i] = -dnorm(log(this->observed_values[i]), mu[i], sd[i], do_log) - log(this->observed_values[i]);
+                
                 nll += this->nll_vec[i];
                 if (this->simulate_flag)
                 {
@@ -66,6 +68,7 @@ namespace fims_distributions
                         this->observed_values[i] = exp(rnorm(mu[i], sd[i]));
                     }
                 }
+                #endif
 
                 /* osa not working yet
                   if(osa_flag){//data observation type implements osa residuals

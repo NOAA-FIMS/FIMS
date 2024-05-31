@@ -39,9 +39,6 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
  std::string  nll_type; //prior, re, data
  bool osa_flag = false;
  bool simulate_flag = false;
-  #ifdef TMB_MODEL
-   ::objective_function<Type> *of;
-  #endif
 
   /** @brief Constructor.
    */
