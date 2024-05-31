@@ -156,6 +156,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
       }
     } else {
+      recruitment->estimate_log_recruit_devs = estimate_log_devs;
       for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
         recruitment->log_recruit_devs[i] = this->log_devs[i];
       }
