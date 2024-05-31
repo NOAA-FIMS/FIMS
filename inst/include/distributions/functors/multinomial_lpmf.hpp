@@ -16,9 +16,6 @@ namespace fims_distributions
         Type nll = 0.0;
         fims::Vector<size_t> dims;
         std::vector<bool> is_na;
-        #ifdef TMB_MODEL
-        ::objective_function<Type> *of;
-        #endif
         // data_indicator<tmbutils::vector<Type> , Type> keep;
 
         MultinomialLPMF() : DensityComponentBase<Type>()

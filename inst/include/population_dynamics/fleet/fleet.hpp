@@ -194,8 +194,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                                 sum;
 
             FLEET_LOG << " age " << a << " in year " << y
-                      << "has expected: " << expected_acomp[a]
-                      << "  and observed: " << dmultinom.observed_values[i_age_year] << std::endl;        }
+                      << "has expected: " <<  dmultinom.expected_values[i_age_year]
+                      << "  and observed: " << dmultinom.observed_values[i_age_year] << std::endl;        
           }
         }
       }
