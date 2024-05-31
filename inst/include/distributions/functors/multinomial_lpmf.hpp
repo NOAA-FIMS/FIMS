@@ -14,7 +14,7 @@ namespace fims_distributions
     struct MultinomialLPMF : public DensityComponentBase<Type>
     {
         Type nll = 0.0;
-        vector<size_t> dims;
+        fims::Vector<size_t> dims;
         std::vector<bool> is_na;
         #ifdef TMB_MODEL
         ::objective_function<Type> *of;
@@ -43,7 +43,9 @@ namespace fims_distributions
                     observed_vector[j] = this->observed_values[idx];
                     expected_vector[j] = this->expected_values[idx];
                 }
+                #ifdef TMB_model
                 this->nll_vec[i] = -dmultinom((vector<Type>)observed_vector, (vector<Type>)expected_vector, do_log);
+                #endif
                 nll += this->nll_vec[i];
                 /*
                 if (this->simulate_flag)
@@ -64,10 +66,10 @@ namespace fims_distributions
                 */
               }
             }
-
+            #ifdef TMB_MODEL
             vector<Type> observed_values = this->observed_values;
           //  FIMS_REPORT_F(observed_values, this->of);
-
+            #endif
             return (nll);
         }
 
