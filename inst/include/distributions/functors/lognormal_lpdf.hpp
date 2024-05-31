@@ -75,9 +75,10 @@ namespace fims_distributions
                   } */
               }
             }
+            #ifdef TMB_MODEL
             vector<Type> lognormal_observed_values = this->observed_values;
           //  FIMS_REPORT_F(lognormal_observed_values, this->of);
-
+            #endif
             return (nll);
         }
     };
