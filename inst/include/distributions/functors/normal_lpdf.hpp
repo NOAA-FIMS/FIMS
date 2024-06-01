@@ -37,9 +37,9 @@ struct NormalLPDF : public DensityComponentBase<Type> {
                 this->mu[i] = this->expected_values[i];
             }
             if(log_sd.size() == 1){
-                sd[i] = exp(log_sd[0]);
+                sd[i] = fims_math::exp(log_sd[0]);
             } else {
-                sd[i] = exp(log_sd[i]);
+                sd[i] = fims_math::exp(log_sd[i]);
             }
         }
         this->nll_vec.resize(this->observed_values.size());
