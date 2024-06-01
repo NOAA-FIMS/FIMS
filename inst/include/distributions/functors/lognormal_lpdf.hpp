@@ -17,6 +17,9 @@ namespace fims_distributions
         fims::Vector<Type> mu;
         fims::Vector<Type> sd;
         std::vector<bool> is_na;
+        #ifdef TMB_MODEL
+        ::objective_function<Type> *of;
+        #endif
         Type nll = 0.0;
         // data_indicator<tmbutils::vector<Type> , Type> keep;
 
@@ -44,11 +47,11 @@ namespace fims_distributions
 
                 if (log_sd.size() == 1)
                 {
-                    sd[i] = exp(log_sd[0]);
+                    sd[i] = fims_math::exp(log_sd[0]);
                 }
                 else
                 {
-                    sd[i] = exp(log_sd[i]);
+                    sd[i] = fims_math::exp(log_sd[i]);
                 }
             }
             this->nll_vec.resize(this->observed_values.size());
@@ -65,7 +68,7 @@ namespace fims_distributions
                     FIMS_SIMULATE_F(this->of)
                     { // preprocessor definition in interface.hpp
                         // this simulates data that is mean biased
-                        this->observed_values[i] = exp(rnorm(mu[i], sd[i]));
+                        this->observed_values[i] = fims_math::exp(rnorm(mu[i], sd[i]));
                     }
                 }
                 #endif

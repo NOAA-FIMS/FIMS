@@ -18,6 +18,7 @@
 #include "../../common/model_object.hpp"
 #include "../../interface/interface.hpp"
 #include "../../common/fims_vector.hpp"
+#include "../../common/fims_math.hpp"
 
 namespace fims_distributions {
 
