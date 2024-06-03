@@ -63,9 +63,10 @@ std::map<uint32_t,
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Parameter observed_values;    /**< observed data */
-  Parameter expected_values; /**< mean of x for the normal distribution */
-  Parameter log_sd;   /**< sd of x for the normal distribution */
+  ParameterVector observed_values;    /**< observed data */
+  ParameterVector expected_values; /**< mean of x for the normal distribution */
+  ParameterVector log_sd;   /**< sd of x for the normal distribution */
+  Rcpp::LogicalVector is_na;
 
   DnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -80,11 +81,26 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @tparam T
    * @return log pdf
    */
+
+
   virtual double evaluate(bool do_log) {
     fims_distributions::NormalLPDF<double> dnorm;
-    dnorm.observed_values = this->observed_values.value_m;
-    dnorm.expected_values = this->observed_values.value_m;
-    dnorm.log_sd = this->log_sd.value_m;
+    dnorm.observed_values.resize(this->observed_values.size());
+    dnorm.expected_values.resize(this->expected_values.size());
+    dnorm.log_sd.resize(this->log_sd.size());
+    dnorm.is_na.resize(this->is_na.size());
+    for(int i=0; i<observed_values.size(); i++){
+      dnorm.observed_values[i] = this->observed_values[i].value_m;
+    }
+    for(int i=0; i<expected_values.size(); i++){
+      dnorm.expected_values[i] = this->expected_values[i].value_m;
+    }
+    for(int i=0; i<log_sd.size(); i++){
+      dnorm.log_sd[i] = this->log_sd[i].value_m;
+    }
+    for(int i=0; i<is_na.size(); i++){
+      dnorm.is_na[i] = this->is_na[i];
+    }
     return dnorm.evaluate(do_log);
   }
 
@@ -100,10 +116,23 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // interface to data/parameter value
     distribution->id = this->id;
-    distribution->observed_values = this->observed_values.value_m;
+    distribution->observed_values.resize(this->observed_values.size());
+    for(int i=0; i<this->observed_values.size(); i++){
+      distribution->observed_values[i] = this->observed_values[i].value_m;
+    }
     // set relative info
-    distribution->expected_values = this->expected_values.value_m;
-    distribution->log_sd = this->log_sd.value_m;
+    distribution->expected_values.resize(this->expected_values.size());
+    for(int i=0; i<this->expected_values.size(); i++){
+      distribution->expected_values[i] = this->expected_values[i].value_m;
+    }
+    distribution->log_sd.resize(this->log_sd.size());
+    for(int i=0; i<this->log_sd.size(); i++){
+      distribution->log_sd[i] = this->log_sd[i].value_m;
+    }
+    distribution->is_na.resize(this->is_na.size());
+    for(int i=0; i<is_na.size(); i++){
+      distribution->is_na[i] = this->is_na[i];
+    }
 
     info->distribution_models[distribution->id] = distribution;
 
@@ -133,9 +162,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Parameter observed_values;       /**< observation */
-  Parameter expected_values; /**< mean of the distribution of log(x) */
-  Parameter log_sd;   /**< standard deviation of the distribution of log(x) */
+  ParameterVector observed_values;       /**< observation */
+  ParameterVector expected_values; /**< mean of the distribution of log(x) */
+  ParameterVector log_sd;   /**< standard deviation of the distribution of log(x) */
+  Rcpp::LogicalVector is_na;
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -155,9 +185,22 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate(bool do_log) {
     fims_distributions::LogNormalLPDF<double> dlnorm;
-    dlnorm.observed_values = this->observed_values.value_m;
-    dlnorm.expected_values = this->expected_values.value_m;
-    dlnorm.log_sd = this->log_sd.value_m;
+    dlnorm.observed_values.resize(this->observed_values.size());
+    dlnorm.expected_values.resize(this->expected_values.size());
+    dlnorm.log_sd.resize(this->log_sd.size());
+    dlnorm.is_na.resize(this->is_na.size());
+    for(int i=0; i<observed_values.size(); i++){
+      dlnorm.observed_values[i] = this->observed_values[i].value_m;
+    }
+    for(int i=0; i<expected_values.size(); i++){
+      dlnorm.expected_values[i] = this->expected_values[i].value_m;
+    }
+    for(int i=0; i<log_sd.size(); i++){
+      dlnorm.log_sd[i] = this->log_sd[i].value_m;
+    }
+    for(int i=0; i<is_na.size(); i++){
+      dlnorm.is_na[i] = this->is_na[i];
+    }
     return dlnorm.evaluate(do_log);
   }
 
@@ -173,9 +216,23 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     distribution->id = this->id;
-    distribution->observed_values = this->observed_values.value_m;
-    distribution->expected_values = this->expected_values.value_m;
-    distribution->log_sd = this->log_sd.value_m;
+    distribution->observed_values.resize(this->observed_values.size());
+    for(int i=0; i<this->observed_values.size(); i++){
+      distribution->observed_values[i] = this->observed_values[i].value_m;
+    }
+    // set relative info
+    distribution->expected_values.resize(this->expected_values.size());
+    for(int i=0; i<this->expected_values.size(); i++){
+      distribution->expected_values[i] = this->expected_values[i].value_m;
+    }
+    distribution->log_sd.resize(this->log_sd.size());
+    for(int i=0; i<this->log_sd.size(); i++){
+      distribution->log_sd[i] = this->log_sd[i].value_m;
+    }
+    distribution->is_na.resize(this->is_na.size());
+    for(int i=0; i<is_na.size(); i++){
+      distribution->is_na[i] = this->is_na[i];
+    }
 
     info->distribution_models[distribution->id] = distribution;
 
@@ -207,9 +264,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  Rcpp::IntegerVector observed_values; /**< Vector of length K of integers */
-  Rcpp::NumericVector expected_values; /**< Vector of length K, specifying the probability
+  ParameterVector observed_values; /**< Vector of length K of integers */
+  ParameterVector expected_values; /**< Vector of length K, specifying the probability
  for the K classes (note, unlike in R these must sum to 1). */
+  Rcpp::LogicalVector is_na;
 
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -227,11 +285,17 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual double evaluate(bool do_log) {
     fims_distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
-    dmultinom.observed_values.resize(observed_values.size());  // Vector from TMB
-    dmultinom.expected_values.resize(expected_values.size());  // Vector from TMB
-    for (int i = 0; i < observed_values.size(); i++) {
-      dmultinom.observed_values[i] = observed_values[i];
-      dmultinom.expected_values[i] = expected_values[i];
+    dmultinom.observed_values.resize(this->observed_values.size());
+    dmultinom.expected_values.resize(this->expected_values.size());
+    dmultinom.is_na.resize(this->is_na.size());
+    for(int i=0; i<observed_values.size(); i++){
+      dmultinom.observed_values[i] = this->observed_values[i].value_m;
+    }
+    for(int i=0; i<expected_values.size(); i++){
+      dmultinom.expected_values[i] = this->expected_values[i].value_m;
+    }
+    for(int i=0; i<is_na.size(); i++){
+      dmultinom.is_na[i] = this->is_na[i];
     }
     return dmultinom.evaluate(do_log);
   }
@@ -247,12 +311,18 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
 
     distribution->id = this->id;
-    distribution->observed_values.resize(observed_values.size());
-    distribution->expected_values.resize(expected_values.size());
-
-    for (int i = 0; i < observed_values.size(); i++) {
-      distribution->observed_values[i] = observed_values[i];
-      distribution->expected_values[i] = expected_values[i];
+    distribution->observed_values.resize(this->observed_values.size());
+    for(int i=0; i<this->observed_values.size(); i++){
+      distribution->observed_values[i] = this->observed_values[i].value_m;
+    }
+    // set relative info
+    distribution->expected_values.resize(this->expected_values.size());
+    for(int i=0; i<this->expected_values.size(); i++){
+      distribution->expected_values[i] = this->expected_values[i].value_m;
+    }
+    distribution->is_na.resize(this->is_na.size());
+    for(int i=0; i<is_na.size(); i++){
+      distribution->is_na[i] = this->is_na[i];
     }
 
     info->distribution_models[distribution->id] = distribution;
