@@ -8,11 +8,12 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dnorm_ <- new(TMBDnormDistribution)
   # populate class members
-  dnorm_$observed_values$value <- y
-  dnorm_$expected_values$value <- 0
-  dnorm_$log_sd$value <- 1
+  dnorm_$observed_values <- new(ParameterVector, y, 1)
+  dnorm_$expected_values <- new(ParameterVector, 0, 1)
+  dnorm_$log_sd <- new(ParameterVector, log(1), 1)
+  dnorm_$is_na <- FALSE
   # evaluate the density and compare with R
-  expect_equal(dnorm_$evaluate(TRUE), stats::dnorm(y, 0, 1, TRUE))
+  expect_equal(dnorm_$evaluate(TRUE), -stats::dnorm(y, 0, 1, TRUE))
 
   clear()
 })
@@ -27,12 +28,13 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dlnorm_ <- new(TMBDlnormDistribution)
   # populate class members
-  dlnorm_$observed_values$value <- y
-  dlnorm_$expected_valueslog$value <- 0
-  dlnorm_$log_sd$value <- 1
+  dlnorm_$observed_values <- new(ParameterVector, y, 1)
+  dlnorm_$expected_values <- new(ParameterVector, 0, 1)
+  dlnorm_$log_sd <- new(ParameterVector, log(1), 1)
+  dlnorm_$is_na <- FALSE
   # evaluate the density and compare with R
-  expect_equal(dlnorm_$evaluate(TRUE), stats::dlnorm(y, 0, 1, TRUE))
-  expect_equal(dlnorm_$evaluate(FALSE), stats::dlnorm(y, 0, 1, FALSE))
+  expect_equal(dlnorm_$evaluate(TRUE), -stats::dlnorm(y, 0, 1, TRUE))
+  expect_equal(dlnorm_$evaluate(FALSE), -stats::dlnorm(y, 0, 1, FALSE))
 
   clear()
 })
@@ -47,16 +49,17 @@ test_that("multinomial_lpdf", {
   # initialize the Dmultinom module
   dmultinom_ <- new(TMBDmultinomDistribution)
   # populate class members
-  dmultinom_$observed_values <- x
-  dmultinom_$expected_values <- p
+  dmultinom_$observed_values <- new(ParameterVector, x, 10)
+  dmultinom_$expected_values <- new(ParameterVector, p, 10)
+  dmultinom_$is_na <- FALSE
   # evaluate the density and compare with R
   expect_equal(
     dmultinom_$evaluate(TRUE),
-    stats::dmultinom(x = x, prob = p, log = TRUE)
+    -stats::dmultinom(x = x, prob = p, log = TRUE)
   )
   expect_equal(
     dmultinom_$evaluate(FALSE),
-    stats::dmultinom(x = x, prob = p, log = FALSE)
+    -stats::dmultinom(x = x, prob = p, log = FALSE)
   )
 
   clear()
