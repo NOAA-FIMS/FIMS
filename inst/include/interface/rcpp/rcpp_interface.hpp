@@ -428,7 +428,8 @@ RCPP_MODULE(fims) {
       .method("evaluate", &DnormDistributionsInterface::evaluate)
       .field("observed_values", &DnormDistributionsInterface::observed_values)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
-      .field("log_sd", &DnormDistributionsInterface::log_sd);
+      .field("log_sd", &DnormDistributionsInterface::log_sd)
+      .field("is_na", &DnormDistributionsInterface::is_na);
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
@@ -469,14 +470,16 @@ RCPP_MODULE(fims) {
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
       .field("observed_values", &DlnormDistributionsInterface::observed_values)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
-      .field("log_sd", &DlnormDistributionsInterface::log_sd);
+      .field("log_sd", &DlnormDistributionsInterface::log_sd)
+      .field("is_na", &DlnormDistributionsInterface::is_na);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
       .method("get_id", &DmultinomDistributionsInterface::get_id)
       .field("observed_values", &DmultinomDistributionsInterface::observed_values)
-      .field("expected_values", &DmultinomDistributionsInterface::expected_values);
+      .field("expected_values", &DmultinomDistributionsInterface::expected_values)
+      .field("is_na", &DmultinomDistributionsInterface::is_na);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
