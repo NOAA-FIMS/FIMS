@@ -329,7 +329,7 @@ print(opt)
 ```{r tmb_report}
 sdr <- TMB::sdreport(obj)
 sdr_fixed <- summary(sdr, "fixed")
-report <- obj$report()
+report <- obj$report(obj$env$last.par.best)
 
 print(sdr_fixed)
 
