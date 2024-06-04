@@ -60,8 +60,10 @@ namespace fims_distributions
               if(!is_na[i]){
                 #ifdef TMB_MODEL
                 // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
-                this->nll_vec[i] = -dnorm(log(this->observed_values[i]), mu[i], sd[i], do_log) - log(this->observed_values[i]);
-                
+                this->nll_vec[i] = -dnorm(log(this->observed_values[i]), mu[i], sd[i], true) + log(this->observed_values[i]);
+                if(!do_log){
+                  this->nll_vec[i] = -exp(-this->nll_vec[i]);
+                }
                 nll += this->nll_vec[i];
                 if (this->simulate_flag)
                 {
