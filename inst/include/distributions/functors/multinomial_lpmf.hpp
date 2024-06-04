@@ -37,13 +37,14 @@ namespace fims_distributions
             for (size_t i = 0; i < dims[0]; i++)
             {
               if(!is_na[i]){
+                #ifdef TMB_MODEL
                 for (size_t j = 0; j < dims[1]; j++)
                 {
                     size_t idx = (i * dims[1]) + j;
                     observed_vector[j] = this->observed_values[idx];
                     expected_vector[j] = this->expected_values[idx];
                 }
-                //#ifdef TMB_model
+
                 this->nll_vec[i] = -dmultinom((vector<Type>)observed_vector, (vector<Type>)expected_vector, do_log);
                 nll += this->nll_vec[i];
                 /*
@@ -63,7 +64,7 @@ namespace fims_distributions
                     }
                 }
                 */
-               //#endif
+               #endif
               }
             }
             #ifdef TMB_MODEL

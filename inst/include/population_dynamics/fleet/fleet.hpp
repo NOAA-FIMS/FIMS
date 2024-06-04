@@ -169,6 +169,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       dmultinom.expected_values.resize(nyears*nages);
       #ifdef TMB_MODEL
       dmultinom.of = this -> of;
+      #endif
       for (size_t y = 0; y < this->nyears; y++) {
         Type sum = 0.0;
         bool containsNA =
@@ -200,7 +201,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         }
       }
       nll += dmultinom.evaluate(true);
-    #endif
       FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id
                 << nll << std::endl;
       return nll;
