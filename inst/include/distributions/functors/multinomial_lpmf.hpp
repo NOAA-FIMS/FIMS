@@ -43,9 +43,8 @@ namespace fims_distributions
                     observed_vector[j] = this->observed_values[idx];
                     expected_vector[j] = this->expected_values[idx];
                 }
-                #ifdef TMB_model
+                //#ifdef TMB_model
                 this->nll_vec[i] = -dmultinom((vector<Type>)observed_vector, (vector<Type>)expected_vector, do_log);
-                
                 nll += this->nll_vec[i];
                 /*
                 if (this->simulate_flag)
@@ -64,7 +63,7 @@ namespace fims_distributions
                     }
                 }
                 */
-               #endif
+               //#endif
               }
             }
             #ifdef TMB_MODEL

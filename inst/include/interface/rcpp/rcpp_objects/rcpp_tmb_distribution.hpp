@@ -268,6 +268,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   ParameterVector expected_values; /**< Vector of length K, specifying the probability
  for the K classes (note, unlike in R these must sum to 1). */
   Rcpp::LogicalVector is_na;
+  Rcpp::NumericVector dims;
 
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -297,6 +298,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     for(int i=0; i<is_na.size(); i++){
       dmultinom.is_na[i] = this->is_na[i];
     }
+    dmultinom.dims.resize(2);
+    dmultinom.dims[0] = this->dims[0];
+    dmultinom.dims[1] = this->dims[1];
     return dmultinom.evaluate(do_log);
   }
 
@@ -324,6 +328,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     for(int i=0; i<is_na.size(); i++){
       distribution->is_na[i] = this->is_na[i];
     }
+    distribution->dims.resize(2);
+    distribution->dims[0] = this->dims[0];
+    distribution->dims[1] = this->dims[1];
 
     info->distribution_models[distribution->id] = distribution;
 

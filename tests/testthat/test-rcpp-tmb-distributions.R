@@ -52,6 +52,7 @@ test_that("multinomial_lpdf", {
   dmultinom_$observed_values <- new(ParameterVector, x, 10)
   dmultinom_$expected_values <- new(ParameterVector, p, 10)
   dmultinom_$is_na <- FALSE
+  dmultinom_$dims <- c(1,10)
   # evaluate the density and compare with R
   expect_equal(
     dmultinom_$evaluate(TRUE),

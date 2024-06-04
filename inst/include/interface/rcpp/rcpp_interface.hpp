@@ -479,7 +479,8 @@ RCPP_MODULE(fims) {
       .method("get_id", &DmultinomDistributionsInterface::get_id)
       .field("observed_values", &DmultinomDistributionsInterface::observed_values)
       .field("expected_values", &DmultinomDistributionsInterface::expected_values)
-      .field("is_na", &DmultinomDistributionsInterface::is_na);
+      .field("is_na", &DmultinomDistributionsInterface::is_na)
+      .field("dims", &DmultinomDistributionsInterface::dims);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
