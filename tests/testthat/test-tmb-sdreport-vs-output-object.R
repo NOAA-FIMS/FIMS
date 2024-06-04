@@ -225,7 +225,7 @@ test_that("TMB sdreport and output object show same point estimates", {
   ## ----tmb_report---------------------------------------------------------------------------------------------------------------------------------
   sdr <- TMB::sdreport(obj)
   sdr_fixed <- summary(sdr, "fixed")
-  report <- obj$report()
+  report <- obj$report(obj$env$last.par.best)
   
   # Check biomass
   for (i in seq_along(report$biomass[[1]])) {
