@@ -199,8 +199,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
           }
         }
       }
-      #endif
       nll += dmultinom.evaluate(true);
+    #endif
       FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id
                 << nll << std::endl;
       return nll;
