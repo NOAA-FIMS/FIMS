@@ -10,7 +10,7 @@ setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
            function(e1, e2) callGeneric(e1, e2))
 
 #Parameter
-setMethod("acos", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,acos(x$value))})
+  setMethod("acos", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,acos(x$value))})
   setMethod("asin", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,asin(x$value))})
   setMethod("atan", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,atan(x$value))})
   setMethod("cos", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,cos(x$value))})
@@ -23,6 +23,112 @@ setMethod("acos", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,a
   setMethod("log10", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,log10(x$value))})
   setMethod("sqrt", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter, (x$value^0.5))})
   setMethod("log", signature(x = "Rcpp_Parameter"), function (x, base=exp(1)){return(new(Parameter,log(x$value)))})
+
+setMethod("acos", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-acos(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("asin", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-asin(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("atan", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-atan(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("cos", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-cos(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("cosh", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-cosh(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("sin", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-sin(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("sinh", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-sinh(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("tan", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-tan(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("tanh", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-tanh(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("exp", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-exp(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("log10", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-log10(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("sqrt", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-sqrt(x[i]$value)
+}
+return(xx)
+})
+
+setMethod("log", signature(x = "Rcpp_ParameterVector"), function (x) {
+ xx<-new(ParameterVector, x$size())
+for(i in 1:x$size()){
+     xx[i]$value<-log(x[i]$value)
+}
+return(xx)
+})
+
+
 
   setMethod("^", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"), function (e1, e2){
     (e1$value^e2$value)})
