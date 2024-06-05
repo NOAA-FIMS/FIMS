@@ -30,7 +30,8 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     virtual const Type evaluate(const bool& do_log){
         this->mu.resize(this->observed_values.size());
         this->sd.resize(this->observed_values.size());
-        for(size_t i=0; i<this->expected_values.size(); i++){
+        this->nll_vec.resize(this->observed_values.size());
+        for(size_t i=0; i<this->observed_values.size(); i++){
             if(this->expected_values.size() == 1){
                 this->mu[i] = this->expected_values[0];
             } else {
@@ -41,28 +42,26 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             } else {
                 sd[i] = fims_math::exp(log_sd[i]);
             }
-        }
-        this->nll_vec.resize(this->observed_values.size());
-        for(size_t i=0; i<this->observed_values.size(); i++){
-          if(!is_na[i]){
-            // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
-            #ifdef TMB_MODEL
-            this->nll_vec[i] = -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
-            
-            nll += this->nll_vec[i];
-            if(this->simulate_flag){
-                FIMS_SIMULATE_F(this->of){
-                    this->observed_values[i] = rnorm(mu[i], sd[i]);
-                }
+            if(!is_na[i])
+            {
+              // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
+              #ifdef TMB_MODEL
+              this->nll_vec[i] = -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
+
+              nll += this->nll_vec[i];
+              if(this->simulate_flag){
+                  FIMS_SIMULATE_F(this->of){
+                      this->observed_values[i] = rnorm(mu[i], sd[i]);
+                  }
+              }
+              #endif
+            /* osa not working yet
+              if(osa_flag){//data observation type implements osa residuals
+                  //code for osa cdf method
+                  this->nll_vec[i] = this->keep.cdf_lower[i] * -log( pnorm(this->observed_values[i], mu[i], sd[i]) );
+                  this->nll_vec[i] = this->keep.cdf_upper[i] * -log( 1.0 - pnorm(this->observed_values[i], mu[i], sd[i]) );
+              } */
             }
-            #endif
-          /* osa not working yet
-            if(osa_flag){//data observation type implements osa residuals
-                //code for osa cdf method
-                this->nll_vec[i] = this->keep.cdf_lower[i] * -log( pnorm(this->observed_values[i], mu[i], sd[i]) );
-                this->nll_vec[i] = this->keep.cdf_upper[i] * -log( 1.0 - pnorm(this->observed_values[i], mu[i], sd[i]) );
-            } */
-          }
         }
         #ifdef TMB_MODEL
         vector<Type> normal_observed_values = this->observed_values;
