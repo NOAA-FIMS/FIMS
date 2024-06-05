@@ -1,3 +1,4 @@
+library(FIMS)
 
 test_that("Parameter vector works as expected", {
 
