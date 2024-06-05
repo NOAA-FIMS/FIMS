@@ -29,9 +29,9 @@ class Parameter {
     uint32_t id_m; /**< id of the parameter */
   double value_m; /**< initial value of the parameter */
   double min_m =
-      std::numeric_limits<double>::min(); /**< min value of the parameter*/
+      -std::numeric_limits<double>::infinity(); /**< min value of the parameter; default is negative infinity*/
   double max_m =
-      std::numeric_limits<double>::max(); /**< max value of the parameter*/
+      std::numeric_limits<double>::infinity(); /**< max value of the parameter; default is positive infinity*/
   bool is_random_effect_m = false;        /**< Is the parameter a random effect
                                            parameter? Default value is false.*/
   bool estimated_m =
@@ -45,7 +45,7 @@ class Parameter {
    * @details Inputs include value, min, max, estimated.
    */
   Parameter(double value, double min, double max, bool estimated)
-      : value_m(value), min_m(min), max_m(max), estimated_m(estimated),id_m(Parameter::id_g++) {}
+      : id_m(Parameter::id_g++), value_m(value), min_m(min), max_m(max), estimated_m(estimated) {}
 
   /**
    * @brief Constructor for initializing Parameter.
@@ -73,36 +73,37 @@ uint32_t Parameter::id_g = 0;
  * interface between R and cpp.
  */
 class ParameterVector{
-    static uint32_t id_g;
+    static uint32_t id_g; /**< global identifier*/
    
 public:
-    Rcpp::List storage_m; //use a list because it's easier
-    uint32_t id;
+    Rcpp::List storage_m;  /**< list of parameter objects*/
+    uint32_t id_m; /**< unique identifier*/
     
     
     /**
-     * default constructor
+     *  @brief default constructor
      */
     ParameterVector(){
-        this->id = ParameterVector::id_g++;
+        this->id_m = ParameterVector::id_g++;
         Parameter p;
         this->storage_m.push_back(Rcpp::wrap(p));
     }
     /**
-     * constructor
+     *  @brief constructor
      */
     ParameterVector(size_t size ){
-        this->id = ParameterVector::id_g++;
+        this->id_m = ParameterVector::id_g++;
         for(size_t i =0; i < size; i++){
             Parameter p;
             this->storage_m.push_back(Rcpp::wrap(p));
         }
     }
     /**
-     * vector constructor
+     *  @brief vector constructor
+     *  @param Rcpp::NumericVector, "size", number of elements to copy over.
      */
     ParameterVector(Rcpp::NumericVector x, size_t size){
-        this->id = ParameterVector::id_g++;
+        this->id_m = ParameterVector::id_g++;
         for(size_t i =0; i < size; i++){
             Parameter p = x[i];
             this->storage_m.push_back(Rcpp::wrap(p));
@@ -110,13 +111,15 @@ public:
     }
     
     /**
-     * Accessor. First index starts is zero.
+     *  @brief Accessor. First index starts is zero.
+     *  @param return a Parameter at position "pos".
      */
     inline Parameter operator[](size_t pos) {
         return this->storage_m[pos]; }
     
     /**
-     * Accessor. First index is one. For calling from R.
+     *  @brief Accessor. First index is one. For calling from R.
+     *  @param return a Parameter at position "pos".
      */
     SEXP at(size_t pos){
         if(pos == 0 || pos > this->storage_m.size()){
@@ -127,14 +130,15 @@ public:
     }
     
     /**
-     * returns vector length
+     *  @brief returns vector length
      */
     size_t size(){
         return this->storage_m.size();
     }
     
     /**
-     * resize to length "size"
+     *  @brief resize to length "size"
+     *  @param resulting size.
      */
     void resize(size_t size){
         size_t n = this->storage_m.size();
@@ -192,6 +196,32 @@ public:
         for(size_t i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
             p.value_m = value;
+            this->storage_m[i] = Rcpp::wrap(p);
+        }
+    }
+
+    /**
+     * @brief Assigns the given values to the minimum value of all elements in the vector
+     * 
+     * @param value The value to be assigned
+     */
+    void fill_min(double value){
+        for(size_t i = 0; i < this->storage_m.size(); i++){
+            Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
+            p.min_m = value;
+            this->storage_m[i] = Rcpp::wrap(p);
+        }
+    }
+
+    /**
+     * @brief Assigns the given values to the maximum value of all elements in the vector
+     * 
+     * @param value The value to be assigned
+     */
+    void fill_max(double value){
+        for(size_t i = 0; i < this->storage_m.size(); i++){
+            Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
+            p.max_m = value;
             this->storage_m[i] = Rcpp::wrap(p);
         }
     }

@@ -1,282 +1,162 @@
-
-
+#' Sets methods for operators under the S4 Generic Group, Ops, which includes 
+#' Arith ("+", "-", "*", "^", %%, %/%, "/"),
+#' Compare ("==", ">", "<", "!=", "<=", ">="), and 
+#' Logic ("&", "|")
+#' @importFrom methods callGeneric
+#' @param e1 Rcpp_Parameter class
+#' @param e2 Rcpp_Parameter class
+#' @export
+#' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
-           function(e1, e2) callGeneric(e1, e2))
- 
- setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
-           function(e1, e2) callGeneric(e1, e2))
- 
- setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
-           function(e1, e2) callGeneric(e1, e2))
-
-#Parameter
-setMethod("acos", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,acos(x$value))})
-  setMethod("asin", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,asin(x$value))})
-  setMethod("atan", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,atan(x$value))})
-  setMethod("cos", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,cos(x$value))})
-  setMethod("cosh", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,cosh(x$value))})
-  setMethod("sin", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,sin(x$value))})
-  setMethod("sinh", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,sinh(x$value))})
-  setMethod("tan", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,tan(x$value))})
-  setMethod("tanh", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,tanh(x$value))})
-  setMethod("exp", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,exp(x$value))})
-  setMethod("log10", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,log10(x$value))})
-  setMethod("sqrt", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter, (x$value^0.5))})
-  setMethod("log", signature(x = "Rcpp_Parameter"), function (x, base=exp(1)){return(new(Parameter,log(x$value)))})
-
-  setMethod("^", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"), function (e1, e2){
-    (e1$value^e2$value)})
-  setMethod("^", signature(e1 = "Rcpp_Parameter", e2 = "numeric"), function (e1, e2){
-    ((e1$value^ e2))})
-  setMethod("^", signature(e1 = "numeric", e2 = "Rcpp_Parameter"), function (e1, e2){
-    (e1^ e2$value)})
-  
-  #+
-  setMethod("+", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"), function (e1, e2){
-    return(new(Parameter,e1$value + e2$value))})
-  setMethod("+", signature(e1 = "Rcpp_Parameter", e2 = "numeric"), function (e1, e2){
-    return(new(Parameter,e1$value + e2))})
-  setMethod("+", signature(e1 = "numeric", e2 = "Rcpp_Parameter"), function (e1, e2){
-    return(new(Parameter,e1 + e2$value))})
-  #-
-  setMethod("-", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"), function (e1, e2){
-    return(new(Parameter,e1$value - e2$value))})
-  setMethod("-", signature(e1 = "Rcpp_Parameter", e2 = "numeric"), function (e1, e2){
-    return (new(Parameter,e1 - e2$value))})
-  setMethod("-", signature(e1 = "numeric", e2 = "Rcpp_Parameter"), function (e1, e2){
-    return(new(Parameter,e1 - e2$value))})
-  
-  #*
-  setMethod("*", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"), function (e1, e2){
-    return(new(Parameter,e1$value * e2$value))})
-  setMethod("*", signature(e1 = "Rcpp_Parameter", e2 = "numeric"), function (e1, e2){
-    return(new(Parameter,e1$value * e2))})
-  setMethod("*", signature(e1 = "numeric", e2 = "Rcpp_Parameter"), function (e1, e2){
-    return(new(Parameter,e1 * e2$value))})
-  
-  #/
-  setMethod("/", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"), function (e1, e2){
-    return(new(Parameter,e1$value / e2$value))})
-  setMethod("/", signature(e1 = "Rcpp_Parameter", e2 = "numeric"), function (e1, e2){
-    return(new(Parameter,e1$value / e2))})
-  setMethod("/", signature(e1 = "numeric", e2 = "Rcpp_Parameter"), function (e1, e2){
-    return(new(Parameter,e1 / e2$value))})
-
-
-# -------------------------------------------------------------------------
-
-#setMethod("<-", c(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"), function (e1, e2){
- # (e1$value<- e2$value)})
-
-#setMethod("=", c(e1 = "Rcpp_Parameter", e2 = "numeric"), function (e1, e2){
- # (e1$value<- e2)})
-
-
-
-setMethod("+", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), function (e1, e2){
-    
-    if(e1$size() != e2$size()){
-        stop("Call to operator \"+\", vectors not equal length")
+    function(e1, e2){
+        ret = new(Parameter)
+        ret$value = callGeneric(e1$value, e2$value)
     }
-    ret<-new(ParameterVector, e1$size())
-    for(i in 1:e1$size()){
-        ret[i]$value <-e1[i]$value +e2[i]$value
-    }
-    return(ret)
-     })
+)
 
-
-setMethod("+", signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"), function (e1, e2){
-    
-    if(e1$size() != length(e2)){
-        
-        if(length(e2) == 1){
-            ret<-new(ParameterVector, e1$size())
-            for(i in 1:e1$size()){
-                ret[i]$value <-e1[i]$value +e2
-            }
-            return(ret)
+#' Sets methods for operators under the S4 Generic Group, Ops, which includes 
+#' Arith ("+", "-", "*", "^", %%, %/%, "/"),
+#' Compare ("==", ">", "<", "!=", "<=", ">="), and 
+#' Logic ("&", "|")
+#' 
+#' @param e1 Rcpp_Parameter class
+#' @param e2 numeric value
+#' @rdname Ops
+setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
+    function(e1, e2){
+        if(length(e2) != 1){
+            stop("Call to operator Ops, value not scalar")
         }
-        stop("Call to operator \"+\", vectors not equal length")
+        ret = new(Parameter)
+        ret$value = methods::callGeneric(e1$value, e2)
     }
-    ret<-new(ParameterVector, e1$size())
-    for(i in 1:e1$size()){
-        ret[i]$value <-e1[i]$value +e2[i]
-    }
-    return(ret)
-     })
+)
 
-setMethod("+", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"), function (e1, e2){
-    
-    if(length(e1) != e2$size()){
-        if(length(e1) == 1){
-            ret<-new(ParameterVector, e2$size())
-            for(i in 1:e2$size()){
-                ret[i]$value <-e1+e2[i]$value
-            }
-            return(ret)
+#' Sets methods for operators under the S4 Generic Group, Ops, which includes 
+#' Arith ("+", "-", "*", "^", %%, %/%, "/"),
+#' Compare ("==", ">", "<", "!=", "<=", ">="), and 
+#' Logic ("&", "|")
+#' 
+#' @param e1 numeric value
+#' @param e2 Rcpp_Parameter class
+#' @rdname Ops
+setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
+    function(e1, e2){
+        if(length(e1) != 1){
+            stop("Call to operator Ops, value not scalar")
         }
-        stop("Call to operator \"+\", vectors not equal length")
+        ret = new(Parameter)
+        ret$value = methods::callGeneric(e1, e2$value)
     }
-    ret<-new(ParameterVector, e2$size())
-    for(i in 1:e2$size()){
-        ret[i]$value <-e1[i]+e2[i]$value
-    }
-    return(ret)
-     })
-
-setMethod("-", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), function (e1, e2){
-    
-    if(e1$size() != e2$size()){
-        stop("Call to operator \"-\", vectors not equal length")
-    }
-    ret<-new(ParameterVector, e1$size())
-    for(i in 1:e1$size()){
-        ret[i]$value <-e1[i]$value - e2[i]$value
-    }
-    return(ret)
-     })
+)
 
 
-setMethod("-", signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"), function (e1, e2){
-    
-    if(e1$size() != length(e2)){
-        
-        if(length(e2) == 1){
-            ret<-new(ParameterVector, e1$size())
-            for(i in 1:e1$size()){
-                ret[i]$value <-e1[i]$value - e2
-            }
-            return(ret)
+
+#' Sets methods for operators under the S4 Generic Group, Ops, which includes 
+#' Arith ("+", "-", "*", "^", %%, %/%, "/"),
+#' Compare ("==", ">", "<", "!=", "<=", ">="), and 
+#' Logic ("&", "|")
+#'
+#' @param e1 Rcpp_ParameterVector class
+#' @param e2 Rcpp_ParameterVector class
+#' @rdname Ops
+setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), 
+    function(e1, e2) {
+        if(e1$size() != e2$size()){
+            stop("Call to operator Ops, vectors not equal length")
         }
-        stop("Call to operator \"-\", vectors not equal length")
-    }
-    ret<-new(ParameterVector, e1$size())
-    for(i in 1:e1$size()){
-        ret[i]$value <-e1[i]$value - e2[i]
-    }
-    return(ret)
-     })
-
-setMethod("-", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"), function (e1, e2){
-    
-    if(length(e1) != e2$size()){
-        if(length(e1) == 1){
-            ret<-new(ParameterVector, e2$size())
-            for(i in 1:e2$size()){
-                ret[i]$value <-e1-e2[i]$value
-            }
-            return(ret)
+        ret <-new(ParameterVector, e1$size())
+        for(i in 1:e1$size()){
+            ret[i]$value = methods::callGeneric(e1[i]$value, e2[i]$value)
         }
-        stop("Call to operator \"-\", vectors not equal length")
-    }
-    ret<-new(ParameterVector, e2$size())
-    for(i in 1:e2$size()){
-        ret[i]$value <-e1[i]-e2[i]$value
-    }
-    return(ret)
-     })
+        return(ret)
+    })
 
-setMethod("*", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), function (e1, e2){
-    
-    if(e1$size() != e2$size()){
-        stop("Call to operator \"*\", vectors not equal length")
-    }
-    ret<-new(ParameterVector, e1$size())
-    for(i in 1:e1$size()){
-        ret[i]$value <-e1[i]$value * e2[i]$value
-    }
-    return(ret)
-     })
-
-
-setMethod("*", signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"), function (e1, e2){
-    
-    if(e1$size() != length(e2)){
-        
-        if(length(e2) == 1){
-            ret<-new(ParameterVector, e1$size())
-            for(i in 1:e1$size()){
-                ret[i]$value <-e1[i]$value * e2
+#' Sets methods for operators under the S4 Generic Group, Ops, which includes 
+#' Arith ("+", "-", "*", "^", %%, %/%, "/"),
+#' Compare ("==", ">", "<", "!=", "<=", ">="), and 
+#' Logic ("&", "|")
+#'
+#' @param e1 Rcpp_ParameterVector class
+#' @param e2 numeric vector or value
+#' @rdname Ops
+setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"),
+    function(e1, e2) {
+        if(e1$size() != length(e2)){
+            if(length(e2) == 1){
+                ret<-new(ParameterVector, e1$size())
+                for(i in 1:e1$size()){
+                    ret[i]$value <- methods::callGeneric(e1[i]$value, e2)
+                }
+                return(ret)
             }
-            return(ret)
+            stop("Call to Ops, vectors not equal length")
         }
-        stop("Call to operator \"*\", vectors not equal length")
-    }
-    ret<-new(ParameterVector, e1$size())
-    for(i in 1:e1$size()){
-        ret[i]$value <-e1[i]$value * e2[i]
-    }
-    return(ret)
-     })
+        ret<-new(ParameterVector, e1$size())
+        for(i in 1:e1$size()){
+            ret[i]$value <- methods::callGeneric(e1[i]$value, e2[i])
+        }
+        return(ret)
+    })
 
-setMethod("*", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"), function (e1, e2){
-    
-    if(length(e1) != e2$size()){
-        if(length(e1) == 1){
-            ret<-new(ParameterVector, e2$size())
-            for(i in 1:e2$size()){
-                ret[i]$value <-e1*e2[i]$value
+#' Sets methods for operators under the S4 Generic Group, Ops, which includes 
+#' Arith ("+", "-", "*", "^", %%, %/%, "/"),
+#' Compare ("==", ">", "<", "!=", "<=", ">="), and 
+#' Logic ("&", "|")
+#'
+#' @param e1 numeric vector or value
+#' @param e2 Rcpp_ParameterVector class
+#' @rdname Ops
+setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"),
+    function(e1, e2) {
+        if(length(e1) != e2$size()){
+            if(length(e1) == 1){
+                ret<-new(ParameterVector, e2$size())
+                for(i in 1:e2$size()){
+                    ret[i]$value <- methods::callGeneric(e1, e2[i]$value)
+                }
+                return(ret)
             }
-            return(ret)
+            stop("Call to operator, vectors not equal length")
         }
-        stop("Call to operator \"*\", vectors not equal length")
-    }
-    ret<-new(ParameterVector, e2$size())
-    for(i in 1:e2$size()){
-        ret[i]$value <-e1[i]*e2[i]$value
-    }
-    return(ret)
-     })
+        ret<-new(ParameterVector, e2$size())
+        for(i in 1:e2$size()){
+            ret[i]$value <- methods::callGeneric(e1[i], e2[i]$value)
+        }
+        return(ret)
+    })    
 
-setMethod("/", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), function (e1, e2){
-    
-    if(e1$size() != e2$size()){
-        stop("Call to operator \"/\", vectors not equal length")
-    }
-    ret<-new(ParameterVector, e1$size())
-    for(i in 1:e1$size()){
-        ret[i]$value <-e1[i]$value / e2[i]$value
-    }
-    return(ret)
-     })
-
-
-setMethod("/", signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"), function (e1, e2){
-    
-    if(e1$size() != length(e2)){
-        
-        if(length(e2) == 1){
-            ret<-new(ParameterVector, e1$size())
-            for(i in 1:e1$size()){
-                ret[i]$value <-e1[i]$value / e2
+#' Sets methods for math functions including trigonometry functions, "abs", "sign", 
+#' "sqrt", "ceiling", "floor", "trunc", "cummax", "cumprod", "cumsum", "log", "log10",
+#' "log2", "log1p", "exp", "expm1", "gamma", "lgamma", "digamma", "trigamma"
+#' 
+#' @param x numeric vector
+#' @export
+#' @rdname Math
+setMethod("Math", signature(x = "Rcpp_ParameterVector"),
+    function(x) {
+            xx <- new(ParameterVector, x$size())
+            for(i in 1:x$size()){
+                xx[i]$value <- methods::callGeneric(x[i]$value)
             }
-            return(ret)
+            return(xx)
         }
-        stop("Call to operator \"/\", vectors not equal length")
-    }
-    ret<-new(ParameterVector, e1$size())
-    for(i in 1:e1$size()){
-        ret[i]$value <-e1[i]$value / e2[i]
-    }
-    return(ret)
-     })
+    )
 
-setMethod("/", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"), function (e1, e2){
-    
-    if(length(e1) != e2$size()){
-        if(length(e1) == 1){
-            ret<-new(ParameterVector, e2$size())
-            for(i in 1:e2$size()){
-                ret[i]$value <-e1/e2[i]$value
+#' Set methods for summary functions including "max", "min", "range", "prod", "sum", "any", "all"
+#' 
+#' @param x numeric vector
+#' @export 
+#' @rdname Summary
+setMethod("Summary", signature(x = "Rcpp_ParameterVector"),
+    function(x) {
+            xx <- new(ParameterVector, x$size())
+            for(i in 1:x$size()){
+                xx[i]$value <- methods::callGeneric(x[i]$value)
             }
-            return(ret)
+            return(xx)
         }
-        stop("Call to operator \"/\", vectors not equal length")
-    }
-    ret<-new(ParameterVector, e2$size())
-    for(i in 1:e2$size()){
-        ret[i]$value <-e1[i]/e2[i]$value
-    }
-    return(ret)
-     })
+    )
+
+
+       

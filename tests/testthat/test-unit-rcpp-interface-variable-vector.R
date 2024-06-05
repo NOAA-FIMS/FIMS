@@ -1,4 +1,3 @@
-
 test_that("Parameter vector works as expected", {
 
 v_size <- 10
@@ -23,82 +22,180 @@ for(i in 1:v_size){
    expect_equal(v2$at(i)$value, v2_value)
 }
 
-#Test that plus operator works
-v3 <- v1+v2
-v3_value<-v1_value+v2_value
+
+#Test plus operator works.
+v_plus_test <- v1 + v2
 for(i in 1:v_size){
-   expect_equal(v3$at(i)$value, v3_value)
+   expect_equal(v_plus_test$at(i)$value, (v1[i]$value + v2[i]$value))
 }
 
-#Test that minus operator works
-v3 <- v1-v2
-v3_value <- v1_value-v2_value
 
+#Test minus operator works.
+v_minus_test <- v1 - v2
 for(i in 1:v_size){
-   expect_equal(v3$at(i)$value, v3_value)
+   expect_equal(v_minus_test$at(i)$value, (v1[i]$value - v2[i]$value))
 }
 
-#Test that multiply operator works
-v3 <- v1*v2
-v3_value <- v1_value*v2_value
 
+#Test mult operator works.
+v_mult_test <- v1 * v2
 for(i in 1:v_size){
-   expect_equal(v3$at(i)$value, v3_value)
+   expect_equal(v_mult_test$at(i)$value, (v1[i]$value * v2[i]$value))
 }
 
-#Test that divide operator works
-v3<- v1/v2
-v3_value<-v1_value/v2_value
 
+#Test div operator works.
+v_div_test <- v1 / v2
 for(i in 1:v_size){
-   expect_equal(v3$at(i)$value, v3_value)
+   expect_equal(v_div_test$at(i)$value, (v1[i]$value / v2[i]$value))
 }
 
 
-#Test that created IDs are unique
-p<-new(ParameterVector, 100)
-
-p[1]$value
-p[1]$value <- 1
-p[1]$value
-k <- p[1]$id
-for(i in 2:length(p)){
-   expect_equal(p[i]$id, k + 1)
-   k <- p[i]$id
-}
-
-#Test that resize works
-p$resize(5)
-for( i in 1:length(p)){
-   print(p[i]$id)
-}
-
-p$resize(10)
-
-for( i in 1:length(p)){
-print(p[i]$id)
+#Test pre scalar plus operator works.
+v_plus_test_scalar <- v2_value + v1
+for(i in 1:v_size){
+   expect_equal(v_plus_test_scalar$at(i)$value, (v2_value+ v1[i]$value ))
 }
 
 
-var<-p[1] + cos(p[2])
-#str(var)
-print(p[1]$value)
-print(p[2]$value)
-print(cos(p[2]$value))
-#str(var)
-#par$value<-3.1459
-#str(var)
-#a<-apply(X = v, MARGIN = 1, FUN = sum)
-cc<-c(1,2,3)
-dim(cc)
-l<-p$data
-r<-sum(p)
-#str(r)
-#q()
-#str(l)
-#a<-lapply(X = l, MARGIN = 1, FUN = sum)
-x <- vector("numeric",   length = 10)
+#Test pre scalar minus operator works.
+v_minus_test_scalar <- v2_value - v1
+for(i in 1:v_size){
+   expect_equal(v_minus_test_scalar$at(i)$value, (v2_value- v1[i]$value ))
+}
 
 
-typeof(x)
+#Test pre scalar mult operator works.
+v_mult_test_scalar <- v2_value * v1
+for(i in 1:v_size){
+   expect_equal(v_mult_test_scalar$at(i)$value, (v2_value* v1[i]$value ))
+}
+
+
+#Test pre scalar div operator works.
+v_div_test_scalar <- v2_value / v1
+for(i in 1:v_size){
+   expect_equal(v_div_test_scalar$at(i)$value, (v2_value/ v1[i]$value ))
+}
+
+
+#Test post scalar plus operator works.
+v_plus_test_scalar <- v1 + v2_value
+for(i in 1:v_size){
+   expect_equal(v_plus_test_scalar$at(i)$value, (v1[i]$value + v2_value))
+}
+
+
+#Test post scalar minus operator works.
+v_minus_test_scalar <- v1 - v2_value
+for(i in 1:v_size){
+   expect_equal(v_minus_test_scalar$at(i)$value, (v1[i]$value - v2_value))
+}
+
+
+#Test post scalar mult operator works.
+v_mult_test_scalar <- v1 * v2_value
+for(i in 1:v_size){
+   expect_equal(v_mult_test_scalar$at(i)$value, (v1[i]$value * v2_value))
+}
+
+
+#Test post scalar div operator works.
+v_div_test_scalar <- v1 / v2_value
+for(i in 1:v_size){
+   expect_equal(v_div_test_scalar$at(i)$value, (v1[i]$value / v2_value))
+}
+
+
+#Test acos function works.
+v_acos_test <- acos(v1)
+for(i in 1:v_size){
+   expect_equal(v_acos_test$at(i)$value, acos(v1_value))
+}
+
+
+#Test asin function works.
+v_asin_test <- asin(v1)
+for(i in 1:v_size){
+   expect_equal(v_asin_test$at(i)$value, asin(v1_value))
+}
+
+
+#Test atan function works.
+v_atan_test <- atan(v1)
+for(i in 1:v_size){
+   expect_equal(v_atan_test$at(i)$value, atan(v1_value))
+}
+
+
+#Test cos function works.
+v_cos_test <- cos(v1)
+for(i in 1:v_size){
+   expect_equal(v_cos_test$at(i)$value, cos(v1_value))
+}
+
+
+#Test cosh function works.
+v_cosh_test <- cosh(v1)
+for(i in 1:v_size){
+   expect_equal(v_cosh_test$at(i)$value, cosh(v1_value))
+}
+
+
+#Test sin function works.
+v_sin_test <- sin(v1)
+for(i in 1:v_size){
+   expect_equal(v_sin_test$at(i)$value, sin(v1_value))
+}
+
+
+#Test sinh function works.
+v_sinh_test <- sinh(v1)
+for(i in 1:v_size){
+   expect_equal(v_sinh_test$at(i)$value, sinh(v1_value))
+}
+
+
+#Test tan function works.
+v_tan_test <- tan(v1)
+for(i in 1:v_size){
+   expect_equal(v_tan_test$at(i)$value, tan(v1_value))
+}
+
+
+#Test tanh function works.
+v_tanh_test <- tanh(v1)
+for(i in 1:v_size){
+   expect_equal(v_tanh_test$at(i)$value, tanh(v1_value))
+}
+
+
+#Test exp function works.
+v_exp_test <- exp(v1)
+for(i in 1:v_size){
+   expect_equal(v_exp_test$at(i)$value, exp(v1_value))
+}
+
+
+#Test log10 function works.
+v_log10_test <- log10(v1)
+for(i in 1:v_size){
+   expect_equal(v_log10_test$at(i)$value, log10(v1_value))
+}
+
+
+#Test sqrt function works.
+v_sqrt_test <- sqrt(v1)
+for(i in 1:v_size){
+   expect_equal(v_sqrt_test$at(i)$value, sqrt(v1_value))
+}
+
+
+#Test log function works.
+v_log_test <- log(v1)
+for(i in 1:v_size){
+   expect_equal(v_log_test$at(i)$value, log(v1_value))
+}
+
 })
+

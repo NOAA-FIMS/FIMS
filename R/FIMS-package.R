@@ -16,6 +16,7 @@
 #' @export AgeComp
 #' @export Index
 #' @export Population
+#' @export ParameterVector
 #' @export TMBDnormDistribution
 #' @export LogisticMaturity
 #' @export LogisticSelectivity
