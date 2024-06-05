@@ -77,14 +77,14 @@ class ParameterVector{
    
 public:
     Rcpp::List storage_m;  /**< list of parameter objects*/
-    uint32_t id; /**< unique identifier*/
+    uint32_t id_m; /**< unique identifier*/
     
     
     /**
      *  @brief default constructor
      */
     ParameterVector(){
-        this->id = ParameterVector::id_g++;
+        this->id_m = ParameterVector::id_g++;
         Parameter p;
         this->storage_m.push_back(Rcpp::wrap(p));
     }
@@ -92,7 +92,7 @@ public:
      *  @brief constructor
      */
     ParameterVector(size_t size ){
-        this->id = ParameterVector::id_g++;
+        this->id_m = ParameterVector::id_g++;
         for(size_t i =0; i < size; i++){
             Parameter p;
             this->storage_m.push_back(Rcpp::wrap(p));
@@ -103,7 +103,7 @@ public:
      *  @param Rcpp::NumericVector, "size", number of elements to copy over.
      */
     ParameterVector(Rcpp::NumericVector x, size_t size){
-        this->id = ParameterVector::id_g++;
+        this->id_m = ParameterVector::id_g++;
         for(size_t i =0; i < size; i++){
             Parameter p = x[i];
             this->storage_m.push_back(Rcpp::wrap(p));
