@@ -1,9 +1,13 @@
 test_that("normal_lpdf", {
+  ## several important cases to test depending on the dimensions
+  ## of the inputs
+
+  ## Single value, e.g. a prior on a parameter
   # generate data using R stats:rnorm
   set.seed(123)
+
   # simulate normal data
   y <- stats::rnorm(1)
-
   # create a fims Rcpp object
   # initialize the Dnorm module
   dnorm_ <- new(TMBDnormDistribution)
@@ -14,7 +18,51 @@ test_that("normal_lpdf", {
   dnorm_$is_na <- FALSE
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(TRUE), -stats::dnorm(y, 0, 1, TRUE))
+  clear()
 
+  ## A vector of state variables, but scalar arguments, e.g., a
+  ## random effect vector
+  # simulate normal data
+  y <- stats::rnorm(10)
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- new(TMBDnormDistribution)
+  # populate class members
+  dnorm_$observed_values <- new(ParameterVector, y, 10)
+  dnorm_$expected_values <- new(ParameterVector, 0, 1)
+  dnorm_$log_sd <- new(ParameterVector, log(1), 1)
+  dnorm_$is_na <- FALSE
+  # evaluate the density and compare with R
+  expect_equal(dnorm_$evaluate(TRUE), -sum(stats::dnorm(y, 0, 1, TRUE)))
+  clear()
+
+  ## Vectors of state variables (x) and arguments, e.g., a
+  ## index likelihood vector
+  # simulate normal data
+  y <- stats::rnorm(10)
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- new(TMBDnormDistribution)
+  # populate class members
+  dnorm_$observed_values <- new(ParameterVector, y, 10)
+  dnorm_$expected_values <- new(ParameterVector, 0, 10)
+  dnorm_$log_sd <- new(ParameterVector, log(1), 10)
+  dnorm_$is_na <- FALSE
+  # evaluate the density and compare with R
+  expect_equal(dnorm_$evaluate(TRUE), -sum(stats::dnorm(y, 0, 1, TRUE)))
+  clear()
+
+  ## It should error out when there is a dimension mismatch
+  y <- stats::rnorm(10)
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- new(TMBDnormDistribution)
+  # populate class members
+  dnorm_$observed_values <- new(ParameterVector, y, 10)
+  dnorm_$expected_values <- new(ParameterVector, 0, 11)
+  dnorm_$log_sd <- new(ParameterVector, log(1), 3)
+  dnorm_$is_na <- FALSE
+  expect_error(dnorm_$evaluate(TRUE))
   clear()
 })
 
