@@ -73,15 +73,15 @@ uint32_t Parameter::id_g = 0;
  * interface between R and cpp.
  */
 class ParameterVector{
-    static uint32_t id_g;
+    static uint32_t id_g; /**< global identifier*/
    
 public:
-    Rcpp::List storage_m; //use a list because it's easier
-    uint32_t id;
+    Rcpp::List storage_m;  /**< list of parameter objects*/
+    uint32_t id; /**< unique identifier*/
     
     
     /**
-     * default constructor
+     *  @brief default constructor
      */
     ParameterVector(){
         this->id = ParameterVector::id_g++;
@@ -89,7 +89,7 @@ public:
         this->storage_m.push_back(Rcpp::wrap(p));
     }
     /**
-     * constructor
+     *  @brief constructor
      */
     ParameterVector(size_t size ){
         this->id = ParameterVector::id_g++;
@@ -99,7 +99,8 @@ public:
         }
     }
     /**
-     * vector constructor
+     *  @brief vector constructor
+     *  @param Rcpp::NumericVector, "size", number of elements to copy over.
      */
     ParameterVector(Rcpp::NumericVector x, size_t size){
         this->id = ParameterVector::id_g++;
@@ -110,13 +111,15 @@ public:
     }
     
     /**
-     * Accessor. First index starts is zero.
+     *  @brief Accessor. First index starts is zero.
+     *  @param return a Parameter at position "pos".
      */
     inline Parameter operator[](size_t pos) {
         return this->storage_m[pos]; }
     
     /**
-     * Accessor. First index is one. For calling from R.
+     *  @brief Accessor. First index is one. For calling from R.
+     *  @param return a Parameter at position "pos".
      */
     SEXP at(size_t pos){
         if(pos == 0 || pos > this->storage_m.size()){
@@ -127,14 +130,15 @@ public:
     }
     
     /**
-     * returns vector length
+     *  @brief returns vector length
      */
     size_t size(){
         return this->storage_m.size();
     }
     
     /**
-     * resize to length "size"
+     *  @brief resize to length "size"
+     *  @param resulting size.
      */
     void resize(size_t size){
         size_t n = this->storage_m.size();
