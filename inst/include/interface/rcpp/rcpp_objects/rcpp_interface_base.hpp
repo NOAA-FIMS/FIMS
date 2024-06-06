@@ -45,7 +45,7 @@ class Parameter {
    * @details Inputs include value, min, max, estimated.
    */
   Parameter(double value, double min, double max, bool estimated)
-      : value_m(value), min_m(min), max_m(max), estimated_m(estimated),id_m(Parameter::id_g++) {}
+      : value_m(value), min_m(min), max_m(max), id_m(Parameter::id_g++), estimated_m(estimated) {}
 
   /**
    * @brief Constructor for initializing Parameter.
