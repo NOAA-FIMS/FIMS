@@ -36,6 +36,7 @@ setClass(
 #' @rdname FIMSOutput
 #' @param data A `data.frame` that contains the necessary columns
 #'   to construct a output of FIMS of a given `FIMSOutput-class`.
+#' @importFrom dplyr tibble
 #' @return An object of the S4 class `FIMSOutput` or one of its child classes
 #' is validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
