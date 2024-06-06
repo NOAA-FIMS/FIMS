@@ -13,14 +13,15 @@
 setClass(
   Class = "FIMSOutput",
   slots = c(
-    estimates = "tibble",
-    fits = "tibble",
+    estimates = "tbl_df",
+    fits = "tbl_df",
     tmb = "list",
     sdreport = "list",
     call = "call",
     timestamp = "vector",
     version = "list"
-  )
+  ),
+  contains = class(tibble())
 )
 
 # Constructors ----
@@ -34,16 +35,18 @@ setClass(
 #' for each model type.
 #' @export
 #' @rdname FIMSOutput
-#' @param data A `data.frame` that contains the necessary columns
-#'   to construct a output of FIMS of a given `FIMSOutput-class`.
+#' @param obj TMB obj ouput
+#' @param sdreport TMB sdr report
+#' @param call the call the users made to run FIMS. This is not available for FIMS yet. 
+#' @param nyears numbers of years in the model. A integer
 #' @importFrom dplyr tibble
 #' @return An object of the S4 class `FIMSOutput` or one of its child classes
 #' is validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [showClass()] to see all available slots.
-create_fims_output <- function(tmb, sdreport, call) {
+create_fims_output <- function(obj, sdreport, call=NA, nyears) {
   # SSB and Biomass
-  # will pull the information from tmb and/or sdreport for estimates, par is a placeholder
+  # will pull the information from obj and/or sdreport for estimates, par is a placeholder
   # The following only applies to SSB and Biomass and need to modify to include other parameters and quantities
   estimate_biomass_tibble <- function(derivedquanname, sdr = sdr) {
     tibble(
@@ -58,13 +61,14 @@ create_fims_output <- function(tmb, sdreport, call) {
       uncertainty = sdr$sd[names(sdr$value) == derivedquanname], likelihood = NA, gradient = NA, estimated = NA
     )
   }
-
+  # The test fail in the following line. It could be sdr. 
+  # Try sdr_report <- summary(sdr, "report") in line 431 in test-intergration-fims-estimation.R  
   estimates_biomass <- do.call("rbind", lapply(c("SSB", "Biomass"), estimate_biomass_tibble, sdr = sdr))
 
   # recruitment (need to add uncertainty)
   estimate_recruitment_tibble <- function(obj) {
     tibble(
-      label = "recruitment", age = NA, time = 1:(nyears + 1), initial = NA, estimates = obj$report()$recruitment[[1]],
+      label = "recruitment", age = NA, time = 1:(nyears + 1), initial = NA, estimates = obj$report(obj$env$last.par.best)$recruitment[[1]],
       uncertainty = NA, likelihood = NA, gradient = NA, estimated = NA
     )
   }
@@ -82,7 +86,7 @@ create_fims_output <- function(tmb, sdreport, call) {
   # natural mortality
   estimate_M_tibble <- function(obj) {
     tibble(
-      label = "natM", age = rep(ages, times = nyears), time = rep(1:nyears, each = nages), initial = NA, estimates = obj$report()$M[[1]],
+      label = "natM", age = rep(ages, times = nyears), time = rep(1:nyears, each = nages), initial = NA, estimates = obj$report(obj$env$last.par.best)$M[[1]],
       uncertainty = NA, likelihood = NA, gradient = NA, estimated = NA
     )
   }
@@ -91,9 +95,8 @@ create_fims_output <- function(tmb, sdreport, call) {
 
   estimates <- rbind(M_estimate, Fmort_estimate, estimates_biomass, estimate_recruitment_tibble(obj = obj), estimate_naa_tibble("NAA", sdr))
 
-  # will pull the information from tmb and/or sdreport for fits, par is a placeholder
-  fits <- tmb$par
-  fits <- sdreport$par
+  # will pull the information from obj and/or sdreport for fits, NA is a placeholder
+  fits <- NA
   # Need to run the following timestamp code before running FIMS and after.
   timestamp <- as.POSIXlt(Sys.time(), tz = "UTC")
   # The following code does not work now but it is the correct comment for getting packageVersion
@@ -105,7 +108,7 @@ create_fims_output <- function(tmb, sdreport, call) {
   out <- new("FIMSOutput",
     estimates = estimates,
     fits = fits,
-    tmb = tmb,
+    tmb = obj,
     sdreport = sdreport,
     call = call,
     timestamp = timestamp,
