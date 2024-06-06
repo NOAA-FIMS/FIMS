@@ -40,65 +40,75 @@ setClass(
 #' is validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [showClass()] to see all available slots.
-create_fims_output <- function(tmb,sdreport,call) {
-# SSB and Biomass
+create_fims_output <- function(tmb, sdreport, call) {
+  # SSB and Biomass
   # will pull the information from tmb and/or sdreport for estimates, par is a placeholder
-  #The following only applies to SSB and Biomass and need to modify to include other parameters and quantities 
-  estimate_biomass_tibble <- function(derivedquanname, sdr=sdr){
-    tibble(label=derivedquanname, age=NA, time=0:nyears, initial=NA, estimates=sdr$value[names(sdr$value)==derivedquanname], 
-    uncertainty=sdr$sd[names(sdr$value)==derivedquanname], likelihood=NA, gradient=NA, estimated=NA) 
-    }
-# NAA
-  estimate_naa_tibble <- function(derivedquanname, sdr=sdr){
-    tibble(label=derivedquanname, age=rep(ages, times = (nyears+1)), time=rep(0:nyears, each = nages), initial=NA, estimates=sdr$value[names(sdr$value)==derivedquanname], 
-    uncertainty=sdr$sd[names(sdr$value)==derivedquanname], likelihood=NA, gradient=NA, estimated=NA) 
-    }
+  # The following only applies to SSB and Biomass and need to modify to include other parameters and quantities
+  estimate_biomass_tibble <- function(derivedquanname, sdr = sdr) {
+    tibble(
+      label = derivedquanname, age = NA, time = 0:nyears, initial = NA, estimates = sdr$value[names(sdr$value) == derivedquanname],
+      uncertainty = sdr$sd[names(sdr$value) == derivedquanname], likelihood = NA, gradient = NA, estimated = NA
+    )
+  }
+  # NAA
+  estimate_naa_tibble <- function(derivedquanname, sdr = sdr) {
+    tibble(
+      label = derivedquanname, age = rep(ages, times = (nyears + 1)), time = rep(0:nyears, each = nages), initial = NA, estimates = sdr$value[names(sdr$value) == derivedquanname],
+      uncertainty = sdr$sd[names(sdr$value) == derivedquanname], likelihood = NA, gradient = NA, estimated = NA
+    )
+  }
 
-estimates_biomass <- do.call("rbind", lapply(c("SSB","Biomass"), estimate_biomass_tibble, sdr = sdr))
+  estimates_biomass <- do.call("rbind", lapply(c("SSB", "Biomass"), estimate_biomass_tibble, sdr = sdr))
 
-# recruitment (need to add uncertainty)
-  estimate_recruitment_tibble <- function(obj){
-    tibble(label="recruitment", age=NA, time=1:(nyears+1), initial=NA, estimates=obj$report()$recruitment[[1]], 
-    uncertainty=NA, likelihood=NA, gradient=NA, estimated=NA) 
-    }  
+  # recruitment (need to add uncertainty)
+  estimate_recruitment_tibble <- function(obj) {
+    tibble(
+      label = "recruitment", age = NA, time = 1:(nyears + 1), initial = NA, estimates = obj$report()$recruitment[[1]],
+      uncertainty = NA, likelihood = NA, gradient = NA, estimated = NA
+    )
+  }
 
-# the fising mortality needs the year vector
-  estimate_Fmort_tibble <- function(parname, sdr=sdr){
-    tibble(label=parname, age=NA, time=NA, initial=NA, estimates=sdr$value[names(sdr$value)==parname], 
-    uncertainty=sdr$sd[names(sdr$value)==parname], likelihood=NA, gradient=NA, estimated=NA) 
-    }
+  # the fising mortality needs the year vector
+  estimate_Fmort_tibble <- function(parname, sdr = sdr) {
+    tibble(
+      label = parname, age = NA, time = NA, initial = NA, estimates = sdr$value[names(sdr$value) == parname],
+      uncertainty = sdr$sd[names(sdr$value) == parname], likelihood = NA, gradient = NA, estimated = NA
+    )
+  }
 
   Fmort_estimate <- estimate_Fmort_tibble("FMort", sdr)
 
-# natural mortality 
-  estimate_M_tibble <- function(obj){
-    tibble(label="natM", age=rep(ages, times = nyears), time=rep(1:nyears, each = nages), initial=NA, estimates=obj$report()$M[[1]], 
-    uncertainty=NA, likelihood=NA, gradient=NA, estimated=NA) 
-    }
+  # natural mortality
+  estimate_M_tibble <- function(obj) {
+    tibble(
+      label = "natM", age = rep(ages, times = nyears), time = rep(1:nyears, each = nages), initial = NA, estimates = obj$report()$M[[1]],
+      uncertainty = NA, likelihood = NA, gradient = NA, estimated = NA
+    )
+  }
 
   M_estimate <- estimate_M_tibble(obj = obj)
 
-estimates <- rbind(M_estimate, Fmort_estimate, estimates_biomass, estimate_recruitment_tibble(obj = obj), estimate_naa_tibble("NAA", sdr))
+  estimates <- rbind(M_estimate, Fmort_estimate, estimates_biomass, estimate_recruitment_tibble(obj = obj), estimate_naa_tibble("NAA", sdr))
 
   # will pull the information from tmb and/or sdreport for fits, par is a placeholder
-  fits = tmb$par
-  fits = sdreport$par
+  fits <- tmb$par
+  fits <- sdreport$par
   # Need to run the following timestamp code before running FIMS and after.
-  timestamp <- as.POSIXlt(Sys.time(), tz = "UTC") 
+  timestamp <- as.POSIXlt(Sys.time(), tz = "UTC")
   # The following code does not work now but it is the correct comment for getting packageVersion
   version <- packageVersion("FIMS")
-  # match.call has to be used to create the call when the user run FIMS 
+  # match.call has to be used to create the call when the user run FIMS
   # call <- match.call()
-  
+
   # Fill the empty data frames with data extracted from the data file
   out <- new("FIMSOutput",
-             estimates = estimates,
-             fits = fits,
-             tmb = tmb,
-             sdreport = sdreport,
-             call = call,
-             timestamp = timestamp,
-             version = version
+    estimates = estimates,
+    fits = fits,
+    tmb = tmb,
+    sdreport = sdreport,
+    call = call,
+    timestamp = timestamp,
+    version = version
   )
   return(out)
 }
