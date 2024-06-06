@@ -36,15 +36,16 @@ setClass(
 #' @export
 #' @rdname FIMSOutput
 #' @param obj TMB obj ouput
-#' @param sdreport TMB sdr report
+#' @param sdrTMB sdr report
 #' @param call the call the users made to run FIMS. This is not available for FIMS yet. 
 #' @param nyears numbers of years in the model. A integer
 #' @importFrom dplyr tibble
+#' @importFrom utils packageVersion
 #' @return An object of the S4 class `FIMSOutput` or one of its child classes
 #' is validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [showClass()] to see all available slots.
-create_fims_output <- function(obj, sdreport, call=NA, nyears) {
+create_fims_output <- function(obj, sdr, call=NA, nyears) {
   # SSB and Biomass
   # will pull the information from obj and/or sdreport for estimates, par is a placeholder
   # The following only applies to SSB and Biomass and need to modify to include other parameters and quantities
@@ -109,7 +110,7 @@ create_fims_output <- function(obj, sdreport, call=NA, nyears) {
     estimates = estimates,
     fits = fits,
     tmb = obj,
-    sdreport = sdreport,
+    sdreport = sdr,
     call = call,
     timestamp = timestamp,
     version = version
