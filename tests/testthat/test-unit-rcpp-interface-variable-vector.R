@@ -1,5 +1,3 @@
-
-
 test_that("Parameter vector works as expected", {
 
 v_size <- 10
