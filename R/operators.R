@@ -1,93 +1,32 @@
-
-
-setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
-           function(e1, e2) callGeneric(e1, e2))
- 
- setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
-           function(e1, e2) callGeneric(e1, e2))
- 
- setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
-           function(e1, e2) callGeneric(e1, e2))
-
-#Parameter
- 
-#' Computes the trigonometric arc-cosine function
-#' @name acos
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("acos", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,acos(x$value))})
-
-#' Computes the trigonometric arc-sine function
-#' @name asin
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("asin", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,asin(x$value))})
-
-#' Computes the trigonometric arc-tangent function
-#' @name atan
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("atan", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,atan(x$value))})
-
-#' Computes the trigonometric cosine function
-#' @name cos
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("cos", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,cos(x$value))})
-
-#' Computes the hyperbolic arc-cosine function
-#' @name cosh
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("cosh", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,cosh(x$value))})
-
-#' Computes the trigonometric sine function
-#' @name sin
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("sin", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,sin(x$value))})
-
-#' Computes the hyperbolic sine function
-#' @name sinh
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("sinh", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,sinh(x$value))})
-
-#' Computes the trigonometric tangent function
-#' @name tan
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("tan", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,tan(x$value))})
-
-#' Computes the hyperbolic tangent function
-#' @name tanh
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("tanh", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,tanh(x$value))})
-
-#' Computes the exponential function
-#' @name exp
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("exp", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,exp(x$value))})
-
-#' Computes the base 10 logarithm
-#' @name log10
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("log10", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter,log10(x$value))})
-
-#' Computes the (principle) square root
-#' @name sqrt
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("sqrt", signature(x = "Rcpp_Parameter"), function (x) {new(Parameter, (x$value^0.5))})
-
-#' Computes logarithms, by default natural logarithms
-#' @name log
-#' @param x input value to be evaluated
-#' @docType methods
-  setMethod("log", signature(x = "Rcpp_Parameter"), function (x, base=exp(1)){return(new(Parameter,log(x$value)))})
+Rcpp::setRcppClass(Class = "Parameter",
+           # CppClass = "Parameter",
+            module = "fims",
+            fields = list(value_m = "numeric",
+                          min_m = "numeric",
+                          max_m = "numeric",
+                          id_m = "integer",
+                          is_random_effect_m = "logical",
+                          estimated_m = "logical"),
+            methods = list(
+                Ops = function(e1 = "self", e2 = "self") callGeneric(e1,e2),
+                Ops = function(e1 = "self", e2 = "numeric") callGeneric(e1,e2),
+                Ops = function(e1 = "numeric", e2 = "self") callGeneric(e1,e2),
+                acos = function(x = "self") new(Parameter,acos(x$value)),
+                asin = function(x = "self") new(Parameter,asin(x$value)),
+                atan = function(x = "self") new(Parameter,atan(x$value)),
+                cos = function(x = "self") new(Parameter,cos(x$value)),
+                cosh = function(x = "self") new(Parameter,cosh(x$value)),
+                sin = function(x = "self") new(Parameter,sin(x$value)),
+                sinh = function(x = "self") new(Parameter,sinh(x$value)),
+                tan = function(x = "self") new(Parameter,tan(x$value)),
+                tanh = function(x = "self") new(Parameter,tanh(x$value)),
+                exp = function(x = "self") new(Parameter,exp(x$value)),
+                log10 = function(x = "self") new(Parameter,log10(x$value)),
+                sqrt = function(x = "self") new(Parameter,sqrt(x$value)),
+                log = function(x = "self") new(Parameter,log(x$value))
+            ),
+            saveAs = "Rcpp_Parameter"
+                          )
 
 
 setMethod("acos", signature(x = "Rcpp_ParameterVector"), function (x) {
