@@ -61,7 +61,7 @@ create_fims_output <- function(obj, sdr, call=NA, nyears) {
       label = derivedquanname, age = rep(ages, times = (nyears + 1)), time = rep(0:nyears, each = nages), initial = NA, estimates = sdr$value[names(sdr$value) == derivedquanname],
       uncertainty = sdr$sd[names(sdr$value) == derivedquanname], likelihood = NA, gradient = NA, estimated = NA
     )
-  }
+  } 
   # The test fail in the following line. It could be sdr. 
   # Try sdr_report <- summary(sdr, "report") in line 431 in test-intergration-fims-estimation.R  
   estimates_biomass <- do.call("rbind", lapply(c("SSB", "Biomass"), estimate_biomass_tibble, sdr = sdr))
