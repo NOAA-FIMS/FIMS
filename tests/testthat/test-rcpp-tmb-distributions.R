@@ -3,10 +3,10 @@ test_that("normal_lpdf", {
   ## of the inputs
 
   ## Single value, e.g. a prior on a parameter
-  # generate data using R stats:rnorm
+  # generate data using R stats::rnorm
   set.seed(123)
 
-  # simulate normal data
+  # simulate normal data with scalar input
   y <- stats::rnorm(1)
   # create a fims Rcpp object
   # initialize the Dnorm module
@@ -31,7 +31,7 @@ test_that("normal_lpdf", {
   dnorm_$observed_values <- new(ParameterVector, y, 10)
   dnorm_$expected_values <- new(ParameterVector, 0, 1)
   dnorm_$log_sd <- new(ParameterVector, log(1), 1)
-  dnorm_$is_na <- FALSE
+  dnorm_$is_na <- rep(FALSE, 10)
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(TRUE), -sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
@@ -45,9 +45,9 @@ test_that("normal_lpdf", {
   dnorm_ <- new(TMBDnormDistribution)
   # populate class members
   dnorm_$observed_values <- new(ParameterVector, y, 10)
-  dnorm_$expected_values <- new(ParameterVector, 0, 10)
+  dnorm_$expected_values <- new(ParameterVector, 0.0, 10)
   dnorm_$log_sd <- new(ParameterVector, log(1), 10)
-  dnorm_$is_na <- FALSE
+  dnorm_$is_na <- rep(FALSE, 10)
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(TRUE), -sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
@@ -58,22 +58,26 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dnorm_ <- new(TMBDnormDistribution)
   # populate class members
-  dnorm_$observed_values <- new(ParameterVector, y, 10)
-  dnorm_$expected_values <- new(ParameterVector, 0, 11)
-  dnorm_$log_sd <- new(ParameterVector, log(1), 3)
-  dnorm_$is_na <- FALSE
+  dnorm_$observed_values <- new(FIMS:::ParameterVector, y, 10)
+  dnorm_$expected_values <- new(FIMS:::ParameterVector, 0, 11)
+  dnorm_$log_sd <- new(FIMS:::ParameterVector, log(1), 3)
+  dnorm_$is_na <- rep(FALSE, 10)
   expect_error(dnorm_$evaluate(TRUE))
   clear()
 })
 
-test_that("normal_lpdf", {
-  # generate data using R stats:rnorm
+test_that("lognormal_lpdf", {
+  ## several important cases to test depending on the dimensions
+  ## of the inputs
+
+  ## Single value, e.g. a prior on a parameter
+  # generate data using R stats::rlnorm
   set.seed(123)
   # simulate lognormal data
   y <- stats::rlnorm(n = 1, meanlog = 0, sdlog = 1)
 
   # create a fims Rcpp object
-  # initialize the Dnorm module
+  # initialize the Dlnorm module
   dlnorm_ <- new(TMBDlnormDistribution)
   # populate class members
   dlnorm_$observed_values <- new(ParameterVector, y, 1)
@@ -82,9 +86,57 @@ test_that("normal_lpdf", {
   dlnorm_$is_na <- FALSE
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(TRUE), -stats::dlnorm(y, 0, 1, TRUE))
-  expect_equal(dlnorm_$evaluate(FALSE), -stats::dlnorm(y, 0, 1, FALSE))
-
   clear()
+
+  ## A vector of state variables, but scalar arguments, e.g., a
+  ## random effect vector
+  y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
+
+  # create a fims Rcpp object
+  # initialize the Dlnorm module
+  dlnorm_ <- new(TMBDlnormDistribution)
+  # populate class members
+  dlnorm_$observed_values <- new(ParameterVector, y, 10)
+  dlnorm_$expected_values <- new(ParameterVector, 0, 1)
+  dlnorm_$log_sd <- new(ParameterVector, log(1), 1)
+  dlnorm_$is_na <- rep(FALSE, 10)
+  # evaluate the density and compare with R
+  expect_equal(dlnorm_$evaluate(TRUE), -sum(stats::dlnorm(y, 0, 1, TRUE)))
+  clear()
+
+
+  ## Vectors of state variables (x) and arguments, e.g., a
+  ## index likelihood vector
+  y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
+
+  # create a fims Rcpp object
+  # initialize the Dlnorm module
+  dlnorm_ <- new(TMBDlnormDistribution)
+  # populate class members
+  dlnorm_$observed_values <- new(ParameterVector, y, 10)
+  dlnorm_$expected_values <- new(ParameterVector, 0, 10)
+  dlnorm_$log_sd <- new(ParameterVector, log(1), 10)
+  dlnorm_$is_na <- rep(FALSE, 10)
+  # evaluate the density and compare with R
+  expect_equal(dlnorm_$evaluate(TRUE), -sum(stats::dlnorm(y, 0, 1, TRUE)))
+  clear()
+
+  ## It should error out when there is a dimension mismatch
+  y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
+
+  # create a fims Rcpp object
+  # initialize the Dlnorm module
+  dlnorm_ <- new(TMBDlnormDistribution)
+  # populate class members
+  dlnorm_$observed_values <- new(ParameterVector, y, 10)
+  dlnorm_$expected_values <- new(ParameterVector, 0, 11)
+  dlnorm_$log_sd <- new(ParameterVector, log(1), 3)
+  dlnorm_$is_na <- rep(FALSE, 10)
+  # evaluate the density and compare with R
+  expect_error(dlnorm_$evaluate(TRUE))
+  clear()
+
+
 })
 
 test_that("multinomial_lpdf", {
@@ -113,3 +165,4 @@ test_that("multinomial_lpdf", {
 
   clear()
 })
+
