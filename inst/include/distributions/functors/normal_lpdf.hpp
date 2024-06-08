@@ -35,12 +35,20 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             if(this->expected_values.size() == 1){
                 this->mu[i] = this->expected_values[0];
             } else {
+              if(this->observed_values.size() != this->expected_values.size()){
+                error("the dimensions of the observed and expected values from normal negative log likelihood do not match");
+              } else {
                 this->mu[i] = this->expected_values[i];
+              }
             }
             if(log_sd.size() == 1){
                 sd[i] = fims_math::exp(log_sd[0]);
             } else {
+              if(this->observed_values.size() != this->log_sd.size()){
+                error("the dimensions of the observed and log sd values from normal negative log likelihood do not match");
+              } else {
                 sd[i] = fims_math::exp(log_sd[i]);
+              }
             }
             if(!is_na[i])
             {
