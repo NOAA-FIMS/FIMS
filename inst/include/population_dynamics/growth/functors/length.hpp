@@ -99,8 +99,6 @@ struct Length : public GrowthBase<Type> {
      * @param age_means, measured mean age at length.
      * @param age_stddevs, measured standard deviation age at length.
      *
-     * @return ALK, a matrix where rows represent different length classes
-     * and columns represent different age classes.
      */
     void update_alk() {
         
