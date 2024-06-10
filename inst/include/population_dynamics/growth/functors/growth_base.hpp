@@ -45,6 +45,8 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
   virtual const Type evaluate(const double& a) = 0;
 };
 
+
+
 template <typename Type>
 uint32_t GrowthBase<Type>::id_g = 0;
 
