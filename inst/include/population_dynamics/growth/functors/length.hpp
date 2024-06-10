@@ -95,10 +95,6 @@ struct Length : public GrowthBase<Type> {
      * @brief The Age-Length Key (ALK) is used to estimate the age
      * composition of a fish population based on length measurements.
      *
-     * @param lengths, measured lengths.
-     * @param age_means, measured mean age at length.
-     * @param age_stddevs, measured standard deviation age at length.
-     *
      */
     void update_alk() {
         
