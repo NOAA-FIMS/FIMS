@@ -29,10 +29,10 @@ struct Length : public GrowthBase<Type> {
     fims::Vector<fims::Vector<Type> > alk;
     
     boolean estimated = false;
-
-  Length() : GrowthBase<Type>() {}
-
-  virtual ~Length() {}
+    
+    Length() : GrowthBase<Type>() {}
+    
+    virtual ~Length() {}
     
     
     /**
@@ -40,7 +40,7 @@ struct Length : public GrowthBase<Type> {
      */
     virtual void prepare(){
         if(estimated)
-        this->update_alk();
+            this->update_alk();
     }
     
     /**
@@ -50,15 +50,15 @@ struct Length : public GrowthBase<Type> {
         this->update_alk();
     }
     
-  /**
-   * @brief Returns the weight at age a (in kg) from the input vector.
-   *
-   * @param a  age of the fish, the age vector must start at zero
-   */
-  virtual const Type evaluate(const double& a) {
- 
-    return ret;
-  }
+    /**
+     * @brief Returns the weight at age a (in kg) from the input vector.
+     *
+     * @param a  age of the fish, the age vector must start at zero
+     */
+    virtual const Type evaluate(const double& a) {
+        
+        return 1.0;
+    }
     
     
     //sign function using hyperbolic tangent
@@ -66,10 +66,18 @@ struct Length : public GrowthBase<Type> {
         const Type k = 1e3; // A large constant
         return tanh(k * x);
     }
-
-
+    
+    
+    /**
+     * @brief Differentiable cumulative normal distribution function.
+     *
+     *@param x
+     *@param mean
+     *@param stddev
+     *
+     */
     Type cdf(Type x, Type mean, Type stddev) {
-
+        
         // Constants for the cumulative normal distribution function
         const Type a1 = 0.254829592;
         const Type a2 = -0.284496736;
@@ -82,7 +90,7 @@ struct Length : public GrowthBase<Type> {
         Type erf_approx = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * exp(-z * z);
         return  0.5 * (1.0 + sign(z) * erf_approx);
     }
-
+    
     /**
      * @brief The Age-Length Key (ALK) is used to estimate the age
      * composition of a fish population based on length measurements.
@@ -98,17 +106,17 @@ struct Length : public GrowthBase<Type> {
         
         size_t num_lengths = this->length_classes.size();
         size_t num_ages = this->age_means.size();
-
+        
         for (size_t i = 0; i < num_lengths; ++i) {
             for (size_t j = 0; j < num_ages; ++j) {
- 
+                
                 // Probability of length given age j
                 this->alk[i][j] = Type(cdf(this->length_classes[i] + 0.5, this->age_means[j], this->age_stddevs[j]) -
                                        cdf(this->length_classes[i] - 0.5, this->age_means[j], this->age_stddevs[j]));
             }
         }
     }
-
+    
 };
 }  // namespace fims_popdy
 #endif
