@@ -42,7 +42,9 @@ namespace fims_distributions
                     this->mu[i] = this->expected_values[0];
                 } else {
                   if(this->observed_values.size() != this->expected_values.size()){
-                    error("the dimensions of the observed and expected values from lognormal negative log likelihood do not match");
+                    /* move error handling to CreateModel in information so not to crash R
+                    Rcpp::stop("the dimensions of the observed and expected values from lognormal negative log likelihood do not match");
+                     */
                   } else {
                     this->mu[i] = this->expected_values[i];
                   }
@@ -52,7 +54,9 @@ namespace fims_distributions
                     sd[i] = fims_math::exp(log_sd[0]);
                 } else {
                   if(this->observed_values.size() != this->log_sd.size()){
-                    error("the dimensions of the observed and log sd values from lognormal negative log likelihood do not match");
+                    /* move error handling to CreateModel in information so not to crash R
+                    Rcpp::stop("the dimensions of the observed and log sd values from lognormal negative log likelihood do not match");
+                     */
                   } else {
                     sd[i] = fims_math::exp(log_sd[i]);
                   }
