@@ -38,6 +38,13 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
 
   virtual ~GrowthBase() {}
 
+    /**
+     * Used to prepare any children of GrowthBase.
+     */
+    virtual void prepare(){
+        
+    }
+    
   /**
    * @brief Calculates the  growth at the independent variable value.
    * @param a The age at which to return weight of the fish (in kg).
