@@ -24,6 +24,11 @@ Logic ("&", "|")}
 
 \S4method{Ops}{numeric,Rcpp_ParameterVector}(e1, e2)
 }
+\arguments{
+\item{e1}{numeric vector or value}
+
+\item{e2}{Rcpp_ParameterVector class}
+}
 \description{
 Sets methods for operators under the S4 Generic Group, Ops, which includes
 Arith ("+", "-", "*", "^", \%\%, \%/\%, "/"),
