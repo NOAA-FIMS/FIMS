@@ -17,20 +17,16 @@
 #' Arith ("+", "-", "*", "^", %%, %/%, "/"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
-#' 
-#' @name Ops - Rcpp_Parameter class inputs
-#' @param e1 Rcpp_Parameter class
-#' @param e2 Rcpp_Parameter class
-#' @aliases Ops-Rcpp_Parameter Ops,Rcpp_Parameter-method
-#' @docType methods
+#' @importFrom methods callGeneric
 #' @export
+#' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
     function(e1, e2){
         if(e1$size() != e2$size()){
             stop("Call to operator Ops, vectors not equal length")
         }
         ret = new(Parameter)
-        ret$value = methods::callGeneric(e1$value, e2$value)
+        ret$value = callGeneric(e1$value, e2$value)
     }
 )
 
@@ -39,12 +35,7 @@ setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
 #' 
-#' @name Ops - Rcpp_Parameter numeric class inputs
-#' @param e1 Rcpp_Parameter class
-#' @param e2 numeric value
-#' @aliases Ops-Rcpp_Parameter-numeric Ops,Rcpp_Parameter-numeric-method
-#' @docType methods
-#' @export
+#' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
     function(e1, e2){
         if(e1$size() != length(e2)){
@@ -60,12 +51,7 @@ setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
 #' 
-#' @name Ops - numeric Rcpp_Parameter class inputs
-#' @param e1 numeric value
-#' @param e2 Rcpp_Parameter class
-#' @aliases Ops-numeric-Rcpp_Parameter Ops,numeric-Rcpp_Parameter-method
-#' @docType methods
-#' @export
+#' @rdname Ops
 setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
     function(e1, e2){
         if(length(e1) != e2$size()){
@@ -97,13 +83,8 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
 #' Arith ("+", "-", "*", "^", %%, %/%, "/"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
-#' 
-#' @name Ops - Rcpp_ParameterVector class inputs
-#' @param e1 Rcpp_ParameterVector class
-#' @param e2 Rcpp_ParameterVector class
-#' @aliases Ops-Rcpp_ParameterVector Ops,Rcpp_ParameterVector-method
-#' @docType methods
-#' @export
+#'
+#' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), 
     function(e1, e2) {
         if(e1$size() != e2$size()){
@@ -120,13 +101,8 @@ setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVect
 #' Arith ("+", "-", "*", "^", %%, %/%, "/"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
-#' 
-#' @name Ops - Rcpp_ParameterVector numeric class inputs
-#' @param e1 Rcpp_ParameterVector class
-#' @param e2 numeric vector or value
-#' @aliases Ops-Rcpp_ParameterVector-numeric Ops,Rcpp_ParameterVector-numeric-method
-#' @docType methods
-#' @export
+#'
+#' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"),
     function(e1, e2) {
         if(e1$size() != length(e2)){
@@ -150,13 +126,8 @@ setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"),
 #' Arith ("+", "-", "*", "^", %%, %/%, "/"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
-#' 
-#' @name Ops - numeric Rcpp_ParameterVector class inputs
-#' @param e1 numeric vector or value
-#' @param e2 Rcpp_ParameterVector class
-#' @aliases Ops-numeric-Rcpp_ParameterVector Ops,numeric-Rcpp_ParameterVector-method
-#' @docType methods
-#' @export
+#'
+#' @rdname Ops
 setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"),
     function(e1, e2) {
         if(length(e1) != e2$size()){
@@ -180,10 +151,8 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"),
 #' "sqrt", "ceiling", "floor", "trunc", "cummax", "cumprod", "cumsum", "log", "log10",
 #' "log2", "log1p", "exp", "expm1", "gamma", "lgamma", "digamma", "trigamma"
 #' 
-#' @name Math
-#' @param x Rcpp_ParameterVector class
-#' @aliases Math-Rcpp_ParameterVector Math,Rcpp_ParameterVector-Math-method
-#' @docType methods
+#' @export
+#' @rdname Math
 setMethod("Math", signature(x = "Rcpp_ParameterVector"),
     function(x) {
             xx <- new(ParameterVector, x$size())
@@ -196,10 +165,8 @@ setMethod("Math", signature(x = "Rcpp_ParameterVector"),
 
 #' Set methods for summary functions including "max", "min", "range", "prod", "sum", "any", "all"
 #' 
-#' @name Summary
-#' @param x Rcpp_ParameterVector class
-#' @aliases Summary-Rcpp_ParameterVector Summary,Rcpp_ParameterVector-Summary-method
-#' @docType methods
+#' @export 
+#' @rdname Summary
 setMethod("Summary", signature(x = "Rcpp_ParameterVector"),
     function(x) {
             xx <- new(ParameterVector, x$size())
