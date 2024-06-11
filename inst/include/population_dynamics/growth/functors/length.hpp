@@ -23,8 +23,10 @@ template <typename Type>
 struct Length : public GrowthBase<Type> {
     
     fims::Vector<Type> length_classes;
+    fims::Vector<Type> midpoints; //calculated at initialization
     fims::Vector<Type> age_means; //estimable
     fims::Vector<Type> age_stddevs; //estimable
+
     //derived
     fims::Vector<fims::Vector<Type> > alk;
     
@@ -47,6 +49,9 @@ struct Length : public GrowthBase<Type> {
      * Computes the initial ALK.
      */
     virtual void initialize(){
+        for (size_t i = 0; i < length_classes.size() - 1; ++i) {
+            midpoints.push_back((length_classes[i] + length_classes[i + 1]) / 2.0);
+        }
         this->update_alk();
     }
     
