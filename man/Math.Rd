@@ -3,11 +3,16 @@
 \docType{methods}
 \name{Math}
 \alias{Math}
+\alias{Math-Rcpp_ParameterVector}
+\alias{Math,Rcpp_ParameterVector-Math-method}
 \title{Sets methods for math functions including trigonometry functions, "abs", "sign",
 "sqrt", "ceiling", "floor", "trunc", "cummax", "cumprod", "cumsum", "log", "log10",
 "log2", "log1p", "exp", "expm1", "gamma", "lgamma", "digamma", "trigamma"}
 \usage{
 \S4method{Math}{Rcpp_ParameterVector}(x)
+}
+\arguments{
+\item{x}{Rcpp_ParameterVector class}
 }
 \description{
 Sets methods for math functions including trigonometry functions, "abs", "sign",
