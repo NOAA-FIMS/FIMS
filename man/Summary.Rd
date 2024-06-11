@@ -3,9 +3,14 @@
 \docType{methods}
 \name{Summary}
 \alias{Summary}
+\alias{Summary-Rcpp_ParameterVector}
+\alias{Summary,Rcpp_ParameterVector-Summary-method}
 \title{Set methods for summary functions including "max", "min", "range", "prod", "sum", "any", "all"}
 \usage{
 \S4method{Summary}{Rcpp_ParameterVector}(x)
+}
+\arguments{
+\item{x}{Rcpp_ParameterVector class}
 }
 \description{
 Set methods for summary functions including "max", "min", "range", "prod", "sum", "any", "all"
