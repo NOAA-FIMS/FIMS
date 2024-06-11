@@ -6,6 +6,9 @@
 \usage{
 \S4method{Summary}{Rcpp_ParameterVector}(x)
 }
+\arguments{
+\item{x}{numeric vector}
+}
 \description{
 Set methods for summary functions including "max", "min", "range", "prod", "sum", "any", "all"
 }

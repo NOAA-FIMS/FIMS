@@ -8,6 +8,9 @@
 \usage{
 \S4method{Math}{Rcpp_ParameterVector}(x)
 }
+\arguments{
+\item{x}{numeric vector}
+}
 \description{
 Sets methods for math functions including trigonometry functions, "abs", "sign",
 "sqrt", "ceiling", "floor", "trunc", "cummax", "cumprod", "cumsum", "log", "log10",

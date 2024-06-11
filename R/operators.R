@@ -18,6 +18,8 @@
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
 #' @importFrom methods callGeneric
+#' @param e1 Rcpp_Parameter class
+#' @param e2 Rcpp_Parameter class
 #' @export
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
@@ -35,6 +37,8 @@ setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
 #' 
+#' @param e1 Rcpp_Parameter class
+#' @param e2 numeric value
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
     function(e1, e2){
@@ -51,6 +55,8 @@ setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
 #' 
+#' @param e1 numeric value
+#' @param e2 Rcpp_Parameter class
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
     function(e1, e2){
@@ -84,6 +90,8 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
 #'
+#' @param e1 Rcpp_ParameterVector class
+#' @param e2 Rcpp_ParameterVector class
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"), 
     function(e1, e2) {
@@ -102,6 +110,8 @@ setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVect
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
 #'
+#' @param e1 Rcpp_ParameterVector class
+#' @param e2 numeric vector or value
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"),
     function(e1, e2) {
@@ -127,6 +137,8 @@ setMethod("Ops", signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
 #' Logic ("&", "|")
 #'
+#' @param e1 numeric vector or value
+#' @param e2 Rcpp_ParameterVector class
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"),
     function(e1, e2) {
@@ -151,6 +163,7 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"),
 #' "sqrt", "ceiling", "floor", "trunc", "cummax", "cumprod", "cumsum", "log", "log10",
 #' "log2", "log1p", "exp", "expm1", "gamma", "lgamma", "digamma", "trigamma"
 #' 
+#' @param x numeric vector
 #' @export
 #' @rdname Math
 setMethod("Math", signature(x = "Rcpp_ParameterVector"),
@@ -165,6 +178,7 @@ setMethod("Math", signature(x = "Rcpp_ParameterVector"),
 
 #' Set methods for summary functions including "max", "min", "range", "prod", "sum", "any", "all"
 #' 
+#' @param x numeric vector
 #' @export 
 #' @rdname Summary
 setMethod("Summary", signature(x = "Rcpp_ParameterVector"),
