@@ -426,9 +426,10 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id)
       .method("evaluate", &DnormDistributionsInterface::evaluate)
-      .field("x", &DnormDistributionsInterface::x)
-      .field("mean", &DnormDistributionsInterface::mean)
-      .field("sd", &DnormDistributionsInterface::sd);
+      .field("observed_values", &DnormDistributionsInterface::observed_values)
+      .field("expected_values", &DnormDistributionsInterface::expected_values)
+      .field("log_sd", &DnormDistributionsInterface::log_sd)
+      .field("is_na", &DnormDistributionsInterface::is_na);
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
@@ -467,16 +468,19 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
-      .field("x", &DlnormDistributionsInterface::x)
-      .field("meanlog", &DlnormDistributionsInterface::meanlog)
-      .field("sdlog", &DlnormDistributionsInterface::sdlog);
+      .field("observed_values", &DlnormDistributionsInterface::observed_values)
+      .field("expected_values", &DlnormDistributionsInterface::expected_values)
+      .field("log_sd", &DlnormDistributionsInterface::log_sd)
+      .field("is_na", &DlnormDistributionsInterface::is_na);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
       .method("get_id", &DmultinomDistributionsInterface::get_id)
-      .field("x", &DmultinomDistributionsInterface::x)
-      .field("p", &DmultinomDistributionsInterface::p);
+      .field("observed_values", &DmultinomDistributionsInterface::observed_values)
+      .field("expected_values", &DmultinomDistributionsInterface::expected_values)
+      .field("is_na", &DmultinomDistributionsInterface::is_na)
+      .field("dims", &DmultinomDistributionsInterface::dims);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
