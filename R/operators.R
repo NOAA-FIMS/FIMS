@@ -24,7 +24,7 @@ setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
     function(e1, e2){
-        if(length(e2) != 1)){
+        if(length(e2) != 1){
             stop("Call to operator Ops, value not scalar")
         }
         ret = new(Parameter)
