@@ -353,7 +353,7 @@ RCPP_MODULE(fims) {
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
       .field("data", &ParameterVector::storage_m, "list where each element is a Parameter class")
-      .method("at", &ParameterVector::at, "returns a Parameter at the indicated position given th eindex argument")
+      .method("at", &ParameterVector::at, "returns a Parameter at the indicated position given the index argument")
       .method("size", &ParameterVector::size, "returns the size of the Parameter Vector")
       .method("resize", &ParameterVector::resize, "resizes the Parameter Vector given the provided length argument")
       .method("set_all_estimable", &ParameterVector::set_all_estimable, "sets all Parameters within vector as estimable")
