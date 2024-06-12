@@ -29,9 +29,9 @@ class Parameter {
     uint32_t id_m; /**< id of the parameter */
   double value_m; /**< initial value of the parameter */
   double min_m =
-      std::numeric_limits<double>::min(); /**< min value of the parameter; default is the lowest finite value of the given type*/
+      -std::numeric_limits<double>::infinity(); /**< min value of the parameter; default is negative infinity*/
   double max_m =
-      std::numeric_limits<double>::max(); /**< max value of the parameter; default is the largest finite value of the given type*/
+      std::numeric_limits<double>::infinity(); /**< max value of the parameter; default is positive infinity*/
   bool is_random_effect_m = false;        /**< Is the parameter a random effect
                                            parameter? Default value is false.*/
   bool estimated_m =
