@@ -1,18 +1,3 @@
-# setClass("Rcpp_Parameter", representation(value_m = "numeric",
-#                                         min_m = "numeric",
-#                                         max_m = "numeric",
-#                                         id_m = "integer",
-#                                         is_random_effect_m = "logical",
-#                                         estimated_m = "logical"))
-# Rcpp::setRcppClass(Class = "Parameter",
-#                 module = "fims",
-#                 fields = list(value_m = "numeric",
-#                               min_m = "numeric",
-#                               max_m = "numeric",
-#                               id_m = "integer",
-#                               is_random_effect_m = "logical",
-#                               estimated_m = "logical"))
-
 #' Sets methods for operators under the S4 Generic Group, Ops, which includes 
 #' Arith ("+", "-", "*", "^", %%, %/%, "/"),
 #' Compare ("==", ">", "<", "!=", "<=", ">="), and 
@@ -24,9 +9,6 @@
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
     function(e1, e2){
-        if(e1$size() != e2$size()){
-            stop("Call to operator Ops, vectors not equal length")
-        }
         ret = new(Parameter)
         ret$value = callGeneric(e1$value, e2$value)
     }
@@ -42,11 +24,11 @@ setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
     function(e1, e2){
-        if(e1$size() != length(e2)){
-            stop("Call to operator Ops, vectors not equal length")
+        if(length(e2) != 1)){
+            stop("Call to operator Ops, value not scalar")
         }
         ret = new(Parameter)
-        ret$value = methods::callGeneric(e1$value, e2$valu)
+        ret$value = methods::callGeneric(e1$value, e2)
     }
 )
 
@@ -60,30 +42,15 @@ setMethod("Ops", signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
 #' @rdname Ops
 setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
     function(e1, e2){
-        if(length(e1) != e2$size()){
-            stop("Call to operator Ops, vectors not equal length")
+        if(length(e1) != 1){
+            stop("Call to operator Ops, value not scalar")
         }
         ret = new(Parameter)
         ret$value = methods::callGeneric(e1, e2$value)
     }
 )
 
-# setClass("Rcpp_ParameterVector", representation(id_g = "integer",
-#                                                 storage_m = "list",
-#                                                 id_m = "integer"))
 
-# #' Define Rcpp_Parameter class
-# #' 
-# #' @name ParameterVector
-# #' 
-# #' @param id_g global unique id
-# #' @param storage_m list of Parameter class values
-# #' @param id_m local unique id
-# Rcpp::setRcppClass(Class = "ParameterVector",
-#             module = "fims",
-#             fields = list(id_g = "integer",
-#                           storage_m = "list",
-#                           id_m = "integer"))
 
 #' Sets methods for operators under the S4 Generic Group, Ops, which includes 
 #' Arith ("+", "-", "*", "^", %%, %/%, "/"),
@@ -150,7 +117,7 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"),
                 }
                 return(ret)
             }
-            stop("Call to operator \"*\", vectors not equal length")
+            stop("Call to operator, vectors not equal length")
         }
         ret<-new(ParameterVector, e2$size())
         for(i in 1:e2$size()){
