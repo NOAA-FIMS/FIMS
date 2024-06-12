@@ -29,9 +29,9 @@ class Parameter {
     uint32_t id_m; /**< id of the parameter */
   double value_m; /**< initial value of the parameter */
   double min_m =
-      std::numeric_limits<double>::min(); /**< min value of the parameter*/
+      std::numeric_limits<double>::min(); /**< min value of the parameter; default is the lowest finite value of the given type*/
   double max_m =
-      std::numeric_limits<double>::max(); /**< max value of the parameter*/
+      std::numeric_limits<double>::max(); /**< max value of the parameter; default is the largest finite value of the given type*/
   bool is_random_effect_m = false;        /**< Is the parameter a random effect
                                            parameter? Default value is false.*/
   bool estimated_m =
@@ -196,6 +196,32 @@ public:
         for(size_t i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
             p.value_m = value;
+            this->storage_m[i] = Rcpp::wrap(p);
+        }
+    }
+
+    /**
+     * @brief Assigns the given values to the minimum value of all elements in the vector
+     * 
+     * @param value The value to be assigned
+     */
+    void fill_min(double value){
+        for(size_t i = 0; i < this->storage_m.size(); i++){
+            Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
+            p.min_m = value;
+            this->storage_m[i] = Rcpp::wrap(p);
+        }
+    }
+
+    /**
+     * @brief Assigns the given values to the maximum value of all elements in the vector
+     * 
+     * @param value The value to be assigned
+     */
+    void fill_max(double value){
+        for(size_t i = 0; i < this->storage_m.size(); i++){
+            Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
+            p.max_m = value;
             this->storage_m[i] = Rcpp::wrap(p);
         }
     }
