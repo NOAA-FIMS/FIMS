@@ -241,7 +241,7 @@ Index module has a vector field named <em>index_data</em> and the
 AgeComp module has a vector field names <em>age_comp_data</em>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Index</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'Index' &lt;0x55586e501db0&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'Index' &lt;0x556025f56e70&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     Index(int)</span></span>
 <span><span class="co">## </span></span>
@@ -253,7 +253,7 @@ AgeComp module has a vector field names <em>age_comp_data</em>.</p>
 <span><span class="co">## </span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">AgeComp</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'AgeComp' &lt;0x55586e501c50&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'AgeComp' &lt;0x55602755d9d0&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     AgeComp(int, int)</span></span>
 <span><span class="co">## </span></span>
@@ -293,7 +293,7 @@ can use the <em>value</em> field to input variables defined in the Model
 Comparison project.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">LogisticSelectivity</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'LogisticSelectivity' &lt;0x55586e502330&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'LogisticSelectivity' &lt;0x556025f573f0&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     LogisticSelectivity()</span></span>
 <span><span class="co">## </span></span>
@@ -323,7 +323,7 @@ actual fleet object. First let’s run <code>methods::show(Fleet)</code>
 to see all the fields and methods available from R.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">Fleet</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'Fleet' &lt;0x55586e501af0&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'Fleet' &lt;0x55602755d870&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     Fleet()</span></span>
 <span><span class="co">## </span></span>
@@ -465,7 +465,7 @@ methods (i.e. functions) available in
 <code class="sourceCode R"><span><span class="co"># Recruitment</span></span>
 <span><span class="va">recruitment</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span>
 <span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">BevertonHoltRecruitment</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## C++ class 'BevertonHoltRecruitment' &lt;0x55586e501990&gt;</span></span>
+<pre><code><span><span class="co">## C++ class 'BevertonHoltRecruitment' &lt;0x55602755d710&gt;</span></span>
 <span><span class="co">## Constructors:</span></span>
 <span><span class="co">##     BevertonHoltRecruitment()</span></span>
 <span><span class="co">## </span></span>
@@ -633,7 +633,7 @@ population.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sdr</span> <span class="op">&lt;-</span> <span class="fu">TMB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/TMB/man/sdreport.html" class="external-link">sdreport</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span><span class="va">sdr_fixed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sdr</span>, <span class="st">"fixed"</span><span class="op">)</span></span>
-<span><span class="va">report</span> <span class="op">&lt;-</span> <span class="va">obj</span><span class="op">$</span><span class="fu">report</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">report</span> <span class="op">&lt;-</span> <span class="va">obj</span><span class="op">$</span><span class="fu">report</span><span class="op">(</span><span class="va">obj</span><span class="op">$</span><span class="va">env</span><span class="op">$</span><span class="va">last.par.best</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sdr_fixed</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##      Estimate  Std. Error</span></span>
@@ -691,10 +691,10 @@ population.</p>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">report</span><span class="op">$</span><span class="va">index_nll</span> <span class="co"># fishery catch and survey index</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] -128.4071</span></span></code></pre>
+<pre><code><span><span class="co">## [1] -128.4122</span></span></code></pre>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">report</span><span class="op">$</span><span class="va">age_comp_nll</span> <span class="co"># fishery and survey age composition</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 2667.826</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 2667.83</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -708,36 +708,36 @@ population.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">index_results</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##       observed    expected</span></span>
-<span><span class="co">## 1  0.006795379 0.006473100</span></span>
-<span><span class="co">## 2  0.006170738 0.006483154</span></span>
-<span><span class="co">## 3  0.005977854 0.006421344</span></span>
-<span><span class="co">## 4  0.005907966 0.006343212</span></span>
-<span><span class="co">## 5  0.007211237 0.006153185</span></span>
-<span><span class="co">## 6  0.006867264 0.006013435</span></span>
-<span><span class="co">## 7  0.006329387 0.005818636</span></span>
-<span><span class="co">## 8  0.006137000 0.005766667</span></span>
-<span><span class="co">## 9  0.005279601 0.005207593</span></span>
-<span><span class="co">## 10 0.005666829 0.005067863</span></span>
-<span><span class="co">## 11 0.004806935 0.004812696</span></span>
-<span><span class="co">## 12 0.004374876 0.004529208</span></span>
-<span><span class="co">## 13 0.003992211 0.004255837</span></span>
-<span><span class="co">## 14 0.004188884 0.004129076</span></span>
-<span><span class="co">## 15 0.003711145 0.003811191</span></span>
-<span><span class="co">## 16 0.003818704 0.003537981</span></span>
-<span><span class="co">## 17 0.002878658 0.003383179</span></span>
-<span><span class="co">## 18 0.002936660 0.002920948</span></span>
-<span><span class="co">## 19 0.002972886 0.002722711</span></span>
-<span><span class="co">## 20 0.002484963 0.002508785</span></span>
-<span><span class="co">## 21 0.001983795 0.002289326</span></span>
-<span><span class="co">## 22 0.001738507 0.001953050</span></span>
-<span><span class="co">## 23 0.002122178 0.001907204</span></span>
-<span><span class="co">## 24 0.001617189 0.001707293</span></span>
-<span><span class="co">## 25 0.001745169 0.001606310</span></span>
-<span><span class="co">## 26 0.001414111 0.001487139</span></span>
-<span><span class="co">## 27 0.001350571 0.001444137</span></span>
-<span><span class="co">## 28 0.001323396 0.001395932</span></span>
+<span><span class="co">## 1  0.006795379 0.006474688</span></span>
+<span><span class="co">## 2  0.006170738 0.006484443</span></span>
+<span><span class="co">## 3  0.005977854 0.006422377</span></span>
+<span><span class="co">## 4  0.005907966 0.006344031</span></span>
+<span><span class="co">## 5  0.007211237 0.006153830</span></span>
+<span><span class="co">## 6  0.006867264 0.006013952</span></span>
+<span><span class="co">## 7  0.006329387 0.005819038</span></span>
+<span><span class="co">## 8  0.006137000 0.005766983</span></span>
+<span><span class="co">## 9  0.005279601 0.005207819</span></span>
+<span><span class="co">## 10 0.005666829 0.005068040</span></span>
+<span><span class="co">## 11 0.004806935 0.004812831</span></span>
+<span><span class="co">## 12 0.004374876 0.004529311</span></span>
+<span><span class="co">## 13 0.003992211 0.004255915</span></span>
+<span><span class="co">## 14 0.004188884 0.004129138</span></span>
+<span><span class="co">## 15 0.003711145 0.003811237</span></span>
+<span><span class="co">## 16 0.003818704 0.003538016</span></span>
+<span><span class="co">## 17 0.002878658 0.003383206</span></span>
+<span><span class="co">## 18 0.002936660 0.002920966</span></span>
+<span><span class="co">## 19 0.002972886 0.002722725</span></span>
+<span><span class="co">## 20 0.002484963 0.002508795</span></span>
+<span><span class="co">## 21 0.001983795 0.002289333</span></span>
+<span><span class="co">## 22 0.001738507 0.001953055</span></span>
+<span><span class="co">## 23 0.002122178 0.001907208</span></span>
+<span><span class="co">## 24 0.001617189 0.001707296</span></span>
+<span><span class="co">## 25 0.001745169 0.001606312</span></span>
+<span><span class="co">## 26 0.001414111 0.001487141</span></span>
+<span><span class="co">## 27 0.001350571 0.001444138</span></span>
+<span><span class="co">## 28 0.001323396 0.001395933</span></span>
 <span><span class="co">## 29 0.001069791 0.001241002</span></span>
-<span><span class="co">## 30 0.001459411 0.001271026</span></span></code></pre>
+<span><span class="co">## 30 0.001459411 0.001271027</span></span></code></pre>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">index_results</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">nyears</span>, y <span class="op">=</span> <span class="va">observed</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -753,36 +753,36 @@ population.</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">catch_results</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##     observed  expected</span></span>
-<span><span class="co">## 1   160.2363  160.1976</span></span>
-<span><span class="co">## 2   460.6336  460.4677</span></span>
-<span><span class="co">## 3   752.1299  751.8079</span></span>
-<span><span class="co">## 4   996.9872  996.9750</span></span>
-<span><span class="co">## 5   769.6972  769.4465</span></span>
-<span><span class="co">## 6  1352.7309 1351.2570</span></span>
-<span><span class="co">## 7  1317.7236 1316.7286</span></span>
-<span><span class="co">## 8  2626.0240 2621.9455</span></span>
-<span><span class="co">## 9  1415.1162 1414.7085</span></span>
-<span><span class="co">## 10 1666.0168 1665.1472</span></span>
-<span><span class="co">## 11 1751.8060 1750.4150</span></span>
-<span><span class="co">## 12 1739.5435 1738.9192</span></span>
-<span><span class="co">## 13 1208.5391 1208.8010</span></span>
-<span><span class="co">## 14 1647.6643 1647.3987</span></span>
-<span><span class="co">## 15 1593.6254 1593.8695</span></span>
-<span><span class="co">## 16 1343.2277 1342.6969</span></span>
-<span><span class="co">## 17 2337.0098 2330.7343</span></span>
-<span><span class="co">## 18 1685.7172 1685.4256</span></span>
-<span><span class="co">## 19 1529.8325 1530.5581</span></span>
-<span><span class="co">## 20 1359.5044 1363.2999</span></span>
-<span><span class="co">## 21 1637.5099 1638.6237</span></span>
-<span><span class="co">## 22 1081.9126 1080.3957</span></span>
-<span><span class="co">## 23 1648.7687 1646.4234</span></span>
-<span><span class="co">## 24 1230.1199 1233.1474</span></span>
-<span><span class="co">## 25 1133.8784 1133.5278</span></span>
-<span><span class="co">## 26  956.5872  958.0252</span></span>
-<span><span class="co">## 27  911.0781  913.1837</span></span>
-<span><span class="co">## 28 1172.4887 1174.4844</span></span>
-<span><span class="co">## 29  852.1934  852.0458</span></span>
-<span><span class="co">## 30 1278.3228 1278.1369</span></span></code></pre>
+<span><span class="co">## 1   160.2363  160.2385</span></span>
+<span><span class="co">## 2   460.6336  460.5628</span></span>
+<span><span class="co">## 3   752.1299  751.9333</span></span>
+<span><span class="co">## 4   996.9872  997.1089</span></span>
+<span><span class="co">## 5   769.6972  769.5302</span></span>
+<span><span class="co">## 6  1352.7309 1351.3767</span></span>
+<span><span class="co">## 7  1317.7236 1316.8230</span></span>
+<span><span class="co">## 8  2626.0240 2622.0952</span></span>
+<span><span class="co">## 9  1415.1162 1414.7725</span></span>
+<span><span class="co">## 10 1666.0168 1665.2075</span></span>
+<span><span class="co">## 11 1751.8060 1750.4662</span></span>
+<span><span class="co">## 12 1739.5435 1738.9603</span></span>
+<span><span class="co">## 13 1208.5391 1208.8241</span></span>
+<span><span class="co">## 14 1647.6643 1647.4244</span></span>
+<span><span class="co">## 15 1593.6254 1593.8898</span></span>
+<span><span class="co">## 16 1343.2277 1342.7109</span></span>
+<span><span class="co">## 17 2337.0098 2330.7538</span></span>
+<span><span class="co">## 18 1685.7172 1685.4367</span></span>
+<span><span class="co">## 19 1529.8325 1530.5660</span></span>
+<span><span class="co">## 20 1359.5044 1363.3055</span></span>
+<span><span class="co">## 21 1637.5099 1638.6292</span></span>
+<span><span class="co">## 22 1081.9126 1080.3986</span></span>
+<span><span class="co">## 23 1648.7687 1646.4270</span></span>
+<span><span class="co">## 24 1230.1199 1233.1494</span></span>
+<span><span class="co">## 25 1133.8784 1133.5293</span></span>
+<span><span class="co">## 26  956.5872  958.0262</span></span>
+<span><span class="co">## 27  911.0781  913.1846</span></span>
+<span><span class="co">## 28 1172.4887 1174.4853</span></span>
+<span><span class="co">## 29  852.1934  852.0463</span></span>
+<span><span class="co">## 30 1278.3228 1278.1376</span></span></code></pre>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">catch_results</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">nyears</span>, y <span class="op">=</span> <span class="va">observed</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
