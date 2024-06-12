@@ -2,8 +2,8 @@
 #define MULTINOMIAL_LPMF
 
 #include "density_components_base.hpp"
-#include "../common/fims_vector.hpp"
-#include "../common/def.hpp"
+#include "../../common/fims_vector.hpp"
+#include "../../common/def.hpp"
 
 namespace fims_distributions
 {
@@ -14,55 +14,66 @@ namespace fims_distributions
     struct MultinomialLPMF : public DensityComponentBase<Type>
     {
         Type nll = 0.0;
-        vector<int> dims;
+        fims::Vector<size_t> dims;
+        std::vector<bool> is_na;
+        #ifdef TMB_MODEL
+        ::objective_function<Type> *of;
+        #endif
         // data_indicator<tmbutils::vector<Type> , Type> keep;
 
-        MultinomialLPMF() : DistributionComponentBase<Type>()
+        MultinomialLPMF() : DensityComponentBase<Type>()
         {
         }
 
         virtual ~MultinomialLPMF() {}
 
-        virtual const Type evaluate()
+        virtual const Type evaluate(const bool& do_log)
         {
             this->nll_vec.resize(dims[0]);
             fims::Vector<Type> observed_vector;
             fims::Vector<Type> expected_vector;
             observed_vector.resize(dims[1]);
             expected_vector.resize(dims[1]);
-            for (int i = 0; i < dims[0]; i++)
+            for (size_t i = 0; i < dims[0]; i++)
             {
-                for (int j = 0; j < dims[1]; j++)
+              if(!is_na[i]){
+                #ifdef TMB_MODEL
+                for (size_t j = 0; j < dims[1]; j++)
                 {
-                    idx = (i * dims[1]) + j;
-                    observed_vector[j] = this->observed_value[idx];
-                    expected_vector[j] = this->expected_value[idx];
+                    size_t idx = (i * dims[1]) + j;
+                    observed_vector[j] = this->observed_values[idx];
+                    expected_vector[j] = this->expected_values[idx];
                 }
-                this->nll_vec[i] = -dmultinom(observed_vector, expected_vector, true);
+
+                this->nll_vec[i] = -dmultinom((vector<Type>)observed_vector, (vector<Type>)expected_vector, do_log);
                 nll += this->nll_vec[i];
+                /*
                 if (this->simulate_flag)
                 {
                     FIMS_SIMULATE_F(this->of)
                     {
-                        fims::Vector<Type> sim_obsered;
+                        fims::Vector<Type> sim_observed;
                         sim_observed.resize(dims[1]);
                         sim_observed = rmultinom(expected_vector);
-                        sim_observed.resize(this->observed_value); 
-                        for (int j = 0; j < dims[1]; j++)
+                        sim_observed.resize(this->observed_values);
+                        for (size_t j = 0; j < dims[1]; j++)
                         {
                             idx = (i * dims[1]) + j;
-                            this->observed_value[idx] = sim_observed[j]; 
+                            this->observed_values[idx] = sim_observed[j];
                         }
-                    }               
+                    }
                 }
+                */
+               #endif
+              }
             }
-
-            vector<Type> observed_value = this->observed_value;
-            FIMS_REPORT_F(observed_value, this->of);
-
+            #ifdef TMB_MODEL
+            vector<Type> observed_values = this->observed_values;
+          //  FIMS_REPORT_F(observed_values, this->of);
+            #endif
             return (nll);
         }
-    } // namespace fims_distributions
 
 };
-#endif;
+} // namespace fims_distributions
+#endif
