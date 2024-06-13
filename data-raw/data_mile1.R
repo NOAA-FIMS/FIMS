@@ -15,6 +15,10 @@
 ###############################################################################
 # Helper functions and load packages
 ###############################################################################
+cv_2_sd <- function(x) {
+  sqrt(log(x^2 + 1))
+}
+
 check_ASSAMC <- function() {
   packages_all <- .packages(all.available = TRUE)
   if (!"ASSAMC" %in% packages_all) {
@@ -25,6 +29,7 @@ check_ASSAMC <- function() {
   library("ASSAMC")
   return(TRUE)
 }
+
 check_ASSAMC()
 library(dplyr)
 
@@ -52,11 +57,7 @@ landings_data <- data.frame(
   ),
   value = returnedom[["em_input"]]$L.obs[[1]],
   unit = "mt", # metric tons
-  # TODO: discuss if CV the appropriate input here given that landings will be
-  #       modeled with a lognormal or similar likelihood. Just because previous
-  #       models have used CV doesn't mean we have to continue to use it.
-  #       E.g., `dlnorm(sdlog = )` uses a standard deviation on the log scale.
-  uncertainty = returnedom[["em_input"]]$cv.L[[1]]
+  uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.L[[1]])
 )
 
 ###############################################################################
@@ -76,7 +77,7 @@ index_data <- data.frame(
   ),
   value = returnedom[["em_input"]]$surveyB.obs[[1]],
   unit = "mt",
-  uncertainty = returnedom[["em_input"]]$cv.survey[[1]]
+  uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.survey[[1]])
 )
 
 ###############################################################################
@@ -164,7 +165,7 @@ unlink("FIMS_input_data.csv")
 
 usethis::use_data(data_mile1, overwrite = TRUE)
 rm(
-  check_ASSAMC,
+  check_ASSAMC, cv_2_sd,
   age_data, landings_data, index_data, weightatage_data,
   timingfishery, weightsfishery,
   data_mile1, returnedom,
