@@ -33,13 +33,13 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
-  static uint32_t id_g;
- fims::Vector<Type> observed_values;
- fims::Vector<Type> expected_values;
- fims::Vector<Type> nll_vec;
- std::string  nll_type; //prior, re, data
- bool osa_flag = false;
- bool simulate_flag = false;
+ static uint32_t id_g; /*!< global unique identifier for distribution modules */
+ fims::Vector<Type> observed_values; /*!< input value of distribution function */
+ fims::Vector<Type> expected_values; /*!< expected value of distribution function */
+ fims::Vector<Type> nll_vec; /*!< vector to record observation level negative log-likelihood values */
+ std::string  nll_type; /*!< string classifies the type of the negative log-likelihood; options are: prior, re, data */
+ bool osa_flag = false; /*!< Boolean; if true, osa residuals are calculated */
+ bool simulate_flag = false; /*!< Boolean; if true, data are simulated from the distribution */
 
   /** @brief Constructor.
    */

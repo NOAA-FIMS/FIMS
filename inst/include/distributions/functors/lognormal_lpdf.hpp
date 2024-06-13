@@ -1,3 +1,15 @@
+/*
+ * File:   lognormal_lpdf.hpp
+ *
+ * This File is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the
+ * source folder for reuse information.
+ *
+ * Lognormal Log Probability Density Function (LPDF) module file
+ * The purpose of this file is to define the Lognormal LPDF class and its fields
+ * and return the log probability density function.
+ *
+ */
 #ifndef LOGNORMAL_LPDF
 #define LOGNORMAL_LPDF
 
@@ -13,22 +25,30 @@ namespace fims_distributions
     template <typename Type>
     struct LogNormalLPDF : public DensityComponentBase<Type>
     {
-        fims::Vector<Type> log_sd;
-        fims::Vector<Type> mu;
-        fims::Vector<Type> sd;
-        std::vector<bool> is_na;
+        fims::Vector<Type> log_sd; /*!< log of the standard deviation of the distribution on the log scale; can be a vector or scalar */
+        fims::Vector<Type> mu; /*!< mean of the distribution on the log scale; can be a vector or scalar */
+        fims::Vector<Type> sd; /*!< standard deviation of the distribution on the log scale; can be a vector or scalar */
+        std::vector<bool> is_na; /*!< Boolean; if true, data observation is NA and the likelihood contribution is skipped */
         #ifdef TMB_MODEL
-        ::objective_function<Type> *of;
+        ::objective_function<Type> *of; /*!< Pointer to the TMB objective function */
         #endif
-        Type nll = 0.0;
-        // data_indicator<tmbutils::vector<Type> , Type> keep;
+        Type nll = 0.0; /*!< total negative log-likelihood contribution of the distribution */
+        // data_indicator<tmbutils::vector<Type> , Type> keep; /*!< Indicator used in TMB one-step-ahead residual calculations */
 
+        /** @brief Constructor.
+         */
         LogNormalLPDF() : DensityComponentBase<Type>()
         {
         }
 
+        /** @brief Destructor.
+         */
         virtual ~LogNormalLPDF() {}
 
+        /**
+         * @brief Evaluates the negative log-likelihood of the lognormal probability density function
+         * @param do_log Boolean; if true, log densities are returned
+         */
         virtual const Type evaluate(const bool &do_log)
         {
             this->mu.resize(this->observed_values.size());

@@ -1,3 +1,16 @@
+/*
+ * File:   normal_lpdf.hpp
+ *
+ * This File is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the
+ * source folder for reuse information.
+ *
+ * Normal Log Probability Density Function (LPDF) module file
+ * The purpose of this file is to define the Normal LPDF class and its fields
+ * and return the log probability density function.
+ *
+ */
+
 #ifndef NORMAL_LPDF
 #define NORMAL_LPDF
 
@@ -11,22 +24,30 @@ namespace fims_distributions {
  */
 template<typename Type>
 struct NormalLPDF : public DensityComponentBase<Type> {
-    fims::Vector<Type> log_sd;
-    fims::Vector<Type> mu;
-    fims::Vector<Type> sd;
-    Type nll = 0.0;
-    std::vector<bool> is_na;
+    fims::Vector<Type> log_sd; /*!< log of the standard deviation of the distribution; can be a vector or scalar */
+    fims::Vector<Type> mu; /*!< mean of the distribution; can be a vector or scalar */
+    fims::Vector<Type> sd; /*!< standard deviation of the distribution; can be a vector or scalar */
+    Type nll = 0.0; /*!< total negative log-likelihood contribution of the distribution */
+    std::vector<bool> is_na; /*!< Boolean; if true, data observation is NA and the likelihood contribution is skipped */
     #ifdef TMB_MODEL
-    ::objective_function<Type> *of;
+    ::objective_function<Type> *of; /*!< Pointer to the TMB objective function */
     #endif
-    //data_indicator<tmbutils::vector<Type> , Type> keep;
+    //data_indicator<tmbutils::vector<Type> , Type> keep; /*!< total negative log-likelihood contribution of the distribution */
 
+    /** @brief Constructor.
+     */
     NormalLPDF() : DensityComponentBase<Type>() {
 
     }
 
+    /** @brief Destructor.
+     */
     virtual ~NormalLPDF() {}
 
+    /**
+     * @brief Evaluates the negative log-likelihood of the normal probability density function
+     * @param do_log Boolean; if true, log densities are returned
+     */
     virtual const Type evaluate(const bool& do_log){
         this->mu.resize(this->observed_values.size());
         this->sd.resize(this->observed_values.size());
