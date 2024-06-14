@@ -32,7 +32,7 @@ namespace fims_distributions
         #ifdef TMB_MODEL
         ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
         #endif
-        // data_indicator<tmbutils::vector<Type> , Type> keep;  /**< total negative log-likelihood contribution of the distribution */
+        // data_indicator<tmbutils::vector<Type> , Type> keep;  /**< Indicator used in TMB one-step-ahead residual calculations */
 
         /** @brief Constructor.
          */
