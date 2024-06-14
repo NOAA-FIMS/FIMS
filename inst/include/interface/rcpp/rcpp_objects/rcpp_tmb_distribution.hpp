@@ -66,7 +66,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   ParameterVector observed_values;    /**< observed data */
   ParameterVector expected_values; /**< mean of x for the normal distribution */
   ParameterVector log_sd;   /**< sd of x for the normal distribution */
-  Rcpp::LogicalVector is_na;
+  Rcpp::LogicalVector is_na; /**<Boolean; if true, data observation is NA and the likelihood contribution is skipped */
 
   DnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -165,7 +165,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   ParameterVector observed_values;       /**< observation */
   ParameterVector expected_values; /**< mean of the distribution of log(x) */
   ParameterVector log_sd;   /**< standard deviation of the distribution of log(x) */
-  Rcpp::LogicalVector is_na;
+  Rcpp::LogicalVector is_na; /**<Boolean; if true, data observation is NA and the likelihood contribution is skipped */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
@@ -267,8 +267,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   ParameterVector observed_values; /**< Vector of length K of integers */
   ParameterVector expected_values; /**< Vector of length K, specifying the probability
  for the K classes (note, unlike in R these must sum to 1). */
-  Rcpp::LogicalVector is_na;
-  Rcpp::NumericVector dims;
+  Rcpp::LogicalVector is_na; /**<Boolean; if true, data observation is NA and the likelihood contribution is skipped */
+  Rcpp::NumericVector dims; /**< Dimensions of the number of rows and columns of the multivariate dataset */
 
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
 

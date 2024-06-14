@@ -74,12 +74,12 @@ uint32_t Parameter::id_g = 0;
  */
 class ParameterVector{
     static uint32_t id_g; /**< global identifier*/
-   
+
 public:
     Rcpp::List storage_m;  /**< list of parameter objects*/
     uint32_t id_m; /**< unique identifier*/
-    
-    
+
+
     /**
      *  @brief default constructor
      */
@@ -100,7 +100,8 @@ public:
     }
     /**
      *  @brief vector constructor
-     *  @param Rcpp::NumericVector, "size", number of elements to copy over.
+     *  @param x numeric vector
+     *  @param size number of elements to copy over
      */
     ParameterVector(Rcpp::NumericVector x, size_t size){
         this->id_m = ParameterVector::id_g++;
@@ -112,14 +113,14 @@ public:
 
     /**
      *  @brief Accessor. First index starts is zero.
-     *  @param return a Parameter at position "pos".
+     *  @param pos return a Parameter at position "pos".
      */
     inline Parameter operator[](R_xlen_t pos) {
         return this->storage_m[pos]; }
 
     /**
      *  @brief Accessor. First index is one. For calling from R.
-     *  @param return a Parameter at position "pos".
+     *  @param pos return a Parameter at position "pos".
      */
     SEXP at(R_xlen_t pos){
         if(pos == 0 || pos > this->storage_m.size()){
@@ -138,7 +139,7 @@ public:
 
     /**
      *  @brief resize to length "size"
-     *  @param resulting size.
+     *  @param size new length of vector to be resized
      */
     void resize(size_t size){
         size_t n = this->storage_m.size();
@@ -164,7 +165,7 @@ public:
     /**
      * @brief Sets all parameters within a vector as estimable
      *
-     * @param estimable A true value indicates the parameters are estimated in the model
+     * @param estimable Boolean; if true, all parameters are set to be estimated in the model
      */
     void set_all_estimable(bool estimable){
         for(R_xlen_t i = 0; i < this->storage_m.size(); i++){
@@ -177,7 +178,7 @@ public:
     /**
      * @brief Sets all parameters within a vector as random
      *
-     * @param random A true value indicates the parameters are random effects
+     * @param random Boolean; if true, all parameters are set to be random effects in the model
      */
     void set_all_random(bool random){
         for(R_xlen_t i = 0; i < this->storage_m.size(); i++){
@@ -202,7 +203,7 @@ public:
 
     /**
      * @brief Assigns the given values to the minimum value of all elements in the vector
-     * 
+     *
      * @param value The value to be assigned
      */
     void fill_min(double value){
@@ -215,7 +216,7 @@ public:
 
     /**
      * @brief Assigns the given values to the maximum value of all elements in the vector
-     * 
+     *
      * @param value The value to be assigned
      */
     void fill_max(double value){
@@ -225,7 +226,7 @@ public:
             this->storage_m[i] = Rcpp::wrap(p);
         }
     }
-    
+
 };
 uint32_t ParameterVector::id_g = 0;
 
