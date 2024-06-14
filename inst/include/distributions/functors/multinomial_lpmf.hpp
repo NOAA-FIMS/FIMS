@@ -26,13 +26,13 @@ namespace fims_distributions
     template <typename Type>
     struct MultinomialLPMF : public DensityComponentBase<Type>
     {
-        Type nll = 0.0; /*!< total negative log-likelihood contribution of the distribution */
-        fims::Vector<size_t> dims; /*!< Dimensions of the number of rows and columns of the multivariate dataset */
-        std::vector<bool> is_na; /*!< Boolean; if true, data observation is NA and the likelihood contribution for the entire row is skipped */
+        Type nll = 0.0; /**< total negative log-likelihood contribution of the distribution */
+        fims::Vector<size_t> dims; /**< Dimensions of the number of rows and columns of the multivariate dataset */
+        std::vector<bool> is_na; /**< Boolean; if true, data observation is NA and the likelihood contribution for the entire row is skipped */
         #ifdef TMB_MODEL
-        ::objective_function<Type> *of; /*!< Pointer to the TMB objective function */
+        ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
         #endif
-        // data_indicator<tmbutils::vector<Type> , Type> keep;  /*!< total negative log-likelihood contribution of the distribution */
+        // data_indicator<tmbutils::vector<Type> , Type> keep;  /**< total negative log-likelihood contribution of the distribution */
 
         /** @brief Constructor.
          */

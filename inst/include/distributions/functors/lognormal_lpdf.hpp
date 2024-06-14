@@ -25,15 +25,15 @@ namespace fims_distributions
     template <typename Type>
     struct LogNormalLPDF : public DensityComponentBase<Type>
     {
-        fims::Vector<Type> log_sd; /*!< log of the standard deviation of the distribution on the log scale; can be a vector or scalar */
-        fims::Vector<Type> mu; /*!< mean of the distribution on the log scale; can be a vector or scalar */
-        fims::Vector<Type> sd; /*!< standard deviation of the distribution on the log scale; can be a vector or scalar */
-        std::vector<bool> is_na; /*!< Boolean; if true, data observation is NA and the likelihood contribution is skipped */
+        fims::Vector<Type> log_sd; /**< log of the standard deviation of the distribution on the log scale; can be a vector or scalar */
+        fims::Vector<Type> mu; /**< mean of the distribution on the log scale; can be a vector or scalar */
+        fims::Vector<Type> sd; /**< standard deviation of the distribution on the log scale; can be a vector or scalar */
+        std::vector<bool> is_na; /**< Boolean; if true, data observation is NA and the likelihood contribution is skipped */
         #ifdef TMB_MODEL
-        ::objective_function<Type> *of; /*!< Pointer to the TMB objective function */
+        ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
         #endif
-        Type nll = 0.0; /*!< total negative log-likelihood contribution of the distribution */
-        // data_indicator<tmbutils::vector<Type> , Type> keep; /*!< Indicator used in TMB one-step-ahead residual calculations */
+        Type nll = 0.0; /**< total negative log-likelihood contribution of the distribution */
+        // data_indicator<tmbutils::vector<Type> , Type> keep; /**< Indicator used in TMB one-step-ahead residual calculations */
 
         /** @brief Constructor.
          */

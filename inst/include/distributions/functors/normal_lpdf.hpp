@@ -24,15 +24,15 @@ namespace fims_distributions {
  */
 template<typename Type>
 struct NormalLPDF : public DensityComponentBase<Type> {
-    fims::Vector<Type> log_sd; /*!< log of the standard deviation of the distribution; can be a vector or scalar */
-    fims::Vector<Type> mu; /*!< mean of the distribution; can be a vector or scalar */
-    fims::Vector<Type> sd; /*!< standard deviation of the distribution; can be a vector or scalar */
-    Type nll = 0.0; /*!< total negative log-likelihood contribution of the distribution */
-    std::vector<bool> is_na; /*!< Boolean; if true, data observation is NA and the likelihood contribution is skipped */
+    fims::Vector<Type> log_sd; /**< log of the standard deviation of the distribution; can be a vector or scalar */
+    fims::Vector<Type> mu; /**< mean of the distribution; can be a vector or scalar */
+    fims::Vector<Type> sd; /**< standard deviation of the distribution; can be a vector or scalar */
+    Type nll = 0.0; /**< total negative log-likelihood contribution of the distribution */
+    std::vector<bool> is_na; /**< Boolean; if true, data observation is NA and the likelihood contribution is skipped */
     #ifdef TMB_MODEL
-    ::objective_function<Type> *of; /*!< Pointer to the TMB objective function */
+    ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
     #endif
-    //data_indicator<tmbutils::vector<Type> , Type> keep; /*!< total negative log-likelihood contribution of the distribution */
+    //data_indicator<tmbutils::vector<Type> , Type> keep; /**< total negative log-likelihood contribution of the distribution */
 
     /** @brief Constructor.
      */
