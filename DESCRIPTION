@@ -66,11 +66,14 @@ Imports:
 Suggests: 
     covr,
     knitr,
+    parallel,
     remotes,
     rmarkdown,
+    snowfall,
     testthat (>= 3.0.0),
     tidyverse,
-    usethis
+    usethis,
+    withr
 LinkingTo: 
     Rcpp,
     RcppEigen,
