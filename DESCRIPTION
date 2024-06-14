@@ -65,12 +65,18 @@ Imports:
     TMB (>= 1.8.0)
 Suggests: 
     covr,
+    doParallel,
+    foreach,
     knitr,
+    parallel,
     remotes,
+    rlecuyer,
     rmarkdown,
+    snowfall,
     testthat (>= 3.0.0),
     tidyverse,
-    usethis
+    usethis,
+    withr
 LinkingTo: 
     Rcpp,
     RcppEigen,
