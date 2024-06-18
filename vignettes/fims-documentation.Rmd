@@ -162,8 +162,8 @@ doc_list <- list(
 library(tidyverse)
 
 list2markdown <- function(list) {
-  enframe(list) %>%
-    group_by(name) %>%
+  enframe(list) |>
+    group_by(name) |>
     mutate(items = paste0(
       "- ",
       name,
@@ -172,9 +172,9 @@ list2markdown <- function(list) {
         unlist(value),
         collapse = ""
       )
-    )) %>%
-    pull(items) %>%
-    paste0(collapse = "\n") %>%
+    )) |>
+    pull(items) |>
+    paste0(collapse = "\n") |>
     cat()
 }
 ```
