@@ -64,7 +64,8 @@ Imports:
     Rcpp,
     scales,
     TMB (>= 1.8.0),
-    usethis
+    usethis,
+    utils
 Suggests: 
     covr,
     knitr,

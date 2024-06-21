@@ -422,7 +422,8 @@ test_that("estimation test of fims", {
   sdr_report <- summary(sdr, "report")
 
   # test output object can be created
-  output_object <- create_fims_output(obj = obj, sdreport = sdr, call = NA, nyears = om_input$nyr)
+  age_frame <- FIMSFrameAge(data_mile1)
+  output_object <- create_fims_output(obj = report, sdr = sdr, data = age_frame)
   expect_snapshot(output_object)
 
   # Numbers at age

@@ -4,11 +4,17 @@
 \alias{create_fims_output}
 \title{Class constructors for \code{FIMSOutput} and associated child classes}
 \usage{
-create_fims_output(tmb, sdreport, call)
+create_fims_output(obj, sdr, call = NULL, data)
 }
 \arguments{
-\item{data}{A \code{data.frame} that contains the necessary columns
-to construct a output of FIMS of a given \code{FIMSOutput-class}.}
+\item{obj}{The output from \code{obj$report(obj$env$last.par.best)}.}
+
+\item{sdr}{sdr The returned object from running \code{\link[TMB:sdreport]{TMB::sdreport()}} on \code{obj}.}
+
+\item{call}{the call the users made to run FIMS. This is not available for FIMS yet.}
+
+\item{data}{The input data used to fit the model. This needs to be a
+FIMS object.}
 }
 \value{
 An object of the S4 class \code{FIMSOutput} or one of its child classes
