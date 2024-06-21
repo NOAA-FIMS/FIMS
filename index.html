@@ -70,48 +70,23 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><p><!-- badges: start --> <a href="https://github.com/NOAA-FIMS/FIMS/actions" class="external-link"><img src="https://github.com/NOAA-FIMS/FIMS/workflows/call-r-cmd-check/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/NOAA-FIMS/FIMS?branch=main" class="external-link"><img src="https://codecov.io/gh/NOAA-FIMS/FIMS/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a> <!-- badges: end --></p>
+  <main id="main" class="col-md-9"><p><!-- badges: start --> <a href="https://noaa-fims.r-universe.dev/FIMS" class="external-link"><img src="https://noaa-fims.r-universe.dev/badges/FIMS" alt="FIMS status badge"></a> <a href="https://github.com/NOAA-FIMS/FIMS/actions" class="external-link"><img src="https://github.com/NOAA-FIMS/FIMS/workflows/call-r-cmd-check/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/NOAA-FIMS/FIMS?branch=main" class="external-link"><img src="https://codecov.io/gh/NOAA-FIMS/FIMS/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a> <!-- badges: end --></p>
 <div class="section level1">
 <div class="page-header"><h1 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h1></div>
 <p>The repository for development of FIMS.</p>
 <p>The NOAA Fisheries Integrated Modeling System is a software system designed and architected to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. A team of experts within NOAA Fisheries is designing and developing the system, and we are advised by the FIMS Council which includes academic, industry, and international partners. The roles of internal and external collaborators are outlined in the <a href="https://noaa-fims.github.io/collaborative_workflow/fims-governance.html" class="external-link">governance section</a> of our developer guide. We plan to have an operational software system that is released to the public in 2023. In the meantime, users and developers are welcome to submit feedback using Github issues. Please use the issues under <a href="https://github.com/NOAA-FIMS/collaborative_workflow/issues" class="external-link">collaborative workflow</a> to make suggestions about the <a href="https://noaa-fims.github.io/collaborative_workflow/" class="external-link">developer guide</a> and the issues under the FIMS software <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">repo</a> for software design and development feedback. You can follow the team discussion <a href="https://github.com/NOAA-FIMS/FIMS/discussions" class="external-link">here</a>.</p>
 <div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="installing-from-r">Installing from R<a class="anchor" aria-label="anchor" href="#installing-from-r"></a>
 </h2>
-<p>The following software is required:</p>
-<ul>
-<li>R version 4.0.0 or newer (or RStudio version 1.2.5042 or newer)</li>
-<li>the <code>remotes</code> R package</li>
-<li>
-<code>TMB</code> version 1.8.0 or newer (install instructions are <a href="https://github.com/kaskr/adcomp/wiki/Download" class="external-link">here</a>.)</li>
-</ul>
-<div class="section level3">
-<h3 id="windows-users">Windows Users<a class="anchor" aria-label="anchor" href="#windows-users"></a>
-</h3>
-<ul>
-<li>Rtools4 (available from <a href="https://cran.r-project.org/bin/windows/Rtools/rtools40.html" class="external-link">here</a>)</li>
-</ul>
-<div class="section level4">
-<h4 id="fixing-fatal-error">Fixing Fatal Error<a class="anchor" aria-label="anchor" href="#fixing-fatal-error"></a>
-</h4>
-<p>Windows users can expect to see some derivative of the following error message in their R session if they have not yet set some flags using {withr}.</p>
-<pre><code>Fatal error: can't write &lt;xxx&gt; bytes to section .text of FIMS.o: 'file too big</code></pre>
-<p>You can easily fix this by running the following line in your local R session. Note that this call will need to be repeated each time you open a new session.</p>
-<pre><code><span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_options.html" class="external-link">local_options</a></span><span class="op">(</span>pkg.build_extra_flags <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre>
-<p>This fix does not work when <code>devtools::test()</code> is called and FIMS is re-compiled. The call to <code>devtools::test()</code> in this case overwrites the local options set by withr. Compile FIMS first using <code>devtools::load_all()</code> prior to running <code>devtools::test()</code>.</p>
-<p>This fix removes the debugger flag <code>-O0 -g</code> from being automatically inserted for certain devtools calls (e.g. <code>devtools::load_all()</code>). Windows developers wanting to compile FIMS with the debugger turned on will need to run the above script in addition to manually modifying the call to PKG_CXXFLAGS in the <a href="https://github.com/NOAA-FIMS/FIMS/blob/doc-install/src/Makevars.win" class="external-link">Makevars.win</a> file in the src directory to the following:</p>
-<pre><code><span><span class="va">PKG_CXXFLAGS</span> <span class="op">=</span>  <span class="op">-</span><span class="va">DTMB_MODEL</span>  <span class="op">-</span><span class="va">DTMB_EIGEN_DISABLE_WARNINGS</span> <span class="op">-</span><span class="va">O1</span> <span class="op">-</span><span class="va">g</span></span></code></pre>
-<p>To turn off the debugger flag, remove the <code>-O1 -g</code> flag:</p>
-<pre><code><span><span class="va">PKG_CXXFLAGS</span> <span class="op">=</span>  <span class="op">-</span><span class="va">DTMB_MODEL</span>  <span class="op">-</span><span class="va">DTMB_EIGEN_DISABLE_WARNINGS</span></span></code></pre>
+<p>Install the latest precompiled version <a href="https://noaa-fims.r-universe.dev/FIMS" class="external-link">FIMS from R universe</a> within R:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"FIMS"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://noaa-fims.r-universe.dev"</span>, <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
-</div>
-<div class="section level3">
-<h3 id="installing-from-r">Installing from R<a class="anchor" aria-label="anchor" href="#installing-from-r"></a>
-</h3>
-<pre><code><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"NOAA-FIMS/FIMS"</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/noaa-fims/fims" class="external-link">FIMS</a></span><span class="op">)</span></span></code></pre>
-</div>
+<div class="section level2">
+<h2 id="local-install-for-developers">Local Install for Developers<a class="anchor" aria-label="anchor" href="#local-install-for-developers"></a>
+</h2>
+<p>Follow instructions in the <a href="https://noaa-fims.github.io/collaborative_workflow/developer-software-and-installation-guide.html" class="external-link">Collaborative Workflow Chapter on Developer Software and Installation</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
