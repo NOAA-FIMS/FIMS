@@ -2,15 +2,15 @@
 % Please edit documentation in R/fimsframe.R
 \name{m_agecomp}
 \alias{m_agecomp}
-\title{Get the agecomp data to be used in the model}
+\title{Get the age-composition data to be used in the model}
 \usage{
 m_agecomp(x, fleet_name)
 }
 \arguments{
-\item{x}{The object containing agecomp}
+\item{x}{The object containing the age-composition data.}
 
-\item{fleet_name}{The name of the fleet for the agecomp data}
+\item{fleet_name}{The name of the fleet for the age-composition data.}
 }
 \description{
-Get the agecomp data to be used in the model
+Get the age-composition data to be used in the model
 }

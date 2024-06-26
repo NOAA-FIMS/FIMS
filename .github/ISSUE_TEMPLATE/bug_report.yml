@@ -1,7 +1,7 @@
 name: Bug Report
 description: Report a bug that causes the existing functionality to differ from what is described in the development plan
 title: "[Bug]: "
-labels: ["kind: bug", "triage_needed"]
+labels: ["kind: bug", "status: triage_needed"]
 body:
   - type: markdown
     attributes:
@@ -20,12 +20,16 @@ body:
     id: reproduce
     attributes:
       label: To Reproduce
-      description: Steps to reproduce the bug
+      description: |
+        Please include a minimal reproducible example (AKA a reprex). If you
+        have not heard of a [reprex](http://reprex.tidyverse.org/) before,
+        you can start by reading about them on the [tidyverse
+        blog](https://www.tidyverse.org/help/#reprex). Feel free to copy, paste,
+        and edit the [demo
+        vignette](https://github.com/NOAA-FIMS/FIMS/blob/4539fc4b6e65b901231c4fb66a113bb5b5d54d22/vignettes/fims-demo.Rmd)
+        for your reprex.
       placeholder: |
-        1. Go to '...'
-        2. Click on '....'
-        3. Scroll down to '....'
-        4. See error
+        # insert reprex here
     validations:
       required: false
   - type: textarea

@@ -224,8 +224,8 @@ data <- rbind(
 test_case <- data
 test_case$Component <- kableExtra::linebreak(test_case$Component)
 test_case$Test <- kableExtra::linebreak(test_case$Test)
-knitr::kable(test_case, escape = FALSE, align = "l", caption = "Evalation criteria for FIMS testing components.") %>%
-  kableExtra::column_spec(1, width = "15em") %>% # Column of Item
+knitr::kable(test_case, escape = FALSE, align = "l", caption = "Evalation criteria for FIMS testing components.") |>
+  kableExtra::column_spec(1, width = "15em") |> # Column of Item
   kableExtra::column_spec(2, width = "28em") # Column of Test
 ```
 

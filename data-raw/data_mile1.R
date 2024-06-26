@@ -15,6 +15,10 @@
 ###############################################################################
 # Helper functions and load packages
 ###############################################################################
+cv_2_sd <- function(x) {
+  sqrt(log(x^2 + 1))
+}
+
 check_ASSAMC <- function() {
   packages_all <- .packages(all.available = TRUE)
   if (!"ASSAMC" %in% packages_all) {
@@ -25,6 +29,7 @@ check_ASSAMC <- function() {
   library("ASSAMC")
   return(TRUE)
 }
+
 check_ASSAMC()
 library(dplyr)
 
@@ -52,11 +57,7 @@ landings_data <- data.frame(
   ),
   value = returnedom[["em_input"]]$L.obs[[1]],
   unit = "mt", # metric tons
-  # TODO: discuss if CV the appropriate input here given that landings will be
-  #       modeled with a lognormal or similar likelihood. Just because previous
-  #       models have used CV doesn't mean we have to continue to use it.
-  #       E.g., `dlnorm(sdlog = )` uses a standard deviation on the log scale.
-  uncertainty = returnedom[["em_input"]]$cv.L[[1]]
+  uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.L[[1]])
 )
 
 ###############################################################################
@@ -75,8 +76,8 @@ index_data <- data.frame(
     format = "%Y-%m-%d"
   ),
   value = returnedom[["em_input"]]$surveyB.obs[[1]],
-  unit = "", # yearly sum of number-at-age / mean(sum of number-at-age)
-  uncertainty = returnedom[["em_input"]]$cv.survey[[1]]
+  unit = "mt",
+  uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.survey[[1]])
 )
 
 ###############################################################################
@@ -86,7 +87,7 @@ age_data <- rbind(
   data.frame(
     name = names(returnedom[["em_input"]]$n.L),
     returnedom[["em_input"]]$L.age.obs$fleet1,
-    unit = "", # unit less values
+    unit = "proportion",
     uncertainty = returnedom[["em_input"]]$n.L$fleet1,
     datestart = as.Date(
       paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
@@ -100,7 +101,7 @@ age_data <- rbind(
   data.frame(
     name = names(returnedom[["om_output"]]$survey_age_comp)[1],
     returnedom[["em_input"]]$survey.age.obs[[1]],
-    unit = "",
+    unit = "number of fish in proportion",
     uncertainty = returnedom[["om_input"]][["n.survey"]][["survey1"]],
     datestart = as.Date(
       paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
@@ -111,10 +112,10 @@ age_data <- rbind(
       "%Y-%m-%d"
     )
   )
-) %>%
+) |>
   dplyr::mutate(
     type = "age"
-  ) %>%
+  ) |>
   tidyr::pivot_longer(
     cols = dplyr::starts_with("X"),
     names_prefix = "X",
@@ -164,7 +165,7 @@ unlink("FIMS_input_data.csv")
 
 usethis::use_data(data_mile1, overwrite = TRUE)
 rm(
-  check_ASSAMC,
+  check_ASSAMC, cv_2_sd,
   age_data, landings_data, index_data, weightatage_data,
   timingfishery, weightsfishery,
   data_mile1, returnedom,

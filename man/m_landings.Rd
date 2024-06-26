@@ -7,7 +7,7 @@
 m_landings(x)
 }
 \arguments{
-\item{x}{The object containing landings}
+\item{x}{The object containing landings.}
 }
 \description{
 Get the landings data to be used in the model
