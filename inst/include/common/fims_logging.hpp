@@ -1,5 +1,5 @@
-#ifndef FIMS_COMMON_FIMS_LOG
-#define FIMS_COMMON_FIMS_LOG 
+#ifndef FIMS_COMMON_FIMS_LOGGING
+#define FIMS_COMMON_FIMS_LOGGING 
 
 
 #include <cstdlib>
