@@ -103,7 +103,8 @@ namespace fims {
         std::vector<LogEntry> log_entries;
         size_t entry_number = 0;
         std::string path = "fims.log";
-
+        size_t warning_count = 0;
+        size_t error_count = 0;
         /**
          * Get username.
          * 
@@ -240,6 +241,7 @@ namespace fims {
          * @param func
          */
         void error_message(std::string str, int line, const char* file, const char* func) {
+            this->error_count++;
             std::filesystem::path cwd = std::filesystem::current_path();
 
             std::stringstream ss;
@@ -276,6 +278,7 @@ namespace fims {
          * @param func
          */
         void warning_message(std::string str, int line, const char* file, const char* func) {
+            this->warning_count++;
             std::filesystem::path cwd = std::filesystem::current_path();
 
             std::stringstream ss;
@@ -437,7 +440,13 @@ namespace fims {
             }
             return ss.str();
         }
+        size_t get_error_count() const {
+            return error_count;
+        }
 
+        size_t get_warning_count() const {
+            return warning_count;
+        }
 
 
 
@@ -460,9 +469,9 @@ namespace fims {
 
 #define FIMS_INFO_LOG(MESSAGE) fims::FIMSLog::fims_log->info_message(MESSAGE, __LINE__, __FILE__, __PRETTY_FUNCTION__);
 
-#define FIMS_WARNING(MESSAGE) fims::FIMSLog::fims_log->warning_message(MESSAGE, __LINE__, __FILE__, __PRETTY_FUNCTION__);
+#define FIMS_WARNING_LOG(MESSAGE) fims::FIMSLog::fims_log->warning_message(MESSAGE, __LINE__, __FILE__, __PRETTY_FUNCTION__);
 
-#define FIMS_ERROR(MESSAGE) fims::FIMSLog::fims_log->error_message(MESSAGE, __LINE__, __FILE__, __PRETTY_FUNCTION__);
+#define FIMS_ERROR_LOG(MESSAGE) fims::FIMSLog::fims_log->error_message(MESSAGE, __LINE__, __FILE__, __PRETTY_FUNCTION__);
 
 #define FIMS_STR(s) #s
 
