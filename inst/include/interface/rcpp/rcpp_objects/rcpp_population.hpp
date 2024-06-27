@@ -123,7 +123,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     if (this->nages == this->ages.size()) {
       population->ages.resize(this->nages);
     } else {
-      warning("The ages vector is not of size nages.");
+//      warning("The ages vector is not of size nages.");
     }
 
     population->growth_id = this->growth_id;
