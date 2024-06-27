@@ -22,6 +22,7 @@
 #include "def.hpp"
 #include "fims_vector.hpp"
 #include "model_object.hpp"
+
 #include "fims_log.hpp"
 
 namespace fims_info {
