@@ -12,7 +12,7 @@
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 
 #define RCPP_NO_SUGAR
-#include <Rcpp.h>
+#include "../../common/def.hpp"
 
 #include "rcpp_objects/rcpp_data.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
