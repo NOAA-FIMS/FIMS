@@ -386,14 +386,14 @@ fixedpars <- lapply(1:length(rcppobj), FUN = function(xx){
     
     #The fields will depend on the parameterization of selectivity
     infpoi <- tibble(parname = "inf_poi", 
-                     starting_value = sel$inflection_point$value,
+                     starting_value = maturity$inflection_point$value,
                      estimate = NA, sd = NA, gradient = NA, 
-                     estimated = sel$inflection_point$estimated)
+                     estimated = maturity$inflection_point$estimated)
     
     slope <- tibble(parname = "slo", 
-                    starting_value = sel$slope$value,
+                    starting_value = maturity$slope$value,
                     estimate = NA, sd = NA, gradient = NA, 
-                    estimated = sel$slope$estimated)
+                    estimated = maturity$slope$estimated)
     #Need to somehow identify the fleet these are associated with
     out <- rbind(infpoi, slope)
     out$parname <- paste0("mat-", out$parname)
