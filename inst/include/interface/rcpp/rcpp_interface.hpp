@@ -11,8 +11,8 @@
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 
-#define RCPP_NO_SUGAR
-#include "../../common/def.hpp"
+#include <Rinternals.h>
+
 
 #include "rcpp_objects/rcpp_data.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
