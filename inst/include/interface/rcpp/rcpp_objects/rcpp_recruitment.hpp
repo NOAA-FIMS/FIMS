@@ -88,9 +88,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     BevHolt.logit_steep = this->logit_steep.value_m;
     if (this->logit_steep.value_m == 1.0) {
-      warning(
-          "Steepness is subject to a logit transformation, so its value is "
-          "0.7848469. Fixing it at 1.0 is not currently possible.");
+//      Rcpp::warning(
+//          "Steepness is subject to a logit transformation, so its value is "
+//          "0.7848469. Fixing it at 1.0 is not currently possible.");
     }
 
     BevHolt.log_rzero = this->log_rzero.value_m;
