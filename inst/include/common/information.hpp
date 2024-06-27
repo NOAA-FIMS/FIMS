@@ -198,13 +198,16 @@ namespace fims_info {
                         valid_model = false;
 
                         FIMS_ERROR_LOG("Expected data observations not defined for fleet"
-                                + fims::to_string(f->id) + ", fleet_observed_index_data_id " + fims::to_string(observed_index_id));
+                                + fims::to_string(f->id) 
+                                + ", fleet_observed_index_data_id " 
+                                + fims::to_string(observed_index_id));
 
                     }
 
                 } else {
                     valid_model = false;
-                    FIMS_ERROR_LOG("Error: No index data observed for fleet " + fims::to_string(f->id)
+                    FIMS_ERROR_LOG("No index data observed for fleet " 
+                            + fims::to_string(f->id)
                             + ". FIMS requires index data for all fleets.");
                 }
                 // end set index data
@@ -222,7 +225,7 @@ namespace fims_info {
 
                     } else {
                         valid_model = false;
-                        FIMS_ERROR_LOG("Error: Expected age comp data observations not defined for fleet "
+                        FIMS_ERROR_LOG("Expected age comp data observations not defined for fleet "
                                 + fims::to_string(f->id)
                                 + ", observed_agecomp_data_id "
                                 + fims::to_string(observed_agecomp_id) + ".");
@@ -230,7 +233,7 @@ namespace fims_info {
 
                 } else {
                     valid_model = false;
-                    FIMS_ERROR_LOG("Error: No age comp data observed for fleet "
+                    FIMS_ERROR_LOG("No age comp data observed for fleet "
                             + fims::to_string(f->id)
                             + ". FIMS requires age comp data for all fleets.");
                 }
@@ -252,7 +255,7 @@ namespace fims_info {
 
                     } else {
                         valid_model = false;
-                        FIMS_ERROR_LOG("Error: Expected selectivity pattern not defined for fleet "
+                        FIMS_ERROR_LOG("Expected selectivity pattern not defined for fleet "
                                 + fims::to_string(f->id)
                                 + ", selectivity pattern "
                                 + fims::to_string(sel_id));
@@ -261,7 +264,7 @@ namespace fims_info {
 
                 } else {
                     valid_model = false;
-                    FIMS_ERROR_LOG("Error: No selectivity pattern defined for fleet "
+                    FIMS_ERROR_LOG("No selectivity pattern defined for fleet "
                             + fims::to_string(f->id)
                             + ". FIMS requires selectivity be defined for all fleets.");
 
@@ -464,6 +467,7 @@ namespace fims_info {
 
 
             FIMS_INFO_LOG("Completed initialization of all populations.");
+            
             FIMS_INFO_LOG("Completed FIMS model creation with "
                     + fims::to_string(fims::FIMSLog::fims_log->get_warning_count())
                     + " warnings and "
