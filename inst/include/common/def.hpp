@@ -15,7 +15,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include "fims_log.hpp"
+#include "fims_logging.hpp"
 
 // The following rows initialize default log files for outputing model progress
 // comments used to assist in diagnosing model issues and tracking progress.
@@ -47,33 +47,33 @@ std::ofstream DEBUG_LOG(
 #define TMB_FIMS_THIRD_ORDER AD<TMB_FIMS_SECOND_ORDER>
 #endif
 
-namespace fims {
-
-/**
- * A static class for FIMS logging.
- */
-
-class fims_log {
- public:
-  static std::map<std::string, std::ofstream>
-      FIMS_LOGS; /**< Map Log of files */
-  /**
-   * Static getter for retrieving a specific log file.
-   */
-  static std::ofstream& get(const std::string& l) {
-    typename std::map<std::string, std::ofstream>::iterator it;
-    it = fims_log::FIMS_LOGS.find(l);
-    if (it == fims_log::FIMS_LOGS.end()) {
-      std::ofstream& of = fims_log::FIMS_LOGS[l];
-      of.open(l.c_str());
-    }
-
-    return fims_log::FIMS_LOGS[l];
-  }
-};
-
-std::map<std::string, std::ofstream> fims_log::FIMS_LOGS;
-
-}  // namespace fims
+//namespace fims {
+//
+///**
+// * A static class for FIMS logging.
+// */
+//
+//class fims_log {
+// public:
+//  static std::map<std::string, std::ofstream>
+//      FIMS_LOGS; /**< Map Log of files */
+//  /**
+//   * Static getter for retrieving a specific log file.
+//   */
+//  static std::ofstream& get(const std::string& l) {
+//    typename std::map<std::string, std::ofstream>::iterator it;
+//    it = fims_log::FIMS_LOGS.find(l);
+//    if (it == fims_log::FIMS_LOGS.end()) {
+//      std::ofstream& of = fims_log::FIMS_LOGS[l];
+//      of.open(l.c_str());
+//    }
+//
+//    return fims_log::FIMS_LOGS[l];
+//  }
+//};
+//
+//std::map<std::string, std::ofstream> fims_log::FIMS_LOGS;
+//
+//}  // namespace fims
 
 #endif /* TRAITS_HPP */
