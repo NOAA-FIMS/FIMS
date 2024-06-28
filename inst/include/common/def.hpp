@@ -260,7 +260,7 @@ namespace fims {
          */
         void info_message(std::string str, int line, const char* file, const char* func) {
 
-            std::__fs::filesystem::path cwd = std::__fs::filesystem::current_path();
+            std::filesystem::path cwd =std::filesystem::current_path();
             std::stringstream ss;
             auto now = std::chrono::system_clock::now();
             std::time_t now_time = std::chrono::system_clock::to_time_t(now);
@@ -290,7 +290,7 @@ namespace fims {
          */
         void debug_message(std::string str, int line, const char* file, const char* func) {
 
-            std::__fs::filesystem::path cwd = std::__fs::filesystem::current_path();
+            std::filesystem::path cwd = std::filesystem::current_path();
             std::stringstream ss;
             auto now = std::chrono::system_clock::now();
             std::time_t now_time = std::chrono::system_clock::to_time_t(now);
@@ -320,7 +320,7 @@ namespace fims {
          */
         void error_message(std::string str, int line, const char* file, const char* func) {
             this->error_count++;
-            std::__fs::filesystem::path cwd = std::__fs::filesystem::current_path();
+            std::filesystem::path cwd = std::filesystem::current_path();
 
             std::stringstream ss;
             auto now = std::chrono::system_clock::now();
@@ -357,7 +357,7 @@ namespace fims {
          */
         void warning_message(std::string str, int line, const char* file, const char* func) {
             this->warning_count++;
-            std::__fs::filesystem::path cwd = std::__fs::filesystem::current_path();
+            std::filesystem::path cwd = std::filesystem::current_path();
 
             std::stringstream ss;
             auto now = std::chrono::system_clock::now();
