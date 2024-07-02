@@ -577,3 +577,5 @@ setup_and_run_FIMS_by_core <- function(core_id,
   return(results)
   closeAllConnections()
 }
+
+
