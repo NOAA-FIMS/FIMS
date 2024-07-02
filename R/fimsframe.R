@@ -225,27 +225,8 @@ setValidity(
       errors <- c(errors, "data must have at least one row")
     }
 
-    # Check columns
-    if (!"type" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'type'")
+    errors <- c(errors, validate_data_colnames(object@data))
     }
-    if (!"datestart" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'datestart'")
-    }
-    if (!"dateend" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'dateend'")
-    }
-    if (!"dateend" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'value'")
-    }
-    if (!"dateend" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'unit'")
-    }
-    if (!"dateend" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'uncertainty'")
-    }
-    if (!"age" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'age'")
     }
 
     # TODO: Add checks for other slots
@@ -258,6 +239,36 @@ setValidity(
     }
   }
 )
+
+validate_data_colnames <- function(data) {
+  the_column_names <- colnames(data)
+  errors <- character()
+  if (!"type" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'type'")
+  }
+  if (!"name" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'name'")
+  }
+  if (!"datestart" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'datestart'")
+  }
+  if (!"dateend" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'dateend'")
+  }
+  if (!"dateend" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'value'")
+  }
+  if (!"dateend" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'unit'")
+  }
+  if (!"dateend" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'uncertainty'")
+  }
+  if (!"age" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'age'")
+  }
+  return(errors)
+}
 
 # Constructors ----
 # All constructors in this file are documented in 1 roxygen file via @rdname.
@@ -281,6 +292,13 @@ setValidity(
 #' on the child class. Use [showClass()] to see all available slots.
 #' @export
 FIMSFrame <- function(data) {
+  errors <- validate_data_colnames(data)
+  if (length(errors) > 0) {
+    stop(
+      "Check the columns of your data, the following are missing:\n",
+      paste(errors, sep = "\n", collapse = "\n")
+    )
+  }
   # Get the earliest and latest year of data and use to calculate n years for
   # population simulation
   start_year <- as.integer(
