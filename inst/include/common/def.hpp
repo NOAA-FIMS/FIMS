@@ -197,8 +197,8 @@ namespace fims {
             user_ret = std::string(user);
 #endif
 #ifdef FIMS_LINUX
-//            user = getenv("USERNAME");
-//            user_ret = std::string(user);
+            user = getenv("USER");
+            user_ret = std::string(user);
 #endif
 
 #ifdef FIMS_MACOS
