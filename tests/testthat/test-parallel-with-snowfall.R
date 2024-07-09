@@ -22,13 +22,13 @@ for (i in 1:length(om_input_list)) {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE)
+    estimation_mode = TRUE
+  )
 }
 end_time_serial <- Sys.time()
 estimation_time_serial <- end_time_serial - start_time_serial
 
 test_that("Run FIMS in parallel using {snowfall}", {
-
   core_num <- parallel::detectCores() - 1
   snowfall::sfInit(parallel = TRUE, cpus = core_num)
   start_time_parallel <- Sys.time()
@@ -39,7 +39,8 @@ test_that("Run FIMS in parallel using {snowfall}", {
     om_input_list,
     om_output_list,
     em_input_list,
-    TRUE)
+    TRUE
+  )
 
   end_time_parallel <- Sys.time()
 
@@ -53,17 +54,22 @@ test_that("Run FIMS in parallel using {snowfall}", {
 
   # Compare parameters in results:
   # Verify that the results from both runs are equivalent.
-  expect_setequal(unname(unlist(lapply(results_parallel, `[[`, "parameters"))),
-                  unname(unlist(lapply(estimation_results_serial, `[[`, "parameters"))))
+  expect_setequal(
+    unname(unlist(lapply(results_parallel, `[[`, "parameters"))),
+    unname(unlist(lapply(estimation_results_serial, `[[`, "parameters")))
+  )
 
   # Compare sdr_fixed values in results:
   # Verify that the results from both runs are equivalent.
-  expect_setequal(unlist(lapply(results_parallel, `[[`, "sdr_fixed")),
-                  unlist(lapply(estimation_results_serial, `[[`, "sdr_fixed")))
+  expect_setequal(
+    unlist(lapply(results_parallel, `[[`, "sdr_fixed")),
+    unlist(lapply(estimation_results_serial, `[[`, "sdr_fixed"))
+  )
 
   # Compare sdr_report values in results:
   # Verify that the results from both runs are equivalent.
-  expect_setequal(unlist(lapply(results_parallel, `[[`, "sdr_report")),
-                  unlist(lapply(estimation_results_serial, `[[`, "sdr_report")))
-
+  expect_setequal(
+    unlist(lapply(results_parallel, `[[`, "sdr_report")),
+    unlist(lapply(estimation_results_serial, `[[`, "sdr_report"))
+  )
 })
