@@ -156,13 +156,12 @@ setup_and_run_FIMS <- function(iter_id,
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameters <- list(p = get_fixed())
-  obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", silent=TRUE)
+  obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", silent = TRUE)
 
-  if (estimation_mode == TRUE){
-
+  if (estimation_mode == TRUE) {
     opt <- with(obj, optim(par, fn, gr,
-                           method = "BFGS",
-                           control = list(maxit = 1000000, reltol = 1e-15)
+      method = "BFGS",
+      control = list(maxit = 1000000, reltol = 1e-15)
     ))
   }
   # Call report using MLE parameter values, or

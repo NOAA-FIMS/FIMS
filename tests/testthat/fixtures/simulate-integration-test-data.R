@@ -36,7 +36,7 @@ on.exit(setwd(working_dir), add = TRUE)
 # .RData files and save them into one file
 om_input_list <- om_output_list <- em_input_list <-
   vector(mode = "list", length = sim_num)
-for (i in 1:sim_num){
+for (i in 1:sim_num) {
   load(file.path(maindir, "FIMS_100iter", "output", "OM", paste0("OM", i, ".RData")))
   om_input_list[[i]] <- om_input
   om_output_list[[i]] <- om_output
@@ -44,4 +44,5 @@ for (i in 1:sim_num){
 }
 
 save(om_input_list, om_output_list, em_input_list,
-     file = test_path("fixtures", "integration_test_data.RData"))
+  file = test_path("fixtures", "integration_test_data.RData")
+)
