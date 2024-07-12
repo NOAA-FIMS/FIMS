@@ -1,17 +1,61 @@
-# Set-up Rcpp modules and fix parameters to "true" values from the OM
+#' Set Up and Run FIMS Model
+#'
+#' This function sets up and runs the FIMS for a given iteration.
+#' It configures the model with the OM inputs and outputs (see simulated data from
+#' tests/testthat/fixtures/simulate-integration-test-data.R),
+#' and runs the optimization process.
+#' It then generates and returns the results including parameter estimates, model
+#' reports, and standard deviation reports.
+#'
+#' @param iter_id An integer specifying the iteration ID to use for loading
+#' the OM data.
+#' @param om_input_list A list of OM inputs, where each element
+#' corresponds to a different iteration.
+#' @param om_output_list A list of OM outputs, where each element
+#' corresponds to a different iteration.
+#' @param em_input_list A list of EM inputs, where each element
+#' corresponds to a different iteration.
+#' @param estimation_mode A logical value indicating whether to perform
+#' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
+#' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
+#' for the report.
+#' @param map A list used to specify mapping for the `MakeADFun` function from
+#' the TMB package.
+#'
+#' @return A list containing the following elements:
+#' \itemize{
+#'   \item{parameters:} A list of parameters for the TMB model.
+#'   \item{obj:} The TMB model object created by `TMB::MakeADFun`.
+#'   \item{opt:} The result of the optimization process, if `estimation_mode`
+#'   is `TRUE`. `NULL` if `estimation_mode` is `FALSE`.
+#'   \item{report:} The model report obtained from the TMB model.
+#'   \item{sdr_report:} Summary of the standard deviation report for the
+#'   model parameters.
+#'   \item{sdr_fixed:} Summary of the standard deviation report for the
+#'   fixed parameters.
+#' }
+#' @examples
+#' results <- setup_and_run_FIMS(
+#'   iter_id = 1,
+#'   om_input_list = om_input_list,
+#'   om_output_list = om_output_list,
+#'   em_input_list = em_input_list,
+#'   estimation_mode = TRUE
+#' )
 setup_and_run_FIMS <- function(iter_id,
                                om_input_list,
                                om_output_list,
                                em_input_list,
-                               estimation_mode = TRUE) {
-  # set.seed(seed = 123)
-
-  # Load operating model data
+                               estimation_mode = TRUE,
+                               map = list()) {
+  # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]]
   om_output <- om_output_list[[iter_id]]
   em_input <- em_input_list[[iter_id]]
 
+  # Clear any previous FIMS settings
   clear()
+
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
@@ -43,7 +87,6 @@ setup_and_run_FIMS <- function(iter_id,
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
   recruitment$log_devs <- om_input$logR.resid[-1]
-
 
   # Data
   catch <- em_input$L.obs$fleet1
@@ -156,13 +199,17 @@ setup_and_run_FIMS <- function(iter_id,
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameters <- list(p = get_fixed())
-  obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", silent = TRUE)
+  obj <- TMB::MakeADFun(
+    data = list(), parameters, DLL = "FIMS",
+    silent = TRUE, map = map
+  )
 
+  # Optimization with nlminb
+  opt <- NULL
   if (estimation_mode == TRUE) {
-    opt <- with(obj, optim(par, fn, gr,
-      method = "BFGS",
-      control = list(maxit = 1000000, reltol = 1e-15)
-    ))
+    opt <- stats::nlminb(obj$par, obj$fn, obj$gr,
+      control = list(eval.max = 800, iter.max = 800)
+    )
   }
   # Call report using MLE parameter values, or
   # the initial values if optimization is skipped
@@ -174,12 +221,228 @@ setup_and_run_FIMS <- function(iter_id,
 
   clear()
 
-  # end of setup_fims function, returning test_env
+  # Return the results as a list
   return(list(
     parameters = parameters,
     obj = obj,
+    opt = opt,
     report = report,
     sdr_report = sdr_report,
     sdr_fixed = sdr_fixed
   ))
+}
+
+#' Validate FIMS Model Output
+#'
+#' This function validates the output from the FIMS
+#' against the known OM values.
+#' It performs various checks to ensure that the estimates provided by the FIMS
+#' are within acceptable tolerance compared to the operating model values.
+#'
+#' @param report A list containing the results of the TMB model report. This
+#' includes the estimated recruitment numbers and other relevant metrics.
+#' @param sdr A list containing the standard deviation report from the TMB model.
+#' @param sdr_report A matrix containing the summary of the standard deviation report.
+#' @param om_input A list containing the operating model inputs, such as years,
+#' ages, and other parameters.
+#' @param om_output A list containing the operating model outputs, including metrics
+#' such as numbers at age, biomass, spawning biomass, fishing mortality, and survey indices.
+#' @param em_input A list containing the estimation model inputs, including observed
+#' catches, survey indices, and other relevant data.
+#'
+#' @return None. The function uses `testthat` functions to perform validations.
+#' It ensures that the output is within the expected range of error based on
+#' standard deviations provided.
+#'
+#' @examples
+#' # Assume `result` is a list of outputs obtained from running `setup_and_run_FIMS()`.
+#' # The `result` list contains components such as `report`, `sdr_report`, and `obj`.
+#'
+#' validate_fims(
+#'  report = result$report,
+#'  sdr = TMB::sdreport(result$obj),
+#'  sdr_report = result$sdr_report,
+#'  om_input = om_input_list[[1]],
+#'  om_output = om_output_list[[1]],
+#'  em_input = em_input_list[[1]]
+#' )
+#'
+#' #' Note: Some sections of the function have commented-out code for additional checks
+#' that are not currently active.
+validate_fims <- function(
+    report,
+    sdr,
+    sdr_report,
+    om_input,
+    om_output,
+    em_input) {
+
+  # Numbers at age
+  # Estimates and SE for NAA
+  sdr_naa <- sdr_report[which(rownames(sdr_report) == "NAA"), ]
+  naa_are <- rep(0, length(c(t(om_output$N.age))))
+  for (i in 1:length(c(t(om_output$N.age)))) {
+    naa_are[i] <- abs(sdr_naa[i, 1] - c(t(om_output$N.age))[i])
+  }
+  # Expect 95% of absolute error to be within 2*SE of NAA
+  expect_lte(
+    sum(naa_are > qnorm(.975) * sdr_naa[1:length(c(t(om_output$N.age))), 2]),
+    0.05 * length(c(t(om_output$N.age)))
+  )
+
+  # Biomass
+  sdr_biomass <- sdr_report[which(rownames(sdr_report) == "Biomass"), ]
+  biomass_are <- rep(0, length(om_output$biomass.mt))
+  for (i in 1:length(om_output$biomass.mt)) {
+    biomass_are[i] <- abs(sdr_biomass[i, 1] - om_output$biomass.mt[i]) # / om_output$biomass.mt[i]
+    # expect_lte(biomass_are[i], 0.15)
+  }
+  expect_lte(
+    sum(biomass_are > qnorm(.975) * sdr_biomass[1:length(om_output$biomass.mt), 2]),
+    0.05 * length(om_output$biomass.mt)
+  )
+
+  # Spawning biomass
+  sdr_sb <- sdr_report[which(rownames(sdr_report) == "SSB"), ]
+  sb_are <- rep(0, length(om_output$SSB))
+  for (i in 1:length(om_output$SSB)) {
+    sb_are[i] <- abs(sdr_sb[i, 1] - om_output$SSB[i]) # / om_output$SSB[i]
+    # expect_lte(sb_are[i], 0.15)
+  }
+  expect_lte(
+    sum(sb_are > qnorm(.975) * sdr_sb[1:length(om_output$SSB), 2]),
+    0.05 * length(om_output$SSB)
+  )
+
+  # Recruitment
+  fims_naa <- matrix(report$naa[[1]][1:(om_input$nyr * om_input$nages)],
+    nrow = om_input$nyr, byrow = TRUE
+  )
+  sdr_naa1_vec <- sdr_report[which(rownames(sdr_report) == "NAA"), 2]
+  sdr_naa1 <- sdr_naa1_vec[seq(1, om_input$nyr * om_input$nages, by = om_input$nages)]
+  fims_naa1_are <- rep(0, om_input$nyr)
+  for (i in 1:om_input$nyr) {
+    fims_naa1_are[i] <- abs(fims_naa[i, 1] - om_output$N.age[i, 1]) # /
+    # om_output$N.age[i, 1]
+    # expect_lte(fims_naa1_are[i], 0.25)
+  }
+  expect_lte(
+    sum(fims_naa1_are > qnorm(.975) * sdr_naa1[1:length(om_output$SSB)]),
+    0.05 * length(om_output$SSB)
+  )
+
+  expect_equal(
+    fims_naa[, 1],
+    report$recruitment[[1]][1:om_input$nyr]
+  )
+
+  # recruitment log deviations
+  # the initial value of om_input$logR.resid is dropped from the model
+  sdr_rdev <- sdr_report[which(rownames(sdr_report) == "LogRecDev"), ]
+  rdev_are <- rep(0, length(om_input$logR.resid) - 1)
+
+  for (i in 1:(length(report$log_recruit_dev[[1]]) - 1)) {
+    rdev_are[i] <- abs(report$log_recruit_dev[[1]][i] - om_input$logR.resid[i + 1]) # /
+    #   exp(om_input$logR.resid[i])
+    # expect_lte(rdev_are[i], 1) # 1
+  }
+  expect_lte(
+    sum(rdev_are > qnorm(.975) * sdr_rdev[1:length(om_input$logR.resid) - 1, 2]),
+    0.05 * length(om_input$logR.resid)
+  )
+
+  # F (needs to be updated when std.error is available)
+  sdr_F <- sdr_report[which(rownames(sdr_report) == "FMort"), ]
+  f_are <- rep(0, length(om_output$f))
+  for (i in 1:length(om_output$f)) {
+    f_are[i] <- abs(sdr_F[i, 1] - om_output$f[i])
+  }
+  # Expect 95% of absolute error to be within 2*SE of Fmort
+  expect_lte(
+    sum(f_are > qnorm(.975) * sdr_F[1:length(om_output$f), 2]),
+    0.05 * length(om_output$f)
+  )
+
+  # Expected fishery catch and survey index
+  fims_index <- sdr_report[which(rownames(sdr_report) == "ExpectedIndex"), ]
+  fims_catch <- fims_index[1:om_input$nyr, ]
+  fims_survey <- fims_index[(om_input$nyr + 1):(om_input$nyr * 2), ]
+
+  # Expected fishery catch - om_output
+  catch_are <- rep(0, length(om_output$L.mt$fleet1))
+  for (i in 1:length(om_output$L.mt$fleet1)) {
+    catch_are[i] <- abs(fims_catch[i, 1] - om_output$L.mt$fleet1[i])
+  }
+  # Expect 95% of absolute error to be within 2*SE of fishery catch
+  expect_lte(
+    sum(catch_are > qnorm(.975) * fims_catch[, 2]),
+    0.05 * length(om_output$L.mt$fleet1)
+  )
+
+  # Expected fishery catch - em_input
+  catch_are <- rep(0, length(em_input$L.obs$fleet1))
+  for (i in 1:length(em_input$L.obs$fleet1)) {
+    catch_are[i] <- abs(fims_catch[i, 1] - em_input$L.obs$fleet1[i])
+  }
+  # Expect 95% of absolute error to be within 2*SE of fishery catch
+  expect_lte(
+    sum(catch_are > qnorm(.975) * fims_catch[, 2]),
+    0.05 * length(em_input$L.obs$fleet1)
+  )
+
+
+  # Expected fishery catch number at age
+  sdr_cnaa <- sdr_report[which(rownames(sdr_report) == "CNAA"), ]
+  cnaa_are <- rep(0, length(c(t(om_output$L.age$fleet1))))
+  for (i in 1:length(c(t(om_output$L.age$fleet1)))) {
+    cnaa_are[i] <- abs(sdr_cnaa[i, 1] - c(t(om_output$L.age$fleet1))[i])
+  }
+  # Expect 95% of absolute error to be within 2*SE of CNAA
+  expect_lte(
+    sum(cnaa_are > qnorm(.975) * sdr_cnaa[, 2]),
+    0.05 * length(c(t(om_output$L.age$fleet1)))
+  )
+
+  # Expected survey index - om_output
+  index_are <- rep(0, length(om_output$survey_index_biomass$survey1))
+  for (i in 1:length(om_output$survey_index_biomass$survey1)) {
+    index_are[i] <- abs(fims_survey[i, 1] - om_output$survey_index_biomass$survey1[i])
+  }
+  # Expect 95% of absolute error to be within 2*SE of survey index
+  expect_lte(
+    sum(index_are > qnorm(.975) * fims_survey[, 2]),
+    0.05 * length(om_output$survey_index_biomass$survey1)
+  )
+
+  # Expected survey index - em_input
+  index_are <- rep(0, length(em_input$surveyB.obs$survey1))
+  for (i in 1:length(em_input$surveyB.obs$survey1)) {
+    index_are[i] <- abs(fims_survey[i, 1] - em_input$surveyB.obs$survey1[i])
+  }
+  # # Expect 95% of absolute error to be within 2*SE of survey index
+  # expect_lte(
+  #   sum(index_are > qnorm(.975) * fims_survey[, 2]),
+  #   0.05 * length(em_input$surveyB.obs$survey1)
+  # )
+
+  for (i in 1:length(em_input$surveyB.obs$survey1)) {
+    expect_lte(abs(fims_survey[i, 1] - em_input$surveyB.obs$survey1[i]) /
+      em_input$surveyB.obs$survey1[i], 0.25)
+  }
+
+  # Expected survey number at age
+  # for (i in 1:length(c(t(om_output$survey_age_comp$survey1)))){
+  #   expect_lte(abs(report$cnaa[i,2] - c(t(om_output$survey_age_comp$survey1))[i])/
+  #                c(t(om_output$survey_age_comp$survey1))[i], 0.001)
+  # }
+
+  # Expected catch number at age in proportion
+  # fims_cnaa <- matrix(report$cnaa[1:(om_input$nyr*om_input$nages), 2],
+  #                     nrow = om_input$nyr, byrow = TRUE)
+  # fims_cnaa_proportion <- fims_cnaa/rowSums(fims_cnaa)
+  #
+  # for (i in 1:length(c(t(em_input$survey.age.obs)))){
+  #   expect_lte(abs(c(t(fims_cnaa_proportion))[i] - c(t(em_input$L.age.obs$fleet1))[i])/
+  #                c(t(em_input$L.age.obs$fleet1))[i], 0.15)
+  # }
 }
