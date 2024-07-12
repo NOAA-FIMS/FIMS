@@ -73,7 +73,7 @@ test_that("Show method works as expected", {
 
 test_that("Validators work as expected", {
   bad_input <- data.frame(test = 1, test2 = 2)
-  expect_warning(expect_error(FIMSFrame(bad_input)))
+  expect_error(FIMSFrame(bad_input))
 })
 
 n_years <- fims_frame@n_years
