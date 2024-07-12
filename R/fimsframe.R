@@ -225,30 +225,24 @@ setValidity(
       errors <- c(errors, "data must have at least one row")
     }
 
-    # Check columns
-    if (!"type" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'type'")
-    }
-    if (!"datestart" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'datestart'")
-    }
-    if (!"dateend" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'dateend'")
-    }
-    if (!"dateend" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'value'")
-    }
-    if (!"dateend" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'unit'")
-    }
-    if (!"dateend" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'uncertainty'")
-    }
-    if (!"age" %in% colnames(object@data)) {
-      errors <- c(errors, "data must contain 'age'")
-    }
+    errors <- c(errors, validate_data_colnames(object@data))
 
-    # TODO: Add checks for other slots
+    # Add checks for other slots
+    # Check the format for acceptable variants of the ideal yyyy-mm-dd
+    grepl_datestart <- grepl(
+      "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
+      data_mile1[["datestart"]]
+    )
+    grepl_dateend <- grepl(
+      "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
+      data_mile1[["dateend"]]
+    )
+    if (!all(grepl_datestart)) {
+      errors <- c(errors, "datestart must be in 'yyyy-mm-dd' format")
+    }
+    if (!all(grepl_dateend)) {
+      errors <- c(errors, "dateend must be in 'yyyy-mm-dd' format")
+    }
 
     # Return
     if (length(errors) == 0) {
@@ -258,6 +252,36 @@ setValidity(
     }
   }
 )
+
+validate_data_colnames <- function(data) {
+  the_column_names <- colnames(data)
+  errors <- character()
+  if (!"type" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'type'")
+  }
+  if (!"name" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'name'")
+  }
+  if (!"datestart" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'datestart'")
+  }
+  if (!"dateend" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'dateend'")
+  }
+  if (!"dateend" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'value'")
+  }
+  if (!"dateend" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'unit'")
+  }
+  if (!"dateend" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'uncertainty'")
+  }
+  if (!"age" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'age'")
+  }
+  return(errors)
+}
 
 # Constructors ----
 # All constructors in this file are documented in 1 roxygen file via @rdname.
@@ -281,14 +305,30 @@ setValidity(
 #' on the child class. Use [showClass()] to see all available slots.
 #' @export
 FIMSFrame <- function(data) {
-  # Get the earliest and latest year of data and use to calculate n years for
-  # population simulation
-  start_year <- as.integer(
-    strsplit(min(data[["datestart"]], na.rm = TRUE), "-")[[1]][1]
-  )
-  end_year <- as.integer(
-    strsplit(max(data[["dateend"]], na.rm = TRUE), "-")[[1]][1]
-  )
+  errors <- validate_data_colnames(data)
+  if (length(errors) > 0) {
+    stop(
+      "Check the columns of your data, the following are missing:\n",
+      paste(errors, sep = "\n", collapse = "\n")
+    )
+  }
+  # datestart and dateend need to be date classes so leading zeros are present
+  # but writing and reading from csv file removes the classes so they must be
+  # enforced here
+  # e.g., 0004-01-01 for January 01 0004
+  date_formats <- c("%Y-%m-%d")
+  data[["datestart"]] <- as.Date(data[["datestart"]], tryFormats = date_formats)
+  data[["dateend"]] <- as.Date(data[["dateend"]], tryFormats = date_formats)
+
+  # Get the earliest and latest year formatted as a string of 4 integers
+  start_year <- as.integer(format(
+    as.Date(min(data[["datestart"]], na.rm = TRUE), tryFormats = date_formats),
+    "%Y"
+  ))
+  end_year <- as.integer(format(
+    as.Date(max(data[["dateend"]], na.rm = TRUE), tryFormats = date_formats),
+    "%Y"
+  ))
   n_years <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
 
