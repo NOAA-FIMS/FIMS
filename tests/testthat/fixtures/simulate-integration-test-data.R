@@ -11,8 +11,8 @@ maindir <- tempdir()
 model_input <- ASSAMC::save_initial_input()
 
 # Configure the input parameters for the simulation
-sim_num <- 100
-FIMS_100iter <- ASSAMC::save_initial_input(
+sim_num <- 150
+sim_input <- ASSAMC::save_initial_input(
   base_case = TRUE,
   input_list = model_input,
   maindir = maindir,
@@ -20,12 +20,12 @@ FIMS_100iter <- ASSAMC::save_initial_input(
   keep_sim_num = sim_num,
   figure_number = 1,
   seed_num = 9924,
-  case_name = "FIMS_100iter"
+  case_name = "sim_data"
 )
 
 # Run OM and generate om_input, om_output, and em_input
 # using function from the model comparison project
-ASSAMC::run_om(input_list = FIMS_100iter)
+ASSAMC::run_om(input_list = sim_input)
 
 on.exit(unlink(maindir, recursive = TRUE), add = TRUE)
 
@@ -37,7 +37,7 @@ on.exit(setwd(working_dir), add = TRUE)
 om_input_list <- om_output_list <- em_input_list <-
   vector(mode = "list", length = sim_num)
 for (i in 1:sim_num) {
-  load(file.path(maindir, "FIMS_100iter", "output", "OM", paste0("OM", i, ".RData")))
+  load(file.path(maindir, "sim_data", "output", "OM", paste0("OM", i, ".RData")))
   om_input_list[[i]] <- om_input
   om_output_list[[i]] <- om_output
   em_input_list[[i]] <- em_input
