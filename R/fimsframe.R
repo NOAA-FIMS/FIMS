@@ -14,7 +14,8 @@ setClass(
   Class = "FIMSFrame",
   slots = c(
     data = "data.frame", # can use c( ) or list here.
-    fleets = "numeric",
+    n_fleets = "numeric",
+    fleets = "character",
     n_years = "integer",
     ages = "numeric",
     n_ages = "integer",
@@ -45,6 +46,9 @@ setMethod("get_data", "FIMSFrame", function(x) x@data)
 # example: so we can call fleets(obj) instead of obj@fleets
 setGeneric("fleets", function(x) standardGeneric("fleets"))
 setMethod("fleets", "FIMSFrame", function(x) x@fleets)
+
+setGeneric("n_fleets", function(x) standardGeneric("n_fleets"))
+setMethod("n_fleets", "FIMSFrame", function(x) x@n_fleets)
 
 setGeneric("n_years", function(x) standardGeneric("n_years"))
 setMethod("n_years", "FIMSFrame", function(x) x@n_years)
@@ -244,6 +248,10 @@ setValidity(
       errors <- c(errors, "dateend must be in 'yyyy-mm-dd' format")
     }
 
+    if (object@n_fleets != length(object@fleets)) {
+      errors <- c(errors, "length of fleets must be equal to n_fleets")
+    }
+
     # Return
     if (length(errors) == 0) {
       return(TRUE)
@@ -333,10 +341,7 @@ FIMSFrame <- function(data) {
   years <- start_year:end_year
 
   # Get the fleets represented in the data
-  fleets <- unique(data[["name"]])[grep("fleet", unique(data[["name"]]))]
-  fleets <- as.numeric(
-    unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2]))
-  )
+  fleets <- unique(data[["name"]])
   n_fleets <- length(fleets)
   # Make empty NA data frames in the format needed to pass to FIMS
   # Get the range of ages displayed in the data to use to specify population
@@ -352,6 +357,7 @@ FIMSFrame <- function(data) {
   out <- new("FIMSFrame",
     data = data,
     fleets = fleets,
+    n_fleets = n_fleets,
     n_years = n_years,
     start_year = start_year,
     end_year = end_year,
