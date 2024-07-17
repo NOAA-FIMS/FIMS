@@ -22,33 +22,34 @@
  * define different Rcpp interfaces for each possible maturity function
  */
 class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
- public:
-  static uint32_t id_g; /**< static id of the recruitment interface base*/
-  uint32_t id;          /**< id of the recruitment interface base */
-  // live objects in C++ are objects that have been created and live in memory
-  static std::map<uint32_t, MaturityInterfaceBase*>
-      live_objects; /**< map associating the ids of
+public:
+    static uint32_t id_g; /**< static id of the recruitment interface base*/
+    uint32_t id; /**< id of the recruitment interface base */
+    // live objects in C++ are objects that have been created and live in memory
+    static std::map<uint32_t, MaturityInterfaceBase*>
+    live_objects; /**< map associating the ids of
                                 MaturityInterfaceBase to the objects */
 
-  MaturityInterfaceBase() {
-    this->id = MaturityInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    MaturityInterfaceBase */
-    MaturityInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
+    MaturityInterfaceBase() {
+        this->id = MaturityInterfaceBase::id_g++;
+        /* Create instance of map: key is id and value is pointer to
+        MaturityInterfaceBase */
+        MaturityInterfaceBase::live_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
 
-  virtual ~MaturityInterfaceBase() {}
+    virtual ~MaturityInterfaceBase() {
+    }
 
-  /** @brief get the ID of the interface base object
-   */
-  virtual uint32_t get_id() = 0;
+    /** @brief get the ID of the interface base object
+     */
+    virtual uint32_t get_id() = 0;
 
-  /**
-   * @brief evaluate the function
-   *
-   */
-  virtual double evaluate(double x) = 0;
+    /**
+     * @brief evaluate the function
+     *
+     */
+    virtual double evaluate(double x) = 0;
 };
 
 uint32_t MaturityInterfaceBase::id_g = 1;
@@ -59,74 +60,153 @@ std::map<uint32_t, MaturityInterfaceBase*> MaturityInterfaceBase::live_objects;
  * instantiate from R: logistic_maturity <- new(logistic_maturity)
  */
 class LogisticMaturityInterface : public MaturityInterfaceBase {
- public:
-  Parameter
-      inflection_point; /**< the index value at which the response reaches .5 */
-  Parameter slope;      /**< the width of the curve at the inflection_point */
+public:
+    Parameter
+    inflection_point; /**< the index value at which the response reaches .5 */
+    Parameter slope; /**< the width of the curve at the inflection_point */
 
-  LogisticMaturityInterface() : MaturityInterfaceBase() {}
+    double estimated_inflection_point; /**< estimmated result of the index value at which the response reaches .5 */
+    double estimated_slope; /**< estimmated result of the width of the curve at the inflection_point */
 
-  virtual ~LogisticMaturityInterface() {}
+    LogisticMaturityInterface() : MaturityInterfaceBase() {
+    }
 
-  /** @brief returns the id for the logistic maturity interface */
-  virtual uint32_t get_id() { return this->id; }
+    virtual ~LogisticMaturityInterface() {
+    }
 
-  /** @brief evaluate the logistic maturity function
-   *   @param x  The independent variable in the logistic function (e.g., age or
-   * size in maturity).
-   */
-  virtual double evaluate(double x) {
-    fims_popdy::LogisticMaturity<double> LogisticMat;
-    LogisticMat.inflection_point = this->inflection_point.value_m;
-    LogisticMat.slope = this->slope.value_m;
-    return LogisticMat.evaluate(x);
-  }
+    /** @brief returns the id for the logistic maturity interface */
+    virtual uint32_t get_id() {
+        return this->id;
+    }
+
+    /** @brief evaluate the logistic maturity function
+     *   @param x  The independent variable in the logistic function (e.g., age or
+     * size in maturity).
+     */
+    virtual double evaluate(double x) {
+        fims_popdy::LogisticMaturity<double> LogisticMat;
+        LogisticMat.inflection_point = this->inflection_point.value_m;
+        LogisticMat.slope = this->slope.value_m;
+        return LogisticMat.evaluate(x);
+    }
+
+    virtual void finalize() {
+
+        if (this->finalized) {
+            //log warning that finalize has been called more than once.
+            FIMS_WARNING_LOG("Logistic Maturity " + fims::to_string(this->id) + " has been finalized already.");
+        }
+
+        this->finalized = true; //indicate this has been called already
+
+        std::shared_ptr<fims_info::Information<double> > info =
+                fims_info::Information<double>::GetInstance();
+
+
+        //set default values as initial values
+        this->estimated_inflection_point = this->inflection_point.value_m;
+        this->estimated_slope = this->slope.value_m;
+
+        fims_info::Information<double>::maturity_models_iterator it;
+
+        //search for maturity in Information
+        it = info->maturity_models.find(this->id);
+        //if not found, just return
+        if (it == info->maturity_models.end()) {
+            FIMS_WARNING_LOG("Logistic Maturity " + fims::to_string(this->id) + " not found in Information.");
+            return;
+        } else {
+            std::shared_ptr<fims_popdy::LogisticMaturity<double> > mat =
+                    std::dynamic_pointer_cast<fims_popdy::LogisticMaturity<double> >(it->second);
+
+            // if the parameter was estimated, set set the estimated value.
+            if (this->inflection_point.estimated_m) {
+                this->estimated_inflection_point = mat->inflection_point;
+            }
+
+            if (this->slope.estimated_m) {
+                this->estimated_slope = mat->slope;
+            }
+        }
+
+    }
+
+    virtual std::string to_json() {
+        std::stringstream ss;
+        ss << "\"module\" : {\n";
+        ss << " \"name\": \"maturity\",\n";
+        ss << " \"type\": \"Logistic\",\n";
+        ss << " \"id\": " << this->id << ",\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "   \"name\": \"inflection_point\",\n";
+        ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
+        ss << "   \"type\": \"scalar\",\n";
+        ss << "   \"value\":" << this->inflection_point.value_m << ",\n";
+        ss << "   \"estimated_value\":" << this->estimated_inflection_point << ",\n";
+        ss << "   \"is_estimated\":" << this->inflection_point.estimated_m << ",\n";
+        ss << "   \"is_random_effect\":" << this->inflection_point.is_random_effect_m << "\n },\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "   \"name\": \"slope\",\n";
+        ss << "   \"id\":" << this->slope.id_m << ",\n";
+        ss << "   \"type\": \"scalar\",\n";
+        ss << "   \"value\":" << this->slope.value_m << ",\n";
+        ss << "   \"estimated_value\":" << this->estimated_slope << ",\n";
+        ss << "   \"is_estimated\":" << this->slope.estimated_m << ",\n";
+        ss << "   \"is_random_effect\":" << this->slope.is_random_effect_m << "\n }\n";
+
+
+        ss << "}";
+
+        return ss.str();
+    }
 
 #ifdef TMB_MODEL
 
-  template <typename Type>
-  bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
-        fims_info::Information<Type>::GetInstance();
+    template <typename Type>
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims_info::Information<Type> > info =
+                fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogisticMaturity<Type> > maturity =
-        std::make_shared<fims_popdy::LogisticMaturity<Type> >();
+        std::shared_ptr<fims_popdy::LogisticMaturity<Type> > maturity =
+                std::make_shared<fims_popdy::LogisticMaturity<Type> >();
 
-    // set relative info
-    maturity->id = this->id;
-    maturity->inflection_point = this->inflection_point.value_m;
-    if (this->inflection_point.estimated_m) {
-      if (this->inflection_point.is_random_effect_m) {
-        info->RegisterRandomEffect(maturity->inflection_point);
-      } else {
-        info->RegisterParameter(maturity->inflection_point);
-      }
+        // set relative info
+        maturity->id = this->id;
+        maturity->inflection_point = this->inflection_point.value_m;
+        if (this->inflection_point.estimated_m) {
+            if (this->inflection_point.is_random_effect_m) {
+                info->RegisterRandomEffect(maturity->inflection_point);
+            } else {
+                info->RegisterParameter(maturity->inflection_point);
+            }
+        }
+        maturity->slope = this->slope.value_m;
+        if (this->slope.estimated_m) {
+            if (this->slope.is_random_effect_m) {
+                info->RegisterRandomEffect(maturity->slope);
+            } else {
+                info->RegisterParameter(maturity->slope);
+            }
+        }
+
+        // add to Information
+        info->maturity_models[maturity->id] = maturity;
+
+        return true;
     }
-    maturity->slope = this->slope.value_m;
-    if (this->slope.estimated_m) {
-      if (this->slope.is_random_effect_m) {
-        info->RegisterRandomEffect(maturity->slope);
-      } else {
-        info->RegisterParameter(maturity->slope);
-      }
+
+    /** @brief this adds the parameter values and derivatives to the TMB model
+     * object */
+    virtual bool add_to_fims_tmb() {
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+        return true;
     }
-
-    // add to Information
-    info->maturity_models[maturity->id] = maturity;
-
-    return true;
-  }
-
-  /** @brief this adds the parameter values and derivatives to the TMB model
-   * object */
-  virtual bool add_to_fims_tmb() {
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-
-    return true;
-  }
 
 #endif
 };

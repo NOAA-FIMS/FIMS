@@ -18,233 +18,246 @@
 
 namespace fims_popdy {
 
-/** @brief Base class for all fleets.
- *
- * @tparam Type The type of the fleet object.
- */
-template <class Type>
-struct Fleet : public fims_model_object::FIMSObject<Type> {
-  static uint32_t id_g; /*!< reference id for fleet object*/
-  size_t nyears;        /*!< the number of years in the model*/
-  size_t nages;         /*!< the number of ages in the model*/
+    /** @brief Base class for all fleets.
+     *
+     * @tparam Type The type of the fleet object.
+     */
+    template <class Type>
+    struct Fleet : public fims_model_object::FIMSObject<Type> {
+        static uint32_t id_g; /*!< reference id for fleet object*/
+        size_t nyears; /*!< the number of years in the model*/
+        size_t nages; /*!< the number of ages in the model*/
 
 
-  // This likelihood index is not currently being used as only one likelihood
-  // distribution is available. These are for a future update M2+.
-  int fleet_index_likelihood_id_m =
-      -999; /*!<id of index likelihood component. The "fleet_" prefix indicates
+        // This likelihood index is not currently being used as only one likelihood
+        // distribution is available. These are for a future update M2+.
+        int fleet_index_likelihood_id_m =
+                -999; /*!<id of index likelihood component. The "fleet_" prefix indicates
              it belongs to the Fleet struct, and the "_m" postfix signifies
              that it's a member variable.*/
-  std::shared_ptr<fims_distributions::DensityComponentBase<Type>>
-      index_likelihood; /*!< index likelihood component*/
+        std::shared_ptr<fims_distributions::DensityComponentBase<Type>>
+        index_likelihood; /*!< index likelihood component*/
 
-  // This likelihood index is not currently being used as only one likelihood
-  // distribution is available. These are for a future update M2+.
-  int fleet_agecomp_likelihood_id_m =
-      -999; /*!< id of agecomp likelihood component*/
-  std::shared_ptr<fims_distributions::DensityComponentBase<Type>>
-      agecomp_likelihood; /*!< agecomp likelihood component*/
+        // This likelihood index is not currently being used as only one likelihood
+        // distribution is available. These are for a future update M2+.
+        int fleet_agecomp_likelihood_id_m =
+                -999; /*!< id of agecomp likelihood component*/
+        std::shared_ptr<fims_distributions::DensityComponentBase<Type>>
+        agecomp_likelihood; /*!< agecomp likelihood component*/
 
-  // selectivity
-  int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
-  std::shared_ptr<SelectivityBase<Type>>
-      selectivity; /*!< selectivity component*/
+        // selectivity
+        int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
+        std::shared_ptr<SelectivityBase<Type>>
+        selectivity; /*!< selectivity component*/
 
-  int fleet_observed_index_data_id_m = -999; /*!< id of index data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
-      observed_index_data; /*!< observed index data*/
+        int fleet_observed_index_data_id_m = -999; /*!< id of index data */
+        std::shared_ptr<fims_data_object::DataObject<Type>>
+        observed_index_data; /*!< observed index data*/
 
-  int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
-      observed_agecomp_data; /*!< observed agecomp data*/
+        int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
+        std::shared_ptr<fims_data_object::DataObject<Type>>
+        observed_agecomp_data; /*!< observed agecomp data*/
 
-  // Mortality and catchability
-  fims::Vector<Type>
-      log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  Type log_q;    /*!< estimated parameter: catchability of the fleet */
+        // Mortality and catchability
+        fims::Vector<Type>
+        log_Fmort; /*!< estimated parameter: log Fishing mortality*/
+        Type log_q; /*!< estimated parameter: catchability of the fleet */
 
-  fims::Vector<Type> log_obs_error; /*!< estimated parameters: observation error
+        fims::Vector<Type> log_obs_error; /*!< estimated parameters: observation error
                        associated with index */
-  fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
-  Type q; /*!< transofrmed parameter: the catchability of the fleet */
+        fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
+        Type q; /*!< transofrmed parameter: the catchability of the fleet */
 
-  // derived quantities
-  fims::Vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
-  fims::Vector<Type> catch_index;     /*!<derived quantity catch index*/
-  fims::Vector<Type> age_composition; /*!<derived quantity age composition*/
+        // derived quantities
+        fims::Vector<Type> catch_at_age; /*!<derived quantity catch at age*/
+        fims::Vector<Type> catch_index; /*!<derived quantity catch index*/
+        fims::Vector<Type> age_composition; /*!<derived quantity age composition*/
 
-  // derived quantities
-  fims::Vector<Type> expected_catch; /*!<model expected total catch*/
-  fims::Vector<Type> expected_index; /*!<model expected index of abundance*/
-  fims::Vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
-  fims::Vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
-  bool is_survey = false;                  /*!< is this fleet object a survey*/
+        // derived quantities
+        fims::Vector<Type> expected_catch; /*!<model expected total catch*/
+        fims::Vector<Type> expected_index; /*!<model expected index of abundance*/
+        fims::Vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
+        fims::Vector<Type> catch_weight_at_age; /*!<model expected weight at age*/
+        bool is_survey = false; /*!< is this fleet object a survey*/
+        
+        Type age_comp_nll;
+        Type index_nll;
 
 #ifdef TMB_MODEL
-  ::objective_function<Type> *of;
+        ::objective_function<Type> *of;
 #endif
 
-  /**
-   * @brief Constructor.
-   */
-  Fleet() { this->id = Fleet::id_g++; }
-
-  /**
-   * @brief Destructor.
-   */
-  virtual ~Fleet() {}
-
-  /**
-   * @brief Intialize Fleet Class
-   * @param nyears The number of years in the model.
-   * @param nages The number of ages in the model.
-   */
-  void Initialize(int nyears, int nages) {
-    this->nyears = nyears;
-    this->nages = nages;
-
-    catch_at_age.resize(nyears * nages);
-    catch_weight_at_age.resize(nyears * nages);
-    catch_index.resize(nyears);  // assume index is for all ages.
-    age_composition.resize(nyears * nages);
-    expected_catch.resize(nyears);
-    expected_index.resize(nyears);  // assume index is for all ages.
-    catch_numbers_at_age.resize(nyears * nages);
-
-    log_obs_error.resize(nyears);
-    log_Fmort.resize(nyears);
-    Fmort.resize(nyears);
-  }
-
-  /**
-   * @brief Prepare to run the fleet module. Called at each model itartion, and
-   * used to exponentiate the log q and Fmort parameters prior to evaluation.
-   *
-   */
-  void Prepare() {
-    // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
-    // this -> Fmort[fleet_] = fims_math::exp(this -> log_Fmort[fleet_]);
-
-    // derived quantities
-    std::fill(catch_at_age.begin(), catch_at_age.end(),
-              0); /**<derived quantity catch at age*/
-    std::fill(catch_index.begin(), catch_index.end(),
-              0); /**<derived quantity catch index*/
-    std::fill(age_composition.begin(), age_composition.end(), 0);
-    std::fill(expected_catch.begin(), expected_catch.end(),
-              0); /**<model expected total catch*/
-    std::fill(expected_index.begin(), expected_index.end(),
-              0); /**<model expected index of abundance*/
-    std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(),
-              0); /**<model expected catch at age*/
-    std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
-              0); /**<model expected weight at age*/
-    this->q = fims_math::exp(this->log_q);
-    for (size_t year = 0; year < this->nyears; year++) {
-      FLEET_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
-      FLEET_LOG << "input q " << this->log_q << std::endl;
-      FLEET_LOG << "input log_obs_error " << this->log_obs_error[year]
-                << std::endl;
-      this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
-    }
-  }
-
-  virtual const Type evaluate_age_comp_nll() {
-    Type nll = 0.0; /**< The negative log likelihood value */
-    fims_distributions::MultinomialLPMF<Type> dmultinom;
-    size_t dims = this->observed_agecomp_data->data.size();
-
-    if (dims != this->catch_numbers_at_age.size()) {
-      ERROR_LOG << "Error: observed age comp is of size " << dims
-                << " and expected is of size " << this->age_composition.size()
-                << std::endl;
-      exit(1);
-
-    } else {
-      dmultinom.dims.resize(2);
-      dmultinom.dims[0] = this -> nyears;
-      dmultinom.dims[1] = this -> nages;
-      dmultinom.is_na.resize(nyears);
-      dmultinom.observed_values.resize(nyears*nages);
-      dmultinom.expected_values.resize(nyears*nages);
-      #ifdef TMB_MODEL
-      dmultinom.of = this -> of;
-      #endif
-      for (size_t y = 0; y < this->nyears; y++) {
-        Type sum = 0.0;
-        bool containsNA =
-            false; /**< skips the entire year if any values are NA */
-        for (size_t a = 0; a < this->nages; a++) {
-          if (this->observed_agecomp_data->at(y, a) !=
-              this->observed_agecomp_data->na_value) {
-            dmultinom.is_na[y] = false;
-            size_t i_age_year = y * this->nages + a;
-
-            sum += this->catch_numbers_at_age[i_age_year];
-          } else {
-            containsNA = true; /**< sets to true if any values are NA >*/
-            dmultinom.is_na[y] = true;
-            break;
-          }
+        /**
+         * @brief Constructor.
+         */
+        Fleet() {
+            this->id = Fleet::id_g++;
         }
-        if (!containsNA) {
-          for (size_t a = 0; a < this->nages; a++) {
-            size_t i_age_year = y * this->nages + a;
-            dmultinom.observed_values[i_age_year] = this->observed_agecomp_data->at(y, a);
-            dmultinom.expected_values[i_age_year] = this->catch_numbers_at_age[i_age_year] /
-                                sum;
 
-            FLEET_LOG << " age " << a << " in year " << y
-                      << "has expected: " <<  dmultinom.expected_values[i_age_year]
-                      << "  and observed: " << dmultinom.observed_values[i_age_year] << std::endl;
-          }
+        /**
+         * @brief Destructor.
+         */
+        virtual ~Fleet() {
         }
-      }
-      nll += dmultinom.evaluate(true);
-      FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id
-                << nll << std::endl;
-      return nll;
-    }
-  }
 
-  virtual const Type evaluate_index_nll() {
-    Type nll = 0.0; /*!< The negative log likelihood value */
-    fims_distributions::NormalLPDF<Type> dnorm;
-    dnorm.observed_values.resize(this->observed_index_data->data.size());
-    dnorm.is_na.resize(this->observed_index_data->data.size());
-    dnorm.expected_values.resize(this->observed_index_data->data.size());
-    dnorm.log_sd.resize(this->observed_index_data->data.size());
-    #ifdef TMB_MODEL
-    dnorm.of = this->of;
-    #endif
-    for (size_t i = 0; i < this->observed_index_data->data.size(); i++) {
-      if (this->observed_index_data->at(i) !=
-          this->observed_index_data->na_value) {
-        dnorm.is_na[i] = false;
-        dnorm.observed_values[i] = fims_math::log(this->observed_index_data->at(i));
-        dnorm.expected_values[i] = fims_math::log(this->expected_index[i]);
-        dnorm.log_sd[i] = this->log_obs_error[i];
+        /**
+         * @brief Intialize Fleet Class
+         * @param nyears The number of years in the model.
+         * @param nages The number of ages in the model.
+         */
+        void Initialize(int nyears, int nages) {
+            this->nyears = nyears;
+            this->nages = nages;
 
-      } else {
-        dnorm.is_na[i] = true;
-      }
-      FLEET_LOG << "observed index data: " << i << " is "
-                << this->observed_index_data->at(i)
-                << " and expected is: " << this->expected_index[i] << std::endl;
-      FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
-    }
-    nll += dnorm.evaluate(true);
-    FLEET_LOG << " log_sd is: " << dnorm.log_sd[0] << std::endl;
-    FLEET_LOG << " index nll: " << nll << std::endl;
+            catch_at_age.resize(nyears * nages);
+            catch_weight_at_age.resize(nyears * nages);
+            catch_index.resize(nyears); // assume index is for all ages.
+            age_composition.resize(nyears * nages);
+            expected_catch.resize(nyears);
+            expected_index.resize(nyears); // assume index is for all ages.
+            catch_numbers_at_age.resize(nyears * nages);
 
-    return nll;
-  }
-};
+            log_obs_error.resize(nyears);
+            log_Fmort.resize(nyears);
+            Fmort.resize(nyears);
+        }
 
-// default id of the singleton fleet class
-template <class Type>
-uint32_t Fleet<Type>::id_g = 0;
+        /**
+         * @brief Prepare to run the fleet module. Called at each model itartion, and
+         * used to exponentiate the log q and Fmort parameters prior to evaluation.
+         *
+         */
+        void Prepare() {
+            // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
+            // this -> Fmort[fleet_] = fims_math::exp(this -> log_Fmort[fleet_]);
 
-}  // end namespace fims_popdy
+            // derived quantities
+            std::fill(catch_at_age.begin(), catch_at_age.end(),
+                    0); /**<derived quantity catch at age*/
+            std::fill(catch_index.begin(), catch_index.end(),
+                    0); /**<derived quantity catch index*/
+            std::fill(age_composition.begin(), age_composition.end(), 0);
+            std::fill(expected_catch.begin(), expected_catch.end(),
+                    0); /**<model expected total catch*/
+            std::fill(expected_index.begin(), expected_index.end(),
+                    0); /**<model expected index of abundance*/
+            std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(),
+                    0); /**<model expected catch at age*/
+            std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
+                    0); /**<model expected weight at age*/
+            this->q = fims_math::exp(this->log_q);
+            for (size_t year = 0; year < this->nyears; year++) {
+                FLEET_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
+                FLEET_LOG << "input q " << this->log_q << std::endl;
+                FLEET_LOG << "input log_obs_error " << this->log_obs_error[year]
+                        << std::endl;
+                this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
+            }
+        }
+
+        virtual const Type evaluate_age_comp_nll() {
+            Type nll = 0.0; /**< The negative log likelihood value */
+            fims_distributions::MultinomialLPMF<Type> dmultinom;
+            size_t dims = this->observed_agecomp_data->data.size();
+
+            if (dims != this->catch_numbers_at_age.size()) {
+                ERROR_LOG << "Error: observed age comp is of size " << dims
+                        << " and expected is of size " << this->age_composition.size()
+                        << std::endl;
+                exit(1);
+
+            } else {
+                dmultinom.dims.resize(2);
+                dmultinom.dims[0] = this -> nyears;
+                dmultinom.dims[1] = this -> nages;
+                dmultinom.is_na.resize(nyears);
+                dmultinom.observed_values.resize(nyears * nages);
+                dmultinom.expected_values.resize(nyears * nages);
+#ifdef TMB_MODEL
+                dmultinom.of = this -> of;
+#endif
+                for (size_t y = 0; y < this->nyears; y++) {
+                    Type sum = 0.0;
+                    bool containsNA =
+                            false; /**< skips the entire year if any values are NA */
+                    for (size_t a = 0; a < this->nages; a++) {
+                        if (this->observed_agecomp_data->at(y, a) !=
+                                this->observed_agecomp_data->na_value) {
+                            dmultinom.is_na[y] = false;
+                            size_t i_age_year = y * this->nages + a;
+
+                            sum += this->catch_numbers_at_age[i_age_year];
+                        } else {
+                            containsNA = true; /**< sets to true if any values are NA >*/
+                            dmultinom.is_na[y] = true;
+                            break;
+                        }
+                    }
+                    if (!containsNA) {
+                        for (size_t a = 0; a < this->nages; a++) {
+                            size_t i_age_year = y * this->nages + a;
+                            dmultinom.observed_values[i_age_year] = this->observed_agecomp_data->at(y, a);
+                            dmultinom.expected_values[i_age_year] = this->catch_numbers_at_age[i_age_year] /
+                                    sum;
+                            age_composition[i_age_year] = this->catch_numbers_at_age[i_age_year] /
+                                    sum;
+                            FLEET_LOG << " age " << a << " in year " << y
+                                    << "has expected: " << dmultinom.expected_values[i_age_year]
+                                    << "  and observed: " << dmultinom.observed_values[i_age_year] << std::endl;
+                        }
+                    }
+                }
+                nll += dmultinom.evaluate(true);
+                FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id
+                        << nll << std::endl;
+                return nll;
+            }
+        }
+
+        virtual const Type evaluate_index_nll() {
+            Type nll = 0.0; /*!< The negative log likelihood value */
+            fims_distributions::NormalLPDF<Type> dnorm;
+            dnorm.observed_values.resize(this->observed_index_data->data.size());
+            dnorm.is_na.resize(this->observed_index_data->data.size());
+            dnorm.expected_values.resize(this->observed_index_data->data.size());
+            dnorm.log_sd.resize(this->observed_index_data->data.size());
+#ifdef TMB_MODEL
+            dnorm.of = this->of;
+#endif
+            for (size_t i = 0; i < this->observed_index_data->data.size(); i++) {
+                if (this->observed_index_data->at(i) !=
+                        this->observed_index_data->na_value) {
+                    dnorm.is_na[i] = false;
+                    dnorm.observed_values[i] = fims_math::log(this->observed_index_data->at(i));
+                    dnorm.expected_values[i] = fims_math::log(this->expected_index[i]);
+                    dnorm.log_sd[i] = this->log_obs_error[i];
+
+                } else {
+                    dnorm.is_na[i] = true;
+                }
+                FLEET_LOG << "observed index data: " << i << " is "
+                        << this->observed_index_data->at(i)
+                        << " and expected is: " << this->expected_index[i] << std::endl;
+                FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
+            }
+            nll += dnorm.evaluate(true);
+            FLEET_LOG << " log_sd is: " << dnorm.log_sd[0] << std::endl;
+            FLEET_LOG << " index nll: " << nll << std::endl;
+
+            return nll;
+        }
+        
+        void Evaluate(){
+            this->index_nll = this->evaluate_index_nll();
+            this->age_comp_nll = this->evaluate_age_comp_nll();
+        }
+        
+    };
+
+    // default id of the singleton fleet class
+    template <class Type>
+    uint32_t Fleet<Type>::id_g = 0;
+
+} // end namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

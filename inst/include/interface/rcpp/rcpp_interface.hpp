@@ -26,43 +26,146 @@
 #include "rcpp_objects/rcpp_selectivity.hpp"
 #include "rcpp_objects/rcpp_tmb_distribution.hpp"
 
+
+SEXP FIMS_objective_function;
+SEXP FIMS_gradient_function;
+double FIMS_function_value = 0;
+Rcpp::NumericVector FIMS_function_gradient;
+double FIMS_mgc_value = 0;
+bool FIMS_finalized = false;
+
 /**
  * @brief Create the TMB model object and add interface objects to it.
  */
 bool CreateTMBModel() {
     bool valid = true;
-    try{
-    for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
-            i++) {
-        FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
-    }
+    try {
+        for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
+                i++) {
+            FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
+        }
 
-    // base model
-    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
-            fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-    valid = d0->CreateModel();
+        // base model
+        std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
+                fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+        valid = d0->CreateModel();
 
-    // first-order derivative
-    std::shared_ptr<fims_info::Information < TMB_FIMS_FIRST_ORDER>> d1 =
-            fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-    valid = d1->CreateModel();
+        // first-order derivative
+        std::shared_ptr<fims_info::Information < TMB_FIMS_FIRST_ORDER>> d1 =
+                fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+        valid = d1->CreateModel();
 
-    // second-order derivative
-    std::shared_ptr<fims_info::Information < TMB_FIMS_SECOND_ORDER>> d2 =
-            fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-    valid = d2->CreateModel();
+        // second-order derivative
+        std::shared_ptr<fims_info::Information < TMB_FIMS_SECOND_ORDER>> d2 =
+                fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+        valid = d2->CreateModel();
 
-    // third-order derivative
-    std::shared_ptr<fims_info::Information < TMB_FIMS_THIRD_ORDER>> d3 =
-            fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-    valid = d3->CreateModel();
-    
-    }catch(std::runtime_error& ex){
+        // third-order derivative
+        std::shared_ptr<fims_info::Information < TMB_FIMS_THIRD_ORDER>> d3 =
+                fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+        valid = d3->CreateModel();
+
+    } catch (std::runtime_error& ex) {
         valid = false;
-        Rcpp::Rcout<<ex.what()<<std::endl;
+        Rcpp::Rcout << ex.what() << std::endl;
     }
 
     return valid;
+}
+
+void SetFIMSFunctions(SEXP fn, SEXP gr) {
+    FIMS_objective_function = fn;
+    FIMS_gradient_function = gr;
+}
+
+/**
+ * @brief Extracts derived quantities from model objects.
+ */
+void Finalize(Rcpp::NumericVector p) {
+    FIMS_finalized = true;
+    std::shared_ptr<fims_info::Information < double>> information =
+            fims_info::Information<double>::GetInstance();
+
+    std::shared_ptr<fims_model::Model < double>> model =
+            fims_model::Model<double>::GetInstance();
+
+    for (size_t i = 0; i < information->fixed_effects_parameters.size(); i++) {
+        *information->fixed_effects_parameters[i] = p[i];
+    }
+
+    model->Evaluate();
+
+    Rcpp::Function f = Rcpp::as<Rcpp::Function>(FIMS_objective_function);
+    Rcpp::Function g = Rcpp::as<Rcpp::Function>(FIMS_gradient_function);
+    double ret = Rcpp::as<double>(f(p));
+    Rcpp::NumericVector grad = Rcpp::as<Rcpp::NumericVector>(g(p));
+
+    FIMS_function_value = ret;
+    FIMS_function_gradient = grad;
+    std::cout << "Final value = " << FIMS_function_value << "\nGradient: \n";
+    double maxgc = -9999;
+    for (size_t i = 0; i < FIMS_function_gradient.size(); i++) {
+        if (std::fabs(FIMS_function_gradient[i]) > maxgc) {
+            maxgc = std::fabs(FIMS_function_gradient[i]);
+        }
+        //            std::cout<<FIMS_function_gradient[i]<< "\n";
+    }
+    FIMS_mgc_value = maxgc;
+    //        std::cout<<"mgc =  "<<maxgc<<"\n";
+
+
+    //    fims_info::Information < double>::population_iterator pit;
+    //    for (pit = information->populations.begin(); pit != information->populations.end(); ++pit) {
+    //        pit->second->Prepare();
+    //        pit->second->Evaluate();
+    //    }
+    //
+    //    fims_info::Information < double>::fleet_iterator fit;
+    //    for (fit = information->fleets.begin(); fit != information->fleets.end(); ++fit) {
+    //        fit->second->Prepare();
+    //        fit->second->Evaluate();
+    ////        double ac = fit->second->evaluate_age_comp_nll();
+    ////        double i = fit->second->evaluate_index_nll();
+    //    }
+
+
+    for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
+            i++) {
+        FIMSRcppInterfaceBase::fims_interface_objects[i]->finalize();
+    }
+}
+
+/**
+ * @brief Extracts derived quantities from model objects.
+ */
+std::string ToJSON() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
+    std::shared_ptr<fims_info::Information < double>> info =
+            fims_info::Information<double>::GetInstance();
+    std::stringstream ss;
+    ss << "{\n";
+    ss << "\"timestamp\": \"" << ctime_no_newline << "\",\n";
+    ss << "\"nyears\":" << info->nyears << ",\n";
+    ss << "\"nseasons\":" << info->nseasons << ",\n";
+    ss << "\"nages\":" << info->nages << ",\n";
+    ss << "\"finalized\":" << FIMS_finalized << ",\n";
+    ss << "\"objective_function_value\": " << FIMS_function_value << ",\n";
+    ss << "\"max_gradient_component\": " << FIMS_mgc_value << ",\n";
+    ss << "\"final_gradient\": [";
+    for (size_t i = 0; i < FIMS_function_gradient.size() - 1; i++) {
+        ss << FIMS_function_gradient[i] << ", ";
+    }
+    ss << FIMS_function_gradient[FIMS_function_gradient.size() - 1] << "],\n";
+
+    size_t length = FIMSRcppInterfaceBase::fims_interface_objects.size();
+    for (size_t i = 0; i < length - 1; i++) {
+        ss << FIMSRcppInterfaceBase::fims_interface_objects[i]->to_json() << ",\n";
+    }
+
+    ss << FIMSRcppInterfaceBase::fims_interface_objects[length - 1]->to_json() << "\n}";
+    return ss.str();
 }
 
 Rcpp::NumericVector get_fixed_parameters_vector() {
@@ -390,7 +493,7 @@ void set_log_throw_on_error(bool throw_on_error) {
  * Initializes the logging syste, Sets all signal handling.
  */
 void init_logging() {
-    
+
     FIMS_INFO_LOG("Initializing FIMS logging system.");
     std::signal(SIGSEGV, &fims::WriteAtExit);
     std::signal(SIGINT, &fims::WriteAtExit);
@@ -453,6 +556,9 @@ RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
 RCPP_MODULE(fims) {
     Rcpp::function("CreateTMBModel", &CreateTMBModel);
+    Rcpp::function("SetFIMSFunctions", &SetFIMSFunctions);
+    Rcpp::function("Finalize", &Finalize);
+    Rcpp::function("ToJSON", &ToJSON);
     Rcpp::function("get_fixed", &get_fixed_parameters_vector);
     Rcpp::function("get_random", &get_random_parameters_vector);
     Rcpp::function("clear", clear);
@@ -510,6 +616,9 @@ RCPP_MODULE(fims) {
             .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
             .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
             .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
+            .field("estimated_logit_steep", &BevertonHoltRecruitmentInterface::estimated_logit_steep)
+            .field("estimated_log_rzero", &BevertonHoltRecruitmentInterface::estimated_log_rzero)
+            .field("estimated_log_devs", &BevertonHoltRecruitmentInterface::estimated_log_devs)
             .field("estimate_log_devs",
             &BevertonHoltRecruitmentInterface::estimate_log_devs)
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
@@ -521,16 +630,20 @@ RCPP_MODULE(fims) {
     Rcpp::class_<FleetInterface>("Fleet")
             .constructor()
             .field("is_survey", &FleetInterface::is_survey)
+            .field("name", &FleetInterface::name)
             .field("log_q", &FleetInterface::log_q)
+            .field("estimated_log_q", &FleetInterface::estimated_log_q)
             .field("log_Fmort", &FleetInterface::log_Fmort)
+            .field("estimated_log_Fmort", &FleetInterface::estimated_log_Fmort)
             .field("nages", &FleetInterface::nages)
             .field("nyears", &FleetInterface::nyears)
             .field("estimate_F", &FleetInterface::estimate_F)
-            .field("estimate_q", &FleetInterface::estimate_q)
+            //            .field("estimate_q", &FleetInterface::estimate_q)
             .field("estimate_obs_error", &FleetInterface::estimate_obs_error)
-            .field("random_q", &FleetInterface::random_q)
+            //            .field("random_q", &FleetInterface::random_q)
             .field("random_F", &FleetInterface::random_F)
             .field("log_obs_error", &FleetInterface::log_obs_error)
+            .field("estimated_log_obs_error", &FleetInterface::estimated_log_obs_error)
             .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
             .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
             .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
@@ -550,17 +663,24 @@ RCPP_MODULE(fims) {
     Rcpp::class_<PopulationInterface>("Population")
             .constructor()
             .method("get_id", &PopulationInterface::get_id)
+            .field("name", &PopulationInterface::name)
             .field("nages", &PopulationInterface::nages)
             .field("nfleets", &PopulationInterface::nfleets)
             .field("nseasons", &PopulationInterface::nseasons)
             .field("nyears", &PopulationInterface::nyears)
             .field("log_M", &PopulationInterface::log_M)
+            .field("estimated_log_M", &PopulationInterface::estimated_log_M)
             .field("log_init_naa", &PopulationInterface::log_init_naa)
+            .field("estimated_log_init_naa", &PopulationInterface::estimated_log_init_naa)
             .field("proportion_female", &PopulationInterface::proportion_female)
+            .field("estimated_proportion_female", &PopulationInterface::estimated_proportion_female)
             .field("ages", &PopulationInterface::ages)
             .field("estimate_M", &PopulationInterface::estimate_M)
             .field("estimate_init_naa", &PopulationInterface::estimate_initNAA)
             .field("estimate_prop_female", &PopulationInterface::estimate_prop_female)
+            .field("derived_naa", &PopulationInterface::derived_naa)
+            .field("derived_ssb", &PopulationInterface::derived_ssb)
+            .field("derived_biomass", &PopulationInterface::derived_biomass)
             .method("evaluate", &PopulationInterface::evaluate)
             .method("SetMaturity", &PopulationInterface::SetMaturity)
             .method("SetGrowth", &PopulationInterface::SetGrowth)
@@ -579,7 +699,9 @@ RCPP_MODULE(fims) {
     Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
             .constructor()
             .field("inflection_point", &LogisticMaturityInterface::inflection_point)
+            .field("estimated_inflection_point", &LogisticMaturityInterface::estimated_inflection_point)
             .field("slope", &LogisticMaturityInterface::slope)
+            .field("estimated_slope", &LogisticMaturityInterface::estimated_slope)
             .method("get_id", &LogisticMaturityInterface::get_id)
             .method("evaluate", &LogisticMaturityInterface::evaluate);
 
@@ -587,6 +709,9 @@ RCPP_MODULE(fims) {
             .constructor()
             .field("inflection_point",
             &LogisticSelectivityInterface::inflection_point)
+            .field("estimated_inflection_point",
+            &LogisticSelectivityInterface::estimated_inflection_point)
+            .field("slope", &LogisticSelectivityInterface::slope)
             .field("slope", &LogisticSelectivityInterface::slope)
             .method("get_id", &LogisticSelectivityInterface::get_id)
             .method("evaluate", &LogisticSelectivityInterface::evaluate);
@@ -595,10 +720,16 @@ RCPP_MODULE(fims) {
             .constructor()
             .field("inflection_point_asc",
             &DoubleLogisticSelectivityInterface::inflection_point_asc)
+            .field("estimated_inflection_point_asc",
+            &DoubleLogisticSelectivityInterface::estimated_inflection_point_asc)
             .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc)
+            .field("estimated_slope_asc", &DoubleLogisticSelectivityInterface::estimated_slope_asc)
             .field("inflection_point_desc",
             &DoubleLogisticSelectivityInterface::inflection_point_desc)
+            .field("estimated_inflection_point_desc",
+            &DoubleLogisticSelectivityInterface::estimated_inflection_point_desc)
             .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
+            .field("estimated_slope_desc", &DoubleLogisticSelectivityInterface::estimated_slope_desc)
             .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
             .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
 

@@ -21,47 +21,48 @@
  * define different Rcpp interfaces for each possible Recruitment function
  */
 class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
- public:
-  static uint32_t id_g; /**< static id of the recruitment interface base*/
-  uint32_t id;          /**< id of the recruitment interface base */
-  // live objects in C++ are objects that have been created and live in memory
-  static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
-  /**< map associating the ids of RecruitmentInterfaceBase to the objects */
+public:
+    static uint32_t id_g; /**< static id of the recruitment interface base*/
+    uint32_t id; /**< id of the recruitment interface base */
+    // live objects in C++ are objects that have been created and live in memory
+    static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
+    /**< map associating the ids of RecruitmentInterfaceBase to the objects */
 
-  // static std::vector<double> log_recruit_devs; /**< vector of log recruitment
-  // deviations*/
-  // static bool constrain_deviations; /**< whether or not the rec devs are
-  // constrained*/
+    // static std::vector<double> log_recruit_devs; /**< vector of log recruitment
+    // deviations*/
+    // static bool constrain_deviations; /**< whether or not the rec devs are
+    // constrained*/
 
-  RecruitmentInterfaceBase() {
-    this->id = RecruitmentInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    RecruitmentInterfaceBase */
-    RecruitmentInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-  }
+    RecruitmentInterfaceBase() {
+        this->id = RecruitmentInterfaceBase::id_g++;
+        /* Create instance of map: key is id and value is pointer to
+        RecruitmentInterfaceBase */
+        RecruitmentInterfaceBase::live_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    }
 
-  virtual ~RecruitmentInterfaceBase() {}
+    virtual ~RecruitmentInterfaceBase() {
+    }
 
-  /** @brief get the ID of the interface base object
-   */
-  virtual uint32_t get_id() = 0;
+    /** @brief get the ID of the interface base object
+     */
+    virtual uint32_t get_id() = 0;
 
-  /** @brief evaluate method for child recruitment interface objects to inherit
-   */
-  virtual double evaluate(double spawners, double ssbzero) = 0;
+    /** @brief evaluate method for child recruitment interface objects to inherit
+     */
+    virtual double evaluate(double spawners, double ssbzero) = 0;
 
-  /**
-   * @brief evaluate recruitment nll
-   *
-   * @return double
-   */
-  virtual double evaluate_nll() = 0;
+    /**
+     * @brief evaluate recruitment nll
+     *
+     * @return double
+     */
+    virtual double evaluate_nll() = 0;
 };
 
 uint32_t RecruitmentInterfaceBase::id_g = 1;
 std::map<uint32_t, RecruitmentInterfaceBase*>
-    RecruitmentInterfaceBase::live_objects;
+RecruitmentInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for Beverton-Holt as an S4 object. To instantiate
@@ -69,115 +70,251 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  * beverton_holt <- new(beverton_holt)
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
- public:
-  Parameter logit_steep; /**< steepness or the productivity of the stock*/
-  Parameter log_rzero;   /**< recruitment at unfished biomass */
-  Parameter
-      log_sigma_recruit; /**< the log of the stock recruit standard deviation */
-  Rcpp::NumericVector log_devs;   /**< log recruitment deviations*/
-  bool estimate_log_devs = false; /**< boolean describing whether to estimate */
+public:
+    Parameter logit_steep; /**< steepness or the productivity of the stock*/
+    Parameter log_rzero; /**< recruitment at unfished biomass */
+    Parameter
+    log_sigma_recruit; /**< the log of the stock recruit standard deviation */
+    Rcpp::NumericVector log_devs; /**< log recruitment deviations*/
+    bool estimate_log_devs = false; /**< boolean describing whether to estimate */
 
-  BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
+    double estimated_logit_steep; /**< estimated steepness or the productivity of the stock*/
+    double estimated_log_rzero; /**< estimated recruitment at unfished biomass */
+    double estimated_log_sigma_recruit; /**< estimated log of the stock recruit standard deviation */
+    Rcpp::NumericVector estimated_log_devs; /**< estimated log recruitment deviations*/
 
-  virtual ~BevertonHoltRecruitmentInterface() {}
-
-  virtual uint32_t get_id() { return this->id; }
-
-  virtual double evaluate(double spawners, double ssbzero) {
-    fims_popdy::SRBevertonHolt<double> BevHolt;
-
-    BevHolt.logit_steep = this->logit_steep.value_m;
-    if (this->logit_steep.value_m == 1.0) {
-//      Rcpp::warning(
-//          "Steepness is subject to a logit transformation, so its value is "
-//          "0.7848469. Fixing it at 1.0 is not currently possible.");
+    BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {
     }
 
-    BevHolt.log_rzero = this->log_rzero.value_m;
-
-    return BevHolt.evaluate(spawners, ssbzero);
-  }
-
-  virtual double evaluate_nll() {
-    fims_popdy::SRBevertonHolt<double> NLL;
-
-    NLL.log_sigma_recruit = this->log_sigma_recruit.value_m;
-    NLL.log_recruit_devs.resize(log_devs.size());  // Vector from TMB
-    for (int i = 0; i < log_devs.size(); i++) {
-      NLL.log_recruit_devs[i] = log_devs[i];
+    virtual ~BevertonHoltRecruitmentInterface() {
     }
-    RECRUITMENT_LOG << "Log recruit devs being passed to C++ are " << log_devs
-                    << std::endl;
-    NLL.estimate_log_recruit_devs = this->estimate_log_devs;
-    return NLL.evaluate_nll();
-  }
+
+    virtual uint32_t get_id() {
+        return this->id;
+    }
+
+    virtual double evaluate(double spawners, double ssbzero) {
+        fims_popdy::SRBevertonHolt<double> BevHolt;
+
+        BevHolt.logit_steep = this->logit_steep.value_m;
+        if (this->logit_steep.value_m == 1.0) {
+            //      Rcpp::warning(
+            //          "Steepness is subject to a logit transformation, so its value is "
+            //          "0.7848469. Fixing it at 1.0 is not currently possible.");
+        }
+
+        BevHolt.log_rzero = this->log_rzero.value_m;
+
+        return BevHolt.evaluate(spawners, ssbzero);
+    }
+
+    virtual double evaluate_nll() {
+        fims_popdy::SRBevertonHolt<double> NLL;
+
+        NLL.log_sigma_recruit = this->log_sigma_recruit.value_m;
+        NLL.log_recruit_devs.resize(log_devs.size()); // Vector from TMB
+        for (int i = 0; i < log_devs.size(); i++) {
+            NLL.log_recruit_devs[i] = log_devs[i];
+        }
+        RECRUITMENT_LOG << "Log recruit devs being passed to C++ are " << log_devs
+                << std::endl;
+        NLL.estimate_log_recruit_devs = this->estimate_log_devs;
+        return NLL.evaluate_nll();
+    }
+
+    virtual void finalize() {
+
+        if (this->finalized) {
+            //log warning that finalize has been called more than once.
+            FIMS_WARNING_LOG("Beverton-Holt Recruitment  " + fims::to_string(this->id) + " has been finalized already.");
+        }
+
+        this->finalized = true; //indicate this has been called already
+
+        std::shared_ptr<fims_info::Information<double> > info =
+                fims_info::Information<double>::GetInstance();
+
+
+        this->estimated_logit_steep = this->logit_steep.value_m;
+        this->estimated_log_rzero = this->log_rzero.value_m;
+        this->estimated_log_sigma_recruit = this->log_sigma_recruit.value_m;
+
+        this->estimated_log_devs = Rcpp::NumericVector(this->log_devs.size());
+
+        for (size_t i = 0; i < this->estimated_log_devs.size(); i++) {
+            this->estimated_log_devs[i] = log_devs[i];
+        }
+
+        fims_info::Information<double>::recruitment_models_iterator it;
+
+        it = info->recruitment_models.find(this->id);
+
+        if (it == info->recruitment_models.end()) {
+            FIMS_WARNING_LOG("Beverton-Holt Recruitment " + fims::to_string(this->id) + " not found in Information.");
+            return;
+        } else {
+
+            std::shared_ptr<fims_popdy::SRBevertonHolt<double> > recr =
+                    std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double> >(it->second);
+
+            if (this->logit_steep.estimated_m) {
+                this->estimated_logit_steep = recr->logit_steep;
+            }
+
+            if (log_rzero.estimated_m) {
+                this->estimated_log_rzero = recr->log_rzero;
+            }
+
+            if (log_sigma_recruit.estimated_m) {
+                this->estimated_log_sigma_recruit = recr->log_sigma_recruit;
+            }
+
+
+            if (this->estimate_log_devs) {
+                for (size_t i = 0; i < this->estimated_log_devs.size(); i++) {
+                    this->estimated_log_devs[i] = recr->log_recruit_devs[i];
+                }
+            }
+        }
+
+
+    }
+
+    virtual std::string to_json() {
+        std::stringstream ss;
+    
+        ss << "\"module\" : {\n";
+        ss << " \"name\": \"recruitment\",\n";
+        ss << " \"type\": \"Beverton-Holt\",\n";
+        ss << " \"id\": " << this->id << ",\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "  \"name\": \"logit_steep\",\n";
+        ss << "  \"id\":" << this->logit_steep.id_m << ",\n";
+        ss << "  \"type\": \"scalar\",\n";
+        ss << "  \"value\":" << this->logit_steep.value_m << ",\n";
+        ss << "  \"estimated_value\":" << this->estimated_logit_steep << ",\n";
+        ss << "  \"is_estimated\":" << this->logit_steep.estimated_m << ",\n";
+        ss << "  \"is_random_effect\":" << this->logit_steep.is_random_effect_m << "\n },\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "   \"name\": \"log_rzero\",\n";
+        ss << "   \"id\":" << this->log_rzero.id_m << ",\n";
+        ss << "   \"type\": \"scalar\",\n";
+        ss << "   \"value\":" << this->log_rzero.value_m << ",\n";
+        ss << "   \"estimated_value\":" << this->estimated_log_rzero << ",\n";
+        ss << "   \"is_estimated\":" << this->log_rzero.estimated_m << ",\n";
+        ss << "   \"is_random_effect\":" << this->log_rzero.is_random_effect_m << "\n },\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "   \"name\": \"log_sigma_recruit\",\n";
+        ss << "   \"id\":" << this->log_sigma_recruit.id_m << ",\n";
+        ss << "   \"type\": \"scalar\",\n";
+        ss << "   \"value\":" << this->log_sigma_recruit.value_m << ",\n";
+        ss << "   \"estimated_value\":" << this->estimated_log_sigma_recruit << ",\n";
+        ss << "   \"is_estimated\":" << this->log_sigma_recruit.estimated_m << ",\n";
+        ss << "   \"is_random_effect\":" << this->log_sigma_recruit.is_random_effect_m << "\n },\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "   \"name\": \"log_devs\",\n";
+        ss << "   \"id\":" << -999 << ",\n";
+        ss << "   \"type\": \"vector\",\n";
+        ss << "   \"values\":[";
+
+        if (this->log_devs.size() == 0) {
+            ss << "],\n";
+        } else {
+            for (size_t i = 0; i < this->log_devs.size() - 1; i++) {
+                ss << this->log_devs[i] << ", ";
+            }
+            ss << this->log_devs[this->log_devs.size() - 1] << "],\n";
+        }
+
+        ss << "   \"estimated_values\":[";
+        if (this->estimated_log_devs.size() == 0) {
+            ss << "],\n";
+        } else {
+            for (size_t i = 0; i < this->estimated_log_devs.size() - 1; i++) {
+                ss << this->estimated_log_devs[i] << ", ";
+            }
+            ss << this->estimated_log_devs[this->estimated_log_devs.size() - 1] << "],\n";
+        }
+
+        ss << "   \"is_estimated\":" << this->estimate_log_devs << ",\n";
+        ss << "   \"is_random_effect\":" << 0 << "\n }\n";
+
+
+        ss << "}";
+
+        return ss.str();
+    }
 
 #ifdef TMB_MODEL
 
-  template <typename Type>
-  bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
-        fims_info::Information<Type>::GetInstance();
+    template <typename Type>
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims_info::Information<Type> > info =
+                fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > recruitment =
-        std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
+        std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > recruitment =
+                std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
 
-    // set relative info
-    recruitment->id = this->id;
-    recruitment->logit_steep = this->logit_steep.value_m;
-    if (this->logit_steep.estimated_m) {
-      if (this->logit_steep.is_random_effect_m) {
-        info->RegisterRandomEffect(recruitment->logit_steep);
-      } else {
-        info->RegisterParameter(recruitment->logit_steep);
-      }
+        // set relative info
+        recruitment->id = this->id;
+        recruitment->logit_steep = this->logit_steep.value_m;
+        if (this->logit_steep.estimated_m) {
+            if (this->logit_steep.is_random_effect_m) {
+                info->RegisterRandomEffect(recruitment->logit_steep);
+            } else {
+                info->RegisterParameter(recruitment->logit_steep);
+            }
+        }
+        recruitment->log_rzero = this->log_rzero.value_m;
+        if (this->log_rzero.estimated_m) {
+            if (this->log_rzero.is_random_effect_m) {
+                info->RegisterRandomEffect(recruitment->log_rzero);
+            } else {
+                info->RegisterParameter(recruitment->log_rzero);
+            }
+        }
+        recruitment->log_sigma_recruit = this->log_sigma_recruit.value_m;
+        if (this->log_sigma_recruit.estimated_m) {
+            if (this->log_sigma_recruit.is_random_effect_m) {
+                info->RegisterRandomEffect(recruitment->log_sigma_recruit);
+            } else {
+                info->RegisterParameter(recruitment->log_sigma_recruit);
+            }
+        }
+
+        recruitment->log_recruit_devs.resize(this->log_devs.size());
+        if (this->estimate_log_devs) {
+            for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
+                recruitment->log_recruit_devs[i] = this->log_devs[i];
+                info->RegisterParameter(recruitment->log_recruit_devs[i]);
+            }
+        } else {
+            recruitment->estimate_log_recruit_devs = estimate_log_devs;
+            for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
+                recruitment->log_recruit_devs[i] = this->log_devs[i];
+            }
+        }
+
+        // add to Information
+        info->recruitment_models[recruitment->id] = recruitment;
+
+        return true;
     }
-    recruitment->log_rzero = this->log_rzero.value_m;
-    if (this->log_rzero.estimated_m) {
-      if (this->log_rzero.is_random_effect_m) {
-        info->RegisterRandomEffect(recruitment->log_rzero);
-      } else {
-        info->RegisterParameter(recruitment->log_rzero);
-      }
+
+    /** @brief this adds the parameter values and derivatives to the TMB model
+     * object */
+    virtual bool add_to_fims_tmb() {
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+        return true;
     }
-    recruitment->log_sigma_recruit = this->log_sigma_recruit.value_m;
-    if (this->log_sigma_recruit.estimated_m) {
-      if (this->log_sigma_recruit.is_random_effect_m) {
-        info->RegisterRandomEffect(recruitment->log_sigma_recruit);
-      } else {
-        info->RegisterParameter(recruitment->log_sigma_recruit);
-      }
-    }
-
-    recruitment->log_recruit_devs.resize(this->log_devs.size());
-    if (this->estimate_log_devs) {
-      for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
-        recruitment->log_recruit_devs[i] = this->log_devs[i];
-        info->RegisterParameter(recruitment->log_recruit_devs[i]);
-      }
-    } else {
-      recruitment->estimate_log_recruit_devs = estimate_log_devs;
-      for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
-        recruitment->log_recruit_devs[i] = this->log_devs[i];
-      }
-    }
-
-    // add to Information
-    info->recruitment_models[recruitment->id] = recruitment;
-
-    return true;
-  }
-
-  /** @brief this adds the parameter values and derivatives to the TMB model
-   * object */
-  virtual bool add_to_fims_tmb() {
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-
-    return true;
-  }
 
 #endif
 };
