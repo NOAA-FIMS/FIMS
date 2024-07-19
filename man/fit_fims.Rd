@@ -54,10 +54,12 @@ If specified, it must end in .RDS. The file is written to folder given by input$
 \value{
 a fit TMB model with additional output if specified:
 \describe{
-\item{\code{$rep}}{List of derived quantity estimates (see examples)}
+\item{\code{$obj}}{Output from \code{\link[TMB::MakeADFun]{TMB::MakeADFun}}}
+\item{\code{$opt}}{Output from \code{\link[TMBHelper::fit_tmb]{TMBHelper::fit_tmb}}}
+\item{\code{$report}}{List of derived quantity estimates (see examples)}
+\item{\code{$parList}}{List of parameters}
+\item{\code{$std}}{formatted data frame}
 \item{\code{$sdrep}}{Parameter estimates (and standard errors if \code{do.sdrep=TRUE})}
-\item{\code{$peels}}{Retrospective analysis (if \code{do.retro=TRUE})}
-\item{\code{$osa}}{One-step-ahead residuals (if \code{do.osa=TRUE})}
 }
 }
 \description{

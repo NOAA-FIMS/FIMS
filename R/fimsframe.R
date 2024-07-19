@@ -39,31 +39,67 @@ setClass(
 # is it problematic to set the generic for data? not sure...
 # but it will not work without set generic
 # can't call this data because there is already a generic
+#' Get the data
+#'
+#' @param x The object containing data.
+#' @export
 setGeneric("get_data", function(x) standardGeneric("get_data"))
 setMethod("get_data", "FIMSFrame", function(x) x@data)
 
 # example: so we can call fleets(obj) instead of obj@fleets
+#' Get the fleets data
+#'
+#' @param x The object containing fleets data.
+#' @export
 setGeneric("fleets", function(x) standardGeneric("fleets"))
 setMethod("fleets", "FIMSFrame", function(x) x@fleets)
 
+#' Get the number of years
+#'
+#' @param x The object containing number of years.
+#' @export
 setGeneric("n_years", function(x) standardGeneric("n_years"))
 setMethod("n_years", "FIMSFrame", function(x) x@n_years)
 
+#' Get the start year
+#'
+#' @param x The object containing start year.
+#' @export
 setGeneric("start_year", function(x) standardGeneric("start_year"))
 setMethod("start_year", "FIMSFrame", function(x) x@start_year)
 
+#' Get the end year
+#'
+#' @param x The object containing end year.
+#' @export
 setGeneric("end_year", function(x) standardGeneric("end_year"))
 setMethod("end_year", "FIMSFrame", function(x) x@end_year)
 
+#' Get the ages data
+#'
+#' @param x The object containing ages data.
+#' @export
 setGeneric("ages", function(x) standardGeneric("ages"))
 setMethod("ages", "FIMSFrame", function(x) x@ages)
 
+#' Get the number of ages
+#'
+#' @param x The object containing number of ages.
+#' @export
 setGeneric("n_ages", function(x) standardGeneric("n_ages"))
 setMethod("n_ages", "FIMSFrame", function(x) x@n_ages)
 
+#' Get the weight at age data
+#'
+#' @param x The object containing weight at age data.
+#' @export
 setGeneric("weight_at_age", function(x) standardGeneric("weight_at_age"))
 setMethod("weight_at_age", "FIMSFrame", function(x) x@weight_at_age)
 
+#' Get the weight at age data to be used in the model
+#'
+#' @param x The object containing weight at age data.
+#' @export
 setGeneric("m_weight_at_age", function(x) standardGeneric("m_weight_at_age"))
 setMethod(
   "m_weight_at_age", "FIMSFrame",
@@ -78,6 +114,10 @@ setMethod(
   }
 )
 
+#' Get the ages data to be used in the model
+#'
+#' @param x The object containing ages data.
+#' @export
 setGeneric("m_ages", function(x) standardGeneric("m_ages"))
 setMethod("m_ages", "FIMSFrame", function(x) {
   x@ages
