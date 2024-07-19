@@ -8,8 +8,6 @@ test_that("Can create the S4 FIMSFrame classes", {
   expect_s3_class(fims_frame@weight_at_age, "data.frame")
   expect_s3_class(fims_frame@data, "data.frame")
 
-  expect_s3_class(fims_frame@data, "data.frame")
-
   # A helper function that creates a figure from code
   save_png <- function(code, width = 1000, height = 1000) {
     path <- tempfile(fileext = ".png")
