@@ -21,7 +21,7 @@ namespace fims_popdy {
  * from fims_math.
  *
  * @param logit_steep Recruitment relative to unfished recruitment at
- * 20% of unfished spawning biomass. Should be a value between 0.2 and 1.0.
+ * 20 percent of unfished spawning biomass. Steepness is subject to a logit transformation.
  */
 template <typename Type>
 struct SRBevertonHolt : public RecruitmentBase<Type> {

@@ -59,13 +59,13 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   // Mortality and catchability
   fims::Vector<Type>
-      log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  Type log_q;    /*!< estimated parameter: catchability of the fleet */
+      log_Fmort; /*!< estimated parameter: natural log Fishing mortality*/
+  Type log_q;    /*!< estimated parameter: natural log of catchability of the fleet */
 
   fims::Vector<Type> log_obs_error; /*!< estimated parameters: observation error
                        associated with index */
   fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
-  Type q; /*!< transofrmed parameter: the catchability of the fleet */
+  Type q; /*!< transformed parameter: the catchability of the fleet */
 
   // derived quantities
   fims::Vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
@@ -77,7 +77,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> expected_index; /*!<model expected index of abundance*/
   fims::Vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
   fims::Vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
-  bool is_survey = false;                  /*!< is this fleet object a survey*/
+  bool is_survey = false;                  /*!<is this fleet object a fishing fleet or a survey?*/
 
 #ifdef TMB_MODEL
   ::objective_function<Type> *of;
@@ -116,8 +116,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
-   * @brief Prepare to run the fleet module. Called at each model itartion, and
-   * used to exponentiate the log q and Fmort parameters prior to evaluation.
+   * @brief Prepare to run the fleet module. Called at each model iteration, and
+   * used to exponentiate the natural log of q and Fmort parameters prior to evaluation.
    *
    */
   void Prepare() {
@@ -221,7 +221,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       FLEET_LOG << "observed index data: " << i << " is "
                 << this->observed_index_data->at(i)
                 << " and expected is: " << this->expected_index[i] << std::endl;
-      FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
+      FLEET_LOG << " natural log of obs error is: " << this->log_obs_error[i] << std::endl;
     }
     FLEET_LOG << " sd is: " << dnorm.sd << std::endl;
     FLEET_LOG << " index nll: " << nll << std::endl;

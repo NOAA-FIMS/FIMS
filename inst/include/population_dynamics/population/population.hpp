@@ -43,13 +43,13 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
   fims::Vector<Type>
-      log_init_naa;         /*!< estimated parameter: log numbers at age*/
-  fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
+      log_init_naa;         /*!< estimated parameter: natural log of numbers at age*/
+  fims::Vector<Type> log_M; /*!< estimated parameter: natural log of natural mortality*/
   fims::Vector<Type>
       proportion_female; /*!< estimated parameter: proportion female by age */
 
   // Transformed values
-  fims::Vector<Type> M; /*!< transformed parameter: Natural Mortality*/
+  fims::Vector<Type> M; /*!< transformed parameter: natural mortality*/
 
   fims::Vector<double> ages;      /*!< vector of the ages for referencing*/
   fims::Vector<double> years;     /*!< vector of years for referencing*/
@@ -388,7 +388,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     POPULATION_LOG << "phi0 = " << phi0 << std::endl;
     POPULATION_LOG << "spawning_biomass[year - 1] = "
                    << this->spawning_biomass[year - 1] << std::endl;
-    POPULATION_LOG << "log recruit devs = "
+    POPULATION_LOG << "recruit devs in natural log space = "
                    << this->recruitment->log_recruit_devs[i_dev - 1]
                    << std::endl;
     POPULATION_LOG << "rec eval = "

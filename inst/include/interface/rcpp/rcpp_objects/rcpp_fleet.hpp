@@ -67,16 +67,16 @@ class FleetInterface : public FleetInterfaceBase {
   bool is_survey = false; /**< whether this is a survey fleet */
   int nages;              /**< number of ages in the fleet data*/
   int nyears;             /**< number of years in the fleet data */
-  double log_q;           /**< log of catchability for the fleet*/
+  double log_q;           /**< natural log of catchability for the fleet*/
   Rcpp::NumericVector
-      log_Fmort;           /**< log of fishing mortality rate for the fleet*/
+      log_Fmort;           /**< natural log of fishing mortality rate for the fleet*/
   bool estimate_F = false; /**< whether the parameter F should be estimated*/
   bool estimate_q = false; /**< whether the parameter q should be estimated*/
   bool estimate_obs_error = false;   /**< whether the parameter log_obs_error
                                           should be estimated*/
   bool random_q = false;             /**< whether q should be a random effect*/
   bool random_F = false;             /**< whether F should be a random effect*/
-  Rcpp::NumericVector log_obs_error; /**< the log of the observation error */
+  Rcpp::NumericVector log_obs_error; /**< the natural log of the observation error */
 
   FleetInterface() : FleetInterfaceBase() {}
 
