@@ -83,7 +83,7 @@ test_that("lognormal_lpdf", {
   # populate class members
   dlnorm_$x <- new(ParameterVector, y, 1)
   dlnorm_$expected_values <- new(ParameterVector, 0, 1)
-  dlnorm_$log_sd <- new(ParameterVector, log(1), 1)
+  dlnorm_$log_logsd <- new(ParameterVector, log(1), 1)
   dlnorm_$is_na <- FALSE
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(TRUE), stats::dlnorm(y, 0, 1, TRUE))
@@ -99,7 +99,7 @@ test_that("lognormal_lpdf", {
   # populate class members
   dlnorm_$x <- new(ParameterVector, y, 10)
   dlnorm_$expected_values <- new(ParameterVector, 0, 1)
-  dlnorm_$log_sd <- new(ParameterVector, log(1), 1)
+  dlnorm_$log_logsd <- new(ParameterVector, log(1), 1)
   dlnorm_$is_na <- rep(FALSE, 10)
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(TRUE), sum(stats::dlnorm(y, 0, 1, TRUE)))
@@ -116,7 +116,7 @@ test_that("lognormal_lpdf", {
   # populate class members
   dlnorm_$x <- new(ParameterVector, y, 10)
   dlnorm_$expected_values <- new(ParameterVector, 0, 10)
-  dlnorm_$log_sd <- new(ParameterVector, log(1), 10)
+  dlnorm_$log_logsd <- new(ParameterVector, log(1), 10)
   dlnorm_$is_na <- rep(FALSE, 10)
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(TRUE), sum(stats::dlnorm(y, 0, 1, TRUE)))
@@ -132,7 +132,7 @@ test_that("lognormal_lpdf", {
   # # populate class members
   # dlnorm_$x <- new(ParameterVector, y, 10)
   # dlnorm_$expected_values <- new(ParameterVector, 0, 11)
-  # dlnorm_$log_sd <- new(ParameterVector, log(1), 3)
+  # dlnorm_$log_logsd <- new(ParameterVector, log(1), 3)
   # dlnorm_$is_na <- rep(FALSE, 10)
   # # evaluate the density and compare with R
   # expect_error(dlnorm_$evaluate(TRUE))
