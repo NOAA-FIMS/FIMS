@@ -33,7 +33,7 @@ test_that("normal_lpdf", {
   dnorm_$log_sd <- new(ParameterVector, log(1), 1)
   dnorm_$is_na <- rep(FALSE, 10)
   # evaluate the density and compare with R
-  expect_equal(dnorm_$evaluate(TRUE), -sum(stats::dnorm(y, 0, 1, TRUE)))
+  expect_equal(dnorm_$evaluate(TRUE), sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
 
   ## Vectors of state variables (x) and arguments, e.g., a
@@ -49,7 +49,7 @@ test_that("normal_lpdf", {
   dnorm_$log_sd <- new(ParameterVector, log(1), 10)
   dnorm_$is_na <- rep(FALSE, 10)
   # evaluate the density and compare with R
-  expect_equal(dnorm_$evaluate(TRUE), -sum(stats::dnorm(y, 0, 1, TRUE)))
+  expect_equal(dnorm_$evaluate(TRUE), sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
 
   ## It should error out when there is a dimension mismatch
@@ -102,7 +102,7 @@ test_that("lognormal_lpdf", {
   dlnorm_$log_sd <- new(ParameterVector, log(1), 1)
   dlnorm_$is_na <- rep(FALSE, 10)
   # evaluate the density and compare with R
-  expect_equal(dlnorm_$evaluate(TRUE), -sum(stats::dlnorm(y, 0, 1, TRUE)))
+  expect_equal(dlnorm_$evaluate(TRUE), sum(stats::dlnorm(y, 0, 1, TRUE)))
   clear()
 
 
@@ -119,7 +119,7 @@ test_that("lognormal_lpdf", {
   dlnorm_$log_sd <- new(ParameterVector, log(1), 10)
   dlnorm_$is_na <- rep(FALSE, 10)
   # evaluate the density and compare with R
-  expect_equal(dlnorm_$evaluate(TRUE), -sum(stats::dlnorm(y, 0, 1, TRUE)))
+  expect_equal(dlnorm_$evaluate(TRUE), sum(stats::dlnorm(y, 0, 1, TRUE)))
   clear()
 
   ## It should error out when there is a dimension mismatch
