@@ -62,7 +62,7 @@ namespace fims_distributions
                 for (size_t j = 0; j < dims[1]; j++)
                 {
                     size_t idx = (i * dims[1]) + j;
-                    observed_vector[j] = this->observed_values[idx];
+                    observed_vector[j] = this->x[idx];
                     expected_vector[j] = this->expected_values[idx];
                 }
 
@@ -76,11 +76,11 @@ namespace fims_distributions
                         fims::Vector<Type> sim_observed;
                         sim_observed.resize(dims[1]);
                         sim_observed = rmultinom(expected_vector);
-                        sim_observed.resize(this->observed_values);
+                        sim_observed.resize(this->x);
                         for (size_t j = 0; j < dims[1]; j++)
                         {
                             idx = (i * dims[1]) + j;
-                            this->observed_values[idx] = sim_observed[j];
+                            this->x[idx] = sim_observed[j];
                         }
                     }
                 }
@@ -89,8 +89,8 @@ namespace fims_distributions
               }
             }
             #ifdef TMB_MODEL
-            vector<Type> observed_values = this->observed_values;
-          //  FIMS_REPORT_F(observed_values, this->of);
+            vector<Type> x = this->x;
+          //  FIMS_REPORT_F(x, this->of);
             #endif
             return (nll);
         }

@@ -77,7 +77,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
     } else {
 #ifdef TMB_MODEL
       fims_distributions::NormalLPDF<Type> dnorm;
-      dnorm.observed_values = this->log_recruit_devs;
+      dnorm.x = this->log_recruit_devs;
       dnorm.expected_values.resize(this->log_recruit_devs.size());
       dnorm.log_sd.resize(this->log_recruit_devs.size());
       dnorm.is_na.resize(this->log_recruit_devs.size());

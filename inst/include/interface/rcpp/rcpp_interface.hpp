@@ -426,7 +426,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id)
       .method("evaluate", &DnormDistributionsInterface::evaluate)
-      .field("observed_values", &DnormDistributionsInterface::observed_values)
+      .field("x", &DnormDistributionsInterface::x)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
       .field("log_sd", &DnormDistributionsInterface::log_sd)
       .field("is_na", &DnormDistributionsInterface::is_na);
@@ -468,7 +468,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
-      .field("observed_values", &DlnormDistributionsInterface::observed_values)
+      .field("x", &DlnormDistributionsInterface::x)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_sd", &DlnormDistributionsInterface::log_sd)
       .field("is_na", &DlnormDistributionsInterface::is_na);
@@ -477,7 +477,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
       .method("get_id", &DmultinomDistributionsInterface::get_id)
-      .field("observed_values", &DmultinomDistributionsInterface::observed_values)
+      .field("x", &DmultinomDistributionsInterface::x)
       .field("expected_values", &DmultinomDistributionsInterface::expected_values)
       .field("is_na", &DmultinomDistributionsInterface::is_na)
       .field("dims", &DmultinomDistributionsInterface::dims);

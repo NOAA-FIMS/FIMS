@@ -51,17 +51,17 @@ namespace fims_distributions
          */
         virtual const Type evaluate(const bool &do_log)
         {
-            this->mu.resize(this->observed_values.size());
-            this->sd.resize(this->observed_values.size());
-            is_na.resize(this->observed_values.size());
-            this->nll_vec.resize(this->observed_values.size());
-            for (size_t i = 0; i < this->observed_values.size(); i++)
+            this->mu.resize(this->x.size());
+            this->sd.resize(this->x.size());
+            is_na.resize(this->x.size());
+            this->nll_vec.resize(this->x.size());
+            for (size_t i = 0; i < this->x.size(); i++)
             {
                 if (this->expected_values.size() == 1)
                 {
                     this->mu[i] = this->expected_values[0];
                 } else {
-                  if(this->observed_values.size() != this->expected_values.size()){
+                  if(this->x.size() != this->expected_values.size()){
                     /* move error handling to CreateModel in information so not to crash R
                     Rcpp::stop("the dimensions of the observed and expected values from lognormal negative log likelihood do not match");
                      */
@@ -73,7 +73,7 @@ namespace fims_distributions
                 {
                     sd[i] = fims_math::exp(log_sd[0]);
                 } else {
-                  if(this->observed_values.size() != this->log_sd.size()){
+                  if(this->x.size() != this->log_sd.size()){
                     /* move error handling to CreateModel in information so not to crash R
                     Rcpp::stop("the dimensions of the observed and log sd values from lognormal negative log likelihood do not match");
                      */
@@ -85,8 +85,8 @@ namespace fims_distributions
                 if(!is_na[i])
                 {
                   #ifdef TMB_MODEL
-                  // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
-                  this->nll_vec[i] = -dnorm(log(this->observed_values[i]), mu[i], sd[i], true) + log(this->observed_values[i]);
+                  // this->nll_vec[i] = this->keep[i] * -dnorm(this->x[i], mu[i], sd[i], do_log);
+                  this->nll_vec[i] = -dnorm(log(this->x[i]), mu[i], sd[i], true) + log(this->x[i]);
                   if(!do_log){
                     this->nll_vec[i] = -exp(-this->nll_vec[i]);
                   }
@@ -96,7 +96,7 @@ namespace fims_distributions
                       FIMS_SIMULATE_F(this->of)
                       { // preprocessor definition in interface.hpp
                           // this simulates data that is mean biased
-                          this->observed_values[i] = fims_math::exp(rnorm(mu[i], sd[i]));
+                          this->x[i] = fims_math::exp(rnorm(mu[i], sd[i]));
                       }
                   }
                   #endif
@@ -104,14 +104,14 @@ namespace fims_distributions
                   /* osa not working yet
                     if(osa_flag){//data observation type implements osa residuals
                         //code for osa cdf method
-                        this->nll_vec[i] = this->keep.cdf_lower[i] * -log( pnorm(this->observed_values[i], mu[i], sd[i]) );
-                        this->nll_vec[i] = this->keep.cdf_upper[i] * -log( 1.0 - pnorm(this->observed_values[i], mu[i], sd[i]) );
+                        this->nll_vec[i] = this->keep.cdf_lower[i] * -log( pnorm(this->x[i], mu[i], sd[i]) );
+                        this->nll_vec[i] = this->keep.cdf_upper[i] * -log( 1.0 - pnorm(this->x[i], mu[i], sd[i]) );
                     } */
                 }
             }
             #ifdef TMB_MODEL
-            vector<Type> lognormal_observed_values = this->observed_values;
-          //  FIMS_REPORT_F(lognormal_observed_values, this->of);
+            vector<Type> lognormal_x = this->x;
+          //  FIMS_REPORT_F(lognormal_x, this->of);
             #endif
             return (nll);
         }

@@ -12,7 +12,7 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dnorm_ <- new(TMBDnormDistribution)
   # populate class members
-  dnorm_$observed_values <- new(ParameterVector, y, 1)
+  dnorm_$x <- new(ParameterVector, y, 1)
   dnorm_$expected_values <- new(ParameterVector, 0, 1)
   dnorm_$log_sd <- new(ParameterVector, log(1), 1)
   dnorm_$is_na <- FALSE
@@ -28,7 +28,7 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dnorm_ <- new(TMBDnormDistribution)
   # populate class members
-  dnorm_$observed_values <- new(ParameterVector, y, 10)
+  dnorm_$x <- new(ParameterVector, y, 10)
   dnorm_$expected_values <- new(ParameterVector, 0, 1)
   dnorm_$log_sd <- new(ParameterVector, log(1), 1)
   dnorm_$is_na <- rep(FALSE, 10)
@@ -44,7 +44,7 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dnorm_ <- new(TMBDnormDistribution)
   # populate class members
-  dnorm_$observed_values <- new(ParameterVector, y, 10)
+  dnorm_$x <- new(ParameterVector, y, 10)
   dnorm_$expected_values <- new(ParameterVector, 0.0, 10)
   dnorm_$log_sd <- new(ParameterVector, log(1), 10)
   dnorm_$is_na <- rep(FALSE, 10)
@@ -59,7 +59,7 @@ test_that("normal_lpdf", {
   # # initialize the Dnorm module
   # dnorm_ <- new(TMBDnormDistribution)
   # # populate class members
-  # dnorm_$observed_values <- new(FIMS:::ParameterVector, y, 10)
+  # dnorm_$x <- new(FIMS:::ParameterVector, y, 10)
   # dnorm_$expected_values <- new(FIMS:::ParameterVector, 0, 11)
   # dnorm_$log_sd <- new(FIMS:::ParameterVector, log(1), 3)
   # dnorm_$is_na <- rep(FALSE, 10)
@@ -81,7 +81,7 @@ test_that("lognormal_lpdf", {
   # initialize the Dlnorm module
   dlnorm_ <- new(TMBDlnormDistribution)
   # populate class members
-  dlnorm_$observed_values <- new(ParameterVector, y, 1)
+  dlnorm_$x <- new(ParameterVector, y, 1)
   dlnorm_$expected_values <- new(ParameterVector, 0, 1)
   dlnorm_$log_sd <- new(ParameterVector, log(1), 1)
   dlnorm_$is_na <- FALSE
@@ -97,7 +97,7 @@ test_that("lognormal_lpdf", {
   # initialize the Dlnorm module
   dlnorm_ <- new(TMBDlnormDistribution)
   # populate class members
-  dlnorm_$observed_values <- new(ParameterVector, y, 10)
+  dlnorm_$x <- new(ParameterVector, y, 10)
   dlnorm_$expected_values <- new(ParameterVector, 0, 1)
   dlnorm_$log_sd <- new(ParameterVector, log(1), 1)
   dlnorm_$is_na <- rep(FALSE, 10)
@@ -114,7 +114,7 @@ test_that("lognormal_lpdf", {
   # initialize the Dlnorm module
   dlnorm_ <- new(TMBDlnormDistribution)
   # populate class members
-  dlnorm_$observed_values <- new(ParameterVector, y, 10)
+  dlnorm_$x <- new(ParameterVector, y, 10)
   dlnorm_$expected_values <- new(ParameterVector, 0, 10)
   dlnorm_$log_sd <- new(ParameterVector, log(1), 10)
   dlnorm_$is_na <- rep(FALSE, 10)
@@ -130,7 +130,7 @@ test_that("lognormal_lpdf", {
   # # initialize the Dlnorm module
   # dlnorm_ <- new(TMBDlnormDistribution)
   # # populate class members
-  # dlnorm_$observed_values <- new(ParameterVector, y, 10)
+  # dlnorm_$x <- new(ParameterVector, y, 10)
   # dlnorm_$expected_values <- new(ParameterVector, 0, 11)
   # dlnorm_$log_sd <- new(ParameterVector, log(1), 3)
   # dlnorm_$is_na <- rep(FALSE, 10)
@@ -151,7 +151,7 @@ test_that("multinomial_lpdf", {
   # initialize the Dmultinom module
   dmultinom_ <- new(TMBDmultinomDistribution)
   # populate class members
-  dmultinom_$observed_values <- new(ParameterVector, x, 10)
+  dmultinom_$x <- new(ParameterVector, x, 10)
   dmultinom_$expected_values <- new(ParameterVector, p, 10)
   dmultinom_$is_na <- FALSE
   dmultinom_$dims <- c(1,10)
