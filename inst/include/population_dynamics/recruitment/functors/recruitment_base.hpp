@@ -69,15 +69,15 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   /** @brief Calculates the negative log likelihood of recruitment deviations.
    *
    */
-  virtual const Type evaluate_nll() {
-    Type nll = 0.0; /**< The negative log likelihood value */
+  virtual const Type evaluate_lpdf() {
+    Type lpdf = 0.0; /**< The log probability density function value */
 
     if (!this->estimate_log_recruit_devs) {
-      return nll;
+      return lpdf;
     } else {
 #ifdef TMB_MODEL
       fims_distributions::NormalLPDF<Type> dnorm;
-      dnorm.observed_values = this->log_recruit_devs;
+      dnorm.x = this->log_recruit_devs;
       dnorm.expected_values.resize(this->log_recruit_devs.size());
       dnorm.log_sd.resize(this->log_recruit_devs.size());
       dnorm.is_na.resize(this->log_recruit_devs.size());
@@ -85,9 +85,9 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
         dnorm.expected_values[i] = 0.0;
         dnorm.log_sd[i] = this->log_sigma_recruit;
       }
-      nll += dnorm.evaluate(true);
+      lpdf += dnorm.evaluate();
 #endif
-      return nll;
+      return lpdf;
     }
   }
 

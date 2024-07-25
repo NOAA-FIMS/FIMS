@@ -21,12 +21,12 @@
 namespace fims_distributions
 {
     /**
-     * Multinomial Negative Log-Likelihood
+     * Multinomial Log Probability Mass Function
      */
     template <typename Type>
     struct MultinomialLPMF : public DensityComponentBase<Type>
     {
-        Type nll = 0.0; /**< total negative log-likelihood contribution of the distribution */
+        Type lpmf = 0.0; /**< total negative log-likelihood contribution of the distribution */
         fims::Vector<size_t> dims; /**< Dimensions of the number of rows and columns of the multivariate dataset */
         std::vector<bool> is_na; /**< Boolean; if true, data observation is NA and the likelihood contribution for the entire row is skipped */
         #ifdef TMB_MODEL
@@ -45,16 +45,16 @@ namespace fims_distributions
         virtual ~MultinomialLPMF() {}
 
         /**
-         * @brief Evaluates the negative log-likelihood of the multinomial probability mass function
-         * @param do_log Boolean; if true, log densities are returned
+         * @brief Evaluates the multinomial probability mass function
          */
-        virtual const Type evaluate(const bool& do_log)
+        virtual const Type evaluate()
         {
-            this->nll_vec.resize(dims[0]);
-            fims::Vector<Type> observed_vector;
-            fims::Vector<Type> expected_vector;
-            observed_vector.resize(dims[1]);
-            expected_vector.resize(dims[1]);
+            this->lpdf_vec.resize(dims[0]);
+            fims::Vector<Type> x_vector;
+            fims::Vector<Type> prob_vector;
+            x_vector.resize(dims[1]);
+            prob_vector.resize(dims[1]);
+            Type lpdf = 0.0; /**< total log probability mass contribution of the distribution */
             for (size_t i = 0; i < dims[0]; i++)
             {
               if(!is_na[i]){
@@ -62,12 +62,12 @@ namespace fims_distributions
                 for (size_t j = 0; j < dims[1]; j++)
                 {
                     size_t idx = (i * dims[1]) + j;
-                    observed_vector[j] = this->observed_values[idx];
-                    expected_vector[j] = this->expected_values[idx];
+                    x_vector[j] = this->x[idx];
+                    prob_vector[j] = this->expected_values[idx];
                 }
 
-                this->nll_vec[i] = -dmultinom((vector<Type>)observed_vector, (vector<Type>)expected_vector, do_log);
-                nll += this->nll_vec[i];
+                this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, true);
+                lpdf += this->lpdf_vec[i];
                 /*
                 if (this->simulate_flag)
                 {
@@ -75,12 +75,12 @@ namespace fims_distributions
                     {
                         fims::Vector<Type> sim_observed;
                         sim_observed.resize(dims[1]);
-                        sim_observed = rmultinom(expected_vector);
-                        sim_observed.resize(this->observed_values);
+                        sim_observed = rmultinom(prob_vector);
+                        sim_observed.resize(this->x);
                         for (size_t j = 0; j < dims[1]; j++)
                         {
                             idx = (i * dims[1]) + j;
-                            this->observed_values[idx] = sim_observed[j];
+                            this->x[idx] = sim_observed[j];
                         }
                     }
                 }
@@ -89,10 +89,10 @@ namespace fims_distributions
               }
             }
             #ifdef TMB_MODEL
-            vector<Type> observed_values = this->observed_values;
-          //  FIMS_REPORT_F(observed_values, this->of);
+            vector<Type> x = this->x;
+          //  FIMS_REPORT_F(x, this->of);
             #endif
-            return (nll);
+            return (lpdf);
         }
 
 };
