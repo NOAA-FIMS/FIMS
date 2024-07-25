@@ -46,9 +46,8 @@ namespace fims_distributions
 
         /**
          * @brief Evaluates the multinomial probability mass function
-         * @param do_log Boolean; if true, log densities are returned
          */
-        virtual const Type evaluate(const bool& do_log)
+        virtual const Type evaluate()
         {
             this->lpdf_vec.resize(dims[0]);
             fims::Vector<Type> x_vector;
@@ -67,7 +66,7 @@ namespace fims_distributions
                     prob_vector[j] = this->expected_values[idx];
                 }
 
-                this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, do_log);
+                this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, true);
                 lpdf += this->lpdf_vec[i];
                 /*
                 if (this->simulate_flag)

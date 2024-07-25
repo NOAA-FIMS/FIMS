@@ -49,9 +49,8 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Generic probability density function. Calculates the pdf at the
    * independent variable value.
-   * @param do_log Boolean; if true, log densities are returned
    */
-  virtual const Type evaluate(const bool& do_log = true) = 0;
+  virtual const Type evaluate() = 0;
 };
 
 /** @brief Default id of the singleton distribution class

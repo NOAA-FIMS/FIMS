@@ -43,7 +43,7 @@ DistributionsInterfaceBase objects */
 
   /** @brief evaluate method for child distribution interface objects to inherit
    */
-  virtual double evaluate(bool do_log) = 0;
+  virtual double evaluate() = 0;
 };
 
 uint32_t DistributionsInterfaceBase::id_g =
@@ -83,7 +83,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
 
 
-  virtual double evaluate(bool do_log) {
+  virtual double evaluate() {
     fims_distributions::NormalLPDF<double> dnorm;
     dnorm.x.resize(this->x.size());
     dnorm.expected_values.resize(this->expected_values.size());
@@ -101,7 +101,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     for(int i=0; i<is_na.size(); i++){
       dnorm.is_na[i] = this->is_na[i];
     }
-    return dnorm.evaluate(do_log);
+    return dnorm.evaluate();
   }
 
 #ifdef TMB_MODEL
@@ -183,7 +183,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @tparam T
    * @return log pdf
    */
-  virtual double evaluate(bool do_log) {
+  virtual double evaluate() {
     fims_distributions::LogNormalLPDF<double> dlnorm;
     dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
@@ -201,7 +201,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     for(int i=0; i<is_na.size(); i++){
       dlnorm.is_na[i] = this->is_na[i];
     }
-    return dlnorm.evaluate(do_log);
+    return dlnorm.evaluate();
   }
 
 #ifdef TMB_MODEL
@@ -283,7 +283,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @tparam T
    * @return log pdf
    */
-  virtual double evaluate(bool do_log) {
+  virtual double evaluate() {
     fims_distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
     dmultinom.x.resize(this->x.size());
@@ -301,7 +301,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     dmultinom.dims.resize(2);
     dmultinom.dims[0] = this->dims[0];
     dmultinom.dims[1] = this->dims[1];
-    return dmultinom.evaluate(do_log);
+    return dmultinom.evaluate();
   }
 
 #ifdef TMB_MODEL

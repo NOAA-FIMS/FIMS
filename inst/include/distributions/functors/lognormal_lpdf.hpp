@@ -47,9 +47,8 @@ namespace fims_distributions
 
         /**
          * @brief Evaluates the lognormal probability density function
-         * @param do_log Boolean; if true, log densities are returned
          */
-        virtual const Type evaluate(const bool &do_log)
+        virtual const Type evaluate()
         {
             this->logmu.resize(this->x.size());
             this->logsd.resize(this->x.size());
@@ -85,13 +84,10 @@ namespace fims_distributions
                 if(!is_na[i])
                 {
                   #ifdef TMB_MODEL
-                  // this->lpdf_vec[i] = this->keep[i] * dnorm(this->x[i], logmu[i], logsd[i], do_log);
+                  // this->lpdf_vec[i] = this->keep[i] * dnorm(this->x[i], logmu[i], logsd[i], true);
                   this->lpdf_vec[i] = dnorm(log(this->x[i]), logmu[i], logsd[i], true);
                   if(this->lpdf_type == "data"){
                     this->lpdf_vec[i] -= log(this->x[i]);
-                  }
-                  if(!do_log){
-                    this->lpdf_vec[i] = exp(this->lpdf_vec[i]);
                   }
                   lpdf += this->lpdf_vec[i];
                   if (this->simulate_flag)

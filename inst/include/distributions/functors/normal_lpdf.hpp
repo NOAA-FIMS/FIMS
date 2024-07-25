@@ -46,9 +46,8 @@ struct NormalLPDF : public DensityComponentBase<Type> {
 
     /**
      * @brief Evaluates the normal probability density function
-     * @param do_log Boolean; if true, log densities are returned
      */
-    virtual const Type evaluate(const bool& do_log){
+    virtual const Type evaluate(){
         this->mu.resize(this->x.size());
         this->sd.resize(this->x.size());
         this->lpdf_vec.resize(this->x.size());
@@ -77,9 +76,9 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             }
             if(!is_na[i])
             {
-              // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x[i], mu[i], sd[i], do_log);
+              // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x[i], mu[i], sd[i], true);
               #ifdef TMB_MODEL
-              this->lpdf_vec[i] = dnorm(this->x[i], mu[i], sd[i], do_log);
+              this->lpdf_vec[i] = dnorm(this->x[i], mu[i], sd[i], true);
 
               lpdf += this->lpdf_vec[i];
               if(this->simulate_flag){
