@@ -467,6 +467,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
+      .field("lpdf_type", &DlnormDistributionsInterface::lpdf_type)
       .field("x", &DlnormDistributionsInterface::x)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_logsd", &DlnormDistributionsInterface::log_logsd)

@@ -165,6 +165,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   ParameterVector x;       /**< observation */
   ParameterVector expected_values; /**< mean of the distribution of log(x) */
   ParameterVector log_logsd;   /**< log standard deviation of the distribution of log(x) */
+  Rcpp::String lpdf_type; /**< character string indicating type of input: data, re, prior */
   Rcpp::LogicalVector is_na; /**<Boolean; if true, data observation is NA and the likelihood contribution is skipped */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
@@ -185,6 +186,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::LogNormalLPDF<double> dlnorm;
+    dlnorm.lpdf_type = this->lpdf_type;
     dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_logsd.resize(this->log_logsd.size());
@@ -216,6 +218,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     distribution->id = this->id;
+    distribution->lpdf_type = this->lpdf_type;
     distribution->x.resize(this->x.size());
     for(int i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].value_m;
