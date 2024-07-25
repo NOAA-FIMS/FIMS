@@ -200,7 +200,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
           }
         }
       }
-      lpmf += dmultinom.evaluate(true);
+      lpmf += dmultinom.evaluate();
       FLEET_LOG << "Age comp negative lpmf for fleet," << this->id
                 << lpmf << std::endl;
       return lpmf;
@@ -233,7 +233,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                 << " and expected is: " << this->expected_index[i] << std::endl;
       FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
     }
-    lpdf += dnorm.evaluate(true);
+    lpdf += dnorm.evaluate();
     FLEET_LOG << " log_sd is: " << dnorm.log_sd[0] << std::endl;
     FLEET_LOG << " index lpdf: " << lpdf << std::endl;
 

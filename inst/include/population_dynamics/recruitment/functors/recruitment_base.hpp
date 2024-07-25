@@ -85,7 +85,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
         dnorm.expected_values[i] = 0.0;
         dnorm.log_sd[i] = this->log_sigma_recruit;
       }
-      lpdf += dnorm.evaluate(true);
+      lpdf += dnorm.evaluate();
 #endif
       return lpdf;
     }
