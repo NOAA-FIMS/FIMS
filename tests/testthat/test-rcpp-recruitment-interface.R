@@ -31,7 +31,7 @@ test_that("Recruitment input settings work as expected", {
   recruitment$log_devs <- log_devs
 
 
-  expected_lpdf <- -sum(log(stats::dnorm(log_devs, 0, 0.7)))
+  expected_lpdf <- sum(log(stats::dnorm(log_devs, 0, 0.7)))
 
 
   recruitment$estimate_log_devs <- FALSE
