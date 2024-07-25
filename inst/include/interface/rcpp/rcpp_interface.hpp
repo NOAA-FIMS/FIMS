@@ -317,6 +317,7 @@ void clear() {
 }
 
 RCPP_EXPOSED_CLASS(Parameter)
+RCPP_EXPOSED_CLASS(ParameterVector)
 RCPP_MODULE(fims) {
   Rcpp::function("CreateTMBModel", &CreateTMBModel);
   Rcpp::function("get_fixed", &get_fixed_parameters_vector);
@@ -336,15 +337,28 @@ RCPP_MODULE(fims) {
   Rcpp::function("clear_selectivity_log", clear_selectivity_log);
   Rcpp::function("clear_debug_log", clear_debug_log);
 
-  Rcpp::class_<Parameter>("Parameter")
+  Rcpp::class_<Parameter>("Parameter", "FIMS Parameter Class")
       .constructor()
       .constructor<double>()
       .constructor<Parameter>()
-      .field("value", &Parameter::value_m)
-      .field("min", &Parameter::min_m)
-      .field("max", &Parameter::max_m)
-      .field("is_random_effect", &Parameter::is_random_effect_m)
-      .field("estimated", &Parameter::estimated_m);
+      .field("value", &Parameter::value_m, "numeric parameter value")
+      .field("min", &Parameter::min_m, "minimum parameter value")
+      .field("max", &Parameter::max_m, "maximum parameter value")
+      .field("id", &Parameter::id_m, "unique id for parameter class")
+      .field("is_random_effect", &Parameter::is_random_effect_m, "boolean indicating whether or not parameter is a random effect; default value is FALSE")
+      .field("estimated", &Parameter::estimated_m, "boolean indicating whether or not parameter is estimated; default value is FALSE");
+
+   Rcpp::class_<ParameterVector>("ParameterVector")
+      .constructor()
+      .constructor<size_t>()
+      .constructor<Rcpp::NumericVector, size_t>()
+      .field("data", &ParameterVector::storage_m, "list where each element is a Parameter class")
+      .method("at", &ParameterVector::at, "returns a Parameter at the indicated position given the index argument")
+      .method("size", &ParameterVector::size, "returns the size of the Parameter Vector")
+      .method("resize", &ParameterVector::resize, "resizes the Parameter Vector given the provided length argument")
+      .method("set_all_estimable", &ParameterVector::set_all_estimable, "sets all Parameters within vector as estimable")
+      .method("set_all_random", &ParameterVector::set_all_random, "sets all Parameters within vector as estimable")
+      .method("fill", &ParameterVector::fill, "sets the value of all Parameters in the vector with the provided value");
 
   Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()
@@ -397,11 +411,9 @@ RCPP_MODULE(fims) {
       .field("nyears", &PopulationInterface::nyears)
       .field("log_M", &PopulationInterface::log_M)
       .field("log_init_naa", &PopulationInterface::log_init_naa)
-      .field("proportion_female", &PopulationInterface::proportion_female)
       .field("ages", &PopulationInterface::ages)
       .field("estimate_M", &PopulationInterface::estimate_M)
       .field("estimate_init_naa", &PopulationInterface::estimate_initNAA)
-      .field("estimate_prop_female", &PopulationInterface::estimate_prop_female)
       .method("evaluate", &PopulationInterface::evaluate)
       .method("SetMaturity", &PopulationInterface::SetMaturity)
       .method("SetGrowth", &PopulationInterface::SetGrowth)
@@ -412,9 +424,10 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id)
       .method("evaluate", &DnormDistributionsInterface::evaluate)
-      .field("x", &DnormDistributionsInterface::x)
-      .field("mean", &DnormDistributionsInterface::mean)
-      .field("sd", &DnormDistributionsInterface::sd);
+      .field("observed_values", &DnormDistributionsInterface::observed_values)
+      .field("expected_values", &DnormDistributionsInterface::expected_values)
+      .field("log_sd", &DnormDistributionsInterface::log_sd)
+      .field("is_na", &DnormDistributionsInterface::is_na);
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
@@ -453,16 +466,19 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
-      .field("x", &DlnormDistributionsInterface::x)
-      .field("meanlog", &DlnormDistributionsInterface::meanlog)
-      .field("sdlog", &DlnormDistributionsInterface::sdlog);
+      .field("observed_values", &DlnormDistributionsInterface::observed_values)
+      .field("expected_values", &DlnormDistributionsInterface::expected_values)
+      .field("log_sd", &DlnormDistributionsInterface::log_sd)
+      .field("is_na", &DlnormDistributionsInterface::is_na);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
       .method("get_id", &DmultinomDistributionsInterface::get_id)
-      .field("x", &DmultinomDistributionsInterface::x)
-      .field("p", &DmultinomDistributionsInterface::p);
+      .field("observed_values", &DmultinomDistributionsInterface::observed_values)
+      .field("expected_values", &DmultinomDistributionsInterface::expected_values)
+      .field("is_na", &DmultinomDistributionsInterface::is_na)
+      .field("dims", &DmultinomDistributionsInterface::dims);
 }
 
 #endif /* RCPP_INTERFACE_HPP */

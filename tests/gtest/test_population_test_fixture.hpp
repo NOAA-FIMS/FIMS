@@ -110,15 +110,6 @@ class PopulationEvaluateTestFixture : public testing::Test {
       population.log_init_naa[i] = log_naa_distribution(generator);
     }
 
-    // prop_female
-    double prop_female_min = 0.1;
-    double prop_female_max = 0.9;
-    std::uniform_real_distribution<double> prop_female_distribution(
-        prop_female_min, prop_female_max);
-    for (int i = 0; i < nages; i++) {
-      population.proportion_female[i] = prop_female_distribution(generator);
-    }
-
     // log_M
     double log_M_min = fims_math::log(0.1);
     double log_M_max = fims_math::log(0.3);
@@ -258,15 +249,6 @@ class PopulationPrepareTestFixture : public testing::Test {
         log_init_naa_min, log_init_naa_max);
     for (int i = 0; i < nages; i++) {
       population.log_init_naa[i] = log_naa_distribution(generator);
-    }
-
-    // prop_female
-    double prop_female_min = 0.1;
-    double prop_female_max = 0.9;
-    std::uniform_real_distribution<double> prop_female_distribution(
-        prop_female_min, prop_female_max);
-    for (int i = 0; i < nages; i++) {
-      population.proportion_female[i] = prop_female_distribution(generator);
     }
 
     // log_M
