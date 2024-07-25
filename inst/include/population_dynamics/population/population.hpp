@@ -40,13 +40,15 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   size_t nages;         /*!< total number of ages in the population*/
   size_t nfleets;       /*!< total number of fleets in the fishery*/
 
+  // constants
+  const Type proportion_female =
+      0.5; /*!< Sex proportion fixed at 50/50 for M1*/
+
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
   fims::Vector<Type>
       log_init_naa;         /*!< estimated parameter: log numbers at age*/
   fims::Vector<Type> log_M; /*!< estimated parameter: log Natural Mortality*/
-  fims::Vector<Type>
-      proportion_female; /*!< estimated parameter: proportion female by age */
 
   // Transformed values
   fims::Vector<Type> M; /*!< transformed parameter: Natural Mortality*/
@@ -131,7 +133,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     mortality_F.resize(nyears * nages);
     mortality_Z.resize(nyears * nages);
     proportion_mature_at_age.resize((nyears + 1) * nages);
-    proportion_female.resize(nages);
     weight_at_age.resize(nages);
     unfished_numbers_at_age.resize((nyears + 1) * nages);
     numbers_at_age.resize((nyears + 1) * nages);
@@ -170,7 +171,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(),
               0.0);
     std::fill(mortality_Z.begin(), mortality_Z.end(), 0.0);
-    std::fill(proportion_female.begin(), proportion_female.end(), 0.5);
 
     // Transformation Section
     for (size_t age = 0; age < this->nages; age++) {
@@ -316,9 +316,9 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    */
   void CalculateSpawningBiomass(size_t i_age_year, size_t year, size_t age) {
     this->spawning_biomass[year] +=
-        this->proportion_female[age] * this->numbers_at_age[i_age_year] *
+        this->proportion_female * this->numbers_at_age[i_age_year] *
         this->proportion_mature_at_age[i_age_year] * this->weight_at_age[age];
-    POPULATION_LOG << " proportion female " << this->proportion_female[age]
+    POPULATION_LOG << " proportion female " << this->proportion_female
                    << " "
                    << " mature age " << age << " is "
                    << this->proportion_mature_at_age[i_age_year] << " "
@@ -341,7 +341,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   void CalculateUnfishedSpawningBiomass(size_t i_age_year, size_t year,
                                         size_t age) {
     this->unfished_spawning_biomass[year] +=
-        this->proportion_female[age] *
+        this->proportion_female *
         this->unfished_numbers_at_age[i_age_year] *
         this->proportion_mature_at_age[i_age_year] * this->weight_at_age[age];
   }
@@ -354,12 +354,12 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   Type CalculateSBPR0() {
     std::vector<Type> numbers_spr(this->nages, 1.0);
     Type phi_0 = 0.0;
-    phi_0 += numbers_spr[0] * this->proportion_female[0] *
+    phi_0 += numbers_spr[0] * this->proportion_female *
              this->proportion_mature_at_age[0] *
              this->growth->evaluate(ages[0]);
     for (size_t a = 1; a < (this->nages - 1); a++) {
       numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-this->M[a]);
-      phi_0 += numbers_spr[a] * this->proportion_female[a] *
+      phi_0 += numbers_spr[a] * this->proportion_female *
                this->proportion_mature_at_age[a] *
                this->growth->evaluate(ages[a]);
     }
@@ -368,7 +368,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
         (numbers_spr[nages - 2] * fims_math::exp(-this->M[nages - 2])) /
         (1 - fims_math::exp(-this->M[this->nages - 1]));
     phi_0 += numbers_spr[this->nages - 1] *
-             this->proportion_female[this->nages - 1] *
+             this->proportion_female *
              this->proportion_mature_at_age[this->nages - 1] *
              this->growth->evaluate(ages[this->nages - 1]);
     return phi_0;
