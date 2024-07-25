@@ -16,7 +16,6 @@
 #include "rcpp_objects/rcpp_growth.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
-//#include "rcpp_objects/rcpp_nll.hpp"
 #include "../../common/model.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
@@ -371,7 +370,7 @@ RCPP_MODULE(fims) {
       .field("log_sigma_recruit",
              &BevertonHoltRecruitmentInterface::log_sigma_recruit)
       .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate)
-      .method("evaluate_nll", &BevertonHoltRecruitmentInterface::evaluate_nll);
+      .method("evaluate_lpdf", &BevertonHoltRecruitmentInterface::evaluate_lpdf);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
@@ -470,7 +469,7 @@ RCPP_MODULE(fims) {
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
       .field("x", &DlnormDistributionsInterface::x)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
-      .field("log_sd", &DlnormDistributionsInterface::log_sd)
+      .field("log_logsd", &DlnormDistributionsInterface::log_logsd)
       .field("is_na", &DlnormDistributionsInterface::is_na);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")

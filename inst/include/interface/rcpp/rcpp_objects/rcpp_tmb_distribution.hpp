@@ -164,7 +164,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
   ParameterVector x;       /**< observation */
   ParameterVector expected_values; /**< mean of the distribution of log(x) */
-  ParameterVector log_sd;   /**< standard deviation of the distribution of log(x) */
+  ParameterVector log_logsd;   /**< log standard deviation of the distribution of log(x) */
   Rcpp::LogicalVector is_na; /**<Boolean; if true, data observation is NA and the likelihood contribution is skipped */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
@@ -187,7 +187,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     fims_distributions::LogNormalLPDF<double> dlnorm;
     dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
-    dlnorm.log_sd.resize(this->log_sd.size());
+    dlnorm.log_logsd.resize(this->log_logsd.size());
     dlnorm.is_na.resize(this->is_na.size());
     for(int i=0; i<x.size(); i++){
       dlnorm.x[i] = this->x[i].value_m;
@@ -195,8 +195,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     for(int i=0; i<expected_values.size(); i++){
       dlnorm.expected_values[i] = this->expected_values[i].value_m;
     }
-    for(int i=0; i<log_sd.size(); i++){
-      dlnorm.log_sd[i] = this->log_sd[i].value_m;
+    for(int i=0; i<log_logsd.size(); i++){
+      dlnorm.log_logsd[i] = this->log_logsd[i].value_m;
     }
     for(int i=0; i<is_na.size(); i++){
       dlnorm.is_na[i] = this->is_na[i];
@@ -225,9 +225,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     for(int i=0; i<this->expected_values.size(); i++){
       distribution->expected_values[i] = this->expected_values[i].value_m;
     }
-    distribution->log_sd.resize(this->log_sd.size());
-    for(int i=0; i<this->log_sd.size(); i++){
-      distribution->log_sd[i] = this->log_sd[i].value_m;
+    distribution->log_logsd.resize(this->log_logsd.size());
+    for(int i=0; i<this->log_logsd.size(); i++){
+      distribution->log_logsd[i] = this->log_logsd[i].value_m;
     }
     distribution->is_na.resize(this->is_na.size());
     for(int i=0; i<is_na.size(); i++){
