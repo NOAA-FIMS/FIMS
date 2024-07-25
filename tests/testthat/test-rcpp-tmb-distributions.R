@@ -17,7 +17,7 @@ test_that("normal_lpdf", {
   dnorm_$log_sd <- new(ParameterVector, log(1), 1)
   dnorm_$is_na <- FALSE
   # evaluate the density and compare with R
-  expect_equal(dnorm_$evaluate(TRUE), -stats::dnorm(y, 0, 1, TRUE))
+  expect_equal(dnorm_$evaluate(TRUE), stats::dnorm(y, 0, 1, TRUE))
   clear()
 
   ## A vector of state variables, but scalar arguments, e.g., a
@@ -86,7 +86,7 @@ test_that("lognormal_lpdf", {
   dlnorm_$log_sd <- new(ParameterVector, log(1), 1)
   dlnorm_$is_na <- FALSE
   # evaluate the density and compare with R
-  expect_equal(dlnorm_$evaluate(TRUE), -stats::dlnorm(y, 0, 1, TRUE))
+  expect_equal(dlnorm_$evaluate(TRUE), stats::dlnorm(y, 0, 1, TRUE))
   clear()
 
   ## A vector of state variables, but scalar arguments, e.g., a
@@ -158,11 +158,11 @@ test_that("multinomial_lpdf", {
   # evaluate the density and compare with R
   expect_equal(
     dmultinom_$evaluate(TRUE),
-    -stats::dmultinom(x = x, prob = p, log = TRUE)
+    stats::dmultinom(x = x, prob = p, log = TRUE)
   )
   expect_equal(
     dmultinom_$evaluate(FALSE),
-    -stats::dmultinom(x = x, prob = p, log = FALSE)
+    stats::dmultinom(x = x, prob = p, log = FALSE)
   )
 
   clear()
