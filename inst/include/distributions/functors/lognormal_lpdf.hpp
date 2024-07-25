@@ -20,19 +20,19 @@
 namespace fims_distributions
 {
     /**
-     * LogNormal Negative Log-Likelihood
+     * LogNormal Log Probability Density Function
      */
     template <typename Type>
     struct LogNormalLPDF : public DensityComponentBase<Type>
     {
-        fims::Vector<Type> log_sd; /**< log of the standard deviation of the distribution on the log scale; can be a vector or scalar */
-        fims::Vector<Type> mu; /**< mean of the distribution on the log scale; can be a vector or scalar */
-        fims::Vector<Type> sd; /**< standard deviation of the distribution on the log scale; can be a vector or scalar */
+        fims::Vector<Type> log_logsd; /**< log of the standard deviation of the distribution on the log scale; can be a vector or scalar */
+        fims::Vector<Type> logmu; /**< mean of the distribution on the log scale; can be a vector or scalar */
+        fims::Vector<Type> logsd; /**< standard deviation of the distribution on the log scale; can be a vector or scalar */
         std::vector<bool> is_na; /**< Boolean; if true, data observation is NA and the likelihood contribution is skipped */
         #ifdef TMB_MODEL
         ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
         #endif
-        Type nll = 0.0; /**< total negative log-likelihood contribution of the distribution */
+        Type lpdf = 0.0; /**< total log probability density contribution of the distribution */
         // data_indicator<tmbutils::vector<Type> , Type> keep; /**< Indicator used in TMB one-step-ahead residual calculations */
 
         /** @brief Constructor.
@@ -46,57 +46,56 @@ namespace fims_distributions
         virtual ~LogNormalLPDF() {}
 
         /**
-         * @brief Evaluates the negative log-likelihood of the lognormal probability density function
-         * @param do_log Boolean; if true, log densities are returned
+         * @brief Evaluates the lognormal probability density function
          */
-        virtual const Type evaluate(const bool &do_log)
+        virtual const Type evaluate()
         {
-            this->mu.resize(this->observed_values.size());
-            this->sd.resize(this->observed_values.size());
-            is_na.resize(this->observed_values.size());
-            this->nll_vec.resize(this->observed_values.size());
-            for (size_t i = 0; i < this->observed_values.size(); i++)
+            this->logmu.resize(this->x.size());
+            this->logsd.resize(this->x.size());
+            is_na.resize(this->x.size());
+            this->lpdf_vec.resize(this->x.size());
+            for (size_t i = 0; i < this->x.size(); i++)
             {
                 if (this->expected_values.size() == 1)
                 {
-                    this->mu[i] = this->expected_values[0];
+                    this->logmu[i] = this->expected_values[0];
                 } else {
-                  if(this->observed_values.size() != this->expected_values.size()){
+                  if(this->x.size() != this->expected_values.size()){
                     /* move error handling to CreateModel in information so not to crash R
                     Rcpp::stop("the dimensions of the observed and expected values from lognormal negative log likelihood do not match");
                      */
                   } else {
-                    this->mu[i] = this->expected_values[i];
+                    this->logmu[i] = this->expected_values[i];
                   }
                 }
-                if (log_sd.size() == 1)
+                if (log_logsd.size() == 1)
                 {
-                    sd[i] = fims_math::exp(log_sd[0]);
+                    logsd[i] = fims_math::exp(log_logsd[0]);
                 } else {
-                  if(this->observed_values.size() != this->log_sd.size()){
+                  if(this->x.size() != this->log_logsd.size()){
                     /* move error handling to CreateModel in information so not to crash R
-                    Rcpp::stop("the dimensions of the observed and log sd values from lognormal negative log likelihood do not match");
+                    Rcpp::stop("the dimensions of the observed and log logsd values from lognormal negative log likelihood do not match");
                      */
                   } else {
-                    sd[i] = fims_math::exp(log_sd[i]);
+                    logsd[i] = fims_math::exp(log_logsd[i]);
                   }
                 }
 
                 if(!is_na[i])
                 {
                   #ifdef TMB_MODEL
-                  // this->nll_vec[i] = this->keep[i] * -dnorm(this->observed_values[i], mu[i], sd[i], do_log);
-                  this->nll_vec[i] = -dnorm(log(this->observed_values[i]), mu[i], sd[i], true) + log(this->observed_values[i]);
-                  if(!do_log){
-                    this->nll_vec[i] = -exp(-this->nll_vec[i]);
+                  // this->lpdf_vec[i] = this->keep[i] * dnorm(this->x[i], logmu[i], logsd[i], true);
+                  this->lpdf_vec[i] = dnorm(log(this->x[i]), logmu[i], logsd[i], true);
+                  if(this->lpdf_type == "data"){
+                    this->lpdf_vec[i] -= log(this->x[i]);
                   }
-                  nll += this->nll_vec[i];
+                  lpdf += this->lpdf_vec[i];
                   if (this->simulate_flag)
                   {
                       FIMS_SIMULATE_F(this->of)
                       { // preprocessor definition in interface.hpp
                           // this simulates data that is mean biased
-                          this->observed_values[i] = fims_math::exp(rnorm(mu[i], sd[i]));
+                          this->x[i] = fims_math::exp(rnorm(logmu[i], logsd[i]));
                       }
                   }
                   #endif
@@ -104,16 +103,16 @@ namespace fims_distributions
                   /* osa not working yet
                     if(osa_flag){//data observation type implements osa residuals
                         //code for osa cdf method
-                        this->nll_vec[i] = this->keep.cdf_lower[i] * -log( pnorm(this->observed_values[i], mu[i], sd[i]) );
-                        this->nll_vec[i] = this->keep.cdf_upper[i] * -log( 1.0 - pnorm(this->observed_values[i], mu[i], sd[i]) );
+                        this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i], logmu[i], logsd[i]) );
+                        this->lpdf_vec[i] = this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i], logmu[i], logsd[i]) );
                     } */
                 }
             }
             #ifdef TMB_MODEL
-            vector<Type> lognormal_observed_values = this->observed_values;
-          //  FIMS_REPORT_F(lognormal_observed_values, this->of);
+            vector<Type> lognormal_x = this->x;
+          //  FIMS_REPORT_F(lognormal_x, this->of);
             #endif
-            return (nll);
+            return (lpdf);
         }
     };
 } // namespace fims_distributions

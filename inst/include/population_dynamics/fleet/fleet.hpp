@@ -149,8 +149,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     }
   }
 
-  virtual const Type evaluate_age_comp_nll() {
-    Type nll = 0.0; /**< The negative log likelihood value */
+  virtual const Type evaluate_age_comp_lpmf() {
+    Type lpmf = 0.0; /**< The log probability mass function value */
     fims_distributions::MultinomialLPMF<Type> dmultinom;
     size_t dims = this->observed_agecomp_data->data.size();
 
@@ -165,7 +165,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       dmultinom.dims[0] = this -> nyears;
       dmultinom.dims[1] = this -> nages;
       dmultinom.is_na.resize(nyears);
-      dmultinom.observed_values.resize(nyears*nages);
+      dmultinom.x.resize(nyears*nages);
       dmultinom.expected_values.resize(nyears*nages);
       #ifdef TMB_MODEL
       dmultinom.of = this -> of;
@@ -190,27 +190,27 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         if (!containsNA) {
           for (size_t a = 0; a < this->nages; a++) {
             size_t i_age_year = y * this->nages + a;
-            dmultinom.observed_values[i_age_year] = this->observed_agecomp_data->at(y, a);
+            dmultinom.x[i_age_year] = this->observed_agecomp_data->at(y, a);
             dmultinom.expected_values[i_age_year] = this->catch_numbers_at_age[i_age_year] /
                                 sum;
 
             FLEET_LOG << " age " << a << " in year " << y
                       << "has expected: " <<  dmultinom.expected_values[i_age_year]
-                      << "  and observed: " << dmultinom.observed_values[i_age_year] << std::endl;
+                      << "  and observed: " << dmultinom.x[i_age_year] << std::endl;
           }
         }
       }
-      nll += dmultinom.evaluate(true);
-      FLEET_LOG << "Age comp negative log-likelihood for fleet," << this->id
-                << nll << std::endl;
-      return nll;
+      lpmf += dmultinom.evaluate();
+      FLEET_LOG << "Age comp negative lpmf for fleet," << this->id
+                << lpmf << std::endl;
+      return lpmf;
     }
   }
 
-  virtual const Type evaluate_index_nll() {
-    Type nll = 0.0; /*!< The negative log likelihood value */
+  virtual const Type evaluate_index_lpdf() {
+    Type lpdf = 0.0; /*!< The log probability density function value */
     fims_distributions::NormalLPDF<Type> dnorm;
-    dnorm.observed_values.resize(this->observed_index_data->data.size());
+    dnorm.x.resize(this->observed_index_data->data.size());
     dnorm.is_na.resize(this->observed_index_data->data.size());
     dnorm.expected_values.resize(this->observed_index_data->data.size());
     dnorm.log_sd.resize(this->observed_index_data->data.size());
@@ -221,7 +221,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       if (this->observed_index_data->at(i) !=
           this->observed_index_data->na_value) {
         dnorm.is_na[i] = false;
-        dnorm.observed_values[i] = fims_math::log(this->observed_index_data->at(i));
+        dnorm.x[i] = fims_math::log(this->observed_index_data->at(i));
         dnorm.expected_values[i] = fims_math::log(this->expected_index[i]);
         dnorm.log_sd[i] = this->log_obs_error[i];
 
@@ -233,11 +233,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                 << " and expected is: " << this->expected_index[i] << std::endl;
       FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
     }
-    nll += dnorm.evaluate(true);
+    lpdf += dnorm.evaluate();
     FLEET_LOG << " log_sd is: " << dnorm.log_sd[0] << std::endl;
-    FLEET_LOG << " index nll: " << nll << std::endl;
+    FLEET_LOG << " index lpdf: " << lpdf << std::endl;
 
-    return nll;
+    return lpdf;
   }
 };
 
