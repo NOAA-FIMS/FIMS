@@ -52,11 +52,11 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   virtual double evaluate(double spawners, double ssbzero) = 0;
 
   /**
-   * @brief evaluate recruitment nll
+   * @brief evaluate recruitment log probability density function
    *
    * @return double
    */
-  virtual double evaluate_nll() = 0;
+  virtual double evaluate_lpdf() = 0;
 };
 
 uint32_t RecruitmentInterfaceBase::id_g = 1;
@@ -98,18 +98,18 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     return BevHolt.evaluate(spawners, ssbzero);
   }
 
-  virtual double evaluate_nll() {
-    fims_popdy::SRBevertonHolt<double> NLL;
+  virtual double evaluate_lpdf() {
+    fims_popdy::SRBevertonHolt<double> LPDF;
 
-    NLL.log_sigma_recruit = this->log_sigma_recruit.value_m;
-    NLL.log_recruit_devs.resize(log_devs.size());  // Vector from TMB
+    LPDF.log_sigma_recruit = this->log_sigma_recruit.value_m;
+    LPDF.log_recruit_devs.resize(log_devs.size());  // Vector from TMB
     for (int i = 0; i < log_devs.size(); i++) {
-      NLL.log_recruit_devs[i] = log_devs[i];
+      LPDF.log_recruit_devs[i] = log_devs[i];
     }
     RECRUITMENT_LOG << "Log recruit devs being passed to C++ are " << log_devs
                     << std::endl;
-    NLL.estimate_log_recruit_devs = this->estimate_log_devs;
-    return NLL.evaluate_nll();
+    LPDF.estimate_log_recruit_devs = this->estimate_log_devs;
+    return LPDF.evaluate_lpdf();
   }
 
 #ifdef TMB_MODEL

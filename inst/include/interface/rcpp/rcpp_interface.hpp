@@ -16,7 +16,6 @@
 #include "rcpp_objects/rcpp_growth.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
-//#include "rcpp_objects/rcpp_nll.hpp"
 #include "../../common/model.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
@@ -371,7 +370,7 @@ RCPP_MODULE(fims) {
       .field("log_sigma_recruit",
              &BevertonHoltRecruitmentInterface::log_sigma_recruit)
       .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate)
-      .method("evaluate_nll", &BevertonHoltRecruitmentInterface::evaluate_nll);
+      .method("evaluate_lpdf", &BevertonHoltRecruitmentInterface::evaluate_lpdf);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
@@ -426,7 +425,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id)
       .method("evaluate", &DnormDistributionsInterface::evaluate)
-      .field("observed_values", &DnormDistributionsInterface::observed_values)
+      .field("x", &DnormDistributionsInterface::x)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
       .field("log_sd", &DnormDistributionsInterface::log_sd)
       .field("is_na", &DnormDistributionsInterface::is_na);
@@ -468,16 +467,17 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
-      .field("observed_values", &DlnormDistributionsInterface::observed_values)
+      .field("lpdf_type", &DlnormDistributionsInterface::lpdf_type)
+      .field("x", &DlnormDistributionsInterface::x)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
-      .field("log_sd", &DlnormDistributionsInterface::log_sd)
+      .field("log_logsd", &DlnormDistributionsInterface::log_logsd)
       .field("is_na", &DlnormDistributionsInterface::is_na);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
       .method("get_id", &DmultinomDistributionsInterface::get_id)
-      .field("observed_values", &DmultinomDistributionsInterface::observed_values)
+      .field("x", &DmultinomDistributionsInterface::x)
       .field("expected_values", &DmultinomDistributionsInterface::expected_values)
       .field("is_na", &DmultinomDistributionsInterface::is_na)
       .field("dims", &DmultinomDistributionsInterface::dims);

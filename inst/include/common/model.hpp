@@ -113,7 +113,7 @@ class Model {  // may need singleton
       // Evaluate population
       (*it).second->Evaluate();
       // Recrtuiment negative log-likelihood
-      rec_nll += (*it).second->recruitment->evaluate_nll();
+      rec_nll -= (*it).second->recruitment->evaluate_lpdf();
       MODEL_LOG << "Recruitment negative log-likelihood is: " << rec_nll
                 << std::endl;
     }
@@ -134,10 +134,10 @@ class Model {  // may need singleton
 #endif
       MODEL_LOG << "Setting up pointer to fleet " << (*jt).second->id << "."
                 << std::endl;
-      age_comp_nll += (*jt).second->evaluate_age_comp_nll();
+      age_comp_nll -= (*jt).second->evaluate_age_comp_lpmf();
       MODEL_LOG << "Sum of survey and age comp negative log-likelihood is: "
                 << age_comp_nll << std::endl;
-      index_nll += (*jt).second->evaluate_index_nll();
+      index_nll -= (*jt).second->evaluate_index_lpdf();
     }
     MODEL_LOG << "All fleets successfully evaluated." << std::endl;
     // Loop over populations and fleets/surveys and fill in reporting
