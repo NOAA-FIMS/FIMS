@@ -7,9 +7,9 @@
 m_index(x, fleet_name)
 }
 \arguments{
-\item{x}{The object containing index}
+\item{x}{The object containing index.}
 
-\item{fleet_name}{The name of the fleet for the index data}
+\item{fleet_name}{The name of the fleet for the index data.}
 }
 \description{
 Get the index data to be used in the model

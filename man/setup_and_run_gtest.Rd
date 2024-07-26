@@ -2,15 +2,16 @@
 % Please edit documentation in R/setup_gtest.R
 \name{setup_and_run_gtest}
 \alias{setup_and_run_gtest}
-\title{setup and run google test suite}
+\title{Setup and run the google test suite}
 \usage{
 setup_and_run_gtest(...)
 }
 \arguments{
-\item{...}{additional arguments to \code{ctest --test-dir build}
-such as "--rerun-failed --output-on-failure"}
+\item{...}{Additional arguments to \verb{ctest --test-dir build} such as
+\code{"--rerun-failed --output-on-failure"}.}
 }
 \description{
-Developer function for setup and running google test suite from R
+Intended for developers to set up their local environment and run the google
+test suite from R.
 }
 \keyword{gtest_helper}

@@ -59,18 +59,21 @@ Imports:
     dplyr,
     ggplot2,
     jsonlite,
-    magrittr,
     methods,
     Rcpp,
     scales,
-    TMB (>= 1.8.0),
-    usethis
+    TMB (>= 1.8.0)
 Suggests: 
     covr,
     knitr,
+    parallel,
     remotes,
     rmarkdown,
-    testthat (>= 3.0.0)
+    snowfall,
+    testthat (>= 3.0.0),
+    tidyverse,
+    usethis,
+    withr
 LinkingTo: 
     Rcpp,
     RcppEigen,
@@ -83,5 +86,5 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 SystemRequirements: GNU make
