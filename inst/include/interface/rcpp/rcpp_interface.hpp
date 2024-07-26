@@ -233,6 +233,7 @@ void clear_internal() {
       fims_info::Information<Type>::GetInstance();
   d0->fixed_effects_parameters.clear();
   d0->random_effects_parameters.clear();
+  d0->variable_map.clear();
 }
 /**
  * Clears the vector of independent variables.
@@ -241,6 +242,9 @@ void clear() {
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
+  //Parameter and ParameterVector
+  Parameter::id_g = 1;
+  ParameterVector::id_g = 1;
   // rcpp_data.hpp
   DataInterfaceBase::id_g = 1;
   DataInterfaceBase::live_objects.clear();
@@ -357,7 +361,8 @@ RCPP_MODULE(fims) {
       .method("resize", &ParameterVector::resize, "resizes the Parameter Vector given the provided length argument")
       .method("set_all_estimable", &ParameterVector::set_all_estimable, "sets all Parameters within vector as estimable")
       .method("set_all_random", &ParameterVector::set_all_random, "sets all Parameters within vector as estimable")
-      .method("fill", &ParameterVector::fill, "sets the value of all Parameters in the vector with the provided value");
+      .method("fill", &ParameterVector::fill, "sets the value of all Parameters in the vector with the provided value")
+      .method("get_id", &ParameterVector::get_id, "get the ID of the interface base object.");
 
   Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
       .constructor()
@@ -467,7 +472,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
-      .field("lpdf_type", &DlnormDistributionsInterface::lpdf_type)
+      .field("input_type", &DlnormDistributionsInterface::input_type)
       .field("x", &DlnormDistributionsInterface::x)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_logsd", &DlnormDistributionsInterface::log_logsd)
