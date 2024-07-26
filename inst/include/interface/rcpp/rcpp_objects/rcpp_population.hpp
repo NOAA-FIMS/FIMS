@@ -60,8 +60,9 @@ class PopulationInterface : public PopulationInterfaceBase {
   uint32_t maturity_id;      /**< id of the maturity function*/
   uint32_t growth_id;        /**< id of the growth function*/
   uint32_t recruitment_id;   /**< id of the recruitment function*/
-  Rcpp::NumericVector log_M; /**< log of the natural mortality of the stock*/
-  Rcpp::NumericVector log_init_naa; /**<log of the initial numbers at age*/
+  ParameterVector log_M; /**< log of the natural mortality of the stock*/
+  ParameterVector log_init_naa; /**<log of the initial numbers at age*/
+  ParameterVector numbers_at_age; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
   Rcpp::NumericVector proportion_female; /**<doule representing the proportion
                                             of female individuals */
@@ -132,18 +133,20 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->log_M.resize(this->log_M.size());
     population->log_init_naa.resize(this->log_init_naa.size());
     for (int i = 0; i < log_M.size(); i++) {
-      population->log_M[i] = this->log_M[i];
-      if (estimate_M) {
+      population->log_M[i] = this->log_M[i].value_m;
+      if (this->log_M[i].estimated_m) {
         info->RegisterParameter(population->log_M[i]);
       }
     }
+    info->variable_map[this->log_M.id_m] = &(population)->log_M;
 
     for (int i = 0; i < log_init_naa.size(); i++) {
-      population->log_init_naa[i] = this->log_init_naa[i];
-      if (estimate_initNAA) {
+      population->log_init_naa[i] = this->log_init_naa[i].value_m;
+      if (this->log_init_naa[i].estimated_m) {
         info->RegisterParameter(population->log_init_naa[i]);
       }
     }
+    info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
@@ -153,6 +156,9 @@ class PopulationInterface : public PopulationInterfaceBase {
         info->RegisterParameter(population->proportion_female[i]);
       }
     }
+
+    population->numbers_at_age.resize((nyears + 1) * nages);
+    info->variable_map[this->numbers_at_age.id_m] = &(population)->numbers_at_age;
 
     // add to Information
     info->populations[population->id] = population;

@@ -134,7 +134,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     proportion_female.resize(nages);
     weight_at_age.resize(nages);
     unfished_numbers_at_age.resize((nyears + 1) * nages);
-    numbers_at_age.resize((nyears + 1) * nages);
     biomass.resize((nyears + 1));
     unfished_biomass.resize((nyears + 1));
     unfished_spawning_biomass.resize((nyears + 1));
@@ -622,7 +621,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
           if (a == 0) {
             // this->numbers_at_age[i_age_year] = this->recruitment->rzero;
             this->unfished_numbers_at_age[i_age_year] =
-                fims_math::exp(this->recruitment->log_rzero);
+                fims_math::exp(this->recruitment->log_rzero[0]);
           } else {
             CalculateUnfishedNumbersAA(i_age_year, a - 1, a);
           }
@@ -659,7 +658,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
             POPULATION_LOG << "Recruitment: " << std::endl;
             CalculateRecruitment(i_age_year, y, y);
             this->unfished_numbers_at_age[i_age_year] =
-                fims_math::exp(this->recruitment->log_rzero);
+                fims_math::exp(this->recruitment->log_rzero[0]);
 
           } else {
             size_t i_agem1_yearm1 = (y - 1) * nages + (a - 1);

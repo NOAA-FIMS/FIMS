@@ -82,11 +82,11 @@ setup_and_run_FIMS <- function(iter_id,
   recruitment$logit_steep$is_random_effect <- FALSE
   recruitment$logit_steep$estimated <- FALSE
   # turn on estimation of deviations
-  recruitment$estimate_log_devs <- TRUE
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  recruitment$log_devs <- om_input$logR.resid[-1]
+  recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], length(om_input$logR.resid[-1]) )
+  recruitment$estimate_log_devs <- TRUE
 
   # Data
   catch <- em_input$L.obs$fleet1
@@ -134,9 +134,8 @@ setup_and_run_FIMS <- function(iter_id,
   fishing_fleet <- new(Fleet)
   fishing_fleet$nages <- om_input$nages
   fishing_fleet$nyears <- om_input$nyr
-  fishing_fleet$log_Fmort <- log(om_output$f)
-  fishing_fleet$estimate_F <- TRUE
-  fishing_fleet$random_F <- FALSE
+  fishing_fleet$log_Fmort <- methods::new(ParameterVector, log(om_output$f), om_input$nyr)
+  fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q <- log(1.0)
   fishing_fleet$estimate_q <- FALSE
   fishing_fleet$random_q <- FALSE
@@ -167,8 +166,8 @@ setup_and_run_FIMS <- function(iter_id,
   survey_fleet$is_survey <- TRUE
   survey_fleet$nages <- om_input$nages
   survey_fleet$nyears <- om_input$nyr
-  survey_fleet$estimate_F <- FALSE
-  survey_fleet$random_F <- FALSE
+  #survey_fleet$estimate_F <- FALSE
+  #survey_fleet$random_F <- FALSE
   survey_fleet$log_q <- log(om_output$survey_q$survey1)
   survey_fleet$estimate_q <- TRUE
   survey_fleet$random_q <- FALSE
@@ -182,10 +181,10 @@ setup_and_run_FIMS <- function(iter_id,
 
   # Population
   population <- new(Population)
-  population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages)
-  population$estimate_M <- FALSE
-  population$log_init_naa <- log(om_output$N.age[1, ])
-  population$estimate_init_naa <- TRUE
+  population$log_M <- methods::new(ParameterVector, rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages), om_input$nyr * om_input$nages)
+  population$log_M$set_all_estimable(FALSE)
+  population$log_init_naa <- methods::new(ParameterVector, log(om_output$N.age[1, ]), om_input$nages)
+  population$log_init_naa$set_all_estimable(TRUE)
   population$nages <- om_input$nages
   population$ages <- om_input$ages
   population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)

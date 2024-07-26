@@ -9,6 +9,7 @@
 
 //#include "../../../interface/interface.hpp"
 #include "../../../common/fims_math.hpp"
+#include "../../../common/fims_vector.hpp"
 #include "selectivity_base.hpp"
 
 namespace fims_popdy {
@@ -19,16 +20,16 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
-  Type inflection_point_asc; /**< 50% quantile of the value of the quantity of
+  fims::Vector<Type> inflection_point_asc; /**< 50% quantile of the value of the quantity of
                interest (x)  on the ascending limb of the double logistic curve;
                e.g. age at  which 50% of the fish are selected */
-  Type slope_asc; /**<scalar multiplier of difference between quantity of
+  fims::Vector<Type> slope_asc; /**<scalar multiplier of difference between quantity of
               interest   value (x) and inflection_point on the ascending limb of
               the double   logistic   curve*/
-  Type inflection_point_desc; /**< 50% quantile of the value of the quantity of
+  fims::Vector<Type> inflection_point_desc; /**< 50% quantile of the value of the quantity of
                interest (x) on the descending limb of the double logistic curve;
                e.g. age at which 50% of the fish are selected */
-  Type slope_desc; /**<scalar multiplier of difference between quantity of
+  fims::Vector<Type> slope_desc; /**<scalar multiplier of difference between quantity of
               interest  value (x) and inflection_point on the descending limb of
               the double  logistic  curve */
 
@@ -48,7 +49,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    */
   virtual const Type evaluate(const Type &x) {
     return fims_math::double_logistic<Type>(
-        inflection_point_asc, slope_asc, inflection_point_desc, slope_desc, x);
+        inflection_point_asc[0], slope_asc[0], inflection_point_desc[0], slope_desc[0], x);
   }
 };
 

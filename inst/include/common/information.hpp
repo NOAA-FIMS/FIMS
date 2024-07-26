@@ -114,6 +114,12 @@ class Information {
       distribution_models_iterator;
   /**< iterator for distribution objects>*/
 
+  std::unordered_map<uint32_t, fims::Vector<Type>* > 
+      variable_map; /**<hash map to link a parameter, derived value, or observation 
+                        to its shared location in memory */
+  typedef typename std::unordered_map<uint32_t, fims::Vector<Type>* >::iterator 
+      variable_map_iterator; /**< iterator for variable map>*/
+
   Information() {}
 
   virtual ~Information() {}

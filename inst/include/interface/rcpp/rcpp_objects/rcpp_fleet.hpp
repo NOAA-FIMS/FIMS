@@ -68,8 +68,11 @@ class FleetInterface : public FleetInterfaceBase {
   int nages;              /**< number of ages in the fleet data*/
   int nyears;             /**< number of years in the fleet data */
   double log_q;           /**< log of catchability for the fleet*/
-  Rcpp::NumericVector
+  ParameterVector
       log_Fmort;           /**< log of fishing mortality rate for the fleet*/
+  ParameterVector expected_catch; /**< expected catch for the fleet */
+  ParameterVector expected_index; /**< expected index of abundance for the survey */
+  ParameterVector catch_numbers_at_age; /**< expected catch numbers at age for the fleet */
   bool estimate_F = false; /**< whether the parameter F should be estimated*/
   bool estimate_q = false; /**< whether the parameter q should be estimated*/
   bool estimate_obs_error = false;   /**< whether the parameter log_obs_error
@@ -171,16 +174,28 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->log_Fmort.resize(this->log_Fmort.size());
     for (int i = 0; i < log_Fmort.size(); i++) {
-      fleet->log_Fmort[i] = this->log_Fmort[i];
+      fleet->log_Fmort[i] = this->log_Fmort[i].value_m;
 
-      if (this->estimate_F) {
-        if (this->random_F) {
+      if (this->log_Fmort[i].estimated_m) {
+        if (this->log_Fmort[i].is_random_effect_m) {
           info->RegisterRandomEffect(fleet->log_Fmort[i]);
         } else {
           info->RegisterParameter(fleet->log_Fmort[i]);
         }
       }
     }
+    //add to variable_map
+    info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
+
+    //exp_catch
+    fleet->expected_catch.resize(nyears);
+    info->variable_map[this->expected_catch.id_m] = &(fleet)->expected_catch;
+    fleet->expected_index.resize(nyears);  // assume index is for all ages.
+    info->variable_map[this->expected_index.id_m] = &(fleet)->expected_index;
+    fleet->catch_numbers_at_age.resize(nyears * nages);
+    info->variable_map[this->catch_numbers_at_age.id_m] = &(fleet)->catch_numbers_at_age;
+
+
     // add to Information
     info->fleets[fleet->id] = fleet;
 

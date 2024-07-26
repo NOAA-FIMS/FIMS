@@ -14,6 +14,7 @@
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 
 #include "recruitment_base.hpp"
+#include "../../../common/fims_vector.hpp"
 
 namespace fims_popdy {
 
@@ -28,7 +29,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   // Here we define the members that will be used in the Beverton Holt SR
   // function. These members are needed by Beverton Holt but will not be common
   // to all recruitment functions like spawners is below.
-  Type logit_steep; /**< Transformed value of recruitment relative to unfished
+  fims::Vector<Type> logit_steep; /**< Transformed value of recruitment relative to unfished
                  recruitment at 20% of unfished spawning biomass.*/
 
   SRBevertonHolt() : RecruitmentBase<Type>() {}
@@ -52,8 +53,8 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
     Type rzero;
 
     // Transform input parameters
-    steep = fims_math::inv_logit(steep_lo, steep_hi, this->logit_steep);
-    rzero = fims_math::exp(this->log_rzero);
+    steep = fims_math::inv_logit(steep_lo, steep_hi, this->logit_steep[0]);
+    rzero = fims_math::exp(this->log_rzero[0]);
 
     recruits = (0.8 * rzero * steep * spawners) /
                (0.2 * phi_0 * rzero * (1.0 - steep) + spawners * (steep - 0.2));

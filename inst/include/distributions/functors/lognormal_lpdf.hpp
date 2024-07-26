@@ -86,7 +86,7 @@ namespace fims_distributions
                   #ifdef TMB_MODEL
                   // this->lpdf_vec[i] = this->keep[i] * dnorm(this->x[i], logmu[i], logsd[i], true);
                   this->lpdf_vec[i] = dnorm(log(this->x[i]), logmu[i], logsd[i], true);
-                  if(this->lpdf_type == "data"){
+                  if(this->input_type == "data"){
                     this->lpdf_vec[i] -= log(this->x[i]);
                   }
                   lpdf += this->lpdf_vec[i];

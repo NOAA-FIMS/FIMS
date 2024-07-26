@@ -9,7 +9,10 @@ namespace
     {
         fims_popdy::Fleet<double> fleet;
         int nyears = 30;
-        int nages = 12;
+        int nages = 12;  
+        fleet.expected_catch.resize(nyears);
+        fleet.expected_index.resize(nyears);  
+        fleet.catch_numbers_at_age.resize(nyears * nages);
         fleet.Initialize(nyears, nages);
         fleet.Prepare();
         
@@ -25,6 +28,9 @@ namespace
         fims_popdy::Fleet<double> fleet;
         int nyears = 30;
         int nages = 12;
+        fleet.expected_catch.resize(nyears);
+        fleet.expected_index.resize(nyears);  
+        fleet.catch_numbers_at_age.resize(nyears * nages);
         fleet.Initialize(nyears, nages);
 
         int seed = 1234;
