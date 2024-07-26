@@ -259,16 +259,13 @@ setup_and_run_FIMS <- function(iter_id,
 #' # The `result` list contains components such as `report`, `sdr_report`, and `obj`.
 #'
 #' validate_fims(
-#'  report = result$report,
-#'  sdr = TMB::sdreport(result$obj),
-#'  sdr_report = result$sdr_report,
-#'  om_input = om_input_list[[1]],
-#'  om_output = om_output_list[[1]],
-#'  em_input = em_input_list[[1]]
+#'   report = result$report,
+#'   sdr = TMB::sdreport(result$obj),
+#'   sdr_report = result$sdr_report,
+#'   om_input = om_input_list[[1]],
+#'   om_output = om_output_list[[1]],
+#'   em_input = em_input_list[[1]]
 #' )
-#'
-#' #' Note: Some sections of the function have commented-out code for additional checks
-#' that are not currently active.
 validate_fims <- function(
     report,
     sdr,
@@ -276,7 +273,6 @@ validate_fims <- function(
     om_input,
     om_output,
     em_input) {
-
   # Numbers at age
   # Estimates and SE for NAA
   sdr_naa <- sdr_report[which(rownames(sdr_report) == "NAA"), ]
