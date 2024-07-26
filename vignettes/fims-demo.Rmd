@@ -134,7 +134,7 @@ fishing_fleet <- methods::new(Fleet)
 fishing_fleet$nages <- nages
 fishing_fleet$nyears <- nyears
 # Set values for log_Fmort
-fishing_fleet$log_Fmort <- log(c(
+fishing_fleet$log_Fmort <- new(ParameterVector, log(c(
   0.009459165, 0.02728886, 0.04506364,
   0.06101782, 0.04860075, 0.08742055,
   0.0884472, 0.1866079, 0.109009, 0.1327043,
@@ -143,10 +143,9 @@ fishing_fleet$log_Fmort <- log(c(
   0.2548873, 0.2514621, 0.3491014, 0.2541077,
   0.4184781, 0.3457212, 0.3436855, 0.3141712,
   0.3080268, 0.4317453, 0.3280309, 0.4996754
-))
+)), nyears)
 # Turn on estimation for F
-fishing_fleet$estimate_F <- TRUE
-fishing_fleet$random_F <- FALSE
+fishing_fleet$log_Fmort$set_all_estimable(TRUE)
 # Set value for log_q
 fishing_fleet$log_q <- log(1.0)
 fishing_fleet$estimate_q <- FALSE
@@ -196,8 +195,8 @@ survey_fleet <- methods::new(Fleet)
 survey_fleet$is_survey <- TRUE
 survey_fleet$nages <- nages
 survey_fleet$nyears <- nyears
-survey_fleet$estimate_F <- FALSE
-survey_fleet$random_F <- FALSE
+# survey_fleet$estimate_F <- FALSE
+# survey_fleet$random_F <- FALSE
 survey_fleet$log_q <- log(3.315143e-07)
 survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
@@ -238,8 +237,7 @@ recruitment$logit_steep$estimated <- FALSE
 We also need to set up log recruitment deviations. FIMS recruitment modules have a boolean, *estimate_log_devs* to specify whether or not log deviations are estimated; and a vector, *log_devs* to set the log deviation values. 
 
 ```{r rec-devs}
-recruitment$estimate_log_devs <- FALSE
-recruitment$log_devs <- c(
+recruitment$log_devs <- new(ParameterVector, c(
   0.08904850, 0.43787763, -0.13299042, -0.43251973,
   0.64861200, 0.50640852, -0.06958319, 0.30246260,
   -0.08257384, 0.20740372, 0.15289604, -0.21709207,
@@ -248,7 +246,8 @@ recruitment$log_devs <- c(
   0.30122785, 0.21930545, -0.22281699, -0.51358369,
   0.15740234, -0.53988240, -0.19556523, 0.20094360,
   0.37248740, -0.07163145
-)
+), nyears)
+recruitment$estimate_log_devs <- FALSE
 ```
 #### Growth
 Now, we'll define the growth module for our population using an empirical weight at age model.
@@ -281,15 +280,15 @@ Now that our life history sub-models are defined, lets define the actual populat
 ```{r population}
 # Population
 population <- new(Population)
-population$log_M <- rep(log(0.2), nyears * nages)
-population$estimate_M <- FALSE
-population$log_init_naa <- log(c(
+population$log_M <- new(ParameterVector, rep(log(0.2), nyears * nages), nyears * nages)
+population$log_M$set_all_estimable(FALSE)
+population$log_init_naa <- new(ParameterVector, log(c(
   993947.5, 811707.8, 661434.4,
   537804.8, 436664.0, 354303.4,
   287397.0, 233100.2, 189054.0,
   153328.4, 124353.2, 533681.3
-)) # unit: in number
-population$estimate_init_naa <- TRUE
+)), nages) # unit: in number
+population$log_init_naa$set_all_estimable(TRUE)
 population$nages <- nages
 population$ages <- ages
 population$nfleets <- 2 # 1 fleet and 1 survey

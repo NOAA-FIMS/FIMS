@@ -7,7 +7,6 @@ test_that("Recruitment input settings work as expected", {
   spawns <- 9.55784 * 10^6
   ssb0 <- 0.0102562
 
-
   recruitment$logit_steep$value <- -log(1.0 - h) + log(h - 0.2)
   recruitment$logit_steep$min <- 0.21
   recruitment$logit_steep$max <- 1.0
@@ -28,7 +27,7 @@ test_that("Recruitment input settings work as expected", {
   expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 1090802.68)
 
   log_devs <- c(-1.0, 2.0, 3.0)
-  recruitment$log_devs <- log_devs
+  recruitment$log_devs <- methods::new(ParameterVector, log_devs, length(log_devs))
 
 
   expected_lpdf <- sum(log(stats::dnorm(log_devs, 0, 0.7)))

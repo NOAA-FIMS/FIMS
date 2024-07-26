@@ -74,7 +74,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   Parameter log_rzero;   /**< recruitment at unfished biomass */
   Parameter
       log_sigma_recruit; /**< the log of the stock recruit standard deviation */
-  Rcpp::NumericVector log_devs;   /**< log recruitment deviations*/
+  ParameterVector log_devs;   /**< log recruitment deviations*/
   bool estimate_log_devs = false; /**< boolean describing whether to estimate */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
@@ -85,29 +85,29 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   virtual double evaluate(double spawners, double ssbzero) {
     fims_popdy::SRBevertonHolt<double> BevHolt;
-
-    BevHolt.logit_steep = this->logit_steep.value_m;
+    BevHolt.logit_steep.resize(1);
+    BevHolt.logit_steep[0] = this->logit_steep.value_m;
     if (this->logit_steep.value_m == 1.0) {
       warning(
           "Steepness is subject to a logit transformation, so its value is "
           "0.7848469. Fixing it at 1.0 is not currently possible.");
     }
-
-    BevHolt.log_rzero = this->log_rzero.value_m;
+    BevHolt.log_rzero.resize(1);
+    BevHolt.log_rzero[0] = this->log_rzero.value_m;
 
     return BevHolt.evaluate(spawners, ssbzero);
   }
 
   virtual double evaluate_lpdf() {
     fims_popdy::SRBevertonHolt<double> LPDF;
-
-    LPDF.log_sigma_recruit = this->log_sigma_recruit.value_m;
+    LPDF.log_sigma_recruit.resize(1);
+    LPDF.log_sigma_recruit[0] = this->log_sigma_recruit.value_m;
     LPDF.log_recruit_devs.resize(log_devs.size());  // Vector from TMB
     for (int i = 0; i < log_devs.size(); i++) {
-      LPDF.log_recruit_devs[i] = log_devs[i];
-    }
-    RECRUITMENT_LOG << "Log recruit devs being passed to C++ are " << log_devs
+      LPDF.log_recruit_devs[i] = log_devs[i].value_m;
+    RECRUITMENT_LOG << "Log recruit devs being passed to C++ are " << log_devs[i].value_m
                     << std::endl;
+    }
     LPDF.estimate_log_recruit_devs = this->estimate_log_devs;
     return LPDF.evaluate_lpdf();
   }
@@ -124,43 +124,53 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     // set relative info
     recruitment->id = this->id;
-    recruitment->logit_steep = this->logit_steep.value_m;
+    //set logit_steep
+    recruitment->logit_steep.resize(1);
+    recruitment->logit_steep[0] = this->logit_steep.value_m;
     if (this->logit_steep.estimated_m) {
       if (this->logit_steep.is_random_effect_m) {
-        info->RegisterRandomEffect(recruitment->logit_steep);
+        info->RegisterRandomEffect(recruitment->logit_steep[0]);
       } else {
-        info->RegisterParameter(recruitment->logit_steep);
+        info->RegisterParameter(recruitment->logit_steep[0]);
       }
     }
-    recruitment->log_rzero = this->log_rzero.value_m;
+    info->variable_map[this->logit_steep.id_m] = &(recruitment)->logit_steep;
+    
+    //set log_rzero
+    recruitment->log_rzero.resize(1);
+    recruitment->log_rzero[0] = this->log_rzero.value_m;
     if (this->log_rzero.estimated_m) {
       if (this->log_rzero.is_random_effect_m) {
-        info->RegisterRandomEffect(recruitment->log_rzero);
+        info->RegisterRandomEffect(recruitment->log_rzero[0]);
       } else {
-        info->RegisterParameter(recruitment->log_rzero);
+        info->RegisterParameter(recruitment->log_rzero[0]);
       }
     }
-    recruitment->log_sigma_recruit = this->log_sigma_recruit.value_m;
+    info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
+
+    //set log_sigma_recruit
+    recruitment->log_sigma_recruit.resize(1);
+    recruitment->log_sigma_recruit[0] = this->log_sigma_recruit.value_m;
     if (this->log_sigma_recruit.estimated_m) {
       if (this->log_sigma_recruit.is_random_effect_m) {
-        info->RegisterRandomEffect(recruitment->log_sigma_recruit);
+        info->RegisterRandomEffect(recruitment->log_sigma_recruit[0]);
       } else {
-        info->RegisterParameter(recruitment->log_sigma_recruit);
+        info->RegisterParameter(recruitment->log_sigma_recruit[0]);
       }
     }
+    info->variable_map[this->log_sigma_recruit.id_m] = &(recruitment)->log_sigma_recruit;
 
+    //set log_recruit_devs
     recruitment->log_recruit_devs.resize(this->log_devs.size());
-    if (this->estimate_log_devs) {
-      for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
-        recruitment->log_recruit_devs[i] = this->log_devs[i];
+    for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
+      recruitment->log_recruit_devs[i] = this->log_devs[i].value_m;
+      if (this->estimate_log_devs) {
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
-      }
-    } else {
-      recruitment->estimate_log_recruit_devs = estimate_log_devs;
-      for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
-        recruitment->log_recruit_devs[i] = this->log_devs[i];
+      } else {
+        recruitment->estimate_log_recruit_devs = false;
       }
     }
+    info->variable_map[this->log_devs.id_m] = &(recruitment)->log_recruit_devs;
 
     // add to Information
     info->recruitment_models[recruitment->id] = recruitment;

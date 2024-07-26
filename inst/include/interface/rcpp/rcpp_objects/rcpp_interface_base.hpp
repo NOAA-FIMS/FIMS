@@ -73,9 +73,9 @@ uint32_t Parameter::id_g = 0;
  * interface between R and cpp.
  */
 class ParameterVector{
-    static uint32_t id_g; /**< global identifier*/
 
 public:
+    static uint32_t id_g; /**< global identifier*/
     Rcpp::List storage_m;  /**< list of parameter objects*/
     uint32_t id_m; /**< unique identifier*/
 
@@ -110,6 +110,11 @@ public:
             this->storage_m.push_back(Rcpp::wrap(p));
         }
     }
+
+    /**
+     * @brief get the ID of the interface base object
+     */
+    virtual uint32_t get_id() { return this->id_m; }
 
     /**
      *  @brief Accessor. First index starts is zero.

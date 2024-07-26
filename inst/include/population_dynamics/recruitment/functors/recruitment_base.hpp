@@ -37,9 +37,9 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                  deviations are summing to zero or not */
 
-  Type log_sigma_recruit; /**< Log standard deviation of log recruitment
+  fims::Vector<Type> log_sigma_recruit; /**< Log standard deviation of log recruitment
                        deviations */
-  Type log_rzero;         /**< Log of unexploited recruitment.*/
+  fims::Vector<Type> log_rzero;         /**< Log of unexploited recruitment.*/
 
   bool estimate_log_recruit_devs = true; /*!< A flag to indicate if recruitment
                                   deviations are estimated or not */
@@ -83,7 +83,8 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
       dnorm.is_na.resize(this->log_recruit_devs.size());
       for (size_t i = 0; i < this->log_recruit_devs.size(); i++) {
         dnorm.expected_values[i] = 0.0;
-        dnorm.log_sd[i] = this->log_sigma_recruit;
+        dnorm.is_na[i] = false;
+        dnorm.log_sd[i] = this->log_sigma_recruit[0];
       }
       lpdf += dnorm.evaluate();
 #endif

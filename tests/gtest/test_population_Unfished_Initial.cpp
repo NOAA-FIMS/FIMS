@@ -69,8 +69,8 @@ namespace
  
                 if (age == 0)
                 {            
-                    population.unfished_numbers_at_age[i_age_year] = fims_math::exp(population.recruitment->log_rzero);
-                    test_unfished_numbers_at_age[i_age_year] = fims_math::exp(population.recruitment->log_rzero);
+                    population.unfished_numbers_at_age[i_age_year] = fims_math::exp(population.recruitment->log_rzero[0]);
+                    test_unfished_numbers_at_age[i_age_year] = fims_math::exp(population.recruitment->log_rzero[0]);
                 }
 
                 if (year == 0 && age > 0){

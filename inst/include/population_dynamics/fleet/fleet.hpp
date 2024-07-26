@@ -107,9 +107,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     catch_weight_at_age.resize(nyears * nages);
     catch_index.resize(nyears);  // assume index is for all ages.
     age_composition.resize(nyears * nages);
-    expected_catch.resize(nyears);
-    expected_index.resize(nyears);  // assume index is for all ages.
-    catch_numbers_at_age.resize(nyears * nages);
 
     log_obs_error.resize(nyears);
     log_Fmort.resize(nyears);

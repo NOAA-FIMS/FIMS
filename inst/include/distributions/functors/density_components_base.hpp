@@ -37,9 +37,10 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
  fims::Vector<Type> x; /**< input value of distribution function */
  fims::Vector<Type> expected_values; /**< expected value of distribution function */
  fims::Vector<Type> lpdf_vec; /**< vector to record observation level negative log-likelihood values */
- std::string  lpdf_type; /**< string classifies the type of the negative log-likelihood; options are: prior, re, data */
+ std::string  input_type; /**< string classifies the type of the negative log-likelihood; options are: prior, re, data */
  bool osa_flag = false; /**< Boolean; if true, osa residuals are calculated */
  bool simulate_flag = false; /**< Boolean; if true, data are simulated from the distribution */
+ std::vector<uint32_t> key; /**< unique id for variable map that points to a fims::Vector */
 
   /** @brief Constructor.
    */

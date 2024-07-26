@@ -77,8 +77,10 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    */
   virtual double evaluate(double x) {
     fims_popdy::LogisticMaturity<double> LogisticMat;
-    LogisticMat.inflection_point = this->inflection_point.value_m;
-    LogisticMat.slope = this->slope.value_m;
+    LogisticMat.inflection_point.resize(1);
+    LogisticMat.inflection_point[0] = this->inflection_point.value_m;
+    LogisticMat.slope.resize(1);
+    LogisticMat.slope[0] = this->slope.value_m;
     return LogisticMat.evaluate(x);
   }
 
@@ -94,20 +96,22 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     // set relative info
     maturity->id = this->id;
-    maturity->inflection_point = this->inflection_point.value_m;
+    maturity->inflection_point.resize(1);
+    maturity->inflection_point[0] = this->inflection_point.value_m;
     if (this->inflection_point.estimated_m) {
       if (this->inflection_point.is_random_effect_m) {
-        info->RegisterRandomEffect(maturity->inflection_point);
+        info->RegisterRandomEffect(maturity->inflection_point[0]);
       } else {
-        info->RegisterParameter(maturity->inflection_point);
+        info->RegisterParameter(maturity->inflection_point[0]);
       }
     }
+    maturity->slope.resize(1);
     maturity->slope = this->slope.value_m;
     if (this->slope.estimated_m) {
       if (this->slope.is_random_effect_m) {
-        info->RegisterRandomEffect(maturity->slope);
+        info->RegisterRandomEffect(maturity->slope[0]);
       } else {
-        info->RegisterParameter(maturity->slope);
+        info->RegisterParameter(maturity->slope[0]);
       }
     }
 
