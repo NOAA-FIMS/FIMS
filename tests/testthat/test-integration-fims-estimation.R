@@ -106,7 +106,8 @@ test_that("deterministic test of fims", {
   # Expected survey index.
   # Using [[2]] because the survey is the 2nd fleet.
   cwaa <- matrix(report$cwaa[[2]][1:(om_input_list[[iter_id]]$nyr * om_input_list[[iter_id]]$nages)],
-                 nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE)
+    nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE
+  )
   expect_equal(fims_index[[2]], apply(cwaa, 1, sum) * om_output_list[[iter_id]]$survey_q$survey1)
 
   for (i in 1:length(om_output_list[[iter_id]]$survey_index_biomass$survey1)) {
@@ -118,8 +119,10 @@ test_that("deterministic test of fims", {
     fims_object_are[i] <- abs(fims_index[[2]][i] - em_input_list[[iter_id]]$surveyB.obs$survey1[i]) / em_input_list[[iter_id]]$surveyB.obs$survey1[i]
   }
   # Expect 95% of relative error to be within 2*cv
-  expect_lte(sum(fims_object_are > om_input_list[[iter_id]]$cv.survey$survey1 * 2.0),
-             length(em_input_list[[iter_id]]$surveyB.obs$survey1) * 0.05)
+  expect_lte(
+    sum(fims_object_are > om_input_list[[iter_id]]$cv.survey$survey1 * 2.0),
+    length(em_input_list[[iter_id]]$surveyB.obs$survey1) * 0.05
+  )
 
   # Expected catch number at age in proportion
   fims_cnaa <- matrix(report$cnaa[[2]][1:(om_input_list[[iter_id]]$nyr * om_input_list[[iter_id]]$nages)],
@@ -136,7 +139,6 @@ test_that("deterministic test of fims", {
   for (i in 1:length(c(t(om_cnaa_proportion)))) {
     expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
-
 })
 
 test_that("nll test of fims", {
@@ -228,11 +230,9 @@ test_that("nll test of fims", {
   expect_equal(report$age_comp_nll, age_comp_nll)
   expect_equal(report$index_nll, index_nll)
   expect_equal(jnll, expected_jnll)
-
 })
 
 test_that("estimation test of fims", {
-
   # Initialize the iteration identifier and run FIMS with the 1st set of OM values
   iter_id <- 1
   result <- setup_and_run_FIMS(
@@ -244,13 +244,14 @@ test_that("estimation test of fims", {
   )
 
   # Compare FIMS results with model comparison project OM values
-  validate_fims(report = result$report,
-                sdr = TMB::sdreport(result$obj),
-                sdr_report = result$sdr_report,
-                om_input = om_input_list[[iter_id]],
-                om_output = om_output_list[[iter_id]],
-                em_input = em_input_list[[iter_id]])
-
+  validate_fims(
+    report = result$report,
+    sdr = TMB::sdreport(result$obj),
+    sdr_report = result$sdr_report,
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]]
+  )
 })
 
 test_that("run FIMS with missing values", {
@@ -313,11 +314,12 @@ test_that("agecomp in proportion works", {
   )
 
   # Compare FIMS results with model comparison project OM values
-  validate_fims(report = result$report,
-                sdr = TMB::sdreport(result$obj),
-                sdr_report = result$sdr_report,
-                om_input = om_input_list[[iter_id]],
-                om_output = om_output_list[[iter_id]],
-                em_input = em_input_list[[iter_id]])
-
+  validate_fims(
+    report = result$report,
+    sdr = TMB::sdreport(result$obj),
+    sdr_report = result$sdr_report,
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]]
+  )
 })
