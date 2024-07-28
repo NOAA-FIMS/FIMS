@@ -33,16 +33,16 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /**< reference id for recruitment object*/
 
   fims::Vector<Type>
-      log_recruit_devs; /*!< A vector of log recruitment deviations */
+      log_recruit_devs; /*!< A vector of recruitment deviations in natural log space.*/
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
-                                 deviations are summing to zero or not */
+                                 deviations are summing to zero or not. */
 
-  Type log_sigma_recruit; /**< Log standard deviation of log recruitment
+  Type log_sigma_recruit; /**< Natural log standard deviation of log recruitment
                        deviations */
-  Type log_rzero;         /**< Log of unexploited recruitment.*/
+  Type log_rzero;         /**< Natural log of unexploited recruitment.*/
 
   bool estimate_log_recruit_devs = true; /*!< A flag to indicate if recruitment
-                                  deviations are estimated or not */
+                                  deviations are estimated or not. */
 
   /** @brief Constructor.
    */

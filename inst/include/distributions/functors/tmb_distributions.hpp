@@ -35,7 +35,7 @@ struct Dnorm : public DistributionsBase<Type> {
    *
    * \f[ \frac{1.0}{ sd\sqrt{2\pi} }exp(-\frac{(x - mean)^{2}}{2sd^{2}}) \f]
    *
-   * @param do_log Boolean; if true, log densities are returned
+   * @param do_log Boolean; if true, natural log densities are returned
    */
   virtual const Type evaluate(const bool& do_log) {
     return dnorm(x, mean, sd, do_log);
@@ -60,7 +60,7 @@ struct Dmultinom : public DistributionsBase<Type> {
    * } x_{i} \in \{0,...,n\}, i \in \{1,...,K\}, \text{ with } \sum_{i}x_{i} = n
    * \text{ and } \sum^{K}_{k=1}p_{k}=1 \f]
    *
-   * @param do_log Boolean; if true, log densities are returned
+   * @param do_log Boolean; if true, natural log densities are returned
    */
   virtual const Type evaluate(const bool& do_log) {
     return dmultinom<Type>(x, p, do_log);
@@ -85,7 +85,7 @@ struct Dlnorm : public DistributionsBase<Type> {
    * \f[ \frac{1.0}{ xsd\sqrt{2.0\pi} }exp(-\frac{(ln(x) -
    * mean)^{2.0}}{2.0sd^{2.0}}) \f]
    *
-   * @param do_log Boolean; if true, log densities are returned
+   * @param do_log Boolean; if true, natural log densities are returned
    */
 
   virtual const Type evaluate(const bool& do_log) {

@@ -128,7 +128,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
 class IndexDataInterface : public DataInterfaceBase {
  public:
   int ymax;                       /**< second dimension of the data */
-  Rcpp::NumericVector index_data; /**<the age composition data*/
+  Rcpp::NumericVector index_data; /**<the index data*/
 
   /**
    * @brief constructor

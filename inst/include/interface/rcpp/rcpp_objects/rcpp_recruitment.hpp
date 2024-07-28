@@ -70,11 +70,11 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
-  Parameter logit_steep; /**< steepness or the productivity of the stock*/
+  Parameter logit_steep; /**< steepness or the productivity of the population*/
   Parameter log_rzero;   /**< recruitment at unfished biomass */
   Parameter
-      log_sigma_recruit; /**< the log of the stock recruit standard deviation */
-  Rcpp::NumericVector log_devs;   /**< log recruitment deviations*/
+      log_sigma_recruit; /**< the natural log of the stock recruit standard deviation */
+  Rcpp::NumericVector log_devs;   /**< natural log recruitment deviations*/
   bool estimate_log_devs = false; /**< boolean describing whether to estimate */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
@@ -106,7 +106,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     for (int i = 0; i < log_devs.size(); i++) {
       NLL.log_recruit_devs[i] = log_devs[i];
     }
-    RECRUITMENT_LOG << "Log recruit devs being passed to C++ are " << log_devs
+    RECRUITMENT_LOG << "Natural log of recruit devs being passed to C++ are " << log_devs
                     << std::endl;
     NLL.estimate_log_recruit_devs = this->estimate_log_devs;
     return NLL.evaluate_nll();

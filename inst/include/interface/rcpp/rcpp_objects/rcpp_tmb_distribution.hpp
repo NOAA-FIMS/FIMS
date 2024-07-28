@@ -75,10 +75,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
   /**
    * @brief Evaluate normal probability density function, default returns the
-   * log of the pdf
+   * natural log of the pdf
    *
    * @tparam T
-   * @return log pdf
+   * @return natural log of the pdf
    */
   virtual double evaluate(bool do_log) {
     fims_distributions::Dnorm<double> dnorm;
@@ -148,10 +148,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
   /**
    * @brief Evaluate lognormal probability density function, default returns the
-   * log of the pdf
+   * natural log of the pdf
    *
    * @tparam T
-   * @return log pdf
+   * @return natural log of the pdf
    */
   virtual double evaluate(bool do_log) {
     fims_distributions::Dlnorm<double> dlnorm;
@@ -219,10 +219,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   /**
    * @brief Evaluate multinom probability density function, default returns the
-   * log of the pdf
+   * natural log of the pdf
    *
    * @tparam T
-   * @return log pdf
+   * @return natural log of the pdf
    */
   virtual double evaluate(bool do_log) {
     fims_distributions::Dmultinom<double> dmultinom;
