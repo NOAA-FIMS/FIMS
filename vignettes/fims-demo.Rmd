@@ -148,9 +148,7 @@ fishing_fleet$log_Fmort <- log(c(
 fishing_fleet$estimate_F <- TRUE
 fishing_fleet$random_F <- FALSE
 # Set value for log_q
-fishing_fleet$log_q <- log(1.0)
-fishing_fleet$estimate_q <- FALSE
-fishing_fleet$random_q <- FALSE
+fishing_fleet$log_q$value <- log(1.0)
 fishing_fleet$log_obs_error <- rep(log(sqrt(log(0.01^2 + 1))), nyears)
 fishing_fleet$estimate_obs_error <- FALSE
 # Next two lines not currently used by FIMS
@@ -198,9 +196,7 @@ survey_fleet$nages <- nages
 survey_fleet$nyears <- nyears
 survey_fleet$estimate_F <- FALSE
 survey_fleet$random_F <- FALSE
-survey_fleet$log_q <- log(3.315143e-07)
-survey_fleet$estimate_q <- TRUE
-survey_fleet$random_q <- FALSE
+survey_fleet$log_q$value <- log(3.315143e-07)
 # sd = sqrt(log(cv^2 + 1)), sd is log transformed
 survey_fleet$log_obs_error <- rep(log(sqrt(log(0.2^2 + 1))), nyears)
 survey_fleet$estimate_obs_error <- FALSE
@@ -314,6 +310,7 @@ population$SetRecruitment(recruitment$get_id())
 sucess <- CreateTMBModel()
 parameters <- list(p = get_fixed())
 obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", silent = TRUE)
+SetFIMSFunctions(obj$fn, obj$gr)
 ```
 ## Fitting the Model
 ```{r fit_model}
@@ -321,7 +318,7 @@ opt <- nlminb(obj$par, obj$fn, obj$gr,
   control = list(eval.max = 800, iter.max = 800)
 ) # , method = "BFGS",
 #   control = list(maxit=1000000, reltol = 1e-15))
-
+Finalize(opt$p)
 print(opt)
 ```
 
@@ -330,7 +327,7 @@ print(opt)
 sdr <- TMB::sdreport(obj)
 sdr_fixed <- summary(sdr, "fixed")
 report <- obj$report(obj$env$last.par.best)
-
+output <- jsonlite::fromJSON(ToJSON())
 print(sdr_fixed)
 
 # report out nll components
@@ -341,7 +338,7 @@ report$age_comp_nll # fishery and survey age composition
 
 
 ## Plotting Results
-```{r plots}
+```{r plots, eval=FALSE}
 library(ggplot2)
 index_results <- data.frame(
   observed = survey_fleet_index$index_data,
