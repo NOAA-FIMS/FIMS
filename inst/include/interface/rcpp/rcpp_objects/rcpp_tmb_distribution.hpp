@@ -23,7 +23,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
       id_g;    /**< static id of the DistributionsInterfaceBase object */
   uint32_t id_m; /**< local id of the DistributionsInterfaceBase object */
   std::vector<uint32_t> key_m; /**< unique id for variable map that points to a fims::Vector */
-  std::string input_type_m;
+  std::string input_type_m; /**< type of density input, options are: prior, re, or data */
   // live objects in C++ are objects that have been created and live in memory
   static std::map<uint32_t, DistributionsInterfaceBase *> live_objects; /**<
 map relating the ID of the DistributionsInterfaceBase to the
