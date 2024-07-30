@@ -48,8 +48,7 @@ setMethod("fits", "FIMSOutput", function(x) x@fits)
 #' for each model type.
 #' @export
 #' @rdname FIMSOutput
-#' @param obj The output from `obj$report(obj$env$last.par.best)`.
-#' @param sdr sdr The returned object from running [TMB::sdreport(obj)].
+#' @param json_list A list of json information output from `Finalize()`.
 #' @param call The call the users made to run FIMS. The default is `NULL`.
 #'   This is not available for FIMS yet.
 #' @param data The input data used to fit the model. This needs to be a
@@ -59,9 +58,7 @@ setMethod("fits", "FIMSOutput", function(x) x@fits)
 #' validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [showClass()] to see all available slots.
-create_fims_output <- function(obj, sdr, call = NULL, data) {
-  # report <- obj$report(obj$env$last.par.best)
-
+create_fims_output <- function(json_list, call = NULL, data) {
   # The code will break if
   # * The age bins are not the same as the ages in the data, e.g., if age 3 is
   #   not in the data or if there is a plus group that is created internally
@@ -70,14 +67,7 @@ create_fims_output <- function(obj, sdr, call = NULL, data) {
   # * How should the initial year should be labeled, e.g., should it always be
   #   zero or one minus the initial year?
   # * Should we be reporting the covariance from sdr?
-  # * Should time by year because that is what it actually is at the moment?
-  # * What order is the index and fishing mortality information given in?
-  # Things to change in C++ code
-  # [ ] SSB should be SB
-  # [ ] Recruitment should be in sdr to get uncertainty
-  # Things to change in FIMSFrame
-  # [x] fleets(data) should give fleet names not the number of fleets
-  # [x] need n_fleets(data)
+  # * Should time be year because that is what it actually is at the moment?
 
   # Need to run the following timestamp code before running FIMS and after.
   timestamp <- as.POSIXlt(Sys.time(), tz = "UTC")
@@ -91,8 +81,8 @@ create_fims_output <- function(obj, sdr, call = NULL, data) {
   # Fill the empty data frames with data extracted from the data file
   out <- new(
     "FIMSOutput",
-    estimates = get_estimates(sdr, data),
-    fits = get_fits(),
+    estimates = get_estimates(json_list),
+    fits = get_fits(json_list, data),
     tmb = obj,
     call = call,
     timestamp = timestamp,
@@ -101,12 +91,7 @@ create_fims_output <- function(obj, sdr, call = NULL, data) {
   return(out)
 }
 
-# Questions
-# * Is there a purrr or dplyr::split way to make the indexing more robust?
-#   E.g., if if the name is length 30 then, length 31 then, length 720 then as
-#   in can you use n_fleets, n_ages, n_years to determine the order of the
-#   index?
-get_estimates <- function(sdr, data) {
+get_estimates <- function(json_list) {
   # Need to define tibble with zero rows so NA will be used to fill in
   # missing sections when combining estimates and derived quantities later
   estimates_outline <- dplyr::tibble(
@@ -122,94 +107,33 @@ get_estimates <- function(sdr, data) {
     estimated = logical()
   )
 
-  # Rules of reporting in sdreport
-  # Ages are always reported by age then by year, e.g.,
-  # age 1, age 2, age 3 for year 1 then age 1, age 2, age 3 for year 2
-  year_int_line <- (start_year(data) - 1):end_year(data)
-  age_int_line <- 1:n_ages(data)
-  year_vector <- c(
-    # Numbers at age
-    rep(year_int_line, each = n_ages(data)),
-    # Biomass
-    rep(year_int_line, 1),
-    # Spawning biomass
-    rep(year_int_line, 1),
-    # Ln Recruitment Deviations
-    rep(year_int_line[-1], 1),
-    # Fishing mortality
-    rep(year_int_line[-1], times = n_fleets(data)),
-    # Index
-    rep(year_int_line[-1], times = n_fleets(data)),
-    # Catch numbers at age
-    rep(rep(year_int_line[-1], each = n_ages(data)), times = n_fleets(data))
-  )
-  age_vector <- c(
-    # Numbers at age
-    rep(age_int_line, times = length(year_int_line)),
-    # Biomass
-    rep(NA, length(year_int_line)),
-    # Spawning biomass
-    rep(NA, length(year_int_line)),
-    # Ln Recruitment Deviations
-    rep(NA, n_years(data)),
-    # Fishing mortality
-    rep(NA, each = n_years(data) * n_fleets(data)),
-    # Index
-    rep(NA, each = n_years(data) * n_fleets(data)),
-    # Catch numbers at age
-    rep(rep(age_int_line, times = n_years(data)), times = n_fleets(data))
-  )
-  fleet_vector <- c(
-    # Numbers at age
-    rep(NA, n_ages(data) * length(year_int_line)),
-    # Biomass
-    rep(NA, length(year_int_line)),
-    # Spawning biomass
-    rep(NA, length(year_int_line)),
-    # Ln Recruitment Deviations
-    rep(NA, n_years(data)),
-    # Fishing mortality
-    rep(fleets(data), each = n_years(data)),
-    # Index
-    rep(fleets(data), each = n_years(data)),
-    # Catch numbers at age
-    rep(fleets(data), each = n_ages(data) * n_years(data))
-  )
-  sdr_tibble <- tibble::tibble(
-    label = names(sdr[["value"]]),
-    fleet = fleet_vector,
-    age = age_vector,
-    time = year_vector,
-    estimate = sdr[["value"]],
-    uncertainty = sdr[["sd"]]
+  # Format the JSON to get information out easier
+  # Delete anything you want here to the return function
+  
+  # Doing this renaming is dumb
+  # but helped me understand some stuff in the beginning
+  names(json_list) <- ifelse(
+    names(json_list) == "module",
+    purrr::map(json_list, "name"),
+    names(json_list)
   )
 
-  fixed_effects_tibble <- dplyr::tibble(
-    label = "",
-    estimate = sdr[["par.fixed"]],
-    uncertainty = sqrt(diag(sdr[["cov.fixed"]])),
-    gradient = sdr[["gradient.fixed"]][1, ]
-  )
-  estimates <- estimates_outline |>
-    dplyr::full_join(
-      sdr_tibble,
-      by = c("label", "fleet", "age", "time", "estimate", "uncertainty")
+  # Does not get what we need but helped me understand the structure
+  # it could be better to use tidyjson in the beginning then reverse
+  # engineer their functions using purrr and tidyr later.
+  # Might want to remove the data objects and just work with modules
+  # for this function
+  json_list |>
+    unlist() |>
+    tibble::enframe() |>
+    tidyr::separate_wider_delim(
+      name,
+      delim = ".",
+      too_few = "align_start",
+      names = c("module", "type", "x")
     ) |>
-    dplyr::full_join(
-      fixed_effects_tibble,
-      by = c("label", "estimate", "uncertainty", "gradient")
-    ) |>
-    dplyr::mutate(
-      label = dplyr::case_when(
-        label == "Biomass" ~ "pop-b",
-        label == "ExpectedIndex" ~ "pop-index",
-        label == "FMort" ~ "pop-F_mort",
-        label == "LogRecDev" ~ "rec-ln_rec_dev",
-        grepl("NAA", label) ~ "pop-naa",
-        label == "SSB" ~ "pop-sb",
-        .default = label
-      )
-    )
+    print(n = 300)
+
   return(estimates)
 }
 
