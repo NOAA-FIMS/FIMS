@@ -97,7 +97,7 @@ init_fims <- function(i) {
   fishing_fleet <- new(fims$Fleet)
   fishing_fleet$nages <- om_input$nages
   fishing_fleet$nyears <- om_input$nyr
-  fishing_fleet$log_Fmort <- log(om_output$f)
+  fishing_fleet$input_type <- new(VariableVector, log(om_output$f), om_input$nyr)
   fishing_fleet$estimate_F <- TRUE
   fishing_fleet$random_F <- FALSE
   fishing_fleet$log_q <- log(1.0)
@@ -125,7 +125,7 @@ init_fims <- function(i) {
   survey_fleet$is_survey <- TRUE
   survey_fleet$nages <- om_input$nages
   survey_fleet$nyears <- om_input$nyr
-  # survey_fleet$log_Fmort <- rep(log(0.0000000000000000000000000001), om_input$nyr) #-Inf?
+  # survey_fleet$input_type <- new(VariableVector, rep(log(0.0000000000000000000000000001), om_input$nyr), om_input$nyr) #-Inf?
   survey_fleet$estimate_F <- FALSE
   survey_fleet$random_F <- FALSE
   survey_fleet$log_q <- log(om_output$survey_q$survey1)

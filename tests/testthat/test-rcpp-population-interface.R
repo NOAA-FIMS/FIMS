@@ -3,10 +3,9 @@ test_that("Population input settings work as expected", {
   population <- new(Population)
   nyears <- 10
   nages <- 10
-  population$log_M <- rep(-1, nyears * nages)
-  population$estimate_M <- FALSE
-  population$log_init_naa <- log(rep(1, nages))
-  population$estimate_init_naa <- TRUE
+  population$log_M <- methods::new(ParameterVector, rep(-1, nyears * nages), nyears * nages)
+  population$log_init_naa <- methods::new(ParameterVector, log(rep(1, nages)), nages)
+  population$log_init_naa$set_all_estimable(TRUE)
   population$nages <- nages
   population$ages <- 1:nages
   population$nfleets <- 2

@@ -50,7 +50,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$recruitment$log_sigma_recruit$is_random_effect <- FALSE
   test_env$recruitment$log_sigma_recruit$estimated <- FALSE
   # set up log_rzero (equilibrium recruitment)
-  test_env$recruitment$log_rzero$value <- log(om_input$R0)
+ test_env$recruitment$log_rzero$value <- log(om_input$R0)
   test_env$recruitment$log_rzero$is_random_effect <- FALSE
   test_env$recruitment$log_rzero$estimated <- TRUE
   # set up logit_steep
@@ -62,7 +62,8 @@ setup_fims <- function(om_input, om_output, em_input) {
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  test_env$recruitment$log_devs <- om_input$logR.resid[-1]
+  test_env$recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], length(om_input$logR.resid[-1]))
+  
 
 
   # Data
@@ -111,9 +112,9 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet <- new(test_env$fims$Fleet)
   test_env$fishing_fleet$nages <- om_input$nages
   test_env$fishing_fleet$nyears <- om_input$nyr
-  test_env$fishing_fleet$log_Fmort <- log(om_output$f)
-  test_env$fishing_fleet$estimate_F <- TRUE
-  test_env$fishing_fleet$random_F <- FALSE
+  test_env$fishing_fleet$log_Fmort <- new(VariableVector, log(om_output$f), om_input$nyr)
+  test_env$fishing_fleet$log_Fmort$set_all_estimatable(TRUE)
+  #test_env$fishing_fleet$random_F <- FALSE
   test_env$fishing_fleet$log_q <- log(1.0)
   test_env$fishing_fleet$estimate_q <- FALSE
   test_env$fishing_fleet$random_q <- FALSE
@@ -131,7 +132,7 @@ setup_fims <- function(om_input, om_output, em_input) {
 
   # Create the survey fleet
   test_env$survey_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
-  test_env$survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
+   test_env$survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
   test_env$survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
   # turn on estimation of inflection_point
   test_env$survey_fleet_selectivity$inflection_point$estimated <- TRUE
@@ -144,8 +145,8 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$survey_fleet$is_survey <- TRUE
   test_env$survey_fleet$nages <- om_input$nages
   test_env$survey_fleet$nyears <- om_input$nyr
-  test_env$survey_fleet$estimate_F <- FALSE
-  test_env$survey_fleet$random_F <- FALSE
+  #test_env$survey_fleet$estimate_F <- FALSE
+  #test_env$survey_fleet$random_F <- FALSE
   test_env$survey_fleet$log_q <- log(om_output$survey_q$survey1)
   test_env$survey_fleet$estimate_q <- TRUE
   test_env$survey_fleet$random_q <- FALSE
@@ -159,10 +160,13 @@ setup_fims <- function(om_input, om_output, em_input) {
 
   # Population
   test_env$population <- new(test_env$fims$Population)
-  test_env$population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages)
-  test_env$population$estimate_M <- FALSE
-  test_env$population$log_init_naa <- log(om_output$N.age[1, ])
-  test_env$population$estimate_init_naa <- TRUE
+  test_env$population$log_M <- methods::new(ParameterVector, 
+    rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages),
+     om_input$nyr * om_input$nages)
+  test_env$population$log_M$set_all_estimable(FALSE)
+  test_env$population$log_init_naa <- methods::new(ParameterVector, 
+    log(om_output$N.age[1, ]), om_input$nages)
+  test_env$population$log_init_naa$set_all_estimatable(TRUE)
   test_env$population$nages <- om_input$nages
   test_env$population$ages <- om_input$ages
   test_env$population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
@@ -623,11 +627,12 @@ test_that("run FIMS in a for loop with missing values", {
     # this change moves the starting value away from its true value
     recruitment$log_rzero$is_random_effect <- FALSE
     recruitment$log_rzero$estimated <- TRUE
-    recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
+   recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
     recruitment$logit_steep$is_random_effect <- FALSE
     recruitment$logit_steep$estimated <- FALSE
     recruitment$estimate_log_devs <- TRUE
-    recruitment$log_devs <- rep(0, length(om_input$logR.resid) - 1)
+    recruitment$log_devs <- methods::new(ParameterVector, rep(0, length(om_input$logR.resid) - 1),length(om_input$logR.resid) - 1)
+   
 
     # Data
     catch <- em_input$L.obs$fleet1
@@ -657,7 +662,7 @@ test_that("run FIMS in a for loop with missing values", {
 
     # Maturity
     maturity <- new(fims$LogisticMaturity)
-    maturity$inflection_point$value <- om_input$A50.mat
+   maturity$inflection_point$value <- om_input$A50.mat
     maturity$inflection_point$is_random_effect <- FALSE
     maturity$inflection_point$estimated <- FALSE
     maturity$slope$value <- om_input$slope
@@ -677,9 +682,9 @@ test_that("run FIMS in a for loop with missing values", {
     fishing_fleet <- new(fims$Fleet)
     fishing_fleet$nages <- om_input$nages
     fishing_fleet$nyears <- om_input$nyr
-    fishing_fleet$log_Fmort <- log(om_output$f)
-    fishing_fleet$estimate_F <- TRUE
-    fishing_fleet$random_F <- FALSE
+    fishing_fleet$log_Fmort <- new(VariableVector, log(om_output$f), om_input$nyr)
+    fishing_fleet$log_Fmort$set_all_estimatable(TRUE)
+    #fishing_fleet$random_F <- FALSE
     fishing_fleet$log_q <- log(1.0)
     fishing_fleet$estimate_q <- FALSE
     fishing_fleet$random_q <- FALSE
@@ -705,9 +710,9 @@ test_that("run FIMS in a for loop with missing values", {
     survey_fleet$is_survey <- TRUE
     survey_fleet$nages <- om_input$nages
     survey_fleet$nyears <- om_input$nyr
-    # survey_fleet$log_Fmort <- rep(log(0.0000000000000000000000000001), om_input$nyr) #-Inf?
-    survey_fleet$estimate_F <- FALSE
-    survey_fleet$random_F <- FALSE
+    # survey_fleet$log_Fmort <- new(VariableVector, rep(log(0.0000000000000000000000000001), om_input$nyr), om_input$nyr) #-Inf?
+    # survey_fleet$estimate_F <- FALSE
+    # survey_fleet$random_F <- FALSE
     survey_fleet$log_q <- log(om_output$survey_q$survey1)
     survey_fleet$estimate_q <- TRUE
     survey_fleet$random_q <- FALSE
@@ -724,10 +729,12 @@ test_that("run FIMS in a for loop with missing values", {
     # is it a problem these are not Parameters in the Population interface?
     # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors,
     # do we need a ParameterVector class?
-    population$log_M <- rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages)
-    population$estimate_M <- FALSE
-    population$log_init_naa <- log(om_output$N.age[1, ])
-    population$estimate_init_naa <- TRUE
+    population$log_M <- methods::new(ParameterVector, 
+      rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages),
+      om_input$nyr * om_input$nages)
+    population$log_M$set_all_estimable(FALSE)
+    population$log_init_naa <- methods::new(ParameterVector, log(om_output$N.age[1, ]), om_input$nages)
+    population$log_init_naa$set_all_estimatable(TRUE)
     population$nages <- om_input$nages
     population$ages <- om_input$ages
     population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)

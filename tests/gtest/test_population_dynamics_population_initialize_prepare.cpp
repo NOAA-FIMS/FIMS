@@ -16,6 +16,7 @@ namespace
     TEST_F(PopulationInitializeTestFixture, Initialize_works)
     {
 
+        population.numbers_at_age.resize((nyears + 1) * nages);
         population.Initialize(nyears, nseasons, nages);
 
         EXPECT_EQ(population.nfleets, nfleets);

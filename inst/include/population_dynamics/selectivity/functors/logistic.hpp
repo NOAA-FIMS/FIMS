@@ -12,6 +12,7 @@
 
 //#include "../../../interface/interface.hpp"
 #include "../../../common/fims_math.hpp"
+#include "../../../common/fims_vector.hpp"
 #include "selectivity_base.hpp"
 
 namespace fims_popdy {

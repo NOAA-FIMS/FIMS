@@ -86,14 +86,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual double evaluate(double spawners, double ssbzero) {
     fims_popdy::SRBevertonHolt<double> BevHolt;
 
-    BevHolt.logit_steep = this->logit_steep.value_m;
+    BevHolt.logit_steep[0] = this->logit_steep.value_m;
     if (this->logit_steep.value_m == 1.0) {
       warning(
           "Steepness is subject to a logit transformation, so its value is "
           "0.7848469. Fixing it at 1.0 is not currently possible.");
     }
 
-    BevHolt.log_rzero = this->log_rzero.value_m;
+    BevHolt.log_rzero[0] = this->log_rzero.value_m;
 
     return BevHolt.evaluate(spawners, ssbzero);
   }
@@ -155,7 +155,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     recruitment->log_recruit_devs.resize(this->log_devs.size());
     for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
       recruitment->log_recruit_devs[i] = this->log_devs[i].value_m;
-      if (this->log_devs[i].estimated_m) {
+      if (this->estimate_log_devs) {
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
       } else {
         recruitment->estimate_log_recruit_devs = false;
