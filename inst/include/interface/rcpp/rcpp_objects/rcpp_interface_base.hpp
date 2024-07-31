@@ -212,7 +212,7 @@ public:
      * @param value The value to be assigned
      */
     void fill_min(double value){
-        for(size_t i = 0; i < this->storage_m.size(); i++){
+        for(int i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
             p.min_m = value;
             this->storage_m[i] = Rcpp::wrap(p);
@@ -225,7 +225,7 @@ public:
      * @param value The value to be assigned
      */
     void fill_max(double value){
-        for(size_t i = 0; i < this->storage_m.size(); i++){
+        for(int i = 0; i < this->storage_m.size(); i++){
             Parameter p = Rcpp::as<Parameter>(this->storage_m[i]);
             p.max_m = value;
             this->storage_m[i] = Rcpp::wrap(p);

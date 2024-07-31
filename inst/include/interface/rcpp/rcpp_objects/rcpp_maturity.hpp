@@ -99,6 +99,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     maturity->inflection_point.resize(1);
     maturity->inflection_point[0] = this->inflection_point.value_m;
     if (this->inflection_point.estimated_m) {
+      info->RegisterParameterName("maturity inflection_point");
       if (this->inflection_point.is_random_effect_m) {
         info->RegisterRandomEffect(maturity->inflection_point[0]);
       } else {
@@ -106,8 +107,9 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
       }
     }
     maturity->slope.resize(1);
-    maturity->slope = this->slope.value_m;
+    maturity->slope[0] = this->slope.value_m;
     if (this->slope.estimated_m) {
+      info->RegisterParameterName("maturity slope");
       if (this->slope.is_random_effect_m) {
         info->RegisterRandomEffect(maturity->slope[0]);
       } else {

@@ -15,6 +15,7 @@
 #ifndef DENSITY_COMPONENT_BASE_HPP
 #define DENSITY_COMPONENT_BASE_HPP
 
+#include "../../common/data_object.hpp"
 #include "../../common/model_object.hpp"
 #include "../../interface/interface.hpp"
 #include "../../common/fims_vector.hpp"
@@ -34,13 +35,20 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
  static uint32_t id_g; /**< global unique identifier for distribution modules */
- fims::Vector<Type> x; /**< input value of distribution function */
+ uint32_t observed_data_id_m = -999; /*!< id of observed data component*/
+ std::shared_ptr<fims_data_object::DataObject<Type>>
+      observed_values; /**< observed data*/
+ fims::Vector<Type > x; /**< input value of distribution function for proirs or random effects*/
  fims::Vector<Type> expected_values; /**< expected value of distribution function */
  fims::Vector<Type> lpdf_vec; /**< vector to record observation level negative log-likelihood values */
- std::string  input_type; /**< string classifies the type of the negative log-likelihood; options are: prior, re, data */
+ std::string  input_type; /**< string classifies the type of the negative log-likelihood; options are: "priors", "random_effects", and "data" */
  bool osa_flag = false; /**< Boolean; if true, osa residuals are calculated */
  bool simulate_flag = false; /**< Boolean; if true, data are simulated from the distribution */
  std::vector<uint32_t> key; /**< unique id for variable map that points to a fims::Vector */
+
+  #ifdef TMB_MODEL
+    ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
+  #endif
 
   /** @brief Constructor.
    */

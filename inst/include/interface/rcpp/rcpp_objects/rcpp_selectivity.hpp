@@ -99,6 +99,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->inflection_point.resize(1);
     selectivity->inflection_point[0] = this->inflection_point.value_m;
     if (this->inflection_point.estimated_m) {
+      info->RegisterParameterName("logistic selectivity inflection_point");
       if (this->inflection_point.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->inflection_point[0]);
       } else {
@@ -109,6 +110,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->slope.resize(1);
     selectivity->slope[0] = this->slope.value_m;
     if (this->slope.estimated_m) {
+      info->RegisterParameterName("logistic selectivity slope");
       if (this->slope.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->slope[0]);
       } else {
@@ -190,6 +192,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->inflection_point_asc.resize(1);
     selectivity->inflection_point_asc[0] = this->inflection_point_asc.value_m;
     if (this->inflection_point_asc.estimated_m) {
+      info->RegisterParameterName("double logistic selectivity inflection_point_asc");
       if (this->inflection_point_asc.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->inflection_point_asc[0]);
       } else {
@@ -200,6 +203,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->slope_asc.resize(1);
     selectivity->slope_asc[0] = this->slope_asc.value_m;
     if (this->slope_asc.estimated_m) {
+      info->RegisterParameterName("double logistic selectivity slope_asc");
       if (this->slope_asc.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->slope_asc[0]);
       } else {
@@ -210,6 +214,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->inflection_point_desc.resize(1);
     selectivity->inflection_point_desc[0] = this->inflection_point_desc.value_m;
     if (this->inflection_point_desc.estimated_m) {
+      info->RegisterParameterName("double logistic selectivity inflection_point_desc");
       if (this->inflection_point_desc.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->inflection_point_desc[0]);
       } else {
@@ -220,6 +225,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->slope_desc.resize(1);
     selectivity->slope_desc[0] = this->slope_desc.value_m;
     if (this->slope_desc.estimated_m) {
+      info->RegisterParameterName("double logistic selectivity slope_desc");
       if (this->slope_desc.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->slope_desc[0]);
       } else {

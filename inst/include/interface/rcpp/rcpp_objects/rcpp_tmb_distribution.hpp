@@ -28,6 +28,8 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   static std::map<uint32_t, DistributionsInterfaceBase *> live_objects; /**<
 map relating the ID of the DistributionsInterfaceBase to the
 DistributionsInterfaceBase objects */
+uint32_t interface_observed_data_id_m =
+      -999; /**< id of observed data object*/
 
   DistributionsInterfaceBase() {
     this->id_m = DistributionsInterfaceBase::id_g++;
@@ -43,15 +45,25 @@ DistributionsInterfaceBase objects */
    */
   virtual uint32_t get_id() = 0;
 
-  /**
+/**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
+   * 
+   * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
+   * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
-  void set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
-    this->input_type_m = input_type;
-    this->key_m.resize(ids.size());
-    for(size_t i; i<ids.size(); i++){
-      this->key_m[i] = ids[i];
-    }
+  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+    return false;
+  }
+
+
+  /**
+   * @brief Set the unique id for the Observed Data object
+   *
+   * @param observed_data_id Unique id for the Observed Age Comp Data
+   * object
+   */
+  virtual bool set_observed_data(int observed_data_id){
+    return false;
   }
 
   /** @brief evaluate method for child distribution interface objects to inherit
@@ -79,13 +91,39 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   ParameterVector x;    /**< observed data */
   ParameterVector expected_values; /**< mean of x for the normal distribution */
   ParameterVector log_sd;   /**< sd of x for the normal distribution */
-  Rcpp::LogicalVector is_na; /**<Boolean; if true, data observation is NA and the likelihood contribution is skipped */
-
+  
   DnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
   virtual uint32_t get_id() { return this->id_m; }
 
   virtual ~DnormDistributionsInterface() {}
+
+ /**
+   * @brief Set the unique id for the Observed Data object
+   *
+   * @param observed_data_id Unique id for the Observed Age Comp Data
+   * object
+   */
+  virtual bool set_observed_data(int observed_data_id) {
+    this->interface_observed_data_id_m = observed_data_id;
+    return true;
+  }
+
+  /**
+   * @brief set_distribution_links sets pointers for data observations, random effects, or priors
+   * 
+   * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
+   * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
+   */
+  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+    this->input_type_m = input_type;
+    this->key_m.resize(ids.size());
+    for(int i; i<ids.size(); i++){
+      this->key_m[i] = ids[i];
+    }
+
+    return true;
+  }
 
   /**
    * @brief Evaluate normal probability density function, default returns the
@@ -94,28 +132,24 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @tparam T
    * @return log pdf
    */
-
-
   virtual double evaluate() {
     fims_distributions::NormalLPDF<double> dnorm;
     dnorm.x.resize(this->x.size());
     dnorm.expected_values.resize(this->expected_values.size());
     dnorm.log_sd.resize(this->log_sd.size());
-    dnorm.is_na.resize(this->is_na.size());
-    for(int i=0; i<x.size(); i++){
+    for(size_t i=0; i<x.size(); i++){
       dnorm.x[i] = this->x[i].value_m;
     }
-    for(int i=0; i<expected_values.size(); i++){
+    for(size_t i=0; i<expected_values.size(); i++){
       dnorm.expected_values[i] = this->expected_values[i].value_m;
     }
-    for(int i=0; i<log_sd.size(); i++){
+    for(size_t i=0; i<log_sd.size(); i++){
       dnorm.log_sd[i] = this->log_sd[i].value_m;
-    }
-    for(int i=0; i<is_na.size(); i++){
-      dnorm.is_na[i] = this->is_na[i];
     }
     return dnorm.evaluate();
   }
+
+  
 
 #ifdef TMB_MODEL
 
@@ -128,26 +162,38 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         std::make_shared<fims_distributions::NormalLPDF<Type>>();
 
     // interface to data/parameter value
+
+    distribution->observed_data_id_m =
+        interface_observed_data_id_m;
+    distribution->input_type = this->input_type_m;
+    distribution->key.resize(this->key_m.size());
+    for(size_t i=0; i<this->key_m.size(); i++){
+      distribution->key[i] = this->key_m[i];
+    }
     distribution->id = this->id_m;
     distribution->x.resize(this->x.size());
-    for(int i=0; i<this->x.size(); i++){
+    for(size_t i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
-    for(int i=0; i<this->expected_values.size(); i++){
+    for(size_t i=0; i<this->expected_values.size(); i++){
       distribution->expected_values[i] = this->expected_values[i].value_m;
     }
     distribution->log_sd.resize(this->log_sd.size());
-    for(int i=0; i<this->log_sd.size(); i++){
+    for(size_t i=0; i<this->log_sd.size(); i++){
       distribution->log_sd[i] = this->log_sd[i].value_m;
+      if(this->log_sd[i].estimated_m){
+        info->RegisterParameterName("normal log_sd");
+        info->RegisterParameter(distribution->log_sd[i]);
+      }
+      if (this->log_sd[i].is_random_effect_m) {
+        error("standard deviations cannot be set to random effects");
+      }
     }
-    distribution->is_na.resize(this->is_na.size());
-    for(int i=0; i<is_na.size(); i++){
-      distribution->is_na[i] = this->is_na[i];
-    }
+    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
-    info->distribution_models[distribution->id] = distribution;
+    info->density_components[distribution->id] = distribution;
 
     return true;
   }
@@ -179,8 +225,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   ParameterVector expected_values; /**< mean of the distribution of log(x) */
   ParameterVector log_logsd;   /**< log standard deviation of the distribution of log(x) */
   Rcpp::String input_type; /**< character string indicating type of input: data, re, prior */
-  Rcpp::LogicalVector is_na; /**<Boolean; if true, data observation is NA and the likelihood contribution is skipped */
-
+  
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
   virtual ~DlnormDistributionsInterface() {}
@@ -189,6 +234,34 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief get the id of the Dlnorm distributions interface class object
    */
   virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @brief Set the unique id for the Observed Data object
+   *
+   * @param observed_data_id Unique id for the Observed Age Comp Data
+   * object
+   */
+  virtual bool set_observed_data(int observed_data_id) {
+    this->interface_observed_data_id_m = observed_data_id;
+
+    return true;
+  }
+
+  /**
+   * @brief set_distribution_links sets pointers for data observations, random effects, or priors
+   * 
+   * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
+   * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
+   */
+  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+    this->input_type_m = input_type;
+    this->key_m.resize(ids.size());
+    for(int i; i<ids.size(); i++){
+      this->key_m[i] = ids[i];
+    }
+
+    return true;
+  }   
 
   /**
    * @brief Evaluate lognormal probability density function, default returns the
@@ -203,18 +276,14 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_logsd.resize(this->log_logsd.size());
-    dlnorm.is_na.resize(this->is_na.size());
-    for(int i=0; i<x.size(); i++){
+    for(size_t i=0; i<x.size(); i++){
       dlnorm.x[i] = this->x[i].value_m;
     }
-    for(int i=0; i<expected_values.size(); i++){
+    for(size_t i=0; i<expected_values.size(); i++){
       dlnorm.expected_values[i] = this->expected_values[i].value_m;
     }
-    for(int i=0; i<log_logsd.size(); i++){
+    for(size_t i=0; i<log_logsd.size(); i++){
       dlnorm.log_logsd[i] = this->log_logsd[i].value_m;
-    }
-    for(int i=0; i<is_na.size(); i++){
-      dlnorm.is_na[i] = this->is_na[i];
     }
     return dlnorm.evaluate();
   }
@@ -231,26 +300,36 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     distribution->id = this->id_m;
-    distribution->input_type = this->input_type;
+    distribution->observed_data_id_m =
+        interface_observed_data_id_m;
+    distribution->input_type = this->input_type_m;
+    distribution->key.resize(this->key_m.size());
+    for(size_t i=0; i<this->key_m.size(); i++){
+      distribution->key[i] = this->key_m[i];
+    }
     distribution->x.resize(this->x.size());
-    for(int i=0; i<this->x.size(); i++){
+    for(size_t i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
-    for(int i=0; i<this->expected_values.size(); i++){
+    for(size_t i=0; i<this->expected_values.size(); i++){
       distribution->expected_values[i] = this->expected_values[i].value_m;
     }
     distribution->log_logsd.resize(this->log_logsd.size());
-    for(int i=0; i<this->log_logsd.size(); i++){
+    for(size_t i=0; i<this->log_logsd.size(); i++){
       distribution->log_logsd[i] = this->log_logsd[i].value_m;
+      if(this->log_logsd[i].estimated_m){
+        info->RegisterParameterName("lognormal log_logsd");
+        info->RegisterParameter(distribution->log_logsd[i]);
+      }
+      if (this->log_logsd[i].is_random_effect_m) {
+        error("standard deviations cannot be set to random effects");
+      }
     }
-    distribution->is_na.resize(this->is_na.size());
-    for(int i=0; i<is_na.size(); i++){
-      distribution->is_na[i] = this->is_na[i];
-    }
+    info->variable_map[this->log_logsd.id_m] = &(distribution)->log_logsd;
 
-    info->distribution_models[distribution->id] = distribution;
+    info->density_components[distribution->id] = distribution;
 
     return true;
   }
@@ -283,7 +362,6 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   ParameterVector x; /**< Vector of length K of integers */
   ParameterVector expected_values; /**< Vector of length K, specifying the probability
  for the K classes (note, unlike in R these must sum to 1). */
-  Rcpp::LogicalVector is_na; /**<Boolean; if true, data observation is NA and the likelihood contribution is skipped */
   Rcpp::NumericVector dims; /**< Dimensions of the number of rows and columns of the multivariate dataset */
 
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
@@ -291,6 +369,34 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual ~DmultinomDistributionsInterface() {}
 
   virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @brief Set the unique id for the Observed Data object
+   *
+   * @param observed_data_id Unique id for the Observed Age Comp Data
+   * object
+   */
+  virtual bool set_observed_data(int observed_data_id) {
+    this->interface_observed_data_id_m = observed_data_id;
+
+    return true;
+  }
+
+  /**
+   * @brief set_distribution_links sets pointers for data observations, random effects, or priors
+   * 
+   * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
+   * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
+   */
+  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+    this->input_type_m = input_type;
+    this->key_m.resize(ids.size());
+    for(int i; i<ids.size(); i++){
+      this->key_m[i] = ids[i];
+    }
+
+    return true;
+  }
 
   /**
    * @brief Evaluate multinom probability density function, default returns the
@@ -304,15 +410,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     // Declare TMBVector in this scope
     dmultinom.x.resize(this->x.size());
     dmultinom.expected_values.resize(this->expected_values.size());
-    dmultinom.is_na.resize(this->is_na.size());
-    for(int i=0; i<x.size(); i++){
+    for(size_t i=0; i<x.size(); i++){
       dmultinom.x[i] = this->x[i].value_m;
     }
-    for(int i=0; i<expected_values.size(); i++){
+    for(size_t i=0; i<expected_values.size(); i++){
       dmultinom.expected_values[i] = this->expected_values[i].value_m;
-    }
-    for(int i=0; i<is_na.size(); i++){
-      dmultinom.is_na[i] = this->is_na[i];
     }
     dmultinom.dims.resize(2);
     dmultinom.dims[0] = this->dims[0];
@@ -331,24 +433,29 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
 
     distribution->id = this->id_m;
+    distribution->observed_data_id_m =
+        interface_observed_data_id_m;
+    distribution->input_type = this->input_type_m;
+    distribution->key.resize(this->key_m.size());
+    for(size_t i=0; i<this->key_m.size(); i++){
+      distribution->key[i] = this->key_m[i];
+    }
     distribution->x.resize(this->x.size());
-    for(int i=0; i<this->x.size(); i++){
+    for(size_t i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
-    for(int i=0; i<this->expected_values.size(); i++){
+    for(size_t i=0; i<this->expected_values.size(); i++){
       distribution->expected_values[i] = this->expected_values[i].value_m;
     }
-    distribution->is_na.resize(this->is_na.size());
-    for(int i=0; i<is_na.size(); i++){
-      distribution->is_na[i] = this->is_na[i];
+    if(this->dims.size()>0){
+      distribution->dims.resize(2);
+      distribution->dims[0] = this->dims[0];
+      distribution->dims[1] = this->dims[1];
     }
-    distribution->dims.resize(2);
-    distribution->dims[0] = this->dims[0];
-    distribution->dims[1] = this->dims[1];
 
-    info->distribution_models[distribution->id] = distribution;
+    info->density_components[distribution->id] = distribution;
 
     return true;
   }
