@@ -85,14 +85,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   virtual double evaluate(double spawners, double ssbzero) {
     fims_popdy::SRBevertonHolt<double> BevHolt;
-
+    BevHolt.logit_steep.resize(1);
     BevHolt.logit_steep[0] = this->logit_steep.value_m;
     if (this->logit_steep.value_m == 1.0) {
       warning(
           "Steepness is subject to a logit transformation, so its value is "
           "0.7848469. Fixing it at 1.0 is not currently possible.");
     }
-
+    BevHolt.log_rzero.resize(1);
     BevHolt.log_rzero[0] = this->log_rzero.value_m;
 
     return BevHolt.evaluate(spawners, ssbzero);
@@ -100,8 +100,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   virtual double evaluate_lpdf() {
     fims_popdy::SRBevertonHolt<double> LPDF;
-
-    LPDF.log_sigma_recruit = this->log_sigma_recruit.value_m;
+    LPDF.log_sigma_recruit.resize(1);
+    LPDF.log_sigma_recruit[0] = this->log_sigma_recruit.value_m;
     LPDF.log_recruit_devs.resize(log_devs.size());  // Vector from TMB
     for (int i = 0; i < log_devs.size(); i++) {
       LPDF.log_recruit_devs[i] = log_devs[i].value_m;
@@ -124,7 +124,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     // set relative info
     recruitment->id = this->id;
-    recruitment->logit_steep = this->logit_steep.value_m;
+    //set logit_steep
+    recruitment->logit_steep.resize(1);
+    recruitment->logit_steep[0] = this->logit_steep.value_m;
     if (this->logit_steep.estimated_m) {
       if (this->logit_steep.is_random_effect_m) {
         info->RegisterRandomEffect(recruitment->logit_steep[0]);
@@ -133,7 +135,10 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
     info->variable_map[this->logit_steep.id_m] = &(recruitment)->logit_steep;
-    recruitment->log_rzero = this->log_rzero.value_m;
+    
+    //set log_rzero
+    recruitment->log_rzero.resize(1);
+    recruitment->log_rzero[0] = this->log_rzero.value_m;
     if (this->log_rzero.estimated_m) {
       if (this->log_rzero.is_random_effect_m) {
         info->RegisterRandomEffect(recruitment->log_rzero[0]);
@@ -142,7 +147,10 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
     info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
-    recruitment->log_sigma_recruit = this->log_sigma_recruit.value_m;
+
+    //set log_sigma_recruit
+    recruitment->log_sigma_recruit.resize(1);
+    recruitment->log_sigma_recruit[0] = this->log_sigma_recruit.value_m;
     if (this->log_sigma_recruit.estimated_m) {
       if (this->log_sigma_recruit.is_random_effect_m) {
         info->RegisterRandomEffect(recruitment->log_sigma_recruit[0]);
@@ -152,6 +160,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     }
     info->variable_map[this->log_sigma_recruit.id_m] = &(recruitment)->log_sigma_recruit;
 
+    //set log_recruit_devs
     recruitment->log_recruit_devs.resize(this->log_devs.size());
     for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
       recruitment->log_recruit_devs[i] = this->log_devs[i].value_m;

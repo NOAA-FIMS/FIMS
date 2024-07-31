@@ -33,10 +33,10 @@ test_that("Recruitment input settings work as expected", {
   expected_lpdf <- sum(log(stats::dnorm(log_devs, 0, 0.7)))
 
 
-  recruitment$log_devs$set_all_estimable(FALSE)
+  recruitment$estimate_log_devs <- FALSE
   expect_equal(recruitment$evaluate_lpdf(), 0.0)
 
-  recruitment$log_devs$set_all_estimable(TRUE)
+  recruitment$estimate_log_devs <- TRUE
   expect_equal(recruitment$evaluate_lpdf(), expected = expected_lpdf)
 
   clear()

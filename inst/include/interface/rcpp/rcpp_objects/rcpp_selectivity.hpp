@@ -77,8 +77,10 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual double evaluate(double x) {
     fims_popdy::LogisticSelectivity<double> LogisticSel;
-    LogisticSel.inflection_point = this->inflection_point.value_m;
-    LogisticSel.slope = this->slope.value_m;
+    LogisticSel.inflection_point.resize(1);
+    LogisticSel.inflection_point[0] = this->inflection_point.value_m;
+    LogisticSel.slope.resize(1);
+    LogisticSel.slope[0] = this->slope.value_m;
     return LogisticSel.evaluate(x);
   }
 
@@ -94,7 +96,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     selectivity->id = this->id;
-    selectivity->inflection_point = this->inflection_point.value_m;
+    selectivity->inflection_point.resize(1);
+    selectivity->inflection_point[0] = this->inflection_point.value_m;
     if (this->inflection_point.estimated_m) {
       if (this->inflection_point.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->inflection_point[0]);
@@ -103,7 +106,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
     }
     info->variable_map[this->inflection_point.id_m] = &(selectivity)->inflection_point;
-    selectivity->slope = this->slope.value_m;
+    selectivity->slope.resize(1);
+    selectivity->slope[0] = this->slope.value_m;
     if (this->slope.estimated_m) {
       if (this->slope.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->slope[0]);
@@ -159,11 +163,15 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual double evaluate(double x) {
     fims_popdy::DoubleLogisticSelectivity<double> DoubleLogisticSel;
-    DoubleLogisticSel.inflection_point_asc = this->inflection_point_asc.value_m;
-    DoubleLogisticSel.slope_asc = this->slope_asc.value_m;
-    DoubleLogisticSel.inflection_point_desc =
+    DoubleLogisticSel.inflection_point_asc.resize(1);
+    DoubleLogisticSel.inflection_point_asc[0] = this->inflection_point_asc.value_m;
+    DoubleLogisticSel.slope_asc.resize(1);
+    DoubleLogisticSel.slope_asc[0] = this->slope_asc.value_m;
+    DoubleLogisticSel.inflection_point_desc.resize(1);
+    DoubleLogisticSel.inflection_point_desc[0] =
         this->inflection_point_desc.value_m;
-    DoubleLogisticSel.slope_desc = this->slope_desc.value_m;
+    DoubleLogisticSel.slope_desc.resize(1);
+    DoubleLogisticSel.slope_desc[0] = this->slope_desc.value_m;
     return DoubleLogisticSel.evaluate(x);
   }
 
@@ -179,7 +187,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     // set relative info
     selectivity->id = this->id;
-    selectivity->inflection_point_asc = this->inflection_point_asc.value_m;
+    selectivity->inflection_point_asc.resize(1);
+    selectivity->inflection_point_asc[0] = this->inflection_point_asc.value_m;
     if (this->inflection_point_asc.estimated_m) {
       if (this->inflection_point_asc.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->inflection_point_asc[0]);
@@ -188,7 +197,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
     }
     info->variable_map[this->inflection_point_asc.id_m] = &(selectivity)->inflection_point_asc;
-    selectivity->slope_asc = this->slope_asc.value_m;
+    selectivity->slope_asc.resize(1);
+    selectivity->slope_asc[0] = this->slope_asc.value_m;
     if (this->slope_asc.estimated_m) {
       if (this->slope_asc.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->slope_asc[0]);
@@ -197,7 +207,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
     }
     info->variable_map[this->slope_asc.id_m] = &(selectivity)->slope_asc;
-    selectivity->inflection_point_desc = this->inflection_point_desc.value_m;
+    selectivity->inflection_point_desc.resize(1);
+    selectivity->inflection_point_desc[0] = this->inflection_point_desc.value_m;
     if (this->inflection_point_desc.estimated_m) {
       if (this->inflection_point_desc.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->inflection_point_desc[0]);
@@ -206,7 +217,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
     }
     info->variable_map[this->inflection_point_desc.id_m] = &(selectivity)->inflection_point_desc;
-    selectivity->slope_desc = this->slope_desc.value_m;
+    selectivity->slope_desc.resize(1);
+    selectivity->slope_desc[0] = this->slope_desc.value_m;
     if (this->slope_desc.estimated_m) {
       if (this->slope_desc.is_random_effect_m) {
         info->RegisterRandomEffect(selectivity->slope_desc[0]);
