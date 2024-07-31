@@ -81,6 +81,17 @@ Rcpp::NumericVector get_random_parameters_vector() {
   return p;
 }
 
+Rcpp::List get_parameter_names(Rcpp::List pars) {
+  // base model
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+  pars.attr("names") = d0->parameter_names;
+
+
+  return pars;
+}
+
 /**
  * Clears the contents of info log file.
  */
@@ -210,6 +221,16 @@ void clear_debug_log() {
 }
 
 /**
+ * Clears the contents of distributions log file.
+ */
+void clear_distributions_log() {
+  DISTRIBUTIONS_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/distributions.log");
+  CLEAR_LOG.close();
+  DISTRIBUTIONS_LOG.seekp(0);
+}
+
+/**
  * Clears the contents of log files.
  */
 void clear_logs() {
@@ -225,6 +246,7 @@ void clear_logs() {
   clear_maturity_log();
   clear_selectivity_log();
   clear_debug_log();
+  clear_distributions_log();
 }
 
 template <typename Type>
@@ -325,6 +347,7 @@ RCPP_MODULE(fims) {
   Rcpp::function("CreateTMBModel", &CreateTMBModel);
   Rcpp::function("get_fixed", &get_fixed_parameters_vector);
   Rcpp::function("get_random", &get_random_parameters_vector);
+  Rcpp::function("get_parameter_names", &get_parameter_names);
   Rcpp::function("clear", clear);
   Rcpp::function("clear_logs", clear_logs);
   Rcpp::function("clear_fims_log", clear_fims_log);
@@ -374,8 +397,7 @@ RCPP_MODULE(fims) {
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
       .field("log_sigma_recruit",
              &BevertonHoltRecruitmentInterface::log_sigma_recruit)
-      .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate)
-      .method("evaluate_lpdf", &BevertonHoltRecruitmentInterface::evaluate_lpdf);
+      .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
@@ -384,16 +406,10 @@ RCPP_MODULE(fims) {
       .field("log_Fmort", &FleetInterface::log_Fmort)
       .field("nages", &FleetInterface::nages)
       .field("nyears", &FleetInterface::nyears)
-      .field("estimate_F", &FleetInterface::estimate_F)
       .field("estimate_q", &FleetInterface::estimate_q)
-      .field("estimate_obs_error", &FleetInterface::estimate_obs_error)
       .field("random_q", &FleetInterface::random_q)
-      .field("random_F", &FleetInterface::random_F)
-      .field("log_obs_error", &FleetInterface::log_obs_error)
-      .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
-      .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
-      .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
-      .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
+      .field("log_expected_index", &FleetInterface::log_expected_index)
+      .field("proportion_catch_numbers_at_age", &FleetInterface::proportion_catch_numbers_at_age)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
@@ -417,8 +433,6 @@ RCPP_MODULE(fims) {
       .field("log_init_naa", &PopulationInterface::log_init_naa)
       .field("proportion_female", &PopulationInterface::proportion_female)
       .field("ages", &PopulationInterface::ages)
-      .field("estimate_M", &PopulationInterface::estimate_M)
-      .field("estimate_init_naa", &PopulationInterface::estimate_initNAA)
       .field("estimate_prop_female", &PopulationInterface::estimate_prop_female)
       .method("evaluate", &PopulationInterface::evaluate)
       .method("SetMaturity", &PopulationInterface::SetMaturity)
@@ -430,10 +444,11 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id)
       .method("evaluate", &DnormDistributionsInterface::evaluate)
+      .method("set_observed_data", &DnormDistributionsInterface::set_observed_data)
+      .method("set_distribution_links", &DnormDistributionsInterface::set_distribution_links)
       .field("x", &DnormDistributionsInterface::x)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
-      .field("log_sd", &DnormDistributionsInterface::log_sd)
-      .field("is_na", &DnormDistributionsInterface::is_na);
+      .field("log_sd", &DnormDistributionsInterface::log_sd);
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
@@ -472,19 +487,21 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
+      .method("set_observed_data", &DlnormDistributionsInterface::set_observed_data)
+      .method("set_distribution_links", &DlnormDistributionsInterface::set_distribution_links)
       .field("input_type", &DlnormDistributionsInterface::input_type)
       .field("x", &DlnormDistributionsInterface::x)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
-      .field("log_logsd", &DlnormDistributionsInterface::log_logsd)
-      .field("is_na", &DlnormDistributionsInterface::is_na);
+      .field("log_logsd", &DlnormDistributionsInterface::log_logsd);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
       .method("get_id", &DmultinomDistributionsInterface::get_id)
+      .method("set_observed_data", &DmultinomDistributionsInterface::set_observed_data)
+      .method("set_distribution_links", &DmultinomDistributionsInterface::set_distribution_links)
       .field("x", &DmultinomDistributionsInterface::x)
       .field("expected_values", &DmultinomDistributionsInterface::expected_values)
-      .field("is_na", &DmultinomDistributionsInterface::is_na)
       .field("dims", &DmultinomDistributionsInterface::dims);
 }
 

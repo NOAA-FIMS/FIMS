@@ -197,5 +197,7 @@ for(i in 1:v_size){
    expect_equal(v_log_test$at(i)$value, log(v1_value))
 }
 
+clear()
+
 })
 

@@ -51,16 +51,6 @@ std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
  *
  */
 class FleetInterface : public FleetInterfaceBase {
-  int interface_agecomp_likelihood_id_m =
-      -999; /**< id of agecomp likelihood component. The "interface_" prefix
-               indicates it belongs to the FleetInterface class, and the "_m"
-               postfix signifies that it's a member variable. */
-  int interface_index_likelihood_id_m =
-      -999; /**< id of index likelihood component*/
-  int interface_observed_agecomp_data_id_m =
-      -999; /**< id of observed agecomp data object*/
-  int interface_observed_index_data_id_m =
-      -999;                              /**< id of observed index data object*/
   int interface_selectivity_id_m = -999; /**< id of selectivity component*/
 
  public:
@@ -70,16 +60,10 @@ class FleetInterface : public FleetInterfaceBase {
   double log_q;           /**< log of catchability for the fleet*/
   ParameterVector
       log_Fmort;           /**< log of fishing mortality rate for the fleet*/
-  ParameterVector expected_catch; /**< expected catch for the fleet */
-  ParameterVector expected_index; /**< expected index of abundance for the survey */
-  ParameterVector catch_numbers_at_age; /**< expected catch numbers at age for the fleet */
-  bool estimate_F = false; /**< whether the parameter F should be estimated*/
+  ParameterVector log_expected_index; /**< expected index of abundance for the survey */
+  ParameterVector proportion_catch_numbers_at_age; /**< expected catch numbers at age for the fleet */
   bool estimate_q = false; /**< whether the parameter q should be estimated*/
-  bool estimate_obs_error = false;   /**< whether the parameter log_obs_error
-                                          should be estimated*/
   bool random_q = false;             /**< whether q should be a random effect*/
-  bool random_F = false;             /**< whether F should be a random effect*/
-  Rcpp::NumericVector log_obs_error; /**< the log of the observation error */
 
   FleetInterface() : FleetInterfaceBase() {}
 
@@ -87,43 +71,6 @@ class FleetInterface : public FleetInterfaceBase {
 
   /** @brief returns the id for the fleet interface */
   virtual uint32_t get_id() { return this->id; }
-
-  /**
-   * @brief Set the unique id for the Age Comp Likelihood object
-   *
-   * @param agecomp_likelihood_id Unique id for the Age Comp Likelihood object
-   */
-  void SetAgeCompLikelihood(int agecomp_likelihood_id) {
-    interface_agecomp_likelihood_id_m = agecomp_likelihood_id;
-  }
-
-  /**
-   * @brief Set the unique id for the Index Likelihood object
-   *
-   * @param index_likelihood_id Unique id for the Index Likelihood object
-   */
-  void SetIndexLikelihood(int index_likelihood_id) {
-    interface_index_likelihood_id_m = index_likelihood_id;
-  }
-
-  /**
-   * @brief Set the unique id for the Observed Age Comp Data object
-   *
-   * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
-   * object
-   */
-  void SetObservedAgeCompData(int observed_agecomp_data_id) {
-    interface_observed_agecomp_data_id_m = observed_agecomp_data_id;
-  }
-
-  /**
-   * @brief Set the unique id for the Observed Index Data object
-   *
-   * @param observed_index_data_id Unique id for the Observed Index Data object
-   */
-  void SetObservedIndexData(int observed_index_data_id) {
-    interface_observed_index_data_id_m = observed_index_data_id;
-  }
 
   /**
    * @brief Set the unique id for the Selectivity object
@@ -148,23 +95,11 @@ class FleetInterface : public FleetInterfaceBase {
     fleet->is_survey = this->is_survey;
     fleet->nages = this->nages;
     fleet->nyears = this->nyears;
-    fleet->fleet_agecomp_likelihood_id_m = interface_agecomp_likelihood_id_m;
-    fleet->fleet_index_likelihood_id_m = interface_index_likelihood_id_m;
-    fleet->fleet_observed_agecomp_data_id_m =
-        interface_observed_agecomp_data_id_m;
-    fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m;
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
-
-    fleet->log_obs_error.resize(this->log_obs_error.size());
-    for (int i = 0; i < log_obs_error.size(); i++) {
-      fleet->log_obs_error[i] = this->log_obs_error[i];
-      if (this->estimate_obs_error) {
-        info->RegisterParameter(fleet->log_obs_error[i]);
-      }
-    }
 
     fleet->log_q = this->log_q;
     if (this->estimate_q) {
+      info->RegisterParameterName("log_q");
       if (this->random_q) {
         info->RegisterRandomEffect(fleet->log_q);
       } else {
@@ -173,10 +108,11 @@ class FleetInterface : public FleetInterfaceBase {
     }
 
     fleet->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_Fmort.size(); i++) {
+    for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].value_m;
 
       if (this->log_Fmort[i].estimated_m) {
+        info->RegisterParameterName("log_Fmort");
         if (this->log_Fmort[i].is_random_effect_m) {
           info->RegisterRandomEffect(fleet->log_Fmort[i]);
         } else {
@@ -188,12 +124,10 @@ class FleetInterface : public FleetInterfaceBase {
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
     //exp_catch
-    fleet->expected_catch.resize(nyears);
-    info->variable_map[this->expected_catch.id_m] = &(fleet)->expected_catch;
-    fleet->expected_index.resize(nyears);  // assume index is for all ages.
-    info->variable_map[this->expected_index.id_m] = &(fleet)->expected_index;
-    fleet->catch_numbers_at_age.resize(nyears * nages);
-    info->variable_map[this->catch_numbers_at_age.id_m] = &(fleet)->catch_numbers_at_age;
+    fleet->log_expected_index.resize(nyears);  // assume index is for all ages.
+    info->variable_map[this->log_expected_index.id_m] = &(fleet)->log_expected_index;
+    fleet->proportion_catch_numbers_at_age.resize(nyears * nages);
+    info->variable_map[this->proportion_catch_numbers_at_age.id_m] = &(fleet)->proportion_catch_numbers_at_age;
 
 
     // add to Information

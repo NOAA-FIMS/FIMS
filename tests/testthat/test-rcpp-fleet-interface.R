@@ -23,34 +23,3 @@ fleet module", {
 })
 
 
-test_that("Fleet: SetAgeCompLikelihood works", {
-  fleet <- new(Fleet)
-
-  expect_silent(fleet$SetAgeCompLikelihood(1))
-
-  clear()
-})
-
-test_that("Fleet: SetIndexLikelihood works", {
-  fleet <- new(Fleet)
-
-  expect_silent(fleet$SetIndexLikelihood(1))
-
-  clear()
-})
-
-test_that("Fleet: SetObservedAgeCompData works", {
-  fleet <- new(Fleet)
-
-  expect_silent(fleet$SetObservedAgeCompData(1))
-
-  clear()
-})
-
-test_that("Fleet: SetObservedIndexData works", {
-  fleet <- new(Fleet)
-
-  expect_silent(fleet$SetObservedIndexData(1))
-
-  clear()
-})

@@ -62,9 +62,7 @@ class Model {  // may need singleton
   const Type Evaluate() {
     // jnll = negative-log-likelihood (the objective function)
     Type jnll = 0.0;
-    Type rec_nll = 0.0;       // recrutiment nll
-    Type age_comp_nll = 0.0;  // age composition nll
-    Type index_nll = 0.0;     // survey and fishery cacth nll
+
 
     int n_fleets = fims_information->fleets.size();
     int n_pops = fims_information->populations.size();
@@ -86,99 +84,165 @@ class Model {  // may need singleton
     vector<vector<Type> > log_recruit_dev(n_pops);
     vector<vector<Type> > recruitment(n_pops);
     vector<vector<Type> > M(n_pops);
-
+    vector<Type> nll_components(this->fims_information->density_components.size());
 #endif
+    // Loop over densities and evaluate joint negative log densities for priors
+    typename fims_info::Information<Type>::density_components_iterator d_it;
+    nll_components.fill(0);
+    int nll_components_idx = 0;
+    size_t n_priors = 0;
+    MODEL_LOG << "Expecting to evaluate " << this->fims_information->density_components.size()
+               << " density components." << std::endl;
+    for(d_it = this->fims_information->density_components.begin();
+        d_it!= this->fims_information->density_components.end(); ++d_it){
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
+      #ifdef TMB_MODEL
+        d->of = this->of;
+      #endif
+      if(d->input_type == "prior"){
+        nll_components[nll_components_idx] = -d->evaluate();
+        jnll += nll_components[nll_components_idx];
+        n_priors += 1;
+        nll_components_idx += 1;
+      }
+    }
+    MODEL_LOG << "The joint negative log likelihood after evaluating "
+              << n_priors << " prior distributions is:  "<< jnll << "."
+              << std::endl;
 
-    // Loop over populations, evaluate, and sum up the recruitment likelihood
-    // component
 
-    typename fims_info::Information<Type>::population_iterator it;
-    MODEL_LOG << "Evaluating expected values and summing recruitment nlls for "
+    // Loop over populations and evaluate recruitment component
+
+    typename fims_info::Information<Type>::population_iterator p_it;
+    MODEL_LOG << "Evaluating recruitment expected values for "
               << this->fims_information->populations.size() << " populations."
               << std::endl;
 
-    for (it = this->fims_information->populations.begin();
-         it != this->fims_information->populations.end(); ++it) {
-      //(*it).second points to the Population module
-      MODEL_LOG << "Setting up pointer to population " << (*it).second->id
+    for (p_it = this->fims_information->populations.begin();
+         p_it != this->fims_information->populations.end(); ++p_it) {
+      //(*p_it).second points to the Population module
+      std::shared_ptr<fims_popdy::Population<Type> > p = (*p_it).second;
+      MODEL_LOG << "Setting up pointer to population " << p->id
                 << "." << std::endl;
       // Prepare recruitment
-      (*it).second->recruitment->Prepare();
+      p->recruitment->Prepare();
       MODEL_LOG << "Recruitment for population successfully prepared"
                 << std::endl;
-// link to TMB objective function
-#ifdef TMB_MODEL
-      (*it).second->of = this->of;
-#endif
-      // Evaluate population
-      (*it).second->Evaluate();
-      // Recrtuiment negative log-likelihood
-      rec_nll -= (*it).second->recruitment->evaluate_lpdf();
-      MODEL_LOG << "Recruitment negative log-likelihood is: " << rec_nll
-                << std::endl;
     }
-    MODEL_LOG << "All populations successfully evaluated." << std::endl;
 
-    // Loop over fleets/surveys, and sum up age comp and index nlls
-
-    typename fims_info::Information<Type>::fleet_iterator jt;
-    MODEL_LOG << "Evaluating expected values and summing nlls for "
-              << this->fims_information->fleets.size() << " fleets."
+    // Loop over densities and evaluate joint negative log-likelihoods for random effects
+    MODEL_LOG << "Setup random effects." << std::endl;
+    this->fims_information->setup_random_effects();
+    size_t n_random_effects = 0;
+    for(d_it = this->fims_information->density_components.begin();
+        d_it!= this->fims_information->density_components.end(); ++d_it){
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
+      #ifdef TMB_MODEL
+        d->of = this->of;
+      #endif
+      if(d->input_type == "random_effects"){
+        nll_components[nll_components_idx] = -d->evaluate();
+        jnll += nll_components[nll_components_idx];
+        n_random_effects += 1;
+        nll_components_idx += 1;
+      }
+    }
+    MODEL_LOG << "The joint negative log likelihood after evaluating "
+              << n_random_effects << " random effects distributions is:  "<< jnll << "."
               << std::endl;
 
-    for (jt = this->fims_information->fleets.begin();
-         jt != this->fims_information->fleets.end(); ++jt) {
-      //(*jt).second points to each individual Fleet module
+    // Loop over and evaluate populations
+    MODEL_LOG << "Evaluating expected values for "
+              << this->fims_information->populations.size() << " populations."
+              << std::endl;
+    for (p_it = this->fims_information->populations.begin();
+         p_it != this->fims_information->populations.end(); ++p_it) {
+      //(*p_it).second points to the Population module
+      std::shared_ptr<fims_popdy::Population<Type> > p = (*p_it).second;
+      // link to TMB objective function
 #ifdef TMB_MODEL
-      (*jt).second->of = this->of;
+      p->of = this->of;
 #endif
-      MODEL_LOG << "Setting up pointer to fleet " << (*jt).second->id << "."
-                << std::endl;
-      age_comp_nll -= (*jt).second->evaluate_age_comp_lpmf();
-      MODEL_LOG << "Sum of survey and age comp negative log-likelihood is: "
-                << age_comp_nll << std::endl;
-      index_nll -= (*jt).second->evaluate_index_lpdf();
+      // Evaluate population
+      p->Evaluate();
     }
-    MODEL_LOG << "All fleets successfully evaluated." << std::endl;
-    // Loop over populations and fleets/surveys and fill in reporting
+
+    typename fims_info::Information<Type>::fleet_iterator f_it;
+    // Loop over fleets/surveys, and evaluate age comp and index expected values
+     for (f_it = this->fims_information->fleets.begin();
+        f_it != this->fims_information->fleets.end(); ++f_it) {
+      //(*f_it).second points to each individual Fleet module
+      std::shared_ptr<fims_popdy::Fleet<Type> > f = (*f_it).second;
+#ifdef TMB_MODEL
+      f->of = this->of;
+#endif
+        MODEL_LOG << "Setting up pointer to fleet " << f->id << "."
+                  << std::endl;
+        f->evaluate_age_comp();
+        f->evaluate_index();
+      }
+    MODEL_LOG << "Setup data expected values." << std::endl;
+    this->fims_information->setup_data();
+    // Loop over and evaluate data joint negative log-likelihoods
+    int n_data = 0;
+    for(d_it = this->fims_information->density_components.begin();
+        d_it!= this->fims_information->density_components.end(); ++d_it){
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
+      #ifdef TMB_MODEL
+        d->of = this->of;
+        //d->keep = this->keep;
+      #endif
+      if(d->input_type == "data"){
+        nll_components[nll_components_idx] = -d->evaluate();
+        jnll += nll_components[nll_components_idx];
+        n_data += 1;
+        nll_components_idx += 1;
+      }
+    }
+    MODEL_LOG << "The joint negative log likelihood after evaluating "
+              << n_data << " data distributions is:  "<< jnll << "."
+              << std::endl;
+
 
     // initiate population index for structuring report out objects
     int pop_idx = 0;
-    for (it = this->fims_information->populations.begin();
-         it != this->fims_information->populations.end(); ++it) {
+    for (p_it = this->fims_information->populations.begin();
+         p_it != this->fims_information->populations.end(); ++p_it) {
+      std::shared_ptr<fims_popdy::Population<Type> > p = (*p_it).second;
 #ifdef TMB_MODEL
-      naa(pop_idx) = vector<Type>((*it).second->numbers_at_age);
-      ssb(pop_idx) = vector<Type>((*it).second->spawning_biomass);
+      naa(pop_idx) = vector<Type>(p->numbers_at_age);
+      ssb(pop_idx) = vector<Type>(p->spawning_biomass);
       log_recruit_dev(pop_idx) =
-          vector<Type>((*it).second->recruitment->log_recruit_devs);
-      recruitment(pop_idx) = vector<Type>((*it).second->expected_recruitment);
-      biomass(pop_idx) = vector<Type>((*it).second->biomass);
-      M(pop_idx) = vector<Type>((*it).second->M);
+          vector<Type>(p->recruitment->log_recruit_devs);
+      recruitment(pop_idx) = vector<Type>(p->expected_recruitment);
+      biomass(pop_idx) = vector<Type>(p->biomass);
+      M(pop_idx) = vector<Type>(p->M);
 #endif
       pop_idx += 1;
     }
 
     // initiate fleet index for structuring report out objects
     int fleet_idx = 0;
-    for (jt = this->fims_information->fleets.begin();
-         jt != this->fims_information->fleets.end(); ++jt) {
+    for (f_it = this->fims_information->fleets.begin();
+         f_it != this->fims_information->fleets.end(); ++f_it) {
+      std::shared_ptr<fims_popdy::Fleet<Type> > f = (*f_it).second;
 #ifdef TMB_MODEL
-      exp_index(fleet_idx) = (*jt).second->expected_index;
-      exp_catch(fleet_idx) = (*jt).second->expected_catch;
-      F_mort(fleet_idx) = (*jt).second->Fmort;
-      cnaa(fleet_idx) = (*jt).second->catch_numbers_at_age;
-      cwaa(fleet_idx) = (*jt).second->catch_weight_at_age;
+      exp_index(fleet_idx) = f->expected_index;
+      exp_catch(fleet_idx) = f->expected_catch;
+      F_mort(fleet_idx) = f->Fmort;
+      cnaa(fleet_idx) = f->catch_numbers_at_age;
+      cwaa(fleet_idx) = f->catch_weight_at_age;
 #endif
       fleet_idx += 1;
     }
 
-    jnll = rec_nll + age_comp_nll + index_nll;
+   // jnll = rec_nll + age_comp_nll + index_nll;
 
 // Reporting
 #ifdef TMB_MODEL
-    FIMS_REPORT_F(rec_nll, of);
-    FIMS_REPORT_F(age_comp_nll, of);
-    FIMS_REPORT_F(index_nll, of);
+    //FIMS_REPORT_F(rec_nll, of);
+    //FIMS_REPORT_F(age_comp_nll, of);
+    //FIMS_REPORT_F(index_nll, of);
     FIMS_REPORT_F(jnll, of);
     FIMS_REPORT_F(naa, of);
     FIMS_REPORT_F(ssb, of);
@@ -191,6 +255,7 @@ class Model {  // may need singleton
     FIMS_REPORT_F(F_mort, of);
     FIMS_REPORT_F(cnaa, of);
     FIMS_REPORT_F(cwaa, of);
+    FIMS_REPORT_F(nll_components, of);
 
     /*ADREPORT using ADREPORTvector defined in
      * inst/include/interface/interface.hpp:
