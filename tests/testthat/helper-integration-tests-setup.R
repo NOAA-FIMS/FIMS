@@ -34,7 +34,7 @@ setup_and_run_FIMS <- function(iter_id,
   recruitment$log_rzero$is_random_effect <- FALSE
   recruitment$log_rzero$estimated <- TRUE
   # set up logit_steep
- recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
+  recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
   recruitment$logit_steep$is_random_effect <- FALSE
   recruitment$logit_steep$estimated <- FALSE
   # turn on estimation of deviations
@@ -72,7 +72,7 @@ setup_and_run_FIMS <- function(iter_id,
   maturity$inflection_point$value <- om_input$A50.mat
   maturity$inflection_point$is_random_effect <- FALSE
   maturity$inflection_point$estimated <- FALSE
- maturity$slope$value <- om_input$slope
+  maturity$slope$value <- om_input$slope
   maturity$slope$is_random_effect <- FALSE
   maturity$slope$estimated <- FALSE
 

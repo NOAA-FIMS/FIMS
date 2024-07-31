@@ -187,7 +187,7 @@ public:
                                             JsonArray a50 = (*it).second.GetArray();
                                             selectivity->inflection_point = a50[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "A50 " << selectivity->inflection_point << "\n";
+                                                std::cout << "A50 " << selectivity->inflection_point[0] << "\n";
                                             }
                                         }
 
@@ -196,7 +196,7 @@ public:
                                             JsonArray slope = (*it).second.GetArray();
                                             selectivity->slope = slope[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "slope " << selectivity->slope << "\n";
+                                                std::cout << "slope " << selectivity->slope[0] << "\n";
                                             }
                                         }
 
@@ -214,7 +214,7 @@ public:
                                             JsonArray a50 = (*it).second.GetArray();
                                             selectivity->inflection_point_asc = a50[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "A50 asc " << selectivity->inflection_point_asc << "\n";
+                                                std::cout << "A50 asc " << selectivity->inflection_point_asc[0] << "\n";
                                             }
                                         }
 
@@ -223,7 +223,7 @@ public:
                                             JsonArray slope = (*it).second.GetArray();
                                             selectivity->slope_asc = slope[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "slope asc " << selectivity->slope_asc << "\n";
+                                                std::cout << "slope asc " << selectivity->slope_asc[0] << "\n";
                                             }
                                         }
 
@@ -232,7 +232,7 @@ public:
                                             JsonArray a50 = (*it).second.GetArray();
                                             selectivity->inflection_point_desc = a50[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "A50 desc " << selectivity->inflection_point_desc << "\n";
+                                                std::cout << "A50 desc " << selectivity->inflection_point_desc[0] << "\n";
                                             }
                                         }
 
@@ -241,7 +241,7 @@ public:
                                             JsonArray slope = (*it).second.GetArray();
                                             selectivity->slope_desc = slope[0].GetDouble();
                                             if (print_statements) {
-                                                std::cout << "slope desc " << selectivity->slope_desc << "\n";
+                                                std::cout << "slope desc " << selectivity->slope_desc[0] << "\n";
                                             }
                                         }
                                         f->selectivity = selectivity;
@@ -509,7 +509,7 @@ public:
                     double r0 = (*it).second.GetArray()[0].GetDouble();
                     rec->log_rzero = std::log(r0);
                     if (print_statements) {
-                        std::cout << "R0 " << rec->log_rzero << "| \n";
+                        std::cout << "R0 " << rec->log_rzero[0] << "| \n";
                     }
                 }
             } else {
@@ -523,7 +523,7 @@ public:
                 if ((*it).second.GetType() == JsonValueType::Array) {
                     rec->logit_steep = fims_math::logit(0.2, 1.0, (*it).second.GetArray()[0].GetDouble());
                     if (print_statements) {
-                        std::cout << "'h' " << rec->logit_steep << " \n";
+                        std::cout << "'h' " << rec->logit_steep[0] << " \n";
                     }
                 }
             } else {
@@ -537,7 +537,7 @@ public:
                 if ((*it).second.GetType() == JsonValueType::Array) {
                     rec->log_sigma_recruit = (*it).second.GetArray()[0].GetDouble();
                     if (print_statements) {
-                        std::cout << "'SD' " << rec->log_sigma_recruit << " \n";
+                        std::cout << "'SD' " << rec->log_sigma_recruit[0] << " \n";
                     }
                 }
             } else {
@@ -588,7 +588,7 @@ public:
                 if ((*it).second.GetType() == JsonValueType::Array) {
                     mat->inflection_point = (*it).second.GetArray()[0].GetDouble();
                     if (print_statements) {
-                        std::cout << "inflection_point " << mat->inflection_point << " \n";
+                        std::cout << "inflection_point " << mat->inflection_point[0] << " \n";
                     }
                 }
             } else {
@@ -604,7 +604,7 @@ public:
                 if ((*it).second.GetType() == JsonValueType::Array) {
                     mat->slope = (*it).second.GetArray()[0].GetDouble();
                     if (print_statements) {
-                        std::cout << "slope " << mat->slope << " \n";
+                        std::cout << "slope " << mat->slope[0] << " \n";
                     }
                 }
             } else {

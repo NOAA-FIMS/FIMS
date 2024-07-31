@@ -79,8 +79,10 @@ class PopulationEvaluateTestFixture : public testing::Test {
       auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
       auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
-      selectivity->inflection_point = 7;
-      selectivity->slope = 0.5;
+      selectivity->inflection_point.resize(1);
+      selectivity->inflection_point[0] = 7;
+      selectivity->slope.resize(1);
+      selectivity->slope[0] = 0.5;
 
       
       fleet->expected_catch.resize(nyears);

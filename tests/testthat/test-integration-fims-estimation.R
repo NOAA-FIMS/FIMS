@@ -112,8 +112,8 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet <- new(test_env$fims$Fleet)
   test_env$fishing_fleet$nages <- om_input$nages
   test_env$fishing_fleet$nyears <- om_input$nyr
-  test_env$fishing_fleet$log_Fmort <- new(VariableVector, log(om_output$f), om_input$nyr)
-  test_env$fishing_fleet$log_Fmort$set_all_estimatable(TRUE)
+  test_env$fishing_fleet$log_Fmort <- new(ParameterVector, log(om_output$f), om_input$nyr)
+  test_env$fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   #test_env$fishing_fleet$random_F <- FALSE
   test_env$fishing_fleet$log_q <- log(1.0)
   test_env$fishing_fleet$estimate_q <- FALSE
@@ -166,7 +166,7 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$population$log_M$set_all_estimable(FALSE)
   test_env$population$log_init_naa <- methods::new(ParameterVector, 
     log(om_output$N.age[1, ]), om_input$nages)
-  test_env$population$log_init_naa$set_all_estimatable(TRUE)
+  test_env$population$log_init_naa$set_all_estimable(TRUE)
   test_env$population$nages <- om_input$nages
   test_env$population$ages <- om_input$ages
   test_env$population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
@@ -682,8 +682,8 @@ test_that("run FIMS in a for loop with missing values", {
     fishing_fleet <- new(fims$Fleet)
     fishing_fleet$nages <- om_input$nages
     fishing_fleet$nyears <- om_input$nyr
-    fishing_fleet$log_Fmort <- new(VariableVector, log(om_output$f), om_input$nyr)
-    fishing_fleet$log_Fmort$set_all_estimatable(TRUE)
+    fishing_fleet$log_Fmort <- new(ParameterVector, log(om_output$f), om_input$nyr)
+    fishing_fleet$log_Fmort$set_all_estimable(TRUE)
     #fishing_fleet$random_F <- FALSE
     fishing_fleet$log_q <- log(1.0)
     fishing_fleet$estimate_q <- FALSE
@@ -710,7 +710,7 @@ test_that("run FIMS in a for loop with missing values", {
     survey_fleet$is_survey <- TRUE
     survey_fleet$nages <- om_input$nages
     survey_fleet$nyears <- om_input$nyr
-    # survey_fleet$log_Fmort <- new(VariableVector, rep(log(0.0000000000000000000000000001), om_input$nyr), om_input$nyr) #-Inf?
+    # survey_fleet$log_Fmort <- new(ParameterVector, rep(log(0.0000000000000000000000000001), om_input$nyr), om_input$nyr) #-Inf?
     # survey_fleet$estimate_F <- FALSE
     # survey_fleet$random_F <- FALSE
     survey_fleet$log_q <- log(om_output$survey_q$survey1)
@@ -734,7 +734,7 @@ test_that("run FIMS in a for loop with missing values", {
       om_input$nyr * om_input$nages)
     population$log_M$set_all_estimable(FALSE)
     population$log_init_naa <- methods::new(ParameterVector, log(om_output$N.age[1, ]), om_input$nages)
-    population$log_init_naa$set_all_estimatable(TRUE)
+    population$log_init_naa$set_all_estimable(TRUE)
     population$nages <- om_input$nages
     population$ages <- om_input$ages
     population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
