@@ -74,26 +74,32 @@ struct NormalLPDF : public DensityComponentBase<Type> {
                 sd[i] = fims_math::exp(log_sd[i]);
               }
             }
-            if(!is_na[i])
-            {
+            #ifdef TMB_MODEL
+            if(this->input_type == "data"){
+              if(this->x->at(i) != this->x->na_value){
+                  this->lpdf_vec[i] = dnorm(this->x->at(i), mu[i], sd[i], true);
+              } else {
+                this->lpdf_vec[i] = 0
+              } 
+              
+            } else {
               // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x[i], mu[i], sd[i], true);
-              #ifdef TMB_MODEL
               this->lpdf_vec[i] = dnorm(this->x[i], mu[i], sd[i], true);
-
-              lpdf += this->lpdf_vec[i];
-              if(this->simulate_flag){
-                  FIMS_SIMULATE_F(this->of){
-                      this->x[i] = rnorm(mu[i], sd[i]);
-                  }
-              }
-              #endif
+            }
+            lpdf += this->lpdf_vec[i];
+            if(this->simulate_flag){
+                FIMS_SIMULATE_F(this->of){
+                    this->x[i] = rnorm(mu[i], sd[i]);
+                }
+            }
+          #endif
             /* osa not working yet
               if(osa_flag){//data observation type implements osa residuals
                   //code for osa cdf method
                   this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i], mu[i], sd[i]) );
                   this->lpdf_vec[i] = this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i], mu[i], sd[i]) );
               } */
-            }
+            
         }
         #ifdef TMB_MODEL
         vector<Type> normal_x = this->x;

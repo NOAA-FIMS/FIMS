@@ -106,12 +106,12 @@ class Information {
   // distributions
   std::map<uint32_t,
            std::shared_ptr<fims_distributions::DensityComponentBase<Type> > >
-      distribution_models; /**<hash map to link each object to its shared
+      density_components; /**<hash map to link each object to its shared
                               location in memory*/
   typedef typename std::map<
       uint32_t,
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > >::iterator
-      distribution_models_iterator;
+      density_components_iterator;
   /**< iterator for distribution objects>*/
 
   std::unordered_map<uint32_t, fims::Vector<Type>* > 
@@ -154,6 +154,56 @@ class Information {
   void RegisterRandomEffect(Type& re) {
     this->random_effects_parameters.push_back(&re);
   }
+
+    
+  void setup_priors(){
+    for(density_components_iterator it = density_components.begin(); it!= density_components.end(); ++it){
+      std::shared_ptr<DensityComponentBase<Type> > n = (*it).second;
+      if(n->input_type == "prior"){
+        variable_map_iterator vmit;
+        vmit = this->variable_map.find(n->key[0]); 
+        n->x = *(*vmit).second;
+        for(size_t i=1; i<n->key.size(); i++){
+          vmit = this->variable_map.find(n->key[i]); 
+          n->x.insert(std::end(n->x), 
+            std::begin(*(*vmit).second), std::end(*(*vmit).second));
+        } 
+      }
+    }
+  }
+  void setup_random_effects(){
+    for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
+      std::shared_ptr<DensityComponentBase<Type> > n = (*it).second;
+      if(n->input_type == "re"){
+        variable_map_iterator vmit;
+        vmit = this->variable_map.find(n->key[0]); 
+        n->x = *(*vmit).second;
+        for(size_t i=1; i<n->key.size(); i++){
+          vmit = this->variable_map.find(n->key[i]); 
+          n->x.insert(std::end(n->x), 
+                                    std::begin(*(*vmit).second), std::end(*(*vmit).second));
+        } 
+      }
+    }
+  }
+  void setup_data(){
+    for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
+      std::shared_ptr<DensityComponentBase<Type> > n = (*it).second;
+      if(n->input_type == "data"){
+        variable_map_iterator vmit;
+        vmit = this->variable_map.find(n->key[0]); 
+        n->expected_value = *(*vmit).second;
+        
+        for(size_t i=1; i<n->key.size(); i++){
+          vmit = this->variable_map.find(n->key[i]); 
+          n->expected_value.insert(std::end(n->expected_value), 
+            std::begin(*(*vmit).second), std::end(*(*vmit).second));
+        } 
+      }
+    }
+  }
+    
+
 
   /**
    * Create the generalized stock assessment model that will evaluate the
@@ -284,86 +334,7 @@ class Information {
       }
       // end set selectivity
 
-      INFO_LOG << "Checking for available index likelihood function."
-               << std::endl;
-      // set index likelihood
-      if (f->fleet_index_likelihood_id_m != -999) {
-        uint32_t ind_like_id = static_cast<uint32_t>(
-            f->fleet_index_likelihood_id_m);  // cast as unsigned integer
-        distribution_models_iterator it = this->distribution_models.find(
-            ind_like_id);  // if find, set it, otherwise invalid
-        INFO_LOG << "Input index likelihood function id = " << ind_like_id
-                 << "." << std::endl;
-
-        if (it != this->distribution_models.end()) {
-          f->index_likelihood =
-              (*it).second;  // elements in container held in pair (first is
-                             // id, second is object - shared pointer to
-                             // distribution)
-          INFO_LOG << "Index likelihood function successfully set."
-                   << std::endl;
-        } else {
-          // Commented out for now as code uses single likelihood function
-          // making this fail valid_model = false; ERROR_LOG << "Error: Expected
-          // index likelihood function not defined for fleet "
-          //          << f->id << ", likelihood function " << ind_like_id <<
-          //          std::endl;
-          // exit(1);
-        }
-
-      } else {
-        // Commented out for now as code uses single likelihood function making
-        // this fail valid_model = false; ERROR_LOG << "Error: No index
-        // likelihood function defined for fleet " << f->id
-        //          << ". FIMS requires likelihood functions be defined for all
-        //          data." << std::endl;
-        // exit(1);
-      }
-      // end set index likelihood
-
-      INFO_LOG << "Checking for available age comp likelihood function."
-               << std::endl;
-      // set agecomp likelihood
-      if (f->fleet_agecomp_likelihood_id_m != -999) {
-        uint32_t ac_like_id = static_cast<uint32_t>(
-            f->fleet_agecomp_likelihood_id_m);  // cast as unsigned integer
-        distribution_models_iterator it = this->distribution_models.find(
-            ac_like_id);  // if find, set it, otherwise invalid
-        INFO_LOG << "Input age comp likelihood function id = " << ac_like_id
-                 << "." << std::endl;
-
-        if (it != this->distribution_models.end()) {
-          f->agecomp_likelihood =
-              (*it).second;  // elements in container held in pair (first is
-                             // id, second is object - shared pointer to
-                             // distribution)
-          INFO_LOG << "Age comp likelihood function successfully set."
-                   << std::endl;
-        } else {
-          // Commented out for now as code uses single likelihood function
-          // making this fail valid_model = false; ERROR_LOG << "Error: Expected
-          // age comp likelihood function not defined for fleet "
-          //         << f->id << ", likelihood function " << ac_like_id <<
-          //         std::endl;
-          // exit(1);
-        }
-
-      } else {
-        // Commented out for now as code uses single likelihood function making
-        // this fail valid_model = false; ERROR_LOG << "Error: No age comp
-        // likelihood function defined for fleet " << f->id
-        //          << ". FIMS requires likelihood functions be defined for all
-        //          data." << std::endl;
-        // exit(1);
-      }
-      // end set agecomp likelihood
-
-      INFO_LOG << "Completed initialization for fleet " << f->id << "."
-               << std::endl;
-
-    }  // close fleet iterator loop
-    INFO_LOG << "Completed initialization of all fleets." << std::endl;
-
+      
     INFO_LOG << "Initializing population objects for "
              << this->populations.size() << " populations." << std::endl;
     for (population_iterator it = this->populations.begin();
@@ -485,6 +456,12 @@ class Information {
                << std::endl;
     }
     INFO_LOG << "Completed initialization of all populations." << std::endl;
+
+    //setup priors, random effect, and data density components
+    setup_priors();
+    setup_random_effects();
+    setup_data();
+
     INFO_LOG << "Completed FIMS model creation." << std::endl;
     return valid_model;
   }

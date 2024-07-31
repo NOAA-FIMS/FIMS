@@ -74,8 +74,16 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> age_composition; /*!<derived quantity age composition*/
 
   // derived quantities
+  fims::Vector<Type> observed_catch_lpdf; /*!<observed total catch linked 
+    to log probability density function*/
+  fims::Vector<Type> observed_index_lpdf; /*!<observed index of abundance linked 
+    to log probability density function*/
   fims::Vector<Type> expected_catch; /*!<model expected total catch*/
   fims::Vector<Type> expected_index; /*!<model expected index of abundance*/
+  fims::Vector<Type> expected_catch_lpdf; /*!<model expected total catch linked 
+    to log probability density function*/
+  fims::Vector<Type> expected_index_lpdf; /*!<model expected index of abundance linked 
+    to log probability density function*/
   fims::Vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
   fims::Vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
   bool is_survey = false;                  /*!< is this fleet object a survey*/
@@ -146,95 +154,29 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     }
   }
 
-  virtual const Type evaluate_age_comp_lpmf() {
-    Type lpmf = 0.0; /**< The log probability mass function value */
-    fims_distributions::MultinomialLPMF<Type> dmultinom;
-    size_t dims = this->observed_agecomp_data->data.size();
-
-    if (dims != this->catch_numbers_at_age.size()) {
-      ERROR_LOG << "Error: observed age comp is of size " << dims
-                << " and expected is of size " << this->age_composition.size()
-                << std::endl;
-      exit(1);
-
-    } else {
-      dmultinom.dims.resize(2);
-      dmultinom.dims[0] = this -> nyears;
-      dmultinom.dims[1] = this -> nages;
-      dmultinom.is_na.resize(nyears);
-      dmultinom.x.resize(nyears*nages);
-      dmultinom.expected_values.resize(nyears*nages);
-      #ifdef TMB_MODEL
-      dmultinom.of = this -> of;
-      #endif
-      for (size_t y = 0; y < this->nyears; y++) {
-        Type sum = 0.0;
-        bool containsNA =
-            false; /**< skips the entire year if any values are NA */
-        for (size_t a = 0; a < this->nages; a++) {
-          if (this->observed_agecomp_data->at(y, a) !=
-              this->observed_agecomp_data->na_value) {
-            dmultinom.is_na[y] = false;
-            size_t i_age_year = y * this->nages + a;
-
-            sum += this->catch_numbers_at_age[i_age_year];
-          } else {
-            containsNA = true; /**< sets to true if any values are NA >*/
-            dmultinom.is_na[y] = true;
-            break;
-          }
-        }
-        if (!containsNA) {
-          for (size_t a = 0; a < this->nages; a++) {
-            size_t i_age_year = y * this->nages + a;
-            dmultinom.x[i_age_year] = this->observed_agecomp_data->at(y, a);
-            dmultinom.expected_values[i_age_year] = this->catch_numbers_at_age[i_age_year] /
-                                sum;
-
-            FLEET_LOG << " age " << a << " in year " << y
-                      << "has expected: " <<  dmultinom.expected_values[i_age_year]
-                      << "  and observed: " << dmultinom.x[i_age_year] << std::endl;
-          }
-        }
+  virtual const Type evaluate_age_comp() {
+    size_t dims;
+    dims.resize(2)
+    dims[0] = this->x->get_imax(); 
+    dims[1] = this->x->get_jmax();
+    
+      
+    for (size_t y = 0; y < this->nyears; y++) {
+      Type sum = 0.0;
+      for (size_t a = 0; a < this->nages; a++) {
+        size_t i_age_year = y * this->nages + a;
+        sum += this->catch_numbers_at_age[i_age_year];
       }
-      lpmf += dmultinom.evaluate();
-      FLEET_LOG << "Age comp negative lpmf for fleet," << this->id
-                << lpmf << std::endl;
-      return lpmf;
-    }
+      for (size_t a = 0; a < this->nages; a++) {
+        this->catch_numbers_at_age[i_age_year] = this->catch_numbers_at_age[i_age_year] /
+                              sum;
+
+      }
+    } 
   }
 
-  virtual const Type evaluate_index_lpdf() {
-    Type lpdf = 0.0; /*!< The log probability density function value */
-    fims_distributions::NormalLPDF<Type> dnorm;
-    dnorm.x.resize(this->observed_index_data->data.size());
-    dnorm.is_na.resize(this->observed_index_data->data.size());
-    dnorm.expected_values.resize(this->observed_index_data->data.size());
-    dnorm.log_sd.resize(this->observed_index_data->data.size());
-    #ifdef TMB_MODEL
-    dnorm.of = this->of;
-    #endif
-    for (size_t i = 0; i < this->observed_index_data->data.size(); i++) {
-      if (this->observed_index_data->at(i) !=
-          this->observed_index_data->na_value) {
-        dnorm.is_na[i] = false;
-        dnorm.x[i] = fims_math::log(this->observed_index_data->at(i));
-        dnorm.expected_values[i] = fims_math::log(this->expected_index[i]);
-        dnorm.log_sd[i] = this->log_obs_error[i];
-
-      } else {
-        dnorm.is_na[i] = true;
-      }
-      FLEET_LOG << "observed index data: " << i << " is "
-                << this->observed_index_data->at(i)
-                << " and expected is: " << this->expected_index[i] << std::endl;
-      FLEET_LOG << " log obs error is: " << this->log_obs_error[i] << std::endl;
-    }
-    lpdf += dnorm.evaluate();
-    FLEET_LOG << " log_sd is: " << dnorm.log_sd[0] << std::endl;
-    FLEET_LOG << " index lpdf: " << lpdf << std::endl;
-
-    return lpdf;
+  virtual const Type evaluate_index() {
+    expected_index[i] = log(this->expected_index[i]);
   }
 };
 

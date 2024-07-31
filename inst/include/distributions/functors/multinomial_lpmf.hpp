@@ -49,44 +49,67 @@ namespace fims_distributions
          */
         virtual const Type evaluate()
         {
-            this->lpdf_vec.resize(dims[0]);
-            fims::Vector<Type> x_vector;
-            fims::Vector<Type> prob_vector;
-            x_vector.resize(dims[1]);
-            prob_vector.resize(dims[1]);
+            size_t dims;
+            dims.resize(2)
+            dims[0] = this->x->get_imax(); 
+            dims[1] = this->x->get_jmax();
+            
             Type lpdf = 0.0; /**< total log probability mass contribution of the distribution */
-            for (size_t i = 0; i < dims[0]; i++)
-            {
-              if(!is_na[i]){
-                #ifdef TMB_MODEL
-                for (size_t j = 0; j < dims[1]; j++)
-                {
-                    size_t idx = (i * dims[1]) + j;
-                    x_vector[j] = this->x[idx];
-                    prob_vector[j] = this->expected_values[idx];
-                }
+            
 
-                this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, true);
-                lpdf += this->lpdf_vec[i];
-                /*
-                if (this->simulate_flag)
+            if (dims[0]*dims[1] != this->expected_values.size()) {
+            ERROR_LOG << "Error: observed age comp is of size " << dims[0]*dims[1]
+                << " and expected is of size " << this->expected_values.size()
+                << std::endl;
+                exit(1);
+            } else {
+
+                for (size_t i = 0; i < dims[0]; i++)
                 {
-                    FIMS_SIMULATE_F(this->of)
-                    {
-                        fims::Vector<Type> sim_observed;
-                        sim_observed.resize(dims[1]);
-                        sim_observed = rmultinom(prob_vector);
-                        sim_observed.resize(this->x);
-                        for (size_t j = 0; j < dims[1]; j++)
-                        {
-                            idx = (i * dims[1]) + j;
-                            this->x[idx] = sim_observed[j];
+                    fims::Vector<Type> x_vector;
+                    fims::Vector<Type> prob_vector;
+                    x_vector.resize(dims[1]);
+                    prob_vector.resize(dims[1]);
+                    bool containsNA =
+                        false; /**< skips the entire row if any values are NA */
+                    
+                    #ifdef TMB_MODEL
+                    for (size_t j = 0; j < dims[1]; j++){
+                        if (this->x->at(i,j) != this->x->na_value) {
+                            size_t idx = (i * dims[1]) + j;
+                        } else {
+                            containsNA - true;
+                            break;
                         }
                     }
+                    if(!containsNA){
+                        for (size_t j = 0; j < dims[1]; j++){
+                            x_vector[j] = this->x->at(i, j);
+                            prob_vector[j] = this->expected_value[idx];
+                        }
+                    }
+
+                    this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, true);
+                    lpdf += this->lpdf_vec[i];
+                    /*
+                    if (this->simulate_flag)
+                    {
+                        FIMS_SIMULATE_F(this->of)
+                        {
+                            fims::Vector<Type> sim_observed;
+                            sim_observed.resize(dims[1]);
+                            sim_observed = rmultinom(prob_vector);
+                            sim_observed.resize(this->x);
+                            for (size_t j = 0; j < dims[1]; j++)
+                            {
+                                idx = (i * dims[1]) + j;
+                                this->x[idx] = sim_observed[j];
+                            }
+                        }
+                    }
+                    */
+                    #endif
                 }
-                */
-               #endif
-              }
             }
             #ifdef TMB_MODEL
             vector<Type> x = this->x;

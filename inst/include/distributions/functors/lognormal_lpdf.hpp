@@ -81,32 +81,35 @@ namespace fims_distributions
                   }
                 }
 
-                if(!is_na[i])
-                {
-                  #ifdef TMB_MODEL
-                  // this->lpdf_vec[i] = this->keep[i] * dnorm(this->x[i], logmu[i], logsd[i], true);
-                  this->lpdf_vec[i] = dnorm(log(this->x[i]), logmu[i], logsd[i], true);
-                  if(this->input_type == "data"){
-                    this->lpdf_vec[i] -= log(this->x[i]);
-                  }
-                  lpdf += this->lpdf_vec[i];
-                  if (this->simulate_flag)
-                  {
-                      FIMS_SIMULATE_F(this->of)
-                      { // preprocessor definition in interface.hpp
-                          // this simulates data that is mean biased
-                          this->x[i] = fims_math::exp(rnorm(logmu[i], logsd[i]));
-                      }
-                  }
-                  #endif
-
-                  /* osa not working yet
-                    if(osa_flag){//data observation type implements osa residuals
-                        //code for osa cdf method
-                        this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i], logmu[i], logsd[i]) );
-                        this->lpdf_vec[i] = this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i], logmu[i], logsd[i]) );
-                    } */
+                #ifdef TMB_MODEL
+                if(this->input_type == "data"){
+                  if(this->x->at(i) != this->x->na_value){
+                      this->lpdf_vec[i] = dnorm(this->x->at(i), logmu[i], logsd[i], true) - this->x->at(i);
+                  } else {
+                    this->lpdf_vec[i] = 0
+                  } 
+                } else {
+                  // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x[i], logmu[i], logsd[i], true);
+                  this->lpdf_vec[i] = dnorm(this->x[i], logmu[i], logsd[i], true);
                 }
+
+                lpdf += this->lpdf_vec[i];
+                if (this->simulate_flag)
+                {
+                    FIMS_SIMULATE_F(this->of)
+                    { // preprocessor definition in interface.hpp
+                        // this simulates data that is mean biased
+                        this->x[i] = fims_math::exp(rnorm(logmu[i], logsd[i]));
+                    }
+                }
+                #endif
+
+                /* osa not working yet
+                  if(osa_flag){//data observation type implements osa residuals
+                      //code for osa cdf method
+                      this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i], logmu[i], logsd[i]) );
+                      this->lpdf_vec[i] = this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i], logmu[i], logsd[i]) );
+                  } */
             }
             #ifdef TMB_MODEL
             vector<Type> lognormal_x = this->x;

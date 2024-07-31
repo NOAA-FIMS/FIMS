@@ -34,6 +34,11 @@ class Model {  // may need singleton
   std::shared_ptr<fims_info::Information<Type> >
       fims_information; /**< Create a shared fims_information as a pointer to
                            Information*/
+  std::map<uint32_t, std::shared_ptr<DensityComponentBase<Type> > >
+    density_components;
+  typedef typename std::map<
+    uint32_t, std::shared_ptr<DensityComponentBase<Type> > >::iterator
+    density_components_iterator;
 
 #ifdef TMB_MODEL
   ::objective_function<Type> *of;
@@ -62,10 +67,8 @@ class Model {  // may need singleton
   const Type Evaluate() {
     // jnll = negative-log-likelihood (the objective function)
     Type jnll = 0.0;
-    Type rec_nll = 0.0;       // recrutiment nll
-    Type age_comp_nll = 0.0;  // age composition nll
-    Type index_nll = 0.0;     // survey and fishery cacth nll
 
+    
     int n_fleets = fims_information->fleets.size();
     int n_pops = fims_information->populations.size();
 
@@ -86,14 +89,28 @@ class Model {  // may need singleton
     vector<vector<Type> > log_recruit_dev(n_pops);
     vector<vector<Type> > recruitment(n_pops);
     vector<vector<Type> > M(n_pops);
-
 #endif
+    // Loop over densities and evaluate joint negative log densities for priors
+   size_t n_priors = 0;
+    for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
+      std::shared_ptr<DensityComponentBase<Type> > n = (*it).second;
+      #ifdef TMB_MODEL
+        n->of = this->of;
+      #endif
+      if(n->input_type == "prior"){
+        jnll -= n->evaluate();
+        n_priors += 1;
+      }
+    }
+    MODEL_LOG << "Finished evaluating joint negative log densities for "
+              << n_priors << " prior distributions."
+              << std::endl;
+    
 
-    // Loop over populations, evaluate, and sum up the recruitment likelihood
-    // component
+    // Loop over populations and evaluate recruitment component
 
     typename fims_info::Information<Type>::population_iterator it;
-    MODEL_LOG << "Evaluating expected values and summing recruitment nlls for "
+    MODEL_LOG << "Evaluating recruitment expected values for "
               << this->fims_information->populations.size() << " populations."
               << std::endl;
 
@@ -112,35 +129,62 @@ class Model {  // may need singleton
 #endif
       // Evaluate population
       (*it).second->Evaluate();
-      // Recrtuiment negative log-likelihood
-      rec_nll -= (*it).second->recruitment->evaluate_lpdf();
-      MODEL_LOG << "Recruitment negative log-likelihood is: " << rec_nll
-                << std::endl;
     }
-    MODEL_LOG << "All populations successfully evaluated." << std::endl;
 
-    // Loop over fleets/surveys, and sum up age comp and index nlls
-
-    typename fims_info::Information<Type>::fleet_iterator jt;
-    MODEL_LOG << "Evaluating expected values and summing nlls for "
-              << this->fims_information->fleets.size() << " fleets."
+    // Loop over densities and evaluate joint negative log-likelihoods for random effects
+    size_t n_random_effects = 0;
+    for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
+      std::shared_ptr<DensityComponentBase<Type> > n = (*it).second;
+      #ifdef TMB_MODEL
+        n->of = this->of;
+      #endif
+      if(n->input_type == "re"){
+        jnll -= n->evaluate();
+        n_random_effects += 1;
+      }
+    }
+    MODEL_LOG << "Finished evaluating joint negative log densities for "
+              << n_random_effects << " random effect distributions."
               << std::endl;
 
-    for (jt = this->fims_information->fleets.begin();
-         jt != this->fims_information->fleets.end(); ++jt) {
+    // Loop over and evaluate populations
+    typename fims_info::Information<Type>::population_iterator it;
+    MODEL_LOG << "Evaluating expected values for "
+              << this->fims_information->populations.size() << " populations."
+              << std::endl;
+    for (it = this->fims_information->populations.begin();
+         it != this->fims_information->populations.end(); ++it) {
+      //(*it).second points to the Population module
+      // Evaluate population
+      (*it).second->Evaluate();
+    }
+
+      
+    // Loop over fleets/surveys, and evaluate age comp and index expected values
+     for (jt = this->fims_information->fleets.begin();
+        jt != this->fims_information->fleets.end(); ++jt) {
       //(*jt).second points to each individual Fleet module
 #ifdef TMB_MODEL
       (*jt).second->of = this->of;
 #endif
-      MODEL_LOG << "Setting up pointer to fleet " << (*jt).second->id << "."
-                << std::endl;
-      age_comp_nll -= (*jt).second->evaluate_age_comp_lpmf();
-      MODEL_LOG << "Sum of survey and age comp negative log-likelihood is: "
-                << age_comp_nll << std::endl;
-      index_nll -= (*jt).second->evaluate_index_lpdf();
+        MODEL_LOG << "Setting up pointer to fleet " << (*jt).second->id << "."
+                  << std::endl;
+        (*jt).second->evaluate_age_comp();
+        (*jt).second->evaluate_index()
+      }
+
+    // Loop over and evaluate data joint negative log-likelihoods
+    for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
+      std::shared_ptr<DensityComponentBase<Type> > n = (*it).second;
+      #ifdef TMB_MODEL
+        n->of = this->of;
+        n->keep = this->keep;
+      #endif
+      if(n->input_type == "data"){
+        jnll -= n->evaluate();
+      }
     }
-    MODEL_LOG << "All fleets successfully evaluated." << std::endl;
-    // Loop over populations and fleets/surveys and fill in reporting
+    return jnll;
 
     // initiate population index for structuring report out objects
     int pop_idx = 0;
