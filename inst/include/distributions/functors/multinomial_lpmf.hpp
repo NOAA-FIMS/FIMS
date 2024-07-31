@@ -49,7 +49,7 @@ namespace fims_distributions
          */
         virtual const Type evaluate()
         {
-            size_t dims;
+            std::vector dims;
             dims.resize(2)
             dims[0] = this->x->get_imax(); 
             dims[1] = this->x->get_jmax();
