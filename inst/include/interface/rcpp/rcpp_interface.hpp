@@ -374,8 +374,7 @@ RCPP_MODULE(fims) {
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
       .field("log_sigma_recruit",
              &BevertonHoltRecruitmentInterface::log_sigma_recruit)
-      .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate)
-      .method("evaluate_lpdf", &BevertonHoltRecruitmentInterface::evaluate_lpdf);
+      .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()

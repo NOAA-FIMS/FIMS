@@ -98,19 +98,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     return BevHolt.evaluate(spawners, ssbzero);
   }
 
-  virtual double evaluate_lpdf() {
-    fims_popdy::SRBevertonHolt<double> LPDF;
-    LPDF.log_sigma_recruit.resize(1);
-    LPDF.log_sigma_recruit[0] = this->log_sigma_recruit.value_m;
-    LPDF.log_recruit_devs.resize(log_devs.size());  // Vector from TMB
-    for (int i = 0; i < log_devs.size(); i++) {
-      LPDF.log_recruit_devs[i] = log_devs[i].value_m;
-    RECRUITMENT_LOG << "Log recruit devs being passed to C++ are " << log_devs[i].value_m
-                    << std::endl;
-    }
-    LPDF.estimate_log_recruit_devs = this->estimate_log_devs;
-    return LPDF.evaluate_lpdf();
-  }
 
 #ifdef TMB_MODEL
 
