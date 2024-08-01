@@ -45,14 +45,14 @@ struct NormalLPDF : public DensityComponentBase<Type> {
      * @brief Evaluates the normal probability density function
      */
     virtual const Type evaluate(){
-        this->mu.resize(this->x.size());
-        this->sd.resize(this->x.size());
-        this->lpdf_vec.resize(this->x.size());
-        for(size_t i=0; i<this->x.size(); i++){
+        this->mu.resize(this->x->size());
+        this->sd.resize(this->x->size());
+        this->lpdf_vec.resize(this->x->size());
+        for(size_t i=0; i<this->x->size(); i++){
             if(this->expected_values.size() == 1){
                 this->mu[i] = this->expected_values[0];
             } else {
-              if(this->x.size() != this->expected_values.size()){
+              if(this->x->size() != this->expected_values.size()){
                 /* move error handling to CreateModel in information so not to crash R
                 Rcpp::stop("the dimensions of the observed and expected values from normal negative log likelihood do not match");
                  */
@@ -63,7 +63,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             if(log_sd.size() == 1){
                 sd[i] = fims_math::exp(log_sd[0]);
             } else {
-              if(this->x.size() != this->log_sd.size()){
+              if(this->x->size() != this->log_sd.size()){
                 /* move error handling to CreateModel in information so not to crash R
                 Rcpp::stop("the dimensions of the observed and log sd values from normal negative log likelihood do not match");
                  */
@@ -86,7 +86,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             lpdf += this->lpdf_vec[i];
             if(this->simulate_flag){
                 FIMS_SIMULATE_F(this->of){
-                    this->x[i] = rnorm(mu[i], sd[i]);
+                    this->x->at(i) = rnorm(mu[i], sd[i]);
                 }
             }
           #endif

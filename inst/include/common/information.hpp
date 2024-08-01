@@ -173,7 +173,7 @@ class Information {
   }
   void setup_random_effects(){
     for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > n = (*it).second;
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
       if(d->input_type == "re"){
         variable_map_iterator vmit;
         vmit = this->variable_map.find(d->key[0]); 
@@ -188,7 +188,7 @@ class Information {
   }
   void setup_data(){
     for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > n = (*it).second;
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
       if(d->input_type == "data"){
         variable_map_iterator vmit;
         vmit = this->variable_map.find(d->key[0]); 

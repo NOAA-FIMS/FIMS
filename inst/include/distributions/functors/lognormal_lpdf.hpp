@@ -46,16 +46,16 @@ namespace fims_distributions
          */
         virtual const Type evaluate()
         {
-            this->logmu.resize(this->x.size());
-            this->logsd.resize(this->x.size());
-            this->lpdf_vec.resize(this->x.size());
-            for (size_t i = 0; i < this->x.size(); i++)
+            this->logmu.resize(this->x->size());
+            this->logsd.resize(this->x->size());
+            this->lpdf_vec.resize(this->x->size());
+            for (size_t i = 0; i < this->x->size(); i++)
             {
                 if (this->expected_values.size() == 1)
                 {
                     this->logmu[i] = this->expected_values[0];
                 } else {
-                  if(this->x.size() != this->expected_values.size()){
+                  if(this->x->size() != this->expected_values.size()){
                     /* move error handling to CreateModel in information so not to crash R
                     Rcpp::stop("the dimensions of the observed and expected values from lognormal negative log likelihood do not match");
                      */
@@ -67,7 +67,7 @@ namespace fims_distributions
                 {
                     logsd[i] = fims_math::exp(log_logsd[0]);
                 } else {
-                  if(this->x.size() != this->log_logsd.size()){
+                  if(this->x->size() != this->log_logsd.size()){
                     /* move error handling to CreateModel in information so not to crash R
                     Rcpp::stop("the dimensions of the observed and log logsd values from lognormal negative log likelihood do not match");
                      */
@@ -94,7 +94,7 @@ namespace fims_distributions
                     FIMS_SIMULATE_F(this->of)
                     { // preprocessor definition in interface.hpp
                         // this simulates data that is mean biased
-                        this->x[i] = fims_math::exp(rnorm(logmu[i], logsd[i]));
+                        this->x->at(i) = fims_math::exp(rnorm(logmu[i], logsd[i]));
                     }
                 }
                 #endif
