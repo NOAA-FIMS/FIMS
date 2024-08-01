@@ -216,13 +216,13 @@ class Model {  // may need singleton
       fleet_idx += 1;
     }
 
-    jnll = rec_nll + age_comp_nll + index_nll;
+   // jnll = rec_nll + age_comp_nll + index_nll;
 
 // Reporting
 #ifdef TMB_MODEL
-    FIMS_REPORT_F(rec_nll, of);
-    FIMS_REPORT_F(age_comp_nll, of);
-    FIMS_REPORT_F(index_nll, of);
+    //FIMS_REPORT_F(rec_nll, of);
+    //FIMS_REPORT_F(age_comp_nll, of);
+    //FIMS_REPORT_F(index_nll, of);
     FIMS_REPORT_F(jnll, of);
     FIMS_REPORT_F(naa, of);
     FIMS_REPORT_F(ssb, of);
