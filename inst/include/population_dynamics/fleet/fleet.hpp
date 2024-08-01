@@ -156,7 +156,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   virtual const Type evaluate_age_comp() {
     std::vector<Type> dims;
-    dims.resize(2)
+    dims.resize(2);
     dims[0] = this->x->get_imax(); 
     dims[1] = this->x->get_jmax();
     
