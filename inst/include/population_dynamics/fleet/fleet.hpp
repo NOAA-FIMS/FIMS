@@ -154,7 +154,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     }
   }
 
-  virtual void const Type evaluate_age_comp() {
+  void const Type evaluate_age_comp() {
     for (size_t y = 0; y < this->nyears; y++) {
       Type sum = 0.0;
       for (size_t a = 0; a < this->nages; a++) {
@@ -170,7 +170,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     } 
   }
 
-  virtual void const Type evaluate_index() {
+  void const Type evaluate_index() {
     for(size_t i=0; i<this->expected_index.size(); i++){
       expected_index[i] = log(this->expected_index[i]);
     }
