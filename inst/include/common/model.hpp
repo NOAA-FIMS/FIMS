@@ -184,7 +184,6 @@ class Model {  // may need singleton
         jnll -= n->evaluate();
       }
     }
-    return jnll;
 
     // initiate population index for structuring report out objects
     int pop_idx = 0;
