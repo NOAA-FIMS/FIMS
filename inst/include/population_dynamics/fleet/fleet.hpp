@@ -154,13 +154,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     }
   }
 
-  virtual const Type evaluate_age_comp() {
-    std::vector<Type> dims;
-    dims.resize(2);
-    dims[0] = this->x->get_imax(); 
-    dims[1] = this->x->get_jmax();
-    
-      
+  virtual void const Type evaluate_age_comp() {
     for (size_t y = 0; y < this->nyears; y++) {
       Type sum = 0.0;
       for (size_t a = 0; a < this->nages; a++) {
@@ -168,6 +162,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         sum += this->catch_numbers_at_age[i_age_year];
       }
       for (size_t a = 0; a < this->nages; a++) {
+        size_t i_age_year = y * this->nages + a;
         this->catch_numbers_at_age[i_age_year] = this->catch_numbers_at_age[i_age_year] /
                               sum;
 
@@ -175,8 +170,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     } 
   }
 
-  virtual const Type evaluate_index() {
-    expected_index[i] = log(this->expected_index[i]);
+  virtual void const Type evaluate_index() {
+    for(size_t i=0; i<this->expected_index.size(); i++){
+      expected_index[i] = log(this->expected_index[i]);
+    }
   }
 };
 
