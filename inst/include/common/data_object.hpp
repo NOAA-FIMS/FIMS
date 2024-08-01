@@ -45,7 +45,7 @@ namespace fims_data_object {
 template <typename Type>
 struct DataObject : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g;   /**< id of the Data Object >*/
-  std::vector<Type> data; /**< vector of the data >*/
+  std::shared_ptr<fims::Vector<Type>> data; /**< vector of the data >*/
   size_t dimensions;      /**< dimension of the Data object >*/
   size_t imax;            /**<1st dimension of data object >*/
   size_t jmax;            /**< 2nd dimension of data object>*/
@@ -57,7 +57,8 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * Constructs a one-dimensional data object.
    */
   DataObject(size_t imax) : dimensions(1), imax(imax) {
-    data.resize(imax);
+    this->data = std::make_shared<fims::Vector<Type> > (imax);
+    //data.resize(imax);
 
     this->id = DataObject<Type>::id_g++;
   }
@@ -66,7 +67,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * Constructs a two-dimensional data object.
    */
   DataObject(size_t imax, size_t jmax) : dimensions(2), imax(imax), jmax(jmax) {
-    data.resize(imax * jmax);
+    this->data = std::make_shared<fims::Vector<Type> > (imax * jmax);
     this->id = DataObject<Type>::id_g++;
   }
 
@@ -75,7 +76,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    */
   DataObject(size_t imax, size_t jmax, size_t kmax)
       : dimensions(3), imax(imax), jmax(jmax), kmax(kmax) {
-    data.resize(imax * jmax * kmax);
+    this->data = std::make_shared<fims::Vector<Type> > (imax * jmax * kmax);
     this->id = DataObject<Type>::id_g++;
   }
 
@@ -84,7 +85,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    */
   DataObject(size_t imax, size_t jmax, size_t kmax, size_t lmax)
       : dimensions(4), imax(imax), jmax(jmax), kmax(kmax), lmax(lmax) {
-    data.resize(imax * jmax * kmax * lmax);
+    this->data = std::make_shared<fims::Vector<Type> >(imax * jmax * kmax * lmax);
     this->id = DataObject<Type>::id_g++;
   }
 

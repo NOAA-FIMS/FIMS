@@ -92,7 +92,7 @@ class Model {  // may need singleton
 #endif
     // Loop over densities and evaluate joint negative log densities for priors
    size_t n_priors = 0;
-   typename density_components_iterator d_it;
+   density_components_iterator d_it;
     for(d_it = this->density_components.begin(); d_it!= this->density_components.end(); ++d_it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
       #ifdef TMB_MODEL
@@ -148,7 +148,7 @@ class Model {  // may need singleton
               << this->fims_information->populations.size() << " populations."
               << std::endl;
     for (p_it = this->fims_information->populations.begin();
-         p_it != this->fims_information->populations.end(); ++it) {
+         p_it != this->fims_information->populations.end(); ++p_it) {
       //(*p_it).second points to the Population module
       std::shared_ptr<fims_popdy::Population<Type> > p = (*p_it).second;
       // link to TMB objective function
@@ -159,7 +159,7 @@ class Model {  // may need singleton
       p->Evaluate();
     }
 
-    typename fims_info::Information<Type>::population_iterator f_it;
+    typename fims_info::Information<Type>::fleet_iterator f_it;
     // Loop over fleets/surveys, and evaluate age comp and index expected values
      for (f_it = this->fims_information->fleets.begin();
         f_it != this->fims_information->fleets.end(); ++f_it) {
@@ -171,7 +171,7 @@ class Model {  // may need singleton
         MODEL_LOG << "Setting up pointer to fleet " << f->id << "."
                   << std::endl;
         f->evaluate_age_comp();
-        f->evaluate_index()
+        f->evaluate_index();
       }
 
     // Loop over and evaluate data joint negative log-likelihoods
@@ -179,7 +179,7 @@ class Model {  // may need singleton
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
       #ifdef TMB_MODEL
         d->of = this->of;
-        d->keep = this->keep;
+        //d->keep = this->keep;
       #endif
       if(d->input_type == "data"){
         jnll -= d->evaluate();

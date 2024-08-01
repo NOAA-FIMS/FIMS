@@ -28,10 +28,6 @@ namespace fims_distributions
         fims::Vector<Type> log_logsd; /**< log of the standard deviation of the distribution on the log scale; can be a vector or scalar */
         fims::Vector<Type> logmu; /**< mean of the distribution on the log scale; can be a vector or scalar */
         fims::Vector<Type> logsd; /**< standard deviation of the distribution on the log scale; can be a vector or scalar */
-        std::vector<bool> is_na; /**< Boolean; if true, data observation is NA and the likelihood contribution is skipped */
-        #ifdef TMB_MODEL
-        ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
-        #endif
         Type lpdf = 0.0; /**< total log probability density contribution of the distribution */
         // data_indicator<tmbutils::vector<Type> , Type> keep; /**< Indicator used in TMB one-step-ahead residual calculations */
 
@@ -52,7 +48,6 @@ namespace fims_distributions
         {
             this->logmu.resize(this->x.size());
             this->logsd.resize(this->x.size());
-            is_na.resize(this->x.size());
             this->lpdf_vec.resize(this->x.size());
             for (size_t i = 0; i < this->x.size(); i++)
             {
@@ -83,14 +78,14 @@ namespace fims_distributions
 
                 #ifdef TMB_MODEL
                 if(this->input_type == "data"){
-                  if(this->x->at(i) != this->x->na_value){
+                  if(this->x->at(i) != this->na_value){
+                  // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x->at(i), logmu[i], logsd[i], true) - this->x->at(i);
                       this->lpdf_vec[i] = dnorm(this->x->at(i), logmu[i], logsd[i], true) - this->x->at(i);
                   } else {
                     this->lpdf_vec[i] = 0;
                   } 
                 } else {
-                  // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x[i], logmu[i], logsd[i], true);
-                  this->lpdf_vec[i] = dnorm(this->x[i], logmu[i], logsd[i], true);
+                  this->lpdf_vec[i] = dnorm(this->x->at(i), logmu[i], logsd[i], true);
                 }
 
                 lpdf += this->lpdf_vec[i];

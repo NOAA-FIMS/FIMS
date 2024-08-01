@@ -80,10 +80,8 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
       dnorm.x = this->log_recruit_devs;
       dnorm.expected_values.resize(this->log_recruit_devs.size());
       dnorm.log_sd.resize(this->log_recruit_devs.size());
-      dnorm.is_na.resize(this->log_recruit_devs.size());
       for (size_t i = 0; i < this->log_recruit_devs.size(); i++) {
         dnorm.expected_values[i] = 0.0;
-        dnorm.is_na[i] = false;
         dnorm.log_sd[i] = this->log_sigma_recruit[0];
       }
       lpdf += dnorm.evaluate();

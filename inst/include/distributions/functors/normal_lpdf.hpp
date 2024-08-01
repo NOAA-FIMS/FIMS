@@ -28,10 +28,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     fims::Vector<Type> mu; /**< mean of the distribution; can be a vector or scalar */
     fims::Vector<Type> sd; /**< standard deviation of the distribution; can be a vector or scalar */
     Type lpdf = 0.0; /**< total log probability density contribution of the distribution */
-    std::vector<bool> is_na; /**< Boolean; if true, data observation is NA and the likelihood contribution is skipped */
-    #ifdef TMB_MODEL
-    ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
-    #endif
+
     //data_indicator<tmbutils::vector<Type> , Type> keep; /**< Indicator used in TMB one-step-ahead residual calculations */
 
     /** @brief Constructor.
@@ -76,15 +73,15 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             }
             #ifdef TMB_MODEL
             if(this->input_type == "data"){
-              if(this->x->at(i) != this->x->na_value){
+              if(this->x->at(i) != this->na_value){
+              // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x->at(i), mu[i], sd[i], true);
                   this->lpdf_vec[i] = dnorm(this->x->at(i), mu[i], sd[i], true);
               } else {
                 this->lpdf_vec[i] = 0;
               } 
               
             } else {
-              // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x[i], mu[i], sd[i], true);
-              this->lpdf_vec[i] = dnorm(this->x[i], mu[i], sd[i], true);
+              this->lpdf_vec[i] = dnorm(this->x->at(i), mu[i], sd[i], true);
             }
             lpdf += this->lpdf_vec[i];
             if(this->simulate_flag){

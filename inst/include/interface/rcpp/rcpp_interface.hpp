@@ -432,8 +432,7 @@ RCPP_MODULE(fims) {
       .method("evaluate", &DnormDistributionsInterface::evaluate)
       .field("x", &DnormDistributionsInterface::x)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
-      .field("log_sd", &DnormDistributionsInterface::log_sd)
-      .field("is_na", &DnormDistributionsInterface::is_na);
+      .field("log_sd", &DnormDistributionsInterface::log_sd);
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
@@ -475,8 +474,7 @@ RCPP_MODULE(fims) {
       .field("input_type", &DlnormDistributionsInterface::input_type)
       .field("x", &DlnormDistributionsInterface::x)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
-      .field("log_logsd", &DlnormDistributionsInterface::log_logsd)
-      .field("is_na", &DlnormDistributionsInterface::is_na);
+      .field("log_logsd", &DlnormDistributionsInterface::log_logsd);
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
@@ -484,7 +482,6 @@ RCPP_MODULE(fims) {
       .method("get_id", &DmultinomDistributionsInterface::get_id)
       .field("x", &DmultinomDistributionsInterface::x)
       .field("expected_values", &DmultinomDistributionsInterface::expected_values)
-      .field("is_na", &DmultinomDistributionsInterface::is_na)
       .field("dims", &DmultinomDistributionsInterface::dims);
 }
 

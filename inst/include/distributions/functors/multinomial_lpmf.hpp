@@ -28,10 +28,7 @@ namespace fims_distributions
     {
         Type lpmf = 0.0; /**< total negative log-likelihood contribution of the distribution */
         fims::Vector<size_t> dims; /**< Dimensions of the number of rows and columns of the multivariate dataset */
-        std::vector<bool> is_na; /**< Boolean; if true, data observation is NA and the likelihood contribution for the entire row is skipped */
-        #ifdef TMB_MODEL
-        ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
-        #endif
+       
         // data_indicator<tmbutils::vector<Type> , Type> keep;  /**< Indicator used in TMB one-step-ahead residual calculations */
 
         /** @brief Constructor.
@@ -75,7 +72,7 @@ namespace fims_distributions
                     
                     #ifdef TMB_MODEL
                     for (size_t j = 0; j < dims[1]; j++){
-                        if (this->x->at(i,j) != this->x->na_value) {
+                        if (this->x->at(i)->at(j) != this->na_value) {
                             size_t idx = (i * dims[1]) + j;
                         } else {
                             containsNA - true;
@@ -85,8 +82,8 @@ namespace fims_distributions
                     if(!containsNA){
                         for (size_t j = 0; j < dims[1]; j++){
                             size_t idx = (i * dims[1]) + j;
-                            x_vector[j] = this->x->at(i, j);
-                            prob_vector[j] = this->expected_value[idx];
+                            x_vector[j] = this->x->at(i)->at(j);
+                            prob_vector[j] = this->expected_values[idx];
                         }
                     }
 

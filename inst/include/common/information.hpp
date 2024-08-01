@@ -158,14 +158,14 @@ class Information {
     
   void setup_priors(){
     for(density_components_iterator it = density_components.begin(); it!= density_components.end(); ++it){
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > n = (*it).second;
-      if(n->input_type == "prior"){
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
+      if(d->input_type == "prior"){
         variable_map_iterator vmit;
-        vmit = this->variable_map.find(n->key[0]); 
-        n->x = *(*vmit).second;
-        for(size_t i=1; i<n->key.size(); i++){
-          vmit = this->variable_map.find(n->key[i]); 
-          n->x.insert(std::end(n->x), 
+        vmit = this->variable_map.find(d->key[0]); 
+        d->x = *(*vmit).second;
+        for(size_t i=1; i<d->key.size(); i++){
+          vmit = this->variable_map.find(d->key[i]); 
+          d->x.insert(std::end(d->x), 
             std::begin(*(*vmit).second), std::end(*(*vmit).second));
         } 
       }
@@ -174,13 +174,13 @@ class Information {
   void setup_random_effects(){
     for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > n = (*it).second;
-      if(n->input_type == "re"){
+      if(d->input_type == "re"){
         variable_map_iterator vmit;
-        vmit = this->variable_map.find(n->key[0]); 
-        n->x = *(*vmit).second;
-        for(size_t i=1; i<n->key.size(); i++){
-          vmit = this->variable_map.find(n->key[i]); 
-          n->x.insert(std::end(n->x), 
+        vmit = this->variable_map.find(d->key[0]); 
+        d->x = *(*vmit).second;
+        for(size_t i=1; i<d->key.size(); i++){
+          vmit = this->variable_map.find(d->key[i]); 
+          d->x.insert(std::end(d->x), 
                                     std::begin(*(*vmit).second), std::end(*(*vmit).second));
         } 
       }
@@ -189,14 +189,14 @@ class Information {
   void setup_data(){
     for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > n = (*it).second;
-      if(n->input_type == "data"){
+      if(d->input_type == "data"){
         variable_map_iterator vmit;
-        vmit = this->variable_map.find(n->key[0]); 
-        n->expected_value = *(*vmit).second;
+        vmit = this->variable_map.find(d->key[0]); 
+        d->expected_values = *(*vmit).second;
         
-        for(size_t i=1; i<n->key.size(); i++){
-          vmit = this->variable_map.find(n->key[i]); 
-          n->expected_value.insert(std::end(n->expected_value), 
+        for(size_t i=1; i<d->key.size(); i++){
+          vmit = this->variable_map.find(d->key[i]); 
+          d->expected_values.insert(std::end(d->expected_values), 
             std::begin(*(*vmit).second), std::end(*(*vmit).second));
         } 
       }
