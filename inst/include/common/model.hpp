@@ -34,10 +34,10 @@ class Model {  // may need singleton
   std::shared_ptr<fims_info::Information<Type> >
       fims_information; /**< Create a shared fims_information as a pointer to
                            Information*/
-  std::map<uint32_t, std::shared_ptr<DensityComponentBase<Type> > >
+  std::map<uint32_t, std::shared_ptr<fims_distributions::DensityComponentBase<Type> > >
     density_components;
   typedef typename std::map<
-    uint32_t, std::shared_ptr<DensityComponentBase<Type> > >::iterator
+    uint32_t, std::shared_ptr<fims_distributions::DensityComponentBase<Type> > >::iterator
     density_components_iterator;
 
 #ifdef TMB_MODEL
@@ -92,13 +92,14 @@ class Model {  // may need singleton
 #endif
     // Loop over densities and evaluate joint negative log densities for priors
    size_t n_priors = 0;
-    for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
-      std::shared_ptr<DensityComponentBase<Type> > n = (*it).second;
+   typename density_components_iterator d_it;
+    for(d_it = this->density_components.begin(); d_it!= this->density_components.end(); ++d_it){
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
       #ifdef TMB_MODEL
-        n->of = this->of;
+        d->of = this->of;
       #endif
-      if(n->input_type == "prior"){
-        jnll -= n->evaluate();
+      if(d->input_type == "prior"){
+        jnll -= d->evaluate();
         n_priors += 1;
       }
     }
@@ -109,37 +110,32 @@ class Model {  // may need singleton
 
     // Loop over populations and evaluate recruitment component
 
-    typename fims_info::Information<Type>::population_iterator it;
+    typename fims_info::Information<Type>::population_iterator p_it;
     MODEL_LOG << "Evaluating recruitment expected values for "
               << this->fims_information->populations.size() << " populations."
               << std::endl;
 
-    for (it = this->fims_information->populations.begin();
-         it != this->fims_information->populations.end(); ++it) {
-      //(*it).second points to the Population module
-      MODEL_LOG << "Setting up pointer to population " << (*it).second->id
+    for (p_it = this->fims_information->populations.begin();
+         p_it != this->fims_information->populations.end(); ++p_it) {
+      //(*p_it).second points to the Population module
+      std::shared_ptr<fims_popdy::Population<Type> > p = (*p_it).second;
+      MODEL_LOG << "Setting up pointer to population " << p->id
                 << "." << std::endl;
       // Prepare recruitment
-      (*it).second->recruitment->Prepare();
+      p->recruitment->Prepare();
       MODEL_LOG << "Recruitment for population successfully prepared"
                 << std::endl;
-// link to TMB objective function
-#ifdef TMB_MODEL
-      (*it).second->of = this->of;
-#endif
-      // Evaluate population
-      (*it).second->Evaluate();
     }
 
     // Loop over densities and evaluate joint negative log-likelihoods for random effects
     size_t n_random_effects = 0;
-    for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
-      std::shared_ptr<DensityComponentBase<Type> > n = (*it).second;
+    for(d_it = this->density_components.begin(); d_it!= this->density_components.end(); ++d_it){
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
       #ifdef TMB_MODEL
-        n->of = this->of;
+        d->of = this->of;
       #endif
-      if(n->input_type == "re"){
-        jnll -= n->evaluate();
+      if(d->input_type == "re"){
+        jnll -= d->evaluate();
         n_random_effects += 1;
       }
     }
@@ -148,69 +144,76 @@ class Model {  // may need singleton
               << std::endl;
 
     // Loop over and evaluate populations
-    typename fims_info::Information<Type>::population_iterator it;
     MODEL_LOG << "Evaluating expected values for "
               << this->fims_information->populations.size() << " populations."
               << std::endl;
-    for (it = this->fims_information->populations.begin();
-         it != this->fims_information->populations.end(); ++it) {
-      //(*it).second points to the Population module
+    for (p_it = this->fims_information->populations.begin();
+         p_it != this->fims_information->populations.end(); ++it) {
+      //(*p_it).second points to the Population module
+      std::shared_ptr<fims_popdy::Population<Type> > p = (*p_it).second;
+      // link to TMB objective function
+#ifdef TMB_MODEL
+      p->of = this->of;
+#endif
       // Evaluate population
-      (*it).second->Evaluate();
+      p->Evaluate();
     }
 
-      
+    typename fims_info::Information<Type>::population_iterator f_it;
     // Loop over fleets/surveys, and evaluate age comp and index expected values
-     for (jt = this->fims_information->fleets.begin();
-        jt != this->fims_information->fleets.end(); ++jt) {
-      //(*jt).second points to each individual Fleet module
+     for (f_it = this->fims_information->fleets.begin();
+        f_it != this->fims_information->fleets.end(); ++f_it) {
+      //(*f_it).second points to each individual Fleet module
+      std::shared_ptr<fims_popdy::Fleet<Type> > f = (*f_it).second;
 #ifdef TMB_MODEL
-      (*jt).second->of = this->of;
+      f->of = this->of;
 #endif
-        MODEL_LOG << "Setting up pointer to fleet " << (*jt).second->id << "."
+        MODEL_LOG << "Setting up pointer to fleet " << f->id << "."
                   << std::endl;
-        (*jt).second->evaluate_age_comp();
-        (*jt).second->evaluate_index()
+        f->evaluate_age_comp();
+        f->evaluate_index()
       }
 
     // Loop over and evaluate data joint negative log-likelihoods
-    for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
-      std::shared_ptr<DensityComponentBase<Type> > n = (*it).second;
+    for(d_it = this->density_components.begin(); d_it!= this->density_components.end(); ++d_it){
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
       #ifdef TMB_MODEL
-        n->of = this->of;
-        n->keep = this->keep;
+        d->of = this->of;
+        d->keep = this->keep;
       #endif
-      if(n->input_type == "data"){
-        jnll -= n->evaluate();
+      if(d->input_type == "data"){
+        jnll -= d->evaluate();
       }
     }
 
     // initiate population index for structuring report out objects
     int pop_idx = 0;
-    for (it = this->fims_information->populations.begin();
-         it != this->fims_information->populations.end(); ++it) {
+    for (p_it = this->fims_information->populations.begin();
+         p_it != this->fims_information->populations.end(); ++p_it) {
+      std::shared_ptr<fims_popdy::Population<Type> > p = (*p_it).second;
 #ifdef TMB_MODEL
-      naa(pop_idx) = vector<Type>((*it).second->numbers_at_age);
-      ssb(pop_idx) = vector<Type>((*it).second->spawning_biomass);
+      naa(pop_idx) = vector<Type>(p->numbers_at_age);
+      ssb(pop_idx) = vector<Type>(p->spawning_biomass);
       log_recruit_dev(pop_idx) =
-          vector<Type>((*it).second->recruitment->log_recruit_devs);
-      recruitment(pop_idx) = vector<Type>((*it).second->expected_recruitment);
-      biomass(pop_idx) = vector<Type>((*it).second->biomass);
-      M(pop_idx) = vector<Type>((*it).second->M);
+          vector<Type>(p->recruitment->log_recruit_devs);
+      recruitment(pop_idx) = vector<Type>(p->expected_recruitment);
+      biomass(pop_idx) = vector<Type>(p->biomass);
+      M(pop_idx) = vector<Type>(p->M);
 #endif
       pop_idx += 1;
     }
 
     // initiate fleet index for structuring report out objects
     int fleet_idx = 0;
-    for (jt = this->fims_information->fleets.begin();
-         jt != this->fims_information->fleets.end(); ++jt) {
+    for (f_it = this->fims_information->fleets.begin();
+         f_it != this->fims_information->fleets.end(); ++f_it) {
+      std::shared_ptr<fims_popdy::Fleet<Type> > f = (*f_it).second;
 #ifdef TMB_MODEL
-      exp_index(fleet_idx) = (*jt).second->expected_index;
-      exp_catch(fleet_idx) = (*jt).second->expected_catch;
-      F_mort(fleet_idx) = (*jt).second->Fmort;
-      cnaa(fleet_idx) = (*jt).second->catch_numbers_at_age;
-      cwaa(fleet_idx) = (*jt).second->catch_weight_at_age;
+      exp_index(fleet_idx) = f->expected_index;
+      exp_catch(fleet_idx) = f->expected_catch;
+      F_mort(fleet_idx) = f->Fmort;
+      cnaa(fleet_idx) = f->catch_numbers_at_age;
+      cwaa(fleet_idx) = f->catch_weight_at_age;
 #endif
       fleet_idx += 1;
     }

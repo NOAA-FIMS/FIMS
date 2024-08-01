@@ -79,7 +79,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
               if(this->x->at(i) != this->x->na_value){
                   this->lpdf_vec[i] = dnorm(this->x->at(i), mu[i], sd[i], true);
               } else {
-                this->lpdf_vec[i] = 0
+                this->lpdf_vec[i] = 0;
               } 
               
             } else {

@@ -86,7 +86,7 @@ namespace fims_distributions
                   if(this->x->at(i) != this->x->na_value){
                       this->lpdf_vec[i] = dnorm(this->x->at(i), logmu[i], logsd[i], true) - this->x->at(i);
                   } else {
-                    this->lpdf_vec[i] = 0
+                    this->lpdf_vec[i] = 0;
                   } 
                 } else {
                   // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x[i], logmu[i], logsd[i], true);

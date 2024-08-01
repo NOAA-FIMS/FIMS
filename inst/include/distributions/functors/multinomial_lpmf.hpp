@@ -84,6 +84,7 @@ namespace fims_distributions
                     }
                     if(!containsNA){
                         for (size_t j = 0; j < dims[1]; j++){
+                            size_t idx = (i * dims[1]) + j;
                             x_vector[j] = this->x->at(i, j);
                             prob_vector[j] = this->expected_value[idx];
                         }
