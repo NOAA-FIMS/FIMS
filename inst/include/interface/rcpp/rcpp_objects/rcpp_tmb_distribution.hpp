@@ -51,7 +51,9 @@ DistributionsInterfaceBase objects */
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
-  virtual void set_distribution_links(std::string input_type, Rcpp::IntegerVector ids);
+  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+    return false;
+  }
 
 
   /**
@@ -60,7 +62,9 @@ DistributionsInterfaceBase objects */
    * @param observed_data_id Unique id for the Observed Age Comp Data
    * object
    */
-  virtual void set_observed_data(int observed_data_id) ;
+  virtual bool set_observed_data(int observed_data_id){
+    return false;
+  }
 
   /** @brief evaluate method for child distribution interface objects to inherit
    */
@@ -100,8 +104,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @param observed_data_id Unique id for the Observed Age Comp Data
    * object
    */
-  virtual void set_observed_data(int observed_data_id) {
+  virtual bool set_observed_data(int observed_data_id) {
     this->interface_observed_data_id_m = observed_data_id;
+    return true;
   }
 
   /**
@@ -110,12 +115,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
-  virtual void set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
     for(int i; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
+
+    return true;
   }
 
   /**
@@ -222,8 +229,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @param observed_data_id Unique id for the Observed Age Comp Data
    * object
    */
-  virtual void set_observed_data(int observed_data_id) {
+  virtual bool set_observed_data(int observed_data_id) {
     this->interface_observed_data_id_m = observed_data_id;
+
+    return true;
   }
 
   /**
@@ -232,12 +241,14 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
-  virtual void set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
     for(int i; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
+
+    return true;
   }   
 
   /**
@@ -341,8 +352,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @param observed_data_id Unique id for the Observed Age Comp Data
    * object
    */
-  virtual void set_observed_data(int observed_data_id) {
+  virtual bool set_observed_data(int observed_data_id) {
     this->interface_observed_data_id_m = observed_data_id;
+
+    return true;
   }
 
   /**
@@ -351,12 +364,14 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
-  virtual void set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
     for(int i; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
+
+    return true;
   }
 
   /**
