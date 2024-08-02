@@ -77,7 +77,7 @@ namespace fims_distributions
                                 this->observed_values->na_value) {
                             size_t idx = (i * dims[1]) + j;
                         } else {
-                            containsNA - true;
+                            containsNA = true;
                             break;
                         }
                     }
