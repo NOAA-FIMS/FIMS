@@ -66,9 +66,7 @@ DistributionsInterfaceBase objects */
    * @param observed_data_id Unique id for the Observed Age Comp Data
    * object
    */
-  void set_observed_data(int observed_data_id) {
-    interface_observed_data_id_m = observed_data_id;
-  }
+  virtual void set_observed_data(int observed_data_id) ;
 
   /** @brief evaluate method for child distribution interface objects to inherit
    */
@@ -101,6 +99,16 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual uint32_t get_id() { return this->id_m; }
 
   virtual ~DnormDistributionsInterface() {}
+
+ /**
+   * @brief Set the unique id for the Observed Data object
+   *
+   * @param observed_data_id Unique id for the Observed Age Comp Data
+   * object
+   */
+  void set_observed_data(int observed_data_id) {
+    this->interface_observed_data_id_m = observed_data_id;
+  }
 
   /**
    * @brief Evaluate normal probability density function, default returns the
@@ -200,6 +208,15 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id_m; }
 
+  /**
+   * @brief Set the unique id for the Observed Data object
+   *
+   * @param observed_data_id Unique id for the Observed Age Comp Data
+   * object
+   */
+  void set_observed_data(int observed_data_id) {
+    this->interface_observed_data_id_m = observed_data_id;
+  }
 
   /**
    * @brief Evaluate lognormal probability density function, default returns the
@@ -296,6 +313,15 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   virtual uint32_t get_id() { return this->id_m; }
 
+  /**
+   * @brief Set the unique id for the Observed Data object
+   *
+   * @param observed_data_id Unique id for the Observed Age Comp Data
+   * object
+   */
+  void set_observed_data(int observed_data_id) {
+    this->interface_observed_data_id_m = observed_data_id;
+  }
 
   /**
    * @brief Evaluate multinom probability density function, default returns the
