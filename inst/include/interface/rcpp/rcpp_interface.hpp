@@ -385,8 +385,6 @@ RCPP_MODULE(fims) {
       .field("nyears", &FleetInterface::nyears)
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
-      .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
-      .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
       .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
       .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);

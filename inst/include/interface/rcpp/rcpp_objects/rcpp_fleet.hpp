@@ -51,12 +51,6 @@ std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
  *
  */
 class FleetInterface : public FleetInterfaceBase {
-  int interface_agecomp_likelihood_id_m =
-      -999; /**< id of agecomp likelihood component. The "interface_" prefix
-               indicates it belongs to the FleetInterface class, and the "_m"
-               postfix signifies that it's a member variable. */
-  int interface_index_likelihood_id_m =
-      -999; /**< id of index likelihood component*/
   int interface_observed_agecomp_data_id_m =
       -999; /**< id of observed agecomp data object*/
   int interface_observed_index_data_id_m =
@@ -82,24 +76,6 @@ class FleetInterface : public FleetInterfaceBase {
 
   /** @brief returns the id for the fleet interface */
   virtual uint32_t get_id() { return this->id; }
-
-  /**
-   * @brief Set the unique id for the Age Comp Likelihood object
-   *
-   * @param agecomp_likelihood_id Unique id for the Age Comp Likelihood object
-   */
-  void SetAgeCompLikelihood(int agecomp_likelihood_id) {
-    interface_agecomp_likelihood_id_m = agecomp_likelihood_id;
-  }
-
-  /**
-   * @brief Set the unique id for the Index Likelihood object
-   *
-   * @param index_likelihood_id Unique id for the Index Likelihood object
-   */
-  void SetIndexLikelihood(int index_likelihood_id) {
-    interface_index_likelihood_id_m = index_likelihood_id;
-  }
 
   /**
    * @brief Set the unique id for the Observed Age Comp Data object
