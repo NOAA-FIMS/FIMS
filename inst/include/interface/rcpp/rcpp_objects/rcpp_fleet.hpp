@@ -51,10 +51,6 @@ std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
  *
  */
 class FleetInterface : public FleetInterfaceBase {
-  int interface_observed_agecomp_data_id_m =
-      -999; /**< id of observed agecomp data object*/
-  int interface_observed_index_data_id_m =
-      -999;                              /**< id of observed index data object*/
   int interface_selectivity_id_m = -999; /**< id of selectivity component*/
 
  public:
@@ -76,25 +72,6 @@ class FleetInterface : public FleetInterfaceBase {
 
   /** @brief returns the id for the fleet interface */
   virtual uint32_t get_id() { return this->id; }
-
-  /**
-   * @brief Set the unique id for the Observed Age Comp Data object
-   *
-   * @param observed_agecomp_data_id Unique id for the Observed Age Comp Data
-   * object
-   */
-  void SetObservedAgeCompData(int observed_agecomp_data_id) {
-    interface_observed_agecomp_data_id_m = observed_agecomp_data_id;
-  }
-
-  /**
-   * @brief Set the unique id for the Observed Index Data object
-   *
-   * @param observed_index_data_id Unique id for the Observed Index Data object
-   */
-  void SetObservedIndexData(int observed_index_data_id) {
-    interface_observed_index_data_id_m = observed_index_data_id;
-  }
 
   /**
    * @brief Set the unique id for the Selectivity object
@@ -119,11 +96,6 @@ class FleetInterface : public FleetInterfaceBase {
     fleet->is_survey = this->is_survey;
     fleet->nages = this->nages;
     fleet->nyears = this->nyears;
-    fleet->fleet_agecomp_likelihood_id_m = interface_agecomp_likelihood_id_m;
-    fleet->fleet_index_likelihood_id_m = interface_index_likelihood_id_m;
-    fleet->fleet_observed_agecomp_data_id_m =
-        interface_observed_agecomp_data_id_m;
-    fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m;
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
 
     fleet->log_q = this->log_q;

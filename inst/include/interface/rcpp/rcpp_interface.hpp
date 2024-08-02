@@ -385,8 +385,6 @@ RCPP_MODULE(fims) {
       .field("nyears", &FleetInterface::nyears)
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
-      .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
-      .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
@@ -421,6 +419,8 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id)
       .method("evaluate", &DnormDistributionsInterface::evaluate)
+      .method("set_observed_data", &DnormDistributionsInterface::set_observed_data)
+      .method("set_distribution_links", &DnormDistributionsInterface::set_distribution_links)
       .field("x", &DnormDistributionsInterface::x)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
       .field("log_sd", &DnormDistributionsInterface::log_sd);
@@ -462,6 +462,8 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
+      .method("set_observed_data", &DlnormDistributionsInterface::set_observed_data)
+      .method("set_distribution_links", &DlnormDistributionsInterface::set_distribution_links)
       .field("input_type", &DlnormDistributionsInterface::input_type)
       .field("x", &DlnormDistributionsInterface::x)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
@@ -471,6 +473,8 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
       .method("get_id", &DmultinomDistributionsInterface::get_id)
+      .method("set_observed_data", &DmultinomDistributionsInterface::set_observed_data)
+      .method("set_distribution_links", &DmultinomDistributionsInterface::set_distribution_links)
       .field("x", &DmultinomDistributionsInterface::x)
       .field("expected_values", &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);

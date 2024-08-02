@@ -28,6 +28,8 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   static std::map<uint32_t, DistributionsInterfaceBase *> live_objects; /**<
 map relating the ID of the DistributionsInterfaceBase to the
 DistributionsInterfaceBase objects */
+  uint32_t interface_observed_data_id_m =
+      -999; /**< id of observed data object*/
 
   DistributionsInterfaceBase() {
     this->id_m = DistributionsInterfaceBase::id_g++;
@@ -43,8 +45,11 @@ DistributionsInterfaceBase objects */
    */
   virtual uint32_t get_id() = 0;
 
-  /**
+/**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
+   * 
+   * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
+   * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
   void set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
@@ -52,6 +57,17 @@ DistributionsInterfaceBase objects */
     for(size_t i; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
+  }
+
+
+  /**
+   * @brief Set the unique id for the Observed Data object
+   *
+   * @param observed_data_id Unique id for the Observed Age Comp Data
+   * object
+   */
+  void set_observed_data(int observed_data_id) {
+    interface_observed_data_id_m = observed_data_id;
   }
 
   /** @brief evaluate method for child distribution interface objects to inherit
@@ -93,8 +109,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @tparam T
    * @return log pdf
    */
-
-
   virtual double evaluate() {
     fims_distributions::NormalLPDF<double> dnorm;
     dnorm.x.resize(this->x.size());
@@ -112,6 +126,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     return dnorm.evaluate();
   }
 
+  
+
 #ifdef TMB_MODEL
 
   template <typename Type>
@@ -123,6 +139,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         std::make_shared<fims_distributions::NormalLPDF<Type>>();
 
     // interface to data/parameter value
+
+    distribution->observed_data_id_m =
+        interface_observed_data_id_m;
+
     distribution->id = this->id_m;
     distribution->x.resize(this->x.size());
     for(int i=0; i<this->x.size(); i++){
@@ -180,6 +200,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id_m; }
 
+
   /**
    * @brief Evaluate lognormal probability density function, default returns the
    * log of the pdf
@@ -217,6 +238,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     distribution->id = this->id_m;
+    distribution->observed_data_id_m =
+        interface_observed_data_id_m;
     distribution->input_type = this->input_type;
     distribution->x.resize(this->x.size());
     for(int i=0; i<this->x.size(); i++){
@@ -273,6 +296,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   virtual uint32_t get_id() { return this->id_m; }
 
+
   /**
    * @brief Evaluate multinom probability density function, default returns the
    * log of the pdf
@@ -308,6 +332,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
 
     distribution->id = this->id_m;
+    distribution->observed_data_id_m =
+        interface_observed_data_id_m;
     distribution->x.resize(this->x.size());
     for(int i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].value_m;

@@ -35,6 +35,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
  static uint32_t id_g; /**< global unique identifier for distribution modules */
+ size_t observed_data_id_m = -999; /*!< id of observed data component*/
  std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_values; /**< observed data*/
  fims::Vector<Type > x; /**< input value of distribution function for proirs or random effects*/
@@ -44,7 +45,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
  bool osa_flag = false; /**< Boolean; if true, osa residuals are calculated */
  bool simulate_flag = false; /**< Boolean; if true, data are simulated from the distribution */
  std::vector<uint32_t> key; /**< unique id for variable map that points to a fims::Vector */
- Type na_value = -999;   /**< specifying the NA value >*/
+  
   #ifdef TMB_MODEL
     ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
   #endif

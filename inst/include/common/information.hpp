@@ -225,81 +225,11 @@ class Information {
              << " fleets." << std::endl;
     for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
          ++it) {
-      // Initialize fleet object
 
       std::shared_ptr<fims_popdy::Fleet<Type> > f = (*it).second;
       INFO_LOG << "Initializing fleet " << f->id << "." << std::endl;
 
       f->Initialize(f->nyears, f->nages);
-
-      INFO_LOG << "Expecting to import " << this->data_objects.size()
-               << " data objects." << std::endl;
-
-      INFO_LOG << "Checking for available fleet index data objects."
-               << std::endl;
-      // set index data
-      if (f->fleet_observed_index_data_id_m != -999) {
-        uint32_t observed_index_id =
-            static_cast<uint32_t>(f->fleet_observed_index_data_id_m);
-        data_iterator it = this->data_objects.find(observed_index_id);
-        INFO_LOG << "Input fleet index id = " << observed_index_id << "."
-                 << std::endl;
-
-        if (it != this->data_objects.end()) {
-          f->observed_index_data = (*it).second;
-          INFO_LOG << "Index data successfully set." << std::endl;
-          DATA_LOG << "" << std::endl;
-          DATA_LOG << "Observed input for fleet " << f->id << ", index "
-                   << observed_index_id << ": \n "
-                   << f->observed_index_data->at(1) << std::endl;
-        } else {
-          valid_model = false;
-          ERROR_LOG << "Error: Expected data observations not defined for fleet"
-                    << f->id << ", index " << observed_index_id << std::endl;
-          exit(1);
-        }
-
-      } else {
-        valid_model = false;
-        ERROR_LOG << "Error: No index data observed for fleet " << f->id
-                  << ". FIMS requires index data for all fleets." << std::endl;
-        exit(1);
-      }
-      // end set index data
-
-      INFO_LOG << "Checking for available fleet age comp data objects."
-               << std::endl;
-      // set age composition data
-      if (f->fleet_observed_agecomp_data_id_m != -999) {
-        uint32_t observed_agecomp_id =
-            static_cast<uint32_t>(f->fleet_observed_agecomp_data_id_m);
-        data_iterator it = this->data_objects.find(observed_agecomp_id);
-        INFO_LOG << "Input fleet age comp id = " << observed_agecomp_id << "."
-                 << std::endl;
-
-        if (it != this->data_objects.end()) {
-          f->observed_agecomp_data = (*it).second;
-          INFO_LOG << "Age comp data successfully set." << std::endl;
-          DATA_LOG << "" << std::endl;
-          DATA_LOG << "Observed input age comp for fleet " << f->id << ", comp "
-                   << observed_agecomp_id << ": \n "
-                   << f->observed_agecomp_data->at(1) << std::endl;
-        } else {
-          valid_model = false;
-          ERROR_LOG << "Error: Expected age comp data observations not defined "
-                       "for fleet "
-                    << f->id << ", index " << observed_agecomp_id << std::endl;
-          exit(1);
-        }
-
-      } else {
-        valid_model = false;
-        ERROR_LOG << "Error: No age comp data observed for fleet " << f->id
-                  << ". FIMS requires age comp data for all fleets."
-                  << std::endl;
-        exit(1);
-      }
-      // end set composition data
 
       INFO_LOG << "Checking for available fleet selectivity pattern."
                << std::endl;
@@ -333,6 +263,37 @@ class Information {
         exit(1);
       }
       // end set selectivity
+    }
+    INFO_LOG << "Expecting to import " << this->data_objects.size()
+               << " data objects." << std::endl;
+    for(density_components_iterator it = this->density_components.begin(); 
+        it!= this->density_components.end(); ++it){
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
+      INFO_LOG << "Checking for available density components data objects."
+          << std::endl;
+      //set data objects
+      if(d->input_type == "data" & d->observed_data_id_m != -999){
+        uint32_t observed_data_id = static_cast<uint32_t>(d->observed_data_id_m);
+        data_iterator it = this->data_objects.find(observed_data_id);
+        INFO_LOG << "Input data id = " << observed_data_id << "." << std::endl;
+
+        if (it != this->data_objects.end()) {
+          d->observed_values = (*it).second;
+          INFO_LOG << "Data for density component, " << d->id << " successfully set." << std::endl;
+          DATA_LOG << "" << std::endl;
+        } else {
+          valid_model = false;
+          ERROR_LOG << "Error: Expected data observations not defined for density component "
+                    << d->id << ", observed data " << observed_data_id << std::endl;
+          exit(1);
+        }
+
+      } else {
+        valid_model = false;
+        ERROR_LOG << "Error: No data input for density " << d->id << std::endl;
+        exit(1);
+      }
+      // end set data
     }
       
     INFO_LOG << "Initializing population objects for "
