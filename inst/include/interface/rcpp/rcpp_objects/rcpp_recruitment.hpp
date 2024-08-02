@@ -51,12 +51,6 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual double evaluate(double spawners, double ssbzero) = 0;
 
-  /**
-   * @brief evaluate recruitment log probability density function
-   *
-   * @return double
-   */
-  virtual double evaluate_lpdf() = 0;
 };
 
 uint32_t RecruitmentInterfaceBase::id_g = 1;
