@@ -15,6 +15,7 @@
 #ifndef DENSITY_COMPONENT_BASE_HPP
 #define DENSITY_COMPONENT_BASE_HPP
 
+#include "../../common/data_object.hpp"
 #include "../../common/model_object.hpp"
 #include "../../interface/interface.hpp"
 #include "../../common/fims_vector.hpp"
@@ -34,7 +35,9 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
  static uint32_t id_g; /**< global unique identifier for distribution modules */
- std::shared_ptr<fims::Vector<Type> > x; /**< input value of distribution function */
+ std::shared_ptr<fims_data_object::DataObject<Type>>
+      observed_values; /**< observed data*/
+ fims::Vector<Type > x; /**< input value of distribution function for proirs or random effects*/
  fims::Vector<Type> expected_values; /**< expected value of distribution function */
  fims::Vector<Type> lpdf_vec; /**< vector to record observation level negative log-likelihood values */
  std::string  input_type; /**< string classifies the type of the negative log-likelihood; options are: prior, re, data */

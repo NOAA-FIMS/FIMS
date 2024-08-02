@@ -97,11 +97,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
   virtual double evaluate() {
     fims_distributions::NormalLPDF<double> dnorm;
-    dnorm.x->resize(this->x.size());
+    dnorm.x.resize(this->x.size());
     dnorm.expected_values.resize(this->expected_values.size());
     dnorm.log_sd.resize(this->log_sd.size());
     for(int i=0; i<x.size(); i++){
-      dnorm.x->at(i) = this->x[i].value_m;
+      dnorm.x[i] = this->x[i].value_m;
     }
     for(int i=0; i<expected_values.size(); i++){
       dnorm.expected_values[i] = this->expected_values[i].value_m;
@@ -124,9 +124,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // interface to data/parameter value
     distribution->id = this->id_m;
-    distribution->x->resize(this->x.size());
+    distribution->x.resize(this->x.size());
     for(int i=0; i<this->x.size(); i++){
-      distribution->x->at(i) = this->x[i].value_m;
+      distribution->x[i] = this->x[i].value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
@@ -190,11 +190,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual double evaluate() {
     fims_distributions::LogNormalLPDF<double> dlnorm;
     dlnorm.input_type = this->input_type;
-    dlnorm.x->resize(this->x.size());
+    dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_logsd.resize(this->log_logsd.size());
     for(int i=0; i<x.size(); i++){
-      dlnorm.x->at(i) = this->x[i].value_m;
+      dlnorm.x[i] = this->x[i].value_m;
     }
     for(int i=0; i<expected_values.size(); i++){
       dlnorm.expected_values[i] = this->expected_values[i].value_m;
@@ -218,9 +218,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     // set relative info
     distribution->id = this->id_m;
     distribution->input_type = this->input_type;
-    distribution->x->resize(this->x.size());
+    distribution->x.resize(this->x.size());
     for(int i=0; i<this->x.size(); i++){
-      distribution->x->at(i) = this->x[i].value_m;
+      distribution->x[i] = this->x[i].value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
@@ -283,10 +283,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual double evaluate() {
     fims_distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
-    dmultinom.x->resize(this->x.size());
+    dmultinom.x.resize(this->x.size());
     dmultinom.expected_values.resize(this->expected_values.size());
     for(int i=0; i<x.size(); i++){
-      dmultinom.x->at(i) = this->x[i].value_m;
+      dmultinom.x[i] = this->x[i].value_m;
     }
     for(int i=0; i<expected_values.size(); i++){
       dmultinom.expected_values[i] = this->expected_values[i].value_m;
@@ -308,9 +308,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
 
     distribution->id = this->id_m;
-    distribution->x->resize(this->x.size());
+    distribution->x.resize(this->x.size());
     for(int i=0; i<this->x.size(); i++){
-      distribution->x->at(i) = this->x[i].value_m;
+      distribution->x[i] = this->x[i].value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
