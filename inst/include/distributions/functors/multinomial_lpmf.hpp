@@ -48,8 +48,9 @@ namespace fims_distributions
         {
             std::vector<size_t> dims;
             dims.resize(2);
-            dims[0] = this->x->get_imax(); 
-            dims[1] = this->x->get_jmax();
+            
+            dims[0] = this->observed_values->get_imax(); 
+            dims[1] = this->observed_values->get_jmax();
             
             Type lpdf = 0.0; /**< total log probability mass contribution of the distribution */
             
@@ -72,7 +73,8 @@ namespace fims_distributions
                     
                     #ifdef TMB_MODEL
                     for (size_t j = 0; j < dims[1]; j++){
-                        if (this->x->at(i)->at(j) != this->na_value) {
+                        if (this->observed_values->at(i, j) !=
+                                this->observed_values->na_value) {
                             size_t idx = (i * dims[1]) + j;
                         } else {
                             containsNA - true;
@@ -82,7 +84,7 @@ namespace fims_distributions
                     if(!containsNA){
                         for (size_t j = 0; j < dims[1]; j++){
                             size_t idx = (i * dims[1]) + j;
-                            x_vector[j] = this->x->at(i)->at(j);
+                            x_vector[j] = this->observed_values->at(i, j);
                             prob_vector[j] = this->expected_values[idx];
                         }
                     }
@@ -110,7 +112,7 @@ namespace fims_distributions
                 }
             }
             #ifdef TMB_MODEL
-            vector<Type> x = this->x;
+            vector<Type> x = this->observed_values->data;
           //  FIMS_REPORT_F(x, this->of);
             #endif
             return (lpdf);

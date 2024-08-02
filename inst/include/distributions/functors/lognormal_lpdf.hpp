@@ -46,16 +46,16 @@ namespace fims_distributions
          */
         virtual const Type evaluate()
         {
-            this->logmu.resize(this->x->size());
-            this->logsd.resize(this->x->size());
-            this->lpdf_vec.resize(this->x->size());
-            for (size_t i = 0; i < this->x->size(); i++)
+            this->logmu.resize(this->x.size());
+            this->logsd.resize(this->x.size());
+            this->lpdf_vec.resize(this->x.size());
+            for (size_t i = 0; i < this->x.size(); i++)
             {
                 if (this->expected_values.size() == 1)
                 {
                     this->logmu[i] = this->expected_values[0];
                 } else {
-                  if(this->x->size() != this->expected_values.size()){
+                  if(this->x.size() != this->expected_values.size()){
                     /* move error handling to CreateModel in information so not to crash R
                     Rcpp::stop("the dimensions of the observed and expected values from lognormal negative log likelihood do not match");
                      */
@@ -67,7 +67,7 @@ namespace fims_distributions
                 {
                     logsd[i] = fims_math::exp(log_logsd[0]);
                 } else {
-                  if(this->x->size() != this->log_logsd.size()){
+                  if(this->x.size() != this->log_logsd.size()){
                     /* move error handling to CreateModel in information so not to crash R
                     Rcpp::stop("the dimensions of the observed and log logsd values from lognormal negative log likelihood do not match");
                      */
@@ -78,14 +78,14 @@ namespace fims_distributions
 
                 #ifdef TMB_MODEL
                 if(this->input_type == "data"){
-                  if(this->x->at(i) != this->na_value){
-                  // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->x->at(i), logmu[i], logsd[i], true) - this->x->at(i);
-                      this->lpdf_vec[i] = dnorm(this->x->at(i), logmu[i], logsd[i], true) - this->x->at(i);
+                  if(this->observed_values->at(i) != this->observed_values->na_value){
+                  // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->observed_values->at(i), logmu[i], logsd[i], true) - this->observed_values->->at(i);
+                      this->lpdf_vec[i] = dnorm(this->observed_values->at(i), logmu[i], logsd[i], true) - this->observed_values->at(i);
                   } else {
                     this->lpdf_vec[i] = 0;
                   } 
                 } else {
-                  this->lpdf_vec[i] = dnorm(this->x->at(i), logmu[i], logsd[i], true);
+                  this->lpdf_vec[i] = dnorm(this->x[i], logmu[i], logsd[i], true);
                 }
 
                 lpdf += this->lpdf_vec[i];
@@ -94,7 +94,11 @@ namespace fims_distributions
                     FIMS_SIMULATE_F(this->of)
                     { // preprocessor definition in interface.hpp
                         // this simulates data that is mean biased
-                        this->x->at(i) = fims_math::exp(rnorm(logmu[i], logsd[i]));
+                        if(this->input_type == "data"){
+                          this->observed_values->at(i) = fims_math::exp(rnorm(logmu[i], logsd[i]));
+                        } else {
+                          this->x[i] = fims_math::exp(rnorm(logmu[i], logsd[i]));
+                        }
                     }
                 }
                 #endif
