@@ -73,10 +73,8 @@ class FleetInterface : public FleetInterfaceBase {
   ParameterVector expected_catch; /**< expected catch for the fleet */
   ParameterVector expected_index; /**< expected index of abundance for the survey */
   ParameterVector catch_numbers_at_age; /**< expected catch numbers at age for the fleet */
-  bool estimate_F = false; /**< whether the parameter F should be estimated*/
   bool estimate_q = false; /**< whether the parameter q should be estimated*/
   bool random_q = false;             /**< whether q should be a random effect*/
-  bool random_F = false;             /**< whether F should be a random effect*/
 
   FleetInterface() : FleetInterfaceBase() {}
 

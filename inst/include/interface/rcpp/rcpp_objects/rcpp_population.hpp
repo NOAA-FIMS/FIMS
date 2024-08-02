@@ -66,8 +66,6 @@ class PopulationInterface : public PopulationInterfaceBase {
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
   Rcpp::NumericVector proportion_female; /**<doule representing the proportion
                                             of female individuals */
-  bool estimate_M;           /**<whether parameter should be estimated*/
-  bool estimate_initNAA;     /**<whether parameter should be estimated*/
   bool estimate_prop_female; /**<whether proportion female should be estimated*/
 
   PopulationInterface() : PopulationInterfaceBase() {}
