@@ -63,8 +63,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       log_Fmort; /*!< estimated parameter: log Fishing mortality*/
   Type log_q;    /*!< estimated parameter: catchability of the fleet */
 
-  fims::Vector<Type> log_obs_error; /*!< estimated parameters: observation error
-                       associated with index */
   fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
   Type q; /*!< transofrmed parameter: the catchability of the fleet */
 
@@ -116,7 +114,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     catch_index.resize(nyears);  // assume index is for all ages.
     age_composition.resize(nyears * nages);
 
-    log_obs_error.resize(nyears);
     log_Fmort.resize(nyears);
     Fmort.resize(nyears);
   }
@@ -148,8 +145,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     for (size_t year = 0; year < this->nyears; year++) {
       FLEET_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
       FLEET_LOG << "input q " << this->log_q << std::endl;
-      FLEET_LOG << "input log_obs_error " << this->log_obs_error[year]
-                << std::endl;
       this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
     }
   }

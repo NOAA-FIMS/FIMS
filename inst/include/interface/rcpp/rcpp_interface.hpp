@@ -388,7 +388,6 @@ RCPP_MODULE(fims) {
       .field("estimate_obs_error", &FleetInterface::estimate_obs_error)
       .field("random_q", &FleetInterface::random_q)
       .field("random_F", &FleetInterface::random_F)
-      .field("log_obs_error", &FleetInterface::log_obs_error)
       .method("SetAgeCompLikelihood", &FleetInterface::SetAgeCompLikelihood)
       .method("SetIndexLikelihood", &FleetInterface::SetIndexLikelihood)
       .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
