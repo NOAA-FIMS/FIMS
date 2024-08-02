@@ -73,20 +73,16 @@ namespace fims_distributions
                     
                     #ifdef TMB_MODEL
                     for (size_t j = 0; j < dims[1]; j++){
-                        if (this->observed_values->at(i, j) !=
+                        if (this->observed_values->at(i, j) ==
                                 this->observed_values->na_value) {
-                            size_t idx = (i * dims[1]) + j;
-                        } else {
                             containsNA = true;
                             break;
                         }
-                    }
                     if(!containsNA){
-                        for (size_t j = 0; j < dims[1]; j++){
-                            size_t idx = (i * dims[1]) + j;
-                            x_vector[j] = this->observed_values->at(i, j);
-                            prob_vector[j] = this->expected_values[idx];
-                        }
+                        size_t idx = (i * dims[1]) + j;
+                        x_vector[j] = this->observed_values->at(i, j);
+                        prob_vector[j] = this->expected_values[idx];
+                    
                     }
 
                     this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, true);

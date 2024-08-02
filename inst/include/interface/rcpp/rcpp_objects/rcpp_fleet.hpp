@@ -108,7 +108,7 @@ class FleetInterface : public FleetInterfaceBase {
     }
 
     fleet->log_Fmort.resize(this->log_Fmort.size());
-    for (int i = 0; i < log_Fmort.size(); i++) {
+    for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].value_m;
 
       if (this->log_Fmort[i].estimated_m) {

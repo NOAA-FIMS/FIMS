@@ -272,7 +272,7 @@ class Information {
       INFO_LOG << "Checking for available density components data objects."
           << std::endl;
       //set data objects
-      if(d->input_type == "data" & d->observed_data_id_m != -999){
+      if((d->input_type == "data") & (d->observed_data_id_m != -999)){
         uint32_t observed_data_id = static_cast<uint32_t>(d->observed_data_id_m);
         data_iterator it = this->data_objects.find(observed_data_id);
         INFO_LOG << "Input data id = " << observed_data_id << "." << std::endl;

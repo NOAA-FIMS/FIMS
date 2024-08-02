@@ -35,7 +35,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
  static uint32_t id_g; /**< global unique identifier for distribution modules */
- size_t observed_data_id_m = -999; /*!< id of observed data component*/
+ uint32_t observed_data_id_m = -999; /*!< id of observed data component*/
  std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_values; /**< observed data*/
  fims::Vector<Type > x; /**< input value of distribution function for proirs or random effects*/
