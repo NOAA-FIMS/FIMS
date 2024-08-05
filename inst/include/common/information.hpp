@@ -43,6 +43,8 @@ class Information {
       random_effects_parameters; /**< list of all random effects parameters >*/
   std::vector<Type*>
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
+  std::vector<std::string>
+      parameter_names; /**< list of all parameter names estimated in the model */
 
   // data objects
   std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<Type> > >
@@ -153,6 +155,15 @@ class Information {
    */
   void RegisterRandomEffect(Type& re) {
     this->random_effects_parameters.push_back(&re);
+  }
+
+  /**
+   * Register a parameter name.
+   *
+   * @param p_name
+   */
+  void RegisterParameterName(std::string p_name) {
+    this->parameter_names.push_back(p_name);
   }
 
     

@@ -81,6 +81,17 @@ Rcpp::NumericVector get_random_parameters_vector() {
   return p;
 }
 
+Rcpp::List get_parameter_names(Rcpp::List pars) {
+  // base model
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+  pars.attr("names") = d0->parameter_names;
+
+
+  return pars;
+}
+
 /**
  * Clears the contents of info log file.
  */
@@ -325,6 +336,7 @@ RCPP_MODULE(fims) {
   Rcpp::function("CreateTMBModel", &CreateTMBModel);
   Rcpp::function("get_fixed", &get_fixed_parameters_vector);
   Rcpp::function("get_random", &get_random_parameters_vector);
+  Rcpp::function("get_parameter_names", &get_parameter_names);
   Rcpp::function("clear", clear);
   Rcpp::function("clear_logs", clear_logs);
   Rcpp::function("clear_fims_log", clear_fims_log);

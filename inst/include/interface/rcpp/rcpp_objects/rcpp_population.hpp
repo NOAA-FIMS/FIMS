@@ -133,6 +133,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (size_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].value_m;
       if (this->log_M[i].estimated_m) {
+        info->RegisterParameterName("log_M");
         info->RegisterParameter(population->log_M[i]);
       }
     }
@@ -141,6 +142,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].value_m;
       if (this->log_init_naa[i].estimated_m) {
+        info->RegisterParameterName("log_init_naa");
         info->RegisterParameter(population->log_init_naa[i]);
       }
     }

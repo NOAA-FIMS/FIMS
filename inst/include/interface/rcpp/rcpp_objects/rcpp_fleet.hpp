@@ -100,6 +100,7 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->log_q = this->log_q;
     if (this->estimate_q) {
+      info->RegisterParameterName("log_q");
       if (this->random_q) {
         info->RegisterRandomEffect(fleet->log_q);
       } else {
@@ -112,6 +113,7 @@ class FleetInterface : public FleetInterfaceBase {
       fleet->log_Fmort[i] = this->log_Fmort[i].value_m;
 
       if (this->log_Fmort[i].estimated_m) {
+        info->RegisterParameterName("log_Fmort");
         if (this->log_Fmort[i].is_random_effect_m) {
           info->RegisterRandomEffect(fleet->log_Fmort[i]);
         } else {

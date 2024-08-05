@@ -109,6 +109,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     recruitment->logit_steep.resize(1);
     recruitment->logit_steep[0] = this->logit_steep.value_m;
     if (this->logit_steep.estimated_m) {
+      info->RegisterParameterName("logit_steep");
       if (this->logit_steep.is_random_effect_m) {
         info->RegisterRandomEffect(recruitment->logit_steep[0]);
       } else {
@@ -121,6 +122,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     recruitment->log_rzero.resize(1);
     recruitment->log_rzero[0] = this->log_rzero.value_m;
     if (this->log_rzero.estimated_m) {
+      info->RegisterParameterName("log_rzero");
       if (this->log_rzero.is_random_effect_m) {
         info->RegisterRandomEffect(recruitment->log_rzero[0]);
       } else {
@@ -133,6 +135,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     recruitment->log_sigma_recruit.resize(1);
     recruitment->log_sigma_recruit[0] = this->log_sigma_recruit.value_m;
     if (this->log_sigma_recruit.estimated_m) {
+      info->RegisterParameterName("log_sigma_recruit");
       if (this->log_sigma_recruit.is_random_effect_m) {
         info->RegisterRandomEffect(recruitment->log_sigma_recruit[0]);
       } else {
