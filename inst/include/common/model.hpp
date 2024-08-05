@@ -34,11 +34,6 @@ class Model {  // may need singleton
   std::shared_ptr<fims_info::Information<Type> >
       fims_information; /**< Create a shared fims_information as a pointer to
                            Information*/
-  std::map<uint32_t, std::shared_ptr<fims_distributions::DensityComponentBase<Type> > >
-    density_components;
-  typedef typename std::map<
-    uint32_t, std::shared_ptr<fims_distributions::DensityComponentBase<Type> > >::iterator
-    density_components_iterator;
 
 #ifdef TMB_MODEL
   ::objective_function<Type> *of;
@@ -65,6 +60,7 @@ class Model {  // may need singleton
    * @brief Evaluate. Calculates the joint negative log-likelihood function.
    */
   const Type Evaluate() {
+    MODEL_LOG << "inside model evaluate" << std::endl;
     // jnll = negative-log-likelihood (the objective function)
     Type jnll = 0.0;
 
@@ -91,9 +87,12 @@ class Model {  // may need singleton
     vector<vector<Type> > M(n_pops);
 #endif
     // Loop over densities and evaluate joint negative log densities for priors
-   size_t n_priors = 0;
-   density_components_iterator d_it;
-    for(d_it = this->density_components.begin(); d_it!= this->density_components.end(); ++d_it){
+    typename fims_info::Information<Type>::density_components_iterator d_it;
+    size_t n_priors = 0;
+    MODEL_LOG << "Expecting to evaluate " << this->fims_information->density_components.size()
+               << " density components." << std::endl;
+    for(d_it = this->fims_information->density_components.begin(); 
+        d_it!= this->fims_information->density_components.end(); ++d_it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
       #ifdef TMB_MODEL
         d->of = this->of;
@@ -129,12 +128,13 @@ class Model {  // may need singleton
 
     // Loop over densities and evaluate joint negative log-likelihoods for random effects
     size_t n_random_effects = 0;
-    for(d_it = this->density_components.begin(); d_it!= this->density_components.end(); ++d_it){
+    for(d_it = this->fims_information->density_components.begin(); 
+        d_it!= this->fims_information->density_components.end(); ++d_it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
       #ifdef TMB_MODEL
         d->of = this->of;
       #endif
-      if(d->input_type == "re"){
+      if(d->input_type == "random_effects"){
         jnll -= d->evaluate();
         n_random_effects += 1;
       }
@@ -175,7 +175,9 @@ class Model {  // may need singleton
       }
 
     // Loop over and evaluate data joint negative log-likelihoods
-    for(d_it = this->density_components.begin(); d_it!= this->density_components.end(); ++d_it){
+    int n_data = 0;
+    for(d_it = this->fims_information->density_components.begin(); 
+        d_it!= this->fims_information->density_components.end(); ++d_it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
       #ifdef TMB_MODEL
         d->of = this->of;
@@ -183,8 +185,13 @@ class Model {  // may need singleton
       #endif
       if(d->input_type == "data"){
         jnll -= d->evaluate();
+        n_data += 1;
       }
     }
+    MODEL_LOG << "Finished evaluating joint negative log densities for "
+              << n_data << " data distributions."
+              << std::endl;
+
 
     // initiate population index for structuring report out objects
     int pop_idx = 0;

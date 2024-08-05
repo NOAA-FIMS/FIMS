@@ -160,29 +160,37 @@ class Information {
     for(density_components_iterator it = density_components.begin(); it!= density_components.end(); ++it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
       if(d->input_type == "prior"){
+        INFO_LOG << "Setup prior for distribution " << d->id << std::endl;
         variable_map_iterator vmit;
+        INFO_LOG << "Link prior from distribution " << d->id << " to parameter " << d->key[0] << std::endl;
         vmit = this->variable_map.find(d->key[0]); 
         d->x = *(*vmit).second;
         for(size_t i=1; i<d->key.size(); i++){
+          INFO_LOG << "Link prior from distribution " << d->id << " to parameter " << d->key[i] << std::endl;
           vmit = this->variable_map.find(d->key[i]); 
           d->x.insert(std::end(d->x), 
             std::begin(*(*vmit).second), std::end(*(*vmit).second));
         } 
+        INFO_LOG << "Prior size for distribution " << d->id << "is: " << d->x.size() << std::endl;
       }
     }
   }
   void setup_random_effects(){
     for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
-      if(d->input_type == "re"){
+      if(d->input_type == "random_effects"){
+        INFO_LOG << "Setup random effects for distribution " << d->id << std::endl;
         variable_map_iterator vmit;
+        INFO_LOG << "Link random effects from distribution " << d->id << " to derived value " << d->key[0] << std::endl;
         vmit = this->variable_map.find(d->key[0]); 
         d->x = *(*vmit).second;
         for(size_t i=1; i<d->key.size(); i++){
+        INFO_LOG << "Link random effects from distribution " << d->id << " to derived value " << d->key[i] << std::endl;
           vmit = this->variable_map.find(d->key[i]); 
           d->x.insert(std::end(d->x), 
                                     std::begin(*(*vmit).second), std::end(*(*vmit).second));
         } 
+        INFO_LOG << "Random effect size for distribution " << d->id << "is: " << d->x.size() << std::endl;
       }
     }
   }
@@ -190,15 +198,19 @@ class Information {
     for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
       if(d->input_type == "data"){
+        INFO_LOG << "Setup expected value for data distribution " << d->id << std::endl;
         variable_map_iterator vmit;
+        INFO_LOG << "Link expected value from distribution " << d->id << " to derived value " << d->key[0] << std::endl;
         vmit = this->variable_map.find(d->key[0]); 
         d->expected_values = *(*vmit).second;
         
         for(size_t i=1; i<d->key.size(); i++){
-          vmit = this->variable_map.find(d->key[i]); 
+          vmit = this->variable_map.find(d->key[i]);
+        INFO_LOG << "Link expected value from distribution " << d->id << " to derived value " << d->key[i] << std::endl; 
           d->expected_values.insert(std::end(d->expected_values), 
             std::begin(*(*vmit).second), std::end(*(*vmit).second));
         } 
+        INFO_LOG << "Expected value size for distribution " << d->id << "is: " << d->expected_values.size() << std::endl;
       }
     }
   }
@@ -271,27 +283,29 @@ class Information {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
       INFO_LOG << "Checking for available density components data objects."
           << std::endl;
-      //set data objects
-      if((d->input_type == "data") & (d->observed_data_id_m != -999)){
-        uint32_t observed_data_id = static_cast<uint32_t>(d->observed_data_id_m);
-        data_iterator it = this->data_objects.find(observed_data_id);
-        INFO_LOG << "Input data id = " << observed_data_id << "." << std::endl;
+      //set data objects if distribution is a data type
+      if(d->input_type == "data"){
+        if(d->observed_data_id_m != -999){
+          uint32_t observed_data_id = static_cast<uint32_t>(d->observed_data_id_m);
+          data_iterator it = this->data_objects.find(observed_data_id);
+          INFO_LOG << "Input data id = " << observed_data_id << "." << std::endl;
 
-        if (it != this->data_objects.end()) {
-          d->observed_values = (*it).second;
-          INFO_LOG << "Data for density component, " << d->id << " successfully set." << std::endl;
-          DATA_LOG << "" << std::endl;
+          if (it != this->data_objects.end()) {
+            d->observed_values = (*it).second;
+            INFO_LOG << "Data for density component, " << d->id << " successfully set." << std::endl;
+            DATA_LOG << "" << std::endl;
+          } else {
+            valid_model = false;
+            ERROR_LOG << "Error: Expected data observations not defined for density component "
+                      << d->id << ", observed data " << observed_data_id << std::endl;
+            exit(1);
+          }
+
         } else {
           valid_model = false;
-          ERROR_LOG << "Error: Expected data observations not defined for density component "
-                    << d->id << ", observed data " << observed_data_id << std::endl;
+          ERROR_LOG << "Error: No data input for density " << d->id << std::endl;
           exit(1);
         }
-
-      } else {
-        valid_model = false;
-        ERROR_LOG << "Error: No data input for density " << d->id << std::endl;
-        exit(1);
       }
       // end set data
     }
@@ -419,8 +433,11 @@ class Information {
     INFO_LOG << "Completed initialization of all populations." << std::endl;
 
     //setup priors, random effect, and data density components
+    INFO_LOG << "Setup priors." << std::endl;
     setup_priors();
+    INFO_LOG << "Setup random effects." << std::endl;
     setup_random_effects();
+    INFO_LOG << "Setup data expected values." << std::endl;
     setup_data();
 
     INFO_LOG << "Completed FIMS model creation." << std::endl;

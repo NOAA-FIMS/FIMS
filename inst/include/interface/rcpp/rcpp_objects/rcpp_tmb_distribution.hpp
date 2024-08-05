@@ -28,7 +28,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   static std::map<uint32_t, DistributionsInterfaceBase *> live_objects; /**<
 map relating the ID of the DistributionsInterfaceBase to the
 DistributionsInterfaceBase objects */
-  uint32_t interface_observed_data_id_m =
+uint32_t interface_observed_data_id_m =
       -999; /**< id of observed data object*/
 
   DistributionsInterfaceBase() {
@@ -165,7 +165,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     distribution->observed_data_id_m =
         interface_observed_data_id_m;
-
+    distribution->input_type = this->input_type_m;
+    distribution->key.resize(this->key_m.size());
+    for(size_t i=0; i<this->key_m.size(); i++){
+      distribution->key[i] = this->key_m[i];
+    }
     distribution->id = this->id_m;
     distribution->x.resize(this->x.size());
     for(size_t i=0; i<this->x.size(); i++){
@@ -290,7 +294,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->id = this->id_m;
     distribution->observed_data_id_m =
         interface_observed_data_id_m;
-    distribution->input_type = this->input_type;
+    distribution->input_type = this->input_type_m;
+    distribution->key.resize(this->key_m.size());
+    for(size_t i=0; i<this->key_m.size(); i++){
+      distribution->key[i] = this->key_m[i];
+    }
     distribution->x.resize(this->x.size());
     for(size_t i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].value_m;
@@ -411,6 +419,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     distribution->id = this->id_m;
     distribution->observed_data_id_m =
         interface_observed_data_id_m;
+    distribution->input_type = this->input_type_m;
+    distribution->key.resize(this->key_m.size());
+    for(size_t i=0; i<this->key_m.size(); i++){
+      distribution->key[i] = this->key_m[i];
+    }
     distribution->x.resize(this->x.size());
     for(size_t i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].value_m;

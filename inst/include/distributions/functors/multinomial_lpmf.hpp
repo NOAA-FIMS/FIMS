@@ -68,6 +68,8 @@ namespace fims_distributions
                     fims::Vector<Type> prob_vector;
                     x_vector.resize(dims[1]);
                     prob_vector.resize(dims[1]);
+                    this->lpdf_vec.resize(dims[0]*dims[1]);
+                    
                     bool containsNA =
                         false; /**< skips the entire row if any values are NA */
                     
