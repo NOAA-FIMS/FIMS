@@ -46,16 +46,22 @@ namespace fims_distributions
          */
         virtual const Type evaluate()
         {
-            this->logmu.resize(this->x.size());
-            this->logsd.resize(this->x.size());
-            this->lpdf_vec.resize(this->x.size());
-            for (size_t i = 0; i < this->x.size(); i++)
+          size_t n_x;
+          if(this->input_type == "data"){
+            n_x = this->observed_values->data.size();
+          } else {
+            n_x = this->x.size();
+          }
+            this->logmu.resize(n_x);
+            this->logsd.resize(n_x);
+            this->lpdf_vec.resize(n_x);
+            for (size_t i = 0; i < n_x; i++)
             {
                 if (this->expected_values.size() == 1)
                 {
                     this->logmu[i] = this->expected_values[0];
                 } else {
-                  if(this->x.size() != this->expected_values.size()){
+                  if(n_x != this->expected_values.size()){
                     /* move error handling to CreateModel in information so not to crash R
                     Rcpp::stop("the dimensions of the observed and expected values from lognormal negative log likelihood do not match");
                      */
@@ -67,7 +73,7 @@ namespace fims_distributions
                 {
                     logsd[i] = fims_math::exp(log_logsd[0]);
                 } else {
-                  if(this->x.size() != this->log_logsd.size()){
+                  if(n_x != this->log_logsd.size()){
                     /* move error handling to CreateModel in information so not to crash R
                     Rcpp::stop("the dimensions of the observed and log logsd values from lognormal negative log likelihood do not match");
                      */
@@ -78,11 +84,15 @@ namespace fims_distributions
 
                 #ifdef TMB_MODEL
                 if(this->input_type == "data"){
+                  MODEL_LOG << "For obs " << i << ", observed_values is: " <<  
+                    this->observed_values->at(i) << ", logmu is: " << 
+                    logmu[i] << " and logsd is: " << logsd[i] << std::endl;
                   if(this->observed_values->at(i) != this->observed_values->na_value){
                   // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->observed_values->at(i), logmu[i], logsd[i], true) - this->observed_values->->at(i);
                       this->lpdf_vec[i] = dnorm(this->observed_values->at(i), logmu[i], logsd[i], true) - this->observed_values->at(i);
                   } else {
                     this->lpdf_vec[i] = 0;
+                    MODEL_LOG << "lpdf_vec for obs " << i << " is: " << this->lpdf_vec[i] <<std::endl;
                   } 
                 } else {
                   this->lpdf_vec[i] = dnorm(this->x[i], logmu[i], logsd[i], true);
