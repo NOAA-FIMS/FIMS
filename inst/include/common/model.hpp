@@ -102,8 +102,8 @@ class Model {  // may need singleton
         n_priors += 1;
       }
     }
-    MODEL_LOG << "Finished evaluating joint negative log densities for "
-              << n_priors << " prior distributions."
+    MODEL_LOG << "The joint negative log likelihood after evaluating "
+              << n_priors << " prior distributions is:  "<< jnll << "."
               << std::endl;
     
 
@@ -127,6 +127,8 @@ class Model {  // may need singleton
     }
 
     // Loop over densities and evaluate joint negative log-likelihoods for random effects
+    MODEL_LOG << "Setup random effects." << std::endl;
+    this->fims_information->setup_random_effects();
     size_t n_random_effects = 0;
     for(d_it = this->fims_information->density_components.begin(); 
         d_it!= this->fims_information->density_components.end(); ++d_it){
@@ -139,8 +141,8 @@ class Model {  // may need singleton
         n_random_effects += 1;
       }
     }
-    MODEL_LOG << "Finished evaluating joint negative log densities for "
-              << n_random_effects << " random effect distributions."
+    MODEL_LOG << "The joint negative log likelihood after evaluating "
+              << n_random_effects << " random effects distributions is:  "<< jnll << "."
               << std::endl;
 
     // Loop over and evaluate populations
@@ -173,7 +175,8 @@ class Model {  // may need singleton
         f->evaluate_age_comp();
         f->evaluate_index();
       }
-
+    MODEL_LOG << "Setup data expected values." << std::endl;
+    this->fims_information->setup_data();
     // Loop over and evaluate data joint negative log-likelihoods
     int n_data = 0;
     for(d_it = this->fims_information->density_components.begin(); 
@@ -188,8 +191,8 @@ class Model {  // may need singleton
         n_data += 1;
       }
     }
-    MODEL_LOG << "Finished evaluating joint negative log densities for "
-              << n_data << " data distributions."
+    MODEL_LOG << "The joint negative log likelihood after evaluating "
+              << n_data << " data distributions is:  "<< jnll << "."
               << std::endl;
 
 

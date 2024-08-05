@@ -84,18 +84,15 @@ namespace fims_distributions
 
                 #ifdef TMB_MODEL
                 if(this->input_type == "data"){
-                  MODEL_LOG << "For obs " << i << ", observed_values is: " <<  
-                    this->observed_values->at(i) << ", logmu is: " << 
-                    logmu[i] << " and logsd is: " << logsd[i] << std::endl;
                   if(this->observed_values->at(i) != this->observed_values->na_value){
-                  // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->observed_values->at(i), logmu[i], logsd[i], true) - this->observed_values->->at(i);
-                      this->lpdf_vec[i] = dnorm(this->observed_values->at(i), logmu[i], logsd[i], true) - this->observed_values->at(i);
-                  } else {
+                  // this->lpdf_vec[i] = this->keep[i] * -dnorm(log(this->observed_values->at(i)), logmu[i], logsd[i], true) - log(this->observed_values->->at(i));
+                      this->lpdf_vec[i] = dnorm(log(this->observed_values->at(i)), logmu[i], logsd[i], true) - log(this->observed_values->at(i));
+                    } else {
                     this->lpdf_vec[i] = 0;
                     MODEL_LOG << "lpdf_vec for obs " << i << " is: " << this->lpdf_vec[i] <<std::endl;
                   } 
                 } else {
-                  this->lpdf_vec[i] = dnorm(this->x[i], logmu[i], logsd[i], true);
+                  this->lpdf_vec[i] = dnorm(log(this->x[i]), logmu[i], logsd[i], true);
                 }
 
                 lpdf += this->lpdf_vec[i];

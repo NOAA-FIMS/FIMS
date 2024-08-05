@@ -446,11 +446,7 @@ class Information {
     //setup priors, random effect, and data density components
     INFO_LOG << "Setup priors." << std::endl;
     setup_priors();
-    INFO_LOG << "Setup random effects." << std::endl;
-    setup_random_effects();
-    INFO_LOG << "Setup data expected values." << std::endl;
-    setup_data();
-
+    
     INFO_LOG << "Completed FIMS model creation." << std::endl;
     return valid_model;
   }
