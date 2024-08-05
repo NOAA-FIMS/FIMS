@@ -60,9 +60,8 @@ class FleetInterface : public FleetInterfaceBase {
   double log_q;           /**< log of catchability for the fleet*/
   ParameterVector
       log_Fmort;           /**< log of fishing mortality rate for the fleet*/
-  ParameterVector expected_catch; /**< expected catch for the fleet */
-  ParameterVector expected_index; /**< expected index of abundance for the survey */
-  ParameterVector catch_numbers_at_age; /**< expected catch numbers at age for the fleet */
+  ParameterVector log_expected_index; /**< expected index of abundance for the survey */
+  ParameterVector proportion_catch_numbers_at_age; /**< expected catch numbers at age for the fleet */
   bool estimate_q = false; /**< whether the parameter q should be estimated*/
   bool random_q = false;             /**< whether q should be a random effect*/
 
@@ -125,12 +124,10 @@ class FleetInterface : public FleetInterfaceBase {
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
     //exp_catch
-    fleet->expected_catch.resize(nyears);
-    info->variable_map[this->expected_catch.id_m] = &(fleet)->expected_catch;
-    fleet->expected_index.resize(nyears);  // assume index is for all ages.
-    info->variable_map[this->expected_index.id_m] = &(fleet)->expected_index;
-    fleet->catch_numbers_at_age.resize(nyears * nages);
-    info->variable_map[this->catch_numbers_at_age.id_m] = &(fleet)->catch_numbers_at_age;
+    fleet->log_expected_index.resize(nyears);  // assume index is for all ages.
+    info->variable_map[this->log_expected_index.id_m] = &(fleet)->log_expected_index;
+    fleet->proportion_catch_numbers_at_age.resize(nyears * nages);
+    info->variable_map[this->proportion_catch_numbers_at_age.id_m] = &(fleet)->proportion_catch_numbers_at_age;
 
 
     // add to Information

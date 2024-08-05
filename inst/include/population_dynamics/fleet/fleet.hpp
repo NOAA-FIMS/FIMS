@@ -53,11 +53,13 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     to log probability density function*/
   fims::Vector<Type> expected_catch; /*!<model expected total catch*/
   fims::Vector<Type> expected_index; /*!<model expected index of abundance*/
+  fims::Vector<Type> log_expected_index; /*!<model expected index of abundance*/
   fims::Vector<Type> expected_catch_lpdf; /*!<model expected total catch linked 
     to log probability density function*/
   fims::Vector<Type> expected_index_lpdf; /*!<model expected index of abundance linked 
     to log probability density function*/
   fims::Vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
+  fims::Vector<Type> proportion_catch_numbers_at_age; /*!<model expected catch at age*/
   fims::Vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
   bool is_survey = false;                  /*!< is this fleet object a survey*/
 
@@ -85,8 +87,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     this->nages = nages;
 
     catch_at_age.resize(nyears * nages);
+    catch_numbers_at_age.resize(nyears * nages);
     catch_weight_at_age.resize(nyears * nages);
     catch_index.resize(nyears);  // assume index is for all ages.
+    expected_catch.resize(nyears);
+    expected_index.resize(nyears);
     age_composition.resize(nyears * nages);
 
     log_Fmort.resize(nyears);
@@ -112,7 +117,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
               0); /**<model expected total catch*/
     std::fill(expected_index.begin(), expected_index.end(),
               0); /**<model expected index of abundance*/
+    std::fill(log_expected_index.begin(), log_expected_index.end(),
+              0); /**<model expected index of abundance*/
     std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(),
+              0); /**<model expected catch at age*/
+    std::fill(proportion_catch_numbers_at_age.begin(), proportion_catch_numbers_at_age.end(),
               0); /**<model expected catch at age*/
     std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
               0); /**<model expected weight at age*/
@@ -133,16 +142,15 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       }
       for (size_t a = 0; a < this->nages; a++) {
         size_t i_age_year = y * this->nages + a;
-        this->catch_numbers_at_age[i_age_year] = this->catch_numbers_at_age[i_age_year] /
-                              sum;
-
+        this->proportion_catch_numbers_at_age[i_age_year] = this->catch_numbers_at_age[i_age_year] / sum;
+       
       }
     } 
   }
 
   void evaluate_index() {
     for(size_t i=0; i<this->expected_index.size(); i++){
-      expected_index[i] = log(this->expected_index[i]);
+      log_expected_index[i] = log(this->expected_index[i]);
     }
   }
 };

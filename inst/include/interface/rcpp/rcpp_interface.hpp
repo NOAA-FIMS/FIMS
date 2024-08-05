@@ -397,8 +397,8 @@ RCPP_MODULE(fims) {
       .field("nyears", &FleetInterface::nyears)
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
-      .field("expected_index", &FleetInterface::expected_index)
-      .field("catch_numbers_at_age", &FleetInterface::catch_numbers_at_age)
+      .field("log_expected_index", &FleetInterface::log_expected_index)
+      .field("proportion_catch_numbers_at_age", &FleetInterface::proportion_catch_numbers_at_age)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
