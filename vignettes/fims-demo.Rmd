@@ -166,11 +166,11 @@ fishing_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
 fishing_fleet_index_distribution$set_observed_data(fishing_fleet_index$get_id())
 ```
 
-The next step is to link this distribution to the expected value of the fleet, expected_index, using the 
+The next step is to link this distribution to the expected value of the fleet, log expected_index, using the 
 set_distribution_links function. The first argument assigns the distribution type ("data", "random_effects", or "prior").
 The second argument takes the id of the parameter or derived value being linked to the distribution. 
 ```{r fleet-expected}
-fishing_fleet_index_distribution$set_distribution_links("data", fishing_fleet$expected_index$get_id())
+fishing_fleet_index_distribution$set_distribution_links("data", fishing_fleet$log_expected_index$get_id())
 
 ```
 
@@ -178,7 +178,7 @@ Now we will set up the distribution for the fishery age composition data using t
 ```{r fleet-age-comp-distribution}
 fishing_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
 fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet_age_comp$get_id())
-fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$catch_numbers_at_age$get_id())
+fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$proportion_catch_numbers_at_age$get_id())
 ```
 ### The Survey Module
 We will now repeat the steps from Fleet to set up the Survey. A survey object is essentially the same as a fleet object with a catchability (q) variable.
@@ -233,13 +233,13 @@ for(y in 1:nyears){
 survey_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
 # Set Data using the IDs from the modules defined above
 survey_fleet_index_distribution$set_observed_data(survey_fleet_index$get_id())
-survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$expected_index$get_id())
+survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_expected_index$get_id())
 
 # Age composition data
 
 survey_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
 survey_fleet_agecomp_distribution$set_observed_data(survey_fleet_age_comp$get_id())
-survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$catch_numbers_at_age$get_id())
+survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$proportion_catch_numbers_at_age$get_id())
 ```
 
 ### Creating a Population
@@ -262,18 +262,6 @@ recruitment$log_rzero$estimated <- TRUE
 recruitment$logit_steep$value <- -log(1.0 - 0.75) + log(0.75 - 0.2)
 recruitment$logit_steep$is_random_effect <- FALSE
 recruitment$logit_steep$estimated <- FALSE
-```
-
-```{r recruitment-distribution}
-recruitment_distribution <- new(TMBDnormDistribution)
-recruitment_distribution$log_sd <- new(ParameterVector, 1)
-recruitment_distribution$log_sd[1]$value <- log(0.4)
-recruitment_distribution$log_sd$estimated_m = FALSE
-```
-
-We also need to set up log recruitment deviations. FIMS recruitment modules have a boolean, *estimate_log_devs* to specify whether or not log deviations are estimated; and a vector, *log_devs* to set the log deviation values. 
-
-```{r rec-devs}
 recruitment$log_devs <- new(ParameterVector, c(
   0.08904850, 0.43787763, -0.13299042, -0.43251973,
   0.64861200, 0.50640852, -0.06958319, 0.30246260,
@@ -284,9 +272,19 @@ recruitment$log_devs <- new(ParameterVector, c(
   0.15740234, -0.53988240, -0.19556523, 0.20094360,
   0.37248740, -0.07163145
 ), nyears)
-recruitment$estimate_log_devs <- FALSE
-recruitment_distribution$set_density_links("random_effects", recruitment$log_devs$get_id())
 ```
+
+In order to estimate *log_devs*, a new distribution needs to be created. This will be left commented out as we will proceed with not estimating log_devs.
+
+```{r recruitment-distribution}
+# recruitment_distribution <- new(TMBDnormDistribution)
+# recruitment_distribution$log_sd <- new(ParameterVector, 1)
+# recruitment_distribution$log_sd[1]$value <- log(0.4)
+# recruitment_distribution$log_sd[1]$estimated = FALSE
+# recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+recruitment$estimate_log_devs = FALSE
+```
+
 #### Growth
 Now, we'll define the growth module for our population using an empirical weight at age model.
 ```{r growth}
