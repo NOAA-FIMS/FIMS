@@ -183,7 +183,15 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->log_sd.resize(this->log_sd.size());
     for(size_t i=0; i<this->log_sd.size(); i++){
       distribution->log_sd[i] = this->log_sd[i].value_m;
+      if(distribution->log_sd[i].estimated_m){
+        info->RegisterParameterName("normal log_sd");
+        info->RegisterParameter(distribution->log_sd[i]);
+      }
+      if (this->log_sd.is_random_effect_m) {
+        error("standard deviations cannot be set to random effects")
+      }
     }
+    info->variable_map[this->log_sd] = &(distribution)->log_sd;
 
     info->density_components[distribution->id] = distribution;
 
@@ -276,6 +284,13 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     for(size_t i=0; i<log_logsd.size(); i++){
       dlnorm.log_logsd[i] = this->log_logsd[i].value_m;
+      if(distribution->log_logsd[i].estimated_m){
+        info->RegisterParameterName("lognormal log_logsd");
+        info->RegisterParameter(distribution->log_logsd[i]);
+      }
+      if (this->log_logsd.is_random_effect_m) {
+        error("standard deviations cannot be set to random effects")
+      }
     }
     return dlnorm.evaluate();
   }
