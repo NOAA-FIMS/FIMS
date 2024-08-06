@@ -186,7 +186,7 @@ public:
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
                                             selectivity->inflection_point.resize(1);
-                                            selectivity->inflection_point = a50[0].GetDouble();
+                                            selectivity->inflection_point[0] = a50[0].GetDouble();
                                             if (print_statements) {
                                                 std::cout << "A50 " << selectivity->inflection_point[0] << "\n";
                                             }
@@ -196,7 +196,7 @@ public:
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray slope = (*it).second.GetArray();
                                             selectivity->slope.resize(1);
-                                            selectivity->slope = slope[0].GetDouble();
+                                            selectivity->slope[0] = slope[0].GetDouble();
                                             if (print_statements) {
                                                 std::cout << "slope " << selectivity->slope[0] << "\n";
                                             }
@@ -215,7 +215,7 @@ public:
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
                                             selectivity->inflection_point_asc.resize(1);
-                                            selectivity->inflection_point_asc = a50[0].GetDouble();
+                                            selectivity->inflection_point_asc[0] = a50[0].GetDouble();
                                             if (print_statements) {
                                                 std::cout << "A50 asc " << selectivity->inflection_point_asc[0] << "\n";
                                             }
@@ -225,7 +225,7 @@ public:
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray slope = (*it).second.GetArray();
                                             selectivity->slope_asc.resize(1);
-                                            selectivity->slope_asc = slope[0].GetDouble();
+                                            selectivity->slope_asc[0] = slope[0].GetDouble();
                                             if (print_statements) {
                                                 std::cout << "slope asc " << selectivity->slope_asc[0] << "\n";
                                             }
@@ -235,7 +235,7 @@ public:
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
                                             selectivity->inflection_point_desc.resize(1);
-                                            selectivity->inflection_point_desc = a50[0].GetDouble();
+                                            selectivity->inflection_point_desc[0] = a50[0].GetDouble();
                                             if (print_statements) {
                                                 std::cout << "A50 desc " << selectivity->inflection_point_desc[0] << "\n";
                                             }
@@ -245,7 +245,7 @@ public:
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray slope = (*it).second.GetArray();
                                             selectivity->slope_desc.resize(1);
-                                            selectivity->slope_desc = slope[0].GetDouble();
+                                            selectivity->slope_desc[0] = slope[0].GetDouble();
                                             if (print_statements) {
                                                 std::cout << "slope desc " << selectivity->slope_desc[0] << "\n";
                                             }
@@ -333,13 +333,15 @@ public:
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->inflection_point = a50[0].GetDouble();
+                                            selectivity->inflection_point.resize(1);
+                                            selectivity->inflection_point[0] = a50[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("slope.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray slope = (*it).second.GetArray();
-                                            selectivity->slope = slope[0].GetDouble();
+                                            selectivity->slope.resize(1);
+                                            selectivity->slope[0] = slope[0].GetDouble();
                                         }
 
                                         s->selectivity = selectivity;
@@ -352,25 +354,29 @@ public:
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->inflection_point_asc = a50[0].GetDouble();
+                                            selectivity->inflection_point_asc.resize(1);
+                                            selectivity->inflection_point_asc[0] = a50[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("slope.sel1");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray slope = (*it).second.GetArray();
-                                            selectivity->slope_asc = slope[0].GetDouble();
+                                            selectivity->slope_asc.resize(1);
+                                            selectivity->slope_asc[0] = slope[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("A50.sel2");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray a50 = (*it).second.GetArray();
-                                            selectivity->inflection_point_desc = a50[0].GetDouble();
+                                            selectivity->inflection_point_desc.resize(1);
+                                            selectivity->inflection_point_desc[0] = a50[0].GetDouble();
                                         }
 
                                         it = fsel_o.find("slope.sel2");
                                         if ((*it).second.GetType() == JsonValueType::Array) {
                                             JsonArray slope = (*it).second.GetArray();
-                                            selectivity->slope_desc = slope[0].GetDouble();
+                                            selectivity->slope_desc.resize(1);
+                                            selectivity->slope_desc[0] = slope[0].GetDouble();
                                         }
                                         s->selectivity = selectivity;
                                     }
@@ -596,7 +602,7 @@ public:
             if (it != obj.end()) {
                 if ((*it).second.GetType() == JsonValueType::Array) {
                     mat->inflection_point.resize(1);
-                    mat->inflection_point = (*it).second.GetArray()[0].GetDouble();
+                    mat->inflection_point[0] = (*it).second.GetArray()[0].GetDouble();
                     if (print_statements) {
                         std::cout << "inflection_point.mat " << mat->inflection_point[0] << " \n";
                     }
@@ -613,7 +619,7 @@ public:
             if (it != obj.end()) {
                 if ((*it).second.GetType() == JsonValueType::Array) {
                     mat->slope.resize(1);
-                    mat->slope = (*it).second.GetArray()[0].GetDouble();
+                    mat->slope[0] = (*it).second.GetArray()[0].GetDouble();
                     if (print_statements) {
                         std::cout << "slope.mat " << mat->slope[0] << " \n";
                     }
