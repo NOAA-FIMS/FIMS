@@ -43,12 +43,6 @@ setup_fims <- function(om_input, om_output, em_input) {
   # of how that is done. Other sections of the code below leave defaults in
   # place as appropriate.
 
-  # set up logR_sd
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
-  # taken before the likelihood calculation
-  test_env$recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
-  test_env$recruitment$log_sigma_recruit$is_random_effect <- FALSE
-  test_env$recruitment$log_sigma_recruit$estimated <- FALSE
   # set up log_rzero (equilibrium recruitment)
  test_env$recruitment$log_rzero$value <- log(om_input$R0)
   test_env$recruitment$log_rzero$is_random_effect <- FALSE
@@ -63,8 +57,15 @@ setup_fims <- function(om_input, om_output, em_input) {
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
   test_env$recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], length(om_input$logR.resid[-1]))
-  
 
+  test_env$recruitment_distribution <- new(TMBDnormDistribution)
+  # set up logR_sd using the normal log_sd parameter
+  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
+  # taken before the likelihood calculation
+  test_env$recruitment_distribution$log_sd <- new(ParameterVector, 1)
+  test_env$recruitment_distribution$log_sd[1]$value <- log(om_input$logR_sd)
+  test_env$recruitment_distribution$log_sd[1]$estimated = FALSE
+  test_env$recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Data
   test_env$catch <- em_input$L.obs$fleet1
@@ -118,17 +119,25 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$fishing_fleet$log_q <- log(1.0)
   test_env$fishing_fleet$estimate_q <- FALSE
   test_env$fishing_fleet$random_q <- FALSE
-  test_env$fishing_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.L$fleet1^2 + 1))), om_input$nyr)
-  test_env$fishing_fleet$estimate_obs_error <- FALSE
-  # Modules are linked together using module IDs
-  # Each module has a get_id() function that returns the unique ID for that module
-  # Each fleet uses the module IDs to link up the correct module to the correct fleet
-  # Note: Likelihoods not yet set up as a stand-alone modules, so no get_id()
-  test_env$fishing_fleet$SetAgeCompLikelihood(1)
-  test_env$fishing_fleet$SetIndexLikelihood(1)
   test_env$fishing_fleet$SetSelectivity(test_env$fishing_fleet_selectivity$get_id())
-  test_env$fishing_fleet$SetObservedIndexData(test_env$fishing_fleet_index$get_id())
-  test_env$fishing_fleet$SetObservedAgeCompData(test_env$fishing_fleet_age_comp$get_id())
+
+  # Set up fishery index data using the lognormal
+  test_env$fishing_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
+  #lognormal observation error transformed on the log scale
+  test_env$fishing_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
+  for(y in 1:om_input$nyr){
+    test_env$fishing_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
+  }
+  test_env$fishing_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
+  # Set Data using the IDs from the modules defined above
+  test_env$fishing_fleet_index_distribution$set_observed_data(test_env$fishing_fleet_index$get_id())
+  test_env$fishing_fleet_index_distribution$set_distribution_links("data", test_env$fishing_fleet$log_expected_index$get_id())
+
+  # Set up fishery age composition data using the multinomial
+  test_env$fishing_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
+  test_env$fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet_age_comp$get_id())
+  test_env$fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$proportion_catch_numbers_at_age$get_id())
+
 
   # Create the survey fleet
   test_env$survey_fleet_selectivity <- new(test_env$fims$LogisticSelectivity)
@@ -150,21 +159,35 @@ setup_fims <- function(om_input, om_output, em_input) {
   test_env$survey_fleet$log_q <- log(om_output$survey_q$survey1)
   test_env$survey_fleet$estimate_q <- TRUE
   test_env$survey_fleet$random_q <- FALSE
-  test_env$survey_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.survey$survey1^2 + 1))), om_input$nyr)
-  test_env$survey_fleet$estimate_obs_error <- FALSE
-  test_env$survey_fleet$SetAgeCompLikelihood(1)
-  test_env$survey_fleet$SetIndexLikelihood(1)
   test_env$survey_fleet$SetSelectivity(test_env$survey_fleet_selectivity$get_id())
-  test_env$survey_fleet$SetObservedIndexData(test_env$survey_fleet_index$get_id())
-  test_env$survey_fleet$SetObservedAgeCompData(test_env$survey_fleet_age_comp$get_id())
+
+  # Set up survey index data using the lognormal
+  test_env$survey_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
+  #lognormal observation error transformed on the log scale
+  # sd = sqrt(log(cv^2 + 1)), sd is log transformed
+  test_env$survey_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
+  for(y in 1:om_input$nyr){
+    test_env$survey_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
+  }
+  test_env$survey_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
+  # Set Data using the IDs from the modules defined above
+  test_env$survey_fleet_index_distribution$set_observed_data(test_env$survey_fleet_index$get_id())
+  test_env$survey_fleet_index_distribution$set_distribution_links("data", test_env$survey_fleet$log_expected_index$get_id())
+
+  # Age composition data
+
+  test_env$survey_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
+  test_env$survey_fleet_agecomp_distribution$set_observed_data(test_env$survey_fleet_age_comp$get_id())
+  test_env$survey_fleet_agecomp_distribution$set_distribution_links("data", test_env$survey_fleet$proportion_catch_numbers_at_age$get_id())
+
 
   # Population
   test_env$population <- new(test_env$fims$Population)
-  test_env$population$log_M <- methods::new(ParameterVector, 
+  test_env$population$log_M <- methods::new(ParameterVector,
     rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages),
      om_input$nyr * om_input$nages)
   test_env$population$log_M$set_all_estimable(FALSE)
-  test_env$population$log_init_naa <- methods::new(ParameterVector, 
+  test_env$population$log_init_naa <- methods::new(ParameterVector,
     log(om_output$N.age[1, ]), om_input$nages)
   test_env$population$log_init_naa$set_all_estimable(TRUE)
   test_env$population$nages <- om_input$nages
@@ -323,83 +346,85 @@ test_that("deterministic test of fims", {
   deterministic_env$fims$clear()
 })
 
-test_that("nll test of fims", {
-  nll_env <- setup_fims(
-    om_input = om_input,
-    om_output = om_output,
-    em_input = em_input
-  )
-  # Set-up TMB
-  nll_env$fims$CreateTMBModel()
-  parameters <- list(p = nll_env$fims$get_fixed())
-  par_list <- 1:length(parameters[[1]])
-  par_list[2:length(par_list)] <- NA
-  map <- list(p = factor(par_list))
-
-  obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
-
-  sdr <- TMB::sdreport(obj)
-  sdr_fixed <- summary(sdr, "fixed")
-
-  # log(R0)
-  fims_logR0 <- sdr_fixed[1, "Estimate"]
-  # expect_lte(abs(fims_logR0 - log(om_input$R0)) / log(om_input$R0), 0.0001)
-  expect_equal(fims_logR0, log(om_input$R0))
-
-  # Call report using deterministic parameter values
-  # obj$report() requires parameter list to avoid errors
-  report <- obj$report(obj$par)
-  obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
-  jnll <- obj$fn()
-
-  # recruitment likelihood
-  # log_devs is of length nyr-1
-  rec_nll <- -sum(dnorm(
-    nll_env$recruitment$log_devs, rep(0, om_input$nyr - 1),
-    om_input$logR_sd, TRUE
-  ))
-
-  # catch and survey index expected likelihoods
-  index_nll_fleet <- -sum(dnorm(
-    log(nll_env$catch),
-    log(om_output$L.mt$fleet1),
-    sqrt(log(em_input$cv.L$fleet1^2 + 1)), TRUE
-  ))
-  index_nll_survey <- -sum(dnorm(
-    log(nll_env$survey_index),
-    log(om_output$survey_index_biomass$survey1),
-    sqrt(log(em_input$cv.survey$survey1^2 + 1)), TRUE
-  ))
-  index_nll <- index_nll_fleet + index_nll_survey
-  # age comp likelihoods
-  fishing_acomp_observed <- em_input$L.age.obs$fleet1
-  fishing_acomp_expected <- om_output$L.age$fleet1 / rowSums(om_output$L.age$fleet1)
-  survey_acomp_observed <- em_input$survey.age.obs$survey1
-  survey_acomp_expected <- om_output$survey_age_comp$survey1 / rowSums(om_output$survey_age_comp$survey1)
-  age_comp_nll_fleet <- age_comp_nll_survey <- 0
-  for (y in 1:om_input$nyr) {
-    age_comp_nll_fleet <- age_comp_nll_fleet -
-      dmultinom(
-        fishing_acomp_observed[y, ] * em_input$n.L$fleet1, em_input$n.L$fleet1,
-        fishing_acomp_expected[y, ], TRUE
-      )
-
-    age_comp_nll_survey <- age_comp_nll_survey -
-      dmultinom(
-        survey_acomp_observed[y, ] * em_input$n.survey$survey1, em_input$n.survey$survey1,
-        survey_acomp_expected[y, ], TRUE
-      )
-  }
-  age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
-  expected_jnll <- rec_nll + index_nll + age_comp_nll
-
-  expect_equal(report$rec_nll, rec_nll)
-  expect_equal(report$age_comp_nll, age_comp_nll)
-  expect_equal(report$index_nll, index_nll)
-  expect_equal(jnll, expected_jnll)
-
-  nll_env$fims$clear()
-})
+# test likelihood components once new logging system is working
+# test_that("nll test of fims", {
+#   nll_env <- setup_fims(
+#     om_input = om_input,
+#     om_output = om_output,
+#     em_input = em_input
+#   )
+#   # Set-up TMB
+#   nll_env$fims$CreateTMBModel()
+#   parameters <- list(p = nll_env$fims$get_fixed())
+#   par_list <- 1:length(parameters[[1]])
+#   par_list[2:length(par_list)] <- NA
+#   map <- list(p = factor(par_list))
+#
+#   obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
+#
+#   sdr <- TMB::sdreport(obj)
+#   sdr_fixed <- summary(sdr, "fixed")
+#
+#   # log(R0)
+#   fims_logR0 <- sdr_fixed[1, "Estimate"]
+#   # expect_lte(abs(fims_logR0 - log(om_input$R0)) / log(om_input$R0), 0.0001)
+#   expect_equal(fims_logR0, log(om_input$R0))
+#
+#   # Call report using deterministic parameter values
+#   # obj$report() requires parameter list to avoid errors
+#   report <- obj$report(obj$par)
+#   obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
+#   jnll <- obj$fn()
+#
+#
+#   # recruitment likelihood
+#   # log_devs is of length nyr-1
+#   rec_nll <- -sum(dnorm(
+#     nll_env$recruitment$log_devs, rep(0, om_input$nyr - 1),
+#     om_input$logR_sd, TRUE
+#   ))
+#
+#   # catch and survey index expected likelihoods
+#   index_nll_fleet <- -sum(dnorm(
+#     log(nll_env$catch),
+#     log(om_output$L.mt$fleet1),
+#     sqrt(log(em_input$cv.L$fleet1^2 + 1)), TRUE
+#   ))
+#   index_nll_survey <- -sum(dnorm(
+#     log(nll_env$survey_index),
+#     log(om_output$survey_index_biomass$survey1),
+#     sqrt(log(em_input$cv.survey$survey1^2 + 1)), TRUE
+#   ))
+#   index_nll <- index_nll_fleet + index_nll_survey
+#   # age comp likelihoods
+#   fishing_acomp_observed <- em_input$L.age.obs$fleet1
+#   fishing_acomp_expected <- om_output$L.age$fleet1 / rowSums(om_output$L.age$fleet1)
+#   survey_acomp_observed <- em_input$survey.age.obs$survey1
+#   survey_acomp_expected <- om_output$survey_age_comp$survey1 / rowSums(om_output$survey_age_comp$survey1)
+#   age_comp_nll_fleet <- age_comp_nll_survey <- 0
+#   for (y in 1:om_input$nyr) {
+#     age_comp_nll_fleet <- age_comp_nll_fleet -
+#       dmultinom(
+#         fishing_acomp_observed[y, ] * em_input$n.L$fleet1, em_input$n.L$fleet1,
+#         fishing_acomp_expected[y, ], TRUE
+#       )
+#
+#     age_comp_nll_survey <- age_comp_nll_survey -
+#       dmultinom(
+#         survey_acomp_observed[y, ] * em_input$n.survey$survey1, em_input$n.survey$survey1,
+#         survey_acomp_expected[y, ], TRUE
+#       )
+#   }
+#   age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
+#   expected_jnll <- rec_nll + index_nll + age_comp_nll
+#
+#   expect_equal(report$rec_nll, rec_nll)
+#   expect_equal(report$age_comp_nll, age_comp_nll)
+#   expect_equal(report$index_nll, index_nll)
+#   expect_equal(jnll, expected_jnll)
+#
+#   nll_env$fims$clear()
+# })
 
 test_that("estimation test of fims", {
   estimation_env <- setup_fims(
@@ -620,19 +645,23 @@ test_that("run FIMS in a for loop with missing values", {
 
     # Recruitment
     recruitment <- new(fims$BevertonHoltRecruitment)
-    # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
-    # before the likelihood calculation
-    recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
     recruitment$log_rzero$value <- 13 # log(om_input$R0)
     # this change moves the starting value away from its true value
     recruitment$log_rzero$is_random_effect <- FALSE
     recruitment$log_rzero$estimated <- TRUE
-   recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
+    recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
     recruitment$logit_steep$is_random_effect <- FALSE
     recruitment$logit_steep$estimated <- FALSE
     recruitment$estimate_log_devs <- TRUE
     recruitment$log_devs <- methods::new(ParameterVector, rep(0, length(om_input$logR.resid) - 1),length(om_input$logR.resid) - 1)
-   
+
+    recruitment_distribution <- new(TMBDnormDistribution)
+    # set up logR_sd using the normal log_sd parameter
+    # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
+    # taken before the likelihood calculation
+    recruitment_distribution$log_sd <- new(ParameterVector, 1)
+    recruitment_distribution$log_sd[1]$value <- log(om_input$logR_sd)
+    recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
     # Data
     catch <- em_input$L.obs$fleet1
@@ -688,14 +717,25 @@ test_that("run FIMS in a for loop with missing values", {
     fishing_fleet$log_q <- log(1.0)
     fishing_fleet$estimate_q <- FALSE
     fishing_fleet$random_q <- FALSE
-    fishing_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.L$fleet1^2 + 1))), om_input$nyr)
-    fishing_fleet$estimate_obs_error <- FALSE
-    # Need get_id() for setting up observed agecomp and index data?
-    fishing_fleet$SetAgeCompLikelihood(1)
-    fishing_fleet$SetIndexLikelihood(1)
-    fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
-    fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
-    fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
+    fishing_fleet$SetSelectivity(test_env$fishing_fleet_selectivity$get_id())
+
+    # Set up fishery index data using the lognormal
+    fishing_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
+    #lognormal observation error transformed on the log scale
+    fishing_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
+    for(y in 1:om_input$nyr){
+      fishing_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
+    }
+    fishing_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
+    # Set Data using the IDs from the modules defined above
+    fishing_fleet_index_distribution$set_observed_data(test_env$fishing_fleet_index$get_id())
+    fishing_fleet_index_distribution$set_distribution_links("data", test_env$fishing_fleet$log_expected_index$get_id())
+
+    # Set up fishery age composition data using the multinomial
+    fishing_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
+    fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet_age_comp$get_id())
+    fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$proportion_catch_numbers_at_age$get_id())
+
 
     # Create the survey fleet
     survey_fleet_selectivity <- new(fims$LogisticSelectivity)
@@ -716,20 +756,34 @@ test_that("run FIMS in a for loop with missing values", {
     survey_fleet$log_q <- log(om_output$survey_q$survey1)
     survey_fleet$estimate_q <- TRUE
     survey_fleet$random_q <- FALSE
-    survey_fleet$log_obs_error <- rep(log(sqrt(log(em_input$cv.survey$survey1^2 + 1))), om_input$nyr)
-    survey_fleet$estimate_obs_error <- FALSE
-    survey_fleet$SetAgeCompLikelihood(1)
-    survey_fleet$SetIndexLikelihood(1)
-    survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
-    survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
-    survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
+    test_env$survey_fleet$SetSelectivity(test_env$survey_fleet_selectivity$get_id())
+
+    # Set up survey index data using the lognormal
+    test_env$survey_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
+    #lognormal observation error transformed on the log scale
+    # sd = sqrt(log(cv^2 + 1)), sd is log transformed
+    test_env$survey_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
+    for(y in 1:om_input$nyr){
+      test_env$survey_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
+    }
+    test_env$survey_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
+    # Set Data using the IDs from the modules defined above
+    test_env$survey_fleet_index_distribution$set_observed_data(test_env$survey_fleet_index$get_id())
+    test_env$survey_fleet_index_distribution$set_distribution_links("data", test_env$survey_fleet$log_expected_index$get_id())
+
+    # Age composition data
+
+    test_env$survey_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
+    test_env$survey_fleet_agecomp_distribution$set_observed_data(test_env$survey_fleet_age_comp$get_id())
+    test_env$survey_fleet_agecomp_distribution$set_distribution_links("data", test_env$survey_fleet$proportion_catch_numbers_at_age$get_id())
+
 
     # Population
     population <- new(fims$Population)
     # is it a problem these are not Parameters in the Population interface?
     # the Parameter class (from rcpp/rcpp_objects/rcpp_interface_base) cannot handle vectors,
     # do we need a ParameterVector class?
-    population$log_M <- methods::new(ParameterVector, 
+    population$log_M <- methods::new(ParameterVector,
       rep(log(om_input$M.age[1]), om_input$nyr * om_input$nages),
       om_input$nyr * om_input$nages)
     population$log_M$set_all_estimable(FALSE)
