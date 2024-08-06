@@ -367,11 +367,6 @@ sdr_fixed <- summary(sdr, "fixed")
 report <- obj$report(obj$env$last.par.best)
 
 print(sdr_fixed)
-
-# report out nll components
-report$rec_nll # recruitment
-report$index_nll # fishery catch and survey index
-report$age_comp_nll # fishery and survey age composition
 ```
 
 
