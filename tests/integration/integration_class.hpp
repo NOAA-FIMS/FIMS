@@ -153,8 +153,8 @@ public:
                 for (size_t i = 0; i < nfleets; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > f = std::make_shared<fims_popdy::Fleet<double> >();
                     f->Initialize(nyears, nages);
-                    f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
-                    f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
+                  //  f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
+                  //  f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
 
                     std::stringstream strs;
                     strs << "fleet" << i + 1;
@@ -303,8 +303,8 @@ public:
                     std::shared_ptr<fims_popdy::Fleet<double> > s = std::make_shared<fims_popdy::Fleet<double> >();
                     s->is_survey = true;
                     s->Initialize(nyears, nages);
-                    s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
-                    s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
+                 //   s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
+                  //  s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
 
                     std::stringstream strs;
                     strs << "survey" << i + 1;
@@ -316,7 +316,7 @@ public:
                         if (e.GetType() == JsonValueType::Object) {
                             JsonObject o = e.GetObject();
                             fsel = o.find(strs.str().c_str());
-                         
+
 
                             if ((*fsel).second.GetType() == JsonValueType::Object) {
 
@@ -606,7 +606,7 @@ public:
                     std::cout << "'A50.mat' not found.\n";
                 }
             }
-            
+
             pop.maturity = mat;
 
             it = obj.find("slope.mat");
@@ -665,7 +665,7 @@ public:
         JsonObject output;
         JsonArray array;
 
-        
+
 
         pop.Evaluate();
 
@@ -683,9 +683,9 @@ public:
                 std::cout << std::endl;
             }
         }
-        
+
         output["NumbersAtAge"] = array;
-        
+
         if (print_statements) {
             std::cout << "\n\n"
                     << std::endl;
