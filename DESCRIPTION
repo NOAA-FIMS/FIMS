@@ -60,7 +60,7 @@ Imports:
     ggplot2,
     jsonlite,
     methods,
-    Rcpp,
+    Rcpp (== 1.0.12),
     scales,
     TMB (>= 1.8.0)
 Suggests: 
