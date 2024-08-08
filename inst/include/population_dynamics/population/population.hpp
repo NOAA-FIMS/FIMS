@@ -1,5 +1,5 @@
-/*
- * File:   population.hpp
+/**
+ * \file population.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the
@@ -194,6 +194,12 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    *
    * @param i_age_year dimension folded index for age and year
    * @param a age index
+   *
+   * ChatGPT:
+   * \f[
+   * \text{NAA}_{i,a,y} = \exp\left(\ln(\text{NAA}_{a})\right)
+   * \f]
+   *
    */
   inline void CalculateInitialNumbersAA(
       size_t i_age_year, size_t a) {  // inline all function unless complicated
