@@ -281,7 +281,9 @@ recruitment_distribution <- new(TMBDnormDistribution)
 recruitment_distribution$log_sd <- new(ParameterVector, 1)
 recruitment_distribution$log_sd[1]$value <- log(0.4)
 recruitment_distribution$log_sd[1]$estimated = FALSE
-recruitment_distribution$expected_values <- new(ParameterVector, 0, 1)
+# set dimension of observations
+recruitment_distribution$x <- new(ParameterVector, rep(0, nyears), nyears)
+recruitment_distribution$expected_values <- new(ParameterVector, rep(0, nyears), nyears)
 recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 recruitment$estimate_log_devs = TRUE
 ```
