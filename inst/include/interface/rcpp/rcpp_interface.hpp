@@ -221,6 +221,16 @@ void clear_debug_log() {
 }
 
 /**
+ * Clears the contents of distributions log file.
+ */
+void clear_distributions_log() {
+  DISTRIBUTIONS_LOG.flush();
+  std::ofstream CLEAR_LOG("logs/distributions.log");
+  CLEAR_LOG.close();
+  DISTRIBUTIONS_LOG.seekp(0);
+}
+
+/**
  * Clears the contents of log files.
  */
 void clear_logs() {
@@ -236,6 +246,7 @@ void clear_logs() {
   clear_maturity_log();
   clear_selectivity_log();
   clear_debug_log();
+  clear_distributions_log();
 }
 
 template <typename Type>

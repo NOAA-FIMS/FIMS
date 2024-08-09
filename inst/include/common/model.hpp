@@ -89,6 +89,7 @@ class Model {  // may need singleton
 #endif
     // Loop over densities and evaluate joint negative log densities for priors
     typename fims_info::Information<Type>::density_components_iterator d_it;
+    nll_components.fill(0);
     int nll_components_idx = 0;
     size_t n_priors = 0;
     MODEL_LOG << "Expecting to evaluate " << this->fims_information->density_components.size()
@@ -141,6 +142,11 @@ class Model {  // may need singleton
         d->of = this->of;
       #endif
       if(d->input_type == "random_effects"){
+        MODEL_LOG << "d->x.size is: " << d->x.size() << std::endl;
+        for(int i=0; i<d->x.size(); i++){
+          MODEL_LOG << "d->x[i] is: " << d->x[i] << std::endl;
+          MODEL_LOG << "d->expected_value[i] is: " << d->expected_values[i] << std::endl;
+        }
         nll_components[nll_components_idx] = -d->evaluate();
         jnll += nll_components[nll_components_idx];
         n_random_effects += 1;

@@ -27,6 +27,7 @@ std::ofstream ERROR_LOG("logs/error.log"); /**< Error tracking log file */
 std::ofstream DATA_LOG("logs/data.log");   /**< Data input tracking log file */
 std::ofstream MODEL_LOG("logs/model.log"); /**< Model.hpp log file */
 std::ofstream FLEET_LOG("logs/fleet.log"); /**< Fleet module log file */
+std::ofstream DISTRIBUTIONS_LOG("logs/distributions.log"); /**< Fleet module log file */
 std::ofstream POPULATION_LOG(
     "logs/population.log"); /**< Populations module log file */
 std::ofstream RECRUITMENT_LOG(

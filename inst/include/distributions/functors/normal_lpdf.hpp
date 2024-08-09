@@ -82,13 +82,21 @@ struct NormalLPDF : public DensityComponentBase<Type> {
               if(this->observed_values->at(i) != this->observed_values->na_value){
               // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->observed_values->at(i), mu[i], sd[i], true);
                   this->lpdf_vec[i] = dnorm(this->observed_values->at(i), mu[i], sd[i], true);
+                  DISTRIBUTIONS_LOG << "obsered_values " << i << " is: " << this->observed_values->at(i) << std::endl;
+                  DISTRIBUTIONS_LOG << "mu " << i << " is: " << mu[i] << std::endl;
+                  DISTRIBUTIONS_LOG << "sd " << i << " is: " << sd[i] << std::endl;
+            
               } else {
                 this->lpdf_vec[i] = 0;
               } 
               
             } else {
               this->lpdf_vec[i] = dnorm(this->x[i], mu[i], sd[i], true);
+                  DISTRIBUTIONS_LOG << "x " << i << " is: " << this->x[i] << std::endl;
+                  DISTRIBUTIONS_LOG << "mu " << i << " is: " << mu[i] << std::endl;
+                  DISTRIBUTIONS_LOG << "sd " << i << " is: " << sd[i] << std::endl;
             }
+            DISTRIBUTIONS_LOG << "normal lpdf_vec "<< i << " is: " << this->lpdf_vec[i] << std::endl;
             lpdf += this->lpdf_vec[i];
             if(this->simulate_flag){
                 FIMS_SIMULATE_F(this->of){
