@@ -14,12 +14,12 @@ test_that("deterministic test of fims", {
   obj <- result$obj
 
   # Calculate standard errors
-  sdr <- TMB::sdreport(obj)
+  sdr <- result$sdr
   sdr_fixed <- result$sdr_fixed
 
-#   # Call report using deterministic parameter values
-#   # obj$report() requires parameter list to avoid errors
-#   report <- obj$report(obj$par)
+  # Call report using deterministic parameter values
+  # obj$report() requires parameter list to avoid errors
+  report <- result$report
 
   # Compare log(R0) to true value
   fims_logR0 <- sdr_fixed[1, "Estimate"]
@@ -99,9 +99,9 @@ test_that("deterministic test of fims", {
   fims_cnaa_proportion <- fims_cnaa / rowSums(fims_cnaa)
   om_cnaa_proportion <- om_output_list[[iter_id]]$L.age$fleet1 / rowSums(om_output_list[[iter_id]]$L.age$fleet1)
 
-#   for (i in 1:length(c(t(om_cnaa_proportion)))) {
-#     expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
-#   }
+  for (i in 1:length(c(t(om_cnaa_proportion)))) {
+    expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
+  }
 
   # Expected survey index.
   # Using [[2]] because the survey is the 2nd fleet.
@@ -141,7 +141,7 @@ test_that("deterministic test of fims", {
   }
 })
 
-test_that("nll test of fims", {
+test_that("nll test of fims", { 
   iter_id <- 1
 
   result <- setup_and_run_FIMS(
@@ -152,39 +152,18 @@ test_that("nll test of fims", {
     estimation_mode = FALSE
   )
 
-  parameters <- result$parameters
-  par_list <- 1:length(parameters[[1]])
-  par_list[2:length(par_list)] <- NA
-  map <- list(p = factor(par_list))
-
-  result <- setup_and_run_FIMS(
-    iter_id = iter_id,
-    om_input_list = om_input_list,
-    om_output_list = om_output_list,
-    em_input_list = em_input_list,
-    estimation_mode = FALSE,
-    map = map
-  )
-
   # Set up TMB's computational graph
   obj <- result$obj
   report <- result$report
 
   # Calculate standard errors
-  sdr <- TMB::sdreport(obj)
+  sdr <- result$sdr
   sdr_fixed <- result$sdr_fixed
 
   # log(R0)
   fims_logR0 <- sdr_fixed[1, "Estimate"]
   # expect_lte(abs(fims_logR0 - log(om_input$R0)) / log(om_input$R0), 0.0001)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]]$R0))
-
-  # Call report using deterministic parameter values
-  # obj$report() requires parameter list to avoid errors
-  report <- obj$report(obj$par)
-  obj <- TMB::MakeADFun(data = list(), parameters, DLL = "FIMS", map = map)
-  jnll <- obj$fn()
-
 
   # recruitment likelihood
   # log_devs is of length nyr-1
@@ -194,13 +173,13 @@ test_that("nll test of fims", {
   ))
 
   # catch and survey index expected likelihoods
-  index_nll_fleet <- -sum(dnorm(
-    log(em_input_list[[iter_id]]$L.obs$fleet1),
+  index_nll_fleet <- -sum(dlnorm(
+    em_input_list[[iter_id]]$L.obs$fleet1,
     log(om_output_list[[iter_id]]$L.mt$fleet1),
     sqrt(log(em_input_list[[iter_id]]$cv.L$fleet1^2 + 1)), TRUE
   ))
-  index_nll_survey <- -sum(dnorm(
-    log(em_input_list[[iter_id]]$surveyB.obs$survey1),
+  index_nll_survey <- -sum(dlnorm(
+    em_input_list[[iter_id]]$surveyB.obs$survey1,
     log(om_output_list[[iter_id]]$survey_index_biomass$survey1),
     sqrt(log(em_input_list[[iter_id]]$cv.survey$survey1^2 + 1)), TRUE
   ))
@@ -226,6 +205,7 @@ test_that("nll test of fims", {
   }
   age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
   expected_jnll <- rec_nll + index_nll + age_comp_nll
+  jnll <- report$jnll
 
   expect_equal(report$nll_components[1], rec_nll)
   expect_equal(report$nll_components[2], index_nll_fleet)
@@ -249,7 +229,7 @@ test_that("estimation test of fims", {
   # Compare FIMS results with model comparison project OM values
   validate_fims(
     report = result$report,
-    sdr = TMB::sdreport(result$obj),
+    sdr = result$sdr,
     sdr_report = result$sdr_report,
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],

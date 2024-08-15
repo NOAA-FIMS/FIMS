@@ -48,7 +48,8 @@ setup_and_run_FIMS <- function(iter_id,
                                em_input_list,
                                estimation_mode = TRUE,
                                map = list()) {
-  # Load operating model data for the current iteration
+
+  # Load operating model data
   om_input <- om_input_list[[iter_id]]
   om_output <- om_output_list[[iter_id]]
   em_input <- em_input_list[[iter_id]]
@@ -79,7 +80,7 @@ setup_and_run_FIMS <- function(iter_id,
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], length(om_input$logR.resid[-1]) )
+  recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], om_input$nyr-1)
 
   recruitment_distribution <- new(TMBDnormDistribution)
   # set up logR_sd using the normal log_sd parameter
@@ -87,25 +88,31 @@ setup_and_run_FIMS <- function(iter_id,
   # taken before the likelihood calculation
   recruitment_distribution$log_sd <- new(ParameterVector, 1)
   recruitment_distribution$log_sd[1]$value <- log(om_input$logR_sd)
-  recruitment_distribution$log_sd[1]$estimated = FALSE
+  recruitment_distribution$log_sd[1]$estimated <- FALSE
+  recruitment_distribution$x <- new(ParameterVector, om_input$nyr)
+  recruitment_distribution$expected_values <- new(ParameterVector, om_input$nyr)
+  for (i in 1:om_input$nyr) {
+    recruitment_distribution$x[i]$value <- 0
+    recruitment_distribution$expected_values[i]$value <- 0
+  }
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
-  recruitment$estimate_log_devs = TRUE
+  recruitment$estimate_log_devs <- TRUE
 
   # Data
   catch <- em_input$L.obs$fleet1
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
-  fishing_fleet_index <- new(Index, length(catch))
+  fishing_fleet_index <- new(Index, om_input$nyr)
   fishing_fleet_index$index_data <- catch
   # set fishing fleet age comp data, need to set dimensions of age comps
-  fishing_fleet_age_comp <- new(AgeComp, length(catch), om_input$nages)
+  fishing_fleet_age_comp <- new(AgeComp, om_input$nyr, om_input$nages)
   fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
 
   # repeat for surveys
   survey_index <- em_input$surveyB.obs$survey1
-  survey_fleet_index <- new(Index, length(survey_index))
+  survey_fleet_index <- new(Index, om_input$nyr)
   survey_fleet_index$index_data <- survey_index
-  survey_fleet_age_comp <- new(AgeComp, length(survey_index), om_input$nages)
+  survey_fleet_age_comp <- new(AgeComp, om_input$nyr, om_input$nages)
   survey_fleet_age_comp$age_comp_data <- c(t(em_input$survey.age.obs$survey1)) * em_input$n.survey$survey1
 
   # Growth
@@ -146,9 +153,9 @@ setup_and_run_FIMS <- function(iter_id,
 
   # Set up fishery index data using the lognormal
   fishing_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
-  #lognormal observation error transformed on the log scale
+  # lognormal observation error transformed on the log scale
   fishing_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
-  for(y in 1:om_input$nyr){
+  for (y in 1:om_input$nyr) {
     fishing_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
   }
   fishing_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
@@ -176,8 +183,6 @@ setup_and_run_FIMS <- function(iter_id,
   survey_fleet$is_survey <- TRUE
   survey_fleet$nages <- om_input$nages
   survey_fleet$nyears <- om_input$nyr
-  #survey_fleet$estimate_F <- FALSE
-  #survey_fleet$random_F <- FALSE
   survey_fleet$log_q <- log(om_output$survey_q$survey1)
   survey_fleet$estimate_q <- TRUE
   survey_fleet$random_q <- FALSE
@@ -185,10 +190,10 @@ setup_and_run_FIMS <- function(iter_id,
 
   # Set up survey index data using the lognormal
   survey_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
-  #lognormal observation error transformed on the log scale
+  # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
   survey_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
-  for(y in 1:om_input$nyr){
+  for (y in 1:om_input$nyr) {
     survey_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
   }
   survey_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
@@ -251,7 +256,8 @@ setup_and_run_FIMS <- function(iter_id,
     opt = opt,
     report = report,
     sdr_report = sdr_report,
-    sdr_fixed = sdr_fixed
+    sdr_fixed = sdr_fixed,
+    sdr = sdr
   ))
 }
 
