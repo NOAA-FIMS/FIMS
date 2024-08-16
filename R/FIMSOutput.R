@@ -91,11 +91,105 @@ create_fims_output <- function(json_list, call = NULL, data) {
   return(out)
 }
 
+#' Process parameter info in json output and return rows for the estimates tibble
+#'
+#' @param json A list extracted from an element of the `json_list`` provided to [get_estimates()].
+#' @param fleet The fleet number associated with this parameter (if applicable)
+#' @param module_name The name of the module which contains this parameter (e.g. "selectivity" or "Fleet")
+#' @param module_type The type of the module which contains this parameter (e.g. "Logistic" or "survey")
+#' @return
+#' Rows that can be added to the `estimates` tibble.
+get_parameter <- function(json, fleet = NA, module_name, module_type) {
+  # placeholder for output
+  estimates_newrows <- NULL
+
+  # rename element to remove inconsistency between "value" and "values".
+  # TODO: delete this step when json becomes standardized
+  #  if ("value" in )
+  names(json)[names(json) == "value"] <- "values"
+  names(json)[names(json) == "estimated_value"] <- "estimated_values"
+
+  # check for zero length output
+  # (currently only present for parameter with name = "proportion_female")
+  if ("values" %in% names(json) && length(json$values) > 0) {
+    # create parameter label
+    # TODO: revise this once parameter labeling gets refined in the future
+    label <- paste(
+      module_name, # (e.g. "selectivity" or "Fleet")
+      module_type, # (e.g. "Logistic" or "survey")
+      json$name, # parameter name (e.g. "inflection_point")
+      sep = "_"
+    )
+
+    # create tibble with new rows for these parameters
+    estimates_newrows <- dplyr::tibble(
+      label = label,
+      parameter_id = json$id,
+      fleet = fleet,
+      age = NA, # TODO: not yet available in the json output
+      time = NA, # TODO: not yet available in the json output
+      initial = json$values,
+      estimate = json$estimated_values,
+      uncertainty = NA, # TODO: not yet available in the json output
+      likelihood = NA, # TODO: not yet available in the json output
+      gradient = NA, # to be filled in based on parameter_id
+      estimated = json$is_estimated
+
+      # TODO: do something with "is_random_effect" in the future?
+    )
+  } # end check for non-zero length of values vector
+
+  # return result (could be NULL if "values" is empty)
+  return(estimates_newrows)
+}
+
+# TODO: consider merging get_parameter() and get_derived_quantity()
+
+#' Process derived quantitiy info in json output and return rows for the estimates tibble
+#'
+#' @param json A list extracted from an element of the `json_list`` provided to [get_estimates()].
+#' @param fleet The fleet number associated with this derived quantity (if applicable)
+#' @param module_name The name of the module which contains this derived quantity
+#' @param module_type The type of the module which contains this derived quantity
+#' @return
+#' Rows that can be added to the `estimates` tibble.
+get_derived_quantity <- function(json, fleet = NA, module_name, module_type) {
+  # placeholder for output
+  estimates_newrows <- NULL
+
+  # create parameter label
+  # TODO: revise this once parameter labeling gets refined in the future
+  label <- paste(
+    module_name, # (e.g. "selectivity" or "Fleet")
+    module_type, # (e.g. "Logistic" or "survey")
+    json$name, # parameter name (e.g. "inflection_point")
+    sep = "_"
+  )
+  # create tibble with new rows for these parameters
+  estimates_newrows <- dplyr::tibble(
+    label = label,
+    parameter_id = NA,
+    fleet = fleet,
+    age = NA, # TODO: not yet available in the json output
+    time = NA, # TODO: not yet available in the json output
+    initial = NA,
+    estimate = json$values,
+    uncertainty = NA, # TODO: not yet available in the json output
+    likelihood = NA, # TODO: not yet available in the json output
+    gradient = NA, # to be filled in based on parameter_id
+    estimated = NA
+  )
+
+  # return result (could be NULL if "values" is empty)
+  return(estimates_newrows)
+}
+
 get_estimates <- function(json_list, nyears = 30, ages = 1:12) {
   # Need to define tibble with zero rows so NA will be used to fill in
   # missing sections when combining estimates and derived quantities later
   estimates_outline <- dplyr::tibble(
     label = character(),
+    parameter_id = integer(), # not included in design doc but will be useful for processing
     fleet = integer(), # was initially character()
     age = numeric(),
     time = numeric(),
@@ -107,137 +201,53 @@ get_estimates <- function(json_list, nyears = 30, ages = 1:12) {
     estimated = logical()
   )
 
-  # Format the JSON to get information out easier
-  # Delete anything you want here to the return function
-
-  # # Doing this renaming is dumb
-  # # but helped me understand some stuff in the beginning
-  # names(json_list) <- ifelse(
-  #   names(json_list) == "module",
-  #   purrr::map(json_list, "name"),
-  #   names(json_list)
-  # )
-
-  # # Does not get what we need but helped me understand the structure
-  # # it could be better to use tidyjson in the beginning then reverse
-  # # engineer their functions using purrr and tidyr later.
-  # # Might want to remove the data objects and just work with modules
-  # # for this function
-  # z <- json_list |>
-  #   unlist() |>
-  #   tibble::enframe() |>
-  #   tidyr::separate_wider_delim(
-  #     name,
-  #     delim = ".",
-  #     too_few = "align_start",
-  #     names = c("module", "type", "x")
-  #   ) |>
-  #   dplyr::filter(type == "name")
-
   # loop over highest level elements in json file which have name "module"
   for (i in which(names(json_list) == "module")) {
     # module names in fims-demo currently include
     # "data", "selectivity", "Fleet", "recruitment", "growth", "maturity", "Population"
     # code below doesn't do anything with "data" as it doesn't have elements called
     # "parameter" or "derived_quantity"
-    message(json_list[[i]]$name)
+    module_name <- json_list[[i]]$name
+    module_type <- json_list[[i]]$type
+    fleet <- NA
+    if (module_name == "Fleet") {
+      fleet <- json_list[[i]]$id
+    }
+    message("processing element ", i, ": ", module_name)
 
     # loop over parameters (if there are none then won't loop)
     # still need to add loop over derived quantities
-    for (parameter_index in which(names(json_list[[i]]) == "parameter")) {
+    for (index in which(names(json_list[[i]]) == "parameter")) {
       # get info from parameter element of module
-      # "is_random_effect" is the one element not yet utilized in the code below
-      parameter_info <- json_list[[i]][[parameter_index]]
-      # check for zero length output (currently present for parameter with name = "proportion_female")
-      if (
-        "value" %in% names(parameters) && length(parameter_info$value) != 0 |
-          "values" %in% names(parameters) && length(parameter_info$values) != 0
-      ) {
-        # create parameter label
-        # parameter labeling will change in the future, currently just concatenating info
-        label <- paste(
-          json_list[[i]]$name, # module name (e.g. "selectivity", or "Fleet")
-          json_list[[i]]$type, # module type (e.g. "Logistic", "fleet")
-          parameter_info$name, # parameter name (e.g. "inflection_point")
-          sep = "_"
-        )
-        # Hack to make unique labels by appending sequence of numbers to
-        # parameter label for vectors (only other type seems to be "scalar")
-        if (parameter_info$type == "vector") {
-          label <- paste(label,
-            1:length(parameter_info$value), # hack to make unique names, need to figure out assigment of age and time
-            sep = "_"
-          )
-        }
-
-        # create tibble with new rows for these parameters
-        estimates_newrows <- dplyr::tibble(
-          label = label,
-          # fleet number is in "id"
-          fleet = ifelse(
-            test = json_list[[i]]$name == "Fleet",
-            yes = json_list[[i]]$id,
-            no = NA
-          ),
-          age = NA,
-          time = NA,
-          # "value" vs "values" depending on whether parameter is a scalar or vector
-          initial = ifelse(
-            test = parameter_info$type == "scalar",
-            yes = parameter_info$value,
-            no = parameter_info$values
-          ),
-          estimate = ifelse(
-            test = parameter_info$type == "scalar",
-            yes = parameter_info$estimated_value,
-            no = parameter_info$estimated_values
-          ),
-          uncertainty = NA,
-          likelihood = NA,
-          gradient = ifelse(
-            test = parameter_info$id >= 0,
-            yes = json_list$final_gradient[parameter_info$id + 1], # id starts at 0
-            no = NA
-          ),
-          estimated = parameter_info$is_estimated
-        )
-        # if new rows were created above, bind to end of tibble
-        if (nrow(estimates_newrows) > 0) {
-          estimates_outline <- dplyr::bind_rows(estimates_outline, estimates_newrows)
-        }
-      } # end check for non-zero length of values vector
+      estimates_newrows <- get_parameter(
+        json = json_list[[i]][[index]],
+        fleet = fleet,
+        module_name = module_name,
+        module_type = module_type
+      )
+      # if new rows were returned by get_parameter(), then bind to end of tibble
+      if (!is.null(estimates_newrows) > 0) {
+        estimates_outline <- dplyr::bind_rows(estimates_outline, estimates_newrows)
+      }
     } # end loop over parameters
 
+    # add gradient based on parameter_id
+    # for all parameters with id avialable (not -999),
+    # TODO: check why length of final_gradient doesn't match number of parameters
+    good_parameter_id <- !is.na(estimates_outline$parameter_id) & estimates_outline$parameter_id >= 0
+    estimates_outline$gradient[good_parameter_id] <-
+      json_list$final_gradient[estimates_outline$parameter_id[good_parameter_id] + 1]
+
     # loop over derived quantities
-    # in the future this could be merged with processing of parameters, but easier to keep separate for now
-    for (derived_quantity_index in which(names(json_list[[i]]) == "derived_quantity")) {
-      info <- json_list[[i]][[derived_quantity_index]]
-      label <- paste(
-        json_list[[i]]$name, # module name (e.g. "Population")
-        json_list[[i]]$type, # module type for things where there's no tag (e.g. "Logistic")
-        info$name, # parameter name (e.g. "inflection_point")
-        sep = "_"
+    # in the future this could be merged with processing of parameters, 
+    # but easier to keep separate for now
+    for (index in which(names(json_list[[i]]) == "derived_quantity")) {
+      estimates_newrows <- get_derived_quantity(
+        json = json_list[[i]][[index]],
+        fleet = fleet,
+        module_name = module_name,
+        module_type = module_type
       )
-
-      # create tibble with new rows for these parameters
-      estimates_newrows <- dplyr::tibble(
-        label = label,
-        # fleet number is in "id"
-        fleet = ifelse(
-          test = json_list[[i]]$name == "Fleet",
-          yes = json_list[[i]]$id,
-          no = NA
-        ),
-        age = NA,
-        time = NA,
-        initial = NA,
-        estimate = info$values,
-        uncertainty = NA,
-        likelihood = NA,
-        gradient = NA,
-        estimated = NA
-      )
-
       # if new rows were created above, bind to end of tibble
       if (nrow(estimates_newrows) > 0) {
         estimates_outline <- dplyr::bind_rows(estimates_outline, estimates_newrows)
