@@ -328,6 +328,10 @@ sdr <- TMB::sdreport(obj)
 sdr_fixed <- summary(sdr, "fixed")
 report <- obj$report(obj$env$last.par.best)
 output <- jsonlite::fromJSON(ToJSON())
+estimates <- get_estimates(output) # work in progress
+# # how to write json output to a file
+# z = ToJSON()
+# writeLines(z, "test_2024-07-30.json")
 print(sdr_fixed)
 
 # report out nll components
