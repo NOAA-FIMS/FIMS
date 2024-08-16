@@ -93,6 +93,7 @@ create_fims_output <- function(json_list, call = NULL, data) {
 
 #' Process parameter info in json output and return rows for the estimates tibble
 #'
+#' @rdname FIMSOutput
 #' @param json A list extracted from an element of the `json_list`` provided to [get_estimates()].
 #' @param fleet The fleet number associated with this parameter (if applicable)
 #' @param module_name The name of the module which contains this parameter (e.g. "selectivity" or "Fleet")
@@ -147,6 +148,7 @@ get_parameter <- function(json, fleet = NA, module_name, module_type) {
 
 #' Process derived quantitiy info in json output and return rows for the estimates tibble
 #'
+#' @rdname FIMSOutput
 #' @param json A list extracted from an element of the `json_list`` provided to [get_estimates()].
 #' @param fleet The fleet number associated with this derived quantity (if applicable)
 #' @param module_name The name of the module which contains this derived quantity
