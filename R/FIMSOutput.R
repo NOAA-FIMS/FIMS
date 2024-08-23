@@ -136,17 +136,17 @@ get_json_summary <- function(json_list) {
         thing = names(json_list)[i], # e.g. "module"
         name = ifelse(
           test = "name" %in% names(json_list[[i]]),
-          yes = json_list[[i]]$name,
+          yes = json_list[[i]][["name"]],
           no = NA
         ),
         type = ifelse(
           test = "type" %in% names(json_list[[i]]),
-          yes = json_list[[i]]$type,
+          yes = json_list[[i]][["type"]],
           no = NA
         ),
         id = ifelse(
           test = "id" %in% names(json_list[[i]]),
-          yes = json_list[[i]]$id,
+          yes = json_list[[i]][["id"]],
           no = NA
         )
       )
@@ -175,29 +175,29 @@ get_parameter <- function(json, fleet = NA, module_name, module_type) {
 
   # check for zero length output
   # (currently only present for parameter with name = "proportion_female")
-  if ("values" %in% names(json) && length(json$values) > 0) {
+  if ("values" %in% names(json) && length(json[["values"]]) > 0) {
     # create parameter label
     # TODO: revise this once parameter labeling gets refined in the future
     label <- paste(
       module_name, # (e.g. "selectivity" or "Fleet")
       module_type, # (e.g. "Logistic" or "survey")
-      json$name, # parameter name (e.g. "inflection_point")
+      json[["name"]], # parameter name (e.g. "inflection_point")
       sep = "_"
     )
 
     # create tibble with new rows for these parameters
     estimates_newrows <- dplyr::tibble(
       label = label,
-      parameter_id = json$id,
+      parameter_id = json[["id"]],
       fleet = fleet,
       age = NA, # TODO: not yet available in the JSON output
       time = NA, # TODO: not yet available in the JSON output
-      initial = json$values,
-      estimate = json$estimated_values,
+      initial = json[["values"]],
+      estimate = json[["estimated_values"]],
       uncertainty = NA, # TODO: not yet available in the JSON output
       likelihood = NA, # TODO: not yet available in the JSON output
       gradient = NA, # to be filled in based on parameter_id
-      estimated = json$is_estimated
+      estimated = json[["is_estimated"]]
 
       # TODO: do something with "is_random_effect" in the future?
     )
@@ -226,7 +226,7 @@ get_derived_quantity <- function(json, fleet = NA, module_name, module_type) {
   label <- paste(
     module_name, # (e.g. "selectivity" or "Fleet")
     module_type, # (e.g. "Logistic" or "survey")
-    json$name, # parameter name (e.g. "inflection_point")
+    json[["name"]], # parameter name (e.g. "inflection_point")
     sep = "_"
   )
   # create tibble with new rows for these parameters
@@ -237,7 +237,7 @@ get_derived_quantity <- function(json, fleet = NA, module_name, module_type) {
     age = NA, # TODO: not yet available in the JSON output
     time = NA, # TODO: not yet available in the JSON output
     initial = NA,
-    estimate = json$values,
+    estimate = json[["values"]],
     uncertainty = NA, # TODO: not yet available in the JSON output
     likelihood = NA, # TODO: not yet available in the JSON output
     gradient = NA, # to be filled in based on parameter_id
@@ -277,11 +277,11 @@ get_estimates <- function(json_list) {
     # "data", "selectivity", "Fleet", "recruitment", "growth", "maturity", "Population"
     # code below doesn't do anything with "data" as it doesn't have elements called
     # "parameter" or "derived_quantity"
-    module_name <- json_list[[i]]$name
-    module_type <- json_list[[i]]$type
+    module_name <- json_list[[i]][["name"]]
+    module_type <- json_list[[i]][["type"]]
     fleet <- NA
     if (module_name == "Fleet") {
-      fleet <- json_list[[i]]$id
+      fleet <- json_list[[i]][["id"]]
     }
     message("processing element ", i, ": ", module_name)
 
@@ -304,9 +304,9 @@ get_estimates <- function(json_list) {
     # add gradient based on parameter_id
     # for all parameters with id avialable (not -999),
     # TODO: check why length of final_gradient doesn't match number of parameters
-    good_parameter_id <- !is.na(estimates$parameter_id) & estimates$parameter_id >= 0
-    estimates$gradient[good_parameter_id] <-
-      json_list$final_gradient[estimates$parameter_id[good_parameter_id] + 1]
+    good_parameter_id <- !is.na(estimates[["parameter_id"]]) & estimates[["parameter_id"]] >= 0
+    estimates[["gradient"]][good_parameter_id] <-
+      json_list[["final_gradient"]][estimates[["parameter_id"]][good_parameter_id] + 1]
 
     # loop over derived quantities
     # in the future this could be merged with processing of parameters,
@@ -362,8 +362,8 @@ get_fits <- function(json_list, data = NULL) {
   for (i in which(names(json_list) == "module")) {
     # module names in fims-demo currently include
     # "data", "selectivity", "Fleet", "recruitment", "growth", "maturity", "Population"
-    module_name <- json_list[[i]]$name
-    module_type <- json_list[[i]]$type
+    module_name <- json_list[[i]][["name"]]
+    module_type <- json_list[[i]][["type"]]
     if (module_name == "Fleet") {
       # get values (e.g. from name == "index")
       # get observed_index_data_id
@@ -376,13 +376,13 @@ get_fits <- function(json_list, data = NULL) {
         # JSON section for derived quantity within fleet module
         fits_newrows <- NULL
         json <- json_list[[i]][[j]]
-        if (json$name == "index") {
+        if (json[["name"]] == "index") {
           # get the input data (should be redundant with FIMSFrame
           # which is an optional input to this function)
           which_list_element <- json_summary |>
             dplyr::filter(
               type == "Index" &
-                id == json_list[[i]]$observed_index_data_id
+                id == json_list[[i]][["observed_index_data_id"]]
             ) |>
             dplyr::pull(element)
           if (length(which_list_element) > 1) {
@@ -392,14 +392,14 @@ get_fits <- function(json_list, data = NULL) {
           # fill in new rows for output tibble
           fits_newrows <- dplyr::tibble(
             type = "index",
-            fleet = json_list[[i]]$id,
+            fleet = json_list[[i]][["id"]],
             name = NA,
             age = NA, # indices are not age-specific, so should be NA
             year = NA, # TODO: fill in based on dimensions or something
-            value = json_list[[which_list_element]]$values,
+            value = json_list[[which_list_element]][["values"]],
             unit = NA, # TODO: add once available
             uncertainty = NA, # TODO: add once available
-            expected = json$values,
+            expected = json[["values"]],
             # TODO: once likelihood values are available in JSON output,
             # we can probably get them just like value above only using
             # `index_likelihood_id`
@@ -408,7 +408,7 @@ get_fits <- function(json_list, data = NULL) {
             distribution = NA # TODO: hardwire to lognormal for now or add to JSON output?
           )
         }
-        if (json$name == "age_composition") {
+        if (json[["name"]] == "age_composition") {
           # TODO: fill this in (as well as for any other data type we may use)
           # NOTE: JSON output has a mix of "AgeComp", "age_composition" and "agecomp" (in "agecomp_likelihood_id")
         }
