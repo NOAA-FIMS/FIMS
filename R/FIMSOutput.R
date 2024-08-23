@@ -39,6 +39,9 @@ setMethod("fits", "FIMSOutput", function(x) x@fits)
 
 # Constructors ----
 # All constructors in this file are documented in 1 roxygen file via @rdname.
+# TODO from Ian 2024-08-23: I'm not sure what functions should go to
+# FIMSOutput.Rd and the .Rd file was getting confusing so currently
+# `create_fims_output()`, `get_estimates()`, and `get_fits()` go there.
 
 #' Class constructors for `FIMSOutput` and associated child classes
 #'
@@ -48,7 +51,7 @@ setMethod("fits", "FIMSOutput", function(x) x@fits)
 #' for each model type.
 #' @export
 #' @rdname FIMSOutput
-#' @param json_list A list of json information output from `Finalize()`.
+#' @param json_list A list of JSON information output from `Finalize()`.
 #' @param call The call the users made to run FIMS. The default is `NULL`.
 #'   This is not available for FIMS yet.
 #' @param data The input data used to fit the model. This needs to be a
@@ -91,9 +94,69 @@ create_fims_output <- function(json_list, call = NULL, data) {
   return(out)
 }
 
-#' Process parameter info in json output and return rows for the estimates tibble
+#' Get information on the name and type of each element in the JSON output
 #'
-#' @rdname FIMSOutput
+#' TODO: this function could surely be replaced by some kind of lapply
+#' function or other more elegant solution.
+#'
+#' @param json_list A list of JSON information output from `Finalize()`.
+#' @return A tibble with columns "thing", "name", "type" and "id" like
+#' ```
+#' # A tibble: 20 x 4
+#'    thing                    name        type             id
+#'    <chr>                    <chr>       <chr>         <int>
+#'  1 timestamp                NA          NA               NA
+#'  2 nyears                   NA          NA               NA
+#'  3 nseasons                 NA          NA               NA
+#'  4 nages                    NA          NA               NA
+#'  5 finalized                NA          NA               NA
+#'  6 objective_function_value NA          NA               NA
+#'  7 max_gradient_component   NA          NA               NA
+#'  8 final_gradient           NA          NA               NA
+#'  9 module                   data        Index             1
+#' 10 module                   data        AgeComp           2
+#' 11 module                   selectivity Logistic          1
+#' 12 module                   Fleet       fleet             1
+#' 13 module                   data        Index             3
+#' 14 module                   data        AgeComp           4
+#' 15 module                   selectivity Logistic          2
+#' 16 module                   Fleet       survey            2
+#' 17 module                   recruitment Beverton-Holt     1
+#' 18 module                   growth      EWAA              1
+#' 19 module                   maturity    Logistic          1
+#' 20 module                   Population  population        1
+#' ```
+get_json_summary <- function(json_list) {
+  json_summary <- NULL
+  for (i in 1:length(json_list)) {
+    json_summary <- dplyr::bind_rows(
+      json_summary,
+      dplyr::tibble(
+        element = i,
+        thing = names(json_list)[i], # e.g. "module"
+        name = ifelse(
+          test = "name" %in% names(json_list[[i]]),
+          yes = json_list[[i]]$name,
+          no = NA
+        ),
+        type = ifelse(
+          test = "type" %in% names(json_list[[i]]),
+          yes = json_list[[i]]$type,
+          no = NA
+        ),
+        id = ifelse(
+          test = "id" %in% names(json_list[[i]]),
+          yes = json_list[[i]]$id,
+          no = NA
+        )
+      )
+    )
+  }
+  return(json_summary)
+}
+
+#' Process parameter info in JSON output and return rows for the 'estimates' tibble
+#'
 #' @param json A list extracted from an element of the `json_list`` provided to [get_estimates()].
 #' @param fleet The fleet number associated with this parameter (if applicable)
 #' @param module_name The name of the module which contains this parameter (e.g. "selectivity" or "Fleet")
@@ -105,7 +168,7 @@ get_parameter <- function(json, fleet = NA, module_name, module_type) {
   estimates_newrows <- NULL
 
   # rename element to remove inconsistency between "value" and "values".
-  # TODO: delete this step when json becomes standardized
+  # TODO: delete this step when JSON becomes standardized
   #  if ("value" in )
   names(json)[names(json) == "value"] <- "values"
   names(json)[names(json) == "estimated_value"] <- "estimated_values"
@@ -127,12 +190,12 @@ get_parameter <- function(json, fleet = NA, module_name, module_type) {
       label = label,
       parameter_id = json$id,
       fleet = fleet,
-      age = NA, # TODO: not yet available in the json output
-      time = NA, # TODO: not yet available in the json output
+      age = NA, # TODO: not yet available in the JSON output
+      time = NA, # TODO: not yet available in the JSON output
       initial = json$values,
       estimate = json$estimated_values,
-      uncertainty = NA, # TODO: not yet available in the json output
-      likelihood = NA, # TODO: not yet available in the json output
+      uncertainty = NA, # TODO: not yet available in the JSON output
+      likelihood = NA, # TODO: not yet available in the JSON output
       gradient = NA, # to be filled in based on parameter_id
       estimated = json$is_estimated
 
@@ -146,9 +209,8 @@ get_parameter <- function(json, fleet = NA, module_name, module_type) {
 
 # TODO: consider merging get_parameter() and get_derived_quantity()
 
-#' Process derived quantitiy info in json output and return rows for the estimates tibble
+#' Process derived quantitiy info in JSON output and return rows for the 'estimates' tibble
 #'
-#' @rdname FIMSOutput
 #' @param json A list extracted from an element of the `json_list`` provided to [get_estimates()].
 #' @param fleet The fleet number associated with this derived quantity (if applicable)
 #' @param module_name The name of the module which contains this derived quantity
@@ -172,12 +234,12 @@ get_derived_quantity <- function(json, fleet = NA, module_name, module_type) {
     label = label,
     parameter_id = NA,
     fleet = fleet,
-    age = NA, # TODO: not yet available in the json output
-    time = NA, # TODO: not yet available in the json output
+    age = NA, # TODO: not yet available in the JSON output
+    time = NA, # TODO: not yet available in the JSON output
     initial = NA,
     estimate = json$values,
-    uncertainty = NA, # TODO: not yet available in the json output
-    likelihood = NA, # TODO: not yet available in the json output
+    uncertainty = NA, # TODO: not yet available in the JSON output
+    likelihood = NA, # TODO: not yet available in the JSON output
     gradient = NA, # to be filled in based on parameter_id
     estimated = NA
   )
@@ -186,10 +248,16 @@ get_derived_quantity <- function(json, fleet = NA, module_name, module_type) {
   return(estimates_newrows)
 }
 
-get_estimates <- function(json_list, nyears = 30, ages = 1:12) {
+#' Convert JSON output into the 'estimates' tibble
+#'
+#' @param json_list A list of JSON information output from `Finalize()`.
+#' @rdname FIMSOutput
+#' @return
+#' A tibble `estimates` to be included with other output in a list
+get_estimates <- function(json_list) {
   # Need to define tibble with zero rows so NA will be used to fill in
   # missing sections when combining estimates and derived quantities later
-  estimates_outline <- dplyr::tibble(
+  estimates <- dplyr::tibble(
     label = character(),
     parameter_id = integer(), # not included in design doc but will be useful for processing
     fleet = integer(), # was initially character()
@@ -203,7 +271,7 @@ get_estimates <- function(json_list, nyears = 30, ages = 1:12) {
     estimated = logical()
   )
 
-  # loop over highest level elements in json file which have name "module"
+  # loop over highest level elements in JSON file which have name "module"
   for (i in which(names(json_list) == "module")) {
     # module names in fims-demo currently include
     # "data", "selectivity", "Fleet", "recruitment", "growth", "maturity", "Population"
@@ -218,50 +286,138 @@ get_estimates <- function(json_list, nyears = 30, ages = 1:12) {
     message("processing element ", i, ": ", module_name)
 
     # loop over parameters (if there are none then won't loop)
-    # still need to add loop over derived quantities
-    for (index in which(names(json_list[[i]]) == "parameter")) {
+    # j is the second level in the nested lists, with i as the first
+    for (j in which(names(json_list[[i]]) == "parameter")) {
       # get info from parameter element of module
       estimates_newrows <- get_parameter(
-        json = json_list[[i]][[index]],
+        json = json_list[[i]][[j]],
         fleet = fleet,
         module_name = module_name,
         module_type = module_type
       )
       # if new rows were returned by get_parameter(), then bind to end of tibble
       if (!is.null(estimates_newrows) > 0) {
-        estimates_outline <- dplyr::bind_rows(estimates_outline, estimates_newrows)
+        estimates <- dplyr::bind_rows(estimates, estimates_newrows)
       }
     } # end loop over parameters
 
     # add gradient based on parameter_id
     # for all parameters with id avialable (not -999),
     # TODO: check why length of final_gradient doesn't match number of parameters
-    good_parameter_id <- !is.na(estimates_outline$parameter_id) & estimates_outline$parameter_id >= 0
-    estimates_outline$gradient[good_parameter_id] <-
-      json_list$final_gradient[estimates_outline$parameter_id[good_parameter_id] + 1]
+    good_parameter_id <- !is.na(estimates$parameter_id) & estimates$parameter_id >= 0
+    estimates$gradient[good_parameter_id] <-
+      json_list$final_gradient[estimates$parameter_id[good_parameter_id] + 1]
 
     # loop over derived quantities
-    # in the future this could be merged with processing of parameters, 
+    # in the future this could be merged with processing of parameters,
     # but easier to keep separate for now
-    for (index in which(names(json_list[[i]]) == "derived_quantity")) {
+    # j is the second level in the nested lists, with i as the first
+    for (j in which(names(json_list[[i]]) == "derived_quantity")) {
       estimates_newrows <- get_derived_quantity(
-        json = json_list[[i]][[index]],
+        json = json_list[[i]][[j]],
         fleet = fleet,
         module_name = module_name,
         module_type = module_type
       )
       # if new rows were created above, bind to end of tibble
       if (nrow(estimates_newrows) > 0) {
-        estimates_outline <- dplyr::bind_rows(estimates_outline, estimates_newrows)
+        estimates <- dplyr::bind_rows(estimates, estimates_newrows)
       }
     } # end loop over derived quantities
   } # end loop over elements of json_list
 
-  estimates <- estimates_outline # maybe no need for separate objects
   return(estimates)
 }
 
-get_fits <- function(obj, sdr) {
-  fits <- dplyr::tibble()
+#' Convert JSON output into the 'fits' tibble
+#'
+#' @param json_list A list of JSON information output from `Finalize()`.
+#' @param data The FIMSFrame input to the model. If that object is not
+#' available the function will return a more limited amount of information
+#' @rdname FIMSOutput
+#' @return
+#' A tibble `estimates` to be included with other output in a list
+get_fits <- function(json_list, data = NULL) {
+  # get some summary information on the json_list
+  # to figure out which elements are needed here
+  json_summary <- get_json_summary(json_list)
+
+  # create placeholder tibble similar to FIMSFrame but with a few additions
+  fits <- dplyr::tibble(
+    type = character(),
+    fleet = integer(), # not found in FIMSFrame but can be used to fill in name
+    name = character(),
+    age = numeric(),
+    year = numeric(), # simple but doesn't match datestart/dateend of FIMSFrame
+    value = numeric(),
+    unit = character(),
+    uncertainty = numeric(),
+    expected = numeric(), # not found in FIMSFrame
+    likelihood = numeric(), # not found in FIMSFrame
+    weight = numeric(), # not found in FIMSFrame
+    distribution = character() # not found in FIMSFrame
+  )
+
+  # loop over highest level elements in JSON file which have name "module"
+  for (i in which(names(json_list) == "module")) {
+    # module names in fims-demo currently include
+    # "data", "selectivity", "Fleet", "recruitment", "growth", "maturity", "Population"
+    module_name <- json_list[[i]]$name
+    module_type <- json_list[[i]]$type
+    if (module_name == "Fleet") {
+      # get values (e.g. from name == "index")
+      # get observed_index_data_id
+      # get index_likelihood_id
+      # go find obs
+      # placeholder for like
+
+      # loop over derived quantities within the fleet module
+      for (j in which(names(json_list[[i]]) == "derived_quantity")) {
+        # JSON section for derived quantity within fleet module
+        fits_newrows <- NULL
+        json <- json_list[[i]][[j]]
+        if (json$name == "index") {
+          # get the input data (should be redundant with FIMSFrame
+          # which is an optional input to this function)
+          which_list_element <- json_summary |>
+            dplyr::filter(
+              type == "Index" &
+                id == json_list[[i]]$observed_index_data_id
+            ) |>
+            dplyr::pull(element)
+          if (length(which_list_element) > 1) {
+            stop("something wrong with matching index to fleet")
+          }
+
+          # fill in new rows for output tibble
+          fits_newrows <- dplyr::tibble(
+            type = "index",
+            fleet = json_list[[i]]$id,
+            name = NA,
+            age = NA, # indices are not age-specific, so should be NA
+            year = NA, # TODO: fill in based on dimensions or something
+            value = json_list[[which_list_element]]$values,
+            unit = NA, # TODO: add once available
+            uncertainty = NA, # TODO: add once available
+            expected = json$values,
+            # TODO: once likelihood values are available in JSON output,
+            # we can probably get them just like value above only using
+            # `index_likelihood_id`
+            likelihood = NA,
+            weight = 1.0,
+            distribution = NA # TODO: hardwire to lognormal for now or add to JSON output?
+          )
+        }
+        if (json$name == "age_composition") {
+          # TODO: fill this in (as well as for any other data type we may use)
+          # NOTE: JSON output has a mix of "AgeComp", "age_composition" and "agecomp" (in "agecomp_likelihood_id")
+        }
+        # if new rows were created above, bind to end of tibble
+        if (!is.null(fits_newrows) && nrow(fits_newrows) > 0) {
+          fits <- dplyr::bind_rows(fits, fits_newrows)
+        }
+      } # end loop over derived quantities
+    }
+  } # end loop over modules
   return(fits)
 }
