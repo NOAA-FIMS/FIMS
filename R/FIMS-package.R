@@ -26,5 +26,6 @@
 #' @export TMBDmultinomDistribution
 #' @export SetFIMSFunctions
 #' @export Finalize
+#' @export ToJSON
 ## usethis namespace: end
 NULL
