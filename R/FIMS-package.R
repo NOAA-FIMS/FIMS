@@ -24,5 +24,6 @@
 #' @export EWAAgrowth
 #' @export TMBDlnormDistribution
 #' @export TMBDmultinomDistribution
+#' @export SetFIMSFunctions
 ## usethis namespace: end
 NULL

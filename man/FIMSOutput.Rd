@@ -2,32 +2,24 @@
 % Please edit documentation in R/FIMSOutput.R
 \name{create_fims_output}
 \alias{create_fims_output}
-\alias{get_parameter}
-\alias{get_derived_quantity}
+\alias{get_estimates}
+\alias{get_fits}
 \title{Class constructors for \code{FIMSOutput} and associated child classes}
 \usage{
 create_fims_output(json_list, call = NULL, data)
 
-get_parameter(json, fleet = NA, module_name, module_type)
+get_estimates(json_list)
 
-get_derived_quantity(json, fleet = NA, module_name, module_type)
+get_fits(json_list, data = NULL)
 }
 \arguments{
-\item{json_list}{A list of json information output from \code{Finalize()}.}
+\item{json_list}{A list of JSON information output from \code{Finalize()}.}
 
 \item{call}{The call the users made to run FIMS. The default is \code{NULL}.
 This is not available for FIMS yet.}
 
-\item{data}{The input data used to fit the model. This needs to be a
-FIMSFrame object.}
-
-\item{json}{A list extracted from an element of the `json_list`` provided to \code{\link[=get_estimates]{get_estimates()}}.}
-
-\item{fleet}{The fleet number associated with this derived quantity (if applicable)}
-
-\item{module_name}{The name of the module which contains this derived quantity}
-
-\item{module_type}{The type of the module which contains this derived quantity}
+\item{data}{The FIMSFrame input to the model. If that object is not
+available the function will return a more limited amount of information}
 }
 \value{
 An object of the S4 class \code{FIMSOutput} or one of its child classes is
@@ -35,9 +27,9 @@ validated and then returned. All objects will at a minimum have a slot
 called \code{data} to store the input data frame. Additional slots are dependent
 on the child class. Use \code{\link[=showClass]{showClass()}} to see all available slots.
 
-Rows that can be added to the \code{estimates} tibble.
+A tibble \code{estimates} to be included with other output in a list
 
-Rows that can be added to the \code{estimates} tibble.
+A tibble \code{estimates} to be included with other output in a list
 }
 \description{
 All constructor functions take a single input and build an object specific to
