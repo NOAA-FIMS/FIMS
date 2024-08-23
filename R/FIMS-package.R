@@ -25,5 +25,6 @@
 #' @export TMBDlnormDistribution
 #' @export TMBDmultinomDistribution
 #' @export SetFIMSFunctions
+#' @export Finalize
 ## usethis namespace: end
 NULL
