@@ -64,9 +64,6 @@ class PopulationInterface : public PopulationInterfaceBase {
   ParameterVector log_init_naa; /**<log of the initial numbers at age*/
   ParameterVector numbers_at_age; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
-  Rcpp::NumericVector proportion_female; /**<doule representing the proportion
-                                            of female individuals */
-  bool estimate_prop_female; /**<whether proportion female should be estimated*/
 
   PopulationInterface() : PopulationInterfaceBase() {}
 
@@ -149,12 +146,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
-    }
-    for (int i = 0; i < proportion_female.size(); i++) {
-      population->proportion_female[i] = this->proportion_female[i];
-      if (estimate_prop_female) {
-        info->RegisterParameter(population->proportion_female[i]);
-      }
     }
 
     population->numbers_at_age.resize((nyears + 1) * nages);

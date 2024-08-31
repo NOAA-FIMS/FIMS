@@ -11,8 +11,6 @@ test_that("Population input settings work as expected", {
   population$nfleets <- 2
   population$nseasons <- 1
   population$nyears <- nyears
-  population$proportion_female <- rep(0.5, nages)
-  population$estimate_prop_female <- FALSE
 
   expect_equal(population$get_id(), 1)
   for(i in 1:(nyears * nages)){
@@ -23,8 +21,6 @@ test_that("Population input settings work as expected", {
     expect_equal(population$log_init_naa[i]$value, 0)
     expect_true(population$log_init_naa[i]$estimated)
   }
-  expect_false(population$estimate_prop_female)
-  expect_equal(population$proportion_female, rep(0.5, nages))
 
   clear()
 })
