@@ -57,9 +57,9 @@ class FleetInterface : public FleetInterfaceBase {
   bool is_survey = false; /**< whether this is a survey fleet */
   int nages;              /**< number of ages in the fleet data*/
   int nyears;             /**< number of years in the fleet data */
-  double log_q;           /**< log of catchability for the fleet*/
+  double log_q;           /**< natural log of catchability for the fleet*/
   ParameterVector
-      log_Fmort;           /**< log of fishing mortality rate for the fleet*/
+      log_Fmort;           /**< natural log of fishing mortality rate for the fleet*/
   ParameterVector log_expected_index; /**< expected index of abundance for the survey */
   ParameterVector proportion_catch_numbers_at_age; /**< expected catch numbers at age for the fleet */
   bool estimate_q = false; /**< whether the parameter q should be estimated*/

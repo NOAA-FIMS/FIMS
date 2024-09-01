@@ -18,11 +18,12 @@
 
 namespace fims_popdy {
 
-/** @brief BevertonHolt class that returns the Beverton Holt SR
- * from fims_math.
+/** @brief BevertonHolt class that returns the Beverton Holt stock--recruitment
+ * function from fims_math.
  *
  * @param logit_steep Recruitment relative to unfished recruitment at
- * 20% of unfished spawning biomass. Should be a value between 0.2 and 1.0.
+ * 20 percent of unfished spawning biomass. Steepness is subject to a logit
+ * transformation.
  */
 template <typename Type>
 struct SRBevertonHolt : public RecruitmentBase<Type> {
@@ -30,7 +31,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   // function. These members are needed by Beverton Holt but will not be common
   // to all recruitment functions like spawners is below.
   fims::Vector<Type> logit_steep; /**< Transformed value of recruitment relative to unfished
-                 recruitment at 20% of unfished spawning biomass.*/
+                 recruitment at 20 percent of unfished spawning biomass.*/
 
   SRBevertonHolt() : RecruitmentBase<Type>() {}
 

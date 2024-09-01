@@ -35,11 +35,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   // Mortality and catchability
   fims::Vector<Type>
-      log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  Type log_q;    /*!< estimated parameter: catchability of the fleet */
+      log_Fmort; /*!< estimated parameter: natural log Fishing mortality*/
+  Type log_q;    /*!< estimated parameter: natural log of catchability of the fleet */
 
   fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
-  Type q; /*!< transofrmed parameter: the catchability of the fleet */
+  Type q; /*!< transformed parameter: the catchability of the fleet */
 
   // derived quantities
   fims::Vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
@@ -61,7 +61,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
   fims::Vector<Type> proportion_catch_numbers_at_age; /*!<model expected catch at age*/
   fims::Vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
-  bool is_survey = false;                  /*!< is this fleet object a survey*/
+  bool is_survey = false;                  /*!< is this fleet object a survey, compared to being a fishing fleet*/
 
 #ifdef TMB_MODEL
   ::objective_function<Type> *of;
@@ -99,8 +99,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
-   * @brief Prepare to run the fleet module. Called at each model itartion, and
-   * used to exponentiate the log q and Fmort parameters prior to evaluation.
+   * @brief Prepare to run the fleet module. Called at each model iteration, and
+   * used to exponentiate the natural log q and Fmort parameters prior to evaluation.
    *
    */
   void Prepare() {
@@ -152,7 +152,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
-   * Evaluate the log of the expected index.
+   * Evaluate the natural log of the expected index.
    */
   void evaluate_index() {
     for(size_t i=0; i<this->expected_index.size(); i++){

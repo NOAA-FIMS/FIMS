@@ -257,7 +257,7 @@ methods::show(BevertonHoltRecruitment)
 There are three parameters we need to set-up: *log_sigma_recruit*, *log_rzero*, and *logit_steep*.
 
 ```{r set-up-recruitment}
-recruitment$log_rzero$value <- log(1e+06) # unit: log(number)
+recruitment$log_rzero$value <- log(1e+06) # unit: ln(number)
 recruitment$log_rzero$is_random_effect <- FALSE
 recruitment$log_rzero$estimated <- TRUE
 recruitment$logit_steep$value <- -log(1.0 - 0.75) + log(0.75 - 0.2)

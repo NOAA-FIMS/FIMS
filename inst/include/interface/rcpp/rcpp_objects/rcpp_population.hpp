@@ -60,8 +60,8 @@ class PopulationInterface : public PopulationInterfaceBase {
   uint32_t maturity_id;      /**< id of the maturity function*/
   uint32_t growth_id;        /**< id of the growth function*/
   uint32_t recruitment_id;   /**< id of the recruitment function*/
-  ParameterVector log_M; /**< log of the natural mortality of the stock*/
-  ParameterVector log_init_naa; /**<log of the initial numbers at age*/
+  ParameterVector log_M; /**< natural log of the natural mortality of the population*/
+  ParameterVector log_init_naa; /**<natural log of the initial numbers at age*/
   ParameterVector numbers_at_age; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
 
@@ -86,9 +86,9 @@ class PopulationInterface : public PopulationInterfaceBase {
   void SetGrowth(uint32_t growth_id) { this->growth_id = growth_id; }
 
   /**
-   * @brief Set the unique id for the Maturity object
+   * @brief Set the unique id for the recruitment object
    *
-   * @param recruitment_id Unique id for the Maturity object
+   * @param recruitment_id Unique id for the recruitment object
    */
   void SetRecruitment(uint32_t recruitment_id) {
     this->recruitment_id = recruitment_id;

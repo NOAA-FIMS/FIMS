@@ -64,11 +64,11 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
-  Parameter logit_steep; /**< steepness or the productivity of the stock*/
+  Parameter logit_steep; /**< steepness or the productivity of the population*/
   Parameter log_rzero;   /**< recruitment at unfished biomass */
   Parameter
-      log_sigma_recruit; /**< the log of the stock recruit standard deviation */
-  ParameterVector log_devs;   /**< log recruitment deviations*/
+      log_sigma_recruit; /**< the natural log of the stock recruit standard deviation */
+  ParameterVector log_devs;   /**< natural log recruitment deviations*/
   bool estimate_log_devs = false; /**< boolean describing whether to estimate */
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
