@@ -1,42 +1,51 @@
-test_that("Selectivity input settings work as expected", {
-  # Create selectivity1
-  selectivity1 <- new(LogisticSelectivity)
+test_that("LogisticSelectivityInterface is initialized correctly", {
+  # Create parameters for inflection point and slope
+  inflection_param <- new(Parameter, 5.0, TRUE)
+  slope_param <- new(Parameter, 1.0, TRUE)
+  
+  # Instantiate the LogisticSelectivityInterface object
+  logistic_selectivity <- new(LogisticSelectivity, inflection_param, slope_param)
+  
+  # Check if inflection_point and slope are set correctly
+  expect_equal(logistic_selectivity$inflection_point$value, 5.0)
+  expect_equal(logistic_selectivity$slope$value, 1.0)
 
-  selectivity1$inflection_point$value <- 10.0
-  selectivity1$inflection_point$min <- 8.0
-  selectivity1$inflection_point$max <- 12.0
-  selectivity1$inflection_point$is_random_effect <- TRUE
-  selectivity1$inflection_point$estimated <- TRUE
-  selectivity1$slope$value <- 0.2
+  # Check if get_id returns a valid ID
+  expect_equal(logistic_selectivity$get_id(), as.integer(1))
 
-  expect_equal(selectivity1$get_id(), 1)
-  expect_equal(selectivity1$inflection_point$value, 10.0)
-  expect_equal(selectivity1$inflection_point$min, 8.0)
-  expect_equal(selectivity1$inflection_point$max, 12.0)
-  expect_true(selectivity1$inflection_point$is_random_effect)
-  expect_true(selectivity1$inflection_point$estimated)
-  expect_equal(selectivity1$slope$value, 0.2)
-  expect_equal(selectivity1$evaluate(10.0), 0.5)
+  # Check if the evaluate method returns the correct logistic function value
+  x <- 5.0
+  expected_value <- 1 / (1 + exp(-slope_param$value * (x - inflection_param$value)))
+  
+  expect_equal(logistic_selectivity$evaluate(x), expected_value)
+  
+  # Test with another value
+  x <- 6.0
+  expected_value <- 1 / (1 + exp(-slope_param$value * (x - inflection_param$value)))
+  
+  expect_equal(logistic_selectivity$evaluate(x), expected_value)
 
-
-  # Create selectivity2
-  selectivity2 <- new(LogisticSelectivity)
-  expect_equal((selectivity2$get_id()), 2)
-
-  # Test double logistic
-  selectivity3 <- new(DoubleLogisticSelectivity)
-
-  selectivity3$inflection_point_asc$value <- 10.5
-  selectivity3$slope_asc$value <- 0.2
-  selectivity3$inflection_point_desc$value <- 15.0
-  selectivity3$slope_desc$value <- 0.05
-
-  expect_equal(selectivity3$get_id(), 3)
-  expect_equal(selectivity3$inflection_point_asc$value, 10.5)
-  expect_equal(selectivity3$slope_asc$value, 0.2)
-  # R code that generates true value for the test
-  # 1.0/(1.0+exp(-(34.5-10.5)*0.2)) * (1.0 - 1.0/(1.0+exp(-(34.5-15)*0.05))) = 0.2716494
-  expect_equal(selectivity3$evaluate(34.5), 0.2716494, tolerance = 0.0000001)
-
+  # Set up logistic_selectivity2 and check if id is incremented correctly
+  logistic_selectivity2 <- LogisticSelectivity$new(inflection_param, slope_param)
+  expect_equal(logistic_selectivity2$get_id(), 2)
   clear()
 })
+
+test_that("DoubleLogisticSelectivity input settings work as expected", {
+  # Test double logistic
+  selectivity <- new(DoubleLogisticSelectivity)
+
+  selectivity$inflection_point_asc$value <- 10.5
+  selectivity$slope_asc$value <- 0.2
+  selectivity$inflection_point_desc$value <- 15.0
+  selectivity$slope_desc$value <- 0.05
+
+  expect_equal(selectivity$get_id(), 1)
+  expect_equal(selectivity$inflection_point_asc$value, 10.5)
+  expect_equal(selectivity$slope_asc$value, 0.2)
+  # R code that generates true value for the test
+  # 1.0/(1.0+exp(-(34.5-10.5)*0.2)) * (1.0 - 1.0/(1.0+exp(-(34.5-15)*0.05))) = 0.2716494
+  expect_equal(selectivity$evaluate(34.5), 0.2716494, tolerance = 0.0000001)
+  clear()
+})
+

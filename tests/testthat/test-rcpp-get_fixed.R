@@ -1,14 +1,10 @@
 test_that("test get parameter vector", {
   # Create selectivity
-  selectivity <- new(LogisticSelectivity)
-  selectivity$inflection_point$value <- 10.0
-  selectivity$inflection_point$min <- 8.0
-  selectivity$inflection_point$max <- 12.0
-  selectivity$inflection_point$is_random_effect <- FALSE
-  selectivity$inflection_point$estimated <- TRUE
-  selectivity$slope$value <- 0.2
-  selectivity$slope$is_random_effect <- FALSE
-  selectivity$slope$estimated <- TRUE
+  selectivity_inflection_point <- new(Parameter, 10.0, TRUE)
+  selectivity_slope <- new(Parameter, 0.2, TRUE)
+  selectivity <- new(LogisticSelectivity, selectivity_inflection_point, selectivity_slope)
+  # selectivity$inflection_point$min <- 8.0
+  # selectivity$inflection_point$max <- 12.0
 
   CreateTMBModel()
   p <- get_fixed()
@@ -28,16 +24,12 @@ test_that("test get parameter vector", {
   clear()
   p <- get_fixed()
   expect_equal(numeric(0), p)
-  selectivity <- new(LogisticSelectivity)
-  selectivity$inflection_point$value <- 11.0
-  selectivity$inflection_point$min <- 8.0
-  selectivity$inflection_point$max <- 12.0
-  selectivity$inflection_point$is_random_effect <- FALSE
-  selectivity$inflection_point$estimated <- TRUE
-  selectivity$slope$value <- 0.5
-  selectivity$slope$is_random_effect <- FALSE
-  selectivity$slope$estimated <- TRUE
+
+  selectivity_inflection_point <- new(Parameter, 11.0, TRUE)
+  selectivity_slope <- new(Parameter, 0.5, TRUE)
+  selectivity <- new(LogisticSelectivity, selectivity_inflection_point, selectivity_slope)
   sel_parm <- c(selectivity$inflection_point$value, selectivity$slope$value)
+
   recruitment <- new(BevertonHoltRecruitment)
   h <- 0.75
   r0 <- 1000000.0

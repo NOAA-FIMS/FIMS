@@ -1,4 +1,3 @@
-library(testthat)
 test_that("Recruitment input settings work as expected", {
   # Create recruitment
   recruitment <- new(BevertonHoltRecruitment)

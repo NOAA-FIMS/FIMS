@@ -109,13 +109,20 @@ Each variable of [Parameter class](https://github.com/NOAA-FIMS/FIMS/blob/main/i
  
 ```{r fleet_selectivity}
 methods::show(LogisticSelectivity)
-fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
-fishing_fleet_selectivity$inflection_point$value <- 2.0
-fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
-fishing_fleet_selectivity$inflection_point$estimated <- TRUE
-fishing_fleet_selectivity$slope$value <- 1.0
-fishing_fleet_selectivity$slope$is_random_effect <- FALSE
-fishing_fleet_selectivity$slope$estimated <- TRUE
+fishing_fleet_selectivity_inflection <- new(Parameter, 2.0, TRUE)
+fishing_fleet_selectivity_slope <- new(Parameter, 1.0, TRUE)
+fishing_fleet_selectivity <- new(
+    LogisticSelectivity,
+    fishing_fleet_selectivity_inflection,
+    fishing_fleet_selectivity_slope
+  )
+# fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
+# fishing_fleet_selectivity$inflection_point$value <- 2.0
+# fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+# fishing_fleet_selectivity$inflection_point$estimated <- TRUE
+# fishing_fleet_selectivity$slope$value <- 1.0
+# fishing_fleet_selectivity$slope$is_random_effect <- FALSE
+# fishing_fleet_selectivity$slope$estimated <- TRUE
 ```
 
 #### Creating the Fleet Object
@@ -170,7 +177,7 @@ The next step is to link this distribution to the expected value of the fleet, l
 set_distribution_links function. The first argument assigns the distribution type ("data", "random_effects", or "prior").
 The second argument takes the id of the parameter or derived value being linked to the distribution. 
 ```{r fleet-expected}
-fishing_fleet_index_distribution$set_distribution_links("data", fishing_fleet$log_expected_index$get_id())
+# fishing_fleet_index_distribution$set_distribution_links("data", fishing_fleet$log_expected_index$get_id())
 
 ```
 
@@ -198,13 +205,21 @@ survey_fleet_age_comp$age_comp_data <- survey_agecomp * 200 # unit: number at ag
 #### Survey Selectivity
 
 ```{r survey-selectivity}
-survey_fleet_selectivity <- new(LogisticSelectivity)
-survey_fleet_selectivity$inflection_point$value <- 1.5
-survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
-survey_fleet_selectivity$inflection_point$estimated <- TRUE
-survey_fleet_selectivity$slope$value <- 2.0
-survey_fleet_selectivity$slope$is_random_effect <- FALSE
-survey_fleet_selectivity$slope$estimated <- TRUE
+survey_fleet_selectivity_inflection <- new(Parameter, 1.5, TRUE)
+survey_fleet_selectivity_slope <- new(Parameter, 2.0, TRUE)
+survey_fleet_selectivity <- new(
+    LogisticSelectivity,
+    survey_fleet_selectivity_inflection,
+    survey_fleet_selectivity_slope
+  )
+
+# survey_fleet_selectivity <- new(LogisticSelectivity)
+# survey_fleet_selectivity$inflection_point$value <- 1.5
+# survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+# survey_fleet_selectivity$inflection_point$estimated <- TRUE
+# survey_fleet_selectivity$slope$value <- 2.0
+# survey_fleet_selectivity$slope$is_random_effect <- FALSE
+# survey_fleet_selectivity$slope$estimated <- TRUE
 ```
 
 

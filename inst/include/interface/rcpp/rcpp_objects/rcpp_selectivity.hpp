@@ -64,7 +64,23 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       inflection_point; /**< the index value at which the response reaches .5 */
   Parameter slope;      /**< the width of the curve at the inflection_point */
 
-  LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
+  //' @rd
+  //' @name LogisticSelectivityInterface
+  //' @title Constructor for initializing a LogisticSelectivityInterface object
+  //' @description Initializes a LogisticSelectivityInterface object with specified inflection point and slope parameters. 
+  //' @param inflection_point A Parameter object representing the inflection point of the logistic selectivity curve.
+  //' @param slope A Parameter object representing the slope of the logistic selectivity curve.
+  //' @return No return value, as this is a constructor.
+  //' @examples
+  //' // R example of creating a LogisticSelectivityInterface object
+  //' inflection <- methods::new(Parameter, 2, true)
+  //' slope <- methods::new(Parameter, 0.2, true)
+  //' logistic_selectivity <- methods::new(LogisticSelectivityInterface, inflection, slope)
+  LogisticSelectivityInterface(Parameter inflection_point, Parameter slope) : SelectivityInterfaceBase()
+  {
+    this->inflection_point = inflection_point;
+    this->slope = slope;
+  }
 
   virtual ~LogisticSelectivityInterface() {}
 

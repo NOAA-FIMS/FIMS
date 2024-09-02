@@ -365,6 +365,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<Parameter>("Parameter", "FIMS Parameter Class")
       .constructor()
+      .constructor<double, bool>()
       .constructor<double>()
       .constructor<Parameter>()
       .field("value", &Parameter::value_m, "numeric parameter value")
@@ -458,7 +459,7 @@ RCPP_MODULE(fims) {
       .method("evaluate", &LogisticMaturityInterface::evaluate);
 
   Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
-      .constructor()
+      .constructor<Parameter, Parameter>("inflection_point, slope")
       .field("inflection_point",
              &LogisticSelectivityInterface::inflection_point)
       .field("slope", &LogisticSelectivityInterface::slope)

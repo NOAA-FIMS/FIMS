@@ -48,7 +48,6 @@ setup_and_run_FIMS <- function(iter_id,
                                em_input_list,
                                estimation_mode = TRUE,
                                map = list()) {
-
   # Load operating model data
   om_input <- om_input_list[[iter_id]]
   om_output <- om_output_list[[iter_id]]
@@ -80,7 +79,7 @@ setup_and_run_FIMS <- function(iter_id,
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], om_input$nyr-1)
+  recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], om_input$nyr - 1)
 
   recruitment_distribution <- new(TMBDnormDistribution)
   # set up logR_sd using the normal log_sd parameter
@@ -131,15 +130,19 @@ setup_and_run_FIMS <- function(iter_id,
 
   # Fleet
   # Create the fishing fleet
-  fishing_fleet_selectivity <- new(LogisticSelectivity)
-  fishing_fleet_selectivity$inflection_point$value <- om_input$sel_fleet$fleet1$A50.sel1
-  fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
-  # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point$estimated <- TRUE
-  fishing_fleet_selectivity$slope$value <- om_input$sel_fleet$fleet1$slope.sel1
-  # turn on estimation of slope
-  fishing_fleet_selectivity$slope$is_random_effect <- FALSE
-  fishing_fleet_selectivity$slope$estimated <- TRUE
+  fishing_fleet_selectivity_inflection_point <- new(Parameter,
+    om_input$sel_fleet$fleet1$A50.sel1,
+    TRUE
+  )
+  fishing_fleet_selectivity_slope <- new(Parameter,
+    om_input$sel_fleet$fleet1$slope.sel1,
+    TRUE
+  )
+  fishing_fleet_selectivity <- new(
+    LogisticSelectivity,
+    fishing_fleet_selectivity_inflection_point,
+    fishing_fleet_selectivity_slope
+  )
 
   fishing_fleet <- new(Fleet)
   fishing_fleet$nages <- om_input$nages
@@ -169,15 +172,20 @@ setup_and_run_FIMS <- function(iter_id,
   fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$proportion_catch_numbers_at_age$get_id())
 
   # Create the survey fleet
-  survey_fleet_selectivity <- new(LogisticSelectivity)
-  survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
-  survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
-  # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point$estimated <- TRUE
-  survey_fleet_selectivity$slope$value <- om_input$sel_survey$survey1$slope.sel1
-  survey_fleet_selectivity$slope$is_random_effect <- FALSE
-  # turn on estimation of slope
-  survey_fleet_selectivity$slope$estimated <- TRUE
+  survey_fleet_selectivity_inflection_point <- new(Parameter,
+    om_input$sel_survey$survey1$A50.sel1,
+    TRUE
+  )
+  survey__fleet_selectivity_slope <- new(Parameter,
+    om_input$sel_survey$survey1$slope.sel1,
+    TRUE
+  )
+
+  survey_fleet_selectivity <- new(
+    LogisticSelectivity,
+    survey_fleet_selectivity_inflection_point,
+    survey__fleet_selectivity_slope
+  )
 
   survey_fleet <- new(Fleet)
   survey_fleet$is_survey <- TRUE
