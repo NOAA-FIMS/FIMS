@@ -47,6 +47,7 @@ print.fimsfit <- function(fit, ...){
   } else if(rt>60){
     rt <- rt/60; ru <- 'minutes'
   }
+
   cat("Total run time was", round(rt,2),  ru, '\n')
   cat("Number of parameters:", paste(names(fit$opt$num_pars),
                                      fit$opt$num_pars, sep='='),"\n")
@@ -100,19 +101,19 @@ if(is.null(control))
 if(!verbose) control$trace <- 0
 ## optimize and compare
 t0 <- Sys.time()
-message("Starting optimization...")
+ if(verbose) message("Starting optimization...")
 opt0 <- opt <-
   with(obj, nlminb(start = par, objective = fn, gradient = gr, control=control))
 maxgrad0 <- maxgrad <- max(abs(obj$gr(opt$par)))
 if(loopnum>0){
-  message("Restarting optimizer ", loopnum, " times silently to improve gradient")
+  if(verbose) message("Restarting optimizer ", loopnum, " times silently to improve gradient")
     for(ii in 2:loopnum){
       control$trace <- 0
     opt <- with(obj, nlminb(start = opt$par, objective = fn,
                             gradient = gr, control=control))
     maxgrad <- max(abs(obj$gr(opt$par)))
   }
-  message("Maximum gradient went from ", sprintf("%.3g", maxgrad0), " to ",
+  if(verbose) message("Maximum gradient went from ", sprintf("%.3g", maxgrad0), " to ",
           sprintf("%.3g",maxgrad), " after ", loopnum," steps.")
 }
 n_total <- length(obj$env$last.par.best)
@@ -130,17 +131,16 @@ rep <- c(version=input$version, obj$report())
 sdrep <- std <- NULL
 time_sdreport <- NA
 if(getsd){
+  t2 <- Sys.time()
   sdrep <- sdreport(obj)
   std <- summary(sdrep)
   std <- data.frame(dimnames(std)[[1]], std)
   names(std) <- c('name', 'est', 'se')
+  std$lwr <- std$est - 1.96*std$se
+  std$upr <- std$est + 1.96*std$se
   row.names(std) <- NULL
-  # std <- group_by(std, name) %>%
-  #   mutate(year=1969+1:n(), lwr=est-1.96*se,
-  #          upr=est+1.96*se, version=input$version) %>%
-  #   ungroup
   if(verbose) message("Finished sdreport")
-  time_sdreport <- Sys.time() - t1
+  time_sdreport <- Sys.time() - t2
 }
 parList <- obj$env$parList()
 parnames <- names(obj$par)
