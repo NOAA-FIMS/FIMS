@@ -17,7 +17,7 @@ estimation_results_serial <- vector(mode = "list", length = length(om_input_list
 
 start_time_serial <- Sys.time()
 for (i in 1:length(om_input_list)) {
-  estimation_results_serial[[i]] <- setup_and_run_FIMS(
+  estimation_results_serial[[i]] <- setup_and_run_FIMS_without_wrappers(
     iter_id = i,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
@@ -35,7 +35,7 @@ test_that("Run FIMS in parallel using {snowfall}", {
 
   results_parallel <- snowfall::sfLapply(
     1:length(om_input_list),
-    setup_and_run_FIMS,
+    setup_and_run_FIMS_without_wrappers,
     om_input_list,
     om_output_list,
     em_input_list,

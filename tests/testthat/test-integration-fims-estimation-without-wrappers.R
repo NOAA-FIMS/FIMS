@@ -2,7 +2,7 @@ load(test_path("fixtures", "integration_test_data.RData"))
 
 test_that("deterministic test of fims", {
   iter_id <- 1
-  result <- setup_and_run_FIMS(
+  result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
@@ -22,7 +22,7 @@ test_that("deterministic test of fims", {
   report <- result$report
 
   # Compare log(R0) to true value
-  fims_logR0 <- sdr_fixed[1, "Estimate"]
+  fims_logR0 <- sdr_fixed[35, "Estimate"]
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]]$R0))
 
@@ -43,7 +43,7 @@ test_that("deterministic test of fims", {
 
   # Compare recruitment to true value
   fims_naa <- matrix(report$naa[[1]][1:(om_input_list[[iter_id]]$nyr * om_input_list[[iter_id]]$nages)],
-    nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE
+                     nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE
   )
 
   # loop over years to compare recruitment by year
@@ -94,7 +94,7 @@ test_that("deterministic test of fims", {
   # Expected catch number at age in proportion
   # QUESTION: Isn't this redundant with the non-proportion test above?
   fims_cnaa <- matrix(report$cnaa[[1]][1:(om_input_list[[iter_id]]$nyr * om_input_list[[iter_id]]$nages)],
-    nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE
+                      nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE
   )
   fims_cnaa_proportion <- fims_cnaa / rowSums(fims_cnaa)
   om_cnaa_proportion <- om_output_list[[iter_id]]$L.age$fleet1 / rowSums(om_output_list[[iter_id]]$L.age$fleet1)
@@ -106,7 +106,7 @@ test_that("deterministic test of fims", {
   # Expected survey index.
   # Using [[2]] because the survey is the 2nd fleet.
   cwaa <- matrix(report$cwaa[[2]][1:(om_input_list[[iter_id]]$nyr * om_input_list[[iter_id]]$nages)],
-    nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE
+                 nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE
   )
   expect_equal(fims_index[[2]], apply(cwaa, 1, sum) * om_output_list[[iter_id]]$survey_q$survey1)
 
@@ -126,7 +126,7 @@ test_that("deterministic test of fims", {
 
   # Expected catch number at age in proportion
   fims_cnaa <- matrix(report$cnaa[[2]][1:(om_input_list[[iter_id]]$nyr * om_input_list[[iter_id]]$nages)],
-    nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE
+                      nrow = om_input_list[[iter_id]]$nyr, byrow = TRUE
   )
 
   for (i in 1:length(c(t(om_output_list[[iter_id]]$survey_age_comp$survey1)))) {
@@ -141,10 +141,10 @@ test_that("deterministic test of fims", {
   }
 })
 
-test_that("nll test of fims", { 
+test_that("nll test of fims", {
   iter_id <- 1
 
-  result <- setup_and_run_FIMS(
+  result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
@@ -161,7 +161,7 @@ test_that("nll test of fims", {
   sdr_fixed <- result$sdr_fixed
 
   # log(R0)
-  fims_logR0 <- sdr_fixed[1, "Estimate"]
+  fims_logR0 <- sdr_fixed[35, "Estimate"]
   # expect_lte(abs(fims_logR0 - log(om_input$R0)) / log(om_input$R0), 0.0001)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]]$R0))
 
@@ -218,7 +218,7 @@ test_that("nll test of fims", {
 test_that("estimation test of fims", {
   # Initialize the iteration identifier and run FIMS with the 1st set of OM values
   iter_id <- 1
-  result <- setup_and_run_FIMS(
+  result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
@@ -249,7 +249,7 @@ test_that("run FIMS with missing values", {
   em_input_list[[iter_id]]$surveyB.obs$survey1[na_index] <- na_value
 
   # Run the FIMS setup and execution function
-  result <- setup_and_run_FIMS(
+  result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
@@ -288,7 +288,7 @@ test_that("agecomp in proportion works", {
   on.exit(om_input_list[[iter_id]]$n.survey$survey1 <- n.survey_original, add = TRUE)
 
   # Run the FIMS setup and execution function
-  result <- setup_and_run_FIMS(
+  result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
