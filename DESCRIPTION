@@ -55,18 +55,23 @@ URL: https://github.com/noaa-fims/fims, https://noaa-fims.github.io
 BugReports: https://github.com/noaa-fims/fims/issues
 Depends:
     R (>= 4.0)
-Imports: 
+Imports:
+    cli,
     dplyr,
     ggplot2,
     jsonlite,
     methods,
     Rcpp,
     scales,
-    TMB (>= 1.8.0)
+    stats,
+    tibble,
+    TMB (>= 1.8.0),
+    utils
 Suggests: 
     covr,
     knitr,
     parallel,
+    purrr,
     remotes,
     rmarkdown,
     snowfall,

@@ -364,39 +364,23 @@ population$SetRecruitment(recruitment$get_id())
 
 ## Putting It All Together 
 
-### Creating the FIMS Model and Making the TMB Function
-
+### Fitting the Model
 ```{r model}
 sucess <- CreateTMBModel()
 parameters <- list(p = get_fixed())
-obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", silent = TRUE)
+input <- list(data = fims_frame, parameters = parameters, version = "FIMS demo")
+# Run the model without optimization to help ensure a viable model
+test_fit <- fit_fims(input, optimize = FALSE)
+# Run the  model with optimization
+fit <- fit_fims(input)
 ```
-## Fitting the Model
-```{r fit_model}
-opt <- nlminb(obj$par, obj$fn, obj$gr,
-  control = list(eval.max = 800, iter.max = 800)
-) # , method = "BFGS",
-#   control = list(maxit=1000000, reltol = 1e-15))
-
-print(opt)
-```
-
-### TMB Reporting
-```{r tmb_report}
-sdr <- TMB::sdreport(obj)
-sdr_fixed <- summary(sdr, "fixed")
-report <- obj$report(obj$env$last.par.best)
-
-print(sdr_fixed)
-```
-
 
 ## Plotting Results
 ```{r plots}
 library(ggplot2)
 index_results <- data.frame(
   observed = survey_fleet_index$index_data,
-  expected = report$exp_index[[2]]
+  expected = fit@report[["exp_index"]][[2]]
 )
 print(index_results)
 
@@ -409,7 +393,7 @@ ggplot(index_results, aes(x = 1:nyears, y = observed)) +
 
 catch_results <- data.frame(
   observed = fishing_fleet_index$index_data,
-  expected = report$exp_index[[1]]
+  expected = fit@report[["exp_index"]][[1]]
 )
 print(catch_results)
 
