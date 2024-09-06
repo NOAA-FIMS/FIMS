@@ -11,7 +11,6 @@ fit_fims(
   do.fit = TRUE,
   newtonsteps = 0,
   control = NULL,
-  verbose = TRUE,
   save.sdrep = FALSE,
   filename = NULL
 )
@@ -28,9 +27,6 @@ fit_fims(
 Hessian to do after optimization.}
 
 \item{control}{A list of optimizer settings passed to code{nlminb}}
-
-\item{verbose}{Whether to print output (default) or suppress
-as much as possible.}
 
 \item{save.sdrep}{Whether to return the sdreport object in the
 fitted model. This is rarely used and large so turned off by
