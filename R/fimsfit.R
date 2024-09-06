@@ -89,7 +89,7 @@ fit_fims <- function(input, getsd=TRUE, loopnum=3, do.fit=TRUE, newtonsteps=0,
                      control=NULL, verbose=TRUE, save.sdrep=FALSE,
                      filename=NULL){
 if(!is.null(input$random)) stop("Random effects declared but not implemetned yet")
-if(newtonsteps>0) stop("Newton steps not implemeted yet")
+if(newtonsteps>0) stop("Newton steps not implemented yet")
 stopifnot(loopnum>=0)
 obj <- MakeADFun(data=list(), parameters=input$parameters,
                  map=input$map, random=input$random,
@@ -121,7 +121,7 @@ n_fe <- length(obj$par)
 opt$num_pars <- list(total=n_total, fixed_effects=n_fe, random_effects=n_total-n_fe)
 if(is.null(input$version)) {
   warning("No model version string provided, using default of 'FIMS model'")
-  input$verison <- 'FIMS model'
+  input$version <- 'FIMS model'
 }
 time_optimization <- Sys.time() - t0
 if(verbose) message("Finished optimization")
@@ -132,7 +132,7 @@ sdrep <- std <- NULL
 time_sdreport <- NA
 if(getsd){
   t2 <- Sys.time()
-  sdrep <- sdreport(obj)
+  sdrep <- TMB::sdreport(obj)
   std <- summary(sdrep)
   std <- data.frame(dimnames(std)[[1]], std)
   names(std) <- c('name', 'est', 'se')
