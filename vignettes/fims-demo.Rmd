@@ -351,35 +351,16 @@ population$SetRecruitment(recruitment$get_id())
 
 ## Putting It All Together 
 
-### Creating the FIMS Model and Making the TMB Function
-
+### Fitting the Model
 ```{r model}
 sucess <- CreateTMBModel()
 parameters <- list(p = get_fixed())
-obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", silent = TRUE)
+input <- list(data = fims_frame, parameters = parameters, version = "FIMS demo")
+fit <- fit_fims(input)
 ```
-## Fitting the Model
-```{r fit_model}
-opt <- nlminb(obj$par, obj$fn, obj$gr,
-  control = list(eval.max = 800, iter.max = 800)
-) # , method = "BFGS",
-#   control = list(maxit=1000000, reltol = 1e-15))
-
-print(opt)
-```
-
-### TMB Reporting
-```{r tmb_report}
-sdr <- TMB::sdreport(obj)
-sdr_fixed <- summary(sdr, "fixed")
-report <- obj$report(obj$env$last.par.best)
-
-print(sdr_fixed)
-```
-
 
 ## Plotting Results
-```{r plots}
+```{r plots, eval = FALSE}
 library(ggplot2)
 index_results <- data.frame(
   observed = survey_fleet_index$index_data,
