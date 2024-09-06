@@ -11,7 +11,7 @@
 #' are printed to the console.
 #'
 #' @examples
-#' is_fims_verbose()
+#' fims:::is_fims_verbose()
 is_fims_verbose <- function() {
   verbose_option <- getOption("rlib_message_verbosity", default = "default")
   verbose_boolean <- ifelse(

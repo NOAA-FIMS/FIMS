@@ -18,5 +18,5 @@ have to be an argument to every function. All \code{cli::cli_abort()} messages a
 printed to the console no matter what the global option is set to.
 }
 \examples{
-is_fims_verbose()
+fims:::is_fims_verbose()
 }
