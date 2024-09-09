@@ -242,6 +242,154 @@ public:
 
 
 
+    virtual void finalize() {
+
+        if (this->finalized) {
+            //log warning that finalize has been called more than once.
+            FIMS_WARNING_LOG("Fleet " + fims::to_string(this->id) + " has been finalized already.");
+        }
+
+        this->finalized = true; //indicate this has been called already
+
+        std::shared_ptr<fims_info::Information<double> > info =
+                fims_info::Information<double>::GetInstance();
+
+        fims_info::Information<double>::fleet_iterator it;
+
+
+        it = info->fleets.find(this->id);
+
+        if (it == info->fleets.end()) {
+            FIMS_WARNING_LOG("Fleet " + fims::to_string(this->id) + " not found in Information.");
+            return;
+        } else {
+
+            std::shared_ptr<fims_popdy::Fleet<double> > fleet =
+                    std::dynamic_pointer_cast<fims_popdy::Fleet<double> >(it->second);
+
+
+            for (size_t i = 0; i < this->log_Fmort.size(); i++) {
+                if (this->log_Fmort[i].estimated_m) {
+                    this->log_Fmort[i].estimated_value_m = fleet->log_Fmort[i];
+                } else {
+                    this->log_Fmort[i].estimated_value_m = this->log_Fmort[i].value_m;
+                }
+            }
+
+            for (size_t i = 0; i < this->log_q.size(); i++) {
+                if (this->log_q[i].estimated_m) {
+                    this->log_q[i].estimated_value_m = fleet->log_q[i];
+                } else {
+                    this->log_q[i].estimated_value_m = this->log_q[i].value_m;
+                }
+            }
+
+            this->derived_cnaa = Rcpp::NumericVector(fleet->catch_numbers_at_age.size());
+            for (size_t i = 0; i < this->derived_cnaa.size(); i++) {
+                this->derived_cnaa[i] = fleet->catch_numbers_at_age[i];
+            }
+
+            this->derived_cwaa = Rcpp::NumericVector(fleet->catch_weight_at_age.size());
+            for (size_t i = 0; i < this->derived_cwaa.size(); i++) {
+                this->derived_cwaa[i] = fleet->catch_weight_at_age[i];
+            }
+
+            this->derived_age_composition = Rcpp::NumericVector(fleet->proportion_catch_numbers_at_age.size());
+            for (size_t i = 0; i < this->derived_age_composition.size(); i++) {
+                this->derived_age_composition[i] = fleet->proportion_catch_numbers_at_age[i];
+            }
+
+            this->derived_index = Rcpp::NumericVector(fleet->expected_index.size());
+            for (size_t i = 0; i < this->derived_index.size(); i++) {
+                this->derived_index[i] = fleet->expected_index[i];
+            }
+
+        }
+
+    }
+
+    virtual std::string to_json() {
+        std::stringstream ss;
+
+        ss << "\"module\" : {\n";
+        ss << " \"name\" : \"Fleet\",\n";
+
+        ss << " \"type\" : \"fleet\",\n";
+        ss << " \"tag\" : \"" << this->name << "\",\n";
+        ss << " \"id\": " << this->id << ",\n";
+
+        ss << " \"parameter\": {\n";
+        ss << " \"name\": \"log_Fmort\",\n";
+        ss << " \"id\":" << this->log_Fmort.id_m << ",\n";
+        ss << " \"type\": \"vector\",\n";
+        ss << " \"values\": " << this->log_Fmort << "\n},\n";
+
+        ss << " \"parameter\": {\n";
+        ss << " \"name\": \"log_Fmort\",\n";
+        ss << " \"id\":" << this->log_q.id_m << ",\n";
+        ss << " \"type\": \"vector\",\n";
+        ss << " \"values\": " << this->log_q << "\n},\n";
+
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"cnaa\",\n";
+        ss << "  \"values\":[";
+        if (this->derived_cnaa.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_cnaa.size() - 1; i++) {
+                ss << this->derived_cnaa[i] << ", ";
+            }
+            ss << this->derived_cnaa[this->derived_cnaa.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"cwaa\",\n";
+        ss << "  \"values\":[";
+        if (this->derived_cwaa.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_cwaa.size() - 1; i++) {
+                ss << this->derived_cwaa[i] << ", ";
+            }
+            ss << this->derived_cwaa[this->derived_cwaa.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"age_composition \",\n";
+        ss << "  \"values\":[";
+        if (this->derived_age_composition.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_age_composition.size() - 1; i++) {
+                ss << this->derived_age_composition[i] << ", ";
+            }
+            ss << this->derived_age_composition[this->derived_age_composition.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"index \",\n";
+        ss << "  \"values\":[";
+        if (this->derived_index.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_index.size() - 1; i++) {
+                ss << this->derived_index[i] << ", ";
+            }
+            ss << this->derived_index[this->derived_index.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        return ss.str();
+
+    }
+
+
+
 #ifdef TMB_MODEL
 
   template <typename Type>

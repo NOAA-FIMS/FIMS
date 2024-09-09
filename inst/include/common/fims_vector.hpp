@@ -510,4 +510,21 @@ std::ostream& operator<<(std::ostream& out, fims::Vector<Type>& v)
 }
 
 
+template<typename Type>
+std::ostream& operator <<(std::ostream& out, fims::Vector<Type>& v){
+    out<<"[";
+    
+    if(v.size() == 0){
+        out<<"]";
+        return out;
+    }
+    for(size_t i = 0; i< v.size()-1; i++){
+        out<<v[i]<<",";
+    }
+    
+    out<<v[v.size()-1]<<"]";
+    return out;
+}
+
+
 #endif

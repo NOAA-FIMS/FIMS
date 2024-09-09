@@ -162,6 +162,16 @@ public:
         }
     }
 
+    ParameterVector(const fims::Vector<double>& v) {
+        this->id_m = ParameterVector::id_g++;
+        this->storage_m = std::make_shared<std::vector<Parameter> >();
+        this->storage_m->resize(v.size());
+        for (size_t i = 0; i < v.size(); i++) {
+            storage_m->at(i).value_m = v[i];
+        }
+     
+    }
+
     /**
      *  @brief vector constructor
      *  @param v A vector of doubles.

@@ -419,6 +419,66 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
 
 
+    virtual void finalize() {
+        if (this->finalized) {
+            //log warning that finalize has been called more than once.
+            FIMS_WARNING_LOG("LogNormalLPDF  " + fims::to_string(this->id_m) + " has been finalized already.");
+        }
+
+        this->finalized = true; //indicate this has been called already
+
+
+        std::shared_ptr<fims_info::Information<double> > info =
+                fims_info::Information<double>::GetInstance();
+
+        fims_info::Information<double>::density_components_iterator it;
+
+        //search for density component in Information
+        it = info->density_components.find(this->id_m);
+        //if not found, just return
+        if (it == info->density_components.end()) {
+            FIMS_WARNING_LOG("LogNormalLPDF " + fims::to_string(this->id_m) + " not found in Information.");
+            return;
+        } else {
+            std::shared_ptr<fims_distributions::LogNormalLPDF<double> > dnorm =
+                    std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double> >(it->second);
+
+            this->lpdf_vec = Rcpp::NumericVector(dnorm->lpdf_vec.size());
+            for(size_t i=0; i < this->lpdf_vec.size(); i++) {
+                this->lpdf_vec[i] = dnorm->lpdf_vec[i];
+            }
+
+        }
+
+
+    }
+
+    virtual std::string to_json() {
+   
+        std::stringstream ss;
+        ss << "\"module\" : {\n";
+        ss << " \"name\": \"LogNormalLPDF\",\n";
+        ss << " \"type\": \"log_normal\",\n";
+        ss << " \"id\": " << this->id_m << ",\n";
+
+        ss << " \"density_component\": {\n";
+        ss << "  \"name\": \"lpdf_vec\",\n";
+        ss << "  \"values\":[";
+        if (this->lpdf_vec.size() == 0) {
+            ss << "]\n";
+        } else {
+            for(size_t i=0; i < this->lpdf_vec.size() - 1; i++) {
+                ss << this->lpdf_vec[i] << ", ";
+            }
+            ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
+        }
+        ss << " }\n]";
+
+        return ss.str();
+    }
+
+
+
 #ifdef TMB_MODEL
 
   template <typename Type>

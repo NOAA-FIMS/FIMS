@@ -164,6 +164,79 @@ public:
         return ss.str();
     }
 
+    virtual void finalize() {
+
+        if (this->finalized) {
+            //log warning that finalize has been called more than once.
+            FIMS_WARNING_LOG("Logistic Maturity  " + fims::to_string(this->id) + " has been finalized already.");
+        }
+
+        this->finalized = true; //indicate this has been called already
+
+
+        std::shared_ptr<fims_info::Information<double> > info =
+                fims_info::Information<double>::GetInstance();
+
+        fims_info::Information<double>::maturity_models_iterator it;
+
+
+        //search for maturity in Information
+        it = info->maturity_models.find(this->id);
+        //if not found, just return
+        if (it == info->maturity_models.end()) {
+            FIMS_WARNING_LOG("Logistic Maturity " + fims::to_string(this->id) + " not found in Information.");
+            return;
+        } else {
+            std::shared_ptr<fims_popdy::LogisticMaturity<double> > mat =
+                    std::dynamic_pointer_cast<fims_popdy::LogisticMaturity<double> >(it->second);
+
+            for (size_t i = 0; i < inflection_point.size(); i++) {
+                if (this->inflection_point[i].estimated_m) {
+                    this->inflection_point[i].estimated_value_m = mat->inflection_point[i];
+                } else {
+                    this->inflection_point[i].estimated_value_m = this->inflection_point[i].value_m;
+                }
+
+            }
+
+            for (size_t i = 0; i < slope.size(); i++) {
+                if (this->slope[i].estimated_m) {
+                    this->slope[i].estimated_value_m = mat->slope[i];
+                } else {
+                    this->slope[i].estimated_value_m = this->slope[i].value_m;
+                }
+
+            }
+
+
+        }
+    }
+
+    virtual std::string to_json() {
+        std::stringstream ss;
+        ss << "\"module\" : {\n";
+        ss << " \"name\": \"maturity\",\n";
+        ss << " \"type\": \"logistic\",\n";
+        ss << " \"id\": " << this->id << ",\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "   \"name\": \"inflection_point\",\n";
+        ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
+        ss << "   \"type\": \"vector\",\n";
+        ss << "   \"values\":" << this->inflection_point << ",\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "   \"name\": \"slope\",\n";
+        ss << "   \"id\":" << this->slope.id_m << ",\n";
+        ss << "   \"type\": \"vector\",\n";
+        ss << "   \"values\":" << this->slope << ",\n";
+
+
+        ss << "}";
+
+        return ss.str();
+    }
+
 #ifdef TMB_MODEL
 
   template <typename Type>
