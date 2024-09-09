@@ -136,7 +136,6 @@ Type objective_function<Type>::operator()(){
     std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
   rec->rzero = R0;
   rec->steep = h;
-  rec->log_sigma_recruit = logR_sd;
   /*the log_recruit_dev vector does not include a value for year == 0
     and is of length nyears - 1 where the first position of the vector
     corresponds to the second year of the time series.*/

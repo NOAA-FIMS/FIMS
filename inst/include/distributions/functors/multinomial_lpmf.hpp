@@ -53,7 +53,7 @@ namespace fims_distributions
             dims[1] = this->observed_values->get_jmax();
             
             Type lpdf = 0.0; /**< total log probability mass contribution of the distribution */
-            this->lpdf_vec.resize(dims[0]*dims[1]);
+            this->lpdf_vec.resize(dims[0]);
             std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0); 
                     
 
@@ -88,7 +88,7 @@ namespace fims_distributions
                         }
                     }
 
-                    this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, true);
+                    this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>) prob_vector, true);
                     lpdf += this->lpdf_vec[i];
                     /*
                     if (this->simulate_flag)

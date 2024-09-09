@@ -53,17 +53,24 @@ std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
 class FleetInterface : public FleetInterfaceBase {
   int interface_selectivity_id_m = -999; /**< id of selectivity component*/
 
- public:
+public:
+  std::string name = "NA"; /**< the name of the fleet */
   bool is_survey = false; /**< whether this is a survey fleet */
   int nages;              /**< number of ages in the fleet data*/
   int nyears;             /**< number of years in the fleet data */
-  double log_q;           /**< log of catchability for the fleet*/
+  ParameterVector log_q;  /**< log of catchability for the fleet*/
   ParameterVector
       log_Fmort;           /**< log of fishing mortality rate for the fleet*/
   ParameterVector log_expected_index; /**< expected index of abundance for the survey */
   ParameterVector proportion_catch_numbers_at_age; /**< expected catch numbers at age for the fleet */
   bool estimate_q = false; /**< whether the parameter q should be estimated*/
   bool random_q = false;             /**< whether q should be a random effect*/
+
+
+    Rcpp::NumericVector derived_cnaa; /**< derived quantity: catch numbers at age */
+    Rcpp::NumericVector derived_cwaa; /**< derived quantity: catch weight at age */
+    Rcpp::NumericVector derived_index; /**< derived quantity: expected index */
+    Rcpp::NumericVector derived_age_composition; /**< derived quantity: expected catch */
 
   FleetInterface() : FleetInterfaceBase() {}
 
@@ -80,8 +87,163 @@ class FleetInterface : public FleetInterfaceBase {
   void SetSelectivity(int selectivity_id) {
     interface_selectivity_id_m = selectivity_id;
   }
+    /** 
+     * @brief finalize function. Extracts derived quantities back to 
+     * the Rcpp interface object from the Information object. 
+     */
+    virtual void finalize() {
+
+        if (this->finalized) {
+            //log warning that finalize has been called more than once.
+            FIMS_WARNING_LOG("Fleet " + fims::to_string(this->id) + " has been finalized already.");
+        }
+
+        this->finalized = true; //indicate this has been called already
+
+        std::shared_ptr<fims_info::Information<double> > info =
+                fims_info::Information<double>::GetInstance();
+
+        fims_info::Information<double>::fleet_iterator it;
+
+
+        it = info->fleets.find(this->id);
+
+        if (it == info->fleets.end()) {
+            FIMS_WARNING_LOG("Fleet " + fims::to_string(this->id) + " not found in Information.");
+            return;
+        } else {
+
+            std::shared_ptr<fims_popdy::Fleet<double> > fleet =
+                    std::dynamic_pointer_cast<fims_popdy::Fleet<double> >(it->second);
+
+
+            for (size_t i = 0; i < this->log_Fmort.size(); i++) {
+                if (this->log_Fmort[i].estimated_m) {
+                    this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
+                } else {
+                    this->log_Fmort[i].final_value_m = this->log_Fmort[i].initial_value_m;
+                }
+            }
+
+            for (size_t i = 0; i < this->log_q.size(); i++) {
+                if (this->log_q[i].estimated_m) {
+                    this->log_q[i].final_value_m = fleet->log_q[i];
+                } else {
+                    this->log_q[i].final_value_m = this->log_q[i].initial_value_m;
+                }
+            }
+
+            this->derived_cnaa = Rcpp::NumericVector(fleet->catch_numbers_at_age.size());
+            for (size_t i = 0; i < this->derived_cnaa.size(); i++) {
+                this->derived_cnaa[i] = fleet->catch_numbers_at_age[i];
+            }
+
+            this->derived_cwaa = Rcpp::NumericVector(fleet->catch_weight_at_age.size());
+            for (size_t i = 0; i < this->derived_cwaa.size(); i++) {
+                this->derived_cwaa[i] = fleet->catch_weight_at_age[i];
+            }
+
+            this->derived_age_composition = Rcpp::NumericVector(fleet->proportion_catch_numbers_at_age.size());
+            for (size_t i = 0; i < this->derived_age_composition.size(); i++) {
+                this->derived_age_composition[i] = fleet->proportion_catch_numbers_at_age[i];
+            }
+
+            this->derived_index = Rcpp::NumericVector(fleet->expected_index.size());
+            for (size_t i = 0; i < this->derived_index.size(); i++) {
+                this->derived_index[i] = fleet->expected_index[i];
+            }
+
+        }
+
+    }
+
+    /**
+     * @brief Convert the data to json representation for the output.
+     */
+    virtual std::string to_json() {
+        std::stringstream ss;
+
+        ss << "\"module\" : {\n";
+        ss << " \"name\" : \"Fleet\",\n";
+
+        ss << " \"type\" : \"fleet\",\n";
+        ss << " \"tag\" : \"" << this->name << "\",\n";
+        ss << " \"id\": " << this->id << ",\n";
+
+        ss << " \"parameter\": {\n";
+        ss << " \"name\": \"log_Fmort\",\n";
+        ss << " \"id\":" << this->log_Fmort.id_m << ",\n";
+        ss << " \"type\": \"vector\",\n";
+        ss << " \"values\": " << this->log_Fmort << "\n},\n";
+
+        ss << " \"parameter\": {\n";
+        ss << " \"name\": \"log_Fmort\",\n";
+        ss << " \"id\":" << this->log_q.id_m << ",\n";
+        ss << " \"type\": \"vector\",\n";
+        ss << " \"values\": " << this->log_q << "\n},\n";
+
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"cnaa\",\n";
+        ss << "  \"values\":[";
+        if (this->derived_cnaa.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_cnaa.size() - 1; i++) {
+                ss << this->derived_cnaa[i] << ", ";
+            }
+            ss << this->derived_cnaa[this->derived_cnaa.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"cwaa\",\n";
+        ss << "  \"values\":[";
+        if (this->derived_cwaa.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_cwaa.size() - 1; i++) {
+                ss << this->derived_cwaa[i] << ", ";
+            }
+            ss << this->derived_cwaa[this->derived_cwaa.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"age_composition \",\n";
+        ss << "  \"values\":[";
+        if (this->derived_age_composition.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_age_composition.size() - 1; i++) {
+                ss << this->derived_age_composition[i] << ", ";
+            }
+            ss << this->derived_age_composition[this->derived_age_composition.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"index \",\n";
+        ss << "  \"values\":[";
+        if (this->derived_index.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_index.size() - 1; i++) {
+                ss << this->derived_index[i] << ", ";
+            }
+            ss << this->derived_index[this->derived_index.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        return ss.str();
+
+    }
+
+
 
 #ifdef TMB_MODEL
+
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type> > info =
@@ -97,19 +259,24 @@ class FleetInterface : public FleetInterfaceBase {
     fleet->nyears = this->nyears;
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
 
-    fleet->log_q = this->log_q;
-    if (this->estimate_q) {
+    fleet->log_q.resize(this->log_q.size());
+    for (size_t i = 0; i < this->log_q.size(); i++) {
+        fleet->log_q[i] = this->log_q[i].initial_value_m;
+
+      if (this->log_q[i].estimated_m) {
       info->RegisterParameterName("log_q");
-      if (this->random_q) {
-        info->RegisterRandomEffect(fleet->log_q);
-      } else {
-        info->RegisterParameter(fleet->log_q);
+          if (this->log_q[i].is_random_effect_m) {
+              info->RegisterRandomEffect(fleet->log_q[i]);
+          } else {
+              info->RegisterParameter(fleet->log_q[i]);
+          }
       }
     }
 
+
     fleet->log_Fmort.resize(this->log_Fmort.size());
     for (size_t i = 0; i < log_Fmort.size(); i++) {
-      fleet->log_Fmort[i] = this->log_Fmort[i].value_m;
+      fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
 
       if (this->log_Fmort[i].estimated_m) {
         info->RegisterParameterName("log_Fmort");
@@ -138,6 +305,7 @@ class FleetInterface : public FleetInterfaceBase {
 
   /** @brief this adds the values to the TMB model object */
   virtual bool add_to_fims_tmb() {
+    FIMS_INFO_LOG("adding Fleet object to TMB");
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();

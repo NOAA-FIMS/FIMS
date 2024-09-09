@@ -21,10 +21,20 @@
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
 #include "rcpp_objects/rcpp_tmb_distribution.hpp"
+
+
+SEXP FIMS_objective_function;
+SEXP FIMS_gradient_function;
+double FIMS_function_value = 0;
+Rcpp::NumericVector FIMS_function_gradient;
+double FIMS_mgc_value = 0;
+bool FIMS_finalized = false;
+
 /**
  * @brief Create the TMB model object and add interface objects to it.
  */
 bool CreateTMBModel() {
+  FIMS_INFO_LOG("adding FIMS objects to TMB");
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
        i++) {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
@@ -51,6 +61,103 @@ bool CreateTMBModel() {
   d3->CreateModel();
 
   return true;
+}
+
+void SetFIMSFunctions(SEXP fn, SEXP gr) {
+    FIMS_objective_function = fn;
+    FIMS_gradient_function = gr;
+}
+
+/**
+ * @brief Extracts derived quantities from model objects.
+ */
+void Finalize(Rcpp::NumericVector p) {
+    FIMS_finalized = true;
+    std::shared_ptr<fims_info::Information < double>> information =
+            fims_info::Information<double>::GetInstance();
+
+    std::shared_ptr<fims_model::Model < double>> model =
+            fims_model::Model<double>::GetInstance();
+
+    for (size_t i = 0; i < information->fixed_effects_parameters.size(); i++) {
+        *information->fixed_effects_parameters[i] = p[i];
+    }
+
+    model->Evaluate();
+
+    Rcpp::Function f = Rcpp::as<Rcpp::Function>(FIMS_objective_function);
+    Rcpp::Function g = Rcpp::as<Rcpp::Function>(FIMS_gradient_function);
+    double ret = Rcpp::as<double>(f(p));
+    Rcpp::NumericVector grad = Rcpp::as<Rcpp::NumericVector>(g(p));
+
+    FIMS_function_value = ret;
+    FIMS_function_gradient = grad;
+    std::cout << "Final value = " << FIMS_function_value << "\nGradient: \n";
+    double maxgc = -9999;
+    for (size_t i = 0; i < FIMS_function_gradient.size(); i++) {
+        if (std::fabs(FIMS_function_gradient[i]) > maxgc) {
+            maxgc = std::fabs(FIMS_function_gradient[i]);
+        }
+    }
+    FIMS_mgc_value = maxgc;
+    //        std::cout<<"mgc =  "<<maxgc<<"\n";
+
+
+    //    fims_info::Information < double>::population_iterator pit;
+    //    for (pit = information->populations.begin(); pit != information->populations.end(); ++pit) {
+    //        pit->second->Prepare();
+    //        pit->second->Evaluate();
+    //    }
+    //
+    //    fims_info::Information < double>::fleet_iterator fit;
+    //    for (fit = information->fleets.begin(); fit != information->fleets.end(); ++fit) {
+    //        fit->second->Prepare();
+    //        fit->second->Evaluate();
+    ////        double ac = fit->second->evaluate_age_comp_nll();
+    ////        double i = fit->second->evaluate_index_nll();
+    //    }
+
+
+    for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
+            i++) {
+        FIMSRcppInterfaceBase::fims_interface_objects[i]->finalize();
+    }
+}
+
+/**
+ * @brief Extracts derived quantities from model objects.
+ */
+std::string ToJSON() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
+    std::shared_ptr<fims_info::Information < double>> info =
+            fims_info::Information<double>::GetInstance();
+    std::stringstream ss;
+    ss << "{\n";
+    ss << "\"timestamp\": \"" << ctime_no_newline << "\",\n";
+    ss << "\"nyears\":" << info->nyears << ",\n";
+    ss << "\"nseasons\":" << info->nseasons << ",\n";
+    ss << "\"nages\":" << info->nages << ",\n";
+    ss << "\"finalized\":" << FIMS_finalized << ",\n";
+    ss << "\"objective_function_value\": " << FIMS_function_value << ",\n";
+    ss << "\"max_gradient_component\": " << FIMS_mgc_value << ",\n";
+    ss << "\"final_gradient\": [";
+    if (FIMS_function_gradient.size() > 0) {
+        for (size_t i = 0; i < FIMS_function_gradient.size() - 1; i++) {
+            ss << FIMS_function_gradient[i] << ", ";
+        }
+        ss << FIMS_function_gradient[FIMS_function_gradient.size() - 1] << "],\n";
+    } else {
+        ss << "],";
+    }
+    size_t length = FIMSRcppInterfaceBase::fims_interface_objects.size();
+    for (size_t i = 0; i < length - 1; i++) {
+        ss << FIMSRcppInterfaceBase::fims_interface_objects[i]->to_json() << ",\n";
+    }
+
+    ss << FIMSRcppInterfaceBase::fims_interface_objects[length - 1]->to_json() << "\n}";
+    return ss.str();
 }
 
 Rcpp::NumericVector get_fixed_parameters_vector() {
@@ -114,10 +221,10 @@ void clear_info_log() {
  * Clears the contents of fims log file.
  */
 void clear_fims_log() {
-  FIMS_LOG.flush();
+  FIMS_LOG_OLD.flush();
   std::ofstream CLEAR_LOG("logs/fims.log");
   CLEAR_LOG.close();
-  FIMS_LOG.seekp(0);
+  FIMS_LOG_OLD.seekp(0);
 }
 
 /**
@@ -339,12 +446,139 @@ void clear() {
   clear_internal<TMB_FIMS_FIRST_ORDER>();
   clear_internal<TMB_FIMS_SECOND_ORDER>();
   clear_internal<TMB_FIMS_THIRD_ORDER>();
+
+    FIMS_finalized = false;
+}
+
+/**
+ * Returns the entire log as a string in JSON format.
+ */
+std::string get_log() {
+    return fims::FIMSLog::fims_log->get_log();
+}
+
+/**
+ * Returns only error entries from log as a string in JSON format.
+ */
+std::string get_log_errors() {
+    return fims::FIMSLog::fims_log->get_errors();
+}
+
+/**
+ * Returns only warning entries from log as a string in JSON format.
+ */
+std::string get_log_warnings() {
+    return fims::FIMSLog::fims_log->get_warnings();
+}
+
+/**
+ * Returns only info entries from log as a string in JSON format.
+ */
+std::string get_log_info() {
+    return fims::FIMSLog::fims_log->get_info();
+}
+
+/**
+ * Returns log entries by module as a string in JSON format.
+ */
+std::string get_log_module(const std::string& module) {
+    return fims::FIMSLog::fims_log->get_module(module);
+}
+
+/**
+ * If true, writes the log on exit .
+ */
+void write_log(bool write) {
+    FIMS_INFO_LOG("Setting FIMS write log: " + fims::to_string(write));
+    fims::FIMSLog::fims_log->write_on_exit = write;
+}
+
+/**
+ * Sets the path for the log file to written.
+ */
+void set_log_path(const std::string& path) {
+    FIMS_INFO_LOG("Setting FIMS log path: " + path);
+    fims::FIMSLog::fims_log->set_path(path);
+}
+
+/**
+ * If true, throws a  runtime exception when an error is logged .
+ */
+void set_log_throw_on_error(bool throw_on_error) {
+    fims::FIMSLog::fims_log->throw_on_error = throw_on_error;
+}
+
+/**
+ * Initializes the logging system, sets all signal handling.
+ */
+void init_logging() {
+
+    FIMS_INFO_LOG("Initializing FIMS logging system.");
+    std::signal(SIGSEGV, &fims::WriteAtExit);
+    std::signal(SIGINT, &fims::WriteAtExit);
+    std::signal(SIGABRT, &fims::WriteAtExit);
+    std::signal(SIGFPE, &fims::WriteAtExit);
+    std::signal(SIGILL, &fims::WriteAtExit);
+    std::signal(SIGTERM, &fims::WriteAtExit);
+}
+
+/**
+ * Add log info entry from R.
+ */
+void log_info(std::string log_entry) {
+    fims::FIMSLog::fims_log->info_message(log_entry, -1, "R_env", "R_script_entry");
+}
+
+/**
+ * Add log warning entry from R.
+ */
+void log_warning(std::string log_entry) {
+    fims::FIMSLog::fims_log->warning_message(log_entry, -1, "R_env", "R_script_entry");
+}
+
+/**
+ * Add log error entry from R.
+ */
+void log_error(std::string log_entry) {
+
+    std::stringstream ss;
+    ss << "capture.output(traceback(4))";
+    SEXP expression, result;
+    ParseStatus status;
+
+    PROTECT(expression = R_ParseVector(Rf_mkString(ss.str().c_str()), 1, &status, R_NilValue));
+    if (status != PARSE_OK) {
+        std::cout << "Error parsing expression" << std::endl;
+        UNPROTECT(1);
+    }
+    Rcpp::Rcout << "before call.";
+    PROTECT(result = Rf_eval(VECTOR_ELT(expression, 0), R_GlobalEnv));
+    Rcpp::Rcout << "after call.";
+    UNPROTECT(2);
+    std::stringstream ss_ret;
+    ss_ret << "traceback:\n";
+    for (int j = 0; j < LENGTH(result); j++) {
+        std::string str(CHAR(STRING_ELT(result, j)));
+        ss_ret << str << "\n";
+    }
+
+    std::string ret = ss_ret.str(); //"find error";//Rcpp::as<std::string>(result);
+
+
+    //    Rcpp::Environment base = Rcpp::Environment::global_env();
+    //    Rcpp::Function f  = base["traceback"];
+    //    std::string ret = Rcpp::as<std::string>(f());
+    fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
+
 RCPP_MODULE(fims) {
   Rcpp::function("CreateTMBModel", &CreateTMBModel);
+  Rcpp::function("SetFIMSFunctions", &SetFIMSFunctions);
+  Rcpp::function("Finalize", &Finalize);
+  Rcpp::function("ToJSON", &ToJSON);
   Rcpp::function("get_fixed", &get_fixed_parameters_vector);
   Rcpp::function("get_random", &get_random_parameters_vector);
   Rcpp::function("get_parameter_names", &get_parameter_names);
@@ -362,12 +596,24 @@ RCPP_MODULE(fims) {
   Rcpp::function("clear_maturity_log", clear_maturity_log);
   Rcpp::function("clear_selectivity_log", clear_selectivity_log);
   Rcpp::function("clear_debug_log", clear_debug_log);
-
+  Rcpp::function("get_log", get_log);
+  Rcpp::function("get_log_errors", get_log_errors);
+  Rcpp::function("get_log_warnings", get_log_warnings);
+  Rcpp::function("get_log_info", get_log_info);
+  Rcpp::function("get_log_module", get_log_module);
+  Rcpp::function("write_log", write_log);
+  Rcpp::function("set_log_path", set_log_path);
+  Rcpp::function("init_logging", init_logging);
+  Rcpp::function("set_log_throw_on_error", set_log_throw_on_error);
+  Rcpp::function("log_info", log_info);
+  Rcpp::function("log_warning", log_warning);
+  Rcpp::function("log_error", log_error);
   Rcpp::class_<Parameter>("Parameter", "FIMS Parameter Class")
       .constructor()
       .constructor<double>()
       .constructor<Parameter>()
-      .field("value", &Parameter::value_m, "numeric parameter value")
+      .field("value", &Parameter::initial_value_m, "numeric parameter value")
+      .field("value", &Parameter::final_value_m, "numeric estimated parameter value")
       .field("min", &Parameter::min_m, "minimum parameter value")
       .field("max", &Parameter::max_m, "maximum parameter value")
       .field("id", &Parameter::id_m, "unique id for parameter class")
@@ -378,7 +624,10 @@ RCPP_MODULE(fims) {
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
-      .field("data", &ParameterVector::storage_m, "list where each element is a Parameter class")
+      .method("get", &ParameterVector::get)
+      .method("set", &ParameterVector::set)
+      .method("show", &ParameterVector::show)
+      //            .field("data", &ParameterVector::storage_m, "list where each element is a Parameter class")
       .method("at", &ParameterVector::at, "returns a Parameter at the indicated position given the index argument")
       .method("size", &ParameterVector::size, "returns the size of the Parameter Vector")
       .method("resize", &ParameterVector::resize, "resizes the Parameter Vector given the provided length argument")

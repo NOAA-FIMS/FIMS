@@ -16,12 +16,71 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+//#include "fims_log.hpp"
+
+
+#include <cstdlib>
+#include <chrono>
+#include <sstream>
+#include <iostream>
+#include <filesystem>
+#include <stdlib.h>
+#include <fstream>
+#include <signal.h>
+#include <csignal>
+#include <cstring>
+
+#include <stdexcept>
+
+
+#if defined(linux) || defined(__linux) || defined(__linux__)
+#define FIMS_LINUX
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#define FIMS_BSD
+#elif defined(sun) || defined(__sun)
+#define FIMS_SOLARIS
+#elif defined(__sgi)
+#define FIMS_IRIX
+#elif defined(__hpux)
+#define FIMS_HPUX
+#elif defined(__CYGWIN__)
+#define FIMS_CYGWIN
+#elif defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+#define FIMS_WIN32
+#elif defined(_WIN64) || defined(__WIN64__) || defined(WIN64)
+#define FIMS_WIN64
+#elif defined(__BEOS__)
+#define FIMS_BEOS
+#elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)
+#define FIMS_MACOS
+#elif defined(__IBMCPP__) || defined(_AIX)
+#define FIMS_AIX
+#elif defined(__amigaos__)
+#define FIMS_AMIGAOS
+#elif defined(__QNXNTO__)
+#define FIMS_QNXNTO
+#endif
+
+#if defined(FIMS_WIN32) || defined(FIMS_WIN64)
+#define FIMS_WINDOWS
+#endif
+
+#ifdef FIMS_WINDOWS
+#include <Windows.h>
+//#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
+#if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
+#ifdef FIMS_WINDOWS
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+#endif
 
 // The following rows initialize default log files for outputing model progress
 // comments used to assist in diagnosing model issues and tracking progress.
 // These files will only be created if a logs folder is added to the root model
 // directory.
-std::ofstream FIMS_LOG("logs/fims.log");   /**< Generic log file */
+std::ofstream FIMS_LOG_OLD("logs/fims.log");   /**< Generic log file */
 std::ofstream INFO_LOG("logs/info.log");   /**< Information.hpp log file */
 std::ofstream ERROR_LOG("logs/error.log"); /**< Error tracking log file */
 std::ofstream DATA_LOG("logs/data.log");   /**< Data input tracking log file */
@@ -50,31 +109,465 @@ std::ofstream DEBUG_LOG(
 
 namespace fims {
 
-/**
- * A static class for FIMS logging.
- */
+    /**
+     * Log entry.
+     */
+    struct LogEntry {
+        std::string timestamp; /*!<TODO: Document>*/
+        std::string message; /*!<TODO: Document>*/
+        std::string level; /*!<TODO: Document>*/
+        size_t rank; /*!<TODO: Document>*/
+        std::string user; /*!<TODO: Document>*/
+        std::string wd; /*!<TODO: Document>*/
+        std::string file; /*!<TODO: Document>*/
+        std::string func; /*!<TODO: Document>*/
+        int line; /*!<TODO: Document>*/
 
-class fims_log {
- public:
-  static std::map<std::string, std::ofstream>
-      FIMS_LOGS; /**< Map Log of files */
-  /**
-   * Static getter for retrieving a specific log file.
-   */
-  static std::ofstream& get(const std::string& l) {
-    typename std::map<std::string, std::ofstream>::iterator it;
-    it = fims_log::FIMS_LOGS.find(l);
-    if (it == fims_log::FIMS_LOGS.end()) {
-      std::ofstream& of = fims_log::FIMS_LOGS[l];
-      of.open(l.c_str());
+        /**
+         * Convert this object to a string.
+         */
+        std::string to_string() {
+            std::stringstream ss;
+            ss << "\"timestamp\" : " << "\"" << this->timestamp << "\"" << ",\n";
+            ss << "\"level\" : " << "\"" << this->level << "\",\n";
+            ss << "\"message\" : " << "\"" << this->message << "\",\n";
+            ss << "\"id\" : " << "\"" << this->rank << "\",\n";
+            ss << "\"user\" : " << "\"" << this->user << "\",\n";
+            ss << "\"wd\" : " << "\"" << this->wd << "\",\n";
+            ss << "\"file\" : " << "\"" << this->file << "\",\n";
+            ss << "\"routine\" : " << "\"" << this->func << "\",\n";
+            ss << "\"line\" : " << "\"" << this->line << "\"\n";
+            return ss.str();
+        }
+
+    };
+
+    /**
+     * FIMS logging class.
+     */
+    class FIMSLog {
+        std::vector<std::string> entries;
+        std::vector<LogEntry> log_entries;
+        size_t entry_number = 0;
+        std::string path = "fims.log";
+        size_t warning_count = 0;
+        size_t error_count = 0;
+
+        /**
+         * Get username.
+         *
+         * @return username.
+         */
+        std::string get_user() {
+            char * user;
+            std::string user_ret = "UNKOWN_USER";
+
+#ifdef FIMS_WINDOWS
+            user = getenv("username");
+            user_ret = std::string(user);
+#endif
+#ifdef FIMS_LINUX
+            user = getenv("USER");
+            user_ret = std::string(user);
+#endif
+
+#ifdef FIMS_MACOS
+            user = getenv("USER");
+            user_ret = std::string(user);
+#endif
+
+            return user_ret;
+        }
+    public:
+        bool write_on_exit = true; /*!<TODO: Document>*/
+        bool throw_on_error = false; /*!<TODO: Document>*/
+        static std::shared_ptr<FIMSLog> fims_log; /*!<TODO: Document>*/
+
+        /**
+         * Default constructor.
+         */
+        FIMSLog() {
+
+        }
+
+        /**
+         * Destructor. If write_on_exit is set to true,
+         * the log will be written to the disk in JSON format.
+         */
+        ~FIMSLog() {
+            if (this->write_on_exit) {
+                std::ofstream log(this->path);
+                log << this->get_log();
+                log.close();
+            }
+        }
+
+        /**
+         * Set a path for the log file.
+         *
+         * @param path
+         */
+        void set_path(std::string path) {
+            this->path = path;
+        }
+
+        /**
+         * Get the path for the log file.
+         *
+         * @return
+         */
+        std::string get_path() {
+            return this->path;
+        }
+
+        /**
+         * Add a "info" level message to the log.
+         *
+         * @param str
+         * @param line
+         * @param file
+         * @param func
+         */
+        void info_message(std::string str, int line, const char* file, const char* func) {
+
+            std::filesystem::path cwd = std::filesystem::current_path();
+            std::stringstream ss;
+            auto now = std::chrono::system_clock::now();
+            std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+            std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
+
+            LogEntry l;
+            l.timestamp = ctime_no_newline;
+            l.message = str;
+            l.level = "info";
+            l.rank = this->log_entries.size();
+            l.user = this->get_user();
+            l.wd = cwd.string();
+            l.file = file;
+            l.line = line;
+            l.func = func;
+            this->log_entries.push_back(l);
+
+        }
+
+        /**
+         * Add a "debug" level message to the log.
+         *
+         * @param str
+         * @param line
+         * @param file
+         * @param func
+         */
+        void debug_message(std::string str, int line, const char* file, const char* func) {
+
+            std::filesystem::path cwd = std::filesystem::current_path();
+            std::stringstream ss;
+            auto now = std::chrono::system_clock::now();
+            std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+            std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
+
+            LogEntry l;
+            l.timestamp = ctime_no_newline;
+            l.message = str;
+            l.level = "debug";
+            l.rank = this->log_entries.size();
+            l.user = this->get_user();
+            l.wd = cwd.string();
+            l.file = file;
+            l.line = line;
+            l.func = func;
+            this->log_entries.push_back(l);
+
+        }
+
+        /**
+         * Add a "error" level message to the log.
+         *
+         * @param str
+         * @param line
+         * @param file
+         * @param func
+         */
+        void error_message(std::string str, int line, const char* file, const char* func) {
+            this->error_count++;
+            std::filesystem::path cwd = std::filesystem::current_path();
+
+            std::stringstream ss;
+            auto now = std::chrono::system_clock::now();
+            std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+            std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
+
+            LogEntry l;
+            l.timestamp = ctime_no_newline;
+            l.message = str;
+            l.level = "error";
+            l.rank = this->log_entries.size();
+            l.user = this->get_user();
+            l.wd = cwd.string();
+            l.file = file;
+            l.line = line;
+            l.func = func;
+            this->log_entries.push_back(l);
+
+            if (this->throw_on_error) {
+                std::stringstream ss;
+                ss << "\n\n" << l.to_string() << "\n\n";
+                throw std::runtime_error(ss.str().c_str());
+            }
+
+        }
+
+        /**
+         * Add a "warning" level message to the log.
+         *
+         * @param str
+         * @param line
+         * @param file
+         * @param func
+         */
+        void warning_message(std::string str, int line, const char* file, const char* func) {
+            this->warning_count++;
+            std::filesystem::path cwd = std::filesystem::current_path();
+
+            std::stringstream ss;
+            auto now = std::chrono::system_clock::now();
+            std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+            std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
+
+            LogEntry l;
+            l.timestamp = ctime_no_newline;
+            l.message = str;
+            l.level = "warning";
+            l.rank = this->log_entries.size();
+            l.user = this->get_user();
+            l.wd = cwd.string();
+            l.file = file;
+            l.line = line;
+            l.func = func;
+            this->log_entries.push_back(l);
+
+        }
+
+        /**
+         * Get the log as a string.
+         *
+         * @return
+         */
+        std::string get_log() {
+            std::stringstream ss;
+            if (log_entries.size() == 0) {
+                ss << "[\n]";
+            } else {
+                ss << "[\n";
+                for (size_t i = 0; i < log_entries.size() - 1; i++) {
+                    ss << "{\n" << this->log_entries[i].to_string() << "},\n";
+
+                }
+                ss << "{\n" << this->log_entries[log_entries.size() - 1].to_string() << "}\n]";
+            }
+            return ss.str();
+        }
+
+        /**
+         * Return only error entries from the log.
+         *
+         * @return
+         */
+        std::string get_errors() {
+            std::stringstream ss;
+            std::vector<LogEntry> errors;
+            for (size_t i = 0; i < log_entries.size(); i++) {
+                if (log_entries[i].level == "error") {
+                    errors.push_back(this->log_entries[i]);
+                }
+            }
+
+            if (errors.size() == 0) {
+                ss << "[\n]";
+            } else {
+                ss << "[\n";
+                for (size_t i = 0; i < errors.size() - 1; i++) {
+
+                    ss << "{\n" << errors[i].to_string() << "},\n";
+
+                }
+
+                ss << "{\n" << errors[errors.size() - 1].to_string() << "}\n]";
+
+            }
+            return ss.str();
+        }
+
+        /**
+         * Return only warning entries from the log.
+         *
+         * @return
+         */
+        std::string get_warnings() {
+            std::stringstream ss;
+            std::vector<LogEntry> warnings;
+            for (size_t i = 0; i < log_entries.size(); i++) {
+                if (log_entries[i].level == "warning") {
+                    warnings.push_back(this->log_entries[i]);
+                }
+            }
+
+            if (warnings.size() == 0) {
+                ss << "[\n]";
+            } else {
+                ss << "[\n";
+                for (size_t i = 0; i < warnings.size() - 1; i++) {
+
+                    ss << "{\n" << warnings[i].to_string() << "},\n";
+
+                }
+
+                ss << "{\n" << warnings[warnings.size() - 1].to_string() << "}\n]";
+
+            }
+            return ss.str();
+        }
+
+        /**
+         * Return only info entries from the log.
+         *
+         * @return
+         */
+        std::string get_info() {
+            std::stringstream ss;
+            std::vector<LogEntry> info;
+            for (size_t i = 0; i < log_entries.size(); i++) {
+                if (log_entries[i].level == "info") {
+                    info.push_back(this->log_entries[i]);
+                }
+            }
+
+            if (info.size() == 0) {
+                ss << "[\n]";
+            } else {
+                ss << "[\n";
+                for (size_t i = 0; i < info.size() - 1; i++) {
+
+                    ss << "{\n" << info[i].to_string() << "},\n";
+
+                }
+
+                ss << "{\n" << info[info.size() - 1].to_string() << "}\n]";
+
+            }
+            return ss.str();
+        }
+
+        /**
+         * Query the log by module.
+         *
+         * @param module
+         * @return
+         */
+        std::string get_module(const std::string& module) {
+            std::stringstream ss;
+            std::vector<LogEntry> info;
+            for (size_t i = 0; i < log_entries.size(); i++) {
+                if (log_entries[i].file.find(module) != std::string::npos) {
+                    info.push_back(this->log_entries[i]);
+                }
+            }
+
+            if (info.size() == 0) {
+                ss << "[\n]";
+            } else {
+                ss << "[\n";
+                for (size_t i = 0; i < info.size() - 1; i++) {
+
+                    ss << "{\n" << info[i].to_string() << "},\n";
+
+                }
+
+                ss << "{\n" << info[info.size() - 1].to_string() << "}\n]";
+
+            }
+            return ss.str();
+        }
+
+        /**
+         * @brief Get the counts of the number of errors
+         */
+        size_t get_error_count() const {
+            return error_count;
+        }
+
+        /**
+         * @brief Get the counts of the number of warnings
+         */
+        size_t get_warning_count() const {
+            return warning_count;
+        }
+
+
+
+    };
+
+
+    std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
+
+} // namespace fims
+
+
+
+
+
+#ifdef FIMS_DEBUG
+
+#define FIMS_DEBUG_LOG(MESSAGE) FIMSLog::fims_log->debug_message(MESSAGE, __LINE__, __FILE__, __PRETTY_FUNCTION__);
+
+#else
+
+#define FIMS_DEBUG_LOG(MESSAGE) /**< Print MESSAGE to debug log */
+
+#endif
+
+#define FIMS_INFO_LOG(MESSAGE) fims::FIMSLog::fims_log->info_message(MESSAGE, __LINE__, __FILE__, __PRETTY_FUNCTION__); /**< Print MESSAGE to info log */
+
+#define FIMS_WARNING_LOG(MESSAGE) fims::FIMSLog::fims_log->warning_message(MESSAGE, __LINE__, __FILE__, __PRETTY_FUNCTION__); /**< Print MESSAGE to warning log */
+
+#define FIMS_ERROR_LOG(MESSAGE) fims::FIMSLog::fims_log->error_message(MESSAGE, __LINE__, __FILE__, __PRETTY_FUNCTION__); /**< Print MESSAGE to error log */
+
+#define FIMS_STR(s) #s  /**< String of s */
+
+
+namespace fims {
+
+    /**
+     * Signal intercept function. Writes the log to the disk before
+     * a crash occurs.
+     *
+     * @param sig
+     */
+    void WriteAtExit(int sig) {
+
+
+        if (FIMSLog::fims_log->write_on_exit) {
+            std::ofstream log(FIMSLog::fims_log->get_path());
+            log << FIMSLog::fims_log->get_log();
+            log.close();
+        }
+        std::signal(sig, SIG_DFL);
+        raise(sig);
     }
 
-    return fims_log::FIMS_LOGS[l];
-  }
-};
+    /**
+     * Converts an object T to a string.
+     *
+     * @param v
+     * @return
+     */
+    template<typename T>
+    std::string to_string(T v) {
+        std::stringstream ss;
+        ss << v;
+        return ss.str();
+    }
 
-std::map<std::string, std::ofstream> fims_log::FIMS_LOGS;
-
-}  // namespace fims
+}
 
 #endif /* TRAITS_HPP */

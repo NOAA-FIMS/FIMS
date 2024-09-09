@@ -21,7 +21,7 @@
  */
 class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
  public:
-  static uint32_t id_g; /**< static id of the population interface base*/
+    static uint32_t id_g; /**< static id of the population interface base*/
   uint32_t id;          /**< id of the population interface base */
   // live objects in C++ are objects that have been created and live in memory
   static std::map<uint32_t, PopulationInterfaceBase*>
@@ -68,6 +68,18 @@ class PopulationInterface : public PopulationInterfaceBase {
                                             of female individuals */
   bool estimate_prop_female; /**<whether proportion female should be estimated*/
 
+
+
+    Rcpp::NumericVector derived_ssb; /**< derived quantity: spawning stock biomass */
+    Rcpp::NumericVector derived_naa; /**< derived quantity: numbers at age */
+    Rcpp::NumericVector derived_biomass; /**< derived quantity: biomass */
+    Rcpp::NumericVector derived_recruitment; /**< derived quantity: recruitment */
+
+    Rcpp::NumericVector estimated_log_M; /**< derived quantity: natural log mortality */
+    Rcpp::NumericVector estimated_log_init_naa; /**< derived quantity: natural log initial numbers at age */
+    Rcpp::NumericVector estimated_proportion_female; /**< TODO: delete */
+    std::string name; /**< TODO: document*/
+
   PopulationInterface() : PopulationInterfaceBase() {}
 
   virtual ~PopulationInterface() {}
@@ -103,6 +115,193 @@ class PopulationInterface : public PopulationInterfaceBase {
     return population.Evaluate();
   }
 
+    /** 
+     * @brief finalize function. Extracts derived quantities back to 
+     * the Rcpp interface object from the Information object. 
+     */
+    virtual void finalize() {
+
+        if (this->finalized) {
+            //log warning that finalize has been called more than once.
+            FIMS_WARNING_LOG("Population " + fims::to_string(this->id) + " has been finalized already.");
+        }
+
+        this->finalized = true; //indicate this has been called already
+
+        std::shared_ptr<fims_info::Information<double> > info =
+                fims_info::Information<double>::GetInstance();
+
+
+
+
+        this->estimated_log_M = Rcpp::NumericVector(this->log_M.size());
+        for (size_t i = 0; i < this->log_M.size(); i++) {
+            this->estimated_log_M[i] = this->log_M[i].initial_value_m;
+        }
+
+        this->estimated_log_init_naa = Rcpp::NumericVector(this->log_init_naa.size());
+        for (size_t i = 0; i < this->log_init_naa.size(); i++) {
+            this->estimated_log_init_naa[i] = this->log_init_naa[i].initial_value_m;
+        }
+
+        this->estimated_proportion_female = Rcpp::NumericVector(this->proportion_female.size());
+        for (size_t i = 0; i < this->proportion_female.size(); i++) {
+            this->estimated_proportion_female[i] = this->proportion_female[i];
+        }
+
+        fims_info::Information<double>::population_iterator it;
+
+
+        it = info->populations.find(this->id);
+
+        std::shared_ptr<fims_popdy::Population<double> > pop =
+                info->populations[this->id];
+        it = info->populations.find(this->id);
+        if (it == info->populations.end()) {
+            FIMS_WARNING_LOG("Population " + fims::to_string(this->id) + " not found in Information.");
+            return;
+        } else {
+
+            if (this->estimated_log_M) {
+                for (size_t i = 0; i < this->log_M.size(); i++) {
+                    this->estimated_log_M[i] = pop->log_M[i];
+                }
+            }
+
+            if (this->estimated_log_init_naa) {
+                for (size_t i = 0; i < this->log_init_naa.size(); i++) {
+                    this->estimated_log_init_naa[i] = pop->log_init_naa[i];
+                }
+            }
+
+            if (this->estimate_prop_female) {
+                for (size_t i = 0; i < this->proportion_female.size(); i++) {
+                    this->estimated_proportion_female[i] = pop->proportion_female[i];
+                }
+            }
+
+            this->derived_naa = Rcpp::NumericVector(pop->numbers_at_age.size());
+            this->derived_ssb = Rcpp::NumericVector(pop->spawning_biomass.size());
+            this->derived_biomass = Rcpp::NumericVector(pop->biomass.size());
+            this->derived_recruitment = Rcpp::NumericVector(pop->expected_recruitment.size());
+
+            //set naa from Information/
+            for (size_t i = 0; i < this->derived_naa.size(); i++) {
+                this->derived_naa[i] = pop->numbers_at_age[i];
+            }
+
+            //set ssb from Information/
+            for (size_t i = 0; i < this->derived_ssb.size(); i++) {
+                this->derived_ssb[i] = pop->spawning_biomass[i];
+            }
+
+            //set biomass from Information
+            for (size_t i = 0; i < this->derived_biomass.size(); i++) {
+                this->derived_biomass[i] = pop->biomass[i];
+            }
+
+            //set recruitment from Information/
+            for (size_t i = 0; i < this->derived_recruitment.size(); i++) {
+                this->derived_recruitment[i] = pop->expected_recruitment[i];
+            }
+
+        }
+
+    }
+
+    /**
+     * @brief Convert the data to json representation for the output.
+     */
+    virtual std::string to_json() {
+        std::stringstream ss;
+
+        ss << "\"module\" : {\n";
+        ss << " \"name\" : \"Population\",\n";
+
+        ss << " \"type\" : \"population\",\n";
+        ss << " \"tag\" : \"" << this->name << "\",\n";
+        ss << " \"id\": " << this->id << ",\n";
+        ss << " \"recruitment_id\": " << this->recruitment_id << ",\n";
+        ss << " \"growth_id\": " << this->growth_id << ",\n";
+        ss << " \"maturity_id\": " << this->maturity_id << ",\n";
+
+        ss << " \"parameter\": {\n";
+        ss << " \"name\": \"log_M\",\n";
+        ss << " \"id\":" << -999 << ",\n";
+        ss << " \"type\": \"vector\",\n";
+        ss << " \"values\": " << this->log_M << "\n},\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "  \"name\": \"log_init_naa\",\n";
+        ss << "  \"id\":" << -999 << ",\n";
+        ss << "  \"type\": \"vector\",\n";
+        ss << "  \"values\":" << this->log_init_naa << " \n},\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "  \"name\": \"proportion_female\",\n";
+        ss << "  \"id\":" << -999 << ",\n";
+        ss << "  \"type\": \"vector\",\n";
+        ss << "  \"values\":" << this->proportion_female << "\n},\n";
+
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"ssb\",\n";
+        ss << "  \"values\":[";
+        if (this->derived_ssb.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_ssb.size() - 1; i++) {
+                ss << this->derived_ssb[i] << ", ";
+            }
+            ss << this->derived_ssb[this->derived_ssb.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "   \"name\": \"naa\",\n";
+        ss << "   \"values\":[";
+        if (this->derived_naa.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_naa.size() - 1; i++) {
+                ss << this->derived_naa[i] << ", ";
+            }
+            ss << this->derived_naa[this->derived_naa.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "   \"name\": \"biomass\",\n";
+        ss << "   \"values\":[";
+        if (this->derived_biomass.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_biomass.size() - 1; i++) {
+                ss << this->derived_biomass[i] << ", ";
+            }
+            ss << this->derived_biomass[this->derived_biomass.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "   \"name\": \"recruitment\",\n";
+        ss << "   \"values\":[";
+        if (this->derived_recruitment.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_recruitment.size() - 1; i++) {
+                ss << this->derived_recruitment[i] << ", ";
+            }
+            ss << this->derived_recruitment[this->derived_recruitment.size() - 1] << "]\n";
+        }
+        ss << " }\n";
+
+        ss << "}";
+
+        return ss.str();
+    }
+
+
 #ifdef TMB_MODEL
 
   template <typename Type>
@@ -131,16 +330,16 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->log_M.resize(this->log_M.size());
     population->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {
-      population->log_M[i] = this->log_M[i].value_m;
+      population->log_M[i] = this->log_M[i].initial_value_m;
       if (this->log_M[i].estimated_m) {
-        info->RegisterParameterName("log_M");
-        info->RegisterParameter(population->log_M[i]);
+          info->RegisterParameterName("log_M");
+          info->RegisterParameter(population->log_M[i]);
       }
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
-      population->log_init_naa[i] = this->log_init_naa[i].value_m;
+      population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
       if (this->log_init_naa[i].estimated_m) {
         info->RegisterParameterName("log_init_naa");
         info->RegisterParameter(population->log_init_naa[i]);
@@ -169,6 +368,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
   virtual bool add_to_fims_tmb() {
+    FIMS_INFO_LOG("adding Population object to TMB");
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();

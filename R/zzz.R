@@ -4,15 +4,15 @@ Rcpp::loadModule(module = "fims", what = TRUE)
   library.dynam.unload("FIMS", libpath)
 }
 
-setMethod("[<-", signature(x = "Rcpp_ParameterVector", i = "numeric"),
-          function(x, i) {
-            (x$at(i))
-             return(x)
-          })
+
+setMethod("[<-", signature(x = "Rcpp_ParameterVector"), function(x, i, j, value) {
+  x$set(i - 1, value)  # R uses 1-based indexing, C++ uses 0-based indexing
+  x  # Return the modified object
+})
 
 setMethod("[", signature(x = "Rcpp_ParameterVector", i = "numeric"),
           function(x, i) {
-            return(x$at(i))
+            return(x$get(i-1))
           })
 
 # setMethod("lapply", signature(X = "Rcpp_ParameterVector", FUN = "sum"),

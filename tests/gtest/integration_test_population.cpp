@@ -218,10 +218,10 @@ namespace
                     typename JsonObject::iterator fleet2_index;
                     fleet2_index = it->second.GetObject().find("survey1");
                     JsonArray &fleet_index = (*fleet2_index).second.GetArray();
-                    EXPECT_EQ(pop.fleets[0]->q, 1.0);
+                    EXPECT_EQ(pop.fleets[0]->q[0], 1.0);
                     // Do not use EXPECT_EQ to compare floats or doubles
                     // Use EXPECT_NEAR here
-                    EXPECT_NEAR(pop.fleets[1]->q, fleet_q[0].GetDouble(), 1.0e-07);
+                    EXPECT_NEAR(pop.fleets[1]->q[0], fleet_q[0].GetDouble(), 1.0e-07);
                     
                         if(pop.fleets[1]->is_survey){
                     for (int year = 0; year < pop.nyears; year++)

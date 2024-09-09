@@ -36,10 +36,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   // Mortality and catchability
   fims::Vector<Type>
       log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  Type log_q;    /*!< estimated parameter: catchability of the fleet */
+  fims::Vector<Type> log_q; /*!< estimated parameter: catchability of the fleet */
 
   fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
-  Type q; /*!< transofrmed parameter: the catchability of the fleet */
+  fims::Vector<Type> q; /*!< transofrmed parameter: the catchability of the fleet */
 
   // derived quantities
   fims::Vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
@@ -83,6 +83,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    * @param nages The number of ages in the model.
    */
   void Initialize(int nyears, int nages) {
+    if(this->log_q.size()==0){
+        this->log_q.resize(1);
+        this->log_q[0] = 0.0;
+    }
     this->nyears = nyears;
     this->nages = nages;
 
@@ -92,8 +96,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     catch_index.resize(nyears);  // assume index is for all ages.
     expected_catch.resize(nyears);
     expected_index.resize(nyears);
+    log_expected_index.resize(nyears);
     age_composition.resize(nyears * nages);
-
+    q.resize(this->log_q.size());
     log_Fmort.resize(nyears);
     Fmort.resize(nyears);
   }
@@ -125,7 +130,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
               0); /**<model expected catch at age*/
     std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
               0); /**<model expected weight at age*/
-    this->q = fims_math::exp(this->log_q);
+  
+    for (size_t i = 0; i < this->log_q.size(); i++) {
+        this->q[i] = fims_math::exp(this->log_q[i]);
+    }
+
     for (size_t year = 0; year < this->nyears; year++) {
       FLEET_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
       FLEET_LOG << "input q " << this->log_q << std::endl;

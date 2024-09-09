@@ -170,6 +170,7 @@ class Information {
    * Loop over distributions and set links to distribution x value if distribution is a prior type.
    */
   void setup_priors(){
+       FIMS_INFO_LOG("segment");
     for(density_components_iterator it = density_components.begin(); it!= density_components.end(); ++it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
       if(d->input_type == "prior"){
@@ -193,6 +194,7 @@ class Information {
    * Loop over distributions and set links to distribution x value if distribution is a random effects type.
    */
   void setup_random_effects(){
+       FIMS_INFO_LOG("segment");
     for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
       if(d->input_type == "random_effects"){
@@ -216,6 +218,7 @@ class Information {
    * Loop over distributions and set links to distribution expected value if distribution is a data type.
    */
   void setup_data(){
+       FIMS_INFO_LOG("segment");
     for(density_components_iterator it = this->density_components.begin(); it!= this->density_components.end(); ++it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
       if(d->input_type == "data"){
@@ -256,12 +259,13 @@ class Information {
         << std::endl;
     INFO_LOG << "Initializing fleet objects for " << this->fleets.size()
              << " fleets." << std::endl;
+    FIMS_INFO_LOG("segment");
     for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
          ++it) {
 
       std::shared_ptr<fims_popdy::Fleet<Type> > f = (*it).second;
       INFO_LOG << "Initializing fleet " << f->id << "." << std::endl;
-
+ FIMS_INFO_LOG("segment");
       f->Initialize(f->nyears, f->nages);
 
       INFO_LOG << "Checking for available fleet selectivity pattern."
@@ -274,18 +278,19 @@ class Information {
             sel_id);  // if find, set it, otherwise invalid
         INFO_LOG << "Input fleet selectivity pattern id = " << sel_id << "."
                  << std::endl;
-
+ FIMS_INFO_LOG("segment");
         if (it != this->selectivity_models.end()) {
           f->selectivity = (*it).second;  // elements in container held in pair
                                           // (first is id, second is object -
                                           // shared pointer to distribution)
           INFO_LOG << "Selectivity successfully set." << std::endl;
+           FIMS_INFO_LOG("segment");
         } else {
           valid_model = false;
+           FIMS_INFO_LOG("segment");
           ERROR_LOG
               << "Error: Expected selectivity pattern not defined for fleet "
               << f->id << ", selectivity pattern " << sel_id << std::endl;
-          exit(1);
         }
 
       } else {
@@ -293,39 +298,40 @@ class Information {
         ERROR_LOG << "Error: No selectivity pattern defined for fleet " << f->id
                   << ". FIMS requires selectivity be defined for all fleets."
                   << std::endl;
-        exit(1);
       }
       // end set selectivity
     }
     INFO_LOG << "Expecting to import " << this->data_objects.size()
                << " data objects." << std::endl;
+     FIMS_INFO_LOG("segment");
     for(density_components_iterator it = this->density_components.begin();
         it!= this->density_components.end(); ++it){
       std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
       INFO_LOG << "Checking for available density components data objects."
           << std::endl;
+       FIMS_INFO_LOG("segment");
       //set data objects if distribution is a data type
       if(d->input_type == "data"){
         if(d->observed_data_id_m != -999){
           uint32_t observed_data_id = static_cast<uint32_t>(d->observed_data_id_m);
           data_iterator it = this->data_objects.find(observed_data_id);
           INFO_LOG << "Input data id = " << observed_data_id << "." << std::endl;
-
+ FIMS_INFO_LOG("segment");
           if (it != this->data_objects.end()) {
             d->observed_values = (*it).second;
             INFO_LOG << "Data for density component, " << d->id << " successfully set." << std::endl;
             DATA_LOG << "" << std::endl;
+             FIMS_INFO_LOG("segment");
           } else {
             valid_model = false;
             ERROR_LOG << "Error: Expected data observations not defined for density component "
                       << d->id << ", observed data " << observed_data_id << std::endl;
-            exit(1);
+             FIMS_INFO_LOG("segment");
           }
 
         } else {
           valid_model = false;
           ERROR_LOG << "Error: No data input for density " << d->id << std::endl;
-          exit(1);
         }
       }
       // end set data
@@ -335,6 +341,7 @@ class Information {
              << this->populations.size() << " populations." << std::endl;
     for (population_iterator it = this->populations.begin();
          it != this->populations.end(); ++it) {
+         FIMS_INFO_LOG("segment");
       std::shared_ptr<fims_popdy::Population<Type> > p = (*it).second;
 
       INFO_LOG << "Setting up links from population " << p->id
@@ -349,6 +356,7 @@ class Information {
         // from population to fleets?
         // any shared member in p (population is pushed into fleets)
         p->fleets.push_back(f);
+         FIMS_INFO_LOG("segment");
         INFO_LOG << f->id << " " << std::flush;
       }
       INFO_LOG << "]" << std::endl;
@@ -359,6 +367,7 @@ class Information {
       INFO_LOG << "Checking for available recruitment function." << std::endl;
       // set recruitment
       if (p->recruitment_id != -999) {
+           FIMS_INFO_LOG("segment");
         uint32_t recruitment_uint = static_cast<uint32_t>(p->recruitment_id);
         recruitment_models_iterator it =
             this->recruitment_models.find(recruitment_uint);
@@ -374,7 +383,6 @@ class Information {
                        "population "
                     << p->id << ", recruitment function " << recruitment_uint
                     << std::endl;
-          exit(1);
         }
 
       } else {
@@ -384,7 +392,6 @@ class Information {
                   << ". FIMS requires recruitment functions be defined for all "
                      "populations."
                   << std::endl;
-        exit(1);
       }
 
       INFO_LOG << "Checking for available growth function." << std::endl;
@@ -393,6 +400,7 @@ class Information {
         uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
         growth_models_iterator it = this->growth_models.find(
             growth_uint);  // growth_models is specified in information.hpp
+         FIMS_INFO_LOG("segment");
         // and used in rcpp
         // at the head of information.hpp; are the
         // dimensions of ages defined in rcpp or where?
@@ -404,10 +412,10 @@ class Information {
           INFO_LOG << "Growth function successfully set." << std::endl;
         } else {
           valid_model = false;
+           FIMS_INFO_LOG("segment");
           ERROR_LOG
               << "Error: Expected growth function not defined for population "
               << p->id << ", growth function " << growth_uint << std::endl;
-          exit(1);
         }
 
       } else {
@@ -417,12 +425,12 @@ class Information {
                   << ". FIMS requires growth functions be defined for all "
                      "populations."
                   << std::endl;
-        exit(1);
       }
 
       INFO_LOG << "Checking for available maturity function." << std::endl;
       // set maturity
       if (p->maturity_id != -999) {
+           FIMS_INFO_LOG("segment");
         uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
         maturity_models_iterator it = this->maturity_models.find(
             maturity_uint);  // >maturity_models is specified in
@@ -436,9 +444,8 @@ class Information {
           ERROR_LOG
               << "Error: Expected maturity function not defined for population "
               << p->id << ", maturity function " << maturity_uint << std::endl;
-          exit(1);
         }
-
+ FIMS_INFO_LOG("segment");
       } else {
         valid_model = false;
         ERROR_LOG << "Error: No maturity function defined for population "
@@ -446,13 +453,13 @@ class Information {
                   << ". FIMS requires maturity functions be defined for all "
                      "populations."
                   << std::endl;
-        exit(1);
       }
+       FIMS_INFO_LOG("segment");
       INFO_LOG << "Completed initialization for population " << p->id << "."
                << std::endl;
     }
     INFO_LOG << "Completed initialization of all populations." << std::endl;
-
+ FIMS_INFO_LOG("segment");
     //setup priors, random effect, and data density components
     setup_priors();
 

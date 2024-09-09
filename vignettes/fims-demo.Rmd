@@ -110,12 +110,25 @@ Each variable of [Parameter class](https://github.com/NOAA-FIMS/FIMS/blob/main/i
 ```{r fleet_selectivity}
 methods::show(LogisticSelectivity)
 fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
-fishing_fleet_selectivity$inflection_point$value <- 2.0
-fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
-fishing_fleet_selectivity$inflection_point$estimated <- TRUE
-fishing_fleet_selectivity$slope$value <- 1.0
-fishing_fleet_selectivity$slope$is_random_effect <- FALSE
-fishing_fleet_selectivity$slope$estimated <- TRUE
+fishing_fleet_selectivity$inflection_point[1]$value <- 2.0
+fishing_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
+fishing_fleet_selectivity$inflection_point[1]$estimated <- TRUE
+
+# Set to not be time-varying but else statement shows how to make the
+# parameter be time-varying, with a different value for every year
+time_varying <- FALSE
+if (!time_varying) {
+  fishing_fleet_selectivity$slope[1]$value <- 1.0
+  fishing_fleet_selectivity$slope[1]$is_random_effect <- FALSE
+  fishing_fleet_selectivity$slope[1]$estimated <- TRUE
+} else {
+  fishing_fleet_selectivity$slope$resize(nyears)
+  for (i in 1:nyears) {
+    fishing_fleet_selectivity$slope[i]$value <- 1.0
+    fishing_fleet_selectivity$slope[i]$is_random_effect <- FALSE
+    fishing_fleet_selectivity$slope[i]$estimated <- TRUE
+  }
+}
 ```
 
 #### Creating the Fleet Object
@@ -147,7 +160,7 @@ fishing_fleet$log_Fmort <- new(ParameterVector, log(c(
 # Turn on estimation for F
 fishing_fleet$log_Fmort$set_all_estimable(TRUE)
 # Set value for log_q
-fishing_fleet$log_q <- log(1.0)
+fishing_fleet$log_q[1]$value <- log(1.0)
 fishing_fleet$estimate_q <- FALSE
 fishing_fleet$random_q <- FALSE
 fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
@@ -199,12 +212,12 @@ survey_fleet_age_comp$age_comp_data <- survey_agecomp * 200 # unit: number at ag
 
 ```{r survey-selectivity}
 survey_fleet_selectivity <- new(LogisticSelectivity)
-survey_fleet_selectivity$inflection_point$value <- 1.5
-survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
-survey_fleet_selectivity$inflection_point$estimated <- TRUE
-survey_fleet_selectivity$slope$value <- 2.0
-survey_fleet_selectivity$slope$is_random_effect <- FALSE
-survey_fleet_selectivity$slope$estimated <- TRUE
+survey_fleet_selectivity$inflection_point[1]$value <- 1.5
+survey_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
+survey_fleet_selectivity$inflection_point[1]$estimated <- TRUE
+survey_fleet_selectivity$slope[1]$value <- 2.0
+survey_fleet_selectivity$slope[1]$is_random_effect <- FALSE
+survey_fleet_selectivity$slope[1]$estimated <- TRUE
 ```
 
 
@@ -217,7 +230,7 @@ survey_fleet$nages <- nages
 survey_fleet$nyears <- nyears
 # survey_fleet$estimate_F <- FALSE
 # survey_fleet$random_F <- FALSE
-survey_fleet$log_q <- log(3.315143e-07)
+survey_fleet$log_q[1]$value <- log(3.315143e-07)
 survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
 survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
@@ -257,12 +270,12 @@ methods::show(BevertonHoltRecruitment)
 Set up the following parameters: *log_rzero* and *logit_steep*.
 
 ```{r set-up-recruitment}
-recruitment$log_rzero$value <- log(1e+06) # unit: log(number)
-recruitment$log_rzero$is_random_effect <- FALSE
-recruitment$log_rzero$estimated <- TRUE
-recruitment$logit_steep$value <- -log(1.0 - 0.75) + log(0.75 - 0.2)
-recruitment$logit_steep$is_random_effect <- FALSE
-recruitment$logit_steep$estimated <- FALSE
+recruitment$log_rzero[1]$value <- log(1e+06) # unit: log(number)
+recruitment$log_rzero[1]$is_random_effect <- FALSE
+recruitment$log_rzero[1]$estimated <- TRUE
+recruitment$logit_steep[1]$value <- -log(1.0 - 0.75) + log(0.75 - 0.2)
+recruitment$logit_steep[1]$is_random_effect <- FALSE
+recruitment$logit_steep[1]$estimated <- FALSE
 recruitment$log_devs <- new(ParameterVector, c(
   0.08904850, 0.43787763, -0.13299042, -0.43251973,
   0.64861200, 0.50640852, -0.06958319, 0.30246260,
@@ -311,12 +324,12 @@ Each population will also need a maturity model. Here we define a logistic matur
 ```{r maturity}
 # Maturity
 maturity <- new(LogisticMaturity)
-maturity$inflection_point$value <- 2.25
-maturity$inflection_point$is_random_effect <- FALSE
-maturity$inflection_point$estimated <- FALSE
-maturity$slope$value <- 3
-maturity$slope$is_random_effect <- FALSE
-maturity$slope$estimated <- FALSE
+maturity$inflection_point[1]$value <- 2.25
+maturity$inflection_point[1]$is_random_effect <- FALSE
+maturity$inflection_point[1]$estimated <- FALSE
+maturity$slope[1]$value <- 3
+maturity$slope[1]$is_random_effect <- FALSE
+maturity$slope[1]$estimated <- FALSE
 ```
 
 Now that our life history sub-models are defined, lets define the actual population.
