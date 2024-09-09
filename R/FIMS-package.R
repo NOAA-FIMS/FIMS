@@ -6,7 +6,11 @@
 #' @import methods
 #' @importFrom ggplot2 .data
 #' @export CreateTMBModel
+#' @export Finalize
+#' @export SetFIMSFunctions
+#' @export ToJSON
 #' @export get_fixed
+#' @export get_log
 #' @export get_random
 #' @export clear
 #' @export clear_logs

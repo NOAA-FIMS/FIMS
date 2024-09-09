@@ -69,13 +69,13 @@ setup_and_run_FIMS <- function(iter_id,
   # place as appropriate.
 
   # set up log_rzero (equilibrium recruitment)
-  recruitment$log_rzero$value <- log(om_input$R0)
-  recruitment$log_rzero$is_random_effect <- FALSE
-  recruitment$log_rzero$estimated <- TRUE
+  recruitment$log_rzero[1]$value <- log(om_input$R0)
+  recruitment$log_rzero[1]$is_random_effect <- FALSE
+  recruitment$log_rzero[1]$estimated <- TRUE
   # set up logit_steep
-  recruitment$logit_steep$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
-  recruitment$logit_steep$is_random_effect <- FALSE
-  recruitment$logit_steep$estimated <- FALSE
+  recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
+  recruitment$logit_steep[1]$is_random_effect <- FALSE
+  recruitment$logit_steep[1]$estimated <- FALSE
   # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
@@ -122,31 +122,31 @@ setup_and_run_FIMS <- function(iter_id,
 
   # Maturity
   maturity <- new(LogisticMaturity)
-  maturity$inflection_point$value <- om_input$A50.mat
-  maturity$inflection_point$is_random_effect <- FALSE
-  maturity$inflection_point$estimated <- FALSE
-  maturity$slope$value <- om_input$slope
-  maturity$slope$is_random_effect <- FALSE
-  maturity$slope$estimated <- FALSE
+  maturity$inflection_point[1]$value <- om_input$A50.mat
+  maturity$inflection_point[1]$is_random_effect <- FALSE
+  maturity$inflection_point[1]$estimated <- FALSE
+  maturity$slope[1]$value <- om_input$slope
+  maturity$slope[1]$is_random_effect <- FALSE
+  maturity$slope[1]$estimated <- FALSE
 
   # Fleet
   # Create the fishing fleet
   fishing_fleet_selectivity <- new(LogisticSelectivity)
-  fishing_fleet_selectivity$inflection_point$value <- om_input$sel_fleet$fleet1$A50.sel1
-  fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+  fishing_fleet_selectivity$inflection_point[1]$value <- om_input$sel_fleet$fleet1$A50.sel1
+  fishing_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
   # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point$estimated <- TRUE
-  fishing_fleet_selectivity$slope$value <- om_input$sel_fleet$fleet1$slope.sel1
+  fishing_fleet_selectivity$inflection_point[1]$estimated <- TRUE
+  fishing_fleet_selectivity$slope[1]$value <- om_input$sel_fleet$fleet1$slope.sel1
   # turn on estimation of slope
-  fishing_fleet_selectivity$slope$is_random_effect <- FALSE
-  fishing_fleet_selectivity$slope$estimated <- TRUE
+  fishing_fleet_selectivity$slope[1]$is_random_effect <- FALSE
+  fishing_fleet_selectivity$slope[1]$estimated <- TRUE
 
   fishing_fleet <- new(Fleet)
   fishing_fleet$nages <- om_input$nages
   fishing_fleet$nyears <- om_input$nyr
   fishing_fleet$log_Fmort <- methods::new(ParameterVector, log(om_output$f), om_input$nyr)
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
-  fishing_fleet$log_q <- log(1.0)
+  fishing_fleet$log_q[1]$value <- log(1.0)
   fishing_fleet$estimate_q <- FALSE
   fishing_fleet$random_q <- FALSE
   fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
@@ -170,20 +170,20 @@ setup_and_run_FIMS <- function(iter_id,
 
   # Create the survey fleet
   survey_fleet_selectivity <- new(LogisticSelectivity)
-  survey_fleet_selectivity$inflection_point$value <- om_input$sel_survey$survey1$A50.sel1
-  survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
+  survey_fleet_selectivity$inflection_point[1]$value <- om_input$sel_survey$survey1$A50.sel1
+  survey_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
   # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point$estimated <- TRUE
-  survey_fleet_selectivity$slope$value <- om_input$sel_survey$survey1$slope.sel1
-  survey_fleet_selectivity$slope$is_random_effect <- FALSE
+  survey_fleet_selectivity$inflection_point[1]$estimated <- TRUE
+  survey_fleet_selectivity$slope[1]$value <- om_input$sel_survey$survey1$slope.sel1
+  survey_fleet_selectivity$slope[1]$is_random_effect <- FALSE
   # turn on estimation of slope
-  survey_fleet_selectivity$slope$estimated <- TRUE
+  survey_fleet_selectivity$slope[1]$estimated <- TRUE
 
   survey_fleet <- new(Fleet)
   survey_fleet$is_survey <- TRUE
   survey_fleet$nages <- om_input$nages
   survey_fleet$nyears <- om_input$nyr
-  survey_fleet$log_q <- log(om_output$survey_q$survey1)
+  survey_fleet$log_q[1]$value <- log(om_output$survey_q$survey1)
   survey_fleet$estimate_q <- TRUE
   survey_fleet$random_q <- FALSE
   survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())

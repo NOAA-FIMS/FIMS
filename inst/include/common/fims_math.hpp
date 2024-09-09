@@ -18,11 +18,15 @@
 // preprocessing macros
 //#include "def.hpp"
 #include <cmath>
+#include <random>
+#include <sstream>
 
 #include "../interface/interface.hpp"
+#include "fims_vector.hpp"
 
 namespace fims_math {
 #ifdef STD_LIB
+
 /**
  * @brief The exponential function.
  *
@@ -44,6 +48,21 @@ inline const Type exp(const Type &x) {
 template <class Type>
 inline const Type log(const Type &x) {
   return std::log(x);
+}
+
+template <class Type>
+inline const Type cos(const Type &x) {
+  return std::cos(x);
+}
+
+template <class Type>
+inline const Type sqrt(const Type &x) {
+  return std::sqrt(x);
+}
+
+template <class Type>
+inline const Type pow(const Type &x, const Type &y) {
+  return std::pow(x, y);
 }
 #endif
 
@@ -85,6 +104,36 @@ inline const Type log(const Type &x) {
 template <>
 inline const double log(const double &x) {
   return std::log(x);
+}
+
+template <class Type>
+inline const Type cos(const Type &x) {
+    return cos(x);
+}
+
+template <>
+inline const double cos(const double &x) {
+    return std::cos(x);
+}
+
+template <class Type>
+inline const Type sqrt(const Type &x) {
+    return sqrt(x);
+}
+
+template <>
+inline const double sqrt(const double &x) {
+    return std::sqrt(x);
+}
+
+template <class Type>
+inline const Type pow(const Type &x, const Type &y) {
+    return pow(x, y);
+}
+
+template <>
+inline const double pow(const double &x, const double &y) {
+    return std::pow(x, y);
 }
 
 #endif
@@ -180,7 +229,7 @@ inline const Type double_logistic(const Type &inflection_point_asc,
  */
 template <class Type>
 const Type ad_fabs(const Type &x, Type C = 1e-5) {
-  return sqrt((x * x) + C);  //, .5);
+  return sqrt((x * x) + C);
 }
 
 /**
@@ -219,6 +268,40 @@ template <typename Type>
 inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
   return (a + b + fims_math::ad_fabs(a - b, C)) * static_cast<Type>(.5);
 }
+
+    /**
+     * Sum elements of a vector
+     * 
+     * @brief 
+     * 
+     * @param v A vector of constants.
+     * @return A single numeric value.
+     */
+    template<class T>
+    T sum(const std::vector<T>& v) {
+        T ret = 0.0;
+        for (int i = 0; i < v.size(); i++) {
+            ret += v[i];
+        }
+        return ret;
+    }
+
+    /**
+     * Sum elements of a vector
+     * 
+     * @brief 
+     * 
+     * @param v A vector of constants.
+     * @return A single numeric value.
+     */
+    template<class T>
+    T sum(const fims::Vector<T>& v) {
+        T ret = 0.0;
+        for (int i = 0; i < v.size(); i++) {
+            ret += v[i];
+        }
+        return ret;
+    }
 
 }  // namespace fims_math
 

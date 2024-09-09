@@ -46,7 +46,11 @@ public:
                     good = false;
                 }
 
+                if(good){
                 this->RunModelLoop(pop, input);
+                }else{
+                  throw std::invalid_argument("model not good!");
+                }
 
                 //                if (!this->CheckModelOutput(pop, output)) {
                 //                    good = false;
@@ -152,6 +156,7 @@ public:
 
                 for (size_t i = 0; i < nfleets; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > f = std::make_shared<fims_popdy::Fleet<double> >();
+                    f->log_q.resize(1);
                     f->Initialize(nyears, nages);
                   //  f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
                   //  f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
@@ -261,7 +266,7 @@ public:
                     }
 
 
-                    f->log_q = 0.0;
+                    f->log_q[0] = 0.0;
                     it = obj.find("f");
                     if ((*it).second.GetType() == JsonValueType::Array) {
                         JsonArray f_values = (*it).second.GetArray();
@@ -302,6 +307,7 @@ public:
                 for (size_t i = 0; i < nsurveys; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > s = std::make_shared<fims_popdy::Fleet<double> >();
                     s->is_survey = true;
+                    s->log_q.resize(1);
                     s->Initialize(nyears, nages);
                  //   s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
                   //  s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
@@ -389,7 +395,7 @@ public:
                     }
 
 
-                    s->log_q = 0.0;
+                    s->log_q[0] = 0.0;
                     it = obj2.find("survey_q");
 
 
@@ -401,7 +407,7 @@ public:
 
                         if ((*qit).second.GetType() == JsonValueType::Array) {
                             JsonArray a = (*qit).second.GetArray();
-                            s->log_q = fims_math::log(a[0].GetDouble());
+                            s->log_q[0] = fims_math::log(a[0].GetDouble());
                             if (this->print_statements) {
                                 std::cout << "q = " << a[0].GetDouble() << "\nlog(q) = " << s->log_q << "\n";
                             }

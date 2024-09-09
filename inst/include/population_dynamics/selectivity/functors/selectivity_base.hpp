@@ -47,6 +47,14 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
    * size in selectivity).
    */
   virtual const Type evaluate(const Type& x) = 0;
+  
+    /**
+   * @brief Calculates the selectivity.
+   * @param x The independent variable in the logistic function (e.g., age or
+   * size in selectivity).
+   * @param pos Position index, e.g., which year.
+   */
+  virtual const Type evaluate(const Type& x, size_t pos) = 0;
 };
 
 // default id of the singleton selectivity class

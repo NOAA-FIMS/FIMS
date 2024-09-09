@@ -57,12 +57,12 @@ library(FIMS)
 # Create a new maturity model
 maturity <- new(LogisticMaturity)
 # Populate the maturity module with parameter values.
-maturity$inflection_point$value <- 10
-maturity$inflection_point$is_random_effect <- FALSE
-maturity$inflection_point$estimated <- FALSE
-maturity$slope$value <- 0.2
-maturity$slope$is_random_effect <- FALSE
-maturity$slope$estimated <- FALSE
+maturity$inflection_point[1]$value <- 10
+maturity$inflection_point[1]$is_random_effect <- FALSE
+maturity$inflection_point[1]$estimated <- FALSE
+maturity$slope[1]$value <- 0.2
+maturity$slope[1]$is_random_effect <- FALSE
+maturity$slope[1]$estimated <- FALSE
 ```
 
 After that, we need to create and set up a population and link the maturity module to the population:

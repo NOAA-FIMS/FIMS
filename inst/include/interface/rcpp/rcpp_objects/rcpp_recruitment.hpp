@@ -64,10 +64,14 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
-  Parameter logit_steep; /**< steepness or the productivity of the stock*/
-  Parameter log_rzero;   /**< recruitment at unfished biomass */
+  ParameterVector logit_steep; /**< steepness or the productivity of the stock*/
+  ParameterVector log_rzero; /**< recruitment at unfished biomass */
   ParameterVector log_devs;   /**< log recruitment deviations*/
   bool estimate_log_devs = false; /**< boolean describing whether to estimate */
+
+    double estimated_logit_steep; /**< estimated steepness or the productivity of the stock*/
+    double estimated_log_rzero; /**< estimated recruitment at unfished biomass */
+    Rcpp::NumericVector estimated_log_devs; /**< estimated log recruitment deviations*/
 
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
@@ -78,18 +82,107 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual double evaluate(double spawners, double ssbzero) {
     fims_popdy::SRBevertonHolt<double> BevHolt;
     BevHolt.logit_steep.resize(1);
-    BevHolt.logit_steep[0] = this->logit_steep.value_m;
-    if (this->logit_steep.value_m == 1.0) {
+    BevHolt.logit_steep[0] = this->logit_steep[0].initial_value_m;
+    if (this->logit_steep[0].initial_value_m == 1.0) {
       warning(
           "Steepness is subject to a logit transformation, so its value is "
           "0.7848469. Fixing it at 1.0 is not currently possible.");
     }
     BevHolt.log_rzero.resize(1);
-    BevHolt.log_rzero[0] = this->log_rzero.value_m;
+    BevHolt.log_rzero[0] = this->log_rzero[0].initial_value_m;
 
     return BevHolt.evaluate(spawners, ssbzero);
   }
 
+    /** 
+     * @brief finalize function. Extracts derived quantities back to 
+     * the Rcpp interface object from the Information object. 
+     */
+    virtual void finalize() {
+
+        if (this->finalized) {
+            //log warning that finalize has been called more than once.
+            FIMS_WARNING_LOG("Beverton-Holt Recruitment  " + fims::to_string(this->id) + " has been finalized already.");
+        }
+
+        this->finalized = true; //indicate this has been called already
+
+        std::shared_ptr<fims_info::Information<double> > info =
+                fims_info::Information<double>::GetInstance();
+
+
+        fims_info::Information<double>::recruitment_models_iterator it;
+
+        it = info->recruitment_models.find(this->id);
+
+        if (it == info->recruitment_models.end()) {
+            FIMS_WARNING_LOG("Beverton-Holt Recruitment " + fims::to_string(this->id) + " not found in Information.");
+            return;
+        } else {
+
+            std::shared_ptr<fims_popdy::SRBevertonHolt<double> > recr =
+                    std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double> >(it->second);
+
+            for (size_t i = 0; i < this->logit_steep.size(); i++) {
+                if (this->logit_steep[i].estimated_m) {
+                    this->logit_steep[i].final_value_m = recr->logit_steep[i];
+                } else {
+                    this->logit_steep[i].final_value_m = this->logit_steep[i].initial_value_m;
+                }
+            }
+
+            for (size_t i = 0; i < log_rzero.size(); i++) {
+                if (log_rzero[i].estimated_m) {
+                    this->log_rzero[i].final_value_m = recr->log_rzero[i];
+                } else {
+                    this->log_rzero[i].final_value_m = this->log_rzero[i].initial_value_m;
+                }
+            }
+
+            for (size_t i = 0; i < this->estimated_log_devs.size(); i++) {
+                if (this->log_devs[i].estimated_m) {
+                    this->log_devs[i].final_value_m = recr->log_recruit_devs[i];
+                } else {
+                    this->log_devs[i].final_value_m = this->log_devs[i].initial_value_m;
+                }
+            }
+        }
+
+
+    }
+
+    /**
+     * @brief Convert the data to json representation for the output.
+     */
+    virtual std::string to_json() {
+        std::stringstream ss;
+
+        ss << "\"module\" : {\n";
+        ss << " \"name\": \"recruitment\",\n";
+        ss << " \"type\": \"Beverton-Holt\",\n";
+        ss << " \"id\": " << this->id << ",\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "  \"name\": \"logit_steep\",\n";
+        ss << "  \"id\":" << this->logit_steep.id_m << ",\n";
+        ss << "  \"type\": \"vector\",\n";
+        ss << "  \"values\":" << this->logit_steep << ",\n},\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "   \"name\": \"log_rzero\",\n";
+        ss << "   \"id\":" << this->log_rzero.id_m << ",\n";
+        ss << "   \"type\": \"vector\",\n";
+        ss << "   \"values\":" << this->log_rzero << ",\n },\n";
+
+        ss << " \"parameter\": {\n";
+        ss << "   \"name\": \"log_devs\",\n";
+        ss << "   \"id\":" << this->log_devs.id_m << ",\n";
+        ss << "   \"type\": \"vector\",\n";
+        ss << "   \"values\":" << this->log_devs << ",\n },\n";
+
+
+        return ss.str();
+    }
 
 #ifdef TMB_MODEL
 
@@ -104,41 +197,54 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     // set relative info
     recruitment->id = this->id;
     //set logit_steep
-    recruitment->logit_steep.resize(1);
-    recruitment->logit_steep[0] = this->logit_steep.value_m;
-    if (this->logit_steep.estimated_m) {
-      info->RegisterParameterName("logit_steep");
-      if (this->logit_steep.is_random_effect_m) {
-        info->RegisterRandomEffect(recruitment->logit_steep[0]);
-      } else {
-        info->RegisterParameter(recruitment->logit_steep[0]);
-      }
-    }
-    info->variable_map[this->logit_steep.id_m] = &(recruitment)->logit_steep;
-    
-    //set log_rzero
-    recruitment->log_rzero.resize(1);
-    recruitment->log_rzero[0] = this->log_rzero.value_m;
-    if (this->log_rzero.estimated_m) {
-      info->RegisterParameterName("log_rzero");
-      if (this->log_rzero.is_random_effect_m) {
-        info->RegisterRandomEffect(recruitment->log_rzero[0]);
-      } else {
-        info->RegisterParameter(recruitment->log_rzero[0]);
-      }
-    }
-    info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
+        recruitment->logit_steep.resize(this->logit_steep.size());
+        for (size_t i = 0; i < this->logit_steep.size(); i++) {
 
-    //set log_recruit_devs
-    recruitment->log_recruit_devs.resize(this->log_devs.size());
-    for (size_t i = 0; i < recruitment->log_recruit_devs.size(); i++) {
-      recruitment->log_recruit_devs[i] = this->log_devs[i].value_m;
-      if (this->estimate_log_devs) {
-        info->RegisterParameter(recruitment->log_recruit_devs[i]);
-      } else {
-        recruitment->estimate_log_recruit_devs = false;
-      }
-    }
+            recruitment->logit_steep[i] = this->logit_steep[i].initial_value_m;
+
+            if (this->logit_steep[i].estimated_m) {
+                info->RegisterParameterName("logit_steep");
+                if (this->logit_steep[i].is_random_effect_m) {
+                    info->RegisterRandomEffect(recruitment->logit_steep[i]);
+                } else {
+                    info->RegisterParameter(recruitment->logit_steep[i]);
+                }
+            }
+
+        }
+
+        info->variable_map[this->logit_steep.id_m] = &(recruitment)->logit_steep;
+
+
+        //set log_rzero
+        recruitment->log_rzero.resize(this->log_rzero.size());
+        for (size_t i = 0; i < this->log_rzero.size(); i++) {
+
+            recruitment->log_rzero[i] = this->log_rzero[i].initial_value_m;
+
+            if (this->log_rzero[i].estimated_m) {
+                info->RegisterParameterName("log_rzero");
+                if (this->log_rzero[i].is_random_effect_m) {
+                    info->RegisterRandomEffect(recruitment->log_rzero[i]);
+                } else {
+                    info->RegisterParameter(recruitment->log_rzero[i]);
+                }
+            }
+        }
+
+        info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
+
+        //set log_recruit_devs
+        recruitment->log_recruit_devs.resize(this->log_devs.size());
+        for (size_t i = 0; i < this->log_devs.size(); i++) {
+            recruitment->log_recruit_devs[i] = this->log_devs[i].initial_value_m;
+            if (this->log_devs[i].estimated_m) {
+                info->RegisterParameter(recruitment->log_recruit_devs[i]);
+            } else {
+                recruitment->estimate_log_recruit_devs = false;
+            }
+
+        }
     info->variable_map[this->log_devs.id_m] = &(recruitment)->log_recruit_devs;
 
     // add to Information
@@ -150,6 +256,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
   virtual bool add_to_fims_tmb() {
+    FIMS_INFO_LOG("adding Recruitment object to TMB");
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();

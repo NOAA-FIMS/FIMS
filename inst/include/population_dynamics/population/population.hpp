@@ -156,7 +156,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     POPULATION_LOG << "nseasons: " << this->nseasons << std::endl;
     POPULATION_LOG << "nyears: " << this->nyears << std::endl;
 
-    for (size_t fleet = 0; fleet < this->nfleets; fleet++) {
+    for (size_t fleet = 0; fleet < this->fleets.size(); fleet++) {
       this->fleets[fleet]->Prepare();
     }
 
@@ -457,7 +457,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
                  this->weight_at_age[age];
       } else {
         POPULATION_LOG << "fleet " << fleet_ << " is a survey" << std::endl;
-        index_ = this->fleets[fleet_]->q *
+        index_ = this->fleets[fleet_]->q.get_force_scalar(year) *
                  this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
                  this->numbers_at_age[i_age_year] *
                  this->weight_at_age[age];  // this->weight_at_age[age];
