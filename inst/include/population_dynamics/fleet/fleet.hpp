@@ -27,6 +27,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
+  size_t nlengths;
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
@@ -45,6 +46,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
   fims::Vector<Type> catch_index;     /*!<derived quantity catch index*/
   fims::Vector<Type> age_composition; /*!<derived quantity age composition*/
+  fims::Vector<Type> length_composition; /*!<derived quantity length composition*/
 
   // derived quantities
   fims::Vector<Type> observed_catch_lpdf; /*!<observed total catch linked
@@ -59,8 +61,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> expected_index_lpdf; /*!<model expected index of abundance linked
     to log probability density function*/
   fims::Vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
+  fims::Vector<Type> catch_numbers_at_length; /*!<model expected catch at length*/
   fims::Vector<Type> proportion_catch_numbers_at_age; /*!<model expected catch at age*/
   fims::Vector<Type> catch_weight_at_age;  /*!<model expected weight at age*/
+  fims::Vector<Type> proportion_catch_numbers_at_length; /*!<model expected catch at length*/
   bool is_survey = false;                  /*!< is this fleet object a survey*/
 
 #ifdef TMB_MODEL
@@ -82,17 +86,20 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    * @param nyears The number of years in the model.
    * @param nages The number of ages in the model.
    */
-  void Initialize(int nyears, int nages) {
+  void Initialize(int nyears, int nages, int nlengths = 0) {
     this->nyears = nyears;
     this->nages = nages;
+    this->nlengths = nlengths;
 
     catch_at_age.resize(nyears * nages);
     catch_numbers_at_age.resize(nyears * nages);
+    catch_numbers_at_length.resize(nyears * nlengths);
     catch_weight_at_age.resize(nyears * nages);
     catch_index.resize(nyears);  // assume index is for all ages.
     expected_catch.resize(nyears);
     expected_index.resize(nyears);
     age_composition.resize(nyears * nages);
+    length_composition.resize(nyears * nlengths);
 
     log_Fmort.resize(nyears);
     Fmort.resize(nyears);
@@ -113,6 +120,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     std::fill(catch_index.begin(), catch_index.end(),
               0); /**<derived quantity catch index*/
     std::fill(age_composition.begin(), age_composition.end(), 0);
+    std::fill(length_composition.begin(), length_composition.end(), 0); /**<model expected proportion at length */
     std::fill(expected_catch.begin(), expected_catch.end(),
               0); /**<model expected total catch*/
     std::fill(expected_index.begin(), expected_index.end(),
@@ -121,8 +129,12 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
               0); /**<model expected index of abundance*/
     std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(),
               0); /**<model expected catch at age*/
+    std::fill(catch_numbers_at_length.begin(), catch_numbers_at_length.end(),
+              0); /**<model expected catch at age*/
     std::fill(proportion_catch_numbers_at_age.begin(), proportion_catch_numbers_at_age.end(),
               0); /**<model expected catch at age*/
+    std::fill(proportion_catch_numbers_at_length.begin(), proportion_catch_numbers_at_length.end(),
+              0); /**<model expected numbers at length */
     std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
               0); /**<model expected weight at age*/
     this->q = fims_math::exp(this->log_q);
@@ -146,6 +158,24 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       for (size_t a = 0; a < this->nages; a++) {
         size_t i_age_year = y * this->nages + a;
         this->proportion_catch_numbers_at_age[i_age_year] = this->catch_numbers_at_age[i_age_year] / sum;
+
+      }
+    }
+  }
+
+  /**
+   * Evaluate the proportion of catch numbers at age.
+   */
+  void evaluate_length_comp() {
+    for (size_t y = 0; y < this->nyears; y++) {
+      Type sum = 0.0;
+      for (size_t l = 0; l < this->nlengths; l++) {
+        size_t i_length_year = y * this->nlengths + l;
+        sum += this->catch_numbers_at_length[i_length_year];
+      }
+      for (size_t l = 0; l < this->nlengths; l++) {
+        size_t i_length_year = y * this->nlengths + l;
+        this->proportion_catch_numbers_at_length[i_length_year] = this->catch_numbers_at_length[i_length_year] / sum;
 
       }
     }
