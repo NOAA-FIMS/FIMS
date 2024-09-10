@@ -64,7 +64,23 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
       inflection_point; /**< the index value at which the response reaches .5 */
   Parameter slope;      /**< the width of the curve at the inflection_point */
 
-  LogisticMaturityInterface() : MaturityInterfaceBase() {}
+  //' @rd
+  //' @name LogisticMaturityInterface
+  //' @title Constructor for initializing a LogisticMaturityInterface object
+  //' @description Initializes a LogisticMaturityInterface object with specified inflection point and slope parameters. 
+  //' @param inflection_point A Parameter object representing the inflection point of the logistic selectivity curve.
+  //' @param slope A Parameter object representing the slope of the logistic selectivity curve.
+  //' @return No return value, as this is a constructor.
+  //' @examples
+  //' // R example of creating a LogisticMaturityInterface object
+  //' inflection <- methods::new(Parameter, 2, true)
+  //' slope <- methods::new(Parameter, 0.2, true)
+  //' logistic_maturity <- methods::new(LogisticMaturityInterface, inflection, slope)
+  LogisticMaturityInterface(Parameter inflection_point, Parameter slope) : MaturityInterfaceBase()
+  {
+    this->inflection_point = inflection_point;
+    this->slope = slope;
+  }
 
   virtual ~LogisticMaturityInterface() {}
 

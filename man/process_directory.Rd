@@ -16,14 +16,3 @@ directory, including subdirectories, by applying the \code{process_cpp_file}
 function to each file. It searches for RD blocks in the files and generates
 corresponding \code{.Rd} files.
 }
-\details{
-The function uses the \code{fs::dir_ls} function to list all \code{.cpp} and \code{.hpp}
-files within the directory and its subdirectories. It then processes each
-file individually, extracting and formatting RD blocks and creating \code{.Rd}
-files.
-}
-\examples{
-\dontrun{
-process_directory("inst/include/interface/rcpp")
-}
-}

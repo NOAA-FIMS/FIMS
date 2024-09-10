@@ -33,12 +33,13 @@ test_that("LogisticSelectivityInterface is initialized correctly", {
 
 test_that("DoubleLogisticSelectivity input settings work as expected", {
   # Test double logistic
-  selectivity <- new(DoubleLogisticSelectivity)
-
-  selectivity$inflection_point_asc$value <- 10.5
-  selectivity$slope_asc$value <- 0.2
-  selectivity$inflection_point_desc$value <- 15.0
-  selectivity$slope_desc$value <- 0.05
+  selectivity <- new(
+    DoubleLogisticSelectivity,
+    new(Parameter, 10.5, TRUE),
+    new(Parameter, 0.2, TRUE),
+    new(Parameter, 15.0, TRUE),
+    new(Parameter, 0.05, TRUE)
+  )
 
   expect_equal(selectivity$get_id(), 1)
   expect_equal(selectivity$inflection_point_asc$value, 10.5)

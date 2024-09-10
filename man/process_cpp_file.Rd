@@ -12,22 +12,5 @@ process_cpp_file(file_path)
 \description{
 This function reads a specified C++ file, searches for RD blocks
 (documentation comments) within the file, and writes the extracted
-and formatted RD content to an \code{.Rd} file in the \verb{man/} directory.
-}
-\details{
-The function identifies RD blocks in three formats:
-\itemize{
-\item Block comments: \verb{/** @rd ... */}.
-\item Line comments: \verb{// @rd ...}
-\item Line comments with a single quote: \verb{//' @rd ...}
-}
-
-After extracting these blocks, it saves the results in an \code{.Rd} file named
-after the function name extracted from the \verb{@name} tag within the RD block.
-If no RD blocks are found, the function will output a message indicating this.
-}
-\examples{
-\dontrun{
-process_cpp_file("my_cpp_file.cpp")
-}
+and formatted RD content to an .Rd file in the man/ directory.
 }

@@ -120,13 +120,11 @@ setup_and_run_FIMS <- function(iter_id,
   ewaa_growth$weights <- om_input$W.mt
 
   # Maturity
-  maturity <- new(LogisticMaturity)
-  maturity$inflection_point$value <- om_input$A50.mat
-  maturity$inflection_point$is_random_effect <- FALSE
-  maturity$inflection_point$estimated <- FALSE
-  maturity$slope$value <- om_input$slope
-  maturity$slope$is_random_effect <- FALSE
-  maturity$slope$estimated <- FALSE
+  maturity <- new(
+    LogisticMaturity,
+    new(Parameter, om_input$A50.mat, FALSE),
+    new(Parameter, om_input$slope, FALSE)
+  )
 
   # Fleet
   # Create the fishing fleet

@@ -116,13 +116,6 @@ fishing_fleet_selectivity <- new(
     fishing_fleet_selectivity_inflection,
     fishing_fleet_selectivity_slope
   )
-# fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
-# fishing_fleet_selectivity$inflection_point$value <- 2.0
-# fishing_fleet_selectivity$inflection_point$is_random_effect <- FALSE
-# fishing_fleet_selectivity$inflection_point$estimated <- TRUE
-# fishing_fleet_selectivity$slope$value <- 1.0
-# fishing_fleet_selectivity$slope$is_random_effect <- FALSE
-# fishing_fleet_selectivity$slope$estimated <- TRUE
 ```
 
 #### Creating the Fleet Object
@@ -212,14 +205,6 @@ survey_fleet_selectivity <- new(
     survey_fleet_selectivity_inflection,
     survey_fleet_selectivity_slope
   )
-
-# survey_fleet_selectivity <- new(LogisticSelectivity)
-# survey_fleet_selectivity$inflection_point$value <- 1.5
-# survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
-# survey_fleet_selectivity$inflection_point$estimated <- TRUE
-# survey_fleet_selectivity$slope$value <- 2.0
-# survey_fleet_selectivity$slope$is_random_effect <- FALSE
-# survey_fleet_selectivity$slope$estimated <- TRUE
 ```
 
 
@@ -325,13 +310,13 @@ ewaa_growth$weights <- c(
 Each population will also need a maturity model. Here we define a logistic maturity model. 
 ```{r maturity}
 # Maturity
-maturity <- new(LogisticMaturity)
-maturity$inflection_point$value <- 2.25
-maturity$inflection_point$is_random_effect <- FALSE
-maturity$inflection_point$estimated <- FALSE
-maturity$slope$value <- 3
-maturity$slope$is_random_effect <- FALSE
-maturity$slope$estimated <- FALSE
+maturity_inflection <- new(Parameter, 2.25, FALSE)
+maturity_slope <- new(Parameter, 3.0, FALSE)
+maturity <- new(
+    LogisticMaturity,
+    maturity_inflection,
+    maturity_slope
+  )
 ```
 
 Now that our life history sub-models are defined, lets define the actual population.

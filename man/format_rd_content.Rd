@@ -10,12 +10,12 @@ format_rd_content(rd_block)
 \item{rd_block}{A string containing the raw RD block extracted from a C++ or a header file.}
 }
 \value{
-A formatted string representing the content of the \code{.Rd} file,
-including sections such as \verb{@title}, \verb{@description}, \verb{@param}, \verb{@return},
-and \verb{@examples}.
+A formatted string representing the content of the .Rd file,
+including sections such as title, description, param, return,
+and examples.
 }
 \description{
 This function takes an RD block extracted from a C++ or a header file, parses its
-components, and formats it into a string suitable for inclusion in an \code{.Rd}
+components, and formats it into a string suitable for inclusion in an .Rd
 documentation file.
 }

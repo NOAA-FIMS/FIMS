@@ -452,7 +452,7 @@ RCPP_MODULE(fims) {
       .field("log_sd", &DnormDistributionsInterface::log_sd);
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
-      .constructor()
+      .constructor<Parameter, Parameter>("inflection_point, slope")
       .field("inflection_point", &LogisticMaturityInterface::inflection_point)
       .field("slope", &LogisticMaturityInterface::slope)
       .method("get_id", &LogisticMaturityInterface::get_id)
@@ -467,7 +467,7 @@ RCPP_MODULE(fims) {
       .method("evaluate", &LogisticSelectivityInterface::evaluate);
 
   Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
-      .constructor()
+      .constructor<Parameter, Parameter, Parameter, Parameter>("inflection_point_asc, slope_asc, inflection_point_desc, slope_desc")
       .field("inflection_point_asc",
              &DoubleLogisticSelectivityInterface::inflection_point_asc)
       .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc)

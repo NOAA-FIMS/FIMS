@@ -1,5 +1,5 @@
 /*
- * File:   rcpp_selectivity.hpp
+ * File: rcpp_selectivity.hpp
  *
  * This File is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE
@@ -20,16 +20,18 @@
  * @brief SelectivityInterfaceBase class should be inherited to
  * define different Rcpp interfaces for each possible Selectivity function
  */
-class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+class SelectivityInterfaceBase : public FIMSRcppInterfaceBase
+{
+public:
   static uint32_t id_g; /**< static id of the recruitment interface base*/
   uint32_t id;          /**< id of the recruitment interface base */
   // live objects in C++ are objects that have been created and live in memory
-  static std::map<uint32_t, SelectivityInterfaceBase*>
+  static std::map<uint32_t, SelectivityInterfaceBase *>
       live_objects; /**< map associating the ids of
                                 SelectivityInterfaceBase to the objects */
 
-  SelectivityInterfaceBase() {
+  SelectivityInterfaceBase()
+  {
     this->id = SelectivityInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     SelectivityInterfaceBase */
@@ -51,15 +53,16 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 uint32_t SelectivityInterfaceBase::id_g = 1;
-std::map<uint32_t, SelectivityInterfaceBase*>
+std::map<uint32_t, SelectivityInterfaceBase *>
     SelectivityInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for logistic selectivity as an S4 object. To
  * instantiate from R: logistic_selectivity <- new(logistic_selectivity)
  */
-class LogisticSelectivityInterface : public SelectivityInterfaceBase {
- public:
+class LogisticSelectivityInterface : public SelectivityInterfaceBase
+{
+public:
   Parameter
       inflection_point; /**< the index value at which the response reaches .5 */
   Parameter slope;      /**< the width of the curve at the inflection_point */
@@ -91,7 +94,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    *   @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
-  virtual double evaluate(double x) {
+  virtual double evaluate(double x)
+  {
     fims_popdy::LogisticSelectivity<double> LogisticSel;
     LogisticSel.inflection_point.resize(1);
     LogisticSel.inflection_point[0] = this->inflection_point.value_m;
@@ -103,33 +107,42 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 #ifdef TMB_MODEL
 
   template <typename Type>
-  bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+  bool add_to_fims_tmb_internal()
+  {
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity =
-        std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticSelectivity<Type>> selectivity =
+        std::make_shared<fims_popdy::LogisticSelectivity<Type>>();
 
     // set relative info
     selectivity->id = this->id;
     selectivity->inflection_point.resize(1);
     selectivity->inflection_point[0] = this->inflection_point.value_m;
-    if (this->inflection_point.estimated_m) {
+    if (this->inflection_point.estimated_m)
+    {
       info->RegisterParameterName("logistic selectivity inflection_point");
-      if (this->inflection_point.is_random_effect_m) {
+      if (this->inflection_point.is_random_effect_m)
+      {
         info->RegisterRandomEffect(selectivity->inflection_point[0]);
-      } else {
+      }
+      else
+      {
         info->RegisterParameter(selectivity->inflection_point[0]);
       }
     }
     info->variable_map[this->inflection_point.id_m] = &(selectivity)->inflection_point;
     selectivity->slope.resize(1);
     selectivity->slope[0] = this->slope.value_m;
-    if (this->slope.estimated_m) {
+    if (this->slope.estimated_m)
+    {
       info->RegisterParameterName("logistic selectivity slope");
-      if (this->slope.is_random_effect_m) {
+      if (this->slope.is_random_effect_m)
+      {
         info->RegisterRandomEffect(selectivity->slope[0]);
-      } else {
+      }
+      else
+      {
         info->RegisterParameter(selectivity->slope[0]);
       }
     }
@@ -143,7 +156,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
-  virtual bool add_to_fims_tmb() {
+  virtual bool add_to_fims_tmb()
+  {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
@@ -159,16 +173,48 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  * @brief Rcpp interface for logistic selectivity as an S4 object. To
  * instantiate from R: logistic_selectivity <- new(logistic_selectivity)
  */
-class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
- public:
-  Parameter inflection_point_asc; /**< the index value at which the response
-                                     reaches .5 */
-  Parameter slope_asc; /**< the width of the curve at the inflection_point */
+class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase
+{
+public:
+  Parameter inflection_point_asc;  /**< the index value at which the response
+                                      reaches .5 */
+  Parameter slope_asc;             /**< the width of the curve at the inflection_point */
   Parameter inflection_point_desc; /**< the index value at which the response
                                       reaches .5 */
-  Parameter slope_desc; /**< the width of the curve at the inflection_point */
+  Parameter slope_desc;            /**< the width of the curve at the inflection_point */
 
-  DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {}
+  //' @rd
+  //' @name DoubleLogisticSelectivityInterface
+  //' @title Constructor for initializing a DoubleLogisticSelectivityInterface object
+  //' @description Initializes a `DoubleLogisticSelectivityInterface` object with specified ascending and descending limb inflection point and slope parameters. 
+  //' @param inflection_point_asc A Parameter object representing the inflection point of the ascending limb of the double logistic selectivity curve.
+  //' @param slope_asc A Parameter object representing the slope of the ascending limb of the double logistic selectivity curve.
+  //' @param inflection_point_desc A Parameter object representing the inflection point of the descending limb of the double logistic selectivity curve.
+  //' @param slope_desc A Parameter object representing the slope of the descending limb of the double logistic selectivity curve.
+  //' @return No return value, as this is a constructor.
+  //' @examples
+  //' // R example of creating a DoubleLogisticSelectivityInterface object
+  //' inflection_point_asc <- methods::new(Parameter, 2, true)
+  //' slope_asc <- methods::new(Parameter, 0.2, true)
+  //' inflection_point_desc <- methods::new(Parameter, 2, true)
+  //' slope_desc <- methods::new(Parameter, 0.2, true)
+  //' double_logistic_selectivity <- methods::new(
+  //'   DoubleLogisticSelectivityInterface,
+  //'   inflection_point_asc,
+  //'   slope_asc,
+  //'   inflection_point_desc,
+  //'   slope_desc
+  //'  )
+  DoubleLogisticSelectivityInterface(Parameter inflection_point_asc,
+                                     Parameter slope_asc,
+                                     Parameter inflection_point_desc,
+                                     Parameter slope_desc) :
+                                     SelectivityInterfaceBase() {
+    this->inflection_point_asc = inflection_point_asc;
+    this->slope_asc = slope_asc;
+    this->inflection_point_desc = inflection_point_desc;
+    this->slope_desc = slope_desc;
+  }
 
   virtual ~DoubleLogisticSelectivityInterface() {}
 
@@ -179,7 +225,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
    *   @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
-  virtual double evaluate(double x) {
+  virtual double evaluate(double x)
+  {
     fims_popdy::DoubleLogisticSelectivity<double> DoubleLogisticSel;
     DoubleLogisticSel.inflection_point_asc.resize(1);
     DoubleLogisticSel.inflection_point_asc[0] = this->inflection_point_asc.value_m;
@@ -196,55 +243,72 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 #ifdef TMB_MODEL
 
   template <typename Type>
-  bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+  bool add_to_fims_tmb_internal()
+  {
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<Type> > selectivity =
-        std::make_shared<fims_popdy::DoubleLogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<Type>> selectivity =
+        std::make_shared<fims_popdy::DoubleLogisticSelectivity<Type>>();
 
     // set relative info
     selectivity->id = this->id;
     selectivity->inflection_point_asc.resize(1);
     selectivity->inflection_point_asc[0] = this->inflection_point_asc.value_m;
-    if (this->inflection_point_asc.estimated_m) {
+    if (this->inflection_point_asc.estimated_m)
+    {
       info->RegisterParameterName("double logistic selectivity inflection_point_asc");
-      if (this->inflection_point_asc.is_random_effect_m) {
+      if (this->inflection_point_asc.is_random_effect_m)
+      {
         info->RegisterRandomEffect(selectivity->inflection_point_asc[0]);
-      } else {
+      }
+      else
+      {
         info->RegisterParameter(selectivity->inflection_point_asc[0]);
       }
     }
     info->variable_map[this->inflection_point_asc.id_m] = &(selectivity)->inflection_point_asc;
     selectivity->slope_asc.resize(1);
     selectivity->slope_asc[0] = this->slope_asc.value_m;
-    if (this->slope_asc.estimated_m) {
+    if (this->slope_asc.estimated_m)
+    {
       info->RegisterParameterName("double logistic selectivity slope_asc");
-      if (this->slope_asc.is_random_effect_m) {
+      if (this->slope_asc.is_random_effect_m)
+      {
         info->RegisterRandomEffect(selectivity->slope_asc[0]);
-      } else {
+      }
+      else
+      {
         info->RegisterParameter(selectivity->slope_asc[0]);
       }
     }
     info->variable_map[this->slope_asc.id_m] = &(selectivity)->slope_asc;
     selectivity->inflection_point_desc.resize(1);
     selectivity->inflection_point_desc[0] = this->inflection_point_desc.value_m;
-    if (this->inflection_point_desc.estimated_m) {
+    if (this->inflection_point_desc.estimated_m)
+    {
       info->RegisterParameterName("double logistic selectivity inflection_point_desc");
-      if (this->inflection_point_desc.is_random_effect_m) {
+      if (this->inflection_point_desc.is_random_effect_m)
+      {
         info->RegisterRandomEffect(selectivity->inflection_point_desc[0]);
-      } else {
+      }
+      else
+      {
         info->RegisterParameter(selectivity->inflection_point_desc[0]);
       }
     }
     info->variable_map[this->inflection_point_desc.id_m] = &(selectivity)->inflection_point_desc;
     selectivity->slope_desc.resize(1);
     selectivity->slope_desc[0] = this->slope_desc.value_m;
-    if (this->slope_desc.estimated_m) {
+    if (this->slope_desc.estimated_m)
+    {
       info->RegisterParameterName("double logistic selectivity slope_desc");
-      if (this->slope_desc.is_random_effect_m) {
+      if (this->slope_desc.is_random_effect_m)
+      {
         info->RegisterRandomEffect(selectivity->slope_desc[0]);
-      } else {
+      }
+      else
+      {
         info->RegisterParameter(selectivity->slope_desc[0]);
       }
     }
@@ -258,7 +322,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   /** @brief this adds the parameter values and derivatives to the TMB model
    * object */
-  virtual bool add_to_fims_tmb() {
+  virtual bool add_to_fims_tmb()
+  {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
