@@ -16,5 +16,6 @@
 
 #include "functors/ewaa.hpp"
 #include "functors/growth_base.hpp"
+#include "functors/length.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */

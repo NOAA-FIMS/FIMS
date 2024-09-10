@@ -176,7 +176,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         size_t i_length_year = y * this->nlengths + l;
         size_t i_age_year = y * this->nages + a;
         size_t i_age_length = a * this->nlengths + l;
-        this->proportion_catch_numbers_at_length[i_length_year] = this->catch_numbers_at_age[i_a_year] * this->age_length_transition_matrix[i_age_length];
+        this->proportion_catch_numbers_at_length[i_length_year] = this->catch_numbers_at_age[i_age_year] * this->age_length_transition_matrix[i_age_length];
         }
     }
   }
