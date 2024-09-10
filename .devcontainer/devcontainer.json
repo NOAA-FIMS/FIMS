@@ -13,7 +13,7 @@
 			"packages": "make,gcc,g++,cmake,clang-tidy,clang-format,clang,doxygen,ninja-build,libxtst6,libxt6"			
 		},
 		 "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "RcppEigen,dplyr,ggplot2,jsonlite,magrittr,methods,Rcpp,scales,TMB,usethis,devtools",
+			"packages": "RcppEigen,dplyr,ggplot2,jsonlite,magrittr,methods,Rcpp,scales,TMB,usethis,devtools,tibble",
 			"installSystemRequirements": true
 		  },
 		 // option to run rstudio. you can type rserver into the command line to
