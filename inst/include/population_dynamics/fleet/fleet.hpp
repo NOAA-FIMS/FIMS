@@ -27,7 +27,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
   size_t nyears;        /*!< the number of years in the model*/
   size_t nages;         /*!< the number of ages in the model*/
-  size_t nlengths;
+  size_t nlengths;      /*!< the number of length bins in the model*/
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
@@ -40,13 +40,14 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   Type log_q;    /*!< estimated parameter: catchability of the fleet */
 
   fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
-  Type q; /*!< transofrmed parameter: the catchability of the fleet */
+  Type q; /*!< transformed parameter: the catchability of the fleet */
 
   // derived quantities
   fims::Vector<Type> catch_at_age;    /*!<derived quantity catch at age*/
   fims::Vector<Type> catch_index;     /*!<derived quantity catch index*/
   fims::Vector<Type> age_composition; /*!<derived quantity age composition*/
   fims::Vector<Type> length_composition; /*!<derived quantity length composition*/
+  fims::Vector<Type> age_length_transition_matrix; /*!<derived quantity age-length transition matrix*/
 
   // derived quantities
   fims::Vector<Type> observed_catch_lpdf; /*!<observed total catch linked
@@ -100,6 +101,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     expected_index.resize(nyears);
     age_composition.resize(nyears * nages);
     length_composition.resize(nyears * nlengths);
+    age_length_transition_matrix.resize(nages * nlengths);
 
     log_Fmort.resize(nyears);
     Fmort.resize(nyears);
@@ -170,15 +172,14 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     for (size_t y = 0; y < this->nyears; y++) {
       Type sum = 0.0;
       for (size_t l = 0; l < this->nlengths; l++) {
+        for(size_t a = 0; a < this->nages; a++){
         size_t i_length_year = y * this->nlengths + l;
-        sum += this->catch_numbers_at_length[i_length_year];
-      }
-      for (size_t l = 0; l < this->nlengths; l++) {
-        size_t i_length_year = y * this->nlengths + l;
-        this->proportion_catch_numbers_at_length[i_length_year] = this->catch_numbers_at_length[i_length_year] / sum;
-
-      }
+        size_t i_age_year = y * this->nages + a;
+        size_t i_age_length = a * this->nlengths + l;
+        this->proportion_catch_numbers_at_length[i_length_year] = this->catch_numbers_at_age[i_a_year] * this->age_length_transition_matrix[i_age_length];
+        }
     }
+  }
   }
 
   /**
