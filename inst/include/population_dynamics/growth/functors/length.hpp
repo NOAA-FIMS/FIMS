@@ -17,7 +17,7 @@
 namespace fims_popdy {
 
 /**
- *  @brief EWAAgrowth class that returns the EWAA function value.
+ *  @brief Length class that returns the length function value.
  */
 template <typename Type>
 struct Length : public GrowthBase<Type> {
@@ -30,7 +30,7 @@ struct Length : public GrowthBase<Type> {
     //derived
     fims::Vector<fims::Vector<Type> > alk;
     
-    boolean estimated = false;
+    bool estimated = false;
     
     Length() : GrowthBase<Type>() {}
     
@@ -40,19 +40,37 @@ struct Length : public GrowthBase<Type> {
     /**
      * Updates the ALK if any elements are estimated.
      */
-    virtual void prepare(){
-        if(estimated)
-            this->update_alk();
+    virtual void Prepare(){
+        
+        if(estimated){
+            this->UpdateALK();
+        }
     }
     
     /**
      * Computes the initial ALK.
      */
-    virtual void initialize(){
+    virtual void Initialize(){
+        this->alk.resize(length_classes.size()); 
         for (size_t i = 0; i < length_classes.size() - 1; ++i) {
             midpoints.push_back((length_classes[i] + length_classes[i + 1]) / 2.0);
+            this->alk[i].resize(age_means.size());
         }
-        this->update_alk();
+        this->UpdateALK();
+    }
+
+    /**
+     * Computes the ALK from a von Bertalanffy growth function (Schnute parameterization).
+     * @param k the von Bertalanffy growth rate
+     * @param L1 the mean length at age a1
+     * @param L2 the mean length at age a2
+     * 
+     */
+    virtual void CalculateVBGF(Type K, size_t a1, size_t a2, Type L1, Type L2){
+        age_means[0] = L1
+        for(size_t a = 1; a < age_means.size(); a++){
+            age_means[a] = L1+(L2-L1)*((1-exp(-K*(a-a1))/(1-exp(-K*(a2-a1)))));
+        }
     }
     
     /**
@@ -60,7 +78,7 @@ struct Length : public GrowthBase<Type> {
      *
      * @param a  age of the fish, the age vector must start at zero
      */
-    virtual const Type evaluate(const double& a) {
+    virtual const Type Evaluate(const double& a) {
         
         return 1.0;
     }
@@ -101,13 +119,13 @@ struct Length : public GrowthBase<Type> {
      * composition of a fish population based on length measurements.
      *
      */
-    void update_alk() {
+    void UpdateALK() {
         
-        size_t num_lengths = this->length_classes.size();
-        size_t num_ages = this->age_means.size();
+        size_t nlengths = this->length_classes.size();
+        size_t nages = this->age_means.size();
         
-        for (size_t i = 0; i < num_lengths; ++i) {
-            for (size_t j = 0; j < num_ages; ++j) {
+        for (size_t i = 0; i < nlengths; ++i) {
+            for (size_t j = 0; j < nages; ++j) {
                 
                 // Probability of length given age j
                 this->alk[i][j] = Type(cdf(this->length_classes[i] + 0.5, this->age_means[j], this->age_stddevs[j]) -
