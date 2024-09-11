@@ -67,7 +67,7 @@ struct Length : public GrowthBase<Type> {
      * 
      */
     virtual void CalculateVBGF(Type K, size_t a1, size_t a2, Type L1, Type L2){
-        age_means[0] = L1
+        age_means[0] = L1;
         for(size_t a = 1; a < age_means.size(); a++){
             age_means[a] = L1+(L2-L1)*((1-exp(-K*(a-a1))/(1-exp(-K*(a2-a1)))));
         }
