@@ -274,6 +274,9 @@ void clear() {
   AgeCompDataInterface::id_g = 1;
   AgeCompDataInterface::live_objects.clear();
 
+  LengthCompDataInterface::id_g = 1;
+  LengthCompDataInterface::live_objects.clear();
+
   IndexDataInterface::id_g = 1;
   IndexDataInterface::live_objects.clear();
 
@@ -412,10 +415,21 @@ RCPP_MODULE(fims) {
       .field("proportion_catch_numbers_at_age", &FleetInterface::proportion_catch_numbers_at_age)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
+  Rcpp::class_<LengthFleetInterface>("LengthFleet")
+    .derives<FleetInterface>("FleetInterface")
+    .constructor()
+    .field("nlengths", &LengthFleetInterface::nlengths)
+    .field("proportion_catch_numbers_at_length", &LengthFleetInterface::proportion_catch_numbers_at_age);
+
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
       .constructor<int, int>()
       .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
       .method("get_id", &AgeCompDataInterface::get_id);
+
+  Rcpp::class_<LengthCompDataInterface>("LengthComp")
+      .constructor<int, int>()
+      .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
+      .method("get_id", &LengthCompDataInterface::get_id);
 
   Rcpp::class_<IndexDataInterface>("Index")
       .constructor<int>()
