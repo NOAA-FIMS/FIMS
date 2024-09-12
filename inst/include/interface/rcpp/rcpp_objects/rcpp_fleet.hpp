@@ -135,6 +135,8 @@ class FleetInterface : public FleetInterfaceBase {
 
     return true;
   }
+  #endif
+};
 
   /**
  * @brief Rcpp interface for Fleet as an S4 object. To instantiate
