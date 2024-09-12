@@ -160,7 +160,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     for (int y = 0; y < ymax; y++) {
       for (int l = 0; l < lmax; l++) {
         int i_length_year = y * lmax + l;
-        length_comp_data->at(y, a) = this->length_comp_data[i_length_year];
+        length_comp_data->at(y, l) = this->length_comp_data[i_length_year];
       }
     }
 
