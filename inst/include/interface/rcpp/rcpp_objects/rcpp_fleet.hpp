@@ -136,6 +136,79 @@ class FleetInterface : public FleetInterfaceBase {
     return true;
   }
 
+  /**
+ * @brief Rcpp interface for Fleet as an S4 object. To instantiate
+ * from R:
+ * fleet <- new(Fleet)
+ *
+ */
+class LengthFleetInterface : public FleetInterface {
+
+ public:
+  int nlengths;             /**< number of years in the fleet data */
+  ParameterVector proportion_catch_numbers_at_length; /**< expected catch numbers at age for the fleet */
+
+  LengthFleetInterface() : FleetInterface() {}
+
+  virtual ~LengthFleetInterface() {}
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_popdy::Fleet<Type> > fleet =
+        std::make_shared<fims_popdy::Fleet<Type> >();
+
+    // set relative info
+    fleet->id = this->id;
+    fleet->is_survey = this->is_survey;
+    fleet->nages = this->nages;
+    fleet->nyears = this->nyears;
+    fleet->nlengths = this->nlengths;
+    fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
+
+    fleet->log_q = this->log_q;
+    if (this->estimate_q) {
+      info->RegisterParameterName("log_q");
+      if (this->random_q) {
+        info->RegisterRandomEffect(fleet->log_q);
+      } else {
+        info->RegisterParameter(fleet->log_q);
+      }
+    }
+
+    fleet->log_Fmort.resize(this->log_Fmort.size());
+    for (size_t i = 0; i < log_Fmort.size(); i++) {
+      fleet->log_Fmort[i] = this->log_Fmort[i].value_m;
+
+      if (this->log_Fmort[i].estimated_m) {
+        info->RegisterParameterName("log_Fmort");
+        if (this->log_Fmort[i].is_random_effect_m) {
+          info->RegisterRandomEffect(fleet->log_Fmort[i]);
+        } else {
+          info->RegisterParameter(fleet->log_Fmort[i]);
+        }
+      }
+    }
+    //add to variable_map
+    info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
+
+    //exp_catch
+    fleet->log_expected_index.resize(nyears);  // assume index is for all ages.
+    info->variable_map[this->log_expected_index.id_m] = &(fleet)->log_expected_index;
+    fleet->proportion_catch_numbers_at_age.resize(nyears * nages);
+    fleet->proportion_catch_numbers_at_length.resize(nyears * nlengths);
+    info->variable_map[this->proportion_catch_numbers_at_age.id_m] = &(fleet)->proportion_catch_numbers_at_age;
+    info->variable_map[this->proportion_catch_numbers_at_length.id_m] = &(fleet)->proportion_catch_numbers_at_length;
+
+    // add to Information
+    info->fleets[fleet->id] = fleet;
+
+    return true;
+  }
+
   /** @brief this adds the values to the TMB model object */
   virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
