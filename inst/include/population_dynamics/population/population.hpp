@@ -541,6 +541,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       POPULATION_LOG << " age-length transition matrix" << std::endl;
       for(size_t a = 0; a < this->nages; a++){
         for(size_t l = 0; l < this->nlengths; l++){
+          size_t i_age_length = a * this->nlengths + l;
+          
           this->fleets[fleet_]->age_length_transition_matrix[i_age_length] = this->growth->alk(ages[a]);
         }
     }
