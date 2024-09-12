@@ -409,17 +409,14 @@ RCPP_MODULE(fims) {
       .field("log_Fmort", &FleetInterface::log_Fmort)
       .field("nages", &FleetInterface::nages)
       .field("nyears", &FleetInterface::nyears)
+      .field("nlengths", &FleetInterface::nlengths)
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
       .field("log_expected_index", &FleetInterface::log_expected_index)
       .field("proportion_catch_numbers_at_age", &FleetInterface::proportion_catch_numbers_at_age)
+      .field("proportion_catch_numbers_at_length", &FleetInterface::proportion_catch_numbers_at_length)
+      .field("age_length_conversion_matrix", &FleetInterface::age_length_conversion_matrix)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
-
-  Rcpp::class_<LengthFleetInterface>("LengthFleet")
-    .derives<FleetInterface>("FleetInterface")
-    .constructor()
-    .field("nlengths", &LengthFleetInterface::nlengths)
-    .field("proportion_catch_numbers_at_length", &LengthFleetInterface::proportion_catch_numbers_at_age);
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
       .constructor<int, int>()
