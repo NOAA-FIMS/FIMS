@@ -465,7 +465,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   input <- list()
   input$parameters <- parameters
   input$version = "Model Comparison Project example"
-  fit <- fit_fims(input)
+  fit <- fit_fims(input, do.fit = estimation_mode)
 
   clear()
   # Return the results as a list
