@@ -178,6 +178,7 @@ class Model {  // may need singleton
 #endif
         MODEL_LOG << "Setting up pointer to fleet " << f->id << "."
                   << std::endl;
+        f->evaluate_length_comp();
         f->evaluate_age_comp();
         f->evaluate_index();
       }
