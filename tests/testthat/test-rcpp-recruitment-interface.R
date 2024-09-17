@@ -13,7 +13,6 @@ test_that("Recruitment input settings work as expected", {
   recruitment$logit_steep$is_random_effect <- TRUE
   recruitment$logit_steep$estimated <- TRUE
   recruitment$log_rzero$value <- log(r0)
-  recruitment$log_sigma_recruit$value <- log(0.7)
 
   expect_equal(recruitment$get_id(), 1)
   expect_equal(recruitment$logit_steep$value, 0.78845736)

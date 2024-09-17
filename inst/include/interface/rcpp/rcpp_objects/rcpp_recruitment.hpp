@@ -66,8 +66,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
   Parameter logit_steep; /**< steepness or the productivity of the stock*/
   Parameter log_rzero;   /**< recruitment at unfished biomass */
-  Parameter
-      log_sigma_recruit; /**< the log of the stock recruit standard deviation */
   ParameterVector log_devs;   /**< log recruitment deviations*/
   bool estimate_log_devs = false; /**< boolean describing whether to estimate */
 
@@ -130,19 +128,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
     info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
-
-    //set log_sigma_recruit
-    recruitment->log_sigma_recruit.resize(1);
-    recruitment->log_sigma_recruit[0] = this->log_sigma_recruit.value_m;
-    if (this->log_sigma_recruit.estimated_m) {
-      info->RegisterParameterName("log_sigma_recruit");
-      if (this->log_sigma_recruit.is_random_effect_m) {
-        info->RegisterRandomEffect(recruitment->log_sigma_recruit[0]);
-      } else {
-        info->RegisterParameter(recruitment->log_sigma_recruit[0]);
-      }
-    }
-    info->variable_map[this->log_sigma_recruit.id_m] = &(recruitment)->log_sigma_recruit;
 
     //set log_recruit_devs
     recruitment->log_recruit_devs.resize(this->log_devs.size());
