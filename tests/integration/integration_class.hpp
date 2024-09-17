@@ -547,22 +547,6 @@ public:
                 }
             }
 
-            it = obj.find("logR_sd");
-            if (it != obj.end()) {
-                if ((*it).second.GetType() == JsonValueType::Array) {
-                    rec->log_sigma_recruit.resize(1);
-                    rec->log_sigma_recruit[0] = (*it).second.GetArray()[0].GetDouble();
-                    if (print_statements) {
-                        std::cout << "'SD' " << rec->log_sigma_recruit[0] << " \n";
-                    }
-                }
-            } else {
-                if (print_statements) {
-                    std::cout << "'logR_sd' not found.\n";
-                }
-            }
-
-
             it = obj.find("logR.resid");
             /*the log_recruit_dev vector does not include a value for year == 0
               and is of length nyears - 1 where the first position of the vector

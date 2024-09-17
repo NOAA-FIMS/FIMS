@@ -55,9 +55,6 @@ init_fims <- function(i) {
 
   # Recruitment
   recruitment <- new(fims$BevertonHoltRecruitment)
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is taken
-  # before the likelihood calculation
-  recruitment$log_sigma_recruit$value <- log(om_input$logR_sd)
   recruitment$log_rzero$value <- log(om_input$R0 + runif(1, min = 0, max = 1000))
   recruitment$log_rzero$is_random_effect <- FALSE
   recruitment$log_rzero$estimated <- FALSE

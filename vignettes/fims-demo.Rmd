@@ -254,7 +254,7 @@ We'll use a Beverton Holt recruitment module. We first instantiate a module usin
 recruitment <- methods::new(BevertonHoltRecruitment)
 methods::show(BevertonHoltRecruitment)
 ```
-There are three parameters we need to set-up: *log_sigma_recruit*, *log_rzero*, and *logit_steep*.
+Set up the following parameters: *log_rzero* and *logit_steep*.
 
 ```{r set-up-recruitment}
 recruitment$log_rzero$value <- log(1e+06) # unit: log(number)
