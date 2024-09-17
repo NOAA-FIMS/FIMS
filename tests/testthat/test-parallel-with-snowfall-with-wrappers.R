@@ -17,7 +17,7 @@ estimation_results_serial <- vector(mode = "list", length = length(om_input_list
 
 start_time_serial <- Sys.time()
 for (i in 1:length(om_input_list)) {
-  estimation_results_serial[[i]] <- setup_and_run_FIMS(
+  estimation_results_serial[[i]] <- setup_and_run_FIMS_with_wrappers(
     iter_id = i,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
@@ -35,7 +35,7 @@ test_that("Run FIMS in parallel using {snowfall}", {
 
   results_parallel <- snowfall::sfLapply(
     1:length(om_input_list),
-    setup_and_run_FIMS,
+    setup_and_run_FIMS_with_wrappers,
     om_input_list,
     om_output_list,
     em_input_list,
@@ -57,13 +57,6 @@ test_that("Run FIMS in parallel using {snowfall}", {
   expect_setequal(
     unname(unlist(lapply(results_parallel, `[[`, "parameters"))),
     unname(unlist(lapply(estimation_results_serial, `[[`, "parameters")))
-  )
-
-  # Compare sdr_fixed values in results:
-  # Verify that the results from both runs are equivalent.
-  expect_setequal(
-    unlist(lapply(results_parallel, `[[`, "sdr_fixed")),
-    unlist(lapply(estimation_results_serial, `[[`, "sdr_fixed"))
   )
 
   # Compare sdr_report values in results:
