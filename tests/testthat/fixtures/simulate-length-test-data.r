@@ -38,11 +38,15 @@ for(i in seq_along(ages)){
 colnames(length_age_conversion) <- len_bins
 rownames(length_age_conversion) <- ages
 
+
+#add code to simulate length data
+length_data <- 0L
+
 on.exit(unlink(maindir, recursive = TRUE), add = TRUE)
 
 setwd(working_dir)
 on.exit(setwd(working_dir), add = TRUE)
 
-save(om_input_list, length_age_conversion,
+save(om_input_list, length_age_conversion, length_data,
   file = test_path("fixtures", "length_test_data.RData")
 )
