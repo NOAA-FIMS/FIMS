@@ -47,9 +47,9 @@ test_that("print.fimsfit prints summary correctly", {
                              max_gradient = 0.0001,
                              objective = 1498.433),
                   rep = list(ssb = list(rep(10000, 5)),
-                             jnll = 1498.33),
+                             jnll = 1498.433),
                   parList = list()
-                  )
+  )
   class(fit_obj) <- c("fimsfit", "list")
 
   expect_snapshot(

@@ -43,13 +43,12 @@
 #'   estimation_mode = TRUE
 #' )
 setup_and_run_FIMS_without_wrappers <- function(iter_id,
-                               om_input_list,
-                               om_output_list,
-                               em_input_list,
-                               estimation_mode = TRUE,
-                               map = list()) {
-
-  # Load operating model data
+                                                om_input_list,
+                                                om_output_list,
+                                                em_input_list,
+                                                estimation_mode = TRUE,
+                                                map = list()) {
+  # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]]
   om_output <- om_output_list[[iter_id]]
   em_input <- em_input_list[[iter_id]]
@@ -236,7 +235,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   opt <- NULL
   if (estimation_mode == TRUE) {
     opt <- stats::nlminb(obj$par, obj$fn, obj$gr,
-                         control = list(eval.max = 800, iter.max = 800)
+      control = list(eval.max = 800, iter.max = 800)
     )
   }
   # Call report using MLE parameter values, or
@@ -306,11 +305,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 #'   estimation_mode = TRUE
 #' )
 setup_and_run_FIMS_with_wrappers <- function(iter_id,
-                                                om_input_list,
-                                                om_output_list,
-                                                em_input_list,
-                                                estimation_mode = TRUE,
-                                                map = list()) {
+                                             om_input_list,
+                                             om_output_list,
+                                             em_input_list,
+                                             estimation_mode = TRUE,
+                                             map = list()) {
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]]
   om_output <- om_output_list[[iter_id]]
@@ -464,7 +463,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   parameters <- list(p = get_fixed())
   input <- list()
   input$parameters <- parameters
-  input$version = "Model Comparison Project example"
+  input$version <- "Model Comparison Project example"
   fit <- fit_fims(input, do.fit = estimation_mode)
 
   clear()
@@ -474,7 +473,9 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
     obj = fit$obj,
     opt = fit$opt,
     report = fit$rep,
-    sdr_report = fit$sd
+    sdr_report = fit$sd,
+    fit = fit
   ))
-}
 
+
+}
