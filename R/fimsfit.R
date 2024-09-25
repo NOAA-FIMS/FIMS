@@ -84,7 +84,8 @@ print.fimsfit <- function(fit, ...){
 #'    Hessian to do after optimization.
 #' @param control A list of optimizer settings passed to code{nlminb}
 #' @param getsd Calculate and return sdreport?
-#' @param do.fit Optimize or return obj? Used for testing.
+#' @param do.fit Optimize (TRUE, default) or (FALSE) build and return
+#'    a list containing the obj and report slot.
 #' @param save.sdrep Whether to return the sdreport object in the
 #'   fitted model. This is rarely used and large so turned off by
 #'   default. When returned it is named `sdrep`.
@@ -93,10 +94,11 @@ print.fimsfit <- function(fit, ...){
 #'   and a value of NULL indicates not to save it. If specified,
 #'   it must end in .RDS. The file is written to folder given by
 #'   \code{input$path}.
-#' @return A list object of class 'fimsfit' which contains a
-#'   "version" model name, rep, parList (MLE in list format), opt
-#'   as returned by \code{nlminb}, std (formatted data frame) and sdrep if
-#'   \code{getsd=TRUE}, and the obj.
+#' @return If \code{do.fit} is TRUE then a list object of class 'fimsfit'
+#'  which contains a "version" model name, rep, parList (MLE in list format),
+#'  opt as returned by \code{nlminb}, std (formatted data frame) and sdrep if
+#'   \code{getsd=TRUE}, and the obj. If \code{do.fit} is FALSE then it returns
+#'   a list containing the TMB obj and rep slot for the report.
 #' @details This function is a beta version still and subject to change
 #'   without warning.
 #' @export
@@ -115,7 +117,7 @@ if (loopnum < 0) {
 obj <- MakeADFun(data=list(), parameters=input$parameters,
                  map=input$map, random=input$random,
                  DLL='FIMS', silent=TRUE)
-if(!do.fit) return(obj)
+if(!do.fit) return(list(obj=obj, rep=obj$report(obj$env$last.par.best)))
 # to do: max this update elements that are not supplied by default
 if(is.null(control))
   control <- list(eval.max=10000, iter.max=10000, trace=0)

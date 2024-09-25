@@ -21,7 +21,8 @@ fit_fims(
 
 \item{getsd}{Calculate and return sdreport?}
 
-\item{do.fit}{Optimize or return obj? Used for testing.}
+\item{do.fit}{Optimize (TRUE, default) or (FALSE) build and return
+a list containing the obj and report slot.}
 
 \item{newtonsteps}{The number of Newton steps using the inverse
 Hessian to do after optimization.}
@@ -39,10 +40,11 @@ it must end in .RDS. The file is written to folder given by
 \code{input$path}.}
 }
 \value{
-A list object of class 'fimsfit' which contains a
-"version" model name, rep, parList (MLE in list format), opt
-as returned by \code{nlminb}, std (formatted data frame) and sdrep if
-\code{getsd=TRUE}, and the obj.
+If \code{do.fit} is TRUE then a list object of class 'fimsfit'
+which contains a "version" model name, rep, parList (MLE in list format),
+opt as returned by \code{nlminb}, std (formatted data frame) and sdrep if
+\code{getsd=TRUE}, and the obj. If \code{do.fit} is FALSE then it returns
+a list containing the TMB obj and rep slot for the report.
 }
 \description{
 Fit a FIMS model (BETA)
