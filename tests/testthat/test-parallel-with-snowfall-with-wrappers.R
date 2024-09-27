@@ -55,14 +55,14 @@ test_that("Run FIMS in parallel using {snowfall}", {
   # Compare parameters in results:
   # Verify that the results from both runs are equivalent.
   expect_setequal(
-    unname(unlist(lapply(results_parallel, `[[`, "parameters"))),
-    unname(unlist(lapply(estimation_results_serial, `[[`, "parameters")))
+    unname(unlist(lapply(results_parallel, `[[`, "parList"))),
+    unname(unlist(lapply(estimation_results_serial, `[[`, "parList")))
   )
 
   # Compare sdr_report values in results:
   # Verify that the results from both runs are equivalent.
   expect_setequal(
-    unlist(lapply(results_parallel, `[[`, "sdr_report")),
-    unlist(lapply(estimation_results_serial, `[[`, "sdr_report"))
+    unname(unlist(lapply(results_parallel, `[[`, "sd"))),
+    unname(unlist(lapply(estimation_results_serial, `[[`, "sd")))
   )
 })

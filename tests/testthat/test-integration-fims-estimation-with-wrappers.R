@@ -11,20 +11,12 @@ test_that("deterministic test of fims", {
     estimation_mode = FALSE
   )
 
-  # Set up TMB's computational graph
-  obj <- result$obj
-
-  # Calculate standard errors
-  sdr <- TMB::sdreport(obj)
-  sdr_report <- summary(sdr, "report")
-  sdr_fixed <- summary(sdr, "fixed")
-
   # Call report using deterministic parameter values
   # obj$report() requires parameter list to avoid errors
-  report <- obj$report(obj$par)
+  report <- result$rep
 
   # Compare log(R0) to true value
-  fims_logR0 <- sdr_fixed[1, "Estimate"]
+  fims_logR0 <- as.numeric(result$obj$par[1])
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]]$R0))
 
@@ -154,11 +146,12 @@ test_that("estimation test of fims using fit_fims()", {
     estimation_mode = TRUE
   )
 
+  result$sd
   # Compare FIMS results with model comparison project OM values
   validate_fims(
-    report = result$report,
-    sdr = TMB::sdreport(result$obj),
-    sdr_report = result$sdr_report,
+    report = result$rep,
+    sdr = result$sd,
+    sdr_report = result$sd,
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],

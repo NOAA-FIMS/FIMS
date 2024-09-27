@@ -144,7 +144,7 @@ test_that("deterministic test of fims", {
 test_that("nll test of fims", {
   iter_id <- 1
 
-  result <- setup_and_run_FIMS(
+  result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
