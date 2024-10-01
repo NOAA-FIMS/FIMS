@@ -26,6 +26,7 @@
 
 namespace fims_math {
 #ifdef STD_LIB
+
 /**
  * @brief The exponential function.
  *
@@ -228,7 +229,7 @@ inline const Type double_logistic(const Type &inflection_point_asc,
  */
 template <class Type>
 const Type ad_fabs(const Type &x, Type C = 1e-5) {
-  return sqrt((x * x) + C);  //, .5);
+  return sqrt((x * x) + C);
 }
 
 /**
@@ -296,26 +297,28 @@ inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
      */
     template<class T>
     const T dnorm(const T &x, const T &mean, const T &sd, bool ret_log = false) {
-      
+
         // Check if the standard deviation is valid
         if (sd <= static_cast<T> (0)) {
             throw std::invalid_argument("Standard deviation must be positive.");
         }
 
         // Constants
-        const T inv_sqrt_2pi = 1.0 / std::sqrt(2.0 * M_PI);
+        const T log_sqrt_2pi = fims_math::log(static_cast<T>(2) * M_PI) / static_cast<T>(2);
 
-        // Compute the exponent part
+        // Compute z-score
         T z = (x - mean) / sd;
-        T exponent = -1.0*static_cast<T> (0.5) * z * z;
 
-        // Compute log density
+    // Compute the log of the density
+    T log_density = -static_cast<T>(0.5) * z * z - fims_math::log(sd) - log_sqrt_2pi;
+
+        // Return log density if requested
         if (ret_log) {
-            return exponent - log(sd) - log(inv_sqrt_2pi);
+            return log_density;
         }
 
         // Otherwise, return the density
-        return inv_sqrt_2pi / sd * exp(exponent);
+        return fims_math::exp(log_density);
     }
 
     /**
