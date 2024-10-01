@@ -82,20 +82,11 @@ setup_and_run_FIMS <- function(iter_id,
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
   recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], om_input$nyr-1)
 
-  recruitment_distribution <- new(TMBDnormDistribution)
   # set up logR_sd using the normal log_sd parameter
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
-  # taken before the likelihood calculation
-  recruitment_distribution$log_sd <- new(ParameterVector, 1)
-  recruitment_distribution$log_sd[1]$value <- log(om_input$logR_sd)
-  recruitment_distribution$log_sd[1]$estimated <- FALSE
-  recruitment_distribution$x <- new(ParameterVector, om_input$nyr)
-  recruitment_distribution$expected_values <- new(ParameterVector, om_input$nyr)
-  for (i in 1:om_input$nyr) {
-    recruitment_distribution$x[i]$value <- 0
-    recruitment_distribution$expected_values[i]$value <- 0
-  }
-  recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+  recruitment_distribution <- 
+    new_process_distribution(par = "log_devs", module = recruitment, family = gaussian(),
+                             sd = list(value = om_input$logR_sd, estimated = FALSE),
+                             is_random_effect = FALSE)
   recruitment$estimate_log_devs <- TRUE
 
   # Data
@@ -150,24 +141,20 @@ setup_and_run_FIMS <- function(iter_id,
   fishing_fleet$estimate_q <- FALSE
   fishing_fleet$random_q <- FALSE
   fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
+  fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
+  fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
 
   # Set up fishery index data using the lognormal
-  fishing_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
-  # lognormal observation error transformed on the log scale
-  fishing_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
-  for (y in 1:om_input$nyr) {
-    fishing_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
-  }
-  fishing_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
-  # Set Data using the IDs from the modules defined above
-  fishing_fleet_index_distribution$set_observed_data(fishing_fleet_index$get_id())
-  fishing_fleet_index_distribution$set_distribution_links("data", fishing_fleet$log_expected_index$get_id())
+  fishing_fleet_index_distribution <-
+    new_data_distribution(data_type = "cpue", module = fishing_fleet,
+                        family = lognormal(link = "log"),
+                        sd = list(value = rep(sqrt(log(em_input$cv.L$fleet1^2 + 1)), om_input$nyr),
+                                  estimated = FALSE))
 
   # Set up fishery age composition data using the multinomial
-  fishing_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
-  fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet_age_comp$get_id())
-  fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$proportion_catch_numbers_at_age$get_id())
-
+fishing_fleet_agecomp_distribution <-
+  new_data_distribution(data_type = "agecomp", module = fishing_fleet,
+                        family = multinomial(link = "logit"))
   # Create the survey fleet
   survey_fleet_selectivity <- new(LogisticSelectivity)
   survey_fleet_selectivity$inflection_point[1]$value <- om_input$sel_survey$survey1$A50.sel1
@@ -187,26 +174,21 @@ setup_and_run_FIMS <- function(iter_id,
   survey_fleet$estimate_q <- TRUE
   survey_fleet$random_q <- FALSE
   survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
+  survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
+  survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
 
   # Set up survey index data using the lognormal
-  survey_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
-  # lognormal observation error transformed on the log scale
-  # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
-  for (y in 1:om_input$nyr) {
-    survey_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
-  }
-  survey_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
-  # Set Data using the IDs from the modules defined above
-  survey_fleet_index_distribution$set_observed_data(survey_fleet_index$get_id())
-  survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_expected_index$get_id())
-
+  survey_fleet_index_distribution <-
+    new_data_distribution(data_type = "index", module = survey_fleet,
+                          family = lognormal(link = "log"),
+                          sd = list(value = rep(sqrt(log(em_input$cv.survey$survey1^2 + 1)), om_input$nyr),
+                                    estimated = FALSE))
+  
   # Age composition data
 
-  survey_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
-  survey_fleet_agecomp_distribution$set_observed_data(survey_fleet_age_comp$get_id())
-  survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$proportion_catch_numbers_at_age$get_id())
-
+  survey_fleet_agecomp_distribution <-
+    new_data_distribution(data_type = "agecomp", module = survey_fleet,
+                          family = multinomial(link = "logit"))
 
   # Population
   population <- new(Population)
