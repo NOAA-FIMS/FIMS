@@ -80,12 +80,14 @@ print.fimsfit <- function(fit, ...){
 #' Fit a FIMS model (BETA)
 #' @param input Input list as returned by
 #'   \code{prepare_input}.
+#' @param getsd Calculate and return sdreport?
+#' @param loopnum A positive integer specifying the number of iterations of
+#'   the optimizer that will be performed to improve the gradient.
+#' @param do.fit Optimize (TRUE, default) or (FALSE) build and return
+#'    a list containing the obj and report slot.
 #' @param newtonsteps The number of Newton steps using the inverse
 #'    Hessian to do after optimization.
 #' @param control A list of optimizer settings passed to code{nlminb}
-#' @param getsd Calculate and return sdreport?
-#' @param do.fit Optimize (TRUE, default) or (FALSE) build and return
-#'    a list containing the obj and report slot.
 #' @param save.sdrep Whether to return the sdreport object in the
 #'   fitted model. This is rarely used and large so turned off by
 #'   default. When returned it is named `sdrep`.

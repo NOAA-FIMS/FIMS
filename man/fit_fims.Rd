@@ -21,6 +21,9 @@ fit_fims(
 
 \item{getsd}{Calculate and return sdreport?}
 
+\item{loopnum}{A positive integer specifying the number of iterations of
+the optimizer that will be performed to improve the gradient.}
+
 \item{do.fit}{Optimize (TRUE, default) or (FALSE) build and return
 a list containing the obj and report slot.}
 
