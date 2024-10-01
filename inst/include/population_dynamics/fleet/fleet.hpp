@@ -33,6 +33,14 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   std::shared_ptr<SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
 
+  int fleet_observed_index_data_id_m = -999; /*!< id of index data */
+  std::shared_ptr<fims_data_object::DataObject<Type>>
+    observed_index_data; /*!< observed index data*/
+
+  int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
+  std::shared_ptr<fims_data_object::DataObject<Type>>
+    observed_agecomp_data; /*!< observed agecomp data*/
+
   // Mortality and catchability
   fims::Vector<Type>
       log_Fmort; /*!< estimated parameter: log Fishing mortality*/
@@ -130,7 +138,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
               0); /**<model expected catch at age*/
     std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
               0); /**<model expected weight at age*/
-  
+
     for (size_t i = 0; i < this->log_q.size(); i++) {
         this->q[i] = fims_math::exp(this->log_q[i]);
     }
