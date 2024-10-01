@@ -48,7 +48,7 @@ struct VBGF : public GrowthBase<Type> {
     virtual void CalculateVBGF(size_t a){
         lengths[0] = L1;
         for(size_t a = 1; a < ages.size(); a++){
-            lengths[a] = L1+(L2-L1)*((1-exp(-K*(a-a1))/(1-exp(-K*(a2-a1)))));
+            lengths[a] = L1+(L2-L1)*((1-exp(-K*(a-a1)))/(1-exp(-K*(a2-a1))));
         }
     }
     
