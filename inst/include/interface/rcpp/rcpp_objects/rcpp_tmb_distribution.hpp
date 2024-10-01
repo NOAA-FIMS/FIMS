@@ -368,12 +368,12 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
             FIMS_WARNING_LOG("LogNormalLPDF " + fims::to_string(this->id_m) + " not found in Information.");
             return;
         } else {
-            std::shared_ptr<fims_distributions::LogNormalLPDF<double> > dnorm =
+            std::shared_ptr<fims_distributions::LogNormalLPDF<double> > dlnorm =
                     std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double> >(it->second);
 
-            this->lpdf_vec = Rcpp::NumericVector(dnorm->lpdf_vec.size());
+            this->lpdf_vec = Rcpp::NumericVector(dlnorm->lpdf_vec.size());
             for(size_t i=0; i < this->lpdf_vec.size(); i++) {
-                this->lpdf_vec[i] = dnorm->lpdf_vec[i];
+                this->lpdf_vec[i] = dlnorm->lpdf_vec[i];
             }
 
         }
