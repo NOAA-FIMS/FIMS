@@ -61,7 +61,6 @@ Imports:
     jsonlite,
     methods,
     Rcpp,
-    scales,
     TMB (>= 1.8.0)
 Suggests: 
     covr,
@@ -69,6 +68,7 @@ Suggests:
     parallel,
     remotes,
     rmarkdown,
+    scales,
     snowfall,
     testthat (>= 3.0.0),
     tidyverse,
