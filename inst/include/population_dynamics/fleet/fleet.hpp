@@ -132,11 +132,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(),
               0); /**<model expected catch at age*/
     std::fill(catch_numbers_at_length.begin(), catch_numbers_at_length.end(),
-              0); /**<model expected catch at age*/
+              0); /**<model expected catch at length*/
     std::fill(proportion_catch_numbers_at_age.begin(), proportion_catch_numbers_at_age.end(),
-              0); /**<model expected catch at age*/
+              0); /**<model expected proportional catch numbers at age*/
     std::fill(proportion_catch_numbers_at_length.begin(), proportion_catch_numbers_at_length.end(),
-              0); /**<model expected numbers at length */
+              0); /**<model expected proportional catch numbers at length */
     std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
               0); /**<model expected weight at age*/
     this->q = fims_math::exp(this->log_q);
@@ -172,14 +172,19 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     for (size_t y = 0; y < this->nyears; y++) {
       Type sum = 0.0;
       for (size_t l = 0; l < this->nlengths; l++) {
-        for(size_t a = 0; a < this->nages; a++){
         size_t i_length_year = y * this->nlengths + l;
+        for(size_t a = 0; a < this->nages; a++){
         size_t i_age_year = y * this->nages + a;
         size_t i_age_length = a * this->nlengths + l;
-        this->proportion_catch_numbers_at_length[i_length_year] = this->catch_numbers_at_age[i_age_year] * this->age_length_conversion_matrix[i_age_length];
+        this->catch_numbers_at_length[i_length_year] += this->catch_numbers_at_age[i_age_year] * this->age_length_conversion_matrix[i_age_length];
         }
+        sum += this->catch_numbers_at_length[i_length_year];
+      }
+      for (size_t l = 0; l < this->nlengths; l++) {
+        size_t i_length_year = y * this->nlengths + l;
+        this->proportion_catch_numbers_at_length[i_length_year] = this->catch_numbers_at_length[i_length_year] / sum;
+      }
     }
-  }
   }
 
   /**
