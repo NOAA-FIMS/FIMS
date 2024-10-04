@@ -16,7 +16,7 @@ test_that("deterministic test of fims", {
   report <- result$rep
 
   # Compare log(R0) to true value
-  fims_logR0 <- as.numeric(result$obj$par[1])
+  fims_logR0 <- as.numeric(result$obj$par[36])
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]]$R0))
 

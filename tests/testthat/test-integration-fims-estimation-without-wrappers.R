@@ -22,7 +22,7 @@ test_that("deterministic test of fims", {
   report <- result$report
 
   # Compare log(R0) to true value
-  fims_logR0 <- sdr_fixed[1, "Estimate"]
+  fims_logR0 <- sdr_fixed[36, "Estimate"]
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]]$R0))
 
@@ -161,7 +161,7 @@ test_that("nll test of fims", {
   sdr_fixed <- result$sdr_fixed
 
   # log(R0)
-  fims_logR0 <- sdr_fixed[1, "Estimate"]
+  fims_logR0 <- sdr_fixed[36, "Estimate"]
   # expect_lte(abs(fims_logR0 - log(om_input$R0)) / log(om_input$R0), 0.0001)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]]$R0))
 
