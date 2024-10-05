@@ -25,3 +25,7 @@
 #' @export TMBDmultinomDistribution
 ## usethis namespace: end
 NULL
+
+ignore_unused_imports <- function() {
+  scales::date_format
+}
