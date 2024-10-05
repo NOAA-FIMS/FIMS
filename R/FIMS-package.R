@@ -26,6 +26,9 @@
 ## usethis namespace: end
 NULL
 
+# Resolve note from R CMD check on unused imports
+# See https://github.com/r-lib/devtools/blob/main/R/devtools-package.R and
+# https://r-pkgs.org/dependencies-in-practice.html#how-to-not-use-a-package-in-imports
 ignore_unused_imports <- function() {
   scales::date_format
 }
