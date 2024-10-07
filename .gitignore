@@ -89,8 +89,9 @@ vignettes/*/libs/
 # mac OS files
 *.DS_Store
 
-# All log file
+# All log files and json output
 *.log
+*.json
 
 #TMB tmp.def file
 src/tmp.def
