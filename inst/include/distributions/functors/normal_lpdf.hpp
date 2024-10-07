@@ -68,44 +68,33 @@ struct NormalLPDF : public DensityComponentBase<Type> {
                 this->mu[i] = this->expected_values[i];
               }
             }
-            if(log_sd.size() == 1){
-                sd[i] = fims_math::exp(log_sd[0]);
-            } else {
-              if(n_x != this->log_sd.size()){
-                /* move error handling to CreateModel in information so not to crash R
-                Rcpp::stop("the dimensions of the observed and log sd values from normal negative log likelihood do not match");
-                 */
-              } else {
-                sd[i] = fims_math::exp(log_sd[i]);
-              }
-            }
             #ifdef TMB_MODEL
             if(this->input_type == "data"){
               if(this->observed_values->at(i) != this->observed_values->na_value){
               // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->observed_values->at(i), mu[i], sd[i], true);
-                  this->lpdf_vec[i] = dnorm(this->observed_values->at(i), mu[i], sd[i], true);
+                  this->lpdf_vec[i] = dnorm(this->observed_values->at(i), mu[i], fims_math::exp(log_sd.get_force_scalar(i)), true);
                   DISTRIBUTIONS_LOG << "obsered_values " << i << " is: " << this->observed_values->at(i) << std::endl;
                   DISTRIBUTIONS_LOG << "mu " << i << " is: " << mu[i] << std::endl;
-                  DISTRIBUTIONS_LOG << "sd " << i << " is: " << sd[i] << std::endl;
+                  DISTRIBUTIONS_LOG << "sd " << i << " is: " << fims_math::exp(log_sd.get_force_scalar(i)) << std::endl;
             
               } else {
                 this->lpdf_vec[i] = 0;
               } 
               
             } else {
-              this->lpdf_vec[i] = dnorm(this->x[i], mu[i], sd[i], true);
+              this->lpdf_vec[i] = dnorm(this->x[i], mu[i], fims_math::exp(log_sd.get_force_scalar(i)), true);
                   DISTRIBUTIONS_LOG << "x " << i << " is: " << this->x[i] << std::endl;
                   DISTRIBUTIONS_LOG << "mu " << i << " is: " << mu[i] << std::endl;
-                  DISTRIBUTIONS_LOG << "sd " << i << " is: " << sd[i] << std::endl;
+                  DISTRIBUTIONS_LOG << "sd " << i << " is: " << fims_math::exp(log_sd.get_force_scalar(i)) << std::endl;
             }
             DISTRIBUTIONS_LOG << "normal lpdf_vec "<< i << " is: " << this->lpdf_vec[i] << std::endl;
             lpdf += this->lpdf_vec[i];
             if(this->simulate_flag){
                 FIMS_SIMULATE_F(this->of){
                   if(this->input_type == "data"){
-                    this->observed_values->at(i) = rnorm(mu[i], sd[i]);
+                    this->observed_values->at(i) = rnorm(mu[i], fims_math::exp(log_sd.get_force_scalar(i)));
                   } else {
-                    this->x[i] = rnorm(mu[i], sd[i]);
+                    this->x[i] = rnorm(mu[i], fims_math::exp(log_sd.get_force_scalar(i)));
                   }
                 }
             }

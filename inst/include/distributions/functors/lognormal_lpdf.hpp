@@ -71,30 +71,18 @@ namespace fims_distributions
                     this->logmu[i] = this->expected_values[i];
                   }
                 }
-                if (log_logsd.size() == 1)
-                {
-                    logsd[i] = fims_math::exp(log_logsd[0]);
-                } else {
-                  if(n_x != this->log_logsd.size()){
-                    /* move error handling to CreateModel in information so not to crash R
-                    Rcpp::stop("the dimensions of the observed and log logsd values from lognormal negative log likelihood do not match");
-                     */
-                  } else {
-                    logsd[i] = fims_math::exp(log_logsd[i]);
-                  }
-                }
 
                 #ifdef TMB_MODEL
                 if(this->input_type == "data"){
                   if(this->observed_values->at(i) != this->observed_values->na_value){
                   // this->lpdf_vec[i] = this->keep[i] * -dnorm(log(this->observed_values->at(i)), logmu[i], logsd[i], true) - log(this->observed_values->->at(i));
-                      this->lpdf_vec[i] = dnorm(log(this->observed_values->at(i)), logmu[i], logsd[i], true) - log(this->observed_values->at(i));
+                      this->lpdf_vec[i] = dnorm(log(this->observed_values->at(i)), logmu[i], fims_math::exp(log_logsd.get_force_scalar(i)), true) - log(this->observed_values->at(i));
                     } else {
                     this->lpdf_vec[i] = 0;
                     MODEL_LOG << "lpdf_vec for obs " << i << " is: " << this->lpdf_vec[i] <<std::endl;
                   } 
                 } else {
-                  this->lpdf_vec[i] = dnorm(log(this->x[i]), logmu[i], logsd[i], true);
+                  this->lpdf_vec[i] = dnorm(log(this->x[i]), logmu[i], fims_math::exp(log_logsd.get_force_scalar(i)), true);
                 }
 
                 lpdf += this->lpdf_vec[i];
@@ -104,9 +92,9 @@ namespace fims_distributions
                     { // preprocessor definition in interface.hpp
                         // this simulates data that is mean biased
                         if(this->input_type == "data"){
-                          this->observed_values->at(i) = fims_math::exp(rnorm(logmu[i], logsd[i]));
+                          this->observed_values->at(i) = fims_math::exp(rnorm(logmu[i], fims_math::exp(log_logsd.get_force_scalar(i))));
                         } else {
-                          this->x[i] = fims_math::exp(rnorm(logmu[i], logsd[i]));
+                          this->x[i] = fims_math::exp(rnorm(logmu[i], fims_math::exp(log_logsd.get_force_scalar(i))));
                         }
                     }
                 }
