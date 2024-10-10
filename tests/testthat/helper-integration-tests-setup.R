@@ -185,9 +185,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   recruitment_distribution$log_sd <- new(ParameterVector, 1)
   recruitment_distribution$log_sd[1]$value <- log(om_input$logR_sd)
   recruitment_distribution$log_sd[1]$estimated <- FALSE
-  recruitment_distribution$x <- new(ParameterVector, om_input$nyr)
-  recruitment_distribution$expected_values <- new(ParameterVector, om_input$nyr)
-  for (i in 1:om_input$nyr) {
+  recruitment_distribution$x <- new(ParameterVector, om_input$nyr - 1)
+  recruitment_distribution$expected_values <- new(ParameterVector, om_input$nyr - 1)
+  for (i in 1:(om_input$nyr - 1)) {
     recruitment_distribution$x[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
