@@ -177,11 +177,21 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
   recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], om_input$nyr-1)
 
+ 
+  recruitment_distribution <- new(TMBDnormDistribution)
   # set up logR_sd using the normal log_sd parameter
-  recruitment_distribution <- 
-    new_process_distribution(par = "log_devs", module = recruitment, family = gaussian(),
-                             sd = list(value = om_input$logR_sd, estimated = FALSE),
-                             is_random_effect = FALSE)
+  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
+  # taken before the likelihood calculation
+  recruitment_distribution$log_sd <- new(ParameterVector, 1)
+  recruitment_distribution$log_sd[1]$value <- log(om_input$logR_sd)
+  recruitment_distribution$log_sd[1]$estimated <- FALSE
+  recruitment_distribution$x <- new(ParameterVector, om_input$nyr)
+  recruitment_distribution$expected_values <- new(ParameterVector, om_input$nyr)
+  for (i in 1:om_input$nyr) {
+    recruitment_distribution$x[i]$value <- 0
+    recruitment_distribution$expected_values[i]$value <- 0
+  }
+  recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
   recruitment$estimate_log_devs <- TRUE
 
   # Growth
@@ -351,9 +361,9 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
                                   estimated = FALSE))
 
   # Set up fishery age composition data using the multinomial
-  fishing_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
-  fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet_age_comp$get_id())
-  fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$proportion_catch_numbers_at_age$get_id())
+fishing_fleet_agecomp_distribution <-
+  new_data_distribution(data_type = "agecomp", module = fishing_fleet,
+                        family = multinomial(link = "logit"))
 
   # repeat data for surveys
   survey_index <- em_input$surveyB.obs$survey1
@@ -362,9 +372,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   survey_fleet_age_comp <- new(AgeComp, length(survey_index), om_input$nages)
   survey_fleet_age_comp$age_comp_data <- c(t(em_input$survey.age.obs$survey1)) * em_input$n.survey$survey1
 
-fishing_fleet_agecomp_distribution <-
-  new_data_distribution(data_type = "agecomp", module = fishing_fleet,
-                        family = multinomial(link = "logit"))
+
   # Create the survey fleet
   survey_fleet_selectivity <- new(LogisticSelectivity)
   survey_fleet_selectivity$inflection_point[1]$value <- om_input$sel_survey$survey1$A50.sel1
@@ -395,10 +403,9 @@ fishing_fleet_agecomp_distribution <-
                                     estimated = FALSE))
   
   # Age composition data
-
-  survey_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
-  survey_fleet_agecomp_distribution$set_observed_data(survey_fleet_age_comp$get_id())
-  survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$proportion_catch_numbers_at_age$get_id())
+ survey_fleet_agecomp_distribution <-
+    new_data_distribution(data_type = "agecomp", module = survey_fleet,
+                          family = multinomial(link = "logit"))
 
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
@@ -425,20 +432,11 @@ fishing_fleet_agecomp_distribution <-
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
   recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], om_input$nyr-1)
 
-  recruitment_distribution <- new(TMBDnormDistribution)
-  # set up logR_sd using the normal log_sd parameter
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
-  # taken before the likelihood calculation
-  recruitment_distribution$log_sd <- new(ParameterVector, 1)
-  recruitment_distribution$log_sd[1]$value <- log(om_input$logR_sd)
-  recruitment_distribution$log_sd[1]$estimated <- FALSE
-  recruitment_distribution$x <- new(ParameterVector, om_input$nyr)
-  recruitment_distribution$expected_values <- new(ParameterVector, om_input$nyr)
-  for (i in 1:om_input$nyr) {
-    recruitment_distribution$x[i]$value <- 0
-    recruitment_distribution$expected_values[i]$value <- 0
-  }
-  recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+ # set up logR_sd using the normal log_sd parameter
+  recruitment_distribution <- 
+    new_process_distribution(par = "log_devs", module = recruitment, family = gaussian(),
+                             sd = list(value = om_input$logR_sd, estimated = FALSE),
+                             is_random_effect = FALSE)
   recruitment$estimate_log_devs <- TRUE
 
   # Growth
@@ -454,9 +452,7 @@ fishing_fleet_agecomp_distribution <-
   maturity$slope[1]$value <- om_input$slope
   maturity$slope[1]$is_random_effect <- FALSE
   maturity$slope[1]$estimated <- FALSE
-  survey_fleet_agecomp_distribution <-
-    new_data_distribution(data_type = "agecomp", module = survey_fleet,
-                          family = multinomial(link = "logit"))
+ 
 
   # Population
   population <- new(Population)
