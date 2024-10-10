@@ -3,7 +3,7 @@
 {
 	"name": "R (rocker/r-ver base)",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "ghcr.io/rocker-org/devcontainer/r-ver:4.3", //commma needed if other sections are used.
+	"image": "ghcr.io/rocker-org/devcontainer/r-ver:4.4", //commma needed if other sections are used.
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
