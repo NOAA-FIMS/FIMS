@@ -80,7 +80,7 @@ setup_and_run_FIMS <- function(iter_id,
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], om_input$nyr-1)
+  recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid, om_input$nyr)
 
   recruitment_distribution <- new(TMBDnormDistribution)
   # set up logR_sd using the normal log_sd parameter
