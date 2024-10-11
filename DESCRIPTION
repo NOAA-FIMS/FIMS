@@ -59,6 +59,7 @@ Imports:
     cli,
     dplyr,
     ggplot2,
+    glue,
     jsonlite,
     methods,
     Rcpp,
