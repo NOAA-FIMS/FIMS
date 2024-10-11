@@ -373,6 +373,9 @@ input <- list(data = fims_frame, parameters = parameters, version = "FIMS demo")
 test_fit <- fit_fims(input, optimize = FALSE)
 # Run the  model with optimization
 fit <- fit_fims(input)
+
+#View parameter estimates and standard errors
+summary(fit@sdreport, "fixed")
 ```
 
 ## Plotting Results
