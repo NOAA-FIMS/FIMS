@@ -22,4 +22,16 @@ fleet module", {
   clear()
 })
 
+test_that("Fleet: SetObservedAgeCompData works", {
+  fleet <- new(Fleet)
+  expect_silent(fleet$SetObservedAgeCompData(1))
+  expect_equal(fleet$GetObservedAgeCompDataID(), 1)
+  clear()
+})
 
+test_that("Fleet: SetObservedIndexData works", {
+  fleet <- new(Fleet)
+  expect_silent(fleet$SetObservedIndexData(1))
+  expect_equal(fleet$GetObservedIndexDataID(), 1)
+  clear()
+})
