@@ -13,15 +13,28 @@ new_process_distribution(
 )
 }
 \arguments{
-\item{par}{parameter name}
+\item{par}{A string specifying the parameter name the distribution applies
+to.}
 
-\item{module}{cpp module that is linked to the parameter}
+\item{module}{An identifier to a C++ fleet module that is linked to the data
+of interest.}
 
-\item{family}{a description of the error distribution and link function to be used in the model.}
+\item{family}{A description of the error distribution and link function to
+be used in the model.}
 
-\item{sd}{list with items, value, numeric vector or value indicating the initial value/s of the standard deviation, and estimated, boolean indicating whether or not sd is estimated
-is_random_effect boolean indicating whether or not the process is estimated as a random effect}
+\item{sd}{A list of length two. The first entry, \code{"value"}, stores the
+initial values for the relevant standard deviations. The second entry,
+\code{"estimated"} is a vector of booleans indicating whether or not
+standard deviation is estimated.}
+
+\item{is_random_effect}{A boolean indicating whether or not the process is
+estimated as a random effect.}
 }
 \description{
 Sets up a new distribution for a process
+}
+\seealso{
+\itemize{
+\item \code{\link[=new_data_distribution]{new_data_distribution()}}
+}
 }

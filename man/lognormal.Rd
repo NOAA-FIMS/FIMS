@@ -7,16 +7,38 @@
 lognormal(link = "log")
 }
 \arguments{
-\item{link}{link function association with family}
+\item{link}{A string specifying the link function for the family.}
 }
 \value{
-An object of class "family"
+An object of class "family" (which has a concise print method). Though this
+particular family has a truncated length compared to other distributions in
+\code{\link[stats:family]{stats::family()}}.
+\item{family}{character: the family name.}
+\item{link}{character: the link name.}
+\item{linkfun}{function: the link.}
+\item{linkinv}{function: the inverse of the link function.}
+\item{mu.eta}{
+TODO: document mu.eta
+function: derivative \eqn{TODO}.
+}
+\item{valideta}{
+logical function. Returns \code{TRUE} if a linear predictor \code{eta} is
+within the domain of \code{linkinv}.
+}
+\item{name}{A string gibing the name of the link.}
 }
 \description{
 Lognormal family and link specification
 }
 \examples{
 fam <- lognormal()
-fam$family
+fam[["family"]]
 fam$link
+}
+\seealso{
+\itemize{
+\item \code{\link[stats:family]{stats::family()}}
+\item \code{\link[stats:family]{stats::gaussian()}}
+\item \code{\link[=multinomial]{multinomial()}}
+}
 }

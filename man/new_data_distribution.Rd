@@ -2,24 +2,31 @@
 % Please edit documentation in R/distribution_formulas.R
 \name{new_data_distribution}
 \alias{new_data_distribution}
-\title{Sets up a new distribution for a data type}
+\title{Set up a new distribution for a data type}
 \usage{
 new_data_distribution(
-  data_type,
+  data_type = c("index", "cpue", "agecomp", "lengthcomp"),
   module,
   family,
   sd = list(value = 1, estimated = FALSE)
 )
 }
 \arguments{
-\item{data_type}{type of data. Options are: "index", "cpue", "agecomp", "lengthcomp"}
+\item{data_type}{A string specifying the type of data that the distribution
+will be fit to. Options are listed in the function call, where the first
+option listed, i.e., \code{"index"} is the default.}
 
-\item{module}{cpp fleet module that is linked to the data}
+\item{module}{An identifier to a C++ fleet module that is linked to the data
+of interest.}
 
-\item{family}{a description of the error distribution and link function to be used in the model.}
+\item{family}{A description of the error distribution and link function to
+be used in the model.}
 
-\item{sd}{list with items, value, numeric vector or value indicating the initial value/s of the standard deviation, and estimated, boolean indicating whether or not sd is estimated}
+\item{sd}{A list of length two. The first entry, \code{"value"}, stores the
+initial values for the relevant standard deviations. The second entry,
+\code{"estimated"} is a vector of booleans indicating whether or not
+standard deviation is estimated.}
 }
 \description{
-Sets up a new distribution for a data type
+Set up a new distribution for a data type
 }

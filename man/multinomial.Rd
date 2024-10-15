@@ -17,6 +17,6 @@ Multinomial family and link specification
 }
 \examples{
 fam <- multinomial()
-fam$family
+fam[["family"]]
 fam$link
 }
