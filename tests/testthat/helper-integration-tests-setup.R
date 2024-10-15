@@ -358,15 +358,17 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
 
   # Set up fishery index data using the lognormal
   fishing_fleet_index_distribution <-
-    new_data_distribution(data_type = "cpue", module = fishing_fleet,
+    new_data_distribution(module = fishing_fleet,
                           family = lognormal(link = "log"),
                           sd = list(value = rep(sqrt(log(em_input$cv.L$fleet1^2 + 1)), om_input$nyr),
-                                    estimated = FALSE))
+                                    estimated = FALSE),
+                          data_type = "cpue")
 
   # Set up fishery age composition data using the multinomial
   fishing_fleet_agecomp_distribution <-
-    new_data_distribution(data_type = "agecomp", module = fishing_fleet,
-                          family = multinomial(link = "logit"))
+    new_data_distribution(module = fishing_fleet,
+                          family = multinomial(link = "logit"),
+                          data_type = "agecomp")
 
   # repeat data for surveys
   survey_index <- em_input$surveyB.obs$survey1
@@ -399,16 +401,17 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
 
   # Set up survey index data using the lognormal
   survey_fleet_index_distribution <-
-    new_data_distribution(data_type = "index", module = survey_fleet,
+    new_data_distribution(module = survey_fleet,
                           family = lognormal(link = "log"),
                           sd = list(value = rep(sqrt(log(em_input$cv.survey$survey1^2 + 1)), om_input$nyr),
-                                    estimated = FALSE))
+                                    estimated = FALSE), data_type = "index")
 
   # Age composition data
 
   survey_fleet_agecomp_distribution <-
-    new_data_distribution(data_type = "agecomp", module = survey_fleet,
-                          family = multinomial(link = "logit"))
+    new_data_distribution(module = survey_fleet,
+                          family = multinomial(link = "logit"), 
+                          data_type = "agecomp")
 
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
@@ -436,7 +439,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   recruitment$log_devs <- methods::new(ParameterVector, om_input$logR.resid[-1], om_input$nyr-1)
 
   recruitment_distribution <- 
-    new_process_distribution(par = "log_devs", module = recruitment, family = gaussian(),
+    new_process_distribution(module = recruitment, par = "log_devs", family = gaussian(),
                              sd = list(value = om_input$logR_sd, estimated = FALSE),
                              is_random_effect = FALSE)
 

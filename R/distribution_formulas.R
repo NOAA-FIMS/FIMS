@@ -13,10 +13,10 @@
 #'   standard deviation is estimated.
 #' @export
 new_data_distribution <- function(
-  data_type = c("index", "cpue", "agecomp", "lengthcomp"),
   module,
   family,
-  sd = list(value = 1, estimated = FALSE)
+  sd = list(value = 1, estimated = FALSE),
+  data_type = c("index", "cpue", "agecomp", "lengthcomp")
 ) {
   data_type <- match.arg(data_type)
   families <- c("lognormal", "gaussian", "multinomial")
@@ -26,19 +26,19 @@ new_data_distribution <- function(
   if (!(family[["family"]] %in% families)) {
     stop("FIMS currently does not offer this distribution.")
   }
-  if ((data_type == "agecomp" | data_type == "lengthcomp") &
-      (family[["family"]] == "lognormal" | family[["family"]] == "gaussian")) {
+  if ((data_type == "agecomp" || data_type == "lengthcomp") &&
+      (family[["family"]] == "lognormal" || family[["family"]] == "gaussian")) {
     stop("Did you mean family = multinomial()?")
   }
-  if ((data_type == "index" | data_type == "cpue") &
+  if ((data_type == "index" || data_type == "cpue") &&
       family[["family"]] == "multinomial") {
     stop("Multinomial is not available for index or CPUE data")
   }
 
-  if (data_type == "index" | data_type == "cpue") {
+  if (data_type == "index" || data_type == "cpue") {
     obs_id_name <- "observed_index_data_id"
   }
-  if (data_type == "agecomp" | data_type == "lengthcomp") {
+  if (data_type == "agecomp" || data_type == "lengthcomp") {
     obs_id_name <- "observed_agecomp_data_id"
   }
   if (family[["family"]] == "lognormal") {
@@ -49,10 +49,10 @@ new_data_distribution <- function(
       length(sd$value)
     )
     new_module$log_logsd$set_all_estimable(sd$estimated)
-    if (family$link == "log") {
+    if (family[["link"]] == "log") {
       expected <- "log_expected_index"
     }
-    if (family$link == "identity") {
+    if (family[["link"]] == "identity") {
       expected <- "expected_index"
     }
   }
@@ -61,10 +61,10 @@ new_data_distribution <- function(
     new_module <- new(TMBDnormDistribution)
     new_module$log_sd <- new(ParameterVector, log(sd$value), length(sd$value))
     new_module$log_sd$set_all_estimable(sd$estimated)
-    if (family$link == "log") {
+    if (family[["link"]] == "log") {
       expected <- "log_expected_index"
     }
-    if (family$link == "identity") {
+    if (family[["link"]] == "identity") {
       expected <- "expected_index"
     }
   }
@@ -73,7 +73,7 @@ new_data_distribution <- function(
     new_module <- new(TMBDmultinomDistribution)
     expected <- "proportion_catch_numbers_at_age"
   }
-  if (data_type == "index" | data_type == "cpue") {
+  if (data_type == "index" || data_type == "cpue") {
     new_module$set_observed_data(module$GetObservedIndexDataID())
   }
   if (data_type == "agecomp") {
@@ -93,8 +93,8 @@ new_data_distribution <- function(
 #' @seealso
 #' * [new_data_distribution()]
 #' @export
-new_process_distribution <- function(par,
-                                     module,
+new_process_distribution <- function(module,
+                                     par,
                                      family,
                                      sd = list(value = 1, estimated = FALSE),
                                      is_random_effect = FALSE) {
