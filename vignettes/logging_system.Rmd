@@ -1,0 +1,374 @@
+---
+title: "Introducing the FIMS Logging System"
+output: github_document
+vignette: >
+  %\VignetteIndexEntryIntroducing the FIMS Logging System
+  %\VignetteEngineknitr::rmarkdown
+  %\VignetteEncodingUTF-8
+---
+
+```{r colorize, include=FALSE}
+library(FIMS)
+library(TMB)
+library(jsonlite)
+
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color, x)
+  } else {
+    x
+  }
+}
+
+# clear memory
+clear()
+
+nyears <- 30 # the number of years which we have data for.
+nseasons <- 1 # the number of seasons in each year. FIMS currently defaults to 1
+ages <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12) # age vector.
+nages <- 12 # the number of age groups.
+
+# use FIMS data frame
+fims_frame <- FIMSFrame(data_mile1)
+
+# fishery data
+fishery_catch <- m_landings(fims_frame)
+fishery_agecomp <- m_agecomp(fims_frame, "fleet1")
+
+# survey data
+survey_index <- m_index(fims_frame, "survey1")
+
+# survey agecomp not set up in fimsframe yet
+survey_agecomp <- m_agecomp(fims_frame, "survey1")
+
+# fleet index data
+fishing_fleet_index <- methods::new(Index, nyears)
+# fleet age composition data
+fishing_fleet_age_comp <- methods::new(AgeComp, nyears, nages)
+fishing_fleet_index$index_data <- fishery_catch # unit: mt
+# Effective sampling size is 200
+fishing_fleet_age_comp$age_comp_data <- fishery_agecomp * 200
+
+fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
+fishing_fleet_selectivity$inflection_point[1]$value <- 2.0
+fishing_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
+fishing_fleet_selectivity$inflection_point[1]$estimated <- TRUE
+
+fishing_fleet_selectivity$slope[1]$value <- 1.0
+fishing_fleet_selectivity$slope[1]$is_random_effect <- FALSE
+fishing_fleet_selectivity$slope[1]$estimated <- TRUE
+
+# Create fleet module
+fishing_fleet <- methods::new(Fleet)
+# Set nyears and nages
+fishing_fleet$nages <- nages
+fishing_fleet$nyears <- nyears
+# Set values for log_Fmort
+fishing_fleet$log_Fmort <- methods::new(
+  ParameterVector,
+  log(c(
+    0.009459165, 0.02728886, 0.04506364, 0.06101782, 0.04860075, 0.08742055,
+    0.0884472, 0.1866079, 0.109009, 0.1327043, 0.1506155, 0.161243, 0.1166402,
+    0.1693461, 0.1801919, 0.1612405, 0.3145732, 0.2572476, 0.2548873,
+    0.2514621, 0.3491014, 0.2541077, 0.4184781, 0.3457212, 0.3436855,
+    0.3141712, 0.3080268, 0.4317453, 0.3280309, 0.4996754
+  )),
+  nyears
+)
+# Turn on estimation for F
+fishing_fleet$log_Fmort$set_all_estimable(TRUE)
+# Set value for log_q
+fishing_fleet$log_q[1]$value <- log(1.0)
+fishing_fleet$estimate_q <- FALSE
+fishing_fleet$random_q <- FALSE
+fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
+
+fishing_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
+#lognormal observation error transformed on the log scale
+fishing_fleet_index_distribution$log_logsd <- methods::new(
+  ParameterVector,
+  nyears
+)
+for (y in 1:nyears) {
+  fishing_fleet_index_distribution$log_logsd[y]$value <- log(
+    sqrt(log(0.01^2 + 1))
+  )
+}
+fishing_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
+# Set Data using the IDs from the modules defined above
+fishing_fleet_index_distribution$set_observed_data(fishing_fleet_index$get_id())
+
+fishing_fleet_index_distribution$set_distribution_links(
+  "data",
+  fishing_fleet$log_expected_index$get_id()
+)
+
+
+fishing_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
+fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet_age_comp$get_id())
+fishing_fleet_agecomp_distribution$set_distribution_links(
+  "data",
+  fishing_fleet$proportion_catch_numbers_at_age$get_id()
+)
+
+# fleet index data
+survey_fleet_index <- methods::new(Index, nyears)
+# survey age composition data
+survey_fleet_age_comp <- methods::new(AgeComp, nyears, nages)
+survey_fleet_index$index_data <- survey_index
+survey_fleet_age_comp$age_comp_data <- survey_agecomp * 200
+
+survey_fleet_selectivity <- methods::new(LogisticSelectivity)
+survey_fleet_selectivity$inflection_point[1]$value <- 1.5
+survey_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
+survey_fleet_selectivity$inflection_point[1]$estimated <- TRUE
+survey_fleet_selectivity$slope[1]$value <- 2.0
+survey_fleet_selectivity$slope[1]$is_random_effect <- FALSE
+survey_fleet_selectivity$slope[1]$estimated <- TRUE
+
+survey_fleet <- methods::new(Fleet)
+survey_fleet$is_survey <- TRUE
+survey_fleet$nages <- nages
+survey_fleet$nyears <- nyears
+survey_fleet$log_q[1]$value <- log(3.315143e-07)
+survey_fleet$estimate_q <- TRUE
+survey_fleet$random_q <- FALSE
+survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
+
+survey_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
+#lognormal observation error transformed on the log scale
+# sd = sqrt(log(cv^2 + 1)), sd is log transformed
+survey_fleet_index_distribution$log_logsd <- methods::new(
+  ParameterVector,
+  nyears
+)
+for(y in 1:nyears) {
+  survey_fleet_index_distribution$log_logsd[y]$value <- log(
+    sqrt(log(0.2^2 + 1))
+  )
+}
+survey_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
+# Set Data using the IDs from the modules defined above
+survey_fleet_index_distribution$set_observed_data(survey_fleet_index$get_id())
+survey_fleet_index_distribution$set_distribution_links(
+  "data",
+  survey_fleet$log_expected_index$get_id()
+)
+
+# Age composition data
+survey_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
+survey_fleet_agecomp_distribution$set_observed_data(survey_fleet_age_comp$get_id())
+survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$proportion_catch_numbers_at_age$get_id())
+
+# Recruitment
+recruitment <- methods::new(BevertonHoltRecruitment)
+recruitment$log_rzero[1]$value <- log(1e+06) # unit: log(number)
+recruitment$log_rzero[1]$is_random_effect <- FALSE
+recruitment$log_rzero[1]$estimated <- TRUE
+recruitment$logit_steep[1]$value <- -log(1.0 - 0.75) + log(0.75 - 0.2)
+recruitment$logit_steep[1]$is_random_effect <- FALSE
+recruitment$logit_steep[1]$estimated <- FALSE
+recruitment$log_devs <- methods::new(
+  ParameterVector,
+  c(
+    0.08904850, 0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
+    -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604, -0.21709207,
+    -0.13320626, 0.11225374, -0.10650836, 0.26877132, 0.24094126, -0.54480751,
+    -0.23680557, -0.58483386, 0.30122785, 0.21930545, -0.22281699, -0.51358369,
+    0.15740234, -0.53988240, -0.19556523, 0.20094360, 0.37248740, -0.07163145
+  ),
+  nyears
+)
+
+recruitment_distribution <- methods::new(TMBDnormDistribution)
+recruitment_distribution$log_sd <- methods::new(ParameterVector, 1)
+recruitment_distribution$log_sd[1]$value <- log(0.4)
+recruitment_distribution$log_sd[1]$estimated = FALSE
+# set dimension of observations
+recruitment_distribution$x <- methods::new(ParameterVector, nyears)
+recruitment_distribution$expected_values <- methods::new(
+  ParameterVector,
+  nyears
+)
+for (i in 1:nyears) {
+  recruitment_distribution$x[i]$value <- 0
+  recruitment_distribution$expected_values[i]$value <- 0
+}
+recruitment_distribution$set_distribution_links(
+  "random_effects",
+  recruitment$log_devs$get_id()
+)
+recruitment$estimate_log_devs <- TRUE
+
+# Growth
+ewaa_growth <- methods::new(EWAAgrowth)
+ewaa_growth$ages <- ages
+ewaa_growth$weights <- c(
+  0.0005306555, 0.0011963283, 0.0020582654,
+  0.0030349873, 0.0040552124, 0.0050646975,
+  0.0060262262, 0.0069169206, 0.0077248909,
+  0.0084461128, 0.0090818532, 0.0096366950
+) # unit: mt
+
+# Maturity
+maturity <- methods::new(LogisticMaturity)
+maturity$inflection_point[1]$value <- 2.25
+maturity$inflection_point[1]$is_random_effect <- FALSE
+maturity$inflection_point[1]$estimated <- FALSE
+maturity$slope[1]$value <- 3
+maturity$slope[1]$is_random_effect <- FALSE
+maturity$slope[1]$estimated <- FALSE
+
+# Population
+population <- methods::new(Population)
+population$log_M <- methods::new(
+  ParameterVector,
+  rep(log(0.2), nyears * nages),
+  nyears * nages
+)
+population$log_M$set_all_estimable(FALSE)
+population$log_init_naa <- methods::new(
+  ParameterVector,
+  log(c(
+    993947.5, 811707.8, 661434.4, 537804.8, 436664.0, 354303.4, 287397.0,
+    233100.2, 189054.0, 153328.4, 124353.2, 533681.3
+  )),
+  nages
+)
+population$log_init_naa$set_all_estimable(TRUE)
+population$nages <- nages
+population$ages <- ages
+population$nfleets <- 2 # 1 fleet and 1 survey
+population$nseasons <- nseasons
+population$nyears <- nyears
+
+population$SetMaturity(maturity$get_id())
+population$SetGrowth(ewaa_growth$get_id())
+population$SetRecruitment(recruitment$get_id())
+```
+
+## Importance of Logging 
+
+Logging in FIMS is important because it allows developers to understand what is happening within a model. It is especially useful when problems arise. The FIMS logging system has been designed to handle common issues, such as undefined modules, dimension issues, and software errors that may occur when a model is not properly defined. This logging system is accessible from both R and C++ and messages are provided in a easy to read JSON format.
+
+## How FIMS Logging works
+
+At run time, logging messages are stored in a C++ structure called LogEntry. This structure contains useful information, such as information regarding when the LogEntry was created and what portion of the code initiated its creation. For details regarding the contents of a LogEntry see the doxygen documentation. All of the LogEntry(s) are stored in a log file that can be accessed from within your R environment or are written to the disk upon failure of R to successfully communicate with C++.
+
+## Backend C++ Specification
+
+The logging system (specified in inst/include/common/def.hpp) provides three useful macro functions for creating log entries, **`r colorize("FIMS_INFO_LOG", "blue")`**, **`r colorize("FIMS_WARNING_LOG", "blue")`** , and **`r colorize("FIMS_ERROR_LOG", "blue")`**. These macros take a single string value as an argument, the rest is handled internally. Therefore, the developer only needs to worry about specifying the message and the macros take care of capturing all the other elements of the log entry. For example, **`r colorize("FIMS_INFO_LOG", "blue")`** is used quite a bit in information.hpp to let the user know that items were initialized appropriately. Developers can specify the information contained within the string passed to the macro to be generic or specific to values stored inside the C++ code. See below for an example of a generic message that is completely specified by the user and a more specific message that uses information stored within C++ for part of the message. Also, note that the C++ function **`r colorize("fims::to_string", "blue") `** converts a numeric value to a string, making it additive to the message.
+
+```{Rcpp, eval = FALSE}
+FIMS_INFO_LOG("Starting to initialize the fleet structures")
+FIMS_INFO_LOG("Initializing fleet " + fims::to_string(f->id))
+```
+
+Below is a real-world example of a log entry that was created while running a FIMS model due to the **`r colorize("FIMS_INFO_LOG", "blue")`** within the selectivity module. The log entry specifies the line of the file with the macro that led to the log entry and below we show screenshots of both the file and the resulting log entry within a log.
+
+![](figures/selectivity_logging.png)
+
+![](figures/selectivity_logging_entry.png)
+
+
+Additionally, if FIMS has been compiled with the **`r colorize("-DFIMS_DEBUG", "blue")`** pre-processing macro, output from the **`r colorize("FIMS_DEBUG_LOG", "blue")`** macro will also be available in the log file, allowing developers a more interactive developing experience. The output from this macro is turned off in the main branch, and thus, the macro is not available to the typical user to stop debugging statements from polluting the log file.
+
+## Using the Logging System in R
+
+The FIMS Logging System is also available from R, with a caveat! Logging from R gives less information than logging from C++. When a log entry originates from R, file, routine, and line information are absent. Further implementations may rectify this issue. Below are examples of adding log entries from R.
+
+
+```{r rlogging_info, results="hide"}
+log_info("info entry from R script")
+```
+![Example of a info level log entry. ](figures/r_info_log.png)
+```{r rlogging_warnings, results="hide"}
+log_warning("warning entry from R script")
+```
+![Example of a warning level log entry. ](figures/r_warning_log.png)
+```{r rlogging_error, results="hide"}
+ log_error("error entry from R script")
+```
+
+![](figures/r_error_log.png)
+In the above example of an error level log entry, notice the R stack trace in the 
+routine field. Sometimes this may contain useful information, but most of the time the stack 
+trace is to large to capture the root cause of the error. For that reason, it's advised 
+to make the error message as detailed as possible when calling **`r colorize("log_error(x)", "blue") `** 
+from R. 
+
+The logging system provides several useful functions. Below is a description of each.
+
+### **FIMS Logging Functions in R**
+
+* **log_info(x)** - add a info level log from R.
+* **log_warning(x)** - add a warning level log from R.
+* **log_error(x)** - add a error level log from R.
+* **get_log()** - returns the whole log as a string.
+* **get_log_info()** - returns only the info level log entries as a string.
+* **get_log_warnings()** -  returns only the warning level log entries as a string.
+* **get_log_errors()** -  returns only the error level log entries as a string.
+* **get_log_module(name)** -  returns only the log entries from a particular module as a string.
+* **set_log_path()** -  sets the path for the log to be written.
+* **write_log(x)** -  if x is true, the log file will be written on exit, otherwise no log will be written. Default = TRUE.
+* **set_log_throw_on_error** - throws an exception and terminates the model run if a error is logged.
+
+
+## Example of FIMS logging from R
+
+Assuming a model has already been defined, below is an example of using the logging system with FIMS in R.
+
+```{r example_code, eval = TRUE}
+
+success <- CreateTMBModel()
+
+if (!success) {
+  log_error("FIMS failed to create TMB model")
+} else {
+  parameters <- list(p = get_fixed())
+  input <- list(
+    data = fims_frame,
+    parameters = parameters,
+    version = "0.2.0.0"
+  )
+  # Run the model without optimization to help ensure a viable model
+  test_fit <- fit_fims(input, optimize = FALSE)
+  # Run the  model with optimization
+  fit <- fit_fims(input)
+}
+
+
+
+# get the log as a string in JSON format and parse into a list
+log_str <- as.character(get_log())
+write(log_str, "log.json")
+log_json <- jsonlite::fromJSON(log_str)
+
+# #write the log string to the console
+# cat(log_str)
+# 
+# #get log warnings only
+log_warnings_str <- get_log_warnings()
+# 
+# #get log errors only
+log_errors_str <- get_log_errors()
+# 
+# #get log entries from the information module
+information_log <- get_log_module("information")
+```
+
+Another useful option is the  **`r colorize("set_throw_on_error", "blue")`** function.
+If this option is set to TRUE, FIMS will abort immediately when an error occurs and
+if the  **`r colorize("write_log", "blue")`** option is set to TRUE, the log file
+will be written before FIMS terminates the session. Below is an example of throwing
+on error.
+
+```{r throw, eval = FALSE}
+set_log_throw_on_error(TRUE)
+
+log_error("throwing now!")
+
+```
+![Console message when an error occurs after the **`r colorize("set_throw_on_error","blue")`** option is set to TRUE.](figures/throw_error.png)

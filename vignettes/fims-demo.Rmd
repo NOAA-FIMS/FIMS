@@ -25,8 +25,8 @@ library(TMB)
 
 # clear memory
 clear()
-```
 
+```
 ## Setting up Data
 Data and variable values are taken from the [Li et. al.](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united) Model Comparison project ([github site](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison)). See [R/data_mile1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_mile1.R) and [tests/testthat/test-fims-estimation.R](https://github.com/NOAA-FIMS/FIMS/blob/integration-test-estimation-R-clear-FIMS/tests/testthat/test-fims-estimation.R) for details on how data and variable values are read into FIMS from the Model Comparison project.
 
@@ -365,6 +365,7 @@ input <- list(data = fims_frame, parameters = parameters, version = "FIMS demo")
 test_fit <- fit_fims(input, optimize = FALSE)
 # Run the  model with optimization
 fit <- fit_fims(input)
+
 ```
 
 ## Plotting Results
@@ -397,7 +398,12 @@ ggplot(catch_results, aes(x = 1:nyears, y = observed)) +
   theme_bw()
 ```
 
-## Clear C++ objects from memory
-```{r clear}
-clear()
+```{r output}
+
+finalize(fit@obj, fit@opt)
+json_output <- get_output()
+writeLines(json_output, "output.json")
+recruitment_log <- get_log_module("information")
+cat(recruitment_log)
+
 ```
