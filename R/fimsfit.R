@@ -22,6 +22,7 @@ setClass(
   )
 )
 
+
 # TODO: Write more validity checks for FIMSFit
 setValidity(
   Class = "FIMSFit",
@@ -383,3 +384,19 @@ fit_fims <- function(input,
   }
   return(fit)
 }
+
+#we create an as.list method for this new FIMSFit
+setMethod("as.list",signature(x="FIMSFit"),function(x) {
+  mapply(function(y) {
+    #apply as.list if the slot is again an user-defined object
+    #therefore, as.list gets applied recursively
+    if (inherits(slot(x,y),"FIMSFit")) {
+      as.list(slot(x,y))
+    } else {
+      #otherwise just return the slot
+      slot(x,y)
+    }
+  },
+  slotNames(class(x)),
+  SIMPLIFY=FALSE)
+})

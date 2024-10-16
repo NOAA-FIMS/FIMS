@@ -40,3 +40,5 @@ setMethod("dim", signature(x = "Rcpp_ParameterVector"),
           function(x) {
             return(x$size())
           })
+
+

@@ -16,7 +16,6 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-//#include "fims_log.hpp"
 
 
 #include <cstdlib>
@@ -80,24 +79,6 @@
 // comments used to assist in diagnosing model issues and tracking progress.
 // These files will only be created if a logs folder is added to the root model
 // directory.
-std::ofstream FIMS_LOG_OLD("logs/fims.log");   /**< Generic log file */
-std::ofstream INFO_LOG("logs/info.log");   /**< Information.hpp log file */
-std::ofstream ERROR_LOG("logs/error.log"); /**< Error tracking log file */
-std::ofstream DATA_LOG("logs/data.log");   /**< Data input tracking log file */
-std::ofstream MODEL_LOG("logs/model.log"); /**< Model.hpp log file */
-std::ofstream FLEET_LOG("logs/fleet.log"); /**< Fleet module log file */
-std::ofstream DISTRIBUTIONS_LOG("logs/distributions.log"); /**< Fleet module log file */
-std::ofstream POPULATION_LOG(
-    "logs/population.log"); /**< Populations module log file */
-std::ofstream RECRUITMENT_LOG(
-    "logs/recruitment.log");                 /**< Recruitment module log file */
-std::ofstream GROWTH_LOG("logs/growth.log"); /**< Growth module log file */
-std::ofstream MATURITY_LOG(
-    "logs/maturity.log"); /**< Maturity module log file */
-std::ofstream SELECTIVITY_LOG(
-    "logs/selectivity.log"); /**< Selectivity module log file */
-std::ofstream DEBUG_LOG(
-    "logs/debug/debug.log"); /**< Development debugging log file */
 
 #ifdef TMB_MODEL
 // simplify access to singletons
@@ -113,15 +94,24 @@ namespace fims {
      * Log entry.
      */
     struct LogEntry {
-        std::string timestamp; /*!<TODO: Document>*/
-        std::string message; /*!<TODO: Document>*/
-        std::string level; /*!<TODO: Document>*/
-        size_t rank; /*!<TODO: Document>*/
-        std::string user; /*!<TODO: Document>*/
-        std::string wd; /*!<TODO: Document>*/
-        std::string file; /*!<TODO: Document>*/
-        std::string func; /*!<TODO: Document>*/
-        int line; /*!<TODO: Document>*/
+        /** The date/time that the log entry was created, e.g., "Oct 28 09:18:51 2024". You can track how long it took to work through each portion of the model by analyzing the progression of the timestamp through the log file.*/
+        std::string timestamp;
+        /** The description of the log entry, e.g., "Adding Selectivity object to TMB" or "Mismatch dimension error", where the descriptions are predefined in the C++ code. Please make a GitHub issue or contact a developer if you have ideas for a more informative description.*/
+        std::string message;
+        /** The logging level, which is a result of which macro was used to generate the message, e.g., FIMS_INFO_LOG(), FIMS_WARNING_LOG(), or FIMS_ERROR_LOG() results in "info", "warning", or "error", respectively, in the log file. An additional level is available to developers from FIMS_DEBUG_LOG(), resulting in a level of "debug", but this macro is only available in branches other than main.*/
+        std::string level;
+        /** The message id, directly corresponds to the order in which the entries were created, e.g., "1", which is helpful for knowing the order of operations within the code base and comparing log files across model runs.*/
+        size_t rank;
+        /** The user name registered to the computer where the log file was created, e.g., "John.Doe".*/
+        std::string user;
+        /** The working directory for the R environment that created the log file, e.g., "C:/github/NOAA-FIMS/FIMS/vignettes" if you are on a Windows machine or "/home/oppy/FIMS-Testing/dev/dev_logging/FIMS/vignettes" if you are on a linux machine.*/
+        std::string wd;
+        /** The full file path of the file that triggered the log entry, e.g., "C:/github/NOAA-FIMS/FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp".*/
+        std::string file;
+        /** The function or method that led to the initialization the log entry, e.g., "virtual bool LogisticSelectivityInterface::add_to_fims_tmb()". If the function is templated, then the function type will be reported here in square brackets after the function name, e.g., "bool fims_info::Information<Type>::CreateModel() [with Type = double]".*/
+        std::string routine;
+        /** The line in `file` where the log entry was initiated, e.g., "219", which will be a line inside of the `routine` listed above.*/
+        int line;
 
         /**
          * Convert this object to a string.
@@ -135,7 +125,7 @@ namespace fims {
             ss << "\"user\" : " << "\"" << this->user << "\",\n";
             ss << "\"wd\" : " << "\"" << this->wd << "\",\n";
             ss << "\"file\" : " << "\"" << this->file << "\",\n";
-            ss << "\"routine\" : " << "\"" << this->func << "\",\n";
+            ss << "\"routine\" : " << "\"" << this->routine << "\",\n";
             ss << "\"line\" : " << "\"" << this->line << "\"\n";
             return ss.str();
         }
@@ -203,6 +193,32 @@ namespace fims {
         }
 
         /**
+         * @brief Get the Absolute Path Without Dot Dot object
+         *
+         * Dot dot notation is for relative paths, where this function replaces
+         * all dot dots with the actual full path.
+         * 
+         * @param relativePath A path in your file system.
+         * @return std::filesystem::path 
+         */
+        std::filesystem::path getAbsolutePathWithoutDotDot(const std::filesystem::path& relativePath) {
+            std::filesystem::path absolutePath = std::filesystem::absolute(relativePath);
+
+            std::filesystem::path result;
+            for (const auto& part : absolutePath) {
+                if (part == "..") {
+                    if (!result.empty()) {
+                        result = result.parent_path();
+                    }
+                } else {
+                    result /= part;
+                }
+            }
+
+            return result.generic_string();
+        }
+
+        /**
          * Set a path for the log file.
          *
          * @param path
@@ -229,7 +245,8 @@ namespace fims {
          * @param func
          */
         void info_message(std::string str, int line, const char* file, const char* func) {
-
+            std::filesystem::path relativePath = file;
+            std::filesystem::path absolutePath = getAbsolutePathWithoutDotDot(relativePath);
             std::filesystem::path cwd = std::filesystem::current_path();
             std::stringstream ss;
             auto now = std::chrono::system_clock::now();
@@ -242,10 +259,10 @@ namespace fims {
             l.level = "info";
             l.rank = this->log_entries.size();
             l.user = this->get_user();
-            l.wd = cwd.string();
-            l.file = file;
+            l.wd = cwd.generic_string();
+            l.file = absolutePath.string();
             l.line = line;
-            l.func = func;
+            l.routine = func;
             this->log_entries.push_back(l);
 
         }
@@ -259,7 +276,8 @@ namespace fims {
          * @param func
          */
         void debug_message(std::string str, int line, const char* file, const char* func) {
-
+            std::filesystem::path relativePath = file;
+            std::filesystem::path absolutePath = getAbsolutePathWithoutDotDot(relativePath);
             std::filesystem::path cwd = std::filesystem::current_path();
             std::stringstream ss;
             auto now = std::chrono::system_clock::now();
@@ -272,10 +290,10 @@ namespace fims {
             l.level = "debug";
             l.rank = this->log_entries.size();
             l.user = this->get_user();
-            l.wd = cwd.string();
-            l.file = file;
+            l.wd = cwd.generic_string();
+            l.file = absolutePath.string();
             l.line = line;
-            l.func = func;
+            l.routine = func;
             this->log_entries.push_back(l);
 
         }
@@ -290,6 +308,8 @@ namespace fims {
          */
         void error_message(std::string str, int line, const char* file, const char* func) {
             this->error_count++;
+            std::filesystem::path relativePath = file;
+            std::filesystem::path absolutePath = getAbsolutePathWithoutDotDot(relativePath);
             std::filesystem::path cwd = std::filesystem::current_path();
 
             std::stringstream ss;
@@ -303,10 +323,10 @@ namespace fims {
             l.level = "error";
             l.rank = this->log_entries.size();
             l.user = this->get_user();
-            l.wd = cwd.string();
-            l.file = file;
+            l.wd = cwd.generic_string();
+            l.file = absolutePath.string();
             l.line = line;
-            l.func = func;
+            l.routine = func;
             this->log_entries.push_back(l);
 
             if (this->throw_on_error) {
@@ -327,6 +347,8 @@ namespace fims {
          */
         void warning_message(std::string str, int line, const char* file, const char* func) {
             this->warning_count++;
+            std::filesystem::path relativePath = file;
+            std::filesystem::path absolutePath = getAbsolutePathWithoutDotDot(relativePath);
             std::filesystem::path cwd = std::filesystem::current_path();
 
             std::stringstream ss;
@@ -340,10 +362,10 @@ namespace fims {
             l.level = "warning";
             l.rank = this->log_entries.size();
             l.user = this->get_user();
-            l.wd = cwd.string();
-            l.file = file;
+            l.wd = cwd.generic_string();
+            l.file = absolutePath.string();
             l.line = line;
-            l.func = func;
+            l.routine = func;
             this->log_entries.push_back(l);
 
         }
@@ -503,7 +525,16 @@ namespace fims {
             return warning_count;
         }
 
-
+        /**
+         * @brief Clear all pointers/references of a FIMS model
+         * 
+         */
+        void clear() {
+            this->entries.clear();
+            this->log_entries.clear();
+            this->warning_count = 0;
+            this->entry_number = 0;
+        }
 
     };
 
@@ -545,8 +576,36 @@ namespace fims {
      */
     void WriteAtExit(int sig) {
 
+        std::string signal_error = "NA";
+        switch (sig) {
+            case SIGSEGV:
+                signal_error = "Invalid memory access (segmentation fault)";
+                break;
+            case SIGINT:
+                signal_error = "External interrupt, possibly initiated by the user.";
+                break;
+            case SIGABRT:
+                signal_error = "Abnormal termination condition, possible call to std::abort.";
+                break;
+            case SIGFPE:
+                signal_error = "Erroneous arithmetic operation.";
+                break;
+            case SIGILL:
+                signal_error = "Invalid program image or invalid instruction";
+                break;
+            case SIGTERM:
+                signal_error = "Termination request, sent to the program.";
+                break;
+            default:
+                signal_error = "Unknown signal thrown";
+
+        }
+
+        FIMSLog::fims_log->error_message(signal_error, -999, "?", "?");
+
 
         if (FIMSLog::fims_log->write_on_exit) {
+
             std::ofstream log(FIMSLog::fims_log->get_path());
             log << FIMSLog::fims_log->get_log();
             log.close();

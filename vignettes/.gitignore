@@ -1,2 +1,6 @@
 *.html
+*.md
+*.pdf
 *.R
+*/libs/
+fims-demo_files/
