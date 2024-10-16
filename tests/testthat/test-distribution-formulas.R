@@ -41,6 +41,15 @@ test_that("test new_process_distribution", {
     expect_error(new_process_distribution(par = "log_devs", module = recruitment, family = multinomial(),
                                 sd = list(value = om_input$logR_sd, estimated = FALSE),
                                 is_random_effect = FALSE))
+    expect_error(new_process_distribution(par = "log_devs", module = recruitment, family = binomial(),
+                                sd = list(value = om_input$logR_sd, estimated = FALSE),
+                                is_random_effect = FALSE))
+    expect_error(new_process_distribution(par = "log_devs", module = recruitment, family = gaussian(),
+                                sd = list(value = -1, estimated = FALSE),
+                                is_random_effect = FALSE))
+    expect_error(new_process_distribution(par = "log_devs", module = recruitment, family = gaussian(),
+                                sd = list(value = rep(om_input$logR_sd, 3), estimated = rep(FALSE, 2)),
+                                is_random_effect = FALSE))
     clear()
 })
 

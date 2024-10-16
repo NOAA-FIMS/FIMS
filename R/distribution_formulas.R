@@ -1,3 +1,64 @@
+#' Validaity checks for new_data_distribution and new_process_distribution
+#' 
+check_distribution_validity <- function(args){
+  list2env(args, envir = environment())
+  if (class(family) !=  "family") {
+    cli::cli_abort(c(
+      "{.code {family}} is the incorrect type",
+      "*" = "family needs to be specified as a family class",
+      "*" = " e.g. `family = gaussian()`."))
+  }
+  if (!(family[["family"]] %in% families)) {
+    fam_name <- family[["family"]]
+    cli::cli_abort(c(
+      "FIMS currently does not offer the family, {.code {fam_name}}. for this distribution type",
+      "*" = "The families available for this distribution type are:",
+      "*" = "{.code {families}}."))
+
+  }
+  if(exists("data_type")){
+
+    if ((data_type == "agecomp" || data_type == "lengthcomp") &&
+        (family[["family"]] == "lognormal" || family[["family"]] == "gaussian")) {
+      fam_name <- family[["family"]]
+      cli::cli_abort(c(
+        "The family, {.code {fam_name}} is not available for the data type, {.code {data_type}}",
+        "*" = "The available families for this data type are:",
+        "*" = "`multinomial`."
+      ))
+    }
+    if ((data_type == "index" || data_type == "cpue") &&
+        family[["family"]] == "multinomial") {
+      fam_name <- family[["family"]]
+      cli::cli_abort(c(
+        "The family, {.code {fam_name}} is not available for the data type, {.code {data_type}}",
+        "*" = "The available families for this data type are:",
+        "*" = "`lognormal`, `gaussian`."
+      ))
+    }
+
+  }
+
+  if(!all(sd$value > 0)) {
+    sd_value <- sd$value
+    cli::cli_abort(c(
+    "At least one value for sd, {.code {sd_value}} is out of bounds.",
+    "*" = "All standard deviation values need to be positive."))
+  }
+
+  if(length(sd$estimated) > 1){
+    if(length(sd$value) != length(sd$estimated)){
+      sd_length <- length(sd$value)
+      est_length <- length(sd$estimated)
+      cli::cli_abort(c(
+        "The length of `sd$value` is {.code {sd_length}} and the length of `sd$estimated` is {.code {est_length}}",
+        "*" = "the size of `value` and `estimated` must match."))
+    }
+  }
+
+
+}
+
 #' Set up a new distribution for a data type
 #'
 
@@ -13,6 +74,7 @@
 #' @param data_type A single string specifying the type of data that the distribution
 #'   will be fit to. Options are listed in the function call, where the first
 #'   option listed, i.e., `"index"` is the default.
+#' @return Reference Class. Use `show()` to view Rcpp class fields, methods, and documentation.
 #' @export
 #' @example 
 #' \dontrun{
@@ -35,21 +97,18 @@ new_data_distribution <- function(
 ) {
   data_type <- match.arg(data_type)
   families <- c("lognormal", "gaussian", "multinomial")
-  if (class(family) !=  "family") {
-    stop("family needs to be specified as a family class, e.g. `family = gaussian()`")
-  }
-  if (!(family[["family"]] %in% families)) {
-    stop("FIMS currently does not offer this distribution.")
-  }
-  if ((data_type == "agecomp" || data_type == "lengthcomp") &&
-      (family[["family"]] == "lognormal" || family[["family"]] == "gaussian")) {
-    stop("Did you mean family = multinomial()?")
-  }
-  if ((data_type == "index" || data_type == "cpue") &&
-      family[["family"]] == "multinomial") {
-    stop("Multinomial is not available for index or CPUE data")
-  }
-
+  
+  # validity check on user input
+  args <- list(
+    module = module,
+    family = family,
+    sd = sd,
+    data_type = data_type,
+    families = families
+  )
+  check_distribution_validity(args)
+  
+  # assign name of observed data based on data_type
   if (data_type == "index" || data_type == "cpue") {
     obs_id_name <- "observed_index_data_id"
   }
@@ -57,19 +116,28 @@ new_data_distribution <- function(
     obs_id_name <- "observed_agecomp_data_id"
   }
 
-  if(!all(sd$value > 0)) {
-    stop("all standard deviation values need to be positive")
-  }
-
   # Set up distribution based on `family` argument` 
   if (family[["family"]] == "lognormal") {
+
+    # create new Rcpp module
     new_module <- new(TMBDlnormDistribution)
+    
+    # populate logged standard deviation parameter with log of input
     new_module$log_logsd <- new(
       ParameterVector,
       log(sd$value),
       length(sd$value)
     )
-    new_module$log_logsd$set_all_estimable(sd$estimated)
+    # setup whether or not sd parameter is estimated
+    if(length(sd$value) > 1 && length(sd$estimated) == 1){
+      new_module$log_logsd$set_all_estimable(sd$estimated)
+    } else {
+      for(i in 1:seq_along(sd$estimated)){
+        new_module$log_logsd[i]$estimated <- sd$estimated[i]
+      }
+    }
+
+    # set name of expected values
     if (family[["link"]] == "log") {
       expected <- "log_expected_index"
     }
@@ -79,9 +147,23 @@ new_data_distribution <- function(
   }
 
   if (family[["family"]] == "gaussian") {
+
+    # create new Rcpp module
     new_module <- new(TMBDnormDistribution)
+
+    # populate logged standard deviation parameter with log of input
     new_module$log_sd <- new(ParameterVector, log(sd$value), length(sd$value))
-    new_module$log_sd$set_all_estimable(sd$estimated)
+
+    # setup whether or not sd parameter is estimated
+    if(length(sd$value) > 1 && length(sd$estimated) == 1){
+      new_module$log_sd$set_all_estimable(sd$estimated)
+    } else {
+      for(i in 1:seq_along(sd$estimated)){
+        new_module$log_sd[i]$estimated <- sd$estimated[i]
+      }
+    }
+
+    # set name of expected values
     if (family[["link"]] == "log") {
       expected <- "log_expected_index"
     }
@@ -91,9 +173,15 @@ new_data_distribution <- function(
   }
 
   if (family[["family"]] == "multinomial") {
+
+    #create new Rcpp module
     new_module <- new(TMBDmultinomDistribution)
+    
+    # set name of expected values
     expected <- "proportion_catch_numbers_at_age"
   }
+
+  # setup link to observed data
   if (data_type == "index" || data_type == "cpue") {
     new_module$set_observed_data(module$GetObservedIndexDataID())
   }
@@ -101,7 +189,9 @@ new_data_distribution <- function(
     new_module$set_observed_data(module$GetObservedAgeCompDataID())
   }
 
+  # setup link to expected values 
   new_module$set_distribution_links("data", module$field(expected)$get_id())
+
   return(new_module)
 }
 
@@ -114,7 +204,7 @@ new_data_distribution <- function(
 #' @seealso
 #' * [new_data_distribution()]
 #' @export
-#' 
+#' @return Reference Class. Use `show()` to view Rcpp class fields, methods, and documentation.
 #' @example 
 #' \dontrun{
 #' nyears <- 30
@@ -132,40 +222,74 @@ new_process_distribution <- function(module,
                                      sd = list(value = 1, estimated = FALSE),
                                      is_random_effect = FALSE) {
   families <- c("lognormal", "gaussian")
-  if (family[["family"]] == "normal") {
-    stop("use family = gaussian() instead")
-  }
-  if (!(family[["family"]] %in% families)) {
-    stop("FIMS currently does not offer this distribution for processes.")
-  }
+
+  # validity check on user input  
+  args <- list(
+    module = module,
+    par = par,
+    family = family,
+    sd = sd,
+    is_random_effect = is_random_effect,
+    families = families
+  )
+  check_distribution_validity(args)
 
   # Set up distribution based on `family` argument` 
   if (family[["family"]] == "lognormal") {
+
+    # create new Rcpp module
     new_module <- new(TMBDlnormDistribution)
+    
+    # populate logged standard deviation parameter with log of input
     new_module$log_logsd <- new(
       ParameterVector,
       log(sd$value),
       length(sd$value)
     )
-    new_module$log_logsd$set_all_estimable(sd$estimated)
+    #setup whether or not sd parameter is estimated
+    if(length(sd$value) > 1 && length(sd$estimated) == 1){
+      new_module$log_logsd$set_all_estimable(sd$estimated)
+    } else {
+      for(i in 1:seq_along(sd$estimated)){
+        new_module$log_logsd[i]$estimated <- sd$estimated[i]
+      }
+    }
   }
 
   if (family[["family"]] == "gaussian") {
+
+    # create new Rcpp module
     new_module <- new(TMBDnormDistribution)
+
+    # populate logged standard deviation parameter with log of input
     new_module$log_sd <- new(ParameterVector, log(sd$value), length(sd$value))
-    new_module$log_sd$set_all_estimable(sd$estimated)
+    
+    #setup whether or not sd parameter is estimated
+    if(length(sd$value) > 1 && length(sd$estimated) == 1){
+      new_module$log_sd$set_all_estimable(sd$estimated)
+    } else {
+      for(i in 1:seq_along(sd$estimated)){
+        new_module$log_sd[i]$estimated <- sd$estimated[i]
+      }
+    }
   }
 
+  # indicate whether or not parameter is treated as a random effect in the model
   module$field(par)$set_all_random(is_random_effect)
 
   n_dim <- length(module$field(par))
+
+  # create new Rcpp modules
   new_module$x <- new(ParameterVector, n_dim)
   new_module$expected_values <- new(ParameterVector, n_dim)
+
+  # initialize values with 0 - these are overwritten in the code later by user input
   for (i in 1:n_dim) {
     new_module$x[i]$value <- 0
     new_module$expected_values[i]$value <- 0
   }
 
+  # setup links to parameter
   new_module$set_distribution_links(
     "random_effects",
     module$field(par)$get_id()
