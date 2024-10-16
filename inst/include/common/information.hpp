@@ -32,9 +32,9 @@ namespace fims_info {
     template <typename Type>
     class Information {
     public:
-        size_t nyears; /**< number of years >*/
+        size_t nyears = 0; /**< number of years >*/
         size_t nseasons = 1; /**< number of seasons >*/
-        size_t nages; /**< number of ages>*/
+        size_t nages = 0; /**< number of ages>*/
 
         static std::shared_ptr<Information<Type> >
         fims_information; /**< singleton instance >*/
@@ -289,11 +289,13 @@ namespace fims_info {
 
                     if (it != this->selectivity_models.end()) {
                         f->selectivity = (*it).second; // elements in container held in pair
-
+                        FIMS_INFO_LOG("Selectivity model "
+                                + fims::to_string(f->fleet_selectivity_id_m)
+                                + "successfully set to fleet " + fims::to_string(f->id));
 
                     } else {
                         valid_model = false;
-                        FIMS_ERROR_LOG("Error: Expected selectivity pattern not defined for fleet "
+                        FIMS_ERROR_LOG("Expected selectivity pattern not defined for fleet "
                                 + fims::to_string(f->id) + ", selectivity pattern " + fims::to_string(sel_id));
                     }
 
@@ -317,16 +319,18 @@ namespace fims_info {
 
                         if (it != this->data_objects.end()) {
                             d->observed_values = (*it).second;
-
+                            FIMS_INFO_LOG("Observed data "
+                                    + fims::to_string(observed_data_id)
+                                    + "successfully set to density component " + fims::to_string(d->id));
                         } else {
                             valid_model = false;
-                            FIMS_ERROR_LOG("Error: Expected data observations not defined for density component "
+                            FIMS_ERROR_LOG("Expected data observations not defined for density component "
                                     + fims::to_string(d->id) + ", observed data " + fims::to_string(observed_data_id));
                         }
 
                     } else {
                         valid_model = false;
-                        FIMS_ERROR_LOG("Error: No data input for density " + fims::to_string(d->id));
+                        FIMS_ERROR_LOG("No data input for density component" + fims::to_string(d->id));
                     }
                 }
                 // end set data
@@ -361,11 +365,16 @@ namespace fims_info {
                     if (it != this->recruitment_models.end()) {
                         p->recruitment =
                                 (*it).second; // recruitment defined in population.hpp
+                        FIMS_INFO_LOG("Recruitment model "
+                                + fims::to_string(recruitment_uint)
+                                + "successfully set to population " 
+                                + fims::to_string(p->id));
                     } else {
                         valid_model = false;
                         FIMS_ERROR_LOG("Expected recruitment function not defined for "
                                 "population "
-                                + fims::to_string(p->id) + ", recruitment function " + fims::to_string(recruitment_uint));
+                                + fims::to_string(p->id) + ", recruitment function " 
+                                + fims::to_string(recruitment_uint));
                     }
 
                 } else {
@@ -388,10 +397,14 @@ namespace fims_info {
                         p->growth =
                                 (*it).second; // growth defined in population.hpp (the object
                         // is called p, growth is within p)
+                        FIMS_INFO_LOG("Growth model "
+                                + fims::to_string(growth_uint)
+                                + "successfully set to population " + fims::to_string(p->id));
                     } else {
                         valid_model = false;
                         FIMS_ERROR_LOG("Expected growth function not defined for population "
-                                + fims::to_string(p->id) + ", growth function " + fims::to_string(growth_uint));
+                                + fims::to_string(p->id) + ", growth function " 
+                                + fims::to_string(growth_uint));
                     }
 
                 } else {
@@ -410,10 +423,14 @@ namespace fims_info {
                     // information.hpp and used in rcpp
                     if (it != this->maturity_models.end()) {
                         p->maturity = (*it).second; // >maturity defined in population.hpp
+                        FIMS_INFO_LOG("Maturity model "
+                                + fims::to_string(maturity_uint)
+                                + "successfully set to population " + fims::to_string(p->id));
                     } else {
                         valid_model = false;
                         FIMS_ERROR_LOG("Expected maturity function not defined for population "
-                                + fims::to_string(p->id) + ", maturity function " + fims::to_string(maturity_uint));
+                                + fims::to_string(p->id) + ", maturity function " 
+                                + fims::to_string(maturity_uint));
                     }
                 } else {
 
