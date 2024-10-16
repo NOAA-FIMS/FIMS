@@ -79,7 +79,6 @@ namespace fims_distributions
                       this->lpdf_vec[i] = dnorm(log(this->observed_values->at(i)), logmu[i], fims_math::exp(log_logsd.get_force_scalar(i)), true) - log(this->observed_values->at(i));
                     } else {
                     this->lpdf_vec[i] = 0;
-                    MODEL_LOG << "lpdf_vec for obs " << i << " is: " << this->lpdf_vec[i] <<std::endl;
                   } 
                 } else {
                   this->lpdf_vec[i] = dnorm(log(this->x[i]), logmu[i], fims_math::exp(log_logsd.get_force_scalar(i)), true);

@@ -58,10 +58,8 @@ namespace fims_distributions
                     
 
             if (dims[0]*dims[1] != this->expected_values.size()) {
-            ERROR_LOG << "Error: observed age comp is of size " << dims[0]*dims[1]
-                << " and expected is of size " << this->expected_values.size()
-                << std::endl;
-                exit(1);
+            FIMS_ERROR_LOG("Observed age comp is of size " + fims::to_string(dims[0]*dims[1])
+                + " and expected is of size " + fims::to_string(this->expected_values.size()));
             } else {
 
                 for (size_t i = 0; i < dims[0]; i++)
