@@ -1,17 +1,32 @@
 #' Set up a new distribution for a data type
 #'
-#' @param data_type A string specifying the type of data that the distribution
-#'   will be fit to. Options are listed in the function call, where the first
-#'   option listed, i.e., `"index"` is the default.
+
 #' @param module An identifier to a C++ fleet module that is linked to the data
 #'   of interest.
 #' @param family A description of the error distribution and link function to
-#'   be used in the model.
-#' @param sd A list of length two. The first entry, `"value"`, stores the
-#'   initial values for the relevant standard deviations. The second entry,
-#'   `"estimated"` is a vector of booleans indicating whether or not
-#'   standard deviation is estimated.
+#'   be used in the model. The argument takes a family class, e.g. `gaussian(link = "identity")`. 
+#' @param sd A list of length two. The first entry, `"value"`, (default = 1) stores the
+#'   initial values (scalar or vector) for the relevant standard deviations. The second entry,
+#'   `"estimated"` (default = FALSE) is a scalar or vector of booleans indicating whether or not
+#'   standard deviation is estimated. If `"value"` is a vector and `"estimated"` is a scalar, the 
+#'   `"estimated"` value will be applied to the entire vector, otherwise, the dimensions of the two must match.
+#' @param data_type A single string specifying the type of data that the distribution
+#'   will be fit to. Options are listed in the function call, where the first
+#'   option listed, i.e., `"index"` is the default.
 #' @export
+#' @example 
+#' \dontrun{
+#' nyears <- 30
+#' # Create a new fleet module
+#' fleet <- methods::new(Fleet)
+#' # Create a distribution for the fleet module
+#' fleet_distribution <-
+#'     new_data_distribution(module = fishing_fleet,
+#'                           family = lognormal(link = "log"),
+#'                           sd = list(value = rep(sqrt(log(0.01^2 + 1)), nyears),
+#'                                     estimated = rep(FALSE, nyears),
+#'                                     data_type = "cpue")
+#' }
 new_data_distribution <- function(
   module,
   family,
@@ -20,8 +35,8 @@ new_data_distribution <- function(
 ) {
   data_type <- match.arg(data_type)
   families <- c("lognormal", "gaussian", "multinomial")
-  if (family[["family"]] == "normal") {
-    stop("use family = gaussian() instead")
+  if (class(family) !=  "family") {
+    stop("family needs to be specified as a family class, e.g. `family = gaussian()`")
   }
   if (!(family[["family"]] %in% families)) {
     stop("FIMS currently does not offer this distribution.")
@@ -41,6 +56,12 @@ new_data_distribution <- function(
   if (data_type == "agecomp" || data_type == "lengthcomp") {
     obs_id_name <- "observed_agecomp_data_id"
   }
+
+  if(!all(sd$value > 0)) {
+    stop("all standard deviation values need to be positive")
+  }
+
+  # Set up distribution based on `family` argument` 
   if (family[["family"]] == "lognormal") {
     new_module <- new(TMBDlnormDistribution)
     new_module$log_logsd <- new(
@@ -85,14 +106,26 @@ new_data_distribution <- function(
 }
 
 #' Sets up a new distribution for a process
+#' @inheritParams new_data_distribution
 #' @param par A string specifying the parameter name the distribution applies
 #'   to.
-#' @inheritParams new_data_distribution
 #' @param is_random_effect A boolean indicating whether or not the process is
 #'   estimated as a random effect.
 #' @seealso
 #' * [new_data_distribution()]
 #' @export
+#' 
+#' @example 
+#' \dontrun{
+#' nyears <- 30
+#' # Create a new fleet module
+#' recruitment <- methods::new(BevertonHoltRecruitment)
+#' # Create a distribution for the recruitment module
+#' recruitment_distribution <- 
+#'   new_process_distribution(module = recruitment, par = "log_devs", family = gaussian(),
+#'                            sd = list(value = 0.4, estimated = FALSE),
+#'                            is_random_effect = FALSE)
+#' }
 new_process_distribution <- function(module,
                                      par,
                                      family,
@@ -105,6 +138,8 @@ new_process_distribution <- function(module,
   if (!(family[["family"]] %in% families)) {
     stop("FIMS currently does not offer this distribution for processes.")
   }
+
+  # Set up distribution based on `family` argument` 
   if (family[["family"]] == "lognormal") {
     new_module <- new(TMBDlnormDistribution)
     new_module$log_logsd <- new(
