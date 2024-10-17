@@ -6,8 +6,8 @@
  * source folder for reuse information.
  *
  */
-#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_TMB_DISTRIBUTION_HPP
-#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_TMB_DISTRIBUTION_HPP
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 
 #include "../../../distributions/distributions.hpp"
 #include "../../interface.hpp"
@@ -47,7 +47,7 @@ uint32_t interface_observed_data_id_m =
 
   /**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
-   * 
+   *
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
@@ -83,7 +83,7 @@ std::map<uint32_t,
 /**
  * @brief Rcpp interface for Dnorm as an S4 object. To instantiate
  * from R:
- * dnorm_ <- new(TMBDnormDistribution)
+ * dnorm_ <- new(DnormDistribution)
  *
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
@@ -112,7 +112,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
   /**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
-   * 
+   *
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
@@ -149,9 +149,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     return dnorm.evaluate();
 }
-    /** 
-     * @brief finalize function. Extracts derived quantities back to 
-     * the Rcpp interface object from the Information object. 
+    /**
+     * @brief finalize function. Extracts derived quantities back to
+     * the Rcpp interface object from the Information object.
      */
     virtual void finalize() {
         if (this->finalized) {
@@ -280,15 +280,17 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 /**
  * @brief Rcpp interface for Dlnorm as an S4 object. To instantiate
  * from R:
- * dlnorm_ <- new(TMBDlnormDistribution)
+ * dlnorm_ <- new(DlnormDistribution)
  *
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
+
   ParameterVector x;       /**< observation */
   ParameterVector expected_values; /**< mean of the distribution of log(x) */
-  ParameterVector log_logsd;   /**< log standard deviation of the distribution of log(x) */
-  Rcpp::String input_type; /**< character string indicating type of input: data, re, prior */
+  // TODO:  Can we use something more generic instead of log_sd to fit more distributions?
+  ParameterVector log_sd;   /**< the natural logarithm of the standard deviation of the distribution of log(x). The natural log of the standard deviation is necessary because
+  the exponential link function is applied to the log transformed sd to insure sd is positive.  */
   Rcpp::NumericVector lpdf_vec; /**< The vector */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
@@ -314,7 +316,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
   /**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
-   * 
+   *
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
@@ -326,7 +328,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     }
 
     return true;
-  }   
+  }
 
   /**
    * @brief Evaluate lognormal probability density function, default returns the
@@ -337,24 +339,23 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::LogNormalLPDF<double> dlnorm;
-    dlnorm.input_type = this->input_type;
     dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
-    dlnorm.log_logsd.resize(this->log_logsd.size());
+    dlnorm.log_sd.resize(this->log_sd.size());
     for(size_t i=0; i<x.size(); i++){
       dlnorm.x[i] = this->x[i].initial_value_m;
     }
     for(size_t i=0; i<expected_values.size(); i++){
       dlnorm.expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    for(size_t i=0; i<log_logsd.size(); i++){
-      dlnorm.log_logsd[i] = this->log_logsd[i].initial_value_m;
+    for(size_t i=0; i<log_sd.size(); i++){
+      dlnorm.log_sd[i] = this->log_sd[i].initial_value_m;
     }
     return dlnorm.evaluate();
   }
-    /** 
-     * @brief finalize function. Extracts derived quantities back to 
-     * the Rcpp interface object from the Information object. 
+    /**
+     * @brief finalize function. Extracts derived quantities back to
+     * the Rcpp interface object from the Information object.
      */
     virtual void finalize() {
         if (this->finalized) {
@@ -394,7 +395,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
      * @brief Convert the data to json representation for the output.
      */
     virtual std::string to_json() {
-   
+
         std::stringstream ss;
         ss << "\"module\" : {\n";
         ss << " \"name\": \"LogNormalLPDF\",\n";
@@ -447,18 +448,18 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     for(size_t i=0; i<this->expected_values.size(); i++){
       distribution->expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    distribution->log_logsd.resize(this->log_logsd.size());
-    for(size_t i=0; i<this->log_logsd.size(); i++){
-      distribution->log_logsd[i] = this->log_logsd[i].initial_value_m;
-      if(this->log_logsd[i].estimated_m){
-        info->RegisterParameterName("lognormal log_logsd");
-        info->RegisterParameter(distribution->log_logsd[i]);
+    distribution->log_sd.resize(this->log_sd.size());
+    for(size_t i=0; i<this->log_sd.size(); i++){
+      distribution->log_sd[i] = this->log_sd[i].initial_value_m;
+      if(this->log_sd[i].estimated_m){
+        info->RegisterParameterName("lognormal log_sd");
+        info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_logsd[i].is_random_effect_m) {
+      if (this->log_sd[i].is_random_effect_m) {
         error("standard deviations cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_logsd.id_m] = &(distribution)->log_logsd;
+    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
     info->density_components[distribution->id] = distribution;
 
@@ -483,7 +484,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 /**
  * @brief Rcpp interface for Dmultinom as an S4 object. To instantiate
  * from R:
- * dmultinom_ <- new(TMBDmultinomDistribution)
+ * dmultinom_ <- new(DmultinomDistribution)
  *
  */
 // template <typename Type>
@@ -516,7 +517,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   /**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
-   * 
+   *
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */

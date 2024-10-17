@@ -12,3 +12,4 @@
 \description{
 Set methods for summary functions including "max", "min", "range", "prod", "sum", "any", "all"
 }
+\keyword{set_methods}

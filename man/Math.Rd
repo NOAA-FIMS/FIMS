@@ -16,3 +16,4 @@ Sets methods for math functions including trigonometry functions, "abs", "sign",
 "sqrt", "ceiling", "floor", "trunc", "cummax", "cumprod", "cumsum", "log", "log10",
 "log2", "log1p", "exp", "expm1", "gamma", "lgamma", "digamma", "trigamma"
 }
+\keyword{set_methods}

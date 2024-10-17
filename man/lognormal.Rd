@@ -42,3 +42,4 @@ a_family <- multinomial()
 a_family[["family"]]
 a_family[["link"]]
 }
+\keyword{distribution}

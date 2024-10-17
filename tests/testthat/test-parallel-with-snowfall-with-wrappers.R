@@ -30,6 +30,7 @@ test_that("Run FIMS in parallel using {snowfall}", {
   core_num <- 2
   snowfall::sfInit(parallel = TRUE, cpus = core_num)
 
+  snowfall::sfLibrary(FIMS)
   results_parallel <- snowfall::sfLapply(
     1:sim_num,
     setup_and_run_FIMS_with_wrappers,

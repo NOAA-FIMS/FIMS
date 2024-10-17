@@ -20,7 +20,7 @@
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
-#include "rcpp_objects/rcpp_tmb_distribution.hpp"
+#include "rcpp_objects/rcpp_distribution.hpp"
 #include "../../utilities/fims_json.hpp"
 
 
@@ -86,7 +86,7 @@ void SetFIMSFunctions(SEXP fn, SEXP gr) {
 }
 
 /**
- * @brief Loops through the Rcpp Interface objects and extracts derived 
+ * @brief Loops through the Rcpp Interface objects and extracts derived
  * quantities.Updates parameter estimates from model core objects.
  */
 void finalize_objects(Rcpp::NumericVector p) {
@@ -129,16 +129,16 @@ void finalize_objects(Rcpp::NumericVector p) {
 }
 
 /**
- * @brief Finalizes a FIMS model by updating the parameter set. This function 
- *        evaluates the objective function and the gradient with the given 
+ * @brief Finalizes a FIMS model by updating the parameter set. This function
+ *        evaluates the objective function and the gradient with the given
  *        parameter set.
- * 
+ *
  * @param obj - Either a list containing \"fn\" and \"gr\", or a list containing
- *              two seperate lists \"obj\" and \"opt\", \"obj\" should contain 
+ *              two seperate lists \"obj\" and \"opt\", \"obj\" should contain
  *              \"fn\" and \"gr\", \"opt\" should contain \"par\". In the second
- *              case, the second function argument is expected to be null and 
+ *              case, the second function argument is expected to be null and
  *              ignored.
- * 
+ *
  * @param opt - A list containing \"par\".
  */
 void finalize_fims(Rcpp::Nullable< Rcpp::List> obj = R_NilValue,
@@ -180,7 +180,7 @@ void finalize_fims(Rcpp::Nullable< Rcpp::List> obj = R_NilValue,
 
             }
 
-            //if we are here, a single argument was used. if it contains the  
+            //if we are here, a single argument was used. if it contains the
             //expected elements, the list is valid and objects can be finalize.
             if (valid_list) {
                 finalize_objects(parameters);
@@ -225,7 +225,7 @@ void finalize_fims(Rcpp::Nullable< Rcpp::List> obj = R_NilValue,
         valid_list = false;
     }
 
-    //if we're here, two arguments were given. If they contain the expected 
+    //if we're here, two arguments were given. If they contain the expected
     //elements, the lists are valid and objects can be finalized.
     if (valid_list) {
         finalize_objects(parameters);
@@ -237,10 +237,10 @@ void finalize_fims(Rcpp::Nullable< Rcpp::List> obj = R_NilValue,
 
 /**
  * @brief Finalizes a FIMS run.
- *  
- * @param tmb_obj is list containing an objective function \"fn\", 
+ *
+ * @param tmb_obj is list containing an objective function \"fn\",
  * a gradient function \"gr\" and a parameter set \"par\".
- * 
+ *
  */
 void finalize_fims_deprecated(SEXP tmb_obj = R_NilValue) {
 
@@ -456,7 +456,7 @@ void clear() {
     DoubleLogisticSelectivityInterface::id_g = 1;
     DoubleLogisticSelectivityInterface::live_objects.clear();
 
-    // rcpp_tmb_distribution.hpp
+    // rcpp_distribution.hpp
     DistributionsInterfaceBase::id_g = 1;
     DistributionsInterfaceBase::live_objects.clear();
 
@@ -633,8 +633,8 @@ RCPP_MODULE(fims) {
             .field("min", &Parameter::min_m, "minimum parameter value")
             .field("max", &Parameter::max_m, "maximum parameter value")
             .field("id", &Parameter::id_m, "unique id for parameter class")
-            .field("is_random_effect", &Parameter::is_random_effect_m, "boolean indicating whether or not parameter is a random effect; default value is FALSE")
-            .field("estimated", &Parameter::estimated_m, "boolean indicating whether or not parameter is estimated; default value is FALSE");
+            .field("is_random_effect", &Parameter::is_random_effect_m, "A boolean indicating whether or not parameter is a random effect; default value is FALSE.")
+            .field("estimated", &Parameter::estimated_m, "A boolean indicating whether or not parameter is estimated; default value is FALSE.");
 
     Rcpp::class_<ParameterVector>("ParameterVector")
             .constructor()
@@ -644,13 +644,13 @@ RCPP_MODULE(fims) {
             .method("set", &ParameterVector::set)
             .method("show", &ParameterVector::show)
             //            .field("data", &ParameterVector::storage_m, "list where each element is a Parameter class")
-            .method("at", &ParameterVector::at, "returns a Parameter at the indicated position given the index argument")
-            .method("size", &ParameterVector::size, "returns the size of the Parameter Vector")
-            .method("resize", &ParameterVector::resize, "resizes the Parameter Vector given the provided length argument")
-            .method("set_all_estimable", &ParameterVector::set_all_estimable, "sets all Parameters within vector as estimable")
-            .method("set_all_random", &ParameterVector::set_all_random, "sets all Parameters within vector as estimable")
-            .method("fill", &ParameterVector::fill, "sets the value of all Parameters in the vector with the provided value")
-            .method("get_id", &ParameterVector::get_id, "get the ID of the interface base object.");
+            .method("at", &ParameterVector::at, "Returns a Parameter at the indicated position given the index argument.")
+            .method("size", &ParameterVector::size, "Returns the size of the Parameter Vector.")
+            .method("resize", &ParameterVector::resize, "Resizes the Parameter Vector given the provided length argument.")
+            .method("set_all_estimable", &ParameterVector::set_all_estimable, "Sets all Parameters within vector as estimable.")
+            .method("set_all_random", &ParameterVector::set_all_random, "Sets all Parameters within vector as estimable.")
+            .method("fill", &ParameterVector::fill, "Sets the value of all Parameters in the vector with the provided value.")
+            .method("get_id", &ParameterVector::get_id, "Get the ID of the interface base object.");
 
     Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
             .constructor()
@@ -707,22 +707,12 @@ RCPP_MODULE(fims) {
             .method("SetRecruitment", &PopulationInterface::SetRecruitment)
             .method("evaluate", &PopulationInterface::evaluate);
 
-    Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
-            .constructor()
-            .method("get_id", &DnormDistributionsInterface::get_id)
-            .method("evaluate", &DnormDistributionsInterface::evaluate)
-            .method("set_observed_data", &DnormDistributionsInterface::set_observed_data)
-            .method("set_distribution_links", &DnormDistributionsInterface::set_distribution_links)
-            .field("x", &DnormDistributionsInterface::x)
-            .field("expected_values", &DnormDistributionsInterface::expected_values)
-            .field("log_sd", &DnormDistributionsInterface::log_sd);
-
     Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
-            .constructor()
-            .field("inflection_point", &LogisticMaturityInterface::inflection_point)
-            .field("slope", &LogisticMaturityInterface::slope)
-            .method("get_id", &LogisticMaturityInterface::get_id)
-            .method("evaluate", &LogisticMaturityInterface::evaluate);
+        .constructor()
+        .field("inflection_point", &LogisticMaturityInterface::inflection_point)
+        .field("slope", &LogisticMaturityInterface::slope)
+        .method("get_id", &LogisticMaturityInterface::get_id)
+        .method("evaluate", &LogisticMaturityInterface::evaluate);
 
     Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
             .constructor()
@@ -750,26 +740,35 @@ RCPP_MODULE(fims) {
             .method("get_id", &EWAAGrowthInterface::get_id)
             .method("evaluate", &EWAAGrowthInterface::evaluate);
 
-    Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")
-            .constructor()
-            .method("get_id", &DlnormDistributionsInterface::get_id)
-            .method("evaluate", &DlnormDistributionsInterface::evaluate)
-            .method("set_observed_data", &DlnormDistributionsInterface::set_observed_data)
-            .method("set_distribution_links", &DlnormDistributionsInterface::set_distribution_links)
-            .field("input_type", &DlnormDistributionsInterface::input_type)
-            .field("x", &DlnormDistributionsInterface::x)
-            .field("expected_values", &DlnormDistributionsInterface::expected_values)
-            .field("log_logsd", &DlnormDistributionsInterface::log_logsd);
+    Rcpp::class_<DnormDistributionsInterface>("DnormDistribution")
+        .constructor()
+        .method("get_id", &DnormDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
+        .method("evaluate", &DnormDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
+        .method("set_observed_data", &DnormDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
+        .method("set_distribution_links", &DnormDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
+        .field("x", &DnormDistributionsInterface::x, "Input for distribution when not observations, e.g., prior or random effect.")
+        .field("expected_values", &DnormDistributionsInterface::expected_values, "Mean of the distribution.")
+        .field("log_sd", &DnormDistributionsInterface::log_sd, "The natural log of the standard deviation.");
 
-    Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
-            .constructor()
-            .method("evaluate", &DmultinomDistributionsInterface::evaluate)
-            .method("get_id", &DmultinomDistributionsInterface::get_id)
-            .method("set_observed_data", &DmultinomDistributionsInterface::set_observed_data)
-            .method("set_distribution_links", &DmultinomDistributionsInterface::set_distribution_links)
-            .field("x", &DmultinomDistributionsInterface::x)
-            .field("expected_values", &DmultinomDistributionsInterface::expected_values)
-            .field("dims", &DmultinomDistributionsInterface::dims);
+    Rcpp::class_<DlnormDistributionsInterface>("DlnormDistribution")
+        .constructor()
+        .method("get_id", &DlnormDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
+        .method("evaluate", &DlnormDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
+        .method("set_observed_data", &DlnormDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
+        .method("set_distribution_links", &DlnormDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
+        .field("x", &DlnormDistributionsInterface::x, "Input for distribution when not observations, e.g., prior or random effect.")
+        .field("expected_values", &DlnormDistributionsInterface::expected_values, "Mean of the distribution on the log scale.")
+        .field("log_sd", &DlnormDistributionsInterface::log_sd, "The natural log of the standard deviation of the distribution on the log scale.");
+
+    Rcpp::class_<DmultinomDistributionsInterface>("DmultinomDistribution")
+        .constructor()
+        .method("get_id", &DmultinomDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
+        .method("evaluate", &DmultinomDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
+        .method("set_observed_data", &DmultinomDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
+        .method("set_distribution_links", &DmultinomDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
+        .field("x", &DmultinomDistributionsInterface::x, "Input for distribution when not observations, e.g., prior or random effect.")
+        .field("expected_values", &DmultinomDistributionsInterface::expected_values, "numeric non-negative vector of length K, specifying the probability for the K classes.")
+        .field("dims", &DmultinomDistributionsInterface::dims, "dimension of the multivariate input, e.g., c(num rows, num cols).");
 }
 
 

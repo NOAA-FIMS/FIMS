@@ -63,6 +63,7 @@ Imports:
     jsonlite,
     methods,
     Rcpp,
+    rlang,
     scales,
     stats,
     tibble,
@@ -71,6 +72,7 @@ Imports:
 Suggests: 
     covr,
     knitr,
+    mockery,
     parallel,
     purrr,
     remotes,

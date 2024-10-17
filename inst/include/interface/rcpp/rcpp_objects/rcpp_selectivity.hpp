@@ -83,9 +83,9 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     LogisticSel.slope[0] = this->slope[0].initial_value_m;
     return LogisticSel.evaluate(x);
   }
-    /** 
-     * @brief finalize function. Extracts derived quantities back to 
-     * the Rcpp interface object from the Information object. 
+    /**
+     * @brief finalize function. Extracts derived quantities back to
+     * the Rcpp interface object from the Information object.
      */
     virtual void finalize() {
 
@@ -266,9 +266,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     DoubleLogisticSel.slope_desc[0] = this->slope_desc[0].initial_value_m;
     return DoubleLogisticSel.evaluate(x);
   }
-    /** 
-     * @brief finalize function. Extracts derived quantities back to 
-     * the Rcpp interface object from the Information object. 
+    /**
+     * @brief finalize function. Extracts derived quantities back to
+     * the Rcpp interface object from the Information object.
      */
     virtual void finalize() {
 
@@ -283,7 +283,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
                 fims_info::Information<double>::GetInstance();
 
 
-   
+
         fims_info::Information<double>::selectivity_models_iterator it;
 
         //search for maturity in Information
@@ -343,37 +343,37 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
      */
     virtual std::string to_json() {
         std::stringstream ss;
-        
+
                 ss << "\"module\" : {\n";
                 ss << " \"name\": \"selectivity\",\n";
                 ss << " \"type\": \"DoubleLogistic\",\n";
                 ss << " \"id\": " << this->id << ",\n";
-        
+
                 ss << " \"parameter\": {\n";
                 ss << "   \"name\": \"inflection_point_asc\",\n";
                 ss << "   \"id\":" << this->inflection_point_asc.id_m << ",\n";
                 ss << "   \"type\": \"vector\",\n";
                 ss << "   \"values\":" << this->inflection_point_asc << ",\n},\n";
-        
+
                 ss << " \"parameter\": {\n";
                 ss << "   \"name\": \"slope_asc\",\n";
                 ss << "   \"id\":" << this->slope_asc.id_m << ",\n";
                 ss << "   \"type\": \"vector\",\n";
                 ss << "   \"values\":" << this->slope_asc << ",\n},\n";
-        
+
                 ss << " \"parameter\": {\n";
                 ss << "   \"name\": \"inflection_point_desc\",\n";
                 ss << "   \"id\":" << this->inflection_point_desc.id_m << ",\n";
                 ss << "   \"type\": \"vector\",\n";
                 ss << "   \"values\":" << this->inflection_point_desc << ",\n},\n";
-        
+
                 ss << " \"parameter\": {\n";
                 ss << "   \"name\": \"slope_desc\",\n";
                 ss << "   \"id\":" << this->slope_desc.id_m << ",\n";
                 ss << "   \"type\": \"vector\",\n";
                 ss << "   \"values\":" << this->slope_desc << ",\n}\n";
-        
-        
+
+
                 ss << "}";
 
         return ss.str();
@@ -446,7 +446,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         selectivity->slope_desc.resize(this->slope_desc.size());
         for (size_t i = 0; i < this->slope_desc.size(); i++) {
             selectivity->slope_desc[i] = this->slope_desc[i].initial_value_m;
-            if (this->slope_asc[i].estimated_m) {
+            if (this->slope_desc[i].estimated_m) {
                 ss.str("");
                 ss << "selectivity.slope_desc." << this->id << "." << i;
                 info->RegisterParameterName(ss.str());

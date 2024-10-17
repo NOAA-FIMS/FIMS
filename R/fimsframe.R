@@ -41,29 +41,77 @@ setClass(
 # can't call this data because there is already a generic
 setGeneric("get_data", function(x) standardGeneric("get_data"))
 setMethod("get_data", "FIMSFrame", function(x) x@data)
+setMethod(
+  "get_data",
+  "data.frame",
+  function(x) FIMSFrame(x)@data
+)
 
 # example: so we can call fleets(obj) instead of obj@fleets
 setGeneric("fleets", function(x) standardGeneric("fleets"))
 setMethod("fleets", "FIMSFrame", function(x) x@fleets)
+setMethod(
+  "fleets",
+  "data.frame",
+  function(x) FIMSFrame(x)@fleets
+)
 
 setGeneric("n_years", function(x) standardGeneric("n_years"))
 setMethod("n_years", "FIMSFrame", function(x) x@n_years)
+setMethod(
+  "n_years",
+  "data.frame",
+  function(x) FIMSFrame(x)@n_years
+)
 
 setGeneric("start_year", function(x) standardGeneric("start_year"))
 setMethod("start_year", "FIMSFrame", function(x) x@start_year)
+setMethod(
+  "start_year",
+  "data.frame",
+  function(x) FIMSFrame(x)@start_year
+)
 
 setGeneric("end_year", function(x) standardGeneric("end_year"))
 setMethod("end_year", "FIMSFrame", function(x) x@end_year)
+setMethod(
+  "end_year",
+  "data.frame",
+  function(x) FIMSFrame(x)@end_year
+)
 
 setGeneric("ages", function(x) standardGeneric("ages"))
 setMethod("ages", "FIMSFrame", function(x) x@ages)
+setMethod(
+  "ages",
+  "data.frame",
+  function(x) FIMSFrame(x)@ages
+)
 
 setGeneric("n_ages", function(x) standardGeneric("n_ages"))
 setMethod("n_ages", "FIMSFrame", function(x) x@n_ages)
+setMethod(
+  "n_ages",
+  "data.frame",
+  function(x) FIMSFrame(x)@n_ages
+)
 
 setGeneric("weight_at_age", function(x) standardGeneric("weight_at_age"))
 setMethod("weight_at_age", "FIMSFrame", function(x) x@weight_at_age)
+setMethod(
+  "weight_at_age",
+  "data.frame",
+  function(x) FIMSFrame(x)@weight_at_age
+)
 
+# TODO: create accessors for all of the model, i.e., m_*, functions that allow
+# things to work if you pass it a data frame rather than a FIMSFrame, i.e.,
+# first convert it to a FIMSFrame and then pass it to the other generic.
+
+#' Get the weight at age data to be used in the model
+#'
+#' @param x The object containing weight at age data.
+#' @export
 setGeneric("m_weight_at_age", function(x) standardGeneric("m_weight_at_age"))
 setMethod(
   "m_weight_at_age", "FIMSFrame",
@@ -78,6 +126,7 @@ setMethod(
   }
 )
 
+# TODO: do we need m_ages()? ages can be extracted using data@ages.
 setGeneric("m_ages", function(x) standardGeneric("m_ages"))
 setMethod("m_ages", "FIMSFrame", function(x) {
   x@ages
@@ -214,6 +263,10 @@ setMethod(
     }
   }
 )
+
+is.FIMSFrame <- function(x) {
+  inherits(x, "FIMSFrame")
+}
 
 # setValidity ----
 setValidity(

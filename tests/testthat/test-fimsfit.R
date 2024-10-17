@@ -6,8 +6,12 @@ test_that("create_FIMSFit creates an object of class 'FIMSFit'", {
     obj = list(
       par = NA, fn = NA, gr = NA, he = NA, hessian = NA, method = NA,
       retape = NA,
-      env = list("last.par.best" = 1, "parList" = function(x) {TRUE}),
-      report = function(x) {list(TRUE)}, simulate = NA
+      env = list("last.par.best" = 1, "parList" = function(x) {
+        TRUE
+      }),
+      report = function(x) {
+        list(TRUE)
+      }, simulate = NA
     )
   )
 
@@ -28,8 +32,12 @@ test_that("fimsfit stops for missing input", {
       obj = list(
         par = NA, fn = NA, gr = NA, he = NA, hessian = NA, method = NA,
         retape = NA,
-        env = list("last.par.best" = 1, "parList" = function(x) {TRUE}),
-        report = function(x) {list(TRUE)}, simulate = NA
+        env = list("last.par.best" = 1, "parList" = function(x) {
+          TRUE
+        }),
+        report = function(x) {
+          list(TRUE)
+        }, simulate = NA
       )
     ),
     "missing, with no default"
