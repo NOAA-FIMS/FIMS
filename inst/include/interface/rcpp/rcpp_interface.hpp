@@ -363,6 +363,7 @@ void clear_internal() {
   d0->fixed_effects_parameters.clear();
   d0->random_effects_parameters.clear();
   d0->variable_map.clear();
+  d0->parameter_names.clear();
 }
 /**
  * Clears the vector of independent variables.
