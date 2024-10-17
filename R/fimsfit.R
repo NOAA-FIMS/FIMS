@@ -367,6 +367,14 @@ fit_fims <- function(input,
     time_sdreport = time_sdreport,
     time_total = Sys.time() - t0
   )
+
+  #rename parameters
+  par.names <- names(get_parameter_names(obj$par))
+  names(obj$par) <- par.names
+  names(opt$par) <- par.names
+  names(sdreport$par.fixed) <- par.names
+  dimnames(sdreport$cov.fixed) <- list(par.names, par.names)
+
   fit <- create_FIMSFit(
     input = input,
     obj = obj,
