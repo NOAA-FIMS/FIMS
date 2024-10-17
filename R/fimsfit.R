@@ -54,6 +54,7 @@ setValidity(
 #' Check if an object is of class FIMSFit
 #'
 #' @param x Returned list from [fit_fims()].
+#' @keywords fit_fims
 #' @export
 is.FIMSFit <- function(x) {
   inherits(x, "FIMSFit")
@@ -62,6 +63,7 @@ is.FIMSFit <- function(x) {
 #' Check if an object is a list of FIMSFit objects
 #'
 #' @param x List of fits returned from multiple calls to [fit_fims()].
+#' @keywords fit_fims
 #' @export
 is.FIMSFits <- function(x) {
   if (!is.list(x)) {
@@ -174,6 +176,7 @@ methods::setMethod(
 #'       if you are running this function yourself.
 #'     }
 #'  }
+#' @keywords fit_fims
 #' @export
 create_FIMSFit <- function(
   input,
@@ -274,6 +277,7 @@ create_FIMSFit <- function(
 #' * [create_FIMSFit()]
 #' @details This function is a beta version still and subject to change
 #'   without warning.
+#' @keywords fit_fims
 #' @export
 fit_fims <- function(input,
                      get_sd = TRUE,

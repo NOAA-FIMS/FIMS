@@ -76,3 +76,4 @@ Create an object with the class of \code{FIMSFit} after running a FIMS model. Th
 is typically done within \code{\link[=fit_fims]{fit_fims()}} but it can be create manually by the
 user if they have used their own bespoke code to fit a FIMS model.
 }
+\keyword{fit_fims}

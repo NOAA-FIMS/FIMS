@@ -1,162 +1,274 @@
 #' Validity checks for distributions
 #'
-#' Check the validity of arguments passed to [new_data_distribution()] and
-#' [new_process_distribution()].
+#' This function checks the validity of arguments passed to functions that
+#' relate to distributions within the Fisheries Integrated Modeling System
+#' (FIMS). This function is designed to fail early only once, otherwise it goes
+#' through many checks before reporting the results in an attempt to give the
+#' user the most information possible. If it were to fail on every mistake,
+#' then the user might have to iterate through multiple changes to their input
+#' values. Sometimes, their mistakes might take quite a bit of time to make it
+#' to this function or worse they might be running things on the cloud and not
+#' have immediate access to the report. Therefore, we feel that providing the
+#' most information possible is the best way forward.
 #'
-#' @param args A list of input arguments.
+#' @param args A named list of input arguments that must contain at least
+#'   `family` and `sd`. `data_type` is only needed for some upstream functions.
+#' @seealso
+#' This function is used in the following functions:
+#' * [initialize_data_distribution()]
+#' * [initialize_process_distribution()]
 #' @noRd
 #' @return
-#' Nothing is returned if the check is successful, and error messages are
-#' returned if the checks are unsuccessful.
+#' If successful, `TRUE` is invisibly returned. If unsuccessful,
+#' [cli::cli_abort()] is used to return the relevant error messages.
 check_distribution_validity <- function(args) {
+  # Separate objects from args
   family <- args[["family"]]
-  families <- args[["families"]]
   sd <- args[["sd"]]
+  # Optional argument data_type
+  data_type <- args[["data_type"]]
+  check_present <- purrr::map_vec(list("family" = family, "sd" = sd), is.null)
+
+  # Set up global rules
+  # FIXME: Move this to a data item in the package so it can be used everywhere
+  # Could do a call to all data objects in the package and get unique types that
+  # are available
+  data_type_names <- c("index", "agecomp", "lengthcomp")
+  if (is.null(data_type)) {
+    available_distributions <- c("lognormal", "gaussian")
+  } else {
+    available_distributions <- switch(
+      EXPR = ifelse(grepl("comp", data_type), "composition", data_type),
+      "index" = c("lognormal", "gaussian"),
+      "composition" = c("multinomial"),
+      "unavailable data type"
+    )
+  }
+  elements_of_sd <- c("value", "estimated")
+
+  # Start a bulleted list of errors and add to it in each if statement
+  abort_bullets <- c(
+    " " = "The following errors were found in the input argument {.var args}."
+  )
+  if (any(check_present)) {
+    bad <- names(check_present[unlist(check_present)])
+    abort_bullets <- c(
+      abort_bullets,
+      "x" = "{.var {bad}} {?is/are} missing from {.var args}."
+    )
+    # Abort early because not all of the necessary items were in args
+    cli::cli_abort(abort_bullets)
+  }
+
+  # Checks related to the family class
   if (!inherits(family, "family")) {
-    cli::cli_abort(c(
-      "x" = "{.code {family}} is the incorrect type.",
-      "i" = "{.var family} needs to be specified as a family class, e.g.,
-             `family = gaussian()`."
-    ))
+    abort_bullets <- c(
+      abort_bullets,
+      "x" = "The class of {.var family} is incorrect.",
+      "i" = "{.var family} should be an object of class {.var family},
+             e.g., `family = gaussian()`, instead of {class(family)}."
+    )
   }
-  if (!(family[["family"]] %in% families)) {
-    fam_name <- family[["family"]]
-    cli::cli_abort(c(
-      "x" = "FIMS currently does not offer the family, {.code {fam_name}}, for
-             this distribution type.",
-      "i" = "The families available for this distribution type are: {.code
-             {families}}."
-    ))
+  if (
+    !(family[["family"]] %in% available_distributions) ||
+    "unavailable data type" %in% available_distributions
+  ) {
+    ifelse_type <- ifelse(
+      is.null(data_type),
+      "distribution",
+      paste(data_type, "data")
+    )
+    abort_bullets <- c(
+      abort_bullets,
+      "x" = "FIMS currently does not allow the family to be
+             {.code {family[['family']]}}.",
+      "i" = "The families available for this {ifelse_type} are
+             {.code {available_distributions}}."
+    )
   }
-  if (!is.null(args[["data_type"]])) {
-    data_type <- args[["data_type"]]
-    data_type_names <- c("index", "agecomp", "lengthcomp")
 
+  # Checks related to the type of data
+  if (!is.null(data_type)) {
     if (!(data_type %in% data_type_names)) {
-      cli::cli_abort(c(
-        "x" = "The data type is incorrect.",
-        "i" = "Correct values are: {.code {data_type_names}}."
-      ))
-    }
-
-    if (grepl("comp", data_type) &&
-        (family[["family"]] == "lognormal" ||
-         family[["family"]] == "gaussian")) {
-      fam_name <- family[["family"]]
-      cli::cli_abort(c(
-        "x" = "The family, {.code {fam_name}} is not available for the data
-               type, {.code {data_type}}.",
-        "i" = "The available families for this data type are: `multinomial`."
-      ))
-    }
-    if (data_type == "index" &&
-        family[["family"]] == "multinomial") {
-      fam_name <- family[["family"]]
-      cli::cli_abort(c(
-        "x" = "The family, {.code {fam_name}} is not available for the data
-               type, {.code {data_type}}.",
-        "i" = "The available families for this data type are: `lognormal` or
-               `gaussian`."
-      ))
+      abort_bullets <- c(
+        abort_bullets,
+        "x" = "The specified {.var data_type} of {.var {data_type}} is not
+               available.",
+        "i" = "Allowed values for {.var data_type} are
+               {.code {data_type_names}}."
+      )
     }
   }
 
-  if (!all(sd[["value"]] > 0)) {
-    sd_value <- sd[["value"]]
-    cli::cli_abort(c(
-      "x" = "At least one value for sd, {.code {sd_value}} is out of bounds.",
-      "i" = "All standard deviation values need to be positive."
-      ))
-  }
-
-  if (length(sd[["estimated"]]) > 1) {
-    if (length(sd[["value"]]) != length(sd[["estimated"]])) {
+  # Checks related to standard deviation
+  # Check if sd has both elements and if yes, then go onto the else statement
+  # for major checks
+  if (!all(elements_of_sd %in% names(sd))) {
+    abort_bullets <- c(
+      abort_bullets,
+      "x" = "{.var {elements_of_sd}} need to be present in sd.",
+      "i" = "Only {.code {names(sd)}} {?is/are} present."
+    )
+  } else {
+    if (!all(sd[["value"]] > 0)) {
+      abort_bullets <- c(
+        abort_bullets,
+        "x" = "Values passed to {.var sd} are out of bounds.",
+        "i" = "Values passed to {.var sd} {?is/are} {.code {sd[['value']]}}.",
+        "i" = "All standard deviation (sd) values need to be positive."
+      )
+    }
+    if (
+      length(sd[["estimated"]]) > 1 &&
+      length(sd[["value"]]) != length(sd[["estimated"]])
+    ) {
       sd_length <- length(sd[["value"]])
       est_length <- length(sd[["estimated"]])
-      cli::cli_abort(c(
-        "x" = "The length of `sd$value` is {.code {sd_length}} and the length
-               of `sd$estimated` is {.code {est_length}}.",
-        "i" = "The size of `value` and `estimated` must match."
-      ))
+      abort_bullets <- c(
+        abort_bullets,
+        "x" = "The sizes of {.var value} and {.var estimated} within {.var sd}
+               must match if more than one value is specified for the latter.",
+        "i" = "The length of {.var sd[['value']]} is {.code {sd_length}}.",
+        "i" = "The length of {.var sd[['estimated']]} is
+               {.code {est_length}}."
+      )
     }
+  }
+
+  # Return error messages if more than just the default is present
+  if (length(abort_bullets) == 1) {
+    invisible(TRUE)
+  } else {
+    cli::cli_abort(abort_bullets)
   }
 }
 
 #' Return name of expected value
 #'
-#' @inheritParams new_data_distribution
+#' The combination of data type, family, and link lead to a specific name for
+#' the expected value within the code base. This function looks at the
+#' combination of these three objects and specifies the appropriate string for
+#' its name going forward.
+#' @inheritParams initialize_data_distribution
 #' @noRd
 #' @return
 #' A string specifying the name of the expected value.
 #'
 get_expected_name <- function(family, data_type) {
+  # TODO: Think about if the name of the expected value should change based on
+  # the link or if it should stay the same? Keeping track of different names in
+  # the code base might be too complex for the output as well
+  family_string <- family[["family"]]
+  link_string <- family[["link"]]
   expected_name <- dplyr::case_when(
-    data_type == "index" && grepl("lognormal|gaussian", family[["family"]]) &&
-      family[["link"]] == "log" ~ "log_expected_index",
-    data_type == "index" && grepl("lognormal|gaussian", family[["family"]]) &&
-      family[["link"]] == "identity" ~ "expected_index",
+    data_type == "index" &&
+      grepl("lognormal|gaussian", family_string) &&
+      link_string == "log" ~ "log_expected_index",
+    data_type == "index" &&
+      grepl("lognormal|gaussian", family_string) &&
+      link_string == "identity" ~ "expected_index",
     grepl("comp", data_type) ~ "proportion_catch_numbers_at_age"
   )
   # Check combination of entries was okay and led to valid name
   if (is.na(expected_name)) {
     cli::cli_abort(c(
-      "x" = "Error, expected_name of distribution is {.var {expected_name}}.",
-      "i" = "Some combination of the family and data_type are incompatible."
+      "x" = "The combination of data type, family, and link are incompatible in
+             some way.",
+      "i" = "{.var data_type} is {.var {data_type}}.",
+      "i" = "The family is {.var {family_string}}.",
+      "i" = "The link is {.var {link_string}}.",
     ))
   }
   return(expected_name)
 }
 
-#' Set up a new distribution for a data type
+#' Set up a new distribution for a data type or a process
 #'
+#' Use [methods::new()] to set up a distribution within an existing module with
+#' the necessary linkages between the two. For example, a fleet module will need
+#' a distributional assumption for parts of the data associated with it, which
+#' requires the use of `initialize_data_distribution()`, and a recruitment
+#' module, like the Beverton--Holt stock--recruit relationship, will need a
+#' distribution associated with the recruitment deviations, which requires
+#' `initialize_process_distribution()`.
 #' @param module An identifier to a C++ fleet module that is linked to the data
 #'   of interest.
 #' @param family A description of the error distribution and link function to
 #'   be used in the model. The argument takes a family class, e.g.,
 #'   `stats::gaussian(link = "identity")`.
-#' @param sd A list of length two. The first entry, `"value"`, (default = 1)
+#' @param sd A list of length two. The first entry is named `"value"` and it
 #'   stores the initial values (scalar or vector) for the relevant standard
-#'   deviations. The second entry, `"estimated"` (default = FALSE) is a scalar
-#'   or vector of booleans indicating whether or not standard deviation is
-#'   estimated. If `"value"` is a vector and `"estimated"` is a scalar, the
-#'   `"estimated"` value will be applied to the entire vector, otherwise, the
-#'   dimensions of the two must match.
-#' @param data_type A single string specifying the type of data that the
-#'   distribution will be fit to. Options are listed in the function call,
-#'   where the first option listed, i.e., `"index"` is the default.
+#'   deviations. The default is `value = 1`. The second entry is named
+#'  `"estimated"` and it stores a vector of booleans (default = FALSE) is a
+#'   scalar indicating whether or not standard deviation is estimated. If
+#'   `"value"` is a vector and `"estimated"` is a scalar, the single value
+#'   specified `"estimated"` value will be repeated to match the length of
+#'   `value`. Otherwise, the dimensions of the two must match.
+#' @param data_type A string specifying the type of data that the
+#'   distribution will be fit to. Allowable types include
+#'   `r toString(formals(initialize_data_distribution)[["data_type"]])`
+#'   and the default is
+#'   `r toString(formals(initialize_data_distribution)[["data_type"]][1])`.
+#' @param par A string specifying the parameter name the distribution applies
+#'   to. Parameters must be members of the specified module. Use
+#'   `methods::show(module)` to obtain names of parameters within the module.
+#' @param is_random_effect A boolean indicating whether or not the process is
+#'   estimated as a random effect.
 #' @return
-#' Reference Class. Use [show()] to view Rcpp class fields, methods, and
-#' documentation.
+#' A reference class. is returned. Use [methods::show()] to view the various
+#' Rcpp class fields, methods, and documentation.
+#' @keywords distribution
 #' @export
 #' @examples
 #' \dontrun{
-#' nyears <- 30
+#' # Set up a new data distribution
+#' n_years <- 30
 #' # Create a new fleet module
 #' fleet <- methods::new(Fleet)
 #' # Create a distribution for the fleet module
-#' fleet_distribution <- new_data_distribution(
+#' fleet_distribution <- initialize_data_distribution(
 #'   module = fishing_fleet,
 #'   family = lognormal(link = "log"),
-#'   sd = list(value = rep(sqrt(log(0.01^2 + 1)), nyears),
-#'   estimated = rep(FALSE, nyears),
+#'   sd = list(
+#'     value = rep(sqrt(log(0.01^2 + 1)), n_years),
+#'     estimated = rep(FALSE, n_years) # Could also be a single FALSE
+#'   ),
 #'   data_type = "index"
 #' )
+#' 
+#' # Set up a new process distribution
+#' # Create a new recruitment module
+#' recruitment <- methods::new(BevertonHoltRecruitment)
+#' # view parameter names of the recruitment module
+#' methods::show(BevertonHoltRecruitment)
+#' # Create a distribution for the recruitment module
+#' recruitment_distribution <- initialize_process_distribution(
+#'   module = recruitment,
+#'   par = "log_devs",
+#'   family = gaussian(),
+#'   sd = list(value = 0.4, estimated = FALSE),
+#'   is_random_effect = FALSE
+#' )
 #' }
-new_data_distribution <- function(
+initialize_data_distribution <- function(
   module,
   family,
   sd = list(value = 1, estimated = FALSE),
+  # FIXME: Move this argument to second to match where par is in
+  # initialize_process_distribution
   data_type = c("index", "agecomp", "lengthcomp")
 ) {
-  data_type <- match.arg(data_type)
-  families <- c("lognormal", "gaussian", "multinomial")
+  data_type <- rlang::arg_match(data_type)
+  # FIXME: Make the available families a data object
+  # Could also make the matrix of distributions available per type as a
+  # data frame where the check could use the stored object.
+  
 
   # validity check on user input
   args <- list(
     family = family,
     sd = sd,
-    data_type = data_type,
-    families = families
+    data_type = data_type
   )
   check_distribution_validity(args)
 
@@ -166,44 +278,47 @@ new_data_distribution <- function(
   # Set up distribution based on `family` argument`
   if (family[["family"]] == "lognormal") {
     # create new Rcpp module
-    new_module <- new(TMBDlnormDistribution)
+    new_module <- methods::new(DlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_logsd <- new(
+    new_module$log_sd <- methods::new(
       ParameterVector,
-      log(sd$value),
-      length(sd$value)
+      log(sd[["value"]]),
+      length(sd[["value"]])
     )
     # setup whether or not sd parameter is estimated
-    if (length(sd$value) > 1 && length(sd$estimated) == 1) {
-      new_module$log_logsd$set_all_estimable(sd$estimated)
+    if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
+      new_module$log_sd$set_all_estimable(sd[["estimated"]])
     } else {
-      for (i in 1:seq_along(sd$estimated)) {
-        new_module$log_logsd[i]$estimated <- sd$estimated[i]
+      for (i in 1:seq_along(sd[["estimated"]])) {
+        new_module$log_sd[i]$estimated <- sd[["estimated"]][i]
       }
     }
   }
 
   if (family[["family"]] == "gaussian") {
     # create new Rcpp module
-    new_module <- new(TMBDnormDistribution)
+    new_module <- methods::new(DnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_sd <- new(ParameterVector, log(sd$value), length(sd$value))
+    new_module$log_sd$resize(length(sd[["value"]]))
+    for (i in seq_along(sd[["value"]])){
+      new_module$log_sd[i]$value <- log(sd[["value"]][i])
+    }
 
     # setup whether or not sd parameter is estimated
-    if (length(sd$value) > 1 && length(sd$estimated) == 1) {
-      new_module$log_sd$set_all_estimable(sd$estimated)
+    if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
+      new_module$log_sd$set_all_estimable(sd[["estimated"]])
     } else {
-      for (i in 1:seq_along(sd$estimated)) {
-        new_module$log_sd[i]$estimated <- sd$estimated[i]
+      for (i in 1:seq_along(sd[["estimated"]])) {
+        new_module$log_sd[i]$estimated <- sd[["estimated"]][i]
       }
     }
   }
 
   if (family[["family"]] == "multinomial") {
     #create new Rcpp module
-    new_module <- new(TMBDmultinomDistribution)
+    new_module <- methods::new(DmultinomDistribution)
   }
 
   # setup link to observed data
@@ -222,79 +337,57 @@ new_data_distribution <- function(
   return(new_module)
 }
 
-#' Sets up a new distribution for a process
-#' @inheritParams new_data_distribution
-#' @param par A string specifying the parameter name the distribution applies
-#'   to. Parameters must be members of the specified module. Use
-#'   `methods::show(module)` to obtain names of parameters within the module.
-#' @param is_random_effect A boolean indicating whether or not the process is
-#'   estimated as a random effect.
-#' @seealso
-#' * [new_data_distribution()]
+#' @rdname initialize_data_distribution
+#' @keywords distribution
 #' @export
-#' @return
-#' Reference Class. Use `show()` to view Rcpp class fields, methods, and
-#' documentation.
-#' @examples
-#' \dontrun{
-#' # Create a new fleet module
-#' recruitment <- methods::new(BevertonHoltRecruitment)
-#' # view parameter names of the recruitment module
-#' methods::show(BevertonHoltRecruitment)
-#' # Create a distribution for the recruitment module
-#' recruitment_distribution <- new_process_distribution(
-#'   module = recruitment,
-#'   par = "log_devs",
-#'   family = gaussian(),
-#'   sd = list(value = 0.4, estimated = FALSE),
-#'   is_random_effect = FALSE
-#' )
-#' }
-new_process_distribution <- function(module,
-                                     par,
-                                     family,
-                                     sd = list(value = 1, estimated = FALSE),
-                                     is_random_effect = FALSE) {
-  families <- c("lognormal", "gaussian")
-
+initialize_process_distribution <- function(
+  module,
+  par,
+  family,
+  sd = list(value = 1, estimated = FALSE),
+  is_random_effect = FALSE
+) {
   # validity check on user input
-  args <- list(family = family, sd = sd, families = families)
+  args <- list(family = family, sd = sd)
   check_distribution_validity(args)
 
   # Set up distribution based on `family` argument`
   if (family[["family"]] == "lognormal") {
     # create new Rcpp module
-    new_module <- new(TMBDlnormDistribution)
+    new_module <- methods::new(DlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_logsd <- new(
+    new_module$log_sd <- methods::new(
       ParameterVector,
-      log(sd$value),
-      length(sd$value)
+      log(sd[["value"]]),
+      length(sd[["value"]])
     )
     #setup whether or not sd parameter is estimated
-    if (length(sd$value) > 1 && length(sd$estimated) == 1) {
-      new_module$log_logsd$set_all_estimable(sd$estimated)
+    if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
+      new_module$log_sd$set_all_estimable(sd[["estimated"]])
     } else {
-      for (i in 1:seq_along(sd$estimated)) {
-        new_module$log_logsd[i]$estimated <- sd$estimated[i]
+      for (i in 1:seq_along(sd[["estimated"]])) {
+        new_module$log_sd[i]$estimated <- sd[["estimated"]][i]
       }
     }
   }
 
   if (family[["family"]] == "gaussian") {
     # create new Rcpp module
-    new_module <- new(TMBDnormDistribution)
+    new_module <- methods::new(DnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_sd <- new(ParameterVector, log(sd$value), length(sd$value))
+    new_module$log_sd$resize(length(sd[["value"]]))
+    for (i in seq_along(sd[["value"]])){
+      new_module$log_sd[i]$value <- log(sd[["value"]][i])
+    }
 
     #setup whether or not sd parameter is estimated
-    if (length(sd$value) > 1 && length(sd$estimated) == 1) {
-      new_module$log_sd$set_all_estimable(sd$estimated)
+    if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
+      new_module$log_sd$set_all_estimable(sd[["estimated"]])
     } else {
-      for (i in 1:seq_along(sd$estimated)) {
-        new_module$log_sd[i]$estimated <- sd$estimated[i]
+      for (i in 1:seq_along(sd[["estimated"]])) {
+        new_module$log_sd[i]$estimated <- sd[["estimated"]][i]
       }
     }
   }
@@ -305,8 +398,8 @@ new_process_distribution <- function(module,
   n_dim <- length(module$field(par))
 
   # create new Rcpp modules
-  new_module$x <- new(ParameterVector, n_dim)
-  new_module$expected_values <- new(ParameterVector, n_dim)
+  new_module$x$resize(n_dim)
+  new_module$expected_values$resize(n_dim)
 
   # initialize values with 0
   # these are overwritten in the code later by user input
@@ -348,6 +441,7 @@ new_process_distribution <- function(module,
 #' * [stats::glm()]
 #' * [stats::power()]
 #' * [stats::make.link()]
+#' @keywords distribution
 #' @export
 #' @examples
 #' a_family <- multinomial()
@@ -363,6 +457,7 @@ lognormal <- function(link = "log") {
 }
 
 #' @rdname lognormal
+#' @keywords distribution
 #' @export
 multinomial <- function(link = "logit") {
   family_class <- c(

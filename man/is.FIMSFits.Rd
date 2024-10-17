@@ -12,3 +12,4 @@ is.FIMSFits(x)
 \description{
 Check if an object is a list of FIMSFit objects
 }
+\keyword{fit_fims}

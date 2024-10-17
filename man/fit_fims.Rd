@@ -60,3 +60,4 @@ without warning.
 \item \code{\link[=create_FIMSFit]{create_FIMSFit()}}
 }
 }
+\keyword{fit_fims}

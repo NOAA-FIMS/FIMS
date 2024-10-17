@@ -15,11 +15,11 @@ test_that("Population input settings work as expected", {
   population$estimate_prop_female <- FALSE
 
   expect_equal(population$get_id(), 1)
-  for(i in 1:(nyears * nages)){
+  for (i in 1:(nyears * nages)) {
     expect_equal(population$log_M[i]$value, -1)
     expect_false(population$log_M[i]$estimated)
   }
-  for(i in 1:nyears){
+  for (i in 1:nyears) {
     expect_equal(population$log_init_naa[i]$value, 0)
     expect_true(population$log_init_naa[i]$estimated)
   }
