@@ -268,6 +268,65 @@ class Information {
  FIMS_INFO_LOG("segment");
       f->Initialize(f->nyears, f->nages);
 
+     // set index data
+      if (f->fleet_observed_index_data_id_m != -999) {
+        uint32_t observed_index_id =
+            static_cast<uint32_t>(f->fleet_observed_index_data_id_m);
+        data_iterator it = this->data_objects.find(observed_index_id);
+        INFO_LOG << "Input fleet index id = " << observed_index_id << "."
+                 << std::endl;
+        if (it != this->data_objects.end()) {
+          f->observed_index_data = (*it).second;
+          INFO_LOG << "Index data successfully set." << std::endl;
+          DATA_LOG << "" << std::endl;
+          DATA_LOG << "Observed input for fleet " << f->id << ", index "
+                   << observed_index_id << ": \n "
+                   << f->observed_index_data->at(1) << std::endl;
+        } else {
+          valid_model = false;
+          ERROR_LOG << "Error: Expected data observations not defined for fleet"
+                    << f->id << ", index " << observed_index_id << std::endl;
+          exit(1);
+        }
+      } else {
+        valid_model = false;
+        ERROR_LOG << "Error: No index data observed for fleet " << f->id
+                  << ". FIMS requires index data for all fleets." << std::endl;
+        exit(1);
+      }
+      // end set index data
+      INFO_LOG << "Checking for available fleet age comp data objects."
+               << std::endl;
+      // set age composition data
+      if (f->fleet_observed_agecomp_data_id_m != -999) {
+        uint32_t observed_agecomp_id =
+            static_cast<uint32_t>(f->fleet_observed_agecomp_data_id_m);
+        data_iterator it = this->data_objects.find(observed_agecomp_id);
+        INFO_LOG << "Input fleet age comp id = " << observed_agecomp_id << "."
+                 << std::endl;
+        if (it != this->data_objects.end()) {
+          f->observed_agecomp_data = (*it).second;
+          INFO_LOG << "Age comp data successfully set." << std::endl;
+          DATA_LOG << "" << std::endl;
+          DATA_LOG << "Observed input age comp for fleet " << f->id << ", comp "
+                   << observed_agecomp_id << ": \n "
+                   << f->observed_agecomp_data->at(1) << std::endl;
+        } else {
+          valid_model = false;
+          ERROR_LOG << "Error: Expected age comp data observations not defined "
+                       "for fleet "
+                    << f->id << ", index " << observed_agecomp_id << std::endl;
+          exit(1);
+        }
+      } else {
+        valid_model = false;
+        ERROR_LOG << "Error: No age comp data observed for fleet " << f->id
+                  << ". FIMS requires age comp data for all fleets."
+                  << std::endl;
+        exit(1);
+      }
+      // end set composition data
+
       INFO_LOG << "Checking for available fleet selectivity pattern."
                << std::endl;
       // set selectivity model
