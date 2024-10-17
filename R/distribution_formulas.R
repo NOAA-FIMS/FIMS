@@ -56,7 +56,34 @@ check_distribution_validity <- function(args){
     }
   }
 
+}
 
+#' Return name of expected value
+#' 
+#' @param family A description of the error distribution and link function to
+#'   be used in the model. The argument takes a family class, e.g. [stats::gaussian(link = "identity")]. 
+#' @param data_type A single string specifying the type of data that the distribution
+#'   will be fit to. Options are listed in the function call, where the first
+#'   option listed, i.e., `"index"` is the default.
+#' @return A string specifying the name of the expected value.
+#' 
+set_expected_name <- function(family, data_type){
+  expected_name <- NA
+  if(data_type == "index" || data_type == "cpue"){
+    if(family[["family"]] == "lognormal" || family[["family"]] == "gaussian"){
+      if(family[["link"]] == "log"){
+        expected_name <- "log_expected_index"
+      } 
+      if(family[["link"]] == "identity"){
+        expected_name <- "expected_index"
+      } 
+    }
+  }
+  if(data_type == "agecomp" || data_type == "lengthcomp"){
+    expected_name <- "proportion_catch_numbers_at_age"
+  }
+
+  return(expected_name)
 }
 
 #' Set up a new distribution for a data type
@@ -65,7 +92,7 @@ check_distribution_validity <- function(args){
 #' @param module An identifier to a C++ fleet module that is linked to the data
 #'   of interest.
 #' @param family A description of the error distribution and link function to
-#'   be used in the model. The argument takes a family class, e.g. `gaussian(link = "identity")`. 
+#'   be used in the model. The argument takes a family class, e.g. [stats::gaussian(link = "identity")]. 
 #' @param sd A list of length two. The first entry, `"value"`, (default = 1) stores the
 #'   initial values (scalar or vector) for the relevant standard deviations. The second entry,
 #'   `"estimated"` (default = FALSE) is a scalar or vector of booleans indicating whether or not
@@ -74,7 +101,7 @@ check_distribution_validity <- function(args){
 #' @param data_type A single string specifying the type of data that the distribution
 #'   will be fit to. Options are listed in the function call, where the first
 #'   option listed, i.e., `"index"` is the default.
-#' @return Reference Class. Use `show()` to view Rcpp class fields, methods, and documentation.
+#' @return Reference Class. Use [show()] to view Rcpp class fields, methods, and documentation.
 #' @export
 #' @example 
 #' \dontrun{
@@ -136,14 +163,6 @@ new_data_distribution <- function(
         new_module$log_logsd[i]$estimated <- sd$estimated[i]
       }
     }
-
-    # set name of expected values
-    if (family[["link"]] == "log") {
-      expected <- "log_expected_index"
-    }
-    if (family[["link"]] == "identity") {
-      expected <- "expected_index"
-    }
   }
 
   if (family[["family"]] == "gaussian") {
@@ -162,23 +181,11 @@ new_data_distribution <- function(
         new_module$log_sd[i]$estimated <- sd$estimated[i]
       }
     }
-
-    # set name of expected values
-    if (family[["link"]] == "log") {
-      expected <- "log_expected_index"
-    }
-    if (family[["link"]] == "identity") {
-      expected <- "expected_index"
-    }
   }
 
   if (family[["family"]] == "multinomial") {
-
     #create new Rcpp module
     new_module <- new(TMBDmultinomDistribution)
-    
-    # set name of expected values
-    expected <- "proportion_catch_numbers_at_age"
   }
 
   # setup link to observed data
@@ -189,6 +196,8 @@ new_data_distribution <- function(
     new_module$set_observed_data(module$GetObservedAgeCompDataID())
   }
 
+  #set name of expected values
+  expected <- set_expected_name(family, data_type)
   # setup link to expected values 
   new_module$set_distribution_links("data", module$field(expected)$get_id())
 
@@ -198,7 +207,8 @@ new_data_distribution <- function(
 #' Sets up a new distribution for a process
 #' @inheritParams new_data_distribution
 #' @param par A string specifying the parameter name the distribution applies
-#'   to.
+#'   to. Parameters must be members of the specified module. 
+#'   Use [methods::show(module)] to obtain names of parameters within the module. 
 #' @param is_random_effect A boolean indicating whether or not the process is
 #'   estimated as a random effect.
 #' @seealso
@@ -210,6 +220,8 @@ new_data_distribution <- function(
 #' nyears <- 30
 #' # Create a new fleet module
 #' recruitment <- methods::new(BevertonHoltRecruitment)
+#' # view parameter names of the recruitment module
+#' methods::show(recruitment)
 #' # Create a distribution for the recruitment module
 #' recruitment_distribution <- 
 #'   new_process_distribution(module = recruitment, par = "log_devs", family = gaussian(),
@@ -307,17 +319,7 @@ new_process_distribution <- function(module,
 #' [stats::family()].
 #' \item{family}{character: the family name.}
 #' \item{link}{character: the link name.}
-#' \item{linkfun}{function: the link.}
-#' \item{linkinv}{function: the inverse of the link function.}
-#' \item{mu.eta}{
-#'   TODO: document mu.eta
-#'   function: derivative \eqn{TODO}.
-#' }
-#' \item{valideta}{
-#'   logical function. Returns \code{TRUE} if a linear predictor \code{eta} is
-#'   within the domain of \code{linkinv}.
-#' }
-#' \item{name}{A string gibing the name of the link.}
+#' 
 #' @seealso
 #' * [stats::family()]
 #' * [stats::gaussian()]
@@ -326,26 +328,29 @@ new_process_distribution <- function(module,
 #' @examples
 #' fam <- lognormal()
 #' fam[["family"]]
-#' fam$link
+#' fam[["link"]]
 lognormal <- function(link = "log") {
-  r <- list(family = "lognormal")
-  f <- c(r, list(link = link), stats::make.link(link))
-  class(f) <- "family"
-  return(f)
+  family_class <- c(list(family = "lognormal", link = link), stats::make.link(link))
+  class(family_class) <- "family"
+  return(family_class)
 }
 
 #' Multinomial family and link specification
 #'
-#' @param link link function association with family
-#' @return An object of class "family"
+#' @inheritsParams lognormal
+#' @return 
+#' An object of class "family" (which has a concise print method). Though this
+#' particular family has a truncated length compared to other distributions in
+#' [stats::family()].
+#' \item{family}{character: the family name.}
+#' \item{link}{character: the link name.}
 #' @export
 #' @examples
 #' fam <- multinomial()
 #' fam[["family"]]
 #' fam$link
 multinomial <- function(link = "logit") {
-  r <- list(family = "multinomial")
-  f <- c(r, list(link = link), stats::make.link(link))
-  class(f) <- "family"
-  return(f)
+  family_class <- c(list(family = "multinomial", link = link), stats::make.link(link))
+  class(family_class) <- "family"
+  return(family_class)
 }
