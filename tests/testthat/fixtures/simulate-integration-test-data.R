@@ -11,7 +11,7 @@ maindir <- tempdir()
 model_input <- ASSAMC::save_initial_input()
 
 # Configure the input parameters for the simulation
-sim_num <- 150
+sim_num <- 100
 sim_input <- ASSAMC::save_initial_input(
   base_case = TRUE,
   input_list = model_input,
