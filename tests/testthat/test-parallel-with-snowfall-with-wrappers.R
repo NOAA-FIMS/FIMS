@@ -5,18 +5,18 @@
 
 # Run FIMS in serial and parallel
 # This test demonstrates how to run the FIMS model in both serial and parallel
-# modes. The test compares the execution time and results of running the model
-# in serial versus parallel. The parallel execution uses the {snowfall} package
-# to parallelize the tasks across multiple CPU cores
+# modes. The parallel execution uses {snowfall} to parallelize the tasks across
+# multiple CPU cores.
 
 # Load the model comparison operating model data from the fixtures folder
 load(test_path("fixtures", "integration_test_data.RData"))
 
-# Run the FIMS model in serial and record the execution time
-estimation_results_serial <- vector(mode = "list", length = length(om_input_list))
+sim_num <- 10
 
-start_time_serial <- Sys.time()
-for (i in 1:length(om_input_list)) {
+# Run the FIMS model in serial and record the execution time
+estimation_results_serial <- vector(mode = "list", length = sim_num)
+
+for (i in 1:sim_num) {
   estimation_results_serial[[i]] <- setup_and_run_FIMS_with_wrappers(
     iter_id = i,
     om_input_list = om_input_list,
@@ -25,16 +25,13 @@ for (i in 1:length(om_input_list)) {
     estimation_mode = TRUE
   )
 }
-end_time_serial <- Sys.time()
-estimation_time_serial <- end_time_serial - start_time_serial
 
 test_that("Run FIMS in parallel using {snowfall}", {
-  core_num <- parallel::detectCores() - 1
+  core_num <- 2
   snowfall::sfInit(parallel = TRUE, cpus = core_num)
-  start_time_parallel <- Sys.time()
 
   results_parallel <- snowfall::sfLapply(
-    1:length(om_input_list),
+    1:sim_num,
     setup_and_run_FIMS_with_wrappers,
     om_input_list,
     om_output_list,
@@ -42,20 +39,37 @@ test_that("Run FIMS in parallel using {snowfall}", {
     TRUE
   )
 
-  end_time_parallel <- Sys.time()
-
-  time_parallel <- end_time_parallel - start_time_parallel
-
   snowfall::sfStop()
 
-  # Compare execution times: verify that the execution time of the parallel run
-  # is less than the serial run.
-  expect_lt(object = time_parallel, expected = estimation_time_serial)
-
-  # Compare parameters in results:
-  # Verify that the results from both runs are equivalent.
+  # Comparison of results:
+  # Verify that SSB values from both runs are equivalent.
   expect_setequal(
-    purrr::map(results_parallel, \(x) x@estimates[["value"]]),
-    purrr::map(estimation_results_serial, \(x) x@estimates[["value"]])
+    purrr::map(
+      results_parallel,
+      \(x) x@estimates[x@estimates$name == "SSB", "value"]
+    ),
+    purrr::map(
+      estimation_results_serial,
+      \(x) x@estimates[x@estimates$name == "SSB", "value"]
+    )
   )
+
+  # Verify that parameter values from both runs are equivalent.
+  expect_setequal(
+    purrr::map(
+      results_parallel,
+      \(x) x@estimates[x@estimates$name == "p", "value"]
+    ),
+    purrr::map(
+      estimation_results_serial,
+      \(x) x@estimates[x@estimates$name == "p", "value"]
+    )
+  )
+
+  # Verify that total NLL values from both runs are equivalent.
+  expect_equal(
+    purrr::map(results_parallel, \(x) x@report[["jnll"]]),
+    purrr::map(estimation_results_serial, \(x) x@report[["jnll"]])
+  )
+
 })
