@@ -107,6 +107,9 @@ setup_and_run_FIMS <- function(iter_id,
   # set fishing fleet age comp data, need to set dimensions of age comps
   fishing_fleet_age_comp <- new(AgeComp, om_input$nyr, om_input$nages)
   fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
+# set fishing fleet length comp data, need to set dimensions of length comps
+  fishing_fleet_length_comp <- new(LengthComp, om_input$nyr, om_input$nages)
+  fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
 
   # repeat for surveys
   survey_index <- em_input$surveyB.obs$survey1

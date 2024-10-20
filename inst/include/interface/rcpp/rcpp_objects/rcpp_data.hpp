@@ -123,7 +123,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
 /**
  * @brief Rcpp interface for length comp data as an S4 object. To instantiate
  * from R:
- * acomp <- new(LengthComp)
+ * lcomp <- new(LengthComp)
  */
 class LengthCompDataInterface : public DataInterfaceBase {
  public:

@@ -86,8 +86,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    * @brief Intialize Fleet Class
    * @param nyears The number of years in the model.
    * @param nages The number of ages in the model.
+   * @param nlengths The number of composition lengths in the model.
    */
-  void Initialize(int nyears, int nages, int nlengths = 0) {
+  void Initialize(int nyears, int nages, int nlengths) {
     this->nyears = nyears;
     this->nages = nages;
     this->nlengths = nlengths;
@@ -101,7 +102,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     expected_index.resize(nyears);
     age_composition.resize(nyears * nages);
     length_composition.resize(nyears * nlengths);
-    age_length_conversion_matrix.resize(nages * nlengths);
 
     log_Fmort.resize(nyears);
     Fmort.resize(nyears);
@@ -141,8 +141,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
               0); /**<model expected weight at age*/
     this->q = fims_math::exp(this->log_q);
     for (size_t year = 0; year < this->nyears; year++) {
-      FLEET_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
-      FLEET_LOG << "input q " << this->log_q << std::endl;
+     FLEET_LOG << "input F mort " << this->log_Fmort[year] << std::endl;
+     FLEET_LOG << "input q " << this->log_q << std::endl;
       this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
     }
   }
@@ -166,7 +166,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
-   * Evaluate the proportion of catch numbers at age.
+   * Evaluate the proportion of catch numbers at length.
    */
   void evaluate_length_comp() {
     for (size_t y = 0; y < this->nyears; y++) {
@@ -175,8 +175,14 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         size_t i_length_year = y * this->nlengths + l;
         for(size_t a = 0; a < this->nages; a++){
         size_t i_age_year = y * this->nages + a;
-        size_t i_age_length = a * this->nlengths + l;
-        this->catch_numbers_at_length[i_length_year] += this->catch_numbers_at_age[i_age_year] * this->age_length_conversion_matrix[i_age_length];
+        size_t i_length_age = a * this->nlengths + l;
+        this->catch_numbers_at_length[i_length_year] += this->catch_numbers_at_age[i_age_year] * this->age_length_conversion_matrix[i_length_age];
+        FLEET_LOG << "year = " << y << 
+                     "age = " << a << 
+                     "length = " << l <<
+                     "length prop " << this->age_length_conversion_matrix[i_length_age] << 
+                     "num at age" << this->catch_numbers_at_age[i_age_year] <<
+                     "num at length" << this->catch_numbers_at_length[i_length_year] << std::endl;
         }
         sum += this->catch_numbers_at_length[i_length_year];
       }

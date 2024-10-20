@@ -18,6 +18,8 @@ setClass(
     n_years = "integer",
     ages = "numeric",
     n_ages = "integer",
+    comp_lengths = "numeric",
+    n_lengths = "integer",
     weight_at_age = "data.frame",
     start_year = "integer",
     end_year = "integer"
@@ -61,6 +63,12 @@ setMethod("ages", "FIMSFrame", function(x) x@ages)
 setGeneric("n_ages", function(x) standardGeneric("n_ages"))
 setMethod("n_ages", "FIMSFrame", function(x) x@n_ages)
 
+setGeneric("comp_lengths", function(x) standardGeneric("comp_lengths"))
+setMethod("comp_lengths", "FIMSFrame", function(x) x@comp_lengths)
+
+setGeneric("n_lengths", function(x) standardGeneric("n_lengths"))
+setMethod("n_lengths", "FIMSFrame", function(x) x@n_lengths)
+
 setGeneric("weight_at_age", function(x) standardGeneric("weight_at_age"))
 setMethod("weight_at_age", "FIMSFrame", function(x) x@weight_at_age)
 
@@ -73,14 +81,19 @@ setMethod(
       .data[["type"]] == "weight-at-age"
     ) |>
       dplyr::group_by(.data[["age"]]) |>
-      dplyr::summarize(mean_value = mean(.data[["value"]])) |>
-      dplyr::pull(.data[["mean_value"]])
+      dplyr::summarize(mean_value = mean(as.numeric(.data[["value"]]),na.rm=TRUE)) |>
+      dplyr::pull(as.numeric(.data[["mean_value"]]))
   }
 )
 
 setGeneric("m_ages", function(x) standardGeneric("m_ages"))
 setMethod("m_ages", "FIMSFrame", function(x) {
-  x@ages
+  as.numeric(x@ages)
+})
+
+setGeneric("m_comp_lengths", function(x) standardGeneric("m_comp_lengths"))
+setMethod("m_comp_lengths", "FIMSFrame", function(x) {
+  as.numeric(x@comp_lengths)
 })
 
 #' Get the landings data to be used in the model
@@ -100,7 +113,7 @@ setMethod(
       .data = x@data,
       .data[["type"]] == "landings"
     ) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::pull(as.numeric(.data[["value"]]))
   }
 )
 
@@ -124,7 +137,7 @@ setMethod(
       .data[["type"]] == "index",
       .data[["name"]] == fleet_name
     ) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::pull(as.numeric(.data[["value"]]))
   }
 )
 
@@ -150,7 +163,59 @@ setMethod(
       .data[["type"]] == "age",
       .data[["name"]] == fleet_name
     ) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::pull(as.numeric(.data[["value"]]))
+  }
+)
+
+
+#' Get the length-composition data to be used in the model
+#'
+#' @param x The object containing the length-composition data.
+#' @param fleet_name The name of the fleet for the length-composition data.
+#' @export
+setGeneric("m_lengthcomp", function(x, fleet_name) standardGeneric("m_lengthcomp"))
+# Should we add name as an argument here?
+
+#' Get the length-composition data data to be used in the model
+#'
+#' @param x  The FIMSFrame containing length-composition data.
+#' @param fleet_name  The name of the fleet for the length-composition data.
+#' @export
+setMethod(
+  "m_lengthcomp", "FIMSFrame",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "length-comp",
+      .data[["name"]] == fleet_name
+    ) |>
+      dplyr::pull(as.numeric(.data[["value"]]))
+  }
+)
+
+#' Get the fleet specific length-at-age conversion data to be used in the model
+#'
+#' @param x The object containing the length-at-age conversion matrix.
+#' @param fleet_name The name of the fleet for the length-at-age data.
+#' @export
+setGeneric("m_length_at_age", function(x, fleet_name) standardGeneric("m_length_at_age"))
+
+#' Get the fleet specific length-at-age conversion data to be used in the model
+#'
+#' @param x The object containing the length-at-age conversion matrix.
+#' @param fleet_name The name of the fleet for the length-at-age data.
+#' @export
+setMethod(
+  "m_length_at_age", "FIMSFrame",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = as.data.frame(x@data),
+      .data[["type"]] == "length-at-age",
+      .data[["name"]] == fleet_name
+    ) |>
+      dplyr::group_by(.data[["age"]],.data[["len"]]) |>
+      dplyr::summarize(mean_value = mean(as.numeric(.data[["value"]]),na.rm=TRUE)) |>
+      dplyr::pull(as.numeric(.data[["mean_value"]]))
   }
 )
 
@@ -231,11 +296,11 @@ setValidity(
     # Check the format for acceptable variants of the ideal yyyy-mm-dd
     grepl_datestart <- grepl(
       "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      data_mile1[["datestart"]]
+      data_mile2[["datestart"]]
     )
     grepl_dateend <- grepl(
       "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      data_mile1[["dateend"]]
+      data_mile2[["dateend"]]
     )
     if (!all(grepl_datestart)) {
       errors <- c(errors, "datestart must be in 'yyyy-mm-dd' format")
@@ -279,6 +344,9 @@ validate_data_colnames <- function(data) {
   }
   if (!"age" %in% the_column_names) {
     errors <- c(errors, "data must contain 'age'")
+  }
+  if (!"len" %in% the_column_names) {
+    errors <- c(errors, "data must contain column for lengths names 'len'")
   }
   return(errors)
 }
@@ -347,6 +415,8 @@ FIMSFrame <- function(data) {
     data,
     .data[["type"]] == "weight-at-age"
   )
+  comp_lengths <- unique(as.numeric(data[["len"]][!is.na(data[["len"]])]))
+  n_lengths <- length(comp_lengths)
 
   # Fill the empty data frames with data extracted from the data file
   out <- new("FIMSFrame",
@@ -357,6 +427,8 @@ FIMSFrame <- function(data) {
     end_year = end_year,
     ages = ages,
     n_ages = n_ages,
+    comp_lengths = comp_lengths,
+    n_lengths = n_lengths,
     weight_at_age = weight_at_age
   )
   return(out)

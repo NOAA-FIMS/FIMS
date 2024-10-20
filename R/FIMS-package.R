@@ -14,6 +14,7 @@
 #' @export BevertonHoltRecruitment
 #' @export Fleet
 #' @export AgeComp
+#' @export LengthComp
 #' @export Index
 #' @export Population
 #' @export ParameterVector

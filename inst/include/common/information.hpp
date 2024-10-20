@@ -262,7 +262,7 @@ class Information {
       std::shared_ptr<fims_popdy::Fleet<Type> > f = (*it).second;
       INFO_LOG << "Initializing fleet " << f->id << "." << std::endl;
 
-      f->Initialize(f->nyears, f->nages);
+      f->Initialize(f->nyears, f->nages, f->nlengths);
 
       INFO_LOG << "Checking for available fleet selectivity pattern."
                << std::endl;

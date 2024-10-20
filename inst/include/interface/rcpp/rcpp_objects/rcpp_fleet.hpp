@@ -135,7 +135,10 @@ class FleetInterface : public FleetInterfaceBase {
     if(nlengths > 0){
       fleet->proportion_catch_numbers_at_length.resize(nyears * nlengths);
       fleet->age_length_conversion_matrix.resize(nages * nlengths);
-      info->variable_map[this->age_length_conversion_matrix.id_m] = *(fleet)->age_length_conversion_matrix;
+      for (size_t i = 0; i < fleet->age_length_conversion_matrix.size(); i++){
+        fleet->age_length_conversion_matrix[i] = this->age_length_conversion_matrix[i].value_m;
+      }
+      info->variable_map[this->age_length_conversion_matrix.id_m] = &(fleet)->age_length_conversion_matrix;
       info->variable_map[this->proportion_catch_numbers_at_length.id_m] = &(fleet)->proportion_catch_numbers_at_length;
     }
 
@@ -144,6 +147,18 @@ class FleetInterface : public FleetInterfaceBase {
 
     return true;
   }
+
+   /** @brief this adds the values to the TMB model object */
+  virtual bool add_to_fims_tmb() {
+    
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+    return true;
+  }
+  
   #endif
 };
 

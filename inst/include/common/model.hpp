@@ -166,11 +166,12 @@ class Model {  // may need singleton
       // Evaluate population
       p->Evaluate();
     }
-
+    MODEL_LOG << "Finished population loop next should be fleets." << std::endl;
     typename fims_info::Information<Type>::fleet_iterator f_it;
     // Loop over fleets/surveys, and evaluate age comp and index expected values
-     for (f_it = this->fims_information->fleets.begin();
-        f_it != this->fims_information->fleets.end(); ++f_it) {
+    for (f_it = this->fims_information->fleets.begin();
+      f_it != this->fims_information->fleets.end(); ++f_it) {
+      MODEL_LOG << "Inside fleet loop." << std::endl;
       //(*f_it).second points to each individual Fleet module
       std::shared_ptr<fims_popdy::Fleet<Type> > f = (*f_it).second;
 #ifdef TMB_MODEL
@@ -181,7 +182,7 @@ class Model {  // may need singleton
         f->evaluate_length_comp();
         f->evaluate_age_comp();
         f->evaluate_index();
-      }
+    }
     MODEL_LOG << "Setup data expected values." << std::endl;
     this->fims_information->setup_data();
     // Loop over and evaluate data joint negative log-likelihoods
