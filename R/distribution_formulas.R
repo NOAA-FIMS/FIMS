@@ -1,7 +1,9 @@
 #' Validaity checks for new_data_distribution and new_process_distribution
 #' 
 check_distribution_validity <- function(args){
-  list2env(args, envir = environment())
+  family <- args$family
+  families <- args$families
+  sd <- args$sd
   if (class(family) !=  "family") {
     cli::cli_abort(c(
       "{.code {family}} is the incorrect type",
@@ -16,7 +18,17 @@ check_distribution_validity <- function(args){
       "*" = "{.code {families}}."))
 
   }
-  if(exists("data_type")){
+  if(!is.null(args$data_type)){
+    data_type <- args$data_type
+    data_type_names <- c("index", "cpue", "agecomp", "lengthcomp")
+
+    if (!(data_type %in% data_type_names)) {
+      cli::cli_abort(c(
+        "The data type is incorrect.",
+        "*" = "Correct values are:",
+        "*" = "{.code {data_type_names}}."
+      ))
+    }
 
     if ((data_type == "agecomp" || data_type == "lengthcomp") &&
         (family[["family"]] == "lognormal" || family[["family"]] == "gaussian")) {
@@ -36,7 +48,6 @@ check_distribution_validity <- function(args){
         "*" = "`lognormal`, `gaussian`."
       ))
     }
-
   }
 
   if(!all(sd$value > 0)) {
@@ -83,6 +94,13 @@ set_expected_name <- function(family, data_type){
     expected_name <- "proportion_catch_numbers_at_age"
   }
 
+  if(is.na(expected_name)) {
+    cli::cli_abort(c(
+      "Error, expected_name of distribution is NA.",
+      "*" = "Error in FIMS:::set_expected_name()."
+    ))
+  }
+
   return(expected_name)
 }
 
@@ -127,7 +145,6 @@ new_data_distribution <- function(
   
   # validity check on user input
   args <- list(
-    module = module,
     family = family,
     sd = sd,
     data_type = data_type,
@@ -237,11 +254,8 @@ new_process_distribution <- function(module,
 
   # validity check on user input  
   args <- list(
-    module = module,
-    par = par,
     family = family,
     sd = sd,
-    is_random_effect = is_random_effect,
     families = families
   )
   check_distribution_validity(args)
