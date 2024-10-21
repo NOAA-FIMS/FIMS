@@ -75,6 +75,7 @@ class Model {  // may need singleton
     vector<vector<Type> > exp_index(n_fleets);
     vector<vector<Type> > exp_catch(n_fleets);
     vector<vector<Type> > cnaa(n_fleets);
+    vector<vector<Type> > cnal(n_fleets);
     vector<vector<Type> > cwaa(n_fleets);
     vector<vector<Type> > F_mort(n_fleets);
     // populations
@@ -233,6 +234,7 @@ class Model {  // may need singleton
       exp_catch(fleet_idx) = f->expected_catch;
       F_mort(fleet_idx) = f->Fmort;
       cnaa(fleet_idx) = f->catch_numbers_at_age;
+      cnal(fleet_idx) = f->catch_numbers_at_length;
       cwaa(fleet_idx) = f->catch_weight_at_age;
 #endif
       fleet_idx += 1;
@@ -256,6 +258,7 @@ class Model {  // may need singleton
     FIMS_REPORT_F(exp_catch, of);
     FIMS_REPORT_F(F_mort, of);
     FIMS_REPORT_F(cnaa, of);
+    FIMS_REPORT_F(cnal, of);
     FIMS_REPORT_F(cwaa, of);
     FIMS_REPORT_F(nll_components, of);
 
@@ -270,6 +273,7 @@ class Model {  // may need singleton
     vector<Type> FMort = ADREPORTvector(F_mort);
     vector<Type> ExpectedIndex = ADREPORTvector(exp_index);
     vector<Type> CNAA = ADREPORTvector(cnaa);
+    vector<Type> CNAL = ADREPORTvector(cnal);
 
     ADREPORT_F(NAA, of);
     ADREPORT_F(Biomass, of);
@@ -278,6 +282,7 @@ class Model {  // may need singleton
     ADREPORT_F(FMort, of);
     ADREPORT_F(ExpectedIndex, of);
     ADREPORT_F(CNAA, of);
+    ADREPORT_F(CNAL, of);
 #endif
 
     return jnll;
