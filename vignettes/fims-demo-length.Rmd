@@ -112,7 +112,7 @@ fishing_fleet_age_comp$age_comp_data <- fishery_agecomp * 200 # unit: number at 
 # fleet length composition data
 fishing_fleet_length_comp <- methods::new(LengthComp, nyears, nlengths)
 # Effective sampling size is 200
-fishing_fleet_age_comp$age_comp_data <- fishery_lengthcomp * 200 # unit:
+fishing_fleet_length_comp$length_comp_data <- fishery_lengthcomp * 200 # unit:
 ```
 
 #### Fleet Selectivity
