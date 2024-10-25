@@ -300,7 +300,7 @@ setMethod(
 setMethod(
   f = "plot",
   signature = "FIMSFrame",
-  definition = function(x) {
+  definition = function(x, y, ...) {
     ggplot2::ggplot(
       data = x@data,
       mapping = ggplot2::aes(
