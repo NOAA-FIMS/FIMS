@@ -93,11 +93,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set up fishery index data using the lognormal
   fishing_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
   # lognormal observation error transformed on the log scale
-  fishing_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
+  fishing_fleet_index_distribution$log_sd <- new(ParameterVector, om_input$nyr)
   for (y in 1:om_input$nyr) {
-    fishing_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
+    fishing_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
   }
-  fishing_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
+  fishing_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
   fishing_fleet_index_distribution$set_observed_data(fishing_fleet$GetObservedIndexDataID())
   fishing_fleet_index_distribution$set_distribution_links("data", fishing_fleet$log_expected_index$get_id())
@@ -141,11 +141,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution$log_logsd <- new(ParameterVector, om_input$nyr)
+  survey_fleet_index_distribution$log_sd <- new(ParameterVector, om_input$nyr)
   for (y in 1:om_input$nyr) {
-    survey_fleet_index_distribution$log_logsd[y]$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
+    survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
   }
-  survey_fleet_index_distribution$log_logsd$set_all_estimable(FALSE)
+  survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
   survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_expected_index$get_id())

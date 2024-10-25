@@ -46,26 +46,28 @@ namespace fims_distributions
          */
         virtual const Type evaluate()
         {
-            std::vector<size_t> dims;
-            dims.resize(2);
-            
-            dims[0] = this->observed_values->get_imax(); 
-            dims[1] = this->observed_values->get_jmax();
-            
+            // set dims using observed_values if no user input
+            if(dims.size() != 2){
+                dims.resize(2);
+                dims[0] = this->observed_values->get_imax(); 
+                dims[1] = this->observed_values->get_jmax();
+            }
+
+
+            // setup vector for recording the log probability density function values
             Type lpdf = 0.0; /**< total log probability mass contribution of the distribution */
             this->lpdf_vec.resize(dims[0]);
             std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0); 
                     
-
             if (dims[0]*dims[1] != this->expected_values.size()) {
             ERROR_LOG << "Error: observed age comp is of size " << dims[0]*dims[1]
                 << " and expected is of size " << this->expected_values.size()
                 << std::endl;
                 exit(1);
             } else {
-
                 for (size_t i = 0; i < dims[0]; i++)
                 {
+                    // for each row, create new x and prob vectors 
                     fims::Vector<Type> x_vector;
                     fims::Vector<Type> prob_vector;
                     x_vector.resize(dims[1]);
@@ -76,18 +78,26 @@ namespace fims_distributions
                     
                     #ifdef TMB_MODEL
                     for (size_t j = 0; j < dims[1]; j++){
-                        if (this->observed_values->at(i, j) ==
-                                this->observed_values->na_value) {
-                            containsNA = true;
-                            break;
-                        }
-                        if(!containsNA){
+                        if(this->input_type == "data"){
+                            // if data, check if there are any NA values and skip lpdf calculation for entire row if there are
+                            if (this->observed_values->at(i, j) ==
+                                    this->observed_values->na_value) {
+                                containsNA = true;
+                                break;
+                            }
+                            if(!containsNA){
+                                size_t idx = (i * dims[1]) + j;
+                                x_vector[j] = this->observed_values->at(i, j);
+                                prob_vector[j] = this->expected_values[idx];
+                            }
+                        } else {
+                            // if not data (i.e. prior or process), use x vector instead of observed_values  
                             size_t idx = (i * dims[1]) + j;
-                            x_vector[j] = this->observed_values->at(i, j);
+                            x_vector[j] = this->x[idx];
                             prob_vector[j] = this->expected_values[idx];
                         }
                     }
-
+                    
                     this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>) prob_vector, true);
                     lpdf += this->lpdf_vec[i];
                     /*
@@ -111,7 +121,7 @@ namespace fims_distributions
                 }
             }
             #ifdef TMB_MODEL
-            vector<Type> x = this->observed_values->data;
+          //   vector<Type> x = this->observed_values->data;
           //  FIMS_REPORT_F(x, this->of);
             #endif
             return (lpdf);

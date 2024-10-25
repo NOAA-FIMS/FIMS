@@ -264,8 +264,8 @@
 #' }
 #' prepare_TMBDlnormDistribution_default <- function(value = 0.1) {
 #'   default <- list(
-#'     log_logsd.value = log(value),
-#'     log_logsd.estimated = rep(FALSE, length(value))
+#'     log_sd.value = log(value),
+#'     log_sd.estimated = rep(FALSE, length(value))
 #'   )
 #'   attr(default, "types") = rep("ParameterVector", length(default))
 #'   return(default)

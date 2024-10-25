@@ -691,16 +691,6 @@ RCPP_MODULE(fims) {
       .method("SetRecruitment", &PopulationInterface::SetRecruitment)
       .method("evaluate", &PopulationInterface::evaluate);
 
-  Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
-      .constructor()
-      .method("get_id", &DnormDistributionsInterface::get_id)
-      .method("evaluate", &DnormDistributionsInterface::evaluate)
-      .method("set_observed_data", &DnormDistributionsInterface::set_observed_data)
-      .method("set_distribution_links", &DnormDistributionsInterface::set_distribution_links)
-      .field("x", &DnormDistributionsInterface::x)
-      .field("expected_values", &DnormDistributionsInterface::expected_values)
-      .field("log_sd", &DnormDistributionsInterface::log_sd);
-
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
       .field("inflection_point", &LogisticMaturityInterface::inflection_point)
@@ -734,26 +724,35 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
+  Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
+      .constructor()
+      .method("get_id", &DnormDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
+      .method("evaluate", &DnormDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
+      .method("set_observed_data", &DnormDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
+      .method("set_distribution_links", &DnormDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
+      .field("x", &DnormDistributionsInterface::x, "Input for distribution when not observations, e.g. prior or random effect")
+      .field("expected_values", &DnormDistributionsInterface::expected_values, "Mean of the distribution.")
+      .field("log_sd", &DnormDistributionsInterface::log_sd, "The natural log of the standard deviation.");
+
   Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")
       .constructor()
-      .method("get_id", &DlnormDistributionsInterface::get_id)
-      .method("evaluate", &DlnormDistributionsInterface::evaluate)
-      .method("set_observed_data", &DlnormDistributionsInterface::set_observed_data)
-      .method("set_distribution_links", &DlnormDistributionsInterface::set_distribution_links)
-      .field("input_type", &DlnormDistributionsInterface::input_type)
-      .field("x", &DlnormDistributionsInterface::x)
-      .field("expected_values", &DlnormDistributionsInterface::expected_values)
-      .field("log_logsd", &DlnormDistributionsInterface::log_logsd);
+      .method("get_id", &DlnormDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
+      .method("evaluate", &DlnormDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
+      .method("set_observed_data", &DlnormDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
+      .method("set_distribution_links", &DlnormDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
+      .field("x", &DlnormDistributionsInterface::x, "Input for distribution when not observations, e.g. prior or random effect")
+      .field("expected_values", &DlnormDistributionsInterface::expected_values, "Mean of the distribution on the log scale.")
+      .field("log_sd", &DlnormDistributionsInterface::log_sd, "The natural log of the standard deviation of the distribution on the log scale.");
 
   Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
       .constructor()
-      .method("evaluate", &DmultinomDistributionsInterface::evaluate)
-      .method("get_id", &DmultinomDistributionsInterface::get_id)
-      .method("set_observed_data", &DmultinomDistributionsInterface::set_observed_data)
-      .method("set_distribution_links", &DmultinomDistributionsInterface::set_distribution_links)
-      .field("x", &DmultinomDistributionsInterface::x)
-      .field("expected_values", &DmultinomDistributionsInterface::expected_values)
-      .field("dims", &DmultinomDistributionsInterface::dims);
+      .method("get_id", &DmultinomDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
+      .method("evaluate", &DmultinomDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
+      .method("set_observed_data", &DmultinomDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
+      .method("set_distribution_links", &DmultinomDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
+      .field("x", &DmultinomDistributionsInterface::x, "Input for distribution when not observations, e.g. prior or random effect")
+      .field("expected_values", &DmultinomDistributionsInterface::expected_values, "numeric non-negative vector of length K, specifying the probability for the K classes.")
+      .field("dims", &DmultinomDistributionsInterface::dims, "dimension of the multivariate input, e.g. c(num rows, num cols).");
 }
 
 #endif /* RCPP_INTERFACE_HPP */

@@ -287,8 +287,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
   ParameterVector x;       /**< observation */
   ParameterVector expected_values; /**< mean of the distribution of log(x) */
-  ParameterVector log_logsd;   /**< log standard deviation of the distribution of log(x) */
-  Rcpp::String input_type; /**< character string indicating type of input: data, re, prior */
+  ParameterVector log_sd;   /**< log standard deviation of the distribution of log(x) */
   Rcpp::NumericVector lpdf_vec; /**< The vector */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
@@ -337,18 +336,17 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::LogNormalLPDF<double> dlnorm;
-    dlnorm.input_type = this->input_type;
     dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
-    dlnorm.log_logsd.resize(this->log_logsd.size());
+    dlnorm.log_sd.resize(this->log_sd.size());
     for(size_t i=0; i<x.size(); i++){
       dlnorm.x[i] = this->x[i].initial_value_m;
     }
     for(size_t i=0; i<expected_values.size(); i++){
       dlnorm.expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    for(size_t i=0; i<log_logsd.size(); i++){
-      dlnorm.log_logsd[i] = this->log_logsd[i].initial_value_m;
+    for(size_t i=0; i<log_sd.size(); i++){
+      dlnorm.log_sd[i] = this->log_sd[i].initial_value_m;
     }
     return dlnorm.evaluate();
   }
@@ -447,18 +445,18 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     for(size_t i=0; i<this->expected_values.size(); i++){
       distribution->expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    distribution->log_logsd.resize(this->log_logsd.size());
-    for(size_t i=0; i<this->log_logsd.size(); i++){
-      distribution->log_logsd[i] = this->log_logsd[i].initial_value_m;
-      if(this->log_logsd[i].estimated_m){
-        info->RegisterParameterName("lognormal log_logsd");
-        info->RegisterParameter(distribution->log_logsd[i]);
+    distribution->log_sd.resize(this->log_sd.size());
+    for(size_t i=0; i<this->log_sd.size(); i++){
+      distribution->log_sd[i] = this->log_sd[i].initial_value_m;
+      if(this->log_sd[i].estimated_m){
+        info->RegisterParameterName("lognormal log_sd");
+        info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_logsd[i].is_random_effect_m) {
+      if (this->log_sd[i].is_random_effect_m) {
         error("standard deviations cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_logsd.id_m] = &(distribution)->log_logsd;
+    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
     info->density_components[distribution->id] = distribution;
 

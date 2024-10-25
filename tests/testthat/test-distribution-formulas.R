@@ -115,7 +115,7 @@ test_that("test new_data_distribution", {
     data_type = "index"
   )
   expect_equal(log(fleet_sd[1]),
-               fishing_fleet_index_distribution$log_logsd[1]$value)
+               fishing_fleet_index_distribution$log_sd[1]$value)
   expect_error(
     new_data_distribution(
       module = fishing_fleet,
