@@ -169,17 +169,17 @@ new_data_distribution <- function(
     new_module <- new(TMBDlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_logsd <- new(
+    new_module$log_sd <- new(
       ParameterVector,
       log(sd$value),
       length(sd$value)
     )
     # setup whether or not sd parameter is estimated
     if (length(sd$value) > 1 && length(sd$estimated) == 1) {
-      new_module$log_logsd$set_all_estimable(sd$estimated)
+      new_module$log_sd$set_all_estimable(sd$estimated)
     } else {
       for (i in 1:seq_along(sd$estimated)) {
-        new_module$log_logsd[i]$estimated <- sd$estimated[i]
+        new_module$log_sd[i]$estimated <- sd$estimated[i]
       }
     }
   }
@@ -267,17 +267,17 @@ new_process_distribution <- function(module,
     new_module <- new(TMBDlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_logsd <- new(
+    new_module$log_sd <- new(
       ParameterVector,
       log(sd$value),
       length(sd$value)
     )
     #setup whether or not sd parameter is estimated
     if (length(sd$value) > 1 && length(sd$estimated) == 1) {
-      new_module$log_logsd$set_all_estimable(sd$estimated)
+      new_module$log_sd$set_all_estimable(sd$estimated)
     } else {
       for (i in 1:seq_along(sd$estimated)) {
-        new_module$log_logsd[i]$estimated <- sd$estimated[i]
+        new_module$log_sd[i]$estimated <- sd$estimated[i]
       }
     }
   }
