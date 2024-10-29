@@ -189,7 +189,10 @@ new_data_distribution <- function(
     new_module <- new(TMBDnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_sd <- new(ParameterVector, log(sd$value), length(sd$value))
+    new_module$log_sd$resize(length(sd$value))
+    for(i in seq_along(sd$value)){
+      new_module$log_sd[i]$value <- log(sd$value[i])
+    }
 
     # setup whether or not sd parameter is estimated
     if (length(sd$value) > 1 && length(sd$estimated) == 1) {
@@ -287,7 +290,10 @@ new_process_distribution <- function(module,
     new_module <- new(TMBDnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_sd <- new(ParameterVector, log(sd$value), length(sd$value))
+    new_module$log_sd$resize(length(sd$value))
+    for(i in seq_along(sd$value)){
+      new_module$log_sd[i]$value <- log(sd$value[i])
+    }
 
     #setup whether or not sd parameter is estimated
     if (length(sd$value) > 1 && length(sd$estimated) == 1) {
@@ -305,8 +311,8 @@ new_process_distribution <- function(module,
   n_dim <- length(module$field(par))
 
   # create new Rcpp modules
-  new_module$x <- new(ParameterVector, n_dim)
-  new_module$expected_values <- new(ParameterVector, n_dim)
+  new_module$x$resize(n_dim)
+  new_module$expected_values$resize(n_dim)
 
   # initialize values with 0
   # these are overwritten in the code later by user input

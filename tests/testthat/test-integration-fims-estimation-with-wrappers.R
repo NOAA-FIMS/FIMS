@@ -1,5 +1,66 @@
 load(test_path("fixtures", "integration_test_data.RData"))
 
+fleets <- list(
+  fleet1 = list(
+    selectivity = list(form = "LogisticSelectivity"),
+    data_distribution = c(
+      Index = "TMBDlnormDistribution",
+      AgeComp = "TMBDmultinomDistribution"
+    )
+  ),
+  survey1 = list(
+    selectivity = list(form = "LogisticSelectivity"),
+    data_distribution = c(
+      Index = "TMBDlnormDistribution",
+      AgeComp = "TMBDmultinomDistribution"
+    )
+  )
+)
+
+data("data_mile1")
+data <- FIMS::FIMSFrame(data_mile1)
+default_parameters <- data_mile1 |>
+  FIMS::FIMSFrame() |>
+  create_default_parameters(
+    fleets = fleets,
+    recruitment = list(
+      form = "BevertonHoltRecruitment",
+      process_distribution = c(log_devs = "TMBDnormDistribution")
+    ),
+    growth = list(form = "EWAAgrowth"),
+    maturity = list(form = "LogisticMaturity")
+  )
+
+modified_parameters <- list(
+  fleet1 = list(
+    Fleet.log_Fmort.value = log(om_output_list[[1]]$f)
+  ),
+  survey1 = list(
+    LogisticSelectivity.inflection_point.value = 1.5,
+    LogisticSelectivity.slope.value = 2,
+    Fleet.log_q.value = log(om_output_list[[1]]$survey_q$survey1)
+  ),
+  recruitment = list(
+    BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]]$R0),
+    BevertonHoltRecruitment.log_devs.value = om_input_list[[1]]$logR.resid[-1],
+    BevertonHoltRecruitment.log_devs.estimated = FALSE
+  ),
+  maturity = list(
+    LogisticMaturity.inflection_point.value = om_input_list[[1]]$A50.mat,
+    LogisticMaturity.inflection_point.estimated = FALSE,
+    LogisticMaturity.slope.value = om_input_list[[1]]$slope.mat,
+    LogisticMaturity.slope.estimated = FALSE
+  ),
+  population = list(
+    Population.log_init_naa.value = log(om_output_list[[1]]$N.age[1, ])
+  )
+)
+
+parameters <- default_parameters |>
+  update_parameters(
+    modified_parameters = modified_parameters
+  )
+
 test_that("deterministic test of fims", {
   iter_id <- 1
 
@@ -8,7 +69,9 @@ test_that("deterministic test of fims", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE
+    estimation_mode = FALSE,
+    parameters = parameters,
+    data = data
   )
 
   # Call report using deterministic parameter values
@@ -16,7 +79,7 @@ test_that("deterministic test of fims", {
   report <- result@report
 
   # Compare log(R0) to true value
-  fims_logR0 <- as.numeric(result@obj$par[35])
+  fims_logR0 <- as.numeric(result@obj$par[36])
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]]$R0))
 
@@ -135,7 +198,7 @@ test_that("deterministic test of fims", {
   }
 })
 
-test_that("estimation test of fims using fit_fims()", {
+test_that("estimation test of fims using wrapper functions", {
   # Initialize the iteration identifier and run FIMS with the 1st set of OM values
   iter_id <- 1
   result <- setup_and_run_FIMS_with_wrappers(
@@ -143,7 +206,9 @@ test_that("estimation test of fims using fit_fims()", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE,
+    parameters = parameters,
+    data = data
   )
 
   # Compare FIMS results with model comparison project OM values
@@ -151,6 +216,37 @@ test_that("estimation test of fims using fit_fims()", {
     report = result@report,
     sdr = result@estimates,
     sdr_report = result@estimates,
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+})
+
+test_that("estimation test of fims using high-level wrappers", {
+  # Load operating model data for the current iteration
+  iter_id <- 1
+  om_input <- om_input_list[[iter_id]]
+  om_output <- om_output_list[[iter_id]]
+  em_input <- em_input_list[[iter_id]]
+
+  # Clear any previous FIMS settings
+  clear()
+  parameter_list <- initialize_fims(
+    parameters = parameters,
+    data = data
+  )
+  input <- list()
+  input$parameters <- parameter_list
+  input$version <- "Model Comparison Project example"
+  fit <- fit_fims(input, optimize = TRUE)
+
+  clear()
+
+  validate_fims(
+    report = fit@report,
+    sdr = fit@estimates,
+    sdr_report = fit@estimates,
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],

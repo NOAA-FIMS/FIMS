@@ -47,7 +47,7 @@ uint32_t interface_observed_data_id_m =
 
   /**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
-   * 
+   *
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
@@ -112,7 +112,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
   /**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
-   * 
+   *
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
@@ -149,9 +149,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     return dnorm.evaluate();
 }
-    /** 
-     * @brief finalize function. Extracts derived quantities back to 
-     * the Rcpp interface object from the Information object. 
+    /**
+     * @brief finalize function. Extracts derived quantities back to
+     * the Rcpp interface object from the Information object.
      */
     virtual void finalize() {
         if (this->finalized) {
@@ -285,9 +285,12 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
+
   ParameterVector x;       /**< observation */
   ParameterVector expected_values; /**< mean of the distribution of log(x) */
-  ParameterVector log_sd;   /**< log standard deviation of the distribution of log(x) */
+  // TODO:  Can we use something more generic instead of log_sd to fit more distributions?
+  ParameterVector log_sd;   /**< the natural logarithm of the standard deviation of the distribution of log(x). The natural log of the standard deviation is necessary because
+  the exponential link function is applied to the log transformed sd to insure sd is positive.  */
   Rcpp::NumericVector lpdf_vec; /**< The vector */
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
@@ -313,7 +316,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
   /**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
-   * 
+   *
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */
@@ -325,7 +328,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     }
 
     return true;
-  }   
+  }
 
   /**
    * @brief Evaluate lognormal probability density function, default returns the
@@ -350,9 +353,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     return dlnorm.evaluate();
   }
-    /** 
-     * @brief finalize function. Extracts derived quantities back to 
-     * the Rcpp interface object from the Information object. 
+    /**
+     * @brief finalize function. Extracts derived quantities back to
+     * the Rcpp interface object from the Information object.
      */
     virtual void finalize() {
         if (this->finalized) {
@@ -392,7 +395,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
      * @brief Convert the data to json representation for the output.
      */
     virtual std::string to_json() {
-   
+
         std::stringstream ss;
         ss << "\"module\" : {\n";
         ss << " \"name\": \"LogNormalLPDF\",\n";
@@ -514,7 +517,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   /**
    * @brief set_distribution_links sets pointers for data observations, random effects, or priors
-   * 
+   *
    * @param input_type String that sets whether the distribution type is: priors, random_effects, or data.
    * @param ids Vector of unique ids for each linked parameter/s, derived value/s, or observed data vector
    */

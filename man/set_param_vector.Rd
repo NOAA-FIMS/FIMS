@@ -2,10 +2,22 @@
 % Please edit documentation in R/utils.R
 \name{set_param_vector}
 \alias{set_param_vector}
-\title{Set Parameter Vector Values from Module Input.}
+\title{Set Parameter Vector Values Based on Module Input}
 \usage{
-set_param_vector(param_vector_name, module_input)
+set_param_vector(field, module, module_input)
+}
+\arguments{
+\item{field}{A character string specifying the field name of the parameter vector to be updated.}
+
+\item{module}{A module object in which the parameter vector is to be set.}
+
+\item{module_input}{A list containing input parameters for the module, including
+value and estimation information for the parameter vector.}
+}
+\value{
+Modified module object.
 }
 \description{
-Set Parameter Vector Values from Module Input.
+This function sets the parameter vector values in a module based on
+the provided module input, including both initial values and estimation information.
 }

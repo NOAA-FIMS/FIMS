@@ -2,10 +2,26 @@
 % Please edit documentation in R/utils.R
 \name{get_data_slot}
 \alias{get_data_slot}
-\title{Get the value of a slot from a data object based on a module field name.}
+\title{Retrieve the Value of a Slot from a Data Object}
 \usage{
 get_data_slot(field_name, data)
 }
+\arguments{
+\item{field_name}{A character string specifying the name of the module field
+whose corresponding slot value is to be retrieved.}
+
+\item{data}{An S4 object containing the data from which the slot value
+should be retrieved.}
+}
+\value{
+The value of the specified slot in the data object.
+}
 \description{
-Get the value of a slot from a data object based on a module field name.
+This function retrieves the value of a specific slot from a data object
+based on the provided module field name.
+}
+\examples{
+data(data_mile1)
+data <- FIMS::FIMSFrame(data_mile1)
+get_data_slot("ages", data)
 }

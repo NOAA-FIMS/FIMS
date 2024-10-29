@@ -36,7 +36,41 @@ library(dplyr)
 ###############################################################################
 # Simulate the data
 ###############################################################################
-returnedom <- ASSAMC::save_om_example()
+working_dir <- getwd()
+
+maindir <- tempdir()
+
+# Save the initial OM input using ASSAMC package (sigmaR = 0.4)
+model_input <- ASSAMC::save_initial_input()
+
+# Configure the input parameters for the simulation
+sim_num <- 100
+sim_input <- ASSAMC::save_initial_input(
+  base_case = TRUE,
+  input_list = model_input,
+  maindir = maindir,
+  om_sim_num = sim_num,
+  keep_sim_num = sim_num,
+  figure_number = 1,
+  seed_num = 9924,
+  case_name = "sim_data"
+)
+
+# Run OM and generate om_input, om_output, and em_input
+# using function from the model comparison project
+ASSAMC::run_om(input_list = sim_input)
+
+on.exit(unlink(maindir, recursive = TRUE), add = TRUE)
+
+setwd(working_dir)
+on.exit(setwd(working_dir), add = TRUE)
+
+load(file.path(maindir, "sim_data", "output", "OM", paste0("OM", 1, ".RData")))
+returnedom <- list(
+  om_input = om_input,
+  om_output = om_output,
+  em_input = em_input
+)
 
 ###############################################################################
 # Landings
@@ -164,10 +198,4 @@ testthat::expect_equal(test_read, data_mile1)
 unlink("FIMS_input_data.csv")
 
 usethis::use_data(data_mile1, overwrite = TRUE)
-rm(
-  check_ASSAMC, cv_2_sd,
-  age_data, landings_data, index_data, weightatage_data,
-  timingfishery, weightsfishery,
-  data_mile1, returnedom,
-  test_read
-)
+rm(list = ls())

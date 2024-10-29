@@ -19,7 +19,7 @@ test_that("test new_process_distribution", {
   recruitment$log_rzero[1]$is_random_effect <- FALSE
   recruitment$log_rzero[1]$estimated <- TRUE
   # set up logit_steep
-  recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) + 
+  recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) +
     log(om_input$h - 0.2)
   recruitment$logit_steep[1]$is_random_effect <- FALSE
   recruitment$logit_steep[1]$estimated <- FALSE
@@ -45,8 +45,10 @@ test_that("test new_process_distribution", {
 
   expect_equal(log(om_input$logR_sd), recruitment_distribution$log_sd[1]$value)
   expect_equal(length(recruitment$log_devs), length(recruitment_distribution$x))
-  expect_equal(length(recruitment_distribution$x), 
-               length(recruitment_distribution$expected_values))
+  expect_equal(
+    length(recruitment_distribution$x),
+    length(recruitment_distribution$expected_values)
+  )
   expect_error(
     new_process_distribution(
       module = recruitment,
@@ -80,11 +82,12 @@ test_that("test new_process_distribution", {
       par = "log_devs",
       family = gaussian(),
       sd = list(
-        value = rep(om_input$logR_sd, 3), 
+        value = rep(om_input$logR_sd, 3),
         estimated = rep(FALSE, 2)
       ),
-      is_random_effect = FALSE)
+      is_random_effect = FALSE
     )
+  )
   clear()
 })
 
@@ -114,8 +117,10 @@ test_that("test new_data_distribution", {
     sd = list(value = fleet_sd, estimated = FALSE),
     data_type = "index"
   )
-  expect_equal(log(fleet_sd[1]),
-               fishing_fleet_index_distribution$log_sd[1]$value)
+  expect_equal(
+    log(fleet_sd[1]),
+    fishing_fleet_index_distribution$log_sd[1]$value
+  )
   expect_error(
     new_data_distribution(
       module = fishing_fleet,
