@@ -180,7 +180,7 @@ survey_fleet_age_comp$age_comp_data <- survey_agecomp * 200 # unit: number at ag
 #### Survey Selectivity
 
 ```{r survey-selectivity}
-survey_fleet_selectivity <- new(LogisticSelectivity)
+survey_fleet_selectivity <- methods::new(LogisticSelectivity)
 survey_fleet_selectivity$inflection_point$value <- 1.5
 survey_fleet_selectivity$inflection_point$is_random_effect <- FALSE
 survey_fleet_selectivity$inflection_point$estimated <- TRUE
@@ -267,7 +267,7 @@ ewaa_growth$weights <- c(
 Each population will also need a maturity model. Here we define a logistic maturity model. 
 ```{r maturity}
 # Maturity
-maturity <- new(LogisticMaturity)
+maturity <- methods::new(LogisticMaturity)
 maturity$inflection_point$value <- 2.25
 maturity$inflection_point$is_random_effect <- FALSE
 maturity$inflection_point$estimated <- FALSE
@@ -280,7 +280,7 @@ Now that our life history sub-models are defined, lets define the actual populat
 
 ```{r population}
 # Population
-population <- new(Population)
+population <- methods::new(Population)
 population$log_M <- rep(log(0.2), nyears * nages)
 population$estimate_M <- FALSE
 population$log_init_naa <- log(c(
