@@ -442,7 +442,11 @@ initialize_age_comp <- function(data, fleet_name) {
   # Assign the age composition data to the module
   # TODO: review the AgeComp interface, do we want to add
   # `age_comp_data` as an argument?
-  module$age_comp_data <- age_comp_data
+
+  module$age_comp_data <- age_comp_data * data@data |>
+    subset(name == fleet_name) |>
+    subset(type == "age") |>
+    (\(x) x$uncertainty)()
 
   return(module)
 }

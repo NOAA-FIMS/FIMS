@@ -4,6 +4,7 @@
 \alias{create_default_parameters}
 \alias{create_default_Population}
 \alias{create_default_Logistic}
+\alias{create_default_DoubleLogistic}
 \alias{create_default_selectivity}
 \alias{create_default_fleet}
 \alias{create_default_maturity}
@@ -26,6 +27,8 @@ create_default_parameters(
 create_default_Population(data, log_rzero)
 
 create_default_Logistic()
+
+create_default_DoubleLogistic()
 
 create_default_selectivity(fleet_name, form)
 
@@ -85,6 +88,9 @@ at age and natural mortality rate.
 A list containing the default logistic parameters, with inflection_point
 and slope values and their estimation status.
 
+A list containing the default double logistic parameters, with inflection_point_asc,
+slope_asc, inflection_point_desc, and slope_desc values and their estimation status.
+
 A list containing default selectivity parameter values for the specified form.
 
 A list with default parameters for the fleet.
@@ -114,6 +120,9 @@ specific module settings are not provided by the user.
 This function sets up default parameters for a population module.
 
 This function creates a default configuration for logistic form.
+It sets up default values for parameters related to the inflection point and slope.
+
+This function creates a default configuration for double logistic form.
 It sets up default values for parameters related to the inflection point and slope.
 
 This function creates default fleet selectivity parameters based on the provided

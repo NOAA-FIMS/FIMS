@@ -27,7 +27,6 @@ create_default_parameters <- function(
     ),
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")) {
-
   # Check if data is an object from FIMSFrame class
   if (!is(data, "FIMSFrame")) {
     cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
@@ -126,7 +125,6 @@ create_default_parameters <- function(
 #' at age and natural mortality rate.
 #' @export
 create_default_Population <- function(data, log_rzero) {
-
   # Check if data is an object from FIMSFrame class
   if (!is(data, "FIMSFrame")) {
     cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
@@ -184,7 +182,29 @@ create_default_Logistic <- function() {
   return(default)
 }
 
-# TODO: Add create_default_DoubleLogistic()
+#' Create Default Double Logistic Parameters
+#'
+#' @description
+#' This function creates a default configuration for double logistic form.
+#' It sets up default values for parameters related to the inflection point and slope.
+#' @rdname create_default_parameters
+#' @return A list containing the default double logistic parameters, with inflection_point_asc,
+#'   slope_asc, inflection_point_desc, and slope_desc values and their estimation status.
+#' @export
+create_default_DoubleLogistic <- function() {
+  # Generate default list with inflection point and slope parameters
+  default <- list(
+    inflection_point_asc.value = 2,
+    inflection_point_asc.estimated = TRUE,
+    slope_asc.value = 1,
+    slope_asc.estimated = TRUE,
+    inflection_point_desc.value = 4,
+    inflection_point_desc.estimated = TRUE,
+    slope_desc.value = 1,
+    slope_desc.estimated = TRUE
+  )
+  return(default)
+}
 
 #' Create Default Selectivity Parameters
 #'
@@ -209,7 +229,8 @@ create_default_selectivity <- function(fleet_name, form) {
     cli::cli_abort(c(
       "Invalid selectivity form: ",
       "x" = "The selectivity form {form} is missing from the supported forms:
-            {paste(valid_forms, collapse = ', ')}", "."))
+            {paste(valid_forms, collapse = ', ')}", "."
+    ))
   }
 
   default <- switch(form,
@@ -237,8 +258,6 @@ create_default_selectivity <- function(fleet_name, form) {
 create_default_fleet <- function(fleets,
                                  fleet_name,
                                  data) {
-
-
   # Check if the fleet_name exists in fleets list
   if (!fleet_name %in% names(fleets)) {
     cli::cli_abort("Fleet name {fleet_name} does not exist in the fleets list.")
@@ -312,7 +331,6 @@ create_default_fleet <- function(fleets,
 #' @return A list containing the default maturity parameters.
 #' @export
 create_default_maturity <- function(form) {
-
   # Check if the form is a character string
   if (!is.character(form) || length(form) != 1) {
     cli::cli_abort("The {.var form} argument must be a non-empty character string.")
@@ -324,7 +342,8 @@ create_default_maturity <- function(form) {
     cli::cli_abort(c(
       "Invalid maturity form: ",
       "x" = "The maturity form {form} is missing from the supported form:
-            {paste(valid_forms, collapse = ', ')}", "."))
+            {paste(valid_forms, collapse = ', ')}", "."
+    ))
   }
 
   # Default parameters setup
@@ -383,7 +402,8 @@ create_default_TMBDnormDistribution <- function(value = log(0.4), data, input_ty
     cli::cli_abort(c(
       "Invalid input_type: ",
       "x" = "The input_type {input_type} is missing from the supported types:
-            {paste(valid_input_types, collapse = ', ')}", "."))
+            {paste(valid_input_types, collapse = ', ')}", "."
+    ))
   }
 
   # Check if data is an object from FIMSFrame class
@@ -423,7 +443,6 @@ create_default_TMBDnormDistribution <- function(value = log(0.4), data, input_ty
 #' @return A list of default parameters for TMBDlnormDistribution.
 #' @export
 create_default_TMBDlnormDistribution <- function(value = 0.1, data, input_type = "data") {
-
   # Validate input value
   if (!is.numeric(value) || any(value <= 0, na.rm = TRUE)) {
     cli::cli_abort("The {.var value} argument must be positive numeric values.")
@@ -440,7 +459,8 @@ create_default_TMBDlnormDistribution <- function(value = 0.1, data, input_type =
     cli::cli_abort(c(
       "Invalid input_type: ",
       "x" = "The input_type {input_type} is missing from the supported types:
-            {paste(valid_input_types, collapse = ', ')}", "."))
+            {paste(valid_input_types, collapse = ', ')}", "."
+    ))
   }
 
   # Create the default list with log standard deviation
@@ -474,7 +494,6 @@ create_default_TMBDlnormDistribution <- function(value = 0.1, data, input_type =
 #' @return A list with the default parameters for recruitment.
 #' @export
 create_default_recruitment <- function(recruitment, data) {
-
   # Check if recruitment is a list
   if (!is.list(recruitment)) {
     cli::cli_abort("The {.var recruitment} argument must be a list.")
@@ -487,7 +506,8 @@ create_default_recruitment <- function(recruitment, data) {
     cli::cli_abort(c(
       "Invalid or missing recruitment form: ",
       "i" = "The supported forms:
-            {paste(valid_forms, collapse = ', ')}", "."))
+            {paste(valid_forms, collapse = ', ')}", "."
+    ))
   }
 
   # Create default parameters based on the recruitment form
@@ -534,7 +554,6 @@ create_default_recruitment <- function(recruitment, data) {
 #'   input.}
 #' @export
 update_parameters <- function(current_parameters, modified_parameters) {
-
   # Check if current_parameters is a list with required components
   if (!is.list(current_parameters) || !all(c("parameters", "modules") %in% names(current_parameters))) {
     cli::cli_abort("The {.var current_parameters} argument must be a list containing parameters and modules.")

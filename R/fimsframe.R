@@ -64,6 +64,10 @@ setMethod("n_ages", "FIMSFrame", function(x) x@n_ages)
 setGeneric("weight_at_age", function(x) standardGeneric("weight_at_age"))
 setMethod("weight_at_age", "FIMSFrame", function(x) x@weight_at_age)
 
+#' Get the weight at age data to be used in the model
+#'
+#' @param x The object containing weight at age data.
+#' @export
 setGeneric("m_weight_at_age", function(x) standardGeneric("m_weight_at_age"))
 setMethod(
   "m_weight_at_age", "FIMSFrame",
@@ -78,6 +82,7 @@ setMethod(
   }
 )
 
+# TODO: do we need m_ages()? ages can be extracted using data@ages.
 setGeneric("m_ages", function(x) standardGeneric("m_ages"))
 setMethod("m_ages", "FIMSFrame", function(x) {
   x@ages
