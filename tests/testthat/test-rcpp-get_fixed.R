@@ -59,3 +59,44 @@ test_that("test get parameter vector", {
   expect_equal(c(sel_parm, rec_parm), p2)
   clear()
 })
+test_that("get_fixed() works when estimated is set to FALSE", {
+
+  clear()
+  selectivity <- new(LogisticSelectivity)
+  selectivity$inflection_point[1]$value <- 10.0
+  selectivity$inflection_point[1]$min <- 8.0
+  selectivity$inflection_point[1]$max <- 12.0
+  selectivity$inflection_point[1]$estimated <- FALSE
+  selectivity$slope[1]$value <- 0.2
+  selectivity$slope[1]$estimated <- TRUE
+
+  CreateTMBModel()
+  p <- get_fixed()
+  sel_parm <- c(
+    selectivity$slope[1]$value
+  )
+  expect_equal(sel_parm, p)
+
+  clear()
+
+  fish_selex <- methods::new(DoubleLogisticSelectivity)
+  fish_selex$inflection_point_asc[1]$value <- 2
+  fish_selex$inflection_point_asc[1]$estimated <- TRUE
+  fish_selex$inflection_point_desc[1]$value <- 3
+  fish_selex$inflection_point_desc[1]$estimated <- TRUE
+  fish_selex$slope_asc[1]$value <- 1
+  fish_selex$slope_asc[1]$estimated <- FALSE
+  fish_selex$slope_desc[1]$value <- 1.5
+  fish_selex$slope_desc[1]$estimated <- TRUE
+
+  CreateTMBModel()
+  p <- get_fixed()
+  sel_parm <- c(
+    fish_selex$inflection_point_asc[1]$value,
+    fish_selex$inflection_point_desc[1]$value,
+    fish_selex$slope_desc[1]$value
+  )
+  expect_equal(p, sel_parm)
+
+  clear()
+})
