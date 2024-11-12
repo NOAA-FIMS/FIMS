@@ -43,7 +43,8 @@ modified_parameters <- list(
   recruitment = list(
     BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]]$R0),
     BevertonHoltRecruitment.log_devs.value = om_input_list[[1]]$logR.resid[-1],
-    BevertonHoltRecruitment.log_devs.estimated = FALSE
+    BevertonHoltRecruitment.log_devs.estimated = FALSE,
+    TMBDnormDistribution.log_sd.value = om_input_list[[1]]$logR_sd
   ),
   maturity = list(
     LogisticMaturity.inflection_point.value = om_input_list[[1]]$A50.mat,
@@ -196,6 +197,81 @@ test_that("deterministic test of fims", {
   for (i in 1:length(c(t(om_cnaa_proportion)))) {
     expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
+})
+
+test_that("nll test of fims", {
+  iter_id <- 1
+
+  result <- setup_and_run_FIMS_with_wrappers(
+    iter_id = iter_id,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = FALSE,
+    parameters = parameters,
+    data = data
+  )
+
+  # Set up TMB's computational graph
+  obj <- result@obj
+  report <- result@report
+
+  # Calculate standard errors
+  # sdr <- result@sdreport
+  # sdr_fixed <- result$sdr_fixed
+
+  # log(R0)
+  fims_logR0 <- as.numeric(result@obj$par[36])
+  expect_equal(fims_logR0, log(om_input_list[[iter_id]]$R0))
+
+  # recruitment likelihood
+  # log_devs is of length nyr-1
+  rec_nll <- -sum(dnorm(
+    om_input_list[[iter_id]]$logR.resid[-1], rep(0, om_input_list[[iter_id]]$nyr - 1),
+    om_input_list[[iter_id]]$logR_sd, TRUE
+  ))
+
+  # catch and survey index expected likelihoods
+  index_nll_fleet <- -sum(dlnorm(
+    em_input_list[[iter_id]]$L.obs$fleet1,
+    log(om_output_list[[iter_id]]$L.mt$fleet1),
+    sqrt(log(em_input_list[[iter_id]]$cv.L$fleet1^2 + 1)), TRUE
+  ))
+  index_nll_survey <- -sum(dlnorm(
+    em_input_list[[iter_id]]$surveyB.obs$survey1,
+    log(om_output_list[[iter_id]]$survey_index_biomass$survey1),
+    sqrt(log(em_input_list[[iter_id]]$cv.survey$survey1^2 + 1)), TRUE
+  ))
+  index_nll <- index_nll_fleet + index_nll_survey
+  # age comp likelihoods
+  fishing_acomp_observed <- em_input_list[[iter_id]]$L.age.obs$fleet1
+  fishing_acomp_expected <- om_output_list[[iter_id]]$L.age$fleet1 / rowSums(om_output_list[[iter_id]]$L.age$fleet1)
+  survey_acomp_observed <- em_input_list[[iter_id]]$survey.age.obs$survey1
+  survey_acomp_expected <- om_output_list[[iter_id]]$survey_age_comp$survey1 / rowSums(om_output_list[[iter_id]]$survey_age_comp$survey1)
+  age_comp_nll_fleet <- age_comp_nll_survey <- 0
+  for (y in 1:om_input_list[[iter_id]]$nyr) {
+    age_comp_nll_fleet <- age_comp_nll_fleet -
+      dmultinom(
+        fishing_acomp_observed[y, ] * em_input_list[[iter_id]]$n.L$fleet1, em_input_list[[iter_id]]$n.L$fleet1,
+        fishing_acomp_expected[y, ], TRUE
+      )
+
+    age_comp_nll_survey <- age_comp_nll_survey -
+      dmultinom(
+        survey_acomp_observed[y, ] * em_input_list[[iter_id]]$n.survey$survey1, em_input_list[[iter_id]]$n.survey$survey1,
+        survey_acomp_expected[y, ], TRUE
+      )
+  }
+  age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
+  expected_jnll <- rec_nll + index_nll + age_comp_nll
+  jnll <- report$jnll
+
+  expect_equal(report$nll_components[1], rec_nll)
+  expect_equal(report$nll_components[2], index_nll_fleet)
+  expect_equal(report$nll_components[3], age_comp_nll_fleet)
+  expect_equal(report$nll_components[4], index_nll_survey)
+  expect_equal(report$nll_components[5], age_comp_nll_survey)
+  expect_equal(jnll, expected_jnll)
 })
 
 test_that("estimation test of fims using wrapper functions", {
