@@ -1,7 +1,7 @@
 #' Validity checks for distributions
 #'
-#' Check the validity of arguments passed to [new_data_distribution()] and
-#' [new_process_distribution()].
+#' Check the validity of arguments passed to [initialize_data_distribution()] and
+#' [initialize_process_distribution()].
 #'
 #' @param args A list of input arguments.
 #' @noRd
@@ -84,7 +84,7 @@ check_distribution_validity <- function(args) {
 
 #' Return name of expected value
 #'
-#' @inheritParams new_data_distribution
+#' @inheritParams initialize_data_distribution
 #' @noRd
 #' @return
 #' A string specifying the name of the expected value.
@@ -134,7 +134,7 @@ get_expected_name <- function(family, data_type) {
 #' # Create a new fleet module
 #' fleet <- methods::new(Fleet)
 #' # Create a distribution for the fleet module
-#' fleet_distribution <- new_data_distribution(
+#' fleet_distribution <- initialize_data_distribution(
 #'   module = fishing_fleet,
 #'   family = lognormal(link = "log"),
 #'   sd = list(value = rep(sqrt(log(0.01^2 + 1)), nyears),
@@ -142,7 +142,7 @@ get_expected_name <- function(family, data_type) {
 #'   data_type = "index"
 #' )
 #' }
-new_data_distribution <- function(
+initialize_data_distribution <- function(
   module,
   family,
   sd = list(value = 1, estimated = FALSE),
@@ -226,14 +226,14 @@ new_data_distribution <- function(
 }
 
 #' Sets up a new distribution for a process
-#' @inheritParams new_data_distribution
+#' @inheritParams initialize_data_distribution
 #' @param par A string specifying the parameter name the distribution applies
 #'   to. Parameters must be members of the specified module. Use
 #'   `methods::show(module)` to obtain names of parameters within the module.
 #' @param is_random_effect A boolean indicating whether or not the process is
 #'   estimated as a random effect.
 #' @seealso
-#' * [new_data_distribution()]
+#' * [initialize_data_distribution()]
 #' @export
 #' @return
 #' Reference Class. Use `show()` to view Rcpp class fields, methods, and
@@ -245,7 +245,7 @@ new_data_distribution <- function(
 #' # view parameter names of the recruitment module
 #' methods::show(BevertonHoltRecruitment)
 #' # Create a distribution for the recruitment module
-#' recruitment_distribution <- new_process_distribution(
+#' recruitment_distribution <- initialize_process_distribution(
 #'   module = recruitment,
 #'   par = "log_devs",
 #'   family = gaussian(),
@@ -253,7 +253,7 @@ new_data_distribution <- function(
 #'   is_random_effect = FALSE
 #' )
 #' }
-new_process_distribution <- function(module,
+initialize_process_distribution <- function(module,
                                      par,
                                      family,
                                      sd = list(value = 1, estimated = FALSE),

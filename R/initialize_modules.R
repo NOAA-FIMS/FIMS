@@ -541,7 +541,7 @@ initialize_fims <- function(parameters, data) {
       cli::cli_abort("Missing required inputs for `log_sd` in fleet `{fleet_name}`.")
     }
 
-    fleet_index_distribution[[i]] <- new_data_distribution(
+    fleet_index_distribution[[i]] <- initialize_data_distribution(
       module = fleet[[i]],
       family = lognormal(link = "log"),
       sd = list(
@@ -562,7 +562,7 @@ initialize_fims <- function(parameters, data) {
     #   )
     # )
 
-    fleet_agecomp_distribution[[i]] <- new_data_distribution(
+    fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
       module = fleet[[i]],
       family = multinomial(link = "logit"),
       data_type = "agecomp"
@@ -592,7 +592,7 @@ initialize_fims <- function(parameters, data) {
     cli::cli_abort("Missing required inputs for recruitment distribution.")
   }
 
-  recruitment_distribution <- new_process_distribution(
+  recruitment_distribution <- initialize_process_distribution(
     module = recruitment,
     par = names(parameters$modules$recruitment$process_distribution),
     family = gaussian(),

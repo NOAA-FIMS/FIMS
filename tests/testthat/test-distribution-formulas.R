@@ -8,7 +8,7 @@ em_input <- em_input_list[[iter_id]]
 # Clear any previous FIMS settings
 clear()
 
-test_that("test new_process_distribution", {
+test_that("test initialize_process_distribution", {
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
@@ -34,7 +34,7 @@ test_that("test new_process_distribution", {
   )
 
   # set up logR_sd using the normal log_sd parameter
-  recruitment_distribution <- new_process_distribution(
+  recruitment_distribution <- initialize_process_distribution(
     module = recruitment,
     par = "log_devs",
     family = gaussian(),
@@ -50,7 +50,7 @@ test_that("test new_process_distribution", {
     length(recruitment_distribution$expected_values)
   )
   expect_error(
-    new_process_distribution(
+    initialize_process_distribution(
       module = recruitment,
       par = "log_devs",
       family = multinomial(),
@@ -59,7 +59,7 @@ test_that("test new_process_distribution", {
     )
   )
   expect_error(
-    new_process_distribution(
+    initialize_process_distribution(
       module = recruitment,
       par = "log_devs",
       family = binomial(),
@@ -68,7 +68,7 @@ test_that("test new_process_distribution", {
     )
   )
   expect_error(
-    new_process_distribution(
+    initialize_process_distribution(
       module = recruitment,
       par = "log_devs",
       family = gaussian(),
@@ -77,7 +77,7 @@ test_that("test new_process_distribution", {
     )
   )
   expect_error(
-    new_process_distribution(
+    initialize_process_distribution(
       module = recruitment,
       par = "log_devs",
       family = gaussian(),
@@ -92,7 +92,7 @@ test_that("test new_process_distribution", {
 })
 
 
-test_that("test new_data_distribution", {
+test_that("test initialize_data_distribution", {
   # Data
   catch <- em_input$L.obs$fleet1
   # set fishing fleet catch data, need to set dimensions of data index
@@ -111,7 +111,7 @@ test_that("test new_data_distribution", {
 
   # Set up fishery index data using the lognormal
   fleet_sd <- rep(sqrt(log(em_input$cv.L$fleet1^2 + 1)), om_input$nyr)
-  fishing_fleet_index_distribution <- new_data_distribution(
+  fishing_fleet_index_distribution <- initialize_data_distribution(
     module = fishing_fleet,
     family = lognormal(link = "log"),
     sd = list(value = fleet_sd, estimated = FALSE),
@@ -122,7 +122,7 @@ test_that("test new_data_distribution", {
     fishing_fleet_index_distribution$log_sd[1]$value
   )
   expect_error(
-    new_data_distribution(
+    initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
       sd = list(value = fleet_sd, estimated = FALSE),
@@ -130,7 +130,7 @@ test_that("test new_data_distribution", {
     )
   )
   expect_error(
-    new_data_distribution(
+    initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
       sd = list(value = fleet_sd, estimated = FALSE),
@@ -138,7 +138,7 @@ test_that("test new_data_distribution", {
     )
   )
   expect_error(
-    new_data_distribution(
+    initialize_data_distribution(
       module = fishing_fleet,
       family = gaussian(),
       sd = list(value = fleet_sd, estimated = FALSE),
@@ -146,7 +146,7 @@ test_that("test new_data_distribution", {
     )
   )
   expect_error(
-    new_data_distribution(
+    initialize_data_distribution(
       module = fishing_fleet,
       family = lognormal(),
       sd = list(value = fleet_sd, estimated = FALSE),

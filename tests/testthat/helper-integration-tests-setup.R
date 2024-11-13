@@ -389,7 +389,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
     # TODO: update argument sd to log_sd to match the Rcpp interface
     parameter_value_name <- grep(paste0("log_sd", ".value"), names(parameters[["parameters"]][[fleet_names[i]]]), value = TRUE)
     parameter_estimated_name <- grep(paste0("log_sd", ".estimated"), names(parameters[["parameters"]][[fleet_names[i]]]), value = TRUE)
-    fleet_index_distribution[[i]] <- new_data_distribution(
+    fleet_index_distribution[[i]] <- initialize_data_distribution(
       module = fleet[[i]],
       family = lognormal(link = "log"),
       sd = list(
@@ -410,7 +410,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
     #   )
     # )
 
-    fleet_agecomp_distribution[[i]] <- new_data_distribution(
+    fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
       module = fleet[[i]],
       family = multinomial(link = "logit"),
       data_type = "agecomp"
@@ -435,7 +435,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   parameter_name <- names(parameters$modules$recruitment$process_distribution)
   field_value_name <- grep(paste0("log_sd.value"), names(parameters[["parameters"]][["recruitment"]]), value = TRUE)
   field_estimated_name <- grep(paste0("log_sd.estimated"), names(parameters[["parameters"]][["recruitment"]]), value = TRUE)
-  recruitment_distribution <- new_process_distribution(
+  recruitment_distribution <- initialize_process_distribution(
     module = recruitment,
     par = names(parameters$modules$recruitment$process_distribution),
     family = gaussian(),
