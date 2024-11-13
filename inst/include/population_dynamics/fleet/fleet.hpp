@@ -27,6 +27,7 @@ namespace fims_popdy {
         static uint32_t id_g; /*!< reference id for fleet object*/
         size_t nyears; /*!< the number of years in the model*/
         size_t nages; /*!< the number of ages in the model*/
+        size_t nlengths;      /*!< the number of length bins in the model*/
 
         // selectivity
         int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
@@ -43,6 +44,11 @@ namespace fims_popdy {
   std::shared_ptr<fims_data_object::DataObject<Type>>
     observed_agecomp_data; /*!< observed agecomp data*/
 
+  // length comp data
+  int fleet_observed_lengthcomp_data_id_m = -999; /*!< id of length comp data */
+  std::shared_ptr<fims_data_object::DataObject<Type>>
+    observed_lengthcomp_data; /*!< observed lengthcomp data*/
+
   // Mortality and catchability
   fims::Vector<Type>
       log_Fmort; /*!< estimated parameter: log Fishing mortality*/
@@ -55,6 +61,8 @@ namespace fims_popdy {
         fims::Vector<Type> catch_at_age; /*!<derived quantity catch at age*/
         fims::Vector<Type> catch_index; /*!<derived quantity catch index*/
         fims::Vector<Type> age_composition; /*!<derived quantity age composition*/
+        fims::Vector<Type> length_composition; /*!<derived quantity length composition*/
+        fims::Vector<Type> age_length_conversion_matrix; /*!<derived quantity age-length transition matrix*/
 
         // derived quantities
         fims::Vector<Type> observed_catch_lpdf; /*!<observed total catch linked
@@ -69,7 +77,9 @@ namespace fims_popdy {
         fims::Vector<Type> expected_index_lpdf; /*!<model expected index of abundance linked
     to log probability density function*/
         fims::Vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
+        fims::Vector<Type> catch_numbers_at_length; /*!<model expected catch at length*/
         fims::Vector<Type> proportion_catch_numbers_at_age; /*!<model expected catch at age*/
+        fims::Vector<Type> proportion_catch_numbers_at_length; /*!<model expected catch at length*/
         fims::Vector<Type> catch_weight_at_age; /*!<model expected weight at age*/
         bool is_survey = false; /*!< is this fleet object a survey*/
 
@@ -94,30 +104,38 @@ namespace fims_popdy {
          * @brief Intialize Fleet Class
          * @param nyears The number of years in the model.
          * @param nages The number of ages in the model.
+         * @param nlengths The number of composition lengths in the model.
          */
-        void Initialize(int nyears, int nages) {
+        void Initialize(int nyears, int nages, int nlengths = 0) {
             if (this->log_q.size() == 0) {
                 this->log_q.resize(1);
                 this->log_q[0] = 0.0;
             }
+
             this->nyears = nyears;
             this->nages = nages;
+            this->nlengths = nlengths;
 
             catch_at_age.resize(nyears * nages);
             catch_numbers_at_age.resize(nyears * nages);
+            catch_numbers_at_length.resize(nyears * nlengths);
+            proportion_catch_numbers_at_age.resize(nyears * nages);
+            proportion_catch_numbers_at_length.resize(nyears * nlengths);
+            age_length_conversion_matrix.resize(nages * nlengths);
             catch_weight_at_age.resize(nyears * nages);
             catch_index.resize(nyears); // assume index is for all ages.
             expected_catch.resize(nyears);
             expected_index.resize(nyears);
             log_expected_index.resize(nyears);
             age_composition.resize(nyears * nages);
+            length_composition.resize(nyears * nlengths);
             q.resize(this->log_q.size());
             log_Fmort.resize(nyears);
             Fmort.resize(nyears);
         }
 
         /**
-         * @brief Prepare to run the fleet module. Called at each model itartion, and
+         * @brief Prepare to run the fleet module. Called at each model iteration, and
          * used to exponentiate the log q and Fmort parameters prior to evaluation.
          *
          */
@@ -130,7 +148,10 @@ namespace fims_popdy {
                     0); /**<derived quantity catch at age*/
             std::fill(catch_index.begin(), catch_index.end(),
                     0); /**<derived quantity catch index*/
-            std::fill(age_composition.begin(), age_composition.end(), 0);
+            std::fill(age_composition.begin(), age_composition.end(), 
+                    0); /**<model expected number at age */
+            std::fill(length_composition.begin(), length_composition.end(), 
+                    0); /**<model expected number at length */
             std::fill(expected_catch.begin(), expected_catch.end(),
                     0); /**<model expected total catch*/
             std::fill(expected_index.begin(), expected_index.end(),
@@ -141,9 +162,13 @@ namespace fims_popdy {
                     0); /**<model expected catch at age*/
             std::fill(proportion_catch_numbers_at_age.begin(), proportion_catch_numbers_at_age.end(),
                     0); /**<model expected catch at age*/
+            std::fill(catch_numbers_at_length.begin(), catch_numbers_at_length.end(),
+                    0); /**<model expected catch at age*/
+            std::fill(proportion_catch_numbers_at_length.begin(), proportion_catch_numbers_at_length.end(),
+                    0); /**<model expected proportional catch numbers at length */
             std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
                     0); /**<model expected weight at age*/
-
+            
             for (size_t i = 0; i < this->log_q.size(); i++) {
                 this->q[i] = fims_math::exp(this->log_q[i]);
             }
@@ -165,8 +190,35 @@ namespace fims_popdy {
                 }
                 for (size_t a = 0; a < this->nages; a++) {
                     size_t i_age_year = y * this->nages + a;
-                    this->proportion_catch_numbers_at_age[i_age_year] = this->catch_numbers_at_age[i_age_year] / sum;
+                    this->proportion_catch_numbers_at_age[i_age_year] = 
+                    this->catch_numbers_at_age[i_age_year] / sum;
+                }
+            }
+        }
 
+        /**
+         * Evaluate the proportion of catch numbers at length.
+         */
+        void evaluate_length_comp() {
+            if(this->nlengths > 0){
+                for (size_t y = 0; y < this->nyears; y++) {
+                    Type sum = 0.0;
+                    for (size_t l = 0; l < this->nlengths; l++) {
+                        size_t i_length_year = y * this->nlengths + l;
+                        for(size_t a = 0; a < this->nages; a++){
+                            size_t i_age_year = y * this->nages + a;
+                            size_t i_length_age = a * this->nlengths + l;
+                            this->catch_numbers_at_length[i_length_year] += 
+                            this->catch_numbers_at_age[i_age_year] * 
+                            this->age_length_conversion_matrix[i_length_age];
+                        }
+                        sum += this->catch_numbers_at_length[i_length_year];
+                    }
+                    for (size_t l = 0; l < this->nlengths; l++) {
+                        size_t i_length_year = y * this->nlengths + l;
+                        this->proportion_catch_numbers_at_length[i_length_year] = 
+                        this->catch_numbers_at_length[i_length_year] / sum;
+                    }
                 }
             }
         }

@@ -53,6 +53,8 @@ std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
 class FleetInterface : public FleetInterfaceBase {
   int interface_observed_agecomp_data_id_m =
     -999; /**< id of observed agecomp data object*/
+  int interface_observed_lengthcomp_data_id_m =
+    -999; /**< id of observed lengthcomp data object*/
   int interface_observed_index_data_id_m =
     -999; /**< id of observed index data object*/
   int interface_selectivity_id_m = -999; /**< id of selectivity component*/
@@ -61,20 +63,25 @@ public:
   std::string name = "NA"; /**< the name of the fleet */
   bool is_survey = false; /**< whether this is a survey fleet */
   int nages;              /**< number of ages in the fleet data*/
+  int nlengths = 0;       /**< number of length bins in the fleet data */
   int nyears;             /**< number of years in the fleet data */
   ParameterVector log_q;  /**< log of catchability for the fleet*/
   ParameterVector
       log_Fmort;           /**< log of fishing mortality rate for the fleet*/
   ParameterVector log_expected_index; /**< expected index of abundance for the survey */
   ParameterVector proportion_catch_numbers_at_age; /**< expected catch numbers at age for the fleet */
+  ParameterVector proportion_catch_numbers_at_length; /**< expected catch numbers at age for the fleet */
+  ParameterVector age_length_conversion_matrix; /**< matrix to convert ages to lengths */
   bool estimate_q = false; /**< whether the parameter q should be estimated*/
   bool random_q = false;             /**< whether q should be a random effect*/
 
 
     Rcpp::NumericVector derived_cnaa; /**< derived quantity: catch numbers at age */
+    Rcpp::NumericVector derived_cnal; /**< derived quantity: catch numbers at length */
     Rcpp::NumericVector derived_cwaa; /**< derived quantity: catch weight at age */
     Rcpp::NumericVector derived_index; /**< derived quantity: expected index */
     Rcpp::NumericVector derived_age_composition; /**< derived quantity: expected catch */
+    Rcpp::NumericVector derived_length_composition; /**< derived quantity: expected catch */
 
   FleetInterface() : FleetInterfaceBase() {}
 
@@ -94,11 +101,29 @@ public:
     }
 
     /**
+    * @brief Set the unique id for the Observed Length Comp Data object
+    *
+    * @param observed_lengthcomp_data_id Unique id for the Observed Length Comp Data
+    * object
+    */
+    void SetObservedLengthCompData(int observed_lengthcomp_data_id) {
+        interface_observed_lengthcomp_data_id_m = observed_lengthcomp_data_id;
+    }
+
+    /**
     * @brief Return the unique id for the Observed Age Comp Data object
     *
     */
     int GetObservedAgeCompDataID() {
         return interface_observed_agecomp_data_id_m;
+    }
+
+    /**
+    * @brief Return the unique id for the Observed Length Comp Data object
+    *
+    */
+    int GetObservedLengthCompDataID() {
+        return interface_observed_lengthcomp_data_id_m;
     }
 
     /**
@@ -177,6 +202,11 @@ public:
                 this->derived_cnaa[i] = fleet->catch_numbers_at_age[i];
             }
 
+            this->derived_cnal = Rcpp::NumericVector(fleet->catch_numbers_at_length.size());
+            for (size_t i = 0; i < this->derived_cnal.size(); i++) {
+                this->derived_cnal[i] = fleet->catch_numbers_at_length[i];
+            }
+
             this->derived_cwaa = Rcpp::NumericVector(fleet->catch_weight_at_age.size());
             for (size_t i = 0; i < this->derived_cwaa.size(); i++) {
                 this->derived_cwaa[i] = fleet->catch_weight_at_age[i];
@@ -185,6 +215,11 @@ public:
             this->derived_age_composition = Rcpp::NumericVector(fleet->proportion_catch_numbers_at_age.size());
             for (size_t i = 0; i < this->derived_age_composition.size(); i++) {
                 this->derived_age_composition[i] = fleet->proportion_catch_numbers_at_age[i];
+            }
+
+            this->derived_length_composition = Rcpp::NumericVector(fleet->proportion_catch_numbers_at_length.size());
+            for (size_t i = 0; i < this->derived_length_composition.size(); i++) {
+                this->derived_length_composition[i] = fleet->proportion_catch_numbers_at_length[i];
             }
 
             this->derived_index = Rcpp::NumericVector(fleet->expected_index.size());
@@ -236,6 +271,19 @@ public:
         ss << " },\n";
 
         ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"cnal\",\n";
+        ss << "  \"values\":[";
+        if (this->derived_cnal.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_cnal.size() - 1; i++) {
+                ss << this->derived_cnal[i] << ", ";
+            }
+            ss << this->derived_cnal[this->derived_cnal.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        ss << " \"derived_quantity\": {\n";
         ss << "  \"name\": \"cwaa\",\n";
         ss << "  \"values\":[";
         if (this->derived_cwaa.size() == 0) {
@@ -259,6 +307,19 @@ public:
                 ss << this->derived_age_composition[i] << ", ";
             }
             ss << this->derived_age_composition[this->derived_age_composition.size() - 1] << "]\n";
+        }
+        ss << " },\n";
+
+        ss << " \"derived_quantity\": {\n";
+        ss << "  \"name\": \"length_composition \",\n";
+        ss << "  \"values\":[";
+        if (this->derived_length_composition.size() == 0) {
+            ss << "]\n";
+        } else {
+            for (size_t i = 0; i < this->derived_length_composition.size() - 1; i++) {
+                ss << this->derived_length_composition[i] << ", ";
+            }
+            ss << this->derived_length_composition[this->derived_length_composition.size() - 1] << "]\n";
         }
         ss << " },\n";
 
@@ -295,9 +356,12 @@ public:
     fleet->id = this->id;
     fleet->is_survey = this->is_survey;
     fleet->nages = this->nages;
+    fleet->nlengths = this->nlengths;
     fleet->nyears = this->nyears;
     fleet->fleet_observed_agecomp_data_id_m =
       interface_observed_agecomp_data_id_m;
+    fleet->fleet_observed_lengthcomp_data_id_m =
+    interface_observed_lengthcomp_data_id_m;
     fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m;
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
 
@@ -337,7 +401,24 @@ public:
     info->variable_map[this->log_expected_index.id_m] = &(fleet)->log_expected_index;
     fleet->proportion_catch_numbers_at_age.resize(nyears * nages);
     info->variable_map[this->proportion_catch_numbers_at_age.id_m] = &(fleet)->proportion_catch_numbers_at_age;
-
+    if(this->nlengths > 0){
+      fleet->proportion_catch_numbers_at_length.resize(nyears * nlengths);
+      fleet->age_length_conversion_matrix.resize(nages * nlengths);
+      for (size_t i = 0; i < fleet->age_length_conversion_matrix.size(); i++){
+        fleet->age_length_conversion_matrix[i] = this->age_length_conversion_matrix[i].initial_value_m;
+        
+        if (this->age_length_conversion_matrix[i].estimated_m) {
+            info->RegisterParameterName("age_length_conversion_matrix");
+            if (this->age_length_conversion_matrix[i].is_random_effect_m) {
+                info->RegisterRandomEffect(fleet->age_length_conversion_matrix[i]);
+            } else {
+                info->RegisterParameter(fleet->age_length_conversion_matrix[i]);
+            }
+        }
+      }
+      info->variable_map[this->age_length_conversion_matrix.id_m] = &(fleet)->age_length_conversion_matrix;
+      info->variable_map[this->proportion_catch_numbers_at_length.id_m] = &(fleet)->proportion_catch_numbers_at_length;
+    }
 
     // add to Information
     info->fleets[fleet->id] = fleet;

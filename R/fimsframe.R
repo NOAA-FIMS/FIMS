@@ -18,6 +18,9 @@ setClass(
     n_years = "integer",
     ages = "numeric",
     n_ages = "integer",
+    comp_lengths = "numeric",
+    n_lengths = "integer",
+    length_at_age = "data.frame",
     weight_at_age = "data.frame",
     start_year = "integer",
     end_year = "integer"
@@ -61,8 +64,17 @@ setMethod("ages", "FIMSFrame", function(x) x@ages)
 setGeneric("n_ages", function(x) standardGeneric("n_ages"))
 setMethod("n_ages", "FIMSFrame", function(x) x@n_ages)
 
+setGeneric("comp_lengths", function(x) standardGeneric("comp_lengths"))
+setMethod("comp_lengths", "FIMSFrame", function(x) x@comp_lengths)
+
+setGeneric("n_lengths", function(x) standardGeneric("n_lengths"))
+setMethod("n_lengths", "FIMSFrame", function(x) x@n_lengths)
+
 setGeneric("weight_at_age", function(x) standardGeneric("weight_at_age"))
 setMethod("weight_at_age", "FIMSFrame", function(x) x@weight_at_age)
+
+setGeneric("length_at_age", function(x) standardGeneric("length_at_age"))
+setMethod("length_at_age", "FIMSFrame", function(x) x@length_at_age)
 
 setGeneric("m_weight_at_age", function(x) standardGeneric("m_weight_at_age"))
 setMethod(
@@ -78,9 +90,15 @@ setMethod(
   }
 )
 
+
 setGeneric("m_ages", function(x) standardGeneric("m_ages"))
 setMethod("m_ages", "FIMSFrame", function(x) {
   x@ages
+})
+
+setGeneric("m_comp_lengths", function(x) standardGeneric("m_comp_lengths"))
+setMethod("m_comp_lengths", "FIMSFrame", function(x) {
+  as.numeric(x@comp_lengths)
 })
 
 #' Get the landings data to be used in the model
@@ -135,7 +153,7 @@ setMethod(
 #' @param fleet_name The name of the fleet for the age-composition data.
 #' @export
 setGeneric("m_agecomp", function(x, fleet_name) standardGeneric("m_agecomp"))
-# Should we add name as an argument here?
+
 
 #' Get the age-composition data data to be used in the model
 #'
@@ -151,6 +169,60 @@ setMethod(
       .data[["name"]] == fleet_name
     ) |>
       dplyr::pull(.data[["value"]])
+  }
+)
+
+#' Get the length-composition data to be used in the model
+#'
+#' @param x The object containing the length-composition data.
+#' @param fleet_name The name of the fleet for the length-composition data.
+#' @export
+setGeneric("m_lengthcomp", function(x, fleet_name) standardGeneric("m_lengthcomp"))
+
+
+#' Get the length-composition data data to be used in the model
+#'
+#' @param x  The FIMSFrame containing length-composition data.
+#' @param fleet_name  The name of the fleet for the length-composition data.
+#' @export
+setMethod(
+  "m_lengthcomp", "FIMSFrame",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "length-comp",
+      .data[["name"]] == fleet_name
+    ) |>
+      dplyr::pull(as.numeric(.data[["value"]]))
+  }
+)
+
+#' Get the length at age conversion matrix to be used in the model
+#'
+#' @param x The object containing the length-composition data.
+#' @param fleet_name The name of the fleet for the length-composition data.
+#' @export
+setGeneric("m_length_at_age", function(x, fleet_name) standardGeneric("m_length_at_age"))
+
+#' Get the length at age conversion matrix to be used in the model
+#'
+#' @param x The object containing the length-composition data.
+#' @param fleet_name The name of the fleet for the length-composition data.
+#' @export
+setMethod(
+  "m_length_at_age", "FIMSFrame",
+  function(x, fleet_name) {
+    if("len" %in% colnames(x@data)){
+      dplyr::filter(
+        .data = as.data.frame(x@data),
+        .data[["type"]] == "length-at-age",
+        .data[["name"]] == fleet_name
+      ) |>
+        dplyr::group_by(.data[["age"]],.data[["len"]]) |>
+        dplyr::summarize(mean_value = mean(as.numeric(.data[["value"]]),
+        na.rm=TRUE)) |>
+        dplyr::pull(as.numeric(.data[["mean_value"]]))
+    }
   }
 )
 
@@ -337,7 +409,7 @@ FIMSFrame <- function(data) {
   fleets <- as.numeric(
     unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2]))
   )
-  n_fleets <- length(fleets)
+
   # Make empty NA data frames in the format needed to pass to FIMS
   # Get the range of ages displayed in the data to use to specify population
   # simulation range
@@ -348,6 +420,19 @@ FIMSFrame <- function(data) {
     .data[["type"]] == "weight-at-age"
   )
 
+  length_at_age <- dplyr::filter(
+    data,
+    .data[["type"]] == "length-at-age"
+  )
+  
+  if (!"len" %in% colnames(data)) {
+    comp_lengths <- numeric(0)
+    n_lengths <- as.integer(0)
+  }else {
+    comp_lengths <- unique(as.numeric(data[["len"]][!is.na(data[["len"]])]))
+    n_lengths <- length(comp_lengths)
+  }
+
   # Fill the empty data frames with data extracted from the data file
   out <- new("FIMSFrame",
     data = data,
@@ -357,7 +442,10 @@ FIMSFrame <- function(data) {
     end_year = end_year,
     ages = ages,
     n_ages = n_ages,
-    weight_at_age = weight_at_age
+    comp_lengths = comp_lengths,
+    n_lengths = n_lengths,
+    weight_at_age = weight_at_age,
+    length_at_age = length_at_age
   )
   return(out)
 }

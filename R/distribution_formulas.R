@@ -213,7 +213,9 @@ new_data_distribution <- function(
   if (data_type == "agecomp") {
     new_module$set_observed_data(module$GetObservedAgeCompDataID())
   }
-
+  if (data_type == "lengthcomp") {
+    new_module$set_observed_data(module$GetObservedLengthCompDataID())
+  }
   # set name of expected values
   expected <- get_expected_name(family, data_type)
   # setup link to expected values

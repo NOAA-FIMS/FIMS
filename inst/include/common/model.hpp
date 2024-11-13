@@ -77,8 +77,12 @@ namespace fims_model {
             vector<vector<Type> > exp_index(n_fleets);
             vector<vector<Type> > exp_catch(n_fleets);
             vector<vector<Type> > cnaa(n_fleets);
+            vector<vector<Type> > cnal(n_fleets);
+            vector<vector<Type> > pcnaa(n_fleets);
+            vector<vector<Type> > pcnal(n_fleets);
             vector<vector<Type> > cwaa(n_fleets);
             vector<vector<Type> > F_mort(n_fleets);
+            vector<vector<Type> > q(n_fleets);
             // populations
             vector<vector<Type> > naa(n_pops);
             vector<vector<Type> > ssb(n_pops);
@@ -167,6 +171,9 @@ namespace fims_model {
 #endif
 
                 f->evaluate_age_comp();
+                if(f->nlengths > 0){
+                    f->evaluate_length_comp();
+                }
                 f->evaluate_index();
             }
             this->fims_information->setup_data();
@@ -213,7 +220,11 @@ namespace fims_model {
                 exp_index(fleet_idx) = f->expected_index;
                 exp_catch(fleet_idx) = f->expected_catch;
                 F_mort(fleet_idx) = f->Fmort;
+                q(fleet_idx) = f->q;
                 cnaa(fleet_idx) = f->catch_numbers_at_age;
+                cnal(fleet_idx) = f->catch_numbers_at_length;
+                pcnaa(fleet_idx) = f->proportion_catch_numbers_at_age;
+                pcnal(fleet_idx) = f->proportion_catch_numbers_at_length;
                 cwaa(fleet_idx) = f->catch_weight_at_age;
 #endif
                 fleet_idx += 1;
@@ -236,7 +247,11 @@ namespace fims_model {
             FIMS_REPORT_F(exp_index, of);
             FIMS_REPORT_F(exp_catch, of);
             FIMS_REPORT_F(F_mort, of);
+            FIMS_REPORT_F(q, of);
             FIMS_REPORT_F(cnaa, of);
+            FIMS_REPORT_F(cnal, of);
+            FIMS_REPORT_F(pcnaa, of);
+            FIMS_REPORT_F(pcnal, of);
             FIMS_REPORT_F(cwaa, of);
             FIMS_REPORT_F(nll_components, of);
 
@@ -249,16 +264,24 @@ namespace fims_model {
             vector<Type> SSB = ADREPORTvector(ssb);
             vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
             vector<Type> FMort = ADREPORTvector(F_mort);
+            vector<Type> Q = ADREPORTvector(q);
             vector<Type> ExpectedIndex = ADREPORTvector(exp_index);
             vector<Type> CNAA = ADREPORTvector(cnaa);
+            vector<Type> CNAL = ADREPORTvector(cnal);
+            vector<Type> PCNAA = ADREPORTvector(pcnaa);
+            vector<Type> PCNAL = ADREPORTvector(pcnal);
 
             ADREPORT_F(NAA, of);
             ADREPORT_F(Biomass, of);
             ADREPORT_F(SSB, of);
             ADREPORT_F(LogRecDev, of);
             ADREPORT_F(FMort, of);
+            ADREPORT_F(Q, of);
             ADREPORT_F(ExpectedIndex, of);
             ADREPORT_F(CNAA, of);
+            ADREPORT_F(CNAL, of);
+            ADREPORT_F(PCNAA, of);
+            ADREPORT_F(PCNAL, of);
 #endif
 
             return jnll;

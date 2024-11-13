@@ -143,6 +143,95 @@ class AgeCompDataInterface : public DataInterfaceBase {
 };
 
 /**
+ * @brief Rcpp interface for length comp data as an S4 object. To instantiate
+ * from R:
+ * lcomp <- new(LengthComp)
+ */
+class LengthCompDataInterface : public DataInterfaceBase {
+ public:
+  int lmax;                          /**< first dimension of the data */
+  int ymax;                          /**< second dimension of the data */
+  Rcpp::NumericVector length_comp_data; /**<the length composition data*/
+
+  /**
+   * @brief constructor
+   */
+  LengthCompDataInterface(int ymax = 0, int lmax = 0) : DataInterfaceBase() {
+    this->lmax = lmax;
+    this->ymax = ymax;
+  }
+
+  /**
+   * @brief destructor
+   */
+  virtual ~LengthCompDataInterface() {}
+
+  /** @brief get the ID of the interface base object
+   */
+  virtual uint32_t get_id() { return this->id; }
+  
+  /**
+   * @brief Convert the data to json representation for the output.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+    
+    ss << "\"module\" : {\n";
+    ss << " \"name\": \"data\",\n";
+    ss << " \"type\" : \"LengthComp\",\n";
+    ss << " \"id\":" << this->id << ",\n";
+    ss << " \"rank\": " << 2 << ",\n";
+    ss << " \"dimensions\": [" << this->ymax << "," << this->lmax << "],\n";
+    ss << " \"values\": [";
+    for (size_t i = 0; i < length_comp_data.size() - 1; i++) {
+      ss << length_comp_data[i] << ", ";
+    }
+    ss << length_comp_data[length_comp_data.size() - 1] << "]\n";
+    ss << "}";
+    return ss.str();
+  }
+  
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_data_object::DataObject<Type>> length_comp_data =
+        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
+                                                             this->lmax);
+
+    length_comp_data->id = this->id;
+    for (int y = 0; y < ymax; y++) {
+      for (int l = 0; l < lmax; l++) {
+        int i_length_year = y * lmax + l;
+        length_comp_data->at(y, l) = this->length_comp_data[i_length_year];
+      }
+    }
+
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    info->data_objects[this->id] = length_comp_data;
+
+    return true;
+  }
+
+  /**
+   * @brief adds parameters to the model
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+    return true;
+  }
+
+#endif
+};
+
+/**
  * @brief Rcpp interface for data as an S4 object. To instantiate
  * from R:
  * fleet <- new(Index)
