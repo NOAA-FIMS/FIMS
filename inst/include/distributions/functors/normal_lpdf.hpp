@@ -25,8 +25,6 @@ namespace fims_distributions {
 template<typename Type>
 struct NormalLPDF : public DensityComponentBase<Type> {
     fims::Vector<Type> log_sd; /**< log of the standard deviation of the distribution; can be a vector or scalar */
-    fims::Vector<Type> mu; /**< mean of the distribution; can be a vector or scalar */
-    fims::Vector<Type> sd; /**< standard deviation of the distribution; can be a vector or scalar */
     Type lpdf = 0.0; /**< total log probability density contribution of the distribution */
 
     //data_indicator<tmbutils::vector<Type> , Type> keep; /**< Indicator used in TMB one-step-ahead residual calculations */
@@ -54,9 +52,9 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       }
       // setup vector for recording the log probability density function values
       this->lpdf_vec.resize(n_x);
-      std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0); 
+      std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
       lpdf = 0;
-      
+
       for(size_t i=0; i<n_x; i++){
         #ifdef TMB_MODEL
         if(this->input_type == "data"){
@@ -66,8 +64,8 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             this->lpdf_vec[i] = dnorm(this->observed_values->at(i), this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)), true);
           } else {
             this->lpdf_vec[i] = 0;
-          } 
-          // if not data (i.e. prior or process), use x vector instead of observed_values       
+          }
+          // if not data (i.e. prior or process), use x vector instead of observed_values
         } else {
           this->lpdf_vec[i] = dnorm(this->x[i], this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)), true);
         }
@@ -88,7 +86,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
               this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i], this->expected_values.get_force_scalar(i), sd[i]) );
               this->lpdf_vec[i] = this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i], this->expected_values.get_force_scalar(i), sd[i]) );
           } */
-            
+
         }
         #ifdef TMB_MODEL
         vector<Type> normal_x = this->x;
