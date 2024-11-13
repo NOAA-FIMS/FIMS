@@ -32,7 +32,7 @@ default_parameters <- data_mile1 |>
   )
 
 modified_parameters <- list(
-  fleet1 = list(
+  fleet11 = list(
     Fleet.log_Fmort.value = log(om_output_list[[1]]$f)
   ),
   survey1 = list(

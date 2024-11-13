@@ -52,10 +52,8 @@ create_default_parameters <- function(
     cli::cli_abort(c(
       "The name of the fleets for selectivity settings must match
       the fleet names from the data:",
-      "i" = "There {?is/are} {length(missmatch_fleet_names)}
-            fleet{?s} missing from the data.",
-      "x" = "The following fleet name{?s} {?is/are} missing from the data:
-            {paste(missmatch_fleet_names, collapse = ', ')}"
+      "x" = "The following {length(mismatch_fleet_names)} fleet name{?s} {?is/are} missing from the data:
+            {paste(mismatch_fleet_names, collapse = ', ')}"
     ))
   }
 
@@ -378,7 +376,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
     log_rzero.estimated = TRUE,
     logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
     logit_steep.estimated = FALSE,
-    log_devs.value = rep(0.0, data@n_years),
+    log_devs.value = rep(0.0, data@n_years-1),
     log_devs.estimated = TRUE,
     estimate_log_devs = TRUE
   )
@@ -564,15 +562,58 @@ update_parameters <- function(current_parameters, modified_parameters) {
     cli::cli_abort("The {.var modified_parameters} argument must be must be a named list.")
   }
 
-  new_param_input <- current_parameters$parameters
+  # Check if modified_parameters exists in current_parameters
+  missing_input <- setdiff(names(modified_parameters), names(current_parameters[["parameters"]]))
+  if (length(missing_input) > 0) {
+    cli::cli_abort(c(
+      "x" = "The following {length(missing_input)} input list{?s} from
+            {.var modified_parameters} {?is/are} missing from
+            {.var current_parameters}: {paste(missing_input, collapse = ', ')}"
+    ))
+  }
+
+  new_param_input <- current_parameters[["parameters"]]
   module_names <- names(new_param_input)
 
   # Update parameters for each module based on modified_parameters
-  for (i in seq_along(module_names)) {
-    parameter_names <- names(modified_parameters[[module_names[i]]])
-    new_param_input[[module_names[i]]][parameter_names] <- modified_parameters[[module_names[i]]]
-  }
+  for (module_name in module_names) {
+    if (module_name %in% names(modified_parameters)) {
+      modified_params <- modified_parameters[[module_name]]
+      current_params <- new_param_input[[module_name]]
 
+      for (param_name in names(modified_params)) {
+        # Check if the parameter exists in current_parameters
+        if (!param_name %in% names(current_params)) {
+          cli::cli_abort(c(
+            "x" = "{param_name} from {module_name} in {.var modified_parameters}
+                         does not exist in {.var current_parameters}."
+          ))
+        }
+
+        # Check if the length of the modified and current parameter match
+        if (!identical(length(modified_params[[param_name]]), length(current_params[[param_name]]))) {
+          cli::cli_abort(c(
+            "x" = "The length of {param_name} from {module_name}
+                          does not match between {.var modified_parameters} and {.var current_parameters}."
+          ))
+        }
+
+        # Check if the type of the modified and current parameter match
+        if (!identical(typeof(modified_params[[param_name]]), typeof(current_params[[param_name]]))) {
+          cli::cli_abort(c(
+            "x" = "The type of {param_name} from {module_name} does not match
+                         between {.var modified_parameters} and {.var current_parameters}."
+          ))
+        }
+
+        # Update the parameter if checks pass
+        current_params[[param_name]] <- modified_params[[param_name]]
+      }
+
+      # Assign the updated module parameters back to new_param_input
+      new_param_input[[module_name]] <- current_params
+    }
+  }
   # Create a new list for updated input
   new_input <- list(
     parameters = new_param_input,
