@@ -32,10 +32,16 @@ Data and variable values are taken from the [Li et. al.](https://spo.nmfs.noaa.g
 
 First let's set up the dimensions of the model based on the Model Comparison project:
 ```{r fims-dims}
+include_age_comps <- TRUE
+include_length_comps <- FALSE
 nyears <- 30 # the number of years which we have data for.
 nseasons <- 1 # the number of seasons in each year. FIMS currently defaults to 1
 ages <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12) # age vector.
 nages <- 12 # the number of age groups.
+if(include_length_comps){
+  comp_lengths <- seq(0,1100,50) # length vector.
+  nlengths <- 23 # the number of length bins.
+}
 ```
 
 ### Preparing Data using FIMSFrame
@@ -45,7 +51,11 @@ nages <- 12 # the number of age groups.
 ```{r fimsframe}
 # use FIMS data frame
 data(package = "FIMS")
-fims_frame <- FIMSFrame(data_mile1)
+if(include_length_comps){
+  fims_frame <- FIMSFrame(data_mile2)
+}else{
+  fims_frame <- FIMSFrame(data_mile1)
+}
 ```
 
 The `fims_frame` object contains a `@data` slot that holds a long data frame with catch data for the fishery and index data for the survey:
@@ -66,13 +76,25 @@ Using this data frame, we will start setting up the FIMS data objects. This exam
 ```{r data}
 # fishery data
 fishery_catch <- FIMS::m_landings(fims_frame)
-fishery_agecomp <- FIMS::m_agecomp(fims_frame, "fleet1")
 
 # survey data
 survey_index <- FIMS::m_index(fims_frame, "survey1")
 
-# survey agecomp not set up in fimsframe yet
+
+if(include_age_comps){
+# fishery agecomp
+fishery_agecomp <- FIMS::m_agecomp(fims_frame, "fleet1")
+# survey agecomp
 survey_agecomp <- FIMS::m_agecomp(fims_frame, "survey1")
+}
+
+if(include_length_comps){
+fishery_lengthcomp <- FIMS::m_lengthcomp(fims_frame, "fleet1")
+fishery_length_at_age <- FIMS::m_length_at_age(fims_frame, "fleet1")
+
+survey_lengthcomp <- FIMS::m_lengthcomp(fims_frame, "survey1")
+survey_length_at_age <- FIMS::m_length_at_age(fims_frame, "survey1")
+}
 ```
 
 ## Creating Modules in FIMS
@@ -88,18 +110,28 @@ Using the `methods::show()` function, we can see that the Index module has a vec
 
 ```{r fleet-show}
 show(Index)
-show(AgeComp)
+if(include_age_comps){show(AgeComp)}
 ```
 
 We'll create both index and age composition modules for the fleet using the `methods::new()` function and pass in the data defined above from the Model Comparison project.
 ```{r fleet-set-data}
 # fleet index data
 fishing_fleet_index <- methods::new(Index, nyears)
+fishing_fleet_index$index_data <- fishery_catch # unit: mt
+
+
+if(include_age_comps){
 # fleet age composition data
 fishing_fleet_age_comp <- methods::new(AgeComp, nyears, nages)
-fishing_fleet_index$index_data <- fishery_catch # unit: mt
 # Effective sampling size is 200
 fishing_fleet_age_comp$age_comp_data <- fishery_agecomp * 200 # unit: number at age; proportion at age also works
+}
+
+if(include_length_comps){
+fishing_fleet_length_comp <- methods::new(LengthComp, nyears, nlengths)
+# Effective sampling size is 200
+fishing_fleet_length_comp$length_comp_data <- fishery_lengthcomp * 200 # unit:
+}
 ```
 
 #### Fleet Selectivity
@@ -165,7 +197,16 @@ fishing_fleet$estimate_q <- FALSE
 fishing_fleet$random_q <- FALSE
 # Set Index, AgeComp, and Selectivity using the IDs from the modules defined above
 fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
-fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
+
+if(include_age_comps){
+  fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
+}
+
+if(include_length_comps){
+  fishing_fleet$nlengths <- nlengths
+  fishing_fleet$SetObservedLengthCompData(fishing_fleet_length_comp$get_id())
+}
+
 fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
 ```
 
@@ -184,11 +225,29 @@ fishing_fleet_index_distribution <- new_data_distribution(
 
 Now we will set up the distribution for the fishery age composition data using the Multinomial distribution
 ```{r fleet-age-comp-distribution}
-fishing_fleet_agecomp_distribution <- new_data_distribution(
+
+if(include_age_comps){
+  fishing_fleet_agecomp_distribution <- new_data_distribution(
   module = fishing_fleet,
   family = multinomial(link = "logit"),
   data_type = "agecomp"
 )
+
+}
+
+if(include_length_comps){
+  fishing_fleet_lengthcomp_distribution <- new_data_distribution(
+  module = fishing_fleet,
+  family = multinomial(link = "logit"),
+  data_type = "lengthcomp"
+)
+    #Set length-at-age conversion matrix
+  fishing_fleet$age_length_conversion_matrix <- new(ParameterVector,fishery_length_at_age,nages*nlengths)
+  # Turn off estimation for length-at-age
+  fishing_fleet$age_length_conversion_matrix$set_all_estimable(FALSE)
+  fishing_fleet$age_length_conversion_matrix$set_all_random(FALSE)
+}
+
 ```
 ### The Survey Module
 We will now repeat the steps from Fleet to set up the Survey. A survey object is essentially the same as a fleet object with a catchability (q) variable.
@@ -198,11 +257,21 @@ We will now repeat the steps from Fleet to set up the Survey. A survey object is
 ```{r survey-set-data}
 # fleet index data
 survey_fleet_index <- methods::new(Index, nyears)
+survey_fleet_index$index_data <- survey_index # unit: mt; it's possible to use other units as long as the index is assumed to be proportional to biomass
+
+if(include_age_comps){
 # survey age composition data
 survey_fleet_age_comp <- methods::new(AgeComp, nyears, nages)
-survey_fleet_index$index_data <- survey_index # unit: mt; it's possible to use other units as long as the index is assumed to be proportional to biomass
 # Effective sampling size is 200
 survey_fleet_age_comp$age_comp_data <- survey_agecomp * 200 # unit: number at age; proportion at age also works
+}
+
+if(include_length_comps){
+  survey_fleet_length_comp <- methods::new(LengthComp, nyears, nlengths)
+# Effective sampling size is 200
+survey_fleet_length_comp$length_comp_data <- survey_lengthcomp * 200 # unit:
+}
+
 ```
 
 #### Survey Selectivity
@@ -231,8 +300,17 @@ survey_fleet$log_q[1]$value <- log(3.315143e-07)
 survey_fleet$estimate_q <- TRUE
 survey_fleet$random_q <- FALSE
 survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
-survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
 survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
+
+if(include_age_comps){
+survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
+}
+
+if(include_length_comps){
+survey_fleet$nlengths <- nlengths
+survey_fleet$SetObservedLengthCompData(survey_fleet_length_comp$get_id())
+}
+
 ```
 
 ```{r survey-distribution}
@@ -246,12 +324,28 @@ survey_fleet_index_distribution <- new_data_distribution(
   data_type = "index"
 )
 
+
+if(include_age_comps){
 # Age composition data
 survey_fleet_agecomp_distribution <- new_data_distribution(
   module = survey_fleet,
   family = multinomial(link = "logit"),
   data_type = "agecomp"
 )
+}
+
+if(include_length_comps){
+survey_fleet_lengthcomp_distribution <- new_data_distribution(
+  module = survey_fleet,
+  family = multinomial(link = "logit"),
+  data_type = "lengthcomp"
+)
+#Set length-at-age conversion matrix
+survey_fleet$age_length_conversion_matrix <- new(ParameterVector,survey_length_at_age,nages*nlengths)
+# Turn off estimation for length-at-age
+survey_fleet$age_length_conversion_matrix$set_all_estimable(FALSE)
+survey_fleet$age_length_conversion_matrix$set_all_random(FALSE)
+}
 ```
 
 ### Creating a Population
