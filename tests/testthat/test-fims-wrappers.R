@@ -3,15 +3,15 @@
 #   fleet1 = list(
 #     selectivity = list(form = "LogisticSelectivity"),
 #     data_distribution = c(
-#       Index = "TMBDlnormDistribution",
-#       AgeComp = "TMBDmultinomDistribution"
+#       Index = "DlnormDistribution",
+#       AgeComp = "DmultinomDistribution"
 #     )
 #   ),
 #   survey1 = list(
 #     selectivity = list(form = "LogisticSelectivity"),
 #     data_distribution = c(
-#       Index = "TMBDlnormDistribution",
-#       AgeComp = "TMBDmultinomDistribution"
+#       Index = "DlnormDistribution",
+#       AgeComp = "DmultinomDistribution"
 #     )
 #   )
 # )
@@ -24,7 +24,7 @@
 #     fleets = fleets,
 #     recruitment = list(
 #       form = "BevertonHoltRecruitment",
-#       process_distribution = c(log_devs = "TMBDnormDistribution")
+#       process_distribution = c(log_devs = "DnormDistribution")
 #     ),
 #     growth = list(form = "EWAAgrowth"),
 #     maturity = list(form = "LogisticMaturity")

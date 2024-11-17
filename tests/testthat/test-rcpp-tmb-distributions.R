@@ -10,7 +10,7 @@ test_that("normal_lpdf", {
   y <- stats::rnorm(1)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- new(TMBDnormDistribution)
+  dnorm_ <- new(DnormDistribution)
   # populate class members
   dnorm_$x <- new(ParameterVector, y, 1)
   dnorm_$expected_values <- new(ParameterVector, 0, 1)
@@ -25,7 +25,7 @@ test_that("normal_lpdf", {
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- new(TMBDnormDistribution)
+  dnorm_ <- new(DnormDistribution)
   # populate class members
   dnorm_$x <- new(ParameterVector, y, 10)
   dnorm_$expected_values <- new(ParameterVector, 0, 1)
@@ -40,7 +40,7 @@ test_that("normal_lpdf", {
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- new(TMBDnormDistribution)
+  dnorm_ <- new(DnormDistribution)
   # populate class members
   dnorm_$x <- new(ParameterVector, y, 10)
   dnorm_$expected_values <- new(ParameterVector, rep(0, 10), 10)
@@ -54,7 +54,7 @@ test_that("normal_lpdf", {
   # y <- stats::rnorm(10)
   # # create a fims Rcpp object
   # # initialize the Dnorm module
-  # dnorm_ <- new(TMBDnormDistribution)
+  # dnorm_ <- new(DnormDistribution)
   # # populate class members
   # dnorm_$x <- new(FIMS:::ParameterVector, y, 10)
   # dnorm_$expected_values <- new(FIMS:::ParameterVector, 0, 11)
@@ -74,7 +74,7 @@ test_that("lognormal_lpdf", {
 
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- new(TMBDlnormDistribution)
+  dlnorm_ <- new(DlnormDistribution)
   # populate class members
   dlnorm_$x <- new(ParameterVector, y, 1)
   dlnorm_$expected_values <- new(ParameterVector, 0, 1)
@@ -89,7 +89,7 @@ test_that("lognormal_lpdf", {
 
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- new(TMBDlnormDistribution)
+  dlnorm_ <- new(DlnormDistribution)
   # populate class members
   dlnorm_$x <- new(ParameterVector, y, 10)
   dlnorm_$expected_values <- new(ParameterVector, 0, 1)
@@ -105,7 +105,7 @@ test_that("lognormal_lpdf", {
 
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- new(TMBDlnormDistribution)
+  dlnorm_ <- new(DlnormDistribution)
   # populate class members
   dlnorm_$x <- new(ParameterVector, y, 10)
   dlnorm_$expected_values <- new(ParameterVector, rep(0, 10), 10)
@@ -120,7 +120,7 @@ test_that("lognormal_lpdf", {
   #
   # # create a fims Rcpp object
   # # initialize the Dlnorm module
-  # dlnorm_ <- new(TMBDlnormDistribution)
+  # dlnorm_ <- new(DlnormDistribution)
   # # populate class members
   # dlnorm_$x <- new(ParameterVector, y, 10)
   # dlnorm_$expected_values <- new(ParameterVector, 0, 11)
@@ -135,7 +135,7 @@ test_that("multinomial_lpdf", {
   x <- t(stats::rmultinom(1, 100, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- new(TMBDmultinomDistribution)
+  dmultinom_ <- new(DmultinomDistribution)
   # populate class members
   dmultinom_$expected_values <- new(ParameterVector, p, 10)
   dmultinom_$dims <- c(1, 10)
