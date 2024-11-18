@@ -119,7 +119,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
-    for(int i; i<ids.size(); i++){
+    for(R_xlen_t i; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
 
@@ -178,7 +178,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
                     std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double> >(it->second);
 
             this->lpdf_vec = Rcpp::NumericVector(dnorm->lpdf_vec.size());
-            for(size_t i=0; i < this->lpdf_vec.size(); i++) {
+            for(R_xlen_t i=0; i < this->lpdf_vec.size(); i++) {
                 this->lpdf_vec[i] = dnorm->lpdf_vec[i];
             }
 
@@ -204,7 +204,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         if (this->lpdf_vec.size() == 0) {
             ss << "]\n";
         } else {
-            for(size_t i=0; i < this->lpdf_vec.size() - 1; i++) {
+            for(R_xlen_t i=0; i < this->lpdf_vec.size() - 1; i++) {
                 ss << this->lpdf_vec[i] << ", ";
             }
             ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
@@ -231,21 +231,21 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
     distribution->key.resize(this->key_m.size());
-    for(size_t i=0; i<this->key_m.size(); i++){
+    for(R_xlen_t i=0; i<this->key_m.size(); i++){
       distribution->key[i] = this->key_m[i];
     }
     distribution->id = this->id_m;
     distribution->x.resize(this->x.size());
-    for(size_t i=0; i<this->x.size(); i++){
+    for(R_xlen_t i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
-    for(size_t i=0; i<this->expected_values.size(); i++) {
+    for(R_xlen_t i=0; i<this->expected_values.size(); i++) {
         distribution->expected_values[i] = this->expected_values[i].initial_value_m;
     }
     distribution->log_sd.resize(this->log_sd.size());
-    for(size_t i=0; i<this->log_sd.size(); i++){
+    for(R_xlen_t i=0; i<this->log_sd.size(); i++){
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
       if(this->log_sd[i].estimated_m){
         info->RegisterParameterName("normal log_sd");
@@ -321,7 +321,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
-    for(int i; i<ids.size(); i++){
+    for(R_xlen_t i; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
 
@@ -341,13 +341,13 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_logsd.resize(this->log_logsd.size());
-    for(size_t i=0; i<x.size(); i++){
+    for(R_xlen_t i=0; i<x.size(); i++){
       dlnorm.x[i] = this->x[i].initial_value_m;
     }
-    for(size_t i=0; i<expected_values.size(); i++){
+    for(R_xlen_t i=0; i<expected_values.size(); i++){
       dlnorm.expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    for(size_t i=0; i<log_logsd.size(); i++){
+    for(R_xlen_t i=0; i<log_logsd.size(); i++){
       dlnorm.log_logsd[i] = this->log_logsd[i].initial_value_m;
     }
     return dlnorm.evaluate();
@@ -381,7 +381,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
                     std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double> >(it->second);
 
             this->lpdf_vec = Rcpp::NumericVector(dlnorm->lpdf_vec.size());
-            for(size_t i=0; i < this->lpdf_vec.size(); i++) {
+            for(R_xlen_t i=0; i < this->lpdf_vec.size(); i++) {
                 this->lpdf_vec[i] = dlnorm->lpdf_vec[i];
             }
 
@@ -407,7 +407,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         if (this->lpdf_vec.size() == 0) {
             ss << "]\n";
         } else {
-            for(size_t i=0; i < this->lpdf_vec.size() - 1; i++) {
+            for(R_xlen_t i=0; i < this->lpdf_vec.size() - 1; i++) {
                 ss << this->lpdf_vec[i] << ", ";
             }
             ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
@@ -435,20 +435,20 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
     distribution->key.resize(this->key_m.size());
-    for(size_t i=0; i<this->key_m.size(); i++){
+    for(R_xlen_t i=0; i<this->key_m.size(); i++){
       distribution->key[i] = this->key_m[i];
     }
     distribution->x.resize(this->x.size());
-    for(size_t i=0; i<this->x.size(); i++){
+    for(R_xlen_t i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
-    for(size_t i=0; i<this->expected_values.size(); i++){
+    for(R_xlen_t i=0; i<this->expected_values.size(); i++){
       distribution->expected_values[i] = this->expected_values[i].initial_value_m;
     }
     distribution->log_logsd.resize(this->log_logsd.size());
-    for(size_t i=0; i<this->log_logsd.size(); i++){
+    for(R_xlen_t i=0; i<this->log_logsd.size(); i++){
       distribution->log_logsd[i] = this->log_logsd[i].initial_value_m;
       if(this->log_logsd[i].estimated_m){
         info->RegisterParameterName("lognormal log_logsd");
@@ -523,7 +523,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
-    for(int i; i<ids.size(); i++){
+    for(R_xlen_t i; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
 
@@ -542,10 +542,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     // Declare TMBVector in this scope
     dmultinom.x.resize(this->x.size());
     dmultinom.expected_values.resize(this->expected_values.size());
-    for(size_t i=0; i<x.size(); i++){
+    for(R_xlen_t i=0; i<x.size(); i++){
       dmultinom.x[i] = this->x[i].initial_value_m;
     }
-    for(size_t i=0; i<expected_values.size(); i++){
+    for(R_xlen_t i=0; i<expected_values.size(); i++){
       dmultinom.expected_values[i] = this->expected_values[i].initial_value_m;
     }
     dmultinom.dims.resize(2);
@@ -569,16 +569,16 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
     distribution->key.resize(this->key_m.size());
-    for(size_t i=0; i<this->key_m.size(); i++){
+    for(R_xlen_t i=0; i<this->key_m.size(); i++){
       distribution->key[i] = this->key_m[i];
     }
     distribution->x.resize(this->x.size());
-    for(size_t i=0; i<this->x.size(); i++){
+    for(R_xlen_t i=0; i<this->x.size(); i++){
       distribution->x[i] = this->x[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
-    for(size_t i=0; i<this->expected_values.size(); i++){
+    for(R_xlen_t i=0; i<this->expected_values.size(); i++){
       distribution->expected_values[i] = this->expected_values[i].initial_value_m;
     }
     if(this->dims.size()>0){

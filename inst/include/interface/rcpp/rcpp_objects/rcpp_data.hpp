@@ -94,7 +94,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
     ss << " \"rank\": " << 2 << ",\n";
     ss << " \"dimensions\": [" << this->ymax << "," << this->amax << "],\n";
     ss << " \"values\": [";
-    for (size_t i = 0; i < age_comp_data.size() - 1; i++) {
+    for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++) {
       ss << age_comp_data[i] << ", ";
     }
     ss << age_comp_data[age_comp_data.size() - 1] << "]\n";
@@ -183,7 +183,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     ss << " \"rank\": " << 2 << ",\n";
     ss << " \"dimensions\": [" << this->ymax << "," << this->lmax << "],\n";
     ss << " \"values\": [";
-    for (size_t i = 0; i < length_comp_data.size() - 1; i++) {
+    for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++) {
       ss << length_comp_data[i] << ", ";
     }
     ss << length_comp_data[length_comp_data.size() - 1] << "]\n";
@@ -268,7 +268,7 @@ class IndexDataInterface : public DataInterfaceBase {
     ss << " \"rank\": " << 1 << ",\n";
     ss << " \"dimensions\": [" << this->ymax << "],\n";
     ss << " \"values\": [";
-    for (size_t i = 0; i < index_data.size() - 1; i++) {
+    for (R_xlen_t i = 0; i < index_data.size() - 1; i++) {
       ss << index_data[i] << ", ";
     }
     ss << index_data[index_data.size() - 1] << "]\n";

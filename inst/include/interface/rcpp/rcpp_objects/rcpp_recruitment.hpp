@@ -123,7 +123,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
             std::shared_ptr<fims_popdy::SRBevertonHolt<double> > recr =
                     std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double> >(it->second);
 
-            for (size_t i = 0; i < this->logit_steep.size(); i++) {
+            for (R_xlen_t i = 0; i < this->logit_steep.size(); i++) {
                 if (this->logit_steep[i].estimated_m) {
                     this->logit_steep[i].final_value_m = recr->logit_steep[i];
                 } else {
@@ -131,7 +131,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
                 }
             }
 
-            for (size_t i = 0; i < log_rzero.size(); i++) {
+            for (R_xlen_t i = 0; i < log_rzero.size(); i++) {
                 if (log_rzero[i].estimated_m) {
                     this->log_rzero[i].final_value_m = recr->log_rzero[i];
                 } else {
@@ -139,7 +139,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
                 }
             }
 
-            for (size_t i = 0; i < this->estimated_log_devs.size(); i++) {
+            for (R_xlen_t i = 0; i < this->estimated_log_devs.size(); i++) {
                 if (this->log_devs[i].estimated_m) {
                     this->log_devs[i].final_value_m = recr->log_recruit_devs[i];
                 } else {
@@ -198,7 +198,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     recruitment->id = this->id;
     //set logit_steep
         recruitment->logit_steep.resize(this->logit_steep.size());
-        for (size_t i = 0; i < this->logit_steep.size(); i++) {
+        for (R_xlen_t i = 0; i < this->logit_steep.size(); i++) {
 
             recruitment->logit_steep[i] = this->logit_steep[i].initial_value_m;
 
@@ -218,7 +218,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
         //set log_rzero
         recruitment->log_rzero.resize(this->log_rzero.size());
-        for (size_t i = 0; i < this->log_rzero.size(); i++) {
+        for (R_xlen_t i = 0; i < this->log_rzero.size(); i++) {
 
             recruitment->log_rzero[i] = this->log_rzero[i].initial_value_m;
 
@@ -236,7 +236,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
         //set log_recruit_devs
         recruitment->log_recruit_devs.resize(this->log_devs.size());
-        for (size_t i = 0; i < this->log_devs.size(); i++) {
+        for (R_xlen_t i = 0; i < this->log_devs.size(); i++) {
             recruitment->log_recruit_devs[i] = this->log_devs[i].initial_value_m;
             if (this->log_devs[i].estimated_m) {
                 info->RegisterParameter(recruitment->log_recruit_devs[i]);

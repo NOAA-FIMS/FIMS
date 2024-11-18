@@ -193,7 +193,8 @@ public:
      *  @param pos return a Parameter at position "pos".
      */
     SEXP at(R_xlen_t pos){
-        if (pos == 0 || pos > this->storage_m->size()) {
+        if (static_cast<size_t>(pos) == 0 ||
+                static_cast<size_t>(pos)  > this->storage_m->size()) {
             Rcpp::Rcout << "ParameterVector: Index out of range.\n";
             FIMS_ERROR_LOG(fims::to_string(pos) + "!<" + fims::to_string(this->size()));
             return NULL;

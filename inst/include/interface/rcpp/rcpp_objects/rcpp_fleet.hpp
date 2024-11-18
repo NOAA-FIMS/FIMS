@@ -181,7 +181,7 @@ public:
                     std::dynamic_pointer_cast<fims_popdy::Fleet<double> >(it->second);
 
 
-            for (size_t i = 0; i < this->log_Fmort.size(); i++) {
+            for (R_xlen_t i = 0; i < this->log_Fmort.size(); i++) {
                 if (this->log_Fmort[i].estimated_m) {
                     this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
                 } else {
@@ -189,7 +189,7 @@ public:
                 }
             }
 
-            for (size_t i = 0; i < this->log_q.size(); i++) {
+            for (R_xlen_t i = 0; i < this->log_q.size(); i++) {
                 if (this->log_q[i].estimated_m) {
                     this->log_q[i].final_value_m = fleet->log_q[i];
                 } else {
@@ -198,32 +198,32 @@ public:
             }
 
             this->derived_cnaa = Rcpp::NumericVector(fleet->catch_numbers_at_age.size());
-            for (size_t i = 0; i < this->derived_cnaa.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_cnaa.size(); i++) {
                 this->derived_cnaa[i] = fleet->catch_numbers_at_age[i];
             }
 
             this->derived_cnal = Rcpp::NumericVector(fleet->catch_numbers_at_length.size());
-            for (size_t i = 0; i < this->derived_cnal.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_cnal.size(); i++) {
                 this->derived_cnal[i] = fleet->catch_numbers_at_length[i];
             }
 
             this->derived_cwaa = Rcpp::NumericVector(fleet->catch_weight_at_age.size());
-            for (size_t i = 0; i < this->derived_cwaa.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_cwaa.size(); i++) {
                 this->derived_cwaa[i] = fleet->catch_weight_at_age[i];
             }
 
             this->derived_age_composition = Rcpp::NumericVector(fleet->proportion_catch_numbers_at_age.size());
-            for (size_t i = 0; i < this->derived_age_composition.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_age_composition.size(); i++) {
                 this->derived_age_composition[i] = fleet->proportion_catch_numbers_at_age[i];
             }
 
             this->derived_length_composition = Rcpp::NumericVector(fleet->proportion_catch_numbers_at_length.size());
-            for (size_t i = 0; i < this->derived_length_composition.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_length_composition.size(); i++) {
                 this->derived_length_composition[i] = fleet->proportion_catch_numbers_at_length[i];
             }
 
             this->derived_index = Rcpp::NumericVector(fleet->expected_index.size());
-            for (size_t i = 0; i < this->derived_index.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_index.size(); i++) {
                 this->derived_index[i] = fleet->expected_index[i];
             }
 
@@ -263,7 +263,7 @@ public:
         if (this->derived_cnaa.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_cnaa.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_cnaa.size() - 1; i++) {
                 ss << this->derived_cnaa[i] << ", ";
             }
             ss << this->derived_cnaa[this->derived_cnaa.size() - 1] << "]\n";
@@ -276,7 +276,7 @@ public:
         if (this->derived_cnal.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_cnal.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_cnal.size() - 1; i++) {
                 ss << this->derived_cnal[i] << ", ";
             }
             ss << this->derived_cnal[this->derived_cnal.size() - 1] << "]\n";
@@ -289,7 +289,7 @@ public:
         if (this->derived_cwaa.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_cwaa.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_cwaa.size() - 1; i++) {
                 ss << this->derived_cwaa[i] << ", ";
             }
             ss << this->derived_cwaa[this->derived_cwaa.size() - 1] << "]\n";
@@ -303,7 +303,7 @@ public:
         if (this->derived_age_composition.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_age_composition.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_age_composition.size() - 1; i++) {
                 ss << this->derived_age_composition[i] << ", ";
             }
             ss << this->derived_age_composition[this->derived_age_composition.size() - 1] << "]\n";
@@ -316,7 +316,7 @@ public:
         if (this->derived_length_composition.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_length_composition.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_length_composition.size() - 1; i++) {
                 ss << this->derived_length_composition[i] << ", ";
             }
             ss << this->derived_length_composition[this->derived_length_composition.size() - 1] << "]\n";
@@ -329,7 +329,7 @@ public:
         if (this->derived_index.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_index.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_index.size() - 1; i++) {
                 ss << this->derived_index[i] << ", ";
             }
             ss << this->derived_index[this->derived_index.size() - 1] << "]\n";
@@ -366,7 +366,7 @@ public:
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
 
     fleet->log_q.resize(this->log_q.size());
-    for (size_t i = 0; i < this->log_q.size(); i++) {
+    for (R_xlen_t i = 0; i < this->log_q.size(); i++) {
         fleet->log_q[i] = this->log_q[i].initial_value_m;
 
       if (this->log_q[i].estimated_m) {
@@ -381,7 +381,7 @@ public:
 
 
     fleet->log_Fmort.resize(this->log_Fmort.size());
-    for (size_t i = 0; i < log_Fmort.size(); i++) {
+    for (R_xlen_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
 
       if (this->log_Fmort[i].estimated_m) {
@@ -404,7 +404,7 @@ public:
     if(this->nlengths > 0){
       fleet->proportion_catch_numbers_at_length.resize(nyears * nlengths);
       fleet->age_length_conversion_matrix.resize(nages * nlengths);
-      for (size_t i = 0; i < fleet->age_length_conversion_matrix.size(); i++){
+      for (R_xlen_t i = 0; i < fleet->age_length_conversion_matrix.size(); i++){
         fleet->age_length_conversion_matrix[i] = this->age_length_conversion_matrix[i].initial_value_m;
         
         if (this->age_length_conversion_matrix[i].estimated_m) {

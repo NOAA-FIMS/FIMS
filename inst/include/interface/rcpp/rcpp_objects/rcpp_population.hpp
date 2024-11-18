@@ -135,17 +135,17 @@ class PopulationInterface : public PopulationInterfaceBase {
 
 
         this->estimated_log_M = Rcpp::NumericVector(this->log_M.size());
-        for (size_t i = 0; i < this->log_M.size(); i++) {
+        for (R_xlen_t i = 0; i < this->log_M.size(); i++) {
             this->estimated_log_M[i] = this->log_M[i].initial_value_m;
         }
 
         this->estimated_log_init_naa = Rcpp::NumericVector(this->log_init_naa.size());
-        for (size_t i = 0; i < this->log_init_naa.size(); i++) {
+        for (R_xlen_t i = 0; i < this->log_init_naa.size(); i++) {
             this->estimated_log_init_naa[i] = this->log_init_naa[i].initial_value_m;
         }
 
         this->estimated_proportion_female = Rcpp::NumericVector(this->proportion_female.size());
-        for (size_t i = 0; i < this->proportion_female.size(); i++) {
+        for (R_xlen_t i = 0; i < this->proportion_female.size(); i++) {
             this->estimated_proportion_female[i] = this->proportion_female[i];
         }
 
@@ -163,19 +163,19 @@ class PopulationInterface : public PopulationInterfaceBase {
         } else {
 
             if (this->estimated_log_M) {
-                for (size_t i = 0; i < this->log_M.size(); i++) {
+                for (R_xlen_t i = 0; i < this->log_M.size(); i++) {
                     this->estimated_log_M[i] = pop->log_M[i];
                 }
             }
 
             if (this->estimated_log_init_naa) {
-                for (size_t i = 0; i < this->log_init_naa.size(); i++) {
+                for (R_xlen_t i = 0; i < this->log_init_naa.size(); i++) {
                     this->estimated_log_init_naa[i] = pop->log_init_naa[i];
                 }
             }
 
             if (this->estimate_prop_female) {
-                for (size_t i = 0; i < this->proportion_female.size(); i++) {
+                for (R_xlen_t i = 0; i < this->proportion_female.size(); i++) {
                     this->estimated_proportion_female[i] = pop->proportion_female[i];
                 }
             }
@@ -186,22 +186,22 @@ class PopulationInterface : public PopulationInterfaceBase {
             this->derived_recruitment = Rcpp::NumericVector(pop->expected_recruitment.size());
 
             //set naa from Information/
-            for (size_t i = 0; i < this->derived_naa.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_naa.size(); i++) {
                 this->derived_naa[i] = pop->numbers_at_age[i];
             }
 
             //set ssb from Information/
-            for (size_t i = 0; i < this->derived_ssb.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_ssb.size(); i++) {
                 this->derived_ssb[i] = pop->spawning_biomass[i];
             }
 
             //set biomass from Information
-            for (size_t i = 0; i < this->derived_biomass.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_biomass.size(); i++) {
                 this->derived_biomass[i] = pop->biomass[i];
             }
 
             //set recruitment from Information/
-            for (size_t i = 0; i < this->derived_recruitment.size(); i++) {
+            for (R_xlen_t i = 0; i < this->derived_recruitment.size(); i++) {
                 this->derived_recruitment[i] = pop->expected_recruitment[i];
             }
 
@@ -250,7 +250,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         if (this->derived_ssb.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_ssb.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_ssb.size() - 1; i++) {
                 ss << this->derived_ssb[i] << ", ";
             }
             ss << this->derived_ssb[this->derived_ssb.size() - 1] << "]\n";
@@ -263,7 +263,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         if (this->derived_naa.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_naa.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_naa.size() - 1; i++) {
                 ss << this->derived_naa[i] << ", ";
             }
             ss << this->derived_naa[this->derived_naa.size() - 1] << "]\n";
@@ -276,7 +276,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         if (this->derived_biomass.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_biomass.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_biomass.size() - 1; i++) {
                 ss << this->derived_biomass[i] << ", ";
             }
             ss << this->derived_biomass[this->derived_biomass.size() - 1] << "]\n";
@@ -289,7 +289,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         if (this->derived_recruitment.size() == 0) {
             ss << "]\n";
         } else {
-            for (size_t i = 0; i < this->derived_recruitment.size() - 1; i++) {
+            for (R_xlen_t i = 0; i < this->derived_recruitment.size() - 1; i++) {
                 ss << this->derived_recruitment[i] << ", ";
             }
             ss << this->derived_recruitment[this->derived_recruitment.size() - 1] << "]\n";
@@ -329,7 +329,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->maturity_id = this->maturity_id;
     population->log_M.resize(this->log_M.size());
     population->log_init_naa.resize(this->log_init_naa.size());
-    for (size_t i = 0; i < log_M.size(); i++) {
+    for (R_xlen_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].initial_value_m;
       if (this->log_M[i].estimated_m) {
           info->RegisterParameterName("log_M");
@@ -338,7 +338,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
 
-    for (size_t i = 0; i < log_init_naa.size(); i++) {
+    for (R_xlen_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
       if (this->log_init_naa[i].estimated_m) {
         info->RegisterParameterName("log_init_naa");
@@ -346,10 +346,10 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
-    for (int i = 0; i < ages.size(); i++) {
+    for (R_xlen_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
-    for (int i = 0; i < proportion_female.size(); i++) {
+    for (R_xlen_t i = 0; i < proportion_female.size(); i++) {
       population->proportion_female[i] = this->proportion_female[i];
       if (estimate_prop_female) {
         info->RegisterParameter(population->proportion_female[i]);
