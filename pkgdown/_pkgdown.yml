@@ -25,6 +25,7 @@ articles:
 - title: Developer
   contents:
   - fims-path-maturity
+  - logging_system
 
 reference:
 - title: Data
@@ -33,6 +34,7 @@ reference:
       examples to illustrate various visualisation challenges.
   contents:
   - data_mile1
+  - data_mile2
 
 - title: Package development
   desc: Primary functions used when developing FIMS package.
@@ -40,6 +42,10 @@ reference:
   - has_keyword("gtest_helper")
   - starts_with("FIMSFrame")
   - starts_with("m_")
+  - has_keyword("set_methods")
+  - has_keyword("distribution")
+  - has_keyword("fit_fims")
+  - is_fims_verbose
 
 news:
   releases:

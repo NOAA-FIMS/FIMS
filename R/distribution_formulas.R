@@ -4,6 +4,7 @@
 #' [new_process_distribution()].
 #'
 #' @param args A list of input arguments.
+#' @keywords distribution
 #' @noRd
 #' @return
 #' Nothing is returned if the check is successful, and error messages are
@@ -85,6 +86,7 @@ check_distribution_validity <- function(args) {
 #' Return name of expected value
 #'
 #' @inheritParams new_data_distribution
+#' @keywords distribution
 #' @noRd
 #' @return
 #' A string specifying the name of the expected value.
@@ -128,6 +130,7 @@ get_expected_name <- function(family, data_type) {
 #' @return
 #' Reference Class. Use [show()] to view Rcpp class fields, methods, and
 #' documentation.
+#' @keywords distribution
 #' @export
 #' @examples
 #' \dontrun{
@@ -138,8 +141,7 @@ get_expected_name <- function(family, data_type) {
 #' fleet_distribution <- new_data_distribution(
 #'   module = fishing_fleet,
 #'   family = lognormal(link = "log"),
-#'   sd = list(value = rep(sqrt(log(0.01^2 + 1)), nyears),
-#'   estimated = rep(FALSE, nyears),
+#'   sd = list(value = rep(sqrt(log(0.01^2 + 1)), nyears), estimated = FALSE),
 #'   data_type = "index"
 #' )
 #' }
@@ -234,6 +236,7 @@ new_data_distribution <- function(
 #'   estimated as a random effect.
 #' @seealso
 #' * [new_data_distribution()]
+#' @keywords distribution
 #' @export
 #' @return
 #' Reference Class. Use `show()` to view Rcpp class fields, methods, and
@@ -351,6 +354,7 @@ new_process_distribution <- function(module,
 #' * [stats::glm()]
 #' * [stats::power()]
 #' * [stats::make.link()]
+#' @keywords distribution
 #' @export
 #' @examples
 #' a_family <- multinomial()
@@ -366,6 +370,7 @@ lognormal <- function(link = "log") {
 }
 
 #' @rdname lognormal
+#' @keywords distribution
 #' @export
 multinomial <- function(link = "logit") {
   family_class <- c(

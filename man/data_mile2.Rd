@@ -9,8 +9,7 @@ A data frame with 19080 observations of
 9 variables:
 \describe{
 \item{type}{The type of data the row contains. Allowed types include
-\code{age}, \code{length-comp}, \code{length-at-age}, \code{index}, \code{landings}, 
-and \code{weight-at-age} data.}
+\code{age}, \code{length-comp}, \code{length-at-age}, \code{index}, \code{landings}, and \code{weight-at-age} data.}
 \item{name}{A character string providing the name of the information source
 that the data was collected from, e.g., \code{"Trawl fishery"}}
 \item{age}{An integer age. Entry can be \code{NA} if information pertains to
@@ -43,7 +42,8 @@ data_mile2
 }
 \description{
 A dataset containing information necessary to run an age-structured stock
-assessment model with length composition data in FIMS for milestone 2. This 
-data was generated using the \code{ASSAMC} package written for the \href{www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison}{model comparison project}.
+assessment model with length composition data in FIMS for milestone 2 .
+This data was generated using
+the \code{ASSAMC} package written for the \href{www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison}{model comparison project}.
 }
 \keyword{datasets}

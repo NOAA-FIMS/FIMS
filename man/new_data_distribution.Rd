@@ -47,9 +47,9 @@ fleet <- methods::new(Fleet)
 fleet_distribution <- new_data_distribution(
   module = fishing_fleet,
   family = lognormal(link = "log"),
-  sd = list(value = rep(sqrt(log(0.01^2 + 1)), nyears),
-  estimated = rep(FALSE, nyears),
+  sd = list(value = rep(sqrt(log(0.01^2 + 1)), nyears), estimated = FALSE),
   data_type = "index"
 )
 }
 }
+\keyword{distribution}

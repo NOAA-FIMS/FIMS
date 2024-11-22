@@ -12,3 +12,4 @@ is.FIMSFit(x)
 \description{
 Check if an object is of class FIMSFit
 }
+\keyword{fit_fims}

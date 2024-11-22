@@ -63,3 +63,4 @@ recruitment_distribution <- new_process_distribution(
 \item \code{\link[=new_data_distribution]{new_data_distribution()}}
 }
 }
+\keyword{distribution}
