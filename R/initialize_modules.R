@@ -6,9 +6,8 @@
 #' @param parameters A list. Contains parameters and modules required for initialization.
 #' @param data An S4 object. FIMS input data.
 #' @param module_name A character. Name of the module to initialize (e.g., "population" or "fleet").
-#' @name initialize_module
 #' @return The initialized module as an object.
-#' @export
+#' @noRd
 initialize_module <- function(parameters, data, module_name) {
   # TODO: how to return all modules between pipes and create links between modules?
   # # Retrieve all objects in the environment
@@ -23,9 +22,7 @@ initialize_module <- function(parameters, data, module_name) {
   }
 
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Validate module_name
   if (!is.character(module_name) || length(module_name) != 1) {
@@ -153,10 +150,9 @@ initialize_module <- function(parameters, data, module_name) {
 #' such as data_link and fleet_link for setting up index distribution.
 #' @rdname initialize_module
 #' @return The initialized distribution module as an object.
-#' @export
+#' @noRd
 initialize_distribution <- function(module_input, distribution_name,
-                                    distribution_type, linked_ids) {
-
+                                    distribution_type = c("data", "process"), linked_ids) {
   # Check if distribution_name is provided
   if (is.null(distribution_name)) {
     return(NULL)
@@ -168,9 +164,12 @@ initialize_distribution <- function(module_input, distribution_name,
   }
 
   # Validate distribution_type as "data" or "process"
-  if (!distribution_type %in% c("data", "process")) {
-    cli::cli_abort("{.var distribution_type} must be either 'data' or 'process'.")
-  }
+  valid_distribution_types <- c("data", "process")
+  check_valid_input(
+    input = distribution_type,
+    valid_options = valid_distribution_types,
+    arg_name = "distribution_type"
+  )
 
   # Validate linked_ids as a named vector with required elements for "data" type
   if (!is.vector(linked_ids) || !all(c("data_link", "fleet_link") %in% names(linked_ids))) {
@@ -207,9 +206,7 @@ initialize_distribution <- function(module_input, distribution_name,
       # Process distribution initialization
       distribution_module$set_distribution_links("random_effects", linked_ids)
     },
-    {
-      cli::cli_abort("Unsupported distribution type: {distribution_type}. Please use 'data' or 'process'.")
-    }
+    check_valid_input(input = distribution_type, valid_options = valid_distribution_types, arg_name = "distribution_type")
   )
 
   # Final message to confirm success
@@ -227,9 +224,8 @@ initialize_distribution <- function(module_input, distribution_name,
 #' the `initialize_module` function to handle specific requirements for
 #' recruitment initialization.
 #' @inheritParams initialize_module
-#' @rdname initialize_module
 #' @return The initialized recruitment module as an object.
-#' @export
+#' @noRd
 initialize_recruitment <- function(parameters, data) {
   module <- initialize_module(
     parameters = parameters,
@@ -246,9 +242,8 @@ initialize_recruitment <- function(parameters, data) {
 #' the `initialize_module` function to handle specific requirements for
 #' growth initialization.
 #' @inheritParams initialize_module
-#' @rdname initialize_module
 #' @return The initialized growth module as an object.
-#' @export
+#' @noRd
 initialize_growth <- function(parameters, data) {
   module <- initialize_module(
     parameters = parameters,
@@ -265,9 +260,8 @@ initialize_growth <- function(parameters, data) {
 #' the `initialize_module` function to handle specific requirements for
 #' maturity initialization.
 #' @inheritParams initialize_module
-#' @rdname initialize_module
 #' @return The initialized maturity module as an object.
-#' @export
+#' @noRd
 initialize_maturity <- function(parameters, data) {
   module <- initialize_module(
     parameters = parameters,
@@ -286,11 +280,9 @@ initialize_maturity <- function(parameters, data) {
 #' @inheritParams initialize_module
 #' @param linked_ids A vector. Named vector of linked IDs required for the population,
 #' including IDs for "growth", "maturity", and "recruitment".
-#' @rdname initialize_module
 #' @return The initialized population module as an object.
-#' @export
+#' @noRd
 initialize_population <- function(parameters, data, linked_ids) {
-
   if (any(is.na(linked_ids[c("growth", "maturity", "recruitment")]))) {
     cli::cli_abort("{.var linked_ids} for population must include `growth`, `maturity`, and `recruitment` IDs.")
   }
@@ -318,9 +310,8 @@ initialize_population <- function(parameters, data, linked_ids) {
 #' population initialization.
 #' @inheritParams initialize_module
 #' @param fleet_name A character. Name of the fleet to initialize.
-#' @rdname initialize_module
 #' @return The initialized selectivity module as an object.
-#' @export
+#' @noRd
 initialize_selectivity <- function(parameters, data, fleet_name) {
   module <- initialize_module(
     parameters = parameters,
@@ -343,11 +334,9 @@ initialize_selectivity <- function(parameters, data, fleet_name) {
 #' @param fleet_name A character. Name of the fleet to initialize.
 #' @param linked_ids A vector. Named vector of linked IDs required for the fleet,
 #' including IDs for "selectivity", "index", and "age_comp".
-#' @rdname initialize_module
 #' @return The initialized fleet module as an object.
-#' @export
+#' @noRd
 initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
-
   if (any(is.na(linked_ids[c("selectivity", "index", "age_comp")]))) {
     cli::cli_abort("{.var linked_ids} for {fleet_name} must include 'selectivity', 'index', and 'age_comp' IDs.")
   }
@@ -372,15 +361,11 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
 #' Initializes an index module based on the provided data and fleet name.
 #' @inheritParams initialize_module
 #' @param fleet_name A character. Name of the fleet for which the index module is initialized.
-#' @rdname initialize_module
 #' @return The initialized index module as an object.
-#' @export
+#' @noRd
 initialize_index <- function(data, fleet_name) {
-
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Check if the specified fleet exists in the data
   fleet_exists <- any(data@data["name"] == fleet_name)
@@ -397,7 +382,7 @@ initialize_index <- function(data, fleet_name) {
 
   if ("landings" %in% fleet_type) {
     module[["index_data"]] <- FIMS::m_landings(data)
-  } else if ("index" %in% fleet_type){
+  } else if ("index" %in% fleet_type) {
     module[["index_data"]] <- FIMS::m_index(data, fleet_name)
   } else {
     cli::cli_abort("Fleet type `{fleet_type}` is not valid for index module initialization.
@@ -414,15 +399,11 @@ initialize_index <- function(data, fleet_name) {
 #' setting the age composition data for the fleet over time.
 #' @inheritParams initialize_module
 #' @param fleet_name A character. Name of the fleet for which age composition data is initialized.
-#' @rdname initialize_module
 #' @return The initialized age composition module as an object.
-#' @export
+#' @noRd
 initialize_age_comp <- function(data, fleet_name) {
-
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Check if the specified fleet exists in the data
   fleet_exists <- any(data@data["name"] == fleet_name)
@@ -431,7 +412,6 @@ initialize_age_comp <- function(data, fleet_name) {
   }
 
   module <- methods::new(AgeComp, data@n_years, data@n_ages)
-
 
   # Validate that the fleet's age composition data is available
   age_comp_data <- FIMS::m_agecomp(data, fleet_name)
@@ -459,22 +439,18 @@ initialize_age_comp <- function(data, fleet_name) {
 #' This function iterates over the provided fleets, setting up necessary sub-modules such as
 #' selectivity, index, and age composition. It also sets up distribution models for fishery
 #' index and age composition data.
-#' @inheritParams initialize_module
-#' @rdname initialize_module
+#' @param parameters A list. Contains parameters and modules required for initialization.
+#' @param data An S4 object. FIMS input data.
 #' @return A list containing parameters for the initialized FIMS modules, ready for use in TMB modeling.
 #' @export
 initialize_fims <- function(parameters, data) {
-
   # Validate parameters input
   if (missing(parameters) || !is.list(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a non-missing list.")
   }
 
   # Check if data is an object from FIMSFrame class
-  # TODO: create reusable CLI messages
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Clear any previous FIMS settings
   clear()
@@ -596,8 +572,10 @@ initialize_fims <- function(parameters, data) {
     module = recruitment,
     par = names(parameters$modules$recruitment$process_distribution),
     family = gaussian(),
-    sd = list(value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
-              estimated = parameters[["parameters"]][["recruitment"]][[field_estimated_name]]),
+    sd = list(
+      value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
+      estimated = parameters[["parameters"]][["recruitment"]][[field_estimated_name]]
+    ),
     is_random_effect = FALSE
   )
 
@@ -632,4 +610,55 @@ initialize_fims <- function(parameters, data) {
   parameter_list <- list(p = get_fixed())
 
   return(parameter_list)
+}
+
+#' Set Parameter Vector Values Based on Module Input
+#'
+#' @description
+#' This function sets the parameter vector values in a module based on
+#' the provided module input, including both initial values and estimation information.
+#' @param field A character string specifying the field name of the parameter vector to be updated.
+#' @param module A module object in which the parameter vector is to be set.
+#' @param module_input A list containing input parameters for the module, including
+#'   value and estimation information for the parameter vector.
+#' @return Modified module object.
+#' @noRd
+set_param_vector <- function(field, module, module_input) {
+  # Check if field_name is a non-empty character string
+  if (missing(field) || !is.character(field) || nchar(field) == 0) {
+    cli::cli_abort("The {.var field} argument must be a non-empty character string.")
+  }
+
+  # Check if module is a reference class
+  if (!is(module, "refClass")) {
+    cli::cli_abort("The {.var module} argument must be a reference class created by {.fn methods::new}.")
+  }
+
+  # Check if module_input is a list
+  if (!is.list(module_input)) {
+    cli::cli_abort("The {.var module_input} argument must be a list.")
+  }
+
+  # Identify the name for the parameter value and estimation fields in module_input
+  field_value_name <- grep(paste0(field, ".value"), names(module_input), value = TRUE)
+  field_estimated_name <- grep(paste0(field, ".estimated"), names(module_input), value = TRUE)
+
+  # Check if both value and estimation information are present
+  if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
+    cli::cli_abort(c("Missing value or estimation information for {.var field}."))
+  }
+
+  # Extract the value of the parameter vector
+  field_value <- module_input[[field_value_name]]
+
+  # Resize the field in the module if it has multiple values
+  if (length(field_value) > 1) module[[field]]$resize(length(field_value))
+
+  # Assign each value to the corresponding position in the parameter vector
+  for (i in seq_along(field_value)) {
+    module[[field]][i][["value"]] <- field_value[i]
+  }
+
+  # Set the estimation information for the entire parameter vector
+  module[[field]]$set_all_estimable(module_input[[field_estimated_name]])
 }

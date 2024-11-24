@@ -13,10 +13,11 @@
 #' Beverton-Holt recruitment with log-normal recruitment deviations.
 #' @param growth A list specifying growth model settings. Default is "EWAAgrowth".
 #' @param maturity A list specifying maturity model settings. Default is "LogisticMaturity".
-#' @name create_default_parameters
 #' @return A list containing:
+#'  \describe{
 #'   \item{parameters}{A list of parameter inputs for the FIMS model.}
 #'   \item{modules}{A list of modules with default or user-provided settings.}
+#'  }
 #' @export
 create_default_parameters <- function(
     data,
@@ -28,9 +29,7 @@ create_default_parameters <- function(
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")) {
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # TODO: if there is no fleets info passed into the function,
   # Use default values for fleets in the data@data
@@ -93,8 +92,6 @@ create_default_parameters <- function(
   if (recruitment[["form"]] == "BevertonHoltRecruitment") {
     log_rzero <-
       recruitment_temp[["recruitment"]][[paste0(recruitment$form, ".log_rzero.value")]]
-  } else {
-    cli::cli_abort("Unsupported recruitment form {.var recruitment[['form']]}")
   }
 
   # Create population parameters
@@ -118,15 +115,12 @@ create_default_parameters <- function(
 #' unexploited recruitment and natural mortality.
 #' @param data An S4 object. FIMS input data.
 #' @param log_rzero A numeric value representing the log of unexploited recruitment.
-#' @rdname create_default_parameters
 #' @return A named list of default population parameters, including initial numbers
 #' at age and natural mortality rate.
-#' @export
+#' @noRd
 create_default_Population <- function(data, log_rzero) {
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Check if log_rzero is numeric
   if (!is.numeric(log_rzero) || length(log_rzero) != 1) {
@@ -165,10 +159,9 @@ create_default_Population <- function(data, log_rzero) {
 #' @description
 #' This function creates a default configuration for logistic form.
 #' It sets up default values for parameters related to the inflection point and slope.
-#' @rdname create_default_parameters
 #' @return A list containing the default logistic parameters, with inflection_point
 #'   and slope values and their estimation status.
-#' @export
+#' @noRd
 create_default_Logistic <- function() {
   # Generate default list with inflection point and slope parameters
   default <- list(
@@ -185,10 +178,9 @@ create_default_Logistic <- function() {
 #' @description
 #' This function creates a default configuration for double logistic form.
 #' It sets up default values for parameters related to the inflection point and slope.
-#' @rdname create_default_parameters
 #' @return A list containing the default double logistic parameters, with inflection_point_asc,
 #'   slope_asc, inflection_point_desc, and slope_desc values and their estimation status.
-#' @export
+#' @noRd
 create_default_DoubleLogistic <- function() {
   # Generate default list with inflection point and slope parameters
   default <- list(
@@ -212,10 +204,9 @@ create_default_DoubleLogistic <- function() {
 #' and DoubleLogisticSelectivity.
 #' @param fleet_name A character. Name of the fleet.
 #' @param form A character. Selectivity form (e.g., LogisticSelectivity and DoubleLogisticSelectivity).
-#' @rdname create_default_parameters
 #' @return A list containing default selectivity parameter values for the specified form.
-#' @export
-create_default_selectivity <- function(fleet_name, form) {
+#' @noRd
+create_default_selectivity <- function(fleet_name, form = c("LogisticSelectivity", "DoubleLogisticSelectivity")) {
   # Validate input fleet_name
   if (!is.character(fleet_name) || nchar(fleet_name) == 0) {
     cli::cli_abort("The {.var fleet_name} argument must be a non-empty character string.")
@@ -223,17 +214,11 @@ create_default_selectivity <- function(fleet_name, form) {
 
   # Validate selectivity form
   valid_forms <- c("LogisticSelectivity", "DoubleLogisticSelectivity")
-  if (!form %in% valid_forms) {
-    cli::cli_abort(c(
-      "Invalid selectivity form: ",
-      "x" = "The selectivity form {form} is missing from the supported forms:
-            {paste(valid_forms, collapse = ', ')}", "."
-    ))
-  }
 
   default <- switch(form,
     "LogisticSelectivity" = create_default_Logistic(),
-    "DoubleLogisticSelectivity" = create_default_DoubleLogistic()
+    "DoubleLogisticSelectivity" = create_default_DoubleLogistic(),
+    check_valid_input(input = form, valid_options = valid_forms, arg_name = "form")
   )
 
   names(default) <- paste0(form, ".", names(default))
@@ -250,21 +235,16 @@ create_default_selectivity <- function(fleet_name, form) {
 #' @param fleets A list of fleet configurations.
 #' @param fleet_name A character. Name of the fleet.
 #' @param data An S4 object. FIMS input data.
-#' @rdname create_default_parameters
 #' @return A list with default parameters for the fleet.
-#' @export
+#' @noRd
 create_default_fleet <- function(fleets,
                                  fleet_name,
                                  data) {
   # Check if the fleet_name exists in fleets list
-  if (!fleet_name %in% names(fleets)) {
-    cli::cli_abort("Fleet name {fleet_name} does not exist in the fleets list.")
-  }
+  check_valid_input(input = fleet_name, valid_options = names(fleets), arg_name = "fleet_name")
 
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Create default selectivity parameters
   selectivity_form <- fleets[[fleet_name]][["selectivity"]][["form"]]
@@ -325,29 +305,15 @@ create_default_fleet <- function(fleets,
 #' This function creates default parameters for maturity based on the specified
 #' form (e.g., LogisticMaturity).
 #' @param form A character. The form of maturity (e.g., LogisticMaturity).
-#' @rdname create_default_parameters
 #' @return A list containing the default maturity parameters.
-#' @export
-create_default_maturity <- function(form) {
-  # Check if the form is a character string
-  if (!is.character(form) || length(form) != 1) {
-    cli::cli_abort("The {.var form} argument must be a non-empty character string.")
-  }
-
-  # Validate the provided maturity form
-  valid_forms <- c("LogisticMaturity")
-  if (!form %in% valid_forms) {
-    cli::cli_abort(c(
-      "Invalid maturity form: ",
-      "x" = "The maturity form {form} is missing from the supported form:
-            {paste(valid_forms, collapse = ', ')}", "."
-    ))
-  }
+#' @noRd
+create_default_maturity <- function(form = c("LogisticMaturity")) {
 
   # Default parameters setup
   # Currently only supports "LogisticMaturity", but can be extended
   default <- list(switch(form,
-    "LogisticMaturity" = create_default_Logistic()
+    "LogisticMaturity" = create_default_Logistic(),
+    check_valid_input(input = form, valid_options = c("LogisticMaturity"), arg_name = "form")
   ))
 
   names(default) <- "maturity"
@@ -361,14 +327,11 @@ create_default_maturity <- function(form) {
 #' @description
 #' This function sets up default parameters for Beverton-Holt recruitment parameters.
 #' @param data An S4 object. FIMS input data.
-#' @rdname create_default_parameters
 #' @return A list containing default recruitment parameters.
-#' @export
+#' @noRd
 create_default_BevertonHoltRecruitment <- function(data) {
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Create default parameters for Beverton-Holt recruitment
   default <- list(
@@ -390,24 +353,15 @@ create_default_BevertonHoltRecruitment <- function(data) {
 #' @param value Default value for `log_sd`.
 #' @param data An S4 object. FIMS input data.
 #' @param input_type A character. Specifies if input is data or process.
-#' @rdname create_default_parameters
 #' @return A list of default parameters for TMBDnormDistribution.
-#' @export
+#' @noRd
 create_default_TMBDnormDistribution <- function(value = log(0.4), data, input_type = "data") {
   # Check if input_type is valid
   valid_input_types <- c("data", "process")
-  if (!input_type %in% valid_input_types) {
-    cli::cli_abort(c(
-      "Invalid input_type: ",
-      "x" = "The input_type {input_type} is missing from the supported types:
-            {paste(valid_input_types, collapse = ', ')}", "."
-    ))
-  }
+  check_valid_input(input = input_type, valid_options = valid_input_types, arg_name = "input_type")
 
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Create default parameters
   default <- list(
@@ -437,9 +391,8 @@ create_default_TMBDnormDistribution <- function(value = log(0.4), data, input_ty
 #' @param value Default value for `log_sd`.
 #' @param data An S4 object. FIMS input data.
 #' @param input_type A character. Specifies if input is data or process.
-#' @rdname create_default_parameters
 #' @return A list of default parameters for TMBDlnormDistribution.
-#' @export
+#' @noRd
 create_default_TMBDlnormDistribution <- function(value = 0.1, data, input_type = "data") {
   # Validate input value
   if (!is.numeric(value) || any(value <= 0, na.rm = TRUE)) {
@@ -447,19 +400,11 @@ create_default_TMBDlnormDistribution <- function(value = 0.1, data, input_type =
   }
 
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Check if input_type is valid
   valid_input_types <- c("data", "process")
-  if (!input_type %in% valid_input_types) {
-    cli::cli_abort(c(
-      "Invalid input_type: ",
-      "x" = "The input_type {input_type} is missing from the supported types:
-            {paste(valid_input_types, collapse = ', ')}", "."
-    ))
-  }
+  check_valid_input(input = input_type, valid_options = valid_input_types, arg_name = "input_type")
 
   # Create the default list with log standard deviation
   default <- list(
@@ -488,9 +433,8 @@ create_default_TMBDlnormDistribution <- function(value = 0.1, data, input_type =
 #'
 #' @param recruitment A list with recruitment details, including form and process distribution type.
 #' @param data An S4 object. FIMS input data.
-#' @rdname create_default_parameters
 #' @return A list with the default parameters for recruitment.
-#' @export
+#' @noRd
 create_default_recruitment <- function(recruitment, data) {
   # Check if recruitment is a list
   if (!is.list(recruitment)) {
@@ -500,13 +444,7 @@ create_default_recruitment <- function(recruitment, data) {
   # Check if form is provided and valid
   form <- recruitment[["form"]]
   valid_forms <- c("BevertonHoltRecruitment")
-  if (is.null(form) || !form %in% valid_forms) {
-    cli::cli_abort(c(
-      "Invalid or missing recruitment form: ",
-      "i" = "The supported forms:
-            {paste(valid_forms, collapse = ', ')}", "."
-    ))
-  }
+  check_valid_input(input = form, valid_options = valid_forms, arg_name = "recruitment form")
 
   # Create default parameters based on the recruitment form
   process_default <- switch(form,

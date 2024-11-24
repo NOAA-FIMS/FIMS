@@ -2,16 +2,6 @@
 % Please edit documentation in R/create_default_parameters.R
 \name{create_default_parameters}
 \alias{create_default_parameters}
-\alias{create_default_Population}
-\alias{create_default_Logistic}
-\alias{create_default_DoubleLogistic}
-\alias{create_default_selectivity}
-\alias{create_default_fleet}
-\alias{create_default_maturity}
-\alias{create_default_BevertonHoltRecruitment}
-\alias{create_default_TMBDnormDistribution}
-\alias{create_default_TMBDlnormDistribution}
-\alias{create_default_recruitment}
 \alias{update_parameters}
 \title{Create Default Parameters for a FIMS Model}
 \usage{
@@ -24,52 +14,21 @@ create_default_parameters(
   maturity = list(form = "LogisticMaturity")
 )
 
-create_default_Population(data, log_rzero)
-
-create_default_Logistic()
-
-create_default_DoubleLogistic()
-
-create_default_selectivity(fleet_name, form)
-
-create_default_fleet(fleets, fleet_name, data)
-
-create_default_maturity(form)
-
-create_default_BevertonHoltRecruitment(data)
-
-create_default_TMBDnormDistribution(
-  value = log(0.4),
-  data,
-  input_type = "data"
-)
-
-create_default_TMBDlnormDistribution(value = 0.1, data, input_type = "data")
-
-create_default_recruitment(recruitment, data)
-
 update_parameters(current_parameters, modified_parameters)
 }
 \arguments{
 \item{data}{An S4 object. FIMS input data.}
 
-\item{fleets}{A list of fleet configurations.}
+\item{fleets}{A named list of fleet configurations. Each element should specify
+a fleet's selectivity form and data distribution settings.
+If empty, default values will be applied based on the fleet types in the input data.}
 
-\item{recruitment}{A list with recruitment details, including form and process distribution type.}
+\item{recruitment}{A list specifying recruitment settings. Default is a
+Beverton-Holt recruitment with log-normal recruitment deviations.}
 
 \item{growth}{A list specifying growth model settings. Default is "EWAAgrowth".}
 
 \item{maturity}{A list specifying maturity model settings. Default is "LogisticMaturity".}
-
-\item{log_rzero}{A numeric value representing the log of unexploited recruitment.}
-
-\item{fleet_name}{A character. Name of the fleet.}
-
-\item{form}{A character. The form of maturity (e.g., LogisticMaturity).}
-
-\item{value}{Default value for \code{log_sd}.}
-
-\item{input_type}{A character. Specifies if input is data or process.}
 
 \item{current_parameters}{A list containing the current input parameters, including:
 \item{parameters}{A list of parameter inputs.}
@@ -79,31 +38,10 @@ update_parameters(current_parameters, modified_parameters)
 }
 \value{
 A list containing:
+\describe{
 \item{parameters}{A list of parameter inputs for the FIMS model.}
 \item{modules}{A list of modules with default or user-provided settings.}
-
-A named list of default population parameters, including initial numbers
-at age and natural mortality rate.
-
-A list containing the default logistic parameters, with inflection_point
-and slope values and their estimation status.
-
-A list containing the default double logistic parameters, with inflection_point_asc,
-slope_asc, inflection_point_desc, and slope_desc values and their estimation status.
-
-A list containing default selectivity parameter values for the specified form.
-
-A list with default parameters for the fleet.
-
-A list containing the default maturity parameters.
-
-A list containing default recruitment parameters.
-
-A list of default parameters for TMBDnormDistribution.
-
-A list of default parameters for TMBDlnormDistribution.
-
-A list with the default parameters for recruitment.
+}
 
 A list containing:
 \item{parameters}{A list of updated parameter inputs that
@@ -117,37 +55,7 @@ Modeling System (FIMS) model, including recruitment, growth, maturity, populatio
 and fleet configurations. It applies default configurations when
 specific module settings are not provided by the user.
 
-This function sets up default parameters for a population module.
-
-This function creates a default configuration for logistic form.
-It sets up default values for parameters related to the inflection point and slope.
-
-This function creates a default configuration for double logistic form.
-It sets up default values for parameters related to the inflection point and slope.
-
-This function creates default fleet selectivity parameters based on the provided
-selectivity form. It supports different selectivity forms such as LogisticSelectivity
-and DoubleLogisticSelectivity.
-
-This function creates default parameters for a given fleet. It compiles selectivity
-parameters along with index and agecomp distributions.
-
-This function creates default parameters for maturity based on the specified
-form (e.g., LogisticMaturity).
-
-This function sets up default parameters for Beverton-Holt recruitment parameters.
-
-Create default parameters for TMBDnormDistribution.
-
-Create default parameters for TMBDlnormDistribution.
-
-Create default recruitment parameters based on recruitment form and process distribution.
-
 This function updates the input parameters of a FIMS model.
 It allows users to modify specific parameters by providing new values, while
 retaining the existing modules information from the current input.
-}
-\details{
-The log of the initial numbers at age (log_init_naa.value) is set based on
-unexploited recruitment and natural mortality.
 }

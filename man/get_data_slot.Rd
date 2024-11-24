@@ -21,7 +21,9 @@ This function retrieves the value of a specific slot from a data object
 based on the provided module field name.
 }
 \examples{
+\dontrun{
 data(data_mile1)
 data <- FIMS::FIMSFrame(data_mile1)
 get_data_slot("ages", data)
+}
 }

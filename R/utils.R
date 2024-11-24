@@ -9,10 +9,11 @@
 #'   should be retrieved.
 #' @return The value of the specified slot in the data object.
 #' @examples
+#' \dontrun{
 #' data(data_mile1)
 #' data <- FIMS::FIMSFrame(data_mile1)
 #' get_data_slot("ages", data)
-#' @export
+#' }
 get_data_slot <- function(field_name, data) {
 
   # Check if field_name is a non-empty character string
@@ -21,9 +22,7 @@ get_data_slot <- function(field_name, data) {
   }
 
   # Check if data is an object from FIMSFrame class
-  if (!is(data, "FIMSFrame")) {
-    cli::cli_abort("The {.var data} argument must be an object created by {.fn FIMS::FIMSFrame}.")
-  }
+  check_arg_data(data)
 
   # Get the slot names from the data object
   slot_names <- slotNames(data)
@@ -45,53 +44,3 @@ get_data_slot <- function(field_name, data) {
   return(output)
 }
 
-#' Set Parameter Vector Values Based on Module Input
-#'
-#' @description
-#' This function sets the parameter vector values in a module based on
-#' the provided module input, including both initial values and estimation information.
-#' @param field A character string specifying the field name of the parameter vector to be updated.
-#' @param module A module object in which the parameter vector is to be set.
-#' @param module_input A list containing input parameters for the module, including
-#'   value and estimation information for the parameter vector.
-#' @return Modified module object.
-#' @export
-set_param_vector <- function(field, module, module_input) {
-  # Check if field_name is a non-empty character string
-  if (missing(field) || !is.character(field) || nchar(field) == 0) {
-    cli::cli_abort("The {.var field} argument must be a non-empty character string.")
-  }
-
-  # Check if module is a reference class
-  if (!is(module, "refClass")) {
-    cli::cli_abort("The {.var module} argument must be a reference class created by {.fn methods::new}.")
-  }
-
-  # Check if module_input is a list
-  if (!is.list(module_input)) {
-    cli::cli_abort("The {.var module_input} argument must be a list.")
-  }
-
-  # Identify the name for the parameter value and estimation fields in module_input
-  field_value_name <- grep(paste0(field, ".value"), names(module_input), value = TRUE)
-  field_estimated_name <- grep(paste0(field, ".estimated"), names(module_input), value = TRUE)
-
-  # Check if both value and estimation information are present
-  if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
-    cli::cli_abort(c("Missing value or estimation information for {.var field}."))
-  }
-
-  # Extract the value of the parameter vector
-  field_value <- module_input[[field_value_name]]
-
-  # Resize the field in the module if it has multiple values
-  if (length(field_value) > 1) module[[field]]$resize(length(field_value))
-
-  # Assign each value to the corresponding position in the parameter vector
-  for (i in seq_along(field_value)) {
-    module[[field]][i][["value"]] <- field_value[i]
-  }
-
-  # Set the estimation information for the entire parameter vector
-  module[[field]]$set_all_estimable(module_input[[field_estimated_name]])
-}

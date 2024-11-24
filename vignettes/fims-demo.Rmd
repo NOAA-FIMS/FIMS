@@ -35,7 +35,6 @@ We will be reading data into the model using the FIMSFrame S4 R class set up in 
 
 ```{r prepare-fimsframe-data}
 # use FIMS data frame
-# data(package = "FIMS")
 data("data_mile1")
 fims_frame <- FIMSFrame(data_mile1)
 ```
@@ -54,10 +53,10 @@ fims_frame@data |>
 
 Using this data frame, we will start setting up the FIMS objects. This example from the Model Comparison project sets up a single fishery fleet with age composition and catch data and a single survey with age composition data and an index. Data are read into FIMS as long vectors, regardless of their original dimension, hence the motivation behind the long data frames created with the fimsframe S4 classes. 
 
-### Prepare Parameters using `create_default_parameters`
+### Prepare Parameters using `create_default_parameters()`
 Now that we've prepared the data, let's set up parameters for modules. Each module in the FIMS-R interface is made of reference classes. These reference classes serve as an interface between R and the underlining C++ code that defines FIMS. 
 
-Here, we define specifications for fleets, recruitment, growth, and maturity modules. Using `create_default_parameters`, we create default values for parameters from fleet, recruitment, growth, and maturity modules. 
+Here, we define specifications for fleets, recruitment, growth, and maturity modules. Using `create_default_parameters()`, we create default values for parameters from fleet, recruitment, growth, and maturity modules. 
 ```{r, max.height='100px', attr.output='.numberLines'}
 # Define fleet specifications for fleet1 and survey1
 fleet1 <- survey1 <- list(
@@ -79,11 +78,6 @@ default_parameters <- fims_frame |>
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")
   )
-
-# Convert default_parameters list to a JSON string for viewing
-# default_parameters |>
-#   jsonlite::toJSON() |>
-#   jsonlite::prettify()
 ```
 We may update default parameters to experiment with different parameter values. Here, we adjust fishing mortality, selectivity, maturity, and population parameters using `update_parameters()`.
 ```{r modify-default-parameters}
@@ -156,6 +150,7 @@ parameters <- default_parameters |>
 ## Initialize modules and fit the model
 With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fimt()`.
 ```{r, max.height='100px', attr.output='.numberLines', fit-fims}
+# TODO: remove the printed memory addresses
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters |>
   initialize_fims(data = fims_frame) |>
@@ -171,7 +166,8 @@ fit <- parameters |>
 # Clear memory post-run
 clear()
 
-parameters2 <- parameters |>
+# Multiple fits with different parameter configurations are performed to explore sensitivity effects.
+parameters_high_slope <- parameters |>
   update_parameters(
     modified_parameters = list(
       survey1 = list(
@@ -180,7 +176,7 @@ parameters2 <- parameters |>
     )
   )
 
-parameters3 <- parameters |>
+parameters_low_slope <- parameters |>
   update_parameters(
     modified_parameters = list(
       survey1 = list(
@@ -189,16 +185,16 @@ parameters3 <- parameters |>
     )
   )
 
-fit2 <- parameters2 |>
+high_slope_fit <- parameters_high_slope |>
   initialize_fims(data = fims_frame) |>
-  (\(parameter_list) list(parameters = parameter_list, version = "FIMS run with optimization"))() |>
+  (\(parameter_list) list(parameters = parameter_list, version = "High slope run"))() |>
   fit_fims(optimize = TRUE)
 
 clear()
 
-fit3 <- parameters3 |>
+low_slope_fit <- parameters_low_slope |>
   initialize_fims(data = fims_frame) |>
-  (\(parameter_list) list(parameters = parameter_list, version = "FIMS run with optimization"))() |>
+  (\(parameter_list) list(parameters = parameter_list, version = "Low slope run"))() |>
   fit_fims(optimize = TRUE)
 
 clear()
