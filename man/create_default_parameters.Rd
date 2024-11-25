@@ -9,7 +9,7 @@ create_default_parameters(
   data,
   fleets,
   recruitment = list(form = "BevertonHoltRecruitment", process_distribution = c(log_devs
-    = "TMBDnormDistribution")),
+    = "DnormDistribution")),
   growth = list(form = "EWAAgrowth"),
   maturity = list(form = "LogisticMaturity")
 )
@@ -66,8 +66,8 @@ fims_frame <- FIMSFrame(data_mile1)
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
-    Index = "TMBDlnormDistribution",
-    AgeComp = "TMBDmultinomDistribution"
+    Index = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution"
   )
 )
 default_parameters <- fims_frame |>
@@ -75,7 +75,7 @@ default_parameters <- fims_frame |>
     fleets = list(fleet1 = fleet1, survey1 = survey1),
     recruitment = list(
       form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "TMBDnormDistribution")
+      process_distribution = c(log_devs = "DnormDistribution")
     ),
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")

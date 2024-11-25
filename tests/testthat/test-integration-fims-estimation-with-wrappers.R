@@ -4,15 +4,15 @@ fleets <- list(
   fleet1 = list(
     selectivity = list(form = "LogisticSelectivity"),
     data_distribution = c(
-      Index = "TMBDlnormDistribution",
-      AgeComp = "TMBDmultinomDistribution"
+      Index = "DlnormDistribution",
+      AgeComp = "DmultinomDistribution"
     )
   ),
   survey1 = list(
     selectivity = list(form = "LogisticSelectivity"),
     data_distribution = c(
-      Index = "TMBDlnormDistribution",
-      AgeComp = "TMBDmultinomDistribution"
+      Index = "DlnormDistribution",
+      AgeComp = "DmultinomDistribution"
     )
   )
 )
@@ -25,7 +25,7 @@ default_parameters <- data_mile1 |>
     fleets = fleets,
     recruitment = list(
       form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "TMBDnormDistribution")
+      process_distribution = c(log_devs = "DnormDistribution")
     ),
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")
@@ -44,7 +44,7 @@ modified_parameters <- list(
     BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]]$R0),
     BevertonHoltRecruitment.log_devs.value = om_input_list[[1]]$logR.resid[-1],
     BevertonHoltRecruitment.log_devs.estimated = FALSE,
-    TMBDnormDistribution.log_sd.value = om_input_list[[1]]$logR_sd
+    DnormDistribution.log_sd.value = om_input_list[[1]]$logR_sd
   ),
   maturity = list(
     LogisticMaturity.inflection_point.value = om_input_list[[1]]$A50.mat,

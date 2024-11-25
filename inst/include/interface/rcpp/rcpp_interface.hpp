@@ -20,7 +20,7 @@
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
-#include "rcpp_objects/rcpp_tmb_distribution.hpp"
+#include "rcpp_objects/rcpp_distribution.hpp"
 
 
 SEXP FIMS_objective_function;
@@ -429,7 +429,7 @@ void clear() {
   DoubleLogisticSelectivityInterface::id_g = 1;
   DoubleLogisticSelectivityInterface::live_objects.clear();
 
-  // rcpp_tmb_distribution.hpp
+  // rcpp_distribution.hpp
   DistributionsInterfaceBase::id_g = 1;
   DistributionsInterfaceBase::live_objects.clear();
 
@@ -724,7 +724,7 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
-  Rcpp::class_<DnormDistributionsInterface>("TMBDnormDistribution")
+  Rcpp::class_<DnormDistributionsInterface>("DnormDistribution")
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
       .method("evaluate", &DnormDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
@@ -734,7 +734,7 @@ RCPP_MODULE(fims) {
       .field("expected_values", &DnormDistributionsInterface::expected_values, "Mean of the distribution.")
       .field("log_sd", &DnormDistributionsInterface::log_sd, "The natural log of the standard deviation.");
 
-  Rcpp::class_<DlnormDistributionsInterface>("TMBDlnormDistribution")
+  Rcpp::class_<DlnormDistributionsInterface>("DlnormDistribution")
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
       .method("evaluate", &DlnormDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
@@ -744,7 +744,7 @@ RCPP_MODULE(fims) {
       .field("expected_values", &DlnormDistributionsInterface::expected_values, "Mean of the distribution on the log scale.")
       .field("log_sd", &DlnormDistributionsInterface::log_sd, "The natural log of the standard deviation of the distribution on the log scale.");
 
-  Rcpp::class_<DmultinomDistributionsInterface>("TMBDmultinomDistribution")
+  Rcpp::class_<DmultinomDistributionsInterface>("DmultinomDistribution")
       .constructor()
       .method("get_id", &DmultinomDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
       .method("evaluate", &DmultinomDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")

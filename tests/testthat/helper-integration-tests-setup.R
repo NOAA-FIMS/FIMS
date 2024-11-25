@@ -94,7 +94,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
 
   # Set up fishery index data using the lognormal
-  fishing_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
+  fishing_fleet_index_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
   fishing_fleet_index_distribution$log_sd$resize(om_input$nyr)
   for (y in 1:om_input$nyr) {
@@ -106,7 +106,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet_index_distribution$set_distribution_links("data", fishing_fleet$log_expected_index$get_id())
 
   # Set up fishery age composition data using the multinomial
-  fishing_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
+  fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
   fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet$GetObservedAgeCompDataID())
   fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$proportion_catch_numbers_at_age$get_id())
 
@@ -141,7 +141,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
 
   # Set up survey index data using the lognormal
-  survey_fleet_index_distribution <- methods::new(TMBDlnormDistribution)
+  survey_fleet_index_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
   survey_fleet_index_distribution$log_sd$resize(om_input$nyr)
@@ -155,7 +155,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # Age composition data
 
-  survey_fleet_agecomp_distribution <- methods::new(TMBDmultinomDistribution)
+  survey_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
   survey_fleet_agecomp_distribution$set_observed_data(survey_fleet$GetObservedAgeCompDataID())
   survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$proportion_catch_numbers_at_age$get_id())
 
@@ -186,7 +186,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   for (y in 1:(om_input$nyr - 1)) {
     recruitment$log_devs[y]$value <- om_input$logR.resid[y + 1]
   }
-  recruitment_distribution <- new(TMBDnormDistribution)
+  recruitment_distribution <- new(DnormDistribution)
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
@@ -449,15 +449,15 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
     fleet1 = list(
       selectivity = list(form = "LogisticSelectivity"),
       data_distribution = c(
-        Index = "TMBDlnormDistribution",
-        AgeComp = "TMBDmultinomDistribution"
+        Index = "DlnormDistribution",
+        AgeComp = "DmultinomDistribution"
       )
     ),
     survey1 = list(
       selectivity = list(form = "LogisticSelectivity"),
       data_distribution = c(
-        Index = "TMBDlnormDistribution",
-        AgeComp = "TMBDmultinomDistribution"
+        Index = "DlnormDistribution",
+        AgeComp = "DmultinomDistribution"
       )
     )
   )
@@ -467,7 +467,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
       fleets = fleets,
       recruitment = list(
         form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "TMBDnormDistribution")
+        process_distribution = c(log_devs = "DnormDistribution")
       ),
       growth = list(form = "EWAAgrowth"),
       maturity = list(form = "LogisticMaturity")
@@ -489,7 +489,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
       BevertonHoltRecruitment.log_rzero.value = log(om_input$R0),
       BevertonHoltRecruitment.log_devs.value = om_input$logR.resid[-1],
       BevertonHoltRecruitment.log_devs.estimated = FALSE,
-      TMBDnormDistribution.log_sd.value = om_input$logR_sd
+      DnormDistribution.log_sd.value = om_input$logR_sd
     ),
     maturity = list(
       LogisticMaturity.inflection_point.value = om_input$A50.mat,

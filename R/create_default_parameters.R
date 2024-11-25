@@ -26,8 +26,8 @@
 #' fleet1 <- survey1 <- list(
 #'   selectivity = list(form = "LogisticSelectivity"),
 #'   data_distribution = c(
-#'     Index = "TMBDlnormDistribution",
-#'     AgeComp = "TMBDmultinomDistribution"
+#'     Index = "DlnormDistribution",
+#'     AgeComp = "DmultinomDistribution"
 #'   )
 #' )
 #' default_parameters <- fims_frame |>
@@ -35,7 +35,7 @@
 #'     fleets = list(fleet1 = fleet1, survey1 = survey1),
 #'     recruitment = list(
 #'       form = "BevertonHoltRecruitment",
-#'       process_distribution = c(log_devs = "TMBDnormDistribution")
+#'       process_distribution = c(log_devs = "DnormDistribution")
 #'     ),
 #'     growth = list(form = "EWAAgrowth"),
 #'     maturity = list(form = "LogisticMaturity")
@@ -46,7 +46,7 @@ create_default_parameters <- function(
     fleets,
     recruitment = list(
       form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "TMBDnormDistribution")
+      process_distribution = c(log_devs = "DnormDistribution")
     ),
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")) {
@@ -296,10 +296,10 @@ create_default_fleet <- function(fleets,
     (\(x) x$uncertainty)()
 
   index_distribution_default <- switch(index_distribution,
-    "TMBDnormDistribution" = create_default_TMBDnormDistribution(
+    "DnormDistribution" = create_default_DnormDistribution(
       value = index_uncertainty, input_type = "data", data = data
     ),
-    "TMBDlnormDistribution" = create_default_TMBDlnormDistribution(
+    "DlnormDistribution" = create_default_DlnormDistribution(
       value = index_uncertainty, input_type = "data", data = data
     )
   )
@@ -358,16 +358,16 @@ create_default_BevertonHoltRecruitment <- function(data) {
   return(default)
 }
 
-#' Create Default TMBDnormDistribution Parameters
+#' Create Default DnormDistribution Parameters
 #'
 #' @description
-#' Create default parameters for TMBDnormDistribution.
+#' Create default parameters for DnormDistribution.
 #' @param value Default value for `log_sd`.
 #' @param data An S4 object. FIMS input data.
 #' @param input_type A character. Specifies if input is data or process.
-#' @return A list of default parameters for TMBDnormDistribution.
+#' @return A list of default parameters for DnormDistribution.
 #' @noRd
-create_default_TMBDnormDistribution <- function(value = log(0.4), data, input_type = "data") {
+create_default_DnormDistribution <- function(value = log(0.4), data, input_type = "data") {
   # Check if input_type is valid
   valid_input_types <- c("data", "process")
   check_valid_input(input = input_type, valid_options = valid_input_types, arg_name = "input_type")
@@ -396,16 +396,16 @@ create_default_TMBDnormDistribution <- function(value = log(0.4), data, input_ty
   return(default)
 }
 
-#' Create Default TMBDlnormDistribution Parameters
+#' Create Default DlnormDistribution Parameters
 #'
 #' @description
-#' Create default parameters for TMBDlnormDistribution.
+#' Create default parameters for DlnormDistribution.
 #' @param value Default value for `log_sd`.
 #' @param data An S4 object. FIMS input data.
 #' @param input_type A character. Specifies if input is data or process.
-#' @return A list of default parameters for TMBDlnormDistribution.
+#' @return A list of default parameters for DlnormDistribution.
 #' @noRd
-create_default_TMBDlnormDistribution <- function(value = 0.1, data, input_type = "data") {
+create_default_DlnormDistribution <- function(value = 0.1, data, input_type = "data") {
   # Validate input value
   if (!is.numeric(value) || any(value <= 0, na.rm = TRUE)) {
     cli::cli_abort("The {.var value} argument must be positive numeric values.")
@@ -469,7 +469,7 @@ create_default_recruitment <- function(recruitment, data) {
   distribution_default <- NULL
   if (!is.null(distribution_input)) {
     distribution_default <- switch(distribution_input,
-      "TMBDnormDistribution" = create_default_TMBDnormDistribution(
+      "DnormDistribution" = create_default_DnormDistribution(
         value = 0.1,
         data = data,
         input_type = "process"

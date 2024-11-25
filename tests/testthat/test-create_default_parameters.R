@@ -4,8 +4,8 @@ data <- FIMSFrame(data_mile1)
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
-    Index = "TMBDlnormDistribution",
-    AgeComp = "TMBDmultinomDistribution"
+    Index = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution"
   )
 )
 
@@ -31,8 +31,8 @@ test_that("create_default_parameters detects missing fleet names", {
   invalid_fleet <- list(
     selectivity = list(form = "LogisticSelectivity"),
     data_distribution = c(
-      Index = "TMBDlnormDistribution",
-      AgeComp = "TMBDmultinomDistribution"
+      Index = "DlnormDistribution",
+      AgeComp = "DmultinomDistribution"
     )
   )
 

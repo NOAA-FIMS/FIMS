@@ -4,8 +4,8 @@ data <- FIMSFrame(data_mile1)
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
-    Index = "TMBDlnormDistribution",
-    AgeComp = "TMBDmultinomDistribution"
+    Index = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution"
   )
 )
 

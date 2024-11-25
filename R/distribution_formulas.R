@@ -166,7 +166,7 @@ initialize_data_distribution <- function(
   # Set up distribution based on `family` argument`
   if (family[["family"]] == "lognormal") {
     # create new Rcpp module
-    new_module <- new(TMBDlnormDistribution)
+    new_module <- new(DlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
     new_module$log_sd <- new(
@@ -186,7 +186,7 @@ initialize_data_distribution <- function(
 
   if (family[["family"]] == "gaussian") {
     # create new Rcpp module
-    new_module <- new(TMBDnormDistribution)
+    new_module <- new(DnormDistribution)
 
     # populate logged standard deviation parameter with log of input
     new_module$log_sd$resize(length(sd$value))
@@ -206,7 +206,7 @@ initialize_data_distribution <- function(
 
   if (family[["family"]] == "multinomial") {
     #create new Rcpp module
-    new_module <- new(TMBDmultinomDistribution)
+    new_module <- new(DmultinomDistribution)
   }
 
   # setup link to observed data
@@ -267,7 +267,7 @@ initialize_process_distribution <- function(module,
   # Set up distribution based on `family` argument`
   if (family[["family"]] == "lognormal") {
     # create new Rcpp module
-    new_module <- new(TMBDlnormDistribution)
+    new_module <- new(DlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
     new_module$log_sd <- new(
@@ -287,7 +287,7 @@ initialize_process_distribution <- function(module,
 
   if (family[["family"]] == "gaussian") {
     # create new Rcpp module
-    new_module <- new(TMBDnormDistribution)
+    new_module <- new(DnormDistribution)
 
     # populate logged standard deviation parameter with log of input
     new_module$log_sd$resize(length(sd$value))

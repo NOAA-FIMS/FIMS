@@ -6,8 +6,8 @@
  * source folder for reuse information.
  *
  */
-#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_TMB_DISTRIBUTION_HPP
-#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_TMB_DISTRIBUTION_HPP
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 
 #include "../../../distributions/distributions.hpp"
 #include "../../interface.hpp"
@@ -83,7 +83,7 @@ std::map<uint32_t,
 /**
  * @brief Rcpp interface for Dnorm as an S4 object. To instantiate
  * from R:
- * dnorm_ <- new(TMBDnormDistribution)
+ * dnorm_ <- new(DnormDistribution)
  *
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
@@ -280,7 +280,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 /**
  * @brief Rcpp interface for Dlnorm as an S4 object. To instantiate
  * from R:
- * dlnorm_ <- new(TMBDlnormDistribution)
+ * dlnorm_ <- new(DlnormDistribution)
  *
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
@@ -484,7 +484,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 /**
  * @brief Rcpp interface for Dmultinom as an S4 object. To instantiate
  * from R:
- * dmultinom_ <- new(TMBDmultinomDistribution)
+ * dmultinom_ <- new(DmultinomDistribution)
  *
  */
 // template <typename Type>

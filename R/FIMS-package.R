@@ -21,12 +21,12 @@
 #' @export Index
 #' @export Population
 #' @export ParameterVector
-#' @export TMBDnormDistribution
+#' @export DnormDistribution
 #' @export LogisticMaturity
 #' @export LogisticSelectivity
 #' @export DoubleLogisticSelectivity
 #' @export EWAAgrowth
-#' @export TMBDlnormDistribution
-#' @export TMBDmultinomDistribution
+#' @export DlnormDistribution
+#' @export DmultinomDistribution
 ## usethis namespace: end
 NULL
