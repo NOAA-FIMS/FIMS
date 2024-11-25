@@ -71,6 +71,7 @@ Imports:
 Suggests: 
     covr,
     knitr,
+    mockery,
     parallel,
     purrr,
     remotes,

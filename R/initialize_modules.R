@@ -458,7 +458,7 @@ initialize_fims <- function(parameters, data) {
   module_name <- "fleets"
   fleet_names <- names(parameters[["modules"]][["fleets"]])
   if (length(fleet_names) == 0) {
-    cli::cli_abort("No fleets found in the provided {.var parameters}.")
+    cli::cli_abort("No fleets found in the provided {.var parameters[['modules']]}.")
   }
 
   # Initialize lists to store fleet-related objects

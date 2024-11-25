@@ -324,155 +324,193 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
                                              om_output_list,
                                              em_input_list,
                                              estimation_mode = TRUE,
-                                             map = list(),
-                                             parameters,
-                                             data) {
+                                             map = list()) {
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]]
   om_output <- om_output_list[[iter_id]]
   em_input <- em_input_list[[iter_id]]
+  returnedom <- list(
+    om_input = om_input,
+    om_output = om_output,
+    em_input = em_input
+  )
 
   # Clear any previous FIMS settings
   clear()
 
-  module_name <- "fleets"
-  fleet_names <- names(parameters[["modules"]][["fleets"]])
-
-  # Initialize lists to store fleet-related objects
-  fleet <- fleet_selectivity <-
-    fleet_index <- fleet_index_distribution <-
-    fleet_age_comp <- fleet_agecomp_distribution <-
-    vector("list", length(fleet_names))
-
-
-  for (i in seq_along(fleet_names)) {
-    fleet_selectivity[[i]] <- initialize_selectivity(
-      parameters = parameters,
-      data = data,
-      fleet_name = fleet_names[i]
-    )
-
-    fleet_index[[i]] <- initialize_index(
-      data = data,
-      fleet_name = fleet_names[i]
-    )
-
-    fleet_age_comp[[i]] <- initialize_age_comp(
-      data = data,
-      fleet_name = fleet_names[i]
-    )
-
-    fleet_module_ids <- c(
-      index = fleet_index[[i]]$get_id(),
-      age_comp = fleet_age_comp[[i]]$get_id(),
-      selectivity = fleet_selectivity[[i]]$get_id()
-    )
-
-    fleet[[i]] <- initialize_fleet(
-      parameters = parameters,
-      data = data,
-      fleet_name = fleet_names[i],
-      linked_ids = fleet_module_ids
-    )
-
-    # Set up fishery index data using the lognormal
-    # fleet_index_distribution[[i]] <- initialize_distribution(
-    #   module_input = parameters[["parameters"]][[fleet_names[i]]],
-    #   distribution_name = parameters[["modules"]][["fleets"]][[fleet_names[i]]][["data_distribution"]]["Index"],
-    #   distribution_type = "data",
-    #   linked_ids = c(
-    #     data_link = fleet[[i]]$GetObservedIndexDataID(),
-    #     fleet_link = fleet[[i]]$log_expected_index$get_id()
-    #   )
-    # )
-
-    # TODO: update argument sd to log_sd to match the Rcpp interface
-    parameter_value_name <- grep(paste0("log_sd", ".value"), names(parameters[["parameters"]][[fleet_names[i]]]), value = TRUE)
-    parameter_estimated_name <- grep(paste0("log_sd", ".estimated"), names(parameters[["parameters"]][[fleet_names[i]]]), value = TRUE)
-    fleet_index_distribution[[i]] <- initialize_data_distribution(
-      module = fleet[[i]],
-      family = lognormal(link = "log"),
-      sd = list(
-        value = exp(parameters[["parameters"]][[fleet_names[i]]][[parameter_value_name]]),
-        estimated = parameters[["parameters"]][[fleet_names[i]]][[parameter_estimated_name]]
-      ),
-      data_type = "index"
-    )
-
-    # Set up fishery age composition data using the multinomial
-    # fleet_agecomp_distribution[[i]] <- initialize_distribution(
-    #   module_input = NULL,
-    #   distribution_name = parameters[["modules"]][["fleets"]][[fleet_names[i]]][["data_distribution"]]["AgeComp"],
-    #   distribution_type = "data",
-    #   linked_ids = c(
-    #     data_link = fleet[[i]]$GetObservedAgeCompDataID(),
-    #     fleet_link = fleet[[i]]$proportion_catch_numbers_at_age$get_id()
-    #   )
-    # )
-
-    fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
-      module = fleet[[i]],
-      family = multinomial(link = "logit"),
-      data_type = "agecomp"
-    )
+  # Set up data
+  cv_2_sd <- function(x) {
+    sqrt(log(x^2 + 1))
   }
 
-  # Recruitment
-  # create new module in the recruitment class (specifically Beverton-Holt,
-  # when there are other options, this would be where the option would be chosen)
-  recruitment <- initialize_recruitment(
+  landings_data <- data.frame(
+    type = "landings",
+    name = names(returnedom[["om_output"]]$L.mt)[1],
+    age = NA,
+    datestart = as.Date(
+      paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
+      format = "%Y-%m-%d"
+    ),
+    dateend = as.Date(
+      paste(returnedom[["om_input"]]$year, 12, 31, sep = "-"),
+      format = "%Y-%m-%d"
+    ),
+    value = returnedom[["em_input"]]$L.obs[[1]],
+    unit = "mt", # metric tons
+    uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.L[[1]])
+  )
+
+  index_data <- data.frame(
+    type = "index",
+    name = names(returnedom[["om_output"]]$survey_index)[1],
+    age = NA, # Not by age in this case, but there is a by age option.
+    datestart = as.Date(
+      paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
+      format = "%Y-%m-%d"
+    ),
+    dateend = as.Date(
+      paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
+      format = "%Y-%m-%d"
+    ),
+    value = returnedom[["em_input"]]$surveyB.obs[[1]],
+    unit = "mt",
+    uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.survey[[1]])
+  )
+
+  age_data <- rbind(
+    data.frame(
+      name = names(returnedom[["em_input"]]$n.L),
+      returnedom[["em_input"]]$L.age.obs$fleet1,
+      unit = "proportion",
+      uncertainty = returnedom[["em_input"]]$n.L$fleet1,
+      datestart = as.Date(
+        paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+        "%Y-%m-%d"
+      ),
+      dateend = as.Date(
+        paste(returnedom[["om_input"]][["year"]], 12, 31, sep = "-"),
+        "%Y-%m-%d"
+      )
+    ),
+    data.frame(
+      name = names(returnedom[["om_output"]]$survey_age_comp)[1],
+      returnedom[["em_input"]]$survey.age.obs[[1]],
+      unit = "number of fish in proportion",
+      uncertainty = returnedom[["om_input"]][["n.survey"]][["survey1"]],
+      datestart = as.Date(
+        paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+        "%Y-%m-%d"
+      ),
+      dateend = as.Date(
+        paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+        "%Y-%m-%d"
+      )
+    )
+  ) |>
+    dplyr::mutate(
+      type = "age"
+    ) |>
+    tidyr::pivot_longer(
+      cols = dplyr::starts_with("X"),
+      names_prefix = "X",
+      names_to = "age",
+      values_to = "value"
+    )
+
+  timingfishery <- data.frame(
+    datestart = as.Date(
+      paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+      "%Y-%m-%d"
+    ),
+    dateend = as.Date(
+      paste(returnedom[["om_input"]][["year"]], 12, 31, sep = "-"),
+      "%Y-%m-%d"
+    )
+  )
+  weightsfishery <- data.frame(
+    type = "weight-at-age",
+    name = names(returnedom[["em_input"]]$n.L),
+    age = seq_along(returnedom[["om_input"]][["W.kg"]]),
+    value = returnedom[["om_input"]][["W.mt"]],
+    uncertainty = NA,
+    unit = "mt"
+  )
+  weightatage_data <- merge(timingfishery, weightsfishery)
+
+  data_dataframe <- type.convert(
+    rbind(landings_data, index_data, age_data, weightatage_data),
+    as.is = TRUE
+  )
+
+  data <- FIMS::FIMSFrame(data_dataframe)
+
+  # Set up default parameters
+  fleets <- list(
+    fleet1 = list(
+      selectivity = list(form = "LogisticSelectivity"),
+      data_distribution = c(
+        Index = "TMBDlnormDistribution",
+        AgeComp = "TMBDmultinomDistribution"
+      )
+    ),
+    survey1 = list(
+      selectivity = list(form = "LogisticSelectivity"),
+      data_distribution = c(
+        Index = "TMBDlnormDistribution",
+        AgeComp = "TMBDmultinomDistribution"
+      )
+    )
+  )
+
+  default_parameters <- data |>
+    create_default_parameters(
+      fleets = fleets,
+      recruitment = list(
+        form = "BevertonHoltRecruitment",
+        process_distribution = c(log_devs = "TMBDnormDistribution")
+      ),
+      growth = list(form = "EWAAgrowth"),
+      maturity = list(form = "LogisticMaturity")
+    )
+
+  # Modify parameters
+  modified_parameters <- list(
+    fleet1 = list(
+      LogisticSelectivity.inflection_point.value = om_input$sel_fleet$fleet1$A50.sel1,
+      LogisticSelectivity.slope.value = om_input$sel_fleet$fleet1$slope.sel1,
+      Fleet.log_Fmort.value = log(om_output$f)
+    ),
+    survey1 = list(
+      LogisticSelectivity.inflection_point.value = om_input$sel_survey$survey1$A50.sel1,
+      LogisticSelectivity.slope.value = om_input$sel_survey$survey1$slope.sel1,
+      Fleet.log_q.value = log(om_output$survey_q$survey1)
+    ),
+    recruitment = list(
+      BevertonHoltRecruitment.log_rzero.value = log(om_input$R0),
+      BevertonHoltRecruitment.log_devs.value = om_input$logR.resid[-1],
+      BevertonHoltRecruitment.log_devs.estimated = FALSE,
+      TMBDnormDistribution.log_sd.value = om_input$logR_sd
+    ),
+    maturity = list(
+      LogisticMaturity.inflection_point.value = om_input$A50.mat,
+      LogisticMaturity.inflection_point.estimated = FALSE,
+      LogisticMaturity.slope.value = om_input$slope.mat,
+      LogisticMaturity.slope.estimated = FALSE
+    ),
+    population = list(
+      Population.log_init_naa.value = log(om_output$N.age[1, ])
+    )
+  )
+
+  parameters <- default_parameters |>
+    update_parameters(
+      modified_parameters = modified_parameters
+    )
+
+  parameter_list <- initialize_fims(
     parameters = parameters,
     data = data
   )
-
-  # recruitment_distribution <- initialize_distribution(
-  #   module_input = parameters[["parameters"]][["recruitment"]],
-  #   distribution_name = parameters[["modules"]][["recruitment"]][["process_distribution"]],
-  #   distribution_type = "process",
-  #   linked_ids = recruitment$get_id()
-  # )
-
-  parameter_name <- names(parameters$modules$recruitment$process_distribution)
-  field_value_name <- grep(paste0("log_sd.value"), names(parameters[["parameters"]][["recruitment"]]), value = TRUE)
-  field_estimated_name <- grep(paste0("log_sd.estimated"), names(parameters[["parameters"]][["recruitment"]]), value = TRUE)
-  recruitment_distribution <- initialize_process_distribution(
-    module = recruitment,
-    par = names(parameters$modules$recruitment$process_distribution),
-    family = gaussian(),
-    sd = list(value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
-              estimated = parameters[["parameters"]][["recruitment"]][[field_estimated_name]]),
-    is_random_effect = FALSE
-  )
-
-  # Growth
-  growth <- initialize_growth(
-    parameters = parameters,
-    data = data
-  )
-
-  # Maturity
-  maturity <- initialize_maturity(
-    parameters = parameters,
-    data = data
-  )
-
-  population_module_ids <- c(
-    recruitment = recruitment$get_id(),
-    growth = growth$get_id(),
-    maturity = maturity$get_id()
-  )
-
-  # Population
-  population <- initialize_population(
-    parameters = parameters,
-    data = data,
-    linked_ids = population_module_ids
-  )
-
-  # Set-up TMB
-  CreateTMBModel()
-  # Create parameter list from Rcpp modules
-  parameter_list <- list(p = get_fixed())
 
   input <- list()
   input$parameters <- parameter_list

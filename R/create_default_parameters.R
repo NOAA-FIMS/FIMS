@@ -19,6 +19,28 @@
 #'   \item{modules}{A list of modules with default or user-provided settings.}
 #'  }
 #' @export
+#' @examples
+#' \dontrun{
+#' data("data_mile1")
+#' fims_frame <- FIMSFrame(data_mile1)
+#' fleet1 <- survey1 <- list(
+#'   selectivity = list(form = "LogisticSelectivity"),
+#'   data_distribution = c(
+#'     Index = "TMBDlnormDistribution",
+#'     AgeComp = "TMBDmultinomDistribution"
+#'   )
+#' )
+#' default_parameters <- fims_frame |>
+#'   create_default_parameters(
+#'     fleets = list(fleet1 = fleet1, survey1 = survey1),
+#'     recruitment = list(
+#'       form = "BevertonHoltRecruitment",
+#'       process_distribution = c(log_devs = "TMBDnormDistribution")
+#'     ),
+#'     growth = list(form = "EWAAgrowth"),
+#'     maturity = list(form = "LogisticMaturity")
+#'   )
+#' }
 create_default_parameters <- function(
     data,
     fleets,
@@ -33,15 +55,6 @@ create_default_parameters <- function(
 
   # TODO: if there is no fleets info passed into the function,
   # Use default values for fleets in the data@data
-  # if (length(fleets) == 0) {
-  #   cli::cli_bullets(c(
-  #     "No fleet settings were provided, FIMS will apply default settings for
-  #     all fleets listed in the data. These include:",
-  #     "i" = "LogisticSelectivity for selectivity module",
-  #     "i" = "TMBDlnormDistribution for index data",
-  #     "i" = "TMBDmultinomDistribution for age composition data"
-  #   ))
-  # }
 
   # Check for fleet names that do not match those in the data object
   fleet_names <- names(fleets)
@@ -308,7 +321,6 @@ create_default_fleet <- function(fleets,
 #' @return A list containing the default maturity parameters.
 #' @noRd
 create_default_maturity <- function(form = c("LogisticMaturity")) {
-
   # Default parameters setup
   # Currently only supports "LogisticMaturity", but can be extended
   default <- list(switch(form,
@@ -339,7 +351,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
     log_rzero.estimated = TRUE,
     logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
     logit_steep.estimated = FALSE,
-    log_devs.value = rep(0.0, data@n_years-1),
+    log_devs.value = rep(0.0, data@n_years - 1),
     log_devs.estimated = TRUE,
     estimate_log_devs = TRUE
   )
@@ -502,6 +514,15 @@ update_parameters <- function(current_parameters, modified_parameters) {
 
   # Check if modified_parameters exists in current_parameters
   missing_input <- setdiff(names(modified_parameters), names(current_parameters[["parameters"]]))
+  if (length(missing_input) > 0) {
+    cli::cli_abort(c(
+      "x" = "The following {length(missing_input)} input list{?s} from
+            {.var modified_parameters} {?is/are} missing from
+            {.var current_parameters}: {paste(missing_input, collapse = ', ')}"
+    ))
+  }
+
+  wrong_input <- setdiff(names(current_parameters[["parameters"]]), names(modified_parameters))
   if (length(missing_input) > 0) {
     cli::cli_abort(c(
       "x" = "The following {length(missing_input)} input list{?s} from

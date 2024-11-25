@@ -59,3 +59,26 @@ This function updates the input parameters of a FIMS model.
 It allows users to modify specific parameters by providing new values, while
 retaining the existing modules information from the current input.
 }
+\examples{
+\dontrun{
+data("data_mile1")
+fims_frame <- FIMSFrame(data_mile1)
+fleet1 <- survey1 <- list(
+  selectivity = list(form = "LogisticSelectivity"),
+  data_distribution = c(
+    Index = "TMBDlnormDistribution",
+    AgeComp = "TMBDmultinomDistribution"
+  )
+)
+default_parameters <- fims_frame |>
+  create_default_parameters(
+    fleets = list(fleet1 = fleet1, survey1 = survey1),
+    recruitment = list(
+      form = "BevertonHoltRecruitment",
+      process_distribution = c(log_devs = "TMBDnormDistribution")
+    ),
+    growth = list(form = "EWAAgrowth"),
+    maturity = list(form = "LogisticMaturity")
+  )
+}
+}

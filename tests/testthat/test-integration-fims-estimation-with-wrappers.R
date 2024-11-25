@@ -70,9 +70,7 @@ test_that("deterministic test of fims", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE,
-    parameters = parameters,
-    data = data
+    estimation_mode = FALSE
   )
 
   # Call report using deterministic parameter values
@@ -207,9 +205,7 @@ test_that("nll test of fims", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE,
-    parameters = parameters,
-    data = data
+    estimation_mode = FALSE
   )
 
   # Set up TMB's computational graph
@@ -282,9 +278,7 @@ test_that("estimation test of fims using wrapper functions", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE,
-    parameters = parameters,
-    data = data
+    estimation_mode = TRUE
   )
 
   # Compare FIMS results with model comparison project OM values
