@@ -25,6 +25,7 @@
 #' @export Fleet
 #' @export AgeComp
 #' @export Index
+#' @export LengthComp
 #' @export Population
 #' @export ParameterVector
 #' @export DnormDistribution

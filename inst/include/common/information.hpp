@@ -262,7 +262,7 @@ namespace fims_info {
                 std::shared_ptr<fims_popdy::Fleet<Type> > f = (*it).second;
                 FIMS_INFO_LOG("Initializing fleet " + fims::to_string(f->id));
 
-                f->Initialize(f->nyears, f->nages);
+                f->Initialize(f->nyears, f->nages, f->nlengths);
 
                // set index data
                 if (f->fleet_observed_index_data_id_m != -999) {
@@ -288,7 +288,7 @@ namespace fims_info {
                 }
                 // end set index data
 
-                // set age composition data
+                // set age-composition data
                 if (f->fleet_observed_agecomp_data_id_m != -999) {
                   uint32_t observed_agecomp_id =
                       static_cast<uint32_t>(f->fleet_observed_agecomp_data_id_m);
@@ -303,12 +303,26 @@ namespace fims_info {
                     FIMS_ERROR_LOG("Expected age-composition observations not defined for fleet "
                         + fims::to_string(f->id));
                   }
-                } else {
-                  valid_model = false;
-                  FIMS_ERROR_LOG("No age-composition data observed for fleet "
-                      + fims::to_string(f->id) + ". FIMS requires age compositions for all fleets.");
                 }
-                // end set composition data
+                // end set age-composition data
+
+                // set length-composition data
+                if (f->fleet_observed_lengthcomp_data_id_m != -999) {
+                  uint32_t observed_lengthcomp_id =
+                      static_cast<uint32_t>(f->fleet_observed_lengthcomp_data_id_m);
+                  data_iterator it = this->data_objects.find(observed_lengthcomp_id);
+                  if (it != this->data_objects.end()) {
+                    f->observed_lengthcomp_data = (*it).second;
+                    FIMS_INFO_LOG("Observed input length-composition data for fleet "
+                        + fims::to_string(f->id) + " successfully set to " 
+                        + fims::to_string(f->observed_lengthcomp_data->at(1)));
+                  } else {
+                    valid_model = false;
+                    FIMS_ERROR_LOG("Expected length-composition observations not defined for fleet "
+                        + fims::to_string(f->id));
+                  }
+                }
+                // end set length-composition data
 
                 // set selectivity model
                 if (f->fleet_selectivity_id_m != -999) {
