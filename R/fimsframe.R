@@ -18,6 +18,8 @@ setClass(
     n_years = "integer",
     ages = "numeric",
     n_ages = "integer",
+    lengths = "numeric",
+    n_lengths = "integer",
     weight_at_age = "data.frame",
     start_year = "integer",
     end_year = "integer"
@@ -94,6 +96,22 @@ setMethod(
   "n_ages",
   "data.frame",
   function(x) FIMSFrame(x)@n_ages
+)
+
+setGeneric("get_lengths", function(x) standardGeneric("get_lengths"))
+setMethod("get_lengths", "FIMSFrame", function(x) x@lengths)
+setMethod(
+  "get_lengths",
+  "data.frame",
+  function(x) FIMSFrame(x)@lengths
+)
+
+setGeneric("n_lengths", function(x) standardGeneric("n_lengths"))
+setMethod("n_lengths", "FIMSFrame", function(x) x@n_lengths)
+setMethod(
+  "n_lengths",
+  "data.frame",
+  function(x) FIMSFrame(x)@n_lengths
 )
 
 setGeneric("weight_at_age", function(x) standardGeneric("weight_at_age"))
@@ -200,6 +218,73 @@ setMethod(
       .data[["name"]] == fleet_name
     ) |>
       dplyr::pull(.data[["value"]])
+  }
+)
+
+#' Get the length-composition data from a FIMSFrame object
+#'
+#' @param x A FIMSFrame object with length-composition data.
+#' @param fleet_name A string providing the name of the fleet for which you
+#'   want the length-composition data for. Technically, you can pass it a
+#'   vector of strings but it is more common to pass it a single string.
+#' @return
+#' A vector of length-composition data. The order of the vector is the order
+#' the data frame was in before this function was called because it is just
+#' extracting a column.
+#' @export
+#' @rdname m_lengthcomp
+setGeneric(
+  "m_lengthcomp",
+  function(x, fleet_name) standardGeneric("m_lengthcomp")
+)
+#' @export
+#' @rdname m_lengthcomp
+setMethod(
+  "m_lengthcomp",
+  "FIMSFrame",
+  function(x, fleet_name) {
+    dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "length",
+      .data[["name"]] %in% fleet_name
+    ) |>
+      dplyr::pull(.data[["value"]])
+  }
+)
+
+#' Get the age-to-length-conversion data from a FIMSFrame object
+#'
+#' @param x A FIMSFrame object with age-to-length-conversion data (i.e.,
+#'   the proportion of age "a" that are length "l").
+#' @inheritParams m_lengthcomp
+#' @return
+#' A vector of age-to-length-conversion data. The order of the vector is the
+#' order the data frame was in before this function was called because it is
+#' just extracting a column.
+#' @export
+#' @rdname m_age_to_length_conversion
+setGeneric(
+  "m_age_to_length_conversion",
+  function(x, fleet_name) standardGeneric("m_age_to_length_conversion")
+)
+#' @export
+#' @rdname m_age_to_length_conversion
+setMethod(
+  "m_age_to_length_conversion",
+  "FIMSFrame",
+  function(x, fleet_name) {
+    if ("length" %in% colnames(x@data)) {
+      dplyr::filter(
+        .data = as.data.frame(x@data),
+        .data[["type"]] == "age-to-length-conversion",
+        .data[["name"]] %in% fleet_name
+      ) |>
+        dplyr::group_by(.data[["age"]], .data[["length"]]) |>
+        dplyr::summarize(
+          mean_value = mean(as.numeric(.data[["value"]]), na.rm = TRUE)
+        ) |>
+        dplyr::pull(as.numeric(.data[["mean_value"]]))
+    }
   }
 )
 
@@ -394,8 +479,20 @@ FIMSFrame <- function(data) {
   # Make empty NA data frames in the format needed to pass to FIMS
   # Get the range of ages displayed in the data to use to specify population
   # simulation range
-  ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
+  if ("age" %in% colnames(data)) {
+    ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
+  } else {
+    ages <- numeric()
+  }
   n_ages <- length(ages)
+  if ("length" %in% colnames(data)) {
+    lengths <- min(data[["length"]], na.rm = TRUE):
+      max(data[["length"]], na.rm = TRUE)
+  } else {
+    lengths <- numeric()
+  }
+  n_lengths <- length(lengths)
+
   weight_at_age <- dplyr::filter(
     data,
     .data[["type"]] == "weight-at-age"
@@ -410,6 +507,8 @@ FIMSFrame <- function(data) {
     end_year = end_year,
     ages = ages,
     n_ages = n_ages,
+    lengths = lengths,
+    n_lengths = n_lengths,
     weight_at_age = weight_at_age
   )
   return(out)

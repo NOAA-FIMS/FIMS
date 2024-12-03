@@ -57,6 +57,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   uint32_t nfleets;          /**< number of fleets */
   uint32_t nseasons;         /**< number of seasons */
   uint32_t nyears;           /**< number of years */
+  uint32_t nlengths;         /**< number of lengths */
   uint32_t maturity_id;      /**< id of the maturity function*/
   uint32_t growth_id;        /**< id of the growth function*/
   uint32_t recruitment_id;   /**< id of the recruitment function*/

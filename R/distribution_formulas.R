@@ -167,7 +167,8 @@ get_expected_name <- function(family, data_type) {
     data_type == "index" &&
       grepl("lognormal|gaussian", family_string) &&
       link_string == "identity" ~ "expected_index",
-    grepl("comp", data_type) ~ "proportion_catch_numbers_at_age"
+    grepl("agecomp", data_type) ~ "proportion_catch_numbers_at_age",
+    grepl("lengthcomp", data_type) ~ "proportion_catch_numbers_at_length",
   )
   # Check combination of entries was okay and led to valid name
   if (is.na(expected_name)) {
@@ -327,6 +328,9 @@ initialize_data_distribution <- function(
   }
   if (data_type == "agecomp") {
     new_module$set_observed_data(module$GetObservedAgeCompDataID())
+  }
+  if (data_type == "lengthcomp") {
+    new_module$set_observed_data(module$GetObservedLengthCompDataID())
   }
 
   # set name of expected values

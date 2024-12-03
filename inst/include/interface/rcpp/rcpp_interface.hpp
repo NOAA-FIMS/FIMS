@@ -408,6 +408,9 @@ void clear() {
     AgeCompDataInterface::id_g = 1;
     AgeCompDataInterface::live_objects.clear();
 
+    LengthCompDataInterface::id_g = 1;
+    LengthCompDataInterface::live_objects.clear();
+
     IndexDataInterface::id_g = 1;
     IndexDataInterface::live_objects.clear();
 
@@ -669,12 +672,17 @@ RCPP_MODULE(fims) {
       .field("log_Fmort", &FleetInterface::log_Fmort)
       .field("nages", &FleetInterface::nages)
       .field("nyears", &FleetInterface::nyears)
+      .field("nlengths", &FleetInterface::nlengths)
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
       .field("log_expected_index", &FleetInterface::log_expected_index)
       .field("proportion_catch_numbers_at_age", &FleetInterface::proportion_catch_numbers_at_age)
+      .field("proportion_catch_numbers_at_length", &FleetInterface::proportion_catch_numbers_at_length)
+      .field("age_length_conversion_matrix", &FleetInterface::age_length_conversion_matrix)
       .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
       .method("GetObservedAgeCompDataID", &FleetInterface::GetObservedAgeCompDataID)
+      .method("SetObservedLengthCompData", &FleetInterface::SetObservedLengthCompData)
+      .method("GetObservedLengthCompDataID", &FleetInterface::GetObservedLengthCompDataID)
       .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
@@ -683,6 +691,11 @@ RCPP_MODULE(fims) {
             .constructor<int, int>()
             .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
             .method("get_id", &AgeCompDataInterface::get_id);
+
+    Rcpp::class_<LengthCompDataInterface>("LengthComp")
+            .constructor<int, int>()
+            .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
+            .method("get_id", &LengthCompDataInterface::get_id);
 
     Rcpp::class_<IndexDataInterface>("Index")
             .constructor<int>()
@@ -696,6 +709,7 @@ RCPP_MODULE(fims) {
             .field("nfleets", &PopulationInterface::nfleets)
             .field("nseasons", &PopulationInterface::nseasons)
             .field("nyears", &PopulationInterface::nyears)
+            .field("nlengths", &PopulationInterface::nlengths)
             .field("log_M", &PopulationInterface::log_M)
             .field("log_init_naa", &PopulationInterface::log_init_naa)
             .field("proportion_female", &PopulationInterface::proportion_female)

@@ -86,6 +86,15 @@ initialize_module <- function(parameters, data, module_name) {
         "log_Fmort"
       ))
     }
+
+    if (!"age-to-length-conversion" %in% fleet_types) {
+      module_fields <- setdiff(module_fields, c(
+        "age_length_conversion_matrix",
+        # Right now we can also remove nlengths because the default is 0
+        "nlengths",
+        "proportion_catch_numbers_at_length"
+      ))
+    }
   }
 
 
@@ -110,7 +119,8 @@ initialize_module <- function(parameters, data, module_name) {
   #     index and agecomp distributions. No input values are required.
 
   non_standard_field <- c(
-    "ages", "nages", "proportion_female", "estimate_prop_female",
+    "ages", "nages", "nlengths",
+    "proportion_female", "estimate_prop_female",
     "nyears", "nseasons", "nfleets", "estimate_log_devs", "weights",
     "is_survey", "estimate_q", "random_q"
   )
@@ -121,6 +131,7 @@ initialize_module <- function(parameters, data, module_name) {
         field,
         "ages" = ages(data),
         "nages" = n_ages(data),
+        "nlengths" = n_lengths(data),
         "proportion_female" = numeric(0),
         "estimate_prop_female" = TRUE,
         "nyears" = n_years(data),
