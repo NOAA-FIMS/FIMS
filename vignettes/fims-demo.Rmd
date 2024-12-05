@@ -14,8 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Fisheries Integrated Modeling System
-
-The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. FIMS is a software system designed and architected to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It's important to note that FIMS itself is not a model, but rather a framework for creating models. The framework is made up of many modules that come together to create a "the best model" that suites the needs of the end-user. What follows is a demo of creating a catch-at-age assessment model using FIMS. 
+The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. FIMS is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It's important to note that FIMS itself is not a model, but rather a framework for creating models. The framework is made up of many modules that come together to create a "the best model" that suites the needs of the end-user. What follows is a demo of creating a catch-at-age assessment model using FIMS. 
 
 ## Import Libraries and Clear Memory
 

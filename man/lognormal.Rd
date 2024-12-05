@@ -21,15 +21,6 @@ particular family has a truncated length compared to other distributions in
 \code{\link[stats:family]{stats::family()}}.
 \item{family}{character: the family name.}
 \item{link}{character: the link name.}
-
-@seealso
-\itemize{
-\item \code{\link[stats:family]{stats::family()}}
-\item \code{\link[stats:family]{stats::gaussian()}}
-\item \code{\link[stats:glm]{stats::glm()}}
-\item \code{\link[stats:power]{stats::power()}}
-\item \code{\link[stats:make.link]{stats::make.link()}}
-}
 }
 \description{
 Family objects provide a convenient way to specify the details of the models
@@ -41,5 +32,14 @@ similar manner.
 a_family <- multinomial()
 a_family[["family"]]
 a_family[["link"]]
+}
+\seealso{
+\itemize{
+\item \code{\link[stats:family]{stats::family()}}
+\item \code{\link[stats:family]{stats::gaussian()}}
+\item \code{\link[stats:glm]{stats::glm()}}
+\item \code{\link[stats:power]{stats::power()}}
+\item \code{\link[stats:make.link]{stats::make.link()}}
+}
 }
 \keyword{distribution}

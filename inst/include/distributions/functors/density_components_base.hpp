@@ -38,7 +38,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
  uint32_t observed_data_id_m = -999; /*!< id of observed data component*/
  std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_values; /**< observed data*/
- fims::Vector<Type > x; /**< input value of distribution function for proirs or random effects*/
+ fims::Vector<Type > x; /**< input value of distribution function for priors or random effects*/
  fims::Vector<Type> expected_values; /**< expected value of distribution function */
  fims::Vector<Type> lpdf_vec; /**< vector to record observation level negative log-likelihood values */
  std::string  input_type; /**< string classifies the type of the negative log-likelihood; options are: "priors", "random_effects", and "data" */
