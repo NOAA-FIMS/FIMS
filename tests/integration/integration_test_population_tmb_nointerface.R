@@ -21,7 +21,7 @@ compile(paste0(path, "integration_test_population_tmb_nointerface.cpp"),
 dyn.load(dynlib(paste0(path, "integration_test_population_tmb_nointerface")))
 
 # Need code chunk below to run with data:
-# data(package = "FIMS")
+# data("data_mile1", package = "FIMS")
 # fims_frame <- FIMSFrame(data_mile1)
 
 naa <- c(
