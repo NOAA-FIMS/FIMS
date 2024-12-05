@@ -1,3 +1,6 @@
+# To remove the WARNING
+# no visible binding for global variable
+utils::globalVariables(c("type", "name", "value", "unit", "uncertainty"))
 
 #' Initialize a generic module
 #'
