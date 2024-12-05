@@ -1,5 +1,5 @@
 # tests for input objects
-data(package = "FIMS")
+data("data_mile1", package = "FIMS")
 fims_frame <- FIMSFrame(data_mile1)
 
 test_that("Can create the S4 FIMSFrame classes", {

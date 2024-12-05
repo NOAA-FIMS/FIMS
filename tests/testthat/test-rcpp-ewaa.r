@@ -1,4 +1,4 @@
-data(package = "FIMS")
+data("data_mile1", package = "FIMS")
 
 test_that("ewaa data can be added to model", {
   ewaa_growth <- new(EWAAgrowth)
