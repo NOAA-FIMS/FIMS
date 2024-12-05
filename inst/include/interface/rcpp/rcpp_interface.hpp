@@ -651,7 +651,7 @@ RCPP_MODULE(fims) {
             .method("size", &ParameterVector::size, "Returns the size of the Parameter Vector.")
             .method("resize", &ParameterVector::resize, "Resizes the Parameter Vector given the provided length argument.")
             .method("set_all_estimable", &ParameterVector::set_all_estimable, "Sets all Parameters within vector as estimable.")
-            .method("set_all_random", &ParameterVector::set_all_random, "Sets all Parameters within vector as estimable.")
+            .method("set_all_random", &ParameterVector::set_all_random, "Sets all Parameters within vector as random.")
             .method("fill", &ParameterVector::fill, "Sets the value of all Parameters in the vector with the provided value.")
             .method("get_id", &ParameterVector::get_id, "Get the ID of the interface base object.");
 
