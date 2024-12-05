@@ -119,7 +119,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
-    for(int i; i<ids.size(); i++){
+    for(int i=0; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
 
@@ -323,7 +323,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
-    for(int i; i<ids.size(); i++){
+    for(int i=0; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
 
@@ -524,7 +524,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
-    for(int i; i<ids.size(); i++){
+    for(int i=0; i<ids.size(); i++){
       this->key_m[i] = ids[i];
     }
 
