@@ -2,9 +2,12 @@
 % Please edit documentation in R/fimsframe.R
 \name{m_weight_at_age}
 \alias{m_weight_at_age}
+\alias{m_weight_at_age,FIMSFrame-method}
 \title{Get the weight at age data to be used in the model}
 \usage{
 m_weight_at_age(x)
+
+\S4method{m_weight_at_age}{FIMSFrame}(x)
 }
 \arguments{
 \item{x}{The object containing weight at age data.}
