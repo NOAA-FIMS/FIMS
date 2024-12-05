@@ -177,7 +177,7 @@ get_expected_name <- function(family, data_type) {
              some way.",
       "i" = "{.var data_type} is {.var {data_type}}.",
       "i" = "The family is {.var {family_string}}.",
-      "i" = "The link is {.var {link_string}}.",
+      "i" = "The link is {.var {link_string}}."
     ))
   }
   return(expected_name)
