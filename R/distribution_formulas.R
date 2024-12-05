@@ -439,7 +439,7 @@ initialize_process_distribution <- function(
 #' \item{family}{character: the family name.}
 #' \item{link}{character: the link name.}
 #'
-#'  @seealso
+#' @seealso
 #' * [stats::family()]
 #' * [stats::gaussian()]
 #' * [stats::glm()]
