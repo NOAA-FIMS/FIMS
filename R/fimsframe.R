@@ -130,7 +130,10 @@ setMethod(
 #'
 #' @param x The object containing weight at age data.
 #' @export
+#' @rdname m_weight_at_age
 setGeneric("m_weight_at_age", function(x) standardGeneric("m_weight_at_age"))
+#' @export
+#' @rdname m_weight_at_age
 setMethod(
   "m_weight_at_age", "FIMSFrame",
   function(x) {
