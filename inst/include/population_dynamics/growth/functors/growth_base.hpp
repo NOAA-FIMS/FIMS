@@ -3,7 +3,6 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the
  * source folder for reuse information.
  *
- *
  * growth module_base file
  * The purpose of this file is to include any .hpp files within the
  * subfolders so that only this file needs to included in the model.hpp file.

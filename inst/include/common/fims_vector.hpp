@@ -13,6 +13,12 @@ namespace fims {
  * these may not be called explicitly in FIMS, they may be required to run other
  * std library functions.
  *
+ *
+ * This File is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the
+ * source folder for reuse information.
+ *
+ */
  */
 template <typename Type>
 class Vector {

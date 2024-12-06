@@ -1,3 +1,13 @@
+/*
+ * File:  init.hpp
+ *
+ *
+ * This File is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE file for reuse
+ * information.
+ *
+ *
+ */
 #ifndef INTERFACE_INIT_HPP
 #define INTERFACE_INIT_HPP
 #include <R_ext/Rdynload.h>

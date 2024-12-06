@@ -2,7 +2,6 @@
  */
 // note: To document a global C function, typedef, enum or preprocessor
 // definition you must first document the file that contains it
-
 /*
  * File:   fims_math.hpp
  *
