@@ -155,7 +155,6 @@ parameters <- default_parameters |>
 
 With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fimt()`.
 ```{r, max.height='100px', attr.output='.numberLines', fit-fims}
-# TODO: remove the printed memory addresses
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters |>
   initialize_fims(data = fims_frame) |>

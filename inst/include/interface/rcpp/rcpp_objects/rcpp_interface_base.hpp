@@ -243,7 +243,6 @@ public:
      * @param estimable Boolean; if true, all parameters are set to be estimated in the model
      */
     void set_all_estimable(bool estimable){
-        Rcpp::Rcout << this->storage_m->data() << "\n";
         for (size_t i = 0; i < this->storage_m->size(); i++) {
             storage_m->at(i).estimated_m = estimable;
         }
