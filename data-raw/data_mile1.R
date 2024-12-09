@@ -38,7 +38,7 @@ library(dplyr)
 ###############################################################################
 working_dir <- getwd()
 
-maindir <- tempdir()
+main_dir <- tempdir()
 
 # Save the initial OM input using ASSAMC package (sigmaR = 0.4)
 model_input <- ASSAMC::save_initial_input()
@@ -48,7 +48,7 @@ sim_num <- 100
 sim_input <- ASSAMC::save_initial_input(
   base_case = TRUE,
   input_list = model_input,
-  maindir = maindir,
+  maindir = main_dir,
   om_sim_num = sim_num,
   keep_sim_num = sim_num,
   figure_number = 1,
@@ -60,12 +60,9 @@ sim_input <- ASSAMC::save_initial_input(
 # using function from the model comparison project
 ASSAMC::run_om(input_list = sim_input)
 
-on.exit(unlink(maindir, recursive = TRUE), add = TRUE)
-
 setwd(working_dir)
-on.exit(setwd(working_dir), add = TRUE)
 
-load(file.path(maindir, "sim_data", "output", "OM", paste0("OM", 1, ".RData")))
+load(file.path(main_dir, "sim_data", "output", "OM", paste0("OM", 1, ".RData")))
 returnedom <- list(
   om_input = om_input,
   om_output = om_output,
@@ -198,4 +195,6 @@ testthat::expect_equal(test_read, data_mile1)
 unlink("FIMS_input_data.csv")
 
 usethis::use_data(data_mile1, overwrite = TRUE)
+on.exit(unlink(main_dir, recursive = TRUE), add = TRUE)
+on.exit(setwd(working_dir), add = TRUE)
 rm(list = ls())
