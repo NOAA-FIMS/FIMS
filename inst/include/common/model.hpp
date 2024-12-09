@@ -122,7 +122,7 @@ namespace fims_model {
             }
 
             // Loop over densities and evaluate joint negative log-likelihoods for random effects
-            this->fims_information->setup_random_effects();
+            this->fims_information->SetupRandomEffects();
             size_t n_random_effects = 0;
             for (d_it = this->fims_information->density_components.begin();
                     d_it != this->fims_information->density_components.end(); ++d_it) {
@@ -168,7 +168,7 @@ namespace fims_model {
                 }
                 f->evaluate_index();
             }
-            this->fims_information->setup_data();
+            this->fims_information->SetupData();
             // Loop over and evaluate data joint negative log-likelihoods
             int n_data = 0;
             for (d_it = this->fims_information->density_components.begin();

@@ -437,9 +437,7 @@ template <typename Type>
 void clear_internal() {
     std::shared_ptr<fims_info::Information < Type>> d0 =
             fims_info::Information<Type>::GetInstance();
-    d0->fixed_effects_parameters.clear();
-    d0->random_effects_parameters.clear();
-    d0->variable_map.clear();
+    d0->Clear();
 }
 
 /**
