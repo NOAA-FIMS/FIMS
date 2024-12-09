@@ -1,16 +1,12 @@
-/*
- * File:   multinomial_lpmf.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- * Multinomial Log Probability Mass Function (LPMF) module file
- * The purpose of this file is to define the Multinomial LPMF class and its fields
- * and return the log probability mass function.
- *
+/**
+ * @file multinomial_lpmf.hpp
+ * @brief Multinomial Log Probability Mass Function (LPMF) module file defines
+ * the Multinomial LPMF class and its fields and returns the log probability
+ * mass function.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
-
 #ifndef MULTINOMIAL_LPMF
 #define MULTINOMIAL_LPMF
 

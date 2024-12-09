@@ -1,5 +1,5 @@
 /*
- * This File is part of the NOAA, National Marine Fisheries Service
+ * This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project.
  * Refer to the LICENSE file for reuse information.
  * 

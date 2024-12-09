@@ -1,15 +1,9 @@
-/*
- * File:   population.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- * Population module file
- * The purpose of this file is to define the Population class and its fields
- * and methods.
- *
- *
+/**
+ * @file population.hpp
+ * @brief Defines the Population class and its fields and methods.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 #define FIMS_POPULATION_DYNAMICS_POPULATION_HPP

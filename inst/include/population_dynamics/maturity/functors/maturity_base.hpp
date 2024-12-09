@@ -1,15 +1,12 @@
-/*
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- * maturity_base.hpp
- * The purpose of this file is to declare the MaturityBase class
- * which is the base class for all maturity functors.
- *
- * DEFINE guards for maturity module outline to define the
- * maturity hpp file if not already defined.
+/**
+ * @file maturity_base.hpp
+ * @brief Declares the MaturityBase class which is the base class for all
+ * maturity functors.
+ * @details Defines guards for maturity module outline to define the maturity
+ * hpp file if not already defined.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef POPULATION_DYNAMICS_MATURITY_BASE_HPP
 #define POPULATION_DYNAMICS_MATURITY_BASE_HPP

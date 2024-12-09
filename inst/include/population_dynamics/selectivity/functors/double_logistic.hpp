@@ -1,8 +1,10 @@
-/*
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project.
- * Refer to the LICENSE file for reuse information.
- *
+/**
+ * @file logistic.hpp
+ * @brief Declares the DoubleLogisticSelectivity class which implements the
+ * logistic function from fims_math in the selectivity module.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef POPULATION_DYNAMICS_SELECTIVITY_DOUBLE_LOGISTIC_HPP
 #define POPULATION_DYNAMICS_SELECTIVITY_DOUBLE_LOGISTIC_HPP

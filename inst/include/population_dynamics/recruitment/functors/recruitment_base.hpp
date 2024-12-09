@@ -1,15 +1,11 @@
-/** \file recruitment_base.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- * Recruitment base file
- * The purpose of this file is to serve as the parent class where
- * recruitment functions are called.
- *
- * DEFINE guards for recruitment base outline to define the
+/** 
+ * @file recruitment_base.hpp
+ * @brief Serves as the parent class where recruitment functions are called.
+ * @details Defines guards for recruitment base outline to define the
  * recruitment hpp file if not already defined.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP

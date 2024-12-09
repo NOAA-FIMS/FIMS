@@ -1,8 +1,11 @@
 /**
  * @file fims_json.hpp
- *  @brief A simple JSON parsing and generation library.
+ * @brief A simple JSON parsing and generation library.
  * @details This library provides classes and functions for parsing JSON
  * strings and generating JSON data structures.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #include <cctype>
 #include <iostream>

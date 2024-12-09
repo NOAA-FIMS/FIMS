@@ -1,14 +1,11 @@
-/*
- * File:   lognormal_lpdf.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- * Lognormal Log Probability Density Function (LPDF) module file
- * The purpose of this file is to define the Lognormal LPDF class and its fields
- * and return the log probability density function.
- *
+/**
+ * @file lognormal_lpdf.hpp
+ * @brief Lognormal Log Probability Density Function (LPDF) defines the
+ * Lognormal LPDF class and its fields and returns the log probability density
+ * function.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef LOGNORMAL_LPDF
 #define LOGNORMAL_LPDF

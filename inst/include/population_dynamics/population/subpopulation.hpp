@@ -1,10 +1,8 @@
-/*
- * File:   subpopulation.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE file
- * for reuse information.
- *
+/**
+ * @file subpopulation.hpp
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP
 #define FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP

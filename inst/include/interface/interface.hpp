@@ -1,10 +1,9 @@
-/*
- * File: interface.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project.
- * Refer to the LICENSE file for reuse information.
- *
+/**
+ * @file interface.hpp
+ * @brief TODO: provide a brief description.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 
 #ifndef FIMS_INTERFACE_HPP
@@ -57,8 +56,20 @@ vector<Type> ADREPORTvector(vector<vector<Type> > x) {
 #endif /* TMB_MODEL */
 
 #ifndef TMB_MODEL
+ /**
+  * @brief TODO: provide a brief description.
+  * 
+  */
  #define FIMS_SIMULATE_F(F)
+ /**
+  * @brief TODO: provide a brief description.
+  * 
+  */
  #define FIMS_REPORT_F(name, F)
+ /**
+  * @brief TODO: provide a brief description.
+  * 
+  */
  #define ADREPORT_F(name, F)
 #endif
 

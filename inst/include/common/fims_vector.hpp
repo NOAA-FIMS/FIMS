@@ -1,3 +1,10 @@
+/**
+ * @file fims_vector.hpp
+ * @brief TODO: provide a brief description.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
+ */
 #ifndef FIMS_VECTOR_HPP
 #define FIMS_VECTOR_HPP
 
@@ -13,12 +20,6 @@ namespace fims {
  * these may not be called explicitly in FIMS, they may be required to run other
  * std library functions.
  *
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- */
  */
 template <typename Type>
 class Vector {
@@ -498,6 +499,14 @@ bool operator==(const fims::Vector<T>& lhs, const fims::Vector<T>& rhs)
 
 } // namespace fims
 
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ * @tparam Type 
+ * @param out TODO: provide a brief description.
+ * @param v A vector.
+ * @return std::ostream& 
+ */
 template<typename Type>
 std::ostream& operator<<(std::ostream& out, fims::Vector<Type>& v)
 {

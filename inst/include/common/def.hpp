@@ -1,11 +1,9 @@
-/** \file def.hpp
- */
-/*
- * File:   def.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
+/**
+ * @file def.hpp
+ * @brief TODO: provide a brief description.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef DEF_HPP
 #define DEF_HPP
