@@ -1,15 +1,9 @@
-/** \file fims_math.hpp
- */
-// note: To document a global C function, typedef, enum or preprocessor
-// definition you must first document the file that contains it
-
-/*
- * File:   fims_math.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
+/**
+ * @file fims_math.hpp
+ * @brief TODO: provide a brief description.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_MATH_HPP
 #define FIMS_MATH_HPP

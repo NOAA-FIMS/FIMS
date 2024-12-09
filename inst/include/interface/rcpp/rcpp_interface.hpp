@@ -1,12 +1,9 @@
-/*
- * File:   rcpp_interface.hpp
- *
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE file for reuse
- * information.
- *
- *
+/**
+ * @file rcpp_interface.hpp
+ * @brief TODO: provide a brief description.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
@@ -23,13 +20,40 @@
 #include "rcpp_objects/rcpp_distribution.hpp"
 #include "../../utilities/fims_json.hpp"
 
-
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ */
 SEXP FIMS_objective_function;
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ */
 SEXP FIMS_gradient_function;
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ */
 double FIMS_function_value = 0;
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ */
 Rcpp::NumericVector FIMS_function_parameters;
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ */
 Rcpp::NumericVector FIMS_function_gradient;
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ */
 double FIMS_mgc_value = 0;
+/**
+ * @brief Sets FIMS_finalized to false as the default.
+ * 
+ */
 bool FIMS_finalized = false;
 
 /**
@@ -80,6 +104,12 @@ bool CreateTMBModel() {
     return true;
 }
 
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ * @param fn 
+ * @param gr 
+ */
 void SetFIMSFunctions(SEXP fn, SEXP gr) {
     FIMS_objective_function = fn;
     FIMS_gradient_function = gr;
@@ -343,6 +373,11 @@ std::string get_output() {
     return ret;
 }
 
+/**
+ * @brief Get the fixed parameters vector object
+ * 
+ * @return Rcpp::NumericVector 
+ */
 Rcpp::NumericVector get_fixed_parameters_vector() {
     // base model
     std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
@@ -357,6 +392,11 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
     return p;
 }
 
+/**
+ * @brief Get the random parameters vector object
+ * 
+ * @return Rcpp::NumericVector 
+ */
 Rcpp::NumericVector get_random_parameters_vector() {
     // base model
     std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
@@ -371,6 +411,12 @@ Rcpp::NumericVector get_random_parameters_vector() {
     return p;
 }
 
+/**
+ * @brief Get the parameter names object
+ * 
+ * @param pars 
+ * @return Rcpp::List 
+ */
 Rcpp::List get_parameter_names(Rcpp::List pars) {
     // base model
     std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
@@ -382,6 +428,11 @@ Rcpp::List get_parameter_names(Rcpp::List pars) {
     return pars;
 }
 
+/**
+ * @brief Clears the internal objects.
+ * 
+ * @tparam Type 
+ */
 template <typename Type>
 void clear_internal() {
     std::shared_ptr<fims_info::Information < Type>> d0 =
@@ -518,7 +569,7 @@ std::string get_log_module(const std::string& module) {
 }
 
 /**
- * If true, writes the log on exit .
+ * If true, writes the log on exit.
  */
 void write_log(bool write) {
     FIMS_INFO_LOG("Setting FIMS write log: " + fims::to_string(write));
@@ -554,6 +605,12 @@ void log_warning(std::string log_entry) {
     fims::FIMSLog::fims_log->warning_message(log_entry, -1, "R_env", "R_script_entry");
 }
 
+/**
+ * @brief Escape quotations.
+ * 
+ * @param input A string.
+ * @return std::string 
+ */
 std::string escapeQuotes(const std::string& input) {
     std::string result = input;
     std::string search = "\"";
@@ -606,6 +663,10 @@ void log_error(std::string log_entry) {
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
 
+/**
+ * @brief Construct a new rcpp module object
+ * 
+ */
 RCPP_MODULE(fims) {
     Rcpp::function("CreateTMBModel", &CreateTMBModel);
     Rcpp::function("SetFIMSFunctions", &SetFIMSFunctions);

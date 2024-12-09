@@ -1,14 +1,11 @@
-/*
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- * Beverton Holt stock recruitment function
- * The purpose of this file is to call the Beverton Holt stock
- * recruitment function from fims_math and does the calculation.
- * Inherits from recruitment base.
- *
+/**
+ * @file sr_beverton_holt.hpp
+ * @brief Calls the Beverton--Holt stock--recruitment function from fims_math
+ * and does the calculation.
+ * @details This function inherits from recruitment base.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP

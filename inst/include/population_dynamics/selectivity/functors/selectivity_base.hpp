@@ -1,15 +1,12 @@
-/*
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- * SelectivityBase  file
- * The purpose of this file is to declare the SelectivityBase class
- * which is the base class for all selectivity functors.
- *
- * DEFINE guards for selectivity module outline to define the
+/**
+ * @file selectivity_base.hpp
+ * @brief Declares the SelectivityBase class which is the base class for all
+ * selectivity functors.
+ * @details Defines guards for selectivity module outline to define the
  * selectivity hpp file if not already defined.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP
 #define POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP

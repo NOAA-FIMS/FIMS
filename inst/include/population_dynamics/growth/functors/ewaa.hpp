@@ -1,10 +1,10 @@
-/*
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project.
- * Refer to the LICENSE file for reuse information.
- *
- * The purpose of this file is to declare the growth functor class
- * which is the base class for all growth functors.
+/**
+ * @file ewaa.hpp
+ * @brief Declares the growth functor class which is the base class for all
+ * growth functors.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef POPULATION_DYNAMICS_GROWTH_EWAA_HPP
 #define POPULATION_DYNAMICS_GROWTH_EWAA_HPP

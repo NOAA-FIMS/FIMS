@@ -1,17 +1,9 @@
-/*
- * File:   model.hpp
- *
- * Author: Matthew Supernaw, Andrea Havron
- * National Oceanic and Atmospheric Administration
- * National Marine Fisheries Service
- * Email: matthew.supernaw@noaa.gov, andrea.havron@noaa.gov
- *
- * Created on September 30, 2021, 1:08 PM
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
+/**
+ * @file model.hpp
+ * @brief TODO: provide a brief description.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_COMMON_MODEL_HPP
 #define FIMS_COMMON_MODEL_HPP

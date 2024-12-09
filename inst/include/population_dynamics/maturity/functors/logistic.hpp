@@ -1,10 +1,11 @@
-/*
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project.
- * Refer to the LICENSE file for reuse information.
+/**
+ * @file logistic.hpp
+ * @brief Defines the LogisticMaturity class, which inherits from the
+ * MaturityBase class.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  *
- * The purpose of this file is to define the LogisticMaturity class, which
- * inherits from the MaturityBase class
  */
 #ifndef POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP
 #define POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP

@@ -1,16 +1,13 @@
 
-/** \file density_components_base.hpp
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE in the
- * source folder for reuse information.
- *
- *
- * density_components_base file
- * The purpose of this file is to declare the DensityComponentBase class
- * which is the base class for all distribution functors.
-
- * DEFINE guards for distributions module outline to define the
+/**
+ * @file density_components_base.hpp
+ * @brief Declares the DensityComponentBase class, which is the base class for
+ * all distribution functors.
+ * @details Defines guards for distributions module outline to define the
  * density_components_base hpp file if not already defined.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef DENSITY_COMPONENT_BASE_HPP
 #define DENSITY_COMPONENT_BASE_HPP

@@ -1,10 +1,9 @@
-/*
- * File:   rcpp_lpdf.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE
- * file for reuse information.
- *
+/**
+ * @file rcpp_lpdf.hpp
+ * @brief TODO: provide a brief description.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_LPDF_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_LPDF_HPP

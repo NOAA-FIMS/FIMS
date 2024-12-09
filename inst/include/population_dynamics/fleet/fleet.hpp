@@ -1,11 +1,10 @@
-/** \file fleet.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project.
- * Refer to the LICENSE file for reuse information.
- *
- * The purpose of this file is to declare the fleet functor class
- * which is the base class for all fleet functors.
+/**
+ * @file fleet.hpp
+ * @brief Declare the fleet functor class which is the base class for all fleet
+ * functors.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP

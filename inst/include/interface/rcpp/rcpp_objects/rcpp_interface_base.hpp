@@ -1,10 +1,9 @@
-/*
- * File:   rcpp_interface_base.hpp
- *
- * This File is part of the NOAA, National Marine Fisheries Service
- * Fisheries Integrated Modeling System project. See LICENSE file
- * for reuse information.
- *
+/**
+ * @file rcpp_interface_base.hpp
+ * @brief TODO: provide a brief description.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
@@ -100,6 +99,13 @@ class Parameter {
 
 uint32_t Parameter::id_g = 0;
 
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ * @param out 
+ * @param p 
+ * @return std::ostream& 
+ */
 std::ostream& operator<<(std::ostream& out, const Parameter& p) {
     out << "Parameter:{" << "id:" << p.id_m << ",\nvalue:" << p.initial_value_m
             << ",\nestimated_value:" << p.final_value_m << ",\nmin:"
@@ -307,6 +313,13 @@ public:
 };
 uint32_t ParameterVector::id_g = 0;
 
+/**
+ * @brief TODO: provide a brief description.
+ * 
+ * @param out 
+ * @param v 
+ * @return std::ostream& 
+ */
 std::ostream& operator<<(std::ostream& out, ParameterVector& v) {
     out << "[";
     size_t size = v.size();
