@@ -10,7 +10,12 @@ m_weight_at_age(x)
 \S4method{m_weight_at_age}{FIMSFrame}(x)
 }
 \arguments{
-\item{x}{The object containing weight at age data.}
+\item{x}{An object returned from \code{\link[=FIMSFrame]{FIMSFrame()}}.}
+}
+\value{
+A vector of weight at age data. The order of the vector is the order
+the data frame was in before this function was called because it is just
+extracting a column.
 }
 \description{
 Get the weight at age data to be used in the model

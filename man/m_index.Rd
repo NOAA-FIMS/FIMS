@@ -2,14 +2,24 @@
 % Please edit documentation in R/fimsframe.R
 \name{m_index}
 \alias{m_index}
+\alias{m_index,FIMSFrame-method}
 \title{Get the index data to be used in the model}
 \usage{
 m_index(x, fleet_name)
+
+\S4method{m_index}{FIMSFrame}(x, fleet_name)
 }
 \arguments{
-\item{x}{The object containing index.}
+\item{x}{An object returned from \code{\link[=FIMSFrame]{FIMSFrame()}}.}
 
-\item{fleet_name}{The name of the fleet for the index data.}
+\item{fleet_name}{A string providing the name of the fleet for which you
+want the index data. Technically, you can pass it a
+vector of strings but it is more common to pass it a single string.}
+}
+\value{
+A vector of index data. The order of the vector is the order
+the data frame was in before this function was called because it is just
+extracting a column.
 }
 \description{
 Get the index data to be used in the model

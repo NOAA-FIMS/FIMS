@@ -2,12 +2,20 @@
 % Please edit documentation in R/fimsframe.R
 \name{m_landings}
 \alias{m_landings}
+\alias{m_landings,FIMSFrame-method}
 \title{Get the landings data to be used in the model}
 \usage{
 m_landings(x)
+
+\S4method{m_landings}{FIMSFrame}(x)
 }
 \arguments{
-\item{x}{The object containing landings.}
+\item{x}{An object returned from \code{\link[=FIMSFrame]{FIMSFrame()}}.}
+}
+\value{
+A vector of landings data. The order of the vector is the order
+the data frame was in before this function was called because it is just
+extracting a column.
 }
 \description{
 Get the landings data to be used in the model

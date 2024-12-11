@@ -22,6 +22,8 @@ cummax
 cumprod
 cumsum
 cyclomatic
+dateend
+datestart
 digamma
 doxygen
 eg
