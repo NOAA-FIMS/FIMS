@@ -41,81 +41,161 @@ setClass(
 # is it problematic to set the generic for data? not sure...
 # but it will not work without set generic
 # can't call this data because there is already a generic
+
+#' Get the data to be used in the model
+#'
+#' @param x An object returned from [FIMSFrame()].
+#' @return
+#' A data frame of the class of `data.frame` containing data for a FIMS model
+#' in a long format. The data frame will have the following columns:
+#' `r glue::glue_collapse(colnames(data_mile1), sep = ", ", last = ", and ")`.
+#' @rdname get_data
 setGeneric("get_data", function(x) standardGeneric("get_data"))
+#' @rdname get_data
 setMethod("get_data", "FIMSFrame", function(x) x@data)
+#' @rdname get_data
 setMethod(
   "get_data",
   "data.frame",
   function(x) FIMSFrame(x)@data
 )
 
-# example: so we can call fleets(obj) instead of obj@fleets
+# TODO: remove or change this function to return fleet names
+#' Get a numeric vector of which fleets are fishing fleets
+#'
+#' @inheritParams get_data
+#' @return
+#' A vector of integer values specifying which fleets in the model are fishing
+#' fleets.
+#' @rdname fleets
 setGeneric("fleets", function(x) standardGeneric("fleets"))
+#' @rdname fleets
 setMethod("fleets", "FIMSFrame", function(x) x@fleets)
+#' @rdname fleets
 setMethod(
   "fleets",
   "data.frame",
   function(x) FIMSFrame(x)@fleets
 )
 
+#' Get the number of years to be used in the model
+#'
+#' @inheritParams get_data
+#' @return
+#' A single integer.
+#' @rdname n_years
 setGeneric("n_years", function(x) standardGeneric("n_years"))
+#' @rdname n_years
 setMethod("n_years", "FIMSFrame", function(x) x@n_years)
+#' @rdname n_years
 setMethod(
   "n_years",
   "data.frame",
   function(x) FIMSFrame(x)@n_years
 )
 
+#' Get the first year used in the model
+#'
+#' @inheritParams get_data
+#' @inherit n_years return
+#' @rdname start_year
 setGeneric("start_year", function(x) standardGeneric("start_year"))
+#' @rdname start_year
 setMethod("start_year", "FIMSFrame", function(x) x@start_year)
+#' @rdname start_year
 setMethod(
   "start_year",
   "data.frame",
   function(x) FIMSFrame(x)@start_year
 )
 
+#' Get the last year used in the model
+#'
+#' @inheritParams get_data
+#' @inherit n_years return
+#' @rdname end_year
 setGeneric("end_year", function(x) standardGeneric("end_year"))
+#' @rdname end_year
 setMethod("end_year", "FIMSFrame", function(x) x@end_year)
+#' @rdname end_year
 setMethod(
   "end_year",
   "data.frame",
   function(x) FIMSFrame(x)@end_year
 )
 
+#' Get the age bins used in the model
+#'
+#' @inheritParams get_data
+#' @return
+#' A vector of the ages in the model.
+#' @rdname ages
 setGeneric("ages", function(x) standardGeneric("ages"))
+#' @rdname ages
 setMethod("ages", "FIMSFrame", function(x) x@ages)
+#' @rdname ages
 setMethod(
   "ages",
   "data.frame",
   function(x) FIMSFrame(x)@ages
 )
 
+#' Get the number of ages used in the model
+#'
+#' @inheritParams get_data
+#' @inherit n_years return
+#' @rdname n_ages
 setGeneric("n_ages", function(x) standardGeneric("n_ages"))
+#' @rdname n_ages
 setMethod("n_ages", "FIMSFrame", function(x) x@n_ages)
+#' @rdname n_ages
 setMethod(
   "n_ages",
   "data.frame",
   function(x) FIMSFrame(x)@n_ages
 )
 
+#' Get the length bins used in the model
+#'
+#' @inheritParams get_data
+#' @return
+#' A vector of the lengths in the model.
+#' @rdname get_lengths
 setGeneric("get_lengths", function(x) standardGeneric("get_lengths"))
+#' @rdname get_lengths
 setMethod("get_lengths", "FIMSFrame", function(x) x@lengths)
+#' @rdname get_lengths
 setMethod(
   "get_lengths",
   "data.frame",
   function(x) FIMSFrame(x)@lengths
 )
 
+#' Get the number of lengths used in the model
+#'
+#' @inheritParams get_data
+#' @inherit n_years return
+#' @rdname n_lengths
 setGeneric("n_lengths", function(x) standardGeneric("n_lengths"))
+#' @rdname n_lengths
 setMethod("n_lengths", "FIMSFrame", function(x) x@n_lengths)
+#' @rdname n_lengths
 setMethod(
   "n_lengths",
   "data.frame",
   function(x) FIMSFrame(x)@n_lengths
 )
 
+#' Get the weight at age data used in the model
+#'
+#' @inheritParams get_data
+#' @return
+#' A dataframe of weight at age data used in the model. 
+#' @rdname weight_at_age
 setGeneric("weight_at_age", function(x) standardGeneric("weight_at_age"))
+#' @rdname weight_at_age
 setMethod("weight_at_age", "FIMSFrame", function(x) x@weight_at_age)
+#' @rdname weight_at_age
 setMethod(
   "weight_at_age",
   "data.frame",
@@ -128,7 +208,11 @@ setMethod(
 
 #' Get the weight at age data to be used in the model
 #'
-#' @param x The object containing weight at age data.
+#' @inheritParams get_data
+#' @return
+#' A vector of weight at age data. The order of the vector is the order
+#' the data frame was in before this function was called because it is just 
+#' extracting a column.
 #' @export
 #' @rdname m_weight_at_age
 setGeneric("m_weight_at_age", function(x) standardGeneric("m_weight_at_age"))
@@ -155,14 +239,16 @@ setMethod("m_ages", "FIMSFrame", function(x) {
 
 #' Get the landings data to be used in the model
 #'
-#' @param x The object containing landings.
+#' @inheritParams get_data
+#' @return
+#' A vector of landings data. The order of the vector is the order
+#' the data frame was in before this function was called because it is just 
+#' extracting a column.
 #' @export
+#' @rdname m_landings
 setGeneric("m_landings", function(x) standardGeneric("m_landings"))
-
-#' Get the landings data to be used in the model
-#'
-#' @param x The FIMSFrame object containing landings.
 #' @export
+#' @rdname m_landings
 setMethod(
   "m_landings", "FIMSFrame",
   function(x) {
@@ -176,23 +262,26 @@ setMethod(
 
 #' Get the index data to be used in the model
 #'
-#' @param x The object containing index.
-#' @param fleet_name The name of the fleet for the index data.
+#' @inheritParams get_data
+#' @param fleet_name A string providing the name of the fleet for which you
+#'   want the index data. Technically, you can pass it a
+#'   vector of strings but it is more common to pass it a single string.
+#' @return
+#' A vector of index data. The order of the vector is the order
+#' the data frame was in before this function was called because it is just 
+#' extracting a column.
 #' @export
+#' @rdname m_index
 setGeneric("m_index", function(x, fleet_name) standardGeneric("m_index"))
-
-#' Get the index data to be used in the model
-#'
-#' @param x The FIMSFrame object containing index.
-#' @param fleet_name The name of the fleet for the index data.
 #' @export
+#' @rdname m_index
 setMethod(
   "m_index", "FIMSFrame",
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "index",
-      .data[["name"]] == fleet_name
+      .data[["name"]] %in% fleet_name
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -201,24 +290,26 @@ setMethod(
 
 #' Get the age-composition data to be used in the model
 #'
-#' @param x The object containing the age-composition data.
-#' @param fleet_name The name of the fleet for the age-composition data.
+#' @inheritParams get_data
+#' @param fleet_name A string providing the name of the fleet for which you
+#'   want the age-composition data. Technically, you can pass it a
+#'   vector of strings but it is more common to pass it a single string.
+#' @return
+#' A vector of age-composition data. The order of the vector is the order
+#' the data frame was in before this function was called because it is just 
+#' extracting a column.
 #' @export
+#' @rdname m_agecomp
 setGeneric("m_agecomp", function(x, fleet_name) standardGeneric("m_agecomp"))
-# Should we add name as an argument here?
-
-#' Get the age-composition data data to be used in the model
-#'
-#' @param x  The FIMSFrame containing age-composition data.
-#' @param fleet_name  The name of the fleet for the age-composition data.
 #' @export
+#' @rdname m_agecomp
 setMethod(
   "m_agecomp", "FIMSFrame",
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "age",
-      .data[["name"]] == fleet_name
+      .data[["name"]] %in% fleet_name
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -226,7 +317,7 @@ setMethod(
 
 #' Get the length-composition data from a FIMSFrame object
 #'
-#' @param x A FIMSFrame object with length-composition data.
+#' @inheritParams get_data
 #' @param fleet_name A string providing the name of the fleet for which you
 #'   want the length-composition data for. Technically, you can pass it a
 #'   vector of strings but it is more common to pass it a single string.
@@ -257,8 +348,8 @@ setMethod(
 
 #' Get the age-to-length-conversion data from a FIMSFrame object
 #'
-#' @param x A FIMSFrame object with age-to-length-conversion data (i.e.,
-#'   the proportion of age "a" that are length "l").
+#' If `x` has age-to-length-conversion data (i.e., the proportion of age "a"
+#' that are length "l"), then this data will be returned.
 #' @inheritParams m_lengthcomp
 #' @return
 #' A vector of age-to-length-conversion data. The order of the vector is the

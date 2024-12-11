@@ -10,7 +10,7 @@ m_lengthcomp(x, fleet_name)
 \S4method{m_lengthcomp}{FIMSFrame}(x, fleet_name)
 }
 \arguments{
-\item{x}{A FIMSFrame object with length-composition data.}
+\item{x}{An object returned from \code{\link[=FIMSFrame]{FIMSFrame()}}.}
 
 \item{fleet_name}{A string providing the name of the fleet for which you
 want the length-composition data for. Technically, you can pass it a
