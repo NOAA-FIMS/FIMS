@@ -30,7 +30,7 @@ clear()
 
 ## Set up Data and Parameters
 
-Data and variable values are taken from the [Li et. al.](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united) Model Comparison project ([github site](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison)). See [R/data_mile1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_mile1.R) and [tests/testthat/fixtures/simulate-integration-test-data.R](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/fixtures/simulate-integration-test-data.R) for details on how data and variable values are read into FIMS from the Model Comparison project.
+Data and variable values are taken from the [Li et. al.](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united) Model Comparison project ([github site](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison)). See [R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) and [tests/testthat/fixtures/simulate-integration-test-data.R](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/fixtures/simulate-integration-test-data.R) for details on how data and variable values are read into FIMS from the Model Comparison project.
 
 ### Prepare Data using FIMSFrame
 
@@ -38,8 +38,8 @@ We will be reading data into the model using the FIMSFrame S4 R class set up in 
 
 ```{r prepare-fimsframe-data}
 # use FIMS data frame
-data("data_mile1")
-fims_frame <- FIMSFrame(data_mile1)
+data("data1")
+fims_frame <- FIMSFrame(data1)
 ```
 
 The `fims_frame` object contains a `@data` slot that holds a long data frame with catch data for the fishery and index data for the survey:

@@ -18,7 +18,7 @@ get_data(x)
 \value{
 A data frame of the class of \code{data.frame} containing data for a FIMS model
 in a long format. The data frame will have the following columns:
-type, name, age, datestart, dateend, value, unit, and uncertainty.
+type, name, age, length, datestart, dateend, value, unit, and uncertainty.
 }
 \description{
 Get the data to be used in the model

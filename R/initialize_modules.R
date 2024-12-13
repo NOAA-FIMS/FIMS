@@ -90,28 +90,48 @@ initialize_module <- function(parameters, data, module_name) {
       ))
     }
 
-    if (!"age-to-length-conversion" %in% fleet_types) {
-      module_fields <- setdiff(module_fields, c(
-        "age_length_conversion_matrix",
-        # Right now we can also remove nlengths because the default is 0
-        "nlengths",
-        "proportion_catch_numbers_at_length"
-      ))
+    # TODO: refactor "age-to-length-conversion" in FIMSFrame data and
+    # "age_length_conversion_matrix" in the Rcpp interface to
+    # "age_to_legnth_conversion" for consistency
+    if ("age-to-length-conversion" %in% fleet_types &
+        "LengthComp" %in% names(parameters[["modules"]][["fleets"]][[module_name]][["data_distribution"]])) {
+      age_length_conversion_matrix_value <- FIMS::m_age_to_length_conversion(data, module_name)
+      module[["age_length_conversion_matrix"]]$resize(length(age_length_conversion_matrix_value))
+      # Assign each value to the corresponding position in the parameter vector
+      for (i in seq_along(age_length_conversion_matrix_value)) {
+        module[["age_length_conversion_matrix"]][i][["value"]] <- age_length_conversion_matrix_value[i]
+      }
+
+      # Set the estimation information for the entire parameter vector
+      module[["age_length_conversion_matrix"]]$set_all_estimable(FALSE)
     }
+
+    module_fields <- setdiff(module_fields, c(
+      "age_length_conversion_matrix",
+      # Right now we can also remove nlengths because the default is 0
+      "nlengths",
+      "proportion_catch_numbers_at_length"
+    ))
+    # else {
+    #   module_fields <- setdiff(module_fields, c(
+    #   "age_length_conversion_matrix",
+    #   # Right now we can also remove nlengths because the default is 0
+    #   "nlength",
+    #   "proportion_catch_numbers_at_length"
+    # ))
+    # }
   }
-
-
 
   # Populate fields based on common and specific settings
   # TODO:
   # - Population interface
   #   - Update the Population interface to consistently use n_ages and n_years,
-  #     as done in the S4 data_mile1 object.
+  #     as done in the S4 data1 object.
   #   - Currently hard-coded `estimate_prop_female` to TRUE, `proportion_female`
   #     to numeric(0), and `nseason` to 1 using the defaults from FIMS.
   #     Update as needed.
-  #   - Add n_fleets to data_mile1. Should n_fleets include both
-  #     fishing and survey fleets? Currently, data_mile1@fleets equals 1.
+  #   - Add n_fleets to data1. Should n_fleets include both
+  #     fishing and survey fleets? Currently, data1@fleets equals 1.
   # - Recruitment interface
   #   - Remove the field estimate_log_devs. It will be set up using the
   #   set_all_estimable() method instead.
@@ -334,7 +354,7 @@ initialize_maturity <- function(parameters, data) {
 initialize_population <- function(parameters, data, linked_ids) {
   if (any(is.na(linked_ids[c("growth", "maturity", "recruitment")]))) {
     cli::cli_abort(c(
-      "{.var linked_ids} for population must include `growth`, `maturity`, and 
+      "{.var linked_ids} for population must include `growth`, `maturity`, and
       `recruitment` IDs."
     ))
   }
@@ -386,7 +406,7 @@ initialize_selectivity <- function(parameters, data, fleet_name) {
 #' @inheritParams initialize_module
 #' @param fleet_name A character. Name of the fleet to initialize.
 #' @param linked_ids A vector. Named vector of linked IDs required for the
-#'  fleet, including IDs for "selectivity", "index", and "age_comp".
+#'  fleet, including IDs for "selectivity", "index", "age_comp", and "length_comp".
 #' @return
 #' The initialized fleet module as an object.
 #' @noRd
@@ -404,11 +424,18 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
     module_name = setNames(fleet_name, "Fleet")
   )
 
-
   module$SetSelectivity(linked_ids["selectivity"])
   module$SetObservedIndexData(linked_ids["index"])
   module$SetObservedAgeCompData(linked_ids["age_comp"])
 
+  fleet_types <- get_data(data) |>
+      dplyr::filter(name == fleet_name) |>
+      dplyr::pull(type) |>
+      unique()
+  if ("length" %in% fleet_types &
+      "LengthComp" %in% names(parameters[["modules"]][["fleets"]][[fleet_name]][["data_distribution"]])) {
+    module$SetObservedLengthCompData(linked_ids["length_comp"])
+  }
   return(module)
 }
 
@@ -429,10 +456,13 @@ initialize_index <- function(data, fleet_name) {
     cli::cli_abort("Fleet {fleet_name} not found in the data object.")
   }
 
-  fleet_type <- get_data(data) |>
-    subset(name == fleet_name) |>
-    (\(x) x$type)() |>
-    unique()
+  fleet_type <- dplyr::filter(
+    .data = as.data.frame(data@data),
+    name == fleet_name
+  ) |>
+    dplyr::distinct(type) |>
+    dplyr::pull(type)
+
 
   module <- methods::new(Index, n_years(data))
 
@@ -469,7 +499,7 @@ initialize_age_comp <- function(data, fleet_name) {
     cli::cli_abort("Fleet {fleet_name} not found in the data object.")
   }
 
-  module <- methods::new(AgeComp, data@n_years, data@n_ages)
+  module <- methods::new(AgeComp, n_years(data), n_ages(data))
 
   # Validate that the fleet's age-composition data is available
   age_comp_data <- m_agecomp(data, fleet_name)
@@ -483,10 +513,57 @@ initialize_age_comp <- function(data, fleet_name) {
   # TODO: review the AgeComp interface, do we want to add
   # `age_comp_data` as an argument?
 
-  module$age_comp_data <- age_comp_data * data@data |>
-    subset(name == fleet_name) |>
-    subset(type == "age") |>
-    (\(x) x$uncertainty)()
+  module$age_comp_data <- age_comp_data * dplyr::filter(
+    .data = as.data.frame(data@data),
+    name == fleet_name,
+    type == "age"
+  ) |>
+    dplyr::pull(uncertainty)
+
+  return(module)
+}
+
+# TODO: combine initialize_length_comp and initialize_age_comp() into a single
+# function, as they share similar code.
+#' Initialize a length-composition module
+#'
+#' @description
+#' Initializes a length-composition module for a specific fleet,
+#' setting the length-composition data for the fleet over time.
+#' @inheritParams initialize_module
+#' @param fleet_name A character. Name of the fleet for which length-composition
+#'   data is initialized.
+#' @return
+#' The initialized length-composition module as an object.
+#' @noRd
+initialize_length_comp <- function(data, fleet_name) {
+
+  # Check if the specified fleet exists in the data
+  fleet_exists <- any(get_data(data)["name"] == fleet_name)
+  if (!fleet_exists) {
+    cli::cli_abort("Fleet {fleet_name} not found in the data object.")
+  }
+
+  module <- methods::new(LengthComp, n_years(data), n_lengths(data))
+
+  # Validate that the fleet's length-composition data is available
+  length_comp_data <- m_lengthcomp(data, fleet_name)
+  if (is.null(length_comp_data) || length(length_comp_data) == 0) {
+    cli::cli_abort(c(
+      "Length-composition data for fleet `{fleet_name}` is unavailable or empty."
+    ))
+  }
+
+  # Assign the length-composition data to the module
+  # TODO: review the LengthComp interface, do we want to add
+  # `age_comp_data` as an argument?
+
+  module$length_comp_data <- length_comp_data * dplyr::filter(
+    .data = as.data.frame(data@data),
+    name == fleet_name,
+    type == "length"
+  ) |>
+    dplyr::pull(uncertainty)
 
   return(module)
 }
@@ -526,6 +603,7 @@ initialize_fims <- function(parameters, data) {
   fleet <- fleet_selectivity <-
     fleet_index <- fleet_index_distribution <-
     fleet_age_comp <- fleet_agecomp_distribution <-
+    fleet_length_comp <- fleet_lengthcomp_distribution <-
     vector("list", length(fleet_names))
 
 
@@ -551,6 +629,23 @@ initialize_fims <- function(parameters, data) {
       age_comp = fleet_age_comp[[i]]$get_id(),
       selectivity = fleet_selectivity[[i]]$get_id()
     )
+
+    fleet_types <- get_data(data) |>
+      dplyr::filter(name == fleet_names[i]) |>
+      dplyr::pull(type) |>
+      unique()
+
+    if ("length" %in% fleet_types &
+        "LengthComp" %in% names(parameters[["modules"]][["fleets"]][[fleet_names[i]]][["data_distribution"]])) {
+      fleet_length_comp[[i]] <- initialize_length_comp(
+        data = data,
+        fleet_name = fleet_names[i]
+      )
+      fleet_module_ids <- c(
+        fleet_module_ids,
+        c(length_comp = fleet_length_comp[[i]]$get_id())
+      )
+    }
 
     fleet[[i]] <- initialize_fleet(
       parameters = parameters,
@@ -599,9 +694,7 @@ initialize_fims <- function(parameters, data) {
         value = exp(
           parameters[["parameters"]][[fleet_names[i]]][[parameter_value_name]]
         ),
-        estimated = parameters[["parameters"]][[
-          fleet_names[i]]
-        ][[parameter_estimated_name]]
+        estimated = parameters[["parameters"]][[fleet_names[i]]][[parameter_estimated_name]]
       ),
       data_type = "index"
     )
@@ -626,6 +719,16 @@ initialize_fims <- function(parameters, data) {
       family = multinomial(link = "logit"),
       data_type = "agecomp"
     )
+
+    if ("length" %in% fleet_types &
+        "LengthComp" %in% names(parameters[["modules"]][["fleets"]][[fleet_names[i]]][["data_distribution"]])) {
+      fleet_lengthcomp_distribution[[i]] <- initialize_data_distribution(
+        module = fleet[[i]],
+        family = multinomial(link = "logit"),
+        data_type = "lengthcomp"
+      )
+    }
+
   }
 
   # Recruitment

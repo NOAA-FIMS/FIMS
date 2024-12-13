@@ -1,8 +1,8 @@
-data("data_mile1", package = "FIMS")
+data("data1", package = "FIMS")
 
 test_that("ewaa data can be added to model", {
   ewaa_growth <- new(EWAAgrowth)
-  fims_frame <- FIMSFrame(data_mile1)
+  fims_frame <- FIMSFrame(data1)
   ewaa_growth$ages <- m_ages(fims_frame)
   ewaa_growth$weights <- m_weight_at_age(fims_frame)
   expect_equal(ewaa_growth$evaluate(1), 0.00053065552)

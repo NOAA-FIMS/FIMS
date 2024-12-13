@@ -1,5 +1,5 @@
-data("data_mile1")
-data <- FIMSFrame(data_mile1)
+data("data1")
+data <- FIMSFrame(data1)
 
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
