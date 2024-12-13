@@ -1,19 +1,22 @@
-#' FIMS input data frame for milestone 1
+#' FIMS input data frame
 #'
 #' A dataset containing information necessary to run an age-structured stock
-#' assessment model in FIMS for milestone 1. This data was generated using
+#' assessment model in FIMS. This data was generated using
 #' the `ASSAMC` package written for the [model comparison project](
 #' www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison).
 #'
-#' @format A data frame with `r NROW(data_mile1)` observations of
-#' `r NCOL(data_mile1)` variables:
-#' \describe{
-#'   \item{type}{The type of data the row contains. Allowed types include
-#'     `age`, `index`, `landings`, and `weight-at-age` data.}
+#' @format
+#' A data frame with `r NROW(data1)` observations of `r NCOL(data1)`
+#' variables:
+#' \describe{ \item{type}{The type of data the row contains. Allowed types
+#'   include `age`, `length`, `index`, `landings`, `age-to-length-conversion`,
+#'     and `weight-at-age` data.}
 #'   \item{name}{A character string providing the name of the information source
 #'     that the data was collected from, e.g., `"Trawl fishery"`}
 #'   \item{age}{An integer age. Entry can be `NA` if information pertains to
 #'     multiple ages, e.g., total catch rather than catch of age-4 fish.}
+#'   \item{length}{A numeric length. Entry can be `NA` if information doesn't
+#'     pertain to length.}
 #'   \item{datestart,dateend}{Start and end dates of the data collection period.
 #'     Format all dates using `yyyy-mm-dd`, which can accommodate fake years
 #'     such as `0001-01-01`.}
@@ -31,4 +34,4 @@
 #' }
 #' }
 #' @source \url{www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison}
-"data_mile1"
+"data1"

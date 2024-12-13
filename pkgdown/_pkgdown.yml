@@ -33,7 +33,7 @@ reference:
       FIMS comes with a selection of built-in datasets that are used in
       examples to illustrate various visualization challenges.
   contents:
-  - data_mile1
+  - data1
 
 - title: Run FIMS
   desc: Primary functions used when setting up or running a FIMS model.

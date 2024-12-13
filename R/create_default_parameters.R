@@ -32,8 +32,8 @@
 #' * [update_parameters()]
 #' @examples
 #' \dontrun{
-#' data("data_mile1")
-#' fims_frame <- FIMSFrame(data_mile1)
+#' data("data1")
+#' fims_frame <- FIMSFrame(data1)
 #' fleet1 <- survey1 <- list(
 #'   selectivity = list(form = "LogisticSelectivity"),
 #'   data_distribution = c(
@@ -41,9 +41,17 @@
 #'     AgeComp = "DmultinomDistribution"
 #'   )
 #' )
+#' fleet2 <- list(
+#'   selectivity = list(form = "DoubleLogisticSelectivity"),
+#'   data_distribution = c(
+#'     Index = "DlnormDistribution",
+#'     AgeComp = "DmultinomDistribution",
+#'     LengthComp = "DmultinomDistribution"
+#'   )
+#' )
 #' default_parameters <- fims_frame |>
 #'   create_default_parameters(
-#'     fleets = list(fleet1 = fleet1, survey1 = survey1),
+#'     fleets = list(fleet1 = fleet1, fleet2 = fleet2, survey1 = survey1),
 #'     recruitment = list(
 #'       form = "BevertonHoltRecruitment",
 #'       process_distribution = c(log_devs = "DnormDistribution")

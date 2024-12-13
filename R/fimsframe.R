@@ -48,7 +48,7 @@ setClass(
 #' @return
 #' A data frame of the class of `data.frame` containing data for a FIMS model
 #' in a long format. The data frame will have the following columns:
-#' `r glue::glue_collapse(colnames(data_mile1), sep = ", ", last = ", and ")`.
+#' `r glue::glue_collapse(colnames(data1), sep = ", ", last = ", and ")`.
 #' @rdname get_data
 setGeneric("get_data", function(x) standardGeneric("get_data"))
 #' @rdname get_data
@@ -463,11 +463,11 @@ setValidity(
     # Check the format for acceptable variants of the ideal yyyy-mm-dd
     grepl_datestart <- grepl(
       "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      data_mile1[["datestart"]]
+      data1[["datestart"]]
     )
     grepl_dateend <- grepl(
       "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      data_mile1[["dateend"]]
+      data1[["dateend"]]
     )
     if (!all(grepl_datestart)) {
       errors <- c(errors, "datestart must be in 'yyyy-mm-dd' format")
@@ -579,9 +579,10 @@ FIMSFrame <- function(data) {
     ages <- numeric()
   }
   n_ages <- length(ages)
+  
   if ("length" %in% colnames(data)) {
-    lengths <- min(data[["length"]], na.rm = TRUE):
-      max(data[["length"]], na.rm = TRUE)
+    lengths <- sort(unique(data[["length"]]))
+    lengths <- lengths[!is.na(lengths)]
   } else {
     lengths <- numeric()
   }

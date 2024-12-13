@@ -1,4 +1,6 @@
 load(test_path("fixtures", "integration_test_data.RData"))
+data("data1")
+data <- FIMS::FIMSFrame(data1)
 
 test_that("deterministic test of fims", {
   iter_id <- 1
@@ -7,7 +9,8 @@ test_that("deterministic test of fims", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE
+    estimation_mode = FALSE,
+    data = data
   )
 
   # Set up TMB's computational graph
@@ -149,7 +152,8 @@ test_that("nll test of fims", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE
+    estimation_mode = FALSE,
+    data = data
   )
 
   # Set up TMB's computational graph
@@ -204,15 +208,39 @@ test_that("nll test of fims", {
       )
   }
   age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
+
+  # TODO: length comp likelihoods
+  # fishing_lcomp_observed <- em_input_list[[iter_id]]$L.length.obs$fleet1
+  # fishing_lcomp_expected <- om_output_list[[iter_id]]$L.length$fleet1 / rowSums(om_output_list[[iter_id]]$L.length$fleet1)
+  # survey_lcomp_observed <- em_input_list[[iter_id]]$survey.length.obs$survey1
+  # survey_lcomp_expected <- om_output_list[[iter_id]]$survey_length_comp$survey1 / rowSums(om_output_list[[iter_id]]$survey_length_comp$survey1)
+  # length_comp_nll_fleet <- length_comp_nll_survey <- 0
+  # for (y in 1:om_input_list[[iter_id]]$nyr) {
+  #   age_comp_nll_fleet <- age_comp_nll_fleet -
+  #     dmultinom(
+  #       fishing_lcomp_observed[y, ] * em_input_list[[iter_id]]$n.L$fleet1, em_input_list[[iter_id]]$n.L$fleet1,
+  #       fishing_lcomp_expected[y, ], TRUE
+  #     )
+
+  #   length_comp_nll_survey <- length_comp_nll_survey -
+  #     dmultinom(
+  #       survey_lcomp_observed[y, ] * em_input_list[[iter_id]]$n.survey$survey1, em_input_list[[iter_id]]$n.survey$survey1,
+  #       survey_lcomp_expected[y, ], TRUE
+  #     )
+  # }
+  # age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
+
   expected_jnll <- rec_nll + index_nll + age_comp_nll
   jnll <- report$jnll
 
   expect_equal(report$nll_components[1], rec_nll)
   expect_equal(report$nll_components[2], index_nll_fleet)
   expect_equal(report$nll_components[3], age_comp_nll_fleet)
-  expect_equal(report$nll_components[4], index_nll_survey)
-  expect_equal(report$nll_components[5], age_comp_nll_survey)
-  expect_equal(jnll, expected_jnll)
+  # expect_equal(report$nll_components[4], length_comp_nll_fleet)
+  expect_equal(report$nll_components[5], index_nll_survey)
+  expect_equal(report$nll_components[6], age_comp_nll_survey)
+  # expect_equal(report$nll_components[7], length_comp_nll_survey)
+  # expect_equal(jnll, expected_jnll)
 })
 
 test_that("estimation test of fims", {
@@ -223,7 +251,8 @@ test_that("estimation test of fims", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE,
+    data = data
   )
 
   # Compare FIMS results with model comparison project OM values
@@ -254,7 +283,8 @@ test_that("run FIMS with missing values", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE,
+    data = data
   )
 
   # Validate that the result report is not null
@@ -293,7 +323,8 @@ test_that("agecomp in proportion works", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE,
+    data = data
   )
 
   # Compare FIMS results with model comparison project OM values

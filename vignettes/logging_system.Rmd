@@ -26,7 +26,7 @@ colorize <- function(x, color) {
 clear()
 
 # use FIMS data frame
-fims_frame <- FIMSFrame(data_mile1)
+fims_frame <- FIMSFrame(data1)
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(

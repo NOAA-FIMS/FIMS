@@ -17,9 +17,9 @@ fleets <- list(
   )
 )
 
-data("data_mile1")
-data <- FIMS::FIMSFrame(data_mile1)
-default_parameters <- data_mile1 |>
+data("data1")
+data <- FIMS::FIMSFrame(data1)
+default_parameters <- data1 |>
   FIMS::FIMSFrame() |>
   create_default_parameters(
     fleets = fleets,
