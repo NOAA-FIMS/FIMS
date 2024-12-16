@@ -14,11 +14,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Fisheries Integrated Modeling System
-The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. FIMS is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It's important to note that FIMS itself is not a model, but rather a framework for creating models. The framework is made up of many modules that come together to create a "the best model" that suites the needs of the end-user. What follows is a demo of creating a catch-at-age assessment model using FIMS. 
+The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. FIMS is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It's important to note that FIMS itself is not a model, but rather a framework for creating models. The framework is made up of many modules that come together to create a model that best suits the needs of the end-user. What follows is a demo of creating a catch-at-age assessment model using FIMS. 
 
 ## Import Libraries and Clear Memory
 
-To begin, we import the FIMS and TMB libraries. Calling `library(FIMS)` automatically loads the Rcpp functions and modules into the R environment. The function call, `clear()`, ensures C++ memory from any previous fims model run is cleared out. 
+To begin, we import the FIMS and TMB libraries. Calling `library(FIMS)` automatically loads the Rcpp functions and modules into the R environment. The function call `clear()` ensures C++ memory from any previous FIMS model run is cleared out.
 ```{r fims1, warning=FALSE, message=FALSE}
 # automatically loads fims Rcpp module
 library(FIMS)
@@ -30,11 +30,11 @@ clear()
 
 ## Set up Data and Parameters
 
-Data and variable values are taken from the [Li et. al.](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united) Model Comparison project ([github site](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison)). See [R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) and [tests/testthat/fixtures/simulate-integration-test-data.R](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/fixtures/simulate-integration-test-data.R) for details on how data and variable values are read into FIMS from the Model Comparison project.
+Data and variable values are taken from the [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) Model Comparison project ([github site](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison)). See [R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) and [tests/testthat/fixtures/simulate-integration-test-data.R](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/fixtures/simulate-integration-test-data.R) for details on how data and variable values are read into FIMS from the Model Comparison project.
 
 ### Prepare Data using FIMSFrame
 
-We will be reading data into the model using the FIMSFrame S4 R class set up in [R/fimsframe.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/fimsframe.R)
+We will be reading data into the model using the FIMSFrame S4 R class set up in [R/fimsframe.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/fimsframe.R).
 
 ```{r prepare-fimsframe-data}
 # use FIMS data frame
@@ -54,13 +54,18 @@ fims_frame@data |>
   utils::head()
 ```
 
-Using this data frame, we will start setting up the FIMS objects. This example from the Model Comparison project sets up a single fishery fleet with age composition and catch data and a single survey with age composition data and an index. Data are read into FIMS as long vectors, regardless of their original dimension, hence the motivation behind the long data frames created with the fimsframe S4 classes. 
+Using this data frame, we will start setting up the FIMS objects. This example from the Model Comparison project sets up a model that includes:
+
+- A single fishery fleet with age composition and catch data
+- A single survey with age composition data and an index
+
+Data are read into FIMS as long vectors, regardless of their original dimension, hence the motivation behind the long data frames created with the fimsframe S4 classes. 
 
 ### Prepare Parameters using `create_default_parameters()`
 
 Now that we've prepared the data, let's set up parameters for modules. Each module in the FIMS-R interface is made of reference classes. These reference classes serve as an interface between R and the underlining C++ code that defines FIMS. 
 
-Here, we define specifications for fleets, recruitment, growth, and maturity modules. Using `create_default_parameters()`, we create default values for parameters from fleet, recruitment, growth, and maturity modules. 
+Here, we define specifications for fleets, recruitment, growth, and maturity modules. Using `create_default_parameters()`, we create default values for parameters from fleet, recruitment, growth, and maturity modules.
 ```{r, max.height='100px', attr.output='.numberLines'}
 # Define fleet specifications for fleet1 and survey1
 fleet1 <- survey1 <- list(
@@ -153,7 +158,7 @@ parameters <- default_parameters |>
 
 ## Initialize modules and fit the model
 
-With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fimt()`.
+With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fims()`.
 ```{r, max.height='100px', attr.output='.numberLines', fit-fims}
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters |>
