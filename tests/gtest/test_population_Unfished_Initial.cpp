@@ -20,7 +20,6 @@ namespace
                 { 
                     if(!population.fleets[fleet_index]->is_survey){
                     // Known values were used to generate "true" value and test CalculateMortality()
-                    size_t index_yf = year * population.nfleets + fleet_index;
                     mortality_F[i_age_year] += population.fleets[fleet_index]->Fmort[year] *
                                              population.fleets[fleet_index]->selectivity->evaluate(population.ages[age]);
                 
