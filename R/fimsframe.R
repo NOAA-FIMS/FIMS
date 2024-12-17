@@ -463,11 +463,11 @@ setValidity(
     # Check the format for acceptable variants of the ideal yyyy-mm-dd
     grepl_datestart <- grepl(
       "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      data1[["datestart"]]
+      object@data[["datestart"]]
     )
     grepl_dateend <- grepl(
       "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      data1[["dateend"]]
+      object@data[["dateend"]]
     )
     if (!all(grepl_datestart)) {
       errors <- c(errors, "datestart must be in 'yyyy-mm-dd' format")
