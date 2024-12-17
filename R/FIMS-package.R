@@ -6,7 +6,6 @@
 #' @import methods
 #' @importFrom ggplot2 .data
 #' @export CreateTMBModel
-#' @export SetFIMSFunctions
 #' @export finalize
 #' @export get_fixed
 #' @export get_log

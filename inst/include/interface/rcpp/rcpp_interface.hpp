@@ -109,17 +109,6 @@ bool CreateTMBModel() {
 }
 
 /**
- * @brief TODO: provide a brief description.
- *
- * @param fn
- * @param gr
- */
-void SetFIMSFunctions(SEXP fn, SEXP gr) {
-    FIMS_objective_function = fn;
-    FIMS_gradient_function = gr;
-}
-
-/**
  * @brief Loops through the Rcpp Interface objects and extracts derived
  * quantities.Updates parameter estimates from model core objects.
  */
@@ -686,9 +675,6 @@ RCPP_MODULE(fims) {
     Rcpp::function(
         "CreateTMBModel", &CreateTMBModel,
         "Creates the TMB model object and adds interface objects to it.");
-    Rcpp::function(
-        "SetFIMSFunctions", &SetFIMSFunctions,
-        "");
     Rcpp::function(
         "finalize", &finalize_fims,
         "Extracts the derived quantities from `Information` to the Rcpp object.");
