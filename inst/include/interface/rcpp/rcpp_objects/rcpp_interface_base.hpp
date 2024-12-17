@@ -20,26 +20,41 @@
 #include <Rcpp.h>
 
 /**
- * @brief RcppInterface class that defines
- * the interface between R and C++ for parameter types.
+ * @brief An RcppInterface class that defines the Parameter class.
+ *
+ * @details
+ * An RcppInterface class that defines the interface between R and C++ for
+ * a parameter type.
  */
 class Parameter {
  public:
  static uint32_t id_g; /**< global id of the parameter */
     uint32_t id_m; /**< id of the parameter */
-  double initial_value_m = 0.0; /**< initial value of the parameter */
-  double final_value_m = 0.0; /**< final value of the parameter */
+  double initial_value_m =
+      0.0; /**<A numeric value specifying the initial value of the parameter.*/
+  double final_value_m =
+      0.0; /**<A numeric value specifying the final value of the parameter.*/
   double min_m =
-      -std::numeric_limits<double>::infinity(); /**< min value of the parameter; default is negative infinity*/
+      -std::numeric_limits<double>::infinity(); /**<A numeric value specifying
+                                                    the minimum possible
+                                                    parameter value, where the
+                                                    default is negative
+                                                    infinity.*/
   double max_m =
-      std::numeric_limits<double>::infinity(); /**< max value of the parameter; default is positive infinity*/
-  bool is_random_effect_m = false;        /**< Is the parameter a random effect
-                                           parameter? Default value is false.*/
+      std::numeric_limits<double>::infinity(); /**<A numeric value specifying
+                                                   the minimum possible
+                                                   parameter value, where the
+                                                   default is positive
+                                                   infinity.*/
+  bool is_random_effect_m =
+      false; /**<A boolean indicating whether or not the parameter is a random
+                 effect; the default is false.*/
   bool estimated_m =
-      false; /**< Is the parameter estimated? Default value is false.*/
-
+      false; /**<A boolean indicating whether or not the parameter is
+                 estimated; the default is false.*/
   bool random_m =
-    false; /**< is the parameter random? Default value is false.*/
+    false; /**<A boolean indicating whether or not the parameter is random; the
+               default is false.*/
 
   /**
    * @brief Constructor for initializing Parameter.
@@ -101,7 +116,7 @@ uint32_t Parameter::id_g = 0;
 
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  * @param out 
  * @param p 
  * @return std::ostream& 
@@ -114,8 +129,11 @@ std::ostream& operator<<(std::ostream& out, const Parameter& p) {
 }
 
 /**
- * @brief Rcpp representation of a Parameter vector
- * interface between R and cpp.
+ * @brief An RcppInterface class that defines the ParameterVector class.
+ *
+ * @details
+ * An RcppInterface class that defines the interface between R and C++ for
+ * a parameter vector type.
  */
 class ParameterVector{
 public:
@@ -183,7 +201,7 @@ public:
     }
 
     /**
-     * @brief get the ID of the interface base object
+     * @brief Gets the ID of the ParameterVector object.
      */
     virtual uint32_t get_id() { return this->id_m; }
 
@@ -208,8 +226,11 @@ public:
     }
 
     /**
-     *  @brief Internal accessor. First index is one. For calling from R.
-     *  @param pos return a Parameter at position "pos".
+     *  @brief An internal accessor for calling a position of a ParameterVector
+     *  from R.
+     *  @param pos An integer specifying the position of the ParameterVector
+     *  you want returned. The first position is one and the last position is
+     *  the same as the size of the ParameterVector.
      */
     Parameter& get(size_t pos) {
         if (pos >= this->storage_m->size()) {
@@ -220,33 +241,40 @@ public:
     }
 
     /**
-     *  @brief Internal setter.
-     *  @param pos The position
-     *  @param p The parameter
+     *  @brief An internal setter for setting a position of a ParameterVector
+     *  from R.
+     *  @param pos An integer specifying the position of the ParameterVector
+     *  you want to set. The first position is one and the last position is the
+     *  same as the size of the ParameterVector.
+     *  @param p A numeric value specifying the value to set position `pos` to
+     *  in the ParameterVector.
      */
     void set(size_t pos, const Parameter& p) {
         this->storage_m->at(pos) = p;
     }
 
     /**
-     *  @brief returns vector length
+     *  @brief Returns the size of a ParameterVector.
      */
     size_t size() {
         return this->storage_m->size();
     }
 
     /**
-     *  @brief resize to length "size"
-     *  @param size new length of vector to be resized
+     *  @brief Resizes a ParameterVector to the desired length.
+     *  @param size An integer specifying the desired length for the
+     *  ParameterVector to be resized to.
      */
     void resize(size_t size) {
         this->storage_m->resize(size);
     }
 
     /**
-     * @brief Sets all parameters within a vector as estimable
+     * @brief Sets all Parameters within a ParameterVector as estimable.
      *
-     * @param estimable Boolean; if true, all parameters are set to be estimated in the model
+     * @param estimable A boolean specifying if all Parameters within the
+     * ParameterVector should be estimated within the model. A value of true
+     * leads to all Parameters being estimated.
      */
     void set_all_estimable(bool estimable){
         for (size_t i = 0; i < this->storage_m->size(); i++) {
@@ -255,9 +283,11 @@ public:
     }
 
     /**
-     * @brief Sets all parameters within a vector as random
+     * @brief Sets all Parameters within a ParameterVector as random effects.
      *
-     * @param random Boolean; if true, all parameters are set to be random effects in the model
+     * @param random A boolean specifying if all Parameters within the
+     * ParameterVector should be designated as random effects. A value of true
+     * leads to all Parameters being random effects.
      */
     void set_all_random(bool random){
         for (size_t i = 0; i < this->storage_m->size(); i++) {
@@ -266,9 +296,11 @@ public:
     }
 
     /**
-     * @brief Assigns the given values to all elements in the vector
+     * @brief Sets the value of all Parameters in the ParameterVector to the
+     * provided value.
      *
-     * @param value The value to be assigned
+     * @param value A double specifying the value to set all Parameters to
+     * within the ParameterVector.
      */
     void fill(double value){
         for (size_t i = 0; i < this->storage_m->size(); i++) {
@@ -299,7 +331,7 @@ public:
     }
 
     /**
-     * @brief Printing methods for ParameterVector
+     * @brief The printing methods for a ParameterVector.
      *
      */
     void show() {
@@ -315,7 +347,7 @@ uint32_t ParameterVector::id_g = 0;
 
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  * @param out 
  * @param v 
  * @return std::ostream& 

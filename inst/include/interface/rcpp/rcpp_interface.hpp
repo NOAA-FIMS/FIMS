@@ -22,42 +22,42 @@
 
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  */
 SEXP FIMS_objective_function;
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  */
 SEXP FIMS_gradient_function;
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  */
 double FIMS_function_value = 0;
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  */
 Rcpp::NumericVector FIMS_function_parameters;
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  */
 Rcpp::NumericVector FIMS_function_gradient;
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  */
 double FIMS_mgc_value = 0;
 /**
  * @brief Sets FIMS_finalized to false as the default.
- * 
+ *
  */
 bool FIMS_finalized = false;
 
 /**
- * Initializes the logging system, sets all signal handling.
+ * Initializes the logging system, setting all signal handling.
  */
 void init_logging() {
     std::signal(SIGSEGV, &fims::WriteAtExit);
@@ -69,7 +69,11 @@ void init_logging() {
 }
 
 /**
- * @brief Create the TMB model object and add interface objects to it.
+ * @brief Creates the TMB model object and adds interface objects to it.
+ *
+ * @details
+ * This function is called within `initialize_fims()` from R and is not
+ * typically called by the user directly.
  */
 bool CreateTMBModel() {
 
@@ -106,9 +110,9 @@ bool CreateTMBModel() {
 
 /**
  * @brief TODO: provide a brief description.
- * 
- * @param fn 
- * @param gr 
+ *
+ * @param fn
+ * @param gr
  */
 void SetFIMSFunctions(SEXP fn, SEXP gr) {
     FIMS_objective_function = fn;
@@ -331,7 +335,7 @@ void finalize_fims_deprecated(SEXP tmb_obj = R_NilValue) {
 }
 
 /**
- * @brief Extracts derived quantities from model objects.
+ * @brief Extracts the derived quantities from model objects.
  */
 std::string get_output() {
     std::string ret;
@@ -374,9 +378,9 @@ std::string get_output() {
 }
 
 /**
- * @brief Get the fixed parameters vector object
- * 
- * @return Rcpp::NumericVector 
+ * @brief Gets the fixed parameters vector object.
+ *
+ * @return Rcpp::NumericVector
  */
 Rcpp::NumericVector get_fixed_parameters_vector() {
     // base model
@@ -393,9 +397,9 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
 }
 
 /**
- * @brief Get the random parameters vector object
- * 
- * @return Rcpp::NumericVector 
+ * @brief Gets the random parameters vector object.
+ *
+ * @return Rcpp::NumericVector
  */
 Rcpp::NumericVector get_random_parameters_vector() {
     // base model
@@ -412,10 +416,10 @@ Rcpp::NumericVector get_random_parameters_vector() {
 }
 
 /**
- * @brief Get the parameter names object
- * 
- * @param pars 
- * @return Rcpp::List 
+ * @brief Gets the parameter names object.
+ *
+ * @param pars
+ * @return Rcpp::List
  */
 Rcpp::List get_parameter_names(Rcpp::List pars) {
     // base model
@@ -430,8 +434,8 @@ Rcpp::List get_parameter_names(Rcpp::List pars) {
 
 /**
  * @brief Clears the internal objects.
- * 
- * @tparam Type 
+ *
+ * @tparam Type
  */
 template <typename Type>
 void clear_internal() {
@@ -532,35 +536,35 @@ void clear() {
 }
 
 /**
- * Returns the entire log as a string in JSON format.
+ * Gets the log entries as a string in JSON format.
  */
 std::string get_log() {
     return fims::FIMSLog::fims_log->get_log();
 }
 
 /**
- * Returns only error entries from log as a string in JSON format.
+ * Gets the error entries from the log as a string in JSON format.
  */
 std::string get_log_errors() {
     return fims::FIMSLog::fims_log->get_errors();
 }
 
 /**
- * Returns only warning entries from log as a string in JSON format.
+ * Gets the warning entries from the log as a string in JSON format.
  */
 std::string get_log_warnings() {
     return fims::FIMSLog::fims_log->get_warnings();
 }
 
 /**
- * Returns only info entries from log as a string in JSON format.
+ * Gets the info entries from the log as a string in JSON format.
  */
 std::string get_log_info() {
     return fims::FIMSLog::fims_log->get_info();
 }
 
 /**
- * Returns log entries by module as a string in JSON format.
+ * Gets log entries by module as a string in JSON format.
  */
 std::string get_log_module(const std::string& module) {
     return fims::FIMSLog::fims_log->get_module(module);
@@ -575,7 +579,7 @@ void write_log(bool write) {
 }
 
 /**
- * Sets the path for the log file to written.
+ * Sets the path for the log file to be written to.
  */
 void set_log_path(const std::string& path) {
     FIMS_INFO_LOG("Setting FIMS log path: " + path);
@@ -583,31 +587,31 @@ void set_log_path(const std::string& path) {
 }
 
 /**
- * If true, throws a  runtime exception when an error is logged .
+ * If true, throws a runtime exception when an error is logged.
  */
 void set_log_throw_on_error(bool throw_on_error) {
     fims::FIMSLog::fims_log->throw_on_error = throw_on_error;
 }
 
 /**
- * Add log info entry from R.
+ * Adds an info entry to the log from the R environment.
  */
 void log_info(std::string log_entry) {
     fims::FIMSLog::fims_log->info_message(log_entry, -1, "R_env", "R_script_entry");
 }
 
 /**
- * Add log warning entry from R.
+ * Adds a warning entry to the log from the R environment.
  */
 void log_warning(std::string log_entry) {
     fims::FIMSLog::fims_log->warning_message(log_entry, -1, "R_env", "R_script_entry");
 }
 
 /**
- * @brief Escape quotations.
- * 
+ * @brief Escapes quotations.
+ *
  * @param input A string.
- * @return std::string 
+ * @return std::string
  */
 std::string escapeQuotes(const std::string& input) {
     std::string result = input;
@@ -624,7 +628,7 @@ std::string escapeQuotes(const std::string& input) {
 }
 
 /**
- * Add log error entry from R.
+ * Adds a error entry to the log from the R environment.
  */
 void log_error(std::string log_entry) {
 
@@ -662,57 +666,137 @@ RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
 
 /**
- * @brief Construct a new rcpp module object
- * 
+ * @brief The `fims` Rcpp module construct, providing declarative code of what
+ * the module exposes to R.
+ *
+ * @details
+ * Each element included in the module should have a name, a pointer, and a
+ * description separated by commas in that order. Both the name and the
+ * description should be wrapped in quotes. The description is printed to the
+ * screen when the R function `methods::show()` is used on the object. The
+ * available description should exactly match the information found in the
+ * brief tag where the function, class, etc. is documented. See the Rcpp
+ * vignette for more information on documenting modules, particularly how to
+ * include lists for parameters to a function. Each of the functions included
+ * in this module should be exported by manually exporting them in
+ * R/FIMS-package.R.
+ *
  */
 RCPP_MODULE(fims) {
-    Rcpp::function("CreateTMBModel", &CreateTMBModel);
-    Rcpp::function("SetFIMSFunctions", &SetFIMSFunctions);
-    Rcpp::function("finalize", &finalize_fims);
-    Rcpp::function("get_output", &get_output);
-    Rcpp::function("get_fixed", &get_fixed_parameters_vector);
-    Rcpp::function("get_random", &get_random_parameters_vector);
-    Rcpp::function("get_parameter_names", &get_parameter_names);
-    Rcpp::function("clear", clear);
-    Rcpp::function("get_log", get_log);
-    Rcpp::function("get_log_errors", get_log_errors);
-    Rcpp::function("get_log_warnings", get_log_warnings);
-    Rcpp::function("get_log_info", get_log_info);
-    Rcpp::function("get_log_module", get_log_module);
-    Rcpp::function("write_log", write_log);
-    Rcpp::function("set_log_path", set_log_path);
-    Rcpp::function("init_logging", init_logging);
-    Rcpp::function("set_log_throw_on_error", set_log_throw_on_error);
-    Rcpp::function("log_info", log_info);
-    Rcpp::function("log_warning", log_warning);
-    Rcpp::function("log_error", log_error);
-    Rcpp::class_<Parameter>("Parameter", "FIMS Parameter Class")
+    Rcpp::function(
+        "CreateTMBModel", &CreateTMBModel,
+        "Creates the TMB model object and adds interface objects to it.");
+    Rcpp::function(
+        "SetFIMSFunctions", &SetFIMSFunctions,
+        "");
+    Rcpp::function(
+        "finalize", &finalize_fims,
+        "Extracts the derived quantities from `Information` to the Rcpp object.");
+    Rcpp::function(
+        "get_output", &get_output,
+        "Extracts the derived quantities from model objects.");
+    Rcpp::function(
+        "get_fixed", &get_fixed_parameters_vector,
+        "Gets the fixed parameters vector object.");
+    Rcpp::function(
+        "get_random", &get_random_parameters_vector,
+        "Gets the random parameters vector object.");
+    Rcpp::function(
+        "get_parameter_names", &get_parameter_names,
+        "Gets the parameter names object.");
+    Rcpp::function(
+        "clear", clear,
+        "Clears all pointers/references of a FIMS model");
+    Rcpp::function(
+        "get_log", get_log,
+        "Gets the log entries as a string in JSON format.");
+    Rcpp::function(
+        "get_log_errors", get_log_errors,
+        "Gets the error entries from the log as a string in JSON format.");
+    Rcpp::function(
+        "get_log_warnings", get_log_warnings,
+        "Gets the warning entries from the log as a string in JSON format.");
+    Rcpp::function(
+        "get_log_info", get_log_info,
+        "Gets the info entries from the log as a string in JSON format.");
+    Rcpp::function(
+        "get_log_module", get_log_module,
+        "Gets log entries by module as a string in JSON format.");
+    Rcpp::function(
+        "write_log", write_log,
+        "If true, writes the log on exit.");
+    Rcpp::function(
+        "set_log_path", set_log_path,
+        "Sets the path for the log file to be written to.");
+    Rcpp::function(
+        "init_logging", init_logging,
+        "Initializes the logging system, setting all signal handling.");
+    Rcpp::function(
+        "set_log_throw_on_error", set_log_throw_on_error,
+        "If true, throws a runtime exception when an error is logged.");
+    Rcpp::function(
+        "log_info", log_info,
+        "Adds an info entry to the log from the R environment.");
+    Rcpp::function(
+        "log_warning", log_warning,
+        "Adds a warning entry to the log from the R environment.");
+    Rcpp::function(
+        "log_error", log_error,
+        "Adds a error entry to the log from the R environment.");
+    Rcpp::class_<Parameter>(
+        "Parameter",
+        "An RcppInterface class that defines the Parameter class.")
             .constructor()
             .constructor<double>()
             .constructor<Parameter>()
-            .field("value", &Parameter::initial_value_m, "numeric parameter value")
-            .field("value", &Parameter::final_value_m, "numeric estimated parameter value")
-            .field("min", &Parameter::min_m, "minimum parameter value")
-            .field("max", &Parameter::max_m, "maximum parameter value")
-            .field("id", &Parameter::id_m, "unique id for parameter class")
-            .field("is_random_effect", &Parameter::is_random_effect_m, "A boolean indicating whether or not parameter is a random effect; default value is FALSE.")
-            .field("estimated", &Parameter::estimated_m, "A boolean indicating whether or not parameter is estimated; default value is FALSE.");
+            .field(
+                "value", &Parameter::initial_value_m,
+                "A numeric value specifying the initial value of the parameter.")
+            .field(
+                "value", &Parameter::final_value_m,
+                "A numeric value specifying the final value of the parameter.")
+            .field(
+                "min", &Parameter::min_m,
+                "A numeric value specifying the minimum possible parameter value, where the default is negative infinity.")
+            .field(
+                "max", &Parameter::max_m,
+                "A numeric value specifying the maximum possible parameter value, where the default is positive infinity.")
+            .field(
+                "id", &Parameter::id_m,
+                "unique id for parameter class")
+            .field(
+                "is_random_effect", &Parameter::is_random_effect_m,
+                "A boolean indicating whether or not the parameter is a random effect; the default is FALSE.")
+            .field(
+                "estimated", &Parameter::estimated_m,
+                "A boolean indicating whether or not the parameter is estimated; the default is FALSE.");
 
-    Rcpp::class_<ParameterVector>("ParameterVector")
+    Rcpp::class_<ParameterVector>(
+      "ParameterVector",
+      "An RcppInterface class that defines the ParameterVector class.")
             .constructor()
             .constructor<size_t>()
             .constructor<Rcpp::NumericVector, size_t>()
-            .method("get", &ParameterVector::get)
-            .method("set", &ParameterVector::set)
-            .method("show", &ParameterVector::show)
-            //            .field("data", &ParameterVector::storage_m, "list where each element is a Parameter class")
-            .method("at", &ParameterVector::at, "Returns a Parameter at the indicated position given the index argument.")
-            .method("size", &ParameterVector::size, "Returns the size of the Parameter Vector.")
-            .method("resize", &ParameterVector::resize, "Resizes the Parameter Vector given the provided length argument.")
-            .method("set_all_estimable", &ParameterVector::set_all_estimable, "Sets all Parameters within vector as estimable.")
-            .method("set_all_random", &ParameterVector::set_all_random, "Sets all Parameters within vector as random.")
-            .method("fill", &ParameterVector::fill, "Sets the value of all Parameters in the vector with the provided value.")
-            .method("get_id", &ParameterVector::get_id, "Get the ID of the interface base object.");
+            .method("get", &ParameterVector::get,
+                "An internal accessor for calling a position of a ParameterVector from R.")
+            .method("set", &ParameterVector::set,
+                "An internal setter for setting a position of a ParameterVector from R.")
+            .method("show", &ParameterVector::show,
+                "The printing methods for a ParameterVector.")
+            .method("at", &ParameterVector::at,
+                "Returns a Parameter at the indicated position given the index argument.")
+            .method("size", &ParameterVector::size,
+                "Returns the size of a ParameterVector.")
+            .method("resize", &ParameterVector::resize,
+                "Resizes a ParameterVector to the desired length.")
+            .method("set_all_estimable", &ParameterVector::set_all_estimable,
+                "Sets all Parameters within a ParameterVector as estimable.")
+            .method("set_all_random", &ParameterVector::set_all_random,
+                "Sets all Parameters within a ParameterVector as random effects.")
+            .method("fill", &ParameterVector::fill,
+                "Sets the value of all Parameters in the ParameterVector to the provided value.")
+            .method("get_id", &ParameterVector::get_id,
+                "Gets the ID of the ParameterVector object.");
 
     Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
             .constructor()
@@ -763,22 +847,22 @@ RCPP_MODULE(fims) {
 
     Rcpp::class_<PopulationInterface>("Population")
             .constructor()
-            .method("get_id", &PopulationInterface::get_id)
-            .field("nages", &PopulationInterface::nages)
-            .field("nfleets", &PopulationInterface::nfleets)
-            .field("nseasons", &PopulationInterface::nseasons)
-            .field("nyears", &PopulationInterface::nyears)
-            .field("nlengths", &PopulationInterface::nlengths)
-            .field("log_M", &PopulationInterface::log_M)
-            .field("log_init_naa", &PopulationInterface::log_init_naa)
-            .field("proportion_female", &PopulationInterface::proportion_female)
-            .field("ages", &PopulationInterface::ages)
-            .field("estimate_prop_female", &PopulationInterface::estimate_prop_female)
-            .method("evaluate", &PopulationInterface::evaluate)
-            .method("SetMaturity", &PopulationInterface::SetMaturity)
-            .method("SetGrowth", &PopulationInterface::SetGrowth)
-            .method("SetRecruitment", &PopulationInterface::SetRecruitment)
-            .method("evaluate", &PopulationInterface::evaluate);
+            .method("get_id", &PopulationInterface::get_id, "get population ID")
+            .field("nages", &PopulationInterface::nages, "number of ages")
+            .field("nfleets", &PopulationInterface::nfleets, "number of fleets")
+            .field("nseasons", &PopulationInterface::nseasons, "number of seasons")
+            .field("nyears", &PopulationInterface::nyears, "number of years")
+            .field("nlengths", &PopulationInterface::nlengths, "number of lengths")
+            .field("log_M", &PopulationInterface::log_M, "log of the natural mortality of the stock")
+            .field("log_init_naa", &PopulationInterface::log_init_naa, "log of the initial numbers at age")
+            .field("proportion_female", &PopulationInterface::proportion_female, "double representing the proportion of female individuals")
+            .field("ages", &PopulationInterface::ages, "vector of ages in the population; length nages")
+            .field("estimate_prop_female", &PopulationInterface::estimate_prop_female, "whether proportion female should be estimated")
+            .method("evaluate", &PopulationInterface::evaluate, "evaluate the population function")
+            .method("SetMaturity", &PopulationInterface::SetMaturity, "Set the unique id for the Maturity object")
+            .method("SetGrowth", &PopulationInterface::SetGrowth, "Set the unique id for the growth object")
+            .method("SetRecruitment", &PopulationInterface::SetRecruitment, "Set the unique id for the Recruitment object")
+            .method("evaluate", &PopulationInterface::evaluate, "evaluate the population function");
 
     Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
         .constructor()
@@ -797,19 +881,35 @@ RCPP_MODULE(fims) {
 
     Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
             .constructor()
-            .field("inflection_point_asc",
-            &DoubleLogisticSelectivityInterface::inflection_point_asc)
-            .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc)
-            .field("inflection_point_desc",
-            &DoubleLogisticSelectivityInterface::inflection_point_desc)
-            .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
-            .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
-            .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
+            .field(
+                "inflection_point_asc",
+                &DoubleLogisticSelectivityInterface::inflection_point_asc,
+                "50 percent quantile of the value of the quantity of interest (x)  on the ascending limb of the double logistic curve; e.g., age at  which 50 percent of the fish are selected.")
+            .field(
+                "slope_asc",
+                &DoubleLogisticSelectivityInterface::slope_asc,
+                "Scalar multiplier of difference between quantity of interest value (x) and inflection_point on the ascending limb of the double logistic curve.")
+            .field(
+                "inflection_point_desc",
+                &DoubleLogisticSelectivityInterface::inflection_point_desc,
+                "50 percent quantile of the value of the quantity of interest (x) on the descending limb of the double logistic curve; e.g. age at which 50 percent of the fish are selected.")
+            .field(
+                "slope_desc",
+                &DoubleLogisticSelectivityInterface::slope_desc,
+                "Scalar multiplier of difference between quantity of interest  value (x) and inflection_point on the descending limb of the double  logistic  curve.")
+            .method(
+                "get_id", 
+                &DoubleLogisticSelectivityInterface::get_id,
+                "Returns a unique ID for the selectivity class.")
+            .method(
+                "evaluate",
+                &DoubleLogisticSelectivityInterface::evaluate,
+                "Evaluates the double logistic selectivity given input value (e.g., age or size in selectivity).");
 
     Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
             .constructor()
-            .field("ages", &EWAAGrowthInterface::ages)
-            .field("weights", &EWAAGrowthInterface::weights)
+            .field("ages", &EWAAGrowthInterface::ages, "Ages for each age class.")
+            .field("weights", &EWAAGrowthInterface::weights, "Weights for each age class.")
             .method("get_id", &EWAAGrowthInterface::get_id)
             .method("evaluate", &EWAAGrowthInterface::evaluate);
 
