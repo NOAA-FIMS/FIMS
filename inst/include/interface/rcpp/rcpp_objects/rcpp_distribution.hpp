@@ -149,8 +149,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     return dnorm.evaluate();
 }
     /**
-     * @brief finalize function. Extracts derived quantities back to
-     * the Rcpp interface object from the Information object.
+     * @brief Extracts the derived quantities from `Information` to the Rcpp
+     * object.
      */
     virtual void finalize() {
         if (this->finalized) {

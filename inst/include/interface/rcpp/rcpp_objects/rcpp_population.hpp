@@ -16,8 +16,8 @@
  */
 
 /**
- * @brief PopulationInterfaceBase class should be inherited to
- * define different Rcpp interfaces for each possible Population function
+ * @brief PopulationInterfaceBase class should be inherited to define different
+ * Rcpp interfaces for each possible Population function.
  */
 class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
  public:
@@ -65,7 +65,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   ParameterVector log_init_naa; /**<log of the initial numbers at age*/
   ParameterVector numbers_at_age; /**<log of the initial numbers at age*/
   Rcpp::NumericVector ages; /**<vector of ages in the population; length nages*/
-  Rcpp::NumericVector proportion_female; /**<doule representing the proportion
+  Rcpp::NumericVector proportion_female; /**<double representing the proportion
                                             of female individuals */
   bool estimate_prop_female; /**<whether proportion female should be estimated*/
 
@@ -88,23 +88,23 @@ class PopulationInterface : public PopulationInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @brief Set the unique id for the Maturity object
+   * @brief Sets the unique id for the Maturity object.
    *
-   * @param maturity_id Unique id for the Maturity object
+   * @param maturity_id Unique id for the Maturity object.
    */
   void SetMaturity(uint32_t maturity_id) { this->maturity_id = maturity_id; }
 
   /**
-   * @brief Set the unique id for the growth object
+   * @brief Set the unique id for the growth object.
    *
-   * @param growth_id Unique id for the growth object
+   * @param growth_id Unique id for the growth object.
    */
   void SetGrowth(uint32_t growth_id) { this->growth_id = growth_id; }
 
   /**
-   * @brief Set the unique id for the Maturity object
+   * @brief Set the unique id for the recruitment object.
    *
-   * @param recruitment_id Unique id for the Maturity object
+   * @param recruitment_id Unique id for the recruitment object.
    */
   void SetRecruitment(uint32_t recruitment_id) {
     this->recruitment_id = recruitment_id;
@@ -366,8 +366,10 @@ class PopulationInterface : public PopulationInterfaceBase {
     return true;
   }
 
-  /** @brief this adds the parameter values and derivatives to the TMB model
-   * object */
+  /**
+   * @brief Adds the parameter values and derivatives to the TMB model object.
+   *
+  */
   virtual bool add_to_fims_tmb() {
     FIMS_INFO_LOG("adding Population object to TMB");
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();

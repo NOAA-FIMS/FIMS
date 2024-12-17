@@ -368,7 +368,7 @@ namespace fims {
         }
 
         /**
-         * Get the log as a string.
+         * Get the log as a string object.
          *
          * @return
          */
@@ -523,7 +523,7 @@ namespace fims {
         }
 
         /**
-         * @brief Clear all pointers/references of a FIMS model
+         * @brief Clears all pointers/references of a FIMS model.
          * 
          */
         void clear() {
