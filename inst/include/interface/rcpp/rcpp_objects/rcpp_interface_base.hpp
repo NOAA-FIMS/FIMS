@@ -52,9 +52,6 @@ class Parameter {
   bool estimated_m =
       false; /**<A boolean indicating whether or not the parameter is
                  estimated; the default is false.*/
-  bool random_m =
-    false; /**<A boolean indicating whether or not the parameter is random; the
-               default is false.*/
 
   /**
    * @brief Constructor for initializing Parameter.
@@ -71,8 +68,7 @@ class Parameter {
     final_value_m(other.final_value_m),
     min_m(other.min_m), max_m(other.max_m),
     is_random_effect_m(other.is_random_effect_m),
-    estimated_m(other.estimated_m),
-    random_m(other.random_m) {
+    estimated_m(other.estimated_m) {
     }
 
   /**
@@ -85,7 +81,6 @@ class Parameter {
         this->id_m = right.id_m;
         this->initial_value_m = right.initial_value_m;
         this->estimated_m = right.estimated_m;
-        this->random_m = right.random_m;
         this->min_m = right.min_m;
         this->max_m = right.max_m;
         this->is_random_effect_m = right.is_random_effect_m;
@@ -291,7 +286,7 @@ public:
      */
     void set_all_random(bool random){
         for (size_t i = 0; i < this->storage_m->size(); i++) {
-            storage_m->at(i).random_m = random;
+            storage_m->at(i).is_random_effect_m = random;
         }
     }
 
