@@ -761,7 +761,9 @@ initialize_fims <- function(parameters, data) {
   # Set-up TMB
   CreateTMBModel()
   # Create parameter list from Rcpp modules
-  parameter_list <- list(p = get_fixed())
+  parameter_list <- list(
+    parameters = list(p = get_fixed())
+  )
 
   return(parameter_list)
 }

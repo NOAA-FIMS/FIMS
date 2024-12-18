@@ -16,7 +16,7 @@ fit_fims(
 )
 }
 \arguments{
-\item{input}{Input list as returned by \code{\link[=create_default_parameters]{create_default_parameters()}}.}
+\item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}.}
 
 \item{get_sd}{A boolean specifying if the \code{\link[TMB:sdreport]{TMB::sdreport()}} should be
 calculated?}

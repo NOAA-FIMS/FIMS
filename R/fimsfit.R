@@ -394,7 +394,7 @@ create_FIMSFit <- function(
 
 #' Fit a FIMS model (BETA)
 #'
-#' @param input Input list as returned by [create_default_parameters()].
+#' @param input Input list as returned by [initialize_fims()].
 #' @param get_sd A boolean specifying if the [TMB::sdreport()] should be
 #'   calculated?
 #' @param save_sd A logical, with the default `TRUE`, indicating whether the
