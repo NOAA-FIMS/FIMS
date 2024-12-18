@@ -16,9 +16,10 @@ fit_fims(
 )
 }
 \arguments{
-\item{input}{Input list as returned by \code{prepare_input()}.}
+\item{input}{Input list as returned by \code{\link[=create_default_parameters]{create_default_parameters()}}.}
 
-\item{get_sd}{Calculate the sdreport?}
+\item{get_sd}{A boolean specifying if the \code{\link[TMB:sdreport]{TMB::sdreport()}} should be
+calculated?}
 
 \item{save_sd}{A logical, with the default \code{TRUE}, indicating whether the
 sdreport is returned in the output. If \code{FALSE}, the slot for the report
@@ -41,7 +42,7 @@ the default is a list of length three with \code{eval.max = 1000},
 \item{filename}{Character string giving a file name to save the fitted
 object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 indicates not to save it. If specified, it must end in .RDS. The file is
-written to folder given by \code{input$path}. Not yet implemented.}
+written to folder given by \code{input[["path"]]}. Not yet implemented.}
 }
 \value{
 An object of class \code{FIMSFit} is returned, where the structure is the same

@@ -2,7 +2,7 @@
 % Please edit documentation in R/fimsfit.R
 \name{create_FIMSFit}
 \alias{create_FIMSFit}
-\title{Constructor for class \code{FIMSFit}}
+\title{Class constructors for class \code{FIMSFit} and associated child classes}
 \usage{
 create_FIMSFit(
   input,
@@ -14,7 +14,7 @@ create_FIMSFit(
 )
 }
 \arguments{
-\item{input}{Input list as returned by \code{prepare_input()}.}
+\item{input}{Input list as returned by \code{\link[=create_default_parameters]{create_default_parameters()}}.}
 
 \item{obj}{An object returned from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.}
 

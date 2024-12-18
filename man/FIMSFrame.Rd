@@ -8,17 +8,19 @@ FIMSFrame(data)
 }
 \arguments{
 \item{data}{A \code{data.frame} that contains the necessary columns to construct
-a data frame of a given \code{FIMSFrame-class}.}
+a \code{FIMSFrame-class} object. Currently, those columns are
+type, name, age, length, datestart, dateend, value, unit, and uncertainty. See
+the data1 object in FIMS, e.g., \code{data(data1, package = "FIMS")}.}
 }
 \value{
-An object of the S4 class \code{FIMSFrame} or one of its child classes is
+An object of the S4 class \code{FIMSFrame} class, or one of its child classes, is
 validated and then returned. All objects will at a minimum have a slot
 called \code{data} to store the input data frame. Additional slots are dependent
 on the child class. Use \code{\link[=showClass]{showClass()}} to see all available slots.
 }
 \description{
-All constructor functions take a single input and build an object specific to
-the needs of each model type within \pkg{FIMS}. \code{FIMSFrame} is the
-parent class and the associated child classes have additional slots needed
-for each model type.
+All constructor functions take a single input and build an object specific
+to the needs of each model type within \pkg{FIMS}. \code{FIMSFrame} is the parent
+class. Future, associated child classes will have the additional slots
+needed for different types of models.
 }

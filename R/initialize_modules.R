@@ -152,12 +152,12 @@ initialize_module <- function(parameters, data, module_name) {
       # TODO: reorder the list alphabetically
       module[[field]] <- switch(
         field,
-        "ages" = ages(data),
-        "nages" = n_ages(data),
-        "nlengths" = n_lengths(data),
+        "ages" = get_ages(data),
+        "nages" = get_n_ages(data),
+        "nlengths" = get_n_lengths(data),
         "proportion_female" = numeric(0),
         "estimate_prop_female" = TRUE,
-        "nyears" = n_years(data),
+        "nyears" = get_n_years(data),
         "nseasons" = 1,
         "nfleets" = length(parameters[["modules"]][["fleets"]]),
         "estimate_log_devs" = module_input[[
@@ -464,7 +464,7 @@ initialize_index <- function(data, fleet_name) {
     dplyr::pull(type)
 
 
-  module <- methods::new(Index, n_years(data))
+  module <- methods::new(Index, get_n_years(data))
 
   if ("landings" %in% fleet_type) {
     module[["index_data"]] <- m_landings(data)
@@ -499,7 +499,7 @@ initialize_age_comp <- function(data, fleet_name) {
     cli::cli_abort("Fleet {fleet_name} not found in the data object.")
   }
 
-  module <- methods::new(AgeComp, n_years(data), n_ages(data))
+  module <- methods::new(AgeComp, get_n_years(data), get_n_ages(data))
 
   # Validate that the fleet's age-composition data is available
   age_comp_data <- m_agecomp(data, fleet_name)
@@ -544,7 +544,7 @@ initialize_length_comp <- function(data, fleet_name) {
     cli::cli_abort("Fleet {fleet_name} not found in the data object.")
   }
 
-  module <- methods::new(LengthComp, n_years(data), n_lengths(data))
+  module <- methods::new(LengthComp, get_n_years(data), get_n_lengths(data))
 
   # Validate that the fleet's length-composition data is available
   length_comp_data <- m_lengthcomp(data, fleet_name)

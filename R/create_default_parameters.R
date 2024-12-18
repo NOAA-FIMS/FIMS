@@ -172,14 +172,14 @@ create_default_Population <- function(data, log_rzero) {
   }
 
   # Extract necessary values from data
-  n_years <- n_years(data)
-  n_ages <- n_ages(data)
+  n_years <- get_n_years(data)
+  n_ages <- get_n_ages(data)
 
   # Set natural mortality rate
   M_value <- 0.2
 
   # Calculate initial numbers at age based on log_rzero and M_value
-  init_naa <- exp(log_rzero) * exp(-(ages(data) - 1) * M_value)
+  init_naa <- exp(log_rzero) * exp(-(get_ages(data) - 1) * M_value)
   init_naa[n_ages] <- init_naa[n_ages] / M_value # sum of infinite series
 
   # Create a list of default parameters
@@ -323,7 +323,7 @@ create_default_fleet <- function(fleets,
   # FIXME: allow for a fleet to have both landings and index data
   process_default <- if ("landings" %in% data_types_present) {
     list(
-      log_Fmort.value = log(rep(0.00001, n_years(data))),
+      log_Fmort.value = log(rep(0.00001, get_n_years(data))),
       log_Fmort.estimated = TRUE
     )
   } else {
@@ -419,7 +419,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
     log_rzero.estimated = TRUE,
     logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
     logit_steep.estimated = FALSE,
-    log_devs.value = rep(0.0, n_years(data) - 1),
+    log_devs.value = rep(0.0, get_n_years(data) - 1),
     log_devs.estimated = TRUE,
     estimate_log_devs = TRUE
   )
@@ -461,9 +461,9 @@ create_default_DnormDistribution <- function(
     default <- c(
       default,
       list(
-        x.value = rep(0, n_years(data)),
+        x.value = rep(0, get_n_years(data)),
         x.estimated = FALSE,
-        expected_values.value = rep(0, n_years(data)),
+        expected_values.value = rep(0, get_n_years(data)),
         expected_values.estimated = FALSE
       )
     )
@@ -512,9 +512,9 @@ create_default_DlnormDistribution <- function(
     default <- c(
       default,
       list(
-        x.value = rep(0, n_years(data)),
+        x.value = rep(0, get_n_years(data)),
         x.estimated = FALSE,
-        expected_values.value = rep(0, n_years(data)),
+        expected_values.value = rep(0, get_n_years(data)),
         expected_values.estimated = FALSE
       )
     )
@@ -674,14 +674,18 @@ update_parameters <- function(current_parameters, modified_parameters) {
         }
 
         # Check if the length of the modified and current parameter match
-        if (!identical(
-          length(modified_params[[param_name]]),
-          length(current_params[[param_name]])
-        )) {
+        length_modified_parameter <- length(modified_params[[param_name]])
+        length_current_parameter <- length(current_params[[param_name]])
+        if (!identical(length_modified_parameter, length_current_parameter)) {
           cli::cli_abort(c(
-            "x" = "The length of {param_name} from {module_name}
+            "x" = "The length of {.var {param_name}} from {module_name}
                   does not match between {.var modified_parameters} and
-                  {.var current_parameters}."
+                  {.var current_parameters}.",
+            "i" = "The parameter name of interest is {.var {param_name}}.",
+            "i" = "The length of the modified parameter is
+                  {length_modified_parameter}.",
+            "i" = "The length of the current parameter is
+                  {length_current_parameter}."
           ))
         }
 
