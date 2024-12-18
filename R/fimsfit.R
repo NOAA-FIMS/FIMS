@@ -1,12 +1,32 @@
+# Developers: ----
+
+# This file defines the parent class of FIMSFit and its potential children. The
+# class is an S4 class with accessors and validators but no setters. For more
+# details on how to create an S4 class in FIMS please see R/fimsframe.R
+
+# TODO: ----
+
+# TODO: Fix "no metadata object found to revise superClass" in sdreportOrList
+# TODO: Write more validity checks for FIMSFit
+# TODO: Better document the return of [get_estimates()], i.e., columns
+# TODO: Decide if the error from is.FIMSFits should be a single FALSE or stop
+# TODO: Decide if "total" should be a part of number_of_parameters because it
+#       can be calculated from fixed_effects + random_effects and would need to
+#       be calculated in print.FITFims()
+# TODO: Determine if report should always use last.par.best
+# TODO: Make a helper function to add lower and upper CI for users in estimates
+# TODO: Add Terminal SB to print()
+
+# methods::setClass: ----
+
 # Need to use an S3 class for the following S4 class
 methods::setOldClass(Classes = "package_version")
 methods::setOldClass(Classes = "difftime")
 methods::setOldClass(Classes = "sdreport")
 # Join sdreport and list into a class incase the sdreport is not created
-# TODO: Fix "no metadata object found to revise superClass" b/c sdreport
 methods::setClassUnion("sdreportOrList", members = c("sdreport", "list"))
 
-setClass(
+methods::setClass(
   Class = "FIMSFit",
   slots = c(
     input = "list",
@@ -21,61 +41,6 @@ setClass(
     version = "package_version"
   )
 )
-
-
-# TODO: Write more validity checks for FIMSFit
-setValidity(
-  Class = "FIMSFit",
-  method = function(object) {
-    errors <- character()
-
-    # Check that obj is from TMB::MakeADFun()
-    TMB_MakeADFun_names <- c(
-      "par", "fn", "gr", "he", "hessian", "method", "retape", "env", "report",
-      "simulate"
-    )
-    if (!setequal(names(object@obj), TMB_MakeADFun_names)) {
-      errors <- c(
-        errors,
-        "obj must be a list returned from TMB::MakeADFun() but it does not
-        appear to be so because it does not have the standard names."
-      )
-    }
-
-    # Return
-    if (length(errors) == 0) {
-      return(TRUE)
-    } else {
-      return(errors)
-    }
-  }
-)
-
-#' Check if an object is of class FIMSFit
-#'
-#' @param x Returned list from [fit_fims()].
-#' @keywords fit_fims
-#' @export
-is.FIMSFit <- function(x) {
-  inherits(x, "FIMSFit")
-}
-
-#' Check if an object is a list of FIMSFit objects
-#'
-#' @param x List of fits returned from multiple calls to [fit_fims()].
-#' @keywords fit_fims
-#' @export
-is.FIMSFits <- function(x) {
-  if (!is.list(x)) {
-    cli::cli_warn(
-      message = c("x" = "{.par x} is not a list -- something went wrong.")
-    )
-    # TODO: Decide if this error should return a single false or if it should
-    #       be a stop instead?
-    return(FALSE)
-  }
-  all(sapply(x, function(i) inherits(i, "FIMSFit")))
-}
 
 methods::setMethod(
   f = "print",
@@ -119,7 +84,190 @@ methods::setMethod(
   }
 )
 
-#' Constructor for class `FIMSFit`
+# methods::setMethod: accessors ----
+
+# Accessor functions for a FIMSFit object
+# 1 setGeneric() per slot but potentially >1 setMethod() per setGeneric()
+
+#' Get a slot in a FIMSFit object
+#'
+#' There is an accessor function for each slot in the S4 class `FIMSFit`, where
+#' the function is named `get_*()` and the star can be replaced with the slot
+#' name, e.g., [get_input()]. These accessor functions are the preferred way
+#' to access objects stored in the available slots.
+#'
+#' @param x Output returned from [fit_fims()].
+#' @name get_FIMSFit
+#' @seealso
+#' * [fit_fims()]
+#' * [create_default_parameters()]
+NULL
+
+#' @return
+#' [get_input()] returns the list that was used to fit the FIMS model, which
+#' is the returned object from [create_default_parameters()].
+#' @export
+#' @rdname get_FIMSFit
+methods::setGeneric("get_input", function(x) standardGeneric("get_input"))
+#' @export
+#' @rdname get_FIMSFit
+methods::setMethod("get_input", "FIMSFit", function(x) x@input)
+
+#' @return
+#' [get_report()] returns the TMB report, where anything that is flagged as
+#' reportable in the C++ code is returned.
+#' @export
+#' @rdname get_FIMSFit
+setGeneric("get_report", function(x) standardGeneric("get_report"))
+#' @export
+#' @rdname get_FIMSFit
+setMethod("get_report", "FIMSFit", function(x) x@report)
+
+#' @return
+#' [get_obj()] returns the output from [TMB::MakeADFun()].
+#' @export
+#' @rdname get_FIMSFit
+setGeneric("get_obj", function(x) standardGeneric("get_obj"))
+#' @export
+#' @rdname get_FIMSFit
+setMethod("get_obj", "FIMSFit", function(x) x@obj)
+
+#' @return
+#' [get_opt()] returns the output from [nlminb()], which is the minimizer used
+#' in [fit_fims()].
+#' @export
+#' @rdname get_FIMSFit
+setGeneric("get_opt", function(x) standardGeneric("get_opt"))
+#' @export
+#' @rdname get_FIMSFit
+setMethod("get_opt", "FIMSFit", function(x) x@opt)
+
+#' @return
+#' [get_max_gradient()] returns the maximum gradient found when optimizing the
+#' model.
+#' @export
+#' @rdname get_FIMSFit
+setGeneric("get_max_gradient", function(x) standardGeneric("get_max_gradient"))
+#' @export
+#' @rdname get_FIMSFit
+setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
+
+
+#' @return
+#' [get_sdreport()] returns the list from [TMB::sdreport()].
+#' @export
+#' @rdname get_FIMSFit
+setGeneric("get_sdreport", function(x) standardGeneric("get_sdreport"))
+#' @export
+#' @rdname get_FIMSFit
+setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
+
+#' @return
+#' [get_estimates()] returns a tibble of parameter values and their
+#' uncertainties from a fitted model.
+#' @export
+#' @rdname get_FIMSFit
+setGeneric("get_estimates", function(x) standardGeneric("get_estimates"))
+#' @export
+#' @rdname get_FIMSFit
+setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
+
+#' @return
+#' [get_number_of_parameters()] returns a vector of integers specifying the
+#' number of fixed-effect parameters and the number of random-effect parameters
+#' in the model.
+#' @export
+#' @rdname get_FIMSFit
+setGeneric(
+  "get_number_of_parameters",
+  function(x) standardGeneric("get_number_of_parameters")
+)
+#' @export
+#' @rdname get_FIMSFit
+setMethod(
+  "get_number_of_parameters",
+  "FIMSFit",
+  function(x) x@get_number_of_parameters
+)
+
+#' @return
+#' [get_timing()] returns the amount of time it took to run the model in
+#' seconds as a `difftime` object.
+#' @export
+#' @rdname get_FIMSFit
+setGeneric("get_timing", function(x) standardGeneric("get_timing"))
+#' @export
+#' @rdname get_FIMSFit
+setMethod("get_timing", "FIMSFit", function(x) x@timing)
+
+#' @return
+#' [get_version()] returns the `package_version` of FIMS that was used to fit
+#' the model.
+#' @export
+#' @rdname get_FIMSFit
+setGeneric("get_version", function(x) standardGeneric("get_version"))
+#' @export
+#' @rdname get_FIMSFit
+setMethod("get_version", "FIMSFit", function(x) x@version)
+
+# methods::setValidity ----
+
+methods::setValidity(
+  Class = "FIMSFit",
+  method = function(object) {
+    errors <- character()
+
+    # Check that obj is from TMB::MakeADFun()
+    TMB_MakeADFun_names <- c(
+      "par", "fn", "gr", "he", "hessian", "method", "retape", "env", "report",
+      "simulate"
+    )
+    if (!setequal(names(object@obj), TMB_MakeADFun_names)) {
+      errors <- c(
+        errors,
+        "obj must be a list returned from TMB::MakeADFun() but it does not
+        appear to be so because it does not have the standard names."
+      )
+    }
+
+    # Return
+    if (length(errors) == 0) {
+      return(TRUE)
+    } else {
+      return(errors)
+    }
+  }
+)
+
+# methods::setMethod: is.FIMSFit ----
+
+#' Check if an object is of class FIMSFit
+#'
+#' @param x Returned list from [fit_fims()].
+#' @keywords fit_fims
+#' @export
+is.FIMSFit <- function(x) {
+  inherits(x, "FIMSFit")
+}
+
+#' Check if an object is a list of FIMSFit objects
+#'
+#' @param x List of fits returned from multiple calls to [fit_fims()].
+#' @keywords fit_fims
+#' @export
+is.FIMSFits <- function(x) {
+  if (!is.list(x)) {
+    cli::cli_warn(
+      message = c("x" = "{.par x} is not a list -- something went wrong.")
+    )
+    return(FALSE)
+  }
+  all(sapply(x, function(i) inherits(i, "FIMSFit")))
+}
+
+# Constructors ----
+
+#' Class constructors for class `FIMSFit` and associated child classes
 #'
 #' Create an object with the class of `FIMSFit` after running a FIMS model. This
 #' is typically done within [fit_fims()] but it can be create manually by the
@@ -189,8 +337,6 @@ create_FIMSFit <- function(
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
-  # TODO: Decide if we want total in here because it can be calculated and
-  #       would need to be calculated in print.FIMSFit()
   number_of_parameters <- c(
     total = n_total,
     fixed_effects = n_fixed_effects,
@@ -206,14 +352,12 @@ create_FIMSFit <- function(
   }
 
   # Get the report
-  # TODO: determine if report should always use last.par.best
   report <- if (length(opt) == 0) {
     obj[["report"]](obj[["env"]][["last.par.best"]])
   } else {
     obj[["report"]]()
   }
 
-  # TODO: Make a helper function to add lower and upper columns for users
   if (length(sdreport) > 0) {
     std <- summary(sdreport)
     estimates <- tibble::tibble(
@@ -250,8 +394,9 @@ create_FIMSFit <- function(
 
 #' Fit a FIMS model (BETA)
 #'
-#' @param input Input list as returned by `prepare_input()`.
-#' @param get_sd Calculate the sdreport?
+#' @param input Input list as returned by [create_default_parameters()].
+#' @param get_sd A boolean specifying if the [TMB::sdreport()] should be
+#'   calculated?
 #' @param save_sd A logical, with the default `TRUE`, indicating whether the
 #'   sdreport is returned in the output. If `FALSE`, the slot for the report
 #'   will be empty.
@@ -268,7 +413,7 @@ create_FIMSFit <- function(
 #' @param filename Character string giving a file name to save the fitted
 #'   object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 #'   indicates not to save it. If specified, it must end in .RDS. The file is
-#'   written to folder given by `input$path`. Not yet implemented.
+#'   written to folder given by `input[["path"]]`. Not yet implemented.
 #' @return
 #' An object of class `FIMSFit` is returned, where the structure is the same
 #' regardless if `optimize = TRUE` or not. Uncertainty information is only
@@ -285,7 +430,11 @@ fit_fims <- function(input,
                      number_of_loops = 3,
                      optimize = TRUE,
                      number_of_newton_steps = 0,
-                     control = list(eval.max = 10000, iter.max = 10000, trace = 0),
+                     control = list(
+                       eval.max = 10000,
+                       iter.max = 10000,
+                       trace = 0
+                     ),
                      filename = NULL) {
   if (!is.null(input$random)) {
     cli::cli_abort("Random effects declared but not implemented yet.")

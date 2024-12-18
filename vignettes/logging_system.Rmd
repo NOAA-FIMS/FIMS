@@ -7,11 +7,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r colorize, include=FALSE}
+```{r fims1, warning=FALSE, message=FALSE}
+# automatically loads fims Rcpp module
 library(FIMS)
-library(TMB)
-library(jsonlite)
 
+# clear memory
+clear()
+```
+
+```{r colorize, include=FALSE}
 colorize <- function(x, color) {
   if (knitr::is_latex_output()) {
     sprintf("\\textcolor{%s}{%s}", color, x)
@@ -21,9 +25,6 @@ colorize <- function(x, color) {
     x
   }
 }
-
-# clear memory
-clear()
 
 # use FIMS data frame
 fims_frame <- FIMSFrame(data1)
@@ -120,16 +121,10 @@ The logging system provides several useful functions. Below is a description of 
 Assuming a model has already been defined, below is an example of using the logging system with FIMS in R.
 
 ```{r example_code, eval = TRUE}
-success <- CreateTMBModel()
-
-if (!success) {
-  log_error("FIMS failed to create TMB model")
-} else {
 fit <- default_parameters |>
   initialize_fims(data = fims_frame) |>
   (\(parameter_list) list(parameters = parameter_list, version = "FIMS run with optimization"))() |>
   fit_fims(optimize = TRUE)
-}
 
 # get the log as a string in JSON format and parse into a list
 log_str <- as.character(get_log())

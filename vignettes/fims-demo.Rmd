@@ -10,7 +10,6 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# library(dplyr)
 ```
 
 ## Fisheries Integrated Modeling System
@@ -22,7 +21,6 @@ To begin, we import the FIMS and TMB libraries. Calling `library(FIMS)` automati
 ```{r fims1, warning=FALSE, message=FALSE}
 # automatically loads fims Rcpp module
 library(FIMS)
-library(TMB)
 
 # clear memory
 clear()
@@ -42,14 +40,14 @@ data("data1")
 fims_frame <- FIMSFrame(data1)
 ```
 
-The `fims_frame` object contains a `@data` slot that holds a long data frame with catch data for the fishery and index data for the survey:
+The `fims_frame` object contains many slots (named components of the object that can be accessed), one of which stores a long data frame. To access this slot use the accessor function `get_data()` for all data used to fit the model:
 
 ```{r view-fimsframe-data}
-str(fims_frame)
-fims_frame@data |>
+str(fims_frame, max.level = 1)
+get_data(fims_frame) |>
   dplyr::filter(type == "landings") |>
   utils::head()
-fims_frame@data |>
+get_data(fims_frame) |>
   dplyr::filter(type == "index") |>
   utils::head()
 ```
@@ -159,7 +157,7 @@ parameters <- default_parameters |>
 ## Initialize modules and fit the model
 
 With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fims()`.
-```{r, max.height='100px', attr.output='.numberLines', fit-fims}
+```{r, max.height='100px', attr.output='.numberLines', fit-fims, eval = FALSE}
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters |>
   initialize_fims(data = fims_frame) |>
@@ -211,40 +209,40 @@ clear()
 
 ## Plotting Results
 
-```{r plots}
+```{r plots, eval = FALSE}
 library(ggplot2)
 index_results <- data.frame(
-  observed = FIMS::m_index(fims_frame, "survey1"),
-  expected = fit@report[["exp_index"]][[2]]
+  observed = m_index(fims_frame, "survey1"),
+  expected = get_report(fit)[["exp_index"]][[2]]
 )
 print(index_results)
 
-years <- fims_frame@start_year:fims_frame@end_year
+years <- get_start_year(fims_frame):get_end_year(fims_frame)
 
-ggplot(index_results, aes(x = years, y = observed)) +
-  geom_point() +
-  xlab("Year") +
-  ylab("Index (mt)") +
-  geom_line(aes(x = years, y = expected), color = "blue") +
-  theme_bw()
+ggplot2::ggplot(index_results, ggplot2::aes(x = years, y = observed)) +
+  ggplot2::geom_point() +
+  ggplot2::xlab("Year") +
+  ggplot2::ylab("Index (mt)") +
+  ggplot2::geom_line(ggplot2::aes(x = years, y = expected), color = "blue") +
+  ggplot2::theme_bw()
 
 catch_results <- data.frame(
-  observed = FIMS::m_landings(fims_frame),
-  expected = fit@report[["exp_index"]][[1]]
+  observed = m_landings(fims_frame),
+  expected = get_report(fit)[["exp_index"]][[1]]
 )
 print(catch_results)
 
-ggplot(catch_results, aes(x = years, y = observed)) +
-  geom_point() +
-  xlab("Year") +
-  ylab("Index (mt)") +
-  geom_line(aes(x = years, y = expected), color = "blue") +
-  theme_bw()
+ggplot2::ggplot(catch_results, ggplot2::aes(x = years, y = observed)) +
+  ggplot2::geom_point() +
+  ggplot2::xlab("Year") +
+  ggplot2::ylab("Index (mt)") +
+  ggplot2::geom_line(ggplot2::aes(x = years, y = expected), color = "blue") +
+  ggplot2::theme_bw()
 ```
 
 ```{r output}
 # TODO: need to import libraries, working in progress?
-# finalize(fit@obj, fit@opt)
+# finalize(get_obj(fit), get_opt(fit))
 # json_output <- get_output()
 # writeLines(json_output, "output.json")
 # recruitment_log <- get_log_module("information")
