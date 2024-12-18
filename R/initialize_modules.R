@@ -459,7 +459,7 @@ initialize_index <- function(data, fleet_name) {
   module <- methods::new(Index, get_n_years(data))
 
   if ("landings" %in% fleet_type) {
-    module[["index_data"]] <- m_landings(data)
+    module[["index_data"]] <- m_landings(data, fleet_name)
   } else if ("index" %in% fleet_type) {
     module[["index_data"]] <- m_index(data, fleet_name)
   } else {

@@ -42,7 +42,6 @@
 # TODO: change @data to return a tibble
 # TODO: remove or change get_fleets to return fleet names in alphabetized order
 # TODO: n_fleets should store total number of fleets, i.e., fishing + survey
-# TODO: does m_landings() need a fleet argument like m_index?
 # TODO: determine how to dplyr::arrange() the data and pass necessary info
 # TODO: implement sorting of information in terms of alphabetized fleet order
 
@@ -264,15 +263,19 @@ NULL
 
 #' @export
 #' @rdname m_
-methods::setGeneric("m_landings", function(x) standardGeneric("m_landings"))
+methods::setGeneric(
+  "m_landings",
+  function(x, fleet_name) standardGeneric("m_landings")
+)
 #' @export
 #' @rdname m_
 methods::setMethod(
   "m_landings", "FIMSFrame",
-  function(x) {
+  function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
-      .data[["type"]] == "landings"
+      .data[["type"]] == "landings",
+      .data[["name"]] %in% fleet_name
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -282,7 +285,7 @@ methods::setMethod(
 methods::setMethod(
   "m_landings",
   "data.frame",
-  function(x) m_landings(FIMSFrame(x))
+  function(x, fleet_name) m_landings(FIMSFrame(x), fleet_name)
 )
 
 #' @export

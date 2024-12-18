@@ -223,7 +223,7 @@ ggplot2::ggplot(index_results, ggplot2::aes(x = years, y = observed)) +
   ggplot2::theme_bw()
 
 catch_results <- data.frame(
-  observed = m_landings(fims_frame),
+  observed = m_landings(fims_frame, fleet = "fleet1"),
   expected = get_report(fit)[["exp_index"]][[1]]
 )
 print(catch_results)
