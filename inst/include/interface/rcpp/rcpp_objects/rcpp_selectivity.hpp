@@ -179,7 +179,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
             selectivity->inflection_point[i] = this->inflection_point[i].initial_value_m;
             if (this->inflection_point[i].estimated_m) {
                 ss.str("");
-                ss << "selectivity.inflection_point ." << this->id << "." << i;
+                ss << "selectivity.inflection_point." << this->id << "." << i;
                 info->RegisterParameterName(ss.str());
                 if (this->inflection_point[i].is_random_effect_m) {
                     info->RegisterRandomEffect(selectivity->inflection_point[i]);
