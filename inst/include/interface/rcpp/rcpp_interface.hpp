@@ -361,7 +361,7 @@ std::string get_output() {
 
         ret = fims::JsonParser::PrettyFormatJSON(ss.str());
     } else {
-        Rcpp::Rcout << "Invalid request to \"get_output\". Please call finalize first.";
+        Rcpp::Rcout << "Invalid request to \"get_output()\". Please call finalize() first.";
     }
     return ret;
 }

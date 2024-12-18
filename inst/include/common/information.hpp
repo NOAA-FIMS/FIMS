@@ -235,7 +235,7 @@ namespace fims_info {
                         d->x.insert(std::end(d->x),
                                 std::begin(*(*vmit).second), std::end(*(*vmit).second));
                     }
-                    FIMS_INFO_LOG("Random effect size for distribution " + fims::to_string(d->id) + "is: " + fims::to_string(d->x.size()));
+                    FIMS_INFO_LOG("Random effect size for distribution " + fims::to_string(d->id) + " is: " + fims::to_string(d->x.size()));
                 }
             }
         }
