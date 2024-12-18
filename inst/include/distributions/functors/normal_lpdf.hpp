@@ -24,8 +24,6 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     fims::Vector<Type> log_sd; /**< log of the standard deviation of the distribution; can be a vector or scalar */
     Type lpdf = 0.0; /**< total log probability density contribution of the distribution */
 
-    //data_indicator<tmbutils::vector<Type> , Type> keep; /**< Indicator used in TMB one-step-ahead residual calculations */
-
     /** @brief Constructor.
      */
     NormalLPDF() : DensityComponentBase<Type>() {
@@ -57,7 +55,6 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         if(this->input_type == "data"){
           // if data, check if there are any NA values and skip lpdf calculation if there are
           if(this->observed_values->at(i) != this->observed_values->na_value){
-          // this->lpdf_vec[i] = this->keep[i] * -dnorm(this->observed_values->at(i), this->expected_values.get_force_scalar(i), sd[i], true);
             this->lpdf_vec[i] = dnorm(this->observed_values->at(i), this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)), true);
           } else {
             this->lpdf_vec[i] = 0;
@@ -87,7 +84,6 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         }
         #ifdef TMB_MODEL
         vector<Type> normal_x = this->x;
-        //FIMS_REPORT_F(normal_x, this->of);
         #endif
         return(lpdf);
     }

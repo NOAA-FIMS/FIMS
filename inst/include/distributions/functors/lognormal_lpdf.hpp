@@ -61,8 +61,6 @@ namespace fims_distributions
               // See Deroba and Miller, 2016 (https://doi.org/10.1016/j.fishres.2015.12.002) for
               // the use of lognormal constant
               if(this->observed_values->at(i) != this->observed_values->na_value){
-              // this->lpdf_vec[i] = this->keep[i] * -dnorm(log(this->observed_values->at(i)), this->expected_values.get_force_scalar(i),
-              //                                            fims_math::exp(log_sd.get_force_scalar(i)), true) - log(this->observed_values->->at(i));
                   this->lpdf_vec[i] = dnorm(log(this->observed_values->at(i)), this->expected_values.get_force_scalar(i),
                                             fims_math::exp(log_sd.get_force_scalar(i)), true) - log(this->observed_values->at(i));
                 } else {
@@ -90,13 +88,6 @@ namespace fims_distributions
                 }
             }
             #endif
-
-            /* osa not working yet
-              if(osa_flag){//data observation type implements osa residuals
-                  //code for osa cdf method
-                  this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i], this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i))) );
-                  this->lpdf_vec[i] = this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i], this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i))) );
-              } */
             }
             #ifdef TMB_MODEL
             vector<Type> lognormal_x = this->x;

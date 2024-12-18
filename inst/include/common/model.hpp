@@ -222,8 +222,6 @@ namespace fims_model {
                 fleet_idx += 1;
             }
 
-            // jnll = rec_nll + age_comp_nll + index_nll;
-
             // Reporting
 #ifdef TMB_MODEL
             //FIMS_REPORT_F(rec_nll, of);

@@ -63,7 +63,6 @@
 
 #ifdef FIMS_WINDOWS
 #include <Windows.h>
-//#define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)

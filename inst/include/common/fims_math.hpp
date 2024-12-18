@@ -10,7 +10,6 @@
 
 // note: this is modeling platform specific, must be controlled by
 // preprocessing macros
-//#include "def.hpp"
 #include <cmath>
 #include <random>
 #include <sstream>
@@ -61,7 +60,6 @@ inline const Type pow(const Type &x, const Type &y) {
 #endif
 
 #ifdef TMB_MODEL
-// #include <TMB.hpp>
 
 /**
  * @brief The exponential function.

@@ -12,7 +12,6 @@
 #include "../fleet/fleet.hpp"
 #include "../growth/growth.hpp"
 #include "../recruitment/recruitment.hpp"
-//#include "subpopulation.hpp"
 #include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
 
@@ -548,7 +547,6 @@ namespace fims_popdy {
                         CalculateInitialNumbersAA(i_age_year, a);
 
                         if (a == 0) {
-                            // this->numbers_at_age[i_age_year] = this->recruitment->rzero;
                             this->unfished_numbers_at_age[i_age_year] =
                                     fims_math::exp(this->recruitment->log_rzero[0]);
                         } else {
