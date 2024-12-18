@@ -70,23 +70,33 @@ fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
     Index = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution"
+    AgeComp = "DmultinomDistribution",
+    LengthComp = "DmultinomDistribution"
   )
 )
 
 # Create default parameters
 default_parameters <- fims_frame |>
   create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1),
-    recruitment = list(
-      form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "DnormDistribution")
-    ),
-    growth = list(form = "EWAAgrowth"),
-    maturity = list(form = "LogisticMaturity")
+    fleets = list(fleet1 = fleet1, survey1 = survey1)
   )
 ```
-We may update default parameters to experiment with different parameter values. Here, we adjust fishing mortality, selectivity, maturity, and population parameters using `update_parameters()`.
+
+create_default_parameters() includes default settings for recruitment, growth, and maturity modules. For example:
+
+ - "BevertonHoltRecruitment" for the recruitment module
+ - "DnormDistribution" for recruitment deviations (log_devs)
+ - "EWAAgrowth" for the growth module 
+ - "LogisticMaturity" for maturity module
+
+The argument names and their corresponding default values of the create_default_parameters() function can be displayed using `args(FIMS::create_default_parameters)`.
+```{r display-create-default-parameters-default-values}
+args(FIMS::create_default_parameters)
+```
+
+We may update the default parameters to experiment with different values. Before modifying the parameter values, we can print the `default_parameters`, then modify a specific element or a list of elements. The dimensions of the updated elements should match the original dimensions from the `default_parameters`.
+
+Here, we adjust fishing mortality, selectivity, maturity, and population parameters using `update_parameters()`. 
 ```{r modify-default-parameters}
 parameters <- default_parameters |>
   update_parameters(
@@ -197,6 +207,51 @@ high_slope_fit <- parameters_high_slope |>
 clear()
 
 low_slope_fit <- parameters_low_slope |>
+  initialize_fims(data = fims_frame) |>
+  fit_fims(optimize = TRUE)
+
+clear()
+
+# Fitting models with only age or only length data
+# Fitting With only age data
+# Define fleet and survey with age-specific data distribution
+fleet1 <- survey1 <- list(
+  selectivity = list(form = "LogisticSelectivity"),
+  data_distribution = c(
+    Index = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution"
+  )
+)
+
+# Create default parameters, update with modified values, initialize FIMS, 
+# and fit the model
+age_only_fit <- fims_frame |>
+  create_default_parameters(
+    fleets = list(fleet1 = fleet1, survey1 = survey1)
+  ) |>
+  update_parameters(modified_parameters = parameters$parameters) |>
+  initialize_fims(data = fims_frame) |>
+  fit_fims(optimize = TRUE)
+
+clear()
+
+# Fitting with only length data
+# Define fleet and survey with length-specific data distribution
+fleet1 <- survey1 <- list(
+  selectivity = list(form = "LogisticSelectivity"),
+  data_distribution = c(
+    Index = "DlnormDistribution",
+    LengthComp = "DmultinomDistribution"
+  )
+)
+
+# Create default parameters, update with modified values, initialize FIMS, 
+# and fit the model
+length_only_fit <- fims_frame |>
+  create_default_parameters(
+    fleets = list(fleet1 = fleet1, survey1 = survey1)
+  ) |>
+  update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = fims_frame) |>
   fit_fims(optimize = TRUE)
 

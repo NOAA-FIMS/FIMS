@@ -62,7 +62,136 @@ ASSAMC::run_om(input_list = sim_input)
 
 setwd(working_dir)
 
-load(file.path(main_dir, "sim_data", "output", "OM", paste0("OM", 1, ".RData")))
+# Helper function to calculate length at age using the von Bertalanffy growth model
+# a: current age
+# Linf: asymptotic average length
+# K: Growth coefficient
+# a_0: Theoretical age at size zero
+AtoL <- function(a, Linf, K, a_0) {
+  L <- Linf * (1 - exp(-K * (a - a_0)))
+}
+
+# Initialize lists for operating model (OM) and estimation model (EM) inputs and outputs
+om_input_list <- om_output_list <- em_input_list <-
+  vector(mode = "list", length = sim_num)
+
+# Loop through each simulation to generate length data
+for (iter in 1:sim_num) {
+  # Load the OM data for the current simulation
+  load(file.path(main_dir, "sim_data", "output", "OM", paste0("OM", iter, ".RData")))
+
+  # Extract von Bertalanffy growth model parameters from the OM input
+  Linf <- om_input[["Linf"]]
+  K <- om_input[["K"]]
+  a0 <- om_input[["a0"]]
+  amax <- max(om_input[["ages"]])
+  # Define coefficient of variation for length-at-age
+  cv <- 0.1
+  # Extract length-weight coefficient from OM
+  L2Wa <- om_input[["a.lw"]]
+  # Extract length-weight exponent from OM
+  L2Wb <- om_input[["b.lw"]]
+
+  # Extract age bins from the OM input
+  ages <- om_input[["ages"]]
+  # Define length bins in intervals of 50
+  len_bins <- seq(0, 1100, 50)
+
+  # Create length at age conversion matrix and fill proportions using above
+  # growth parameters
+  age_to_length_conversion <- matrix(NA, nrow = length(ages), ncol = length(len_bins))
+  for (age in seq_along(ages)) {
+    # Calculate mean length at age to spread lengths around
+    mean_length <- AtoL(ages[age], Linf, K, a0)
+    # mean_length <- AtoLSchnute(ages[age],L1,L2,a1,a2,Ks)
+    # Calculate the cumulative proportion shorter than each composition length
+    temp_len_probs <- pnorm(q = len_bins, mean = mean_length, sd = mean_length * cv)
+    # Reset the first length proportion to zero so the first bin includes all
+    # density smaller than that bin
+    temp_len_probs[1] <- 0
+    # subtract the offset length probabilities to calculate the proportion in each
+    # bin. For each length bin the proportion is how many fish are larger than this
+    # length but shorter than the next bin length.
+    temp_len_probs <- c(temp_len_probs[-1], 1) - temp_len_probs
+    age_to_length_conversion[age, ] <- temp_len_probs
+  }
+  colnames(age_to_length_conversion) <- len_bins
+  rownames(age_to_length_conversion) <- ages
+
+  # Loop through each simulation to load the results from the corresponding
+  # .RData files
+  # Assign the conversion matrix and other information to the OM input
+  om_input[["lengths"]] <- len_bins
+  om_input[["nlengths"]] <- length(len_bins)
+  om_input[["cv.length_at_age"]] <- cv
+  om_input[["age_to_length_conversion"]] <- age_to_length_conversion
+
+  om_output[["L.length"]] <- list()
+  om_output[["survey_length_comp"]] <- list()
+  om_output[["N.length"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
+  om_output[["L.length"]][["fleet1"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
+  om_output[["survey_length_comp"]][["survey1"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
+
+  em_input[["L.length.obs"]] <- list()
+  em_input[["survey.length.obs"]] <- list()
+  em_input[["L.length.obs"]][["fleet1"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
+  em_input[["survey.length.obs"]][["survey1"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
+
+  em_input[["lengths"]] <- len_bins
+  em_input[["nlengths"]] <- length(len_bins)
+  em_input[["cv.length_at_age"]] <- cv
+  em_input[["age_to_length_conversion"]] <- age_to_length_conversion
+  em_input[["n.L.lengthcomp"]][["fleet1"]] <- em_input[["n.survey.lengthcomp"]][["survey1"]] <- 200
+
+  # Populate length-based outputs for each year, length bin, and age
+  for (i in seq_along(om_input[["year"]])) {
+    for (j in seq_along(len_bins)) {
+      for (k in seq_along(om_input[["ages"]])) {
+        # Calculate numbers and landings at length for each fleet and survey
+        om_output[["N.length"]][i, j] <- om_output[["N.length"]][i, j] +
+          age_to_length_conversion[k, j] *
+            om_output[["N.age"]][i, k]
+
+        om_output[["L.length"]][[1]][i, j] <- om_output[["L.length"]][[1]][i, j] +
+          age_to_length_conversion[k, j] *
+            om_output[["L.age"]][[1]][i, k]
+
+        om_output[["survey_length_comp"]][[1]][i, j] <- om_output[["survey_length_comp"]][[1]][i, j] +
+          age_to_length_conversion[k, j] *
+            om_output[["survey_age_comp"]][[1]][i, k]
+
+        em_input[["L.length.obs"]][[1]][i, j] <- em_input[["L.length.obs"]][[1]][i, j] +
+          age_to_length_conversion[k, j] *
+            em_input[["L.age.obs"]][[1]][i, k]
+
+        em_input[["survey.length.obs"]][[1]][i, j] <- em_input[["survey.length.obs"]][[1]][i, j] +
+          age_to_length_conversion[k, j] *
+            em_input[["survey.age.obs"]][[1]][i, k]
+      }
+    }
+  }
+
+  # Save updated inputs and outputs to file
+  save(
+    om_input, om_output, em_input,
+    file = file.path(main_dir, "sim_data", "output", "OM", paste0("OM", iter, ".RData"))
+  )
+  # Store inputs and outputs in respective lists
+  om_input_list[[iter]] <- om_input
+  om_output_list[[iter]] <- om_output
+  em_input_list[[iter]] <- em_input
+}
+
+# Save all simulations to a single file for {testthat} integration tests
+save(om_input_list, om_output_list, em_input_list,
+  file = testthat::test_path("fixtures", "integration_test_data.RData")
+)
+
+# Load a specific simulation for further processing
+sim_id <- 1
+load(file.path(main_dir, "sim_data", "output", "OM", paste0("OM", sim_id, ".RData")))
+
+# Return the loaded data
 returnedom <- list(
   om_input = om_input,
   om_output = om_output,
@@ -76,19 +205,19 @@ landings_data <- data.frame(
   # TODO: Should there be a type that are not removed but just noted,
   #       where obviously in this instance they are removed.
   type = "landings",
-  name = names(returnedom[["om_output"]]$L.mt)[1],
+  name = names(returnedom[["om_output"]][["L.mt"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
   datestart = as.Date(
-    paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
+    paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
     format = "%Y-%m-%d"
   ),
   dateend = as.Date(
-    paste(returnedom[["om_input"]]$year, 12, 31, sep = "-"),
+    paste(returnedom[["om_input"]][["year"]], 12, 31, sep = "-"),
     format = "%Y-%m-%d"
   ),
-  value = returnedom[["em_input"]]$L.obs[[1]],
+  value = returnedom[["em_input"]][["L.obs"]][[1]],
   unit = "mt", # metric tons
-  uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.L[[1]])
+  uncertainty = cv_2_sd(returnedom[["em_input"]][["cv.L"]][[1]])
 )
 
 ###############################################################################
@@ -96,19 +225,19 @@ landings_data <- data.frame(
 ###############################################################################
 index_data <- data.frame(
   type = "index",
-  name = names(returnedom[["om_output"]]$survey_index)[1],
+  name = names(returnedom[["om_output"]][["survey_index"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
   datestart = as.Date(
-    paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
+    paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
     format = "%Y-%m-%d"
   ),
   dateend = as.Date(
-    paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
+    paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
     format = "%Y-%m-%d"
   ),
-  value = returnedom[["em_input"]]$surveyB.obs[[1]],
+  value = returnedom[["em_input"]][["surveyB.obs"]][[1]],
   unit = "mt",
-  uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.survey[[1]])
+  uncertainty = cv_2_sd(returnedom[["em_input"]][["cv.survey"]][[1]])
 )
 
 ###############################################################################
@@ -116,10 +245,10 @@ index_data <- data.frame(
 ###############################################################################
 age_data <- rbind(
   data.frame(
-    name = names(returnedom[["em_input"]]$n.L),
-    returnedom[["em_input"]]$L.age.obs$fleet1,
+    name = names(returnedom[["em_input"]][["n.L"]]),
+    returnedom[["em_input"]][["L.age.obs"]][["fleet1"]],
     unit = "proportion",
-    uncertainty = returnedom[["em_input"]]$n.L$fleet1,
+    uncertainty = returnedom[["em_input"]][["n.L"]][["fleet1"]],
     datestart = as.Date(
       paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
       "%Y-%m-%d"
@@ -130,8 +259,8 @@ age_data <- rbind(
     )
   ),
   data.frame(
-    name = names(returnedom[["om_output"]]$survey_age_comp)[1],
-    returnedom[["em_input"]]$survey.age.obs[[1]],
+    name = names(returnedom[["om_output"]][["survey_age_comp"]])[1],
+    returnedom[["em_input"]][["survey.age.obs"]][[1]],
     unit = "number of fish in proportion",
     uncertainty = returnedom[["om_input"]][["n.survey"]][["survey1"]],
     datestart = as.Date(
@@ -151,7 +280,9 @@ age_data <- rbind(
     cols = dplyr::starts_with("X"),
     names_prefix = "X",
     names_to = "age",
-    values_to = "value"
+    values_to = "value",
+    # Convert the "age" column from strings to integers
+    names_transform = list(age = as.integer)
   )
 
 ###############################################################################
@@ -169,7 +300,7 @@ timingfishery <- data.frame(
 )
 weightsfishery <- data.frame(
   type = "weight-at-age",
-  name = names(returnedom[["em_input"]]$n.L),
+  name = names(returnedom[["em_input"]][["n.L"]]),
   age = seq_along(returnedom[["om_input"]][["W.kg"]]),
   value = returnedom[["om_input"]][["W.mt"]],
   uncertainty = NA,
@@ -180,149 +311,56 @@ weightatage_data <- merge(timingfishery, weightsfishery)
 ###############################################################################
 # {FIMS} data
 ###############################################################################
-data1 <- type.convert(
-  rbind(landings_data, index_data, age_data, weightatage_data),
-  as.is = TRUE
-)
+data1 <-rbind(landings_data, index_data, age_data, weightatage_data)
 
 # Add new column for length values and set to NA for all milestone 1 data
 data1 <- data1[, c(1:3, 3:8)]
 colnames(data1)[4] <- "length"
 data1[, 4] <- NA
 
-# Growth function values to create length age conversion matrix from model
-# comparison project
-Linf <- 800
-K <- 0.18
-a0 <- -1.36
-amax <- 12
-cv <- 0.1
-
-L2Wa <- 2.5e-08
-L2Wb <- 3
-
-AtoL <- function(a, Linf, K, a_0) {
-  L <- Linf * (1 - exp(-K * (a - a_0)))
-}
-
-ages <- 1:amax
-len_bins <- seq(0, 1100, 50)
-
-# Create length at age conversion matrix and fill proportions using above
-# growth parameters
-length_age_conversion <- matrix(NA, nrow = length(ages), ncol = length(len_bins))
-for (i in seq_along(ages)) {
-  # Calculate mean length at age to spread lengths around
-  mean_length <- AtoL(ages[i], Linf, K, a0)
-  # mean_length <- AtoLSchnute(ages[i],L1,L2,a1,a2,Ks)
-  # Calculate the cumulative proportion shorter than each composition length
-  temp_len_probs <- pnorm(q = len_bins, mean = mean_length, sd = mean_length * cv)
-  # Reset the first length proportion to zero so the first bin includes all
-  # density smaller than that bin
-  temp_len_probs[1] <- 0
-  # subtract the offset length probabilities to calculate the proportion in each
-  # bin. For each length bin the proportion is how many fish are larger than this
-  # length but shorter than the next bin length.
-  temp_len_probs <- c(temp_len_probs[-1], 1) - temp_len_probs
-  length_age_conversion[i, ] <- temp_len_probs
-}
-colnames(length_age_conversion) <- len_bins
-rownames(length_age_conversion) <- ages
-
 # Extract years and fleets from milestone 1 data
-start_date <- unique(data1$datestart[data1$type == "weight-at-age"])
-end_date <- unique(data1$dateend[data1$type == "weight-at-age"])
-observers <- unique(data1$name[data1$type == "age"])
+start_date <- timingfishery[["datestart"]]
+end_date <- timingfishery[["dateend"]]
+observers <- c("fleet1", "survey1")
 
 # Create data frame for new fleet and year specific length at age conversion proportions
 # These are identical across years and fleets in this default example
-# length_age_data <- data1[rep(1, length(ages) *
-#   length(len_bins) *
-#   length(start_date) *
-#   length(observers)), ]
 length_age_data <- data.frame(
-  matrix(NA, ncol = ncol(data1), nrow = length(ages) *
-           length(len_bins) *
-           length(start_date) *
-           length(observers))
-)
-colnames(length_age_data) <- colnames(data1)
-row_index <- 1
-for (k in seq_along(start_date)) {
-  for (l in seq_along(observers)) {
-    for (i in seq_along(ages)) {
-      for (j in seq_along(len_bins)) {
-        length_age_data[row_index, ] <- c(
-          "age-to-length-conversion",
-          observers[l],
-          ages[i],
-          len_bins[j],
-          start_date[k],
-          end_date[k],
-          length_age_conversion[i, j],
-          "proportion",
-          200
-        )
-        row_index <- row_index + 1
-      }
-    }
-  }
-}
+  type = rep("age-to-length-conversion",length(len_bins)*length(ages)*length(observers)*length(start_date)),
+  name = rep(sort(rep(observers,length(len_bins)*length(ages))),length(start_date)),
+  age = rep(sort(rep(ages,length(len_bins))),length(observers)*length(start_date)),
+  length = rep(len_bins,length(ages)*length(observers)*length(start_date)),
+  datestart = rep(start_date,each=length(len_bins)*length(ages)*length(observers)),
+  dateend = rep(end_date,each=length(len_bins)*length(ages)*length(observers)),
+  value = rep(c(t(returnedom[["em_input"]][["age_to_length_conversion"]])),length(observers)*length(start_date)),
+  unit = rep("proportion",length(len_bins)*length(ages)*length(observers)*length(start_date)),
+  uncertainty = rep(c(em_input[["n.L.lengthcomp"]][["fleet1"]], em_input[["n.survey.lengthcomp"]][["survey1"]]),length(len_bins)*length(ages)*length(start_date)))
 
-# Create a length compostion data frame that will be filled by transforming
+# Create a length composition data frame that will be filled by transforming
 # the age composition data
-# length_comp_data <- data1[rep(1, length(len_bins) *
-#   length(start_date) *
-#   length(observers)), ]
-
 length_comp_data <- data.frame(
-  matrix(NA, ncol = ncol(data1), nrow = length(len_bins) *
-           length(start_date) *
-           length(observers))
-)
-colnames(length_comp_data) <- colnames(data1)
-
-age_comp_data <- data1[data1$type == "age", ]
-
-row_index <- 1
-for (k in seq_along(start_date)) {
-  year_sub <- age_comp_data[age_comp_data$datestart == start_date[k], ]
-  for (l in seq_along(observers)) {
-    obs_sub <- year_sub[year_sub$name == observers[l], ]
-    for (j in seq_along(len_bins)) {
-      temp_len_props <- length_age_conversion[, j]
-      temp_len_prob <- sum(temp_len_props * obs_sub$value)
-      length_comp_data[row_index, ] <- c(
-        "length",
-        observers[l],
-        NA,
-        len_bins[j],
-        start_date[k],
-        end_date[k],
-        temp_len_prob,
-        "proportion",
-        200
-      )
-      row_index <- row_index + 1
-    }
-  }
-}
+  type = rep("length",length(len_bins)*length(start_date)*length(observers)),
+  name = sort(rep(observers,length(len_bins)*length(start_date))),
+  age = NA,
+  length = rep(len_bins,length(start_date)*length(observers)),
+  datestart = rep(start_date,each=length(len_bins)*length(observers)),
+  dateend = rep(end_date,each=length(len_bins)*length(observers)),
+  value = c(c(t(returnedom[["em_input"]][["L.length.obs"]][["fleet1"]])), c(t(returnedom[["em_input"]][["survey.length.obs"]][["survey1"]]))),
+  unit = rep("proportion",length(len_bins)*length(start_date)*length(observers)),
+  uncertainty = rep(c(em_input[["n.L.lengthcomp"]][["fleet1"]], em_input[["n.survey.lengthcomp"]][["survey1"]]),length(len_bins)*length(start_date)))
 
 # Add the conversion matrix and length composition data to dataframe
-# data1 <- rbind(data1,length_comp_data,length_age_data)
-
-data1 <- type.convert(
-  rbind(data1, length_comp_data, length_age_data),
-  as.is = TRUE
-)
+data1 <- rbind(data1,length_comp_data,length_age_data)
 
 write.csv(data1,
           file.path("FIMS_input_data.csv"),
           row.names = FALSE
 )
-
 # check csv can be read into R well
 test_read <- read.csv(file.path("FIMS_input_data.csv"))
+# TODO: check if we need to do following conversion before running expect_equal()
+test_read[["datestart"]] <- as.Date(test_read[["datestart"]])
+test_read[["dateend"]] <- as.Date(test_read[["dateend"]])
 testthat::expect_equal(test_read, data1)
 unlink("FIMS_input_data.csv")
 

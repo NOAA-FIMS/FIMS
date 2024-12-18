@@ -1,6 +1,6 @@
 library(testthat)
 test_that("Population input settings work as expected", {
-  population <- new(Population)
+  population <- methods::new(Population)
   nyears <- 10
   nages <- 10
   population$log_M <- methods::new(ParameterVector, rep(-1, nyears * nages), nyears * nages)

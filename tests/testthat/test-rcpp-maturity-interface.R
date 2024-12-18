@@ -1,6 +1,6 @@
 test_that("Maturity input settings work as expected", {
   # Create maturity1
-  maturity1 <- new(LogisticMaturity)
+  maturity1 <- methods::new(LogisticMaturity)
 
   maturity1$inflection_point[1]$value <- 10.0
   maturity1$inflection_point[1]$min <- 8.0
@@ -20,7 +20,7 @@ test_that("Maturity input settings work as expected", {
 
 
   # Create selectivity2
-  maturity2 <- new(LogisticMaturity)
+  maturity2 <- methods::new(LogisticMaturity)
   expect_equal((maturity2$get_id()), 2)
 
   clear()

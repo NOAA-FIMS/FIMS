@@ -92,7 +92,7 @@ test_that("Can add index data to model", {
 
   for (index_i in 1:n_index) {
     index <- Index
-    index_dat[[fleet_names_index[index_i]]] <- new(index, n_years)
+    index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
     expect_silent(index_dat[[fleet_names_index[index_i]]] <-
       m_index(fims_frame, fleet_names_index[index_i]))
   }
@@ -105,7 +105,7 @@ test_that("Can add agecomp data to model", {
   names(age_comp_dat) <- fleet_names_age_comp
 
   for (fleet_f in 1:n_age_comp) {
-    age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- new(AgeComp, n_years, n_ages)
+    age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- methods::new(AgeComp, n_years, n_ages)
     expect_silent(age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data <-
       m_agecomp(fims_frame, fleet_names_age_comp[fleet_f]))
   }

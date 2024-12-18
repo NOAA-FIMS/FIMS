@@ -1,6 +1,6 @@
 test_that("Selectivity input settings work as expected", {
   # Create selectivity1
-  selectivity1 <- new(LogisticSelectivity)
+  selectivity1 <- methods::new(LogisticSelectivity)
 
   selectivity1$inflection_point[1]$value <- 10.0
   selectivity1$inflection_point[1]$min <- 8.0
@@ -20,11 +20,11 @@ test_that("Selectivity input settings work as expected", {
 
 
   # Create selectivity2
-  selectivity2 <- new(LogisticSelectivity)
+  selectivity2 <- methods::new(LogisticSelectivity)
   expect_equal((selectivity2$get_id()), 2)
 
   # Test double logistic
-  selectivity3 <- new(DoubleLogisticSelectivity)
+  selectivity3 <- methods::new(DoubleLogisticSelectivity)
 
   selectivity3$inflection_point_asc[1]$value <- 10.5
   selectivity3$slope_asc[1]$value <- 0.2

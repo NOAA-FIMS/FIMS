@@ -628,11 +628,13 @@ FIMSFrame <- function(data) {
   # simulation range
   if ("age" %in% colnames(data)) {
     ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
+    # ages <- sort(unique(data[["age"]]))
+    # ages <- ages[!is.na(ages)]
   } else {
     ages <- numeric()
   }
   n_ages <- length(ages)
-  
+
   if ("length" %in% colnames(data)) {
     lengths <- sort(unique(data[["length"]]))
     lengths <- lengths[!is.na(lengths)]

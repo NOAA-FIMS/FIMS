@@ -109,3 +109,4 @@ to access objects stored in the available slots.
 \item \code{\link[=create_default_parameters]{create_default_parameters()}}
 }
 }
+\keyword{fit_fims}

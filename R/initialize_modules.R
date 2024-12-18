@@ -64,7 +64,7 @@ initialize_module <- function(parameters, data, module_name) {
 
   module_class <- get(module_class_name)
   module_fields <- names(module_class@fields)
-  module <- new(module_class)
+  module <- methods::new(module_class)
   module_input <- parameters[["parameters"]][[module_name]]
 
   if (module_class_name == "Fleet") {
@@ -93,8 +93,9 @@ initialize_module <- function(parameters, data, module_name) {
     # TODO: refactor "age-to-length-conversion" in FIMSFrame data and
     # "age_length_conversion_matrix" in the Rcpp interface to
     # "age_to_legnth_conversion" for consistency
-    if ("age-to-length-conversion" %in% fleet_types &
-        "LengthComp" %in% names(parameters[["modules"]][["fleets"]][[module_name]][["data_distribution"]])) {
+    data_distribution_names_for_fleet_i <- names(parameters[["modules"]][["fleets"]][[module_name]][["data_distribution"]])
+    if ("age-to-length-conversion" %in% fleet_types &&
+        "LengthComp" %in% data_distribution_names_for_fleet_i) {
       age_length_conversion_matrix_value <- FIMS::m_age_to_length_conversion(data, module_name)
       module[["age_length_conversion_matrix"]]$resize(length(age_length_conversion_matrix_value))
       # Assign each value to the corresponding position in the parameter vector
@@ -104,12 +105,17 @@ initialize_module <- function(parameters, data, module_name) {
 
       # Set the estimation information for the entire parameter vector
       module[["age_length_conversion_matrix"]]$set_all_estimable(FALSE)
+
+      module[["age_length_conversion_matrix"]]$set_all_random(FALSE)
+    } else {
+      module_fields <- setdiff(module_fields, c(
+        # Right now we can also remove nlengths because the default is 0
+        "nlengths"
+      ))
     }
 
     module_fields <- setdiff(module_fields, c(
       "age_length_conversion_matrix",
-      # Right now we can also remove nlengths because the default is 0
-      "nlengths",
       "proportion_catch_numbers_at_length"
     ))
   }
@@ -228,7 +234,7 @@ initialize_distribution <- function(
 
   # Get distribution value and initialize the module
   distribution_value <- get(distribution_name)
-  distribution_module <- new(distribution_value)
+  distribution_module <- methods::new(distribution_value)
   distribution_fields <- names(distribution_value@fields)
   if (distribution_type == "data") {
     distribution_fields <- setdiff(
@@ -403,12 +409,6 @@ initialize_selectivity <- function(parameters, data, fleet_name) {
 #' The initialized fleet module as an object.
 #' @noRd
 initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
-  if (any(is.na(linked_ids[c("selectivity", "index", "age_comp")]))) {
-    cli::cli_abort(c(
-      "{.var linked_ids} for {fleet_name} must include 'selectivity', 'index',
-      and 'age_comp' IDs."
-    ))
-  }
 
   module <- initialize_module(
     parameters = parameters,
@@ -418,14 +418,26 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
 
   module$SetSelectivity(linked_ids["selectivity"])
   module$SetObservedIndexData(linked_ids["index"])
-  module$SetObservedAgeCompData(linked_ids["age_comp"])
 
   fleet_types <- get_data(data) |>
       dplyr::filter(name == fleet_name) |>
       dplyr::pull(type) |>
       unique()
-  if ("length" %in% fleet_types &
-      "LengthComp" %in% names(parameters[["modules"]][["fleets"]][[fleet_name]][["data_distribution"]])) {
+
+  # Link the observed age composition data to the fleet module using its associated ID
+  # if the data type includes "age" and if "AgeComp" exists in the data distribution
+  # specification
+  distribution_names_for_fleet <- names(parameters[["modules"]][["fleets"]][[fleet_name]][["data_distribution"]])
+  if ("age" %in% fleet_types &&
+      "AgeComp" %in% distribution_names_for_fleet) {
+    module$SetObservedAgeCompData(linked_ids["age_comp"])
+  }
+
+  # Link the observed length composition data to the fleet module using its associated ID
+  # if the data type includes "length" and if "LengthComp" exists in the data
+  # distribution specification
+  if ("length" %in% fleet_types &&
+      "LengthComp" %in% distribution_names_for_fleet) {
     module$SetObservedLengthCompData(linked_ids["length_comp"])
   }
   return(module)
@@ -611,14 +623,8 @@ initialize_fims <- function(parameters, data) {
       fleet_name = fleet_names[i]
     )
 
-    fleet_age_comp[[i]] <- initialize_age_comp(
-      data = data,
-      fleet_name = fleet_names[i]
-    )
-
     fleet_module_ids <- c(
       index = fleet_index[[i]]$get_id(),
-      age_comp = fleet_age_comp[[i]]$get_id(),
       selectivity = fleet_selectivity[[i]]$get_id()
     )
 
@@ -627,12 +633,40 @@ initialize_fims <- function(parameters, data) {
       dplyr::pull(type) |>
       unique()
 
-    if ("length" %in% fleet_types &
-        "LengthComp" %in% names(parameters[["modules"]][["fleets"]][[fleet_names[i]]][["data_distribution"]])) {
+    # Initialize age composition module if the data type includes "age" and
+    # if "AgeComp" exists in the data distribution specification
+    data_distribution_names_for_fleet_i <- names(
+      parameters[["modules"]][["fleets"]][[fleet_names[i]]][["data_distribution"]]
+    )
+
+    if ("age" %in% fleet_types &&
+        "AgeComp" %in% data_distribution_names_for_fleet_i) {
+
+      # Initialize age composition module for the current fleet
+      fleet_age_comp[[i]] <- initialize_age_comp(
+        data = data,
+        fleet_name = fleet_names[i]
+      )
+
+      # Add the module ID for the initialized age composition to the list of fleet module IDs
+      fleet_module_ids <- c(
+        fleet_module_ids,
+        c(age_comp = fleet_age_comp[[i]]$get_id())
+      )
+    }
+
+    # Initialize length composition module if the data type includes "length" and
+    # if "LengthComp" exists in the data distribution specification
+    if ("length" %in% fleet_types &&
+        "LengthComp" %in% data_distribution_names_for_fleet_i) {
+
+      # Initialize length composition module for the current fleet
       fleet_length_comp[[i]] <- initialize_length_comp(
         data = data,
         fleet_name = fleet_names[i]
       )
+
+      # Add the module ID for the initialized length composition to the list of fleet module IDs
       fleet_module_ids <- c(
         fleet_module_ids,
         c(length_comp = fleet_length_comp[[i]]$get_id())
@@ -678,14 +712,17 @@ initialize_fims <- function(parameters, data) {
       data_type = "index"
     )
 
-    fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
-      module = fleet[[i]],
-      family = multinomial(link = "logit"),
-      data_type = "agecomp"
-    )
+    if ("age" %in% fleet_types &&
+       "AgeComp" %in% data_distribution_names_for_fleet_i) {
+     fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
+       module = fleet[[i]],
+       family = multinomial(link = "logit"),
+       data_type = "agecomp"
+     )
+   }
 
-    if ("length" %in% fleet_types &
-        "LengthComp" %in% names(parameters[["modules"]][["fleets"]][[fleet_names[i]]][["data_distribution"]])) {
+    if ("length" %in% fleet_types &&
+        "LengthComp" %in% data_distribution_names_for_fleet_i) {
       fleet_lengthcomp_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
         family = multinomial(link = "logit"),

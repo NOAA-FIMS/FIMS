@@ -4,19 +4,19 @@ test_that("Parameter vector works as expected", {
   v2_value <- 2.0
 
   # Test that default constructor works
-  v0 <- new(ParameterVector)
+  v0 <- methods::new(ParameterVector)
   expect_equal(length(v0), 1)
   expect_equal(v0$at(1)$value, 0)
 
   # Test that constructor that initializes based on size works.
-  v1 <- new(ParameterVector, v_size)
+  v1 <- methods::new(ParameterVector, v_size)
   v1$fill(v1_value)
   for (i in 1:v_size) {
     expect_equal(v1$get(i - 1)$value, v1_value)
   }
 
   # Test that constructor that takes vector and size works.
-  v2 <- new(ParameterVector, rep(v2_value, v_size), v_size)
+  v2 <- methods::new(ParameterVector, rep(v2_value, v_size), v_size)
   for (i in 1:v_size) {
     expect_equal(v2$get(i - 1)$value, v2_value)
   }

@@ -1,7 +1,7 @@
 library(testthat)
 test_that("Recruitment input settings work as expected", {
   # Create recruitment
-  recruitment <- new(BevertonHoltRecruitment)
+  recruitment <- methods::new(BevertonHoltRecruitment)
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6

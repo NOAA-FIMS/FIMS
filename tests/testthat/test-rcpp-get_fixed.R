@@ -1,6 +1,6 @@
 test_that("test get parameter vector", {
   # Create selectivity
-  selectivity <- new(LogisticSelectivity)
+  selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0
   selectivity$inflection_point[1]$min <- 8.0
   selectivity$inflection_point[1]$max <- 12.0
@@ -28,7 +28,7 @@ test_that("test get parameter vector", {
   clear()
   p <- get_fixed()
   expect_equal(numeric(0), p)
-  selectivity <- new(LogisticSelectivity)
+  selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 11.0
   selectivity$inflection_point[1]$min <- 8.0
   selectivity$inflection_point[1]$max <- 12.0
@@ -38,7 +38,7 @@ test_that("test get parameter vector", {
   selectivity$slope[1]$is_random_effect <- FALSE
   selectivity$slope[1]$estimated <- TRUE
   sel_parm <- c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value)
-  recruitment <- new(BevertonHoltRecruitment)
+  recruitment <- methods::new(BevertonHoltRecruitment)
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
@@ -62,7 +62,7 @@ test_that("test get parameter vector", {
 test_that("get_fixed() works when estimated is set to FALSE", {
 
   clear()
-  selectivity <- new(LogisticSelectivity)
+  selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0
   selectivity$inflection_point[1]$min <- 8.0
   selectivity$inflection_point[1]$max <- 12.0

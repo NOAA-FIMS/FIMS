@@ -47,57 +47,57 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 om_output_list,
                                                 em_input_list,
                                                 estimation_mode = TRUE,
-                                                map = list(),
-                                                data) {
+                                                map = list()) {
   # Load operating model data for the current iteration
-  om_input <- om_input_list[[iter_id]]
-  om_output <- om_output_list[[iter_id]]
-  em_input <- em_input_list[[iter_id]]
+  om_input <- om_input_list[[iter_id]] # Operating model input for the current iteration
+  om_output <- om_output_list[[iter_id]] # Operating model output for the current iteration
+  em_input <- em_input_list[[iter_id]] # Estimation model input for the current iteration
 
   # Clear any previous FIMS settings
   clear()
 
-  # Data
-  catch <- em_input$L.obs$fleet1
+  # Extract fishing fleet landings data (observed) and initialize index module
+  catch <- em_input[["L.obs"]][["fleet1"]]
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
-  fishing_fleet_index <- new(Index, om_input$nyr)
+  fishing_fleet_index <- methods::new(Index, om_input[["nyr"]])
   fishing_fleet_index$index_data <- catch
   # set fishing fleet age comp data, need to set dimensions of age comps
   # Here the new function initializes the object with length nyr*nages
-  fishing_fleet_age_comp <- new(AgeComp, om_input$nyr, om_input$nages)
-  # Here we fill in the values for the object with the observed length comps for fleet one
-  # we multiply these proportions by the sample size for likelihood weighting 
-  fishing_fleet_age_comp$age_comp_data <- c(t(em_input$L.age.obs$fleet1)) * em_input$n.L$fleet1
+  fishing_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
+  # Here we fill in the values for the object with the observed age comps for fleet one
+  # we multiply these proportions by the sample size for likelihood weighting
+  fishing_fleet_age_comp$age_comp_data <- c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]]
 
-  #TODO
   # set fishing fleet length comp data, need to set dimensions of length comps
-  fishery_lengthcomp <- FIMS::m_lengthcomp(data, "fleet1")
-  fishery_age_length_conversion <- FIMS::m_age_to_length_conversion(data, "fleet1")
-  fishing_fleet_length_comp <- new(LengthComp, om_input$nyr, data@n_lengths)
-  fishing_fleet_length_comp$length_comp_data <- fishery_lengthcomp * em_input$n.L$fleet1
+  fishing_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
+  fishing_fleet_length_comp$length_comp_data <- c(t(em_input[["L.length.obs"]][["fleet1"]])) * em_input[["n.L.lengthcomp"]][["fleet1"]]
 
   # Fleet
   # Create the fishing fleet
-  fishing_fleet_selectivity <- new(LogisticSelectivity)
-  fishing_fleet_selectivity$inflection_point[1]$value <- om_input$sel_fleet$fleet1$A50.sel1
+  fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
+  fishing_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
   fishing_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
   # turn on estimation of inflection_point
   fishing_fleet_selectivity$inflection_point[1]$estimated <- TRUE
-  fishing_fleet_selectivity$slope[1]$value <- om_input$sel_fleet$fleet1$slope.sel1
+  fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
   # turn on estimation of slope
   fishing_fleet_selectivity$slope[1]$is_random_effect <- FALSE
   fishing_fleet_selectivity$slope[1]$estimated <- TRUE
 
-  fishing_fleet <- new(Fleet)
-  fishing_fleet$nyears <- om_input$nyr
-  fishing_fleet$nages <- om_input$nages
-  #TODO
-  fishing_fleet$nlengths <- data@n_lengths
+  # Initialize the fishing fleet module
+  fishing_fleet <- methods::new(Fleet)
+  # Set number of years
+  fishing_fleet$nyears <- om_input[["nyr"]]
+  # Set number of age classes
+  fishing_fleet$nages <- om_input[["nages"]]
+  # Set number of length bins
+  fishing_fleet$nlengths <- om_input[["nlengths"]]
 
-  fishing_fleet$log_Fmort$resize(om_input$nyr)
+  fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
-    fishing_fleet$log_Fmort[y]$value <- log(om_output$f[y])
+    # Log-transform OM fishing mortality
+    fishing_fleet$log_Fmort[y]$value <- log(om_output[["f"]][y])
   }
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
@@ -106,16 +106,15 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
   fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
-
-  #TODO
   fishing_fleet$SetObservedLengthCompData(fishing_fleet_length_comp$get_id())
-  
+
   # Set up fishery index data using the lognormal
   fishing_fleet_index_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
-  fishing_fleet_index_distribution$log_sd$resize(om_input$nyr)
-  for (y in 1:om_input$nyr) {
-    fishing_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input$cv.L$fleet1^2 + 1)))
+  fishing_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
+  for (y in 1:om_input[["nyr"]]) {
+    # Compute lognormal SD from OM coefficient of variation (CV)
+    fishing_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
   }
   fishing_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
@@ -127,85 +126,87 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet$GetObservedAgeCompDataID())
   fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$proportion_catch_numbers_at_age$get_id())
 
-  #TODO change age to length
   # Set up fishery length composition data using the multinomial
   fishing_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
   fishing_fleet_lengthcomp_distribution$set_observed_data(fishing_fleet$GetObservedLengthCompDataID())
   fishing_fleet_lengthcomp_distribution$set_distribution_links("data", fishing_fleet$proportion_catch_numbers_at_length$get_id())
 
-  #TODO age to length conversion 
-  #Set age-to-length conversion matrix
-  fishing_fleet$age_length_conversion_matrix <- new(ParameterVector,fishery_age_length_conversion,om_input$nages*data@n_lengths)
+  # Set age-to-length conversion matrix
+  # TODO: If an age_to_length_conversion matrix is provided, the code below
+  # still executes. Consider adding a check in the Rcpp interface to ensure
+  # users provide a vector of inputs.
+  fishing_fleet$age_length_conversion_matrix <- methods::new(
+    ParameterVector,
+    c(t(em_input[["age_to_length_conversion"]])),
+    om_input[["nages"]] * om_input[["nlengths"]]
+  )
   # Turn off estimation for length-at-age
   fishing_fleet$age_length_conversion_matrix$set_all_estimable(FALSE)
   fishing_fleet$age_length_conversion_matrix$set_all_random(FALSE)
 
-  # repeat data for surveys
-  survey_index <- em_input$surveyB.obs$survey1
-  survey_fleet_index <- new(Index, om_input$nyr)
+  # Repeat similar setup for the survey fleet (e.g., index, age comp, and length comp)
+  # This includes initializing logistic selectivity, observed data modules, and distribution links.
+  survey_index <- em_input[["surveyB.obs"]][["survey1"]]
+  survey_fleet_index <- methods::new(Index, om_input[["nyr"]])
   survey_fleet_index$index_data <- survey_index
-  survey_fleet_age_comp <- new(AgeComp, om_input$nyr, om_input$nages)
-  survey_fleet_age_comp$age_comp_data <- c(t(em_input$survey.age.obs$survey1)) * em_input$n.survey$survey1
-
-  #TODO change age to length
-  survey_lengthcomp <- m_lengthcomp(data, "survey1")
-  survey_age_length_conversion <- m_age_to_length_conversion(data, "survey1")
-  survey_fleet_length_comp <- new(LengthComp, om_input$nyr, data@n_lengths)
-  survey_fleet_length_comp$length_comp_data <- survey_lengthcomp * em_input$n.survey$survey1
-
+  survey_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
+  survey_fleet_age_comp$age_comp_data <- c(t(em_input[["survey.age.obs"]][["survey1"]])) * em_input[["n.survey"]][["survey1"]]
+  survey_lengthcomp <- em_input[["survey.length.obs"]][["survey1"]]
+  survey_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
+  survey_fleet_length_comp$length_comp_data <- c(t(survey_lengthcomp)) * em_input[["n.survey.lengthcomp"]][["survey1"]]
   # Fleet
   # Create the survey fleet
-  survey_fleet_selectivity <- new(LogisticSelectivity)
-  survey_fleet_selectivity$inflection_point[1]$value <- om_input$sel_survey$survey1$A50.sel1
+  survey_fleet_selectivity <- methods::new(LogisticSelectivity)
+  survey_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]
   survey_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
   # turn on estimation of inflection_point
   survey_fleet_selectivity$inflection_point[1]$estimated <- TRUE
-  survey_fleet_selectivity$slope[1]$value <- om_input$sel_survey$survey1$slope.sel1
+  survey_fleet_selectivity$slope[1]$value <- om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]
   survey_fleet_selectivity$slope[1]$is_random_effect <- FALSE
   # turn on estimation of slope
   survey_fleet_selectivity$slope[1]$estimated <- TRUE
 
-  survey_fleet <- new(Fleet)
+  survey_fleet <- methods::new(Fleet)
   survey_fleet$is_survey <- TRUE
-  survey_fleet$nages <- om_input$nages
-  survey_fleet$nyears <- om_input$nyr
-
-  #TODO
-  survey_fleet$nlengths <- data@n_lengths
-
-  survey_fleet$log_q[1]$value <- log(om_output$survey_q$survey1)
+  survey_fleet$nages <- om_input[["nages"]]
+  survey_fleet$nyears <- om_input[["nyr"]]
+  survey_fleet$nlengths <- om_input[["nlengths"]]
+  survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
+  survey_fleet$log_q[1]$estimated <- TRUE
   survey_fleet$estimate_q <- TRUE
   survey_fleet$random_q <- FALSE
   survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
   survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
-
-  #TODO
   survey_fleet$SetObservedLengthCompData(survey_fleet_length_comp$get_id())
 
   # Set up survey index data using the lognormal
   survey_fleet_index_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution$log_sd$resize(om_input$nyr)
+  survey_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
-    survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input$cv.survey$survey1^2 + 1)))
+    survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)))
   }
   survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
   survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_expected_index$get_id())
 
-  # Age composition data
+  # Age composition distribution
   survey_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
   survey_fleet_agecomp_distribution$set_observed_data(survey_fleet$GetObservedAgeCompDataID())
   survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$proportion_catch_numbers_at_age$get_id())
 
-  #TODO
+  # Length composition distribution
   survey_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
   survey_fleet_lengthcomp_distribution$set_observed_data(survey_fleet$GetObservedLengthCompDataID())
-  survey_fleet_lengthcomp_distribution$set_distribution_links("data", survey_fleet$proportion_catch_numbers_at_length$get_id())  #Set age to length conversion matrix
-  survey_fleet$age_length_conversion_matrix <- new(ParameterVector,survey_age_length_conversion,om_input$nages*data@n_lengths)
+  survey_fleet_lengthcomp_distribution$set_distribution_links("data", survey_fleet$proportion_catch_numbers_at_length$get_id()) # Set age to length conversion matrix
+  survey_fleet$age_length_conversion_matrix <- methods::new(
+    ParameterVector,
+    c(t(em_input[["age_to_length_conversion"]])),
+    om_input[["nages"]] * om_input[["nlengths"]]
+  )
   # Turn off estimation for length-at-age
   survey_fleet$age_length_conversion_matrix$set_all_estimable(FALSE)
   survey_fleet$age_length_conversion_matrix$set_all_random(FALSE)
@@ -213,7 +214,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
-  recruitment <- new(BevertonHoltRecruitment)
+  recruitment <- methods::new(BevertonHoltRecruitment)
 
   # NOTE: in first set of parameters below (for recruitment),
   # $is_random_effect (default is FALSE) and $estimated (default is FALSE)
@@ -222,31 +223,31 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # place as appropriate.
 
   # set up log_rzero (equilibrium recruitment)
-  recruitment$log_rzero[1]$value <- log(om_input$R0)
+  recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
   recruitment$log_rzero[1]$is_random_effect <- FALSE
   recruitment$log_rzero[1]$estimated <- TRUE
   # set up logit_steep
-  recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) + log(om_input$h - 0.2)
+  recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
   recruitment$logit_steep[1]$is_random_effect <- FALSE
   recruitment$logit_steep[1]$estimated <- FALSE
   # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  recruitment$log_devs$resize(om_input$nyr - 1)
-  for (y in 1:(om_input$nyr - 1)) {
-    recruitment$log_devs[y]$value <- om_input$logR.resid[y + 1]
+  recruitment$log_devs$resize(om_input[["nyr"]] - 1)
+  for (y in 1:(om_input[["nyr"]] - 1)) {
+    recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
-  recruitment_distribution <- new(DnormDistribution)
+  recruitment_distribution <- methods::new(DnormDistribution)
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
-  recruitment_distribution$log_sd <- new(ParameterVector, 1)
-  recruitment_distribution$log_sd[1]$value <- log(om_input$logR_sd)
+  recruitment_distribution$log_sd <- methods::new(ParameterVector, 1)
+  recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
   recruitment_distribution$log_sd[1]$estimated <- FALSE
-  recruitment_distribution$x$resize(om_input$nyr - 1)
-  recruitment_distribution$expected_values$resize(om_input$nyr - 1)
-  for (i in 1:(om_input$nyr - 1)) {
+  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
+  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
+  for (i in 1:(om_input[["nyr"]] - 1)) {
     recruitment_distribution$x[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
@@ -254,36 +255,36 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   recruitment$estimate_log_devs <- TRUE
 
   # Growth
-  ewaa_growth <- new(EWAAgrowth)
-  ewaa_growth$ages <- om_input$ages
-  ewaa_growth$weights <- om_input$W.mt
+  ewaa_growth <- methods::new(EWAAgrowth)
+  ewaa_growth$ages <- om_input[["ages"]]
+  ewaa_growth$weights <- om_input[["W.mt"]]
 
   # Maturity
-  maturity <- new(LogisticMaturity)
-  maturity$inflection_point[1]$value <- om_input$A50.mat
+  maturity <- methods::new(LogisticMaturity)
+  maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
   maturity$inflection_point[1]$is_random_effect <- FALSE
   maturity$inflection_point[1]$estimated <- FALSE
-  maturity$slope[1]$value <- om_input$slope
+  maturity$slope[1]$value <- om_input[["slope.mat"]]
   maturity$slope[1]$is_random_effect <- FALSE
   maturity$slope[1]$estimated <- FALSE
 
   # Population
-  population <- new(Population)
-  population$log_M$resize(om_input$nyr * om_input$nages)
-  for (i in 1:(om_input$nyr * om_input$nages)) {
-    population$log_M[i]$value <- log(om_input$M.age[1])
+  population <- methods::new(Population)
+  population$log_M$resize(om_input[["nyr"]] * om_input[["nages"]])
+  for (i in 1:(om_input[["nyr"]] * om_input[["nages"]])) {
+    population$log_M[i]$value <- log(om_input[["M.age"]][1])
   }
   population$log_M$set_all_estimable(FALSE)
-  population$log_init_naa$resize(om_input$nages)
+  population$log_init_naa$resize(om_input[["nages"]])
   for (i in 1:om_input$nages) {
-    population$log_init_naa[i]$value <- log(om_output$N.age[1, i])
+    population$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
   }
   population$log_init_naa$set_all_estimable(TRUE)
-  population$nages <- om_input$nages
-  population$ages <- om_input$ages
-  population$nfleets <- sum(om_input$fleet_num, om_input$survey_num)
+  population$nages <- om_input[["nages"]]
+  population$ages <- om_input[["ages"]]
+  population$nfleets <- sum(om_input[["fleet_num"]], om_input[["survey_num"]])
   population$nseasons <- 1
-  population$nyears <- om_input$nyr
+  population$nyears <- om_input[["nyr"]]
   population$SetRecruitment(recruitment$get_id())
   population$SetGrowth(ewaa_growth$get_id())
   population$SetMaturity(maturity$get_id())
@@ -300,13 +301,13 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Optimization with nlminb
   opt <- NULL
   if (estimation_mode == TRUE) {
-    opt <- stats::nlminb(obj$par, obj$fn, obj$gr,
+    opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
       control = list(eval.max = 800, iter.max = 800)
     )
   }
   # Call report using MLE parameter values, or
   # the initial values if optimization is skipped
-  report <- obj$report(obj$env$last.par.best)
+  report <- obj[["report"]](obj[["env"]][["last.par.best"]])
 
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
@@ -380,120 +381,11 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   om_input <- om_input_list[[iter_id]]
   om_output <- om_output_list[[iter_id]]
   em_input <- em_input_list[[iter_id]]
-  returnedom <- list(
-    om_input = om_input,
-    om_output = om_output,
-    em_input = em_input
-  )
 
   # Clear any previous FIMS settings
   clear()
 
-  # Set up data
-  cv_2_sd <- function(x) {
-    sqrt(log(x^2 + 1))
-  }
-
-  landings_data <- data.frame(
-    type = "landings",
-    name = names(returnedom[["om_output"]]$L.mt)[1],
-    age = NA,
-    datestart = as.Date(
-      paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
-      format = "%Y-%m-%d"
-    ),
-    dateend = as.Date(
-      paste(returnedom[["om_input"]]$year, 12, 31, sep = "-"),
-      format = "%Y-%m-%d"
-    ),
-    value = returnedom[["em_input"]]$L.obs[[1]],
-    unit = "mt", # metric tons
-    uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.L[[1]])
-  )
-
-  index_data <- data.frame(
-    type = "index",
-    name = names(returnedom[["om_output"]]$survey_index)[1],
-    age = NA, # Not by age in this case, but there is a by age option.
-    datestart = as.Date(
-      paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
-      format = "%Y-%m-%d"
-    ),
-    dateend = as.Date(
-      paste(returnedom[["om_input"]]$year, 1, 1, sep = "-"),
-      format = "%Y-%m-%d"
-    ),
-    value = returnedom[["em_input"]]$surveyB.obs[[1]],
-    unit = "mt",
-    uncertainty = cv_2_sd(returnedom[["em_input"]]$cv.survey[[1]])
-  )
-
-  age_data <- rbind(
-    data.frame(
-      name = names(returnedom[["em_input"]]$n.L),
-      returnedom[["em_input"]]$L.age.obs$fleet1,
-      unit = "proportion",
-      uncertainty = returnedom[["em_input"]]$n.L$fleet1,
-      datestart = as.Date(
-        paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
-        "%Y-%m-%d"
-      ),
-      dateend = as.Date(
-        paste(returnedom[["om_input"]][["year"]], 12, 31, sep = "-"),
-        "%Y-%m-%d"
-      )
-    ),
-    data.frame(
-      name = names(returnedom[["om_output"]]$survey_age_comp)[1],
-      returnedom[["em_input"]]$survey.age.obs[[1]],
-      unit = "number of fish in proportion",
-      uncertainty = returnedom[["om_input"]][["n.survey"]][["survey1"]],
-      datestart = as.Date(
-        paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
-        "%Y-%m-%d"
-      ),
-      dateend = as.Date(
-        paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
-        "%Y-%m-%d"
-      )
-    )
-  ) |>
-    dplyr::mutate(
-      type = "age"
-    ) |>
-    tidyr::pivot_longer(
-      cols = dplyr::starts_with("X"),
-      names_prefix = "X",
-      names_to = "age",
-      values_to = "value"
-    )
-
-  timingfishery <- data.frame(
-    datestart = as.Date(
-      paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
-      "%Y-%m-%d"
-    ),
-    dateend = as.Date(
-      paste(returnedom[["om_input"]][["year"]], 12, 31, sep = "-"),
-      "%Y-%m-%d"
-    )
-  )
-  weightsfishery <- data.frame(
-    type = "weight-at-age",
-    name = names(returnedom[["em_input"]]$n.L),
-    age = seq_along(returnedom[["om_input"]][["W.kg"]]),
-    value = returnedom[["om_input"]][["W.mt"]],
-    uncertainty = NA,
-    unit = "mt"
-  )
-  weightatage_data <- merge(timingfishery, weightsfishery)
-
-  data_dataframe <- type.convert(
-    rbind(landings_data, index_data, age_data, weightatage_data),
-    as.is = TRUE
-  )
-
-  data <- FIMS::FIMSFrame(data_dataframe)
+  data <- FIMS::FIMSFrame(data1)
 
   # Set up default parameters
   fleets <- list(
@@ -501,14 +393,16 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
       selectivity = list(form = "LogisticSelectivity"),
       data_distribution = c(
         Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution"
+        AgeComp = "DmultinomDistribution",
+        LengthComp = "DmultinomDistribution"
       )
     ),
     survey1 = list(
       selectivity = list(form = "LogisticSelectivity"),
       data_distribution = c(
         Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution"
+        AgeComp = "DmultinomDistribution",
+        LengthComp = "DmultinomDistribution"
       )
     )
   )
@@ -527,29 +421,29 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   # Modify parameters
   modified_parameters <- list(
     fleet1 = list(
-      LogisticSelectivity.inflection_point.value = om_input$sel_fleet$fleet1$A50.sel1,
-      LogisticSelectivity.slope.value = om_input$sel_fleet$fleet1$slope.sel1,
-      Fleet.log_Fmort.value = log(om_output$f)
+      LogisticSelectivity.inflection_point.value = om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]],
+      LogisticSelectivity.slope.value = om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]],
+      Fleet.log_Fmort.value = log(om_output[["f"]])
     ),
     survey1 = list(
-      LogisticSelectivity.inflection_point.value = om_input$sel_survey$survey1$A50.sel1,
-      LogisticSelectivity.slope.value = om_input$sel_survey$survey1$slope.sel1,
-      Fleet.log_q.value = log(om_output$survey_q$survey1)
+      LogisticSelectivity.inflection_point.value = om_input[["sel_survey"]][["survey1"]][["A50.sel1"]],
+      LogisticSelectivity.slope.value = om_input[["sel_survey"]][["survey1"]][["slope.sel1"]],
+      Fleet.log_q.value = log(om_output[["survey_q"]][["survey1"]])
     ),
     recruitment = list(
-      BevertonHoltRecruitment.log_rzero.value = log(om_input$R0),
-      BevertonHoltRecruitment.log_devs.value = om_input$logR.resid[-1],
+      BevertonHoltRecruitment.log_rzero.value = log(om_input[["R0"]]),
+      BevertonHoltRecruitment.log_devs.value = om_input[["logR.resid"]][-1],
       BevertonHoltRecruitment.log_devs.estimated = FALSE,
-      DnormDistribution.log_sd.value = om_input$logR_sd
+      DnormDistribution.log_sd.value = om_input[["logR_sd"]]
     ),
     maturity = list(
-      LogisticMaturity.inflection_point.value = om_input$A50.mat,
+      LogisticMaturity.inflection_point.value = om_input[["A50.mat"]],
       LogisticMaturity.inflection_point.estimated = FALSE,
-      LogisticMaturity.slope.value = om_input$slope.mat,
+      LogisticMaturity.slope.value = om_input[["slope.mat"]],
       LogisticMaturity.slope.estimated = FALSE
     ),
     population = list(
-      Population.log_init_naa.value = log(om_output$N.age[1, ])
+      Population.log_init_naa.value = log(om_output[["N.age"]][1, ])
     )
   )
 

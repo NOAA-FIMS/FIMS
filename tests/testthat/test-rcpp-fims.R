@@ -1,8 +1,8 @@
 test_that("Rcpp interface works for modules", {
-  expect_no_error(parameter <- new(Parameter, .1))
-  expect_no_error(beverton_holt <- new(BevertonHoltRecruitment))
-  expect_no_error(logistic_selectivity <- new(LogisticSelectivity))
-  expect_no_error(ewaa_growth <- new(EWAAgrowth))
+  expect_no_error(parameter <- methods::new(Parameter, .1))
+  expect_no_error(beverton_holt <- methods::new(BevertonHoltRecruitment))
+  expect_no_error(logistic_selectivity <- methods::new(LogisticSelectivity))
+  expect_no_error(ewaa_growth <- methods::new(EWAAgrowth))
   logistic_selectivity$slope[1]$value <- .7
   logistic_selectivity$inflection_point[1]$value <- 5.0
 

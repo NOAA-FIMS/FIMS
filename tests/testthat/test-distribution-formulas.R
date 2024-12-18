@@ -12,7 +12,7 @@ test_that("test initialize_process_distribution", {
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
-  recruitment <- new(BevertonHoltRecruitment)
+  recruitment <- methods::new(BevertonHoltRecruitment)
 
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input$R0)
@@ -97,9 +97,9 @@ test_that("test initialize_data_distribution", {
   catch <- em_input$L.obs$fleet1
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
-  fishing_fleet_index <- new(Index, om_input$nyr)
+  fishing_fleet_index <- methods::new(Index, om_input$nyr)
   fishing_fleet_index$index_data <- catch
-  fishing_fleet <- new(Fleet)
+  fishing_fleet <- methods::new(Fleet)
   fishing_fleet$nages <- om_input$nages
   fishing_fleet$nyears <- om_input$nyr
   fishing_fleet$log_Fmort <- methods::new(ParameterVector, log(om_output$f), om_input$nyr)

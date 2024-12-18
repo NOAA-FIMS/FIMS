@@ -108,9 +108,11 @@ NULL
 #' is the returned object from [create_default_parameters()].
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 methods::setGeneric("get_input", function(x) standardGeneric("get_input"))
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 methods::setMethod("get_input", "FIMSFit", function(x) x@input)
 
 #' @return
@@ -118,18 +120,22 @@ methods::setMethod("get_input", "FIMSFit", function(x) x@input)
 #' reportable in the C++ code is returned.
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setGeneric("get_report", function(x) standardGeneric("get_report"))
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setMethod("get_report", "FIMSFit", function(x) x@report)
 
 #' @return
 #' [get_obj()] returns the output from [TMB::MakeADFun()].
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setGeneric("get_obj", function(x) standardGeneric("get_obj"))
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setMethod("get_obj", "FIMSFit", function(x) x@obj)
 
 #' @return
@@ -137,9 +143,11 @@ setMethod("get_obj", "FIMSFit", function(x) x@obj)
 #' in [fit_fims()].
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setGeneric("get_opt", function(x) standardGeneric("get_opt"))
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setMethod("get_opt", "FIMSFit", function(x) x@opt)
 
 #' @return
@@ -147,9 +155,11 @@ setMethod("get_opt", "FIMSFit", function(x) x@opt)
 #' model.
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setGeneric("get_max_gradient", function(x) standardGeneric("get_max_gradient"))
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
 
 
@@ -157,9 +167,11 @@ setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
 #' [get_sdreport()] returns the list from [TMB::sdreport()].
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setGeneric("get_sdreport", function(x) standardGeneric("get_sdreport"))
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 
 #' @return
@@ -167,9 +179,11 @@ setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 #' uncertainties from a fitted model.
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setGeneric("get_estimates", function(x) standardGeneric("get_estimates"))
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
 
 #' @return
@@ -178,12 +192,14 @@ setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
 #' in the model.
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setGeneric(
   "get_number_of_parameters",
   function(x) standardGeneric("get_number_of_parameters")
 )
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setMethod(
   "get_number_of_parameters",
   "FIMSFit",
@@ -195,9 +211,11 @@ setMethod(
 #' seconds as a `difftime` object.
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setGeneric("get_timing", function(x) standardGeneric("get_timing"))
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setMethod("get_timing", "FIMSFit", function(x) x@timing)
 
 #' @return
@@ -205,9 +223,11 @@ setMethod("get_timing", "FIMSFit", function(x) x@timing)
 #' the model.
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setGeneric("get_version", function(x) standardGeneric("get_version"))
 #' @export
 #' @rdname get_FIMSFit
+#' @keywords fit_fims
 setMethod("get_version", "FIMSFit", function(x) x@version)
 
 # methods::setValidity ----

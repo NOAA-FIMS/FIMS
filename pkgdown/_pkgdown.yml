@@ -39,6 +39,7 @@ reference:
   desc: Primary functions used when setting up or running a FIMS model.
   contents:
   - starts_with("FIMSFrame")
+  - starts_with("get_FIMSFrame")
   - starts_with("m_")
   - starts_with("create_default_")
   - update_parameters

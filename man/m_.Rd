@@ -22,11 +22,11 @@
 \alias{m_age_to_length_conversion,data.frame-method}
 \title{Get a vector of data to be passed to a FIMS module from a FIMSFrame object}
 \usage{
-m_landings(x)
+m_landings(x, fleet_name)
 
-\S4method{m_landings}{FIMSFrame}(x)
+\S4method{m_landings}{FIMSFrame}(x, fleet_name)
 
-\S4method{m_landings}{data.frame}(x)
+\S4method{m_landings}{data.frame}(x, fleet_name)
 
 m_index(x, fleet_name)
 

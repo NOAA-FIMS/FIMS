@@ -5,7 +5,8 @@ fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
     Index = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution"
+    AgeComp = "DmultinomDistribution",
+    LengthComp = "DmultinomDistribution"
   )
 )
 
