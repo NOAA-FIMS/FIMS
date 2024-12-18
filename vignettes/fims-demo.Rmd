@@ -157,17 +157,15 @@ parameters <- default_parameters |>
 ## Initialize modules and fit the model
 
 With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fims()`.
-```{r, max.height='100px', attr.output='.numberLines', fit-fims, eval = FALSE}
+```{r, max.height='100px', attr.output='.numberLines', fit-fims, eval = TRUE}
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters |>
   initialize_fims(data = fims_frame) |>
-  (\(parameter_list) list(parameters = parameter_list, version = "FIMS run without optimization"))() |>
   fit_fims(optimize = FALSE)
 
 # Run the  model with optimization
 fit <- parameters |>
   initialize_fims(data = fims_frame) |>
-  (\(parameter_list) list(parameters = parameter_list, version = "FIMS run with optimization"))() |>
   fit_fims(optimize = TRUE)
 
 # Clear memory post-run
@@ -194,14 +192,12 @@ parameters_low_slope <- parameters |>
 
 high_slope_fit <- parameters_high_slope |>
   initialize_fims(data = fims_frame) |>
-  (\(parameter_list) list(parameters = parameter_list, version = "High slope run"))() |>
   fit_fims(optimize = TRUE)
 
 clear()
 
 low_slope_fit <- parameters_low_slope |>
   initialize_fims(data = fims_frame) |>
-  (\(parameter_list) list(parameters = parameter_list, version = "Low slope run"))() |>
   fit_fims(optimize = TRUE)
 
 clear()
@@ -209,7 +205,7 @@ clear()
 
 ## Plotting Results
 
-```{r plots, eval = FALSE}
+```{r plots, eval = TRUE}
 library(ggplot2)
 index_results <- data.frame(
   observed = m_index(fims_frame, "survey1"),
@@ -246,6 +242,6 @@ ggplot2::ggplot(catch_results, ggplot2::aes(x = years, y = observed)) +
 # json_output <- get_output()
 # writeLines(json_output, "output.json")
 # recruitment_log <- get_log_module("information")
-# cat(recruitment_log)
+# substr(recruitment_log, 1, 100)
 
 ```

@@ -123,7 +123,6 @@ Assuming a model has already been defined, below is an example of using the logg
 ```{r example_code, eval = TRUE}
 fit <- default_parameters |>
   initialize_fims(data = fims_frame) |>
-  (\(parameter_list) list(parameters = parameter_list, version = "FIMS run with optimization"))() |>
   fit_fims(optimize = TRUE)
 
 # get the log as a string in JSON format and parse into a list
