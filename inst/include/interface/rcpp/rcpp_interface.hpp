@@ -644,10 +644,6 @@ void log_error(std::string log_entry) {
 
     std::string ret = ss_ret.str(); //"find error";//Rcpp::as<std::string>(result);
 
-
-    //    Rcpp::Environment base = Rcpp::Environment::global_env();
-    //    Rcpp::Function f  = base["traceback"];
-    //    std::string ret = Rcpp::as<std::string>(f());
     fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
 

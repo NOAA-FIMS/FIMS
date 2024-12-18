@@ -10,7 +10,6 @@
 #ifndef POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP
 #define POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP
 
-//#include "../../../interface/interface.hpp"
 #include "../../../common/fims_math.hpp"
 #include "../../../common/fims_vector.hpp"
 #include "maturity_base.hpp"

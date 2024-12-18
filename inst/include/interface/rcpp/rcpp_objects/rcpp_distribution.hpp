@@ -486,7 +486,6 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  * dmultinom_ <- new(DmultinomDistribution)
  *
  */
-// template <typename Type>
 
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:

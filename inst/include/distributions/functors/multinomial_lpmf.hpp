@@ -25,8 +25,6 @@ namespace fims_distributions
         Type lpdf = 0.0; /**< total negative log-likelihood contribution of the distribution */
         fims::Vector<size_t> dims; /**< Dimensions of the number of rows and columns of the multivariate dataset */
 
-        // data_indicator<tmbutils::vector<Type> , Type> keep;  /**< Indicator used in TMB one-step-ahead residual calculations */
-
         /** @brief Constructor.
          */
         MultinomialLPMF() : DensityComponentBase<Type>()
@@ -119,8 +117,6 @@ namespace fims_distributions
                 }
             }
             #ifdef TMB_MODEL
-          //   vector<Type> x = this->observed_values->data;
-          //  FIMS_REPORT_F(x, this->of);
             #endif
             return (lpdf);
         }

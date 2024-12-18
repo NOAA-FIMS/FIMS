@@ -112,14 +112,6 @@ initialize_module <- function(parameters, data, module_name) {
       "nlengths",
       "proportion_catch_numbers_at_length"
     ))
-    # else {
-    #   module_fields <- setdiff(module_fields, c(
-    #   "age_length_conversion_matrix",
-    #   # Right now we can also remove nlengths because the default is 0
-    #   "nlength",
-    #   "proportion_catch_numbers_at_length"
-    # ))
-    # }
   }
 
   # Populate fields based on common and specific settings
@@ -654,19 +646,6 @@ initialize_fims <- function(parameters, data) {
       linked_ids = fleet_module_ids
     )
 
-    # Set up fishery index data using the lognormal
-    # fleet_index_distribution[[i]] <- initialize_distribution(
-    #   module_input = parameters[["parameters"]][[fleet_names[i]]],
-    #   distribution_name = parameters[["modules"]][["fleets"]][[
-    #     fleet_names[i]
-    #   ]][["data_distribution"]]["Index"],
-    #   distribution_type = "data",
-    #   linked_ids = c(
-    #     data_link = fleet[[i]]$GetObservedIndexDataID(),
-    #     fleet_link = fleet[[i]]$log_expected_index$get_id()
-    #   )
-    # )
-
     # TODO: update argument sd to log_sd to match the Rcpp interface
     parameter_value_name <- grep(
       paste0("log_sd", ".value"),
@@ -699,21 +678,6 @@ initialize_fims <- function(parameters, data) {
       data_type = "index"
     )
 
-    # Set up fishery age-composition data using the multinomial
-    # fleet_agecomp_distribution[[i]] <- initialize_distribution(
-    #   module_input = NULL,
-    #   distribution_name = parameters[["modules"]][["fleets"]][[
-    #     fleet_names[i]
-    #   ]][["data_distribution"]]["AgeComp"],
-    #   distribution_type = "data",
-    #   linked_ids = c(
-    #     data_link = fleet[[i]]$GetObservedAgeCompDataID(),
-    #     fleet_link = fleet[[
-    #       i
-    #     ]]$proportion_catch_numbers_at_age$get_id()
-    #   )
-    # )
-
     fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
       module = fleet[[i]],
       family = multinomial(link = "logit"),
@@ -739,15 +703,6 @@ initialize_fims <- function(parameters, data) {
     parameters = parameters,
     data = data
   )
-
-  # recruitment_distribution <- initialize_distribution(
-  #   module_input = parameters[["parameters"]][["recruitment"]],
-  #   distribution_name = parameters[["modules"]][[
-  #     "recruitment"
-  #   ]][["process_distribution"]],
-  #   distribution_type = "process",
-  #   linked_ids = recruitment$get_id()
-  # )
 
   parameter_name <- names(parameters$modules$recruitment$process_distribution)
   field_value_name <- grep(
