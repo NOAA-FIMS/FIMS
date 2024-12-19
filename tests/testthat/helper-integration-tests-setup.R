@@ -558,13 +558,13 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
       modified_parameters = modified_parameters
     )
 
-  parameter_list <- initialize_fims(
+  output <- initialize_fims(
     parameters = parameters,
     data = data
   )
 
   input <- list()
-  input$parameters <- parameter_list
+  input$parameters <- output$parameter_list
   input$version <- "Model Comparison Project example"
   fit <- fit_fims(input, optimize = estimation_mode)
 

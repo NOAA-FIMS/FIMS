@@ -302,12 +302,12 @@ test_that("estimation test of fims using high-level wrappers", {
 
   # Clear any previous FIMS settings
   clear()
-  parameter_list <- initialize_fims(
+  output <- initialize_fims(
     parameters = parameters,
     data = data
   )
   input <- list()
-  input$parameters <- parameter_list
+  input$parameters <- output$parameter_list
   input$version <- "Model Comparison Project example"
   fit <- fit_fims(input, optimize = TRUE)
 

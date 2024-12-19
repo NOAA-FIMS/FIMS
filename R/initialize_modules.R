@@ -762,8 +762,26 @@ initialize_fims <- function(parameters, data) {
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameter_list <- list(p = get_fixed())
+  module_list <- list(
+    fleet = fleet,
+    fleet_selectivity = fleet_selectivity,
+    fleet_index = fleet_index,
+    fleet_index_distribution = fleet_index_distribution,
+    fleet_age_comp = fleet_age_comp,
+    fleet_agecomp_distribution = fleet_agecomp_distribution,
+    fleet_length_comp = fleet_length_comp,
+    fleet_lengthcomp_distribution = fleet_lengthcomp_distribution,
+    recruitment = recruitment,
+    recruitment_distribution = recruitment_distribution,
+    growth = growth,
+    maturity = maturity,
+    population = population
+  )
 
-  return(parameter_list)
+  output <- list(
+    parameter_list = parameter_list,
+    module_list = module_list
+  )
 }
 
 #' Set parameter vector values based on module input
