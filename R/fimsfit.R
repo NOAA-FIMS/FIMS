@@ -197,6 +197,7 @@ create_FIMSFit <- function(
   # Calculate the maximum gradient
   max_gradient <- if (length(opt) > 0) {
     max(abs(obj[["gr"]](opt[["par"]])))
+    names(max_gradient) <- names(opt$par)
   } else {
     NA_real_
   }
@@ -371,6 +372,7 @@ fit_fims <- function(input,
   #rename parameters
   par.names <- names(get_parameter_names(obj$par))
   names(obj$par) <- par.names
+  names(obj$env$parList()) <- par.names
   names(opt$par) <- par.names
   names(sdreport$par.fixed) <- par.names
   dimnames(sdreport$cov.fixed) <- list(par.names, par.names)
