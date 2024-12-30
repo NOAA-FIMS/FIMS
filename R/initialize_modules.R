@@ -764,18 +764,18 @@ initialize_fims <- function(parameters, data) {
   parameter_list <- list(p = get_fixed())
   module_list <- list(
     fleet = fleet,
-    fleet_selectivity = fleet_selectivity,
-    fleet_index = fleet_index,
-    fleet_index_distribution = fleet_index_distribution,
     fleet_age_comp = fleet_age_comp,
     fleet_agecomp_distribution = fleet_agecomp_distribution,
+    fleet_index = fleet_index,
+    fleet_index_distribution = fleet_index_distribution,
     fleet_length_comp = fleet_length_comp,
     fleet_lengthcomp_distribution = fleet_lengthcomp_distribution,
-    recruitment = recruitment,
-    recruitment_distribution = recruitment_distribution,
+    fleet_selectivity = fleet_selectivity,
     growth = growth,
     maturity = maturity,
-    population = population
+    population = population,
+    recruitment = recruitment,
+    recruitment_distribution = recruitment_distribution
   )
 
   output <- list(

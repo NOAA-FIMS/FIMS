@@ -165,10 +165,15 @@ test_fit <- parameters |>
   fit_fims(optimize = FALSE)
 
 # Run the  model with optimization
-fit <- parameters |>
-  initialize_fims(data = fims_frame) |>
-  (\(output) list(parameters = output$parameter_list, version = "FIMS run with optimization"))() |>
-  fit_fims(optimize = TRUE)
+initialization <- parameters |>
+  initialize_fims(data = fims_frame) 
+
+# mapping the module list to environment
+# list2env(initialization$module_list, globalenv())
+
+parameter_list <- list(parameters = initialization$parameter_list, version = "FIMS run without optimization")
+
+fit <- fit_fims(input = parameter_list, optimize = TRUE)
 
 # Clear memory post-run
 clear()
@@ -242,7 +247,7 @@ ggplot2::ggplot(catch_results, ggplot2::aes(x = years, y = observed)) +
 
 ```{r output}
 # TODO: need to import libraries, working in progress?
-# finalize(get_obj(fit), get_opt(fit))
+finalize(get_obj(fit), get_opt(fit))
 # json_output <- get_output()
 # writeLines(json_output, "output.json")
 # recruitment_log <- get_log_module("information")
