@@ -61,7 +61,7 @@ class Parameter {
 class FIMSRcppInterfaceBase {
  public:
   /**< FIMS interface object vectors */
-  static std::vector<FIMSRcppInterfaceBase *> fims_interface_objects;
+  static std::map<uint32_t, FIMSRcppInterfaceBase *> fims_interface_objects;
 
   /** @brief virtual method to inherit to add objects to the TMB model */
   virtual bool add_to_fims_tmb() {
@@ -70,7 +70,7 @@ class FIMSRcppInterfaceBase {
     return false;
   }
 };
-std::vector<FIMSRcppInterfaceBase *>
+std::map<uint32_t, FIMSRcppInterfaceBase *> 
     FIMSRcppInterfaceBase::fims_interface_objects;
 
 #endif

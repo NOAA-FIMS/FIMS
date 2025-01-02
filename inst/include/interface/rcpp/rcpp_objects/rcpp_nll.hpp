@@ -18,29 +18,36 @@
  * function
  */
 class NLLInterfaceBase : public FIMSRcppInterfaceBase {
- public:
-  static uint32_t id_g; /**< static id of the recruitment interface base*/
-  uint32_t id;          /**< id of the recruitment interface base */
-  // live objects in C++ are objects that have been created and live in memory
-  static std::map<uint32_t, NLLInterfaceBase*> live_objects;
-  /**< map associating the ids of NLLInterfaceBase to the objects */
+public:
+    static uint32_t id_g; /**< static id of the recruitment interface base*/
+    uint32_t id; /**< id of the recruitment interface base */
+    // live objects in C++ are objects that have been created and live in memory
+    static std::map<uint32_t, NLLInterfaceBase*> live_objects;
 
-  NLLInterfaceBase() {
-    this->id = NLLInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    NLLInterfaceBase */
-    NLLInterfaceBase::live_objects[this->id] = this;
-    NLLInterfaceBase::fims_interface_objects.push_back(this);
-  }
+    /**< map associating the ids of NLLInterfaceBase to the objects */
 
-  virtual ~NLLInterfaceBase() {}
+    NLLInterfaceBase() {
+        this->id = NLLInterfaceBase::id_g++;
+        /* Create instance of map: key is id and value is pointer to
+        NLLInterfaceBase */
+        NLLInterfaceBase::live_objects[this->id] = this;
+        FIMSRcppInterfaceBase::fims_interface_objects[this->id] = this;
+    }
 
-  /** @brief get the ID of the interface base object
-   */
-  virtual uint32_t get_id() = 0;
+    NLLInterfaceBase(const NLLInterfaceBase& other) :
+    id(other.id) {
+        FIMSRcppInterfaceBase::fims_interface_objects[this->id] = this;
+    }
 
-  /** @brief evaluate method for child nll interface objects to inherit */
-  virtual double evaluate_nll() = 0;
+    virtual ~NLLInterfaceBase() {
+    }
+
+    /** @brief get the ID of the interface base object
+     */
+    virtual uint32_t get_id() = 0;
+
+    /** @brief evaluate method for child nll interface objects to inherit */
+    virtual double evaluate_nll() = 0;
 };
 
 uint32_t NLLInterfaceBase::id_g = 1;

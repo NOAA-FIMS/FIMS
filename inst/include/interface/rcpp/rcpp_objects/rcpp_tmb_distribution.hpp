@@ -32,9 +32,14 @@ DistributionsInterfaceBase objects */
     /* Create instance of map: key is id and value is pointer to
     DistributionsInterfaceBase */
     DistributionsInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+    FIMSRcppInterfaceBase::fims_interface_objects[this->id] = this;
   }
 
+    DistributionsInterfaceBase(const DistributionsInterfaceBase& other) :
+    id(other.id) {
+    }
+
+  
   virtual ~DistributionsInterfaceBase() {}
 
   /** @brief get_id method for child distribution interface objects to inherit
@@ -69,6 +74,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
   DnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
+    DnormDistributionsInterface(const DnormDistributionsInterface& other) :
+    DistributionsInterfaceBase(other), x(other.x), mean(other.mean), sd(other.sd) {
+    }
+
+  
   virtual uint32_t get_id() { return this->id; }
 
   virtual ~DnormDistributionsInterface() {}
@@ -139,6 +149,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
+    DlnormDistributionsInterface(const DlnormDistributionsInterface& other) :
+    DistributionsInterfaceBase(other), x(other.x), meanlog(other.meanlog), sdlog(other.sdlog) {
+    }
+
+  
   virtual ~DlnormDistributionsInterface() {}
 
   /**
@@ -213,6 +228,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
 
+    DmultinomDistributionsInterface(const DmultinomDistributionsInterface& other) :
+    DistributionsInterfaceBase(other), x(other.x), p(other.p) {
+    }
+
+  
   virtual ~DmultinomDistributionsInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
