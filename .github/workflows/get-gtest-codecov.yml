@@ -4,8 +4,8 @@ name: get-gtest-codecov
 on:
   workflow_dispatch:
   push:
-    branches:    
-      - main
+    # branches:
+    #   - main
     paths-ignore:
       - .devcontainer
       - .github
@@ -44,22 +44,22 @@ jobs:
     - name: Configure
     # Do not run -DBUILD_DOC=OFF locally. Only run cmake -S . -B build -G Ninja locally.
       run: |
-        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja 
-        
+        cmake -S . -B build -DBUILD_DOC=OFF -G Ninja
+
     - name: Build
-      run: |  
+      run: |
         cmake --build build --parallel 16
-        
+
     - name: Test
       run: |
         ctest --test-dir build --parallel 16
-    
+
     - name: Install gcovr
       run: |
         pip install gcovr
 
-    - name: Run gcovr 
-      run: |  
+    - name: Run gcovr
+      run: |
         gcovr --exclude tests/ --cobertura coverage.xml
 
     - name: save coverage report
@@ -73,6 +73,6 @@ jobs:
       with:
         files: coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-  
+
 
 
