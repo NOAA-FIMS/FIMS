@@ -87,7 +87,7 @@ methods::setMethod(
 # methods::setMethod: accessors ----
 
 # Accessor functions for a FIMSFit object
-# 1 setGeneric() per slot but potentially >1 setMethod() per setGeneric()
+# 1 methods::setGeneric() per slot but potentially >1 methods::setMethod() per methods::setGeneric()
 
 #' Get a slot in a FIMSFit object
 #'
@@ -120,20 +120,20 @@ methods::setMethod("get_input", "FIMSFit", function(x) x@input)
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setGeneric("get_report", function(x) standardGeneric("get_report"))
+methods::setGeneric("get_report", function(x) standardGeneric("get_report"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setMethod("get_report", "FIMSFit", function(x) x@report)
+methods::setMethod("get_report", "FIMSFit", function(x) x@report)
 
 #' @return
 #' [get_obj()] returns the output from [TMB::MakeADFun()].
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setGeneric("get_obj", function(x) standardGeneric("get_obj"))
+methods::setGeneric("get_obj", function(x) standardGeneric("get_obj"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setMethod("get_obj", "FIMSFit", function(x) x@obj)
+methods::setMethod("get_obj", "FIMSFit", function(x) x@obj)
 
 #' @return
 #' [get_opt()] returns the output from [nlminb()], which is the minimizer used
@@ -141,10 +141,10 @@ setMethod("get_obj", "FIMSFit", function(x) x@obj)
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setGeneric("get_opt", function(x) standardGeneric("get_opt"))
+methods::setGeneric("get_opt", function(x) standardGeneric("get_opt"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setMethod("get_opt", "FIMSFit", function(x) x@opt)
+methods::setMethod("get_opt", "FIMSFit", function(x) x@opt)
 
 #' @return
 #' [get_max_gradient()] returns the maximum gradient found when optimizing the
@@ -152,10 +152,10 @@ setMethod("get_opt", "FIMSFit", function(x) x@opt)
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setGeneric("get_max_gradient", function(x) standardGeneric("get_max_gradient"))
+methods::setGeneric("get_max_gradient", function(x) standardGeneric("get_max_gradient"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
+methods::setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
 
 
 #' @return
@@ -163,10 +163,10 @@ setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setGeneric("get_sdreport", function(x) standardGeneric("get_sdreport"))
+methods::setGeneric("get_sdreport", function(x) standardGeneric("get_sdreport"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
+methods::setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 
 #' @return
 #' [get_estimates()] returns a tibble of parameter values and their
@@ -174,10 +174,10 @@ setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setGeneric("get_estimates", function(x) standardGeneric("get_estimates"))
+methods::setGeneric("get_estimates", function(x) standardGeneric("get_estimates"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
+methods::setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
 
 #' @return
 #' [get_number_of_parameters()] returns a vector of integers specifying the
@@ -186,13 +186,13 @@ setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setGeneric(
+methods::setGeneric(
   "get_number_of_parameters",
   function(x) standardGeneric("get_number_of_parameters")
 )
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setMethod(
+methods::setMethod(
   "get_number_of_parameters",
   "FIMSFit",
   function(x) x@get_number_of_parameters
@@ -204,10 +204,10 @@ setMethod(
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setGeneric("get_timing", function(x) standardGeneric("get_timing"))
+methods::setGeneric("get_timing", function(x) standardGeneric("get_timing"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setMethod("get_timing", "FIMSFit", function(x) x@timing)
+methods::setMethod("get_timing", "FIMSFit", function(x) x@timing)
 
 #' @return
 #' [get_version()] returns the `package_version` of FIMS that was used to fit
@@ -215,10 +215,10 @@ setMethod("get_timing", "FIMSFit", function(x) x@timing)
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setGeneric("get_version", function(x) standardGeneric("get_version"))
+methods::setGeneric("get_version", function(x) standardGeneric("get_version"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-setMethod("get_version", "FIMSFit", function(x) x@version)
+methods::setMethod("get_version", "FIMSFit", function(x) x@version)
 
 # methods::setValidity ----
 
@@ -571,18 +571,20 @@ fit_fims <- function(input,
   return(fit)
 }
 
-#we create an as.list method for this new FIMSFit
-setMethod("as.list",signature(x="FIMSFit"),function(x) {
-  mapply(function(y) {
-    #apply as.list if the slot is again an user-defined object
-    #therefore, as.list gets applied recursively
-    if (inherits(slot(x,y),"FIMSFit")) {
-      as.list(slot(x,y))
-    } else {
-      #otherwise just return the slot
-      slot(x,y)
-    }
-  },
-  slotNames(class(x)),
-  SIMPLIFY=FALSE)
+# we create an as.list method for this new FIMSFit
+methods::setMethod("as.list", signature(x = "FIMSFit"), function(x) {
+  mapply(
+    function(y) {
+      # apply as.list if the slot is again an user-defined object
+      # therefore, as.list gets applied recursively
+      if (inherits(slot(x, y), "FIMSFit")) {
+        as.list(slot(x, y))
+      } else {
+        # otherwise just return the slot
+        slot(x, y)
+      }
+    },
+    slotNames(class(x)),
+    SIMPLIFY = FALSE
+  )
 })

@@ -72,5 +72,4 @@ test_that("Run FIMS in parallel using {snowfall}", {
     purrr::map(results_parallel, \(x) x@report[["jnll"]]),
     purrr::map(estimation_results_serial, \(x) x@report[["jnll"]])
   )
-
 })

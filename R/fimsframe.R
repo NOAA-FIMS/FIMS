@@ -630,7 +630,7 @@ validate_data_colnames <- function(data) {
 #' sorting for time series data like landings and indices.
 #' The biological data are further sorted by bin. Thus, age-composition
 #' information will be arranged as follows:
-#' 
+#'
 #' | type | name     | datestart  | age  | value  |
 #' |:---- |:--------:|:----------:|:----:|-------:|
 #' | age  | fleet1   | 2022-01-01 | 1    | 0.3    |

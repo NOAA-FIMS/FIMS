@@ -296,7 +296,7 @@ We can also link these two pointers together so that the **fims_info::Informatio
 info->maturity_models[maturity->id] = maturity;
 ```
 
-The $\color{#c55a11}{\text{`add_to_fims_tmb()`}}$ function repeats `add_to_fims_tmb_internal` four times to track the estimated value of each parameter along with their first, second, and third derivatives.
+The `add_to_fims_tmb` function repeats `add_to_fims_tmb_internal` four times to track the estimated value of each parameter along with their first, second, and third derivatives.
 
 ```{r image-path-maturity-2, echo = FALSE, message=FALSE, out.width = '100%'}
 knitr::include_graphics("figures/fims-path-maturity-2.png")

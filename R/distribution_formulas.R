@@ -71,7 +71,7 @@ check_distribution_validity <- function(args) {
   }
   if (
     !(family[["family"]] %in% available_distributions) ||
-    "unavailable data type" %in% available_distributions
+      "unavailable data type" %in% available_distributions
   ) {
     ifelse_type <- ifelse(
       is.null(data_type),
@@ -120,7 +120,7 @@ check_distribution_validity <- function(args) {
     }
     if (
       length(sd[["estimated"]]) > 1 &&
-      length(sd[["value"]]) != length(sd[["estimated"]])
+        length(sd[["value"]]) != length(sd[["estimated"]])
     ) {
       sd_length <- length(sd[["value"]])
       est_length <- length(sd[["estimated"]])
@@ -236,7 +236,7 @@ get_expected_name <- function(family, data_type) {
 #'   ),
 #'   data_type = "index"
 #' )
-#' 
+#'
 #' # Set up a new process distribution
 #' # Create a new recruitment module
 #' recruitment <- methods::new(BevertonHoltRecruitment)
@@ -263,7 +263,7 @@ initialize_data_distribution <- function(
   # FIXME: Make the available families a data object
   # Could also make the matrix of distributions available per type as a
   # data frame where the check could use the stored object.
-  
+
 
   # validity check on user input
   args <- list(
@@ -303,7 +303,7 @@ initialize_data_distribution <- function(
 
     # populate logged standard deviation parameter with log of input
     new_module$log_sd$resize(length(sd[["value"]]))
-    for (i in seq_along(sd[["value"]])){
+    for (i in seq_along(sd[["value"]])) {
       new_module$log_sd[i]$value <- log(sd[["value"]][i])
     }
 
@@ -318,7 +318,7 @@ initialize_data_distribution <- function(
   }
 
   if (family[["family"]] == "multinomial") {
-    #create new Rcpp module
+    # create new Rcpp module
     new_module <- methods::new(DmultinomDistribution)
   }
 
@@ -366,7 +366,7 @@ initialize_process_distribution <- function(
       log(sd[["value"]]),
       length(sd[["value"]])
     )
-    #setup whether or not sd parameter is estimated
+    # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
       new_module$log_sd$set_all_estimable(sd[["estimated"]])
     } else {
@@ -382,11 +382,11 @@ initialize_process_distribution <- function(
 
     # populate logged standard deviation parameter with log of input
     new_module$log_sd$resize(length(sd[["value"]]))
-    for (i in seq_along(sd[["value"]])){
+    for (i in seq_along(sd[["value"]])) {
       new_module$log_sd[i]$value <- log(sd[["value"]][i])
     }
 
-    #setup whether or not sd parameter is estimated
+    # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
       new_module$log_sd$set_all_estimable(sd[["estimated"]])
     } else {

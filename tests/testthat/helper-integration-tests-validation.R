@@ -82,7 +82,7 @@ validate_fims <- function(
 
     # Recruitment
     fims_naa <- matrix(report[["naa"]][[1]][1:(om_input[["nyr"]] * om_input[["nages"]])],
-                       nrow = om_input[["nyr"]], byrow = TRUE
+      nrow = om_input[["nyr"]], byrow = TRUE
     )
     sdr_naa1_vec <- sdr_report[which(sdr_report[["name"]] == "NAA"), "se"]
     sdr_naa1 <- sdr_naa1_vec[seq(1, om_input[["nyr"]] * om_input[["nages"]], by = om_input[["nages"]]), "se"]
@@ -193,7 +193,7 @@ validate_fims <- function(
 
     for (i in 1:length(em_input[["surveyB.obs"]][["survey1"]])) {
       expect_lte(abs(fims_survey[i, 1] - em_input[["surveyB.obs"]][["survey1"]][i]) /
-                   em_input[["surveyB.obs"]][["survey1"]][i], 0.25)
+        em_input[["surveyB.obs"]][["survey1"]][i], 0.25)
     }
 
     # Expected survey number at age
@@ -251,7 +251,7 @@ validate_fims <- function(
 
     # Recruitment
     fims_naa <- matrix(report[["naa"]][[1]][1:(om_input[["nyr"]] * om_input[["nages"]])],
-                       nrow = om_input[["nyr"]], byrow = TRUE
+      nrow = om_input[["nyr"]], byrow = TRUE
     )
     sdr_naa1_vec <- sdr_report[which(rownames(sdr_report) == "NAA"), 2]
     sdr_naa1 <- sdr_naa1_vec[seq(1, om_input[["nyr"]] * om_input[["nages"]], by = om_input[["nages"]])]
@@ -362,7 +362,7 @@ validate_fims <- function(
 
     for (i in 1:length(em_input[["surveyB.obs"]][["survey1"]])) {
       expect_lte(abs(fims_survey[i, 1] - em_input[["surveyB.obs"]][["survey1"]][i]) /
-                   em_input[["surveyB.obs"]][["survey1"]][i], 0.25)
+        em_input[["surveyB.obs"]][["survey1"]][i], 0.25)
     }
 
     # Expected survey number at age

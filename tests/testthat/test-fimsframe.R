@@ -55,7 +55,6 @@ test_that("Accessors work as expected in FIMSFrame", {
   expect_length(get_n_ages(fims_frame), 1)
 
   expect_vector(m_weight_at_age(fims_frame), ptype = numeric())
-
 })
 
 test_that("Show method works as expected", {

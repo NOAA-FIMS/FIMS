@@ -60,7 +60,6 @@ test_that("test get parameter vector", {
   clear()
 })
 test_that("get_fixed() works when estimated is set to FALSE", {
-
   clear()
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0

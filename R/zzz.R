@@ -25,8 +25,8 @@ methods::setMethod(
     x = "Rcpp_ParameterVector"
   ),
   definition = function(x, i, j, value) {
-    x$set(i - 1, value)  # R uses 1-based indexing, C++ uses 0-based indexing
-    return(x)  # Return the modified object
+    x$set(i - 1, value) # R uses 1-based indexing, C++ uses 0-based indexing
+    return(x) # Return the modified object
   }
 )
 
@@ -116,7 +116,7 @@ methods::setMethod(
 #' @keywords set_methods
 #' @export
 #' @rdname Rcpp_Math
-setMethod(
+methods::setMethod(
   "Ops",
   signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
   function(e1, e2) {
@@ -126,7 +126,7 @@ setMethod(
 )
 
 #' @rdname Rcpp_Math
-setMethod(
+methods::setMethod(
   "Ops",
   signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
   function(e1, e2) {
@@ -139,7 +139,8 @@ setMethod(
 )
 
 #' @rdname Rcpp_Math
-setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
+methods::setMethod(
+  "Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
   function(e1, e2) {
     if (length(e1) != 1) {
       stop("Call to operator Ops, value not scalar")
@@ -150,7 +151,7 @@ setMethod("Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
 )
 
 #' @rdname Rcpp_Math
-setMethod(
+methods::setMethod(
   "Ops",
   signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"),
   function(e1, e2) {
@@ -159,14 +160,14 @@ setMethod(
     }
     ret <- methods::new(ParameterVector, e1$size())
     for (i in 1:e1$size()) {
-        ret[i]$value <- methods::callGeneric(e1[i]$value, e2[i]$value)
+      ret[i]$value <- methods::callGeneric(e1[i]$value, e2[i]$value)
     }
     return(ret)
   }
 )
 
 #' @rdname Rcpp_Math
-setMethod(
+methods::setMethod(
   "Ops",
   signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"),
   function(e1, e2) {
@@ -189,7 +190,7 @@ setMethod(
 )
 
 #' @rdname Rcpp_Math
-setMethod(
+methods::setMethod(
   "Ops",
   signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"),
   function(e1, e2) {
@@ -224,7 +225,7 @@ setMethod(
 #' @keywords set_methods
 #' @export
 #' @rdname Rcpp_Math
-setMethod(
+methods::setMethod(
   "Math",
   signature(x = "Rcpp_ParameterVector"),
   function(x) {
@@ -247,7 +248,7 @@ setMethod(
 #' @export
 #' @keywords set_methods
 #' @rdname Rcpp_ParameterVector
-setMethod(
+methods::setMethod(
   "Summary",
   signature(x = "Rcpp_ParameterVector"),
   function(x) {
