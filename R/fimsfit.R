@@ -337,13 +337,12 @@ is.FIMSFits <- function(x) {
 #' @keywords fit_fims
 #' @export
 FIMSFit <- function(
-  input,
-  obj,
-  opt = list(),
-  sdreport = list(),
-  timing = c("time_total" = as.difftime(0, units = "secs")),
-  version = utils::packageVersion("FIMS")
-) {
+    input,
+    obj,
+    opt = list(),
+    sdreport = list(),
+    timing = c("time_total" = as.difftime(0, units = "secs")),
+    version = utils::packageVersion("FIMS")) {
   # What we aspire the estimate table to look like
   estimates_outline <- dplyr::tibble(
     label = character(),
