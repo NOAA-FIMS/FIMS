@@ -11,8 +11,8 @@
 #include <exception>
 #include <vector>
 
-#include "model_object.hpp"
 #include "fims_vector.hpp"
+#include "model_object.hpp"
 
 namespace fims_data_object {
 
@@ -21,14 +21,14 @@ namespace fims_data_object {
  */
 template <typename Type>
 struct DataObject : public fims_model_object::FIMSObject<Type> {
-  static uint32_t id_g;   /**< id of the Data Object >*/
+  static uint32_t id_g;    /**< id of the Data Object >*/
   fims::Vector<Type> data; /**< vector of the data >*/
-  size_t dimensions;      /**< dimension of the Data object >*/
-  size_t imax;            /**<1st dimension of data object >*/
-  size_t jmax;            /**< 2nd dimension of data object>*/
-  size_t kmax;            /**< 3rd dimension of data object>*/
-  size_t lmax;            /**< 4th dimension of data object>*/
-  Type na_value = -999;   /**< specifying the NA value >*/
+  size_t dimensions;       /**< dimension of the Data object >*/
+  size_t imax;             /**<1st dimension of data object >*/
+  size_t jmax;             /**< 2nd dimension of data object>*/
+  size_t kmax;             /**< 3rd dimension of data object>*/
+  size_t lmax;             /**< 4th dimension of data object>*/
+  Type na_value = -999;    /**< specifying the NA value >*/
 
   /**
    * Constructs a one-dimensional data object.

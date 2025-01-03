@@ -100,32 +100,32 @@ inline const double log(const double &x) {
 
 template <class Type>
 inline const Type cos(const Type &x) {
-    return cos(x);
+  return cos(x);
 }
 
 template <>
 inline const double cos(const double &x) {
-    return std::cos(x);
+  return std::cos(x);
 }
 
 template <class Type>
 inline const Type sqrt(const Type &x) {
-    return sqrt(x);
+  return sqrt(x);
 }
 
 template <>
 inline const double sqrt(const double &x) {
-    return std::sqrt(x);
+  return std::sqrt(x);
 }
 
 template <class Type>
 inline const Type pow(const Type &x, const Type &y) {
-    return pow(x, y);
+  return pow(x, y);
 }
 
 template <>
 inline const double pow(const double &x, const double &y) {
-    return std::pow(x, y);
+  return std::pow(x, y);
 }
 
 #endif
@@ -261,39 +261,39 @@ inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
   return (a + b + fims_math::ad_fabs(a - b, C)) * static_cast<Type>(.5);
 }
 
-    /**
-     * Sum elements of a vector
-     * 
-     * @brief 
-     * 
-     * @param v A vector of constants.
-     * @return A single numeric value.
-     */
-    template<class T>
-    T sum(const std::vector<T>& v) {
-        T ret = 0.0;
-        for (int i = 0; i < v.size(); i++) {
-            ret += v[i];
-        }
-        return ret;
-    }
+/**
+ * Sum elements of a vector
+ *
+ * @brief
+ *
+ * @param v A vector of constants.
+ * @return A single numeric value.
+ */
+template <class T>
+T sum(const std::vector<T> &v) {
+  T ret = 0.0;
+  for (int i = 0; i < v.size(); i++) {
+    ret += v[i];
+  }
+  return ret;
+}
 
-    /**
-     * Sum elements of a vector
-     * 
-     * @brief 
-     * 
-     * @param v A vector of constants.
-     * @return A single numeric value.
-     */
-    template<class T>
-    T sum(const fims::Vector<T>& v) {
-        T ret = 0.0;
-        for (int i = 0; i < v.size(); i++) {
-            ret += v[i];
-        }
-        return ret;
-    }
+/**
+ * Sum elements of a vector
+ *
+ * @brief
+ *
+ * @param v A vector of constants.
+ * @return A single numeric value.
+ */
+template <class T>
+T sum(const fims::Vector<T> &v) {
+  T ret = 0.0;
+  for (int i = 0; i < v.size(); i++) {
+    ret += v[i];
+  }
+  return ret;
+}
 
 }  // namespace fims_math
 

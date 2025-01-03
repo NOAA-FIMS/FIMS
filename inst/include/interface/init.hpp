@@ -30,7 +30,7 @@
 
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  */
 #define CALLDEF(name, n) \
   { #name, (DL_FUNC)&name, n }
@@ -39,28 +39,28 @@ extern "C" {
 
 /**
  * @brief TODO: provide a brief description.
- * 
- * @param mean 
- * @param nu 
- * @return SEXP 
+ *
+ * @param mean
+ * @param nu
+ * @return SEXP
  */
 SEXP compois_calc_var(SEXP mean, SEXP nu);
 /**
  * @brief TODO: provide a brief description.
- * 
- * @return SEXP 
+ *
+ * @return SEXP
  */
 SEXP omp_check();
 /**
  * @brief TODO: provide a brief description.
- * 
- * @return SEXP 
+ *
+ * @return SEXP
  */
 SEXP omp_num_threads(SEXP);
 /**
  * @brief TODO: provide a brief description.
- * 
- * @return SEXP 
+ *
+ * @return SEXP
  */
 SEXP _rcpp_module_boot_fims();
 

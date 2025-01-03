@@ -27,9 +27,9 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    */
   uint32_t id;
   /**
-   * @brief The map associating the IDs of PopulationInterfaceBase to the objects.
-   * This is a live object, which is an object that has been created and lives
-   * in memory.
+   * @brief The map associating the IDs of PopulationInterfaceBase to the
+   * objects. This is a live object, which is an object that has been created
+   * and lives in memory.
    */
   static std::map<uint32_t, PopulationInterfaceBase*> live_objects;
 
@@ -59,7 +59,7 @@ uint32_t PopulationInterfaceBase::id_g = 1;
 // local id of the PopulationInterfaceBase object map relating the ID of the
 // PopulationInterfaceBase to the PopulationInterfaceBase objects
 std::map<uint32_t, PopulationInterfaceBase*>
-  PopulationInterfaceBase::live_objects;
+    PopulationInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for a new Population to instantiate from R:
@@ -193,27 +193,29 @@ class PopulationInterface : public PopulationInterfaceBase {
     return population.Evaluate();
   }
 
-  /** 
+  /**
    * @brief Extracts derived quantities back to the Rcpp interface object from
-   * the Information object. 
+   * the Information object.
    */
   virtual void finalize() {
     if (this->finalized) {
-      //log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("Population " + fims::to_string(this->id) + " has been finalized already.");
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Population " + fims::to_string(this->id) +
+                       " has been finalized already.");
     }
 
-    this->finalized = true; //indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double> > info =
-      fims_info::Information<double>::GetInstance();
+        fims_info::Information<double>::GetInstance();
 
     this->estimated_log_M = Rcpp::NumericVector(this->log_M.size());
     for (size_t i = 0; i < this->log_M.size(); i++) {
       this->estimated_log_M[i] = this->log_M[i].initial_value_m;
     }
 
-    this->estimated_log_init_naa = Rcpp::NumericVector(this->log_init_naa.size());
+    this->estimated_log_init_naa =
+        Rcpp::NumericVector(this->log_init_naa.size());
     for (size_t i = 0; i < this->log_init_naa.size(); i++) {
       this->estimated_log_init_naa[i] = this->log_init_naa[i].initial_value_m;
     }
@@ -223,10 +225,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     it = info->populations.find(this->id);
 
     std::shared_ptr<fims_popdy::Population<double> > pop =
-      info->populations[this->id];
+        info->populations[this->id];
     it = info->populations.find(this->id);
     if (it == info->populations.end()) {
-      FIMS_WARNING_LOG("Population " + fims::to_string(this->id) + " not found in Information.");
+      FIMS_WARNING_LOG("Population " + fims::to_string(this->id) +
+                       " not found in Information.");
       return;
     } else {
       if (this->estimated_log_M) {
@@ -244,30 +247,29 @@ class PopulationInterface : public PopulationInterfaceBase {
       this->derived_naa = Rcpp::NumericVector(pop->numbers_at_age.size());
       this->derived_ssb = Rcpp::NumericVector(pop->spawning_biomass.size());
       this->derived_biomass = Rcpp::NumericVector(pop->biomass.size());
-      this->derived_recruitment = Rcpp::NumericVector(pop->expected_recruitment.size());
+      this->derived_recruitment =
+          Rcpp::NumericVector(pop->expected_recruitment.size());
 
-      //set naa from Information/
+      // set naa from Information/
       for (R_xlen_t i = 0; i < this->derived_naa.size(); i++) {
         this->derived_naa[i] = pop->numbers_at_age[i];
       }
 
-      //set ssb from Information/
+      // set ssb from Information/
       for (R_xlen_t i = 0; i < this->derived_ssb.size(); i++) {
         this->derived_ssb[i] = pop->spawning_biomass[i];
       }
 
-      //set biomass from Information
+      // set biomass from Information
       for (R_xlen_t i = 0; i < this->derived_biomass.size(); i++) {
         this->derived_biomass[i] = pop->biomass[i];
       }
 
-      //set recruitment from Information/
+      // set recruitment from Information/
       for (R_xlen_t i = 0; i < this->derived_recruitment.size(); i++) {
         this->derived_recruitment[i] = pop->expected_recruitment[i];
       }
-
     }
-
   }
 
   /**
@@ -276,7 +278,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * population interface. It also returns the ID for each associated module
    * and the values associated with that module. Then it returns several
    * derived quantities. This string is formatted for a json file.
-   */ 
+   */
   virtual std::string to_json() {
     std::stringstream ss;
 
@@ -350,7 +352,8 @@ class PopulationInterface : public PopulationInterfaceBase {
       for (R_xlen_t i = 0; i < this->derived_recruitment.size() - 1; i++) {
         ss << this->derived_recruitment[i] << ", ";
       }
-      ss << this->derived_recruitment[this->derived_recruitment.size() - 1] << "]\n";
+      ss << this->derived_recruitment[this->derived_recruitment.size() - 1]
+         << "]\n";
     }
     ss << " }\n";
 
@@ -358,7 +361,6 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     return ss.str();
   }
-
 
 #ifdef TMB_MODEL
 
@@ -390,8 +392,8 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (size_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].initial_value_m;
       if (this->log_M[i].estimated_m) {
-          info->RegisterParameterName("log_M");
-          info->RegisterParameter(population->log_M[i]);
+        info->RegisterParameterName("log_M");
+        info->RegisterParameter(population->log_M[i]);
       }
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
@@ -409,7 +411,8 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
 
     population->numbers_at_age.resize((nyears + 1) * nages);
-    info->variable_map[this->numbers_at_age.id_m] = &(population)->numbers_at_age;
+    info->variable_map[this->numbers_at_age.id_m] =
+        &(population)->numbers_at_age;
 
     // add to Information
     info->populations[population->id] = population;

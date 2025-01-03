@@ -25,7 +25,7 @@ class LPDFInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The local ID of the LPDFInterfaceBase object.
    * TODO: think about why this is not id_m like other modules?
-   */  
+   */
   uint32_t id;
   /**
    * @brief The map associating the ID of the LPDFInterfaceBase to the
