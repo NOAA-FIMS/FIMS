@@ -1,11 +1,12 @@
 pandoc: 3.1.11
-pkgdown: 2.1.0
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   fims-demo: fims-demo.html
   fims-documentation: fims-documentation.html
+  fims-logging: fims-logging.html
   fims-path-maturity: fims-path-maturity.html
-last_built: 2024-07-26T20:11Z
+last_built: 2025-01-03T03:43Z
 urls:
   reference: https://NOAA-FIMS.github.io/FIMS/reference
   article: https://NOAA-FIMS.github.io/FIMS/articles
