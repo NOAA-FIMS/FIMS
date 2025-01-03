@@ -9,11 +9,11 @@ fleet1 <- survey1 <- list(
   )
 )
 
-fleets = list(fleet1 = fleet1, survey1 = survey1)
+fleets <- list(fleet1 = fleet1, survey1 = survey1)
 
 current_parameters <- create_default_parameters(data, fleets = fleets)
 
-modified_parameters_valid = list(
+modified_parameters_valid <- list(
   survey1 = list(
     LogisticSelectivity.slope.value = 2,
     Fleet.log_q.value = -14
@@ -21,11 +21,10 @@ modified_parameters_valid = list(
 )
 
 test_that("update_parameters updates parameters correctly", {
-
   updated_params <- update_parameters(current_parameters, modified_parameters_valid)
 
   # Check that parameters are updated correctly
-  expect_equal(updated_params$parameters$survey1$Fleet.log_q.value,  -14)
+  expect_equal(updated_params$parameters$survey1$Fleet.log_q.value, -14)
   expect_equal(updated_params$parameters$survey1$LogisticSelectivity.slope.value, 2)
 
   # Check that modules are unchanged
@@ -68,7 +67,7 @@ test_that("update_parameters validates parameter names", {
 
 test_that("update_parameters validates parameter length", {
   invalid_modified_parameters <- list(
-    fleet1 = list(LogisticSelectivity.slope.value = c(2, 3))  # Mismatched length
+    fleet1 = list(LogisticSelectivity.slope.value = c(2, 3)) # Mismatched length
   )
 
   expect_error(
@@ -87,4 +86,3 @@ test_that("update_parameters validates parameter types", {
     "does not match between"
   )
 })
-

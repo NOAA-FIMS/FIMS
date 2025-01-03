@@ -2,122 +2,44 @@ Package: FIMS
 Title: The Fisheries Integrated Modeling System
 Version: 0.3.0.0
 Authors@R: c(
-    person(
-      role = c("aut", "cre"),
-      family = "Johnson",
-      given = c("Kelli", "F."),
-      email = "kelli.johnson@noaa.gov",
-      comment = c(ORCID = "0000-0002-5149-451X")
-    ),
-    person(
-      role = "aut",
-      family = "Brodziak",
-      given = c("Jon", "K.", "T."),
-      comment = c(ORCID = "0000-0001-8690-5588")
-    ),
-    person(
-      role = "aut",
-      family = "Doering",
-      given = c("Kathryn", "L."),
-      comment = c(ORCID = "0000-0002-0396-7044")
-    ),
-    person(
-      role = "aut",
-      family = "Havron",
-      given = c("Andrea", "M."),
-      comment = c(ORCID = "0000-0002-4080-448X")
-    ),
-    person(
-      role = "aut",
-      family = "Klasky",
-      given = c("Ronald"),
-      comment = c(ORCID = "0009-0004-7563-7716")
-    ),
-    person(
-      role = "aut",
-      family = "Kuriyama",
-      given = c("Peter", "T."),
-      comment = c(ORCID = "0000-0002-6971-4015")
-    ),
-    person(
-      role = "aut",
-      family = "Legault",
-      given = c("Christopher", "M."),
-      comment = c(ORCID = "0000-0002-0328-1376")
-    ),
-    person(
-      role = "aut",
-      family = "Li",
-      given = "Bai",
-      comment = c(ORCID = "0000-0002-8249-1442")
-    ),
-    person(
-      role = "aut",
-      family = "Miller",
-      given = c("Timothy", "J."),
-      comment = c(ORCID = "0000-0003-1411-1206")
-    ),
-    person(
-      role = "aut",
-      family = "Monnahan",
-      given = c("Cole", "C."),
-      comment = c(ORCID = "0000-0003-0871-6700")
-    ),
-    person(
-      role = "aut",
-      family = "Oshima",
-      given = c("Megumi", "C."),
-      comment = c(ORCID = "0009-0002-2239-1594")
-    ),
-    person(
-      role = "aut",
-      family = "Shertzer",
-      given = c("Kyle", "W."),
-      comment = c(ORCID = "0000-0001-7196-5959")
-    ),
-    person(
-      role = "aut",
-      family = "Stawitz",
-      given = c("Christine", "C."),
-      email = "christine.stawitz@noaa.gov",
-      comment = c(ORCID = "0000-0003-3122-4501")
-    ),
-    person(
-      role = "aut",
-      family = "Sullivan",
-      given = c("Jane", "Y."),
-      comment = c(ORCID = "0000-0002-8094-1673")
-    ),
-    person(
-      role = "aut",
-      family = "Supernaw",
-      given = "Matthew",
-      comment = c(ORCID = "0009-0007-3681-7433")
-    ),
-    person(
-      role = "aut",
-      family = "Taylor",
-      given = c("Ian", "G."),
-      comment = c(ORCID = "0000-0002-4232-5669")
-    ),
-    person(
-      role = "aut",
-      family = "Vaughan",
-      given = c("Nathan", "R."),
-      comment = c(ORCID = "0009-0000-3054-6950")
-    ),
-    person(
-      role = "ctb",
-      family = "Blackhart",
-      given = "Kristan",
-      comment = c(ORCID = "0000-0003-4232-2510")
-    ),
-    person(
-      role = "ctb",
-      family = "Ianelli",
-      given = c("James", "N."),
-      comment = c(ORCID = "0000-0002-7170-8677")
-    )
+    person(c("Kelli", "F."), "Johnson", , "kelli.johnson@noaa.gov", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-5149-451X")),
+    person(c("Jon", "K.", "T."), "Brodziak", role = "aut",
+           comment = c(ORCID = "0000-0001-8690-5588")),
+    person(c("Kathryn", "L."), "Doering", role = "aut",
+           comment = c(ORCID = "0000-0002-0396-7044")),
+    person(c("Andrea", "M."), "Havron", role = "aut",
+           comment = c(ORCID = "0000-0002-4080-448X")),
+    person("Ronald", "Klasky", role = "aut",
+           comment = c(ORCID = "0009-0004-7563-7716")),
+    person(c("Peter", "T."), "Kuriyama", role = "aut",
+           comment = c(ORCID = "0000-0002-6971-4015")),
+    person(c("Christopher", "M."), "Legault", role = "aut",
+           comment = c(ORCID = "0000-0002-0328-1376")),
+    person("Bai", "Li", role = "aut",
+           comment = c(ORCID = "0000-0002-8249-1442")),
+    person(c("Timothy", "J."), "Miller", role = "aut",
+           comment = c(ORCID = "0000-0003-1411-1206")),
+    person(c("Cole", "C."), "Monnahan", role = "aut",
+           comment = c(ORCID = "0000-0003-0871-6700")),
+    person(c("Megumi", "C."), "Oshima", role = "aut",
+           comment = c(ORCID = "0009-0002-2239-1594")),
+    person(c("Kyle", "W."), "Shertzer", role = "aut",
+           comment = c(ORCID = "0000-0001-7196-5959")),
+    person(c("Christine", "C."), "Stawitz", , "christine.stawitz@noaa.gov", role = "aut",
+           comment = c(ORCID = "0000-0003-3122-4501")),
+    person(c("Jane", "Y."), "Sullivan", role = "aut",
+           comment = c(ORCID = "0000-0002-8094-1673")),
+    person("Matthew", "Supernaw", role = "aut",
+           comment = c(ORCID = "0009-0007-3681-7433")),
+    person(c("Ian", "G."), "Taylor", role = "aut",
+           comment = c(ORCID = "0000-0002-4232-5669")),
+    person(c("Nathan", "R."), "Vaughan", role = "aut",
+           comment = c(ORCID = "0009-0000-3054-6950")),
+    person("Kristan", "Blackhart", role = "ctb",
+           comment = c(ORCID = "0000-0003-4232-2510")),
+    person(c("James", "N."), "Ianelli", role = "ctb",
+           comment = c(ORCID = "0000-0002-7170-8677"))
   )
 Description: The Fisheries Integrated Modeling System is a next-generation
     framework of stock assessment models, assisting fishery managers with

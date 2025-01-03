@@ -10,7 +10,7 @@ fleet1 <- survey1 <- list(
   )
 )
 
-fleets = list(fleet1 = fleet1, survey1 = survey1)
+fleets <- list(fleet1 = fleet1, survey1 = survey1)
 
 default_parameters <- create_default_parameters(data, fleets = fleets)
 
@@ -41,7 +41,6 @@ test_that("initialize_fims fails when no fleets are provided", {
 })
 
 test_that("initialize_fims works", {
-
   result <- initialize_fims(parameters = default_parameters, data = data)
 
   expect_type(result, "list")
@@ -58,4 +57,3 @@ test_that("initialize_fims clears previous FIMS settings before initializing", {
   mockery::expect_called(mock_clear, 1)
   clear()
 })
-

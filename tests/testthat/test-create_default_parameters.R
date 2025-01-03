@@ -9,7 +9,7 @@ fleet1 <- survey1 <- list(
   )
 )
 
-fleets = list(fleet1 = fleet1, survey1 = survey1)
+fleets <- list(fleet1 = fleet1, survey1 = survey1)
 
 test_that("create_default_parameters handles empty data object", {
   empty_data <- NULL
@@ -18,7 +18,6 @@ test_that("create_default_parameters handles empty data object", {
 })
 
 test_that("create_default_parameters returns correct structure", {
-
   result <- create_default_parameters(data, fleets = fleets)
 
   expect_named(result, c("parameters", "modules"))
@@ -36,7 +35,7 @@ test_that("create_default_parameters detects missing fleet names", {
     )
   )
 
-  invalid_fleets = list(
+  invalid_fleets <- list(
     fleet1 = fleet1,
     survey1 = survey1,
     invalid_fleet = invalid_fleet

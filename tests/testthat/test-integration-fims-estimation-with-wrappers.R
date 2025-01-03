@@ -257,7 +257,7 @@ test_that("estimation test of fims using wrapper functions", {
   )
 })
 
-test_that("estimation test with age and length comp using wrappers",{
+test_that("estimation test with age and length comp using wrappers", {
   # Load operating model data for the current iteration
   iter_id <- 1
   om_input <- om_input_list[[iter_id]]
@@ -349,7 +349,7 @@ test_that("estimation test with age and length comp using wrappers",{
   )
 })
 
-test_that("estimation test with length comp using wrappers",{
+test_that("estimation test with length comp using wrappers", {
   # Load operating model data for the current iteration
   iter_id <- 1
   om_input <- om_input_list[[iter_id]]

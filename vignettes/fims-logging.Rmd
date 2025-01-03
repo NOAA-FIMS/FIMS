@@ -76,7 +76,7 @@ In the above example of an error level log entry, notice the R stack trace in th
 There are several exported logging functions in the FIMS packages. To find out more about each of the following functions, use `methods::show()` to view the documentation.
 
 ```{r}
-ls("package:FIMS") |> 
+ls("package:FIMS") |>
   grep(pattern = "_log|log_", value = TRUE) |>
   cli::cli_bullets()
 

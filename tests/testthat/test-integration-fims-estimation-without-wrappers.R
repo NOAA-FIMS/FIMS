@@ -8,7 +8,6 @@ load(test_path("fixtures", "integration_test_data.RData"))
 iter_id <- 1
 
 test_that("deterministic test of fims", {
-
   result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
@@ -149,7 +148,6 @@ test_that("deterministic test of fims", {
 })
 
 test_that("nll test of fims", {
-
   result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
@@ -247,7 +245,6 @@ test_that("nll test of fims", {
 })
 
 test_that("estimation test of fims", {
-
   result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
@@ -268,7 +265,6 @@ test_that("estimation test of fims", {
 })
 
 test_that("run FIMS with missing values", {
-
   # Define the NA (missing value) placeholder and the index where it will be inserted
   na_value <- -999
   na_index <- 2
@@ -301,7 +297,6 @@ test_that("run FIMS with missing values", {
 })
 
 test_that("agecomp in proportion works", {
-
   # Store the original values of the number of landings observations and
   # survey observations
   n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]

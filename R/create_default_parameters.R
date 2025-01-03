@@ -344,8 +344,7 @@ create_default_fleet <- function(fleets,
     dplyr::arrange(dplyr::desc(type)) |>
     dplyr::pull(uncertainty)
 
-  index_distribution_default <- switch(
-    index_distribution,
+  index_distribution_default <- switch(index_distribution,
     "DnormDistribution" = create_default_DnormDistribution(
       value = index_uncertainty,
       input_type = "data",
@@ -367,8 +366,8 @@ create_default_fleet <- function(fleets,
   default <- list(c(
     selectivity_default,
     process_default,
-    index_distribution_default)
-  )
+    index_distribution_default
+  ))
 
   names(default) <- fleet_name
   return(default)
@@ -523,7 +522,7 @@ create_default_DlnormDistribution <- function(
 }
 
 #' Create default recruitment parameters
-#'#'
+#'
 #' @description
 #' This function sets up default parameters for a recruitment module.
 #'
@@ -541,7 +540,8 @@ create_default_DlnormDistribution <- function(
 create_default_recruitment <- function(
   recruitment,
   data,
-  input_type = "BevertonHoltRecruitment") {
+  input_type = "BevertonHoltRecruitment"
+) {
   # Input checks
   if (!is.list(recruitment)) {
     cli::cli_abort(c(
@@ -554,8 +554,7 @@ create_default_recruitment <- function(
   # NOTE: All new forms of recruitment must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
-  process_default <- switch(
-    form,
+  process_default <- switch(form,
     "BevertonHoltRecruitment" = create_default_BevertonHoltRecruitment(data)
   )
   names(process_default) <- paste0(form, ".", names(process_default))
@@ -564,8 +563,7 @@ create_default_recruitment <- function(
   distribution_input <- recruitment[["process_distribution"]]
   distribution_default <- NULL
   if (!is.null(distribution_input)) {
-    distribution_default <- switch(
-      distribution_input,
+    distribution_default <- switch(distribution_input,
       "DnormDistribution" = create_default_DnormDistribution(
         data = data,
         input_type = "process"
@@ -614,7 +612,7 @@ update_parameters <- function(current_parameters, modified_parameters) {
   # Check if current_parameters is a list with required components
   if (
     !is.list(current_parameters) ||
-    !all(c("parameters", "modules") %in% names(current_parameters))
+      !all(c("parameters", "modules") %in% names(current_parameters))
   ) {
     cli::cli_abort(c(
       "i" = "{.var current_parameters} argument must be a list containing
