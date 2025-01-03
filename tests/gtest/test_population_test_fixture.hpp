@@ -2,9 +2,6 @@
 
 #include "population_dynamics/population/population.hpp"
 
-
-
-
 namespace {
 
 // Use test fixture to reuse the same configuration of objects for
@@ -89,7 +86,7 @@ class PopulationEvaluateTestFixture : public testing::Test {
       selectivity->slope[0] = 0.5;
 
       fleet->expected_catch.resize(nyears);
-      fleet->expected_index.resize(nyears);  
+      fleet->expected_index.resize(nyears);
       fleet->catch_numbers_at_age.resize(nyears * nages);
       fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
@@ -106,9 +103,9 @@ class PopulationEvaluateTestFixture : public testing::Test {
     }
     population.numbers_at_age.resize((nyears + 1) * nages);
     try {
-        population.Initialize(nyears, nseasons, nages);
+      population.Initialize(nyears, nseasons, nages);
     } catch (std::exception& e) {
-        std::cout << e.what() << "\n";
+      std::cout << e.what() << "\n";
     }
 
     for (int i = 0; i < nages; i++) {
@@ -251,9 +248,9 @@ class PopulationPrepareTestFixture : public testing::Test {
       selectivity->slope.resize(1);
       selectivity->inflection_point[0] = 7;
       selectivity->slope[0] = 0.5;
-      
+
       fleet->expected_catch.resize(nyears);
-      fleet->expected_index.resize(nyears);  
+      fleet->expected_index.resize(nyears);
       fleet->catch_numbers_at_age.resize(nyears * nages);
       fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
