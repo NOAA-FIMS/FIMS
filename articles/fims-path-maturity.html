@@ -453,10 +453,10 @@ later.</p>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">// id of the fims_popdy::LogisticMaturity class is equal to the pointer </span></span>
 <span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">// to fims_popdy::LogisticMaturity </span></span>
 <span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>info<span class="op">-&gt;</span>maturity_models<span class="op">[</span>maturity<span class="op">-&gt;</span>id<span class="op">]</span> <span class="op">=</span> maturity<span class="op">;</span></span></code></pre></div>
-<p>The <span class="math inline">$\color{#c55a11}{\text{`add_to_fims_tmb()`}}$</span>
-function repeats <code>add_to_fims_tmb_internal</code> four times to
-track the estimated value of each parameter along with their first,
-second, and third derivatives.</p>
+<p>The <code>add_to_fims_tmb</code> function repeats
+<code>add_to_fims_tmb_internal</code> four times to track the estimated
+value of each parameter along with their first, second, and third
+derivatives.</p>
 <p><img src="figures%2Ffims-path-maturity-2.png" width="100%"></p>
 </div>
 </div>
