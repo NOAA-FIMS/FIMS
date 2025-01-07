@@ -3,9 +3,9 @@
 name: call-update-pkgdown
 # on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
-# this workflow runs on pushes to main or master or any time a new tag is pushed
+# this workflow runs on pushes to main or any time a new tag is pushed
   push:
-    branches: [main, master]
+    branches: [main]
     tags: ['*']
 jobs:
   call-workflow:

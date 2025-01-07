@@ -6,18 +6,11 @@ on:
   push:
     branches:    
       - main
-    paths-ignore:
-      - .devcontainer
-      - .github
-      - 'LICENSE'
-      - 'README.md'
-      - 'CONTRIBUTING.md'
-      - 'Rbuildignore'
-      - '.gitignore'
-      - 'man'
+      - dev
   pull_request:
     branches:
       - main
+      - dev
 
 jobs:
   build:

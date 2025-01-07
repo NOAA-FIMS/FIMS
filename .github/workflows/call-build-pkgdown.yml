@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+      - dev
 jobs:
   call-workflow:
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/build-pkgdown.yml@main
