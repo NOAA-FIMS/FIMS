@@ -13,6 +13,13 @@ on:
       - 'Rbuildignore'
       - '.gitignore'
       - 'man'
+  push:
+    branches:
+      - dev  
+  pull_request:
+    branches:
+      - main
+      - dev  
 jobs:
   call-workflow:
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/calc-coverage.yml@main
