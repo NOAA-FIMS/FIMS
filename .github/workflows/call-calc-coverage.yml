@@ -4,6 +4,9 @@ name: call-calc_coverage
 # The default is to run the workflow on every push or pull request to every branch.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - dev
     paths-ignore:
       - .devcontainer
       - .github
@@ -13,13 +16,19 @@ on:
       - 'Rbuildignore'
       - '.gitignore'
       - 'man'
-  push:
-    branches:
-      - dev  
   pull_request:
     branches:
       - main
-      - dev  
+      - dev
+    paths-ignore:
+      - .devcontainer
+      - .github
+      - 'LICENSE'
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - 'Rbuildignore'
+      - '.gitignore'
+      - 'man'  
 jobs:
   call-workflow:
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/calc-coverage.yml@main
