@@ -9,9 +9,6 @@ on:
     branches: 
       - main
       - dev
-  # To run the default repository branch weekly on sunday, uncomment the following 2 lines
-  #schedule:
-    #- cron: '0 0 * * 0'
 
 jobs:
   build-doxygen:
@@ -30,8 +27,28 @@ jobs:
         sudo apt install cmake doxygen gcc git ninja-build
 
     - name: Building HTML documentation with Doxygen
-    # Do not run mkdir docs and mv build/html docs locally
     # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
+    # FIX? run cmake --build build --parallel 16
       run: |
         cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=YES
         cmake --build build
+    
+    - name: Deploy html documentation with Doxygen
+    # Do not run mkdir docs and mv build/html docs locally
+      if: ${{ github.ref == 'refs/heads/main' }}
+      run: |
+        mv build/html ./
+        mv ./html ./docs
+
+    - name: Push docs to FIMS-docs repo
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: dmnemec/copy_file_to_another_repo_action@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+      with:
+        source_file: 'docs'
+        destination_repo: 'NOAA-FIMS/FIMS-docs'
+        destination_branch: 'main'
+        user_email: 'christine.stawitz@noaa.gov' # your email
+        user_name: 'Christine Stawitz'           # your login
+        commit_message: 'Docs: run Doxygen'    
