@@ -1,16 +1,16 @@
-# Get GoogleTest code coverage
+# Gets the GoogleTest code coverage metrics.
 name: get-gtest-codecov
-# on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
+
 on:
-  workflow_dispatch:
-  push:
-    branches:    
-      - main
-      - dev
   pull_request:
     branches:
-      - main
       - dev
+      - main
+  push:
+    branches:    
+      - dev
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -66,6 +66,3 @@ jobs:
       with:
         files: coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-  
-
-

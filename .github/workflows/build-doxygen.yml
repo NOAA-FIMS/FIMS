@@ -1,14 +1,16 @@
-# Run doxygen to generate documentation from C++ code
-# build doxygen, error on warnings.
+# Run doxygen to generate documentation from C++ code, which is the equivalent
+# of roxygen documentation in the R code. After building the html files, if the
+# action is being ran on main, the files are moved to the appropriate location
+# and pushed to NOAA-FIMS/FIMS-docs@main.
 name: run-doxygen
-# The default build trigger is to run the action on every push for any branch
+
 on:
-  workflow_dispatch:
   pull_request:
   push:
     branches: 
-      - main
       - dev
+      - main
+  workflow_dispatch:
 
 jobs:
   build-doxygen:
