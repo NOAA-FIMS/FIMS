@@ -83,7 +83,7 @@
 
 #ifdef TMBAD_FRAMEWORK
 
-#define ADrep TMB_AD_TYPE
+#define TMBAD_FIMS_TYPE TMBad::ad_aug
 
 #else
 

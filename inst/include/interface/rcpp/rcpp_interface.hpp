@@ -86,24 +86,31 @@ bool CreateTMBModel() {
     }
 
     // base model
-    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
+    #ifdef TMBAD_FRAMEWORK
+    std::shared_ptr<fims_info::Information < TMBAD_FIMS_TYPE>> info =
+            fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+    info->CreateModel();
+
+    #else
+    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info0 =
             fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-    d0->CreateModel();
+    info0->CreateModel();
 
     // first-order derivative
-    std::shared_ptr<fims_info::Information < TMB_FIMS_FIRST_ORDER>> d1 =
+    std::shared_ptr<fims_info::Information < TMB_FIMS_FIRST_ORDER>> info1 =
             fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-    d1->CreateModel();
+    info1->CreateModel();
 
     // second-order derivative
-    std::shared_ptr<fims_info::Information < TMB_FIMS_SECOND_ORDER>> d2 =
+    std::shared_ptr<fims_info::Information < TMB_FIMS_SECOND_ORDER>> info2 =
             fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-    d2->CreateModel();
+    info2->CreateModel();
 
     // third-order derivative
-    std::shared_ptr<fims_info::Information < TMB_FIMS_THIRD_ORDER>> d3 =
+    std::shared_ptr<fims_info::Information < TMB_FIMS_THIRD_ORDER>> info3 =
             fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-    d3->CreateModel();
+    info3->CreateModel();
+    #endif
 
     return true;
 }
@@ -440,10 +447,14 @@ void clear() {
     DmultinomDistributionsInterface::id_g = 1;
     DmultinomDistributionsInterface::live_objects.clear();
 
+    #ifdef TMBAD_FRAMEWORK
+    clear_internal<TMBAD_FIMS_TYPE>();
+    #else
     clear_internal<TMB_FIMS_REAL_TYPE>();
     clear_internal<TMB_FIMS_FIRST_ORDER>();
     clear_internal<TMB_FIMS_SECOND_ORDER>();
     clear_internal<TMB_FIMS_THIRD_ORDER>();
+    #endif
 
     fims::FIMSLog::fims_log->clear();
 
