@@ -1,9 +1,12 @@
-# This workflow automatically adds a comment containing a reviewer checklist
-# when a new pull request is opened.
+# Adds a comment to a newly opened PR letting reviewers know what should be
+# included in their review.
+# TODO: change this to email the assigned reviewer
 name: Add a comment with reviewer checklist when PR opened
+
 on:
   pull_request:
     types: [opened]
+
 jobs:
   pr-checklist:
     runs-on: ubuntu-latest
