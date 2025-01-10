@@ -307,13 +307,13 @@ std::string get_output() {
  */
 Rcpp::NumericVector get_fixed_parameters_vector() {
     // base model
-    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
+    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info =
             fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
     Rcpp::NumericVector p;
 
-    for (size_t i = 0; i < d0->fixed_effects_parameters.size(); i++) {
-        p.push_back(*d0->fixed_effects_parameters[i]);
+    for (size_t i = 0; i < info->fixed_effects_parameters.size(); i++) {
+        p.push_back(*info->fixed_effects_parameters[i]);
     }
 
     return p;
@@ -326,13 +326,13 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
  */
 Rcpp::NumericVector get_random_parameters_vector() {
     // base model
-    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
+    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info =
             fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-
+    
     Rcpp::NumericVector p;
 
-    for (size_t i = 0; i < d0->random_effects_parameters.size(); i++) {
-        p.push_back(*d0->random_effects_parameters[i]);
+    for (size_t i = 0; i < info->random_effects_parameters.size(); i++) {
+        p.push_back(*info->random_effects_parameters[i]);
     }
 
     return p;
@@ -346,10 +346,10 @@ Rcpp::NumericVector get_random_parameters_vector() {
  */
 Rcpp::List get_parameter_names(Rcpp::List pars) {
     // base model
-    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
+    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info =
             fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-
-    pars.attr("names") = d0->parameter_names;
+    
+    pars.attr("names") = info->parameter_names;
 
     return pars;
 }
@@ -361,9 +361,9 @@ Rcpp::List get_parameter_names(Rcpp::List pars) {
  */
 template <typename Type>
 void clear_internal() {
-    std::shared_ptr<fims_info::Information < Type>> d0 =
+    std::shared_ptr<fims_info::Information < Type>> info =
             fims_info::Information<Type>::GetInstance();
-    d0->Clear();
+    info->Clear();
 }
 
 /**
