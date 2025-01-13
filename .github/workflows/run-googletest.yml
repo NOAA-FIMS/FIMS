@@ -1,13 +1,10 @@
-# Run C++ tests using GoogleTest
+# Runs C++ tests using GoogleTest.
 name: run-googletest
-# on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
+
 on:
-  workflow_dispatch:
-# The default build trigger is to run the action on every push and pull request, for any branch
   push:
-  # To run the default repository branch weekly on sunday, uncomment the following 2 lines
-  #schedule:
-    #- cron: '0 0 * * 0'
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -49,7 +46,7 @@ jobs:
         ctest --test-dir build --parallel 16
     
     - name: Upload log when tests failed
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: googletest-log-${{ matrix.os }}

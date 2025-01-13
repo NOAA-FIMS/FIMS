@@ -1,20 +1,17 @@
-# Run clang-format
-# This workflow runs clang-format to format C++ code and then creates
-# a pull request to commit the changed files to the main branch. 
-# More details about clang-format can be found here: 
-# https://clang.llvm.org/docs/ClangFormat.html. To style 
-# C++ code in VS Code locally, you could follow the instructions on this 
-# website https://code.visualstudio.com/docs/editor/codebasics#_formatting 
-# to format the entire file or selected text. 
-
+# Runs clang-format to format C++ code and then creates a PR to the branch
+# which had changes and triggered this action. More details about clang-format
+# can be found here: https://clang.llvm.org/docs/ClangFormat.html. To style C++
+# code in VS Code locally, you could follow the instructions on this website
+# https://code.visualstudio.com/docs/editor/codebasics#_formatting to format
+# the entire file or selected text.
 name: run-clang-format
 
 on:
-  workflow_dispatch:
-# Runs the workflow on each push to the main or master branch:
   push:
     branches:
+      - dev
       - main
+  workflow_dispatch:
 
 jobs:
   job:
@@ -24,11 +21,10 @@ jobs:
     # We use Google style to format code.
     steps:
     - uses: actions/checkout@v4
-    - uses: DoozyX/clang-format-lint-action@v0.14
+    - uses: DoozyX/clang-format-lint-action@v0.18.1
       with:
         source: './inst/include ./src ./tests/gtest'
         extensions: 'hpp, cpp'
-        clangFormatVersion: 13.0.0
         style: Google
         inplace: True
     
