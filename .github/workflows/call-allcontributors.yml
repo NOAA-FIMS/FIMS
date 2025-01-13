@@ -1,9 +1,12 @@
+# Runs allcontributors::add_contributors() to add, or update, an alphabetized
+# list of contributors to the README.md file and open a new PR with those
+# changes.
 name: Collect contributors
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: '0 8 * * 1'
+  workflow_dispatch:
 
 jobs:
     run-r-script:
