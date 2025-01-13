@@ -1,15 +1,15 @@
-# document and style using reusable workflow
-# This workflow runs devtools::document and styler::style_active_package(), then opens a pull request to the branch
-# That started the workflow with the changes
+# Runs devtools::document() and styler::style_active_package(), then opens a
+# pull request to the branch that had changes in the push that triggered the
+# workflow.
 name: call-doc-and-style-r
-# on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
+
 on:
-# workflow_dispatch requires pushing a button to run the workflow manually. uncomment the following line to add:
-  workflow_dispatch:
-  # Runs the workflow on each push to the main or master branch:
   push:
-    branches: 
+    branches:
+      - dev 
       - main
+  workflow_dispatch:
+
 jobs:
   call-workflow:
     uses: nmfs-fish-tools/ghactions4r/.github/workflows/doc-and-style-r.yml@main
