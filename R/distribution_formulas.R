@@ -54,7 +54,8 @@ check_distribution_validity <- function(args) {
     bad <- names(check_present[unlist(check_present)])
     abort_bullets <- c(
       abort_bullets,
-      "x" = "{.var {bad}} {?is/are} missing from {.var args}."
+      "x" = "{.var {bad}} {cli::qty(length(bad))} {?is/are} missing from
+             {.var args}."
     )
     # Abort early because not all of the necessary items were in args
     cli::cli_abort(abort_bullets)
@@ -107,14 +108,15 @@ check_distribution_validity <- function(args) {
     abort_bullets <- c(
       abort_bullets,
       "x" = "{.var {elements_of_sd}} need to be present in sd.",
-      "i" = "Only {.code {names(sd)}} {?is/are} present."
+      "i" = "Only {.code {names(sd)}} {cli::qty(length(sd))} {?is/are} present."
     )
   } else {
-    if (!all(sd[["value"]] > 0)) {
+    if (!all(sd[["value"]] > 0, na.rm = TRUE)) {
       abort_bullets <- c(
         abort_bullets,
         "x" = "Values passed to {.var sd} are out of bounds.",
-        "i" = "Values passed to {.var sd} {?is/are} {.code {sd[['value']]}}.",
+        "i" = "Values passed to {.var sd} {cli::qty(length(sd[['value']]))}
+               {?is/are} {.code {sd[['value']]}}.",
         "i" = "All standard deviation (sd) values need to be positive."
       )
     }
