@@ -1,3 +1,21 @@
+#' FIMS dmultinom()
+#' This function matches the dmultinom() function in TMB and differs from R 
+#' by NOT rounding obs to the nearest integer. The function is evaluated in 
+#' log space and returns the log probability mass function.
+#' 
+#' @param x A vector of length K of numeric values.
+#' 
+#' @param p A numeric non-negative vector of length K, specifying the probability 
+#' for the K classes; must sum 1.
+#' 
+#' @return The log of the probability mass function for the multinomal.
+FIMS_dmultinom <- function(x, p){
+    xp1 <- x + 1
+    log_pmf = lgamma(sum(x) + 1) - sum(lgamma(xp1)) + sum(x*log(p))
+    return(log_pmf)
+}   
+
+
 #' Set Up and Run FIMS Model without using wrapper functions
 #'
 #' This function sets up and runs the FIMS for a given iteration.
