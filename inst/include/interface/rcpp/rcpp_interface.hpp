@@ -87,6 +87,10 @@ bool CreateTMBModel() {
 
     // base model
     #ifdef TMBAD_FRAMEWORK
+    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info0 =
+            fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    info0->CreateModel();
+    
     std::shared_ptr<fims_info::Information < TMBAD_FIMS_TYPE>> info =
             fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
     info->CreateModel();
@@ -446,8 +450,9 @@ void clear() {
 
     DmultinomDistributionsInterface::id_g = 1;
     DmultinomDistributionsInterface::live_objects.clear();
-
+#ifdef TMB_MODEL
     #ifdef TMBAD_FRAMEWORK
+    clear_internal<TMB_FIMS_REAL_TYPE>();
     clear_internal<TMBAD_FIMS_TYPE>();
     #else
     clear_internal<TMB_FIMS_REAL_TYPE>();
@@ -455,7 +460,7 @@ void clear() {
     clear_internal<TMB_FIMS_SECOND_ORDER>();
     clear_internal<TMB_FIMS_THIRD_ORDER>();
     #endif
-
+#endif
     fims::FIMSLog::fims_log->clear();
 
     FIMS_finalized = false;
