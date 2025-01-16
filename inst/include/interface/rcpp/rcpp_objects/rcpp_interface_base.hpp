@@ -48,12 +48,12 @@ class Parameter {
    * @brief The minimum possible parameter value, where the default is negative
    * infinity.
    */
-  double min_m = -std::numeric_limits<double>::infinity();
+  double min_m = std::numeric_limits<double>::min();
   /**
    * @brief The maximum possible parameter value, where the default is positive
    * infinity.
    */
-  double max_m = std::numeric_limits<double>::infinity();
+  double max_m = std::numeric_limits<double>::max();
   /**
    * @brief Is the parameter a random effect? The default is false.
    */
@@ -126,9 +126,9 @@ class Parameter {
  * @return std::ostream& 
  */
 std::ostream& operator<<(std::ostream& out, const Parameter& p) {
-  out << "{id:" << p.id_m << ",\nvalue:" << p.initial_value_m
-    << ",\nestimated_value:" << p.final_value_m << ",\nmin:"
-    << p.min_m << ",\nmax:" << p.max_m << ",\nestimated:" << p.estimated_m << "\n}";
+  out << "{\"id\": " << p.id_m << ",\n\"value\": " << p.initial_value_m
+    << ",\n\"estimated_value\": " << p.final_value_m << ",\n\"min\": "
+    << p.min_m << ",\n\"max\": " << p.max_m << ",\n\"estimated\": " << p.estimated_m << "}";
   return out;
 }
 
