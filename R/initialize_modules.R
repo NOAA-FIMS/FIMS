@@ -514,12 +514,16 @@ initialize_age_comp <- function(data, fleet_name) {
   # TODO: review the AgeComp interface, do we want to add
   # `age_comp_data` as an argument?
 
-  module$age_comp_data <- age_comp_data * dplyr::filter(
-    .data = as.data.frame(data@data),
-    name == fleet_name,
-    type == "age"
-  ) |>
-    dplyr::pull(uncertainty)
+  module$age_comp_data <- age_comp_data *
+    get_data(data) |>
+      dplyr::filter(
+        name == fleet_name,
+        type == "age"
+      ) |>
+      dplyr::mutate(
+        valid_n = ifelse(value == -999, 1, uncertainty)
+      ) |>
+      dplyr::pull(valid_n)
 
   return(module)
 }
@@ -558,12 +562,16 @@ initialize_length_comp <- function(data, fleet_name) {
   # TODO: review the LengthComp interface, do we want to add
   # `age_comp_data` as an argument?
 
-  module$length_comp_data <- length_comp_data * dplyr::filter(
-    .data = as.data.frame(data@data),
-    name == fleet_name,
-    type == "length"
-  ) |>
-    dplyr::pull(uncertainty)
+  module$length_comp_data <- length_comp_data *
+    get_data(data) |>
+      dplyr::filter(
+        name == fleet_name,
+        type == "length"
+      ) |>
+      dplyr::mutate(
+        valid_n = ifelse(value == -999, 1, uncertainty)
+      ) |>
+      dplyr::pull(valid_n)
 
   return(module)
 }

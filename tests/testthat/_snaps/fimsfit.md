@@ -3,7 +3,7 @@
     Code
       print(result)
     Message
-      i FIMS model version: 0.3.0.0
+      i FIMS model version: 0.3.0.1
       i Total run time was 10 seconds
       i Number of parameters: total=1, fixed_effects=1, and random_effects=0
       i Maximum gradient= NA
