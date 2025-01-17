@@ -24,7 +24,7 @@
 #include <TMB.hpp>
 
 // define REPORT, ADREPORT, and SIMULATE
-#define FIMS_REPORT_F(name, F)                                              \
+#define FIMS_REPORT_F(name, F)                                         \
   if (isDouble<Type>::value && F->current_parallel_region < 0) {       \
     Rf_defineVar(Rf_install(#name), PROTECT(asSEXP(name)), F->report); \
     UNPROTECT(1);                                                      \
@@ -50,25 +50,23 @@ vector<Type> ADREPORTvector(vector<vector<Type> > x) {
   return res;
 }
 
-
-
 #define FIMS_SIMULATE_F(F) if (isDouble<Type>::value && F->do_simulate)
 
 #endif /* TMB_MODEL */
 
 #ifndef TMB_MODEL
- /**
-  * @brief TODO: provide a brief description.
-  */
- #define FIMS_SIMULATE_F(F)
- /**
-  * @brief TODO: provide a brief description.
-  */
- #define FIMS_REPORT_F(name, F)
- /**
-  * @brief TODO: provide a brief description.
-  */
- #define ADREPORT_F(name, F)
+/**
+ * @brief TODO: provide a brief description.
+ */
+#define FIMS_SIMULATE_F(F)
+/**
+ * @brief TODO: provide a brief description.
+ */
+#define FIMS_REPORT_F(name, F)
+/**
+ * @brief TODO: provide a brief description.
+ */
+#define ADREPORT_F(name, F)
 #endif
 
 #endif /* FIMS_INTERFACE_HPP */

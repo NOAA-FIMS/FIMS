@@ -70,11 +70,13 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief Sets pointers for data observations, random effects, or priors.
    *
-   * @param input_type String that sets whether the distribution type is for priors, random effects, or data.
+   * @param input_type String that sets whether the distribution type is for
+   * priors, random effects, or data.
    * @param ids Vector of unique ids for each linked parameter(s), derived
    * value(s), or observed data vector.
    */
-  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+  virtual bool set_distribution_links(std::string input_type,
+                                      Rcpp::IntegerVector ids) {
     return false;
   }
 
@@ -84,9 +86,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @param observed_data_id Unique ID for the Observed Age Comp Data
    * object
    */
-  virtual bool set_observed_data(int observed_data_id){
-    return false;
-  }
+  virtual bool set_observed_data(int observed_data_id) { return false; }
 
   /**
    * @brief A method for each child distribution interface object to inherit so
@@ -98,8 +98,8 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t DistributionsInterfaceBase::id_g = 1;
 // local id of the DistributionsInterfaceBase object map relating the ID of the
 // DistributionsInterfaceBase to the DistributionsInterfaceBase objects
-std::map<uint32_t,
-  DistributionsInterfaceBase*> DistributionsInterfaceBase::live_objects;
+std::map<uint32_t, DistributionsInterfaceBase *>
+    DistributionsInterfaceBase::live_objects;
 
 /**
  * @brief The Rcpp interface for Dnorm to instantiate from R:
@@ -154,14 +154,16 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Sets pointers for data observations, random effects, or priors.
    *
-   * @param input_type String that sets whether the distribution type is for priors, random effects, or data.
+   * @param input_type String that sets whether the distribution type is for
+   * priors, random effects, or data.
    * @param ids Vector of unique ids for each linked parameter(s), derived
    * value(s), or observed data vector.
    */
-  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+  virtual bool set_distribution_links(std::string input_type,
+                                      Rcpp::IntegerVector ids) {
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
-    for(int i=0; i<ids.size(); i++){
+    for (int i = 0; i < ids.size(); i++) {
       this->key_m[i] = ids[i];
     }
     return true;
@@ -178,13 +180,13 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     dnorm.x.resize(this->x.size());
     dnorm.expected_values.resize(this->expected_values.size());
     dnorm.log_sd.resize(this->log_sd.size());
-    for(size_t i=0; i<x.size(); i++){
+    for (size_t i = 0; i < x.size(); i++) {
       dnorm.x[i] = this->x[i].initial_value_m;
     }
-    for(size_t i=0; i<expected_values.size(); i++){
+    for (size_t i = 0; i < expected_values.size(); i++) {
       dnorm.expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    for(size_t i=0; i<log_sd.size(); i++){
+    for (size_t i = 0; i < log_sd.size(); i++) {
       dnorm.log_sd[i] = this->log_sd[i].initial_value_m;
     }
     return dnorm.evaluate();
@@ -196,29 +198,32 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual void finalize() {
     if (this->finalized) {
-      //log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("DnormDistribution  " + fims::to_string(this->id_m) + " has been finalized already.");
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("DnormDistribution  " + fims::to_string(this->id_m) +
+                       " has been finalized already.");
     }
 
-    this->finalized = true; //indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double> > info =
+    std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::density_components_iterator it;
 
-    //search for density component in Information
+    // search for density component in Information
     it = info->density_components.find(this->id_m);
-    //if not found, just return
+    // if not found, just return
     if (it == info->density_components.end()) {
-      FIMS_WARNING_LOG("DnormDistribution " + fims::to_string(this->id_m) + " not found in Information.");
+      FIMS_WARNING_LOG("DnormDistribution " + fims::to_string(this->id_m) +
+                       " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_distributions::NormalLPDF<double> > dnorm =
-        std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double> >(it->second);
+      std::shared_ptr<fims_distributions::NormalLPDF<double>> dnorm =
+          std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double>>(
+              it->second);
       this->lpdf_vec = Rcpp::NumericVector(dnorm->lpdf_vec.size());
-      for(R_xlen_t i=0; i < this->lpdf_vec.size(); i++) {
-          this->lpdf_vec[i] = dnorm->lpdf_vec[i];
+      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
+        this->lpdf_vec[i] = dnorm->lpdf_vec[i];
       }
     }
   }
@@ -244,7 +249,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->lpdf_vec.size() == 0) {
       ss << "]\n";
     } else {
-      for(R_xlen_t i=0; i < this->lpdf_vec.size() - 1; i++) {
+      for (R_xlen_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
         ss << this->lpdf_vec[i] << ", ";
       }
       ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
@@ -254,40 +259,39 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     return ss.str();
   }
 
-
 #ifdef TMB_MODEL
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
-      fims_info::Information<Type>::GetInstance();
+        fims_info::Information<Type>::GetInstance();
 
     std::shared_ptr<fims_distributions::NormalLPDF<Type>> distribution =
-      std::make_shared<fims_distributions::NormalLPDF<Type>>();
+        std::make_shared<fims_distributions::NormalLPDF<Type>>();
 
     // interface to data/parameter value
 
-    distribution->observed_data_id_m =
-      interface_observed_data_id_m;
+    distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
     distribution->key.resize(this->key_m.size());
-    for(size_t i=0; i<this->key_m.size(); i++){
+    for (size_t i = 0; i < this->key_m.size(); i++) {
       distribution->key[i] = this->key_m[i];
     }
     distribution->id = this->id_m;
     distribution->x.resize(this->x.size());
-    for(size_t i=0; i<this->x.size(); i++){
+    for (size_t i = 0; i < this->x.size(); i++) {
       distribution->x[i] = this->x[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
-    for(size_t i=0; i<this->expected_values.size(); i++) {
-      distribution->expected_values[i] = this->expected_values[i].initial_value_m;
+    for (size_t i = 0; i < this->expected_values.size(); i++) {
+      distribution->expected_values[i] =
+          this->expected_values[i].initial_value_m;
     }
     distribution->log_sd.resize(this->log_sd.size());
-    for(size_t i=0; i<this->log_sd.size(); i++){
+    for (size_t i = 0; i < this->log_sd.size(); i++) {
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if(this->log_sd[i].estimated_m){
+      if (this->log_sd[i].estimated_m) {
         info->RegisterParameterName("normal log_sd");
         info->RegisterParameter(distribution->log_sd[i]);
       }
@@ -374,14 +378,16 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Sets pointers for data observations, random effects, or priors.
    *
-   * @param input_type String that sets whether the distribution type is for priors, random effects, or data.
+   * @param input_type String that sets whether the distribution type is for
+   * priors, random effects, or data.
    * @param ids Vector of unique ids for each linked parameter(s), derived
    * value(s), or observed data vector.
    */
-  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+  virtual bool set_distribution_links(std::string input_type,
+                                      Rcpp::IntegerVector ids) {
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
-    for(int i=0; i<ids.size(); i++){
+    for (int i = 0; i < ids.size(); i++) {
       this->key_m[i] = ids[i];
     }
     return true;
@@ -398,13 +404,13 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_sd.resize(this->log_sd.size());
-    for(size_t i=0; i<x.size(); i++){
+    for (size_t i = 0; i < x.size(); i++) {
       dlnorm.x[i] = this->x[i].initial_value_m;
     }
-    for(size_t i=0; i<expected_values.size(); i++){
+    for (size_t i = 0; i < expected_values.size(); i++) {
       dlnorm.expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    for(size_t i=0; i<log_sd.size(); i++){
+    for (size_t i = 0; i < log_sd.size(); i++) {
       dlnorm.log_sd[i] = this->log_sd[i].initial_value_m;
     }
     return dlnorm.evaluate();
@@ -416,28 +422,31 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual void finalize() {
     if (this->finalized) {
-      //log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("LogNormalLPDF  " + fims::to_string(this->id_m) + " has been finalized already.");
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("LogNormalLPDF  " + fims::to_string(this->id_m) +
+                       " has been finalized already.");
     }
 
-    this->finalized = true; //indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double> > info =
+    std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::density_components_iterator it;
 
-    //search for density component in Information
+    // search for density component in Information
     it = info->density_components.find(this->id_m);
-    //if not found, just return
+    // if not found, just return
     if (it == info->density_components.end()) {
-      FIMS_WARNING_LOG("LogNormalLPDF " + fims::to_string(this->id_m) + " not found in Information.");
+      FIMS_WARNING_LOG("LogNormalLPDF " + fims::to_string(this->id_m) +
+                       " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_distributions::LogNormalLPDF<double> > dlnorm =
-        std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double> >(it->second);
+      std::shared_ptr<fims_distributions::LogNormalLPDF<double>> dlnorm =
+          std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double>>(
+              it->second);
       this->lpdf_vec = Rcpp::NumericVector(dlnorm->lpdf_vec.size());
-      for(R_xlen_t i=0; i < this->lpdf_vec.size(); i++) {
+      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dlnorm->lpdf_vec[i];
       }
     }
@@ -462,19 +471,17 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"values\":[";
     if (this->lpdf_vec.size() == 0) {
-        ss << "]\n";
+      ss << "]\n";
     } else {
-        for(R_xlen_t i=0; i < this->lpdf_vec.size() - 1; i++) {
-            ss << this->lpdf_vec[i] << ", ";
-        }
-        ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
+      for (R_xlen_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
+        ss << this->lpdf_vec[i] << ", ";
+      }
+      ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
     }
     ss << " }\n]";
 
     return ss.str();
   }
-
-
 
 #ifdef TMB_MODEL
 
@@ -488,26 +495,26 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     distribution->id = this->id_m;
-    distribution->observed_data_id_m =
-        interface_observed_data_id_m;
+    distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
     distribution->key.resize(this->key_m.size());
-    for(size_t i=0; i<this->key_m.size(); i++){
+    for (size_t i = 0; i < this->key_m.size(); i++) {
       distribution->key[i] = this->key_m[i];
     }
     distribution->x.resize(this->x.size());
-    for(size_t i=0; i<this->x.size(); i++){
+    for (size_t i = 0; i < this->x.size(); i++) {
       distribution->x[i] = this->x[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
-    for(size_t i=0; i<this->expected_values.size(); i++){
-      distribution->expected_values[i] = this->expected_values[i].initial_value_m;
+    for (size_t i = 0; i < this->expected_values.size(); i++) {
+      distribution->expected_values[i] =
+          this->expected_values[i].initial_value_m;
     }
     distribution->log_sd.resize(this->log_sd.size());
-    for(size_t i=0; i<this->log_sd.size(); i++){
+    for (size_t i = 0; i < this->log_sd.size(); i++) {
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if(this->log_sd[i].estimated_m){
+      if (this->log_sd[i].estimated_m) {
         info->RegisterParameterName("lognormal log_sd");
         info->RegisterParameter(distribution->log_sd[i]);
       }
@@ -591,14 +598,16 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Sets pointers for data observations, random effects, or priors.
    *
-   * @param input_type String that sets whether the distribution type is for priors, random effects, or data.
+   * @param input_type String that sets whether the distribution type is for
+   * priors, random effects, or data.
    * @param ids Vector of unique ids for each linked parameter(s), derived
    * value(s), or observed data vector.
    */
-  virtual bool set_distribution_links(std::string input_type, Rcpp::IntegerVector ids){
+  virtual bool set_distribution_links(std::string input_type,
+                                      Rcpp::IntegerVector ids) {
     this->input_type_m = input_type;
     this->key_m.resize(ids.size());
-    for(int i=0; i<ids.size(); i++){
+    for (int i = 0; i < ids.size(); i++) {
       this->key_m[i] = ids[i];
     }
     return true;
@@ -615,10 +624,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     // Declare TMBVector in this scope
     dmultinom.x.resize(this->x.size());
     dmultinom.expected_values.resize(this->expected_values.size());
-    for(size_t i=0; i<x.size(); i++){
+    for (size_t i = 0; i < x.size(); i++) {
       dmultinom.x[i] = this->x[i].initial_value_m;
     }
-    for(size_t i=0; i<expected_values.size(); i++){
+    for (size_t i = 0; i < expected_values.size(); i++) {
       dmultinom.expected_values[i] = this->expected_values[i].initial_value_m;
     }
     dmultinom.dims.resize(2);
@@ -638,23 +647,23 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
 
     distribution->id = this->id_m;
-    distribution->observed_data_id_m =
-        interface_observed_data_id_m;
+    distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
     distribution->key.resize(this->key_m.size());
-    for(size_t i=0; i<this->key_m.size(); i++){
+    for (size_t i = 0; i < this->key_m.size(); i++) {
       distribution->key[i] = this->key_m[i];
     }
     distribution->x.resize(this->x.size());
-    for(size_t i=0; i<this->x.size(); i++){
+    for (size_t i = 0; i < this->x.size(); i++) {
       distribution->x[i] = this->x[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
-    for(size_t i=0; i<this->expected_values.size(); i++){
-      distribution->expected_values[i] = this->expected_values[i].initial_value_m;
+    for (size_t i = 0; i < this->expected_values.size(); i++) {
+      distribution->expected_values[i] =
+          this->expected_values[i].initial_value_m;
     }
-    if(this->dims.size()>0){
+    if (this->dims.size() > 0) {
       distribution->dims.resize(2);
       distribution->dims[0] = this->dims[0];
       distribution->dims[1] = this->dims[1];
