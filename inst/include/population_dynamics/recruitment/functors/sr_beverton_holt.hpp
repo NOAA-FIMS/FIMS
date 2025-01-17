@@ -10,8 +10,8 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 
-#include "recruitment_base.hpp"
 #include "../../../common/fims_vector.hpp"
+#include "recruitment_base.hpp"
 
 namespace fims_popdy {
 
@@ -28,7 +28,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   // stock--recruitment function. These members are needed by the Beverton--Holt
   // stock--recruitment function but will not be common to all recruitment
   // functions like spawners is below.
-  fims::Vector<Type> logit_steep; /**< Transformed value of recruitment 
+  fims::Vector<Type> logit_steep; /**< Transformed value of recruitment
                                   relative to unfished
                                   recruitment at 20 percent of unfished
                                   spawning biomass.*/

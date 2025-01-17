@@ -135,9 +135,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     BevHolt.logit_steep[0] = this->logit_steep[0].initial_value_m;
     if (this->logit_steep[0].initial_value_m == 1.0) {
       warning(
-        "Steepness is subject to a logit transformation. "
-        "Fixing it at 1.0 is not currently possible."
-      );
+          "Steepness is subject to a logit transformation. "
+          "Fixing it at 1.0 is not currently possible.");
     }
     BevHolt.log_rzero.resize(1);
     BevHolt.log_rzero[0] = this->log_rzero[0].initial_value_m;
@@ -145,37 +144,43 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     return BevHolt.evaluate(spawners, ssbzero);
   }
 
-  /** 
+  /**
    * @brief Extracts derived quantities back to the Rcpp interface object from
-   * the Information object. 
+   * the Information object.
    */
   virtual void finalize() {
     if (this->finalized) {
-      //log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("Beverton-Holt Recruitment  " + fims::to_string(this->id) + " has been finalized already.");
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Beverton-Holt Recruitment  " +
+                       fims::to_string(this->id) +
+                       " has been finalized already.");
     }
 
-    this->finalized = true; //indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double> > info =
-      fims_info::Information<double>::GetInstance();
+        fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::recruitment_models_iterator it;
 
     it = info->recruitment_models.find(this->id);
 
     if (it == info->recruitment_models.end()) {
-      FIMS_WARNING_LOG("Beverton-Holt Recruitment " + fims::to_string(this->id) + " not found in Information.");
+      FIMS_WARNING_LOG("Beverton-Holt Recruitment " +
+                       fims::to_string(this->id) +
+                       " not found in Information.");
       return;
     } else {
       std::shared_ptr<fims_popdy::SRBevertonHolt<double> > recr =
-        std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double> >(it->second);
+          std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double> >(
+              it->second);
 
       for (size_t i = 0; i < this->logit_steep.size(); i++) {
         if (this->logit_steep[i].estimated_m) {
           this->logit_steep[i].final_value_m = recr->logit_steep[i];
         } else {
-          this->logit_steep[i].final_value_m = this->logit_steep[i].initial_value_m;
+          this->logit_steep[i].final_value_m =
+              this->logit_steep[i].initial_value_m;
         }
       }
 
@@ -203,9 +208,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * recruitment interface with Beverton--Holt stock--recruitment relationship.
    * It also returns the ID and the parameters. This string is formatted for a
    * json file.
-   */ 
+   */
   virtual std::string to_json() {
-      std::stringstream ss;
+    std::stringstream ss;
 
     ss << "\"module\" : {\n";
     ss << " \"name\": \"recruitment\",\n";
@@ -238,14 +243,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type> > info =
-      fims_info::Information<Type>::GetInstance();
+        fims_info::Information<Type>::GetInstance();
 
     std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > recruitment =
-      std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
+        std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
 
     // set relative info
     recruitment->id = this->id;
-    //set logit_steep
+    // set logit_steep
     recruitment->logit_steep.resize(this->logit_steep.size());
     for (size_t i = 0; i < this->logit_steep.size(); i++) {
       recruitment->logit_steep[i] = this->logit_steep[i].initial_value_m;
@@ -258,12 +263,11 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
           info->RegisterParameter(recruitment->logit_steep[i]);
         }
       }
-
     }
 
     info->variable_map[this->logit_steep.id_m] = &(recruitment)->logit_steep;
 
-    //set log_rzero
+    // set log_rzero
     recruitment->log_rzero.resize(this->log_rzero.size());
     for (size_t i = 0; i < this->log_rzero.size(); i++) {
       recruitment->log_rzero[i] = this->log_rzero[i].initial_value_m;
@@ -280,7 +284,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
 
-    //set log_recruit_devs
+    // set log_recruit_devs
     recruitment->log_recruit_devs.resize(this->log_devs.size());
     for (size_t i = 0; i < this->log_devs.size(); i++) {
       recruitment->log_recruit_devs[i] = this->log_devs[i].initial_value_m;
