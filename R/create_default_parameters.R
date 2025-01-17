@@ -61,16 +61,15 @@
 #'   )
 #' }
 create_default_parameters <- function(
-  data,
-  fleets,
-  recruitment = list(
-    form = "BevertonHoltRecruitment",
-    process_distribution = c(log_devs = "DnormDistribution")
-  ),
-  # TODO: Rename EWAAgrowth to not use an acronym
-  growth = list(form = "EWAAgrowth"),
-  maturity = list(form = "LogisticMaturity")
-) {
+    data,
+    fleets,
+    recruitment = list(
+      form = "BevertonHoltRecruitment",
+      process_distribution = c(log_devs = "DnormDistribution")
+    ),
+    # TODO: Rename EWAAgrowth to not use an acronym
+    growth = list(form = "EWAAgrowth"),
+    maturity = list(form = "LogisticMaturity")) {
   # FIXME: use default values if there are no fleets info passed into the
   # function or a fleet is not present but it has data? Maybe we don't want the
   # latter because it could be that we want to drop a fleet from a model but we
@@ -256,8 +255,7 @@ create_default_DoubleLogistic <- function() {
 #' of selectivity.
 #' @noRd
 create_default_selectivity <- function(
-  form = c("LogisticSelectivity", "DoubleLogisticSelectivity")
-) {
+    form = c("LogisticSelectivity", "DoubleLogisticSelectivity")) {
   # Input checks
   form <- rlang::arg_match(form)
   # NOTE: All new forms of selectivity must be placed in the vector of default
@@ -442,10 +440,9 @@ create_default_BevertonHoltRecruitment <- function(data) {
 #' A list of default parameters for DnormDistribution.
 #' @noRd
 create_default_DnormDistribution <- function(
-  value = 0.1,
-  data,
-  input_type = c("data", "process")
-) {
+    value = 0.1,
+    data,
+    input_type = c("data", "process")) {
   # Input checks
   input_type <- rlang::arg_match(input_type)
 
@@ -486,10 +483,9 @@ create_default_DnormDistribution <- function(
 #' A list of default parameters for DlnormDistribution.
 #' @noRd
 create_default_DlnormDistribution <- function(
-  value = 0.1,
-  data,
-  input_type = c("data", "process")
-) {
+    value = 0.1,
+    data,
+    input_type = c("data", "process")) {
   # Input checks
   # TODO: Determine if value can be a vector?
   if (!is.numeric(value) || any(value <= 0, na.rm = TRUE)) {
@@ -538,10 +534,9 @@ create_default_DlnormDistribution <- function(
 #' A list with the default parameters for recruitment.
 #' @noRd
 create_default_recruitment <- function(
-  recruitment,
-  data,
-  input_type = "BevertonHoltRecruitment"
-) {
+    recruitment,
+    data,
+    input_type = "BevertonHoltRecruitment") {
   # Input checks
   if (!is.list(recruitment)) {
     cli::cli_abort(c(
