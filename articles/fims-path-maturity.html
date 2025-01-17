@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,7 @@
       <h1>FIMS Path: Maturity</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/v0.3.0/vignettes/fims-path-maturity.Rmd" class="external-link"><code>vignettes/fims-path-maturity.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/main/vignettes/fims-path-maturity.Rmd" class="external-link"><code>vignettes/fims-path-maturity.Rmd</code></a></small>
       <div class="d-none name"><code>fims-path-maturity.Rmd</code></div>
     </div>
 
@@ -244,7 +244,6 @@ session will also work to free up the memory.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Clear C++ memory</span></span>
 <span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; NULL</span></span>
 <span><span class="co"># Clear R memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span>list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -451,10 +450,10 @@ later.</p>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">// id of the fims_popdy::LogisticMaturity class is equal to the pointer </span></span>
 <span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">// to fims_popdy::LogisticMaturity </span></span>
 <span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>info<span class="op">-&gt;</span>maturity_models<span class="op">[</span>maturity<span class="op">-&gt;</span>id<span class="op">]</span> <span class="op">=</span> maturity<span class="op">;</span></span></code></pre></div>
-<p>The <span class="math inline">$\color{#c55a11}{\text{`add_to_fims_tmb()`}}$</span>
-function repeats <code>add_to_fims_tmb_internal</code> four times to
-track the estimated value of each parameter along with their first,
-second, and third derivatives.</p>
+<p>The <code>add_to_fims_tmb</code> function repeats
+<code>add_to_fims_tmb_internal</code> four times to track the estimated
+value of each parameter along with their first, second, and third
+derivatives.</p>
 <p><img src="figures%2Ffims-path-maturity-2.png" width="100%"></p>
 </div>
 </div>
