@@ -8,6 +8,7 @@
 # modes. The parallel execution uses {snowfall} to parallelize the tasks across
 # multiple CPU cores.
 
+testthat::skip_on_covr()
 # Load the model comparison operating model data from the fixtures folder
 load(test_path("fixtures", "integration_test_data.RData"))
 

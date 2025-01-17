@@ -65,7 +65,7 @@ uint32_t SelectivityInterfaceBase::id_g = 1;
 // local id of the SelectivityInterfaceBase object map relating the ID of the
 // SelectivityInterfaceBase to the SelectivityInterfaceBase objects
 std::map<uint32_t, SelectivityInterfaceBase*>
-  SelectivityInterfaceBase::live_objects;
+    SelectivityInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for logistic selectivity to instantiate the object
@@ -75,7 +75,7 @@ std::map<uint32_t, SelectivityInterfaceBase*>
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   /**
-   * @brief The index value at which the response reaches 0.5. 
+   * @brief The index value at which the response reaches 0.5.
    */
   ParameterVector inflection_point;
   /**
@@ -113,38 +113,42 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     return LogisticSel.evaluate(x);
   }
 
-  /** 
+  /**
    * @brief Extracts derived quantities back to the Rcpp interface object from
    * the Information object.
    */
   virtual void finalize() {
     if (this->finalized) {
-      //log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("Logistic Selectivity  " + fims::to_string(this->id) + " has been finalized already.");
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Logistic Selectivity  " + fims::to_string(this->id) +
+                       " has been finalized already.");
     }
 
-    this->finalized = true; //indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double> > info =
-      fims_info::Information<double>::GetInstance();
+        fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::selectivity_models_iterator it;
 
-    //search for maturity in Information
+    // search for maturity in Information
     it = info->selectivity_models.find(this->id);
-    //if not found, just return
+    // if not found, just return
     if (it == info->selectivity_models.end()) {
-      FIMS_WARNING_LOG("Logistic Selectivity " + fims::to_string(this->id) + " not found in Information.");
+      FIMS_WARNING_LOG("Logistic Selectivity " + fims::to_string(this->id) +
+                       " not found in Information.");
       return;
     } else {
       std::shared_ptr<fims_popdy::LogisticSelectivity<double> > sel =
-        std::dynamic_pointer_cast<fims_popdy::LogisticSelectivity<double> >(it->second);
+          std::dynamic_pointer_cast<fims_popdy::LogisticSelectivity<double> >(
+              it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
         if (this->inflection_point[i].estimated_m) {
           this->inflection_point[i].final_value_m = sel->inflection_point[i];
         } else {
-          this->inflection_point[i].final_value_m = this->inflection_point[i].initial_value_m;
+          this->inflection_point[i].final_value_m =
+              this->inflection_point[i].initial_value_m;
         }
       }
 
@@ -163,7 +167,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @return A string is returned specifying that the module relates to the
    * selectivity interface with logistic selectivity. It also returns the ID
    * and the parameters. This string is formatted for a json file.
-   */ 
+   */
   virtual std::string to_json() {
     std::stringstream ss;
 
@@ -189,49 +193,50 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     return ss.str();
   }
 
-
 #ifdef TMB_MODEL
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type> > info =
-      fims_info::Information<Type>::GetInstance();
+        fims_info::Information<Type>::GetInstance();
 
     std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity =
-      std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
+        std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
     std::stringstream ss;
     // set relative info
     selectivity->id = this->id;
-      selectivity->inflection_point.resize(this->inflection_point.size());
-      for (size_t i = 0; i < this->inflection_point.size(); i++) {
-        selectivity->inflection_point[i] = this->inflection_point[i].initial_value_m;
-        if (this->inflection_point[i].estimated_m) {
-          ss.str("");
-          ss << "selectivity.inflection_point." << this->id << "." << i;
-          info->RegisterParameterName(ss.str());
-          if (this->inflection_point[i].is_random_effect_m) {
-            info->RegisterRandomEffect(selectivity->inflection_point[i]);
-          } else {
-            info->RegisterParameter(selectivity->inflection_point[i]);
-          }
+    selectivity->inflection_point.resize(this->inflection_point.size());
+    for (size_t i = 0; i < this->inflection_point.size(); i++) {
+      selectivity->inflection_point[i] =
+          this->inflection_point[i].initial_value_m;
+      if (this->inflection_point[i].estimated_m) {
+        ss.str("");
+        ss << "selectivity.inflection_point." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
+        if (this->inflection_point[i].is_random_effect_m) {
+          info->RegisterRandomEffect(selectivity->inflection_point[i]);
+        } else {
+          info->RegisterParameter(selectivity->inflection_point[i]);
         }
       }
+    }
 
-    info->variable_map[this->inflection_point.id_m] = &(selectivity)->inflection_point;
-      selectivity->slope.resize(this->slope.size());
-      for (size_t i = 0; i < this->slope.size(); i++) {
-        selectivity->slope[i] = this->slope[i].initial_value_m;
-        if (this->slope[i].estimated_m) {
-          ss.str("");
-          ss << "selectivity.slope." << this->id << "." << i;
-          info->RegisterParameterName(ss.str());
-          if (this->slope[i].is_random_effect_m) {
-            info->RegisterRandomEffect(selectivity->slope[i]);
-          } else {
-            info->RegisterParameter(selectivity->slope[i]);
-          }
+    info->variable_map[this->inflection_point.id_m] =
+        &(selectivity)->inflection_point;
+    selectivity->slope.resize(this->slope.size());
+    for (size_t i = 0; i < this->slope.size(); i++) {
+      selectivity->slope[i] = this->slope[i].initial_value_m;
+      if (this->slope[i].estimated_m) {
+        ss.str("");
+        ss << "selectivity.slope." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
+        if (this->slope[i].is_random_effect_m) {
+          info->RegisterRandomEffect(selectivity->slope[i]);
+        } else {
+          info->RegisterParameter(selectivity->slope[i]);
         }
       }
+    }
     info->variable_map[this->slope.id_m] = &(selectivity)->slope;
 
     // add to Information
@@ -259,17 +264,19 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
 /**
  * @brief Rcpp interface for logistic selectivity as an S4 object. To
- * instantiate from R: logistic_selectivity <- methods::new(logistic_selectivity)
+ * instantiate from R: logistic_selectivity <-
+ * methods::new(logistic_selectivity)
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
-  ParameterVector inflection_point_asc; /**< the index value at which the response
-                                     reaches .5 */
-  ParameterVector slope_asc; /**< the width of the curve at the inflection_point */
-  ParameterVector inflection_point_desc; /**< the index value at which the response
-                                      reaches .5 */
-  ParameterVector slope_desc; /**< the width of the curve at the inflection_point */
-
+  ParameterVector inflection_point_asc; /**< the index value at which the
+                                     response reaches .5 */
+  ParameterVector
+      slope_asc; /**< the width of the curve at the inflection_point */
+  ParameterVector inflection_point_desc; /**< the index value at which the
+                                      response reaches .5 */
+  ParameterVector
+      slope_desc; /**< the width of the curve at the inflection_point */
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
@@ -285,7 +292,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual double evaluate(double x) {
     fims_popdy::DoubleLogisticSelectivity<double> DoubleLogisticSel;
     DoubleLogisticSel.inflection_point_asc.resize(1);
-    DoubleLogisticSel.inflection_point_asc[0] = this->inflection_point_asc[0].initial_value_m;
+    DoubleLogisticSel.inflection_point_asc[0] =
+        this->inflection_point_asc[0].initial_value_m;
     DoubleLogisticSel.slope_asc.resize(1);
     DoubleLogisticSel.slope_asc[0] = this->slope_asc[0].initial_value_m;
     DoubleLogisticSel.inflection_point_desc.resize(1);
@@ -295,119 +303,116 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     DoubleLogisticSel.slope_desc[0] = this->slope_desc[0].initial_value_m;
     return DoubleLogisticSel.evaluate(x);
   }
-    /**
-     * @brief finalize function. Extracts derived quantities back to
-     * the Rcpp interface object from the Information object.
-     */
-    virtual void finalize() {
+  /**
+   * @brief finalize function. Extracts derived quantities back to
+   * the Rcpp interface object from the Information object.
+   */
+  virtual void finalize() {
+    if (this->finalized) {
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Double Logistic Selectivity  " +
+                       fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
 
-        if (this->finalized) {
-            //log warning that finalize has been called more than once.
-            FIMS_WARNING_LOG("Double Logistic Selectivity  " + fims::to_string(this->id) + " has been finalized already.");
-        }
+    this->finalized = true;  // indicate this has been called already
 
-        this->finalized = true; //indicate this has been called already
+    std::shared_ptr<fims_info::Information<double> > info =
+        fims_info::Information<double>::GetInstance();
 
-        std::shared_ptr<fims_info::Information<double> > info =
-                fims_info::Information<double>::GetInstance();
+    fims_info::Information<double>::selectivity_models_iterator it;
 
+    // search for maturity in Information
+    it = info->selectivity_models.find(this->id);
+    // if not found, just return
+    if (it == info->selectivity_models.end()) {
+      FIMS_WARNING_LOG("Double Logistic Selectivity " +
+                       fims::to_string(this->id) +
+                       " not found in Information.");
+      return;
+    } else {
+      std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double> > sel =
+          std::dynamic_pointer_cast<
+              fims_popdy::DoubleLogisticSelectivity<double> >(it->second);
 
-
-        fims_info::Information<double>::selectivity_models_iterator it;
-
-        //search for maturity in Information
-        it = info->selectivity_models.find(this->id);
-        //if not found, just return
-        if (it == info->selectivity_models.end()) {
-            FIMS_WARNING_LOG("Double Logistic Selectivity " + fims::to_string(this->id) + " not found in Information.");
-            return;
+      for (size_t i = 0; i < inflection_point_asc.size(); i++) {
+        if (this->inflection_point_asc[i].estimated_m) {
+          this->inflection_point_asc[i].final_value_m =
+              sel->inflection_point_asc[i];
         } else {
-            std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double> > sel =
-                    std::dynamic_pointer_cast<fims_popdy::DoubleLogisticSelectivity<double> >(it->second);
-
-
-            for (size_t i = 0; i < inflection_point_asc.size(); i++) {
-                if (this->inflection_point_asc[i].estimated_m) {
-                    this->inflection_point_asc[i].final_value_m = sel->inflection_point_asc[i];
-                } else {
-                    this->inflection_point_asc[i].final_value_m = this->inflection_point_asc[i].initial_value_m;
-                }
-
-            }
-
-            for (size_t i = 0; i < slope_asc.size(); i++) {
-                if (this->slope_asc[i].estimated_m) {
-                    this->slope_asc[i].final_value_m = sel->slope_asc[i];
-                } else {
-                    this->slope_asc[i].final_value_m = this->slope_asc[i].initial_value_m;
-                }
-
-            }
-
-            for (size_t i = 0; i < inflection_point_desc.size(); i++) {
-                if (this->inflection_point_desc[i].estimated_m) {
-                    this->inflection_point_desc[i].final_value_m = sel->inflection_point_desc[i];
-                } else {
-                    this->inflection_point_desc[i].final_value_m = this->inflection_point_desc[i].initial_value_m;
-                }
-
-            }
-
-            for (size_t i = 0; i < slope_desc.size(); i++) {
-                if (this->slope_desc[i].estimated_m) {
-                    this->slope_desc[i].final_value_m = sel->slope_desc[i];
-                } else {
-                    this->slope_desc[i].final_value_m = this->slope_desc[i].initial_value_m;
-                }
-
-            }
-
-
-
+          this->inflection_point_asc[i].final_value_m =
+              this->inflection_point_asc[i].initial_value_m;
         }
+      }
+
+      for (size_t i = 0; i < slope_asc.size(); i++) {
+        if (this->slope_asc[i].estimated_m) {
+          this->slope_asc[i].final_value_m = sel->slope_asc[i];
+        } else {
+          this->slope_asc[i].final_value_m = this->slope_asc[i].initial_value_m;
+        }
+      }
+
+      for (size_t i = 0; i < inflection_point_desc.size(); i++) {
+        if (this->inflection_point_desc[i].estimated_m) {
+          this->inflection_point_desc[i].final_value_m =
+              sel->inflection_point_desc[i];
+        } else {
+          this->inflection_point_desc[i].final_value_m =
+              this->inflection_point_desc[i].initial_value_m;
+        }
+      }
+
+      for (size_t i = 0; i < slope_desc.size(); i++) {
+        if (this->slope_desc[i].estimated_m) {
+          this->slope_desc[i].final_value_m = sel->slope_desc[i];
+        } else {
+          this->slope_desc[i].final_value_m =
+              this->slope_desc[i].initial_value_m;
+        }
+      }
     }
+  }
 
-    /**
-     * @brief Convert the data to json representation for the output.
-     */
-    virtual std::string to_json() {
-        std::stringstream ss;
+  /**
+   * @brief Convert the data to json representation for the output.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
 
-                ss << "\"module\" : {\n";
-                ss << " \"name\": \"selectivity\",\n";
-                ss << " \"type\": \"DoubleLogistic\",\n";
-                ss << " \"id\": " << this->id << ",\n";
+    ss << "\"module\" : {\n";
+    ss << " \"name\": \"selectivity\",\n";
+    ss << " \"type\": \"DoubleLogistic\",\n";
+    ss << " \"id\": " << this->id << ",\n";
 
-                ss << " \"parameter\": {\n";
-                ss << "   \"name\": \"inflection_point_asc\",\n";
-                ss << "   \"id\":" << this->inflection_point_asc.id_m << ",\n";
-                ss << "   \"type\": \"vector\",\n";
-                ss << "   \"values\":" << this->inflection_point_asc << ",\n},\n";
+    ss << " \"parameter\": {\n";
+    ss << "   \"name\": \"inflection_point_asc\",\n";
+    ss << "   \"id\":" << this->inflection_point_asc.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->inflection_point_asc << ",\n},\n";
 
-                ss << " \"parameter\": {\n";
-                ss << "   \"name\": \"slope_asc\",\n";
-                ss << "   \"id\":" << this->slope_asc.id_m << ",\n";
-                ss << "   \"type\": \"vector\",\n";
-                ss << "   \"values\":" << this->slope_asc << ",\n},\n";
+    ss << " \"parameter\": {\n";
+    ss << "   \"name\": \"slope_asc\",\n";
+    ss << "   \"id\":" << this->slope_asc.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->slope_asc << ",\n},\n";
 
-                ss << " \"parameter\": {\n";
-                ss << "   \"name\": \"inflection_point_desc\",\n";
-                ss << "   \"id\":" << this->inflection_point_desc.id_m << ",\n";
-                ss << "   \"type\": \"vector\",\n";
-                ss << "   \"values\":" << this->inflection_point_desc << ",\n},\n";
+    ss << " \"parameter\": {\n";
+    ss << "   \"name\": \"inflection_point_desc\",\n";
+    ss << "   \"id\":" << this->inflection_point_desc.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->inflection_point_desc << ",\n},\n";
 
-                ss << " \"parameter\": {\n";
-                ss << "   \"name\": \"slope_desc\",\n";
-                ss << "   \"id\":" << this->slope_desc.id_m << ",\n";
-                ss << "   \"type\": \"vector\",\n";
-                ss << "   \"values\":" << this->slope_desc << ",\n}\n";
+    ss << " \"parameter\": {\n";
+    ss << "   \"name\": \"slope_desc\",\n";
+    ss << "   \"id\":" << this->slope_desc.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->slope_desc << ",\n}\n";
 
+    ss << "}";
 
-                ss << "}";
-
-        return ss.str();
-    }
-
+    return ss.str();
+  }
 
 #ifdef TMB_MODEL
 
@@ -419,74 +424,77 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<Type> > selectivity =
         std::make_shared<fims_popdy::DoubleLogisticSelectivity<Type> >();
 
-        std::stringstream ss;
-        // set relative info
-        selectivity->id = this->id;
-        selectivity->inflection_point_asc.resize(this->inflection_point_asc.size());
-        for (size_t i = 0; i < this->inflection_point_asc.size(); i++) {
-            selectivity->inflection_point_asc[i] = this->inflection_point_asc[i].initial_value_m;
-            if (this->inflection_point_asc[i].estimated_m) {
-                ss.str("");
-                ss << "selectivity.inflection_point_asc." << this->id << "." << i;
-                info->RegisterParameterName(ss.str());
-                if (this->inflection_point_asc[i].is_random_effect_m) {
-                    info->RegisterRandomEffect(selectivity->inflection_point_asc[i]);
-                } else {
-                    info->RegisterParameter(selectivity->inflection_point_asc[i]);
-                }
-            }
+    std::stringstream ss;
+    // set relative info
+    selectivity->id = this->id;
+    selectivity->inflection_point_asc.resize(this->inflection_point_asc.size());
+    for (size_t i = 0; i < this->inflection_point_asc.size(); i++) {
+      selectivity->inflection_point_asc[i] =
+          this->inflection_point_asc[i].initial_value_m;
+      if (this->inflection_point_asc[i].estimated_m) {
+        ss.str("");
+        ss << "selectivity.inflection_point_asc." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
+        if (this->inflection_point_asc[i].is_random_effect_m) {
+          info->RegisterRandomEffect(selectivity->inflection_point_asc[i]);
+        } else {
+          info->RegisterParameter(selectivity->inflection_point_asc[i]);
         }
+      }
+    }
 
-    info->variable_map[this->inflection_point_asc.id_m] = &(selectivity)->inflection_point_asc;
+    info->variable_map[this->inflection_point_asc.id_m] =
+        &(selectivity)->inflection_point_asc;
 
-
-        selectivity->slope_asc.resize(this->slope_asc.size());
-        for (size_t i = 0; i < this->slope_asc.size(); i++) {
-            selectivity->slope_asc[i] = this->slope_asc[i].initial_value_m;
-            if (this->slope_asc[i].estimated_m) {
-                ss.str("");
-                ss << "selectivity.slope_asc." << this->id << "." << i;
-                info->RegisterParameterName(ss.str());
-                if (this->slope_asc[i].is_random_effect_m) {
-                    info->RegisterRandomEffect(selectivity->slope_asc[i]);
-                } else {
-                    info->RegisterParameter(selectivity->slope_asc[i]);
-                }
-            }
+    selectivity->slope_asc.resize(this->slope_asc.size());
+    for (size_t i = 0; i < this->slope_asc.size(); i++) {
+      selectivity->slope_asc[i] = this->slope_asc[i].initial_value_m;
+      if (this->slope_asc[i].estimated_m) {
+        ss.str("");
+        ss << "selectivity.slope_asc." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
+        if (this->slope_asc[i].is_random_effect_m) {
+          info->RegisterRandomEffect(selectivity->slope_asc[i]);
+        } else {
+          info->RegisterParameter(selectivity->slope_asc[i]);
         }
+      }
+    }
     info->variable_map[this->slope_asc.id_m] = &(selectivity)->slope_asc;
 
-        selectivity->inflection_point_desc.resize(this->inflection_point_desc.size());
-        for (size_t i = 0; i < this->inflection_point_desc.size(); i++) {
-            selectivity->inflection_point_desc[i] = this->inflection_point_desc[i].initial_value_m;
-            if (this->inflection_point_desc[i].estimated_m) {
-                ss.str("");
-                ss << "selectivity.inflection_point_desc." << this->id << "." << i;
-                info->RegisterParameterName(ss.str());
-                if (this->inflection_point_desc[i].is_random_effect_m) {
-                    info->RegisterRandomEffect(selectivity->inflection_point_desc[i]);
-                } else {
-                    info->RegisterParameter(selectivity->inflection_point_desc[i]);
-                }
-            }
+    selectivity->inflection_point_desc.resize(
+        this->inflection_point_desc.size());
+    for (size_t i = 0; i < this->inflection_point_desc.size(); i++) {
+      selectivity->inflection_point_desc[i] =
+          this->inflection_point_desc[i].initial_value_m;
+      if (this->inflection_point_desc[i].estimated_m) {
+        ss.str("");
+        ss << "selectivity.inflection_point_desc." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
+        if (this->inflection_point_desc[i].is_random_effect_m) {
+          info->RegisterRandomEffect(selectivity->inflection_point_desc[i]);
+        } else {
+          info->RegisterParameter(selectivity->inflection_point_desc[i]);
         }
+      }
+    }
 
-    info->variable_map[this->inflection_point_desc.id_m] = &(selectivity)->inflection_point_desc;
-        selectivity->slope_desc.resize(this->slope_desc.size());
-        for (size_t i = 0; i < this->slope_desc.size(); i++) {
-            selectivity->slope_desc[i] = this->slope_desc[i].initial_value_m;
-            if (this->slope_desc[i].estimated_m) {
-                ss.str("");
-                ss << "selectivity.slope_desc." << this->id << "." << i;
-                info->RegisterParameterName(ss.str());
-                if (this->slope_desc[i].is_random_effect_m) {
-                    info->RegisterRandomEffect(selectivity->slope_desc[i]);
-                } else {
-                    info->RegisterParameter(selectivity->slope_desc[i]);
-                }
-            }
+    info->variable_map[this->inflection_point_desc.id_m] =
+        &(selectivity)->inflection_point_desc;
+    selectivity->slope_desc.resize(this->slope_desc.size());
+    for (size_t i = 0; i < this->slope_desc.size(); i++) {
+      selectivity->slope_desc[i] = this->slope_desc[i].initial_value_m;
+      if (this->slope_desc[i].estimated_m) {
+        ss.str("");
+        ss << "selectivity.slope_desc." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
+        if (this->slope_desc[i].is_random_effect_m) {
+          info->RegisterRandomEffect(selectivity->slope_desc[i]);
+        } else {
+          info->RegisterParameter(selectivity->slope_desc[i]);
         }
-
+      }
+    }
 
     info->variable_map[this->slope_desc.id_m] = &(selectivity)->slope_desc;
 

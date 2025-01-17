@@ -143,14 +143,14 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     EWAAGrowth.ewaa = this->ewaa;
     return EWAAGrowth.evaluate(age);
   }
-  
+
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
    * growth interface with empirical weight at age. It also returns the ID, the
    * rank of 1, the dimensions, age bins, and the calculated values themselves.
    * This string is formatted for a json file.
-   */ 
+   */
   virtual std::string to_json() {
     std::stringstream ss;
     ss << "\"module\" : {\n";
@@ -162,28 +162,28 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     ss << " \"ages\": [";
     for (size_t i = 0; i < ages.size() - 1; i++) {
-        ss << ages[i] << ", ";
+      ss << ages[i] << ", ";
     }
     ss << ages[ages.size() - 1] << "],\n";
 
     ss << " \"values\": [";
     for (size_t i = 0; i < weights.size() - 1; i++) {
-        ss << weights[i] << ", ";
+      ss << weights[i] << ", ";
     }
     ss << weights[weights.size() - 1] << "]\n";
     ss << "}";
     return ss.str();
   }
-  
+
 #ifdef TMB_MODEL
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type> > info =
-      fims_info::Information<Type>::GetInstance();
+        fims_info::Information<Type>::GetInstance();
 
     std::shared_ptr<fims_popdy::EWAAgrowth<Type> > ewaa_growth =
-      std::make_shared<fims_popdy::EWAAgrowth<Type> >();
+        std::make_shared<fims_popdy::EWAAgrowth<Type> >();
 
     // set relative info
     ewaa_growth->id = this->id;

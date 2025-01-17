@@ -71,9 +71,9 @@ std::map<uint32_t, MaturityInterfaceBase*> MaturityInterfaceBase::live_objects;
  * logistic_maturity <- methods::new(logistic_maturity).
  */
 class LogisticMaturityInterface : public MaturityInterfaceBase {
-public:
+ public:
   /**
-   * @brief The index value at which the response reaches 0.5. 
+   * @brief The index value at which the response reaches 0.5.
    */
   ParameterVector inflection_point;
   /**
@@ -111,38 +111,42 @@ public:
     return LogisticMat.evaluate(x);
   }
 
-  /** 
+  /**
    * @brief Extracts derived quantities back to the Rcpp interface object from
    * the Information object.
    */
   virtual void finalize() {
     if (this->finalized) {
-      //log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("Logistic Maturity  " + fims::to_string(this->id) + " has been finalized already.");
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Logistic Maturity  " + fims::to_string(this->id) +
+                       " has been finalized already.");
     }
 
-    this->finalized = true; //indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double> > info =
-      fims_info::Information<double>::GetInstance();
+        fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::maturity_models_iterator it;
 
-    //search for maturity in Information
+    // search for maturity in Information
     it = info->maturity_models.find(this->id);
-    //if not found, just return
+    // if not found, just return
     if (it == info->maturity_models.end()) {
-      FIMS_WARNING_LOG("Logistic Maturity " + fims::to_string(this->id) + " not found in Information.");
+      FIMS_WARNING_LOG("Logistic Maturity " + fims::to_string(this->id) +
+                       " not found in Information.");
       return;
     } else {
       std::shared_ptr<fims_popdy::LogisticMaturity<double> > mat =
-        std::dynamic_pointer_cast<fims_popdy::LogisticMaturity<double> >(it->second);
+          std::dynamic_pointer_cast<fims_popdy::LogisticMaturity<double> >(
+              it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
         if (this->inflection_point[i].estimated_m) {
           this->inflection_point[i].final_value_m = mat->inflection_point[i];
         } else {
-          this->inflection_point[i].final_value_m = this->inflection_point[i].initial_value_m;
+          this->inflection_point[i].final_value_m =
+              this->inflection_point[i].initial_value_m;
         }
       }
 
@@ -161,7 +165,7 @@ public:
    * @return A string is returned specifying that the module relates to the
    * maturity interface with logistic maturity. It also returns the ID and the
    * parameters. This string is formatted for a json file.
-   */ 
+   */
   virtual std::string to_json() {
     std::stringstream ss;
     ss << "\"module\" : {\n";
@@ -191,10 +195,10 @@ public:
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type> > info =
-      fims_info::Information<Type>::GetInstance();
+        fims_info::Information<Type>::GetInstance();
 
     std::shared_ptr<fims_popdy::LogisticMaturity<Type> > maturity =
-      std::make_shared<fims_popdy::LogisticMaturity<Type> >();
+        std::make_shared<fims_popdy::LogisticMaturity<Type> >();
 
     // set relative info
     maturity->id = this->id;
