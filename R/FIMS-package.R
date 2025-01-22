@@ -11,6 +11,7 @@
 #' @export finalize
 #' @export Fleet
 #' @export get_fixed
+#' @export get_random
 #' @export get_log
 #' @export get_log_errors
 #' @export get_log_module

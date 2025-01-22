@@ -311,7 +311,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set-up TMB
   CreateTMBModel()
   # Create parameter list from Rcpp modules
-  parameters <- list(p = get_fixed())
+  parameters <- list(p = get_fixed(),
+                     re = get_random())
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
     silent = TRUE, map = map
