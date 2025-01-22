@@ -10,10 +10,10 @@
 		// if we want to install r packages using pak
 		// more info: https://github.com/rocker-org/devcontainer-features/blob/main/src/r-packages/README.md
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "make,gcc,g++,cmake,clang-tidy,clang-format,clang,doxygen,ninja-build,libxtst6,libxt6"			
+			"packages": "clang,clang-format,clang-tidy,cmake,doxygen,g++,gcc,libxt6,libxtst6,make,ninja-build"			
 		},
 		 "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "RcppEigen,dplyr,ggplot2,jsonlite,magrittr,methods,Rcpp,scales,TMB,usethis,devtools,tibble",
+			"packages": "dplyr,devtools,ggplot2,jsonlite,methods,mockery,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis",
 			"installSystemRequirements": true
 		  },
 		 // option to run rstudio. you can type rserver into the command line to
