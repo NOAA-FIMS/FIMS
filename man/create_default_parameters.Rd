@@ -73,8 +73,11 @@ from the current input.
 }
 \examples{
 \dontrun{
+# Load the example dataset and create a FIMS data frame
 data("data1")
 fims_frame <- FIMSFrame(data1)
+
+# Define fleets specifications for each fleet in the example dataset
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
@@ -82,17 +85,12 @@ fleet1 <- survey1 <- list(
     AgeComp = "DmultinomDistribution"
   )
 )
-fleet2 <- list(
-  selectivity = list(form = "DoubleLogisticSelectivity"),
-  data_distribution = c(
-    Index = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution",
-    LengthComp = "DmultinomDistribution"
-  )
-)
+
+# Create a list of default parameters given the fleet specifications set up
+# above, recruitment, growth, and maturity specifications
 default_parameters <- fims_frame |>
   create_default_parameters(
-    fleets = list(fleet1 = fleet1, fleet2 = fleet2, survey1 = survey1),
+    fleets = list(fleet1 = fleet1, survey1 = survey1),
     recruitment = list(
       form = "BevertonHoltRecruitment",
       process_distribution = c(log_devs = "DnormDistribution")
@@ -100,10 +98,95 @@ default_parameters <- fims_frame |>
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")
   )
+
+# Do the same as above except, model fleet1 with double logistic selectivity
+# and do not specify the recruitment, growth, and maturity specifications
+# because everything specified above were default arguments
+parameters_with_double_logistic <- fims_frame |>
+  create_default_parameters(
+    fleets = list(
+      fleet1 = list(
+        selectivity = list(form = "DoubleLogisticSelectivity"),
+        data_distribution = c(
+          Index = "DlnormDistribution",
+          AgeComp = "DmultinomDistribution",
+          LengthComp = "DmultinomDistribution"
+        )
+      ),
+      survey1 = survey1
+    )
+  )
+
+# Compare the parameters for fleet1 in each set up
+default_fleet1 <- purrr::map_df(
+  default_parameters[["parameters"]][["fleet1"]],
+  \(x) length(x)
+) |>
+  tidyr::pivot_longer(cols = dplyr::everything())
+updated_fleet1 <- purrr::map_df(
+  parameters_with_double_logistic[["parameters"]][["fleet1"]],
+  \(x) length(x)
+) |>
+  tidyr::pivot_longer(cols = dplyr::everything())
+dplyr::full_join(default_fleet1, updated_fleet1, by = "name")
+knitr::kable(dplyr::full_join(default_fleet1, updated_fleet1, by = "name"))
+}
+\dontrun{
+# Load the example dataset
+data("data1")
+fims_frame <- FIMSFrame(data1)
+
+# Define fleets specifications
+fleet1 <- survey1 <- list(
+  selectivity = list(form = "LogisticSelectivity"),
+  data_distribution = c(
+    Index = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution"
+  )
+)
+
+# Create default parameters for the specified fleets
+default_parameters <- fims_frame |>
+  create_default_parameters(
+    fleets = list(fleet1 = fleet1, survey1 = survey1)
+  )
+
+updated_parameters <- default_parameters |>
+  update_parameters(
+     modified_parameters = list(
+       fleet1 = list(
+         Fleet.log_Fmort.value = log(c(
+           0.009459165, 0.027288858, 0.045063639,
+           0.061017825, 0.048600752, 0.087420554,
+           0.088447204, 0.186607929, 0.109008958,
+           0.132704335, 0.150615473, 0.161242955,
+           0.116640187, 0.169346119, 0.180191913,
+           0.161240483, 0.314573212, 0.257247574,
+           0.254887252, 0.251462108, 0.349101406,
+           0.254107720, 0.418478117, 0.345721184,
+           0.343685540, 0.314171227, 0.308026829,
+           0.431745298, 0.328030899, 0.499675368
+         ))
+       )
+     )
+  )
+
+# purrr::map_vec() can be used to compare the length of adjusted parameter vectors with defaults for a specific module (e.g., fleet1)
+default_fleet1 <- purrr::map_vec(default_parameters[["parameters"]][["fleet1"]], \(x) length(x))
+updated_fleet1 <- purrr::map_vec(updated_parameters[["parameters"]][["fleet1"]], \(x) length(x))
+
+# purrr::map_df() can be used to summarize parameter vector lengths across all modules
+purrr::map_df(
+  updated_parameters[["parameters"]], \(x) purrr::map_vec(x, length),
+  .id = "module"
+) |>
+  tibble::column_to_rownames(var = "module") |>
+  t()
 }
 }
 \seealso{
 \itemize{
+\item \code{\link[=FIMSFrame]{FIMSFrame()}}
 \item \code{\link[=update_parameters]{update_parameters()}}
 }
 
