@@ -18,7 +18,6 @@ namespace
         // the integration test loops over all ages to test the index.
         for (int fleet_ = 0; fleet_ < population.nfleets; fleet_++)
         {
-            if(population.fleets[fleet_]->is_survey){
             int index_yf = year * population.nfleets + fleet_;
             
             // Currently q is not a vector and not changing over years. 
@@ -33,7 +32,7 @@ namespace
         EXPECT_GT(population.fleets[fleet_]->expected_index[year], 0);
         EXPECT_GT(expected_index[index_yf], 0);
         EXPECT_EQ(expected_index[index_yf], population.fleets[fleet_]->expected_index[year]);
-            }
+            
         }
     }
 }

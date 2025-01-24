@@ -98,9 +98,7 @@ class PopulationEvaluateTestFixture : public testing::Test {
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
-      if (i == 0) {
-        fleet->is_survey = true;
-      }
+      
       fleet->Prepare();
       population.fleets.push_back(fleet);
     }
@@ -262,9 +260,7 @@ class PopulationPrepareTestFixture : public testing::Test {
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
-      if (i == 0) {
-        fleet->is_survey = true;
-      }
+      
       fleet->Prepare();
       population.fleets.push_back(fleet);
     }

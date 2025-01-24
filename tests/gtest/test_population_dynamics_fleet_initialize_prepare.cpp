@@ -20,7 +20,7 @@ namespace
         EXPECT_EQ(fleet.log_Fmort.size(), nyears);
         EXPECT_EQ(fleet.Fmort.size(), nyears);
         EXPECT_EQ(fleet.catch_weight_at_age.size(), nyears*nages);
-        EXPECT_EQ(fleet.catch_index.size(), nyears);
+        EXPECT_EQ(fleet.log_expected_catch.size(), nyears);
     }
 
     TEST(FleetTests, FleetPrepareWorks)

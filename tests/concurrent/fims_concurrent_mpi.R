@@ -58,8 +58,8 @@ init_fims <- function(i) {
   catch <- c(t(em_input[["L.obs"]][["fleet1"]]))
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
-  fishing_fleet_index <- methods::new(Index, om_input[["nyr"]])
-  fishing_fleet_index$index_data$fromR(catch)
+  fishing_fleet_catch <- methods::new(Catch, om_input[["nyr"]])
+  fishing_fleet_catch$catch_data$fromR(catch)
   # set fishing fleet age comp data, need to set dimensions of age comps
   # Here the new function initializes the object with length nyr*nages
   fishing_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
@@ -108,22 +108,22 @@ init_fims <- function(i) {
   fishing_fleet$estimate_q <- FALSE
   fishing_fleet$random_q <- FALSE
   fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
-  fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
+  fishing_fleet$SetObservedCatchData(fishing_fleet_catch$get_id())
   fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
   # fishing_fleet$SetObservedLengthCompData(fishing_fleet_length_comp$get_id())
 
   # Set up fishery index data using the lognormal
-  fishing_fleet_index_distribution <- methods::new(DlnormDistribution)
+  fishing_fleet_catch_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
-  fishing_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
+  fishing_fleet_catch_distribution$log_sd$resize(om_input[["nyr"]])
   for (y in 1:om_input[["nyr"]]) {
     # Compute lognormal SD from OM coefficient of variation (CV)
-    fishing_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
+    fishing_fleet_catch_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
   }
-  fishing_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+  fishing_fleet_catch_distribution$log_sd$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
-  fishing_fleet_index_distribution$set_observed_data(fishing_fleet$GetObservedIndexDataID())
-  fishing_fleet_index_distribution$set_distribution_links("data", fishing_fleet$log_expected_index$get_id())
+  fishing_fleet_catch_distribution$set_observed_data(fishing_fleet$GetObservedCatchDataID())
+  fishing_fleet_catch_distribution$set_distribution_links("data", fishing_fleet$log_expected_catch$get_id())
 
   # Set up fishery age composition data using the multinomial
   fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
@@ -179,7 +179,6 @@ init_fims <- function(i) {
   survey_fleet_selectivity$slope[1]$estimated <- TRUE
 
   survey_fleet <- methods::new(Fleet)
-  survey_fleet$is_survey <- TRUE
   survey_fleet$nages$set(om_input[["nages"]])
   survey_fleet$nyears$set(om_input[["nyr"]])
   # survey_fleet$nlengths$set(om_input[["nlengths"]])

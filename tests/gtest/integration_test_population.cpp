@@ -196,11 +196,13 @@ namespace
                                       expected_catch[year] * 100,
                                   1.0)
                             << "year " << year;
-                        // Expect FIMS value is greater than 0.0
+                        // Expect FIMS value is greater than 0.0 checking that
+                        // the fishing fleet always has positive catches
                         EXPECT_GT(pop.fleets[0]->expected_catch[year], 0.0)
                             << "year " << year;
-                        // Expect FIMS value = 0.0
-                        EXPECT_EQ(pop.fleets[1]->expected_catch[year], 0.0)
+                        // Expect FIMS value = 0.0 checking that the survey 
+                        // fleet always has close to or zero catches
+                        EXPECT_LE(pop.fleets[1]->expected_catch[year], 0.0001)
                             << "year " << year;
                     }
                 }
@@ -223,7 +225,9 @@ namespace
                     // Use EXPECT_NEAR here
                     EXPECT_NEAR(pop.fleets[1]->q[0], fleet_q[0].GetDouble(), 1.0e-07);
                     
-                        if(pop.fleets[1]->is_survey){
+                    //I'm removing the is_survey check here because it is
+                    //no longer a field of the fleet class. If we change the
+                    //test fleets this may cause an error in the future.
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         // Expect catchability of the fishing fleet = 1.0
@@ -247,8 +251,7 @@ namespace
                         // Expect FIMS value is greater than 0.0
                         EXPECT_GT(pop.fleets[1]->expected_index[year], 0.0)
                             << "year " << year;
-                    }
-                        }
+                    }  
                 }
 
                 // Test numbers at age

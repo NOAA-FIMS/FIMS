@@ -306,7 +306,6 @@ public:
 
                 for (size_t i = 0; i < nsurveys; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > s = std::make_shared<fims_popdy::Fleet<double> >();
-                    s->is_survey = true;
                     s->log_q.resize(1);
                     s->Initialize(nyears, nages);
                  //   s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);

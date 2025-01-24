@@ -269,6 +269,33 @@ namespace fims_info {
         }
 
         /**
+         * @brief Set pointers to catch data in the fleet module.
+         * 
+         * @param &valid_model reference to true/false boolean indicating whether model is valid.
+         * @param f shared pointer to fleet module
+         */
+        void SetFleetCatchData(
+                bool &valid_model,
+                std::shared_ptr<fims_popdy::Fleet<Type> > f) {
+            if (f->fleet_observed_catch_data_id_m != -999) {
+                uint32_t observed_catch_id =
+                        static_cast<uint32_t> (f->fleet_observed_catch_data_id_m);
+                data_iterator it = this->data_objects.find(observed_catch_id);
+                if (it != this->data_objects.end()) {
+                    f->observed_catch_data = (*it).second;
+                    FIMS_INFO_LOG("Catch data for fleet "
+                            + fims::to_string(f->id) + " successfully set to "
+                            + fims::to_string(f->observed_catch_data->at(1)));
+                } else {
+                    valid_model = false;
+                    FIMS_ERROR_LOG("Expected catch data not defined for fleet "
+                            + fims::to_string(f->id) + ", index "
+                            + fims::to_string(observed_catch_id));
+                }
+            }
+        }
+
+        /**
          * @brief Set pointers to index data in the fleet module.
          * 
          * @param &valid_model reference to true/false boolean indicating whether model is valid.
@@ -292,11 +319,6 @@ namespace fims_info {
                             + fims::to_string(f->id) + ", index "
                             + fims::to_string(observed_index_id));
                 }
-            } else {
-                valid_model = false;
-                // TODO: explore why index data is required because it should not be
-                FIMS_ERROR_LOG("No index data observed for fleet "
-                        + fims::to_string(f->id) + ". FIMS requires index data for all fleets.");
             }
         }
 
@@ -512,6 +534,8 @@ namespace fims_info {
                 FIMS_INFO_LOG("Initializing fleet " + fims::to_string(f->id));
 
                 f->Initialize(f->nyears, f->nages, f->nlengths);
+
+                SetFleetCatchData(valid_model, f);
 
                 SetFleetIndexData(valid_model, f);
 

@@ -86,6 +86,10 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt interface_observed_index_data_id_m = -999;
   /**
+   * @brief The ID of the observed catch data object.
+   */
+  SharedInt interface_observed_catch_data_id_m = -999;
+  /**
    * @brief The ID of the selectivity object.
    */
   SharedInt interface_selectivity_id_m = -999;
@@ -95,14 +99,6 @@ public:
    * @brief The name of the fleet.
    */
   std::string name = "NA";
-  /**
-   * @brief Is this fleet a survey, then true. If the fleet is a fishery, then
-   * false, where false is the default. As of version 0.3.0, a fleet in FIMS
-   * cannot accommodate both landings and index data, and thus must be
-   * designated to be a fleet or a survey. This will be fixed in later
-   * versions.
-   */
-  SharedBoolean is_survey = false;
   /**
    * @brief The number of age bins in the fleet data.
    */
@@ -124,6 +120,10 @@ public:
    * fleet.
    */
   ParameterVector log_Fmort;
+  /**
+   * @brief The vector of natural log of the expected total catch for the fleet.
+   */
+  ParameterVector log_expected_catch;
   /**
    * @brief The vector of natural log of the expected index of abundance for the fleet.
    */
@@ -160,7 +160,11 @@ public:
   /**
    * @brief Derived catch-at-age in weight (mt).
    */
-  Rcpp::NumericVector derived_cwaa;
+  Rcpp::NumericVector derived_cwaa;  
+  /**
+   * @brief Derived catch.
+   */
+  Rcpp::NumericVector derived_catch;
   /**
    * @brief Derived index.
    */
@@ -190,15 +194,17 @@ public:
   FleetInterfaceBase(other),
   interface_observed_agecomp_data_id_m(other.interface_observed_agecomp_data_id_m),
   interface_observed_lengthcomp_data_id_m(other.interface_observed_lengthcomp_data_id_m), 
-  interface_observed_index_data_id_m(other.interface_observed_index_data_id_m), 
+  interface_observed_index_data_id_m(other.interface_observed_index_data_id_m),
+  interface_observed_catch_data_id_m(other.interface_observed_catch_data_id_m), 
   interface_selectivity_id_m(other.interface_selectivity_id_m), 
-  name(other.name), is_survey(other.is_survey), 
+  name(other.name), 
   nages(other.nages), 
   nlengths(other.nlengths),
   nyears(other.nyears), 
   log_q(other.log_q), 
   log_Fmort(other.log_Fmort), 
-  log_expected_index(other.log_expected_index),
+  log_expected_index(other.log_expected_index), 
+  log_expected_catch(other.log_expected_catch),
   proportion_catch_numbers_at_age(other.proportion_catch_numbers_at_age), 
   proportion_catch_numbers_at_length(other.proportion_catch_numbers_at_length),
   age_length_conversion_matrix(other.age_length_conversion_matrix), 
@@ -207,7 +213,8 @@ public:
   derived_cnaa(other.derived_cnaa), 
   derived_cnal(other.derived_cnal), 
   derived_cwaa(other.derived_cwaa), 
-  derived_index(other.derived_index), 
+  derived_index(other.derived_index),  
+  derived_catch(other.derived_catch), 
   derived_age_composition(other.derived_age_composition), 
   derived_length_composition(other.derived_length_composition) {}
 
@@ -247,6 +254,13 @@ public:
   }
 
   /**
+   * @brief Set the unique ID for the observed catch data object.
+   * @param observed_catch_data_id Unique ID for the observed data object.
+   */
+  void SetObservedCatchData(int observed_catch_data_id) {
+    interface_observed_catch_data_id_m.set(observed_catch_data_id);
+  }
+  /**
    * @brief Set the unique ID for the selectivity object.
    * @param selectivity_id Unique ID for the observed object.
    */
@@ -276,6 +290,12 @@ public:
     return interface_observed_index_data_id_m.get();
   }
 
+  /**
+   * @brief Get the unique id for the observed catch data object.
+   */
+  int GetObservedCatchDataID() {
+    return interface_observed_catch_data_id_m.get();
+  }
   /** 
    * @brief Extracts the derived quantities from `Information` to the Rcpp
    * object. 
@@ -350,6 +370,11 @@ public:
         this->derived_index[i] = fleet->expected_index[i];
       }
 
+      this->derived_catch = Rcpp::NumericVector(fleet->expected_catch.size());
+      for (R_xlen_t i = 0; i < this->derived_catch.size(); i++) {
+        this->derived_catch[i] = fleet->expected_catch[i];
+      }
+
     }
 
   }
@@ -370,7 +395,6 @@ public:
     ss << " \"type\" : \"fleet\",\n";
     ss << " \"tag\" : \"" << this->name << "\",\n";
     ss << " \"id\": " << this->id << ",\n";
-    ss << " \"is_survey\": " << this->is_survey << ",\n";
     ss << " \"nlengths\": " << this->nlengths.get() << ",\n";
     ss << "\"parameters\": [\n";
     ss << "{\n";
@@ -472,6 +496,19 @@ public:
     }
     ss << " }\n]\n}";
 
+    ss << "{\n";
+    ss << "  \"name\": \"catch \",\n";
+    ss << "  \"values\":[";
+    if (this->derived_catch.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->derived_catch.size() - 1; i++) {
+        ss << this->derived_catch[i] << ", ";
+      }
+      ss << this->derived_catch[this->derived_catch.size() - 1] << "]\n";
+    }
+    ss << " }\n]\n}";
+
     return ss.str();
 
   }
@@ -493,7 +530,6 @@ public:
 
     // set relative info
     fleet->id = this->id;
-    fleet->is_survey = this->is_survey.get();
     fleet->nages = this->nages.get();
     fleet->nlengths = this->nlengths.get();
     fleet->nyears = this->nyears.get();
@@ -505,6 +541,7 @@ public:
       interface_observed_lengthcomp_data_id_m.get();
     
     fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m.get();
+    fleet->fleet_observed_catch_data_id_m = interface_observed_catch_data_id_m.get();
     
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
@@ -545,7 +582,9 @@ public:
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
     //exp_catch
-    fleet->log_expected_index.resize(nyears.get()); // assume index is for all ages.
+    fleet->log_expected_catch.resize(nyears);  // assume catch is for all ages.
+    info->variable_map[this->log_expected_catch.id_m] = &(fleet)->log_expected_catch;
+    fleet->log_expected_index.resize(nyears);  // assume index is for all ages.
     info->variable_map[this->log_expected_index.id_m] = &(fleet)->log_expected_index;
     
     fleet->proportion_catch_numbers_at_age.resize(nyears.get() * nages.get());

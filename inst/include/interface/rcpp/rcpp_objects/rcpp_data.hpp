@@ -409,4 +409,109 @@ class IndexDataInterface : public DataInterfaceBase {
 #endif
 };
 
+/**
+ * @brief  The Rcpp interface for Catch to instantiate the object from R:
+ * fleet <- methods::new(Catch).
+ */
+class CatchDataInterface : public DataInterfaceBase {
+ public:
+  /**
+   * @brief An integer that specifies the second dimension of the data.
+   */
+  fims_int ymax = 0;
+  /**
+   * @brief The vector of catch data that is being passed from R.
+   */
+  RealVector catch_data;
+
+  /**
+   * @brief The constructor.
+   */
+  CatchDataInterface(int ymax = 0) : DataInterfaceBase() {
+    this->ymax = ymax;
+    this->catch_data.resize(ymax);
+
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<CatchDataInterface>(*this));
+  }
+
+  /**
+   * @brief Construct a new Catch Data Interface object
+   *
+   * @param other
+   */
+  CatchDataInterface(const CatchDataInterface& other) :
+  DataInterfaceBase(other), ymax(other.ymax), catch_data(other.catch_data) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~CatchDataInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
+  
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * data interface with catch data. It also returns the ID, the rank of 1, the
+   * dimensions by printing ymax, followed by the data values themselves. This
+   * string is formatted for a json file.
+   */ 
+  virtual std::string to_json() {
+    std::stringstream ss;
+    
+    ss << "{\n";
+    ss << " \"name\": \"data\",\n";
+    ss << " \"type\": \"Catch\",\n";
+    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"rank\": " << 1 << ",\n";
+    ss << " \"dimensions\": [" << this->ymax << "],\n";
+    ss << " \"values\": [";
+    for (R_xlen_t i = 0; i < catch_data.size() - 1; i++) {
+      ss << catch_data[i] << ", ";
+    }
+    ss << catch_data[catch_data.size() - 1] << "]\n";
+    ss << "}";
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_data_object::DataObject<Type>> data =
+        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
+
+    data->id = this->id;
+
+    for (int y = 0; y < ymax; y++) {
+      data->at(y) = this->catch_data[y];
+    }
+
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    info->data_objects[this->id] = data;
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+    return true;
+  }
+
+#endif
+};
+
 #endif

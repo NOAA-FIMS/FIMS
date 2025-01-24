@@ -72,15 +72,15 @@ test_that("deterministic test of fims", {
   expect_equal(report[["F_mort"]][[1]], om_output_list[[iter_id]][["f"]])
 
   # Expected catch
-  fims_index <- report[["exp_index"]]
+  fims_catch <- report[["exp_catch"]]
   for (i in 1:length(om_output_list[[iter_id]][["L.mt"]][["fleet1"]])) {
-    expect_equal(fims_index[[1]][i], om_output_list[[iter_id]][["L.mt"]][["fleet1"]][i])
+    expect_equal(fims_catch[[1]][i], om_output_list[[iter_id]][["L.mt"]][["fleet1"]][i])
   }
 
   # Expect small relative error for deterministic test
   fims_object_are <- rep(0, length(em_input_list[[iter_id]][["L.obs"]][["fleet1"]]))
   for (i in 1:length(em_input_list[[iter_id]][["L.obs"]][["fleet1"]])) {
-    fims_object_are[i] <- abs(fims_index[[1]][i] - em_input_list[[iter_id]][["L.obs"]][["fleet1"]][i]) / em_input_list[[iter_id]][["L.obs"]][["fleet1"]][i]
+    fims_object_are[i] <- abs(fims_catch[[1]][i] - em_input_list[[iter_id]][["L.obs"]][["fleet1"]][i]) / em_input_list[[iter_id]][["L.obs"]][["fleet1"]][i]
   }
 
   # Expect 95% of relative error to be within 2*cv
@@ -104,11 +104,12 @@ test_that("deterministic test of fims", {
   }
 
   # Expected survey index.
+  fims_index <- report[["exp_index"]]
   # Using [[2]] because the survey is the 2nd fleet.
   cwaa <- matrix(report[["cwaa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
     nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
-  expect_equal(fims_index[[2]], apply(cwaa, 1, sum) * om_output_list[[iter_id]][["survey_q"]][["survey1"]])
+  expect_equal(fims_catch[[2]], apply(cwaa, 1, sum))# * om_output_list[[iter_id]][["survey_q"]][["survey1"]])
 
   for (i in 1:length(om_output_list[[iter_id]][["survey_index_biomass"]][["survey1"]])) {
     expect_equal(fims_index[[2]][i], om_output_list[[iter_id]][["survey_index_biomass"]][["survey1"]][i])
@@ -156,18 +157,20 @@ test_that("nll test of fims", {
     om_input_list[[iter_id]][["logR_sd"]], TRUE
   ))
 
-  # catch and survey index expected likelihoods
-  index_nll_fleet <- -sum(dlnorm(
+  # fishery catch expected likelihood
+  catch_nll <- catch_nll_fleet <- -sum(dlnorm(
     em_input_list[[iter_id]][["L.obs"]][["fleet1"]],
     log(om_output_list[[iter_id]][["L.mt"]][["fleet1"]]),
     sqrt(log(em_input_list[[iter_id]][["cv.L"]][["fleet1"]]^2 + 1)), TRUE
   ))
-  index_nll_survey <- -sum(dlnorm(
+
+  # survey index expected likelihood
+  index_nll <- index_nll_survey <- -sum(dlnorm(
     em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]],
     log(om_output_list[[iter_id]][["survey_index_biomass"]][["survey1"]]),
     sqrt(log(em_input_list[[iter_id]][["cv.survey"]][["survey1"]]^2 + 1)), TRUE
   ))
-  index_nll <- index_nll_fleet + index_nll_survey
+
   # age comp likelihoods
   fishing_acomp_observed <- em_input_list[[iter_id]][["L.age.obs"]][["fleet1"]]
   fishing_acomp_expected <- om_output_list[[iter_id]][["L.age"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.age"]][["fleet1"]])
@@ -212,11 +215,11 @@ test_that("nll test of fims", {
   }
   lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
 
-  expected_jnll <- rec_nll + index_nll + age_comp_nll + lengthcomp_nll
+  expected_jnll <- rec_nll + catch_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
 
   expect_equal(report[["nll_components"]][1], rec_nll)
-  expect_equal(report[["nll_components"]][2], index_nll_fleet)
+  expect_equal(report[["nll_components"]][2], catch_nll_fleet)
   expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
   expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
   expect_equal(report[["nll_components"]][5], index_nll_survey)

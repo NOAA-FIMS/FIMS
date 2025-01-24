@@ -85,10 +85,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
-  fishing_fleet_index <- methods::new(Index, om_input[["nyr"]])
+  fishing_fleet_catch <- methods::new(Catch, om_input[["nyr"]])
   purrr::walk(
     1:om_input[["nyr"]],
-    \(x) fishing_fleet_index$index_data$set(x - 1, catch[x])
+    \(x) fishing_fleet_catch$catch_data$set(x - 1, catch[x])
   )
 
   # set fishing fleet age comp data, need to set dimensions of age comps
@@ -147,22 +147,22 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$estimate_q$set(FALSE)
   fishing_fleet$random_q$set(FALSE)
   fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
-  fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
+  fishing_fleet$SetObservedCatchData(fishing_fleet_catch$get_id())
   fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompData(fishing_fleet_length_comp$get_id())
 
   # Set up fishery index data using the lognormal
-  fishing_fleet_index_distribution <- methods::new(DlnormDistribution)
+  fishing_fleet_catch_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
-  fishing_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
+  fishing_fleet_catch_distribution$log_sd$resize(om_input[["nyr"]])
   for (y in 1:om_input[["nyr"]]) {
     # Compute lognormal SD from OM coefficient of variation (CV)
-    fishing_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
+    fishing_fleet_catch_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
   }
-  fishing_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+  fishing_fleet_catch_distribution$log_sd$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
-  fishing_fleet_index_distribution$set_observed_data(fishing_fleet$GetObservedIndexDataID())
-  fishing_fleet_index_distribution$set_distribution_links("data", fishing_fleet$log_expected_index$get_id())
+  fishing_fleet_catch_distribution$set_observed_data(fishing_fleet$GetObservedCatchDataID())
+  fishing_fleet_catch_distribution$set_distribution_links("data", fishing_fleet$log_expected_catch$get_id())
 
   # Set up fishery age composition data using the multinomial
   fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
@@ -229,7 +229,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet_selectivity$slope[1]$estimated <- TRUE
 
   survey_fleet <- methods::new(Fleet)
-  survey_fleet$is_survey$set(TRUE)
   survey_fleet$nages$set(om_input[["nages"]])
   survey_fleet$nyears$set(om_input[["nyr"]])
   survey_fleet$nlengths$set(om_input[["nlengths"]])
@@ -481,6 +480,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
     fleet1 = list(
       selectivity = list(form = "LogisticSelectivity"),
       data_distribution = c(
+        Catch = "DlnormDistribution",
         Index = "DlnormDistribution",
         AgeComp = "DmultinomDistribution",
         LengthComp = "DmultinomDistribution"
@@ -489,6 +489,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
     survey1 = list(
       selectivity = list(form = "LogisticSelectivity"),
       data_distribution = c(
+        Catch = "DlnormDistribution",
         Index = "DlnormDistribution",
         AgeComp = "DmultinomDistribution",
         LengthComp = "DmultinomDistribution"

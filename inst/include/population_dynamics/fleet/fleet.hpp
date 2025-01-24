@@ -33,6 +33,11 @@ namespace fims_popdy {
         std::shared_ptr<SelectivityBase<Type>>
         selectivity; /*!< selectivity component*/
 
+  // catch data
+  int fleet_observed_catch_data_id_m = -999; /*!< id of catch data */
+  std::shared_ptr<fims_data_object::DataObject<Type>>
+    observed_catch_data; /*!< observed catch data*/
+
   // index data
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
   std::shared_ptr<fims_data_object::DataObject<Type>>
@@ -58,7 +63,6 @@ namespace fims_popdy {
 
         // derived quantities
         fims::Vector<Type> catch_at_age; /*!<derived quantity catch at age*/
-        fims::Vector<Type> catch_index; /*!<derived quantity catch index*/
         fims::Vector<Type> age_composition; /*!<derived quantity age composition*/
         fims::Vector<Type> length_composition; /*!<derived quantity length composition*/
         fims::Vector<Type> age_length_conversion_matrix; /*!<derived quantity age-length transition matrix*/
@@ -70,7 +74,8 @@ namespace fims_popdy {
     to log probability density function*/
         fims::Vector<Type> expected_catch; /*!<model expected total catch*/
         fims::Vector<Type> expected_index; /*!<model expected index of abundance*/
-        fims::Vector<Type> log_expected_index; /*!<model expected index of abundance*/
+        fims::Vector<Type> log_expected_catch; /*!<model expected log total catch*/
+        fims::Vector<Type> log_expected_index; /*!<model expected log index of abundance*/
         fims::Vector<Type> expected_catch_lpdf; /*!<model expected total catch linked
     to log probability density function*/
         fims::Vector<Type> expected_index_lpdf; /*!<model expected index of abundance linked
@@ -121,9 +126,9 @@ namespace fims_popdy {
             proportion_catch_numbers_at_length.resize(nyears * nlengths);
             age_length_conversion_matrix.resize(nages * nlengths);
             catch_weight_at_age.resize(nyears * nages);
-            catch_index.resize(nyears); // assume index is for all ages.
             expected_catch.resize(nyears);
             expected_index.resize(nyears);
+            log_expected_catch.resize(nyears);
             log_expected_index.resize(nyears);
             age_composition.resize(nyears * nages);
             length_composition.resize(nyears * nlengths);
@@ -144,9 +149,7 @@ namespace fims_popdy {
 
             // derived quantities
             std::fill(catch_at_age.begin(), catch_at_age.end(),
-                    static_cast<Type>(0)); /**<derived quantity catch at age*/
-            std::fill(catch_index.begin(), catch_index.end(),
-                    static_cast<Type>(0)); /**<derived quantity catch index*/
+                    0); /**<derived quantity catch at age*/
             std::fill(age_composition.begin(), age_composition.end(), 
                     static_cast<Type>(0)); /**<model expected number at age */
             std::fill(length_composition.begin(), length_composition.end(), 
@@ -154,9 +157,11 @@ namespace fims_popdy {
             std::fill(expected_catch.begin(), expected_catch.end(),
                     static_cast<Type>(0)); /**<model expected total catch*/
             std::fill(expected_index.begin(), expected_index.end(),
-                    static_cast<Type>(0)); /**<model expected index of abundance*/
+                    0); /**<model expected index of abundance*/
+            std::fill(log_expected_catch.begin(), log_expected_catch.end(),
+                    0); /**<model log of expected total catch*/
             std::fill(log_expected_index.begin(), log_expected_index.end(),
-                    static_cast<Type>(0)); /**<model expected index of abundance*/
+                    0); /**<model log of expected index of abundance*/
             std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(),
                     static_cast<Type>(0)); /**<model expected catch at age*/
             std::fill(proportion_catch_numbers_at_age.begin(), proportion_catch_numbers_at_age.end(),
@@ -228,6 +233,15 @@ namespace fims_popdy {
         void evaluate_index() {
             for (size_t i = 0; i<this->expected_index.size(); i++) {
                 log_expected_index[i] = log(this->expected_index[i]);
+            }
+        }
+
+        /**
+         * Evaluate the natural log of the expected catch.
+         */
+        void evaluate_catch() {
+            for (size_t i = 0; i<this->expected_catch.size(); i++) {
+                log_expected_catch[i] = log(this->expected_catch[i]);
             }
         }
     };

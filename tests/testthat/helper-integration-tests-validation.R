@@ -143,7 +143,15 @@ validate_fims <- function(
   # Note: test failed when using em_input with observation errors as expected values
   validate_error(
     expected = c(
-      om_output[["L.mt"]][["fleet1"]],
+      om_output[["L.mt"]][["fleet1"]]
+    ),
+    param_name = "ExpectedCatch",
+    use_fimsfit = use_fimsfit,
+    estimates = estimates
+  )
+
+  validate_error(
+    expected = c(
       om_output[["survey_index_biomass"]][["survey1"]]
     ),
     param_name = "ExpectedIndex",

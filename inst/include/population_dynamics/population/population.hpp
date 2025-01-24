@@ -198,13 +198,10 @@ namespace fims_popdy {
          */
         void CalculateMortality(size_t i_age_year, size_t year, size_t age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                if (this->fleets[fleet_]->is_survey == false) {
-                    this->mortality_F[i_age_year] +=
-                            this->fleets[fleet_]->Fmort[year] *
-                            // evaluate is a member function of the selectivity class
-                            this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-
-                }
+                this->mortality_F[i_age_year] +=
+                        this->fleets[fleet_]->Fmort[year] *
+                        // evaluate is a member function of the selectivity class
+                        this->fleets[fleet_]->selectivity->evaluate(ages[age]);
             }
 
             this->mortality_Z[i_age_year] =
@@ -374,18 +371,16 @@ namespace fims_popdy {
          * @param age the age of catch that is being added into total catch
          */
         void CalculateCatch(size_t year, size_t age) {
-            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                if (this->fleets[fleet_]->is_survey == false) {
-                    size_t index_yf = year * this->nfleets +
-                            fleet_; // index by fleet and years to dimension fold
-                    size_t i_age_year = year * this->nages + age;
+            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {               
+                size_t index_yf = year * this->nfleets +
+                        fleet_; // index by fleet and years to dimension fold
+                size_t i_age_year = year * this->nages + age;
 
-                    this->expected_catch[index_yf] +=
-                            this->fleets[fleet_]->catch_weight_at_age[i_age_year];
+                this->expected_catch[index_yf] +=
+                        this->fleets[fleet_]->catch_weight_at_age[i_age_year];
 
-                    fleets[fleet_]->expected_catch[year] +=
-                            this->fleets[fleet_]->catch_weight_at_age[i_age_year];
-                }
+                fleets[fleet_]->expected_catch[year] +=
+                        this->fleets[fleet_]->catch_weight_at_age[i_age_year];      
             }
         }
 
@@ -400,15 +395,11 @@ namespace fims_popdy {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
                 Type index_;
                 // I = qN (N is total numbers), I is an index in numbers
-                if (this->fleets[fleet_]->is_survey == false) {
-                    index_ = this->fleets[fleet_]->catch_numbers_at_age[i_age_year] *
-                            this->weight_at_age[age];
-                } else {
-                    index_ = this->fleets[fleet_]->q.get_force_scalar(year) *
-                            this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
-                            this->numbers_at_age[i_age_year] *
-                            this->weight_at_age[age]; // this->weight_at_age[age];
-                }
+                index_ = this->fleets[fleet_]->q.get_force_scalar(year) *
+                        this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
+                        this->numbers_at_age[i_age_year] *
+                        this->weight_at_age[age]; 
+                
                 fleets[fleet_]->expected_index[year] += index_;
             }
         }
@@ -428,17 +419,13 @@ namespace fims_popdy {
                 // current and fleet objects) to that value.
                 Type catch_; // catch_ is used to avoid using the c++ keyword catch
                 // Baranov Catch Equation
-                if (this->fleets[fleet_]->is_survey == false) {
-                    catch_ = (this->fleets[fleet_]->Fmort[year] *
-                            this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
-                            this->mortality_Z[i_age_year] *
-                            this->numbers_at_age[i_age_year] *
-                            (1 - fims_math::exp(-(this->mortality_Z[i_age_year])));
-                } else {
-                    catch_ = (this->fleets[fleet_]->selectivity->evaluate(ages[age])) *
-                            this->numbers_at_age[i_age_year];
-                }
-
+                
+                catch_ = (this->fleets[fleet_]->Fmort[year] *
+                        this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
+                        this->mortality_Z[i_age_year] *
+                        this->numbers_at_age[i_age_year] *
+                        (1 - fims_math::exp(-(this->mortality_Z[i_age_year])));
+                
                 // this->catch_numbers_at_age[i_age_yearf] += catch_;
                 // catch_numbers_at_age for the fleet module has different
                 // dimensions (year/age, not year/fleet/age)

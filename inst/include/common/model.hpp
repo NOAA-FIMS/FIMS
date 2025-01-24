@@ -90,7 +90,7 @@ namespace fims_model {
             nll_components.fill(0);
             int nll_components_idx = 0;
             size_t n_priors = 0;
-
+            FIMS_INFO_LOG("Begin evaluating prior densities.")
             for (d_it = this->fims_information->density_components.begin();
                     d_it != this->fims_information->density_components.end(); ++d_it) {
                 std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
@@ -119,6 +119,7 @@ namespace fims_model {
 
                 // Prepare recruitment
                 p->recruitment->Prepare();
+                FIMS_INFO_LOG("Recruitmnt successfully prepared.")
 
             }
 
@@ -150,7 +151,9 @@ namespace fims_model {
                 p->of = this->of;
 #endif
                 // Evaluate population
+                FIMS_INFO_LOG("Begin evaluation for population " + fims::to_string(p->id));
                 p->Evaluate();
+                FIMS_INFO_LOG("Population successfully evaluated");
             }
 
             typename fims_info::Information<Type>::fleet_iterator f_it;
@@ -162,11 +165,14 @@ namespace fims_model {
 #ifdef TMB_MODEL
                 f->of = this->of;
 #endif
-
+                FIMS_INFO_LOG("Begin evalulation for fleet "+fims::to_string(f->id));
                 f->evaluate_age_comp();
                 if (f->nlengths > 0) {
                   f->evaluate_length_comp();
                 }
+                FIMS_INFO_LOG("Begin evalulation for catch for fleet "+fims::to_string(f->id));
+                f->evaluate_catch();
+                FIMS_INFO_LOG("Begin evalulation for index for fleet "+fims::to_string(f->id));
                 f->evaluate_index();
             }
             this->fims_information->SetupData();
@@ -257,6 +263,7 @@ namespace fims_model {
             vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
             vector<Type> FMort = ADREPORTvector(F_mort);
             vector<Type> Q = ADREPORTvector(q);
+            vector<Type> ExpectedCatch = ADREPORTvector(exp_catch);
             vector<Type> ExpectedIndex = ADREPORTvector(exp_index);
             vector<Type> CNAA = ADREPORTvector(cnaa);
             vector<Type> CNAL = ADREPORTvector(cnal);
@@ -269,6 +276,7 @@ namespace fims_model {
             ADREPORT_F(LogRecDev, of);
             ADREPORT_F(FMort, of);
             ADREPORT_F(Q, of);
+            ADREPORT_F(ExpectedCatch, of);
             ADREPORT_F(ExpectedIndex, of);
             ADREPORT_F(CNAA, of);
             ADREPORT_F(CNAL, of);

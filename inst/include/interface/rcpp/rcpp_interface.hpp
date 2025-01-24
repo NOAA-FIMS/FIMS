@@ -247,6 +247,9 @@ void clear() {
   LengthCompDataInterface::id_g = 1;
   LengthCompDataInterface::live_objects.clear();
 
+  CatchDataInterface::id_g = 1;
+  CatchDataInterface::live_objects.clear();
+
   IndexDataInterface::id_g = 1;
   IndexDataInterface::live_objects.clear();
 
@@ -632,7 +635,6 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
-      .field("is_survey", &FleetInterface::is_survey)
       .field("log_q", &FleetInterface::log_q)
       .field("log_Fmort", &FleetInterface::log_Fmort)
       .field("nages", &FleetInterface::nages)
@@ -641,6 +643,7 @@ RCPP_MODULE(fims) {
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
       .field("log_expected_index", &FleetInterface::log_expected_index)
+      .field("log_expected_catch", &FleetInterface::log_expected_catch)
       .field("proportion_catch_numbers_at_age", &FleetInterface::proportion_catch_numbers_at_age)
       .field("proportion_catch_numbers_at_length", &FleetInterface::proportion_catch_numbers_at_length)
       .field("age_length_conversion_matrix", &FleetInterface::age_length_conversion_matrix)
@@ -650,6 +653,8 @@ RCPP_MODULE(fims) {
       .method("GetObservedLengthCompDataID", &FleetInterface::GetObservedLengthCompDataID)
       .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
+      .method("SetObservedCatchData", &FleetInterface::SetObservedCatchData)
+      .method("GetObservedCatchDataID", &FleetInterface::GetObservedCatchDataID)
       .method("SetSelectivity", &FleetInterface::SetSelectivity);
 
     Rcpp::class_<AgeCompDataInterface>("AgeComp")
@@ -661,6 +666,11 @@ RCPP_MODULE(fims) {
             .constructor<int, int>()
             .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
             .method("get_id", &LengthCompDataInterface::get_id);
+
+    Rcpp::class_<CatchDataInterface>("Catch")
+            .constructor<int>()
+            .field("catch_data", &CatchDataInterface::catch_data)
+            .method("get_id", &CatchDataInterface::get_id);
 
     Rcpp::class_<IndexDataInterface>("Index")
             .constructor<int>()

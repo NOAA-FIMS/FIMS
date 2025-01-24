@@ -2,6 +2,7 @@
 
 export(AgeComp)
 export(BevertonHoltRecruitment)
+export(Catch)
 export(CreateTMBModel)
 export(DlnormDistribution)
 export(DmultinomDistribution)

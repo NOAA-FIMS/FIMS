@@ -17,7 +17,6 @@ namespace
 
         for (int fleet_ = 0; fleet_ < population.nfleets; fleet_++)
         {
-            if(!population.fleets[fleet_]->is_survey){
             int index_yf = year * population.nfleets + fleet_;
             
             expected_catch[index_yf] += population.fleets[fleet_]->catch_weight_at_age[i_age_year];
@@ -26,7 +25,6 @@ namespace
             EXPECT_GT(population.expected_catch[index_yf], 0);
             EXPECT_GT(expected_catch[index_yf], 0);
             EXPECT_EQ(expected_catch[index_yf], population.fleets[fleet_]->expected_catch[year]);
-            }
         }
     }
 }
