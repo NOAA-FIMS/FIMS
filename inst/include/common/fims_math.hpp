@@ -61,6 +61,29 @@ inline const Type pow(const Type &x, const Type &y) {
 
 #ifdef TMB_MODEL
 
+template<class Type>
+vector<Type> rmultinom(Type N, vector<Type> p, vector<int> ages)
+{
+  //multinomial
+  int dim = ages.size();
+  vector<Type> x(dim);
+  vector<Type> p_use(dim);
+  for(int i = 0; i < dim; i++) p_use(i) = p(ages(i)-1);
+  p_use /= sum(p_use);
+  int Nint = CppAD::Integer(N);
+  x.setZero();
+  for(int i = 0; i < Nint; i++)
+  {
+    Type y = runif(0.0,1.0);
+    for(int a = 0; a < dim; a++) if(y < p_use.head(a+1).sum())
+    {
+      x(a) += 1.0;
+      break;
+    }
+  }
+  return x;
+}
+
 /**
  * @brief The exponential function.
  * The code cannot be tested using the compilation flag

@@ -45,6 +45,9 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
 
   #ifdef TMB_MODEL
     ::objective_function<Type> *of; /**< Pointer to the TMB objective function */
+    matrix<Type> distribution_obs;
+    matrix<Type> distribution_re;
+    matrix<Type> distribution_priors;
   #endif
 
   /** @brief Constructor.

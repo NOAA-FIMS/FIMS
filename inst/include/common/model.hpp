@@ -82,6 +82,9 @@ namespace fims_model {
             vector<vector<Type> > log_recruit_dev(n_pops);
             vector<vector<Type> > recruitment(n_pops);
             vector<vector<Type> > M(n_pops);
+            vector<matrix<Type> > distribution_obs;
+            vector<matrix<Type> > distribution_re;
+            vector<matrix<Type> > distribution_priors;
             vector<Type> nll_components(this->fims_information->density_components.size());
 #endif
             // Loop over densities and evaluate joint negative log densities for priors
@@ -103,7 +106,8 @@ namespace fims_model {
                     nll_components_idx += 1;
                 }
             }
-
+            
+            distribution_priors.resize(n_priors);
 
 
             // Loop over populations and evaluate recruitment component
@@ -137,6 +141,7 @@ namespace fims_model {
                     nll_components_idx += 1;
                 }
             }
+            distribution_re.resize(n_random_effects);
 
 
             // Loop over and evaluate populations
@@ -185,6 +190,7 @@ namespace fims_model {
                     nll_components_idx += 1;
                 }
             }
+            distribution_obs.resize(n_data);
 
             // initiate population index for structuring report out objects
             int pop_idx = 0;
@@ -222,11 +228,38 @@ namespace fims_model {
                 fleet_idx += 1;
             }
 
+            // initiate distribution index for structuring report out objects
+            int obs_idx = 0;
+            int re_idx = 0;
+            int priors_idx = 0;
+            for (d_it = this->fims_information->density_components.begin();
+                    d_it != this->fims_information->density_components.end(); ++d_it) {
+                std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
+                
+                #ifdef TMB_MODEL
+                if (d->input_type == "data") {
+                    distribution_obs(obs_idx) = d->distribution_obs;
+                    obs_idx += 1;
+                }
+                if(d->input_type == "random_effects"){
+                    distribution_re(re_idx) = d->distribution_re;
+                    re_idx += 1;
+                }
+                if(d->input_type == "prior"){
+                    distribution_priors(priors_idx) = d->distribution_priors;
+                    priors_idx += 1;
+                }
+                #endif
+                
+            }
+
+
+
             // Reporting
 #ifdef TMB_MODEL
-            //FIMS_REPORT_F(rec_nll, of);
-            //FIMS_REPORT_F(age_comp_nll, of);
-            //FIMS_REPORT_F(index_nll, of);
+            FIMS_REPORT_F(distribution_obs, of);
+            FIMS_REPORT_F(distribution_re, of);
+            FIMS_REPORT_F(distribution_priors, of);
             FIMS_REPORT_F(jnll, of);
             FIMS_REPORT_F(naa, of);
             FIMS_REPORT_F(ssb, of);

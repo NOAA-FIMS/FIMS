@@ -40,6 +40,8 @@ namespace fims_distributions
          */
         virtual const Type evaluate()
         {
+            
+    
             // set dims using observed_values if no user input
             if(dims.size() != 2){
                 dims.resize(2);
@@ -48,6 +50,16 @@ namespace fims_distributions
             }
 
 
+            if(this->input_type == "data"){
+                this->distribution_obs.resize(dims[0], dims[1]);
+                }
+            if(this->input_type == "prior"){
+                this->distribution_priors.resize(dims[0], dims[1]);
+                }
+            if(this->input_type == "random_effects"){
+                this->distribution_re.resize(dims[0], dims[1]);
+            }
+            
             // setup vector for recording the log probability density function values
             Type lpdf = 0.0; /**< total log probability mass contribution of the distribution */
             this->lpdf_vec.resize(dims[0]);
@@ -64,6 +76,7 @@ namespace fims_distributions
                     fims::Vector<Type> prob_vector;
                     x_vector.resize(dims[1]);
                     prob_vector.resize(dims[1]);
+                    
 
                     bool containsNA =
                         false; /**< skips the entire row if any values are NA */
@@ -81,12 +94,19 @@ namespace fims_distributions
                                 size_t idx = (i * dims[1]) + j;
                                 x_vector[j] = this->observed_values->at(i, j);
                                 prob_vector[j] = this->expected_values[idx];
+                                this->distribution_obs(i,j) = this->observed_values->at(i, j);
                             }
                         } else {
                             // if not data (i.e. prior or process), use x vector instead of observed_values
                             size_t idx = (i * dims[1]) + j;
                             x_vector[j] = this->x[idx];
                             prob_vector[j] = this->expected_values[idx];
+                            if(this->input_type == "prior"){
+                                this->distribution_priors(i,j) = this->x[idx];
+                            }
+                            if(this->input_type == "random_effects"){
+                                this->distribution_re(i,j) = this->x[idx];
+                            }
                         }
                     }
 
@@ -103,21 +123,21 @@ namespace fims_distributions
                         {
                             fims::Vector<Type> sim_observed;
                             sim_observed.resize(dims[1]);
-                            sim_observed = rmultinom(prob_vector);
-                            sim_observed.resize(this->x);
+                            sim_observed = fims_math::rmultinom(prob_vector);
                             for (size_t j = 0; j < dims[1]; j++)
                             {
-                                idx = (i * dims[1]) + j;
-                                this->x[idx] = sim_observed[j];
+                                if(this->input_type == "data"){
+                                    this->distribution_obs(i,j) = sim_observed[j];
+                                }
+                                if(this->input_type == "priors"){
+                                    this->distribution_priors(i,j) = sim_observed[j];
+                                }
                             }
                         }
-                    }
-                    */
+                    }*/
                     #endif
                 }
             }
-            #ifdef TMB_MODEL
-            #endif
             return (lpdf);
         }
 

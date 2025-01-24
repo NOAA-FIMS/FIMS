@@ -45,6 +45,16 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       } else {
         n_x = this->x.size();
       }
+      
+      if(this->input_type == "data"){
+          this->distribution_obs.resize(n_x, 1);
+        }
+      if(this->input_type == "prior"){
+          this->distribution_priors.resize(n_x, 1);
+        }
+      if(this->input_type == "random_effects"){
+        this->distribution_re.resize(n_x, 1);
+      }
       // setup vector for recording the log probability density function values
       this->lpdf_vec.resize(n_x);
       std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
@@ -64,15 +74,24 @@ struct NormalLPDF : public DensityComponentBase<Type> {
           this->lpdf_vec[i] = dnorm(this->x[i], this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)), true);
         }
         lpdf += this->lpdf_vec[i];
-        if(this->simulate_flag){
-            FIMS_SIMULATE_F(this->of){
-              if(this->input_type == "data"){
-                this->observed_values->at(i) = rnorm(this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)));
-              } else {
-                this->x[i] = rnorm(this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)));
-              }
+        /*
+        if (this->simulate_flag){
+          FIMS_SIMULATE_F(this->of){ 
+            // preprocessor definition in interface.hpp
+            if(this->input_type == "data"){
+              this->distribution_obs(i,0) = rnorm(this->expected_values.get_force_scalar(i),
+                                                                  fims_math::exp(log_sd.get_force_scalar(i)));
             }
-        }
+            if(this->input_type == "priors"){
+              this->distribution_priors(i,0) = rnorm(this->expected_values.get_force_scalar(i),
+                                              fims_math::exp(log_sd.get_force_scalar(i)));
+            }
+            if(this->input_type == "random_effects"){
+              this->distribution_random_effects(i,0) = fims_math::exp(rnorm(this->expected_values.get_force_scalar(i),
+                                              fims_math::exp(log_sd.get_force_scalar(i))));  
+            }
+          }
+        } */
         #endif
         /* osa not working yet
           if(osa_flag){//data observation type implements osa residuals
@@ -82,9 +101,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
           } */
 
         }
-        #ifdef TMB_MODEL
-        vector<Type> normal_x = this->x;
-        #endif
+        
         return(lpdf);
     }
 
