@@ -153,6 +153,8 @@ parameters <- default_parameters |>
           0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
           -0.19556523, 0.20094360, 0.37248740, -0.07163145
         ),
+        # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
+        # to TRUE. We need to debug the issue, then update the line below accordingly.
         BevertonHoltRecruitment.log_devs.estimated = FALSE
       )
     )

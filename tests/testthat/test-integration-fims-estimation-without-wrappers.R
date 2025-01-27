@@ -257,8 +257,7 @@ test_that("estimation test of fims", {
   # Compare FIMS results with model comparison project OM values
   validate_fims(
     report = result[["report"]],
-    sdr = result[["sdr"]],
-    sdr_report = result[["sdr_report"]],
+    estimates = result[["sdr_report"]],
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
@@ -321,8 +320,7 @@ test_that("agecomp in proportion works", {
   # Compare FIMS results with model comparison project OM values
   validate_fims(
     report = result[["report"]],
-    sdr = TMB::sdreport(result[["obj"]]),
-    sdr_report = result[["sdr_report"]],
+    estimates = result[["sdr_report"]],
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
