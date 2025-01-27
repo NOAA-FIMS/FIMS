@@ -9,6 +9,10 @@
 #' * Timing:
 #'   * Fishery is assumed to operate over the entire year
 #'   * Survey occurs instantaneously at the start of the year
+#' * Note: If you encounter warning messages such as `cannot open 
+#'    the connection: warning messages from top-level task callback 'vsc.workspace'` 
+#'    while running the code in VS Code, try calling 
+#'    `removeTaskCallback("vsc.workspace")` before executing the code. 
 #'
 #' @author Kathryn L. Doering and Kelli F. Johnson
 #'
@@ -383,6 +387,11 @@ length_comp_data <- data.frame(
     ),
     length(len_bins) * length(start_date)
   )
+)
+
+# Save individual dataframes to a single file for {testthat} integration tests
+save(landings_data, index_data, age_data, weightatage_data, length_comp_data, length_age_data, 
+  file = testthat::test_path("fixtures", "integration_test_data_components.RData")
 )
 
 # Add the conversion matrix and length composition data to dataframe

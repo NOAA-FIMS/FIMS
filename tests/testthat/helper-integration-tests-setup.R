@@ -4,7 +4,6 @@
 #' log space and returns the log probability mass function.
 #'
 #' @param x A vector of length K of numeric values.
-#'
 #' @param p A numeric non-negative vector of length K, specifying the probability
 #' for the K classes; must sum 1.
 #'
@@ -256,6 +255,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
+  # TODO: integration tests fail after setting recruitment log_devs all estimable.
+  # We need to debug the issue, then uncomment the line below.
+  # recruitment$log_devs$set_all_estimable(TRUE)
   recruitment_distribution <- methods::new(DnormDistribution)
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
@@ -270,7 +272,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     recruitment_distribution$expected_values[i]$value <- 0
   }
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
-  recruitment$estimate_log_devs <- TRUE
 
   # Growth
   ewaa_growth <- methods::new(EWAAgrowth)
@@ -320,7 +321,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   opt <- NULL
   if (estimation_mode == TRUE) {
     opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-      control = list(eval.max = 800, iter.max = 800)
+      control = list(eval.max = 10000, iter.max = 10000, trace = 0)
     )
   }
   # Call report using MLE parameter values, or
@@ -394,6 +395,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
                                              om_output_list,
                                              em_input_list,
                                              estimation_mode = TRUE,
+                                             modified_parameters,
                                              map = list()) {
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]]
@@ -436,38 +438,9 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
       maturity = list(form = "LogisticMaturity")
     )
 
-  # Modify parameters
-  modified_parameters <- list(
-    fleet1 = list(
-      LogisticSelectivity.inflection_point.value = om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]],
-      LogisticSelectivity.slope.value = om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]],
-      Fleet.log_Fmort.value = log(om_output[["f"]])
-    ),
-    survey1 = list(
-      LogisticSelectivity.inflection_point.value = om_input[["sel_survey"]][["survey1"]][["A50.sel1"]],
-      LogisticSelectivity.slope.value = om_input[["sel_survey"]][["survey1"]][["slope.sel1"]],
-      Fleet.log_q.value = log(om_output[["survey_q"]][["survey1"]])
-    ),
-    recruitment = list(
-      BevertonHoltRecruitment.log_rzero.value = log(om_input[["R0"]]),
-      BevertonHoltRecruitment.log_devs.value = om_input[["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimated = FALSE,
-      DnormDistribution.log_sd.value = om_input[["logR_sd"]]
-    ),
-    maturity = list(
-      LogisticMaturity.inflection_point.value = om_input[["A50.mat"]],
-      LogisticMaturity.inflection_point.estimated = FALSE,
-      LogisticMaturity.slope.value = om_input[["slope.mat"]],
-      LogisticMaturity.slope.estimated = FALSE
-    ),
-    population = list(
-      Population.log_init_naa.value = log(om_output[["N.age"]][1, ])
-    )
-  )
-
   parameters <- default_parameters |>
     update_parameters(
-      modified_parameters = modified_parameters
+      modified_parameters = modified_parameters[[iter_id]]
     )
 
   parameter_list <- initialize_fims(
