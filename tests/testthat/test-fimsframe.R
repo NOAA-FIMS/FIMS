@@ -1,6 +1,5 @@
 # tests for input objects
-data("data1", package = "FIMS")
-fims_frame <- FIMSFrame(data1)
+fims_frame <- FIMS::FIMSFrame(data1)
 
 test_that("Can create the S4 FIMSFrame classes", {
   expect_s4_class(fims_frame, "FIMSFrame")
