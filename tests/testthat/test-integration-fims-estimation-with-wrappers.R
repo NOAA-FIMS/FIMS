@@ -205,22 +205,22 @@ test_that("nll test of fims", {
   survey_lengthcomp_expected <- om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]])
   lengthcomp_nll_fleet <- lengthcomp_nll_survey <- 0
   for (y in 1:om_input_list[[iter_id]][["nyr"]]) {
-  # test using FIMS_dmultinom which matches the TMB dmultinom calculation and differs from R 
-  # by NOT rounding obs to the nearest integer.
+    # test using FIMS_dmultinom which matches the TMB dmultinom calculation and differs from R
+    # by NOT rounding obs to the nearest integer.
     lengthcomp_nll_fleet <- lengthcomp_nll_fleet -
       FIMS_dmultinom(
         fishing_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.L.lengthcomp"]][["fleet1"]],
         fishing_lengthcomp_expected[y, ]
       )
-  
+
     lengthcomp_nll_survey <- lengthcomp_nll_survey -
       FIMS_dmultinom(
-        survey_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.survey.lengthcomp"]][["survey1"]], 
+        survey_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.survey.lengthcomp"]][["survey1"]],
         survey_lengthcomp_expected[y, ]
       )
   }
   lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
-  
+
   expected_jnll <- rec_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
 
