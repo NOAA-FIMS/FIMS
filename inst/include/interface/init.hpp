@@ -14,53 +14,52 @@
  * @brief Callback definition for TMB C++ functions.
  */
 #ifndef TMB_CALLDEFS
-#define TMB_CALLDEFS                                             \
-  {"MakeADFunObject", (DL_FUNC)&MakeADFunObject, 4},             \
-      {"InfoADFunObject", (DL_FUNC)&InfoADFunObject, 1},         \
-      {"EvalADFunObject", (DL_FUNC)&EvalADFunObject, 3},         \
-      {"MakeDoubleFunObject", (DL_FUNC)&MakeDoubleFunObject, 3}, \
-      {"EvalDoubleFunObject", (DL_FUNC)&EvalDoubleFunObject, 3}, \
-      {"getParameterOrder", (DL_FUNC)&getParameterOrder, 3},     \
-      {"MakeADGradObject", (DL_FUNC)&MakeADGradObject, 3},       \
-      {"MakeADHessObject2", (DL_FUNC)&MakeADHessObject2, 4},     \
-      {"usingAtomics", (DL_FUNC)&usingAtomics, 0}, {             \
-    "TMBconfig", (DL_FUNC)&TMBconfig, 2                          \
+#define TMB_CALLDEFS                                               \
+  {"MakeADFunObject", (DL_FUNC) & MakeADFunObject, 4},             \
+      {"InfoADFunObject", (DL_FUNC) & InfoADFunObject, 1},         \
+      {"EvalADFunObject", (DL_FUNC) & EvalADFunObject, 3},         \
+      {"MakeDoubleFunObject", (DL_FUNC) & MakeDoubleFunObject, 3}, \
+      {"EvalDoubleFunObject", (DL_FUNC) & EvalDoubleFunObject, 3}, \
+      {"getParameterOrder", (DL_FUNC) & getParameterOrder, 3},     \
+      {"MakeADGradObject", (DL_FUNC) & MakeADGradObject, 3},       \
+      {"MakeADHessObject2", (DL_FUNC) & MakeADHessObject2, 4},     \
+      {"usingAtomics", (DL_FUNC) & usingAtomics, 0}, {             \
+    "TMBconfig", (DL_FUNC) & TMBconfig, 2                          \
   }
 #endif
 
 /**
  * @brief TODO: provide a brief description.
- * 
+ *
  */
-#define CALLDEF(name, n) \
-  { #name, (DL_FUNC)&name, n }
+#define CALLDEF(name, n) {#name, (DL_FUNC) & name, n}
 
 extern "C" {
 
 /**
  * @brief TODO: provide a brief description.
- * 
- * @param mean 
- * @param nu 
- * @return SEXP 
+ *
+ * @param mean
+ * @param nu
+ * @return SEXP
  */
 SEXP compois_calc_var(SEXP mean, SEXP nu);
 /**
  * @brief TODO: provide a brief description.
- * 
- * @return SEXP 
+ *
+ * @return SEXP
  */
 SEXP omp_check();
 /**
  * @brief TODO: provide a brief description.
- * 
- * @return SEXP 
+ *
+ * @return SEXP
  */
 SEXP omp_num_threads(SEXP);
 /**
  * @brief TODO: provide a brief description.
- * 
- * @return SEXP 
+ *
+ * @return SEXP
  */
 SEXP _rcpp_module_boot_fims();
 

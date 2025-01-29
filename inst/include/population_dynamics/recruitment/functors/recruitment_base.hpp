@@ -1,4 +1,4 @@
-/** 
+/**
  * @file recruitment_base.hpp
  * @brief Serves as the parent class where recruitment functions are called.
  * @details Defines guards for recruitment base outline to define the
@@ -28,12 +28,12 @@ template <class Type>
 struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /**< reference id for recruitment object*/
 
-  fims::Vector<Type>
-      log_recruit_devs; /*!< A vector of the natural log of recruitment deviations */
-  bool constrain_deviations = false; /*!< A flag to indicate if recruitment
-                                 deviations are summing to zero or not */
+  fims::Vector<Type> log_recruit_devs; /*!< A vector of the natural log of
+                                          recruitment deviations */
+  bool constrain_deviations = false;   /*!< A flag to indicate if recruitment
+                                   deviations are summing to zero or not */
 
-  fims::Vector<Type> log_rzero;         /**< Natural log of unexploited recruitment.*/
+  fims::Vector<Type> log_rzero; /**< Natural log of unexploited recruitment.*/
 
   bool estimate_log_recruit_devs = true; /*!< A flag to indicate if recruitment
                                   deviations are estimated or not */
@@ -59,7 +59,6 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   virtual const Type evaluate(
       const Type &spawners,
       const Type &ssbzero) = 0;  // need to add input parameter values
-
 
   /** @brief Prepare constrained recruitment deviations.
    *  Based on ADMB sum-to-zero constraint implementation. We still
