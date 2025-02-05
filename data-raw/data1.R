@@ -9,10 +9,10 @@
 #' * Timing:
 #'   * Fishery is assumed to operate over the entire year
 #'   * Survey occurs instantaneously at the start of the year
-#' * Note: If you encounter warning messages such as `cannot open 
-#'    the connection: warning messages from top-level task callback 'vsc.workspace'` 
-#'    while running the code in VS Code, try calling 
-#'    `removeTaskCallback("vsc.workspace")` before executing the code. 
+#' * Note: If you encounter warning messages such as `cannot open the
+#'   connection: warning messages from top-level task callback
+#'   'vsc.workspace'` while running the code in VS Code, try calling
+#'   `removeTaskCallback("vsc.workspace")` before executing the code.
 #'
 #' @author Kathryn L. Doering and Kelli F. Johnson
 #'
@@ -66,7 +66,8 @@ ASSAMC::run_om(input_list = sim_input)
 
 setwd(working_dir)
 
-# Helper function to calculate length at age using the von Bertalanffy growth model
+# Helper function to calculate length at age using the von Bertalanffy growth
+# model
 # a: current age
 # Linf: asymptotic average length
 # K: Growth coefficient
@@ -75,7 +76,8 @@ AtoL <- function(a, Linf, K, a_0) {
   L <- Linf * (1 - exp(-K * (a - a_0)))
 }
 
-# Initialize lists for operating model (OM) and estimation model (EM) inputs and outputs
+# Initialize lists for operating model (OM) and estimation model (EM) inputs
+# and outputs
 om_input_list <- om_output_list <- em_input_list <-
   vector(mode = "list", length = sim_num)
 
@@ -103,19 +105,27 @@ for (iter in 1:sim_num) {
 
   # Create length at age conversion matrix and fill proportions using above
   # growth parameters
-  age_to_length_conversion <- matrix(NA, nrow = length(ages), ncol = length(len_bins))
+  age_to_length_conversion <- matrix(
+    NA,
+    nrow = length(ages),
+    ncol = length(len_bins)
+  )
   for (age in seq_along(ages)) {
     # Calculate mean length at age to spread lengths around
     mean_length <- AtoL(ages[age], Linf, K, a0)
     # mean_length <- AtoLSchnute(ages[age],L1,L2,a1,a2,Ks)
     # Calculate the cumulative proportion shorter than each composition length
-    temp_len_probs <- pnorm(q = len_bins, mean = mean_length, sd = mean_length * cv)
+    temp_len_probs <- pnorm(
+      q = len_bins,
+      mean = mean_length,
+      sd = mean_length * cv
+    )
     # Reset the first length proportion to zero so the first bin includes all
     # density smaller than that bin
     temp_len_probs[1] <- 0
-    # subtract the offset length probabilities to calculate the proportion in each
-    # bin. For each length bin the proportion is how many fish are larger than this
-    # length but shorter than the next bin length.
+    # subtract the offset length probabilities to calculate the proportion in
+    # each bin. For each length bin the proportion is how many fish are larger
+    # than this length but shorter than the next bin length.
     temp_len_probs <- c(temp_len_probs[-1], 1) - temp_len_probs
     age_to_length_conversion[age, ] <- temp_len_probs
   }
@@ -132,20 +142,42 @@ for (iter in 1:sim_num) {
 
   om_output[["L.length"]] <- list()
   om_output[["survey_length_comp"]] <- list()
-  om_output[["N.length"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
-  om_output[["L.length"]][["fleet1"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
-  om_output[["survey_length_comp"]][["survey1"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
+  om_output[["N.length"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
+  om_output[["L.length"]][["fleet1"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
+  om_output[["survey_length_comp"]][["survey1"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
 
   em_input[["L.length.obs"]] <- list()
   em_input[["survey.length.obs"]] <- list()
-  em_input[["L.length.obs"]][["fleet1"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
-  em_input[["survey.length.obs"]][["survey1"]] <- matrix(0, nrow = om_input[["nyr"]], ncol = length(len_bins))
+  em_input[["L.length.obs"]][["fleet1"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
+  em_input[["survey.length.obs"]][["survey1"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
 
   em_input[["lengths"]] <- len_bins
   em_input[["nlengths"]] <- length(len_bins)
   em_input[["cv.length_at_age"]] <- cv
   em_input[["age_to_length_conversion"]] <- age_to_length_conversion
-  em_input[["n.L.lengthcomp"]][["fleet1"]] <- em_input[["n.survey.lengthcomp"]][["survey1"]] <- 200
+  n_length_compositions <- 200
+  em_input[["n.L.lengthcomp"]][["fleet1"]] <- n_length_compositions
+  em_input[["n.survey.lengthcomp"]][["survey1"]] <- n_length_compositions
 
   # Populate length-based outputs for each year, length bin, and age
   for (i in seq_along(om_input[["year"]])) {
@@ -178,7 +210,13 @@ for (iter in 1:sim_num) {
   # Save updated inputs and outputs to file
   save(
     om_input, om_output, em_input,
-    file = file.path(main_dir, "sim_data", "output", "OM", paste0("OM", iter, ".RData"))
+    file = file.path(
+      main_dir,
+      "sim_data",
+      "output",
+      "OM",
+      paste0("OM", iter, ".RData")
+    )
   )
   # Store inputs and outputs in respective lists
   om_input_list[[iter]] <- om_input
@@ -187,13 +225,22 @@ for (iter in 1:sim_num) {
 }
 
 # Save all simulations to a single file for {testthat} integration tests
-save(om_input_list, om_output_list, em_input_list,
+save(
+  om_input_list, om_output_list, em_input_list,
   file = testthat::test_path("fixtures", "integration_test_data.RData")
 )
 
 # Load a specific simulation for further processing
 sim_id <- 1
-load(file.path(main_dir, "sim_data", "output", "OM", paste0("OM", sim_id, ".RData")))
+load(
+  file.path(
+    main_dir,
+    "sim_data",
+    "output",
+    "OM",
+    paste0("OM", sim_id, ".RData")
+  )
+)
 
 # Return the loaded data
 returnedom <- list(
@@ -390,8 +437,17 @@ length_comp_data <- data.frame(
 )
 
 # Save individual dataframes to a single file for {testthat} integration tests
-save(landings_data, index_data, age_data, weightatage_data, length_comp_data, length_age_data, 
-  file = testthat::test_path("fixtures", "integration_test_data_components.RData")
+save(
+  landings_data,
+  index_data,
+  age_data,
+  weightatage_data,
+  length_comp_data,
+  length_age_data, 
+  file = testthat::test_path(
+    "fixtures",
+    "integration_test_data_components.RData"
+  )
 )
 
 # Add the conversion matrix and length composition data to dataframe
