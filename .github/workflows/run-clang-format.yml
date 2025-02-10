@@ -9,7 +9,6 @@ name: run-clang-format
 on:
   push:
     branches:
-      - dev
       - main
   workflow_dispatch:
 
