@@ -759,7 +759,7 @@ initialize_fims <- function(parameters, data) {
 
   recruitment_distribution <- initialize_process_distribution(
     module = recruitment,
-    par = names(parameters$modules$recruitment$process_distribution),
+    par = names(parameters$modules$recruitment$process_distribution[1]),
     family = gaussian(),
     sd = list(
       value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
@@ -767,7 +767,7 @@ initialize_fims <- function(parameters, data) {
         "recruitment"
       ]][[field_estimated_name]]
     ),
-    is_random_effect = FALSE
+    is_random_effect = as.logical(parameters$modules$recruitment$process_distribution[2])
   )
 
   # Growth

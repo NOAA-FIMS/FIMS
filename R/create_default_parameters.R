@@ -414,10 +414,12 @@ create_default_BevertonHoltRecruitment <- function(data) {
   default <- list(
     log_rzero.value = log(1e+06),
     log_rzero.estimated = TRUE,
+    log_rzero.random = FALSE,
     logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
     logit_steep.estimated = FALSE,
     log_devs.value = rep(0.0, get_n_years(data) - 1),
     log_devs.estimated = TRUE,
+    log_devs.random = FALSE,
     estimate_log_devs = TRUE
   )
   return(default)
@@ -442,7 +444,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
 create_default_DnormDistribution <- function(
     value = 0.1,
     data,
-    input_type = c("data", "process")) {
+    input_type = c("data", "process", "random", "prior")) {
   # Input checks
   input_type <- rlang::arg_match(input_type)
 
@@ -452,8 +454,12 @@ create_default_DnormDistribution <- function(
     log_sd.estimated = FALSE
   )
 
+  if(input_type == "random" ){
+    log_sd.estimated = TRUE
+  }
+
   # If input_type is 'process', add additional parameters
-  if (input_type == "process") {
+  if (input_type == "process" | input_type == "prior") {
     default <- c(
       default,
       list(
@@ -553,9 +559,14 @@ create_default_recruitment <- function(
     "BevertonHoltRecruitment" = create_default_BevertonHoltRecruitment(data)
   )
   names(process_default) <- paste0(form, ".", names(process_default))
+  # set random_effects to true or false based on used input
+  process_parm_name <-  names(recruitment[["process_distribution"]])[1]
+  process_args <- process_default[grep(process_parm_name, names(process_default))]
+  process_args[grep("random", names(process_args))] <- 
+    recruitment[["process_distribution"]][[2]]
 
   # Create default distribution parameters based on the distribution type
-  distribution_input <- recruitment[["process_distribution"]]
+  distribution_input <- recruitment[["process_distribution"]][1]
   distribution_default <- NULL
   if (!is.null(distribution_input)) {
     distribution_default <- switch(distribution_input,
@@ -569,6 +580,10 @@ create_default_recruitment <- function(
       ".",
       names(distribution_default)
     )
+  }
+
+  if(recruitment[["process_distribution"]][[2]]){
+    distribution_default$DnormDistribution.log_sd.estimated <- TRUE
   }
 
   # Combine process and distribution defaults into a single list

@@ -187,8 +187,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         }
       }
 
-      for (R_xlen_t i = 0; i < this->estimated_log_devs.size(); i++) {
-        if (this->log_devs[i].estimated_m) {
+      for (R_xlen_t i = 0; i < this->log_devs.size(); i++) {
+        if (this->log_devs[i].estimated_m | this->log_devs[i].is_random_effect_m ) {
           this->log_devs[i].final_value_m = recr->log_recruit_devs[i];
         } else {
           this->log_devs[i].final_value_m = this->log_devs[i].initial_value_m;
@@ -285,10 +285,16 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     for (size_t i = 0; i < this->log_devs.size(); i++) {
       recruitment->log_recruit_devs[i] = this->log_devs[i].initial_value_m;
       if (this->log_devs[i].estimated_m) {
+        recruitment->estimate_log_recruit_devs = true;
+        if (this->log_devs[i].is_random_effect_m) { 
+        info->RegisterRandomEffect(recruitment->log_recruit_devs[i]);
+        } else {
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
+        }
       } else {
         recruitment->estimate_log_recruit_devs = false;
-      }
+      } 
+     
     }
     info->variable_map[this->log_devs.id_m] = &(recruitment)->log_recruit_devs;
 
