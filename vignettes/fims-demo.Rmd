@@ -153,7 +153,7 @@ parameters <- default_parameters |>
           0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
           -0.19556523, 0.20094360, 0.37248740, -0.07163145
         ),
-        BevertonHoltRecruitment.log_devs.estimated = FALSE
+        BevertonHoltRecruitment.log_devs.estimated = TRUE
       )
     )
   ) |>

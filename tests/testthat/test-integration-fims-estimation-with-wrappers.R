@@ -311,7 +311,7 @@ test_that("estimation test with age and length comp using wrappers", {
     recruitment = list(
       BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]][["R0"]]),
       BevertonHoltRecruitment.log_devs.value = om_input_list[[1]][["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimated = FALSE,
+      BevertonHoltRecruitment.log_devs.estimated = TRUE,
       DnormDistribution.log_sd.value = om_input_list[[1]][["logR_sd"]]
     ),
     maturity = list(

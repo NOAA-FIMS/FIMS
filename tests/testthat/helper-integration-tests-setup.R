@@ -256,6 +256,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
+  recruitment$log_devs$set_all_estimable(TRUE)
   recruitment_distribution <- methods::new(DnormDistribution)
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
@@ -270,7 +271,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     recruitment_distribution$expected_values[i]$value <- 0
   }
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
-  recruitment$estimate_log_devs <- TRUE
+  # recruitment$estimate_log_devs <- TRUE
 
   # Growth
   ewaa_growth <- methods::new(EWAAgrowth)
@@ -451,7 +452,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
     recruitment = list(
       BevertonHoltRecruitment.log_rzero.value = log(om_input[["R0"]]),
       BevertonHoltRecruitment.log_devs.value = om_input[["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimated = FALSE,
+      BevertonHoltRecruitment.log_devs.estimated = TRUE,
       DnormDistribution.log_sd.value = om_input[["logR_sd"]]
     ),
     maturity = list(

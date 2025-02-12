@@ -475,7 +475,7 @@ fit_fims <- function(input,
   if (number_of_loops < 0) {
     cli::cli_abort("number_of_loops ({.par {number_of_loops}}) must be >= 0.")
   }
-  obj <- MakeADFun(
+  obj <- TMB::MakeADFun(
     data = list(),
     parameters = input$parameters,
     map = input$map,
