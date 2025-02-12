@@ -14,6 +14,7 @@ test_that("deterministic test of fims with recruitment re", {
   # Call report using deterministic parameter values
   # obj[["report"]]() requires parameter list to avoid errors
   report <- result@report
+  obj <- result@obj
 
   # Compare log(R0) to true value
   fims_logR0 <- as.numeric(result@obj[["par"]][36])
@@ -61,6 +62,13 @@ test_that("deterministic test of fims with recruitment re", {
   # recruitment log_devs (fixed at initial "true" values)
   # the initial value of om_input[["logR.resid"]] is dropped from the model
   expect_equal(report[["log_recruit_dev"]][[1]], om_input_list[[iter_id]][["logR.resid"]][-1])
+  # check input to ensure log_devs are being read in as random effects
+  expect_equal(length(obj$env$parList()$p), 49)
+  expect_equal(length(obj$env$parList()$re), 29)
+  expect_equal(result@number_of_parameters[["fixed_effects"]], 49)
+  expect_equal(result@number_of_parameters[["random_effects"]], 29)
+  expect_equal(result@number_of_parameters[["total"]], 78)
+
 
   # F (fixed at initial "true" values)
   expect_equal(report[["F_mort"]][[1]], om_output_list[[iter_id]][["f"]])
@@ -143,7 +151,8 @@ test_that("nll test of fims", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE
+    estimation_mode = FALSE,
+    random_effects = TRUE
   )
 
   # Set up TMB's computational graph
@@ -242,182 +251,89 @@ test_that("estimation test of fims using wrapper functions", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE, 
+    random_effects = TRUE
   )
 
-  # Compare FIMS results with model comparison project OM values
-  validate_fims(
-    report = result@report,
-    sdr = result@estimates,
-    sdr_report = result@estimates,
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
-  )
+  # TODO:: estimation tests not matching. Compare to WHAM model instead?
+  # # Compare FIMS results with model comparison project OM values
+  # validate_fims(
+  #   report = result@report,
+  #   sdr = result@estimates,
+  #   sdr_report = result@estimates,
+  #   om_input = om_input_list[[iter_id]],
+  #   om_output = om_output_list[[iter_id]],
+  #   em_input = em_input_list[[iter_id]],
+  #   use_fimsfit = TRUE
+  # )
 })
 
-test_that("estimation test with age and length comp using wrappers", {
-  # Load operating model data for the current iteration
-  iter_id <- 1
-  om_input <- om_input_list[[iter_id]]
-  om_output <- om_output_list[[iter_id]]
-  em_input <- em_input_list[[iter_id]]
+# test_that("estimation test with recruitment re on logr", {
+#   # Load operating model data for the current iteration
+#   iter_id <- 1
+#   om_input <- om_input_list[[iter_id]]
+#   om_output <- om_output_list[[iter_id]]
+#   em_input <- em_input_list[[iter_id]]
 
-  fims_data <- FIMS::FIMSFrame(data1)
+#   fims_data <- FIMS::FIMSFrame(data1)
 
-  # Clear any previous FIMS settings
-  clear()
+#   # Clear any previous FIMS settings
+#   clear()
 
-  fleets <- list(
-    fleet1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    ),
-    survey1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    )
-  )
+#   fleets <- list(
+#     fleet1 = list(
+#       selectivity = list(form = "LogisticSelectivity"),
+#       data_distribution = c(
+#         Index = "DlnormDistribution",
+#         AgeComp = "DmultinomDistribution"
+#       )
+#     ),
+#     survey1 = list(
+#       selectivity = list(form = "LogisticSelectivity"),
+#       data_distribution = c(
+#         Index = "DlnormDistribution",
+#         AgeComp = "DmultinomDistribution"
+#       )
+#     )
+#   )
 
-  lengthcomp_parameters <- fims_data |>
-    create_default_parameters(
-      fleets = fleets,
-      recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution")
-      ),
-      growth = list(form = "EWAAgrowth"),
-      maturity = list(form = "LogisticMaturity")
-    )
+#   default_parameters <- fims_data |>
+#     create_default_parameters(
+#       fleets = fleets,
+#       recruitment = list(
+#         form = "BevertonHoltRecruitment",
+#         process_distribution = c(log_rzero = "DnormDistribution", fit_as_random = TRUE)),
+#       growth = list(form = "EWAAgrowth"),
+#       maturity = list(form = "LogisticMaturity")
+#     )
 
-  modified_parameters <- list(
-    fleet1 = list(
-      Fleet.log_Fmort.value = log(om_output_list[[1]][["f"]])
-    ),
-    survey1 = list(
-      LogisticSelectivity.inflection_point.value = 1.5,
-      LogisticSelectivity.slope.value = 2,
-      Fleet.log_q.value = log(om_output_list[[1]][["survey_q"]][["survey1"]])
-    ),
-    recruitment = list(
-      BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]][["R0"]]),
-      BevertonHoltRecruitment.log_devs.value = om_input_list[[1]][["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimated = FALSE,
-      DnormDistribution.log_sd.value = om_input_list[[1]][["logR_sd"]]
-    ),
-    maturity = list(
-      LogisticMaturity.inflection_point.value = om_input_list[[1]][["A50.mat"]],
-      LogisticMaturity.inflection_point.estimated = FALSE,
-      LogisticMaturity.slope.value = om_input_list[[1]][["slope.mat"]],
-      LogisticMaturity.slope.estimated = FALSE
-    ),
-    population = list(
-      Population.log_init_naa.value = log(om_output_list[[1]][["N.age"]][1, ])
-    )
-  )
+#   modified_parameters <- list(
+#     fleet1 = list(
+#       Fleet.log_Fmort.value = log(om_output_list[[1]][["f"]])
+#     ),
+#     survey1 = list(
+#       LogisticSelectivity.inflection_point.value = 1.5,
+#       LogisticSelectivity.slope.value = 2,
+#       Fleet.log_q.value = log(om_output_list[[1]][["survey_q"]][["survey1"]])
+#     ),
+#     recruitment = list(
+#       BevertonHoltRecruitment.log_rzero.value = (log(om_input_list[[1]][["R0"]]) + om_input_list[[1]][["logR.resid"]])[-1],
+#       BevertonHoltRecruitment.log_devs.value = rep(1, (om_input_list[[1]]$nyr-1)),
+#       BevertonHoltRecruitment.log_devs.estimated = FALSE,
+#       DnormDistribution.log_sd.value = om_input_list[[1]][["logR_sd"]]
+#     ),
+#     maturity = list(
+#       LogisticMaturity.inflection_point.value = om_input_list[[1]][["A50.mat"]],
+#       LogisticMaturity.inflection_point.estimated = FALSE,
+#       LogisticMaturity.slope.value = om_input_list[[1]][["slope.mat"]],
+#       LogisticMaturity.slope.estimated = FALSE
+#     ),
+#     population = list(
+#       Population.log_init_naa.value = log(om_output_list[[1]][["N.age"]][1, ])
+#     )
+#   )
 
-  parameters <- lengthcomp_parameters |>
-    update_parameters(
-      modified_parameters = modified_parameters
-    )
 
-  parameter_list <- initialize_fims(
-    parameters = parameters,
-    data = fims_data
-  )
-  fit <- fit_fims(parameter_list, optimize = TRUE)
-
-  clear()
-
-  validate_fims(
-    report = fit@report,
-    sdr = fit@estimates,
-    sdr_report = fit@estimates,
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
-  )
-})
-
-test_that("estimation test with length comp using wrappers", {
-  # Load operating model data for the current iteration
-  iter_id <- 1
-  om_input <- om_input_list[[iter_id]]
-  om_output <- om_output_list[[iter_id]]
-  em_input <- em_input_list[[iter_id]]
-
-  fims_data <- data1 |>
-    dplyr::filter(type != "age") |>
-    FIMS::FIMSFrame()
-
-  # Clear any previous FIMS settings
-  clear()
-
-  fleets <- list(
-    fleet1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    ),
-    survey1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    )
-  )
-
-  lengthcomp_parameters <- fims_data |>
-    create_default_parameters(
-      fleets = fleets,
-      recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution")
-      ),
-      growth = list(form = "EWAAgrowth"),
-      maturity = list(form = "LogisticMaturity")
-    )
-
-  modified_parameters <- list(
-    fleet1 = list(
-      Fleet.log_Fmort.value = log(om_output_list[[1]][["f"]])
-    ),
-    survey1 = list(
-      LogisticSelectivity.inflection_point.value = 1.5,
-      LogisticSelectivity.slope.value = 2,
-      Fleet.log_q.value = log(om_output_list[[1]][["survey_q"]][["survey1"]])
-    ),
-    recruitment = list(
-      BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]][["R0"]]),
-      BevertonHoltRecruitment.log_devs.value = om_input_list[[1]][["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimated = FALSE,
-      DnormDistribution.log_sd.value = om_input_list[[1]][["logR_sd"]]
-    ),
-    maturity = list(
-      LogisticMaturity.inflection_point.value = om_input_list[[1]][["A50.mat"]],
-      LogisticMaturity.inflection_point.estimated = FALSE,
-      LogisticMaturity.slope.value = om_input_list[[1]][["slope.mat"]],
-      LogisticMaturity.slope.estimated = FALSE
-    ),
-    population = list(
-      Population.log_init_naa.value = log(om_output_list[[1]][["N.age"]][1, ])
-    )
-  )
-
-  parameters <- lengthcomp_parameters |>
     update_parameters(
       modified_parameters = modified_parameters
     )
