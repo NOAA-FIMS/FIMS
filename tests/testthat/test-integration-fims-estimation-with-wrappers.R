@@ -234,6 +234,99 @@ test_that("nll test of fims", {
   expect_equal(jnll, expected_jnll)
 })
 
+test_that("estimation test with age comp using wrappers", {
+  # Load operating model data for the current iteration
+  iter_id <- 1
+  om_input <- om_input_list[[iter_id]]
+  om_output <- om_output_list[[iter_id]]
+  em_input <- em_input_list[[iter_id]]
+
+  fims_data <- data1 |>
+    dplyr::filter(type != "length") |>
+    dplyr::filter(type != "age-to-length-conversion") |>
+    FIMS::FIMSFrame()
+
+  # Clear any previous FIMS settings
+  clear()
+
+  fleets <- list(
+    fleet1 = list(
+      selectivity = list(form = "LogisticSelectivity"),
+      data_distribution = c(
+        Index = "DlnormDistribution",
+        AgeComp = "DmultinomDistribution"
+      )
+    ),
+    survey1 = list(
+      selectivity = list(form = "LogisticSelectivity"),
+      data_distribution = c(
+        Index = "DlnormDistribution",
+        AgeComp = "DmultinomDistribution"
+      )
+    )
+  )
+
+  agecomp_parameters <- fims_data |>
+    create_default_parameters(
+      fleets = fleets,
+      recruitment = list(
+        form = "BevertonHoltRecruitment",
+        process_distribution = c(log_devs = "DnormDistribution")
+      ),
+      growth = list(form = "EWAAgrowth"),
+      maturity = list(form = "LogisticMaturity")
+    )
+
+  modified_parameters <- list(
+    fleet1 = list(
+      Fleet.log_Fmort.value = log(om_output_list[[1]][["f"]])
+    ),
+    survey1 = list(
+      LogisticSelectivity.inflection_point.value = 1.5,
+      LogisticSelectivity.slope.value = 2,
+      Fleet.log_q.value = log(om_output_list[[1]][["survey_q"]][["survey1"]])
+    ),
+    recruitment = list(
+      BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]][["R0"]]),
+      BevertonHoltRecruitment.log_devs.value = om_input_list[[1]][["logR.resid"]][-1],
+      BevertonHoltRecruitment.log_devs.estimated = TRUE,
+      DnormDistribution.log_sd.value = om_input_list[[1]][["logR_sd"]]
+    ),
+    maturity = list(
+      LogisticMaturity.inflection_point.value = om_input_list[[1]][["A50.mat"]],
+      LogisticMaturity.inflection_point.estimated = FALSE,
+      LogisticMaturity.slope.value = om_input_list[[1]][["slope.mat"]],
+      LogisticMaturity.slope.estimated = FALSE
+    ),
+    population = list(
+      Population.log_init_naa.value = log(om_output_list[[1]][["N.age"]][1, ])
+    )
+  )
+
+  parameters <- agecomp_parameters |>
+    update_parameters(
+      modified_parameters = modified_parameters
+    )
+
+  parameter_list <- initialize_fims(
+    parameters = parameters,
+    data = fims_data
+  )
+  fit <- fit_fims(parameter_list, optimize = TRUE)
+
+  clear()
+
+  validate_fims(
+    report = fit@report,
+    sdr = fit@estimates,
+    sdr_report = fit@estimates,
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+})
+
 test_that("estimation test of fims using wrapper functions", {
   # Initialize the iteration identifier and run FIMS with the 1st set of OM values
   iter_id <- 1

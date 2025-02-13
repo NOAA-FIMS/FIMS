@@ -256,7 +256,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
-  recruitment$log_devs$set_all_estimable(TRUE)
   recruitment_distribution <- methods::new(DnormDistribution)
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
