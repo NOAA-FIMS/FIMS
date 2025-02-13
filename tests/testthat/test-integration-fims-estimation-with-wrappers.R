@@ -47,7 +47,7 @@ test_that("deterministic test of fims", {
     om_output_list = om_output_list,
     em_input_list = em_input_list,
     estimation_mode = FALSE,
-    modified_parameters = modified_parameters 
+    modified_parameters = modified_parameters
   )
 
   # Call report using deterministic parameter values
@@ -56,7 +56,7 @@ test_that("deterministic test of fims", {
   estimates <- get_estimates(result)
 
   # Compare log(R0) to true value
-  fims_logR0 <- estimates |> 
+  fims_logR0 <- estimates |>
     dplyr::filter(name == "log_rzero") |>
     dplyr::pull(value)
   expect_gt(fims_logR0, 0.0)
@@ -193,7 +193,7 @@ test_that("nll test of fims", {
   estimates <- get_estimates(result)
 
   # log(R0)
-  fims_logR0 <- estimates |> 
+  fims_logR0 <- estimates |>
     dplyr::filter(name == "log_rzero") |>
     dplyr::pull(value)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]][["R0"]]))
