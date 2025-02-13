@@ -50,7 +50,7 @@ for (i in 1:sim_num) {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE, 
+    estimation_mode = TRUE,
     modified_parameters = modified_parameters
   )
 }

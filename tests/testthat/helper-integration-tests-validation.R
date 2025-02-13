@@ -39,16 +39,16 @@ validate_fims <- function(
     om_output,
     em_input,
     use_fimsfit = FALSE) {
-
   # Helper function to validate estimates against expected values
   validate_error <- function(expected,
                              param_name,
                              use_fimsfit = FALSE,
                              estimates = NULL) {
-    
     # Extract estimates based on whether fimsfit is used
     if (use_fimsfit) {
-      object <- estimates |> dplyr::filter(name == param_name) |> dplyr::select(value, se)
+      object <- estimates |>
+        dplyr::filter(name == param_name) |>
+        dplyr::select(value, se)
     } else {
       object <- estimates[(rownames(estimates) == param_name), ]
     }
@@ -90,13 +90,13 @@ validate_fims <- function(
   # Recruitment
   # Expect recruitment from report equal to number at age 1 from estimates
   naa1_id <- seq(1, (om_input[["nyr"]] * om_input[["nages"]]), by = om_input[["nages"]])
-  if (use_fimsfit){
+  if (use_fimsfit) {
     expect_equal(
       report[["recruitment"]][[1]][1:om_input[["nyr"]]],
       estimates |>
         dplyr::filter(name == "NAA") |>
         dplyr::slice(naa1_id) |>
-        dplyr::pull(value) 
+        dplyr::pull(value)
     )
   } else {
     expect_equal(
@@ -104,11 +104,11 @@ validate_fims <- function(
       as.numeric(estimates[rownames(estimates) == "NAA", "Estimate"][naa1_id])
     )
   }
-  
+
   # Recruitment log deviations
   # The initial value of om_input[["logR.resid"]] is dropped from the model
-  # TODO: the estimates table contains fixed "true" values for LogRecDev, causing 
-  # the test below to pass even when recruitment log_devs are fixed. Need to add 
+  # TODO: the estimates table contains fixed "true" values for LogRecDev, causing
+  # the test below to pass even when recruitment log_devs are fixed. Need to add
   # additional checks to verify that real estimates are being extracted?
   validate_error(
     expected = om_input[["logR.resid"]][-1],
@@ -139,8 +139,10 @@ validate_fims <- function(
 
   # Expected survey number at age
   validate_error(
-    expected = c(t(om_output[["L.age"]][["fleet1"]]), 
-    t(om_output[["survey_age_comp"]][["survey1"]])),
+    expected = c(
+      t(om_output[["L.age"]][["fleet1"]]),
+      t(om_output[["survey_age_comp"]][["survey1"]])
+    ),
     param_name = "CNAA",
     use_fimsfit = use_fimsfit,
     estimates = estimates
