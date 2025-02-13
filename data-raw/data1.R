@@ -443,7 +443,7 @@ save(
   age_data,
   weightatage_data,
   length_comp_data,
-  length_age_data, 
+  length_age_data,
   file = testthat::test_path(
     "fixtures",
     "integration_test_data_components.RData"
