@@ -1,14 +1,52 @@
 load(test_path("fixtures", "integration_test_data.RData"))
 
-test_that("deterministic test of fims with recruitment re", {
-  iter_id <- 1
+# Set the iteration ID to 1 for accessing specific input/output list
+iter_id <- 1
 
+# Extract model input and output data for the specified iteration
+om_input <- om_input_list[[iter_id]]
+om_output <- om_output_list[[iter_id]]
+em_input <- em_input_list[[iter_id]]
+
+# Define modified parameters for different modules
+modified_parameters <- vector(mode = "list", length = length(iter_id))
+modified_parameters[[iter_id]] <- list(
+  fleet1 = list(
+    Fleet.log_Fmort.value = log(om_output_list[[iter_id]][["f"]])
+  ),
+  survey1 = list(
+    LogisticSelectivity.inflection_point.value = 1.5,
+    LogisticSelectivity.slope.value = 2,
+    Fleet.log_q.value = log(om_output_list[[iter_id]][["survey_q"]][["survey1"]])
+  ),
+  recruitment = list(
+    BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[iter_id]][["R0"]]),
+    BevertonHoltRecruitment.log_devs.value = om_input_list[[iter_id]][["logR.resid"]][-1],
+    # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
+    # to TRUE. We need to debug the issue, then update the line below accordingly.
+    BevertonHoltRecruitment.log_devs.estimated = TRUE,
+    DnormDistribution.log_sd.value = om_input_list[[iter_id]][["logR_sd"]]
+  ),
+  maturity = list(
+    LogisticMaturity.inflection_point.value = om_input_list[[iter_id]][["A50.mat"]],
+    LogisticMaturity.inflection_point.estimated = FALSE,
+    LogisticMaturity.slope.value = om_input_list[[iter_id]][["slope.mat"]],
+    LogisticMaturity.slope.estimated = FALSE
+  ),
+  population = list(
+    Population.log_init_naa.value = log(om_output_list[[iter_id]][["N.age"]][1, ])
+  )
+)
+
+test_that("deterministic test of fims with recruitment re", {
   result <- setup_and_run_FIMS_with_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE, random_effects = TRUE
+    estimation_mode = FALSE, 
+    random_effects = TRUE,
+    modified_parameters = modified_parameters 
   )
 
   # Call report using deterministic parameter values
@@ -144,15 +182,14 @@ test_that("deterministic test of fims with recruitment re", {
 })
 
 test_that("nll test of fims", {
-  iter_id <- 1
-
   result <- setup_and_run_FIMS_with_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
     estimation_mode = FALSE,
-    random_effects = TRUE
+    random_effects = TRUE,
+    modified_parameters = modified_parameters
   )
 
   # Set up TMB's computational graph
@@ -244,23 +281,21 @@ test_that("nll test of fims", {
 })
 
 test_that("estimation test of fims using wrapper functions", {
-  # Initialize the iteration identifier and run FIMS with the 1st set of OM values
-  iter_id <- 1
   result <- setup_and_run_FIMS_with_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
     estimation_mode = TRUE, 
-    random_effects = TRUE
+    random_effects = TRUE,
+    modified_parameters = modified_parameters 
   )
 
   # TODO:: naa tests fail when log_dev estimation turned on
   # # Compare FIMS results with model comparison project OM values
   # validate_fims(
-  #   report = result@report,
-  #   sdr = result@estimates,
-  #   sdr_report = result@estimates,
+  #   report = get_report(result),
+  #   estimates = get_estimates(result),
   #   om_input = om_input_list[[iter_id]],
   #   om_output = om_output_list[[iter_id]],
   #   em_input = em_input_list[[iter_id]],
@@ -269,12 +304,6 @@ test_that("estimation test of fims using wrapper functions", {
 })
 
 test_that("estimation test with recruitment re on logr", {
-  # Load operating model data for the current iteration
-  iter_id <- 1
-  om_input <- om_input_list[[iter_id]]
-  om_output <- om_output_list[[iter_id]]
-  em_input <- em_input_list[[iter_id]]
-
   fims_data <- FIMS::FIMSFrame(data1)
 
   # Clear any previous FIMS settings
@@ -304,9 +333,7 @@ test_that("estimation test with recruitment re on logr", {
       fleets = fleets,
       recruitment = list(
         form = "BevertonHoltRecruitment",
-        process_distribution = c(log_r = "DnormDistribution", fit_as_random = TRUE)),
-      growth = list(form = "EWAAgrowth"),
-      maturity = list(form = "LogisticMaturity")
+        process_distribution = c(log_r = "DnormDistribution", fit_as_random = TRUE))
     )
 
   modified_parameters <- list(
@@ -370,63 +397,24 @@ test_that("estimation test with recruitment re on logr", {
   # Clear any previous FIMS settings
   clear()
 
-  fleets <- list(
-    fleet1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    ),
-    survey1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
+  fleet1 <- survey1 <- list(
+    selectivity = list(form = "LogisticSelectivity"),
+    data_distribution = c(
+      Index = "DlnormDistribution",
+      AgeComp = "DmultinomDistribution",
+      LengthComp = "DmultinomDistribution"
     )
   )
 
   default_parameters <- fims_data |>
     create_default_parameters(
-      fleets = fleets,
+      fleets = list(fleet1 = fleet1, survey1 = survey1),
       recruitment = list(
         form = "BevertonHoltRecruitment",
         process_distribution = c(log_devs = "DnormDistribution", fit_as_random = TRUE)),
       growth = list(form = "EWAAgrowth"),
       maturity = list(form = "LogisticMaturity")
     )
-
-  modified_parameters <- list(
-    fleet1 = list(
-      Fleet.log_Fmort.value = log(om_output_list[[1]][["f"]])
-    ),
-    survey1 = list(
-      LogisticSelectivity.inflection_point.value = 1.5,
-      LogisticSelectivity.slope.value = 2,
-      Fleet.log_q.value = log(om_output_list[[1]][["survey_q"]][["survey1"]])
-    ),
-    recruitment = list(
-      BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]][["R0"]]),
-      BevertonHoltRecruitment.log_rzero.estimated = TRUE,
-      BevertonHoltRecruitment.log_rzero.random = FALSE,
-      BevertonHoltRecruitment.log_devs.value =  om_input[["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimated = TRUE,
-      BevertonHoltRecruitment.log_devs.random = TRUE,
-      DnormDistribution.log_sd.value = om_input_list[[1]][["logR_sd"]]
-    ),
-    maturity = list(
-      LogisticMaturity.inflection_point.value = om_input_list[[1]][["A50.mat"]],
-      LogisticMaturity.inflection_point.estimated = FALSE,
-      LogisticMaturity.slope.value = om_input_list[[1]][["slope.mat"]],
-      LogisticMaturity.slope.estimated = FALSE
-    ),
-    population = list(
-      Population.log_init_naa.value = log(om_output_list[[1]][["N.age"]][1, ])
-    )
-  )
 
  parameters <- default_parameters |>
     update_parameters(
@@ -448,12 +436,6 @@ expect_equal(fit_log_r@report$recruitment, fit_log_devs@report$recruitment, tole
 })
 
 test_that("compare re on log_devs with re on logr - raw (not matching)", {
-  # Load operating model data for the current iteration
-  iter_id <- 1
-  om_input <- om_input_list[[iter_id]]
-  om_output <- om_output_list[[iter_id]]
-  em_input <- em_input_list[[iter_id]]
-
   fims_data <- FIMS::FIMSFrame(data1)
 
   # Clear any previous FIMS settings
@@ -641,6 +623,8 @@ test_that("compare re on log_devs with re on logr - raw (not matching)", {
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- 1
   } 
+  recruitment$log_devs$set_all_estimable(TRUE)
+  recruitment$log_devs$set_all_random(TRUE)
   recruitment$log_r$resize(1)
   recruitment$log_r[1]$value <- -999
   recruitment$log_r$set_all_estimable(FALSE)
@@ -661,8 +645,6 @@ test_that("compare re on log_devs with re on logr - raw (not matching)", {
     recruitment_distribution$expected_values[i]$value <- 0
   }
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
-  recruitment$log_devs$set_all_estimable(TRUE)
-  recruitment$log_devs$set_all_random(TRUE)
 
   # Growth
   ewaa_growth <- methods::new(EWAAgrowth)
