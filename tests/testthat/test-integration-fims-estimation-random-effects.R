@@ -44,9 +44,9 @@ test_that("deterministic test of fims with recruitment re", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE, 
+    estimation_mode = FALSE,
     random_effects = TRUE,
-    modified_parameters = modified_parameters 
+    modified_parameters = modified_parameters
   )
 
   # Call report using deterministic parameter values
@@ -286,9 +286,9 @@ test_that("estimation test of fims using wrapper functions", {
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE, 
+    estimation_mode = TRUE,
     random_effects = TRUE,
-    modified_parameters = modified_parameters 
+    modified_parameters = modified_parameters
   )
 
   # TODO:: naa tests fail when log_dev estimation turned on
@@ -333,7 +333,8 @@ test_that("estimation test with recruitment re on logr", {
       fleets = fleets,
       recruitment = list(
         form = "BevertonHoltRecruitment",
-        process_distribution = c(log_r = "DnormDistribution", fit_as_random = TRUE))
+        process_distribution = c(log_r = "DnormDistribution", fit_as_random = TRUE),
+        process_expected = "log_expected_recruitment"),
     )
 
   modified_parameters <- list(
@@ -622,7 +623,7 @@ test_that("compare re on log_devs with re on logr - raw (not matching)", {
   recruitment$log_devs$resize(om_input[["nyr"]] - 1)
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- 1
-  } 
+  }
   recruitment$log_devs$set_all_estimable(TRUE)
   recruitment$log_devs$set_all_random(TRUE)
   recruitment$log_r$resize(1)
@@ -681,7 +682,7 @@ test_that("compare re on log_devs with re on logr - raw (not matching)", {
   population$SetGrowth(ewaa_growth$get_id())
   population$SetMaturity(maturity$get_id())
 
- 
+
   # Set-up TMB
   CreateTMBModel()
   # Create parameter list from Rcpp modules
@@ -939,7 +940,7 @@ test_that("compare re on log_devs with re on logr - raw (not matching)", {
     recruitment_distribution$x[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
-  recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), 
+  recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(),
                                                   recruitment$log_expected_recruitment$get_id()))
 
   # Growth
@@ -977,7 +978,7 @@ test_that("compare re on log_devs with re on logr - raw (not matching)", {
   population$SetGrowth(ewaa_growth$get_id())
   population$SetMaturity(maturity$get_id())
 
- 
+
 
   # Set-up TMB
   CreateTMBModel()

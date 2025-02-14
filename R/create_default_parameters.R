@@ -65,7 +65,9 @@ create_default_parameters <- function(
     fleets,
     recruitment = list(
       form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "DnormDistribution", fit_as_random = FALSE)
+      process_distribution = c(log_devs = "DnormDistribution",
+                               fit_as_random = FALSE),
+      process_expected = NULL
     ),
     # TODO: Rename EWAAgrowth to not use an acronym
     growth = list(form = "EWAAgrowth"),
@@ -567,7 +569,7 @@ create_default_recruitment <- function(
   # set random_effects to true or false based on used input
   process_parm_name <-  names(recruitment[["process_distribution"]])[1]
   process_args <- process_default[grep(process_parm_name, names(process_default))]
-  process_args[grep("random", names(process_args))] <- 
+  process_args[grep("random", names(process_args))] <-
     recruitment[["process_distribution"]][[2]]
 
   # Create default distribution parameters based on the distribution type
@@ -686,7 +688,7 @@ update_parameters <- function(current_parameters, modified_parameters) {
           ))
         }
 
-        # default is a scalar but user might want to modify to time-varying, 
+        # default is a scalar but user might want to modify to time-varying,
         # e.g. log_q, log_r
         # Check if the length of the modified and current parameter match
         # length_modified_parameter <- length(modified_params[[param_name]])

@@ -348,6 +348,7 @@ initialize_data_distribution <- function(
 initialize_process_distribution <- function(
     module,
     par,
+    expected = NULL,
     family,
     sd = list(value = 1, estimated = FALSE),
     is_random_effect = FALSE) {
@@ -413,10 +414,20 @@ initialize_process_distribution <- function(
   }
 
   # setup links to parameter
-  new_module$set_distribution_links(
-    "random_effects",
-    module$field(par)$get_id()
-  )
+
+  if(is.null(expected)){
+    new_module$set_distribution_links(
+      "random_effects",
+      module$field(par)$get_id()
+    )
+  } else {
+    new_module$set_distribution_links(
+      "random_effects",
+      c(module$field(par)$get_id(),
+        module$field(expected)$get_id())
+    )
+  }
+
 
   return(new_module)
 }
