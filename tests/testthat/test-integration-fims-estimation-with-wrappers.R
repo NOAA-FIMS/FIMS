@@ -316,7 +316,11 @@ test_that("estimation test with age comp only using wrappers", {
   # * Fit the FIMS model with optimization enabled
   agecomp_fit <- data_age_comp |>
     create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
+      fleets = list(fleet1 = fleet1, survey1 = survey1),
+      recruitment = list(
+        form = "BevertonHoltRecruitment",
+        process_distribution = c(log_devs = "DnormDistribution", fit_as_random = FALSE)
+      )
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_comp) |>
@@ -339,7 +343,11 @@ test_that("estimation test with age comp only using wrappers", {
   # Fit the FIMS model using the second dataset (with missing values)
   agecomp_na_fit <- data_age_comp_na |>
     create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
+      fleets = list(fleet1 = fleet1, survey1 = survey1),
+      recruitment = list(
+        form = "BevertonHoltRecruitment",
+        process_distribution = c(log_devs = "DnormDistribution", fit_as_random = FALSE)
+      )
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_comp_na) |>

@@ -228,12 +228,8 @@ namespace fims_info {
                             + fims::to_string(d->id) + " to derived value " + fims::to_string(d->key[0]));
                     vmit = this->variable_map.find(d->key[0]);
                     d->x = *(*vmit).second;
-                    for (size_t i = 1; i < d->key.size(); i++) {
-                        FIMS_INFO_LOG("Link random effects from distribution " + fims::to_string(d->id)
-                                + " to derived value " + fims::to_string(d->key[0]));
-                        vmit = this->variable_map.find(d->key[i]);
-                        d->x.insert(std::end(d->x),
-                                std::begin(*(*vmit).second), std::end(*(*vmit).second));
+                    if(d->key.size() == 2){
+                        d->expected_values = *(*vmit).second;
                     }
                     FIMS_INFO_LOG("Random effect size for distribution " + fims::to_string(d->id) + " is: " + fims::to_string(d->x.size()));
                 }

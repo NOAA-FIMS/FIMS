@@ -65,7 +65,7 @@ create_default_parameters <- function(
     fleets,
     recruitment = list(
       form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "DnormDistribution")
+      process_distribution = c(log_devs = "DnormDistribution", fit_as_random = FALSE)
     ),
     # TODO: Rename EWAAgrowth to not use an acronym
     growth = list(form = "EWAAgrowth"),
@@ -415,12 +415,17 @@ create_default_BevertonHoltRecruitment <- function(data) {
     log_rzero.value = log(1e+06),
     log_rzero.estimated = TRUE,
     log_rzero.random = FALSE,
+    log_r.value = -999,
+    log_r.estimated = FALSE,
+    log_r.random = FALSE,
     logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
     logit_steep.estimated = FALSE,
     log_devs.value = rep(0.0, get_n_years(data) - 1),
     log_devs.estimated = TRUE,
     log_devs.random = FALSE,
-    estimate_log_devs = TRUE
+    log_expected_recruitment.value = rep(0.0, get_n_years(data) + 1),
+    log_expected_recruitment.estimated = FALSE,
+    log_expected_recruitment.random = FALSE
   )
   return(default)
 }
@@ -681,21 +686,23 @@ update_parameters <- function(current_parameters, modified_parameters) {
           ))
         }
 
+        # default is a scalar but user might want to modify to time-varying, 
+        # e.g. log_q, log_r
         # Check if the length of the modified and current parameter match
-        length_modified_parameter <- length(modified_params[[param_name]])
-        length_current_parameter <- length(current_params[[param_name]])
-        if (!identical(length_modified_parameter, length_current_parameter)) {
-          cli::cli_abort(c(
-            "x" = "The length of {.var {param_name}} from {module_name}
-                  does not match between {.var modified_parameters} and
-                  {.var current_parameters}.",
-            "i" = "The parameter name of interest is {.var {param_name}}.",
-            "i" = "The length of the modified parameter is
-                  {length_modified_parameter}.",
-            "i" = "The length of the current parameter is
-                  {length_current_parameter}."
-          ))
-        }
+        # length_modified_parameter <- length(modified_params[[param_name]])
+        # length_current_parameter <- length(current_params[[param_name]])
+        # if (!identical(length_modified_parameter, length_current_parameter)) {
+        #   cli::cli_abort(c(
+        #     "x" = "The length of {.var {param_name}} from {module_name}
+        #           does not match between {.var modified_parameters} and
+        #           {.var current_parameters}.",
+        #     "i" = "The parameter name of interest is {.var {param_name}}.",
+        #     "i" = "The length of the modified parameter is
+        #           {length_modified_parameter}.",
+        #     "i" = "The length of the current parameter is
+        #           {length_current_parameter}."
+        #   ))
+        # }
 
         # Check if the type of the modified and current parameter match
         if (!identical(

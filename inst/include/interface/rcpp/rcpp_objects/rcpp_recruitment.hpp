@@ -74,6 +74,11 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
+ 
+  /**
+  * @brief The number of years.
+  */
+  uint32_t nyears;
   /**
    * @brief The logistic transformation of steepness (h; productivity of the
    * population), where the parameter is transformed to constrain it between
@@ -89,10 +94,13 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    */
   ParameterVector log_devs;
   /**
-   * @brief Should the natural log of recruitment deviations be estimated? The
-   * default is false.
+   * @brief The recruitment random effect parameter on the natural log scale.
    */
-  bool estimate_log_devs = false;
+  ParameterVector log_r;
+  /**
+   * @brief Expectation of the recruitment process.
+   */
+  ParameterVector log_expected_recruitment;
   /**
    * @brief The estimate of the logit transformation of steepness.
    */
@@ -229,6 +237,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     ss << "   \"id\":" << this->log_devs.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
     ss << "   \"values\":" << this->log_devs << ",\n },\n";
+   
 
     return ss.str();
   }
@@ -267,13 +276,12 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     recruitment->log_rzero.resize(this->log_rzero.size());
     for (size_t i = 0; i < this->log_rzero.size(); i++) {
       recruitment->log_rzero[i] = this->log_rzero[i].initial_value_m;
-
       if (this->log_rzero[i].estimated_m) {
-        info->RegisterParameterName("log_rzero");
         if (this->log_rzero[i].is_random_effect_m) {
           info->RegisterRandomEffect(recruitment->log_rzero[i]);
         } else {
           info->RegisterParameter(recruitment->log_rzero[i]);
+          info->RegisterParameterName("log_rzero");
         }
       }
     }
@@ -290,6 +298,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         info->RegisterRandomEffect(recruitment->log_recruit_devs[i]);
         } else {
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
+        info->RegisterParameterName("log_recruit_devs");
         }
       } else {
         recruitment->estimate_log_recruit_devs = false;
@@ -297,6 +306,22 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
      
     }
     info->variable_map[this->log_devs.id_m] = &(recruitment)->log_recruit_devs;
+
+    recruitment->log_r.resize(this->log_r.size());
+    for (size_t i = 0; i < log_r.size(); i++) {
+      recruitment->log_r[i] = this->log_r[i].initial_value_m;
+      if (this->log_r[i].estimated_m) {
+        if(this->log_r[i].is_random_effect_m){
+          info->RegisterRandomEffect(recruitment->log_r[i]);
+        } else {
+          info->RegisterParameterName("log_r");
+          info->RegisterParameter(recruitment->log_r[i]);
+        }
+      }
+    }
+    info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
+    recruitment->log_expected_recruitment.resize(nyears+1);
+    info->variable_map[this->log_expected_recruitment.id_m] = &(recruitment)->log_expected_recruitment;
 
     // add to Information
     info->recruitment_models[recruitment->id] = recruitment;

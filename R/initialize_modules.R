@@ -133,8 +133,6 @@ initialize_module <- function(parameters, data, module_name) {
   #   - Add n_fleets to data1. Should n_fleets include both
   #     fishing and survey fleets? Currently, data1@fleets equals 1.
   # - Recruitment interface
-  #   - Remove the field estimate_log_devs. It will be set up using the
-  #   set_all_estimable() method instead.
   # - Fleet
   #   - Remove estimate_Fmort, estimate_q, and random_q from the Rcpp interface
   #   - Reconsider exposing `log_expected_index` and
@@ -144,7 +142,7 @@ initialize_module <- function(parameters, data, module_name) {
   non_standard_field <- c(
     "ages", "nages", "nlengths",
     "estimate_prop_female",
-    "nyears", "nseasons", "nfleets", "estimate_log_devs", "weights",
+    "nyears", "nseasons", "nfleets", "weights",
     "is_survey", "estimate_q", "random_q"
   )
   for (field in module_fields) {
@@ -158,9 +156,6 @@ initialize_module <- function(parameters, data, module_name) {
         "nyears" = get_n_years(data),
         "nseasons" = 1,
         "nfleets" = length(parameters[["modules"]][["fleets"]]),
-        "estimate_log_devs" = module_input[[
-          paste0(module_class_name, ".estimate_log_devs")
-        ]],
         "weights" = m_weight_at_age(data),
         "is_survey" = !("landings" %in% fleet_types),
         "estimate_q" = module_input[[

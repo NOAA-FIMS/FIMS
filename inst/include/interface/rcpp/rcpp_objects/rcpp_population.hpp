@@ -112,6 +112,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Numbers at age.
    */
   ParameterVector numbers_at_age;
+    /**
+   * @brief random effect for recruitment.
+   */
+  ParameterVector log_r;
   /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"nages\".
@@ -130,6 +134,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Derived biomass (mt).
    */
   Rcpp::NumericVector derived_biomass;
+
   /**
    * @brief Derived recruitment.
    * TODO: document the unit.
@@ -263,7 +268,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
       //set recruitment from Information/
       for (R_xlen_t i = 0; i < this->derived_recruitment.size(); i++) {
-        this->derived_recruitment[i] = pop->expected_recruitment[i];
+       this->derived_recruitment[i] = pop->expected_recruitment[i];
       }
 
     }
@@ -352,6 +357,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
       ss << this->derived_recruitment[this->derived_recruitment.size() - 1] << "]\n";
     }
+    
     ss << " }\n";
 
     ss << "}";
@@ -406,14 +412,14 @@ class PopulationInterface : public PopulationInterfaceBase {
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
-    }
+    }  
 
     population->numbers_at_age.resize((nyears + 1) * nages);
     info->variable_map[this->numbers_at_age.id_m] = &(population)->numbers_at_age;
 
     // add to Information
     info->populations[population->id] = population;
-
+    
     return true;
   }
 

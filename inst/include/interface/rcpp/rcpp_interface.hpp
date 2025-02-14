@@ -705,8 +705,9 @@ RCPP_MODULE(fims) {
             .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
             .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
             .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
-            .field("estimate_log_devs",
-            &BevertonHoltRecruitmentInterface::estimate_log_devs)
+            .field("log_r", &BevertonHoltRecruitmentInterface::log_r, "recruitment as a random effect on the natural log scale")
+            .field("log_expected_recruitment", &BevertonHoltRecruitmentInterface::log_expected_recruitment, "expectation of the recruitment process on the natural log scale")
+            .field("nyears", &BevertonHoltRecruitmentInterface::nyears)
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
             .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 

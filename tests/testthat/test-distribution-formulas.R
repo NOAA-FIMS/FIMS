@@ -41,7 +41,6 @@ test_that("test initialize_process_distribution", {
     sd = list(value = om_input$logR_sd, estimated = FALSE),
     is_random_effect = FALSE
   )
-  recruitment$estimate_log_devs <- TRUE
 
   expect_equal(log(om_input$logR_sd), recruitment_distribution$log_sd[1]$value)
   expect_equal(length(recruitment$log_devs), length(recruitment_distribution$x))

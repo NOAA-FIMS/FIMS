@@ -33,7 +33,9 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   bool constrain_deviations = false; /*!< A flag to indicate if recruitment
                                  deviations are summing to zero or not */
 
-  fims::Vector<Type> log_rzero;         /**< Natural log of unexploited recruitment.*/
+  fims::Vector<Type> log_rzero;         /**< Natural log of unexploited recruitment.*/       
+  fims::Vector<Type> log_r; /**< Natural log of recruitment used for random effects */     
+  fims::Vector<Type> log_expected_recruitment; /**< Expectation of the recruitment process */
 
   bool estimate_log_recruit_devs = true; /*!< A flag to indicate if recruitment
                                   deviations are estimated or not */
@@ -48,12 +50,16 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    * @brief Prepares the recruitment deviations vector.
    *
    */
-  void Prepare() { this->PrepareConstrainedDeviations(); }
+  void Prepare() { 
+  //  this->PrepareConstrainedDeviations(); 
+    std::fill(log_expected_recruitment.begin(), log_expected_recruitment.end(), 0.0);
+  }
 
   /** @brief Calculates the expected recruitment for a given spawning input.
    *
    * @param spawners A measure for spawning output.
    * @param ssbzero A measure for spawning output in unfished population.
+   * @param idx An index for the rzero vector
    *
    */
   virtual const Type evaluate(

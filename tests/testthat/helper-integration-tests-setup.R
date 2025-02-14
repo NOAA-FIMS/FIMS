@@ -36,8 +36,6 @@ FIMS_dmultinom <- function(x, p) {
 #' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
 #' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
 #' for the report.
-#' @param random_effects A logical value indicating whether recruitment is fit as 
-#' a random_effect (`TRUE`) or as a fixed effect (`FALSE`).
 #' @param map A list used to specify mapping for the `MakeADFun` function from
 #' the TMB package.
 #'
@@ -59,7 +57,6 @@ FIMS_dmultinom <- function(x, p) {
 #'   om_input_list = om_input_list,
 #'   om_output_list = om_output_list,
 #'   em_input_list = em_input_list,
-#'   random_effects = FALSE,
 #'   estimation_mode = TRUE
 #' )
 setup_and_run_FIMS_without_wrappers <- function(iter_id,
@@ -67,7 +64,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 om_output_list,
                                                 em_input_list,
                                                 estimation_mode = TRUE,
-                                                random_effects = FALSE,
                                                 map = list()) {
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]] # Operating model input for the current iteration
@@ -337,11 +333,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
   sdr_fixed <- summary(sdr, "fixed")
-  if(random_effects){
-    sdr_random <- summary(sdr, "random")
-  } else {
-    sdr_random <- NA
-  }
 
   clear()
 
@@ -353,7 +344,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     report = report,
     sdr_report = sdr_report,
     sdr_fixed = sdr_fixed,
-    sdr_random = sdr_random,
     sdr = sdr
   ))
 }
