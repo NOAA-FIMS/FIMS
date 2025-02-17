@@ -229,6 +229,7 @@ namespace fims_info {
                     vmit = this->variable_map.find(d->key[0]);
                     d->x = *(*vmit).second;
                     if(d->key.size() == 2){
+                        vmit = this->variable_map.find(d->key[1]);
                         d->expected_values = *(*vmit).second;
                     }
                     FIMS_INFO_LOG("Random effect size for distribution " + fims::to_string(d->id) + " is: " + fims::to_string(d->x.size()));

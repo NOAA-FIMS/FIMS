@@ -371,12 +371,12 @@ namespace fims_popdy {
                     devs, so this value is set to the mean recruitment.*/
                 } else {
                     recruitment->log_expected_recruitment[year-1] =
-                        log(this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0));
-                    this->numbers_at_age[i_age_year] = exp(recruitment->log_r[year-1]);
+                        fims_math::log(this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0));
+                    this->numbers_at_age[i_age_year] = fims_math::exp(recruitment->log_r[year-1]);
                 }
             }
             this->expected_recruitment[year] = this->numbers_at_age[i_age_year];
-        }
+       }
 
         /**
          * @brief Adds to exiting expected total catch by fleet in weight
