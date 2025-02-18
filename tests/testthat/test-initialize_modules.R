@@ -43,7 +43,7 @@ test_that("initialize_fims works", {
   result <- initialize_fims(parameters = default_parameters, data = data)
 
   expect_type(result, "list")
-  expect_named(result, "parameters")
+  expect_named(result, c("parameters", "module_ids", "data"))
   clear()
 })
 

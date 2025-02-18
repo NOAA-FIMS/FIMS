@@ -310,7 +310,7 @@ age_only_fit <- data_4_model |>
   create_default_parameters(
     fleets = list(fleet1 = fleet1, survey1 = survey1)
   ) |>
-  # update_parameters(modified_parameters = parameters$parameters) |>
+  update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 

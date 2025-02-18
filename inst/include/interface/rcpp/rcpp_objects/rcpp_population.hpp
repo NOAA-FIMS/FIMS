@@ -391,6 +391,8 @@ class PopulationInterface : public PopulationInterfaceBase {
     std::shared_ptr<fims_popdy::Population<Type> > population =
         std::make_shared<fims_popdy::Population<Type> >();
 
+    std::stringstream ss;
+
     // set relative info
     population->id = this->id;
     population->nyears = this->nyears.get();
@@ -411,8 +413,10 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (size_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].initial_value_m;
       if (this->log_M[i].estimated_m) {
-        info->RegisterParameterName("log_M");
-        info->RegisterParameter(population->log_M[i]);
+          ss.str("");
+          ss << "population.log_M." << this->id << "." << i;
+          info->RegisterParameterName(ss.str());
+          info->RegisterParameter(population->log_M[i]);
       }
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
@@ -420,7 +424,9 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
       if (this->log_init_naa[i].estimated_m) {
-        info->RegisterParameterName("log_init_naa");
+        ss.str("");
+        ss << "population.log_init_naa." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
       }
     }

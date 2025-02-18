@@ -255,6 +255,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > recruitment =
       std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
+    
+    std::stringstream ss;
 
     // set relative info
     recruitment->id = this->id;
@@ -264,7 +266,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       recruitment->logit_steep[i] = this->logit_steep[i].initial_value_m;
 
       if (this->logit_steep[i].estimated_m) {
-        info->RegisterParameterName("logit_steep");
+        ss.str("");
+        ss << "recruitment.logit_steep." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
         if (this->logit_steep[i].is_random_effect_m) {
           info->RegisterRandomEffect(recruitment->logit_steep[i]);
         } else {
@@ -282,7 +286,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       recruitment->log_rzero[i] = this->log_rzero[i].initial_value_m;
 
       if (this->log_rzero[i].estimated_m) {
-        info->RegisterParameterName("log_rzero");
+        ss.str("");
+        ss << "recruitment.log_rzero." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
         if (this->log_rzero[i].is_random_effect_m) {
           info->RegisterRandomEffect(recruitment->log_rzero[i]);
         } else {
@@ -298,6 +304,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     for (size_t i = 0; i < this->log_devs.size(); i++) {
       recruitment->log_recruit_devs[i] = this->log_devs[i].initial_value_m;
       if (this->log_devs[i].estimated_m) {
+        ss.str("");
+        ss << "recruitment.log_devs." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
       } else {
         recruitment->estimate_log_recruit_devs = false;

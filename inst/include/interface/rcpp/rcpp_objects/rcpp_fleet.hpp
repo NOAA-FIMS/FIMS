@@ -488,6 +488,8 @@ public:
     std::shared_ptr<fims_popdy::Fleet<Type> > fleet =
       std::make_shared<fims_popdy::Fleet<Type> >();
 
+    std::stringstream ss;
+
     // set relative info
     fleet->id = this->id;
     fleet->is_survey = this->is_survey.get();
@@ -510,7 +512,9 @@ public:
       fleet->log_q[i] = this->log_q[i].initial_value_m;
 
       if (this->log_q[i].estimated_m) {
-        info->RegisterParameterName("log_q");
+        ss.str("");
+        ss << "fleet.log_q." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
           if (this->log_q[i].is_random_effect_m) {
             info->RegisterRandomEffect(fleet->log_q[i]);
           } else {
@@ -525,7 +529,9 @@ public:
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
 
       if (this->log_Fmort[i].estimated_m) {
-        info->RegisterParameterName("log_Fmort");
+        ss.str("");
+        ss << "fleet.log_Fmort." << this->id << "." << i;
+        info->RegisterParameterName(ss.str());
         if (this->log_Fmort[i].is_random_effect_m) {
           info->RegisterRandomEffect(fleet->log_Fmort[i]);
         } else {
@@ -564,7 +570,9 @@ public:
           fims::to_string(fleet->age_length_conversion_matrix.size()));
 
         if (this->age_length_conversion_matrix[i].estimated_m) {
-          info->RegisterParameterName("age_length_conversion_matrix");
+          ss.str("");
+          ss << "fleet.age_length_conversion_matrix." << this->id << "." << i;
+          info->RegisterParameterName(ss.str());
           if (this->age_length_conversion_matrix[i].is_random_effect_m) {
             info->RegisterRandomEffect(fleet->age_length_conversion_matrix[i]);
           } else {

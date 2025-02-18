@@ -236,7 +236,7 @@ public:
       maturity->slope[i] = this->slope[i].initial_value_m;
       if (this->slope[i].estimated_m) {
         ss.str("");
-        ss << "maturity.slope_" << this->id << "." << i;
+        ss << "maturity.slope." << this->id << "." << i;
         info->RegisterParameterName(ss.str());
         if (this->slope[i].is_random_effect_m) {
           info->RegisterRandomEffect(maturity->slope[i]);

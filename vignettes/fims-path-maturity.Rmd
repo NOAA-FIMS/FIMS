@@ -63,7 +63,10 @@ fims_frame <- FIMSFrame(data1)
 
 # Create default maturity parameters using internal function
 default_parameters <- list(
-  parameters = FIMS:::create_default_maturity(form = "LogisticMaturity"),
+  parameters = c(
+    FIMS:::create_default_Population(data = fims_frame, log_rzero = 13), 
+    FIMS:::create_default_maturity(form = "LogisticMaturity")
+  ),
   modules = list(maturity = list(form = "LogisticMaturity"))
 )
 show(default_parameters)

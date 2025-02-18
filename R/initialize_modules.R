@@ -608,8 +608,8 @@ initialize_comp <- function(data,
 #'   initialization.
 #' @param data An S4 object. FIMS input data.
 #' @return
-#' A list containing parameters for the initialized FIMS modules, ready for use
-#' in TMB modeling.
+#' A list containing parameters, module_ids, and data for the initialized FIMS 
+#' modules, ready for use in TMB modeling.
 #' @export
 initialize_fims <- function(parameters, data) {
   # Validate parameters input
@@ -632,8 +632,9 @@ initialize_fims <- function(parameters, data) {
     fleet_index <- fleet_index_distribution <-
     fleet_age_comp <- fleet_agecomp_distribution <-
     fleet_length_comp <- fleet_lengthcomp_distribution <-
+    fleet_module_ids <- 
     vector("list", length(fleet_names))
-
+  names(fleet_module_ids) <- fleet_names
 
   for (i in seq_along(fleet_names)) {
     fleet_selectivity[[i]] <- initialize_selectivity(
@@ -647,7 +648,7 @@ initialize_fims <- function(parameters, data) {
       fleet_name = fleet_names[i]
     )
 
-    fleet_module_ids <- c(
+    fleet_module_ids[[i]] <- c(
       index = fleet_index[[i]]$get_id(),
       selectivity = fleet_selectivity[[i]]$get_id()
     )
@@ -673,8 +674,8 @@ initialize_fims <- function(parameters, data) {
       )
 
       # Add the module ID for the initialized age composition to the list of fleet module IDs
-      fleet_module_ids <- c(
-        fleet_module_ids,
+      fleet_module_ids[[i]] <- c(
+        fleet_module_ids[[i]],
         c(age_comp = fleet_age_comp[[i]]$get_id())
       )
     }
@@ -691,8 +692,8 @@ initialize_fims <- function(parameters, data) {
       )
 
       # Add the module ID for the initialized length composition to the list of fleet module IDs
-      fleet_module_ids <- c(
-        fleet_module_ids,
+      fleet_module_ids[[i]] <- c(
+        fleet_module_ids[[i]],
         c(length_comp = fleet_length_comp[[i]]$get_id())
       )
     }
@@ -701,7 +702,7 @@ initialize_fims <- function(parameters, data) {
       parameters = parameters,
       data = data,
       fleet_name = fleet_names[i],
-      linked_ids = fleet_module_ids
+      linked_ids = fleet_module_ids[[i]]
     )
 
     # TODO: update argument sd to log_sd to match the Rcpp interface
@@ -759,7 +760,7 @@ initialize_fims <- function(parameters, data) {
       )
     }
   }
-
+  
   # Recruitment
   # create new module in the recruitment class (specifically Beverton--Holt,
   # when there are other options, this would be where the option would be
@@ -825,12 +826,15 @@ initialize_fims <- function(parameters, data) {
 
   # Set-up TMB
   CreateTMBModel()
-  # Create parameter list from Rcpp modules
-  parameter_list <- list(
-    parameters = list(p = get_fixed())
+  # Create output list from Rcpp modules
+  module_ids <- c(fleet_module_ids, population_module_ids)
+  output_list <- list(
+    parameters = list(p = get_fixed()),
+    module_ids = module_ids,
+    data = data 
   )
 
-  return(parameter_list)
+  return(output_list)
 }
 
 #' Set parameter vector values based on module input
