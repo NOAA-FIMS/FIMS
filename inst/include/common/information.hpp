@@ -201,15 +201,19 @@ namespace fims_info {
                     FIMS_INFO_LOG("Setup prior for distribution " + fims::to_string(d->id));
                     variable_map_iterator vmit;
                     FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id) + " to parameter " + fims::to_string(d->key[0]));
-                    vmit = this->variable_map.find(d->key[0]);
-                    d->x = *(*vmit).second;
-                    for (size_t i = 1; i < d->key.size(); i++) {
+                    d->priors.resize(d->key.size());
+                    for (size_t i = 0; i < d->key.size(); i++) {
                         FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id)
                                 + " to parameter " + fims::to_string(d->key[0]));
                         vmit = this->variable_map.find(d->key[i]);
-                        d->x.insert(std::end(d->x),
-                                std::begin(*(*vmit).second), std::end(*(*vmit).second));
+                        d->priors[i] = (*vmit).second;
                     }
+                    /* Rcouts for checking prior types - use when setting up prior tests
+                    Rcout << "priors type is: " << typeid(d->priors).name() << std::endl;
+                    Rcout << "priors[0] type is: " << typeid(d->priors[0]).name() << std::endl;
+                    Rcout << "(*priors[0]) type is: " << typeid(*(d->priors[0])).name() << std::endl;
+                    Rcout << "(*priors[0][0]) type is: " << typeid((*(d->priors[0]))[0]).name() << std::endl;
+                    */
                     FIMS_INFO_LOG("Prior size for distribution " + fims::to_string(d->id) + "is: " + fims::to_string(d->x.size()));
                 }
             }
@@ -227,11 +231,12 @@ namespace fims_info {
                     FIMS_INFO_LOG("Link random effects from distribution "
                             + fims::to_string(d->id) + " to derived value " + fims::to_string(d->key[0]));
                     vmit = this->variable_map.find(d->key[0]);
-                    d->x = *(*vmit).second;
+                     d->re = (*vmit).second;
                     if(d->key.size() == 2){
                         vmit = this->variable_map.find(d->key[1]);
                         d->expected_values = *(*vmit).second;
                     }
+                    d->priors.resize(2);
                     FIMS_INFO_LOG("Random effect size for distribution " + fims::to_string(d->id) + " is: " + fims::to_string(d->x.size()));
                 }
             }
@@ -250,14 +255,6 @@ namespace fims_info {
                             + " to derived value " + fims::to_string(d->key[0]));
                     vmit = this->variable_map.find(d->key[0]);
                     d->expected_values = *(*vmit).second;
-
-                    for (size_t i = 1; i < d->key.size(); i++) {
-                        vmit = this->variable_map.find(d->key[i]);
-                        FIMS_INFO_LOG("Link expected value from distribution "
-                                + fims::to_string(d->id) + " to derived value " + fims::to_string(d->key[i]));
-                        d->expected_values.insert(std::end(d->expected_values),
-                                std::begin(*(*vmit).second), std::end(*(*vmit).second));
-                    }
                     FIMS_INFO_LOG("Expected value size for distribution " + fims::to_string(d->id)
                             + " is: " + fims::to_string(d->expected_values.size()));
                 }

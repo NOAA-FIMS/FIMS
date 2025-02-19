@@ -83,10 +83,7 @@ namespace fims_distributions
                                 prob_vector[j] = this->expected_values[idx];
                             }
                         } else {
-                            // if not data (i.e. prior or process), use x vector instead of observed_values
-                            size_t idx = (i * dims[1]) + j;
-                            x_vector[j] = this->x[idx];
-                            prob_vector[j] = this->expected_values[idx];
+                         FIMS_ERROR_LOG("Multinomial is not a valid distribution for priors or random effects.") 
                         }
                     }
 

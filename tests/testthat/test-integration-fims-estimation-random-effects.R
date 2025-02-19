@@ -418,6 +418,39 @@ test_that("estimation test with recruitment re on logr", {
       maturity = list(form = "LogisticMaturity")
     )
 
+   modified_parameters <- list(
+    fleet1 = list(
+      Fleet.log_Fmort.value = log(om_output_list[[1]][["f"]])
+    ),
+    survey1 = list(
+      LogisticSelectivity.inflection_point.value = 1.5,
+      LogisticSelectivity.slope.value = 2,
+      Fleet.log_q.value = log(om_output_list[[1]][["survey_q"]][["survey1"]])
+    ),
+    recruitment = list(
+      BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]][["R0"]]),
+      BevertonHoltRecruitment.log_rzero.estimated = TRUE,
+      BevertonHoltRecruitment.log_rzero.random = FALSE,
+      BevertonHoltRecruitment.log_r.value = -999,
+      BevertonHoltRecruitment.log_r.estimated = FALSE,
+      BevertonHoltRecruitment.log_r.random = FALSE,
+      BevertonHoltRecruitment.log_devs.value = rep(1, (om_input_list[[1]]$nyr-1)),
+      BevertonHoltRecruitment.log_devs.estimated = TRUE,
+      BevertonHoltRecruitment.log_devs.random = TRUE,
+      DnormDistribution.log_sd.value = om_input_list[[1]][["logR_sd"]],
+      DnormDistribution.log_sd.estimated = FALSE
+    ),
+    maturity = list(
+      LogisticMaturity.inflection_point.value = om_input_list[[1]][["A50.mat"]],
+      LogisticMaturity.inflection_point.estimated = FALSE,
+      LogisticMaturity.slope.value = om_input_list[[1]][["slope.mat"]],
+      LogisticMaturity.slope.estimated = FALSE
+    ),
+    population = list(
+      Population.log_init_naa.value = log(om_output_list[[1]][["N.age"]][1, ])
+    )
+  )
+
  parameters <- default_parameters |>
     update_parameters(
       modified_parameters = modified_parameters
@@ -651,10 +684,10 @@ om_input <- om_input_list[[iter_id]] # Operating model input for the current ite
   recruitment_distribution$log_sd <- methods::new(ParameterVector, 1)
   recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
   recruitment_distribution$log_sd[1]$estimated <- FALSE
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
+ # recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
   recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
   for (i in 1:(om_input[["nyr"]] - 1)) {
-    recruitment_distribution$x[i]$value <- 0
+  #  recruitment_distribution$x[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
   recruitment_distribution$set_distribution_links("random_effects", 

@@ -169,12 +169,6 @@ namespace fims_model {
       }
   }
 
-  #ifdef TMB_MODEL
-  distribution_re_obs.resize(n_random_effects);
-  distribution_re_expected.resize(n_random_effects);
-  #endif
-
-
 
             this->fims_information->SetupData();
             // Loop over and evaluate data joint negative log-likelihoods
