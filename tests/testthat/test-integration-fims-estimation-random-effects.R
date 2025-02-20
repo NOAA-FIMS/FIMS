@@ -418,7 +418,7 @@ test_that("estimation test with recruitment re on logr", {
       maturity = list(form = "LogisticMaturity")
     )
 
-   modified_parameters <- list(
+  modified_parameters <- list(
     fleet1 = list(
       Fleet.log_Fmort.value = log(om_output_list[[1]][["f"]])
     ),
@@ -683,8 +683,8 @@ om_input <- om_input_list[[iter_id]] # Operating model input for the current ite
   # taken before the likelihood calculation
   recruitment_distribution$log_sd <- methods::new(ParameterVector, 1)
   recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
-  recruitment_distribution$log_sd[1]$estimated <- FALSE
- # recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
+  recruitment_distribution$log_sd[1]$estimated <- TRUE
+  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
   recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
   for (i in 1:(om_input[["nyr"]] - 1)) {
   #  recruitment_distribution$x[i]$value <- 0
