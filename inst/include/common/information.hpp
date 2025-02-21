@@ -149,6 +149,17 @@ namespace fims_info {
             this->nyears = 0;
             this->nseasons = 0;
             this->nages = 0;
+
+            for (density_components_iterator it = density_components.begin(); 
+                it != density_components.end(); ++it) {
+                std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
+                    
+                    for(int i=0; i<d->priors.size(); i++){
+                        delete(d->priors[i]);
+                    }
+                    d->priors.clear();
+                    d->re->clear();
+            }
         }
 
         /**

@@ -568,9 +568,22 @@ create_default_recruitment <- function(
   names(process_default) <- paste0(form, ".", names(process_default))
   # set random_effects to true or false based on used input
   process_parm_name <-  names(recruitment[["process_distribution"]])[1]
-  process_args <- process_default[grep(process_parm_name, names(process_default))]
-  process_args[grep("random", names(process_args))] <-
-    recruitment[["process_distribution"]][[2]]
+  if(process_parm_name == "log_devs"){
+    if(recruitment[["process_distribution"]][[2]]){
+      process_default[[grep("log_devs.random", names(process_default))]] <- TRUE
+    }
+  }
+  if(process_parm_name == "log_r"){
+    process_default[[grep("log_devs.estimated", names(process_default))]] <- FALSE
+    process_default[[grep("log_r.estimated", names(process_default))]] <- TRUE
+    process_default[[grep("log_r.value", names(process_default))]] <- 
+      rep(0, get_n_years(data)-1)
+    if(recruitment[["process_distribution"]][[2]]){
+      process_default[[grep("log_r.random", names(process_default))]] <- TRUE
+    }
+    
+  }
+
 
   # Create default distribution parameters based on the distribution type
   distribution_input <- recruitment[["process_distribution"]][1]
