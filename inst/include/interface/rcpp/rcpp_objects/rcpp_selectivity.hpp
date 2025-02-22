@@ -11,6 +11,7 @@
 
 #include "../../../population_dynamics/selectivity/selectivity.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../interface.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp selectivity
@@ -60,6 +61,8 @@ public:
      * each selectivity option can have an evaluate() function.
      */
     virtual double evaluate(double x) = 0;
+   
+    
 };
 // static id of the SelectivityInterfaceBase object
 uint32_t SelectivityInterfaceBase::id_g = 1;
@@ -117,6 +120,23 @@ public:
         LogisticSel.slope[0] = this->slope[0].initial_value_m;
         return LogisticSel.evaluate(x);
     }
+
+    #define VECTORIZE_UNARY(FUN)                    
+    size_t n = x.size();                            
+    const ad* X = adptr(x);                         
+    ADrep ans(n);                                   
+    ad* Y = adptr(ans);                             
+    for (size_t i=0; i < n; i++) {                  
+    Y[i] = FUN(X[i]);                             
+    }                                               
+    return ans;
+
+
+    #ifdef TMB_MODEL
+    ADrep evaluate(ADrep x){
+        VECTORIZE_UNARY(evaluate);
+    }
+    #endif
 
     /** 
      * @brief Extracts derived quantities back to the Rcpp interface object from

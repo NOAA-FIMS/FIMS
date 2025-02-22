@@ -388,7 +388,7 @@ public:
         if (this->nages == this->ages.size()) {
             population->ages.resize(this->nages);
         } else {
-            warning("The ages vector is not of size nages.");
+            FIMS_WARNING_LOG("The ages vector is not of size nages.");
         }
 
         population->growth_id = this->growth_id;
