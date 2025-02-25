@@ -121,20 +121,35 @@ public:
         return LogisticSel.evaluate(x);
     }
 
-    #define VECTORIZE_UNARY(FUN)                    
-    size_t n = x.size();                            
-    const ad* X = adptr(x);                         
-    ADrep ans(n);                                   
-    ad* Y = adptr(ans);                             
-    for (size_t i=0; i < n; i++) {                  
-    Y[i] = FUN(X[i]);                             
-    }                                               
-    return ans;
-
-
     #ifdef TMB_MODEL
-    ADrep evaluate(ADrep x){
-        VECTORIZE_UNARY(evaluate);
+    /*
+    #define VECTORIZE_UNARY(FUN)    \                
+    size_t n = x.size();            \                   
+    const ad* X = adptr(x);         \                
+    ADrep ans(n);                   \                
+    ad* Y = adptr(ans);             \                
+    for (size_t i=0; i < n; i++) {  \                
+        Y[i] = FUN(X[i]);           \                  
+    }                               \                
+    return ans;
+*/
+    ADrep evaluate_RTMB(ADrep x){
+        fims_popdy::LogisticSelectivity<ad*> LogisticSel;
+        // inflection_point and slope are fims::Vector<Type>
+        // initial_value_m is a double
+        ad* IP = adptr(this->inflection_point[0].initial_value_m);
+        ad* Slope = adptr(this->slope[0].initial_value_m);
+        LogisticSel.inflection_point.resize(1);
+        LogisticSel.inflection_point[0] = IP;
+        LogisticSel.slope.resize(1);
+        LogisticSel.slope[0] = Slope;
+        ad* X = adptr(x);
+        int n = x.size();
+        ADrep ans(n); 
+        ad* Y = adptr(ans); 
+        Y = LogisticSel.evaluate(X);
+        return ans; 
+     //VECTORIZE_UNARY(evaluate);
     }
     #endif
 

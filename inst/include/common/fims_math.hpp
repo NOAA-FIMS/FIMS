@@ -143,7 +143,9 @@ inline const double pow(const double &x, const double &y) {
 template <class Type>
 inline const Type logistic(const Type &inflection_point, const Type &slope,
                            const Type &x) {
-  return (1.0) / (1.0 + exp(-1.0 * slope * (x - inflection_point)));
+  Type unit = Type(1); 
+  Type neg_unit = Type(-1);
+  return (unit) / (unit + exp(neg_unit * slope * (x - inflection_point)));
 }
 
 /**

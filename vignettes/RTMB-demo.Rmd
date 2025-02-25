@@ -64,7 +64,7 @@ mod <- function(par){
     logistic$slope[1]$value <- slope
     nll <- 0
     for(i in x){
-        nll <- nll - dnorm(y[i], logistic$evaluate(x[i]), sdy, TRUE)
+        nll <- nll - dnorm(y[i], logistic$evaluate_RTMB(x[i]), sdy, TRUE)
     }
     return(nll)
 }
