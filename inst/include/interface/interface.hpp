@@ -21,6 +21,7 @@
 // issue
 #include <math.h>
 #include "RTMB.h"
+#include "RTMB_stubs.cpp"
 
 
 

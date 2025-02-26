@@ -35,25 +35,25 @@ logistic <- methods::new(LogisticSelectivity)
 #   inflection_point and slope
 logistic$inflection_point[1]$value <- 10.0
 logistic$slope[1]$value <- 0.2
-x <- 1:30
-y <- mu <- x * 0
+X <- 1:30
+Y <- mu <- X * 0
 sdy <- 0.05 #observation error around logistic
 
 set.seed(123)
-for(i in x){
+for(i in X){
     # evaluate returns the logistic function given the parameters and x 
-    mu[i] <- logistic$evaluate(x[i])
+    mu[i] <- logistic$evaluate(X[i])
     # simulate random noise around the mean
-    y[i] <- rnorm(1, mu[i], sdy)
+    Y[i] <- rnorm(1, mu[i], sdy)
 }
 
-df <- data.frame(x = x, y = y)
+df <- data.frame(x = X, y = Y)
 ggplot(df, aes(x = x, y = y)) + geom_point()
 ```
 
 ### Set up RTMB model
 ```{r model}
-dat <- list(y = y, x = x)
+dat <- list(y = Y, x = X)
 par <- list(inflection_point = 2, slope = 0,
             ln_sdy = 0)
 
