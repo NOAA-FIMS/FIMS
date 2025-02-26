@@ -25,6 +25,7 @@ jobs:
             Hello reviewer, thanks for taking the time to review this PR!
 
             - Please use this checklist during your review, checking off items that you have verified are complete!
+            - Please use conventions in the [guidelines for conventional commit messages](https://www.conventionalcommits.org/) for both commits and comments.
             - For PRs that don't make changes to code (e.g., changes to README.md or Github actions workflows), feel free to skip over items on the checklist that are not relevant. Remember it is still important to do a thorough review.
             - Then, comment on the pull request with your review indicating where you have questions or changes need to be made before merging.
             - Remember to review **every line of code** you’ve been asked to review, look at the context, make sure you’re improving code health, and compliment developers on good things that they do.
