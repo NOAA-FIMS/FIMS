@@ -134,11 +134,11 @@ public:
     return ans;
 */
     ADrep evaluate_RTMB(ADrep x){
-        fims_popdy::LogisticSelectivity<ad*> LogisticSel;
+        fims_popdy::LogisticSelectivity<ad> LogisticSel;
         // inflection_point and slope are fims::Vector<Type>
         // initial_value_m is a double
-        ad* IP = adptr(this->inflection_point[0].initial_value_m);
-        ad* Slope = adptr(this->slope[0].initial_value_m);
+        ad IP = this->inflection_point[0].initial_value_m;
+        ad Slope = this->slope[0].initial_value_m;
         LogisticSel.inflection_point.resize(1);
         LogisticSel.inflection_point[0] = IP;
         LogisticSel.slope.resize(1);
@@ -147,7 +147,9 @@ public:
         int n = x.size();
         ADrep ans(n); 
         ad* Y = adptr(ans); 
-        Y = LogisticSel.evaluate(X);
+        for(int i=0; i<n; i++){
+          Y[i] = LogisticSel.evaluate(X[i]);
+        }
         return ans; 
      //VECTORIZE_UNARY(evaluate);
     }
