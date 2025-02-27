@@ -62,6 +62,11 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
 
     return recruits;
   }
+
+  /** Empty return of base class function */
+  virtual const Type add_error(size_t pos){
+    return 0;
+  }
 };
 
 }  // namespace fims_popdy

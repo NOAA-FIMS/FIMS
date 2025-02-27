@@ -711,6 +711,17 @@ RCPP_MODULE(fims) {
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
             .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
 
+    Rcpp::class_<LogDevsRecruitmentErrorInterface>("LogDevsRecruitmentError")
+            .constructor()
+            .method("get_id", &LogDevsRecruitmentErrorInterface::get_id)
+            .method("add_error", &LogDevsRecruitmentErrorInterface::add_error);
+
+    Rcpp::class_<LogRRecruitmentErrorInterface>("LogRRecruitmentError")
+            .constructor()
+            .method("get_id", &LogRRecruitmentErrorInterface::get_id)
+            .method("add_error", &LogRRecruitmentErrorInterface::add_error);
+  
+
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
       .field("is_survey", &FleetInterface::is_survey)
@@ -763,6 +774,7 @@ RCPP_MODULE(fims) {
             .method("SetMaturity", &PopulationInterface::SetMaturity, "Set the unique id for the Maturity object")
             .method("SetGrowth", &PopulationInterface::SetGrowth, "Set the unique id for the growth object")
             .method("SetRecruitment", &PopulationInterface::SetRecruitment, "Set the unique id for the Recruitment object")
+            .method("SetRecruitmentError", &PopulationInterface::SetRecruitmentError, "Set the unique id for the Recruitment Error object")
             .method("evaluate", &PopulationInterface::evaluate, "evaluate the population function");
 
     Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")

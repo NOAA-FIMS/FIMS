@@ -101,6 +101,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   uint32_t recruitment_id;
   /**
+   * @brief The ID of the recruitment error module.
+   */
+  uint32_t recruitment_err_id;
+  /**
    * @brief The natural log of the natural mortality for each year.
    */
   ParameterVector log_M;
@@ -189,6 +193,15 @@ class PopulationInterface : public PopulationInterfaceBase {
   void SetRecruitment(uint32_t recruitment_id) {
     this->recruitment_id = recruitment_id;
   }
+
+  /**
+   * @brief Set the unique ID for the recruitment error object.
+   * @param recruitment_err_id Unique ID for the recruitment error object.
+   */
+  void SetRecruitmentError(uint32_t recruitment_err_id) {
+    this->recruitment_err_id = recruitment_err_id;
+  }
+
 
   /**
    * @brief Evaluate the population function.

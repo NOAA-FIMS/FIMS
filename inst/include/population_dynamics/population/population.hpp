@@ -75,6 +75,9 @@ namespace fims_popdy {
         int recruitment_id = -999; /*!< id of recruitment model object*/
         std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
         recruitment; /*!< shared pointer to recruitment module */
+        int recruitment_err_id = -999; /*!< id of recruitment error model object*/
+        std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
+        recruitment_err; /*!< shared pointer to recruitment module */
 
         // growth
         int growth_id = -999; /*!< id of growth model object*/
@@ -348,32 +351,19 @@ namespace fims_popdy {
          */
         void CalculateRecruitment(size_t i_age_year, size_t year, size_t i_dev) {
             Type phi0 = CalculateSBPR0();
-            if(recruitment->log_r[0] == -999){
-                if (i_dev == this->nyears) {
-                    this->numbers_at_age[i_age_year] =
-                            this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0);
-                    /*the final year of the time series has no data to inform recruitment
-                    devs, so this value is set to the mean recruitment.*/
-                } else {
-                    this->numbers_at_age[i_age_year] =
-                            this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0) *
-                            /*the log_recruit_dev vector does not include a value for year == 0
-                            and is of length nyears - 1 where the first position of the vector
-                            corresponds to the second year of the time series. The first year is 
-                            informed by the init_naa parameter*/
-                            fims_math::exp(this->recruitment->log_recruit_devs[i_dev - 1]);
-                }
+            if (i_dev == this->nyears) {
+                this->numbers_at_age[i_age_year] =
+                        this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0);
+                /*the final year of the time series has no data to inform recruitment
+                devs, so this value is set to the mean recruitment.*/
             } else {
-                if (i_dev == this->nyears) {
-                    this->numbers_at_age[i_age_year] =
-                            this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0);
-                    /*the final year of the time series has no data to inform recruitment
-                    devs, so this value is set to the mean recruitment.*/
-                } else {
-                    recruitment->log_expected_recruitment[year-1] =
-                        fims_math::log(this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0));
-                    this->numbers_at_age[i_age_year] = fims_math::exp(recruitment->log_r[year-1]);
-                }
+                recruitment->log_expected_recruitment[year-1] =
+                    fims_math::log(this->recruitment->evaluate(this->spawning_biomass[year - 1], phi0));
+                    /*the log_recruit_err vector does not include a value for year == 0
+                        and is of length nyears - 1 where the first position of the vector
+                        corresponds to the second year of the time series. The first year is 
+                        informed by the init_naa parameter*/
+                this->numbers_at_age[i_age_year] = fims_math::exp(recruitment_err->add_error(year-1));
             }
             this->expected_recruitment[year] = this->numbers_at_age[i_age_year];
        }

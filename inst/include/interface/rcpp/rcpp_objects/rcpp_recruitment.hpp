@@ -68,6 +68,62 @@ uint32_t RecruitmentInterfaceBase::id_g = 1;
 std::map<uint32_t, RecruitmentInterfaceBase*>
     RecruitmentInterfaceBase::live_objects;
 
+
+/**
+ * @brief Rcpp interface that serves as the parent class for Rcpp recruitment
+ * interfaces. This type should be inherited and not called from R directly.
+ */
+class RecruitmentErrorInterfaceBase : public FIMSRcppInterfaceBase {
+  public:
+   /**
+    * @brief The static id of the RecruitmentErrorInterfaceBase object.
+    */
+   static uint32_t id_g;
+   /**
+    * @brief The local id of the RecruitmentErrorInterfaceBase object.
+    */
+   uint32_t id;
+   /**
+    * @brief The map associating the IDs of RecruitmentErrorInterfaceBase to the
+    * objects. This is a live object, which is an object that has been created
+    * and lives in memory.
+    */
+   static std::map<uint32_t, RecruitmentErrorInterfaceBase*> live_objects;
+ 
+   /**
+    * @brief The constructor.
+    */
+   RecruitmentErrorInterfaceBase() {
+     this->id = RecruitmentErrorInterfaceBase::id_g++;
+     /* Create instance of map: key is id and value is pointer to
+     RecruitmentErrorInterfaceBase */
+     RecruitmentErrorInterfaceBase::live_objects[this->id] = this;
+     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+   }
+ 
+   /**
+    * @brief The destructor.
+    */
+   virtual ~RecruitmentErrorInterfaceBase() {}
+ 
+   /**
+    * @brief Get the ID for the child recruitment error interface objects to inherit.
+    */
+   virtual uint32_t get_id() = 0;
+ 
+   /**
+    * @brief A method for each child recruitment error interface object to inherit so
+    * each recruitment error option can have an add_error() function.
+    */
+   virtual double add_error(size_t pos) = 0;
+ };
+ // static id of the RecruitmentInterfaceBase object
+ uint32_t RecruitmentErrorInterfaceBase::id_g = 1;
+ // local id of the RecruitmentErrorInterfaceBase object map relating the ID of the
+ // RecruitmentErrorInterfaceBase to the RecruitmentErrorInterfaceBase objects
+ std::map<uint32_t, RecruitmentErrorInterfaceBase*>
+     RecruitmentErrorInterfaceBase::live_objects;
+
 /**
  * @brief Rcpp interface for Beverton--Holt to instantiate from R:
  * beverton_holt <- methods::new(beverton_holt).
@@ -345,5 +401,149 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
 #endif
 };
+
+
+/**
+ * @brief Rcpp interface for Log--Devs to instantiate from R:
+ * log_devs <- methods::new(log_devs).
+ */
+class LogDevsRecruitmentErrorInterface : public RecruitmentErrorInterfaceBase {
+  public:
+ 
+   /**
+    * @brief The constructor.
+    */
+   LogDevsRecruitmentErrorInterface() : RecruitmentErrorInterfaceBase() {}
+ 
+   /**
+    * @brief The destructor.
+    */
+   virtual ~LogDevsRecruitmentErrorInterface() {}
+ 
+   /**
+    * @brief Gets the ID of the interface base object.
+    * @return The ID.
+    */
+   virtual uint32_t get_id() { return this->id; }
+ 
+   /**
+    * @brief Evaluate recruitment error using the Log--Devs approach.
+    * @param pos Position index, e.g., which year.
+    */
+   virtual double add_error(size_t pos) {
+     fims_popdy::LogDevs<double> LogDevs;
+
+     return LogDevs.add_error(pos);
+   }
+
+  
+#ifdef TMB_MODEL
+
+template <typename Type>
+bool add_to_fims_tmb_internal() {
+  std::shared_ptr<fims_info::Information<Type> > info =
+    fims_info::Information<Type>::GetInstance();
+
+  std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_err =
+    std::make_shared<fims_popdy::LogDevs<Type> >();
+
+  // set relative info
+  recruitment_err->id = this->id;
+
+  // add to Information
+  info->recruitment_err_models[recruitment_err->id] = recruitment_err;
+
+  return true;
+}
+
+ /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    FIMS_INFO_LOG("adding Recruitment Error object to TMB");
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+    return true;
+  }
+
+#endif
+};
+
+
+
+/**
+ * @brief Rcpp interface for Log--R to instantiate from R:
+ * log_r <- methods::new(log_r).
+ */
+class LogRRecruitmentErrorInterface : public RecruitmentErrorInterfaceBase {
+ public:
+ 
+  /**
+   * @brief The constructor.
+   */
+  LogRRecruitmentErrorInterface() : RecruitmentErrorInterfaceBase() {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~LogRRecruitmentErrorInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Evaluate recruitment error using the Log--R approach.
+   * @param pos Position index, e.g., which year.
+   */
+  virtual double add_error(size_t pos) {
+    fims_popdy::LogR<double> LogR;
+
+    return LogR.add_error(pos);
+  }
+
+ 
+#ifdef TMB_MODEL
+
+template <typename Type>
+bool add_to_fims_tmb_internal() {
+ std::shared_ptr<fims_info::Information<Type> > info =
+   fims_info::Information<Type>::GetInstance();
+
+ std::shared_ptr<fims_popdy::LogR<Type> > recruitment_err =
+   std::make_shared<fims_popdy::LogR<Type> >();
+
+ // set relative info
+ recruitment_err->id = this->id;
+
+ // add to Information
+ info->recruitment_err_models[recruitment_err->id] = recruitment_err;
+
+ return true;
+}
+
+/**
+  * @brief Adds the parameters to the TMB model.
+  * @return A boolean of true.
+  */
+ virtual bool add_to_fims_tmb() {
+   FIMS_INFO_LOG("adding Recruitment Error object to TMB");
+   this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+   this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+   this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+   this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+   return true;
+ }
+
+#endif
+};
+  
 
 #endif
