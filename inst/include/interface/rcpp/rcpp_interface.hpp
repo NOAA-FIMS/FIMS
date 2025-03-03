@@ -714,12 +714,12 @@ RCPP_MODULE(fims) {
     Rcpp::class_<LogDevsRecruitmentErrorInterface>("LogDevsRecruitmentError")
             .constructor()
             .method("get_id", &LogDevsRecruitmentErrorInterface::get_id)
-            .method("add_error", &LogDevsRecruitmentErrorInterface::add_error);
+            .method("process_structure", &LogDevsRecruitmentErrorInterface::process_structure);
 
     Rcpp::class_<LogRRecruitmentErrorInterface>("LogRRecruitmentError")
             .constructor()
             .method("get_id", &LogRRecruitmentErrorInterface::get_id)
-            .method("add_error", &LogRRecruitmentErrorInterface::add_error);
+            .method("process_structure", &LogRRecruitmentErrorInterface::process_structure);
   
 
   Rcpp::class_<FleetInterface>("Fleet")

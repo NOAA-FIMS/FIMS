@@ -275,7 +275,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
-  recruitment_err <- new(LogDevsRecruitmentError)
+  recruitment_err <- new(LogDevsRecruitmentProcess)
   
   # Growth
   ewaa_growth <- methods::new(EWAAgrowth)
@@ -309,7 +309,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   population$nseasons <- 1
   population$nyears <- om_input[["nyr"]]
   population$SetRecruitment(recruitment$get_id())
-  population$SetRecruitmentError(recruitment_err$get_id())
+  population$SetRecruitmentProcess(recruitment_err$get_id())
   population$SetGrowth(ewaa_growth$get_id())
   population$SetMaturity(maturity$get_id())
 

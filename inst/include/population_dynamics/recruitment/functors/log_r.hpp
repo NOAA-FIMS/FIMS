@@ -29,7 +29,7 @@ struct LogR : public RecruitmentBase<Type> {
    * 
    * @param pos Position index, e.g., which year.
    */
-  virtual const Type add_error(size_t pos) {
+  virtual const Type process_structure(size_t pos) {
     return this->log_r[pos];
   }
 

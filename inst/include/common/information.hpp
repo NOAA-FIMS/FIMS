@@ -64,11 +64,11 @@ namespace fims_info {
         /**< iterator for recruitment objects>*/
 
         std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >
-        recruitment_err_models; /**<hash map to link each object to its shared
+        recruitment_structure_models; /**<hash map to link each object to its shared
                              location in memory*/
         typedef typename std::map<
         uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >::iterator
-        recruitment_err_iterator;
+        recruitment_structure_iterator;
         /**< iterator for recruitment error objects>*/
         
 
@@ -153,7 +153,7 @@ namespace fims_info {
             this->parameters.clear();
             this->random_effects_parameters.clear();
             this->recruitment_models.clear();
-            this->recruitment_err_models.clear();
+            this->recruitment_structure_models.clear();
             this->selectivity_models.clear();
             this->variable_map.clear();
             this->nyears = 0;
@@ -444,34 +444,34 @@ namespace fims_info {
          * @param &valid_model reference to true/false boolean indicating whether model is valid.
          * @param p shared pointer to population module
          */
-        void SetRecruitmentError(
+        void SetRecruitmentProcess(
             bool &valid_model,
             std::shared_ptr<fims_popdy::Population<Type> > p) {
-        if (p->recruitment_err_id != -999) {
-            uint32_t recruitment_err_uint = static_cast<uint32_t> (p->recruitment_err_id);
-            recruitment_err_iterator it =
-                    this->recruitment_err_models.find(recruitment_err_uint);
+        if (p->recruitment_structure_id != -999) {
+            uint32_t recruitment_structure_uint = static_cast<uint32_t> (p->recruitment_structure_id);
+            recruitment_structure_iterator it =
+                    this->recruitment_structure_models.find(recruitment_structure_uint);
 
-            if (it != this->recruitment_err_models.end()) {
-                p->recruitment_err =
+            if (it != this->recruitment_structure_models.end()) {
+                p->recruitment_structure =
                         (*it).second; // recruitment error defined in population.hpp
-                FIMS_INFO_LOG("Recruitment Error model "
-                        + fims::to_string(recruitment_err_uint)
+                FIMS_INFO_LOG("Recruitment Process model "
+                        + fims::to_string(recruitment_structure_uint)
                         + " successfully set to population "
                         + fims::to_string(p->id));
             } else {
                 valid_model = false;
-                FIMS_ERROR_LOG("Expected recruitment error function not defined for "
+                FIMS_ERROR_LOG("Expected recruitment process function not defined for "
                         "population "
-                        + fims::to_string(p->id) + ", recruitment error function "
-                        + fims::to_string(recruitment_err_uint));
+                        + fims::to_string(p->id) + ", recruitment process function "
+                        + fims::to_string(recruitment_structure_uint));
             }
 
         } else {
             valid_model = false;
-            FIMS_ERROR_LOG("No recruitment error function defined for population "
+            FIMS_ERROR_LOG("No recruitment process function defined for population "
                     + fims::to_string(p->id)
-                    + ". FIMS requires recruitment error functions be defined for all "
+                    + ". FIMS requires recruitment process functions be defined for all "
                     "populations.");
         }
     }
@@ -642,7 +642,7 @@ namespace fims_info {
 
                 SetRecruitment(valid_model, p);
 
-                SetRecruitmentError(valid_model, p);
+                SetRecruitmentProcess(valid_model, p);
 
                 SetGrowth(valid_model, p);
 

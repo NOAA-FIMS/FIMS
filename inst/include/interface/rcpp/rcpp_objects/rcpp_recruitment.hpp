@@ -113,9 +113,9 @@ class RecruitmentErrorInterfaceBase : public FIMSRcppInterfaceBase {
  
    /**
     * @brief A method for each child recruitment error interface object to inherit so
-    * each recruitment error option can have an add_error() function.
+    * each recruitment error option can have a process_structure() function.
     */
-   virtual double add_error(size_t pos) = 0;
+   virtual double process_structure(size_t pos) = 0;
  };
  // static id of the RecruitmentInterfaceBase object
  uint32_t RecruitmentErrorInterfaceBase::id_g = 1;
@@ -430,10 +430,10 @@ class LogDevsRecruitmentErrorInterface : public RecruitmentErrorInterfaceBase {
     * @brief Evaluate recruitment error using the Log--Devs approach.
     * @param pos Position index, e.g., which year.
     */
-   virtual double add_error(size_t pos) {
+   virtual double process_structure(size_t pos) {
      fims_popdy::LogDevs<double> LogDevs;
 
-     return LogDevs.add_error(pos);
+     return LogDevs.process_structure(pos);
    }
 
   
@@ -444,14 +444,14 @@ bool add_to_fims_tmb_internal() {
   std::shared_ptr<fims_info::Information<Type> > info =
     fims_info::Information<Type>::GetInstance();
 
-  std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_err =
+  std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_structure =
     std::make_shared<fims_popdy::LogDevs<Type> >();
 
   // set relative info
-  recruitment_err->id = this->id;
+  recruitment_structure->id = this->id;
 
   // add to Information
-  info->recruitment_err_models[recruitment_err->id] = recruitment_err;
+  info->recruitment_structure_models[recruitment_structure->id] = recruitment_structure;
 
   return true;
 }
@@ -502,10 +502,10 @@ class LogRRecruitmentErrorInterface : public RecruitmentErrorInterfaceBase {
    * @brief Evaluate recruitment error using the Log--R approach.
    * @param pos Position index, e.g., which year.
    */
-  virtual double add_error(size_t pos) {
+  virtual double process_structure(size_t pos) {
     fims_popdy::LogR<double> LogR;
 
-    return LogR.add_error(pos);
+    return LogR.process_structure(pos);
   }
 
  
@@ -516,14 +516,14 @@ bool add_to_fims_tmb_internal() {
  std::shared_ptr<fims_info::Information<Type> > info =
    fims_info::Information<Type>::GetInstance();
 
- std::shared_ptr<fims_popdy::LogR<Type> > recruitment_err =
+ std::shared_ptr<fims_popdy::LogR<Type> > recruitment_structure =
    std::make_shared<fims_popdy::LogR<Type> >();
 
  // set relative info
- recruitment_err->id = this->id;
+ recruitment_structure->id = this->id;
 
  // add to Information
- info->recruitment_err_models[recruitment_err->id] = recruitment_err;
+ info->recruitment_structure_models[recruitment_structure->id] = recruitment_structure;
 
  return true;
 }

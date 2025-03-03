@@ -64,7 +64,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   }
 
   /** Empty return of base class function */
-  virtual const Type add_error(size_t pos){
+  virtual const Type process_structure(size_t pos){
     return 0;
   }
 };

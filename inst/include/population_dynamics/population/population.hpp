@@ -75,9 +75,9 @@ namespace fims_popdy {
         int recruitment_id = -999; /*!< id of recruitment model object*/
         std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
         recruitment; /*!< shared pointer to recruitment module */
-        int recruitment_err_id = -999; /*!< id of recruitment error model object*/
+        int recruitment_structure_id = -999; /*!< id of recruitment error model object*/
         std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
-        recruitment_err; /*!< shared pointer to recruitment module */
+        recruitment_structure; /*!< shared pointer to recruitment module */
 
         // growth
         int growth_id = -999; /*!< id of growth model object*/
@@ -363,7 +363,7 @@ namespace fims_popdy {
                         and is of length nyears - 1 where the first position of the vector
                         corresponds to the second year of the time series. The first year is 
                         informed by the init_naa parameter*/
-                this->numbers_at_age[i_age_year] = fims_math::exp(recruitment_err->add_error(year-1));
+                this->numbers_at_age[i_age_year] = fims_math::exp(recruitment_structure->process_structure(year-1));
             }
             this->expected_recruitment[year] = this->numbers_at_age[i_age_year];
        }

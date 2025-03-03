@@ -70,7 +70,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    * 
    * @param pos Position index, e.g., which year.
   */
-  virtual const Type add_error(size_t pos) = 0;
+  virtual const Type process_structure(size_t pos) = 0;
 
   /** @brief Prepare constrained recruitment deviations.
    *  Based on ADMB sum-to-zero constraint implementation. We still
