@@ -2,27 +2,36 @@
 % Please edit documentation in R/use_template.R
 \name{use_testthat_template}
 \alias{use_testthat_template}
-\title{Create R test file}
+\title{Create tests/testthat/test-*.R test file}
 \usage{
 use_testthat_template(name)
 }
 \arguments{
-\item{name}{A character string to specify the name of the test file. The name
-should be used to create the file (with a \code{test-} prefix). If \code{name}
-is \code{NULL}, the function will not generate a name and will throws an error.}
+\item{name}{A character string providing the name of the R function that you
+want to test. The name will be used to create the file name, i.e.,
+tests/testthat/test-{name}.R. If \code{name} is not specified, the function
+will not be able to create a file name and an error will be returned.}
 }
 \value{
-Returns \code{invisible(TRUE)} to allow for chaining of commands.
+If successful, this function invisibly returns \code{TRUE} to allow for the
+chaining of commands. If the function is unsuccessful, an error message is
+returned.
+
+Two messages are also returned from the usethis package, which is used by
+this function. The first states where the FIMS project is on your computer.
+The second states the file path of the newly created file. The file will not
+be automatically opened.
 }
 \description{
-This helper function creates a new test file using a template if it doesn't already exist.
-The test file is created under the "tests/testthat" directory with a name based on
-the input argument \code{name}. If the test file already exists at the
-specified path, an error message is raised and no changes are made.
+This helper function creates a new test file for testthat using a template
+available within the templates folder of this package. The test file is
+created under the "tests/testthat" directory with a name based on the input
+argument \code{name}. If the test file already exists, an error message is
+returned and no changes are made.
 }
 \examples{
-# Create a new test file named "my-test"
+# Create a new test file named "test-new_function" for `new_function()`
 \dontrun{
-FIMS:::use_testthat_template("my-test")
+FIMS:::use_testthat_template("new_function")
 }
 }

@@ -1,14 +1,14 @@
 #' FIMS Testing Criteria (This section should be removed once the test has been
 #' created):
-#' 
-#' These are the three minimum testing criteria for FIMS, which should be 
+#'
+#' These are the three minimum testing criteria for FIMS, which should be
 #' validated for every R function:
-#'  
-#' 1. Input and output correctness [IO correctness]: ensure that the function 
+#'
+#' 1. Input and output correctness [IO correctness]: ensure that the function
 #'    behaves as expected with correct inputs and returns the expected outputs.
-#' 2. Edge case handling [Edge handling]: Validate the function's performance with 
-#'    invalid inputs and unusual scenarios.
-#' 3. Built-in errors and warnings [Error handling]: confirm that appropriate 
+#' 2. Edge case handling [Edge handling]: Validate the function's performance
+#'    with invalid inputs and unusual scenarios.
+#' 3. Built-in errors and warnings [Error handling]: confirm that appropriate
 #'    error and warning messages are triggered under exceptional conditions.
 #'
 #' Example function (This section should be removed once the test has
@@ -20,10 +20,10 @@
 #'   result <- dividend / divisor
 #' }
 #'
-#' Note: 
+#' Note:
 #' The @description tag below can be used to generate a bookdown report of
 #' {testthat} results using {testdown}. Currently, the description must be kept
-#' on a single line. 
+#' on a single line.
 
 # IO correctness
 test_that("divide_by() works with correct inputs", {
