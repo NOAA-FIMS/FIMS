@@ -33,7 +33,7 @@ create_temporary_file <- function(temp_path) {
       temp_path, "tests", "testthat", "test-individual_function.R"
     ),
     function_group_path = file.path(
-      temp_path, "tests", "testthat", "test-function-group.R" 
+      temp_path, "tests", "testthat", "test-function-group.R"
     ),
     error = error
   )
