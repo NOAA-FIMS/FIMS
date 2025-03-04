@@ -41,7 +41,7 @@ test_that("EWAAgrowth get_id() works with correct input data", {
 clear()
 
 ## Edge handling ----
-# Question: The following test has been commented out due to it causing R to crash. 
+# Question: The following test has been commented out due to it causing R to crash.
 # Should we remove the test entirely or revisit and fix it in the future?
 # test_that("EWAAgrowth evaluate() doesn't work when missing weights", {
 #   # Initialize an EWAAgrowth object
