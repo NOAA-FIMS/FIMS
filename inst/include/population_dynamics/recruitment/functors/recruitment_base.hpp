@@ -62,7 +62,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    * @param idx An index for the rzero vector
    *
    */
-  virtual const Type evaluate(
+  virtual const Type evaluate_mean(
       const Type &spawners,
       const Type &ssbzero) = 0;  // need to add input parameter values
 
@@ -70,7 +70,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    * 
    * @param pos Position index, e.g., which year.
   */
-  virtual const Type process_structure(size_t pos) = 0;
+  virtual const Type evaluate_process(size_t pos) = 0;
 
   /** @brief Prepare constrained recruitment deviations.
    *  Based on ADMB sum-to-zero constraint implementation. We still

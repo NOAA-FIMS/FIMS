@@ -57,9 +57,9 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 
   /**
    * @brief A method for each child recruitment interface object to inherit so
-   * each recruitment option can have an evaluate() function.
+   * each recruitment option can have an evaluate_mean() function.
    */
-  virtual double evaluate(double spawners, double ssbzero) = 0;
+  virtual double evaluate_mean(double spawners, double ssbzero) = 0;
 };
 // static id of the RecruitmentInterfaceBase object
 uint32_t RecruitmentInterfaceBase::id_g = 1;
@@ -73,56 +73,56 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
  * @brief Rcpp interface that serves as the parent class for Rcpp recruitment
  * interfaces. This type should be inherited and not called from R directly.
  */
-class RecruitmentErrorInterfaceBase : public FIMSRcppInterfaceBase {
+class RecruitmentProcessInterfaceBase : public FIMSRcppInterfaceBase {
   public:
    /**
-    * @brief The static id of the RecruitmentErrorInterfaceBase object.
+    * @brief The static id of the RecruitmentProcessInterfaceBase object.
     */
    static uint32_t id_g;
    /**
-    * @brief The local id of the RecruitmentErrorInterfaceBase object.
+    * @brief The local id of the RecruitmentProcessInterfaceBase object.
     */
    uint32_t id;
    /**
-    * @brief The map associating the IDs of RecruitmentErrorInterfaceBase to the
+    * @brief The map associating the IDs of RecruitmentProcessInterfaceBase to the
     * objects. This is a live object, which is an object that has been created
     * and lives in memory.
     */
-   static std::map<uint32_t, RecruitmentErrorInterfaceBase*> live_objects;
+   static std::map<uint32_t, RecruitmentProcessInterfaceBase*> live_objects;
  
    /**
     * @brief The constructor.
     */
-   RecruitmentErrorInterfaceBase() {
-     this->id = RecruitmentErrorInterfaceBase::id_g++;
+   RecruitmentProcessInterfaceBase() {
+     this->id = RecruitmentProcessInterfaceBase::id_g++;
      /* Create instance of map: key is id and value is pointer to
-     RecruitmentErrorInterfaceBase */
-     RecruitmentErrorInterfaceBase::live_objects[this->id] = this;
+     RecruitmentProcessInterfaceBase */
+     RecruitmentProcessInterfaceBase::live_objects[this->id] = this;
      FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
    }
  
    /**
     * @brief The destructor.
     */
-   virtual ~RecruitmentErrorInterfaceBase() {}
+   virtual ~RecruitmentProcessInterfaceBase() {}
  
    /**
-    * @brief Get the ID for the child recruitment error interface objects to inherit.
+    * @brief Get the ID for the child recruitment process interface objects to inherit.
     */
    virtual uint32_t get_id() = 0;
  
    /**
-    * @brief A method for each child recruitment error interface object to inherit so
-    * each recruitment error option can have a process_structure() function.
+    * @brief A method for each child recruitment process interface object to inherit so
+    * each recruitment process option can have a evaluate_process() function.
     */
-   virtual double process_structure(size_t pos) = 0;
+   virtual double evaluate_process(size_t pos) = 0;
  };
  // static id of the RecruitmentInterfaceBase object
- uint32_t RecruitmentErrorInterfaceBase::id_g = 1;
- // local id of the RecruitmentErrorInterfaceBase object map relating the ID of the
- // RecruitmentErrorInterfaceBase to the RecruitmentErrorInterfaceBase objects
- std::map<uint32_t, RecruitmentErrorInterfaceBase*>
-     RecruitmentErrorInterfaceBase::live_objects;
+ uint32_t RecruitmentProcessInterfaceBase::id_g = 1;
+ // local id of the RecruitmentProcessInterfaceBase object map relating the ID of the
+ // RecruitmentProcessInterfaceBase to the RecruitmentProcessInterfaceBase objects
+ std::map<uint32_t, RecruitmentProcessInterfaceBase*>
+     RecruitmentProcessInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for Beverton--Holt to instantiate from R:
@@ -193,7 +193,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param ssbzero The biomass at unfished levels.
    * TODO: Change to sbzero if continuing to use acronyms.
    */
-  virtual double evaluate(double spawners, double ssbzero) {
+  virtual double evaluate_mean(double spawners, double ssbzero) {
     fims_popdy::SRBevertonHolt<double> BevHolt;
     BevHolt.logit_steep.resize(1);
     BevHolt.logit_steep[0] = this->logit_steep[0].initial_value_m;
@@ -206,7 +206,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     BevHolt.log_rzero.resize(1);
     BevHolt.log_rzero[0] = this->log_rzero[0].initial_value_m;
 
-    return BevHolt.evaluate(spawners, ssbzero);
+    return BevHolt.evaluate_mean(spawners, ssbzero);
   }
 
   /** 
@@ -407,18 +407,18 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  * @brief Rcpp interface for Log--Devs to instantiate from R:
  * log_devs <- methods::new(log_devs).
  */
-class LogDevsRecruitmentErrorInterface : public RecruitmentErrorInterfaceBase {
+class LogDevsRecruitmentInterface : public RecruitmentProcessInterfaceBase {
   public:
  
    /**
     * @brief The constructor.
     */
-   LogDevsRecruitmentErrorInterface() : RecruitmentErrorInterfaceBase() {}
+   LogDevsRecruitmentInterface() : RecruitmentProcessInterfaceBase() {}
  
    /**
     * @brief The destructor.
     */
-   virtual ~LogDevsRecruitmentErrorInterface() {}
+   virtual ~LogDevsRecruitmentInterface() {}
  
    /**
     * @brief Gets the ID of the interface base object.
@@ -427,13 +427,13 @@ class LogDevsRecruitmentErrorInterface : public RecruitmentErrorInterfaceBase {
    virtual uint32_t get_id() { return this->id; }
  
    /**
-    * @brief Evaluate recruitment error using the Log--Devs approach.
+    * @brief Evaluate recruitment process using the Log--Devs approach.
     * @param pos Position index, e.g., which year.
     */
-   virtual double process_structure(size_t pos) {
+   virtual double evaluate_process(size_t pos) {
      fims_popdy::LogDevs<double> LogDevs;
 
-     return LogDevs.process_structure(pos);
+     return LogDevs.evaluate_process(pos);
    }
 
   
@@ -444,14 +444,14 @@ bool add_to_fims_tmb_internal() {
   std::shared_ptr<fims_info::Information<Type> > info =
     fims_info::Information<Type>::GetInstance();
 
-  std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_structure =
+  std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_process =
     std::make_shared<fims_popdy::LogDevs<Type> >();
 
   // set relative info
-  recruitment_structure->id = this->id;
+  recruitment_process->id = this->id;
 
   // add to Information
-  info->recruitment_structure_models[recruitment_structure->id] = recruitment_structure;
+  info->recruitment_process_models[recruitment_process->id] = recruitment_process;
 
   return true;
 }
@@ -461,7 +461,7 @@ bool add_to_fims_tmb_internal() {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    FIMS_INFO_LOG("adding Recruitment Error object to TMB");
+    FIMS_INFO_LOG("adding recruitment process object to TMB");
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
@@ -479,18 +479,18 @@ bool add_to_fims_tmb_internal() {
  * @brief Rcpp interface for Log--R to instantiate from R:
  * log_r <- methods::new(log_r).
  */
-class LogRRecruitmentErrorInterface : public RecruitmentErrorInterfaceBase {
+class LogRRecruitmentInterface : public RecruitmentProcessInterfaceBase {
  public:
  
   /**
    * @brief The constructor.
    */
-  LogRRecruitmentErrorInterface() : RecruitmentErrorInterfaceBase() {}
+  LogRRecruitmentInterface() : RecruitmentProcessInterfaceBase() {}
 
   /**
    * @brief The destructor.
    */
-  virtual ~LogRRecruitmentErrorInterface() {}
+  virtual ~LogRRecruitmentInterface() {}
 
   /**
    * @brief Gets the ID of the interface base object.
@@ -499,13 +499,13 @@ class LogRRecruitmentErrorInterface : public RecruitmentErrorInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @brief Evaluate recruitment error using the Log--R approach.
+   * @brief Evaluate recruitment process using the Log--R approach.
    * @param pos Position index, e.g., which year.
    */
-  virtual double process_structure(size_t pos) {
+  virtual double evaluate_process(size_t pos) {
     fims_popdy::LogR<double> LogR;
 
-    return LogR.process_structure(pos);
+    return LogR.evaluate_process(pos);
   }
 
  
@@ -516,14 +516,14 @@ bool add_to_fims_tmb_internal() {
  std::shared_ptr<fims_info::Information<Type> > info =
    fims_info::Information<Type>::GetInstance();
 
- std::shared_ptr<fims_popdy::LogR<Type> > recruitment_structure =
+ std::shared_ptr<fims_popdy::LogR<Type> > recruitment_process =
    std::make_shared<fims_popdy::LogR<Type> >();
 
  // set relative info
- recruitment_structure->id = this->id;
+ recruitment_process->id = this->id;
 
  // add to Information
- info->recruitment_structure_models[recruitment_structure->id] = recruitment_structure;
+ info->recruitment_process_models[recruitment_process->id] = recruitment_process;
 
  return true;
 }
@@ -533,7 +533,7 @@ bool add_to_fims_tmb_internal() {
   * @return A boolean of true.
   */
  virtual bool add_to_fims_tmb() {
-   FIMS_INFO_LOG("adding Recruitment Error object to TMB");
+   FIMS_INFO_LOG("adding recruitment process object to TMB");
    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();

@@ -46,7 +46,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
    * @param spawners A measure of spawning output.
    * @param phi_0 Number of spawners per recruit of an unfished population
    */
-  virtual const Type evaluate(const Type& spawners, const Type& phi_0) {
+  virtual const Type evaluate_mean(const Type& spawners, const Type& phi_0) {
     Type recruits;
     Type steep;
     Type steep_lo = 0.2;
@@ -64,7 +64,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   }
 
   /** Empty return of base class function */
-  virtual const Type process_structure(size_t pos){
+  virtual const Type evaluate_process(size_t pos){
     return 0;
   }
 };

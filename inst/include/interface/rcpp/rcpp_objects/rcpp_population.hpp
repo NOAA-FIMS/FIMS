@@ -101,7 +101,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   uint32_t recruitment_id;
   /**
-   * @brief The ID of the recruitment error module.
+   * @brief The ID of the recruitment process module.
    */
   uint32_t recruitment_err_id;
   /**
@@ -195,8 +195,8 @@ class PopulationInterface : public PopulationInterfaceBase {
   }
 
   /**
-   * @brief Set the unique ID for the recruitment error object.
-   * @param recruitment_err_id Unique ID for the recruitment error object.
+   * @brief Set the unique ID for the recruitment process object.
+   * @param recruitment_err_id Unique ID for the recruitment process object.
    */
   void SetRecruitmentError(uint32_t recruitment_err_id) {
     this->recruitment_err_id = recruitment_err_id;
