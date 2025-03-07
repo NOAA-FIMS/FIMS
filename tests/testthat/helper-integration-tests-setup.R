@@ -233,6 +233,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
   recruitment <- methods::new(BevertonHoltRecruitment)
+  recruitment_process <- new(LogDevsRecruitmentProcess)
 
   # NOTE: in first set of parameters below (for recruitment),
   # $is_random_effect (default is FALSE) and $estimated (default is FALSE)
@@ -256,10 +257,15 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
+   recruitment$log_r$resize(om_input[["nyr"]] - 1)
+  for (y in 1:(om_input[["nyr"]] - 1)) {
+    recruitment$log_r[y]$value <- 0
+  }
   recruitment$log_devs$set_all_estimable(TRUE)
   if(random_effects){
     recruitment$log_devs$set_all_random(TRUE)
   }
+  recruitment$SetRecruitmentProcess(recruitment_process$get_id())
   recruitment_distribution <- methods::new(DnormDistribution)
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
@@ -274,8 +280,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     recruitment_distribution$expected_values[i]$value <- 0
   }
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+  recruitment$nyears <- om_input[["nyr"]]
 
-  recruitment_err <- new(LogDevsRecruitmentProcess)
   
   # Growth
   ewaa_growth <- methods::new(EWAAgrowth)
@@ -309,7 +315,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   population$nseasons <- 1
   population$nyears <- om_input[["nyr"]]
   population$SetRecruitment(recruitment$get_id())
-  population$SetRecruitmentProcess(recruitment_err$get_id())
   population$SetGrowth(ewaa_growth$get_id())
   population$SetMaturity(maturity$get_id())
 
