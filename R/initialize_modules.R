@@ -482,6 +482,104 @@ initialize_index <- function(data, fleet_name) {
   return(module)
 }
 
+# Issue #756 combine initialize_length_comp() and initialize_age_comp()
+# into a single function
+#' Initialize any composition module
+#'
+#' @description
+#' Initializes a composition module for a specific fleet,
+#' setting the composition data for the fleet over time.
+#' @inheritParams initialize_module
+#' @param fleet_name A character. Name of the fleet for which composition
+#'   data is initialized. A string indicating the type of composition,
+#'   either AgeComp or LengthComp.
+#' @param type A character. Name of the composition type, either
+#    "AgeComp" or "LengthComp".
+#' @return
+#' The initialized composition module as an object.
+#' @noRd
+initialize_comp <- function(data, fleet_name, type = c("AgeComp", "LengthComp")) {
+
+  comp_types <- list(
+    "AgeComp"    = list("name" = "age",
+                        "get_n_function" = get_n_ages,
+                        "comp_object" = AgeComp,
+                        "m_comp" = m_agecomp
+                        ),
+    "LengthComp" = list("name" = "length",
+                        "get_n_function" = get_n_lengths,
+                        "comp_object" = LengthComp,
+                        "m_comp" = m_lengthcomp
+                        )
+  )
+
+  # Ensures the user input matches the options provided,
+  #   if not, then match.arg() throws an error
+  type <- match.arg(type)
+  # Select the row in comp_types that matches the user's type selection
+  comp <- comp_types[[type]]
+
+  # Check if the specified fleet exists in the data
+  fleet_exists <- any(get_data(data)["name"] == fleet_name)
+  if (!fleet_exists) {
+    cli::cli_abort("Fleet `{fleet_name}` not found in the data object.")
+  }
+
+  # Note: "module" will be a different kind of object depending
+  #   on the "type" parameter.
+  comp_obj <- comp[["comp_object"]]
+  get_function <- comp[["get_n_function"]]
+
+  module <- methods::new(comp_obj, get_n_years(data),
+                         get_function(data))
+
+  # Validate that the fleet's -composition data is available
+  comp_data <- comp[["m_comp"]](data, fleet_name)
+  if (is.null(comp_data) || length(comp_data) == 0) {
+    cli::cli_abort(c(
+      "`{comp[['name']]}`-composition data for fleet `{fleet_name}` is unavailable or empty."
+    ))
+  }
+
+  # TODO: Figure out a better way to init the module other
+  #   than switching on the type string. Figure out how to
+  #   remove the duplicate code.
+  if(type == "LengthComp") {
+    # Assign the length-composition data to the module
+    # TODO: review the LengthComp interface, do we want to add
+    # `age_comp_data` as an argument?
+
+    module$length_comp_data <- comp_data *
+      get_data(data) |>
+        dplyr::filter(
+          name == fleet_name,
+          type == comp[["name"]]
+        ) |>
+        dplyr::mutate(
+          valid_n = ifelse(value == -999, 1, uncertainty)
+        ) |>
+        dplyr::pull(valid_n)
+  } else {
+    # default is AgeComp
+    # Assign the age-composition data to the module
+    # TODO: review the AgeComp interface, do we want to add
+    # `age_comp_data` as an argument?
+    module$age_comp_data <- comp_data *
+      get_data(data) |>
+        dplyr::filter(
+          name == fleet_name,
+          type == comp[["name"]]
+        ) |>
+        dplyr::mutate(
+          valid_n = ifelse(value == -999, 1, uncertainty)
+        ) |>
+        dplyr::pull(valid_n)
+  }
+  return(module)
+}
+
+
+# TODO: remove the older initialize_age_comp() function
 #' Initialize an age-composition module
 #'
 #' @description
@@ -528,8 +626,7 @@ initialize_age_comp <- function(data, fleet_name) {
   return(module)
 }
 
-# TODO: combine initialize_length_comp and initialize_age_comp() into a single
-# function, as they share similar code.
+# TODO: remove the older initialize_length_comp() function
 #' Initialize a length-composition module
 #'
 #' @description
@@ -646,9 +743,10 @@ initialize_fims <- function(parameters, data) {
     if ("age" %in% fleet_types &&
       "AgeComp" %in% data_distribution_names_for_fleet_i) {
       # Initialize age composition module for the current fleet
-      fleet_age_comp[[i]] <- initialize_age_comp(
+      fleet_age_comp[[i]] <- initialize_comp(
         data = data,
-        fleet_name = fleet_names[i]
+        fleet_name = fleet_names[i],
+        type = "AgeComp"
       )
 
       # Add the module ID for the initialized age composition to the list of fleet module IDs
@@ -663,9 +761,10 @@ initialize_fims <- function(parameters, data) {
     if ("length" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
       # Initialize length composition module for the current fleet
-      fleet_length_comp[[i]] <- initialize_length_comp(
+      fleet_length_comp[[i]] <- initialize_comp(
         data = data,
-        fleet_name = fleet_names[i]
+        fleet_name = fleet_names[i],
+        type = "LengthComp"
       )
 
       # Add the module ID for the initialized length composition to the list of fleet module IDs

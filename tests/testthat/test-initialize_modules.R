@@ -57,3 +57,41 @@ test_that("initialize_fims clears previous FIMS settings before initializing", {
   mockery::expect_called(mock_clear, 1)
   clear()
 })
+
+test_that("initialize_comp correctly returns error on unknown fleet_name", {
+  expect_error(
+    initialize_comp(data = data,
+                    fleet_name = "unknownfleet",
+                    type="AgeComp"),
+    "Fleet `unknownfleet` not found in the data object.")
+  clear()
+})
+
+
+test_that("initialize_comp correctly returns error on unknown type", {
+  expect_error(
+    initialize_comp(data = data,
+                    fleet_name = "fleet1",
+                    type="unknown"),
+    "should be one of")
+
+  clear()
+})
+
+test_that("initialize_comp works for type=AgeComp", {
+  result <-  initialize_comp(data = data,
+                             fleet_name = "fleet1",
+                             type="AgeComp")
+  expect_type(result, "S4")
+
+  clear()
+})
+
+test_that("initialize_comp works for type=LengthComp", {
+  result <-  initialize_comp(data = data,
+                             fleet_name = "fleet1",
+                             type="LengthComp")
+  expect_type(result, "S4")
+
+  clear()
+})
