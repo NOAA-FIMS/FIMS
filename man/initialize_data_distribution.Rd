@@ -15,6 +15,7 @@ initialize_data_distribution(
 initialize_process_distribution(
   module,
   par,
+  expected = NULL,
   family,
   sd = list(value = 1, estimated = FALSE),
   is_random_effect = FALSE

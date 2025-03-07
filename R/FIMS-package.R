@@ -1,8 +1,8 @@
 ## usethis namespace: start
 #' @export AgeComp
 #' @export BevertonHoltRecruitment
-#' @export LogDevsRecruitmentError
-#' @export LogRRecruitmentError
+#' @export LogDevsRecruitmentProcess
+#' @export LogRRecruitmentProcess
 #' @export clear
 #' @export CreateTMBModel
 #' @export DlnormDistribution
