@@ -30,7 +30,7 @@ struct LogDevs : public RecruitmentBase<Type> {
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate_process(size_t pos) {
-    return this->log_expected_recruitment[pos] + this->log_recruit_devs[pos];
+    return this->recruitment->log_expected_recruitment[pos] + this->recruitment->log_recruit_devs[pos];
   }
   
   /** Empty return of base class function */

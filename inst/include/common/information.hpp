@@ -458,6 +458,7 @@ namespace fims_info {
                         + fims::to_string(process_uint)
                         + " successfully set to population "
                         + fims::to_string(r->id));
+                (*it).second->recruitment = r;
             } else {
                 valid_model = false;
                 FIMS_ERROR_LOG("Expected recruitment process function not defined for "

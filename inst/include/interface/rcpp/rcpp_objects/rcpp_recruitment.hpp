@@ -59,18 +59,18 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual uint32_t get_id() = 0;
 
-     
-  /**
-   * @brief Set the unique ID for the recruitment process object.
-   * @param recruitment_id Unique ID for the recruitment process object.
-   */
-  virtual void SetRecruitmentProcess(uint32_t process_id) = 0;
 
   /**
    * @brief A method for each child recruitment interface object to inherit so
    * each recruitment option can have an evaluate_mean() function.
    */
   virtual double evaluate_mean(double spawners, double ssbzero) = 0;
+
+  /**
+   * @brief A method for each child recruitment process interface object to inherit so
+   * each recruitment process option can have a evaluate_process() function.
+   */
+  virtual double evaluate_process(size_t pos) = 0;
 };
 // static id of the RecruitmentInterfaceBase object
 uint32_t RecruitmentInterfaceBase::id_g = 1;
@@ -79,61 +79,6 @@ uint32_t RecruitmentInterfaceBase::id_g = 1;
 std::map<uint32_t, RecruitmentInterfaceBase*>
     RecruitmentInterfaceBase::live_objects;
 
-
-/**
- * @brief Rcpp interface that serves as the parent class for Rcpp recruitment
- * interfaces. This type should be inherited and not called from R directly.
- */
-class RecruitmentProcessInterfaceBase : public FIMSRcppInterfaceBase {
-  public:
-   /**
-    * @brief The static id of the RecruitmentProcessInterfaceBase object.
-    */
-   static uint32_t id_g;
-   /**
-    * @brief The local id of the RecruitmentProcessInterfaceBase object.
-    */
-   uint32_t id;
-   /**
-    * @brief The map associating the IDs of RecruitmentProcessInterfaceBase to the
-    * objects. This is a live object, which is an object that has been created
-    * and lives in memory.
-    */
-   static std::map<uint32_t, RecruitmentProcessInterfaceBase*> live_objects;
- 
-   /**
-    * @brief The constructor.
-    */
-   RecruitmentProcessInterfaceBase() {
-     this->id = RecruitmentProcessInterfaceBase::id_g++;
-     /* Create instance of map: key is id and value is pointer to
-     RecruitmentProcessInterfaceBase */
-     RecruitmentProcessInterfaceBase::live_objects[this->id] = this;
-     FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
-   }
- 
-   /**
-    * @brief The destructor.
-    */
-   virtual ~RecruitmentProcessInterfaceBase() {}
- 
-   /**
-    * @brief Get the ID for the child recruitment process interface objects to inherit.
-    */
-   virtual uint32_t get_id() = 0;
- 
-   /**
-    * @brief A method for each child recruitment process interface object to inherit so
-    * each recruitment process option can have a evaluate_process() function.
-    */
-   virtual double evaluate_process(size_t pos) = 0;
- };
- // static id of the RecruitmentInterfaceBase object
- uint32_t RecruitmentProcessInterfaceBase::id_g = 1;
- // local id of the RecruitmentProcessInterfaceBase object map relating the ID of the
- // RecruitmentProcessInterfaceBase to the RecruitmentProcessInterfaceBase objects
- std::map<uint32_t, RecruitmentProcessInterfaceBase*>
-     RecruitmentProcessInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for Beverton--Holt to instantiate from R:
@@ -201,7 +146,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Set the unique ID for the recruitment process object.
    * @param recruitment_id Unique ID for the recruitment process object.
    */
-  virtual void SetRecruitmentProcess(uint32_t process_id) {
+  void SetRecruitmentProcess(uint32_t process_id) {
     this->process_id = process_id;
   }
 
@@ -226,6 +171,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     BevHolt.log_rzero[0] = this->log_rzero[0].initial_value_m;
 
     return BevHolt.evaluate_mean(spawners, ssbzero);
+  }
+
+  /**
+   * @brief Evaluate recruitment process - returns 0 in this module.
+   * @param pos Position index, e.g., which year.
+   */
+  virtual double evaluate_process(size_t pos) {
+    return 0;
   }
 
   /** 
@@ -329,6 +282,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
       // set relative info
     recruitment->id = this->id;
+    recruitment->process_id = this->process_id;
     //set logit_steep
     recruitment->logit_steep.resize(this->logit_steep.size());
     for (size_t i = 0; i < this->logit_steep.size(); i++) {
@@ -364,38 +318,53 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
 
     //set log_recruit_devs
-    recruitment->log_recruit_devs.resize(this->log_devs.size());
-    for (size_t i = 0; i < this->log_devs.size(); i++) {
-      recruitment->log_recruit_devs[i] = this->log_devs[i].initial_value_m;
-      if (this->log_devs[i].estimated_m) {
-        recruitment->estimate_log_recruit_devs = true;
-        if (this->log_devs[i].is_random_effect_m) { 
-        info->RegisterRandomEffect(recruitment->log_recruit_devs[i]);
+    if(this->log_devs.size() > 0){
+      recruitment->log_recruit_devs.resize(this->log_devs.size());
+      for (size_t i = 0; i < this->log_devs.size(); i++) {
+        recruitment->log_recruit_devs[i] = this->log_devs[i].initial_value_m;
+        if (this->log_devs[i].estimated_m) {
+          recruitment->estimate_log_recruit_devs = true;
+          if (this->log_devs[i].is_random_effect_m) { 
+          info->RegisterRandomEffect(recruitment->log_recruit_devs[i]);
+          } else {
+          info->RegisterParameter(recruitment->log_recruit_devs[i]);
+          info->RegisterParameterName("log_recruit_devs");
+          }
         } else {
-        info->RegisterParameter(recruitment->log_recruit_devs[i]);
-        info->RegisterParameterName("log_recruit_devs");
-        }
-      } else {
-        recruitment->estimate_log_recruit_devs = false;
+          recruitment->estimate_log_recruit_devs = false;
+        } 
+      
       } 
-     
+
+    } else {
+      recruitment->log_recruit_devs.resize(this->nyears-1);
+      for (size_t i = 0; i < this->nyears; i++) {
+        recruitment->log_recruit_devs[i] = 0;
+      }
     }
     info->variable_map[this->log_devs.id_m] = &(recruitment)->log_recruit_devs;
     
-    recruitment->log_r.resize(this->log_r.size());
-    for (size_t i = 0; i < log_r.size(); i++) {
-      recruitment->log_r[i] = this->log_r[i].initial_value_m;
-      if (this->log_r[i].estimated_m) {
-        if(this->log_r[i].is_random_effect_m){
-          info->RegisterRandomEffect(recruitment->log_r[i]);
-        } else {
-          info->RegisterParameterName("log_r");
-          info->RegisterParameter(recruitment->log_r[i]);
+    if(this->log_r.size() > 0){
+      recruitment->log_r.resize(this->log_r.size());
+      for (size_t i = 0; i < log_r.size(); i++) {
+        recruitment->log_r[i] = this->log_r[i].initial_value_m;
+        if (this->log_r[i].estimated_m) {
+          if(this->log_r[i].is_random_effect_m){
+            info->RegisterRandomEffect(recruitment->log_r[i]);
+          } else {
+            info->RegisterParameterName("log_r");
+            info->RegisterParameter(recruitment->log_r[i]);
+          }
         }
+      }
+    } else {
+      recruitment->log_r.resize(this->nyears);
+      for (size_t i = 0; i < this->nyears; i++) {
+        recruitment->log_r[i] = 0;
       }
     }
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
-    recruitment->log_expected_recruitment.resize(nyears+1);
+    recruitment->log_expected_recruitment.resize(this->nyears+1);
     info->variable_map[this->log_expected_recruitment.id_m] = &(recruitment)->log_expected_recruitment;
     
     // add to Information
@@ -426,13 +395,13 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  * @brief Rcpp interface for Log--Devs to instantiate from R:
  * log_devs <- methods::new(log_devs).
  */
-class LogDevsRecruitmentInterface : public RecruitmentProcessInterfaceBase {
+class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
   public:
  
    /**
     * @brief The constructor.
     */
-   LogDevsRecruitmentInterface() : RecruitmentProcessInterfaceBase() {}
+   LogDevsRecruitmentInterface() : RecruitmentInterfaceBase() {}
  
    /**
     * @brief The destructor.
@@ -444,6 +413,15 @@ class LogDevsRecruitmentInterface : public RecruitmentProcessInterfaceBase {
     * @return The ID.
     */
    virtual uint32_t get_id() { return this->id; }
+
+   /**
+    * @brief Evaluate mean - returns empty function for this module.
+   * @param spawners Spawning biomass per time step.
+   * @param ssbzero The biomass at unfished levels.
+    */
+   virtual double evaluate_mean(double spawners, double ssbzero) {
+    return 0;
+  }
  
    /**
     * @brief Evaluate recruitment process using the Log--Devs approach.
@@ -466,6 +444,8 @@ bool add_to_fims_tmb_internal() {
   std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_process =
     std::make_shared<fims_popdy::LogDevs<Type> >();
 
+  recruitment_process->id = this->id;
+  
   // add to Information
   info->recruitment_process_models[recruitment_process->id] = recruitment_process;
 
@@ -495,13 +475,13 @@ bool add_to_fims_tmb_internal() {
  * @brief Rcpp interface for Log--R to instantiate from R:
  * log_r <- methods::new(log_r).
  */
-class LogRRecruitmentInterface : public RecruitmentProcessInterfaceBase {
+class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
  
   /**
    * @brief The constructor.
    */
-  LogRRecruitmentInterface() : RecruitmentProcessInterfaceBase() {}
+  LogRRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
   /**
    * @brief The destructor.
@@ -513,6 +493,16 @@ class LogRRecruitmentInterface : public RecruitmentProcessInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  
+   /**
+    * @brief Evaluate mean - returns empty function for this module.
+   * @param spawners Spawning biomass per time step.
+   * @param ssbzero The biomass at unfished levels.
+    */
+   virtual double evaluate_mean(double spawners, double ssbzero) {
+    return 0;
+  }
 
   /**
    * @brief Evaluate recruitment process using the Log--R approach.
@@ -535,6 +525,7 @@ bool add_to_fims_tmb_internal() {
  std::shared_ptr<fims_popdy::LogR<Type> > recruitment_process =
    std::make_shared<fims_popdy::LogR<Type> >();
 
+  recruitment_process->id = this->id;
 
  // add to Information
  info->recruitment_process_models[recruitment_process->id] = recruitment_process;

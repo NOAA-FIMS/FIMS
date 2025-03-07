@@ -18,7 +18,7 @@ test_that("Recruitment input settings work as expected", {
 
 
   expect_equal(recruitment$get_id(), 1)
-  expect_equal(recruitment_process$get_id(), 1)
+  expect_equal(recruitment_process$get_id(), 2)
   expect_equal(recruitment$logit_steep[1]$value, 0.78845736)
   expect_equal(recruitment$logit_steep[1]$min, 0.21)
   expect_equal(recruitment$logit_steep[1]$max, 1.0)

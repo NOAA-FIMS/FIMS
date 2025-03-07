@@ -257,10 +257,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
-   recruitment$log_r$resize(om_input[["nyr"]] - 1)
-  for (y in 1:(om_input[["nyr"]] - 1)) {
-    recruitment$log_r[y]$value <- 0
-  }
   recruitment$log_devs$set_all_estimable(TRUE)
   if(random_effects){
     recruitment$log_devs$set_all_random(TRUE)
