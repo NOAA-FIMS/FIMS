@@ -27,6 +27,10 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local id of the RecruitmentInterfaceBase object.
    */
   uint32_t id;
+    /**
+   * @brief The process id of the RecruitmentInterfaceBase object.
+   */
+  uint32_t process_id;
   /**
    * @brief The map associating the IDs of RecruitmentInterfaceBase to the
    * objects. This is a live object, which is an object that has been created
@@ -54,6 +58,13 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief Get the ID for the child recruitment interface objects to inherit.
    */
   virtual uint32_t get_id() = 0;
+
+     
+  /**
+   * @brief Set the unique ID for the recruitment process object.
+   * @param recruitment_id Unique ID for the recruitment process object.
+   */
+  virtual void SetRecruitmentProcess(uint32_t process_id) = 0;
 
   /**
    * @brief A method for each child recruitment interface object to inherit so
@@ -186,6 +197,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id; }
 
+   /**
+   * @brief Set the unique ID for the recruitment process object.
+   * @param recruitment_id Unique ID for the recruitment process object.
+   */
+  virtual void SetRecruitmentProcess(uint32_t process_id) {
+    this->process_id = process_id;
+  }
+
   /**
    * @brief Evaluate recruitment using the Beverton--Holt stock--recruitment
    * relationship.
@@ -308,7 +327,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > recruitment =
       std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
 
-    // set relative info
+      // set relative info
     recruitment->id = this->id;
     //set logit_steep
     recruitment->logit_steep.resize(this->logit_steep.size());
@@ -362,7 +381,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
      
     }
     info->variable_map[this->log_devs.id_m] = &(recruitment)->log_recruit_devs;
-
+    
     recruitment->log_r.resize(this->log_r.size());
     for (size_t i = 0; i < log_r.size(); i++) {
       recruitment->log_r[i] = this->log_r[i].initial_value_m;
@@ -378,7 +397,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
     recruitment->log_expected_recruitment.resize(nyears+1);
     info->variable_map[this->log_expected_recruitment.id_m] = &(recruitment)->log_expected_recruitment;
-
+    
     // add to Information
     info->recruitment_models[recruitment->id] = recruitment;
 
@@ -446,9 +465,6 @@ bool add_to_fims_tmb_internal() {
 
   std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_process =
     std::make_shared<fims_popdy::LogDevs<Type> >();
-
-  // set relative info
-  recruitment_process->id = this->id;
 
   // add to Information
   info->recruitment_process_models[recruitment_process->id] = recruitment_process;
@@ -519,8 +535,6 @@ bool add_to_fims_tmb_internal() {
  std::shared_ptr<fims_popdy::LogR<Type> > recruitment_process =
    std::make_shared<fims_popdy::LogR<Type> >();
 
- // set relative info
- recruitment_process->id = this->id;
 
  // add to Information
  info->recruitment_process_models[recruitment_process->id] = recruitment_process;

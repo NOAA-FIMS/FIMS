@@ -709,14 +709,15 @@ RCPP_MODULE(fims) {
             .field("log_expected_recruitment", &BevertonHoltRecruitmentInterface::log_expected_recruitment, "expectation of the recruitment process on the natural log scale")
             .field("nyears", &BevertonHoltRecruitmentInterface::nyears)
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
+            .method("SetRecruitmentProcess", &BevertonHoltRecruitmentInterface::SetRecruitmentProcess)
             .method("evaluate_mean", &BevertonHoltRecruitmentInterface::evaluate_mean);
 
-    Rcpp::class_<LogDevsRecruitmentInterface>("LogDevsRecruitmentError")
+    Rcpp::class_<LogDevsRecruitmentInterface>("LogDevsRecruitmentProcess")
             .constructor()
             .method("get_id", &LogDevsRecruitmentInterface::get_id)
             .method("evaluate_process", &LogDevsRecruitmentInterface::evaluate_process);
 
-    Rcpp::class_<LogRRecruitmentInterface>("LogRRecruitmentError")
+    Rcpp::class_<LogRRecruitmentInterface>("LogRRecruitmentProcess")
             .constructor()
             .method("get_id", &LogRRecruitmentInterface::get_id)
             .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
@@ -774,7 +775,6 @@ RCPP_MODULE(fims) {
             .method("SetMaturity", &PopulationInterface::SetMaturity, "Set the unique id for the Maturity object")
             .method("SetGrowth", &PopulationInterface::SetGrowth, "Set the unique id for the growth object")
             .method("SetRecruitment", &PopulationInterface::SetRecruitment, "Set the unique id for the Recruitment object")
-            .method("SetRecruitmentError", &PopulationInterface::SetRecruitmentError, "Set the unique id for the recruitment process object")
             .method("evaluate", &PopulationInterface::evaluate, "evaluate the population function");
 
     Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")

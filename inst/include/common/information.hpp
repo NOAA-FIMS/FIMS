@@ -420,7 +420,7 @@ namespace fims_info {
                     FIMS_INFO_LOG("Recruitment model "
                             + fims::to_string(recruitment_uint)
                             + " successfully set to population "
-                            + fims::to_string(p->id));
+                            + fims::to_string(p->id));                 
                 } else {
                     valid_model = false;
                     FIMS_ERROR_LOG("Expected recruitment function not defined for "
@@ -442,37 +442,36 @@ namespace fims_info {
          * @brief Set pointers to the recruitment process module referened in the population module. 
          * 
          * @param &valid_model reference to true/false boolean indicating whether model is valid.
-         * @param p shared pointer to population module
+         * @param r shared pointer to recruitment module
          */
         void SetRecruitmentProcess(
             bool &valid_model,
-            std::shared_ptr<fims_popdy::Population<Type> > p) {
-        if (p->recruitment_process_id != -999) {
-            uint32_t recruitment_process_uint = static_cast<uint32_t> (p->recruitment_process_id);
+            std::shared_ptr<fims_popdy::RecruitmentBase<Type> > r) {
+        if (r->process_id != -999) {
+            uint32_t process_uint = static_cast<uint32_t> (r->process_id);
             recruitment_process_iterator it =
-                    this->recruitment_process_models.find(recruitment_process_uint);
+                    this->recruitment_process_models.find(process_uint);
 
             if (it != this->recruitment_process_models.end()) {
-                p->recruitment_process =
-                        (*it).second; // recruitment process defined in population.hpp
+                r->process = (*it).second; // recruitment process
                 FIMS_INFO_LOG("Recruitment Process model "
-                        + fims::to_string(recruitment_process_uint)
+                        + fims::to_string(process_uint)
                         + " successfully set to population "
-                        + fims::to_string(p->id));
+                        + fims::to_string(r->id));
             } else {
                 valid_model = false;
                 FIMS_ERROR_LOG("Expected recruitment process function not defined for "
                         "population "
-                        + fims::to_string(p->id) + ", recruitment process function "
-                        + fims::to_string(recruitment_process_uint));
+                        + fims::to_string(r->id) + ", recruitment process function "
+                        + fims::to_string(process_uint));
             }
 
         } else {
             valid_model = false;
             FIMS_ERROR_LOG("No recruitment process function defined for population "
-                    + fims::to_string(p->id)
+                    + fims::to_string(r->id)
                     + ". FIMS requires recruitment process functions be defined for all "
-                    "populations.");
+                    "recruitments.");
         }
     }
 
@@ -642,7 +641,7 @@ namespace fims_info {
 
                 SetRecruitment(valid_model, p);
 
-                SetRecruitmentProcess(valid_model, p);
+                SetRecruitmentProcess(valid_model, p->recruitment);
 
                 SetGrowth(valid_model, p);
 

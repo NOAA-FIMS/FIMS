@@ -40,6 +40,11 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   bool estimate_log_recruit_devs = true; /*!< A flag to indicate if recruitment
                                   deviations are estimated or not */
 
+  
+  int process_id = -999; /*!< id of recruitment process model object*/
+  std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
+  process; /*!< shared pointer to recruitment module */
+
   /** @brief Constructor.
    */
   RecruitmentBase() { this->id = RecruitmentBase::id_g++; }

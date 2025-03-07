@@ -194,14 +194,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     this->recruitment_id = recruitment_id;
   }
 
-  /**
-   * @brief Set the unique ID for the recruitment process object.
-   * @param recruitment_err_id Unique ID for the recruitment process object.
-   */
-  void SetRecruitmentError(uint32_t recruitment_err_id) {
-    this->recruitment_err_id = recruitment_err_id;
-  }
-
 
   /**
    * @brief Evaluate the population function.
