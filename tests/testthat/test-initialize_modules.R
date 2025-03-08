@@ -83,6 +83,16 @@ test_that("initialize_comp works for type=AgeComp", {
                              fleet_name = "fleet1",
                              type="AgeComp")
   expect_type(result, "S4")
+  # expect that class contain correct function
+  expect_no_error(result$age_comp_data)
+  expect_true("age_comp_data" %in% names(result))
+  # expect that class does not contain the other
+  #   type of function
+  expect_error(result$length_comp_data)
+  expect_false("length_comp_data" %in% names(result))
+
+  # TODO: figure out a way to test that result contains
+  #   the correct data.
 
   clear()
 })
@@ -92,6 +102,15 @@ test_that("initialize_comp works for type=LengthComp", {
                              fleet_name = "fleet1",
                              type="LengthComp")
   expect_type(result, "S4")
+  # expect that class contain correct function
+  expect_no_error(result$length_comp_data)
+  expect_true("length_comp_data" %in% names(result))
+  # expect that class does not contain the other
+  #   type of function
+  expect_error(result$age_comp_data)
+
+  # TODO: figure out a way to test that result contains
+  #   the correct data.
 
   clear()
 })

@@ -502,11 +502,13 @@ initialize_comp <- function(data, fleet_name, type = c("AgeComp", "LengthComp"))
 
   comp_types <- list(
     "AgeComp"    = list("name" = "age",
+                        "comp_data_field" = "age_comp_data",
                         "get_n_function" = get_n_ages,
                         "comp_object" = AgeComp,
                         "m_comp" = m_agecomp
                         ),
     "LengthComp" = list("name" = "length",
+                        "comp_data_field" = "length_comp_data",
                         "get_n_function" = get_n_lengths,
                         "comp_object" = LengthComp,
                         "m_comp" = m_lengthcomp
@@ -529,6 +531,8 @@ initialize_comp <- function(data, fleet_name, type = c("AgeComp", "LengthComp"))
   #   on the "type" parameter.
   comp_obj <- comp[["comp_object"]]
   get_function <- comp[["get_n_function"]]
+  comp_data_field <- comp[["comp_data_field"]]
+  filter_type <- comp[["name"]]
 
   module <- methods::new(comp_obj, get_n_years(data),
                          get_function(data))
@@ -541,40 +545,23 @@ initialize_comp <- function(data, fleet_name, type = c("AgeComp", "LengthComp"))
     ))
   }
 
-  # TODO: Figure out a better way to init the module other
-  #   than switching on the type string. Figure out how to
-  #   remove the duplicate code.
-  if(type == "LengthComp") {
-    # Assign the length-composition data to the module
-    # TODO: review the LengthComp interface, do we want to add
-    # `age_comp_data` as an argument?
+  # Assign the -composition data to the module
+  # TODO: review the AgeComp and LengthComp interface, do we
+  #   want to add comp_data_field of `age_comp_data`
+  #   and `length_comp_data` as an argument?
+  valid_data <- comp_data *
+    get_data(data) |>
+      dplyr::filter(
+        name == fleet_name,
+        type == filter_type
+      ) |>
+      dplyr::mutate(
+        valid_n = ifelse(value == -999, 1, uncertainty)
+      ) |>
+      dplyr::pull(valid_n)
 
-    module$length_comp_data <- comp_data *
-      get_data(data) |>
-        dplyr::filter(
-          name == fleet_name,
-          type == comp[["name"]]
-        ) |>
-        dplyr::mutate(
-          valid_n = ifelse(value == -999, 1, uncertainty)
-        ) |>
-        dplyr::pull(valid_n)
-  } else {
-    # default is AgeComp
-    # Assign the age-composition data to the module
-    # TODO: review the AgeComp interface, do we want to add
-    # `age_comp_data` as an argument?
-    module$age_comp_data <- comp_data *
-      get_data(data) |>
-        dplyr::filter(
-          name == fleet_name,
-          type == comp[["name"]]
-        ) |>
-        dplyr::mutate(
-          valid_n = ifelse(value == -999, 1, uncertainty)
-        ) |>
-        dplyr::pull(valid_n)
-  }
+  module[[comp_data_field]] <- valid_data
+
   return(module)
 }
 
