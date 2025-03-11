@@ -12,9 +12,9 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x <- methods::new(ParameterVector, y, 1)
-  dnorm_$expected_values <- methods::new(ParameterVector, 0, 1)
-  dnorm_$log_sd <- methods::new(ParameterVector, log(1), 1)
+  dnorm_$x[1]$value <- y
+  dnorm_$expected_values[1]$value <- 0
+  dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
   clear()
@@ -27,9 +27,13 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x <- methods::new(ParameterVector, y, 10)
-  dnorm_$expected_values <- methods::new(ParameterVector, 0, 1)
-  dnorm_$log_sd <- methods::new(ParameterVector, log(1), 1)
+  dnorm_$x$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dnorm_$x[x]$value <- y[x]
+  )
+  dnorm_$expected_values[1]$value <- 0
+  dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
@@ -42,9 +46,21 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x <- methods::new(ParameterVector, y, 10)
-  dnorm_$expected_values <- methods::new(ParameterVector, rep(0, 10), 10)
-  dnorm_$log_sd <- methods::new(ParameterVector, rep(log(1), 10), 10)
+  dnorm_$x$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dnorm_$x[x]$value <- y[x]
+  )
+  dnorm_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dnorm_$expected_values[x]$value <- 0
+  )
+  dnorm_$log_sd$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dnorm_$log_sd[x]$value <- log(1)
+  )
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
@@ -76,9 +92,9 @@ test_that("lognormal_lpdf", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x <- methods::new(ParameterVector, y, 1)
-  dlnorm_$expected_values <- methods::new(ParameterVector, 0, 1)
-  dlnorm_$log_sd <- methods::new(ParameterVector, log(1), 1)
+  dlnorm_$x[1]$value <- y
+  dlnorm_$expected_values[1]$value <- 0
+  dlnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, 1, TRUE) + log(y))
   clear()
@@ -91,9 +107,13 @@ test_that("lognormal_lpdf", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x <- methods::new(ParameterVector, y, 10)
-  dlnorm_$expected_values <- methods::new(ParameterVector, 0, 1)
-  dlnorm_$log_sd <- methods::new(ParameterVector, log(1), 1)
+  dlnorm_$x$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dlnorm_$x[x]$value <- y[x]
+  )
+  dlnorm_$expected_values[1]$value <- 0
+  dlnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)) + sum(log(y)))
   clear()
@@ -107,9 +127,21 @@ test_that("lognormal_lpdf", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x <- methods::new(ParameterVector, y, 10)
-  dlnorm_$expected_values <- methods::new(ParameterVector, rep(0, 10), 10)
-  dlnorm_$log_sd <- methods::new(ParameterVector, rep(log(1), 10), 10)
+  dlnorm_$x$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dlnorm_$x[x]$value <- y[x]
+  )
+  dlnorm_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dlnorm_$expected_values[x]$value <- 0
+  )
+  dlnorm_$log_sd$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dlnorm_$log_sd[x]$value <- log(1)
+  )
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)) + sum(log(y)))
   clear()
@@ -132,18 +164,30 @@ test_that("multinomial_lpdf", {
   # generate data using R stats:rnorm
   set.seed(123)
   p <- (1:10) / sum(1:10)
-  x <- t(stats::rmultinom(1, 100, p))
+  x_values <- t(stats::rmultinom(1, 100, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
   dmultinom_ <- methods::new(DmultinomDistribution)
   # populate class members
-  dmultinom_$expected_values <- methods::new(ParameterVector, p, 10)
-  dmultinom_$dims <- c(1, 10)
-  dmultinom_$x <- methods::new(ParameterVector, as.vector(x), 10)
+  dmultinom_$dims$resize(2)
+  dmultinom_$dims$set(0, 1)
+  dmultinom_$dims$set(1, length(p))
+  dmultinom_$expected_values$resize(length(p))
+  purrr::walk(
+    seq_along(p),
+    \(x) dmultinom_$expected_values[x]$value <- p[x]
+  )
+
+  dmultinom_$x$resize(length(p))
+  purrr::walk(
+    seq_along(p),
+    \(x) dmultinom_$x[x]$value <- x_values[x]
+  )
+ 
   # evaluate the density and compare with R
   expect_equal(
     dmultinom_$evaluate(),
-    stats::dmultinom(x = x, prob = p, log = TRUE)
+    stats::dmultinom(x = x_values, prob = p, log = TRUE)
   )
 
   clear()

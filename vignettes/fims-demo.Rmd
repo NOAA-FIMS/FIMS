@@ -206,6 +206,8 @@ fit <- parameters |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
+fit_output<- finalize(fit@opt$par, fit@obj$fn, fit@obj$gr)
+
 # Get information about the model and print a few characters to the screen
 recruitment_log <- get_log_module("information")
 substr(recruitment_log, 1, 100)
@@ -217,6 +219,8 @@ clear()
 The results can be plotted with either base R or using {ggplot2}.
 
 ```{r fit-plots}
+
+
 index_results <- data.frame(
   observed = m_index(data_4_model, "survey1"),
   expected = get_report(fit)[["exp_index"]][[2]],
@@ -336,6 +340,6 @@ length_only_fit <- data_4_model |>
   update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-
+cat(fit_output)
 clear()
 ```

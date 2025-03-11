@@ -118,6 +118,7 @@ namespace fims_distributions
             }
             #ifdef TMB_MODEL
             #endif
+            this->lpdf = lpdf;
             return (lpdf);
         }
 

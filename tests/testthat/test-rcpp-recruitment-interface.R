@@ -26,8 +26,11 @@ test_that("Recruitment input settings work as expected", {
   expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 1090802.68)
 
   log_devs <- c(-1.0, 2.0, 3.0)
-  recruitment$log_devs <- methods::new(ParameterVector, log_devs, length(log_devs))
-
+  recruitment$log_devs$resize(length(log_devs))
+  purrr::walk(
+    seq_along(log_devs),
+    \(x) recruitment$log_devs[x]$value <- log_devs[x]
+  )
 
   expected_lpdf <- sum(log(stats::dnorm(log_devs, 0, 0.7)))
 

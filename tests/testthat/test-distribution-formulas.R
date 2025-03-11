@@ -27,10 +27,11 @@ test_that("test initialize_process_distribution", {
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  recruitment$log_devs <- methods::new(
-    ParameterVector,
-    om_input$logR.resid[-1],
-    om_input$nyr - 1
+  recruitment$log_devs$resize(om_input$nyr - 1)
+  logR_resid <- om_input$logR.resid[-1]
+  purrr::walk(
+    seq_along(logR_resid),
+    \(x) recruitment$log_devs[x]$value <- logR_resid[x]
   )
 
   # set up logR_sd using the normal log_sd parameter
@@ -41,7 +42,7 @@ test_that("test initialize_process_distribution", {
     sd = list(value = om_input$logR_sd, estimated = FALSE),
     is_random_effect = FALSE
   )
-  recruitment$estimate_log_devs <- TRUE
+  recruitment$estimate_log_devs$set(TRUE)
 
   expect_equal(log(om_input$logR_sd), recruitment_distribution$log_sd[1]$value)
   expect_equal(length(recruitment$log_devs), length(recruitment_distribution$x))
@@ -98,15 +99,22 @@ test_that("test initialize_data_distribution", {
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
   fishing_fleet_index <- methods::new(Index, om_input$nyr)
-  fishing_fleet_index$index_data <- catch
+  purrr::walk(
+    seq_along(catch), 
+    \(x) fishing_fleet_index$index_data$set(x-1, catch[x])
+  )
   fishing_fleet <- methods::new(Fleet)
-  fishing_fleet$nages <- om_input$nages
-  fishing_fleet$nyears <- om_input$nyr
-  fishing_fleet$log_Fmort <- methods::new(ParameterVector, log(om_output$f), om_input$nyr)
+  fishing_fleet$nages$set(om_input$nages)
+  fishing_fleet$nyears$set(om_input$nyr)
+  fishing_fleet$log_Fmort$resize(om_input$nyr)
+  purrr::walk(
+    seq_along(log(om_output$f)),
+    \(x) fishing_fleet$log_Fmort[x]$value <- log(om_output$f)[x]
+  )
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$estimate_q <- FALSE
-  fishing_fleet$random_q <- FALSE
+  fishing_fleet$estimate_q$set(FALSE)
+  fishing_fleet$random_q$set(FALSE)
   fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
 
   # Set up fishery index data using the lognormal

@@ -41,8 +41,15 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
     /* Create instance of map: key is id and value is pointer to
     PopulationInterfaceBase */
     PopulationInterfaceBase::live_objects[this->id] = this;
-    PopulationInterfaceBase::fims_interface_objects.push_back(this);
   }
+
+  /**
+   * @brief Construct a new Population Interface Base object
+   *
+   * @param other
+   */
+  PopulationInterfaceBase(const PopulationInterfaceBase& other) :
+  id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -70,36 +77,36 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The number of age bins.
    */
-  uint32_t nages;
+  SharedInt nages;
   /**
    * @brief The number of fleets.
    */
-  uint32_t nfleets;
+  SharedInt nfleets;
   /**
    * @brief The number of seasons.
    * TODO: Remove seasons because we do not model them.
    */
-  uint32_t nseasons;
+  SharedInt nseasons;
   /**
    * @brief The number of years.
    */
-  uint32_t nyears;
+  SharedInt nyears;
   /**
    * @brief The number of length bins.
    */
-  uint32_t nlengths;
+  SharedInt nlengths;
   /**
    * @brief The ID of the maturity module.
    */
-  uint32_t maturity_id;
+  SharedInt maturity_id;
   /**
    * @brief The ID of the growth module.
    */
-  uint32_t growth_id;
+  SharedInt growth_id;
   /**
    * @brief The ID of the recruitment module.
    */
-  uint32_t recruitment_id;
+  SharedInt recruitment_id;
   /**
    * @brief The natural log of the natural mortality for each year.
    */
@@ -116,7 +123,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"nages\".
    */
-  Rcpp::NumericVector ages;
+  RealVector ages;
   /**
    * @brief Derived spawning biomass.
    * TODO: This should be sb not ssb if left as an acronym.
@@ -152,7 +159,17 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The constructor.
    */
-  PopulationInterface() : PopulationInterfaceBase() {}
+  PopulationInterface() : PopulationInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<PopulationInterface>(*this));
+  }
+
+  /**
+   * @brief Construct a new Population Interface object
+   *
+   * @param other
+   */
+  PopulationInterface(const PopulationInterface& other) :
+  PopulationInterfaceBase(other), nages(other.nages), nfleets(other.nfleets), nseasons(other.nseasons), nyears(other.nyears), nlengths(other.nlengths), maturity_id(other.maturity_id), growth_id(other.growth_id), recruitment_id(other.recruitment_id), log_M(other.log_M), log_init_naa(other.log_init_naa), numbers_at_age(other.numbers_at_age), ages(other.ages), derived_ssb(other.derived_ssb), derived_naa(other.derived_naa), derived_biomass(other.derived_biomass), derived_recruitment(other.derived_recruitment), estimated_log_M(other.estimated_log_M), estimated_log_init_naa(other.estimated_log_init_naa), name(other.name) {}
 
   /**
    * @brief The destructor.
@@ -169,20 +186,24 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Sets the unique ID for the Maturity object.
    * @param maturity_id Unique ID for the Maturity object.
    */
-  void SetMaturity(uint32_t maturity_id) { this->maturity_id = maturity_id; }
+  void SetMaturity(uint32_t maturity_id) {
+    this->maturity_id.set(maturity_id);
+  }
 
   /**
    * @brief Set the unique ID for the growth object.
    * @param growth_id Unique ID for the growth object.
    */
-  void SetGrowth(uint32_t growth_id) { this->growth_id = growth_id; }
+  void SetGrowth(uint32_t growth_id) {
+    this->growth_id.set(growth_id);
+  }
 
   /**
    * @brief Set the unique ID for the recruitment object.
    * @param recruitment_id Unique ID for the recruitment object.
    */
   void SetRecruitment(uint32_t recruitment_id) {
-    this->recruitment_id = recruitment_id;
+    this->recruitment_id.set(recruitment_id);
   }
 
   /**
@@ -280,7 +301,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
 
-    ss << "\"module\" : {\n";
+    ss << "{\n";
     ss << " \"name\" : \"Population\",\n";
 
     ss << " \"type\" : \"population\",\n";
@@ -290,19 +311,19 @@ class PopulationInterface : public PopulationInterfaceBase {
     ss << " \"growth_id\": " << this->growth_id << ",\n";
     ss << " \"maturity_id\": " << this->maturity_id << ",\n";
 
-    ss << " \"parameter\": {\n";
+    ss << " \"parameters\": [\n{\n";
     ss << " \"name\": \"log_M\",\n";
-    ss << " \"id\":" << -999 << ",\n";
+    ss << " \"id\":" << this->log_M.id_m << ",\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"values\": " << this->log_M << "\n},\n";
 
-    ss << " \"parameter\": {\n";
+    ss << "{\n";
     ss << "  \"name\": \"log_init_naa\",\n";
-    ss << "  \"id\":" << -999 << ",\n";
+    ss << "  \"id\":" <<  this->log_init_naa.id_m << ",\n";
     ss << "  \"type\": \"vector\",\n";
-    ss << "  \"values\":" << this->log_init_naa << " \n},\n";
+    ss << "  \"values\":" << this->log_init_naa << " \n}],\n";
 
-    ss << " \"derived_quantity\": {\n";
+    ss << " \"derived_quantities\": [{\n";
     ss << "  \"name\": \"ssb\",\n";
     ss << "  \"values\":[";
     if (this->derived_ssb.size() == 0) {
@@ -315,7 +336,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     ss << " },\n";
 
-    ss << " \"derived_quantity\": {\n";
+    ss << "{\n";
     ss << "   \"name\": \"naa\",\n";
     ss << "   \"values\":[";
     if (this->derived_naa.size() == 0) {
@@ -328,11 +349,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     ss << " },\n";
 
-    ss << " \"derived_quantity\": {\n";
+    ss << "{\n";
     ss << "   \"name\": \"biomass\",\n";
     ss << "   \"values\":[";
     if (this->derived_biomass.size() == 0) {
-      ss << "]\n";
+        ss << "]\n";
     } else {
       for (R_xlen_t i = 0; i < this->derived_biomass.size() - 1; i++) {
         ss << this->derived_biomass[i] << ", ";
@@ -341,7 +362,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     ss << " },\n";
 
-    ss << " \"derived_quantity\": {\n";
+    ss << "{\n";
     ss << "   \"name\": \"recruitment\",\n";
     ss << "   \"values\":[";
     if (this->derived_recruitment.size() == 0) {
@@ -352,7 +373,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
       ss << this->derived_recruitment[this->derived_recruitment.size() - 1] << "]\n";
     }
-    ss << " }\n";
+    ss << " }\n]\n";
 
     ss << "}";
 
@@ -372,26 +393,26 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     population->id = this->id;
-    population->nyears = this->nyears;
-    population->nfleets = this->nfleets;
-    population->nseasons = this->nseasons;
-    population->nages = this->nages;
-    if (this->nages == this->ages.size()) {
-      population->ages.resize(this->nages);
+    population->nyears = this->nyears.get();
+    population->nfleets = this->nfleets.get();
+    population->nseasons = this->nseasons.get();
+    population->nages = this->nages.get();
+    if (this->nages.get() == this->ages.size()) {
+      population->ages.resize(this->nages.get());
     } else {
       warning("The ages vector is not of size nages.");
     }
 
-    population->growth_id = this->growth_id;
-    population->recruitment_id = this->recruitment_id;
-    population->maturity_id = this->maturity_id;
+    population->growth_id = this->growth_id.get();
+    population->recruitment_id = this->recruitment_id.get();
+    population->maturity_id = this->maturity_id.get();
     population->log_M.resize(this->log_M.size());
     population->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].initial_value_m;
       if (this->log_M[i].estimated_m) {
-          info->RegisterParameterName("log_M");
-          info->RegisterParameter(population->log_M[i]);
+        info->RegisterParameterName("log_M");
+        info->RegisterParameter(population->log_M[i]);
       }
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
@@ -405,7 +426,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
     for (int i = 0; i < ages.size(); i++) {
-      population->ages[i] = this->ages[i];
+        population->ages[i] = this->ages[i];
     }
 
     population->numbers_at_age.resize((nyears + 1) * nages);

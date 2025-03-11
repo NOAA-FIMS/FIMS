@@ -20,42 +20,7 @@
 #include "rcpp_objects/rcpp_selectivity.hpp"
 #include "rcpp_objects/rcpp_distribution.hpp"
 #include "../../utilities/fims_json.hpp"
-
-/**
- * @brief TODO: provide a brief description.
- *
- */
-SEXP FIMS_objective_function;
-/**
- * @brief TODO: provide a brief description.
- *
- */
-SEXP FIMS_gradient_function;
-/**
- * @brief A double to store the objective function value.
- *
- */
-double FIMS_function_value = 0;
-/**
- * @brief TODO: provide a brief description.
- *
- */
-Rcpp::NumericVector FIMS_function_parameters;
-/**
- * @brief TODO: provide a brief description.
- *
- */
-Rcpp::NumericVector FIMS_function_gradient;
-/**
- * @brief A double to store the maximum gradient component.
- *
- */
-double FIMS_mgc_value = 0;
-/**
- * @brief Sets FIMS_finalized to false as the default.
- *
- */
-bool FIMS_finalized = false;
+#include "../rcpp/rcpp_objects/rcpp_interface_base.hpp"
 
 /**
  * Initializes the logging system, setting all signal handling.
@@ -79,7 +44,9 @@ void init_logging() {
 bool CreateTMBModel() {
   init_logging();
 
-  FIMS_INFO_LOG("adding FIMS objects to TMB");
+  FIMS_INFO_LOG("Adding FIMS objects to TMB, " +
+    fims::to_string(FIMSRcppInterfaceBase::fims_interface_objects.size()) +
+    " objects");
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
       i++) {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
@@ -105,153 +72,55 @@ bool CreateTMBModel() {
     fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
   d3->CreateModel();
 
+  // instantiate the model? TODO: Ask Matthew what this does
+  std::shared_ptr<fims_model::Model < TMB_FIMS_REAL_TYPE>> m0 =
+  fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
+
   return true;
 }
 
 /**
- * @brief Loops through the Rcpp Interface objects and extracts derived
- * quantities. Updates parameter estimates from model core objects.
+ * Finalize a model run by populating derived quantities into the Rcpp interface
+ * objects and return the output as a JSON string.
+ * 
+ * @param par A vector of parameter values.
+ * @param fn The objective function.
+ * @param gr The gradient function.
+ * 
+ * @return A JSON output string is returned.
  */
-void finalize_objects(Rcpp::NumericVector p) {
-    FIMS_function_parameters = p;
+std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn, Rcpp::Function gr) {
 
     std::shared_ptr<fims_info::Information < double>> information =
       fims_info::Information<double>::GetInstance();
 
     std::shared_ptr<fims_model::Model < double>> model =
       fims_model::Model<double>::GetInstance();
-
+    model->do_tmb_reporting = false;
     for (size_t i = 0; i < information->fixed_effects_parameters.size(); i++) {
-        *information->fixed_effects_parameters[i] = p[i];
+        *information->fixed_effects_parameters[i] = par[i];
     }
 
+    bool reporting = model->do_tmb_reporting;
+    model->do_tmb_reporting = false;
     model->Evaluate();
 
-    Rcpp::Function f = Rcpp::as<Rcpp::Function>(FIMS_objective_function);
-    Rcpp::Function g = Rcpp::as<Rcpp::Function>(FIMS_gradient_function);
-    double ret = Rcpp::as<double>(f(p));
-    Rcpp::NumericVector grad = Rcpp::as<Rcpp::NumericVector>(g(p));
-
-    FIMS_function_value = ret;
-    FIMS_function_gradient = grad;
-    Rcpp::Rcout << "Final value = " << FIMS_function_value << "\nGradient: \n";
+    Rcpp::Function f = Rcpp::as<Rcpp::Function>(fn);
+    Rcpp::Function g = Rcpp::as<Rcpp::Function>(gr);
+    double val = Rcpp::as<double>(f(par));
+    Rcpp::NumericVector grad = Rcpp::as<Rcpp::NumericVector>(g(par));
     double maxgc = -999;
-    for (R_xlen_t i = 0; i < FIMS_function_gradient.size(); i++) {
-      if (std::fabs(FIMS_function_gradient[i]) > maxgc) {
-        maxgc = std::fabs(FIMS_function_gradient[i]);
+    for (R_xlen_t i = 0; i < grad.size(); i++) {
+      if (std::fabs(grad[i]) > maxgc) {
+        maxgc = std::fabs(grad[i]);
       }
     }
-    FIMS_mgc_value = maxgc;
 
     for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
         i++) {
       FIMSRcppInterfaceBase::fims_interface_objects[i]->finalize();
     }
-}
-
-/**
- * @brief Finalizes a FIMS model by updating the parameter set. This function
- * evaluates the objective function and the gradient with the given parameter
- * set.
- * @param obj Either a list containing \"fn\" and \"gr\", or a list containing
- * two separate lists \"obj\" and \"opt\", \"obj\" should contain \"fn\" and
- * \"gr\", \"opt\" should contain \"par\". In the second case, the second
- * function argument is expected to be null and ignored.
- * TODO: Remove the ability to take a single list.
- * @param opt A list containing \"par\".
- */
-void finalize_fims(Rcpp::Nullable< Rcpp::List> obj = R_NilValue,
-                   Rcpp::Nullable< Rcpp::List> opt = R_NilValue) {
-
-  bool valid_list = true;
-  Rcpp::NumericVector parameters;
-
-  //check and handle the first argument.
-  if (!Rf_isNull(obj.get())) {
-    Rcpp::List input_list = Rcpp::as<Rcpp::List>(obj);
-    if (input_list.containsElementNamed("obj")
-        && input_list.containsElementNamed("opt")) {
-      Rcpp::List obj_list = input_list["obj"];
-      Rcpp::List opt_list = input_list["opt"];
-
-      if (obj_list.containsElementNamed("fn")) {
-        FIMS_objective_function = obj_list["fn"];
-      } else {
-        valid_list = false;
-        FIMS_ERROR_LOG("Invalid call, \"fn\" not found in argument list.");
-      }
-
-      if (obj_list.containsElementNamed("gr")) {
-        FIMS_gradient_function = obj_list["gr"];
-      } else {
-        valid_list = false;
-        FIMS_ERROR_LOG("Invalid call, \"gr\" not found in argument list.");
-      }
-
-      if (opt_list.containsElementNamed("par")) {
-        parameters = Rcpp::as<Rcpp::NumericVector>(opt_list["par"]);
-      } else {
-        valid_list = false;
-        FIMS_ERROR_LOG("Invalid call, \"par\" not found in argument list.");
-      }
-
-      //if we are here, a single argument was used. if it contains the
-      //expected elements, the list is valid and objects can be finalize.
-      if (valid_list) {
-        finalize_objects(parameters);
-        FIMS_finalized = true;
-        return;
-      } else {
-        return;
-      }
-
-    } else {//two arguments?
-      if (input_list.containsElementNamed("fn")) {
-        FIMS_objective_function = input_list["fn"];
-      } else {
-        valid_list = false;
-        FIMS_ERROR_LOG("Invalid call, \"fn\" not found in argument list.");
-      }
-
-      if (input_list.containsElementNamed("gr")) {
-        FIMS_gradient_function = input_list["gr"];
-      } else {
-        valid_list = false;
-        FIMS_ERROR_LOG("Invalid call, \"gr\" not found in argument list.");
-      }
-    }
-  }
-
-  //check second argument.
-  if (!Rf_isNull(opt.get())) {
-
-      Rcpp::List input_list = Rcpp::as<Rcpp::List>(opt);
-
-      if (input_list.containsElementNamed("par")) {
-          parameters = Rcpp::as<Rcpp::NumericVector>(input_list["par"]);
-      } else {
-          valid_list = false;
-          FIMS_ERROR_LOG("Invalid call, \"par\" not found in argument list.");
-
-      }
-  } else {
-      valid_list = false;
-  }
-
-  //if we're here, two arguments were given. If they contain the expected
-  //elements, the lists are valid and objects can be finalized.
-  if (valid_list) {
-    finalize_objects(parameters);
-    FIMS_finalized = true;
-  }
-}
-
-/**
- * @brief Extracts the derived quantities from model objects.
- */
-std::string get_output() {
   std::string ret;
-  if (FIMS_finalized) {
     auto now = std::chrono::system_clock::now();
     std::time_t now_time = std::chrono::system_clock::to_time_t(now);
     std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
@@ -263,30 +132,33 @@ std::string get_output() {
     ss << "\"nyears\":" << info->nyears << ",\n";
     ss << "\"nseasons\":" << info->nseasons << ",\n";
     ss << "\"nages\":" << info->nages << ",\n";
-    ss << "\"finalized\":" << FIMS_finalized << ",\n";
-    ss << "\"objective_function_value\": " << FIMS_function_value << ",\n";
-    ss << "\"max_gradient_component\": " << FIMS_mgc_value << ",\n";
+    ss << "\"objective_function_value\": " << val << ",\n";
+    ss << "\"max_gradient_component\": " << maxgc << ",\n";
     ss << "\"final_gradient\": [";
-    if (FIMS_function_gradient.size() > 0) {
-      for (R_xlen_t i = 0; i < FIMS_function_gradient.size() - 1; i++) {
-        ss << FIMS_function_gradient[i] << ", ";
+    if (grad.size() > 0) {
+      for (R_xlen_t i = 0; i < grad.size() - 1; i++) {
+        ss << grad[i] << ", ";
       }
-      ss << FIMS_function_gradient[FIMS_function_gradient.size() - 1] << "],\n";
+      ss << grad[grad.size() - 1] << "],\n";
     } else {
       ss << "],";
     }
+    ss << "\"modules\" : [\n";
     size_t length = FIMSRcppInterfaceBase::fims_interface_objects.size();
-    for (size_t i = 0; i < length - 1; i++) {
-      ss << FIMSRcppInterfaceBase::fims_interface_objects[i]->to_json() << ",\n";
+    if (length > 0) {
+        for (size_t i = 0; i < length - 1; i++) {
+            ss << FIMSRcppInterfaceBase::fims_interface_objects[i]->to_json() << ",\n";
+        }
+
+        ss << FIMSRcppInterfaceBase::fims_interface_objects[length - 1]->to_json() << "\n]\n}";
+
+    } else {
+        ss << "\n]\n}";
     }
 
-    ss << FIMSRcppInterfaceBase::fims_interface_objects[length - 1]->to_json() << "\n}";
-
     ret = fims::JsonParser::PrettyFormatJSON(ss.str());
-  } else {
-    Rcpp::Rcout << "Invalid request to \"get_output()\". Please call finalize() first.";
-  }
-  return ret;
+    model->do_tmb_reporting = reporting;
+    return ret;
 }
 
 /**
@@ -359,6 +231,7 @@ void clear_internal() {
  * @brief Clears the vector of independent variables.
  */
 void clear() {
+  FIMS_INFO_LOG("Clearing FIMS objects from interface stack");
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
@@ -443,7 +316,6 @@ void clear() {
 
   fims::FIMSLog::fims_log->clear();
 
-  FIMS_finalized = false;
 }
 
 /**
@@ -570,6 +442,10 @@ void log_error(std::string log_entry) {
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
+RCPP_EXPOSED_CLASS(RealVector)
+RCPP_EXPOSED_CLASS(SharedInt)
+RCPP_EXPOSED_CLASS(SharedReal)
+RCPP_EXPOSED_CLASS(SharedBoolean)
 
 /**
  * @brief The `fims` Rcpp module construct, providing declarative code of what
@@ -593,10 +469,7 @@ RCPP_MODULE(fims) {
         "Creates the TMB model object and adds interface objects to it.");
     Rcpp::function(
         "finalize", &finalize_fims,
-        "Extracts the derived quantities from `Information` to the Rcpp object.");
-    Rcpp::function(
-        "get_output", &get_output,
-        "Extracts the derived quantities from model objects.");
+        "Extracts the derived quantities from `Information` to the Rcpp object and returns a JSON string as the output.");
     Rcpp::function(
         "get_fixed", &get_fixed_parameters_vector,
         "Gets the fixed parameters vector object.");
@@ -699,6 +572,54 @@ RCPP_MODULE(fims) {
                 "Sets the value of all Parameters in the ParameterVector to the provided value.")
             .method("get_id", &ParameterVector::get_id,
                 "Gets the ID of the ParameterVector object.");
+          Rcpp::class_<RealVector>(
+            "RealVector",
+            "An RcppInterface class that defines the RealVector class.")
+            .constructor()
+            .constructor<size_t>()
+            .constructor<Rcpp::NumericVector, size_t>()
+            .method("get", &RealVector::get,
+            "An internal accessor for calling a position of a RealVector from R.")
+            .method("set", &RealVector::set,
+            "An internal setter for setting a position of a RealVector from R.")
+            .method("fromRVector", &RealVector::fromRVector,
+            "Initializes the RealVector from the values of a R vector.")
+            .method("toRVector", &RealVector::toRVector,
+            "Returns values as a R vector.")
+            .method("show", &RealVector::show,
+            "The printing methods for a RealVector.")
+            .method("at", &RealVector::at,
+            "Returns a double at the indicated position given the index argument.")
+            .method("size", &RealVector::size,
+            "Returns the size of a RealVector.")
+            .method("resize", &RealVector::resize,
+            "Resizes a RealVector to the desired length.")
+            .method("get_id", &RealVector::get_id,
+            "Gets the ID of the RealVector object.");
+
+    Rcpp::class_<SharedInt>(
+            "SharedInt",
+            "An RcppInterface class that defines the SharedInt class.")
+            .constructor()
+            .constructor<int>()
+            .method("get", &SharedInt::get)
+            .method("set", &SharedInt::set);
+
+    Rcpp::class_<SharedBoolean>(
+            "SharedBoolean",
+            "An RcppInterface class that defines the SharedBoolean class.")
+            .constructor()
+            .constructor<bool>()
+            .method("get", &SharedBoolean::get)
+            .method("set", &SharedBoolean::set);
+
+    Rcpp::class_<SharedReal>(
+            "SharedReal",
+            "An RcppInterface class that defines the SharedReal class.")
+            .constructor()
+            .constructor<double>()
+            .method("get", &SharedReal::get)
+            .method("set", &SharedReal::set);
 
     Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
             .constructor()
@@ -839,6 +760,7 @@ RCPP_MODULE(fims) {
         .method("evaluate", &DmultinomDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
         .method("set_observed_data", &DmultinomDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
         .method("set_distribution_links", &DmultinomDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
+        .method("set_note",&DmultinomDistributionsInterface::set_note)
         .field("x", &DmultinomDistributionsInterface::x, "Input for distribution when not observations, e.g., prior or random effect.")
         .field("expected_values", &DmultinomDistributionsInterface::expected_values, "numeric non-negative vector of length K, specifying the probability for the K classes.")
         .field("dims", &DmultinomDistributionsInterface::dims, "dimension of the multivariate input, e.g., c(num rows, num cols).");
