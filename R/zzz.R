@@ -259,3 +259,6 @@ methods::setMethod(
     return(xx)
   }
 )
+
+# TODO: update zzz.R to set methods for RealVector that handle indexing
+# translation (e.g., R uses 1-based indexing, C++ uses 0-based indexing).

@@ -104,8 +104,12 @@ test_that("Can add agecomp data to model", {
 
   for (fleet_f in 1:n_age_comp) {
     age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- methods::new(AgeComp, n_years, n_ages)
-    expect_silent(age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data <-
-      m_agecomp(fims_frame, fleet_names_age_comp[fleet_f]))
+    expect_silent(
+      purrr::walk(
+        1:(n_years * n_ages),
+        \(x) age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$set(x - 1, m_agecomp(fims_frame, fleet_names_age_comp[fleet_f])[x])
+      )
+    )
   }
 
   clear()

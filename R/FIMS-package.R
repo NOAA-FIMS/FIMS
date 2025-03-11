@@ -15,7 +15,6 @@
 #' @export get_log_errors
 #' @export get_log_module
 #' @export get_log_warnings
-#' @export get_output
 #' @export get_random
 #' @export Index
 #' @export LengthComp
@@ -27,7 +26,10 @@
 #' @export Parameter
 #' @export ParameterVector
 #' @export Population
+#' @export RealVector
 #' @export set_log_throw_on_error
+#' @export SharedInt
+#' @export SharedReal
 #' @import methods
 #' @import stats
 #' @importFrom ggplot2 .data

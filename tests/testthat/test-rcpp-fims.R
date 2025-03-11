@@ -8,9 +8,9 @@ test_that("Rcpp interface works for modules", {
 
   expect_equal(logistic_selectivity$slope[1]$value, 0.7)
   expect_equal(logistic_selectivity$get_id(), 1)
-  ewaa_growth$ages <- 1.0
-  ewaa_growth$weights <- 2.5
-  expect_equal(ewaa_growth$ages, 1.0)
+  ewaa_growth$ages$set(0, 1.0)
+  ewaa_growth$weights$set(0, 2.5)
+  expect_equal(ewaa_growth$ages$get(0), 1.0)
 
   # check IDs for additional modules
   expect_equal(ewaa_growth$get_id(), 1)
