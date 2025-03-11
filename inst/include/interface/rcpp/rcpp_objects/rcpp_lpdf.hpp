@@ -42,8 +42,15 @@ class LPDFInterfaceBase : public FIMSRcppInterfaceBase {
     /* Create instance of map: key is id and value is pointer to
     LPDFInterfaceBase */
     LPDFInterfaceBase::live_objects[this->id] = this;
-    LPDFInterfaceBase::fims_interface_objects.push_back(this);
   }
+
+  /**
+   * @brief Construct a new LPDFInterfaceBase object
+   *
+   * @param other
+   */
+  LPDFInterfaceBase(const LPDFInterfaceBase& other) :
+  id(other.id) {}
 
   /**
    * @brief The destructor.

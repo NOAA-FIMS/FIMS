@@ -102,9 +102,10 @@ initialize_module <- function(parameters, data, module_name) {
       age_length_conversion_matrix_value <- FIMS::m_age_to_length_conversion(data, module_name)
       module[["age_length_conversion_matrix"]]$resize(length(age_length_conversion_matrix_value))
       # Assign each value to the corresponding position in the parameter vector
-      for (i in seq_along(age_length_conversion_matrix_value)) {
-        module[["age_length_conversion_matrix"]][i][["value"]] <- age_length_conversion_matrix_value[i]
-      }
+      purrr::walk(
+        seq_along(age_length_conversion_matrix_value),
+        \(x) module[["age_length_conversion_matrix"]][x][["value"]] <- age_length_conversion_matrix_value[x]
+      )
 
       # Set the estimation information for the entire parameter vector
       module[["age_length_conversion_matrix"]]$set_all_estimable(FALSE)
@@ -141,37 +142,57 @@ initialize_module <- function(parameters, data, module_name) {
   #     `proportion_catch_numbers_at_age` to users. Their IDs are linked with
   #     index and agecomp distributions. No input values are required.
 
-  non_standard_field <- c(
-    "ages", "nages", "nlengths",
-    "estimate_prop_female",
-    "nyears", "nseasons", "nfleets", "estimate_log_devs", "weights",
-    "is_survey", "estimate_q", "random_q"
+  integer_fields <- c(
+    "nages", "nfleets", "nlengths",
+    "nseasons", "nyears" 
   )
+
+  boolean_fields <- c(
+    "estimate_log_devs", "estimate_prop_female", 
+    "estimate_q", "is_survey", "random_q"
+  )
+
+  real_vector_fields <- c(
+    "ages", "weights"
+  )
+
   for (field in module_fields) {
-    if (field %in% non_standard_field) {
-      # TODO: reorder the list alphabetically
-      module[[field]] <- switch(field,
-        "ages" = get_ages(data),
-        "nages" = get_n_ages(data),
-        "nlengths" = get_n_lengths(data),
-        "estimate_prop_female" = TRUE,
-        "nyears" = get_n_years(data),
-        "nseasons" = 1,
-        "nfleets" = length(parameters[["modules"]][["fleets"]]),
-        "estimate_log_devs" = module_input[[
-          paste0(module_class_name, ".estimate_log_devs")
-        ]],
-        "weights" = m_weight_at_age(data),
-        "is_survey" = !("landings" %in% fleet_types),
-        "estimate_q" = module_input[[
-          paste0(module_class_name, ".log_q.estimated")
-        ]],
-        "random_q" = FALSE,
-        cli::cli_abort(c(
-          "{.var {field}} is not a valid field in {.var {module_class_name}}
-          module."
-        ))
+    if (field %in% integer_fields) {
+      module[[field]]$set(
+        switch(field,
+          "nages" = get_n_ages(data),
+          "nfleets" = length(parameters[["modules"]][["fleets"]]),
+          "nlengths" = get_n_lengths(data),
+          "nseasons" = 1,
+          "nyears" = get_n_years(data)
+        )
       )
+    } else if (field %in% boolean_fields) {
+      module[[field]]$set(
+        switch(field,
+          "estimate_log_devs" = module_input[[
+            paste0(module_class_name, ".estimate_log_devs")
+          ]],
+          "estimate_q" = module_input[[
+            paste0(module_class_name, ".log_q.estimated")
+          ]],
+          "is_survey" = !("landings" %in% fleet_types),
+          "random_q" = FALSE,
+          cli::cli_abort(c(
+            "{.var {field}} is not a valid field in {.var {module_class_name}}
+            module."
+          ))
+        )
+      )
+    } else if (field %in% c("ages", "weights")) {
+        get_value_function <- switch(field,
+          "ages" = get_ages,
+          "weights" = m_weight_at_age
+        )
+        module[[field]]$resize(get_n_ages(data))
+        purrr::walk(seq_len(get_n_ages(data)), function(x) {
+          module[[field]]$set(x - 1, get_value_function(data)[x])
+        })
     } else {
       set_param_vector(
         field = field,
@@ -206,10 +227,11 @@ initialize_module <- function(parameters, data, module_name) {
 #' The initialized distribution module as an object.
 #' @noRd
 initialize_distribution <- function(
-    module_input,
-    distribution_name,
-    distribution_type = c("data", "process"),
-    linked_ids) {
+  module_input,
+  distribution_name,
+  distribution_type = c("data", "process"),
+  linked_ids
+) {
   # Input checks
   # Check if distribution_name is provided
   if (is.null(distribution_name)) {
@@ -468,9 +490,15 @@ initialize_index <- function(data, fleet_name) {
   module <- methods::new(Index, get_n_years(data))
 
   if ("landings" %in% fleet_type) {
-    module[["index_data"]] <- m_landings(data, fleet_name)
+    purrr::walk(
+      1:get_n_years(data),
+      \(x) module[["index_data"]]$set(x - 1, m_landings(data, fleet_name)[x])
+    )
   } else if ("index" %in% fleet_type) {
-    module[["index_data"]] <- m_index(data, fleet_name)
+    purrr::walk(
+      1:get_n_years(data),
+      \(x) module[["index_data"]]$set(x - 1, m_index(data, fleet_name)[x])
+    )
   } else {
     cli::cli_abort(c(
       "Fleet type `{fleet_type}` is not valid for index module initialization.
@@ -502,18 +530,7 @@ initialize_age_comp <- function(data, fleet_name) {
   module <- methods::new(AgeComp, get_n_years(data), get_n_ages(data))
 
   # Validate that the fleet's age-composition data is available
-  age_comp_data <- m_agecomp(data, fleet_name)
-  if (is.null(age_comp_data) || length(age_comp_data) == 0) {
-    cli::cli_abort(c(
-      "Age-composition data for fleet `{fleet_name}` is unavailable or empty."
-    ))
-  }
-
-  # Assign the age-composition data to the module
-  # TODO: review the AgeComp interface, do we want to add
-  # `age_comp_data` as an argument?
-
-  module$age_comp_data <- age_comp_data *
+  age_comp_data <- m_agecomp(data, fleet_name) *
     get_data(data) |>
       dplyr::filter(
         name == fleet_name,
@@ -523,6 +540,20 @@ initialize_age_comp <- function(data, fleet_name) {
         valid_n = ifelse(value == -999, 1, uncertainty)
       ) |>
       dplyr::pull(valid_n)
+
+  if (is.null(age_comp_data) || length(age_comp_data) == 0) {
+    cli::cli_abort(c(
+      "Age-composition data for fleet `{fleet_name}` is unavailable or empty."
+    ))
+  }
+
+  # Assign the age-composition data to the module
+  # TODO: review the AgeComp interface, do we want to add
+  # `age_comp_data` as an argument?  
+  purrr::walk(
+    seq_along(age_comp_data),
+    \(x) module$age_comp_data$set(x - 1, age_comp_data[x])
+  )
 
   return(module)
 }
@@ -550,18 +581,7 @@ initialize_length_comp <- function(data, fleet_name) {
   module <- methods::new(LengthComp, get_n_years(data), get_n_lengths(data))
 
   # Validate that the fleet's length-composition data is available
-  length_comp_data <- m_lengthcomp(data, fleet_name)
-  if (is.null(length_comp_data) || length(length_comp_data) == 0) {
-    cli::cli_abort(c(
-      "Length-composition data for fleet `{fleet_name}` is unavailable or empty."
-    ))
-  }
-
-  # Assign the length-composition data to the module
-  # TODO: review the LengthComp interface, do we want to add
-  # `age_comp_data` as an argument?
-
-  module$length_comp_data <- length_comp_data *
+  length_comp_data <- m_lengthcomp(data, fleet_name) *
     get_data(data) |>
       dplyr::filter(
         name == fleet_name,
@@ -571,6 +591,21 @@ initialize_length_comp <- function(data, fleet_name) {
         valid_n = ifelse(value == -999, 1, uncertainty)
       ) |>
       dplyr::pull(valid_n)
+
+  if (is.null(length_comp_data) || length(length_comp_data) == 0) {
+    cli::cli_abort(c(
+      "Length-composition data for fleet `{fleet_name}` is unavailable or empty."
+    ))
+  }
+
+  # Assign the length-composition data to the module
+  # TODO: review the LengthComp interface, do we want to add
+  # `length_comp_data` as an argument?
+
+  purrr::walk(
+    seq_along(length_comp_data),
+    \(x) module$length_comp_data$set(x - 1, length_comp_data[x])
+  )
 
   return(module)
 }
@@ -700,7 +735,7 @@ initialize_fims <- function(parameters, data) {
         "Missing required inputs for `log_sd` in fleet `{fleet_name}`."
       ))
     }
-
+   
     fleet_index_distribution[[i]] <- initialize_data_distribution(
       module = fleet[[i]],
       family = lognormal(link = "log"),
@@ -713,6 +748,11 @@ initialize_fims <- function(parameters, data) {
       data_type = "index"
     )
 
+    # TODO (Matthew): Determine if the "dims" field is required for DmultinomDistribution.
+    # We need to decide whether to: 
+    # 1. Remove the "dims" field to maintain consistency with other distributions, or
+    # 2. Update all relevant R functions (e.g., initialize_data_distribution()) 
+    #    that call DmultinomDistribution to set the "dims" field.
     if ("age" %in% fleet_types &&
       "AgeComp" %in% data_distribution_names_for_fleet_i) {
       fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
