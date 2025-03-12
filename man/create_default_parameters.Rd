@@ -8,8 +8,7 @@
 create_default_parameters(
   data,
   fleets,
-  recruitment = list(form = "BevertonHoltRecruitment", process_distribution = c(log_devs
-    = "DnormDistribution", fit_as_random = FALSE), process_expected = NULL),
+  recruitment,
   growth = list(form = "EWAAgrowth"),
   maturity = list(form = "LogisticMaturity")
 )

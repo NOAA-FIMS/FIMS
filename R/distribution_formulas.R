@@ -348,13 +348,17 @@ initialize_data_distribution <- function(
 initialize_process_distribution <- function(
     module,
     par,
-    expected = NULL,
     family,
     sd = list(value = 1, estimated = FALSE),
     is_random_effect = FALSE) {
   # validity check on user input
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
+
+  expected <- switch(paste0(par,"_",class(module)),
+    "log_devs_Rcpp_BevertonHoltRecruitment" = NULL,
+    "log_r_Rcpp_BevertonHoltRecruitment" = "log_expected_recruitment"
+  )
 
   # Set up distribution based on `family` argument`
   if (family[["family"]] == "lognormal") {
@@ -430,6 +434,20 @@ initialize_process_distribution <- function(
 
 
   return(new_module)
+}
+
+#' @rdname initialize_data_distribution
+#' @keywords distribution
+#' @export
+initialize_process_structure <- function(module, par){
+ new_process_module <- switch(paste0(par,"_",class(module)),
+    "log_devs_Rcpp_BevertonHoltRecruitment" = new(LogDevsRecruitmentProcess),
+    "log_r_Rcpp_BevertonHoltRecruitment" = new(LogRRecruitmentProcess)
+  )
+
+  module$SetRecruitmentProcess(new_process_module$get_id())
+
+  return(new_process_module)
 }
 
 #' Distributions not available in the stats package

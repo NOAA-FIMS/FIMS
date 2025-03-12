@@ -318,9 +318,15 @@ test_that("estimation test with age comp only using wrappers", {
     create_default_parameters(
       fleets = list(fleet1 = fleet1, survey1 = survey1),
       recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution", fit_as_random = FALSE)
-      )
+        form = "BevertonHoltRecruitment")
+      ) |>
+    create_default_process(
+      data = data_age_comp,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = random_effects
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_comp) |>
@@ -345,9 +351,16 @@ test_that("estimation test with age comp only using wrappers", {
     create_default_parameters(
       fleets = list(fleet1 = fleet1, survey1 = survey1),
       recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution", fit_as_random = FALSE)
+        form = "BevertonHoltRecruitment"
       )
+    ) |>
+    create_default_process(
+      data = data_age_comp_na,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = random_effects
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_comp_na) |>
@@ -385,7 +398,18 @@ test_that("estimation test with length comp only using wrappers", {
   # * Fit the FIMS model with optimization enabled
   lengthcomp_fit <- data_length_comp |>
     create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
+      fleets = list(fleet1 = fleet1, survey1 = survey1),
+      recruitment = list(
+        form = "BevertonHoltRecruitment"
+      )
+    ) |>
+    create_default_process(
+      data = data_length_comp,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = random_effects
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_length_comp) |>
@@ -408,7 +432,18 @@ test_that("estimation test with length comp only using wrappers", {
   # Fit the FIMS model using the second dataset (with missing values)
   lengthcomp_na_fit <- data_length_comp_na |>
     create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
+      fleets = list(fleet1 = fleet1, survey1 = survey1),
+      recruitment = list(
+        form = "BevertonHoltRecruitment"
+      )
+    ) |>
+    create_default_process(
+      data = data_length_comp_na,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = random_effects
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_length_comp_na) |>
@@ -447,7 +482,18 @@ test_that("estimation test with age and length comp with NAs", {
   # * Fit the FIMS model with optimization enabled
   age_length_comp_na_fit <- data_age_length_comp_na |>
     create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
+      fleets = list(fleet1 = fleet1, survey1 = survey1),
+      recruitment = list(
+        form = "BevertonHoltRecruitment"
+      )
+    ) |>
+    create_default_process(
+      data = data_age_length_comp_na,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = random_effects
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_length_comp_na) |>

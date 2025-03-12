@@ -332,9 +332,15 @@ test_that("estimation test with recruitment re on logr", {
     create_default_parameters(
       fleets = fleets,
       recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_r = "DnormDistribution", fit_as_random = TRUE),
-        process_expected = "log_expected_recruitment"),
+        form = "BevertonHoltRecruitment")
+    )|>
+    create_default_process(
+      data = fims_data,
+      module = "recruitment",
+      par = "log_r", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = TRUE
     )
 
   modified_parameters <- list(
@@ -405,10 +411,17 @@ test_that("estimation test with recruitment re on logr", {
     create_default_parameters(
       fleets = list(fleet1 = fleet1, survey1 = survey1),
       recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution", fit_as_random = TRUE)),
+        form = "BevertonHoltRecruitment"),
       growth = list(form = "EWAAgrowth"),
       maturity = list(form = "LogisticMaturity")
+    ) |>
+    create_default_process(
+      data = fims_data,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = TRUE
     )
 
   modified_parameters <- list(

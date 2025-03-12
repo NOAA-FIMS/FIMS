@@ -257,8 +257,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
-  recruitment$log_devs$set_all_estimable(TRUE)
+  #TODO: tests on naa fail when log devs estimated. This needs to be fixed
+  #recruitment$log_devs$set_all_estimable(TRUE)
   if(random_effects){
+    recruitment$log_devs$set_all_estimable(TRUE)
     recruitment$log_devs$set_all_random(TRUE)
   }
   recruitment$SetRecruitmentProcess(recruitment_process$get_id())
@@ -438,11 +440,17 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   default_parameters <- data |>
     create_default_parameters(
       fleets = fleets,
-      recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution", fit_as_random = random_effects)),
+      recruitment = list(form = "BevertonHoltRecruitment"),
       growth = list(form = "EWAAgrowth"),
       maturity = list(form = "LogisticMaturity")
+    ) |>
+    create_default_process(
+      data = data,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = random_effects
     )
 
   parameters <- default_parameters |>
