@@ -94,8 +94,19 @@ fleet1 <- survey1 <- list(
 # Create default recruitment, growth, and maturity parameters
 default_parameters <- data_4_model |>
   create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
-  )
+    fleets = list(fleet1 = fleet1, survey1 = survey1),
+      recruitment = list(
+        form = "BevertonHoltRecruitment"
+      )
+    ) |>
+    create_default_process(
+      data = data_4_model,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = FALSE
+    )
 ```
 
 The argument names and their corresponding default values of the create_default_parameters() function can be displayed using `args()`.
