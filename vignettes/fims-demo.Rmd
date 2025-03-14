@@ -315,8 +315,19 @@ fleet1 <- survey1 <- list(
 # and fit the model
 age_only_fit <- data_4_model |>
   create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
-  ) |>
+    fleets = list(fleet1 = fleet1, survey1 = survey1),
+      recruitment = list(
+        form = "BevertonHoltRecruitment"
+      )
+    ) |>
+    create_default_process(
+      data = data_4_model,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = FALSE
+    ) |>
   # update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
@@ -342,8 +353,19 @@ fleet1 <- survey1 <- list(
 # and fit the model
 length_only_fit <- data_4_model |>
   create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
-  ) |>
+    fleets = list(fleet1 = fleet1, survey1 = survey1),
+      recruitment = list(
+        form = "BevertonHoltRecruitment"
+      )
+    ) |>
+    create_default_process(
+      data = data_4_model,
+      module = "recruitment",
+      par = "log_devs", 
+      process_distribution = gaussian(),
+      estimated = TRUE,
+      random = FALSE
+    ) |>
   update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
