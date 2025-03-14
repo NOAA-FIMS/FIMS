@@ -123,6 +123,18 @@ target_link_libraries(population_dynamics_recruitment_base
 
 gtest_discover_tests(population_dynamics_recruitment_base)
 
+# test_population_dynamics_recruitment_process.cpp
+add_executable(population_dynamics_recruitment_process
+test_population_dynamics_recruitment_process.cpp
+)
+
+target_link_libraries(population_dynamics_recruitment_process
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_dynamics_recruitment_process)
+
 # test_sr_beverton_holt.cpp
 add_executable(sr_beverton_holt
 test_sr_beverton_holt.cpp
