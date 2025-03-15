@@ -83,7 +83,15 @@ namespace fims_distributions
                                 prob_vector[j] = this->expected_values[idx];
                             }
                         } else {
-                         FIMS_ERROR_LOG("Multinomial is not a valid distribution for priors or random effects.") 
+                            size_t idx = (i * dims[1]) + j;
+                            if (this->x[idx] == -999) {
+                                containsNA = true;
+                                break;
+                            }
+                            if(!containsNA){
+                                x_vector[j] = this->x[idx];
+                                prob_vector[j] = this->expected_values[idx];
+                            }
                         }
                     }
 

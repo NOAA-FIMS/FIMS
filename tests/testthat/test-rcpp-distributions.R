@@ -12,9 +12,9 @@ test_that("normal_lpdf", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x <- methods::new(ParameterVector, y, 1)
-  dnorm_$expected_values <- methods::new(ParameterVector, 0, 1)
-  dnorm_$log_sd <- methods::new(ParameterVector, log(1), 1)
+  dnorm_$x[1]$value <- y
+  dnorm_$expected_values[1]$value <- 0
+  dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
   clear()
@@ -128,6 +128,8 @@ test_that("lognormal_lpdf", {
   # clear()
 })
 
+library(FIMS)
+library(testthat)
 test_that("multinomial_lpdf", {
   # generate data using R stats:rnorm
   set.seed(123)
@@ -137,9 +139,16 @@ test_that("multinomial_lpdf", {
   # initialize the Dmultinom module
   dmultinom_ <- methods::new(DmultinomDistribution)
   # populate class members
-  dmultinom_$expected_values <- methods::new(ParameterVector, p, 10)
+  dmultinom_$expected_values$resize(10)
+  for(i in 1:dmultinom_$expected_values$size()){
+    dmultinom_$expected_values[i]$value <- p[i]
+  }
   dmultinom_$dims <- c(1, 10)
-  dmultinom_$x <- methods::new(ParameterVector, as.vector(x), 10)
+  dmultinom_$x$resize(10)
+  for(i in 1:dmultinom_$x$size()){
+    dmultinom_$x[i]$value <- x[i]
+  }
+
   # evaluate the density and compare with R
   expect_equal(
     dmultinom_$evaluate(),

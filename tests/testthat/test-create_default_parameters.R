@@ -17,7 +17,10 @@ test_that("create_default_parameters handles empty data object", {
 })
 
 test_that("create_default_parameters returns correct structure", {
-  result <- create_default_parameters(data, fleets = fleets)
+  result <- create_default_parameters(data, fleets = fleets,
+      recruitment = list(
+        form = "BevertonHoltRecruitment"
+      ))
 
   expect_named(result, c("parameters", "modules"))
   expect_type(result[["parameters"]], "list")

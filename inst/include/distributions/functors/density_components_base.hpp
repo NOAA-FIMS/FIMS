@@ -73,7 +73,7 @@ struct DistributionElementObject {
     if(this->input_type == "prior"){
      return this->expected_values.size();
     }
-    return 0;
+    return x.size();
   }
 
 };
