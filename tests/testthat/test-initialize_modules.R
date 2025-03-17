@@ -11,7 +11,10 @@ fleet1 <- survey1 <- list(
 
 fleets <- list(fleet1 = fleet1, survey1 = survey1)
 
-default_parameters <- create_default_parameters(data, fleets = fleets)
+default_parameters <- create_default_parameters(data, fleets = fleets,
+      recruitment = list(
+        form = "BevertonHoltRecruitment"
+      ))
 
 test_that("initialize_fims handles missing parameters input correctly", {
   expect_error(

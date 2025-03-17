@@ -27,7 +27,7 @@ test_that("Recruitment input settings work as expected", {
   expect_equal(recruitment$log_rzero[1]$value, log(1000000.0))
 
 
-  expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 1090802.68)
+  expect_equal(object = recruitment$evaluate_mean(spawns, ssb0), expected = 1090802.68)
 
   log_devs <- c(-1.0, 2.0, 3.0)
   recruitment$log_devs <- methods::new(ParameterVector, log_devs, length(log_devs))

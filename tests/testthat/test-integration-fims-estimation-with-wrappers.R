@@ -326,7 +326,7 @@ test_that("estimation test with age comp only using wrappers", {
       par = "log_devs", 
       process_distribution = gaussian(),
       estimated = TRUE,
-      random = random_effects
+      random = FALSE
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_comp) |>
@@ -360,7 +360,7 @@ test_that("estimation test with age comp only using wrappers", {
       par = "log_devs", 
       process_distribution = gaussian(),
       estimated = TRUE,
-      random = random_effects
+      random = FALSE
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_comp_na) |>
@@ -409,7 +409,7 @@ test_that("estimation test with length comp only using wrappers", {
       par = "log_devs", 
       process_distribution = gaussian(),
       estimated = TRUE,
-      random = random_effects
+      random = FALSE
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_length_comp) |>
@@ -443,7 +443,7 @@ test_that("estimation test with length comp only using wrappers", {
       par = "log_devs", 
       process_distribution = gaussian(),
       estimated = TRUE,
-      random = random_effects
+      random = FALSE
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_length_comp_na) |>
@@ -493,7 +493,7 @@ test_that("estimation test with age and length comp with NAs", {
       par = "log_devs", 
       process_distribution = gaussian(),
       estimated = TRUE,
-      random = random_effects
+      random = FALSE
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_length_comp_na) |>

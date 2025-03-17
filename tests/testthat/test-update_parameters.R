@@ -10,7 +10,8 @@ fleet1 <- survey1 <- list(
 
 fleets <- list(fleet1 = fleet1, survey1 = survey1)
 
-current_parameters <- create_default_parameters(data, fleets = fleets)
+current_parameters <- create_default_parameters(data, fleets = fleets,
+    recruitment = list(form = "BevertonHoltRecruitment"))
 
 modified_parameters_valid <- list(
   survey1 = list(
