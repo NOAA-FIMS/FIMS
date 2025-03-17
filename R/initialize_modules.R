@@ -748,9 +748,10 @@ initialize_fims <- function(parameters, data) {
     value = TRUE
   )
 
-  if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
-    cli::cli_abort("Missing required inputs for recruitment distribution.")
-  }
+   if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
+  # Remove this check: if log_devs are fixed, there is no recruitment distribution
+  #   cli::cli_abort("Missing required inputs for recruitment distribution.")
+   } else {
 
   recruitment_distribution <- initialize_process_distribution(
     module = recruitment,
@@ -770,6 +771,7 @@ initialize_fims <- function(parameters, data) {
     module = recruitment,
     par = names(parameters$modules$recruitment$process_distribution[1])
   )
+}
 
   # Growth
   growth <- initialize_growth(
