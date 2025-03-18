@@ -1,0 +1,1 @@
+#include "../inst/include/interface/RTMB_stubs.cpp"

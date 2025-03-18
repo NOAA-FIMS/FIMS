@@ -120,41 +120,43 @@ public:
         LogisticSel.slope[0] = this->slope[0].initial_value_m;
         return LogisticSel.evaluate(x);
     }
-
+/*
     #ifdef TMB_MODEL
-    /*
-    #define VECTORIZE_UNARY(FUN)    \                
-    size_t n = x.size();            \                   
-    const ad* X = adptr(x);         \                
-    ADrep ans(n);                   \                
-    ad* Y = adptr(ans);             \                
-    for (size_t i=0; i < n; i++) {  \                
-        Y[i] = FUN(X[i]);           \                  
-    }                               \                
-    return ans;
-*/
-    ADrep evaluate_RTMB(ADrep x){
-        fims_popdy::LogisticSelectivity<ad> LogisticSel;
+    ADrep evaluate_RTMB(ADrep x, ADrep input_slope, ADrep input_inflection_point){
+      //  fims_popdy::LogisticSelectivity<ad> LogSel;
         // inflection_point and slope are fims::Vector<Type>
         // initial_value_m is a double
-        ad IP = this->inflection_point[0].initial_value_m;
-        ad Slope = this->slope[0].initial_value_m;
-        LogisticSel.inflection_point.resize(1);
-        LogisticSel.inflection_point[0] = IP;
-        LogisticSel.slope.resize(1);
-        LogisticSel.slope[0] = Slope;
-        ad* X = adptr(x);
+        //const ad* IP = adptr(input_inflection_point);
+        //LogSel.inflection_point.resize(1);
+        //LogSel.inflection_point[0] = *IP;
+        //LogSel.slope.resize(1);
+        const ad* Slope = adptr(input_slope);
+        //LogSel.slope[0] = *Slope;
+        const ad* X = adptr(x);
         int n = x.size();
         ADrep ans(n); 
         ad* Y = adptr(ans); 
         for(int i=0; i<n; i++){
-          Y[i] = LogisticSel.evaluate(X[i]);
+            Y[i] = dpois(X[i], Slope[i], true);//LogSel.evaluate(X[i]);
         }
         return ans; 
      //VECTORIZE_UNARY(evaluate);
     }
-    #endif
 
+    ADrep distr_dpois ( ADrep x, ADrep lambda, bool give_log ){
+    int n1=x.size();
+    int n2=lambda.size();
+    int nmax = std::max({n1, n2});
+    int nmin = std::min({n1, n2});
+    int n = (nmin == 0 ? 0 : nmax);
+    ADrep ans(n);
+    const ad* X1 = adptr(x); const ad* X2 = adptr(lambda);
+    ad* Y = adptr(ans);
+    for (int i=0; i<n; i++) Y[i] = dpois(X1[i % n1], X2[i % n2], give_log);
+    return ans;
+    }
+    #endif
+*/
     /** 
      * @brief Extracts derived quantities back to the Rcpp interface object from
      * the Information object.

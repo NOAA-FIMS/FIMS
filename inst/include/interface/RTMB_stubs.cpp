@@ -1,5 +1,5 @@
 #define TMB_PRECOMPILE
-#include "interface.hpp"
+#include "RTMB.h"
 
 inline Rcpp::ComplexVector unwrap(ADrep x) {
   return Rcpp::ComplexVector(x);
@@ -54,24 +54,24 @@ ad cplx2ad(const Rcomplex &x) {
   ad* px = (ad*)(&x);
   return *px;
 }
-ad* adptr(ADrep x) {
+inline ad* adptr(ADrep x) {
   return x.adptr();
 }
-bool is_advector (SEXP x) {
+inline bool is_advector (SEXP x) {
   return Rf_inherits(x, "advector");
 }
-bool is_admatrix (SEXP x) {
+inline bool is_admatrix (SEXP x) {
   return is_advector(x) && Rcpp::ComplexVector(x).hasAttribute("dim");
 }
-bool is_adsparse (SEXP x) {
+inline bool is_adsparse (SEXP x) {
   return Rf_inherits(x, "adsparse");
 }
-bool is_adscalar (SEXP x) {
+inline bool is_adscalar (SEXP x) {
   return is_advector(x) &&
     (Rcpp::ComplexVector(x).size() == 1) &&
     !Rcpp::ComplexVector(x).hasAttribute("dim");
 }
-bool valid(const ad &x) {
+inline bool valid(const ad &x) {
   return
     !x.ontape() || x.in_context_stack(x.data.glob);
 }

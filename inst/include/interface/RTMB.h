@@ -1,11 +1,14 @@
 /* ========================================================================== */
 /* RTMB interface (R <-> C++) */
 /* ========================================================================== */
+#ifndef RTMB_H
+#define RTMB_H
 
 #include <Rcpp.h>
-#include <TMB.hpp>
+#include "interface.hpp"
 
 // AD type shorthands
+
 typedef TMBad::ad_aug ad;
 typedef Eigen::Map<Eigen::Matrix<ad, Eigen::Dynamic, Eigen::Dynamic> > MapMatrix;
 typedef Eigen::Map<const Eigen::Matrix<ad, Eigen::Dynamic, Eigen::Dynamic> > ConstMapMatrix;
@@ -86,3 +89,5 @@ void ptr_forward(TMBad::ADFun<>* adf);
 #define RTMB_CCALLABLES                                                 \
   TMB_CCALLABLES("RTMB")                                                \
   R_RegisterCCallable("RTMB", "ptr_forward", (DL_FUNC) &ptr_forward);
+
+  #endif
