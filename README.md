@@ -6,27 +6,28 @@
   <!-- badges: end -->
 
 # Overview
-The repository for development of FIMS. 
 
-The NOAA Fisheries Integrated Modeling System is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. A team of experts within NOAA Fisheries is designing and developing the system, and we are advised by the FIMS Council which includes academic, industry, and international partners. The roles of internal and external collaborators are outlined in the [governance section](https://noaa-fims.github.io/collaborative_workflow/fims-governance.html) of our developer guide. We plan to have an operational software system that is released to the public in 2023. In the meantime, users and developers are welcome to submit feedback using Github issues. Please use the issues under [collaborative workflow](https://github.com/NOAA-FIMS/collaborative_workflow/issues) to make suggestions about the [developer guide](https://noaa-fims.github.io/collaborative_workflow/) and the issues under the FIMS software [repo](https://github.com/NOAA-FIMS/FIMS/issues) for software design and development feedback. You can follow the team discussion [here](https://github.com/NOAA-FIMS/FIMS/discussions).
+The NOAA Fisheries Integrated Modeling System (FIMS) is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. A team of experts within NOAA Fisheries is designing and developing the system, and we are advised by the FIMS Council, which includes academic, industry, and international partners. The roles of internal and external collaborators are outlined in the [governance section](https://noaa-fims.github.io/collaborative_workflow/fims-governance.html) of our [Developer Guide](https://noaa-fims.github.io/collaborative_workflow/). Our software is currently operational for estimation purposes and we plan for it to be operational for management in late 2025.
 
-## Installing from R
+Users and developers are welcome to submit ideas or questions using the [GitHub Discussion Board](https://github.com/NOAA-FIMS/FIMS/discussions) and bug reports using GitHub Issues. The [Discussion Board](https://github.com/NOAA-FIMS/FIMS/discussions) is a place for **all** members of the assessment and open-source software community to ask and answer questions, share updates, have open-ended conversations, and follow along on decisions affecting FIMS. If you happen to find a bug, please report it in the appropriate repository, for example use [issues in the collaborative workflow repository](https://github.com/NOAA-FIMS/collaborative_workflow/issues) to make suggestions about the [developer guide](https://noaa-fims.github.io/collaborative_workflow/) and [issues in the FIMS repository](https://github.com/NOAA-FIMS/FIMS/issues) for bugs in the software design.
 
-Install the latest precompiled version [FIMS from R universe](https://noaa-fims.r-universe.dev/FIMS) within R:
+## Installing FIMS
+
+Install the latest [precompiled version of FIMS](https://noaa-fims.r-universe.dev/FIMS) from [R universe](https://noaa-fims.r-universe.dev) within R using the following code:
 
 ```r
 install.packages("FIMS", repos = c("https://noaa-fims.r-universe.dev", "https://cloud.r-project.org"))
 ```
 
-## Local Install for Developers
-
-Follow instructions in the [Collaborative Workflow Chapter on Developer Software and Installation](https://noaa-fims.github.io/collaborative_workflow/developer-software-and-installation-guide.html).
+Or, you can follow the instructions in the [Collaborative Workflow](https://noaa-fims.github.io/collaborative_workflow/developer-software-and-installation-guide.html) to install FIMS from GitHub or a local clone.
 
 ## Getting Help
-Please report bugs along with a minimal reproducible example on github [issues](https://github.com/NOAA-FIMS/FIMS/issues)
+
+Please report bugs along with a minimal reproducible example on the FIMS [GitHub Issues page](https://github.com/NOAA-FIMS/FIMS/issues).
 
 ## Code of Conduct
-All contributors participating and contributing to the FIMS project are expected to adhere to the [FIMS Code of Conduct](https://noaa-fims.github.io/collaborative_workflow/code-of-conduct.html#code-of-conduct)
+
+All contributors participating and contributing to the FIMS project are expected to adhere to the [FIMS Code of Conduct](https://noaa-fims.github.io/collaborative_workflow/code-of-conduct.html#code-of-conduct).
 
 ****************************
 
