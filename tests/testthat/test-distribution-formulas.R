@@ -100,8 +100,8 @@ test_that("test initialize_data_distribution", {
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
   fishing_fleet_index <- methods::new(Index, om_input$nyr)
   purrr::walk(
-    seq_along(catch), 
-    \(x) fishing_fleet_index$index_data$set(x-1, catch[x])
+    seq_along(catch),
+    \(x) fishing_fleet_index$index_data$set(x - 1, catch[x])
   )
   fishing_fleet <- methods::new(Fleet)
   fishing_fleet$nages$set(om_input$nages)
