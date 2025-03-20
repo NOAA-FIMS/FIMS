@@ -39,8 +39,6 @@
 
 # TODO: ----
 
-# TODO: remove or change get_fleets to return fleet names in alphabetized order
-# TODO: n_fleets should store total number of fleets, i.e., fishing + survey
 # TODO: make date_formats a local variable
 # TODO: document sorting of information in terms of alphabetized fleet order
 # TODO: test implement addition of -999
@@ -56,7 +54,7 @@ methods::setClass(
   Class = "FIMSFrame",
   slots = c(
     data = "tbl_df",
-    fleets = "numeric",
+    fleets = "character",
     n_years = "integer",
     ages = "numeric",
     n_ages = "integer",
@@ -105,8 +103,7 @@ methods::setMethod(
 )
 
 #' @return
-#' [get_fleets()] returns a vector of integer values specifying which fleets in
-#' the model are fishing fleets.
+#' [get_fleets()] returns a vector of strings containing the fleet names.
 #' @export
 #' @rdname get_FIMSFrame
 #' @keywords FIMSFrame
@@ -120,6 +117,24 @@ methods::setMethod(
   "get_fleets",
   "data.frame",
   function(x) FIMSFrame(x)@fleets
+)
+
+#' @return
+#' [get_n_fleets()] returns an integer specifying the number of fleets in the
+#' model, where fleets is inclusive of both fishing fleets and survey vessels.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric("get_n_fleets", function(x) standardGeneric("get_n_fleets"))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod("get_n_fleets", "FIMSFrame", function(x) length(x@fleets))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_n_fleets",
+  "data.frame",
+  function(x) length(FIMSFrame(x)@fleets)
 )
 
 #' @return
@@ -688,10 +703,7 @@ FIMSFrame <- function(data) {
   years <- start_year:end_year
 
   # Get the fleets represented in the data
-  fleets <- unique(data[["name"]])[grep("fleet", unique(data[["name"]]))]
-  fleets <- as.numeric(
-    unlist(lapply(strsplit(fleets, "fleet"), function(x) x[2]))
-  )
+  fleets <- unique(data[["name"]])
   n_fleets <- length(fleets)
 
   if ("age" %in% colnames(data)) {
