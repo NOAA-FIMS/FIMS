@@ -13,8 +13,8 @@ initialization.}
 \item{data}{An S4 object. FIMS input data.}
 }
 \value{
-A list containing parameters for the initialized FIMS modules, ready for use
-in TMB modeling.
+A list containing parameters, module_ids, and data for the initialized FIMS
+modules, ready for use in TMB modeling.
 }
 \description{
 Initializes multiple modules within the Fisheries Integrated Modeling System
