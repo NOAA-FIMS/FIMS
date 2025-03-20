@@ -23,7 +23,7 @@ test_that("Can create the S4 FIMSFrame classes", {
 test_that("Accessors work as expected in FIMSFrame", {
   expect_s3_class(get_data(fims_frame), "data.frame")
 
-  expect_vector(get_fleets(fims_frame), ptype = numeric())
+  expect_vector(get_fleets(fims_frame), ptype = character())
 
   expect_type(get_n_years(fims_frame), "integer")
   expect_length(get_n_years(fims_frame), 1)
@@ -36,7 +36,7 @@ test_that("Accessors work as expected in FIMSFrame", {
 
   expect_s3_class(get_data(fims_frame), "data.frame")
 
-  expect_vector(get_fleets(fims_frame), ptype = numeric())
+  expect_vector(get_fleets(fims_frame), ptype = character())
 
   expect_type(get_n_years(fims_frame), "integer")
   expect_length(get_n_years(fims_frame), 1)
