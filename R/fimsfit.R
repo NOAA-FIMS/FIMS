@@ -282,7 +282,7 @@ is.FIMSFits <- function(x) {
 #' @details This helper function updates the estimates tibble based on specific
 #' labels by mutating the age, length, and time columns.
 #' 
-#' @param estimates A tibble containing esimates to be updated.
+#' @param estimates A tibble containing estimates to be updated.
 #' @param label_name A character string specifying the label name to filter on.
 #' @param age_value A numeric vector specifying the age values to update. Default
 #'   is NA_real_.

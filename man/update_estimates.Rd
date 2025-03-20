@@ -13,7 +13,7 @@ update_estimates(
 )
 }
 \arguments{
-\item{estimates}{A tibble containing esimates to be updated.}
+\item{estimates}{A tibble containing estimates to be updated.}
 
 \item{label_name}{A character string specifying the label name to filter on.}
 
