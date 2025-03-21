@@ -5,7 +5,7 @@ load(test_path("fixtures", "integration_test_data.RData"))
 iter_id <- 1
 
 # Define modified parameters for different modules
-fit_agecomp <- readRDS(testthat::test_path(
+modified_parameters <- readRDS(testthat::test_path(
   "fixtures",
   "parameters_model_comparison_project.RDS"
 ))
