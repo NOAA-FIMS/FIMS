@@ -304,16 +304,27 @@ estimates <- estimates_outline |>
       ) 
 
 fit_output<- finalize(opt$par, obj$fn, obj$gr)
+# Convert the JSON-formatted string `fit_output` into an R list object (`json_list`) 
+# for easier manipulation and extraction of data.
 json_list <- jsonlite::fromJSON(fit_output)
+# Identify the index of the "modules" element in `json_list` by matching its name.
+# This is used to locate the relevant part of the JSON structure for further processing.
 modules_id <- which(names(json_list) == "modules")
 
+# Extract and process the "parameters" from each module in `json_list`
 estimates <- purrr::map(seq_along(json_list[[modules_id]][["parameters"]]), ~{
+  # If the current module's "parameters" is NULL, return NULL to skip processing.
   if (is.null(json_list[[modules_id]][["parameters"]][[.x]])) {
     NULL
   } else{
+    # Convert the current module's "parameters" into a tibble for easier manipulation.
     tibble::as_tibble(json_list[[modules_id]][["parameters"]][[.x]]) |>
+      # Rename the columns of the tibble.
       dplyr::rename_with(~c("parameter_name", "parameter_type_id", "parameter_type", "parameter")) |>
+      # Expand the "parameter" column into multiple rows if it has more than one parameter.
       tidyr::unnest_longer(parameter) |>
+      # Expand the nested structure in the "parameter" column into multiple columns,
+      # using an underscore (`_`) as a separator for the new column names.
       tidyr::unnest_wider(
         parameter,
         names_sep = "_"
@@ -321,23 +332,88 @@ estimates <- purrr::map(seq_along(json_list[[modules_id]][["parameters"]]), ~{
   }
 }) 
 
+# Combine the processed estimates with additional information from `json_list`
 combined_estimates <- purrr::pmap(
   list(estimates, json_list[[modules_id]][["name"]], json_list[[modules_id]][["id"]], json_list[[modules_id]][["type"]]),
   ~ {
+    # Skip processing if the current estimate is NULL.
     if (is.null(..1)) {
       NULL
     } else {
       ..1 |> 
         dplyr::mutate(
+          # Add the module name from `json_list` as a new column of the current estimates.
           module_name = ..2,  
-          module_id = ..3,           
+          # Add the module ID from `json_list` as a new column.
+          module_id = ..3,  
+          # Add the module type from `json_list` as a new column.         
           module_type = ..4
         )
     }
   }
 ) |>
+  # Combine all the processed tibbles into a single tibble by stacking rows.
   dplyr::bind_rows() |>
+  # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
   dplyr::relocate(module_name, module_id, module_type, .before = everything())
 
 combined_estimates |>
   dplyr::filter(parameter_estimated == 1) 
+
+# Extract and process the "derived_quantities" from each module in `json_list`
+which(sapply(json_list[[modules_id]][["derived_quantities"]], is.null))
+which(sapply(json_list[[modules_id]][["density_component"]][[2]], is.null))
+cbind(
+  1:21, 
+  json_list[[modules_id]][["name"]], 
+  json_list[[modules_id]][["type"]]
+)
+
+
+derived_quantity <- purrr::map(seq_along(json_list[[modules_id]][["derived_quantities"]]), ~{
+  # If the current module's "derived_quantities" is NULL, return NULL to skip processing.
+  if (is.null(json_list[[modules_id]][["derived_quantities"]][[.x]])) {
+    NULL
+  } else {
+    # Convert the current module's "derived_quantities" into a tibble for easier manipulation.
+    tibble::as_tibble(json_list[[modules_id]][["derived_quantities"]][[.x]]) |>
+      # Expand the "values" column into multiple rows.
+      tidyr::unnest_longer(values) 
+  }
+}) 
+
+combined_derived_quantity <- purrr::pmap(
+  list(derived_quantity, json_list[[modules_id]][["name"]], json_list[[modules_id]][["id"]], json_list[[modules_id]][["type"]]),
+  ~ {
+    # Skip processing if the current derived_quantity is NULL.
+    if (is.null(..1)) {
+      NULL
+    } else {
+      ..1 |> 
+        dplyr::mutate(
+          # Add the module name from `json_list` as a new column of the current estimates.
+          module_name = ..2,  
+          # Add the module ID from `json_list` as a new column.
+          module_id = ..3,  
+          # Add the module type from `json_list` as a new column.         
+          module_type = ..4
+        )
+    }
+  }
+) |>
+  # Combine all the processed tibbles into a single tibble by stacking rows.
+  dplyr::bind_rows() |>
+  # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
+  dplyr::relocate(module_name, module_id, module_type, .before = everything())
+
+density_component <- purrr::map(seq_along(json_list[[modules_id]][["density_component"]][[2]]), ~{
+  # If the current module's "derived_quantities" is NULL, return NULL to skip processing.
+  if (is.null(json_list[[modules_id]][["derived_quantities"]][[.x]])) {
+    NULL
+  } else {
+    # Convert the current module's "derived_quantities" into a tibble for easier manipulation.
+    tibble::as_tibble(json_list[[modules_id]][["derived_quantities"]][[.x]]) |>
+      # Expand the "values" column into multiple rows.
+      tidyr::unnest_longer(values) 
+  }
+}) 
