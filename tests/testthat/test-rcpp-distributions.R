@@ -183,7 +183,7 @@ test_that("multinomial_lpdf", {
     seq_along(p),
     \(x) dmultinom_$x[x]$value <- x_values[x]
   )
- 
+
   # evaluate the density and compare with R
   expect_equal(
     dmultinom_$evaluate(),

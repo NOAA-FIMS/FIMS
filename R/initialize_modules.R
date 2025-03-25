@@ -146,11 +146,11 @@ initialize_module <- function(parameters, data, module_name) {
 
   integer_fields <- c(
     "nages", "nfleets", "nlengths",
-    "nseasons", "nyears" 
+    "nseasons", "nyears"
   )
 
   boolean_fields <- c(
-    "estimate_log_devs", "estimate_prop_female", 
+    "estimate_log_devs", "estimate_prop_female",
     "estimate_q", "is_survey", "random_q"
   )
 
@@ -187,14 +187,14 @@ initialize_module <- function(parameters, data, module_name) {
         )
       )
     } else if (field %in% c("ages", "weights")) {
-        get_value_function <- switch(field,
-          "ages" = get_ages,
-          "weights" = m_weight_at_age
-        )
-        module[[field]]$resize(get_n_ages(data))
-        purrr::walk(seq_len(get_n_ages(data)), function(x) {
-          module[[field]]$set(x - 1, get_value_function(data)[x])
-        })
+      get_value_function <- switch(field,
+        "ages" = get_ages,
+        "weights" = m_weight_at_age
+      )
+      module[[field]]$resize(get_n_ages(data))
+      purrr::walk(seq_len(get_n_ages(data)), function(x) {
+        module[[field]]$set(x - 1, get_value_function(data)[x])
+      })
     } else {
       set_param_vector(
         field = field,
@@ -229,11 +229,10 @@ initialize_module <- function(parameters, data, module_name) {
 #' The initialized distribution module as an object.
 #' @noRd
 initialize_distribution <- function(
-  module_input,
-  distribution_name,
-  distribution_type = c("data", "process"),
-  linked_ids
-) {
+    module_input,
+    distribution_name,
+    distribution_type = c("data", "process"),
+    linked_ids) {
   # Input checks
   # Check if distribution_name is provided
   if (is.null(distribution_name)) {
@@ -723,7 +722,7 @@ initialize_fims <- function(parameters, data) {
         "Missing required inputs for `log_sd` in fleet `{fleet_name}`."
       ))
     }
-   
+
     fleet_index_distribution[[i]] <- initialize_data_distribution(
       module = fleet[[i]],
       family = lognormal(link = "log"),
@@ -737,9 +736,9 @@ initialize_fims <- function(parameters, data) {
     )
 
     # TODO (Matthew): Determine if the "dims" field is required for DmultinomDistribution.
-    # We need to decide whether to: 
+    # We need to decide whether to:
     # 1. Remove the "dims" field to maintain consistency with other distributions, or
-    # 2. Update all relevant R functions (e.g., initialize_data_distribution()) 
+    # 2. Update all relevant R functions (e.g., initialize_data_distribution())
     #    that call DmultinomDistribution to set the "dims" field.
     if ("age" %in% fleet_types &&
       "AgeComp" %in% data_distribution_names_for_fleet_i) {
