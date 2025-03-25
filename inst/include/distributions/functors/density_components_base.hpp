@@ -20,6 +20,9 @@
 
 namespace fims_distributions {
 
+/**
+* Container to hold density components including pointers to density inputs.
+*/
 template <typename Type>
 struct DistributionElementObject {
   std::string  input_type; /**< string classifies the type of the negative log-likelihood; options are: "priors", "random_effects", and "data" */

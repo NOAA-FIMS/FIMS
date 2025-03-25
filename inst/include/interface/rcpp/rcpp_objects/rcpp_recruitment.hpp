@@ -151,7 +151,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
    /**
    * @brief Set the unique ID for the recruitment process object.
-   * @param recruitment_id Unique ID for the recruitment process object.
+   * @param process_id Unique ID for the recruitment process object.
    */
   void SetRecruitmentProcess(uint32_t process_id) {
     this->process_id = process_id;
