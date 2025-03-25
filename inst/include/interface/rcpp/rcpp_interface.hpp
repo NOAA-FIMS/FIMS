@@ -626,10 +626,22 @@ RCPP_MODULE(fims) {
             .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
             .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
             .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
-            .field("estimate_log_devs",
-            &BevertonHoltRecruitmentInterface::estimate_log_devs)
+            .field("log_r", &BevertonHoltRecruitmentInterface::log_r, "recruitment as a random effect on the natural log scale")
+            .field("log_expected_recruitment", &BevertonHoltRecruitmentInterface::log_expected_recruitment, "expectation of the recruitment process on the natural log scale")
+            .field("nyears", &BevertonHoltRecruitmentInterface::nyears, "number of years")
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
-            .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
+            .method("SetRecruitmentProcess", &BevertonHoltRecruitmentInterface::SetRecruitmentProcess, "Set unique ID for recruitment process")
+            .method("evaluate_mean", &BevertonHoltRecruitmentInterface::evaluate_mean);
+
+  Rcpp::class_<LogDevsRecruitmentInterface>("LogDevsRecruitmentProcess")
+      .constructor()
+      .method("get_id", &LogDevsRecruitmentInterface::get_id)
+      .method("evaluate_process", &LogDevsRecruitmentInterface::evaluate_process);
+
+  Rcpp::class_<LogRRecruitmentInterface>("LogRRecruitmentProcess")
+      .constructor()
+      .method("get_id", &LogRRecruitmentInterface::get_id)
+      .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()

@@ -85,8 +85,14 @@ namespace fims_distributions
                         } else {
                             // if not data (i.e. prior or process), use x vector instead of observed_values
                             size_t idx = (i * dims[1]) + j;
-                            x_vector[j] = this->x[idx];
-                            prob_vector[j] = this->expected_values[idx];
+                            if (this->x[idx] == -999) {
+                                containsNA = true;
+                                break;
+                            }
+                            if(!containsNA){
+                                x_vector[j] = this->x[idx];
+                                prob_vector[j] = this->expected_values[idx];
+                            }
                         }
                     }
 

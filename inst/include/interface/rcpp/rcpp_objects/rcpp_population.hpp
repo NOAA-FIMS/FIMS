@@ -108,6 +108,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   SharedInt recruitment_id;
   /**
+   * @brief The ID of the recruitment process module.
+   */
+  SharedInt recruitment_err_id;
+  /**
    * @brief The natural log of the natural mortality for each year.
    */
   ParameterVector log_M;
@@ -119,6 +123,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Numbers at age.
    */
   ParameterVector numbers_at_age;
+  /**
+   * @brief random effect for recruitment.
+   */
+  ParameterVector log_r;
   /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"nages\".
