@@ -156,7 +156,7 @@ parameters <- default_parameters |>
         ),
         # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
         # to TRUE. We need to debug the issue, then update the line below accordingly.
-        BevertonHoltRecruitment.log_devs.estimated = FALSE
+        BevertonHoltRecruitment.log_devs.estimation_type = "constant"
       )
     )
   ) |>
@@ -164,9 +164,9 @@ parameters <- default_parameters |>
     modified_parameters = list(
       maturity = list(
         LogisticMaturity.inflection_point.value = 2.25,
-        LogisticMaturity.inflection_point.estimated = FALSE,
+        LogisticMaturity.inflection_point.estimation_type = "constant",
         LogisticMaturity.slope.value = 3,
-        LogisticMaturity.slope.estimated = FALSE
+        LogisticMaturity.slope.estimation_type = "constant"
       )
     )
   ) |>

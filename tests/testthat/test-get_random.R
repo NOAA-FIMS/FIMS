@@ -9,51 +9,51 @@
 # Setup ----
 # Load or prepare any necessary data for testing
 
-# get_fixed ----
+# get_random ----
 ## IO correctness ----
-test_that("get_fixed() works with correct inputs", {
-  #' @description Test that [get_fixed()] works with a logistic selectivity
-  #' curve returns the correct number of parameters with their specified
-  #' inputs.
+test_that("get_random() works with correct inputs", {
+  #' @description Test that [get_random()] works with a logistic selectivity
+  #' curve returns the correct number of random effects parameters with their
+  #' specified inputs.
   clear()
   # Create selectivity
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0
-  selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
+  selectivity$inflection_point[1]$estimation_type <- "random_effects"
   selectivity$slope[1]$value <- 0.2
-  selectivity$slope[1]$estimation_type <- "fixed_effects"
+  selectivity$slope[1]$estimation_type <- "random_effects"
 
   CreateTMBModel()
   expect_equal(
     c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value),
-    get_fixed()
+    get_random()
   )
   clear()
 
-  #' @description Test that setting a selectivity parameter to FALSE in a
-  #' previously defined module changes the number of parameters.
+  #' @description Test that setting a selectivity parameter to 'constant' in a
+  #' previously defined module changes the number of random effects parameters.
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0
   selectivity$slope[1]$value <- 0.2
-  selectivity$slope[1]$estimation_type <- "fixed_effects"
+  selectivity$slope[1]$estimation_type <- "random_effects"
   CreateTMBModel()
   expect_equal(
     selectivity$slope[1]$value,
-    get_fixed()
+    get_random()
   )
   clear()
 
-  #' @description Test that the correct number of parameters are returned for a
-  #' double logistic selectivity curve.
+  #' @description Test that the correct number of random effects parameters are
+  #' returned for a double logistic selectivity curve.
   fish_selex <- methods::new(DoubleLogisticSelectivity)
   fish_selex$inflection_point_asc[1]$value <- 2
-  fish_selex$inflection_point_asc[1]$estimation_type <- "fixed_effects"
+  fish_selex$inflection_point_asc[1]$estimation_type <- "random_effects"
   fish_selex$inflection_point_desc[1]$value <- 3
-  fish_selex$inflection_point_desc[1]$estimation_type <- "fixed_effects"
+  fish_selex$inflection_point_desc[1]$estimation_type <- "random_effects"
   fish_selex$slope_asc[1]$value <- 1
   fish_selex$slope_asc[1]$estimation_type <- "constant"
   fish_selex$slope_desc[1]$value <- 1.5
-  fish_selex$slope_desc[1]$estimation_type <- "fixed_effects"
+  fish_selex$slope_desc[1]$estimation_type <- "random_effects"
 
   CreateTMBModel()
   sel_parm <- c(
@@ -61,18 +61,18 @@ test_that("get_fixed() works with correct inputs", {
     fish_selex$inflection_point_desc[1]$value,
     fish_selex$slope_desc[1]$value
   )
-  expect_equal(get_fixed(), sel_parm)
+  expect_equal(get_random(), sel_parm)
   clear()
 
-  #' @description Test the counting of parameters when multiple modules are
-  #' involved, e.g., selectivity and recruitment.
+  #' @description Test the counting of random effects parameters when multiple
+  #' modules are involved, e.g., selectivity and recruitment.
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 11.0
   selectivity$inflection_point[1]$min <- 8.0
   selectivity$inflection_point[1]$max <- 12.0
-  selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
+  selectivity$inflection_point[1]$estimation_type <- "random_effects"
   selectivity$slope[1]$value <- 0.5
-  selectivity$slope[1]$estimation_type <- "fixed_effects"
+  selectivity$slope[1]$estimation_type <- "random_effects"
   sel_parm <- c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value)
   recruitment <- methods::new(BevertonHoltRecruitment)
   h <- 0.75
@@ -82,26 +82,26 @@ test_that("get_fixed() works with correct inputs", {
   recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
   recruitment$logit_steep[1]$min <- 0.21
   recruitment$logit_steep[1]$max <- 1.0
-  recruitment$logit_steep[1]$estimation_type <- "fixed_effects"
+  recruitment$logit_steep[1]$estimation_type <- "random_effects"
   recruitment$log_rzero[1]$value <- log(r0)
-  recruitment$log_rzero[1]$estimation_type <- "fixed_effects"
+  recruitment$log_rzero[1]$estimation_type <- "random_effects"
   rec_parm <- c(-log(1.0 - h) + log(h - 0.2), log(r0))
 
   CreateTMBModel()
-  expect_equal(c(sel_parm, rec_parm), get_fixed())
+  expect_equal(c(sel_parm, rec_parm), get_random())
   clear()
 })
 
 
 ## Edge handling ----
 # No edge cases to test for this interface.
-test_that("get_fixed() returns correct outputs for edge cases", {
+test_that("get_random() returns correct outputs for edge cases", {
   #' @description Test that zero parameters are registered after using clear
   #' even if [CreateTMBModel()] is called.
   clear()
-  expect_equal(numeric(0), get_fixed())
+  expect_equal(numeric(0), get_random())
   CreateTMBModel()
-  expect_equal(numeric(0), get_fixed())
+  expect_equal(numeric(0), get_random())
   clear()
 })
 

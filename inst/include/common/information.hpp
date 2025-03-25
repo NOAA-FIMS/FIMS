@@ -46,6 +46,8 @@ namespace fims_info {
         fixed_effects_parameters; /**< list of all fixed effects parameters >*/
         std::vector<std::string>
         parameter_names; /**< list of all parameter names estimated in the model */
+        std::vector<std::string> 
+        random_effects_names; /**< list of all random effects names estimated in the model */
 
         // data objects
         std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<Type> > >
@@ -62,6 +64,14 @@ namespace fims_info {
         uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >::iterator
         recruitment_models_iterator;
         /**< iterator for recruitment objects>*/
+
+        std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >
+        recruitment_process_models; /**<hash map to link each object to its shared
+                             location in memory*/
+        typedef typename std::map<
+        uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type> > >::iterator
+        recruitment_process_iterator;
+        /**< iterator for recruitment process objects>*/
 
         std::map<uint32_t, std::shared_ptr<fims_popdy::SelectivityBase<Type> > >
         selectivity_models; /**<hash map to link each object to its shared
@@ -136,20 +146,36 @@ namespace fims_info {
         void Clear(){
             this->data_objects.clear();
             this->populations.clear();
-            this->density_components.clear();
             this->fixed_effects_parameters.clear();
             this->fleets.clear();
             this->growth_models.clear();
             this->maturity_models.clear();
             this->parameter_names.clear();
             this->parameters.clear();
+            this->random_effects_names.clear();
             this->random_effects_parameters.clear();
-            this->recruitment_models.clear();
+            this->recruitment_models.clear();            
+            this->recruitment_process_models.clear();
             this->selectivity_models.clear();
-            this->variable_map.clear();
             this->nyears = 0;
             this->nseasons = 0;
             this->nages = 0;
+
+
+            for (density_components_iterator it = density_components.begin(); 
+                it != density_components.end(); ++it) {
+                std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*it).second;
+                if((d->priors)[0] != NULL){
+                    d->priors.clear();
+                }
+                if(d->re != NULL){
+                    d->re->clear();
+                }
+                if(d->re_expected_values != NULL){
+                    d->re_expected_values->clear();
+                }
+            }
+            this->density_components.clear();
         }
 
         /**
@@ -168,7 +194,7 @@ namespace fims_info {
         /**
          * @brief Register a parameter as estimable.
          *
-         * @param p
+         * @param p parameter
          */
         void RegisterParameter(Type& p) {
             this->fixed_effects_parameters.push_back(&p);
@@ -177,7 +203,7 @@ namespace fims_info {
         /**
          * @brief Register a random effect as estimable.
          *
-         * @param re
+         * @param re random effect
          */
         void RegisterRandomEffect(Type& re) {
             this->random_effects_parameters.push_back(&re);
@@ -186,10 +212,19 @@ namespace fims_info {
         /**
          * @brief Register a parameter name.
          *
-         * @param p_name
+         * @param p_name parameter name
          */
         void RegisterParameterName(std::string p_name) {
             this->parameter_names.push_back(p_name);
+        }
+
+        /**
+         * @brief Register a random effects name.
+         *
+         * @param re_name random effects name
+         */
+        void RegisterRandomEffectName(std::string re_name) {
+            this->random_effects_names.push_back(re_name);
         }
 
         /**
@@ -202,14 +237,12 @@ namespace fims_info {
                     FIMS_INFO_LOG("Setup prior for distribution " + fims::to_string(d->id));
                     variable_map_iterator vmit;
                     FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id) + " to parameter " + fims::to_string(d->key[0]));
-                    vmit = this->variable_map.find(d->key[0]);
-                    d->x = *(*vmit).second;
-                    for (size_t i = 1; i < d->key.size(); i++) {
+                    d->priors.resize(d->key.size());
+                    for (size_t i = 0; i < d->key.size(); i++) {
                         FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id)
                                 + " to parameter " + fims::to_string(d->key[0]));
                         vmit = this->variable_map.find(d->key[i]);
-                        d->x.insert(std::end(d->x),
-                                std::begin(*(*vmit).second), std::end(*(*vmit).second));
+                         d->priors[i] = (*vmit).second;
                     }
                     FIMS_INFO_LOG("Prior size for distribution " + fims::to_string(d->id) + "is: " + fims::to_string(d->x.size()));
                 }
@@ -228,13 +261,12 @@ namespace fims_info {
                     FIMS_INFO_LOG("Link random effects from distribution "
                             + fims::to_string(d->id) + " to derived value " + fims::to_string(d->key[0]));
                     vmit = this->variable_map.find(d->key[0]);
-                    d->x = *(*vmit).second;
-                    for (size_t i = 1; i < d->key.size(); i++) {
-                        FIMS_INFO_LOG("Link random effects from distribution " + fims::to_string(d->id)
-                                + " to derived value " + fims::to_string(d->key[0]));
-                        vmit = this->variable_map.find(d->key[i]);
-                        d->x.insert(std::end(d->x),
-                                std::begin(*(*vmit).second), std::end(*(*vmit).second));
+                    d->re = (*vmit).second;
+                    if(d->key.size() == 2){
+                        vmit = this->variable_map.find(d->key[1]);
+                        d->re_expected_values = (*vmit).second;
+                    } else {
+                        d->re_expected_values = &d->expected_values;
                     }
                     FIMS_INFO_LOG("Random effect size for distribution " + fims::to_string(d->id) + " is: " + fims::to_string(d->x.size()));
                 }
@@ -254,14 +286,6 @@ namespace fims_info {
                             + " to derived value " + fims::to_string(d->key[0]));
                     vmit = this->variable_map.find(d->key[0]);
                     d->expected_values = *(*vmit).second;
-
-                    for (size_t i = 1; i < d->key.size(); i++) {
-                        vmit = this->variable_map.find(d->key[i]);
-                        FIMS_INFO_LOG("Link expected value from distribution "
-                                + fims::to_string(d->id) + " to derived value " + fims::to_string(d->key[i]));
-                        d->expected_values.insert(std::end(d->expected_values),
-                                std::begin(*(*vmit).second), std::end(*(*vmit).second));
-                    }
                     FIMS_INFO_LOG("Expected value size for distribution " + fims::to_string(d->id)
                             + " is: " + fims::to_string(d->expected_values.size()));
                 }
@@ -447,6 +471,46 @@ namespace fims_info {
             }
         }
 
+         /**
+         * @brief Set pointers to the recruitment process module referened in the population module. 
+         * 
+         * @param &valid_model reference to true/false boolean indicating whether model is valid.
+         * @param p shared pointer to population module
+         */
+        void SetRecruitmentProcess(
+            bool &valid_model,
+            std::shared_ptr<fims_popdy::Population<Type> > p){
+        
+            std::shared_ptr<fims_popdy::RecruitmentBase<Type> > r = p->recruitment;
+            if (r->process_id != -999) {
+                uint32_t process_uint = static_cast<uint32_t> (r->process_id);
+                recruitment_process_iterator it =
+                        this->recruitment_process_models.find(process_uint);
+
+                if (it != this->recruitment_process_models.end()) {
+                    r->process = (*it).second; // recruitment process
+                    FIMS_INFO_LOG("Recruitment Process model "
+                            + fims::to_string(process_uint)
+                            + " successfully set to population "
+                            + fims::to_string(p->id));
+                    (*it).second->recruitment = r;
+                } else {
+                    valid_model = false;
+                    FIMS_ERROR_LOG("Expected recruitment process function not defined for "
+                            "population "
+                            + fims::to_string(p->id) + ", recruitment process function "
+                            + fims::to_string(process_uint));
+                }
+
+            } else {
+                valid_model = false;
+                FIMS_ERROR_LOG("No recruitment process function defined for population "
+                        + fims::to_string(p->id)
+                        + ". FIMS requires recruitment process functions be defined for all "
+                        "recruitments.");
+            }
+        }
+
         /**
          * @brief Set pointers to the growth module referened in the population module. 
          * 
@@ -615,6 +679,8 @@ namespace fims_info {
 
                 SetRecruitment(valid_model, p);
 
+                SetRecruitmentProcess(valid_model, p);
+
                 SetGrowth(valid_model, p);
 
                 SetMaturity(valid_model, p);
@@ -643,6 +709,7 @@ namespace fims_info {
 
             //setup priors, random effect, and data density components
             SetupPriors();
+            SetupRandomEffects();
 
             return valid_model;
         }
