@@ -45,24 +45,20 @@ reshape_json_estimates <- function(finalized_fims, opt = list()) {
         dplyr::rename(
           initial = parameter_value,
           estimate = parameter_estimated_value,
-          estimated = parameter_estimated
+          estimation_type = parameter_estimationtypeis
         )
       # If the `opt` has a length of 0, set the `estimated` column to FALSE.
       # TODO: ask Matthew if we can set estimated (in JSON) to FALSE when optimization = 0
       if (length(opt) == 0) {
         temp <- temp |>
-          dplyr::mutate(estimated = 0)
+          dplyr::mutate(estimation_type = "constant")
       }
 
       temp <- temp |>
         dplyr::rowwise() |>
-        # Convert estimated from int to logical
-        dplyr::mutate(
-          estimated = ifelse(estimated == 1, TRUE, FALSE)
-        ) |>
         # if estimated == FALSE, then copy initial value to estimate
         dplyr::mutate(
-          estimate = ifelse(estimated == FALSE, initial, estimate)
+          estimate = ifelse(estimation_type == "constant", initial, estimate)
         ) |>
         dplyr::ungroup()
     }
@@ -122,7 +118,8 @@ reshape_json_estimates <- function(finalized_fims, opt = list()) {
 reshape_tmb_estimates <- function(obj,
                                   sdreport = NULL,
                                   opt = NULL,
-                                  parameter_names) {
+                                  parameter_names,
+                                  random_names) {
   # Outline for the estimates table
   # TODO: The fleet_name, age, length, and time columns are currently emplty. Matthew
   # has started adding information to the JSON output in the dev-model-families branch.
@@ -160,7 +157,7 @@ reshape_tmb_estimates <- function(obj,
     gradient = numeric(),
     # A TRUE/FALSE indicator of whether the parameter was estimated (and not fixed),
     # with NA for derived quantities
-    estimated = logical()
+    estimation_type = character()
   )
 
   if (length(sdreport) > 0) {
@@ -185,8 +182,8 @@ reshape_tmb_estimates <- function(obj,
           obj[["gr"]](opt[["par"]]),
           rep(NA_real_, derived_quantity_nrow)
         ),
-        estimated = c(
-          rep(TRUE, length(parameter_names)),
+        estimation_type = c(
+          rep("fixed_effects", length(parameter_names)),
           rep(NA, derived_quantity_nrow)
         )
       )
@@ -196,7 +193,7 @@ reshape_tmb_estimates <- function(obj,
         label = names(obj[["par"]]),
         initial = obj[["env"]][["parameters"]][["p"]],
         estimate = obj[["env"]][["parameters"]][["p"]],
-        estimated = FALSE
+        estimation_type = "constant"
       )
   }
 

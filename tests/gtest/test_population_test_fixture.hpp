@@ -173,6 +173,9 @@ class PopulationEvaluateTestFixture : public testing::Test {
     population.maturity = maturity;
 
     auto recruitment = std::make_shared<fims_popdy::SRBevertonHolt<double>>();
+    auto log_devs = std::make_shared<fims_popdy::LogDevs<double>>();
+    recruitment->process = log_devs;
+    recruitment->process->recruitment = recruitment;
     recruitment->logit_steep.resize(1);
     recruitment->log_rzero.resize(1);
     recruitment->logit_steep[0] = fims_math::logit(0.2, 1.0, 0.75);
@@ -183,6 +186,10 @@ class PopulationEvaluateTestFixture : public testing::Test {
     recruitment->log_recruit_devs.resize(nyears - 1);
     for (int i = 0; i < recruitment->log_recruit_devs.size(); i++) {
       recruitment->log_recruit_devs[i] = 0.0;
+    }
+    recruitment->log_expected_recruitment.resize(nyears + 1);
+    for (int i = 0; i < recruitment->log_expected_recruitment.size(); i++) {
+      recruitment->log_expected_recruitment[i] = 0.0;
     }
     population.recruitment = recruitment;
 

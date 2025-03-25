@@ -302,9 +302,9 @@ init_fims <- function(i) {
 
 
 
-  population$SetRecruitment(recruitment$get_id())
-  population$SetGrowth(ewaa_growth$get_id())
-  population$SetMaturity(maturity$get_id())
+  population$SetRecruitmentID(recruitment$get_id())
+  population$SetGrowthID(ewaa_growth$get_id())
+  population$SetMaturityID(maturity$get_id())
   ## Set-up TMB
   CreateTMBModel()
   parameters <- list(p = get_fixed())

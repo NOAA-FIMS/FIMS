@@ -19,7 +19,7 @@ expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
   "parameter_id", "fleet_name", "age", "length", "time",
   "initial", "estimate", "uncertainty", "log_like", "log_like_cv",
-  "gradient", "estimated"
+  "gradient", "estimation_type"
 )
 
 test_that("get_estimates() works with deterministic run", {

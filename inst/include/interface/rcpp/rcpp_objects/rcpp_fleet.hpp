@@ -162,15 +162,7 @@ public:
    * age-to-length-conversion matrix.
    */
   ParameterVector age_to_length_conversion;
-  /**
-   * @brief Should catchability (q) be estimated?
-   * The default is false.
-   */
-  SharedBoolean estimate_q = false;
-  /**
-   * @brief Is catchability (q) a random effect? The default is false.
-   */
-  SharedBoolean random_q = false;
+
   // derived quantities
   /**
    * @brief Derived landings-at-age in numbers.
@@ -269,8 +261,6 @@ public:
   agecomp_expected(other.agecomp_expected),
   lengthcomp_expected(other.lengthcomp_expected),
   age_to_length_conversion(other.age_to_length_conversion),
-  estimate_q(other.estimate_q),
-  random_q(other.random_q),
   observed_landings_units(other.observed_landings_units),
   observed_index_units(other.observed_index_units),
   derived_landings_naa(other.derived_landings_naa),
@@ -394,18 +384,26 @@ public:
 
 
       for (size_t i = 0; i < this->log_Fmort.size(); i++) {
-        if (this->log_Fmort[i].estimated_m) {
-          this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
-        } else {
+        if (this->log_Fmort[i].estimation_type_m == "constant") {
           this->log_Fmort[i].final_value_m = this->log_Fmort[i].initial_value_m;
+        } else {
+          this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
         }
       }
 
       for (size_t i = 0; i < this->log_q.size(); i++) {
-        if (this->log_q[i].estimated_m) {
-          this->log_q[i].final_value_m = fleet->log_q[i];
-        } else {
+        if (this->log_q[i].estimation_type_m == "constant") {
           this->log_q[i].final_value_m = this->log_q[i].initial_value_m;
+        } else {
+          this->log_q[i].final_value_m = fleet->log_q[i];
+        }
+      }
+
+      for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
+        if (this->age_to_length_conversion[i].estimation_type_m == "constant") {
+          this->age_to_length_conversion[i].final_value_m = this->age_to_length_conversion[i].initial_value_m;
+        } else {
+          this->age_to_length_conversion[i].final_value_m = fleet->age_to_length_conversion[i];
         }
       }
 
@@ -781,16 +779,17 @@ public:
     for (size_t i = 0; i < this->log_q.size(); i++) {
       fleet->log_q[i] = this->log_q[i].initial_value_m;
 
-      if (this->log_q[i].estimated_m) {
+      if (this->log_q[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "Fleet.log_q." << this->id << "." << this->log_q[i].id_m;
-        // register the parameter name
-        info->RegisterParameterName(ss.str());
-          if (this->log_q[i].is_random_effect_m) {
-            info->RegisterRandomEffect(fleet->log_q[i]);
-          } else {
-            info->RegisterParameter(fleet->log_q[i]);
-          }
+        ss << "fleet_" << this->id << "_log_q_" <<  this->log_q[i].id_m;
+        info->RegisterParameterName(ss.str()); 
+        info->RegisterParameter(fleet->log_q[i]);
+      }
+      if(this->log_q[i].estimation_type_m == "random_effects"){
+        ss.str("");
+        ss << "fleet." << this->id << "log_q." <<  this->log_q[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(fleet->log_q[i]);
       }
     }
 
@@ -799,15 +798,17 @@ public:
     for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
 
-      if (this->log_Fmort[i].estimated_m) {
+      if (this->log_Fmort[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "Fleet.log_Fmort." << this->id << "." << this->log_Fmort[i].id_m;
+        ss << "fleet_" << this->id << "_log_Fmort_" <<  this->log_Fmort[i].id_m;
         info->RegisterParameterName(ss.str());
-        if (this->log_Fmort[i].is_random_effect_m) {
-          info->RegisterRandomEffect(fleet->log_Fmort[i]);
-        } else {
-          info->RegisterParameter(fleet->log_Fmort[i]);
-        }
+        info->RegisterParameter(fleet->log_Fmort[i]);
+      }
+      if (this->log_Fmort[i].estimation_type_m == "random_effects") {
+        ss.str("");
+        ss << "fleet." << this->id << "log_Fmort." <<  this->log_Fmort[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(fleet->log_Fmort[i]);
       }
     }
     //add to variable_map
@@ -845,16 +846,14 @@ public:
           fims::to_string(i) + " of " +
           fims::to_string(fleet->age_to_length_conversion.size()));
 
-        if (this->age_to_length_conversion[i].estimated_m) {
+        if (this->age_to_length_conversion[i].estimation_type_m == "fixed_effects") {
           ss.str("");
-          ss << "Fleet.age_to_length_conversion." << this->id << "." << 
-            this->age_to_length_conversion[i].id_m;
+          ss << "fleet_" << this->id << "_age_to_length_conversion_" <<  this->age_to_length_conversion[i].id_m;
           info->RegisterParameterName(ss.str());
-          if (this->age_to_length_conversion[i].is_random_effect_m) {
-            info->RegisterRandomEffect(fleet->age_to_length_conversion[i]);
-          } else {
-            info->RegisterParameter(fleet->age_to_length_conversion[i]);
-          }
+          info->RegisterParameter(fleet->age_to_length_conversion[i]);
+        }
+        if (this->age_to_length_conversion[i].estimation_type_m == "random_effects") {
+          FIMS_ERROR_LOG("age_to_length_conversion cannot be set to random effects");
         }
         FIMS_INFO_LOG(" adding Fleet length object to TMB in loop after if");
       }
