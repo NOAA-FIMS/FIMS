@@ -27,7 +27,7 @@ check_ASSAMC <- function() {
   packages_all <- .packages(all.available = TRUE)
   if (!"ASSAMC" %in% packages_all) {
     remotes::install_github(
-      "Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison"
+      "NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison"
     )
   }
   library("ASSAMC")

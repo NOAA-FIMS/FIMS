@@ -3,7 +3,7 @@ om_output <- om_input <- NULL
 c_case <- 0
 i_iter <- 1
 
-github_dir <- paste0("https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/raw/master/FIMS_integration_test_data/FIMS_C", c_case, "/output/OM/")
+github_dir <- paste0("https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison/raw/main/FIMS_integration_test_data/FIMS_C", c_case, "/output/OM/")
 Rdata_file <- paste0("OM", i_iter, ".RData") # e.g. OM1.Rdata
 # this loads the file directly from github
 # (which was easier to figure out than downloading the Rdata first)

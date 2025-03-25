@@ -32,7 +32,7 @@ Data for a FIMS model must be stored in a single data frame with a long format, 
 
 ### `data1`
 
-A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data1`. This data set is based on data that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data1.R) based on an age-length conversion matrix. See [R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) or `?data1` for details about the package data.
+A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data1`. This data set is based on data that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data1.R) based on an age-length conversion matrix. See [R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) or `?data1` for details about the package data.
 
 ### `FIMSFrame()`
 
