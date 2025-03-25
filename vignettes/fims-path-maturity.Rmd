@@ -74,9 +74,9 @@ parameters <- default_parameters |>
     modified_parameters = list(
       maturity = list(
         LogisticMaturity.inflection_point.value = 2.25,
-        LogisticMaturity.inflection_point.estimated = FALSE,
+        LogisticMaturity.inflection_point.estimation_type = "constant",
         LogisticMaturity.slope.value = 3,
-        LogisticMaturity.slope.estimated = FALSE
+        LogisticMaturity.slope.estimation_type = "constant"
       )
     )
   )
@@ -98,11 +98,9 @@ library(FIMS)
 maturity <- methods::new(LogisticMaturity)
 # Populate the maturity module with parameter values.
 maturity$inflection_point[1]$value <- 10
-maturity$inflection_point[1]$is_random_effect <- FALSE
-maturity$inflection_point[1]$estimated <- FALSE
+maturity$inflection_point[1]$estimation_type <- "constant"
 maturity$slope[1]$value <- 0.2
-maturity$slope[1]$is_random_effect <- FALSE
-maturity$slope[1]$estimated <- FALSE
+maturity$slope[1]$estimation_type <- "constant"
 ```
 
 To run a FIMS model, more modules than just a maturity module need to be linked to a population module. But, this example only includes a maturity module so the code below is just pseudo code showing how to link a maturity module to a population module. The code below assumes that growth and recruitment modules, i.e., modules 2 and 3, have already been set up.
@@ -124,9 +122,9 @@ For power users, the methods package can be used to call Rcpp and create the pop
 
 ```{r,  class.source = "rchunk", eval = FALSE}
 population <- methods::new(Population)
-population$SetMaturity(maturity$get_id())
-population$SetGrowth(2)
-population$SetRecruitment(3)
+population$SetMaturityID(maturity$get_id())
+population$SetGrowthID(2)
+population$SetRecruitmentID(3)
 ```
 
 Because FIMS sets up objects that are stored in memory simply running `rm(population)` will not free this memory back up. Instead, users need to use `clear()`, which is a function written in the Rcpp interface but callable from R. Restarting or closing your R session will also work to free up the memory.
@@ -192,11 +190,10 @@ All Rcpp interface classes from FIMS define parameters (e.g., `inflection_point`
   .field("value", &Parameter::value)
   .field("min", &Parameter::min)
   .field("max", &Parameter::max)
-  .field("is_random_effect", &Parameter::is_random_effect)
-  .field("estimated", &Parameter::estimated);
+  .field("estimation_type", &Parameter::estimation_type);
 ```
 
-Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defined in R) will therefore inherit the five fields defined in the Parameter class: `value`, `min`, `max`, `is_random_effect`, `estimated`. That is, two parameter fields and 10 fields within those parameters.
+Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defined in R) will therefore inherit the five fields defined in the Parameter class: `value`, `min`, `max`, `estimation_type`. That is, two parameter fields and 10 fields within those parameters.
 
 ## `fims` namespace
 
@@ -252,23 +249,22 @@ Within rcpp_maturity.hpp, there is a link to the `fims_info::Information` class 
 // info is a shared pointer that points to fims_info::Information
 std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > info =
         fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
- if (this->inflection_point.estimated) {
-      if (this->inflection_point.is_random_effect) {
+ if (this->inflection_point.estimation_type == "random_effects") {
         /*
-         if inflection_point is estimated and a random effect, 
+         if inflection_point is a random effect, 
          the inflection_point value from LogisticMaturityInterface (maturity->inflection_point) 
          is passed to the Information member function RegisterRandomEffect
         */
         info->RegisterRandomEffect(maturity->inflection_point);
-      } else {
+  }
+  if (this->inflection_point.estimation_type == "fixed_effects") {
         /*
-         if inflection_point is estimated and not a random effect, 
+         if inflection_point is estimated as a fixed_effect,
          the inflection_point value from LogisticMaturityInterface (maturity->inflection_point)
          is passed to the Information member function RegisterParameter
          */
         info->RegisterParameter(maturity->inflection_point);
-      }
-    }
+  }
 ```
 
 Linking to the `fims_popdy::LogisticMaturity` class allows the code to link the values input from R to the values used in the estimation of parameters when fitting data to a model. Below is an example of the link for maturity.

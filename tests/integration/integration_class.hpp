@@ -525,6 +525,11 @@ public:
             // set recruitment
             std::shared_ptr<fims_popdy::SRBevertonHolt<double> > rec =
                     std::make_shared<fims_popdy::SRBevertonHolt<double> >();
+            //set recruitment process
+            std::shared_ptr<fims_popdy::LogDevs<double> > log_devs =
+                        std::make_shared<fims_popdy::LogDevs<double> >();
+            rec->process = log_devs;
+            rec->process->recruitment = rec;
             if (print_statements) {
                 std::cout << "\nRecruitment:\n";
             }
@@ -563,8 +568,10 @@ public:
             /*the log_recruit_dev vector does not include a value for year == 0
               and is of length nyears - 1 where the first position of the vector
               corresponds to the second year of the time series.*/
-            rec->log_recruit_devs.resize(nyears);
+            rec->log_recruit_devs.resize(nyears);           
+            rec->log_expected_recruitment.resize(nyears+1);
             std::fill(rec->log_recruit_devs.begin(), rec->log_recruit_devs.end(), 0.0);
+            std::fill(rec->log_expected_recruitment.begin(), rec->log_expected_recruitment.end(), 0.0);
             if (it != obj.end()) {
                 if ((*it).second.GetType() == fims::JsonValueType::JArray) {
                     fims::JsonArray rdev = (*it).second.GetArray();
