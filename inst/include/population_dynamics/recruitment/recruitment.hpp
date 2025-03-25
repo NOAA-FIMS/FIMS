@@ -13,5 +13,7 @@
 
 #include "functors/recruitment_base.hpp"
 #include "functors/sr_beverton_holt.hpp"
+#include "functors/log_devs.hpp"
+#include "functors/log_r.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP */

@@ -150,7 +150,6 @@ std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn, Rcpp::Func
         }
 
         ss << FIMSRcppInterfaceBase::fims_interface_objects[length - 1]->to_json() << "\n]\n}";
-
     } else {
         ss << "\n]\n}";
     }
@@ -210,6 +209,22 @@ Rcpp::List get_parameter_names(Rcpp::List pars) {
     fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   pars.attr("names") = d0->parameter_names;
+
+  return pars;
+}
+
+/**
+ * @brief Gets the random effects names object.
+ *
+ * @param pars
+ * @return Rcpp::List
+ */
+Rcpp::List get_random_names(Rcpp::List pars) {
+  // base model
+  std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
+    fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+  pars.attr("names") = d0->random_effects_names;
 
   return pars;
 }
@@ -483,6 +498,9 @@ RCPP_MODULE(fims) {
         "get_parameter_names", &get_parameter_names,
         "Gets the parameter names object.");
     Rcpp::function(
+        "get_random_names", &get_random_names,
+        "Gets the random effects names object.");
+    Rcpp::function(
         "clear", clear,
         "Clears all pointers/references of a FIMS model");
     Rcpp::function(
@@ -543,11 +561,8 @@ RCPP_MODULE(fims) {
                 "id", &Parameter::id_m,
                 "unique id for parameter class")
             .field(
-                "is_random_effect", &Parameter::is_random_effect_m,
-                "A boolean indicating whether or not the parameter is a random effect; the default is FALSE.")
-            .field(
-                "estimated", &Parameter::estimated_m,
-                "A boolean indicating whether or not the parameter is estimated; the default is FALSE.");
+                "estimation_type", &Parameter::estimation_type_m,
+                "A string that takes three arguments: constant, indicating a parameter is not estimated; fixed_effects, indicating a parameter is estimated; and random_effects, indicating a parameter is estimated; the default is constant.");
 
     Rcpp::class_<ParameterVector>(
       "ParameterVector",
@@ -629,10 +644,22 @@ RCPP_MODULE(fims) {
             .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
             .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
             .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
-            .field("estimate_log_devs",
-            &BevertonHoltRecruitmentInterface::estimate_log_devs)
+            .field("log_r", &BevertonHoltRecruitmentInterface::log_r, "recruitment as a random effect on the natural log scale")
+            .field("nyears", &BevertonHoltRecruitmentInterface::nyears, "Number of years")
+            .field("log_expected_recruitment", &BevertonHoltRecruitmentInterface::log_expected_recruitment, "Log expectation of the recruitment process")
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
-            .method("evaluate", &BevertonHoltRecruitmentInterface::evaluate);
+            .method("SetRecruitmentProcessID", &BevertonHoltRecruitmentInterface::SetRecruitmentProcessID, "Set unique ID for recruitment process")
+            .method("evaluate_mean", &BevertonHoltRecruitmentInterface::evaluate_mean);
+
+  Rcpp::class_<LogDevsRecruitmentInterface>("LogDevsRecruitmentProcess")
+      .constructor()
+      .method("get_id", &LogDevsRecruitmentInterface::get_id)
+      .method("evaluate_process", &LogDevsRecruitmentInterface::evaluate_process);
+
+  Rcpp::class_<LogRRecruitmentInterface>("LogRRecruitmentProcess")
+      .constructor()
+      .method("get_id", &LogRRecruitmentInterface::get_id)
+      .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
 
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
@@ -641,8 +668,6 @@ RCPP_MODULE(fims) {
       .field("nages", &FleetInterface::nages)
       .field("nyears", &FleetInterface::nyears)
       .field("nlengths", &FleetInterface::nlengths)
-      .field("estimate_q", &FleetInterface::estimate_q)
-      .field("random_q", &FleetInterface::random_q)
       .field("observed_landings_units", &FleetInterface::observed_landings_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
       .field("index_expected", &FleetInterface::derived_index_expected)
@@ -696,9 +721,9 @@ RCPP_MODULE(fims) {
             .field("log_init_naa", &PopulationInterface::log_init_naa, "natural log of the initial numbers at age")
             .field("ages", &PopulationInterface::ages, "vector of ages in the population; length nages")
             .method("evaluate", &PopulationInterface::evaluate, "evaluate the population function")
-            .method("SetMaturity", &PopulationInterface::SetMaturity, "Set the unique id for the Maturity object")
-            .method("SetGrowth", &PopulationInterface::SetGrowth, "Set the unique id for the growth object")
-            .method("SetRecruitment", &PopulationInterface::SetRecruitment, "Set the unique id for the Recruitment object")
+            .method("SetMaturityID", &PopulationInterface::SetMaturityID, "Set the unique id for the Maturity object")
+            .method("SetGrowthID", &PopulationInterface::SetGrowthID, "Set the unique id for the growth object")
+            .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID, "Set the unique id for the Recruitment object")
             .method("evaluate", &PopulationInterface::evaluate, "evaluate the population function");
 
     Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")

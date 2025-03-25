@@ -33,8 +33,9 @@ namespace
       // }
       // (0.8 * 1000.0 * 0.75 * 30.0) / (0.2 * 100.0 * (1.0 - 0.75) + 30.0 * (0.75 - 0.2)) = 837.2093
       double expect_recruit1 = 837.209300;
-      EXPECT_NEAR(recruit1.evaluate(spawners,phi_0), expect_recruit1, 0.0001);
+      EXPECT_NEAR(recruit1.evaluate_mean(spawners,phi_0), expect_recruit1, 0.0001);
       EXPECT_EQ(recruit1.GetId(), 0);
+      EXPECT_EQ(recruit1.evaluate_process(0), 0);
       
       fims_popdy::SRBevertonHolt<double> recruit2;
       recruit2.logit_steep.resize(1);
@@ -54,8 +55,9 @@ namespace
       // }
       
       double expect_recruit2 = 200.0;
-      EXPECT_NEAR(recruit2.evaluate(spawners2, phi_02), expect_recruit2, 0.0001);
+      EXPECT_NEAR(recruit2.evaluate_mean(spawners2, phi_02), expect_recruit2, 0.0001);
       EXPECT_EQ(recruit2.GetId(), 1);
+      EXPECT_EQ(recruit2.evaluate_process(0), 0);
   }
 
 }
