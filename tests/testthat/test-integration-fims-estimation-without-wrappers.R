@@ -1,7 +1,7 @@
 # Load test data for integration testing
 # The test data is stored as an RData file in the tests/testthat/fixtures folder,
 # which contains 100 sets of simulated data using {ASSAMC} from
-# https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison.
+# https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison.
 load(test_path("fixtures", "integration_test_data.RData"))
 
 # Initialize the iteration identifier and run FIMS with the 1st set of OM values
