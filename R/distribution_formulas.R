@@ -359,6 +359,11 @@ initialize_process_distribution <- function(
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
 
+  expected <- switch(paste0(par,"_",class(module)),
+    "log_devs_Rcpp_BevertonHoltRecruitment" = NULL,
+    "log_r_Rcpp_BevertonHoltRecruitment" = "log_expected_recruitment"
+  )
+
   # Set up distribution based on `family` argument`
   if (family[["family"]] == "lognormal") {
     # create new Rcpp module
@@ -418,12 +423,34 @@ initialize_process_distribution <- function(
   }
 
   # setup links to parameter
-  new_module$set_distribution_links(
-    "random_effects",
-    module$field(par)$get_id()
-  )
+  if(is.null(expected)){
+    new_module$set_distribution_links(
+      "random_effects",
+      module$field(par)$get_id()
+    )
+  } else {
+    new_module$set_distribution_links(
+      "random_effects",
+      c(module$field(par)$get_id(),
+        module$field(expected)$get_id())
+    )
+  }
 
   return(new_module)
+}
+
+#' @rdname initialize_data_distribution
+#' @keywords distribution
+#' @export
+initialize_process_structure <- function(module, par){
+ new_process_module <- switch(paste0(par,"_",class(module)),
+    "log_devs_Rcpp_BevertonHoltRecruitment" = new(LogDevsRecruitmentProcess),
+    "log_r_Rcpp_BevertonHoltRecruitment" = new(LogRRecruitmentProcess)
+  )
+
+  module$SetRecruitmentProcess(new_process_module$get_id())
+
+  return(new_process_module)
 }
 
 #' Distributions not available in the stats package

@@ -3,6 +3,7 @@
 \name{initialize_data_distribution}
 \alias{initialize_data_distribution}
 \alias{initialize_process_distribution}
+\alias{initialize_process_structure}
 \title{Set up a new distribution for a data type or a process}
 \usage{
 initialize_data_distribution(
@@ -19,6 +20,8 @@ initialize_process_distribution(
   sd = list(value = 1, estimated = FALSE),
   is_random_effect = FALSE
 )
+
+initialize_process_structure(module, par)
 }
 \arguments{
 \item{module}{An identifier to a C++ fleet module that is linked to the data

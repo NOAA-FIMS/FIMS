@@ -348,8 +348,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       } 
 
     } else {
-      recruitment->log_recruit_devs.resize(this->nyears-1);
-      for (size_t i = 0; i < this->nyears; i++) {
+      recruitment->log_recruit_devs.resize(this->nyears.get()-1);
+      for (size_t i = 0; i < this->nyears.get(); i++) {
         recruitment->log_recruit_devs[i] = 0;
       }
     }
@@ -370,13 +370,13 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         }
       }
     } else {
-      recruitment->log_r.resize(this->nyears);
-      for (size_t i = 0; i < this->nyears; i++) {
+      recruitment->log_r.resize(this->nyears.get());
+      for (size_t i = 0; i < this->nyears.get(); i++) {
         recruitment->log_r[i] = 0;
       }
     }
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
-    recruitment->log_expected_recruitment.resize(this->nyears+1);
+    recruitment->log_expected_recruitment.resize(this->nyears.get()+1);
     info->variable_map[this->log_expected_recruitment.id_m] = &(recruitment)->log_expected_recruitment;
 
     // add to Information

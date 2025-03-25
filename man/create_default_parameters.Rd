@@ -8,8 +8,7 @@
 create_default_parameters(
   data,
   fleets,
-  recruitment = list(form = "BevertonHoltRecruitment", process_distribution = c(log_devs
-    = "DnormDistribution")),
+  recruitment = list(form = "BevertonHoltRecruitment"),
   growth = list(form = "EWAAgrowth"),
   maturity = list(form = "LogisticMaturity")
 )
@@ -92,9 +91,7 @@ default_parameters <- fims_frame |>
   create_default_parameters(
     fleets = list(fleet1 = fleet1, survey1 = survey1),
     recruitment = list(
-      form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "DnormDistribution")
-    ),
+      form = "BevertonHoltRecruitment"),
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")
   )

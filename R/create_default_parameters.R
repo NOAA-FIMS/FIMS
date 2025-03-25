@@ -52,9 +52,7 @@
 #'   create_default_parameters(
 #'     fleets = list(fleet1 = fleet1, survey1 = survey1),
 #'     recruitment = list(
-#'       form = "BevertonHoltRecruitment",
-#'       process_distribution = c(log_devs = "DnormDistribution")
-#'     ),
+#'       form = "BevertonHoltRecruitment"),
 #'     growth = list(form = "EWAAgrowth"),
 #'     maturity = list(form = "LogisticMaturity")
 #'   )
@@ -94,10 +92,7 @@
 create_default_parameters <- function(
     data,
     fleets,
-    recruitment = list(
-      form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "DnormDistribution")
-    ),
+    recruitment = list(form = "BevertonHoltRecruitment"),
     # TODO: Rename EWAAgrowth to not use an acronym
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")) {
@@ -171,6 +166,53 @@ create_default_parameters <- function(
     modules = module_list
   )
   return(output)
+}
+
+
+#' Create a FIMS model object
+#' 
+#' @description This function creates a model object used to 
+#' store the model formula, family, and random effects boolean of a process.
+#' 
+#' @param formula A formula object specifying the model formula.
+#' @param family A family object specifying the distribution of the model.
+#' @param random A logical value specifying whether the model has random effects.
+#' 
+#' @return A list representing the model object.
+#' @export
+#' @examples 
+#'  create_default_parameters(
+#'   fleets = list(fleet1 = fleet1, survey1 = survey1),
+#'     recruitment = list(
+#'       form = "BevertonHoltRecruitment",
+#'       process = model(~log_devs, family = gaussian(link = "log"), random = FALSE)
+#'      )
+#'    )
+model <- function(formula, family, random = FALSE) {
+  # Validate inputs
+  if (!inherits(formula, "formula")) {
+    stop("The 'formula' argument must be a valid formula.")
+  }
+
+  if (!inherits(family, "family")) {
+    stop("The 'family' argument must be a valid family object (e.g., gaussian()).")
+  }
+
+  if (!is.logical(random)) {
+    stop("The 'random' argument must be a logical value (TRUE or FALSE).")
+  }
+
+  # Create a list to represent the model
+  model_object <- list(
+    formula = formula,
+    family = family,
+    random = random
+  )
+
+  # Assign a class to the model object for future extensions
+  class(model_object) <- "FIMSModel"
+
+  return(model_object)
 }
 
 #' Create default population parameters
@@ -444,12 +486,20 @@ create_default_BevertonHoltRecruitment <- function(data) {
   # Create default parameters for Beverton--Holt recruitment
   default <- list(
     log_rzero.value = log(1e+06),
-    log_rzero.estimated = TRUE,
+    log_rzero.estimated = TRUE,    
+    log_rzero.random = FALSE,
+    log_r.value = rep(0.0, get_n_years(data) - 1),
+    log_r.estimated = FALSE,
+    log_r.random = FALSE,
     logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
     logit_steep.estimated = FALSE,
     log_devs.value = rep(0.0, get_n_years(data) - 1),
     log_devs.estimated = TRUE,
-    estimate_log_devs = TRUE
+    log_devs.random = FALSE,
+    log_expected_recruitment.value = rep(0.0, get_n_years(data) + 1),
+    log_expected_recruitment.estimated = FALSE,
+    log_expected_recruitment.random = FALSE,
+    nyears = get_n_years(data)
   )
   return(default)
 }
@@ -473,7 +523,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
 create_default_DnormDistribution <- function(
     value = 0.1,
     data,
-    input_type = c("data", "process")) {
+    input_type = c("data", "process", "random", "prior")) {
   # Input checks
   input_type <- rlang::arg_match(input_type)
 
@@ -483,8 +533,12 @@ create_default_DnormDistribution <- function(
     log_sd.estimated = FALSE
   )
 
+  if(input_type == "random" ){
+    log_sd.estimated = TRUE
+  }
+
   # If input_type is 'process', add additional parameters
-  if (input_type == "process") {
+  if (input_type == "process"| input_type == "prior") {
     default <- c(
       default,
       list(
@@ -580,34 +634,92 @@ create_default_recruitment <- function(
   # NOTE: All new forms of recruitment must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
-  process_default <- switch(form,
+  form_default <- switch(form,
     "BevertonHoltRecruitment" = create_default_BevertonHoltRecruitment(data)
   )
-  names(process_default) <- paste0(form, ".", names(process_default))
+  names(form_default) <- paste0(form, ".", names(form_default))
 
+  if(is.list(recruitment[["process"]])){
+    process_default <- create_default_process( 
+      input = recruitment,
+      data = data, 
+      module = "recruitment",
+      par = all.vars(recruitment[["process"]][["formula"]])[1], 
+      process_distribution = recruitment[["process"]][["family"]],
+      estimated = TRUE,
+      random = recruitment[["process"]][["random"]]
+    )
+
+    default <- list(c(form_default, process_default))
+  } else {
+    default <- list(form_default)
+  }
+  names(default) <- "recruitment"
+  return(default)
+
+}
+
+#' Create default process for a FIMS model
+#'
+#' @description
+#' This function generates default process settings for a Fisheries
+#' Integrated Modeling System (FIMS) model, including distribution name, estimation 
+#' and random settings. It applies default configurations when specific module settings 
+#' are not provided by the user.
+#' @param module Name of the process module.
+#' @param par Name of the parameter that is random.
+#' @param process_distribution Name of the process distribution. 
+#' @param random Boolean indicating whether of not the parameter is estimated. If FALSE, the \code{process_distribution} argument should be NULL.
+#' @param random Boolean indicating whether of not the process is treated with the Laplace Approximation (TRUE) or Penalized Likelihood method (FALSE).
+#' @return
+#' A list containing the following two entries:
+#' \describe{
+#'   \item{\code{parameters}:}{A list of parameter inputs for the FIMS
+#'     model.}
+#'   \item{\code{modules}:}{A list of modules with default or user-provided
+#'     settings.}
+#' }
+#' @seealso
+#' * [create_default_parameters()]
+#' * [update_parameters()]
+create_default_process <- function(input, data, module, par, 
+                                    process_distribution, estimated = FALSE,
+                                    random = FALSE){
+   # Input checks
+  if (is.null(process_distribution) & estimated) {
+    cli::cli_abort(c(
+      "i" = "The process_distribution argument must be a specified when {.var par} is estimated.",
+      "x" = "process_distribution argment is set to {.var process_distribution}."
+    ))
+  }
+  if (!is.null(process_distribution) & !estimated) {
+    cli::cli_abort(c(
+      "i" = "The process_distribution argument is speciefied as {.var process_distribution} but estimation of {.var par} is set to {.var esimtated}.",
+      "x" = "Estimation for {.var par} needs to be set to TRUE when the process_distribution is specified."
+    ))
+  }
   # Create default distribution parameters based on the distribution type
-  distribution_input <- recruitment[["process_distribution"]]
+  distribution_input <- process_distribution
   distribution_default <- NULL
   if (!is.null(distribution_input)) {
-    distribution_default <- switch(distribution_input,
-      "DnormDistribution" = create_default_DnormDistribution(
+    distribution_default <- switch(distribution_input[["family"]],
+      "gaussian" = create_default_DnormDistribution(
         data = data,
         input_type = "process"
       )
     )
+
+    distribution_name <- switch(distribution_input[["family"]],
+      "gaussian" = "DnormDistribution"
+    )
     names(distribution_default) <- paste0(
-      distribution_input,
+      distribution_name,
       ".",
       names(distribution_default)
     )
   }
-
-  # Combine process and distribution defaults into a single list
-  default <- list(c(process_default, distribution_default))
-  names(default) <- "recruitment"
-  return(default)
+  return(distribution_default)
 }
-
 #' Update input parameters for a FIMS model
 #'
 #' @description
@@ -749,7 +861,8 @@ update_parameters <- function(current_parameters, modified_parameters) {
                          does not exist in {.var current_parameters}."
           ))
         }
-
+        # TODO: default is a scalar but user might want to modify to time-varying,
+        # e.g. log_q, log_r
         # Check if the length of the modified and current parameter match
         length_modified_parameter <- length(modified_params[[param_name]])
         length_current_parameter <- length(current_params[[param_name]])

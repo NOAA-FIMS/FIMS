@@ -466,9 +466,6 @@ fit_fims <- function(input,
                        trace = 0
                      ),
                      filename = NULL) {
-  if (!is.null(input$random)) {
-    cli::cli_abort("Random effects declared but are not implemented yet.")
-  }
   if (number_of_newton_steps > 0) {
     cli::cli_abort("Newton steps not implemented yet.")
   }
@@ -479,7 +476,7 @@ fit_fims <- function(input,
     data = list(),
     parameters = input$parameters,
     map = input$map,
-    random = input$random,
+    random = "re",
     DLL = "FIMS",
     silent = TRUE
   )

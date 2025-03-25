@@ -135,9 +135,6 @@ initialize_module <- function(parameters, data, module_name) {
   #     Update as needed.
   #   - Add n_fleets to data1. Should n_fleets include both
   #     fishing and survey fleets? Currently, data1@fleets equals 1.
-  # - Recruitment interface
-  #   - Remove the field estimate_log_devs. It will be set up using the
-  #   set_all_estimable() method instead.
   # - Fleet
   #   - Remove estimate_Fmort, estimate_q, and random_q from the Rcpp interface
   #   - Reconsider exposing `log_expected_index` and
@@ -150,7 +147,7 @@ initialize_module <- function(parameters, data, module_name) {
   )
 
   boolean_fields <- c(
-    "estimate_log_devs", "estimate_prop_female", 
+    "estimate_prop_female", 
     "estimate_q", "is_survey", "random_q"
   )
 
@@ -172,9 +169,6 @@ initialize_module <- function(parameters, data, module_name) {
     } else if (field %in% boolean_fields) {
       module[[field]]$set(
         switch(field,
-          "estimate_log_devs" = module_input[[
-            paste0(module_class_name, ".estimate_log_devs")
-          ]],
           "estimate_q" = module_input[[
             paste0(module_class_name, ".log_q.estimated")
           ]],
@@ -741,6 +735,11 @@ initialize_fims <- function(parameters, data) {
     # 1. Remove the "dims" field to maintain consistency with other distributions, or
     # 2. Update all relevant R functions (e.g., initialize_data_distribution()) 
     #    that call DmultinomDistribution to set the "dims" field.
+    # AMH comment: 
+    # 1. dims field is needed to track the dimension of multivariate input
+    # 2. the pattern for multinomial is different because it is a multivariate distribution. 
+    #  Other multivariate distributions (e.g. MVNORM) will likely also need a dims field
+
     if ("age" %in% fleet_types &&
       "AgeComp" %in% data_distribution_names_for_fleet_i) {
       fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
@@ -781,22 +780,34 @@ initialize_fims <- function(parameters, data) {
     value = TRUE
   )
 
-  if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
-    cli::cli_abort("Missing required inputs for recruitment distribution.")
-  }
+   if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
+  # TODO: Remove this check?: if log_devs are fixed, there is no recruitment distribution
+  #   cli::cli_abort("Missing required inputs for recruitment distribution.")
+   recruitment_process <- initialize_process_structure(
+    module = recruitment,
+    par = "log_devs"
+  )
+   } else {
 
   recruitment_distribution <- initialize_process_distribution(
     module = recruitment,
-    par = names(parameters$modules$recruitment$process_distribution),
-    family = gaussian(),
+    par = all.vars(parameters[["modules"]][["recruitment"]][["process"]][["formula"]])[1],
+    family = parameters[["modules"]][["recruitment"]][["process"]][["family"]],
     sd = list(
       value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
       estimated = parameters[["parameters"]][[
         "recruitment"
       ]][[field_estimated_name]]
     ),
-    is_random_effect = FALSE
+    is_random_effect =
+      as.logical(parameters[["modules"]][["recruitment"]][["process"]][["random"]])
   )
+
+  recruitment_process <- initialize_process_structure(
+    module = recruitment,
+    par = all.vars(parameters[["modules"]][["recruitment"]][["process"]][["formula"]])[1]
+  )
+}
 
   # Growth
   growth <- initialize_growth(
@@ -827,7 +838,8 @@ initialize_fims <- function(parameters, data) {
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameter_list <- list(
-    parameters = list(p = get_fixed())
+    parameters = list(p = get_fixed(),
+                      re = get_random())
   )
 
   return(parameter_list)
