@@ -34,7 +34,7 @@ be your input sample size.
 }
 }
 \source{
-\url{www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison}
+\url{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
 }
 \usage{
 data1
@@ -42,6 +42,6 @@ data1
 \description{
 A dataset containing information necessary to run an age-structured stock
 assessment model in FIMS. This data was generated using
-the \code{ASSAMC} package written for the \href{www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison}{model comparison project}.
+the \code{ASSAMC} package written for the \href{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}{model comparison project}.
 }
 \keyword{datasets}
