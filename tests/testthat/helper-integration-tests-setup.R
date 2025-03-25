@@ -36,6 +36,9 @@ FIMS_dmultinom <- function(x, p) {
 #' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
 #' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
 #' for the report.
+#' @param random_effects A logical value indicating whether to include random
+#' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects 
+#' will be included on recruitment in the model.
 #' @param map A list used to specify mapping for the `MakeADFun` function from
 #' the TMB package.
 #'
@@ -64,6 +67,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 om_output_list,
                                                 em_input_list,
                                                 estimation_mode = TRUE,
+                                                random_effects = NULL,
                                                 map = list()) {
 
   # Load operating model data for the current iteration
@@ -112,15 +116,13 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Create the fishing fleet
   fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
   fishing_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
-  fishing_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
 
   # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point[1]$estimated <- TRUE
+  fishing_fleet_selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
   fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
 
   # turn on estimation of slope
-  fishing_fleet_selectivity$slope[1]$is_random_effect <- FALSE
-  fishing_fleet_selectivity$slope[1]$estimated <- TRUE
+  fishing_fleet_selectivity$slope[1]$estimation_type <- "fixed_effects"
 
   # Initialize the fishing fleet module
   fishing_fleet <- methods::new(Fleet)
@@ -138,8 +140,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$estimate_q$set(FALSE)
-  fishing_fleet$random_q$set(FALSE)
+  fishing_fleet$log_q[1]$estimation_type <- "constant"
   fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
   fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
@@ -212,15 +213,13 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Create the survey fleet
   survey_fleet_selectivity <- methods::new(LogisticSelectivity)
   survey_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]
-  survey_fleet_selectivity$inflection_point[1]$is_random_effect <- FALSE
 
   # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point[1]$estimated <- TRUE
+  survey_fleet_selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
   survey_fleet_selectivity$slope[1]$value <- om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]
-  survey_fleet_selectivity$slope[1]$is_random_effect <- FALSE
 
   # turn on estimation of slope
-  survey_fleet_selectivity$slope[1]$estimated <- TRUE
+  survey_fleet_selectivity$slope[1]$estimation_type <- "fixed_effects"
 
   survey_fleet <- methods::new(Fleet)
   survey_fleet$is_survey$set(TRUE)
@@ -228,9 +227,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$nyears$set(om_input[["nyr"]])
   survey_fleet$nlengths$set(om_input[["nlengths"]])
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
-  survey_fleet$log_q[1]$estimated <- TRUE
-  survey_fleet$estimate_q$set(TRUE)
-  survey_fleet$random_q$set(FALSE)
+  survey_fleet$log_q[1]$estimation_type <- "fixed_effects"
   survey_fleet$SetSelectivity(survey_fleet_selectivity$get_id())
   survey_fleet$SetObservedIndexData(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompData(survey_fleet_age_comp$get_id())
@@ -281,6 +278,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
   recruitment <- methods::new(BevertonHoltRecruitment)
+  if(is.null(random_effects) || random_effects[["recruitment"]] == "log_devs"){
+    recruitment_process <- new(LogDevsRecruitmentProcess)
+  } else {
+    recruitment_process <- new(LogRRecruitmentProcess)
+  }
+  recruitment$SetRecruitmentProcess(recruitment_process$get_id())
 
   # NOTE: in first set of parameters below (for recruitment),
   # $is_random_effect (default is FALSE) and $estimated (default is FALSE)
@@ -290,37 +293,85 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
-  recruitment$log_rzero[1]$is_random_effect <- FALSE
-  recruitment$log_rzero[1]$estimated <- TRUE
+  recruitment$log_rzero[1]$estimation_type <- "fixed_effects"
   # set up logit_steep
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
-  recruitment$logit_steep[1]$is_random_effect <- FALSE
-  recruitment$logit_steep[1]$estimated <- FALSE
+  recruitment$logit_steep[1]$estimation_type <- "constant"
+  recruitment$nyears$set(om_input[["nyr"]])
+  
   # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-  recruitment$log_devs$resize(om_input[["nyr"]] - 1)
-  for (y in 1:(om_input[["nyr"]] - 1)) {
-    recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
+
+ 
+  if(is.null(random_effects) || random_effects[["recruitment"]] == "log_devs"){
+    recruitment$log_devs$resize(om_input[["nyr"]] - 1)
+    for (y in 1:(om_input[["nyr"]] - 1)) {
+      recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
+    }
   }
-  # TODO: integration tests fail after setting recruitment log_devs all estimable.
-  # We need to debug the issue, then uncomment the line below.
-  # recruitment$log_devs$set_all_estimable(TRUE)
+  if("recruitment" %in% names(random_effects)){
+    if(random_effects[["recruitment"]] == "log_devs"){
+      recruitment$log_devs$set_all_random(TRUE)
+    }
+    if(random_effects[["recruitment"]] == "log_r"){
+      recruitment$log_r$resize(om_input[["nyr"]] - 1)
+      for(y in 1:(om_input[["nyr"]]-1)){
+        recruitment$log_r[y]$value <- 1
+      }
+      recruitment$log_r$set_all_random(TRUE)
+    }
+  }
+   if(is.null(random_effects)) {
+    # TODO: integration tests fail after setting recruitment log_devs all estimable.
+    # We need to debug the issue, then uncomment the line below.
+    #recruitment$log_devs$set_all_estimable(TRUE)
+  }
+
+  if("selectivity" %in% names(random_effects)){
+    if(random_effects[["selectivity"]] == "log_devs"){
+      fishing_fleet_selectivity$log_devs$set_all_random(TRUE)
+      survey_fleet_selectivity$log_devs$set_all_random(TRUE)
+    }
+    if(random_effects[["selectivity"]] == "log_sel"){
+      fishing_fleet_selectivity$log_sel$set_all_random(TRUE)
+      survey_fleet_selectivity$log_sel$set_all_random(TRUE)
+    }
+    if(random_effects[["selectivity"]] == "pars"){
+      fishing_fleet_selectivity$inflection_point$estimation_type <- "random_effects"
+      fishing_fleet_selectivity$inflection_point$slope <- "random_effects"
+      survey_fleet_selectivity$inflection_point$estimation_type <- "random_effects"
+      survey_fleet_selectivity$inflection_point$slope <- "random_effects"
+    }
+  }
   recruitment_distribution <- methods::new(DnormDistribution)
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
   recruitment_distribution$log_sd$resize(1)
   recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
-  recruitment_distribution$log_sd[1]$estimated <- FALSE
   recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
   recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
   for (i in 1:(om_input[["nyr"]] - 1)) {
     recruitment_distribution$x[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
-  recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+  if("recruitment" %in% names(random_effects)){
+    if(random_effects[["recruitment"]] == "log_devs"){
+      recruitment_distribution$log_sd[1]$estimation_type <- "fixed_effects"
+      recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+    }
+    if(random_effects[["recruitment"]] == "log_r"){
+  recruitment_distribution$log_sd[1]$value <- log(1)
+      recruitment_distribution$log_sd[1]$estimation_type <- "fixed_effects"
+      recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), recruitment$log_expected_recruitment$get_id()))
+    }
+  }
+  
+  if(is.null(random_effects)){
+    recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+  }
 
   # Growth
   ewaa_growth <- methods::new(EWAAgrowth)
@@ -338,11 +389,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Maturity
   maturity <- methods::new(LogisticMaturity)
   maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
-  maturity$inflection_point[1]$is_random_effect <- FALSE
-  maturity$inflection_point[1]$estimated <- FALSE
+  maturity$inflection_point[1]$estimation_type <- "constant"
   maturity$slope[1]$value <- om_input[["slope.mat"]]
-  maturity$slope[1]$is_random_effect <- FALSE
-  maturity$slope[1]$estimated <- FALSE
+  maturity$slope[1]$estimation_type <- "constant"
 
   # Population
   population <- methods::new(Population)
@@ -372,10 +421,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set-up TMB
   CreateTMBModel()
   # Create parameter list from Rcpp modules
-  parameters <- list(p = get_fixed())
+  parameters <- list(p = get_fixed(),
+                     re = get_random())
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
-    silent = FALSE, map = map
+    silent = FALSE, map = map, random = "re"
   )
 
   # Optimization with nlminb
@@ -395,6 +445,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
   sdr_fixed <- summary(sdr, "fixed")
+  row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[,1]))
 
   clear()
 
@@ -431,6 +482,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 #' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
 #' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
 #' for the report.
+#' @param random_effects A logical value indicating whether to include random
+#' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects 
+#' will be included on recruitment in the model.
 #' @param map A list used to specify mapping for the `MakeADFun` function from
 #' the TMB package.
 #'
@@ -459,6 +513,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
                                              om_output_list,
                                              em_input_list,
                                              estimation_mode = TRUE,
+                                             random_effects = FALSE,
                                              modified_parameters,
                                              map = list()) {
   # Load operating model data for the current iteration

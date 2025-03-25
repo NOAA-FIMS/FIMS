@@ -25,14 +25,14 @@ modified_parameters[[iter_id]] <- list(
     BevertonHoltRecruitment.log_devs.value = om_input_list[[iter_id]][["logR.resid"]][-1],
     # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
     # to TRUE. We need to debug the issue, then update the line below accordingly.
-    BevertonHoltRecruitment.log_devs.estimated = FALSE,
+    BevertonHoltRecruitment.log_devs.estimation_type = "constant",
     DnormDistribution.log_sd.value = om_input_list[[iter_id]][["logR_sd"]]
   ),
   maturity = list(
     LogisticMaturity.inflection_point.value = om_input_list[[iter_id]][["A50.mat"]],
-    LogisticMaturity.inflection_point.estimated = FALSE,
+    LogisticMaturity.inflection_point.estimation_type = "constant",
     LogisticMaturity.slope.value = om_input_list[[iter_id]][["slope.mat"]],
-    LogisticMaturity.slope.estimated = FALSE
+    LogisticMaturity.slope.estimation_type = "constant"
   ),
   population = list(
     Population.log_init_naa.value = log(om_output_list[[iter_id]][["N.age"]][1, ])
@@ -57,7 +57,7 @@ test_that("deterministic test of fims", {
 
   # Compare log(R0) to true value
   fims_logR0 <- estimates |>
-    dplyr::filter(name == "log_rzero") |>
+    dplyr::filter(name == "recruitment_1_log_rzero_0") |>
     dplyr::pull(value)
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]][["R0"]]))
@@ -194,7 +194,7 @@ test_that("nll test of fims", {
 
   # log(R0)
   fims_logR0 <- estimates |>
-    dplyr::filter(name == "log_rzero") |>
+    dplyr::filter(name == "recruitment_1_log_rzero_0") |>
     dplyr::pull(value)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]][["R0"]]))
 

@@ -94,8 +94,7 @@
 create_default_parameters <- function(
     data,
     fleets,
-    recruitment = list(
-      form = "BevertonHoltRecruitment",
+    recruitment = list(form = "BevertonHoltRecruitment",
       process_distribution = c(log_devs = "DnormDistribution")
     ),
     # TODO: Rename EWAAgrowth to not use an acronym
@@ -173,6 +172,7 @@ create_default_parameters <- function(
   return(output)
 }
 
+
 #' Create default population parameters
 #'
 #' @description
@@ -215,9 +215,9 @@ create_default_Population <- function(data, log_rzero) {
   # Create a list of default parameters
   default <- list(
     log_M.value = rep(log(M_value), n_years * n_ages),
-    log_M.estimated = FALSE,
+    log_M.estimation_type = "constant",
     log_init_naa.value = log(init_naa),
-    log_init_naa.estimated = TRUE
+    log_init_naa.estimation_type = "fixed_effects"
   )
 
   # Name the list elements
@@ -240,9 +240,9 @@ create_default_Population <- function(data, log_rzero) {
 create_default_Logistic <- function() {
   default <- list(
     inflection_point.value = 2,
-    inflection_point.estimated = TRUE,
+    inflection_point.estimation_type = "fixed_effects",
     slope.value = 1,
-    slope.estimated = TRUE
+    slope.estimation_type = "fixed_effects"
   )
   return(default)
 }
@@ -353,12 +353,12 @@ create_default_fleet <- function(fleets,
   process_default <- if ("landings" %in% data_types_present) {
     list(
       log_Fmort.value = log(rep(0.00001, get_n_years(data))),
-      log_Fmort.estimated = TRUE
+      log_Fmort.estimation_type = "fixed_effects"
     )
   } else {
     list(
       log_q.value = 0,
-      log_q.estimated = TRUE
+      log_q.estimation_type = "fixed_effects"
     )
   }
 
@@ -444,12 +444,15 @@ create_default_BevertonHoltRecruitment <- function(data) {
   # Create default parameters for Beverton--Holt recruitment
   default <- list(
     log_rzero.value = log(1e+06),
-    log_rzero.estimated = TRUE,
+    log_rzero.estimation_type = "fixed_effects",    
+    log_r.value = rep(0.0, get_n_years(data) - 1),
+    log_r.estimation_type = "constant",
     logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
-    logit_steep.estimated = FALSE,
+    logit_steep.estimation_type = "constant",
     log_devs.value = rep(0.0, get_n_years(data) - 1),
-    log_devs.estimated = TRUE,
-    estimate_log_devs = TRUE
+    log_devs.estimation_type = "fixed_effects",
+    log_expected_recruitment.value = rep(0.0, get_n_years(data) + 1),
+    log_expected_recruitment.estimation_type = "constant"
   )
   return(default)
 }
@@ -473,25 +476,26 @@ create_default_BevertonHoltRecruitment <- function(data) {
 create_default_DnormDistribution <- function(
     value = 0.1,
     data,
-    input_type = c("data", "process")) {
+    input_type = c("data", "process", "prior")) {
   # Input checks
   input_type <- rlang::arg_match(input_type)
 
   # Create default parameters
   default <- list(
     log_sd.value = value,
-    log_sd.estimated = FALSE
+    log_sd.estimation_type = "constant"
   )
 
+
   # If input_type is 'process', add additional parameters
-  if (input_type == "process") {
+  if (input_type == "process"| input_type == "prior") {
     default <- c(
       default,
       list(
         x.value = rep(0, get_n_years(data)),
-        x.estimated = FALSE,
+        x.estimation_type = "constant",
         expected_values.value = rep(0, get_n_years(data)),
-        expected_values.estimated = FALSE
+        expected_values.estimation_type = "constant"
       )
     )
   }
@@ -530,7 +534,7 @@ create_default_DlnormDistribution <- function(
   # Create the default list with log standard deviation
   default <- list(
     log_sd.value = log(value),
-    log_sd.estimated = FALSE
+    log_sd.estimation_type = "constant"
   )
 
   # Add additional parameters if input_type is "process"
@@ -539,9 +543,9 @@ create_default_DlnormDistribution <- function(
       default,
       list(
         x.value = rep(0, get_n_years(data)),
-        x.estimated = FALSE,
+        x.estimation_type = "constant",
         expected_values.value = rep(0, get_n_years(data)),
-        expected_values.estimated = FALSE
+        expected_values.estimation_type = "constant"
       )
     )
   }
@@ -580,12 +584,11 @@ create_default_recruitment <- function(
   # NOTE: All new forms of recruitment must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
-  process_default <- switch(form,
+  form_default <- switch(form,
     "BevertonHoltRecruitment" = create_default_BevertonHoltRecruitment(data)
   )
-  names(process_default) <- paste0(form, ".", names(process_default))
+  names(form_default) <- paste0(form, ".", names(form_default))
 
-  # Create default distribution parameters based on the distribution type
   distribution_input <- recruitment[["process_distribution"]]
   distribution_default <- NULL
   if (!is.null(distribution_input)) {
@@ -595,7 +598,8 @@ create_default_recruitment <- function(
         input_type = "process"
       )
     )
-    names(distribution_default) <- paste0(
+  
+  names(distribution_default) <- paste0(
       distribution_input,
       ".",
       names(distribution_default)
@@ -603,7 +607,7 @@ create_default_recruitment <- function(
   }
 
   # Combine process and distribution defaults into a single list
-  default <- list(c(process_default, distribution_default))
+  default <- list(c(form_default, distribution_default))
   names(default) <- "recruitment"
   return(default)
 }
@@ -749,7 +753,8 @@ update_parameters <- function(current_parameters, modified_parameters) {
                          does not exist in {.var current_parameters}."
           ))
         }
-
+        # TODO: default is a scalar but user might want to modify to time-varying,
+        # e.g. log_q, log_r
         # Check if the length of the modified and current parameter match
         length_modified_parameter <- length(modified_params[[param_name]])
         length_current_parameter <- length(current_params[[param_name]])

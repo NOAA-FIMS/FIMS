@@ -16,13 +16,11 @@ test_that("test initialize_process_distribution", {
 
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input$R0)
-  recruitment$log_rzero[1]$is_random_effect <- FALSE
-  recruitment$log_rzero[1]$estimated <- TRUE
+  recruitment$log_rzero[1]$estimation_type <- "fixed_effects"
   # set up logit_steep
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) +
     log(om_input$h - 0.2)
-  recruitment$logit_steep[1]$is_random_effect <- FALSE
-  recruitment$logit_steep[1]$estimated <- FALSE
+  recruitment$logit_steep[1]$estimation_type <- "constant"
   # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
@@ -39,10 +37,10 @@ test_that("test initialize_process_distribution", {
     module = recruitment,
     par = "log_devs",
     family = gaussian(),
-    sd = list(value = om_input$logR_sd, estimated = FALSE),
+    sd = list(value = om_input$logR_sd, estimation_type = "constant"),
     is_random_effect = FALSE
   )
-  recruitment$estimate_log_devs$set(TRUE)
+  recruitment$log_devs$set_all_estimable(TRUE)
 
   expect_equal(log(om_input$logR_sd), recruitment_distribution$log_sd[1]$value)
   expect_equal(length(recruitment$log_devs), length(recruitment_distribution$x))
@@ -55,7 +53,7 @@ test_that("test initialize_process_distribution", {
       module = recruitment,
       par = "log_devs",
       family = multinomial(),
-      sd = list(value = om_input$logR_sd, estimated = FALSE),
+      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
       is_random_effect = FALSE
     )
   )
@@ -64,7 +62,7 @@ test_that("test initialize_process_distribution", {
       module = recruitment,
       par = "log_devs",
       family = binomial(),
-      sd = list(value = om_input$logR_sd, estimated = FALSE),
+      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
       is_random_effect = FALSE
     )
   )
@@ -73,7 +71,7 @@ test_that("test initialize_process_distribution", {
       module = recruitment,
       par = "log_devs",
       family = gaussian(),
-      sd = list(value = -1, estimated = FALSE),
+      sd = list(value = -1, estimation_type = "constant"),
       is_random_effect = FALSE
     )
   )
@@ -84,7 +82,7 @@ test_that("test initialize_process_distribution", {
       family = gaussian(),
       sd = list(
         value = rep(om_input$logR_sd, 3),
-        estimated = rep(FALSE, 2)
+        estimation_type = rep("constant", 2)
       ),
       is_random_effect = FALSE
     )
@@ -113,8 +111,7 @@ test_that("test initialize_data_distribution", {
   )
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$estimate_q$set(FALSE)
-  fishing_fleet$random_q$set(FALSE)
+  fishing_fleet$log_q[1]$estimation_type <- "constant"
   fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
 
   # Set up fishery index data using the lognormal
@@ -122,7 +119,7 @@ test_that("test initialize_data_distribution", {
   fishing_fleet_index_distribution <- initialize_data_distribution(
     module = fishing_fleet,
     family = lognormal(link = "log"),
-    sd = list(value = fleet_sd, estimated = FALSE),
+    sd = list(value = fleet_sd, estimation_type = "constant"),
     data_type = "index"
   )
   expect_equal(
@@ -133,7 +130,7 @@ test_that("test initialize_data_distribution", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
-      sd = list(value = fleet_sd, estimated = FALSE),
+      sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "index"
     )
   )
@@ -141,7 +138,7 @@ test_that("test initialize_data_distribution", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
-      sd = list(value = fleet_sd, estimated = FALSE),
+      sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "index"
     )
   )
@@ -149,7 +146,7 @@ test_that("test initialize_data_distribution", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = gaussian(),
-      sd = list(value = fleet_sd, estimated = FALSE),
+      sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "agecomp"
     )
   )
@@ -157,7 +154,7 @@ test_that("test initialize_data_distribution", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = lognormal(),
-      sd = list(value = fleet_sd, estimated = FALSE),
+      sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "lengthcomp"
     )
   )
@@ -165,7 +162,7 @@ test_that("test initialize_data_distribution", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
-      sd = list(value = fleet_sd, estimated = c(FALSE, FALSE)),
+      sd = list(value = fleet_sd, estimation_type = c("constant", "constant")),
       data_type = "agecomp"
     )
   )

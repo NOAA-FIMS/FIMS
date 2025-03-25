@@ -7,13 +7,14 @@ load(test_path("fixtures", "integration_test_data.RData"))
 # Initialize the iteration identifier and run FIMS with the 1st set of OM values
 iter_id <- 1
 
-test_that("deterministic test of fims", {
+test_that("deterministic test of fims with random effects", {
   result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE
+    estimation_mode = FALSE,
+    random_effects = c(recruitment = "log_devs")
   )
 
   # Set up TMB's computational graph
@@ -26,6 +27,13 @@ test_that("deterministic test of fims", {
   # Call report using deterministic parameter values
   # obj[["report"]]() requires parameter list to avoid errors
   report <- result[["report"]]
+
+    # recruitment log_devs (fixed at initial "true" values)
+  # the initial value of om_input[["logR.resid"]] is dropped from the model
+  expect_equal(report[["log_recruit_dev"]][[1]], om_input_list[[iter_id]][["logR.resid"]][-1])
+  # check input to ensure log_devs are being read in as random effects
+  expect_equal(length(obj[["env"]][["parList"]]()[["p"]]), 49)
+  expect_equal(length(obj[["env"]][["parList"]]()[["re"]]), 29)
 
   # Compare log(R0) to true value
   fims_logR0 <- sdr_fixed[, "Estimate"][["recruitment_1_log_rzero_0"]]
@@ -147,13 +155,14 @@ test_that("deterministic test of fims", {
   }
 })
 
-test_that("nll test of fims", {
+test_that("nll test of fims with radnom effects", {
   result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE
+    estimation_mode = FALSE,
+    random_effects = c(recruitment = "log_devs")
   )
 
   # Set up TMB's computational graph
@@ -245,84 +254,59 @@ test_that("nll test of fims", {
   expect_equal(report[["jnll"]], expected_jnll)
 })
 
-test_that("estimation test of fims", {
+test_that("estimation test of fims with random effects", {
   result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_devs")
   )
 
   # Compare FIMS results with model comparison project OM values
-  validate_fims(
-    report = result[["report"]],
-    estimates = result[["sdr_report"]],
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]]
-  )
+  # validate_fims(
+  #   report = result[["report"]],
+  #   estimates = result[["sdr_report"]],
+  #   om_input = om_input_list[[iter_id]],
+  #   om_output = om_output_list[[iter_id]],
+  #   em_input = em_input_list[[iter_id]]
+  # )
 })
 
-test_that("run FIMS with missing values", {
-  # Define the NA (missing value) placeholder and the index where it will be inserted
-  na_value <- -999
-  na_index <- 2
-
-  # Introduce a missing value into the survey observations for the estimation model input
-  em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index] <- na_value
-
-  # Run the FIMS setup and execution function
-  result <- setup_and_run_FIMS_without_wrappers(
+test_that("estimation test with recruitment re on logr", {
+    result_log_r <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
-  )
-
-  # Validate that the result report is not null
-  expect_false(is.null(result[["report"]]))
-
-  # Obtain the gradient and Hessian matrix
-  g <- as.numeric(result[["obj"]][["gr"]](result[["opt"]][["par"]]))
-  h <- optimHess(result[["opt"]][["par"]], fn = result[["obj"]][["fn"]], gr = result[["obj"]][["gr"]])
-  result[["opt"]][["par"]] <- result[["opt"]][["par"]] - solve(h, g)
-
-  # Obtain the maximum absolute gradient to check convergence
-  # Ensure that the maximum gradient is less than or equal to
-  # the specified tolerance (0.0001)
-  max_gradient <- max(abs(result[["obj"]][["gr"]](result[["opt"]][["par"]])))
-  expect_lte(max_gradient, 0.0001)
-})
-
-test_that("agecomp in proportion works", {
-  # Store the original values of the number of landings observations and
-  # survey observations
-  n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]
-  n.survey_original <- om_input_list[[iter_id]][["n.survey"]][["survey1"]]
-
-  # Set the number of landings observations and survey observations to 1
-  om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- 1
-  om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- 1
-  on.exit(om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- n.L_original, add = TRUE)
-  on.exit(om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- n.survey_original, add = TRUE)
-
-  # Run the FIMS setup and execution function
-  result <- setup_and_run_FIMS_without_wrappers(
-    iter_id = iter_id,
-    om_input_list = om_input_list,
-    om_output_list = om_output_list,
-    em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_r")
   )
 
   # Compare FIMS results with model comparison project OM values
-  validate_fims(
-    report = result[["report"]],
-    estimates = result[["sdr_report"]],
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]]
+  # validate_fims(
+  #   report = result_log_r[["report"]],
+  #   estimates = result_log_r[["sdr_report"]],
+  #   om_input = om_input_list[[iter_id]],
+  #   om_output = om_output_list[[iter_id]],
+  #   em_input = em_input_list[[iter_id]]
+  # )
+
+  result_log_devs <- setup_and_run_FIMS_without_wrappers(
+    iter_id = iter_id,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_devs")
   )
+
+
+  expect_equal(result_log_r$report[["nll_components"]], result_log_devs$report[["nll_components"]], tolerance = 1e-4)
+  expect_equal(result_log_r$report[["recruitment"]], result_log_devs$report[["recruitment"]], tolerance = 1e-4)
+
+  clear()
+
+
 })

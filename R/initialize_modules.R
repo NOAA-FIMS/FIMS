@@ -85,9 +85,7 @@ initialize_module <- function(parameters, data, module_name) {
 
     if ("landings" %in% fleet_types) {
       module_fields <- setdiff(module_fields, c(
-        "log_q",
-        "random_q",
-        "estimate_q"
+        "log_q"
       ))
     } else {
       module_fields <- setdiff(module_fields, c(
@@ -135,11 +133,7 @@ initialize_module <- function(parameters, data, module_name) {
   #     Update as needed.
   #   - Add n_fleets to data1. Should n_fleets include both
   #     fishing and survey fleets? Currently, data1@fleets equals 1.
-  # - Recruitment interface
-  #   - Remove the field estimate_log_devs. It will be set up using the
-  #   set_all_estimable() method instead.
   # - Fleet
-  #   - Remove estimate_Fmort, estimate_q, and random_q from the Rcpp interface
   #   - Reconsider exposing `log_expected_index` and
   #     `proportion_catch_numbers_at_age` to users. Their IDs are linked with
   #     index and agecomp distributions. No input values are required.
@@ -150,8 +144,8 @@ initialize_module <- function(parameters, data, module_name) {
   )
 
   boolean_fields <- c(
-    "estimate_log_devs", "estimate_prop_female", 
-    "estimate_q", "is_survey", "random_q"
+    "estimate_prop_female", 
+     "is_survey"
   )
 
   real_vector_fields <- c(
@@ -172,14 +166,7 @@ initialize_module <- function(parameters, data, module_name) {
     } else if (field %in% boolean_fields) {
       module[[field]]$set(
         switch(field,
-          "estimate_log_devs" = module_input[[
-            paste0(module_class_name, ".estimate_log_devs")
-          ]],
-          "estimate_q" = module_input[[
-            paste0(module_class_name, ".log_q.estimated")
-          ]],
           "is_survey" = !("landings" %in% fleet_types),
-          "random_q" = FALSE,
           cli::cli_abort(c(
             "{.var {field}} is not a valid field in {.var {module_class_name}}
             module."
@@ -710,14 +697,14 @@ initialize_fims <- function(parameters, data) {
       names(parameters[["parameters"]][[fleet_names[i]]]),
       value = TRUE
     )
-    parameter_estimated_name <- grep(
-      paste0("log_sd", ".estimated"),
+    parameter_estimation_name <- grep(
+      paste0("log_sd", ".estimation_type"),
       names(parameters[["parameters"]][[fleet_names[i]]]),
       value = TRUE
     )
 
     if (length(parameter_value_name) == 0 ||
-      length(parameter_estimated_name) == 0
+      length(parameter_estimation_name) == 0
     ) {
       cli::cli_abort(c(
         "Missing required inputs for `log_sd` in fleet `{fleet_name}`."
@@ -731,7 +718,7 @@ initialize_fims <- function(parameters, data) {
         value = exp(
           parameters[["parameters"]][[fleet_names[i]]][[parameter_value_name]]
         ),
-        estimated = parameters[["parameters"]][[fleet_names[i]]][[parameter_estimated_name]]
+        estimation_type = parameters[["parameters"]][[fleet_names[i]]][[parameter_estimation_name]]
       ),
       data_type = "index"
     )
@@ -741,6 +728,11 @@ initialize_fims <- function(parameters, data) {
     # 1. Remove the "dims" field to maintain consistency with other distributions, or
     # 2. Update all relevant R functions (e.g., initialize_data_distribution()) 
     #    that call DmultinomDistribution to set the "dims" field.
+    # AMH comment: 
+    # 1. dims field is needed to track the dimension of multivariate input
+    # 2. the pattern for multinomial is different because it is a multivariate distribution. 
+    #  Other multivariate distributions (e.g. MVNORM) will likely also need a dims field
+
     if ("age" %in% fleet_types &&
       "AgeComp" %in% data_distribution_names_for_fleet_i) {
       fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
@@ -775,15 +767,20 @@ initialize_fims <- function(parameters, data) {
     names(parameters[["parameters"]][["recruitment"]]),
     value = TRUE
   )
-  field_estimated_name <- grep(
-    paste0("log_sd.estimated"),
+  field_estimation_name <- grep(
+    paste0("log_sd.estimation_type"),
     names(parameters[["parameters"]][["recruitment"]]),
     value = TRUE
   )
 
-  if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
-    cli::cli_abort("Missing required inputs for recruitment distribution.")
-  }
+   if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
+  # TODO: Remove this check?: if log_devs are fixed, there is no recruitment distribution
+  #   cli::cli_abort("Missing required inputs for recruitment distribution.")
+   recruitment_process <- initialize_process_structure(
+    module = recruitment,
+    par = "log_devs"
+  )
+   } else {
 
   recruitment_distribution <- initialize_process_distribution(
     module = recruitment,
@@ -791,12 +788,18 @@ initialize_fims <- function(parameters, data) {
     family = gaussian(),
     sd = list(
       value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
-      estimated = parameters[["parameters"]][[
+      estimation_type = parameters[["parameters"]][[
         "recruitment"
-      ]][[field_estimated_name]]
+      ]][[field_estimation_name]]
     ),
     is_random_effect = FALSE
   )
+
+  recruitment_process <- initialize_process_structure(
+    module = recruitment,
+    par = names(parameters$modules$recruitment$process_distribution)
+  )
+}
 
   # Growth
   growth <- initialize_growth(
@@ -827,7 +830,8 @@ initialize_fims <- function(parameters, data) {
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameter_list <- list(
-    parameters = list(p = get_fixed())
+    parameters = list(p = get_fixed(),
+                      re = get_random())
   )
 
   return(parameter_list)
@@ -875,14 +879,14 @@ set_param_vector <- function(field, module, module_input) {
     names(module_input),
     value = TRUE
   )
-  field_estimated_name <- grep(
-    paste0(field, ".estimated"),
+  field_estimation_name <- grep(
+    paste0(field, ".estimation_type"),
     names(module_input),
     value = TRUE
   )
 
   # Check if both value and estimation information are present
-  if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
+  if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
     cli::cli_abort(c(
       "Missing value or estimation information for {.var field}."
     ))
@@ -900,5 +904,13 @@ set_param_vector <- function(field, module, module_input) {
   }
 
   # Set the estimation information for the entire parameter vector
-  module[[field]]$set_all_estimable(module_input[[field_estimated_name]])
+  if(module_input[[field_estimation_name]] == "constant"){
+    module[[field]]$set_all_estimable(FALSE)
+  }
+  if(module_input[[field_estimation_name]] == "random_effects"){
+    module[[field]]$set_all_random(TRUE)
+  }
+  if(module_input[[field_estimation_name]] == "fixed_effects"){
+    module[[field]]$set_all_estimable(TRUE)
+  }
 }

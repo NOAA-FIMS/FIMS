@@ -39,12 +39,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
      */
     virtual const Type evaluate(){
       // set vector size based on input type (prior, process, or data)
-      size_t n_x;
-      if(this->input_type == "data"){
-        n_x = this->observed_values->data.size();
-      } else {
-        n_x = this->x.size();
-      }
+      size_t n_x = this->get_n_x();
       // setup vector for recording the log probability density function values
       this->lpdf_vec.resize(n_x);
       std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
@@ -54,31 +49,40 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         #ifdef TMB_MODEL
         if(this->input_type == "data"){
           // if data, check if there are any NA values and skip lpdf calculation if there are
-          if(this->observed_values->at(i) != this->observed_values->na_value){
-            this->lpdf_vec[i] = dnorm(this->observed_values->at(i), this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)), true);
+          if(this->get_observed(i) != this->observed_values->na_value){
+            this->lpdf_vec[i] = dnorm(this->get_observed(i), this->get_expected(i), 
+              fims_math::exp(log_sd.get_force_scalar(i)), true);
           } else {
             this->lpdf_vec[i] = 0;
           }
           // if not data (i.e. prior or process), use x vector instead of observed_values
         } else {
-          this->lpdf_vec[i] = dnorm(this->x[i], this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)), true);
+          this->lpdf_vec[i] = dnorm(this->get_observed(i), this->get_expected(i),
+            fims_math::exp(log_sd.get_force_scalar(i)), true);
         }
         lpdf += this->lpdf_vec[i];
         if(this->simulate_flag){
-            FIMS_SIMULATE_F(this->of){
-              if(this->input_type == "data"){
-                this->observed_values->at(i) = rnorm(this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)));
-              } else {
-                this->x[i] = rnorm(this->expected_values.get_force_scalar(i), fims_math::exp(log_sd.get_force_scalar(i)));
-              }
+          FIMS_SIMULATE_F(this->of){
+            if(this->input_type == "data"){
+              this->observed_values->at(i) = rnorm(this->get_expected(i), 
+                      fims_math::exp(log_sd.get_force_scalar(i)));
+            } 
+            if(this->input_type == "random_effects"){
+              (*this->re)[i] = rnorm(this->get_expected(i),
+                      fims_math::exp(log_sd.get_force_scalar(i)));
             }
+            if(this->input_type == "prior"){
+              (*(this->priors[i]))[0] = rnorm(this->get_expected(i), 
+                      fims_math::exp(log_sd.get_force_scalar(i)));
+            }
+          }
         }
         #endif
         /* osa not working yet
           if(osa_flag){//data observation type implements osa residuals
               //code for osa cdf method
-              this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i], this->expected_values.get_force_scalar(i), sd[i]) );
-              this->lpdf_vec[i] = this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i], this->expected_values.get_force_scalar(i), sd[i]) );
+              this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i], this->get_expected(i), sd[i]) );
+              this->lpdf_vec[i] = this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i], this->get_expected(i), sd[i]) );
           } */
 
         }

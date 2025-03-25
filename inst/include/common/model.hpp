@@ -104,9 +104,10 @@ namespace fims_model {
                     nll_components_idx += 1;
                 }
             }
+            FIMS_INFO_LOG("Model: Finished evaluating prior distributions. The jnll after evaluating " + fims::to_string(n_priors) + " priors is: " +
+                    fims::to_string(jnll));
 
-
-
+           
             // Loop over populations and evaluate recruitment component
 
             typename fims_info::Information<Type>::population_iterator p_it;
@@ -121,24 +122,6 @@ namespace fims_model {
                 p->recruitment->Prepare();
 
             }
-
-            // Loop over densities and evaluate joint negative log-likelihoods for random effects
-            this->fims_information->SetupRandomEffects();
-            size_t n_random_effects = 0;
-            for (d_it = this->fims_information->density_components.begin();
-                    d_it != this->fims_information->density_components.end(); ++d_it) {
-                std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
-#ifdef TMB_MODEL
-                d->of = this->of;
-#endif
-                if (d->input_type == "random_effects") {
-                    nll_components[nll_components_idx] = -d->evaluate();
-                    jnll += nll_components[nll_components_idx];
-                    n_random_effects += 1;
-                    nll_components_idx += 1;
-                }
-            }
-
 
             // Loop over and evaluate populations
             for (p_it = this->fims_information->populations.begin();
@@ -169,6 +152,25 @@ namespace fims_model {
                 }
                 f->evaluate_index();
             }
+            
+            // Loop over densities and evaluate joint negative log-likelihoods for random effects
+            size_t n_random_effects = 0;
+            for (d_it = this->fims_information->density_components.begin();
+                    d_it != this->fims_information->density_components.end(); ++d_it) {
+                std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
+            #ifdef TMB_MODEL
+                d->of = this->of;
+            #endif
+                if (d->input_type == "random_effects") {
+                    nll_components[nll_components_idx] = -d->evaluate();
+                    jnll += nll_components[nll_components_idx];
+                    n_random_effects += 1;
+                    nll_components_idx += 1;
+                }
+            }
+            FIMS_INFO_LOG("Model: Finished evaluating random effect distributions. The jnll after evaluating priors and " + fims::to_string(n_random_effects) + " random_effects is: " +
+                    fims::to_string(jnll));    
+
             this->fims_information->SetupData();
             // Loop over and evaluate data joint negative log-likelihoods
             int n_data = 0;

@@ -28,11 +28,11 @@ test_that("Population input settings work as expected", {
   expect_equal(population$get_id(), 1)
   for (i in 1:(nyears * nages)) {
     expect_equal(population$log_M[i]$value, -1)
-    expect_false(population$log_M[i]$estimated)
+    expect_equal(population$log_M[i]$estimation_type, "constant")
   }
   for (i in 1:nyears) {
     expect_equal(population$log_init_naa[i]$value, 0)
-    expect_true(population$log_init_naa[i]$estimated)
+    expect_equal(population$log_init_naa[i]$estimation_type, "fixed_effects")
   }
 
   clear()
