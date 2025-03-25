@@ -27,6 +27,7 @@
 #' @export log_warning
 #' @export LogisticMaturity
 #' @export LogisticSelectivity
+#' @export model
 #' @export Parameter
 #' @export ParameterVector
 #' @export Population

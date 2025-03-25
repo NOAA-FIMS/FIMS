@@ -95,18 +95,11 @@ fleet1 <- survey1 <- list(
 default_parameters <- data_4_model |>
   create_default_parameters(
     fleets = list(fleet1 = fleet1, survey1 = survey1),
-      recruitment = list(
-        form = "BevertonHoltRecruitment"
+     recruitment = list(
+        form = "AR1",
+        process = model(~log_devs, family = ar1(), random = TRUE)
       )
-    ) |>
-    create_default_process(
-      data = data_4_model,
-      module = "recruitment",
-      par = "log_devs", 
-      process_distribution = gaussian(),
-      estimated = TRUE,
-      random = FALSE
-    )
+  )
 ```
 
 The argument names and their corresponding default values of the create_default_parameters() function can be displayed using `args()`.
@@ -166,7 +159,9 @@ parameters <- default_parameters |>
         ),
         # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
         # to TRUE. We need to debug the issue, then update the line below accordingly.
-        BevertonHoltRecruitment.log_devs.estimated = FALSE
+        BevertonHoltRecruitment.log_devs.estimated = FALSE,
+        BevertonHoltRecruitment.DnormDistribution.sd.value = 0.5,
+        DnormDistribution.sd.estimated = FALSE
       )
     )
   ) |>
@@ -315,19 +310,7 @@ fleet1 <- survey1 <- list(
 # and fit the model
 age_only_fit <- data_4_model |>
   create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1),
-      recruitment = list(
-        form = "BevertonHoltRecruitment"
-      )
-    ) |>
-    create_default_process(
-      data = data_4_model,
-      module = "recruitment",
-      par = "log_devs", 
-      process_distribution = gaussian(),
-      estimated = TRUE,
-      random = FALSE
-    ) |>
+    fleets = list(fleet1 = fleet1, survey1 = survey1)) |>
   # update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
@@ -353,19 +336,8 @@ fleet1 <- survey1 <- list(
 # and fit the model
 length_only_fit <- data_4_model |>
   create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1),
-      recruitment = list(
-        form = "BevertonHoltRecruitment"
-      )
-    ) |>
-    create_default_process(
-      data = data_4_model,
-      module = "recruitment",
-      par = "log_devs", 
-      process_distribution = gaussian(),
-      estimated = TRUE,
-      random = FALSE
-    ) |>
+    fleets = list(fleet1 = fleet1, survey1 = survey1)
+    )  |>
   update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)

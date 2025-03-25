@@ -751,12 +751,16 @@ initialize_fims <- function(parameters, data) {
    if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
   # Remove this check: if log_devs are fixed, there is no recruitment distribution
   #   cli::cli_abort("Missing required inputs for recruitment distribution.")
+   recruitment_process <- initialize_process_structure(
+    module = recruitment,
+    par = "log_devs"
+  )
    } else {
 
   recruitment_distribution <- initialize_process_distribution(
     module = recruitment,
-    par = names(parameters$modules$recruitment$process_distribution[1]),
-    family = unname(parameters$modules$recruitment$process_distribution[1])[[1]],
+    par = all.vars(parameters[["modules"]][["recruitment"]][["process"]][["formula"]])[1],
+    family = parameters[["modules"]][["recruitment"]][["process"]][["family"]],
     sd = list(
       value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
       estimated = parameters[["parameters"]][[
@@ -764,12 +768,12 @@ initialize_fims <- function(parameters, data) {
       ]][[field_estimated_name]]
     ),
     is_random_effect =
-      as.logical(parameters$modules$recruitment$process_distribution[["fit_as_random"]])
+      as.logical(parameters[["modules"]][["recruitment"]][["process"]][["random"]])
   )
 
   recruitment_process <- initialize_process_structure(
     module = recruitment,
-    par = names(parameters$modules$recruitment$process_distribution[1])
+    par = all.vars(parameters[["modules"]][["recruitment"]][["process"]][["formula"]])[1]
   )
 }
 

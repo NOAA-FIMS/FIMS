@@ -63,7 +63,7 @@
 create_default_parameters <- function(
     data,
     fleets,
-    recruitment,
+    recruitment = list(form = "BevertonHoltRecruitment"),
     # TODO: Rename EWAAgrowth to not use an acronym
     growth = list(form = "EWAAgrowth"),
     maturity = list(form = "LogisticMaturity")) {
@@ -237,6 +237,52 @@ create_default_DoubleLogistic <- function() {
   default[["inflection_point_desc.value"]] <- 4
 
   return(default)
+}
+
+#' Create a FIMS model object
+#' 
+#' @description This function creates a model object used to 
+#' store the model formula, family, and random effects boolean of a process.
+#' 
+#' @param formula A formula object specifying the model formula.
+#' @param family A family object specifying the distribution of the model.
+#' @param random A logical value specifying whether the model has random effects.
+#' 
+#' @return A list representing the model object.
+#' @export
+#' @example 
+#'  create_default_parameters(
+#'   fleets = list(fleet1 = fleet1, survey1 = survey1),
+#'     recruitment = list(
+#'       form = "BevertonHoltRecruitment",
+#'       process = model(~log_devs, family = gaussian(link = "log"), random = FALSE)
+#'      )
+#'    )
+model <- function(formula, family, random = FALSE) {
+  # Validate inputs
+  if (!inherits(formula, "formula")) {
+    stop("The 'formula' argument must be a valid formula.")
+  }
+  
+  if (!inherits(family, "family")) {
+    stop("The 'family' argument must be a valid family object (e.g., gaussian()).")
+  }
+  
+  if (!is.logical(random)) {
+    stop("The 'random' argument must be a logical value (TRUE or FALSE).")
+  }
+  
+  # Create a list to represent the model
+  model_object <- list(
+    formula = formula,
+    family = family,
+    random = random
+  )
+  
+  # Assign a class to the model object for future extensions
+  class(model_object) <- "FIMSModel"
+  
+  return(model_object)
 }
 
 #' Create default selectivity parameters
@@ -558,16 +604,30 @@ create_default_recruitment <- function(
   # NOTE: All new forms of recruitment must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
-  process_default <- switch(form,
+  form_default <- switch(form,
     "BevertonHoltRecruitment" = create_default_BevertonHoltRecruitment(data)
   )
   
-  names(process_default) <- paste0(form, ".", names(process_default))
-  # Combine process and distribution defaults into a single list
- # default <- list(c(process_default, distribution_default))
-  default <- list(process_default)
+  names(form_default) <- paste0(form, ".", names(form_default))
+
+  if(is.list(recruitment[["process"]])){
+    process_default <- create_default_process( 
+      input = recruitment,
+      data = data, 
+      module = "recruitment",
+      par = all.vars(recruitment[["process"]][["formula"]])[1], 
+      process_distribution = recruitment[["process"]][["family"]],
+      estimated = TRUE,
+      random = recruitment[["process"]][["random"]]
+    )
+
+    default <- list(c(form_default, process_default))
+  } else {
+    default <- list(form_default)
+  }
   names(default) <- "recruitment"
   return(default)
+ 
 }
 
 #' Create default process for a FIMS model
@@ -622,7 +682,7 @@ create_default_recruitment <- function(
 #'    ) |>
 #'    create_default_process(
 #'      module = "recruitment",
-#'      par = "log_devs", expected = NULL,
+#'      par = "log_devs",
 #'      process_distribution = "DnormDistribution",
 #'      estimated = TRUE,
 #'      random = FALSE
@@ -655,24 +715,16 @@ create_default_process <- function(input, data, module, par,
       )
     )
     
-    distribution_name <- "DnormDistribution"
+    distribution_name <- switch(distribution_input[["family"]],
+      "gaussian" = "DnormDistribution"
+    )
     names(distribution_default) <- paste0(
       distribution_name,
       ".",
       names(distribution_default)
     )
-    form <- input[["modules"]][[module]][["form"]]
-    input[["parameters"]][[module]][[paste0(form, ".", par, ".", "estimated")]] <- TRUE
-    if(random){
-      distribution_default[[paste0(distribution_name, ".log_sd.estimated" )]]<- TRUE
-    }
-    input[["parameters"]][[module]] <- append(input[["parameters"]][[module]], distribution_default)
-    distribution_list <- list()
-    distribution_list[[par]] <- process_distribution
-    distribution_list[["fit_as_random"]] <- random
-    input[["modules"]][[module]][["process_distribution"]] <- distribution_list
-    return(input)
   }
+  return(distribution_default)
 }
 
 #' Update input parameters for a FIMS model

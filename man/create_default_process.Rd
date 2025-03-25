@@ -6,6 +6,7 @@
 \usage{
 create_default_process(
   input,
+  data,
   module,
   par,
   process_distribution,
@@ -65,7 +66,7 @@ default_parameters <- data |>
    ) |>
    create_default_process(
      module = "recruitment",
-     par = "log_devs", expected = NULL,
+     par = "log_devs",
      process_distribution = "DnormDistribution",
      estimated = TRUE,
      random = FALSE
