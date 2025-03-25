@@ -47,14 +47,14 @@ for (i in 1:sim_num) {
     recruitment = list(
       BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[i]][["R0"]]),
       BevertonHoltRecruitment.log_devs.value = om_input_list[[i]][["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimated = FALSE,
+      BevertonHoltRecruitment.log_devs.estimation_type = "constant",
       DnormDistribution.log_sd.value = om_input_list[[i]][["logR_sd"]]
     ),
     maturity = list(
       LogisticMaturity.inflection_point.value = om_input_list[[i]][["A50.mat"]],
-      LogisticMaturity.inflection_point.estimated = FALSE,
+      LogisticMaturity.inflection_point.estimation_type = "constant",
       LogisticMaturity.slope.value = om_input_list[[i]][["slope.mat"]],
-      LogisticMaturity.slope.estimated = FALSE
+      LogisticMaturity.slope.estimation_type = "constant"
     ),
     population = list(
       Population.log_init_naa.value = log(om_output_list[[i]][["N.age"]][1, ])
@@ -84,6 +84,7 @@ test_that("Run FIMS in parallel using {snowfall}", {
     om_output_list,
     em_input_list,
     TRUE,
+    FALSE,
     modified_parameters
   )
 

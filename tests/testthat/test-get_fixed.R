@@ -19,9 +19,9 @@ test_that("get_fixed() works with correct inputs", {
   # Create selectivity
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0
-  selectivity$inflection_point[1]$estimated <- TRUE
+  selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
   selectivity$slope[1]$value <- 0.2
-  selectivity$slope[1]$estimated <- TRUE
+  selectivity$slope[1]$estimation_type <- "fixed_effects"
 
   CreateTMBModel()
   expect_equal(
@@ -35,7 +35,7 @@ test_that("get_fixed() works with correct inputs", {
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0
   selectivity$slope[1]$value <- 0.2
-  selectivity$slope[1]$estimated <- TRUE
+  selectivity$slope[1]$estimation_type <- "fixed_effects"
   CreateTMBModel()
   expect_equal(
     selectivity$slope[1]$value,
@@ -47,13 +47,13 @@ test_that("get_fixed() works with correct inputs", {
   #' double logistic selectivity curve.
   fish_selex <- methods::new(DoubleLogisticSelectivity)
   fish_selex$inflection_point_asc[1]$value <- 2
-  fish_selex$inflection_point_asc[1]$estimated <- TRUE
+  fish_selex$inflection_point_asc[1]$estimation_type <- "fixed_effects"
   fish_selex$inflection_point_desc[1]$value <- 3
-  fish_selex$inflection_point_desc[1]$estimated <- TRUE
+  fish_selex$inflection_point_desc[1]$estimation_type <- "fixed_effects"
   fish_selex$slope_asc[1]$value <- 1
-  fish_selex$slope_asc[1]$estimated <- FALSE
+  fish_selex$slope_asc[1]$estimation_type <- "constant"
   fish_selex$slope_desc[1]$value <- 1.5
-  fish_selex$slope_desc[1]$estimated <- TRUE
+  fish_selex$slope_desc[1]$estimation_type <- "fixed_effects"
 
   CreateTMBModel()
   sel_parm <- c(
@@ -70,11 +70,9 @@ test_that("get_fixed() works with correct inputs", {
   selectivity$inflection_point[1]$value <- 11.0
   selectivity$inflection_point[1]$min <- 8.0
   selectivity$inflection_point[1]$max <- 12.0
-  selectivity$inflection_point[1]$is_random_effect <- FALSE
-  selectivity$inflection_point[1]$estimated <- TRUE
+  selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
   selectivity$slope[1]$value <- 0.5
-  selectivity$slope[1]$is_random_effect <- FALSE
-  selectivity$slope[1]$estimated <- TRUE
+  selectivity$slope[1]$estimation_type <- "fixed_effects"
   sel_parm <- c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value)
   recruitment <- methods::new(BevertonHoltRecruitment)
   h <- 0.75
@@ -84,11 +82,9 @@ test_that("get_fixed() works with correct inputs", {
   recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
   recruitment$logit_steep[1]$min <- 0.21
   recruitment$logit_steep[1]$max <- 1.0
-  recruitment$logit_steep[1]$is_random_effect <- FALSE
-  recruitment$logit_steep[1]$estimated <- TRUE
+  recruitment$logit_steep[1]$estimation_type <- "fixed_effects"
   recruitment$log_rzero[1]$value <- log(r0)
-  recruitment$log_rzero[1]$is_random_effect <- FALSE
-  recruitment$log_rzero[1]$estimated <- TRUE
+  recruitment$log_rzero[1]$estimation_type <- "fixed_effects"
   rec_parm <- c(-log(1.0 - h) + log(h - 0.2), log(r0))
 
   CreateTMBModel()

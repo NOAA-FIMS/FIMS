@@ -14,6 +14,7 @@
 test_that("test_rcpp_recruitment_interface() works with correct inputs", {
   # Create recruitment
   recruitment <- methods::new(BevertonHoltRecruitment)
+  recruitment_process <- new(LogDevsRecruitmentProcess)
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
@@ -22,8 +23,7 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
   recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
   recruitment$logit_steep[1]$min <- 0.21
   recruitment$logit_steep[1]$max <- 1.0
-  recruitment$logit_steep[1]$is_random_effect <- TRUE
-  recruitment$logit_steep[1]$estimated <- TRUE
+  recruitment$logit_steep[1]$estimation_type <- "random_effects"
   recruitment$log_rzero[1]$value <- log(r0)
 
   #' @description Test that the recruitment id is 1.
@@ -47,12 +47,8 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
     expected = 1.0
   )
   #' @description Test that the logit_steep is a random effect.
-  expect_true(
-    object = recruitment$logit_steep[1]$is_random_effect
-  )
-  #' @description Test that the logit_steep is estimated.
-  expect_true(
-    object = recruitment$logit_steep[1]$estimated
+  expect_equal(
+    object = recruitment$logit_steep[1]$estimation_type, "random_effects"
   )
   #' @description Test that the log_rzero value is log(1000000.0).
   expect_equal(
@@ -61,7 +57,7 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
   )
   #' @description Test that recruitment$evaluate(spawns, ssb0) returns 1090802.68.
   expect_equal(
-    object = recruitment$evaluate(spawns, ssb0),
+    object = recruitment$evaluate_mean(spawns, ssb0),
     expected = 1090802.68
   )
   log_devs <- c(-1.0, 2.0, 3.0)
@@ -97,14 +93,13 @@ test_that("test_rcpp_recruitment_interface() returns correct error messages", {
   recruitment$logit_steep[1]$value <- 1
   recruitment$logit_steep[1]$min <- 0.21
   recruitment$logit_steep[1]$max <- 1.0
-  recruitment$logit_steep[1]$is_random_effect <- TRUE
-  recruitment$logit_steep[1]$estimated <- TRUE
+  recruitment$logit_steep[1]$estimation_type <- "random_effects"
   recruitment$log_rzero[1]$value <- log(r0)
 
 
   #' @description Test that recruitment errors if logit_steep==1.
   expect_warning(
-    object = recruitment$evaluate(spawns, ssb0),
+    object = recruitment$evaluate_mean(spawns, ssb0),
     regexp = "Steepness is subject to a logit transformation. Fixing it at 1.0 is not currently possible."
   )
   clear()

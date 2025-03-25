@@ -108,6 +108,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   SharedInt recruitment_id;
   /**
+   * @brief The ID of the recruitment process module.
+   */
+  SharedInt recruitment_err_id;
+  /**
    * @brief The natural log of the natural mortality for each year.
    */
   ParameterVector log_M;
@@ -119,6 +123,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Numbers at age.
    */
   ParameterVector numbers_at_age;
+  /**
+   * @brief random effect for recruitment.
+   */
+  ParameterVector log_r;
   /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"nages\".
@@ -178,7 +186,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Sets the unique ID for the Maturity object.
    * @param maturity_id Unique ID for the Maturity object.
    */
-  void SetMaturity(uint32_t maturity_id) {
+  void SetMaturityID(uint32_t maturity_id) {
     this->maturity_id.set(maturity_id);
   }
 
@@ -186,7 +194,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Set the unique ID for the growth object.
    * @param growth_id Unique ID for the growth object.
    */
-  void SetGrowth(uint32_t growth_id) {
+  void SetGrowthID(uint32_t growth_id) {
     this->growth_id.set(growth_id);
   }
 
@@ -194,7 +202,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Set the unique ID for the recruitment object.
    * @param recruitment_id Unique ID for the recruitment object.
    */
-  void SetRecruitment(uint32_t recruitment_id) {
+  void SetRecruitmentID(uint32_t recruitment_id) {
     this->recruitment_id.set(recruitment_id);
   }
 
@@ -232,22 +240,24 @@ class PopulationInterface : public PopulationInterfaceBase {
       FIMS_WARNING_LOG("Population " + fims::to_string(this->id) + " not found in Information.");
       return;
     } else {
+      
       for (size_t i = 0; i < this->log_M.size(); i++) {
-        if (this->log_M[i].estimated_m) {
-          this->log_M[i].final_value_m = pop->log_M[i];
-        } else {
-          this->log_M[i].final_value_m = this->log_M[i].initial_value_m;
-        }
+        if (this->log_M[i].estimation_type_m == "constant" ) {
+            this->log_M[i].final_value_m = this->log_M[i].initial_value_m;
+          } else {
+            this->log_M[i].final_value_m = pop->log_M[i];
+          }
       }
 
       for (size_t i = 0; i < this->log_init_naa.size(); i++) {
-        if (this->log_init_naa[i].estimated_m) {
-          this->log_init_naa[i].final_value_m = pop->log_init_naa[i];
-        } else {
+        if (this->log_init_naa[i].estimation_type_m == "constant") {
           this->log_init_naa[i].final_value_m = this->log_init_naa[i].initial_value_m;
+        } else {
+          this->log_init_naa[i].final_value_m = pop->log_init_naa[i];
         }
       }
 
+      //set the derived quantities
       this->derived_naa = Rcpp::NumericVector(pop->numbers_at_age.size());
       this->derived_ssb = Rcpp::NumericVector(pop->spawning_biomass.size());
       this->derived_biomass = Rcpp::NumericVector(pop->biomass.size());
@@ -398,22 +408,34 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].initial_value_m;
-      if (this->log_M[i].estimated_m) {
+      if (this->log_M[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "Population.log_M." << this->id << "." << this->log_M[i].id_m;
+        ss << "population_" << this->id << "_log_M_" << this->log_M[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_M[i]);
+      }
+      if(this->log_M[i].estimation_type_m == "random_effects") {
+        ss.str("");
+        ss << "population." << this->id << "log_M." << this->log_M[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(population->log_M[i]);
       }
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
-      if (this->log_init_naa[i].estimated_m) {
+      if (this->log_init_naa[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "Population.log_init_naa." << this->id << "." << this->log_init_naa[i].id_m;
+        ss << "population_" << this->id << "_log_init_naa_" << this->log_init_naa[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
+      }
+      if(this->log_init_naa[i].estimation_type_m == "random_effects") {
+        ss.str("");
+        ss << "population." << this->id << "log_init_naa." << this->log_init_naa[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(population->log_init_naa[i]);
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;

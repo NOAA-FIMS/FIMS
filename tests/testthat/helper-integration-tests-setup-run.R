@@ -133,14 +133,14 @@ prepare_test_data <- function() {
       BevertonHoltRecruitment.log_devs.value = om_input_list[[iter_id]][["logR.resid"]][-1],
       # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
       # to TRUE. We need to debug the issue, then update the line below accordingly.
-      BevertonHoltRecruitment.log_devs.estimated = FALSE,
+      BevertonHoltRecruitment.log_devs.estimation_type = "constant",
       DnormDistribution.log_sd.value = om_input_list[[iter_id]][["logR_sd"]]
     ),
     maturity = list(
       LogisticMaturity.inflection_point.value = om_input_list[[iter_id]][["A50.mat"]],
-      LogisticMaturity.inflection_point.estimated = FALSE,
+      LogisticMaturity.inflection_point.estimation_type = "constant",
       LogisticMaturity.slope.value = om_input_list[[iter_id]][["slope.mat"]],
-      LogisticMaturity.slope.estimated = FALSE
+      LogisticMaturity.slope.estimation_type = "constant"
     ),
     population = list(
       Population.log_init_naa.value = log(om_output_list[[iter_id]][["N.age"]][1, ])
