@@ -76,7 +76,7 @@
 #'       survey1 = survey1
 #'     )
 #'   )
-#' 
+#'
 #' # Compare the parameters for fleet1 in each set up
 #' default_fleet1 <- purrr::map_df(
 #'   default_parameters[["parameters"]][["fleet1"]],
@@ -653,25 +653,25 @@ create_default_recruitment <- function(
 #'   create_default_parameters(
 #'     fleets = list(fleet1 = fleet1, survey1 = survey1)
 #'   )
-#' 
+#'
 #' updated_parameters <- default_parameters |>
 #'   update_parameters(
-#'      modified_parameters = list(
-#'        fleet1 = list(
-#'          Fleet.log_Fmort.value = log(c(
-#'            0.009459165, 0.027288858, 0.045063639,
-#'            0.061017825, 0.048600752, 0.087420554,
-#'            0.088447204, 0.186607929, 0.109008958,
-#'            0.132704335, 0.150615473, 0.161242955,
-#'            0.116640187, 0.169346119, 0.180191913,
-#'            0.161240483, 0.314573212, 0.257247574,
-#'            0.254887252, 0.251462108, 0.349101406,
-#'            0.254107720, 0.418478117, 0.345721184,
-#'            0.343685540, 0.314171227, 0.308026829,
-#'            0.431745298, 0.328030899, 0.499675368
-#'          ))
-#'        )
-#'      )
+#'     modified_parameters = list(
+#'       fleet1 = list(
+#'         Fleet.log_Fmort.value = log(c(
+#'           0.009459165, 0.027288858, 0.045063639,
+#'           0.061017825, 0.048600752, 0.087420554,
+#'           0.088447204, 0.186607929, 0.109008958,
+#'           0.132704335, 0.150615473, 0.161242955,
+#'           0.116640187, 0.169346119, 0.180191913,
+#'           0.161240483, 0.314573212, 0.257247574,
+#'           0.254887252, 0.251462108, 0.349101406,
+#'           0.254107720, 0.418478117, 0.345721184,
+#'           0.343685540, 0.314171227, 0.308026829,
+#'           0.431745298, 0.328030899, 0.499675368
+#'         ))
+#'       )
+#'     )
 #'   )
 #'
 #' # purrr::map_vec() can be used to compare the length of adjusted parameter vectors with defaults for a specific module (e.g., fleet1)
