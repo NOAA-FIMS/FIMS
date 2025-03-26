@@ -281,29 +281,30 @@ estimates_outline <- dplyr::tibble(
     # between the total number of rows in std and the length of parameter_names.
     derived_quantity_nrow <- nrow(std) - length(parameter_names)
 
-estimates <- estimates_outline |>
-      tibble::add_row(
-        label = dimnames(std)[[1]],
-        estimate = std[, "Estimate"],
-        uncertainty = std[, "Std. Error"],
-        # Use obj[["env"]][["parameters"]][["p"]] as this will return both initial
-        # fixed and random effects while obj[["par"]] only returns initial fixed
-        # effects
-        initial = c(
-          obj[["env"]][["parameters"]][["p"]], 
-          rep(NA_real_, derived_quantity_nrow)
-        ),
-        gradient = c(
-          obj[["gr"]](opt[["par"]]), 
-          rep(NA_real_, derived_quantity_nrow)
-        ),
-        estimated = c(
-          rep(TRUE, length(parameter_names)),
-          rep(NA, derived_quantity_nrow)
-        )
-      ) 
+# estimates <- estimates_outline |>
+#       tibble::add_row(
+#         label = dimnames(std)[[1]],
+#         estimate = std[, "Estimate"],
+#         uncertainty = std[, "Std. Error"],
+#         # Use obj[["env"]][["parameters"]][["p"]] as this will return both initial
+#         # fixed and random effects while obj[["par"]] only returns initial fixed
+#         # effects
+#         initial = c(
+#           obj[["env"]][["parameters"]][["p"]], 
+#           rep(NA_real_, derived_quantity_nrow)
+#         ),
+#         gradient = c(
+#           obj[["gr"]](opt[["par"]]), 
+#           rep(NA_real_, derived_quantity_nrow)
+#         ),
+#         estimated = c(
+#           rep(TRUE, length(parameter_names)),
+#           rep(NA, derived_quantity_nrow)
+#         )
+#       ) 
 
 fit_output<- finalize(opt$par, obj$fn, obj$gr)
+write(fit_output, "json_output.json")
 # Convert the JSON-formatted string `fit_output` into an R list object (`json_list`) 
 # for easier manipulation and extraction of data.
 json_list <- jsonlite::fromJSON(fit_output)
@@ -332,8 +333,8 @@ estimates <- purrr::map(seq_along(json_list[[modules_id]][["parameters"]]), ~{
   }
 }) 
 
-# Combine the processed estimates with additional information from `json_list`
-combined_estimates <- purrr::pmap(
+# Expand the processed estimates with additional information from `json_list`
+expand_estimates <- purrr::pmap(
   list(estimates, json_list[[modules_id]][["name"]], json_list[[modules_id]][["id"]], json_list[[modules_id]][["type"]]),
   ~ {
     # Skip processing if the current estimate is NULL.
@@ -355,10 +356,16 @@ combined_estimates <- purrr::pmap(
   # Combine all the processed tibbles into a single tibble by stacking rows.
   dplyr::bind_rows() |>
   # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
-  dplyr::relocate(module_name, module_id, module_type, .before = everything())
-
-combined_estimates |>
-  dplyr::filter(parameter_estimated == 1) 
+  dplyr::relocate(module_name, module_id, module_type, .before = everything()) 
+  # Add gradient column
+  # TODO: should we save parameter ids for final gradient? Right now, we assume that
+  # the order of parameters in json_list is the same as the order of parameters in
+  # estimates. Is it guaranteed to be true? Mismatch happens at row 33 (inflection_point)
+  # combined_estimates |> 
+  #   dplyr::filter(parameter_estimated == 1) |> 
+  #   dplyr::select(parameter_name, parameter_estimated, gradient) |>
+  #   print(n=50)
+  # json_list[["final_gradient"]]
 
 # Extract and process the "derived_quantities" from each module in `json_list`
 which(sapply(json_list[[modules_id]][["derived_quantities"]], is.null))
@@ -407,13 +414,94 @@ combined_derived_quantity <- purrr::pmap(
   dplyr::relocate(module_name, module_id, module_type, .before = everything())
 
 density_component <- purrr::map(seq_along(json_list[[modules_id]][["density_component"]][[2]]), ~{
-  # If the current module's "derived_quantities" is NULL, return NULL to skip processing.
-  if (is.null(json_list[[modules_id]][["derived_quantities"]][[.x]])) {
+  # If the current module's "density_component" is NULL, return NULL to skip processing.
+  if (is.null(json_list[[modules_id]][["density_component"]][[2]][[.x]])) {
     NULL
   } else {
-    # Convert the current module's "derived_quantities" into a tibble for easier manipulation.
-    tibble::as_tibble(json_list[[modules_id]][["derived_quantities"]][[.x]]) |>
-      # Expand the "values" column into multiple rows.
-      tidyr::unnest_longer(values) 
+    # Convert the current module's "density_component" into a tibble for easier manipulation.
+    tibble::as_tibble(json_list[[modules_id]][["density_component"]][[2]][[.x]]) 
   }
 }) 
+
+combined_density_component <- purrr::pmap(
+  list(density_component, json_list[[modules_id]][["name"]], json_list[[modules_id]][["id"]], json_list[[modules_id]][["type"]]),
+  ~ {
+    # Skip processing if the current derived_quantity is NULL.
+    if (is.null(..1)) {
+      NULL
+    } else {
+      ..1 |> 
+        dplyr::mutate(
+          # Add the module name from `json_list` as a new column of the current estimates.
+          module_name = ..2,  
+          # Add the module ID from `json_list` as a new column.
+          module_id = ..3,  
+          # Add the module type from `json_list` as a new column.         
+          module_type = ..4
+        )
+    }
+  }
+) |>
+  # Combine all the processed tibbles into a single tibble by stacking rows.
+  dplyr::bind_rows() |>
+  # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
+  dplyr::relocate(module_name, module_id, module_type, .before = everything())
+
+
+# Helper function to reshape JSON elements
+reshape_json_elements <- function(json_list, element_name, column_names) {
+  modules_id <- which(names(json_list) == "modules")
+  
+  purrr::map(seq_along(json_list[[modules_id]][[element_name]]), ~ {
+    if (is.null(json_list[[modules_id]][[element_name]][[.x]])) {
+      NULL
+    } else {
+      tibble::as_tibble(json_list[[modules_id]][[element_name]][[.x]]) |>
+        tidyr::unnest_longer(values, keep_empty = TRUE) |>
+        tidyr::unnest_wider(values, names_sep = "_", keep_empty = TRUE) |>
+        dplyr::rename_with(~ column_names, everything())
+    }
+  }) |>
+    purrr::pmap(
+      list(
+        .,
+        json_list[[modules_id]][["name"]],
+        json_list[[modules_id]][["id"]],
+        json_list[[modules_id]][["type"]]
+      ),
+      ~ {
+        if (is.null(..1)) {
+          NULL
+        } else {
+          ..1 |>
+            dplyr::mutate(
+              module_name = ..2,
+              module_id = ..3,
+              module_type = ..4
+            )
+        }
+      }
+    ) |>
+    dplyr::bind_rows() |>
+    dplyr::relocate(module_name, module_id, module_type, .before = everything())
+}
+
+# Optimized reshape_derived_quantities_json
+reshape_derived_quantities_json <- function(finalized_fims) {
+  json_list <- jsonlite::fromJSON(finalized_fims)
+  reshape_json_elements(
+    json_list,
+    "derived_quantities",
+    c("label", "value")
+  )
+}
+
+# Optimized reshape_density_component_json
+reshape_density_component_json <- function(finalized_fims) {
+  json_list <- jsonlite::fromJSON(finalized_fims)
+  reshape_json_elements(
+    json_list,
+    "density_component",
+    c("label", "value")
+  )
+}

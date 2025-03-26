@@ -277,48 +277,6 @@ is.FIMSFits <- function(x) {
 
 
 # Helper function for FIMSFit() ----
-#' Update estimates tibble based on specific labels
-#' 
-#' @details This helper function updates the estimates tibble based on specific
-#' labels by mutating the age, length, and time columns.
-#' 
-#' @param estimates A tibble containing estimates to be updated.
-#' @param label_name A character string specifying the label name to filter on.
-#' @param age_value A numeric vector specifying the age values to update. Default
-#'   is NA_real_.
-#' @param length_value A numeric vector specifying the length values to update.
-#'   Default is NA_real_.
-#' @param time_value An integer vector specifying the time values to update. Default
-#'   is NA_integer_.
-#' @return A tibble with updated estimates.
-#' @keywords fit_fims
-#' @examples
-#' \dontrun{
-#' estimates <- FIMS:::update_estimates(
-#'   estimates = estimates,
-#'   label_name = "log_init_naa",
-#'   age_value = 1:12
-#' )
-#' }
-update_estimates <- function(estimates, label_name, age_value = NA_real_, 
-    length_value = NA_real_, time_value = NA_integer_) {
-  # Check if the label_name exists in the estimates tibble
-  if (label_name %in% estimates[["label"]]) {
-    updated_estimates <- estimates |>
-      # Filter the estimates tibble based on the label_name
-      dplyr::filter(label == label_name) |>
-      # Update the age, length, and time columns with the provided values
-      dplyr::mutate(
-        age = age_value,
-        length = length_value,
-        time = time_value
-      )
-    # Update the original estimates tibble with the modified rows
-    estimates <- estimates |>
-      dplyr::rows_update(updated_estimates, by = "row_id")
-  }
-  return(estimates)
-}
 # Constructors ----
 #' Class constructors for class `FIMSFit` and associated child classes
 #'
@@ -386,42 +344,7 @@ FIMSFit <- function(
     sdreport = list(),
     timing = c("time_total" = as.difftime(0, units = "secs")),
     version = utils::packageVersion("FIMS")) {
-  # Outline for the estimates table
-  estimates_outline <- dplyr::tibble(
-    # The FIMS Rcpp module
-    module = character(),
-    # The unique ID of the module
-    id = integer(),
-    # The name of the parameter or derived quantity
-    label = character(),
-    # The index number corresponding to the label
-    index = integer(),
-    # The fleet name associated with the parameter or derived quantity
-    fleet = character(),
-    # The age associated with the parameter or derived quantity
-    age = numeric(),
-    # The length associated with the parameter or derived quantity
-    length = numeric(),
-    # The modeled time perioed that the value pertains to
-    time = integer(),
-    # The initial value use to start the optimization procedure
-    initial = numeric(),
-    # The estaimted parameter value, which would be the MLE estimate or the value
-    # used for a given MCMC iteration
-    estimate = numeric(),
-    # Estimated uncertainty, reported as a standard deviation
-    uncertainty = numeric(),
-    # The pointwise log-likelihood used for the estimation model
-    log_lik = numeric(),
-    # The pointwise log-likelihood used for the test or holdout data
-    log_lik_cv = numeric(),
-    # The gradient component for that parameter, NA for derived quantities
-    gradient = numeric(),
-    # A TRUE/FALSE indicator of whether the parameter was estimated (and not fixed),
-    # with NA for derived quantities
-    estimated = logical()
-  )
-
+  
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
@@ -468,175 +391,13 @@ FIMSFit <- function(
     # Number of rows for derived quantities: based on the difference
     # between the total number of rows in std and the length of parameter_names.
     derived_quantity_nrow <- nrow(std) - length(parameter_names)
+    tmb_estimates <- reshape_estimates_tmb(std = std, obj = obj)
 
-    # Create a tibble with the data from the std, and then apply transformations.
-    estimates <- estimates_outline |>
-      tibble::add_row(
-        label = dimnames(std)[[1]],
-        estimate = std[, "Estimate"],
-        uncertainty = std[, "Std. Error"],
-        # Use obj[["env"]][["parameters"]][["p"]] as this will return both initial
-        # fixed and random effects while obj[["par"]] only returns initial fixed
-        # effects
-        initial = c(
-          obj[["env"]][["parameters"]][["p"]], 
-          rep(NA_real_, derived_quantity_nrow)
-        ),
-        gradient = c(
-          obj[["gr"]](opt[["par"]]), 
-          rep(NA_real_, derived_quantity_nrow)
-        ),
-        estimated = c(
-          rep(TRUE, length(parameter_names)),
-          rep(NA, derived_quantity_nrow)
-        )
-      ) 
   } else {
-    estimates <- estimates_outline |>
-      tibble::add_row( 
-        label = names(obj[["par"]]),
-        initial = obj[["env"]][["parameters"]][["p"]],
-        estimate = obj[["env"]][["parameters"]][["p"]],
-        estimated = FALSE
-      ) 
+    tmb_estimates <- reshape_estimates_tmb(obj = obj)
   }
 
-  estimates <- estimates |>
-    # Create row_id to be used in mutating joins later
-    tibble::rowid_to_column("row_id") |>
-    # Split labels and extract module, id, label, and index
-    dplyr::mutate(label_splits = strsplit(label, split = "\\.")) |>
-    dplyr::rowwise() |>
-    dplyr::mutate(
-      module = ifelse(length(label_splits) > 1, label_splits[[1]], NA_character_),
-      id = ifelse(length(label_splits) > 1, as.integer(label_splits[[3]]), NA_integer_),
-      label = ifelse(length(label_splits) > 1, label_splits[[2]], label),
-      index = ifelse(length(label_splits) > 1, as.integer(label_splits[[4]]), NA_integer_)
-    ) |>
-    dplyr::select(-label_splits) |>
-    # Map fleet name
-    dplyr::mutate(
-      fleet = switch(module,
-        "selectivity" = {
-          # Get the corresponding module ID and filter based on the id
-          match_module_id <- which(unlist_module_ids[grepl(module, names(unlist_module_ids))] == id)
-          strsplit(names(match_module_id), "\\.")[[1]][1]
-        },
-        "fleet" = names(input[["module_ids"]])[id],
-        NA_character_
-      )
-    ) |>
-    dplyr::ungroup()
-
-  # Update estimates based on specific labels using the helper function
-  fleet_time = estimates |> 
-    dplyr::filter(label == "log_Fmort") |> 
-    dplyr::pull(fleet) |> 
-    unique() |> 
-    length()
-  estimates <- update_estimates(
-    estimates = estimates, 
-    label_name = "log_Fmort", 
-    time_value = rep(model_years, times = fleet_time)
-  )
-  estimates <- update_estimates(
-    estimates = estimates, 
-    label_name = "log_init_naa",
-    age_value = FIMS::get_ages(input[["data"]]),
-    time_value = FIMS::get_start_year(input[["data"]])
-  )
-
-  estimates <- update_estimates(
-    estimates = estimates, 
-    label_name = "NAA",
-    age_value = rep(
-      FIMS::get_ages(input[["data"]]),
-      # + 1 means consider one project year
-      times = FIMS::get_n_years(input[["data"]]) + 1
-    ),
-    time_value = rep(
-      # + 1 means consider one project year
-      c(model_years, tail(model_years, 1) + 1),
-      each = get_n_ages(input[["data"]])
-    )
-  )
-
-  estimates <- update_estimates(
-    estimates = estimates, 
-    label_name = "Biomass", 
-    time_value = all_years
-  )
- 
-  estimates <- update_estimates(
-    estimates = estimates,
-    label_name = "SSB",
-    time_value = all_years
-  )
-
-  estimates <- update_estimates(
-    estimates = estimates, 
-    label_name = "LogRecDev",
-    age_value = FIMS::get_ages(input[["data"]])[1],
-    time_value = model_years[-1]
-  )
-
-  estimates <- update_estimates(
-    estimates = estimates, 
-    label_name = "FMort"#,
-    # TODO: uncomment out the line below after filling in fleet info based on
-    # module and id info.
-    # time_value = rep(model_years, times = fleet_time)
-  )
-
-  estimates <- update_estimates(
-    estimates = estimates, 
-    label_name = "ExpectedIndex",
-    time_value = rep(model_years, times = total_fleet_num)
-  )
-
-  naa_age_rep <- rep(
-    FIMS::get_ages(input[["data"]]),
-    times = FIMS::get_n_years(input[["data"]])*total_fleet_num
-  )
-  naa_time_rep <- rep(
-    model_years,
-    each = FIMS::get_n_ages(input[["data"]])*total_fleet_num
-  )
-  nal_length_rep <- rep(
-    FIMS::get_lengths(input[["data"]]),
-    times = FIMS::get_n_years(input[["data"]])*total_fleet_num
-  )
-  nal_time_rep <- rep(
-    model_years,
-    each = FIMS::get_n_lengths(input[["data"]])*total_fleet_num
-  )
-  estimates <- update_estimates(
-    estimates = estimates,
-    label_name = "CNAA",
-    age_value = naa_age_rep,
-    time_value = naa_time_rep
-  )
-
-  estimates <- update_estimates(
-    estimates = estimates,
-    label_name = "CNAL",
-    length_value = nal_length_rep,
-    time_value = nal_time_rep
-  )
-
-  estimates <- update_estimates(
-    estimates = estimates,
-    label_name = "PCNAA",
-    age_value = naa_age_rep,
-    time_value = naa_time_rep
-  )
-
-  estimates <- update_estimates(
-    estimates = estimates,
-    label_name = "PCNAL",
-    length_value = nal_length_rep,
-    time_value = nal_time_rep
-  )
+  
   
   estimates <- estimates |>
     dplyr::select(-row_id)
