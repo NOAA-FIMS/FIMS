@@ -36,6 +36,9 @@ FIMS_dmultinom <- function(x, p) {
 #' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
 #' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
 #' for the report.
+#' @param random_effects A logical value indicating whether to include random
+#' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects 
+#' will be included on recruitment in the model.
 #' @param map A list used to specify mapping for the `MakeADFun` function from
 #' the TMB package.
 #'
@@ -64,6 +67,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 om_output_list,
                                                 em_input_list,
                                                 estimation_mode = TRUE,
+                                                random_effects = FALSE,
                                                 map = list()) {
 
   # Load operating model data for the current iteration
@@ -281,6 +285,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
   recruitment <- methods::new(BevertonHoltRecruitment)
+  recruitment_process <- new(LogDevsRecruitmentProcess)
 
   # NOTE: in first set of parameters below (for recruitment),
   # $is_random_effect (default is FALSE) and $estimated (default is FALSE)
@@ -307,6 +312,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # TODO: integration tests fail after setting recruitment log_devs all estimable.
   # We need to debug the issue, then uncomment the line below.
   # recruitment$log_devs$set_all_estimable(TRUE)
+   if(random_effects){
+    recruitment$log_devs$set_all_estimable(TRUE)
+    recruitment$log_devs$set_all_random(TRUE)
+  }
+  recruitment$SetRecruitmentProcess(recruitment_process$get_id())
+  recruitment$nyears <- om_input[["nyr"]]
   recruitment_distribution <- methods::new(DnormDistribution)
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
@@ -372,10 +383,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set-up TMB
   CreateTMBModel()
   # Create parameter list from Rcpp modules
-  parameters <- list(p = get_fixed())
+  parameters <- list(p = get_fixed(),
+                     re = get_random())
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
-    silent = FALSE, map = map
+    silent = FALSE, map = map, random = "re"
   )
 
   # Optimization with nlminb
@@ -431,6 +443,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 #' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
 #' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
 #' for the report.
+#' @param random_effects A logical value indicating whether to include random
+#' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects 
+#' will be included on recruitment in the model.
 #' @param map A list used to specify mapping for the `MakeADFun` function from
 #' the TMB package.
 #'
@@ -459,6 +474,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
                                              om_output_list,
                                              em_input_list,
                                              estimation_mode = TRUE,
+                                             random_effects = FALSE
                                              modified_parameters,
                                              map = list()) {
   # Load operating model data for the current iteration
@@ -496,7 +512,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
       fleets = fleets,
       recruitment = list(
         form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution")
+        process = model(~log_devs, family = gaussian(), random = random_effects)
       ),
       growth = list(form = "EWAAgrowth"),
       maturity = list(form = "LogisticMaturity")

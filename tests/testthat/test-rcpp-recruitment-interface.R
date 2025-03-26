@@ -2,6 +2,7 @@ library(testthat)
 test_that("Recruitment input settings work as expected", {
   # Create recruitment
   recruitment <- methods::new(BevertonHoltRecruitment)
+  recruitment_process <- new(LogDevsRecruitmentProcess)
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
@@ -15,6 +16,7 @@ test_that("Recruitment input settings work as expected", {
   recruitment$log_rzero[1]$value <- log(r0)
 
   expect_equal(recruitment$get_id(), 1)
+  expect_equal(recruitment_process$get_id(), 2)
   expect_equal(recruitment$logit_steep[1]$value, 0.78845736)
   expect_equal(recruitment$logit_steep[1]$min, 0.21)
   expect_equal(recruitment$logit_steep[1]$max, 1.0)
@@ -23,7 +25,7 @@ test_that("Recruitment input settings work as expected", {
   expect_equal(recruitment$log_rzero[1]$value, log(1000000.0))
 
 
-  expect_equal(object = recruitment$evaluate(spawns, ssb0), expected = 1090802.68)
+  expect_equal(object = recruitment$evaluate_mean(spawns, ssb0), expected = 1090802.68)
 
   log_devs <- c(-1.0, 2.0, 3.0)
   recruitment$log_devs$resize(length(log_devs))
