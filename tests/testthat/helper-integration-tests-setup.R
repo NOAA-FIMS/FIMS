@@ -65,7 +65,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 em_input_list,
                                                 estimation_mode = TRUE,
                                                 map = list()) {
-
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]] # Operating model input for the current iteration
   om_output <- om_output_list[[iter_id]] # Operating model output for the current iteration

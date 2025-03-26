@@ -284,14 +284,14 @@ initialize_data_distribution <- function(
 
     # populate logged standard deviation parameter with log of input
     # Using resize() and then assigning value to each element of log_sd diretly
-    # is correct, as creating a new ParameterVector for log_sd here would 
+    # is correct, as creating a new ParameterVector for log_sd here would
     # trigger an error in integration tests with wrappers.
     new_module$log_sd$resize(length(sd[["value"]]))
     purrr::walk(
       seq_along(sd[["value"]]),
       \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
     )
-    
+
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
       new_module$log_sd$set_all_estimable(sd[["estimated"]])
@@ -370,7 +370,7 @@ initialize_process_distribution <- function(
       seq_along(sd[["value"]]),
       \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
     )
-    
+
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
       new_module$log_sd$set_all_estimable(sd[["estimated"]])
