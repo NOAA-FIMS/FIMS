@@ -95,6 +95,9 @@ src/tmp.def
 #Testing files
 tests/test_plan/FIMS_Integration_Test_Plan.log
 tests/integration/FIMS-deterministic-inputs/
+tests/testthat/fixtures/fit*.RDS
+tests/testthat/fixtures/data*.RDS
+tests/testthat/fixtures/parameters*.RDS
 
 #vignettes
 inst/doc
