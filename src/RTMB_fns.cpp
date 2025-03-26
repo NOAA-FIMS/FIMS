@@ -4,7 +4,7 @@
 #include "../inst/include/population_dynamics/selectivity/selectivity.hpp"
 
 
-// [[Rcpp::export]]
+//[[Rcpp::export]]
 ADrep evaluate_logistic_selectivity(ADrep x, ADrep input_slope, ADrep input_inflection_point){
     fims_popdy::LogisticSelectivity<ad> LogSel;
     // inflection_point and slope are fims::Vector<Type>
