@@ -1,5 +1,5 @@
 # This R script generates multiple fit results for use in tests located in
-# tests/testthat. For example, it creates fits from FIMS runs with only age 
+# tests/testthat. For example, it creates fits from FIMS runs with only age
 # composition, only length composition data, or data with missing values.
 
 # Load necessary data for the integration test
