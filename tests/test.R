@@ -281,33 +281,93 @@ estimates_outline <- dplyr::tibble(
     # between the total number of rows in std and the length of parameter_names.
     derived_quantity_nrow <- nrow(std) - length(parameter_names)
 
-# estimates <- estimates_outline |>
-#       tibble::add_row(
-#         label = dimnames(std)[[1]],
-#         estimate = std[, "Estimate"],
-#         uncertainty = std[, "Std. Error"],
-#         # Use obj[["env"]][["parameters"]][["p"]] as this will return both initial
-#         # fixed and random effects while obj[["par"]] only returns initial fixed
-#         # effects
-#         initial = c(
-#           obj[["env"]][["parameters"]][["p"]], 
-#           rep(NA_real_, derived_quantity_nrow)
-#         ),
-#         gradient = c(
-#           obj[["gr"]](opt[["par"]]), 
-#           rep(NA_real_, derived_quantity_nrow)
-#         ),
-#         estimated = c(
-#           rep(TRUE, length(parameter_names)),
-#           rep(NA, derived_quantity_nrow)
-#         )
-#       ) 
 
-fit_output<- finalize(opt$par, obj$fn, obj$gr)
-write(fit_output, "json_output.json")
+
+finalized_fims <- finalize(opt$par, obj$fn, obj$gr)
+write(finalized_fims, "json_output.json")
+
+
+json_estimates <- reshape_json_estimates(finalized_fims)
+tmb_estimates <- reshape_tmb_estimates(std = std, obj, sdreport)
+
+inner_join(
+  json_estimates[, c("label", "parameter_id", "initial")],
+  tmb_estimates[, c("label", "parameter_id", "initial")], 
+  by = c("label", "parameter_id"), 
+  suffix = c("_json", "_tmb")
+) |> 
+  mutate(diff = initial_json - initial_tmb) |> 
+  select(label, parameter_id, diff) |>
+  print(n = 50)
+
+  inner_join(
+  json_estimates[, c("label", "parameter_id", "estimate")],
+  tmb_estimates[, c("label", "parameter_id", "estimate")], 
+  by = c("label", "parameter_id"), 
+  suffix = c("_json", "_tmb")
+) |> 
+  mutate(diff = estimate_json - estimate_tmb) |> 
+  select(label, parameter_id, diff) |>
+  print(n = 50)
+
+# Merge json_estimates into tmb_estimates based on common columns
+
+merged_estimates <- dplyr::full_join(
+  tmb_estimates,
+  json_estimates,
+  by = dplyr::join_by(
+    parameter_id,
+    module_name,
+    module_id,
+    label,
+    estimated
+  )
+) |>
+  # Select the relevant columns for the final output
+  # Drop the initial and estimate columns from the json_estimates and
+  # use values from tmb_estimates
+  dplyr::select(
+    -c(initial.y, estimate.y)
+  ) |>
+  dplyr::rename(
+    initial = initial.x,
+    estimate = estimate.x
+  ) |>
+  # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
+  dplyr::relocate(module_name, module_id, module_type, type, type_id,.before = everything()) |>
+  # Reorder the rows by `parameter_id`
+  dplyr::arrange(parameter_id)
+
+ 
+  # Select only the relevant columns for the final output
+  # dplyr::select(-c(module_name, module_id, module_type)) |>
+  # Keep only the relevant columns
+merged_estimates[, c(3, 6:ncol(merged_estimates))] 
+write.csv(merged_estimates, "merged_estimates.csv")
+  
+  # Remove the columns that are not needed
+  dplyr::select(-c(module_type, module_id, module_name)) |>
+  # Rename the columns to match the desired output
+  dplyr::rename(
+    parameter_estimated = estimated,
+    parameter_value = initial,
+    parameter_estimated_value = estimate
+  ) |>
+  # Add a column for the log-likelihood
+  dplyr::mutate(log_lik = NA_real_) |>
+  # Add a column for the log-likelihood for cross-validation
+  dplyr::mutate(log_lik_cv = NA_real_) |>
+  # Add a column for the gradient
+  dplyr::mutate(gradient = NA_real_)
+
+
+
+
+
+
 # Convert the JSON-formatted string `fit_output` into an R list object (`json_list`) 
 # for easier manipulation and extraction of data.
-json_list <- jsonlite::fromJSON(fit_output)
+finalized_fims <- jsonlite::fromJSON(fit_output)
 # Identify the index of the "modules" element in `json_list` by matching its name.
 # This is used to locate the relevant part of the JSON structure for further processing.
 modules_id <- which(names(json_list) == "modules")

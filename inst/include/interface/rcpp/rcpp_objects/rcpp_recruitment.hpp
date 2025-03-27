@@ -1,7 +1,7 @@
 /**
  * @file rcpp_recruitment.hpp
  * @brief The Rcpp interface to declare different types of recruitment, e.g.,
- * Beverton--Holt stock--recruitment relationship. Allows for the use of
+ * Beverton-Holt stock-recruitment relationship. Allows for the use of
  * methods::new() in R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
@@ -77,7 +77,7 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
     RecruitmentInterfaceBase::live_objects;
 
 /**
- * @brief Rcpp interface for Beverton--Holt to instantiate from R:
+ * @brief Rcpp interface for Beverton-Holt to instantiate from R:
  * beverton_holt <- methods::new(beverton_holt).
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
@@ -133,7 +133,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @brief Evaluate recruitment using the Beverton--Holt stock--recruitment
+   * @brief Evaluate recruitment using the Beverton-Holt stock-recruitment
    * relationship.
    * @param spawners Spawning biomass per time step.
    * @param ssbzero The biomass at unfished levels.
@@ -210,7 +210,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
-   * recruitment interface with Beverton--Holt stock--recruitment relationship.
+   * recruitment interface with Beverton-Holt stock-recruitment relationship.
    * It also returns the ID and the parameters. This string is formatted for a
    * json file.
    */ 
@@ -219,7 +219,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     ss << "{\n";
     ss << " \"name\": \"recruitment\",\n";
-    ss << " \"type\": \"Beverton--Holt\",\n";
+    ss << " \"type\": \"Beverton-Holt\",\n";
     ss << " \"id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
@@ -248,7 +248,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   template <typename Type>
   bool add_to_fims_tmb_internal() {
         
-    FIMS_INFO_LOG("Adding Beverton--Holt model "+fims::to_string(this->id)+" to Information object.");
+    FIMS_INFO_LOG("Adding Beverton-Holt model "+fims::to_string(this->id)+" to Information object.");
     
     std::shared_ptr<fims_info::Information<Type> > info =
       fims_info::Information<Type>::GetInstance();
@@ -267,7 +267,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
       if (this->logit_steep[i].estimated_m) {
         ss.str("");
-        ss << "recruitment.logit_steep." << this->id << "." << i;
+        ss << "recruitment.logit_steep." << this->id << "." << this->logit_steep[i].id_m;
         info->RegisterParameterName(ss.str());
         if (this->logit_steep[i].is_random_effect_m) {
           info->RegisterRandomEffect(recruitment->logit_steep[i]);
@@ -287,7 +287,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
       if (this->log_rzero[i].estimated_m) {
         ss.str("");
-        ss << "recruitment.log_rzero." << this->id << "." << i;
+        ss << "recruitment.log_rzero." << this->id << "." << this->log_rzero[i].id_m;
         info->RegisterParameterName(ss.str());
         if (this->log_rzero[i].is_random_effect_m) {
           info->RegisterRandomEffect(recruitment->log_rzero[i]);
@@ -305,7 +305,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       recruitment->log_recruit_devs[i] = this->log_devs[i].initial_value_m;
       if (this->log_devs[i].estimated_m) {
         ss.str("");
-        ss << "recruitment.log_devs." << this->id << "." << i;
+        ss << "recruitment.log_devs." << this->id << "." << this->log_devs[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
       } else {

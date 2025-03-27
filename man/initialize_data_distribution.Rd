@@ -59,7 +59,7 @@ Use \code{\link[methods:new]{methods::new()}} to set up a distribution within an
 the necessary linkages between the two. For example, a fleet module will need
 a distributional assumption for parts of the data associated with it, which
 requires the use of \code{initialize_data_distribution()}, and a recruitment
-module, like the Beverton--Holt stock--recruit relationship, will need a
+module, like the Beverton-Holt stock-recruit relationship, will need a
 distribution associated with the recruitment deviations, which requires
 \code{initialize_process_distribution()}.
 }

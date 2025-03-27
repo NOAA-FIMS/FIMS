@@ -1,4 +1,11 @@
 # A list of functions to reshape output from finalize()
+#' Reshape JSON estimates
+#'
+#' This function processes the finalized FIMS JSON output and reshapes the parameter estimates 
+#' into a structured tibble for easier analysis and manipulation.
+#'
+#' @param finalized_fims A JSON object containing the finalized FIMS output.
+#' @return A tibble containing the reshaped parameter estimates.
 reshape_json_estimates <- function(finalized_fims) {
   json_list <- jsonlite::fromJSON(finalized_fims)
   # Identify the index of the "modules" element in `json_list` by matching its name.
@@ -25,7 +32,15 @@ reshape_json_estimates <- function(finalized_fims) {
         )|>
         # TODO: update finalize() to use initial_value instead of value, 
         # then we can delete the following line.
-        dplyr::rename(parameter_initial_value = parameter_value) 
+        dplyr::rename(
+          initial = parameter_value,
+          estimate = parameter_estimated_value,
+          estimated = parameter_estimated
+        ) |>
+        # Convert estimated from int to logical
+        dplyr::mutate(
+          estimated = ifelse(estimated == 1, TRUE, FALSE)
+        )
     }
   })
 
@@ -63,6 +78,13 @@ reshape_json_estimates <- function(finalized_fims) {
     # json_list[["final_gradient"]]
 }
 
+#' Reshape JSON derived quantities
+#'
+#' This function processes the finalized FIMS JSON output and reshapes the derived
+#' quantities into a structured tibble for easier analysis and manipulation.
+#'
+#' @param finalized_fims A JSON object containing the finalized FIMS output.
+#' @return A tibble containing the reshaped parameter estimates.
 reshape_json_derived_quantities <- function(finalized_fims){
   json_list <- jsonlite::fromJSON(finalized_fims)
   # Identify the index of the "modules" element in `json_list` by matching its name.
@@ -111,6 +133,13 @@ reshape_json_derived_quantities <- function(finalized_fims){
     dplyr::relocate(module_name, module_id, module_type, .before = everything())
 }
 
+#' Reshape JSON density component
+#'
+#' This function processes the finalized FIMS JSON output and reshapes the density
+#' component into a structured tibble for easier analysis and manipulation.
+#'
+#' @param finalized_fims A JSON object containing the finalized FIMS output.
+#' @return A tibble containing the reshaped density component.
 reshape_density_component_json <- function(finalized_fims){
   density_component <- purrr::map(seq_along(json_list[[modules_id]][["density_component"]][[2]]), ~{
     # If the current module's "density_component" is NULL, return NULL to skip processing.
@@ -155,7 +184,24 @@ reshape_density_component_json <- function(finalized_fims){
     dplyr::relocate(module_name, module_id, module_type, .before = everything())
 }
 
-reshape_estimates_tmb <- function(std = NULL, obj, sdreport){
+#' Reshape TMB estimates
+#'  
+#' This function processes the TMB std and reshapes them into a structured 
+#' tibble for easier analysis and manipulation.
+#' 
+#' @param obj An object returned from [TMB::MakeADFun()].
+#' @param sdreport An object of the `sdreport` class as returned from 
+#'   [TMB::sdreport()].
+#' @param opt An object returned from [TMB::Optimize()].
+#' @param parameter_names A character vector of parameter names. This is used to
+#'   identify the parameters in the `std` object.
+#' @return A tibble containing the reshaped estimates (i.e., parameters and 
+#' derived quantities).
+reshape_tmb_estimates <- function( 
+  obj, 
+  sdreport, 
+  opt = NULL, 
+  parameter_names){
   # Outline for the estimates table
   estimates_outline <- dplyr::tibble(
     # The FIMS Rcpp module
@@ -164,6 +210,8 @@ reshape_estimates_tmb <- function(std = NULL, obj, sdreport){
     module_id = integer(),
     # The name of the parameter or derived quantity
     label = character(),
+    # The unique ID of the parameter
+    parameter_id = integer(),
     # The fleet name associated with the parameter or derived quantity
     fleet_name = character(),
     # The age associated with the parameter or derived quantity
@@ -189,16 +237,12 @@ reshape_estimates_tmb <- function(std = NULL, obj, sdreport){
     # with NA for derived quantities
     estimated = logical()
   )
-
-  if (is.null(std)) {
-    estimates <- estimates_outline |>
-      tibble::add_row( 
-        label = names(obj[["par"]]),
-        initial = obj[["env"]][["parameters"]][["p"]],
-        estimate = obj[["env"]][["parameters"]][["p"]],
-        estimated = FALSE
-      ) 
-  } else {
+ 
+  if (length(sdreport) > 0) {
+    std <- summary(sdreport)
+    # Number of rows for derived quantities: based on the difference
+    # between the total number of rows in std and the length of parameter_names.
+    derived_quantity_nrow <- nrow(std) - length(parameter_names)
     # Create a tibble with the data from the std, and then apply transformations.
     estimates <- estimates_outline |>
       tibble::add_row(
@@ -230,9 +274,19 @@ reshape_estimates_tmb <- function(std = NULL, obj, sdreport){
       dplyr::mutate(
         module_name = ifelse(length(label_splits) > 1, label_splits[[1]], NA_character_),
         module_id = ifelse(length(label_splits) > 1, as.integer(label_splits[[3]]), NA_integer_),
-        label = ifelse(length(label_splits) > 1, label_splits[[2]], label)
+        label = ifelse(length(label_splits) > 1, label_splits[[2]], label),
+        parameter_id = ifelse(length(label_splits) > 1, as.integer(label_splits[[4]]), NA_integer_)
       ) |>
       dplyr::select(-label_splits) |>
       dplyr::ungroup()
+  } else {
+    estimates <- estimates_outline |>
+      tibble::add_row( 
+        label = names(obj[["par"]]),
+        initial = obj[["env"]][["parameters"]][["p"]],
+        estimate = obj[["env"]][["parameters"]][["p"]],
+        estimated = FALSE
+      ) 
   }
 }
+

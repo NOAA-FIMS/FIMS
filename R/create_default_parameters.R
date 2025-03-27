@@ -13,7 +13,7 @@
 #'   applied for each fleet that is not specified but present in `data` based
 #'   on the types of information present for that fleet.
 #' @param recruitment A list specifying the settings for the recruitment
-#'   module. The default is a Beverton--Holt recruitment relationship with
+#'   module. The default is a Beverton-Holt recruitment relationship with
 #'   log-normal recruitment deviations.
 #' @param growth A list specifying the settings for the growth module. The
 #'   default is `"EWAAgrowth"`.
@@ -397,10 +397,10 @@ create_default_maturity <- function(form = c("LogisticMaturity")) {
   return(default)
 }
 
-#' Create default Beverton--Holt recruitment parameters
+#' Create default Beverton-Holt recruitment parameters
 #'
 #' @description
-#' This function sets up default parameters for a Beverton--Holt recruitment
+#' This function sets up default parameters for a Beverton-Holt recruitment
 #' relationship. Parameters include the natural log of unfished recruitment,
 #' the logit transformation of the slope of the spawner-–recruitment curve to
 #' keep it between zero and one, and the time series of spawner-recruitment
@@ -410,7 +410,7 @@ create_default_maturity <- function(form = c("LogisticMaturity")) {
 #' A list containing default recruitment parameters.
 #' @noRd
 create_default_BevertonHoltRecruitment <- function(data) {
-  # Create default parameters for Beverton--Holt recruitment
+  # Create default parameters for Beverton-Holt recruitment
   default <- list(
     log_rzero.value = log(1e+06),
     log_rzero.estimated = TRUE,

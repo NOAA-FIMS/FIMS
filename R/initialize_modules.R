@@ -762,7 +762,7 @@ initialize_fims <- function(parameters, data) {
   }
   
   # Recruitment
-  # create new module in the recruitment class (specifically Beverton--Holt,
+  # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be
   # chosen)
   recruitment <- initialize_recruitment(

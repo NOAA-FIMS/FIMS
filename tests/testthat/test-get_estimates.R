@@ -19,9 +19,10 @@ test_that("get_estimates() works with correct inputs", {
 
   # Define the expected column names for the estimates tibble
   expected_colnames <- c(
-    "module", "id", "label", "index", "fleet", "age", "length", "time", 
+    "module_name", "module_id", "module_type", "type", "type_id", "label", 
+    "parameter_id", "fleet_name", "age", "length", "time", 
     "initial", "estimate", "uncertainty", "log_lik", "log_lik_cv",
-    "gradient", "estimated"
+    "gradient", "estimated", "parameter_min", "parameter_max"
   )
 
   # Function to read the RDS file, get estimates, and check column names

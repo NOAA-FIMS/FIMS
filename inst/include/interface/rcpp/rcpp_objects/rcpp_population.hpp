@@ -142,14 +142,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * TODO: document the unit.
    */
   Rcpp::NumericVector derived_recruitment;
-  /**
-   * @brief Estimated natural log of mortality.
-   */
-  Rcpp::NumericVector estimated_log_M;
-  /**
-   * @brief Estimated natural log of initial numbers at age.
-   */
-  Rcpp::NumericVector estimated_log_init_naa;
+
   /**
    * @brief The name.
    * TODO: Document name better.
@@ -169,7 +162,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @param other
    */
   PopulationInterface(const PopulationInterface& other) :
-  PopulationInterfaceBase(other), nages(other.nages), nfleets(other.nfleets), nseasons(other.nseasons), nyears(other.nyears), nlengths(other.nlengths), maturity_id(other.maturity_id), growth_id(other.growth_id), recruitment_id(other.recruitment_id), log_M(other.log_M), log_init_naa(other.log_init_naa), numbers_at_age(other.numbers_at_age), ages(other.ages), derived_ssb(other.derived_ssb), derived_naa(other.derived_naa), derived_biomass(other.derived_biomass), derived_recruitment(other.derived_recruitment), estimated_log_M(other.estimated_log_M), estimated_log_init_naa(other.estimated_log_init_naa), name(other.name) {}
+  PopulationInterfaceBase(other), nages(other.nages), nfleets(other.nfleets), nseasons(other.nseasons), nyears(other.nyears), nlengths(other.nlengths), maturity_id(other.maturity_id), growth_id(other.growth_id), recruitment_id(other.recruitment_id), log_M(other.log_M), log_init_naa(other.log_init_naa), numbers_at_age(other.numbers_at_age), ages(other.ages), derived_ssb(other.derived_ssb), derived_naa(other.derived_naa), derived_biomass(other.derived_biomass), derived_recruitment(other.derived_recruitment), name(other.name) {}
 
   /**
    * @brief The destructor.
@@ -229,16 +222,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     std::shared_ptr<fims_info::Information<double> > info =
       fims_info::Information<double>::GetInstance();
 
-    this->estimated_log_M = Rcpp::NumericVector(this->log_M.size());
-    for (size_t i = 0; i < this->log_M.size(); i++) {
-      this->estimated_log_M[i] = this->log_M[i].initial_value_m;
-    }
-
-    this->estimated_log_init_naa = Rcpp::NumericVector(this->log_init_naa.size());
-    for (size_t i = 0; i < this->log_init_naa.size(); i++) {
-      this->estimated_log_init_naa[i] = this->log_init_naa[i].initial_value_m;
-    }
-
     fims_info::Information<double>::population_iterator it;
 
     it = info->populations.find(this->id);
@@ -250,15 +233,20 @@ class PopulationInterface : public PopulationInterfaceBase {
       FIMS_WARNING_LOG("Population " + fims::to_string(this->id) + " not found in Information.");
       return;
     } else {
-      if (this->estimated_log_M) {
-        for (size_t i = 0; i < this->log_M.size(); i++) {
-          this->estimated_log_M[i] = pop->log_M[i];
+
+      for (size_t i = 0; i < this->log_M.size(); i++) {
+        if (this->log_M[i].estimated_m) {
+          this->log_M[i].final_value_m = pop->log_M[i];
+        } else {
+          this->log_M[i].final_value_m = this->log_M[i].initial_value_m;
         }
       }
 
-      if (this->estimated_log_init_naa) {
-        for (size_t i = 0; i < this->log_init_naa.size(); i++) {
-          this->estimated_log_init_naa[i] = pop->log_init_naa[i];
+      for (size_t i = 0; i < this->log_init_naa.size(); i++) {
+        if (this->log_init_naa[i].estimated_m) {
+          this->log_init_naa[i].final_value_m = pop->log_init_naa[i];
+        } else {
+          this->log_init_naa[i].final_value_m = this->log_init_naa[i].initial_value_m;
         }
       }
 
@@ -414,7 +402,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_M[i] = this->log_M[i].initial_value_m;
       if (this->log_M[i].estimated_m) {
           ss.str("");
-          ss << "population.log_M." << this->id << "." << i;
+          ss << "Population.log_M." << this->id << "." << this->log_M[i].id_m;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(population->log_M[i]);
       }
@@ -425,7 +413,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
       if (this->log_init_naa[i].estimated_m) {
         ss.str("");
-        ss << "population.log_init_naa." << this->id << "." << i;
+        ss << "Population.log_init_naa." << this->id << "." << this->log_init_naa[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
       }

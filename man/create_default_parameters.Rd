@@ -26,7 +26,7 @@ applied for each fleet that is not specified but present in \code{data} based
 on the types of information present for that fleet.}
 
 \item{recruitment}{A list specifying the settings for the recruitment
-module. The default is a Beverton--Holt recruitment relationship with
+module. The default is a Beverton-Holt recruitment relationship with
 log-normal recruitment deviations.}
 
 \item{growth}{A list specifying the settings for the growth module. The

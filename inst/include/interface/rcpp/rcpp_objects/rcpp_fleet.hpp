@@ -513,7 +513,8 @@ public:
 
       if (this->log_q[i].estimated_m) {
         ss.str("");
-        ss << "fleet.log_q." << this->id << "." << i;
+        ss << "Fleet.log_q." << this->id << "." << this->log_q[i].id_m;
+          // register the parameter name
         info->RegisterParameterName(ss.str());
           if (this->log_q[i].is_random_effect_m) {
             info->RegisterRandomEffect(fleet->log_q[i]);
@@ -530,7 +531,7 @@ public:
 
       if (this->log_Fmort[i].estimated_m) {
         ss.str("");
-        ss << "fleet.log_Fmort." << this->id << "." << i;
+        ss << "Fleet.log_Fmort." << this->id << "." << this->log_Fmort[i].id_m;
         info->RegisterParameterName(ss.str());
         if (this->log_Fmort[i].is_random_effect_m) {
           info->RegisterRandomEffect(fleet->log_Fmort[i]);
@@ -571,7 +572,8 @@ public:
 
         if (this->age_length_conversion_matrix[i].estimated_m) {
           ss.str("");
-          ss << "fleet.age_length_conversion_matrix." << this->id << "." << i;
+          ss << "Fleet.age_length_conversion_matrix." << this->id << "." << 
+            this->age_length_conversion_matrix[i].id_m;
           info->RegisterParameterName(ss.str());
           if (this->age_length_conversion_matrix[i].is_random_effect_m) {
             info->RegisterRandomEffect(fleet->age_length_conversion_matrix[i]);

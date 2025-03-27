@@ -386,21 +386,58 @@ FIMSFit <- function(
   if (length(sdreport) > 0) {
     names(sdreport[["par.fixed"]]) <- parameter_names
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
-    std <- summary(sdreport)
-
-    # Number of rows for derived quantities: based on the difference
-    # between the total number of rows in std and the length of parameter_names.
-    derived_quantity_nrow <- nrow(std) - length(parameter_names)
-    tmb_estimates <- reshape_estimates_tmb(std = std, obj = obj)
-
+    # Create JSON output for FIMS run
+    browser()
+    finalized_fims <- finalize(opt$par, obj$fn, obj$gr)
+    # Reshape the JSON estimates and TMB estimates to join them together
+    json_estimates <- reshape_json_estimates(finalized_fims)
+    tmb_estimates <- reshape_tmb_estimates(
+      obj = obj, 
+      sdreport = sdreport,
+      opt = opt,
+      parameter_names = parameter_names
+    )
   } else {
-    tmb_estimates <- reshape_estimates_tmb(obj = obj)
+    # Create JSON output for FIMS run
+    finalized_fims <- finalize(obj$par, obj$fn, obj$gr)
+    # Reshape the JSON estimates and TMB estimates to join them together
+    json_estimates <- reshape_json_estimates(finalized_fims)
+    tmb_estimates <- reshape_tmb_estimates(
+      obj = obj, 
+      sdreport = sdreport,
+      opt = NULL,
+      parameter_names = parameter_names
+    )
   }
 
-  
-  
-  estimates <- estimates |>
-    dplyr::select(-row_id)
+  # Merge json_estimates into tmb_estimates based on common columns
+  # TODO: need to update the derived quantities section of the tibble
+  # The outputs from TMB and JSON are not the same, difficult to join them
+  estimates <- dplyr::full_join(
+    tmb_estimates,
+    json_estimates,
+    by = dplyr::join_by(
+      parameter_id,
+      module_name,
+      module_id,
+      label,
+      estimated
+    )
+  ) |>
+    # Select the relevant columns for the final output
+    # Drop the initial and estimate columns from the json_estimates and
+    # use values from tmb_estimates
+    dplyr::select(
+      -c(initial.y, estimate.y)
+    ) |>
+    dplyr::rename(
+      initial = initial.x,
+      estimate = estimate.x
+    ) |>
+    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
+    dplyr::relocate(module_name, module_id, module_type, type, type_id,.before = everything()) |>
+    # Reorder the rows by `parameter_id`
+    dplyr::arrange(parameter_id)
     
   fit <- methods::new(
     "FIMSFit",

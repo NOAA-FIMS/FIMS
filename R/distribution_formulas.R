@@ -191,7 +191,7 @@ get_expected_name <- function(family, data_type) {
 #' the necessary linkages between the two. For example, a fleet module will need
 #' a distributional assumption for parts of the data associated with it, which
 #' requires the use of `initialize_data_distribution()`, and a recruitment
-#' module, like the Beverton--Holt stock--recruit relationship, will need a
+#' module, like the Beverton-Holt stock-recruit relationship, will need a
 #' distribution associated with the recruitment deviations, which requires
 #' `initialize_process_distribution()`.
 #' @param module An identifier to a C++ fleet module that is linked to the data

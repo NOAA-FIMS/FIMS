@@ -1,6 +1,6 @@
 /**
  * @file sr_beverton_holt.hpp
- * @brief Calls the Beverton--Holt stock--recruitment function from fims_math
+ * @brief Calls the Beverton-Holt stock-recruitment function from fims_math
  * and does the calculation.
  * @details This function inherits from recruitment base.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
@@ -15,8 +15,8 @@
 
 namespace fims_popdy {
 
-/** @brief BevertonHolt class that returns the Beverton--Holt
- * stock--recruitment from fims_math.
+/** @brief BevertonHolt class that returns the Beverton-Holt
+ * stock-recruitment from fims_math.
  *
  * @param logit_steep Recruitment relative to unfished recruitment at 20
  * percent of unfished spawning biomass. Steepness is subject to a logit
@@ -24,9 +24,9 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct SRBevertonHolt : public RecruitmentBase<Type> {
-  // Here we define the members that will be used in the Beverton--Holt
-  // stock--recruitment function. These members are needed by the Beverton--Holt
-  // stock--recruitment function but will not be common to all recruitment
+  // Here we define the members that will be used in the Beverton-Holt
+  // stock-recruitment function. These members are needed by the Beverton-Holt
+  // stock-recruitment function but will not be common to all recruitment
   // functions like spawners is below.
   fims::Vector<Type> logit_steep; /**< Transformed value of recruitment 
                                   relative to unfished
@@ -37,9 +37,9 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
 
   virtual ~SRBevertonHolt() {}
 
-  /** @brief Beverton--Holt implementation of the stock--recruitment function.
+  /** @brief Beverton-Holt implementation of the stock-recruitment function.
    *
-   * The Beverton--Holt stock--recruitment implementation:
+   * The Beverton-Holt stock-recruitment implementation:
    * \f$ \frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h -
    * 0.2)} \f$
    *
