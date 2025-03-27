@@ -216,6 +216,22 @@ Rcpp::List get_parameter_names(Rcpp::List pars) {
 }
 
 /**
+ * @brief Gets the random effects names object.
+ *
+ * @param pars
+ * @return Rcpp::List
+ */
+Rcpp::List get_random_names(Rcpp::List pars) {
+  // base model
+  std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
+    fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+  pars.attr("names") = d0->random_effects_names;
+
+  return pars;
+}
+
+/**
  * @brief Clears the internal objects.
  *
  * @tparam Type
@@ -480,6 +496,9 @@ RCPP_MODULE(fims) {
         "get_parameter_names", &get_parameter_names,
         "Gets the parameter names object.");
     Rcpp::function(
+        "get_random_names", &get_random_names,
+        "Gets the random effects names object.");
+    Rcpp::function(
         "clear", clear,
         "Clears all pointers/references of a FIMS model");
     Rcpp::function(
@@ -540,11 +559,9 @@ RCPP_MODULE(fims) {
                 "id", &Parameter::id_m,
                 "unique id for parameter class")
             .field(
-                "is_random_effect", &Parameter::is_random_effect_m,
-                "A boolean indicating whether or not the parameter is a random effect; the default is FALSE.")
-            .field(
-                "estimated", &Parameter::estimated_m,
-                "A boolean indicating whether or not the parameter is estimated; the default is FALSE.");
+                "estimation_type", &Parameter::estimation_type_m,
+                "A string that takes three arguments: constant, indicating a parameter is not estimated; fixed_effects, 
+                indicating a parameter is estimated; and random_effects, indicating a parameter is estimated; the default is constant.");
 
     Rcpp::class_<ParameterVector>(
       "ParameterVector",
@@ -651,8 +668,6 @@ RCPP_MODULE(fims) {
       .field("nages", &FleetInterface::nages)
       .field("nyears", &FleetInterface::nyears)
       .field("nlengths", &FleetInterface::nlengths)
-      .field("estimate_q", &FleetInterface::estimate_q)
-      .field("random_q", &FleetInterface::random_q)
       .field("log_expected_index", &FleetInterface::log_expected_index)
       .field("proportion_catch_numbers_at_age", &FleetInterface::proportion_catch_numbers_at_age)
       .field("proportion_catch_numbers_at_length", &FleetInterface::proportion_catch_numbers_at_length)

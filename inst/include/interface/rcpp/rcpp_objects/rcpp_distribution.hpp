@@ -234,6 +234,15 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     } else {
       std::shared_ptr<fims_distributions::NormalLPDF<double> > dnorm =
         std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double> >(it->second);
+
+      for (size_t i = 0; i < this->log_sd.size(); i++) {
+        if (this->log_sd[i].estimatation_type == "constant" ) {
+          this->log_sd[i].final_value_m = dnorm->log_sd.initial_value_m;
+        } else {
+          this->log_sd[i].final_value_m = dnorm->log_sd[i];
+        }
+      }
+
       this->lpdf_vec = RealVector(dnorm->lpdf_vec.size());
       for(R_xlen_t i=0; i < this->lpdf_vec.size(); i++) {
           this->lpdf_vec[i] = dnorm->lpdf_vec[i];
@@ -287,6 +296,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     distribution->observed_data_id_m =
     interface_observed_data_id_m;
+    std::stringstream ss;
     distribution->input_type = this->input_type_m;
     distribution->key.resize(this->key_m->size());
     for (size_t i=0; i<this->key_m->size(); i++){
@@ -305,12 +315,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->log_sd.resize(this->log_sd.size());
     for(size_t i=0; i<this->log_sd.size(); i++){
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if(this->log_sd[i].estimated_m){
-        info->RegisterParameterName("normal log_sd");
+      if(this->log_sd[i].estimatation_type == "fixed_effects"){
+        ss.str("");
+        ss << "dnorm." << this->id_m << "log_sd." << i;
+        info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_sd[i].is_random_effect_m) {
-        error("standard deviations cannot be set to random effects");
+      if (this->log_sd[i].estimatation_type == "random_effects") {
+        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
@@ -464,6 +476,15 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     } else {
       std::shared_ptr<fims_distributions::LogNormalLPDF<double> > dlnorm =
         std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double> >(it->second);
+
+      for (size_t i = 0; i < this->log_sd.size(); i++) {
+        if (this->log_sd[i].estimatation_type == "constant" ) {
+          this->log_sd[i].final_value_m = dlnorm->log_sd.initial_value_m;
+        } else {
+          this->log_sd[i].final_value_m = dlnorm->log_sd[i];
+        }
+      }
+
       this->lpdf_vec = Rcpp::NumericVector(dlnorm->lpdf_vec.size());
       for(R_xlen_t i=0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dlnorm->lpdf_vec[i];
@@ -535,12 +556,14 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->log_sd.resize(this->log_sd.size());
     for(size_t i=0; i<this->log_sd.size(); i++){
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if(this->log_sd[i].estimated_m){
-        info->RegisterParameterName("lognormal log_sd");
+      if(this->log_sd[i].estimatation_type == "fixed_effects"){
+        ss.str("");
+        ss << "dlnorm." << this->id_m << "log_sd." << i;
+        info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_sd[i].is_random_effect_m) {
-        error("standard deviations cannot be set to random effects");
+      if (this->log_sd[i].estimatation_type == "random_effects") {
+        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;

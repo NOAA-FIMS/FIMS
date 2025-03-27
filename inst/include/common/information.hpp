@@ -46,6 +46,7 @@ namespace fims_info {
         fixed_effects_parameters; /**< list of all fixed effects parameters >*/
         std::vector<std::string>
         parameter_names; /**< list of all parameter names estimated in the model */
+        random_effects_names; /**< list of all random effects names estimated in the model */
 
         // data objects
         std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<Type> > >
@@ -151,6 +152,7 @@ namespace fims_info {
             this->maturity_models.clear();
             this->parameter_names.clear();
             this->parameters.clear();
+            this->random_effects_names.clear();
             this->random_effects_parameters.clear();
             this->recruitment_models.clear();            
             this->recruitment_process_models.clear();
@@ -211,6 +213,15 @@ namespace fims_info {
          */
         void RegisterParameterName(std::string p_name) {
             this->parameter_names.push_back(p_name);
+        }
+
+        /**
+         * @brief Register a parameter name.
+         *
+         * @param p_name
+         */
+        void RegisterRandomEffectName(std::string re_name) {
+            this->random_effects_names.push_back(re_name);
         }
 
         /**
