@@ -290,6 +290,7 @@ data_age_length_comp_na <- readRDS(test_path("fixtures", "data_age_length_comp_n
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
+    Catch = "DlnormDistribution",
     Index = "DlnormDistribution",
     AgeComp = "DmultinomDistribution",
     LengthComp = "DmultinomDistribution"
