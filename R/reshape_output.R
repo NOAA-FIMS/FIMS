@@ -5,8 +5,9 @@
 #' into a structured tibble for easier analysis and manipulation.
 #'
 #' @param finalized_fims A JSON object containing the finalized FIMS output.
+#' @param opt An optional object returned from [TMB::Optimize()].
 #' @return A tibble containing the reshaped parameter estimates.
-reshape_json_estimates <- function(finalized_fims) {
+reshape_json_estimates <- function(finalized_fims, opt = list()) {
   json_list <- jsonlite::fromJSON(finalized_fims)
   # Identify the index of the "modules" element in `json_list` by matching its name.
   # This is used to locate the relevant part of the JSON structure for further processing.
@@ -40,6 +41,14 @@ reshape_json_estimates <- function(finalized_fims) {
         # Convert estimated from int to logical
         dplyr::mutate(
           estimated = ifelse(estimated == 1, TRUE, FALSE)
+        ) |>
+        # if opt is NULL, then set estimated to FALSE
+        dplyr::mutate(
+          estimated = ifelse(length(opt) == 0, FALSE, estimated)
+        ) |>
+        # if estimated == FALSE, then copy initial value to estimate
+        dplyr::mutate(
+          estimate = ifelse(estimated == FALSE, initial, estimate)
         )
     }
   })
@@ -199,7 +208,7 @@ reshape_density_component_json <- function(finalized_fims){
 #' derived quantities).
 reshape_tmb_estimates <- function( 
   obj, 
-  sdreport, 
+  sdreport = NULL, 
   opt = NULL, 
   parameter_names){
   # Outline for the estimates table
@@ -264,8 +273,19 @@ reshape_tmb_estimates <- function(
           rep(TRUE, length(parameter_names)),
           rep(NA, derived_quantity_nrow)
         )
-      ) |>
-      # TODO: Create row_id to be used in mutating joins later if generating 
+      ) 
+  } else {
+    estimates <- estimates_outline |>
+      tibble::add_row( 
+        label = names(obj[["par"]]),
+        initial = obj[["env"]][["parameters"]][["p"]],
+        estimate = obj[["env"]][["parameters"]][["p"]],
+        estimated = FALSE
+      ) 
+  }
+
+  estimates <- estimates |>
+    # TODO: Create row_id to be used in mutating joins later if generating 
       # age, length, and time values in R.
       # tibble::rowid_to_column("row_id") |>
       # Split labels and extract module, id, label, and index
@@ -279,14 +299,5 @@ reshape_tmb_estimates <- function(
       ) |>
       dplyr::select(-label_splits) |>
       dplyr::ungroup()
-  } else {
-    estimates <- estimates_outline |>
-      tibble::add_row( 
-        label = names(obj[["par"]]),
-        initial = obj[["env"]][["parameters"]][["p"]],
-        estimate = obj[["env"]][["parameters"]][["p"]],
-        estimated = FALSE
-      ) 
-  }
 }
 

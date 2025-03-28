@@ -373,24 +373,23 @@ FIMSFit <- function(
     obj[["report"]]()
   }
   
-  # Unlist module ids and use the ids to map selectivity fleet name later 
-  unlist_module_ids <- unlist(input$module_ids)
-  # Total number of fleets
-  # 3 represents recruitment, growth, and maturity modules
-  total_fleet_num <- length(input[["module_ids"]]) - 3
-  # Define common variables for model years, one projection year, and all years
-  model_years <- FIMS::get_start_year(input[["data"]]):FIMS::get_end_year(input[["data"]])
-  projection_year <- tail(model_years, 1) + 1
-  all_years <- c(model_years, projection_year)
+  # # Unlist module ids and use the ids to map selectivity fleet name later 
+  # unlist_module_ids <- unlist(input$module_ids)
+  # # Total number of fleets
+  # # 3 represents recruitment, growth, and maturity modules
+  # total_fleet_num <- length(input[["module_ids"]]) - 3
+  # # Define common variables for model years, one projection year, and all years
+  # model_years <- FIMS::get_start_year(input[["data"]]):FIMS::get_end_year(input[["data"]])
+  # projection_year <- tail(model_years, 1) + 1
+  # all_years <- c(model_years, projection_year)
 
   if (length(sdreport) > 0) {
     names(sdreport[["par.fixed"]]) <- parameter_names
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
     # Create JSON output for FIMS run
-    browser()
     finalized_fims <- finalize(opt$par, obj$fn, obj$gr)
     # Reshape the JSON estimates and TMB estimates to join them together
-    json_estimates <- reshape_json_estimates(finalized_fims)
+    json_estimates <- reshape_json_estimates(finalized_fims, opt)
     tmb_estimates <- reshape_tmb_estimates(
       obj = obj, 
       sdreport = sdreport,
@@ -401,11 +400,11 @@ FIMSFit <- function(
     # Create JSON output for FIMS run
     finalized_fims <- finalize(obj$par, obj$fn, obj$gr)
     # Reshape the JSON estimates and TMB estimates to join them together
-    json_estimates <- reshape_json_estimates(finalized_fims)
+    json_estimates <- reshape_json_estimates(finalized_fims, opt)
     tmb_estimates <- reshape_tmb_estimates(
       obj = obj, 
       sdreport = sdreport,
-      opt = NULL,
+      opt = opt,
       parameter_names = parameter_names
     )
   }

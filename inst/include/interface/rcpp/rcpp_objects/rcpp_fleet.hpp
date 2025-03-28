@@ -383,8 +383,9 @@ public:
     ss << " \"name\": \"log_q\",\n";
     ss << " \"id\":" << this->log_q.id_m << ",\n";
     ss << " \"type\": \"vector\",\n";
-    ss << " \"values\": " << this->log_q << "\n},\n";
+    ss << " \"values\": " << this->log_q << "\n}\n";
     if (this->nlengths > 0) {
+      ss << " ,\n";
       ss << " {\n";
       ss << " \"name\": \"age_length_conversion_matrix\",\n";
       ss << " \"id\":" << this->age_length_conversion_matrix.id_m << ",\n";
