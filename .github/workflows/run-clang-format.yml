@@ -1,9 +1,16 @@
 # Runs clang-format to format C++ code and then creates a PR to the branch
-# which had changes and triggered this action. More details about clang-format
-# can be found here: https://clang.llvm.org/docs/ClangFormat.html. To style C++
-# code in VS Code locally, you could follow the instructions on this website
-# https://code.visualstudio.com/docs/editor/codebasics#_formatting to format
-# the entire file or selected text.
+# that had changes and triggered this action.
+#
+# Clang-Format Version Update:
+# - Previously, we were using clang-format version 13.0.0.
+# - The latest available version is 18.0.0, which is now the default in the GitHub action.
+# - We explicitly set `clangFormatVersion: 18.0.0` to ensure consistency.
+# - Clang-format 17 had known bugs that could cause formatting failures, so we are avoiding auto-updating.
+# - Future updates should be reviewed before upgrading to a new major version.
+#
+# More details:
+# - Clang-Format: https://clang.llvm.org/docs/ClangFormat.html
+# - Formatting in VS Code: https://code.visualstudio.com/docs/editor/codebasics#_formatting
 name: run-clang-format
 
 on:
@@ -24,6 +31,7 @@ jobs:
       with:
         source: './inst/include ./src ./tests/gtest'
         extensions: 'hpp, cpp'
+        clangFormatVersion: 18.0.0
         style: Google
         inplace: True
     
