@@ -101,5 +101,8 @@ target_compile_definitions(fims_test
     STD_LIB
 )
 
-# Add a subdirectory to the build
+
+add_subdirectory(tests/google_benchmark)
+
 add_subdirectory(tests/gtest)
+add_subdirectory(tests/cpp_tests)  
