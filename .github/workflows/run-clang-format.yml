@@ -1,9 +1,19 @@
-# Runs clang-format to format C++ code and then creates a PR to the branch
-# which had changes and triggered this action. More details about clang-format
-# can be found here: https://clang.llvm.org/docs/ClangFormat.html. To style C++
-# code in VS Code locally, you could follow the instructions on this website
-# https://code.visualstudio.com/docs/editor/codebasics#_formatting to format
-# the entire file or selected text.
+# Run clang-format
+# This workflow runs clang-format to format C++ code and then creates
+# a pull request to commit the changed files to the main branch.
+#
+# Clang-Format Version Update:
+# - We updated clang-format from version 13.0.0 to 18.0.0.
+# - The GitHub Action we are using (DoozyX/clang-format-lint-action@v0.14) defaults to 18.0.0.
+# - Using an outdated version could lead to formatting inconsistencies.
+# - We chose to explicitly set 18.0.0 instead of using "latest" because Clang 17 had known issues
+#   that could have caused failures in our workflow.
+# - Future updates should be reviewed before upgrading to a new major version.
+#
+# More details: https://clang.llvm.org/docs/ClangFormat.html
+#
+# To format C++ code locally in VS Code:
+# https://code.visualstudio.com/docs/editor/codebasics#_formatting
 name: run-clang-format
 
 on:
@@ -24,6 +34,10 @@ jobs:
       with:
         source: './inst/include ./src ./tests/gtest'
         extensions: 'hpp, cpp'
+<<<<<<< HEAD
+=======
+        clangFormatVersion: 18.0.0
+>>>>>>> 45ea4a4 (updated clang-format-version)
         style: Google
         inplace: True
     
