@@ -1,4 +1,5 @@
 #define TMB_PRECOMPILE
+#include "TMB.h"
 #include "RTMB.h"
 
 inline Rcpp::ComplexVector unwrap(ADrep x) {

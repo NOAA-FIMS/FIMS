@@ -77,6 +77,7 @@ static const R_CallMethodDef CallEntries[] = {
  * @param dll TODO: provide a brief description.
  *
  */
+/*
 void R_init_FIMS(DllInfo *dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
@@ -84,6 +85,7 @@ void R_init_FIMS(DllInfo *dll) {
   TMB_CCALLABLES("FIMS");
 #endif
 }
+*/
 }
 
 #endif
