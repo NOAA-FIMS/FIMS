@@ -5,7 +5,7 @@
 #define RTMB_H
 
 #include <Rcpp.h>
-#include "TMB.h"
+#include <TMB.hpp>
 
 
 // AD type shorthands

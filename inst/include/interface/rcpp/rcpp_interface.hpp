@@ -304,6 +304,10 @@ std::string get_output() {
     return ret;
 }
 
+void activate_ad_context() {
+    static TMBad::global glob;  // Activate the AD context
+}
+
 /**
  * @brief Gets the fixed parameters vector object.
  *
@@ -608,6 +612,7 @@ RCPP_EXPOSED_CLASS(ParameterVector)
  *
  */
 RCPP_MODULE(fims) {
+    static TMBad::global glob;  // Activate the AD context
     Rcpp::function(
             "CreateTMBModel", &CreateTMBModel,
             "Creates the TMB model object and adds interface objects to it.");
@@ -617,6 +622,10 @@ RCPP_MODULE(fims) {
     Rcpp::function(
             "get_output", &get_output,
             "Extracts the derived quantities from model objects.");
+    Rcpp::function(
+            "activate_ad_context", &activate_ad_context,
+            "Activates the AD context for TMBAD framework. This should be called "
+            "before any TMBAD model is created.");
     Rcpp::function(
             "get_fixed", &get_fixed_parameters_vector,
             "Gets the fixed parameters vector object.");
@@ -797,9 +806,9 @@ RCPP_MODULE(fims) {
             &LogisticSelectivityInterface::inflection_point)
             .field("slope", &LogisticSelectivityInterface::slope)
             .method("get_id", &LogisticSelectivityInterface::get_id)
-            .method("evaluate", &LogisticSelectivityInterface::evaluate);
-       //     .method("evaluate_RTMB", &LogisticSelectivityInterface::evaluate_RTMB)
-        //    .method("distr_dpois", &LogisticSelectivityInterface::distr_dpois);
+            .method("evaluate", &LogisticSelectivityInterface::evaluate)
+            .method("evaluate_RTMB", &LogisticSelectivityInterface::evaluate_RTMB)
+            .method("distr_dpois", &LogisticSelectivityInterface::distr_dpois);
 
     Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
             .constructor()

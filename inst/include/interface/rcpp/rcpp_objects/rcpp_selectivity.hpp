@@ -91,6 +91,7 @@ public:
      * @brief The constructor.
      */
     LogisticSelectivityInterface() : SelectivityInterfaceBase() {
+        static TMBad::global glob;  // Activate the AD context
     }
 
     /**
@@ -120,7 +121,7 @@ public:
         LogisticSel.slope[0] = this->slope[0].initial_value_m;
         return LogisticSel.evaluate(x);
     }
-/*
+
     #ifdef TMB_MODEL
     ADrep evaluate_RTMB(ADrep x, ADrep input_slope, ADrep input_inflection_point){
       //  fims_popdy::LogisticSelectivity<ad> LogSel;
@@ -156,7 +157,7 @@ public:
     return ans;
     }
     #endif
-*/
+
     /** 
      * @brief Extracts derived quantities back to the Rcpp interface object from
      * the Information object.
