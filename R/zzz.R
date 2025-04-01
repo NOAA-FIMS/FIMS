@@ -259,3 +259,9 @@ methods::setMethod(
     return(xx)
   }
 )
+
+.onLoad <- function(libname, pkgname) {
+    if (!requireNamespace("RTMB", quietly = TRUE)) {
+        stop("The 'RTMB' package is required but not installed or loaded.")
+    }
+}
