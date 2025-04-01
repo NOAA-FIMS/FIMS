@@ -1,3 +1,9 @@
+# Helper file for FIMS R tests----
+# This file contains multiple functions that are used to set up and run  
+# FIMS models with or without wrapper functions. The functions are sourced by 
+# devtools::load_all().
+
+# FIMS helper function to validate the output of the FIMS model
 #' Validate FIMS Model Output
 #'
 #' This function validates the output from the FIMS against the known OM values.
@@ -47,19 +53,24 @@ validate_fims <- function(
     # Extract estimates based on whether fimsfit is used
     if (use_fimsfit) {
       object <- estimates |>
-        dplyr::filter(name == param_name) |>
-        dplyr::select(value, se)
+        dplyr::filter(label == param_name) |>
+        dplyr::select(label, estimate, uncertainty)
+      # Extract estimate
+      object_estimate <- object[1:length(expected), "estimate"]
+      # Extract uncertainty
+      object_uncertainty <- object[1:length(expected), "uncertainty"]
     } else {
       object <- estimates[(rownames(estimates) == param_name), ]
+      # Extract estimate
+      object_estimate <- object[1:length(expected), "Estimate"]
+      # Extract uncertainty
+      object_uncertainty <- object[1:length(expected), "Std. Error"]
     }
-    # Extract values
-    object_value <- object[1:length(expected), 1]
-    # Extract SEs
-    object_se <- object[1:length(expected), 2]
+    
 
     # Validate errors against 2*SE threshold
-    absolute_error <- abs(object_value - expected)
-    threshold <- qnorm(.975) * object_se
+    absolute_error <- abs(object_estimate - expected)
+    threshold <- qnorm(.975) * object_uncertainty
     expect_lte(sum(absolute_error > threshold), 0.05 * length(expected))
   }
 
@@ -94,9 +105,12 @@ validate_fims <- function(
     expect_equal(
       report[["recruitment"]][[1]][1:om_input[["nyr"]]],
       estimates |>
-        dplyr::filter(name == "NAA") |>
+        dplyr::filter(
+          label == "NAA" 
+        ) |>
         dplyr::slice(naa1_id) |>
-        dplyr::pull(value)
+        dplyr::pull(estimate) |>
+        as.numeric()
     )
   } else {
     expect_equal(
@@ -104,7 +118,7 @@ validate_fims <- function(
       as.numeric(estimates[rownames(estimates) == "NAA", "Estimate"][naa1_id])
     )
   }
-
+  
   # Recruitment log deviations
   # The initial value of om_input[["logR.resid"]] is dropped from the model
   # TODO: the estimates table contains fixed "true" values for LogRecDev, causing

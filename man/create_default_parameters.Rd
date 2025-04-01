@@ -122,12 +122,12 @@ default_fleet1 <- purrr::map_df(
   default_parameters[["parameters"]][["fleet1"]],
   \(x) length(x)
 ) |>
-  tidyr::pivot_longer(cols = dplyr::everything())
+  tidyr::pivot_longer(cols = tidyselect::everything())
 updated_fleet1 <- purrr::map_df(
   parameters_with_double_logistic[["parameters"]][["fleet1"]],
   \(x) length(x)
 ) |>
-  tidyr::pivot_longer(cols = dplyr::everything())
+  tidyr::pivot_longer(cols = tidyselect::everything())
 dplyr::full_join(default_fleet1, updated_fleet1, by = "name")
 knitr::kable(dplyr::full_join(default_fleet1, updated_fleet1, by = "name"))
 }
@@ -171,7 +171,8 @@ updated_parameters <- default_parameters |>
     )
   )
 
-# purrr::map_vec() can be used to compare the length of adjusted parameter vectors with defaults for a specific module (e.g., fleet1)
+# purrr::map_vec() can be used to compare the length of adjusted parameter 
+# vectors with defaults for a specific module (e.g., fleet1)
 default_fleet1 <- purrr::map_vec(default_parameters[["parameters"]][["fleet1"]], \(x) length(x))
 updated_fleet1 <- purrr::map_vec(updated_parameters[["parameters"]][["fleet1"]], \(x) length(x))
 

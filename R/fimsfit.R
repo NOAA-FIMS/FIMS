@@ -1,3 +1,12 @@
+# To remove the NOTE
+# no visible binding for global variable
+utils::globalVariables(c(
+  "parameter_id", "module_name", "module_id", "label", "initial.x", "initial.y",
+  "estimate.x", "estimate.y", "module_type", "type_id", "values", "derived_quantity_id",
+  "module_name.x", "module_name.y", "module_id.x", "module_id.y", "module_type.x",
+  "module_type.y"
+))
+
 # Developers: ----
 
 # This file defines the parent class of FIMSFit and its potential children. The
@@ -23,7 +32,7 @@
 methods::setOldClass(Classes = "package_version")
 methods::setOldClass(Classes = "difftime")
 methods::setOldClass(Classes = "sdreport")
-# Join sdreport and list into a class incase the sdreport is not created
+# Join sdreport and list into a class in case the sdreport is not created
 methods::setClassUnion("sdreportOrList", members = c("sdreport", "list"))
 
 methods::setClass(
@@ -195,7 +204,7 @@ methods::setGeneric(
 methods::setMethod(
   "get_number_of_parameters",
   "FIMSFit",
-  function(x) x@get_number_of_parameters
+  function(x) x@number_of_parameters
 )
 
 #' @return
@@ -319,7 +328,7 @@ is.FIMSFits <- function(x) {
 #'       A list containing the model report from `obj[["report"]]()`.
 #'     }
 #'     \item{\code{sdreport}:}{
-#'       A object with the `sdreport` class containing the output from
+#'       An object with the `sdreport` class containing the output from
 #'       `TMB::sdreport(obj)`.
 #'     }
 #'     \item{\code{estimates}:}{
@@ -343,20 +352,6 @@ FIMSFit <- function(
     sdreport = list(),
     timing = c("time_total" = as.difftime(0, units = "secs")),
     version = utils::packageVersion("FIMS")) {
-  # What we aspire the estimate table to look like
-  estimates_outline <- dplyr::tibble(
-    label = character(),
-    fleet = character(),
-    age = numeric(),
-    time = numeric(),
-    initial = numeric(),
-    estimate = numeric(),
-    uncertainty = numeric(),
-    likelihood = numeric(),
-    gradient = numeric(),
-    estimated = logical()
-  )
-  rm(estimates_outline)
 
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
@@ -385,26 +380,136 @@ FIMSFit <- function(
   } else {
     obj[["report"]]()
   }
-
+  
   if (length(sdreport) > 0) {
+    # rename the sdreport
     names(sdreport[["par.fixed"]]) <- parameter_names
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
-    std <- summary(sdreport)
-    estimates <- tibble::tibble(
-      as.data.frame(std)
-    ) |>
-      dplyr::rename(value = "Estimate", se = "Std. Error") |>
-      dplyr::mutate(
-        name = dimnames(std)[[1]],
-        .before = "value"
-      )
-  } else {
-    estimates <- tibble::tibble(
-      name = names(obj[["par"]]),
-      value = obj[["env"]][["parList"]]()[["p"]],
-      se = NA_real_
-    )
   }
+
+  # Reshape the TMB estimates
+  # If the model is not optimized, opt is an empty list and is not used in 
+  # reshape_tmb_estimates(). 
+  tmb_estimates <- reshape_tmb_estimates(
+    obj = obj, 
+    sdreport = sdreport,
+    opt = opt,
+    parameter_names = parameter_names
+  )
+ 
+  # Create JSON output for FIMS run
+  finalized_fims <- finalize(
+    # Use par from obj if the model is not optimized; otherwise, use par from opt.
+    if (length(sdreport) > 0) opt[["par"]] else obj[["par"]], 
+    obj[["fn"]], 
+    obj[["gr"]]
+  )
+  # Reshape the JSON estimates 
+  json_estimates <- reshape_json_estimates(finalized_fims, opt)
+
+  # Merge json_estimates into tmb_estimates based on common columns
+  # TODO: need to update the derived quantities section of the tibble
+  # The outputs from TMB and JSON are not the same, difficult to join them
+  estimates <- dplyr::full_join(
+    tmb_estimates,
+    json_estimates,
+    by = dplyr::join_by(
+      parameter_id,
+      module_name,
+      module_id,
+      label,
+      estimated
+    )
+  ) |>
+    dplyr::mutate(
+      # if estimated = FALSE and initial.x = NA, then set initial.x = initial.y
+      # and set estimate.x = estimate.y. Here .x represents the TMB values and .y
+      # represents the JSON values. json_estimates have values
+      # for all parameters, including constant (not estimated) parameters.
+      initial.x = ifelse(
+        estimated == FALSE & is.na(initial.x),
+        initial.y,
+        initial.x
+      ),
+      estimate.x = ifelse(
+        estimated == FALSE & is.na(estimate.x),
+        estimate.y,
+        estimate.x
+      )
+    ) |>
+    # Select the relevant columns for the final output
+    # Drop the initial and estimate columns from the json_estimates and
+    # use values from tmb_estimates. The values from json_estimates are 
+    # slightly different from the values from tmb_estimates, most likely 
+    # due to rounding differences.
+    dplyr::select(
+      -c(initial.y, estimate.y)
+    ) |>
+    # Drop .x suffix from column names
+    dplyr::rename(
+      initial = initial.x,
+      estimate = estimate.x
+    ) |>
+    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
+    dplyr::relocate(module_name, module_id, module_type, label, type, type_id, .before = tidyselect::everything()) |>
+    # Reorder the rows by `parameter_id`
+    dplyr::arrange(parameter_id) |>
+    # Add derived quantity IDs to the tibble for merging with the JSON output
+    # TODO: Refactor once we can reliably extract unique IDs from 
+    # both the JSON and TMB outputs.
+    dplyr::group_by(label) |>
+    dplyr::mutate(
+      derived_quantity_id = ifelse(
+        is.na(parameter_id),
+        paste0(label, "_", seq_len(dplyr::n())),
+        NA_character_
+      )
+    ) 
+
+  # Reshape the JSON derived quantities
+  json_derived_quantities <- reshape_json_derived_quantities(finalized_fims) |>
+    # Add derived quantity IDs to the tibble for merging with the JSON output
+    # TODO: Refactor once we can reliably extract unique IDs from 
+    # both the JSON and TMB outputs.
+    dplyr::group_by(name) |>
+    dplyr::mutate(
+      derived_quantity_id = paste0(name, "_", seq_len(dplyr::n()))
+    ) |>
+    # Rename the columns to match the tmb_estimates
+    dplyr::rename(
+      label = name,
+      estimate = values
+    ) 
+
+  # Merge json_derived_quantities into estimates based on common columns
+  estimates <- dplyr::full_join(
+    estimates,
+    json_derived_quantities,
+    by = dplyr::join_by(
+      derived_quantity_id,
+      label
+    )
+  ) |>
+    # Fill missing values in .x columns (TMB output) using corresponding values 
+    # from .y columns (JSON output). 
+    dplyr::mutate(
+      module_name.x = dplyr::coalesce(module_name.x, module_name.y),
+      module_id.x = dplyr::coalesce(module_id.x, module_id.y),
+      module_type.x = dplyr::coalesce(module_type.x, module_type.y),
+      estimate.x = dplyr::coalesce(estimate.x, estimate.y)
+    ) |>
+    # Drop .x suffix from column names
+    dplyr::rename(
+      module_name = module_name.x,
+      module_id = module_id.x,
+      module_type = module_type.x,
+      estimate = estimate.x
+    ) |>
+    # Select the relevant columns for the final output
+    dplyr::select(
+      -c(derived_quantity_id, module_name.y, module_id.y, module_type.y,
+        estimate.y)
+    ) 
 
   fit <- methods::new(
     "FIMSFit",
@@ -475,7 +580,7 @@ fit_fims <- function(input,
   if (number_of_loops < 0) {
     cli::cli_abort("number_of_loops ({.par {number_of_loops}}) must be >= 0.")
   }
-  obj <- MakeADFun(
+  obj <- TMB::MakeADFun(
     data = list(),
     parameters = input$parameters,
     map = input$map,

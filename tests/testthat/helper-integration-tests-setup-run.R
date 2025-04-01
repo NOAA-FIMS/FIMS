@@ -1,4 +1,96 @@
-# This R script generates multiple fit results for use in tests located in
+## Setup file for FIMS R tests ----
+# This file generates multiple test datasets for use in tests located in
+# tests/testthat. Typically there is only one setup file. The file is not 
+# sourced by devtools::load_all().
+
+# Set up FIMS data ----
+# The section generates datasets containing only age composition, only length
+# composition data, or data with missing values.
+# The integration_test_data_components.RData is generated after running the
+# script R/data1.R.
+# Load required integration test data components
+load(test_path("fixtures", "integration_test_data_components.RData"))
+
+# Generate dataset with only age composition data
+data_age_comp_raw <- rbind(
+  landings_data,
+  index_data,
+  age_data,
+  weightatage_data
+)
+data_age_comp <- FIMS::FIMSFrame(data_age_comp_raw)
+saveRDS(
+  data_age_comp,
+  file = testthat::test_path("fixtures", "data_age_comp.RDS")
+)
+
+# Generate dataset with only length composition data
+data_length_comp_raw <- rbind(landings_data, index_data, weightatage_data) |>
+  dplyr::mutate(
+    length = NA,
+    .after = "age"
+  ) |>
+  rbind(length_comp_data, length_age_data)
+data_length_comp <- FIMS::FIMSFrame(data_length_comp_raw)
+saveRDS(
+  data_length_comp,
+  file = testthat::test_path("fixtures", "data_length_comp.RDS")
+)
+
+# Missing year for all data sets is year 0002, i.e., yyyy-mm-dd
+na_index <- as.Date("2-01-01")
+
+# Generate dataset with missing age composition for fleet1
+data_age_comp_na <- data_age_comp_raw |>
+  dplyr::filter(!(name == "fleet1" & type == "age" & datestart == na_index)) |>
+  FIMS::FIMSFrame()
+saveRDS(
+  data_age_comp_na,
+  file = testthat::test_path("fixtures", "data_age_comp_na.RDS")
+)
+
+# Generate dataset with missing length composition, age-to-length-conversion,
+# and index for survey1
+data_length_comp_na <- data_length_comp_raw |>
+  dplyr::filter(
+    !(name == "survey1" &
+      type %in% c("index", "length", "age-to-length-conversion") &
+      datestart == na_index
+    )
+  ) |>
+  FIMS::FIMSFrame()
+saveRDS(
+  data_length_comp_na,
+  file = testthat::test_path("fixtures", "data_length_comp_na.RDS")
+)
+
+# Generate dataset with missing values in age composition for survey1
+# Missing values for length composition for fleet1 year 0012
+length_na_index <- as.Date("12-01-01")
+data_age_length_comp_raw <- rbind(
+  landings_data,
+  index_data,
+  age_data,
+  weightatage_data
+)
+data_age_length_comp_na <- data_age_length_comp_raw |>
+  dplyr::filter(
+    !(name == "survey1" & type %in% c("age") & datestart == na_index)
+  ) |>
+  dplyr::filter(
+    !(name == "fleet1" &
+      type %in% c("length", "age-to-length-conversion") &
+      datestart == length_na_index
+    )
+  ) |>
+  FIMS::FIMSFrame()
+saveRDS(
+  data_age_length_comp_na,
+  file = testthat::test_path("fixtures", "data_age_length_comp_na.RDS")
+)
+
+# Set up FIMS deterministic and estimation runs results ----
+# This section generates multiple fit results for use in tests located in
 # tests/testthat. For example, it creates fits from FIMS runs with only age
 # composition, only length composition data, or data with missing values.
 
@@ -47,7 +139,25 @@ saveRDS(
   file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
 )
 
-# Estimation run with age and length comp using wrappers ----
+## Deterministic run with age and length comp using wrappers ----
+# Run FIMS using the setup_and_run_FIMS_with_wrappers function
+deterministic_age_length_comp <- setup_and_run_FIMS_with_wrappers(
+  iter_id = iter_id,
+  om_input_list = om_input_list,
+  om_output_list = om_output_list,
+  em_input_list = em_input_list,
+  estimation_mode = FALSE,
+  modified_parameters = modified_parameters
+)
+clear()
+
+# Save FIMS results as a test fixture for additional fimsfit tests
+saveRDS(
+  deterministic_age_length_comp,
+  file = testthat::test_path("fixtures", "deterministic_age_length_comp.RDS")
+)
+
+## Estimation run with age and length comp using wrappers ----
 # Run FIMS using the setup_and_run_FIMS_with_wrappers function
 fit_age_length_comp <- setup_and_run_FIMS_with_wrappers(
   iter_id = iter_id,
@@ -57,6 +167,7 @@ fit_age_length_comp <- setup_and_run_FIMS_with_wrappers(
   estimation_mode = TRUE,
   modified_parameters = modified_parameters
 )
+
 clear()
 
 # Save FIMS results as a test fixture for additional fimsfit tests
@@ -65,7 +176,7 @@ saveRDS(
   file = testthat::test_path("fixtures", "fit_age_length_comp.RDS")
 )
 
-# Estimation run with age comp only using wrappers ----
+## Estimation run with age comp only using wrappers ----
 # Load test data for age composition from an RDS file
 data_age_comp <- readRDS(test_path("fixtures", "data_age_comp.RDS"))
 
@@ -118,7 +229,7 @@ saveRDS(
   file = testthat::test_path("fixtures", "fit_agecomp_na.RDS")
 )
 
-# Estimation run with length comp only using wrappers ----
+## Estimation run with length comp only using wrappers ----
 # Load test data for length composition from an RDS file
 data_length_comp <- readRDS(test_path("fixtures", "data_length_comp.RDS"))
 # Define fleet1 and survey1 specifications
@@ -170,7 +281,7 @@ saveRDS(
   file = testthat::test_path("fixtures", "fit_lengthcomp_na.RDS")
 )
 
-# Estimation run with age and length comp with NAs ----
+## Estimation run with age and length comp with NAs ----
 # Load test data with both age and length composition data, which contains missing values
 data_age_length_comp_na <- readRDS(test_path("fixtures", "data_age_length_comp_na.RDS"))
 # Define fleet1 and survey1 specifications

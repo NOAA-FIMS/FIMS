@@ -383,8 +383,9 @@ public:
     ss << " \"name\": \"log_q\",\n";
     ss << " \"id\":" << this->log_q.id_m << ",\n";
     ss << " \"type\": \"vector\",\n";
-    ss << " \"values\": " << this->log_q << "\n},\n";
+    ss << " \"values\": " << this->log_q << "\n}\n";
     if (this->nlengths > 0) {
+      ss << " ,\n";
       ss << " {\n";
       ss << " \"name\": \"age_length_conversion_matrix\",\n";
       ss << " \"id\":" << this->age_length_conversion_matrix.id_m << ",\n";
@@ -393,7 +394,7 @@ public:
     }
     ss << "], \"derived_quantities\":[\n";
     ss << "{\n";
-    ss << "  \"name\": \"cnaa\",\n";
+    ss << "  \"name\": \"CNAA\",\n";
     ss << "  \"values\":[";
     if (this->derived_cnaa.size() == 0) {
         ss << "]\n";
@@ -406,7 +407,7 @@ public:
     ss << " },\n";
 
     ss << " {\n";
-    ss << "  \"name\": \"cnal\",\n";
+    ss << "  \"name\": \"CNAL\",\n";
     ss << "  \"values\":[";
     if (this->derived_cnal.size() == 0) {
       ss << "]\n";
@@ -433,7 +434,7 @@ public:
 
 
     ss << "{\n";
-    ss << "  \"name\": \"age_composition \",\n";
+    ss << "  \"name\": \"PCNAA \",\n";
     ss << "  \"values\":[";
     if (this->derived_age_composition.size() == 0) {
       ss << "]\n";
@@ -446,7 +447,7 @@ public:
     ss << " },\n";
 
     ss << " {\n";
-    ss << "  \"name\": \"length_composition \",\n";
+    ss << "  \"name\": \"PCNAL \",\n";
     ss << "  \"values\":[";
     if (this->derived_length_composition.size() == 0) {
       ss << "]\n";
@@ -459,7 +460,7 @@ public:
     ss << " },\n";
 
     ss << "{\n";
-    ss << "  \"name\": \"index \",\n";
+    ss << "  \"name\": \"ExpectedIndex \",\n";
     ss << "  \"values\":[";
     if (this->derived_index.size() == 0) {
       ss << "]\n";
@@ -488,6 +489,8 @@ public:
     std::shared_ptr<fims_popdy::Fleet<Type> > fleet =
       std::make_shared<fims_popdy::Fleet<Type> >();
 
+    std::stringstream ss;
+
     // set relative info
     fleet->id = this->id;
     fleet->is_survey = this->is_survey.get();
@@ -510,7 +513,10 @@ public:
       fleet->log_q[i] = this->log_q[i].initial_value_m;
 
       if (this->log_q[i].estimated_m) {
-        info->RegisterParameterName("log_q");
+        ss.str("");
+        ss << "Fleet.log_q." << this->id << "." << this->log_q[i].id_m;
+        // register the parameter name
+        info->RegisterParameterName(ss.str());
           if (this->log_q[i].is_random_effect_m) {
             info->RegisterRandomEffect(fleet->log_q[i]);
           } else {
@@ -525,7 +531,9 @@ public:
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
 
       if (this->log_Fmort[i].estimated_m) {
-        info->RegisterParameterName("log_Fmort");
+        ss.str("");
+        ss << "Fleet.log_Fmort." << this->id << "." << this->log_Fmort[i].id_m;
+        info->RegisterParameterName(ss.str());
         if (this->log_Fmort[i].is_random_effect_m) {
           info->RegisterRandomEffect(fleet->log_Fmort[i]);
         } else {
@@ -564,7 +572,10 @@ public:
           fims::to_string(fleet->age_length_conversion_matrix.size()));
 
         if (this->age_length_conversion_matrix[i].estimated_m) {
-          info->RegisterParameterName("age_length_conversion_matrix");
+          ss.str("");
+          ss << "Fleet.age_length_conversion_matrix." << this->id << "." << 
+            this->age_length_conversion_matrix[i].id_m;
+          info->RegisterParameterName(ss.str());
           if (this->age_length_conversion_matrix[i].is_random_effect_m) {
             info->RegisterRandomEffect(fleet->age_length_conversion_matrix[i]);
           } else {
