@@ -6,7 +6,7 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# rcpp_selectivity ----
+# rcpp selectivity ----
 ## IO correctness ----
 test_that("rcpp logistic selectivity works with correct inputs", {
   #' @description Test that logistic selectivity works with correct inputs.
@@ -46,7 +46,7 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   selectivity1$slope_asc[1]$estimated <- TRUE
   selectivity1$inflection_point_desc[1]$value <- 15.0
   selectivity1$slope_desc[1]$value <- 0.05
-  
+
   expect_equal(selectivity1$get_id(), 1)
   expect_equal(selectivity1$inflection_point_asc[1]$value, 10.5)
   expect_equal(selectivity1$slope_asc[1]$value, 0.2)
@@ -64,7 +64,7 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   selectivity2$slope_asc[1]$value <- 0.2
   selectivity2$inflection_point_desc[1]$value <- 15.0
   selectivity2$slope_desc[1]$value <- 0.05
-  
+
   selectivity2$inflection_point_asc[1]$is_random_effect <- TRUE
   selectivity2$inflection_point_asc[1]$estimated <- TRUE
   selectivity2$inflection_point_desc[1]$is_random_effect <- TRUE
@@ -73,7 +73,7 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   selectivity2$slope_asc[1]$estimated <- TRUE
   selectivity2$slope_desc[1]$is_random_effect <- TRUE
   selectivity2$slope_desc[1]$estimated <- TRUE
-  
+
   expect_equal(selectivity2$get_id(), 2)
   expect_equal(selectivity2$inflection_point_asc[1]$value, 10.5)
   expect_equal(selectivity2$slope_asc[1]$value, 0.2)
@@ -99,7 +99,7 @@ test_that("rcpp selectivity returns correct outputs for edge cases", {
   #' @description Test that rcpp selectivity returns default values when no
   #' parameters are set for input values of 20.
 
-  # emptyeLogistic
+  # emptyLogistic
   emptyLogistic <- methods::new(LogisticSelectivity)
   expect_equal(
     object = emptyLogistic$evaluate(20),
