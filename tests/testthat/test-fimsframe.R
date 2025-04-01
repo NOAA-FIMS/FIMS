@@ -23,7 +23,7 @@ test_that("Can create the S4 FIMSFrame classes", {
 test_that("Accessors work as expected in FIMSFrame", {
   expect_s3_class(get_data(fims_frame), "data.frame")
 
-  expect_vector(get_fleets(fims_frame), ptype = numeric())
+  expect_vector(get_fleets(fims_frame), ptype = character())
 
   expect_type(get_n_years(fims_frame), "integer")
   expect_length(get_n_years(fims_frame), 1)
@@ -36,7 +36,7 @@ test_that("Accessors work as expected in FIMSFrame", {
 
   expect_s3_class(get_data(fims_frame), "data.frame")
 
-  expect_vector(get_fleets(fims_frame), ptype = numeric())
+  expect_vector(get_fleets(fims_frame), ptype = character())
 
   expect_type(get_n_years(fims_frame), "integer")
   expect_length(get_n_years(fims_frame), 1)
@@ -113,4 +113,28 @@ test_that("Can add agecomp data to model", {
   }
 
   clear()
+})
+
+test_that("get_n_fleets() works with correct inputs", {
+  # Load the test data from an RDS file containing model fits.
+  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
+  data_files <- list.files(
+    path = test_path("fixtures"),
+    pattern = "^data.*\\.RDS$",
+    full.names = TRUE
+  )
+
+  # Function to read the RDS file and get input
+  check_input <- function(data_file) {
+    data <- readRDS(data_file)
+    n_fleets <- get_n_fleets(data)
+    #' @description Test that get_input() returns correct output for the input slot.
+    expect_equal(
+      object = n_fleets,
+      expected = 2
+    )
+  }
+
+  # Use purrr::map to apply the function to each file
+  result <- purrr::map(data_files, check_input)
 })

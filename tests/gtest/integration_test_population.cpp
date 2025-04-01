@@ -79,7 +79,7 @@ namespace
                 double log_rzero = fims_math::log(R_0[0].GetDouble()); 
 
                 it = input.find("Phi.0");
-                fims::JsonArray &Phi0 = (*it).second.GetArray();;
+                fims::JsonArray &Phi0 = (*it).second.GetArray();
                 double phi_0 = Phi0[0].GetDouble();
 
                 for (int year = 0; year < pop.nyears; year++)
@@ -123,7 +123,7 @@ namespace
 
                 if (it != output.end())
                 {
-                    fims::JsonArray &e = (*it).second.GetArray();;
+                    fims::JsonArray &e = (*it).second.GetArray();
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         expected_spawning_biomass[year] = e[year].GetDouble();
@@ -153,7 +153,7 @@ namespace
 
                 if (it != output.end())
                 {
-                    fims::JsonArray &e = (*it).second.GetArray();;
+                    fims::JsonArray &e = (*it).second.GetArray();
                     for (int year = 0; year < pop.nyears; year++)
                     {
                         expected_biomass[year] = e[year].GetDouble();

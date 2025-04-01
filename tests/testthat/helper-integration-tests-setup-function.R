@@ -1,3 +1,9 @@
+# Helper file for FIMS R tests----
+# This file contains multiple functions that are used to set up and run  
+# FIMS models with or without wrapper functions. The functions are sourced by 
+# devtools::load_all().
+
+# FIMS dmultinorm function ----
 #' FIMS dmultinom()
 #' This function matches the dmultinom() function in TMB and differs from R
 #' by NOT rounding obs to the nearest integer. The function is evaluated in
@@ -15,7 +21,8 @@ FIMS_dmultinom <- function(x, p) {
 }
 
 
-#' Set Up and Run FIMS Model without using wrapper functions
+# FIMS helper function to run FIMS model without wrappers ----
+#' Set up and run FIMS model without using wrapper functions
 #'
 #' This function sets up and runs the FIMS for a given iteration.
 #' It configures the model with the OM inputs and outputs (see simulated data from
@@ -262,7 +269,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # TODO: Check that the dimensions of the matrix of age_to_length_conversion matrix
   #       is rows = length() and columns = length()
   # TODO: Fix code below to not use 1:x and instead use seq_along() where this
-  #       doesn't currently break becuase we are only testing models with both
+  #       doesn't currently break because we are only testing models with both
   #       age and length data but it would break for only age data.
   for (i in 1:length(em_input[["age_to_length_conversion"]])) {
     # Transposing the below will have NO impact on the results if the object is
@@ -385,8 +392,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     )
   }
 
-  # write(finalize(obj$par, obj$fn, obj$gr),"outno.json")
-
   # Call report using MLE parameter values, or
   # the initial values if optimization is skipped
   report <- obj[["report"]](obj[["env"]][["last.par.best"]])
@@ -409,6 +414,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   ))
 }
 
+# FIMS helper function to run FIMS model with wrappers ----
 #' Set Up and Run FIMS Model using wrapper functions
 #'
 #' This function sets up and runs the FIMS for a given iteration.

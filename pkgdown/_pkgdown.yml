@@ -54,6 +54,7 @@ reference:
   - has_keyword("gtest_helper")
   - has_keyword("set_methods")
   - use_testthat_template
+  - starts_with("reshape_")
 
 news:
   releases:
