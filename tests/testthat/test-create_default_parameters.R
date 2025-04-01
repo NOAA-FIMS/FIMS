@@ -62,3 +62,131 @@ test_that("create_default_parameters() returns correct error messages", {
 
   expect_error(create_default_parameters(empty_data, fleets = fleets))
 })
+
+# create_default_Population ----
+## IO correctness ----
+test_that("create_default_Population() works with correct inputs", {
+  #' @description Test that create_default_Population() returns a list.
+  expect_type(
+    object = create_default_Population(
+      data = data,
+      log_rzero = 1
+    ),
+    type = "list"
+  )
+
+  #' @description Test that create_default_Population() returns the correct list
+  #' structure with four elements.
+  population_1 <- create_default_Population(data, log_rzero = 10)
+  expect_equal(
+    object = names(population_1),
+    expected = "population"
+  )
+
+  expect_equal(
+    object = names(population_1[["population"]]),
+    expected = c(
+      "Population.log_M.value",
+      "Population.log_M.estimated",
+      "Population.log_init_naa.value",
+      "Population.log_init_naa.estimated"
+    )
+  )
+})
+
+## Edge handling ----
+
+
+## Error handling ----
+test_that("create_default_Population() returns correct error messages", {
+  #' @description Test that create_default_Population(x) returns expected errors
+  #' when the input `log_rzero` is incorrect.
+
+  expect_error(
+    object = create_default_Population(
+      data = data,
+      log_rzero = rep(2, 2)
+    ),
+    regexp = "has a length of 2"
+  )
+  expect_error(
+    object = create_default_Population(
+      data = data,
+      log_rzero = NULL
+    ),
+    regexp = "argument must be a single numeric value."
+  )
+  expect_error(
+    object = create_default_Population(
+      data = data,
+      log_rzero = "invalid class"
+    ),
+    regexp = "argument must be a single numeric value."
+  )
+})
+
+# create_default_DoubleLogistic ----
+## IO correctness ----
+test_that("create_default_DoubleLogistic() works with correct inputs", {
+  #' @description Test that create_default_DoubleLogistic(x) returns the correct
+  #' list structure.
+  DoubleLogistic_1 <- create_default_DoubleLogistic()
+  expect_type(
+    object = DoubleLogistic_1,
+    type = "list"
+  )
+  expect_equal(
+    object = names(DoubleLogistic_1),
+    expected = c(
+      "inflection_point_asc.value",
+      "inflection_point_asc.estimated",
+      "slope_asc.value",
+      "slope_asc.estimated",
+      "inflection_point_desc.value",
+      "inflection_point_desc.estimated",
+      "slope_desc.value",
+      "slope_desc.estimated"
+    )
+  )
+
+  #' @description Test that create_default_DoubleLogistic() returns correct
+  #' default values.
+  expect_equal(
+    object = DoubleLogistic_1[["inflection_point_asc.value"]],
+    expected = 2
+  )
+  expect_equal(
+    object = DoubleLogistic_1[["inflection_point_asc.estimated"]],
+    expected = TRUE
+  )
+  expect_equal(
+    object = DoubleLogistic_1[["slope_asc.value"]],
+    expected = 1
+  )
+  expect_equal(
+    object = DoubleLogistic_1[["slope_asc.estimated"]],
+    expected = TRUE
+  )
+  expect_equal(
+    object = DoubleLogistic_1[["inflection_point_desc.value"]],
+    expected = 4
+  )
+  expect_equal(
+    object = DoubleLogistic_1[["inflection_point_desc.estimated"]],
+    expected = TRUE
+  )
+  expect_equal(
+    object = DoubleLogistic_1[["slope_desc.value"]],
+    expected = 1
+  )
+  expect_equal(
+    object = DoubleLogistic_1[["slope_desc.estimated"]],
+    expected = TRUE
+  )
+})
+
+## Edge handling ----
+
+
+## Error handling ----
+

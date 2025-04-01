@@ -65,10 +65,18 @@ test_that("update_parameters detects invalid current_parameters format", {
     parameters = list(module1 = list(param1 = 1)),
     extra_field = "unexpected"
   )
-  #' @description update_parameters detects invalid current_parameters format
+  #' @description update_parameters detects invalid current_parameters format (not a list)
   expect_error(
     update_parameters(invalid_current_parameters, modified_parameters_valid),
     "must be a list containing parameters and modules"
+  )
+  missing_names_current_parameters <- list(
+    parameters = list(list(1))
+  )
+  #' @description update_parameters(x) detects that list is missing names
+  expect_error(
+    update_parameters(missing_names_current_parameters), 
+    "argument must be a named list"
   )
 })
 
@@ -104,3 +112,5 @@ test_that("update_parameters validates parameter types", {
     "does not match between"
   )
 })
+
+

@@ -181,7 +181,11 @@ test_that("rcpp_distribution works with correct inputs", {
 ## Edge handling ----
 test_that("rcpp_distribution returns correct outputs for edge cases", {
   #' @description Test that rcpp_distribution(x) returns an error.
-
+  # place holder test until Andrea can come back to this
+  expect_equal(
+    object = 1,
+    expected = 1
+  )
 })
 
 ## Error handling ----
