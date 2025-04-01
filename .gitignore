@@ -98,6 +98,7 @@ tests/integration/FIMS-deterministic-inputs/
 tests/testthat/fixtures/fit*.RDS
 tests/testthat/fixtures/data*.RDS
 tests/testthat/fixtures/parameters*.RDS
+tests/testthat/fixtures/deterministic*.RDS
 
 #vignettes
 inst/doc

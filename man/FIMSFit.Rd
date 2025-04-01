@@ -55,7 +55,7 @@ The maximum gradient found when optimizing the model. The default is
 A list containing the model report from \code{obj[["report"]]()}.
 }
 \item{\code{sdreport}:}{
-A object with the \code{sdreport} class containing the output from
+An object with the \code{sdreport} class containing the output from
 \code{TMB::sdreport(obj)}.
 }
 \item{\code{estimates}:}{

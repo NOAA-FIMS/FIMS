@@ -34,11 +34,11 @@ There are three minimum testing criteria for FIMS, which should be validated
 for every R function within the package. The template file sets up a
 section for each of the three following test criteria:
 \enumerate{
-\item Input and output correctness \link{IO correctness}: ensure that the function
+\item Input and output correctness (IO correctness): ensure that the function
 behaves as expected with correct inputs and returns the expected outputs.
-\item Edge-case handling \link{Edge handling}: validate the function's performance
+\item Edge-case handling (Edge handling): validate the function's performance
 with invalid inputs and unusual scenarios.
-\item Built-in errors and warnings \link{Error handling}: confirm that appropriate
+\item Built-in errors and warnings (Error handling): confirm that appropriate
 error and warning messages are triggered under exceptional conditions.
 }
 

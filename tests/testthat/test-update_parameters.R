@@ -77,7 +77,7 @@ test_that("update_parameters validates parameter length", {
 
 test_that("update_parameters validates parameter types", {
   invalid_modified_parameters <- list(
-    fleet1 = list(LogisticSelectivity.slope.value = "invalide_type")
+    fleet1 = list(LogisticSelectivity.slope.value = "invalid_type")
   )
 
   expect_error(

@@ -82,12 +82,12 @@
 #'   default_parameters[["parameters"]][["fleet1"]],
 #'   \(x) length(x)
 #' ) |>
-#'   tidyr::pivot_longer(cols = dplyr::everything())
+#'   tidyr::pivot_longer(cols = tidyselect::everything())
 #' updated_fleet1 <- purrr::map_df(
 #'   parameters_with_double_logistic[["parameters"]][["fleet1"]],
 #'   \(x) length(x)
 #' ) |>
-#'   tidyr::pivot_longer(cols = dplyr::everything())
+#'   tidyr::pivot_longer(cols = tidyselect::everything())
 #' dplyr::full_join(default_fleet1, updated_fleet1, by = "name")
 #' knitr::kable(dplyr::full_join(default_fleet1, updated_fleet1, by = "name"))
 #' }
@@ -433,8 +433,8 @@ create_default_maturity <- function(form = c("LogisticMaturity")) {
 #' @description
 #' This function sets up default parameters for a Beverton--Holt recruitment
 #' relationship. Parameters include the natural log of unfished recruitment,
-#' the logit transformation of the slope of the spawner--recruitment curve to
-#' keep it between zero and one, and the time series of spawner--recruitment
+#' the logit transformation of the slope of the stock--recruitment curve to
+#' keep it between zero and one, and the time series of stock--recruitment
 #' deviations on the natural log scale.
 #' @param data An S4 object. FIMS input data.
 #' @return
@@ -674,7 +674,8 @@ create_default_recruitment <- function(
 #'     )
 #'   )
 #'
-#' # purrr::map_vec() can be used to compare the length of adjusted parameter vectors with defaults for a specific module (e.g., fleet1)
+#' # purrr::map_vec() can be used to compare the length of adjusted parameter 
+#' # vectors with defaults for a specific module (e.g., fleet1)
 #' default_fleet1 <- purrr::map_vec(default_parameters[["parameters"]][["fleet1"]], \(x) length(x))
 #' updated_fleet1 <- purrr::map_vec(updated_parameters[["parameters"]][["fleet1"]], \(x) length(x))
 #'

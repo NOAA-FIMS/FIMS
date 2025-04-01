@@ -11,25 +11,18 @@ modified_parameters <- readRDS(testthat::test_path(
 ))
 
 test_that("deterministic test of fims", {
-  # Run FIMS using the setup_and_run_FIMS_with_wrappers function
-  result <- setup_and_run_FIMS_with_wrappers(
-    iter_id = iter_id,
-    om_input_list = om_input_list,
-    om_output_list = om_output_list,
-    em_input_list = em_input_list,
-    estimation_mode = FALSE,
-    modified_parameters = modified_parameters
-  )
+  # Load the test data from an RDS file containing the model fit
+  deterministic_age_length_comp <- readRDS(test_path("fixtures", "deterministic_age_length_comp.RDS"))
 
   # Call report using deterministic parameter values
   # obj[["report"]]() requires parameter list to avoid errors
-  report <- get_report(result)
-  estimates <- get_estimates(result)
+  report <- get_report(deterministic_age_length_comp)
+  estimates <- get_estimates(deterministic_age_length_comp)
 
   # Compare log(R0) to true value
   fims_logR0 <- estimates |>
-    dplyr::filter(name == "log_rzero") |>
-    dplyr::pull(value)
+    dplyr::filter(label == "log_rzero") |>
+    dplyr::pull(estimate)
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]][["R0"]]))
 
@@ -149,25 +142,12 @@ test_that("deterministic test of fims", {
 })
 
 test_that("nll test of fims", {
-  # Run FIMS using the setup_and_run_FIMS_with_wrappers function
-  result <- setup_and_run_FIMS_with_wrappers(
-    iter_id = iter_id,
-    om_input_list = om_input_list,
-    om_output_list = om_output_list,
-    em_input_list = em_input_list,
-    estimation_mode = FALSE,
-    modified_parameters = modified_parameters
-  )
+  # Load the test data from an RDS file containing the model fit
+  deterministic_age_length_comp <- readRDS(test_path("fixtures", "deterministic_age_length_comp.RDS"))
 
   # Set up TMB's computational graph
-  report <- get_report(result)
-  estimates <- get_estimates(result)
-
-  # log(R0)
-  fims_logR0 <- estimates |>
-    dplyr::filter(name == "log_rzero") |>
-    dplyr::pull(value)
-  expect_equal(fims_logR0, log(om_input_list[[iter_id]][["R0"]]))
+  report <- get_report(deterministic_age_length_comp)
+  estimates <- get_estimates(deterministic_age_length_comp)
 
   # recruitment likelihood
   # log_devs is of length nyr-1

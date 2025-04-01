@@ -11,11 +11,11 @@
 #' for every R function within the package. The template file sets up a
 #' section for each of the three following test criteria:
 #'
-#' 1. Input and output correctness [IO correctness]: ensure that the function
+#' 1. Input and output correctness (IO correctness): ensure that the function
 #'    behaves as expected with correct inputs and returns the expected outputs.
-#' 1. Edge-case handling [Edge handling]: validate the function's performance
+#' 1. Edge-case handling (Edge handling): validate the function's performance
 #'    with invalid inputs and unusual scenarios.
-#' 1. Built-in errors and warnings [Error handling]: confirm that appropriate
+#' 1. Built-in errors and warnings (Error handling): confirm that appropriate
 #'    error and warning messages are triggered under exceptional conditions.
 #'
 #' Above every expectation within the test file there should be a call to

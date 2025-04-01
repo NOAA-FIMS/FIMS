@@ -8,6 +8,9 @@
 \alias{get_fleets}
 \alias{get_fleets,FIMSFrame-method}
 \alias{get_fleets,data.frame-method}
+\alias{get_n_fleets}
+\alias{get_n_fleets,FIMSFrame-method}
+\alias{get_n_fleets,data.frame-method}
 \alias{get_n_years}
 \alias{get_n_years,FIMSFrame-method}
 \alias{get_n_years,data.frame-method}
@@ -42,6 +45,12 @@ get_fleets(x)
 \S4method{get_fleets}{FIMSFrame}(x)
 
 \S4method{get_fleets}{data.frame}(x)
+
+get_n_fleets(x)
+
+\S4method{get_n_fleets}{FIMSFrame}(x)
+
+\S4method{get_n_fleets}{data.frame}(x)
 
 get_n_years(x)
 
@@ -95,8 +104,10 @@ following columns depending if it fits to ages and lengths or just one of
 them:
 type, name, age, length, datestart, dateend, value, unit, and uncertainty.
 
-\code{\link[=get_fleets]{get_fleets()}} returns a vector of integer values specifying which fleets in
-the model are fishing fleets.
+\code{\link[=get_fleets]{get_fleets()}} returns a vector of strings containing the fleet names.
+
+\code{\link[=get_n_fleets]{get_n_fleets()}} returns an integer specifying the number of fleets in the
+model, where fleets is inclusive of both fishing fleets and survey vessels.
 
 \code{\link[=get_n_years]{get_n_years()}} returns an integer specifying the number of years in the
 model.

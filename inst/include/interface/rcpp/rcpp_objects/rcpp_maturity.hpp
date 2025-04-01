@@ -221,7 +221,8 @@ public:
       maturity->inflection_point[i] = this->inflection_point[i].initial_value_m;
       if (this->inflection_point[i].estimated_m) {
         ss.str("");
-        ss << "maturity.inflection_point." << this->id << "." << i;
+        ss << "maturity.inflection_point." << this->id << "." << 
+          this->inflection_point[i].id_m;
         info->RegisterParameterName(ss.str());
         if (this->inflection_point[i].is_random_effect_m) {
           info->RegisterRandomEffect(maturity->inflection_point[i]);
@@ -236,7 +237,7 @@ public:
       maturity->slope[i] = this->slope[i].initial_value_m;
       if (this->slope[i].estimated_m) {
         ss.str("");
-        ss << "maturity.slope_" << this->id << "." << i;
+        ss << "maturity.slope." << this->id << "." << this->slope[i].id_m;
         info->RegisterParameterName(ss.str());
         if (this->slope[i].is_random_effect_m) {
           info->RegisterRandomEffect(maturity->slope[i]);

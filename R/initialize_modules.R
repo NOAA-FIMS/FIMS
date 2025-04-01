@@ -97,7 +97,7 @@ initialize_module <- function(parameters, data, module_name) {
 
     # TODO: refactor "age-to-length-conversion" in FIMSFrame data and
     # "age_length_conversion_matrix" in the Rcpp interface to
-    # "age_to_legnth_conversion" for consistency
+    # "age_to_length_conversion" for consistency
     data_distribution_names_for_fleet_i <- names(parameters[["modules"]][["fleets"]][[module_name]][["data_distribution"]])
     if ("age-to-length-conversion" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
