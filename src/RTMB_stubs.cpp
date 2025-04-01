@@ -1,6 +1,5 @@
 #define TMB_PRECOMPILE
-#include "TMB.h"
-#include "RTMB.h"
+#include "../inst/include/interface/RTMB.h"
 
 inline Rcpp::ComplexVector unwrap(ADrep x) {
   return Rcpp::ComplexVector(x);
@@ -55,24 +54,24 @@ ad cplx2ad(const Rcomplex &x) {
   ad* px = (ad*)(&x);
   return *px;
 }
-inline ad* adptr(ADrep x) {
+ad* adptr(ADrep x) {
   return x.adptr();
 }
-inline bool is_advector (SEXP x) {
+bool is_advector (SEXP x) {
   return Rf_inherits(x, "advector");
 }
-inline bool is_admatrix (SEXP x) {
+bool is_admatrix (SEXP x) {
   return is_advector(x) && Rcpp::ComplexVector(x).hasAttribute("dim");
 }
-inline bool is_adsparse (SEXP x) {
+bool is_adsparse (SEXP x) {
   return Rf_inherits(x, "adsparse");
 }
-inline bool is_adscalar (SEXP x) {
+bool is_adscalar (SEXP x) {
   return is_advector(x) &&
     (Rcpp::ComplexVector(x).size() == 1) &&
     !Rcpp::ComplexVector(x).hasAttribute("dim");
 }
-inline bool valid(const ad &x) {
+bool valid(const ad &x) {
   return
     !x.ontape() || x.in_context_stack(x.data.glob);
 }
@@ -145,4 +144,4 @@ ad ScalarInput(SEXP x_) {
   return adptr(x)[0];
 }
 
-#include "rtmb_set_shared_pointers.cpp"
+#include "../inst/include/interface/rtmb_set_shared_pointers.cpp"

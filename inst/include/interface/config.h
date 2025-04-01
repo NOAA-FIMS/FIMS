@@ -1,5 +1,6 @@
 // RTMB configuration to include by TMB.h
-
+#ifndef TMB_CONFIG_H
+#define TMB_CONFIG_H
 #include <Rcpp.h>
 // Any failed internal assertion sends Rcpp::exception
 #define TMB_ABORT Rcpp::stop("TMB unexpected")
@@ -22,3 +23,5 @@
 #define ASSERT(x) TMBAD_ASSERT(x)
 #undef  ASSERT2
 #define ASSERT2(x, msg) TMBAD_ASSERT2(x, msg)
+
+#endif // TMB_CONFIG_H

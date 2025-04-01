@@ -61,12 +61,14 @@ bool valid(ADrep x);
 bool ad_context();
 
 // AD input validity check
+#ifndef CHECK_INPUT_FUN
+#define CHECK_INPUT_FUN
 #define CHECK_INPUT(x)                                                  \
 if (!is_advector(x))                                                    \
   Rcpp::stop("'" #x "' must be 'advector' (lost class attribute?)" );   \
  if (!valid(x))                                                         \
   Rcpp::stop("'" #x "' is not a valid 'advector' (constructed using illegal operation?)" );
-
+#endif
 // Global Tape Configuration
 struct tape_config_t {
   int comparison; // Safe=0 / Taped=1 / Unsafe=2
@@ -87,8 +89,9 @@ struct tape_config_t {
 
 // Tweak RcppExports
 void ptr_forward(TMBad::ADFun<>* adf);
+#ifndef RTMB_CCALLABLES
 #define RTMB_CCALLABLES                                                 \
   TMB_CCALLABLES("RTMB")                                                \
   R_RegisterCCallable("RTMB", "ptr_forward", (DL_FUNC) &ptr_forward);
-
+#endif
   #endif

@@ -4,7 +4,7 @@ CXX17STD = -std=c++17 -w
 USE_CXX17 = "yes"
 
 SRC_FILES = $(wildcard *.cpp)
-OBJECTS = RcppExports.o $(filter-out RTMB_fns.o, $(SRC_FILES:.cpp=.o)) # Exclude RTMB_fns.o
+OBJECTS = RcppExports.o $(SRC_FILES:.cpp=.o)
 all: $(SHLIB)
 
 RcppExports.o: RcppExports.cpp

@@ -5,3 +5,15 @@ evaluate_logistic_selectivity <- function(x, input_slope, input_inflection_point
     .Call(`_FIMS_evaluate_logistic_selectivity`, x, input_slope, input_inflection_point)
 }
 
+valid <- function(x) {
+    .Call(`_FIMS_valid`, x)
+}
+
+ad_context <- function() {
+    .Call(`_FIMS_ad_context`)
+}
+
+as_advector <- function(x) {
+    .Call(`_FIMS_as_advector`, x)
+}
+

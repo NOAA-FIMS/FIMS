@@ -20,12 +20,12 @@
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
 // issue
 #include <math.h>
-#ifndef TMB_HPP
-#define TMB_HPP
+//#ifndef TMB_H
+//#define TMB_H
 
-#include <TMB.hpp>
+#include "TMB.h"
 
-#endif // TMB_HPP
+//#endif // TMB_H
 #undef length
 #undef isNull
 

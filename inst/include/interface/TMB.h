@@ -1,9 +1,9 @@
 // TMB already included => skip!
+#ifndef TMB_H
+#define TMB_H
 #ifndef TMB_OBJECTIVE_PTR
 
 #include "config.h"
-#ifndef TMB_H
-#define TMB_H
 #ifdef TMB_PRECOMPILE
 /** \file
     \brief Include this file to extract declarations, definitions and selected code for pre-compilation
@@ -35,7 +35,10 @@
 #define IF_TMB_PRECOMPILE(...)
 #define TMB_EXTERN extern
 #endif
+#ifndef TMB_HPP
+#define TMB_HPP
 #include <TMB.hpp>
+#endif // TMB_HPP
 #endif
 
 #endif
