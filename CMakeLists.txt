@@ -1,5 +1,5 @@
 # Top level CMakeLists.txt: setting up top level project dependencies
-# and options. CMake Referecen documentation can be found here:
+# and options. CMake Reference documentation can be found here:
 # https://cmake.org/cmake/help/v4.0/
 cmake_minimum_required(VERSION 3.14...4.0)
 project(FIMS
@@ -14,7 +14,7 @@ include(FetchContent)
 # Set up GoogleTest
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip
+  URL https://github.com/google/googletest/archive/refs/tags/v1.16.0.zip
 )
 
 # For Windows: Prevent overriding the parent project's compiler/linker
