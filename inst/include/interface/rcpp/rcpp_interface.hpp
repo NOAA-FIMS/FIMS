@@ -96,7 +96,6 @@ std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn, Rcpp::Func
 
     std::shared_ptr<fims_model::Model < double>> model =
       fims_model::Model<double>::GetInstance();
-    model->do_tmb_reporting = false;
     for (size_t i = 0; i < information->fixed_effects_parameters.size(); i++) {
         *information->fixed_effects_parameters[i] = par[i];
     }
