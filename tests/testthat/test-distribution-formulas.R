@@ -85,7 +85,7 @@ fishing_fleet_index_distribution1 <- initialize_data_distribution(
 )
 fishing_fleet_index_distribution2 <- initialize_data_distribution(
   module = fishing_fleet,
-  family = stats::gaussion(link = "log"),
+  family = stats::gaussian(link = "log"),
   sd = list(value = fleet_sd, estimated = TRUE),
   data_type = "index"
 )

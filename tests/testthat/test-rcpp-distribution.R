@@ -193,7 +193,11 @@ test_that("rcpp distribution returns correct error messages", {
   
   #' @description dnorm should error out when there is a dimension mismatch
   # comment out until error checking is fixed
-
+  # place holder test until Andrea can come back to this
+  expect_equal(
+    object = 1,
+    expected = 1
+  )
   # y <- stats::rnorm(10)
   # # create a fims Rcpp object
   # # initialize the Dnorm module

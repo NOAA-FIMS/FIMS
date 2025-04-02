@@ -7,6 +7,7 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # FIMSFit ----
+## Setup ----
 # Load the test data from an RDS file containing the fitted model estimates
 fit_age_length_comp <- readRDS(test_path("fixtures", "fit_age_length_comp.RDS"))
 on.exit(rm(fit_age_length_comp), add = TRUE)
