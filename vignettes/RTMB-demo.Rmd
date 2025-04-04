@@ -60,11 +60,14 @@ par <- list(inflection_point = 2, slope = 0,
 mod <- function(par){
     getAll(par, dat)
     sdy <- exp(ln_sdy)
-    logistic$inflection_point[1]$value <- inflection_point
-    logistic$slope[1]$value <- slope
+    mean_selectivity <- logistic_selectivity(
+        x = advector(dat$x),
+        inflection_point = advector(par$inflection_point),
+        slope = advector(par$slope)
+    )
     nll <- 0
     for(i in x){
-        nll <- nll - dnorm(y[i], logistic$evaluate_RTMB(x[i]), sdy, TRUE)
+        nll <- nll - dnorm(y[i], mean_selectivity[i], sdy, TRUE)
     }
     return(nll)
 }
@@ -72,6 +75,7 @@ mod <- function(par){
 
 ### Generate TMB object and optimize
 ```{r fit}
-obj <- MakeADFun(mod, par)
+obj <- RTMB::MakeADFun(mod, par)
+opt <- nlminb(obj$par, obj$fn, obj$gr)
+opt$par
 ```
-}

@@ -9,17 +9,17 @@
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 
-#include "rcpp_objects/rcpp_data.hpp"
-#include "rcpp_objects/rcpp_fleet.hpp"
-#include "rcpp_objects/rcpp_growth.hpp"
-#include "rcpp_objects/rcpp_maturity.hpp"
-#include "rcpp_objects/rcpp_natural_mortality.hpp"
-#include "../../common/model.hpp"
-#include "rcpp_objects/rcpp_population.hpp"
-#include "rcpp_objects/rcpp_recruitment.hpp"
-#include "rcpp_objects/rcpp_selectivity.hpp"
-#include "rcpp_objects/rcpp_distribution.hpp"
-#include "../../utilities/fims_json.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
+#include "../inst/include/common/model.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
+#include "../inst/include/utilities/fims_json.hpp"
 
 /**
  * @brief TODO: provide a brief description.

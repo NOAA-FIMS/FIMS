@@ -1,9 +1,8 @@
 
 #include <cmath>
 
-#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
+#include "fims_types.hpp"
 #include "../inst/include/interface/interface.hpp"
-#include "../inst/include/interface/init.hpp"
 #include "../inst/include/common/model.hpp"
 
 /// @cond
@@ -39,4 +38,5 @@ Type objective_function<Type>::operator()() {
     return nll;
 
 }
+
 /// @endcond

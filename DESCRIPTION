@@ -54,7 +54,8 @@ License: GPL (>= 3) | file LICENSE
 URL: https://github.com/noaa-fims/fims, https://noaa-fims.github.io
 BugReports: https://github.com/noaa-fims/fims/issues
 Depends:
-    R (>= 4.1.0)
+    R (>= 4.1.0),
+    RTMB
 Imports:
     cli,
     dplyr,
