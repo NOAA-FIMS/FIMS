@@ -21,6 +21,7 @@ articles:
   contents:
   - fims-documentation
   - fims-demo
+  - fims-demo-minimal
   - fims-logging
 
 - title: Developer
