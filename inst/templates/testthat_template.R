@@ -6,6 +6,9 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
+# Setup ----
+# Load or prepare any necessary data for testing
+
 # {{{ function_name }}} ----
 ## IO correctness ----
 test_that("{{{ function_name }}}() works with correct inputs", {
