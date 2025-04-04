@@ -76,7 +76,7 @@ test_that("update_parameters detects invalid current_parameters format", {
   #' @description update_parameters(x) detects that list is missing names
   expect_error(
     update_parameters(missing_names_current_parameters), 
-    "argument must be a named list"
+    "must be a list containing parameters and modules"
   )
 })
 

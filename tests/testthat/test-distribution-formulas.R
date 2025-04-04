@@ -113,10 +113,11 @@ test_that("distribution formulas work with correct inputs", {
 })
 
 ## Edge handling ----
-test_that("distribution_formulas_new() returns correct outputs for edge cases", {
-  #' @description Test that distribution_formulas_new(x) returns an error.
+# TODO: Andrea to add edge handling tests
+# test_that("distribution_formulas_new() returns correct outputs for edge cases", {
+#   #' @description Test that distribution_formulas_new(x) returns an error.
   
-})
+# })
 
 ## Error handling ----
 test_that("distribution_formulas_new() returns correct error messages", {
