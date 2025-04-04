@@ -195,29 +195,29 @@ target_link_libraries(population_MaturityAtAge
 
 gtest_discover_tests(population_MaturityAtAge)
 
-#test_population_CatchNumbersAtAge.cpp
-add_executable(population_CatchNumbersAtAge
-  test_population_CatchNumbersAtAge.cpp
+#test_population_LandingsNumbersAtAge.cpp
+add_executable(population_LandingsNumbersAtAge
+  test_population_LandingsNumbersAtAge.cpp
 )
 
-target_link_libraries(population_CatchNumbersAtAge
+target_link_libraries(population_LandingsNumbersAtAge
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_CatchNumbersAtAge)
+gtest_discover_tests(population_LandingsNumbersAtAge)
 
-#test_CalculateCatch.cpp
-add_executable(population_Catch
-  test_population_Catch.cpp
+#test_CalculateLandings.cpp
+add_executable(population_Landings
+  test_population_Landings.cpp
 )
 
-target_link_libraries(population_Catch
+target_link_libraries(population_Landings
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_Catch)
+gtest_discover_tests(population_Landings)
 
 #test_B_and_SB.cpp
 add_executable(population_B_and_SB

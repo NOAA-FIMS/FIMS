@@ -19,7 +19,7 @@
 #' @param om_output A list containing the operating model outputs, including metrics
 #' such as numbers at age, biomass, spawning biomass, fishing mortality, and survey indices.
 #' @param em_input A list containing the estimation model inputs, including observed
-#' catches, survey indices, and other relevant data.
+#' landingses, survey indices, and other relevant data.
 #' @param use_fimsfit Logical; if `TRUE`, validates using `fit_fims()` results.
 #'
 #' @return None. The function uses `testthat` functions to perform validations.
@@ -139,13 +139,13 @@ validate_fims <- function(
     estimates = estimates
   )
 
-  # Expected fishery catch and survey index from om_output
+  # Expected fishery landings and survey index from om_output
   # Note: test failed when using em_input with observation errors as expected values
   validate_error(
     expected = c(
       om_output[["L.mt"]][["fleet1"]]
     ),
-    param_name = "ExpectedCatch",
+    param_name = "ExpectedLandings",
     use_fimsfit = use_fimsfit,
     estimates = estimates
   )

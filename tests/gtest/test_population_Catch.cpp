@@ -5,26 +5,26 @@
 namespace
 {
 
-    TEST_F(PopulationEvaluateTestFixture, CalculateCatch_works)
+    TEST_F(PopulationEvaluateTestFixture, CalculateLandings_works)
     {
 
-        std::vector<double> expected_catch(nyears * nfleets, 0);
-        // calculate catch numbers at age in population module
-         population.CalculateCatchNumbersAA(i_age_year, year, age);
+        std::vector<double> landings_expected(nyears * nfleets, 0);
+        // calculate landings numbers at age in population module
+         population.CalculateLandingsNumbersAA(i_age_year, year, age);
         
-        population.CalculateCatchWeightAA(year, age);
-        population.CalculateCatch(year, age);
+        population.CalculateLandingsWeightAA(year, age);
+        population.CalculateLandings(year, age);
 
         for (int fleet_ = 0; fleet_ < population.nfleets; fleet_++)
         {
             int index_yf = year * population.nfleets + fleet_;
             
-            expected_catch[index_yf] += population.fleets[fleet_]->catch_weight_at_age[i_age_year];
+            landings_expected[index_yf] += population.fleets[fleet_]->landings_weight_at_age[i_age_year];
             
-            EXPECT_EQ(population.expected_catch[index_yf], expected_catch[index_yf]);
-            EXPECT_GT(population.expected_catch[index_yf], 0);
-            EXPECT_GT(expected_catch[index_yf], 0);
-            EXPECT_EQ(expected_catch[index_yf], population.fleets[fleet_]->expected_catch[year]);
+            EXPECT_EQ(population.landings_expected[index_yf], landings_expected[index_yf]);
+            EXPECT_GT(population.landings_expected[index_yf], 0);
+            EXPECT_GT(landings_expected[index_yf], 0);
+            EXPECT_EQ(landings_expected[index_yf], population.fleets[fleet_]->landings_expected[year]);
         }
     }
 }

@@ -77,27 +77,27 @@ test_that("deterministic test of fims", {
   # F (fixed at initial "true" values)
   expect_equal(report[["F_mort"]][[1]], om_output_list[[iter_id]][["f"]])
 
-  # Expected catch
-  fims_catch <- report[["exp_catch"]]
+  # Expected landings
+  fims_landings <- report[["exp_landings"]]
   for (i in 1:length(om_output_list[[iter_id]][["L.mt"]][["fleet1"]])) {
-    expect_equal(fims_catch[[1]][i], om_output_list[[iter_id]][["L.mt"]][["fleet1"]][i])
+    expect_equal(fims_landings[[1]][i], om_output_list[[iter_id]][["L.mt"]][["fleet1"]][i])
   }
 
   # Expect small relative error for deterministic test
   fims_object_are <- rep(0, length(em_input_list[[iter_id]][["L.obs"]][["fleet1"]]))
   for (i in 1:length(em_input_list[[iter_id]][["L.obs"]][["fleet1"]])) {
-    fims_object_are[i] <- abs(fims_catch[[1]][i] - em_input_list[[iter_id]][["L.obs"]][["fleet1"]][i]) / em_input_list[[iter_id]][["L.obs"]][["fleet1"]][i]
+    fims_object_are[i] <- abs(fims_landings[[1]][i] - em_input_list[[iter_id]][["L.obs"]][["fleet1"]][i]) / em_input_list[[iter_id]][["L.obs"]][["fleet1"]][i]
   }
 
   # Expect 95% of relative error to be within 2*cv
   expect_lte(sum(fims_object_are > om_input_list[[iter_id]][["cv.L"]][["fleet1"]] * 2.0), length(em_input_list[[iter_id]][["L.obs"]][["fleet1"]]) * 0.05)
 
-  # Compare expected catch number at age to true values
+  # Compare expected landings number at age to true values
   for (i in 1:length(c(t(om_output_list[[iter_id]][["L.age"]][["fleet1"]])))) {
     expect_equal(report[["cnaa"]][[1]][i], c(t(om_output_list[[iter_id]][["L.age"]][["fleet1"]]))[i])
   }
 
-  # Expected catch number at age in proportion
+  # Expected landings number at age in proportion
   # QUESTION: Isn't this redundant with the non-proportion test above?
   fims_cnaa <- matrix(report[["cnaa"]][[1]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
     nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
@@ -131,7 +131,7 @@ test_that("deterministic test of fims", {
     length(em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]]) * 0.05
   )
 
-  # Expected catch number at age in proportion
+  # Expected landings number at age in proportion
   fims_cnaa <- matrix(report[["cnaa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
     nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
@@ -177,8 +177,8 @@ test_that("nll test of fims", {
     om_input_list[[iter_id]][["logR_sd"]], TRUE
   ))
 
-  # catch and survey index expected likelihoods
-  catch_nll <- catch_nll_fleet <- -sum(dlnorm(
+  # landings and survey index expected likelihoods
+  landings_nll <- landings_nll_fleet <- -sum(dlnorm(
     em_input_list[[iter_id]][["L.obs"]][["fleet1"]],
     log(om_output_list[[iter_id]][["L.mt"]][["fleet1"]]),
     sqrt(log(em_input_list[[iter_id]][["cv.L"]][["fleet1"]]^2 + 1)), TRUE
@@ -233,11 +233,11 @@ test_that("nll test of fims", {
   }
   lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
 
-  expected_jnll <- rec_nll + catch_nll + index_nll + age_comp_nll + lengthcomp_nll
+  expected_jnll <- rec_nll + landings_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
 
   expect_equal(report[["nll_components"]][1], rec_nll)
-  expect_equal(report[["nll_components"]][2], catch_nll_fleet)
+  expect_equal(report[["nll_components"]][2], landings_nll_fleet)
   expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
   expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
   expect_equal(report[["nll_components"]][5], index_nll_survey)

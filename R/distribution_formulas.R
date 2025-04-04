@@ -166,18 +166,18 @@ get_expected_name <- function(family, data_type) {
   expected_name <- dplyr::case_when(
     data_type == "landings" &&
       grepl("lognormal|gaussian", family_string) &&
-      link_string == "log" ~ "log_expected_catch",
+      link_string == "log" ~ "log_landings_expected",
     data_type == "landings" &&
       grepl("lognormal|gaussian", family_string) &&
-      link_string == "identity" ~ "expected_catch",
+      link_string == "identity" ~ "landings_expected",
     data_type == "index" &&
       grepl("lognormal|gaussian", family_string) &&
-      link_string == "log" ~ "log_expected_index",
+      link_string == "log" ~ "log_index_expected",
     data_type == "index" &&
       grepl("lognormal|gaussian", family_string) &&
-      link_string == "identity" ~ "expected_index",
-    grepl("agecomp", data_type) ~ "proportion_catch_numbers_at_age",
-    grepl("lengthcomp", data_type) ~ "proportion_catch_numbers_at_length",
+      link_string == "identity" ~ "index_expected",
+    grepl("agecomp", data_type) ~ "proportion_numbers_at_age",
+    grepl("lengthcomp", data_type) ~ "proportion_numbers_at_length",
   )
   # Check combination of entries was okay and led to valid name
   if (is.na(expected_name)) {
@@ -335,7 +335,7 @@ initialize_data_distribution <- function(
 
   # setup link to observed data
   if (data_type == "landings") {
-    new_module$set_observed_data(module$GetObservedCatchDataID())
+    new_module$set_observed_data(module$GetObservedLandingsDataID())
   }
   if (data_type == "index") {
     new_module$set_observed_data(module$GetObservedIndexDataID())

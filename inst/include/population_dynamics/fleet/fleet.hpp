@@ -33,15 +33,19 @@ namespace fims_popdy {
         std::shared_ptr<SelectivityBase<Type>>
         selectivity; /*!< selectivity component*/
 
-  // catch data
-  int fleet_observed_catch_data_id_m = -999; /*!< id of catch data */
+  // landings data
+  int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */
   std::shared_ptr<fims_data_object::DataObject<Type>>
-    observed_catch_data; /*!< observed catch data*/
+    observed_landings_data; /*!< observed landings data*/
+
+    bool observed_landings_in_weight = true; /*!< is this fleet landings in weight*/
 
   // index data
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
   std::shared_ptr<fims_data_object::DataObject<Type>>
     observed_index_data; /*!< observed index data*/
+
+    bool observed_index_in_weight = true; /*!< is this fleet index in weight*/
 
   // age comp data
   int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
@@ -53,39 +57,44 @@ namespace fims_popdy {
   std::shared_ptr<fims_data_object::DataObject<Type>>
     observed_lengthcomp_data; /*!< observed lengthcomp data*/
 
-  // Mortality and catchability
+  // Mortality and landingsability
   fims::Vector<Type>
       log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  fims::Vector<Type> log_q; /*!< estimated parameter: catchability of the fleet */
+  fims::Vector<Type> log_q; /*!< estimated parameter: landingsability of the fleet */
 
         fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
-        fims::Vector<Type> q; /*!< transformed parameter: the catchability of the fleet */
+        fims::Vector<Type> q; /*!< transformed parameter: the landingsability of the fleet */
 
         // derived quantities
-        fims::Vector<Type> catch_at_age; /*!<derived quantity catch at age*/
-        fims::Vector<Type> age_composition; /*!<derived quantity age composition*/
-        fims::Vector<Type> length_composition; /*!<derived quantity length composition*/
-        fims::Vector<Type> age_length_conversion_matrix; /*!<derived quantity age-length transition matrix*/
-
-        // derived quantities
-        fims::Vector<Type> observed_catch_lpdf; /*!<observed total catch linked
-    to log probability density function*/
-        fims::Vector<Type> observed_index_lpdf; /*!<observed index of abundance linked
-    to log probability density function*/
-        fims::Vector<Type> expected_catch; /*!<model expected total catch*/
-        fims::Vector<Type> expected_index; /*!<model expected index of abundance*/
-        fims::Vector<Type> log_expected_catch; /*!<model expected log total catch*/
-        fims::Vector<Type> log_expected_index; /*!<model expected log index of abundance*/
-        fims::Vector<Type> expected_catch_lpdf; /*!<model expected total catch linked
-    to log probability density function*/
-        fims::Vector<Type> expected_index_lpdf; /*!<model expected index of abundance linked
-    to log probability density function*/
-        fims::Vector<Type> catch_numbers_at_age; /*!<model expected catch at age*/
-        fims::Vector<Type> catch_numbers_at_length; /*!<model expected catch at length*/
-        fims::Vector<Type> proportion_catch_numbers_at_age; /*!<model expected catch at age*/
-        fims::Vector<Type> proportion_catch_numbers_at_length; /*!<model expected catch at length*/
-        fims::Vector<Type> catch_weight_at_age; /*!<model expected weight at age*/
-        bool is_survey = false; /*!< is this fleet object a survey*/
+        // landings
+        fims::Vector<Type> landings_weight; /*!<model landings in weight*/
+        fims::Vector<Type> landings_numbers; /*!<model landings in numbers*/
+        fims::Vector<Type> landings_expected; /*!<model expected landings*/
+        fims::Vector<Type> log_landings_weight; /*!<model log landings in weight*/
+        fims::Vector<Type> log_landings_numbers; /*!<model log landings in numbers*/
+        fims::Vector<Type> log_landings_expected; /*!<model log expected landings*/
+        fims::Vector<Type> landings_numbers_at_age; /*!<model landings numbers at age*/
+        fims::Vector<Type> landings_weight_at_age; /*!<model landings weight at age*/
+        fims::Vector<Type> landings_numbers_at_length; /*!<model landings numbers at length*/
+        
+        // index
+        fims::Vector<Type> index_weight; /*!<model index of abundance in weight*/
+        fims::Vector<Type> index_numbers; /*!<model index of abundance in numbers*/
+        fims::Vector<Type> index_expected; /*!<model expected index of abundance*/
+        fims::Vector<Type> log_index_weight; /*!<model log index of abundance in weight*/
+        fims::Vector<Type> log_index_numbers; /*!<model log index of abundance in numbers*/
+        fims::Vector<Type> log_index_expected; /*!<model expected log index of abundance*/
+        fims::Vector<Type> index_numbers_at_age; /*!<model index sampled numbers at age*/
+        fims::Vector<Type> index_weight_at_age; /*!<model index weight at age*/
+        fims::Vector<Type> index_numbers_at_length; /*!<model index sampled numbers at length*/
+        
+        // composition
+        fims::Vector<Type> age_to_length_conversion; /*!<derived quantity age to length conversion matrix*/
+        fims::Vector<Type> composition_numbers_at_age; /*!<model expected composition numbers at age*/
+        fims::Vector<Type> composition_numbers_at_length; /*!<model expected composition numbers at length*/
+        fims::Vector<Type> proportion_numbers_at_age; /*!<model expected composition proportion numbers at age*/
+        fims::Vector<Type> proportion_numbers_at_length; /*!<model expected composition proportion numbers at length*/
+        
 
 #ifdef TMB_MODEL
         ::objective_function<Type> *of;
@@ -118,23 +127,38 @@ namespace fims_popdy {
             this->nyears = nyears;
             this->nages = nages;
             this->nlengths = nlengths;
-
-            catch_at_age.resize(nyears * nages);
-            catch_numbers_at_age.resize(nyears * nages);
-            catch_numbers_at_length.resize(nyears * nlengths);
-            proportion_catch_numbers_at_age.resize(nyears * nages);
-            proportion_catch_numbers_at_length.resize(nyears * nlengths);
-            age_length_conversion_matrix.resize(nages * nlengths);
-            catch_weight_at_age.resize(nyears * nages);
-            expected_catch.resize(nyears);
-            expected_index.resize(nyears);
-            log_expected_catch.resize(nyears);
-            log_expected_index.resize(nyears);
-            age_composition.resize(nyears * nages);
-            length_composition.resize(nyears * nlengths);
             q.resize(this->log_q.size());
             log_Fmort.resize(nyears);
             Fmort.resize(nyears);
+            
+            //landings
+            landings_numbers_at_age.resize(nyears * nages);
+            landings_weight_at_age.resize(nyears * nages);
+            landings_numbers_at_length.resize(nyears * nlengths);
+            landings_weight.resize(nyears);
+            landings_numbers.resize(nyears);
+            landings_expected.resize(nyears);
+            log_landings_weight.resize(nyears);
+            log_landings_numbers.resize(nyears);
+            log_landings_expected.resize(nyears);
+
+            //index
+            index_numbers_at_age.resize(nyears * nages);
+            index_weight_at_age.resize(nyears * nages);
+            index_numbers_at_length.resize(nyears * nlengths);
+            index_weight.resize(nyears);
+            index_numbers.resize(nyears);
+            index_expected.resize(nyears);
+            log_index_weight.resize(nyears);
+            log_index_numbers.resize(nyears);
+            log_index_expected.resize(nyears);
+
+            //composition
+            composition_numbers_at_age.resize(nyears * nages);
+            composition_numbers_at_length.resize(nyears * nlengths);
+            proportion_numbers_at_age.resize(nyears * nages);
+            proportion_numbers_at_length.resize(nyears * nlengths);
+            age_to_length_conversion.resize(nages * nlengths);
         }
 
         /**
@@ -147,32 +171,6 @@ namespace fims_popdy {
             // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
             // this -> Fmort[fleet_] = fims_math::exp(this -> log_Fmort[fleet_]);
 
-            // derived quantities
-            std::fill(catch_at_age.begin(), catch_at_age.end(),
-                    0); /**<derived quantity catch at age*/
-            std::fill(age_composition.begin(), age_composition.end(), 
-                    static_cast<Type>(0)); /**<model expected number at age */
-            std::fill(length_composition.begin(), length_composition.end(), 
-                    static_cast<Type>(0)); /**<model expected number at length */
-            std::fill(expected_catch.begin(), expected_catch.end(),
-                    static_cast<Type>(0)); /**<model expected total catch*/
-            std::fill(expected_index.begin(), expected_index.end(),
-                    0); /**<model expected index of abundance*/
-            std::fill(log_expected_catch.begin(), log_expected_catch.end(),
-                    0); /**<model log of expected total catch*/
-            std::fill(log_expected_index.begin(), log_expected_index.end(),
-                    0); /**<model log of expected index of abundance*/
-            std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(),
-                    static_cast<Type>(0)); /**<model expected catch at age*/
-            std::fill(proportion_catch_numbers_at_age.begin(), proportion_catch_numbers_at_age.end(),
-                    static_cast<Type>(0)); /**<model expected catch at age*/
-            std::fill(catch_numbers_at_length.begin(), catch_numbers_at_length.end(),
-                    static_cast<Type>(0)); /**<model expected catch at length*/
-            std::fill(proportion_catch_numbers_at_length.begin(), proportion_catch_numbers_at_length.end(),
-                    static_cast<Type>(0)); /**<model expected catch at length*/
-            std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
-                    static_cast<Type>(0)); /**<model expected weight at age*/
-
             for (size_t i = 0; i < this->log_q.size(); i++) {
                 this->q[i] = fims_math::exp(this->log_q[i]);
             }
@@ -180,48 +178,129 @@ namespace fims_popdy {
             for (size_t year = 0; year < this->nyears; year++) {
                 this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
             }
+
+            // derived quantities
+            // landings
+            std::fill(landings_weight.begin(), landings_weight.end(),
+                    static_cast<Type>(0)); /**<model landings in weight*/
+            std::fill(landings_numbers.begin(), landings_numbers.end(),
+                    static_cast<Type>(0)); /**<model landings in numbers*/
+            std::fill(landings_expected.begin(), landings_expected.end(),
+                    static_cast<Type>(0)); /**<model expected landings*/
+            std::fill(log_landings_weight.begin(), log_landings_weight.end(),
+                    static_cast<Type>(0)); /**<model log of landings in weight*/
+            std::fill(log_landings_numbers.begin(), log_landings_numbers.end(),
+                    static_cast<Type>(0)); /**<model log of landings in numbers*/
+            std::fill(log_landings_expected.begin(), log_landings_expected.end(),
+                    static_cast<Type>(0)); /**<model log of expected landings*/
+            std::fill(landings_numbers_at_age.begin(), landings_numbers_at_age.end(),
+                    static_cast<Type>(0)); /**<model landings numbers at age*/
+            std::fill(landings_weight_at_age.begin(), landings_weight_at_age.end(),
+                    static_cast<Type>(0)); /**<model landings weight at age*/
+            std::fill(landings_numbers_at_length.begin(), landings_numbers_at_length.end(),
+                    static_cast<Type>(0)); /**<model landings numbers at length*/
+
+            //index
+            std::fill(index_weight.begin(), index_weight.end(),
+                    static_cast<Type>(0)); /**<model index of abundance in weight*/
+            std::fill(index_numbers.begin(), index_numbers.end(),
+                    static_cast<Type>(0)); /**<model index of abundance in numbers*/
+            std::fill(index_expected.begin(), index_expected.end(),
+                    static_cast<Type>(0)); /**<model expected index of abundance*/
+            std::fill(log_index_weight.begin(), log_index_weight.end(),
+                    static_cast<Type>(0)); /**<model log of index of abundance in weight*/
+            std::fill(log_index_numbers.begin(), log_index_numbers.end(),
+                    static_cast<Type>(0)); /**<model log of index of abundance in numbers*/
+            std::fill(log_index_expected.begin(), log_index_expected.end(),
+                    static_cast<Type>(0)); /**<model log of expected index of abundance*/
+            std::fill(index_numbers_at_age.begin(), index_numbers_at_age.end(),
+                    static_cast<Type>(0)); /**<model index numbers at age*/
+            std::fill(index_weight_at_age.begin(), index_weight_at_age.end(),
+                    static_cast<Type>(0)); /**<model index weight at age*/
+            std::fill(index_numbers_at_length.begin(), index_numbers_at_length.end(),
+                    static_cast<Type>(0)); /**<model index numbers at length*/
+
+            //composition
+            std::fill(composition_numbers_at_age.begin(), composition_numbers_at_age.end(),
+                    static_cast<Type>(0)); /**<model composition numbers at age*/
+            std::fill(composition_numbers_at_length.begin(), composition_numbers_at_length.end(),
+                    static_cast<Type>(0)); /**<model composition numbers at length*/
+            std::fill(proportion_numbers_at_age.begin(), proportion_numbers_at_age.end(),
+                    static_cast<Type>(0)); /**<model expected composition proportion numbers at age*/
+            std::fill(proportion_numbers_at_length.begin(), proportion_numbers_at_length.end(),
+                    static_cast<Type>(0)); /**<model expected composition proportion numbers at length*/
+            std::fill(age_to_length_conversion.begin(), age_to_length_conversion.end(),
+                    static_cast<Type>(0)); /**<model age to length conversion matrix*/
         }
 
         /**
-         * Evaluate the proportion of catch numbers at age.
+         * Evaluate the proportion of landings numbers at age.
          */
         void evaluate_age_comp() {
             for (size_t y = 0; y < this->nyears; y++) {
                 Type sum = static_cast<Type>(0.0);
+                Type sum_obs = static_cast<Type>(0.0);
                 for (size_t a = 0; a < this->nages; a++) {
                     size_t i_age_year = y * this->nages + a;
-                    sum += this->catch_numbers_at_age[i_age_year];
+                    sum += this->composition_numbers_at_age[i_age_year];
+                        
+                    if( this->fleet_observed_agecomp_data_id_m != -999) {
+                        if( this->observed_agecomp_data->at(i_age_year)!=
+                            this->observed_agecomp_data->na_value) {
+                            sum_obs += this->observed_agecomp_data->at(i_age_year);
+                        }
+                    }
                 }
                 for (size_t a = 0; a < this->nages; a++) {
                     size_t i_age_year = y * this->nages + a;
-                    this->proportion_catch_numbers_at_age[i_age_year] = this->catch_numbers_at_age[i_age_year] / sum;
+                    this->proportion_numbers_at_age[i_age_year] = 
+                    this->composition_numbers_at_age[i_age_year] / sum;
 
+                    if( fleet_observed_agecomp_data_id_m != -999) {
+                        this->composition_numbers_at_age[i_age_year] = 
+                        this->proportion_numbers_at_age[i_age_year] * 
+                        sum_obs;
+                    }
                 }
             }
         }
 
         /**
-         * Evaluate the proportion of catch numbers at length.
+         * Evaluate the proportion of landings numbers at length.
          */
         void evaluate_length_comp() {
             if (this->nlengths > 0) {
                 for (size_t y = 0; y < this->nyears; y++) {
+                    Type sum_obs = static_cast<Type>(0.0);
                     Type sum = static_cast<Type>(0.0);
                     for (size_t l = 0; l < this->nlengths; l++) {
                         size_t i_length_year = y * this->nlengths + l;
                         for(size_t a = 0; a < this->nages; a++) {
                             size_t i_age_year = y * this->nages + a;
                             size_t i_length_age = a * this->nlengths + l;
-                            this->catch_numbers_at_length[i_length_year] += 
-                            this->catch_numbers_at_age[i_age_year] * 
-                            this->age_length_conversion_matrix[i_length_age];
+                            this->composition_numbers_at_length[i_length_year] += 
+                            this->composition_numbers_at_age[i_age_year] * 
+                            this->age_to_length_conversion[i_length_age];
                         }
-                        sum += this->catch_numbers_at_length[i_length_year];
+                        sum += this->composition_numbers_at_length[i_length_year];
+                        
+                        if( this->fleet_observed_lengthcomp_data_id_m != -999) {
+                            if( this->observed_lengthcomp_data->at(i_length_year)!=
+                                this->observed_lengthcomp_data->na_value) {
+                                sum_obs += this->observed_lengthcomp_data->at(i_length_year);
+                            }
+                        }
                     }
                     for (size_t l = 0; l < this->nlengths; l++) {
                         size_t i_length_year = y * this->nlengths + l;
-                        this->proportion_catch_numbers_at_length[i_length_year] = 
-                        this->catch_numbers_at_length[i_length_year] / sum;
+                        this->proportion_numbers_at_length[i_length_year] = 
+                        this->composition_numbers_at_length[i_length_year] / sum;
+
+                        if( this->fleet_observed_lengthcomp_data_id_m != -999) {
+                            this->composition_numbers_at_length[i_length_year] = 
+                            this->proportion_numbers_at_length[i_length_year] * 
+                            sum_obs;
+                        }
                     }
                 }
             }
@@ -231,17 +310,31 @@ namespace fims_popdy {
          * Evaluate the natural log of the expected index.
          */
         void evaluate_index() {
-            for (size_t i = 0; i<this->expected_index.size(); i++) {
-                log_expected_index[i] = log(this->expected_index[i]);
+            for (size_t i = 0; i<this->index_weight.size(); i++) {
+                log_index_weight[i] = log(this->index_weight[i]);
+                log_index_numbers[i] = log(this->index_numbers[i]);
+                if(this->observed_index_in_weight) {
+                    index_expected[i] = this->index_weight[i];
+                } else {
+                    index_expected[i] = this->index_numbers[i];
+                }
+                log_index_expected[i] = log(this->index_expected[i]);
             }
         }
 
         /**
-         * Evaluate the natural log of the expected catch.
+         * Evaluate the natural log of the expected landings.
          */
-        void evaluate_catch() {
-            for (size_t i = 0; i<this->expected_catch.size(); i++) {
-                log_expected_catch[i] = log(this->expected_catch[i]);
+        void evaluate_landings() {
+            for (size_t i = 0; i<this->landings_weight.size(); i++) {
+                log_landings_weight[i] = log(this->landings_weight[i]);
+                log_landings_numbers[i] = log(this->landings_numbers[i]);
+                if(this->observed_landings_in_weight) {
+                    landings_expected[i] = this->landings_weight[i];
+                } else {
+                    landings_expected[i] = this->landings_numbers[i];
+                }
+                log_landings_expected[i] = log(this->landings_expected[i]);
             }
         }
     };

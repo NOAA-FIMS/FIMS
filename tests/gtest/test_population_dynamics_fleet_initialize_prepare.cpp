@@ -10,17 +10,17 @@ namespace
         fims_popdy::Fleet<double> fleet;
         int nyears = 30;
         int nages = 12;  
-        fleet.expected_catch.resize(nyears);
-        fleet.expected_index.resize(nyears);  
-        fleet.catch_numbers_at_age.resize(nyears * nages);
+        fleet.landings_expected.resize(nyears);
+        fleet.index_expected.resize(nyears);  
+        fleet.landings_numbers_at_age.resize(nyears * nages);
         fleet.Initialize(nyears, nages);
         fleet.Prepare();
         
       
         EXPECT_EQ(fleet.log_Fmort.size(), nyears);
         EXPECT_EQ(fleet.Fmort.size(), nyears);
-        EXPECT_EQ(fleet.catch_weight_at_age.size(), nyears*nages);
-        EXPECT_EQ(fleet.log_expected_catch.size(), nyears);
+        EXPECT_EQ(fleet.landings_weight_at_age.size(), nyears*nages);
+        EXPECT_EQ(fleet.log_landings_expected.size(), nyears);
     }
 
     TEST(FleetTests, FleetPrepareWorks)
@@ -28,9 +28,9 @@ namespace
         fims_popdy::Fleet<double> fleet;
         int nyears = 30;
         int nages = 12;
-        fleet.expected_catch.resize(nyears);
-        fleet.expected_index.resize(nyears);  
-        fleet.catch_numbers_at_age.resize(nyears * nages);
+        fleet.landings_expected.resize(nyears);
+        fleet.index_expected.resize(nyears);  
+        fleet.landings_numbers_at_age.resize(nyears * nages);
          fleet.log_q.resize(1);//needs to be initialized here, size used by q in Initialize
         fleet.Initialize(nyears, nages);
 

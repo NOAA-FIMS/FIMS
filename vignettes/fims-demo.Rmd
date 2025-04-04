@@ -85,7 +85,7 @@ By just passing lists of fleet specifications and the data to `create_default_pa
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
-    Catch = "DlnormDistribution",
+    Landings = "DlnormDistribution",
     Index = "DlnormDistribution",
     AgeComp = "DmultinomDistribution",
     LengthComp = "DmultinomDistribution"
@@ -258,14 +258,14 @@ ggplot2::ggplot(index_results, ggplot2::aes(x = years, y = observed)) +
   ggplot2::geom_line(ggplot2::aes(x = years, y = expected), color = "blue") +
   ggplot2::theme_bw()
 
-catch_results <- data.frame(
+landings_results <- data.frame(
   observed = m_landings(data_4_model, fleet = "fleet1"),
-  expected = get_report(fit)[["exp_catch"]][[1]],
+  expected = get_report(fit)[["exp_landings"]][[1]],
   years = get_start_year(data_4_model):get_end_year(data_4_model)
 )
-print(catch_results)
+print(landings_results)
 
-ggplot2::ggplot(catch_results, ggplot2::aes(x = years, y = observed)) +
+ggplot2::ggplot(landings_results, ggplot2::aes(x = years, y = observed)) +
   ggplot2::geom_point() +
   ggplot2::xlab("Year") +
   ggplot2::ylab("Index (mt)") +
@@ -323,7 +323,7 @@ fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
     Index = "DlnormDistribution",
-    Catch = "DlnormDistribution",
+    Landings = "DlnormDistribution",
     AgeComp = "DmultinomDistribution"
   )
 )
@@ -351,7 +351,7 @@ fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
     Index = "DlnormDistribution",
-    Catch = "DlnormDistribution",
+    Landings = "DlnormDistribution",
     LengthComp = "DmultinomDistribution"
   )
 )

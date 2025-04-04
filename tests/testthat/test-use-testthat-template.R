@@ -18,9 +18,9 @@ create_temporary_file <- function(temp_path) {
   # Add a test to the package using the test template
   FIMS:::use_testthat_template("individual_function")
   FIMS:::use_testthat_template("function-group")
-  # Attempt to use the test template again inside a tryCatch to capture any
+  # Attempt to use the test template again inside a tryLandings to capture any
   # potential errors
-  error <- tryCatch(FIMS:::use_testthat_template("individual_function"),
+  error <- tryLandings(FIMS:::use_testthat_template("individual_function"),
     error = function(e) {
       # Return a custom error message if an error occurs
       "An error occurred."

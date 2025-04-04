@@ -86,9 +86,9 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt interface_observed_index_data_id_m = -999;
   /**
-   * @brief The ID of the observed catch data object.
+   * @brief The ID of the observed landings data object.
    */
-  SharedInt interface_observed_catch_data_id_m = -999;
+  SharedInt interface_observed_landings_data_id_m = -999;
   /**
    * @brief The ID of the selectivity object.
    */
@@ -112,7 +112,18 @@ public:
    */
   SharedInt nyears = 0;
   /**
-   * @brief The natural log of the catchability parameter for this fleet.
+   * @brief Are observed landings for this fleet measured in weight. 
+   * Default is TRUE, if measured in numbers set to FALSE.
+   */
+  SharedBoolean observed_landings_in_weight = true;
+  /**
+   * @brief Is the observed index of abundance for this fleet measured in  
+   * weight. Default is TRUE, if measured in numbers set to FALSE.
+   */
+  SharedBoolean observed_index_in_weight = true;
+  /**
+   * @brief The natural log of the index of abundance scaling parameter 
+   * for this fleet.
    */
   ParameterVector log_q;
   /**
@@ -121,54 +132,74 @@ public:
    */
   ParameterVector log_Fmort;
   /**
-   * @brief The vector of natural log of the expected total catch for the fleet.
+   * @brief The vector of natural log of the expected total landings for 
+   * the fleet.
    */
-  ParameterVector log_expected_catch;
+  ParameterVector log_landings_expected;
   /**
-   * @brief The vector of natural log of the expected index of abundance for the fleet.
+   * @brief The vector of natural log of the expected index of abundance 
+   * for the fleet.
    */
-  ParameterVector log_expected_index;
+  ParameterVector log_index_expected;
   /**
-   * @brief The vector of expected catch-at-age in numbers for the fleet.
+   * @brief The vector of expected landings-at-age in numbers for the fleet.
    */
-  ParameterVector proportion_catch_numbers_at_age;
+  ParameterVector proportion_numbers_at_age;
   /**
-   * @brief The vector of expected catch-at-length in numbers for the fleet.
+   * @brief The vector of expected landings-at-length in numbers for the fleet.
    */
-  ParameterVector proportion_catch_numbers_at_length;
+  ParameterVector proportion_numbers_at_length;
   /**
-   * @brief The vector of conversions to go from age to length, i.e., the age-to-length-conversion matrix.
+   * @brief The vector of conversions to go from age to length, i.e., the 
+   * age-to-length-conversion matrix.
    */
-  ParameterVector age_length_conversion_matrix;
+  ParameterVector age_to_length_conversion;
   /**
-   * @brief Should catchability (q) be estimated? The default is false.
+   * @brief Should index scaling parameter (q) be estimated? 
+   * The default is false.
    */
   SharedBoolean estimate_q = false;
   /**
-   * @brief Is catchability (q) a random effect? The default is false.
+   * @brief Is landingsability (q) a random effect? The default is false.
    */
   SharedBoolean random_q = false;
   // derived quantities
   /**
-   * @brief Derived catch-at-age in numbers.
+   * @brief Derived landings-at-age in numbers.
    */
-  Rcpp::NumericVector derived_cnaa;
+  Rcpp::NumericVector derived_landings_naa;
   /**
-   * @brief Derived catch-at-length in numbers.
+   * @brief Derived landings-at-length in numbers.
    */
-  Rcpp::NumericVector derived_cnal;
+  Rcpp::NumericVector derived_landings_nal;
   /**
-   * @brief Derived catch-at-age in weight (mt).
+   * @brief Derived landings-at-age in weight (mt).
    */
-  Rcpp::NumericVector derived_cwaa;  
+  Rcpp::NumericVector derived_landings_waa;  
   /**
-   * @brief Derived catch.
+   * @brief Derived landings in observed units.
    */
-  Rcpp::NumericVector derived_catch;
+  Rcpp::NumericVector derived_landings;    
   /**
-   * @brief Derived index.
+   * @brief Derived landings in weight.
+   */
+  Rcpp::NumericVector derived_landings_w;  
+  /**
+   * @brief Derived landings in numbers.
+   */
+  Rcpp::NumericVector derived_landings_n;
+  /**
+   * @brief Derived index in observed units.
    */
   Rcpp::NumericVector derived_index;
+  /**
+   * @brief Derived index in weight.
+   */
+  Rcpp::NumericVector derived_index_w;
+  /**
+   * @brief Derived index in numbers.
+   */
+  Rcpp::NumericVector derived_index_n;
   /**
    * @brief Derived age compositions.
    */
@@ -195,7 +226,7 @@ public:
   interface_observed_agecomp_data_id_m(other.interface_observed_agecomp_data_id_m),
   interface_observed_lengthcomp_data_id_m(other.interface_observed_lengthcomp_data_id_m), 
   interface_observed_index_data_id_m(other.interface_observed_index_data_id_m),
-  interface_observed_catch_data_id_m(other.interface_observed_catch_data_id_m), 
+  interface_observed_landings_data_id_m(other.interface_observed_landings_data_id_m), 
   interface_selectivity_id_m(other.interface_selectivity_id_m), 
   name(other.name), 
   nages(other.nages), 
@@ -203,18 +234,24 @@ public:
   nyears(other.nyears), 
   log_q(other.log_q), 
   log_Fmort(other.log_Fmort), 
-  log_expected_index(other.log_expected_index), 
-  log_expected_catch(other.log_expected_catch),
-  proportion_catch_numbers_at_age(other.proportion_catch_numbers_at_age), 
-  proportion_catch_numbers_at_length(other.proportion_catch_numbers_at_length),
-  age_length_conversion_matrix(other.age_length_conversion_matrix), 
+  log_index_expected(other.log_index_expected), 
+  log_landings_expected(other.log_landings_expected),
+  proportion_numbers_at_age(other.proportion_numbers_at_age), 
+  proportion_numbers_at_length(other.proportion_numbers_at_length),
+  age_to_length_conversion(other.age_to_length_conversion), 
   estimate_q(other.estimate_q), 
   random_q(other.random_q), 
-  derived_cnaa(other.derived_cnaa), 
-  derived_cnal(other.derived_cnal), 
-  derived_cwaa(other.derived_cwaa), 
-  derived_index(other.derived_index),  
-  derived_catch(other.derived_catch), 
+  observed_landings_in_weight(other.observed_landings_in_weight), 
+  observed_index_in_weight(other.observed_index_in_weight), 
+  derived_landings_naa(other.derived_landings_naa), 
+  derived_landings_nal(other.derived_landings_nal), 
+  derived_landings_waa(other.derived_landings_waa), 
+  derived_index(other.derived_index),   
+  derived_index_w(other.derived_index_w),  
+  derived_index_n(other.derived_index_n), 
+  derived_landings(other.derived_landings),
+  derived_landings_w(other.derived_landings_w),
+  derived_landings_n(other.derived_landings_n), 
   derived_age_composition(other.derived_age_composition), 
   derived_length_composition(other.derived_length_composition) {}
 
@@ -233,7 +270,7 @@ public:
    * @brief Set the unique ID for the observed age-composition data object.
    * @param observed_agecomp_data_id Unique ID for the observed data object.
    */
-  void SetObservedAgeCompData(int observed_agecomp_data_id) {
+  void SetObservedAgeCompDataID(int observed_agecomp_data_id) {
     interface_observed_agecomp_data_id_m.set(observed_agecomp_data_id);
   }
 
@@ -241,7 +278,7 @@ public:
    * @brief Set the unique ID for the observed length-composition data object.
    * @param observed_lengthcomp_data_id Unique ID for the observed data object.
    */
-  void SetObservedLengthCompData(int observed_lengthcomp_data_id) {
+  void SetObservedLengthCompDataID(int observed_lengthcomp_data_id) {
     interface_observed_lengthcomp_data_id_m.set(observed_lengthcomp_data_id);
   }
 
@@ -249,22 +286,22 @@ public:
    * @brief Set the unique ID for the observed index data object.
    * @param observed_index_data_id Unique ID for the observed data object.
    */
-  void SetObservedIndexData(int observed_index_data_id) {
+  void SetObservedIndexDataID(int observed_index_data_id) {
     interface_observed_index_data_id_m.set(observed_index_data_id);
   }
 
   /**
-   * @brief Set the unique ID for the observed catch data object.
-   * @param observed_catch_data_id Unique ID for the observed data object.
+   * @brief Set the unique ID for the observed landings data object.
+   * @param observed_landings_data_id Unique ID for the observed data object.
    */
-  void SetObservedCatchData(int observed_catch_data_id) {
-    interface_observed_catch_data_id_m.set(observed_catch_data_id);
+  void SetObservedLandingsDataID(int observed_landings_data_id) {
+    interface_observed_landings_data_id_m.set(observed_landings_data_id);
   }
   /**
    * @brief Set the unique ID for the selectivity object.
    * @param selectivity_id Unique ID for the observed object.
    */
-  void SetSelectivity(int selectivity_id) {
+  void SetSelectivityID(int selectivity_id) {
     interface_selectivity_id_m.set(selectivity_id);
   }
 
@@ -291,10 +328,10 @@ public:
   }
 
   /**
-   * @brief Get the unique id for the observed catch data object.
+   * @brief Get the unique id for the observed landings data object.
    */
-  int GetObservedCatchDataID() {
-    return interface_observed_catch_data_id_m.get();
+  int GetObservedLandingsDataID() {
+    return interface_observed_landings_data_id_m.get();
   }
   /** 
    * @brief Extracts the derived quantities from `Information` to the Rcpp
@@ -340,39 +377,59 @@ public:
         }
       }
 
-      this->derived_cnaa = Rcpp::NumericVector(fleet->catch_numbers_at_age.size());
-      for (R_xlen_t i = 0; i < this->derived_cnaa.size(); i++) {
-        this->derived_cnaa[i] = fleet->catch_numbers_at_age[i];
+      this->derived_landings_naa = Rcpp::NumericVector(fleet->landings_numbers_at_age.size());
+      for (R_xlen_t i = 0; i < this->derived_landings_naa.size(); i++) {
+        this->derived_landings_naa[i] = fleet->landings_numbers_at_age[i];
       }
 
-      this->derived_cnal = Rcpp::NumericVector(fleet->catch_numbers_at_length.size());
-      for (R_xlen_t i = 0; i < this->derived_cnal.size(); i++) {
-        this->derived_cnal[i] = fleet->catch_numbers_at_length[i];
+      this->derived_landings_nal = Rcpp::NumericVector(fleet->landings_numbers_at_length.size());
+      for (R_xlen_t i = 0; i < this->derived_landings_nal.size(); i++) {
+        this->derived_landings_nal[i] = fleet->landings_numbers_at_length[i];
       }
 
-      this->derived_cwaa = Rcpp::NumericVector(fleet->catch_weight_at_age.size());
-      for (R_xlen_t i = 0; i < this->derived_cwaa.size(); i++) {
-        this->derived_cwaa[i] = fleet->catch_weight_at_age[i];
+      this->derived_landings_waa = Rcpp::NumericVector(fleet->landings_weight_at_age.size());
+      for (R_xlen_t i = 0; i < this->derived_landings_waa.size(); i++) {
+        this->derived_landings_waa[i] = fleet->landings_weight_at_age[i];
       }
 
-      this->derived_age_composition = Rcpp::NumericVector(fleet->proportion_catch_numbers_at_age.size());
+      this->derived_age_composition = Rcpp::NumericVector(fleet->proportion_numbers_at_age.size());
       for (R_xlen_t i = 0; i < this->derived_age_composition.size(); i++) {
-        this->derived_age_composition[i] = fleet->proportion_catch_numbers_at_age[i];
+        this->derived_age_composition[i] = fleet->proportion_numbers_at_age[i];
       }
 
-      this->derived_length_composition = Rcpp::NumericVector(fleet->proportion_catch_numbers_at_length.size());
+      this->derived_length_composition = Rcpp::NumericVector(fleet->proportion_numbers_at_length.size());
       for (R_xlen_t i = 0; i < this->derived_length_composition.size(); i++) {
-        this->derived_length_composition[i] = fleet->proportion_catch_numbers_at_length[i];
+        this->derived_length_composition[i] = fleet->proportion_numbers_at_length[i];
       }
 
-      this->derived_index = Rcpp::NumericVector(fleet->expected_index.size());
+      this->derived_index_w = Rcpp::NumericVector(fleet->index_weight.size());
+      for (R_xlen_t i = 0; i < this->derived_index_w.size(); i++) {
+        this->derived_index_w[i] = fleet->index_weight[i];
+      }
+
+      this->derived_index_n = Rcpp::NumericVector(fleet->index_numbers.size());
+      for (R_xlen_t i = 0; i < this->derived_index_n.size(); i++) {
+        this->derived_index_n[i] = fleet->index_numbers[i];
+      }
+
+      this->derived_index = Rcpp::NumericVector(fleet->index_expected.size());
       for (R_xlen_t i = 0; i < this->derived_index.size(); i++) {
-        this->derived_index[i] = fleet->expected_index[i];
+        this->derived_index[i] = fleet->index_expected[i];
       }
 
-      this->derived_catch = Rcpp::NumericVector(fleet->expected_catch.size());
-      for (R_xlen_t i = 0; i < this->derived_catch.size(); i++) {
-        this->derived_catch[i] = fleet->expected_catch[i];
+      this->derived_landings = Rcpp::NumericVector(fleet->landings_expected.size());
+      for (R_xlen_t i = 0; i < this->derived_landings.size(); i++) {
+        this->derived_landings[i] = fleet->landings_expected[i];
+      }
+
+      this->derived_landings_w = Rcpp::NumericVector(fleet->landings_weight.size());
+      for (R_xlen_t i = 0; i < this->derived_landings_w.size(); i++) {
+        this->derived_landings_w[i] = fleet->landings_weight[i];
+      }
+
+      this->derived_landings_n = Rcpp::NumericVector(fleet->landings_numbers.size());
+      for (R_xlen_t i = 0; i < this->derived_landings_n.size(); i++) {
+        this->derived_landings_n[i] = fleet->landings_numbers[i];
       }
 
     }
@@ -411,48 +468,48 @@ public:
     if (this->nlengths > 0) {
       ss << " ,\n";
       ss << " {\n";
-      ss << " \"name\": \"age_length_conversion_matrix\",\n";
-      ss << " \"id\":" << this->age_length_conversion_matrix.id_m << ",\n";
+      ss << " \"name\": \"age_to_length_conversion\",\n";
+      ss << " \"id\":" << this->age_to_length_conversion.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
-      ss << " \"values\": " << this->age_length_conversion_matrix << "\n}\n";
+      ss << " \"values\": " << this->age_to_length_conversion << "\n}\n";
     }
     ss << "], \"derived_quantities\":[\n";
     ss << "{\n";
     ss << "  \"name\": \"CNAA\",\n";
     ss << "  \"values\":[";
-    if (this->derived_cnaa.size() == 0) {
+    if (this->derived_landings_naa.size() == 0) {
         ss << "]\n";
     } else {
-        for (R_xlen_t i = 0; i < this->derived_cnaa.size() - 1; i++) {
-            ss << this->derived_cnaa[i] << ", ";
+        for (R_xlen_t i = 0; i < this->derived_landings_naa.size() - 1; i++) {
+            ss << this->derived_landings_naa[i] << ", ";
         }
-        ss << this->derived_cnaa[this->derived_cnaa.size() - 1] << "]\n";
+        ss << this->derived_landings_naa[this->derived_landings_naa.size() - 1] << "]\n";
     }
     ss << " },\n";
 
     ss << " {\n";
     ss << "  \"name\": \"CNAL\",\n";
     ss << "  \"values\":[";
-    if (this->derived_cnal.size() == 0) {
+    if (this->derived_landings_nal.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->derived_cnal.size() - 1; i++) {
-        ss << this->derived_cnal[i] << ", ";
+      for (R_xlen_t i = 0; i < this->derived_landings_nal.size() - 1; i++) {
+        ss << this->derived_landings_nal[i] << ", ";
       }
-      ss << this->derived_cnal[this->derived_cnal.size() - 1] << "]\n";
+      ss << this->derived_landings_nal[this->derived_landings_nal.size() - 1] << "]\n";
     }
     ss << " },\n";
 
     ss << " {\n";
     ss << "  \"name\": \"cwaa\",\n";
     ss << "  \"values\":[";
-    if (this->derived_cwaa.size() == 0) {
+    if (this->derived_landings_waa.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->derived_cwaa.size() - 1; i++) {
-        ss << this->derived_cwaa[i] << ", ";
+      for (R_xlen_t i = 0; i < this->derived_landings_waa.size() - 1; i++) {
+        ss << this->derived_landings_waa[i] << ", ";
       }
-      ss << this->derived_cwaa[this->derived_cwaa.size() - 1] << "]\n";
+      ss << this->derived_landings_waa[this->derived_landings_waa.size() - 1] << "]\n";
     }
     ss << " },\n";
 
@@ -484,7 +541,7 @@ public:
     ss << " },\n";
 
     ss << "{\n";
-    ss << "  \"name\": \"ExpectedIndex \",\n";
+    ss << "  \"name\": \"index expected \",\n";
     ss << "  \"values\":[";
     if (this->derived_index.size() == 0) {
       ss << "]\n";
@@ -497,15 +554,67 @@ public:
     ss << " }\n]\n}";
 
     ss << "{\n";
-    ss << "  \"name\": \"catch \",\n";
+    ss << "  \"name\": \"index weight \",\n";
     ss << "  \"values\":[";
-    if (this->derived_catch.size() == 0) {
+    if (this->derived_index_w.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->derived_catch.size() - 1; i++) {
-        ss << this->derived_catch[i] << ", ";
+      for (R_xlen_t i = 0; i < this->derived_index_w.size() - 1; i++) {
+        ss << this->derived_index_w[i] << ", ";
       }
-      ss << this->derived_catch[this->derived_catch.size() - 1] << "]\n";
+      ss << this->derived_index_w[this->derived_index_w.size() - 1] << "]\n";
+    }
+    ss << " }\n]\n}";
+
+    ss << "{\n";
+    ss << "  \"name\": \"index numbers \",\n";
+    ss << "  \"values\":[";
+    if (this->derived_index_n.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->derived_index_n.size() - 1; i++) {
+        ss << this->derived_index_n[i] << ", ";
+      }
+      ss << this->derived_index_n[this->derived_index_n.size() - 1] << "]\n";
+    }
+    ss << " }\n]\n}";
+
+    ss << "{\n";
+    ss << "  \"name\": \"landings expected \",\n";
+    ss << "  \"values\":[";
+    if (this->derived_landings.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->derived_landings.size() - 1; i++) {
+        ss << this->derived_landings[i] << ", ";
+      }
+      ss << this->derived_landings[this->derived_landings.size() - 1] << "]\n";
+    }
+    ss << " }\n]\n}";
+
+    ss << "{\n";
+    ss << "  \"name\": \"landings weight \",\n";
+    ss << "  \"values\":[";
+    if (this->derived_landings_w.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->derived_landings_w.size() - 1; i++) {
+        ss << this->derived_landings_w[i] << ", ";
+      }
+      ss << this->derived_landings_w[this->derived_landings_w.size() - 1] << "]\n";
+    }
+    ss << " }\n]\n}";
+
+    ss << "{\n";
+    ss << "  \"name\": \"landings numbers \",\n";
+    ss << "  \"values\":[";
+    if (this->derived_landings_n.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->derived_landings_n.size() - 1; i++) {
+        ss << this->derived_landings_n[i] << ", ";
+      }
+      ss << this->derived_landings_n[this->derived_landings_n.size() - 1] << "]\n";
     }
     ss << " }\n]\n}";
 
@@ -533,7 +642,9 @@ public:
     fleet->nages = this->nages.get();
     fleet->nlengths = this->nlengths.get();
     fleet->nyears = this->nyears.get();
-    
+    fleet->observed_landings_in_weight = this->observed_landings_in_weight.get();
+    fleet->observed_index_in_weight = this->observed_index_in_weight.get();
+
     fleet->fleet_observed_agecomp_data_id_m =
       interface_observed_agecomp_data_id_m.get();
     
@@ -541,7 +652,7 @@ public:
       interface_observed_lengthcomp_data_id_m.get();
     
     fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m.get();
-    fleet->fleet_observed_catch_data_id_m = interface_observed_catch_data_id_m.get();
+    fleet->fleet_observed_landings_data_id_m = interface_observed_landings_data_id_m.get();
     
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
@@ -581,51 +692,51 @@ public:
     //add to variable_map
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
-    //exp_catch
-    fleet->log_expected_catch.resize(nyears);  // assume catch is for all ages.
-    info->variable_map[this->log_expected_catch.id_m] = &(fleet)->log_expected_catch;
-    fleet->log_expected_index.resize(nyears);  // assume index is for all ages.
-    info->variable_map[this->log_expected_index.id_m] = &(fleet)->log_expected_index;
+    //exp_landings
+    fleet->log_landings_expected.resize(nyears);  // assume landings is for all ages.
+    info->variable_map[this->log_landings_expected.id_m] = &(fleet)->log_landings_expected;
+    fleet->log_index_expected.resize(nyears);  // assume index is for all ages.
+    info->variable_map[this->log_index_expected.id_m] = &(fleet)->log_index_expected;
     
-    fleet->proportion_catch_numbers_at_age.resize(nyears.get() * nages.get());
-    info->variable_map[this->proportion_catch_numbers_at_age.id_m] = &(fleet)->proportion_catch_numbers_at_age;
+    fleet->proportion_numbers_at_age.resize(nyears.get() * nages.get());
+    info->variable_map[this->proportion_numbers_at_age.id_m] = &(fleet)->proportion_numbers_at_age;
     FIMS_INFO_LOG(fims::to_string(this->nyears.get()) + " " + fims::to_string(this->nages.get()));
     FIMS_INFO_LOG(" adding Fleet length object to TMB");
 
     if (this->nlengths > 0) {
-      fleet->proportion_catch_numbers_at_length.resize(this->nyears.get() * this->nlengths.get());
-      fleet->age_length_conversion_matrix.resize(this->age_length_conversion_matrix.size());
+      fleet->proportion_numbers_at_length.resize(this->nyears.get() * this->nlengths.get());
+      fleet->age_to_length_conversion.resize(this->age_to_length_conversion.size());
 
-      if (this->age_length_conversion_matrix.size() !=
+      if (this->age_to_length_conversion.size() !=
               (this->nages.get()*this->nlengths.get())) {
-          FIMS_ERROR_LOG("age_length_conversion_matrix don't match, " +
-                  fims::to_string(this->age_length_conversion_matrix.size()) + " != " +
+          FIMS_ERROR_LOG("age_to_length_conversion don't match, " +
+                  fims::to_string(this->age_to_length_conversion.size()) + " != " +
                   fims::to_string((this->nages.get()*this->nlengths.get())));
       }
 
-      for (size_t i = 0; i < fleet->age_length_conversion_matrix.size(); i++) {
-        fleet->age_length_conversion_matrix[i] =
-          this->age_length_conversion_matrix[i].initial_value_m;
+      for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
+        fleet->age_to_length_conversion[i] =
+          this->age_to_length_conversion[i].initial_value_m;
         FIMS_INFO_LOG(" adding Fleet length object to TMB in loop " + 
           fims::to_string(i) + " of " + 
-          fims::to_string(fleet->age_length_conversion_matrix.size()));
+          fims::to_string(fleet->age_to_length_conversion.size()));
 
-        if (this->age_length_conversion_matrix[i].estimated_m) {
+        if (this->age_to_length_conversion[i].estimated_m) {
           ss.str("");
-          ss << "Fleet.age_length_conversion_matrix." << this->id << "." << 
-            this->age_length_conversion_matrix[i].id_m;
+          ss << "Fleet.age_to_length_conversion." << this->id << "." << 
+            this->age_to_length_conversion[i].id_m;
           info->RegisterParameterName(ss.str());
-          if (this->age_length_conversion_matrix[i].is_random_effect_m) {
-            info->RegisterRandomEffect(fleet->age_length_conversion_matrix[i]);
+          if (this->age_to_length_conversion[i].is_random_effect_m) {
+            info->RegisterRandomEffect(fleet->age_to_length_conversion[i]);
           } else {
-            info->RegisterParameter(fleet->age_length_conversion_matrix[i]);
+            info->RegisterParameter(fleet->age_to_length_conversion[i]);
           }
         }
         FIMS_INFO_LOG(" adding Fleet length object to TMB in loop after if");
       }
       FIMS_INFO_LOG(" adding Fleet length object to TMB out loop");
-      info->variable_map[this->age_length_conversion_matrix.id_m] = &(fleet)->age_length_conversion_matrix;
-      info->variable_map[this->proportion_catch_numbers_at_length.id_m] = &(fleet)->proportion_catch_numbers_at_length;
+      info->variable_map[this->age_to_length_conversion.id_m] = &(fleet)->age_to_length_conversion;
+      info->variable_map[this->proportion_numbers_at_length.id_m] = &(fleet)->proportion_numbers_at_length;
   }
 
     // add to Information

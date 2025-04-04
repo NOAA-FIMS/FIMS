@@ -21,7 +21,7 @@ data_4_model <- FIMSFrame(data1)
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
-    Catch = "DlnormDistribution",
+    Landings = "DlnormDistribution",
     Index = "DlnormDistribution",
     AgeComp = "DmultinomDistribution"
   )

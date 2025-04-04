@@ -16,7 +16,7 @@
 #' @export get_log_module
 #' @export get_log_warnings
 #' @export get_random
-#' @export Catch
+#' @export Landings
 #' @export Index
 #' @export LengthComp
 #' @export log_error

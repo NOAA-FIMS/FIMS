@@ -105,7 +105,7 @@ DiagrammeR::grViz(
   run_FIMS [label = <<b>run FIMS population module</b>>, 
             shape = plaintext]
             
-  FIMS_comparison [label = <<b>FIMS and OM Comparison</b><br ALIGN = 'LEFT'/><br ALIGN = 'LEFT'/> &#8226; Unfished numbers at age<br ALIGN = 'LEFT'/> &#8226; Unfished biomass<br ALIGN = 'LEFT'/> &#8226; Unfished spwaning biomass<br ALIGN = 'LEFT'/> &#8226; Biomass<br ALIGN = 'LEFT'/> &#8226; Spawning biomass<br ALIGN = 'LEFT'/> &#8226; Fishing mortality at age<br ALIGN = 'LEFT'/> &#8226; Total mortality at age<br ALIGN = 'LEFT'/> &#8226; Expected catch<br ALIGN = 'LEFT'/> &#8226; Expected index<br ALIGN = 'LEFT'/> &#8226; Unfished numbers at age<br ALIGN = 'LEFT'/>>, 
+  FIMS_comparison [label = <<b>FIMS and OM Comparison</b><br ALIGN = 'LEFT'/><br ALIGN = 'LEFT'/> &#8226; Unfished numbers at age<br ALIGN = 'LEFT'/> &#8226; Unfished biomass<br ALIGN = 'LEFT'/> &#8226; Unfished spwaning biomass<br ALIGN = 'LEFT'/> &#8226; Biomass<br ALIGN = 'LEFT'/> &#8226; Spawning biomass<br ALIGN = 'LEFT'/> &#8226; Fishing mortality at age<br ALIGN = 'LEFT'/> &#8226; Total mortality at age<br ALIGN = 'LEFT'/> &#8226; Expected landings<br ALIGN = 'LEFT'/> &#8226; Expected index<br ALIGN = 'LEFT'/> &#8226; Unfished numbers at age<br ALIGN = 'LEFT'/>>, 
                     shape = component]
 
   start -> ASSAMC_RScript
@@ -154,7 +154,7 @@ The integration test validates following components (Table \ref{tab:evaluation_c
 - Spawning biomass
 - Fishing mortality at age
 - Total mortality at age
-- Expected catch
+- Expected landings
 - Expected index
 
 ```{r evaluation_criteria_table}
@@ -198,14 +198,14 @@ total_mortality_at_age <- data.frame(
   Test = "- Absolute error (|FIMS - OM|) of individual elements is less than 0.0001 \n - Individual elements are greater than 0"
 )
 
-expected_catch <- data.frame(
-  Component = "Expected catch \n nyears",
+landings_expected <- data.frame(
+  Component = "Expected landings \n nyears",
   Test = "Fishing fleet: \n - Absolute error (|FIMS - OM|) of individual elements is less than 1 mt - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 1.0\\% \n - Individual elements are greater than 0 \n\n Survey fleet: \n - Individual elements equal to 0"
 )
 
-expected_index <- data.frame(
+index_expected <- data.frame(
   Component = "Expected index \n nyears",
-  Test = "Fishing fleet: \n - Individual elements of catchability equal to 1 \n - Individual elements of expected index are greater than 0 \n\n Survey fleet: \n - Absolute error (|FIMS - OM|) of individual elements is less than 0.0001 - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 5.0\\% \n - Absolute error (|FIMS - OM|) of individual elements of catchability is less than 1.0e-07 \n - Individual elements of expected index equal to 0"
+  Test = "Fishing fleet: \n - Individual elements of landingsability equal to 1 \n - Individual elements of expected index are greater than 0 \n\n Survey fleet: \n - Absolute error (|FIMS - OM|) of individual elements is less than 0.0001 - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 5.0\\% \n - Absolute error (|FIMS - OM|) of individual elements of landingsability is less than 1.0e-07 \n - Individual elements of expected index equal to 0"
 )
 
 data <- rbind(
@@ -217,8 +217,8 @@ data <- rbind(
   spawning_biomass,
   fishing_mortality_at_age,
   total_mortality_at_age,
-  expected_catch,
-  expected_index
+  landings_expected,
+  index_expected
 )
 
 test_case <- data

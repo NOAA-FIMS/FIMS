@@ -13,25 +13,25 @@ fleet module", {
   fleet2 <- methods::new(Fleet)
 
   # Expect code produces no output, error, message, or warnings
-  expect_silent(fleet1$SetSelectivity(selectivity_fleet1$get_id()))
-  expect_silent(fleet2$SetSelectivity(selectivity_fleet2$get_id()))
+  expect_silent(fleet1$SetSelectivityID(selectivity_fleet1$get_id()))
+  expect_silent(fleet2$SetSelectivityID(selectivity_fleet2$get_id()))
 
   # Expect code produces error when ID of selectivity is a character string
-  expect_error(fleet1$SetSelectivity("id"))
+  expect_error(fleet1$SetSelectivityID("id"))
 
   clear()
 })
 
-test_that("Fleet: SetObservedAgeCompData works", {
+test_that("Fleet: SetObservedAgeCompDataID works", {
   fleet <- methods::new(Fleet)
-  expect_silent(fleet$SetObservedAgeCompData(1))
+  expect_silent(fleet$SetObservedAgeCompDataID(1))
   expect_equal(fleet$GetObservedAgeCompDataID(), 1)
   clear()
 })
 
-test_that("Fleet: SetObservedIndexData works", {
+test_that("Fleet: SetObservedIndexDataID works", {
   fleet <- methods::new(Fleet)
-  expect_silent(fleet$SetObservedIndexData(1))
+  expect_silent(fleet$SetObservedIndexDataID(1))
   expect_equal(fleet$GetObservedIndexDataID(), 1)
   clear()
 })

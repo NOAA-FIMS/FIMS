@@ -396,44 +396,44 @@ create_default_fleet <- function(fleets,
   names(q_default) <- paste0("Fleet.", names(q_default))
 
   if ("landings" %in% data_types_present &&
-                   "Catch" %in% distribution_names_for_fleet) {
+                   "Landings" %in% distribution_names_for_fleet) {
     log_Fmort_default <- list(
       log_Fmort.value = rep(-3, get_n_years(data)),
       log_Fmort.estimated = TRUE
     )
 
-    catch_distribution <- fleets[[fleet_name]][["data_distribution"]]["Catch"]
+    landings_distribution <- fleets[[fleet_name]][["data_distribution"]]["Landings"]
 
-    catch_uncertainty <- get_data(data) |>
+    landings_uncertainty <- get_data(data) |>
       dplyr::filter(name == fleet_name, type %in% c("landings")) |>
       dplyr::arrange(dplyr::desc(type)) |>
       dplyr::pull(uncertainty)
 
-    catch_distribution_default <- switch(catch_distribution,
+    landings_distribution_default <- switch(landings_distribution,
                                          "DnormDistribution" = create_default_DnormDistribution(
-                                           value = catch_uncertainty,
+                                           value = landings_uncertainty,
                                            input_type = "data",
                                            data = data
                                          ),
                                          "DlnormDistribution" = create_default_DlnormDistribution(
-                                           value = catch_uncertainty,
+                                           value = landings_uncertainty,
                                            input_type = "data",
                                            data = data
                                          )
     )
-    names(catch_distribution_default) <- paste0(
-      catch_distribution,
+    names(landings_distribution_default) <- paste0(
+      landings_distribution,
       ".",
-      names(catch_distribution_default)
+      names(landings_distribution_default)
     )
 
   } else {
     log_Fmort_default <- list(
-      log_Fmort.value = rep(-20, get_n_years(data)),
+      log_Fmort.value = rep(-100, get_n_years(data)),
       log_Fmort.estimated = FALSE
     )
 
-    catch_distribution_default <- NULL
+    landings_distribution_default <- NULL
   }
 
   names(log_Fmort_default) <- paste0("Fleet.", names(log_Fmort_default))
@@ -444,7 +444,7 @@ create_default_fleet <- function(fleets,
     q_default,
     log_Fmort_default,
     index_distribution_default,
-    catch_distribution_default
+    landings_distribution_default
   ))
 
   names(default) <- fleet_name

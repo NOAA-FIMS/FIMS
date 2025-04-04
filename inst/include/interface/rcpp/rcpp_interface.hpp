@@ -247,8 +247,8 @@ void clear() {
   LengthCompDataInterface::id_g = 1;
   LengthCompDataInterface::live_objects.clear();
 
-  CatchDataInterface::id_g = 1;
-  CatchDataInterface::live_objects.clear();
+  LandingsDataInterface::id_g = 1;
+  LandingsDataInterface::live_objects.clear();
 
   IndexDataInterface::id_g = 1;
   IndexDataInterface::live_objects.clear();
@@ -642,20 +642,22 @@ RCPP_MODULE(fims) {
       .field("nlengths", &FleetInterface::nlengths)
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
-      .field("log_expected_index", &FleetInterface::log_expected_index)
-      .field("log_expected_catch", &FleetInterface::log_expected_catch)
-      .field("proportion_catch_numbers_at_age", &FleetInterface::proportion_catch_numbers_at_age)
-      .field("proportion_catch_numbers_at_length", &FleetInterface::proportion_catch_numbers_at_length)
-      .field("age_length_conversion_matrix", &FleetInterface::age_length_conversion_matrix)
-      .method("SetObservedAgeCompData", &FleetInterface::SetObservedAgeCompData)
+      .field("observed_landings_in_weight", &FleetInterface::observed_landings_in_weight)
+      .field("observed_index_in_weight", &FleetInterface::observed_index_in_weight)
+      .field("log_index_expected", &FleetInterface::log_index_expected)
+      .field("log_landings_expected", &FleetInterface::log_landings_expected)
+      .field("proportion_numbers_at_age", &FleetInterface::proportion_numbers_at_age)
+      .field("proportion_numbers_at_length", &FleetInterface::proportion_numbers_at_length)
+      .field("age_to_length_conversion", &FleetInterface::age_to_length_conversion)
+      .method("SetObservedAgeCompDataID", &FleetInterface::SetObservedAgeCompDataID)
       .method("GetObservedAgeCompDataID", &FleetInterface::GetObservedAgeCompDataID)
-      .method("SetObservedLengthCompData", &FleetInterface::SetObservedLengthCompData)
+      .method("SetObservedLengthCompDataID", &FleetInterface::SetObservedLengthCompDataID)
       .method("GetObservedLengthCompDataID", &FleetInterface::GetObservedLengthCompDataID)
-      .method("SetObservedIndexData", &FleetInterface::SetObservedIndexData)
+      .method("SetObservedIndexDataID", &FleetInterface::SetObservedIndexDataID)
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
-      .method("SetObservedCatchData", &FleetInterface::SetObservedCatchData)
-      .method("GetObservedCatchDataID", &FleetInterface::GetObservedCatchDataID)
-      .method("SetSelectivity", &FleetInterface::SetSelectivity);
+      .method("SetObservedLandingsDataID", &FleetInterface::SetObservedLandingsDataID)
+      .method("GetObservedLandingsDataID", &FleetInterface::GetObservedLandingsDataID)
+      .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
 
     Rcpp::class_<AgeCompDataInterface>("AgeComp")
             .constructor<int, int>()
@@ -667,10 +669,10 @@ RCPP_MODULE(fims) {
             .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
             .method("get_id", &LengthCompDataInterface::get_id);
 
-    Rcpp::class_<CatchDataInterface>("Catch")
+    Rcpp::class_<LandingsDataInterface>("Landings")
             .constructor<int>()
-            .field("catch_data", &CatchDataInterface::catch_data)
-            .method("get_id", &CatchDataInterface::get_id);
+            .field("landings_data", &LandingsDataInterface::landings_data)
+            .method("get_id", &LandingsDataInterface::get_id);
 
     Rcpp::class_<IndexDataInterface>("Index")
             .constructor<int>()

@@ -56,11 +56,11 @@ namespace
 
                 // declare vector of doubles to hold
                 // biomass, spawning biomass, unfished spawning biomass,
-                // expected catch in weight, expected index
+                // expected landings in weight, expected index
                 std::vector<double> expected_biomass(pop.nyears, 0.0);
                 std::vector<double> expected_spawning_biomass(pop.nyears, 0.0);
-                std::vector<double> expected_catch(pop.nyears, 0.0);
-                std::vector<double> expected_index(pop.nyears, 0.0);
+                std::vector<double> landings_expected(pop.nyears, 0.0);
+                std::vector<double> index_expected(pop.nyears, 0.0);
 
                 // declare vector of doubles to hold dimension folded
                 // numbers at age,
@@ -175,34 +175,34 @@ namespace
                 EXPECT_GT(pop.biomass[pop.nyears], 0.0)
                     << "year " << pop.nyears + 1;
 
-                // Test expected catch
+                // Test expected landings
                 it = output.find("L.mt");
 
                 if (it != output.end())
                 {
                     typename fims::JsonObject::iterator fleet1;
                     fleet1 = it->second.GetObject().find("fleet1");
-                    fims::JsonArray &fleet_catch = (*fleet1).second.GetArray();
+                    fims::JsonArray &fleet_landings = (*fleet1).second.GetArray();
                     for (int year = 0; year < pop.nyears; year++)
                     {
-                        expected_catch[year] = fleet_catch[year].GetDouble();
+                        landings_expected[year] = fleet_landings[year].GetDouble();
                         // Expect the difference between FIMS and OM is less than 1 mt
-                        EXPECT_NEAR(pop.fleets[0]->expected_catch[year], expected_catch[year], 1)
+                        EXPECT_NEAR(pop.fleets[0]->landings_expected[year], landings_expected[year], 1)
                             << "year " << year;
                         // Expect the difference between FIMS value and the
                         // expected value from the MCP OM
                         // is less than 1.0% of the expected value.
-                        EXPECT_LE(std::abs(pop.fleets[0]->expected_catch[year] - expected_catch[year]) /
-                                      expected_catch[year] * 100,
+                        EXPECT_LE(std::abs(pop.fleets[0]->landings_expected[year] - landings_expected[year]) /
+                                      landings_expected[year] * 100,
                                   1.0)
                             << "year " << year;
                         // Expect FIMS value is greater than 0.0 checking that
-                        // the fishing fleet always has positive catches
-                        EXPECT_GT(pop.fleets[0]->expected_catch[year], 0.0)
+                        // the fishing fleet always has positive landingses
+                        EXPECT_GT(pop.fleets[0]->landings_expected[year], 0.0)
                             << "year " << year;
                         // Expect FIMS value = 0.0 checking that the survey 
-                        // fleet always has close to or zero catches
-                        EXPECT_LE(pop.fleets[1]->expected_catch[year], 0.0001)
+                        // fleet always has close to or zero landingses
+                        EXPECT_LE(pop.fleets[1]->landings_expected[year], 0.0001)
                             << "year " << year;
                     }
                 }
@@ -230,26 +230,26 @@ namespace
                     //test fleets this may cause an error in the future.
                     for (int year = 0; year < pop.nyears; year++)
                     {
-                        // Expect catchability of the fishing fleet = 1.0
+                        // Expect landingsability of the fishing fleet = 1.0
                         // Expect expected index of the fishing fleet to be
                         // greater than 0.0
-                            EXPECT_GT(pop.fleets[0]->expected_index[year], 0.0)
+                            EXPECT_GT(pop.fleets[0]->index_expected[year], 0.0)
                             << "year " << year;
 
-                        expected_index[year] = fleet_index[year].GetDouble();
+                        index_expected[year] = fleet_index[year].GetDouble();
 
-                        EXPECT_NEAR(pop.fleets[1]->expected_index[year], expected_index[year], 0.0001)
+                        EXPECT_NEAR(pop.fleets[1]->index_expected[year], index_expected[year], 0.0001)
                             << "year " << year;
                         // Expect the difference between FIMS value and the
                         // expected value from the MCP OM
                         // is less than 5.0% of the expected value.
-                        EXPECT_LE(std::abs(pop.fleets[1]->expected_index[year] - expected_index[year]) /
-                                      expected_index[year] * 100,
+                        EXPECT_LE(std::abs(pop.fleets[1]->index_expected[year] - index_expected[year]) /
+                                      index_expected[year] * 100,
                                   5.0)
                             << "year " << year;
 
                         // Expect FIMS value is greater than 0.0
-                        EXPECT_GT(pop.fleets[1]->expected_index[year], 0.0)
+                        EXPECT_GT(pop.fleets[1]->index_expected[year], 0.0)
                             << "year " << year;
                     }  
                 }

@@ -95,13 +95,13 @@ test_that("test initialize_process_distribution", {
 
 test_that("test initialize_data_distribution", {
   # Data
-  catch <- em_input$L.obs$fleet1
-  # set fishing fleet catch data, need to set dimensions of data index
-  # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
-  fishing_fleet_catch <- methods::new(Catch, om_input$nyr)
+  landings <- em_input$L.obs$fleet1
+  # set fishing fleet landings data, need to set dimensions of data index
+  # currently FIMS only has a fleet module that takes index for both survey index and fishery landings
+  fishing_fleet_landings <- methods::new(Landings, om_input$nyr)
   purrr::walk(
-    seq_along(catch),
-    \(x) fishing_fleet_catch$catch_data$set(x - 1, catch[x])
+    seq_along(landings),
+    \(x) fishing_fleet_landings$landings_data$set(x - 1, landings[x])
   )
   fishing_fleet <- methods::new(Fleet)
   fishing_fleet$nages$set(om_input$nages)
@@ -115,11 +115,11 @@ test_that("test initialize_data_distribution", {
   fishing_fleet$log_q[1]$value <- log(1.0)
   fishing_fleet$estimate_q$set(FALSE)
   fishing_fleet$random_q$set(FALSE)
-  fishing_fleet$SetObservedCatchData(fishing_fleet_catch$get_id())
+  fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
 
-  # Set up fishery catch data using the lognormal
+  # Set up fishery landings data using the lognormal
   fleet_sd <- rep(sqrt(log(em_input$cv.L$fleet1^2 + 1)), om_input$nyr)
-  fishing_fleet_catch_distribution <- initialize_data_distribution(
+  fishing_fleet_landings_distribution <- initialize_data_distribution(
     module = fishing_fleet,
     family = lognormal(link = "log"),
     sd = list(value = fleet_sd, estimated = FALSE),
@@ -127,7 +127,7 @@ test_that("test initialize_data_distribution", {
   )
   expect_equal(
     log(fleet_sd[1]),
-    fishing_fleet_catch_distribution$log_sd[1]$value
+    fishing_fleet_landings_distribution$log_sd[1]$value
   )
   expect_error(
     initialize_data_distribution(

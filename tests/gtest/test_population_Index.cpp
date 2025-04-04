@@ -8,7 +8,7 @@ namespace
     TEST_F(PopulationEvaluateTestFixture, CalculateIndex_works)
     {
         
-        std::vector<double> expected_index(nyears * nfleets, 0);
+        std::vector<double> index_expected(nyears * nfleets, 0);
        
         // calculate index numbers at age in population module
         population.CalculateIndex(i_age_year, year, age);
@@ -24,14 +24,14 @@ namespace
             // When testing time varying q, better to test entire vector.
             // If not possible to test entire vector, test middle or second to last 
             // than earlier years (collapses to mean in early years)
-            expected_index[index_yf] += population.numbers_at_age[i_age_year]*
+            index_expected[index_yf] += population.numbers_at_age[i_age_year]*
                                         population.fleets[fleet_]->q[0]*
                                         population.fleets[fleet_]->selectivity->evaluate(population.ages[age])*
                                         population.growth->evaluate(population.ages[age]);
     
-        EXPECT_GT(population.fleets[fleet_]->expected_index[year], 0);
-        EXPECT_GT(expected_index[index_yf], 0);
-        EXPECT_EQ(expected_index[index_yf], population.fleets[fleet_]->expected_index[year]);
+        EXPECT_GT(population.fleets[fleet_]->index_expected[year], 0);
+        EXPECT_GT(index_expected[index_yf], 0);
+        EXPECT_EQ(index_expected[index_yf], population.fleets[fleet_]->index_expected[year]);
             
         }
     }

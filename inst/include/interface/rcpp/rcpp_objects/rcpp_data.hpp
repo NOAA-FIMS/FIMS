@@ -410,42 +410,42 @@ class IndexDataInterface : public DataInterfaceBase {
 };
 
 /**
- * @brief  The Rcpp interface for Catch to instantiate the object from R:
- * fleet <- methods::new(Catch).
+ * @brief  The Rcpp interface for Landings to instantiate the object from R:
+ * fleet <- methods::new(Landings).
  */
-class CatchDataInterface : public DataInterfaceBase {
+class LandingsDataInterface : public DataInterfaceBase {
  public:
   /**
    * @brief An integer that specifies the second dimension of the data.
    */
   fims_int ymax = 0;
   /**
-   * @brief The vector of catch data that is being passed from R.
+   * @brief The vector of landings data that is being passed from R.
    */
-  RealVector catch_data;
+  RealVector landings_data;
 
   /**
    * @brief The constructor.
    */
-  CatchDataInterface(int ymax = 0) : DataInterfaceBase() {
+  LandingsDataInterface(int ymax = 0) : DataInterfaceBase() {
     this->ymax = ymax;
-    this->catch_data.resize(ymax);
+    this->landings_data.resize(ymax);
 
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<CatchDataInterface>(*this));
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LandingsDataInterface>(*this));
   }
 
   /**
-   * @brief Construct a new Catch Data Interface object
+   * @brief Construct a new Landings Data Interface object
    *
    * @param other
    */
-  CatchDataInterface(const CatchDataInterface& other) :
-  DataInterfaceBase(other), ymax(other.ymax), catch_data(other.catch_data) {}
+  LandingsDataInterface(const LandingsDataInterface& other) :
+  DataInterfaceBase(other), ymax(other.ymax), landings_data(other.landings_data) {}
 
   /**
    * @brief The destructor.
    */
-  virtual ~CatchDataInterface() {}
+  virtual ~LandingsDataInterface() {}
 
   /**
    * @brief Gets the ID of the interface base object.
@@ -456,7 +456,7 @@ class CatchDataInterface : public DataInterfaceBase {
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
-   * data interface with catch data. It also returns the ID, the rank of 1, the
+   * data interface with landings data. It also returns the ID, the rank of 1, the
    * dimensions by printing ymax, followed by the data values themselves. This
    * string is formatted for a json file.
    */ 
@@ -465,15 +465,15 @@ class CatchDataInterface : public DataInterfaceBase {
     
     ss << "{\n";
     ss << " \"name\": \"data\",\n";
-    ss << " \"type\": \"Catch\",\n";
+    ss << " \"type\": \"Landings\",\n";
     ss << " \"id\": " << this->id << ",\n";
     ss << " \"rank\": " << 1 << ",\n";
     ss << " \"dimensions\": [" << this->ymax << "],\n";
     ss << " \"values\": [";
-    for (R_xlen_t i = 0; i < catch_data.size() - 1; i++) {
-      ss << catch_data[i] << ", ";
+    for (R_xlen_t i = 0; i < landings_data.size() - 1; i++) {
+      ss << landings_data[i] << ", ";
     }
-    ss << catch_data[catch_data.size() - 1] << "]\n";
+    ss << landings_data[landings_data.size() - 1] << "]\n";
     ss << "}";
     return ss.str();
   }
@@ -488,7 +488,7 @@ class CatchDataInterface : public DataInterfaceBase {
     data->id = this->id;
 
     for (int y = 0; y < ymax; y++) {
-      data->at(y) = this->catch_data[y];
+      data->at(y) = this->landings_data[y];
     }
 
     std::shared_ptr<fims_info::Information<Type>> info =
