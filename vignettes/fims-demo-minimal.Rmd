@@ -1,0 +1,74 @@
+---
+title: "Minimal Example for Running a FIMS Model"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Minimal Example for Running a FIMS Model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This vignette provides the minimal steps needed to run a Fisheries Integrated Modeling System (FIMS) model.
+
+## Setup
+
+Load the FIMS package and clear memory:
+```{r memory, warning=FALSE, message=FALSE}
+library(FIMS)
+
+# clear memory
+clear()
+```
+
+## Data and parameters
+
+First, load the available data and create a FIMS data frame to create a model with. Then create a set of default parameters.
+```{r data}
+# Load sample data
+data("data1")
+# Prepare data for FIMS model
+data_4_model <- FIMSFrame(data1)
+
+# Define fleet specifications
+fleet1 <- list(
+  selectivity = list(form = "LogisticSelectivity"),
+  data_distribution = c(
+    Landings = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution",
+    LengthComp = "DmultinomDistribution"
+  )
+)
+survey1 <- list(
+  selectivity = list(form = "LogisticSelectivity"),
+  data_distribution = c(
+    Index = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution",
+    LengthComp = "DmultinomDistribution"
+  )
+)
+
+# Create parameters
+parameters <- data_4_model |>
+  create_default_parameters(
+    fleets = list(fleet1 = fleet1, survey1 = survey1)
+  )
+```
+
+## Initialize and Fit
+
+Initialize the FIMS modules and fit the model.
+```{r fit, max.height='100px', attr.output='.numberLines', eval=TRUE}
+# Run the  model with optimization
+fit <- parameters |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+
+# Clear memory post-run
+clear()
+```
