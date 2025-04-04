@@ -1,8 +1,8 @@
 ---
-title: "Introducing the Fisheries Integrated Modeling System (FIMS)"
+title: "Minimal Example for Running a FIMS Model"
 output: github_document
 vignette: >
-  %\VignetteIndexEntry{Introducing the Fisheries Integrated Modeling System (FIMS)}
+  %\VignetteIndexEntry{Minimal Example for Running a FIMS Model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,12 +12,11 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## FIMS
-The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. The framework is designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It is important to note that FIMS itself is not a model but rather a framework for creating models. The framework is made up of many modules that come together to create a model that best suits the needs of the end-user. The remainder of this vignette walks through what is absolutely necessary to run a FIMS catch-at-age model using the default settings.
+## Introduction
+This vignette provides the minimal steps needed to run a Fisheries Integrated Modeling System (FIMS) model.
 
-## Memory
-
-Calling `library(FIMS)` loads the R package and Rcpp functions and modules into the R environment. The C++ code is compiled upon installation rather than loading so the call to `library()` should be pretty fast. Users should always run `clear()` prior to modeling to ensure that the C++ memory from any previous FIMS model run is cleared out.
+## Setup
+Load the FIMS package and clear memory:
 ```{r memory, warning=FALSE, message=FALSE}
 library(FIMS)
 library(ggplot2)
@@ -27,61 +26,18 @@ clear()
 ```
 
 ## Data
-
-Data for a FIMS model must be stored in a single data frame with a long format, e.g., `data("data1", package = "FIMS")`. The design is similar to running a linear model where you pass a single data frame to `lm()`. The long format does lead to some information being duplicated. For example, the units are listed for every row rather than stored in a single location for each data type. But, the long format facilitates using tidy functions to manipulate the data. And, a single function, i.e., `FIMSFrame()`, is all that is needed to prepare the data to be used in a FIMS model.
-
-### `data1`
-
-A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data1`. This data set is based on data that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data1.R) based on an age-length conversion matrix. See [R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) or `?data1` for details about the package data.
-
-### `FIMSFrame()`
-
-The easiest way to prepare the data for a FIMS model is to use `FIMSFrame()`. This function performs several validation checks and returns an object of the S4 class called `FIMSFrame`. There are helper functions for working with a `FIMSFrame` object, e.g., `get_data()`, `get_n_years()`, `get_*()`. Additionally, there are helper functions for pulling data out of the S4 class in the format needed for a module, i.e., a vector, but these `m_*()` functions are largely meant to be used internally within the package and are only exported to allow for their use by power users wishing to manually set up.
-
-```{r FIMSFrame}
-# Bring the package data into your environment
+Load and prepare data:
+```{r data}
+# Load sample data
 data("data1")
-# Prepare the package data for being used in a FIMS model
+# Prepare data for FIMS model
 data_4_model <- FIMSFrame(data1)
 ```
 
-The S4 object that we named `data_4_model` contains many slots (i.e., named components of the object that can be accessed) but perhaps the most interesting one is the long data frame stored in the "data" slot. The tibble stored in this slot can be accessed using `get_data()`.
-
-```{r FIMSFrame-view}
-# Use show() to see what is stored in the FIMSFrame S4 class
-methods::show(data_4_model)
-# Or, look at the structure using str()
-# Increase max.level to see more of the structure
-str(data_4_model, max.level = 1)
-# Use dplyr to subset the data for just the landings
-get_data(data_4_model) |>
-  dplyr::filter(type == "landings")
-```
-
-The data contains the following fleets:
-
-- A single fishery fleet with age- and length-composition, weight-at-age, and landings data
-- A single survey with age- and length-composition and index data
-
 ## Parameters
-
-The parameters that are in the model will depend on which modules are used from the FIMS framework. This combination of modules rather than the use of a control file negates the need for complicated if{} else{} statements in the code.
-
-### `create_default_parameters()`
-
-By passing the data to `create_default_parameters()` the function can tailor the defaults based on how many fleets there are and what data types exist. For example, if you have three fleets, then `create_default_parameters()` will set up three logistic selectivity modules.
-
-Modules that are available in FIMS are known as reference classes in the C++ code. Each reference class acts as an interface between R and the underlining C++ code that defines FIMS. Several reference classes exist and several more will be created in the future. The beauty of having modules rather than a control file really comes out when more reference classes are created because each reference class can be accessed through R by itself to build up a model rather than needing to modify a control file for future features.
-
-By just passing lists of fleet specifications and the data to `create_default_parameters()`, the default values for parameters that relate to fleet(s), recruitment, growth, and maturity modules can be created. For example,
-
-  - "BevertonHoltRecruitment" for the recruitment module
-  - "DnormDistribution" for recruitment deviations (log_devs)
-  - "EWAAgrowth" for the growth module, and
-  - "LogisticMaturity" for maturity module.
-
+Set up model parameters:
 ```{r parameters, max.height='100px', attr.output='.numberLines'}
-# Define the same fleet specifications for fleet1 and survey1
+# Define fleet specifications
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
@@ -91,132 +47,15 @@ fleet1 <- survey1 <- list(
   )
 )
 
-# Create default recruitment, growth, and maturity parameters
-default_parameters <- data_4_model |>
+# Create parameters
+parameters <- data_4_model |>
   create_default_parameters(
     fleets = list(fleet1 = fleet1, survey1 = survey1)
   )
 ```
 
-The argument names and their corresponding default values of the create_default_parameters() function can be displayed using `args()`.
-```{r parameters-args}
-args(create_default_parameters)
-```
-
-### `update_parameters()`
-
-In the future, the developers of FIMS may update the default parameters to experiment with different values. Regardless, you can still use `create_default_parameters()` as a starting point because it will provide information on the appropriate dimensions and necessary elements that the final list must contain. And, although it is a good idea to modify the returned defaults with `update_parameters()`, you can update the list manually.
-
-In the code below, `update_parameters()` is used to adjust the fishing mortality, selectivity, maturity, and population parameters from their default values. If the parameters are estimated, these updates will change their starting values, and if they are fixed, these updates will change their value used in the model.
-
-```{r parameters-update}
-# Each call to update_parameters() returns the full list so the pipe can be
-# used to daisy chain all of these updates together to a new object called
-# parameters that will be used to fit the model
-parameters <- default_parameters |>
-  update_parameters(
-    modified_parameters = list(
-      fleet1 = list(
-        Fleet.log_Fmort.value = log(c(
-          0.009459165, 0.027288858, 0.045063639,
-          0.061017825, 0.048600752, 0.087420554,
-          0.088447204, 0.186607929, 0.109008958,
-          0.132704335, 0.150615473, 0.161242955,
-          0.116640187, 0.169346119, 0.180191913,
-          0.161240483, 0.314573212, 0.257247574,
-          0.254887252, 0.251462108, 0.349101406,
-          0.254107720, 0.418478117, 0.345721184,
-          0.343685540, 0.314171227, 0.308026829,
-          0.431745298, 0.328030899, 0.499675368
-        ))
-      )
-    )
-  ) |>
-  update_parameters(
-    modified_parameters = list(
-      survey1 = list(
-        LogisticSelectivity.inflection_point.value = 1.5,
-        LogisticSelectivity.slope.value = 2,
-        Fleet.log_q.value = log(3.315143e-07)
-      )
-    )
-  ) |>
-  update_parameters(
-    modified_parameters = list(
-      recruitment = list(
-        BevertonHoltRecruitment.log_rzero.value = log(1e+06),
-        BevertonHoltRecruitment.log_devs.value = c(
-          0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
-          -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
-          -0.21709207, -0.13320626, 0.11225374, -0.10650836, 0.26877132,
-          0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
-          0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
-          -0.19556523, 0.20094360, 0.37248740, -0.07163145
-        ),
-        # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
-        # to TRUE. We need to debug the issue, then update the line below accordingly.
-        BevertonHoltRecruitment.log_devs.estimated = FALSE
-      )
-    )
-  ) |>
-  update_parameters(
-    modified_parameters = list(
-      maturity = list(
-        LogisticMaturity.inflection_point.value = 2.25,
-        LogisticMaturity.inflection_point.estimated = FALSE,
-        LogisticMaturity.slope.value = 3,
-        LogisticMaturity.slope.estimated = FALSE
-      )
-    )
-  ) |>
-  update_parameters(
-    modified_parameters = list(
-      population = list(
-        Population.log_init_naa.value = c(
-          13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
-          12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
-        )
-      )
-    )
-  )
-```
-
-`purrr::map_vec()` can be used to compare the length of individual updated parameter vectors from `parameters` with the length of individual parameter vectors from `default_parameters`.
-```{r parameter-length-comparison}
-default_fleet1 <- purrr::map_vec(
-  default_parameters[["parameters"]][["fleet1"]],
-  \(x) length(x)
-)
-updated_fleet1 <- purrr::map_vec(
-  parameters[["parameters"]][["fleet1"]],
-  \(x) length(x)
-)
-knitr::kable(cbind(default_fleet1, updated_fleet1))
-```
-
-`purrr::map_df()` can be used to summarize parameter vector lengths across all modules.
-```{r parameter-length-table}
-purrr::map_df(
-  parameters[["parameters"]], \(x) purrr::map_vec(x, length),
-  .id = "module"
-) |>
-  tibble::column_to_rownames(var = "module") |>
-  t()
-```
-## Fit
-
-With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fims()`.
-
-### `initialize_fims()`
-
-The list returned by `create_default_parameters()` has two elements, parameters and modules. But, these are just lists of lists containing specifications. Nothing has been created in memory as of yet. To actually initialize the modules specified in `parameters[["modules"]]`, `initialize_fims()` needs to be called. This function takes all of the specifications and matches them with the appropriate data to initialize a module and create the pointers to the memory.
-
-### `fit_fims()`
-
-The list returned from `initialize_fims()` can be passed to the parameter of `fit_fims()` called `input` to run a FIMS model. If `optimize = FALSE`, the model will not actually be optimized but instead just checked to ensure it is a viable model. When `optimize = TRUE`, the model will be fit using `stats::nlminb()` and an object of the class `FIMSFit` will be returned.
-
-### Example
-
+## Initialize and Fit
+Initialize FIMS modules and fit the model:
 ```{r fit, max.height='100px', attr.output='.numberLines', eval=TRUE}
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters |>
@@ -228,138 +67,6 @@ fit <- parameters |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
-fit_output <- finalize(fit@opt$par, fit@obj$fn, fit@obj$gr)
-
-# Get information about the model and print a few characters to the screen
-recruitment_log <- get_log_module("information")
-substr(recruitment_log, 1, 100)
-
 # Clear memory post-run
-clear()
-```
-
-The results can be plotted with either base R or using {ggplot2}.
-
-```{r fit-plots}
-index_results <- data.frame(
-  observed = m_index(data_4_model, "survey1"),
-  expected = get_report(fit)[["exp_index"]][[2]],
-  years = get_start_year(data_4_model):get_end_year(data_4_model)
-)
-print(index_results)
-
-ggplot2::ggplot(index_results, ggplot2::aes(x = years, y = observed)) +
-  ggplot2::geom_point() +
-  ggplot2::xlab("Year") +
-  ggplot2::ylab("Index (mt)") +
-  ggplot2::geom_line(ggplot2::aes(x = years, y = expected), color = "blue") +
-  ggplot2::theme_bw()
-
-catch_results <- data.frame(
-  observed = m_landings(data_4_model, fleet = "fleet1"),
-  expected = get_report(fit)[["exp_index"]][[1]],
-  years = get_start_year(data_4_model):get_end_year(data_4_model)
-)
-print(catch_results)
-
-ggplot2::ggplot(catch_results, ggplot2::aes(x = years, y = observed)) +
-  ggplot2::geom_point() +
-  ggplot2::xlab("Year") +
-  ggplot2::ylab("Index (mt)") +
-  ggplot2::geom_line(ggplot2::aes(x = years, y = expected), color = "blue") +
-  ggplot2::theme_bw()
-```
-
-### Sensitivities
-
-Multiple fits, i.e., sensitivity runs, can be set up by modifying the parameter list using `update_parameters()` or changing the data that is used to fit the model.
-
-#### Initial values
-
-For example, one could change the initial value used for the slope of the logistic curve for the survey to see if the terminal estimate changes due to changes to the initial value.
-
-```{r initial-values}
-parameters_high_slope <- parameters |>
-  update_parameters(
-    modified_parameters = list(
-      survey1 = list(
-        LogisticSelectivity.slope.value = 2.5
-      )
-    )
-  )
-
-parameters_low_slope <- parameters |>
-  update_parameters(
-    modified_parameters = list(
-      survey1 = list(
-        LogisticSelectivity.slope.value = 1
-      )
-    )
-  )
-
-high_slope_fit <- parameters_high_slope |>
-  initialize_fims(data = data_4_model) |>
-  fit_fims(optimize = TRUE)
-
-clear()
-
-low_slope_fit <- parameters_low_slope |>
-  initialize_fims(data = data_4_model) |>
-  fit_fims(optimize = TRUE)
-
-clear()
-```
-
-#### Age only
-
-The same model can be fit to just the age data, removing the length data.
-
-```{r age}
-# Define fleet and survey with age-specific data distribution
-fleet1 <- survey1 <- list(
-  selectivity = list(form = "LogisticSelectivity"),
-  data_distribution = c(
-    Index = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution"
-  )
-)
-
-# Create default parameters, update with modified values, initialize FIMS,
-# and fit the model
-age_only_fit <- data_4_model |>
-  create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
-  ) |>
-  # update_parameters(modified_parameters = parameters$parameters) |>
-  initialize_fims(data = data_4_model) |>
-  fit_fims(optimize = TRUE)
-
-clear()
-```
-
-#### Length
-
-The same model can be fit to just the length data, removing the age data.
-
-```{r length}
-# Define fleet and survey with length-specific data distribution
-fleet1 <- survey1 <- list(
-  selectivity = list(form = "LogisticSelectivity"),
-  data_distribution = c(
-    Index = "DlnormDistribution",
-    LengthComp = "DmultinomDistribution"
-  )
-)
-
-# Create default parameters, update with modified values, initialize FIMS,
-# and fit the model
-length_only_fit <- data_4_model |>
-  create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
-  ) |>
-  update_parameters(modified_parameters = parameters$parameters) |>
-  initialize_fims(data = data_4_model) |>
-  fit_fims(optimize = TRUE)
-cat(fit_output)
 clear()
 ```
