@@ -144,6 +144,14 @@ public:
   /**
    * @brief The vector of expected landings-at-age in numbers for the fleet.
    */
+  ParameterVector composition_numbers_at_age;
+  /**
+   * @brief The vector of expected landings-at-length in numbers for the fleet.
+   */
+  ParameterVector composition_numbers_at_length;
+  /**
+   * @brief The vector of expected landings-at-age in numbers for the fleet.
+   */
   ParameterVector proportion_numbers_at_age;
   /**
    * @brief The vector of expected landings-at-length in numbers for the fleet.
@@ -698,12 +706,15 @@ public:
     fleet->log_index_expected.resize(nyears);  // assume index is for all ages.
     info->variable_map[this->log_index_expected.id_m] = &(fleet)->log_index_expected;
     
+    fleet->composition_numbers_at_age.resize(nyears.get() * nages.get());
     fleet->proportion_numbers_at_age.resize(nyears.get() * nages.get());
+    info->variable_map[this->composition_numbers_at_age.id_m] = &(fleet)->composition_numbers_at_age;
     info->variable_map[this->proportion_numbers_at_age.id_m] = &(fleet)->proportion_numbers_at_age;
     FIMS_INFO_LOG(fims::to_string(this->nyears.get()) + " " + fims::to_string(this->nages.get()));
     FIMS_INFO_LOG(" adding Fleet length object to TMB");
 
-    if (this->nlengths > 0) {
+    if (this->nlengths.get() > 0) {
+      fleet->composition_numbers_at_length.resize(this->nyears.get() * this->nlengths.get());
       fleet->proportion_numbers_at_length.resize(this->nyears.get() * this->nlengths.get());
       fleet->age_to_length_conversion.resize(this->age_to_length_conversion.size());
 
@@ -736,6 +747,7 @@ public:
       }
       FIMS_INFO_LOG(" adding Fleet length object to TMB out loop");
       info->variable_map[this->age_to_length_conversion.id_m] = &(fleet)->age_to_length_conversion;
+      info->variable_map[this->composition_numbers_at_length.id_m] = &(fleet)->composition_numbers_at_length;
       info->variable_map[this->proportion_numbers_at_length.id_m] = &(fleet)->proportion_numbers_at_length;
   }
 

@@ -76,6 +76,7 @@ initialize_module <- function(parameters, data, module_name) {
     module_fields <- setdiff(module_fields, c(
       "log_index_expected",
       "log_landings_expected",
+      "composition_numbers_at_age",
       "proportion_numbers_at_age",
       "observed_index_in_weight",
       "observed_landings_in_weight"
@@ -124,6 +125,7 @@ initialize_module <- function(parameters, data, module_name) {
 
     module_fields <- setdiff(module_fields, c(
       "age_to_length_conversion",
+      "composition_numbers_at_length",
       "proportion_numbers_at_length"
     ))
   }

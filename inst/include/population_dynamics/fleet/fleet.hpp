@@ -229,8 +229,6 @@ namespace fims_popdy {
                     static_cast<Type>(0)); /**<model expected composition proportion numbers at age*/
             std::fill(proportion_numbers_at_length.begin(), proportion_numbers_at_length.end(),
                     static_cast<Type>(0)); /**<model expected composition proportion numbers at length*/
-            std::fill(age_to_length_conversion.begin(), age_to_length_conversion.end(),
-                    static_cast<Type>(0)); /**<model age to length conversion matrix*/
         }
 
         /**
@@ -244,23 +242,23 @@ namespace fims_popdy {
                     size_t i_age_year = y * this->nages + a;
                     sum += this->composition_numbers_at_age[i_age_year];
                         
-                    if( this->fleet_observed_agecomp_data_id_m != -999) {
-                        if( this->observed_agecomp_data->at(i_age_year)!=
-                            this->observed_agecomp_data->na_value) {
-                            sum_obs += this->observed_agecomp_data->at(i_age_year);
-                        }
-                    }
+                    //if( this->fleet_observed_agecomp_data_id_m != -999) {
+                    //    if( this->observed_agecomp_data->at(i_age_year)!=
+                    //        this->observed_agecomp_data->na_value) {
+                    //        sum_obs += this->observed_agecomp_data->at(i_age_year);
+                    //    }
+                    //}
                 }
                 for (size_t a = 0; a < this->nages; a++) {
                     size_t i_age_year = y * this->nages + a;
                     this->proportion_numbers_at_age[i_age_year] = 
                     this->composition_numbers_at_age[i_age_year] / sum;
 
-                    if( fleet_observed_agecomp_data_id_m != -999) {
-                        this->composition_numbers_at_age[i_age_year] = 
-                        this->proportion_numbers_at_age[i_age_year] * 
-                        sum_obs;
-                    }
+                    //if( fleet_observed_agecomp_data_id_m != -999) {
+                    //    this->composition_numbers_at_age[i_age_year] = 
+                    //    this->proportion_numbers_at_age[i_age_year] * 
+                    //    sum_obs;
+                    //}
                 }
             }
         }
@@ -284,23 +282,23 @@ namespace fims_popdy {
                         }
                         sum += this->composition_numbers_at_length[i_length_year];
                         
-                        if( this->fleet_observed_lengthcomp_data_id_m != -999) {
-                            if( this->observed_lengthcomp_data->at(i_length_year)!=
-                                this->observed_lengthcomp_data->na_value) {
-                                sum_obs += this->observed_lengthcomp_data->at(i_length_year);
-                            }
-                        }
+                        //if( this->fleet_observed_lengthcomp_data_id_m != -999) {
+                        //    if( this->observed_lengthcomp_data->at(i_length_year)!=
+                        //        this->observed_lengthcomp_data->na_value) {
+                        //        sum_obs += this->observed_lengthcomp_data->at(i_length_year);
+                        //    }
+                        //}
                     }
                     for (size_t l = 0; l < this->nlengths; l++) {
                         size_t i_length_year = y * this->nlengths + l;
                         this->proportion_numbers_at_length[i_length_year] = 
                         this->composition_numbers_at_length[i_length_year] / sum;
 
-                        if( this->fleet_observed_lengthcomp_data_id_m != -999) {
-                            this->composition_numbers_at_length[i_length_year] = 
-                            this->proportion_numbers_at_length[i_length_year] * 
-                            sum_obs;
-                        }
+                        //if( this->fleet_observed_lengthcomp_data_id_m != -999) {
+                        //    this->composition_numbers_at_length[i_length_year] = 
+                        //    this->proportion_numbers_at_length[i_length_year] * 
+                        //    sum_obs;
+                        //}
                     }
                 }
             }

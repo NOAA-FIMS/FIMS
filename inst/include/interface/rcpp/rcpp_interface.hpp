@@ -646,6 +646,8 @@ RCPP_MODULE(fims) {
       .field("observed_index_in_weight", &FleetInterface::observed_index_in_weight)
       .field("log_index_expected", &FleetInterface::log_index_expected)
       .field("log_landings_expected", &FleetInterface::log_landings_expected)
+      .field("composition_numbers_at_age", &FleetInterface::composition_numbers_at_age)
+      .field("composition_numbers_at_length", &FleetInterface::composition_numbers_at_length)
       .field("proportion_numbers_at_age", &FleetInterface::proportion_numbers_at_age)
       .field("proportion_numbers_at_length", &FleetInterface::proportion_numbers_at_length)
       .field("age_to_length_conversion", &FleetInterface::age_to_length_conversion)

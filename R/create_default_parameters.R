@@ -429,7 +429,7 @@ create_default_fleet <- function(fleets,
 
   } else {
     log_Fmort_default <- list(
-      log_Fmort.value = rep(-100, get_n_years(data)),
+      log_Fmort.value = rep(-200, get_n_years(data)),
       log_Fmort.estimated = FALSE
     )
 

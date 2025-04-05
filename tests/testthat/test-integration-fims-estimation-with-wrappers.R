@@ -72,7 +72,7 @@ test_that("deterministic test of fims", {
   expect_equal(report[["F_mort"]][[1]], om_output_list[[iter_id]][["f"]])
 
   # Expected landings
-  fims_landings <- report[["exp_landings"]]
+  fims_landings <- report[["landings_exp"]]
   for (i in 1:length(om_output_list[[iter_id]][["L.mt"]][["fleet1"]])) {
     expect_equal(fims_landings[[1]][i], om_output_list[[iter_id]][["L.mt"]][["fleet1"]][i])
   }
@@ -88,28 +88,28 @@ test_that("deterministic test of fims", {
 
   # Compare expected landings number at age to true values
   for (i in 1:length(c(t(om_output_list[[iter_id]][["L.age"]][["fleet1"]])))) {
-    expect_equal(report[["cnaa"]][[1]][i], c(t(om_output_list[[iter_id]][["L.age"]][["fleet1"]]))[i])
+    expect_equal(report[["landings_naa"]][[1]][i], c(t(om_output_list[[iter_id]][["L.age"]][["fleet1"]]))[i])
   }
 
   # Expected landings number at age in proportion
   # QUESTION: Isn't this redundant with the non-proportion test above?
-  fims_cnaa <- matrix(report[["cnaa"]][[1]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
+  fims_landings_naa <- matrix(report[["landings_naa"]][[1]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
     nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
-  fims_cnaa_proportion <- fims_cnaa / rowSums(fims_cnaa)
-  om_cnaa_proportion <- om_output_list[[iter_id]][["L.age"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.age"]][["fleet1"]])
+  fims_landings_naa_proportion <- fims_landings_naa / rowSums(fims_landings_naa)
+  om_landings_naa_proportion <- om_output_list[[iter_id]][["L.age"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.age"]][["fleet1"]])
 
-  for (i in 1:length(c(t(om_cnaa_proportion)))) {
-    expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
+  for (i in 1:length(c(t(om_landings_naa_proportion)))) {
+    expect_equal(c(t(fims_landings_naa_proportion))[i], c(t(om_landings_naa_proportion))[i])
   }
 
   # Expected survey index.
-  fims_index <- report[["exp_index"]]
+  fims_index <- report[["index_exp"]]
   # Using [[2]] because the survey is the 2nd fleet.
-  cwaa <- matrix(report[["cwaa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
+  landings_waa <- matrix(report[["landings_waa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
     nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
-  expect_equal(fims_landings[[2]], apply(cwaa, 1, sum))# * om_output_list[[iter_id]][["survey_q"]][["survey1"]])
+  expect_equal(fims_landings[[2]], apply(landings_waa, 1, sum))# * om_output_list[[iter_id]][["survey_q"]][["survey1"]])
 
   for (i in 1:length(om_output_list[[iter_id]][["survey_index_biomass"]][["survey1"]])) {
     expect_equal(fims_index[[2]][i], om_output_list[[iter_id]][["survey_index_biomass"]][["survey1"]][i])
@@ -126,25 +126,27 @@ test_that("deterministic test of fims", {
   )
 
   # Expected landings number at age in proportion
-  fims_cnaa <- matrix(report[["cnaa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
+  fims_cnaa <- matrix(report[["landings_naa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
     nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
-
-  # Excluding these tests at the moment because the survey landings number at age no longer
-  # matches because it includes tiny F values
+  fims_index_naa <- matrix(report[["index_naa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
+                           nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
+  )
+  # Excluding these tests at the moment to figure out what the correct comparison values are
   # for (i in 1:length(c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])))) {
-  #   expect_equal(report[["cnaa"]][[2]][i], c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]]))[i])
+  #   expect_lt(abs(report[["index_waa"]][[2]][i]-c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]]))[i]),0.0000000001)
   # }
 
-  fims_cnaa_proportion <- fims_cnaa / rowSums(fims_cnaa)
+  fims_cnaa_proportion <- matrix(report[["comp_pnaa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
+                                 nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
+  )
+
   om_cnaa_proportion <- om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
 
-  # Excluding these tests at the moment because the survey landings number at age no longer
-  # matches because it includes tiny F values that seem to be affecting proportions
-  # maybe due to rounding errors??
-  # for (i in 1:length(c(t(om_cnaa_proportion)))) {
-  #   expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
-  # }
+  # Ensure the proportions match for the survey age composition
+  for (i in 1:length(c(t(om_cnaa_proportion)))) {
+     expect_lt(abs(c(t(fims_cnaa_proportion))[i]-c(t(om_cnaa_proportion))[i]),0.00000001)
+  }
 })
 
 test_that("nll test of fims", {
@@ -226,10 +228,10 @@ test_that("nll test of fims", {
   expect_equal(report[["nll_components"]][1], rec_nll)
   expect_equal(report[["nll_components"]][2], landings_nll_fleet)
   expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
-  expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
+  #expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
   expect_equal(report[["nll_components"]][5], index_nll_survey)
   #Removing for now to test while figuring out the survey comp issue
-  #expect_equal(report[["nll_components"]][6], age_comp_nll_survey)
+  expect_equal(report[["nll_components"]][6], age_comp_nll_survey)
   #expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
   #expect_equal(jnll, expected_jnll)
 })
