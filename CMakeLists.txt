@@ -1,7 +1,7 @@
 # Top level CMakeLists.txt: setting up top level project dependencies
 # and options. CMake Referecen documentation can be found here:
 # https://cmake.org/cmake/help/v3.22/
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.5)
 project(FIMS
   CXX
 ) # CXX is the language name
