@@ -22,7 +22,7 @@ namespace fims_distributions {
 template<typename Type>
 struct NormalLPDF : public DensityComponentBase<Type> {
     fims::Vector<Type> log_sd; /**< the natural log of the standard deviation of the distribution; can be a vector or scalar */
-    Type lpdf = 0.0; /**< total log probability density contribution of the distribution */
+    Type lpdf = Type(0.0); /**< total log probability density contribution of the distribution */
 
     /** @brief Constructor.
      */
@@ -47,8 +47,8 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       }
       // setup vector for recording the log probability density function values
       this->lpdf_vec.resize(n_x);
-      std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
-      lpdf = 0;
+      std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), Type(0));
+      lpdf = Type(0);
 
       for(size_t i=0; i<n_x; i++){
         #ifdef TMB_MODEL
