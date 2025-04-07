@@ -108,7 +108,7 @@ namespace fims_popdy {
         void Initialize(int nyears, int nages, int nlengths = 0) {
             if (this->log_q.size() == 0) {
                 this->log_q.resize(1);
-                this->log_q[0] = Type(0.0);
+                this->log_q[0] = static_cast<Type>(0.0);
             }
             this->nyears = nyears;
             this->nages = nages;
@@ -144,29 +144,29 @@ namespace fims_popdy {
 
             // derived quantities
             std::fill(catch_at_age.begin(), catch_at_age.end(),
-                    Type(0)); /**<derived quantity catch at age*/
+                    static_cast<Type>(0)); /**<derived quantity catch at age*/
             std::fill(catch_index.begin(), catch_index.end(),
-                    Type(0)); /**<derived quantity catch index*/
+                    static_cast<Type>(0)); /**<derived quantity catch index*/
             std::fill(age_composition.begin(), age_composition.end(), 
-                    Type(0)); /**<model expected number at age */
+                    static_cast<Type>(0)); /**<model expected number at age */
             std::fill(length_composition.begin(), length_composition.end(), 
-                    Type(0)); /**<model expected number at length */
+                    static_cast<Type>(0)); /**<model expected number at length */
             std::fill(expected_catch.begin(), expected_catch.end(),
-                    Type(0)); /**<model expected total catch*/
+                    static_cast<Type>(0)); /**<model expected total catch*/
             std::fill(expected_index.begin(), expected_index.end(),
-                    Type(0)); /**<model expected index of abundance*/
+                    static_cast<Type>(0)); /**<model expected index of abundance*/
             std::fill(log_expected_index.begin(), log_expected_index.end(),
-                    Type(0)); /**<model expected index of abundance*/
+                    static_cast<Type>(0)); /**<model expected index of abundance*/
             std::fill(catch_numbers_at_age.begin(), catch_numbers_at_age.end(),
-                    Type(0)); /**<model expected catch at age*/
+                    static_cast<Type>(0)); /**<model expected catch at age*/
             std::fill(proportion_catch_numbers_at_age.begin(), proportion_catch_numbers_at_age.end(),
-                    Type(0)); /**<model expected catch at age*/
+                    static_cast<Type>(0)); /**<model expected catch at age*/
             std::fill(catch_numbers_at_length.begin(), catch_numbers_at_length.end(),
-                    Type(0)); /**<model expected catch at length*/
+                    static_cast<Type>(0)); /**<model expected catch at length*/
             std::fill(proportion_catch_numbers_at_length.begin(), proportion_catch_numbers_at_length.end(),
-                    Type(0)); /**<model expected catch at length*/
+                    static_cast<Type>(0)); /**<model expected catch at length*/
             std::fill(catch_weight_at_age.begin(), catch_weight_at_age.end(),
-                    Type(0)); /**<model expected weight at age*/
+                    static_cast<Type>(0)); /**<model expected weight at age*/
 
             for (size_t i = 0; i < this->log_q.size(); i++) {
                 this->q[i] = fims_math::exp(this->log_q[i]);
@@ -182,7 +182,7 @@ namespace fims_popdy {
          */
         void evaluate_age_comp() {
             for (size_t y = 0; y < this->nyears; y++) {
-                Type sum = Type(0.0);
+                Type sum = static_cast<Type>(0.0);
                 for (size_t a = 0; a < this->nages; a++) {
                     size_t i_age_year = y * this->nages + a;
                     sum += this->catch_numbers_at_age[i_age_year];
@@ -201,7 +201,7 @@ namespace fims_popdy {
         void evaluate_length_comp() {
             if (this->nlengths > 0) {
                 for (size_t y = 0; y < this->nyears; y++) {
-                    Type sum = Type(0.0);
+                    Type sum = static_cast<Type>(0.0);
                     for (size_t l = 0; l < this->nlengths; l++) {
                         size_t i_length_year = y * this->nlengths + l;
                         for(size_t a = 0; a < this->nages; a++) {
