@@ -25,7 +25,7 @@
 
 // define REPORT, ADREPORT, and SIMULATE
 #define FIMS_REPORT_F(name, F)                                              \
-  if (isDouble<Type>::value && F->current_parallel_region < 0) {       \
+  if (isDouble<Type>::value && F->current_parallel_region < Type(0)) {       \
     Rf_defineVar(Rf_install(#name), PROTECT(asSEXP(name)), F->report); \
     UNPROTECT(1);                                                      \
   }

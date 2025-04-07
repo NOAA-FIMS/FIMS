@@ -150,16 +150,16 @@ namespace fims_popdy {
                 this->fleets[fleet]->Prepare();
             }
 
-            std::fill(biomass.begin(), biomass.end(), 0.0);
+            std::fill(biomass.begin(), biomass.end(), Type(0.0));
             std::fill(unfished_spawning_biomass.begin(),
-                    unfished_spawning_biomass.end(), 0.0);
-            std::fill(spawning_biomass.begin(), spawning_biomass.end(), 0.0);
-            std::fill(expected_catch.begin(), expected_catch.end(), 0.0);
-            std::fill(expected_recruitment.begin(), expected_recruitment.end(), 0.0);
+                    unfished_spawning_biomass.end(), Type(0.0));
+            std::fill(spawning_biomass.begin(), spawning_biomass.end(), Type(0.0));
+            std::fill(expected_catch.begin(), expected_catch.end(), Type(0.0));
+            std::fill(expected_recruitment.begin(), expected_recruitment.end(), Type(0.0));
             std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(),
-                    0.0);
-            std::fill(mortality_Z.begin(), mortality_Z.end(), 0.0);
-            std::fill(proportion_female.begin(), proportion_female.end(), 0.5);
+                    Type(0.0));
+            std::fill(mortality_Z.begin(), mortality_Z.end(), Type(0.0));
+            std::fill(proportion_female.begin(), proportion_female.end(), Type(0.5));
 
             // Transformation Section
             for (size_t age = 0; age < this->nages; age++) {
@@ -169,7 +169,7 @@ namespace fims_popdy {
                     this->M[i_age_year] = fims_math::exp(this->log_M[i_age_year]);
                     // mortality_F is a fims::Vector and therefore needs to be filled
                     // within a loop
-                    this->mortality_F[i_age_year] = 0.0;
+                    this->mortality_F[i_age_year] = Type(0.0);
                 }
             }
         }
@@ -319,7 +319,7 @@ namespace fims_popdy {
          */
         Type CalculateSBPR0() {
             std::vector<Type> numbers_spr(this->nages, 1.0);
-            Type phi_0 = 0.0;
+            Type phi_0 = Type(0.0);
             phi_0 += numbers_spr[0] * this->proportion_female[0] *
                     this->proportion_mature_at_age[0] *
                     this->growth->evaluate(ages[0]);

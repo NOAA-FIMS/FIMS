@@ -143,7 +143,7 @@ inline const double pow(const double &x, const double &y) {
 template <class Type>
 inline const Type logistic(const Type &inflection_point, const Type &slope,
                            const Type &x) {
-  return (1.0) / (1.0 + exp(-1.0 * slope * (x - inflection_point)));
+  return Type(1.0) / (Type(1.0) + exp(Type(-1.0) * slope * (x - inflection_point)));
 }
 
 /**
@@ -173,7 +173,7 @@ inline const Type logit(const Type &a, const Type &b, const Type &x) {
  */
 template <class Type>
 inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
-  return a + (b - a) / (1.0 + fims_math::exp(-logit_x));
+  return a + (b - a) / (Type(1.0) + fims_math::exp(-logit_x));
 }
 
 /**
@@ -201,9 +201,9 @@ inline const Type double_logistic(const Type &inflection_point_asc,
                                   const Type &slope_asc,
                                   const Type &inflection_point_desc,
                                   const Type &slope_desc, const Type &x) {
-  return (1.0) / (1.0 + exp(-1.0 * slope_asc * (x - inflection_point_asc))) *
-         (1.0 -
-          (1.0) / (1.0 + exp(-1.0 * slope_desc * (x - inflection_point_desc))));
+  return (Type(1.0)) / (Type(1.0) + exp(Type(-1.0) * slope_asc * (x - inflection_point_asc))) *
+         (Type(1.0) -
+          (Type(1.0)) / (Type(1.0) + exp(Type(-1.0) * slope_desc * (x - inflection_point_desc))));
 }
 
 /**
@@ -241,7 +241,7 @@ const Type ad_fabs(const Type &x, Type C = 1e-5) {
 
 template <typename Type>
 inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
-  return (a + b - fims_math::ad_fabs(a - b, C)) * 0.5;
+  return (a + b - fims_math::ad_fabs(a - b, C)) * Type(0.5);
 }
 
 /**
