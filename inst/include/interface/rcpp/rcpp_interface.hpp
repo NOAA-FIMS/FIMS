@@ -753,16 +753,27 @@ RCPP_MODULE(fims) {
         .field("expected_values", &DlnormDistributionsInterface::expected_values, "Mean of the distribution on the natural log scale.")
         .field("log_sd", &DlnormDistributionsInterface::log_sd, "The natural log of the standard deviation of the distribution on the natural log scale.");
 
-    Rcpp::class_<DmultinomDistributionsInterface>("DmultinomDistribution")
+    Rcpp::class_<DDirichletMultinomDistributionsInterface>("DDirichletMultinomDistribution")
         .constructor()
-        .method("get_id", &DmultinomDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
-        .method("evaluate", &DmultinomDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
-        .method("set_observed_data", &DmultinomDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
-        .method("set_distribution_links", &DmultinomDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
-        .method("set_note",&DmultinomDistributionsInterface::set_note)
-        .field("x", &DmultinomDistributionsInterface::x, "Input for distribution when not observations, e.g., prior or random effect.")
-        .field("expected_values", &DmultinomDistributionsInterface::expected_values, "numeric non-negative vector of length K, specifying the probability for the K classes.")
-        .field("dims", &DmultinomDistributionsInterface::dims, "dimension of the multivariate input, e.g., c(num rows, num cols).");
+        .method("get_id", &DDirichletMultinomDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
+        .method("evaluate", &DDirichletMultinomDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
+        .method("set_observed_data", &DDirichletMultinomDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
+        .method("set_distribution_links", &DDirichletMultinomDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
+        .method("set_note",&DDirichletMultinomDistributionsInterface::set_note)
+        .field("x", &DDirichletMultinomDistributionsInterface::x, "Input for distribution when not observations, e.g., prior or random effect.")
+        .field("expected_values", &DDirichletMultinomDistributionsInterface::expected_values, "numeric non-negative vector of length K, specifying the probability for the K classes.")
+        .field("dims", &DDirichletMultinomDistributionsInterface::dims, "dimension of the multivariate input, e.g., c(num rows, num cols).");
+        .constructor()
+        .method("get_id", &DDirichletMultinomDistributionsInterface::get_id, "Returns a unique ID for the Dnorm distribution class.")
+        .method("evaluate", &DDirichletMultinomDistributionsInterface::evaluate, "Evaluates the normal distribution given input data and parameter values.")
+        .method("set_observed_data", &DDirichletMultinomDistributionsInterface::set_observed_data, "Accepts a unique ID for a given Data Object class to link the data with the distribution.")
+        .method("set_distribution_links", &DDirichletMultinomDistributionsInterface::set_distribution_links, "Accepts a unique ID for a given parameter to link the parameter with the distribution.")
+        .method("set_note",&DDirichletMultinomDistributionsInterface::set_note)
+        .field("x", &DDirichletMultinomDistributionsInterface::x, "Input for distribution when not observations, e.g., prior or random effect.")
+        .field("expected_values", &DDirichletMultinomDistributionsInterface::expected_values, "numeric non-negative vector of length K, specifying the probability for the K classes.")
+        .field("dims", &DDirichletMultinomDistributionsInterface::dims, "dimension of the multivariate input, e.g., c(num rows, num cols).")
+        .field("theta", &DDirichletMultinomDistributionsInterface::theta, "");
+
 }
 
 #endif /* RCPP_INTERFACE_HPP */
