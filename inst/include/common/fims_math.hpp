@@ -343,7 +343,8 @@ namespace fims_math
 
   template <typename Type>
   Type ddirichlet_multinomial(const fims::Vector<Type> &x,
-                              const fims::Vector<Type> &p, Type theta,
+                              const fims::Vector<Type> &p, 
+                              Type theta,
                               bool give_log = true)
   {
     Type loglik = 0.0;
