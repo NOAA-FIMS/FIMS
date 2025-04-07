@@ -356,7 +356,7 @@ namespace fims_math
     }
 
     // Precompute some terms
-    Type alpha0 = theta;
+    //Type alpha0 = theta;
     Type alpha_sum = 0.0;
     std::vector<Type> alpha(ncat);
     for (int i = 0; i < ncat; ++i)

@@ -904,7 +904,7 @@ public:
    */
   DDirichletMultinomDistributionsInterface() : DistributionsInterfaceBase()
   {
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<DmultinomDistributionsInterface>(*this));
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<DDirichletMultinomDistributionsInterface>(*this));
   }
 
   /**
@@ -989,7 +989,7 @@ public:
     ddirichlet.dims.resize(2);
     ddirichlet.dims[0] = this->dims[0];
     ddirichlet.dims[1] = this->dims[1];
-    ddirichlet.theta = this->theta.initial_value_m;
+    ddirichlet.theta = this->theta[0].initial_value_m;
     return ddirichlet.evaluate();
   }
 
@@ -1043,7 +1043,7 @@ public:
     ss << " \"name\": \"Ddirichlet\",\n";
     ss << " \"type\": \"Ddirichlet\",\n";
     ss << " \"id\": " << this->id_m << ",\n";
-    ss << " \theta\" : \"" << this->theta.initial_value_m << "\",\n";
+    ss << " \theta\" : \"" << this->theta[0].initial_value_m << "\",\n";
     ss << " \"note\": \"" << this->notes.get() << "\",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
@@ -1098,12 +1098,12 @@ public:
       distribution->expected_values[i] = this->expected_values[i].initial_value_m;
     }
 
-    distributions->theta = this->theta.initial_value_m;
-    if(this->theta.estimated_m)
+    distribution->theta = this->theta[0].initial_value_m;
+    if(this->theta[0].estimated_m)
     {
       info->RegisterParameterName("DirichletMultinom_theta");
       info->RegisterParameter(distribution->theta);
-    }else if (this->theta.is_random_effect_m)
+    }else if (this->theta[0].is_random_effect_m)
     {
       FIMS_ERROR_LOG("DirichletMultinom \"theta\" cannot be a random effect");
     }
