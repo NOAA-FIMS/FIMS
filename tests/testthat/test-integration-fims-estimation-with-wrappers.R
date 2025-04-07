@@ -225,15 +225,14 @@ test_that("nll test of fims", {
   expected_jnll <- rec_nll + landings_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
 
-  expect_equal(report[["nll_components"]][1], rec_nll)
-  expect_equal(report[["nll_components"]][2], landings_nll_fleet)
-  expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
-  #expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
-  expect_equal(report[["nll_components"]][5], index_nll_survey)
-  #Removing for now to test while figuring out the survey comp issue
-  expect_equal(report[["nll_components"]][6], age_comp_nll_survey)
-  #expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
-  #expect_equal(jnll, expected_jnll)
+  expect_lt(abs(report[["nll_components"]][1] - rec_nll),0.000000001)
+  expect_lt(abs(report[["nll_components"]][2] - landings_nll_fleet), 0.000000001)
+  expect_lt(abs(report[["nll_components"]][3] - age_comp_nll_fleet), 0.000000001)
+  expect_lt(abs(report[["nll_components"]][4] - lengthcomp_nll_fleet), 0.000000001)
+  expect_lt(abs(report[["nll_components"]][5] - index_nll_survey), 0.000000001)
+  expect_lt(abs(report[["nll_components"]][6] - age_comp_nll_survey), 0.000000001)
+  expect_lt(abs(report[["nll_components"]][7] - lengthcomp_nll_survey), 0.000000001)
+  expect_lt(abs(jnll - expected_jnll), 0.000000001)
 })
 
 test_that("estimation test with age and length comp using wrappers", {

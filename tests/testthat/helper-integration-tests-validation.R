@@ -150,7 +150,7 @@ validate_fims <- function(
     estimates = estimates
   )
 
-  #Commented out for now because ther is now om_output for fishery index
+  #Commented out for now because there is no om_output for fishery index
   #and the function uses length expected to filter so it only works for the
   #fishing fleet when there is only one fleet. Manual testing shows it working
   #for now at least.
@@ -169,7 +169,7 @@ validate_fims <- function(
       t(om_output[["L.age"]][["fleet1"]])#,
       #t(om_output[["survey_age_comp"]][["survey1"]])
     ),
-    param_name = "CNAA",
+    param_name = "ExpectedLandingsAtAge",
     use_fimsfit = use_fimsfit,
     estimates = estimates
   )

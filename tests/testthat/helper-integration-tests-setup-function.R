@@ -235,7 +235,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
     # Set very low survey fishing mortality
-    survey_fleet$log_Fmort[y]$value <- -20
+    survey_fleet$log_Fmort[y]$value <- -200
   }
   survey_fleet$log_Fmort$set_all_estimable(FALSE)
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
