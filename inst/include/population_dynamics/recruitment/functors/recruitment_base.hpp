@@ -79,7 +79,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
     }
 
     for (size_t i = 0; i < this->log_recruit_devs.size(); i++) {
-      this->log_recruit_devs[i] -= sum / Type(this->log_recruit_devs.size());
+      this->log_recruit_devs[i] -= sum / this->log_recruit_devs.size();
     }
   }
 };
