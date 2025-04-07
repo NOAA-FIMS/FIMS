@@ -49,16 +49,16 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   virtual const Type evaluate(const Type& spawners, const Type& phi_0) {
     Type recruits;
     Type steep;
-    Type steep_lo = Type(0.2);
-    Type steep_hi = Type(1.0);
+    Type steep_lo = static_cast<Type>(0.2);
+    Type steep_hi = static_cast<Type>(1.0);
     Type rzero;
 
     // Transform input parameters
     steep = fims_math::inv_logit(steep_lo, steep_hi, this->logit_steep[0]);
     rzero = fims_math::exp(this->log_rzero[0]);
 
-    recruits = (Type(0.8) * rzero * steep * spawners) /
-               (Type(0.2) * phi_0 * rzero * (Type(1.0) - steep) + spawners * (steep - Type(0.2)));
+    recruits = (static_cast<Type>(0.8) * rzero * steep * spawners) /
+               (static_cast<Type>(0.2) * phi_0 * rzero * (static_cast<Type>(1.0) - steep) + spawners * (steep - static_cast<Type>(0.2)));
 
     return recruits;
   }

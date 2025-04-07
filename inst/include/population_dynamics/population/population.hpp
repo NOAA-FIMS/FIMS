@@ -38,7 +38,7 @@ namespace fims_popdy {
         fims::Vector<Type>
         log_init_naa; /*!< estimated parameter: natural log of numbers at age*/
         fims::Vector<Type> log_M; /*!< estimated parameter: natural log of Natural Mortality*/
-        fims::Vector<Type>proportion_female = fims::Vector<Type>(1, Type(0.5)); /*!< proportion female by age */
+        fims::Vector<Type>proportion_female = fims::Vector<Type>(1, static_cast<Type>(0.5)); /*!< proportion female by age */
 
         // Transformed values
         fims::Vector<Type> M; /*!< transformed parameter: natural mortality*/
@@ -150,16 +150,16 @@ namespace fims_popdy {
                 this->fleets[fleet]->Prepare();
             }
 
-            std::fill(biomass.begin(), biomass.end(), Type(0.0));
+            std::fill(biomass.begin(), biomass.end(), static_cast<Type>(0.0));
             std::fill(unfished_spawning_biomass.begin(),
-                    unfished_spawning_biomass.end(), Type(0.0));
-            std::fill(spawning_biomass.begin(), spawning_biomass.end(), Type(0.0));
-            std::fill(expected_catch.begin(), expected_catch.end(), Type(0.0));
-            std::fill(expected_recruitment.begin(), expected_recruitment.end(), Type(0.0));
+                    unfished_spawning_biomass.end(), static_cast<Type>(0.0));
+            std::fill(spawning_biomass.begin(), spawning_biomass.end(), static_cast<Type>(0.0));
+            std::fill(expected_catch.begin(), expected_catch.end(), static_cast<Type>(0.0));
+            std::fill(expected_recruitment.begin(), expected_recruitment.end(), static_cast<Type>(0.0));
             std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(),
-                    Type(0.0));
-            std::fill(mortality_Z.begin(), mortality_Z.end(), Type(0.0));
-            std::fill(proportion_female.begin(), proportion_female.end(), Type(0.5));
+                    static_cast<Type>(0.0));
+            std::fill(mortality_Z.begin(), mortality_Z.end(), static_cast<Type>(0.0));
+            std::fill(proportion_female.begin(), proportion_female.end(), static_cast<Type>(0.5));
 
             // Transformation Section
             for (size_t age = 0; age < this->nages; age++) {
@@ -169,7 +169,7 @@ namespace fims_popdy {
                     this->M[i_age_year] = fims_math::exp(this->log_M[i_age_year]);
                     // mortality_F is a fims::Vector and therefore needs to be filled
                     // within a loop
-                    this->mortality_F[i_age_year] = Type(0.0);
+                    this->mortality_F[i_age_year] = static_cast<Type>(0.0);
                 }
             }
         }
@@ -319,7 +319,7 @@ namespace fims_popdy {
          */
         Type CalculateSBPR0() {
             std::vector<Type> numbers_spr(this->nages, 1.0);
-            Type phi_0 = Type(0.0);
+            Type phi_0 = static_cast<Type>(0.0);
             phi_0 += numbers_spr[0] * this->proportion_female[0] *
                     this->proportion_mature_at_age[0] *
                     this->growth->evaluate(ages[0]);

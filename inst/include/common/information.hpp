@@ -277,7 +277,7 @@ namespace fims_info {
         void SetFleetIndexData(
                 bool &valid_model,
                 std::shared_ptr<fims_popdy::Fleet<Type> > f) {
-            if (f->fleet_observed_index_data_id_m != Type(-999)) {
+            if (f->fleet_observed_index_data_id_m != static_cast<Type>(-999)) {
                 uint32_t observed_index_id =
                         static_cast<uint32_t> (f->fleet_observed_index_data_id_m);
                 data_iterator it = this->data_objects.find(observed_index_id);
@@ -309,7 +309,7 @@ namespace fims_info {
         void SetAgeCompositionData(
                 bool &valid_model,
                 std::shared_ptr<fims_popdy::Fleet<Type> > f) {
-            if (f->fleet_observed_agecomp_data_id_m != Type(-999)) {
+            if (f->fleet_observed_agecomp_data_id_m != static_cast<Type>(-999)) {
                 uint32_t observed_agecomp_id =
                         static_cast<uint32_t> (f->fleet_observed_agecomp_data_id_m);
                 data_iterator it = this->data_objects.find(observed_agecomp_id);
@@ -335,7 +335,7 @@ namespace fims_info {
         void SetLengthCompositionData(
                 bool &valid_model,
                 std::shared_ptr<fims_popdy::Fleet<Type> > f) {
-            if (f->fleet_observed_lengthcomp_data_id_m != Type(-999)) {
+            if (f->fleet_observed_lengthcomp_data_id_m != static_cast<Type>(-999)) {
                 uint32_t observed_lengthcomp_id =
                         static_cast<uint32_t> (f->fleet_observed_lengthcomp_data_id_m);
                 data_iterator it = this->data_objects.find(observed_lengthcomp_id);
@@ -361,7 +361,7 @@ namespace fims_info {
         void SetFleetSelectivityModel(
                 bool &valid_model,
                 std::shared_ptr<fims_popdy::Fleet<Type> > f) {
-            if (f->fleet_selectivity_id_m != Type(-999)) {
+            if (f->fleet_selectivity_id_m != static_cast<Type>(-999)) {
                 uint32_t sel_id = static_cast<uint32_t> (
                         f->fleet_selectivity_id_m); // cast as unsigned integer
                 selectivity_models_iterator it = this->selectivity_models.find(
@@ -395,7 +395,7 @@ namespace fims_info {
         void SetRecruitment(
                 bool &valid_model,
                 std::shared_ptr<fims_popdy::Population<Type> > p) {
-            if (p->recruitment_id != Type(-999)) {
+            if (p->recruitment_id != static_cast<Type>(-999)) {
                 uint32_t recruitment_uint = static_cast<uint32_t> (p->recruitment_id);
                 FIMS_INFO_LOG("searching for recruitment model "+fims::to_string(recruitment_uint));
                 recruitment_models_iterator it =
@@ -434,7 +434,7 @@ namespace fims_info {
         void SetGrowth(
                 bool &valid_model,
                 std::shared_ptr<fims_popdy::Population<Type> > p) {
-            if (p->growth_id != Type(-999)) {
+            if (p->growth_id != static_cast<Type>(-999)) {
                 uint32_t growth_uint = static_cast<uint32_t> (p->growth_id);
                 growth_models_iterator it = this->growth_models.find(
                         growth_uint); // growth_models is specified in information.hpp
@@ -473,7 +473,7 @@ namespace fims_info {
         void SetMaturity(
                 bool &valid_model,
                 std::shared_ptr<fims_popdy::Population<Type> > p) {
-            if (p->maturity_id != Type(-999)) {
+            if (p->maturity_id != static_cast<Type>(-999)) {
                 uint32_t maturity_uint = static_cast<uint32_t> (p->maturity_id);
                 maturity_models_iterator it = this->maturity_models.find(
                         maturity_uint); // >maturity_models is specified in
@@ -535,7 +535,7 @@ namespace fims_info {
 
                 //set data objects if distribution is a data type
                 if (d->input_type == "data") {
-                    if (d->observed_data_id_m != Type(-999)) {
+                    if (d->observed_data_id_m != static_cast<Type>(-999)) {
                         uint32_t observed_data_id = static_cast<uint32_t> (d->observed_data_id_m);
                         data_iterator it = this->data_objects.find(observed_data_id);
 
