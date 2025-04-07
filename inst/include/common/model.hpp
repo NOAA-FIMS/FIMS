@@ -56,7 +56,7 @@ namespace fims_model {
          */
         const Type Evaluate() {
             // jnll = negative-log-likelihood (the objective function)
-            Type jnll = 0.0;
+            Type jnll = Type(0.0);
 
 
             int n_fleets = fims_information->fleets.size();

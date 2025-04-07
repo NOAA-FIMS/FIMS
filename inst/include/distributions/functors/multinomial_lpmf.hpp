@@ -22,7 +22,7 @@ namespace fims_distributions
     template <typename Type>
     struct MultinomialLPMF : public DensityComponentBase<Type>
     {
-        Type lpdf = 0.0; /**< total negative log-likelihood contribution of the distribution */
+        Type lpdf = Type(0.0); /**< total negative log-likelihood contribution of the distribution */
         fims::Vector<size_t> dims; /**< Dimensions of the number of rows and columns of the multivariate dataset */
 
         /** @brief Constructor.
@@ -49,7 +49,7 @@ namespace fims_distributions
 
 
             // setup vector for recording the log probability density function values
-            Type lpdf = 0.0; /**< total log probability mass contribution of the distribution */
+            Type lpdf = Type(0.0); /**< total log probability mass contribution of the distribution */
             this->lpdf_vec.resize(dims[0]);
             std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
 
