@@ -343,6 +343,25 @@ Rcpp::NumericVector get_random_parameters_vector() {
 }
 
 /**
+ * @brief Gets the data vector object.
+ *
+ * @return Rcpp::NumericVector
+ */
+Rcpp::NumericVector get_data_vector() {
+    // base model
+    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info =
+            fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    
+    Rcpp::NumericVector d;
+
+    for (size_t i = 0; i < info->data.size(); i++) {
+        d.push_back(*info->data[i]);
+    }
+
+    return d;
+}
+
+/**
  * @brief Gets the parameter names object.
  *
  * @param pars
@@ -623,6 +642,9 @@ RCPP_MODULE(fims) {
     Rcpp::function(
             "get_random", &get_random_parameters_vector,
             "Gets the random parameters vector object.");
+    Rcpp::function(
+        "get_module_data", &get_data_vector,
+        "Gets the data vector object.");
     Rcpp::function(
             "get_parameter_names", &get_parameter_names,
             "Gets the parameter names object.");

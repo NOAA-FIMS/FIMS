@@ -10,6 +10,8 @@
 #' @export EWAAgrowth
 #' @export finalize
 #' @export Fleet
+#' @export get_data
+#' @export get_module_data
 #' @export get_fixed
 #' @export get_log
 #' @export get_log_errors

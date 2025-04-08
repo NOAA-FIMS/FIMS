@@ -66,6 +66,7 @@ public:
      * @brief Adds the parameters to the TMB model.
      */
     virtual bool add_to_fims_tmb() {
+
         return true;
     };
 };
@@ -148,6 +149,8 @@ public:
 
     template <typename Type>
     bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims_info::Information<Type> > info =
+                fims_info::Information<Type>::GetInstance();
         std::shared_ptr<fims_data_object::DataObject < Type>> age_comp_data =
                 std::make_shared<fims_data_object::DataObject < Type >> (this->ymax,
                 this->amax);
@@ -157,11 +160,9 @@ public:
             for (int a = 0; a < amax; a++) {
                 int i_age_year = y * amax + a;
                 age_comp_data->at(y, a) = this->age_comp_data[i_age_year];
+                info->RegisterData(age_comp_data->at(y, a));
             }
         }
-
-        std::shared_ptr<fims_info::Information < Type>> info =
-                fims_info::Information<Type>::GetInstance();
 
         info->data_objects[this->id] = age_comp_data;
 
@@ -261,6 +262,8 @@ public:
 
     template <typename Type>
     bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims_info::Information<Type> > info =
+                fims_info::Information<Type>::GetInstance();
         std::shared_ptr<fims_data_object::DataObject < Type>> length_comp_data =
                 std::make_shared<fims_data_object::DataObject < Type >> (this->ymax,
                 this->lmax);
@@ -269,10 +272,10 @@ public:
             for (int l = 0; l < lmax; l++) {
                 int i_length_year = y * lmax + l;
                 length_comp_data->at(y, l) = this->length_comp_data[i_length_year];
+                info->RegisterData(length_comp_data->at(y, l));
             }
         }
-        std::shared_ptr<fims_info::Information < Type>> info =
-                fims_info::Information<Type>::GetInstance();
+
         info->data_objects[this->id] = length_comp_data;
         return true;
     }
@@ -362,6 +365,8 @@ public:
 
     template <typename Type>
     bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims_info::Information<Type> > info =
+                fims_info::Information<Type>::GetInstance();
         std::shared_ptr<fims_data_object::DataObject < Type>> data =
                 std::make_shared<fims_data_object::DataObject < Type >> (this->ymax);
 
@@ -369,10 +374,8 @@ public:
 
         for (int y = 0; y < ymax; y++) {
             data->at(y) = this->index_data[y];
+            info->RegisterData(data->at(y));
         }
-
-        std::shared_ptr<fims_info::Information < Type>> info =
-                fims_info::Information<Type>::GetInstance();
 
         info->data_objects[this->id] = data;
         return true;

@@ -791,11 +791,12 @@ initialize_fims <- function(parameters, data) {
   # Set-up TMB
   CreateTMBModel()
   # Create parameter list from Rcpp modules
-  parameter_list <- list(
+  model_list <- list(
+    data = list(y = get_module_data()),
     parameters = list(p = get_fixed())
   )
 
-  return(parameter_list)
+  return(model_list)
 }
 
 #' Set parameter vector values based on module input

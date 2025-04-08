@@ -43,6 +43,8 @@ namespace fims_info {
         std::vector<Type*>
         random_effects_parameters; /**< list of all random effects parameters >*/
         std::vector<Type*>
+        data; /**< list of all data >*/
+        std::vector<Type*>
         fixed_effects_parameters; /**< list of all fixed effects parameters >*/
         std::vector<std::string>
         parameter_names; /**< list of all parameter names estimated in the model */
@@ -143,6 +145,7 @@ namespace fims_info {
             this->parameter_names.clear();
             this->parameters.clear();
             this->random_effects_parameters.clear();
+            this->data.clear();
             this->recruitment_models.clear();
             this->selectivity_models.clear();
             this->variable_map.clear();
@@ -189,6 +192,15 @@ namespace fims_info {
          */
         void RegisterParameterName(std::string p_name) {
             this->parameter_names.push_back(p_name);
+        }
+
+        /**
+         * @brief Register data in the data vector.
+         *
+         * @param d
+         */
+        void RegisterData(Type& d) {
+            this->data.push_back(&d);
         }
 
         /**

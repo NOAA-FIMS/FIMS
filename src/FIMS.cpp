@@ -14,7 +14,7 @@
 template<class Type>
 Type objective_function<Type>::operator()() {
 
-
+    DATA_VECTOR(y);
     PARAMETER_VECTOR(p);
 
     // code below copied from ModularTMBExample/src/tmb_objective_function.cpp
@@ -26,6 +26,10 @@ Type objective_function<Type>::operator()() {
     std::shared_ptr<fims_info::Information<Type>> information =
       fims_info::Information<Type>::GetInstance();
 
+    //update the data vector 
+    for(size_t i =0; i < information->data.size(); i++){
+      *information->data[i] = y[i];
+    }
     //update the parameter values
     for(size_t i =0; i < information->fixed_effects_parameters.size(); i++){
         *information->fixed_effects_parameters[i] = p[i];
