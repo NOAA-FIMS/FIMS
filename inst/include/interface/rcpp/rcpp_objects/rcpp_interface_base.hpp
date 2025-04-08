@@ -59,7 +59,7 @@ class Parameter {
    * @brief A string indicationg the estimation type. Options are: constant, 
    * fixed_effects, or random_effects, where the default is constant.
    */
-  std::string estimatation_type = "constant";
+  std::string estimatation_type_m = "constant";
 
   /**
    * @brief The constructor for initializing a parameter.
