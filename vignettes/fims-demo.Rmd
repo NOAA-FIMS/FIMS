@@ -19,7 +19,6 @@ This vignette provides the minimal steps needed to run a Fisheries Integrated Mo
 Load the FIMS package and clear memory:
 ```{r memory, warning=FALSE, message=FALSE}
 library(FIMS)
-library(ggplot2)
 
 # clear memory
 clear()

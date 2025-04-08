@@ -32,7 +32,7 @@ Data for a FIMS model must be stored in a single data frame with a long format, 
 
 ### `data1`
 
-A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data1`. This data set is based on data that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data1.R) based on an age-length conversion matrix. See [R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) or `?data1` for details about the package data.
+A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data1`. This data set is based on data that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data1.R) based on an age-length conversion matrix. See [R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) or `?data1` for details about the package data.
 
 ### `FIMSFrame()`
 
@@ -153,6 +153,8 @@ parameters <- default_parameters |>
           0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
           -0.19556523, 0.20094360, 0.37248740, -0.07163145
         ),
+        # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
+        # to TRUE. We need to debug the issue, then update the line below accordingly.
         BevertonHoltRecruitment.log_devs.estimated = FALSE
       )
     )
@@ -179,6 +181,28 @@ parameters <- default_parameters |>
   )
 ```
 
+`purrr::map_vec()` can be used to compare the length of individual updated parameter vectors from `parameters` with the length of individual parameter vectors from `default_parameters`.
+```{r parameter-length-comparison}
+default_fleet1 <- purrr::map_vec(
+  default_parameters[["parameters"]][["fleet1"]],
+  \(x) length(x)
+)
+updated_fleet1 <- purrr::map_vec(
+  parameters[["parameters"]][["fleet1"]],
+  \(x) length(x)
+)
+knitr::kable(cbind(default_fleet1, updated_fleet1))
+```
+
+`purrr::map_df()` can be used to summarize parameter vector lengths across all modules.
+```{r parameter-length-table}
+purrr::map_df(
+  parameters[["parameters"]], \(x) purrr::map_vec(x, length),
+  .id = "module"
+) |>
+  tibble::column_to_rownames(var = "module") |>
+  t()
+```
 ## Fit
 
 With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fims()`.
@@ -203,6 +227,8 @@ test_fit <- parameters |>
 fit <- parameters |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
+
+fit_output <- finalize(fit@opt$par, fit@obj$fn, fit@obj$gr)
 
 # Get information about the model and print a few characters to the screen
 recruitment_log <- get_log_module("information")
@@ -334,6 +360,6 @@ length_only_fit <- data_4_model |>
   update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-
+cat(fit_output)
 clear()
 ```
