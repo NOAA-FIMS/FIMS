@@ -236,8 +236,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double> >(it->second);
 
       for (size_t i = 0; i < this->log_sd.size(); i++) {
-        if (this->log_sd[i].estimatation_type == "constant" ) {
-          this->log_sd[i].final_value_m = dnorm->log_sd.initial_value_m;
+        if (this->log_sd[i].estimation_type_m == "constant" ) {
+          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
           this->log_sd[i].final_value_m = dnorm->log_sd[i];
         }
@@ -315,13 +315,13 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->log_sd.resize(this->log_sd.size());
     for(size_t i=0; i<this->log_sd.size(); i++){
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if(this->log_sd[i].estimatation_type == "fixed_effects"){
+      if(this->log_sd[i].estimation_type_m == "fixed_effects"){
         ss.str("");
         ss << "dnorm." << this->id_m << "log_sd." << i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_sd[i].estimatation_type == "random_effects") {
+      if (this->log_sd[i].estimation_type_m == "random_effects") {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
@@ -478,8 +478,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double> >(it->second);
 
       for (size_t i = 0; i < this->log_sd.size(); i++) {
-        if (this->log_sd[i].estimatation_type == "constant" ) {
-          this->log_sd[i].final_value_m = dlnorm->log_sd.initial_value_m;
+        if (this->log_sd[i].estimation_type_m == "constant" ) {
+          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
           this->log_sd[i].final_value_m = dlnorm->log_sd[i];
         }
@@ -537,6 +537,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     // set relative info
     distribution->id = this->id_m;
+    std::stringstream ss;
     distribution->observed_data_id_m =
         interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
@@ -556,13 +557,13 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->log_sd.resize(this->log_sd.size());
     for(size_t i=0; i<this->log_sd.size(); i++){
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if(this->log_sd[i].estimatation_type == "fixed_effects"){
+      if(this->log_sd[i].estimation_type_m == "fixed_effects"){
         ss.str("");
         ss << "dlnorm." << this->id_m << "log_sd." << i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_sd[i].estimatation_type == "random_effects") {
+      if (this->log_sd[i].estimation_type_m == "random_effects") {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
@@ -810,8 +811,8 @@ virtual std::string to_json() {
 
 
 /**
- * @brief The Rcpp interface for DDirichletMultinom to instantiate from R:
- * ddirichletmultinom_ <- methods::new(DmultinomDistribution).
+ * @brief The Rcpp interface for DirichletMultinom to instantiate from R:
+ * ddirmultinom_ <- methods::new(DirichletMultinomDistribution).
  */
 class DDirichletMultinomDistributionsInterface : public DistributionsInterfaceBase
 {
@@ -836,7 +837,7 @@ public:
    */
   RealVector lpdf_vec; /**< The vector */
 
-  ParameterVector theta; /**< Dirichlet parameter */
+  ParameterVector theta; /**< Dirichlet overdispersion parameter */
 
   /**
    * @brief TODO: document this.
@@ -853,7 +854,7 @@ public:
   }
 
   /**
-   * @brief Construct a new Dmultinom Distributions Interface object
+   * @brief Construct a new DDircihletMultinom Distributions Interface object
    *
    * @param other
    */
@@ -919,23 +920,24 @@ public:
    */
   virtual double evaluate()
   {
-    fims_distributions::DirichiletMultinomialLPMF<double> ddirichlet;
+    fims_distributions::DirichiletMultinomialLPMF<double> ddirmultinom;
     // Declare TMBVector in this scope
-    ddirichlet.x.resize(this->x.size());
-    ddirichlet.expected_values.resize(this->expected_values.size());
+    ddirmultinom.x.resize(this->x.size());
+    ddirmultinom.expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < x.size(); i++)
     {
-      ddirichlet.x[i] = this->x[i].initial_value_m;
+      ddirmultinom.x[i] = this->x[i].initial_value_m;
     }
     for (size_t i = 0; i < expected_values.size(); i++)
     {
-      ddirichlet.expected_values[i] = this->expected_values[i].initial_value_m;
+      ddirmultinom.expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    ddirichlet.dims.resize(2);
-    ddirichlet.dims[0] = this->dims[0];
-    ddirichlet.dims[1] = this->dims[1];
-    ddirichlet.theta = this->theta[0].initial_value_m;
-    return ddirichlet.evaluate();
+    ddirmultinom.dims.resize(2);
+    ddirmultinom.dims[0] = this->dims[0];
+    ddirmultinom.dims[1] = this->dims[1];
+    ddirmultinom.theta = this->theta[0].initial_value_m;
+    
+    return ddirmultinom.evaluate();
   }
 
   void finalize()
@@ -943,7 +945,7 @@ public:
     if (this->finalized)
     {
       // log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("DDirichletMultinomDistributionsInterface  " + fims::to_string(this->id_m) + " has been finalized already.");
+      FIMS_WARNING_LOG("ddirmultinomMultinomDistributionsInterface  " + fims::to_string(this->id_m) + " has been finalized already.");
     }
 
     this->finalized = true; // indicate this has been called already
@@ -958,17 +960,24 @@ public:
     // if not found, just return
     if (it == info->density_components.end())
     {
-      FIMS_WARNING_LOG("DDirichletMultinomDistributionsInterface " + fims::to_string(this->id_m) + " not found in Information.");
+      FIMS_WARNING_LOG("DDirchletMultinomDistributionsInterface " + fims::to_string(this->id_m) + " not found in Information.");
       return;
     }
     else
     {
-      std::shared_ptr<fims_distributions::DirichiletMultinomialLPMF<double>> ddirichlet =
+      std::shared_ptr<fims_distributions::DirichiletMultinomialLPMF<double>> ddirmultinom =
           std::dynamic_pointer_cast<fims_distributions::DirichiletMultinomialLPMF<double>>(it->second);
-      this->lpdf_vec = Rcpp::NumericVector(ddirichlet->lpdf_vec.size());
+
+   
+      if (this->theta[0].estimation_type_m == "constant" ) {
+        this->theta[0].final_value_m = this->theta[0].initial_value_m;
+        this->theta[0].final_value_m = ddirmultinom->theta;
+      }
+
+      this->lpdf_vec = Rcpp::NumericVector(ddirmultinom->lpdf_vec.size());
       for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++)
       {
-        this->lpdf_vec[i] = ddirichlet->lpdf_vec[i];
+        this->lpdf_vec[i] = ddirmultinom->lpdf_vec[i];
       }
     }
   }
@@ -985,8 +994,8 @@ public:
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"Ddirichlet\",\n";
-    ss << " \"type\": \"Ddirichlet\",\n";
+    ss << " \"name\": \"ddirmultinom\",\n";
+    ss << " \"type\": \"ddirmultinom\",\n";
     ss << " \"id\": " << this->id_m << ",\n";
     ss << " \theta\" : \"" << this->theta[0].initial_value_m << "\",\n";
     ss << " \"note\": \"" << this->notes.get() << "\",\n";
@@ -1023,6 +1032,7 @@ public:
         std::make_shared<fims_distributions::DirichiletMultinomialLPMF<Type>>();
 
     distribution->id = this->id_m;
+    std::stringstream ss;
     distribution->observed_data_id_m =
         interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
@@ -1043,12 +1053,13 @@ public:
       distribution->expected_values[i] = this->expected_values[i].initial_value_m;
     }
 
+ 
     distribution->theta = this->theta[0].initial_value_m;
-    if(this->theta[0].estimated_m)
-    {
-      info->RegisterParameterName("DirichletMultinom_theta");
-      info->RegisterParameter(distribution->theta);
-    }else if (this->theta[0].is_random_effect_m)
+    if(this->theta[0].estimation_type_m == "fixed_effects") {
+        ss << "dirichlet." << this->id_m << "theta." << 0;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->theta);
+    }else if (this->theta[0].estimation_type_m == "random_effects")
     {
       FIMS_ERROR_LOG("DirichletMultinom \"theta\" cannot be a random effect");
     }

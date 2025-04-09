@@ -59,13 +59,13 @@ class Parameter {
    * @brief A string indicationg the estimation type. Options are: constant, 
    * fixed_effects, or random_effects, where the default is constant.
    */
-  std::string estimatation_type_m = "constant";
+  std::string estimation_type_m = "constant";
 
   /**
    * @brief The constructor for initializing a parameter.
    */
-  Parameter(double value, double min, double max, std::string estimatation_type)
-  : id_m(Parameter::id_g++), initial_value_m(value), min_m(min), max_m(max), estimatation_type_m(estimatation_type) {
+  Parameter(double value, double min, double max, std::string estimation_type)
+  : id_m(Parameter::id_g++), initial_value_m(value), min_m(min), max_m(max), estimation_type_m(estimation_type) {
   }
 
   /**
@@ -75,7 +75,7 @@ class Parameter {
     id_m(other.id_m), initial_value_m(other.initial_value_m),
     final_value_m(other.final_value_m),
     min_m(other.min_m), max_m(other.max_m),
-    estimatation_type_m(other.estimation_type_m) {
+    estimation_type_m(other.estimation_type_m) {
   }
 
   /**
@@ -87,7 +87,7 @@ class Parameter {
       return *this; // Yes, so skip assignment, and just return *this.
     this->id_m = right.id_m;
     this->initial_value_m = right.initial_value_m;
-    this->estimation_type_m = right.estimatation_type_m;
+    this->estimation_type_m = right.estimation_type_m;
     this->min_m = right.min_m;
     this->max_m = right.max_m;
     return *this;
@@ -138,7 +138,7 @@ std::ostream& operator<<(std::ostream& out, const Parameter& p) {
       out << p.max_m;
   }
 
-  out << ",\n\"estimatation type is\": " << p.estimatation_type_m << "\n}";
+  out << ",\n\"estimatation type is\": " << p.estimation_type_m << "\n}";
 
   return out;
 }
@@ -307,9 +307,9 @@ public:
   void set_all_estimable(bool estimable){
     for (size_t i = 0; i < this->storage_m->size(); i++) {    
       if(estimable){
-        storage_m->at(i).estimatation_type_m = "fixed_effects";
+        storage_m->at(i).estimation_type_m = "fixed_effects";
       } else {
-        storage_m->at(i).estimatation_type_m = "constant";
+        storage_m->at(i).estimation_type_m = "constant";
       }
     }
   }
@@ -324,9 +324,9 @@ public:
   void set_all_random(bool random){
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       if(random){
-        storage_m->at(i).estimatation_type_m = "random_effects";
+        storage_m->at(i).estimation_type_m = "random_effects";
       } else {
-        storage_m->at(i).estimatation_type_m = "constant";
+        storage_m->at(i).estimation_type_m = "constant";
       }
     }
   }

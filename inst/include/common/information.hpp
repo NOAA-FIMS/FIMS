@@ -46,6 +46,7 @@ namespace fims_info {
         fixed_effects_parameters; /**< list of all fixed effects parameters >*/
         std::vector<std::string>
         parameter_names; /**< list of all parameter names estimated in the model */
+        std::vector<std::string> 
         random_effects_names; /**< list of all random effects names estimated in the model */
 
         // data objects

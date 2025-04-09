@@ -598,8 +598,7 @@ RCPP_MODULE(fims)
                 "unique id for parameter class")
             .field(
                 "estimation_type", &Parameter::estimation_type_m,
-                "A string that takes three arguments: constant, indicating a parameter is not estimated; fixed_effects, 
-                indicating a parameter is estimated; and random_effects, indicating a parameter is estimated; the default is constant.");
+                "A string that takes three arguments: constant, indicating a parameter is not estimated; fixed_effects, indicating a parameter is estimated; and random_effects, indicating a parameter is estimated; the default is constant.");
 
     Rcpp::class_<ParameterVector>(
       "ParameterVector",
