@@ -175,9 +175,9 @@ for (iter in 1:sim_num) {
   em_input[["nlengths"]] <- length(len_bins)
   em_input[["cv.length_at_age"]] <- cv
   em_input[["age_to_length_conversion"]] <- age_to_length_conversion
-  n_length_compositions <- 200
-  em_input[["n.L.lengthcomp"]][["fleet1"]] <- n_length_compositions
-  em_input[["n.survey.lengthcomp"]][["survey1"]] <- n_length_compositions
+  n_lengthcomps <- 200
+  em_input[["n.L.lengthcomp"]][["fleet1"]] <- n_lengthcomps
+  em_input[["n.survey.lengthcomp"]][["survey1"]] <- n_lengthcomps
 
   # Populate length-based outputs for each year, length bin, and age
   for (i in seq_along(om_input[["year"]])) {

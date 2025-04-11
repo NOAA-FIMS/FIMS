@@ -239,10 +239,10 @@ namespace fims_model {
                 index_exp(fleet_idx) = f->index_expected;
                 index_naa(fleet_idx) = f->index_numbers_at_age;
                 index_nal(fleet_idx) = f->index_numbers_at_length;
-                comp_naa(fleet_idx) = f->composition_numbers_at_age;
-                comp_nal(fleet_idx) = f->composition_numbers_at_length;
-                comp_pnaa(fleet_idx) = f->proportion_numbers_at_age;
-                comp_pnal(fleet_idx) = f->proportion_numbers_at_length;
+                comp_naa(fleet_idx) = f->agecomp_expected;
+                comp_nal(fleet_idx) = f->lengthcomp_expected;
+                comp_pnaa(fleet_idx) = f->agecomp_proportion;
+                comp_pnal(fleet_idx) = f->lengthcomp_proportion;
                 F_mort(fleet_idx) = f->Fmort;
                 q(fleet_idx) = f->q;
 #endif

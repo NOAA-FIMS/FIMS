@@ -176,8 +176,8 @@ get_expected_name <- function(family, data_type) {
     data_type == "index" &&
       grepl("lognormal|gaussian", family_string) &&
       link_string == "identity" ~ "index_expected",
-    grepl("agecomp", data_type) ~ "proportion_numbers_at_age",
-    grepl("lengthcomp", data_type) ~ "proportion_numbers_at_length",
+    grepl("agecomp", data_type) ~ "agecomp_proportion",
+    grepl("lengthcomp", data_type) ~ "lengthcomp_proportion",
   )
   # Check combination of entries was okay and led to valid name
   if (is.na(expected_name)) {

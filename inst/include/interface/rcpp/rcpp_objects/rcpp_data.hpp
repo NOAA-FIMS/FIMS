@@ -28,7 +28,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
   static uint32_t id_g;
   /**
    * @brief The local id of the DataInterfaceBase object.
-   * 
+   *
    */
   uint32_t id;
   /**
@@ -128,7 +128,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
-  
+
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
@@ -138,7 +138,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
    */
   virtual std::string to_json() {
     std::stringstream ss;
-    
+
     ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\" : \"AgeComp\",\n";
@@ -153,7 +153,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
     ss << "}";
     return ss.str();
   }
-  
+
 
 #ifdef TMB_MODEL
 
@@ -205,7 +205,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @brief The first dimension of the data, which relates to the number of
    * length bins.
    */
-  fims_int lmax;
+  fims_int lmax = 0;
   /**
    * @brief The second dimension of the data, which relates to the number of
    * time steps or years.
@@ -245,7 +245,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
-  
+
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
@@ -255,7 +255,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
    */
   virtual std::string to_json() {
     std::stringstream ss;
-    
+
     ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\" : \"LengthComp\",\n";
@@ -270,7 +270,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     ss << "}";
     return ss.str();
   }
-  
+
 #ifdef TMB_MODEL
   template <typename Type>
   bool add_to_fims_tmb_internal() {
@@ -325,7 +325,7 @@ class IndexDataInterface : public DataInterfaceBase {
   IndexDataInterface(int ymax = 0) : DataInterfaceBase() {
     this->ymax = ymax;
     this->index_data.resize(ymax);
-    
+
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<IndexDataInterface>(*this));
   }
 
@@ -347,17 +347,17 @@ class IndexDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
-  
+
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
    * data interface with index data. It also returns the ID, the rank of 1, the
    * dimensions by printing ymax, followed by the data values themselves. This
    * string is formatted for a json file.
-   */ 
+   */
   virtual std::string to_json() {
     std::stringstream ss;
-    
+
     ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\": \"Index\",\n";
@@ -452,17 +452,17 @@ class LandingsDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
-  
+
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
    * data interface with landings data. It also returns the ID, the rank of 1, the
    * dimensions by printing ymax, followed by the data values themselves. This
    * string is formatted for a json file.
-   */ 
+   */
   virtual std::string to_json() {
     std::stringstream ss;
-    
+
     ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\": \"Landings\",\n";

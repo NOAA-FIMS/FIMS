@@ -26,7 +26,7 @@ units for each data type are as follows. \code{mt} is used for \code{index},
 viable units for the composition data, where the former is the preferred
 unit of measurement.}
 \item{uncertainty}{A real value providing a measurement of uncertainty
-for value. For landingses and survey indices of abundance this should be
+for value. For landings and indices of abundance this should be
 the standard deviation of the logged observations if you are using the
 lognormal distribution to fit your data. For composition data it will
 be your input sample size.

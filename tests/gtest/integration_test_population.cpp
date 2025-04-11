@@ -197,11 +197,11 @@ namespace
                                   1.0)
                             << "year " << year;
                         // Expect FIMS value is greater than 0.0 checking that
-                        // the fishing fleet always has positive landingses
+                        // the fishing fleet always has positive landings
                         EXPECT_GT(pop.fleets[0]->landings_expected[year], 0.0)
                             << "year " << year;
                         // Expect FIMS value = 0.0 checking that the survey 
-                        // fleet always has close to or zero landingses
+                        // fleet always has close to or zero landings
                         EXPECT_LE(pop.fleets[1]->landings_expected[year], 0.0001)
                             << "year " << year;
                     }
@@ -230,7 +230,7 @@ namespace
                     //test fleets this may cause an error in the future.
                     for (int year = 0; year < pop.nyears; year++)
                     {
-                        // Expect landingsability of the fishing fleet = 1.0
+                        // Expect catchability of the fishing fleet = 1.0
                         // Expect expected index of the fishing fleet to be
                         // greater than 0.0
                             EXPECT_GT(pop.fleets[0]->index_expected[year], 0.0)

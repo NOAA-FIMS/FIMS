@@ -112,17 +112,17 @@ public:
    */
   SharedInt nyears = 0;
   /**
-   * @brief Are observed landings for this fleet measured in weight. 
-   * Default is TRUE, if measured in numbers set to FALSE.
+   * @brief What units are the observed landings for this fleet measured in.
+   * Options are weight or numbers, default is weight.
    */
-  SharedBoolean observed_landings_in_weight = true;
+  SharedString  observed_landings_units = fims::to_string("weight");
   /**
-   * @brief Is the observed index of abundance for this fleet measured in  
-   * weight. Default is TRUE, if measured in numbers set to FALSE.
+   * @brief What units is the observed index of abundance for this fleet
+   * measured in. Options are weight or numbers, default is weight.
    */
-  SharedBoolean observed_index_in_weight = true;
+  SharedString observed_index_units = fims::to_string("weight");
   /**
-   * @brief The natural log of the index of abundance scaling parameter 
+   * @brief The natural log of the index of abundance scaling parameter
    * for this fleet.
    */
   ParameterVector log_q;
@@ -132,43 +132,43 @@ public:
    */
   ParameterVector log_Fmort;
   /**
-   * @brief The vector of natural log of the expected total landings for 
+   * @brief The vector of natural log of the expected total landings for
    * the fleet.
    */
   ParameterVector log_landings_expected;
   /**
-   * @brief The vector of natural log of the expected index of abundance 
+   * @brief The vector of natural log of the expected index of abundance
    * for the fleet.
    */
   ParameterVector log_index_expected;
   /**
    * @brief The vector of expected landings-at-age in numbers for the fleet.
    */
-  ParameterVector composition_numbers_at_age;
+  ParameterVector agecomp_expected;
   /**
    * @brief The vector of expected landings-at-length in numbers for the fleet.
    */
-  ParameterVector composition_numbers_at_length;
+  ParameterVector lengthcomp_expected;
   /**
    * @brief The vector of expected landings-at-age in numbers for the fleet.
    */
-  ParameterVector proportion_numbers_at_age;
+  ParameterVector agecomp_proportion;
   /**
    * @brief The vector of expected landings-at-length in numbers for the fleet.
    */
-  ParameterVector proportion_numbers_at_length;
+  ParameterVector lengthcomp_proportion;
   /**
-   * @brief The vector of conversions to go from age to length, i.e., the 
+   * @brief The vector of conversions to go from age to length, i.e., the
    * age-to-length-conversion matrix.
    */
   ParameterVector age_to_length_conversion;
   /**
-   * @brief Should index scaling parameter (q) be estimated? 
+   * @brief Should catchability (q) be estimated?
    * The default is false.
    */
   SharedBoolean estimate_q = false;
   /**
-   * @brief Is landingsability (q) a random effect? The default is false.
+   * @brief Is catchability (q) a random effect? The default is false.
    */
   SharedBoolean random_q = false;
   // derived quantities
@@ -183,23 +183,35 @@ public:
   /**
    * @brief Derived landings-at-age in weight (mt).
    */
-  Rcpp::NumericVector derived_landings_waa;  
+  Rcpp::NumericVector derived_landings_waa;
   /**
    * @brief Derived landings in observed units.
    */
-  Rcpp::NumericVector derived_landings;    
+  Rcpp::NumericVector derived_landings_expected;
   /**
    * @brief Derived landings in weight.
    */
-  Rcpp::NumericVector derived_landings_w;  
+  Rcpp::NumericVector derived_landings_w;
   /**
    * @brief Derived landings in numbers.
    */
   Rcpp::NumericVector derived_landings_n;
   /**
+   * @brief Derived landings-at-age in numbers.
+   */
+  Rcpp::NumericVector derived_index_naa;
+  /**
+   * @brief Derived landings-at-length in numbers.
+   */
+  Rcpp::NumericVector derived_index_nal;
+  /**
+   * @brief Derived landings-at-age in weight (mt).
+   */
+  Rcpp::NumericVector derived_index_waa;
+  /**
    * @brief Derived index in observed units.
    */
-  Rcpp::NumericVector derived_index;
+  Rcpp::NumericVector derived_index_expected;
   /**
    * @brief Derived index in weight.
    */
@@ -209,13 +221,21 @@ public:
    */
   Rcpp::NumericVector derived_index_n;
   /**
+   * @brief Derived age composition proportions.
+   */
+  Rcpp::NumericVector derived_agecomp_proportion;
+  /**
+   * @brief Derived length composition proportions.
+   */
+  Rcpp::NumericVector derived_lengthcomp_proportion;
+  /**
    * @brief Derived age compositions.
    */
-  Rcpp::NumericVector derived_age_composition;
+  Rcpp::NumericVector derived_agecomp_expected;
   /**
    * @brief Derived length compositions.
    */
-  Rcpp::NumericVector derived_length_composition;
+  Rcpp::NumericVector derived_lengthcomp_expected;
 
   /**
    * @brief The constructor.
@@ -232,36 +252,40 @@ public:
   FleetInterface(const FleetInterface& other) :
   FleetInterfaceBase(other),
   interface_observed_agecomp_data_id_m(other.interface_observed_agecomp_data_id_m),
-  interface_observed_lengthcomp_data_id_m(other.interface_observed_lengthcomp_data_id_m), 
+  interface_observed_lengthcomp_data_id_m(other.interface_observed_lengthcomp_data_id_m),
   interface_observed_index_data_id_m(other.interface_observed_index_data_id_m),
-  interface_observed_landings_data_id_m(other.interface_observed_landings_data_id_m), 
-  interface_selectivity_id_m(other.interface_selectivity_id_m), 
-  name(other.name), 
-  nages(other.nages), 
+  interface_observed_landings_data_id_m(other.interface_observed_landings_data_id_m),
+  interface_selectivity_id_m(other.interface_selectivity_id_m),
+  name(other.name),
+  nages(other.nages),
   nlengths(other.nlengths),
-  nyears(other.nyears), 
-  log_q(other.log_q), 
-  log_Fmort(other.log_Fmort), 
-  log_index_expected(other.log_index_expected), 
+  nyears(other.nyears),
+  log_q(other.log_q),
+  log_Fmort(other.log_Fmort),
+  log_index_expected(other.log_index_expected),
   log_landings_expected(other.log_landings_expected),
-  proportion_numbers_at_age(other.proportion_numbers_at_age), 
-  proportion_numbers_at_length(other.proportion_numbers_at_length),
-  age_to_length_conversion(other.age_to_length_conversion), 
-  estimate_q(other.estimate_q), 
-  random_q(other.random_q), 
-  observed_landings_in_weight(other.observed_landings_in_weight), 
-  observed_index_in_weight(other.observed_index_in_weight), 
-  derived_landings_naa(other.derived_landings_naa), 
-  derived_landings_nal(other.derived_landings_nal), 
-  derived_landings_waa(other.derived_landings_waa), 
-  derived_index(other.derived_index),   
-  derived_index_w(other.derived_index_w),  
-  derived_index_n(other.derived_index_n), 
-  derived_landings(other.derived_landings),
+  agecomp_proportion(other.agecomp_proportion),
+  lengthcomp_proportion(other.lengthcomp_proportion),
+  agecomp_expected(other.agecomp_expected),
+  lengthcomp_expected(other.lengthcomp_expected),
+  age_to_length_conversion(other.age_to_length_conversion),
+  estimate_q(other.estimate_q),
+  random_q(other.random_q),
+  observed_landings_units(other.observed_landings_units),
+  observed_index_units(other.observed_index_units),
+  derived_landings_naa(other.derived_landings_naa),
+  derived_landings_nal(other.derived_landings_nal),
+  derived_landings_waa(other.derived_landings_waa),
+  derived_index_expected(other.derived_index_expected),
+  derived_index_w(other.derived_index_w),
+  derived_index_n(other.derived_index_n),
+  derived_landings_expected(other.derived_landings_expected),
   derived_landings_w(other.derived_landings_w),
-  derived_landings_n(other.derived_landings_n), 
-  derived_age_composition(other.derived_age_composition), 
-  derived_length_composition(other.derived_length_composition) {}
+  derived_landings_n(other.derived_landings_n),
+  derived_agecomp_proportion(other.derived_agecomp_proportion),
+  derived_lengthcomp_proportion(other.derived_lengthcomp_proportion),
+  derived_agecomp_expected(other.derived_agecomp_expected),
+  derived_lengthcomp_expected(other.derived_lengthcomp_expected) {}
 
   /**
    * @brief The destructor.
@@ -341,9 +365,9 @@ public:
   int GetObservedLandingsDataID() {
     return interface_observed_landings_data_id_m.get();
   }
-  /** 
+  /**
    * @brief Extracts the derived quantities from `Information` to the Rcpp
-   * object. 
+   * object.
    */
   virtual void finalize() {
     if (this->finalized) {
@@ -400,14 +424,19 @@ public:
         this->derived_landings_waa[i] = fleet->landings_weight_at_age[i];
       }
 
-      this->derived_age_composition = Rcpp::NumericVector(fleet->proportion_numbers_at_age.size());
-      for (R_xlen_t i = 0; i < this->derived_age_composition.size(); i++) {
-        this->derived_age_composition[i] = fleet->proportion_numbers_at_age[i];
+      this->derived_index_naa = Rcpp::NumericVector(fleet->index_numbers_at_age.size());
+      for (R_xlen_t i = 0; i < this->derived_index_naa.size(); i++) {
+        this->derived_index_naa[i] = fleet->index_numbers_at_age[i];
       }
 
-      this->derived_length_composition = Rcpp::NumericVector(fleet->proportion_numbers_at_length.size());
-      for (R_xlen_t i = 0; i < this->derived_length_composition.size(); i++) {
-        this->derived_length_composition[i] = fleet->proportion_numbers_at_length[i];
+      this->derived_index_nal = Rcpp::NumericVector(fleet->index_numbers_at_length.size());
+      for (R_xlen_t i = 0; i < this->derived_index_nal.size(); i++) {
+        this->derived_index_nal[i] = fleet->index_numbers_at_length[i];
+      }
+
+      this->derived_index_waa = Rcpp::NumericVector(fleet->index_weight_at_age.size());
+      for (R_xlen_t i = 0; i < this->derived_index_waa.size(); i++) {
+        this->derived_index_waa[i] = fleet->index_weight_at_age[i];
       }
 
       this->derived_index_w = Rcpp::NumericVector(fleet->index_weight.size());
@@ -420,14 +449,14 @@ public:
         this->derived_index_n[i] = fleet->index_numbers[i];
       }
 
-      this->derived_index = Rcpp::NumericVector(fleet->index_expected.size());
-      for (R_xlen_t i = 0; i < this->derived_index.size(); i++) {
-        this->derived_index[i] = fleet->index_expected[i];
+      this->derived_index_expected = Rcpp::NumericVector(fleet->index_expected.size());
+      for (R_xlen_t i = 0; i < this->derived_index_expected.size(); i++) {
+        this->derived_index_expected[i] = fleet->index_expected[i];
       }
 
-      this->derived_landings = Rcpp::NumericVector(fleet->landings_expected.size());
-      for (R_xlen_t i = 0; i < this->derived_landings.size(); i++) {
-        this->derived_landings[i] = fleet->landings_expected[i];
+      this->derived_landings_expected = Rcpp::NumericVector(fleet->landings_expected.size());
+      for (R_xlen_t i = 0; i < this->derived_landings_expected.size(); i++) {
+        this->derived_landings_expected[i] = fleet->landings_expected[i];
       }
 
       this->derived_landings_w = Rcpp::NumericVector(fleet->landings_weight.size());
@@ -438,6 +467,26 @@ public:
       this->derived_landings_n = Rcpp::NumericVector(fleet->landings_numbers.size());
       for (R_xlen_t i = 0; i < this->derived_landings_n.size(); i++) {
         this->derived_landings_n[i] = fleet->landings_numbers[i];
+      }
+
+      this->derived_agecomp_proportion = Rcpp::NumericVector(fleet->agecomp_proportion.size());
+      for (R_xlen_t i = 0; i < this->derived_agecomp_proportion.size(); i++) {
+        this->derived_agecomp_proportion[i] = fleet->agecomp_proportion[i];
+      }
+
+      this->derived_lengthcomp_proportion = Rcpp::NumericVector(fleet->lengthcomp_proportion.size());
+      for (R_xlen_t i = 0; i < this->derived_lengthcomp_proportion.size(); i++) {
+        this->derived_lengthcomp_proportion[i] = fleet->lengthcomp_proportion[i];
+      }
+
+      this->derived_agecomp_expected = Rcpp::NumericVector(fleet->agecomp_expected.size());
+      for (R_xlen_t i = 0; i < this->derived_agecomp_expected.size(); i++) {
+        this->derived_agecomp_expected[i] = fleet->agecomp_expected[i];
+      }
+
+      this->derived_lengthcomp_expected = Rcpp::NumericVector(fleet->lengthcomp_expected.size());
+      for (R_xlen_t i = 0; i < this->derived_lengthcomp_expected.size(); i++) {
+        this->derived_lengthcomp_expected[i] = fleet->lengthcomp_expected[i];
       }
 
     }
@@ -483,7 +532,7 @@ public:
     }
     ss << "], \"derived_quantities\":[\n";
     ss << "{\n";
-    ss << "  \"name\": \"CNAA\",\n";
+    ss << "  \"name\": \"landings_naa\",\n";
     ss << "  \"values\":[";
     if (this->derived_landings_naa.size() == 0) {
         ss << "]\n";
@@ -496,7 +545,7 @@ public:
     ss << " },\n";
 
     ss << " {\n";
-    ss << "  \"name\": \"CNAL\",\n";
+    ss << "  \"name\": \"landings_nal\",\n";
     ss << "  \"values\":[";
     if (this->derived_landings_nal.size() == 0) {
       ss << "]\n";
@@ -509,7 +558,7 @@ public:
     ss << " },\n";
 
     ss << " {\n";
-    ss << "  \"name\": \"cwaa\",\n";
+    ss << "  \"name\": \"landings_waa\",\n";
     ss << "  \"values\":[";
     if (this->derived_landings_waa.size() == 0) {
       ss << "]\n";
@@ -520,44 +569,104 @@ public:
       ss << this->derived_landings_waa[this->derived_landings_waa.size() - 1] << "]\n";
     }
     ss << " },\n";
-
-
-    ss << "{\n";
-    ss << "  \"name\": \"PCNAA \",\n";
+    ss << "  \"name\": \"index_naa\",\n";
     ss << "  \"values\":[";
-    if (this->derived_age_composition.size() == 0) {
+    if (this->derived_index_naa.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->derived_age_composition.size() - 1; i++) {
-        ss << this->derived_age_composition[i] << ", ";
+      for (R_xlen_t i = 0; i < this->derived_index_naa.size() - 1; i++) {
+        ss << this->derived_index_naa[i] << ", ";
       }
-      ss << this->derived_age_composition[this->derived_age_composition.size() - 1] << "]\n";
+      ss << this->derived_index_naa[this->derived_index_naa.size() - 1] << "]\n";
+    }
+    ss << " },\n";
+    ss << "  \"name\": \"index_nal\",\n";
+    ss << "  \"values\":[";
+    if (this->derived_index_nal.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->derived_index_nal.size() - 1; i++) {
+        ss << this->derived_index_nal[i] << ", ";
+      }
+      ss << this->derived_index_nal[this->derived_index_nal.size() - 1] << "]\n";
     }
     ss << " },\n";
 
     ss << " {\n";
-    ss << "  \"name\": \"PCNAL \",\n";
+    ss << "  \"name\": \"index_waa\",\n";
     ss << "  \"values\":[";
-    if (this->derived_length_composition.size() == 0) {
+    if (this->derived_index_waa.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->derived_length_composition.size() - 1; i++) {
-        ss << this->derived_length_composition[i] << ", ";
+      for (R_xlen_t i = 0; i < this->derived_index_waa.size() - 1; i++) {
+        ss << this->derived_index_waa[i] << ", ";
       }
-      ss << this->derived_length_composition[this->derived_length_composition.size() - 1] << "]\n";
+      ss << this->derived_index_waa[this->derived_index_waa.size() - 1] << "]\n";
+    }
+    ss << " },\n";
+
+    ss << "{\n";
+    ss << "  \"name\": \"agecomp_expected \",\n";
+    ss << "  \"values\":[";
+    if (this->derived_agecomp_expected.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->derived_agecomp_expected.size() - 1; i++) {
+        ss << this->derived_agecomp_expected[i] << ", ";
+      }
+      ss << this->derived_agecomp_expected[this->derived_agecomp_expected.size() - 1] << "]\n";
+    }
+    ss << " },\n";
+
+    ss << " {\n";
+    ss << "  \"name\": \"lengthcomp_expected \",\n";
+    ss << "  \"values\":[";
+    if (this->derived_lengthcomp_expected.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->derived_lengthcomp_expected.size() - 1; i++) {
+        ss << this->derived_lengthcomp_expected[i] << ", ";
+      }
+      ss << this->derived_lengthcomp_expected[this->derived_lengthcomp_expected.size() - 1] << "]\n";
+    }
+    ss << " },\n";
+
+    ss << "{\n";
+    ss << "  \"name\": \"agecomp_proportion \",\n";
+    ss << "  \"values\":[";
+    if (this->agecomp_proportion.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->agecomp_proportion.size() - 1; i++) {
+        ss << this->agecomp_proportion[i] << ", ";
+      }
+      ss << this->agecomp_proportion[this->agecomp_proportion.size() - 1] << "]\n";
+    }
+    ss << " },\n";
+
+    ss << " {\n";
+    ss << "  \"name\": \"lengthcomp_proportion \",\n";
+    ss << "  \"values\":[";
+    if (this->lengthcomp_proportion.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->lengthcomp_proportion.size() - 1; i++) {
+        ss << this->lengthcomp_proportion[i] << ", ";
+      }
+      ss << this->lengthcomp_proportion[this->lengthcomp_proportion.size() - 1] << "]\n";
     }
     ss << " },\n";
 
     ss << "{\n";
     ss << "  \"name\": \"index expected \",\n";
     ss << "  \"values\":[";
-    if (this->derived_index.size() == 0) {
+    if (this->derived_index_expected.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->derived_index.size() - 1; i++) {
-        ss << this->derived_index[i] << ", ";
+      for (R_xlen_t i = 0; i < this->derived_index_expected.size() - 1; i++) {
+        ss << this->derived_index_expected[i] << ", ";
       }
-      ss << this->derived_index[this->derived_index.size() - 1] << "]\n";
+      ss << this->derived_index_expected[this->derived_index_expected.size() - 1] << "]\n";
     }
     ss << " }\n]\n}";
 
@@ -590,13 +699,13 @@ public:
     ss << "{\n";
     ss << "  \"name\": \"landings expected \",\n";
     ss << "  \"values\":[";
-    if (this->derived_landings.size() == 0) {
+    if (this->derived_landings_expected.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->derived_landings.size() - 1; i++) {
-        ss << this->derived_landings[i] << ", ";
+      for (R_xlen_t i = 0; i < this->derived_landings_expected.size() - 1; i++) {
+        ss << this->derived_landings_expected[i] << ", ";
       }
-      ss << this->derived_landings[this->derived_landings.size() - 1] << "]\n";
+      ss << this->derived_landings_expected[this->derived_landings_expected.size() - 1] << "]\n";
     }
     ss << " }\n]\n}";
 
@@ -650,18 +759,18 @@ public:
     fleet->nages = this->nages.get();
     fleet->nlengths = this->nlengths.get();
     fleet->nyears = this->nyears.get();
-    fleet->observed_landings_in_weight = this->observed_landings_in_weight.get();
-    fleet->observed_index_in_weight = this->observed_index_in_weight.get();
+    fleet->observed_landings_units = this->observed_landings_units;
+    fleet->observed_index_units = this->observed_index_units;
 
     fleet->fleet_observed_agecomp_data_id_m =
       interface_observed_agecomp_data_id_m.get();
-    
+
     fleet->fleet_observed_lengthcomp_data_id_m =
       interface_observed_lengthcomp_data_id_m.get();
-    
+
     fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m.get();
     fleet->fleet_observed_landings_data_id_m = interface_observed_landings_data_id_m.get();
-    
+
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
     fleet->log_q.resize(this->log_q.size());
@@ -705,17 +814,17 @@ public:
     info->variable_map[this->log_landings_expected.id_m] = &(fleet)->log_landings_expected;
     fleet->log_index_expected.resize(nyears);  // assume index is for all ages.
     info->variable_map[this->log_index_expected.id_m] = &(fleet)->log_index_expected;
-    
-    fleet->composition_numbers_at_age.resize(nyears.get() * nages.get());
-    fleet->proportion_numbers_at_age.resize(nyears.get() * nages.get());
-    info->variable_map[this->composition_numbers_at_age.id_m] = &(fleet)->composition_numbers_at_age;
-    info->variable_map[this->proportion_numbers_at_age.id_m] = &(fleet)->proportion_numbers_at_age;
+
+    fleet->agecomp_expected.resize(nyears.get() * nages.get());
+    fleet->agecomp_proportion.resize(nyears.get() * nages.get());
+    info->variable_map[this->agecomp_expected.id_m] = &(fleet)->agecomp_expected;
+    info->variable_map[this->agecomp_proportion.id_m] = &(fleet)->agecomp_proportion;
     FIMS_INFO_LOG(fims::to_string(this->nyears.get()) + " " + fims::to_string(this->nages.get()));
     FIMS_INFO_LOG(" adding Fleet length object to TMB");
 
     if (this->nlengths.get() > 0) {
-      fleet->composition_numbers_at_length.resize(this->nyears.get() * this->nlengths.get());
-      fleet->proportion_numbers_at_length.resize(this->nyears.get() * this->nlengths.get());
+      fleet->lengthcomp_expected.resize(this->nyears.get() * this->nlengths.get());
+      fleet->lengthcomp_proportion.resize(this->nyears.get() * this->nlengths.get());
       fleet->age_to_length_conversion.resize(this->age_to_length_conversion.size());
 
       if (this->age_to_length_conversion.size() !=
@@ -728,8 +837,8 @@ public:
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
         fleet->age_to_length_conversion[i] =
           this->age_to_length_conversion[i].initial_value_m;
-        FIMS_INFO_LOG(" adding Fleet length object to TMB in loop " + 
-          fims::to_string(i) + " of " + 
+        FIMS_INFO_LOG(" adding Fleet length object to TMB in loop " +
+          fims::to_string(i) + " of " +
           fims::to_string(fleet->age_to_length_conversion.size()));
 
         if (this->age_to_length_conversion[i].estimated_m) {
@@ -747,8 +856,8 @@ public:
       }
       FIMS_INFO_LOG(" adding Fleet length object to TMB out loop");
       info->variable_map[this->age_to_length_conversion.id_m] = &(fleet)->age_to_length_conversion;
-      info->variable_map[this->composition_numbers_at_length.id_m] = &(fleet)->composition_numbers_at_length;
-      info->variable_map[this->proportion_numbers_at_length.id_m] = &(fleet)->proportion_numbers_at_length;
+      info->variable_map[this->lengthcomp_expected.id_m] = &(fleet)->lengthcomp_expected;
+      info->variable_map[this->lengthcomp_proportion.id_m] = &(fleet)->lengthcomp_proportion;
   }
 
     // add to Information

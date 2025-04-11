@@ -82,11 +82,11 @@ bool CreateTMBModel() {
 /**
  * Finalize a model run by populating derived quantities into the Rcpp interface
  * objects and return the output as a JSON string.
- * 
+ *
  * @param par A vector of parameter values.
  * @param fn The objective function.
  * @param gr The gradient function.
- * 
+ *
  * @return A JSON output string is returned.
  */
 std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn, Rcpp::Function gr) {
@@ -446,6 +446,7 @@ RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
 RCPP_EXPOSED_CLASS(RealVector)
 RCPP_EXPOSED_CLASS(SharedInt)
+RCPP_EXPOSED_CLASS(SharedString)
 RCPP_EXPOSED_CLASS(SharedReal)
 RCPP_EXPOSED_CLASS(SharedBoolean)
 
@@ -642,14 +643,16 @@ RCPP_MODULE(fims) {
       .field("nlengths", &FleetInterface::nlengths)
       .field("estimate_q", &FleetInterface::estimate_q)
       .field("random_q", &FleetInterface::random_q)
-      .field("observed_landings_in_weight", &FleetInterface::observed_landings_in_weight)
-      .field("observed_index_in_weight", &FleetInterface::observed_index_in_weight)
+      .field("observed_landings_units", &FleetInterface::observed_landings_units)
+      .field("observed_index_units", &FleetInterface::observed_index_units)
+      .field("index_expected", &FleetInterface::derived_index_expected)
+      .field("landings_expected", &FleetInterface::derived_landings_expected)
       .field("log_index_expected", &FleetInterface::log_index_expected)
       .field("log_landings_expected", &FleetInterface::log_landings_expected)
-      .field("composition_numbers_at_age", &FleetInterface::composition_numbers_at_age)
-      .field("composition_numbers_at_length", &FleetInterface::composition_numbers_at_length)
-      .field("proportion_numbers_at_age", &FleetInterface::proportion_numbers_at_age)
-      .field("proportion_numbers_at_length", &FleetInterface::proportion_numbers_at_length)
+      .field("agecomp_expected", &FleetInterface::agecomp_expected)
+      .field("lengthcomp_expected", &FleetInterface::lengthcomp_expected)
+      .field("agecomp_proportion", &FleetInterface::agecomp_proportion)
+      .field("lengthcomp_proportion", &FleetInterface::lengthcomp_proportion)
       .field("age_to_length_conversion", &FleetInterface::age_to_length_conversion)
       .method("SetObservedAgeCompDataID", &FleetInterface::SetObservedAgeCompDataID)
       .method("GetObservedAgeCompDataID", &FleetInterface::GetObservedAgeCompDataID)
@@ -732,7 +735,7 @@ RCPP_MODULE(fims) {
                 &DoubleLogisticSelectivityInterface::slope_desc,
                 "Scalar multiplier of difference between quantity of interest  value (x) and inflection_point on the descending limb of the double  logistic  curve.")
             .method(
-                "get_id", 
+                "get_id",
                 &DoubleLogisticSelectivityInterface::get_id,
                 "Returns a unique ID for the selectivity class.")
             .method(

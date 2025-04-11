@@ -76,10 +76,12 @@ initialize_module <- function(parameters, data, module_name) {
     module_fields <- setdiff(module_fields, c(
       "log_index_expected",
       "log_landings_expected",
-      "composition_numbers_at_age",
-      "proportion_numbers_at_age",
-      "observed_index_in_weight",
-      "observed_landings_in_weight"
+      "index_expected",
+      "landings_expected",
+      "agecomp_expected",
+      "agecomp_proportion",
+      "observed_index_units",
+      "observed_landings_units"
     ))
 
     fleet_types <- get_data(data) |>
@@ -125,8 +127,8 @@ initialize_module <- function(parameters, data, module_name) {
 
     module_fields <- setdiff(module_fields, c(
       "age_to_length_conversion",
-      "composition_numbers_at_length",
-      "proportion_numbers_at_length"
+      "lengthcomp_expected",
+      "lengthcomp_proportion"
     ))
   }
 
@@ -145,7 +147,7 @@ initialize_module <- function(parameters, data, module_name) {
   # - Fleet
   #   - Remove estimate_Fmort, estimate_q, and random_q from the Rcpp interface
   #   - Reconsider exposing `log_index_expected` and
-  #     `proportion_numbers_at_age` to users. Their IDs are linked with
+  #     `agecomp_proportion` to users. Their IDs are linked with
   #     index and agecomp distributions. No input values are required.
 
   integer_fields <- c(

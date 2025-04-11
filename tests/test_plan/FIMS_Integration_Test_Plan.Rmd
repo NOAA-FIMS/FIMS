@@ -205,7 +205,7 @@ landings_expected <- data.frame(
 
 index_expected <- data.frame(
   Component = "Expected index \n nyears",
-  Test = "Fishing fleet: \n - Individual elements of landingsability equal to 1 \n - Individual elements of expected index are greater than 0 \n\n Survey fleet: \n - Absolute error (|FIMS - OM|) of individual elements is less than 0.0001 - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 5.0\\% \n - Absolute error (|FIMS - OM|) of individual elements of landingsability is less than 1.0e-07 \n - Individual elements of expected index equal to 0"
+  Test = "Fishing fleet: \n - Individual elements of catchability equal to 1 \n - Individual elements of expected index are greater than 0 \n\n Survey fleet: \n - Absolute error (|FIMS - OM|) of individual elements is less than 0.0001 - Absolute relative error (|FIMS - OM| / OM x 100) of individual elements is less than 5.0\\% \n - Absolute error (|FIMS - OM|) of individual elements of catchability is less than 1.0e-07 \n - Individual elements of expected index equal to 0"
 )
 
 data <- rbind(

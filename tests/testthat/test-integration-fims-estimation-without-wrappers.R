@@ -143,7 +143,7 @@ test_that("deterministic test of fims", {
   fims_cnaa_proportion <- matrix(report[["comp_pnaa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
                                  nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
-  om_cnaa_proportion <- om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
+  om_cnaa_proportion <- 0.0 + (1-0.0*om_input[["nages"]])*om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
 
   for (i in 1:length(c(t(om_cnaa_proportion)))) {
     expect_lt(abs(c(t(fims_cnaa_proportion))[i]-c(t(om_cnaa_proportion))[i]),0.00000001)
@@ -193,9 +193,9 @@ test_that("nll test of fims", {
 
   # age comp likelihoods
   fishing_acomp_observed <- em_input_list[[iter_id]][["L.age.obs"]][["fleet1"]]
-  fishing_acomp_expected <- om_output_list[[iter_id]][["L.age"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.age"]][["fleet1"]])
+  fishing_acomp_expected <- 0.0 + (1-0.0*om_input[["nages"]])*om_output_list[[iter_id]][["L.age"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.age"]][["fleet1"]])
   survey_acomp_observed <- em_input_list[[iter_id]][["survey.age.obs"]][["survey1"]]
-  survey_acomp_expected <- om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
+  survey_acomp_expected <- 0.0 + (1-0.0*om_input[["nages"]])*om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
   age_comp_nll_fleet <- age_comp_nll_survey <- 0
   for (y in 1:om_input_list[[iter_id]][["nyr"]]) {
     age_comp_nll_fleet <- age_comp_nll_fleet -
@@ -214,9 +214,9 @@ test_that("nll test of fims", {
 
   # length comp likelihoods
   fishing_lengthcomp_observed <- em_input_list[[iter_id]][["L.length.obs"]][["fleet1"]]
-  fishing_lengthcomp_expected <- om_output_list[[iter_id]][["L.length"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.length"]][["fleet1"]])
+  fishing_lengthcomp_expected <- 0.0 + (1-0.0*om_input[["nlengths"]])*om_output_list[[iter_id]][["L.length"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.length"]][["fleet1"]])
   survey_lengthcomp_observed <- em_input_list[[iter_id]][["survey.length.obs"]][["survey1"]]
-  survey_lengthcomp_expected <- om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]])
+  survey_lengthcomp_expected <- 0.0 + (1-0.0*om_input[["nlengths"]])*om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]])
   lengthcomp_nll_fleet <- lengthcomp_nll_survey <- 0
   for (y in 1:om_input_list[[iter_id]][["nyr"]]) {
     # test using FIMS_dmultinom which matches the TMB dmultinom calculation and differs from R

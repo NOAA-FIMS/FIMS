@@ -17,9 +17,9 @@
 #' @param om_input A list containing the operating model inputs, such as years,
 #' ages, and other parameters.
 #' @param om_output A list containing the operating model outputs, including metrics
-#' such as numbers at age, biomass, spawning biomass, fishing mortality, and survey indices.
+#' such as numbers at age, biomass, spawning biomass, fishing mortality, and indices.
 #' @param em_input A list containing the estimation model inputs, including observed
-#' landingses, survey indices, and other relevant data.
+#' landings, indices, and other relevant data.
 #' @param use_fimsfit Logical; if `TRUE`, validates using `fit_fims()` results.
 #'
 #' @return None. The function uses `testthat` functions to perform validations.

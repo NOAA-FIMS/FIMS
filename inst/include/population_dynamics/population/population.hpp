@@ -399,7 +399,7 @@ namespace fims_popdy {
 
                 this->total_landings_numbers[year] +=
                         this->fleets[fleet_]->landings_numbers_at_age[i_age_year];
-        
+
                 fleets[fleet_]->landings_numbers[year] +=
                         this->fleets[fleet_]->landings_numbers_at_age[i_age_year];
             }
@@ -452,7 +452,7 @@ namespace fims_popdy {
          */
         void CalculateIndex(size_t i_age_year, size_t year, size_t age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                
+
                 fleets[fleet_]->index_weight[year] +=
                         this->fleets[fleet_]->index_weight_at_age[i_age_year];
 
@@ -462,8 +462,8 @@ namespace fims_popdy {
         }
 
         /**
-         * @brief Calculates index sample in numbers at age for each fleet for 
-         * a given year and age, then adds the value to the expected index in 
+         * @brief Calculates index sample in numbers at age for each fleet for
+         * a given year and age, then adds the value to the expected index in
          * numbers at age for each fleet
          *
          * @param i_age_year dimension folded index for age and year
@@ -472,7 +472,7 @@ namespace fims_popdy {
          */
         void CalculateIndexNumbersAA(size_t i_age_year, size_t year, size_t age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                
+
                 this->fleets[fleet_]->index_numbers_at_age[i_age_year] +=
                 (this->fleets[fleet_]->q.get_force_scalar(year) *
                 this->fleets[fleet_]->selectivity->evaluate(ages[age]))*
@@ -481,7 +481,7 @@ namespace fims_popdy {
         }
 
         /**
-         * @brief Calculates expected index weight at age for each fleet for 
+         * @brief Calculates expected index weight at age for each fleet for
          * a given year and age
          *
          * @param year the year of expected index weight at age
@@ -497,24 +497,6 @@ namespace fims_popdy {
             }
         }
 
-        /**
-         * @brief Calculates composition numbers at age for each fleet for a 
-         * given year and age, then adds the value to the expected numbers 
-         * at age for each fleet
-         *
-         * @param i_age_year dimension folded index for age and year
-         * @param year the year expected selection is being calculated for
-         * @param age the age selection is being calculated for
-         */
-        void CalculateCompositionNumbersAA(size_t i_age_year, size_t year, size_t age) {
-          for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-            
-            this->fleets[fleet_]->composition_numbers_at_age[i_age_year] +=  
-            this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
-            this->numbers_at_age[i_age_year];
-          }
-        }
-    
         /**
          * @brief Executes the population loop
          *
@@ -642,12 +624,10 @@ namespace fims_popdy {
                         CalculateLandingsNumbersAA(i_age_year, y, a);
                         CalculateLandingsWeightAA(y, a);
                         CalculateLandings(y, a);
-                        
+
                         CalculateIndexNumbersAA(i_age_year, y, a);
                         CalculateIndexWeightAA(y, a);
                         CalculateIndex(i_age_year, y, a);
-
-                        CalculateCompositionNumbersAA(i_age_year, y, a);
                     }
                 }
             }
