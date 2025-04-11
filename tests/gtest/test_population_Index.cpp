@@ -11,8 +11,10 @@ namespace
         std::vector<double> index_expected(nyears * nfleets, 0);
        
         // calculate index numbers at age in population module
+        population.CalculateIndexNumbersAA(i_age_year, year, age);
+        population.CalculateIndexWeightAA(year, age);
         population.CalculateIndex(i_age_year, year, age);
-        
+
         // The test checks a single age in a single year, not an index. 
         // It was developed to test CalculateIndex() function while
         // the integration test loops over all ages to test the index.
@@ -29,9 +31,9 @@ namespace
                                         population.fleets[fleet_]->selectivity->evaluate(population.ages[age])*
                                         population.growth->evaluate(population.ages[age]);
     
-        EXPECT_GT(population.fleets[fleet_]->index_expected[year], 0);
+        EXPECT_GT(population.fleets[fleet_]->index_weight[year], 0);
         EXPECT_GT(index_expected[index_yf], 0);
-        EXPECT_EQ(index_expected[index_yf], population.fleets[fleet_]->index_expected[year]);
+        EXPECT_EQ(index_expected[index_yf], population.fleets[fleet_]->index_weight[year]);
             
         }
     }
