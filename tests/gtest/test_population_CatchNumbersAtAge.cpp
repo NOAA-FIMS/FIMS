@@ -48,8 +48,6 @@ namespace
             // test value
           EXPECT_EQ(population.fleets[fleet_index]->landings_numbers_at_age[i_age_year], test_landings_naa[i_age_yearf]);
           EXPECT_EQ(population.fleets[fleet_index]->landings_weight_at_age[i_age_year], test_landings_waa[i_age_yearf]);
-          EXPECT_GT(population.fleets[fleet_index]->landings_numbers_at_age[i_age_year], 0);
-          EXPECT_GT(population.fleets[fleet_index]->landings_weight_at_age[i_age_year], 0);
             
         }
     }

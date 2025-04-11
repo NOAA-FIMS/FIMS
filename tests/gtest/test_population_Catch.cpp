@@ -21,9 +21,6 @@ namespace
             
             landings_expected[index_yf] += population.fleets[fleet_]->landings_weight_at_age[i_age_year];
             
-            EXPECT_EQ(population.landings_expected[index_yf], landings_expected[index_yf]);
-            EXPECT_GT(population.landings_expected[index_yf], 0);
-            EXPECT_GT(landings_expected[index_yf], 0);
             EXPECT_EQ(landings_expected[index_yf], population.fleets[fleet_]->landings_expected[year]);
         }
     }

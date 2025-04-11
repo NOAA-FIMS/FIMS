@@ -105,7 +105,7 @@ class PopulationEvaluateTestFixture : public testing::Test {
     population.numbers_at_age.resize((nyears + 1) * nages);
     try {
         population.Initialize(nyears, nseasons, nages);
-    } landings (std::exception& e) {
+    } catch (std::exception& e) {
         std::cout << e.what() << "\n";
     }
 

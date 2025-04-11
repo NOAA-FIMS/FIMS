@@ -27,7 +27,7 @@ namespace
         EXPECT_EQ(population.weight_at_age.size(), nages);
         EXPECT_EQ(population.unfished_numbers_at_age.size(), (nyears + 1) * nages);
         EXPECT_EQ(population.numbers_at_age.size(), (nyears + 1) * nages);
-        EXPECT_EQ(population.landings_expected.size(), nyears * nfleets);
+        EXPECT_EQ(population.total_landings_weight.size(), nyears);
         EXPECT_EQ(population.biomass.size(), (nyears + 1));
         EXPECT_EQ(population.unfished_spawning_biomass.size(), (nyears + 1));
         EXPECT_EQ(population.spawning_biomass.size(), nyears + 1);
@@ -61,11 +61,11 @@ namespace
             );
         };
 
-        for (int i = 0; i < population.landings_expected.size(); i++)
+        for (int i = 0; i < population.total_landings_weight.size(); i++)
         {
             EXPECT_EQ(
-                population.landings_expected,
-                fims::Vector<double>(nyears * nfleets, 0)
+                population.total_landings_weight,
+                fims::Vector<double>(nyears, 0)
             );
         };
 
