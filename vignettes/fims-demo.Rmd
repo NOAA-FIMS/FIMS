@@ -223,12 +223,12 @@ The list returned from `initialize_fims()` can be passed to the parameter of `fi
 test_fit <- parameters |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = FALSE)
-
+clear()
 # Run the  model with optimization
 fit <- parameters |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-
+clear()
 # finalize is not working, you get the following error when you do this code
 # Error: basic_string::_M_create
 # if you run clear() ahead of the following line the error will go away
