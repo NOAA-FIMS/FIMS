@@ -145,7 +145,7 @@ validate_fims <- function(
     expected = c(
       om_output[["L.mt"]][["fleet1"]]
     ),
-    param_name = "ExpectedLandings",
+    param_name = "LandingsExpected",
     use_fimsfit = use_fimsfit,
     estimates = estimates
   )
@@ -158,7 +158,7 @@ validate_fims <- function(
   #   expected = c(
   #     om_output[["survey_index_biomass"]][["survey1"]]
   #   ),
-  #   param_name = "ExpectedIndex",
+  #   param_name = "IndexExpected",
   #   use_fimsfit = use_fimsfit,
   #   estimates = estimates
   # )
@@ -169,7 +169,7 @@ validate_fims <- function(
       t(om_output[["L.age"]][["fleet1"]])#,
       #t(om_output[["survey_age_comp"]][["survey1"]])
     ),
-    param_name = "ExpectedLandingsAtAge",
+    param_name = "LandingsNumberAtAge",
     use_fimsfit = use_fimsfit,
     estimates = estimates
   )

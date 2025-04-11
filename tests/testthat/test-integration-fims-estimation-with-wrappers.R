@@ -137,7 +137,7 @@ test_that("deterministic test of fims", {
   #   expect_lt(abs(report[["index_waa"]][[2]][i]-c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]]))[i]),0.0000000001)
   # }
 
-  fims_cnaa_proportion <- matrix(report[["comp_pnaa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
+  fims_cnaa_proportion <- matrix(report[["agecomp_prop"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
                                  nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
 

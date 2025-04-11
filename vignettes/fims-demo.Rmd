@@ -246,7 +246,7 @@ The results can be plotted with either base R or using {ggplot2}.
 ```{r fit-plots}
 index_results <- data.frame(
   observed = m_index(data_4_model, "survey1"),
-  expected = get_report(fit)[["exp_index"]][[2]],
+  expected = get_report(fit)[["index_exp"]][[2]],
   years = get_start_year(data_4_model):get_end_year(data_4_model)
 )
 print(index_results)
@@ -260,7 +260,7 @@ ggplot2::ggplot(index_results, ggplot2::aes(x = years, y = observed)) +
 
 landings_results <- data.frame(
   observed = m_landings(data_4_model, fleet = "fleet1"),
-  expected = get_report(fit)[["exp_landings"]][[1]],
+  expected = get_report(fit)[["landings_exp"]][[1]],
   years = get_start_year(data_4_model):get_end_year(data_4_model)
 )
 print(landings_results)

@@ -78,10 +78,10 @@ namespace fims_model {
             vector<vector<Type> > index_exp(n_fleets);
             vector<vector<Type> > index_naa(n_fleets);
             vector<vector<Type> > index_nal(n_fleets);
-            vector<vector<Type> > comp_naa(n_fleets);
-            vector<vector<Type> > comp_nal(n_fleets);
-            vector<vector<Type> > comp_pnaa(n_fleets);
-            vector<vector<Type> > comp_pnal(n_fleets);
+            vector<vector<Type> > agecomp_exp(n_fleets);
+            vector<vector<Type> > lengthcomp_exp(n_fleets);
+            vector<vector<Type> > agecomp_prop(n_fleets);
+            vector<vector<Type> > lengthcomp_prop(n_fleets);
             vector<vector<Type> > F_mort(n_fleets);
             vector<vector<Type> > q(n_fleets);
             // populations
@@ -239,10 +239,10 @@ namespace fims_model {
                 index_exp(fleet_idx) = f->index_expected;
                 index_naa(fleet_idx) = f->index_numbers_at_age;
                 index_nal(fleet_idx) = f->index_numbers_at_length;
-                comp_naa(fleet_idx) = f->agecomp_expected;
-                comp_nal(fleet_idx) = f->lengthcomp_expected;
-                comp_pnaa(fleet_idx) = f->agecomp_proportion;
-                comp_pnal(fleet_idx) = f->lengthcomp_proportion;
+                agecomp_exp(fleet_idx) = f->agecomp_expected;
+                lengthcomp_exp(fleet_idx) = f->lengthcomp_expected;
+                agecomp_prop(fleet_idx) = f->agecomp_proportion;
+                lengthcomp_prop(fleet_idx) = f->lengthcomp_proportion;
                 F_mort(fleet_idx) = f->Fmort;
                 q(fleet_idx) = f->q;
 #endif
@@ -275,10 +275,10 @@ namespace fims_model {
             FIMS_REPORT_F(index_exp, of);
             FIMS_REPORT_F(index_naa, of);
             FIMS_REPORT_F(index_nal, of);
-            FIMS_REPORT_F(comp_naa, of);
-            FIMS_REPORT_F(comp_nal, of);
-            FIMS_REPORT_F(comp_pnaa, of);
-            FIMS_REPORT_F(comp_pnal, of);
+            FIMS_REPORT_F(agecomp_exp, of);
+            FIMS_REPORT_F(lengthcomp_exp, of);
+            FIMS_REPORT_F(agecomp_prop, of);
+            FIMS_REPORT_F(lengthcomp_prop, of);
             FIMS_REPORT_F(F_mort, of);
             FIMS_REPORT_F(q, of);
             FIMS_REPORT_F(nll_components, of);
@@ -293,18 +293,18 @@ namespace fims_model {
             vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
             vector<Type> FMort = ADREPORTvector(F_mort);
             vector<Type> Q = ADREPORTvector(q);
-            vector<Type> ExpectedLandings = ADREPORTvector(landings_exp);
-            vector<Type> ExpectedIndex = ADREPORTvector(index_exp);
-            vector<Type> ExpectedLandingsAtAge = ADREPORTvector(landings_naa);
-            vector<Type> ExpectedLandingsAtLength = ADREPORTvector(landings_nal);
-            vector<Type> ExpectedIndexAtAge = ADREPORTvector(index_naa);
-            vector<Type> ExpectedIndexAtLength = ADREPORTvector(index_nal);
-            vector<Type> ExpectedCompositionAtAge = ADREPORTvector(comp_naa);
-            vector<Type> ExpectedCompositionAtLength = ADREPORTvector(comp_nal);
-            vector<Type> ExpectedCompositionAtAgeProportion =
-                    ADREPORTvector(comp_pnaa);
-            vector<Type> ExpectedCompositionAtLengthProportion =
-                    ADREPORTvector(comp_pnal);
+            vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
+            vector<Type> IndexExpected = ADREPORTvector(index_exp);
+            vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
+            vector<Type> LandingsNumberAtLength = ADREPORTvector(landings_nal);
+            vector<Type> IndexNumberAtAge = ADREPORTvector(index_naa);
+            vector<Type> IndexNumberAtLength = ADREPORTvector(index_nal);
+            vector<Type> AgeCompositionExpected = ADREPORTvector(agecomp_exp);
+            vector<Type> LengthCompositionExpected = ADREPORTvector(lengthcomp_exp);
+            vector<Type> AgeCompositionProportion =
+                    ADREPORTvector(agecomp_prop);
+            vector<Type> LengthCompositionProportion =
+                    ADREPORTvector(lengthcomp_prop);
 
             ADREPORT_F(NAA, of);
             ADREPORT_F(Biomass, of);
@@ -312,16 +312,16 @@ namespace fims_model {
             ADREPORT_F(LogRecDev, of);
             ADREPORT_F(FMort, of);
             ADREPORT_F(Q, of);
-            ADREPORT_F(ExpectedLandings, of);
-            ADREPORT_F(ExpectedIndex, of);
-            ADREPORT_F(ExpectedLandingsAtAge, of);
-            ADREPORT_F(ExpectedLandingsAtLength, of);
-            ADREPORT_F(ExpectedIndexAtAge, of);
-            ADREPORT_F(ExpectedIndexAtLength, of);
-            ADREPORT_F(ExpectedCompositionAtAge, of);
-            ADREPORT_F(ExpectedCompositionAtLength, of);
-            ADREPORT_F(ExpectedCompositionAtAgeProportion, of);
-            ADREPORT_F(ExpectedCompositionAtLengthProportion, of);        
+            ADREPORT_F(LandingsExpected, of);
+            ADREPORT_F(IndexExpected, of);
+            ADREPORT_F(LandingsNumberAtAge, of);
+            ADREPORT_F(LandingsNumberAtLength, of);
+            ADREPORT_F(IndexNumberAtAge, of);
+            ADREPORT_F(IndexNumberAtLength, of);
+            ADREPORT_F(AgeCompositionExpected, of);
+            ADREPORT_F(LengthCompositionExpected, of);
+            ADREPORT_F(AgeCompositionProportion, of);
+            ADREPORT_F(LengthCompositionProportion, of);        
     }
 #endif
 
