@@ -413,7 +413,14 @@ public:
                         }
                     }
 
-
+                    for (int i = 0; i < nyears; i++) {
+                        s->log_Fmort[i] = -200.0;
+                        s->Fmort[i] = std::exp(log_Fmort[i].GetDouble());
+                        
+                        if (print_statements) {
+                            std::cout << s->Fmort[i] << " ";
+                        }
+                    }
 
                     pop.fleets.push_back(s);
 

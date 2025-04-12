@@ -22,17 +22,18 @@ namespace
                     mortality_F[i_age_year] += population.fleets[fleet_index]->Fmort[year] *
                                              population.fleets[fleet_index]->selectivity->evaluate(population.ages[age]);
                 
-                    EXPECT_LT(abs(population.mortality_F[i_age_year] - mortality_F[i_age_year]), 1e-7);
+                }
                 
-
+                EXPECT_LT(abs(population.mortality_F[i_age_year] - mortality_F[i_age_year]), 1e-7);
+                
                 std::vector<double> mortality_Z(nyears * nages, 0);
                 mortality_Z[i_age_year] = fims_math::exp(population.log_M[i_age_year]) +
                                         mortality_F[i_age_year];
                 EXPECT_LT(abs(population.mortality_Z[i_age_year] - mortality_Z[i_age_year]), 1e-7);
                     
+                
             }
         }
-    }
     }
 
     TEST_F(PopulationEvaluateTestFixture, CalculateInitialNumbersAA_works)
