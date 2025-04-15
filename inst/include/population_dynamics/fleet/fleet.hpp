@@ -232,6 +232,12 @@ namespace fims_popdy {
 
                 for (size_t a = 0; a < this->nages; a++) {
                     size_t i_age_year = y * this->nages + a;
+                    // Here we have a check to determine if the age comp 
+                    // should be calculated from the retained landings or 
+                    // the total population. These values are slightly different.
+                    // In the future this will have more impact as we implement
+                    // timing rather than everything occuring at the start of 
+                    // the year. 
                     if(this->fleet_observed_landings_data_id_m == -999){
                         this->agecomp_expected[i_age_year] =
                         this->index_numbers_at_age[i_age_year];
