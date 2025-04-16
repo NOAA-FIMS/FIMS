@@ -343,7 +343,7 @@ namespace fims_math
 
   template <typename Type>
   Type ddirichlet_multinomial(const fims::Vector<Type> &x,
-                              const fims::Vector<Type> &p, 
+                              const fims::Vector<Type> &p,
                               Type theta,
                               bool give_log = true)
   {
@@ -354,14 +354,14 @@ namespace fims_math
     {
       N += x[i];
     }
-
+    Type neff = ((Type(1.0) + theta) * static_cast<Type>(N)) / (Type(1.0) + theta * static_cast<Type>(N));
     // Precompute some terms
-    //Type alpha0 = theta;
+    // Type alpha0 = theta;
     Type alpha_sum = 0.0;
     std::vector<Type> alpha(ncat);
     for (int i = 0; i < ncat; ++i)
     {
-      alpha[i] = theta * p[i];
+      alpha[i] = neff * p[i];
       alpha_sum += alpha[i];
     }
 
