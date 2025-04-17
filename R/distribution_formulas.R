@@ -33,12 +33,13 @@ check_distribution_validity <- function(args) {
   # FIXME: Move this to a data item in the package so it can be used everywhere
   # Could do a call to all data objects in the package and get unique types that
   # are available
-  data_type_names <- c("index", "agecomp", "lengthcomp")
+  data_type_names <- c("landings", "index", "agecomp", "lengthcomp")
   if (is.null(data_type)) {
     available_distributions <- c("lognormal", "gaussian")
   } else {
     available_distributions <- switch(
       EXPR = ifelse(grepl("comp", data_type), "composition", data_type),
+      "landings" = c("lognormal", "gaussian"),
       "index" = c("lognormal", "gaussian"),
       "composition" = c("multinomial"),
       "unavailable data type"
@@ -163,14 +164,20 @@ get_expected_name <- function(family, data_type) {
   family_string <- family[["family"]]
   link_string <- family[["link"]]
   expected_name <- dplyr::case_when(
+    data_type == "landings" &&
+      grepl("lognormal|gaussian", family_string) &&
+      link_string == "log" ~ "log_landings_expected",
+    data_type == "landings" &&
+      grepl("lognormal|gaussian", family_string) &&
+      link_string == "identity" ~ "landings_expected",
     data_type == "index" &&
       grepl("lognormal|gaussian", family_string) &&
-      link_string == "log" ~ "log_expected_index",
+      link_string == "log" ~ "log_index_expected",
     data_type == "index" &&
       grepl("lognormal|gaussian", family_string) &&
-      link_string == "identity" ~ "expected_index",
-    grepl("agecomp", data_type) ~ "proportion_catch_numbers_at_age",
-    grepl("lengthcomp", data_type) ~ "proportion_catch_numbers_at_length",
+      link_string == "identity" ~ "index_expected",
+    grepl("agecomp", data_type) ~ "agecomp_proportion",
+    grepl("lengthcomp", data_type) ~ "lengthcomp_proportion",
   )
   # Check combination of entries was okay and led to valid name
   if (is.na(expected_name)) {
@@ -259,12 +266,11 @@ initialize_data_distribution <- function(
     sd = list(value = 1, estimated = FALSE),
     # FIXME: Move this argument to second to match where par is in
     # initialize_process_distribution
-    data_type = c("index", "agecomp", "lengthcomp")) {
+    data_type = c("landings", "index", "agecomp", "lengthcomp")) {
   data_type <- rlang::arg_match(data_type)
   # FIXME: Make the available families a data object
   # Could also make the matrix of distributions available per type as a
   # data frame where the check could use the stored object.
-
 
   # validity check on user input
   args <- list(
@@ -328,6 +334,9 @@ initialize_data_distribution <- function(
   }
 
   # setup link to observed data
+  if (data_type == "landings") {
+    new_module$set_observed_data(module$GetObservedLandingsDataID())
+  }
   if (data_type == "index") {
     new_module$set_observed_data(module$GetObservedIndexDataID())
   }

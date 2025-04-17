@@ -68,9 +68,8 @@ namespace fims_popdy {
                                                  biomass assuming unfished*/
         fims::Vector<Type> proportion_mature_at_age; /*!< Derived quantity: Proportion
                                                 mature at age */
-        fims::Vector<Type> expected_numbers_at_age; /*!< Expected values: Numbers at
-                                                age (thousands?? millions??) */
-        fims::Vector<Type> expected_catch; /*!< Expected values: Catch*/
+        fims::Vector<Type> total_landings_weight; /*!< Derived quantity: Total landings in weight*/
+        fims::Vector<Type> total_landings_numbers; /*!< Derived quantity: Total landings in numbers*/
         fims::Vector<Type> expected_recruitment; /*!< Expected recruitment */
         /// recruitment
         int recruitment_id = -999; /*!< id of recruitment model object*/
@@ -120,7 +119,8 @@ namespace fims_popdy {
 
             // size all the vectors to length of nages
             nfleets = fleets.size();
-            expected_catch.resize(nyears * nfleets);
+            total_landings_weight.resize(nyears);
+            total_landings_numbers.resize(nyears);
             years.resize(nyears);
             mortality_F.resize(nyears * nages);
             mortality_Z.resize(nyears * nages);
@@ -154,7 +154,8 @@ namespace fims_popdy {
             std::fill(unfished_spawning_biomass.begin(),
                     unfished_spawning_biomass.end(), static_cast<Type>(0.0));
             std::fill(spawning_biomass.begin(), spawning_biomass.end(), static_cast<Type>(0.0));
-            std::fill(expected_catch.begin(), expected_catch.end(), static_cast<Type>(0.0));
+            std::fill(total_landings_weight.begin(), total_landings_weight.end(), static_cast<Type>(0.0));
+            std::fill(total_landings_numbers.begin(), total_landings_numbers.end(), static_cast<Type>(0.0));
             std::fill(expected_recruitment.begin(), expected_recruitment.end(), static_cast<Type>(0.0));
             std::fill(proportion_mature_at_age.begin(), proportion_mature_at_age.end(),
                     static_cast<Type>(0.0));
@@ -198,13 +199,10 @@ namespace fims_popdy {
          */
         void CalculateMortality(size_t i_age_year, size_t year, size_t age) {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                if (this->fleets[fleet_]->is_survey == false) {
-                    this->mortality_F[i_age_year] +=
-                            this->fleets[fleet_]->Fmort[year] *
-                            // evaluate is a member function of the selectivity class
-                            this->fleets[fleet_]->selectivity->evaluate(ages[age]);
-
-                }
+                this->mortality_F[i_age_year] +=
+                        this->fleets[fleet_]->Fmort[year] *
+                        // evaluate is a member function of the selectivity class
+                        this->fleets[fleet_]->selectivity->evaluate(ages[age]);
             }
 
             this->mortality_Z[i_age_year] =
@@ -368,103 +366,6 @@ namespace fims_popdy {
         }
 
         /**
-         * @brief Adds to exiting expected total catch by fleet in weight
-         *
-         * @param year the year of expected total catch
-         * @param age the age of catch that is being added into total catch
-         */
-        void CalculateCatch(size_t year, size_t age) {
-            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                if (this->fleets[fleet_]->is_survey == false) {
-                    size_t index_yf = year * this->nfleets +
-                            fleet_; // index by fleet and years to dimension fold
-                    size_t i_age_year = year * this->nages + age;
-
-                    this->expected_catch[index_yf] +=
-                            this->fleets[fleet_]->catch_weight_at_age[i_age_year];
-
-                    fleets[fleet_]->expected_catch[year] +=
-                            this->fleets[fleet_]->catch_weight_at_age[i_age_year];
-                }
-            }
-        }
-
-        /**
-         * @brief Adds to the expected population indices by fleet
-         *
-         * @param i_age_year dimension folded index for age and year
-         * @param year the year of the population index
-         * @param age the age of the index that is added into population index
-         */
-        void CalculateIndex(size_t i_age_year, size_t year, size_t age) {
-            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                Type index_;
-                // I = qN (N is total numbers), I is an index in numbers
-                if (this->fleets[fleet_]->is_survey == false) {
-                    index_ = this->fleets[fleet_]->catch_numbers_at_age[i_age_year] *
-                            this->weight_at_age[age];
-                } else {
-                    index_ = this->fleets[fleet_]->q.get_force_scalar(year) *
-                            this->fleets[fleet_]->selectivity->evaluate(ages[age]) *
-                            this->numbers_at_age[i_age_year] *
-                            this->weight_at_age[age]; // this->weight_at_age[age];
-                }
-                fleets[fleet_]->expected_index[year] += index_;
-            }
-        }
-
-        /**
-         * @brief Calculates catch in numbers at age for each fleet for a given year
-         * and age, then adds the value to the expected catch in numbers at age for
-         * each fleet
-         *
-         * @param i_age_year dimension folded index for age and year
-         * @param year the year of expected catch composition is being calculated for
-         * @param age the age composition is being calculated for
-         */
-        void CalculateCatchNumbersAA(size_t i_age_year, size_t year, size_t age) {
-            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-                // make an intermediate value in order to set multiple members (of
-                // current and fleet objects) to that value.
-                Type catch_; // catch_ is used to avoid using the c++ keyword catch
-                // Baranov Catch Equation
-                if (this->fleets[fleet_]->is_survey == false) {
-                    catch_ = (this->fleets[fleet_]->Fmort[year] *
-                            this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
-                            this->mortality_Z[i_age_year] *
-                            this->numbers_at_age[i_age_year] *
-                            (1 - fims_math::exp(-(this->mortality_Z[i_age_year])));
-                } else {
-                    catch_ = (this->fleets[fleet_]->selectivity->evaluate(ages[age])) *
-                            this->numbers_at_age[i_age_year];
-                }
-
-                // this->catch_numbers_at_age[i_age_yearf] += catch_;
-                // catch_numbers_at_age for the fleet module has different
-                // dimensions (year/age, not year/fleet/age)
-                this->fleets[fleet_]->catch_numbers_at_age[i_age_year] += catch_;
-            }
-        }
-
-        /**
-         * @brief Calculates expected catch weight at age for each fleet for a given
-         * year and age
-         *
-         * @param year the year of expected catch weight at age
-         * @param age the age of expected catch weight at age
-         */
-        void CalculateCatchWeightAA(size_t year, size_t age) {
-            int i_age_year = year * this->nages + age;
-            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-
-                this->fleets[fleet_]->catch_weight_at_age[i_age_year] =
-                        this->fleets[fleet_]->catch_numbers_at_age[i_age_year] *
-                        this->weight_at_age[age];
-
-            }
-        }
-
-        /**
          * @brief Calculates expected proportion of individuals mature at a selected
          * ageage
          *
@@ -478,6 +379,122 @@ namespace fims_popdy {
             this->proportion_mature_at_age[i_age_year] =
                     this->maturity->evaluate(ages[age]);
 
+        }
+
+        /**
+         * @brief Adds to existing expected total landings by fleet
+         *
+         * @param year the year of expected total landings
+         * @param age the age of landings that is being added into total landings
+         */
+        void CalculateLandings(size_t year, size_t age) {
+            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+                size_t i_age_year = year * this->nages + age;
+
+                this->total_landings_weight[year] +=
+                        this->fleets[fleet_]->landings_weight_at_age[i_age_year];
+
+                fleets[fleet_]->landings_weight[year] +=
+                        this->fleets[fleet_]->landings_weight_at_age[i_age_year];
+
+                this->total_landings_numbers[year] +=
+                        this->fleets[fleet_]->landings_numbers_at_age[i_age_year];
+
+                fleets[fleet_]->landings_numbers[year] +=
+                        this->fleets[fleet_]->landings_numbers_at_age[i_age_year];
+            }
+        }
+
+        /**
+         * @brief Calculates landings in numbers at age for each fleet for a given year
+         * and age, then adds the value to the expected landings in numbers at age for
+         * each fleet
+         *
+         * @param i_age_year dimension folded index for age and year
+         * @param year the year of expected landings composition is being calculated for
+         * @param age the age composition is being calculated for
+         */
+        void CalculateLandingsNumbersAA(size_t i_age_year, size_t year, size_t age) {
+            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+                // Baranov Catch Equation
+                this->fleets[fleet_]->landings_numbers_at_age[i_age_year] +=
+                (this->fleets[fleet_]->Fmort[year] *
+                    this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
+                    this->mortality_Z[i_age_year] *
+                    this->numbers_at_age[i_age_year] *
+                    (1 - fims_math::exp(-(this->mortality_Z[i_age_year])));
+            }
+        }
+
+        /**
+         * @brief Calculates expected landings weight at age for each fleet for a given
+         * year and age
+         *
+         * @param year the year of expected landings weight at age
+         * @param age the age of expected landings weight at age
+         */
+        void CalculateLandingsWeightAA(size_t year, size_t age) {
+            int i_age_year = year * this->nages + age;
+            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+
+                this->fleets[fleet_]->landings_weight_at_age[i_age_year] =
+                        this->fleets[fleet_]->landings_numbers_at_age[i_age_year] *
+                        this->weight_at_age[age];
+            }
+        }
+
+        /**
+         * @brief Adds to the expected population indices by fleet
+         *
+         * @param i_age_year dimension folded index for age and year
+         * @param year the year of the population index
+         * @param age the age of the index that is added into population index
+         */
+        void CalculateIndex(size_t i_age_year, size_t year, size_t age) {
+            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+
+                fleets[fleet_]->index_weight[year] +=
+                        this->fleets[fleet_]->index_weight_at_age[i_age_year];
+
+                fleets[fleet_]->index_numbers[year] +=
+                        this->fleets[fleet_]->index_numbers_at_age[i_age_year];
+            }
+        }
+
+        /**
+         * @brief Calculates index sample in numbers at age for each fleet for
+         * a given year and age, then adds the value to the expected index in
+         * numbers at age for each fleet
+         *
+         * @param i_age_year dimension folded index for age and year
+         * @param year the year the expected index is being calculated for
+         * @param age the age index is being calculated for
+         */
+        void CalculateIndexNumbersAA(size_t i_age_year, size_t year, size_t age) {
+            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+
+                this->fleets[fleet_]->index_numbers_at_age[i_age_year] +=
+                (this->fleets[fleet_]->q.get_force_scalar(year) *
+                this->fleets[fleet_]->selectivity->evaluate(ages[age]))*
+                this->numbers_at_age[i_age_year];
+            }
+        }
+
+        /**
+         * @brief Calculates expected index weight at age for each fleet for
+         * a given year and age
+         *
+         * @param year the year of expected index weight at age
+         * @param age the age of expected index weight at age
+         */
+        void CalculateIndexWeightAA(size_t year, size_t age) {
+            int i_age_year = year * this->nages + age;
+            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+
+                this->fleets[fleet_]->index_weight_at_age[i_age_year] =
+                        this->fleets[fleet_]->index_numbers_at_age[i_age_year] *
+                        this->weight_at_age[age];
+            }
         }
 
         /**
@@ -528,7 +545,7 @@ namespace fims_popdy {
                     if (y < this->nyears) {
                         /*
                          First thing we need is total mortality aggregated across all fleets
-                         to inform the subsequent catch and change in numbers at age
+                         to inform the subsequent landings and change in numbers at age
                          calculations. This is only calculated for years < nyears as these are
                          the model estimated years with data. The year loop extends to
                          y=nyears so that population numbers at age and SSB can be calculated
@@ -598,16 +615,18 @@ namespace fims_popdy {
                     }
 
                     /*
-                    Here composition, total catch, and index values are calculated for all
+                    Here composition, total landings, and index values are calculated for all
                     years with reference data. They are not calculated for y=nyears as there
                     is this is just to get final population structure at the end of the
                     terminal year.
                      */
                     if (y < this->nyears) {
-                        CalculateCatchNumbersAA(i_age_year, y, a);
+                        CalculateLandingsNumbersAA(i_age_year, y, a);
+                        CalculateLandingsWeightAA(y, a);
+                        CalculateLandings(y, a);
 
-                        CalculateCatchWeightAA(y, a);
-                        CalculateCatch(y, a);
+                        CalculateIndexNumbersAA(i_age_year, y, a);
+                        CalculateIndexWeightAA(y, a);
                         CalculateIndex(i_age_year, y, a);
                     }
                 }

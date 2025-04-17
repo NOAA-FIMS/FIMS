@@ -85,6 +85,7 @@ By just passing lists of fleet specifications and the data to `create_default_pa
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
+    Landings = "DlnormDistribution",
     Index = "DlnormDistribution",
     AgeComp = "DmultinomDistribution",
     LengthComp = "DmultinomDistribution"
@@ -222,20 +223,22 @@ The list returned from `initialize_fims()` can be passed to the parameter of `fi
 test_fit <- parameters |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = FALSE)
-
+clear()
 # Run the  model with optimization
 fit <- parameters |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-
-fit_output <- finalize(fit@opt$par, fit@obj$fn, fit@obj$gr)
+clear()
+# finalize is not working, you get the following error when you do this code
+# Error: basic_string::_M_create
+# if you run clear() ahead of the following line the error will go away
+# fit_output <- finalize(fit@opt$par, fit@obj$fn, fit@obj$gr)
 
 # Get information about the model and print a few characters to the screen
 recruitment_log <- get_log_module("information")
 substr(recruitment_log, 1, 100)
 
-# Clear memory post-run
-clear()
+
 ```
 
 The results can be plotted with either base R or using {ggplot2}.
@@ -243,7 +246,7 @@ The results can be plotted with either base R or using {ggplot2}.
 ```{r fit-plots}
 index_results <- data.frame(
   observed = m_index(data_4_model, "survey1"),
-  expected = get_report(fit)[["exp_index"]][[2]],
+  expected = get_report(fit)[["index_exp"]][[2]],
   years = get_start_year(data_4_model):get_end_year(data_4_model)
 )
 print(index_results)
@@ -255,14 +258,14 @@ ggplot2::ggplot(index_results, ggplot2::aes(x = years, y = observed)) +
   ggplot2::geom_line(ggplot2::aes(x = years, y = expected), color = "blue") +
   ggplot2::theme_bw()
 
-catch_results <- data.frame(
+landings_results <- data.frame(
   observed = m_landings(data_4_model, fleet = "fleet1"),
-  expected = get_report(fit)[["exp_index"]][[1]],
+  expected = get_report(fit)[["landings_exp"]][[1]],
   years = get_start_year(data_4_model):get_end_year(data_4_model)
 )
-print(catch_results)
+print(landings_results)
 
-ggplot2::ggplot(catch_results, ggplot2::aes(x = years, y = observed)) +
+ggplot2::ggplot(landings_results, ggplot2::aes(x = years, y = observed)) +
   ggplot2::geom_point() +
   ggplot2::xlab("Year") +
   ggplot2::ylab("Index (mt)") +
@@ -320,6 +323,7 @@ fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
     Index = "DlnormDistribution",
+    Landings = "DlnormDistribution",
     AgeComp = "DmultinomDistribution"
   )
 )
@@ -347,6 +351,7 @@ fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),
   data_distribution = c(
     Index = "DlnormDistribution",
+    Landings = "DlnormDistribution",
     LengthComp = "DmultinomDistribution"
   )
 )
@@ -360,6 +365,6 @@ length_only_fit <- data_4_model |>
   update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-cat(fit_output)
+# cat(fit_output)
 clear()
 ```

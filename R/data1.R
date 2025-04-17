@@ -14,7 +14,7 @@
 #'   \item{name}{A character string providing the name of the information source
 #'     that the data was collected from, e.g., `"Trawl fishery"`.}
 #'   \item{age}{An integer age. Entry can be `NA` if information pertains to
-#'     multiple ages, e.g., total catch rather than catch of age-4 fish.}
+#'     multiple ages, e.g., total landings rather than landings of age-4 fish.}
 #'   \item{length}{A numeric length. Entry can be `NA` if information doesn't
 #'     pertain to length.}
 #'   \item{datestart,dateend}{Start and end dates of the data collection period.
@@ -27,7 +27,7 @@
 #'     viable units for the composition data, where the former is the preferred
 #'     unit of measurement.}
 #'   \item{uncertainty}{A real value providing a measurement of uncertainty
-#'     for value. For catches and survey indices of abundance this should be
+#'     for value. For landings and indices of abundance this should be
 #'     the standard deviation of the logged observations if you are using the
 #'     lognormal distribution to fit your data. For composition data it will
 #'     be your input sample size.

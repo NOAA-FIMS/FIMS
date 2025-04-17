@@ -269,6 +269,33 @@ namespace fims_info {
         }
 
         /**
+         * @brief Set pointers to landings data in the fleet module.
+         * 
+         * @param &valid_model reference to true/false boolean indicating whether model is valid.
+         * @param f shared pointer to fleet module
+         */
+        void SetFleetLandingsData(
+                bool &valid_model,
+                std::shared_ptr<fims_popdy::Fleet<Type> > f) {
+            if (f->fleet_observed_landings_data_id_m != -999) {
+                uint32_t observed_landings_id =
+                        static_cast<uint32_t> (f->fleet_observed_landings_data_id_m);
+                data_iterator it = this->data_objects.find(observed_landings_id);
+                if (it != this->data_objects.end()) {
+                    f->observed_landings_data = (*it).second;
+                    FIMS_INFO_LOG("Landings data for fleet "
+                            + fims::to_string(f->id) + " successfully set to "
+                            + fims::to_string(f->observed_landings_data->at(1)));
+                } else {
+                    valid_model = false;
+                    FIMS_ERROR_LOG("Expected landings data not defined for fleet "
+                            + fims::to_string(f->id) + ", index "
+                            + fims::to_string(observed_landings_id));
+                }
+            }
+        }
+
+        /**
          * @brief Set pointers to index data in the fleet module.
          * 
          * @param &valid_model reference to true/false boolean indicating whether model is valid.
@@ -292,11 +319,6 @@ namespace fims_info {
                             + fims::to_string(f->id) + ", index "
                             + fims::to_string(observed_index_id));
                 }
-            } else {
-                valid_model = false;
-                // TODO: explore why index data is required because it should not be
-                FIMS_ERROR_LOG("No index data observed for fleet "
-                        + fims::to_string(f->id) + ". FIMS requires index data for all fleets.");
             }
         }
 
@@ -513,6 +535,8 @@ namespace fims_info {
 
                 f->Initialize(f->nyears, f->nages, f->nlengths);
 
+                SetFleetLandingsData(valid_model, f);
+
                 SetFleetIndexData(valid_model, f);
 
                 SetAgeCompositionData(valid_model, f);
@@ -576,7 +600,7 @@ namespace fims_info {
                         ++it) {
                     // Initialize fleet object
                     std::shared_ptr<fims_popdy::Fleet<Type> > f = (*it).second;
-                    // population to the individual fleets This is to pass catch at age
+                    // population to the individual fleets This is to pass landings at age
                     // from population to fleets?
                     // any shared member in p (population is pushed into fleets)
                     p->fleets.push_back(f);

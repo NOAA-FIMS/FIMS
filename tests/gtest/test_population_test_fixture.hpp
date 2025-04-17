@@ -88,9 +88,9 @@ class PopulationEvaluateTestFixture : public testing::Test {
       selectivity->slope.resize(1);
       selectivity->slope[0] = 0.5;
 
-      fleet->expected_catch.resize(nyears);
-      fleet->expected_index.resize(nyears);  
-      fleet->catch_numbers_at_age.resize(nyears * nages);
+      fleet->landings_expected.resize(nyears);
+      fleet->index_expected.resize(nyears);  
+      fleet->landings_numbers_at_age.resize(nyears * nages);
       fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
       fleet->selectivity = selectivity;
@@ -98,9 +98,7 @@ class PopulationEvaluateTestFixture : public testing::Test {
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
-      if (i == 0) {
-        fleet->is_survey = true;
-      }
+      
       fleet->Prepare();
       population.fleets.push_back(fleet);
     }
@@ -252,9 +250,9 @@ class PopulationPrepareTestFixture : public testing::Test {
       selectivity->inflection_point[0] = 7;
       selectivity->slope[0] = 0.5;
       
-      fleet->expected_catch.resize(nyears);
-      fleet->expected_index.resize(nyears);  
-      fleet->catch_numbers_at_age.resize(nyears * nages);
+      fleet->landings_expected.resize(nyears);
+      fleet->index_expected.resize(nyears);  
+      fleet->landings_numbers_at_age.resize(nyears * nages);
       fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
       fleet->selectivity = selectivity;
@@ -262,9 +260,7 @@ class PopulationPrepareTestFixture : public testing::Test {
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
-      if (i == 0) {
-        fleet->is_survey = true;
-      }
+      
       fleet->Prepare();
       population.fleets.push_back(fleet);
     }
