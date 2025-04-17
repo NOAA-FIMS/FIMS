@@ -521,16 +521,16 @@ public:
     ss << " \"name\": \"log_q\",\n";
     ss << " \"id\":" << this->log_q.id_m << ",\n";
     ss << " \"type\": \"vector\",\n";
-    ss << " \"values\": " << this->log_q << "\n}\n";
+    ss << " \"values\": " << this->log_q << "\n}";
     if (this->nlengths > 0) {
       ss << " ,\n";
       ss << " {\n";
       ss << " \"name\": \"age_to_length_conversion\",\n";
       ss << " \"id\":" << this->age_to_length_conversion.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
-      ss << " \"values\": " << this->age_to_length_conversion << "\n}\n";
+      ss << " \"values\": " << this->age_to_length_conversion << "\n}";
     }
-    ss << "], \"derived_quantities\":[\n";
+    ss << "\n],\n \"derived_quantities\":[\n";
     ss << "{\n";
     ss << "  \"name\": \"landings_naa\",\n";
     ss << "  \"values\":[";
@@ -569,6 +569,8 @@ public:
       ss << this->derived_landings_waa[this->derived_landings_waa.size() - 1] << "]\n";
     }
     ss << " },\n";
+
+    ss << " {\n";
     ss << "  \"name\": \"index_naa\",\n";
     ss << "  \"values\":[";
     if (this->derived_index_naa.size() == 0) {
@@ -580,6 +582,8 @@ public:
       ss << this->derived_index_naa[this->derived_index_naa.size() - 1] << "]\n";
     }
     ss << " },\n";
+    
+    ss << " {\n";
     ss << "  \"name\": \"index_nal\",\n";
     ss << "  \"values\":[";
     if (this->derived_index_nal.size() == 0) {
@@ -634,26 +638,26 @@ public:
     ss << "{\n";
     ss << "  \"name\": \"agecomp_proportion \",\n";
     ss << "  \"values\":[";
-    if (this->agecomp_proportion.size() == 0) {
+    if (this->derived_agecomp_proportion.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->agecomp_proportion.size() - 1; i++) {
-        ss << this->agecomp_proportion[i] << ", ";
+      for (R_xlen_t i = 0; i < this->derived_agecomp_proportion.size() - 1; i++) {
+        ss << this->derived_agecomp_proportion[i] << ", ";
       }
-      ss << this->agecomp_proportion[this->agecomp_proportion.size() - 1] << "]\n";
+      ss << this->derived_agecomp_proportion[this->derived_agecomp_proportion.size() - 1] << "]\n";
     }
     ss << " },\n";
 
     ss << " {\n";
     ss << "  \"name\": \"lengthcomp_proportion \",\n";
     ss << "  \"values\":[";
-    if (this->lengthcomp_proportion.size() == 0) {
+    if (this->derived_lengthcomp_proportion.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->lengthcomp_proportion.size() - 1; i++) {
-        ss << this->lengthcomp_proportion[i] << ", ";
+      for (R_xlen_t i = 0; i < this->derived_lengthcomp_proportion.size() - 1; i++) {
+        ss << this->derived_lengthcomp_proportion[i] << ", ";
       }
-      ss << this->lengthcomp_proportion[this->lengthcomp_proportion.size() - 1] << "]\n";
+      ss << this->derived_lengthcomp_proportion[this->derived_lengthcomp_proportion.size() - 1] << "]\n";
     }
     ss << " },\n";
 
@@ -668,7 +672,7 @@ public:
       }
       ss << this->derived_index_expected[this->derived_index_expected.size() - 1] << "]\n";
     }
-    ss << " }\n]\n}";
+    ss << " },\n";
 
     ss << "{\n";
     ss << "  \"name\": \"index weight \",\n";
@@ -681,7 +685,7 @@ public:
       }
       ss << this->derived_index_w[this->derived_index_w.size() - 1] << "]\n";
     }
-    ss << " }\n]\n}";
+    ss << " },\n";
 
     ss << "{\n";
     ss << "  \"name\": \"index numbers \",\n";
@@ -694,7 +698,7 @@ public:
       }
       ss << this->derived_index_n[this->derived_index_n.size() - 1] << "]\n";
     }
-    ss << " }\n]\n}";
+    ss << " },\n";
 
     ss << "{\n";
     ss << "  \"name\": \"landings expected \",\n";
@@ -707,7 +711,7 @@ public:
       }
       ss << this->derived_landings_expected[this->derived_landings_expected.size() - 1] << "]\n";
     }
-    ss << " }\n]\n}";
+    ss << " },\n";
 
     ss << "{\n";
     ss << "  \"name\": \"landings weight \",\n";
@@ -720,7 +724,7 @@ public:
       }
       ss << this->derived_landings_w[this->derived_landings_w.size() - 1] << "]\n";
     }
-    ss << " }\n]\n}";
+    ss << " },\n";
 
     ss << "{\n";
     ss << "  \"name\": \"landings numbers \",\n";
