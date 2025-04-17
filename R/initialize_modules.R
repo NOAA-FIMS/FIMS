@@ -89,20 +89,6 @@ initialize_module <- function(parameters, data, module_name) {
       dplyr::pull(type) |>
       unique()
 
-    # if (!"index" %in% fleet_types) {
-    #   module_fields <- setdiff(module_fields, c(
-    #     "log_q",
-    #     "random_q",
-    #     "estimate_q"
-    #   ))
-    # }
-
-    # if (!"landings" %in% fleet_types) {
-    #   module_fields <- setdiff(module_fields, c(
-    #     "log_Fmort"
-    #   ))
-    # }
-
     data_distribution_names_for_fleet_i <- names(parameters[["modules"]][["fleets"]][[module_name]][["data_distribution"]])
     if ("age-to-length-conversion" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
