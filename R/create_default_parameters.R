@@ -348,54 +348,103 @@ create_default_fleet <- function(fleets,
     dplyr::pull(type) |>
     unique()
 
+  #Get data likelihood distributions assigned for this fleet
+  distribution_names_for_fleet <- names(fleets[[fleet_name]][["data_distribution"]])
+
   # Determine default fleet parameters based on types of data present
-  # FIXME: allow for a fleet to have both landings and index data
-  process_default <- if ("landings" %in% data_types_present) {
-    list(
-      log_Fmort.value = log(rep(0.00001, get_n_years(data))),
-      log_Fmort.estimated = TRUE
-    )
-  } else {
-    list(
+  if ("index" %in% data_types_present &&
+                   "Index" %in% distribution_names_for_fleet) {
+     q_default <- list(
       log_q.value = 0,
       log_q.estimated = TRUE
+     )
+
+     index_distribution <- fleets[[fleet_name]][["data_distribution"]]["Index"]
+
+     index_uncertainty <- get_data(data) |>
+       dplyr::filter(name == fleet_name, type %in% c("index")) |>
+       dplyr::arrange(dplyr::desc(type)) |>
+       dplyr::pull(uncertainty)
+
+     index_distribution_default <- switch(index_distribution,
+                                          "DnormDistribution" = create_default_DnormDistribution(
+                                            value = index_uncertainty,
+                                            input_type = "data",
+                                            data = data
+                                          ),
+                                          "DlnormDistribution" = create_default_DlnormDistribution(
+                                            value = index_uncertainty,
+                                            input_type = "data",
+                                            data = data
+                                          )
+     )
+     names(index_distribution_default) <- paste0(
+       index_distribution,
+       ".",
+       names(index_distribution_default)
+     )
+
+  }else{
+    q_default <- list(
+      log_q.value = 0,
+      log_q.estimated = FALSE
     )
+
+    index_distribution_default <- NULL
   }
 
-  names(process_default) <- paste0("Fleet.", names(process_default))
+  names(q_default) <- paste0("Fleet.", names(q_default))
 
-  # Create index distribution defaults
-  index_distribution <- fleets[[fleet_name]][["data_distribution"]]["Index"]
-
-  # FIXME: Will this work if both landings and index data are present?
-  index_uncertainty <- get_data(data) |>
-    dplyr::filter(name == fleet_name, type %in% c("landings", "index")) |>
-    dplyr::arrange(dplyr::desc(type)) |>
-    dplyr::pull(uncertainty)
-
-  index_distribution_default <- switch(index_distribution,
-    "DnormDistribution" = create_default_DnormDistribution(
-      value = index_uncertainty,
-      input_type = "data",
-      data = data
-    ),
-    "DlnormDistribution" = create_default_DlnormDistribution(
-      value = index_uncertainty,
-      input_type = "data",
-      data = data
+  if ("landings" %in% data_types_present &&
+                   "Landings" %in% distribution_names_for_fleet) {
+    log_Fmort_default <- list(
+      log_Fmort.value = rep(-3, get_n_years(data)),
+      log_Fmort.estimated = TRUE
     )
-  )
-  names(index_distribution_default) <- paste0(
-    index_distribution,
-    ".",
-    names(index_distribution_default)
-  )
+
+    landings_distribution <- fleets[[fleet_name]][["data_distribution"]]["Landings"]
+
+    landings_uncertainty <- get_data(data) |>
+      dplyr::filter(name == fleet_name, type %in% c("landings")) |>
+      dplyr::arrange(dplyr::desc(type)) |>
+      dplyr::pull(uncertainty)
+
+    landings_distribution_default <- switch(landings_distribution,
+                                         "DnormDistribution" = create_default_DnormDistribution(
+                                           value = landings_uncertainty,
+                                           input_type = "data",
+                                           data = data
+                                         ),
+                                         "DlnormDistribution" = create_default_DlnormDistribution(
+                                           value = landings_uncertainty,
+                                           input_type = "data",
+                                           data = data
+                                         )
+    )
+    names(landings_distribution_default) <- paste0(
+      landings_distribution,
+      ".",
+      names(landings_distribution_default)
+    )
+
+  } else {
+    log_Fmort_default <- list(
+      log_Fmort.value = rep(-200, get_n_years(data)),
+      log_Fmort.estimated = FALSE
+    )
+
+    landings_distribution_default <- NULL
+  }
+
+  names(log_Fmort_default) <- paste0("Fleet.", names(log_Fmort_default))
 
   # Compile all default parameters into a single list
   default <- list(c(
     selectivity_default,
-    process_default,
-    index_distribution_default
+    q_default,
+    log_Fmort_default,
+    index_distribution_default,
+    landings_distribution_default
   ))
 
   names(default) <- fleet_name

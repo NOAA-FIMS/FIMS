@@ -9,7 +9,7 @@ initialize_data_distribution(
   module,
   family,
   sd = list(value = 1, estimated = FALSE),
-  data_type = c("index", "agecomp", "lengthcomp")
+  data_type = c("landings", "index", "agecomp", "lengthcomp")
 )
 
 initialize_process_distribution(
@@ -39,7 +39,7 @@ specified \code{"estimated"} value will be repeated to match the length of
 
 \item{data_type}{A string specifying the type of data that the
 distribution will be fit to. Allowable types include
-c, index, agecomp, lengthcomp
+c, landings, index, agecomp, lengthcomp
 and the default is
 c.}
 

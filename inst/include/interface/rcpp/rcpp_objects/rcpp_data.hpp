@@ -28,7 +28,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
   static uint32_t id_g;
   /**
    * @brief The local id of the DataInterfaceBase object.
-   * 
+   *
    */
   uint32_t id;
   /**
@@ -128,7 +128,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
-  
+
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
@@ -138,7 +138,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
    */
   virtual std::string to_json() {
     std::stringstream ss;
-    
+
     ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\" : \"AgeComp\",\n";
@@ -153,7 +153,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
     ss << "}";
     return ss.str();
   }
-  
+
 
 #ifdef TMB_MODEL
 
@@ -205,7 +205,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @brief The first dimension of the data, which relates to the number of
    * length bins.
    */
-  fims_int lmax;
+  fims_int lmax = 0;
   /**
    * @brief The second dimension of the data, which relates to the number of
    * time steps or years.
@@ -245,7 +245,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
-  
+
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
@@ -255,7 +255,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
    */
   virtual std::string to_json() {
     std::stringstream ss;
-    
+
     ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\" : \"LengthComp\",\n";
@@ -270,7 +270,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     ss << "}";
     return ss.str();
   }
-  
+
 #ifdef TMB_MODEL
   template <typename Type>
   bool add_to_fims_tmb_internal() {
@@ -325,7 +325,7 @@ class IndexDataInterface : public DataInterfaceBase {
   IndexDataInterface(int ymax = 0) : DataInterfaceBase() {
     this->ymax = ymax;
     this->index_data.resize(ymax);
-    
+
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<IndexDataInterface>(*this));
   }
 
@@ -347,17 +347,17 @@ class IndexDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
-  
+
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
    * data interface with index data. It also returns the ID, the rank of 1, the
    * dimensions by printing ymax, followed by the data values themselves. This
    * string is formatted for a json file.
-   */ 
+   */
   virtual std::string to_json() {
     std::stringstream ss;
-    
+
     ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\": \"Index\",\n";
@@ -384,6 +384,111 @@ class IndexDataInterface : public DataInterfaceBase {
 
     for (int y = 0; y < ymax; y++) {
       data->at(y) = this->index_data[y];
+    }
+
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    info->data_objects[this->id] = data;
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+
+    return true;
+  }
+
+#endif
+};
+
+/**
+ * @brief  The Rcpp interface for Landings to instantiate the object from R:
+ * fleet <- methods::new(Landings).
+ */
+class LandingsDataInterface : public DataInterfaceBase {
+ public:
+  /**
+   * @brief An integer that specifies the second dimension of the data.
+   */
+  fims_int ymax = 0;
+  /**
+   * @brief The vector of landings data that is being passed from R.
+   */
+  RealVector landings_data;
+
+  /**
+   * @brief The constructor.
+   */
+  LandingsDataInterface(int ymax = 0) : DataInterfaceBase() {
+    this->ymax = ymax;
+    this->landings_data.resize(ymax);
+
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LandingsDataInterface>(*this));
+  }
+
+  /**
+   * @brief Construct a new Landings Data Interface object
+   *
+   * @param other
+   */
+  LandingsDataInterface(const LandingsDataInterface& other) :
+  DataInterfaceBase(other), ymax(other.ymax), landings_data(other.landings_data) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~LandingsDataInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * data interface with landings data. It also returns the ID, the rank of 1, the
+   * dimensions by printing ymax, followed by the data values themselves. This
+   * string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"name\": \"data\",\n";
+    ss << " \"type\": \"Landings\",\n";
+    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"rank\": " << 1 << ",\n";
+    ss << " \"dimensions\": [" << this->ymax << "],\n";
+    ss << " \"values\": [";
+    for (R_xlen_t i = 0; i < landings_data.size() - 1; i++) {
+      ss << landings_data[i] << ", ";
+    }
+    ss << landings_data[landings_data.size() - 1] << "]\n";
+    ss << "}";
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_data_object::DataObject<Type>> data =
+        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
+
+    data->id = this->id;
+
+    for (int y = 0; y < ymax; y++) {
+      data->at(y) = this->landings_data[y];
     }
 
     std::shared_ptr<fims_info::Information<Type>> info =

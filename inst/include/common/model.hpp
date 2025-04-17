@@ -67,18 +67,28 @@ namespace fims_model {
             // vector< vector<Type> > creates a nested vector structure where
             // each vector can be a different dimension. Does not work with ADREPORT
             // fleets
-            vector<vector<Type> > exp_index(n_fleets);
-            vector<vector<Type> > exp_catch(n_fleets);
-            vector<vector<Type> > cnaa(n_fleets);
-            vector<vector<Type> > cwaa(n_fleets);
-            vector<vector<Type> > cnal(n_fleets);
-            vector<vector<Type> > pcnaa(n_fleets);
-            vector<vector<Type> > pcnal(n_fleets);
+            vector<vector<Type> > landings_w(n_fleets);
+            vector<vector<Type> > landings_n(n_fleets);
+            vector<vector<Type> > landings_exp(n_fleets);
+            vector<vector<Type> > landings_naa(n_fleets);
+            vector<vector<Type> > landings_waa(n_fleets);
+            vector<vector<Type> > landings_nal(n_fleets);
+            vector<vector<Type> > index_w(n_fleets);
+            vector<vector<Type> > index_n(n_fleets);
+            vector<vector<Type> > index_exp(n_fleets);
+            vector<vector<Type> > index_naa(n_fleets);
+            vector<vector<Type> > index_nal(n_fleets);
+            vector<vector<Type> > agecomp_exp(n_fleets);
+            vector<vector<Type> > lengthcomp_exp(n_fleets);
+            vector<vector<Type> > agecomp_prop(n_fleets);
+            vector<vector<Type> > lengthcomp_prop(n_fleets);
             vector<vector<Type> > F_mort(n_fleets);
             vector<vector<Type> > q(n_fleets);
             // populations
             vector<vector<Type> > naa(n_pops);
             vector<vector<Type> > ssb(n_pops);
+            vector<vector<Type> > total_landings_w(n_pops);
+            vector<vector<Type> > total_landings_n(n_pops);
             vector<vector<Type> > biomass(n_pops);
             vector<vector<Type> > log_recruit_dev(n_pops);
             vector<vector<Type> > recruitment(n_pops);
@@ -90,7 +100,7 @@ namespace fims_model {
             nll_components.fill(0);
             int nll_components_idx = 0;
             size_t n_priors = 0;
-
+            FIMS_INFO_LOG("Begin evaluating prior densities.")
             for (d_it = this->fims_information->density_components.begin();
                     d_it != this->fims_information->density_components.end(); ++d_it) {
                 std::shared_ptr<fims_distributions::DensityComponentBase<Type> > d = (*d_it).second;
@@ -119,6 +129,7 @@ namespace fims_model {
 
                 // Prepare recruitment
                 p->recruitment->Prepare();
+                FIMS_INFO_LOG("Recruitmnt successfully prepared.")
 
             }
 
@@ -150,7 +161,9 @@ namespace fims_model {
                 p->of = this->of;
 #endif
                 // Evaluate population
+                FIMS_INFO_LOG("Begin evaluation for population " + fims::to_string(p->id));
                 p->Evaluate();
+                FIMS_INFO_LOG("Population successfully evaluated");
             }
 
             typename fims_info::Information<Type>::fleet_iterator f_it;
@@ -162,11 +175,14 @@ namespace fims_model {
 #ifdef TMB_MODEL
                 f->of = this->of;
 #endif
-
+                FIMS_INFO_LOG("Begin evalulation for fleet "+fims::to_string(f->id));
                 f->evaluate_age_comp();
                 if (f->nlengths > 0) {
                   f->evaluate_length_comp();
                 }
+                FIMS_INFO_LOG("Begin evalulation of landings for fleet "+fims::to_string(f->id));
+                f->evaluate_landings();
+                FIMS_INFO_LOG("Begin evalulation of index for fleet "+fims::to_string(f->id));
                 f->evaluate_index();
             }
             this->fims_information->SetupData();
@@ -195,6 +211,8 @@ namespace fims_model {
 #ifdef TMB_MODEL
                 naa(pop_idx) = vector<Type>(p->numbers_at_age);
                 ssb(pop_idx) = vector<Type>(p->spawning_biomass);
+                total_landings_w(pop_idx) = vector<Type>(p->total_landings_weight);
+                total_landings_n(pop_idx) = vector<Type>(p->total_landings_numbers);
                 log_recruit_dev(pop_idx) =
                         vector<Type>(p->recruitment->log_recruit_devs);
                 recruitment(pop_idx) = vector<Type>(p->expected_recruitment);
@@ -210,15 +228,23 @@ namespace fims_model {
                     f_it != this->fims_information->fleets.end(); ++f_it) {
                 std::shared_ptr<fims_popdy::Fleet<Type> > f = (*f_it).second;
 #ifdef TMB_MODEL
-                exp_index(fleet_idx) = f->expected_index;
-                exp_catch(fleet_idx) = f->expected_catch;
+                landings_w(fleet_idx) = f->landings_weight;
+                landings_n(fleet_idx) = f->landings_numbers;
+                landings_exp(fleet_idx) = f->landings_expected;
+                landings_naa(fleet_idx) = f->landings_numbers_at_age;
+                landings_waa(fleet_idx) = f->landings_weight_at_age;
+                landings_nal(fleet_idx) = f->landings_numbers_at_length;
+                index_w(fleet_idx) = f->index_weight;
+                index_n(fleet_idx) = f->index_numbers;
+                index_exp(fleet_idx) = f->index_expected;
+                index_naa(fleet_idx) = f->index_numbers_at_age;
+                index_nal(fleet_idx) = f->index_numbers_at_length;
+                agecomp_exp(fleet_idx) = f->agecomp_expected;
+                lengthcomp_exp(fleet_idx) = f->lengthcomp_expected;
+                agecomp_prop(fleet_idx) = f->agecomp_proportion;
+                lengthcomp_prop(fleet_idx) = f->lengthcomp_proportion;
                 F_mort(fleet_idx) = f->Fmort;
                 q(fleet_idx) = f->q;
-                cnaa(fleet_idx) = f->catch_numbers_at_age;
-                cnal(fleet_idx) = f->catch_numbers_at_length;
-                pcnaa(fleet_idx) = f->proportion_catch_numbers_at_age;
-                pcnal(fleet_idx) = f->proportion_catch_numbers_at_length;
-                cwaa(fleet_idx) = f->catch_weight_at_age;
 #endif
                 fleet_idx += 1;
             }
@@ -236,15 +262,25 @@ namespace fims_model {
             FIMS_REPORT_F(recruitment, of);
             FIMS_REPORT_F(biomass, of);
             FIMS_REPORT_F(M, of);
-            FIMS_REPORT_F(exp_index, of);
-            FIMS_REPORT_F(exp_catch, of);
+            FIMS_REPORT_F(total_landings_w, of);
+            FIMS_REPORT_F(total_landings_n, of);
+            FIMS_REPORT_F(landings_w, of);
+            FIMS_REPORT_F(landings_n, of);
+            FIMS_REPORT_F(landings_exp, of);
+            FIMS_REPORT_F(landings_naa, of);
+            FIMS_REPORT_F(landings_waa, of);
+            FIMS_REPORT_F(landings_nal, of);
+            FIMS_REPORT_F(index_w, of);
+            FIMS_REPORT_F(index_n, of);
+            FIMS_REPORT_F(index_exp, of);
+            FIMS_REPORT_F(index_naa, of);
+            FIMS_REPORT_F(index_nal, of);
+            FIMS_REPORT_F(agecomp_exp, of);
+            FIMS_REPORT_F(lengthcomp_exp, of);
+            FIMS_REPORT_F(agecomp_prop, of);
+            FIMS_REPORT_F(lengthcomp_prop, of);
             FIMS_REPORT_F(F_mort, of);
             FIMS_REPORT_F(q, of);
-            FIMS_REPORT_F(cnaa, of);
-            FIMS_REPORT_F(cnal, of);
-            FIMS_REPORT_F(pcnaa, of);
-            FIMS_REPORT_F(pcnal, of);
-            FIMS_REPORT_F(cwaa, of);
             FIMS_REPORT_F(nll_components, of);
 
             /*ADREPORT using ADREPORTvector defined in
@@ -257,11 +293,18 @@ namespace fims_model {
             vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
             vector<Type> FMort = ADREPORTvector(F_mort);
             vector<Type> Q = ADREPORTvector(q);
-            vector<Type> ExpectedIndex = ADREPORTvector(exp_index);
-            vector<Type> CNAA = ADREPORTvector(cnaa);
-            vector<Type> CNAL = ADREPORTvector(cnal);
-            vector<Type> PCNAA = ADREPORTvector(pcnaa);
-            vector<Type> PCNAL = ADREPORTvector(pcnal);
+            vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
+            vector<Type> IndexExpected = ADREPORTvector(index_exp);
+            vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
+            vector<Type> LandingsNumberAtLength = ADREPORTvector(landings_nal);
+            vector<Type> IndexNumberAtAge = ADREPORTvector(index_naa);
+            vector<Type> IndexNumberAtLength = ADREPORTvector(index_nal);
+            vector<Type> AgeCompositionExpected = ADREPORTvector(agecomp_exp);
+            vector<Type> LengthCompositionExpected = ADREPORTvector(lengthcomp_exp);
+            vector<Type> AgeCompositionProportion =
+                    ADREPORTvector(agecomp_prop);
+            vector<Type> LengthCompositionProportion =
+                    ADREPORTvector(lengthcomp_prop);
 
             ADREPORT_F(NAA, of);
             ADREPORT_F(Biomass, of);
@@ -269,11 +312,16 @@ namespace fims_model {
             ADREPORT_F(LogRecDev, of);
             ADREPORT_F(FMort, of);
             ADREPORT_F(Q, of);
-            ADREPORT_F(ExpectedIndex, of);
-            ADREPORT_F(CNAA, of);
-            ADREPORT_F(CNAL, of);
-            ADREPORT_F(PCNAA, of);
-            ADREPORT_F(PCNAL, of);
+            ADREPORT_F(LandingsExpected, of);
+            ADREPORT_F(IndexExpected, of);
+            ADREPORT_F(LandingsNumberAtAge, of);
+            ADREPORT_F(LandingsNumberAtLength, of);
+            ADREPORT_F(IndexNumberAtAge, of);
+            ADREPORT_F(IndexNumberAtLength, of);
+            ADREPORT_F(AgeCompositionExpected, of);
+            ADREPORT_F(LengthCompositionExpected, of);
+            ADREPORT_F(AgeCompositionProportion, of);
+            ADREPORT_F(LengthCompositionProportion, of);        
     }
 #endif
 
