@@ -140,7 +140,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$log_q[1]$estimation_type <- "fixed_effects"
+  fishing_fleet$log_q[1]$estimation_type <- "constant"
   fishing_fleet$SetSelectivity(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
   fishing_fleet$SetObservedAgeCompData(fishing_fleet_age_comp$get_id())
@@ -395,6 +395,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
   sdr_fixed <- summary(sdr, "fixed")
+  row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[,1]))
 
   clear()
 
