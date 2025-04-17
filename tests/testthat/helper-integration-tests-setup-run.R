@@ -1,6 +1,6 @@
 ## Setup file for FIMS R tests ----
 # This file generates multiple test datasets for use in tests located in
-# tests/testthat. Typically there is only one setup file. The file is not 
+# tests/testthat. Typically there is only one setup file. The file is not
 # sourced by devtools::load_all().
 
 # Set up FIMS data ----

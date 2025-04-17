@@ -26,7 +26,7 @@ test_that("get_max_gradient() works with correct inputs", {
       object = max_gradient,
       expected = fit_data@max_gradient
     )
-  
+
     #' @description Test that get_max_gradient() returns a numeric value.
     expect_true(
       object = is.numeric(max_gradient)

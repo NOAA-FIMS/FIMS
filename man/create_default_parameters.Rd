@@ -171,7 +171,7 @@ updated_parameters <- default_parameters |>
     )
   )
 
-# purrr::map_vec() can be used to compare the length of adjusted parameter 
+# purrr::map_vec() can be used to compare the length of adjusted parameter
 # vectors with defaults for a specific module (e.g., fleet1)
 default_fleet1 <- purrr::map_vec(default_parameters[["parameters"]][["fleet1"]], \(x) length(x))
 updated_fleet1 <- purrr::map_vec(updated_parameters[["parameters"]][["fleet1"]], \(x) length(x))

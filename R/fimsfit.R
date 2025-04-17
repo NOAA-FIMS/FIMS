@@ -352,7 +352,6 @@ FIMSFit <- function(
     sdreport = list(),
     timing = c("time_total" = as.difftime(0, units = "secs")),
     version = utils::packageVersion("FIMS")) {
-
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
@@ -380,7 +379,7 @@ FIMSFit <- function(
   } else {
     obj[["report"]]()
   }
-  
+
   if (length(sdreport) > 0) {
     # rename the sdreport
     names(sdreport[["par.fixed"]]) <- parameter_names
@@ -388,23 +387,23 @@ FIMSFit <- function(
   }
 
   # Reshape the TMB estimates
-  # If the model is not optimized, opt is an empty list and is not used in 
-  # reshape_tmb_estimates(). 
+  # If the model is not optimized, opt is an empty list and is not used in
+  # reshape_tmb_estimates().
   tmb_estimates <- reshape_tmb_estimates(
-    obj = obj, 
+    obj = obj,
     sdreport = sdreport,
     opt = opt,
     parameter_names = parameter_names
   )
- 
+
   # Create JSON output for FIMS run
   finalized_fims <- finalize(
     # Use par from obj if the model is not optimized; otherwise, use par from opt.
-    if (length(sdreport) > 0) opt[["par"]] else obj[["par"]], 
-    obj[["fn"]], 
+    if (length(sdreport) > 0) opt[["par"]] else obj[["par"]],
+    obj[["fn"]],
     obj[["gr"]]
   )
-  # Reshape the JSON estimates 
+  # Reshape the JSON estimates
   json_estimates <- reshape_json_estimates(finalized_fims, opt)
 
   # Merge json_estimates into tmb_estimates based on common columns
@@ -439,8 +438,8 @@ FIMSFit <- function(
     ) |>
     # Select the relevant columns for the final output
     # Drop the initial and estimate columns from the json_estimates and
-    # use values from tmb_estimates. The values from json_estimates are 
-    # slightly different from the values from tmb_estimates, most likely 
+    # use values from tmb_estimates. The values from json_estimates are
+    # slightly different from the values from tmb_estimates, most likely
     # due to rounding differences.
     dplyr::select(
       -c(initial.y, estimate.y)
@@ -455,7 +454,7 @@ FIMSFit <- function(
     # Reorder the rows by `parameter_id`
     dplyr::arrange(parameter_id) |>
     # Add derived quantity IDs to the tibble for merging with the JSON output
-    # TODO: Refactor once we can reliably extract unique IDs from 
+    # TODO: Refactor once we can reliably extract unique IDs from
     # both the JSON and TMB outputs.
     dplyr::group_by(label) |>
     dplyr::mutate(
@@ -464,12 +463,12 @@ FIMSFit <- function(
         paste0(label, "_", seq_len(dplyr::n())),
         NA_character_
       )
-    ) 
+    )
 
   # Reshape the JSON derived quantities
   json_derived_quantities <- reshape_json_derived_quantities(finalized_fims) |>
     # Add derived quantity IDs to the tibble for merging with the JSON output
-    # TODO: Refactor once we can reliably extract unique IDs from 
+    # TODO: Refactor once we can reliably extract unique IDs from
     # both the JSON and TMB outputs.
     dplyr::group_by(name) |>
     dplyr::mutate(
@@ -479,7 +478,7 @@ FIMSFit <- function(
     dplyr::rename(
       label = name,
       estimate = values
-    ) 
+    )
 
   # Merge json_derived_quantities into estimates based on common columns
   estimates <- dplyr::full_join(
@@ -490,8 +489,8 @@ FIMSFit <- function(
       label
     )
   ) |>
-    # Fill missing values in .x columns (TMB output) using corresponding values 
-    # from .y columns (JSON output). 
+    # Fill missing values in .x columns (TMB output) using corresponding values
+    # from .y columns (JSON output).
     dplyr::mutate(
       module_name.x = dplyr::coalesce(module_name.x, module_name.y),
       module_id.x = dplyr::coalesce(module_id.x, module_id.y),
@@ -507,9 +506,11 @@ FIMSFit <- function(
     ) |>
     # Select the relevant columns for the final output
     dplyr::select(
-      -c(derived_quantity_id, module_name.y, module_id.y, module_type.y,
-        estimate.y)
-    ) 
+      -c(
+        derived_quantity_id, module_name.y, module_id.y, module_type.y,
+        estimate.y
+      )
+    )
 
   fit <- methods::new(
     "FIMSFit",

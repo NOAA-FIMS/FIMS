@@ -10,8 +10,8 @@
 ## IO correctness ----
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
-  "module_name", "module_id", "module_type", "label", "type", "type_id", 
-  "parameter_id", "fleet_name", "age", "length", "time", 
+  "module_name", "module_id", "module_type", "label", "type", "type_id",
+  "parameter_id", "fleet_name", "age", "length", "time",
   "initial", "estimate", "uncertainty", "log_like", "log_like_cv",
   "gradient", "estimated"
 )
