@@ -221,7 +221,7 @@ public:
       maturity->inflection_point[i] = this->inflection_point[i].initial_value_m;
       if (this->inflection_point[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "maturity." << this->id << "inflection_point." <<  i;
+        ss << "maturity_" << this->id << "_inflection_point_" <<  i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->inflection_point[i]);
       }
@@ -238,7 +238,7 @@ public:
       maturity->slope[i] = this->slope[i].initial_value_m;
       if (this->slope[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "maturity." << this->id << "slope." << i;
+        ss << "maturity_" << this->id << "_slope_" << i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->slope[i]);
       }

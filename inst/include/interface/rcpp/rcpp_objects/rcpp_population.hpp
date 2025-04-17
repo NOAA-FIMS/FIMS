@@ -409,7 +409,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_M[i] = this->log_M[i].initial_value_m;
       if (this->log_M[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "population." << this->id << "log_M." << i;
+        ss << "population_" << this->id << "_log_M_" << i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_M[i]);
       }
@@ -426,7 +426,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
       if (this->log_init_naa[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "population." << this->id << "log_init_naa." << i;
+        ss << "population_" << this->id << "_log_init_naa_" << i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
       }

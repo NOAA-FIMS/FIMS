@@ -681,7 +681,6 @@ RCPP_MODULE(fims)
             .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
             .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
             .field("log_r", &BevertonHoltRecruitmentInterface::log_r, "recruitment as a random effect on the natural log scale")
-            .field("log_expected_recruitment", &BevertonHoltRecruitmentInterface::log_expected_recruitment, "expectation of the recruitment process on the natural log scale")
             .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
             .method("SetRecruitmentProcess", &BevertonHoltRecruitmentInterface::SetRecruitmentProcess, "Set unique ID for recruitment process")
             .method("evaluate_mean", &BevertonHoltRecruitmentInterface::evaluate_mean);

@@ -224,7 +224,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       selectivity->inflection_point[i] = this->inflection_point[i].initial_value_m;
       if (this->inflection_point[i].estimation_type_m == "fixed_effects") {
         ss.str(""); 
-        ss << "selectivity." << this->id << "inflection_point." << i;
+        ss << "selectivity_" << this->id << "_inflection_point_" << i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->inflection_point[i]);
       }
@@ -242,7 +242,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       selectivity->slope[i] = this->slope[i].initial_value_m;
       if (this->slope[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << "slope." << i;
+        ss << "selectivity_" << this->id << "_slope_" << i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->slope[i]);
       }
@@ -453,7 +453,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         selectivity->inflection_point_asc[i] = this->inflection_point_asc[i].initial_value_m;
         if (this->inflection_point_asc[i].estimation_type_m == "fixed_effects") { 
             ss.str(""); 
-            ss << "selectivity." << this->id << "inflection_point_asc." << i;
+            ss << "selectivity_" << this->id << "_inflection_point_asc_" << i;
             info->RegisterParameterName(ss.str());
             info->RegisterParameter(selectivity->inflection_point_asc[i]);
         }
@@ -473,7 +473,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
         if (this->slope_asc[i].estimation_type_m == "fixed_effects") {
             ss.str("");
-            ss << "selectivity." << this->id << "slope_asc." << i;
+            ss << "selectivity_" << this->id << "_slope_asc_" << i;
             info->RegisterParameterName(ss.str());
             info->RegisterParameter(selectivity->slope_asc[i]);
         }
@@ -492,7 +492,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
         if (this->inflection_point_desc[i].estimation_type_m == "fixed_effects") {
             ss.str("");
-            ss << "selectivity." << this->id << "inflection_point_desc." << i;
+            ss << "selectivity_" << this->id << "_inflection_point_desc_" << i;
             info->RegisterParameterName(ss.str());
             info->RegisterParameter(selectivity->inflection_point_desc[i]);
         }
@@ -511,7 +511,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
         if (this->slope_desc[i].estimation_type_m == "fixed_effects") {
             ss.str("");
-            ss << "selectivity." << this->id << "slope_desc." << i;
+            ss << "selectivity_" << this->id << "_slope_desc_" << i;
             info->RegisterParameterName(ss.str());
             info->RegisterParameter(selectivity->slope_desc[i]);
         }

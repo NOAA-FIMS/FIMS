@@ -307,7 +307,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       
       if (this->logit_steep[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << "logit_steep." <<  i;
+        ss << "recruitment_" << this->id << "_logit_steep_" <<  i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->logit_steep[i]);
       }
@@ -327,7 +327,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
       if (this->log_rzero[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << "log_rzero." <<  i;
+        ss << "recruitment_" << this->id << "_log_rzero_" <<  i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_rzero[i]);
       }
@@ -353,7 +353,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
         if (this->log_devs[i].estimation_type_m == "fixed_effects") {
           ss.str("");
-          ss << "recruitment." << this->id << "log_recruit_devs." <<  i;
+          ss << "recruitment_" << this->id << "_log_recruit_devs_" <<  i;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(recruitment->log_recruit_devs[i]);
         }
@@ -382,7 +382,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
         if (this->log_r[i].estimation_type_m == "fixed_effects") {
           ss.str("");
-          ss << "recruitment." << this->id << "log_r." <<  i;
+          ss << "recruitment_" << this->id << "_log_r_" <<  i;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(recruitment->log_r[i]);
         }

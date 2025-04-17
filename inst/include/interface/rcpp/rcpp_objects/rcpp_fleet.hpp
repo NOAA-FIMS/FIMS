@@ -510,7 +510,7 @@ public:
 
       if (this->log_q[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "fleet." << this->id << "log_q." <<  i;
+        ss << "fleet_" << this->id << "_log_q_" <<  i;
         info->RegisterParameterName(ss.str()); 
         info->RegisterParameter(fleet->log_q[i]);
       }
@@ -529,7 +529,7 @@ public:
 
       if (this->log_Fmort[i].estimation_type_m == "fixed_effects") {
         ss.str("");
-        ss << "fleet." << this->id << "log_Fmort." <<  i;
+        ss << "fleet_" << this->id << "_log_Fmort_" <<  i;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
       }
@@ -572,7 +572,7 @@ public:
 
         if (this->age_length_conversion_matrix[i].estimation_type_m == "fixed_effects") {
           ss.str("");
-          ss << "fleet." << this->id << "age_length_conversion_matrix." <<  i;
+          ss << "fleet_" << this->id << "_age_length_conversion_matrix_" <<  i;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(fleet->age_length_conversion_matrix[i]);
         }
