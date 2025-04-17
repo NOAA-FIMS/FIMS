@@ -30,7 +30,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The process id of the RecruitmentInterfaceBase object.
    */
-  uint32_t process_id;
+  SharedInt process_id;
   /**
    * @brief The map associating the IDs of RecruitmentInterfaceBase to the
    * objects. This is a live object, which is an object that has been created
@@ -54,7 +54,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    * @param other
    */
   RecruitmentInterfaceBase(const RecruitmentInterfaceBase& other) :
-  id(other.id) {
+  id(other.id), process_id(other.process_id) {
   }
 
   /**
@@ -95,7 +95,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   /**
   * @brief The number of years.
   */
-  SharedInt nyears;
+  uint32_t nyears;
   /**
    * @brief The logistic transformation of steepness (h; productivity of the
    * population), where the parameter is transformed to constrain it between
@@ -154,7 +154,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param process_id Unique ID for the recruitment process object.
    */
   void SetRecruitmentProcess(uint32_t process_id) {
-    this->process_id = process_id;
+    this->process_id.set(process_id);
   }
 
   /**
@@ -289,9 +289,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-        
-    FIMS_INFO_LOG("Adding Beverton--Holt model "+fims::to_string(this->id)+" to Information object.");
-    
+
     std::shared_ptr<fims_info::Information<Type> > info =
       fims_info::Information<Type>::GetInstance();
 
@@ -301,7 +299,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     // set relative info
     recruitment->id = this->id;  
     std::stringstream ss; 
-    recruitment->process_id = this->process_id;
+    recruitment->process_id = this->process_id.get();
     //set logit_steep
     recruitment->logit_steep.resize(this->logit_steep.size());
     for (size_t i = 0; i < this->logit_steep.size(); i++) {
@@ -341,7 +339,12 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
     info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
-
+    //set nyears
+    if(this->log_devs.size() > 0){
+      this->nyears = this->log_devs.size() + 1;
+    } else {
+      this->nyears = this->log_rzero.size();
+    }
     //set log_recruit_devs
     if(this->log_devs.size() > 0){
       recruitment->log_recruit_devs.resize(this->log_devs.size());
@@ -364,8 +367,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       } 
 
     } else {
-      recruitment->log_recruit_devs.resize(this->nyears.get()-1);
-      for (size_t i = 0; i < this->nyears.get(); i++) {
+      recruitment->log_recruit_devs.resize(this->nyears-1);
+      for (size_t i = 0; i < this->nyears; i++) {
         recruitment->log_recruit_devs[i] = 0;
       }
     }
@@ -391,13 +394,13 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         }
       }
     } else {
-      recruitment->log_r.resize(this->nyears.get());
-      for (size_t i = 0; i < this->nyears.get(); i++) {
+      recruitment->log_r.resize(this->nyears);
+      for (size_t i = 0; i < this->nyears; i++) {
         recruitment->log_r[i] = 0;
       }
     }
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
-    recruitment->log_expected_recruitment.resize(this->nyears.get()+1);
+    recruitment->log_expected_recruitment.resize(this->nyears+1);
     info->variable_map[this->log_expected_recruitment.id_m] = &(recruitment)->log_expected_recruitment;
 
     // add to Information
@@ -411,7 +414,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    FIMS_INFO_LOG("adding Recruitment object to TMB");
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
@@ -434,7 +436,10 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
    /**
     * @brief The constructor.
     */
-   LogDevsRecruitmentInterface() : RecruitmentInterfaceBase() {}
+   LogDevsRecruitmentInterface() : RecruitmentInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LogDevsRecruitmentInterface>(*this));
+   }
+
 
    /**
     * @brief The destructor.
@@ -478,7 +483,7 @@ bool add_to_fims_tmb_internal() {
     std::make_shared<fims_popdy::LogDevs<Type> >();
 
   recruitment_process->id = this->id;
-
+ 
   // add to Information
   info->recruitment_process_models[recruitment_process->id] = recruitment_process;
 
@@ -490,7 +495,6 @@ bool add_to_fims_tmb_internal() {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    FIMS_INFO_LOG("adding recruitment process object to TMB");
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
@@ -514,7 +518,9 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogRRecruitmentInterface() : RecruitmentInterfaceBase() {}
+  LogRRecruitmentInterface() : RecruitmentInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LogRRecruitmentInterface>(*this));
+  }
 
   /**
    * @brief The destructor.
@@ -571,7 +577,6 @@ bool add_to_fims_tmb_internal() {
   * @return A boolean of true.
   */
  virtual bool add_to_fims_tmb() {
-   FIMS_INFO_LOG("adding recruitment process object to TMB");
    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();

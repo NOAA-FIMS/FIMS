@@ -453,7 +453,9 @@ namespace fims_info {
          */
         void SetRecruitmentProcess(
             bool &valid_model,
-            std::shared_ptr<fims_popdy::RecruitmentBase<Type> > r) {
+            std::shared_ptr<fims_popdy::Population<Type> > p){
+        
+            std::shared_ptr<fims_popdy::RecruitmentBase<Type> > r = p->recruitment;
             if (r->process_id != -999) {
                 uint32_t process_uint = static_cast<uint32_t> (r->process_id);
                 recruitment_process_iterator it =
@@ -464,20 +466,20 @@ namespace fims_info {
                     FIMS_INFO_LOG("Recruitment Process model "
                             + fims::to_string(process_uint)
                             + " successfully set to population "
-                            + fims::to_string(r->id));
+                            + fims::to_string(p->id));
                     (*it).second->recruitment = r;
                 } else {
                     valid_model = false;
                     FIMS_ERROR_LOG("Expected recruitment process function not defined for "
                             "population "
-                            + fims::to_string(r->id) + ", recruitment process function "
+                            + fims::to_string(p->id) + ", recruitment process function "
                             + fims::to_string(process_uint));
                 }
 
             } else {
                 valid_model = false;
                 FIMS_ERROR_LOG("No recruitment process function defined for population "
-                        + fims::to_string(r->id)
+                        + fims::to_string(p->id)
                         + ". FIMS requires recruitment process functions be defined for all "
                         "recruitments.");
             }
@@ -649,7 +651,7 @@ namespace fims_info {
 
                 SetRecruitment(valid_model, p);
 
-                SetRecruitmentProcess(valid_model, p->recruitment);
+                SetRecruitmentProcess(valid_model, p);
 
                 SetGrowth(valid_model, p);
 
