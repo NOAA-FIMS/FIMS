@@ -74,7 +74,7 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
       expected = log_devs[i]
     )
   }
-  
+
   #expected_lpdf <- sum(log(stats::dnorm(log_devs, 0, 0.7)))
   clear()
 })
@@ -96,14 +96,14 @@ test_that("test_rcpp_recruitment_interface() returns correct error messages", {
   spawns <- 9.55784 * 10^6
   ssb0 <- 0.0102562
 
-  recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
+  recruitment$logit_steep[1]$value <- 1
   recruitment$logit_steep[1]$min <- 0.21
   recruitment$logit_steep[1]$max <- 1.0
   recruitment$logit_steep[1]$is_random_effect <- TRUE
   recruitment$logit_steep[1]$estimated <- TRUE
   recruitment$log_rzero[1]$value <- log(r0)
 
-  
+
   #' @description Test that recruitment errors if logit_steep==1.
   expect_warning(
     object = recruitment$evaluate(spawns, ssb0),
