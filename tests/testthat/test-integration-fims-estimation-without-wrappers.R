@@ -116,7 +116,7 @@ test_that("deterministic test of fims", {
     nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
 
-  expect_equal(fims_landings[[2]], apply(landings_waa, 1, sum))# * om_output_list[[iter_id]][["survey_q"]][["survey1"]])
+  expect_equal(fims_landings[[2]], apply(landings_waa, 1, sum)) # * om_output_list[[iter_id]][["survey_q"]][["survey1"]])
 
   for (i in 1:length(om_output_list[[iter_id]][["survey_index_biomass"]][["survey1"]])) {
     expect_equal(fims_index[[2]][i], om_output_list[[iter_id]][["survey_index_biomass"]][["survey1"]][i])
@@ -136,17 +136,17 @@ test_that("deterministic test of fims", {
   fims_landings_naa <- matrix(report[["landings_naa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
     nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
-#
-#   for (i in 1:length(c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])))) {
-#     expect_equal(report[["landings_naa"]][[2]][i], c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]]))[i])
-#   }
+  #
+  #   for (i in 1:length(c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])))) {
+  #     expect_equal(report[["landings_naa"]][[2]][i], c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]]))[i])
+  #   }
   fims_cnaa_proportion <- matrix(report[["agecomp_prop"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
-                                 nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
+    nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
-  om_cnaa_proportion <- 0.0 + (1-0.0*om_input[["nages"]])*om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
+  om_cnaa_proportion <- 0.0 + (1 - 0.0 * om_input[["nages"]]) * om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
 
   for (i in 1:length(c(t(om_cnaa_proportion)))) {
-    expect_lt(abs(c(t(fims_cnaa_proportion))[i]-c(t(om_cnaa_proportion))[i]),0.00000001)
+    expect_lt(abs(c(t(fims_cnaa_proportion))[i] - c(t(om_cnaa_proportion))[i]), 0.00000001)
   }
 })
 
@@ -193,9 +193,9 @@ test_that("nll test of fims", {
 
   # age comp likelihoods
   fishing_acomp_observed <- em_input_list[[iter_id]][["L.age.obs"]][["fleet1"]]
-  fishing_acomp_expected <- 0.0 + (1-0.0*om_input[["nages"]])*om_output_list[[iter_id]][["L.age"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.age"]][["fleet1"]])
+  fishing_acomp_expected <- 0.0 + (1 - 0.0 * om_input[["nages"]]) * om_output_list[[iter_id]][["L.age"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.age"]][["fleet1"]])
   survey_acomp_observed <- em_input_list[[iter_id]][["survey.age.obs"]][["survey1"]]
-  survey_acomp_expected <- 0.0 + (1-0.0*om_input[["nages"]])*om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
+  survey_acomp_expected <- 0.0 + (1 - 0.0 * om_input[["nages"]]) * om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
   age_comp_nll_fleet <- age_comp_nll_survey <- 0
   for (y in 1:om_input_list[[iter_id]][["nyr"]]) {
     age_comp_nll_fleet <- age_comp_nll_fleet -
@@ -214,9 +214,9 @@ test_that("nll test of fims", {
 
   # length comp likelihoods
   fishing_lengthcomp_observed <- em_input_list[[iter_id]][["L.length.obs"]][["fleet1"]]
-  fishing_lengthcomp_expected <- 0.0 + (1-0.0*om_input[["nlengths"]])*om_output_list[[iter_id]][["L.length"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.length"]][["fleet1"]])
+  fishing_lengthcomp_expected <- 0.0 + (1 - 0.0 * om_input[["nlengths"]]) * om_output_list[[iter_id]][["L.length"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.length"]][["fleet1"]])
   survey_lengthcomp_observed <- em_input_list[[iter_id]][["survey.length.obs"]][["survey1"]]
-  survey_lengthcomp_expected <- 0.0 + (1-0.0*om_input[["nlengths"]])*om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]])
+  survey_lengthcomp_expected <- 0.0 + (1 - 0.0 * om_input[["nlengths"]]) * om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]])
   lengthcomp_nll_fleet <- lengthcomp_nll_survey <- 0
   for (y in 1:om_input_list[[iter_id]][["nyr"]]) {
     # test using FIMS_dmultinom which matches the TMB dmultinom calculation and differs from R
@@ -239,7 +239,7 @@ test_that("nll test of fims", {
   jnll <- report[["jnll"]]
 
 
-  expect_lt(abs(report[["nll_components"]][1] - rec_nll),0.000000001)
+  expect_lt(abs(report[["nll_components"]][1] - rec_nll), 0.000000001)
   expect_lt(abs(report[["nll_components"]][2] - landings_nll_fleet), 0.000000001)
   expect_lt(abs(report[["nll_components"]][3] - age_comp_nll_fleet), 0.000000001)
   expect_lt(abs(report[["nll_components"]][4] - lengthcomp_nll_fleet), 0.000000001)

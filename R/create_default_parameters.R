@@ -348,43 +348,42 @@ create_default_fleet <- function(fleets,
     dplyr::pull(type) |>
     unique()
 
-  #Get data likelihood distributions assigned for this fleet
+  # Get data likelihood distributions assigned for this fleet
   distribution_names_for_fleet <- names(fleets[[fleet_name]][["data_distribution"]])
 
   # Determine default fleet parameters based on types of data present
   if ("index" %in% data_types_present &&
-                   "Index" %in% distribution_names_for_fleet) {
-     q_default <- list(
+    "Index" %in% distribution_names_for_fleet) {
+    q_default <- list(
       log_q.value = 0,
       log_q.estimated = TRUE
-     )
+    )
 
-     index_distribution <- fleets[[fleet_name]][["data_distribution"]]["Index"]
+    index_distribution <- fleets[[fleet_name]][["data_distribution"]]["Index"]
 
-     index_uncertainty <- get_data(data) |>
-       dplyr::filter(name == fleet_name, type %in% c("index")) |>
-       dplyr::arrange(dplyr::desc(type)) |>
-       dplyr::pull(uncertainty)
+    index_uncertainty <- get_data(data) |>
+      dplyr::filter(name == fleet_name, type %in% c("index")) |>
+      dplyr::arrange(dplyr::desc(type)) |>
+      dplyr::pull(uncertainty)
 
-     index_distribution_default <- switch(index_distribution,
-                                          "DnormDistribution" = create_default_DnormDistribution(
-                                            value = index_uncertainty,
-                                            input_type = "data",
-                                            data = data
-                                          ),
-                                          "DlnormDistribution" = create_default_DlnormDistribution(
-                                            value = index_uncertainty,
-                                            input_type = "data",
-                                            data = data
-                                          )
-     )
-     names(index_distribution_default) <- paste0(
-       index_distribution,
-       ".",
-       names(index_distribution_default)
-     )
-
-  }else{
+    index_distribution_default <- switch(index_distribution,
+      "DnormDistribution" = create_default_DnormDistribution(
+        value = index_uncertainty,
+        input_type = "data",
+        data = data
+      ),
+      "DlnormDistribution" = create_default_DlnormDistribution(
+        value = index_uncertainty,
+        input_type = "data",
+        data = data
+      )
+    )
+    names(index_distribution_default) <- paste0(
+      index_distribution,
+      ".",
+      names(index_distribution_default)
+    )
+  } else {
     q_default <- list(
       log_q.value = 0,
       log_q.estimated = FALSE
@@ -396,7 +395,7 @@ create_default_fleet <- function(fleets,
   names(q_default) <- paste0("Fleet.", names(q_default))
 
   if ("landings" %in% data_types_present &&
-                   "Landings" %in% distribution_names_for_fleet) {
+    "Landings" %in% distribution_names_for_fleet) {
     log_Fmort_default <- list(
       log_Fmort.value = rep(-3, get_n_years(data)),
       log_Fmort.estimated = TRUE
@@ -410,23 +409,22 @@ create_default_fleet <- function(fleets,
       dplyr::pull(uncertainty)
 
     landings_distribution_default <- switch(landings_distribution,
-                                         "DnormDistribution" = create_default_DnormDistribution(
-                                           value = landings_uncertainty,
-                                           input_type = "data",
-                                           data = data
-                                         ),
-                                         "DlnormDistribution" = create_default_DlnormDistribution(
-                                           value = landings_uncertainty,
-                                           input_type = "data",
-                                           data = data
-                                         )
+      "DnormDistribution" = create_default_DnormDistribution(
+        value = landings_uncertainty,
+        input_type = "data",
+        data = data
+      ),
+      "DlnormDistribution" = create_default_DlnormDistribution(
+        value = landings_uncertainty,
+        input_type = "data",
+        data = data
+      )
     )
     names(landings_distribution_default) <- paste0(
       landings_distribution,
       ".",
       names(landings_distribution_default)
     )
-
   } else {
     log_Fmort_default <- list(
       log_Fmort.value = rep(-200, get_n_years(data)),
@@ -723,7 +721,7 @@ create_default_recruitment <- function(
 #'     )
 #'   )
 #'
-#' # purrr::map_vec() can be used to compare the length of adjusted parameter 
+#' # purrr::map_vec() can be used to compare the length of adjusted parameter
 #' # vectors with defaults for a specific module (e.g., fleet1)
 #' default_fleet1 <- purrr::map_vec(default_parameters[["parameters"]][["fleet1"]], \(x) length(x))
 #' updated_fleet1 <- purrr::map_vec(updated_parameters[["parameters"]][["fleet1"]], \(x) length(x))

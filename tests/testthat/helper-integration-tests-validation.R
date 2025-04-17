@@ -1,6 +1,6 @@
 # Helper file for FIMS R tests----
-# This file contains multiple functions that are used to set up and run  
-# FIMS models with or without wrapper functions. The functions are sourced by 
+# This file contains multiple functions that are used to set up and run
+# FIMS models with or without wrapper functions. The functions are sourced by
 # devtools::load_all().
 
 # FIMS helper function to validate the output of the FIMS model
@@ -66,7 +66,7 @@ validate_fims <- function(
       # Extract uncertainty
       object_uncertainty <- object[1:length(expected), "Std. Error"]
     }
-    
+
 
     # Validate errors against 2*SE threshold
     absolute_error <- abs(object_estimate - expected)
@@ -106,7 +106,7 @@ validate_fims <- function(
       report[["recruitment"]][[1]][1:om_input[["nyr"]]],
       estimates |>
         dplyr::filter(
-          label == "NAA" 
+          label == "NAA"
         ) |>
         dplyr::slice(naa1_id) |>
         dplyr::pull(estimate) |>
@@ -118,7 +118,7 @@ validate_fims <- function(
       as.numeric(estimates[rownames(estimates) == "NAA", "Estimate"][naa1_id])
     )
   }
-  
+
   # Recruitment log deviations
   # The initial value of om_input[["logR.resid"]] is dropped from the model
   # TODO: the estimates table contains fixed "true" values for LogRecDev, causing
@@ -150,10 +150,10 @@ validate_fims <- function(
     estimates = estimates
   )
 
-  #Commented out for now because there is no om_output for fishery index
-  #and the function uses length expected to filter so it only works for the
-  #fishing fleet when there is only one fleet. Manual testing shows it working
-  #for now at least.
+  # Commented out for now because there is no om_output for fishery index
+  # and the function uses length expected to filter so it only works for the
+  # fishing fleet when there is only one fleet. Manual testing shows it working
+  # for now at least.
   # validate_error(
   #   expected = c(
   #     om_output[["survey_index_biomass"]][["survey1"]]
@@ -166,8 +166,8 @@ validate_fims <- function(
   # Expected survey number at age
   validate_error(
     expected = c(
-      t(om_output[["L.age"]][["fleet1"]])#,
-      #t(om_output[["survey_age_comp"]][["survey1"]])
+      t(om_output[["L.age"]][["fleet1"]]) # ,
+      # t(om_output[["survey_age_comp"]][["survey1"]])
     ),
     param_name = "LandingsNumberAtAge",
     use_fimsfit = use_fimsfit,

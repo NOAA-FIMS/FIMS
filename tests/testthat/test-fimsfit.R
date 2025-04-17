@@ -39,7 +39,8 @@ test_that("as.list() works with correct inputs", {
 
   expected_names <- c(
     "input", "obj", "opt", "max_gradient", "report", "sdreport", "estimates",
-    "number_of_parameters", "timing", "version")
+    "number_of_parameters", "timing", "version"
+  )
   #' @description Test that as.list(fit_age_length_comp) contains correct components.
   expect_equal(
     object = names(as.list(fit_age_length_comp)),

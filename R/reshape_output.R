@@ -1,13 +1,13 @@
 # To remove the NOTE
 # no visible binding for global variable
 utils::globalVariables(c(
-  "module_name", "module_id", "module_type", 
+  "module_name", "module_id", "module_type",
   "parameter_min", "parameter_max", "label", "label_splits"
 ))
 
 # A list of functions to reshape output from finalize()
 #' Reshape JSON estimates
-#' 
+#'
 #' @description
 #' This function processes the finalized FIMS JSON output and reshapes the
 #' parameter estimates into a structured tibble for easier analysis and
@@ -46,14 +46,14 @@ reshape_json_estimates <- function(finalized_fims, opt = list()) {
           initial = parameter_value,
           estimate = parameter_estimated_value,
           estimated = parameter_estimated
-        ) 
+        )
       # If the `opt` has a length of 0, set the `estimated` column to FALSE.
       # TODO: ask Matthew if we can set estimated (in JSON) to FALSE when optimization = 0
       if (length(opt) == 0) {
         temp <- temp |>
           dplyr::mutate(estimated = 0)
-      } 
-     
+      }
+
       temp <- temp |>
         dplyr::rowwise() |>
         # Convert estimated from int to logical
@@ -67,10 +67,10 @@ reshape_json_estimates <- function(finalized_fims, opt = list()) {
         dplyr::ungroup()
     }
   })
-  
+
   # Expand the parameter estimates with additional information from the json output
   estimates <- purrr::pmap(
-    # Combine the parameter estimates with the module name, ID, and type from 
+    # Combine the parameter estimates with the module name, ID, and type from
     # `json_list`.
     list(
       parameter_estimates,
@@ -100,12 +100,12 @@ reshape_json_estimates <- function(finalized_fims, opt = list()) {
     # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
     dplyr::relocate(module_name, module_id, module_type, .before = tidyselect::everything()) |>
     # Remove columns `parameter_min` and `parameter_max` as we currently don't
-    # have bounds on parameters. 
+    # have bounds on parameters.
     dplyr::select(-c(parameter_min, parameter_max))
 }
 
 #' Reshape TMB estimates
-#' 
+#'
 #' @description
 #' This function processes the TMB std and reshapes them into a structured
 #' tibble for easier analysis and manipulation.
@@ -126,7 +126,7 @@ reshape_tmb_estimates <- function(obj,
   # Outline for the estimates table
   # TODO: The fleet_name, age, length, and time columns are currently emplty. Matthew
   # has started adding information to the JSON output in the dev-model-families branch.
-  # We can populate these columns once the dev-model-families branch is merged 
+  # We can populate these columns once the dev-model-families branch is merged
   # into dev.
   estimates_outline <- dplyr::tibble(
     # The FIMS Rcpp module
@@ -162,7 +162,7 @@ reshape_tmb_estimates <- function(obj,
     # with NA for derived quantities
     estimated = logical()
   )
-  
+
   if (length(sdreport) > 0) {
     std <- summary(sdreport)
     # Number of rows for derived quantities: based on the difference
@@ -204,10 +204,10 @@ reshape_tmb_estimates <- function(obj,
     # Split labels and extract module, id, label, and parameter id
     dplyr::mutate(label_splits = strsplit(label, split = "\\.")) |>
     dplyr::rowwise() |>
-    # TODO: the code could be simplified using tidyr::separate_wider_*(). 
-    # However, doing so would require avoiding pre-specification of these columns 
-    # in the estimates_outline tibble. Consider updating the code if we decide 
-    # not to create the `estimates_outline` tibble in advance. 
+    # TODO: the code could be simplified using tidyr::separate_wider_*().
+    # However, doing so would require avoiding pre-specification of these columns
+    # in the estimates_outline tibble. Consider updating the code if we decide
+    # not to create the `estimates_outline` tibble in advance.
     dplyr::mutate(
       module_name = ifelse(length(label_splits) > 1, label_splits[[1]], NA_character_),
       module_id = ifelse(length(label_splits) > 1, as.integer(label_splits[[3]]), NA_integer_),
