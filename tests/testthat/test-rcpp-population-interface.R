@@ -42,25 +42,25 @@ test_that("test_rcpp_population_interface() works with correct inputs", {
     expected = 1
   )
 
-  #' @description Test that the log_M values are all -1.
-  #' @description Test that the log_M values are not estimated.
   for (i in 1:(nyears * nages)) {
+    #' @description Test that the log_M values are all -1.
     expect_equal(
       object = population$log_M[i]$value,
       expected = -1
     )
+    #' @description Test that the log_M values are not estimated.
     expect_false(
       object = population$log_M[i]$estimated
     )
   }
 
-  #' @description Test that the log_init_naa values are all 0.
-  #' @description Test that the log_init_naa values are estimated.
   for (i in 1:nyears) {
+    #' @description Test that the log_init_naa values are all 0.
     expect_equal(
       object = population$log_init_naa[i]$value,
       expected = 0
     )
+    #' @description Test that the log_init_naa values are estimated.
     expect_true(
       object = population$log_init_naa[i]$estimated
     )
@@ -69,24 +69,25 @@ test_that("test_rcpp_population_interface() works with correct inputs", {
   population$log_init_naa$set_all_estimable(FALSE)
   population$log_M$set_all_estimable(TRUE)
 
-  #' @description Test that the log_M values are now estimated.
   for (i in 1:(nyears * nages)) {
+    #' @description Test that the log_M values are all -1.
     expect_equal(
       object = population$log_M[i]$value,
       expected = -1
     )
+    #' @description Test that the log_M values are now estimated.
     expect_true(
       object = population$log_M[i]$estimated
     )
   }
 
-  #' @description Test that the log_init_naa values are all 0.
-  #' @description Test that the log_init_naa values not estimated.
   for (i in 1:nyears) {
+    #' @description Test that the log_init_naa values are all 0.
     expect_equal(
       object = population$log_init_naa[i]$value,
       expected = 0
     )
+    #' @description Test that the log_init_naa values not estimated.
     expect_false(
       object = population$log_init_naa[i]$estimated
     )
@@ -95,46 +96,6 @@ test_that("test_rcpp_population_interface() works with correct inputs", {
   clear()
 })
 
-## Edge handling ----
-test_that("test_rcpp_population_interface() returns correct outputs for edge cases", {
-  # @description Test that test_rcpp_population_interface(x) returns an error.
-  #expect_error(
-  #  object = test_rcpp_population_interface(x)
-  #)
-})
+# No Edge handling for now.
 
-## Error handling ----
-test_that("test_rcpp_population_interface() returns correct error messages", {
-  # setup population to create test values
-  population <- methods::new(Population)
-  nyears <- 10
-  nages <- 10
-  log_M_length <- nyears * nages
-  population$log_M$resize(log_M_length)
-  purrr::walk(
-    seq_along(1:log_M_length),
-    \(x) population$log_M[x]$value <- -1
-  )
-  population$log_init_naa$resize(nages)
-  purrr::walk(
-    seq_along(1:nages),
-    \(x) population$log_init_naa[x]$value <- 0
-  )
-  population$log_init_naa$set_all_estimable(TRUE)
-  population$nages$set(nages)
-  population$ages$resize(nages)
-  purrr::walk(
-    seq_along(1:nages),
-    \(x) population$ages$set(x - 1, x)
-  )
-  population$nfleets$set(2)
-  population$nseasons$set(1)
-  population$nyears$set(nyears)
-  
-  clear()
-  # @description Test that test_rcpp_population_interface(x) returns expected error.
-  #expect_error(
-  #  object = test_rcpp_population_interface(x),
-  #  regexp = "Insert text here that should be in the error message."
-  #)
-})
+# No built in errors or warnings to test for now.

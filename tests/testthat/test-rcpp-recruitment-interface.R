@@ -79,13 +79,7 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
   clear()
 })
 
-## Edge handling ----
-test_that("test_rcpp_recruitment_interface() returns correct outputs for edge cases", {
-  # @description Test that test_rcpp_recruitment_interface(x) returns an error.
-  #expect_error(
-  #  object = test_rcpp_recruitment_interface(x)
-  #)
-})
+# No edge cases for now.
 
 ## Error handling ----
 test_that("test_rcpp_recruitment_interface() returns correct error messages", {
