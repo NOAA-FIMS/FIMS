@@ -381,6 +381,44 @@ namespace fims_math
     return (give_log ? loglik : exp(loglik));
   }
 
+  template <typename Type>
+  Type ddirichlet_multinomial_linear(const fims::Vector<Type> &x,
+                              const fims::Vector<Type> &p,
+                              Type theta,
+                              const fims::Vector<Type> &pred_p,
+                              bool give_log = true)
+  {
+    Type loglik = 0.0;
+    int ncat = x.size();
+    Type N = 0.0;
+    for (int i = 0; i < ncat; ++i)
+    {
+      N += x[i];
+    }
+    // neff = (1 + theta * N)/(1 + theta) 
+    Type neff = ((Type(1.0) + theta * static_cast<Type>(N)) / (Type(1.0) + theta);
+
+    // Dirichlet-Multinomial Log-Likelihood
+    // Term 1 in eqn 4.4 of Fisch et al. (2021. Fish. Res., Table 3)
+    loglik += lgamma(N + 1.0);
+    // Term 2
+    for (int i = 0; i < ncat; ++i)
+    {
+      loglik -= lgamma(x[i] + 1.0);
+    }
+    // Term 3
+    loglik += lgamma(N * theta);
+    // Term 4
+    loglik -= lgamma(N * theta + N);
+    // Term 5
+    for (int i = 0; i < ncat; ++i)
+    {
+      loglik += lgamma(x[i] + theta * N * pred_p[i]) - lgamma(theta * N * pred_p[i]);
+    }
+
+    return (give_log ? loglik : exp(loglik));
+  }
+
 } // namespace fims_math
 
 #endif /* FIMS_MATH_HPP */
