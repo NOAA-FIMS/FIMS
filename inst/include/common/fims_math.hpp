@@ -396,7 +396,7 @@ namespace fims_math
       N += x[i];
     }
     // neff = (1 + theta * N)/(1 + theta) 
-    Type neff = ((Type(1.0) + theta * static_cast<Type>(N)) / (Type(1.0) + theta);
+    Type neff = (Type(1.0) + theta * static_cast<Type>(N)) / (Type(1.0) + theta);
 
     // Dirichlet-Multinomial Log-Likelihood
     // Term 1 in eqn 4.4 of Fisch et al. (2021. Fish. Res., Table 3)
