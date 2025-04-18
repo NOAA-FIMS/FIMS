@@ -49,7 +49,7 @@ The objective of the integration test is to validate the FIMS C++ operation as a
 
 ## Approach
 
-- Prepare expected values using R script [FIMS_integration_test.R](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/blob/master/FIMS_integration_test_data/FIMS_integration_test.R) from [Age Structured Stock Assessment Model Comparison repository (ASSAMC)](https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/tree/master).
+- Prepare expected values using R script [FIMS_integration_test.R](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison/blob/main/FIMS_integration_test_data/FIMS_integration_test.R) from [Age Structured Stock Assessment Model Comparison repository (ASSAMC)](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison/tree/main).
 
 - Run `FIMS::setup_gtest()` to create om_input1.json and om_output1.json files and save the files under `FIMS/tests/integration/inputs/` folder.
 

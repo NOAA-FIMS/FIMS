@@ -3,7 +3,7 @@
 #' A dataset containing information necessary to run an age-structured stock
 #' assessment model in FIMS. This data was generated using
 #' the `ASSAMC` package written for the [model comparison project](
-#' www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison).
+#' www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison).
 #'
 #' @format
 #' A data frame with `r NROW(data1)` observations of `r NCOL(data1)`
@@ -33,5 +33,5 @@
 #'     be your input sample size.
 #' }
 #' }
-#' @source \url{www.github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison}
+#' @source \url{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
 "data1"

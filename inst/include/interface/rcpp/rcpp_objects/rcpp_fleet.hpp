@@ -42,8 +42,15 @@ class FleetInterfaceBase : public FIMSRcppInterfaceBase {
     /* Create instance of map: key is id and value is pointer to
     FleetInterfaceBase */
     FleetInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
+
+  /**
+   * @brief Construct a new Fleet Interface Base object
+   *
+   * @param other
+   */
+  FleetInterfaceBase(const FleetInterfaceBase& other) :
+  id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -69,19 +76,19 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief The ID of the observed age-composition data object.
    */
-  int interface_observed_agecomp_data_id_m = -999;
+  SharedInt interface_observed_agecomp_data_id_m = -999;
   /**
    * @brief The ID of the observed length-composition data object.
    */
-  int interface_observed_lengthcomp_data_id_m = -999;
+  SharedInt interface_observed_lengthcomp_data_id_m = -999;
   /**
    * @brief The ID of the observed index data object.
    */
-  int interface_observed_index_data_id_m = -999;
+  SharedInt interface_observed_index_data_id_m = -999;
   /**
    * @brief The ID of the selectivity object.
    */
-  int interface_selectivity_id_m = -999;
+  SharedInt interface_selectivity_id_m = -999;
 
 public:
   /**
@@ -95,19 +102,19 @@ public:
    * designated to be a fleet or a survey. This will be fixed in later
    * versions.
    */
-  bool is_survey = false;
+  SharedBoolean is_survey = false;
   /**
    * @brief The number of age bins in the fleet data.
    */
-  int nages;
+  SharedInt nages = 0;
   /**
    * @brief The number of length bins in the fleet data.
    */
-  int nlengths = 0;
+  SharedInt nlengths = 0;
   /**
    * @brief The number of years in the fleet data.
    */
-  int nyears;
+  SharedInt nyears = 0;
   /**
    * @brief The natural log of the catchability parameter for this fleet.
    */
@@ -136,11 +143,11 @@ public:
   /**
    * @brief Should catchability (q) be estimated? The default is false.
    */
-  bool estimate_q = false;
+  SharedBoolean estimate_q = false;
   /**
    * @brief Is catchability (q) a random effect? The default is false.
    */
-  bool random_q = false;
+  SharedBoolean random_q = false;
   // derived quantities
   /**
    * @brief Derived catch-at-age in numbers.
@@ -170,7 +177,39 @@ public:
   /**
    * @brief The constructor.
    */
-  FleetInterface() : FleetInterfaceBase() {}
+  FleetInterface() : FleetInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<FleetInterface>(*this));
+  }
+
+  /**
+   * @brief Construct a new Fleet Interface object
+   *
+   * @param other
+   */
+  FleetInterface(const FleetInterface& other) :
+  FleetInterfaceBase(other),
+  interface_observed_agecomp_data_id_m(other.interface_observed_agecomp_data_id_m),
+  interface_observed_lengthcomp_data_id_m(other.interface_observed_lengthcomp_data_id_m), 
+  interface_observed_index_data_id_m(other.interface_observed_index_data_id_m), 
+  interface_selectivity_id_m(other.interface_selectivity_id_m), 
+  name(other.name), is_survey(other.is_survey), 
+  nages(other.nages), 
+  nlengths(other.nlengths),
+  nyears(other.nyears), 
+  log_q(other.log_q), 
+  log_Fmort(other.log_Fmort), 
+  log_expected_index(other.log_expected_index),
+  proportion_catch_numbers_at_age(other.proportion_catch_numbers_at_age), 
+  proportion_catch_numbers_at_length(other.proportion_catch_numbers_at_length),
+  age_length_conversion_matrix(other.age_length_conversion_matrix), 
+  estimate_q(other.estimate_q), 
+  random_q(other.random_q), 
+  derived_cnaa(other.derived_cnaa), 
+  derived_cnal(other.derived_cnal), 
+  derived_cwaa(other.derived_cwaa), 
+  derived_index(other.derived_index), 
+  derived_age_composition(other.derived_age_composition), 
+  derived_length_composition(other.derived_length_composition) {}
 
   /**
    * @brief The destructor.
@@ -188,7 +227,7 @@ public:
    * @param observed_agecomp_data_id Unique ID for the observed data object.
    */
   void SetObservedAgeCompData(int observed_agecomp_data_id) {
-    interface_observed_agecomp_data_id_m = observed_agecomp_data_id;
+    interface_observed_agecomp_data_id_m.set(observed_agecomp_data_id);
   }
 
   /**
@@ -196,7 +235,7 @@ public:
    * @param observed_lengthcomp_data_id Unique ID for the observed data object.
    */
   void SetObservedLengthCompData(int observed_lengthcomp_data_id) {
-    interface_observed_lengthcomp_data_id_m = observed_lengthcomp_data_id;
+    interface_observed_lengthcomp_data_id_m.set(observed_lengthcomp_data_id);
   }
 
   /**
@@ -204,7 +243,7 @@ public:
    * @param observed_index_data_id Unique ID for the observed data object.
    */
   void SetObservedIndexData(int observed_index_data_id) {
-    interface_observed_index_data_id_m = observed_index_data_id;
+    interface_observed_index_data_id_m.set(observed_index_data_id);
   }
 
   /**
@@ -212,14 +251,14 @@ public:
    * @param selectivity_id Unique ID for the observed object.
    */
   void SetSelectivity(int selectivity_id) {
-    interface_selectivity_id_m = selectivity_id;
+    interface_selectivity_id_m.set(selectivity_id);
   }
 
   /**
   * @brief Get the unique ID for the observed age-composition data object.
   */
   int GetObservedAgeCompDataID() {
-    return interface_observed_agecomp_data_id_m;
+    return interface_observed_agecomp_data_id_m.get();
   }
 
   /**
@@ -227,14 +266,14 @@ public:
   * object.
   */
   int GetObservedLengthCompDataID() {
-    return interface_observed_lengthcomp_data_id_m;
+    return interface_observed_lengthcomp_data_id_m.get();
   }
 
   /**
    * @brief Get the unique id for the observed index data object.
    */
   int GetObservedIndexDataID() {
-    return interface_observed_index_data_id_m;
+    return interface_observed_index_data_id_m.get();
   }
 
   /** 
@@ -325,39 +364,48 @@ public:
   virtual std::string to_json() {
     std::stringstream ss;
 
-    ss << "\"module\" : {\n";
+    ss << "{\n";
     ss << " \"name\" : \"Fleet\",\n";
 
     ss << " \"type\" : \"fleet\",\n";
     ss << " \"tag\" : \"" << this->name << "\",\n";
     ss << " \"id\": " << this->id << ",\n";
-
-    ss << " \"parameter\": {\n";
+    ss << " \"is_survey\": " << this->is_survey << ",\n";
+    ss << " \"nlengths\": " << this->nlengths.get() << ",\n";
+    ss << "\"parameters\": [\n";
+    ss << "{\n";
     ss << " \"name\": \"log_Fmort\",\n";
     ss << " \"id\":" << this->log_Fmort.id_m << ",\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"values\": " << this->log_Fmort << "\n},\n";
 
-    ss << " \"parameter\": {\n";
+    ss << " {\n";
     ss << " \"name\": \"log_q\",\n";
     ss << " \"id\":" << this->log_q.id_m << ",\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"values\": " << this->log_q << "\n},\n";
-
-    ss << " \"derived_quantity\": {\n";
+    if (this->nlengths > 0) {
+      ss << " {\n";
+      ss << " \"name\": \"age_length_conversion_matrix\",\n";
+      ss << " \"id\":" << this->age_length_conversion_matrix.id_m << ",\n";
+      ss << " \"type\": \"vector\",\n";
+      ss << " \"values\": " << this->age_length_conversion_matrix << "\n}\n";
+    }
+    ss << "], \"derived_quantities\":[\n";
+    ss << "{\n";
     ss << "  \"name\": \"cnaa\",\n";
     ss << "  \"values\":[";
     if (this->derived_cnaa.size() == 0) {
-      ss << "]\n";
+        ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->derived_cnaa.size() - 1; i++) {
-        ss << this->derived_cnaa[i] << ", ";
-      }
-      ss << this->derived_cnaa[this->derived_cnaa.size() - 1] << "]\n";
+        for (R_xlen_t i = 0; i < this->derived_cnaa.size() - 1; i++) {
+            ss << this->derived_cnaa[i] << ", ";
+        }
+        ss << this->derived_cnaa[this->derived_cnaa.size() - 1] << "]\n";
     }
     ss << " },\n";
 
-    ss << " \"derived_quantity\": {\n";
+    ss << " {\n";
     ss << "  \"name\": \"cnal\",\n";
     ss << "  \"values\":[";
     if (this->derived_cnal.size() == 0) {
@@ -370,7 +418,7 @@ public:
     }
     ss << " },\n";
 
-    ss << " \"derived_quantity\": {\n";
+    ss << " {\n";
     ss << "  \"name\": \"cwaa\",\n";
     ss << "  \"values\":[";
     if (this->derived_cwaa.size() == 0) {
@@ -384,7 +432,7 @@ public:
     ss << " },\n";
 
 
-    ss << " \"derived_quantity\": {\n";
+    ss << "{\n";
     ss << "  \"name\": \"age_composition \",\n";
     ss << "  \"values\":[";
     if (this->derived_age_composition.size() == 0) {
@@ -397,7 +445,7 @@ public:
     }
     ss << " },\n";
 
-    ss << " \"derived_quantity\": {\n";
+    ss << " {\n";
     ss << "  \"name\": \"length_composition \",\n";
     ss << "  \"values\":[";
     if (this->derived_length_composition.size() == 0) {
@@ -410,7 +458,7 @@ public:
     }
     ss << " },\n";
 
-    ss << " \"derived_quantity\": {\n";
+    ss << "{\n";
     ss << "  \"name\": \"index \",\n";
     ss << "  \"values\":[";
     if (this->derived_index.size() == 0) {
@@ -421,11 +469,12 @@ public:
       }
       ss << this->derived_index[this->derived_index.size() - 1] << "]\n";
     }
-    ss << " },\n";
+    ss << " }\n]\n}";
 
     return ss.str();
 
   }
+
 
 
 
@@ -441,16 +490,20 @@ public:
 
     // set relative info
     fleet->id = this->id;
-    fleet->is_survey = this->is_survey;
-    fleet->nages = this->nages;
-    fleet->nlengths = this->nlengths;
-    fleet->nyears = this->nyears;
+    fleet->is_survey = this->is_survey.get();
+    fleet->nages = this->nages.get();
+    fleet->nlengths = this->nlengths.get();
+    fleet->nyears = this->nyears.get();
+    
     fleet->fleet_observed_agecomp_data_id_m =
-      interface_observed_agecomp_data_id_m;
+      interface_observed_agecomp_data_id_m.get();
+    
     fleet->fleet_observed_lengthcomp_data_id_m =
-      interface_observed_lengthcomp_data_id_m;
-    fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m;
-    fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
+      interface_observed_lengthcomp_data_id_m.get();
+    
+    fleet->fleet_observed_index_data_id_m = interface_observed_index_data_id_m.get();
+    
+    fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
     fleet->log_q.resize(this->log_q.size());
     for (size_t i = 0; i < this->log_q.size(); i++) {
@@ -466,7 +519,7 @@ public:
       }
     }
 
-
+    FIMS_INFO_LOG("adding Fleet fmort object to TMB");
     fleet->log_Fmort.resize(this->log_Fmort.size());
     for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
@@ -484,17 +537,32 @@ public:
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
     //exp_catch
-    fleet->log_expected_index.resize(nyears);  // assume index is for all ages.
+    fleet->log_expected_index.resize(nyears.get()); // assume index is for all ages.
     info->variable_map[this->log_expected_index.id_m] = &(fleet)->log_expected_index;
-    fleet->proportion_catch_numbers_at_age.resize(nyears * nages);
+    
+    fleet->proportion_catch_numbers_at_age.resize(nyears.get() * nages.get());
     info->variable_map[this->proportion_catch_numbers_at_age.id_m] = &(fleet)->proportion_catch_numbers_at_age;
+    FIMS_INFO_LOG(fims::to_string(this->nyears.get()) + " " + fims::to_string(this->nages.get()));
+    FIMS_INFO_LOG(" adding Fleet length object to TMB");
 
-    if(this->nlengths > 0){
-      fleet->proportion_catch_numbers_at_length.resize(nyears * nlengths);
-      fleet->age_length_conversion_matrix.resize(nages * nlengths);
-      for (size_t i = 0; i < fleet->age_length_conversion_matrix.size(); i++){
-        fleet->age_length_conversion_matrix[i] = this->age_length_conversion_matrix[i].initial_value_m;
-        
+    if (this->nlengths > 0) {
+      fleet->proportion_catch_numbers_at_length.resize(this->nyears.get() * this->nlengths.get());
+      fleet->age_length_conversion_matrix.resize(this->age_length_conversion_matrix.size());
+
+      if (this->age_length_conversion_matrix.size() !=
+              (this->nages.get()*this->nlengths.get())) {
+          FIMS_ERROR_LOG("age_length_conversion_matrix don't match, " +
+                  fims::to_string(this->age_length_conversion_matrix.size()) + " != " +
+                  fims::to_string((this->nages.get()*this->nlengths.get())));
+      }
+
+      for (size_t i = 0; i < fleet->age_length_conversion_matrix.size(); i++) {
+        fleet->age_length_conversion_matrix[i] =
+          this->age_length_conversion_matrix[i].initial_value_m;
+        FIMS_INFO_LOG(" adding Fleet length object to TMB in loop " + 
+          fims::to_string(i) + " of " + 
+          fims::to_string(fleet->age_length_conversion_matrix.size()));
+
         if (this->age_length_conversion_matrix[i].estimated_m) {
           info->RegisterParameterName("age_length_conversion_matrix");
           if (this->age_length_conversion_matrix[i].is_random_effect_m) {
@@ -503,16 +571,18 @@ public:
             info->RegisterParameter(fleet->age_length_conversion_matrix[i]);
           }
         }
+        FIMS_INFO_LOG(" adding Fleet length object to TMB in loop after if");
       }
+      FIMS_INFO_LOG(" adding Fleet length object to TMB out loop");
       info->variable_map[this->age_length_conversion_matrix.id_m] = &(fleet)->age_length_conversion_matrix;
       info->variable_map[this->proportion_catch_numbers_at_length.id_m] = &(fleet)->proportion_catch_numbers_at_length;
-    }
+  }
 
     // add to Information
     info->fleets[fleet->id] = fleet;
-
+    FIMS_INFO_LOG("done adding Fleet object to TMB");
     return true;
-  }
+}
 
   /**
    * @brief Adds the parameters to the TMB model.

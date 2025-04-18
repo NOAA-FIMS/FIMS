@@ -1,5 +1,4 @@
-data("data1")
-data <- FIMSFrame(data1)
+data <- FIMS::FIMSFrame(data1)
 
 fleet1 <- survey1 <- list(
   selectivity = list(form = "LogisticSelectivity"),

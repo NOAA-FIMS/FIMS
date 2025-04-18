@@ -38,7 +38,7 @@ class PopulationInitializeTestFixture : public testing::Test {
   fims_popdy::Population<double> population;
 
   // Use default values from the Li et al., 2021
-  // https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison/blob/master/R/save_initial_input.R
+  // https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison/blob/main/R/save_initial_input.R
   int id_g = 0;
   int nyears = 30;
   int nseasons = 1;

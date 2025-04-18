@@ -46,7 +46,15 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
     /* Create instance of map: key is id and value is pointer to
     DataInterfaceBase */
     DataInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+  }
+
+  /**
+   * @brief Construct a new Data Interface Base object
+   *
+   * @param other
+   */
+  DataInterfaceBase(const DataInterfaceBase& other) :
+  observed_data(other.observed_data), id(other.id) {
   }
 
   /**
@@ -80,16 +88,16 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @brief The first dimension of the data, which relates to the number of age
    * bins.
    */
-  int amax;
+  fims_int amax = 0;
   /**
    * @brief The second dimension of the data, which relates to the number of
    * time steps or years.
    */
-  int ymax;
+  fims_int ymax = 0;
   /**
    * @brief The vector of age-composition data that is being passed from R.
    */
-  Rcpp::NumericVector age_comp_data;
+  RealVector age_comp_data;
 
   /**
    * @brief The constructor.
@@ -97,7 +105,18 @@ class AgeCompDataInterface : public DataInterfaceBase {
   AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase() {
     this->amax = amax;
     this->ymax = ymax;
+    this->age_comp_data.resize(amax*ymax);
+
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<AgeCompDataInterface>(*this));
   }
+
+  /**
+   * @brief Construct a new Age Comp Data Interface object
+   *
+   * @param other
+   */
+  AgeCompDataInterface(const AgeCompDataInterface& other) :
+  DataInterfaceBase(other), amax(other.amax), ymax(other.ymax), age_comp_data(other.age_comp_data) {}
 
   /**
    * @brief The destructor.
@@ -120,7 +139,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
     
-    ss << "\"module\" : {\n";
+    ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\" : \"AgeComp\",\n";
     ss << " \"id\":" << this->id << ",\n";
@@ -128,7 +147,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
     ss << " \"dimensions\": [" << this->ymax << "," << this->amax << "],\n";
     ss << " \"values\": [";
     for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++) {
-      ss << age_comp_data[i] << ", ";
+        ss << age_comp_data[i] << ", ";
     }
     ss << age_comp_data[age_comp_data.size() - 1] << "]\n";
     ss << "}";
@@ -186,16 +205,16 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @brief The first dimension of the data, which relates to the number of
    * length bins.
    */
-  int lmax;
+  fims_int lmax;
   /**
    * @brief The second dimension of the data, which relates to the number of
    * time steps or years.
    */
-  int ymax;
+  fims_int ymax = 0;
   /**
    * @brief The vector of length-composition data that is being passed from R.
    */
-  Rcpp::NumericVector length_comp_data;
+  RealVector length_comp_data;
 
   /**
    * @brief The constructor.
@@ -203,7 +222,18 @@ class LengthCompDataInterface : public DataInterfaceBase {
   LengthCompDataInterface(int ymax = 0, int lmax = 0) : DataInterfaceBase() {
     this->lmax = lmax;
     this->ymax = ymax;
+    this->length_comp_data.resize(lmax*ymax);
+
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LengthCompDataInterface>(*this));
   }
+
+  /**
+   * @brief Construct a new Length Comp Data Interface object
+   *
+   * @param other
+   */
+  LengthCompDataInterface(const LengthCompDataInterface& other) :
+  DataInterfaceBase(other), lmax(other.lmax), ymax(other.ymax), length_comp_data(other.length_comp_data) {}
 
   /**
    * @brief The destructor.
@@ -226,7 +256,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
     
-    ss << "\"module\" : {\n";
+    ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\" : \"LengthComp\",\n";
     ss << " \"id\":" << this->id << ",\n";
@@ -234,7 +264,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     ss << " \"dimensions\": [" << this->ymax << "," << this->lmax << "],\n";
     ss << " \"values\": [";
     for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++) {
-      ss << length_comp_data[i] << ", ";
+        ss << length_comp_data[i] << ", ";
     }
     ss << length_comp_data[length_comp_data.size() - 1] << "]\n";
     ss << "}";
@@ -283,16 +313,29 @@ class IndexDataInterface : public DataInterfaceBase {
   /**
    * @brief An integer that specifies the second dimension of the data.
    */
-  int ymax;
+  fims_int ymax = 0;
   /**
    * @brief The vector of index data that is being passed from R.
    */
-  Rcpp::NumericVector index_data;
+  RealVector index_data;
 
   /**
    * @brief The constructor.
    */
-  IndexDataInterface(int ymax = 0) : DataInterfaceBase() { this->ymax = ymax; }
+  IndexDataInterface(int ymax = 0) : DataInterfaceBase() {
+    this->ymax = ymax;
+    this->index_data.resize(ymax);
+    
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<IndexDataInterface>(*this));
+  }
+
+  /**
+   * @brief Construct a new Index Data Interface object
+   *
+   * @param other
+   */
+  IndexDataInterface(const IndexDataInterface& other) :
+  DataInterfaceBase(other), ymax(other.ymax), index_data(other.index_data) {}
 
   /**
    * @brief The destructor.
@@ -315,7 +358,7 @@ class IndexDataInterface : public DataInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
     
-    ss << "\"module\" : {\n";
+    ss << "{\n";
     ss << " \"name\": \"data\",\n";
     ss << " \"type\": \"Index\",\n";
     ss << " \"id\": " << this->id << ",\n";
@@ -323,7 +366,7 @@ class IndexDataInterface : public DataInterfaceBase {
     ss << " \"dimensions\": [" << this->ymax << "],\n";
     ss << " \"values\": [";
     for (R_xlen_t i = 0; i < index_data.size() - 1; i++) {
-      ss << index_data[i] << ", ";
+        ss << index_data[i] << ", ";
     }
     ss << index_data[index_data.size() - 1] << "]\n";
     ss << "}";

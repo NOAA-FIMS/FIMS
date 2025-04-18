@@ -1,4 +1,5 @@
 test_that("test get parameter vector", {
+  clear()
   # Create selectivity
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0

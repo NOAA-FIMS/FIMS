@@ -41,8 +41,15 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
     /* Create instance of map: key is id and value is pointer to
     MaturityInterfaceBase */
     MaturityInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
+
+  /**
+   * @brief Construct a new Maturity Interface Base object
+   *
+   * @param other
+   */
+  MaturityInterfaceBase(const MaturityInterfaceBase& other) :
+  id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -84,7 +91,17 @@ public:
   /**
    * @brief The constructor.
    */
-  LogisticMaturityInterface() : MaturityInterfaceBase() {}
+  LogisticMaturityInterface() : MaturityInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LogisticMaturityInterface>(*this));
+  }
+
+  /**
+   * @brief Construct a new Logistic Maturity Interface object
+   *
+   * @param other
+   */
+  LogisticMaturityInterface(const LogisticMaturityInterface& other) :
+  MaturityInterfaceBase(other), inflection_point(other.inflection_point), slope(other.slope) {}
 
   /**
    * @brief The destructor.
@@ -164,24 +181,24 @@ public:
    */ 
   virtual std::string to_json() {
     std::stringstream ss;
-    ss << "\"module\" : {\n";
+    ss << "{\n";
     ss << " \"name\": \"maturity\",\n";
     ss << " \"type\": \"logistic\",\n";
     ss << " \"id\": " << this->id << ",\n";
 
-    ss << " \"parameter\": {\n";
+    ss << " \"parameters\": [\n{\n";
     ss << "   \"name\": \"inflection_point\",\n";
     ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->inflection_point << ",\n";
+    ss << "   \"values\":" << this->inflection_point << "},\n";
 
-    ss << " \"parameter\": {\n";
+    ss << "{\n";
     ss << "   \"name\": \"slope\",\n";
     ss << "   \"id\":" << this->slope.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->slope << ",\n";
+    ss << "   \"values\":" << this->slope << "}\n";
 
-    ss << "}";
+    ss << "]}";
 
     return ss.str();
   }

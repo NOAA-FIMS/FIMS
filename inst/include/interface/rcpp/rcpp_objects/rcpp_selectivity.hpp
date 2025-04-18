@@ -41,8 +41,15 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
     /* Create instance of map: key is id and value is pointer to
     SelectivityInterfaceBase */
     SelectivityInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
+
+  /**
+   * @brief Construct a new Selectivity Interface Base object
+   * 
+   * @param other 
+   */
+  SelectivityInterfaceBase(const SelectivityInterfaceBase& other) :
+  id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -86,7 +93,17 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
+  LogisticSelectivityInterface() : SelectivityInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LogisticSelectivityInterface>(*this));
+  }
+
+  /**
+   * @brief Construct a new Logistic Selectivity Interface object
+   * 
+   * @param other 
+   */
+  LogisticSelectivityInterface(const LogisticSelectivityInterface& other) :
+  SelectivityInterfaceBase(other), inflection_point(other.inflection_point), slope(other.slope) {}
 
   /**
    * @brief The destructor.
@@ -167,22 +184,22 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
 
-    ss << "\"module\" : {\n";
+    ss << "{\n";
     ss << " \"name\":\"selectivity\",\n";
     ss << " \"type\": \"Logistic\",\n";
     ss << " \"id\": " << this->id << ",\n";
 
-    ss << " \"parameter\": {\n";
+    ss << " \"parameters\": [\n{\n";
     ss << "   \"name\": \"inflection_point\",\n";
     ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->inflection_point << ",\n },\n";
+    ss << "   \"values\":" << this->inflection_point << "\n },\n";
 
-    ss << " \"parameter\": {\n";
+    ss << "{\n";
     ss << "   \"name\": \"slope\",\n";
     ss << "   \"id\":" << this->slope.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->slope << ",\n}\n";
+    ss << "   \"values\":" << this->slope << "\n}]\n";
 
     ss << "}";
 
@@ -271,8 +288,18 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   ParameterVector slope_desc; /**< the width of the curve at the inflection_point */
 
 
-  DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {}
+  DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<DoubleLogisticSelectivityInterface>(*this));
+  }
 
+  /**
+   * @brief Construct a new Double Logistic Selectivity Interface object
+   * 
+   * @param other 
+   */
+  DoubleLogisticSelectivityInterface(const DoubleLogisticSelectivityInterface& other) :
+  SelectivityInterfaceBase(other), inflection_point_asc(other.inflection_point_asc), slope_asc(other.slope_asc), inflection_point_desc(other.inflection_point_desc), slope_desc(other.slope_desc) {}
+  
   virtual ~DoubleLogisticSelectivityInterface() {}
 
   /** @brief returns the id for the double logistic selectivity interface */
@@ -373,34 +400,34 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     virtual std::string to_json() {
         std::stringstream ss;
 
-                ss << "\"module\" : {\n";
+                ss << "{\n";
                 ss << " \"name\": \"selectivity\",\n";
                 ss << " \"type\": \"DoubleLogistic\",\n";
                 ss << " \"id\": " << this->id << ",\n";
 
-                ss << " \"parameter\": {\n";
+                ss << " \"parameters\":[\n{\n";
                 ss << "   \"name\": \"inflection_point_asc\",\n";
                 ss << "   \"id\":" << this->inflection_point_asc.id_m << ",\n";
                 ss << "   \"type\": \"vector\",\n";
-                ss << "   \"values\":" << this->inflection_point_asc << ",\n},\n";
+                ss << "   \"values\":" << this->inflection_point_asc << "\n},\n";
 
-                ss << " \"parameter\": {\n";
+                ss << "{\n";
                 ss << "   \"name\": \"slope_asc\",\n";
                 ss << "   \"id\":" << this->slope_asc.id_m << ",\n";
                 ss << "   \"type\": \"vector\",\n";
-                ss << "   \"values\":" << this->slope_asc << ",\n},\n";
+                ss << "   \"values\":" << this->slope_asc << "\n},\n";
 
-                ss << " \"parameter\": {\n";
+                ss << " {\n";
                 ss << "   \"name\": \"inflection_point_desc\",\n";
                 ss << "   \"id\":" << this->inflection_point_desc.id_m << ",\n";
                 ss << "   \"type\": \"vector\",\n";
-                ss << "   \"values\":" << this->inflection_point_desc << ",\n},\n";
+                ss << "   \"values\":" << this->inflection_point_desc << "\n},\n";
 
-                ss << " \"parameter\": {\n";
+                ss << "{\n";
                 ss << "   \"name\": \"slope_desc\",\n";
                 ss << "   \"id\":" << this->slope_desc.id_m << ",\n";
                 ss << "   \"type\": \"vector\",\n";
-                ss << "   \"values\":" << this->slope_desc << ",\n}\n";
+                ss << "   \"values\":" << this->slope_desc << "\n}]\n";
 
 
                 ss << "}";
@@ -419,23 +446,23 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<Type> > selectivity =
         std::make_shared<fims_popdy::DoubleLogisticSelectivity<Type> >();
 
-        std::stringstream ss;
-        // set relative info
-        selectivity->id = this->id;
-        selectivity->inflection_point_asc.resize(this->inflection_point_asc.size());
-        for (size_t i = 0; i < this->inflection_point_asc.size(); i++) {
-            selectivity->inflection_point_asc[i] = this->inflection_point_asc[i].initial_value_m;
-            if (this->inflection_point_asc[i].estimated_m) {
-                ss.str("");
-                ss << "selectivity.inflection_point_asc." << this->id << "." << i;
-                info->RegisterParameterName(ss.str());
-                if (this->inflection_point_asc[i].is_random_effect_m) {
-                    info->RegisterRandomEffect(selectivity->inflection_point_asc[i]);
-                } else {
-                    info->RegisterParameter(selectivity->inflection_point_asc[i]);
-                }
+    std::stringstream ss;
+    // set relative info
+    selectivity->id = this->id;
+    selectivity->inflection_point_asc.resize(this->inflection_point_asc.size());
+    for (size_t i = 0; i < this->inflection_point_asc.size(); i++) {
+        selectivity->inflection_point_asc[i] = this->inflection_point_asc[i].initial_value_m;
+        if (this->inflection_point_asc[i].estimated_m) {
+            ss.str("");
+            ss << "selectivity.inflection_point_asc." << this->id << "." << i;
+            info->RegisterParameterName(ss.str());
+            if (this->inflection_point_asc[i].is_random_effect_m) {
+                info->RegisterRandomEffect(selectivity->inflection_point_asc[i]);
+            } else {
+                info->RegisterParameter(selectivity->inflection_point_asc[i]);
             }
         }
+    }
 
     info->variable_map[this->inflection_point_asc.id_m] = &(selectivity)->inflection_point_asc;
 

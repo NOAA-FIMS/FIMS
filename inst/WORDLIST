@@ -19,6 +19,7 @@ Rcpp
 TMB
 agecomp
 al
+bookdown
 cli
 codebase
 cov
@@ -63,4 +64,5 @@ testthat
 tibble
 trigamma
 trunc
+usethis
 vec

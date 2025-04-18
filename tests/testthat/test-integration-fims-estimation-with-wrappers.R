@@ -1,22 +1,35 @@
+# Load necessary data for the integration test
 load(test_path("fixtures", "integration_test_data.RData"))
 
-test_that("deterministic test of fims", {
-  iter_id <- 1
+# Set the iteration ID to 1 for accessing specific input/output list
+iter_id <- 1
 
+# Define modified parameters for different modules
+modified_parameters <- readRDS(testthat::test_path(
+  "fixtures",
+  "parameters_model_comparison_project.RDS"
+))
+
+test_that("deterministic test of fims", {
+  # Run FIMS using the setup_and_run_FIMS_with_wrappers function
   result <- setup_and_run_FIMS_with_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE
+    estimation_mode = FALSE,
+    modified_parameters = modified_parameters
   )
 
   # Call report using deterministic parameter values
   # obj[["report"]]() requires parameter list to avoid errors
-  report <- result@report
+  report <- get_report(result)
+  estimates <- get_estimates(result)
 
   # Compare log(R0) to true value
-  fims_logR0 <- as.numeric(result@obj[["par"]][36])
+  fims_logR0 <- estimates |>
+    dplyr::filter(name == "log_rzero") |>
+    dplyr::pull(value)
   expect_gt(fims_logR0, 0.0)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]][["R0"]]))
 
@@ -136,26 +149,24 @@ test_that("deterministic test of fims", {
 })
 
 test_that("nll test of fims", {
-  iter_id <- 1
-
+  # Run FIMS using the setup_and_run_FIMS_with_wrappers function
   result <- setup_and_run_FIMS_with_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = FALSE
+    estimation_mode = FALSE,
+    modified_parameters = modified_parameters
   )
 
   # Set up TMB's computational graph
-  obj <- result@obj
-  report <- result@report
-
-  # Calculate standard errors
-  # sdr <- result@sdreport
-  # sdr_fixed <- result[["sdr_fixed"]]
+  report <- get_report(result)
+  estimates <- get_estimates(result)
 
   # log(R0)
-  fims_logR0 <- as.numeric(result@obj[["par"]][36])
+  fims_logR0 <- estimates |>
+    dplyr::filter(name == "log_rzero") |>
+    dplyr::pull(value)
   expect_equal(fims_logR0, log(om_input_list[[iter_id]][["R0"]]))
 
   # recruitment likelihood
@@ -199,149 +210,49 @@ test_that("nll test of fims", {
   age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
 
   # length comp likelihoods
-  # TODO: the commented-out code below is not working yet
-  # fishing_lengthcomp_observed <- em_input_list[[iter_id]][["L.length.obs"]][["fleet1"]]
-  # fishing_lengthcomp_expected <- om_output_list[[iter_id]][["L.length"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.length"]][["fleet1"]])
-  # survey_lengthcomp_observed <- em_input_list[[iter_id]][["survey.length.obs"]][["survey1"]]
-  # survey_lengthcomp_expected <- om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]])
-  # lengthcomp_nll_fleet <- lengthcomp_nll_survey <- 0
-  # for (y in 1:om_input_list[[iter_id]][["nyr"]]) {
-  #
-  #   lengthcomp_nll_fleet <- lengthcomp_nll_fleet -
-  #     dmultinom(
-  #       fishing_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.L.lengthcomp"]][["fleet1"]], em_input_list[[iter_id]][["n.L.lengthcomp"]][["fleet1"]],
-  #       fishing_lengthcomp_expected[y, ], TRUE
-  #     )
-  #
-  #   lengthcomp_nll_survey <- lengthcomp_nll_survey -
-  #     dmultinom(
-  #       survey_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.survey.lengthcomp"]][["survey1"]], em_input_list[[iter_id]][["n.survey.lengthcomp"]][["survey1"]],
-  #       survey_lengthcomp_expected[y, ], TRUE
-  #     )
-  # }
-  # lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
-  #
-  # expected_jnll <- rec_nll + index_nll + age_comp_nll + lengthcomp_nll
-  # jnll <- report[["jnll"]]
+  fishing_lengthcomp_observed <- em_input_list[[iter_id]][["L.length.obs"]][["fleet1"]]
+  fishing_lengthcomp_expected <- om_output_list[[iter_id]][["L.length"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.length"]][["fleet1"]])
+  survey_lengthcomp_observed <- em_input_list[[iter_id]][["survey.length.obs"]][["survey1"]]
+  survey_lengthcomp_expected <- om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]])
+  lengthcomp_nll_fleet <- lengthcomp_nll_survey <- 0
+  for (y in 1:om_input_list[[iter_id]][["nyr"]]) {
+    # test using FIMS_dmultinom which matches the TMB dmultinom calculation and differs from R
+    # by NOT rounding obs to the nearest integer.
+    lengthcomp_nll_fleet <- lengthcomp_nll_fleet -
+      FIMS_dmultinom(
+        fishing_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.L.lengthcomp"]][["fleet1"]],
+        fishing_lengthcomp_expected[y, ]
+      )
+
+    lengthcomp_nll_survey <- lengthcomp_nll_survey -
+      FIMS_dmultinom(
+        survey_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.survey.lengthcomp"]][["survey1"]],
+        survey_lengthcomp_expected[y, ]
+      )
+  }
+  lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
+
+  expected_jnll <- rec_nll + index_nll + age_comp_nll + lengthcomp_nll
+  jnll <- report[["jnll"]]
 
   expect_equal(report[["nll_components"]][1], rec_nll)
   expect_equal(report[["nll_components"]][2], index_nll_fleet)
   expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
-  # expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
+  expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
   expect_equal(report[["nll_components"]][5], index_nll_survey)
   expect_equal(report[["nll_components"]][6], age_comp_nll_survey)
-  # expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
-  # expect_equal(jnll, expected_jnll)
-})
-
-test_that("estimation test of fims using wrapper functions", {
-  # Initialize the iteration identifier and run FIMS with the 1st set of OM values
-  iter_id <- 1
-  result <- setup_and_run_FIMS_with_wrappers(
-    iter_id = iter_id,
-    om_input_list = om_input_list,
-    om_output_list = om_output_list,
-    em_input_list = em_input_list,
-    estimation_mode = TRUE
-  )
-
-  # Compare FIMS results with model comparison project OM values
-  validate_fims(
-    report = result@report,
-    sdr = result@estimates,
-    sdr_report = result@estimates,
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
-  )
+  expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
+  expect_equal(jnll, expected_jnll)
 })
 
 test_that("estimation test with age and length comp using wrappers", {
-  # Load operating model data for the current iteration
-  iter_id <- 1
-  om_input <- om_input_list[[iter_id]]
-  om_output <- om_output_list[[iter_id]]
-  em_input <- em_input_list[[iter_id]]
+  # Load the test data from an RDS file containing the model fit
+  fit_age_length_comp <- readRDS(test_path("fixtures", "fit_age_length_comp.RDS"))
 
-  fims_data <- FIMS::FIMSFrame(data1)
-
-  # Clear any previous FIMS settings
-  clear()
-
-  fleets <- list(
-    fleet1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    ),
-    survey1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    )
-  )
-
-  lengthcomp_parameters <- fims_data |>
-    create_default_parameters(
-      fleets = fleets,
-      recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution")
-      ),
-      growth = list(form = "EWAAgrowth"),
-      maturity = list(form = "LogisticMaturity")
-    )
-
-  modified_parameters <- list(
-    fleet1 = list(
-      Fleet.log_Fmort.value = log(om_output_list[[1]][["f"]])
-    ),
-    survey1 = list(
-      LogisticSelectivity.inflection_point.value = 1.5,
-      LogisticSelectivity.slope.value = 2,
-      Fleet.log_q.value = log(om_output_list[[1]][["survey_q"]][["survey1"]])
-    ),
-    recruitment = list(
-      BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]][["R0"]]),
-      BevertonHoltRecruitment.log_devs.value = om_input_list[[1]][["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimated = FALSE,
-      DnormDistribution.log_sd.value = om_input_list[[1]][["logR_sd"]]
-    ),
-    maturity = list(
-      LogisticMaturity.inflection_point.value = om_input_list[[1]][["A50.mat"]],
-      LogisticMaturity.inflection_point.estimated = FALSE,
-      LogisticMaturity.slope.value = om_input_list[[1]][["slope.mat"]],
-      LogisticMaturity.slope.estimated = FALSE
-    ),
-    population = list(
-      Population.log_init_naa.value = log(om_output_list[[1]][["N.age"]][1, ])
-    )
-  )
-
-  parameters <- lengthcomp_parameters |>
-    update_parameters(
-      modified_parameters = modified_parameters
-    )
-
-  parameter_list <- initialize_fims(
-    parameters = parameters,
-    data = fims_data
-  )
-  fit <- fit_fims(parameter_list, optimize = TRUE)
-
-  clear()
-
+  # Compare FIMS results with model comparison project OM values
   validate_fims(
-    report = fit@report,
-    sdr = fit@estimates,
-    sdr_report = fit@estimates,
+    report = get_report(fit_age_length_comp),
+    estimates = get_estimates(fit_age_length_comp),
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
@@ -349,91 +260,70 @@ test_that("estimation test with age and length comp using wrappers", {
   )
 })
 
-test_that("estimation test with length comp using wrappers", {
-  # Load operating model data for the current iteration
-  iter_id <- 1
-  om_input <- om_input_list[[iter_id]]
-  om_output <- om_output_list[[iter_id]]
-  em_input <- em_input_list[[iter_id]]
+test_that("estimation test with age comp only using wrappers", {
+  # Load the test data from an RDS file containing the model fit
+  fit_agecomp <- readRDS(test_path("fixtures", "fit_agecomp.RDS"))
 
-  fims_data <- data1 |>
-    dplyr::filter(type != "age") |>
-    FIMS::FIMSFrame()
-
-  # Clear any previous FIMS settings
-  clear()
-
-  fleets <- list(
-    fleet1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    ),
-    survey1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Index = "DlnormDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    )
-  )
-
-  lengthcomp_parameters <- fims_data |>
-    create_default_parameters(
-      fleets = fleets,
-      recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution")
-      ),
-      growth = list(form = "EWAAgrowth"),
-      maturity = list(form = "LogisticMaturity")
-    )
-
-  modified_parameters <- list(
-    fleet1 = list(
-      Fleet.log_Fmort.value = log(om_output_list[[1]][["f"]])
-    ),
-    survey1 = list(
-      LogisticSelectivity.inflection_point.value = 1.5,
-      LogisticSelectivity.slope.value = 2,
-      Fleet.log_q.value = log(om_output_list[[1]][["survey_q"]][["survey1"]])
-    ),
-    recruitment = list(
-      BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[1]][["R0"]]),
-      BevertonHoltRecruitment.log_devs.value = om_input_list[[1]][["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimated = FALSE,
-      DnormDistribution.log_sd.value = om_input_list[[1]][["logR_sd"]]
-    ),
-    maturity = list(
-      LogisticMaturity.inflection_point.value = om_input_list[[1]][["A50.mat"]],
-      LogisticMaturity.inflection_point.estimated = FALSE,
-      LogisticMaturity.slope.value = om_input_list[[1]][["slope.mat"]],
-      LogisticMaturity.slope.estimated = FALSE
-    ),
-    population = list(
-      Population.log_init_naa.value = log(om_output_list[[1]][["N.age"]][1, ])
-    )
-  )
-
-  parameters <- lengthcomp_parameters |>
-    update_parameters(
-      modified_parameters = modified_parameters
-    )
-
-  parameter_list <- initialize_fims(
-    parameters = parameters,
-    data = fims_data
-  )
-  fit <- fit_fims(parameter_list, optimize = TRUE)
-
-  clear()
-
+  # Compare FIMS results with model comparison project OM values
   validate_fims(
-    report = fit@report,
-    sdr = fit@estimates,
-    sdr_report = fit@estimates,
+    report = get_report(fit_agecomp),
+    estimates = get_estimates(fit_agecomp),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+
+  # Load the test data from an RDS file containing the model fit
+  fit_agecomp_na <- readRDS(test_path("fixtures", "fit_agecomp_na.RDS"))
+
+  # Compare FIMS results with model comparison project OM values
+  validate_fims(
+    report = get_report(fit_agecomp_na),
+    estimates = get_estimates(fit_agecomp_na),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+})
+
+test_that("estimation test with length comp only using wrappers", {
+  # Load the test data from an RDS file containing the model fit
+  fit_lengthcomp <- readRDS(test_path("fixtures", "fit_lengthcomp.RDS"))
+
+  # Compare FIMS results with model comparison project OM values
+  validate_fims(
+    report = get_report(fit_lengthcomp),
+    estimates = get_estimates(fit_lengthcomp),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+
+  # Load the test data from an RDS file containing the model fit
+  fit_lengthcomp_na <- readRDS(test_path("fixtures", "fit_lengthcomp_na.RDS"))
+
+  # Compare FIMS results with model comparison project OM values
+  validate_fims(
+    report = get_report(fit_lengthcomp_na),
+    estimates = get_estimates(fit_lengthcomp_na),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+})
+
+test_that("estimation test with age and length comp with NAs", {
+  # Load the test data from an RDS file containing the model fit
+  fit_age_length_comp_na <- readRDS(test_path("fixtures", "fit_age_length_comp_na.RDS"))
+
+  # Compare FIMS results with model comparison project OM values
+  validate_fims(
+    report = get_report(fit_age_length_comp_na),
+    estimates = get_estimates(fit_age_length_comp_na),
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],

@@ -42,7 +42,15 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
     /* Create instance of map: key is id and value is pointer to
     RecruitmentInterfaceBase */
     RecruitmentInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
+  }
+
+  /**
+   * @brief Construct a new Recruitment Interface Base object
+   *
+   * @param other
+   */
+  RecruitmentInterfaceBase(const RecruitmentInterfaceBase& other) :
+  id(other.id) {
   }
 
   /**
@@ -92,24 +100,26 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Should the natural log of recruitment deviations be estimated? The
    * default is false.
    */
-  bool estimate_log_devs = false;
+  SharedBoolean estimate_log_devs = false;
   /**
    * @brief The estimate of the logit transformation of steepness.
    */
-  double estimated_logit_steep;
+  fims_double estimated_logit_steep;
   /**
    * @brief The estimate of the natural log of recruitment at unfished biomass.
    */
-  double estimated_log_rzero;
+  fims_double estimated_log_rzero;
   /**
    * @brief The estimates of the natural log of recruitment deviations.
    */
-  Rcpp::NumericVector estimated_log_devs;
+  RealVector estimated_log_devs;
 
   /**
    * @brief The constructor.
    */
-  BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
+  BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<BevertonHoltRecruitmentInterface>(*this));
+  }
 
   /**
    * @brief The destructor.
@@ -205,30 +215,30 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * json file.
    */ 
   virtual std::string to_json() {
-      std::stringstream ss;
+    std::stringstream ss;
 
-    ss << "\"module\" : {\n";
+    ss << "{\n";
     ss << " \"name\": \"recruitment\",\n";
     ss << " \"type\": \"Beverton--Holt\",\n";
     ss << " \"id\": " << this->id << ",\n";
 
-    ss << " \"parameter\": {\n";
+    ss << " \"parameters\": [\n{\n";
     ss << "  \"name\": \"logit_steep\",\n";
     ss << "  \"id\":" << this->logit_steep.id_m << ",\n";
     ss << "  \"type\": \"vector\",\n";
-    ss << "  \"values\":" << this->logit_steep << ",\n},\n";
+    ss << "  \"values\":" << this->logit_steep << "\n},\n";
 
-    ss << " \"parameter\": {\n";
+    ss << "{\n";
     ss << "   \"name\": \"log_rzero\",\n";
     ss << "   \"id\":" << this->log_rzero.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->log_rzero << ",\n },\n";
+    ss << "   \"values\":" << this->log_rzero << "\n },\n";
 
-    ss << " \"parameter\": {\n";
+    ss << "{\n";
     ss << "   \"name\": \"log_devs\",\n";
     ss << "   \"id\":" << this->log_devs.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->log_devs << ",\n },\n";
+    ss << "   \"values\":" << this->log_devs << "\n }]\n}";
 
     return ss.str();
   }
@@ -237,6 +247,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
+        
+    FIMS_INFO_LOG("Adding Beverton--Holt model "+fims::to_string(this->id)+" to Information object.");
+    
     std::shared_ptr<fims_info::Information<Type> > info =
       fims_info::Information<Type>::GetInstance();
 

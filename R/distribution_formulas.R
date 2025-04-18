@@ -254,13 +254,12 @@ get_expected_name <- function(family, data_type) {
 #' )
 #' }
 initialize_data_distribution <- function(
-  module,
-  family,
-  sd = list(value = 1, estimated = FALSE),
-  # FIXME: Move this argument to second to match where par is in
-  # initialize_process_distribution
-  data_type = c("index", "agecomp", "lengthcomp")
-) {
+    module,
+    family,
+    sd = list(value = 1, estimated = FALSE),
+    # FIXME: Move this argument to second to match where par is in
+    # initialize_process_distribution
+    data_type = c("index", "agecomp", "lengthcomp")) {
   data_type <- rlang::arg_match(data_type)
   # FIXME: Make the available families a data object
   # Could also make the matrix of distributions available per type as a
@@ -284,11 +283,15 @@ initialize_data_distribution <- function(
     new_module <- methods::new(DlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_sd <- methods::new(
-      ParameterVector,
-      log(sd[["value"]]),
-      length(sd[["value"]])
+    # Using resize() and then assigning value to each element of log_sd diretly
+    # is correct, as creating a new ParameterVector for log_sd here would
+    # trigger an error in integration tests with wrappers.
+    new_module$log_sd$resize(length(sd[["value"]]))
+    purrr::walk(
+      seq_along(sd[["value"]]),
+      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
     )
+
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
       new_module$log_sd$set_all_estimable(sd[["estimated"]])
@@ -347,12 +350,11 @@ initialize_data_distribution <- function(
 #' @keywords distribution
 #' @export
 initialize_process_distribution <- function(
-  module,
-  par,
-  family,
-  sd = list(value = 1, estimated = FALSE),
-  is_random_effect = FALSE
-) {
+    module,
+    par,
+    family,
+    sd = list(value = 1, estimated = FALSE),
+    is_random_effect = FALSE) {
   # validity check on user input
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
@@ -363,11 +365,12 @@ initialize_process_distribution <- function(
     new_module <- methods::new(DlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_sd <- methods::new(
-      ParameterVector,
-      log(sd[["value"]]),
-      length(sd[["value"]])
+    new_module$log_sd$resize(length(sd[["value"]]))
+    purrr::walk(
+      seq_along(sd[["value"]]),
+      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
     )
+
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
       new_module$log_sd$set_all_estimable(sd[["estimated"]])

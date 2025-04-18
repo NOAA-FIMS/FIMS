@@ -1,7 +1,7 @@
 # Load test data for integration testing
 # The test data is stored as an RData file in the tests/testthat/fixtures folder,
 # which contains 100 sets of simulated data using {ASSAMC} from
-# https://github.com/Bai-Li-NOAA/Age_Structured_Stock_Assessment_Model_Comparison.
+# https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison.
 load(test_path("fixtures", "integration_test_data.RData"))
 
 # Initialize the iteration identifier and run FIMS with the 1st set of OM values
@@ -210,38 +210,39 @@ test_that("nll test of fims", {
   age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
 
   # length comp likelihoods
-  # TODO: the commented-out code below is not working yet
-  # fishing_lengthcomp_observed <- em_input_list[[iter_id]][["L.length.obs"]][["fleet1"]]
-  # fishing_lengthcomp_expected <- om_output_list[[iter_id]][["L.length"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.length"]][["fleet1"]])
-  # survey_lengthcomp_observed <- em_input_list[[iter_id]][["survey.length.obs"]][["survey1"]]
-  # survey_lengthcomp_expected <- om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]])
-  # lengthcomp_nll_fleet <- lengthcomp_nll_survey <- 0
-  # for (y in 1:om_input_list[[iter_id]][["nyr"]]) {
-  #   lengthcomp_nll_fleet <- lengthcomp_nll_fleet -
-  #     dmultinom(
-  #       fishing_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.L.lengthcomp"]][["fleet1"]], em_input_list[[iter_id]][["n.L.lengthcomp"]][["fleet1"]],
-  #       fishing_lengthcomp_expected[y, ], TRUE
-  #     )
-  #
-  #   lengthcomp_nll_survey <- lengthcomp_nll_survey -
-  #     dmultinom(
-  #       survey_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.survey.lengthcomp"]][["survey1"]], em_input_list[[iter_id]][["n.survey.lengthcomp"]][["survey1"]],
-  #       survey_lengthcomp_expected[y, ], TRUE
-  #     )
-  # }
-  # lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
-  #
-  # expected_jnll <- rec_nll + index_nll + age_comp_nll + lengthcomp_nll
+  fishing_lengthcomp_observed <- em_input_list[[iter_id]][["L.length.obs"]][["fleet1"]]
+  fishing_lengthcomp_expected <- om_output_list[[iter_id]][["L.length"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.length"]][["fleet1"]])
+  survey_lengthcomp_observed <- em_input_list[[iter_id]][["survey.length.obs"]][["survey1"]]
+  survey_lengthcomp_expected <- om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_length_comp"]][["survey1"]])
+  lengthcomp_nll_fleet <- lengthcomp_nll_survey <- 0
+  for (y in 1:om_input_list[[iter_id]][["nyr"]]) {
+    # test using FIMS_dmultinom which matches the TMB dmultinom calculation and differs from R
+    # by NOT rounding obs to the nearest integer.
+    lengthcomp_nll_fleet <- lengthcomp_nll_fleet -
+      FIMS_dmultinom(
+        fishing_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.L.lengthcomp"]][["fleet1"]],
+        fishing_lengthcomp_expected[y, ]
+      )
+
+    lengthcomp_nll_survey <- lengthcomp_nll_survey -
+      FIMS_dmultinom(
+        survey_lengthcomp_observed[y, ] * em_input_list[[iter_id]][["n.survey.lengthcomp"]][["survey1"]],
+        survey_lengthcomp_expected[y, ]
+      )
+  }
+  lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
+
+  expected_jnll <- rec_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
 
   expect_equal(report[["nll_components"]][1], rec_nll)
   expect_equal(report[["nll_components"]][2], index_nll_fleet)
   expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
-  # expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
+  expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
   expect_equal(report[["nll_components"]][5], index_nll_survey)
   expect_equal(report[["nll_components"]][6], age_comp_nll_survey)
-  # expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
-  # expect_equal(report[["jnll"]], expected_jnll)
+  expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
+  expect_equal(report[["jnll"]], expected_jnll)
 })
 
 test_that("estimation test of fims", {
@@ -256,8 +257,7 @@ test_that("estimation test of fims", {
   # Compare FIMS results with model comparison project OM values
   validate_fims(
     report = result[["report"]],
-    sdr = result[["sdr"]],
-    sdr_report = result[["sdr_report"]],
+    estimates = result[["sdr_report"]],
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
@@ -320,8 +320,7 @@ test_that("agecomp in proportion works", {
   # Compare FIMS results with model comparison project OM values
   validate_fims(
     report = result[["report"]],
-    sdr = TMB::sdreport(result[["obj"]]),
-    sdr_report = result[["sdr_report"]],
+    estimates = result[["sdr_report"]],
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]

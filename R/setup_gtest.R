@@ -20,8 +20,8 @@ setup_gtest <- function() {
       # temporarily use a scenario from the model comparison project that is
       # not deterministic
       github_dir <- paste0(
-        "https://github.com/Bai-Li-NOAA/",
-        "Age_Structured_Stock_Assessment_Model_Comparison/raw/master/",
+        "https://github.com/NOAA-FIMS/",
+        "Age_Structured_Stock_Assessment_Model_Comparison/raw/main/",
         "FIMS_integration_test_data/FIMS_C",
         c_case,
         "/output/OM/"

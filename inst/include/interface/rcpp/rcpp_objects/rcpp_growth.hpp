@@ -41,8 +41,15 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
     /* Create instance of map: key is id and value is pointer to
     GrowthInterfaceBase */
     GrowthInterfaceBase::live_objects[this->id] = this;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(this);
   }
+
+  /**
+   * @brief Construct a new Growth Interface Base object
+   *
+   * @param other
+   */
+  GrowthInterfaceBase(const GrowthInterfaceBase& other) :
+  id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -76,16 +83,16 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   /**
    * @brief Weights (mt) for each age class.
    */
-  std::vector<double> weights;
+  RealVector weights;
   /**
    * @brief Ages (years) for each age class.
    */
-  std::vector<double> ages;
+  RealVector ages;
   /**
    * @brief A map of empirical weight-at-age values. TODO: describe this
    * parameter better.
    */
-  std::map<double, double> ewaa;
+  std::shared_ptr<std::map<double, double> > ewaa;
   /**
    * @brief Have weight and age vectors been set? The default is false.
    */
@@ -94,7 +101,18 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   /**
    * @brief The constructor.
    */
-  EWAAGrowthInterface() : GrowthInterfaceBase() {}
+  EWAAGrowthInterface() : GrowthInterfaceBase() {
+    this->ewaa = std::make_shared< std::map<double, double> > ();
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<EWAAGrowthInterface>(*this));
+  }
+
+  /**
+   * @brief Construct a new EWAAGrowthInterface object
+   *
+   * @param other
+   */
+  EWAAGrowthInterface(const EWAAGrowthInterface& other) :
+  GrowthInterfaceBase(other), weights(other.weights), ages(other.ages), ewaa(other.ewaa), initialized(other.initialized) {}
 
   /**
    * @brief The destructor.
@@ -113,8 +131,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @param ages Type vector of ages.
    * @return std::map<T, T>.
    */
-  inline std::map<double, double> make_map(std::vector<double> ages,
-                                           std::vector<double> weights) {
+  inline std::map<double, double> make_map(RealVector ages,
+    RealVector weights) {
     std::map<double, double> mymap;
     for (uint32_t i = 0; i < ages.size(); i++) {
       mymap.insert(std::pair<double, double>(ages[i], weights[i]));
@@ -131,16 +149,15 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     fims_popdy::EWAAgrowth<double> EWAAGrowth;
 
     if (initialized == false) {
-      this->ewaa = make_map(this->ages, this->weights);
       // Check that ages and weights vector are the same length
       if (this->ages.size() != this->weights.size()) {
         Rcpp::stop("ages and weights must be the same length");
       }
+      EWAAGrowth.ewaa = make_map(this->ages, this->weights);
       initialized = true;
     } else {
       Rcpp::stop("this empirical weight at age object is already initialized");
     }
-    EWAAGrowth.ewaa = this->ewaa;
     return EWAAGrowth.evaluate(age);
   }
   
@@ -153,7 +170,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    */ 
   virtual std::string to_json() {
     std::stringstream ss;
-    ss << "\"module\" : {\n";
+    ss << "{\n";
     ss << " \"name\": \"growth\",\n";
     ss << " \"type\" : \"EWAA\",\n";
     ss << " \"id\":" << this->id << ",\n";
