@@ -51,6 +51,7 @@ namespace fims_distributions
             // setup vector for recording the log probability density function values
             Type lpdf = static_cast<Type>(0.0); /**< total log probability mass contribution of the distribution */
             this->lpdf_vec.resize(dims[0]);
+            this->report_lpdf_vec.clear();
             std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
 
             //Dimension checks
@@ -89,29 +90,32 @@ namespace fims_distributions
                 for (size_t j = 0; j < dims[1]; j++){
                     if(this->input_type == "data"){
                         // if data, check if there are any NA values and skip lpdf calculation for entire row if there are
-                        if (this->observed_values->at(i, j) ==
+                        if (this->get_observed(i, j) ==
                                 this->observed_values->na_value) {
                             containsNA = true;
                             break;
                         }
-                        if(!containsNA){
+                        if (!containsNA){
                             size_t idx = (i * dims[1]) + j;
-                            x_vector[j] = this->observed_values->at(i, j);
-                            prob_vector[j] = this->expected_values[idx];
+                            x_vector[j] = this->get_observed(i,j);
+                            prob_vector[j] = this->get_expected(idx);
                         }
                     } else {
                         // if not data (i.e. prior or process), use x vector instead of observed_values
                         size_t idx = (i * dims[1]) + j;
-                        x_vector[j] = this->x[idx];
-                        prob_vector[j] = this->expected_values[idx];
+                        x_vector[j] = this->get_observed(idx);
+                        prob_vector[j] = this->get_expected(idx);
                     }
                 }
 
                 if(!containsNA){
                     this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>) prob_vector, true);
+
                 } else {
                     this->lpdf_vec[i] = 0;
                 }
+                // track the values for output, e.g., report_lpdf_vec
+                this->report_lpdf_vec.insert(this->report_lpdf_vec.end(), dims[1], this->lpdf_vec[i]);
                 lpdf += this->lpdf_vec[i];
                 /*
                 if (this->simulate_flag)

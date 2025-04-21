@@ -16,6 +16,8 @@
 \alias{get_sdreport,FIMSFit-method}
 \alias{get_estimates}
 \alias{get_estimates,FIMSFit-method}
+\alias{get_fits}
+\alias{get_fits,FIMSFit-method}
 \alias{get_number_of_parameters}
 \alias{get_number_of_parameters,FIMSFit-method}
 \alias{get_timing}
@@ -52,6 +54,10 @@ get_estimates(x)
 
 \S4method{get_estimates}{FIMSFit}(x)
 
+get_fits(x)
+
+\S4method{get_fits}{FIMSFit}(x)
+
 get_number_of_parameters(x)
 
 \S4method{get_number_of_parameters}{FIMSFit}(x)
@@ -85,6 +91,9 @@ model.
 \code{\link[=get_sdreport]{get_sdreport()}} returns the list from \code{\link[TMB:sdreport]{TMB::sdreport()}}.
 
 \code{\link[=get_estimates]{get_estimates()}} returns a tibble of parameter values and their
+uncertainties from a fitted model.
+
+\code{\link[=get_fits]{get_fits()}} returns a tibble of parameter values and their
 uncertainties from a fitted model.
 
 \code{\link[=get_number_of_parameters]{get_number_of_parameters()}} returns a vector of integers specifying the

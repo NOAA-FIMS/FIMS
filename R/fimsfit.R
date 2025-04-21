@@ -45,6 +45,7 @@ methods::setClass(
     report = "list",
     sdreport = "sdreportOrList",
     estimates = "tbl_df",
+    fits = "tbl_df",
     number_of_parameters = "integer",
     timing = "difftime",
     version = "package_version"
@@ -187,6 +188,17 @@ methods::setGeneric("get_estimates", function(x) standardGeneric("get_estimates"
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
 methods::setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
+
+#' @return
+#' [get_fits()] returns a tibble of parameter values and their
+#' uncertainties from a fitted model.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_fits", function(x) standardGeneric("get_fits"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_fits", "FIMSFit", function(x) x@fits)
 
 #' @return
 #' [get_number_of_parameters()] returns a vector of integers specifying the
@@ -352,6 +364,30 @@ FIMSFit <- function(
     sdreport = list(),
     timing = c("time_total" = as.difftime(0, units = "secs")),
     version = utils::packageVersion("FIMS")) {
+  # What we aspire the 'fits' table to look like
+  fits_outline <- dplyr::tibble(
+    module_name = character(),
+    module_id = integer(),
+    label = character(), # equiv. to 'type' in data input table (e.g., landings, index, age, length)
+    data_id = integer(),
+    fleet_name = character(), # equiv. to 'name' in data input table (e.g., fleet1, survey1)
+    unit = character(),
+    uncertainty = numeric(),
+    age = integer(),
+    length = integer(),
+    datestart = as.Date(character()),
+    dateend = as.Date(character()),
+    year = integer(), # year of model run
+    init = numeric(), # equiv. to 'value' in data input table
+    expected = numeric(),
+    log_like = numeric(),
+    distribution = character(),
+    re_estimated = logical(),
+    log_like_cv = numeric(),
+    weight = numeric()
+  )
+  rm(fits_outline)
+
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
@@ -514,6 +550,69 @@ FIMSFit <- function(
       )
     )
 
+  # Create fits tibble
+  # TO DO
+  # 1. Develop better method to provide 'module_name'/'module_id'/'label'
+  # for 'init', 'expected', 'distribution'
+  # 2. Find generalizable way to standardize 'init' and 'expected' units
+  # for distribution %in% c("Dlnorm", "Dmultinom")
+  # 3. Double-check string for 'random_effects' IF statemenet
+  # 4. Develop means to provide missing metadata for desired columns
+
+  # Obtain 'init' values for data inputs reported in JSON file, using 'values'
+  # Necessary to obtain 'label' values (e.g., "Index", "AgeComp", etc.)
+  data_init_res <- reshape_json_values(finalized_fims) |>
+    dplyr::filter(module_name == "data") |> # remove EWAA
+    dplyr::rename(
+      init_values = value,
+      label = module_type,
+      module_id_init = module_id
+    ) |>
+    dplyr::arrange(module_id_init) # ensure this aligns with 'data_fits_res'
+
+  # Obtain 'log_like', 'distribution', 'init', and 'expected'
+  data_fits_res <- reshape_json_fits(finalized_fims) |>
+    dplyr::select(-module_name) |>
+    dplyr::rename(distribution = module_type) |>
+    # manually standardize distribution names
+    dplyr::mutate(
+      distribution = dplyr::case_when(
+        distribution == "log_normal" ~ "Dlnorm",
+        .default = distribution
+      )
+    ) |>
+    # remove likelihoods not affiliated with data (e.g., recruitment)
+    dplyr::filter(module_id %in% unique(data_init_res$module_id_init)) |>
+    # ensure module_id order aligns with 'data_init_res'
+    dplyr::arrange(module_id) |>
+    # assign T/F to 're_estimated' based on estimation_type == "random_effects"
+    dplyr::mutate(re_estimated = any(json_estimates$estimation_type == "random_effects"))
+
+  # Join, format data into final 'fits' tibble
+  fits <- data_init_res |>
+    cbind(data_fits_res) |> # Consider test to ensure 'init_values' = 'init'
+    # Provide blank fields for currently missing values
+    dplyr::mutate(
+      data_id = as.integer(NA), # not available from JSON output
+      fleet_name = as.character(NA), # not available from JSON output
+      unit = as.character(NA), # not available from JSON output
+      uncertainty = as.numeric(NA), # not available from JSON output
+      age = as.integer(NA), # not available from JSON output
+      length = as.integer(NA), # not available from JSON output
+      datestart = as.character(NA), # not available from JSON output
+      dateend = as.character(NA), # not available from JSON output
+      year = as.integer(NA), # not available from JSON output
+      log_like_cv = as.numeric(NA), # future feature
+      weight = 1.0 # future feature; fixed at 1.0 for time being
+    ) |>
+    dplyr::select(
+      "module_name", "module_id", "label", "data_id", "fleet_name",
+      "unit", "uncertainty", "age", "length", "datestart",
+      "dateend", "year", "init", "expected", "log_like",
+      "distribution", "re_estimated", "log_like_cv", "weight"
+    ) |>
+    tibble::as_tibble()
+
   fit <- methods::new(
     "FIMSFit",
     input = input,
@@ -523,6 +622,7 @@ FIMSFit <- function(
     report = report,
     sdreport = sdreport,
     estimates = estimates,
+    fits = fits,
     number_of_parameters = number_of_parameters,
     timing = timing,
     version = version
