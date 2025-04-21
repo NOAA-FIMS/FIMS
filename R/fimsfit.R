@@ -45,6 +45,7 @@ methods::setClass(
     report = "list",
     sdreport = "sdreportOrList",
     estimates = "tbl_df",
+    fits = "tbl_df",
     number_of_parameters = "integer",
     timing = "difftime",
     version = "package_version"
@@ -353,6 +354,24 @@ FIMSFit <- function(
     timing = c("time_total" = as.difftime(0, units = "secs")),
     version = utils::packageVersion("FIMS")) {
 
+  # What we aspire the 'fits' table to look like
+  fits_outline <- dplyr::tibble(
+    type = character(),
+    name = character(),
+    value = numeric(),
+    unit = character(),
+    uncertainty = numeric(),
+    age = integer(),
+    length = integer(),
+    datastart = as.Date(character()),
+    dataend = as.Date(character()),
+    expected = numeric(),
+    likelihood = numeric(),
+    weight = numeric(),
+    distribution = character()
+  )
+  rm(fits_outline)
+
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
@@ -511,6 +530,39 @@ FIMSFit <- function(
         estimate.y)
     ) 
 
+    # Create 'fits' tibble
+    # OVERALL TO DO
+      # 1. Identify way to extract following values from JSON output:
+        # data inputs (tibble?)
+        # 'weight' values corresponding to data
+        # 'distribution' values corresponding to data
+      # 2. If necessary, find ways to obtain data inputs that aren't estimated/used in model likelihood
+        # e.g., weight-at-age, age-to-length-conversion
+      # 3. Identify method to connect model outputs to data inputs using appropriate fields/mapping
+    # Extract, set-up data tibble, for later appending 'expected', 'likelihood', 'weight', and 'distribution' values
+    # Obtain 'expected' values for data inputs affecting likelihood ('landings', 'index', 'age', 'length')
+      # TO DO:
+        # Generalize code to automatically ID and extract 'expected' values for only relevant data
+        # Link outputs to data inputs
+  data_res <- json_derived_quantities |>
+    dplyr::filter(label %in% c("PCNAA", "PCNAL", "ExpectedIndex")) |> # *generalize*
+    dplyr::rename(expected = estimate) |>
+    dplyr::mutate(type = dplyr::case_when(
+      label == "PCNAA" ~ "age",
+      label == "PCNAL" ~ "length",
+      label == "ExpectedIndex" & module_id == 1 ~ "landings",
+      label == "ExpectedIndex" & module_id == 2 ~ "index"
+    ))
+    # (IF NECESSARY) Obtain 'expected values' for fixed inputs
+    # Obtain likelihood values for input data
+      # TO DO:
+        # Generalize reshape_json_likelihoods() to ID and pull all data-based values
+        # Connect these outputs to data inputs
+  json_likelihoods <- reshape_json_likelihoods(finalized_fims)
+    # Obtain, append 'weight' values
+    # Obtain, append 'distribution' values
+    # Combine all datasets, create final 'fits' table
+
   fit <- methods::new(
     "FIMSFit",
     input = input,
@@ -520,6 +572,7 @@ FIMSFit <- function(
     report = report,
     sdreport = sdreport,
     estimates = estimates,
+    fits = fits,
     number_of_parameters = number_of_parameters,
     timing = timing,
     version = version
