@@ -53,6 +53,25 @@ struct DistributionElementObject {
   }
 
   /**
+   * Retrieve element from observed data set, random effect, or prior.
+   * @param i index referencing row
+   * @param j index referencing column
+   * @return the reference to the row and column at position i, j
+   */
+  inline Type& get_observed(size_t i, size_t j){
+     if(this->input_type == "data"){
+      return observed_values->at(i,j);
+    }
+    if(this->input_type == "random_effects"){
+      return (*re)[i,j];
+    }
+    if(this->input_type == "prior"){
+      return (*(priors[i,j]))[0];
+    }
+    return x[i];
+  }
+
+  /**
    * Retrieve expected element given data, random effect, or prior.
    * @param i index referencing vector or pointer
    * @return the reference to the value of the vector or pointer at position i
@@ -98,6 +117,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type>, public
  static uint32_t id_g; /**< global unique identifier for distribution modules */
  int observed_data_id_m = -999; /*!< id of observed data component*/
  fims::Vector<Type> lpdf_vec; /**< vector to record observation level negative log-likelihood values */
+ fims::Vector<Type> report_lpdf_vec; /**< vector to record observation level negative log-likelihood values */
  bool osa_flag = false; /**< Boolean; if true, osa residuals are calculated */
  bool simulate_flag = false; /**< Boolean; if true, data are simulated from the distribution */
  std::vector<uint32_t> key; /**< unique id for variable map that points to a fims::Vector */

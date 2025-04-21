@@ -33,6 +33,7 @@ cli
 cmake
 codebase
 cov
+cv
 cyclomatic
 dateend
 datestart

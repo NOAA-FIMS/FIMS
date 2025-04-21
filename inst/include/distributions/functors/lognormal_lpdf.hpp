@@ -45,7 +45,9 @@ namespace fims_distributions
           size_t n_x = this->get_n_x();
           // setup vector for recording the log probability density function values
           this->lpdf_vec.resize(n_x);
+          this->report_lpdf_vec.resize(n_x);
           std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
+          std::fill(this->report_lpdf_vec.begin(), this->report_lpdf_vec.end(), 0);
           lpdf = static_cast<Type>(0);
 
           // Dimension checks
@@ -78,7 +80,7 @@ namespace fims_distributions
               this->lpdf_vec[i] = dnorm(log(this->x[i]), this->expected_values.get_force_scalar(i),
                                         fims_math::exp(log_sd.get_force_scalar(i)), true);
             }
-
+            this->report_lpdf_vec[i] = this->lpdf_vec[i];
             lpdf += this->lpdf_vec[i];
             if (this->simulate_flag)
             {
