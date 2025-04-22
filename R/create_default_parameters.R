@@ -51,8 +51,7 @@
 #' default_parameters <- fims_frame |>
 #'   create_default_parameters(
 #'     fleets = list(fleet1 = fleet1, survey1 = survey1),
-#'     recruitment = list(
-#'       form = "BevertonHoltRecruitment"),
+#'     recruitment = list(form = "BevertonHoltRecruitment"),
 #'     growth = list(form = "EWAAgrowth"),
 #'     maturity = list(form = "LogisticMaturity")
 #'   )
@@ -92,10 +91,15 @@
 create_default_parameters <- function(
     data,
     fleets,
-    recruitment = list(form = "BevertonHoltRecruitment"),
-    # TODO: Rename EWAAgrowth to not use an acronym
-    growth = list(form = "EWAAgrowth"),
-    maturity = list(form = "LogisticMaturity")) {
+    populations = list(
+      population1 = list(
+        recruitment = list(form = "BevertonHoltRecruitment"),
+        # TODO: Rename EWAAgrowth to not use an acronym
+        growth = list(form = "EWAAgrowth"),
+        maturity = list(form = "LogisticMaturity")) 
+    )
+)
+{
   # FIXME: use default values if there are no fleets info passed into the
   # function or a fleet is not present but it has data? Maybe we don't want the
   # latter because it could be that we want to drop a fleet from a model but we
@@ -118,16 +122,14 @@ create_default_parameters <- function(
   # Create module list
   module_list <- list(
     fleets = fleets,
-    recruitment = recruitment,
-    growth = growth,
-    maturity = maturity
+    populations = populations
   )
 
   # Create fleet parameters
-  fleet_temp <- list()
+  fleets_temp <- list()
   for (i in 1:length(fleets)) {
-    fleet_temp <- c(
-      fleet_temp,
+    fleets_temp <- c(
+      fleets_temp,
       create_default_fleet(
         fleets = fleets,
         fleet_name = names(fleets)[i],
@@ -136,83 +138,156 @@ create_default_parameters <- function(
     )
   }
 
-  # Create recruitment parameters
-  recruitment_temp <- create_default_recruitment(
-    recruitment = recruitment,
-    data = data,
-    input_type = recruitment[["form"]]
-  )
+  populations_temp <- list()
+  for(i in 1:length(populations)){
 
-  # Create maturity parameters
-  maturity_temp <- create_default_maturity(form = maturity$form)
+    # Create recruitment parameters
+     recruitment_temp <- create_default_recruitment(
+      recruitment = populations[[i]][["recruitment"]],
+      data = data,
+      input_type = populations[[i]][["recruitment"]][["form"]]
+    )
 
-  # Create population parameters
-  # Handle population parameters based on recruitment form
-  if (recruitment[["form"]] == "BevertonHoltRecruitment") {
-    log_rzero <- recruitment_temp[["recruitment"]][[
-      paste0(recruitment[["form"]], ".log_rzero.value")
-    ]]
+    # Create maturity parameters
+    maturity_temp <- create_default_maturity(
+      form = populations[[i]][["maturity"]][["form"]]
+    )
+
+    # Create population parameters
+    # Handle population parameters based on recruitment form
+    if (populations[[i]][["recruitment"]][["form"]] == "BevertonHoltRecruitment") {
+      log_rzero <- recruitment_temp[["population1"]][["recruitment"]][[
+        paste0(populations[[i]][["recruitment"]][["form"]], ".log_rzero.value")
+      ]]
+    }
+    population_temp <- create_default_Population(data, log_rzero)
+
+    populations_temp <- c(
+      populations_temp,
+      recruitment_temp,
+      maturity_temp,
+      population_temp
+    )
   }
-  population_temp <- create_default_Population(data, log_rzero)
 
   # Compile output
   output <- list(
     parameters = c(
-      fleet_temp,
-      recruitment_temp,
-      maturity_temp,
-      population_temp
-    ),
+      fleets_temp,
+      populations_temp),
     modules = module_list
   )
   return(output)
 }
 
 
-#' Create a FIMS model object
-#' 
-#' @description This function creates a model object used to 
-#' store the model formula, family, and random effects boolean of a process.
-#' 
-#' @param formula A formula object specifying the model formula.
-#' @param family A family object specifying the distribution of the model.
-#' @param random A logical value specifying whether the model has random effects.
-#' 
-#' @return A list representing the model object.
+
+#' @ Create a process model object
+#'
+#' @description This function creates a process model object used to store the
+#' model parameters, type, method, log standard deviation, initial values, and
+#' mapping.
+#'
+#' @param par A character string specifying the parameter name.
+#' @param type A character string specifying the type of process model. Options are:
+#' - iid: univariate normal distribution
+#' - AR1: first-order autoregressive process - not implemented yet
+#' - AR2: second-order autoregressive process - not implemented yet
+#' - RW: a random walk process - not implemented yet
+#' @param method A character string specifying the method used for the process
+#'   model. Options are: 
+#' - Fixed Effect: fixed effects estimation
+#' - Penalized MLE: penalized maximum likelihood estimation
+#' - Random Effect ConstVar: random effects with constant variance
+#' - Random Effect Full: random effects with estimated variance
+#' @param log_sd A numeric value specifying the log standard deviation.
+#' @param init A numeric value specifying the initial value for the process
+#'   model.
+#' @param map A list specifying the mapping for the process model.
+#' @return A list representing the process model object.
 #' @export
-#' @examples 
-#'  create_default_parameters(
-#'   fleets = list(fleet1 = fleet1, survey1 = survey1),
-#'     recruitment = list(
-#'       form = "BevertonHoltRecruitment",
-#'       process = model(~log_devs, family = gaussian(link = "log"), random = FALSE)
-#'      )
-#'    )
-model <- function(formula, family, random = FALSE) {
+#' @example
+#'  process_model(
+#'   par = "log_devs",
+#'   type = "iid",
+#'   method = "Random Effect ConstVar",
+#'   sd = .01,  
+#'   init = NULL)  
+process_model <- function(
+  par, 
+  type = c("iid"), 
+  method = c("Fixed Effect", "Penalized MLE", "Random Effect ConstVar", 
+             "Random Effect Full"), 
+  sd = NULL, 
+  init = NULL, 
+  map = list()){
+  
+  type <- rlang::arg_match(type)
+  method <- rlang::arg_match(method)
+
   # Validate inputs
-  if (!inherits(formula, "formula")) {
-    stop("The 'formula' argument must be a valid formula.")
+   if (!is.character(par)) {
+    cli::cli_abort(c(
+      "i" = "{.var par} needs to be a character representing a parameter in the FIMS model.",
+      "x" = "{.var par} is type {typeof(par)}."
+    ))
+  }
+  if (!is.null(sd) && !is.numeric(sd)) {
+    cli::cli_abort(c(
+      "i" = "{.var sd} needs to be a numeric value.",
+      "x" = "{.var sd} is type {typeof(sd)}."
+    ))
+  }
+  if (!is.null(init) && !is.numeric(init)) {
+    cli::cli_abort(c(
+      "i" = "{.var init} needs to be a numeric value.",
+      "x" = "{.var init} is type {typeof(init)}."
+    ))
+  }
+  if (!is.list(map)) {
+    cli::cli_abort(c(
+      "i" = "{.var map} needs to be a list.",
+      "x" = "{.var map} is type {typeof(map)}."
+    ))
+  }
+  if (method == "Fixed Effect" && !is.null(sd)) {
+    cli::cli_abort(c(
+      "i" = "{.var sd} should not be specified when method is set to {.var Fixed Effect}.",
+      "i" = "The Fixed Effect method does not apply a distribution to the process and does not estimate sd.",
+      "i" = "If you want to use a distribution, please set method to {.var Penalized MLE}, {.var Random Effect ConstVar}, or {.var Random Effect Full}.",
+      "x" = "{.var sd} is {sd}}."
+    ))
+  }
+  
+  if (method == "Penalized MLE" && is.null(sd)) {
+    cli::cli_abort(c(
+      "i" = "{.var sd} needs to be specified when method is set to {.var Penalized MLE}.",
+      "x" = "{.var sd} is NULL."
+    ))
   }
 
-  if (!inherits(family, "family")) {
-    stop("The 'family' argument must be a valid family object (e.g., gaussian()).")
+  if (method == "Random Effects ConstVar" && is.null(log_sd)) {
+    cli::cli_abort(c(
+      "i" = "{.var sd} needs to be specified when method is set to {.var Random Effects ConstVar}.",
+      "x" = "{.var sd} is NULL."
+    ))
   }
 
-  if (!is.logical(random)) {
-    stop("The 'random' argument must be a logical value (TRUE or FALSE).")
-  }
-
-  # Create a list to represent the model
-  model_object <- list(
-    formula = formula,
-    family = family,
-    random = random
+  
+  # Create a list to represent the process model
+  process_model_object <- list(
+    par = par,
+    type = type,
+    method = method,
+    sd = sd,
+    init = init,
+    map = map
   )
-
-  # Assign a class to the model object for future extensions
-  class(model_object) <- "FIMSModel"
-
-  return(model_object)
+  
+  # Assign a class to the process model object for future extensions
+  class(process_model_object) <- "FIMSProcessModel"
+  
+  return(process_model_object)
 }
 
 #' Create default population parameters
@@ -255,19 +330,20 @@ create_default_Population <- function(data, log_rzero) {
   init_naa[n_ages] <- init_naa[n_ages] / M_value # sum of infinite series
 
   # Create a list of default parameters
-  default <- list(
+  form_default <- list(
     log_M.value = rep(log(M_value), n_years * n_ages),
-    log_M.estimated = FALSE,
+    log_M.estimatation_type = "constant",
     log_init_naa.value = log(init_naa),
-    log_init_naa.estimated = TRUE
+    log_init_naa.estimatation_type = "fixed_effects"
   )
 
   # Name the list elements
-  names(default) <- paste0("Population.", names(default))
-  # Wrap the default parameters in a population list for output
-  population_list <- list(default)
-  names(population_list) <- "population"
-  return(population_list)
+  names(form_default) <- paste0("Population.", names(form_default))
+  # Wrap the default parameters in a population1 list for output
+  default <- list(list("population" = form_default))
+  names(default) <- "population1"
+
+  return(default)
 }
 
 #' Create default logistic parameters
@@ -282,9 +358,9 @@ create_default_Population <- function(data, log_rzero) {
 create_default_Logistic <- function() {
   default <- list(
     inflection_point.value = 2,
-    inflection_point.estimated = TRUE,
+    inflection_point.estimation_type = "fixed_effects",
     slope.value = 1,
-    slope.estimated = TRUE
+    slope.estimation_type = "fixed_effects"
   )
   return(default)
 }
@@ -334,12 +410,13 @@ create_default_selectivity <- function(
   # NOTE: All new forms of selectivity must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
-  default <- switch(form,
+  form_default <- switch(form,
     "LogisticSelectivity" = create_default_Logistic(),
     "DoubleLogisticSelectivity" = create_default_DoubleLogistic()
   )
-  names(default) <- paste0(form, ".", names(default))
-
+  names(form_default) <- paste0(form, ".", names(form_default))
+  default <- list(form_default)
+  names(default) <- "selectivity"
   return(default)
 }
 
@@ -392,19 +469,21 @@ create_default_fleet <- function(fleets,
 
   # Determine default fleet parameters based on types of data present
   # FIXME: allow for a fleet to have both landings and index data
-  process_default <- if ("landings" %in% data_types_present) {
+  form_default <- if ("landings" %in% data_types_present) {
     list(
       log_Fmort.value = log(rep(0.00001, get_n_years(data))),
-      log_Fmort.estimated = TRUE
+      log_Fmort.estimation_type = "fixed_effects"
     )
   } else {
     list(
       log_q.value = 0,
-      log_q.estimated = TRUE
+      log_q.estimation_type = "fixed_effects"
     )
   }
 
-  names(process_default) <- paste0("Fleet.", names(process_default))
+  names(form_default) <- paste0("Fleet.", names(form_default))
+  fleet_default = list(form_default)
+  names(fleet_default) <- "fleet"
 
   # Create index distribution defaults
   index_distribution <- fleets[[fleet_name]][["data_distribution"]]["Index"]
@@ -432,11 +511,12 @@ create_default_fleet <- function(fleets,
     ".",
     names(index_distribution_default)
   )
+  index_distribution_default <- list("distribution" = index_distribution_default)
 
   # Compile all default parameters into a single list
   default <- list(c(
     selectivity_default,
-    process_default,
+    fleet_default,
     index_distribution_default
   ))
 
@@ -460,12 +540,15 @@ create_default_maturity <- function(form = c("LogisticMaturity")) {
   # NOTE: All new forms of maturity must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
-  default <- list(
+  form_default <- list(
     "maturity" = switch(form,
       "LogisticMaturity" = create_default_Logistic()
     )
   )
-  names(default[["maturity"]]) <- paste0(form, ".", names(default[["maturity"]]))
+  names(form_default) <- paste0(form, ".", names(form_default))
+  # Wrap the default parameters in a population1 list for output
+  default <- list(list("maturity" = form_default))
+  names(default) <- "population1"
 
   return(default)
 }
@@ -486,20 +569,13 @@ create_default_BevertonHoltRecruitment <- function(data) {
   # Create default parameters for Beverton--Holt recruitment
   default <- list(
     log_rzero.value = log(1e+06),
-    log_rzero.estimated = TRUE,    
-    log_rzero.random = FALSE,
+    log_rzero.estimation_type = "fixed_effects",   
     log_r.value = rep(0.0, get_n_years(data) - 1),
-    log_r.estimated = FALSE,
-    log_r.random = FALSE,
+    log_r.estimation_type = "constant",
     logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
-    logit_steep.estimated = FALSE,
+    logit_steep.estimation_type = "constant",
     log_devs.value = rep(0.0, get_n_years(data) - 1),
-    log_devs.estimated = TRUE,
-    log_devs.random = FALSE,
-    log_expected_recruitment.value = rep(0.0, get_n_years(data) + 1),
-    log_expected_recruitment.estimated = FALSE,
-    log_expected_recruitment.random = FALSE,
-    nyears = get_n_years(data)
+    log_devs.estimation_type = "fixed_effects"
   )
   return(default)
 }
@@ -523,19 +599,15 @@ create_default_BevertonHoltRecruitment <- function(data) {
 create_default_DnormDistribution <- function(
     value = 0.1,
     data,
-    input_type = c("data", "process", "random", "prior")) {
+    input_type = c("data", "process", "prior")) {
   # Input checks
   input_type <- rlang::arg_match(input_type)
 
   # Create default parameters
   default <- list(
     log_sd.value = value,
-    log_sd.estimated = FALSE
+    log_sd.estimation_type = "constant"
   )
-
-  if(input_type == "random" ){
-    log_sd.estimated = TRUE
-  }
 
   # If input_type is 'process', add additional parameters
   if (input_type == "process"| input_type == "prior") {
@@ -543,9 +615,9 @@ create_default_DnormDistribution <- function(
       default,
       list(
         x.value = rep(0, get_n_years(data)),
-        x.estimated = FALSE,
+        x.estimation_type = "constant",
         expected_values.value = rep(0, get_n_years(data)),
-        expected_values.estimated = FALSE
+        expected_values.estimation_type = "constant"
       )
     )
   }
@@ -584,7 +656,7 @@ create_default_DlnormDistribution <- function(
   # Create the default list with log standard deviation
   default <- list(
     log_sd.value = log(value),
-    log_sd.estimated = FALSE
+    log_sd.estimation_type = "constant"
   )
 
   # Add additional parameters if input_type is "process"
@@ -593,9 +665,9 @@ create_default_DlnormDistribution <- function(
       default,
       list(
         x.value = rep(0, get_n_years(data)),
-        x.estimated = FALSE,
+        x.estimation_type = "constant",
         expected_values.value = rep(0, get_n_years(data)),
-        expected_values.estimated = FALSE
+        expected_values.estimation_type = "constant"
       )
     )
   }
@@ -607,8 +679,7 @@ create_default_DlnormDistribution <- function(
 #' @description
 #' This function sets up default parameters for a recruitment module.
 #'
-#' @param recruitment A list with recruitment details, including form and
-#'   process distribution type.
+#' @param recruitment A list with recruitment details
 #' @param data An S4 object. FIMS input data.
 #' @param input_type A string specifying the type of recruitment you want to
 #'   use. The available options are
@@ -638,23 +709,10 @@ create_default_recruitment <- function(
     "BevertonHoltRecruitment" = create_default_BevertonHoltRecruitment(data)
   )
   names(form_default) <- paste0(form, ".", names(form_default))
+  # Wrap the default parameters in a population1 list for output
+  default <- list(list("recruitment" = form_default))
+  names(default) <- "population1"
 
-  if(is.list(recruitment[["process"]])){
-    process_default <- create_default_process( 
-      input = recruitment,
-      data = data, 
-      module = "recruitment",
-      par = all.vars(recruitment[["process"]][["formula"]])[1], 
-      process_distribution = recruitment[["process"]][["family"]],
-      estimated = TRUE,
-      random = recruitment[["process"]][["random"]]
-    )
-
-    default <- list(c(form_default, process_default))
-  } else {
-    default <- list(form_default)
-  }
-  names(default) <- "recruitment"
   return(default)
 
 }
@@ -666,11 +724,10 @@ create_default_recruitment <- function(
 #' Integrated Modeling System (FIMS) model, including distribution name, estimation 
 #' and random settings. It applies default configurations when specific module settings 
 #' are not provided by the user.
+#' @param parent_module A string specifying the parent module name or names.
 #' @param module Name of the process module.
-#' @param par Name of the parameter that is random.
-#' @param process_distribution Name of the process distribution. 
-#' @param random Boolean indicating whether of not the parameter is estimated. If FALSE, the \code{process_distribution} argument should be NULL.
-#' @param random Boolean indicating whether of not the process is treated with the Laplace Approximation (TRUE) or Penalized Likelihood method (FALSE).
+#' @param form A string specifying the form of the process.
+#' @param process object return from process_model function. 
 #' @return
 #' A list containing the following two entries:
 #' \describe{
@@ -682,35 +739,51 @@ create_default_recruitment <- function(
 #' @seealso
 #' * [create_default_parameters()]
 #' * [update_parameters()]
-create_default_process <- function(input, data, module, par, 
-                                    process_distribution, estimated = FALSE,
-                                    random = FALSE){
-   # Input checks
-  if (is.null(process_distribution) & estimated) {
-    cli::cli_abort(c(
-      "i" = "The process_distribution argument must be a specified when {.var par} is estimated.",
-      "x" = "process_distribution argment is set to {.var process_distribution}."
-    ))
-  }
-  if (!is.null(process_distribution) & !estimated) {
-    cli::cli_abort(c(
-      "i" = "The process_distribution argument is speciefied as {.var process_distribution} but estimation of {.var par} is set to {.var esimtated}.",
-      "x" = "Estimation for {.var par} needs to be set to TRUE when the process_distribution is specified."
-    ))
-  }
+#' * [process_model()]
+#' @export
+update_process <- function(input, data, parent_module = "population1", 
+                            module, form, process){
+
+  #TODO: update form if user wants to change it from the default
+ #input[[parent_module]][[module]]...
+  
   # Create default distribution parameters based on the distribution type
-  distribution_input <- process_distribution
+  distribution_input <- process$method
   distribution_default <- NULL
-  if (!is.null(distribution_input)) {
-    distribution_default <- switch(distribution_input[["family"]],
-      "gaussian" = create_default_DnormDistribution(
+  if(!is.null(process$init)){
+    for(i in seq_along(init)){
+      input[["parameters"]][[parent_module]][[module]][[form]][[par]][i][["value"]] <- process$init[i]
+    }
+  }
+  if (distribution_input != "Fixed Effect") {
+    input[["modules"]][[module]][["process_distribution"]]  <- switch(process$type,
+      "iid" = "DnormDistribution"
+    )
+    names(input[["modules"]][[module]][["process_distribution"]]) <- process$par
+    distribution_default <- switch(process$type,
+      "iid" = create_default_DnormDistribution(
         data = data,
         input_type = "process"
       )
     )
 
-    distribution_name <- switch(distribution_input[["family"]],
-      "gaussian" = "DnormDistribution"
+    if(distribution_input == "Penalized MLE"){
+      input[["parameters"]][[module]][[process$par]][["estimation_type"]] <- "fixed_effects"
+      distribution_default$log_sd.value <- log(process$sd)
+    }
+    if(distribution_input == "Random Effect ConstVar"){
+      input[["parameters"]][[parent_module]][[module]][[process$par]][["estimation_type"]] <- "random_effects"
+      distribution_default$log_sd.value <- log(process$sd)
+    }
+    if(distribution_input == "Random Effect Full"){
+      input[["parameters"]][[parent_module]][[module]][[process$par]][["estimation_type"]] <- "random_effects"
+      if(!is.null(process$sd)){
+        distribution_default$log_sd.value <- log(process$sd)
+      }
+    }
+
+    distribution_name <- switch(process$type,
+      "iid" = "DnormDistribution"
     )
     names(distribution_default) <- paste0(
       distribution_name,
@@ -718,7 +791,10 @@ create_default_process <- function(input, data, module, par,
       names(distribution_default)
     )
   }
-  return(distribution_default)
+
+  input <- c(input, distribution_default)
+
+  return(input)
 }
 #' Update input parameters for a FIMS model
 #'
@@ -845,58 +921,62 @@ update_parameters <- function(current_parameters, modified_parameters) {
   }
 
   new_param_input <- current_parameters[["parameters"]]
-  module_names <- names(new_param_input)
+  parent_module_names <- names(new_param_input)
 
   # Update parameters for each module based on modified_parameters
-  for (module_name in module_names) {
-    if (module_name %in% names(modified_parameters)) {
-      modified_params <- modified_parameters[[module_name]]
-      current_params <- new_param_input[[module_name]]
+  for (i in seq_along(parent_module_names)) {
+    if(parent_module_names[i] %in% names(modified_parameters)) {
+      module_names <- names(current_parameters[["parameters"]][[parent_module_names[i]]])
+      for(module_name in module_names){
+        if (module_name %in% names(modified_parameters[[parent_module_names[i]]])) {
+          modified_params <- modified_parameters[[parent_module_names[i]]][[module_name]]
+          current_params <- new_param_input[[parent_module_names[i]]][[module_name]]
+          for (param_name in names(modified_params)) {
+            # Check if the parameter exists in current_parameters
+            if (!param_name %in% names(current_params)) {
+              cli::cli_abort(c(
+                "x" = "{param_name} from {module_name} in {.var modified_parameters}
+                            does not exist in {.var current_parameters}."
+              ))
+            }
 
-      for (param_name in names(modified_params)) {
-        # Check if the parameter exists in current_parameters
-        if (!param_name %in% names(current_params)) {
-          cli::cli_abort(c(
-            "x" = "{param_name} from {module_name} in {.var modified_parameters}
-                         does not exist in {.var current_parameters}."
-          ))
-        }
-        # TODO: default is a scalar but user might want to modify to time-varying,
-        # e.g. log_q, log_r
-        # Check if the length of the modified and current parameter match
-        length_modified_parameter <- length(modified_params[[param_name]])
-        length_current_parameter <- length(current_params[[param_name]])
-        if (!identical(length_modified_parameter, length_current_parameter)) {
-          cli::cli_abort(c(
-            "x" = "The length of {.var {param_name}} from {module_name}
-                  does not match between {.var modified_parameters} and
-                  {.var current_parameters}.",
-            "i" = "The parameter name of interest is {.var {param_name}}.",
-            "i" = "The length of the modified parameter is
-                  {length_modified_parameter}.",
-            "i" = "The length of the current parameter is
-                  {length_current_parameter}."
-          ))
-        }
+            # TODO: default is a scalar but user might want to modify to time-varying,
+            # e.g. log_q, log_r
+            # Check if the length of the modified and current parameter match
+            length_modified_parameter <- length(modified_params[[param_name]])
+            length_current_parameter <- length(current_params[[param_name]])
+            if (!identical(length_modified_parameter, length_current_parameter)) {
+              cli::cli_abort(c(
+                "x" = "The length of {.var {param_name}} from {module_name}
+                      does not match between {.var modified_parameters} and
+                      {.var current_parameters}.",
+                "i" = "The parameter name of interest is {.var {param_name}}.",
+                "i" = "The length of the modified parameter is
+                      {length_modified_parameter}.",
+                "i" = "The length of the current parameter is
+                      {length_current_parameter}."
+              ))
+            }
 
-        # Check if the type of the modified and current parameter match
-        if (!identical(
-          typeof(modified_params[[param_name]]),
-          typeof(current_params[[param_name]])
-        )) {
-          cli::cli_abort(c(
-            "x" = "The type of {param_name} from {module_name} does not match
-                  between {.var modified_parameters} and
-                  {.var current_parameters}."
-          ))
-        }
+            # Check if the type of the modified and current parameter match
+            if (!identical(
+              typeof(modified_params[[param_name]]),
+              typeof(current_params[[param_name]])
+            )) {
+              cli::cli_abort(c(
+                "x" = "The type of {param_name} from {module_name} does not match
+                      between {.var modified_parameters} and
+                      {.var current_parameters}."
+              ))
+            }
 
-        # Update the parameter if checks pass
-        current_params[[param_name]] <- modified_params[[param_name]]
+            # Update the parameter if checks pass
+            current_params[[param_name]] <- modified_params[[param_name]]
+          }
+          # Assign the updated module parameters back to new_param_input
+          new_param_input[[parent_module_names[i]]][[module_name]] <- current_params
+        }
       }
-
-      # Assign the updated module parameters back to new_param_input
-      new_param_input[[module_name]] <- current_params
     }
   }
   # Create a new list for updated input
@@ -906,3 +986,4 @@ update_parameters <- function(current_parameters, modified_parameters) {
   )
   return(new_input)
 }
+

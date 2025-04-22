@@ -90,7 +90,6 @@ fleet1 <- survey1 <- list(
     LengthComp = "DmultinomDistribution"
   )
 )
-
 # Create default recruitment, growth, and maturity parameters
 default_parameters <- data_4_model |>
   create_default_parameters(
@@ -114,9 +113,23 @@ In the code below, `update_parameters()` is used to adjust the fishing mortality
 # used to daisy chain all of these updates together to a new object called
 # parameters that will be used to fit the model
 parameters <- default_parameters |>
+  # FIMS:::update_process(
+  #   data = data_4_model,
+  #   module = "recruitment",   
+  #   form = "BevertonHolt",   
+  #   process = process_model(par = "log_devs", type = "iid", method = "Penalized MLE",
+  #       sd = 0.4)) |>
+#  update_process(
+#    parent_modules = list(fleet1)
+#    module = "selectivity",   
+#    form = "LogisticSelectivity",   
+#    process = process_model(par = log_devs, type = iid, method = "REFull",
+#        log_sd = 0, init = 0)
+#  ) |>
   update_parameters(
     modified_parameters = list(
       fleet1 = list(
+        fleet = list(
         Fleet.log_Fmort.value = log(c(
           0.009459165, 0.027288858, 0.045063639,
           0.061017825, 0.048600752, 0.087420554,
@@ -130,48 +143,51 @@ parameters <- default_parameters |>
           0.431745298, 0.328030899, 0.499675368
         ))
       )
-    )
+    ))
   ) |>
   update_parameters(
     modified_parameters = list(
       survey1 = list(
-        LogisticSelectivity.inflection_point.value = 1.5,
-        LogisticSelectivity.slope.value = 2,
-        Fleet.log_q.value = log(3.315143e-07)
+        selectivity = list(
+          LogisticSelectivity.inflection_point.value = 1.5,
+          LogisticSelectivity.slope.value = 2),
+        fleet = list(
+          Fleet.log_q.value = log(3.315143e-07))
       )
     )
   ) |>
   update_parameters(
     modified_parameters = list(
-      recruitment = list(
-        BevertonHoltRecruitment.log_rzero.value = log(1e+06),
-        BevertonHoltRecruitment.log_devs.value = c(
-          0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
-          -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
-          -0.21709207, -0.13320626, 0.11225374, -0.10650836, 0.26877132,
-          0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
-          0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
-          -0.19556523, 0.20094360, 0.37248740, -0.07163145
-        ),
-        # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
-        # to TRUE. We need to debug the issue, then update the line below accordingly.
-        BevertonHoltRecruitment.log_devs.estimated = FALSE
+      population1 = list(
+        recruitment = list(
+          BevertonHoltRecruitment.log_rzero.value = log(1e+06),
+          BevertonHoltRecruitment.log_devs.value = c(
+            0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
+            -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
+            -0.21709207, -0.13320626, 0.11225374, -0.10650836, 0.26877132,
+            0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
+            0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
+            -0.19556523, 0.20094360, 0.37248740, -0.07163145
+          )
+        )
       )
     )
   ) |>
   update_parameters(
     modified_parameters = list(
-      maturity = list(
-        LogisticMaturity.inflection_point.value = 2.25,
-        LogisticMaturity.inflection_point.estimated = FALSE,
-        LogisticMaturity.slope.value = 3,
-        LogisticMaturity.slope.estimated = FALSE
+      population1 = list(
+        maturity = list(
+          LogisticMaturity.inflection_point.value = 2.25,
+          LogisticMaturity.inflection_point.estimated = FALSE,
+          LogisticMaturity.slope.value = 3,
+          LogisticMaturity.slope.estimated = FALSE
+        )
       )
     )
   ) |>
   update_parameters(
     modified_parameters = list(
-      population = list(
+      population1 = list(
         Population.log_init_naa.value = c(
           13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
           12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
@@ -183,12 +199,14 @@ parameters <- default_parameters |>
 
 `purrr::map_vec()` can be used to compare the length of individual updated parameter vectors from `parameters` with the length of individual parameter vectors from `default_parameters`.
 ```{r parameter-length-comparison}
-default_fleet1 <- purrr::map_vec(
-  default_parameters[["parameters"]][["fleet1"]],
+default_fleet1 <- default_parameters[["parameters"]][["fleet1"]] |>
+  purrr::list_flatten() |>
+  purrr::map_vec(
   \(x) length(x)
 )
-updated_fleet1 <- purrr::map_vec(
-  parameters[["parameters"]][["fleet1"]],
+updated_fleet1 <- parameters[["parameters"]][["fleet1"]] |>
+  purrr::list_flatten() |>
+  purrr::map_vec(
   \(x) length(x)
 )
 knitr::kable(cbind(default_fleet1, updated_fleet1))
@@ -196,8 +214,9 @@ knitr::kable(cbind(default_fleet1, updated_fleet1))
 
 `purrr::map_df()` can be used to summarize parameter vector lengths across all modules.
 ```{r parameter-length-table}
-purrr::map_df(
-  parameters[["parameters"]], \(x) purrr::map_vec(x, length),
+  parameters[["parameters"]] |>
+  purrr::list_flatten() |>
+  purrr::map_df( \(x) purrr::map_vec(x, length),
   .id = "module"
 ) |>
   tibble::column_to_rownames(var = "module") |>

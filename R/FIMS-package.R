@@ -20,7 +20,6 @@
 #' @export get_log_errors
 #' @export get_log_module
 #' @export get_log_warnings
-#' @export get_random
 #' @export Index
 #' @export LengthComp
 #' @export log_error
@@ -28,7 +27,7 @@
 #' @export log_warning
 #' @export LogisticMaturity
 #' @export LogisticSelectivity
-#' @export model
+#' @export process_model
 #' @export Parameter
 #' @export ParameterVector
 #' @export Population

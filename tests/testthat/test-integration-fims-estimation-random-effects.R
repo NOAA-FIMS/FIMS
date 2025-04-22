@@ -42,7 +42,6 @@ test_that("deterministic test of fims with recruitment re", {
     om_output_list = om_output_list,
     em_input_list = em_input_list,
     estimation_mode = FALSE,
-    random_effects = TRUE,
     modified_parameters = modified_parameters
   )
 
