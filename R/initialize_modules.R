@@ -85,9 +85,7 @@ initialize_module <- function(parameters, data, module_name) {
 
     if ("landings" %in% fleet_types) {
       module_fields <- setdiff(module_fields, c(
-        "log_q",
-        "random_q",
-        "estimate_q"
+        "log_q"
       ))
     } else {
       module_fields <- setdiff(module_fields, c(
@@ -136,7 +134,6 @@ initialize_module <- function(parameters, data, module_name) {
   #   - Add n_fleets to data1. Should n_fleets include both
   #     fishing and survey fleets? Currently, data1@fleets equals 1.
   # - Fleet
-  #   - Remove estimate_Fmort, estimate_q, and random_q from the Rcpp interface
   #   - Reconsider exposing `log_expected_index` and
   #     `proportion_catch_numbers_at_age` to users. Their IDs are linked with
   #     index and agecomp distributions. No input values are required.
@@ -148,7 +145,7 @@ initialize_module <- function(parameters, data, module_name) {
 
   boolean_fields <- c(
     "estimate_prop_female", 
-    "estimate_q", "is_survey", "random_q"
+     "is_survey"
   )
 
   real_vector_fields <- c(
@@ -169,11 +166,7 @@ initialize_module <- function(parameters, data, module_name) {
     } else if (field %in% boolean_fields) {
       module[[field]]$set(
         switch(field,
-          "estimate_q" = module_input[[
-            paste0(module_class_name, ".log_q.estimated")
-          ]],
           "is_survey" = !("landings" %in% fleet_types),
-          "random_q" = FALSE,
           cli::cli_abort(c(
             "{.var {field}} is not a valid field in {.var {module_class_name}}
             module."
@@ -704,14 +697,14 @@ initialize_fims <- function(parameters, data) {
       names(parameters[["parameters"]][[fleet_names[i]]]),
       value = TRUE
     )
-    parameter_estimated_name <- grep(
-      paste0("log_sd", ".estimated"),
+    parameter_estimation_name <- grep(
+      paste0("log_sd", ".estimation_type"),
       names(parameters[["parameters"]][[fleet_names[i]]]),
       value = TRUE
     )
 
     if (length(parameter_value_name) == 0 ||
-      length(parameter_estimated_name) == 0
+      length(parameter_estimation_name) == 0
     ) {
       cli::cli_abort(c(
         "Missing required inputs for `log_sd` in fleet `{fleet_name}`."
@@ -725,7 +718,7 @@ initialize_fims <- function(parameters, data) {
         value = exp(
           parameters[["parameters"]][[fleet_names[i]]][[parameter_value_name]]
         ),
-        estimated = parameters[["parameters"]][[fleet_names[i]]][[parameter_estimated_name]]
+        estimation_type = parameters[["parameters"]][[fleet_names[i]]][[parameter_estimation_name]]
       ),
       data_type = "index"
     )
@@ -774,13 +767,13 @@ initialize_fims <- function(parameters, data) {
     names(parameters[["parameters"]][["recruitment"]]),
     value = TRUE
   )
-  field_estimated_name <- grep(
-    paste0("log_sd.estimated"),
+  field_estimation_name_name <- grep(
+    paste0("log_sd.estimation_type"),
     names(parameters[["parameters"]][["recruitment"]]),
     value = TRUE
   )
 
-   if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
+   if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
   # TODO: Remove this check?: if log_devs are fixed, there is no recruitment distribution
   #   cli::cli_abort("Missing required inputs for recruitment distribution.")
    recruitment_process <- initialize_process_structure(
@@ -795,9 +788,9 @@ initialize_fims <- function(parameters, data) {
     family = parameters[["modules"]][["recruitment"]][["process"]][["family"]],
     sd = list(
       value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
-      estimated = parameters[["parameters"]][[
+      estimation_type = parameters[["parameters"]][[
         "recruitment"
-      ]][[field_estimated_name]]
+      ]][[field_estimation_name]]
     ),
     is_random_effect =
       as.logical(parameters[["modules"]][["recruitment"]][["process"]][["random"]])
@@ -887,14 +880,14 @@ set_param_vector <- function(field, module, module_input) {
     names(module_input),
     value = TRUE
   )
-  field_estimated_name <- grep(
-    paste0(field, ".estimated"),
+  field_estimation_name <- grep(
+    paste0(field, ".estimation_type"),
     names(module_input),
     value = TRUE
   )
 
   # Check if both value and estimation information are present
-  if (length(field_value_name) == 0 || length(field_estimated_name) == 0) {
+  if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
     cli::cli_abort(c(
       "Missing value or estimation information for {.var field}."
     ))
@@ -912,5 +905,13 @@ set_param_vector <- function(field, module, module_input) {
   }
 
   # Set the estimation information for the entire parameter vector
-  module[[field]]$set_all_estimable(module_input[[field_estimated_name]])
+  if(field_estimation_name == "constant"){
+    module[[field]]$set_all_estimable(FALSE)
+  }
+  if(field_estimation_name == "random_effects"){
+    module[[field]]$set_all_random(TRUE)
+  }
+  if(field_estimation_name == "fixed_effects"){
+    module[[field]]$set_all_estimable(TRUE)
+  }
 }
