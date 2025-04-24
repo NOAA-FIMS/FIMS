@@ -7,11 +7,13 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # get_estimates ----
+## Setup ----
+# Load or prepare any necessary data for testing
 ## IO correctness ----
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
-  "module_name", "module_id", "module_type", "label", "type", "type_id", 
-  "parameter_id", "fleet_name", "age", "length", "time", 
+  "module_name", "module_id", "module_type", "label", "type", "type_id",
+  "parameter_id", "fleet_name", "age", "length", "time",
   "initial", "estimate", "uncertainty", "log_like", "log_like_cv",
   "gradient", "estimated"
 )
@@ -86,4 +88,4 @@ test_that("get_estimates() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-# No built-in errors or warnings to test for get_estimates().
+# No built-in errors to test.

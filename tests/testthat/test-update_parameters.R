@@ -8,7 +8,6 @@
 
 
 # update_parameters ----
-
 ## setup ----
 data <- FIMS::FIMSFrame(data1)
 
@@ -35,11 +34,11 @@ modified_parameters_valid <- list(
 
 test_that("update_parameters updates parameters correctly", {
   updated_params <- update_parameters(current_parameters, modified_parameters_valid)
-  
+
   #' @description Test that parameters are updated correctly
   expect_equal(updated_params$parameters$survey1$Fleet.log_q.value, -14)
   expect_equal(updated_params$parameters$survey1$LogisticSelectivity.slope.value, 2)
-  
+
   #' @description Test that modules are unchanged
   expect_equal(updated_params$modules, current_parameters$modules)
 })
@@ -75,7 +74,7 @@ test_that("update_parameters detects invalid current_parameters format", {
   )
   #' @description update_parameters(x) detects that list is missing names
   expect_error(
-    update_parameters(missing_names_current_parameters), 
+    update_parameters(missing_names_current_parameters),
     "must be a list containing parameters and modules"
   )
 })
@@ -112,5 +111,3 @@ test_that("update_parameters validates parameter types", {
     "does not match between"
   )
 })
-
-

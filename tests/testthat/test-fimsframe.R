@@ -6,7 +6,7 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# fims_frame() ----
+# fims_frame ----
 ## Setup ----
 fims_frame <- FIMS::FIMSFrame(data1)
 
@@ -57,7 +57,6 @@ test_that("fims_frame() returns correct structure", {
   expect_type(get_end_year(fims_frame), "integer")
   expect_length(get_end_year(fims_frame), 1)
 
-
   expect_vector(get_ages(fims_frame), ptype = integer())
 
   expect_type(get_n_ages(fims_frame), "integer")
@@ -71,7 +70,7 @@ test_that("fims_frame() returns correct structure", {
 })
 
 ## Edge handling ----
-# No edge cases to test
+# No edge cases to test.
 ## Error handling ----
 test_that("FIMSFrame() returns correct error messages", {
   #' @description Validators for FIMSFrame work as expected.
@@ -79,7 +78,7 @@ test_that("FIMSFrame() returns correct error messages", {
   expect_error(FIMSFrame(bad_input))
 })
 
-# m_*() ----
+# m_* ----
 ## Setup ----
 n_years <- get_n_years(fims_frame)
 n_ages <- get_n_ages(fims_frame)
@@ -137,7 +136,7 @@ test_that("m_agecomp() works", {
   clear()
 })
 
-# get_n_fleets() ----
+# get_n_fleets ----
 ## Setup ----
 # Load the test data from an RDS file containing model fits.
 # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
@@ -163,3 +162,8 @@ test_that("get_n_fleets() works with correct inputs", {
   # Use purrr::map to apply the function to each file
   result <- purrr::map(data_files, check_input)
 })
+
+## Edge handling ----
+# No edge cases to test.
+## Error handling ----
+# No built-in errors to test.

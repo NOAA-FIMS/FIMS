@@ -7,6 +7,8 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # rcpp selectivity ----
+## Setup ----
+# Load or prepare any necessary data for testing
 ## IO correctness ----
 test_that("rcpp logistic selectivity works with correct inputs", {
   #' @description Test that logistic selectivity works with correct inputs.
@@ -53,7 +55,7 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   expect_equal(
     selectivity1$evaluate(34.5),
     # Line below equals 0.2716494
-    1.0/(1.0+exp(-(34.5-10.5)*0.2)) * (1.0 - 1.0/(1.0+exp(-(34.5-15)*0.05))),
+    1.0 / (1.0 + exp(-(34.5 - 10.5) * 0.2)) * (1.0 - 1.0 / (1.0 + exp(-(34.5 - 15) * 0.05))),
     tolerance = 0.0000001
   )
 
@@ -88,7 +90,7 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   expect_equal(
     selectivity2$evaluate(34.5),
     # Line below equals 0.2716494
-    1.0/(1.0+exp(-(34.5-10.5)*0.2)) * (1.0 - 1.0/(1.0+exp(-(34.5-15)*0.05))),
+    1.0 / (1.0 + exp(-(34.5 - 10.5) * 0.2)) * (1.0 - 1.0 / (1.0 + exp(-(34.5 - 15) * 0.05))),
     tolerance = 0.0000001
   )
   clear()
@@ -115,4 +117,4 @@ test_that("rcpp selectivity returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-# No error handling to test for this interface.
+# No built-in errors to test.

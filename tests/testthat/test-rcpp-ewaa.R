@@ -6,7 +6,8 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# Setup ----
+# EWAAgrowth ----
+## Setup ----
 # Prepare data
 fims_frame <- FIMS::FIMSFrame(data1)
 # Ensure that the fims_frame object is removed after tests are completed
@@ -35,7 +36,6 @@ on.exit(ewaa_growth)
 ewaa_growth2 <- methods::new(EWAAgrowth)
 on.exit(ewaa_growth2)
 
-# EWAAgrowth ----
 ## IO correctness ----
 test_that("EWAAgrowth evaluate() works with correct input data", {
   #' @description Test that EWAAgrowth evaluate(1) returns the first value in the weight-at-age data.

@@ -7,6 +7,8 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # get_max_gradient ----
+## Setup ----
+# Load or prepare any necessary data for testing
 ## IO correctness ----
 test_that("get_max_gradient() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
@@ -26,7 +28,7 @@ test_that("get_max_gradient() works with correct inputs", {
       object = max_gradient,
       expected = fit_data@max_gradient
     )
-  
+
     #' @description Test that get_max_gradient() returns a numeric value.
     expect_true(
       object = is.numeric(max_gradient)
@@ -46,4 +48,4 @@ test_that("get_max_gradient() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-# No built-in errors or warnings to test for get_opt().
+# No built-in errors to test.

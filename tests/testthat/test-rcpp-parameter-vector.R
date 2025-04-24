@@ -6,10 +6,11 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# rcpp_variable_vector ----
+# rcpp variable vector ----
+## Setup ----
+# Load or prepare any necessary data for testing
 ## IO correctness ----
 test_that("rcpp ParameterVector works as expected", {
-  
   v_size <- 10
   v1_value <- 1.0
   v2_value <- 2.0
@@ -19,7 +20,7 @@ test_that("rcpp ParameterVector works as expected", {
   v0 <- methods::new(ParameterVector)
   expect_equal(length(v0), 1)
   expect_equal(v0$at(1)$value, 0)
- 
+
   #' @description Test that constructor that initializes based on size works.
   v1 <- methods::new(ParameterVector, v_size)
   v1$fill(v1_value)

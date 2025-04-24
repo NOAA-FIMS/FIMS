@@ -6,7 +6,8 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# Setup ----
+# rcpp data ----
+## Setup ----
 fims_frame <- FIMS::FIMSFrame(data1)
 n_years <- get_n_years(fims_frame)
 n_ages <- get_n_ages(fims_frame)
@@ -27,7 +28,6 @@ fleet_names_index <- dplyr::filter(
   dplyr::pull(name)
 n_index <- length(fleet_names_index)
 
-# rcpp data ----
 ## IO correctness ----
 test_that("rcpp data() works with correct inputs", {
   #' @description Test that adding index data to a model is possible.
@@ -62,6 +62,7 @@ test_that("rcpp data() works with correct inputs", {
 })
 
 ## Edge handling ----
-
+# No edge cases to test.
 
 ## Error handling ----
+# No built-in errors to test.

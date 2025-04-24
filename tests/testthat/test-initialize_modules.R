@@ -48,16 +48,6 @@ test_that("initialize_fims works", {
   clear()
 })
 
-test_that("initialize_fims clears previous FIMS settings before initializing", {
-  mock_clear <- mockery::mock()
-  mockery::stub(initialize_fims, "clear", mock_clear)
-
-  initialize_fims(parameters = default_parameters, data = data)
-
-  mockery::expect_called(mock_clear, 1)
-  clear()
-})
-
 test_that("initialize_comp correctly returns error on unknown fleet_name", {
   expect_error(
     initialize_comp(

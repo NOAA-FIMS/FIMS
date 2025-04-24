@@ -6,10 +6,9 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# Setup ----
+# rcpp fleet ----
+## Setup ----
 # Load or prepare any necessary data for testing
-
-# rcpp-fleet ----
 ## IO correctness ----
 test_that("rcpp fleet works with correct inputs", {
   #' @description Test that two selectivity modules can be set up without any

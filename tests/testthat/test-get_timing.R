@@ -7,6 +7,8 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # get_timing ----
+## Setup ----
+# Load or prepare any necessary data for testing
 ## IO correctness ----
 test_that("get_timing() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
@@ -52,4 +54,4 @@ test_that("get_timing() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-# No built-in errors or warnings to test for get_timing().
+# No built-in errors to test.

@@ -6,7 +6,8 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# Setup ----
+# distribution_formulas ----
+## Setup ----
 load(test_path("fixtures", "integration_test_data.RData"))
 iter_id <- 1
 # Load operating model data
@@ -73,7 +74,7 @@ fishing_fleet$log_Fmort$set_all_estimable(TRUE)
 fishing_fleet$log_q[1]$value <- log(1.0)
 fishing_fleet$estimate_q$set(FALSE)
 fishing_fleet$random_q$set(FALSE)
-fishing_fleet$SetObservedIndexData(fishing_fleet_index$get_id())
+fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
 
 # Set up fishery index data using the lognormal
 fleet_sd <- rep(sqrt(log(em_input$cv.L$fleet1^2 + 1)), om_input$nyr)
@@ -90,7 +91,6 @@ fishing_fleet_index_distribution2 <- initialize_data_distribution(
   data_type = "index"
 )
 
-# distribution_formulas ----
 ## IO correctness ----
 test_that("distribution formulas work with correct inputs", {
   #' @description Test that io of initialize_process_distribution() works.
@@ -102,7 +102,7 @@ test_that("distribution formulas work with correct inputs", {
   )
 
   #' @description Test that io of initialize_data_distribution() works.
-   expect_equal(
+  expect_equal(
     log(fleet_sd[1]),
     fishing_fleet_index_distribution1$log_sd[1]$value
   )
@@ -116,12 +116,11 @@ test_that("distribution formulas work with correct inputs", {
 # TODO: Andrea to add edge handling tests
 # test_that("distribution_formulas_new() returns correct outputs for edge cases", {
 #   #' @description Test that distribution_formulas_new(x) returns an error.
-  
+
 # })
 
 ## Error handling ----
 test_that("distribution_formulas_new() returns correct error messages", {
-  
   #' @description Test that initialize_process_distribution returns expected error.
   expect_error(
     initialize_process_distribution(

@@ -6,7 +6,8 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# Setup ----
+# create_default_parameters ----
+## Setup ----
 data <- FIMS::FIMSFrame(data1)
 
 fleet1 <- survey1 <- list(
@@ -19,7 +20,6 @@ fleet1 <- survey1 <- list(
 
 fleets <- list(fleet1 = fleet1, survey1 = survey1)
 
-# create_default_parameters() ----
 ## IO correctness ----
 test_that("create_default_parameters() returns correct structure", {
   result <- create_default_parameters(data, fleets = fleets)
@@ -31,12 +31,11 @@ test_that("create_default_parameters() returns correct structure", {
 })
 
 ## Edge handling ----
-
+# No edge cases to test.
 
 ## Error handling ----
 test_that("create_default_parameters() returns correct error messages", {
-  #' @description Test that create_default_parameters() detects missing fleet
-  #' names.
+  #' @description Test that create_default_parameters() detects missing fleet names.
   invalid_fleet <- list(
     selectivity = list(form = "LogisticSelectivity"),
     data_distribution = c(
@@ -56,8 +55,7 @@ test_that("create_default_parameters() returns correct error messages", {
     "The following 1 fleet name is missing from the data: invalid_fleet"
   )
 
-  #' @description Test that create_default_parameters() returns error because
-  #' input list is `NULL`.
+  #' @description Test that create_default_parameters() returns error because input list is `NULL`.
   empty_data <- NULL
 
   expect_error(create_default_parameters(empty_data, fleets = fleets))
@@ -75,8 +73,7 @@ test_that("create_default_Population() works with correct inputs", {
     type = "list"
   )
 
-  #' @description Test that create_default_Population() returns the correct list
-  #' structure with four elements.
+  #' @description Test that create_default_Population() returns the correct list structure with four elements.
   population_1 <- create_default_Population(data, log_rzero = 10)
   expect_equal(
     object = names(population_1),
@@ -95,7 +92,7 @@ test_that("create_default_Population() works with correct inputs", {
 })
 
 ## Edge handling ----
-
+# No edge cases to test. 
 
 ## Error handling ----
 test_that("create_default_Population() returns correct error messages", {
@@ -186,7 +183,7 @@ test_that("create_default_DoubleLogistic() works with correct inputs", {
 })
 
 ## Edge handling ----
-
+# No edge cases to test.
 
 ## Error handling ----
-
+# No built-in errors to test.

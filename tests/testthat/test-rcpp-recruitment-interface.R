@@ -6,7 +6,9 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# test_rcpp_recruitment_interface ----
+# rcpp recruitment interface ----
+## Setup ----
+# Load or prepare any necessary data for testing
 ## IO correctness ----
 test_that("test_rcpp_recruitment_interface() works with correct inputs", {
   # Create recruitment

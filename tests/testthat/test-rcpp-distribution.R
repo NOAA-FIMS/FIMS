@@ -6,12 +6,14 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# rcpp_distribution ----
+# rcpp distribution ----
+## Setup ----
+# Load or prepare any necessary data for testing
 ## IO correctness ----
 test_that("rcpp_distribution works with correct inputs", {
-  #' @description Test that dnorm works with a single value input, 
+  #' @description Test that dnorm works with a single value input,
   #' e.g. a prior on a parameter
-  
+
   # generate data using R stats::rnorm
   set.seed(123)
 
@@ -28,7 +30,7 @@ test_that("rcpp_distribution works with correct inputs", {
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
   clear()
 
-  #' @description Test that dnorm works with a vector of state variables, 
+  #' @description Test that dnorm works with a vector of state variables,
   #' but scalar arguments, e.g., a random effect vector
 
   # simulate normal data
@@ -48,7 +50,7 @@ test_that("rcpp_distribution works with correct inputs", {
   expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
 
-  #' @description Test that dnorm works with vectors of state variables (x) 
+  #' @description Test that dnorm works with vectors of state variables (x)
   #' and arguments, e.g., an index likelihood vector
 
   # simulate normal data
@@ -76,7 +78,7 @@ test_that("rcpp_distribution works with correct inputs", {
   expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
 
-  #' @description Test that dlnorm works with a single value input, 
+  #' @description Test that dlnorm works with a single value input,
   #' e.g. a prior on a parameter
 
   # generate data using R stats::rlnorm
@@ -95,7 +97,7 @@ test_that("rcpp_distribution works with correct inputs", {
   expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, 1, TRUE) + log(y))
   clear()
 
-  #' @description Test that dlnorm works with a vector of state variables, 
+  #' @description Test that dlnorm works with a vector of state variables,
   #' but scalar arguments, e.g., a random effect vector
 
   y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
@@ -115,10 +117,10 @@ test_that("rcpp_distribution works with correct inputs", {
   expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)) + sum(log(y)))
   clear()
 
-  #' @description Test that dlnorm with vectors of state variables (x) 
+  #' @description Test that dlnorm with vectors of state variables (x)
   #' and arguments, e.g., an index likelihood vector
 
-  
+
   y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
 
   # create a fims Rcpp object
@@ -144,7 +146,7 @@ test_that("rcpp_distribution works with correct inputs", {
   expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)) + sum(log(y)))
   clear()
 
- #' @description Test that dmultinom works with vector inputs
+  #' @description Test that dmultinom works with vector inputs
 
   # generate data using R stats:rnorm
   set.seed(123)
@@ -484,6 +486,4 @@ test_that("rcpp distribution returns correct error messages", {
     regexp = "MultinomialLPDF: Vector index out of bounds. The dimension of the observed vector of size 9 and the expected vector is of size 10"
   )
   clear()
-
-
 })
