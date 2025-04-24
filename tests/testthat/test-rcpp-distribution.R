@@ -180,55 +180,310 @@ test_that("rcpp_distribution works with correct inputs", {
 
 ## Edge handling ----
 test_that("rcpp_distribution returns correct outputs for edge cases", {
-  #' @description Test that rcpp_distribution(x) returns an error.
-  # place holder test until Andrea can come back to this
-  expect_equal(
-    object = 1,
-    expected = 1
+  #' @description Test extreme observed values for dnorm (-1000, 1000) return expected output.
+  y <- -1000
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- methods::new(DnormDistribution)
+  # populate class members
+  dnorm_$x[1]$value <- y
+  dnorm_$expected_values[1]$value <- 0
+  dnorm_$log_sd[1]$value <- log(1)
+  # evaluate the density and compare with R
+  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
+  clear()
+  y <- 1000
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- methods::new(DnormDistribution)
+  # populate class members
+  dnorm_$x[1]$value <- y
+  dnorm_$expected_values[1]$value <- 0
+  dnorm_$log_sd[1]$value <- log(1)
+  # evaluate the density and compare with R
+  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
+  clear()
+
+  #' @description Test extreme expected values for dnorm (-1000, 1000) return expected output.
+  y <- 1
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- methods::new(DnormDistribution)
+  # populate class members
+  dnorm_$x[1]$value <- y
+  dnorm_$expected_values[1]$value <- -1000
+  dnorm_$log_sd[1]$value <- log(1)
+  # evaluate the density and compare with R
+  expect_equal(dnorm_$evaluate(), stats::dnorm(y, -1000, 1, TRUE))
+  clear()
+  y <- 1
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- methods::new(DnormDistribution)
+  # populate class members
+  dnorm_$x[1]$value <- y
+  dnorm_$expected_values[1]$value <- 1000
+  dnorm_$log_sd[1]$value <- log(1)
+  # evaluate the density and compare with R
+  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 1000, 1, TRUE))
+  clear()
+
+  #' @description Test extreme log_sd values for dnorm (-10, 10) return expected output.
+  y <- 1
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- methods::new(DnormDistribution)
+  # populate class members
+  dnorm_$x[1]$value <- y
+  dnorm_$expected_values[1]$value <- 0
+  dnorm_$log_sd[1]$value <- 10
+  # evaluate the density and compare with R
+  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(10), TRUE))
+  clear()
+  y <- 1
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- methods::new(DnormDistribution)
+  # populate class members
+  dnorm_$x[1]$value <- y
+  dnorm_$expected_values[1]$value <- 0
+  dnorm_$log_sd[1]$value <- -10
+  # evaluate the density and compare with R
+  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(-10), TRUE))
+  clear()
+
+  #' @description Test extreme observed values for dlnorm (0, -1, 1000) return expected output.
+  y <- 0
+  dlnorm_ <- methods::new(DlnormDistribution)
+  # populate class members
+  dlnorm_$x[1]$value <- y
+  dlnorm_$expected_values[1]$value <- 0
+  dlnorm_$log_sd[1]$value <- log(1)
+  # evaluate the density and compare with R
+  expect_equal(dlnorm_$evaluate(), -Inf)
+  clear()
+
+  y <- -1
+  dlnorm_ <- methods::new(DlnormDistribution)
+  # populate class members
+  dlnorm_$x[1]$value <- y
+  dlnorm_$expected_values[1]$value <- 0
+  dlnorm_$log_sd[1]$value <- log(1)
+  expect_equal(dlnorm_$evaluate(), NaN)
+  clear()
+
+  y <- 1000
+  dlnorm_ <- methods::new(DlnormDistribution)
+  # populate class members
+  dlnorm_$x[1]$value <- y
+  dlnorm_$expected_values[1]$value <- 0
+  dlnorm_$log_sd[1]$value <- log(1)
+  expect_equal(dlnorm_$evaluate(),-24.77748)
+  clear()
+
+  #' @description Test extreme expected values for dlnorm (-1000, 1000) return expected output.
+  y <- 1
+  dlnorm_ <- methods::new(DlnormDistribution)
+  # populate class members
+  dlnorm_$x[1]$value <- y
+  dlnorm_$expected_values[1]$value <- -1000
+  dlnorm_$log_sd[1]$value <- log(1)
+  expect_equal(dlnorm_$evaluate(),-500000.9)
+  clear()
+  y <- 1
+  dlnorm_ <- methods::new(DlnormDistribution)
+  # populate class members
+  dlnorm_$x[1]$value <- y
+  dlnorm_$expected_values[1]$value <- 1000
+  dlnorm_$log_sd[1]$value <- log(1)
+  expect_equal(dlnorm_$evaluate(),-500000.92)
+  clear()
+
+  #' @description Test extreme log_sd values for dlnorm (-10, 10) return expected output.
+  y <- 1
+  dlnorm_ <- methods::new(DlnormDistribution)
+  # populate class members
+  dlnorm_$x[1]$value <- y
+  dlnorm_$expected_values[1]$value <- 0
+  dlnorm_$log_sd[1]$value <- 10
+  expect_equal(dlnorm_$evaluate(),-10.91894)
+  clear()
+  y <- 1
+  dlnorm_ <- methods::new(DlnormDistribution)
+  # populate class members
+  dlnorm_$x[1]$value <- y
+  dlnorm_$expected_values[1]$value <- 0
+  dlnorm_$log_sd[1]$value <- -10
+  expect_equal(dlnorm_$evaluate(),9.0810615)
+  clear()
+
+  #' @description Test empty bins with large N (1000) in dmultinom return expected output.
+  # generate data using R stats:rnorm
+  p <- c(1, rep(0,9))
+  x_values <- t(stats::rmultinom(1, 1000, p))
+  # create a fims Rcpp object
+  # initialize the Dmultinom module
+  dmultinom_ <- methods::new(DmultinomDistribution)
+  # populate class members
+  dmultinom_$dims$resize(2)
+  dmultinom_$dims$set(0, 1)
+  dmultinom_$dims$set(1, length(p))
+  dmultinom_$expected_values$resize(length(p))
+  purrr::walk(
+    seq_along(p),
+    \(x) dmultinom_$expected_values[x]$value <- p[x]
   )
+
+  dmultinom_$x$resize(length(p))
+  purrr::walk(
+    seq_along(p),
+    \(x) dmultinom_$x[x]$value <- x_values[x]
+  )
+
+  # evaluate the density and compare with R
+  expect_equal(
+    dmultinom_$evaluate(), NaN
+  )
+  clear()
+
+  #' @description Test empty bins with small N (1) in dmultinom return expected output.
+  # generate data using R stats:rnorm
+  p <- c(1, rep(0,9))
+  x_values <- t(stats::rmultinom(1, 1, p))
+  # create a fims Rcpp object
+  # initialize the Dmultinom module
+  dmultinom_ <- methods::new(DmultinomDistribution)
+  # populate class members
+  dmultinom_$dims$resize(2)
+  dmultinom_$dims$set(0, 1)
+  dmultinom_$dims$set(1, length(p))
+  dmultinom_$expected_values$resize(length(p))
+  purrr::walk(
+    seq_along(p),
+    \(x) dmultinom_$expected_values[x]$value <- p[x]
+  )
+
+  dmultinom_$x$resize(length(p))
+  purrr::walk(
+    seq_along(p),
+    \(x) dmultinom_$x[x]$value <- x_values[x]
+  )
+
+  # evaluate the density and compare with R
+  expect_equal(
+    dmultinom_$evaluate(), NaN
+  )
+  clear()
 })
 
 ## Error handling ----
 test_that("rcpp distribution returns correct error messages", {
   
-  #' @description dnorm should error out when there is a dimension mismatch
-  # comment out until error checking is fixed
-  # place holder test until Andrea can come back to this
-  expect_equal(
-    object = 1,
-    expected = 1
+  #' @description dnorm should error out when there is a dimension mismatch 
+  y <- stats::rnorm(10)
+  # create a fims Rcpp object
+  # initialize the Dnorm module
+  dnorm_ <- methods::new(DnormDistribution)
+  # populate class members
+  dnorm_$x <- methods::new(FIMS:::ParameterVector, y, 10)
+  dnorm_$expected_values <- methods::new(FIMS:::ParameterVector, 0, 11)
+  dnorm_$log_sd <- methods::new(FIMS:::ParameterVector, log(1), 10)
+  expect_error(
+    object = dnorm_$evaluate(),
+    regexp = "NormalLPDF::Vector index out of bounds. The size of observed data does not equal the size of expected values. The observed data vector is of size 10 and the expected vector is of size 11"
   )
-  # y <- stats::rnorm(10)
-  # # create a fims Rcpp object
-  # # initialize the Dnorm module
-  # dnorm_ <- methods::new(DnormDistribution)
-  # # populate class members
-  # dnorm_$x <- methods::new(FIMS:::ParameterVector, y, 10)
-  # dnorm_$expected_values <- methods::new(FIMS:::ParameterVector, 0, 11)
-  # dnorm_$log_sd <- methods::new(FIMS:::ParameterVector, log(1), 3)
-  # expect_error(
-  #   object = rcpp_distribution(x),
-  #   regexp = "Insert text here that should be in the error message."
-  # )
-  # clear()
+  clear()
+  dnorm_ <- methods::new(DnormDistribution)
+  # populate class members
+  dnorm_$x <- methods::new(FIMS:::ParameterVector, y, 10)
+  dnorm_$expected_values <- methods::new(FIMS:::ParameterVector, 0, 10)
+  dnorm_$log_sd <- methods::new(FIMS:::ParameterVector, log(1), 3)
+  expect_error(
+    object = dnorm_$evaluate(),
+    regexp = "NormalLPDF::Vector index out of bounds. The size of observed data does not equal the size of the log_sd vector. The observed data vector is of size 10 and the log_sd vector is of size 3"
+  )
+  clear()
 
   #' @description dlnorm should error out when there is a dimension mismatch
-  # comment out until error checking is fixed
+  y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
+  # create a fims Rcpp object
+  # initialize the Dlnorm module
+  dlnorm_ <- methods::new(DlnormDistribution)
+  # populate class members
+  dlnorm_$x <- methods::new(ParameterVector, y, 10)
+  dlnorm_$expected_values <- methods::new(ParameterVector, 0, 11)
+  dlnorm_$log_sd <- methods::new(ParameterVector, log(1), 10)
+  expect_error(
+    object = dlnorm_$evaluate(),
+    regexp = "LognormalLPDF::Vector index out of bounds. The size of observed data does not equal the size of expected values. The observed data vector is of size 10 and the expected vector is of size 11"
+  )
+  clear()
 
-  # y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
-  #
-  # # create a fims Rcpp object
-  # # initialize the Dlnorm module
-  # dlnorm_ <- methods::new(DlnormDistribution)
-  # # populate class members
-  # dlnorm_$x <- methods::new(ParameterVector, y, 10)
-  # dlnorm_$expected_values <- methods::new(ParameterVector, 0, 11)
-  # dlnorm_$log_sd <- methods::new(ParameterVector, log(1), 3)
-  # expect_error(
-  #   object = rcpp_distribution(x),
-  #   regexp = "Insert text here that should be in the error message."
-  # )
-  # clear()
+  # initialize the Dlnorm module
+  dlnorm_ <- methods::new(DlnormDistribution)
+  # populate class members
+  dlnorm_$x <- methods::new(ParameterVector, y, 10)
+  dlnorm_$expected_values <- methods::new(ParameterVector, 0, 10)
+  dlnorm_$log_sd <- methods::new(ParameterVector, log(1), 3)
+  expect_error(
+    object = dlnorm_$evaluate(),
+    regexp = "LognormalLPDF::Vector index out of bounds. The size of observed data does not equal the size of the log_sd vector. The observed data vector is of size 10 and the log_sd vector is of size 3"
+  )
+  clear()
+
+ 
+  #' @description dmultinom should error out when there is a dimension mismatch 
+  set.seed(123)
+  p <- (1:12) / sum(1:12)
+  x_values <- t(stats::rmultinom(1, 100, p))
+  # create a fims Rcpp object
+  # initialize the Dmultinom module
+  dmultinom_ <- methods::new(DmultinomDistribution)
+  # populate class members
+  dmultinom_$dims$resize(2)
+  dmultinom_$dims$set(0, 1)
+  dmultinom_$dims$set(1, 10)
+  dmultinom_$expected_values$resize(length(p))
+  purrr::walk(
+    seq_along(p),
+    \(x) dmultinom_$expected_values[x]$value <- p[x]
+  )
+  dmultinom_$x$resize(length(p))
+  purrr::walk(
+    seq_along(p),
+    \(x) dmultinom_$x[x]$value <- x_values[x]
+  )
+  expect_error(
+    object = dmultinom_$evaluate(),
+    regexp = "MultinomialLPDF: Vector index out of bounds. The dimension of the number of  rows times the number of columns is of size 10 and the observed vector is of size 12"
+  )
+  clear()
+
+  set.seed(123)
+  p <- (1:10) / sum(1:10)
+  x_values <- t(stats::rmultinom(1, 100, p))
+  # create a fims Rcpp object
+  # initialize the Dmultinom module
+  dmultinom_ <- methods::new(DmultinomDistribution)
+  # populate class members
+  dmultinom_$dims$resize(2)
+  dmultinom_$dims$set(0, 1)
+  dmultinom_$dims$set(1, 9)
+  dmultinom_$expected_values$resize(length(p))
+  purrr::walk(
+    seq_along(p),
+    \(x) dmultinom_$expected_values[x]$value <- p[x]
+  )
+  dmultinom_$x$resize(length(p)-1)
+  purrr::walk(
+    seq_along(p[1:9]),
+    \(x) dmultinom_$x[x]$value <- x_values[x]
+  )
+  expect_error(
+    object = dmultinom_$evaluate(),
+    regexp = "MultinomialLPDF: Vector index out of bounds. The dimension of the observed vector of size 9 and the expected vector is of size 10"
+  )
+  clear()
 
 
 })

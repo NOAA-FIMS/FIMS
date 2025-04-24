@@ -53,69 +53,86 @@ namespace fims_distributions
             this->lpdf_vec.resize(dims[0]);
             std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
 
-            if (dims[0]*dims[1] != this->expected_values.size()) {
-            FIMS_ERROR_LOG("Observed age comp is of size " + fims::to_string(dims[0]*dims[1])
-                + " and expected is of size " + fims::to_string(this->expected_values.size()));
+            //Dimension checks
+            if(this->input_type == "data"){
+                if (dims[0]*dims[1] != this->expected_values.size()) {
+                    throw std::invalid_argument("MultinomialLPDF: Vector index out of bounds. The dimension of the number of rows times the number of columns is of size " + 
+                        fims::to_string(dims[0]*dims[1]) + " and the expected vector is of size " + 
+                        fims::to_string(this->expected_values.size()));
+                    } 
             } else {
-                for (size_t i = 0; i < dims[0]; i++)
-                {
-                    // for each row, create new x and prob vectors
-                    fims::Vector<Type> x_vector;
-                    fims::Vector<Type> prob_vector;
-                    x_vector.resize(dims[1]);
-                    prob_vector.resize(dims[1]);
-
-                    bool containsNA =
-                        false; /**< skips the entire row if any values are NA */
-
-                    #ifdef TMB_MODEL
-                    for (size_t j = 0; j < dims[1]; j++){
-                        if(this->input_type == "data"){
-                            // if data, check if there are any NA values and skip lpdf calculation for entire row if there are
-                            if (this->observed_values->at(i, j) ==
-                                    this->observed_values->na_value) {
-                                containsNA = true;
-                                break;
-                            }
-                            if(!containsNA){
-                                size_t idx = (i * dims[1]) + j;
-                                x_vector[j] = this->observed_values->at(i, j);
-                                prob_vector[j] = this->expected_values[idx];
-                            }
-                        } else {
-                            // if not data (i.e. prior or process), use x vector instead of observed_values
-                            size_t idx = (i * dims[1]) + j;
-                            x_vector[j] = this->x[idx];
-                            prob_vector[j] = this->expected_values[idx];
-                        }
-                    }
-
-                    if(!containsNA){
-                      this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>) prob_vector, true);
-                    } else {
-                      this->lpdf_vec[i] = 0;
-                    }
-                    lpdf += this->lpdf_vec[i];
-                    /*
-                    if (this->simulate_flag)
-                    {
-                        FIMS_SIMULATE_F(this->of)
-                        {
-                            fims::Vector<Type> sim_observed;
-                            sim_observed.resize(dims[1]);
-                            sim_observed = rmultinom(prob_vector);
-                            sim_observed.resize(this->x);
-                            for (size_t j = 0; j < dims[1]; j++)
-                            {
-                                idx = (i * dims[1]) + j;
-                                this->x[idx] = sim_observed[j];
-                            }
-                        }
-                    }
-                    */
-                    #endif
+                if (dims[0]*dims[1] != this->x.size()) {
+                    throw std::invalid_argument("MultinomialLPDF: Vector index out of bounds. The dimension of the number of  rows times the number of columns is of size " + 
+                        fims::to_string(dims[0]*dims[1]) + " and the observed vector is of size " + 
+                        fims::to_string(this->x.size()));
+                }
+                if (this->x.size() != this->expected_values.size()) {
+                    throw std::invalid_argument("MultinomialLPDF: Vector index out of bounds. The dimension of the observed vector of size " + 
+                        fims::to_string(this->x.size()) + " and the expected vector is of size " + 
+                        fims::to_string(this->expected_values.size()));
                 }
             }
+            
+            
+            for (size_t i = 0; i < dims[0]; i++)
+            {
+                // for each row, create new x and prob vectors
+                fims::Vector<Type> x_vector;
+                fims::Vector<Type> prob_vector;
+                x_vector.resize(dims[1]);
+                prob_vector.resize(dims[1]);
+
+                bool containsNA =
+                    false; /**< skips the entire row if any values are NA */
+
+                #ifdef TMB_MODEL
+                for (size_t j = 0; j < dims[1]; j++){
+                    if(this->input_type == "data"){
+                        // if data, check if there are any NA values and skip lpdf calculation for entire row if there are
+                        if (this->observed_values->at(i, j) ==
+                                this->observed_values->na_value) {
+                            containsNA = true;
+                            break;
+                        }
+                        if(!containsNA){
+                            size_t idx = (i * dims[1]) + j;
+                            x_vector[j] = this->observed_values->at(i, j);
+                            prob_vector[j] = this->expected_values[idx];
+                        }
+                    } else {
+                        // if not data (i.e. prior or process), use x vector instead of observed_values
+                        size_t idx = (i * dims[1]) + j;
+                        x_vector[j] = this->x[idx];
+                        prob_vector[j] = this->expected_values[idx];
+                    }
+                }
+
+                if(!containsNA){
+                    this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>) prob_vector, true);
+                } else {
+                    this->lpdf_vec[i] = 0;
+                }
+                lpdf += this->lpdf_vec[i];
+                /*
+                if (this->simulate_flag)
+                {
+                    FIMS_SIMULATE_F(this->of)
+                    {
+                        fims::Vector<Type> sim_observed;
+                        sim_observed.resize(dims[1]);
+                        sim_observed = rmultinom(prob_vector);
+                        sim_observed.resize(this->x);
+                        for (size_t j = 0; j < dims[1]; j++)
+                        {
+                            idx = (i * dims[1]) + j;
+                            this->x[idx] = sim_observed[j];
+                        }
+                    }
+                }
+                */
+                #endif
+            }
+            
             #ifdef TMB_MODEL
             #endif
             this->lpdf = lpdf;
