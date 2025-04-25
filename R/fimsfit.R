@@ -190,6 +190,17 @@ methods::setGeneric("get_estimates", function(x) standardGeneric("get_estimates"
 methods::setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
 
 #' @return
+#' [get_fits()] returns a tibble of parameter values and their
+#' uncertainties from a fitted model.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_fits", function(x) standardGeneric("get_fits"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_fits", "FIMSFit", function(x) x@fits)
+
+#' @return
 #' [get_number_of_parameters()] returns a vector of integers specifying the
 #' number of fixed-effect parameters and the number of random-effect parameters
 #' in the model.
