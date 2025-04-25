@@ -8,7 +8,6 @@
 
 # rcpp distribution ----
 ## Setup ----
-testthat::skip()
 # Load or prepare any necessary data for testing
 ## IO correctness ----
 test_that("rcpp_distribution works with correct inputs", {
@@ -188,8 +187,11 @@ test_that("rcpp_distribution works with correct inputs", {
 
   clear()
 })
-
 ## Edge handling ----
+# Skip this test on GitHub Actions runs, as it takes too long and causes the
+# R CMD Check to fail.
+testthat::skip_on_ci()
+
 test_that("rcpp_distribution returns correct outputs for edge cases", {
   set.seed(123)
   #' @description Test extreme observed values for dnorm (-1000, 1000) return expected output.
