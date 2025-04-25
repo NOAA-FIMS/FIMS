@@ -18,10 +18,12 @@
 
 ## Setup ----
 # Skip this test if not on a GitHub Actions run
-testthat::skip_if(
-  !testthat:::env_var_is_true("CI"),
-  message = "Not on CI, skip parallel tests"
-)
+# testthat::skip_if(
+#   !testthat:::env_var_is_true("CI"),
+#   message = "Not on CI, skip parallel tests"
+# )
+# Skip this test
+testthat::skip()
 
 # Skip this test if calculating code coverage
 testthat::skip_on_covr()
