@@ -44,7 +44,11 @@ test_that("rcpp_distribution works with correct inputs", {
     seq_along(y),
     \(x) dnorm_$x[x]$value <- y[x]
   )
-  dnorm_$expected_values[1]$value <- 0
+  dnorm_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dnorm_$expected_values[x]$value <- 0
+  )
   dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
   expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
@@ -111,7 +115,11 @@ test_that("rcpp_distribution works with correct inputs", {
     seq_along(y),
     \(x) dlnorm_$x[x]$value <- y[x]
   )
-  dlnorm_$expected_values[1]$value <- 0
+  dlnorm_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dlnorm_$expected_values[x]$value <- 0
+  )
   dlnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
   expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)) + sum(log(y)))
@@ -182,6 +190,7 @@ test_that("rcpp_distribution works with correct inputs", {
 
 ## Edge handling ----
 test_that("rcpp_distribution returns correct outputs for edge cases", {
+  set.seed(123)
   #' @description Test extreme observed values for dnorm (-1000, 1000) return expected output.
   y <- -1000
   # create a fims Rcpp object
@@ -280,7 +289,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   dlnorm_$x[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
   dlnorm_$log_sd[1]$value <- log(1)
-  expect_equal(dlnorm_$evaluate(),-24.77748)
+  expect_equal(dlnorm_$evaluate(), -24.77748)
   clear()
 
   #' @description Test extreme expected values for dlnorm (-1000, 1000) return expected output.
@@ -290,7 +299,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   dlnorm_$x[1]$value <- y
   dlnorm_$expected_values[1]$value <- -1000
   dlnorm_$log_sd[1]$value <- log(1)
-  expect_equal(dlnorm_$evaluate(),-500000.9)
+  expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, -1000, 1, TRUE) + log(y))
   clear()
   y <- 1
   dlnorm_ <- methods::new(DlnormDistribution)
@@ -298,7 +307,8 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   dlnorm_$x[1]$value <- y
   dlnorm_$expected_values[1]$value <- 1000
   dlnorm_$log_sd[1]$value <- log(1)
-  expect_equal(dlnorm_$evaluate(),-500000.92)
+
+  expect_equal(dlnorm_$evaluate(), -500000.92)
   clear()
 
   #' @description Test extreme log_sd values for dlnorm (-10, 10) return expected output.
@@ -308,7 +318,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   dlnorm_$x[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
   dlnorm_$log_sd[1]$value <- 10
-  expect_equal(dlnorm_$evaluate(),-10.91894)
+  expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, exp(10), TRUE) + log(y))
   clear()
   y <- 1
   dlnorm_ <- methods::new(DlnormDistribution)
@@ -316,12 +326,12 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   dlnorm_$x[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
   dlnorm_$log_sd[1]$value <- -10
-  expect_equal(dlnorm_$evaluate(),9.0810615)
+  expect_equal(dlnorm_$evaluate(), 9.0810615)
   clear()
 
   #' @description Test empty bins with large N (1000) in dmultinom return expected output.
   # generate data using R stats:rnorm
-  p <- c(1, rep(0,9))
+  p <- c(1, rep(0, 9))
   x_values <- t(stats::rmultinom(1, 1000, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
@@ -350,7 +360,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
 
   #' @description Test empty bins with small N (1) in dmultinom return expected output.
   # generate data using R stats:rnorm
-  p <- c(1, rep(0,9))
+  p <- c(1, rep(0, 9))
   x_values <- t(stats::rmultinom(1, 1, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
@@ -380,8 +390,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
 
 ## Error handling ----
 test_that("rcpp distribution returns correct error messages", {
-  
-  #' @description dnorm should error out when there is a dimension mismatch 
+  #' @description dnorm should error out when there is a dimension mismatch
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
@@ -433,8 +442,8 @@ test_that("rcpp distribution returns correct error messages", {
   )
   clear()
 
- 
-  #' @description dmultinom should error out when there is a dimension mismatch 
+
+  #' @description dmultinom should error out when there is a dimension mismatch
   set.seed(123)
   p <- (1:12) / sum(1:12)
   x_values <- t(stats::rmultinom(1, 100, p))
@@ -476,7 +485,7 @@ test_that("rcpp distribution returns correct error messages", {
     seq_along(p),
     \(x) dmultinom_$expected_values[x]$value <- p[x]
   )
-  dmultinom_$x$resize(length(p)-1)
+  dmultinom_$x$resize(length(p) - 1)
   purrr::walk(
     seq_along(p[1:9]),
     \(x) dmultinom_$x[x]$value <- x_values[x]

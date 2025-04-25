@@ -92,7 +92,7 @@ test_that("create_default_Population() works with correct inputs", {
 })
 
 ## Edge handling ----
-# No edge cases to test. 
+# No edge cases to test.
 
 ## Error handling ----
 test_that("create_default_Population() returns correct error messages", {

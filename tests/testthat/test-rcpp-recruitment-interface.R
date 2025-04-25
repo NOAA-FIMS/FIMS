@@ -77,7 +77,7 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
     )
   }
 
-  #expected_lpdf <- sum(log(stats::dnorm(log_devs, 0, 0.7)))
+  # expected_lpdf <- sum(log(stats::dnorm(log_devs, 0, 0.7)))
   clear()
 })
 
