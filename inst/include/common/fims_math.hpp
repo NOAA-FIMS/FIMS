@@ -381,6 +381,21 @@ namespace fims_math
     return (give_log ? loglik : exp(loglik));
   }
 
+ /**
+   * Calculate the linear parameterization of the Dirichlet-Multinomial distribution
+   * and return the loglikelihood or likelihood value
+   *
+   * @brief
+   *
+   * @param x A vector of observed counts by catergory.
+   * @param p A vector of observed proportions by catergory.
+   * @param theta The weighting parameter for the linear DM.
+   * @param pred_p A parameter vector of estimated proportions by catergory.
+   * @param give_log A boolean for the returned value. 
+   *        If true then return loglikelihood value, 
+   *        else if false, return likelihood.
+   * @return A single numeric value.
+   */
   template <typename Type>
   Type ddirichlet_multinomial_linear(const fims::Vector<Type> &x,
                               const fims::Vector<Type> &p,
@@ -398,7 +413,7 @@ namespace fims_math
     // neff = (1 + theta * N)/(1 + theta) 
     Type neff = (Type(1.0) + theta * static_cast<Type>(N)) / (Type(1.0) + theta);
 
-    // Dirichlet-Multinomial Log-Likelihood
+    // Dirichlet-Multinomial Log-Likelihood linear parameterization
     // Term 1 in eqn 4.4 of Fisch et al. (2021. Fish. Res., Table 3)
     loglik += lgamma(N + 1.0);
     // Term 2
@@ -418,6 +433,60 @@ namespace fims_math
 
     return (give_log ? loglik : exp(loglik));
   }
+
+/**
+   * Calculate the saturated parameterization of the Dirichlet-Multinomial distribution
+   * and return the loglikelihood or likelihood value
+   *
+   * @brief
+   *
+   * @param x A vector of observed counts by catergory.
+   * @param p A vector of observed proportions by catergory.
+   * @param beta The weighting parameter for the saturated DM.
+   * @param pred_p A parameter vector of estimated proportions by catergory.
+   * @param give_log A boolean for the returned value. 
+   *        If true then return loglikelihood value, 
+   *        else if false, return likelihood.
+   * @return A single numeric value.
+   */
+  template <typename Type>
+  Type ddirichlet_multinomial_saturated(const fims::Vector<Type> &x,
+                              const fims::Vector<Type> &p,
+                              Type beta,
+                              const fims::Vector<Type> &pred_p,
+                              bool give_log = true)
+  {
+    Type loglik = 0.0;
+    int ncat = x.size();
+    Type N = 0.0;
+    for (int i = 0; i < ncat; ++i)
+    {
+      N += x[i];
+    }
+    // neff = N * (1 + beta)/(N + beta) 
+    Type neff = static_cast<Type>(N) * (Type(1.0) + beta) / (static_cast<Type>(N) + beta);
+
+    // Dirichlet-Multinomial Log-Likelihood saturated parameterization
+    // Term 1 in eqn 4.5 of Fisch et al. (2021. Fish. Res., Table 3)
+    loglik += lgamma(N + 1.0);
+    // Term 2
+    for (int i = 0; i < ncat; ++i)
+    {
+      loglik -= lgamma(x[i] + 1.0);
+    }
+    // Term 3
+    loglik += lgamma(beta);
+    // Term 4
+    loglik -= lgamma(beta + N);
+    // Term 5
+    for (int i = 0; i < ncat; ++i)
+    {
+      loglik += lgamma(x[i] + beta * pred_p[i]) - lgamma(beta * pred_p[i]);
+    }
+
+    return (give_log ? loglik : exp(loglik));
+  }
+
 
 } // namespace fims_math
 
