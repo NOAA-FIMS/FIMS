@@ -273,6 +273,60 @@ reshape_json_derived_quantities <- function(finalized_fims) {
     dplyr::relocate(module_name, module_id, module_type, .before = tidyselect::everything())
 }
 
+#' Reshape JSON 'values' components - UNFINISHED
+#'
+#' This function processes the model input from FIMS JSON output and reshapes the initial values
+#' for data inputs into a structured tibble for easier analysis and manipulation.
+#'
+#' @param finalized_fims A JSON object containing the finalized FIMS output.
+#' @return A tibble containing the reshaped likelihood estimates.
+#'
+reshape_json_values <- function(finalized_fims) {
+  json_list <- jsonlite::fromJSON(finalized_fims)
+  # Identify the index of the "modules" element in `json_list` by matching its name.
+  # This is used to locate the relevant part of the JSON structure for further processing.
+  modules_id <- which(names(json_list) == "modules")
+
+  values <- purrr::map(seq_along(json_list[[modules_id]][["values"]]), ~ {
+    # If the current module's "values" is NULL, return NULL to skip processing.
+    if (is.null(json_list[[modules_id]][["values"]][[.x]])) {
+      NULL
+    } else {
+      # Convert the current module's "values" into a tibble for easier manipulation.
+      tibble::as_tibble(json_list[[modules_id]][["values"]][[.x]])
+    }
+  })
+
+  expanded_values <- purrr::pmap(
+    list(
+      values,
+      json_list[[modules_id]][["name"]],
+      json_list[[modules_id]][["id"]],
+      json_list[[modules_id]][["type"]]
+    ),
+    ~ {
+      # Skip processing if the current derived_quantity is NULL.
+      if (is.null(..1)) {
+        NULL
+      } else {
+        ..1 |>
+          dplyr::mutate(
+            # Add the module name from `json_list` as a new column of the current estimates.
+            module_name = ..2,
+            # Add the module ID from `json_list` as a new column.
+            module_id = ..3,
+            # Add the module type from `json_list` as a new column.
+            module_type = ..4
+          )
+      }
+    }
+  ) |>
+    # Combine all the processed tibbles into a single tibble by stacking rows.
+    dplyr::bind_rows() |>
+    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
+    dplyr::relocate(module_name, module_id, module_type, .before = everything())
+}
+
 #' Reshape JSON likelihood components - UNFINISHED
 #'
 #' This function processes the finalized FIMS JSON output and reshapes the likelihood values
