@@ -1,6 +1,6 @@
 # Helper file for FIMS R tests----
-# This file contains multiple functions that are used to set up and run  
-# FIMS models with or without wrapper functions. The functions are sourced by 
+# This file contains multiple functions that are used to set up and run
+# FIMS models with or without wrapper functions. The functions are sourced by
 # devtools::load_all().
 
 # FIMS dmultinorm function ----

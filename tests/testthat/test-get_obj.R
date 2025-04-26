@@ -7,6 +7,9 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # get_obj ----
+## Setup ----
+# Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("get_obj() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
@@ -26,12 +29,14 @@ test_that("get_obj() works with correct inputs", {
   check_obj <- function(fit_file) {
     fit_data <- readRDS(fit_file)
     obj <- get_obj(fit_data)
-    #' @description Test that get_obj() returns correct output for the obj slot.
+    #' @description Test that [get_obj()] returns correct output for the obj
+    #' slot.
     expect_equal(
       object = obj,
       expected = fit_data@obj
     )
-    #' @description Test that get_obj() returns correct names for the obj slot.
+    #' @description Test that [get_obj()] returns correct names for the obj
+    #' slot.
     expect_equal(
       object = names(obj),
       expected = expected_names
@@ -44,11 +49,12 @@ test_that("get_obj() works with correct inputs", {
 
 ## Edge handling ----
 test_that("get_obj() returns correct outputs for edge cases", {
-  #' @description Test that get_obj("invalid_input") returns an error.
+  #' @description Test that [get_obj()] returns an error when given invalid
+  #' input.
   expect_error(
     object = get_obj("invalid_input")
   )
 })
 
 ## Error handling ----
-# No built-in errors or warnings to test for get_obj().
+# No built-in errors to test.

@@ -7,6 +7,9 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # get_version ----
+## Setup ----
+# Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("get_version() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
@@ -23,12 +26,13 @@ test_that("get_version() works with correct inputs", {
   check_version <- function(fit_file) {
     fit_data <- readRDS(fit_file)
     version <- get_version(fit_data)
-    #' @description Test that get_version() returns correct output for the version slot.
+    #' @description Test that [get_version()] returns correct output for the
+    #' version slot.
     expect_equal(
       object = version,
       expected = fit_data@version
     )
-    #' @description Test that get_version() returns correct version.
+    #' @description Test that [get_version()] returns correct version.
     expect_equal(
       object = version,
       expected = expected_version
@@ -41,11 +45,12 @@ test_that("get_version() works with correct inputs", {
 
 ## Edge handling ----
 test_that("get_version() returns correct outputs for edge cases", {
-  #' @description Test that get_version("invalid_input") returns an error.
+  #' @description Test that [get_version()] returns an error when given invalid
+  #' input.
   expect_error(
     object = get_version("invalid_input")
   )
 })
 
 ## Error handling ----
-# No built-in errors or warnings to test for get_version().
+# No built-in errors to test.
