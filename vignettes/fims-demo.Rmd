@@ -237,8 +237,6 @@ clear()
 # Get information about the model and print a few characters to the screen
 recruitment_log <- get_log_module("information")
 substr(recruitment_log, 1, 100)
-
-
 ```
 
 The results can be plotted with either base R or using {ggplot2}.

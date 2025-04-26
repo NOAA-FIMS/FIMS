@@ -12,14 +12,13 @@
 
 ## IO correctness ----
 test_that("Rcpp interface works for modules", {
-
   #' @description Test that Rcpp interface works for parameter module.
   expect_no_error(parameter <- methods::new(Parameter, .1))
 
   #' @description Test that Rcpp interface works for recruitment module.
   expect_no_error(beverton_holt <- methods::new(BevertonHoltRecruitment))
   expect_equal(beverton_holt$get_id(), 1)
-  
+
   #' @description Test that Rcpp interface works for selectivity module.
   expect_no_error(logistic_selectivity <- methods::new(LogisticSelectivity))
   logistic_selectivity$slope[1]$value <- .7

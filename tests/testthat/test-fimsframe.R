@@ -143,7 +143,7 @@ test_that("m_index works with correct inputs", {
     index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
     expect_silent(
       index_dat[[fleet_names_index[index_i]]] <-
-      m_index(fims_frame, fleet_names_index[index_i])
+        m_index(fims_frame, fleet_names_index[index_i])
     )
   }
 
