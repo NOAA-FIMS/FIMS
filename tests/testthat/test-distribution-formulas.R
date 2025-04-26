@@ -19,7 +19,7 @@ em_input <- em_input_list[[iter_id]]
 clear()
 
 # Set up recruitment module to test initialize_process_distribution
-# create new module in the recruitment class (specifically Beverton-Holt,
+# create new module in the recruitment class (specifically Beverton--Holt,
 # when there are other options, this would be where the option would be chosen)
 recruitment <- methods::new(BevertonHoltRecruitment)
 
@@ -32,10 +32,9 @@ recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) +
   log(om_input$h - 0.2)
 recruitment$logit_steep[1]$is_random_effect <- FALSE
 recruitment$logit_steep[1]$estimated <- FALSE
-# turn on estimation of deviations
-# recruit deviations should enter the model in normal space.
-# The log is taken in the likelihood calculations
-# alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
+# turn on estimation of deviations recruit deviations should enter the model in
+# normal space. The log is taken in the likelihood calculations alternative
+# setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
 recruitment$log_devs$resize(om_input$nyr - 1)
 logR_resid <- om_input$logR.resid[-1]
 purrr::walk(
@@ -55,8 +54,9 @@ recruitment$estimate_log_devs$set(TRUE)
 
 # Set up fishing fleet modules to test initialize_data_distribution
 catch <- em_input$L.obs$fleet1
-# set fishing fleet catch data, need to set dimensions of data index
-# currently FIMS only has a fleet module that takes index for both survey index and fishery catch
+# set fishing fleet catch data, need to set dimensions of data index currently
+# FIMS only has a fleet module that takes index for both survey index and
+# fishery catch
 fishing_fleet_index <- methods::new(Index, om_input$nyr)
 purrr::walk(
   seq_along(catch),
@@ -121,7 +121,8 @@ test_that("distribution formulas work with correct inputs", {
 
 ## Error handling ----
 test_that("distribution_formulas_new() returns correct error messages", {
-  #' @description Test that initialize_process_distribution returns expected error.
+  #' @description Test that initialize_process_distribution returns expected
+  #' error.
   expect_error(
     initialize_process_distribution(
       module = recruitment,

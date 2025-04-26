@@ -9,6 +9,7 @@
 # rcpp variable vector ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("rcpp ParameterVector works as expected", {
   v_size <- 10
@@ -49,14 +50,14 @@ test_that("rcpp ParameterVector works as expected", {
   }
 
 
-  #' @description Test mult operator works.
+  #' @description Test multiplier operator works.
   v_mult_test <- v1 * v2
   for (i in 1:v_size) {
     expect_equal(v_mult_test$get(i - 1)$value, (v1[i]$value * v2[i]$value))
   }
 
 
-  #' @description Test div operator works.
+  #' @description Test division operator works.
   v_div_test <- v1 / v2
   for (i in 1:v_size) {
     expect_equal(v_div_test$get(i - 1)$value, (v1[i]$value / v2[i]$value))

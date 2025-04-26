@@ -26,33 +26,34 @@ default_parameters <- create_default_parameters(data, fleets = fleets)
 
 ## IO correctness ----
 
-test_that("initialize_fims works", {
-  #' @description Test that [initialize_fims()] works.
+test_that("initialize_fims works with correct inputs", {
+  #' @description Test that [initialize_fims()] returns a list with one
+  #' element named parameters.
   result <- initialize_fims(parameters = default_parameters, data = data)
-
   expect_type(result, "list")
   expect_named(result, "parameters")
+  expect_equal(length(result), 1)
   clear()
-})
-
-test_that("initialize_comp works for type = AgeComp", {
+  
+  #' @description Test that [initialize_comp()] works for AgeComp and returns
+  #' an S4 object.
   result <- initialize_comp(
     data = data,
     fleet_name = "fleet1",
     type = "AgeComp"
   )
-  #' @description Test that [initialize_fims()] works for AgeComp and returns
-  #' an S4 object.
   expect_type(result, "S4")
-  #' @description Test that [initialize_fims()] works for AgeComp and contains
-  #' correct function.
-  expect_no_error(result$age_comp_data)
-  expect_true("age_comp_data" %in% names(result))
-  #' @description Test that [initialize_fims()] works and does not contain the
-  #' other type of function.
-  expect_error(result$length_comp_data)
-  expect_false("length_comp_data" %in% names(result))
-
+  #' @description Test that [initialize_comp()] works for AgeComp and contains
+  #' the correct names inside the rcpp object.
+  expect_no_error(result[["age_comp_data"]])
+  expect_null(result[["length_comp_data"]])
+  expect_true(
+    all(c("age_comp_data", "initialize", "finalize", ".pointer") %in%
+      names(result)
+    )
+  )
+  #' @description Test that the age-composition data in the returned object from
+  #' [initialize_comp()] has the correct values.
   expect_equal(
     result$age_comp_data$toRVector(),
     data |>
@@ -61,27 +62,27 @@ test_that("initialize_comp works for type = AgeComp", {
       dplyr::mutate(out = value * uncertainty) |>
       dplyr::pull(out)
   )
-
   clear()
-})
 
-test_that("initialize_comp works for type = LengthComp", {
+  #' @description Test that [initialize_fims()] works for LengthComp and
+  #' returns an S4 object.
   result <- initialize_comp(
     data = data,
     fleet_name = "fleet1",
     type = "LengthComp"
   )
-  #' @description Test that [initialize_fims()] works for LengthComp and
-  #' returns an S4 object.
   expect_type(result, "S4")
   #' @description Test that [initialize_fims()] works for LengthComp and
   #' contains correct function.
-  expect_no_error(result$length_comp_data)
-  expect_true("length_comp_data" %in% names(result))
-  #' @description Test that [initialize_fims()] works and does not contain the
-  #' other type of function.
-  expect_error(result$age_comp_data)
-
+  expect_no_error(result[["length_comp_data"]])
+  expect_null(result[["age_comp_data"]])
+  expect_true(
+    all(c("length_comp_data", "initialize", "finalize", ".pointer") %in%
+      names(result)
+    )
+  )
+  #' @description Test that the length-composition data in the returned object
+  #' from [initialize_comp()] has the correct values.
   expect_equal(
     result$length_comp_data$toRVector(),
     data |>
@@ -90,7 +91,6 @@ test_that("initialize_comp works for type = LengthComp", {
       dplyr::mutate(out = value * uncertainty) |>
       dplyr::pull(out)
   )
-
   clear()
 })
 

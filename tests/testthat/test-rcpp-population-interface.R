@@ -9,6 +9,7 @@
 # rcpp population interface ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("test_rcpp_population_interface() works with correct inputs", {
   # setup population to create test values
@@ -97,7 +98,9 @@ test_that("test_rcpp_population_interface() works with correct inputs", {
 
   clear()
 })
+
 ## Edge handling ----
 # No Edge handling for now.
+
 ## Error handling ----
 # No built in errors or warnings to test for now.

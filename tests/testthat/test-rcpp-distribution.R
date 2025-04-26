@@ -8,6 +8,7 @@
 
 # rcpp distribution ----
 ## Setup ----
+
 # Load or prepare any necessary data for testing
 ## IO correctness ----
 test_that("rcpp_distribution works with correct inputs", {
@@ -187,6 +188,7 @@ test_that("rcpp_distribution works with correct inputs", {
 
   clear()
 })
+
 ## Edge handling ----
 # Skip this test on GitHub Actions runs, as it takes too long and causes the
 # R CMD Check to fail.

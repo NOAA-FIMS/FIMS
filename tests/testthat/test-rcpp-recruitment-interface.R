@@ -9,6 +9,7 @@
 # rcpp recruitment interface ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("test_rcpp_recruitment_interface() works with correct inputs", {
   # Create recruitment
@@ -81,7 +82,8 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
   clear()
 })
 
-# No edge cases for now.
+## Edge handling ----
+# No Edge handling for now.
 
 ## Error handling ----
 test_that("test_rcpp_recruitment_interface() returns correct error messages", {

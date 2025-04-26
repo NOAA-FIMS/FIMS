@@ -9,6 +9,7 @@
 # get_opt ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("get_opt() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
@@ -28,12 +29,14 @@ test_that("get_opt() works with correct inputs", {
   check_opt <- function(fit_file) {
     fit_data <- readRDS(fit_file)
     opt <- get_opt(fit_data)
-    #' @description Test that get_opt() returns correct output for the opt slot.
+    #' @description Test that [get_opt()] returns correct output for the opt
+    #' slot.
     expect_equal(
       object = opt,
       expected = fit_data@opt
     )
-    #' @description Test that get_opt() returns correct names for the opt slot.
+    #' @description Test that [get_opt()] returns correct names for the opt
+    #' slot.
     expect_equal(
       object = names(opt),
       expected = expected_names
@@ -46,7 +49,8 @@ test_that("get_opt() works with correct inputs", {
 
 ## Edge handling ----
 test_that("get_opt() returns correct outputs for edge cases", {
-  #' @description Test that get_opt("invalid_input") returns an error.
+  #' @description Test that [get_opt()] returns an error when given invalid
+  #' input.
   expect_error(
     object = get_opt("invalid_input")
   )

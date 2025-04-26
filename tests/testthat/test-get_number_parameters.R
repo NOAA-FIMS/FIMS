@@ -9,6 +9,7 @@
 # get_number_of_parameters ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("get_number_of_parameters() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
@@ -31,12 +32,14 @@ test_that("get_number_of_parameters() works with correct inputs", {
       fixed_effects = expected_n_fixed_effects,
       random_effects = expected_n_random_effects
     )
-    #' @description Test that get_number_of_parameters() returns correct output for the number_of_parameters slot.
+    #' @description Test that [get_number_of_parameters()] returns correct
+    #' output for the number_of_parameters slot.
     expect_equal(
       object = number_of_parameters,
       expected = fit_data@number_of_parameters
     )
-    #' @description Test that get_number_of_parameters() returns correct names for the number_of_parameters slot.
+    #' @description Test that [get_number_of_parameters()] returns correct
+    #' names for the number_of_parameters slot.
     expect_equal(
       object = number_of_parameters,
       expected = expected_vector
@@ -49,7 +52,8 @@ test_that("get_number_of_parameters() works with correct inputs", {
 
 ## Edge handling ----
 test_that("get_number_of_parameters() returns correct outputs for edge cases", {
-  #' @description Test that get_number_of_parameters("invalid_input") returns an error.
+  #' @description Test that [get_number_of_parameters()] returns an error when
+  #' given invalid input.
   expect_error(
     object = get_number_of_parameters("invalid_input")
   )

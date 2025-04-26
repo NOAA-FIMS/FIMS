@@ -6,7 +6,7 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# create_default_parameters ----
+# create_default_* ----
 ## Setup ----
 data <- FIMS::FIMSFrame(data1)
 
@@ -20,14 +20,20 @@ fleet1 <- survey1 <- list(
 
 fleets <- list(fleet1 = fleet1, survey1 = survey1)
 
+# create_default_parameters ----
 ## IO correctness ----
-test_that("create_default_parameters() returns correct structure", {
+test_that("create_default_parameters() works with correct inputs", {
+  #' @description Test that [create_default_parameters()] returns correct
+  #' structure.
   result <- create_default_parameters(data, fleets = fleets)
 
   expect_named(result, c("parameters", "modules"))
   expect_type(result[["parameters"]], "list")
   expect_type(result[["modules"]], "list")
-  expect_named(result[["modules"]], c("fleets", "recruitment", "growth", "maturity"))
+  expect_named(
+    object = result[["modules"]],
+    expected = c("fleets", "recruitment", "growth", "maturity")
+  )
 })
 
 ## Edge handling ----
@@ -35,7 +41,8 @@ test_that("create_default_parameters() returns correct structure", {
 
 ## Error handling ----
 test_that("create_default_parameters() returns correct error messages", {
-  #' @description Test that create_default_parameters() detects missing fleet names.
+  #' @description Test that [create_default_parameters()] detects missing fleet
+  #' names.
   invalid_fleet <- list(
     selectivity = list(form = "LogisticSelectivity"),
     data_distribution = c(
@@ -55,7 +62,8 @@ test_that("create_default_parameters() returns correct error messages", {
     "The following 1 fleet name is missing from the data: invalid_fleet"
   )
 
-  #' @description Test that create_default_parameters() returns error because input list is `NULL`.
+  #' @description Test that create_default_parameters() returns error because
+  #' input list is `NULL`.
   empty_data <- NULL
 
   expect_error(create_default_parameters(empty_data, fleets = fleets))
@@ -64,7 +72,7 @@ test_that("create_default_parameters() returns correct error messages", {
 # create_default_Population ----
 ## IO correctness ----
 test_that("create_default_Population() works with correct inputs", {
-  #' @description Test that create_default_Population() returns a list.
+  #' @description Test that [create_default_Population()] returns a list.
   expect_type(
     object = create_default_Population(
       data = data,
@@ -73,7 +81,7 @@ test_that("create_default_Population() works with correct inputs", {
     type = "list"
   )
 
-  #' @description Test that create_default_Population() returns the correct list structure with four elements.
+  #' @description Test that [create_default_Population()] returns the correct list structure with four elements.
   population_1 <- create_default_Population(data, log_rzero = 10)
   expect_equal(
     object = names(population_1),
@@ -96,8 +104,8 @@ test_that("create_default_Population() works with correct inputs", {
 
 ## Error handling ----
 test_that("create_default_Population() returns correct error messages", {
-  #' @description Test that create_default_Population(x) returns expected errors
-  #' when the input `log_rzero` is incorrect.
+  #' @description Test that [create_default_Population()] returns expected
+  #' errors when the input to `log_rzero` is incorrect.
 
   expect_error(
     object = create_default_Population(
@@ -125,8 +133,8 @@ test_that("create_default_Population() returns correct error messages", {
 # create_default_DoubleLogistic ----
 ## IO correctness ----
 test_that("create_default_DoubleLogistic() works with correct inputs", {
-  #' @description Test that create_default_DoubleLogistic(x) returns the correct
-  #' list structure.
+  #' @description Test that [create_default_DoubleLogistic()] returns the
+  #' correct list structure.
   DoubleLogistic_1 <- create_default_DoubleLogistic()
   expect_type(
     object = DoubleLogistic_1,
@@ -146,7 +154,7 @@ test_that("create_default_DoubleLogistic() works with correct inputs", {
     )
   )
 
-  #' @description Test that create_default_DoubleLogistic() returns correct
+  #' @description Test that [create_default_DoubleLogistic()] returns correct
   #' default values.
   expect_equal(
     object = DoubleLogistic_1[["inflection_point_asc.value"]],

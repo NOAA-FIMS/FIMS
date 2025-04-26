@@ -12,8 +12,9 @@
 # get_fixed ----
 ## IO correctness ----
 test_that("get_fixed() works with correct inputs", {
-  #' @description Test that get_fixed() works with a logistic selectivity curve
-  #' returns the correct number of parameters with their specified inputs.
+  #' @description Test that [get_fixed()] works with a logistic selectivity
+  #' curve returns the correct number of parameters with their specified
+  #' inputs.
   clear()
   # Create selectivity
   selectivity <- methods::new(LogisticSelectivity)

@@ -9,6 +9,7 @@
 # get_timing ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("get_timing() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
@@ -27,17 +28,20 @@ test_that("get_timing() works with correct inputs", {
   check_timing <- function(fit_file) {
     fit_data <- readRDS(fit_file)
     timing <- get_timing(fit_data)
-    #' @description Test that get_timing() returns correct output for the timing slot.
+    #' @description Test that [get_timing()] returns correct output for the
+    #' timing slot.
     expect_equal(
       object = timing,
       expected = fit_data@timing
     )
-    #' @description Test that get_timing() returns correct names for the timing slot.
+    #' @description Test that [get_timing()] returns correct names for the
+    #' timing slot.
     expect_equal(
       object = names(timing),
       expected = expected_names
     )
-    #' @description Test that get_timing() returns > 0 values for the timing slot.
+    #' @description Test that [get_timing()] returns > 0 values for the timing
+    #' slot.
     expect_true(object = all(timing > 0))
   }
 
@@ -47,7 +51,8 @@ test_that("get_timing() works with correct inputs", {
 
 ## Edge handling ----
 test_that("get_timing() returns correct outputs for edge cases", {
-  #' @description Test that get_timing("invalid_input") returns an error.
+  #' @description Test that [get_timing()] returns an error when given invalid
+  #' input.
   expect_error(
     object = get_timing("invalid_input")
   )
