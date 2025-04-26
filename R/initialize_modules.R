@@ -421,7 +421,6 @@ initialize_selectivity <- function(parameters, data, fleet_name) {
 #' The initialized fleet module as an object.
 #' @noRd
 initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
-
   module <- initialize_module(
     parameters = parameters,
     data = data,
@@ -442,7 +441,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # if the data type includes "landings" and if "Landings" exists in the data distribution
   # specification
   if ("landings" %in% fleet_types &&
-      "Landings" %in% distribution_names_for_fleet) {
+    "Landings" %in% distribution_names_for_fleet) {
     module$SetObservedLandingsDataID(linked_ids["landings"])
   }
 
@@ -450,7 +449,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # if the data type includes "index" and if "Index" exists in the data distribution
   # specification
   if ("index" %in% fleet_types &&
-      "Index" %in% distribution_names_for_fleet) {
+    "Index" %in% distribution_names_for_fleet) {
     module$SetObservedIndexDataID(linked_ids["index"])
   }
 
@@ -503,7 +502,7 @@ initialize_landings <- function(data, fleet_name) {
       \(x) module$landings_data$set(x - 1, m_landings(data, fleet_name)[x])
     )
     return(module)
-  }else{
+  } else {
     return(NULL)
   }
 }
@@ -698,8 +697,8 @@ initialize_fims <- function(parameters, data) {
       "Landings" %in% data_distribution_names_for_fleet_i) {
       # Initialize landings module for the current fleet
       fleet_landings[[i]] <- initialize_landings(
-      data = data,
-      fleet_name = fleet_names[i]
+        data = data,
+        fleet_name = fleet_names[i]
       )
 
       # Add the module ID for the initialized landings to the list of fleet module IDs
@@ -715,8 +714,8 @@ initialize_fims <- function(parameters, data) {
       "Index" %in% data_distribution_names_for_fleet_i) {
       # Initialize index module for the current fleet
       fleet_index[[i]] <- initialize_index(
-      data = data,
-      fleet_name = fleet_names[i]
+        data = data,
+        fleet_name = fleet_names[i]
       )
 
       # Add the module ID for the initialized index to the list of fleet module IDs
@@ -790,7 +789,7 @@ initialize_fims <- function(parameters, data) {
     }
 
     if ("index" %in% fleet_types &&
-        "Index" %in% data_distribution_names_for_fleet_i){
+      "Index" %in% data_distribution_names_for_fleet_i) {
       fleet_index_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
         family = lognormal(link = "log"),
@@ -805,7 +804,7 @@ initialize_fims <- function(parameters, data) {
     }
 
     if ("landings" %in% fleet_types &&
-        "Landings" %in% data_distribution_names_for_fleet_i) {
+      "Landings" %in% data_distribution_names_for_fleet_i) {
       fleet_landings_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
         family = lognormal(link = "log"),
@@ -840,7 +839,6 @@ initialize_fims <- function(parameters, data) {
         data_type = "lengthcomp"
       )
     }
-
   }
 
   # Recruitment
