@@ -34,7 +34,7 @@ test_that("initialize_fims works with correct inputs", {
   expect_named(result, "parameters")
   expect_equal(length(result), 1)
   clear()
-  
+
   #' @description Test that [initialize_comp()] works for AgeComp and returns
   #' an S4 object.
   result <- initialize_comp(
@@ -49,8 +49,7 @@ test_that("initialize_fims works with correct inputs", {
   expect_null(result[["length_comp_data"]])
   expect_true(
     all(c("age_comp_data", "initialize", "finalize", ".pointer") %in%
-      names(result)
-    )
+      names(result))
   )
   #' @description Test that the age-composition data in the returned object from
   #' [initialize_comp()] has the correct values.
@@ -78,8 +77,7 @@ test_that("initialize_fims works with correct inputs", {
   expect_null(result[["age_comp_data"]])
   expect_true(
     all(c("length_comp_data", "initialize", "finalize", ".pointer") %in%
-      names(result)
-    )
+      names(result))
   )
   #' @description Test that the length-composition data in the returned object
   #' from [initialize_comp()] has the correct values.
@@ -106,7 +104,7 @@ test_that("initialize_fims returns correct error messages", {
     "argument must be a non-missing list."
   )
   clear()
-  
+
   #' @description Test that [initialize_fims()] handles non-list parameters
   #' input correctly.
   expect_error(
@@ -114,7 +112,7 @@ test_that("initialize_fims returns correct error messages", {
     "argument must be a non-missing list."
   )
   clear()
-  
+
   #' @description Test that [initialize_fims()] fails when no fleets are
   #' provided.
   parameters_no_fleets <- default_parameters
@@ -151,5 +149,5 @@ test_that("initialize_fims returns correct error messages", {
   clear()
 })
 
-# TODO: most lines with no coverage are error checks that are not verified to 
+# TODO: most lines with no coverage are error checks that are not verified to
 # work via the tests.
