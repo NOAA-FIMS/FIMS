@@ -7,11 +7,14 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # get_estimates ----
+## Setup ----
+# Load or prepare any necessary data for testing
+
 ## IO correctness ----
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
-  "module_name", "module_id", "module_type", "label", "type", "type_id", 
-  "parameter_id", "fleet_name", "age", "length", "time", 
+  "module_name", "module_id", "module_type", "label", "type", "type_id",
+  "parameter_id", "fleet_name", "age", "length", "time",
   "initial", "estimate", "uncertainty", "log_like", "log_like_cv",
   "gradient", "estimated"
 )
@@ -20,13 +23,15 @@ test_that("get_estimates() works with deterministic run", {
   # Read the RDS file containing the deterministic run results
   deterministic_results <- readRDS(test_path("fixtures", "deterministic_age_length_comp.RDS"))
   deterministic_colnames <- get_estimates(deterministic_results) |> colnames()
-  #' @description Test that get_estimates() returns correct colnames from a deterministic run.
+  #' @description Test that [get_estimates()] returns correct colnames from a
+  #' deterministic run.
   expect_equal(
     object = deterministic_colnames,
     expected = expected_colnames
   )
 
-  #' @description Test that get_estimates() returns correct snapshot from a deterministic run.
+  #' @description Test that [get_estimates()] returns correct snapshot from a
+  #' deterministic run.
   expect_snapshot(
     get_estimates(deterministic_results) |>
       # Remove the estimate, uncertainty, and gradient columns, as they
@@ -50,12 +55,14 @@ test_that("get_estimates() works with estimation run", {
     fit_data <- readRDS(fit_file)
     estimates <- get_estimates(fit_data)
     estimates_colnames <- colnames(estimates)
-    #' @description Test that get_estimates() returns correct output for the estimates slot.
+    #' @description Test that [get_estimates()] returns correct output for the
+    #' estimates slot.
     expect_equal(
       object = estimates,
       expected = fit_data@estimates
     )
-    #' @description Test that get_estimates() returns correct column names for the estimates tibble.
+    #' @description Test that [get_estimates()] returns correct column names
+    #' for the estimates tibble.
     expect_equal(
       object = estimates_colnames,
       expected = expected_colnames
@@ -65,7 +72,8 @@ test_that("get_estimates() works with estimation run", {
   # Use purrr::map to apply the function to each file
   result <- purrr::map(fit_files, check_estimates_colnames)
 
-  #' @description Test that get_estimates() returns correct snapshot for an estimation run.
+  #' @description Test that [get_estimates()] returns correct snapshot for an
+  #' estimation run.
   expect_snapshot(
     # Read the first RDS file, get estimates, and print a snapshot
     readRDS(fit_files[[1]]) |>
@@ -79,11 +87,12 @@ test_that("get_estimates() works with estimation run", {
 
 ## Edge handling ----
 test_that("get_estimates() returns correct outputs for edge cases", {
-  #' @description Test that get_estimates("invalid_fit") returns an error.
+  #' @description Test that [get_estimates()] returns an error when given
+  #' invalid arguments.
   expect_error(
     object = get_estimates("invalid_fit")
   )
 })
 
 ## Error handling ----
-# No built-in errors or warnings to test for get_estimates().
+# No built-in errors to test.

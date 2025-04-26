@@ -14,7 +14,7 @@
 			"updatePackages": true			
 		},
 		 "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "dplyr,devtools,ggplot2,jsonlite,methods,mockery,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis",
+			"packages": "dplyr,devtools,ggplot2,jsonlite,methods,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis",
 			"installSystemRequirements": true
 		  },
 		 // option to run rstudio. you can type rserver into the command line to

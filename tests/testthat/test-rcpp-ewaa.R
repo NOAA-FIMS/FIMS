@@ -6,7 +6,8 @@
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
 
-# Setup ----
+# EWAAgrowth ----
+## Setup ----
 # Prepare data
 fims_frame <- FIMS::FIMSFrame(data1)
 # Ensure that the fims_frame object is removed after tests are completed
@@ -35,7 +36,6 @@ on.exit(ewaa_growth)
 ewaa_growth2 <- methods::new(EWAAgrowth)
 on.exit(ewaa_growth2)
 
-# EWAAgrowth ----
 ## IO correctness ----
 test_that("EWAAgrowth evaluate() works with correct input data", {
   #' @description Test that EWAAgrowth evaluate(1) returns the first value in the weight-at-age data.
@@ -84,7 +84,8 @@ test_that("EWAAgrowth evaluate() returns expected error for mismatched input len
     seq_along(weights),
     \(x) ewaa_growth$weights$set(x - 1, weights[x])
   )
-  #' @description Test that EWAAgrowth evaluate() throws an error when the lengths of ages and weights don't match.
+  #' @description Test that EWAAgrowth evaluate() throws an error when the
+  #' lengths of ages and weights don't match.
   expect_error(
     ewaa_growth$evaluate(1),
     regexp = "ages and weights must be the same length",

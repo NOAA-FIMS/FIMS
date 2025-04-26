@@ -762,6 +762,7 @@ update_parameters <- function(current_parameters, modified_parameters) {
     names(modified_parameters),
     names(current_parameters[["parameters"]])
   )
+  
   if (length(missing_input) > 0) {
     cli::cli_abort(c(
       "x" = "The following {length(missing_input)} input list{?s} from
@@ -769,7 +770,8 @@ update_parameters <- function(current_parameters, modified_parameters) {
             {.var current_parameters}: {missing_input}."
     ))
   }
-
+ # TODO: is this duplicated code or is this testing something else? If not
+ # duplicated, should missing_input be wrong_input?
   wrong_input <- setdiff(
     names(current_parameters[["parameters"]]),
     names(modified_parameters)

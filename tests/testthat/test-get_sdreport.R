@@ -7,6 +7,9 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # get_sdreport ----
+## Setup ----
+# Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("get_sdreport() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
@@ -26,12 +29,14 @@ test_that("get_sdreport() works with correct inputs", {
   check_sdreport <- function(fit_file) {
     fit_data <- readRDS(fit_file)
     sdreport <- get_sdreport(fit_data)
-    #' @description Test that get_sdreport() returns correct output for the sdreport slot.
+    #' @description Test that [get_sdreport()] returns correct output for the
+    #' sdreport slot.
     expect_equal(
       object = sdreport,
       expected = fit_data@sdreport
     )
-    #' @description Test that get_sdreport() returns correct names for the sdreport slot.
+    #' @description Test that [get_sdreport()] returns correct names for the
+    #' sdreport slot.
     expect_equal(
       object = names(sdreport),
       expected = expected_names
@@ -44,11 +49,12 @@ test_that("get_sdreport() works with correct inputs", {
 
 ## Edge handling ----
 test_that("get_sdreport() returns correct outputs for edge cases", {
-  #' @description Test that get_sdreport("invalid_input") returns an error.
+  #' @description Test that [get_sdreport()] returns an error when given invalid
+  #' input.
   expect_error(
     object = get_sdreport("invalid_input")
   )
 })
 
 ## Error handling ----
-# No built-in errors or warnings to test for get_sdreport().
+# No built-in errors to test.

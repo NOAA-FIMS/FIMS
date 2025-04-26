@@ -7,6 +7,7 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # FIMSFit ----
+## Setup ----
 # Load the test data from an RDS file containing the fitted model estimates
 fit_age_length_comp <- readRDS(test_path("fixtures", "fit_age_length_comp.RDS"))
 on.exit(rm(fit_age_length_comp), add = TRUE)
@@ -21,26 +22,23 @@ test_that("is.FIMSFit() works with correct inputs", {
   expect_true(
     object = is.FIMSFit(fit_age_length_comp)
   )
-})
 
-test_that("is.FIMSFits() works with correct inputs", {
   #' @description Test that is.FIMSFits(fit_list) returns TRUE.
   expect_true(
     object = is.FIMSFits(fit_list)
   )
-})
 
-test_that("as.list() works with correct inputs", {
   #' @description Test that as.list(fit_age_length_comp) returns a nested list.
   expect_equal(
     object = typeof(as.list(fit_age_length_comp)),
     expected = "list"
   )
 
+  #' @description Test that as.list(fit_age_length_comp) contains correct components.
   expected_names <- c(
     "input", "obj", "opt", "max_gradient", "report", "sdreport", "estimates",
-    "number_of_parameters", "timing", "version")
-  #' @description Test that as.list(fit_age_length_comp) contains correct components.
+    "number_of_parameters", "timing", "version"
+  )
   expect_equal(
     object = names(as.list(fit_age_length_comp)),
     expected = expected_names
@@ -51,26 +49,30 @@ test_that("as.list() works with correct inputs", {
 test_that("is.FIMSFit() returns correct outputs for edge cases", {
   #' @description Test that is.FIMSFit("not_a_FIMSFit") returns FALSE.
   expect_false(is.FIMSFit("not_a_FIMSFit"))
-})
 
-test_that("print() returns correct outputs for edge cases", {
+  #' @description Test that print(FIMSFit) returns no error when the total time
+  #' is more than a day.
   # Modify the total time to be more than a day
   fit_age_length_comp@timing[["time_total"]] <- 86401 # 60*60*24+1
-  #' @description Test that print(FIMSFit) returns no error when the total time is more than a day.
   expect_no_error(print(fit_age_length_comp))
+
+  #' @description Test that print(FIMSFit) returns no error when the total time
+  #' is more than an hour.
   # Modify the total time to be more than a hour
   fit_age_length_comp@timing[["time_total"]] <- 3601 # 60*60+1
-  #' @description Test that print(FIMSFit) returns no error when the total time is more than an hour.
   expect_no_error(print(fit_age_length_comp))
+
+  #' @description Test that print(FIMSFit) returns no error when the total time
+  #' is more than a minute.
   # Modify the total time to be more than a minute
   fit_age_length_comp@timing[["time_total"]] <- 61 # 60+1
-  #' @description Test that print(FIMSFit) returns no error when the total time is more than a minute.
   expect_no_error(print(fit_age_length_comp))
 })
 
 ## Error handling ----
 test_that("is.FIMSFits() returns correct error messages", {
-  #' @description Test that is.FIMSFits(fit_age_length_comp) returns expected error.
+  #' @description Test that is.FIMSFits(fit_age_length_comp) returns expected
+  #' error.
   expect_warning(
     object = is.FIMSFits(fit_age_length_comp),
     regexp = "x is not a list -- something went wrong."

@@ -7,6 +7,9 @@
 #' one line, which will be used in the bookdown report of {testthat} results.
 
 # {{{ function_name }}} ----
+## Setup ----
+# Load or prepare any necessary data for testing
+
 ## IO correctness ----
 test_that("{{{ function_name }}}() works with correct inputs", {
   #' @description Test that {{{ function_name }}}(x) returns y.
@@ -23,6 +26,7 @@ test_that("{{{ function_name }}}() works with correct inputs", {
 })
 
 ## Edge handling ----
+# Please remove/comment out the test template below if no edge cases are being tested.
 test_that("{{{ function_name }}}() returns correct outputs for edge cases", {
   #' @description Test that {{{ function_name }}}(x) returns an error.
   expect_error(
@@ -31,6 +35,7 @@ test_that("{{{ function_name }}}() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
+# Please remove/comment out the test template below if there are no built-in errors/warnings.
 test_that("{{{ function_name }}}() returns correct error messages", {
   #' @description Test that {{{ function_name }}}(x) returns expected error.
   expect_error(

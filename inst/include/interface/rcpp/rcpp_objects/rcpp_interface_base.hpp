@@ -251,7 +251,8 @@ public:
   SEXP at(R_xlen_t pos){
     if (static_cast<size_t>(pos) == 0 ||
       static_cast<size_t>(pos) > this->storage_m->size()) {
-      Rcpp::Rcout << "ParameterVector: Index out of range.\n";
+      Rcpp::Rcerr << "ParameterVector: Index out of range.\n";
+      throw std::invalid_argument("ParameterVector: Index out of range");
       FIMS_ERROR_LOG(fims::to_string(pos) + "!<" + fims::to_string(this->size()));
       return NULL;
     }
@@ -267,7 +268,7 @@ public:
    */
   Parameter& get(size_t pos) {
     if (pos >= this->storage_m->size()) {
-      Rcpp::Rcout << "ParameterVector: Index out of range.\n";
+      Rcpp::Rcerr << "ParameterVector: Index out of range.\n";
       throw std::invalid_argument("ParameterVector: Index out of range");
     }
     return (this->storage_m->at(pos));
