@@ -27,7 +27,7 @@ jobs:
     # We use Google style to format code.
     steps:
     - uses: actions/checkout@v4
-    - uses: DoozyX/clang-format-lint-action@v0.18.1
+    - uses: DoozyX/clang-format-lint-action@v0.18.2
       with:
         source: './inst/include ./src ./tests/gtest'
         extensions: 'hpp, cpp'
