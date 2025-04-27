@@ -1,3 +1,39 @@
+# FIMS 0.4.0
+
+* Allows for CPUE data and landings within a single fleet and changes the
+  composition data to be separate from the catch. If there are catches, 
+  compositions are based on F, if you have survey compositions those are scaled
+  by q, and you can also have composition data without catch or CPUE and those
+  match the population.
+* Fixes bug in `finalize()` where variables were going out of scope by using a
+  shared pointer and RealVector, which allows for estimates tibble to return
+  more. Output is integrated between json and TMB using
+  `reshape_tmb_estimates()`, `reshape_json_estimates()`, and
+  `reshape_json_derived_quantities()`. ParameterVector are now set using
+  `resize()` and `purrr::walk()` rather than `methods::new()`.
+* Increases code coverage
+  * Restructures R tests using `use_testthat_template()`
+  * Starts to use Rcpp::Rcerr instead of Rcpp::Rcout
+  * Skips parallel and distribution rcpp test
+  * Adds `FIMS_dmultinom()` distribution to match TMB
+* Fixes bug in `get_number_of_parameters()`.
+* Uses static_cast<Type>([-0-9\.]+) to wrap constant variables.
+* Fixes cmake_minimum_required to use a range and updates googletest version.
+* Adds minimal fims-demo vignette.
+* Removes unused estimated_log_M and estimated_log_init_naa from
+  inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp.
+* Adds gdb to the devcontainer.json file.
+* Fixes broken model comparison project links.
+* Adds dependabot.yml file to update GitHub actions.
+* Combine `initialize_comp()` functions.
+
+# FIMS 0.3.0.1
+
+* Pluralism in cli was incorrect in FIMSFrame.
+* Composition modules are initialized using the composition times the
+  uncertainty, which was failing for -999 values because -999 * uncertainty
+  does not equal -999 and was leading to the likelihood being evaluated.
+
 # FIMS 0.3.0.0
 
 * Fits to length data using an age-to-length-conversion matrix, `data1`
