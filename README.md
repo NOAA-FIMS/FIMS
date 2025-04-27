@@ -246,10 +246,22 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Akristanblackhart-NOAA">kristanblackhart-NOAA</a>
 </td>
 <td align="center">
+<a href="https://github.com/jbigman-NOAA">
+<img src="https://avatars.githubusercontent.com/u/164287934?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Ajbigman-NOAA">jbigman-NOAA</a>
+</td>
+<td align="center">
 <a href="https://github.com/N-DucharmeBarth-NOAA">
 <img src="https://avatars.githubusercontent.com/u/97110196?u=92cfb0fd9fa6524ce455b6610035f9402a25e3bb&v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3AN-DucharmeBarth-NOAA">N-DucharmeBarth-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/Srajald">
+<img src="https://avatars.githubusercontent.com/u/99940237?u=520681185ea7e6952f57666f22cf6a36940a713a&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3ASrajald">Srajald</a>
 </td>
 <td align="center">
 <a href="https://github.com/rklasky">
@@ -258,10 +270,26 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Arklasky">rklasky</a>
 </td>
 <td align="center">
-<a href="https://github.com/jbigman-NOAA">
-<img src="https://avatars.githubusercontent.com/u/164287934?v=4" width="100px;" alt=""/>
+<a href="https://github.com/cgrandin">
+<img src="https://avatars.githubusercontent.com/u/4551051?u=7d289d4508c6ba2f6d2691b71be5bd2dc5456115&v=4" width="100px;" alt=""/>
 </a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Ajbigman-NOAA">jbigman-NOAA</a>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Acgrandin">cgrandin</a>
+</td>
+<td align="center">
+<a href="https://github.com/alexjensen-NOAA">
+<img src="https://avatars.githubusercontent.com/u/168662602?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aalexjensen-NOAA">alexjensen-NOAA</a>
+</td>
+</tr>
+
+
+<tr>
+<td align="center">
+<a href="https://github.com/e-perl-NOAA">
+<img src="https://avatars.githubusercontent.com/u/118312785?u=975ef418e0a078e338b89a4f9eed851a08d2564d&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Ae-perl-NOAA">e-perl-NOAA</a>
 </td>
 </tr>
 
