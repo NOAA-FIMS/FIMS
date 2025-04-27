@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,34 +60,170 @@
 <div class="section level1">
 <div class="page-header"><h1 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h1></div>
-<p>The repository for development of FIMS.</p>
-<p>The NOAA Fisheries Integrated Modeling System is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. A team of experts within NOAA Fisheries is designing and developing the system, and we are advised by the FIMS Council which includes academic, industry, and international partners. The roles of internal and external collaborators are outlined in the <a href="https://noaa-fims.github.io/collaborative_workflow/fims-governance.html" class="external-link">governance section</a> of our developer guide. We plan to have an operational software system that is released to the public in 2023. In the meantime, users and developers are welcome to submit feedback using Github issues. Please use the issues under <a href="https://github.com/NOAA-FIMS/collaborative_workflow/issues" class="external-link">collaborative workflow</a> to make suggestions about the <a href="https://noaa-fims.github.io/collaborative_workflow/" class="external-link">developer guide</a> and the issues under the FIMS software <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">repo</a> for software design and development feedback. You can follow the team discussion <a href="https://github.com/NOAA-FIMS/FIMS/discussions" class="external-link">here</a>.</p>
+<p>The NOAA Fisheries Integrated Modeling System (FIMS) is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. A team of experts within NOAA Fisheries is designing and developing the system, and we are advised by the FIMS Council, which includes academic, industry, and international partners. The roles of internal and external collaborators are outlined in the <a href="https://noaa-fims.github.io/collaborative_workflow/fims-governance.html" class="external-link">governance section</a> of our <a href="https://noaa-fims.github.io/collaborative_workflow/" class="external-link">Developer Guide</a>. Our software is currently operational for estimation purposes and we plan for it to be operational for management in late 2025.</p>
+<p>Users and developers are welcome to submit ideas or questions using the <a href="https://github.com/NOAA-FIMS/FIMS/discussions" class="external-link">GitHub Discussion Board</a> and bug reports using GitHub Issues. The <a href="https://github.com/NOAA-FIMS/FIMS/discussions" class="external-link">Discussion Board</a> is a place for <strong>all</strong> members of the assessment and open-source software community to ask and answer questions, share updates, have open-ended conversations, and follow along on decisions affecting FIMS. If you happen to find a bug, please report it in the appropriate repository, for example use <a href="https://github.com/NOAA-FIMS/collaborative_workflow/issues" class="external-link">issues in the collaborative workflow repository</a> to make suggestions about the <a href="https://noaa-fims.github.io/collaborative_workflow/" class="external-link">developer guide</a> and <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">issues in the FIMS repository</a> for bugs in the software design.</p>
 <div class="section level2">
-<h2 id="installing-from-r">Installing from R<a class="anchor" aria-label="anchor" href="#installing-from-r"></a>
+<h2 id="installing-fims">Installing FIMS<a class="anchor" aria-label="anchor" href="#installing-fims"></a>
 </h2>
-<p>Install the latest precompiled version <a href="https://noaa-fims.r-universe.dev/FIMS" class="external-link">FIMS from R universe</a> within R:</p>
+<p>Install the latest <a href="https://noaa-fims.r-universe.dev/FIMS" class="external-link">precompiled version of FIMS</a> from <a href="https://noaa-fims.r-universe.dev" class="external-link">R universe</a> within R using the following code:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"FIMS"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://noaa-fims.r-universe.dev"</span>, <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="local-install-for-developers">Local Install for Developers<a class="anchor" aria-label="anchor" href="#local-install-for-developers"></a>
-</h2>
-<p>Follow instructions in the <a href="https://noaa-fims.github.io/collaborative_workflow/developer-software-and-installation-guide.html" class="external-link">Collaborative Workflow Chapter on Developer Software and Installation</a>.</p>
+<p>Or, you can follow the instructions in the <a href="https://noaa-fims.github.io/collaborative_workflow/developer-software-and-installation-guide.html" class="external-link">Collaborative Workflow</a> to install FIMS from GitHub or a local clone.</p>
 </div>
 <div class="section level2">
 <h2 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h2>
-<p>Please report bugs along with a minimal reproducible example on github <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">issues</a></p>
+<p>Please report bugs along with a minimal reproducible example on the FIMS <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">GitHub Issues page</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
 </h2>
-<p>All contributors participating and contributing to the FIMS project are expected to adhere to the <a href="https://noaa-fims.github.io/collaborative_workflow/code-of-conduct.html#code-of-conduct" class="external-link">FIMS Code of Conduct</a></p>
+<p>All contributors participating and contributing to the FIMS project are expected to adhere to the <a href="https://noaa-fims.github.io/collaborative_workflow/code-of-conduct.html#code-of-conduct" class="external-link">FIMS Code of Conduct</a>.</p>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="contributors">Contributors<a class="anchor" aria-label="anchor" href="#contributors"></a>
 </h2>
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<p>All contributions to this project are gratefully acknowledged using the <a href="https://github.com/ropensci/allcontributors" class="external-link"><code>allcontributors</code> package</a> following the <a href="https://allcontributors.org" class="external-link">all-contributors</a> specification. Contributions of any kind are welcome!</p>
+<div class="section level3">
+<h3 id="code">Code<a class="anchor" aria-label="anchor" href="#code"></a>
+</h3>
+<table class="table">
+<tr>
+<td align="center">
+<a href="https://github.com/ChristineStawitz-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/47904621?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=ChristineStawitz-NOAA" class="external-link">ChristineStawitz-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/Andrea-Havron-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/85530309?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=Andrea-Havron-NOAA" class="external-link">Andrea-Havron-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/Bai-Li-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/59936250?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=Bai-Li-NOAA" class="external-link">Bai-Li-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/msupernaw" class="external-link"> <img src="https://avatars.githubusercontent.com/u/4933904?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=msupernaw" class="external-link">msupernaw</a>
+</td>
+<td align="center">
+<a href="https://github.com/k-doering-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/48930335?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=k-doering-NOAA" class="external-link">k-doering-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/nathanvaughan-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/53061482?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=nathanvaughan-NOAA" class="external-link">nathanvaughan-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/kellijohnson-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/4108564?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=kellijohnson-NOAA" class="external-link">kellijohnson-NOAA</a>
+</td>
+</tr>
+<tr>
+<td align="center">
+<a href="https://github.com/JaneSullivan-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/68303089?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=JaneSullivan-NOAA" class="external-link">JaneSullivan-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/JonBrodziak" class="external-link"> <img src="https://avatars.githubusercontent.com/u/11236454?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=JonBrodziak" class="external-link">JonBrodziak</a>
+</td>
+<td align="center">
+<a href="https://github.com/MOshima-PIFSC" class="external-link"> <img src="https://avatars.githubusercontent.com/u/78562167?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=MOshima-PIFSC" class="external-link">MOshima-PIFSC</a>
+</td>
+<td align="center">
+<a href="https://github.com/iantaylor-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/4992918?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=iantaylor-NOAA" class="external-link">iantaylor-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/jimianelli" class="external-link"> <img src="https://avatars.githubusercontent.com/u/2715618?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=jimianelli" class="external-link">jimianelli</a>
+</td>
+<td align="center">
+<a href="https://github.com/timjmiller" class="external-link"> <img src="https://avatars.githubusercontent.com/u/17852156?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=timjmiller" class="external-link">timjmiller</a>
+</td>
+<td align="center">
+<a href="https://github.com/peterkuriyama-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/103060418?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=peterkuriyama-NOAA" class="external-link">peterkuriyama-NOAA</a>
+</td>
+</tr>
+<tr>
+<td align="center">
+<a href="https://github.com/KyleShertzer-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/81244856?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=KyleShertzer-NOAA" class="external-link">KyleShertzer-NOAA</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="section level3">
+<h3 id="issue-authors">Issue Authors<a class="anchor" aria-label="anchor" href="#issue-authors"></a>
+</h3>
+<table class="table"><tr>
+<td align="center">
+<a href="https://github.com/Cole-Monnahan-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/58868176?u=dd9ad18144f97dff5b805108945a85c81422e893&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+author%3ACole-Monnahan-NOAA" class="external-link">Cole-Monnahan-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/Andrea-Havron" class="external-link"> <img src="https://avatars.githubusercontent.com/u/18160915?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+author%3AAndrea-Havron" class="external-link">Andrea-Havron</a>
+</td>
+<td align="center">
+<a href="https://github.com/Ovec8hkin" class="external-link"> <img src="https://avatars.githubusercontent.com/u/9124240?u=346d6e2c2914e2e422c0d8395e49fea4f3f1f856&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+author%3AOvec8hkin" class="external-link">Ovec8hkin</a>
+</td>
+<td align="center">
+<a href="https://github.com/cmlegault" class="external-link"> <img src="https://avatars.githubusercontent.com/u/8029432?u=735e58b9c668f88d7e051cad5e4410be93d5ee54&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+author%3Acmlegault" class="external-link">cmlegault</a>
+</td>
+<td align="center">
+<a href="https://github.com/arni-magnusson" class="external-link"> <img src="https://avatars.githubusercontent.com/u/3720910?u=66d58326e0e04ff9f57faecc971f53c6c19e1adf&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+author%3Aarni-magnusson" class="external-link">arni-magnusson</a>
+</td>
+</tr></table>
+</div>
+<div class="section level3">
+<h3 id="issue-contributors">Issue Contributors<a class="anchor" aria-label="anchor" href="#issue-contributors"></a>
+</h3>
+<table class="table">
+<tr>
+<td align="center">
+<a href="https://github.com/chantelwetzel-noaa" class="external-link"> <img src="https://avatars.githubusercontent.com/u/6172110?u=fa2a894f014dc10b5204de094ae8ec153b7ca5a9&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Achantelwetzel-noaa" class="external-link">chantelwetzel-noaa</a>
+</td>
+<td align="center">
+<a href="https://github.com/Rick-Methot-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/6250016?u=3730ea84740e5ec06865052e3c486f88ed574f5e&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3ARick-Methot-NOAA" class="external-link">Rick-Methot-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/Huihualee-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/81672131?u=8f8cd12b6de5cb4174df3336c37de862ba400e62&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3AHuihualee-NOAA" class="external-link">Huihualee-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/EJDick-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/64495990?u=f21944c5dd59e99a4a0facc8b7c981ca68efa0fb&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3AEJDick-NOAA" class="external-link">EJDick-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/jimianelli-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/53797573?u=0c7f18c76144d612833c5cd2941858f25e8ce7d8&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Ajimianelli-NOAA" class="external-link">jimianelli-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/Craig44" class="external-link"> <img src="https://avatars.githubusercontent.com/u/13144077?u=3ac28c7f2c555169ece87584fc9e45cccb265f8d&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3ACraig44" class="external-link">Craig44</a>
+</td>
+<td align="center">
+<a href="https://github.com/James-Thorson-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/50178738?u=d314fbca8b41fdeb14212782d70b156a14e34af3&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3AJames-Thorson-NOAA" class="external-link">James-Thorson-NOAA</a>
+</td>
+</tr>
+<tr>
+<td align="center">
+<a href="https://github.com/kristanblackhart-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/89920963?u=e5fed919762f545e44319fd8808825878c7c3b40&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Akristanblackhart-NOAA" class="external-link">kristanblackhart-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/jbigman-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/164287934?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Ajbigman-NOAA" class="external-link">jbigman-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/N-DucharmeBarth-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/97110196?u=92cfb0fd9fa6524ce455b6610035f9402a25e3bb&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3AN-DucharmeBarth-NOAA" class="external-link">N-DucharmeBarth-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/Srajald" class="external-link"> <img src="https://avatars.githubusercontent.com/u/99940237?u=520681185ea7e6952f57666f22cf6a36940a713a&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3ASrajald" class="external-link">Srajald</a>
+</td>
+<td align="center">
+<a href="https://github.com/rklasky" class="external-link"> <img src="https://avatars.githubusercontent.com/u/28567752?u=e28036c5bcac3c2f14f7de7d1dcc9b2f4f03a4e0&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Arklasky" class="external-link">rklasky</a>
+</td>
+<td align="center">
+<a href="https://github.com/cgrandin" class="external-link"> <img src="https://avatars.githubusercontent.com/u/4551051?u=7d289d4508c6ba2f6d2691b71be5bd2dc5456115&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Acgrandin" class="external-link">cgrandin</a>
+</td>
+<td align="center">
+<a href="https://github.com/alexjensen-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/168662602?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aalexjensen-NOAA" class="external-link">alexjensen-NOAA</a>
+</td>
+</tr>
+<tr>
+<td align="center">
+<a href="https://github.com/e-perl-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/118312785?u=975ef418e0a078e338b89a4f9eed851a08d2564d&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Ae-perl-NOAA" class="external-link">e-perl-NOAA</a>
+</td>
+</tr>
+</table>
+<!-- markdownlint-enable --><!-- prettier-ignore-end --><!-- ALL-CONTRIBUTORS-LIST:END -->
+</div>
 </div>
 <div class="section level2">
 <h2 id="noaa-disclaimer">NOAA Disclaimer<a class="anchor" aria-label="anchor" href="#noaa-disclaimer"></a>

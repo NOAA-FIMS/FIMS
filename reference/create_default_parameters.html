@@ -21,7 +21,7 @@ from the current input."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,7 @@ from the current input."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Create default parameters for a FIMS model</h1>
-      <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/v0.3.0.1/R/create_default_parameters.R" class="external-link"><code>R/create_default_parameters.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/main/R/create_default_parameters.R" class="external-link"><code>R/create_default_parameters.R</code></a></small>
       <div class="d-none name"><code>create_default_parameters.Rd</code></div>
     </div>
 
@@ -150,7 +150,8 @@ input.</p></dd>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index">
-<ul><li><p><code>update_parameters()</code></p></li>
+<ul><li><p><code><a href="FIMSFrame.html">FIMSFrame()</a></code></p></li>
+<li><p><code>update_parameters()</code></p></li>
 </ul><ul><li><p><code>create_default_parameters()</code></p></li>
 </ul></div>
     </div>
@@ -158,8 +159,11 @@ input.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># Load the example dataset and create a FIMS data frame</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data1"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fims_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Define fleets specifications for each fleet in the example dataset</span></span></span>
 <span class="r-in"><span><span class="va">fleet1</span> <span class="op">&lt;-</span> <span class="va">survey1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  selectivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>form <span class="op">=</span> <span class="st">"LogisticSelectivity"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  data_distribution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
@@ -167,17 +171,12 @@ input.</p></dd>
 <span class="r-in"><span>    AgeComp <span class="op">=</span> <span class="st">"DmultinomDistribution"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">fleet2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  selectivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>form <span class="op">=</span> <span class="st">"DoubleLogisticSelectivity"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  data_distribution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    Index <span class="op">=</span> <span class="st">"DlnormDistribution"</span>,</span></span>
-<span class="r-in"><span>    AgeComp <span class="op">=</span> <span class="st">"DmultinomDistribution"</span>,</span></span>
-<span class="r-in"><span>    LengthComp <span class="op">=</span> <span class="st">"DmultinomDistribution"</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Create a list of default parameters given the fleet specifications set up</span></span></span>
+<span class="r-in"><span><span class="co"># above, recruitment, growth, and maturity specifications</span></span></span>
 <span class="r-in"><span><span class="va">default_parameters</span> <span class="op">&lt;-</span> <span class="va">fims_frame</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">create_default_parameters</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    fleets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fleet1 <span class="op">=</span> <span class="va">fleet1</span>, fleet2 <span class="op">=</span> <span class="va">fleet2</span>, survey1 <span class="op">=</span> <span class="va">survey1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    fleets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fleet1 <span class="op">=</span> <span class="va">fleet1</span>, survey1 <span class="op">=</span> <span class="va">survey1</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    recruitment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      form <span class="op">=</span> <span class="st">"BevertonHoltRecruitment"</span>,</span></span>
 <span class="r-in"><span>      process_distribution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>log_devs <span class="op">=</span> <span class="st">"DnormDistribution"</span><span class="op">)</span></span></span>
@@ -185,6 +184,91 @@ input.</p></dd>
 <span class="r-in"><span>    growth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>form <span class="op">=</span> <span class="st">"EWAAgrowth"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    maturity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>form <span class="op">=</span> <span class="st">"LogisticMaturity"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Do the same as above except, model fleet1 with double logistic selectivity</span></span></span>
+<span class="r-in"><span><span class="co"># and do not specify the recruitment, growth, and maturity specifications</span></span></span>
+<span class="r-in"><span><span class="co"># because everything specified above were default arguments</span></span></span>
+<span class="r-in"><span><span class="va">parameters_with_double_logistic</span> <span class="op">&lt;-</span> <span class="va">fims_frame</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">create_default_parameters</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    fleets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      fleet1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        selectivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>form <span class="op">=</span> <span class="st">"DoubleLogisticSelectivity"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        data_distribution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>          Index <span class="op">=</span> <span class="st">"DlnormDistribution"</span>,</span></span>
+<span class="r-in"><span>          AgeComp <span class="op">=</span> <span class="st">"DmultinomDistribution"</span>,</span></span>
+<span class="r-in"><span>          LengthComp <span class="op">=</span> <span class="st">"DmultinomDistribution"</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span>,</span></span>
+<span class="r-in"><span>      survey1 <span class="op">=</span> <span class="va">survey1</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Compare the parameters for fleet1 in each set up</span></span></span>
+<span class="r-in"><span><span class="va">default_fleet1</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_df</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">default_parameters</span><span class="op">[[</span><span class="st">"parameters"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"fleet1"</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu">tidyselect</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">updated_fleet1</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_df</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">parameters_with_double_logistic</span><span class="op">[[</span><span class="st">"parameters"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"fleet1"</span><span class="op">]</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>  \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu">tidyselect</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span><span class="va">default_fleet1</span>, <span class="va">updated_fleet1</span>, by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span><span class="va">default_fleet1</span>, <span class="va">updated_fleet1</span>, by <span class="op">=</span> <span class="st">"name"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># Load the example dataset</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fims_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Define fleets specifications</span></span></span>
+<span class="r-in"><span><span class="va">fleet1</span> <span class="op">&lt;-</span> <span class="va">survey1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  selectivity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>form <span class="op">=</span> <span class="st">"LogisticSelectivity"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  data_distribution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    Index <span class="op">=</span> <span class="st">"DlnormDistribution"</span>,</span></span>
+<span class="r-in"><span>    AgeComp <span class="op">=</span> <span class="st">"DmultinomDistribution"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Create default parameters for the specified fleets</span></span></span>
+<span class="r-in"><span><span class="va">default_parameters</span> <span class="op">&lt;-</span> <span class="va">fims_frame</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">create_default_parameters</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    fleets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fleet1 <span class="op">=</span> <span class="va">fleet1</span>, survey1 <span class="op">=</span> <span class="va">survey1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">updated_parameters</span> <span class="op">&lt;-</span> <span class="va">default_parameters</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">update_parameters</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    modified_parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      fleet1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        Fleet.log_Fmort.value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>          <span class="fl">0.009459165</span>, <span class="fl">0.027288858</span>, <span class="fl">0.045063639</span>,</span></span>
+<span class="r-in"><span>          <span class="fl">0.061017825</span>, <span class="fl">0.048600752</span>, <span class="fl">0.087420554</span>,</span></span>
+<span class="r-in"><span>          <span class="fl">0.088447204</span>, <span class="fl">0.186607929</span>, <span class="fl">0.109008958</span>,</span></span>
+<span class="r-in"><span>          <span class="fl">0.132704335</span>, <span class="fl">0.150615473</span>, <span class="fl">0.161242955</span>,</span></span>
+<span class="r-in"><span>          <span class="fl">0.116640187</span>, <span class="fl">0.169346119</span>, <span class="fl">0.180191913</span>,</span></span>
+<span class="r-in"><span>          <span class="fl">0.161240483</span>, <span class="fl">0.314573212</span>, <span class="fl">0.257247574</span>,</span></span>
+<span class="r-in"><span>          <span class="fl">0.254887252</span>, <span class="fl">0.251462108</span>, <span class="fl">0.349101406</span>,</span></span>
+<span class="r-in"><span>          <span class="fl">0.254107720</span>, <span class="fl">0.418478117</span>, <span class="fl">0.345721184</span>,</span></span>
+<span class="r-in"><span>          <span class="fl">0.343685540</span>, <span class="fl">0.314171227</span>, <span class="fl">0.308026829</span>,</span></span>
+<span class="r-in"><span>          <span class="fl">0.431745298</span>, <span class="fl">0.328030899</span>, <span class="fl">0.499675368</span></span></span>
+<span class="r-in"><span>        <span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># purrr::map_vec() can be used to compare the length of adjusted parameter</span></span></span>
+<span class="r-in"><span><span class="co"># vectors with defaults for a specific module (e.g., fleet1)</span></span></span>
+<span class="r-in"><span><span class="va">default_fleet1</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">default_parameters</span><span class="op">[[</span><span class="st">"parameters"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"fleet1"</span><span class="op">]</span><span class="op">]</span>, \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">updated_fleet1</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">updated_parameters</span><span class="op">[[</span><span class="st">"parameters"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"fleet1"</span><span class="op">]</span><span class="op">]</span>, \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># purrr::map_df() can be used to summarize parameter vector lengths across all modules</span></span></span>
+<span class="r-in"><span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_df</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">updated_parameters</span><span class="op">[[</span><span class="st">"parameters"</span><span class="op">]</span><span class="op">]</span>, \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">length</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  .id <span class="op">=</span> <span class="st">"module"</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"module"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

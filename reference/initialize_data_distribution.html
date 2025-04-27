@@ -19,7 +19,7 @@ initialize_process_distribution()."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,7 @@ initialize_process_distribution()."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Set up a new distribution for a data type or a process</h1>
-      <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/v0.3.0.1/R/distribution_formulas.R" class="external-link"><code>R/distribution_formulas.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/main/R/distribution_formulas.R" class="external-link"><code>R/distribution_formulas.R</code></a></small>
       <div class="d-none name"><code>initialize_data_distribution.Rd</code></div>
     </div>
 
@@ -68,7 +68,7 @@ distribution associated with the recruitment deviations, which requires
 <span>  <span class="va">module</span>,</span>
 <span>  <span class="va">family</span>,</span>
 <span>  sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fl">1</span>, estimated <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  data_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"index"</span>, <span class="st">"agecomp"</span>, <span class="st">"lengthcomp"</span><span class="op">)</span></span>
+<span>  data_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"landings"</span>, <span class="st">"index"</span>, <span class="st">"agecomp"</span>, <span class="st">"lengthcomp"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">initialize_process_distribution</span><span class="op">(</span></span>
@@ -109,7 +109,7 @@ specified <code>"estimated"</code> value will be repeated to match the length of
 <dt id="arg-data-type">data_type<a class="anchor" aria-label="anchor" href="#arg-data-type"></a></dt>
 <dd><p>A string specifying the type of data that the
 distribution will be fit to. Allowable types include
-c, index, agecomp, lengthcomp
+c, landings, index, agecomp, lengthcomp
 and the default is
 c.</p></dd>
 

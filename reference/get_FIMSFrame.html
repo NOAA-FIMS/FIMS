@@ -13,7 +13,7 @@ way to access objects stored in the available slots."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +42,7 @@ way to access objects stored in the available slots."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Get a slot in a FIMSFrame object</h1>
-      <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/v0.3.0.1/R/fimsframe.R" class="external-link"><code>R/fimsframe.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/main/R/fimsframe.R" class="external-link"><code>R/fimsframe.R</code></a></small>
       <div class="d-none name"><code>get_FIMSFrame.Rd</code></div>
     </div>
 
@@ -70,6 +70,14 @@ way to access objects stored in the available slots.</p>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
 <span><span class="fu">get_fleets</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">get_n_fleets</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'FIMSFrame'</span></span>
+<span><span class="fu">get_n_fleets</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'data.frame'</span></span>
+<span><span class="fu">get_n_fleets</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">get_n_years</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -143,8 +151,9 @@ a FIMS model in a long format. The tibble will potentially have the
 following columns depending if it fits to ages and lengths or just one of
 them:
 type, name, age, length, datestart, dateend, value, unit, and uncertainty.</p>
-<p><code>get_fleets()</code> returns a vector of integer values specifying which fleets in
-the model are fishing fleets.</p>
+<p><code>get_fleets()</code> returns a vector of strings containing the fleet names.</p>
+<p><code>get_n_fleets()</code> returns an integer specifying the number of fleets in the
+model, where fleets is inclusive of both fishing fleets and survey vessels.</p>
 <p><code>get_n_years()</code> returns an integer specifying the number of years in the
 model.</p>
 <p><code>get_start_year()</code> returns an integer specifying the start year of the

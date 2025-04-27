@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,9 +36,35 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/noaa-fims/fims/blob/v0.3.0.1/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/noaa-fims/fims/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="fims-040">FIMS 0.4.0<a class="anchor" aria-label="anchor" href="#fims-040"></a></h2>
+<ul><li>Allows for CPUE data and landings within a single fleet and changes the composition data to be separate from the catch. If there are catches, compositions are based on F, if you have survey compositions those are scaled by q, and you can also have composition data without catch or CPUE and those match the population.</li>
+<li>Fixes bug in <code>finalize()</code> where variables were going out of scope by using a shared pointer and RealVector, which allows for estimates tibble to return more. Output is integrated between json and TMB using <code><a href="../reference/reshape_tmb_estimates.html">reshape_tmb_estimates()</a></code>, <code><a href="../reference/reshape_json_estimates.html">reshape_json_estimates()</a></code>, and <code><a href="../reference/reshape_json_derived_quantities.html">reshape_json_derived_quantities()</a></code>. ParameterVector are now set using <code>resize()</code> and <code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::walk()</a></code> rather than <code><a href="https://rdrr.io/r/methods/new.html" class="external-link">methods::new()</a></code>.</li>
+<li>Increases code coverage
+<ul><li>Restructures R tests using <code><a href="../reference/use_testthat_template.html">use_testthat_template()</a></code>
+</li>
+<li>Starts to use Rcpp::Rcerr instead of Rcpp::Rcout</li>
+<li>Skips parallel and distribution rcpp test</li>
+<li>Adds <code>FIMS_dmultinom()</code> distribution to match TMB</li>
+</ul></li>
+<li>Fixes bug in <code><a href="../reference/get_FIMSFit.html">get_number_of_parameters()</a></code>.</li>
+<li>Uses static_cast<type>([-0-9.]+) to wrap constant variables.</type></li>
+<li>Fixes cmake_minimum_required to use a range and updates googletest version.</li>
+<li>Adds minimal fims-demo vignette.</li>
+<li>Removes unused estimated_log_M and estimated_log_init_naa from inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp.</li>
+<li>Adds gdb to the devcontainer.json file.</li>
+<li>Fixes broken model comparison project links.</li>
+<li>Adds dependabot.yml file to update GitHub actions.</li>
+<li>Combine <code>initialize_comp()</code> functions.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0.1" id="fims-0301">FIMS 0.3.0.1<a class="anchor" aria-label="anchor" href="#fims-0301"></a></h2>
+<ul><li>Pluralism in cli was incorrect in FIMSFrame.</li>
+<li>Composition modules are initialized using the composition times the uncertainty, which was failing for -999 values because -999 * uncertainty does not equal -999 and was leading to the likelihood being evaluated.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0.0" id="fims-0300">FIMS 0.3.0.0<a class="anchor" aria-label="anchor" href="#fims-0300"></a></h2>
 <ul><li>Fits to length data using an age-to-length-conversion matrix, <code>data1</code> includes the necessary information needed to fit to both ages and lengths.</li>
