@@ -27,11 +27,10 @@ jobs:
     # We use Google style to format code.
     steps:
     - uses: actions/checkout@v4
-    - uses: DoozyX/clang-format-lint-action@v0.18.2
+    - uses: DoozyX/clang-format-lint-action@v0.20
       with:
         source: './inst/include ./src ./tests/gtest'
         extensions: 'hpp, cpp'
-        clangFormatVersion: 18.0.0
         style: Google
         inplace: True
     
