@@ -11,15 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     name: pr-checklist
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: 'Comment PR'
-        uses: actions/github-script@v0.3.0
+        uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            var msg = `# Instructions for code reviewer
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `# Instructions for code reviewer
 
             Hello reviewer, thanks for taking the time to review this PR!
 
@@ -38,5 +39,4 @@ jobs:
             - [ ] The code is commented and the comments are clear, useful, and mostly explain why instead of what.
             - [ ] Code is appropriately documented (doxygen and roxygen).
             `
-            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
-            github.issues.createComment({ issue_number, owner, repo, body: msg });
+            })
