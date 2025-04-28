@@ -9,7 +9,7 @@ use_testthat_template(name)
 \arguments{
 \item{name}{A character string providing the name of the R function that you
 want to test. The name will be used to create the file name, i.e.,
-tests/testthat/test-{name}.R. If \code{name} is not specified, the function
+\verb{tests/testthat/test-\{name\}.R}. If \code{name} is not specified, the function
 will not be able to create a file name and an error will be returned.}
 }
 \value{
