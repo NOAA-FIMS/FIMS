@@ -397,7 +397,7 @@ for (i in 1:processR::HardwareConcurrency()) {
   # get child out stream
   # message<-pool[[i]]$get_message()
 
-  # access the childs environment
+  # access the child environment
   env <- as.environment(pool[[i]]$get_environment())
   # show minimizer results
   # print(env[["results"]])
