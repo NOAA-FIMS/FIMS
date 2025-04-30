@@ -10,11 +10,11 @@
 		// if we want to install r packages using pak
 		// more info: https://github.com/rocker-org/devcontainer-features/blob/main/src/r-packages/README.md
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "clang,clang-format,clang-tidy,cmake,doxygen,g++,gcc,libxt6,libxtst6,make,ninja-build,gdb",
+			"packages": "clang,clang-format,clang-tidy,cmake,doxygen,g++,gcc,libxt6,libxtst6,make,ninja-build,gdb,valgrind",
 			"updatePackages": true			
 		},
 		 "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-			"packages": "dplyr,devtools,ggplot2,jsonlite,methods,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis",
+			"packages": "covr,dplyr,devtools,ggplot2,jsonlite,methods,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis,spelling",
 			"installSystemRequirements": true
 		  },
 		 // option to run rstudio. you can type rserver into the command line to
@@ -51,10 +51,11 @@
 				 "reditorsupport.r",
 				 "rdebugger.r-debugger",
                                  "github.vscode-pull-request-github"
-	 		]
+	 		],
+			"settings": {
+			    "r.session.emulateRStudioAPI": false
+			}
 	     }
-	 
-
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }

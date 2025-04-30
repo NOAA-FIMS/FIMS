@@ -20,7 +20,9 @@ Rcerr
 Rcout
 Rcpp
 RealVector
+Rstudio
 TMB
+WORDLIST
 agecomp
 al
 bookdown
@@ -54,14 +56,18 @@ github
 googletest
 grey
 hpp
+https
+init
 json
 lengthcomp
 lgamma
 lm
 lpdf
 minimizer
+multinomial
 naa
 nlmimb
+pdf
 popdy
 pre
 precompiled
@@ -78,4 +84,5 @@ trigamma
 trunc
 usethis
 vec
+wordlist
 yml

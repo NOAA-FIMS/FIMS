@@ -52,7 +52,7 @@ reference:
 - title: Package development
   desc: Primary functions used when developing FIMS package.
   contents:
-  - has_keyword("gtest_helper")
+  - has_keyword("developer")
   - has_keyword("set_methods")
   - use_testthat_template
   - starts_with("reshape_")

@@ -78,6 +78,8 @@ Suggests:
     remotes,
     rmarkdown,
     snowfall,
+    spelling,
+    styler,
     testthat (>= 3.0.0),
     tidyr,
     usethis,
@@ -96,3 +98,4 @@ NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 SystemRequirements: GNU make
+Language: en-US
