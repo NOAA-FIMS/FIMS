@@ -175,6 +175,10 @@ test_that("m_agecomp() works with correct inputs", {
 ## Setup ----
 # Load the test data from an RDS file containing model fits.
 # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
+if (!file.exists(test_path("fixtures", "data_age_comp.RDS"))) {
+  prepare_test_data()
+}
+
 data_files <- list.files(
   path = test_path("fixtures"),
   pattern = "^data.*\\.RDS$",

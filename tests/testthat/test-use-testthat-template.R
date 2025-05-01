@@ -51,9 +51,10 @@ create_temporary_file <- function(temp_path) {
 
 # Generate temporary files for testing
 temp_path <- file.path(tempdir(), "rcmdcheck")
+unlink(temp_path, recursive = TRUE, force = TRUE)
 output <- create_temporary_file(temp_path)
 # Ensure the temporary folder is cleaned up after tests are complete
-on.exit(unlink(output[["folder_path"]], recursive = TRUE), add = TRUE)
+on.exit(unlink(output[["folder_path"]], recursive = TRUE, force = TRUE), add = TRUE)
 on.exit(unlink(temp_path))
 
 ## IO correctness ----

@@ -87,3 +87,87 @@ run_gtest <- function(...) {
   system(paste("ctest --test-dir build", ...))
   TRUE
 }
+
+#' Run R integration tests
+#'
+#' Intended for developers to run the R integration tests.
+#' @keywords developer
+#' @examples 
+#' \dontrun{
+#' run_r_integration_tests()
+#' }
+run_r_integration_tests <- function() {
+  devtools::test(filter = "integration")
+  devtools::test(filter = "parallel")
+}
+
+#' Run R unit tests
+#'
+#' Intended for developers to run the R unit tests.
+#' @keywords developer
+#' @examples
+#' \dontrun{
+#' run_r_unit_tests()
+#' }
+run_r_unit_tests <- function() {
+  # List all R files in the tests/testthat directory with the pattern 
+  # "test-integration*.R"
+  integration_tests <- list.files(
+    path = file.path("tests", "testthat"),
+    pattern = "^test-integration.*\\.R$"
+  )
+  # List parallel tests
+  integration_tests <- c(integration_tests, list.files(
+    path = file.path("tests", "testthat"),
+    pattern = "^test-parallel-.*\\.R$"
+  ))
+  # List all files in the tests/testthat directory that are not integation tests 
+  all_tests <- list.files(
+    path = file.path("tests", "testthat"),
+    pattern = "^test-.*\\.R$"
+  )
+  # Exclude integration tests
+  unit_tests <- setdiff(all_tests, integration_tests)
+  # Remove "test-" and ".R" from the file names
+  test_files <- gsub("^test-|\\.R$", "", unit_tests)
+  # Run unit tests
+  # TODO: use purrr::pwalk() to run the tests in parallel. 
+  purrr::walk(
+    test_files,
+    \(x) {
+      devtools::test(filter = x)
+    }
+  )
+}
+
+#' Remove test data
+#' 
+#' Intended for developers to remove test data to run the tests from fresh. 
+#' Developers should run this function before testing if changes affect FIMS
+#' input or outout.
+#' 
+#' @keywords developer
+#' @examples \dontrun{
+#' remove_test_data()
+#' }
+remove_test_data <- function() {
+  # List the data files starting with "integration-"
+  data_to_keep <- list.files(
+    path = file.path("tests", "testthat", "fixtures"),
+    pattern = "^integration-.*\\.R$"
+  )
+
+  # List all data files 
+  all_files <- list.files(
+    path = file.path("tests", "testthat", "fixtures"),
+    pattern = "\\.RDS$", 
+    full.names = TRUE
+  )
+
+  # Remove the files that are not data_to_keep
+  unlink(
+    setdiff(all_files, data_to_keep),
+    recursive = TRUE,
+    force = TRUE
+  )
+}
