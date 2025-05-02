@@ -92,7 +92,7 @@ run_gtest <- function(...) {
 #'
 #' Intended for developers to run the R integration tests.
 #' @keywords developer
-#' @examples 
+#' @examples
 #' \dontrun{
 #' run_r_integration_tests()
 #' }
@@ -110,7 +110,7 @@ run_r_integration_tests <- function() {
 #' run_r_unit_tests()
 #' }
 run_r_unit_tests <- function() {
-  # List all R files in the tests/testthat directory with the pattern 
+  # List all R files in the tests/testthat directory with the pattern
   # "test-integration*.R"
   integration_tests <- list.files(
     path = file.path("tests", "testthat"),
@@ -121,7 +121,7 @@ run_r_unit_tests <- function() {
     path = file.path("tests", "testthat"),
     pattern = "^test-parallel-.*\\.R$"
   ))
-  # List all files in the tests/testthat directory that are not integation tests 
+  # List all files in the tests/testthat directory that are not integation tests
   all_tests <- list.files(
     path = file.path("tests", "testthat"),
     pattern = "^test-.*\\.R$"
@@ -131,7 +131,7 @@ run_r_unit_tests <- function() {
   # Remove "test-" and ".R" from the file names
   test_files <- gsub("^test-|\\.R$", "", unit_tests)
   # Run unit tests
-  # TODO: use purrr::pwalk() to run the tests in parallel. 
+  # TODO: use purrr::pwalk() to run the tests in parallel.
   purrr::walk(
     test_files,
     \(x) {
@@ -141,11 +141,11 @@ run_r_unit_tests <- function() {
 }
 
 #' Remove test data
-#' 
-#' Intended for developers to remove test data to run the tests from fresh. 
+#'
+#' Intended for developers to remove test data to run the tests from fresh.
 #' Developers should run this function before testing if changes affect FIMS
 #' input or outout.
-#' 
+#'
 #' @keywords developer
 #' @examples \dontrun{
 #' remove_test_data()
@@ -157,10 +157,10 @@ remove_test_data <- function() {
     pattern = "^integration-.*\\.R$"
   )
 
-  # List all data files 
+  # List all data files
   all_files <- list.files(
     path = file.path("tests", "testthat", "fixtures"),
-    pattern = "\\.RDS$", 
+    pattern = "\\.RDS$",
     full.names = TRUE
   )
 

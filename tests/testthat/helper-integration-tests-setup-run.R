@@ -2,19 +2,19 @@
 # tests/testthat.
 
 #' Prepare FIMS input data for integration tests
-#' 
+#'
 #' This function prepares the input data for integration tests by generating
 #' datasets containing only age composition, only length composition data, or
-#' data with missing values. The integration_test_data_components.RData is 
+#' data with missing values. The integration_test_data_components.RData is
 #' generated after running the script R/data1.R.
-#' 
+#'
 #' @return None. The function saves the generated datasets as RDS files in the
 #' specified directory.
 #' @examples
-# \dontrun{
-#   prepare_test_data()
-# }
-prepare_test_data <- function(){
+#' \dontrun{
+#' prepare_test_data()
+#' }
+prepare_test_data <- function() {
   # Set up FIMS data ----
   # The section generates datasets containing only age composition, only length
   # composition data, or data with missing values.

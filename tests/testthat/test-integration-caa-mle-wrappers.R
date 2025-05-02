@@ -37,7 +37,7 @@ test_that("deterministic run works with correct inputs", {
 test_that("deterministic run returns correct nlls", {
   # Load the test data from an RDS file containing the model fit
   deterministic_age_length_comp <- readRDS(test_path("fixtures", "deterministic_age_length_comp.RDS"))
-  
+
   #' Compare FIMS NLLs with model comparison project "true" NLLs
   verify_fims_nll(
     report = get_report(deterministic_age_length_comp),
