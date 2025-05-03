@@ -9,6 +9,9 @@
 # get_estimates ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
+  prepare_test_data()
+}
 
 ## IO correctness ----
 # Define the expected column names for the estimates tibble
