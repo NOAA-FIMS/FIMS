@@ -9,7 +9,9 @@
 # get_max_gradient ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-
+if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
+  prepare_test_data()
+}
 ## IO correctness ----
 test_that("get_max_gradient() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.

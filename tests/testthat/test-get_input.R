@@ -9,6 +9,9 @@
 # get_input ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
+  prepare_test_data()
+}
 
 ## IO correctness ----
 test_that("get_input() works with correct inputs", {
