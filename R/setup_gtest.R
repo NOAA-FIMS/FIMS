@@ -110,24 +110,18 @@ run_r_integration_tests <- function() {
 #' run_r_unit_tests()
 #' }
 run_r_unit_tests <- function() {
-  # List all R files in the tests/testthat directory with the pattern
-  # "test-integration*.R"
-  integration_tests <- list.files(
-    path = file.path("tests", "testthat"),
-    pattern = "^test-integration.*\\.R$"
+  # Exclude the files returned from the second set because we do not want
+  # integration tests which includes integration and parallel tests
+  unit_tests <- setdiff(
+    list.files(
+      path = testthat::test_path(),
+      pattern = "^test-.*\\.R$"
+    ),
+    list.files(
+      path = testthat::test_path(),
+      pattern = "^test-integration.*|^test-parallel.*"
+    )
   )
-  # List parallel tests
-  integration_tests <- c(integration_tests, list.files(
-    path = file.path("tests", "testthat"),
-    pattern = "^test-parallel-.*\\.R$"
-  ))
-  # List all files in the tests/testthat directory that are not integation tests
-  all_tests <- list.files(
-    path = file.path("tests", "testthat"),
-    pattern = "^test-.*\\.R$"
-  )
-  # Exclude integration tests
-  unit_tests <- setdiff(all_tests, integration_tests)
   # Remove "test-" and ".R" from the file names
   test_files <- gsub("^test-|\\.R$", "", unit_tests)
   # Run unit tests
@@ -153,14 +147,15 @@ run_r_unit_tests <- function() {
 remove_test_data <- function() {
   # List the data files starting with "integration-"
   data_to_keep <- list.files(
-    path = file.path("tests", "testthat", "fixtures"),
-    pattern = "^integration-.*\\.R$"
+    path = testthat::test_path("fixtures"),
+    pattern = "^integration[-_].*\\.RD",
+    full.names = TRUE
   )
 
   # List all data files
   all_files <- list.files(
-    path = file.path("tests", "testthat", "fixtures"),
-    pattern = "\\.RDS$",
+    path = testthat::test_path("fixtures"),
+    pattern = "\\.RDS$|\\.RData$",
     full.names = TRUE
   )
 
