@@ -12,6 +12,7 @@
 #include "rcpp_objects/rcpp_data.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
+#include "rcpp_objects/rcpp_math.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "../../common/model.hpp"
@@ -539,6 +540,12 @@ RCPP_MODULE(fims) {
     Rcpp::function(
         "log_error", log_error,
         "Adds a error entry to the log from the R environment.");
+    Rcpp::function(
+        "logit", logit_rcpp,
+        "Applies the logit transformation: -log(b - x) + log(x - a).");
+    Rcpp::function(
+        "inv_logit", inv_logit_rcpp,
+        "Applies the inverse of the logit transformation to a bounded space.");
     Rcpp::class_<Parameter>(
         "Parameter",
         "An RcppInterface class that defines the Parameter class.")
