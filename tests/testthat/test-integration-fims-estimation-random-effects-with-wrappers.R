@@ -336,12 +336,13 @@ test_that("estimation test with recruitment re on logr", {
     create_default_parameters(
       fleets = fleets,
       recruitment = list(
-        form = "BevertonHoltRecruitment")
-    )|>
+        form = "BevertonHoltRecruitment"
+      )
+    ) |>
     create_default_process(
       data = fims_data,
       module = "recruitment",
-      par = "log_r", 
+      par = "log_r",
       process_distribution = gaussian(),
       estimated = TRUE,
       random = TRUE
@@ -371,7 +372,7 @@ test_that("estimation test with recruitment re on logr", {
     )
   )
 
- parameters <- default_parameters |>
+  parameters <- default_parameters |>
     update_parameters(
       modified_parameters = modified_parameters
     )
@@ -385,7 +386,7 @@ test_that("estimation test with recruitment re on logr", {
   clear()
 
   # make sure random effects are turned on
-  expect_equal(fit_log_r@obj[["env"]][["parameters"]][["re"]], rep(0, get_n_years(fims_data)-1) )
+  expect_equal(fit_log_r@obj[["env"]][["parameters"]][["re"]], rep(0, get_n_years(fims_data) - 1))
 
   # # TODO:: naa tests fail when log_dev estimation turned on
   # # Compare FIMS results with model comparison project OM values
@@ -398,7 +399,7 @@ test_that("estimation test with recruitment re on logr", {
   #   use_fimsfit = TRUE
   # )
 
- # fit with log_devs as re
+  # fit with log_devs as re
   # Clear any previous FIMS settings
   clear()
 
@@ -415,14 +416,15 @@ test_that("estimation test with recruitment re on logr", {
     create_default_parameters(
       fleets = list(fleet1 = fleet1, survey1 = survey1),
       recruitment = list(
-        form = "BevertonHoltRecruitment"),
+        form = "BevertonHoltRecruitment"
+      ),
       growth = list(form = "EWAAgrowth"),
       maturity = list(form = "LogisticMaturity")
     ) |>
     create_default_process(
       data = fims_data,
       module = "recruitment",
-      par = "log_devs", 
+      par = "log_devs",
       process_distribution = gaussian(),
       estimated = TRUE,
       random = TRUE
@@ -452,7 +454,7 @@ test_that("estimation test with recruitment re on logr", {
     )
   )
 
- parameters <- default_parameters |>
+  parameters <- default_parameters |>
     update_parameters(
       modified_parameters = modified_parameters
     )
@@ -465,10 +467,8 @@ test_that("estimation test with recruitment re on logr", {
 
   clear()
 
-expect_equal(fit_log_r@report[["nll_components"]], fit_log_devs@report[["nll_components"]], tolerance = .001)
-expect_equal(fit_log_r@report[["recruitment"]], fit_log_devs@report[["recruitment"]], tolerance = .001)
-expect_lte(fit_log_r@timing[["time_optimization"]], fit_log_devs@timing[["time_optimization"]])
-expect_lte(fit_log_r@timing[["time_sdreport"]], fit_log_devs@timing[["time_sdreport"]])
-
-
+  expect_equal(fit_log_r@report[["nll_components"]], fit_log_devs@report[["nll_components"]], tolerance = .001)
+  expect_equal(fit_log_r@report[["recruitment"]], fit_log_devs@report[["recruitment"]], tolerance = .001)
+  expect_lte(fit_log_r@timing[["time_optimization"]], fit_log_devs@timing[["time_optimization"]])
+  expect_lte(fit_log_r@timing[["time_sdreport"]], fit_log_devs@timing[["time_sdreport"]])
 })

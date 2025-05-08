@@ -9,14 +9,14 @@ om_output <- om_output_list[[iter_id]]
 em_input <- em_input_list[[iter_id]]
 
 test_that("prior predictive check", {
-  #Set up fleet and survey without data distributions
+  # Set up fleet and survey without data distributions
 
   # Extract fishing fleet landings data (observed) and initialize index module
   catch <- em_input[["L.obs"]][["fleet1"]]
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
   fishing_fleet_index <- methods::new(Index, om_input[["nyr"]])
-   purrr::walk(
+  purrr::walk(
     1:om_input[["nyr"]],
     \(x) fishing_fleet_index$index_data$set(x - 1, catch[x])
   )
@@ -54,7 +54,7 @@ test_that("prior predictive check", {
   fishing_fleet_selectivity$slope[1]$estimation_type <- "fixed_effects"
 
   # Initialize the fishing fleet module
-   # Initialize the fishing fleet module
+  # Initialize the fishing fleet module
   fishing_fleet <- methods::new(Fleet)
   # Set number of years
   fishing_fleet$nyears$set(om_input[["nyr"]])
@@ -80,11 +80,11 @@ test_that("prior predictive check", {
   # still executes. Consider adding a check in the Rcpp interface to ensure
   # users provide a vector of inputs.
   fishing_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
-  for(i in 1:(om_input[["nages"]] * om_input[["nlengths"]])){
+  for (i in 1:(om_input[["nages"]] * om_input[["nlengths"]])) {
     # Set the age-length conversion matrix values
     fishing_fleet$age_to_length_conversion[i]$value <- c(t(em_input[["age_to_length_conversion"]]))[i]
   }
-  
+
   # Turn off estimation for length-at-age
   fishing_fleet$age_to_length_conversion$set_all_estimable(FALSE)
   fishing_fleet$age_to_length_conversion$set_all_random(FALSE)
@@ -93,7 +93,7 @@ test_that("prior predictive check", {
   # This includes initializing logistic selectivity, observed data modules, and distribution links.
   survey_index <- em_input[["surveyB.obs"]][["survey1"]]
   survey_fleet_index <- methods::new(Index, om_input[["nyr"]])
-   purrr::walk(
+  purrr::walk(
     1:om_input[["nyr"]],
     \(x) survey_fleet_index$index_data$set(x - 1, survey_index[x])
   )
@@ -107,7 +107,7 @@ test_that("prior predictive check", {
   )
   survey_lengthcomp <- em_input[["survey.length.obs"]][["survey1"]]
   survey_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
- purrr::walk(
+  purrr::walk(
     1:(om_input[["nyr"]] * om_input[["nlengths"]]),
     \(x) survey_fleet_length_comp$length_comp_data$set(
       x - 1,
@@ -136,8 +136,8 @@ test_that("prior predictive check", {
   survey_fleet$SetObservedLengthCompDataID(survey_fleet_length_comp$get_id())
 
   survey_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
-  for(i in 1:(om_input[["nages"]] * om_input[["nlengths"]])){
-    survey_fleet$age_to_length_conversion[i]$value <-  
+  for (i in 1:(om_input[["nages"]] * om_input[["nlengths"]])) {
+    survey_fleet$age_to_length_conversion[i]$value <-
       c(t(em_input[["age_to_length_conversion"]]))[i]
   }
   # Turn off estimation for length-at-age
@@ -154,7 +154,7 @@ test_that("prior predictive check", {
   slope_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$slope$get_id(), survey_fleet_selectivity$slope$get_id()))
 
   inflection_point_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]))
-  inflection_point_prior <-methods::new(DnormDistribution)
+  inflection_point_prior <- methods::new(DnormDistribution)
   inflection_point_prior$expected_values$resize(2)
   inflection_point_prior$expected_values[1]$value <- inflection_point_mean
   inflection_point_prior$expected_values[2]$value <- inflection_point_mean
@@ -162,7 +162,7 @@ test_that("prior predictive check", {
   inflection_point_prior$log_sd[1]$value <- log(3)
   inflection_point_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$inflection_point$get_id(), survey_fleet_selectivity$inflection_point$get_id()))
 
-  #Add shared selectivity vague prior for fishery and survey
+  # Add shared selectivity vague prior for fishery and survey
 
   recruitment <- methods::new(BevertonHoltRecruitment)
   recruitment_process <- new(LogDevsRecruitmentProcess)
@@ -265,7 +265,7 @@ test_that("prior predictive check", {
   names(opt$par) <- names(get_parameter_names(opt$par))
   inflection_point_out <- opt$par[grep(names(opt$par), pattern = "inflection_point")]
   slope_out <- opt$par[grep(names(opt$par), pattern = "slope")]
-  for(i in 1:2){
+  for (i in 1:2) {
     expect_equal(unname(inflection_point_out[i]), unname(inflection_point_mean), tolerance = 1e-4)
     expect_equal(unname(slope_out[i]), unname(slope_mean), tolerance = 1e-4)
   }
@@ -285,6 +285,3 @@ test_that("prior predictive check", {
 
   clear()
 })
-
-
-

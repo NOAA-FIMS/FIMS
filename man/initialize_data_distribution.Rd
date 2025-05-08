@@ -34,7 +34,7 @@ be used in the model. The argument takes a family class, e.g.,
 \item{sd}{A list of length two. The first entry is named \code{"value"} and it
 stores the initial values (scalar or vector) for the relevant standard
 deviations. The default is \code{value = 1}. The second entry is named
-\code{"estimation_type"} and it stores a vector of booleans (default = "contant") is a
+\code{"estimation_type"} and it stores a vector of booleans (default = "constant") is a
 string indicating whether or not standard deviation is estimated as a fixed effect
 or held constant. If \code{"value"} is a vector and \code{"estimation_type"} is a scalar,
 the single value specified \code{"estimation_type"} value will be repeated to match the length of

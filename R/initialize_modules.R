@@ -156,7 +156,7 @@ initialize_module <- function(parameters, data, module_name) {
           "nyears" = get_n_years(data)
         )
       )
-    }  else if (field %in% c("ages", "weights")) {
+    } else if (field %in% c("ages", "weights")) {
       get_value_function <- switch(field,
         "ages" = get_ages,
         "weights" = m_weight_at_age
@@ -801,9 +801,9 @@ initialize_fims <- function(parameters, data) {
     # 1. Remove the "dims" field to maintain consistency with other distributions, or
     # 2. Update all relevant R functions (e.g., initialize_data_distribution())
     #    that call DmultinomDistribution to set the "dims" field.
-    # AMH comment: 
+    # AMH comment:
     # 1. dims field is needed to track the dimension of multivariate input
-    # 2. the pattern for multinomial is different because it is a multivariate distribution. 
+    # 2. the pattern for multinomial is different because it is a multivariate distribution.
     #  Other multivariate distributions (e.g. MVNORM) will likely also need a dims field
 
     if ("age" %in% fleet_types &&
@@ -846,33 +846,32 @@ initialize_fims <- function(parameters, data) {
     value = TRUE
   )
 
-   if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
-  # TODO: Remove this check?: if log_devs are fixed, there is no recruitment distribution
-  #   cli::cli_abort("Missing required inputs for recruitment distribution.")
-   recruitment_process <- initialize_process_structure(
-    module = recruitment,
-    par = "log_devs"
-  )
-   } else {
+  if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
+    # TODO: Remove this check?: if log_devs are fixed, there is no recruitment distribution
+    #   cli::cli_abort("Missing required inputs for recruitment distribution.")
+    recruitment_process <- initialize_process_structure(
+      module = recruitment,
+      par = "log_devs"
+    )
+  } else {
+    recruitment_distribution <- initialize_process_distribution(
+      module = recruitment,
+      par = names(parameters$modules$recruitment$process_distribution),
+      family = gaussian(),
+      sd = list(
+        value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
+        estimation_type = parameters[["parameters"]][[
+          "recruitment"
+        ]][[field_estimation_name]]
+      ),
+      is_random_effect = FALSE
+    )
 
-  recruitment_distribution <- initialize_process_distribution(
-    module = recruitment,
-    par = names(parameters$modules$recruitment$process_distribution),
-    family = gaussian(),
-    sd = list(
-      value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
-      estimation_type = parameters[["parameters"]][[
-        "recruitment"
-      ]][[field_estimation_name]]
-    ),
-    is_random_effect = FALSE
-  )
-
-  recruitment_process <- initialize_process_structure(
-    module = recruitment,
-    par = names(parameters$modules$recruitment$process_distribution)
-  )
-}
+    recruitment_process <- initialize_process_structure(
+      module = recruitment,
+      par = names(parameters$modules$recruitment$process_distribution)
+    )
+  }
 
   # Growth
   growth <- initialize_growth(
@@ -903,8 +902,10 @@ initialize_fims <- function(parameters, data) {
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameter_list <- list(
-    parameters = list(p = get_fixed(),
-                      re = get_random())
+    parameters = list(
+      p = get_fixed(),
+      re = get_random()
+    )
   )
 
   return(parameter_list)
@@ -977,13 +978,13 @@ set_param_vector <- function(field, module, module_input) {
   }
 
   # Set the estimation information for the entire parameter vector
-  if(module_input[[field_estimation_name]] == "constant"){
+  if (module_input[[field_estimation_name]] == "constant") {
     module[[field]]$set_all_estimable(FALSE)
   }
-  if(module_input[[field_estimation_name]] == "random_effects"){
+  if (module_input[[field_estimation_name]] == "random_effects") {
     module[[field]]$set_all_random(TRUE)
   }
-  if(module_input[[field_estimation_name]] == "fixed_effects"){
+  if (module_input[[field_estimation_name]] == "fixed_effects") {
     module[[field]]$set_all_estimable(TRUE)
   }
 }

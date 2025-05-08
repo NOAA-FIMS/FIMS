@@ -209,9 +209,9 @@ get_expected_name <- function(family, data_type) {
 #' @param sd A list of length two. The first entry is named `"value"` and it
 #'   stores the initial values (scalar or vector) for the relevant standard
 #'   deviations. The default is `value = 1`. The second entry is named
-#'  `"estimation_type"` and it stores a vector of booleans (default = "contant") is a
-#'   string indicating whether or not standard deviation is estimated as a fixed effect 
-#'   or held constant. If `"value"` is a vector and `"estimation_type"` is a scalar, 
+#'  `"estimation_type"` and it stores a vector of booleans (default = "constant") is a
+#'   string indicating whether or not standard deviation is estimated as a fixed effect
+#'   or held constant. If `"value"` is a vector and `"estimation_type"` is a scalar,
 #'   the single value specified `"estimation_type"` value will be repeated to match the length of
 #'   `value`. Otherwise, the dimensions of the two must match.
 #' @param data_type A string specifying the type of data that the
@@ -300,7 +300,7 @@ initialize_data_distribution <- function(
 
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if(sd[["estimation_type"]] == "constant") {
+      if (sd[["estimation_type"]] == "constant") {
         new_module$log_sd$set_all_estimable(FALSE)
       } else {
         new_module$log_sd$set_all_estimable(TRUE)
@@ -324,7 +324,7 @@ initialize_data_distribution <- function(
 
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if(sd[["estimation_type"]] == "constant") {
+      if (sd[["estimation_type"]] == "constant") {
         new_module$log_sd$set_all_estimable(FALSE)
       } else {
         new_module$log_sd$set_all_estimable(TRUE)
@@ -376,7 +376,7 @@ initialize_process_distribution <- function(
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
 
-  expected <- switch(paste0(par,"_",class(module)),
+  expected <- switch(paste0(par, "_", class(module)),
     "log_devs_Rcpp_BevertonHoltRecruitment" = NULL,
     "log_r_Rcpp_BevertonHoltRecruitment" = "log_expected_recruitment"
   )
@@ -395,7 +395,7 @@ initialize_process_distribution <- function(
 
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if(sd[["estimation_type"]] == "constant") {
+      if (sd[["estimation_type"]] == "constant") {
         new_module$log_sd$set_all_estimable(FALSE)
       } else {
         new_module$log_sd$set_all_estimable(TRUE)
@@ -419,7 +419,7 @@ initialize_process_distribution <- function(
 
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if(sd[["estimation_type"]] == "constant") {
+      if (sd[["estimation_type"]] == "constant") {
         new_module$log_sd$set_all_estimable(FALSE)
       } else {
         new_module$log_sd$set_all_estimable(TRUE)
@@ -448,7 +448,7 @@ initialize_process_distribution <- function(
   }
 
   # setup links to parameter
-  if(is.null(expected)){
+  if (is.null(expected)) {
     new_module$set_distribution_links(
       "random_effects",
       module$field(par)$get_id()
@@ -456,8 +456,10 @@ initialize_process_distribution <- function(
   } else {
     new_module$set_distribution_links(
       "random_effects",
-      c(module$field(par)$get_id(),
-        module$field(expected)$get_id())
+      c(
+        module$field(par)$get_id(),
+        module$field(expected)$get_id()
+      )
     )
   }
 
@@ -467,8 +469,8 @@ initialize_process_distribution <- function(
 #' @rdname initialize_data_distribution
 #' @keywords distribution
 #' @export
-initialize_process_structure <- function(module, par){
- new_process_module <- switch(paste0(par,"_",class(module)),
+initialize_process_structure <- function(module, par) {
+  new_process_module <- switch(paste0(par, "_", class(module)),
     "log_devs_Rcpp_BevertonHoltRecruitment" = new(LogDevsRecruitmentProcess),
     "log_r_Rcpp_BevertonHoltRecruitment" = new(LogRRecruitmentProcess)
   )

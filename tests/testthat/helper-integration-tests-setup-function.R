@@ -44,7 +44,7 @@ FIMS_dmultinom <- function(x, p) {
 #' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
 #' for the report.
 #' @param random_effects A logical value indicating whether to include random
-#' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects 
+#' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects
 #' will be included on recruitment in the model.
 #' @param map A list used to specify mapping for the `MakeADFun` function from
 #' the TMB package.
@@ -290,7 +290,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
   recruitment <- methods::new(BevertonHoltRecruitment)
-  if(is.null(random_effects) || random_effects[["recruitment"]] == "log_devs"){
+  if (is.null(random_effects) || random_effects[["recruitment"]] == "log_devs") {
     recruitment_process <- new(LogDevsRecruitmentProcess)
   } else {
     recruitment_process <- new(LogRRecruitmentProcess)
@@ -298,7 +298,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
 
   # NOTE: in first set of parameters below (for recruitment),
-  # $estimation_type (default is "constant") 
+  # $estimation_type (default is "constant")
   # is defined even if it matches the defaults in order to provide an example
   # of how that is done. Other sections of the code below leave defaults in
   # place as appropriate.
@@ -310,47 +310,47 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
   recruitment$logit_steep[1]$estimation_type <- "constant"
   recruitment$nyears$set(om_input[["nyr"]])
-  
+
   # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
 
- 
-  if(is.null(random_effects) || random_effects[["recruitment"]] == "log_devs"){
+
+  if (is.null(random_effects) || random_effects[["recruitment"]] == "log_devs") {
     recruitment$log_devs$resize(om_input[["nyr"]] - 1)
     for (y in 1:(om_input[["nyr"]] - 1)) {
       recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
     }
   }
-  if("recruitment" %in% names(random_effects)){
-    if(random_effects[["recruitment"]] == "log_devs"){
+  if ("recruitment" %in% names(random_effects)) {
+    if (random_effects[["recruitment"]] == "log_devs") {
       recruitment$log_devs$set_all_random(TRUE)
     }
-    if(random_effects[["recruitment"]] == "log_r"){
+    if (random_effects[["recruitment"]] == "log_r") {
       recruitment$log_r$resize(om_input[["nyr"]] - 1)
-      for(y in 1:(om_input[["nyr"]]-1)){
+      for (y in 1:(om_input[["nyr"]] - 1)) {
         recruitment$log_r[y]$value <- 1
       }
       recruitment$log_r$set_all_random(TRUE)
     }
   }
-   if(is.null(random_effects)) {
+  if (is.null(random_effects)) {
     # TODO: integration tests fail after setting recruitment log_devs all estimable.
     # We need to debug the issue, then uncomment the line below.
-    #recruitment$log_devs$set_all_estimable(TRUE)
+    # recruitment$log_devs$set_all_estimable(TRUE)
   }
 
-  if("selectivity" %in% names(random_effects)){
-    if(random_effects[["selectivity"]] == "log_devs"){
+  if ("selectivity" %in% names(random_effects)) {
+    if (random_effects[["selectivity"]] == "log_devs") {
       fishing_fleet_selectivity$log_devs$set_all_random(TRUE)
       survey_fleet_selectivity$log_devs$set_all_random(TRUE)
     }
-    if(random_effects[["selectivity"]] == "log_sel"){
+    if (random_effects[["selectivity"]] == "log_sel") {
       fishing_fleet_selectivity$log_sel$set_all_random(TRUE)
       survey_fleet_selectivity$log_sel$set_all_random(TRUE)
     }
-    if(random_effects[["selectivity"]] == "pars"){
+    if (random_effects[["selectivity"]] == "pars") {
       fishing_fleet_selectivity$inflection_point$estimation_type <- "random_effects"
       fishing_fleet_selectivity$inflection_point$slope <- "random_effects"
       survey_fleet_selectivity$inflection_point$estimation_type <- "random_effects"
@@ -369,19 +369,19 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     recruitment_distribution$x[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
-  if("recruitment" %in% names(random_effects)){
-    if(random_effects[["recruitment"]] == "log_devs"){
+  if ("recruitment" %in% names(random_effects)) {
+    if (random_effects[["recruitment"]] == "log_devs") {
       recruitment_distribution$log_sd[1]$estimation_type <- "fixed_effects"
       recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
     }
-    if(random_effects[["recruitment"]] == "log_r"){
-  recruitment_distribution$log_sd[1]$value <- log(1)
+    if (random_effects[["recruitment"]] == "log_r") {
+      recruitment_distribution$log_sd[1]$value <- log(1)
       recruitment_distribution$log_sd[1]$estimation_type <- "fixed_effects"
       recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), recruitment$log_expected_recruitment$get_id()))
     }
   }
-  
-  if(is.null(random_effects)){
+
+  if (is.null(random_effects)) {
     recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
   }
 
@@ -433,8 +433,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set-up TMB
   CreateTMBModel()
   # Create parameter list from Rcpp modules
-  parameters <- list(p = get_fixed(),
-                     re = get_random())
+  parameters <- list(
+    p = get_fixed(),
+    re = get_random()
+  )
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
     silent = FALSE, map = map, random = "re"
@@ -455,7 +457,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
   sdr_fixed <- summary(sdr, "fixed")
-  row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[,1]))
+  row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
 
   clear()
 
@@ -494,7 +496,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 #' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
 #' for the report.
 #' @param random_effects A logical value indicating whether to include random
-#' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects 
+#' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects
 #' will be included on recruitment in the model.
 #' @param map A list used to specify mapping for the `MakeADFun` function from
 #' the TMB package.

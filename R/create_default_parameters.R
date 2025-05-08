@@ -94,7 +94,8 @@
 create_default_parameters <- function(
     data,
     fleets,
-    recruitment = list(form = "BevertonHoltRecruitment",
+    recruitment = list(
+      form = "BevertonHoltRecruitment",
       process_distribution = c(log_devs = "DnormDistribution")
     ),
     # TODO: Rename EWAAgrowth to not use an acronym
@@ -491,7 +492,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
   # Create default parameters for Beverton--Holt recruitment
   default <- list(
     log_rzero.value = log(1e+06),
-    log_rzero.estimation_type = "fixed_effects",    
+    log_rzero.estimation_type = "fixed_effects",
     log_r.value = rep(0.0, get_n_years(data) - 1),
     log_r.estimation_type = "constant",
     logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
@@ -535,7 +536,7 @@ create_default_DnormDistribution <- function(
 
 
   # If input_type is 'process', add additional parameters
-  if (input_type == "process"| input_type == "prior") {
+  if (input_type == "process" | input_type == "prior") {
     default <- c(
       default,
       list(
@@ -645,8 +646,8 @@ create_default_recruitment <- function(
         input_type = "process"
       )
     )
-  
-  names(distribution_default) <- paste0(
+
+    names(distribution_default) <- paste0(
       distribution_input,
       ".",
       names(distribution_default)

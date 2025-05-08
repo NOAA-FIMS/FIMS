@@ -24,7 +24,7 @@ result <- setup_and_run_FIMS_without_wrappers(
   random_effects = c(recruitment = "log_devs")
 )
 
- ## IO correctness ----
+## IO correctness ----
 test_that("deterministic run works with correct inputs", {
   # Compare FIMS results with model comparison project OM values
   verify_fims_deterministic(
@@ -65,9 +65,9 @@ result <- setup_and_run_FIMS_without_wrappers(
 )
 
 ## IO correctness ----
-# Compare FIMS results with model comparison project OM values 
+# Compare FIMS results with model comparison project OM values
 test_that("nll test of fims with radnom effects", {
- result <- setup_and_run_FIMS_without_wrappers(
+  result <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
@@ -87,7 +87,7 @@ test_that("nll test of fims with radnom effects", {
 })
 
 test_that("estimation test with recruitment re on logr", {
-    result_log_r <- setup_and_run_FIMS_without_wrappers(
+  result_log_r <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
@@ -119,6 +119,4 @@ test_that("estimation test with recruitment re on logr", {
   expect_equal(result_log_r$report[["recruitment"]], result_log_devs$report[["recruitment"]], tolerance = 1e-4)
 
   clear()
-
-
 })

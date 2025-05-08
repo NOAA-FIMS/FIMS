@@ -67,8 +67,7 @@ struct DistributionElementObject {
 
   /**
    * Retrieve expected element size given data, random effect, or prior.
-   * @param i index referencing vector or pointer
-   * @return the reference to the value of the vector or pointer at position i
+   * @return The size of the element.
    */
   inline size_t get_n_x(){
     if(this->input_type == "data"){
