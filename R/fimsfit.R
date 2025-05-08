@@ -355,12 +355,13 @@ FIMSFit <- function(
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
+  n_random_effects <- length(obj[["env"]][["parList()"]][["re"]])
   number_of_parameters <- c(
     total = n_total,
     fixed_effects = n_fixed_effects,
-    random_effects = n_total - n_fixed_effects
+    random_effects = n_random_effects
   )
-  rm(n_total, n_fixed_effects)
+  rm(n_total, n_fixed_effects, n_random_effects)
 
   # Calculate the maximum gradient
   max_gradient <- if (length(opt) > 0) {
@@ -372,6 +373,7 @@ FIMSFit <- function(
   # Rename parameters instead of "p"
   parameter_names <- names(get_parameter_names(obj[["par"]]))
   names(obj[["par"]]) <- parameter_names
+  random_effects_names <- names(get_random_names(obj[["env"]][["parList()"]][["re"]]))
 
   # Get the report
   report <- if (length(opt) == 0) {
@@ -417,21 +419,21 @@ FIMSFit <- function(
       module_name,
       module_id,
       label,
-      estimated
+      estimation_type
     )
   ) |>
     dplyr::mutate(
-      # if estimated = FALSE and initial.x = NA, then set initial.x = initial.y
+      # if estimation_type = "constant" and initial.x = NA, then set initial.x = initial.y
       # and set estimate.x = estimate.y. Here .x represents the TMB values and .y
       # represents the JSON values. json_estimates have values
       # for all parameters, including constant (not estimated) parameters.
       initial.x = ifelse(
-        estimated == FALSE & is.na(initial.x),
+        estimation_type == "constant" & is.na(initial.x),
         initial.y,
         initial.x
       ),
       estimate.x = ifelse(
-        estimated == FALSE & is.na(estimate.x),
+        estimation_type == "constant" & is.na(estimate.x),
         estimate.y,
         estimate.x
       )
@@ -572,9 +574,6 @@ fit_fims <- function(input,
                        trace = 0
                      ),
                      filename = NULL) {
-  if (!is.null(input$random)) {
-    cli::cli_abort("Random effects declared but are not implemented yet.")
-  }
   if (number_of_newton_steps > 0) {
     cli::cli_abort("Newton steps not implemented yet.")
   }
@@ -585,7 +584,7 @@ fit_fims <- function(input,
     data = list(),
     parameters = input$parameters,
     map = input$map,
-    random = input$random,
+    random = "re",
     DLL = "FIMS",
     silent = TRUE
   )

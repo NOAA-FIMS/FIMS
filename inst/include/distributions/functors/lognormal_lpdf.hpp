@@ -42,12 +42,7 @@ namespace fims_distributions
         virtual const Type evaluate()
         {
           // set vector size based on input type (prior, process, or data)
-          size_t n_x;
-          if(this->input_type == "data"){
-            n_x = this->observed_values->data.size();
-          } else {
-            n_x = this->x.size();
-          }
+          size_t n_x = this->get_n_x();
           // setup vector for recording the log probability density function values
           this->lpdf_vec.resize(n_x);
           std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
@@ -72,9 +67,9 @@ namespace fims_distributions
               // if data, check if there are any NA values and skip lpdf calculation if there are
               // See Deroba and Miller, 2016 (https://doi.org/10.1016/j.fishres.2015.12.002) for
               // the use of lognormal constant
-              if(this->observed_values->at(i) != this->observed_values->na_value){
-                  this->lpdf_vec[i] = dnorm(log(this->observed_values->at(i)), this->expected_values.get_force_scalar(i),
-                                            fims_math::exp(log_sd.get_force_scalar(i)), true) - log(this->observed_values->at(i));
+              if(this->get_observed(i) != this->observed_values->na_value){
+                this->lpdf_vec[i] = dnorm(log(this->get_observed(i)), this->get_expected(i),
+                                          fims_math::exp(log_sd.get_force_scalar(i)), true) - log(this->get_observed(i));
                 } else {
                 this->lpdf_vec[i] = 0;
               }
@@ -90,12 +85,20 @@ namespace fims_distributions
                 FIMS_SIMULATE_F(this->of)
                 { // preprocessor definition in interface.hpp
                     // this simulates data that is mean biased
-                    if(this->input_type == "data"){
-                      this->observed_values->at(i) = fims_math::exp(rnorm(this->expected_values.get_force_scalar(i),
-                                                                          fims_math::exp(log_sd.get_force_scalar(i))));
-                    } else {
-                      this->x[i] = fims_math::exp(rnorm(this->expected_values.get_force_scalar(i),
-                                                        fims_math::exp(log_sd.get_force_scalar(i))));
+                  if(this->input_type == "data"){                      
+                    this->observed_values->at(i) = 
+                      fims_math::exp(rnorm(this->get_expected(i),
+                      fims_math::exp(log_sd.get_force_scalar(i))));
+                  }
+                  if(this->input_type == "random_effects"){
+                    (*this->re)[i] = 
+                      fims_math::exp(rnorm(this->get_expected(i),
+                      fims_math::exp(log_sd.get_force_scalar(i))));
+                  }
+                  if(this->input_type == "prior"){
+                    (*(this->priors[i]))[0] = 
+                      fims_math::exp(rnorm(this->get_expected(i),
+                      fims_math::exp(log_sd.get_force_scalar(i))));
                     }
                 }
             }

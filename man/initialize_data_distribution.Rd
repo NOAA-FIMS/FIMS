@@ -3,12 +3,13 @@
 \name{initialize_data_distribution}
 \alias{initialize_data_distribution}
 \alias{initialize_process_distribution}
+\alias{initialize_process_structure}
 \title{Set up a new distribution for a data type or a process}
 \usage{
 initialize_data_distribution(
   module,
   family,
-  sd = list(value = 1, estimated = FALSE),
+  sd = list(value = 1, estimation_type = "constant"),
   data_type = c("landings", "index", "agecomp", "lengthcomp")
 )
 
@@ -16,9 +17,11 @@ initialize_process_distribution(
   module,
   par,
   family,
-  sd = list(value = 1, estimated = FALSE),
+  sd = list(value = 1, estimation_type = "constant"),
   is_random_effect = FALSE
 )
+
+initialize_process_structure(module, par)
 }
 \arguments{
 \item{module}{An identifier to a C++ fleet module that is linked to the data
@@ -31,10 +34,10 @@ be used in the model. The argument takes a family class, e.g.,
 \item{sd}{A list of length two. The first entry is named \code{"value"} and it
 stores the initial values (scalar or vector) for the relevant standard
 deviations. The default is \code{value = 1}. The second entry is named
-\code{"estimated"} and it stores a vector of booleans (default = FALSE) is a
-scalar indicating whether or not standard deviation is estimated. If
-\code{"value"} is a vector and \code{"estimated"} is a scalar, the single value
-specified \code{"estimated"} value will be repeated to match the length of
+\code{"estimation_type"} and it stores a vector of booleans (default = "constant") is a
+string indicating whether or not standard deviation is estimated as a fixed effect
+or held constant. If \code{"value"} is a vector and \code{"estimation_type"} is a scalar,
+the single value specified \code{"estimation_type"} value will be repeated to match the length of
 \code{value}. Otherwise, the dimensions of the two must match.}
 
 \item{data_type}{A string specifying the type of data that the
@@ -75,7 +78,7 @@ fleet_distribution <- initialize_data_distribution(
   family = lognormal(link = "log"),
   sd = list(
     value = rep(sqrt(log(0.01^2 + 1)), n_years),
-    estimated = rep(FALSE, n_years) # Could also be a single FALSE
+    estimation_type = rep("constant", n_years) # Could also be a single "constant"
   ),
   data_type = "index"
 )
@@ -90,7 +93,7 @@ recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
   family = gaussian(),
-  sd = list(value = 0.4, estimated = FALSE),
+  sd = list(value = 0.4, estimation_type = "constant"),
   is_random_effect = FALSE
 )
 }

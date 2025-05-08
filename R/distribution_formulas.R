@@ -45,7 +45,7 @@ check_distribution_validity <- function(args) {
       "unavailable data type"
     )
   }
-  elements_of_sd <- c("value", "estimated")
+  elements_of_sd <- c("value", "estimation_type")
 
   # Start a bulleted list of errors and add to it in each if statement
   abort_bullets <- c(
@@ -122,17 +122,17 @@ check_distribution_validity <- function(args) {
       )
     }
     if (
-      length(sd[["estimated"]]) > 1 &&
-        length(sd[["value"]]) != length(sd[["estimated"]])
+      length(sd[["estimation_type"]]) > 1 &&
+        length(sd[["value"]]) != length(sd[["estimation_type"]])
     ) {
       sd_length <- length(sd[["value"]])
-      est_length <- length(sd[["estimated"]])
+      est_length <- length(sd[["estimation_type"]])
       abort_bullets <- c(
         abort_bullets,
-        "x" = "The sizes of {.var value} and {.var estimated} within {.var sd}
+        "x" = "The sizes of {.var value} and {.var estimation_type} within {.var sd}
                must match if more than one value is specified for the latter.",
         "i" = "The length of {.var sd[['value']]} is {.code {sd_length}}.",
-        "i" = "The length of {.var sd[['estimated']]} is
+        "i" = "The length of {.var sd[['estimation_type']]} is
                {.code {est_length}}."
       )
     }
@@ -209,10 +209,10 @@ get_expected_name <- function(family, data_type) {
 #' @param sd A list of length two. The first entry is named `"value"` and it
 #'   stores the initial values (scalar or vector) for the relevant standard
 #'   deviations. The default is `value = 1`. The second entry is named
-#'  `"estimated"` and it stores a vector of booleans (default = FALSE) is a
-#'   scalar indicating whether or not standard deviation is estimated. If
-#'   `"value"` is a vector and `"estimated"` is a scalar, the single value
-#'   specified `"estimated"` value will be repeated to match the length of
+#'  `"estimation_type"` and it stores a vector of booleans (default = "constant") is a
+#'   string indicating whether or not standard deviation is estimated as a fixed effect
+#'   or held constant. If `"value"` is a vector and `"estimation_type"` is a scalar,
+#'   the single value specified `"estimation_type"` value will be repeated to match the length of
 #'   `value`. Otherwise, the dimensions of the two must match.
 #' @param data_type A string specifying the type of data that the
 #'   distribution will be fit to. Allowable types include
@@ -241,7 +241,7 @@ get_expected_name <- function(family, data_type) {
 #'   family = lognormal(link = "log"),
 #'   sd = list(
 #'     value = rep(sqrt(log(0.01^2 + 1)), n_years),
-#'     estimated = rep(FALSE, n_years) # Could also be a single FALSE
+#'     estimation_type = rep("constant", n_years) # Could also be a single "constant"
 #'   ),
 #'   data_type = "index"
 #' )
@@ -256,14 +256,14 @@ get_expected_name <- function(family, data_type) {
 #'   module = recruitment,
 #'   par = "log_devs",
 #'   family = gaussian(),
-#'   sd = list(value = 0.4, estimated = FALSE),
+#'   sd = list(value = 0.4, estimation_type = "constant"),
 #'   is_random_effect = FALSE
 #' )
 #' }
 initialize_data_distribution <- function(
     module,
     family,
-    sd = list(value = 1, estimated = FALSE),
+    sd = list(value = 1, estimation_type = "constant"),
     # FIXME: Move this argument to second to match where par is in
     # initialize_process_distribution
     data_type = c("landings", "index", "agecomp", "lengthcomp")) {
@@ -299,11 +299,15 @@ initialize_data_distribution <- function(
     )
 
     # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
-      new_module$log_sd$set_all_estimable(sd[["estimated"]])
+    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
+      if (sd[["estimation_type"]] == "constant") {
+        new_module$log_sd$set_all_estimable(FALSE)
+      } else {
+        new_module$log_sd$set_all_estimable(TRUE)
+      }
     } else {
-      for (i in 1:seq_along(sd[["estimated"]])) {
-        new_module$log_sd[i]$estimated <- sd[["estimated"]][i]
+      for (i in 1:seq_along(sd[["estimation_type"]])) {
+        new_module$log_sd[i]$estimation_type <- sd[["estimation_type"]][i]
       }
     }
   }
@@ -319,11 +323,15 @@ initialize_data_distribution <- function(
     }
 
     # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
-      new_module$log_sd$set_all_estimable(sd[["estimated"]])
+    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
+      if (sd[["estimation_type"]] == "constant") {
+        new_module$log_sd$set_all_estimable(FALSE)
+      } else {
+        new_module$log_sd$set_all_estimable(TRUE)
+      }
     } else {
-      for (i in 1:seq_along(sd[["estimated"]])) {
-        new_module$log_sd[i]$estimated <- sd[["estimated"]][i]
+      for (i in 1:seq_along(sd[["estimation_type"]])) {
+        new_module$log_sd[i]$estimation_type <- sd[["estimation_type"]][i]
       }
     }
   }
@@ -362,11 +370,16 @@ initialize_process_distribution <- function(
     module,
     par,
     family,
-    sd = list(value = 1, estimated = FALSE),
+    sd = list(value = 1, estimation_type = "constant"),
     is_random_effect = FALSE) {
   # validity check on user input
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
+
+  expected <- switch(paste0(par, "_", class(module)),
+    "log_devs_Rcpp_BevertonHoltRecruitment" = NULL,
+    "log_r_Rcpp_BevertonHoltRecruitment" = "log_expected_recruitment"
+  )
 
   # Set up distribution based on `family` argument`
   if (family[["family"]] == "lognormal") {
@@ -381,11 +394,15 @@ initialize_process_distribution <- function(
     )
 
     # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
-      new_module$log_sd$set_all_estimable(sd[["estimated"]])
+    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
+      if (sd[["estimation_type"]] == "constant") {
+        new_module$log_sd$set_all_estimable(FALSE)
+      } else {
+        new_module$log_sd$set_all_estimable(TRUE)
+      }
     } else {
-      for (i in 1:seq_along(sd[["estimated"]])) {
-        new_module$log_sd[i]$estimated <- sd[["estimated"]][i]
+      for (i in 1:seq_along(sd[["estimation_type"]])) {
+        new_module$log_sd[i]$estimation_type <- sd[["estimation_type"]][i]
       }
     }
   }
@@ -401,11 +418,15 @@ initialize_process_distribution <- function(
     }
 
     # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimated"]]) == 1) {
-      new_module$log_sd$set_all_estimable(sd[["estimated"]])
+    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
+      if (sd[["estimation_type"]] == "constant") {
+        new_module$log_sd$set_all_estimable(FALSE)
+      } else {
+        new_module$log_sd$set_all_estimable(TRUE)
+      }
     } else {
-      for (i in 1:seq_along(sd[["estimated"]])) {
-        new_module$log_sd[i]$estimated <- sd[["estimated"]][i]
+      for (i in 1:seq_along(sd[["estimation_type"]])) {
+        new_module$log_sd[i]$estimation_type <- sd[["estimation_type"]][i]
       }
     }
   }
@@ -427,12 +448,36 @@ initialize_process_distribution <- function(
   }
 
   # setup links to parameter
-  new_module$set_distribution_links(
-    "random_effects",
-    module$field(par)$get_id()
-  )
+  if (is.null(expected)) {
+    new_module$set_distribution_links(
+      "random_effects",
+      module$field(par)$get_id()
+    )
+  } else {
+    new_module$set_distribution_links(
+      "random_effects",
+      c(
+        module$field(par)$get_id(),
+        module$field(expected)$get_id()
+      )
+    )
+  }
 
   return(new_module)
+}
+
+#' @rdname initialize_data_distribution
+#' @keywords distribution
+#' @export
+initialize_process_structure <- function(module, par) {
+  new_process_module <- switch(paste0(par, "_", class(module)),
+    "log_devs_Rcpp_BevertonHoltRecruitment" = new(LogDevsRecruitmentProcess),
+    "log_r_Rcpp_BevertonHoltRecruitment" = new(LogRRecruitmentProcess)
+  )
+
+  module$SetRecruitmentProcessID(new_process_module$get_id())
+
+  return(new_process_module)
 }
 
 #' Distributions not available in the stats package

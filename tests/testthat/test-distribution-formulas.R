@@ -25,13 +25,11 @@ recruitment <- methods::new(BevertonHoltRecruitment)
 
 # set up log_rzero (equilibrium recruitment)
 recruitment$log_rzero[1]$value <- log(om_input$R0)
-recruitment$log_rzero[1]$is_random_effect <- FALSE
-recruitment$log_rzero[1]$estimated <- TRUE
+recruitment$log_rzero[1]$estimation_type <- "fixed_effects"
 # set up logit_steep
 recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) +
   log(om_input$h - 0.2)
-recruitment$logit_steep[1]$is_random_effect <- FALSE
-recruitment$logit_steep[1]$estimated <- FALSE
+recruitment$logit_steep[1]$estimation_type <- "constant"
 # turn on estimation of deviations recruit deviations should enter the model in
 # normal space. The log is taken in the likelihood calculations alternative
 # setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
@@ -47,10 +45,10 @@ recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
   family = gaussian(),
-  sd = list(value = om_input$logR_sd, estimated = FALSE),
+  sd = list(value = om_input$logR_sd, estimation_type = "constant"),
   is_random_effect = FALSE
 )
-recruitment$estimate_log_devs$set(TRUE)
+recruitment$log_devs$set_all_estimable(TRUE)
 
 # Set up fishing fleet modules to test initialize_data_distribution
 catch <- em_input$L.obs$fleet1
@@ -72,8 +70,7 @@ purrr::walk(
 )
 fishing_fleet$log_Fmort$set_all_estimable(TRUE)
 fishing_fleet$log_q[1]$value <- log(1.0)
-fishing_fleet$estimate_q$set(FALSE)
-fishing_fleet$random_q$set(FALSE)
+fishing_fleet$log_q$set_all_estimable(FALSE)
 fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
 
 # Set up fishery index data using the lognormal
@@ -81,13 +78,13 @@ fleet_sd <- rep(sqrt(log(em_input$cv.L$fleet1^2 + 1)), om_input$nyr)
 fishing_fleet_index_distribution1 <- initialize_data_distribution(
   module = fishing_fleet,
   family = lognormal(link = "log"),
-  sd = list(value = fleet_sd, estimated = FALSE),
+  sd = list(value = fleet_sd, estimation_type = "constant"),
   data_type = "index"
 )
 fishing_fleet_index_distribution2 <- initialize_data_distribution(
   module = fishing_fleet,
   family = stats::gaussian(link = "log"),
-  sd = list(value = fleet_sd, estimated = TRUE),
+  sd = list(value = fleet_sd, estimation_type = "fixed_effects"),
   data_type = "index"
 )
 
@@ -128,7 +125,7 @@ test_that("distribution_formulas_new() returns correct error messages", {
       module = recruitment,
       par = "log_devs",
       family = multinomial(),
-      sd = list(value = om_input$logR_sd, estimated = FALSE),
+      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
       is_random_effect = FALSE
     )
   )
@@ -137,7 +134,7 @@ test_that("distribution_formulas_new() returns correct error messages", {
       module = recruitment,
       par = "log_devs",
       family = binomial(),
-      sd = list(value = om_input$logR_sd, estimated = FALSE),
+      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
       is_random_effect = FALSE
     )
   )
@@ -146,7 +143,7 @@ test_that("distribution_formulas_new() returns correct error messages", {
       module = recruitment,
       par = "log_devs",
       family = gaussian(),
-      sd = list(value = -1, estimated = FALSE),
+      sd = list(value = -1, estimation_type = "constant"),
       is_random_effect = FALSE
     )
   )
@@ -157,7 +154,7 @@ test_that("distribution_formulas_new() returns correct error messages", {
       family = gaussian(),
       sd = list(
         value = rep(om_input$logR_sd, 3),
-        estimated = rep(FALSE, 2)
+        estimation_type = rep("constant", 2)
       ),
       is_random_effect = FALSE
     )
@@ -168,7 +165,7 @@ test_that("distribution_formulas_new() returns correct error messages", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
-      sd = list(value = fleet_sd, estimated = FALSE),
+      sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "index"
     )
   )
@@ -176,7 +173,7 @@ test_that("distribution_formulas_new() returns correct error messages", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
-      sd = list(value = fleet_sd, estimated = FALSE),
+      sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "index"
     )
   )
@@ -184,7 +181,7 @@ test_that("distribution_formulas_new() returns correct error messages", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = gaussian(),
-      sd = list(value = fleet_sd, estimated = FALSE),
+      sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "agecomp"
     )
   )
@@ -192,7 +189,7 @@ test_that("distribution_formulas_new() returns correct error messages", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = lognormal(),
-      sd = list(value = fleet_sd, estimated = FALSE),
+      sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "lengthcomp"
     )
   )
@@ -200,7 +197,7 @@ test_that("distribution_formulas_new() returns correct error messages", {
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
-      sd = list(value = fleet_sd, estimated = c(FALSE, FALSE)),
+      sd = list(value = fleet_sd, estimation_type = c("constant", "constant")),
       data_type = "agecomp"
     )
   )

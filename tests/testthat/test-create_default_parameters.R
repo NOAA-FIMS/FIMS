@@ -92,9 +92,9 @@ test_that("create_default_Population() works with correct inputs", {
     object = names(population_1[["population"]]),
     expected = c(
       "Population.log_M.value",
-      "Population.log_M.estimated",
+      "Population.log_M.estimation_type",
       "Population.log_init_naa.value",
-      "Population.log_init_naa.estimated"
+      "Population.log_init_naa.estimation_type"
     )
   )
 })
@@ -144,13 +144,13 @@ test_that("create_default_DoubleLogistic() works with correct inputs", {
     object = names(DoubleLogistic_1),
     expected = c(
       "inflection_point_asc.value",
-      "inflection_point_asc.estimated",
+      "inflection_point_asc.estimation_type",
       "slope_asc.value",
-      "slope_asc.estimated",
+      "slope_asc.estimation_type",
       "inflection_point_desc.value",
-      "inflection_point_desc.estimated",
+      "inflection_point_desc.estimation_type",
       "slope_desc.value",
-      "slope_desc.estimated"
+      "slope_desc.estimation_type"
     )
   )
 
@@ -161,32 +161,32 @@ test_that("create_default_DoubleLogistic() works with correct inputs", {
     expected = 2
   )
   expect_equal(
-    object = DoubleLogistic_1[["inflection_point_asc.estimated"]],
-    expected = TRUE
+    object = DoubleLogistic_1[["inflection_point_asc.estimation_type"]],
+    expected = "fixed_effects"
   )
   expect_equal(
     object = DoubleLogistic_1[["slope_asc.value"]],
     expected = 1
   )
   expect_equal(
-    object = DoubleLogistic_1[["slope_asc.estimated"]],
-    expected = TRUE
+    object = DoubleLogistic_1[["slope_asc.estimation_type"]],
+    expected = "fixed_effects"
   )
   expect_equal(
     object = DoubleLogistic_1[["inflection_point_desc.value"]],
     expected = 4
   )
   expect_equal(
-    object = DoubleLogistic_1[["inflection_point_desc.estimated"]],
-    expected = TRUE
+    object = DoubleLogistic_1[["inflection_point_desc.estimation_type"]],
+    expected = "fixed_effects"
   )
   expect_equal(
     object = DoubleLogistic_1[["slope_desc.value"]],
     expected = 1
   )
   expect_equal(
-    object = DoubleLogistic_1[["slope_desc.estimated"]],
-    expected = TRUE
+    object = DoubleLogistic_1[["slope_desc.estimation_type"]],
+    expected = "fixed_effects"
   )
 })
 

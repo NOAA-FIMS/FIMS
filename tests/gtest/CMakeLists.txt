@@ -111,6 +111,26 @@ target_link_libraries(growth_evaluate
 
 gtest_discover_tests(growth_evaluate)
 
+# test_info_setup_random_effects.cpp
+add_executable(info_setup_random_effects
+  test_info_setup_random_effects.cpp
+)
+target_link_libraries(info_setup_random_effects
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(info_setup_random_effects)
+
+# test_info_setup_priors.cpp
+ add_executable(info_setup_priors
+   test_info_setup_priors.cpp
+ )
+ target_link_libraries(info_setup_priors
+   gtest_main
+   fims_test
+ )
+ gtest_discover_tests(info_setup_priors)
+
 # test_population_dynamics_recruitment_base.cpp
 add_executable(population_dynamics_recruitment_base
 test_population_dynamics_recruitment_base.cpp
@@ -122,6 +142,18 @@ target_link_libraries(population_dynamics_recruitment_base
 )
 
 gtest_discover_tests(population_dynamics_recruitment_base)
+
+# test_population_dynamics_recruitment_process.cpp
+add_executable(population_dynamics_recruitment_process
+test_population_dynamics_recruitment_process.cpp
+)
+
+target_link_libraries(population_dynamics_recruitment_process
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_dynamics_recruitment_process)
 
 # test_sr_beverton_holt.cpp
 add_executable(sr_beverton_holt
