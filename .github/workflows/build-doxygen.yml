@@ -51,6 +51,6 @@ jobs:
         source_file: 'docs'
         destination_repo: 'NOAA-FIMS/FIMS-docs'
         destination_branch: 'main'
-        user_email: 'christine.stawitz@noaa.gov' # your email
-        user_name: 'Christine Stawitz'           # your login
+        user_email: 'kelli.johnson@noaa.gov' # your email
+        user_name: 'Kelli Johnson'           # your login
         commit_message: 'Docs: run Doxygen'    
