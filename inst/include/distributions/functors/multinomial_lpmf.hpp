@@ -90,21 +90,21 @@ namespace fims_distributions
                 for (size_t j = 0; j < dims[1]; j++){
                     if(this->input_type == "data"){
                         // if data, check if there are any NA values and skip lpdf calculation for entire row if there are
-                        if (this->observed_values->at(i, j) ==
+                        if (this->get_observed(i, j) ==
                                 this->observed_values->na_value) {
                             containsNA = true;
                             break;
                         }
-                        if(!containsNA){
+                        if (!containsNA){
                             size_t idx = (i * dims[1]) + j;
-                            x_vector[j] = this->observed_values->at(i, j);
-                            prob_vector[j] = this->expected_values[idx];
+                            x_vector[j] = this->get_observed(i,j);
+                            prob_vector[j] = this->get_expected(idx);
                         }
                     } else {
                         // if not data (i.e. prior or process), use x vector instead of observed_values
                         size_t idx = (i * dims[1]) + j;
-                        x_vector[j] = this->x[idx];
-                        prob_vector[j] = this->expected_values[idx];
+                        x_vector[j] = this->get_observed(idx);
+                        prob_vector[j] = this->get_expected(idx);
                     }
                 }
 
