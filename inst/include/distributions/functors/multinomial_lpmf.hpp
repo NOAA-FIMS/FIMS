@@ -51,6 +51,7 @@ namespace fims_distributions
             // setup vector for recording the log probability density function values
             Type lpdf = static_cast<Type>(0.0); /**< total log probability mass contribution of the distribution */
             this->lpdf_vec.resize(dims[0]);
+            this->report_lpdf_vec.clear();
             std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
 
             //Dimension checks
@@ -109,9 +110,12 @@ namespace fims_distributions
 
                 if(!containsNA){
                     this->lpdf_vec[i] = dmultinom((vector<Type>)x_vector, (vector<Type>) prob_vector, true);
+                   
                 } else {
                     this->lpdf_vec[i] = 0;
                 }
+                // track the values for output, e.g., report_lpdf_vec
+                this->report_lpdf_vec.insert(this->report_lpdf_vec.end(), dims[1], this->lpdf_vec[i]);
                 lpdf += this->lpdf_vec[i];
                 /*
                 if (this->simulate_flag)
