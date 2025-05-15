@@ -77,9 +77,8 @@ test_that("nll test of fims with radnom effects", {
   )
 
   # Compare FIMS results with model comparison project OM values
-  validate_fims(
+  verify_fims_nll(
     report = result[["report"]],
-    estimates = result[["sdr_report"]],
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
