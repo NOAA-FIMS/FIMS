@@ -66,6 +66,12 @@ validate_fims <- function(
       # Extract uncertainty
       object_uncertainty <- object[1:length(expected), "Std. Error"]
     }
+
+    # Validate errors against 2*SE threshold
+    absolute_error <- abs(object_estimate - expected)
+    threshold <- qnorm(.975) * object_uncertainty
+    #' @description Test that the 95% of the estimates fall within 2*SE
+    expect_lte(sum(absolute_error > threshold), 0.05 * length(expected))
   }
 
   # Numbers at age
