@@ -380,7 +380,7 @@ FIMSFit <- function(
     datestart = as.Date(character()),
     dateend = as.Date(character()),
     year = integer(), # year of model run
-    estimated = numeric(),
+    expected = numeric(),
     log_like = numeric(),
     log_like_cv = numeric(),
     weight = numeric(),
@@ -589,7 +589,7 @@ FIMSFit <- function(
       datestart = as.character(NA), # no datestart information available from JSON output
       dateend = as.character(NA),  # no dateend information available from JSON output
       year = as.integer(NA), # no year information available from JSON output
-      estimated = as.numeric(NA), # can't link 'derived_quantities' to 'init' values
+      expected = as.numeric(NA), # can't link 'derived_quantities' to 'init' values
       log_like = as.numeric(NA), # can't link 'log_like' values to 'init' values
       log_like_cv = as.numeric(NA), # future feature
       weight = 1.0, # future feature; fixed at 1.0 for time being
@@ -597,7 +597,7 @@ FIMSFit <- function(
     ) |>
     dplyr::select("module_name", "module_id", "label", "data_id", "fleet_name",
                   "init", "unit", "uncertainty", "age", "length", "datestart", "dateend",
-                  "year", "estimated", "log_like", "log_like_cv", "weight", "distribution")
+                  "year", "expected", "log_like", "log_like_cv", "weight", "distribution")
 
   fit <- methods::new(
     "FIMSFit",
