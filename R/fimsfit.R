@@ -604,7 +604,8 @@ FIMSFit <- function(
     dplyr::select("module_name", "module_id", "label", "data_id", "fleet_name",
                   "unit", "uncertainty", "age", "length", "datestart",
                   "dateend", "year", "init", "expected", "log_like",
-                  "distribution", "log_like_cv", "weight")
+                  "distribution", "log_like_cv", "weight") |>
+    tibble::as_tibble()
 
   fit <- methods::new(
     "FIMSFit",

@@ -405,5 +405,6 @@ reshape_json_fits <- function(finalized_fims) {
     # Combine all the processed tibbles into a single tibble by stacking rows.
     dplyr::bind_rows() |>
     # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
-    dplyr::relocate(module_name, module_id, module_type, .before = everything())
+    dplyr::relocate(module_name, module_id, module_type, .before = everything()) |>
+    tibble::as_tibble()
 }
