@@ -372,7 +372,6 @@ FIMSFit <- function(
     label = character(), # equiv. to 'type' in data input table (e.g., landings, index, age, length)
     data_id = integer(),
     fleet_name = character(), # equiv. to 'name' in data input table (e.g., fleet1, survey1)
-    init = numeric(), # equiv. to 'value' in data input table
     unit = character(),
     uncertainty = numeric(),
     age = integer(),
@@ -380,11 +379,12 @@ FIMSFit <- function(
     datestart = as.Date(character()),
     dateend = as.Date(character()),
     year = integer(), # year of model run
+    init = numeric(), # equiv. to 'value' in data input table
     expected = numeric(),
     log_like = numeric(),
+    distribution = character(),
     log_like_cv = numeric(),
-    weight = numeric(),
-    distribution = character()
+    weight = numeric()
   )
   rm(fits_outline)
 
@@ -550,54 +550,61 @@ FIMSFit <- function(
       )
     )
 
-    # Create 'fits' tibble
-    # OVERALL TO DO (more or less interrelated)
-      # 1. Develop means and code to link 'init' values to 'estimated'
-        # The two JSON outputs utilize completely different unique identifiers and names
-      # 2. Develop means and code to link 'init' values to 'log_like' and 'distribution'
-        # 'log_like' and 'distribution' have different dimensions than 'init' values, and require new identifiers
-      # 3. Develop means and code to provide 'unit':'year' values alongside 'init', etc.
-        # Not currently available from JSON output
-      # 4. If desired, develop means and code to include data inputs not included in model likelihood
-        # Data inputs not part of likelihood are only sporadically/inconsistently included in JSON output
-        # E.g., weight-at-age, age-length-conversion, etc.
-    # Obtain 'init' values for data inputs reported in JSON file (i.e., identified as 'data' in 'module_name')
+  # Create fits tibble
+  # TO DO
+  # 1. Develop better method to provide 'module_name'/'module_id'/'label'
+  # for 'init', 'expected', 'distribution'
+  # 2. Find generalizable way to standardize 'init' and 'expected' units
+  # for distribution %in% c("Dlnorm", "Dmultinom")
+  # 3. Double-check string for 'random_effects' IF statemenet
+  # 4. Develop means to provide missing metadata for desired columns
+
+  # Obtain 'init' values for data inputs reported in JSON file, using 'values'
+  # Necessary to obtain 'label' values (e.g., "Index", "AgeComp", etc.)
   data_init_res <- reshape_json_values(finalized_fims) |>
-    dplyr::filter(module_name == "data") |>
-    dplyr::rename(init = value,
-                  label = module_type)
-    # Obtain 'estimated' values for data inputs reported in JSON file - INCOMPLETE
-  data_estimated_res <- json_derived_quantities
-    # Obtain 'log_like' and 'distribution' values for data inputs reported in JSON file
-  data_log_like_res <- reshape_json_likelihoods(finalized_fims) |>
-    dplyr::select(-module_name) |> # module name for 'log_like' is different than for same data input for 'init'
-    dplyr::rename(distribution = module_type, # module_type for 'log_like' is different than for same data input for 'init'
-                  log_like = value) |>
+    dplyr::filter(module_name == "data") |> # remove EWAA
+    dplyr::rename(init_values= value,
+                  label = module_type,
+                  module_id_init = module_id) |>
+    dplyr::arrange(module_id_init) # ensure this aligns with 'data_fits_res'
+
+  # Obtain 'log_like', 'distribution', 'init', and 'expected'
+  data_fits_res <- reshape_json_fits(finalized_fims) |>
+    dplyr::select(-module_name) |>
+    dplyr::rename(distribution = module_type) |>
+    # manually standardize distribution names
     dplyr::mutate(distribution = dplyr::case_when(distribution == "log_normal" ~ "Dlnorm",
-                                                  .default = distribution)) |> # manually correct naming convention
-    dplyr::group_by(module_id) |>
-    dplyr::mutate(yr_id_temp = 1:dplyr::n())
-    # Join available data to generate fits tibble (just 'init' for time being), add in missing values
+                                                  .default = distribution)) |>
+    # remove likelihoods not affiliated with data (e.g., recruitment)
+    dplyr::filter(module_id %in% unique(data_init_res$module_id_init)) |>
+    # ensure module_id order aligns with 'data_init_res'
+    dplyr::arrange(module_id)
+  # Set 'log_lik' values to NA if any random effects estimated
+  if (any(json_estimates$estimation_type == "random_effects")) {
+    data_fits_res <- data_fits_res |>
+      dplyr::mutate(log_lik = NA)
+  }
+  # Join, format data into final 'fits' tibble
   fits <- data_init_res |>
-    dplyr::mutate( # providing blank template columns
-      data_id = as.integer(NA), # no unique data_id values available from JSON output
-      fleet_name = as.character(NA), # no informative fleet names available from JSON output
-      unit = as.character(NA), # no unit information available from JSON output
-      uncertainty = as.numeric(NA), # no uncertainty information available from JSON output
-      age = as.integer(NA), # no age information available from JSON output
-      length = as.integer(NA), # no length information available from JSON output
-      datestart = as.character(NA), # no datestart information available from JSON output
-      dateend = as.character(NA),  # no dateend information available from JSON output
-      year = as.integer(NA), # no year information available from JSON output
-      expected = as.numeric(NA), # can't link 'derived_quantities' to 'init' values
-      log_like = as.numeric(NA), # can't link 'log_like' values to 'init' values
+    cbind(data_fits_res) |> # Consider test to ensure 'init_values' = 'init'
+    # Provide blank fields for currently missing values
+    dplyr::mutate(
+      data_id = as.integer(NA), # not available from JSON output
+      fleet_name = as.character(NA), # not available from JSON output
+      unit = as.character(NA), # not available from JSON output
+      uncertainty = as.numeric(NA), # not available from JSON output
+      age = as.integer(NA), # not available from JSON output
+      length = as.integer(NA), # not available from JSON output
+      datestart = as.character(NA), # not available from JSON output
+      dateend = as.character(NA),  # not available from JSON output
+      year = as.integer(NA), # not available from JSON output
       log_like_cv = as.numeric(NA), # future feature
-      weight = 1.0, # future feature; fixed at 1.0 for time being
-      distribution = as.character(NA) # can't link 'distribution' value to 'init' values
+      weight = 1.0 # future feature; fixed at 1.0 for time being
     ) |>
     dplyr::select("module_name", "module_id", "label", "data_id", "fleet_name",
-                  "init", "unit", "uncertainty", "age", "length", "datestart", "dateend",
-                  "year", "expected", "log_like", "log_like_cv", "weight", "distribution")
+                  "unit", "uncertainty", "age", "length", "datestart",
+                  "dateend", "year", "init", "expected", "log_like",
+                  "distribution", "log_like_cv", "weight")
 
   fit <- methods::new(
     "FIMSFit",
