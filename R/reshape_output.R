@@ -270,10 +270,10 @@ reshape_json_derived_quantities <- function(finalized_fims) {
     dplyr::relocate(module_name, module_id, module_type, .before = tidyselect::everything())
 }
 
-#' Reshape JSON 'values' components - UNFINISHED
+#' Reshape JSON 'values' components
 #'
-#' This function processes the model input from FIMS JSON output and reshapes the initial values
-#' for data inputs into a structured tibble for easier analysis and manipulation.
+#' This function processes the model input from FIMS JSON output ('values') and
+#' reshapes the initial values for data inputs into a structured tibble.
 #'
 #' @param finalized_fims A JSON object containing the finalized FIMS output.
 #' @return A tibble containing the reshaped likelihood estimates.
@@ -324,21 +324,24 @@ reshape_json_values <- function(finalized_fims) {
     dplyr::relocate(module_name, module_id, module_type, .before = everything())
 }
 
-#' Reshape JSON likelihood components - UNFINISHED
+
+#' Reshape JSON 'fits' components - UNFINISHED
 #'
-#' This function processes the finalized FIMS JSON output and reshapes the likelihood values
-#' for derived quantities into a structured tibble for easier analysis and manipulation.
+#' This function processes the finalized FIMS JSON output and extracts/formats
+#' log_lik, distribution, init, and expected from
+#' density_components, observed_values, and expected_values
+#' into a structured tibble for easier analysis and manipulation.
 #'
 #' @param finalized_fims A JSON object containing the finalized FIMS output.
 #' @return A tibble containing the reshaped likelihood estimates.
 #'
-reshape_json_likelihoods <- function(finalized_fims) {
+reshape_json_fits <- function(finalized_fims) {
   json_list <- jsonlite::fromJSON(finalized_fims)
-  # Identify the index of the "modules" element in `json_list` by matching its name.
-  # This is used to locate the relevant part of the JSON structure for further processing.
+  # Identify the index of the "modules" element in `json_list`.
+  # This is used to locate the relevant part of the JSON structure.
   modules_id <- which(names(json_list) == "modules")
 
-  likelihoods <- purrr::map(seq_along(json_list[[modules_id]][["density_component"]][["values"]]), ~ {
+  log_like <- purrr::map(seq_along(json_list[[modules_id]][["density_component"]][["values"]]), ~ {
     # If the current module's "density_component" is NULL, return NULL to skip processing.
     if (is.null(json_list[[modules_id]][["density_component"]][["values"]][[.x]])) {
       NULL
@@ -348,26 +351,53 @@ reshape_json_likelihoods <- function(finalized_fims) {
     }
   })
 
-  expanded_likelihoods <- purrr::pmap(
+  init <- purrr::map(seq_along(json_list[[modules_id]][["observed_values"]][["values"]]), ~ {
+    # If the current module's "observed_values" is NULL, return NULL to skip processing.
+    if (is.null(json_list[[modules_id]][["observed_values"]][["values"]][[.x]])) {
+      NULL
+    } else {
+      # Convert the current module's "observed_values" into a tibble for easier manipulation.
+      tibble::as_tibble(json_list[[modules_id]][["observed_values"]][["values"]][[.x]])
+    }
+  })
+
+  expected <- purrr::map(seq_along(json_list[[modules_id]][["expected_values"]][["values"]]), ~ {
+    # If the current module's "expected_values" is NULL, return NULL to skip processing.
+    if (is.null(json_list[[modules_id]][["expected_values"]][["values"]][[.x]])) {
+      NULL
+    } else {
+      # Convert the current module's "expected_values" into a tibble for easier manipulation.
+      tibble::as_tibble(json_list[[modules_id]][["expected_values"]][["values"]][[.x]])
+    }
+  })
+
+  prelim_fits <- purrr::pmap(
     list(
-      likelihoods,
+      log_like,
+      init,
+      expected,
       json_list[[modules_id]][["name"]],
       json_list[[modules_id]][["id"]],
       json_list[[modules_id]][["type"]]
     ),
     ~ {
-      # Skip processing if the current derived_quantity is NULL.
+      # Skip processing if the current log_like is NULL.
       if (is.null(..1)) {
         NULL
       } else {
         ..1 |>
+          dplyr::rename(log_like = value) |>
+          cbind(..2) |>
+          dplyr::rename(init = value) |>
+          cbind(..3) |>
+          dplyr::rename(expected = value) |>
           dplyr::mutate(
             # Add the module name from `json_list` as a new column of the current estimates.
-            module_name = ..2,
+            module_name = ..4,
             # Add the module ID from `json_list` as a new column.
-            module_id = ..3,
+            module_id = ..5,
             # Add the module type from `json_list` as a new column.
-            module_type = ..4
+            module_type = ..6
           )
       }
     }
@@ -376,7 +406,4 @@ reshape_json_likelihoods <- function(finalized_fims) {
     dplyr::bind_rows() |>
     # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
     dplyr::relocate(module_name, module_id, module_type, .before = everything())
-
-  # *Need to find way to link likehood/density_component values to fleet ID and data type in generalizable way
-    # I could manually link it for data1 practice case study, but it needs to be flexible to input data type, etc.
 }
