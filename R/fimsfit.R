@@ -383,6 +383,7 @@ FIMSFit <- function(
     expected = numeric(),
     log_like = numeric(),
     distribution = character(),
+    re_estimated = logical(),
     log_like_cv = numeric(),
     weight = numeric()
   )
@@ -578,12 +579,10 @@ FIMSFit <- function(
     # remove likelihoods not affiliated with data (e.g., recruitment)
     dplyr::filter(module_id %in% unique(data_init_res$module_id_init)) |>
     # ensure module_id order aligns with 'data_init_res'
-    dplyr::arrange(module_id)
-  # Set 'log_lik' values to NA if any random effects estimated
-  if (any(json_estimates$estimation_type == "random_effects")) {
-    data_fits_res <- data_fits_res |>
-      dplyr::mutate(log_lik = NA)
-  }
+    dplyr::arrange(module_id) |>
+    # assign T/F to 're_estimated' based on estimation_type == "random_effects"
+    dplyr::mutate(re_estimated = any(json_estimates$estimation_type == "random_effects"))
+    
   # Join, format data into final 'fits' tibble
   fits <- data_init_res |>
     cbind(data_fits_res) |> # Consider test to ensure 'init_values' = 'init'
@@ -604,7 +603,7 @@ FIMSFit <- function(
     dplyr::select("module_name", "module_id", "label", "data_id", "fleet_name",
                   "unit", "uncertainty", "age", "length", "datestart",
                   "dateend", "year", "init", "expected", "log_like",
-                  "distribution", "log_like_cv", "weight") |>
+                  "distribution", "re_estimated", "log_like_cv", "weight") |>
     tibble::as_tibble()
 
   fit <- methods::new(
