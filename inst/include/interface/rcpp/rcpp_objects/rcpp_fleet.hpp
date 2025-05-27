@@ -547,6 +547,7 @@ public:
     //add to variable_map
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
+    #warning use derived quanties from the fleet dq map here, rather than the listed member vectors
     //exp_catch
     fleet->log_expected_index.resize(nyears.get()); // assume index is for all ages.
     info->variable_map[this->log_expected_index.id_m] = &(fleet)->log_expected_index;
