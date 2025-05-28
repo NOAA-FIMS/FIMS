@@ -33,6 +33,16 @@ test_that("get_fits() works with deterministic run", {
     object = deterministic_colnames,
     expected = expected_colnames
   )
+
+  #' @description Test that [get_fits()] returns correct snapshot from a
+  #' deterministic run.
+  expect_snapshot(
+    get_fits(deterministic_results) |>
+      # Remove the expected and log_like columns, as they
+      # may change between runs
+      dplyr::select(-expected, -log_like) |>
+      print(n = 320, width = Inf)
+  )
 })
 
 test_that("get_fits() works with estimation run", {
@@ -65,10 +75,28 @@ test_that("get_fits() works with estimation run", {
 
   # Use purrr::map to apply the function to each file
   result <- purrr::map(fit_files, check_fits_colnames)
+
+  #' @description Test that [get_fits()] returns correct snapshot for an
+  #' estimation run.
+  expect_snapshot(
+    # Read the first RDS file, get estimates, and print a snapshot
+    readRDS(fit_files[[1]]) |>
+      get_fits() |>
+      # Remove the expected and log_like columns, as they
+      # may change between runs
+      dplyr::select(-expected, -log_like) |>
+      print(n = 320, width = Inf)
+  )
 })
 
 ## Edge handling ----
-# Unsure of what/how to test
+test_that("get_fits() returns correct outputs for edge cases", {
+  #' @description Test that [get_fits()] returns an error when given
+  #' invalid arguments.
+  expect_error(
+    object = get_fits("invalid_fit")
+  )
+})
 
 ## Error handling ----
 # No built-in errors to test.
