@@ -33,6 +33,8 @@ namespace fims_popdy {
         std::shared_ptr<SelectivityBase<Type>>
         selectivity; /*!< selectivity component*/
 
+        std::string  selectivity_units; /*!< units for fleet selectivity (age or length)*/
+
   // landings data
   int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */
   std::shared_ptr<fims_data_object::DataObject<Type>>
@@ -66,6 +68,9 @@ namespace fims_popdy {
         fims::Vector<Type> q; /*!< transformed parameter: the catchability of the fleet */
 
         // derived quantities
+        // selectivity
+        fims::Vector<Type> selectivity_at_age; /*!< Derived quantity: selectivity at age*/
+        
         // landings
         fims::Vector<Type> landings_weight; /*!<model landings in weight*/
         fims::Vector<Type> landings_numbers; /*!<model landings in numbers*/
@@ -127,6 +132,9 @@ namespace fims_popdy {
             log_Fmort.resize(nyears);
             Fmort.resize(nyears);
 
+            //selectivity
+            selectivity_at_age.resize(nyears * nages);
+
             //landings
             landings_numbers_at_age.resize(nyears * nages);
             landings_weight_at_age.resize(nyears * nages);
@@ -172,6 +180,10 @@ namespace fims_popdy {
             }
 
             // derived quantities
+            // selectivity
+            std::fill(selectivity_at_age.begin(), selectivity_at_age.end(),
+                    static_cast<Type>(0)); /**<model selectivity at age*/
+                    
             // landings
             std::fill(landings_weight.begin(), landings_weight.end(),
                     static_cast<Type>(0)); /**<model landings in weight*/
@@ -360,6 +372,25 @@ namespace fims_popdy {
                     landings_expected[i] = this->landings_weight[i];
                 }
                 log_landings_expected[i] = log(this->landings_expected[i]);
+            }
+        }
+
+        /**
+         * Evaluate selectivity at age of the fleet.
+         */
+        void evaluate_selectivity() {
+            for (size_t i = 0; i<this->selectivity_at_age.size(); i++) {
+                if(this->selectivity_units == "age") {
+                    this->selectivity_at_age[i] = this->selectivity->evaluate(i);
+                } else if(this->selectivity_units == "length") {
+                    for (size_t l = 0; l < this->nlengths; l++) {
+                        size_t i_length_age = i * this->nlengths + l;
+                        this->selectivity_at_age[i] += 
+                            this->selectivity->evaluate(l)*
+                            this->age_to_length_conversion[i_length_age];
+                    }
+                } else {
+                }
             }
         }
     };

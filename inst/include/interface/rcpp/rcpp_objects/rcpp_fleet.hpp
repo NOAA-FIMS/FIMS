@@ -112,6 +112,11 @@ public:
    */
   SharedInt nyears = 0;
   /**
+   * @brief What units is selectivity for this fleet modeled in.
+   * Options are age or length, default is age.
+   */
+  SharedString  selectivity_units = fims::to_string("age");
+  /**
    * @brief What units are the observed landings for this fleet measured in.
    * Options are weight or numbers, default is weight.
    */
@@ -261,6 +266,7 @@ public:
   agecomp_expected(other.agecomp_expected),
   lengthcomp_expected(other.lengthcomp_expected),
   age_to_length_conversion(other.age_to_length_conversion),
+  selectivity_units(other.selectivity_units),
   observed_landings_units(other.observed_landings_units),
   observed_index_units(other.observed_index_units),
   derived_landings_naa(other.derived_landings_naa),
@@ -761,6 +767,7 @@ public:
     fleet->nages = this->nages.get();
     fleet->nlengths = this->nlengths.get();
     fleet->nyears = this->nyears.get();
+    fleet->selectivity_units = this->selectivity_units;
     fleet->observed_landings_units = this->observed_landings_units;
     fleet->observed_index_units = this->observed_index_units;
 

@@ -675,6 +675,7 @@ RCPP_MODULE(fims) {
       .field("nages", &FleetInterface::nages)
       .field("nyears", &FleetInterface::nyears)
       .field("nlengths", &FleetInterface::nlengths)
+      .field("selectivity_units", &FleetInterface::selectivity_units)
       .field("observed_landings_units", &FleetInterface::observed_landings_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
       .field("index_expected", &FleetInterface::derived_index_expected)
