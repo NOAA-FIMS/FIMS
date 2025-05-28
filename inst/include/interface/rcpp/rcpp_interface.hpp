@@ -675,9 +675,12 @@ RCPP_MODULE(fims) {
       .field("nages", &FleetInterface::nages)
       .field("nyears", &FleetInterface::nyears)
       .field("nlengths", &FleetInterface::nlengths)
+      .field("selectivity_units", &FleetInterface::selectivity_units)
       .field("observed_landings_units", &FleetInterface::observed_landings_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
       .field("index_expected", &FleetInterface::derived_index_expected)
+      .field("selectivity_at_age", &FleetInterface::derived_selectivity_at_age)
+      .field("selectivity_at_length", &FleetInterface::derived_selectivity_at_length)
       .field("landings_expected", &FleetInterface::derived_landings_expected)
       .field("log_index_expected", &FleetInterface::log_index_expected)
       .field("log_landings_expected", &FleetInterface::log_landings_expected)
@@ -694,7 +697,10 @@ RCPP_MODULE(fims) {
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
       .method("SetObservedLandingsDataID", &FleetInterface::SetObservedLandingsDataID)
       .method("GetObservedLandingsDataID", &FleetInterface::GetObservedLandingsDataID)
-      .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
+      .method("SetSelectivityAgeID", &FleetInterface::SetSelectivityAgeID)
+      .method("SetSelectivityLengthID", &FleetInterface::SetSelectivityLengthID)
+      .method("GetSelectivityID", &FleetInterface::GetSelectivityID)
+      .method("GetSelectivityUnits", &FleetInterface::GetSelectivityUnits);
 
     Rcpp::class_<AgeCompDataInterface>("AgeComp")
             .constructor<int, int>()

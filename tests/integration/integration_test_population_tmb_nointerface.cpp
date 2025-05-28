@@ -72,6 +72,7 @@ Type objective_function<Type>::operator()(){
     selectivity->inflection_point = fleet_sel_A50(i);
     selectivity->slope = fleet_sel_slope(i);
     f->selectivity = selectivity;
+    f->selectivity_units = "age"; // default to age selectivity
 
     for(int y = 0; y<nyears; y++){
       f->log_Fmort[y] = log_Fmort(y,i);
@@ -107,6 +108,7 @@ Type objective_function<Type>::operator()(){
     selectivity->inflection_point = surv_sel_A50(i);
     selectivity->slope = surv_sel_slope(i);
     s->selectivity = selectivity;
+    s->selectivity_units = "age"; // default to age selectivity
     for(int y = 0; y<nyears; y++){
       s->log_q[y] = log_q(y);
       s->q[y] = exp(log_q(y));

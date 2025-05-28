@@ -112,6 +112,11 @@ public:
    */
   SharedInt nyears = 0;
   /**
+   * @brief What units is selectivity for this fleet modeled in.
+   * Options are age or length, default is age.
+   */
+  SharedString  selectivity_units = fims::to_string("age");
+  /**
    * @brief What units are the observed landings for this fleet measured in.
    * Options are weight or numbers, default is weight.
    */
@@ -162,8 +167,25 @@ public:
    * age-to-length-conversion matrix.
    */
   ParameterVector age_to_length_conversion;
+  /**
+   * @brief Calculated selectivity at age.
+   */
+  ParameterVector selectivity_at_age;
+  /**
+   * @brief Calculated selectivity at length.
+   */
+  ParameterVector selectivity_at_length;
 
   // derived quantities
+  /**
+   * @brief Derived selectivity at age.
+   */
+  Rcpp::NumericVector derived_selectivity_at_age;
+  // derived quantities
+  /**
+   * @brief Derived selectivity at length.
+   */
+  Rcpp::NumericVector derived_selectivity_at_length;
   /**
    * @brief Derived landings-at-age in numbers.
    */
@@ -238,6 +260,9 @@ public:
 
   /**
    * @brief Construct a new Fleet Interface object
+   * @details When using the wrapper functions in R, things will go out of scope
+   * and thus repeating the copy constructors here allows for all information
+   * to go to the copy and finalize().
    *
    * @param other
    */
@@ -261,8 +286,13 @@ public:
   agecomp_expected(other.agecomp_expected),
   lengthcomp_expected(other.lengthcomp_expected),
   age_to_length_conversion(other.age_to_length_conversion),
+  selectivity_units(other.selectivity_units),
+  selectivity_at_age(other.selectivity_at_age),
+  selectivity_at_length(other.selectivity_at_length),
   observed_landings_units(other.observed_landings_units),
   observed_index_units(other.observed_index_units),
+  derived_selectivity_at_age(other.derived_selectivity_at_age),
+  derived_selectivity_at_length(other.derived_selectivity_at_length),
   derived_landings_naa(other.derived_landings_naa),
   derived_landings_nal(other.derived_landings_nal),
   derived_landings_waa(other.derived_landings_waa),
@@ -320,11 +350,39 @@ public:
     interface_observed_landings_data_id_m.set(observed_landings_data_id);
   }
   /**
-   * @brief Set the unique ID for the selectivity object.
+   * @brief Set the unique ID for selectivity object and set units to age.
    * @param selectivity_id Unique ID for the observed object.
    */
-  void SetSelectivityID(int selectivity_id) {
+  void SetSelectivityAgeID(int selectivity_id) {
     interface_selectivity_id_m.set(selectivity_id);
+    selectivity_units.set(fims::to_string("age"));
+    // TODO: We should as a warning/notification that this is setting selectivity
+    // units to age.
+  }
+
+  /**
+   * @brief Set the unique ID for the selectivity object and set units to length.
+   * @param selectivity_id Unique ID for the observed object.
+   */
+  void SetSelectivityLengthID(int selectivity_id) {
+    interface_selectivity_id_m.set(selectivity_id);
+    selectivity_units.set(fims::to_string("length"));
+    // TODO: We should as a warning/notification that this is setting selectivity
+    // units to length.
+  }
+
+  /**
+   * @brief Get the unique ID for the selectivity object.
+   */
+  int GetSelectivityID() {
+    return interface_selectivity_id_m.get();
+  }
+
+  /**
+   * @brief Get the units for the selectivity object.
+   */
+  std::string GetSelectivityUnits() {
+    return selectivity_units.get();
   }
 
   /**
@@ -405,6 +463,16 @@ public:
         } else {
           this->age_to_length_conversion[i].final_value_m = fleet->age_to_length_conversion[i];
         }
+      }
+
+      this->derived_selectivity_at_age = Rcpp::NumericVector(fleet->selectivity_at_age.size());
+      for (R_xlen_t i = 0; i < this->derived_selectivity_at_age.size(); i++) {
+        this->derived_selectivity_at_age[i] = fleet->selectivity_at_age[i];
+      }
+
+      this->derived_selectivity_at_length = Rcpp::NumericVector(fleet->selectivity_at_length.size());
+      for (R_xlen_t i = 0; i < this->derived_selectivity_at_length.size(); i++) {
+        this->derived_selectivity_at_length[i] = fleet->selectivity_at_length[i];
       }
 
       this->derived_landings_naa = Rcpp::NumericVector(fleet->landings_numbers_at_age.size());
@@ -529,6 +597,32 @@ public:
       ss << " \"values\": " << this->age_to_length_conversion << "\n}";
     }
     ss << "\n],\n \"derived_quantities\":[\n";
+
+    ss << "{\n";
+    ss << "  \"name\": \"selectivity_at_age\",\n";
+    ss << "  \"values\":[";
+    if (this->derived_selectivity_at_age.size() == 0) {
+        ss << "]\n";
+    } else {
+        for (R_xlen_t i = 0; i < this->derived_selectivity_at_age.size() - 1; i++) {
+            ss << this->derived_selectivity_at_age[i] << ", ";
+        }
+        ss << this->derived_selectivity_at_age[this->derived_selectivity_at_age.size() - 1] << "]\n";
+    }
+    ss << " },\n";
+    ss << "{\n";
+    ss << "  \"name\": \"selectivity_at_length\",\n";
+    ss << "  \"values\":[";
+    if (this->derived_selectivity_at_length.size() == 0) {
+        ss << "]\n";
+    } else {
+        for (R_xlen_t i = 0; i < this->derived_selectivity_at_length.size() - 1; i++) {
+            ss << this->derived_selectivity_at_length[i] << ", ";
+        }
+        ss << this->derived_selectivity_at_length[this->derived_selectivity_at_length.size() - 1] << "]\n";
+    }
+    ss << " },\n";
+
     ss << "{\n";
     ss << "  \"name\": \"landings_naa\",\n";
     ss << "  \"values\":[";
@@ -761,6 +855,7 @@ public:
     fleet->nages = this->nages.get();
     fleet->nlengths = this->nlengths.get();
     fleet->nyears = this->nyears.get();
+    fleet->selectivity_units = this->selectivity_units;
     fleet->observed_landings_units = this->observed_landings_units;
     fleet->observed_index_units = this->observed_index_units;
 
@@ -813,6 +908,12 @@ public:
     }
     //add to variable_map
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
+
+    //selectivity
+    fleet->selectivity_at_age.resize(this->nages.get());
+    info->variable_map[this->selectivity_at_age.id_m] = &(fleet)->selectivity_at_age;
+    fleet->selectivity_at_length.resize(this->nlengths.get());
+    info->variable_map[this->selectivity_at_length.id_m] = &(fleet)->selectivity_at_length;
 
     //exp_landings
     fleet->log_landings_expected.resize(nyears);  // assume landings is for all ages.
