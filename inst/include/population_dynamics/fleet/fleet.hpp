@@ -133,7 +133,7 @@ namespace fims_popdy {
             Fmort.resize(nyears);
 
             //selectivity
-            selectivity_at_age.resize(nyears * nages);
+            selectivity_at_age.resize(nages);
 
             //landings
             landings_numbers_at_age.resize(nyears * nages);
@@ -183,7 +183,7 @@ namespace fims_popdy {
             // selectivity
             std::fill(selectivity_at_age.begin(), selectivity_at_age.end(),
                     static_cast<Type>(0)); /**<model selectivity at age*/
-                    
+
             // landings
             std::fill(landings_weight.begin(), landings_weight.end(),
                     static_cast<Type>(0)); /**<model landings in weight*/
