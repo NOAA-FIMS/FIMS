@@ -24,7 +24,6 @@ utils::globalVariables(c(
 #       be calculated in print.FITFims()
 # TODO: Determine if report should always use last.par.best
 # TODO: Make a helper function to add lower and upper CI for users in estimates
-# TODO: Add Terminal SB to print()
 
 # methods::setClass: ----
 
@@ -87,8 +86,7 @@ methods::setMethod(
       "i" = "Negative log likelihood (NLL):",
       "*" = "Marginal NLL= {.val {x@opt$objective}}",
       "*" = "Total NLL= {.val {x@report$jnll}}",
-      # TODO: x@rep[["sb"]] does not exist
-      "i" = "Terminal SB= "
+      "i" = "Terminal SB= {.val {terminal_ssb}}"
     ))
     cli::cli_end(div_digit)
   }
