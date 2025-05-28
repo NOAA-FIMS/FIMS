@@ -67,6 +67,7 @@ namespace fims_model {
             // vector< vector<Type> > creates a nested vector structure where
             // each vector can be a different dimension. Does not work with ADREPORT
             // fleets
+            vector<vector<Type> > selectivity_age(n_fleets);
             vector<vector<Type> > landings_w(n_fleets);
             vector<vector<Type> > landings_n(n_fleets);
             vector<vector<Type> > landings_exp(n_fleets);

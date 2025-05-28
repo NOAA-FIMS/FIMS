@@ -379,6 +379,8 @@ namespace fims_popdy {
          * Evaluate selectivity at age of the fleet.
          */
         void evaluate_selectivity() {
+            // should be indexing over ages rather than i because the ages might
+            // not always start at zero but this will change in model families
             for (size_t i = 0; i<this->selectivity_at_age.size(); i++) {
                 if(this->selectivity_units == "age") {
                     this->selectivity_at_age[i] = this->selectivity->evaluate(i);

@@ -167,6 +167,10 @@ public:
    * age-to-length-conversion matrix.
    */
   ParameterVector age_to_length_conversion;
+  /**
+   * @brief Calculated selectivity at age.
+   */
+  ParameterVector selectivity_at_age;
 
   // derived quantities
   /**
@@ -247,6 +251,9 @@ public:
 
   /**
    * @brief Construct a new Fleet Interface object
+   * @details When using the wrapper functions in R, things will go out of scope
+   * and thus repeating the copy constructors here allows for all information
+   * to go to the copy and finalize().
    *
    * @param other
    */
@@ -271,6 +278,7 @@ public:
   lengthcomp_expected(other.lengthcomp_expected),
   age_to_length_conversion(other.age_to_length_conversion),
   selectivity_units(other.selectivity_units),
+  selectivity_at_age(other.selectivity_at_age),
   observed_landings_units(other.observed_landings_units),
   observed_index_units(other.observed_index_units),
   derived_selectivity_at_age(other.derived_selectivity_at_age),
