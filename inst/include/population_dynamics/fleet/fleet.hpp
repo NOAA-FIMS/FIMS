@@ -264,10 +264,11 @@ namespace fims_popdy {
                 }
                 for (size_t a = 0; a < this->nages; a++) {
                     size_t i_age_year = y * this->nages + a;
-                    this->agecomp_proportion[i_age_year] =
-                      this->agecomp_expected[i_age_year] / sum;
-                    //robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
-
+                    if (sum != 0) {
+                        this->agecomp_proportion[i_age_year] =
+                        this->agecomp_expected[i_age_year] / sum;
+                        //robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
+                    }
                     if( fleet_observed_agecomp_data_id_m != -999) {
                         this->agecomp_expected[i_age_year] =
                         this->agecomp_proportion[i_age_year] *
@@ -322,8 +323,10 @@ namespace fims_popdy {
                     }
                     for (size_t l = 0; l < this->nlengths; l++) {
                         size_t i_length_year = y * this->nlengths + l;
-                        this->lengthcomp_proportion[i_length_year] =
-                        this->lengthcomp_expected[i_length_year] / sum;
+                        if (sum != 0) {
+                            this->lengthcomp_proportion[i_length_year] =
+                            this->lengthcomp_expected[i_length_year] / sum;
+                        }
                         //robust_add + robust_sum * this->lengthcomp_expected[i_length_year] / sum;
                         if( this->fleet_observed_lengthcomp_data_id_m != -999) {
                             this->lengthcomp_expected[i_length_year] =
