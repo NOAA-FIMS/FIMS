@@ -73,8 +73,10 @@ Imports:
     utils
 Suggests:
     covr,
+    devtools,
     knitr,
     parallel,
+    pkgdown,
     remotes,
     rmarkdown,
     snowfall,
