@@ -306,8 +306,8 @@ initialize_data_distribution <- function(
         new_module$log_sd$set_all_estimable(TRUE)
       }
     } else {
-      for (i in 1:seq_along(sd[["estimation_type"]])) {
-        new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
+      for (i in seq_along(sd[["estimation_type"]])) {
+        new_module$log_sd[i]$estimation_type <- sd[["estimation_type"]][i]
       }
     }
   }
