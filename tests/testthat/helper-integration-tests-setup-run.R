@@ -329,4 +329,24 @@ prepare_test_data <- function() {
     fit_age_length_comp_na,
     file = testthat::test_path("fixtures", "fit_age_length_comp_na.RDS")
   )
+
+  ## Make new data set with empty start years ----
+  data_no_catch <- data_age_length_comp_raw |>
+    dplyr::filter(
+      datestart %in% c("1-01-01", "2-01-01", "3-01-01")
+    ) |>
+    dplyr::filter(
+      type == "landings"
+    ) |>
+    dplyr::mutate(value = -999)
+  data_with_catch <- data_age_length_comp_raw |>
+    dplyr::filter(
+      !datestart %in% c("1-01-01", "2-01-01", "3-01-01")
+    )
+  data_3_years_no_catch <- FIMSFrame(rbind(data_no_catch, data_with_catch))
+  # Save FIMS results as a test fixture for additional fimsfit tests
+  saveRDS(
+    data_3_years_no_catch,
+    file = testthat::test_path("fixtures", "data_3_years_no_catch.RDS")
+  )
 }

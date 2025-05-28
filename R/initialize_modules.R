@@ -978,13 +978,19 @@ set_param_vector <- function(field, module, module_input) {
   }
 
   # Set the estimation information for the entire parameter vector
-  if (module_input[[field_estimation_name]] == "constant") {
-    module[[field]]$set_all_estimable(FALSE)
-  }
-  if (module_input[[field_estimation_name]] == "random_effects") {
-    module[[field]]$set_all_random(TRUE)
-  }
-  if (module_input[[field_estimation_name]] == "fixed_effects") {
-    module[[field]]$set_all_estimable(TRUE)
+  if (length(module_input[[field_estimation_name]]) == 1) {
+    if (module_input[[field_estimation_name]] == "constant") {
+      module[[field]]$set_all_estimable(FALSE)
+    }
+    if (module_input[[field_estimation_name]] == "random_effects") {
+      module[[field]]$set_all_random(TRUE)
+    }
+    if (module_input[[field_estimation_name]] == "fixed_effects") {
+      module[[field]]$set_all_estimable(TRUE)
+    }
+  } else {
+    for (i in seq_along(module_input[[field_estimation_name]])) {
+      module[[field]][i]$estimation_type <- module_input[[field_estimation_name]][i]
+    }
   }
 }

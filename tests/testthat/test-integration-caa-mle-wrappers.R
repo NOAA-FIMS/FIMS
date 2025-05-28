@@ -144,5 +144,85 @@ test_that("estimation test with age and length comp with NAs", {
   )
 })
 
+test_that("estimation with three spin-up years works", {
+  # Load data that has no landings from fleet1 for first three years to mimic
+  # the behavior of a Stock Synthesis model
+  data_3_years_no_catch <- readRDS(
+    test_path("fixtures", "data_3_years_no_catch.RDS")
+  )
+  #' @description Test that the first three years of data are all -999.
+  expect_true(
+    all(
+      data_3_years_no_catch |>
+        get_data() |>
+        dplyr::filter(datestart %in% c("1-01-01", "2-01-01", "3-01-01")) |>
+        dplyr::pull(value) == -999
+    )
+  )
+  modified_parameters <- readRDS(
+    test_path("fixtures", "parameters_model_comparison_project.RDS")
+  )
+  # Set the fishing mortality values to zero for years without any landings
+  modified_parameters[[1]][["fleet1"]][["Fleet.log_Fmort.value"]][1:3] <- 0
+  parameters <- create_default_parameters(
+    data_3_years_no_catch,
+    fleets = list(
+      fleet1 = list(
+        selectivity = list(form = "LogisticSelectivity"),
+        data_distribution = c(
+          Landings = "DlnormDistribution",
+          AgeComp = "DmultinomDistribution"
+        )
+      ),
+      survey1 = list(
+        selectivity = list(form = "LogisticSelectivity"),
+        data_distribution = c(
+          Index = "DlnormDistribution",
+          AgeComp = "DmultinomDistribution"
+        )
+      )
+    )
+  ) |>
+    update_parameters(modified_parameters = modified_parameters[[1]])
+  # Right now you cannot use update_parameters to do this, it must be done
+  # manually, see #852
+  parameters[[1]][["fleet1"]][["Fleet.log_Fmort.estimation_type"]] <- c(
+    rep("constant", 3),
+    rep("fixed_effect", 27)
+  )
+  #' @description Test that the model with no data for the first three years,
+  #' i.e., all values are -999, runs without any errors. During debugging of
+  #' this feature we witnessed the ability to fit the model but an inability to
+  #' generate the json output because of `nan` values in the expected age and
+  #' length compositions.
+  expect_no_error(
+    fit <- parameters |>
+      initialize_fims(data = data_3_years_no_catch) |>
+      fit_fims(optimize = TRUE)
+  )
+  #' @description Test that the first three years of the estimated fishing
+  #' mortality levels for fleet1 are zero because they were fixed to be constant
+  #' values.
+  expect_equal(
+    get_estimates(fit) |>
+      dplyr::filter(label == "log_Fmort", module_id == 1) |>
+      dplyr::pull(estimate) |>
+      (\(x) x[1:3])() |>
+      unname(),
+    rep(0, 3)
+  )
+  #' @description Test that the 4th through 30th years of the estimated fishing
+  #' mortality levels for fleet1 are not zero because they set to be estimated
+  #' as fixed effects.
+  expect_true(
+    all(
+      get_estimates(fit) |>
+        dplyr::filter(label == "log_Fmort", module_id == 1) |>
+        dplyr::pull(estimate) |>
+        (\(x) x[-c(1:3)])() != 0
+    )
+  )
+})
+
 ## Error handling ----
 # No built-in errors to test.
