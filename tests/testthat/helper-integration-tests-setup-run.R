@@ -132,8 +132,9 @@ prepare_test_data <- function() {
       BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[iter_id]][["R0"]]),
       BevertonHoltRecruitment.log_devs.value = om_input_list[[iter_id]][["logR.resid"]][-1],
       # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
-      # to TRUE. We need to debug the issue, then update the line below accordingly.
-      BevertonHoltRecruitment.log_devs.estimation_type = "constant",
+      # to TRUE. We need to debug the issue, then update the line below accordingly. Currently it
+      # is set up as fixed_effects for deterministic run and constant for estimation runs.
+      BevertonHoltRecruitment.log_devs.estimation_type = "fixed_effects",
       DnormDistribution.log_sd.value = om_input_list[[iter_id]][["logR_sd"]]
     ),
     maturity = list(
@@ -167,6 +168,13 @@ prepare_test_data <- function() {
   saveRDS(
     deterministic_age_length_comp,
     file = testthat::test_path("fixtures", "deterministic_age_length_comp.RDS")
+  )
+
+  # TODO: delete this lines 74-78 when log_devs estimation error fixed
+  modified_parameters[[iter_id]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- "constant"
+  saveRDS(
+    modified_parameters,
+    file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   )
 
   ## Estimation run with age and length comp using wrappers ----

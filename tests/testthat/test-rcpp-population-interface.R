@@ -53,7 +53,7 @@ test_that("test_rcpp_population_interface() works with correct inputs", {
     )
     #' @description Test that the log_M values are not estimated.
     expect_equal(
-      object = population$log_M[i]$estimation_type, "constant"
+      object = population$log_M[i]$estimation_type$get(), "constant"
     )
   }
 
@@ -65,7 +65,7 @@ test_that("test_rcpp_population_interface() works with correct inputs", {
     )
     #' @description Test that the log_init_naa values are estimated.
     expect_equal(
-      object = population$log_init_naa[i]$estimation_type, "fixed_effects"
+      object = population$log_init_naa[i]$estimation_type$get(), "fixed_effects"
     )
   }
 
@@ -80,7 +80,7 @@ test_that("test_rcpp_population_interface() works with correct inputs", {
     )
     #' @description Test that the log_M values are now estimated.
     expect_equal(
-      object = population$log_M[i]$estimation_type, "fixed_effects"
+      object = population$log_M[i]$estimation_type$get(), "fixed_effects"
     )
   }
 
@@ -92,7 +92,7 @@ test_that("test_rcpp_population_interface() works with correct inputs", {
     )
     #' @description Test that the log_init_naa values not estimated.
     expect_equal(
-      object = population$log_init_naa[i]$estimation_type, "constant"
+      object = population$log_init_naa[i]$estimation_type$get(), "constant"
     )
   }
 

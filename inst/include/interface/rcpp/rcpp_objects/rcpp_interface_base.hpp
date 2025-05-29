@@ -59,7 +59,7 @@ class Parameter {
    * @brief A string indicationg the estimation type. Options are: constant, 
    * fixed_effects, or random_effects, where the default is constant.
    */
-  std::string estimation_type_m = "constant";
+  SharedString estimation_type_m = SharedString("constant");
 
   /**
    * @brief The constructor for initializing a parameter.
@@ -308,9 +308,9 @@ public:
   void set_all_estimable(bool estimable){
     for (size_t i = 0; i < this->storage_m->size(); i++) {    
       if(estimable){
-        storage_m->at(i).estimation_type_m = "fixed_effects";
+        this->storage_m->at(i).estimation_type_m.set("fixed_effects");
       } else {
-        storage_m->at(i).estimation_type_m = "constant";
+        this->storage_m->at(i).estimation_type_m.set("constant");
       }
     }
   }
@@ -325,9 +325,9 @@ public:
   void set_all_random(bool random){
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       if(random){
-        storage_m->at(i).estimation_type_m = "random_effects";
+        this->storage_m->at(i).estimation_type_m.set("random_effects");
       } else {
-        storage_m->at(i).estimation_type_m = "constant";
+        this->storage_m->at(i).estimation_type_m.set("constant");
       }
     }
   }
