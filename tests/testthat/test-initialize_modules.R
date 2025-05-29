@@ -147,7 +147,22 @@ test_that("initialize_fims returns correct error messages", {
   )
 
   clear()
+
+  #' @description Test that [initialize_fim()] correctly returns an error on 
+  #' an unknown estimation_type
+  parameters_wrong_type <- default_parameters
+  parameters_wrong_type[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- 'fixed.effects'
+  expect_error(
+    initialize_fims(parameters = parameters_wrong_type, data = data),
+    "estimation type entered",
+)
+  clear()
 })
 
 # TODO: most lines with no coverage are error checks that are not verified to
 # work via the tests.
+
+
+
+
+

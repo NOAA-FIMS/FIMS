@@ -214,7 +214,7 @@ initialize_distribution <- function(
   }
   # Validate distribution_type as "data" or "process"
   distribution_type <- rlang::arg_match(distribution_type)
-  # Validate linked_ids as a named vector with required elements for "data" type
+  # Validate linked_id as a named vector with required elements for "data" type
   if (!is.vector(linked_ids) ||
     !all(c("data_link", "fleet_link") %in% names(linked_ids))
   ) {
@@ -959,6 +959,8 @@ set_param_vector <- function(field, module, module_input) {
     value = TRUE
   )
 
+
+
   # Check if both value and estimation information are present
   if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
     cli::cli_abort(c(
@@ -968,16 +970,30 @@ set_param_vector <- function(field, module, module_input) {
 
   # Extract the value of the parameter vector
   field_value <- module_input[[field_value_name]]
+  estimation_type_value <- module_input[[field_estimation_name]]
 
   # Resize the field in the module if it has multiple values
   if (length(field_value) > 1) module[[field]]$resize(length(field_value))
 
   # Assign each value to the corresponding position in the parameter vector
+  # TODO: this is currently set up to handle a single estimation type value
+  # for all values in the parameter vector. If this is not the case, we need to
+  # modify this logic to handle multiple estimation types.
   for (i in seq_along(field_value)) {
     module[[field]][i][["value"]] <- field_value[i]
+    module[[field]][i][["estimation_type"]]$set(estimation_type_value)
   }
 
   # Set the estimation information for the entire parameter vector
+  estimation_type_names <- c('constant', 'fixed_effects', 'random_effects')
+  if (!(module_input[[field_estimation_name]] %in% estimation_type_names)){
+    cli::cli_abort(c(
+      "The estimation type entered: {.val {module_input[[field_estimation_name]]}}, does not equal:",
+        "*" = "constant",
+        "*" = "fixed_effects",
+        "*" = "random_effects"
+    ))
+  }
   if (module_input[[field_estimation_name]] == "constant") {
     module[[field]]$set_all_estimable(FALSE)
   }

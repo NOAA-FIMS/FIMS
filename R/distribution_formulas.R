@@ -426,13 +426,15 @@ initialize_process_distribution <- function(
       }
     } else {
       for (i in 1:seq_along(sd[["estimation_type"]])) {
-        new_module$log_sd[i]$estimation_type <- sd[["estimation_type"]][i]
+        new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
       }
     }
   }
 
-  # indicate whether or not parameter is treated as a random effect in the model
-  module$field(par)$set_all_random(is_random_effect)
+  # # indicate whether or not parameter is treated as a random effect in the model
+  # if(is_random_effect){
+  #   module$field(par)$set_all_random(is_random_effect)
+  # }
 
   n_dim <- length(module$field(par))
 

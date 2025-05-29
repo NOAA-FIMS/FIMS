@@ -236,7 +236,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double> >(it->second);
 
       for (size_t i = 0; i < this->log_sd.size(); i++) {
-        if (this->log_sd[i].estimation_type_m == "constant" ) {
+        if (this->log_sd[i].estimation_type_m.get() == "constant")  {
           this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
           this->log_sd[i].final_value_m = dnorm->log_sd[i];
@@ -315,13 +315,13 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->log_sd.resize(this->log_sd.size());
     for(size_t i=0; i<this->log_sd.size(); i++){
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if(this->log_sd[i].estimation_type_m == "fixed_effects"){
+      if(this->log_sd[i].estimation_type_m.get() == "fixed_effects"){
         ss.str("");
         ss << "dnorm_" << this->id_m << "_log_sd_" << this->log_sd[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_sd[i].estimation_type_m == "random_effects") {
+      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
@@ -478,7 +478,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double> >(it->second);
 
       for (size_t i = 0; i < this->log_sd.size(); i++) {
-        if (this->log_sd[i].estimation_type_m == "constant" ) {
+        if (this->log_sd[i].estimation_type_m.get() == "constant") {
           this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
           this->log_sd[i].final_value_m = dlnorm->log_sd[i];
@@ -557,13 +557,13 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->log_sd.resize(this->log_sd.size());
     for(size_t i=0; i<this->log_sd.size(); i++){
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if(this->log_sd[i].estimation_type_m == "fixed_effects"){
+      if(this->log_sd[i].estimation_type_m.get() == "fixed_effects"){
         ss.str("");
         ss << "dlnorm_" << this->id_m << "_log_sd_" << this->log_sd[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_sd[i].estimation_type_m == "random_effects") {
+      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }

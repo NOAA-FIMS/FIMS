@@ -45,6 +45,11 @@ test_that("deterministic run returns correct nlls", {
     em_input = em_input_list[[iter_id]]
   )
 })
+test_that("deterministic run results correct number of parameters", {
+  #' @description Veryify the number of parameters are correct
+  #' TODO: change parameter number to 77 after fixing log_devs esitmation error
+  expect_equal(length(result[["obj"]][["par"]]), 48)
+})
 
 ## Edge handling ----
 # No edge cases to test.
