@@ -9,7 +9,7 @@
 #' @export DmultinomDistribution
 #' @export DnormDistribution
 #' @export DoubleLogisticSelectivity
-#' @export EWAAgrowth
+#' @export EWAAGrowth
 #' @export finalize
 #' @export Fleet
 #' @export get_fixed

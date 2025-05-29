@@ -251,7 +251,7 @@ init_fims <- function(i) {
   recruitment$estimate_log_devs <- TRUE
 
   # Growth
-  ewaa_growth <- methods::new(EWAAgrowth)
+  ewaa_growth <- methods::new(EWAAGrowth)
 
   ewaa_growth$ages$resize(om_input[["nages"]])
   for (i in 0:(om_input[["nages"]] - 1)) {

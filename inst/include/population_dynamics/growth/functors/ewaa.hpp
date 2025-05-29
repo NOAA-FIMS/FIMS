@@ -17,10 +17,10 @@
 namespace fims_popdy {
 
 /**
- *  @brief EWAAgrowth class that returns the EWAA function value.
+ *  @brief EWAAGrowth class that returns the EWAA function value.
  */
 template <typename Type>
-struct EWAAgrowth : public GrowthBase<Type> {
+struct EWAAGrowth : public GrowthBase<Type> {
   // add submodule class members here
   // these include parameters of the submodule
   // a map looks up values based on a reference key
@@ -31,9 +31,9 @@ struct EWAAgrowth : public GrowthBase<Type> {
   typedef typename std::map<double, double>::iterator
       weight_iterator; /**< Iterator for ewaa map object > */
 
-  EWAAgrowth() : GrowthBase<Type>() {}
+  EWAAGrowth() : GrowthBase<Type>() {}
 
-  virtual ~EWAAgrowth() {}
+  virtual ~EWAAGrowth() {}
 
   /**
    * @brief Returns the weight at age a (in kg) from the input vector.

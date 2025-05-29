@@ -360,7 +360,7 @@ RCPP_MODULE(fims) {
               "Evaluates the double logistic selectivity given input value "
               "(e.g., age or size in selectivity).");
 
-  Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
+  Rcpp::class_<EWAAGrowthInterface>("EWAAGrowth")
       .constructor()
       .field("ages", &EWAAGrowthInterface::ages, "Ages for each age class.")
       .field("weights", &EWAAGrowthInterface::weights,

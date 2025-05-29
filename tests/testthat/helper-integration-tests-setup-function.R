@@ -383,7 +383,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
 
   # Growth
-  ewaa_growth <- methods::new(EWAAgrowth)
+  ewaa_growth <- methods::new(EWAAGrowth)
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
@@ -542,55 +542,18 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   clear()
 
   data <- FIMS::FIMSFrame(data1)
-
-  # Set up default parameters
-  fleets <- list(
-    fleet1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Landings = "DlnormDistribution",
-        Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    ),
-    survey1 = list(
-      selectivity = list(form = "LogisticSelectivity"),
-      data_distribution = c(
-        Landings = "DlnormDistribution",
-        Index = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution",
-        LengthComp = "DmultinomDistribution"
-      )
-    )
-  )
-
-  default_parameters <- data |>
-    create_default_parameters(
-      fleets = fleets,
-      recruitment = list(
-        form = "BevertonHoltRecruitment",
-        process_distribution = c(log_devs = "DnormDistribution")
-      ),
-      growth = list(form = "EWAAgrowth"),
-      maturity = list(form = "LogisticMaturity")
-    )
-
-  parameters <- default_parameters |>
-    update_parameters(
-      modified_parameters = modified_parameters[[iter_id]]
-    )
+  parameters <- modified_parameters
 
   # The model will not always run when log_q is very small.
   # We will need to make sure log_q is the true value for deterministic runs but
   # then reset to log(1.0) for estimation runs.
-  if (estimation_mode == TRUE) {
+  if (estimation_mode == TRUE){
     parameters <- parameters |>
-      update_parameters(
-        modified_parameters = list(
-          survey1 = list(
-            Fleet.log_q.value = log(1.0)
-          )
+      dplyr::mutate(
+        value = dplyr::if_else(
+          fleet_name == "survey1" & label == "log_q",
+          log(1.0),
+          value
         )
       )
   }
