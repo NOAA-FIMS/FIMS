@@ -959,6 +959,8 @@ set_param_vector <- function(field, module, module_input) {
     value = TRUE
   )
 
+
+
   # Check if both value and estimation information are present
   if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
     cli::cli_abort(c(
@@ -978,6 +980,12 @@ set_param_vector <- function(field, module, module_input) {
   }
 
   # Set the estimation information for the entire parameter vector
+  estimation_type_names <- c('constant', 'fixed_effects', 'random_effects')
+  if (!(model_input[[field_estimation_name]]) %in% estimation_type_names){
+    cli::cli_abort(c(
+      "The estimation type entered: {.var field_estimation_name}, is not one of the three options: {estimation_type_names}"
+    ))
+  }
   if (module_input[[field_estimation_name]] == "constant") {
     module[[field]]$set_all_estimable(FALSE)
   }

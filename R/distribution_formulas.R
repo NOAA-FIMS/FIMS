@@ -431,8 +431,10 @@ initialize_process_distribution <- function(
     }
   }
 
-  # indicate whether or not parameter is treated as a random effect in the model
-  module$field(par)$set_all_random(is_random_effect)
+  # # indicate whether or not parameter is treated as a random effect in the model
+  # if(is_random_effect){
+  #   module$field(par)$set_all_random(is_random_effect)
+  # }
 
   n_dim <- length(module$field(par))
 
