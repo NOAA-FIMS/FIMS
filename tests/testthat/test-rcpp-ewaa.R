@@ -7,16 +7,16 @@
 #' multiple lines, that will be used in the bookdown report of the results from
 #' {testthat}.
 
-# EWAAgrowth ----
+# EWAAGrowth ----
 ## Setup ----
 # Prepare data
 fims_frame <- FIMS::FIMSFrame(data1)
 # Ensure that the fims_frame object is removed after tests are completed
 on.exit(rm(fims_frame), add = TRUE)
 
-# Initialize an EWAAgrowth object
-ewaa_growth <- methods::new(EWAAgrowth)
-# Assign age data to the EWAAgrowth object
+# Initialize an EWAAGrowth object
+ewaa_growth <- methods::new(EWAAGrowth)
+# Assign age data to the EWAAGrowth object
 ages <- get_ages(fims_frame)
 ewaa_growth$ages$resize(length(ages))
 purrr::walk(
@@ -24,7 +24,7 @@ purrr::walk(
   \(x) ewaa_growth$ages$set(x - 1, ages[x])
 )
 
-# Assign weight data to the EWAAgrowth object
+# Assign weight data to the EWAAGrowth object
 weights <- m_weight_at_age(fims_frame)
 ewaa_growth$weights$resize(length(weights))
 purrr::walk(
@@ -33,17 +33,17 @@ purrr::walk(
 )
 on.exit(ewaa_growth)
 
-# Set up a different EWAAgrowth object
-ewaa_growth2 <- methods::new(EWAAgrowth)
+# Set up a different EWAAGrowth object
+ewaa_growth2 <- methods::new(EWAAGrowth)
 on.exit(ewaa_growth2)
 
 ## IO correctness ----
-test_that("EWAAgrowth evaluate() works with correct input data", {
-  #' @description Test that EWAAgrowth evaluate(1) returns the first value in the weight-at-age data.
+test_that("EWAAGrowth evaluate() works with correct input data", {
+  #' @description Test that EWAAGrowth evaluate(1) returns the first value in the weight-at-age data.
   expect_equal(ewaa_growth$evaluate(1), 0.00053065552)
 })
 
-test_that("EWAAgrowth get_id() works with correct input data", {
+test_that("EWAAGrowth get_id() works with correct input data", {
   #' @description Test that id of ewaa_growth is 1.
   expect_equal(ewaa_growth$get_id(), 1)
   #' @description Test that id of ewaa_growth2 is 2.
@@ -53,25 +53,25 @@ test_that("EWAAgrowth get_id() works with correct input data", {
 clear()
 
 ## Edge handling ----
-test_that("EWAAgrowth evaluate() doesn't work when missing weights", {
-  # Initialize an EWAAgrowth object
-  ewaa_growth <- methods::new(EWAAgrowth)
-  # Assign age data to the EWAAgrowth object
+test_that("EWAAGrowth evaluate() doesn't work when missing weights", {
+  # Initialize an EWAAGrowth object
+  ewaa_growth <- methods::new(EWAAGrowth)
+  # Assign age data to the EWAAGrowth object
   ewaa_growth$ages$resize(length(ages))
   purrr::walk(
     seq_along(ages),
     \(x) ewaa_growth$ages$set(x - 1, ages[x])
   )
-  #' @description Test that EWAAgrowth evaluate(1) throws an error when weights are missing.
+  #' @description Test that EWAAGrowth evaluate(1) throws an error when weights are missing.
   expect_error(ewaa_growth$evaluate(1))
   # Clear any previous FIMS settings
   clear()
 })
 
 ## Error handling ----
-test_that("EWAAgrowth evaluate() returns expected error for mismatched input lengths", {
-  # Initialize an EWAAgrowth object
-  ewaa_growth <- methods::new(EWAAgrowth)
+test_that("EWAAGrowth evaluate() returns expected error for mismatched input lengths", {
+  # Initialize an EWAAGrowth object
+  ewaa_growth <- methods::new(EWAAGrowth)
   # Assign age data and intentionally mismatch the length of ages and weights
   age_vector_long <- c(get_ages(fims_frame), 13)
   ewaa_growth$ages$resize(length(age_vector_long))
@@ -79,13 +79,13 @@ test_that("EWAAgrowth evaluate() returns expected error for mismatched input len
     seq_along(age_vector_long),
     \(x) ewaa_growth$ages$set(x - 1, age_vector_long[x])
   )
-  # Assign weight data to the EWAAgrowth object
+  # Assign weight data to the EWAAGrowth object
   ewaa_growth$weights$resize(length(weights))
   purrr::walk(
     seq_along(weights),
     \(x) ewaa_growth$weights$set(x - 1, weights[x])
   )
-  #' @description Test that EWAAgrowth evaluate() throws an error when the
+  #' @description Test that EWAAGrowth evaluate() throws an error when the
   #' lengths of ages and weights don't match.
   expect_error(
     ewaa_growth$evaluate(1),

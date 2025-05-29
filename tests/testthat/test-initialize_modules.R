@@ -9,21 +9,12 @@
 
 # test_initialize_modules ----
 ## Setup ----
+
 data <- FIMS::FIMSFrame(data1)
 
-fleet1 <- survey1 <- list(
-  selectivity = list(form = "LogisticSelectivity"),
-  data_distribution = c(
-    Landings = "DlnormDistribution",
-    Index = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution",
-    LengthComp = "DmultinomDistribution"
-  )
-)
-
-fleets <- list(fleet1 = fleet1, survey1 = survey1)
-
-default_parameters <- create_default_parameters(data, fleets = fleets)
+default_parameters <- create_default_configurations(data = data) |>
+  create_default_parameters(data = data) |>
+  tidyr::unnest(cols = data)
 
 ## IO correctness ----
 
@@ -58,7 +49,7 @@ test_that("initialize_fims works with correct inputs", {
     result$age_comp_data$toRVector(),
     data |>
       get_data() |>
-      dplyr::filter(type == "age", name == "fleet1") |>
+      dplyr::filter(type == "age_comp", name == "fleet1") |>
       dplyr::mutate(out = value * uncertainty) |>
       dplyr::pull(out)
   )
@@ -86,7 +77,7 @@ test_that("initialize_fims works with correct inputs", {
     result$length_comp_data$toRVector(),
     data |>
       get_data() |>
-      dplyr::filter(type == "length", name == "fleet1") |>
+      dplyr::filter(type == "length_comp", name == "fleet1") |>
       dplyr::mutate(out = value * uncertainty) |>
       dplyr::pull(out)
   )
@@ -97,10 +88,22 @@ test_that("initialize_fims works with correct inputs", {
 test_that("initialize_fims works with edge cases", {
   #' @description Test that [initialize_fims()] works with multiple
   #' estimation types
-  parameters_multiple_types <- default_parameters
-  n_rec_devs <- get_n_years(data) - 1
-  parameters_multiple_types[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <-
-    c(rep("constant", 10), rep("fixed_effects", n_rec_devs - 10))
+  modified_log_devs <- default_parameters |>
+    dplyr::filter(label == "log_devs") |>
+    # change first 10 estimation_type for label of log_devs from fixed_effects
+    # to constant
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        time <= 11,
+        "constant",
+        estimation_type
+      )
+    )
+
+  parameters_multiple_types <- default_parameters |>
+    # Remove rows where label is "log_devs" but keep the rows where label is NA
+    dplyr::filter(label != "log_devs" | is.na(label)) |>
+    dplyr::bind_rows(modified_log_devs)
   init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
   init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data)
   expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)
@@ -113,7 +116,7 @@ test_that("initialize_fims returns correct error messages", {
   #' input correctly.
   expect_error(
     initialize_fims(data = data),
-    "argument must be a non-missing list."
+    "The `parameters` argument must be a tibble."
   )
   clear()
 
@@ -121,17 +124,17 @@ test_that("initialize_fims returns correct error messages", {
   #' input correctly.
   expect_error(
     initialize_fims(parameters = "not_a_list", data = data),
-    "argument must be a non-missing list."
+    "The `parameters` argument must be a tibble."
   )
   clear()
 
   #' @description Test that [initialize_fims()] fails when no fleets are
   #' provided.
-  parameters_no_fleets <- default_parameters
-  parameters_no_fleets[["modules"]][["fleets"]] <- NULL
+  parameters_no_fleets <- default_parameters |>
+    dplyr::filter(!(fleet_name %in% c("fleet1", "survey1")))
   expect_error(
     initialize_fims(parameters = parameters_no_fleets, data = data),
-    "No fleets found in the provided"
+    "No fleets found in the provided `parameters`."
   )
   clear()
 
@@ -162,20 +165,18 @@ test_that("initialize_fims returns correct error messages", {
 
   #' @description Test that [initialize_fims()] correctly returns an error on
   #' an unknown estimation_type
-  parameters_wrong_type <- default_parameters
+  parameters_wrong_type <- default_parameters |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        estimation_type == "fixed_effects",
+        "fixed.effects",
+        estimation_type
+      )
+    )
   parameters_wrong_type[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- "fixed.effects"
   expect_error(
     initialize_fims(parameters = parameters_wrong_type, data = data),
-    "You entered",
-  )
-  clear()
-
-  #' @description Test that [initialize_fims()] correctly returns an error when
-  #' the lengths of value and estimation_type do not match
-  parameters_wrong_type[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- c("fixed_effects", "fixed_effects")
-  expect_error(
-    initialize_fims(parameters = parameters_wrong_type, data = data),
-    "does not match the length",
+    "The `estimation_type` must be one of: constant, fixed_effects, and random_effects.",
   )
   clear()
 })

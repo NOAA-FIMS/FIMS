@@ -12,67 +12,45 @@ utils::globalVariables(c(
 #' @description
 #' Initializes a generic module by setting up its fields based on the provided
 #' `module_name`.
-#' @param parameters A list. Contains parameters and modules required for
+#' @param parameters A tibble. Contains parameters and modules required for
 #'   initialization.
 #' @param data An S4 object. FIMS input data.
 #' @param module_name A character. Name of the module to initialize (e.g.,
-#'   "population" or "fleet").
+#'   "Population" or "Fleet").
+#' @param fleet_name A character. Name of the fleet to initialize. If not
+#'   specified, the module will be initialized without fleet-specific data.
 #' @return
 #' The initialized module as an object.
 #' @noRd
-initialize_module <- function(parameters, data, module_name) {
-  # TODO: how to return all modules between pipes and create links between
-  # modules?
-  # # Retrieve all objects in the environment
-  # objs <- mget(ls())
-  # modules <- get_rcpp_modules(objs)
+initialize_module <- function(parameters, data, module_name, fleet_name = NA_character_) {
 
-  # Input checks
-  # Check if parameters is a list and contains the necessary sub-elements
-  if (!is.list(parameters)) {
-    cli::cli_abort("The {.var parameters} argument should be a list.")
-  } else if (!all(c("parameters", "modules") %in% names(parameters))) {
-    cli::cli_abort(c(
-      "The {.var parameters} argument must contain both parameters and modules
-      lists."
-    ))
-  }
-  # Validate module_name
-  if (!is.character(module_name) || length(module_name) != 1) {
-    cli::cli_abort("{.var module_name} must be a single character string.")
+  module_input <- parameters |>
+    # Using !! to unquote the variables
+    dplyr::filter(module_name == !!module_name)
+
+  if (!is.na(fleet_name)) {
+    module_input <- module_input |>
+      dplyr::filter(fleet_name == !!fleet_name)
   }
 
-  # Check if module_name exists in the parameters list
-  if (!module_name %in% c(
-    names(parameters[["parameters"]]),
-    names(parameters[["modules"]])
-  )) {
-    cli::cli_abort("{.var module_name} is missing from the {.var parameters}.")
-  }
-
-  # Define module class and fields
-  module_class_name <- if (module_name == "population") {
-    "Population"
-  } else if (!(module_name %in% names(parameters[["modules"]])) &&
-    (names(module_name) == "selectivity")
-  ) {
-    parameters[["modules"]][["fleets"]][[
-      module_name
-    ]][[names(module_name)]][["form"]]
-  } else if (!(module_name %in% names(parameters[["modules"]])) &&
-    names(module_name) == "Fleet"
-  ) {
-    "Fleet"
-  } else {
-    parameters[["modules"]][[module_name]][["form"]]
-  }
+  module_class_name <- module_input |>
+    # Combine module_type and module_name into a single string
+    dplyr::mutate(
+      temp_name = paste0(
+        # Replace NAs with ""
+        dplyr::coalesce(module_type, ""),
+        dplyr::coalesce(module_name, "")
+      )
+    ) |>
+    dplyr::pull(temp_name) |>
+    unique()
 
   module_class <- get(module_class_name)
   module_fields <- names(module_class@fields)
   module <- methods::new(module_class)
-  module_input <- parameters[["parameters"]][[module_name]]
 
   if (module_class_name == "Fleet") {
+    # Remove certain fields for the Fleet module
     module_fields <- setdiff(module_fields, c(
       "log_index_expected",
       "log_landings_expected",
@@ -85,14 +63,16 @@ initialize_module <- function(parameters, data, module_name) {
     ))
 
     fleet_types <- get_data(data) |>
-      dplyr::filter(name == module_name) |>
+      dplyr::filter(name == fleet_name) |>
       dplyr::pull(type) |>
       unique()
 
-    data_distribution_names_for_fleet_i <- names(parameters[["modules"]][["fleets"]][[module_name]][["data_distribution"]])
+    data_distribution_names_for_fleet_i <- parameters |>
+      dplyr::filter(fleet_name == !!fleet_name & distribution_type == "Data") |>
+      dplyr::pull(module_type)
     if ("age-to-length-conversion" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
-      age_to_length_conversion_value <- FIMS::m_age_to_length_conversion(data, module_name)
+      age_to_length_conversion_value <- FIMS::m_age_to_length_conversion(data, fleet_name)
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
       # Assign each value to the corresponding position in the parameter vector
       purrr::walk(
@@ -173,7 +153,6 @@ initialize_module <- function(parameters, data, module_name) {
       )
     }
   }
-
   return(module)
 }
 
@@ -285,9 +264,8 @@ initialize_recruitment <- function(parameters, data) {
   module <- initialize_module(
     parameters = parameters,
     data = data,
-    module_name = setNames("recruitment", "population")
+    module_name = "Recruitment"
   )
-  return(module)
 }
 
 #' Initialize a growth module
@@ -304,9 +282,8 @@ initialize_growth <- function(parameters, data) {
   module <- initialize_module(
     parameters = parameters,
     data = data,
-    module_name = setNames("growth", "population")
+    module_name = "Growth"
   )
-  return(module)
 }
 
 #' Initialize a maturity module
@@ -323,9 +300,8 @@ initialize_maturity <- function(parameters, data) {
   module <- initialize_module(
     parameters = parameters,
     data = data,
-    module_name = setNames("maturity", "population")
+    module_name = "Maturity"
   )
-  return(module)
 }
 
 #' Initialize a population module.
@@ -351,7 +327,7 @@ initialize_population <- function(parameters, data, linked_ids) {
   module <- initialize_module(
     parameters = parameters,
     data = data,
-    module_name = setNames("population", "population")
+    module_name = "Population"
   )
 
   # Link up the recruitment, growth, and maturity modules with
@@ -379,13 +355,13 @@ initialize_population <- function(parameters, data, linked_ids) {
 #' The initialized selectivity module as an object.
 #' @noRd
 initialize_selectivity <- function(parameters, data, fleet_name) {
+  module_name <- "Selectivity"
   module <- initialize_module(
     parameters = parameters,
     data = data,
-    module_name = setNames(fleet_name, "selectivity")
+    module_name = module_name,
+    fleet_name = fleet_name
   )
-
-  return(module)
 }
 
 # TODO: Do we want to put initialize_selectivity(), initialize_index(), and
@@ -407,7 +383,8 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   module <- initialize_module(
     parameters = parameters,
     data = data,
-    module_name = setNames(fleet_name, "Fleet")
+    fleet_name = fleet_name,
+    module_name = "Fleet"
   )
 
   module$SetSelectivityID(linked_ids["selectivity"])
@@ -418,7 +395,9 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
     unique()
 
 
-  distribution_names_for_fleet <- names(parameters[["modules"]][["fleets"]][[fleet_name]][["data_distribution"]])
+  distribution_names_for_fleet <- parameters |>
+    dplyr::filter(fleet_name == !!fleet_name & distribution_type == "Data") |>
+    dplyr::pull(module_type)
 
   # Link the observed landings data to the fleet module using its associated ID
   # if the data type includes "landings" and if "Landings" exists in the data distribution
@@ -437,17 +416,17 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   }
 
   # Link the observed age composition data to the fleet module using its associated ID
-  # if the data type includes "age" and if "AgeComp" exists in the data distribution
+  # if the data type includes "age_comp" and if "AgeComp" exists in the data distribution
   # specification
-  if ("age" %in% fleet_types &&
+  if ("age_comp" %in% fleet_types &&
     "AgeComp" %in% distribution_names_for_fleet) {
     module$SetObservedAgeCompDataID(linked_ids["age_comp"])
   }
 
   # Link the observed length composition data to the fleet module using its associated ID
-  # if the data type includes "length" and if "LengthComp" exists in the data
+  # if the data type includes "length_comp" and if "LengthComp" exists in the data
   # distribution specification
-  if ("length" %in% fleet_types &&
+  if ("length_comp" %in% fleet_types &&
     "LengthComp" %in% distribution_names_for_fleet) {
     module$SetObservedLengthCompDataID(linked_ids["length_comp"])
   }
@@ -472,7 +451,7 @@ initialize_landings <- function(data, fleet_name) {
   }
 
   fleet_type <- dplyr::filter(
-    .data = as.data.frame(data@data),
+    .data = as.data.frame(get_data(data)),
     name == fleet_name
   ) |>
     dplyr::distinct(type) |>
@@ -508,14 +487,11 @@ initialize_index <- function(data, fleet_name) {
   }
 
   fleet_type <- dplyr::filter(
-    .data = as.data.frame(data@data),
+    .data = as.data.frame(get_data(data)),
     name == fleet_name
   ) |>
     dplyr::distinct(type) |>
     dplyr::pull(type)
-
-
-
 
   if ("index" %in% fleet_type) {
     module <- methods::new(Index, get_n_years(data))
@@ -552,14 +528,14 @@ initialize_comp <- function(data,
   # Set up the specifics for the given type.
   comp_types <- list(
     "AgeComp" = list(
-      "name" = "age",
+      "name" = "age_comp",
       "comp_data_field" = "age_comp_data",
       "get_n_function" = get_n_ages,
       "comp_object" = AgeComp,
       "m_comp" = m_agecomp
     ),
     "LengthComp" = list(
-      "name" = "length",
+      "name" = "length_comp",
       "comp_data_field" = "length_comp_data",
       "get_n_function" = get_n_lengths,
       "comp_object" = LengthComp,
@@ -642,7 +618,7 @@ initialize_comp <- function(data,
 #' modules. This function iterates over the provided fleets, setting up
 #' necessary sub-modules such as selectivity, index, and age composition. It
 #' also sets up distribution models for fishery index and age-composition data.
-#' @param parameters A list. Contains parameters and modules required for
+#' @param parameters A tibble. Contains parameters and modules required for
 #'   initialization.
 #' @param data An S4 object. FIMS input data.
 #' @return
@@ -651,17 +627,42 @@ initialize_comp <- function(data,
 #' @export
 initialize_fims <- function(parameters, data) {
   # Validate parameters input
-  if (missing(parameters) || !is.list(parameters)) {
-    cli::cli_abort("The {.var parameters} argument must be a non-missing list.")
+  if (missing(parameters) || !tibble::is_tibble(parameters)) {
+    cli::cli_abort("The {.var parameters} argument must be a tibble.")
   }
+
+  # Check if parameters is a nested tibble. If so, unnest parameters
+  if ("data" %in% names(parameters)) {
+    parameters <- parameters |>
+      tidyr::unnest(cols = c(data))
+  }
+
+  # Check if estimation_type is within "constant", "fixed_effect", "random_effect"
+  valid_estimation_types <- c("constant", "fixed_effects", "random_effects")
+  invalid_estimation_types <- parameters |>
+    dplyr::filter(!estimation_type %in% valid_estimation_types) |>
+    dplyr::pull(estimation_type) |>
+    unique() |>
+    na.omit()
+
+  if (length(invalid_estimation_types) > 0) {
+    cli::cli_abort(c(
+      "The `estimation_type` must be one of: {valid_estimation_types}.",
+      i = "Invalid values found: {invalid_estimation_types}."
+    ))
+  }
+
   # Clear any previous FIMS settings
   clear()
 
-  module_name <- "fleets"
-  fleet_names <- names(parameters[["modules"]][["fleets"]])
+  fleet_names <- parameters |>
+    dplyr::pull(fleet_name) |>
+    unique() |>
+    na.omit()
+
   if (length(fleet_names) == 0) {
     cli::cli_abort(c(
-      "No fleets found in the provided {.var parameters[['modules']]}."
+      "No fleets found in the provided {.var parameters}."
     ))
   }
 
@@ -672,7 +673,6 @@ initialize_fims <- function(parameters, data) {
     fleet_age_comp <- fleet_agecomp_distribution <-
     fleet_length_comp <- fleet_lengthcomp_distribution <-
     vector("list", length(fleet_names))
-
 
   for (i in seq_along(fleet_names)) {
     fleet_selectivity[[i]] <- initialize_selectivity(
@@ -690,9 +690,9 @@ initialize_fims <- function(parameters, data) {
       dplyr::pull(type) |>
       unique()
 
-    data_distribution_names_for_fleet_i <- names(
-      parameters[["modules"]][["fleets"]][[fleet_names[i]]][["data_distribution"]]
-    )
+    data_distribution_names_for_fleet_i <- parameters |>
+      dplyr::filter(fleet_name == fleet_names[i] & distribution_type == "Data") |>
+      dplyr::pull(module_type)
 
     # Initialize landings module if the data type includes "landings" and
     # if "Landings" exists in the data distribution specification
@@ -728,9 +728,9 @@ initialize_fims <- function(parameters, data) {
       )
     }
 
-    # Initialize age composition module if the data type includes "age" and
+    # Initialize age composition module if the data type includes "age_comp" and
     # if "AgeComp" exists in the data distribution specification
-    if ("age" %in% fleet_types &&
+    if ("age_comp" %in% fleet_types &&
       "AgeComp" %in% data_distribution_names_for_fleet_i) {
       # Initialize age composition module for the current fleet
       fleet_age_comp[[i]] <- initialize_comp(
@@ -746,9 +746,9 @@ initialize_fims <- function(parameters, data) {
       )
     }
 
-    # Initialize length composition module if the data type includes "length" and
+    # Initialize length composition module if the data type includes "length_comp" and
     # if "LengthComp" exists in the data distribution specification
-    if ("length" %in% fleet_types &&
+    if ("length_comp" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
       # Initialize length composition module for the current fleet
       fleet_length_comp[[i]] <- initialize_comp(
@@ -768,24 +768,19 @@ initialize_fims <- function(parameters, data) {
       parameters = parameters,
       data = data,
       fleet_name = fleet_names[i],
+      # TODO: need to remove linked_ids from the function and add module_id to the
+      # parameters tibble
       linked_ids = fleet_module_ids
     )
 
-    # TODO: update argument sd to log_sd to match the Rcpp interface
-    parameter_value_name <- grep(
-      paste0("log_sd", ".value"),
-      names(parameters[["parameters"]][[fleet_names[i]]]),
-      value = TRUE
-    )
-    parameter_estimation_name <- grep(
-      paste0("log_sd", ".estimation_type"),
-      names(parameters[["parameters"]][[fleet_names[i]]]),
-      value = TRUE
-    )
+    fleet_sd_input <- parameters |>
+      dplyr::filter(fleet_name == fleet_names[i] & label == "log_sd") |>
+      dplyr::mutate(
+        label = "sd",
+        value = exp(value)
+      )
 
-    if (length(parameter_value_name) == 0 ||
-      length(parameter_estimation_name) == 0
-    ) {
+    if (length(fleet_sd_input) == 0) {
       cli::cli_abort(c(
         "Missing required inputs for `log_sd` in fleet `{fleet_name}`."
       ))
@@ -795,13 +790,10 @@ initialize_fims <- function(parameters, data) {
       "Index" %in% data_distribution_names_for_fleet_i) {
       fleet_index_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
+        # TODO: need to update family and match options from the distribution
+        # column from the parameters tibble
         family = lognormal(link = "log"),
-        sd = list(
-          value = exp(
-            parameters[["parameters"]][[fleet_names[i]]][[parameter_value_name]]
-          ),
-          estimation_type = parameters[["parameters"]][[fleet_names[i]]][[parameter_estimation_name]]
-        ),
+        sd = fleet_sd_input,
         data_type = "index"
       )
     }
@@ -810,30 +802,31 @@ initialize_fims <- function(parameters, data) {
       "Landings" %in% data_distribution_names_for_fleet_i) {
       fleet_landings_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
+        # TODO: need to update family and match options from the distribution
+        # column from the parameters tibble
         family = lognormal(link = "log"),
-        sd = list(
-          value = exp(
-            parameters[["parameters"]][[fleet_names[i]]][[parameter_value_name]]
-          ),
-          estimation_type = parameters[["parameters"]][[fleet_names[i]]][[parameter_estimation_name]]
-        ),
+        sd = fleet_sd_input,
         data_type = "landings"
       )
     }
 
-    if ("age" %in% fleet_types &&
+    if ("age_comp" %in% fleet_types &&
       "AgeComp" %in% data_distribution_names_for_fleet_i) {
       fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
+        # TODO: need to update family and match options from the distribution
+        # column from the parameters tibble
         family = multinomial(link = "logit"),
         data_type = "agecomp"
       )
     }
 
-    if ("length" %in% fleet_types &&
+    if ("length_comp" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
       fleet_lengthcomp_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
+        # TODO: need to update family and match options from the distribution
+        # column from the parameters tibble
         family = multinomial(link = "logit"),
         data_type = "lengthcomp"
       )
@@ -849,43 +842,41 @@ initialize_fims <- function(parameters, data) {
     data = data
   )
 
-  parameter_name <- names(parameters$modules$recruitment$process_distribution)
-  field_value_name <- grep(
-    paste0("log_sd.value"),
-    names(parameters[["parameters"]][["recruitment"]]),
-    value = TRUE
-  )
-  field_estimation_name <- grep(
-    paste0("log_sd.estimation_type"),
-    names(parameters[["parameters"]][["recruitment"]]),
-    value = TRUE
-  )
+  recruitment_process_input <- parameters |>
+    dplyr::filter(module_name == "Recruitment" & distribution_type == "process")
 
-  if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
-    # TODO: Remove this check?: if log_devs are fixed, there is no recruitment distribution
-    #   cli::cli_abort("Missing required inputs for recruitment distribution.")
+  if (length(recruitment_process_input) == 0) {
+    # TODO: need to revisit initialize_process_structure and add R tests
     recruitment_process <- initialize_process_structure(
       module = recruitment,
       par = "log_devs"
     )
   } else {
-    recruitment_distribution <- initialize_process_distribution(
-      module = recruitment,
-      par = names(parameters$modules$recruitment$process_distribution),
-      family = gaussian(),
-      sd = list(
-        value = parameters[["parameters"]][["recruitment"]][[field_value_name]],
-        estimation_type = parameters[["parameters"]][[
-          "recruitment"
-        ]][[field_estimation_name]]
-      ),
-      is_random_effect = FALSE
-    )
+    pars <- recruitment_process_input |>
+      dplyr::pull(distribution_link) |>
+      unique()
 
-    recruitment_process <- initialize_process_structure(
-      module = recruitment,
-      par = names(parameters$modules$recruitment$process_distribution)
-    )
+    # Initialize_process_distribution for each par
+    recruitment_distribution <- purrr::map(pars, function(par) {
+      sd_input <- recruitment_process_input |>
+        dplyr::filter(distribution_link == par & label == "log_sd")
+      initialize_process_distribution(
+        module = recruitment,
+        par = par,
+        # TODO: need to update family and match options from the distribution
+        # column from the parameters tibble
+        family = gaussian(),
+        sd = sd_input,
+        # TODO: need to remove is_random_effect and match options from the
+        # estimation_type from the parameters tibble
+        is_random_effect = FALSE
+      )
+
+      recruitment_process <- initialize_process_structure(
+        module = recruitment,
+        par = par
+      )
+    })
   }
 
   # Growth
@@ -911,6 +902,8 @@ initialize_fims <- function(parameters, data) {
   population <- initialize_population(
     parameters = parameters,
     data = data,
+    # TODO: need to remove linked_ids from the function and add module_id to the
+    # parameters tibble
     linked_ids = population_module_ids
   )
 
@@ -966,76 +959,31 @@ set_param_vector <- function(field, module, module_input) {
   }
 
   # Check if module_input is a list
-  if (!is.list(module_input)) {
-    cli::cli_abort("The {.var module_input} argument must be a list.")
-  }
-
-  # Identify the name for the parameter value and estimation fields in
-  # module_input
-  field_value_name <- grep(
-    paste0(field, ".value"),
-    names(module_input),
-    value = TRUE
-  )
-  field_estimation_name <- grep(
-    paste0(field, ".estimation_type"),
-    names(module_input),
-    value = TRUE
-  )
-
-
-
-  # Check if both value and estimation information are present
-  if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
-    cli::cli_abort(c(
-      "Missing value or estimation information for {.var field}."
-    ))
+  if (!tibble::is_tibble(module_input)) {
+    cli::cli_abort("The {.var module_input} argument must be tibble.")
   }
 
   # Extract the value of the parameter vector
-  field_value <- module_input[[field_value_name]]
-  estimation_type_value <- module_input[[field_estimation_name]]
+  field_value <- module_input |>
+    dplyr::filter(label == field) |>
+    dplyr::pull(value)
 
-  # Resize the field in the module if it has multiple values
-  if (length(field_value) > 1) module[[field]]$resize(length(field_value))
-  if (length(field_value) > 1 && length(estimation_type_value) > 1) {
-    if (length(field_value) != length(estimation_type_value)) {
-      cli::cli_abort(c(
-        "The length of {.var field_value} ({length(field_value)}) does not match
-        the length of {.var estimation_type_value} ({length(estimation_type_value)})."
-      ))
-    }
+  field_estimation_type <- module_input |>
+    dplyr::filter(label == field) |>
+    dplyr::pull(estimation_type)
+
+  # Check if both value and estimation information are present
+  if (length(field_value) == 0 || length(field_estimation_type) == 0) {
+    cli::cli_abort(c(
+      "Missing value or estimation_type information for {.var field}."
+    ))
   }
+  # Resize the field in the module
+  module[[field]]$resize(length(field_value))
 
   # Assign each value to the corresponding position in the parameter vector
   for (i in seq_along(field_value)) {
     module[[field]][i][["value"]] <- field_value[i]
-    if (length(estimation_type_value) == 1) {
-      # If there is only one estimation type value, set it for all elements
-      module[[field]][i][["estimation_type"]]$set(estimation_type_value)
-    } else {
-      # If there are multiple estimation type values, set them individually
-      module[[field]][i][["estimation_type"]]$set(estimation_type_value[i])
-    }
-  }
-
-  # Set the estimation information for the entire parameter vector when estimation_type is scalar
-  estimation_type_names <- c("constant", "fixed_effects", "random_effects")
-  if (length(module_input[[field_estimation_name]]) == 1) {
-    if (!(module_input[[field_estimation_name]] %in% estimation_type_names)) {
-      cli::cli_abort(c(
-        "x" = "You entered {.val {module_input[[field_estimation_name]]}}",
-        "i" = "The available options are {estimation_type_names}"
-      ))
-    }
-    if (module_input[[field_estimation_name]] == "constant") {
-      module[[field]]$set_all_estimable(FALSE)
-    }
-    if (module_input[[field_estimation_name]] == "random_effects") {
-      module[[field]]$set_all_random(TRUE)
-    }
-    if (module_input[[field_estimation_name]] == "fixed_effects") {
-      module[[field]]$set_all_estimable(TRUE)
-    }
+    module[[field]][i][["estimation_type"]]$set(field_estimation_type[i])
   }
 }

@@ -29,7 +29,7 @@ test_that("Rcpp interface works for modules", {
   expect_equal(logistic_selectivity$get_id(), 1)
 
   #' @description Test that Rcpp interface works for growth module.
-  expect_no_error(ewaa_growth <- methods::new(EWAAgrowth))
+  expect_no_error(ewaa_growth <- methods::new(EWAAGrowth))
   ewaa_growth$ages$set(0, 1.0)
   ewaa_growth$weights$set(0, 2.5)
   expect_equal(ewaa_growth$ages$get(0), 1.0)
@@ -59,7 +59,7 @@ test_that("Rcpp interface returns correct error messages", {
     regexp = "no valid constructor available for the argument list"
   )
   expect_error(
-    methods::new(EWAAgrowth, "a"),
+    methods::new(EWAAGrowth, "a"),
     regexp = "no valid constructor available for the argument list"
   )
   clear()

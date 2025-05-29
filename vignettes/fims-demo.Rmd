@@ -63,152 +63,167 @@ The data contains the following fleets:
 - A single fishery fleet with age- and length-composition, weight-at-age, and landings data
 - A single survey with age- and length-composition and index data
 
+## configurations
+
+### `create_default_configurations()`
+
+The `create_default_configurations()` function is designed to generate a set of default configurations for the various components of a FIMS model. This includes configurations for fleets, growth, maturity, and recruitment modules. By leveraging the structure of the input data, the function can automatically set up initial configurations for each module. By passing the data and configurations to `create_default_parameters()` the function can tailor the defaults based on how many fleets there are and what data types exist. For example, if you have three fleets, then `create_default_configurations()` will set up three logistic selectivity modules.
+
+```{r configurations, max.height='100px', attr.output='.numberLines'}
+# Create default configurations based on the data
+default_configurations <- create_default_configurations(data = data_4_model) |>
+  print()
+
+# The output is a nested tibble, with details in the `data` column.
+default_configurations_unnested <- default_configurations |>
+  tidyr::unnest(cols = data) |>
+  print()
+```
+
+### Update configurations
+
+The default_configurations are just a starting point. Functions (e.g., `rows_*()`) from `{dplyr}` can be used to modify the default configurations as needed. For example, logistic selectivity for survey1 can be changed to double logistic selectivity.
+```{r updated_configurations, max.height='100px', attr.output='.numberLines'}
+# Update the module_type for survey1's selectivity
+updated_configurations <- default_configurations_unnested |>
+  dplyr::rows_update(
+    y = tibble::tibble(
+      module_name = c("Selectivity"),
+      fleet_name = c("survey1"),
+      module_type = c("DoubleLogistic")
+    ),
+    by = c("module_name", "fleet_name")
+  ) |>
+  print()
+
+# Nest updated_configurations
+updated_configurations_nested <- updated_configurations |>
+  tidyr::nest(.by = c(model_family, module_name, fleet_name))
+
+```
+
 ## Parameters
 
 The parameters that are in the model will depend on which modules are used from the FIMS framework. This combination of modules rather than the use of a control file negates the need for complicated if{} else{} statements in the code.
 
 ### `create_default_parameters()`
 
-By passing the data to `create_default_parameters()` the function can tailor the defaults based on how many fleets there are and what data types exist. For example, if you have three fleets, then `create_default_parameters()` will set up three logistic selectivity modules.
-
 Modules that are available in FIMS are known as reference classes in the C++ code. Each reference class acts as an interface between R and the underlining C++ code that defines FIMS. Several reference classes exist and several more will be created in the future. The beauty of having modules rather than a control file really comes out when more reference classes are created because each reference class can be accessed through R by itself to build up a model rather than needing to modify a control file for future features.
 
-By just passing lists of fleet specifications and the data to `create_default_parameters()`, the default values for parameters that relate to fleet(s), recruitment, growth, and maturity modules can be created. For example,
+By just passing the configurations and the data to `create_default_parameters()`, the default values for parameters that relate to fleet(s), recruitment, growth, and maturity modules can be created. For example,
 
-  - "BevertonHoltRecruitment" for the recruitment module
-  - "DnormDistribution" for recruitment deviations (log_devs)
-  - "EWAAgrowth" for the growth module, and
-  - "LogisticMaturity" for maturity module.
+  - "BevertonHolt" for the recruitment module
+  - "Dnorm" distribution for recruitment deviations (log_devs)
+  - "EWAA" for the Growth module, and
+  - "Logistic" for Maturity module.
 
 ```{r parameters, max.height='100px', attr.output='.numberLines'}
-# Define the same fleet specifications for fleet1 and survey1
-fleet1 <- survey1 <- list(
-  selectivity = list(form = "LogisticSelectivity"),
-  data_distribution = c(
-    Landings = "DlnormDistribution",
-    Index = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution",
-    LengthComp = "DmultinomDistribution"
-  )
-)
+# Create default parameters based on default_configurations and data
+default_parameters <- create_default_parameters(
+  configurations = default_configurations,
+  data = data_4_model
+) |>
+  print()
 
-# Create default recruitment, growth, and maturity parameters
-default_parameters <- data_4_model |>
-  create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
-  )
+# Unnest the default_parameters to see the detailed parameters
+default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data) |>
+  print()
 ```
 
-The argument names and their corresponding default values of the create_default_parameters() function can be displayed using `args()`.
-```{r parameters-args}
-args(create_default_parameters)
-```
+### Update parameters
 
-### `update_parameters()`
+Functions (e.g., `rows_*()`) from `{dplyr}` can be used to update the default parameters as needed. 
 
-In the future, the developers of FIMS may update the default parameters to experiment with different values. Regardless, you can still use `create_default_parameters()` as a starting point because it will provide information on the appropriate dimensions and necessary elements that the final list must contain. And, although it is a good idea to modify the returned defaults with `update_parameters()`, you can update the list manually.
-
-In the code below, `update_parameters()` is used to adjust the fishing mortality, selectivity, maturity, and population parameters from their default values. If the parameters are estimated, these updates will change their starting values, and if they are fixed, these updates will change their value used in the model.
+In the code below, `rows_update()` is used to adjust the fishing mortality, selectivity, maturity, and population parameters from their default values.
 
 ```{r parameters-update}
-# Each call to update_parameters() returns the full list so the pipe can be
-# used to daisy chain all of these updates together to a new object called
-# parameters that will be used to fit the model
-parameters <- default_parameters |>
-  update_parameters(
-    modified_parameters = list(
-      fleet1 = list(
-        Fleet.log_Fmort.value = log(c(
-          0.009459165, 0.027288858, 0.045063639,
-          0.061017825, 0.048600752, 0.087420554,
-          0.088447204, 0.186607929, 0.109008958,
-          0.132704335, 0.150615473, 0.161242955,
-          0.116640187, 0.169346119, 0.180191913,
-          0.161240483, 0.314573212, 0.257247574,
-          0.254887252, 0.251462108, 0.349101406,
-          0.254107720, 0.418478117, 0.345721184,
-          0.343685540, 0.314171227, 0.308026829,
-          0.431745298, 0.328030899, 0.499675368
-        ))
-      )
-    )
+parameters_4_model <- default_parameters |>
+  tidyr::unnest(cols = data) |>
+  # Update log_Fmort initial values for Fleet1
+  dplyr::rows_update(
+    dplyr::tibble(
+      fleet_name = "fleet1",
+      label = "log_Fmort",
+      time = 1:30,
+      value = log(c(
+        0.009459165, 0.027288858, 0.045063639,
+        0.061017825, 0.048600752, 0.087420554,
+        0.088447204, 0.186607929, 0.109008958,
+        0.132704335, 0.150615473, 0.161242955,
+        0.116640187, 0.169346119, 0.180191913,
+        0.161240483, 0.314573212, 0.257247574,
+        0.254887252, 0.251462108, 0.349101406,
+        0.254107720, 0.418478117, 0.345721184,
+        0.343685540, 0.314171227, 0.308026829,
+        0.431745298, 0.328030899, 0.499675368
+      ))
+    ),
+    by = c("fleet_name", "label", "time")
   ) |>
-  update_parameters(
-    modified_parameters = list(
-      survey1 = list(
-        LogisticSelectivity.inflection_point.value = 1.5,
-        LogisticSelectivity.slope.value = 2,
-        Fleet.log_q.value = log(3.315143e-07)
-      )
-    )
+  # Update selectivity parameters and log_q for survey1
+  dplyr::rows_update(
+    dplyr::tibble(
+      fleet_name = "survey1",
+      label = c("inflection_point", "slope", "log_q"),
+      value = c(1.5, 2, log(3.315143e-07))
+    ),
+    by = c("fleet_name", "label")
   ) |>
-  update_parameters(
-    modified_parameters = list(
-      recruitment = list(
-        BevertonHoltRecruitment.log_rzero.value = log(1e+06),
-        BevertonHoltRecruitment.log_devs.value = c(
-          0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
-          -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
-          -0.21709207, -0.13320626, 0.11225374, -0.10650836, 0.26877132,
-          0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
-          0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
-          -0.19556523, 0.20094360, 0.37248740, -0.07163145
-        ),
-        BevertonHoltRecruitment.log_devs.estimation_type = "fixed_effects"
+  # Update log_devs in the Recruitment module (time steps 2–30)
+  dplyr::rows_update(
+    dplyr::tibble(
+      label = "log_devs",
+      time = 2:30,
+      value = c(
+        0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
+        -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
+        -0.21709207, -0.13320626, 0.11225374, -0.10650836, 0.26877132,
+        0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
+        0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
+        -0.19556523, 0.20094360, 0.37248740, -0.07163145
       )
-    )
+    ),
+    by = c("label", "time")
   ) |>
-  update_parameters(
-    modified_parameters = list(
-      maturity = list(
-        LogisticMaturity.inflection_point.value = 2.25,
-        LogisticMaturity.inflection_point.estimation_type = "constant",
-        LogisticMaturity.slope.value = 3,
-        LogisticMaturity.slope.estimation_type = "constant"
-      )
-    )
+  # Update log_sd for log_devs in the Recruitment module
+  dplyr::rows_update(
+    dplyr::tibble(
+      module_name = "Recruitment",
+      label = "log_sd",
+      value = 0.4
+    ),
+    by = c("module_name", "label")
   ) |>
-  update_parameters(
-    modified_parameters = list(
-      population = list(
-        Population.log_init_naa.value = c(
-          13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
-          12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
-        )
+  # Update inflection point and slope parameters in the Maturity module
+  dplyr::rows_update(
+    dplyr::tibble(
+      module_name = "Maturity",
+      label = c("inflection_point", "slope"),
+      value = c(2.25, 3)
+    ),
+    by = c("module_name", "label")
+  ) |>
+  # Update log_init_naa values in the Population module
+  dplyr::rows_update(
+    dplyr::tibble(
+      label = "log_init_naa",
+      age = 1:12,
+      value = c(
+        13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
+        12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
       )
-    )
+    ),
+    by = c("label", "age")
   )
 ```
 
-`purrr::map_vec()` can be used to compare the length of individual updated parameter vectors from `parameters` with the length of individual parameter vectors from `default_parameters`.
-```{r parameter-length-comparison}
-default_fleet1 <- purrr::map_vec(
-  default_parameters[["parameters"]][["fleet1"]],
-  \(x) length(x)
-)
-updated_fleet1 <- purrr::map_vec(
-  parameters[["parameters"]][["fleet1"]],
-  \(x) length(x)
-)
-knitr::kable(cbind(default_fleet1, updated_fleet1))
-```
-
-`purrr::map_df()` can be used to summarize parameter vector lengths across all modules.
-```{r parameter-length-table}
-purrr::map_df(
-  parameters[["parameters"]], \(x) purrr::map_vec(x, length),
-  .id = "module"
-) |>
-  tibble::column_to_rownames(var = "module") |>
-  t()
-```
 ## Fit
 
 With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fims()`.
 
 ### `initialize_fims()`
 
-The list returned by `create_default_parameters()` has two elements, parameters and modules. But, these are just lists of lists containing specifications. Nothing has been created in memory as of yet. To actually initialize the modules specified in `parameters[["modules"]]`, `initialize_fims()` needs to be called. This function takes all of the specifications and matches them with the appropriate data to initialize a module and create the pointers to the memory.
+The tibble returned by `create_default_parameters()` is just a data frame containing specifications. Nothing has been created in memory as of yet. To actually initialize the modules, `initialize_fims()` needs to be called. This function takes all of the specifications and matches them with the appropriate data to initialize a module and create the pointers to the memory.
 
 ### `fit_fims()`
 
@@ -218,12 +233,12 @@ The list returned from `initialize_fims()` can be passed to the parameter of `fi
 
 ```{r fit, max.height='100px', attr.output='.numberLines', eval=TRUE}
 # Run the model without optimization to help ensure a viable model
-test_fit <- parameters |>
+test_fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = FALSE)
 clear()
 # Run the  model with optimization
-fit <- parameters |>
+fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 clear()
@@ -278,21 +293,26 @@ Multiple fits, i.e., sensitivity runs, can be set up by modifying the parameter 
 For example, one could change the initial value used for the slope of the logistic curve for the survey to see if the terminal estimate changes due to changes to the initial value.
 
 ```{r initial-values}
-parameters_high_slope <- parameters |>
-  update_parameters(
-    modified_parameters = list(
-      survey1 = list(
-        LogisticSelectivity.slope.value = 2.5
-      )
+parameters_high_slope <- parameters_4_model |>
+  # Update the slope value of the logistic selectivity for the survey
+  dplyr::mutate(
+    value = dplyr::if_else(
+      module_name == "Selectivity" &
+        fleet_name == "survey1" &
+        label == "slope",
+      2.5,
+      value
     )
   )
 
-parameters_low_slope <- parameters |>
-  update_parameters(
-    modified_parameters = list(
-      survey1 = list(
-        LogisticSelectivity.slope.value = 1
-      )
+parameters_low_slope <- parameters_4_model |>
+  dplyr::mutate(
+    value = dplyr::if_else(
+      module_name == "Selectivity" &
+        fleet_name == "survey1" &
+        label == "slope",
+      1,
+      value
     )
   )
 
@@ -311,26 +331,16 @@ clear()
 
 #### Age only
 
-The same model can be fit to just the age data, removing the length data.
+The same model can be fit to just the age data, removing the length composition configurations.
 
 ```{r age}
-# Define fleet and survey with age-specific data distribution
-fleet1 <- survey1 <- list(
-  selectivity = list(form = "LogisticSelectivity"),
-  data_distribution = c(
-    Index = "DlnormDistribution",
-    Landings = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution"
-  )
-)
-
 # Create default parameters, update with modified values, initialize FIMS,
 # and fit the model
-age_only_fit <- data_4_model |>
-  create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
+age_only_fit <- parameters_4_model |>
+  # remove rows that have module_type == LengthComp
+  dplyr::rows_delete(
+    y = tibble::tibble(module_type = "LengthComp")
   ) |>
-  # update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
@@ -339,28 +349,17 @@ clear()
 
 #### Length
 
-The same model can be fit to just the length data, removing the age data.
+The same model can be fit to just the length data, removing the age composition configurations.
 
 ```{r length}
-# Define fleet and survey with length-specific data distribution
-fleet1 <- survey1 <- list(
-  selectivity = list(form = "LogisticSelectivity"),
-  data_distribution = c(
-    Index = "DlnormDistribution",
-    Landings = "DlnormDistribution",
-    LengthComp = "DmultinomDistribution"
-  )
-)
-
 # Create default parameters, update with modified values, initialize FIMS,
 # and fit the model
-length_only_fit <- data_4_model |>
-  create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
+length_only_fit <- parameters_4_model |>
+  # remove rows that have module_type == AgeComp
+  dplyr::rows_delete(
+    y = tibble::tibble(module_type = "AgeComp")
   ) |>
-  update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-# cat(fit_output)
 clear()
 ```

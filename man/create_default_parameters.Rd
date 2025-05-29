@@ -2,74 +2,63 @@
 % Please edit documentation in R/create_default_parameters.R
 \name{create_default_parameters}
 \alias{create_default_parameters}
-\alias{update_parameters}
 \title{Create default parameters for a FIMS model}
 \usage{
-create_default_parameters(
-  data,
-  fleets,
-  recruitment = list(form = "BevertonHoltRecruitment", process_distribution = c(log_devs
-    = "DnormDistribution")),
-  growth = list(form = "EWAAgrowth"),
-  maturity = list(form = "LogisticMaturity")
-)
-
-update_parameters(current_parameters, modified_parameters)
+create_default_parameters(configurations, data)
 }
 \arguments{
+\item{configurations}{A tibble of model configurations. Typically created
+by \code{\link[=create_default_configurations]{create_default_configurations()}}. Users can modify this tibble
+to customize the model structure before generating default parameters.}
+
 \item{data}{An S4 object. FIMS input data.}
-
-\item{fleets}{A named list of settings for the fleet module. Each element of
-the list should specify a fleet's selectivity form and settings for the
-data distribution. If this argument is missing, default values will be
-applied for each fleet that is not specified but present in \code{data} based
-on the types of information present for that fleet.}
-
-\item{recruitment}{A list specifying the settings for the recruitment
-module. The default is a Beverton--Holt recruitment relationship with
-log-normal recruitment deviations.}
-
-\item{growth}{A list specifying the settings for the growth module. The
-default is \code{"EWAAgrowth"}.}
-
-\item{maturity}{A list specifying the settings for the maturity module. The
-default is \code{"LogisticMaturity"}.}
-
-\item{current_parameters}{A list containing the current input parameters, including:
-\describe{
-\item{\code{parameters}:}{A list of parameter inputs.}
-\item{\code{modules}:}{A list of module names used in the model.}
-}}
-
-\item{modified_parameters}{A named list representing new parameter values to update.}
 }
 \value{
-A list containing the following two entries:
+A \code{tibble} with default model parameters. The tibble has a nested
+structure with the following top-level columns.
 \describe{
-\item{\code{parameters}:}{A list of parameter inputs for the FIMS
-model.}
-\item{\code{modules}:}{A list of modules with default or user-provided
-settings.}
+\item{\code{model_family}:}{The specified model family (e.g.,
+"catch_at_age").}
+\item{\code{module_name}:}{The name of the FIMS module (e.g.,
+"Data", "Selectivity", "Recruitment", "Growth", "Maturity").}
+\item{\code{fleet_name}:}{The name of the fleet the module applies to. This
+will be \code{NA} for non-fleet-specific modules like "Recruitment".}
+\item{\code{data}:}{A list-column containing a \code{tibble} with detailed
+parameters. Unnesting this column reveals:
+\describe{
+\item{\code{module_type}:}{The specific type of the module (e.g.,
+"Logistic" for a "Selectivity" module).}
+\item{\code{label}:}{The name of the parameter (e.g., "inflection_point").}
+\item{\code{distribution_link}:}{The component the distribution module
+links to.}
+\item{\code{age}:}{The age the parameter applies to.}
+\item{\code{length}:}{The length bin the parameter applies to.}
+\item{\code{time}:}{The time step (i.e., year) the parameter applies to.}
+\item{\code{value}:}{The initial value of the parameter.}
+\item{\code{estimation_type}:}{The type of estimation (e.g.,
+"constant", "fixed_effects", "random_effects").}
+\item{\code{distribution_type}:}{The type of distribution (e.g., "Data",
+"process").}
+\item{\code{distribution}:}{The name of distribution (e.g.,
+"Dlnorm", \code{Dmultinom}).}
 }
-
-A list containing:
-\describe{
-\item{parameters}{A list of updated parameter inputs that
-includes any modifications made by the user.}
-\item{modules}{The unchanged list of module names from the current
-input.}
+}
 }
 }
 \description{
-This function generates default parameter settings for a Fisheries
-Integrated Modeling System (FIMS) model, including recruitment, growth,
-maturity, population, and fleet configurations. It applies default
-configurations when specific module settings are not provided by the user.
-
-This function updates the input parameters of a Fisheries Integrated
-Modeling System (FIMS) model. It allows users to modify specific parameters
-by providing new values, while retaining the existing modules information
-from the current input.
+This function generates a Fisheries Integrated Modeling System (FIMS) model
+configuration with detailed parameter specifications. This function takes a
+high-level configuration \code{tibble} and generates the corresponding parameters
+with default initial values and estimation settings required to build and run
+the model.
+}
+\details{
+The function processes the input \code{configurations} tibble, which defines the
+modules for different model components (e.g., \code{"Selectivity"}, \code{"Recruitment"}).
+For each module specified, it calls internal helper functions to create a
+default set of parameters. For example, if a fleet's selectivity is configured
+as \code{"Logistic"}, it generates initial values for \code{"inflection_point"} and
+\code{"slope"}.
 }
 \examples{
 \dontrun{
@@ -77,121 +66,48 @@ from the current input.
 data("data1")
 fims_frame <- FIMSFrame(data1)
 
-# Define fleets specifications for each fleet in the example dataset
-fleet1 <- survey1 <- list(
-  selectivity = list(form = "LogisticSelectivity"),
-  data_distribution = c(
-    Index = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution"
-  )
-)
+# Create default configurations
+default_configurations <- create_default_configurations(fims_frame)
 
-# Create a list of default parameters given the fleet specifications set up
-# above, recruitment, growth, and maturity specifications
-default_parameters <- fims_frame |>
-  create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1),
-    recruitment = list(
-      form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "DnormDistribution")
+# Create default parameters
+default_parameters <- create_default_parameters(
+  configurations = default_configurations,
+  data = fims_frame
+) |>
+  tidyr::unnest(cols = data)
+
+# Update selectivity parameters for survey1
+updated_parameters <- default_parameters |>
+  dplyr::rows_update(
+    dplyr::tibble(
+      fleet_name = "survey1",
+      label = c("inflection_point", "slope"),
+      value = c(1.5, 2)
     ),
-    growth = list(form = "EWAAgrowth"),
-    maturity = list(form = "LogisticMaturity")
+    by = c("fleet_name", "label")
   )
 
 # Do the same as above except, model fleet1 with double logistic selectivity
-# and do not specify the recruitment, growth, and maturity specifications
-# because everything specified above were default arguments
-parameters_with_double_logistic <- fims_frame |>
+# To see required parameters for double logistic selectivity, run
+# show(DoubleLogisticSelectivity)
+parameters_with_double_logistic <- default_configurations |>
+  tidyr::unnest(cols = data) |>
+  dplyr::rows_update(
+    dplyr::tibble(
+      module_name = "Selectivity",
+      fleet_name = "fleet1",
+      module_type = "DoubleLogistic"
+    ),
+  by = c("module_name", "fleet_name")
+  ) |>
   create_default_parameters(
-    fleets = list(
-      fleet1 = list(
-        selectivity = list(form = "DoubleLogisticSelectivity"),
-        data_distribution = c(
-          Index = "DlnormDistribution",
-          AgeComp = "DmultinomDistribution",
-          LengthComp = "DmultinomDistribution"
-        )
-      ),
-      survey1 = survey1
-    )
+    data = fims_frame
   )
-
-# Compare the parameters for fleet1 in each set up
-default_fleet1 <- purrr::map_df(
-  default_parameters[["parameters"]][["fleet1"]],
-  \(x) length(x)
-) |>
-  tidyr::pivot_longer(cols = tidyselect::everything())
-updated_fleet1 <- purrr::map_df(
-  parameters_with_double_logistic[["parameters"]][["fleet1"]],
-  \(x) length(x)
-) |>
-  tidyr::pivot_longer(cols = tidyselect::everything())
-dplyr::full_join(default_fleet1, updated_fleet1, by = "name")
-knitr::kable(dplyr::full_join(default_fleet1, updated_fleet1, by = "name"))
-}
-\dontrun{
-# Load the example dataset
-data("data1")
-fims_frame <- FIMSFrame(data1)
-
-# Define fleets specifications
-fleet1 <- survey1 <- list(
-  selectivity = list(form = "LogisticSelectivity"),
-  data_distribution = c(
-    Index = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution"
-  )
-)
-
-# Create default parameters for the specified fleets
-default_parameters <- fims_frame |>
-  create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
-  )
-
-updated_parameters <- default_parameters |>
-  update_parameters(
-    modified_parameters = list(
-      fleet1 = list(
-        Fleet.log_Fmort.value = log(c(
-          0.009459165, 0.027288858, 0.045063639,
-          0.061017825, 0.048600752, 0.087420554,
-          0.088447204, 0.186607929, 0.109008958,
-          0.132704335, 0.150615473, 0.161242955,
-          0.116640187, 0.169346119, 0.180191913,
-          0.161240483, 0.314573212, 0.257247574,
-          0.254887252, 0.251462108, 0.349101406,
-          0.254107720, 0.418478117, 0.345721184,
-          0.343685540, 0.314171227, 0.308026829,
-          0.431745298, 0.328030899, 0.499675368
-        ))
-      )
-    )
-  )
-
-# purrr::map_vec() can be used to compare the length of adjusted parameter
-# vectors with defaults for a specific module (e.g., fleet1)
-default_fleet1 <- purrr::map_vec(default_parameters[["parameters"]][["fleet1"]], \(x) length(x))
-updated_fleet1 <- purrr::map_vec(updated_parameters[["parameters"]][["fleet1"]], \(x) length(x))
-
-# purrr::map_df() can be used to summarize parameter vector lengths across all modules
-purrr::map_df(
-  updated_parameters[["parameters"]], \(x) purrr::map_vec(x, length),
-  .id = "module"
-) |>
-  tibble::column_to_rownames(var = "module") |>
-  t()
 }
 }
 \seealso{
 \itemize{
 \item \code{\link[=FIMSFrame]{FIMSFrame()}}
-\item \code{\link[=update_parameters]{update_parameters()}}
-}
-
-\itemize{
-\item \code{\link[=create_default_parameters]{create_default_parameters()}}
+\item \code{\link[=create_default_configurations]{create_default_configurations()}}
 }
 }

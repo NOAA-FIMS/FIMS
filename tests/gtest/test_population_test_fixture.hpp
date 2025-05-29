@@ -150,8 +150,8 @@ class PopulationEvaluateTestFixture : public testing::Test {
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
 
-    std::shared_ptr<fims_popdy::EWAAgrowth<double>> growth =
-        std::make_shared<fims_popdy::EWAAgrowth<double>>();
+    std::shared_ptr<fims_popdy::EWAAGrowth<double>> growth =
+        std::make_shared<fims_popdy::EWAAGrowth<double>>();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
     for (int i = 0; i < nages; i++) {
@@ -316,8 +316,8 @@ class PopulationPrepareTestFixture : public testing::Test {
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
 
-    std::shared_ptr<fims_popdy::EWAAgrowth<double>> growth =
-        std::make_shared<fims_popdy::EWAAgrowth<double>>();
+    std::shared_ptr<fims_popdy::EWAAGrowth<double>> growth =
+        std::make_shared<fims_popdy::EWAAGrowth<double>>();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
     for (int i = 0; i < nages; i++) {

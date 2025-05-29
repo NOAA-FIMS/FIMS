@@ -2,177 +2,216 @@
 #' Create default parameters for a FIMS model
 #'
 #' @description
-#' This function generates default parameter settings for a Fisheries
-#' Integrated Modeling System (FIMS) model, including recruitment, growth,
-#' maturity, population, and fleet configurations. It applies default
-#' configurations when specific module settings are not provided by the user.
+#' This function generates a Fisheries Integrated Modeling System (FIMS) model
+#' configuration with detailed parameter specifications. This function takes a
+#' high-level configuration `tibble` and generates the corresponding parameters
+#' with default initial values and estimation settings required to build and run
+#' the model.
+#'
+#' @details
+#' The function processes the input `configurations` tibble, which defines the
+#' modules for different model components (e.g., `"Selectivity"`, `"Recruitment"`).
+#' For each module specified, it calls internal helper functions to create a
+#' default set of parameters. For example, if a fleet's selectivity is configured
+#' as `"Logistic"`, it generates initial values for `"inflection_point"` and
+#' `"slope"`.
+#' 
+#' @param configurations A tibble of model configurations. Typically created
+#'   by [create_default_configurations()]. Users can modify this tibble
+#'   to customize the model structure before generating default parameters.
 #' @param data An S4 object. FIMS input data.
-#' @param fleets A named list of settings for the fleet module. Each element of
-#'   the list should specify a fleet's selectivity form and settings for the
-#'   data distribution. If this argument is missing, default values will be
-#'   applied for each fleet that is not specified but present in `data` based
-#'   on the types of information present for that fleet.
-#' @param recruitment A list specifying the settings for the recruitment
-#'   module. The default is a Beverton--Holt recruitment relationship with
-#'   log-normal recruitment deviations.
-#' @param growth A list specifying the settings for the growth module. The
-#'   default is `"EWAAgrowth"`.
-#' @param maturity A list specifying the settings for the maturity module. The
-#'   default is `"LogisticMaturity"`.
-#' @return
-#' A list containing the following two entries:
+#' @return A `tibble` with default model parameters. The tibble has a nested
+#'   structure with the following top-level columns.
 #' \describe{
-#'   \item{\code{parameters}:}{A list of parameter inputs for the FIMS
-#'     model.}
-#'   \item{\code{modules}:}{A list of modules with default or user-provided
-#'     settings.}
+#'   \item{\code{model_family}:}{The specified model family (e.g.,
+#'     "catch_at_age").}
+#'   \item{\code{module_name}:}{The name of the FIMS module (e.g.,
+#'     "Data", "Selectivity", "Recruitment", "Growth", "Maturity").}
+#'   \item{\code{fleet_name}:}{The name of the fleet the module applies to. This
+#'     will be `NA` for non-fleet-specific modules like "Recruitment".}
+#'   \item{\code{data}:}{A list-column containing a `tibble` with detailed
+#'     parameters. Unnesting this column reveals:
+#'     \describe{
+#'       \item{\code{module_type}:}{The specific type of the module (e.g.,
+#'         "Logistic" for a "Selectivity" module).}
+#'       \item{\code{label}:}{The name of the parameter (e.g., "inflection_point").}
+#'       \item{\code{distribution_link}:}{The component the distribution module
+#'         links to.}
+#'       \item{\code{age}:}{The age the parameter applies to.}
+#'       \item{\code{length}:}{The length bin the parameter applies to.}
+#'       \item{\code{time}:}{The time step (i.e., year) the parameter applies to.}
+#'       \item{\code{value}:}{The initial value of the parameter.}
+#'       \item{\code{estimation_type}:}{The type of estimation (e.g.,
+#'         "constant", "fixed_effects", "random_effects").}
+#'       \item{\code{distribution_type}:}{The type of distribution (e.g., "Data",
+#'         "process").}
+#'       \item{\code{distribution}:}{The name of distribution (e.g.,
+#'         "Dlnorm", `Dmultinom`).}
+#'     }
+#'   }
 #' }
 #' @export
 #' @seealso
 #' * [FIMSFrame()]
-#' * [update_parameters()]
+#' * [create_default_configurations()]
 #' @examples
 #' \dontrun{
 #' # Load the example dataset and create a FIMS data frame
 #' data("data1")
 #' fims_frame <- FIMSFrame(data1)
 #'
-#' # Define fleets specifications for each fleet in the example dataset
-#' fleet1 <- survey1 <- list(
-#'   selectivity = list(form = "LogisticSelectivity"),
-#'   data_distribution = c(
-#'     Index = "DlnormDistribution",
-#'     AgeComp = "DmultinomDistribution"
-#'   )
-#' )
+#' # Create default configurations
+#' default_configurations <- create_default_configurations(fims_frame)
+#' 
+#' # Create default parameters
+#' default_parameters <- create_default_parameters(
+#'   configurations = default_configurations,
+#'   data = fims_frame
+#' ) |>
+#'   tidyr::unnest(cols = data)
 #'
-#' # Create a list of default parameters given the fleet specifications set up
-#' # above, recruitment, growth, and maturity specifications
-#' default_parameters <- fims_frame |>
-#'   create_default_parameters(
-#'     fleets = list(fleet1 = fleet1, survey1 = survey1),
-#'     recruitment = list(
-#'       form = "BevertonHoltRecruitment",
-#'       process_distribution = c(log_devs = "DnormDistribution")
+#' # Update selectivity parameters for survey1
+#' updated_parameters <- default_parameters |>
+#'   dplyr::rows_update(
+#'     dplyr::tibble(
+#'       fleet_name = "survey1",
+#'       label = c("inflection_point", "slope"),
+#'       value = c(1.5, 2)
 #'     ),
-#'     growth = list(form = "EWAAgrowth"),
-#'     maturity = list(form = "LogisticMaturity")
+#'     by = c("fleet_name", "label")
 #'   )
 #'
 #' # Do the same as above except, model fleet1 with double logistic selectivity
-#' # and do not specify the recruitment, growth, and maturity specifications
-#' # because everything specified above were default arguments
-#' parameters_with_double_logistic <- fims_frame |>
+#' # To see required parameters for double logistic selectivity, run
+#' # show(DoubleLogisticSelectivity)
+#' parameters_with_double_logistic <- default_configurations |>
+#'   tidyr::unnest(cols = data) |>
+#'   dplyr::rows_update(
+#'     dplyr::tibble(
+#'       module_name = "Selectivity",
+#'       fleet_name = "fleet1",
+#'       module_type = "DoubleLogistic"
+#'     ),
+#'   by = c("module_name", "fleet_name")
+#'   ) |>
 #'   create_default_parameters(
-#'     fleets = list(
-#'       fleet1 = list(
-#'         selectivity = list(form = "DoubleLogisticSelectivity"),
-#'         data_distribution = c(
-#'           Index = "DlnormDistribution",
-#'           AgeComp = "DmultinomDistribution",
-#'           LengthComp = "DmultinomDistribution"
-#'         )
-#'       ),
-#'       survey1 = survey1
-#'     )
+#'     data = fims_frame
 #'   )
-#'
-#' # Compare the parameters for fleet1 in each set up
-#' default_fleet1 <- purrr::map_df(
-#'   default_parameters[["parameters"]][["fleet1"]],
-#'   \(x) length(x)
-#' ) |>
-#'   tidyr::pivot_longer(cols = tidyselect::everything())
-#' updated_fleet1 <- purrr::map_df(
-#'   parameters_with_double_logistic[["parameters"]][["fleet1"]],
-#'   \(x) length(x)
-#' ) |>
-#'   tidyr::pivot_longer(cols = tidyselect::everything())
-#' dplyr::full_join(default_fleet1, updated_fleet1, by = "name")
-#' knitr::kable(dplyr::full_join(default_fleet1, updated_fleet1, by = "name"))
 #' }
 create_default_parameters <- function(
-    data,
-    fleets,
-    recruitment = list(
-      form = "BevertonHoltRecruitment",
-      process_distribution = c(log_devs = "DnormDistribution")
-    ),
-    # TODO: Rename EWAAgrowth to not use an acronym
-    growth = list(form = "EWAAgrowth"),
-    maturity = list(form = "LogisticMaturity")) {
+    configurations,
+    data
+) {
   # FIXME: use default values if there are no fleets info passed into the
   # function or a fleet is not present but it has data? Maybe we don't want the
   # latter because it could be that we want to drop a fleet from a model but we
   # don't want to alter the data?
-
-  # Check for fleet names that do not match those in the data object
-  fleet_names <- names(fleets)
-  mismatch_fleet_names <- fleet_names[
-    !(fleet_names %in% unique(dplyr::pull(get_data(data), name)))
-  ]
-  if (length(mismatch_fleet_names) > 0) {
-    cli::cli_abort(c(
-      "i" = "The name of the fleets for selectivity settings must match
-            the fleet names present in the {.var data}.",
-      "x" = "The following {length(mismatch_fleet_names)} fleet name{?s}
-            {?is/are} missing from the data: {mismatch_fleet_names}."
-    ))
+  
+  # Check if configurations is a nested tibble. If so, unnest configurations
+  if ("data" %in% names(configurations)) {
+    unnested_configurations <- tidyr::unnest(configurations, cols = data)
+  } else {
+    unnested_configurations <- configurations
   }
-
-  # Create module list
-  module_list <- list(
-    fleets = fleets,
-    recruitment = recruitment,
-    growth = growth,
-    maturity = maturity
-  )
-
+  
   # Create fleet parameters
-  fleet_temp <- list()
-  for (i in seq_along(fleets)) {
-    fleet_temp <- c(
-      fleet_temp,
+  fleet_names <- unnested_configurations |>
+    dplyr::pull(fleet_name) |>
+    na.omit() |>
+    unique()
+  fleet_temp <- purrr::map(
+    fleet_names,
+    function(fleet_name_i) {
       create_default_fleet(
-        fleets = fleets,
-        fleet_name = names(fleets)[i],
+        unnested_configurations = unnested_configurations,
+        current_fleet_name = fleet_name_i,
         data = data
       )
-    )
-  }
+    }
+  ) |>
+    # bind_rows now directly takes the list of tibbles from map()
+    dplyr::bind_rows()
 
   # Create recruitment parameters
   recruitment_temp <- create_default_recruitment(
-    recruitment = recruitment,
-    data = data,
-    input_type = recruitment[["form"]]
+    unnested_configurations = unnested_configurations,
+    data = data
   )
 
   # Create maturity parameters
-  maturity_temp <- create_default_maturity(form = maturity$form)
+  maturity_temp <- create_default_maturity(
+    unnested_configurations = unnested_configurations,
+    data = data
+  )
 
   # Create population parameters
   # Handle population parameters based on recruitment form
-  if (recruitment[["form"]] == "BevertonHoltRecruitment") {
-    log_rzero <- recruitment_temp[["recruitment"]][[
-      paste0(recruitment[["form"]], ".log_rzero.value")
-    ]]
-  }
-  population_temp <- create_default_Population(data, log_rzero)
-
-  # Compile output
-  output <- list(
-    parameters = c(
-      fleet_temp,
-      recruitment_temp,
-      maturity_temp,
-      population_temp
-    ),
-    modules = module_list
+  log_rzero <- recruitment_temp |>
+    dplyr::filter(label == "log_rzero") |>
+    dplyr::pull(value)
+    
+  population_temp <- create_default_Population(
+    unnested_configurations = unnested_configurations,
+    data,
+    log_rzero = log_rzero
   )
-  return(output)
+
+  # Compile temps
+  temp <- dplyr::bind_rows(
+    fleet_temp,
+    recruitment_temp,
+    maturity_temp,
+    population_temp
+  )
+  # Merge with configuration_unnest
+  expanded_configurations <- dplyr::full_join(
+    temp,
+    unnested_configurations, 
+    by = c("module_name", "fleet_name", "module_type", "distribution_link")
+  ) |>
+    dplyr::mutate(
+      model_family = dplyr::coalesce(model_family.y, model_family.x),
+      distribution_type = dplyr::coalesce(distribution_type.y, distribution_type.x),
+      distribution = dplyr::coalesce(distribution.y, distribution.x)
+    ) |>
+    dplyr::select(-dplyr::ends_with(c(".x", ".y"))) |>
+    tidyr::fill(model_family) |>
+    dplyr::select(
+      model_family, module_name, module_type, label, distribution_link, dplyr::everything()
+    ) |>
+    tidyr::nest(.by = c(model_family, module_name, fleet_name))
 }
 
+#' Create default parameters for a FIMS model
+#' @description
+#' This function creates a template for default parameters used in a Fisheries
+#' Integrated Modeling System (FIMS) model. The template includes fields for
+#' module name, module type, label, fleet name, population name, age, length,
+#' time, value, estimation type, distribution type, and distribution.
+#' @param n_parameters An integer specifying the number of parameters in the template.
+#' @return
+#' A tibble template for a FIMS model.
+#' @noRd
+#' @examples
+#' FIMS:::reate_default_parameters_template(n_parameters = 3)
+create_default_parameters_template <- function(n_parameters = 1) {
+  template <- dplyr::tibble(
+    model_family = NA_character_,
+    module_name = NA_character_,
+    module_type = NA_character_,
+    label = NA_character_,
+    distribution_link = NA_character_,
+    fleet_name = NA_character_,
+    age = NA_real_,
+    length = NA_real_,
+    time = NA_integer_,
+    value = NA_real_,
+    estimation_type = NA_character_,
+    distribution_type = NA_character_,
+    distribution = NA_character_
+  ) |>
+    dplyr::slice(rep(1, each = n_parameters))
+}
 
 #' Create default population parameters
 #'
@@ -181,14 +220,20 @@ create_default_parameters <- function(
 #' @details
 #' The natural log of the initial numbers at age (`log_init_naa.value`) is set based on
 #' unexploited recruitment and natural mortality.
+#' @param unnested_configurations A tibble of model configurations. Typically created
+#'   by the `create_default_configurations()`.
 #' @param data An S4 object. FIMS input data.
 #' @param log_rzero A numeric value representing the natural log of unexploited
 #'   recruitment.
 #' @return
-#' A named list of default population parameters, including initial numbers at
+#' A tibble of default population parameters, including initial numbers at
 #' age and natural mortality rate.
 #' @noRd
-create_default_Population <- function(data, log_rzero) {
+create_default_Population <- function(
+    unnested_configurations,
+    data,
+    log_rzero
+) {
   # Input checks
   # Check if log_rzero is numeric
   if (!is.numeric(log_rzero) || length(log_rzero) != 1) {
@@ -214,19 +259,24 @@ create_default_Population <- function(data, log_rzero) {
   init_naa[n_ages] <- init_naa[n_ages] / M_value # sum of infinite series
 
   # Create a list of default parameters
-  default <- list(
-    log_M.value = rep(log(M_value), n_years * n_ages),
-    log_M.estimation_type = "constant",
-    log_init_naa.value = log(init_naa),
-    log_init_naa.estimation_type = "fixed_effects"
-  )
-
-  # Name the list elements
-  names(default) <- paste0("Population.", names(default))
-  # Wrap the default parameters in a population list for output
-  population_list <- list(default)
-  names(population_list) <- "population"
-  return(population_list)
+  default <- create_default_parameters_template(
+    n_parameters = n_years * n_ages
+  ) |>
+    # Add the module type, label, value, and estimation type
+    dplyr::mutate(
+      label = "log_M",
+      value = log(M_value),
+      estimation_type = "constant"
+    ) |>
+    dplyr::add_row(
+      label = "log_init_naa",
+      age = get_ages(data),
+      value = log(init_naa),
+      estimation_type = "fixed_effects"
+    ) |>
+    dplyr::mutate(
+      module_name = "Population"
+    )
 }
 
 #' Create default logistic parameters
@@ -235,17 +285,20 @@ create_default_Population <- function(data, log_rzero) {
 #' This function sets up default parameters for a logistic function. There are
 #' two specified parameters, the inflection point and slope.
 #' @return
-#' A list containing the default logistic parameters, with inflection_point and
+#' A tibble containing the default logistic parameters, with inflection_point and
 #' slope values and their estimation status.
 #' @noRd
 create_default_Logistic <- function() {
-  default <- list(
-    inflection_point.value = 2,
-    inflection_point.estimation_type = "fixed_effects",
-    slope.value = 1,
-    slope.estimation_type = "fixed_effects"
-  )
-  return(default)
+
+  # Create a template for default parameters
+  default <- create_default_parameters_template(n_parameters = 2) |>
+    # Add the module type, label, value, and estimation type
+    dplyr::mutate(
+      module_type = "Logistic",
+      label = c("inflection_point", "slope"),
+      value = c(2, 1),
+      estimation_type = "fixed_effects"
+    )
 }
 
 #' Create default double logistic parameters
@@ -255,23 +308,20 @@ create_default_Logistic <- function() {
 #' There four specified parameters, two for the ascending and two for the
 #' descending inflection points and slopes.
 #' @return
-#' A list containing the default double logistic parameters,
+#' A tibble containing the default double logistic parameters,
 #' inflection_point_asc, slope_asc, inflection_point_desc, and slope_desc
 #' values and their estimation status.
 #' @noRd
-create_default_DoubleLogistic <- function() {
-  logistic_defaults <- create_default_Logistic()
-  default <- structure(
-    rep(logistic_defaults, 2),
-    names = c(
-      gsub("\\.", "_asc.", names(logistic_defaults)),
-      gsub("\\.", "_desc.", names(logistic_defaults))
+create_default_DoubleLogistic <- function(module_name = NA_character_) {
+  default <- create_default_parameters_template(n_parameters = 4) |>
+    dplyr::mutate(
+      module_name = !!module_name,
+      module_type = "DoubleLogistic",
+      label = c("inflection_point_asc", "slope_asc", "inflection_point_desc", "slope_desc"),
+      # TODO: Determine if inflection_point_desc should really be 4?
+      value = c(2, 1, 4, 1),
+      estimation_type = "fixed_effects"
     )
-  )
-  # TODO: Determine if this should really be 4?
-  default[["inflection_point_desc.value"]] <- 4
-
-  return(default)
 }
 
 #' Create default selectivity parameters
@@ -283,23 +333,23 @@ create_default_DoubleLogistic <- function() {
 #'   and the default is
 #'   `r toString(formals(create_default_selectivity)[["form"]][1])`.
 #' @return
-#' A list is returned with the default parameter values for the specified form
+#' A tibble is returned with the default parameter values for the specified form
 #' of selectivity.
 #' @noRd
 create_default_selectivity <- function(
-    form = c("LogisticSelectivity", "DoubleLogisticSelectivity")) {
+    form = c("Logistic", "DoubleLogistic")) {
   # Input checks
   form <- rlang::arg_match(form)
   # NOTE: All new forms of selectivity must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
   default <- switch(form,
-    "LogisticSelectivity" = create_default_Logistic(),
-    "DoubleLogisticSelectivity" = create_default_DoubleLogistic()
-  )
-  names(default) <- paste0(form, ".", names(default))
-
-  return(default)
+    "Logistic" = create_default_Logistic(),
+    "DoubleLogistic" = create_default_DoubleLogistic()
+  ) |>
+    dplyr::mutate(
+      module_name = "Selectivity"
+    )
 }
 
 #' Create default fleet parameters
@@ -309,145 +359,186 @@ create_default_selectivity <- function(
 #' selectivity parameters along with distributions for each type of data that
 #' are present for the given fleet.
 #'
-#' @param fleets A list of fleet configurations.
+#' @param unnested_configurations A tibble of model configurations. Typically
+#'   created by the `create_default_configurations()`.
 #' @param fleet_name A character. Name of the fleet.
 #' @param data An S4 object. FIMS input data.
 #' @return
-#' A list with default parameters for the fleet.
+#' A tibble with default parameters for the fleet.
 #' @noRd
-create_default_fleet <- function(fleets,
-                                 fleet_name,
+create_default_fleet <- function(unnested_configurations,
+                                 current_fleet_name,
                                  data) {
   # Input checks
-  if (length(fleet_name) > 1) {
+  if (length(current_fleet_name) > 1) {
     cli::cli_abort(c(
-      "i" = "{.var fleet_name} should have a length of 1.",
-      "x" = "{.var fleet_name} has a length of {length(fleet_name)}."
+      "i" = "{.var current_fleet_name} should have a length of 1.",
+      "x" = "{.var current_fleet_name} has a length of {length(current_fleet_name)}."
     ))
   }
-  if (!inherits(fleet_name, "character")) {
+  if (!inherits(current_fleet_name, "character")) {
     cli::cli_abort(c(
-      "i" = "{.var fleet_name} should be a string.",
-      "x" = "{.var fleet_name} is a {class(fleet_name)}."
-    ))
-  }
-  if (!fleet_name %in% names(fleets)) {
-    cli::cli_abort(c(
-      "i" = "{.var fleet_name} should be present in the names of {.var fleets}.",
-      "x" = "{.var {fleet_name}} is not in {names(fleets)}."
+      "i" = "{.var current_fleet_name} should be a string.",
+      "x" = "{.var current_fleet_name} is a {class(current_fleet_name)}."
     ))
   }
 
   # Create default selectivity parameters
+  selectivity_form <- unnested_configurations |>
+    dplyr::filter(fleet_name == current_fleet_name & module_name == "Selectivity") |>
+    dplyr::pull(module_type)
+
   selectivity_default <- create_default_selectivity(
-    form = fleets[[fleet_name]][["selectivity"]][["form"]]
-  )
+    form = selectivity_form
+  ) |>
+    # Add fleet name
+    dplyr::mutate(
+      fleet_name = current_fleet_name
+    )
 
   # Get types of data for this fleet from the data object
   data_types_present <- get_data(data) |>
-    dplyr::filter(name == fleet_name) |>
+    dplyr::filter(name == current_fleet_name) |>
     dplyr::pull(type) |>
     unique()
 
   # Get data likelihood distributions assigned for this fleet
-  distribution_names_for_fleet <- names(fleets[[fleet_name]][["data_distribution"]])
+  distribution_names_for_fleet <- unnested_configurations |>
+    dplyr::filter(fleet_name == current_fleet_name & module_name == "Data") |>
+    dplyr::pull(module_type)
 
   # Determine default fleet parameters based on types of data present
   if ("index" %in% data_types_present &&
     "Index" %in% distribution_names_for_fleet) {
-    q_default <- list(
-      log_q.value = 0,
-      log_q.estimation_type = "fixed_effects"
-    )
 
-    index_distribution <- fleets[[fleet_name]][["data_distribution"]]["Index"]
+    fleet_index <- get_data(data) |> 
+      dplyr::filter(type == "index" & name == current_fleet_name)
+
+    q_default <- create_default_parameters_template(n_parameters = 1) |>
+      dplyr::mutate(
+        module_name = "Fleet",
+        label = "log_q",
+        fleet_name = current_fleet_name,
+        value = 0,
+        estimation_type = "fixed_effects"
+      )
+
+    index_distribution <- unnested_configurations |>
+      dplyr::filter(
+        fleet_name == current_fleet_name & module_name == "Data" & module_type == "Index"
+      ) |>
+      dplyr::pull(distribution)
 
     index_uncertainty <- get_data(data) |>
-      dplyr::filter(name == fleet_name, type %in% c("index")) |>
+      dplyr::filter(name == current_fleet_name, type %in% c("index")) |>
       dplyr::arrange(dplyr::desc(type)) |>
       dplyr::pull(uncertainty)
 
     index_distribution_default <- switch(index_distribution,
-      "DnormDistribution" = create_default_DnormDistribution(
+      "Dnorm" = create_default_DnormDistribution(
         value = index_uncertainty,
         input_type = "data",
         data = data
       ),
-      "DlnormDistribution" = create_default_DlnormDistribution(
+      "Dlnorm" = create_default_DlnormDistribution(
         value = index_uncertainty,
         input_type = "data",
         data = data
       )
-    )
-    names(index_distribution_default) <- paste0(
-      index_distribution,
-      ".",
-      names(index_distribution_default)
-    )
+    ) |>
+      dplyr::mutate(
+        module_name = "Data",
+        module_type = "Index",
+        distribution_link = "Index",
+        fleet_name = current_fleet_name,
+        time = fleet_index[["year"]]
+      )
   } else {
-    q_default <- list(
-      log_q.value = 0,
-      log_q.estimation_type = "constant"
-    )
-
+    q_default <- create_default_parameters_template(n_parameters = 1) |>
+      dplyr::mutate(
+        module_name = "Fleet",
+        label = "log_q",
+        fleet_name = current_fleet_name,
+        value = 0,
+        estimation_type = "constant"
+      )
     index_distribution_default <- NULL
   }
 
-  names(q_default) <- paste0("Fleet.", names(q_default))
-
   if ("landings" %in% data_types_present &&
     "Landings" %in% distribution_names_for_fleet) {
-    log_Fmort_default <- list(
-      log_Fmort.value = rep(-3, get_n_years(data)),
-      log_Fmort.estimation_type = "fixed_effects"
-    )
 
-    landings_distribution <- fleets[[fleet_name]][["data_distribution"]]["Landings"]
+    fleet_landings <- get_data(data) |>
+      dplyr::filter(type == "landings" & name == current_fleet_name)
+
+    log_Fmort_default <- create_default_parameters_template(
+      n_parameters = get_n_years(data)
+    ) |>
+      dplyr::mutate(
+        module_name = "Fleet",
+        label = "log_Fmort",
+        fleet_name = current_fleet_name,
+        time = get_start_year(data):get_end_year(data),
+        value = -3,
+        estimation_type = "fixed_effects"
+      )
+
+    landings_distribution <-  unnested_configurations |>
+      dplyr::filter(fleet_name == current_fleet_name & module_name == "Data" & module_type == "Landings") |>
+      dplyr::pull(distribution)
 
     landings_uncertainty <- get_data(data) |>
-      dplyr::filter(name == fleet_name, type %in% c("landings")) |>
+      dplyr::filter(name == current_fleet_name, type %in% c("landings")) |>
       dplyr::arrange(dplyr::desc(type)) |>
       dplyr::pull(uncertainty)
 
     landings_distribution_default <- switch(landings_distribution,
-      "DnormDistribution" = create_default_DnormDistribution(
+      "Dnorm" = create_default_DnormDistribution(
         value = landings_uncertainty,
         input_type = "data",
         data = data
       ),
-      "DlnormDistribution" = create_default_DlnormDistribution(
+      "Dlnorm" = create_default_DlnormDistribution(
         value = landings_uncertainty,
         input_type = "data",
         data = data
       )
-    )
-    names(landings_distribution_default) <- paste0(
-      landings_distribution,
-      ".",
-      names(landings_distribution_default)
-    )
+    ) |>
+      dplyr::mutate(
+        module_name = "Data",
+        module_type = "Landings",
+        distribution_link = "Landings",
+        fleet_name = current_fleet_name,
+        time = fleet_landings[["year"]]
+      )
+
   } else {
-    log_Fmort_default <- list(
-      log_Fmort.value = rep(-200, get_n_years(data)),
-      log_Fmort.estimation_type = "constant"
-    )
+    fleet_index <- get_data(data) |>
+      dplyr::filter(type == "index" & name == current_fleet_name)
+
+    log_Fmort_default <- create_default_parameters_template(
+      n_parameters = get_n_years(data)
+    ) |>
+      dplyr::mutate(
+        module_name = "Fleet",
+        label = "log_Fmort",
+        fleet_name = current_fleet_name,
+        time = get_start_year(data):get_end_year(data),
+        value = -200,
+        estimation_type = "constant"
+      )
 
     landings_distribution_default <- NULL
   }
 
-  names(log_Fmort_default) <- paste0("Fleet.", names(log_Fmort_default))
-
   # Compile all default parameters into a single list
-  default <- list(c(
+  default <- dplyr::bind_rows(
     selectivity_default,
     q_default,
     log_Fmort_default,
     index_distribution_default,
     landings_distribution_default
-  ))
-
-  names(default) <- fleet_name
-  return(default)
+  )
 }
 
 #' Create default maturity parameters
@@ -455,25 +546,39 @@ create_default_fleet <- function(fleets,
 #' @description
 #' This function sets up default parameters for a maturity module.
 #' @param form A string specifying the form of maturity (e.g.,
-#' `"LogisticMaturity"`).
+#' `"Logistic"`).
 #' @return
-#' A list containing the default maturity parameters.
+#' A tibble containing the default maturity parameters.
 #' @noRd
-create_default_maturity <- function(form = c("LogisticMaturity")) {
+create_default_maturity <- function(
+    unnested_configurations,
+    data
+) {
   # Input checks
-  form <- rlang::arg_match(form)
+  available_forms <- c("Logistic")
+  form <- unnested_configurations |>
+      dplyr::filter(module_name == "Maturity") |>
+      dplyr::pull(module_type)
+  if (!form %in% available_forms) {
+    cli::cli_abort(c(
+      "Invalid `module_type`` for Maturity: {.var {form}}",
+      "i" = "Valid options include: {.var {available_forms}}"
+    ))
+  }
 
   # NOTE: All new forms of maturity must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
-  default <- list(
-    "maturity" = switch(form,
-      "LogisticMaturity" = create_default_Logistic()
-    )
+  default <- switch(form,
+    "Logistic" = create_default_Logistic()
+  ) |>
+  # We don't have an option to input maturity data into FIMS, so the maturity 
+  # parameters aren't really estimable. The parameters should be constant for now.
+  # See more details from https://github.com/orgs/NOAA-FIMS/discussions/944.
+  dplyr::mutate(
+    estimation_type = "constant",
+    module_name = "Maturity"
   )
-  names(default[["maturity"]]) <- paste0(form, ".", names(default[["maturity"]]))
-
-  return(default)
 }
 
 #' Create default Beverton--Holt recruitment parameters
@@ -486,23 +591,71 @@ create_default_maturity <- function(form = c("LogisticMaturity")) {
 #' deviations on the natural log scale.
 #' @param data An S4 object. FIMS input data.
 #' @return
-#' A list containing default recruitment parameters.
+#' A tibble containing default recruitment parameters.
 #' @noRd
 create_default_BevertonHoltRecruitment <- function(data) {
   # Create default parameters for Beverton--Holt recruitment
-  default <- list(
-    log_rzero.value = log(1e+06),
-    log_rzero.estimation_type = "fixed_effects",
-    log_r.value = rep(0.0, get_n_years(data) - 1),
-    log_r.estimation_type = "constant",
-    logit_steep.value = -log(1.0 - 0.75) + log(0.75 - 0.2),
-    logit_steep.estimation_type = "constant",
-    log_devs.value = rep(0.0, get_n_years(data) - 1),
-    log_devs.estimation_type = "fixed_effects",
-    log_expected_recruitment.value = rep(0.0, get_n_years(data) + 1),
-    log_expected_recruitment.estimation_type = "constant"
-  )
-  return(default)
+  log_rzero <- create_default_parameters_template(
+    n_parameters = 1
+  ) |>
+    dplyr::mutate(
+      label = "log_rzero",
+      value = log(1e+06),
+      estimation_type = "fixed_effects"
+    )
+  logit_steep <- create_default_parameters_template(
+    n_parameters = 1
+  ) |>
+    dplyr::mutate(
+      label = "logit_steep",
+      value = -log(1.0 - 0.75) + log(0.75 - 0.2),
+      estimation_type = "constant"
+    )
+  
+  # TODO: Revisit the settings for log_r. Do we must set up log_r when
+  # it is not random effect parameters?
+  log_r <- create_default_parameters_template(
+    n_parameters = get_n_years(data) - 1
+  ) |>
+    dplyr::mutate(
+      # TODO: should this be LogRecDev to match output?
+      label = "log_r",
+      value = 0.0,
+      time = (get_start_year(data) + 1):get_end_year(data),
+      estimation_type = "constant"
+    )
+  
+  log_devs <- create_default_parameters_template(
+    n_parameters = get_n_years(data) - 1
+  ) |>
+    dplyr::mutate(
+      # TODO: should this be LogRecDev to match output?
+      label = "log_devs",
+      value = 0.0,
+      time = (get_start_year(data) + 1):get_end_year(data),
+      estimation_type = "fixed_effects"
+    )
+
+  expected_recruitment <- create_default_parameters_template(
+    n_parameters = get_n_years(data) + 1
+  ) |>
+    dplyr::mutate(
+      label = "log_expected_recruitment",
+      value = 0.0,
+      estimation_type = "constant"
+    )
+
+  default <- dplyr::bind_rows(
+    log_rzero,
+    logit_steep,
+    log_r,
+    log_devs,
+    expected_recruitment
+  ) |>
+    dplyr::mutate(
+      module_name = "Recruitment",
+      module_type = "BevertonHolt"
+    )
 }
 
 #' Create default DnormDistribution parameters
@@ -519,7 +672,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
 #'   The default is
 #'   `r toString(formals(create_default_DnormDistribution)[["input_type"]][1])`.
 #' @return
-#' A list of default parameters for DnormDistribution.
+#' A tibble of default parameters for Dnorm distribution.
 #' @noRd
 create_default_DnormDistribution <- function(
     value = 0.1,
@@ -529,25 +682,39 @@ create_default_DnormDistribution <- function(
   input_type <- rlang::arg_match(input_type)
 
   # Create default parameters
-  default <- list(
-    log_sd.value = value,
-    log_sd.estimation_type = "constant"
-  )
-
+  default <- create_default_parameters_template(
+    n_parameters = length(value)
+  ) |>
+    # Add the module type and label
+    dplyr::mutate(
+      label = "log_sd",
+      value = !!value,
+      estimation_type = "constant",
+      distribution_type = input_type,
+      distribution = "Dnorm"
+    )
 
   # If input_type is 'process', add additional parameters
   if (input_type == "process" | input_type == "prior") {
-    default <- c(
-      default,
-      list(
-        x.value = rep(0, get_n_years(data)),
-        x.estimation_type = "constant",
-        expected_values.value = rep(0, get_n_years(data)),
-        expected_values.estimation_type = "constant"
+    new_params <- create_default_parameters_template(
+      n_parameters = length(value)
+    ) |>
+      dplyr::mutate(label = "x", value = 0) |>
+      dplyr::add_row(
+        label = "expected_values",
+        value = rep(0, length(value))
+      ) |>
+      dplyr::mutate(
+        estimation_type = "constant",
+        distribution_type = input_type,
+        distribution = "Dnorm"
       )
+
+    default <- dplyr::bind_rows(
+      default,
+      new_params
     )
   }
-  return(default)
 }
 
 #' Create default DlnormDistribution parameters
@@ -563,7 +730,7 @@ create_default_DnormDistribution <- function(
 #'   The default is
 #'   `r toString(formals(create_default_DlnormDistribution)[["input_type"]][1])`.
 #' @return
-#' A list of default parameters for DlnormDistribution.
+#' A tibble of default parameters for Dlnorm distribution.
 #' @noRd
 create_default_DlnormDistribution <- function(
     value = 0.1,
@@ -578,25 +745,33 @@ create_default_DlnormDistribution <- function(
     ))
   }
   input_type <- rlang::arg_match(input_type)
-
+  
+  log_value <- log(value)
   # Create the default list with log standard deviation
-  default <- list(
-    log_sd.value = log(value),
-    log_sd.estimation_type = "constant"
-  )
+  default <- create_default_parameters_template(
+    n_parameters = get_n_years(data)
+  ) |>
+    # Add the module label and value
+    dplyr::mutate(
+      label = "log_sd",
+      value = log_value
+    )
 
   # Add additional parameters if input_type is "process"
   if (input_type == "process") {
-    default <- c(
-      default,
-      list(
-        x.value = rep(0, get_n_years(data)),
-        x.estimation_type = "constant",
-        expected_values.value = rep(0, get_n_years(data)),
-        expected_values.estimation_type = "constant"
+    default <- default |>
+      dplyr::add_row(
+        label = "x",
+        value = rep(0, get_n_years(data))
       )
-    )
   }
+
+  default <- default |>
+    dplyr::mutate(
+      estimation_type = "constant",
+      distribution_type = input_type,
+      distribution = "Dlnorm"
+    )
   return(default)
 }
 
@@ -605,247 +780,67 @@ create_default_DlnormDistribution <- function(
 #' @description
 #' This function sets up default parameters for a recruitment module.
 #'
-#' @param recruitment A list with recruitment details, including form and
-#'   process distribution type.
+#' @param unnested_configurations A tibble of model configurations. Typically
+#'   created by the `create_default_configurations()`.
 #' @param data An S4 object. FIMS input data.
-#' @param input_type A string specifying the type of recruitment you want to
-#'   use. The available options are
-#'   `r toString(formals(create_default_recruitment)[["input_type"]])`. The
-#'   default is
-#'   `r toString(formals(create_default_recruitment)[["input_type"]][1])`.
 #' @return
-#' A list with the default parameters for recruitment.
+#' A tibble with the default parameters for recruitment.
 #' @noRd
 create_default_recruitment <- function(
-    recruitment,
-    data,
-    input_type = "BevertonHoltRecruitment") {
+    unnested_configurations,
+    data) {
   # Input checks
-  if (!is.list(recruitment)) {
+  available_forms <- c("BevertonHolt")
+  form <- unnested_configurations |>
+    dplyr::filter(module_name == "Recruitment") |>
+    dplyr::pull(module_type)
+  if (!form %in% available_forms) {
     cli::cli_abort(c(
-      "i" = "The {.var recruitment} argument must be a list.",
-      "x" = "{.var recruitment} is a {class(recruitment)}."
+      "Invalid `module_type` for Recruitment: {.var {form}}",
+      "i" = "Valid options include: {.var {available_forms}}"
     ))
   }
-  form <- rlang::arg_match(input_type)
   # Create default parameters based on the recruitment form
   # NOTE: All new forms of recruitment must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
   form_default <- switch(form,
-    "BevertonHoltRecruitment" = create_default_BevertonHoltRecruitment(data)
+    "BevertonHolt" = create_default_BevertonHoltRecruitment(data)
   )
-  names(form_default) <- paste0(form, ".", names(form_default))
 
-  distribution_input <- recruitment[["process_distribution"]]
-  distribution_default <- NULL
-  if (!is.null(distribution_input)) {
-    distribution_default <- switch(distribution_input,
-      "DnormDistribution" = create_default_DnormDistribution(
+  distribution_input <- unnested_configurations |>
+    dplyr::filter(module_name == "Recruitment")
+
+  if (!is.null(distribution_input[["distribution"]])) {
+    distribution_default <- switch(distribution_input[["distribution"]],
+      "Dnorm" = create_default_DnormDistribution(
         data = data,
         input_type = "process"
       )
     )
 
-    names(distribution_default) <- paste0(
-      distribution_input,
-      ".",
-      names(distribution_default)
-    )
-  }
+    distribution_link <- distribution_input[["distribution_link"]]
+    if (distribution_link == "log_devs") {
+      distribution_default <- distribution_default |>
+        dplyr::mutate(
+          distribution_link = !!distribution_link
+        )
 
-  # Combine process and distribution defaults into a single list
-  default <- list(c(form_default, distribution_default))
-  names(default) <- "recruitment"
-  return(default)
-}
+      expanded_rows <- distribution_default |>
+        dplyr::filter(label %in% c("x", "expected_values")) |>
+        # Create all combinations of the original rows and years
+        tidyr::expand_grid(year = (get_start_year(data) + 1):get_end_year(data)) |>
+        dplyr::mutate(
+          time = year
+        ) |>
+        dplyr::select(-year)
 
-#' Update input parameters for a FIMS model
-#'
-#' @description
-#' This function updates the input parameters of a Fisheries Integrated
-#' Modeling System (FIMS) model. It allows users to modify specific parameters
-#' by providing new values, while retaining the existing modules information
-#' from the current input.
-#' @param current_parameters A list containing the current input parameters, including:
-#'   \describe{
-#'     \item{\code{parameters}:}{A list of parameter inputs.}
-#'     \item{\code{modules}:}{A list of module names used in the model.}
-#'   }
-#' @param modified_parameters A named list representing new parameter values to update.
-#' @rdname create_default_parameters
-#' @return
-#' A list containing:
-#' \describe{
-#'   \item{parameters}{A list of updated parameter inputs that
-#'   includes any modifications made by the user.}
-#'   \item{modules}{The unchanged list of module names from the current
-#'   input.}
-#' }
-#' @seealso
-#' * [create_default_parameters()]
-#' @export
-#' @examples
-#' \dontrun{
-#' # Load the example dataset
-#' data("data1")
-#' fims_frame <- FIMSFrame(data1)
-#'
-#' # Define fleets specifications
-#' fleet1 <- survey1 <- list(
-#'   selectivity = list(form = "LogisticSelectivity"),
-#'   data_distribution = c(
-#'     Index = "DlnormDistribution",
-#'     AgeComp = "DmultinomDistribution"
-#'   )
-#' )
-#'
-#' # Create default parameters for the specified fleets
-#' default_parameters <- fims_frame |>
-#'   create_default_parameters(
-#'     fleets = list(fleet1 = fleet1, survey1 = survey1)
-#'   )
-#'
-#' updated_parameters <- default_parameters |>
-#'   update_parameters(
-#'     modified_parameters = list(
-#'       fleet1 = list(
-#'         Fleet.log_Fmort.value = log(c(
-#'           0.009459165, 0.027288858, 0.045063639,
-#'           0.061017825, 0.048600752, 0.087420554,
-#'           0.088447204, 0.186607929, 0.109008958,
-#'           0.132704335, 0.150615473, 0.161242955,
-#'           0.116640187, 0.169346119, 0.180191913,
-#'           0.161240483, 0.314573212, 0.257247574,
-#'           0.254887252, 0.251462108, 0.349101406,
-#'           0.254107720, 0.418478117, 0.345721184,
-#'           0.343685540, 0.314171227, 0.308026829,
-#'           0.431745298, 0.328030899, 0.499675368
-#'         ))
-#'       )
-#'     )
-#'   )
-#'
-#' # purrr::map_vec() can be used to compare the length of adjusted parameter
-#' # vectors with defaults for a specific module (e.g., fleet1)
-#' default_fleet1 <- purrr::map_vec(default_parameters[["parameters"]][["fleet1"]], \(x) length(x))
-#' updated_fleet1 <- purrr::map_vec(updated_parameters[["parameters"]][["fleet1"]], \(x) length(x))
-#'
-#' # purrr::map_df() can be used to summarize parameter vector lengths across all modules
-#' purrr::map_df(
-#'   updated_parameters[["parameters"]], \(x) purrr::map_vec(x, length),
-#'   .id = "module"
-#' ) |>
-#'   tibble::column_to_rownames(var = "module") |>
-#'   t()
-#' }
-update_parameters <- function(current_parameters, modified_parameters) {
-  # Input checks
-  # Check if current_parameters is a list with required components
-  if (
-    !is.list(current_parameters) ||
-      !all(c("parameters", "modules") %in% names(current_parameters))
-  ) {
-    cli::cli_abort(c(
-      "i" = "{.var current_parameters} argument must be a list containing
-            parameters and modules.",
-      "x" = "{.var current_parameters} is a {class(current_parameters)}."
-    ))
-  }
-  # Check if modified_parameters is a named list
-  if (!is.list(modified_parameters) || is.null(names(modified_parameters))) {
-    cli::cli_abort(c(
-      "i" = "{.var modified_parameters} argument must be must be a named list.",
-      "x" = "{.var modified_parameters} is a {class(modified_parameters)}."
-    ))
-  }
-
-  # Check if modified_parameters exists in current_parameters
-  missing_input <- setdiff(
-    names(modified_parameters),
-    names(current_parameters[["parameters"]])
-  )
-
-  if (length(missing_input) > 0) {
-    cli::cli_abort(c(
-      "x" = "The following {length(missing_input)} input list{?s} from
-            {.var modified_parameters} {?is/are} missing from
-            {.var current_parameters}: {missing_input}."
-    ))
-  }
-  # TODO: is this duplicated code or is this testing something else? If not
-  # duplicated, should missing_input be wrong_input?
-  wrong_input <- setdiff(
-    names(current_parameters[["parameters"]]),
-    names(modified_parameters)
-  )
-  if (length(missing_input) > 0) {
-    cli::cli_abort(c(
-      "x" = "The following {length(missing_input)} input list{?s} from
-            {.var modified_parameters} {?is/are} missing from
-            {.var current_parameters}: {missing_input}."
-    ))
-  }
-
-  new_param_input <- current_parameters[["parameters"]]
-  module_names <- names(new_param_input)
-
-  # Update parameters for each module based on modified_parameters
-  for (module_name in module_names) {
-    if (module_name %in% names(modified_parameters)) {
-      modified_params <- modified_parameters[[module_name]]
-      current_params <- new_param_input[[module_name]]
-
-      for (param_name in names(modified_params)) {
-        # Check if the parameter exists in current_parameters
-        if (!param_name %in% names(current_params)) {
-          cli::cli_abort(c(
-            "x" = "{param_name} from {module_name} in {.var modified_parameters}
-                         does not exist in {.var current_parameters}."
-          ))
-        }
-        # TODO: default is a scalar but user might want to modify to time-varying,
-        # e.g. log_q, log_r
-        # Check if the length of the modified and current parameter match
-        length_modified_parameter <- length(modified_params[[param_name]])
-        length_current_parameter <- length(current_params[[param_name]])
-        if (!identical(length_modified_parameter, length_current_parameter)) {
-          cli::cli_abort(c(
-            "x" = "The length of {.var {param_name}} from {module_name}
-                  does not match between {.var modified_parameters} and
-                  {.var current_parameters}.",
-            "i" = "The parameter name of interest is {.var {param_name}}.",
-            "i" = "The length of the modified parameter is
-                  {length_modified_parameter}.",
-            "i" = "The length of the current parameter is
-                  {length_current_parameter}."
-          ))
-        }
-
-        # Check if the type of the modified and current parameter match
-        if (!identical(
-          typeof(modified_params[[param_name]]),
-          typeof(current_params[[param_name]])
-        )) {
-          cli::cli_abort(c(
-            "x" = "The type of {param_name} from {module_name} does not match
-                  between {.var modified_parameters} and
-                  {.var current_parameters}."
-          ))
-        }
-
-        # Update the parameter if checks pass
-        current_params[[param_name]] <- modified_params[[param_name]]
-      }
-
-      # Assign the updated module parameters back to new_param_input
-      new_param_input[[module_name]] <- current_params
+      distribution_default <- distribution_default |>
+        dplyr::filter(label == "log_sd") |>
+        dplyr::bind_rows(expanded_rows)
     }
   }
-  # Create a new list for updated input
-  new_input <- list(
-    parameters = new_param_input,
-    modules = current_parameters$modules
-  )
-  return(new_input)
+
+  default <- dplyr::bind_rows(form_default, distribution_default) |>
+    tidyr::fill(module_name, module_type)
 }

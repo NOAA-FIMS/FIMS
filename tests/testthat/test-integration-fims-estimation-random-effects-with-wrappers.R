@@ -419,7 +419,7 @@ test_that("estimation test with recruitment re on logr", {
       recruitment = list(
         form = "BevertonHoltRecruitment"
       ),
-      growth = list(form = "EWAAgrowth"),
+      growth = list(form = "EWAAGrowth"),
       maturity = list(form = "LogisticMaturity")
     ) |>
     create_default_process(

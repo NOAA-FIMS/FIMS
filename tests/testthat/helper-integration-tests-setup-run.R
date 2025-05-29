@@ -56,7 +56,7 @@ prepare_test_data <- function() {
 
   # Generate dataset with missing age composition for fleet1
   data_age_comp_na <- data_age_comp_raw |>
-    dplyr::filter(!(name == "fleet1" & type == "age" & datestart == na_index)) |>
+    dplyr::filter(!(name == "fleet1" & type == "age_comp" & datestart == na_index)) |>
     FIMS::FIMSFrame()
   saveRDS(
     data_age_comp_na,
@@ -69,7 +69,7 @@ prepare_test_data <- function() {
   data_length_comp_na <- data_length_comp_raw |>
     dplyr::filter(
       !(name == "survey1" &
-        type %in% c("index", "length", "age-to-length-conversion") &
+        type %in% c("index", "length_comp", "age-to-length-conversion") &
         datestart == na_index
       )
     ) |>
@@ -91,11 +91,11 @@ prepare_test_data <- function() {
   )
   data_age_length_comp_na <- data_age_length_comp_raw |>
     dplyr::filter(
-      !(name == "survey1" & type %in% c("age") & datestart == na_index)
+      !(name == "survey1" & type %in% c("age_comp") & datestart == na_index)
     ) |>
     dplyr::filter(
       !(name == "fleet1" &
-        type %in% c("length", "age-to-length-conversion") &
+        type %in% c("length_comp", "age-to-length-conversion") &
         datestart == length_na_index
       )
     ) |>
@@ -122,36 +122,77 @@ prepare_test_data <- function() {
   om_output <- om_output_list[[iter_id]]
   em_input <- em_input_list[[iter_id]]
 
-  # Define modified parameters for different modules
-  modified_parameters <- vector(mode = "list", length = length(iter_id))
-  modified_parameters[[iter_id]] <- list(
-    fleet1 = list(
-      Fleet.log_Fmort.value = log(om_output_list[[iter_id]][["f"]])
-    ),
-    survey1 = list(
-      LogisticSelectivity.inflection_point.value = 1.5,
-      LogisticSelectivity.slope.value = 2,
-      Fleet.log_q.value = log(om_output_list[[iter_id]][["survey_q"]][["survey1"]])
-    ),
-    recruitment = list(
-      BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[iter_id]][["R0"]]),
-      BevertonHoltRecruitment.log_devs.value = om_input_list[[iter_id]][["logR.resid"]][-1],
-      # TODO: integration tests fail after setting BevertonHoltRecruitment.log_devs.estimated
-      # to TRUE. We need to debug the issue, then update the line below accordingly. Currently it
-      # is set up as fixed_effects for deterministic run and constant for estimation runs.
-      BevertonHoltRecruitment.log_devs.estimation_type = "fixed_effects",
-      DnormDistribution.log_sd.value = om_input_list[[iter_id]][["logR_sd"]]
-    ),
-    maturity = list(
-      LogisticMaturity.inflection_point.value = om_input_list[[iter_id]][["A50.mat"]],
-      LogisticMaturity.inflection_point.estimation_type = "constant",
-      LogisticMaturity.slope.value = om_input_list[[iter_id]][["slope.mat"]],
-      LogisticMaturity.slope.estimation_type = "constant"
-    ),
-    population = list(
-      Population.log_init_naa.value = log(om_output_list[[iter_id]][["N.age"]][1, ])
+  data_age_length_comp <- FIMSFrame(data1)
+  default_parameters <- create_default_configurations(
+    data = data_age_length_comp
+  ) |>
+    create_default_parameters(
+      data = data_age_length_comp
     )
-  )
+
+  modified_parameters <- default_parameters |>
+    tidyr::unnest(cols = data) |>
+    # Update log_Fmort initial values for Fleet1
+    dplyr::rows_update(
+      dplyr::tibble(
+        fleet_name = "fleet1",
+        label = "log_Fmort",
+        time = 1:30,
+        value = log(om_output_list[[iter_id]][["f"]]),
+      ),
+      by = c("fleet_name", "label", "time")
+    ) |>
+    # Update selectivity parameters and log_q for survey1
+    dplyr::rows_update(
+      dplyr::tibble(
+        fleet_name = "survey1",
+        label = c("inflection_point", "slope", "log_q"),
+        value = c(1.5, 2, log(om_output_list[[iter_id]][["survey_q"]][["survey1"]]))
+      ),
+      by = c("fleet_name", "label")
+    ) |>
+    # Update log_devs in the Recruitment module (time steps 2–30)
+    dplyr::rows_update(
+      dplyr::tibble(
+        label = "log_devs",
+        time = 2:30,
+        value = om_input_list[[iter_id]][["logR.resid"]][-1],
+        # TODO: integration tests fail after setting recruitment log_devs all estimable.
+        # We need to debug the issue, then change constant to fixed_effects.
+        estimation_type = "fixed_effects"
+      ),
+      by = c("label", "time")
+    ) |>
+    # Update log_sd for log_devs in the Recruitment module
+    dplyr::rows_update(
+      dplyr::tibble(
+        module_name = "Recruitment",
+        label = "log_sd",
+        value = om_input_list[[iter_id]][["logR_sd"]]
+      ),
+      by = c("module_name", "label")
+    ) |>
+    # Update inflection point and slope parameters in the Maturity module
+    dplyr::rows_update(
+      dplyr::tibble(
+        module_name = "Maturity",
+        label = c("inflection_point", "slope"),
+        value = c(
+          om_input_list[[iter_id]][["A50.mat"]],
+          om_input_list[[iter_id]][["slope.mat"]]
+        )
+      ),
+      by = c("module_name", "label")
+    ) |>
+    # Update log_init_naa values in the Population module
+    dplyr::rows_update(
+      dplyr::tibble(
+        label = "log_init_naa",
+        age = 1:12,
+        value = log(om_output_list[[iter_id]][["N.age"]][1, ])
+      ),
+      by = c("label", "age")
+    )
   saveRDS(
     modified_parameters,
     file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
@@ -178,7 +219,15 @@ prepare_test_data <- function() {
   )
 
   # TODO: delete this lines 74-78 when log_devs estimation error fixed
-  modified_parameters[[iter_id]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- "constant"
+  modified_parameters <- modified_parameters |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        label == "log_devs" & module_type == "BevertonHolt",
+        "constant",
+        estimation_type
+      )
+    )
+  
   saveRDS(
     modified_parameters,
     file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
@@ -209,26 +258,12 @@ prepare_test_data <- function() {
   # Load test data for age composition from an RDS file
   data_age_comp <- readRDS(test_path("fixtures", "data_age_comp.RDS"))
 
-  # Define fleet and survey specifications
-  fleet1 <- survey1 <- list(
-    selectivity = list(form = "LogisticSelectivity"),
-    data_distribution = c(
-      Landings = "DlnormDistribution",
-      Index = "DlnormDistribution",
-      AgeComp = "DmultinomDistribution"
-    )
-  )
-
-  # Run FIMS model with following steps
-  # * Create default parameters with fleet1 and survey1 specifications
-  # * Update parameters if any modifications are provided
-  # * Initialize FIMS with the provided data and parameters
-  # * Fit the FIMS model with optimization enabled
-  fit_agecomp <- data_age_comp |>
-    create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
+  # Run FIMS model
+  fit_agecomp <- modified_parameters |>
+    # remove rows that have module_type == LengthComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "LengthComp")
     ) |>
-    update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_comp) |>
     fit_fims(optimize = TRUE)
 
@@ -244,11 +279,11 @@ prepare_test_data <- function() {
   # Load a second dataset that contains missing age composition data
   data_age_comp_na <- readRDS(test_path("fixtures", "data_age_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
-  fit_agecomp_na <- data_age_comp_na |>
-    create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
+  fit_agecomp_na <- modified_parameters |>
+    # remove rows that have module_type == LengthComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "LengthComp")
     ) |>
-    update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_comp_na) |>
     fit_fims(optimize = TRUE)
 
@@ -264,26 +299,13 @@ prepare_test_data <- function() {
   ## Estimation run with length comp only using wrappers ----
   # Load test data for length composition from an RDS file
   data_length_comp <- readRDS(test_path("fixtures", "data_length_comp.RDS"))
-  # Define fleet1 and survey1 specifications
-  fleet1 <- survey1 <- list(
-    selectivity = list(form = "LogisticSelectivity"),
-    data_distribution = c(
-      Landings = "DlnormDistribution",
-      Index = "DlnormDistribution",
-      LengthComp = "DmultinomDistribution"
-    )
-  )
 
-  # Run FIMS model with following steps:
-  # * Create default parameters with fleet1 and survey1 specifications
-  # * Update parameters if any modifications are provided
-  # * Initialize FIMS with the provided data and parameters
-  # * Fit the FIMS model with optimization enabled
-  fit_lengthcomp <- data_length_comp |>
-    create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
+  # Run FIMS model
+  fit_lengthcomp <- modified_parameters |>
+    # remove rows that have module_type == AgeComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "AgeComp")
     ) |>
-    update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_length_comp) |>
     fit_fims(optimize = TRUE)
 
@@ -299,11 +321,11 @@ prepare_test_data <- function() {
   # Load a second dataset that contains missing length composition data
   data_length_comp_na <- readRDS(test_path("fixtures", "data_length_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
-  fit_lengthcomp_na <- data_length_comp_na |>
-    create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
+  fit_lengthcomp_na <- modified_parameters |>
+    # remove rows that have module_type == LengthComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "AgeComp")
     ) |>
-    update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_length_comp_na) |>
     fit_fims(optimize = TRUE)
 
@@ -320,27 +342,16 @@ prepare_test_data <- function() {
   # Load test data with both age and length composition data, which contains missing values
   data_age_length_comp_na <- readRDS(test_path("fixtures", "data_age_length_comp_na.RDS"))
   # Define fleet1 and survey1 specifications
-  fleet1 <- survey1 <- list(
-    selectivity = list(form = "LogisticSelectivity"),
-    data_distribution = c(
-      Landings = "DlnormDistribution",
-      Index = "DlnormDistribution",
-      AgeComp = "DmultinomDistribution",
-      LengthComp = "DmultinomDistribution"
-    )
-  )
-
+  
   # Run FIMS model with the following steps:
   # * Create default parameters with fleet1 and survey1 specifications
   # * Update parameters if any modifications are provided
   # * Initialize FIMS with the provided data (age and length composition with missing values)
   # * Fit the FIMS model with optimization enabled
-  fit_age_length_comp_na <- data_age_length_comp_na |>
-    create_default_parameters(
-      fleets = list(fleet1 = fleet1, survey1 = survey1)
-    ) |>
-    update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
-    initialize_fims(data = data_age_length_comp_na) |>
+  fit_age_length_comp_na <- initialize_fims(
+    parameters = modified_parameters, 
+    data = data_age_length_comp_na
+  ) |>
     fit_fims(optimize = TRUE)
 
   clear()

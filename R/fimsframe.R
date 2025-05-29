@@ -362,7 +362,7 @@ methods::setMethod(
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
-      .data[["type"]] == "age",
+      .data[["type"]] == "age_comp",
       .data[["name"]] %in% fleet_name
     ) |>
       dplyr::pull(.data[["value"]])
@@ -391,7 +391,7 @@ methods::setMethod(
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
-      .data[["type"]] == "length",
+      .data[["type"]] == "length_comp",
       .data[["name"]] %in% fleet_name
     ) |>
       dplyr::pull(.data[["value"]])
@@ -743,7 +743,7 @@ FIMSFrame <- function(data) {
       bins = ages,
       years = years,
       column = age,
-      types = c("weight-at-age", "age")
+      types = c("weight-at-age", "age_comp")
     )
   } else {
     missing_ages <- missing_time_series[0, ]
@@ -754,7 +754,7 @@ FIMSFrame <- function(data) {
       bins = lengths,
       years = years,
       column = length,
-      types = "length"
+      types = "length_comp"
     )
   } else {
     missing_lengths <- missing_time_series[0, ]

@@ -73,8 +73,8 @@ uint32_t GrowthInterfaceBase::id_g = 1;
 std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
 
 /**
- * @brief Rcpp interface for EWAAgrowth to instantiate the object from R:
- * ewaa <- methods::new(EWAAgrowth). Where, EWAA stands for empirical weight at
+ * @brief Rcpp interface for EWAAGrowth to instantiate the object from R:
+ * ewaa <- methods::new(EWAAGrowth). Where, EWAA stands for empirical weight at
  * age and growth is not actually estimated.
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
@@ -150,7 +150,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @details This can be called from R using ewaagrowth.evaluate(age).
    */
   virtual double evaluate(double age) {
-    fims_popdy::EWAAgrowth<double> EWAAGrowth;
+    fims_popdy::EWAAGrowth<double> EWAAGrowth;
 
     if (initialized == false) {
       // Check that ages and weights vector are the same length
@@ -203,8 +203,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     std::shared_ptr<fims_info::Information<Type> > info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::EWAAgrowth<Type> > ewaa_growth =
-        std::make_shared<fims_popdy::EWAAgrowth<Type> >();
+    std::shared_ptr<fims_popdy::EWAAGrowth<Type> > ewaa_growth =
+        std::make_shared<fims_popdy::EWAAGrowth<Type> >();
 
     // set relative info
     ewaa_growth->id = this->id;

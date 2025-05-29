@@ -264,7 +264,11 @@ get_expected_name <- function(family, data_type) {
 initialize_data_distribution <- function(
     module,
     family = NULL,
-    sd = list(value = 1, estimation_type = "constant"),
+    # Create a tibble with value and estiamtion_type column for sd
+    sd = dplyr::tibble(
+      value = 1,
+      estimation_type = "constant"
+    ),
     # FIXME: Move this argument to second to match where par is in
     # initialize_process_distribution
     data_type = c("landings", "index", "agecomp", "lengthcomp")) {
@@ -294,23 +298,16 @@ initialize_data_distribution <- function(
     # is correct, as creating a new ParameterVector for log_sd here would
     # trigger an error in integration tests with wrappers.
     new_module$log_sd$resize(length(sd[["value"]]))
+
     purrr::walk(
       seq_along(sd[["value"]]),
       \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
     )
 
-    # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if (sd[["estimation_type"]] == "constant") {
-        new_module$log_sd$set_all_estimable(FALSE)
-      } else {
-        new_module$log_sd$set_all_estimable(TRUE)
-      }
-    } else {
-      for (i in seq_along(sd[["estimation_type"]])) {
-        new_module$log_sd[i]$estimation_type <- sd[["estimation_type"]][i]
-      }
-    }
+    purrr::walk(
+      seq_along(sd[["estimation_type"]]),
+      \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
+    )
   }
 
   if (family[["family"]] == "gaussian") {
@@ -318,23 +315,15 @@ initialize_data_distribution <- function(
     new_module <- methods::new(DnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_sd$resize(length(sd[["value"]]))
-    for (i in seq_along(sd[["value"]])) {
-      new_module$log_sd[i]$value <- log(sd[["value"]][i])
-    }
+    purrr::walk(
+      seq_along(sd[["value"]]),
+      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
+    )
 
-    # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if (sd[["estimation_type"]] == "constant") {
-        new_module$log_sd$set_all_estimable(FALSE)
-      } else {
-        new_module$log_sd$set_all_estimable(TRUE)
-      }
-    } else {
-      for (i in 1:seq_along(sd[["estimation_type"]])) {
-        new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
-      }
-    }
+    purrr::walk(
+      seq_along(sd[["estimation_type"]]),
+      \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
+    )
   }
 
   if (family[["family"]] == "multinomial") {
@@ -371,7 +360,10 @@ initialize_process_distribution <- function(
     module,
     par,
     family = NULL,
-    sd = list(value = 1, estimation_type = "constant"),
+    sd = dplyr::tibble(
+      value = 1,
+      estimation_type = "constant"
+    ),
     is_random_effect = FALSE) {
   # validity check on user input
   args <- list(family = family, sd = sd)
@@ -402,7 +394,7 @@ initialize_process_distribution <- function(
         new_module$log_sd$set_all_estimable(TRUE)
       }
     } else {
-      for (i in 1:seq_along(sd[["estimation_type"]])) {
+      for (i in seq_along(sd[["estimation_type"]])) {
         new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
       }
     }
@@ -426,7 +418,7 @@ initialize_process_distribution <- function(
         new_module$log_sd$set_all_estimable(TRUE)
       }
     } else {
-      for (i in 1:seq_along(sd[["estimation_type"]])) {
+      for (i in seq_along(sd[["estimation_type"]])) {
         new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
       }
     }

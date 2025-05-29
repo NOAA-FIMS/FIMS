@@ -15,7 +15,7 @@ n_ages <- get_n_ages(fims_frame)
 
 fleet_names_age_comp <- dplyr::filter(
   .data = as.data.frame(get_data(fims_frame)),
-  type == "age"
+  type == "age_comp"
 ) |>
   dplyr::distinct(name) |>
   dplyr::pull(name)

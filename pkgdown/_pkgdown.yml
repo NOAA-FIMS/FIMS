@@ -42,7 +42,6 @@ reference:
   - starts_with("get_FIMSFrame")
   - starts_with("m_")
   - starts_with("create_default_")
-  - update_parameters
   - has_keyword("distribution")
   - starts_with("initialize_")
   - has_keyword("fit_fims")

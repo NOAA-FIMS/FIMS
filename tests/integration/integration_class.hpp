@@ -635,7 +635,7 @@ public:
             }
 
             // set empirical growth
-            std::shared_ptr<fims_popdy::EWAAgrowth<double> > growth = std::make_shared<fims_popdy::EWAAgrowth<double> >();
+            std::shared_ptr<fims_popdy::EWAAGrowth<double> > growth = std::make_shared<fims_popdy::EWAAGrowth<double> >();
             std::cout << "Growth:\n";
 
             it = obj.find("W.kg");
