@@ -19,14 +19,14 @@ test_that("rcpp maturity works with correct inputs", {
   maturity1$inflection_point[1]$value <- 10.0
   maturity1$inflection_point[1]$min <- 8.0
   maturity1$inflection_point[1]$max <- 12.0
-  maturity1$inflection_point[1]$estimation_type <- "fixed_effects"
+  maturity1$inflection_point[1]$estimation_type$set("fixed_effects")
   maturity1$slope[1]$value <- 0.2
 
   expect_equal(maturity1$get_id(), 1)
   expect_equal(maturity1$inflection_point[1]$value, 10.0)
   expect_equal(maturity1$inflection_point[1]$min, 8.0)
   expect_equal(maturity1$inflection_point[1]$max, 12.0)
-  expect_equal(maturity1$inflection_point[1]$estimation_type, "fixed_effects")
+  expect_equal(maturity1$inflection_point[1]$estimation_type$get(), "fixed_effects")
   expect_equal(maturity1$slope[1]$value, 0.2)
   expect_equal(maturity1$evaluate(10.0), 0.5)
 

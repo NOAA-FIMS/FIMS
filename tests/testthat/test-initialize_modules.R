@@ -93,6 +93,17 @@ test_that("initialize_fims works with correct inputs", {
 })
 
 ## Edge handling ----
+test_that("initialize_fims works with edge cases", {
+  #' @description Test that [initialize_fims()] works with multiple
+  #' estimation types
+  parameters_multiple_types <- default_parameters
+  n_rec_devs <- get_n_years(data) - 1
+  parameters_multiple_types[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <-
+    c(rep("constant", 10), rep("fixed_effects", n_rec_devs - 10))
+  init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
+  init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data)
+  expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)
+})
 
 ## Error handling ----
 
@@ -146,6 +157,25 @@ test_that("initialize_fims returns correct error messages", {
     "should be one of"
   )
 
+  clear()
+
+  #' @description Test that [initialize_fims()] correctly returns an error on
+  #' an unknown estimation_type
+  parameters_wrong_type <- default_parameters
+  parameters_wrong_type[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- "fixed.effects"
+  expect_error(
+    initialize_fims(parameters = parameters_wrong_type, data = data),
+    "You entered",
+  )
+  clear()
+
+  #' @description Test that [initialize_fims()] correctly returns an error when
+  #' the lenfths of value and estimation_type do not match
+  parameters_wrong_type[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- c("fixed_effects", "fixed_effects")
+  expect_error(
+    initialize_fims(parameters = parameters_wrong_type, data = data),
+    "does not match the length",
+  )
   clear()
 })
 

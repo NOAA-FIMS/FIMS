@@ -282,6 +282,7 @@ test_that("nll test of fims", {
   expect_equal(jnll, expected_jnll)
 })
 
+
 test_that("estimation test of fims using wrapper functions", {
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")
   result <- setup_and_run_FIMS_with_wrappers(
