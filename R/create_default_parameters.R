@@ -128,6 +128,15 @@ create_default_parameters <- function(
     maturity = maturity
   )
 
+  # Outline for the default parameters tibble
+  parameters_outline <- tibble::tibble(
+    module_name = character(),
+    module_type = character(),
+    label = character(),
+    type = character(), 
+    fleet_name = character(), 
+    population_name = list(age = numeric(), length = numeric())
+  )
   # Create fleet parameters
   fleet_temp <- list()
   for (i in 1:length(fleets)) {
@@ -355,6 +364,7 @@ create_default_fleet <- function(fleets,
   # Determine default fleet parameters based on types of data present
   if ("index" %in% data_types_present &&
     "Index" %in% distribution_names_for_fleet) {
+    q_default <- tibble::add_row()
     q_default <- list(
       log_q.value = 0,
       log_q.estimation_type = "fixed_effects"
