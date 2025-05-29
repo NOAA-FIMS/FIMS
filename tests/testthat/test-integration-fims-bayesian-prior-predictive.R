@@ -204,7 +204,7 @@ test_that("prior predictive check", {
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
-  ewaa_growth <- methods::new(EWAAgrowth)
+  ewaa_growth <- methods::new(EWAAGrowth)
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),

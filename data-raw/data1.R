@@ -325,7 +325,7 @@ age_data <- rbind(
   )
 ) |>
   dplyr::mutate(
-    type = "age"
+    type = "age_comp"
   ) |>
   tidyr::pivot_longer(
     cols = dplyr::starts_with("X"),
@@ -416,7 +416,7 @@ length_age_data <- data.frame(
 # Create a length-composition data frame that will be filled by transforming
 # the age composition data
 length_comp_data <- data.frame(
-  type = "length",
+  type = "length_comp",
   name = sort(rep(observers, length(len_bins) * length(start_date))),
   age = NA,
   length = rep(len_bins, length(start_date) * length(observers)),

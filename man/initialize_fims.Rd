@@ -7,7 +7,7 @@
 initialize_fims(parameters, data)
 }
 \arguments{
-\item{parameters}{A list. Contains parameters and modules required for
+\item{parameters}{A tibble. Contains parameters and modules required for
 initialization.}
 
 \item{data}{An S4 object. FIMS input data.}

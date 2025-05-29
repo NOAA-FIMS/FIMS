@@ -62,24 +62,24 @@ data("data1")
 fims_frame <- FIMSFrame(data1)
 
 # Create default maturity parameters using internal function
-default_parameters <- list(
-  parameters = FIMS:::create_default_maturity(form = "LogisticMaturity"),
-  modules = list(maturity = list(form = "LogisticMaturity"))
-)
+default_parameters <- create_default_configurations(fims_frame) |>
+  tidyr::unnest(cols = data) |>
+  FIMS:::create_default_maturity(data = fims_frame)
+
 show(default_parameters)
 
 # The default maturity parameters can be updated
 parameters <- default_parameters |>
-  update_parameters(
-    modified_parameters = list(
-      maturity = list(
-        LogisticMaturity.inflection_point.value = 2.25,
-        LogisticMaturity.inflection_point.estimation_type = "constant",
-        LogisticMaturity.slope.value = 3,
-        LogisticMaturity.slope.estimation_type = "constant"
-      )
-    )
+  dplyr::rows_update(
+    tibble::tibble(
+      model_family = "catch_at_age",
+      module_name = "Maturity",
+      label = c("inflection_point", "slope"),
+      value = c(2.25, 3),
+    ),
+    by = c("module_name", "label")
   )
+
 show(parameters)
 
 # Initialize maturity module based on the list of parameters
@@ -98,9 +98,9 @@ library(FIMS)
 maturity <- methods::new(LogisticMaturity)
 # Populate the maturity module with parameter values.
 maturity$inflection_point[1]$value <- 10
-maturity$inflection_point[1]$estimation_type <- "constant"
+maturity$inflection_point[1]$estimation_type$set("constant")
 maturity$slope[1]$value <- 0.2
-maturity$slope[1]$estimation_type <- "constant"
+maturity$slope[1]$estimation_type$set("constant")
 ```
 
 To run a FIMS model, more modules than just a maturity module need to be linked to a population module. But, this example only includes a maturity module so the code below is just pseudo code showing how to link a maturity module to a population module. The code below assumes that growth and recruitment modules, i.e., modules 2 and 3, have already been set up.
@@ -108,14 +108,18 @@ To run a FIMS model, more modules than just a maturity module need to be linked 
 ```{r population,  class.source = "rchunk", eval = FALSE}
 # Initialize the population module and link the maturity module
 # The IDs of the growth and recruitment modules are pseudo code and don't exist
-population <- FIMS:::initialize_population(
-  parameters = parameters,
-  data = fims_frame,
-  linked_ids = setNames(
-    c(maturity$get_id(), 2, 3),
-    c("maturity", "growth", "recruitment")
+population <- create_default_configurations(fims_frame) |>
+  tidyr::unnest(cols = data) |>
+  FIMS:::create_default_Population(data = fims_frame, log_rzero = log(1000000)) |>
+  dplyr::mutate(model_family = "catch_at_age") |> 
+  dplyr::bind_rows(parameters) |>
+  FIMS:::initialize_population(
+    data = fims_frame,
+    linked_ids = setNames(
+      c(maturity$get_id(), 2, 3),
+      c("maturity", "growth", "recruitment")
+    )
   )
-)
 ```
 
 For power users, the methods package can be used to call Rcpp and create the population module without using lists of parameters or any wrapper functions.
@@ -354,14 +358,18 @@ std::shared_ptr<fims_popdy::MaturityBase<Type>> maturity;
 The `maturity_id` was set from R using the `SetMaturity()` method from the `PopulationInterface` class, which as a reminder is done internally within `FIMS::initialize_population` but can also be done by hand with `SetMaturity`. Where both options are shown, again, below.
 ```{r,  class.source = "rchunk", eval = FALSE}
 # Helper function
-population <- FIMS:::initialize_population(
-  parameters = parameters,
-  data = fims_frame,
-  linked_ids = setNames(
-    c(maturity$get_id(), 2, 3),
-    c("maturity", "growth", "recruitment")
+population <- create_default_configurations(fims_frame) |>
+  tidyr::unnest(cols = data) |>
+  FIMS:::create_default_Population(data = fims_frame, log_rzero = log(1000000)) |>
+  dplyr::mutate(model_family = "catch_at_age") |> 
+  dplyr::bind_rows(parameters) |>
+  FIMS:::initialize_population(
+    data = fims_frame,
+    linked_ids = setNames(
+      c(maturity$get_id(), 2, 3),
+      c("maturity", "growth", "recruitment")
+    )
   )
-)
 
 # Manual
 population$SetMaturity(maturity$get_id())
