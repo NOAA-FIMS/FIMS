@@ -4,8 +4,8 @@
       print(dplyr::select(get_estimates(deterministic_results), -estimate,
       -uncertainty, -gradient), n = 320, width = Inf)
     Output
-      # A tibble: 11,736 x 15
-      # Groups:   label [78]
+      # A tibble: 11,765 x 15
+      # Groups:   label [107]
           module_name module_id module_type label                    type   type_id
           <chr>           <int> <chr>       <chr>                    <chr>    <int>
         1 selectivity         1 Logistic    inflection_point         vector       1
@@ -972,7 +972,7 @@
       318 constant       
       319 constant       
       320 constant       
-      # i 11,416 more rows
+      # i 11,445 more rows
 
 # get_estimates() works with estimation run
 

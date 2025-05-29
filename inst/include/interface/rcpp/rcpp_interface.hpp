@@ -629,6 +629,14 @@ RCPP_MODULE(fims) {
             .constructor<int>()
             .method("get", &SharedInt::get)
             .method("set", &SharedInt::set);
+    
+    Rcpp::class_<SharedString>(
+            "SharedString",
+            "An RcppInterface class that defines the SharedString class.")
+            .constructor()
+            .constructor<std::string>()
+            .method("get", &SharedString::get)
+            .method("set", &SharedString::set);
 
     Rcpp::class_<SharedBoolean>(
             "SharedBoolean",
