@@ -25,11 +25,11 @@ recruitment <- methods::new(BevertonHoltRecruitment)
 
 # set up log_rzero (equilibrium recruitment)
 recruitment$log_rzero[1]$value <- log(om_input$R0)
-recruitment$log_rzero[1]$estimation_type <- "fixed_effects"
+recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
 # set up logit_steep
 recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) +
   log(om_input$h - 0.2)
-recruitment$logit_steep[1]$estimation_type <- "constant"
+recruitment$logit_steep[1]$estimation_type$set("constant")
 # turn on estimation of deviations recruit deviations should enter the model in
 # normal space. The log is taken in the likelihood calculations alternative
 # setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))

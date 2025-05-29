@@ -384,7 +384,7 @@ public:
 
 
       for (size_t i = 0; i < this->log_Fmort.size(); i++) {
-        if (this->log_Fmort[i].estimation_type_m == "constant") {
+        if (this->log_Fmort[i].estimation_type_m.get() == "constant") {
           this->log_Fmort[i].final_value_m = this->log_Fmort[i].initial_value_m;
         } else {
           this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
@@ -392,7 +392,7 @@ public:
       }
 
       for (size_t i = 0; i < this->log_q.size(); i++) {
-        if (this->log_q[i].estimation_type_m == "constant") {
+        if (this->log_q[i].estimation_type_m.get() == "constant") {
           this->log_q[i].final_value_m = this->log_q[i].initial_value_m;
         } else {
           this->log_q[i].final_value_m = fleet->log_q[i];
@@ -400,7 +400,7 @@ public:
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
-        if (this->age_to_length_conversion[i].estimation_type_m == "constant") {
+        if (this->age_to_length_conversion[i].estimation_type_m.get() == "constant") {
           this->age_to_length_conversion[i].final_value_m = this->age_to_length_conversion[i].initial_value_m;
         } else {
           this->age_to_length_conversion[i].final_value_m = fleet->age_to_length_conversion[i];
@@ -779,13 +779,13 @@ public:
     for (size_t i = 0; i < this->log_q.size(); i++) {
       fleet->log_q[i] = this->log_q[i].initial_value_m;
 
-      if (this->log_q[i].estimation_type_m == "fixed_effects") {
+      if (this->log_q[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
         ss << "fleet_" << this->id << "_log_q_" <<  this->log_q[i].id_m;
         info->RegisterParameterName(ss.str()); 
         info->RegisterParameter(fleet->log_q[i]);
       }
-      if(this->log_q[i].estimation_type_m == "random_effects"){
+      if(this->log_q[i].estimation_type_m.get() == "random_effects"){
         ss.str("");
         ss << "fleet." << this->id << "log_q." <<  this->log_q[i].id_m;
         info->RegisterRandomEffectName(ss.str());
@@ -798,13 +798,13 @@ public:
     for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
 
-      if (this->log_Fmort[i].estimation_type_m == "fixed_effects") {
+      if (this->log_Fmort[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
         ss << "fleet_" << this->id << "_log_Fmort_" <<  this->log_Fmort[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
       }
-      if (this->log_Fmort[i].estimation_type_m == "random_effects") {
+      if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "fleet." << this->id << "log_Fmort." <<  this->log_Fmort[i].id_m;
         info->RegisterRandomEffectName(ss.str());
@@ -846,13 +846,13 @@ public:
           fims::to_string(i) + " of " +
           fims::to_string(fleet->age_to_length_conversion.size()));
 
-        if (this->age_to_length_conversion[i].estimation_type_m == "fixed_effects") {
+        if (this->age_to_length_conversion[i].estimation_type_m.get() == "fixed_effects") {
           ss.str("");
           ss << "fleet_" << this->id << "_age_to_length_conversion_" <<  this->age_to_length_conversion[i].id_m;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(fleet->age_to_length_conversion[i]);
         }
-        if (this->age_to_length_conversion[i].estimation_type_m == "random_effects") {
+        if (this->age_to_length_conversion[i].estimation_type_m.get() == "random_effects") {
           FIMS_ERROR_LOG("age_to_length_conversion cannot be set to random effects");
         }
         FIMS_INFO_LOG(" adding Fleet length object to TMB in loop after if");

@@ -38,6 +38,7 @@
 #' @export set_log_throw_on_error
 #' @export SharedInt
 #' @export SharedReal
+#' @export SharedString
 #' @import methods
 #' @import stats
 #' @importFrom ggplot2 .data

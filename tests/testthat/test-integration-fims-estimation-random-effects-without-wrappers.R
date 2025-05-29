@@ -47,10 +47,10 @@ test_that("deterministic run returns correct nlls", {
   )
 })
 
-test_that("check number of parameters and random effects", {
-  # TODO: add a test description using the #' @description tag
+test_that("deterministic run results correct number of parameters and random effects", {
+  #' @description Veryify the number of parameters are correct
   expect_equal(length(result[["obj"]][["par"]]), 49)
-  # TODO: add a test description using the #' @description tag
+  #' @description Veryify the number of random effects are correct
   expect_equal(length(result[["obj"]][["env"]][["random"]]), 29)
 })
 
@@ -97,7 +97,7 @@ test_that("estimation test with recruitment re on log devs", {
 
 test_that("estimation test with recruitment re on logr", {
   # Compare FIMS results with model comparison project OM values
-    # Tests currently don't pass when log devs are estimated
+  # Tests currently don't pass when log devs are estimated
   testthat::skip()
   validate_fims(
     report = result_log_r[["report"]],
@@ -107,9 +107,9 @@ test_that("estimation test with recruitment re on logr", {
     em_input = em_input_list[[iter_id]]
   )
 
-  # TODO: add a test description using the #' @description tag
+  #' @description Verify the log_devs and log_r approach result in comparable negative log-likelihoods
   expect_equal(result_log_r$report[["nll_components"]], result_log_devs$report[["nll_components"]], tolerance = 1e-4)
-  # TODO: add a test description using the #' @description tag
+  #' @description Verify the log_devs and log_r approach result in comparable expected recruitment
   expect_equal(result_log_r$report[["recruitment"]], result_log_devs$report[["recruitment"]], tolerance = 1e-4)
 
   clear()

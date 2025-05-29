@@ -125,11 +125,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
 
   # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
+  fishing_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
   fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
 
   # turn on estimation of slope
-  fishing_fleet_selectivity$slope[1]$estimation_type <- "fixed_effects"
+  fishing_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
   # Initialize the fishing fleet module
   fishing_fleet <- methods::new(Fleet)
@@ -147,7 +147,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$log_q[1]$estimation_type <- "constant"
+  fishing_fleet$log_q[1]$estimation_type$set("constant")
   fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
@@ -222,11 +222,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]
 
   # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
+  survey_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
   survey_fleet_selectivity$slope[1]$value <- om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]
 
   # turn on estimation of slope
-  survey_fleet_selectivity$slope[1]$estimation_type <- "fixed_effects"
+  survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
   survey_fleet <- methods::new(Fleet)
   survey_fleet$nages$set(om_input[["nages"]])
@@ -239,7 +239,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
   survey_fleet$log_Fmort$set_all_estimable(FALSE)
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
-  survey_fleet$log_q[1]$estimation_type <- "fixed_effects"
+  survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
@@ -305,10 +305,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
-  recruitment$log_rzero[1]$estimation_type <- "fixed_effects"
+  recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
   # set up logit_steep
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
-  recruitment$logit_steep[1]$estimation_type <- "constant"
+  recruitment$logit_steep[1]$estimation_type$set("constant")
   recruitment$nyears$set(om_input[["nyr"]])
 
   # turn on estimation of deviations
@@ -351,9 +351,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
       survey_fleet_selectivity$log_sel$set_all_random(TRUE)
     }
     if (random_effects[["selectivity"]] == "pars") {
-      fishing_fleet_selectivity$inflection_point$estimation_type <- "random_effects"
+      fishing_fleet_selectivity$inflection_point$estimation_type$set("random_effects")
       fishing_fleet_selectivity$inflection_point$slope <- "random_effects"
-      survey_fleet_selectivity$inflection_point$estimation_type <- "random_effects"
+      survey_fleet_selectivity$inflection_point$estimation_type$set("random_effects")
       survey_fleet_selectivity$inflection_point$slope <- "random_effects"
     }
   }
@@ -371,12 +371,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
   if ("recruitment" %in% names(random_effects)) {
     if (random_effects[["recruitment"]] == "log_devs") {
-      recruitment_distribution$log_sd[1]$estimation_type <- "fixed_effects"
+      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
       recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
     }
     if (random_effects[["recruitment"]] == "log_r") {
       recruitment_distribution$log_sd[1]$value <- log(1)
-      recruitment_distribution$log_sd[1]$estimation_type <- "fixed_effects"
+      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
       recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), recruitment$log_expected_recruitment$get_id()))
     }
   }
@@ -401,9 +401,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Maturity
   maturity <- methods::new(LogisticMaturity)
   maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
-  maturity$inflection_point[1]$estimation_type <- "constant"
+  maturity$inflection_point[1]$estimation_type$set("constant")
   maturity$slope[1]$value <- om_input[["slope.mat"]]
-  maturity$slope[1]$estimation_type <- "constant"
+  maturity$slope[1]$estimation_type$set("constant")
 
   # Population
   population <- methods::new(Population)

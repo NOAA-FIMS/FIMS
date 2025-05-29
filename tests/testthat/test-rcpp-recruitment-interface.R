@@ -23,7 +23,7 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
   recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
   recruitment$logit_steep[1]$min <- 0.21
   recruitment$logit_steep[1]$max <- 1.0
-  recruitment$logit_steep[1]$estimation_type <- "random_effects"
+  recruitment$logit_steep[1]$estimation_type$set("random_effects")
   recruitment$log_rzero[1]$value <- log(r0)
 
   #' @description Test that the recruitment id is 1.
@@ -48,7 +48,7 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
   )
   #' @description Test that the logit_steep is a random effect.
   expect_equal(
-    object = recruitment$logit_steep[1]$estimation_type, "random_effects"
+    object = recruitment$logit_steep[1]$estimation_type$get(), "random_effects"
   )
   #' @description Test that the log_rzero value is log(1000000.0).
   expect_equal(
@@ -93,7 +93,7 @@ test_that("test_rcpp_recruitment_interface() returns correct error messages", {
   recruitment$logit_steep[1]$value <- 1
   recruitment$logit_steep[1]$min <- 0.21
   recruitment$logit_steep[1]$max <- 1.0
-  recruitment$logit_steep[1]$estimation_type <- "random_effects"
+  recruitment$logit_steep[1]$estimation_type$set("random_effects")
   recruitment$log_rzero[1]$value <- log(r0)
 
 

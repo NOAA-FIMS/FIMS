@@ -19,14 +19,14 @@ test_that("rcpp logistic selectivity works with correct inputs", {
   selectivity1$inflection_point[1]$value <- 10.0
   selectivity1$inflection_point[1]$min <- 8.0
   selectivity1$inflection_point[1]$max <- 12.0
-  selectivity1$inflection_point[1]$estimation_type <- "random_effects"
+  selectivity1$inflection_point[1]$estimation_type$set("random_effects")
   selectivity1$slope[1]$value <- 0.2
 
   expect_equal(selectivity1$get_id(), 1)
   expect_equal(selectivity1$inflection_point[1]$value, 10.0)
   expect_equal(selectivity1$inflection_point[1]$min, 8.0)
   expect_equal(selectivity1$inflection_point[1]$max, 12.0)
-  expect_equal(selectivity1$inflection_point[1]$estimation_type, "random_effects")
+  expect_equal(selectivity1$inflection_point[1]$estimation_type$get(), "random_effects")
   expect_equal(selectivity1$slope[1]$value, 0.2)
   expect_equal(selectivity1$evaluate(10.0), 0.5)
 
@@ -44,7 +44,7 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
 
   selectivity1$inflection_point_asc[1]$value <- 10.5
   selectivity1$slope_asc[1]$value <- 0.2
-  selectivity1$slope_asc[1]$estimation_type <- "fixed_effects"
+  selectivity1$slope_asc[1]$estimation_type$set("fixed_effects")
   selectivity1$inflection_point_desc[1]$value <- 15.0
   selectivity1$slope_desc[1]$value <- 0.05
 
@@ -66,18 +66,18 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   selectivity2$inflection_point_desc[1]$value <- 15.0
   selectivity2$slope_desc[1]$value <- 0.05
 
-  selectivity2$inflection_point_asc[1]$estimation_type <- "random_effects"
-  selectivity2$inflection_point_desc[1]$estimation_type <- "random_effects"
-  selectivity2$slope_asc[1]$estimation_type <- "random_effects"
-  selectivity2$slope_desc[1]$estimation_type <- "random_effects"
+  selectivity2$inflection_point_asc[1]$estimation_type$set("random_effects")
+  selectivity2$inflection_point_desc[1]$estimation_type$set("random_effects")
+  selectivity2$slope_asc[1]$estimation_type$set("random_effects")
+  selectivity2$slope_desc[1]$estimation_type$set("random_effects")
 
   expect_equal(selectivity2$get_id(), 2)
   expect_equal(selectivity2$inflection_point_asc[1]$value, 10.5)
   expect_equal(selectivity2$slope_asc[1]$value, 0.2)
-  expect_equal(selectivity2$inflection_point_asc[1]$estimation_type, "random_effects")
-  expect_equal(selectivity2$inflection_point_desc[1]$estimation_type, "random_effects")
-  expect_equal(selectivity2$slope_asc[1]$estimation_type, "random_effects")
-  expect_equal(selectivity2$slope_desc[1]$estimation_type, "random_effects")
+  expect_equal(selectivity2$inflection_point_asc[1]$estimation_type$get(), "random_effects")
+  expect_equal(selectivity2$inflection_point_desc[1]$estimation_type$get(), "random_effects")
+  expect_equal(selectivity2$slope_asc[1]$estimation_type$get(), "random_effects")
+  expect_equal(selectivity2$slope_desc[1]$estimation_type$get(), "random_effects")
   expect_equal(
     selectivity2$evaluate(34.5),
     # Line below equals 0.2716494
