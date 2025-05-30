@@ -983,7 +983,10 @@ set_param_vector <- function(field, module, module_input) {
   estimation_type_names <- c('constant', 'fixed_effects', 'random_effects')
   if (!(module_input[[field_estimation_name]] %in% estimation_type_names)){
     cli::cli_abort(c(
-      "The estimation type entered: {.var field_estimation_name}, is not one of the three options: {estimation_type_names}"
+      "The estimation type entered: {.val {module_input[[field_estimation_name]]}}, does not equal:",
+        "*" = "constant",
+        "*" = "fixed_effects",
+        "*" = "random_effects"
     ))
   }
   if (module_input[[field_estimation_name]] == "constant") {

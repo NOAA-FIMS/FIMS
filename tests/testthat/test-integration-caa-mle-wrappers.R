@@ -45,6 +45,13 @@ test_that("deterministic run returns correct nlls", {
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
   )
+
+  test_that("deterministic run results correct number of parameters and random effects", {
+  #' @description Veryify the number of parameters are correct
+  expect_equal(deterministic_age_length_comp@number_of_parameters$fixed_effects, 77)
+  #' @description Veryify the number of random effects are correct
+  expect_equal(deterministic_age_length_comp@number_of_parameters$random_effects, 0)
+})
 })
 
 ## Edge handling ----
