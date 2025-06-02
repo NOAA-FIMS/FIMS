@@ -290,7 +290,8 @@ public:
    * @brief Creates a copy of the FleetInterface object.
    * @details This function creates a deep copy of the FleetInterface object
    * and returns it. It is used to create a new instance of the FleetInterface
-   * with the same properties as the original object.
+   * with the same properties as the original object except the shared memory components 
+   * are also copies, making the returned object independent of the original.
    */
   FleetInterface Copy()
   {

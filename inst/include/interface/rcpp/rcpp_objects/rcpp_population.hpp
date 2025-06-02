@@ -180,6 +180,10 @@ public:
 
   /**
    * @brief Copy the PopulationInterface object.
+   * @details This function creates a deep copy of the PopulationInterface object
+   * and returns it. It is used to create a new instance of the FleetInterface
+   * with the same properties as the original object except the shared memory components
+   * are also copies, making the returned object independent of the original.
    * @return A copy of the PopulationInterface object.
    */
   PopulationInterface Copy()
