@@ -13,6 +13,7 @@
 #include "rcpp_interface_base.hpp"
 #include "../../interface.hpp"
 
+#include "../../RTMB.h"
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp selectivity
  * interfaces. This type should be inherited and not called from R directly.
@@ -120,43 +121,29 @@ public:
         LogisticSel.slope[0] = this->slope[0].initial_value_m;
         return LogisticSel.evaluate(x);
     }
-/*
+
     #ifdef TMB_MODEL
-    ADrep evaluate_RTMB(ADrep x, ADrep input_slope, ADrep input_inflection_point){
-      //  fims_popdy::LogisticSelectivity<ad> LogSel;
+    ADrep evaluate_RTMB(ADrep x, ADrep input_inflection_point, ADrep input_slope){
+        fims_popdy::LogisticSelectivity<ad> LogSel;
         // inflection_point and slope are fims::Vector<Type>
         // initial_value_m is a double
-        //const ad* IP = adptr(input_inflection_point);
-        //LogSel.inflection_point.resize(1);
-        //LogSel.inflection_point[0] = *IP;
-        //LogSel.slope.resize(1);
+        const ad* IP = adptr(input_inflection_point);
+        LogSel.inflection_point.resize(1);
+        LogSel.inflection_point[0] = *IP;
+        LogSel.slope.resize(1);
         const ad* Slope = adptr(input_slope);
-        //LogSel.slope[0] = *Slope;
+        LogSel.slope[0] = *Slope;
         const ad* X = adptr(x);
         int n = x.size();
         ADrep ans(n); 
         ad* Y = adptr(ans); 
         for(int i=0; i<n; i++){
-            Y[i] = dpois(X[i], Slope[i], true);//LogSel.evaluate(X[i]);
+            Y[i] = LogSel.evaluate(X[i]);
         }
         return ans; 
-     //VECTORIZE_UNARY(evaluate);
-    }
-
-    ADrep distr_dpois ( ADrep x, ADrep lambda, bool give_log ){
-    int n1=x.size();
-    int n2=lambda.size();
-    int nmax = std::max({n1, n2});
-    int nmin = std::min({n1, n2});
-    int n = (nmin == 0 ? 0 : nmax);
-    ADrep ans(n);
-    const ad* X1 = adptr(x); const ad* X2 = adptr(lambda);
-    ad* Y = adptr(ans);
-    for (int i=0; i<n; i++) Y[i] = dpois(X1[i % n1], X2[i % n2], give_log);
-    return ans;
     }
     #endif
-*/
+
     /** 
      * @brief Extracts derived quantities back to the Rcpp interface object from
      * the Information object.

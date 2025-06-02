@@ -1,18 +1,6 @@
 CXX_STD = CXX17
-PKG_CXXFLAGS = -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS -DTMBAD_FRAMEWORK
-CXX17STD = -std=c++17 -w
+PKG_CXXFLAGS = -DTMB_MODEL -DTMB_EIGEN_DISABLE_WARNINGS -DTMBAD_FRAMEWORK
 USE_CXX17 = "yes"
 
 SRC_FILES = $(wildcard *.cpp)
-OBJECTS = RcppExports.o $(SRC_FILES:.cpp=.o)
 all: $(SHLIB)
-
-RcppExports.o: RcppExports.cpp
-
-RcppExports.cpp:
-	echo 'Rcpp::compileAttributes("../", verbose=TRUE)' | $(R_HOME)/bin$(R_ARCH_BIN)/R --vanilla --quiet --no-echo
-	sed -i '/RcppEigen/d' RcppExports.cpp
-	sed -i '/\#include <Rcpp.h>/a \#include "../inst/include/interface/RTMB.h"' RcppExports.cpp
-	sed -i '/RcppExport void R_init/ s/^/void rtmb_set_shared_pointers();\n/' RcppExports.cpp
-	sed -i '/R_CallMethodDef/ s/$$/\n    TMB_CALLDEFS,/' RcppExports.cpp
-	sed -i '/R_useDynamicSymbols/ s/$$/\n    rtmb_set_shared_pointers();\n #ifdef TMB_CCALLABLES\n	TMB_CCALLABLES("FIMS");\n #endif/' RcppExports.cpp

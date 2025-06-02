@@ -1,9 +1,11 @@
 
 #include <cmath>
 
-#include "fims_types.hpp"
 #include "../inst/include/interface/interface.hpp"
 #include "../inst/include/common/model.hpp"
+#include <R_ext/Rdynload.h>
+#include <stdlib.h>
+#include <Rinternals.h>
 
 /// @cond
 /**
@@ -40,6 +42,26 @@ Type objective_function<Type>::operator()() {
     Type nll = model->Evaluate();
 
     return nll;
+
+}
+
+
+extern "C" {
+
+SEXP _rcpp_module_boot_fims();
+SEXP _rtmb_set_shared_pointers();
+// Redefine CallEntries here so it's not just in the header!
+static const R_CallMethodDef CallEntries[] = {
+    TMB_CALLDEFS,
+    {"_rcpp_module_boot_fims", (DL_FUNC)&_rcpp_module_boot_fims, 0},
+    {"_rtmb_set_shared_pointers", (DL_FUNC)&_rtmb_set_shared_pointers, 0},
+    {NULL, NULL, 0}
+};
+
+void R_init_FIMS(DllInfo *dll) {
+  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
+}
 
 }
 

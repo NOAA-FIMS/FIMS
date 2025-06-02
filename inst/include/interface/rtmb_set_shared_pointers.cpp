@@ -5,7 +5,7 @@
 #include <R_ext/Visibility.h>
 
 
-void rtmb_set_shared_pointers() {
+extern "C" SEXP _rtmb_set_shared_pointers() {
   typedef SEXP(*funptr)(SEXP);
   funptr fun = (funptr) R_FindSymbol("getSetGlobalPtr", "RTMB", NULL);
   if (fun == NULL) {
@@ -23,4 +23,5 @@ void rtmb_set_shared_pointers() {
   }
 
   Rprintf("Global pointer successfully set: %p\n", (void*)TMBad::global_ptr);
+  return R_NilValue;
 }

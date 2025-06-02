@@ -819,9 +819,10 @@ RCPP_MODULE(fims) {
             &LogisticSelectivityInterface::inflection_point)
             .field("slope", &LogisticSelectivityInterface::slope)
             .method("get_id", &LogisticSelectivityInterface::get_id)
+            .method("evaluate_RTMB", &LogisticSelectivityInterface::evaluate_RTMB)
             .method("evaluate", &LogisticSelectivityInterface::evaluate);
-       //     .method("evaluate_RTMB", &LogisticSelectivityInterface::evaluate_RTMB)
-        //    .method("distr_dpois", &LogisticSelectivityInterface::distr_dpois);
+
+            
 
     Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
             .constructor()
