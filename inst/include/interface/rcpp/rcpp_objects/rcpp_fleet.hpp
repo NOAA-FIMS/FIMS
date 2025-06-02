@@ -313,7 +313,7 @@ public:
     copy.agecomp_expected = this->agecomp_expected.Copy();
     copy.lengthcomp_expected = this->lengthcomp_expected.Copy();
     copy.age_to_length_conversion = this->age_to_length_conversion.Copy();
-    copy.observed_landings_units.set(his->observed_landings_units.get());
+    copy.observed_landings_units.set(this->observed_landings_units.get());
     copy.observed_index_units.set(this->observed_index_units.get());
 
     return copy;

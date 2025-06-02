@@ -197,7 +197,7 @@ public:
     copy.log_M = this->log_M.Copy();
     copy.log_init_naa = this->log_init_naa.Copy();
     copy.numbers_at_age = this->numbers_at_age.Copy();
-    copy.ages = this->ages.Copy();
+    copy.ages = this->ages;
 
     return copy;
   }
