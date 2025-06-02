@@ -176,6 +176,26 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   virtual ~PopulationInterface() {}
 
+PopulationInterface Copy() {
+    PopulationInterface copy;
+    copy.nages.set(this->nages.get());
+    copy.nfleets.set(this->nfleets.get());
+    copy.nseasons.set(this->nseasons.get());
+    copy.nyears.set(this->nyears.get());
+    copy.nlengths.set(this->nlengths.get());
+    copy.maturity_id.set(this->maturity_id.get());
+    copy.growth_id.set(this->growth_id.get());
+    copy.recruitment_id.set(this->recruitment_id.get());
+    copy.recruitment_err_id.set(this->recruitment_err_id.get());
+    copy.log_M = this->log_M.Copy();
+    copy.log_init_naa = this->log_init_naa.Copy();
+    copy.numbers_at_age = this->numbers_at_age.Copy();
+    copy.ages = this->ages.Copy();
+
+    return copy;
+  }
+
+
   /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.

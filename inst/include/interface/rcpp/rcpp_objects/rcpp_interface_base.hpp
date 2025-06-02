@@ -225,6 +225,24 @@ public:
    */
   virtual ~ParameterVector(){}
 
+ParameterVector Copy(){
+    ParameterVector copy;
+    copy.storage_m = std::make_shared<std::vector<Parameter> >(*this->storage_m);
+    return copy;
+  }
+
+  /**
+   * @brief The assignment operator for a ParameterVector.
+   */
+  ParameterVector& operator=(const ParameterVector& right) {
+    // Check for self-assignment!
+    if (this == &right) // Same object?
+      return *this; // Yes, so skip assignment, and just return *this.
+    this->id_m = right.id_m;
+    this->storage_m = right.storage_m;
+    return *this;
+}
+
   /**
    * @brief Gets the ID of the ParameterVector object.
    */
