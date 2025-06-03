@@ -602,6 +602,26 @@ initialize_comp <- function(data,
       ) |>
       dplyr::pull(valid_n)
 
+  if (length(model_data) != get_n_years(data) * get_function(data)) {
+    bad_data_years <- get_data(data) |>
+      dplyr::filter(
+        name == fleet_name,
+        type == comp[["name"]]
+      ) |>
+      dplyr::count(datestart) |>
+      dplyr::filter(n != get_function(data)) |>
+      dplyr::pull(datestart)
+
+    cli::cli_abort(c(
+      "The length of the `{comp[['name']]}`-composition data for fleet
+      `{fleet_name}` does not match the expected dimensions.",
+      i = "Expected length: {get_n_years(data) * get_function(data)}",
+      i = "Actual length: {length(model_data)}",
+      i = "Number of -999 values: {sum(model_data == -999)}",
+      i = "Dates with invalid data: {bad_data_years}"
+    ))
+  }
+
   purrr::walk(
     seq_along(model_data),
     \(x) module[[comp[["comp_data_field"]]]]$set(x - 1, model_data[x])
