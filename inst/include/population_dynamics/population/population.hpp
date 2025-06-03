@@ -87,7 +87,7 @@ namespace fims_popdy {
         maturity; /*!< shared pointer to maturity module */
 
         // fleet
-        int fleet_id = -999; /*!< id of fleet model object*/
+        std::set<uint32_t>fleet_ids; /*!< ids of fleet model object interacting with this population*/
         std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
         fleets; /*!< shared pointer to fleet module */
 

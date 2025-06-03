@@ -159,11 +159,19 @@ public:
   std::string name;
 
   /**
+   * @brief A set of fleet IDs that this population is associated with.
+   * This is used to determine which fleets are associated with this population.
+   * It is a shared pointer to a set of fleet IDs.
+   */
+  std::shared_ptr<std::set<uint32_t>> fleet_ids;
+
+  /**
    * @brief The constructor.
    */
   PopulationInterface() : PopulationInterfaceBase()
   {
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<PopulationInterface>(*this));
+    this->fleet_ids = std::make_shared<std::set<uint32_t>>();
   }
 
   /**
@@ -171,7 +179,7 @@ public:
    *
    * @param other
    */
-  PopulationInterface(const PopulationInterface &other) : PopulationInterfaceBase(other), nages(other.nages), nfleets(other.nfleets), nseasons(other.nseasons), nyears(other.nyears), nlengths(other.nlengths), maturity_id(other.maturity_id), growth_id(other.growth_id), recruitment_id(other.recruitment_id), log_M(other.log_M), log_init_naa(other.log_init_naa), numbers_at_age(other.numbers_at_age), ages(other.ages), derived_ssb(other.derived_ssb), derived_naa(other.derived_naa), derived_biomass(other.derived_biomass), derived_recruitment(other.derived_recruitment), name(other.name) {}
+  PopulationInterface(const PopulationInterface &other) : PopulationInterfaceBase(other), nages(other.nages), nfleets(other.nfleets), nseasons(other.nseasons), nyears(other.nyears), nlengths(other.nlengths), maturity_id(other.maturity_id), growth_id(other.growth_id), recruitment_id(other.recruitment_id), log_M(other.log_M), log_init_naa(other.log_init_naa), numbers_at_age(other.numbers_at_age), ages(other.ages), derived_ssb(other.derived_ssb), derived_naa(other.derived_naa), derived_biomass(other.derived_biomass), derived_recruitment(other.derived_recruitment), name(other.name), fleet_ids(other.fleet_ids) {}
 
   /**
    * @brief The destructor.
@@ -202,6 +210,7 @@ public:
     copy.log_init_naa = this->log_init_naa.Copy();
     copy.numbers_at_age = this->numbers_at_age.Copy();
     copy.ages = this->ages;
+    *copy.fleet_ids = *this->fleet_ids; // copy the set of fleet IDs
 
     return copy;
   }
@@ -237,6 +246,25 @@ public:
   void SetRecruitmentID(uint32_t recruitment_id)
   {
     this->recruitment_id.set(recruitment_id);
+  }
+  /**
+   *@brief adds a fleet ID to the set of fleet IDs.
+   * @param fleet_id The ID of the fleet to add.
+   * This is used to associate fleets with this population.
+   */
+  void AddFleet(uint32_t fleet_id)
+  {
+    this->fleet_ids->insert(fleet_id);
+  }
+
+  /**
+   * @brief clears the set of fleet IDs.
+   * This is used to remove all associations with fleets.
+   * This is useful when you want to reset the associations with fleets.
+   */
+  void ClearFleets()
+  {
+    this->fleet_ids->clear();
   }
 
   /**
