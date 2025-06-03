@@ -51,6 +51,24 @@ methods::setClass(
   )
 )
 
+# methods::setMethod: printers ----
+
+methods::setMethod(
+  f = "show",
+  signature = "FIMSFit",
+  definition = function(object) {
+    cli::cli_inform(c(
+      "i" = "The object is of the class FIMSFit v.{get_version(object)}",
+      "i" = "The slots can be accessed using {.fn get_*} functions, e.g.,",
+      "*" = "{.fn get_estimates}",
+      "*" = "{.fn get_obj}",
+      "*" = "{.fn get_version}",
+      "i" = "The following slots are available: {methods::slotNames(object)}.",
+      "i" = "Use {.fn print} to see a summary of the fit."
+    ))
+  }
+)
+
 methods::setMethod(
   f = "print",
   signature = "FIMSFit",
