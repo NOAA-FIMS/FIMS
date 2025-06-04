@@ -481,6 +481,12 @@ public:
     std::shared_ptr<fims_popdy::Population<Type>> population =
         std::make_shared<fims_popdy::Population<Type>>();
 
+    typename std::set<uint32_t>::iterator fit;
+    for (fit = this->fleet_ids->begin(); fit != this->fleet_ids->end(); ++fit)
+    {
+      population->fleet_ids.insert(*fit);
+    }
+
     std::stringstream ss;
 
     // set relative info
