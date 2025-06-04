@@ -187,14 +187,14 @@ public:
   virtual ~PopulationInterface() {}
 
   /**
-   * @brief Copy the PopulationInterface object.
+   * @brief Deep copy the PopulationInterface object.
    * @details This function creates a deep copy of the PopulationInterface object
-   * and returns it. It is used to create a new instance of the FleetInterface
+   * and returns it. It is used to create a new instance of the PopulationInterface
    * with the same properties as the original object except the shared memory components
    * are also copies, making the returned object independent of the original.
    * @return A copy of the PopulationInterface object.
    */
-  PopulationInterface Copy()
+  PopulationInterface Clone()
   {
     PopulationInterface copy;
     copy.nages.set(this->nages.get());
@@ -212,7 +212,7 @@ public:
     copy.ages = this->ages;
     *copy.fleet_ids = *this->fleet_ids; // copy the set of fleet IDs
 
-    return copy;
+    return copy;//Rcpp::wrap(copy);
   }
 
   /**
@@ -256,6 +256,8 @@ public:
   {
     this->fleet_ids->insert(fleet_id);
   }
+
+
 
   /**
    * @brief clears the set of fleet IDs.
