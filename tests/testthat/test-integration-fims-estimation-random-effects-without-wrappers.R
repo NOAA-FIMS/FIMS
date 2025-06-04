@@ -97,7 +97,7 @@ test_that("estimation test with recruitment re on log devs", {
 
 test_that("estimation test with recruitment re on logr", {
   # Compare FIMS results with model comparison project OM values
-    # Tests currently don't pass when log devs are estimated
+  # Tests currently don't pass when log devs are estimated
   testthat::skip()
   validate_fims(
     report = result_log_r[["report"]],
