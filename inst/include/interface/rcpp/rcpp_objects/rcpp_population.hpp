@@ -170,8 +170,9 @@ public:
    */
   PopulationInterface() : PopulationInterfaceBase()
   {
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<PopulationInterface>(*this));
     this->fleet_ids = std::make_shared<std::set<uint32_t>>();
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<PopulationInterface>(*this));
+    
   }
 
   /**
@@ -212,7 +213,7 @@ public:
     copy.ages = this->ages;
     *copy.fleet_ids = *this->fleet_ids; // copy the set of fleet IDs
 
-    return copy;//Rcpp::wrap(copy);
+    return copy; // Rcpp::wrap(copy);
   }
 
   /**
@@ -256,8 +257,6 @@ public:
   {
     this->fleet_ids->insert(fleet_id);
   }
-
-
 
   /**
    * @brief clears the set of fleet IDs.
@@ -484,11 +483,13 @@ public:
         std::make_shared<fims_popdy::Population<Type>>();
 
     typename std::set<uint32_t>::iterator fit;
-    for (fit = this->fleet_ids->begin(); fit != this->fleet_ids->end(); ++fit)
-    {
-      population->fleet_ids.insert(*fit);
-    }
-
+    if (this->fleet_ids->size() > 0)
+      {
+        for (fit = this->fleet_ids->begin(); fit != this->fleet_ids->end(); ++fit)
+        {
+          population->fleet_ids.insert(*fit);
+        }
+      }
     std::stringstream ss;
 
     // set relative info
@@ -568,7 +569,8 @@ public:
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
-  virtual bool add_to_fims_tmb()
+  virtual bool
+  add_to_fims_tmb()
   {
     FIMS_INFO_LOG("adding Population object to TMB");
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
