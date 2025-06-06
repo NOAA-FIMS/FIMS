@@ -48,10 +48,10 @@ test_that("prior predictive check", {
   fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
   fishing_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
   # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
+  fishing_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
   fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
   # turn on estimation of slope
-  fishing_fleet_selectivity$slope[1]$estimation_type <- "fixed_effects"
+  fishing_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
   # Initialize the fishing fleet module
   # Initialize the fishing fleet module
@@ -119,17 +119,17 @@ test_that("prior predictive check", {
   survey_fleet_selectivity <- methods::new(LogisticSelectivity)
   survey_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]
   # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point[1]$estimation_type <- "fixed_effects"
+  survey_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
   survey_fleet_selectivity$slope[1]$value <- om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]
   # turn on estimation of slope
-  survey_fleet_selectivity$slope[1]$estimation_type <- "fixed_effects"
+  survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
   survey_fleet <- methods::new(Fleet)
   survey_fleet$nages$set(om_input[["nages"]])
   survey_fleet$nyears$set(om_input[["nyr"]])
   survey_fleet$nlengths$set(om_input[["nlengths"]])
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
-  survey_fleet$log_q[1]$estimation_type <- "fixed_effects"
+  survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
@@ -174,10 +174,10 @@ test_that("prior predictive check", {
 
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
-  recruitment$log_rzero[1]$estimation_type <- "fixed_effects"
+  recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
   # set up logit_steep
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
-  recruitment$logit_steep[1]$estimation_type <- "constant"
+  recruitment$logit_steep[1]$estimation_type$set("constant")
   # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
@@ -219,9 +219,9 @@ test_that("prior predictive check", {
   # Maturity
   maturity <- methods::new(LogisticMaturity)
   maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
-  maturity$inflection_point[1]$estimation_type <- "constant"
+  maturity$inflection_point[1]$estimation_type$set("constant")
   maturity$slope[1]$value <- om_input[["slope.mat"]]
-  maturity$slope[1]$estimation_type <- "constant"
+  maturity$slope[1]$estimation_type$set("constant")
 
   # Population
   population <- methods::new(Population)
