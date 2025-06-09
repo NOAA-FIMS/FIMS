@@ -163,10 +163,10 @@ namespace fims_popdy {
             std::fill(proportion_female.begin(), proportion_female.end(), static_cast<Type>(0.5));
 
             // Transformation Section
-            for (size_t age = 0; age < this->nages; age++) {
-                this->weight_at_age[age] = growth->evaluate(ages[age]);
+            for (size_t a = 0; a < this->nages; a++) {
+                this->weight_at_age[a] = growth->evaluate(ages[a]);
                 for (size_t year = 0; year < this->nyears; year++) {
-                    size_t i_age_year = age * this->nyears + year;
+                    size_t i_age_year = a * this->nyears + year;
                     this->M[i_age_year] = fims_math::exp(this->log_M[i_age_year]);
                     // mortality_F is a fims::Vector and therefore needs to be filled
                     // within a loop
@@ -201,8 +201,10 @@ namespace fims_popdy {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
                 this->mortality_F[i_age_year] +=
                         this->fleets[fleet_]->Fmort[year] *
-                        // evaluate is a member function of the selectivity class
-                        this->fleets[fleet_]->selectivity->evaluate(ages[age]);
+                        // TODO:
+                        // the line below will need to be changed dimension wise
+                        // if selectivity-at-age can be time varying
+                        this->fleets[fleet_]->selectivity_at_age[age];
             }
 
             this->mortality_Z[i_age_year] =
@@ -371,14 +373,14 @@ namespace fims_popdy {
          * ageage
          *
          * @param i_age_year dimension folded index for age and year
-         * @param age the age of maturity
+         * @param a the index of the age for calculating the fraction mature
          */
-        void CalculateMaturityAA(size_t i_age_year, size_t age) {
+        void CalculateMaturityAA(size_t i_age_year, size_t a) {
             // this->maturity is pointing to the maturity module, which has
             //  an evaluate function. -> can be nested.
 
             this->proportion_mature_at_age[i_age_year] =
-                    this->maturity->evaluate(ages[age]);
+                    this->maturity->evaluate(ages[a]);
 
         }
 
@@ -420,7 +422,7 @@ namespace fims_popdy {
                 // Baranov Catch Equation
                 this->fleets[fleet_]->landings_numbers_at_age[i_age_year] +=
                 (this->fleets[fleet_]->Fmort[year] *
-                    this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
+                    this->fleets[fleet_]->selectivity_at_age[age]) /
                     this->mortality_Z[i_age_year] *
                     this->numbers_at_age[i_age_year] *
                     (1 - fims_math::exp(-(this->mortality_Z[i_age_year])));
@@ -475,8 +477,8 @@ namespace fims_popdy {
             for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
 
                 this->fleets[fleet_]->index_numbers_at_age[i_age_year] +=
-                (this->fleets[fleet_]->q.get_force_scalar(year) *
-                this->fleets[fleet_]->selectivity->evaluate(ages[age]))*
+                this->fleets[fleet_]->q.get_force_scalar(year) *
+                this->fleets[fleet_]->selectivity_at_age[age]*
                 this->numbers_at_age[i_age_year];
             }
         }

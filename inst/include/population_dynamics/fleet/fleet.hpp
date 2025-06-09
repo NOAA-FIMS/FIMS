@@ -30,6 +30,7 @@ namespace fims_popdy
         size_t nages;              /*!< the number of ages in the model*/
         size_t nlengths;           /*!< the number of lengths in the model*/
         fims::Vector<double> ages; /*!< vector of the ages for referencing*/
+        fims::Vector<double> lengths; /*!< vector of the ages for referencing*/
 
         // selectivity
         int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
@@ -140,13 +141,18 @@ namespace fims_popdy
             // TODO: Think about how to make this a vector so you can start at
             // whatever age you want instead of age 0 with using resize.
             ages.resize(nages);
-#warning this  is wrong
+            lengths.resize(nlengths);
+#warning this  is wrong          
             // use a magic number for right now but eventually we need to add this
             // to fleet
             for (size_t i = 0; i < this->ages.size(); i++) {
                 this->ages[i] = static_cast<double>(i+1);
             }
-
+            // use a magic number for right now but eventually we need to add this
+            // to fleet
+            for (size_t i = 0; i < this->lengths.size(); i++) {
+                this->lengths[i] = static_cast<double>(i+1);
+            }
             // selectivity
             selectivity_at_age.resize(nages);
 
@@ -200,10 +206,26 @@ namespace fims_popdy
             // selectivity
             // TODO: We need an if here to use age or length in the evaluate function
             // No age in fleet
-            for (size_t age = 0; age < this->nages; age++)
-            {
-                this->selectivity_at_age[age] = this->selectivity->evaluate(ages[age]);
+            if(selectivity_units == "age"){
+                for (size_t a = 0; a < this->nages; a++)
+                {
+                    this->selectivity_at_age[a] = this->selectivity->evaluate(ages[a]);
+                }
+            }else if(selectivity_units == "length"){
+                for (size_t a = 0; a < this->nages; a++)
+                {
+                    for (size_t l = 0; l < this->nlengths; l++)
+                    {
+                        // iterate through all lengths within an age and sum the selectivity
+                        // to get a selectivity at age
+                        size_t i_length_age = a * this->nlengths + l;
+                        this->selectivity_at_age[a] += 
+                        this->age_to_length_conversion[i_length_age] *
+                            this->selectivity->evaluate(lengths[l]);
+                    }
+                }
             }
+            
 
             // derived quantities are filled with zero because they have compound
             // assignment
