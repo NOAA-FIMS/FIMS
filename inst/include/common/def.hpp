@@ -79,9 +79,13 @@
 #ifdef TMB_MODEL
 // simplify access to singletons
 #define TMB_FIMS_REAL_TYPE double
+#ifdef TMBAD_FRAMEWORK
+#define TMBAD_FIMS_TYPE TMBad::ad_aug
+#else
 #define TMB_FIMS_FIRST_ORDER AD<TMB_FIMS_REAL_TYPE>
 #define TMB_FIMS_SECOND_ORDER AD<TMB_FIMS_FIRST_ORDER>
 #define TMB_FIMS_THIRD_ORDER AD<TMB_FIMS_SECOND_ORDER>
+#endif
 #endif
 
 namespace fims {
