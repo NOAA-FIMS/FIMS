@@ -11,6 +11,9 @@
 
 #include "../../../population_dynamics/selectivity/selectivity.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../interface.hpp"
+
+#include "../../RTMB.h"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp selectivity
@@ -129,6 +132,29 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     LogisticSel.slope[0] = this->slope[0].initial_value_m;
     return LogisticSel.evaluate(x);
   }
+
+  
+    #ifdef TMB_MODEL
+    ADrep evaluate_RTMB(ADrep x, ADrep input_inflection_point, ADrep input_slope){
+        fims_popdy::LogisticSelectivity<ad> LogSel;
+        // inflection_point and slope are fims::Vector<Type>
+        // initial_value_m is a double
+        const ad* IP = adptr(input_inflection_point);
+        LogSel.inflection_point.resize(1);
+        LogSel.inflection_point[0] = *IP;
+        LogSel.slope.resize(1);
+        const ad* Slope = adptr(input_slope);
+        LogSel.slope[0] = *Slope;
+        const ad* X = adptr(x);
+        int n = x.size();
+        ADrep ans(n); 
+        ad* Y = adptr(ans); 
+        for(int i=0; i<n; i++){
+            Y[i] = LogSel.evaluate(X[i]);
+        }
+        return ans; 
+    }
+    #endif
 
   /** 
    * @brief Extracts derived quantities back to the Rcpp interface object from

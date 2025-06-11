@@ -398,7 +398,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     if (this->nages.get() == this->ages.size()) {
       population->ages.resize(this->nages.get());
     } else {
-      warning("The ages vector is not of size nages.");
+      Rcpp::warning("The ages vector is not of size nages.");
     }
 
     population->growth_id = this->growth_id.get();

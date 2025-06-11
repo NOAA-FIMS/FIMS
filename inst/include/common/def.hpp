@@ -539,7 +539,7 @@ namespace fims {
     };
 
 
-    std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
+    inline std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 
 } // namespace fims
 
@@ -574,7 +574,7 @@ namespace fims {
      *
      * @param sig
      */
-    void WriteAtExit(int sig) {
+    inline void WriteAtExit(int sig) {
 
         std::string signal_error = "NA";
         switch (sig) {

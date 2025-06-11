@@ -4,3 +4,6 @@ CXX17STD = -std=c++17
 CXX14FLAGS = Wa, -mbig-obj -O3
 CXX17FLAGS = Wa, -mbig-obj -O3
 
+SRC_FILES = $(wildcard *.cpp)
+all: $(SHLIB)
+

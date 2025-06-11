@@ -1,0 +1,81 @@
+---
+title: "Introducing the Fisheries Integrated Modeling System (FIMS)"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Introducing the Fisheries Integrated Modeling System (FIMS)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## FIMS-RTMB Example
+This demo uses a FIMS module to set up an RTMB model.
+```{r memory, warning=FALSE, message=FALSE}
+library(FIMS)
+FIMS:::setup_RTMB()
+library(ggplot2)
+
+# clear memory
+clear()
+```
+
+### Set up a logistic module using FIMS
+
+```{r logistic-module}
+logistic <- methods::new(LogisticSelectivity)
+```
+
+### Simulate data using the FIMS module
+```{r simulate}
+# set the two parameters from the logistic module:
+#   inflection_point and slope
+logistic$inflection_point[1]$value <- 10.0
+logistic$slope[1]$value <- 0.2
+X <- 1:30
+Y <- mu <- X * 0
+sdy <- 0.05 #observation error around logistic
+
+set.seed(123)
+for(i in X){
+    # evaluate returns the logistic function given the parameters and x 
+    mu[i] <- logistic$evaluate(X[i])
+    # simulate random noise around the mean
+    Y[i] <- rnorm(1, mu[i], sdy)
+}
+
+df <- data.frame(x = X, y = Y)
+ggplot(df, aes(x = x, y = y)) + geom_point()
+```
+
+### Set up RTMB model
+```{r model}
+dat <- list(y = Y, x = X)
+par <- list(inflection_point = 10, slope = 0.2,
+            ln_sdy = 0)
+
+mod <- function(par){
+    getAll(par, dat)
+    sdy <- exp(ln_sdy)
+    mean_selectivity <- logistic$evaluate_RTMB(
+        x = advector(dat$x),
+        inflection_point = advector(par$inflection_point),
+        slope = advector(par$slope)
+    )
+    nll <- 0
+    for(i in x){
+        nll <- nll - RTMB::dnorm(y[i], mean_selectivity[i], sdy, TRUE)
+    }
+    return(nll)
+}
+```
+
+### Generate TMB object and optimize
+```{r fit}
+obj <- RTMB::MakeADFun(mod, par)
+opt <- nlminb(obj$par, obj$fn, obj$gr)
+opt$par
+```

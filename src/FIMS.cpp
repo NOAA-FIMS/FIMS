@@ -3,9 +3,9 @@
 
 #include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 #include "../inst/include/interface/interface.hpp"
-#include "init.hpp"
-#include "fims_modules.hpp"
 #include "../inst/include/common/model.hpp"
+#include "fims_modules.hpp"
+#include "init.hpp"
 
 /// @cond
 /**
@@ -45,4 +45,7 @@ Type objective_function<Type>::operator()() {
     return nll;
 
 }
+
+
+
 /// @endcond

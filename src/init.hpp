@@ -20,11 +20,17 @@ extern "C" {
 SEXP _rcpp_module_boot_fims();
 
 /**
+ * @brief Sets up the pointers for an RTMB environment.
+ */
+SEXP _rtmb_set_shared_pointers();
+
+/**
  * @brief Callback definition to load the FIMS module.
  */
 static const R_CallMethodDef CallEntries[] = {
     TMB_CALLDEFS,
     {"_rcpp_module_boot_fims", (DL_FUNC)&_rcpp_module_boot_fims, 0},
+    {"_rtmb_set_shared_pointers", (DL_FUNC)&_rtmb_set_shared_pointers, 0},
     {NULL, NULL, 0}};
 
 /**

@@ -7,6 +7,7 @@
  */
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
+
 #include "../../common/model.hpp"
 #include "../../utilities/fims_json.hpp"
 #include "rcpp_objects/rcpp_interface_base.hpp"
@@ -470,4 +471,5 @@ void log_error(std::string log_entry) {
 
   fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
+
 #endif // FIMS_INTERFACE_RCPP_INTERFACE_HPP
