@@ -4,8 +4,9 @@
 name: Collect contributors
 
 on:
-  schedule:
-    - cron: '0 8 * * 1'
+  push:
+    branches:
+      - dev
   workflow_dispatch:
 
 jobs:
