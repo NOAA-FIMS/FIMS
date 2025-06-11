@@ -54,24 +54,34 @@ bool CreateTMBModel() {
   }
 
   // base model
-  std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
-    fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-  d0->CreateModel();
+    #ifdef TMBAD_FRAMEWORKAdd commentMore actions
+    std::shared_ptr<fims_info::Information < TMBAD_FIMS_TYPE>> info =
+            fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+    info->CreateModel();
 
-  // first-order derivative
-  std::shared_ptr<fims_info::Information < TMB_FIMS_FIRST_ORDER>> d1 =
-    fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-  d1->CreateModel();
+    #else
+    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info0 =
+            fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    info0->CreateModel();
 
-  // second-order derivative
-  std::shared_ptr<fims_info::Information < TMB_FIMS_SECOND_ORDER>> d2 =
-    fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-  d2->CreateModel();
+    // first-order derivative
+    std::shared_ptr<fims_info::Information < TMB_FIMS_FIRST_ORDER>> info1 =
+            fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+    info1->CreateModel();
 
-  // third-order derivative
-  std::shared_ptr<fims_info::Information < TMB_FIMS_THIRD_ORDER>> d3 =
-    fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-  d3->CreateModel();
+    // second-order derivative
+    std::shared_ptr<fims_info::Information < TMB_FIMS_SECOND_ORDER>> info2 =
+            fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+    info2->CreateModel();
+
+    // third-order derivative
+    std::shared_ptr<fims_info::Information < TMB_FIMS_THIRD_ORDER>> info3 =
+            fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+    info3->CreateModel();
+    #endif
+
+    return true;
+}
 
   // instantiate the model? TODO: Ask Matthew what this does
   std::shared_ptr<fims_model::Model < TMB_FIMS_REAL_TYPE>> m0 =
@@ -327,10 +337,14 @@ void clear() {
   DmultinomDistributionsInterface::id_g = 1;
   DmultinomDistributionsInterface::live_objects.clear();
 
+  #ifdef TMBAD_FRAMEWORKAdd commentMore actions
+  clear_internal<TMBAD_FIMS_TYPE>();
+  #else
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMB_FIMS_FIRST_ORDER>();
   clear_internal<TMB_FIMS_SECOND_ORDER>();
   clear_internal<TMB_FIMS_THIRD_ORDER>();
+  #endif
 
   fims::FIMSLog::fims_log->clear();
 
