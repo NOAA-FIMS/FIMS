@@ -4,8 +4,9 @@
 name: Collect contributors
 
 on:
-  schedule:
-    - cron: '0 8 * * 1'
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -28,7 +29,7 @@ jobs:
                     gh
                     allcontributors
             - name: Collect contributor data
-              run: Rscript -e 'allcontributors::add_contributors(files = c("README.md"), alphabetical = TRUE)'
+              run: Rscript -e 'allcontributors::add_contributors(files = c("README.md"))'
             - name: Create Pull Request
               uses: peter-evans/create-pull-request@v7
               with:
