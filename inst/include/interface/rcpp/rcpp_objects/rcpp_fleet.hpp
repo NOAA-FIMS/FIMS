@@ -874,7 +874,7 @@ public:
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    #ifdef TMBAD_FRAMEWORK Add commentMore actions
+    #ifdef TMBAD_FRAMEWORK
         this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
     #else
     FIMS_INFO_LOG("adding Fleet object to TMB");
