@@ -267,6 +267,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual bool add_to_fims_tmb() {
     #ifdef TMBAD_FRAMEWORK
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
         this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
     #else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
@@ -541,6 +542,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual bool add_to_fims_tmb() {
     #ifdef TMBAD_FRAMEWORK
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
         this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
     #else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();

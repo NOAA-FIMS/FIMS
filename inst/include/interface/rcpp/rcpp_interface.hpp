@@ -55,6 +55,10 @@ bool CreateTMBModel() {
 
   // base model
     #ifdef TMBAD_FRAMEWORK
+     std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info0 =
+            fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    info0->CreateModel();
+
     std::shared_ptr<fims_info::Information < TMBAD_FIMS_TYPE>> info =
             fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
     info->CreateModel();
@@ -175,13 +179,13 @@ std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn, Rcpp::Func
  */
 Rcpp::NumericVector get_fixed_parameters_vector() {
   // base model
-  std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
+  std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info0 =
     fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   Rcpp::NumericVector p;
 
-  for (size_t i = 0; i < d0->fixed_effects_parameters.size(); i++) {
-    p.push_back(*d0->fixed_effects_parameters[i]);
+  for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++) {
+    p.push_back(*info0->fixed_effects_parameters[i]);
   }
 
   return p;
@@ -336,7 +340,8 @@ void clear() {
   DmultinomDistributionsInterface::live_objects.clear();
 
   #ifdef TMBAD_FRAMEWORK
-  clear_internal<TMBAD_FIMS_TYPE>();
+    clear_internal<TMB_FIMS_REAL_TYPE>();
+    clear_internal<TMBAD_FIMS_TYPE>();
   #else
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMB_FIMS_FIRST_ORDER>();
