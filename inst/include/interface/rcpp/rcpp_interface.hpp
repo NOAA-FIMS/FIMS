@@ -54,7 +54,7 @@ bool CreateTMBModel() {
   }
 
   // base model
-    #ifdef TMBAD_FRAMEWORKAdd commentMore actions
+    #ifdef TMBAD_FRAMEWORK
     std::shared_ptr<fims_info::Information < TMBAD_FIMS_TYPE>> info =
             fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
     info->CreateModel();
@@ -80,8 +80,6 @@ bool CreateTMBModel() {
     info3->CreateModel();
     #endif
 
-    return true;
-}
 
   // instantiate the model? TODO: Ask Matthew what this does
   std::shared_ptr<fims_model::Model < TMB_FIMS_REAL_TYPE>> m0 =
@@ -337,7 +335,7 @@ void clear() {
   DmultinomDistributionsInterface::id_g = 1;
   DmultinomDistributionsInterface::live_objects.clear();
 
-  #ifdef TMBAD_FRAMEWORKAdd commentMore actions
+  #ifdef TMBAD_FRAMEWORK
   clear_internal<TMBAD_FIMS_TYPE>();
   #else
   clear_internal<TMB_FIMS_REAL_TYPE>();
