@@ -276,7 +276,7 @@ reshape_json_derived_quantities <- function(finalized_fims) {
 #' reshapes the initial values for data inputs into a structured tibble.
 #'
 #' @param finalized_fims A JSON object containing the finalized FIMS output.
-#' @return A tibble containing the reshaped likelihood estimates.
+#' @return A tibble containing the reshaped initial data values.
 #'
 reshape_json_values <- function(finalized_fims) {
   json_list <- jsonlite::fromJSON(finalized_fims)
@@ -325,15 +325,16 @@ reshape_json_values <- function(finalized_fims) {
 }
 
 
-#' Reshape JSON 'fits' components - UNFINISHED
+#' Reshape JSON 'fits' components
 #'
 #' This function processes the finalized FIMS JSON output and extracts/formats
 #' log_like, distribution, init, and expected from
 #' density_components, observed_values, and expected_values
-#' into a structured tibble for easier analysis and manipulation.
+#' into a structured tibble for easier analysis and manipulation. Values are
+#' subsequently used to generate the 'fits' tibble from get_fits().
 #'
 #' @param finalized_fims A JSON object containing the finalized FIMS output.
-#' @return A tibble containing the reshaped likelihood estimates.
+#' @return A tibble containing the reshaped data fitting values.
 #'
 reshape_json_fits <- function(finalized_fims) {
   json_list <- jsonlite::fromJSON(finalized_fims)

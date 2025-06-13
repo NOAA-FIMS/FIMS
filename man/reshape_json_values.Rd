@@ -10,7 +10,7 @@ reshape_json_values(finalized_fims)
 \item{finalized_fims}{A JSON object containing the finalized FIMS output.}
 }
 \value{
-A tibble containing the reshaped likelihood estimates.
+A tibble containing the reshaped initial data values.
 }
 \description{
 This function processes the model input from FIMS JSON output ('values') and

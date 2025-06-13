@@ -190,8 +190,50 @@ methods::setGeneric("get_estimates", function(x) standardGeneric("get_estimates"
 methods::setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
 
 #' @return
-#' [get_fits()] returns a tibble of parameter values and their
-#' uncertainties from a fitted model.
+#' [get_fits()] returns a tibble of input data and corresponding
+#'  expected values, likelihoods, and additional metadata from a fitted model.
+#'  The tibble includes the following variables:
+#' \itemize{
+#'  \item{module_name}{Character string that describes the name of the module,
+#'  e.g., `"Data"`.}
+#'  \item{module_id}{Integer that provides identifier for linking outputs.}
+#'  \item{label}{Character string that describes type of data.}
+#'  \item{data_id}{Not yet implemented/NA: Integer that will provide
+#'  unique identifer for data.}
+#'  \item{fleet_name}{Not yet implemented/NA: Character string that
+#' will provide fleet name corresponding to name provided via FIMSFrame.}
+#'  \item{unit}{Not yet implemented/NA: Character string that will
+#'  describe appropriate units for the data inputs and expected values.}
+#'  \item{uncertainty}{Not yet implemented/NA: Character string that will
+#'  describe the uncertainty specified for the data input value.}
+#'  \item{age}{Not yet implemented/NA: Integer that will provide the age
+#'  affiliated with a data input, where appropriate.}
+#'  \item{length}{Not yet implemented/NA: Integer that will provide the length
+#'  affiliated with a data input, where appropriate.}
+#'  \item{datestart}{Not yet implemented/NA: Character string that will provide
+#'  the start date for the data input, corresponding to the value provided in
+#'  the input data.}
+#'  \item{dateend}{Not yet implemented/NA: Character string that will provide
+#'  the end date for the data input, corresponding to the value provided in
+#'  the input data.}
+#'  \item{year}{Not yet implemented/NA: Integer that will provide model year
+#'  for the data input.}
+#'  \item{init}{Numeric that provides the initial value for the data input.}
+#'  \item{expected}{Numeric that provides the expected value for the data input.
+#'  *NOTE: units for provided init and expected values need to be standardized.}
+#'  \item{log_like}{Numeric that provides log-likelihood for expected value.}
+#'  \item{distribution}{Character string that indicates the distribution used
+#'  for the log-likelihood estimation.}
+#'  \item{re_estimated}{Logical that indicates whether any random effects were
+#'  estimated during model fitting. Log-likelihood values should not be directly
+#'  compared between models with and without estimation of random effects.}
+#'  \item{log_like_cv}{Not yet implemented/NA: Numeric that will indicate
+#'  corresponding uncertainty for the log-likelihood value.}
+#'  \item{weight}{Numeric that indicates data weighting applied to each data
+#'  value; manually fixed at 1. *NOTE: Will need to be made responsive to
+#'  user-specified or user-estimated data weighting once data weighting is
+#'  added to FIMS as a feature.}
+#' }
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
@@ -364,29 +406,6 @@ FIMSFit <- function(
     sdreport = list(),
     timing = c("time_total" = as.difftime(0, units = "secs")),
     version = utils::packageVersion("FIMS")) {
-  # What we aspire the 'fits' table to look like
-  fits_outline <- dplyr::tibble(
-    module_name = character(),
-    module_id = integer(),
-    label = character(), # equiv. to 'type' in data input table (e.g., landings, index, age, length)
-    data_id = integer(),
-    fleet_name = character(), # equiv. to 'name' in data input table (e.g., fleet1, survey1)
-    unit = character(),
-    uncertainty = numeric(),
-    age = integer(),
-    length = integer(),
-    datestart = as.Date(character()),
-    dateend = as.Date(character()),
-    year = integer(), # year of model run
-    init = numeric(), # equiv. to 'value' in data input table
-    expected = numeric(),
-    log_like = numeric(),
-    distribution = character(),
-    re_estimated = logical(),
-    log_like_cv = numeric(),
-    weight = numeric()
-  )
-  rm(fits_outline)
 
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
@@ -551,16 +570,13 @@ FIMSFit <- function(
     )
 
   # Create fits tibble
-  # TO DO
-  # 1. Develop better method to provide 'module_name'/'module_id'/'label'
-  # for 'init', 'expected', 'distribution'
-  # 2. Find generalizable way to standardize 'init' and 'expected' units
-  # for distribution %in% c("Dlnorm", "Dmultinom")
-  # 3. Double-check string for 'random_effects' IF statemenet
-  # 4. Develop means to provide missing metadata for desired columns
+  # TODO: Develop better/more reliable method for obtaining 'module_name'/'module_id'/'label' from output
+  # TODO: Standardize 'init' and 'expected' units for distributions Dlnorm, Dmultinom
+  # TODO: Develop means to provide values for remaining columns with NAs
 
-  # Obtain 'init' values for data inputs reported in JSON file, using 'values'
-  # Necessary to obtain 'label' values (e.g., "Index", "AgeComp", etc.)
+  # Obtain preliminary 'init' values for data inputs in JSON, using 'values'
+  # Necessary to obtain 'label' values (e.g., "Index", "AgeComp", etc.) for
+  # final 'init', 'expected', etc.
   data_init_res <- reshape_json_values(finalized_fims) |>
     dplyr::filter(module_name == "data") |> # remove EWAA
     dplyr::rename(

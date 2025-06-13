@@ -2,7 +2,7 @@
 % Please edit documentation in R/reshape_output.R
 \name{reshape_json_fits}
 \alias{reshape_json_fits}
-\title{Reshape JSON 'fits' components - UNFINISHED}
+\title{Reshape JSON 'fits' components}
 \usage{
 reshape_json_fits(finalized_fims)
 }
@@ -10,11 +10,12 @@ reshape_json_fits(finalized_fims)
 \item{finalized_fims}{A JSON object containing the finalized FIMS output.}
 }
 \value{
-A tibble containing the reshaped likelihood estimates.
+A tibble containing the reshaped data fitting values.
 }
 \description{
 This function processes the finalized FIMS JSON output and extracts/formats
 log_like, distribution, init, and expected from
 density_components, observed_values, and expected_values
-into a structured tibble for easier analysis and manipulation.
+into a structured tibble for easier analysis and manipulation. Values are
+subsequently used to generate the 'fits' tibble from get_fits().
 }
