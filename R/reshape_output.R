@@ -269,3 +269,143 @@ reshape_json_derived_quantities <- function(finalized_fims) {
     # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
     dplyr::relocate(module_name, module_id, module_type, .before = tidyselect::everything())
 }
+
+#' Reshape JSON 'values' components
+#'
+#' This function processes the model input from FIMS JSON output ('values') and
+#' reshapes the initial values for data inputs into a structured tibble.
+#'
+#' @param finalized_fims A JSON object containing the finalized FIMS output.
+#' @return A tibble containing the reshaped initial data values.
+#'
+reshape_json_values <- function(finalized_fims) {
+  json_list <- jsonlite::fromJSON(finalized_fims)
+  # Identify the index of the "modules" element in `json_list` by matching its name.
+  # This is used to locate the relevant part of the JSON structure for further processing.
+  modules_id <- which(names(json_list) == "modules")
+
+  values <- purrr::map(seq_along(json_list[[modules_id]][["values"]]), ~ {
+    # If the current module's "values" is NULL, return NULL to skip processing.
+    if (is.null(json_list[[modules_id]][["values"]][[.x]])) {
+      NULL
+    } else {
+      # Convert the current module's "values" into a tibble for easier manipulation.
+      tibble::as_tibble(json_list[[modules_id]][["values"]][[.x]])
+    }
+  })
+
+  expanded_values <- purrr::pmap(
+    list(
+      values,
+      json_list[[modules_id]][["name"]],
+      json_list[[modules_id]][["id"]],
+      json_list[[modules_id]][["type"]]
+    ),
+    ~ {
+      # Skip processing if the current derived_quantity is NULL.
+      if (is.null(..1)) {
+        NULL
+      } else {
+        ..1 |>
+          dplyr::mutate(
+            # Add the module name from `json_list` as a new column of the current estimates.
+            module_name = ..2,
+            # Add the module ID from `json_list` as a new column.
+            module_id = ..3,
+            # Add the module type from `json_list` as a new column.
+            module_type = ..4
+          )
+      }
+    }
+  ) |>
+    # Combine all the processed tibbles into a single tibble by stacking rows.
+    dplyr::bind_rows() |>
+    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
+    dplyr::relocate(module_name, module_id, module_type, .before = everything())
+}
+
+
+#' Reshape JSON 'fits' components
+#'
+#' This function processes the finalized FIMS JSON output and extracts/formats
+#' log_like, distribution, init, and expected from
+#' density_components, observed_values, and expected_values
+#' into a structured tibble for easier analysis and manipulation. Values are
+#' subsequently used to generate the 'fits' tibble from get_fits().
+#'
+#' @param finalized_fims A JSON object containing the finalized FIMS output.
+#' @return A tibble containing the reshaped data fitting values.
+#'
+reshape_json_fits <- function(finalized_fims) {
+  json_list <- jsonlite::fromJSON(finalized_fims)
+  # Identify the index of the "modules" element in `json_list`.
+  # This is used to locate the relevant part of the JSON structure.
+  modules_id <- which(names(json_list) == "modules")
+
+  log_like <- purrr::map(seq_along(json_list[[modules_id]][["density_component"]][["values"]]), ~ {
+    # If the current module's "density_component" is NULL, return NULL to skip processing.
+    if (is.null(json_list[[modules_id]][["density_component"]][["values"]][[.x]])) {
+      NULL
+    } else {
+      # Convert the current module's "density_component" into a tibble for easier manipulation.
+      tibble::as_tibble(json_list[[modules_id]][["density_component"]][["values"]][[.x]])
+    }
+  })
+
+  init <- purrr::map(seq_along(json_list[[modules_id]][["observed_values"]][["values"]]), ~ {
+    # If the current module's "observed_values" is NULL, return NULL to skip processing.
+    if (is.null(json_list[[modules_id]][["observed_values"]][["values"]][[.x]])) {
+      NULL
+    } else {
+      # Convert the current module's "observed_values" into a tibble for easier manipulation.
+      tibble::as_tibble(json_list[[modules_id]][["observed_values"]][["values"]][[.x]])
+    }
+  })
+
+  expected <- purrr::map(seq_along(json_list[[modules_id]][["expected_values"]][["values"]]), ~ {
+    # If the current module's "expected_values" is NULL, return NULL to skip processing.
+    if (is.null(json_list[[modules_id]][["expected_values"]][["values"]][[.x]])) {
+      NULL
+    } else {
+      # Convert the current module's "expected_values" into a tibble for easier manipulation.
+      tibble::as_tibble(json_list[[modules_id]][["expected_values"]][["values"]][[.x]])
+    }
+  })
+
+  prelim_fits <- purrr::pmap(
+    list(
+      log_like,
+      init,
+      expected,
+      json_list[[modules_id]][["name"]],
+      json_list[[modules_id]][["id"]],
+      json_list[[modules_id]][["type"]]
+    ),
+    ~ {
+      # Skip processing if the current log_like is NULL.
+      if (is.null(..1)) {
+        NULL
+      } else {
+        ..1 |>
+          dplyr::rename(log_like = value) |>
+          cbind(..2) |>
+          dplyr::rename(init = value) |>
+          cbind(..3) |>
+          dplyr::rename(expected = value) |>
+          dplyr::mutate(
+            # Add the module name from `json_list` as a new column of the current estimates.
+            module_name = ..4,
+            # Add the module ID from `json_list` as a new column.
+            module_id = ..5,
+            # Add the module type from `json_list` as a new column.
+            module_type = ..6
+          )
+      }
+    }
+  ) |>
+    # Combine all the processed tibbles into a single tibble by stacking rows.
+    dplyr::bind_rows() |>
+    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
+    dplyr::relocate(module_name, module_id, module_type, .before = everything()) |>
+    tibble::as_tibble()
+}

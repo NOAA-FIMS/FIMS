@@ -243,9 +243,19 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         }
       }
 
-      this->lpdf_vec = RealVector(dnorm->lpdf_vec.size());
-      for(R_xlen_t i=0; i < this->lpdf_vec.size(); i++) {
-          this->lpdf_vec[i] = dnorm->lpdf_vec[i];
+      this->lpdf_vec = RealVector(dnorm->report_lpdf_vec.size());
+      if(this->expected_values.size() == 1){
+        this->expected_values.resize(dnorm->expected_values.size());
+      }
+      if(this->x.size() == 1){
+        size_t nx = dnorm->get_n_x();
+        this->x.resize(nx);
+      }
+
+      for(R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
+        this->lpdf_vec[i] = dnorm->report_lpdf_vec[i];
+        this->expected_values[i].final_value_m = dnorm->get_expected(i);
+        this->x[i].final_value_m = dnorm->get_observed(i);
       }
     }
   }
@@ -275,6 +285,31 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
           ss << this->lpdf_vec[i] << ", ";
       }
       ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
+    }
+    ss << " },\n";
+
+    ss << " \"expected_values\": {\n";
+    ss << "  \"name\": \"expected_values\",\n";
+    ss << "  \"values\":[";
+    if (this->expected_values.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->expected_values.size() - 1; i++) {
+        ss << this->expected_values[i].final_value_m << ", ";
+      }
+      ss << this->expected_values[this->expected_values.size() - 1].final_value_m << "]\n";
+    }
+    ss << " },\n";
+    ss << " \"observed_values\": {\n";
+    ss << "  \"name\": \"x\",\n";
+    ss << "  \"values\":[";
+    if (this->x.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->x.size() - 1; i++) {
+        ss << this->x[i].final_value_m << ", ";
+      }
+      ss << this->x[this->x.size() - 1].final_value_m << "]\n";
     }
     ss << " }}\n";
 
@@ -485,9 +520,18 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         }
       }
 
-      this->lpdf_vec = Rcpp::NumericVector(dlnorm->lpdf_vec.size());
-      for(R_xlen_t i=0; i < this->lpdf_vec.size(); i++) {
-        this->lpdf_vec[i] = dlnorm->lpdf_vec[i];
+      this->lpdf_vec = Rcpp::NumericVector(dlnorm->report_lpdf_vec.size());
+      if(this->expected_values.size() == 1){
+        this->expected_values.resize(dlnorm->expected_values.size());
+      }
+      if(this->x.size() == 1){
+        size_t nx = dlnorm->get_n_x();
+        this->x.resize(nx);
+      }
+      for(R_xlen_t i=0; i<this->lpdf_vec.size(); i++) {
+        this->lpdf_vec[i] = dlnorm->report_lpdf_vec[i];
+        this->expected_values[i].final_value_m = dlnorm->get_expected(i);
+        this->x[i].final_value_m = dlnorm->get_observed(i);
       }
     }
   }
@@ -518,8 +562,40 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         }
         ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
     }
-    ss << " }}\n";
+    ss << " },\n";
 
+    ss << " \"expected_values\": {\n";
+    ss << "  \"name\": \"expected_values\",\n";
+    ss << "  \"values\":[";
+    if (this->expected_values.size() == 0)
+    {
+      ss << "]\n";
+    }
+    else
+    {
+      for (R_xlen_t i = 0; i < this->expected_values.size() - 1; i++)
+      {
+        ss << this->expected_values[i].final_value_m << ", ";
+      }
+      ss << this->expected_values[this->expected_values.size() - 1].final_value_m << "]\n";
+    }
+    ss << " },\n";
+    ss << " \"observed_values\": {\n";
+    ss << "  \"name\": \"x\",\n";
+    ss << "  \"values\":[";
+    if (this->x.size() == 0)
+    {
+      ss << "]\n";
+    }
+    else
+    {
+      for (R_xlen_t i = 0; i < this->x.size() - 1; i++)
+      {
+        ss << this->x[i].final_value_m << ", ";
+      }
+      ss << this->x[this->x.size() - 1].final_value_m << "]\n";
+    }
+    ss << " }}\n";
     return ss.str();
 }
 
@@ -725,12 +801,37 @@ void finalize() {
   } else {
     std::shared_ptr<fims_distributions::MultinomialLPMF<double> > dmultinom =
             std::dynamic_pointer_cast<fims_distributions::MultinomialLPMF<double> >(it->second);
-    this->lpdf_vec = Rcpp::NumericVector(dmultinom->lpdf_vec.size());
-    for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
-        this->lpdf_vec[i] = dmultinom->lpdf_vec[i];
+
+      size_t nx = dmultinom->report_lpdf_vec.size();
+      this->lpdf_vec = Rcpp::NumericVector(nx);
+      if(this->expected_values.size() != nx){
+        this->expected_values.resize(nx);
+      }
+      if(this->x.size() != nx){
+        this->x.resize(nx);
+      }
+      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++)
+      {
+        this->lpdf_vec[i] = dmultinom->report_lpdf_vec[i];
+        this->expected_values[i].final_value_m = dmultinom->get_expected(i);
+        if (dmultinom->input_type != "data"){
+          this->x[i].final_value_m = dmultinom->get_observed(i);
+        }
+      }
+      if(dmultinom->input_type == "data"){
+        dims.resize(2);
+        dims[0] = dmultinom->observed_values->get_imax();
+        dims[1] = dmultinom->observed_values->get_jmax();
+         for (size_t i = 0; i < dims[0]; i++){
+          for (size_t j = 0; j < dims[1]; j++){
+            size_t idx = (i * dims[1]) + j;
+            this->x[idx].final_value_m = dmultinom->get_observed(i,j);
+          }
+        }
+      }
+
     }
   }
-}
 
 /**
  * @brief Converts the data to json representation for the output.
@@ -758,8 +859,36 @@ virtual std::string to_json() {
     }
     ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
   }
-  ss << " }}\n";
+  ss << " },\n";
 
+  ss << " \"expected_values\": {\n";
+  ss << "  \"name\": \"expected_values\",\n";
+  ss << "  \"values\":[";
+  if (this->expected_values.size() == 0) {
+    ss << "]\n";
+  } else {
+    for (R_xlen_t i = 0; i < this->expected_values.size() - 1; i++) {
+      ss << this->expected_values[i].final_value_m << ", ";
+    }
+    ss << this->expected_values[this->expected_values.size() - 1].final_value_m << "]\n";
+  }
+  ss << " },\n";
+  ss << " \"observed_values\": {\n";
+  ss << "  \"name\": \"x\",\n";
+  ss << "  \"values\":[";
+  if (this->x.size() == 0)
+  {
+    ss << "]\n";
+  }
+  else
+  {
+    for (R_xlen_t i = 0; i < this->x.size() - 1; i++)
+    {
+      ss << this->x[i].final_value_m << ", ";
+    }
+    ss << this->x[this->x.size() - 1].final_value_m << "]\n";
+  }
+  ss << " }}\n";
   return ss.str();
 }
 
