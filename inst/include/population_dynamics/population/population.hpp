@@ -99,6 +99,8 @@ namespace fims_popdy {
         // available anywhere in the R package
 #endif
 
+        std::map<std::string, fims::Vector<Type> > derived_quantities; /*!< derived quantities for specific model type, i.e. caa, surplus production, etc */
+        typedef typename std::map<std::string, fims::Vector<Type> >::iterator derived_quantities_iterator;
         // this -> means you're referring to a class member (member of self)
 
         Population() {

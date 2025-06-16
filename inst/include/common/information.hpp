@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include "../distributions/distributions.hpp"
+#include "../models/fisheries_models.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/population/population.hpp"
@@ -126,6 +127,13 @@ namespace fims_info {
         std::shared_ptr<fims_distributions::DensityComponentBase<Type> > >::iterator
         density_components_iterator;
         /**< iterator for distribution objects>*/
+
+        std::unordered_map<uint32_t,
+                           std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
+            models_map; /**<hash map of fishery models, eg. CAA, GMACS, Spatial, etc*/
+        typedef typename std::unordered_map<uint32_t,
+            std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>::iterator
+            model_map_iterator; /**< iterator for variable map>*/
 
         std::unordered_map<uint32_t, fims::Vector<Type>* >
         variable_map; /**<hash map to link a parameter, derived value, or observation

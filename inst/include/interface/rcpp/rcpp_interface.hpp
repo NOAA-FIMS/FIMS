@@ -14,6 +14,7 @@
 #include "rcpp_objects/rcpp_growth.hpp"
 #include "rcpp_objects/rcpp_math.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
+#include "rcpp_objects/rcpp_models.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "../../common/model.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
@@ -820,6 +821,12 @@ RCPP_MODULE(fims) {
         .field("x", &DmultinomDistributionsInterface::x, "Input for distribution when not observations, e.g., prior or random effect.")
         .field("expected_values", &DmultinomDistributionsInterface::expected_values, "numeric non-negative vector of length K, specifying the probability for the K classes.")
         .field("dims", &DmultinomDistributionsInterface::dims, "dimension of the multivariate input, e.g., c(num rows, num cols).");
+
+    Rcpp::class_<CatchAtAgeInterface>("CatchAtAge")
+      .constructor()
+      .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
+      .method("get_output", &CatchAtAgeInterface::to_json)
+      .method("calculate_reference_points", &CatchAtAgeInterface::calculate_reference_points);
 }
 
 #endif /* RCPP_INTERFACE_HPP */
