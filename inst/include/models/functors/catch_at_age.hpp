@@ -9,13 +9,11 @@
 namespace fims_popdy
 {
 
-
     // TODO: add a function to compute length composition
     template <typename Type>
     class CatchAtAge : public FisheryModelBase<Type>
     {
     public:
-      
         std::string name_m;
         std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>> fleets; // unique instances to eliminate duplicate initialization
         typedef typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator fleet_iterator;
@@ -147,7 +145,6 @@ namespace fims_popdy
                 derived_quantities["length_composition"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nlengths);
-               
             }
         }
 
@@ -278,6 +275,9 @@ namespace fims_popdy
             {
                 std::shared_ptr<fims_popdy::Population<Type>> &population =
                     this->populations[p];
+                std::map<std::string, fims::Vector<Type>> &derived_quantities =
+                    this->population_derived_quantities[population->GetId()];
+
                 // Transformation Section
                 for (size_t age = 0; age < population->nages; age++)
                 {
@@ -287,8 +287,8 @@ namespace fims_popdy
                         population->M[i_age_year] = fims_math::exp(population->log_M[i_age_year]);
                         // mortality_F is a fims::Vector and therefore needs to be filled
                         // within a loop
-                        population->derived_quantities["mortality_F"][i_age_year] = 0.0;
-                        population->derived_quantities["weight_at_age"][i_age_year] = population->growth->evaluate(population->ages[age]);
+                        derived_quantities["mortality_F"][i_age_year] = 0.0;
+                        derived_quantities["weight_at_age"][i_age_year] = population->growth->evaluate(population->ages[age]);
                     }
                 }
             }
@@ -332,7 +332,7 @@ namespace fims_popdy
             size_t i_age_year, size_t a)
         {
 
-            population->derived_quantities["numbers_at_age"][i_age_year] =
+            this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] =
                 fims_math::exp(population->log_init_naa[a]);
         }
 
@@ -356,17 +356,17 @@ namespace fims_popdy
         {
             // using Z from previous age/year
 
-            population->derived_quantities["numbers_at_age"][i_age_year] =
-                population->derived_quantities["numbers_at_age"][i_agem1_yearm1] *
-                (fims_math::exp(-population->derived_quantities["mortality_Z"][i_agem1_yearm1]));
+            this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] =
+                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_agem1_yearm1] *
+                (fims_math::exp(-this->population_derived_quantities[population->GetId()]["mortality_Z"][i_agem1_yearm1]));
 
             // Plus group calculation
             if (age == (population->nages - 1))
             {
-                population->derived_quantities["numbers_at_age"][i_age_year] =
-                    population->derived_quantities["numbers_at_age"][i_age_year] +
-                    population->derived_quantities["numbers_at_age"][i_agem1_yearm1 + 1] *
-                        (fims_math::exp(-population->derived_quantities["mortality_Z"][i_agem1_yearm1 + 1]));
+                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] =
+                    this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] +
+                    this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_agem1_yearm1 + 1] *
+                        (fims_math::exp(-this->population_derived_quantities[population->GetId()]["mortality_Z"][i_agem1_yearm1 + 1]));
             }
         }
 
@@ -390,16 +390,16 @@ namespace fims_popdy
         {
 
             // using M from previous age/year
-            population->derived_quantities["unfished_numbers_at_age"][i_age_year] =
-                population->derived_quantities["unfished_numbers_at_age"][i_agem1_yearm1] *
+            this->population_derived_quantities[population->GetId()]["unfished_numbers_at_age"][i_age_year] =
+                this->population_derived_quantities[population->GetId()]["unfished_numbers_at_age"][i_agem1_yearm1] *
                 (fims_math::exp(-population->M[i_agem1_yearm1]));
 
             // Plus group calculation
             if (age == (population->nages - 1))
             {
-                population->derived_quantities["unfished_numbers_at_age"][i_age_year] =
-                    population->derived_quantities["unfished_numbers_at_age"][i_age_year] +
-                    population->derived_quantities["unfished_numbers_at_age"][i_agem1_yearm1 + 1] *
+                this->population_derived_quantities[population->GetId()]["unfished_numbers_at_age"][i_age_year] =
+                    this->population_derived_quantities[population->GetId()]["unfished_numbers_at_age"][i_age_year] +
+                    this->population_derived_quantities[population->GetId()]["unfished_numbers_at_age"][i_agem1_yearm1 + 1] *
                         (fims_math::exp(-population->M[i_agem1_yearm1 + 1]));
             }
         }
@@ -426,16 +426,14 @@ namespace fims_popdy
                 // evaluate is a member function of the selectivity class
                 Type s = population->fleets[fleet_]->selectivity->evaluate(population->ages[age]);
 
-                population->derived_quantities["mortality_F"][i_age_year] +=
+                this->population_derived_quantities[population->GetId()]["mortality_F"][i_age_year] +=
                     population->fleets[fleet_]->Fmort[year] * s;
 
-                population->derived_quantities["sum_selectivity"][i_age_year] += s;
+                this->population_derived_quantities[population->GetId()]["sum_selectivity"][i_age_year] += s;
             }
-            population->derived_quantities["mortality_Z"][i_age_year] =
-                population->M[i_age_year] + population->derived_quantities["mortality_F"][i_age_year];
+            this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year] =
+                population->M[i_age_year] + this->population_derived_quantities[population->GetId()]["mortality_F"][i_age_year];
         }
-
-       
 
         /**
          * * This method is used to calculate the biomass for a population. It takes a
@@ -454,9 +452,9 @@ namespace fims_popdy
             size_t age)
         {
 
-            population->derived_quantities["biomass"][year] +=
-                population->derived_quantities["numbers_at_age"][i_age_year] *
-                population->derived_quantities["weight_at_age"][age];
+            this->population_derived_quantities[population->GetId()]["biomass"][year] +=
+                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] *
+                this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
         }
 
         /**
@@ -476,9 +474,9 @@ namespace fims_popdy
             size_t age)
         {
 
-            population->derived_quantities["unfished_biomass"][year] +=
-                population->derived_quantities["unfished_numbers_at_age"][i_age_year] *
-                population->derived_quantities["weight_at_age"][age];
+            this->population_derived_quantities[population->GetId()]["unfished_biomass"][year] +=
+                this->population_derived_quantities[population->GetId()]["unfished_numbers_at_age"][i_age_year] *
+                this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
         }
 
         /**
@@ -498,13 +496,13 @@ namespace fims_popdy
             size_t age)
         {
 
-            population->derived_quantities["spawning_biomass"][year] +=
+            this->population_derived_quantities[population->GetId()]["spawning_biomass"][year] +=
                 population->proportion_female[age] *
-                population->derived_quantities["numbers_at_age"][i_age_year] *
-                population->derived_quantities["proportion_mature_at_age"][i_age_year] *
-                population->derived_quantities["weight_at_age"][age];
+                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] *
+                this->population_derived_quantities[population->GetId()]["proportion_mature_at_age"][i_age_year] *
+                this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
         }
-       
+
         /**
          * This method is used to calculate the unfished spawning biomass for a population. It takes a
          * population object, the index of the age in the current year, the year,
@@ -521,14 +519,13 @@ namespace fims_popdy
             size_t year,
             size_t age)
         {
-            population->derived_quantities["unfished_spawning_biomass"][year] +=
+            this->population_derived_quantities[population->GetId()]["unfished_spawning_biomass"][year] +=
                 population->proportion_female[age] *
-                population->derived_quantities["unfished_numbers_at_age"][i_age_year] *
-                population->derived_quantities["proportion_mature_at_age"][i_age_year] *
-                population->derived_quantities["weight_at_age"][age];
+                this->population_derived_quantities[population->GetId()]["unfished_numbers_at_age"][i_age_year] *
+                this->population_derived_quantities[population->GetId()]["proportion_mature_at_age"][i_age_year] *
+                this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
         }
 
-      
         /**
          * This method is used to calculate the spawning biomass per recruit for a population. It takes a
          * population object.
@@ -539,13 +536,13 @@ namespace fims_popdy
             std::vector<Type> numbers_spr(population->nages, 1.0);
             Type phi_0 = 0.0;
             phi_0 += numbers_spr[0] * population->proportion_female[0] *
-                     population->derived_quantities["proportion_mature_at_age"][0] *
+                     this->population_derived_quantities[population->GetId()]["proportion_mature_at_age"][0] *
                      population->growth->evaluate(population->ages[0]);
             for (size_t a = 1; a < (population->nages - 1); a++)
             {
                 numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
                 phi_0 += numbers_spr[a] * population->proportion_female[a] *
-                         population->derived_quantities["proportion_mature_at_age"][a] *
+                         this->population_derived_quantities[population->GetId()]["proportion_mature_at_age"][a] *
                          population->growth->evaluate(population->ages[a]);
             }
 
@@ -554,13 +551,12 @@ namespace fims_popdy
                 (1 - fims_math::exp(-population->M[population->nages - 1]));
             phi_0 += numbers_spr[population->nages - 1] *
                      population->proportion_female[population->nages - 1] *
-                     population->derived_quantities["proportion_mature_at_age"][population->nages - 1] *
+                     this->population_derived_quantities[population->GetId()]["proportion_mature_at_age"][population->nages - 1] *
                      population->growth->evaluate(population->ages[population->nages - 1]);
 
             return phi_0;
         }
 
-       
         /**
          * This method is used to calculate the recruitment for a population.
          *
@@ -576,7 +572,7 @@ namespace fims_popdy
 
             if (i_dev == population->nyears)
             {
-                population->derived_quantities["numbers_at_age"][i_age_year] =
+                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] =
                     population->recruitment->evaluate_mean(population->derived_quantities["spawning_biomass"][year - 1], phi0);
                 /*the final year of the time series has no data to inform recruitment
                 devs, so this value is set to the mean recruitment.*/
@@ -584,19 +580,17 @@ namespace fims_popdy
             else
             {
                 // Why are we using evaluate_mean, how come a virtual function was changed?
-                population->derived_quantities["numbers_at_age"][i_age_year] =
+                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] =
                     population->recruitment->evaluate_mean(population->derived_quantities["spawning_biomass"][year - 1], phi0) *
                     /*the log_recruit_dev vector does not include a value for year == 0
                     and is of length nyears - 1 where the first position of the vector
                     corresponds to the second year of the time series.*/
                     fims_math::exp(population->recruitment->log_recruit_devs[i_dev - 1]);
 
-                population->derived_quantities["expected_recruitment"][year] =
-                    population->derived_quantities["numbers_at_age"][i_age_year];
+                this->population_derived_quantities[population->GetId()]["expected_recruitment"][year] =
+                    this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year];
             }
         }
-
-       
 
         /**
          * This method is used to calculate the catch for a population. It takes a
@@ -619,15 +613,13 @@ namespace fims_popdy
                                   fleet_; // index by fleet and years to dimension fold
                 size_t i_age_year = year * population->nages + age;
 
-                population->derived_quantities["expected_catch"][index_yf] +=
-                    population->fleets[fleet_]->derived_quantities["catch_weight_at_age"][i_age_year];
+                this->population_derived_quantities[population->GetId()]["expected_catch"][index_yf] +=
+                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_weight_at_age"][i_age_year];
 
-                population->fleets[fleet_]->derived_quantities["expected_catch"][year] +=
-                    population->fleets[fleet_]->derived_quantities["catch_weight_at_age"][i_age_year];
+                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["expected_catch"][year] +=
+                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_weight_at_age"][i_age_year];
             }
         }
-
-       
 
         /**
          * This method is used to calculate the catch index for a population. It takes a
@@ -653,12 +645,11 @@ namespace fims_popdy
 
                 index_ = population->fleets[fleet_]->q.get_force_scalar(year) *
                          population->fleets[fleet_]->selectivity->evaluate(population->ages[age]) *
-                         population->derived_quantities["numbers_at_age"][i_age_year] *
-                         population->derived_quantities["weight_at_age"][age]; // this->weight_at_age[age];
-                population->fleets[fleet_]->derived_quantities["expected_index"][year] += index_;
+                         this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] *
+                         this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
+                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["expected_index"][year] += index_;
             }
         }
-
 
         /**
          * This method is used to calculate the catch numbers at age for a population. It takes a
@@ -685,18 +676,16 @@ namespace fims_popdy
                 // Baranov Catch Equation
                 catch_ = (population->fleets[fleet_]->Fmort[year] *
                           population->fleets[fleet_]->selectivity->evaluate(population->ages[age])) /
-                         population->derived_quantities["mortality_Z"][i_age_year] *
-                         population->derived_quantities["numbers_at_age"][i_age_year] *
-                         (1 - fims_math::exp(-(population->derived_quantities["mortality_Z"][i_age_year])));
+                         this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year] *
+                         this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] *
+                         (1 - fims_math::exp(-(this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year])));
 
                 // this->catch_numbers_at_age[i_age_yearf] += catch_;
                 // catch_numbers_at_age for the fleet module has different
                 // dimensions (year/age, not year/fleet/age)
-                population->fleets[fleet_]->derived_quantities["catch_numbers_at_age"][i_age_year] += catch_;
+                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"][i_age_year] += catch_;
             }
         }
-
-       
 
         /**
          * This method is used to calculate the catch weight at age for a population. It takes a
@@ -717,13 +706,12 @@ namespace fims_popdy
             for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
             {
 
-                population->fleets[fleet_]->derived_quantities["catch_weight_at_age"][i_age_year] =
-                    population->fleets[fleet_]->derived_quantities["catch_numbers_at_age"][i_age_year] *
-                    population->derived_quantities["weight_at_age"][age];
+                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_weight_at_age"][i_age_year] =
+                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"][i_age_year] *
+                    this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
             }
         }
 
-      
         /**
          * This method is used to calculate the maturity at age for a population. It takes a
          * population object, the index of the age in the current year, the age as input
@@ -738,7 +726,7 @@ namespace fims_popdy
             size_t i_age_year,
             size_t age)
         {
-            population->derived_quantities["proportion_mature_at_age"][i_age_year] =
+            this->population_derived_quantities[population->GetId()]["proportion_mature_at_age"][i_age_year] =
                 population->maturity->evaluate(population->ages[age]);
         }
 
@@ -769,14 +757,14 @@ namespace fims_popdy
                         for (size_t age = 0; age < population->nages; age++)
                         {
                             size_t i_age_year = year * population->nages + age;
-                            sum_age += population->fleets[fleet_]->derived_quantities["catch_numbers_at_age"][i_age_year];
+                            sum_age += this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"][i_age_year];
                         }
 
                         for (size_t age = 0; age < population->nages; age++)
                         {
                             size_t i_age_year = year * population->nages + age;
-                            population->fleets[fleet_]->derived_quantities["proportion_catch_numbers_at_age"][i_age_year] =
-                                population->fleets[fleet_]->derived_quantities["catch_numbers_at_age"][i_age_year] /
+                            this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_catch_numbers_at_age"][i_age_year] =
+                                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"][i_age_year] /
                                 sum_age;
                         }
 
@@ -786,11 +774,11 @@ namespace fims_popdy
                             for (size_t y = 0; y < population->fleets[fleet_]->nyears; y++)
                             {
                                 fims::Vector<Type> &catch_numbers_at_length =
-                                    population->fleets[fleet_]->derived_quantities["catch_numbers_at_length"];
+                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_length"];
                                 fims::Vector<Type> &catch_numbers_at_age =
-                                    population->fleets[fleet_]->derived_quantities["catch_numbers_at_age"];
+                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"];
                                 fims::Vector<Type> &proportion_catch_numbers_at_length =
-                                    population->fleets[fleet_]->derived_quantities["proportion_catch_numbers_at_length"];
+                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_catch_numbers_at_length"];
 
                                 sum_length = 0.0;
                                 for (size_t l = 0; l < population->fleets[fleet_]->nlengths; l++)
@@ -898,7 +886,7 @@ namespace fims_popdy
 
                             if (a == 0)
                             {
-                                population->derived_quantities["unfished_numbers_at_age"][i_age_year] =
+                                this->population_derived_quantities[population->GetId()]["unfished_numbers_at_age"][i_age_year] =
                                     fims_math::exp(population->recruitment->log_rzero[0]);
                             }
                             else
@@ -928,8 +916,8 @@ namespace fims_popdy
                              Expected recruitment in year 0 is numbers at age 0 in year 0.
                              */
 
-                            population->derived_quantities["expected_recruitment"][i_age_year] =
-                                population->derived_quantities["numbers_at_age"][i_age_year];
+                            this->population_derived_quantities[population->GetId()]["expected_recruitment"][i_age_year] =
+                                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year];
                         }
                         else
                         {
@@ -938,7 +926,7 @@ namespace fims_popdy
                                 // Set the nrecruits for age a=0 year y (use pointers instead of
                                 // functional returns) assuming fecundity = 1 and 50:50 sex ratio
                                 CalculateRecruitment(population, i_age_year, y, y);
-                                population->derived_quantities["unfished_numbers_at_age"][i_age_year] =
+                                this->population_derived_quantities[population->GetId()]["unfished_numbers_at_age"][i_age_year] =
                                     fims_math::exp(population->recruitment->log_rzero[0]);
                             }
                             else
