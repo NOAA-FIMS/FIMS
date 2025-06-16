@@ -171,12 +171,21 @@ public:
    * @brief Calculated selectivity at age.
    */
   ParameterVector selectivity_at_age;
+  /**
+   * @brief Calculated selectivity at length.
+   */
+  ParameterVector selectivity_at_length;
 
   // derived quantities
   /**
    * @brief Derived selectivity at age.
    */
   Rcpp::NumericVector derived_selectivity_at_age;
+  // derived quantities
+  /**
+   * @brief Derived selectivity at length.
+   */
+  Rcpp::NumericVector derived_selectivity_at_length;
   /**
    * @brief Derived landings-at-age in numbers.
    */
@@ -279,9 +288,11 @@ public:
   age_to_length_conversion(other.age_to_length_conversion),
   selectivity_units(other.selectivity_units),
   selectivity_at_age(other.selectivity_at_age),
+  selectivity_at_length(other.selectivity_at_length),
   observed_landings_units(other.observed_landings_units),
   observed_index_units(other.observed_index_units),
   derived_selectivity_at_age(other.derived_selectivity_at_age),
+  derived_selectivity_at_length(other.derived_selectivity_at_length),
   derived_landings_naa(other.derived_landings_naa),
   derived_landings_nal(other.derived_landings_nal),
   derived_landings_waa(other.derived_landings_waa),
@@ -431,6 +442,11 @@ public:
         this->derived_selectivity_at_age[i] = fleet->selectivity_at_age[i];
       }
 
+      this->derived_selectivity_at_length = Rcpp::NumericVector(fleet->selectivity_at_length.size());
+      for (R_xlen_t i = 0; i < this->derived_selectivity_at_length.size(); i++) {
+        this->derived_selectivity_at_length[i] = fleet->selectivity_at_length[i];
+      }
+
       this->derived_landings_naa = Rcpp::NumericVector(fleet->landings_numbers_at_age.size());
       for (R_xlen_t i = 0; i < this->derived_landings_naa.size(); i++) {
         this->derived_landings_naa[i] = fleet->landings_numbers_at_age[i];
@@ -564,6 +580,18 @@ public:
             ss << this->derived_selectivity_at_age[i] << ", ";
         }
         ss << this->derived_selectivity_at_age[this->derived_selectivity_at_age.size() - 1] << "]\n";
+    }
+    ss << " },\n";
+    ss << "{\n";
+    ss << "  \"name\": \"selectivity_at_length\",\n";
+    ss << "  \"values\":[";
+    if (this->derived_selectivity_at_length.size() == 0) {
+        ss << "]\n";
+    } else {
+        for (R_xlen_t i = 0; i < this->derived_selectivity_at_length.size() - 1; i++) {
+            ss << this->derived_selectivity_at_length[i] << ", ";
+        }
+        ss << this->derived_selectivity_at_length[this->derived_selectivity_at_length.size() - 1] << "]\n";
     }
     ss << " },\n";
 
@@ -856,6 +884,8 @@ public:
     //selectivity
     fleet->selectivity_at_age.resize(this->nages.get());
     info->variable_map[this->selectivity_at_age.id_m] = &(fleet)->selectivity_at_age;
+    fleet->selectivity_at_length.resize(this->nlengths.get());
+    info->variable_map[this->selectivity_at_length.id_m] = &(fleet)->selectivity_at_length;
 
     //exp_landings
     fleet->log_landings_expected.resize(nyears);  // assume landings is for all ages.

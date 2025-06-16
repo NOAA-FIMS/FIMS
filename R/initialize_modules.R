@@ -82,6 +82,7 @@ initialize_module <- function(parameters, data, module_name) {
       "agecomp_proportion",
       "selectivity_units",
       "selectivity_at_age",
+      "selectivity_at_length",
       "observed_index_units",
       "observed_landings_units"
     ))

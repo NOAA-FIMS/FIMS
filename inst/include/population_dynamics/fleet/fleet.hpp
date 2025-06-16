@@ -74,6 +74,7 @@ namespace fims_popdy
         // derived quantities
         // selectivity
         fims::Vector<Type> selectivity_at_age; /*!< Derived quantity: selectivity at age*/
+        fims::Vector<Type> selectivity_at_length; /*!< Derived quantity: selectivity at length*/
 
         // landings
         fims::Vector<Type> landings_weight;            /*!<model landings in weight*/
@@ -155,6 +156,7 @@ namespace fims_popdy
             }
             // selectivity
             selectivity_at_age.resize(nages);
+            selectivity_at_length.resize(nlengths);
 
             // landings
             landings_numbers_at_age.resize(nyears * nages);
@@ -210,18 +212,24 @@ namespace fims_popdy
                 for (size_t a = 0; a < this->nages; a++)
                 {
                     this->selectivity_at_age[a] = this->selectivity->evaluate(ages[a]);
+                    // setting selectivity at length to zero if age based may not be necessary
+                    // depending on whether we can exclude it from the report on not
+                    // if reported, should it be set to 1.0 instead of 0?
+                    std::fill(selectivity_at_length.begin(), selectivity_at_length.end(),
+                    static_cast<Type>(0)); /**<model selectivity at length is zero if age based*/
                 }
             }else if(selectivity_units == "length"){
                 for (size_t a = 0; a < this->nages; a++)
                 {
                     for (size_t l = 0; l < this->nlengths; l++)
                     {
+                        this->selectivity_at_length[l] = this->selectivity->evaluate(lengths[l]);
                         // iterate through all lengths within an age and sum the selectivity
                         // to get a selectivity at age
                         size_t i_length_age = a * this->nlengths + l;
                         this->selectivity_at_age[a] += 
                         this->age_to_length_conversion[i_length_age] *
-                            this->selectivity->evaluate(lengths[l]);
+                            this->selectivity_at_length[l];
                     }
                 }
             }

@@ -680,6 +680,7 @@ RCPP_MODULE(fims) {
       .field("observed_index_units", &FleetInterface::observed_index_units)
       .field("index_expected", &FleetInterface::derived_index_expected)
       .field("selectivity_at_age", &FleetInterface::derived_selectivity_at_age)
+      .field("selectivity_at_length", &FleetInterface::derived_selectivity_at_length)
       .field("landings_expected", &FleetInterface::derived_landings_expected)
       .field("log_index_expected", &FleetInterface::log_index_expected)
       .field("log_landings_expected", &FleetInterface::log_landings_expected)

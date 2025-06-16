@@ -234,6 +234,7 @@ namespace fims_model {
                 std::shared_ptr<fims_popdy::Fleet<Type> > f = (*f_it).second;
 #ifdef TMB_MODEL
                 selectivity_age(fleet_idx) = f->selectivity_at_age;
+                selectivity_length(fleet_idx) = f->selectivity_at_length;
                 landings_w(fleet_idx) = f->landings_weight;
                 landings_n(fleet_idx) = f->landings_numbers;
                 landings_exp(fleet_idx) = f->landings_expected;
