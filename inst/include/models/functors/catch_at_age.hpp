@@ -9,104 +9,13 @@
 namespace fims_popdy
 {
 
-    /**
-     * A proxy class for fleet objects. This class is used to access the derived quantities of
-     * the fleet object from a population object. This is used to reduce the
-     * overhead of hashing for the derived quantities map.
-     */
-    template <typename Type>
-    struct CAAFleetProxy
-    {
-        std::shared_ptr<fims_popdy::Fleet<Type>> fleet;
-        fims::Vector<Type> &catch_at_age;
-        fims::Vector<Type> &catch_numbers_at_age;
-        fims::Vector<Type> &catch_numbers_at_length;
-        fims::Vector<Type> &proportion_catch_numbers_at_age;
-        fims::Vector<Type> &proportion_catch_numbers_at_length;
-        fims::Vector<Type> &age_to_length_conversion;
-        fims::Vector<Type> &catch_weight_at_age;
-        fims::Vector<Type> &catch_index;
-        fims::Vector<Type> &age_composition;
-        fims::Vector<Type> &length_composition;
-        fims::Vector<Type> &expected_catch;
-        fims::Vector<Type> &expected_index;
-        fims::Vector<Type> &log_expected_index;
-
-        CAAFleetProxy(std::shared_ptr<fims_popdy::Fleet<Type>> fleet) : fleet(fleet),
-                                                                        catch_at_age(fleet->derived_quantities["catch_at_age"]),
-                                                                        catch_numbers_at_age(fleet->derived_quantities["catch_numbers_at_age"]),
-                                                                        catch_numbers_at_length(fleet->derived_quantities["catch_numbers_at_length"]),
-                                                                        proportion_catch_numbers_at_age(fleet->derived_quantities["proportion_catch_numbers_at_age"]),
-                                                                        proportion_catch_numbers_at_length(fleet->derived_quantities["proportion_catch_numbers_at_length"]),
-                                                                        age_to_length_conversion(fleet->derived_quantities["age_to_length_conversion"]),
-                                                                        catch_weight_at_age(fleet->derived_quantities["catch_weight_at_age"]),
-                                                                        catch_index(fleet->derived_quantities["catch_index"]),
-                                                                        age_composition(fleet->derived_quantities["age_composition"]),
-                                                                        length_composition(fleet->derived_quantities["length_composition"]),
-                                                                        expected_catch(fleet->derived_quantities["expected_catch"]),
-                                                                        expected_index(fleet->derived_quantities["expected_index"]),
-                                                                        log_expected_index(fleet->derived_quantities["log_expected_index"])
-        {
-        }
-    };
-
-    /**
-     *  A proxy class for population objects. This class is used to access the derived quantities of
-     *  the population object from the CatachAtAge object. This is used to reduce the
-     *  overhead of hashing for the derived quantities map.
-     */
-    template <typename Type>
-    struct CAAPopulationProxy
-    {
-
-        std::shared_ptr<fims_popdy::Population<Type>> population;
-        std::vector<CAAFleetProxy<Type>> fleets;
-        fims::Vector<Type> &mortality_F;
-        fims::Vector<Type> &mortality_Z;
-        fims::Vector<Type> &weight_at_age;
-        fims::Vector<Type> &numbers_at_age;
-        fims::Vector<Type> &unfished_numbers_at_age;
-        fims::Vector<Type> &biomass;
-        fims::Vector<Type> &spawning_biomass;
-        fims::Vector<Type> &unfished_biomass;
-        fims::Vector<Type> &unfished_spawning_biomass;
-        fims::Vector<Type> &proportion_mature_at_age;
-        fims::Vector<Type> &expected_catch;
-        fims::Vector<Type> &expected_recruitment;
-        fims::Vector<Type> &sum_selectivity;
-
-        CAAPopulationProxy(std::shared_ptr<fims_popdy::Population<Type>> population) : population(population),
-                                                                                       mortality_F(population->derived_quantities["mortality_F"]),
-                                                                                       mortality_Z(population->derived_quantities["mortality_Z"]),
-                                                                                       weight_at_age(population->derived_quantities["weight_at_age"]),
-                                                                                       numbers_at_age(population->derived_quantities["numbers_at_age"]),
-                                                                                       unfished_numbers_at_age(population->derived_quantities["unfished_numbers_at_age"]),
-                                                                                       biomass(population->derived_quantities["biomass"]),
-                                                                                       spawning_biomass(population->derived_quantities["spawning_biomass"]),
-                                                                                       unfished_biomass(population->derived_quantities["unfished_biomass"]),
-                                                                                       unfished_spawning_biomass(population->derived_quantities["unfished_spawning_biomass"]),
-                                                                                       proportion_mature_at_age(population->derived_quantities["proportion_mature_at_age"]),
-                                                                                       expected_catch(population->derived_quantities["expected_catch"]),
-                                                                                       expected_recruitment(population->derived_quantities["expected_recruitment"]),
-                                                                                       sum_selectivity(population->derived_quantities["sum_selectivity"])
-
-        {
-
-            // fill the fleets vector with fleet proxies
-            for (size_t i = 0; i < population->fleets.size(); i++)
-            {
-                this->fleets.push_back(CAAFleetProxy<Type>(population->fleets[i]));
-            }
-        }
-    };
 
     // TODO: add a function to compute length composition
     template <typename Type>
     class CatchAtAge : public FisheryModelBase<Type>
     {
     public:
-        std::vector<CAAPopulationProxy<Type>> populations_proxies;
-        std::vector<CAAFleetProxy<Type>> fleets_proxies;
+      
         std::string name_m;
         std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>> fleets; // unique instances to eliminate duplicate initialization
         typedef typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator fleet_iterator;
@@ -427,14 +336,6 @@ namespace fims_popdy
                 fims_math::exp(population->log_init_naa[a]);
         }
 
-        void CalculateInitialNumbersAA(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year, size_t a)
-        {
-
-            population_proxy.numbers_at_age[i_age_year] =
-                fims_math::exp(population_proxy.population->log_init_naa[a]);
-        }
         /**
          * * This method is used to calculate the numbers at age for a
          * population. It takes a population object, the index of the age
@@ -466,28 +367,6 @@ namespace fims_popdy
                     population->derived_quantities["numbers_at_age"][i_age_year] +
                     population->derived_quantities["numbers_at_age"][i_agem1_yearm1 + 1] *
                         (fims_math::exp(-population->derived_quantities["mortality_Z"][i_agem1_yearm1 + 1]));
-            }
-        }
-
-        void CalculateNumbersAA(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t i_agem1_yearm1,
-            size_t age)
-        {
-            // using Z from previous age/year
-
-            population_proxy.numbers_at_age[i_age_year] =
-                population_proxy.numbers_at_age[i_agem1_yearm1] *
-                (fims_math::exp(-population_proxy.mortality_Z[i_agem1_yearm1]));
-
-            // Plus group calculation
-            if (age == (population_proxy.population->nages - 1))
-            {
-                population_proxy.numbers_at_age[i_age_year] =
-                    population_proxy.numbers_at_age[i_age_year] +
-                    population_proxy.numbers_at_age[i_agem1_yearm1 + 1] *
-                        (fims_math::exp(-population_proxy.mortality_Z[i_agem1_yearm1 + 1]));
             }
         }
 
@@ -525,27 +404,6 @@ namespace fims_popdy
             }
         }
 
-        void CalculateUnfishedNumbersAA(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t i_agem1_yearm1,
-            size_t age)
-        {
-
-            // using M from previous age/year
-            population_proxy.unfished_numbers_at_age[i_age_year] =
-                population_proxy.unfished_numbers_at_age[i_agem1_yearm1] *
-                (fims_math::exp(-population_proxy.population->M[i_agem1_yearm1]));
-
-            // Plus group calculation
-            if (age == (population_proxy.population->nages - 1))
-            {
-                population_proxy.unfished_numbers_at_age[i_age_year] =
-                    population_proxy.unfished_numbers_at_age[i_age_year] +
-                    population_proxy.unfished_numbers_at_age[i_agem1_yearm1 + 1] *
-                        (fims_math::exp(-population_proxy.population->M[i_agem1_yearm1 + 1]));
-            }
-        }
         /**
          * * This method is used to calculate the mortality for a population. It takes a
          * population object, the index of the age in the current year, the year,
@@ -577,26 +435,7 @@ namespace fims_popdy
                 population->M[i_age_year] + population->derived_quantities["mortality_F"][i_age_year];
         }
 
-        void CalculateMortality(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-
-            for (size_t fleet_ = 0; fleet_ < population_proxy.population->nfleets; fleet_++)
-            {
-                // evaluate is a member function of the selectivity class
-                Type s = population_proxy.population->fleets[fleet_]->selectivity->evaluate(population_proxy.population->ages[age]);
-
-                population_proxy.mortality_F[i_age_year] +=
-                    population_proxy.population->fleets[fleet_]->Fmort[year] * s;
-
-                population_proxy.sum_selectivity[i_age_year] += s;
-            }
-            population_proxy.mortality_Z[i_age_year] =
-                population_proxy.population->M[i_age_year] + population_proxy.mortality_F[i_age_year];
-        }
+       
 
         /**
          * * This method is used to calculate the biomass for a population. It takes a
@@ -620,18 +459,6 @@ namespace fims_popdy
                 population->derived_quantities["weight_at_age"][age];
         }
 
-        void CalculateBiomass(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-
-            population_proxy.biomass[year] +=
-                population_proxy.numbers_at_age[i_age_year] *
-                population_proxy.weight_at_age[age];
-        }
-
         /**
          * * This method is used to calculate the unfished biomass for a population. It takes a
          * population object, the index of the age in the current year, the year,
@@ -652,18 +479,6 @@ namespace fims_popdy
             population->derived_quantities["unfished_biomass"][year] +=
                 population->derived_quantities["unfished_numbers_at_age"][i_age_year] *
                 population->derived_quantities["weight_at_age"][age];
-        }
-
-        void CalculateUnfishedBiomass(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-
-            population_proxy.unfished_biomass[year] +=
-                population_proxy.unfished_numbers_at_age[i_age_year] *
-                population_proxy.weight_at_age[age];
         }
 
         /**
@@ -689,29 +504,7 @@ namespace fims_popdy
                 population->derived_quantities["proportion_mature_at_age"][i_age_year] *
                 population->derived_quantities["weight_at_age"][age];
         }
-        /**
-         * * This method is used to calculate the spawning biomass for a population. It takes a
-         * population object, the index of the age in the current year, the year,
-         * and the age as input and calculates the spawning biomass for that population.
-         * @param population
-         * @param i_age_year
-         * @param year
-         * @param age
-         */
-        void CalculateSpawningBiomass(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-
-            population_proxy.spawning_biomass[year] +=
-                population_proxy.population->proportion_female[age] *
-                population_proxy.numbers_at_age[i_age_year] *
-                population_proxy.proportion_mature_at_age[i_age_year] *
-                population_proxy.weight_at_age[age];
-        }
-
+       
         /**
          * This method is used to calculate the unfished spawning biomass for a population. It takes a
          * population object, the index of the age in the current year, the year,
@@ -735,19 +528,7 @@ namespace fims_popdy
                 population->derived_quantities["weight_at_age"][age];
         }
 
-        void CalculateUnfishedSpawningBiomass(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-            population_proxy.unfished_spawning_biomass[year] +=
-                population_proxy.population->proportion_female[age] *
-                population_proxy.unfished_numbers_at_age[i_age_year] *
-                population_proxy.proportion_mature_at_age[i_age_year] *
-                population_proxy.weight_at_age[age];
-        }
-
+      
         /**
          * This method is used to calculate the spawning biomass per recruit for a population. It takes a
          * population object.
@@ -779,32 +560,7 @@ namespace fims_popdy
             return phi_0;
         }
 
-        Type CalculateSBPR0(
-            CAAPopulationProxy<Type> &population_proxy)
-        {
-            std::vector<Type> numbers_spr(population_proxy.population->nages, 1.0);
-            Type phi_0 = 0.0;
-            phi_0 += numbers_spr[0] * population_proxy.population->proportion_female[0] *
-                     population_proxy.proportion_mature_at_age[0] *
-                     population_proxy.population->growth->evaluate(population_proxy.population->ages[0]);
-            for (size_t a = 1; a < (population_proxy.population->nages - 1); a++)
-            {
-                numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population_proxy.population->M[a]);
-                phi_0 += numbers_spr[a] * population_proxy.population->proportion_female[a] *
-                         population_proxy.proportion_mature_at_age[a] *
-                         population_proxy.population->growth->evaluate(population_proxy.population->ages[a]);
-            }
-
-            numbers_spr[population_proxy.population->nages - 1] =
-                (numbers_spr[population_proxy.population->nages - 2] * fims_math::exp(-population_proxy.population->M[population_proxy.population->nages - 2])) /
-                (1 - fims_math::exp(-population_proxy.population->M[population_proxy.population->nages - 1]));
-            phi_0 += numbers_spr[population_proxy.population->nages - 1] *
-                     population_proxy.population->proportion_female[population_proxy.population->nages - 1] *
-                     population_proxy.proportion_mature_at_age[population_proxy.population->nages - 1] *
-                     population_proxy.population->growth->evaluate(population_proxy.population->ages[population_proxy.population->nages - 1]);
-
-            return phi_0;
-        }
+       
         /**
          * This method is used to calculate the recruitment for a population.
          *
@@ -840,35 +596,7 @@ namespace fims_popdy
             }
         }
 
-        void CalculateRecruitment(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t year,
-            size_t i_dev)
-        {
-
-            Type phi0 = CalculateSBPR0(population_proxy);
-
-            if (i_dev == population_proxy.population->nyears)
-            {
-                population_proxy.numbers_at_age[i_age_year] =
-                    population_proxy.population->recruitment->evaluate(population_proxy.spawning_biomass[year - 1], phi0);
-                /*the final year of the time series has no data to inform recruitment
-                devs, so this value is set to the mean recruitment.*/
-            }
-            else
-            {
-                population_proxy.numbers_at_age[i_age_year] =
-                    population_proxy.population->recruitment->evaluate(population_proxy.spawning_biomass[year - 1], phi0) *
-                    /*the log_recruit_dev vector does not include a value for year == 0
-                    and is of length nyears - 1 where the first position of the vector
-                    corresponds to the second year of the time series.*/
-                    fims_math::exp(population_proxy.population->recruitment->log_recruit_devs[i_dev - 1]);
-
-                population_proxy.expected_recruitment[year] =
-                    population_proxy.numbers_at_age[i_age_year];
-            }
-        }
+       
 
         /**
          * This method is used to calculate the catch for a population. It takes a
@@ -899,25 +627,7 @@ namespace fims_popdy
             }
         }
 
-        void CalculateCatch(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t year,
-            size_t age)
-        {
-
-            for (size_t fleet_ = 0; fleet_ < population_proxy.population->nfleets; fleet_++)
-            {
-                size_t index_yf = year * population_proxy.population->nfleets +
-                                  fleet_; // index by fleet and years to dimension fold
-                size_t i_age_year = year * population_proxy.population->nages + age;
-
-                population_proxy.fleets[fleet_].expected_catch[index_yf] +=
-                    population_proxy.fleets[fleet_].catch_weight_at_age[i_age_year];
-
-                population_proxy.fleets[fleet_].expected_catch[year] +=
-                    population_proxy.fleets[fleet_].catch_weight_at_age[i_age_year];
-            }
-        }
+       
 
         /**
          * This method is used to calculate the catch index for a population. It takes a
@@ -949,24 +659,6 @@ namespace fims_popdy
             }
         }
 
-        void CalculateIndex(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-
-            for (size_t fleet_ = 0; fleet_ < population_proxy.population->nfleets; fleet_++)
-            {
-                Type index_;
-                // I = qN (N is total numbers), I is an index in numbers
-                index_ = population_proxy.fleets[fleet_].fleet->q.get_force_scalar(year) *
-                         population_proxy.fleets[fleet_].fleet->selectivity->evaluate(population_proxy.population->ages[age]) *
-                         population_proxy.numbers_at_age[i_age_year] *
-                         population_proxy.weight_at_age[age]; // this->weight_at_age[age];
-                population_proxy.fleets[fleet_].expected_index[year] += index_;
-            }
-        }
 
         /**
          * This method is used to calculate the catch numbers at age for a population. It takes a
@@ -1004,31 +696,7 @@ namespace fims_popdy
             }
         }
 
-        void CalculateCatchNumbersAA(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-
-            for (size_t fleet_ = 0; fleet_ < population_proxy.population->nfleets; fleet_++)
-            {
-                // make an intermediate value in order to set multiple members (of
-                // current and fleet objects) to that value.
-                Type catch_; // catch_ is used to avoid using the c++ keyword catch
-                // Baranov Catch Equation
-                catch_ = (population_proxy.fleets[fleet_].fleet->Fmort[year] *
-                          population_proxy.fleets[fleet_].fleet->selectivity->evaluate(population_proxy.population->ages[age])) /
-                         population_proxy.mortality_Z[i_age_year] *
-                         population_proxy.numbers_at_age[i_age_year] *
-                         (1 - fims_math::exp(-(population_proxy.mortality_Z[i_age_year])));
-
-                // this->catch_numbers_at_age[i_age_yearf] += catch_;
-                // catch_numbers_at_age for the fleet module has different
-                // dimensions (year/age, not year/fleet/age)
-                population_proxy.fleets[fleet_].catch_numbers_at_age[i_age_year] += catch_;
-            }
-        }
+       
 
         /**
          * This method is used to calculate the catch weight at age for a population. It takes a
@@ -1055,22 +723,7 @@ namespace fims_popdy
             }
         }
 
-        void CalculateCatchWeightAA(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t year,
-            size_t age)
-        {
-
-            int i_age_year = year * population_proxy.population->nages + age;
-            for (size_t fleet_ = 0; fleet_ < population_proxy.population->nfleets; fleet_++)
-            {
-
-                population_proxy.fleets[fleet_].catch_weight_at_age[i_age_year] =
-                    population_proxy.fleets[fleet_].catch_numbers_at_age[i_age_year] *
-                    population_proxy.weight_at_age[age];
-            }
-        }
-
+      
         /**
          * This method is used to calculate the maturity at age for a population. It takes a
          * population object, the index of the age in the current year, the age as input
@@ -1087,15 +740,6 @@ namespace fims_popdy
         {
             population->derived_quantities["proportion_mature_at_age"][i_age_year] =
                 population->maturity->evaluate(population->ages[age]);
-        }
-
-        void CalculateMaturityAA(
-            CAAPopulationProxy<Type> &population_proxy,
-            size_t i_age_year,
-            size_t age)
-        {
-            population_proxy.proportion_mature_at_age[i_age_year] =
-                population_proxy.population->maturity->evaluate(population_proxy.population->ages[age]);
         }
 
         /**
