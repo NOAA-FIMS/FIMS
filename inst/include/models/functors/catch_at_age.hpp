@@ -112,6 +112,8 @@ namespace fims_popdy
         typedef typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator fleet_iterator;
         typedef typename std::map<std::string, fims::Vector<Type>>::iterator derived_quantities_iterator;
 
+        std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> fleet_derived_quantities;      // derived quantities for all fleets, indexed by fleet id
+        std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> population_derived_quantities; // derived quantities for all populations, indexed by population id
     public:
         /**
          * Constructor for the CatchAtAge class. This constructor initializes the
@@ -134,48 +136,51 @@ namespace fims_popdy
             for (size_t i = 0; i < this->populations.size(); i++)
             {
 
-                this->populations[i]->derived_quantities["mortality_F"] =
+                std::map<std::string, fims::Vector<Type>> &derived_quantities =
+                    this->population_derived_quantities[this->populations[i]->GetId()];
+
+                derived_quantities["mortality_F"] =
                     fims::Vector<Type>(this->populations[i]->nyears *
                                        this->populations[i]->nages);
 
-                this->populations[i]->derived_quantities["mortality_Z"] =
+                derived_quantities["mortality_Z"] =
                     fims::Vector<Type>(this->populations[i]->nyears *
                                        this->populations[i]->nages);
 
-                this->populations[i]->derived_quantities["weight_at_age"] =
+                derived_quantities["weight_at_age"] =
                     fims::Vector<Type>(this->populations[i]->nyears * this->populations[i]->nages);
 
-                this->populations[i]->derived_quantities["numbers_at_age"] =
+                derived_quantities["numbers_at_age"] =
                     fims::Vector<Type>((this->populations[i]->nyears + 1) *
                                        this->populations[i]->nages);
 
-                this->populations[i]->derived_quantities["unfished_numbers_at_age"] =
+                derived_quantities["unfished_numbers_at_age"] =
                     fims::Vector<Type>((this->populations[i]->nyears + 1) *
                                        this->populations[i]->nages);
-                this->populations[i]->derived_quantities["biomass"] =
+                derived_quantities["biomass"] =
                     fims::Vector<Type>((this->populations[i]->nyears + 1));
 
-                this->populations[i]->derived_quantities["spawning_biomass"] =
+                derived_quantities["spawning_biomass"] =
                     fims::Vector<Type>((this->populations[i]->nyears + 1));
 
-                this->populations[i]->derived_quantities["unfished_biomass"] =
+                derived_quantities["unfished_biomass"] =
                     fims::Vector<Type>((this->populations[i]->nyears + 1));
 
-                this->populations[i]->derived_quantities["unfished_spawning_biomass"] =
+                derived_quantities["unfished_spawning_biomass"] =
                     fims::Vector<Type>((this->populations[i]->nyears + 1));
 
-                this->populations[i]->derived_quantities["proportion_mature_at_age"] =
+                derived_quantities["proportion_mature_at_age"] =
                     fims::Vector<Type>((this->populations[i]->nyears + 1) *
                                        this->populations[i]->nages);
 
-                this->populations[i]->derived_quantities["expected_catch"] =
+                derived_quantities["expected_catch"] =
                     fims::Vector<Type>(this->populations[i]->nyears *
                                        this->populations[i]->nfleets);
 
-                this->populations[i]->derived_quantities["expected_recruitment"] =
+                derived_quantities["expected_recruitment"] =
                     fims::Vector<Type>((this->populations[i]->nyears + 1));
 
-                this->populations[i]->derived_quantities["sum_selectivity"] =
+                derived_quantities["sum_selectivity"] =
                     fims::Vector<Type>(this->populations[i]->nyears * this->populations[i]->nages);
 
                 for (size_t j = 0; j < this->populations[i]->fleets.size(); j++)
@@ -183,59 +188,57 @@ namespace fims_popdy
 
                     this->fleets[this->populations[i]->fleets[j]->id] = this->populations[i]->fleets[j];
                 }
-                // push back the population proxy
-                this->populations_proxies.push_back(CAAPopulationProxy<Type>(this->populations[i]));
             }
 
             for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end(); ++it)
             {
-
+                std::map<std::string, fims::Vector<Type>> &derived_quantities =
+                    this->fleet_derived_quantities[(*it).second->id];
                 // initialize derive quantities
-                (*it).second->derived_quantities["catch_at_age"] =
+                derived_quantities["catch_at_age"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nages);
 
-                (*it).second->derived_quantities["catch_numbers_at_age"] =
+                derived_quantities["catch_numbers_at_age"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nages);
 
-                (*it).second->derived_quantities["catch_numbers_at_length"] =
+                derived_quantities["catch_numbers_at_length"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nlengths);
 
-                (*it).second->derived_quantities["proportion_catch_numbers_at_age"] =
+                derived_quantities["proportion_catch_numbers_at_age"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nages);
 
-                (*it).second->derived_quantities["proportion_catch_numbers_at_length"] =
+                derived_quantities["proportion_catch_numbers_at_length"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nlengths);
 
-                (*it).second->derived_quantities["catch_weight_at_age"] =
+                derived_quantities["catch_weight_at_age"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nages);
 
-                (*it).second->derived_quantities["catch_index"] =
+                derived_quantities["catch_index"] =
                     fims::Vector<Type>((*it).second->nyears);
 
-                (*it).second->derived_quantities["expected_catch"] =
+                derived_quantities["expected_catch"] =
                     fims::Vector<Type>((*it).second->nyears);
 
-                (*it).second->derived_quantities["expected_index"] =
+                derived_quantities["expected_index"] =
                     fims::Vector<Type>((*it).second->nyears);
 
-                (*it).second->derived_quantities["log_expected_index"] =
+                derived_quantities["log_expected_index"] =
                     fims::Vector<Type>((*it).second->nyears);
 
-                (*it).second->derived_quantities["age_composition"] =
+                derived_quantities["age_composition"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nages);
 
-                (*it).second->derived_quantities["length_composition"] =
+                derived_quantities["length_composition"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nlengths);
-                // add fleet proxy
-                this->fleets_proxies.push_back(CAAFleetProxy<Type>((*it).second));
+               
             }
         }
 
@@ -803,7 +806,7 @@ namespace fims_popdy
             return phi_0;
         }
         /**
-         * This method is used to calculate the recruitment for a population. 
+         * This method is used to calculate the recruitment for a population.
          *
          */
         void CalculateRecruitment(
@@ -824,7 +827,7 @@ namespace fims_popdy
             }
             else
             {
-                //Why are we using evaluate_mean, how come a virtual function was changed?
+                // Why are we using evaluate_mean, how come a virtual function was changed?
                 population->derived_quantities["numbers_at_age"][i_age_year] =
                     population->recruitment->evaluate_mean(population->derived_quantities["spawning_biomass"][year - 1], phi0) *
                     /*the log_recruit_dev vector does not include a value for year == 0
@@ -993,7 +996,6 @@ namespace fims_popdy
                          population->derived_quantities["mortality_Z"][i_age_year] *
                          population->derived_quantities["numbers_at_age"][i_age_year] *
                          (1 - fims_math::exp(-(population->derived_quantities["mortality_Z"][i_age_year])));
-
 
                 // this->catch_numbers_at_age[i_age_yearf] += catch_;
                 // catch_numbers_at_age for the fleet module has different
@@ -1174,7 +1176,7 @@ namespace fims_popdy
         }
 
         /**
-         * * This method is used to evaluate the population dynamics model. 
+         * * This method is used to evaluate the population dynamics model.
          */
         virtual void Evaluate()
         {
