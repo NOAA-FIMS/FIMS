@@ -15,3 +15,5 @@ jobs:
     uses: nmfs-ost/ghactions4r/.github/workflows/doc-and-style-r.yml@main
     secrets:
       PAT: ${{ secrets.PAT }}
+    with:
+      use-air: true
