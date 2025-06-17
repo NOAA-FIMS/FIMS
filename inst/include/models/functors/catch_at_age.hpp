@@ -835,14 +835,14 @@ namespace fims_popdy
                         for (size_t age = 0; age < population->nages; age++)
                         {
                             size_t i_age_year = year * population->nages + age;
-                            sum_age += this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"][i_age_year];
+                            sum_age += this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year];
                         }
 
                         for (size_t age = 0; age < population->nages; age++)
                         {
                             size_t i_age_year = year * population->nages + age;
-                            this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_catch_numbers_at_age"][i_age_year] =
-                                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"][i_age_year] /
+                            this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_landings_numbers_at_age"][i_age_year] =
+                                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year] /
                                 sum_age;
                         }
 
@@ -851,12 +851,12 @@ namespace fims_popdy
 
                             for (size_t y = 0; y < population->fleets[fleet_]->nyears; y++)
                             {
-                                fims::Vector<Type> &catch_numbers_at_length =
-                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_length"];
-                                fims::Vector<Type> &catch_numbers_at_age =
-                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"];
-                                fims::Vector<Type> &proportion_catch_numbers_at_length =
-                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_catch_numbers_at_length"];
+                                fims::Vector<Type> &landings_numbers_at_length =
+                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_length"];
+                                fims::Vector<Type> &landings_numbers_at_age =
+                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"];
+                                fims::Vector<Type> &proportion_landings_numbers_at_length =
+                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_landings_numbers_at_length"];
 
                                 sum_length = 0.0;
                                 for (size_t l = 0; l < population->fleets[fleet_]->nlengths; l++)
@@ -866,17 +866,17 @@ namespace fims_popdy
                                     {
                                         size_t i_age_year = y * population->fleets[fleet_]->nages + a;
                                         size_t i_length_age = a * population->fleets[fleet_]->nlengths + l;
-                                        catch_numbers_at_length[i_length_year] +=
-                                            catch_numbers_at_age[i_age_year] *
+                                        this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_length"][i_length_year] +=
+                                            this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year] *
                                             population->fleets[fleet_]->age_to_length_conversion[i_length_age];
                                     }
-                                    sum_length += catch_numbers_at_length[i_length_year];
+                                    sum_length += this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_length"][i_length_year];
                                 }
                                 for (size_t l = 0; l < population->fleets[fleet_]->nlengths; l++)
                                 {
                                     size_t i_length_year = y * population->fleets[fleet_]->nlengths + l;
-                                    proportion_catch_numbers_at_length[i_length_year] =
-                                        catch_numbers_at_length[i_length_year] / sum_length;
+                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_landings_numbers_at_length"][i_length_year] =
+                                        this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_length"][i_length_year] / sum_length;
                                 }
                             }
                         }
