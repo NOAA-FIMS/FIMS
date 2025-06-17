@@ -86,7 +86,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
 {
     std::shared_ptr<std::set<uint32_t>> population_ids;
     typedef typename std::set<uint32_t>::iterator population_id_iterator;
-
+    std::map<uint32_t, uint32_t> age_comp_density_components_links;    // fleet id, density component id
+    std::map<uint32_t, uint32_t> index_density_components_links;       // fleet id, density component id
+    std::map<uint32_t, uint32_t> length_comp_density_components_links; // fleet id, density component id
+    typedef typename std::map<uint32_t, uint32_t>::iterator density_component_iterator;
 public:
     /**
      * @brief The constructor.
@@ -129,6 +132,21 @@ public:
         }
     }
 
+    void AddAgeCompDensityComponent(uint32_t fleet_id, uint32_t density_component_id)
+    {
+        this->age_comp_density_components_links[fleet_id] = density_component_id;
+    }
+
+    void AddLengthCompDensityComponent(uint32_t fleet_id, uint32_t density_component_id)
+    {
+        this->length_comp_density_components_links[fleet_id] = density_component_id;
+    }
+
+    void AddIndexDensityComponent(uint32_t fleet_id, uint32_t density_component_id)
+    {
+        this->index_density_components_links[fleet_id] = density_component_id;
+    }
+
     /**
      * @brief Method to get the population id.
      */
@@ -164,7 +182,6 @@ public:
      */
     std::string population_to_json(PopulationInterface *population_interface)
     {
-
         std::stringstream ss;
 
         std::shared_ptr<fims_info::Information<double>> info =
@@ -523,7 +540,6 @@ public:
      */
     virtual std::string to_json()
     {
-
         this->Show();
         typename std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
         std::vector<uint32_t> pop_ids(this->population_ids->begin(), this->population_ids->end());
