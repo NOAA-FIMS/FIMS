@@ -89,6 +89,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
     std::map<uint32_t, uint32_t> age_comp_density_components_links;    // fleet id, density component id
     std::map<uint32_t, uint32_t> index_density_components_links;       // fleet id, density component id
     std::map<uint32_t, uint32_t> length_comp_density_components_links; // fleet id, density component id
+    std::map<uint32_t, uint32_t> recruitment_density_components_links; // population id, density component id
     typedef typename std::map<uint32_t, uint32_t>::iterator density_component_iterator;
 public:
     /**
@@ -145,6 +146,11 @@ public:
     void AddIndexDensityComponent(uint32_t fleet_id, uint32_t density_component_id)
     {
         this->index_density_components_links[fleet_id] = density_component_id;
+    }
+
+    void AddRecruitmentDensityComponent(uint32_t population_id, uint32_t density_component_id)
+    {
+        this->recruitment_density_components_links[population_id] = density_component_id;
     }
 
     /**
