@@ -74,7 +74,7 @@
 #endif
 #endif
 
-// The following rows initialize default log files for outputing model progress
+// The following rows initialize default log files for outputting model progress
 // comments used to assist in diagnosing model issues and tracking progress.
 // These files will only be created if a logs folder is added to the root model
 // directory.

@@ -1,4 +1,30 @@
-Rcpp::loadModule(module = "fims", what = TRUE)
+# Note
+#
+# Placing `Rcpp::loadModule(module = "fims", what = TRUE)` inside the
+# `.onLoad` function has been observed to fix R session crashes when running
+# `devtools::load_all()` followed by `devtools::test()` in the package
+# development workflow.
+#
+# `Rcpp::loadModule()` is called to make all objects from C++ module
+# "fims" accessible in R.
+# `loadNamespace` calls `.onLoad()` before sealing the namespace and processing
+# exports.
+# This might provide `pkgload` (used by `devtools::load_all()` and
+# `devtools::test()`) a more consistent state to manage the dynamic library
+# during its unload/reload cycles in a development environment (Source: Gemini).
+#
+# There is no direct or explicit documentation stating that `Rcpp::loadModule()`
+# must be called in `.onLoad()`. The `Rcpp` documentation mentions that for
+# R 2.15.1 and later (e.g., from
+# `https://github.com/RcppCore/Rcpp/blob/29b3b78df547e55dbcceb1c5e81a978f441dd58b/inst/skeleton/zzz.R`)
+# `loadModule()` does not strictly need to be in `.onLoad()`
+# because it "triggers a load action" internally. However, packages like
+# `stan-dev/rstan` and several others do call `Rcpp::loadModule()` within
+# their `.onLoad()` functions. See examples from
+# https://github.com/search?q=Rcpp%3A%3AloadModule%28+zzz.R&type=code.
+.onLoad <- function(libname, pkgname) {
+  Rcpp::loadModule(module = "fims", what = TRUE)
+}
 
 .onUnload <- function(libpath) {
   library.dynam.unload("FIMS", libpath)
