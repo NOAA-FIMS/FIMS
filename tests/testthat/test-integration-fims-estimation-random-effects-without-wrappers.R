@@ -48,9 +48,9 @@ test_that("deterministic run returns correct nlls", {
 })
 
 test_that("deterministic run results correct number of parameters and random effects", {
-  #' @description Veryify the number of parameters are correct
+  #' @description Verify the number of parameters are correct
   expect_equal(length(result[["obj"]][["par"]]), 49)
-  #' @description Veryify the number of random effects are correct
+  #' @description Verify the number of random effects are correct
   expect_equal(length(result[["obj"]][["env"]][["random"]]), 29)
 })
 

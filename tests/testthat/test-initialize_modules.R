@@ -170,7 +170,7 @@ test_that("initialize_fims returns correct error messages", {
   clear()
 
   #' @description Test that [initialize_fims()] correctly returns an error when
-  #' the lenfths of value and estimation_type do not match
+  #' the lengths of value and estimation_type do not match
   parameters_wrong_type[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- c("fixed_effects", "fixed_effects")
   expect_error(
     initialize_fims(parameters = parameters_wrong_type, data = data),
