@@ -54,33 +54,6 @@ IF(BUILD_DOC)
     COMMENT "Building documentation with Doxygen.")
 ENDIF()
 
-# Set up Rcpp
-FetchContent_Declare(
-  rcpp
-  URL https://github.com/RcppCore/Rcpp/archive/refs/tags/1.0.8.zip
-)
-FetchContent_MakeAvailable(rcpp)
-
-# Set up R
-MESSAGE(STATUS "Looking for R executable")
-
-EXECUTE_PROCESS(
-  COMMAND which R
-  OUTPUT_VARIABLE R_EXECUTABLE)
-
-MESSAGE(STATUS "R_EXECUTABLE is ${R_EXECUTABLE}")
-
-EXECUTE_PROCESS(
-		COMMAND R "--slave" "--no-save" "-e" "cat(R.home())"
-		OUTPUT_VARIABLE R_HOME)
-
-MESSAGE(STATUS "R_HOME is ${R_HOME}")
-
-EXECUTE_PROCESS(
-		COMMAND R "--slave" "--no-save" "-e" "remotes::install_local(upgrade = 'always')")
-EXECUTE_PROCESS(
-		COMMAND R "--slave" "--no-save" "-e" "FIMS:::setup_gtest()")
-
 # Enable testing for current directory and below
 enable_testing()
 
@@ -91,8 +64,6 @@ add_library(fims_test INTERFACE)
 target_include_directories(fims_test
   INTERFACE
     inst/include
-    ${rcpp_SOURCE_DIR}/inst/include
-    ${R_HOME}/include
 )
 
 # Add compile definition STD_LIB to the fims_test target.
