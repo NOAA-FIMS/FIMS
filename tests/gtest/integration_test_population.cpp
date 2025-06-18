@@ -48,7 +48,7 @@ namespace
                 pop.numbers_at_age = t.RunModelLoop(pop, input_);
                 good = t.CheckModelOutput(pop, output_);
 
-                // declare unfished numbers at age 1, unfished spawning bimoass,
+                // declare unfished numbers at age 1, unfished spawning biomass,
                 // and unfished biomass
                 std::vector<double> expected_unfished_numbers_at_age1(pop.nyears, 0.0);
                 std::vector<double> expected_unfished_spawning_biomass(pop.nyears, 0.0);
