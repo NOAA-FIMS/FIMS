@@ -147,7 +147,7 @@ class Model {  // may need singleton
 
       // Prepare recruitment
       p->recruitment->Prepare();
-      FIMS_INFO_LOG("Recruitmnt successfully prepared.")
+      FIMS_INFO_LOG("Recruitment successfully prepared.")
     }
 
     // Loop over and evaluate populations
@@ -175,15 +175,15 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       f->of = this->of;
 #endif
-      FIMS_INFO_LOG("Begin evalulation for fleet " + fims::to_string(f->id));
+      FIMS_INFO_LOG("Begin evaluation for fleet " + fims::to_string(f->id));
       f->evaluate_age_comp();
       if (f->nlengths > 0) {
         f->evaluate_length_comp();
       }
-      FIMS_INFO_LOG("Begin evalulation of landings for fleet " +
+      FIMS_INFO_LOG("Begin evaluation of landings for fleet " +
                     fims::to_string(f->id));
       f->evaluate_landings();
-      FIMS_INFO_LOG("Begin evalulation of index for fleet " +
+      FIMS_INFO_LOG("Begin evaluation of index for fleet " +
                     fims::to_string(f->id));
       f->evaluate_index();
     }

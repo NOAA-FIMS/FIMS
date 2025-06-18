@@ -464,7 +464,7 @@ class Information {
   }
 
   /**
-   * @brief Set pointers to the recruitment module referened in the population
+   * @brief Set pointers to the recruitment module referenced in the population
    * module.
    *
    * @param &valid_model reference to true/false boolean indicating whether
@@ -503,7 +503,7 @@ class Information {
   }
 
   /**
-   * @brief Set pointers to the recruitment process module referened in the
+   * @brief Set pointers to the recruitment process module referenced in the
    * population module.
    *
    * @param &valid_model reference to true/false boolean indicating whether
@@ -543,7 +543,7 @@ class Information {
   }
 
   /**
-   * @brief Set pointers to the growth module referened in the population
+   * @brief Set pointers to the growth module referenced in the population
    * module.
    *
    * @param &valid_model reference to true/false boolean indicating whether
@@ -582,7 +582,7 @@ class Information {
   }
 
   /**
-   * @brief Set pointers to the maturity module referened in the population
+   * @brief Set pointers to the maturity module referenced in the population
    * module.
    *
    * @param &valid_model reference to true/false boolean indicating whether
