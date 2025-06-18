@@ -26,7 +26,7 @@ class Vector {
   std::vector<Type> vec_m;
 
   /**
-   * @brief friend comparison operator. Allows the operartor to see private
+   * @brief friend comparison operator. Allows the operator to see private
    * members of fims::Vector<Type>.
    */
   template <typename T>
@@ -46,10 +46,10 @@ class Vector {
   typedef typename std::vector<Type>::reference
       reference; /*!<Reference type &Type>*/
   typedef typename std::vector<Type>::const_reference
-      const_reference; /*!<Constant eference type const &Type>*/
+      const_reference; /*!<Constant reference type const &Type>*/
   typedef typename std::vector<Type>::pointer pointer; /*!<Pointer type Type*>*/
   typedef typename std::vector<Type>::const_pointer
-      const_pointer; /*!<Constant ointer type const Type*>*/
+      const_pointer; /*!<Constant pointer type const Type*>*/
   typedef typename std::vector<Type>::iterator iterator; /*!<Iterator>*/
   typedef typename std::vector<Type>::const_iterator
       const_iterator; /*!<Constant iterator>*/

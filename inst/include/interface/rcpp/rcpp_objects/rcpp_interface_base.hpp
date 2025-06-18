@@ -56,7 +56,7 @@ class Parameter {
    */
   double max_m = std::numeric_limits<double>::infinity();
   /**
-   * @brief A string indicationg the estimation type. Options are: constant,
+   * @brief A string indicating the estimation type. Options are: constant,
    * fixed_effects, or random_effects, where the default is constant.
    */
   SharedString estimation_type_m = SharedString("constant");

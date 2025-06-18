@@ -3,8 +3,9 @@
 #' Necessary tests include input and output (IO) correctness [IO
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
-#' information. Every test should have a @description tag that takes up just
-#' one line, which will be used in the bookdown report of {testthat} results.
+#' information. Every test should have a @description tag, which can span
+#' multiple lines, that will be used in the bookdown report of the results from
+#' {testthat}.
 
 # distribution_formulas ----
 ## Setup ----
@@ -104,7 +105,7 @@ test_that("initialize_process_distribution() works with correct inputs", {
   expect_equal(length(recruitment$log_devs), length(recruitment_distribution$x))
 
   #' @description Test that [initialize_process_distribution()] matches
-  #' the dimesnions of x and expected values.
+  #' the dimensions of x and expected values.
   expect_equal(
     length(recruitment_distribution$x),
     length(recruitment_distribution$expected_values)

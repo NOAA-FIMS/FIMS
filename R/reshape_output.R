@@ -120,7 +120,7 @@ reshape_tmb_estimates <- function(obj,
                                   opt = NULL,
                                   parameter_names) {
   # Outline for the estimates table
-  # TODO: The fleet_name, age, length, and time columns are currently emplty. Matthew
+  # TODO: The fleet_name, age, length, and time columns are currently empty. Matthew
   # has started adding information to the JSON output in the dev-model-families branch.
   # We can populate these columns once the dev-model-families branch is merged
   # into dev.
