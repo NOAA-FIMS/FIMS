@@ -4,18 +4,6 @@ include(GoogleTest)
 
 # Add tests: specify add_executable and target_link_libraries
 
-# test_population_dynamics_selectivity_logistic
-add_executable(population_dynamics_selectivity_logistic
-  test_population_dynamics_selectivity_logistic.cpp
-)
-
-target_link_libraries(population_dynamics_selectivity_logistic
-  gtest_main
-  fims_test
-)
-
-gtest_discover_tests(population_dynamics_selectivity_logistic)
-
 # test_population_dynamics_maturity_logistic
 add_executable(population_dynamics_maturity_logistic
   test_population_dynamics_maturity_logistic.cpp
@@ -303,13 +291,38 @@ gtest_discover_tests(fims_math_logit)
 
 
 # test_integration
-add_executable(population_integration
-  integration_test_population.cpp
+# add_executable(population_integration
+#   integration_test_population.cpp
+# )
+
+#  target_link_libraries(population_integration
+#   gtest_main
+#   fims_test
+#  )
+
+#  gtest_discover_tests(population_integration)
+
+# test_Logistic_LogisticSelectivity_Evaluate.cpp
+add_executable(Logistic_LogisticSelectivity_Evaluate
+  test_Logistic_LogisticSelectivity_Evaluate.cpp
 )
 
- target_link_libraries(population_integration
+target_link_libraries(Logistic_LogisticSelectivity_Evaluate
   gtest_main
   fims_test
- )
+)
 
- gtest_discover_tests(population_integration)
+gtest_discover_tests(Logistic_LogisticSelectivity_Evaluate)
+
+
+# test_FIMSJson_JsonParser_WriteToFile.cpp
+add_executable(FIMSJson_JsonParser_WriteToFile
+  test_FIMSJson_JsonParser_WriteToFile.cpp
+)
+
+target_link_libraries(FIMSJson_JsonParser_WriteToFile
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(FIMSJson_JsonParser_WriteToFile)

@@ -115,7 +115,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         population_ids(other.population_ids) {}
 
   /**
-   * Metthod to add a population id to the set of population ids.
+   * Method to add a population id to the set of population ids.
    */
   void AddPopulation(uint32_t id) {
     this->population_ids->insert(id);
@@ -504,7 +504,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   }
 
   /**
-   * @brief Minimimum method to calculate the minimum of an array or vector
+   * @brief Minimum method to calculate the minimum of an array or vector
    * of doubles.
    *
    * @param v
@@ -544,7 +544,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   Rcpp::List calculate_reference_points_population(
       PopulationInterface *population_interface, double maxF = 1.0,
       double step = 0.01) {
-    //         //note: this algoritm is ported from the Meta-population
+    //         //note: this algorithm is ported from the Meta-population
     //         assessment system project and
     //         //needs review
 
@@ -662,7 +662,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     //                                          Z_age[nages - 1]));
 
     //                 spr[i] = sum(N_age * reprod);
-    // #warning This is propbably not correct
+    // #warning This is probably not correct
     //                 R_eq[i] = pop->recruitment->evaluate(spr[i], spr_F0);
     //                 // R_eq[i] = (R0 / ((5.0 * steep - 1.0) * spr[i])) *
     //                 //           (BC * 4.0 * steep * spr[i] - spr_F0 * (1.0 -
