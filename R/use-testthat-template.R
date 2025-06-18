@@ -33,7 +33,7 @@
 #' returned.
 #'
 #' Two messages are also returned from the usethis package, which is used by
-#' this function. The first states where the FIMS project is on your computer.
+#' #' this function. The first states where the FIMS project is on your computer.
 #' The second states the file path of the newly created file. The file will not
 #' be automatically opened.
 #'

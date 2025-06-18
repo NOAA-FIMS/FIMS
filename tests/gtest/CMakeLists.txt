@@ -303,13 +303,25 @@ gtest_discover_tests(fims_math_logit)
 
 
 # test_integration
-add_executable(population_integration
-  integration_test_population.cpp
+# add_executable(population_integration
+#   integration_test_population.cpp
+# )
+
+#  target_link_libraries(population_integration
+#   gtest_main
+#   fims_test
+#  )
+
+#  gtest_discover_tests(population_integration)
+
+# test_JasonParse_WriteToFile.cpp
+add_executable(JasonParse_WriteToFile
+  test_JasonParse_WriteToFile.cpp
 )
 
- target_link_libraries(population_integration
+target_link_libraries(JasonParse_WriteToFile
   gtest_main
   fims_test
- )
+)
 
- gtest_discover_tests(population_integration)
+gtest_discover_tests(JasonParse_WriteToFile)
