@@ -232,6 +232,8 @@ namespace fims_popdy
                             this->selectivity_at_length[l];
                     }
                 }
+            }else{
+                FIMS_ERROR_LOG("Fleet selectivity units must be either 'age' or 'length', not " + selectivity_units);
             }
             
 

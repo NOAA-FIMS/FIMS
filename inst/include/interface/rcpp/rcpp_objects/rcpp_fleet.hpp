@@ -352,9 +352,12 @@ public:
   /**
    * @brief Set the unique ID for the selectivity object.
    * @param selectivity_id Unique ID for the observed object.
+   * @param units The units of the selectivity, either "age" or "length".
+   * Default is "age".
    */
-  void SetSelectivityID(int selectivity_id) {
+  void SetSelectivityID(int selectivity_id, string units = fims::to_string("age")) {
     interface_selectivity_id_m.set(selectivity_id);
+    selectivity_units = units;
   }
 
   /**

@@ -68,6 +68,7 @@ namespace fims_model {
             // each vector can be a different dimension. Does not work with ADREPORT
             // fleets
             vector<vector<Type> > selectivity_age(n_fleets);
+            vector<vector<Type> > selectivity_length(n_fleets);
             vector<vector<Type> > landings_w(n_fleets);
             vector<vector<Type> > landings_n(n_fleets);
             vector<vector<Type> > landings_exp(n_fleets);
@@ -271,6 +272,7 @@ namespace fims_model {
             FIMS_REPORT_F(biomass, of);
             FIMS_REPORT_F(M, of);
             FIMS_REPORT_F(selectivity_age, of);
+            FIMS_REPORT_F(selectivity_length, of);
             FIMS_REPORT_F(total_landings_w, of);
             FIMS_REPORT_F(total_landings_n, of);
             FIMS_REPORT_F(landings_w, of);
@@ -303,6 +305,7 @@ namespace fims_model {
             vector<Type> FMort = ADREPORTvector(F_mort);
             vector<Type> Q = ADREPORTvector(q);
             vector<Type> SelectivityAge = ADREPORTvector(selectivity_age);
+            vector<Type> SelectivityLength = ADREPORTvector(selectivity_length);
             vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
             vector<Type> IndexExpected = ADREPORTvector(index_exp);
             vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
@@ -323,6 +326,7 @@ namespace fims_model {
             ADREPORT_F(FMort, of);
             ADREPORT_F(Q, of);
             ADREPORT_F(SelectivityAge, of);
+            ADREPORT_F(SelectivityLength, of);
             ADREPORT_F(LandingsExpected, of);
             ADREPORT_F(IndexExpected, of);
             ADREPORT_F(LandingsNumberAtAge, of);
