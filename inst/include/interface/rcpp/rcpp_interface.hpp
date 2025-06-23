@@ -78,6 +78,8 @@ bool CreateTMBModel() {
   std::shared_ptr<fims_model::Model < TMB_FIMS_REAL_TYPE>> m0 =
   fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
 
+
+
   return true;
 }
 
@@ -459,6 +461,12 @@ void log_error(std::string log_entry) {
   fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
 
+
+// size_t EstimationType::Constant = 0;
+// size_t EstimationType::FixedEffects = 1;
+// size_t EstimationType::RandomEffects = 2;
+
+RCPP_EXPOSED_CLASS(EstimationType)
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
 RCPP_EXPOSED_CLASS(RealVector)

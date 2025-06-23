@@ -10,6 +10,7 @@
 #include "rcpp_interface_base.hpp"
 #include <valarray>
 #include <cmath>
+#include <mutex>
 
 class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase
 {
@@ -93,7 +94,15 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
     std::map<uint32_t, uint32_t> initial_numbers_at_age_density_components_links; // population id, density component id
     typedef typename std::map<uint32_t, uint32_t>::iterator density_component_iterator;
 
+    static void build_R_enum()
+    {
+        Rcpp::Environment global_env = Rcpp::Environment::global_env();
+        global_env["CatchAtAge::density_stuff"] = CatchAtAgeInterface::density_expected;
+    }
+
 public:
+    static std::once_flag density_expected_flag;
+    static Rcpp::List density_expected;
     /**
      * @brief The constructor.
      */
@@ -103,6 +112,8 @@ public:
         std::shared_ptr<CatchAtAgeInterface> caa = std::make_shared<CatchAtAgeInterface>(*this);
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(caa);
         FisheryModelInterfaceBase::live_objects[this->id] = caa;
+
+        std::call_once(density_expected_flag, CatchAtAgeInterface::build_R_enum);
     }
 
     /**
@@ -138,43 +149,11 @@ public:
     /**
      * @brief Method to add an age composition density component.
      */
-    void AddAgeCompDensityComponent(uint32_t fleet_id, uint32_t density_component_id)
+    void AddFleetDensityComponent(uint32_t fleet_id, uint32_t data, uint32_t density_component_id, std::string input_type = "constant")
     {
         this->age_comp_density_components_links[fleet_id] = density_component_id;
     }
 
-    /**
-     * @brief Method to add a length composition density component.
-     */
-    void AddLengthCompDensityComponent(uint32_t fleet_id, uint32_t density_component_id)
-    {
-        this->length_comp_density_components_links[fleet_id] = density_component_id;
-    }
-
-    /**
-     * @brief Method to add an index density component.
-     */
-    void AddIndexDensityComponent(uint32_t fleet_id, uint32_t density_component_id)
-    {
-        this->index_density_components_links[fleet_id] = density_component_id;
-    }
-
-    /**
-     * @brief Method to add a recruitment density component.
-     */
-    void AddRecruitmentDensityComponent(uint32_t population_id, uint32_t density_component_id)
-    {
-        this->recruitment_density_components_links[population_id] = density_component_id;
-    }
-
-    /**
-     * @brief Method to add an initial numbers at age density component.
-     */
-    void AddInitialNumbersAtAgeDensityComponent(uint32_t population_id, uint32_t density_component_id)
-    {
-        this->initial_numbers_at_age_density_components_links[population_id] = density_component_id;
-    }
-    
     /**
      * @brief Method to get the population id.
      */
@@ -952,5 +931,9 @@ public:
 
 #endif
 };
+std::once_flag CatchAtAgeInterface::density_expected_flag;
 
+Rcpp::List CatchAtAgeInterface::density_expected = Rcpp::List::create(
+    Rcpp::Named("density_expected") = Rcpp::NumericVector::create(0L),
+    Rcpp::Named("density_expected_stdev") = Rcpp::NumericVector::create(1L));
 #endif

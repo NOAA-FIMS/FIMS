@@ -22,6 +22,7 @@ namespace fims_popdy
         std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> fleet_derived_quantities;      // derived quantities for all fleets, indexed by fleet id
         std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> population_derived_quantities; // derived quantities for all populations, indexed by population id
     public:
+        std::vector<Type> ages; /*!< vector of the ages for referencing*/
         /**
          * Constructor for the CatchAtAge class. This constructor initializes the
          * name of the model and sets the id of the model.
@@ -680,7 +681,7 @@ namespace fims_popdy
             for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
             {
                 // Baranov Catch Equation
-                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year] +=   
+                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year] +=
                     (this->fleets[fleet_]->Fmort[year] *
                      this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
                     this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year] *
@@ -689,36 +690,6 @@ namespace fims_popdy
             }
         }
 
-
-        /**
-         * This method is used to calculate the catch index for a population. It takes a
-         * population object, the index of the age in the current year, the year,
-         * and the age as input and calculates the index for that population.
-         * @param population
-         * @param i_age_year
-         * @param year
-         * @param age
-         * @return void
-         */
-        void CalculateIndex(
-            std::shared_ptr<fims_popdy::Population<Type>> &population,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-
-            for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
-            {
-                Type index_;
-                // I = qN (N is total numbers), I is an index in numbers
-
-                index_ = population->fleets[fleet_]->q.get_force_scalar(year) *
-                         population->fleets[fleet_]->selectivity->evaluate(population->ages[age]) *
-                         this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] *
-                         this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
-                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["expected_index"][year] += index_;
-            }
-        }
 
         /**
          * This method is used to calculate the catch numbers at age for a population. It takes a
@@ -756,7 +727,6 @@ namespace fims_popdy
             }
         }
 
-
         /**
          * This method is used to calculate the catch weight at age for a population. It takes a
          * population object, the index of the age in the current year, the year,
@@ -782,7 +752,7 @@ namespace fims_popdy
             }
         }
 
-             /**
+        /**
          * This method is used to calculate the catch weight at age for a population. It takes a
          * population object, the index of the age in the current year, the year,
          * and the age as input and calculates the weight at age for that population.
@@ -806,7 +776,6 @@ namespace fims_popdy
                     this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
             }
         }
-
 
         /**
          * This method is used to calculate the proportions for a population. It takes a
