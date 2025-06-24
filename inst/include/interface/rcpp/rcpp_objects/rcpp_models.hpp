@@ -97,7 +97,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
     static void build_R_enum()
     {
         Rcpp::Environment global_env = Rcpp::Environment::global_env();
-        global_env["CatchAtAge::density_stuff"] = CatchAtAgeInterface::density_expected;
+        global_env["CatchAtAge::density_density_flags"] = CatchAtAgeInterface::density_expected;
+        global_env.lock_binding("CatchAtAge::density_density_flags");
     }
 
 public:
@@ -147,9 +148,13 @@ public:
     }
 
     /**
-     * @brief Method to add an age composition density component.
+     * @brief Method to add a fleet based density component link.
+     * @param fleet_id The id of the fleet.
+     * @param linked_type The type of the linked component (e.g., age composition, index, length composition, recruitment, initial numbers at age).
+     * @param density_component_id The id of the density component to link to.
+     * @param input_type The type of input for the density component (default is "constant)
      */
-    void AddFleetDensityComponent(uint32_t fleet_id, uint32_t data, uint32_t density_component_id, std::string input_type = "constant")
+    void AddFleetDensityComponent(uint32_t fleet_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
     {
         this->age_comp_density_components_links[fleet_id] = density_component_id;
     }
@@ -934,6 +939,25 @@ public:
 std::once_flag CatchAtAgeInterface::density_expected_flag;
 
 Rcpp::List CatchAtAgeInterface::density_expected = Rcpp::List::create(
-    Rcpp::Named("density_expected") = Rcpp::NumericVector::create(0L),
-    Rcpp::Named("density_expected_stdev") = Rcpp::NumericVector::create(1L));
+    Rcpp::Named("mortality_F") = Rcpp::NumericVector::create(0L),
+    Rcpp::Named("mortality_Z") = Rcpp::NumericVector::create(1L),
+    Rcpp::Named("weight_at_age") = Rcpp::NumericVector::create(2L),
+    Rcpp::Named("numbers_at_age") = Rcpp::NumericVector::create(3L),
+    Rcpp::Named("initial_numbers_at_age") = Rcpp::NumericVector::create(4L),
+    Rcpp::Named("unfished_numbers_at_age") = Rcpp::NumericVector::create(5L),
+    Rcpp::Named("biomass") = Rcpp::NumericVector::create(6L),
+    Rcpp::Named("spawning_biomass") = Rcpp::NumericVector::create(7L),
+    Rcpp::Named("unfished_spawning_biomass") = Rcpp::NumericVector::create(8L),
+    Rcpp::Named("expected_recruitment") = Rcpp::NumericVector::create(9L),
+    Rcpp::Named("recruitment_deviations") = Rcpp::NumericVector::create(10L),
+    Rcpp::Named("catch_at_age") = Rcpp::NumericVector::create(11L),
+    Rcpp::Named("catch_numbers_at_age") = Rcpp::NumericVector::create(12L),
+    Rcpp::Named("proportion_catch_numbers_at_age") = Rcpp::NumericVector::create(13L),
+    Rcpp::Named("proportion_catch_numbers_at_length") = Rcpp::NumericVector::create(14L),
+    Rcpp::Named("catch_weight_at_age") = Rcpp::NumericVector::create(15L),
+    Rcpp::Named("expected_catch") = Rcpp::NumericVector::create(16L),
+    Rcpp::Named("expected_index") = Rcpp::NumericVector::create(17L),
+    Rcpp::Named("log_expected_index") = Rcpp::NumericVector::create(18L),
+    Rcpp::Named("age_composition") = Rcpp::NumericVector::create(19L),
+    Rcpp::Named("length_composition") = Rcpp::NumericVector::create(20L));
 #endif
