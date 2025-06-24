@@ -44,6 +44,12 @@ namespace fims_popdy
             for (size_t i = 0; i < this->populations.size(); i++)
             {
 
+                std::shared_ptr<fims_info::Information<Type>> info =
+                    fims_info::Information<Type>::GetInstance();
+
+                std::shared_ptr<PopulationInterface> population =
+                    PopulationInterface::live_objects[this->populations[i]->GetId()];
+
                 std::map<std::string, fims::Vector<Type>> &derived_quantities =
                     this->population_derived_quantities[this->populations[i]->GetId()];
 
@@ -90,6 +96,8 @@ namespace fims_popdy
 
                 derived_quantities["sum_selectivity"] =
                     fims::Vector<Type>(this->populations[i]->nyears * this->populations[i]->nages);
+                // replace elements in the variable map
+                info->variable_map[this->numbers_at_age.id_m] = &(derived_quantities["numbers_at_age"]);
 
                 for (size_t j = 0; j < this->populations[i]->fleets.size(); j++)
                 {
@@ -100,6 +108,9 @@ namespace fims_popdy
 
             for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end(); ++it)
             {
+                std::shared_ptr<FleetInterface> fleet_interface =
+                    FleetInterface::live_objects[(*it).second->id];
+
                 std::map<std::string, fims::Vector<Type>> &derived_quantities =
                     this->fleet_derived_quantities[(*it).second->id];
                 // initialize derive quantities
@@ -146,6 +157,16 @@ namespace fims_popdy
                 derived_quantities["length_composition"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nlengths);
+
+                // replace elements in the variable map
+                info->variable_map[fleet->log_landings_expected.id_m] = &(derived_quantities["log_landings_expected"]);
+                info->variable_map[fleet->log_index_expected.id_m] = &(derived_quantities["log_expected_index"]);
+                info->variable_map[fleet->agecomp_expected.id_m] = &(derived_quantities["agecomp_expected"]);
+                info->variable_map[fleet->agecomp_proportion.id_m] = &(derived_quantities["agecomp_proportion"]);
+                info->variable_map[fleet->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
+                info->variable_map[fleet->age_to_length_conversion.id_m] = &(derived_quantities["age_to_length_conversion"]);
+                info->variable_map[fleet->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
+                info->variable_map[fleet->lengthcomp_proportion.id_m] = &(derived_quantities["lengthcomp_proportion"]);
             }
         }
 
@@ -689,7 +710,6 @@ namespace fims_popdy
                     (1 - fims_math::exp(-(this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year])));
             }
         }
-
 
         /**
          * This method is used to calculate the catch numbers at age for a population. It takes a
