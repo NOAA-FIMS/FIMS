@@ -98,8 +98,22 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
     {
         Rcpp::Environment global_env = Rcpp::Environment::global_env();
         global_env["CatchAtAge::density_density_flags"] = CatchAtAgeInterface::density_expected;
-        global_env.lock_binding("CatchAtAge::density_density_flags");
+        global_env.lockBinding("CatchAtAge::density_density_flags");
     }
+struct DensityComponentLink
+{
+    uint32_t module_id;
+    uint32_t density_component_id;
+    uint32_t linked_component;
+    std::string input_type;
+};
+
+std::vector<DensityComponentLink> fleet_density_component_links;
+std::vector<DensityComponentLink> growth_density_component_links;
+std::vector<DensityComponentLink> maturity_density_component_links;
+std::vector<DensityComponentLink> population_density_component_links;
+std::vector<DensityComponentLink> recruitment_density_component_links;
+std::vector<DensityComponentLink> selectivity_density_component_links;
 
 public:
     static std::once_flag density_expected_flag;
@@ -156,7 +170,97 @@ public:
      */
     void AddFleetDensityComponent(uint32_t fleet_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
     {
-        this->age_comp_density_components_links[fleet_id] = density_component_id;
+        DensityComponentLink dcl;
+        dcl.module_id = fleet_id;
+        dcl.density_component_id = density_component_id;
+        dcl.linked_component = linked_type;
+        dcl.input_type = input_type;    
+        this->fleet_density_component_links.push_back(dcl);
+    }
+
+    /**
+     * @brief Method to add a growth based density component link.  
+     * @param growth_id The id of the growth module.
+     * @param linked_type The type of the linked component.
+     * @param density_component_id The id of the density component to link to.
+     * @param input_type The type of input for the density component (default is "constant)
+     */
+    void AddGrowthDensityComponent(uint32_t growth_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
+    {
+        DensityComponentLink dcl;
+        dcl.module_id = growth_id;
+        dcl.density_component_id = density_component_id;
+        dcl.linked_component = linked_type;
+        dcl.input_type = input_type;    
+        this->growth_density_component_links.push_back(dcl);
+    }
+
+    /**
+     * @brief Method to add a maturity based density component link.  
+     * @param maturity_id The id of the maturity module.
+     * @param linked_type The type of the linked component.
+     * @param density_component_id The id of the density component to link to.
+     * @param input_type The type of input for the density component (default is "constant)
+     */
+    void AddMaturityDensityComponent(uint32_t maturity_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
+    {
+        DensityComponentLink dcl;
+        dcl.module_id = maturity_id;
+        dcl.density_component_id = density_component_id;
+        dcl.linked_component = linked_type;
+        dcl.input_type = input_type;    
+        this->maturity_density_component_links.push_back(dcl);
+    }
+
+    /**
+     * @brief Method to add a population based density component link.  
+     * @param population_id The id of the population module.
+     * @param linked_type The type of the linked component.
+     * @param density_component_id The id of the density component to link to.
+     * @param input_type The type of input for the density component (default is "constant)
+     */
+    void AddPopulationDensityComponent(uint32_t population_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
+    {
+        DensityComponentLink dcl;
+        dcl.module_id = population_id;
+        dcl.density_component_id = density_component_id;
+        dcl.linked_component = linked_type;
+        dcl.input_type = input_type;    
+        this->population_density_component_links.push_back(dcl);
+    }
+
+    /**
+     * @brief Method to add a recruitment based density component link.  
+     * @param recruitment_id The id of the recruitment module.
+     * @param linked_type The type of the linked component.
+     * @param density_component_id The id of the density component to link to.
+     * @param input_type The type of input for the density component (default is "constant)
+     */
+    void AddRecruitmentDensityComponent(uint32_t recruitment_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
+    {
+        DensityComponentLink dcl;
+        dcl.module_id = recruitment_id;
+        dcl.density_component_id = density_component_id;
+        dcl.linked_component = linked_type;
+        dcl.input_type = input_type;    
+        this->recruitment_density_component_links.push_back(dcl);
+    }
+
+    /**
+     * @brief Method to add a selectivity based density component link.  
+     * @param selectivity_id The id of the selectivity module.
+     * @param linked_type The type of the linked component.
+     * @param density_component_id The id of the density component to link to.
+     * @param input_type The type of input for the density component (default is "constant)
+     */
+    void AddSelectivityDensityComponent(uint32_t selectivity_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
+    {
+        DensityComponentLink dcl;
+        dcl.module_id = selectivity_id;
+        dcl.density_component_id = density_component_id;
+        dcl.linked_component = linked_type;
+        dcl.input_type = input_type;    
+        this->selectivity_density_component_links.push_back(dcl);
     }
 
     /**
