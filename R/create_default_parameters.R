@@ -130,7 +130,7 @@ create_default_parameters <- function(
 
   # Create fleet parameters
   fleet_temp <- list()
-  for (i in 1:length(fleets)) {
+  for (i in seq_along(fleets)) {
     fleet_temp <- c(
       fleet_temp,
       create_default_fleet(

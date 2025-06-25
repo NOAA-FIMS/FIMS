@@ -2,6 +2,7 @@ Arith
 Beverton
 BevertonHoltRecruitment
 CMD
+CppAD
 CPUE
 Codecov
 DlnormDistribution
@@ -22,9 +23,11 @@ ParameterVectors
 Rcerr
 Rcout
 Rcpp
+README
 RealVector
 Rstudio
 TMB
+TMBad
 WORDLIST
 agecomp
 al

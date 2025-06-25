@@ -56,7 +56,7 @@ namespace fims_distributions
               fims::to_string(n_x) + " and the expected vector is of size " + 
               fims::to_string(this->expected_values.size()));
           }
-          if( this->log_sd.size() > 1 & n_x != this->log_sd.size()){
+          if( this->log_sd.size() > 1 && n_x != this->log_sd.size()){
             throw std::invalid_argument("LognormalLPDF::Vector index out of bounds. The size of observed data does not equal the size of the log_sd vector. The observed data vector is of size " + 
               fims::to_string(n_x) + " and the log_sd vector is of size " + 
               fims::to_string(this->log_sd.size()));

@@ -32,7 +32,7 @@ jobs:
       with:
         source: './inst/include ./src ./tests/gtest'
         extensions: 'hpp, cpp'
-        style: Google
+        style: "{BasedOnStyle: Google, SortIncludes: false}"
         inplace: True
     
     - name: Create Pull Request
