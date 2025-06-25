@@ -704,35 +704,6 @@ namespace fims_popdy
         }
 
         /**
-         * This method is used to calculate the catch for a population. It takes a
-         * population object, the index of the age in the current year, the year,
-         * and the age as input and calculates the catch for that population.
-         * @param population
-         * @param year
-         * @param age
-         * @return void
-         */
-        void CalculateLandings(
-            std::shared_ptr<fims_popdy::Population<Type>> &population,
-            size_t year,
-            size_t age)
-        {
-
-            for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
-            {
-                size_t index_yf = year * population->nfleets +
-                                  fleet_; // index by fleet and years to dimension fold
-                size_t i_age_year = year * population->nages + age;
-
-                this->population_derived_quantities[population->GetId()]["expected_catch"][index_yf] +=
-                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_weight_at_age"][i_age_year];
-
-                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["expected_catch"][year] +=
-                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_weight_at_age"][i_age_year];
-            }
-        }
-
-        /**
          * This method is used to calculate the landings for a population and adds to existing
          * expected total landings by fleet. It takes a population object, the year, and the age
          * as input and calculates the landings for that population.
@@ -764,85 +735,6 @@ namespace fims_popdy
             }
         }
 
-        void CalculateIndex(
-            std::shared_ptr<fims_popdy::Population<Type>> &population,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-            for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
-            {
-                // Baranov Catch Equation
-                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year] +=
-                    (this->fleets[fleet_]->Fmort[year] *
-                     this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
-                    this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year] *
-                    this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] *
-                    (1 - fims_math::exp(-(this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year])));
-            }
-        }
-
-        /**
-         * This method is used to calculate the catch numbers at age for a population. It takes a
-         * population object, the index of the age in the current year, the year,
-         * and the age as input and calculates the numbers at age for that population.
-         * @param population
-         * @param i_age_year
-         * @param year
-         * @param age
-         * @return void
-         */
-        void CalculateCatchNumbersAA(
-            std::shared_ptr<fims_popdy::Population<Type>> &population,
-            size_t i_age_year,
-            size_t year,
-            size_t age)
-        {
-
-            for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
-            {
-                // make an intermediate value in order to set multiple members (of
-                // current and fleet objects) to that value.
-                Type catch_; // catch_ is used to avoid using the c++ keyword catch
-                // Baranov Catch Equation
-                catch_ = (population->fleets[fleet_]->Fmort[year] *
-                          population->fleets[fleet_]->selectivity->evaluate(population->ages[age])) /
-                         this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year] *
-                         this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] *
-                         (1 - fims_math::exp(-(this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year])));
-
-                // this->catch_numbers_at_age[i_age_yearf] += catch_;
-                // catch_numbers_at_age for the fleet module has different
-                // dimensions (year/age, not year/fleet/age)
-                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"][i_age_year] += catch_;
-            }
-        }
-
-        /**
-         * This method is used to calculate the catch weight at age for a population. It takes a
-         * population object, the index of the age in the current year, the year,
-         * and the age as input and calculates the weight at age for that population.
-         * @param population
-         * @param year
-         * @param age
-         * @return void
-         */
-        void CalculateCatchWeightAA(
-            std::shared_ptr<fims_popdy::Population<Type>> &population,
-            size_t year,
-            size_t age)
-        {
-
-            int i_age_year = year * population->nages + age;
-            for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
-            {
-
-                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_weight_at_age"][i_age_year] =
-                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["catch_numbers_at_age"][i_age_year] *
-                    this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
-            }
-        }
-
         /**
          * This method is used to calculate the catch weight at age for a population. It takes a
          * population object, the index of the age in the current year, the year,
@@ -865,6 +757,53 @@ namespace fims_popdy
                 this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_weight_at_age"][i_age_year] =
                     this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year] *
                     this->population_derived_quantities[population->GetId()]["weight_at_age"][age];
+            }
+        }
+
+        void CalculateLandingNumbersAA(
+            std::shared_ptr<fims_popdy::Population<Type>> &population,
+            size_t i_age_year,
+            size_t year,
+            size_t age)
+        {
+            for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
+            {
+                // Baranov Catch Equation
+                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year] +=
+                    (this->fleets[fleet_]->Fmort[year] *
+                     this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
+                    this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year] *
+                    this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] *
+                    (1 - fims_math::exp(-(this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year])));
+            }
+        }
+
+        void CalculateIndex(
+            std::shared_ptr<fims_popdy::Population<Type>> &population,
+            size_t year,
+            size_t age)
+        {
+            for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
+            {
+                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["index_weight"][year] +=
+                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["index_weight_at_age"][i_age_year];
+
+                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["index_numbers"][year] +=
+                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["index_numbers_at_age"][i_age_year];
+            }
+        }
+
+        void CalculateIndexNumbersAA(
+            std::shared_ptr<fims_popdy::Population<Type>> &population,
+            size_t year,
+            size_t age)
+        {
+            for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
+            {
+                this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["index_numbers_at_age"][i_age_year] +=
+                    (this->fleets[fleet_]->q.get_force_scalar(year) *
+                     this->fleets[fleet_]->selectivity->evaluate(ages[age])) *
+                    this->population_derived_quantities[population->GetId()]["this->numbers_at_age"][i_age_year];
             }
         }
 
@@ -1088,10 +1027,12 @@ namespace fims_popdy
                          */
                         if (y < population->nyears)
                         {
-                            CalculateCatchNumbersAA(population, i_age_year, y, a);
+                            CalculateLandingsNumbersAA(population, i_age_year, y, a);
+                            CalculateLandingsWeightAA(population, y, a);
+                            CalculateLandings(population, y, a);
 
-                            CalculateCatchWeightAA(population, y, a);
-                            CalculateCatch(population, y, a);
+                            CalculateIndexNumbersAA(population, i_age_year, y, a);
+                            CalculateIndexWeightAA(population, y, a);
                             CalculateIndex(population, i_age_year, y, a);
                         }
                     }
