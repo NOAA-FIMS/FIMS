@@ -4,13 +4,7 @@
 \alias{reshape_tmb_estimates}
 \title{Reshape TMB estimates}
 \usage{
-reshape_tmb_estimates(
-  obj,
-  sdreport = NULL,
-  opt = NULL,
-  parameter_names,
-  random_names
-)
+reshape_tmb_estimates(obj, sdreport = NULL, opt = NULL, parameter_names)
 }
 \arguments{
 \item{obj}{An object returned from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.}

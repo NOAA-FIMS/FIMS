@@ -97,42 +97,42 @@ uncertainties from a fitted model.
 expected values, likelihoods, and additional metadata from a fitted model.
 The tibble includes the following variables:
 \itemize{
-\item{module_name}{Character string that describes the name of the module,
+\item{module_name: Character string that describes the name of the module,
 e.g., \code{"Data"}.}
-\item{module_id}{Integer that provides identifier for linking outputs.}
-\item{label}{Character string that describes type of data.}
-\item{data_id}{Not yet implemented/NA: Integer that will provide
+\item{module_id: Integer that provides identifier for linking outputs.}
+\item{label: Character string that describes type of data.}
+\item{data_id: Not yet implemented/NA: Integer that will provide
 unique identifier for data.}
-\item{fleet_name}{Not yet implemented/NA: Character string that
+\item{fleet_name: Not yet implemented/NA: Character string that
 will provide fleet name corresponding to name provided via FIMSFrame.}
-\item{unit}{Not yet implemented/NA: Character string that will
+\item{unit: Not yet implemented/NA: Character string that will
 describe appropriate units for the data inputs and expected values.}
-\item{uncertainty}{Not yet implemented/NA: Character string that will
+\item{uncertainty: Not yet implemented/NA: Character string that will
 describe the uncertainty specified for the data input value.}
-\item{age}{Not yet implemented/NA: Integer that will provide the age
+\item{age: Not yet implemented/NA: Integer that will provide the age
 affiliated with a data input, where appropriate.}
-\item{length}{Not yet implemented/NA: Integer that will provide the length
+\item{length: Not yet implemented/NA: Integer that will provide the length
 affiliated with a data input, where appropriate.}
-\item{datestart}{Not yet implemented/NA: Character string that will provide
+\item{datestart: Not yet implemented/NA: Character string that will provide
 the start date for the data input, corresponding to the value provided in
 the input data.}
-\item{dateend}{Not yet implemented/NA: Character string that will provide
+\item{dateend: Not yet implemented/NA: Character string that will provide
 the end date for the data input, corresponding to the value provided in
 the input data.}
-\item{year}{Not yet implemented/NA: Integer that will provide model year
+\item{year: Not yet implemented/NA: Integer that will provide model year
 for the data input.}
-\item{init}{Numeric that provides the initial value for the data input.}
-\item{expected}{Numeric that provides the expected value for the data input.
+\item{init: Numeric that provides the initial value for the data input.}
+\item{expected: Numeric that provides the expected value for the data input.
 *NOTE: units for provided init and expected values need to be standardized.}
-\item{log_like}{Numeric that provides log-likelihood for expected value.}
-\item{distribution}{Character string that indicates the distribution used
+\item{log_like: Numeric that provides log-likelihood for expected value.}
+\item{distribution: Character string that indicates the distribution used
 for the log-likelihood estimation.}
-\item{re_estimated}{Logical that indicates whether any random effects were
+\item{re_estimated: Logical that indicates whether any random effects were
 estimated during model fitting. Log-likelihood values should not be directly
 compared between models with and without estimation of random effects.}
-\item{log_like_cv}{Not yet implemented/NA: Numeric that will indicate
+\item{log_like_cv: Not yet implemented/NA: Numeric that will indicate
 corresponding uncertainty for the log-likelihood value.}
-\item{weight}{Numeric that indicates data weighting applied to each data
+\item{weight: Numeric that indicates data weighting applied to each data
 value; manually fixed at 1. *NOTE: Will need to be made responsive to
 user-specified or user-estimated data weighting once data weighting is
 added to FIMS as a feature.}

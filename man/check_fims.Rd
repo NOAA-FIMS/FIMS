@@ -9,13 +9,13 @@ check_fims()
 \value{
 An invisible list is returned with the following four items:
 \itemize{
-\item{\code{style_r}}{Contains the report from \code{\link[styler:style_pkg]{styler::style_pkg()}}.}
-\item{\code{spelling_code}}{Contains a 2-column data frame of words that are
+\item{\code{style_r}: Contains the report from \code{\link[styler:style_pkg]{styler::style_pkg()}}.}
+\item{\code{spelling_code}: Contains a 2-column data frame of words that are
 spelled incorrectly in the code but not in the excluded word list.}
-\item{\code{spelling_package}}{Contains a 2-column data frame of words that need
+\item{\code{spelling_package}: Contains a 2-column data frame of words that need
 to be added to the WORDLIST file. This will be an empty data frame if no
 words are spelled incorrectly.}
-\item{\code{spelling_word_list}}{A vector of strings indicating the words that
+\item{\code{spelling_word_list}: A vector of strings indicating the words that
 are included in the WORDLIST file and are ignored when performing a spell
 check.}
 }

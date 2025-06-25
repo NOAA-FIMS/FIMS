@@ -195,13 +195,13 @@ style_cpp <- function() {
 #' @return
 #' An invisible list is returned with the following four items:
 #' \itemize{
-#'   \item{`style_r`}{Contains the report from [styler::style_pkg()].}
-#'   \item{`spelling_code`}{Contains a 2-column data frame of words that are
+#'   \item{`style_r`: Contains the report from [styler::style_pkg()].}
+#'   \item{`spelling_code`: Contains a 2-column data frame of words that are
 #'   spelled incorrectly in the code but not in the excluded word list.}
-#'   \item{`spelling_package`}{Contains a 2-column data frame of words that need
+#'   \item{`spelling_package`: Contains a 2-column data frame of words that need
 #'   to be added to the WORDLIST file. This will be an empty data frame if no
 #'   words are spelled incorrectly.}
-#'   \item{`spelling_word_list`}{A vector of strings indicating the words that
+#'   \item{`spelling_word_list`: A vector of strings indicating the words that
 #'   are included in the WORDLIST file and are ignored when performing a spell
 #'   check.}
 #' }
@@ -275,7 +275,7 @@ check_fims <- function() {
   }
   results_spelling_package <- spelling::spell_check_package(
     pkg = ".",
-    vignettes = ifelse(length(md_vignette_files) > 0, FALSE, TRUE),
+    vignettes = !(length(md_vignette_files) > 0),
     use_wordlist = TRUE
   )
 

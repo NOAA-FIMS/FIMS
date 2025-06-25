@@ -2,9 +2,13 @@
 # no visible binding for global variable
 utils::globalVariables(c(
   "parameter_id", "module_name", "module_id", "label", "initial.x", "initial.y",
-  "estimate.x", "estimate.y", "module_type", "type_id", "values", "derived_quantity_id",
-  "module_name.x", "module_name.y", "module_id.x", "module_id.y", "module_type.x",
-  "module_type.y"
+  "estimate.x", "estimate.y",
+  "derived_quantity_id",
+  "distribution", "module_type", "n", "type_id", "values",
+  "module_name.x", "module_name.y",
+  "module_id.x", "module_id.y",
+  "module_id_init",
+  "module_type.x", "module_type.y"
 ))
 
 # Developers: ----
@@ -24,7 +28,6 @@ utils::globalVariables(c(
 #       be calculated in print.FITFims()
 # TODO: Determine if report should always use last.par.best
 # TODO: Make a helper function to add lower and upper CI for users in estimates
-# TODO: Add Terminal SB to print()
 
 # methods::setClass: ----
 
@@ -50,6 +53,24 @@ methods::setClass(
     timing = "difftime",
     version = "package_version"
   )
+)
+
+# methods::setMethod: printers ----
+
+methods::setMethod(
+  f = "show",
+  signature = "FIMSFit",
+  definition = function(object) {
+    cli::cli_inform(c(
+      "i" = "The object is of the class FIMSFit v.{get_version(object)}",
+      "i" = "The slots can be accessed using {.fn get_*} functions, e.g.,",
+      "*" = "{.fn get_estimates}",
+      "*" = "{.fn get_obj}",
+      "*" = "{.fn get_version}",
+      "i" = "The following slots are available: {methods::slotNames(object)}.",
+      "i" = "Use {.fn print} to see a summary of the fit."
+    ))
+  }
 )
 
 methods::setMethod(
@@ -87,8 +108,7 @@ methods::setMethod(
       "i" = "Negative log likelihood (NLL):",
       "*" = "Marginal NLL= {.val {x@opt$objective}}",
       "*" = "Total NLL= {.val {x@report$jnll}}",
-      # TODO: x@rep[["sb"]] does not exist
-      "i" = "Terminal SB= "
+      "i" = "Terminal SB= {.val {terminal_ssb}}"
     ))
     cli::cli_end(div_digit)
   }
@@ -194,42 +214,42 @@ methods::setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
 #'  expected values, likelihoods, and additional metadata from a fitted model.
 #'  The tibble includes the following variables:
 #' \itemize{
-#'  \item{module_name}{Character string that describes the name of the module,
+#'  \item{module_name: Character string that describes the name of the module,
 #'  e.g., `"Data"`.}
-#'  \item{module_id}{Integer that provides identifier for linking outputs.}
-#'  \item{label}{Character string that describes type of data.}
-#'  \item{data_id}{Not yet implemented/NA: Integer that will provide
+#'  \item{module_id: Integer that provides identifier for linking outputs.}
+#'  \item{label: Character string that describes type of data.}
+#'  \item{data_id: Not yet implemented/NA: Integer that will provide
 #'  unique identifier for data.}
-#'  \item{fleet_name}{Not yet implemented/NA: Character string that
+#'  \item{fleet_name: Not yet implemented/NA: Character string that
 #' will provide fleet name corresponding to name provided via FIMSFrame.}
-#'  \item{unit}{Not yet implemented/NA: Character string that will
+#'  \item{unit: Not yet implemented/NA: Character string that will
 #'  describe appropriate units for the data inputs and expected values.}
-#'  \item{uncertainty}{Not yet implemented/NA: Character string that will
+#'  \item{uncertainty: Not yet implemented/NA: Character string that will
 #'  describe the uncertainty specified for the data input value.}
-#'  \item{age}{Not yet implemented/NA: Integer that will provide the age
+#'  \item{age: Not yet implemented/NA: Integer that will provide the age
 #'  affiliated with a data input, where appropriate.}
-#'  \item{length}{Not yet implemented/NA: Integer that will provide the length
+#'  \item{length: Not yet implemented/NA: Integer that will provide the length
 #'  affiliated with a data input, where appropriate.}
-#'  \item{datestart}{Not yet implemented/NA: Character string that will provide
+#'  \item{datestart: Not yet implemented/NA: Character string that will provide
 #'  the start date for the data input, corresponding to the value provided in
 #'  the input data.}
-#'  \item{dateend}{Not yet implemented/NA: Character string that will provide
+#'  \item{dateend: Not yet implemented/NA: Character string that will provide
 #'  the end date for the data input, corresponding to the value provided in
 #'  the input data.}
-#'  \item{year}{Not yet implemented/NA: Integer that will provide model year
+#'  \item{year: Not yet implemented/NA: Integer that will provide model year
 #'  for the data input.}
-#'  \item{init}{Numeric that provides the initial value for the data input.}
-#'  \item{expected}{Numeric that provides the expected value for the data input.
+#'  \item{init: Numeric that provides the initial value for the data input.}
+#'  \item{expected: Numeric that provides the expected value for the data input.
 #'  *NOTE: units for provided init and expected values need to be standardized.}
-#'  \item{log_like}{Numeric that provides log-likelihood for expected value.}
-#'  \item{distribution}{Character string that indicates the distribution used
+#'  \item{log_like: Numeric that provides log-likelihood for expected value.}
+#'  \item{distribution: Character string that indicates the distribution used
 #'  for the log-likelihood estimation.}
-#'  \item{re_estimated}{Logical that indicates whether any random effects were
+#'  \item{re_estimated: Logical that indicates whether any random effects were
 #'  estimated during model fitting. Log-likelihood values should not be directly
 #'  compared between models with and without estimation of random effects.}
-#'  \item{log_like_cv}{Not yet implemented/NA: Numeric that will indicate
+#'  \item{log_like_cv: Not yet implemented/NA: Numeric that will indicate
 #'  corresponding uncertainty for the log-likelihood value.}
-#'  \item{weight}{Numeric that indicates data weighting applied to each data
+#'  \item{weight: Numeric that indicates data weighting applied to each data
 #'  value; manually fixed at 1. *NOTE: Will need to be made responsive to
 #'  user-specified or user-estimated data weighting once data weighting is
 #'  added to FIMS as a feature.}
@@ -608,16 +628,16 @@ FIMSFit <- function(
     cbind(data_fits_res) |> # Consider test to ensure 'init_values' = 'init'
     # Provide blank fields for currently missing values
     dplyr::mutate(
-      data_id = as.integer(NA), # not available from JSON output
-      fleet_name = as.character(NA), # not available from JSON output
-      unit = as.character(NA), # not available from JSON output
-      uncertainty = as.numeric(NA), # not available from JSON output
-      age = as.integer(NA), # not available from JSON output
-      length = as.integer(NA), # not available from JSON output
-      datestart = as.character(NA), # not available from JSON output
-      dateend = as.character(NA), # not available from JSON output
-      year = as.integer(NA), # not available from JSON output
-      log_like_cv = as.numeric(NA), # future feature
+      data_id = NA_integer_, # not available from JSON output
+      fleet_name = NA_character_, # not available from JSON output
+      unit = NA_character_, # not available from JSON output
+      uncertainty = NA_real_, # not available from JSON output
+      age = NA_integer_, # not available from JSON output
+      length = NA_integer_, # not available from JSON output
+      datestart = NA_character_, # not available from JSON output
+      dateend = NA_character_, # not available from JSON output
+      year = NA_integer_, # not available from JSON output
+      log_like_cv = NA_real_, # future feature
       weight = 1.0 # future feature; fixed at 1.0 for time being
     ) |>
     dplyr::select(
