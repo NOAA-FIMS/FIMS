@@ -255,7 +255,7 @@ public:
 
     this->finalized = true; // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
+    std::shared_ptr<fims_info::Information<double> > info =
         fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::population_iterator it;

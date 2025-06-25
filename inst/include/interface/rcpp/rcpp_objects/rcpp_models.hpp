@@ -100,20 +100,20 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
         global_env["CatchAtAge::density_density_flags"] = CatchAtAgeInterface::density_expected;
         global_env.lockBinding("CatchAtAge::density_density_flags");
     }
-struct DensityComponentLink
-{
-    uint32_t module_id;
-    uint32_t density_component_id;
-    uint32_t linked_component;
-    std::string input_type;
-};
+    struct DensityComponentLink
+    {
+        uint32_t module_id;
+        uint32_t density_component_id;
+        uint32_t linked_component;
+        std::string input_type;
+    };
 
-std::vector<DensityComponentLink> fleet_density_component_links;
-std::vector<DensityComponentLink> growth_density_component_links;
-std::vector<DensityComponentLink> maturity_density_component_links;
-std::vector<DensityComponentLink> population_density_component_links;
-std::vector<DensityComponentLink> recruitment_density_component_links;
-std::vector<DensityComponentLink> selectivity_density_component_links;
+    std::vector<DensityComponentLink> fleet_density_component_links;
+    std::vector<DensityComponentLink> growth_density_component_links;
+    std::vector<DensityComponentLink> maturity_density_component_links;
+    std::vector<DensityComponentLink> population_density_component_links;
+    std::vector<DensityComponentLink> recruitment_density_component_links;
+    std::vector<DensityComponentLink> selectivity_density_component_links;
 
 public:
     static std::once_flag density_expected_flag;
@@ -174,12 +174,12 @@ public:
         dcl.module_id = fleet_id;
         dcl.density_component_id = density_component_id;
         dcl.linked_component = linked_type;
-        dcl.input_type = input_type;    
+        dcl.input_type = input_type;
         this->fleet_density_component_links.push_back(dcl);
     }
 
     /**
-     * @brief Method to add a growth based density component link.  
+     * @brief Method to add a growth based density component link.
      * @param growth_id The id of the growth module.
      * @param linked_type The type of the linked component.
      * @param density_component_id The id of the density component to link to.
@@ -191,12 +191,12 @@ public:
         dcl.module_id = growth_id;
         dcl.density_component_id = density_component_id;
         dcl.linked_component = linked_type;
-        dcl.input_type = input_type;    
+        dcl.input_type = input_type;
         this->growth_density_component_links.push_back(dcl);
     }
 
     /**
-     * @brief Method to add a maturity based density component link.  
+     * @brief Method to add a maturity based density component link.
      * @param maturity_id The id of the maturity module.
      * @param linked_type The type of the linked component.
      * @param density_component_id The id of the density component to link to.
@@ -208,12 +208,12 @@ public:
         dcl.module_id = maturity_id;
         dcl.density_component_id = density_component_id;
         dcl.linked_component = linked_type;
-        dcl.input_type = input_type;    
+        dcl.input_type = input_type;
         this->maturity_density_component_links.push_back(dcl);
     }
 
     /**
-     * @brief Method to add a population based density component link.  
+     * @brief Method to add a population based density component link.
      * @param population_id The id of the population module.
      * @param linked_type The type of the linked component.
      * @param density_component_id The id of the density component to link to.
@@ -225,12 +225,12 @@ public:
         dcl.module_id = population_id;
         dcl.density_component_id = density_component_id;
         dcl.linked_component = linked_type;
-        dcl.input_type = input_type;    
+        dcl.input_type = input_type;
         this->population_density_component_links.push_back(dcl);
     }
 
     /**
-     * @brief Method to add a recruitment based density component link.  
+     * @brief Method to add a recruitment based density component link.
      * @param recruitment_id The id of the recruitment module.
      * @param linked_type The type of the linked component.
      * @param density_component_id The id of the density component to link to.
@@ -242,12 +242,12 @@ public:
         dcl.module_id = recruitment_id;
         dcl.density_component_id = density_component_id;
         dcl.linked_component = linked_type;
-        dcl.input_type = input_type;    
+        dcl.input_type = input_type;
         this->recruitment_density_component_links.push_back(dcl);
     }
 
     /**
-     * @brief Method to add a selectivity based density component link.  
+     * @brief Method to add a selectivity based density component link.
      * @param selectivity_id The id of the selectivity module.
      * @param linked_type The type of the linked component.
      * @param density_component_id The id of the density component to link to.
@@ -259,7 +259,7 @@ public:
         dcl.module_id = selectivity_id;
         dcl.density_component_id = density_component_id;
         dcl.linked_component = linked_type;
-        dcl.input_type = input_type;    
+        dcl.input_type = input_type;
         this->selectivity_density_component_links.push_back(dcl);
     }
 
@@ -1021,8 +1021,178 @@ public:
             model->AddPopulation((*it));
         }
 
+        std::set<uint32_t> fleet_ids; // all fleets in the model
+        typedef typename std::set<uint32_t>::iterator fleet_ids_iterator;
+
         // add to Information
         info->models_map[this->get_id()] = model;
+        for (it = this->population_ids->begin(); it != this->population_ids->end(); ++it)
+        {
+
+            std::shared_ptr<PopulationInterface> population =
+                std::dynamic_pointer_cast<PopulationInterface>(PopulationInterfaceBase::live_objects[(*it)]);
+
+            std::map<std::string, fims::Vector<Type>> &derived_quantities =
+                model->population_derived_quantities[(*it)];
+
+            derived_quantities["total_landings_weight"] =
+                fims::Vector<Type>(population->nyears.get());
+
+            derived_quantities["total_landings_numbers"] =
+                fims::Vector<Type>(population->nyears.get());
+
+            derived_quantities["mortality_F"] =
+                fims::Vector<Type>(population->nyears.get() *
+                                   population->nages.get());
+
+            derived_quantities["mortality_Z"] =
+                fims::Vector<Type>(population->nyears.get() *
+                                   population->nages.get());
+
+            derived_quantities["weight_at_age"] =
+                fims::Vector<Type>(population->nyears.get() * population->nages.get());
+
+            derived_quantities["numbers_at_age"] =
+                fims::Vector<Type>((population->nyears.get() + 1) *
+                                   population->nages.get());
+
+            derived_quantities["unfished_numbers_at_age"] =
+                fims::Vector<Type>((population->nyears.get() + 1) *
+                                   population->nages.get());
+            derived_quantities["biomass"] =
+                fims::Vector<Type>((population->nyears.get() + 1));
+
+            derived_quantities["spawning_biomass"] =
+                fims::Vector<Type>((population->nyears.get() + 1));
+
+            derived_quantities["unfished_biomass"] =
+                fims::Vector<Type>((population->nyears.get() + 1));
+
+            derived_quantities["unfished_spawning_biomass"] =
+                fims::Vector<Type>((population->nyears.get() + 1));
+
+            derived_quantities["proportion_mature_at_age"] =
+                fims::Vector<Type>((population->nyears.get() + 1) *
+                                   population->nages.get());
+
+            derived_quantities["expected_catch"] =
+                fims::Vector<Type>(population->nyears.get() *
+                                   population->nfleets.get());
+
+            derived_quantities["expected_recruitment"] =
+                fims::Vector<Type>((population->nyears.get() + 1));
+
+            derived_quantities["sum_selectivity"] =
+                fims::Vector<Type>(population->nyears.get() * population->nages.get());
+            // replace elements in the variable map
+            info->variable_map[population->numbers_at_age.id_m] = &(derived_quantities["numbers_at_age"]);
+
+            for (fleet_ids_iterator it = population->fleet_ids->begin(); it != population->fleet_ids->end(); ++it)
+            {
+                fleet_ids.insert(*it);
+            }
+        }
+
+        for (fleet_ids_iterator it = fleet_ids.begin(); it != fleet_ids.end(); ++it)
+        {
+            std::shared_ptr<FleetInterface> fleet_interface =
+                std::dynamic_pointer_cast<FleetInterface>(FleetInterfaceBase::live_objects[(*it)]);
+
+            std::map<std::string, fims::Vector<Type>> &derived_quantities =
+                model->fleet_derived_quantities[fleet_interface->id];
+
+            // initialize derive quantities
+            // landings
+            derived_quantities["landings_numbers_at_age"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nages.get());
+
+            derived_quantities["landings_weight_at_age"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nages.get());
+
+            derived_quantities["landings_numbers_at_length"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nlengths.get());
+
+            derived_quantities["landings_weight"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["landings_numbers"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["landings_expected"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["log_landings_expected"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["agecomp_proportion"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nages.get());
+
+            derived_quantities["lengthcomp_proportion"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nlengths.get());
+            // index
+            derived_quantities["index_numbers_at_age"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nages.get());
+
+            derived_quantities["index_weight_at_age"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nages.get());
+
+            derived_quantities["index_numbers_at_length"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nlengths.get());
+
+            derived_quantities["index_weight"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["index_numbers"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["index_expected"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["log_index_expected"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+            //
+            derived_quantities["catch_index"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["expected_catch"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["expected_index"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["log_expected_index"] =
+                fims::Vector<Type>(fleet_interface->nyears.get());
+
+            derived_quantities["agecomp_expected"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nages.get());
+
+            derived_quantities["lengthcomp_expected"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nlengths.get());
+
+            derived_quantities["age_to_length_conversion"] =
+                fims::Vector<Type>(fleet_interface->nyears.get() *
+                                   fleet_interface->nlengths.get());
+
+            // replace elements in the variable map
+            info->variable_map[fleet_interface->log_landings_expected.id_m] = &(derived_quantities["log_landings_expected"]);
+            info->variable_map[fleet_interface->log_index_expected.id_m] = &(derived_quantities["log_expected_index"]);
+            info->variable_map[fleet_interface->agecomp_expected.id_m] = &(derived_quantities["agecomp_expected"]);
+            info->variable_map[fleet_interface->agecomp_proportion.id_m] = &(derived_quantities["agecomp_proportion"]);
+            info->variable_map[fleet_interface->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
+            info->variable_map[fleet_interface->age_to_length_conversion.id_m] = &(derived_quantities["age_to_length_conversion"]);
+            info->variable_map[fleet_interface->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
+            info->variable_map[fleet_interface->lengthcomp_proportion.id_m] = &(derived_quantities["lengthcomp_proportion"]);
+        }
 
         return true;
     }
