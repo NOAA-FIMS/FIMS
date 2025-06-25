@@ -341,7 +341,7 @@ initialize_maturity <- function(parameters, data) {
 #' The initialized population module as an object.
 #' @noRd
 initialize_population <- function(parameters, data, linked_ids) {
-  if (any(is.na(linked_ids[c("growth", "maturity", "recruitment")]))) {
+  if (anyNA(linked_ids[c("growth", "maturity", "recruitment")])) {
     cli::cli_abort(c(
       "{.var linked_ids} for population must include `growth`, `maturity`, and
       `recruitment` IDs."
@@ -601,6 +601,26 @@ initialize_comp <- function(data,
         valid_n = ifelse(value == -999, 1, uncertainty)
       ) |>
       dplyr::pull(valid_n)
+
+  if (length(model_data) != get_n_years(data) * get_function(data)) {
+    bad_data_years <- get_data(data) |>
+      dplyr::filter(
+        name == fleet_name,
+        type == comp[["name"]]
+      ) |>
+      dplyr::count(datestart) |>
+      dplyr::filter(n != get_function(data)) |>
+      dplyr::pull(datestart)
+
+    cli::cli_abort(c(
+      "The length of the `{comp[['name']]}`-composition data for fleet
+      `{fleet_name}` does not match the expected dimensions.",
+      i = "Expected length: {get_n_years(data) * get_function(data)}",
+      i = "Actual length: {length(model_data)}",
+      i = "Number of -999 values: {sum(model_data == -999)}",
+      i = "Dates with invalid data: {bad_data_years}"
+    ))
+  }
 
   purrr::walk(
     seq_along(model_data),

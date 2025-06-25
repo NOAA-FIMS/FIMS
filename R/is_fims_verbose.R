@@ -17,10 +17,6 @@
 #' }
 is_fims_verbose <- function() {
   verbose_option <- getOption("rlib_message_verbosity", default = "default")
-  verbose_boolean <- ifelse(
-    verbose_option %in% c("default", "verbose"),
-    TRUE,
-    FALSE
-  )
+  verbose_boolean <- verbose_option %in% c("default", "verbose")
   return(verbose_boolean)
 }
