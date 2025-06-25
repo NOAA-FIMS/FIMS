@@ -53,6 +53,12 @@ namespace fims_popdy
                 std::map<std::string, fims::Vector<Type>> &derived_quantities =
                     this->population_derived_quantities[this->populations[i]->GetId()];
 
+                derived_quantities["total_landings_weight"] =
+                    fims::Vector<Type>((*it).second->nyears);
+
+                derived_quantities["total_landings_numbers"] =
+                    fims::Vector<Type>((*it).second->nyears);
+
                 derived_quantities["mortality_F"] =
                     fims::Vector<Type>(this->populations[i]->nyears *
                                        this->populations[i]->nages);
@@ -113,31 +119,92 @@ namespace fims_popdy
 
                 std::map<std::string, fims::Vector<Type>> &derived_quantities =
                     this->fleet_derived_quantities[(*it).second->id];
+
+                /**
+                   //landings
+            landings_numbers_at_age.resize(nyears * nages);
+            landings_weight_at_age.resize(nyears * nages);
+            landings_numbers_at_length.resize(nyears * nlengths);
+            landings_weight.resize(nyears);
+            landings_numbers.resize(nyears);
+            landings_expected.resize(nyears);
+            log_landings_expected.resize(nyears);
+
+            //index
+            index_numbers_at_age.resize(nyears * nages);
+            index_weight_at_age.resize(nyears * nages);
+            index_numbers_at_length.resize(nyears * nlengths);
+            index_weight.resize(nyears);
+            index_numbers.resize(nyears);
+            index_expected.resize(nyears);
+            log_index_expected.resize(nyears);
+
+            //composition
+            agecomp_expected.resize(nyears * nages);
+            lengthcomp_expected.resize(nyears * nlengths);
+            agecomp_proportion.resize(nyears * nages);
+            lengthcomp_proportion.resize(nyears * nlengths);
+            age_to_length_conversion.resize(nages * nlengths);
+                 */
+
                 // initialize derive quantities
-                derived_quantities["catch_at_age"] =
+                // landings
+                derived_quantities["landings_numbers_at_age"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nages);
 
-                derived_quantities["catch_numbers_at_age"] =
+                derived_quantities["landings_weight_at_age"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nages);
 
-                derived_quantities["catch_numbers_at_length"] =
+                derived_quantities["landings_numbers_at_length"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nlengths);
 
-                derived_quantities["proportion_catch_numbers_at_age"] =
+                derived_quantities["landings_weight"] =
+                    fims::Vector<Type>((*it).second->nyears);
+
+                derived_quantities["landings_numbers"] =
+                    fims::Vector<Type>((*it).second->nyears);
+
+                derived_quantities["landings_expected"] =
+                    fims::Vector<Type>((*it).second->nyears);
+
+                derived_quantities["log_landings_expected"] =
+                    fims::Vector<Type>((*it).second->nyears);
+
+                derived_quantities["agecomp_proportion"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nages);
 
-                derived_quantities["proportion_catch_numbers_at_length"] =
+                derived_quantities["lengthcomp_proportion"] =
+                    fims::Vector<Type>((*it).second->nyears *
+                                       (*it).second->nlengths);
+                // index
+                derived_quantities["index_numbers_at_age"] =
+                    fims::Vector<Type>((*it).second->nyears *
+                                       (*it).second->nages);
+
+                derived_quantities["index_weight_at_age"] =
+                    fims::Vector<Type>((*it).second->nyears *
+                                       (*it).second->nages);
+
+                derived_quantities["index_numbers_at_length"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nlengths);
 
-                derived_quantities["catch_weight_at_age"] =
-                    fims::Vector<Type>((*it).second->nyears *
-                                       (*it).second->nages);
+                derived_quantities["index_weight"] =
+                    fims::Vector<Type>((*it).second->nyears);
 
+                derived_quantities["index_numbers"] =
+                    fims::Vector<Type>((*it).second->nyears);
+
+                derived_quantities["index_expected"] =
+                    fims::Vector<Type>((*it).second->nyears);
+
+                derived_quantities["log_index_expected"] =
+                    fims::Vector<Type>((*it).second->nyears);
+                //
                 derived_quantities["catch_index"] =
                     fims::Vector<Type>((*it).second->nyears);
 
@@ -150,11 +217,15 @@ namespace fims_popdy
                 derived_quantities["log_expected_index"] =
                     fims::Vector<Type>((*it).second->nyears);
 
-                derived_quantities["age_composition"] =
+                derived_quantities["agecomp_expected"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nages);
 
-                derived_quantities["length_composition"] =
+                derived_quantities["lengthcomp_expected"] =
+                    fims::Vector<Type>((*it).second->nyears *
+                                       (*it).second->nlengths);
+
+                derived_quantities["age_to_length_conversion"] =
                     fims::Vector<Type>((*it).second->nyears *
                                        (*it).second->nlengths);
 
@@ -641,7 +712,7 @@ namespace fims_popdy
          * @param age
          * @return void
          */
-        void CalculateCatch(
+        void CalculateLandings(
             std::shared_ptr<fims_popdy::Population<Type>> &population,
             size_t year,
             size_t age)
