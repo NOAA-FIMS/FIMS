@@ -25,7 +25,7 @@ result <- setup_and_run_FIMS_without_wrappers(
 
 ## IO correctness ----
 test_that("deterministic run works with correct inputs", {
-  # Compare FIMS results with model comparison project OM values
+  #' @description Compare FIMS results with model comparison project OM values.
   verify_fims_deterministic(
     report = result[["report"]],
     estimates = result[["sdr_fixed"]],
@@ -34,20 +34,18 @@ test_that("deterministic run works with correct inputs", {
     em_input = em_input_list[[iter_id]],
     use_fimsfit = FALSE
   )
-})
 
-test_that("deterministic run returns correct nlls", {
-  #' Compare FIMS NLLs with model comparison project "true" NLLs
+  #' @description Compare FIMS results with model comparison project OM values.
   verify_fims_nll(
     report = result[["report"]],
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
   )
-})
-test_that("deterministic run results correct number of parameters", {
-  #' @description Veryify the number of parameters are correct
-  #' TODO: change parameter number to 77 after fixing log_devs esitmation error
+
+  #' @description Verify the number of parameters is correct for deterministic
+  #' run.
+  #' TODO: change parameter number to 77 after fixing log_devs estimation error
   expect_equal(length(result[["obj"]][["par"]]), 48)
 })
 
@@ -68,7 +66,10 @@ result <- setup_and_run_FIMS_without_wrappers(
 )
 ## IO correctness ----
 # Compare FIMS results with model comparison project OM values
-test_that("estimation test with age and length comp", {
+## IO correctness ----
+test_that("deterministic run works with correct inputs", {
+  #' @description Compare FIMS results with model comparison project OM values
+  #' in a non-deterministic run with age- and length-composition data.
   validate_fims(
     report = result[["report"]],
     estimates = result[["sdr_report"]],
@@ -79,12 +80,10 @@ test_that("estimation test with age and length comp", {
 })
 
 ## Edge handling ----
-test_that("run FIMS with missing values", {
-  # Define the NA (missing value) placeholder and the index where it will be inserted
+test_that("run FIMS and return correct outputs for edge cases", {
+  # Introduce a missing value in survey observations for the EM input
   na_value <- -999
   na_index <- 2
-
-  # Introduce a missing value into the survey observations for the estimation model input
   em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index] <- na_value
 
   # Run the FIMS setup and execution function
@@ -96,22 +95,28 @@ test_that("run FIMS with missing values", {
     estimation_mode = TRUE
   )
 
-  # Validate that the result report is not null
+  #' @description Test that FIMS runs with missing values in survey index
+  #' observations using NA (missing value) placeholder in the second value and
+  #' the report is not NULL.
   expect_false(is.null(result[["report"]]))
 
   # Obtain the gradient and Hessian matrix
   g <- as.numeric(result[["obj"]][["gr"]](result[["opt"]][["par"]]))
-  h <- optimHess(result[["opt"]][["par"]], fn = result[["obj"]][["fn"]], gr = result[["obj"]][["gr"]])
+  h <- optimHess(
+    result[["opt"]][["par"]],
+    fn = result[["obj"]][["fn"]],
+    gr = result[["obj"]][["gr"]]
+  )
   result[["opt"]][["par"]] <- result[["opt"]][["par"]] - solve(h, g)
-
-  # Obtain the maximum absolute gradient to check convergence
-  # Ensure that the maximum gradient is less than or equal to
-  # the specified tolerance (0.0001)
   max_gradient <- max(abs(result[["obj"]][["gr"]](result[["opt"]][["par"]])))
-  expect_lte(max_gradient, 0.0001)
-})
 
-test_that("agecomp in proportion works", {
+  #' @description Test that the maximum gradient is less than or equal to 0.0001
+  #' after running FIMS with missing values in survey index observations.
+  #'   # Obtain the maximum absolute gradient to check convergence
+  expect_lte(max_gradient, 0.0001)
+
+  #' @description Test that running FIMS with age compositions in proportions
+  #' works.
   # Store the original values of the number of landings observations and
   # survey observations
   n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]
@@ -120,8 +125,14 @@ test_that("agecomp in proportion works", {
   # Set the number of landings observations and survey observations to 1
   om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- 1
   om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- 1
-  on.exit(om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- n.L_original, add = TRUE)
-  on.exit(om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- n.survey_original, add = TRUE)
+  on.exit(
+    om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- n.L_original,
+    add = TRUE
+  )
+  on.exit(
+    om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- n.survey_original,
+    add = TRUE
+  )
 
   # Run the FIMS setup and execution function
   result <- setup_and_run_FIMS_without_wrappers(

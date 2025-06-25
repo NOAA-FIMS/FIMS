@@ -51,15 +51,15 @@ FIMS_dmultinom <- function(x, p) {
 #'
 #' @return A list containing the following elements:
 #' \itemize{
-#'   \item{parameters:} A list of parameters for the TMB model.
-#'   \item{obj:} The TMB model object created by `TMB::MakeADFun`.
-#'   \item{opt:} The result of the optimization process, if `estimation_mode`
-#'   is `TRUE`. `NULL` if `estimation_mode` is `FALSE`.
-#'   \item{report:} The model report obtained from the TMB model.
-#'   \item{sdr_report:} Summary of the standard deviation report for the
-#'   model parameters.
-#'   \item{sdr_fixed:} Summary of the standard deviation report for the
-#'   fixed parameters.
+#'   \item{parameters: A list of parameters for the TMB model.}
+#'   \item{obj: The TMB model object created by `TMB::MakeADFun`.}
+#'   \item{opt: The result of the optimization process, if `estimation_mode`
+#'   is `TRUE`. `NULL` if `estimation_mode` is `FALSE`.}
+#'   \item{report: The model report obtained from the TMB model.}
+#'   \item{sdr_report: Summary of the standard deviation report for the
+#'   model parameters.}
+#'   \item{sdr_fixed: Summary of the standard deviation report for the
+#'   fixed parameters.}
 #' }
 #' @examples
 #' results <- setup_and_run_FIMS_without_wrappers(
@@ -503,15 +503,15 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 #'
 #' @return A list containing the following elements:
 #' \itemize{
-#'   \item{parameters:} A list of parameters for the TMB model.
-#'   \item{obj:} The TMB model object created by `TMB::MakeADFun`.
-#'   \item{opt:} The result of the optimization process, if `estimation_mode`
-#'   is `TRUE`. `NULL` if `estimation_mode` is `FALSE`.
-#'   \item{report:} The model report obtained from the TMB model.
-#'   \item{sdr_report:} Summary of the standard deviation report for the
-#'   model parameters.
-#'   \item{sdr_fixed:} Summary of the standard deviation report for the
-#'   fixed parameters.
+#'   \item{parameters: A list of parameters for the TMB model.}
+#'   \item{obj: The TMB model object created by `TMB::MakeADFun`.}
+#'   \item{opt: The result of the optimization process, if `estimation_mode`
+#'   is `TRUE`. `NULL` if `estimation_mode` is `FALSE`.}
+#'   \item{report: The model report obtained from the TMB model.}
+#'   \item{sdr_report: Summary of the standard deviation report for the
+#'   model parameters.}
+#'   \item{sdr_fixed: Summary of the standard deviation report for the
+#'   fixed parameters.}
 #' }
 #' @examples
 #' results <- setup_and_run_FIMS_with_wrappers(

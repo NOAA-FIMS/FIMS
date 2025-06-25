@@ -118,8 +118,7 @@ reshape_json_estimates <- function(finalized_fims, opt = list()) {
 reshape_tmb_estimates <- function(obj,
                                   sdreport = NULL,
                                   opt = NULL,
-                                  parameter_names,
-                                  random_names) {
+                                  parameter_names) {
   # Outline for the estimates table
   # TODO: The fleet_name, age, length, and time columns are currently emplty. Matthew
   # has started adding information to the JSON output in the dev-model-families branch.
@@ -321,7 +320,10 @@ reshape_json_values <- function(finalized_fims) {
     # Combine all the processed tibbles into a single tibble by stacking rows.
     dplyr::bind_rows() |>
     # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
-    dplyr::relocate(module_name, module_id, module_type, .before = everything())
+    dplyr::relocate(
+      module_name, module_id, module_type,
+      .before = tidyselect::everything()
+    )
 }
 
 
@@ -406,6 +408,9 @@ reshape_json_fits <- function(finalized_fims) {
     # Combine all the processed tibbles into a single tibble by stacking rows.
     dplyr::bind_rows() |>
     # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
-    dplyr::relocate(module_name, module_id, module_type, .before = everything()) |>
+    dplyr::relocate(
+      module_name, module_id, module_type,
+      .before = tidyselect::everything()
+    ) |>
     tibble::as_tibble()
 }
