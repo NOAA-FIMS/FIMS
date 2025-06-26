@@ -355,9 +355,12 @@ namespace fims_popdy
             {
                 this->populations[p]->Prepare();
 
+                auto derived_quantities =
+                    this->population_derived_quantities[this->populations[p]->GetId()];
+
                 typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-                for (it = this->populations[p]->derived_quantities.begin();
-                     it != this->populations[p]->derived_quantities.end(); it++)
+                for (it = derived_quantities.begin();
+                     it != derived_quantities.end(); it++)
                 {
                     fims::Vector<Type> &dq = (*it).second;
                     this->ResetVector(dq);
@@ -383,6 +386,20 @@ namespace fims_popdy
                         derived_quantities["mortality_F"][i_age_year] = 0.0;
                         derived_quantities["weight_at_age"][i_age_year] = population->growth->evaluate(population->ages[age]);
                     }
+                }
+            }
+
+            for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end(); ++fit)
+            {
+                std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+                std::map<std::string, fims::Vector<Type>> &derived_quantities =
+                    this->fleet_derived_quantities[fleet->GetId()];
+                typename fims_popdy::Population<Type>::derived_quantities_iterator it;
+                for (it = derived_quantities.begin();
+                     it != derived_quantities.end(); it++)
+                {
+                    fims::Vector<Type> &dq = (*it).second;
+                    this->ResetVector(dq);
                 }
             }
         }
@@ -666,15 +683,16 @@ namespace fims_popdy
             if (i_dev == population->nyears)
             {
                 this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] =
-                    population->recruitment->evaluate_mean(population->derived_quantities["spawning_biomass"][year - 1], phi0);
+                    population->recruitment->evaluate_mean(this->population_derived_quantities[population->GetId()]["spawning_biomass"][year - 1], phi0);
                 /*the final year of the time series has no data to inform recruitment
                 devs, so this value is set to the mean recruitment.*/
             }
             else
             {
+
                 // Why are we using evaluate_mean, how come a virtual function was changed?
                 this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] =
-                    population->recruitment->evaluate_mean(population->derived_quantities["spawning_biomass"][year - 1], phi0) *
+                    population->recruitment->evaluate_mean(this->population_derived_quantities[population->GetId()]["spawning_biomass"][year - 1], phi0) *
                     /*the log_recruit_dev vector does not include a value for year == 0
                     and is of length nyears - 1 where the first position of the vector
                     corresponds to the second year of the time series.*/
@@ -770,8 +788,8 @@ namespace fims_popdy
             {
                 // Baranov Catch Equation
                 this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year] +=
-                    (this->fleets[fleet_]->Fmort[year] *
-                     this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
+                    (population->fleets[fleet_]->Fmort[year] *
+                     population->fleets[fleet_]->selectivity->evaluate(population->ages[age])) /
                     this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year] *
                     this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] *
                     (1 - fims_math::exp(-(this->population_derived_quantities[population->GetId()]["mortality_Z"][i_age_year])));
@@ -803,9 +821,9 @@ namespace fims_popdy
             for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
             {
                 this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["index_numbers_at_age"][i_age_year] +=
-                    (this->fleets[fleet_]->q.get_force_scalar(year) *
-                     this->fleets[fleet_]->selectivity->evaluate(ages[age])) *
-                    this->population_derived_quantities[population->GetId()]["this->numbers_at_age"][i_age_year];
+                    (population->fleets[fleet_]->q.get_force_scalar(year) *
+                     population->fleets[fleet_]->selectivity->evaluate(population->ages[age])) *
+                    this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year];
             }
         }
 
@@ -858,7 +876,7 @@ namespace fims_popdy
                         for (size_t age = 0; age < population->nages; age++)
                         {
                             size_t i_age_year = year * population->nages + age;
-                            this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_landings_numbers_at_age"][i_age_year] =
+                            this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["agecomp_proportion"][i_age_year] =
                                 this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year] /
                                 sum_age;
                         }
@@ -873,7 +891,7 @@ namespace fims_popdy
                                 fims::Vector<Type> &landings_numbers_at_age =
                                     this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"];
                                 fims::Vector<Type> &proportion_landings_numbers_at_length =
-                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_landings_numbers_at_length"];
+                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["lengthcomp_proportion"];
 
                                 sum_length = 0.0;
                                 for (size_t l = 0; l < population->fleets[fleet_]->nlengths; l++)
@@ -892,7 +910,7 @@ namespace fims_popdy
                                 for (size_t l = 0; l < population->fleets[fleet_]->nlengths; l++)
                                 {
                                     size_t i_length_year = y * population->fleets[fleet_]->nlengths + l;
-                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["proportion_landings_numbers_at_length"][i_length_year] =
+                                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["lengthcomp_proportion"][i_length_year] =
                                         this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_length"][i_length_year] / sum_length;
                                 }
                             }

@@ -87,7 +87,7 @@ namespace fims_popdy {
         maturity; /*!< shared pointer to maturity module */
 
         // fleet
-        int fleet_id = -999; /*!< id of fleet model object*/
+        std::set<uint32_t> fleet_ids; /*!< id of fleet model object*/
         std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
         fleets; /*!< shared pointer to fleet module */
 
@@ -530,6 +530,7 @@ namespace fims_popdy {
              */
             for (size_t y = 0; y <= this->nyears; y++) {
                 for (size_t a = 0; a < this->nages; a++) {
+
                     /*
                      index naming defines the dimensional folding structure
                      i.e. i_age_year is referencing folding over years and ages.

@@ -464,6 +464,12 @@ public:
       warning("The ages vector is not of size nages.");
     }
 
+    fleet_ids_iterator it;
+    for (it = this->fleet_ids->begin(); it != this->fleet_ids->end(); it++)
+    {
+      population->fleet_ids.insert(*it);
+    }
+
     population->growth_id = this->growth_id.get();
     population->recruitment_id = this->recruitment_id.get();
     population->maturity_id = this->maturity_id.get();

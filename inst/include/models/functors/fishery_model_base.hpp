@@ -6,72 +6,84 @@
 #include "../../common/fims_vector.hpp"
 #include "../../population_dynamics/population/population.hpp"
 
-namespace fims_popdy {
+namespace fims_popdy
+{
 
-    template<typename Type>
-    class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
+    template <typename Type>
+    class FisheryModelBase : public fims_model_object::FIMSObject<Type>
+    {
         static uint32_t id_g;
         uint32_t id;
+
     public:
-
         std::set<uint32_t> population_ids;
-        std::vector<std::shared_ptr<fims_popdy::Population<Type> > > populations;
+        std::vector<std::shared_ptr<fims_popdy::Population<Type>>> populations;
 
-        FisheryModelBase() :
-        id(FisheryModelBase::id_g++) {
-
+        FisheryModelBase() : id(FisheryModelBase::id_g++)
+        {
+        }
+        
+        FisheryModelBase(const FisheryModelBase &other) : id(other.id)
+        {
+            this->population_ids = other.population_ids;
+            this->populations = other.populations;
         }
 
-        virtual ~FisheryModelBase() {
-            // Clear the populations
-            this->populations.clear();
+        virtual ~FisheryModelBase()
+        {
         }
 
-        void ShowPopulation(std::shared_ptr<fims_popdy::Population<double> >& p) {
-
+        void ShowPopulation(std::shared_ptr<fims_popdy::Population<double>> &p)
+        {
 
             std::cout << "\n\nCAA Model Derived Quantities:\n";
             typename fims_popdy::Population<double>::derived_quantities_iterator it;
-            for (it = p->derived_quantities.begin(); it != p->derived_quantities.end(); it++) {
-                fims::Vector<double>& dq = (*it).second;
+            for (it = p->derived_quantities.begin(); it != p->derived_quantities.end(); it++)
+            {
+                fims::Vector<double> &dq = (*it).second;
                 std::cout << (*it).first << ":" << std::endl;
-                for (int i = 0; i < dq.size(); i++) {
+                for (int i = 0; i < dq.size(); i++)
+                {
                     std::cout << dq[i] << " ";
                 }
-                std::cout << std::endl << std::endl;
+                std::cout << std::endl
+                          << std::endl;
             }
-
-
         }
 
-        void Show() {
-            for (size_t p = 0; p < this->populations.size(); p++) {
+        void Show()
+        {
+            for (size_t p = 0; p < this->populations.size(); p++)
+            {
                 this->ShowPopulation(this->populations[p]);
             }
         }
 
-        virtual void Initialize() {
-
+        virtual void Initialize()
+        {
         }
 
-        virtual void Prepare() {
+        virtual void Prepare()
+        {
         }
 
-        virtual void ResetVector(fims::Vector<Type>& v, Type value = 0.0) {
+        virtual void ResetVector(fims::Vector<Type> &v, Type value = 0.0)
+        {
             std::fill(v.begin(), v.end(), value);
         }
 
-        virtual void Evaluate() {
+        virtual void Evaluate()
+        {
             FIMS_WARNING_LOG("Not yet implemented.");
         }
 
-        uint32_t GetId() {
+        uint32_t GetId()
+        {
             return this->id;
         }
-
     };
 
-    template<typename Type>
+    template <typename Type>
     uint32_t FisheryModelBase<Type>::id_g = 0;
 
 }
