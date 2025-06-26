@@ -1026,6 +1026,7 @@ public:
 
         // add to Information
         info->models_map[this->get_id()] = model;
+        
         for (it = this->population_ids->begin(); it != this->population_ids->end(); ++it)
         {
 

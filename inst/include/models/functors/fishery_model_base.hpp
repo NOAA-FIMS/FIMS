@@ -22,6 +22,11 @@ namespace fims_popdy {
 
         }
 
+        virtual ~FisheryModelBase() {
+            // Clear the populations
+            this->populations.clear();
+        }
+
         void ShowPopulation(std::shared_ptr<fims_popdy::Population<double> >& p) {
 
 

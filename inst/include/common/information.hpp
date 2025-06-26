@@ -170,6 +170,7 @@ namespace fims_info
             this->recruitment_models.clear();
             this->recruitment_process_models.clear();
             this->selectivity_models.clear();
+            this->models_map.clear();
             this->nyears = 0;
             this->nseasons = 0;
             this->nages = 0;
@@ -705,19 +706,47 @@ namespace fims_info
                 std::shared_ptr<fims_popdy::Population<Type>> p = (*it).second;
 
                 FIMS_INFO_LOG("Initializing population " + fims::to_string(p->id));
-                // error check and set population elements
-                // check me - add another fleet iterator to push information from
-                for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
-                     ++it)
-                {
-                    // Initialize fleet object
-                    std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
-                    // population to the individual fleets This is to pass landings at age
-                    // from population to fleets?
-                    // any shared member in p (population is pushed into fleets)
-                    p->fleets.push_back(f);
-                }
+                // check if population has fleets
+                typename std::set<uint32_t>::iterator fleet_ids_it;
 
+                for (fleet_ids_it = p->fleet_ids.begin();
+                     fleet_ids_it != p->fleet_ids.end(); ++fleet_ids_it)
+                {
+                    // error check and set population elements
+                    // check me - add another fleet iterator to push information from
+                    //  for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
+                    //        ++it) {
+
+                    fleet_iterator it = this->fleets.find(*fleet_ids_it);
+
+                    if (it != this->fleets.end())
+                    {
+
+                        // Initialize fleet object
+                        std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
+                        // population to the individual fleets This is to pass catch at age
+                        // from population to fleets?
+                        // any shared member in p (population is pushed into fleets)
+                        p->fleets.push_back(f);
+                    }
+                    else
+                    {
+                        valid_model = false;
+                        FIMS_ERROR_LOG("Fleet \"" + fims::to_string(*fleet_ids_it) + "\" undefined, not found for Population \"" + fims::to_string(p->id) + "\". ");
+                    }
+                    // // error check and set population elements
+                    // // check me - add another fleet iterator to push information from
+                    // for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
+                    //      ++it)
+                    // {
+                    //     // Initialize fleet object
+                    //     std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
+                    //     // population to the individual fleets This is to pass landings at age
+                    //     // from population to fleets?
+                    //     // any shared member in p (population is pushed into fleets)
+                    //     p->fleets.push_back(f);
+                    // }
+                }
                 p->Initialize(p->nyears, p->nseasons, p->nages);
 
                 // set information dimensions
