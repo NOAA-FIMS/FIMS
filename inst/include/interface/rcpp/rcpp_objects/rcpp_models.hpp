@@ -1026,7 +1026,7 @@ public:
 
         // add to Information
         info->models_map[this->get_id()] = model;
-        
+
         for (it = this->population_ids->begin(); it != this->population_ids->end(); ++it)
         {
 
@@ -1087,12 +1087,10 @@ public:
                 fims::Vector<Type>(population->nyears.get() * population->nages.get());
             // replace elements in the variable map
             info->variable_map[population->numbers_at_age.id_m] = &(derived_quantities["numbers_at_age"]);
-int count = 0;
+
             for (fleet_ids_iterator fit = population->fleet_ids->begin(); fit != population->fleet_ids->end(); ++fit)
             {
-                count++;
                 fleet_ids.insert(*fit);
-                std::cout << "fleet id: " << *fit << " count: " << count << std::endl;
             }
         }
 

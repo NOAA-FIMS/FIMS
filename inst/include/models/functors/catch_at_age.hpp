@@ -15,12 +15,13 @@ namespace fims_popdy
     {
     public:
         std::string name_m;
-        std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>> fleets; // unique instances to eliminate duplicate initialization
-        typedef typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator fleet_iterator;
+
         typedef typename std::map<std::string, fims::Vector<Type>>::iterator derived_quantities_iterator;
 
         std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> fleet_derived_quantities;      // derived quantities for all fleets, indexed by fleet id
         std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> population_derived_quantities; // derived quantities for all populations, indexed by population id
+        typedef typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator fleet_iterator;
+
     public:
         std::vector<Type> ages; /*!< vector of the ages for referencing*/
         /**
@@ -32,6 +33,53 @@ namespace fims_popdy
             std::stringstream ss;
             ss << "caa_" << this->GetId() << "_";
             this->name_m = ss.str();
+        }
+
+        virtual ~CatchAtAge()
+        {
+
+            std::cout << "Populartions:\n";
+            for (size_t p = 0; p < this->populations.size(); p++)
+            {
+                std::cout << "Population ID: " << this->populations[p]->GetId() << "\n";
+
+                auto derived_quantities =
+                    this->population_derived_quantities[this->populations[p]->GetId()];
+
+                typename fims_popdy::Population<Type>::derived_quantities_iterator it;
+                for (it = derived_quantities.begin();
+                     it != derived_quantities.end(); it++)
+                {
+                    std::cout << "Derived Quantity: " << (*it).first << "\n";
+                    fims::Vector<Type> &dq = (*it).second;
+                    for (size_t i = 0; i < dq.size(); i++)
+                    {
+                        std::cout << dq[i] << " ";
+                    }
+                    std::cout << "\n";
+                }
+            }
+
+            std::cout << "Fleets:\n";
+            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator it;
+            for (it = this->fleet_derived_quantities.begin(); it != this->fleet_derived_quantities.end(); it++)
+            {
+                std::cout << "Fleet ID: " << (*it).first << "\n";
+                auto derived_quantities = (*it).second;
+
+                typename fims_popdy::Fleet<Type>::derived_quantities_iterator dq_it;
+                for (dq_it = derived_quantities.begin();
+                     dq_it != derived_quantities.end(); dq_it++)
+                {
+                    std::cout << "Derived Quantity: " << (*dq_it).first << "\n";
+                    fims::Vector<Type> &dq = (*dq_it).second;
+                    for (size_t i = 0; i < dq.size(); i++)
+                    {
+                        std::cout << dq[i] << " ";
+                    }
+                    std::cout << "\n";
+                }
+            }
         }
 
         /**

@@ -785,7 +785,12 @@ namespace fims_info
 
                     if (pt != this->populations.end())
                     {
-                        model->populations.push_back((*pt).second);
+                        std::shared_ptr<fims_popdy::Population<Type>> p = (*pt).second;
+                        model->populations.push_back(p);
+                        for(size_t i = 0; i < p->fleets.size(); i++)
+                        {
+                            model->fleets[p->fleets[i]->GetId()] = p->fleets[i];
+                        }
                     }
                     else
                     {

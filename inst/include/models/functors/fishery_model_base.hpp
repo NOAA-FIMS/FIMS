@@ -19,10 +19,13 @@ namespace fims_popdy
         std::set<uint32_t> population_ids;
         std::vector<std::shared_ptr<fims_popdy::Population<Type>>> populations;
 
+        std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>> fleets; // unique instances to eliminate duplicate initialization
+        typedef typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator fleet_iterator;
+
         FisheryModelBase() : id(FisheryModelBase::id_g++)
         {
         }
-        
+
         FisheryModelBase(const FisheryModelBase &other) : id(other.id)
         {
             this->population_ids = other.population_ids;

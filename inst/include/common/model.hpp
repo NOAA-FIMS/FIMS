@@ -82,7 +82,6 @@ namespace fims_model
             }
 
 
-            return jnll;
 
             int n_fleets = fims_information->fleets.size();
             int n_pops = fims_information->populations.size();
