@@ -138,6 +138,19 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<BevertonHoltRecruitmentInterface>(*this));
   }
 
+  BevertonHoltRecruitmentInterface(const BevertonHoltRecruitmentInterface& other) :
+    RecruitmentInterfaceBase(other),
+    nyears(other.nyears),
+    logit_steep(other.logit_steep),
+    log_rzero(other.log_rzero),
+    log_devs(other.log_devs),
+    log_r(other.log_r),
+    log_expected_recruitment(other.log_expected_recruitment),
+    estimated_logit_steep(other.estimated_logit_steep),
+    estimated_log_rzero(other.estimated_log_rzero),
+    estimated_log_devs(other.estimated_log_devs) {
+  }
+
   /**
    * @brief The destructor.
    */

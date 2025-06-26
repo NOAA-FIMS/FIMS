@@ -172,6 +172,7 @@ public:
    */
   PopulationInterface() : PopulationInterfaceBase()
   {
+    this->fleet_ids = std::make_shared<std::set<uint32_t>>();
     std::shared_ptr<PopulationInterface> population = std::make_shared<PopulationInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(population);
     PopulationInterfaceBase::live_objects[this->id] = population;
@@ -182,7 +183,7 @@ public:
    *
    * @param other
    */
-  PopulationInterface(const PopulationInterface &other) : PopulationInterfaceBase(other), nages(other.nages), nfleets(other.nfleets), nseasons(other.nseasons), nyears(other.nyears), nlengths(other.nlengths), maturity_id(other.maturity_id), growth_id(other.growth_id), recruitment_id(other.recruitment_id), log_M(other.log_M), log_init_naa(other.log_init_naa), numbers_at_age(other.numbers_at_age), ages(other.ages), derived_ssb(other.derived_ssb), derived_naa(other.derived_naa), derived_biomass(other.derived_biomass), derived_recruitment(other.derived_recruitment), name(other.name) {}
+  PopulationInterface(const PopulationInterface &other) : PopulationInterfaceBase(other), fleet_ids(other.fleet_ids), nages(other.nages), nfleets(other.nfleets), nseasons(other.nseasons), nyears(other.nyears), nlengths(other.nlengths), maturity_id(other.maturity_id), growth_id(other.growth_id), recruitment_id(other.recruitment_id), log_M(other.log_M), log_init_naa(other.log_init_naa), numbers_at_age(other.numbers_at_age), ages(other.ages), derived_ssb(other.derived_ssb), derived_naa(other.derived_naa), derived_biomass(other.derived_biomass), derived_recruitment(other.derived_recruitment), name(other.name) {}
 
   /**
    * @brief The destructor.
@@ -255,7 +256,7 @@ public:
 
     this->finalized = true; // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double> > info =
+    std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::population_iterator it;
