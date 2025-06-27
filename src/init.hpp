@@ -14,8 +14,8 @@ extern "C" {
 
 /**
  * @brief TODO: Handles the initialization of the fims rcpp module.
- * 
- * @return SEXP 
+ *
+ * @return SEXP
  */
 SEXP _rcpp_module_boot_fims();
 
@@ -41,4 +41,4 @@ void R_init_FIMS(DllInfo *dll) {
 }
 }
 
-#endif // SRC_INIT_HPP
+#endif  // SRC_INIT_HPP
