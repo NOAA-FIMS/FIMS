@@ -1050,6 +1050,79 @@ namespace fims_popdy
         }
 
         /**
+         * Evaluate the proportion of landings numbers at length.
+         */
+        void evaluate_length_comp()
+        {
+            fleet_iterator fit;
+            for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit)
+            {
+                 std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+                 
+                if (fleet->nlengths > 0)
+                {
+                    for (size_t y = 0; y < this->nyears; y++)
+                    {
+                        Type sum = static_cast<Type>(0.0);
+                        Type sum_obs = static_cast<Type>(0.0);
+                        // robust_add is a small value to add to expected compostion
+                        // proportions at age to stabilize likelihood calculations
+                        // when the expected proportions are close to zero.
+                        // Type robust_add = static_cast<Type>(0.0); // 0.0001; zeroed out before testing
+                        // sum robust is used to calculate the total sum of robust
+                        // additions to ensure that proportions sum to 1.
+                        // Type robust_sum = static_cast<Type>(1.0);
+                        for (size_t l = 0; l < fleet->nlengths; l++)
+                        {
+                            size_t i_length_year = y * fleet->nlengths + l;
+                            for (size_t a = 0; a < fleet->nages; a++)
+                            {
+                                size_t i_age_year = y * this->nages + a;
+                                size_t i_length_age = a * this->nlengths + l;
+                                this->lengthcomp_expected[i_length_year] +=
+                                    this->agecomp_expected[i_age_year] *
+                                    this->age_to_length_conversion[i_length_age];
+
+                                this->landings_numbers_at_length[i_length_year] +=
+                                    this->landings_numbers_at_age[i_age_year] *
+                                    this->age_to_length_conversion[i_length_age];
+
+                                this->index_numbers_at_length[i_length_year] +=
+                                    this->index_numbers_at_age[i_age_year] *
+                                    this->age_to_length_conversion[i_length_age];
+                            }
+
+                            sum += this->lengthcomp_expected[i_length_year];
+                            // robust_sum -= robust_add;
+
+                            if (this->fleet_observed_lengthcomp_data_id_m != -999)
+                            {
+                                if (this->observed_lengthcomp_data->at(i_length_year) !=
+                                    this->observed_lengthcomp_data->na_value)
+                                {
+                                    sum_obs += this->observed_lengthcomp_data->at(i_length_year);
+                                }
+                            }
+                        }
+                        for (size_t l = 0; l < this->nlengths; l++)
+                        {
+                            size_t i_length_year = y * this->nlengths + l;
+                            this->lengthcomp_proportion[i_length_year] =
+                                this->lengthcomp_expected[i_length_year] / sum;
+                            // robust_add + robust_sum * this->lengthcomp_expected[i_length_year] / sum;
+                            if (this->fleet_observed_lengthcomp_data_id_m != -999)
+                            {
+                                this->lengthcomp_expected[i_length_year] =
+                                    this->lengthcomp_proportion[i_length_year] *
+                                    sum_obs;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
          * * This method is used to evaluate the population dynamics model.
          */
         virtual void Evaluate()
