@@ -656,60 +656,69 @@ public:
      */
     virtual std::string to_json()
     {
-        this->Show();
-        typename std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
-        std::vector<uint32_t> pop_ids(this->population_ids->begin(), this->population_ids->end());
+
+        std::shared_ptr<fims_info::Information<double>> info =
+            fims_info::Information<double>::GetInstance();
+        std::shared_ptr<fims_popdy::CatchAtAge<double>> model =
+            std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(info->models_map[this->get_id()]);
 
         std::stringstream ss;
-        std::set<uint32_t> fleet_ids; // all fleets in the model
-        ss << "{\n";
-        ss << "\"model\" : \"catch_at_age\",\n";
-        ss << "\"id\" : " << this->get_id() << ",\n";
-        ss << "\"populations\" : [\n";
-        // loop through populations for this model
-        std::vector<std::string> pop_strings;
-        for (size_t p = 0; p < pop_ids.size(); p++)
-        {
+        ss<<model->ToJSON();
+        
+        // this->Show();
+        // typename std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
+        // std::vector<uint32_t> pop_ids(this->population_ids->begin(), this->population_ids->end());
 
-            pit = PopulationInterfaceBase::live_objects.find(pop_ids[p]);
-            if (pit != PopulationInterfaceBase::live_objects.end())
-            {
-                PopulationInterface *pop = (PopulationInterface *)(*pit).second.get();
-                fleet_ids.insert(pop->fleet_ids->begin(), pop->fleet_ids->end());
-                pop_strings.push_back(this->population_to_json(pop));
-            }
-        }
-        if (pop_strings.size() > 0)
-        {
-            for (size_t i = 0; i < pop_strings.size() - 1; i++)
-            {
-                ss << pop_strings[i] << ",\n";
-            }
-            ss << pop_strings[pop_strings.size() - 1] << "\n";
-        }
-        ss << "],\n";
-        ss << "\"fleets\" : [\n";
-        typename std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>::iterator fit;
-        // all fleets encapuslated in this model run
-        std::vector<uint32_t> fids(fleet_ids.begin(), fleet_ids.end());
-        // // loop through fleets for this model
-        for (size_t f = 0; f < fids.size(); f++)
-        {
-            fit = FleetInterfaceBase::live_objects.find(fids[f]);
-            if (fit != FleetInterfaceBase::live_objects.end())
-            {
-                if (f == fids.size() - 1)
-                {
-                    ss << this->fleets_to_json((FleetInterface *)(*fit).second.get()) << "\n";
-                }
-                else
-                {
-                    ss << this->fleets_to_json((FleetInterface *)(*fit).second.get()) << ",\n";
-                }
-            }
-        }
+        
+        // std::set<uint32_t> fleet_ids; // all fleets in the model
+        // ss << "{\n";
+        // ss << "\"model\" : \"catch_at_age\",\n";
+        // ss << "\"id\" : " << this->get_id() << ",\n";
+        // ss << "\"populations\" : [\n";
+        // // loop through populations for this model
+        // std::vector<std::string> pop_strings;
+        // for (size_t p = 0; p < pop_ids.size(); p++)
+        // {
 
-        ss << "]\n}";
+        //     pit = PopulationInterfaceBase::live_objects.find(pop_ids[p]);
+        //     if (pit != PopulationInterfaceBase::live_objects.end())
+        //     {
+        //         PopulationInterface *pop = (PopulationInterface *)(*pit).second.get();
+        //         fleet_ids.insert(pop->fleet_ids->begin(), pop->fleet_ids->end());
+        //         pop_strings.push_back(this->population_to_json(pop));
+        //     }
+        // }
+        // if (pop_strings.size() > 0)
+        // {
+        //     for (size_t i = 0; i < pop_strings.size() - 1; i++)
+        //     {
+        //         ss << pop_strings[i] << ",\n";
+        //     }
+        //     ss << pop_strings[pop_strings.size() - 1] << "\n";
+        // }
+        // ss << "],\n";
+        // ss << "\"fleets\" : [\n";
+        // typename std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>::iterator fit;
+        // // all fleets encapuslated in this model run
+        // std::vector<uint32_t> fids(fleet_ids.begin(), fleet_ids.end());
+        // // // loop through fleets for this model
+        // for (size_t f = 0; f < fids.size(); f++)
+        // {
+        //     fit = FleetInterfaceBase::live_objects.find(fids[f]);
+        //     if (fit != FleetInterfaceBase::live_objects.end())
+        //     {
+        //         if (f == fids.size() - 1)
+        //         {
+        //             ss << this->fleets_to_json((FleetInterface *)(*fit).second.get()) << "\n";
+        //         }
+        //         else
+        //         {
+        //             ss << this->fleets_to_json((FleetInterface *)(*fit).second.get()) << ",\n";
+        //         }
+        //     }
+        // }
+
+        // ss << "]\n}";
 
         return fims::JsonParser::PrettyFormatJSON(ss.str());
     }
@@ -1169,8 +1178,8 @@ public:
             derived_quantities["expected_index"] =
                 fims::Vector<Type>(fleet_interface->nyears.get());
 
-            derived_quantities["log_expected_index"] =
-                fims::Vector<Type>(fleet_interface->nyears.get());
+            // derived_quantities["log_expected_index"] =
+            //     fims::Vector<Type>(fleet_interface->nyears.get());
 
             derived_quantities["agecomp_expected"] =
                 fims::Vector<Type>(fleet_interface->nyears.get() *
@@ -1186,7 +1195,7 @@ public:
 
             // replace elements in the variable map
             info->variable_map[fleet_interface->log_landings_expected.id_m] = &(derived_quantities["log_landings_expected"]);
-            info->variable_map[fleet_interface->log_index_expected.id_m] = &(derived_quantities["log_expected_index"]);
+            info->variable_map[fleet_interface->log_index_expected.id_m] = &(derived_quantities["log_index_expected"]);
             info->variable_map[fleet_interface->agecomp_expected.id_m] = &(derived_quantities["agecomp_expected"]);
             info->variable_map[fleet_interface->agecomp_proportion.id_m] = &(derived_quantities["agecomp_proportion"]);
             info->variable_map[fleet_interface->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);

@@ -40,49 +40,6 @@ namespace fims_popdy
 
         virtual ~CatchAtAge()
         {
-
-            std::cout << "Populartions:\n";
-            for (size_t p = 0; p < this->populations.size(); p++)
-            {
-                std::cout << "Population ID: " << this->populations[p]->GetId() << "\n";
-
-                auto derived_quantities =
-                    this->population_derived_quantities[this->populations[p]->GetId()];
-
-                typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-                for (it = derived_quantities.begin();
-                     it != derived_quantities.end(); it++)
-                {
-                    std::cout << "Derived Quantity: " << (*it).first << "\n";
-                    fims::Vector<Type> &dq = (*it).second;
-                    for (size_t i = 0; i < dq.size(); i++)
-                    {
-                        std::cout << dq[i] << " ";
-                    }
-                    std::cout << "\n";
-                }
-            }
-
-            std::cout << "Fleets:\n";
-            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator it;
-            for (it = this->fleet_derived_quantities.begin(); it != this->fleet_derived_quantities.end(); it++)
-            {
-                std::cout << "Fleet ID: " << (*it).first << "\n";
-                auto derived_quantities = (*it).second;
-
-                typename fims_popdy::Fleet<Type>::derived_quantities_iterator dq_it;
-                for (dq_it = derived_quantities.begin();
-                     dq_it != derived_quantities.end(); dq_it++)
-                {
-                    std::cout << "Derived Quantity: " << (*dq_it).first << "\n";
-                    fims::Vector<Type> &dq = (*dq_it).second;
-                    for (size_t i = 0; i < dq.size(); i++)
-                    {
-                        std::cout << dq[i] << " ";
-                    }
-                    std::cout << "\n";
-                }
-            }
         }
 
         /**
@@ -329,69 +286,68 @@ namespace fims_popdy
          */
         std::string ToJSON()
         {
+
+            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator pit;
+            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator fit;
             std::stringstream ss;
             ss << "{\n";
-            ss << "\"populations\" : [\n";
-            for (size_t p = 0; p < this->populations.size(); p++)
+            ss << "Populations:[\n";
+            for (pit = this->population_derived_quantities.begin();
+                 pit != this->population_derived_quantities.end(); pit++)
             {
                 ss << "{\n";
-                ss << "\"id\": " << this->populations[p]->id << ",\n";
-
+                ss << "\"id\": " << (*pit).first << ",\n";
                 ss << "\"derived_quantities\": [\n";
-                if (this->populations[p]->derived_quantities.size() > 0)
+
+                typename fims_popdy::Population<Type>::derived_quantities_iterator it;
+                typename fims_popdy::Population<Type>::derived_quantities_iterator end_it;
+                typename fims_popdy::Population<Type>::derived_quantities_iterator second_to_last;
+
+                it = (*pit).second.begin();
+                end_it = (*pit).second.end();
+                second_to_last = (*pit).second.end();
+                if (it != end_it)
                 {
-                    typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-                    typename fims_popdy::Population<Type>::derived_quantities_iterator end_it;
-                    typename fims_popdy::Population<Type>::derived_quantities_iterator second_to_last;
-
-                    it = this->populations[p]->derived_quantities.begin();
-                    end_it = this->populations[p]->derived_quantities.end();
-                    second_to_last = this->populations[p]->derived_quantities.end();
-                    if (it != end_it)
-                    {
-                        second_to_last--;
-                    }
-
-                    for (; it != second_to_last; ++it)
-                    {
-
-                        ss << this->DerivedQuantityToJSON(it) << ",\n";
-                    }
-                    //                    ++it;
-                    ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
+                    second_to_last--;
                 }
-            }
+
+                for (; it != second_to_last; ++it)
+                {
+                    ss << this->DerivedQuantityToJSON(it) << ",\n";
+                }
+                //                    ++it;
+                ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
+            }   
             ss << "],\n";
-            fleet_iterator fit;
-            ss << "\"fleets\": [\n";
-            for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit)
+
+            ss << "Fleets:[\n";
+
+            for (fit = this->fleet_derived_quantities.begin(); fit != this->fleet_derived_quantities.end(); fit++)
             {
-                ss << "{\"id\": " << (*fit).second->id << ",\n";
-                if ((*fit).second->derived_quantities.size() > 0)
+                ss << "{\n";
+                ss << "\"id\": " << (*fit).first << ",\n";
+                ss << "\"derived_quantities\": [\n";
+                typename fims_popdy::Fleet<Type>::derived_quantities_iterator it;
+                typename fims_popdy::Fleet<Type>::derived_quantities_iterator end_it;
+                typename fims_popdy::Fleet<Type>::derived_quantities_iterator second_to_last;
+                it = (*fit).second.begin();
+                end_it = (*fit).second.end();
+                second_to_last = (*fit).second.end();
+                if (it != end_it)
                 {
-                    typename fims_popdy::Fleet<Type>::derived_quantities_iterator it;
-                    typename fims_popdy::Fleet<Type>::derived_quantities_iterator end_it;
-                    typename fims_popdy::Fleet<Type>::derived_quantities_iterator second_to_last;
-
-                    it = (*fit).second->derived_quantities.begin();
-                    end_it = (*fit).second->derived_quantities.end();
-                    second_to_last = (*fit).second->derived_quantities.end();
-                    if (it != end_it)
-                    {
-                        second_to_last--;
-                    }
-
-                    for (; it != second_to_last; ++it)
-                    {
-                        std::cout << (*it).first << std::endl;
-                        ss << this->DerivedQuantityToJSON(it) << ",\n";
-                    }
-                    std::cout << (*second_to_last).first << std::endl;
-
-                    ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
+                    second_to_last--;
+                }                
+                for (; it != second_to_last; ++it)
+                {
+                    ss << this->DerivedQuantityToJSON(it) << ",\n";
                 }
+                //                    ++it;
+                ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";  
             }
-            ss << "}";
+            ss << "]\n";
+            ss << "}\n";
+
+           
 
             return ss.str();
         }
@@ -451,6 +407,11 @@ namespace fims_popdy
                 {
                     fims::Vector<Type> &dq = (*it).second;
                     this->ResetVector(dq);
+                }
+
+                for (size_t i_length_age = 0; i_length_age < fleet->age_to_length_conversion.size(); i_length_age++)
+                {
+                    this->fleet_derived_quantities[fleet->GetId()]["age_to_length_conversion"][i_length_age] = fleet->age_to_length_conversion[i_length_age];
                 }
             }
         }
@@ -791,16 +752,16 @@ namespace fims_popdy
                 size_t i_age_year = year * population->nages + age;
 
                 this->population_derived_quantities[population->GetId()]["total_landings_weight"][year] +=
-                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_weight"][i_age_year];
+                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_weight_at_age"][i_age_year];
 
                 this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_weight"][year] +=
-                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_weight"][i_age_year];
+                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_weight_at_age"][i_age_year];
 
                 this->population_derived_quantities[population->GetId()]["total_landings_numbers"][year] +=
-                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers"][i_age_year];
+                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year];
 
                 this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers"][year] +=
-                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers"][i_age_year];
+                    this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_age"][i_age_year];
             }
         }
 
@@ -995,7 +956,7 @@ namespace fims_popdy
 
                     for (size_t a = 0; a < fleet->nages; a++)
                     {
-                        size_t i_age_year = y * this->nages + a;
+                        size_t i_age_year = y * fleet->nages + a;
                         // Here we have a check to determine if the age comp
                         // should be calculated from the retained landings or
                         // the total population. These values are slightly different.
@@ -1061,7 +1022,7 @@ namespace fims_popdy
 
                 if (fleet->nlengths > 0)
                 {
-                    for (size_t y = 0; y < this->nyears; y++)
+                    for (size_t y = 0; y < fleet->nyears; y++)
                     {
                         Type sum = static_cast<Type>(0.0);
                         Type sum_obs = static_cast<Type>(0.0);
@@ -1132,7 +1093,7 @@ namespace fims_popdy
             {
                 std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-                for (size_t i = 0; i < fleet->index_weight.size(); i++)
+                for (size_t i = 0; i < this->fleet_derived_quantities[fleet->GetId()]["index_numbers"].size(); i++)
                 {
                     if (fleet->observed_index_units == "number")
                     {
@@ -1161,11 +1122,11 @@ namespace fims_popdy
                 {
                     if (fleet->observed_landings_units == "number")
                     {
-                        this->fleet_derived_quantities[fleet->GetId()]["landings_expected"][i] = fleet->landings_numbers[i];
+                        this->fleet_derived_quantities[fleet->GetId()]["landings_expected"][i] = this->fleet_derived_quantities[fleet->GetId()]["landings_numbers"][i];
                     }
                     else
                     {
-                        this->fleet_derived_quantities[fleet->GetId()]["landings_expected"][i] = fleet->landings_weight[i];
+                        this->fleet_derived_quantities[fleet->GetId()]["landings_expected"][i] = this->fleet_derived_quantities[fleet->GetId()]["landings_weight"][i];
                     }
                     this->fleet_derived_quantities[fleet->GetId()]["log_landings_expected"][i] = log(this->fleet_derived_quantities[fleet->GetId()]["landings_expected"][i]);
                 }
@@ -1325,7 +1286,11 @@ namespace fims_popdy
                     }
                 }
             }
-            ComputeProportions();
+            evaluate_age_comp();
+            evaluate_length_comp();
+            evaluate_index();
+            evaluate_landings();
+            // ComputeProportions();
         }
     };
 
