@@ -114,7 +114,7 @@ test_that("run FIMS and return correct outputs for edge cases", {
   #' after running FIMS with missing values in survey index observations.
   #'   # Obtain the maximum absolute gradient to check convergence
   expect_lte(max_gradient, 0.0001)
-  
+
   #' @description Test that running FIMS with age compositions in proportions
   #' works.
   # Store the original values of the number of landings observations and
