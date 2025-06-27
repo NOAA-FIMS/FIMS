@@ -1057,8 +1057,8 @@ namespace fims_popdy
             fleet_iterator fit;
             for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit)
             {
-                 std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-                 
+                std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+
                 if (fleet->nlengths > 0)
                 {
                     for (size_t y = 0; y < this->nyears; y++)
@@ -1077,43 +1077,43 @@ namespace fims_popdy
                             size_t i_length_year = y * fleet->nlengths + l;
                             for (size_t a = 0; a < fleet->nages; a++)
                             {
-                                size_t i_age_year = y * this->nages + a;
-                                size_t i_length_age = a * this->nlengths + l;
-                                this->lengthcomp_expected[i_length_year] +=
-                                    this->agecomp_expected[i_age_year] *
-                                    this->age_to_length_conversion[i_length_age];
+                                size_t i_age_year = y * fleet->nages + a;
+                                size_t i_length_age = a * fleet->nlengths + l;
+                                this->fleet_derived_quantities[fleet->GetId()]["lengthcomp_expected"][i_length_year] +=
+                                    this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"][i_age_year] *
+                                    this->fleet_derived_quantities[fleet->GetId()]["age_to_length_conversion"][i_length_age];
 
-                                this->landings_numbers_at_length[i_length_year] +=
-                                    this->landings_numbers_at_age[i_age_year] *
-                                    this->age_to_length_conversion[i_length_age];
+                                this->fleet_derived_quantities[fleet->GetId()]["landings_numbers_at_length"][i_length_year] +=
+                                    this->fleet_derived_quantities[fleet->GetId()]["landings_numbers_at_age"][i_age_year] *
+                                    this->fleet_derived_quantities[fleet->GetId()]["age_to_length_conversion"][i_length_age];
 
-                                this->index_numbers_at_length[i_length_year] +=
-                                    this->index_numbers_at_age[i_age_year] *
-                                    this->age_to_length_conversion[i_length_age];
+                                this->fleet_derived_quantities[fleet->GetId()]["index_numbers_at_length"][i_length_year] +=
+                                    this->fleet_derived_quantities[fleet->GetId()]["index_numbers_at_age"][i_age_year] *
+                                    this->fleet_derived_quantities[fleet->GetId()]["age_to_length_conversion"][i_length_age];
                             }
 
-                            sum += this->lengthcomp_expected[i_length_year];
+                            sum += this->fleet_derived_quantities[fleet->GetId()]["lengthcomp_expected"][i_length_year];
                             // robust_sum -= robust_add;
 
-                            if (this->fleet_observed_lengthcomp_data_id_m != -999)
+                            if (fleet->fleet_observed_lengthcomp_data_id_m != -999)
                             {
-                                if (this->observed_lengthcomp_data->at(i_length_year) !=
-                                    this->observed_lengthcomp_data->na_value)
+                                if (fleet->observed_lengthcomp_data->at(i_length_year) !=
+                                    fleet->observed_lengthcomp_data->na_value)
                                 {
-                                    sum_obs += this->observed_lengthcomp_data->at(i_length_year);
+                                    sum_obs += fleet->observed_lengthcomp_data->at(i_length_year);
                                 }
                             }
                         }
-                        for (size_t l = 0; l < this->nlengths; l++)
+                        for (size_t l = 0; l < fleet->nlengths; l++)
                         {
-                            size_t i_length_year = y * this->nlengths + l;
-                            this->lengthcomp_proportion[i_length_year] =
-                                this->lengthcomp_expected[i_length_year] / sum;
+                            size_t i_length_year = y * fleet->nlengths + l;
+                            this->fleet_derived_quantities[fleet->GetId()]["lengthcomp_proportion"][i_length_year] =
+                                this->fleet_derived_quantities[fleet->GetId()]["lengthcomp_expected"][i_length_year] / sum;
                             // robust_add + robust_sum * this->lengthcomp_expected[i_length_year] / sum;
-                            if (this->fleet_observed_lengthcomp_data_id_m != -999)
+                            if (fleet->fleet_observed_lengthcomp_data_id_m != -999)
                             {
-                                this->lengthcomp_expected[i_length_year] =
-                                    this->lengthcomp_proportion[i_length_year] *
+                                this->fleet_derived_quantities[fleet->GetId()]["lengthcomp_expected"][i_length_year] =
+                                    this->fleet_derived_quantities[fleet->GetId()]["lengthcomp_proportion"][i_length_year] *
                                     sum_obs;
                             }
                         }
@@ -1122,6 +1122,55 @@ namespace fims_popdy
             }
         }
 
+        /**
+         * Evaluate the natural log of the expected index.
+         */
+        void evaluate_index()
+        {
+            fleet_iterator fit;
+            for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit)
+            {
+                std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+
+                for (size_t i = 0; i < fleet->index_weight.size(); i++)
+                {
+                    if (fleet->observed_index_units == "number")
+                    {
+                        this->fleet_derived_quantities[fleet->GetId()]["index_expected"][i] = this->fleet_derived_quantities[fleet->GetId()]["index_numbers"][i];
+                    }
+                    else
+                    {
+                        this->fleet_derived_quantities[fleet->GetId()]["index_expected"][i] = this->fleet_derived_quantities[fleet->GetId()]["index_weight"][i];
+                    }
+                    this->fleet_derived_quantities[fleet->GetId()]["log_index_expected"][i] = log(this->fleet_derived_quantities[fleet->GetId()]["index_expected"][i]);
+                }
+            }
+        }
+
+        /**
+         * Evaluate the natural log of the expected landings.
+         */
+        void evaluate_landings()
+        {
+            fleet_iterator fit;
+            for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit)
+            {
+                std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+
+                for (size_t i = 0; i < fleet->landings_weight.size(); i++)
+                {
+                    if (fleet->observed_landings_units == "number")
+                    {
+                        this->fleet_derived_quantities[fleet->GetId()]["landings_expected"][i] = fleet->landings_numbers[i];
+                    }
+                    else
+                    {
+                        this->fleet_derived_quantities[fleet->GetId()]["landings_expected"][i] = fleet->landings_weight[i];
+                    }
+                    this->fleet_derived_quantities[fleet->GetId()]["log_landings_expected"][i] = log(this->fleet_derived_quantities[fleet->GetId()]["landings_expected"][i]);
+                }
+            }
+        }
         /**
          * * This method is used to evaluate the population dynamics model.
          */
