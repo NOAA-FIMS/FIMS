@@ -14,7 +14,8 @@
 
 namespace fims_popdy {
 
-/** @brief Log Devs class that returns the log of the input added to the log of the recruitment deviations.
+/** @brief Log Devs class that returns the log of the input added to the log of
+ * the recruitment deviations.
  */
 template <typename Type>
 struct LogR : public RecruitmentBase<Type> {
@@ -22,11 +23,12 @@ struct LogR : public RecruitmentBase<Type> {
 
   virtual ~LogR() {}
 
-  /** @brief Log of recruitment approach to adding error to expected recruitment.
+  /** @brief Log of recruitment approach to adding error to expected
+   * recruitment.
    *
    * The Log Recruitment implementation:
    * \f$ \text{log expected recruitment} \f$
-   * 
+   *
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate_process(size_t pos) {
@@ -34,7 +36,7 @@ struct LogR : public RecruitmentBase<Type> {
   }
 
   /** Empty return of base class function */
-  virtual const Type evaluate_mean(const Type& spawners, const Type& phi_0){
+  virtual const Type evaluate_mean(const Type& spawners, const Type& phi_0) {
     return 0;
   }
 };
