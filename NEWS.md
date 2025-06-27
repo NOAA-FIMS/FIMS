@@ -1,3 +1,14 @@
+# FIMS 0.5.0
+
+* Implements random effects
+* Adds fits tibble to output with `get_fits()`
+* Switch to TMBad from CppAD
+* Checks that length data has the correct dimension in R
+* Adds SB to model output
+* Adds README files to the C++ code
+* Exports logit functions to R
+* Adds capabilities in GitHub actions to document
+
 # FIMS 0.4.0
 
 * Allows for CPUE data and landings within a single fleet and changes the
