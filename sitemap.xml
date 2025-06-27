@@ -15,6 +15,7 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/check_fims.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/data1.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.html</loc></url>
@@ -28,12 +29,18 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/is_fims_verbose.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/lognormal.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/m_.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/remove_test_data.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/reshape_json_derived_quantities.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/reshape_json_estimates.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/reshape_json_fits.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/reshape_json_values.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/reshape_tmb_estimates.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/run_gtest.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/run_r_integration_tests.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/run_r_unit_tests.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_and_run_gtest.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_gtest.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/style_cpp.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/use_testthat_template.html</loc></url>
 </urlset>
 
