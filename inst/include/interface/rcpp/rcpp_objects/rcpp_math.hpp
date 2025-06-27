@@ -14,7 +14,7 @@
 
 /**
  * @brief A rcpp interface to the logit function.
- * 
+ *
  * @param a Lower bound of the logit function, typically 0.0.
  * @param b Upper bound of the logit function, typically 1.0.
  * @param x A single numeric value (double) to be transformed on the real line.
@@ -26,7 +26,7 @@ double logit_rcpp(double a, double b, double x) {
 
 /**
  * @brief A rcpp interface to the inverse-logit function.
- * 
+ *
  * @param a Lower bound of the logit function, typically 0.0.
  * @param b Upper bound of the logit function, typically 1.0.
  * @param logit_x A single numeric value (double) in real space.
