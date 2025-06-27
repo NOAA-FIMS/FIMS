@@ -87,16 +87,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
 {
     std::shared_ptr<std::set<uint32_t>> population_ids;
     typedef typename std::set<uint32_t>::iterator population_id_iterator;
-    std::map<uint32_t, uint32_t> age_comp_density_components_links;               // fleet id, density component id
-    std::map<uint32_t, uint32_t> index_density_components_links;                  // fleet id, density component id
-    std::map<uint32_t, uint32_t> length_comp_density_components_links;            // fleet id, density component id
-    std::map<uint32_t, uint32_t> recruitment_density_components_links;            // population id, density component id
-    std::map<uint32_t, uint32_t> initial_numbers_at_age_density_components_links; // population id, density component id
-    typedef typename std::map<uint32_t, uint32_t>::iterator density_component_iterator;
-
-
+  
 public:
-
     /**
      * @brief The constructor.
      */
@@ -106,7 +98,6 @@ public:
         std::shared_ptr<CatchAtAgeInterface> caa = std::make_shared<CatchAtAgeInterface>(*this);
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(caa);
         FisheryModelInterfaceBase::live_objects[this->id] = caa;
-
     }
 
     /**
@@ -155,11 +146,6 @@ public:
 
         fims_popdy::CatchAtAge<double> *model = (fims_popdy::CatchAtAge<double> *)info->models_map[this->get_id()].get();
         model->Show();
-        // std::cout << this->to_json(); // fims::JsonParser::PrettyFormatJSON(model->ToJSON());
-
-        // std::ofstream o("test.json");
-        // o << this->to_json();
-        // o.close();
     }
 
     /**
@@ -539,8 +525,7 @@ public:
             std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(info->models_map[this->get_id()]);
 
         std::stringstream ss;
-        ss<<model->ToJSON();
-    
+        ss << model->ToJSON();
 
         return fims::JsonParser::PrettyFormatJSON(ss.str());
     }
@@ -907,10 +892,6 @@ public:
                 fims::Vector<Type>((population->nyears.get() + 1) *
                                    population->nages.get());
 
-            derived_quantities["expected_catch"] =
-                fims::Vector<Type>(population->nyears.get() *
-                                   population->nfleets.get());
-
             derived_quantities["expected_recruitment"] =
                 fims::Vector<Type>((population->nyears.get() + 1));
 
@@ -999,9 +980,6 @@ public:
 
             derived_quantities["expected_index"] =
                 fims::Vector<Type>(fleet_interface->nyears.get());
-
-            // derived_quantities["log_expected_index"] =
-            //     fims::Vector<Type>(fleet_interface->nyears.get());
 
             derived_quantities["agecomp_expected"] =
                 fims::Vector<Type>(fleet_interface->nyears.get() *
