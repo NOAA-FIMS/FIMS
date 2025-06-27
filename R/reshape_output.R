@@ -118,8 +118,7 @@ reshape_json_estimates <- function(finalized_fims, opt = list()) {
 reshape_tmb_estimates <- function(obj,
                                   sdreport = NULL,
                                   opt = NULL,
-                                  parameter_names,
-                                  random_names) {
+                                  parameter_names) {
   # Outline for the estimates table
   # TODO: The fleet_name, age, length, and time columns are currently emplty. Matthew
   # has started adding information to the JSON output in the dev-model-families branch.
