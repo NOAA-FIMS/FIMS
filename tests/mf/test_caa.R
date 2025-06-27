@@ -225,7 +225,7 @@ for (i in 1:(om_input[["nyr"]] - 1)) {
   recruitment_distribution$x[i]$value <- 0
   recruitment_distribution$expected_values[i]$value <- 0
 }
-recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+recruitment_distribution$set_distribution_links("fixed_effects", recruitment$log_devs$get_id())
 
 
 
@@ -280,8 +280,6 @@ system.time( obj <- TMB::MakeADFun(
   data = list(), parameters, DLL = "FIMS",
   silent = TRUE
 ))
-q()
-
 
 opt <- minimizR(obj[["par"]], # initial parameters values
   obj[["fn"]], # objective function
@@ -293,20 +291,28 @@ opt <- minimizR(obj[["par"]], # initial parameters values
     hessian = FALSE
   )
  ) # include hessian in the output
+opt
 
+write(caa$get_output(), "caa.json")
+q()
 
 # Optimization with nlminb
  opt <- NULL
    opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
      control = list(eval.max = 10000, iter.max = 10000, trace = 0)
 )
+
 opt
+q()
+
+
+
 
 q()
 global_ouput<-finalize(opt$par, obj$fn, obj$gr)
 # loop throught the derived quantities in population and print
 
-write(caa$get_output(), "caa.json")
+
 # print(opt)
 caa$calculate_reference_points()
 
