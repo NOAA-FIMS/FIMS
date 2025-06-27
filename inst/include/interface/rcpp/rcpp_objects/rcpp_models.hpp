@@ -94,30 +94,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
     std::map<uint32_t, uint32_t> initial_numbers_at_age_density_components_links; // population id, density component id
     typedef typename std::map<uint32_t, uint32_t>::iterator density_component_iterator;
 
-    static void build_R_enum()
-    {
-        Rcpp::Environment global_env = Rcpp::Environment::global_env();
-        global_env["CatchAtAge::density_density_flags"] = CatchAtAgeInterface::density_expected;
-        global_env.lockBinding("CatchAtAge::density_density_flags");
-    }
-    struct DensityComponentLink
-    {
-        uint32_t module_id;
-        uint32_t density_component_id;
-        uint32_t linked_component;
-        std::string input_type;
-    };
-
-    std::vector<DensityComponentLink> fleet_density_component_links;
-    std::vector<DensityComponentLink> growth_density_component_links;
-    std::vector<DensityComponentLink> maturity_density_component_links;
-    std::vector<DensityComponentLink> population_density_component_links;
-    std::vector<DensityComponentLink> recruitment_density_component_links;
-    std::vector<DensityComponentLink> selectivity_density_component_links;
 
 public:
-    static std::once_flag density_expected_flag;
-    static Rcpp::List density_expected;
+
     /**
      * @brief The constructor.
      */
@@ -128,7 +107,6 @@ public:
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(caa);
         FisheryModelInterfaceBase::live_objects[this->id] = caa;
 
-        std::call_once(density_expected_flag, CatchAtAgeInterface::build_R_enum);
     }
 
     /**
@@ -159,108 +137,6 @@ public:
         {
             FIMS_ERROR_LOG("Population with id " + fims::to_string(id) + " not found.");
         }
-    }
-
-    /**
-     * @brief Method to add a fleet based density component link.
-     * @param fleet_id The id of the fleet.
-     * @param linked_type The type of the linked component (e.g., age composition, index, length composition, recruitment, initial numbers at age).
-     * @param density_component_id The id of the density component to link to.
-     * @param input_type The type of input for the density component (default is "constant)
-     */
-    void AddFleetDensityComponent(uint32_t fleet_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
-    {
-        DensityComponentLink dcl;
-        dcl.module_id = fleet_id;
-        dcl.density_component_id = density_component_id;
-        dcl.linked_component = linked_type;
-        dcl.input_type = input_type;
-        this->fleet_density_component_links.push_back(dcl);
-    }
-
-    /**
-     * @brief Method to add a growth based density component link.
-     * @param growth_id The id of the growth module.
-     * @param linked_type The type of the linked component.
-     * @param density_component_id The id of the density component to link to.
-     * @param input_type The type of input for the density component (default is "constant)
-     */
-    void AddGrowthDensityComponent(uint32_t growth_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
-    {
-        DensityComponentLink dcl;
-        dcl.module_id = growth_id;
-        dcl.density_component_id = density_component_id;
-        dcl.linked_component = linked_type;
-        dcl.input_type = input_type;
-        this->growth_density_component_links.push_back(dcl);
-    }
-
-    /**
-     * @brief Method to add a maturity based density component link.
-     * @param maturity_id The id of the maturity module.
-     * @param linked_type The type of the linked component.
-     * @param density_component_id The id of the density component to link to.
-     * @param input_type The type of input for the density component (default is "constant)
-     */
-    void AddMaturityDensityComponent(uint32_t maturity_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
-    {
-        DensityComponentLink dcl;
-        dcl.module_id = maturity_id;
-        dcl.density_component_id = density_component_id;
-        dcl.linked_component = linked_type;
-        dcl.input_type = input_type;
-        this->maturity_density_component_links.push_back(dcl);
-    }
-
-    /**
-     * @brief Method to add a population based density component link.
-     * @param population_id The id of the population module.
-     * @param linked_type The type of the linked component.
-     * @param density_component_id The id of the density component to link to.
-     * @param input_type The type of input for the density component (default is "constant)
-     */
-    void AddPopulationDensityComponent(uint32_t population_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
-    {
-        DensityComponentLink dcl;
-        dcl.module_id = population_id;
-        dcl.density_component_id = density_component_id;
-        dcl.linked_component = linked_type;
-        dcl.input_type = input_type;
-        this->population_density_component_links.push_back(dcl);
-    }
-
-    /**
-     * @brief Method to add a recruitment based density component link.
-     * @param recruitment_id The id of the recruitment module.
-     * @param linked_type The type of the linked component.
-     * @param density_component_id The id of the density component to link to.
-     * @param input_type The type of input for the density component (default is "constant)
-     */
-    void AddRecruitmentDensityComponent(uint32_t recruitment_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
-    {
-        DensityComponentLink dcl;
-        dcl.module_id = recruitment_id;
-        dcl.density_component_id = density_component_id;
-        dcl.linked_component = linked_type;
-        dcl.input_type = input_type;
-        this->recruitment_density_component_links.push_back(dcl);
-    }
-
-    /**
-     * @brief Method to add a selectivity based density component link.
-     * @param selectivity_id The id of the selectivity module.
-     * @param linked_type The type of the linked component.
-     * @param density_component_id The id of the density component to link to.
-     * @param input_type The type of input for the density component (default is "constant)
-     */
-    void AddSelectivityDensityComponent(uint32_t selectivity_id, uint32_t linked_type, uint32_t density_component_id, std::string input_type = "constant")
-    {
-        DensityComponentLink dcl;
-        dcl.module_id = selectivity_id;
-        dcl.density_component_id = density_component_id;
-        dcl.linked_component = linked_type;
-        dcl.input_type = input_type;
-        this->selectivity_density_component_links.push_back(dcl);
     }
 
     /**
@@ -664,61 +540,7 @@ public:
 
         std::stringstream ss;
         ss<<model->ToJSON();
-        
-        // this->Show();
-        // typename std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
-        // std::vector<uint32_t> pop_ids(this->population_ids->begin(), this->population_ids->end());
-
-        
-        // std::set<uint32_t> fleet_ids; // all fleets in the model
-        // ss << "{\n";
-        // ss << "\"model\" : \"catch_at_age\",\n";
-        // ss << "\"id\" : " << this->get_id() << ",\n";
-        // ss << "\"populations\" : [\n";
-        // // loop through populations for this model
-        // std::vector<std::string> pop_strings;
-        // for (size_t p = 0; p < pop_ids.size(); p++)
-        // {
-
-        //     pit = PopulationInterfaceBase::live_objects.find(pop_ids[p]);
-        //     if (pit != PopulationInterfaceBase::live_objects.end())
-        //     {
-        //         PopulationInterface *pop = (PopulationInterface *)(*pit).second.get();
-        //         fleet_ids.insert(pop->fleet_ids->begin(), pop->fleet_ids->end());
-        //         pop_strings.push_back(this->population_to_json(pop));
-        //     }
-        // }
-        // if (pop_strings.size() > 0)
-        // {
-        //     for (size_t i = 0; i < pop_strings.size() - 1; i++)
-        //     {
-        //         ss << pop_strings[i] << ",\n";
-        //     }
-        //     ss << pop_strings[pop_strings.size() - 1] << "\n";
-        // }
-        // ss << "],\n";
-        // ss << "\"fleets\" : [\n";
-        // typename std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>::iterator fit;
-        // // all fleets encapuslated in this model run
-        // std::vector<uint32_t> fids(fleet_ids.begin(), fleet_ids.end());
-        // // // loop through fleets for this model
-        // for (size_t f = 0; f < fids.size(); f++)
-        // {
-        //     fit = FleetInterfaceBase::live_objects.find(fids[f]);
-        //     if (fit != FleetInterfaceBase::live_objects.end())
-        //     {
-        //         if (f == fids.size() - 1)
-        //         {
-        //             ss << this->fleets_to_json((FleetInterface *)(*fit).second.get()) << "\n";
-        //         }
-        //         else
-        //         {
-        //             ss << this->fleets_to_json((FleetInterface *)(*fit).second.get()) << ",\n";
-        //         }
-        //     }
-        // }
-
-        // ss << "]\n}";
+    
 
         return fims::JsonParser::PrettyFormatJSON(ss.str());
     }
@@ -1220,28 +1042,5 @@ public:
 
 #endif
 };
-std::once_flag CatchAtAgeInterface::density_expected_flag;
 
-Rcpp::List CatchAtAgeInterface::density_expected = Rcpp::List::create(
-    Rcpp::Named("mortality_F") = Rcpp::NumericVector::create(0L),
-    Rcpp::Named("mortality_Z") = Rcpp::NumericVector::create(1L),
-    Rcpp::Named("weight_at_age") = Rcpp::NumericVector::create(2L),
-    Rcpp::Named("numbers_at_age") = Rcpp::NumericVector::create(3L),
-    Rcpp::Named("initial_numbers_at_age") = Rcpp::NumericVector::create(4L),
-    Rcpp::Named("unfished_numbers_at_age") = Rcpp::NumericVector::create(5L),
-    Rcpp::Named("biomass") = Rcpp::NumericVector::create(6L),
-    Rcpp::Named("spawning_biomass") = Rcpp::NumericVector::create(7L),
-    Rcpp::Named("unfished_spawning_biomass") = Rcpp::NumericVector::create(8L),
-    Rcpp::Named("expected_recruitment") = Rcpp::NumericVector::create(9L),
-    Rcpp::Named("recruitment_deviations") = Rcpp::NumericVector::create(10L),
-    Rcpp::Named("catch_at_age") = Rcpp::NumericVector::create(11L),
-    Rcpp::Named("catch_numbers_at_age") = Rcpp::NumericVector::create(12L),
-    Rcpp::Named("proportion_catch_numbers_at_age") = Rcpp::NumericVector::create(13L),
-    Rcpp::Named("proportion_catch_numbers_at_length") = Rcpp::NumericVector::create(14L),
-    Rcpp::Named("catch_weight_at_age") = Rcpp::NumericVector::create(15L),
-    Rcpp::Named("expected_catch") = Rcpp::NumericVector::create(16L),
-    Rcpp::Named("expected_index") = Rcpp::NumericVector::create(17L),
-    Rcpp::Named("log_expected_index") = Rcpp::NumericVector::create(18L),
-    Rcpp::Named("age_composition") = Rcpp::NumericVector::create(19L),
-    Rcpp::Named("length_composition") = Rcpp::NumericVector::create(20L));
 #endif
