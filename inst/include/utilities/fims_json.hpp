@@ -9,6 +9,7 @@
  */
 #include <cctype>
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <sstream>
 #include <string>
@@ -220,7 +221,7 @@ namespace fims {
         /** Parse a JSON array. */
         JsonValue ParseArray();
         /** Write a JSON value to an output file stream. */
-        void WriteJsonValue(std::ofstream& outputFile, JsonValue jsonValue);
+        void WriteJsonValue(std::ostream& outputFile, JsonValue jsonValue);
         /** Display a JSON value to an output stream. */
         void PrintJsonValue(std::ostream& outputFile, JsonValue jsonValue);
         /** Indentation helper for printing JSON values in an output file stream. */
@@ -423,7 +424,7 @@ namespace fims {
      * @param outputFile The output file stream.
      *  @param jsonValue The JSON value to write.
      */
-    void JsonParser::WriteJsonValue(std::ofstream& outputFile,
+    void JsonParser::WriteJsonValue(std::ostream& outputFile,
             JsonValue jsonValue) {
         switch (jsonValue.GetType()) {
             case JsonValueType::Null:
