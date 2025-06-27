@@ -18,9 +18,12 @@ namespace fims_popdy
 
         typedef typename std::map<std::string, fims::Vector<Type>>::iterator derived_quantities_iterator;
 
-        std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> fleet_derived_quantities;      // derived quantities for all fleets, indexed by fleet id
-        std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> population_derived_quantities; // derived quantities for all populations, indexed by population id
+        std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> fleet_derived_quantities;                                          // derived quantities for all fleets, indexed by fleet id
+        std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> population_derived_quantities;                                     // derived quantities for all populations, indexed by population id
+        typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator fleet_derived_quantities_iterator;      // iterator for fleet derived quantities
+        typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator population_derived_quantities_iterator; // iterator for population derived quantities
         typedef typename std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator fleet_iterator;
+        typedef typename std::map<std::string, fims::Vector<Type>>::iterator dq_iterator;
 
     public:
         std::vector<Type> ages; /*!< vector of the ages for referencing*/
@@ -962,6 +965,84 @@ namespace fims_popdy
                                         this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]["landings_numbers_at_length"][i_length_year] / sum_length;
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Evaluate the proportion of landings numbers at age.
+         */
+        void evaluate_age_comp()
+        {
+
+            fleet_iterator fit;
+            for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit)
+            {
+                std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+                for (size_t y = 0; y < fleet->nyears; y++)
+                {
+                    Type sum = static_cast<Type>(0.0);
+                    Type sum_obs = static_cast<Type>(0.0);
+                    // robust_add is a small value to add to expected compostion
+                    // proportions at age to stabilize likelihood calculations
+                    // when the expected proportions are close to zero.
+                    // Type robust_add = static_cast<Type>(0.0); // zeroed out before testing 0.0001;
+                    // sum robust is used to calculate the total sum of robust
+                    // additions to ensure that proportions sum to 1.
+                    // Type robust_sum = static_cast<Type>(1.0);
+
+                    for (size_t a = 0; a < fleet->nages; a++)
+                    {
+                        size_t i_age_year = y * this->nages + a;
+                        // Here we have a check to determine if the age comp
+                        // should be calculated from the retained landings or
+                        // the total population. These values are slightly different.
+                        // In the future this will have more impact as we implement
+                        // timing rather than everything occuring at the start of
+                        // the year.
+                        if (fleet->fleet_observed_landings_data_id_m == -999)
+                        {
+                            this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"][i_age_year] =
+                                this->fleet_derived_quantities[fleet->GetId()]["index_numbers_at_age"][i_age_year];
+                        }
+                        else
+                        {
+                            this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"][i_age_year] =
+                                this->fleet_derived_quantities[fleet->GetId()]["landings_numbers_at_age"][i_age_year];
+                        }
+                        sum += this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"][i_age_year];
+                        // robust_sum -= robust_add;
+
+                        // This sums over the observed age composition data so that
+                        // the expected age composition can be rescaled to match the
+                        // total number observed. The check for na values should not
+                        // be needed as individual years should not have missing data.
+                        // This is need to be re-explored if/when we modify FIMS to
+                        // allow for composition bins that do not match the population
+                        // bins.
+                        if (fleet->fleet_observed_agecomp_data_id_m != -999)
+                        {
+                            if (fleet->observed_agecomp_data->at(i_age_year) !=
+                                fleet->observed_agecomp_data->na_value)
+                            {
+                                sum_obs += fleet->observed_agecomp_data->at(i_age_year);
+                            }
+                        }
+                    }
+                    for (size_t a = 0; a < fleet->nages; a++)
+                    {
+                        size_t i_age_year = y * fleet->nages + a;
+                        this->fleet_derived_quantities[fleet->GetId()]["agecomp_proportion"][i_age_year] =
+                            this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"][i_age_year] / sum;
+                        // robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
+
+                        if (fleet->fleet_observed_agecomp_data_id_m != -999)
+                        {
+                            this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"][i_age_year] =
+                                this->fleet_derived_quantities[fleet->GetId()]["agecomp_proportion"][i_age_year] *
+                                sum_obs;
                         }
                     }
                 }
