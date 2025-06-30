@@ -148,7 +148,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
   fishing_fleet$log_q[1]$estimation_type <- "constant"
-  fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
+  fishing_fleet$SetSelectivityAgeID(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
@@ -240,7 +240,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$log_Fmort$set_all_estimable(FALSE)
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
   survey_fleet$log_q[1]$estimation_type <- "fixed_effects"
-  survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
+  survey_fleet$SetSelectivityAgeID(survey_fleet_selectivity$get_id())
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
   survey_fleet$SetObservedLengthCompDataID(survey_fleet_length_comp$get_id())

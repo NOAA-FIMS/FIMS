@@ -350,16 +350,23 @@ public:
     interface_observed_landings_data_id_m.set(observed_landings_data_id);
   }
   /**
-   * @brief Set the unique ID for the selectivity object.
+   * @brief Set the unique ID for selectivity object and adding units as age.
    * @param selectivity_id Unique ID for the observed object.
-   * @param units The units of the selectivity, either "age" or "length".
-   * Default is "age".
    */
-  void SetSelectivityID(int selectivity_id, string units = fims::to_string("age")) {
+  void SetSelectivityAgeID(int selectivity_id) {
     interface_selectivity_id_m.set(selectivity_id);
-    selectivity_units = units;
+    selectivity_units = fims::to_string("age");
+  }
+  /**
+   * @brief Set the unique ID for the selectivity object and adding units as length.
+   * @param selectivity_id Unique ID for the observed object.
+   */
+  void SetSelectivityLengthID(int selectivity_id) {
+    interface_selectivity_id_m.set(selectivity_id);
+    selectivity_units = fims::to_string("length");
   }
 
+  
   /**
   * @brief Get the unique ID for the observed age-composition data object.
   */

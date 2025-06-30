@@ -89,7 +89,7 @@ init_fims <- function(i) {
   fishing_fleet$log_q[1]$value <- log(1.0)
   fishing_fleet$estimate_q <- FALSE
   fishing_fleet$random_q <- FALSE
-  fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
+  fishing_fleet$SetSelectivityAgeID(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   # fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
@@ -168,7 +168,7 @@ init_fims <- function(i) {
   survey_fleet$log_q[1]$estimated <- TRUE
   survey_fleet$estimate_q <- TRUE
   survey_fleet$random_q <- FALSE
-  survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
+  survey_fleet$SetSelectivityAgeID(survey_fleet_selectivity$get_id())
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
   # survey_fleet$SetObservedLengthCompDataID(survey_fleet_length_comp$get_id())

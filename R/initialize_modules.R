@@ -409,7 +409,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
     module_name = setNames(fleet_name, "Fleet")
   )
 
-  module$SetSelectivityID(linked_ids["selectivity"])
+  module$SetSelectivityAgeID(linked_ids["selectivity"])
 
   fleet_types <- get_data(data) |>
     dplyr::filter(name == fleet_name) |>
