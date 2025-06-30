@@ -1,7 +1,7 @@
 #' Set up your local environment to run the google tests locally
 #'
 #' Intended for developers to set up their local environment prior to running
-#' the integration tests.
+#' the integration tests. Test Updating Documentation
 #'
 #' @keywords developer
 #' @examples \dontrun{
@@ -30,7 +30,8 @@ setup_gtest <- function() {
       # (which was easier to figure out than downloading the Rdata first)
       load(url(paste0(github_dir, r_data_file)))
       # write json file
-      output_name <- paste0("C", c_case, "_om_output", i_iter, ".json")
+      output_name <- paste0("C",
+       c_case, "_om_output", i_iter, ".json")
       input_name <- paste0("C", c_case, "_om_input", i_iter, ".json")
       json_folder <- file.path(
         "tests",
