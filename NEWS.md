@@ -1,3 +1,7 @@
+# FIMS 0.5.1
+
+* Fixes fix-pr-commands.yml permissions and to use the parent workflow.
+
 # FIMS 0.5.0
 
 * Implements random effects
