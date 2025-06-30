@@ -355,22 +355,36 @@ public:
    */
   void SetSelectivityAgeID(int selectivity_id) {
     interface_selectivity_id_m.set(selectivity_id);
-    selectivity_units = fims::to_string("age");
+    selectivity_units.set(fims::to_string("age"));
     // TODO: We should as a warning/notification that this is setting selectivity
     // units to age.
   }
+
   /**
    * @brief Set the unique ID for the selectivity object and set units to length.
    * @param selectivity_id Unique ID for the observed object.
    */
   void SetSelectivityLengthID(int selectivity_id) {
     interface_selectivity_id_m.set(selectivity_id);
-    selectivity_units = fims::to_string("length");
+    selectivity_units.set(fims::to_string("length"));
     // TODO: We should as a warning/notification that this is setting selectivity
     // units to length.
   }
 
-  
+  /**
+   * @brief Get the unique ID for the selectivity object.
+   */
+  int GetSelectivityID() {
+    return interface_selectivity_id_m.get();
+  }
+
+  /**
+   * @brief Get the units for the selectivity object.
+   */
+  std::string GetSelectivityUnits() {
+    return selectivity_units.get();
+  }
+
   /**
   * @brief Get the unique ID for the observed age-composition data object.
   */
