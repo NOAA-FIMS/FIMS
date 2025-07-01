@@ -170,7 +170,7 @@ public:
             return "{}"; // Return empty JSON
         }
 
-        std::shared_ptr<PopulationInterface> population_interface_ptr = std::dynamic_pointer_cast(*pi_it).second;
+        std::shared_ptr<PopulationInterface> population_interface_ptr = std::dynamic_pointer_cast<PopulationInterface>((*pi_it).second);
 
         std::shared_ptr<fims_info::Information<double>> info =
             fims_info::Information<double>::GetInstance();
@@ -186,12 +186,6 @@ public:
         if (pit != info->populations.end())
         {
             std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
-
-            fims::Vector<double> &derived_ssb = pop->derived_quantities["spawning_biomass"];
-            fims::Vector<double> &derived_naa = pop->derived_quantities["numbers_at_age"];
-            fims::Vector<double> &derived_biomass = pop->derived_quantities["biomass"];
-            fims::Vector<double> &derived_recruitment = pop->derived_quantities["recruitment"];
-
             // ToDo: add list of fleet ids operating on this population
             ss << "{\n";
             ss << " \"name\" : \"Population\",\n";
@@ -204,9 +198,9 @@ public:
             ss << " \"maturity_id\": " << population_interface->maturity_id << ",\n";
 
             ss << " \"parameters\": [\n{\n";
-            for (size_t i = 0; i < populations->log_M.size() - 1; i++)
+            for (size_t i = 0; i < pop->log_M.size(); i++)
             {
-                pop->log_M[i].value_m = population->log_M[i];
+                population_interface_ptr->log_M[i].final_value_m = pop->log_M[i];
             }
 
             ss << " \"name\": \"log_M\",\n";
@@ -216,9 +210,9 @@ public:
 
             ss << "{\n";
 
-            for (size_t i = 0; i < populations->log_init_naa.size() - 1; i++)
+            for (size_t i = 0; i < pop->log_init_naa.size(); i++)
             {
-                pop->log_init_naa[i].value_m = population->log_init_naa[i];
+                population_interface_ptr->log_init_naa[i].final_value_m = pop->log_init_naa[i];
             }
             ss << "  \"name\": \"log_init_naa\",\n";
             ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
@@ -231,12 +225,7 @@ public:
 
             if (cit != model_ptr->population_derived_quantities.end())
             {
-                fims::Vector<double> &dq = (*cit).second;
-                for (size_t i = 0; i < dq.size() - 1; i++)
-                {
-                    ss << this->DerivedQuantityToJSON(dq[i]) << ",\n";
-                }
-                ss << this->DerivedQuantityToJSON(dq[dq.size() - 1]) << "]\n";
+                ss << model_ptr->population_derived_quantities_to_json(cit);
             }
             else
             {
@@ -253,7 +242,7 @@ public:
             ss << " \"id\": " << population_interface->get_id() << ",\n";
             ss << " \"recruitment_id\": " << population_interface->recruitment_id << ",\n";
             ss << " \"growth_id\": " << population_interface->growth_id << ",\n";
-            ss << " \"maturity_id\": " << population_interface->m
+            ss << " \"maturity_id\": " << population_interface->maturity_id << ",\n";
             ss << " \"derived_quantities\": []}\n";
 #warning Add error log here
         }
@@ -269,8 +258,28 @@ public:
     {
         std::stringstream ss;
 
+        typename std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>::iterator fi_it; // fleet interface iterator
+        fi_it = FleetInterfaceBase::live_objects.find(fleet_interface->get_id());
+        if (fi_it == FleetInterfaceBase::live_objects.end())
+        {
+            FIMS_ERROR_LOG("Fleet with id " + fims::to_string(fleet_interface->get_id()) + " not found in live objects.");
+            return "{}"; // Return empty JSON
+        }
+
+        std::shared_ptr<FleetInterface> fleet_interface_ptr = std::dynamic_pointer_cast<FleetInterface>((*fi_it).second);
+
+        if (!fleet_interface_ptr)
+        {
+            FIMS_ERROR_LOG("Fleet with id " + fims::to_string(fleet_interface->get_id()) + " not found in live objects.");
+            return "{}"; // Return empty JSON
+        }
+
         std::shared_ptr<fims_info::Information<double>> info =
             fims_info::Information<double>::GetInstance();
+
+        typename fims_info::Information<double>::model_map_iterator model_it;
+        model_it = info->models_map.find(this->get_id());
+        std::shared_ptr<fims_popdy::CatchAtAge<double>> model_ptr = std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>((*model_it).second);
 
         typename fims_info::Information<double>::fleet_iterator fit;
 
@@ -280,16 +289,6 @@ public:
         {
 
             std::shared_ptr<fims_popdy::Fleet<double>> &fleet = (*fit).second;
-
-            fims::Vector<double> &derived_caa = fleet->derived_quantities["catch_numbers_at_age"];
-            fims::Vector<double> &derived_cal = fleet->derived_quantities["catch_numbers_at_length"];
-            fims::Vector<double> &derived_proportion_cnaa = fleet->derived_quantities["proportion_catch_numbers_at_age"];
-            fims::Vector<double> &derived_proportion_cnal = fleet->derived_quantities["proportion_catch_numbers_at_length"];
-            fims::Vector<double> &derived_index = fleet->derived_quantities["expected_index"];
-            fims::Vector<double> &derived_catch = fleet->derived_quantities["expected_catch"];
-            fims::Vector<double> &derived_cwaa = fleet->derived_quantities["catch_weight_at_age"];
-            fims::Vector<double> &derived_age_comp = fleet->derived_quantities["age_composition"];
-            fims::Vector<double> &derived_length_comp = fleet->derived_quantities["length_composition"];
 
             ss << "{\n";
             ss << " \"name\" : \"Fleet\",\n";
@@ -301,12 +300,21 @@ public:
             ss << " \"nlengths\": " << fleet_interface->nlengths.get() << ",\n";
             ss << "\"parameters\": [\n";
             ss << "{\n";
+            for (size_t i = 0; i < fleet_interface->log_Fmort.size(); i++)
+            {
+                fleet_interface->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
+            }
+
             ss << " \"name\": \"log_Fmort\",\n";
             ss << " \"id\":" << fleet_interface->log_Fmort.id_m << ",\n";
             ss << " \"type\": \"vector\",\n";
             ss << " \"values\": " << fleet_interface->log_Fmort << "\n},\n";
 
             ss << " {\n";
+            for (size_t i = 0; i < fleet->log_q.size(); i++)
+            {
+                fleet_interface->log_q[i].final_value_m = fleet->log_q[i];
+            }
             ss << " \"name\": \"log_q\",\n";
             ss << " \"id\":" << fleet_interface->log_q.id_m << ",\n";
             ss << " \"type\": \"vector\",\n";
@@ -314,169 +322,31 @@ public:
             if (fleet_interface->nlengths > 0)
             {
                 ss << " {\n";
-                ss << " \"name\": \"age_length_conversion_matrix\",\n";
-                // ss << " \"id\":" << fleet_interface->age_length_conversion_matrix.id_m << ",\n";
+                for (size_t i = 0; i < fleet_interface->age_to_length_conversion.size(); i++)
+                {
+                    fleet_interface->age_to_length_conversion[i].final_value_m = fleet->age_to_length_conversion[i];
+                }
+                ss << " \"name\": \"age_to_length_conversion\",\n";
+                ss << " \"id\":" << fleet_interface->age_to_length_conversion.id_m << ",\n";
                 ss << " \"type\": \"vector\",\n";
-                // ss << " \"values\": " << fleet_interface->age_length_conversion_matrix << "\n}\n";
-            }
-            ss << "], \"derived_quantities\": [{\n";
-            ss << "  \"name\": \"cnaa\",\n";
-            ss << " \"dimensions\" : [" << this->make_dimensions(1, fleet->nyears + 1) << "],";
-            ss << "  \"values\":[";
-            if (derived_caa.size() == 0)
-            {
-                ss << "]\n";
-            }
-            else
-            {
-                for (size_t i = 0; i < derived_caa.size() - 1; i++)
-                {
-                    ss << derived_caa[i] << ", ";
-                }
-                ss << derived_caa[derived_caa.size() - 1] << "]\n";
-            }
-            ss << ",stdev: [" << fims::Vector<double>(derived_caa.size(), -999) << "]\n";
-            ss << " },\n";
-            ss << " {\n";
-            ss << "  \"name\": \"cnal\",\n";
-            ss << "  \"values\":[";
-            if (derived_cal.size() == 0)
-            {
-                ss << "]\n";
-            }
-            else
-            {
-                for (size_t i = 0; i < derived_cal.size() - 1; i++)
-                {
-                    ss << derived_cal[i] << ", ";
-                }
-                ss << derived_cal[derived_cal.size() - 1] << "]\n";
-            }
-            ss << " },\n";
-            ss << " {\n";
-            ss << "  \"name\": \"cwaa\",\n";
-            ss << "  \"values\":[";
-            if (derived_cwaa.size() == 0)
-            {
-                ss << "]\n";
-            }
-            else
-            {
-                for (size_t i = 0; i < derived_cwaa.size() - 1; i++)
-                {
-                    ss << derived_cwaa[i] << ", ";
-                }
-                ss << derived_cwaa[derived_cwaa.size() - 1] << "]\n";
-            }
-            ss << ",stdev: [" << fims::Vector<double>(derived_cwaa.size(), -999) << "]\n";
-            ss << " },\n";
-            ss << " {\n";
-            ss << "  \"name\": \"proportion_catch_numbers_at_age\",\n";
-            ss << "  \"values\":[";
-            if (derived_proportion_cnaa.size() == 0)
-            {
-                ss << "]\n";
-            }
-            else
-            {
-                for (size_t i = 0; i < derived_proportion_cnaa.size() - 1; i++)
-                {
-                    ss << derived_proportion_cnaa[i] << ", ";
-                }
-                ss << derived_proportion_cnaa[derived_proportion_cnaa.size() - 1] << "]\n";
-            }
-            ss << ",stdev: [" << fims::Vector<double>(derived_proportion_cnaa.size(), -999) << "]\n";
-            ss << " },\n";
-            ss << " {\n";
-            ss << "  \"name\": \"proportion_catch_numbers_at_length\",\n";
-            ss << "  \"values\":[";
-            if (derived_proportion_cnal.size() == 0)
-            {
-                ss << "]\n";
-                ss << ",stdev: []\n";
-            }
-            else
-            {
-                for (size_t i = 0; i < derived_proportion_cnal.size() - 1; i++)
-                {
-                    ss << derived_proportion_cnal[i] << ", ";
-                }
-                ss << derived_proportion_cnal[derived_proportion_cnal.size() - 1] << "]\n";
-                ss << ",stdev: [" << fims::Vector<double>(derived_proportion_cnal.size(), -999) << "]\n";
+                ss << " \"values\": " << fleet_interface->age_to_length_conversion << "\n}\n";
             }
 
-            ss << " }\n";
-            // ss << " {\n";
-            // ss << "  \"name\": \"expected_index\",\n";
-            // ss << "  \"values\":[";
-            // if (derived_index.size() == 0)
-            // {
-            //     ss << "]\n";
-            // }
-            // else
-            // {
-            //     for (size_t i = 0; i < derived_index.size() - 1; i++)
-            //     {
-            //         ss << derived_index[i] << ", ";
-            //     }
-            //     ss << derived_index[derived_index.size() - 1] << "]\n";
-            // }
-            // ss << " }\n";
-            // ss << " {\n";
-            // ss << "  \"name\": \"expected_catch\",\n";
-            // ss << "  \"values\":[";
-            // if (derived_catch.size() == 0)
-            // {
-            //     ss << "]\n";
-            // }
-            // else
-            // {
-            //     for (size_t i = 0; i < derived_catch.size() - 1; i++)
-            //     {
-            //         ss << derived_catch[i] << ", ";
-            //     }
-            //     ss << derived_catch[derived_catch.size() - 1] << "]\n";
-            // }
-            // ss << " },\n";
-            // ss << " {\n";
-            // ss << "  \"name\": \"age_composition \",\n";
-            // ss << "  \"values\":[";
-            // if (derived_age_comp.size() == 0)
-            // {
-            //     ss << "]\n";
-            // }
-            // else
-            // {
-            //     for (size_t i = 0; i < derived_age_comp.size() - 1; i++)
-            //     {
-            //         ss << derived_age_comp[i] << ", ";
-            //     }
-            //     ss << derived_age_comp[derived_age_comp.size() - 1] << "]\n";
-            // }
-            // ss << " },\n";
-            // ss << " {\n";
-            // ss << "  \"name\": \"length_composition \",\n";
-            // ss << "  \"values\":[";
-            // if (derived_length_comp.size() == 0)
-            // {
-            //     ss << "]\n";
-            // }
-            // else
-            // {
-            //     for (size_t i = 0; i < derived_length_comp.size() - 1; i++)
-            //     {
-            //         ss << derived_length_comp[i] << ", ";
-            //     }
-            //     ss << derived_length_comp[derived_length_comp.size() - 1] << "]\n";
-            // }
-            // ss << " }\n]\n";
-            ss << "]}";
+            ss << "], \"derived_quantities\": [";
+            fims_popdy::CatchAtAge<double>::fleet_derived_quantities_iterator cit;
+            if (cit != model_ptr->population_derived_quantities.end())
+            {
+                ss << model_ptr->fleet_derived_quantities_to_json(cit);
+            }
+            else
+            {
+                ss << " ]\n";
+            }
         }
         else
         {
             ss << "{\n";
             ss << " \"name\" : \"Fleet\",\n";
-
             ss << " \"type\" : \"fleet\",\n";
             ss << " \"tag\" : \"" << fleet_interface->get_id() << " not found in Information.\",\n}";
         }
@@ -979,12 +849,15 @@ public:
 
     virtual bool add_to_fims_tmb()
     {
-        FIMS_INFO_LOG("adding CAA model object to TMB");
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+#ifdef TMBAD_FRAMEWORK
+        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
         this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
         this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
         this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
         this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-
+#endif
         return true;
     }
 

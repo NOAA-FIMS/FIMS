@@ -81,6 +81,62 @@ namespace fims_popdy
             return ss.str();
         }
 
+        std::string fleet_derived_quantities_to_json(fleet_derived_quantities_iterator fdqit)
+        {
+            std::stringstream ss;
+            ss << "{\n";
+            ss << "\"id\": " << (*fdqit).first << ",\n";
+            ss << "\"derived_quantities\": [\n";
+
+            typename std::map<std::string, fims::Vector<Type>>::iterator it;
+            typename std::map<std::string, fims::Vector<Type>>::iterator end_it;
+            end_it = (*fdqit).second.end();
+            typename std::map<std::string, fims::Vector<Type>>::iterator second_to_last;
+            second_to_last = (*fdqit).second.end();
+            if (it != end_it)
+            {
+                second_to_last--;
+            }
+
+            it = (*fdqit).second.begin();
+            for (; it != second_to_last; ++it)
+            {
+                ss << this->DerivedQuantityToJSON(it) << ",\n";
+            }
+            //                    ++it;
+            ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
+
+            return ss.str();
+        }
+
+        std::string population_derived_quantities_to_json(population_derived_quantities_iterator pdqit)
+        {
+            std::stringstream ss;
+            ss << "{\n";
+            ss << "\"id\": " << (*pdqit).first << ",\n";
+            ss << "\"derived_quantities\": [\n";
+
+            typename std::map<std::string, fims::Vector<Type>>::iterator it;
+            typename std::map<std::string, fims::Vector<Type>>::iterator end_it;
+            end_it = (*pdqit).second.end();
+            typename std::map<std::string, fims::Vector<Type>>::iterator second_to_last;
+            second_to_last = (*pdqit).second.end();
+            if (it != end_it)
+            {
+                second_to_last--;
+            }
+
+            it = (*pdqit).second.begin();
+            for (; it != second_to_last; ++it)
+            {
+                ss << this->DerivedQuantityToJSON(it) << ",\n";
+            }
+            //                    ++it;
+            ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
+
+            return ss.str();
+        }
+
         /**
          * This function is used to convert the derived quantities of a population or fleet
          * to a JSON string.
