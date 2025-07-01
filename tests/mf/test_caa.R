@@ -281,6 +281,19 @@ system.time( obj <- TMB::MakeADFun(
   silent = TRUE
 ))
 
+# Optimization with nlminb
+ opt <- NULL
+   opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
+     control = list(eval.max = 10000, iter.max = 10000, trace = 0)
+)
+
+opt
+max(abs(obj$gr(opt$par))) # check gradient at the optimum
+obj$gr(opt$par)
+q()
+
+
+
 opt <- minimizR(obj[["par"]], # initial parameters values
   obj[["fn"]], # objective function
   obj[["gr"]], # gradient function
@@ -296,14 +309,7 @@ opt
 write(caa$get_output(), "caa.json")
 q()
 
-# Optimization with nlminb
- opt <- NULL
-   opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-     control = list(eval.max = 10000, iter.max = 10000, trace = 0)
-)
 
-opt
-q()
 
 
 
