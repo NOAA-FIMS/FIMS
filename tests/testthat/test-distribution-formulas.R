@@ -34,11 +34,16 @@ recruitment$logit_steep[1]$estimation_type$set("constant")
 # normal space. The log is taken in the likelihood calculations alternative
 # setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
 recruitment$log_devs$resize(om_input$nyr - 1)
+recruitment$log_devs$set_all_estimable(TRUE)
+recruitment$log_r$resize(om_input$nyr - 1)
+recruitment$log_r$set_all_random(TRUE)
+
 logR_resid <- om_input$logR.resid[-1]
 purrr::walk(
   seq_along(logR_resid),
   \(x) recruitment$log_devs[x]$value <- logR_resid[x]
 )
+
 
 # set up logR_sd using the normal log_sd parameter
 recruitment_distribution <- initialize_process_distribution(
@@ -48,7 +53,6 @@ recruitment_distribution <- initialize_process_distribution(
   sd = list(value = om_input$logR_sd, estimation_type = "constant"),
   is_random_effect = FALSE
 )
-recruitment$log_devs$set_all_estimable(TRUE)
 
 # Set up fishing fleet modules to test initialize_data_distribution
 catch <- em_input$L.obs$fleet1
@@ -84,25 +88,44 @@ fishing_fleet_index_distribution1 <- initialize_data_distribution(
 fishing_fleet_index_distribution2 <- initialize_data_distribution(
   module = fishing_fleet,
   family = stats::gaussian(link = "log"),
-  sd = list(value = fleet_sd, estimation_type = "fixed_effects"),
+  sd = list(value = fleet_sd[1], estimation_type = "fixed_effects"),
   data_type = "index"
 )
 
+
 ## IO correctness ----
-test_that("distribution formulas work with correct inputs", {
-  #' @description Test that io of initialize_process_distribution() works.
+test_that("initialize_process_distribution() works with correct inputs", {
+  #' @description Test that [initialize_process_distribution()] returns
+  #' the correct log sd values when scalar.
   expect_equal(log(om_input$logR_sd), recruitment_distribution$log_sd[1]$value)
+
+  #' @description Test that [initialize_process_distribution()] returns
+  #' the correct dimension for x values.
   expect_equal(length(recruitment$log_devs), length(recruitment_distribution$x))
+
+  #' @description Test that [initialize_process_distribution()] matches
+  #' the dimesnions of x and expected values.
   expect_equal(
     length(recruitment_distribution$x),
     length(recruitment_distribution$expected_values)
   )
+})
 
-  #' @description Test that io of initialize_data_distribution() works.
+test_that("initialize_data_distribution() works with correct inputs", {
+  #' @description Test that [initialize_data_distribution()] returns
+  #' the correct log sd values when vector.
   expect_equal(
     log(fleet_sd[1]),
     fishing_fleet_index_distribution1$log_sd[1]$value
   )
+  #' @description Test that [initialize_data_distribution()] returns
+  #' the correct log sd estimation type
+  expect_equal(
+    "constant",
+    fishing_fleet_index_distribution1$log_sd[1]$estimation_type$get()
+  )
+  #' @description Test that [initialize_data_distribution() returns
+  #' the correct log sd values when scalar.
   expect_equal(
     log(fleet_sd[1]),
     fishing_fleet_index_distribution2$log_sd[1]$value
@@ -110,34 +133,8 @@ test_that("distribution formulas work with correct inputs", {
 })
 
 ## Edge handling ----
-# TODO: Andrea to add edge handling tests
-# test_that("distribution_formulas_new() returns correct outputs for edge cases", {
-#   #' @description Test that distribution_formulas_new(x) returns an error.
-
-# })
-
-## Error handling ----
-test_that("distribution_formulas_new() returns correct error messages", {
-  #' @description Test that initialize_process_distribution returns expected
-  #' error.
-  expect_error(
-    initialize_process_distribution(
-      module = recruitment,
-      par = "log_devs",
-      family = multinomial(),
-      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
-      is_random_effect = FALSE
-    )
-  )
-  expect_error(
-    initialize_process_distribution(
-      module = recruitment,
-      par = "log_devs",
-      family = binomial(),
-      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
-      is_random_effect = FALSE
-    )
-  )
+test_that("sd value must be greater than 0", {
+  #' @description Test that error is thrown when sd value is out of bounds
   expect_error(
     initialize_process_distribution(
       module = recruitment,
@@ -145,8 +142,42 @@ test_that("distribution_formulas_new() returns correct error messages", {
       family = gaussian(),
       sd = list(value = -1, estimation_type = "constant"),
       is_random_effect = FALSE
-    )
+    ),
+    "are out of bounds"
   )
+})
+
+
+## Error handling ----
+test_that("initialize_process_distribution returns correct error messages", {
+  #' @description Test that multinomial cannot be specified as a family
+  #' in [initialize_process_distribution())
+  expect_error(
+    initialize_process_distribution(
+      module = recruitment,
+      par = "log_devs",
+      family = multinomial(),
+      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
+      is_random_effect = FALSE
+    ),
+    "FIMS currently does not allow the family"
+  )
+
+  #' @description Test that error is thrown when incorrect family specified for
+  #' [initialize_process_distribution()]
+  expect_error(
+    initialize_process_distribution(
+      module = recruitment,
+      par = "log_devs",
+      family = binomial(),
+      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
+      is_random_effect = FALSE
+    ),
+    "FIMS currently does not allow the family"
+  )
+
+  #' @description Test that error is thrown when vector size of sd value
+  #' and estimation_type do not match
   expect_error(
     initialize_process_distribution(
       module = recruitment,
@@ -157,64 +188,129 @@ test_that("distribution_formulas_new() returns correct error messages", {
         estimation_type = rep("constant", 2)
       ),
       is_random_effect = FALSE
-    )
+    ),
+    "must match"
   )
 
-  #' @description Test that initialize_data_distribution returns expected error.
+  #' @description Test that error is thrown when family is not a family class
+  expect_error(
+    initialize_process_distribution(
+      module = recruitment,
+      par = "log_devs",
+      family = "normal",
+      sd = list(
+        value = rep(om_input$logR_sd, 3),
+        estimation_type = "constant"
+      ),
+      is_random_effect = FALSE
+    ),
+    "should be an object of class"
+  )
+
+  #' @description Test that error is thrown when sd estimation type is missing
+  expect_error(
+    initialize_process_distribution(
+      module = recruitment,
+      par = "log_devs",
+      family = gaussian(),
+      sd = list(value = 1),
+      is_random_effect = FALSE
+    ),
+    "need to be present"
+  )
+})
+
+
+test_that("initialize_data_distribution returns correct error messages", {
+  #' @description Test that error is thrown when family and index data type
+  #' don't match in [initialize_data_distribution()]
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
       sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "index"
-    )
+    ),
+    "does not allow the family to be"
   )
+
+  #' @description Test that error is thrown when family and landings data type
+  #' don't match in [initialize_data_distribution()]
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
       sd = list(value = fleet_sd, estimation_type = "constant"),
-      data_type = "index"
-    )
+      data_type = "landings"
+    ),
+    "does not allow the family to be"
   )
+
+  #' @description Test that error is thrown when family and agecomp data type
+  #' don't match in [initialize_data_distribution()]
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
       family = gaussian(),
       sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "agecomp"
-    )
+    ),
+    "does not allow the family to be"
   )
+
+  #' @description Test that error is thrown when family and lengthcomp data type
+  #' don't match in [initialize_data_distribution()]
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
       family = lognormal(),
       sd = list(value = fleet_sd, estimation_type = "constant"),
       data_type = "lengthcomp"
-    )
+    ),
+    "does not allow the family to be"
   )
+
+  #' @description Test that error is thrown when data type is incorrect in
+  #' [initialize_data_distribution()]
+  expect_error(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      family = lognormal(),
+      sd = list(value = fleet_sd, estimation_type = "constant"),
+      data_type = "length_comp"
+    ),
+    "must be one of"
+  )
+
+  #' @description Test that error is thrown when sd value and estimation_type
+  #' dimensions do not match
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
       sd = list(value = fleet_sd, estimation_type = c("constant", "constant")),
       data_type = "agecomp"
-    )
+    ),
+    "must match if more than one value"
   )
+
+  #' @description Test that error is thrown when sd value is missing
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
       family = multinomial(),
-      sd = list(value = fleet_sd),
+      sd = list(estimation_type = "constant"),
       data_type = "agecomp"
-    )
+    ),
+    "need to be present"
   )
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
       sd = list(value = fleet_sd),
       data_type = "agecomp"
-    )
+    ),
+    "is missing from"
   )
   clear()
 })
