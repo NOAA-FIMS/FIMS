@@ -59,7 +59,7 @@ namespace fims_popdy
         {
             fims::Vector<Type> &dq = (*it).second;
             std::stringstream ss;
-
+            // ss << std::fixed;
             ss << "{\n";
             ss << "\"name\":\"" << (*it).first << "\",\n";
             ss << "\"values\":[";
@@ -68,9 +68,24 @@ namespace fims_popdy
             {
                 for (size_t i = 0; i < dq.size() - 1; i++)
                 {
-                    ss << dq[i] << ", ";
+                    if (dq[i] != dq[i]) // check for NaN
+                    {
+                        ss << "\"nan\", ";
+                    }
+                    else
+                    {
+                        ss << dq[i] << ", ";
+                    }
                 }
-                ss << dq[dq.size() - 1] << "]\n";
+                if (dq[dq.size() - 1] != dq[dq.size() - 1]) // check for NaN
+                {
+                    ss << "\"nan\"";
+                }
+                else
+                {
+                    ss << dq[dq.size() - 1]<< "]\n";
+
+                }
             }
             else
             {
@@ -84,9 +99,9 @@ namespace fims_popdy
         std::string fleet_derived_quantities_to_json(fleet_derived_quantities_iterator fdqit)
         {
             std::stringstream ss;
-            ss << "{\n";
-            ss << "\"id\": " << (*fdqit).first << ",\n";
-            ss << "\"derived_quantities\": [\n";
+            // ss << std::fixed;
+  
+            // ss << "\"derived_quantities\": [\n";
 
             typename std::map<std::string, fims::Vector<Type>>::iterator it;
             typename std::map<std::string, fims::Vector<Type>>::iterator end_it;
@@ -104,7 +119,7 @@ namespace fims_popdy
                 ss << this->DerivedQuantityToJSON(it) << ",\n";
             }
             //                    ++it;
-            ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
+            ss << this->DerivedQuantityToJSON(second_to_last) << "\n";
 
             return ss.str();
         }
@@ -112,9 +127,10 @@ namespace fims_popdy
         std::string population_derived_quantities_to_json(population_derived_quantities_iterator pdqit)
         {
             std::stringstream ss;
-            ss << "{\n";
-            ss << "\"id\": " << (*pdqit).first << ",\n";
-            ss << "\"derived_quantities\": [\n";
+            // ss << std::fixed;
+            // ss << "{\n";
+            // ss << "\"id\": " << (*pdqit).first << ",\n";
+            // ss << "\"derived_quantities\": [\n";
 
             typename std::map<std::string, fims::Vector<Type>>::iterator it;
             typename std::map<std::string, fims::Vector<Type>>::iterator end_it;
@@ -132,7 +148,7 @@ namespace fims_popdy
                 ss << this->DerivedQuantityToJSON(it) << ",\n";
             }
             //                    ++it;
-            ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
+            ss << this->DerivedQuantityToJSON(second_to_last) << "\n";
 
             return ss.str();
         }
@@ -144,131 +160,131 @@ namespace fims_popdy
         std::string ToJSON()
         {
 
-            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator pit;
-            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator end_pit;
-            end_pit = this->population_derived_quantities.end();
-            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator second_to_last_pit;
-            second_to_last_pit = this->population_derived_quantities.end();
-            if (pit != end_pit)
-            {
-                second_to_last_pit--;
-            }
+            // typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator pit;
+            // typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator end_pit;
+            // end_pit = this->population_derived_quantities.end();
+            // typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator second_to_last_pit;
+            // second_to_last_pit = this->population_derived_quantities.end();
+            // if (pit != end_pit)
+            // {
+            //     second_to_last_pit--;
+            // }
 
-            std::stringstream ss;
-            ss << "{\n";
-            ss << "\"Populations\":[\n";
-            pit = this->population_derived_quantities.begin();
-            for (; pit != second_to_last_pit; pit++)
-            {
-                ss << "{\n";
-                ss << "\"id\": " << (*pit).first << ",\n";
-                ss << "\"derived_quantities\": [\n";
+            // std::stringstream ss;
+            // ss << "{\n";
+            // ss << "\"Populations\":[\n";
+            // pit = this->population_derived_quantities.begin();
+            // for (; pit != second_to_last_pit; pit++)
+            // {
+            //     ss << "{\n";
+            //     ss << "\"id\": " << (*pit).first << ",\n";
+            //     ss << "\"derived_quantities\": [\n";
 
-                typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-                typename fims_popdy::Population<Type>::derived_quantities_iterator end_it;
-                typename fims_popdy::Population<Type>::derived_quantities_iterator second_to_last;
+            //     typename fims_popdy::Population<Type>::derived_quantities_iterator it;
+            //     typename fims_popdy::Population<Type>::derived_quantities_iterator end_it;
+            //     typename fims_popdy::Population<Type>::derived_quantities_iterator second_to_last;
 
-                it = (*pit).second.begin();
-                end_it = (*pit).second.end();
-                second_to_last = (*pit).second.end();
-                if (it != end_it)
-                {
-                    second_to_last--;
-                }
+            //     it = (*pit).second.begin();
+            //     end_it = (*pit).second.end();
+            //     second_to_last = (*pit).second.end();
+            //     if (it != end_it)
+            //     {
+            //         second_to_last--;
+            //     }
 
-                for (; it != second_to_last; ++it)
-                {
-                    ss << this->DerivedQuantityToJSON(it) << ",\n";
-                }
-                //                    ++it;
-                ss << this->DerivedQuantityToJSON(second_to_last) << "\n]},\n";
-            }
+            //     for (; it != second_to_last; ++it)
+            //     {
+            //         ss << this->DerivedQuantityToJSON(it) << ",\n";
+            //     }
+            //     //                    ++it;
+            //     ss << this->DerivedQuantityToJSON(second_to_last) << "\n]},\n";
+            // }
 
-            ss << "{\n";
-            ss << "\"id\": " << (*second_to_last_pit).first << ",\n";
-            ss << "\"derived_quantities\": [\n";
+            // ss << "{\n";
+            // ss << "\"id\": " << (*second_to_last_pit).first << ",\n";
+            // ss << "\"derived_quantities\": [\n";
 
-            typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-            typename fims_popdy::Population<Type>::derived_quantities_iterator end_it;
-            typename fims_popdy::Population<Type>::derived_quantities_iterator second_to_last;
+            // typename fims_popdy::Population<Type>::derived_quantities_iterator it;
+            // typename fims_popdy::Population<Type>::derived_quantities_iterator end_it;
+            // typename fims_popdy::Population<Type>::derived_quantities_iterator second_to_last;
 
-            it = (*second_to_last_pit).second.begin();
-            end_it = (*second_to_last_pit).second.end();
-            second_to_last = (*second_to_last_pit).second.end();
-            if (it != end_it)
-            {
-                second_to_last--;
-            }
+            // it = (*second_to_last_pit).second.begin();
+            // end_it = (*second_to_last_pit).second.end();
+            // second_to_last = (*second_to_last_pit).second.end();
+            // if (it != end_it)
+            // {
+            //     second_to_last--;
+            // }
 
-            for (; it != second_to_last; ++it)
-            {
-                ss << this->DerivedQuantityToJSON(it) << ",\n";
-            }
-            //                    ++it;
-            ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
+            // for (; it != second_to_last; ++it)
+            // {
+            //     ss << this->DerivedQuantityToJSON(it) << ",\n";
+            // }
+            // //                    ++it;
+            // ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
 
-            ss << "],\n";
+            // ss << "],\n";
 
-            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator fit;
-            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator end_fit;
-            end_fit = this->fleet_derived_quantities.end();
-            typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator second_to_last_fit;
-            second_to_last_fit = this->fleet_derived_quantities.end();
-            if (fit != end_fit)
-            {
-                second_to_last_fit--;
-            }
-            ss << "\"Fleets\":[\n";
+            // typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator fit;
+            // typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator end_fit;
+            // end_fit = this->fleet_derived_quantities.end();
+            // typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>::iterator second_to_last_fit;
+            // second_to_last_fit = this->fleet_derived_quantities.end();
+            // if (fit != end_fit)
+            // {
+            //     second_to_last_fit--;
+            // }
+            // ss << "\"Fleets\":[\n";
 
-            fit = this->fleet_derived_quantities.begin();
-            for (; fit != second_to_last_fit; fit++)
-            {
-                ss << "{\n";
-                ss << "\"id\": " << (*fit).first << ",\n";
-                ss << "\"derived_quantities\": [\n";
-                typename fims_popdy::Fleet<Type>::derived_quantities_iterator it;
-                typename fims_popdy::Fleet<Type>::derived_quantities_iterator end_it;
-                typename fims_popdy::Fleet<Type>::derived_quantities_iterator second_to_last;
-                it = (*fit).second.begin();
-                end_it = (*fit).second.end();
-                second_to_last = (*fit).second.end();
-                if (it != end_it)
-                {
-                    second_to_last--;
-                }
+            // fit = this->fleet_derived_quantities.begin();
+            // for (; fit != second_to_last_fit; fit++)
+            // {
+            //     ss << "{\n";
+            //     ss << "\"id\": " << (*fit).first << ",\n";
+            //     ss << "\"derived_quantities\": [\n";
+            //     typename fims_popdy::Fleet<Type>::derived_quantities_iterator it;
+            //     typename fims_popdy::Fleet<Type>::derived_quantities_iterator end_it;
+            //     typename fims_popdy::Fleet<Type>::derived_quantities_iterator second_to_last;
+            //     it = (*fit).second.begin();
+            //     end_it = (*fit).second.end();
+            //     second_to_last = (*fit).second.end();
+            //     if (it != end_it)
+            //     {
+            //         second_to_last--;
+            //     }
 
-                for (; it != second_to_last; ++it)
-                {
-                    ss << this->DerivedQuantityToJSON(it) << ",\n";
-                }
-                //                    ++it;
-                ss << this->DerivedQuantityToJSON(second_to_last) << "\n]},\n";
-            }
+            //     for (; it != second_to_last; ++it)
+            //     {
+            //         ss << this->DerivedQuantityToJSON(it) << ",\n";
+            //     }
+            //     //                    ++it;
+            //     ss << this->DerivedQuantityToJSON(second_to_last) << "\n]},\n";
+            // }
 
-            ss << "{\n";
-            ss << "\"id\": " << (*second_to_last_fit).first << ",\n";
-            ss << "\"derived_quantities\": [\n";
-            typename fims_popdy::Fleet<Type>::derived_quantities_iterator it_;
-            typename fims_popdy::Fleet<Type>::derived_quantities_iterator end_it_;
-            typename fims_popdy::Fleet<Type>::derived_quantities_iterator second_to_last_;
-            it_ = (*second_to_last_fit).second.begin();
-            end_it_ = (*second_to_last_fit).second.end();
-            second_to_last_ = (*second_to_last_fit).second.end();
-            if (it_ != end_it_)
-            {
-                second_to_last--;
-            }
+            // ss << "{\n";
+            // ss << "\"id\": " << (*second_to_last_fit).first << ",\n";
+            // ss << "\"derived_quantities\": [\n";
+            // typename fims_popdy::Fleet<Type>::derived_quantities_iterator it_;
+            // typename fims_popdy::Fleet<Type>::derived_quantities_iterator end_it_;
+            // typename fims_popdy::Fleet<Type>::derived_quantities_iterator second_to_last_;
+            // it_ = (*second_to_last_fit).second.begin();
+            // end_it_ = (*second_to_last_fit).second.end();
+            // second_to_last_ = (*second_to_last_fit).second.end();
+            // if (it_ != end_it_)
+            // {
+            //     second_to_last--;
+            // }
 
-            for (; it_ != second_to_last_; ++it_)
-            {
-                ss << this->DerivedQuantityToJSON(it) << ",\n";
-            }
-            //                    ++it;
-            ss << this->DerivedQuantityToJSON(second_to_last_) << "\n]}\n";
-            ss << "]\n";
-            ss << "}\n";
+            // for (; it_ != second_to_last_; ++it_)
+            // {
+            //     ss << this->DerivedQuantityToJSON(it) << ",\n";
+            // }
+            // //                    ++it;
+            // ss << this->DerivedQuantityToJSON(second_to_last_) << "\n]}\n";
+            // ss << "]\n";
+            // ss << "}\n";
 
-            return ss.str();
+            // return ss.str();
         }
 
         /**

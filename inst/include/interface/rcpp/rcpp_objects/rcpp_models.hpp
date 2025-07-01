@@ -225,11 +225,11 @@ public:
 
             if (cit != model_ptr->population_derived_quantities.end())
             {
-                ss << model_ptr->population_derived_quantities_to_json(cit);
+                ss << model_ptr->population_derived_quantities_to_json(cit)<<"]}\n";
             }
             else
             {
-                ss << " ]\n";
+                ss << " ]}\n";
             }
         }
         else
@@ -254,7 +254,7 @@ public:
      * @brief Method to convert a fleet to a JSON string.
      */
     std::string
-    fleets_to_json(FleetInterface *fleet_interface)
+    fleet_to_json(FleetInterface *fleet_interface)
     {
         std::stringstream ss;
 
@@ -333,14 +333,16 @@ public:
             }
 
             ss << "], \"derived_quantities\": [";
-            fims_popdy::CatchAtAge<double>::fleet_derived_quantities_iterator cit;
-            if (cit != model_ptr->population_derived_quantities.end())
+            fims_popdy::CatchAtAge<double>::fleet_derived_quantities_iterator fit;
+            fit = model_ptr->fleet_derived_quantities.find(fleet_interface->get_id());
+
+            if (fit != model_ptr->fleet_derived_quantities.end())
             {
-                ss << model_ptr->fleet_derived_quantities_to_json(cit);
+                ss << model_ptr->fleet_derived_quantities_to_json(fit)<<"]}\n";
             }
             else
             {
-                ss << " ]\n";
+                ss << " ]}\n";
             }
         }
         else
@@ -348,7 +350,8 @@ public:
             ss << "{\n";
             ss << " \"name\" : \"Fleet\",\n";
             ss << " \"type\" : \"fleet\",\n";
-            ss << " \"tag\" : \"" << fleet_interface->get_id() << " not found in Information.\",\n}";
+            ss << " \"tag\" : \"" << fleet_interface->get_id() << " not found in Information.\",\n";
+            ss << " \"derived_quantities\": []}\n";
         }
         return ss.str();
     }
@@ -359,14 +362,117 @@ public:
     virtual std::string to_json()
     {
 
+        std::set<uint32_t> fleet_ids;
+        // typename std::set<uint32_t>::iterator fleet_it;
         std::shared_ptr<fims_info::Information<double>> info =
             fims_info::Information<double>::GetInstance();
         std::shared_ptr<fims_popdy::CatchAtAge<double>> model =
             std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(info->models_map[this->get_id()]);
 
         std::stringstream ss;
-        ss << model->ToJSON();
 
+        ss << "{\n";
+        ss << " \"name\" : \"CatchAtAge\",\n";
+        ss << " \"type\" : \"model\",\n";
+        // ss << " \"tag\" : \"" << model->name << "\",\n";
+        ss << " \"id\": " << this->get_id() << ",\n";
+        ss << " \"population_ids\": [";
+        typename std::set<uint32_t>::iterator pit;
+        for (pit = this->population_ids->begin(); pit != this->population_ids->end(); pit++)
+        {
+            ss << *pit;
+            if (std::next(pit) != this->population_ids->end())
+            {
+                ss << ", ";
+            }
+        }
+        ss << "],\n";
+        ss << "\"populations\": [\n";
+        typename std::set<uint32_t>::iterator pop_it;
+        typename std::set<uint32_t>::iterator pop_end_it;
+        pop_end_it = this->population_ids->end();
+        typename std::set<uint32_t>::iterator pop_second_to_last_it;
+        if (pop_end_it != this->population_ids->begin())
+        {
+            pop_second_to_last_it = std::prev(pop_end_it);
+        }
+        else
+        {
+            pop_second_to_last_it = pop_end_it;
+        }
+
+        for (pop_it = this->population_ids->begin(); pop_it != pop_second_to_last_it; pop_it++)
+        {
+            std::shared_ptr<PopulationInterface> population_interface = std::dynamic_pointer_cast<PopulationInterface>(PopulationInterfaceBase::live_objects[*pop_it]);
+            if (population_interface)
+            {
+                std::set<uint32_t>::iterator fids;
+                for (fids = population_interface->fleet_ids->begin(); fids != population_interface->fleet_ids->end(); fids++)
+                {
+                    fleet_ids.insert(*fids);
+                }
+                ss << this->population_to_json(population_interface.get()) << ",";
+            }
+            else
+            {
+                FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) + " not found in live objects.");
+                ss << "{}"; // Return empty JSON for this population
+            }
+        }
+
+        std::shared_ptr<PopulationInterface> population_interface = std::dynamic_pointer_cast<PopulationInterface>(PopulationInterfaceBase::live_objects[*pop_second_to_last_it]);
+        if (population_interface)
+        {
+            std::set<uint32_t>::iterator fids;
+            for (fids = population_interface->fleet_ids->begin(); fids != population_interface->fleet_ids->end(); fids++)
+            {
+                fleet_ids.insert(*fids);
+            }
+            ss << this->population_to_json(population_interface.get());
+        }
+        else
+        {
+            FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) + " not found in live objects.");
+            ss << "{}"; // Return empty JSON for this population
+        }
+
+        ss << "]";
+        ss << ",\n";
+        ss << "\"fleets\": [\n";
+        typename std::set<uint32_t>::iterator fleet_it;
+        typename std::set<uint32_t>::iterator fleet_end_it;
+        fleet_end_it = fleet_ids.end();
+        typename std::set<uint32_t>::iterator fleet_second_to_last_it;
+        if (fleet_end_it != fleet_ids.begin())
+        {
+            fleet_second_to_last_it = std::prev(fleet_end_it);
+        }
+
+        for (fleet_it = fleet_ids.begin(); fleet_it != fleet_second_to_last_it; fleet_it++)
+        {
+            std::shared_ptr<FleetInterface> fleet_interface = std::dynamic_pointer_cast<FleetInterface>(FleetInterfaceBase::live_objects[*fleet_it]);
+            if (fleet_interface)
+            {
+                ss << this->fleet_to_json(fleet_interface.get()) << ",";
+            }
+            else
+            {
+                FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*fleet_it) + " not found in live objects.");
+                ss << "{}"; // Return empty JSON for this fleet
+            }
+        }
+        std::shared_ptr<FleetInterface> fleet_interface = std::dynamic_pointer_cast<FleetInterface>(FleetInterfaceBase::live_objects[*fleet_second_to_last_it]);
+        if (fleet_interface)
+        {
+            ss << this->fleet_to_json(fleet_interface.get());
+        }
+        else
+        {
+            FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*fleet_it) + " not found in live objects.");
+            ss << "{}"; // Return empty JSON for this fleet
+        }
+
+        ss << "]\n}";
         return fims::JsonParser::PrettyFormatJSON(ss.str());
     }
 
