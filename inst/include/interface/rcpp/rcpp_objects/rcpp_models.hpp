@@ -204,94 +204,43 @@ public:
             ss << " \"maturity_id\": " << population_interface->maturity_id << ",\n";
 
             ss << " \"parameters\": [\n{\n";
+            for (size_t i = 0; i < populations->log_M.size() - 1; i++)
+            {
+                pop->log_M[i].value_m = population->log_M[i];
+            }
+
             ss << " \"name\": \"log_M\",\n";
             ss << " \"id\":" << population_interface->log_M.id_m << ",\n";
             ss << " \"type\": \"vector\",\n";
             ss << " \"values\": " << population_interface->log_M << "\n},\n";
 
             ss << "{\n";
+
+            for (size_t i = 0; i < populations->log_init_naa.size() - 1; i++)
+            {
+                pop->log_init_naa[i].value_m = population->log_init_naa[i];
+            }
             ss << "  \"name\": \"log_init_naa\",\n";
             ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
             ss << "  \"type\": \"vector\",\n";
             ss << "  \"values\":" << population_interface->log_init_naa << " \n}],\n";
+            fims_popdy::CatchAtAge<double>::population_derived_quantities_iterator cit;
+            ss << " \"derived_quantities\": [\n";
+            cit = model_ptr->population_derived_quantities.find(population_interface->get_id());
 
-            ss << " \"derived_quantities\": [{\n";
-            ss << "  \"name\": \"ssb\",\n";
-            ss << " \"dimensions\" : [" << this->make_dimensions(1, population_interface->nyears + 1) << "],";
-            ss << "  \"values\":[";
-            if (derived_ssb.size() == 0)
+            if (cit != model_ptr->population_derived_quantities.end())
             {
-                ss << "]\n";
+                fims::Vector<double> &dq = (*cit).second;
+                for (size_t i = 0; i < dq.size() - 1; i++)
+                {
+                    ss << this->DerivedQuantityToJSON(dq[i]) << ",\n";
+                }
+                ss << this->DerivedQuantityToJSON(dq[dq.size() - 1]) << "]\n";
             }
             else
             {
-                for (size_t i = 0; i < derived_ssb.size() - 1; i++)
-                {
-                    ss << derived_ssb[i] << ", ";
-                }
-                ss << derived_ssb[derived_ssb.size() - 1] << "]\n";
+                ss << " ]\n";
             }
-            ss << ",stdev: [" << fims::Vector<double>(derived_ssb.size(), -999) << "]\n";
-            ss << " },\n";
-
-            ss << "{\n";
-            ss << "   \"name\": \"naa\",\n";
-            ss << " \"dimensions\" : [[" << this->make_dimensions(1, population_interface->nyears) << "],[" << this->make_dimensions(population_interface->ages[0], population_interface->ages[population_interface->ages.size() - 1], population_interface->nyears + 1) << "]],";
-            ss << "   \"values\":[";
-            if (derived_naa.size() == 0)
-            {
-                ss << "]\n";
-            }
-            else
-            {
-                for (size_t i = 0; i < derived_naa.size() - 1; i++)
-                {
-                    ss << derived_naa[i] << ", ";
-                }
-                ss << derived_naa[derived_naa.size() - 1] << "]\n";
-            }
-            ss << ",stdev: [" << fims::Vector<double>(derived_naa.size(), -999) << "]\n";
-            ss << " },\n";
-
-            ss << "{\n";
-            ss << "   \"name\": \"biomass\",\n";
-            ss << " \"dimensions\" : [" << population_interface->make_dimensions(1, population_interface->nyears + 1) << "],";
-            ss << "   \"values\":[";
-            if (derived_biomass.size() == 0)
-            {
-                ss << "]\n";
-            }
-            else
-            {
-                for (size_t i = 0; i < derived_biomass.size() - 1; i++)
-                {
-                    ss << derived_biomass[i] << ", ";
-                }
-                ss << derived_biomass[derived_biomass.size() - 1] << "]\n";
-            }
-            ss << ",stdev: [" << fims::Vector<double>(derived_biomass.size(), -999) << "]\n";
-            ss << " },\n";
-
-            ss << "{\n";
-            ss << "   \"name\": \"recruitment\",\n";
-            ss << " \"dimensions\" : [" << this->make_dimensions(1, population_interface->nyears + 1) << "],";
-            ss << "   \"values\":[";
-            if (derived_recruitment.size() == 0)
-            {
-                ss << "]\n";
-            }
-            else
-            {
-                for (size_t i = 0; i < derived_recruitment.size() - 1; i++)
-                {
-                    ss << derived_recruitment[i] << ", ";
-                }
-                ss << derived_recruitment[derived_recruitment.size() - 1] << "]\n";
-            }
-            ss << ",stdev: [" << fims::Vector<double>(derived_recruitment.size(), -999) << "]\n";
-            ss << " }\n]\n";
-
-            ss << "}";
         }
         else
         {
@@ -303,6 +252,94 @@ public:
 
 #warning Add error log here
         }
+        // ss << "{\n";
+        // ss << "  \"name\": \"ssb\",\n";
+        // ss << " \"dimensions\" : [" << this->make_dimensions(1, population_interface->nyears + 1) << "],";
+        // ss << "  \"values\":[";
+        // if (derived_ssb.size() == 0)
+        // {
+        //     ss << "]\n";
+        // }
+        // else
+        // {
+        //     for (size_t i = 0; i < derived_ssb.size() - 1; i++)
+        //     {
+        //         ss << derived_ssb[i] << ", ";
+        //     }
+        //     ss << derived_ssb[derived_ssb.size() - 1] << "]\n";
+        // }
+        // ss << ",stdev: [" << fims::Vector<double>(derived_ssb.size(), -999) << "]\n";
+        // ss << " },\n";
+
+        // ss << "{\n";
+        // ss << "   \"name\": \"naa\",\n";
+        // ss << " \"dimensions\" : [[" << this->make_dimensions(1, population_interface->nyears) << "],[" << this->make_dimensions(population_interface->ages[0], population_interface->ages[population_interface->ages.size() - 1], population_interface->nyears + 1) << "]],";
+        // ss << "   \"values\":[";
+        // if (derived_naa.size() == 0)
+        // {
+        //     ss << "]\n";
+        // }
+        // else
+        // {
+        //     for (size_t i = 0; i < derived_naa.size() - 1; i++)
+        //     {
+        //         ss << derived_naa[i] << ", ";
+        //     }
+        //     ss << derived_naa[derived_naa.size() - 1] << "]\n";
+        // }
+        // ss << ",stdev: [" << fims::Vector<double>(derived_naa.size(), -999) << "]\n";
+        // ss << " },\n";
+
+        // ss << "{\n";
+        // ss << "   \"name\": \"biomass\",\n";
+        // ss << " \"dimensions\" : [" << population_interface->make_dimensions(1, population_interface->nyears + 1) << "],";
+        // ss << "   \"values\":[";
+        // if (derived_biomass.size() == 0)
+        // {
+        //     ss << "]\n";
+        // }
+        // else
+        // {
+        //     for (size_t i = 0; i < derived_biomass.size() - 1; i++)
+        //     {
+        //         ss << derived_biomass[i] << ", ";
+        //     }
+        //     ss << derived_biomass[derived_biomass.size() - 1] << "]\n";
+        // }
+        // ss << ",stdev: [" << fims::Vector<double>(derived_biomass.size(), -999) << "]\n";
+        // ss << " },\n";
+
+        // ss << "{\n";
+        // ss << "   \"name\": \"recruitment\",\n";
+        // ss << " \"dimensions\" : [" << this->make_dimensions(1, population_interface->nyears + 1) << "],";
+        // ss << "   \"values\":[";
+        // if (derived_recruitment.size() == 0)
+        // {
+        //     ss << "]\n";
+        // }
+        // else
+        // {
+        //     for (size_t i = 0; i < derived_recruitment.size() - 1; i++)
+        //     {
+        //         ss << derived_recruitment[i] << ", ";
+        //     }
+        //     ss << derived_recruitment[derived_recruitment.size() - 1] << "]\n";
+        // }
+        // ss << ",stdev: [" << fims::Vector<double>(derived_recruitment.size(), -999) << "]\n";
+        // ss << " }\n]\n";
+
+        //             ss << "}";
+        //         }
+        //         else
+        //         {
+        //             ss << "{\n";
+        //             ss << " \"name\" : \"Population\",\n";
+
+        //             ss << " \"type\" : \"population\",\n";
+        //             ss << " \"tag\" : \"" << population_interface->get_id() << " not found in Information.\",\n}";
+
+        // #warning Add error log here
+        //         }
         return ss.str();
     }
 
