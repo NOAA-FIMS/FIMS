@@ -87,7 +87,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
 {
     std::shared_ptr<std::set<uint32_t>> population_ids;
     typedef typename std::set<uint32_t>::iterator population_id_iterator;
-  
+
 public:
     /**
      * @brief The constructor.
@@ -162,8 +162,22 @@ public:
     {
         std::stringstream ss;
 
+        typename std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pi_it; // population interface iterator
+        pi_it = PopulationInterfaceBase::live_objects.find(population_interface->get_id());
+        if (pi_it == PopulationInterfaceBase::live_objects.end())
+        {
+            FIMS_ERROR_LOG("Population with id " + fims::to_string(population_interface->get_id()) + " not found in live objects.");
+            return "{}"; // Return empty JSON
+        }
+
+        std::shared_ptr<PopulationInterface> population_interface_ptr = std::dynamic_pointer_cast(*pi_it).second;
+
         std::shared_ptr<fims_info::Information<double>> info =
             fims_info::Information<double>::GetInstance();
+
+        typename fims_info::Information<double>::model_map_iterator model_it;
+        model_it = info->models_map.find(this->get_id());
+        std::shared_ptr<fims_popdy::CatchAtAge<double>> model_ptr = std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>((*model_it).second);
 
         typename fims_info::Information<double>::population_iterator pit;
 
