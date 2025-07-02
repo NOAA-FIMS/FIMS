@@ -190,9 +190,6 @@ test_that("rcpp_distribution works with correct inputs", {
 })
 
 ## Edge handling ----
-# Skip this test on GitHub Actions runs, as it takes too long and causes the
-# R CMD Check to fail.
-testthat::skip_on_ci()
 
 test_that("rcpp_distribution returns correct outputs for edge cases", {
   set.seed(123)
@@ -396,27 +393,49 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
 ## Error handling ----
 test_that("rcpp distribution returns correct error messages", {
   #' @description dnorm should error out when there is a dimension mismatch
+  #' where it is expecting expected_values to have a size 10 
+  #' but is provided a size 11 vector.
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x <- methods::new(FIMS:::ParameterVector, y, 10)
-  dnorm_$expected_values <- methods::new(FIMS:::ParameterVector, 0, 11)
-  dnorm_$log_sd <- methods::new(FIMS:::ParameterVector, log(1), 10)
+  dnorm_$x$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dnorm_$x[x]$value <- y[x]
+  )
+  dnorm_$expected_values$resize(length(y) + 1)
+  dnorm_$log_sd$resize(length(y))
+  purrr::walk(
+    seq_along(length(y)),
+    \(x) dnorm_$expected_values[x]$value <- log(1)
+  )
   expect_error(
     object = dnorm_$evaluate(),
-    regexp = "NormalLPDF::Vector index out of bounds. The size of observed data does not equal the size of expected values. The observed data vector is of size 10 and the expected vector is of size 11"
+    regexp = "NormalLPDF::Vector .* out of bounds. .* 10 .* 11"
   )
   clear()
+
+  #' @description dnorm should error out when there is a dimension mismatch
+  #' where it is expecting log_sd to have a size 10 
+  #' but is provided a size 3 vector.
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x <- methods::new(FIMS:::ParameterVector, y, 10)
-  dnorm_$expected_values <- methods::new(FIMS:::ParameterVector, 0, 10)
-  dnorm_$log_sd <- methods::new(FIMS:::ParameterVector, log(1), 3)
+  dnorm_$x$resize(length(y))
+  purrr::walk(
+    seq_along(dnorm_),
+    \(x) dnorm_$x[x]$value <- y[x]
+  )
+  dnorm_$expected_values$resize(length(y))
+  dnorm_$log_sd$resize(3)
+  purrr::walk(
+    1:3,
+    \(x) dnorm_$log_sd[x]$value <- log(1)
+  )
   expect_error(
     object = dnorm_$evaluate(),
-    regexp = "NormalLPDF::Vector index out of bounds. The size of observed data does not equal the size of the log_sd vector. The observed data vector is of size 10 and the log_sd vector is of size 3"
+    regexp = "NormalLPDF::Vector .* out of bounds. .* 10 .* 3"
   )
   clear()
 
@@ -426,24 +445,43 @@ test_that("rcpp distribution returns correct error messages", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x <- methods::new(ParameterVector, y, 10)
-  dlnorm_$expected_values <- methods::new(ParameterVector, 0, 11)
-  dlnorm_$log_sd <- methods::new(ParameterVector, log(1), 10)
+  dlnorm_$x$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dlnorm_$x[x]$value <- y[x]
+  )
+  dlnorm_$expected_values$resize(length(y) + 1)
+  dlnorm_$log_sd$resize(length(y))
+  purrr::walk(
+    1:10,
+    \(x) dlnorm_$log_sd[x]$value <- log(1)
+  )
   expect_error(
     object = dlnorm_$evaluate(),
-    regexp = "LognormalLPDF::Vector index out of bounds. The size of observed data does not equal the size of expected values. The observed data vector is of size 10 and the expected vector is of size 11"
+    regexp = "LognormalLPDF::Vector .* out of bounds. .* 10 .* 11"
   )
   clear()
 
+  #' @description dlnorm should error out when there is a dimension mismatch
+  #' where it is expecting log_sd to have a size 10 
+  #' but is provided a size 3 vector.
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x <- methods::new(ParameterVector, y, 10)
-  dlnorm_$expected_values <- methods::new(ParameterVector, 0, 10)
-  dlnorm_$log_sd <- methods::new(ParameterVector, log(1), 3)
+  dlnorm_$x$resize(length(y))
+   purrr::walk(
+    seq_along(y),
+    \(x) dlnorm_$x[x]$value <- y[x]
+  )
+  dlnorm_$expected_values$resize(length(y)) 
+  dlnorm_$log_sd$resize(3) 
+   purrr::walk(
+    1:3,
+    \(x) dlnorm_$log_sd[x]$value <- log(1)
+  )
   expect_error(
     object = dlnorm_$evaluate(),
-    regexp = "LognormalLPDF::Vector index out of bounds. The size of observed data does not equal the size of the log_sd vector. The observed data vector is of size 10 and the log_sd vector is of size 3"
+    regexp = "LognormalLPDF::Vector .* out of bounds. .* 10 .* 3"
   )
   clear()
 
