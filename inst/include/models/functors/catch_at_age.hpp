@@ -637,17 +637,19 @@ namespace fims_popdy
             else
             {
 
-                // Why are we using evaluate_mean, how come a virtual function was changed?
-                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] =
-                    population->recruitment->evaluate_mean(this->population_derived_quantities[population->GetId()]["spawning_biomass"][year - 1], phi0) *
-                    /*the log_recruit_dev vector does not include a value for year == 0
-                    and is of length nyears - 1 where the first position of the vector
-                    corresponds to the second year of the time series.*/
-                    fims_math::exp(population->recruitment->log_recruit_devs[i_dev - 1]);
-
-                this->population_derived_quantities[population->GetId()]["expected_recruitment"][year] =
-                    this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year];
+                // Why are we using evaluate_mean, how come a virtual function was changed? 
+                // AMH: there are now two virtual functions: evaluate_mean and evaluate_process (see below)
+                population->recruitment->log_expected_recruitment[year-1] =
+                    fims_math::log(population->recruitment->evaluate_mean(this->population_derived_quantities[population->GetId()]["spawning_biomass"][year - 1], phi0));
+                
+               
+                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year] = 
+                    fims_math::exp(population->recruitment->process->evaluate_process(year-1));
             }
+
+            this->population_derived_quantities[population->GetId()]["expected_recruitment"][year] = 
+                this->population_derived_quantities[population->GetId()]["numbers_at_age"][i_age_year];
+
         }
 
         /**
