@@ -1,3 +1,7 @@
+# FIMS 0.5.2
+
+* Fixes constructor in ParameterVector to error if the size is too small.
+
 # FIMS 0.5.1
 
 * Fixes fix-pr-commands.yml permissions and to use the parent workflow.
