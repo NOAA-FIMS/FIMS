@@ -57,5 +57,3 @@ jobs:
           mkdir -p mylib
           R CMD INSTALL $FIMS --library=mylib --build 2>&1 | tee install.log
           R CMD check $FIMS --library=mylib --install=check:install.log $CHECKARGS || true
-        with:
-          upload-snapshots: true
