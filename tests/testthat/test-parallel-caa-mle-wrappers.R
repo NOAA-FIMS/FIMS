@@ -17,9 +17,11 @@
 # - devtools::check()
 
 ## Setup ----
-# Skip this test on GitHub Actions runs, as it takes too long and causes the
-# R CMD Check to fail.
-testthat::skip_on_ci()
+# Skip the test if running on a local machine not in a CI environment
+testthat::skip_if(!testthat:::env_var_is_true("CI"))
+
+# Skip the test on CRAN and R-universe to avoid long runtimes
+testthat::skip_on_cran()
 
 # Skip this test if calculating code coverage
 testthat::skip_on_covr()
