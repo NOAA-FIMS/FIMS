@@ -41,6 +41,8 @@ Authors@R: c(
     person(c("James", "N."), "Ianelli", role = "ctb",
            comment = c(ORCID = "0000-0002-7170-8677"))
   )
+Author: Kelli F. Johnson
+Maintainer: Kelli F. Johnson <kelli.johnson@noaa.gov>
 Description: The Fisheries Integrated Modeling System is a next-generation
     framework of stock assessment models, assisting fishery managers with
     the goal of achieving sustainable fisheries. This system, when

@@ -1,0 +1,92 @@
+on:
+  # TODO: 
+  push:
+    # branches: [main]
+  pull_request:
+    # branches: [dev]
+
+name: r-universe-R-CMD-check.yaml
+
+permissions: read-all
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          # corresponds to MacOS arm64
+          - {os: macos-14,   r: 'release'}
+          - {os: macos-14,   r: 'oldrel-1'}
+          # corresponds to MacOS x86_64
+          - {os: macos-13, r: 'release'}
+          - {os: macos-13, r: 'oldrel-1'}
+          # corresponds to Windows
+          - {os: windows-2022, r: 'release'}
+          - {os: windows-2022,  r: 'devel'}
+          - {os: windows-2022, r: 'oldrel-1'}
+          # corresponds to Linux x86_64
+          - {os: ubuntu-24.04,  r: 'release'}
+          - {os: ubuntu-24.04,  r: 'devel', http-user-agent: 'release'}
+          # corresponds to Linux arm64
+          - {os: ubuntu-22.04-arm,  r: 'release'}
+          - {os: ubuntu-22.04-arm,  r: 'devel', http-user-agent: 'release'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - name: Run R-universe check 
+        run: |
+          # Crucial: Enable 'pipefail' and 'exit on error' for robust scripting
+          # This applies to all OSes running this Bash script.
+          set -euo pipefail
+          # -e: Exit immediately if a command exits with a non-zero status.
+          # -u: Treat unset variables as an error.
+          # -o pipefail: Ensures that a command failing in a pipeline causes the 
+          # pipeline to fail.
+          # Set environment variables 
+          export FIMS="."
+          export CHECKARGS="--no-manual --no-vignettes"
+
+          # Create library directory 
+          mkdir -p mylib
+          
+          # Run R CMD INSTALL and capture output to log file and console
+          # Due to 'set -o pipefail', if R CMD INSTALL fails, the whole line 
+          # will cause script to exit.
+          echo "Running R CMD INSTALL..."
+          # Run R CMD INSTALL and capture output to log file and console 
+          R CMD INSTALL "$FIMS" --library=mylib --build 2>&1 | tee install.log
+
+          # Run R CMD check. This command's exit code will determine step success/failure.
+          R CMD check "$FIMS" --library=mylib --install=check:install.log "$CHECKARGS" 
+        shell: bash
+        
+      - name: Upload check results on failure
+        if: failure() # This step will only run if a previous step in the job failed
+        uses: actions/upload-artifact@main
+        with:
+          # Unique name for the artifact per OS
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          path: ..Rcheck 
