@@ -224,4 +224,11 @@ test_that("ParameterVector returns correct error messages", {
 
   #' @description Test that get method returns expected error.
   expect_error(v0$get(10)$value, regexp = "ParameterVector: Index out of range")
+
+  #' @description Test that ParameterVector returns an error message when
+  #' trying to make a vector that has dimensions larger than specified in x.
+  expect_error(
+    methods::new(ParameterVector, 1:3, 5),
+    "Error in call to ParameterVector"
+  )
 })
