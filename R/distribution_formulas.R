@@ -70,23 +70,24 @@ check_distribution_validity <- function(args) {
       "i" = "{.var family} should be an object of class {.var family},
              e.g., `family = gaussian()`, instead of {class(family)}."
     )
-  }
-  if (
-    !(family[["family"]] %in% available_distributions) ||
-      "unavailable data type" %in% available_distributions
-  ) {
-    ifelse_type <- ifelse(
-      is.null(data_type),
-      "distribution",
-      paste(data_type, "data")
-    )
-    abort_bullets <- c(
-      abort_bullets,
-      "x" = "FIMS currently does not allow the family to be
-             {.code {family[['family']]}}.",
-      "i" = "The families available for this {ifelse_type} are
-             {.code {available_distributions}}."
-    )
+  } else {
+    if (
+      !(family[["family"]] %in% available_distributions) ||
+        "unavailable data type" %in% available_distributions
+    ) {
+      ifelse_type <- ifelse(
+        is.null(data_type),
+        "distribution",
+        paste(data_type, "data")
+      )
+      abort_bullets <- c(
+        abort_bullets,
+        "x" = "FIMS currently does not allow the family to be
+              {.code {family[['family']]}}.",
+        "i" = "The families available for this {ifelse_type} are
+              {.code {available_distributions}}."
+      )
+    }
   }
 
   # Checks related to the type of data
@@ -262,7 +263,7 @@ get_expected_name <- function(family, data_type) {
 #' }
 initialize_data_distribution <- function(
     module,
-    family,
+    family = NULL,
     sd = list(value = 1, estimation_type = "constant"),
     # FIXME: Move this argument to second to match where par is in
     # initialize_process_distribution
@@ -369,7 +370,7 @@ initialize_data_distribution <- function(
 initialize_process_distribution <- function(
     module,
     par,
-    family,
+    family = NULL,
     sd = list(value = 1, estimation_type = "constant"),
     is_random_effect = FALSE) {
   # validity check on user input
