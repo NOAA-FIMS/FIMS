@@ -198,12 +198,16 @@ public:
    * @param size The number of elements to copy over.
    */
   ParameterVector(Rcpp::NumericVector x, size_t size){
-    this->id_m = ParameterVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<Parameter> >();
-    this->resize(size);
-    for (size_t i = 0; i < size; i++) {
-      storage_m->at(i).initial_value_m = x[i];
-    }
+      if(x.size() < size){
+          throw std::invalid_argument("Error in call to ParameterVector(Rcpp::NumericVector x, size_t size): x.size() < size argument.");
+      }else{
+          this->id_m = ParameterVector::id_g++;
+          this->storage_m = std::make_shared<std::vector<Parameter> >();
+          this->storage_m->resize(size);
+          for (size_t i = 0; i < size; i++) {
+              storage_m->at(i).initial_value_m = x[i];
+          }
+      }
   }
 
   /**
