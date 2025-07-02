@@ -18,72 +18,136 @@
 # - devtools::check()
 
 ## Setup ----
-# Skip the test if running on a local machine not in a CI environment
 #' @description Skip the test if not running in a CI environment.
 testthat::skip_if(!testthat:::env_var_is_true("CI"))
 
-# TODO: don't skip the test on CI after resolving the failed parallel tests
-testthat::skip_on_ci()
+#' @description Skip the test on R-universe to avoid long runtimes.
+if (identical(Sys.getenv("R_UNIVERSE"), "true")) {
+  testthat::skip("Skipping test on r-universe")
+}
 
-# Skip the test on CRAN and R-universe to avoid long runtimes
-testthat::skip_on_cran()
-
-# Skip this test if calculating code coverage
+#' @description Skip the test if calculating code coverage.
 testthat::skip_on_covr()
 
 # Load the model comparison operating model data from the fixtures folder
 load(test_path("fixtures", "integration_test_data.RData"))
 
-# Run 10 FIMS models
-sim_num <- 10
+# Simulation configuration
+# We run a subset of simulations to verify that the FIMS estimation wrapper
+# produces identical results regardless of the execution mode (serial vs parallel).
+#
+# Memory Management Note:
+# R crashes when attempting to run 10 models in parallel with the error
+# `cannot allocate vector of size 1.4 Gigabyte`. According to Gemini, the error indicates
+# that during the serialization or unserialization of the data between the main 
+# R process and the worker nodes, R requested more memory than the system or the
+# R environment allowed. This may be related to the size of the tibble being
+# passed around. We limit sim_num to 4 to ensure the tests pass on CI.
+sim_num <- 4
 
-# Run the FIMS model in serial and record the execution time
-modified_parameters <- estimation_results_serial <- vector(mode = "list", length = sim_num)
-
-for (i in 1:sim_num) {
-  # Define modified parameters for different modules
-  modified_parameters[[i]] <- list(
-    fleet1 = list(
-      Fleet.log_Fmort.value = log(om_output_list[[i]][["f"]])
-    ),
-    survey1 = list(
-      LogisticSelectivity.inflection_point.value = 1.5,
-      LogisticSelectivity.slope.value = 2,
-      Fleet.log_q.value = log(1.0)
-    ),
-    recruitment = list(
-      BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[i]][["R0"]]),
-      BevertonHoltRecruitment.log_devs.value = om_input_list[[i]][["logR.resid"]][-1],
-      BevertonHoltRecruitment.log_devs.estimation_type = "constant",
-      DnormDistribution.log_sd.value = om_input_list[[i]][["logR_sd"]]
-    ),
-    maturity = list(
-      LogisticMaturity.inflection_point.value = om_input_list[[i]][["A50.mat"]],
-      LogisticMaturity.inflection_point.estimation_type = "constant",
-      LogisticMaturity.slope.value = om_input_list[[i]][["slope.mat"]],
-      LogisticMaturity.slope.estimation_type = "constant"
-    ),
-    population = list(
-      Population.log_init_naa.value = log(om_output_list[[i]][["N.age"]][1, ])
-    )
+# Create the initial FIMS data and default parameter structures,
+# then map through the simulation iterations to apply iteration-specific 
+# values from the operating model.
+data_age_length_comp <- FIMSFrame(data1)
+default_parameters <- create_default_configurations(
+  data = data_age_length_comp
+) |>
+  create_default_parameters(
+    data = data_age_length_comp
   )
 
-  estimation_results_serial[[i]] <- setup_and_run_FIMS_with_wrappers(
-    iter_id = i,
+modified_parameters <- purrr::map(1:sim_num, \(iter_id) {
+  default_parameters |>
+    tidyr::unnest(cols = data) |>
+    # Update log_Fmort input values for Fleet1
+    dplyr::rows_update(
+      tibble::tibble(
+        fleet_name = "fleet1",
+        label = "log_Fmort",
+        time = 1:30,
+        value = log(om_output_list[[iter_id]][["f"]]),
+      ),
+      by = c("fleet_name", "label", "time")
+    ) |>
+    # Update selectivity parameters and log_q for survey1
+    dplyr::rows_update(
+      tibble::tibble(
+        fleet_name = "survey1",
+        label = c("inflection_point", "slope", "log_q"),
+        value = c(1.5, 2, log(om_output_list[[iter_id]][["survey_q"]][["survey1"]]))
+      ),
+      by = c("fleet_name", "label")
+    ) |>
+    # Update log_devs in the Recruitment module (time steps 2–30)
+    dplyr::rows_update(
+      tibble::tibble(
+        label = "log_devs",
+        time = 2:30,
+        value = om_input_list[[iter_id]][["logR.resid"]][-1],
+        # TODO: integration tests fail after setting recruitment log_devs all estimable.
+        # We need to debug the issue, then change constant to fixed_effects.
+        # estimation_type = "fixed_effects"
+        estimation_type = "constant"
+      ),
+      by = c("label", "time")
+    ) |>
+    # Update log_sd for log_devs in the Recruitment module
+    dplyr::rows_update(
+      tibble::tibble(
+        module_name = "Recruitment",
+        label = "log_sd",
+        value = om_input_list[[iter_id]][["logR_sd"]]
+      ),
+      by = c("module_name", "label")
+    ) |>
+    # Update inflection point and slope parameters in the Maturity module
+    dplyr::rows_update(
+      tibble::tibble(
+        module_name = "Maturity",
+        label = c("inflection_point", "slope"),
+        value = c(
+          om_input_list[[iter_id]][["A50.mat"]],
+          om_input_list[[iter_id]][["slope.mat"]]
+        )
+      ),
+      by = c("module_name", "label")
+    ) |>
+    # Update log_init_naa values in the Population module
+    dplyr::rows_update(
+      tibble::tibble(
+        label = "log_init_naa",
+        age = 1:12,
+        value = log(om_output_list[[iter_id]][["N.age"]][1, ])
+      ),
+      by = c("label", "age")
+    )
+})
+
+# Serial execution
+# Establish the baseline "ground truth" results using standard purrr::map.
+estimation_results_serial <- purrr::map(1:sim_num, \(iter_id) {
+  setup_and_run_FIMS_with_wrappers(
+    iter_id = iter_id,
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
     estimation_mode = TRUE,
     modified_parameters = modified_parameters
   )
-}
+})
 
 ## IO correctness ----
 test_that("Run FIMS in parallel using {snowfall}", {
+  # Parallel Initialization
   core_num <- 2
-  snowfall::sfInit(parallel = TRUE, cpus = core_num)
-
+  # suppressWarnings is used to hide the 'Unknown option --file' warning 
+  # triggered by snowfall's command-line scanner during Rscript execution.
+  suppressWarnings(snowfall::sfInit(parallel = TRUE, cpus = core_num))
+  
+  # Ensure the FIMS package and required objects are available on all worker nodes.
   snowfall::sfLibrary(FIMS)
+
+  # Parallel Execution
   results_parallel <- snowfall::sfLapply(
     1:sim_num,
     setup_and_run_FIMS_with_wrappers,
@@ -98,37 +162,45 @@ test_that("Run FIMS in parallel using {snowfall}", {
   snowfall::sfStop()
 
   # Comparison of results:
-  # Verify that SSB values from both runs are equivalent.
-  ssb_parallel <- purrr::map(
+  # Verify that spawning biomass values from both runs are equivalent.
+  sb_parallel <- purrr::map(
     results_parallel,
-    \(x) x@estimates[x@estimates$label == "SSB", "estimated"]
+    \(x) get_estimates(x) |>
+      dplyr::filter(label == "spawning_biomass") |>
+      dplyr::pull(estimated)
   )
 
-  ssb_serial <- purrr::map(
+  sb_serial <- purrr::map(
     estimation_results_serial,
-    \(x) x@estimates[x@estimates$label == "SSB", "estimated"]
+    \(x) get_estimates(x) |>
+      dplyr::filter(label == "spawning_biomass") |>
+      dplyr::pull(estimated)
   )
-  #' @description Test that SSB values from parallel runs equal those from serial runs.
-  expect_setequal(ssb_parallel, ssb_serial)
+  #' @description Test that spawning biomass values from parallel runs equal those from serial runs. We apply a tolerance of 1e-5 to floating-point comparison.
+  expect_equal(sb_parallel, sb_serial, tolerance = 1e-5)
 
   parameters_parallel <- purrr::map(
     results_parallel,
-    \(x) x@estimates[x@estimates$label == "p", "estimated"]
+    \(x) get_estimates(x) |>
+      dplyr::filter(estimation_type == "fixed_effects") |>
+      dplyr::pull(estimated)
   )
   parameters_serial <- purrr::map(
     estimation_results_serial,
-    \(x) x@estimates[x@estimates$label == "p", "estimated"]
+    \(x) get_estimates(x) |>
+      dplyr::filter(estimation_type == "fixed_effects") |>
+      dplyr::pull(estimated)
   )
-  #' @description Test that parameter estimates from parallel runs equal those from serial runs.
-  expect_setequal(parameters_parallel, parameters_serial)
+  #' @description Test that parameter estimates from parallel runs equal those from serial runs. We apply a tolerance of 1e-5 to floating-point comparison.
+  expect_equal(parameters_parallel, parameters_serial, tolerance = 1e-5)
 
   jnll_parallel <- purrr::map(
     results_parallel,
-    \(x) x@report[["jnll"]]
+    \(x) get_report(x)[["jnll"]]
   )
   jnll_serial <- purrr::map(
     estimation_results_serial,
-    \(x) x@report[["jnll"]]
+    \(x) get_report(x)[["jnll"]]
   )
   #' @description Test that total NLL values from parallel runs equal those from serial runs.
   expect_equal(jnll_parallel, jnll_serial)

@@ -1008,6 +1008,7 @@ substr
 sudo
 superClass
 suppressMessages
+suppressWarnings
 surveyB
 syms
 tabset
@@ -1058,6 +1059,7 @@ unlist
 unname
 unnest
 unnested
+unserialization
 useDynLib
 useDynamicSymbols
 usethis
