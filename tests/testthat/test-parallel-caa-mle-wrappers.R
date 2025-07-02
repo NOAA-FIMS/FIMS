@@ -19,7 +19,7 @@
 ## Setup ----
 # Skip this test on GitHub Actions runs, as it takes too long and causes the
 # R CMD Check to fail.
-testthat::skip_on_ci()
+# testthat::skip_on_ci()
 
 # Skip this test if calculating code coverage
 testthat::skip_on_covr()
