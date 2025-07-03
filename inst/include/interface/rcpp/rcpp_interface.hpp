@@ -1,6 +1,6 @@
 /**
  * @file rcpp_interface.hpp
- * @brief The Rcpp interface to declare things. 
+ * @brief The Rcpp interface to declare things.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -41,49 +41,49 @@ void init_logging() {
 bool CreateTMBModel() {
   init_logging();
 
-  FIMS_INFO_LOG("Adding FIMS objects to TMB, " +
-    fims::to_string(FIMSRcppInterfaceBase::fims_interface_objects.size()) +
-    " objects");
+  FIMS_INFO_LOG(
+      "Adding FIMS objects to TMB, " +
+      fims::to_string(FIMSRcppInterfaceBase::fims_interface_objects.size()) +
+      " objects");
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
-      i++) {
+       i++) {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
   }
 
   // base model
-    #ifdef TMBAD_FRAMEWORK
-     std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info0 =
-            fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-    info0->CreateModel();
+#ifdef TMBAD_FRAMEWORK
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  info0->CreateModel();
 
-    std::shared_ptr<fims_info::Information < TMBAD_FIMS_TYPE>> info =
-            fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
-    info->CreateModel();
+  std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
+      fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+  info->CreateModel();
 
-    #else
-    std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info0 =
-            fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-    info0->CreateModel();
+#else
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  info0->CreateModel();
 
-    // first-order derivative
-    std::shared_ptr<fims_info::Information < TMB_FIMS_FIRST_ORDER>> info1 =
-            fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
-    info1->CreateModel();
+  // first-order derivative
+  std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> info1 =
+      fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+  info1->CreateModel();
 
-    // second-order derivative
-    std::shared_ptr<fims_info::Information < TMB_FIMS_SECOND_ORDER>> info2 =
-            fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
-    info2->CreateModel();
+  // second-order derivative
+  std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> info2 =
+      fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+  info2->CreateModel();
 
-    // third-order derivative
-    std::shared_ptr<fims_info::Information < TMB_FIMS_THIRD_ORDER>> info3 =
-            fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
-    info3->CreateModel();
-    #endif
-
+  // third-order derivative
+  std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> info3 =
+      fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+  info3->CreateModel();
+#endif
 
   // instantiate the model? TODO: Ask Matthew what this does
-  std::shared_ptr<fims_model::Model < TMB_FIMS_REAL_TYPE>> m0 =
-  fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> m0 =
+      fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   return true;
 }
@@ -98,74 +98,76 @@ bool CreateTMBModel() {
  *
  * @return A JSON output string is returned.
  */
-std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn, Rcpp::Function gr) {
-
-    std::shared_ptr<fims_info::Information < double>> information =
+std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn,
+                          Rcpp::Function gr) {
+  std::shared_ptr<fims_info::Information<double>> information =
       fims_info::Information<double>::GetInstance();
 
-    std::shared_ptr<fims_model::Model < double>> model =
+  std::shared_ptr<fims_model::Model<double>> model =
       fims_model::Model<double>::GetInstance();
-    for (size_t i = 0; i < information->fixed_effects_parameters.size(); i++) {
-        *information->fixed_effects_parameters[i] = par[i];
-    }
+  for (size_t i = 0; i < information->fixed_effects_parameters.size(); i++) {
+    *information->fixed_effects_parameters[i] = par[i];
+  }
 
-    bool reporting = model->do_tmb_reporting;
-    model->do_tmb_reporting = false;
-    model->Evaluate();
+  bool reporting = model->do_tmb_reporting;
+  model->do_tmb_reporting = false;
+  model->Evaluate();
 
-    Rcpp::Function f = Rcpp::as<Rcpp::Function>(fn);
-    Rcpp::Function g = Rcpp::as<Rcpp::Function>(gr);
-    double val = Rcpp::as<double>(f(par));
-    Rcpp::NumericVector grad = Rcpp::as<Rcpp::NumericVector>(g(par));
-    double maxgc = -999;
-    for (R_xlen_t i = 0; i < grad.size(); i++) {
-      if (std::fabs(grad[i]) > maxgc) {
-        maxgc = std::fabs(grad[i]);
-      }
+  Rcpp::Function f = Rcpp::as<Rcpp::Function>(fn);
+  Rcpp::Function g = Rcpp::as<Rcpp::Function>(gr);
+  double val = Rcpp::as<double>(f(par));
+  Rcpp::NumericVector grad = Rcpp::as<Rcpp::NumericVector>(g(par));
+  double maxgc = -999;
+  for (R_xlen_t i = 0; i < grad.size(); i++) {
+    if (std::fabs(grad[i]) > maxgc) {
+      maxgc = std::fabs(grad[i]);
     }
+  }
 
-    for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
-        i++) {
-      FIMSRcppInterfaceBase::fims_interface_objects[i]->finalize();
-    }
+  for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
+       i++) {
+    FIMSRcppInterfaceBase::fims_interface_objects[i]->finalize();
+  }
   std::string ret;
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-    std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
-    std::shared_ptr<fims_info::Information < double>> info =
+  auto now = std::chrono::system_clock::now();
+  std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+  std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
+  std::shared_ptr<fims_info::Information<double>> info =
       fims_info::Information<double>::GetInstance();
-    std::stringstream ss;
-    ss << "{\n";
-    ss << "\"timestamp\": \"" << ctime_no_newline << "\",\n";
-    ss << "\"nyears\":" << info->nyears << ",\n";
-    ss << "\"nseasons\":" << info->nseasons << ",\n";
-    ss << "\"nages\":" << info->nages << ",\n";
-    ss << "\"objective_function_value\": " << val << ",\n";
-    ss << "\"max_gradient_component\": " << maxgc << ",\n";
-    ss << "\"final_gradient\": [";
-    if (grad.size() > 0) {
-      for (R_xlen_t i = 0; i < grad.size() - 1; i++) {
-        ss << grad[i] << ", ";
-      }
-      ss << grad[grad.size() - 1] << "],\n";
-    } else {
-      ss << "],";
+  std::stringstream ss;
+  ss << "{\n";
+  ss << "\"timestamp\": \"" << ctime_no_newline << "\",\n";
+  ss << "\"nyears\":" << info->nyears << ",\n";
+  ss << "\"nseasons\":" << info->nseasons << ",\n";
+  ss << "\"nages\":" << info->nages << ",\n";
+  ss << "\"objective_function_value\": " << val << ",\n";
+  ss << "\"max_gradient_component\": " << maxgc << ",\n";
+  ss << "\"final_gradient\": [";
+  if (grad.size() > 0) {
+    for (R_xlen_t i = 0; i < grad.size() - 1; i++) {
+      ss << grad[i] << ", ";
     }
-    ss << "\"modules\" : [\n";
-    size_t length = FIMSRcppInterfaceBase::fims_interface_objects.size();
-    if (length > 0) {
-        for (size_t i = 0; i < length - 1; i++) {
-            ss << FIMSRcppInterfaceBase::fims_interface_objects[i]->to_json() << ",\n";
-        }
-
-        ss << FIMSRcppInterfaceBase::fims_interface_objects[length - 1]->to_json() << "\n]\n}";
-    } else {
-        ss << "\n]\n}";
+    ss << grad[grad.size() - 1] << "],\n";
+  } else {
+    ss << "],";
+  }
+  ss << "\"modules\" : [\n";
+  size_t length = FIMSRcppInterfaceBase::fims_interface_objects.size();
+  if (length > 0) {
+    for (size_t i = 0; i < length - 1; i++) {
+      ss << FIMSRcppInterfaceBase::fims_interface_objects[i]->to_json()
+         << ",\n";
     }
 
-    ret = fims::JsonParser::PrettyFormatJSON(ss.str());
-    model->do_tmb_reporting = reporting;
-    return ret;
+    ss << FIMSRcppInterfaceBase::fims_interface_objects[length - 1]->to_json()
+       << "\n]\n}";
+  } else {
+    ss << "\n]\n}";
+  }
+
+  ret = fims::JsonParser::PrettyFormatJSON(ss.str());
+  model->do_tmb_reporting = reporting;
+  return ret;
 }
 
 /**
@@ -175,8 +177,8 @@ std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn, Rcpp::Func
  */
 Rcpp::NumericVector get_fixed_parameters_vector() {
   // base model
-  std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> info0 =
-    fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   Rcpp::NumericVector p;
 
@@ -194,8 +196,8 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
  */
 Rcpp::NumericVector get_random_parameters_vector() {
   // base model
-  std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
-    fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   Rcpp::NumericVector p;
 
@@ -214,8 +216,8 @@ Rcpp::NumericVector get_random_parameters_vector() {
  */
 Rcpp::List get_parameter_names(Rcpp::List pars) {
   // base model
-  std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
-    fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   pars.attr("names") = d0->parameter_names;
 
@@ -230,8 +232,8 @@ Rcpp::List get_parameter_names(Rcpp::List pars) {
  */
 Rcpp::List get_random_names(Rcpp::List pars) {
   // base model
-  std::shared_ptr<fims_info::Information < TMB_FIMS_REAL_TYPE>> d0 =
-    fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   pars.attr("names") = d0->random_effects_names;
 
@@ -245,8 +247,8 @@ Rcpp::List get_random_names(Rcpp::List pars) {
  */
 template <typename Type>
 void clear_internal() {
-  std::shared_ptr<fims_info::Information < Type>> d0 =
-    fims_info::Information<Type>::GetInstance();
+  std::shared_ptr<fims_info::Information<Type>> d0 =
+      fims_info::Information<Type>::GetInstance();
   d0->Clear();
 }
 
@@ -258,7 +260,7 @@ void clear() {
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
-  //Parameter and ParameterVector
+  // Parameter and ParameterVector
   Parameter::id_g = 1;
   ParameterVector::id_g = 1;
   // rcpp_data.hpp
@@ -335,47 +337,40 @@ void clear() {
   DmultinomDistributionsInterface::id_g = 1;
   DmultinomDistributionsInterface::live_objects.clear();
 
-  #ifdef TMBAD_FRAMEWORK
-    clear_internal<TMB_FIMS_REAL_TYPE>();
-    clear_internal<TMBAD_FIMS_TYPE>();
-  #else
+#ifdef TMBAD_FRAMEWORK
+  clear_internal<TMB_FIMS_REAL_TYPE>();
+  clear_internal<TMBAD_FIMS_TYPE>();
+#else
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMB_FIMS_FIRST_ORDER>();
   clear_internal<TMB_FIMS_SECOND_ORDER>();
   clear_internal<TMB_FIMS_THIRD_ORDER>();
-  #endif
+#endif
 
   fims::FIMSLog::fims_log->clear();
-
 }
 
 /**
  * @brief Gets the log entries as a string in JSON format.
  */
-std::string get_log() {
-  return fims::FIMSLog::fims_log->get_log();
-}
+std::string get_log() { return fims::FIMSLog::fims_log->get_log(); }
 
 /**
  * @brief Gets the error entries from the log as a string in JSON format.
  */
-std::string get_log_errors() {
-  return fims::FIMSLog::fims_log->get_errors();
-}
+std::string get_log_errors() { return fims::FIMSLog::fims_log->get_errors(); }
 
 /**
  * @brief Gets the warning entries from the log as a string in JSON format.
  */
 std::string get_log_warnings() {
-    return fims::FIMSLog::fims_log->get_warnings();
+  return fims::FIMSLog::fims_log->get_warnings();
 }
 
 /**
  * @brief Gets the info entries from the log as a string in JSON format.
  */
-std::string get_log_info() {
-    return fims::FIMSLog::fims_log->get_info();
-}
+std::string get_log_info() { return fims::FIMSLog::fims_log->get_info(); }
 
 /**
  * @brief Gets log entries by module as a string in JSON format.
@@ -411,14 +406,16 @@ void set_log_throw_on_error(bool throw_on_error) {
  * @brief Adds an info entry to the log from the R environment.
  */
 void log_info(std::string log_entry) {
-  fims::FIMSLog::fims_log->info_message(log_entry, -1, "R_env", "R_script_entry");
+  fims::FIMSLog::fims_log->info_message(log_entry, -1, "R_env",
+                                        "R_script_entry");
 }
 
 /**
  * @brief Adds a warning entry to the log from the R environment.
  */
 void log_warning(std::string log_entry) {
-  fims::FIMSLog::fims_log->warning_message(log_entry, -1, "R_env", "R_script_entry");
+  fims::FIMSLog::fims_log->warning_message(log_entry, -1, "R_env",
+                                           "R_script_entry");
 }
 
 /**
@@ -436,7 +433,8 @@ std::string escapeQuotes(const std::string& input) {
   size_t pos = result.find(search);
   while (pos != std::string::npos) {
     result.replace(pos, search.size(), replace);
-    pos = result.find(search, pos + replace.size()); // Move past the replaced position
+    pos = result.find(search,
+                      pos + replace.size());  // Move past the replaced position
   }
   return result;
 }
@@ -450,7 +448,8 @@ void log_error(std::string log_entry) {
   SEXP expression, result;
   ParseStatus status;
 
-  PROTECT(expression = R_ParseVector(Rf_mkString(ss.str().c_str()), 1, &status, R_NilValue));
+  PROTECT(expression = R_ParseVector(Rf_mkString(ss.str().c_str()), 1, &status,
+                                     R_NilValue));
   if (status != PARSE_OK) {
     Rcpp::Rcout << "Error parsing expression" << std::endl;
     UNPROTECT(1);
@@ -466,8 +465,9 @@ void log_error(std::string log_entry) {
     ss_ret << escapeQuotes(str) << "\\n";
   }
 
-  std::string ret = ss_ret.str(); //"find error";//Rcpp::as<std::string>(result);
+  std::string ret =
+      ss_ret.str();  //"find error";//Rcpp::as<std::string>(result);
 
   fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
-#endif // FIMS_INTERFACE_RCPP_INTERFACE_HPP
+#endif  // FIMS_INTERFACE_RCPP_INTERFACE_HPP
