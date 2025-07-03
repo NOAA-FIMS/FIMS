@@ -1,10 +1,17 @@
-#' Create a GoogleTest test file and register it in CMakeLists.txt
+#' Create tests/gtest/test_*.cpp test file and register it in CMakeLists.txt
 #'
 #' This helper function generate a GoogleTest (gtest) C++ template file for a
-#' given function and optionally appends test registration lines to a
+#' given function and appends test registration lines to a
 #' `CMakeLists.txt` file.
 #'
-#' @param class_name A character string providing the name of the C++ class.
+#' @param name A character string providing the name of the C++ method that you
+#' want to test. The name includes the class name and method name, separated by 
+#' an underscore (e.g., "LogisticSelectivity_evaluate", the ).
+#' The name will be used to create the file name, i.e.,
+#' `tests/gtest/test-{name}.R`. If `name` is not specified, the function
+#' will not be able to create a file name and an error will be returned.
+#'  
+#' class_name A character string providing the name of the C++ class.
 #' @param function_name A character string providing the name of the function
 #' to test.
 #' @param header_file_path A character string providing the path to the header

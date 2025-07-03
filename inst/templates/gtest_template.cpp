@@ -8,8 +8,24 @@
 // https://google.github.io/googletest/reference/assertions.html.
 
 #include "gtest/gtest.h"
-// Include header files for the functions being tested
-#include "{{{ header_file }}}"
+// TODO: Include the header file for the function being tested
+// For example, if testing the `evaluate` member function of the 
+// `LogisticSelectivity` class, include the corresponding header in the test 
+// file `tests/gtest/test_population_dynamics_selectivity_logistic.cpp`:
+// #include "population_dynamics/selectivity/functors/logistic.hpp"
+// TODO: Rename the test file following the naming convention:
+// option 1: `test_{file_name}_{function_name}.cpp` where 
+// `{file_name}` is the name of the source code file and `function_name` is the
+// name of the function being tested. If the `file_name` is too long, use the module
+// name instead. 
+// option 2: `test_{class_name}_{function_name}.cpp` where 
+// `{class_name}` is the class the function belongs to and 
+// `function_name` is the specific function being tested. 
+
+#include "path/to/relevant/header_file.hpp"
+// Include additional headers as needed
+// For example, include <iostream> to use `std::cerr` and `std::cout`:
+// #include <iostream>
 
 namespace
 {

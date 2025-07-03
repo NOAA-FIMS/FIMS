@@ -66,8 +66,9 @@ GoogleTest suite.
 continuous integration runs.
 1. Add `testthat::skip_on_covr()` at the beginning of a test file to skip it
 during coverage calculation.
-1. Run `devtools::test()` to execute all tests in the package.
+1. Run `devtools::load_all()` and `devtools::test()` to execute all tests in the package.
 1. Run `devtools::test(filter = "test_file_name")` to execute a specific test file.
+1. Run `devtools::install()` before running `test-parallel*-.R`.
 1. `FIMS:::run_r_unit_tests()`: Run all R unit tests in the package.
 1. `FIMS:::run_r_integration_tests()`: Run all R integration tests in the package.
 1. `FIMS:::check_fims()`: Run all styling, documentation, and testing for FIMS
