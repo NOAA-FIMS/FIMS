@@ -781,13 +781,13 @@ public:
 
       if (this->log_q[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "fleet_" << this->id << "_log_q_" <<  this->log_q[i].id_m;
+        ss << "Fleet." << this->id << ".log_q." <<  this->log_q[i].id_m;
         info->RegisterParameterName(ss.str()); 
         info->RegisterParameter(fleet->log_q[i]);
       }
       if(this->log_q[i].estimation_type_m.get() == "random_effects"){
         ss.str("");
-        ss << "fleet." << this->id << "log_q." <<  this->log_q[i].id_m;
+        ss << "Fleet." << this->id << ".log_q." <<  this->log_q[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_q[i]);
       }
@@ -800,13 +800,13 @@ public:
 
       if (this->log_Fmort[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "fleet_" << this->id << "_log_Fmort_" <<  this->log_Fmort[i].id_m;
+        ss << "Fleet." << this->id << ".log_Fmort." <<  this->log_Fmort[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
       }
       if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "fleet." << this->id << "log_Fmort." <<  this->log_Fmort[i].id_m;
+        ss << "Fleet." << this->id << ".log_Fmort." <<  this->log_Fmort[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_Fmort[i]);
       }
@@ -848,7 +848,7 @@ public:
 
         if (this->age_to_length_conversion[i].estimation_type_m.get() == "fixed_effects") {
           ss.str("");
-          ss << "fleet_" << this->id << "_age_to_length_conversion_" <<  this->age_to_length_conversion[i].id_m;
+          ss << "Fleet." << this->id << ".age_to_length_conversion." <<  this->age_to_length_conversion[i].id_m;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(fleet->age_to_length_conversion[i]);
         }

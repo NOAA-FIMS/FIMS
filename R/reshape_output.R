@@ -206,8 +206,8 @@ reshape_tmb_estimates <- function(obj,
     # not to create the `estimates_outline` tibble in advance.
     dplyr::mutate(
       module_name = ifelse(length(label_splits) > 1, label_splits[[1]], NA_character_),
-      module_id = ifelse(length(label_splits) > 1, as.integer(label_splits[[3]]), NA_integer_),
-      label = ifelse(length(label_splits) > 1, label_splits[[2]], label),
+      module_id = ifelse(length(label_splits) > 1, as.integer(label_splits[[2]]), NA_integer_),
+      label = ifelse(length(label_splits) > 1, label_splits[[3]], label),
       parameter_id = ifelse(length(label_splits) > 1, as.integer(label_splits[[4]]), NA_integer_)
     ) |>
     dplyr::select(-label_splits) |>
