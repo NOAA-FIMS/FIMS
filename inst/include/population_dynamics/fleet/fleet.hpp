@@ -205,18 +205,30 @@ namespace fims_popdy
                 this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
             }
 
-            // selectivity
-            // TODO: We need an if here to use age or length in the evaluate function
-            // No age in fleet
+            std::fill(selectivity_at_age.begin(), selectivity_at_age.end(),
+            static_cast<Type>(0)); /**<initialize selectivity with zeros before filling*/
+
+            std::fill(selectivity_at_length.begin(), selectivity_at_length.end(),
+            static_cast<Type>(0)); /**<initialize selectivity with zeros before filling*/
+
+            // fill selectivity at age and length
             if(selectivity_units == "age"){
                 for (size_t a = 0; a < this->nages; a++)
                 {
                     this->selectivity_at_age[a] = this->selectivity->evaluate(ages[a]);
-                    // setting selectivity at length to zero if age based may not be necessary
-                    // depending on whether we can exclude it from the report on not
-                    // if reported, should it be set to 1.0 instead of 0?
-                    std::fill(selectivity_at_length.begin(), selectivity_at_length.end(),
-                    static_cast<Type>(0)); /**<model selectivity at length is zero if age based*/
+                    
+                    if(this->nlengths > 0){
+                        for (size_t l = 0; l < this->nlengths; l++)
+                        {
+                            // iterate through all lengths within an age and sum the selectivity
+                            // to get a selectivity at length
+                            size_t i_length_age = a * this->nlengths + l;
+                            
+                            this->selectivity_at_length[l] += 
+                            this->age_to_length_conversion[i_length_age] *
+                                this->selectivity_at_age[a];
+                        }
+                    }
                 }
             }else if(selectivity_units == "length"){
                 for (size_t a = 0; a < this->nages; a++)
@@ -375,26 +387,32 @@ namespace fims_popdy
                     for (size_t l = 0; l < this->nlengths; l++)
                     {
                         size_t i_length_year = y * this->nlengths + l;
-                        for (size_t a = 0; a < this->nages; a++)
+                        // Here we have a check to determine if the length comp
+                        // should be calculated from the retained landings or
+                        // the total population. These values are slightly different.
+                        // In the future this will have more impact as we implement
+                        // timing rather than everything occuring at the start of
+                        // the year.
+                        if (this->fleet_observed_landings_data_id_m == -999)
                         {
-                            size_t i_age_year = y * this->nages + a;
-                            size_t i_length_age = a * this->nlengths + l;
-                            this->lengthcomp_expected[i_length_year] +=
-                                this->agecomp_expected[i_age_year] *
-                                this->age_to_length_conversion[i_length_age];
-
-                            this->landings_numbers_at_length[i_length_year] +=
-                                this->landings_numbers_at_age[i_age_year] *
-                                this->age_to_length_conversion[i_length_age];
-
-                            this->index_numbers_at_length[i_length_year] +=
-                                this->index_numbers_at_age[i_age_year] *
-                                this->age_to_length_conversion[i_length_age];
+                            this->lengthcomp_expected[i_length_year] =
+                                this->index_numbers_at_length[i_length_year];
                         }
-
+                        else
+                        {
+                            this->lengthcomp_expected[i_length_year] =
+                                this->landings_numbers_at_length[i_length_year];
+                        }
                         sum += this->lengthcomp_expected[i_length_year];
                         // robust_sum -= robust_add;
 
+                        // This sums over the observed age composition data so that
+                        // the expected age composition can be rescaled to match the
+                        // total number observed. The check for na values should not
+                        // be needed as individual years should not have missing data.
+                        // This is need to be re-explored if/when we modify FIMS to
+                        // allow for composition bins that do not match the population
+                        // bins.
                         if (this->fleet_observed_lengthcomp_data_id_m != -999)
                         {
                             if (this->observed_lengthcomp_data->at(i_length_year) !=
@@ -403,6 +421,7 @@ namespace fims_popdy
                                 sum_obs += this->observed_lengthcomp_data->at(i_length_year);
                             }
                         }
+                        
                     }
                     for (size_t l = 0; l < this->nlengths; l++)
                     {
@@ -471,8 +490,7 @@ namespace fims_popdy
                 if (this->selectivity_units == "age")
                 {
                     this->selectivity_at_age[i] = this->selectivity->evaluate(i);
-                }
-                else if (this->selectivity_units == "length")
+                }else if (this->selectivity_units == "length")
                 {
                     for (size_t l = 0; l < this->nlengths; l++)
                     {
@@ -481,8 +499,7 @@ namespace fims_popdy
                             this->selectivity->evaluate(l) *
                             this->age_to_length_conversion[i_length_age];
                     }
-                }
-                else
+                }else
                 {
                 }
             }

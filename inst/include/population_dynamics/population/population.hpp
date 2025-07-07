@@ -430,6 +430,35 @@ namespace fims_popdy {
         }
 
         /**
+         * @brief Calculates landings in numbers at length for each fleet for a given year
+         * and length, then adds the value to the expected landings in numbers at length for
+         * each fleet
+         *
+         * @param i_age_year dimension folded index for age and year
+         * @param year the year of expected landings composition is being calculated for
+         * @param age the age composition is being calculated for
+         */
+        void CalculateLandingsNumbersAL(size_t i_age_year, size_t year, size_t age) {
+            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+                if(this->fleets[fleet_]->nlengths > 0) {
+                    for(size_t i_length = 0; i_length < this->fleets[fleet_]->nlengths; i_length++) {
+                        // iterate through all lengths within an age and sum the selectivity
+                        // to get numbers at length
+                        size_t i_length_age = age * this->fleets[fleet_]->nlengths + i_length;
+                        size_t i_length_year = year * this->fleets[fleet_]->nlengths + i_length;
+                        this->fleets[fleet_]->landings_numbers_at_length[i_length_year] +=
+                        (this->fleets[fleet_]->Fmort[year] *
+                        this->fleets[fleet_]->selectivity_at_length[i_length]) /
+                        this->mortality_Z[i_age_year] *
+                        this->numbers_at_age[i_age_year] *
+                        (1 - fims_math::exp(-(this->mortality_Z[i_age_year])))*
+                        this->age_to_length_conversion[i_length_age];
+                    }
+                }
+            }
+        }
+
+        /**
          * @brief Calculates expected landings weight at age for each fleet for a given
          * year and age
          *
@@ -480,6 +509,33 @@ namespace fims_popdy {
                 this->fleets[fleet_]->q.get_force_scalar(year) *
                 this->fleets[fleet_]->selectivity_at_age[age]*
                 this->numbers_at_age[i_age_year];
+            }
+        }
+
+        /**
+         * @brief Calculates index sample in numbers at length for each fleet for
+         * a given year and length, then adds the value to the expected index in
+         * numbers at length for each fleet
+         *
+         * @param i_age_year dimension folded index for age and year
+         * @param year the year the expected index is being calculated for
+         * @param age the age index is being calculated for
+         */
+        void CalculateIndexNumbersAL(size_t i_age_year, size_t year, size_t age) {
+            for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+                if(this->fleets[fleet_]->nlengths > 0) {
+                    for(size_t i_length = 0; i_length < this->fleets[fleet_]->nlengths; i_length++) {
+                        // iterate through all lengths within an age and sum the selectivity
+                        // to get numbers at length
+                        size_t i_length_age = age * this->fleets[fleet_]->nlengths + i_length;
+                        size_t i_length_year = year * this->fleets[fleet_]->nlengths + i_length;
+                        this->fleets[fleet_]->index_numbers_at_length[i_length_year] +=
+                        this->fleets[fleet_]->q.get_force_scalar(year) *
+                        this->fleets[fleet_]->selectivity_at_length[i_length] *
+                        this->numbers_at_age[i_age_year]*
+                        this->age_to_length_conversion[i_length_age];
+                    }
+                }
             }
         }
 
@@ -625,10 +681,12 @@ namespace fims_popdy {
                      */
                     if (y < this->nyears) {
                         CalculateLandingsNumbersAA(i_age_year, y, a);
+                        CalculateLandingsNumbersAL(i_age_year, y, a);
                         CalculateLandingsWeightAA(y, a);
                         CalculateLandings(y, a);
 
                         CalculateIndexNumbersAA(i_age_year, y, a);
+                        CalculateIndexNumbersAL(i_age_year, y, a);
                         CalculateIndexWeightAA(y, a);
                         CalculateIndex(i_age_year, y, a);
                     }
