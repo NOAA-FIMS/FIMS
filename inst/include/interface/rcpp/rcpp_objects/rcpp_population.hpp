@@ -410,13 +410,13 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_M[i] = this->log_M[i].initial_value_m;
       if (this->log_M[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "population_" << this->id << "_log_M_" << this->log_M[i].id_m;
+        ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_M[i]);
       }
       if(this->log_M[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "population." << this->id << "log_M." << this->log_M[i].id_m;
+        ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_M[i]);
       }
@@ -427,13 +427,13 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
       if (this->log_init_naa[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "population_" << this->id << "_log_init_naa_" << this->log_init_naa[i].id_m;
+        ss << "Population." << this->id << ".log_init_naa." << this->log_init_naa[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
       }
       if(this->log_init_naa[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "population." << this->id << "log_init_naa." << this->log_init_naa[i].id_m;
+        ss << "Population." << this->id << ".log_init_naa." << this->log_init_naa[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_init_naa[i]);
       }
