@@ -522,7 +522,7 @@ public:
     ss << " \"id\":" << this->log_q.id_m << ",\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"values\": " << this->log_q << "\n}";
-    if (this->nlengths > 0) {
+    if (this->nlengths.get() > 0) {
       ss << " ,\n";
       ss << " {\n";
       ss << " \"name\": \"age_to_length_conversion\",\n";
