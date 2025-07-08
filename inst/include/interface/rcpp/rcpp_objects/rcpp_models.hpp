@@ -936,9 +936,11 @@ public:
                                    fleet_interface->nlengths.get());
 
             if (fleet_interface->nlengths.get() > 0)
+            {
                 derived_quantities["age_to_length_conversion"] =
                     fims::Vector<Type>(fleet_interface->nyears.get() *
                                        fleet_interface->nlengths.get());
+            }
         }
         // replace elements in the variable map
         info->variable_map[fleet_interface->log_landings_expected.id_m] = &(derived_quantities["log_landings_expected"]);
@@ -947,7 +949,9 @@ public:
         info->variable_map[fleet_interface->agecomp_proportion.id_m] = &(derived_quantities["agecomp_proportion"]);
         info->variable_map[fleet_interface->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
         if (fleet_interface->nlengths.get() > 0)
+        {
             info->variable_map[fleet_interface->age_to_length_conversion.id_m] = &(derived_quantities["age_to_length_conversion"]);
+        }
         info->variable_map[fleet_interface->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
         info->variable_map[fleet_interface->lengthcomp_proportion.id_m] = &(derived_quantities["lengthcomp_proportion"]);
     }
