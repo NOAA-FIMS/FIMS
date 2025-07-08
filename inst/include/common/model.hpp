@@ -171,32 +171,32 @@ namespace fims_model
 #endif
                 // Evaluate population
                 FIMS_INFO_LOG("Begin evaluation for population " + fims::to_string(p->id));
-                // p->Evaluate();
+                p->Evaluate();
                 FIMS_INFO_LOG("Population successfully evaluated");
             }
 
-//             typename fims_info::Information<Type>::fleet_iterator f_it;
-//             // Loop over fleets/surveys, and evaluate age comp and index expected values
-//             for (f_it = this->fims_information->fleets.begin();
-//                  f_it != this->fims_information->fleets.end(); ++f_it)
-//             {
-//                 //(*f_it).second points to each individual Fleet module
-//                 std::shared_ptr<fims_popdy::Fleet<Type>> f = (*f_it).second;
-// #ifdef TMB_MODEL
-//                 f->of = this->of;
-// #endif
-//                 FIMS_INFO_LOG("Begin evalulation for fleet " + fims::to_string(f->id));
-//                 f->evaluate_age_comp();
-//                 if (f->nlengths > 0)
-//                 {
-//                     f->evaluate_length_comp();
+            typename fims_info::Information<Type>::fleet_iterator f_it;
+            // Loop over fleets/surveys, and evaluate age comp and index expected values
+            for (f_it = this->fims_information->fleets.begin();
+                 f_it != this->fims_information->fleets.end(); ++f_it)
+            {
+                //(*f_it).second points to each individual Fleet module
+                std::shared_ptr<fims_popdy::Fleet<Type>> f = (*f_it).second;
+#ifdef TMB_MODEL
+                f->of = this->of;
+#endif
+                FIMS_INFO_LOG("Begin evalulation for fleet " + fims::to_string(f->id));
+                f->evaluate_age_comp();
+                if (f->nlengths > 0)
+                {
+                    f->evaluate_length_comp();
                     
-//                 }
-//                 FIMS_INFO_LOG("Begin evalulation of landings for fleet " + fims::to_string(f->id));
-//                 // f->evaluate_landings();
-//                 FIMS_INFO_LOG("Begin evalulation of index for fleet " + fims::to_string(f->id));
-//                 f->evaluate_index();
-//             }
+                }
+                FIMS_INFO_LOG("Begin evalulation of landings for fleet " + fims::to_string(f->id));
+                f->evaluate_landings();
+                FIMS_INFO_LOG("Begin evalulation of index for fleet " + fims::to_string(f->id));
+                f->evaluate_index();
+            }
 
             // Loop over densities and evaluate joint negative log-likelihoods for random effects
             size_t n_random_effects = 0;
