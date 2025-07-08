@@ -941,41 +941,38 @@ public:
                     fims::Vector<Type>(fleet_interface->nyears.get() *
                                        fleet_interface->nlengths.get());
             }
+            // replace elements in the variable map
+            info->variable_map[fleet_interface->log_landings_expected.id_m] = &(derived_quantities["log_landings_expected"]);
+            info->variable_map[fleet_interface->log_index_expected.id_m] = &(derived_quantities["log_index_expected"]);
+            info->variable_map[fleet_interface->agecomp_expected.id_m] = &(derived_quantities["agecomp_expected"]);
+            info->variable_map[fleet_interface->agecomp_proportion.id_m] = &(derived_quantities["agecomp_proportion"]);
+            info->variable_map[fleet_interface->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
+            if (fleet_interface->nlengths.get() > 0)
+            {
+                    info->variable_map[fleet_interface->age_to_length_conversion.id_m] = &(derived_quantities["age_to_length_conversion"]);
+            }
+            info->variable_map[fleet_interface->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
+            info->variable_map[fleet_interface->lengthcomp_proportion.id_m] = &(derived_quantities["lengthcomp_proportion"]);
         }
-        // replace elements in the variable map
-        info->variable_map[fleet_interface->log_landings_expected.id_m] = &(derived_quantities["log_landings_expected"]);
-        info->variable_map[fleet_interface->log_index_expected.id_m] = &(derived_quantities["log_index_expected"]);
-        info->variable_map[fleet_interface->agecomp_expected.id_m] = &(derived_quantities["agecomp_expected"]);
-        info->variable_map[fleet_interface->agecomp_proportion.id_m] = &(derived_quantities["agecomp_proportion"]);
-        info->variable_map[fleet_interface->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
-        if (fleet_interface->nlengths.get() > 0)
-        {
-            info->variable_map[fleet_interface->age_to_length_conversion.id_m] = &(derived_quantities["age_to_length_conversion"]);
-        }
-        info->variable_map[fleet_interface->lengthcomp_expected.id_m] = &(derived_quantities["lengthcomp_expected"]);
-        info->variable_map[fleet_interface->lengthcomp_proportion.id_m] = &(derived_quantities["lengthcomp_proportion"]);
+
+        return true;
     }
 
-    return true;
-}
-
-virtual bool
-add_to_fims_tmb()
-{
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    virtual bool add_to_fims_tmb()
+    {
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
 #ifdef TMBAD_FRAMEWORK
-    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
 #else
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
 #endif
-    return true;
-}
+        return true;
+    }
 
 #endif
-}
-;
+};
 
 #endif
