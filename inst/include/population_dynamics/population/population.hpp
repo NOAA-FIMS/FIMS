@@ -452,7 +452,7 @@ namespace fims_popdy {
                         this->mortality_Z[i_age_year] *
                         this->numbers_at_age[i_age_year] *
                         (1 - fims_math::exp(-(this->mortality_Z[i_age_year])))*
-                        this->age_to_length_conversion[i_length_age];
+                        this->fleets[fleet_]->age_to_length_conversion[i_length_age];
                     }
                 }
             }
@@ -533,7 +533,7 @@ namespace fims_popdy {
                         this->fleets[fleet_]->q.get_force_scalar(year) *
                         this->fleets[fleet_]->selectivity_at_length[i_length] *
                         this->numbers_at_age[i_age_year]*
-                        this->age_to_length_conversion[i_length_age];
+                        this->fleets[fleet_]->age_to_length_conversion[i_length_age];
                     }
                 }
             }
