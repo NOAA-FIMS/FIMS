@@ -1,6 +1,7 @@
 # FIMS 0.6.0
 
 * Initializes backend code to support model families.
+* Returns ungrouped tibble from `get_estimates()`.
 
 # FIMS 0.5.3
 
