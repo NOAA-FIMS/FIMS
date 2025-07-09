@@ -239,131 +239,131 @@ namespace fims_model
             }
 
             // initiate population index for structuring report out objects
-//             int pop_idx = 0;
-//             for (p_it = this->fims_information->populations.begin();
-//                  p_it != this->fims_information->populations.end(); ++p_it)
-//             {
-//                 std::shared_ptr<fims_popdy::Population<Type>> p = (*p_it).second;
-// #ifdef TMB_MODEL
-//                 naa(pop_idx) = vector<Type>(p->numbers_at_age);
-//                 ssb(pop_idx) = vector<Type>(p->spawning_biomass);
-//                 total_landings_w(pop_idx) = vector<Type>(p->total_landings_weight);
-//                 total_landings_n(pop_idx) = vector<Type>(p->total_landings_numbers);
-//                 log_recruit_dev(pop_idx) =
-//                     vector<Type>(p->recruitment->log_recruit_devs);
-//                 log_r(pop_idx) = vector<Type>(p->recruitment->log_r);
-//                 recruitment(pop_idx) = vector<Type>(p->expected_recruitment);
-//                 biomass(pop_idx) = vector<Type>(p->biomass);
-//                 M(pop_idx) = vector<Type>(p->M);
-// #endif
-//                 pop_idx += 1;
-//             }
+            int pop_idx = 0;
+            for (p_it = this->fims_information->populations.begin();
+                 p_it != this->fims_information->populations.end(); ++p_it)
+            {
+                std::shared_ptr<fims_popdy::Population<Type>> p = (*p_it).second;
+#ifdef TMB_MODEL
+                naa(pop_idx) = vector<Type>(p->numbers_at_age);
+                ssb(pop_idx) = vector<Type>(p->spawning_biomass);
+                total_landings_w(pop_idx) = vector<Type>(p->total_landings_weight);
+                total_landings_n(pop_idx) = vector<Type>(p->total_landings_numbers);
+                log_recruit_dev(pop_idx) =
+                    vector<Type>(p->recruitment->log_recruit_devs);
+                log_r(pop_idx) = vector<Type>(p->recruitment->log_r);
+                recruitment(pop_idx) = vector<Type>(p->expected_recruitment);
+                biomass(pop_idx) = vector<Type>(p->biomass);
+                M(pop_idx) = vector<Type>(p->M);
+#endif
+                pop_idx += 1;
+            }
 
-//             // initiate fleet index for structuring report out objects
-//             int fleet_idx = 0;
-//             for (f_it = this->fims_information->fleets.begin();
-//                  f_it != this->fims_information->fleets.end(); ++f_it)
-//             {
-//                 std::shared_ptr<fims_popdy::Fleet<Type>> f = (*f_it).second;
-// #ifdef TMB_MODEL
-//                 landings_w(fleet_idx) = f->landings_weight;
-//                 landings_n(fleet_idx) = f->landings_numbers;
-//                 landings_exp(fleet_idx) = f->landings_expected;
-//                 landings_naa(fleet_idx) = f->landings_numbers_at_age;
-//                 landings_waa(fleet_idx) = f->landings_weight_at_age;
-//                 landings_nal(fleet_idx) = f->landings_numbers_at_length;
-//                 index_w(fleet_idx) = f->index_weight;
-//                 index_n(fleet_idx) = f->index_numbers;
-//                 index_exp(fleet_idx) = f->index_expected;
-//                 index_naa(fleet_idx) = f->index_numbers_at_age;
-//                 index_nal(fleet_idx) = f->index_numbers_at_length;
-//                 agecomp_exp(fleet_idx) = f->agecomp_expected;
-//                 lengthcomp_exp(fleet_idx) = f->lengthcomp_expected;
-//                 agecomp_prop(fleet_idx) = f->agecomp_proportion;
-//                 lengthcomp_prop(fleet_idx) = f->lengthcomp_proportion;
-//                 F_mort(fleet_idx) = f->Fmort;
-//                 q(fleet_idx) = f->q;
-// #endif
-//                 fleet_idx += 1;
-//             }
+            // initiate fleet index for structuring report out objects
+            int fleet_idx = 0;
+            for (f_it = this->fims_information->fleets.begin();
+                 f_it != this->fims_information->fleets.end(); ++f_it)
+            {
+                std::shared_ptr<fims_popdy::Fleet<Type>> f = (*f_it).second;
+#ifdef TMB_MODEL
+                landings_w(fleet_idx) = f->landings_weight;
+                landings_n(fleet_idx) = f->landings_numbers;
+                landings_exp(fleet_idx) = f->landings_expected;
+                landings_naa(fleet_idx) = f->landings_numbers_at_age;
+                landings_waa(fleet_idx) = f->landings_weight_at_age;
+                landings_nal(fleet_idx) = f->landings_numbers_at_length;
+                index_w(fleet_idx) = f->index_weight;
+                index_n(fleet_idx) = f->index_numbers;
+                index_exp(fleet_idx) = f->index_expected;
+                index_naa(fleet_idx) = f->index_numbers_at_age;
+                index_nal(fleet_idx) = f->index_numbers_at_length;
+                agecomp_exp(fleet_idx) = f->agecomp_expected;
+                lengthcomp_exp(fleet_idx) = f->lengthcomp_expected;
+                agecomp_prop(fleet_idx) = f->agecomp_proportion;
+                lengthcomp_prop(fleet_idx) = f->lengthcomp_proportion;
+                F_mort(fleet_idx) = f->Fmort;
+                q(fleet_idx) = f->q;
+#endif
+                fleet_idx += 1;
+            }
 
 //             // Reporting
-// #ifdef TMB_MODEL
-//             if (do_tmb_reporting)
-//             {
-//                 // FIMS_REPORT_F(rec_nll, of);
-//                 // FIMS_REPORT_F(age_comp_nll, of);
-//                 // FIMS_REPORT_F(index_nll, of);
-//                 FIMS_REPORT_F(jnll, of);
-//                 FIMS_REPORT_F(naa, of);
-//                 FIMS_REPORT_F(ssb, of);
-//                 FIMS_REPORT_F(log_recruit_dev, of);
-//                 FIMS_REPORT_F(log_r, of);
-//                 FIMS_REPORT_F(recruitment, of);
-//                 FIMS_REPORT_F(biomass, of);
-//                 FIMS_REPORT_F(M, of);
-//                 FIMS_REPORT_F(total_landings_w, of);
-//                 FIMS_REPORT_F(total_landings_n, of);
-//                 FIMS_REPORT_F(landings_w, of);
-//                 FIMS_REPORT_F(landings_n, of);
-//                 FIMS_REPORT_F(landings_exp, of);
-//                 FIMS_REPORT_F(landings_naa, of);
-//                 FIMS_REPORT_F(landings_waa, of);
-//                 FIMS_REPORT_F(landings_nal, of);
-//                 FIMS_REPORT_F(index_w, of);
-//                 FIMS_REPORT_F(index_n, of);
-//                 FIMS_REPORT_F(index_exp, of);
-//                 FIMS_REPORT_F(index_naa, of);
-//                 FIMS_REPORT_F(index_nal, of);
-//                 FIMS_REPORT_F(agecomp_exp, of);
-//                 FIMS_REPORT_F(lengthcomp_exp, of);
-//                 FIMS_REPORT_F(agecomp_prop, of);
-//                 FIMS_REPORT_F(lengthcomp_prop, of);
-//                 FIMS_REPORT_F(F_mort, of);
-//                 FIMS_REPORT_F(q, of);
-//                 FIMS_REPORT_F(nll_components, of);
+#ifdef TMB_MODEL
+            if (do_tmb_reporting)
+            {
+                // FIMS_REPORT_F(rec_nll, of);
+                // FIMS_REPORT_F(age_comp_nll, of);
+                // FIMS_REPORT_F(index_nll, of);
+                FIMS_REPORT_F(jnll, of);
+                FIMS_REPORT_F(naa, of);
+                FIMS_REPORT_F(ssb, of);
+                FIMS_REPORT_F(log_recruit_dev, of);
+                FIMS_REPORT_F(log_r, of);
+                FIMS_REPORT_F(recruitment, of);
+                FIMS_REPORT_F(biomass, of);
+                FIMS_REPORT_F(M, of);
+                FIMS_REPORT_F(total_landings_w, of);
+                FIMS_REPORT_F(total_landings_n, of);
+                FIMS_REPORT_F(landings_w, of);
+                FIMS_REPORT_F(landings_n, of);
+                FIMS_REPORT_F(landings_exp, of);
+                FIMS_REPORT_F(landings_naa, of);
+                FIMS_REPORT_F(landings_waa, of);
+                FIMS_REPORT_F(landings_nal, of);
+                FIMS_REPORT_F(index_w, of);
+                FIMS_REPORT_F(index_n, of);
+                FIMS_REPORT_F(index_exp, of);
+                FIMS_REPORT_F(index_naa, of);
+                FIMS_REPORT_F(index_nal, of);
+                FIMS_REPORT_F(agecomp_exp, of);
+                FIMS_REPORT_F(lengthcomp_exp, of);
+                FIMS_REPORT_F(agecomp_prop, of);
+                FIMS_REPORT_F(lengthcomp_prop, of);
+                FIMS_REPORT_F(F_mort, of);
+                FIMS_REPORT_F(q, of);
+                FIMS_REPORT_F(nll_components, of);
 
-//                 /*ADREPORT using ADREPORTvector defined in
-//                  * inst/include/interface/interface.hpp:
-//                  * function collapses the nested vector into a single vector
-//                  */
-//                 vector<Type> NAA = ADREPORTvector(naa);
-//                 vector<Type> Biomass = ADREPORTvector(biomass);
-//                 vector<Type> SSB = ADREPORTvector(ssb);
-//                 vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
-//                 vector<Type> FMort = ADREPORTvector(F_mort);
-//                 vector<Type> Q = ADREPORTvector(q);
-//                 vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
-//                 vector<Type> IndexExpected = ADREPORTvector(index_exp);
-//                 vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
-//                 vector<Type> LandingsNumberAtLength = ADREPORTvector(landings_nal);
-//                 vector<Type> IndexNumberAtAge = ADREPORTvector(index_naa);
-//                 vector<Type> IndexNumberAtLength = ADREPORTvector(index_nal);
-//                 vector<Type> AgeCompositionExpected = ADREPORTvector(agecomp_exp);
-//                 vector<Type> LengthCompositionExpected = ADREPORTvector(lengthcomp_exp);
-//                 vector<Type> AgeCompositionProportion =
-//                     ADREPORTvector(agecomp_prop);
-//                 vector<Type> LengthCompositionProportion =
-//                     ADREPORTvector(lengthcomp_prop);
+                /*ADREPORT using ADREPORTvector defined in
+                 * inst/include/interface/interface.hpp:
+                 * function collapses the nested vector into a single vector
+                 */
+                vector<Type> NAA = ADREPORTvector(naa);
+                vector<Type> Biomass = ADREPORTvector(biomass);
+                vector<Type> SSB = ADREPORTvector(ssb);
+                vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
+                vector<Type> FMort = ADREPORTvector(F_mort);
+                vector<Type> Q = ADREPORTvector(q);
+                vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
+                vector<Type> IndexExpected = ADREPORTvector(index_exp);
+                vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
+                vector<Type> LandingsNumberAtLength = ADREPORTvector(landings_nal);
+                vector<Type> IndexNumberAtAge = ADREPORTvector(index_naa);
+                vector<Type> IndexNumberAtLength = ADREPORTvector(index_nal);
+                vector<Type> AgeCompositionExpected = ADREPORTvector(agecomp_exp);
+                vector<Type> LengthCompositionExpected = ADREPORTvector(lengthcomp_exp);
+                vector<Type> AgeCompositionProportion =
+                    ADREPORTvector(agecomp_prop);
+                vector<Type> LengthCompositionProportion =
+                    ADREPORTvector(lengthcomp_prop);
 
-//                 ADREPORT_F(NAA, of);
-//                 ADREPORT_F(Biomass, of);
-//                 ADREPORT_F(SSB, of);
-//                 ADREPORT_F(LogRecDev, of);
-//                 ADREPORT_F(FMort, of);
-//                 ADREPORT_F(Q, of);
-//                 ADREPORT_F(LandingsExpected, of);
-//                 ADREPORT_F(IndexExpected, of);
-//                 ADREPORT_F(LandingsNumberAtAge, of);
-//                 ADREPORT_F(LandingsNumberAtLength, of);
-//                 ADREPORT_F(IndexNumberAtAge, of);
-//                 ADREPORT_F(IndexNumberAtLength, of);
-//                 ADREPORT_F(AgeCompositionExpected, of);
-//                 ADREPORT_F(LengthCompositionExpected, of);
-//                 ADREPORT_F(AgeCompositionProportion, of);
-//                 ADREPORT_F(LengthCompositionProportion, of);
-//             }
-// #endif
+                ADREPORT_F(NAA, of);
+                ADREPORT_F(Biomass, of);
+                ADREPORT_F(SSB, of);
+                ADREPORT_F(LogRecDev, of);
+                ADREPORT_F(FMort, of);
+                ADREPORT_F(Q, of);
+                ADREPORT_F(LandingsExpected, of);
+                ADREPORT_F(IndexExpected, of);
+                ADREPORT_F(LandingsNumberAtAge, of);
+                ADREPORT_F(LandingsNumberAtLength, of);
+                ADREPORT_F(IndexNumberAtAge, of);
+                ADREPORT_F(IndexNumberAtLength, of);
+                ADREPORT_F(AgeCompositionExpected, of);
+                ADREPORT_F(LengthCompositionExpected, of);
+                ADREPORT_F(AgeCompositionProportion, of);
+                ADREPORT_F(LengthCompositionProportion, of);
+            }
+#endif
 
             return jnll;
         }
