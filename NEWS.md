@@ -1,3 +1,7 @@
+# FIMS 0.6.0
+
+* Initializes backend code to support model families.
+
 # FIMS 0.5.3
 
 * Fix json output to use full stop rather than underscore for names, a bug
