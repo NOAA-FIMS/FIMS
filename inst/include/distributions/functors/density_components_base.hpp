@@ -63,10 +63,10 @@ struct DistributionElementObject {
       return observed_values->at(i,j);
     }
     if(this->input_type == "random_effects"){
-      return (*re)[i,j];
+      return (*re)[i];
     }
     if(this->input_type == "prior"){
-      return (*(priors[i,j]))[0];
+      return (*(priors[i][j]));
     }
     return x[i];
   }
