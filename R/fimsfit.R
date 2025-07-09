@@ -588,7 +588,8 @@ FIMSFit <- function(
         derived_quantity_id, module_name.y, module_id.y, module_type.y,
         estimate.y
       )
-    )
+    ) |>
+    dplyr::ungroup()
 
   # Create fits tibble
   # TODO: Develop better/more reliable method for obtaining 'module_name'/'module_id'/'label' from output

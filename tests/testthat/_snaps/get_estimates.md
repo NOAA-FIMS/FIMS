@@ -5,7 +5,6 @@
       -uncertainty, -gradient), n = 320, width = Inf)
     Output
       # A tibble: 11,688 x 15
-      # Groups:   label [30]
           module_name module_id module_type label                    type   type_id
           <chr>           <int> <chr>       <chr>                    <chr>    <int>
         1 selectivity         1 Logistic    inflection_point         vector       1
@@ -981,7 +980,6 @@
       -uncertainty, -gradient), n = 320, width = Inf)
     Output
       # A tibble: 20,299 x 15
-      # Groups:   label [43]
           module_name module_id module_type label                    type   type_id
           <chr>           <int> <chr>       <chr>                    <chr>    <int>
         1 selectivity         1 Logistic    inflection_point         vector       1
