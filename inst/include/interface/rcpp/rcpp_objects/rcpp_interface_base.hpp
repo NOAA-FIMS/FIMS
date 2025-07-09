@@ -665,6 +665,32 @@ public:
     FIMS_WARNING_LOG("Method not yet defined.");
     return "{\"name\" : \"not yet implemented\"}";
   }
+
+
+  /**
+   * @brief Make a string of dimensions for the model.
+   */
+  std::string make_dimensions(uint32_t start, uint32_t end, uint32_t rep = 1)
+  {
+    std::stringstream ss;
+
+    for (size_t i = 0; i < rep; i++)
+    {
+      for (size_t j = start; j < end; j++)
+      {
+        ss << j << ", ";
+      }
+      if (i < (rep - 1))
+      {
+        ss << end << ", ";
+      }
+      else
+      {
+        ss << end;
+      }
+    }
+    return ss.str();
+  }
 };
 std::vector<std::shared_ptr<FIMSRcppInterfaceBase> >
   FIMSRcppInterfaceBase::fims_interface_objects;

@@ -473,6 +473,8 @@ FIMSFit <- function(
   )
 
   # Create JSON output for FIMS run
+  # TODO: turn on get_output()
+  # finalized_fims <- input[["model"]]$get_output()
   finalized_fims <- finalize(
     # Use par from obj if the model is not optimized; otherwise, use par from opt.
     if (length(sdreport) > 0) opt[["par"]] else obj[["par"]],
