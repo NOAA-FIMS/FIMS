@@ -53,9 +53,8 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  DataInterfaceBase(const DataInterfaceBase& other) :
-  observed_data(other.observed_data), id(other.id) {
-  }
+  DataInterfaceBase(const DataInterfaceBase& other)
+      : observed_data(other.observed_data), id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -105,9 +104,10 @@ class AgeCompDataInterface : public DataInterfaceBase {
   AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase() {
     this->amax = amax;
     this->ymax = ymax;
-    this->age_comp_data.resize(amax*ymax);
+    this->age_comp_data.resize(amax * ymax);
 
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<AgeCompDataInterface>(*this));
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<AgeCompDataInterface>(*this));
   }
 
   /**
@@ -115,8 +115,11 @@ class AgeCompDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  AgeCompDataInterface(const AgeCompDataInterface& other) :
-  DataInterfaceBase(other), amax(other.amax), ymax(other.ymax), age_comp_data(other.age_comp_data) {}
+  AgeCompDataInterface(const AgeCompDataInterface& other)
+      : DataInterfaceBase(other),
+        amax(other.amax),
+        ymax(other.ymax),
+        age_comp_data(other.age_comp_data) {}
 
   /**
    * @brief The destructor.
@@ -147,13 +150,12 @@ class AgeCompDataInterface : public DataInterfaceBase {
     ss << " \"dimensions\": [" << this->ymax << "," << this->amax << "],\n";
     ss << " \"values\": [";
     for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++) {
-        ss << age_comp_data[i] << ", ";
+      ss << age_comp_data[i] << ", ";
     }
     ss << age_comp_data[age_comp_data.size() - 1] << "]\n";
     ss << "}";
     return ss.str();
   }
-
 
 #ifdef TMB_MODEL
 
@@ -184,15 +186,15 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    #ifdef TMBAD_FRAMEWORK
-        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-    #else
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-    #endif
+#endif
 
     return true;
   }
@@ -227,9 +229,10 @@ class LengthCompDataInterface : public DataInterfaceBase {
   LengthCompDataInterface(int ymax = 0, int lmax = 0) : DataInterfaceBase() {
     this->lmax = lmax;
     this->ymax = ymax;
-    this->length_comp_data.resize(lmax*ymax);
+    this->length_comp_data.resize(lmax * ymax);
 
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LengthCompDataInterface>(*this));
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<LengthCompDataInterface>(*this));
   }
 
   /**
@@ -237,8 +240,11 @@ class LengthCompDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  LengthCompDataInterface(const LengthCompDataInterface& other) :
-  DataInterfaceBase(other), lmax(other.lmax), ymax(other.ymax), length_comp_data(other.length_comp_data) {}
+  LengthCompDataInterface(const LengthCompDataInterface& other)
+      : DataInterfaceBase(other),
+        lmax(other.lmax),
+        ymax(other.ymax),
+        length_comp_data(other.length_comp_data) {}
 
   /**
    * @brief The destructor.
@@ -269,7 +275,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     ss << " \"dimensions\": [" << this->ymax << "," << this->lmax << "],\n";
     ss << " \"values\": [";
     for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++) {
-        ss << length_comp_data[i] << ", ";
+      ss << length_comp_data[i] << ", ";
     }
     ss << length_comp_data[length_comp_data.size() - 1] << "]\n";
     ss << "}";
@@ -300,15 +306,15 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    #ifdef TMBAD_FRAMEWORK
-        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-    #else
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-    #endif
+#endif
 
     return true;
   }
@@ -337,7 +343,8 @@ class IndexDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->index_data.resize(ymax);
 
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<IndexDataInterface>(*this));
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<IndexDataInterface>(*this));
   }
 
   /**
@@ -345,8 +352,10 @@ class IndexDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  IndexDataInterface(const IndexDataInterface& other) :
-  DataInterfaceBase(other), ymax(other.ymax), index_data(other.index_data) {}
+  IndexDataInterface(const IndexDataInterface& other)
+      : DataInterfaceBase(other),
+        ymax(other.ymax),
+        index_data(other.index_data) {}
 
   /**
    * @brief The destructor.
@@ -377,7 +386,7 @@ class IndexDataInterface : public DataInterfaceBase {
     ss << " \"dimensions\": [" << this->ymax << "],\n";
     ss << " \"values\": [";
     for (R_xlen_t i = 0; i < index_data.size() - 1; i++) {
-        ss << index_data[i] << ", ";
+      ss << index_data[i] << ", ";
     }
     ss << index_data[index_data.size() - 1] << "]\n";
     ss << "}";
@@ -409,15 +418,15 @@ class IndexDataInterface : public DataInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    #ifdef TMBAD_FRAMEWORK
-        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-    #else
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-    #endif
+#endif
 
     return true;
   }
@@ -447,7 +456,8 @@ class LandingsDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->landings_data.resize(ymax);
 
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LandingsDataInterface>(*this));
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<LandingsDataInterface>(*this));
   }
 
   /**
@@ -455,8 +465,10 @@ class LandingsDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  LandingsDataInterface(const LandingsDataInterface& other) :
-  DataInterfaceBase(other), ymax(other.ymax), landings_data(other.landings_data) {}
+  LandingsDataInterface(const LandingsDataInterface& other)
+      : DataInterfaceBase(other),
+        ymax(other.ymax),
+        landings_data(other.landings_data) {}
 
   /**
    * @brief The destructor.
@@ -472,9 +484,9 @@ class LandingsDataInterface : public DataInterfaceBase {
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
-   * data interface with landings data. It also returns the ID, the rank of 1, the
-   * dimensions by printing ymax, followed by the data values themselves. This
-   * string is formatted for a json file.
+   * data interface with landings data. It also returns the ID, the rank of 1,
+   * the dimensions by printing ymax, followed by the data values themselves.
+   * This string is formatted for a json file.
    */
   virtual std::string to_json() {
     std::stringstream ss;
@@ -519,15 +531,15 @@ class LandingsDataInterface : public DataInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    #ifdef TMBAD_FRAMEWORK
-        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-    #else
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-    #endif
+#endif
 
     return true;
   }
