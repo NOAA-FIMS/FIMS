@@ -72,25 +72,6 @@ struct DistributionElementObject {
   }
 
   /**
-   * Retrieve element from observed data set, random effect, or prior.
-   * @param i index referencing row
-   * @param j index referencing column
-   * @return the reference to the row and column at position i, j
-   */
-  inline Type& get_observed(size_t i, size_t j){
-     if(this->input_type == "data"){
-      return observed_values->at(i,j);
-    }
-    if(this->input_type == "random_effects"){
-      return (*re)[i,j];
-    }
-    if(this->input_type == "prior"){
-      return (*(priors[i,j]))[0];
-    }
-    return x[i];
-  }
-
-  /**
    * Retrieve expected element given data, random effect, or prior.
    * @param i index referencing vector or pointer
    * @return the reference to the value of the vector or pointer at position i

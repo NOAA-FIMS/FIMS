@@ -87,7 +87,7 @@ namespace fims_popdy {
         maturity; /*!< shared pointer to maturity module */
 
         // fleet
-        int fleet_id = -999; /*!< id of fleet model object*/
+        std::set<uint32_t> fleet_ids; /*!< id of fleet model object*/
         std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
         fleets; /*!< shared pointer to fleet module */
 
@@ -99,6 +99,12 @@ namespace fims_popdy {
         // available anywhere in the R package
 #endif
 
+        std::map<std::string, fims::Vector<Type> > derived_quantities; /*!< derived quantities for specific model type, i.e. caa, surplus production, etc */
+        /**
+         * @brief Iterator for the derived quantities.
+         * 
+         */
+        typedef typename std::map<std::string, fims::Vector<Type> >::iterator derived_quantities_iterator;
         // this -> means you're referring to a class member (member of self)
 
         Population() {
@@ -528,6 +534,7 @@ namespace fims_popdy {
              */
             for (size_t y = 0; y <= this->nyears; y++) {
                 for (size_t a = 0; a < this->nages; a++) {
+
                     /*
                      index naming defines the dimensional folding structure
                      i.e. i_age_year is referencing folding over years and ages.

@@ -91,6 +91,12 @@ namespace fims_popdy {
         fims::Vector<Type> agecomp_proportion; /*!<model expected composition proportion numbers at age*/
         fims::Vector<Type> lengthcomp_proportion; /*!<model expected composition proportion numbers at length*/
 
+        std::map<std::string, fims::Vector<Type> > derived_quantities; /*!< derived quantities for specific model type, i.e. caa, surplus production, etc */
+        /**
+         * @brief Derived quantities iterator.
+         * 
+         */
+        typedef typename std::map<std::string, fims::Vector<Type> >::iterator derived_quantities_iterator;
 
 #ifdef TMB_MODEL
         ::objective_function<Type> *of;

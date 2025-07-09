@@ -356,9 +356,13 @@ initialize_population <- function(parameters, data, linked_ids) {
 
   # Link up the recruitment, growth, and maturity modules with
   # this population module
-  module$SetGrowthID(linked_ids["growth"])
-  module$SetMaturityID(linked_ids["maturity"])
-  module$SetRecruitmentID(linked_ids["recruitment"])
+  module$SetGrowthID(linked_ids[["growth"]])
+  module$SetMaturityID(linked_ids[["maturity"]])
+  module$SetRecruitmentID(linked_ids[["recruitment"]])
+  # Link fleets to module
+  for (i in which(grepl("fleet", names(linked_ids)))) {
+    module$AddFleet(linked_ids[[i]])
+  }
 
   return(module)
 }
@@ -908,7 +912,8 @@ initialize_fims <- function(parameters, data) {
   population_module_ids <- c(
     recruitment = recruitment$get_id(),
     growth = growth$get_id(),
-    maturity = maturity$get_id()
+    maturity = maturity$get_id(),
+    fleets = purrr::map(fleet, \(x) x$get_id())
   )
 
   # Population
@@ -919,12 +924,20 @@ initialize_fims <- function(parameters, data) {
   )
 
   # Set-up TMB
+  # TODO: Fix this when more families come online
+  # Hard code to be a catch-at-age model
+  # caa <- methods::new(CatchAtAge)
+  # caa$AddPopulation(population$get_id())
+
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameter_list <- list(
     parameters = list(
       p = get_fixed(),
       re = get_random()
+    # TODO: Add the model to this list
+    # ),
+    # model = caa
     )
   )
 
