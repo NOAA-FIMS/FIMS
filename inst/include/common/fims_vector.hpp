@@ -506,7 +506,7 @@ bool operator==(const fims::Vector<T>& lhs, const fims::Vector<T>& rhs) {
  * @return std::ostream& 
  */
 template<typename Type>
-std::ostream& operator<<(std::ostream& out, fims::Vector<Type>& v) {
+std::ostream& operator<<(std::ostream& out, const fims::Vector<Type>& v) {
   out << "[";
 
   if (v.size() == 0) {
