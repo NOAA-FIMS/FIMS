@@ -662,7 +662,7 @@ public:
     ss << " },\n";
 
     ss << "{\n";
-    ss << "  \"name\": \"index expected \",\n";
+    ss << "  \"name\": \"index_expected\",\n";
     ss << "  \"values\":[";
     if (this->derived_index_expected.size() == 0) {
       ss << "]\n";
@@ -675,7 +675,7 @@ public:
     ss << " },\n";
 
     ss << "{\n";
-    ss << "  \"name\": \"index weight \",\n";
+    ss << "  \"name\": \"index_weight\",\n";
     ss << "  \"values\":[";
     if (this->derived_index_w.size() == 0) {
       ss << "]\n";
@@ -688,7 +688,7 @@ public:
     ss << " },\n";
 
     ss << "{\n";
-    ss << "  \"name\": \"index numbers \",\n";
+    ss << "  \"name\": \"index_numbers\",\n";
     ss << "  \"values\":[";
     if (this->derived_index_n.size() == 0) {
       ss << "]\n";
@@ -701,7 +701,7 @@ public:
     ss << " },\n";
 
     ss << "{\n";
-    ss << "  \"name\": \"landings expected \",\n";
+    ss << "  \"name\": \"landings_expected\",\n";
     ss << "  \"values\":[";
     if (this->derived_landings_expected.size() == 0) {
       ss << "]\n";
@@ -714,7 +714,7 @@ public:
     ss << " },\n";
 
     ss << "{\n";
-    ss << "  \"name\": \"landings weight \",\n";
+    ss << "  \"name\": \"landings_weight\",\n";
     ss << "  \"values\":[";
     if (this->derived_landings_w.size() == 0) {
       ss << "]\n";
@@ -727,7 +727,7 @@ public:
     ss << " },\n";
 
     ss << "{\n";
-    ss << "  \"name\": \"landings numbers \",\n";
+    ss << "  \"name\": \"landings_numbers\",\n";
     ss << "  \"values\":[";
     if (this->derived_landings_n.size() == 0) {
       ss << "]\n";
