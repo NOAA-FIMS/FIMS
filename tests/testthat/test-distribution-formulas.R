@@ -109,6 +109,75 @@ test_that("distribution formulas work with correct inputs", {
   )
 })
 
+## Test purrr::walk2() improvements
+test_that("purrr::walk2() improvements work correctly", {
+  #' @description Test that the improved purrr::walk2() calls work with vector inputs
+  # Create test data with multiple values
+  test_sd_values <- c(0.5, 1.0, 1.5, 2.0)
+  
+  # Test initialize_data_distribution with lognormal family
+  test_fleet <- methods::new(Fleet)
+  test_fleet$nages$set(4)
+  test_fleet$nyears$set(4)
+  test_fleet$log_Fmort$resize(4)
+  test_fleet$log_q[1]$value <- log(1.0)
+  test_fleet$log_q$set_all_estimable(FALSE)
+  
+  # Create index for testing
+  test_index <- methods::new(Index, 4)
+  test_fleet$SetObservedIndexDataID(test_index$get_id())
+  
+  # Test with vector sd values
+  test_dist <- initialize_data_distribution(
+    module = test_fleet,
+    family = lognormal(link = "log"),
+    sd = list(value = test_sd_values, estimation_type = "constant"),
+    data_type = "index"
+  )
+  
+  # Verify that all log_sd values are correctly set
+  expected_log_sd <- log(test_sd_values)
+  for (i in seq_along(test_sd_values)) {
+    expect_equal(
+      test_dist$log_sd[i]$value,
+      expected_log_sd[i],
+      info = paste("log_sd[", i, "] should equal log(", test_sd_values[i], ")"))
+  }
+  
+  # Test initialize_process_distribution with vector inputs
+  test_recruitment <- methods::new(BevertonHoltRecruitment)
+  test_recruitment$log_devs$resize(4)
+  
+  test_process_dist <- initialize_process_distribution(
+    module = test_recruitment,
+    par = "log_devs",
+    family = lognormal(),
+    sd = list(value = test_sd_values, estimation_type = "constant"),
+    is_random_effect = FALSE
+  )
+  
+  # Verify that all log_sd values are correctly set
+  for (i in seq_along(test_sd_values)) {
+    expect_equal(
+      test_process_dist$log_sd[i]$value,
+      expected_log_sd[i],
+      info = paste("process log_sd[", i, "] should equal log(", test_sd_values[i], ")"))
+  }
+  
+  # Test with single value (edge case)
+  single_sd <- 1.5
+  single_dist <- initialize_data_distribution(
+    module = test_fleet,
+    family = lognormal(link = "log"),
+    sd = list(value = single_sd, estimation_type = "constant"),
+    data_type = "index"
+  )
+  
+  expect_equal(single_dist$log_sd[1]$value, log(single_sd))
+  
+  clear()
+})
+
 ## Edge handling ----
 # TODO: Andrea to add edge handling tests
 # test_that("distribution_formulas_new() returns correct outputs for edge cases", {
