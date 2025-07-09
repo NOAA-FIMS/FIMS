@@ -33,8 +33,8 @@ jobs:
           - {os: ubuntu-24.04,  r: 'release'}
           - {os: ubuntu-24.04,  r: 'devel', http-user-agent: 'release'}
           # corresponds to Linux arm64
-          - {os: ubuntu-22.04-arm,  r: 'release'}
-          - {os: ubuntu-22.04-arm,  r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-24.04-arm,  r: 'release'}
+          - {os: ubuntu-24.04-arm,  r: 'devel', http-user-agent: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -67,7 +67,7 @@ jobs:
           # pipeline to fail.
           # Set environment variables 
           export FIMS="."
-          export CHECKARGS="--no-manual"
+          export CHECKARGS="--no-manual --no-vignettes"
 
           # Create library directory 
           mkdir -p mylib

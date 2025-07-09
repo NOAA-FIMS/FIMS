@@ -3,11 +3,13 @@
 ^\.github$
 ^\.history$
 CMakeLists.txt
+tests/concurrent
 tests/gtest
+tests/integration
 tests/test_plan
 build
 ^codecov\.yml$
-.vscode
+^\.vscode$
 ^data-raw$
 ^\.devcontainer$
 CONTRIBUTING.md
