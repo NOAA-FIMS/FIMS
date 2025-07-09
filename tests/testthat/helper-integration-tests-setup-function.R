@@ -433,8 +433,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   population$AddFleet(survey_fleet$get_id())
 
   # Set up catch at age model
-  caa <- methods::new(CatchAtAge)
-  caa$AddPopulation(population$get_id())
+  # caa <- methods::new(CatchAtAge)
+  # caa$AddPopulation(population$get_id())
 
   # Set-up TMB
   CreateTMBModel()
