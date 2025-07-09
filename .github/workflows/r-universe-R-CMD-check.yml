@@ -67,7 +67,7 @@ jobs:
           # pipeline to fail.
           # Set environment variables 
           export FIMS="."
-          export CHECKARGS="--no-manual --no-vignettes"
+          export CHECKARGS="--no-manual"
 
           # Create library directory 
           mkdir -p mylib
