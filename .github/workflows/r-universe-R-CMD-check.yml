@@ -77,10 +77,12 @@ jobs:
           # will cause script to exit.
           echo "Running R CMD INSTALL..."
           # Run R CMD INSTALL and capture output to log file and console 
-          R CMD INSTALL "$FIMS" --library=mylib --build 2>&1 | tee install.log
+          # R CMD INSTALL "$FIMS" --library=mylib --build 2>&1 | tee install.log
+          R CMD INSTALL "$FIMS" --library=mylib --build
 
           # Run R CMD check. This command's exit code will determine step success/failure.
-          R CMD check "$FIMS" --library=mylib --install=check:install.log "$CHECKARGS" 
+          # R CMD check "$FIMS" --library=mylib --install=check:install.log "$CHECKARGS" 
+          R CMD check "$FIMS" --library=mylib "$CHECKARGS"
         shell: bash
         
       - name: Upload check results on failure
@@ -89,4 +91,4 @@ jobs:
         with:
           # Unique name for the artifact per OS
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: ${{ github.workspace }}/../FIMS.Rcheck/
+          path: ${{ github.workspace }}/.Rcheck/
