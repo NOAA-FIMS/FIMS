@@ -2,9 +2,6 @@
 
 #include "population_dynamics/population/population.hpp"
 
-
-
-
 namespace {
 
 // Use test fixture to reuse the same configuration of objects for
@@ -89,7 +86,7 @@ class PopulationEvaluateTestFixture : public testing::Test {
       selectivity->slope[0] = 0.5;
 
       fleet->landings_expected.resize(nyears);
-      fleet->index_expected.resize(nyears);  
+      fleet->index_expected.resize(nyears);
       fleet->landings_numbers_at_age.resize(nyears * nages);
       fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
@@ -98,15 +95,15 @@ class PopulationEvaluateTestFixture : public testing::Test {
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
-      
+
       fleet->Prepare();
       population.fleets.push_back(fleet);
     }
     population.numbers_at_age.resize((nyears + 1) * nages);
     try {
-        population.Initialize(nyears, nseasons, nages);
+      population.Initialize(nyears, nseasons, nages);
     } catch (std::exception& e) {
-        std::cout << e.what() << "\n";
+      std::cout << e.what() << "\n";
     }
 
     for (int i = 0; i < nages; i++) {
@@ -256,9 +253,9 @@ class PopulationPrepareTestFixture : public testing::Test {
       selectivity->slope.resize(1);
       selectivity->inflection_point[0] = 7;
       selectivity->slope[0] = 0.5;
-      
+
       fleet->landings_expected.resize(nyears);
-      fleet->index_expected.resize(nyears);  
+      fleet->index_expected.resize(nyears);
       fleet->landings_numbers_at_age.resize(nyears * nages);
       fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
@@ -267,7 +264,7 @@ class PopulationPrepareTestFixture : public testing::Test {
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
-      
+
       fleet->Prepare();
       population.fleets.push_back(fleet);
     }

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file recruitment_base.hpp
  * @brief Serves as the parent class where recruitment functions are called.
  * @details Defines guards for recruitment base outline to define the
@@ -28,23 +28,25 @@ template <class Type>
 struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /**< reference id for recruitment object*/
 
-  fims::Vector<Type>
-      log_recruit_devs; /*!< A vector of the natural log of recruitment deviations */
-  bool constrain_deviations = false; /*!< A flag to indicate if recruitment
-                                 deviations are summing to zero or not */
+  fims::Vector<Type> log_recruit_devs; /*!< A vector of the natural log of
+                                          recruitment deviations */
+  bool constrain_deviations = false;   /*!< A flag to indicate if recruitment
+                                   deviations are summing to zero or not */
 
-  fims::Vector<Type> log_rzero;         /**< Natural log of unexploited recruitment.*/  
-  fims::Vector<Type> log_r; /**< Natural log of recruitment used for random effects */     
-  fims::Vector<Type> log_expected_recruitment; /**< Expectation of the recruitment process */
+  fims::Vector<Type> log_rzero; /**< Natural log of unexploited recruitment.*/
+  fims::Vector<Type>
+      log_r; /**< Natural log of recruitment used for random effects */
+  fims::Vector<Type>
+      log_expected_recruitment; /**< Expectation of the recruitment process */
 
   bool estimate_log_recruit_devs = true; /*!< A flag to indicate if recruitment
                                   deviations are estimated or not */
 
   int process_id = -999; /*!< id of recruitment process model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
-    process; /*!< shared pointer to recruitment processmodule */
+      process; /*!< shared pointer to recruitment processmodule */
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
-    recruitment; /*!< shared pointer to recruitment module */
+      recruitment; /*!< shared pointer to recruitment module */
 
   /** @brief Constructor.
    */
@@ -56,9 +58,10 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    * @brief Prepares the recruitment deviations vector.
    *
    */
-  void Prepare() { 
-   // this->PrepareConstrainedDeviations();
-   std::fill(log_expected_recruitment.begin(), log_expected_recruitment.end(), 0.0); 
+  void Prepare() {
+    // this->PrepareConstrainedDeviations();
+    std::fill(log_expected_recruitment.begin(), log_expected_recruitment.end(),
+              0.0);
   }
 
   /** @brief Calculates the expected recruitment for a given spawning input.
@@ -72,9 +75,9 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
       const Type &ssbzero) = 0;  // need to add input parameter values
 
   /** @brief Handle error in recruitment
-   * 
+   *
    * @param pos Position index, e.g., which year.
-  */
+   */
   virtual const Type evaluate_process(size_t pos) = 0;
 
   /** @brief Prepare constrained recruitment deviations.

@@ -48,8 +48,7 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  GrowthInterfaceBase(const GrowthInterfaceBase& other) :
-  id(other.id) {}
+  GrowthInterfaceBase(const GrowthInterfaceBase& other) : id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -102,8 +101,9 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @brief The constructor.
    */
   EWAAGrowthInterface() : GrowthInterfaceBase() {
-    this->ewaa = std::make_shared< std::map<double, double> > ();
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<EWAAGrowthInterface>(*this));
+    this->ewaa = std::make_shared<std::map<double, double> >();
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<EWAAGrowthInterface>(*this));
   }
 
   /**
@@ -111,8 +111,12 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    *
    * @param other
    */
-  EWAAGrowthInterface(const EWAAGrowthInterface& other) :
-  GrowthInterfaceBase(other), weights(other.weights), ages(other.ages), ewaa(other.ewaa), initialized(other.initialized) {}
+  EWAAGrowthInterface(const EWAAGrowthInterface& other)
+      : GrowthInterfaceBase(other),
+        weights(other.weights),
+        ages(other.ages),
+        ewaa(other.ewaa),
+        initialized(other.initialized) {}
 
   /**
    * @brief The destructor.
@@ -132,7 +136,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @return std::map<T, T>.
    */
   inline std::map<double, double> make_map(RealVector ages,
-    RealVector weights) {
+                                           RealVector weights) {
     std::map<double, double> mymap;
     for (uint32_t i = 0; i < ages.size(); i++) {
       mymap.insert(std::pair<double, double>(ages[i], weights[i]));
@@ -160,14 +164,14 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     }
     return EWAAGrowth.evaluate(age);
   }
-  
+
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
    * growth interface with empirical weight at age. It also returns the ID, the
    * rank of 1, the dimensions, age bins, and the calculated values themselves.
    * This string is formatted for a json file.
-   */ 
+   */
   virtual std::string to_json() {
     std::stringstream ss;
     ss << "{\n";
@@ -179,28 +183,28 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     ss << " \"ages\": [";
     for (size_t i = 0; i < ages.size() - 1; i++) {
-        ss << ages[i] << ", ";
+      ss << ages[i] << ", ";
     }
     ss << ages[ages.size() - 1] << "],\n";
 
     ss << " \"values\": [";
     for (size_t i = 0; i < weights.size() - 1; i++) {
-        ss << weights[i] << ", ";
+      ss << weights[i] << ", ";
     }
     ss << weights[weights.size() - 1] << "]\n";
     ss << "}";
     return ss.str();
   }
-  
+
 #ifdef TMB_MODEL
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type> > info =
-      fims_info::Information<Type>::GetInstance();
+        fims_info::Information<Type>::GetInstance();
 
     std::shared_ptr<fims_popdy::EWAAgrowth<Type> > ewaa_growth =
-      std::make_shared<fims_popdy::EWAAgrowth<Type> >();
+        std::make_shared<fims_popdy::EWAAgrowth<Type> >();
 
     // set relative info
     ewaa_growth->id = this->id;
@@ -216,15 +220,15 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    #ifdef TMBAD_FRAMEWORK
-        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-    #else
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-    #endif
+#endif
 
     return true;
   }
