@@ -94,4 +94,4 @@ jobs:
         with:
           # Unique name for the artifact per OS
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: ${{ github.workspace }}/..Rcheck/
+          path: ${{ github.workspace }}/..Rcheck
