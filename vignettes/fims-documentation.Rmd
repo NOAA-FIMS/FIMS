@@ -1,5 +1,6 @@
 ---
 title: "Fisheries Integrated Modeling System (FIMS) Documentation"
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Fisheries Integrated Modeling System (FIMS) Documentation}
   %\VignetteEngine{knitr::rmarkdown}

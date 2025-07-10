@@ -1,6 +1,6 @@
 ---
 title: "Introducing the Fisheries Integrated Modeling System (FIMS)"
-output: github_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introducing the Fisheries Integrated Modeling System (FIMS)}
   %\VignetteEngine{knitr::rmarkdown}

@@ -1,6 +1,6 @@
 ---
 title: "Minimal Example for Running a FIMS Model"
-output: github_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Minimal Example for Running a FIMS Model}
   %\VignetteEngine{knitr::rmarkdown}

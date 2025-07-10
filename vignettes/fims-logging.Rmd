@@ -1,6 +1,6 @@
 ---
 title: "Introducing the FIMS Logging System"
-output: github_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introducing the FIMS Logging System}
   %\VignetteEngine{knitr::rmarkdown}
