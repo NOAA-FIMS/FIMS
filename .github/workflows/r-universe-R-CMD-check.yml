@@ -1,7 +1,7 @@
 on:
   # TODO: 
   push:
-    # branches: [main]
+    branches: [dev]
   pull_request:
     # branches: [dev]
 
@@ -47,6 +47,9 @@ jobs:
 
       - name: Install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2 
+      
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -60,32 +63,35 @@ jobs:
           needs: check
 
       - name: Run R-universe check 
+        id: rcmdcheck
         run: |
           # Crucial: Enable 'pipefail' and 'exit on error' for robust scripting
           # This applies to all OSes running this Bash script.
-          set -euo pipefail
-          # -e: Exit immediately if a command exits with a non-zero status.
-          # -u: Treat unset variables as an error.
-          # -o pipefail: Ensures that a command failing in a pipeline causes the 
-          # pipeline to fail.
-          # Set environment variables 
-          export FIMS="."
-          export CHECKARGS="--no-manual --no-vignettes"
+          {
+            set -euo pipefail
+            # -e: Exit immediately if a command exits with a non-zero status.
+            # -u: Treat unset variables as an error.
+            # -o pipefail: Ensures that a command failing in a pipeline causes the 
+            # pipeline to fail.
+            # Set environment variables 
+            export FIMS="."
+            export CHECKARGS="--no-manual --no-vignettes"
+            export MY_R_LIB="${{ github.workspace }}/../mylib"
 
-          # Create library directory 
-          mkdir -p mylib
-          
-          # Run R CMD INSTALL and capture output to log file and console
-          # Due to 'set -o pipefail', if R CMD INSTALL fails, the whole line 
-          # will cause script to exit.
-          echo "Running R CMD INSTALL..."
-          # Run R CMD INSTALL and capture output to log file and console 
-          # R CMD INSTALL "$FIMS" --library=mylib --build 2>&1 | tee install.log
-          R CMD INSTALL "$FIMS" --library=mylib --build
+            # Create library directory 
+             mkdir -p "$MY_R_LIB"
+            
+            # Run R CMD INSTALL and capture output to log file and console
+            # Due to 'set -o pipefail', if R CMD INSTALL fails, the whole line 
+            # will cause script to exit.
+            echo "Running R CMD INSTALL..."
+            # Run R CMD INSTALL and capture output to log file and console 
+            R CMD INSTALL "$FIMS" --library="$MY_R_LIB" --build 
 
-          # Run R CMD check. This command's exit code will determine step success/failure.
-          # R CMD check "$FIMS" --library=mylib --install=check:install.log "$CHECKARGS" 
-          R CMD check "$FIMS" --library=mylib "$CHECKARGS"
+            # Run R CMD check. This command's exit code will determine step success/failure.
+            # R CMD check "$FIMS" --library="$MY_R_LIB" --install=check:install.log "$CHECKARGS" 
+            R CMD check "$FIMS" --library="$MY_R_LIB" "$CHECKARGS"
+          } 2>&1 | tee install_check.log
         shell: bash
         
       - name: Upload check results on failure
@@ -94,4 +100,4 @@ jobs:
         with:
           # Unique name for the artifact per OS
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: ${{ github.workspace }}/..Rcheck
+          path: install_check.log
