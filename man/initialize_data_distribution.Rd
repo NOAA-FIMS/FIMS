@@ -8,7 +8,7 @@
 \usage{
 initialize_data_distribution(
   module,
-  family,
+  family = NULL,
   sd = list(value = 1, estimation_type = "constant"),
   data_type = c("landings", "index", "agecomp", "lengthcomp")
 )
@@ -16,7 +16,7 @@ initialize_data_distribution(
 initialize_process_distribution(
   module,
   par,
-  family,
+  family = NULL,
   sd = list(value = 1, estimation_type = "constant"),
   is_random_effect = FALSE
 )
