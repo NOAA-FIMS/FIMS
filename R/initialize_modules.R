@@ -935,9 +935,9 @@ initialize_fims <- function(parameters, data) {
     parameters = list(
       p = get_fixed(),
       re = get_random()
-    # TODO: Add the model to this list
-    # ),
-    # model = caa
+      # TODO: Add the model to this list
+      # ),
+      # model = caa
     )
   )
 
