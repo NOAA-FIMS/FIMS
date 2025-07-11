@@ -33,7 +33,8 @@ prepare_test_data <- function() {
   data_age_comp <- FIMS::FIMSFrame(data_age_comp_raw)
   saveRDS(
     data_age_comp,
-    file = testthat::test_path("fixtures", "data_age_comp.RDS")
+    file = testthat::test_path("fixtures", "data_age_comp.RDS"),
+    compress = FALSE
   )
 
   # Generate dataset with only length composition data
@@ -46,7 +47,8 @@ prepare_test_data <- function() {
   data_length_comp <- FIMS::FIMSFrame(data_length_comp_raw)
   saveRDS(
     data_length_comp,
-    file = testthat::test_path("fixtures", "data_length_comp.RDS")
+    file = testthat::test_path("fixtures", "data_length_comp.RDS"),
+    compress = FALSE
   )
 
   # Missing year for all data sets is year 0002, i.e., yyyy-mm-dd
@@ -58,7 +60,8 @@ prepare_test_data <- function() {
     FIMS::FIMSFrame()
   saveRDS(
     data_age_comp_na,
-    file = testthat::test_path("fixtures", "data_age_comp_na.RDS")
+    file = testthat::test_path("fixtures", "data_age_comp_na.RDS"),
+    compress = FALSE
   )
 
   # Generate dataset with missing length composition, age-to-length-conversion,
@@ -73,7 +76,8 @@ prepare_test_data <- function() {
     FIMS::FIMSFrame()
   saveRDS(
     data_length_comp_na,
-    file = testthat::test_path("fixtures", "data_length_comp_na.RDS")
+    file = testthat::test_path("fixtures", "data_length_comp_na.RDS"),
+    compress = FALSE
   )
 
   # Generate dataset with missing values in age composition for survey1
@@ -98,7 +102,8 @@ prepare_test_data <- function() {
     FIMS::FIMSFrame()
   saveRDS(
     data_age_length_comp_na,
-    file = testthat::test_path("fixtures", "data_age_length_comp_na.RDS")
+    file = testthat::test_path("fixtures", "data_age_length_comp_na.RDS"),
+    compress = FALSE
   )
 
   # Set up FIMS deterministic and estimation runs results ----
@@ -149,7 +154,8 @@ prepare_test_data <- function() {
   )
   saveRDS(
     modified_parameters,
-    file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
+    file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
+    compress = FALSE
   )
 
   ## Deterministic run with age and length comp using wrappers ----
@@ -167,14 +173,16 @@ prepare_test_data <- function() {
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
     deterministic_age_length_comp,
-    file = testthat::test_path("fixtures", "deterministic_age_length_comp.RDS")
+    file = testthat::test_path("fixtures", "deterministic_age_length_comp.RDS"),
+    compress = FALSE
   )
 
   # TODO: delete this lines 74-78 when log_devs estimation error fixed
   modified_parameters[[iter_id]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- "constant"
   saveRDS(
     modified_parameters,
-    file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
+    file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
+    compress = FALSE
   )
 
   ## Estimation run with age and length comp using wrappers ----
@@ -193,7 +201,8 @@ prepare_test_data <- function() {
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
     fit_age_length_comp,
-    file = testthat::test_path("fixtures", "fit_age_length_comp.RDS")
+    file = testthat::test_path("fixtures", "fit_age_length_comp.RDS"),
+    compress = FALSE
   )
 
   ## Estimation run with age comp only using wrappers ----
@@ -228,7 +237,8 @@ prepare_test_data <- function() {
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
     fit_agecomp,
-    file = testthat::test_path("fixtures", "fit_agecomp.RDS")
+    file = testthat::test_path("fixtures", "fit_agecomp.RDS"),
+    compress = FALSE
   )
 
   # Load a second dataset that contains missing age composition data
@@ -247,7 +257,8 @@ prepare_test_data <- function() {
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
     fit_agecomp_na,
-    file = testthat::test_path("fixtures", "fit_agecomp_na.RDS")
+    file = testthat::test_path("fixtures", "fit_agecomp_na.RDS"),
+    compress = FALSE
   )
 
   ## Estimation run with length comp only using wrappers ----
@@ -281,7 +292,8 @@ prepare_test_data <- function() {
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
     fit_lengthcomp,
-    file = testthat::test_path("fixtures", "fit_lengthcomp.RDS")
+    file = testthat::test_path("fixtures", "fit_lengthcomp.RDS"),
+    compress = FALSE
   )
 
   # Load a second dataset that contains missing length composition data
@@ -300,7 +312,8 @@ prepare_test_data <- function() {
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
     fit_lengthcomp_na,
-    file = testthat::test_path("fixtures", "fit_lengthcomp_na.RDS")
+    file = testthat::test_path("fixtures", "fit_lengthcomp_na.RDS"),
+    compress = FALSE
   )
 
   ## Estimation run with age and length comp with NAs ----
@@ -335,6 +348,7 @@ prepare_test_data <- function() {
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
     fit_age_length_comp_na,
-    file = testthat::test_path("fixtures", "fit_age_length_comp_na.RDS")
+    file = testthat::test_path("fixtures", "fit_age_length_comp_na.RDS"),
+    compress = FALSE
   )
 }
