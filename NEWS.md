@@ -1,3 +1,13 @@
+# FIMS 0.6.0
+
+* Initializes backend code to support model families.
+
+# FIMS 0.5.3
+
+* Fix json output to use full stop rather than underscore for names, a bug
+  introduced in v0.5.0. Also fixes `reshape_tmb_estimates()` where the splits
+  were incorrectly referenced because module_id comes before the label.
+
 # FIMS 0.5.2
 
 * Fixes constructor in ParameterVector to error if the size is too small.

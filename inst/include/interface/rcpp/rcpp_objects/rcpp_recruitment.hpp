@@ -139,6 +139,24 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   }
 
   /**
+   * @brief Construct a new Beverton--Holt Recruitment Interface object.
+   * 
+   * @param other The passed object to copy.
+   */
+  BevertonHoltRecruitmentInterface(const BevertonHoltRecruitmentInterface& other) :
+    RecruitmentInterfaceBase(other),
+    nyears(other.nyears),
+    logit_steep(other.logit_steep),
+    log_rzero(other.log_rzero),
+    log_devs(other.log_devs),
+    log_r(other.log_r),
+    log_expected_recruitment(other.log_expected_recruitment),
+    estimated_logit_steep(other.estimated_logit_steep),
+    estimated_log_rzero(other.estimated_log_rzero),
+    estimated_log_devs(other.estimated_log_devs) {
+  }
+
+  /**
    * @brief The destructor.
    */
   virtual ~BevertonHoltRecruitmentInterface() {}
@@ -308,13 +326,13 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       
       if (this->logit_steep[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "recruitment_" << this->id << "_logit_steep_" <<  this->logit_steep[i].id_m;
+        ss << "recruitment." << this->id << ".logit_steep." <<  this->logit_steep[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->logit_steep[i]);
       }
       if (this->logit_steep[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << "logit_steep." <<  this->logit_steep[i].id_m;
+        ss << "recruitment." << this->id << ".logit_steep." <<  this->logit_steep[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->logit_steep[i]);
       }
@@ -328,13 +346,13 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
       if (this->log_rzero[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "recruitment_" << this->id << "_log_rzero_" <<  this->log_rzero[i].id_m;
+        ss << "recruitment." << this->id << ".log_rzero." <<  this->log_rzero[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_rzero[i]);
       }
       if (this->log_rzero[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << "log_rzero." <<  this->log_rzero[i].id_m;
+        ss << "recruitment." << this->id << ".log_rzero." <<  this->log_rzero[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_rzero[i]);
       }
@@ -347,13 +365,13 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
       if (this->log_devs[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "recruitment_" << this->id << "_log_recruit_devs_" <<  this->log_devs[i].id_m;
+        ss << "recruitment." << this->id << ".log_devs." <<  this->log_devs[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
       }
       if (this->log_devs[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << "log_recruit_devs." <<  this->log_devs[i].id_m;
+        ss << "recruitment." << this->id << ".log_devs." <<  this->log_devs[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_recruit_devs[i]);
       }
@@ -369,13 +387,13 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
      
       if (this->log_r[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "recruitment_" << this->id << "_log_r_" <<  this->log_r[i].id_m;
+        ss << "recruitment." << this->id << ".log_r." <<  this->log_r[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_r[i]);
       }
       if (this->log_r[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << "log_r." <<  this->log_r[i].id_m;
+        ss << "recruitment." << this->id << ".log_r." <<  this->log_r[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_r[i]);
       }

@@ -224,13 +224,13 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       selectivity->inflection_point[i] = this->inflection_point[i].initial_value_m;
       if (this->inflection_point[i].estimation_type_m.get() == "fixed_effects") {
         ss.str(""); 
-        ss << "selectivity_" << this->id << "_inflection_point_" << this->inflection_point[i].id_m;
+        ss << "selectivity." << this->id << ".inflection_point." << this->inflection_point[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->inflection_point[i]);
       }
       if (this->inflection_point[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << "inflection_point." << this->inflection_point[i].id_m;
+        ss << "selectivity." << this->id << ".inflection_point." << this->inflection_point[i].id_m;
         info->RegisterRandomEffect(selectivity->inflection_point[i]);
         info->RegisterRandomEffectName(ss.str());
       }
@@ -242,13 +242,13 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       selectivity->slope[i] = this->slope[i].initial_value_m;
       if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "selectivity_" << this->id << "_slope_" << this->slope[i].id_m;
+        ss << "selectivity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->slope[i]);
       }
       if (this->slope[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << "slope." << this->slope[i].id_m;
+        ss << "selectivity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(selectivity->slope[i]);
       }
@@ -457,13 +457,13 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         selectivity->inflection_point_asc[i] = this->inflection_point_asc[i].initial_value_m;
         if (this->inflection_point_asc[i].estimation_type_m.get() == "fixed_effects") { 
             ss.str(""); 
-            ss << "selectivity_" << this->id << "_inflection_point_asc_" << this->inflection_point_asc[i].id_m;
+            ss << "selectivity." << this->id << ".inflection_point_asc." << this->inflection_point_asc[i].id_m;
             info->RegisterParameterName(ss.str());
             info->RegisterParameter(selectivity->inflection_point_asc[i]);
         }
         if (this->inflection_point_asc[i].estimation_type_m.get() == "random_effects") {
             ss.str("");
-            ss << "selectivity." << this->id << "inflection_point_asc." << this->inflection_point_asc[i].id_m;
+            ss << "selectivity." << this->id << ".inflection_point_asc." << this->inflection_point_asc[i].id_m;
             info->RegisterRandomEffectName(ss.str());
             info->RegisterRandomEffect(selectivity->inflection_point_asc[i]);
         }
@@ -477,13 +477,13 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
         if (this->slope_asc[i].estimation_type_m.get() == "fixed_effects") {
             ss.str("");
-            ss << "selectivity_" << this->id << "_slope_asc_" << this->slope_asc[i].id_m;
+            ss << "selectivity." << this->id << ".slope_asc." << this->slope_asc[i].id_m;
             info->RegisterParameterName(ss.str());
             info->RegisterParameter(selectivity->slope_asc[i]);
         }
         if (this->slope_asc[i].estimation_type_m.get() == "random_effects") {
             ss.str("");
-            ss << "selectivity." << this->id << "slope_asc." << this->slope_asc[i].id_m;
+            ss << "selectivity." << this->id << ".slope_asc." << this->slope_asc[i].id_m;
             info->RegisterRandomEffectName(ss.str());
             info->RegisterRandomEffect(selectivity->slope_asc[i]);
         }
@@ -496,13 +496,13 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
         if (this->inflection_point_desc[i].estimation_type_m.get() == "fixed_effects") {
             ss.str("");
-            ss << "selectivity_" << this->id << "_inflection_point_desc_" << this->inflection_point_desc[i].id_m;
+            ss << "selectivity." << this->id << ".inflection_point_desc." << this->inflection_point_desc[i].id_m;
             info->RegisterParameterName(ss.str());
             info->RegisterParameter(selectivity->inflection_point_desc[i]);
         }
         if (this->inflection_point_desc[i].estimation_type_m.get() == "random_effects") {
             ss.str("");
-            ss << "selectivity." << this->id << "inflection_point_desc." << this->inflection_point_desc[i].id_m;
+            ss << "selectivity." << this->id << ".inflection_point_desc." << this->inflection_point_desc[i].id_m;
             info->RegisterRandomEffectName(ss.str());
             info->RegisterRandomEffect(selectivity->inflection_point_desc[i]);
         }
@@ -515,13 +515,13 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
         if (this->slope_desc[i].estimation_type_m.get() == "fixed_effects") {
             ss.str("");
-            ss << "selectivity_" << this->id << "_slope_desc_" << this->slope_desc[i].id_m;
+            ss << "selectivity." << this->id << ".slope_desc." << this->slope_desc[i].id_m;
             info->RegisterParameterName(ss.str());
             info->RegisterParameter(selectivity->slope_desc[i]);
         }
         if (this->slope_desc[i].estimation_type_m.get() == "random_effects") {
             ss.str("");
-            ss << "selectivity." << this->id << "slope_desc." << this->slope_desc[i].id_m;
+            ss << "selectivity." << this->id << ".slope_desc." << this->slope_desc[i].id_m;
             info->RegisterRandomEffectName(ss.str());
             info->RegisterRandomEffect(selectivity->slope_desc[i]);
         }

@@ -221,13 +221,13 @@ public:
       maturity->inflection_point[i] = this->inflection_point[i].initial_value_m;
       if (this->inflection_point[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "maturity_" << this->id << "_inflection_point_" <<  this->inflection_point[i].id_m;
+        ss << "maturity." << this->id << ".inflection_point." <<  this->inflection_point[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->inflection_point[i]);
       }
       if (this->inflection_point[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "maturity." << this->id << "inflection_point." <<  this->inflection_point[i].id_m;
+        ss << "maturity." << this->id << ".inflection_point." <<  this->inflection_point[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(maturity->inflection_point[i]);
       }
@@ -238,13 +238,13 @@ public:
       maturity->slope[i] = this->slope[i].initial_value_m;
       if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "maturity_" << this->id << "_slope_" << this->slope[i].id_m;
+        ss << "maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->slope[i]);
       }
       if (this->slope[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "maturity." << this->id << "slope." << this->slope[i].id_m;
+        ss << "maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterRandomEffect(maturity->slope[i]);
         info->RegisterRandomEffectName(ss.str());
       }

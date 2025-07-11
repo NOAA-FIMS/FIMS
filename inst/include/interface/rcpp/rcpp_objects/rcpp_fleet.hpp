@@ -32,7 +32,7 @@ class FleetInterfaceBase : public FIMSRcppInterfaceBase {
    * This is a live object, which is an object that has been created and lives
    * in memory.
    */
-  static std::map<uint32_t, FleetInterfaceBase*> live_objects;
+   static std::map<uint32_t, std::shared_ptr<FleetInterfaceBase> > live_objects;
 
   /**
    * @brief The constructor.
@@ -41,7 +41,7 @@ class FleetInterfaceBase : public FIMSRcppInterfaceBase {
     this->id = FleetInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     FleetInterfaceBase */
-    FleetInterfaceBase::live_objects[this->id] = this;
+    // FleetInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -66,8 +66,7 @@ class FleetInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t FleetInterfaceBase::id_g = 1;
 // local id of the FleetInterfaceBase object map relating the ID of the
 // FleetInterfaceBase to the FleetInterfaceBase objects
-std::map<uint32_t, FleetInterfaceBase*> FleetInterfaceBase::live_objects;
-
+std::map<uint32_t, std::shared_ptr<FleetInterfaceBase> > FleetInterfaceBase::live_objects;
 /**
  * @brief The Rcpp interface for Fleet to instantiate from R:
  * fleet <- methods::new(Fleet)
@@ -233,8 +232,11 @@ public:
    * @brief The constructor.
    */
   FleetInterface() : FleetInterfaceBase() {
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<FleetInterface>(*this));
-  }
+    std::shared_ptr<FleetInterface> fleet = std::make_shared<FleetInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(fleet);
+   /* Create instance of map: key is id and value is pointer to
+    FleetInterfaceBase */
+    FleetInterfaceBase::live_objects[this->id] = fleet;  }
 
   /**
    * @brief Construct a new Fleet Interface object
@@ -520,7 +522,7 @@ public:
     ss << " \"id\":" << this->log_q.id_m << ",\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"values\": " << this->log_q << "\n}";
-    if (this->nlengths > 0) {
+    if (this->nlengths.get() > 0) {
       ss << " ,\n";
       ss << " {\n";
       ss << " \"name\": \"age_to_length_conversion\",\n";
@@ -781,13 +783,13 @@ public:
 
       if (this->log_q[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "fleet_" << this->id << "_log_q_" <<  this->log_q[i].id_m;
+        ss << "Fleet." << this->id << ".log_q." <<  this->log_q[i].id_m;
         info->RegisterParameterName(ss.str()); 
         info->RegisterParameter(fleet->log_q[i]);
       }
       if(this->log_q[i].estimation_type_m.get() == "random_effects"){
         ss.str("");
-        ss << "fleet." << this->id << "log_q." <<  this->log_q[i].id_m;
+        ss << "Fleet." << this->id << ".log_q." <<  this->log_q[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_q[i]);
       }
@@ -800,13 +802,13 @@ public:
 
       if (this->log_Fmort[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "fleet_" << this->id << "_log_Fmort_" <<  this->log_Fmort[i].id_m;
+        ss << "Fleet." << this->id << ".log_Fmort." <<  this->log_Fmort[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
       }
       if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "fleet." << this->id << "log_Fmort." <<  this->log_Fmort[i].id_m;
+        ss << "Fleet." << this->id << ".log_Fmort." <<  this->log_Fmort[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_Fmort[i]);
       }
@@ -848,7 +850,7 @@ public:
 
         if (this->age_to_length_conversion[i].estimation_type_m.get() == "fixed_effects") {
           ss.str("");
-          ss << "fleet_" << this->id << "_age_to_length_conversion_" <<  this->age_to_length_conversion[i].id_m;
+          ss << "Fleet." << this->id << ".age_to_length_conversion." <<  this->age_to_length_conversion[i].id_m;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(fleet->age_to_length_conversion[i]);
         }

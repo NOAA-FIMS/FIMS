@@ -4,8 +4,8 @@
       print(dplyr::select(get_estimates(deterministic_results), -estimate,
       -uncertainty, -gradient), n = 320, width = Inf)
     Output
-      # A tibble: 11,765 x 15
-      # Groups:   label [107]
+      # A tibble: 11,688 x 15
+      # Groups:   label [30]
           module_name module_id module_type label                    type   type_id
           <chr>           <int> <chr>       <chr>                    <chr>    <int>
         1 selectivity         1 Logistic    inflection_point         vector       1
@@ -972,7 +972,7 @@
       318 constant       
       319 constant       
       320 constant       
-      # i 11,445 more rows
+      # i 11,368 more rows
 
 # get_estimates() works with estimation run
 
@@ -980,8 +980,8 @@
       print(dplyr::select(get_estimates(readRDS(fit_files[[1]])), -estimate,
       -uncertainty, -gradient), n = 320, width = Inf)
     Output
-      # A tibble: 20,347 x 15
-      # Groups:   label [91]
+      # A tibble: 20,299 x 15
+      # Groups:   label [43]
           module_name module_id module_type label                    type   type_id
           <chr>           <int> <chr>       <chr>                    <chr>    <int>
         1 selectivity         1 Logistic    inflection_point         vector       1
@@ -1306,10 +1306,10 @@
       320 Fleet               2 fleet       age_to_length_conversion vector      29
           parameter_id fleet_name   age length  time   initial log_like log_like_cv
                  <int> <chr>      <dbl>  <dbl> <int>     <dbl>    <dbl>       <dbl>
-        1            1 <NA>          NA     NA    NA NA              NA          NA
-        2            2 <NA>          NA     NA    NA NA              NA          NA
+        1            1 <NA>          NA     NA    NA  2   e+ 0       NA          NA
+        2            2 <NA>          NA     NA    NA  1   e+ 0       NA          NA
         3            3 <NA>          NA     NA    NA  0              NA          NA
-        4            4 <NA>          NA     NA    NA NA              NA          NA
+        4            4 <NA>          NA     NA    NA -4.66e+ 0       NA          NA
         5           11 <NA>          NA     NA    NA  1.26e-16       NA          NA
         6           12 <NA>          NA     NA    NA  8.39e-11       NA          NA
         7           13 <NA>          NA     NA    NA  2.30e- 6       NA          NA
@@ -1586,38 +1586,38 @@
       278          284 <NA>          NA     NA    NA  8.70e- 5       NA          NA
       279          285 <NA>          NA     NA    NA  4.61e- 6       NA          NA
       280          286 <NA>          NA     NA    NA  1.57e- 7       NA          NA
-      281          287 <NA>          NA     NA    NA NA              NA          NA
-      282          288 <NA>          NA     NA    NA NA              NA          NA
-      283          289 <NA>          NA     NA    NA NA              NA          NA
-      284          290 <NA>          NA     NA    NA NA              NA          NA
-      285          291 <NA>          NA     NA    NA NA              NA          NA
-      286          292 <NA>          NA     NA    NA NA              NA          NA
-      287          293 <NA>          NA     NA    NA NA              NA          NA
-      288          294 <NA>          NA     NA    NA NA              NA          NA
-      289          295 <NA>          NA     NA    NA NA              NA          NA
-      290          296 <NA>          NA     NA    NA NA              NA          NA
-      291          297 <NA>          NA     NA    NA NA              NA          NA
-      292          298 <NA>          NA     NA    NA NA              NA          NA
-      293          299 <NA>          NA     NA    NA NA              NA          NA
-      294          300 <NA>          NA     NA    NA NA              NA          NA
-      295          301 <NA>          NA     NA    NA NA              NA          NA
-      296          302 <NA>          NA     NA    NA NA              NA          NA
-      297          303 <NA>          NA     NA    NA NA              NA          NA
-      298          304 <NA>          NA     NA    NA NA              NA          NA
-      299          305 <NA>          NA     NA    NA NA              NA          NA
-      300          306 <NA>          NA     NA    NA NA              NA          NA
-      301          307 <NA>          NA     NA    NA NA              NA          NA
-      302          308 <NA>          NA     NA    NA NA              NA          NA
-      303          309 <NA>          NA     NA    NA NA              NA          NA
-      304          310 <NA>          NA     NA    NA NA              NA          NA
-      305          311 <NA>          NA     NA    NA NA              NA          NA
-      306          312 <NA>          NA     NA    NA NA              NA          NA
-      307          313 <NA>          NA     NA    NA NA              NA          NA
-      308          314 <NA>          NA     NA    NA NA              NA          NA
-      309          315 <NA>          NA     NA    NA NA              NA          NA
-      310          352 <NA>          NA     NA    NA NA              NA          NA
-      311          353 <NA>          NA     NA    NA NA              NA          NA
-      312          354 <NA>          NA     NA    NA NA              NA          NA
+      281          287 <NA>          NA     NA    NA -3.60e+ 0       NA          NA
+      282          288 <NA>          NA     NA    NA -3.10e+ 0       NA          NA
+      283          289 <NA>          NA     NA    NA -2.80e+ 0       NA          NA
+      284          290 <NA>          NA     NA    NA -3.02e+ 0       NA          NA
+      285          291 <NA>          NA     NA    NA -2.44e+ 0       NA          NA
+      286          292 <NA>          NA     NA    NA -2.43e+ 0       NA          NA
+      287          293 <NA>          NA     NA    NA -1.68e+ 0       NA          NA
+      288          294 <NA>          NA     NA    NA -2.22e+ 0       NA          NA
+      289          295 <NA>          NA     NA    NA -2.02e+ 0       NA          NA
+      290          296 <NA>          NA     NA    NA -1.89e+ 0       NA          NA
+      291          297 <NA>          NA     NA    NA -1.82e+ 0       NA          NA
+      292          298 <NA>          NA     NA    NA -2.15e+ 0       NA          NA
+      293          299 <NA>          NA     NA    NA -1.78e+ 0       NA          NA
+      294          300 <NA>          NA     NA    NA -1.71e+ 0       NA          NA
+      295          301 <NA>          NA     NA    NA -1.82e+ 0       NA          NA
+      296          302 <NA>          NA     NA    NA -1.16e+ 0       NA          NA
+      297          303 <NA>          NA     NA    NA -1.36e+ 0       NA          NA
+      298          304 <NA>          NA     NA    NA -1.37e+ 0       NA          NA
+      299          305 <NA>          NA     NA    NA -1.38e+ 0       NA          NA
+      300          306 <NA>          NA     NA    NA -1.05e+ 0       NA          NA
+      301          307 <NA>          NA     NA    NA -1.37e+ 0       NA          NA
+      302          308 <NA>          NA     NA    NA -8.71e- 1       NA          NA
+      303          309 <NA>          NA     NA    NA -1.06e+ 0       NA          NA
+      304          310 <NA>          NA     NA    NA -1.07e+ 0       NA          NA
+      305          311 <NA>          NA     NA    NA -1.16e+ 0       NA          NA
+      306          312 <NA>          NA     NA    NA -1.18e+ 0       NA          NA
+      307          313 <NA>          NA     NA    NA -8.40e- 1       NA          NA
+      308          314 <NA>          NA     NA    NA -1.11e+ 0       NA          NA
+      309          315 <NA>          NA     NA    NA -6.94e- 1       NA          NA
+      310          352 <NA>          NA     NA    NA  1.5 e+ 0       NA          NA
+      311          353 <NA>          NA     NA    NA  2   e+ 0       NA          NA
+      312          354 <NA>          NA     NA    NA -1.49e+ 1       NA          NA
       313          355 <NA>          NA     NA    NA -2   e+ 2       NA          NA
       314          362 <NA>          NA     NA    NA  1.26e-16       NA          NA
       315          363 <NA>          NA     NA    NA  8.39e-11       NA          NA
@@ -1948,5 +1948,5 @@
       318 constant       
       319 constant       
       320 constant       
-      # i 20,027 more rows
+      # i 19,979 more rows
 

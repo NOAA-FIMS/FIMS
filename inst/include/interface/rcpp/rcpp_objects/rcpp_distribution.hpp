@@ -352,7 +352,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
       if(this->log_sd[i].estimation_type_m.get() == "fixed_effects"){
         ss.str("");
-        ss << "dnorm_" << this->id_m << "_log_sd_" << this->log_sd[i].id_m;
+        ss << "dnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }
@@ -640,7 +640,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
       if(this->log_sd[i].estimation_type_m.get() == "fixed_effects"){
         ss.str("");
-        ss << "dlnorm_" << this->id_m << "_log_sd_" << this->log_sd[i].id_m;
+        ss << "dlnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }

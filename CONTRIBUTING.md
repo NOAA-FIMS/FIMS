@@ -10,7 +10,7 @@ This project and everyone participating in it is governed by the [Code of Conduc
 
 > **Note:** Please don't file an issue to ask a question. You'll get faster results by using the resources below.
 
-Please email the FIMS maintainer [christine.stawitz@noaa.gov](mailto:christine.stawitz@noaa.gov) if you have a question.
+Please use [GitHub Discussions](https://github.com/orgs/NOAA-FIMS/discussions) if you have a question. There is a special category set up for [Q&A](https://github.com/orgs/NOAA-FIMS/discussions/categories/q-a). But, you should also check out the other categories to see if your question has already been answered.
 
 ## I want to file a bug or feature request
 
