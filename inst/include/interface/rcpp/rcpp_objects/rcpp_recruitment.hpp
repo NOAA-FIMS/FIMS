@@ -53,9 +53,8 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  RecruitmentInterfaceBase(const RecruitmentInterfaceBase& other) :
-  id(other.id), process_id(other.process_id) {
-  }
+  RecruitmentInterfaceBase(const RecruitmentInterfaceBase& other)
+      : id(other.id), process_id(other.process_id) {}
 
   /**
    * @brief The destructor.
@@ -74,8 +73,9 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   virtual double evaluate_mean(double spawners, double ssbzero) = 0;
 
   /**
-   * @brief A method for each child recruitment process interface object to inherit so
-   * each recruitment process option can have a evaluate_process() function.
+   * @brief A method for each child recruitment process interface object to
+   * inherit so each recruitment process option can have a evaluate_process()
+   * function.
    */
   virtual double evaluate_process(size_t pos) = 0;
 };
@@ -93,8 +93,8 @@ std::map<uint32_t, RecruitmentInterfaceBase*>
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
   /**
-  * @brief The number of years.
-  */
+   * @brief The number of years.
+   */
   SharedInt nyears;
   /**
    * @brief The logistic transformation of steepness (h; productivity of the
@@ -135,26 +135,27 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief The constructor.
    */
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<BevertonHoltRecruitmentInterface>(*this));
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<BevertonHoltRecruitmentInterface>(*this));
   }
 
   /**
    * @brief Construct a new Beverton--Holt Recruitment Interface object.
-   * 
+   *
    * @param other The passed object to copy.
    */
-  BevertonHoltRecruitmentInterface(const BevertonHoltRecruitmentInterface& other) :
-    RecruitmentInterfaceBase(other),
-    nyears(other.nyears),
-    logit_steep(other.logit_steep),
-    log_rzero(other.log_rzero),
-    log_devs(other.log_devs),
-    log_r(other.log_r),
-    log_expected_recruitment(other.log_expected_recruitment),
-    estimated_logit_steep(other.estimated_logit_steep),
-    estimated_log_rzero(other.estimated_log_rzero),
-    estimated_log_devs(other.estimated_log_devs) {
-  }
+  BevertonHoltRecruitmentInterface(
+      const BevertonHoltRecruitmentInterface& other)
+      : RecruitmentInterfaceBase(other),
+        nyears(other.nyears),
+        logit_steep(other.logit_steep),
+        log_rzero(other.log_rzero),
+        log_devs(other.log_devs),
+        log_r(other.log_r),
+        log_expected_recruitment(other.log_expected_recruitment),
+        estimated_logit_steep(other.estimated_logit_steep),
+        estimated_log_rzero(other.estimated_log_rzero),
+        estimated_log_devs(other.estimated_log_devs) {}
 
   /**
    * @brief The destructor.
@@ -167,7 +168,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id; }
 
-   /**
+  /**
    * @brief Set the unique ID for the recruitment process object.
    * @param process_id Unique ID for the recruitment process object.
    */
@@ -188,9 +189,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     BevHolt.logit_steep[0] = this->logit_steep[0].initial_value_m;
     if (this->logit_steep[0].initial_value_m == 1.0) {
       warning(
-        "Steepness is subject to a logit transformation. "
-        "Fixing it at 1.0 is not currently possible."
-      );
+          "Steepness is subject to a logit transformation. "
+          "Fixing it at 1.0 is not currently possible.");
     }
     BevHolt.log_rzero.resize(1);
     BevHolt.log_rzero[0] = this->log_rzero[0].initial_value_m;
@@ -202,39 +202,43 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Evaluate recruitment process - returns 0 in this module.
    * @param pos Position index, e.g., which year.
    */
-  virtual double evaluate_process(size_t pos) {
-    return 0;
-  }
+  virtual double evaluate_process(size_t pos) { return 0; }
 
-  /** 
+  /**
    * @brief Extracts derived quantities back to the Rcpp interface object from
-   * the Information object. 
+   * the Information object.
    */
   virtual void finalize() {
     if (this->finalized) {
-      //log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("Beverton-Holt Recruitment  " + fims::to_string(this->id) + " has been finalized already.");
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Beverton-Holt Recruitment  " +
+                       fims::to_string(this->id) +
+                       " has been finalized already.");
     }
 
-    this->finalized = true; //indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double> > info =
-      fims_info::Information<double>::GetInstance();
+        fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::recruitment_models_iterator it;
 
     it = info->recruitment_models.find(this->id);
 
     if (it == info->recruitment_models.end()) {
-      FIMS_WARNING_LOG("Beverton-Holt Recruitment " + fims::to_string(this->id) + " not found in Information.");
+      FIMS_WARNING_LOG("Beverton-Holt Recruitment " +
+                       fims::to_string(this->id) +
+                       " not found in Information.");
       return;
     } else {
       std::shared_ptr<fims_popdy::SRBevertonHolt<double> > recr =
-        std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double> >(it->second);
+          std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double> >(
+              it->second);
 
       for (size_t i = 0; i < this->logit_steep.size(); i++) {
         if (this->logit_steep[i].estimation_type_m.get() == "constant") {
-          this->logit_steep[i].final_value_m = this->logit_steep[i].initial_value_m;
+          this->logit_steep[i].final_value_m =
+              this->logit_steep[i].initial_value_m;
         } else {
           this->logit_steep[i].final_value_m = recr->logit_steep[i];
         }
@@ -263,7 +267,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
           this->log_r[i].final_value_m = recr->log_r[i];
         }
       }
-
     }
   }
 
@@ -273,7 +276,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * recruitment interface with Beverton--Holt stock--recruitment relationship.
    * It also returns the ID and the parameters. This string is formatted for a
    * json file.
-   */ 
+   */
   virtual std::string to_json() {
     std::stringstream ss;
 
@@ -307,105 +310,110 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-
     std::shared_ptr<fims_info::Information<Type> > info =
-      fims_info::Information<Type>::GetInstance();
+        fims_info::Information<Type>::GetInstance();
 
     std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > recruitment =
-      std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
-    
-      std::stringstream ss;
+        std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
+
+    std::stringstream ss;
 
     // set relative info
-    recruitment->id = this->id;  
+    recruitment->id = this->id;
     recruitment->process_id = this->process_id.get();
-    //set logit_steep
+    // set logit_steep
     recruitment->logit_steep.resize(this->logit_steep.size());
     for (size_t i = 0; i < this->logit_steep.size(); i++) {
       recruitment->logit_steep[i] = this->logit_steep[i].initial_value_m;
-      
+
       if (this->logit_steep[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << ".logit_steep." <<  this->logit_steep[i].id_m;
+        ss << "recruitment." << this->id << ".logit_steep."
+           << this->logit_steep[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->logit_steep[i]);
       }
       if (this->logit_steep[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << ".logit_steep." <<  this->logit_steep[i].id_m;
+        ss << "recruitment." << this->id << ".logit_steep."
+           << this->logit_steep[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->logit_steep[i]);
       }
     }
     info->variable_map[this->logit_steep.id_m] = &(recruitment)->logit_steep;
 
-    //set log_rzero
+    // set log_rzero
     recruitment->log_rzero.resize(this->log_rzero.size());
     for (size_t i = 0; i < this->log_rzero.size(); i++) {
       recruitment->log_rzero[i] = this->log_rzero[i].initial_value_m;
 
       if (this->log_rzero[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << ".log_rzero." <<  this->log_rzero[i].id_m;
+        ss << "recruitment." << this->id << ".log_rzero."
+           << this->log_rzero[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_rzero[i]);
       }
       if (this->log_rzero[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << ".log_rzero." <<  this->log_rzero[i].id_m;
+        ss << "recruitment." << this->id << ".log_rzero."
+           << this->log_rzero[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_rzero[i]);
       }
     }
     info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
-    //set log_recruit_devs
+    // set log_recruit_devs
     recruitment->log_recruit_devs.resize(this->log_devs.size());
     for (size_t i = 0; i < this->log_devs.size(); i++) {
       recruitment->log_recruit_devs[i] = this->log_devs[i].initial_value_m;
 
       if (this->log_devs[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << ".log_devs." <<  this->log_devs[i].id_m;
+        ss << "recruitment." << this->id << ".log_devs."
+           << this->log_devs[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
       }
       if (this->log_devs[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << ".log_devs." <<  this->log_devs[i].id_m;
+        ss << "recruitment." << this->id << ".log_devs."
+           << this->log_devs[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_recruit_devs[i]);
       }
-
-    } 
+    }
 
     info->variable_map[this->log_devs.id_m] = &(recruitment)->log_recruit_devs;
 
-    //set log_r
+    // set log_r
     recruitment->log_r.resize(this->log_r.size());
     for (size_t i = 0; i < log_r.size(); i++) {
       recruitment->log_r[i] = this->log_r[i].initial_value_m;
-     
+
       if (this->log_r[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << ".log_r." <<  this->log_r[i].id_m;
+        ss << "recruitment." << this->id << ".log_r." << this->log_r[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_r[i]);
       }
       if (this->log_r[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "recruitment." << this->id << ".log_r." <<  this->log_r[i].id_m;
+        ss << "recruitment." << this->id << ".log_r." << this->log_r[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_r[i]);
       }
     }
-   
+
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
-    //set log_expected_recruitment
-    recruitment->log_expected_recruitment.resize(this->nyears.get()+1);
-    for(size_t i = 0; i < this->nyears.get()+1; i++){
+    // set log_expected_recruitment
+    recruitment->log_expected_recruitment.resize(this->nyears.get() + 1);
+    for (size_t i = 0; i < this->nyears.get() + 1; i++) {
       recruitment->log_expected_recruitment[i] = 0;
     }
-    info->variable_map[this->log_expected_recruitment.id_m] = &(recruitment)->log_expected_recruitment;
+    info->variable_map[this->log_expected_recruitment.id_m] =
+        &(recruitment)->log_expected_recruitment;
 
     // add to Information
     info->recruitment_models[recruitment->id] = recruitment;
@@ -418,109 +426,103 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    #ifdef TMBAD_FRAMEWORK
-        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-    #else
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-    #endif
+#endif
 
     return true;
   }
 
 #endif
 };
-
 
 /**
  * @brief Rcpp interface for Log--Devs to instantiate from R:
  * log_devs <- methods::new(log_devs).
  */
 class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
-  public:
-
-   /**
-    * @brief The constructor.
-    */
-   LogDevsRecruitmentInterface() : RecruitmentInterfaceBase() {
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LogDevsRecruitmentInterface>(*this));
-   }
-
-
-   /**
-    * @brief The destructor.
-    */
-   virtual ~LogDevsRecruitmentInterface() {}
-
-   /**
-    * @brief Gets the ID of the interface base object.
-    * @return The ID.
-    */
-   virtual uint32_t get_id() { return this->id; }
-
-   /**
-    * @brief Evaluate mean - returns empty function for this module.
-   * @param spawners Spawning biomass per time step.
-   * @param ssbzero The biomass at unfished levels.
-    */
-   virtual double evaluate_mean(double spawners, double ssbzero) {
-    return 0;
+ public:
+  /**
+   * @brief The constructor.
+   */
+  LogDevsRecruitmentInterface() : RecruitmentInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<LogDevsRecruitmentInterface>(*this));
   }
 
-   /**
-    * @brief Evaluate recruitment process using the Log--Devs approach.
-    * @param pos Position index, e.g., which year.
-    */
-   virtual double evaluate_process(size_t pos) {
-     fims_popdy::LogDevs<double> LogDevs;
+  /**
+   * @brief The destructor.
+   */
+  virtual ~LogDevsRecruitmentInterface() {}
 
-     return LogDevs.evaluate_process(pos);
-   }
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
 
+  /**
+   * @brief Evaluate mean - returns empty function for this module.
+   * @param spawners Spawning biomass per time step.
+   * @param ssbzero The biomass at unfished levels.
+   */
+  virtual double evaluate_mean(double spawners, double ssbzero) { return 0; }
+
+  /**
+   * @brief Evaluate recruitment process using the Log--Devs approach.
+   * @param pos Position index, e.g., which year.
+   */
+  virtual double evaluate_process(size_t pos) {
+    fims_popdy::LogDevs<double> LogDevs;
+
+    return LogDevs.evaluate_process(pos);
+  }
 
 #ifdef TMB_MODEL
 
-template <typename Type>
-bool add_to_fims_tmb_internal() {
-  std::shared_ptr<fims_info::Information<Type> > info =
-    fims_info::Information<Type>::GetInstance();
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
 
-  std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_process =
-    std::make_shared<fims_popdy::LogDevs<Type> >();
+    std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_process =
+        std::make_shared<fims_popdy::LogDevs<Type> >();
 
-  recruitment_process->id = this->id;
- 
-  // add to Information
-  info->recruitment_process_models[recruitment_process->id] = recruitment_process;
+    recruitment_process->id = this->id;
 
-  return true;
-}
+    // add to Information
+    info->recruitment_process_models[recruitment_process->id] =
+        recruitment_process;
 
- /**
+    return true;
+  }
+
+  /**
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    #ifdef TMBAD_FRAMEWORK
-        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-    #else
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-    #endif
+#endif
 
     return true;
   }
 
 #endif
 };
-
-
 
 /**
  * @brief Rcpp interface for Log--R to instantiate from R:
@@ -528,12 +530,12 @@ bool add_to_fims_tmb_internal() {
  */
 class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
-
   /**
    * @brief The constructor.
    */
   LogRRecruitmentInterface() : RecruitmentInterfaceBase() {
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(std::make_shared<LogRRecruitmentInterface>(*this));
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<LogRRecruitmentInterface>(*this));
   }
 
   /**
@@ -547,15 +549,12 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id; }
 
-
-   /**
-    * @brief Evaluate mean - returns empty function for this module.
+  /**
+   * @brief Evaluate mean - returns empty function for this module.
    * @param spawners Spawning biomass per time step.
    * @param ssbzero The biomass at unfished levels.
-    */
-   virtual double evaluate_mean(double spawners, double ssbzero) {
-    return 0;
-  }
+   */
+  virtual double evaluate_mean(double spawners, double ssbzero) { return 0; }
 
   /**
    * @brief Evaluate recruitment process using the Log--R approach.
@@ -567,42 +566,42 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
     return LogR.evaluate_process(pos);
   }
 
-
 #ifdef TMB_MODEL
 
-template <typename Type>
-bool add_to_fims_tmb_internal() {
- std::shared_ptr<fims_info::Information<Type> > info =
-   fims_info::Information<Type>::GetInstance();
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
 
- std::shared_ptr<fims_popdy::LogR<Type> > recruitment_process =
-   std::make_shared<fims_popdy::LogR<Type> >();
+    std::shared_ptr<fims_popdy::LogR<Type> > recruitment_process =
+        std::make_shared<fims_popdy::LogR<Type> >();
 
-  recruitment_process->id = this->id;
+    recruitment_process->id = this->id;
 
- // add to Information
- info->recruitment_process_models[recruitment_process->id] = recruitment_process;
+    // add to Information
+    info->recruitment_process_models[recruitment_process->id] =
+        recruitment_process;
 
- return true;
-}
+    return true;
+  }
 
-/**
-  * @brief Adds the parameters to the TMB model.
-  * @return A boolean of true.
-  */
- virtual bool add_to_fims_tmb() {
-    #ifdef TMBAD_FRAMEWORK
-        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-    #else
-   this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-   this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-   this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-   this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-   #endif
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+#endif
 
-   return true;
- }
+    return true;
+  }
 
 #endif
 };

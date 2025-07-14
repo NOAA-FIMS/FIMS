@@ -28,7 +28,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   // stock--recruitment function. These members are needed by the Beverton--Holt
   // stock--recruitment function but will not be common to all recruitment
   // functions like spawners is below.
-  fims::Vector<Type> logit_steep; /**< Transformed value of recruitment 
+  fims::Vector<Type> logit_steep; /**< Transformed value of recruitment
                                   relative to unfished
                                   recruitment at 20 percent of unfished
                                   spawning biomass.*/
@@ -58,17 +58,17 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
     rzero = fims_math::exp(this->log_rzero[0]);
 
     recruits = (static_cast<Type>(0.8) * rzero * steep * spawners) /
-               (static_cast<Type>(0.2) * phi_0 * rzero * (static_cast<Type>(1.0) - steep) + spawners * (steep - static_cast<Type>(0.2)));
+               (static_cast<Type>(0.2) * phi_0 * rzero *
+                    (static_cast<Type>(1.0) - steep) +
+                spawners * (steep - static_cast<Type>(0.2)));
 
     return recruits;
   }
 
   /** Empty return of base class function
-   * @param pos position index 
+   * @param pos position index
    */
-  virtual const Type evaluate_process(size_t pos){
-    return 0;
-  }
+  virtual const Type evaluate_process(size_t pos) { return 0; }
 };
 
 }  // namespace fims_popdy
