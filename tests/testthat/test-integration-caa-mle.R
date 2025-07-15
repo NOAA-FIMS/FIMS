@@ -5,7 +5,6 @@
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
 #' information. Every test should have a @description tag that takes up just
 #' one line, which will be used in the bookdown report of {testthat} results.
-
 # Deterministic test ----
 ## Setup ----
 # Load necessary data for the integration test
