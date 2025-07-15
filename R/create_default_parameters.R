@@ -128,15 +128,6 @@ create_default_parameters <- function(
     maturity = maturity
   )
 
-  # Outline for the default parameters tibble
-  parameters_outline <- tibble::tibble(
-    module_name = character(),
-    module_type = character(),
-    label = character(),
-    type = character(), 
-    fleet_name = character(), 
-    population_name = list(age = numeric(), length = numeric())
-  )
   # Create fleet parameters
   fleet_temp <- list()
   for (i in 1:length(fleets)) {
@@ -182,6 +173,36 @@ create_default_parameters <- function(
   return(output)
 }
 
+#' Create default parameters for a FIMS model
+#' @description
+#' This function creates a template for default parameters used in a Fisheries
+#' Integrated Modeling System (FIMS) model. The template includes fields for
+#' module name, module type, label, fleet name, population name, age, length,
+#' time, value, estimation type, distribution type, and distribution.
+#' @param n_parameters An integer specifying the number of parameters in the template.
+#' @return
+#' An empty tibble template for a FIMS model.
+#' @noRd
+#' @examples
+#' create_default_parameters_template(n_parameters = 3)
+create_default_parameters_template <- function(n_parameters = 1) {
+  template <- dplyr::tibble(
+    module_name = NA_character_,
+    module_type = NA_character_,
+    label = NA_character_,
+    fleet_name = NA_character_,
+    population_name = NA_character_,
+    age = NA_real_,
+    length = NA_real_,
+    time = NA_integer_,
+    value = NA_real_,
+    estimation_type = NA_character_,
+    distribution_type = NA_character_,
+    distribution = NA_character_
+  ) |>
+    # tidyr::nest(detail = c(age:distribution)) |>
+    dplyr::slice(rep(1, each = n_parameters))
+}
 
 #' Create default population parameters
 #'
@@ -248,12 +269,17 @@ create_default_Population <- function(data, log_rzero) {
 #' slope values and their estimation status.
 #' @noRd
 create_default_Logistic <- function() {
-  default <- list(
-    inflection_point.value = 2,
-    inflection_point.estimation_type = "fixed_effects",
-    slope.value = 1,
-    slope.estimation_type = "fixed_effects"
-  )
+
+  # Create a template for default parameters
+  default <- create_default_parameters_template(n_parameters = 2) |>
+    # Add the module type, label, value, and estimation type
+    dplyr::mutate(
+      module_type = "Logistic",
+      label = c("inflection_point", "slope"),
+      value = c(2, 1),
+      estimation_type = "fixed_effects"
+    )
+
   return(default)
 }
 
@@ -305,8 +331,10 @@ create_default_selectivity <- function(
   default <- switch(form,
     "LogisticSelectivity" = create_default_Logistic(),
     "DoubleLogisticSelectivity" = create_default_DoubleLogistic()
-  )
-  names(default) <- paste0(form, ".", names(default))
+  ) |>
+    dplyr::mutate(
+      module_name = "Selectivity"
+    ) 
 
   return(default)
 }
@@ -350,7 +378,11 @@ create_default_fleet <- function(fleets,
   # Create default selectivity parameters
   selectivity_default <- create_default_selectivity(
     form = fleets[[fleet_name]][["selectivity"]][["form"]]
-  )
+  ) |>
+    # Add fleet name 
+    dplyr::mutate(
+      fleet_name = fleet_name
+    )
 
   # Get types of data for this fleet from the data object
   data_types_present <- get_data(data) |>
@@ -364,13 +396,12 @@ create_default_fleet <- function(fleets,
   # Determine default fleet parameters based on types of data present
   if ("index" %in% data_types_present &&
     "Index" %in% distribution_names_for_fleet) {
-    q_default <- tibble::add_row()
-    q_default <- list(
-      log_q.value = 0,
-      log_q.estimation_type = "fixed_effects"
-    )
-
-    index_distribution <- fleets[[fleet_name]][["data_distribution"]]["Index"]
+    q_default <- fleet_default |>
+      dplyr::mutate(
+        label = "log_q",
+        value = 0,
+        estimation_type = "fixed_effects",
+      )
 
     index_uncertainty <- get_data(data) |>
       dplyr::filter(name == fleet_name, type %in% c("index")) |>
@@ -395,22 +426,30 @@ create_default_fleet <- function(fleets,
       names(index_distribution_default)
     )
   } else {
-    q_default <- list(
-      log_q.value = 0,
-      log_q.estimation_type = "constant"
-    )
-
+    q_default <- create_default_parameters_template(n_parameters = 1) |>
+      dplyr::mutate(
+        module_name = "Fleet",
+        module_type = "Fleet",
+        label = "log_q",
+        fleet_name = fleet_name,
+        value = 0,
+        estimation_type = "constant"
+      ) |>
+      tidyr::nest(detail = age:distribution)
     index_distribution_default <- NULL
   }
 
-  names(q_default) <- paste0("Fleet.", names(q_default))
-
   if ("landings" %in% data_types_present &&
     "Landings" %in% distribution_names_for_fleet) {
-    log_Fmort_default <- list(
-      log_Fmort.value = rep(-3, get_n_years(data)),
-      log_Fmort.estimation_type = "fixed_effects"
-    )
+    log_Fmort_default <- create_default_parameters_template(
+      n_parameters = get_n_years(data)
+    ) |>
+      dplyr::mutate(
+        label = "log_Fmort",
+        value = -3,
+        estimation_type = "fixed_effects"
+      ) |>
+      tidyr::nest(detail = age:distribution)
 
     landings_distribution <- fleets[[fleet_name]][["data_distribution"]]["Landings"]
 
@@ -430,12 +469,11 @@ create_default_fleet <- function(fleets,
         input_type = "data",
         data = data
       )
-    )
-    names(landings_distribution_default) <- paste0(
-      landings_distribution,
-      ".",
-      names(landings_distribution_default)
-    )
+    ) |>
+      dplyr::mutate(
+        fleet_name = fleet_name
+      )
+
   } else {
     log_Fmort_default <- list(
       log_Fmort.value = rep(-200, get_n_years(data)),
@@ -445,9 +483,14 @@ create_default_fleet <- function(fleets,
     landings_distribution_default <- NULL
   }
 
-  names(log_Fmort_default) <- paste0("Fleet.", names(log_Fmort_default))
-
   # Compile all default parameters into a single list
+  default <- dplyr::bind_rows(
+    selectivity_default,
+    q_default,
+    log_Fmort_default,
+    index_distribution_default,
+    landings_distribution_default
+  )
   default <- list(c(
     selectivity_default,
     q_default,
@@ -539,11 +582,20 @@ create_default_DnormDistribution <- function(
   input_type <- rlang::arg_match(input_type)
 
   # Create default parameters
-  default <- list(
-    log_sd.value = value,
-    log_sd.estimation_type = "constant"
-  )
-
+  default <- create_default_parameters_template(
+    n_parameters = get_n_years(data)
+  ) |>
+    # Add the module type and label
+    dplyr::mutate(
+      module_name = "Distribution",
+      module_type = "Dnorm",
+      label = "log_sd",
+      value = value,
+      estimation_type = "constant",
+      distribution_type = input_type,
+      distribution = "DnormDistribution"
+    ) |>
+    tidyr::nest(detail = age:distribution)
 
   # If input_type is 'process', add additional parameters
   if (input_type == "process" | input_type == "prior") {
@@ -588,24 +640,32 @@ create_default_DlnormDistribution <- function(
     ))
   }
   input_type <- rlang::arg_match(input_type)
-
+  
+  log_value <- log(value)
   # Create the default list with log standard deviation
-  default <- list(
-    log_sd.value = log(value),
-    log_sd.estimation_type = "constant"
-  )
+  default <- create_default_parameters_template(
+    n_parameters = get_n_years(data)
+  ) |>
+    # Add the module type and label
+    dplyr::mutate(
+      module_name = "Distribution",
+      module_type = "Dlnorm",
+      label = "log_sd",
+      value = log_value,
+      estimation_type = "constant",
+      distribution_type = input_type,
+      distribution = "DlnormDistribution"
+    ) |>
+    tidyr::nest(detail = age:distribution)
 
   # Add additional parameters if input_type is "process"
   if (input_type == "process") {
-    default <- c(
-      default,
-      list(
-        x.value = rep(0, get_n_years(data)),
-        x.estimation_type = "constant",
-        expected_values.value = rep(0, get_n_years(data)),
-        expected_values.estimation_type = "constant"
+    default <- default |>
+      dplyr::add_row(
+        label = "x",
+        value = rep(0, get_n_years(data)),
+        estimation_type = "constant"
       )
-    )
   }
   return(default)
 }
