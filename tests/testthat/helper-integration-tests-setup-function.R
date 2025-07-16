@@ -13,7 +13,7 @@
 #' @param p A numeric non-negative vector of length K, specifying the probability
 #' for the K classes; must sum 1.
 #'
-#' @return The log of the probability mass function for the multinomal.
+#' @return The log of the probability mass function for the multinomial.
 FIMS_dmultinom <- function(x, p) {
   xp1 <- x + 1
   log_pmf <- lgamma(sum(x) + 1) - sum(lgamma(xp1)) + sum(x * log(p))
