@@ -11,6 +11,7 @@
 #ifndef FIMS_POPULATION_DYNAMICS_DEPLETION_HPP
 #define FIMS_POPULATION_DYNAMICS_DEPLETION_HPP
 
-#include "functions/pella_tomlinson.hpp"
+#include "functors/depletion_base.hpp"
+#include "functors/pella_tomlinson.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */

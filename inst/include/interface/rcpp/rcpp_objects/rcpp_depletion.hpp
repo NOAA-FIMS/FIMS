@@ -165,27 +165,28 @@ public:
       std::shared_ptr<fims_popdy::PellaTomlinsonDepletion<double> > dep =
         std::dynamic_pointer_cast<fims_popdy::PellaTomlinsonDepletion<double> >(it->second);
 
+
       for (size_t i = 0; i < log_r.size(); i++) {
-        if (this->log_r[i].estimated_m) {
-          this->log_r[i].final_value_m = dep->log_r[i];
-        } else {
+        if (this->log_r[i].estimation_type_m.get() == "constant") {
           this->log_r[i].final_value_m = this->log_r[i].initial_value_m;
+        } else {
+          this->log_r[i].final_value_m = dep->log_r[i];
         }
       }
 
       for (size_t i = 0; i < log_K.size(); i++) {
-        if (this->log_K[i].estimated_m) {
-          this->log_K[i].final_value_m = dep->log_K[i];
-        } else {
+        if (this->log_K[i].estimation_type_m.get() == "constant") {
           this->log_K[i].final_value_m = this->log_K[i].initial_value_m;
+        } else {
+          this->log_K[i].final_value_m = dep->log_K[i];
         }
       }
 
       for (size_t i = 0; i < log_m.size(); i++) {
-        if (this->log_m[i].estimated_m) {
-          this->log_m[i].final_value_m = dep->log_m[i];
-        } else {
+        if (this->log_m[i].estimation_type_m.get() == "constant") {
           this->log_m[i].final_value_m = this->log_m[i].initial_value_m;
+        } else {
+          this->log_m[i].final_value_m = dep->log_m[i];
         }
       }
     }
@@ -242,50 +243,68 @@ public:
     // set relative info
     depletion->id = this->id;
     std::stringstream ss;
+
+    // set log_r
     depletion->log_r.resize(this->log_r.size());
     for (size_t i = 0; i < this->log_r.size(); i++) {
       depletion->log_r[i] = this->log_r[i].initial_value_m;
-      if (this->log_r[i].estimated_m) {
+
+      if (this->log_r[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "depletion.log_r." << this->id << "." << i;
+        ss << "depletion."<< this->id << "log_r." 
+           << this->log_r[i].id_m;
         info->RegisterParameterName(ss.str());
-        if (this->log_r[i].is_random_effect_m) {
-          info->RegisterRandomEffect(depletion->log_r[i]);
-        } else {
-          info->RegisterParameter(depletion->log_r[i]);
-        }
+        info->RegisterParameter(depletion->log_r[i]);
+      }
+      if (this->log_r[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "depletion."<< this->id << "log_r." 
+           << this->log_r[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(depletion->log_r[i]);
       }
     }
+    info->variable_map[this->log_r.id_m] = &(depletion)->log_r;
 
     depletion->log_K.resize(this->log_K.size());
     for (size_t i = 0; i < this->log_K.size(); i++) {
       depletion->log_K[i] = this->log_K[i].initial_value_m;
-      if (this->log_K[i].estimated_m) {
+      if (this->log_K[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "depletion.log_K_" << this->id << "." << i;
+        ss << "depletion."<< this->id << "log_K." 
+           << this->log_K[i].id_m;
         info->RegisterParameterName(ss.str());
-        if (this->log_K[i].is_random_effect_m) {
-          info->RegisterRandomEffect(depletion->log_K[i]);
-        } else {
-          info->RegisterParameter(depletion->log_K[i]);
-        }
+        info->RegisterParameter(depletion->log_K[i]);
+      }
+      if (this->log_K[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "depletion."<< this->id << "log_K."
+           << this->log_K[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(depletion->log_K[i]);
       }
     }
+    info->variable_map[this->log_K.id_m] = &(depletion)->log_K;
 
     depletion->log_m.resize(this->log_m.size());
     for (size_t i = 0; i < this->log_m.size(); i++) {
       depletion->log_m[i] = this->log_m[i].initial_value_m;
-      if (this->log_m[i].estimated_m) {
+      if (this->log_m[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "depletion.log_m_" << this->id << "." << i;
+        ss << "depletion."<< this->id << "log_m."
+           << this->log_m[i].id_m;
         info->RegisterParameterName(ss.str());
-        if (this->log_m[i].is_random_effect_m) {
-          info->RegisterRandomEffect(depletion->log_m[i]);
-        } else {
-          info->RegisterParameter(depletion->log_m[i]);
-        }
+        info->RegisterParameter(depletion->log_m[i]);
+      }
+      if (this->log_m[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "depletion."<< this->id << "log_m."
+           << this->log_m[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(depletion->log_m[i]);
       }
     }
+    info->variable_map[this->log_m.id_m] = &(depletion)->log_m;
 
     // add to Information
     info->depletion_models[depletion->id] = depletion;
@@ -298,11 +317,15 @@ public:
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-    FIMS_INFO_LOG("adding Depletion object to TMB");
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
     this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+#endif
 
     return true;
   }

@@ -17,6 +17,7 @@
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_depletion.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
