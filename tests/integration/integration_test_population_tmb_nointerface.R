@@ -53,6 +53,9 @@ Par <- list(
   slope_mat = om_input$slope.mat
 )
 # crashes Rstudio - next step: comment out population
-obj <- MakeADFun(Dat, Par, DLL = "integration_test_population_tmb_nointerface")
+obj <- TMB::MakeADFun(
+  Dat, Par,
+  DLL = "integration_test_population_tmb_nointerface", silent = TRUE
+)
 rep <- obj$report()
 rep$pop_naa
