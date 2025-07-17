@@ -113,10 +113,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   typedef typename std::map<std::string, fims::Vector<Type>>::iterator
       derived_quantities_iterator;
 
-#ifdef TMB_MODEL
-  ::objective_function<Type> *of;
-#endif
-
   /**
    * @brief Constructor.
    */

@@ -4,7 +4,7 @@
 
 namespace
 {
-    TEST_F(PopulationEvaluateTestFixture, CalculateMaturityAA_works)
+    TEST_F(CAAEvaluateTestFixture, CalculateMaturityAA_works)
     {        
         double inflection_point = 6;
         double slope = 0.15;
@@ -12,12 +12,13 @@ namespace
 
         for (size_t year = 0; year < nyears; year++) {
            for (size_t age = 0; age < nages; age++){
-               int i_age_year = year * population.nages + age;
-               population.CalculateMaturityAA(i_age_year, age);
-               expect_maturity[i_age_year] = 1.0/(1.0+exp(-(population.ages[age]-inflection_point)*slope));
+               int i_age_year = year * population->nages + age;
+               catch_at_age_model->CalculateMaturityAA(population, i_age_year, age);
+               expect_maturity[i_age_year] = 1.0/(1.0+exp(-(population->ages[age]-inflection_point)*slope));
            }
         }
-
-        EXPECT_NEAR(population.proportion_mature_at_age[10], expect_maturity[10], 0.0001);
+        size_t pop_id = population->GetId();
+        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
+        EXPECT_NEAR(dq["proportion_mature_at_age"][10], expect_maturity[10], 0.0001);
    }
 }

@@ -12,6 +12,7 @@
 #include "../fleet/fleet.hpp"
 #include "../growth/growth.hpp"
 #include "../recruitment/recruitment.hpp"
+#include "../depletion/depletion.hpp"
 #include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
 
@@ -37,6 +38,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   // parameter list - in information.hpp (same for initial F in fleet)
   fims::Vector<Type>
       log_init_naa; /*!< estimated parameter: natural log of numbers at age*/
+  fims::Vector<Type>
+      log_init_depletion; /*!< estimated parameter: natural log of depletion*/
   fims::Vector<Type>
       log_M; /*!< estimated parameter: natural log of Natural Mortality*/
   fims::Vector<Type> proportion_female = fims::Vector<Type>(
@@ -75,10 +78,16 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       total_landings_numbers; /*!< Derived quantity: Total landings in numbers*/
   fims::Vector<Type> expected_recruitment; /*!< Expected recruitment */
+  fims::Vector<Type> sum_selectivity;      /*!< TODO: add documentation */
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
       recruitment; /*!< shared pointer to recruitment module */
+
+  // depletion
+  int depletion_id = -999; /*!< id of depletion model object*/
+  std::shared_ptr<fims_popdy::DepletionBase<Type>>
+      depletion; /*!< shared pointer to recruitment module */
 
   // growth
   int growth_id = -999; /*!< id of growth model object*/
