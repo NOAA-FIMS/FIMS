@@ -61,11 +61,15 @@ BOOL
 byrow
 caa
 CAA
+CAAEvaluateTestFixture
+CAAInitializeTestFixture
 CAAPopulationProxy
+CAAPrepareTestFixture
 calc
 CalculateB
 CalculateBiomass
 CalculateCatch
+CalculateDepletion
 CalculateEquilibriumRecruitment
 CalculateEquilibriumSpawningBiomass
 CalculateIndex
@@ -101,6 +105,7 @@ cctype
 cdf
 cerr
 CheckDimensions
+CheckModel
 checkmarks
 CheckModelOutput
 choco
@@ -134,6 +139,7 @@ Const
 ConstraintWorks
 containsNA
 conventionalcommits
+conversiondouble
 cout
 cov
 covr
@@ -181,6 +187,10 @@ defineVar
 deliverables
 dellog
 DensityComponentBase
+dep
+DepletionBase
+DepletionExpected
+DepletionInterfaceBase
 dependabot
 Dereference
 DerivedQuantityToJSON
@@ -594,6 +604,7 @@ nyears
 Nyears
 nyr
 objs
+ObservedCatch
 ofstream
 onLoad
 onUnload
@@ -629,6 +640,10 @@ passwd
 pbs
 pdHess
 pdqit
+pella
+Pella
+PellaTomlinsonDepletion
+PellaTomlinsonInterface
 pkgdown
 pkgload
 pkgname
@@ -760,6 +775,8 @@ SetAgeCompositionData
 setClass
 setClassUnion
 SetDataObjects
+SetDepletion
+SetDepletionID
 setdiff
 setequal
 SetFleetIndexData
@@ -785,7 +802,9 @@ SetRecruitment
 SetRecruitmentID
 SetRecruitmentProcess
 SetRecruitmentProcessID
+SetSelectivityAgeID
 SetSelectivityID
+SetSelectivityLengthID
 SetUp
 SetupData
 SetupPriors
@@ -863,6 +882,8 @@ substr
 sudo
 superClass
 suppressMessages
+SurplusProduction
+SurplusProductionInterface
 surveyB
 Sys
 tabset
@@ -891,6 +912,9 @@ TMBVector
 tmp
 ToDo
 ToJSON
+tomlinson
+Tomlinson
+TOMLINSON
 toRVector
 toString
 tparam
@@ -959,6 +983,7 @@ yearm
 yf
 YJmYGEPuE
 ylab
+ym
 ymax
 yml
 yyyy

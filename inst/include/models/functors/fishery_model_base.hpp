@@ -22,6 +22,11 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
   uint32_t id;
 
  public:
+ /**
+  * @brief A string specifying the model type.
+  * 
+  */
+  std::string model_type_m;
   /**
    * @brief Unique identifier for the fishery model.
    *
@@ -46,6 +51,9 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
                             std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator
       fleet_iterator;
 
+#ifdef TMB_MODEL
+  ::objective_function<Type> *of;
+#endif
   /**
    * @brief Construct a new Fishery Model Base object.
    *
@@ -124,7 +132,13 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @brief Evaluate the model.
    *
    */
-  virtual void Evaluate() { FIMS_WARNING_LOG("Not yet implemented."); }
+  virtual void Evaluate() {}
+
+  /**
+   * @brief Report the model results via TMB.
+   *
+   */
+  virtual void Report() {}
 
   /**
    * @brief Get the Id object.

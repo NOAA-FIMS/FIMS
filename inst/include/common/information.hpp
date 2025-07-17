@@ -100,6 +100,14 @@ class Information {
       maturity_models_iterator;
   /**< iterator for maturity objects>*/
 
+  std::map<uint32_t, std::shared_ptr<fims_popdy::DepletionBase<Type>>>
+      depletion_models; /**<hash map to link each object to its shared location
+                        in memory*/
+  typedef typename std::map<
+      uint32_t, std::shared_ptr<fims_popdy::DepletionBase<Type>>>::iterator
+      depletion_models_iterator;
+  /**< iterator for depletion objects>*/
+
   // fleet modules
   std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>>
       fleets; /**<hash map to link each object to its shared location in
@@ -132,7 +140,8 @@ class Information {
 
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
-      models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial, etc*/
+      models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
+                     etc*/
   typedef typename std::unordered_map<
       uint32_t, std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>::iterator
       model_map_iterator; /**< iterator for variable map>*/
@@ -456,10 +465,10 @@ class Information {
                        fims::to_string(sel_id));
       }
     } else {
-      valid_model = false;
-      FIMS_ERROR_LOG("Error: No selectivity pattern defined for fleet " +
-                     fims::to_string(f->id) +
-                     ". FIMS requires selectivity be defined for all fleets.");
+      FIMS_WARNING_LOG("Warning: No selectivity pattern defined for fleet " +
+                       fims::to_string(f->id) +
+                       ". FIMS requires selectivity be defined for all fleets "
+                       "when running a catch at age model.");
     }
   }
 
@@ -494,11 +503,11 @@ class Information {
             fims::to_string(recruitment_uint));
       }
     } else {
-      valid_model = false;
-      FIMS_ERROR_LOG("No recruitment function defined for population " +
-                     fims::to_string(p->id) +
-                     ". FIMS requires recruitment functions be defined for all "
-                     "populations.");
+      FIMS_WARNING_LOG(
+          "No recruitment function defined for population " +
+          fims::to_string(p->id) +
+          ". FIMS requires recruitment functions be defined for all "
+          "populations when running a catch at age model.");
     }
   }
 
@@ -513,32 +522,72 @@ class Information {
   void SetRecruitmentProcess(bool &valid_model,
                              std::shared_ptr<fims_popdy::Population<Type>> p) {
     std::shared_ptr<fims_popdy::RecruitmentBase<Type>> r = p->recruitment;
-    if (r->process_id != -999) {
-      uint32_t process_uint = static_cast<uint32_t>(r->process_id);
-      recruitment_process_iterator it =
-          this->recruitment_process_models.find(process_uint);
+    // if recruitment is defined
+    if (r) {
+      if (r->process_id != -999) {
+        uint32_t process_uint = static_cast<uint32_t>(r->process_id);
+        recruitment_process_iterator it =
+            this->recruitment_process_models.find(process_uint);
 
-      if (it != this->recruitment_process_models.end()) {
-        r->process = (*it).second;  // recruitment process
-        FIMS_INFO_LOG(
-            "Recruitment Process model " + fims::to_string(process_uint) +
-            " successfully set to population " + fims::to_string(p->id));
-        (*it).second->recruitment = r;
+        if (it != this->recruitment_process_models.end()) {
+          r->process = (*it).second;  // recruitment process
+          FIMS_INFO_LOG(
+              "Recruitment Process model " + fims::to_string(process_uint) +
+              " successfully set to population " + fims::to_string(p->id));
+          (*it).second->recruitment = r;
+        } else {
+          valid_model = false;
+          FIMS_ERROR_LOG(
+              "Expected recruitment process function not defined for "
+              "population " +
+              fims::to_string(p->id) + ", recruitment process function " +
+              fims::to_string(process_uint));
+        }
+      } else {
+        FIMS_WARNING_LOG(
+            "No recruitment process function defined for population " +
+            fims::to_string(p->id) +
+            ". FIMS requires recruitment process functions be defined for all "
+            "recruitments when running a catch at age model.");
+      }
+    }
+  }
+
+  /**
+   * @brief Set pointers to the recruitment module referenced in the population
+   * module.
+   *
+   * @param &valid_model reference to true/false boolean indicating whether
+   * model is valid.
+   * @param p shared pointer to population module
+   */
+  void SetDepletion(bool &valid_model,
+                    std::shared_ptr<fims_popdy::Population<Type>> p) {
+    if (p->depletion_id != -999) {
+      uint32_t depletion_uint = static_cast<uint32_t>(p->depletion_id);
+      FIMS_INFO_LOG("searching for depletion model " +
+                    fims::to_string(depletion_uint));
+      depletion_models_iterator it =
+          this->depletion_models.find(depletion_uint);
+
+      if (it != this->depletion_models.end()) {
+        p->depletion = (*it).second;  // depletion defined in population.hpp
+        FIMS_INFO_LOG("Depletion model " + fims::to_string(depletion_uint) +
+                      " successfully set to population " +
+                      fims::to_string(p->id));
       } else {
         valid_model = false;
         FIMS_ERROR_LOG(
-            "Expected recruitment process function not defined for "
+            "Expected depletion function not defined for "
             "population " +
-            fims::to_string(p->id) + ", recruitment process function " +
-            fims::to_string(process_uint));
+            fims::to_string(p->id) + ", depletion function " +
+            fims::to_string(depletion_uint));
       }
     } else {
-      valid_model = false;
-      FIMS_ERROR_LOG(
-          "No recruitment process function defined for population " +
-          fims::to_string(p->id) +
-          ". FIMS requires recruitment process functions be defined for all "
-          "recruitments.");
+      FIMS_WARNING_LOG("No depletion function defined for population " +
+                       fims::to_string(p->id) +
+                       ". FIMS requires depletion functions be defined for all "
+                       "populations when running a surplus production model.");
     }
   }
 
@@ -573,11 +622,10 @@ class Information {
                        fims::to_string(growth_uint));
       }
     } else {
-      valid_model = false;
-      FIMS_ERROR_LOG("No growth function defined for population " +
-                     fims::to_string(p->id) +
-                     ". FIMS requires growth functions be defined for all "
-                     "populations.");
+      FIMS_WARNING_LOG("No growth function defined for population " +
+                       fims::to_string(p->id) +
+                       ". FIMS requires growth functions be defined for all "
+                       "populations when running a catch at age model.");
     }
   }
 
@@ -609,11 +657,10 @@ class Information {
             fims::to_string(maturity_uint));
       }
     } else {
-      valid_model = false;
-      FIMS_ERROR_LOG("No maturity function defined for population " +
-                     fims::to_string(p->id) +
-                     ". FIMS requires maturity functions be defined for all "
-                     "populations.");
+      FIMS_WARNING_LOG("No maturity function defined for population " +
+                       fims::to_string(p->id) +
+                       ". FIMS requires maturity functions be defined for all "
+                       "populations when running a catch at age model.");
     }
   }
 
@@ -628,8 +675,6 @@ class Information {
          ++it) {
       std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
       FIMS_INFO_LOG("Initializing fleet " + fims::to_string(f->id));
-
-      f->Initialize(f->nyears, f->nages, f->nlengths);
 
       SetFleetLandingsData(valid_model, f);
 
@@ -737,7 +782,6 @@ class Information {
         //     p->fleets.push_back(f);
         // }
       }
-      p->Initialize(p->nyears, p->nseasons, p->nages);
 
       // set information dimensions
       this->nyears = std::max(this->nyears, p->nyears);
@@ -747,6 +791,8 @@ class Information {
       SetRecruitment(valid_model, p);
 
       SetRecruitmentProcess(valid_model, p);
+
+      SetDepletion(valid_model, p);
 
       SetGrowth(valid_model, p);
 
@@ -876,6 +922,105 @@ class Information {
    */
   std::vector<Type *> &GetRandomEffectsParameters() {
     return random_effects_parameters;
+  }
+
+  /**
+   * @brief Checks to make sure all required modules are present for specified
+   * model
+   *
+   * @return True if valid model, False if invalid model, check fims.log for
+   * errors.
+   */
+  bool CheckModel() {
+    bool valid_model = true;
+    for (model_map_iterator it = this->models_map.begin();
+         it != this->models_map.end(); ++it) {
+      std::shared_ptr<fims_popdy::FisheryModelBase<Type>> &model = (*it).second;
+      std::set<uint32_t>::iterator jt;
+
+      for (jt = model->population_ids.begin();
+           jt != model->population_ids.end(); ++jt) {
+        population_iterator pt = this->populations.find((*jt));
+
+        if (pt != this->populations.end()) {
+          std::shared_ptr<fims_popdy::Population<Type>> p = (*pt).second;
+
+          if (model->model_type_m == "sp") {
+            if (p->depletion_id == -999) {
+              valid_model = false;
+              FIMS_ERROR_LOG("No depletion function defined for population " +
+                             fims::to_string(p->id) +
+                             ". FIMS SP model requires depletion functions be "
+                             "defined for all populations.");
+            }
+          }
+
+          if (model->model_type_m == "caa") {
+            typename std::set<uint32_t>::iterator fleet_ids_it;
+            for (fleet_ids_it = p->fleet_ids.begin();
+                 fleet_ids_it != p->fleet_ids.end(); ++fleet_ids_it) {
+              fleet_iterator it = this->fleets.find(*fleet_ids_it);
+
+              if (it != this->fleets.end()) {
+                // Initialize fleet object
+                std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
+
+                if (f->fleet_selectivity_id_m == -999) {
+                  valid_model = false;
+                  FIMS_ERROR_LOG(
+                      "No selectivity pattern defined for fleet " +
+                      fims::to_string(f->id) +
+                      ". FIMS requires selectivity be defined for all fleets "
+                      "when running a catch at age model.");
+                }
+              }
+            }
+
+            if (p->recruitment_id == -999) {
+              valid_model = false;
+              FIMS_ERROR_LOG(
+                  "No recruitment function defined for population " +
+                  fims::to_string(p->id) +
+                  ". FIMS requires recruitment functions be defined for all "
+                  "populations when running a catch at age model.");
+            }
+
+            std::shared_ptr<fims_popdy::RecruitmentBase<Type>> r =
+                p->recruitment;
+            r = p->recruitment;
+            if (r->process_id == -999) {
+              valid_model = false;
+              FIMS_ERROR_LOG(
+                  "No recruitment process function defined for population " +
+                  fims::to_string(p->id) +
+                  ". FIMS requires recruitment process functions be defined "
+                  "for all "
+                  "recruitments when running a catch at age model.");
+            }
+
+            if (p->growth_id == -999) {
+              valid_model = false;
+              FIMS_ERROR_LOG(
+                  "No growth function defined for population " +
+                  fims::to_string(p->id) +
+                  ". FIMS requires growth functions be defined for all "
+                  "populations when running a catch at age model.");
+            }
+
+            if (p->maturity_id == -999) {
+              valid_model = false;
+
+              FIMS_WARNING_LOG(
+                  "No maturity function defined for population " +
+                  fims::to_string(p->id) +
+                  ". FIMS requires maturity functions be defined for all "
+                  "populations when running a catch at age model.");
+            }
+          }
+        }
+      }
+    }
+    return valid_model;
   }
 };
 
