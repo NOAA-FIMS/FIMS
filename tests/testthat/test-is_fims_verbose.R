@@ -9,30 +9,26 @@
 # is_fims_verbose ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-option_verbosity <- getOption("rlib_message_verbosity")
-on.exit(options("rlib_message_verbosity" = option_verbosity), add = TRUE)
 
 ## IO correctness ----
 test_that("is_fims_verbose() works with correct inputs", {
   #' @description Test that is_fims_verbose() returns a boolean.
   expect_type(object = is_fims_verbose(), "logical")
 
-  #' @description Test that is_fims_verbose() returns TRUE by default.
-  expect_true(is_fims_verbose())
-
-  options("rlib_message_verbosity" = "quiet")
-  #' @description Test that you can turn it to FALSE by setting the global
-  #' verbosity option using `setOption()`.
+  #' @description Test that is_fims_verbose() returns FALSE by default because
+  #' of the settings in the helper-quiet-test-output.R file.
   expect_false(is_fims_verbose())
 })
 
 ## Edge handling ----
 test_that("is_fims_verbose() returns correct outputs for edge cases", {
+  # Save the current verbosity setting
+  current_verbosity <- getOption("rlib_message_verbosity")
+  options("rlib_message_verbosity" = "verbose")
+  # Restore the original verbosity setting on exit
+  on.exit(options("rlib_message_verbosity" = current_verbosity), add = TRUE)
   #' @description Test that "verbose" works for setting the verbosity.
-  expect_true({
-    options("rlib_message_verbosity" = "verbose")
-    is_fims_verbose()
-  })
+  expect_true(is_fims_verbose())
 })
 
 ## Error handling ----

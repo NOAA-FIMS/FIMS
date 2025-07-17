@@ -20,14 +20,18 @@ create_temporary_file <- function(temp_path) {
   # Ensure that the working directory is reset after the function exits
   on.exit(setwd(old_wd), add = TRUE)
   # Create a new package at the specified path
-  pkg <- usethis::create_package(temp_path)
-  # Set the project to the temporary package directory
-  usethis::proj_set(temp_path)
-  # Initialize the {testthat} framework for testing
-  usethis::use_testthat()
-  # Add a test to the package using the test template
-  FIMS:::use_testthat_template("individual_function")
-  FIMS:::use_testthat_template("function-group")
+  pkg <- suppressMessages(
+    invisible(capture.output(
+      usethis::create_package(temp_path),
+      type = "output"
+    ))
+  )
+
+  suppressMessages(usethis::proj_set(temp_path))
+  suppressMessages(usethis::use_testthat())
+  suppressMessages(FIMS:::use_testthat_template("individual_function"))
+  suppressMessages(FIMS:::use_testthat_template("function-group"))
+
   # Attempt to use the test template again inside a tryCatch to capture any
   # potential errors
   error <- tryCatch(FIMS:::use_testthat_template("individual_function"),

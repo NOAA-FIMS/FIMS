@@ -68,7 +68,7 @@ test_that("fims_frame() works with the correct inputs", {
 
   #' @description Test that the `show()` method works as expected on a FIMSFrame
   #' object.
-  expect_output(show(fims_frame))
+  expect_output(suppressMessages(show(fims_frame)))
 })
 
 ## Edge handling ----
