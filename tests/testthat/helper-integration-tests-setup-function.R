@@ -445,7 +445,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
-    silent = FALSE, map = map, random = "re"
+    silent = TRUE, map = map, random = "re"
   )
 
   # Optimization with nlminb
@@ -459,6 +459,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Call report using MLE parameter values, or
   # the initial values if optimization is skipped
   report <- obj[["report"]](obj[["env"]][["last.par.best"]])
+
 
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
