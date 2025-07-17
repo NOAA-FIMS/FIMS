@@ -30,7 +30,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The process id of the RecruitmentInterfaceBase object.
    */
-  SharedInt process_id;
+  SharedInt process_id = -999;
   /**
    * @brief The map associating the IDs of RecruitmentInterfaceBase to the
    * objects. This is a live object, which is an object that has been created

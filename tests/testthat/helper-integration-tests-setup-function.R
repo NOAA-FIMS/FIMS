@@ -430,8 +430,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   population$AddFleet(survey_fleet$get_id())
 
   # Set up catch at age model
-  # caa <- methods::new(CatchAtAge)
-  # caa$AddPopulation(population$get_id())
+  caa <- methods::new(CatchAtAge)
+  caa$AddPopulation(population$get_id())
 
   # Set-up TMB
   CreateTMBModel()
@@ -605,4 +605,429 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   clear()
   # Return the results as a list
   return(fit)
+}
+
+setup_and_run_sp <- function(estimation_mode = TRUE,
+                             map = list()) {
+  # #   # path to download the surplus prooduction test data
+  #   path_sp_data <- test_path("fixtures", "integration_test_data_sp.RData")
+  #   download.file(
+  #     "https://github.com/iagomosqueira/simtest_SP/raw/main/data/sims.RData",
+  #     path_sp_data
+  #   )
+  #   # remotes::install_github("flr/FLCore")
+  #   #load om object
+  #   load(path_sp_data)
+
+  #   # Simulated data and other information (e.g., number of iteration, end year, and start year)
+  #   args <- list(it = dim(om)[6], ay = 2020, y0 = 1951)
+  #   tracking <- FLCore::FLQuant(dimnames = list(
+  #     metric = "conv.est",
+  #     year = 1951:2020,
+  #     iter = seq(args$it)
+  #   ))
+  #   # OM
+  #   rom <- FLCore::FLQuants(
+  #     B = tsb(om),
+  #     Bstatus = tsb(om) / refpts(om)$Btgt,
+  #     Bdepletion = tsb(om) / refpts(om)$B0
+  #   )
+  #   res <- lapply(
+  #     setNames(names(rom), nm = c("B", "B/B[MSY]", "B/B[0]")),
+  #     function(x) FLCore::FLQuants(lapply(list(rom), "[[", x))
+  #   )
+
+  #   # Life history parameters from FishLife (https://github.com/James-Thorson-NOAA/FishLife)
+  #   # More examples can be found at https://github.com/iagomosqueira/simtest_SP/blob/main/data.R
+  #   # remotes::install_github("James-Thorson-NOAA/FishLife")
+  #   # remotes::install_github("Henning-Winker/SPMpriors")
+  #   # remotes::install_github( 'ropensci/rfishbase@fb-21.06', force=TRUE )
+  # library(FishLife)
+  # alb <- SPMpriors::flmvn_traits(
+  #     Genus="Thunnus",
+  #     Species="alalunga",
+  #     h=c(0.6,0.9),
+  #     Plot=FALSE
+  #   )$traits
+
+  #   lh <- list(
+  #     linf = alb[alb$trait=="Loo","mu.stk"],
+  #     k =  alb[alb$trait=="K","mu.stk"],
+  #     t0 = -0.5,
+  #     tm = alb[alb$trait=="tm","mu.stk"],
+  #     a = 0.00001,
+  #     b = 3.04,
+  #     tmax =  ceiling(alb[alb$trait=="tmax","mu.stk"]),
+  #     s = alb[alb$trait=="h","mu.stk"]
+  #   )
+
+  #   # Load om survey indices
+  #   om_survey_indices <- lapply(FLCore::FLIndices(A = idx), index)
+  #   om_survey_indices_se <- rep(0.2, length(FLCore::FLIndices(A = idx)))
+  #   # Load om landings data
+  #   om_landings <- FLCore::catch(om)
+  #   # HANDLE NAs in catch
+  #   om_landings[is.na(om_landings)] <- 0
+
+  #   # Extract args and SET dims
+  #   # end year: 2020
+  #   ay <- args$ay
+  #   # number of iterations: 100
+  #   it <- args$it
+  #   # start year:1951
+  #   y0 <- args$y0
+  #   # number of years:70
+  #   ny <- dim(om_landings)[2]
+
+  #   # Create ouput
+  #   empty <- om_landings %=% 0
+  #   out <- list(
+  #     ind = FLQuants(lapply(
+  #       setNames(nm = c("F", "Fstatus", "B", "Bstatus", "Bdepletion")),
+  #       function(x) propagate(empty, it)
+  #     )),
+  #     rps = FLPar(NA, dimnames = list(
+  #       params = c("FMSY", "BMSY", "MSY", "K", "B0"),
+  #       iter = seq(it)
+  #     ), units = c("f", "t", "t", "t", "t")),
+  #     conv = rep(NA, it)
+  #   )
+
+  #   # Extract the 1st iter landings data for the fishing fleet
+  #   iter_id <- 1
+  #   fishing_fleet_landings <- as.data.frame(
+  #     iter(om_landings, iter_id),
+  #     drop = TRUE
+  #   )
+  #   survey_fleet_index <- model.frame(
+  #     window(iter(om_survey_indices, iter_id), start = y0),
+  #     drop = TRUE
+  #   )
+  #   se <- survey_fleet_index
+  #   # Assign indx.se
+  #   se[, -1] <- as.list(om_survey_indices_se)
+
+  #   # JABBA (needs to install JABBA, rjags, and R2jags)
+  #   # need to run the following in ubuntu before installing rjags:
+  #   # sudo apt-get update
+  #   # sudo apt-get install -y jags
+  #   # install.packages("rjags")
+  #   # install.packages("R2jags")
+  #   # remotes::install_github("jabbamodel/JABBA")
+  #   # TODO: It appears the model is run using default priors, what are these?
+
+  #   inpput <- JABBA::build_jabba(
+  #     catch = fishing_fleet_landings,
+  #     cpue = survey_fleet_index,
+  #     se = se,
+  #     assessment = "STK",
+  #     scenario = "jabba.sa",
+  #     model.type = "Schaefer",
+  #     sigma.est = TRUE,
+  #     fixed.obsE = 0.05,
+  #     verbose = FALSE
+  #   )
+  #   JABBA::mp_jabba(input)
+
+  # Simulate data
+
+  # library(FishLife)
+  # library(SPMpriors)
+  # library(FLRef)
+  # library(FLife)
+  # library(patchwork)
+
+
+  # # --- Life history
+
+  # # A set of parameters are sampled from FishLife
+
+  # alb <- flmvn_traits(Genus="Thunnus", Species="alalunga",
+  #   h=c(0.6,0.9), Plot=FALSE)$traits
+
+  # # Other parameters are specified
+
+  # lh <- list(linf = alb[alb$trait=="Loo","mu.stk"],
+  #   k =  alb[alb$trait=="K","mu.stk"],
+  #   t0 = -0.5,
+  #   tm = alb[alb$trait=="tm","mu.stk"],
+  #   a = 0.00001,
+  #   b = 3.04,
+  #   tmax =  ceiling(alb[alb$trait=="tmax","mu.stk"]),
+  #   s = alb[alb$trait=="h","mu.stk"])
+
+  # # Check the corresponding Von Bertalanffy growth curve
+
+  # lena <- with(lh, vonbert(linf, k, t0, age=0:tmax))
+
+  # # M using Then (), with tmax1 = 22 and tmax2 = 12
+
+  # lh$M <- 4.899 * lh$tmax ^- 0.916
+
+  # #  Leslie matrix `r`
+
+  # bio <- with(lh, jbio(amax=tmax, nsexes=1, Loo=linf, k=k, t0=t0, aW=1000*a, bW=b,
+  #   mat=c(tm, tm*1.2, 1), M=M, h=s))
+
+  # r <- jbleslie(bio)$r
+
+
+  # # --- Generic OM for ALB
+
+  # # Life-history parameter set com,pleted by lhPar
+
+  # par <- with(lh, lhPar(FLPar(linf=linf, k=k, t0=t0, a=a, b=b, a50=2, s=s, m1=M)))
+
+  # # Constructor a basic `FLBRP()` (equilibrium) object.
+
+  # eql <- lhEql(par, range = c(min = 0, max = lh$tmax,
+  #   minfbar = 1, maxfbar = lh$tmax-1, plusgroup=lh$tmax))
+
+  # # Adjusts the inbuilt Gislason M to a scaled Lorenzen $M$
+
+  # m(eql)[] <- lorenzen(stock.wt(eql), Mref=lh$M, Aref=2)
+
+  #  # Specifying a new maturity ogive
+
+  # mat(eql) <- newselex(mat(eql), FLPar(S50=lh$tm, mat95=lh$tm * 1.5, Smax=1000,
+  #   Dcv=0.5,Dmin=0.1))
+
+  # # Updates the stock recruitment steepness if biological parameters are modified
+
+  # params(eql)
+
+  # eql <- updsr(eql, s=lh$s)
+
+  # params(eql)
+
+  # # Time horizon can be adjusted with `fbar` range, 1981-2020
+
+  # f0 <- 0.01
+
+  # fbar(eql) <- FLQuant(f0, dimnames=list(year=1951:2020))
+
+  # # Convert FLBRP into FLStock + SRR
+
+  # stk <- as(eql,"FLStock")
+  # units(stk) <- standardUnits(stk)
+
+  # srr <- as(as(eql,"predictModel"),"FLSR")
+
+  # # Set new selectivity parameters
+
+  # selpar <- FLPar(
+  #   # catch before maturity
+  #   S50=3, S95=4.2,
+  #   # Domed-shaped
+  #   Smax=7, Dcv=0.5, Dmin=0.2)
+
+  # # Modify selectivity
+
+  # harvest(stk) <-  f0 * newselex(harvest(stk), selpar)
+
+  # # Plots weight-at-age, maturity-at-age, natural mortality and selective
+
+  # ggplot(FLQuants(stk,"m","catch.sel","mat","catch.wt"))+
+  #   geom_line(aes(age,data))+
+  #   facet_wrap(~qname,scale="free")+theme_bw()
+
+
+  # # --- Estimating priors from FLStock and SRR
+
+  # #' First, it is straight forward to compute the intrinsic rate of population increase from a Leslie for a specified steepness value. However, this $r$ estimate ignores selectivity and should only be used in the context of a Schaefer model with $F_{MSY} = r/2$.
+
+  # r.leslie <- mean(productivity(stk, s=lh$s)$r)
+
+  # # compare
+  # c(r=r, r.leslie=r.leslie, FMSY=r.leslie / 2)
+
+  # #' An alternative is to estimate $r$ and the shape parameter $n$ as function $MSY$, $VB_{MSY}$ and $VB_0$ from an age-structured equilibrium model (ASEM), where $BB$ denotes that the vulnarable (or exploitable) biomass as function of selectivity.
+
+  # brp <- brp(FLBRP(stk, srr))
+
+  # r.pella <- asem2spm(brp)
+  # r.pella
+
+  # plotpf(brp, rel=FALSE) + plotpf(brp, rel=TRUE) + plot_layout(guides = "collect")
+
+
+  # # --- Simulating stock dynamics with evolutionary F-trajectories
+
+  # # Estimate refpts
+  # brp <- computeFbrp(stk, srr, proxy="msy", blim=0.3, type="btgt")
+  # stk <- FLStockR(stk)
+  # refpts(stk) <- Fbrp(brp)
+
+  # ploteq(brp)
+
+  # its <- 100
+
+  # # SSB0 for brp
+  # b0 <- an(refpts(eql)["virgin","ssb"])
+
+  # # one-way downhill projection
+  # control = FLPar(Feq=0.15,Frate=0.05,Fsigma=0.15,SB0=b0,
+  #   minyear=dims(stk)$minyear+1,
+  #   maxyear=dims(stk)$maxyear,its=its)
+
+  # # Forecasted with random recruitment under an evolving F-trajectory
+
+  # set.seed(1234)
+  # # Random recruitment deviations with sigR = 0.5 and AR1 rho = 0.3
+  # rec_devs = ar1rlnorm(0.3, 1951:2020, its, 0, 0.5)
+  # # propagate desired iterations
+  # stki <- propagate(stk, its)
+  # # create OM
+  # om <- rffwd(stki, srr, control=control, deviances=rec_devs)
+  # refpts(om) <- refpts(stk)
+
+  # plotAdvice(om)
+
+  # # Generate LL CPUE, flat-topped selectivity
+
+  # cpue.sel <- newselex(harvest(stk),
+  #   FLPar(S50=3.5, mat95=4.2, Smax=100, Dcv=0.5, Dmin=0.05))
+
+  # idx <- window(bioidx.sim(om,sel=cpue.sel,sigma=0.25,q=0.001),start=1970)
+  # FIMS
+
+  # Load surplus production data
+  data("data_sp")
+  # doesn't work because of age
+  # data_4_model <- FIMSFrame(data_sp)
+  nyears <- 70
+  survey_index <- data_sp |> dplyr::filter(type == "index")
+  landings <- data_sp |> dplyr::filter(type == "landings")
+
+  clear()
+  # create index module
+  survey_fleet_index <- methods::new(Index, nyears)
+  purrr::walk(
+    1:nyears,
+    \(x) survey_fleet_index$index_data$set(x - 1, survey_index$value[x])
+  )
+
+
+  # create catch module
+  fishing_fleet_landings <- methods::new(Landings, nyears)
+  purrr::walk(
+    1:nyears,
+    \(x) fishing_fleet_landings$landings_data$set(x - 1, landings$value[x])
+  )
+
+  # Survey and Fishery Fleet modules
+  # Initialize the fishing fleet module
+  fishing_fleet <- methods::new(Fleet)
+  # Set number of years
+  fishing_fleet$nyears$set(nyears)
+  fishing_fleet$log_q[1]$value <- log(1.0)
+  fishing_fleet$log_q[1]$estimation_type$set("constant")
+  fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
+  survey_fleet <- methods::new(Fleet)
+  survey_fleet$nyears$set(nyears)
+  # Estimate q
+  survey_fleet$log_q[1]$value <- 1 # TODO: check initial value
+  survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
+  survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
+
+  # setup distributions for fleet and survey
+  # Set up fishery index data using the lognormal
+  fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
+  # lognormal observation error transformed on the log scale
+  fishing_fleet_landings_distribution$log_sd$resize(nyears)
+  for (y in 1:nyears) {
+    # Compute lognormal SD from OM coefficient of variation (CV)
+    fishing_fleet_landings_distribution$log_sd[y]$value <- log(landings$uncertainty[y])
+  }
+  fishing_fleet_landings_distribution$log_sd$set_all_estimable(FALSE)
+  # Set Data using the IDs from the modules defined above
+  fishing_fleet_landings_distribution$set_observed_data(fishing_fleet$GetObservedLandingsDataID())
+  fishing_fleet_landings_distribution$set_distribution_links("data", fishing_fleet$log_landings_expected$get_id())
+  survey_fleet_index_distribution <- methods::new(DlnormDistribution)
+
+  # lognormal observation error transformed on the log scale
+  # sd = sqrt(log(cv^2 + 1)), sd is log transformed
+  survey_fleet_index_distribution$log_sd$resize(nyears)
+  for (y in 1:nyears) {
+    survey_fleet_index_distribution$log_sd[y]$value <- log(survey_index$uncertainty[y])
+  }
+  survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+  # Set Data using the IDs from the modules defined above
+  survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
+  survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
+
+  # create depletion module
+  production <- new(PTDepletion)
+  # estimate log r and K
+  # TODO: what are good input values for log_r and log_K?
+  production$log_r[1]$value <- rnorm(1, 0.2, 0.5) # random draw from prior
+  production$log_r[1]$estimation_type$set("fixed_effects")
+  production$log_K[1]$value <- rnorm(1, 8 * max(landings$value), 1) # random draw from prior
+  production$log_K[1]$estimation_type$set("fixed_effects")
+  # Fix to get Schaefer model
+  production$log_m[1]$value <- log(1)
+  production$log_depletion$resize(nyears)
+  for (i in 1:nyears) {
+    production$log_depletion[i]$value <- 0
+  }
+  production$log_depletion$set_all_estimable(TRUE)
+  production$nyears$set(nyears)
+
+  production_distribution <- new(DnormDistribution)
+  production_distribution$log_sd[1]$value <- log(1)
+  production_distribution$set_distribution_links(
+    "random_effect",
+    c(production$log_depletion$get_id(), production$log_depletion$get_id())
+  )
+
+
+  # Setup Priors USING jabba DEFAULTS
+  log_r_Prior <- new(DlnormDistribution)
+  log_r_Prior$expected_values[1]$value <- 0.2
+  log_r_Prior$log_sd[1]$value <- log(0.5)
+  log_r_Prior$set_distribution_links("prior", production$log_r$get_id())
+
+  log_K_Prior <- new(DlnormDistribution)
+  log_K_Prior$expected_values[1]$value <- 8 * max(landings$value)
+  log_K_Prior$log_sd[1]$value <- log(1.0)
+  log_K_Prior$set_distribution_links("prior", production$log_K$get_id())
+
+  # create population module
+  population <- new(Population)
+  population$nyears$set(nyears)
+  population$nages$set(1) # only one age in surplus production
+  population$ages$resize(1)
+  population$ages$set(0, 0) # only one age in surplus production
+  # Fix init depletion
+  population$log_init_depletion[1]$value <- 1
+  population$log_init_depletion[1]$estimation_type$set("fixed_effects")
+  population$SetDepletionID(production$get_id())
+
+
+  # TODO: setup prior on init_depletion even though fixed?
+
+  # Set up catch at age model
+  surplus_production <- methods::new(SurplusProduction)
+  surplus_production$AddPopulation(population$get_id())
+
+
+  # create TMB Model
+  # Set-up TMB
+  CreateTMBModel()
+  # Create parameter list from Rcpp modules
+  parameters <- list(
+    p = get_fixed(),
+    re = get_random()
+  )
+
+  obj <- TMB::MakeADFun(
+    data = list(), parameters, DLL = "FIMS",
+    silent = TRUE, map = list()
+  )
+
+  # fit <- tmbstan::tmbstan(obj, init =  "best.last.par")
+  # postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
+  opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
+    control = list(eval.max = 10000, iter.max = 10000, trace = 0)
+  )
 }
