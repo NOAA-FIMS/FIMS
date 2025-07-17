@@ -368,6 +368,14 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
+  Rcpp::class_<PellaTomlinsonInterface>("PTDepletion")
+      .constructor()
+      .field("log_r", &PellaTomlinsonInterface::log_r)
+      .field("log_K", &PellaTomlinsonInterface::log_K)
+      .field("log_m", &PellaTomlinsonInterface::log_m)
+      .method("get_id", &PellaTomlinsonInterface::get_id)
+      .method("evaluate_mean", &PellaTomlinsonInterface::evaluate_mean);
+
   Rcpp::class_<DnormDistributionsInterface>("DnormDistribution")
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id,
