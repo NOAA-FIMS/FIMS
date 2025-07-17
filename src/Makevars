@@ -1,4 +1,5 @@
 CXX_STD = CXX17
-PKG_CXXFLAGS = -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS  -DTMBAD_FRAMEWORK
+# The -fno-gnu-unique flag disables GNU unique symbol handling (needed for some Linux builds)
+PKG_CXXFLAGS = -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS  -DTMBAD_FRAMEWORK -fno-gnu-unique
 CXX17STD = -std=c++17 -w
 USE_CXX17 = "yes"
