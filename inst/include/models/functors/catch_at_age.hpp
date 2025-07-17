@@ -83,6 +83,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::stringstream ss;
     ss << "caa_" << this->GetId() << "_";
     this->name_m = ss.str();
+    this->model_type_m = "caa";
   }
 
   /**
@@ -95,7 +96,144 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function is called once at the beginning of the model run. It
    * initializes the derived quantities for the populations and fleets.
    */
-  virtual void Initialize() {}
+  virtual void Initialize() {
+    // The following are initialized in the rcpp interface: ages, log_init_naa, 
+    //   numbers_at_age, log_Fmort, log_q
+    for (size_t p = 0; p < this->populations.size(); p++) {
+      std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          this->population_derived_quantities[this->populations[p]->GetId()];
+
+      derived_quantities["total_landings_weight"] =
+          fims::Vector<Type>(this->populations[p]->nyears);
+
+      derived_quantities["total_landings_numbers"] =
+          fims::Vector<Type>(this->populations[p]->nyears);
+
+      derived_quantities["mortality_F"] = fims::Vector<Type>(
+          this->populations[p]->nyears * this->populations[p]->nages);
+
+      derived_quantities["mortality_Z"] = fims::Vector<Type>(
+          this->populations[p]->nyears * this->populations[p]->nages);
+
+      derived_quantities["weight_at_age"] = fims::Vector<Type>(
+          this->populations[p]->nages);
+
+      //TODO: numbers_at_age are resized in rcpp_population, should this be removed?
+      derived_quantities["numbers_at_age"] = fims::Vector<Type>(
+          (this->populations[p]->nyears + 1) * this->populations[p]->nages);
+
+      derived_quantities["unfished_numbers_at_age"] = fims::Vector<Type>(
+          (this->populations[p]->nyears + 1) * this->populations[p]->nages);
+          
+      derived_quantities["biomass"] =
+          fims::Vector<Type>(this->populations[p]->nyears + 1);
+
+      derived_quantities["spawning_biomass"] =
+          fims::Vector<Type>(this->populations[p]->nyears + 1);
+
+      derived_quantities["unfished_biomass"] =
+          fims::Vector<Type>(this->populations[p]->nyears + 1);
+
+      derived_quantities["unfished_spawning_biomass"] =
+          fims::Vector<Type>(this->populations[p]->nyears + 1);
+
+      derived_quantities["proportion_mature_at_age"] = fims::Vector<Type>(
+          (this->populations[p]->nyears + 1) * this->populations[p]->nages);
+
+      derived_quantities["expected_recruitment"] =
+          fims::Vector<Type>(this->populations[p]->nyears + 1);
+
+      derived_quantities["sum_selectivity"] = fims::Vector<Type>(
+          this->populations[p]->nyears * this->populations[p]->nages);
+      this->populations[p]->proportion_female.resize(this->populations[p]->nages);
+      this->populations[p]->M.resize(
+          this->populations[p]->nyears * this->populations[p]->nages);
+    }
+
+    for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
+        ++fit) {
+      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+      std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          this->fleet_derived_quantities[fleet->GetId()];
+           // initialize derive quantities
+      // landings
+      derived_quantities["landings_numbers_at_age"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nages);
+
+      derived_quantities["landings_weight_at_age"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nages);
+
+      derived_quantities["landings_numbers_at_length"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nlengths);
+
+      derived_quantities["landings_weight"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["landings_numbers"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["landings_expected"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["log_landings_expected"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["agecomp_proportion"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nages);
+
+      derived_quantities["lengthcomp_proportion"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nlengths);
+      // index
+      derived_quantities["index_numbers_at_age"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nages);
+
+      derived_quantities["index_weight_at_age"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nages);
+
+      derived_quantities["index_numbers_at_length"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nlengths);
+
+      derived_quantities["index_weight"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["index_numbers"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["index_expected"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["log_index_expected"] =
+          fims::Vector<Type>(fleet->nyears);
+      //
+      derived_quantities["catch_index"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["expected_catch"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["expected_index"] =
+          fims::Vector<Type>(fleet->nyears);
+
+      derived_quantities["agecomp_expected"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nages);
+
+      derived_quantities["lengthcomp_expected"] = fims::Vector<Type>(
+          fleet->nyears * fleet->nlengths);
+
+      if (fleet->nlengths > 0) {
+        derived_quantities["age_to_length_conversion"] = fims::Vector<Type>(
+            fleet->nages * fleet->nlengths);
+      }
+
+      if(fleet->log_q.size() == 0){
+        fleet->log_q.resize(1);
+        fleet->log_q[0] = static_cast<Type>(0.0);
+      }
+      fleet->q.resize(fleet->log_q.size());
+      fleet->Fmort.resize(fleet->nyears);
+    }
+
+  }
 
   /**
    * This function is used to convert the derived quantities of a population or
@@ -336,11 +474,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   virtual void Prepare() {
     for (size_t p = 0; p < this->populations.size(); p++) {
-      this->populations[p]->Prepare();
-
       auto derived_quantities =
           this->population_derived_quantities[this->populations[p]->GetId()];
 
+      // Reset the derived quantities for the population
       typename fims_popdy::Population<Type>::derived_quantities_iterator it;
       for (it = derived_quantities.begin(); it != derived_quantities.end();
            it++) {
@@ -354,6 +491,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
           this->populations[p];
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           this->population_derived_quantities[population->GetId()];
+      
+      //Prepare proportion_female
+      for(size_t age = 0; age < population->nages; age++) {
+        population->proportion_female[age] = 0.5;
+      }
 
       // Transformation Section
       for (size_t age = 0; age < population->nages; age++) {
@@ -361,10 +503,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
           size_t i_age_year = age * population->nyears + year;
           population->M[i_age_year] =
               fims_math::exp(population->log_M[i_age_year]);
+          // TODO: is this still needed now that derived quantities are filled with ResetVector?
           // mortality_F is a fims::Vector and therefore needs to be filled
           // within a loop
-          derived_quantities["mortality_F"][i_age_year] = 0.0;
-          derived_quantities["weight_at_age"][i_age_year] =
+          // derived_quantities["mortality_F"][i_age_year] = 0.0;
+          derived_quantities["weight_at_age"][age] =
               population->growth->evaluate(population->ages[age]);
         }
       }
@@ -382,6 +525,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
         this->ResetVector(dq);
       }
 
+      // Transformation Section
+      for (size_t i = 0; i < fleet->log_q.size(); i++) {
+        fleet->q[i] = fims_math::exp(fleet->log_q[i]);
+      }
+
+      for (size_t year = 0; year < fleet->nyears; year++) {
+        fleet->Fmort[year] = fims_math::exp(fleet->log_Fmort[year]);
+      }
+
+      //TODO: does this age_length_to_conversion need to be a dq and parameter of fleet?
       for (size_t i_length_age = 0;
            i_length_age < fleet->age_to_length_conversion.size();
            i_length_age++) {
@@ -1345,6 +1498,166 @@ class CatchAtAge : public FisheryModelBase<Type> {
     evaluate_index();
     evaluate_landings();
     // ComputeProportions();
+  }
+
+
+  /**
+   * * This method is used to generate TMB reports from the population dynamics model.
+   */
+  virtual void Report(){
+    
+    int n_fleets = this->fleets.size();
+    int n_pops = this->populations.size();
+    #ifdef TMB_MODEL
+    
+      // Create vector lists to store output for reporting
+      // vector< vector<Type> > creates a nested vector structure where
+      // each vector can be a different dimension. Does not work with ADREPORT
+      // fleets
+      vector<vector<Type>> landings_w(n_fleets);
+      vector<vector<Type>> landings_n(n_fleets);
+      vector<vector<Type>> landings_exp(n_fleets);
+      vector<vector<Type>> landings_naa(n_fleets);
+      vector<vector<Type>> landings_waa(n_fleets);
+      vector<vector<Type>> landings_nal(n_fleets);
+      vector<vector<Type>> index_w(n_fleets);
+      vector<vector<Type>> index_n(n_fleets);
+      vector<vector<Type>> index_exp(n_fleets);
+      vector<vector<Type>> index_naa(n_fleets);
+      vector<vector<Type>> index_nal(n_fleets);
+      vector<vector<Type>> agecomp_exp(n_fleets);
+      vector<vector<Type>> lengthcomp_exp(n_fleets);
+      vector<vector<Type>> agecomp_prop(n_fleets);
+      vector<vector<Type>> lengthcomp_prop(n_fleets);
+      vector<vector<Type>> F_mort(n_fleets);
+      vector<vector<Type>> q(n_fleets);
+      // populations
+      vector<vector<Type>> naa(n_pops);
+      vector<vector<Type>> ssb(n_pops);
+      vector<vector<Type>> total_landings_w(n_pops);
+      vector<vector<Type>> total_landings_n(n_pops);
+      vector<vector<Type>> biomass(n_pops);
+      vector<vector<Type>> log_recruit_dev(n_pops);
+      vector<vector<Type>> log_r(n_pops);
+      vector<vector<Type>> recruitment(n_pops);
+      vector<vector<Type>> M(n_pops);
+      // initiate population index for structuring report out objects
+      int pop_idx = 0;
+      for (size_t p = 0; p < this->populations.size(); p++) {   
+        std::shared_ptr<fims_popdy::Population<Type>> &population =
+          this->populations[p];
+        std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          this->population_derived_quantities[this->populations[p]->GetId()];
+        naa(pop_idx) = vector<Type>(derived_quantities["numbers_at_age"]);
+        ssb(pop_idx) = vector<Type>(derived_quantities["spawning_biomass"]);
+        total_landings_w(pop_idx) = vector<Type>(derived_quantities["total_landings_weight"]);
+        total_landings_n(pop_idx) = vector<Type>(derived_quantities["total_landings_numbers"]);
+        log_recruit_dev(pop_idx) = vector<Type>(population->recruitment->log_recruit_devs);
+        log_r(pop_idx) = vector<Type>(derived_quantities["log_r"]);
+        recruitment(pop_idx) = vector<Type>(derived_quantities["expected_recruitment"]);
+        biomass(pop_idx) = vector<Type>(derived_quantities["biomass"]);
+        M(pop_idx) = vector<Type>(population->M);
+
+        pop_idx += 1;
+      }
+
+      // initiate fleet index for structuring report out objects
+      int fleet_idx = 0;
+      fleet_iterator fit;
+      for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
+        std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+      std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          this->fleet_derived_quantities[fleet->GetId()];
+        landings_w(fleet_idx) = derived_quantities["landings_weight"];
+        landings_n(fleet_idx) = derived_quantities["landings_numbers"];
+        landings_exp(fleet_idx) = derived_quantities["landings_expected"];
+        landings_naa(fleet_idx) = derived_quantities["landings_numbers_at_age"];
+        landings_waa(fleet_idx) = derived_quantities["landings_weight_at_age"];
+        landings_nal(fleet_idx) = derived_quantities["landings_numbers_at_length"];
+        index_w(fleet_idx) = derived_quantities["index_weight"];
+        index_n(fleet_idx) = derived_quantities["index_numbers"];
+        index_exp(fleet_idx) = derived_quantities["index_expected"];
+        index_naa(fleet_idx) = derived_quantities["index_numbers_at_age"];
+        index_nal(fleet_idx) = derived_quantities["index_numbers_at_length"];
+        agecomp_exp(fleet_idx) = derived_quantities["agecomp_expected"];
+        lengthcomp_exp(fleet_idx) = derived_quantities["lengthcomp_expected"];
+        agecomp_prop(fleet_idx) = derived_quantities["agecomp_proportion"];
+        lengthcomp_prop(fleet_idx) = derived_quantities["lengthcomp_proportion"];
+        F_mort(fleet_idx) = derived_quantities["Fmort"];
+        q(fleet_idx) = derived_quantities["q"];
+        fleet_idx += 1;
+      }
+
+      // FIMS_REPORT_F(rec_nll, this->of);
+      // FIMS_REPORT_F(age_comp_nll, this->of);
+      // FIMS_REPORT_F(index_nll, this->of);
+      FIMS_REPORT_F(naa, this->of);
+      FIMS_REPORT_F(ssb, this->of);
+      FIMS_REPORT_F(log_recruit_dev, this->of);
+      FIMS_REPORT_F(log_r, this->of);
+      FIMS_REPORT_F(recruitment, this->of);
+      FIMS_REPORT_F(biomass, this->of);
+      FIMS_REPORT_F(M, this->of);
+      FIMS_REPORT_F(total_landings_w, this->of);
+      FIMS_REPORT_F(total_landings_n, this->of);
+      FIMS_REPORT_F(landings_w, this->of);
+      FIMS_REPORT_F(landings_n, this->of);
+      FIMS_REPORT_F(landings_exp, this->of);
+      FIMS_REPORT_F(landings_naa, this->of);
+      FIMS_REPORT_F(landings_waa, this->of);
+      FIMS_REPORT_F(landings_nal, this->of);
+      FIMS_REPORT_F(index_w, this->of);
+      FIMS_REPORT_F(index_n, this->of);
+      FIMS_REPORT_F(index_exp, this->of);
+      FIMS_REPORT_F(index_naa, this->of);
+      FIMS_REPORT_F(index_nal, this->of);
+      FIMS_REPORT_F(agecomp_exp, this->of);
+      FIMS_REPORT_F(lengthcomp_exp, this->of);
+      FIMS_REPORT_F(agecomp_prop, this->of);
+      FIMS_REPORT_F(lengthcomp_prop, this->of);
+      FIMS_REPORT_F(F_mort, this->of);
+      FIMS_REPORT_F(q, this->of);
+
+      /*ADREPORT using ADREPORTvector defined in
+        * inst/include/interface/interface.hpp:
+        * function collapses the nested vector into a single vector
+        */
+      vector<Type> NAA = ADREPORTvector(naa);
+      vector<Type> Biomass = ADREPORTvector(biomass);
+      vector<Type> SSB = ADREPORTvector(ssb);
+      vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
+      vector<Type> FMort = ADREPORTvector(F_mort);
+      vector<Type> Q = ADREPORTvector(q);
+      vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
+      vector<Type> IndexExpected = ADREPORTvector(index_exp);
+      vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
+      vector<Type> LandingsNumberAtLength = ADREPORTvector(landings_nal);
+      vector<Type> IndexNumberAtAge = ADREPORTvector(index_naa);
+      vector<Type> IndexNumberAtLength = ADREPORTvector(index_nal);
+      vector<Type> AgeCompositionExpected = ADREPORTvector(agecomp_exp);
+      vector<Type> LengthCompositionExpected = ADREPORTvector(lengthcomp_exp);
+      vector<Type> AgeCompositionProportion = ADREPORTvector(agecomp_prop);
+      vector<Type> LengthCompositionProportion =
+          ADREPORTvector(lengthcomp_prop);
+
+      ADREPORT_F(NAA, this->of);
+      ADREPORT_F(Biomass, this->of);
+      ADREPORT_F(SSB, this->of);
+      ADREPORT_F(LogRecDev, this->of);
+      ADREPORT_F(FMort, this->of);
+      ADREPORT_F(Q, this->of);
+      ADREPORT_F(LandingsExpected, this->of);
+      ADREPORT_F(IndexExpected, this->of);
+      ADREPORT_F(LandingsNumberAtAge, this->of);
+      ADREPORT_F(LandingsNumberAtLength, this->of);
+      ADREPORT_F(IndexNumberAtAge, this->of);
+      ADREPORT_F(IndexNumberAtLength, this->of);
+      ADREPORT_F(AgeCompositionExpected, this->of);
+      ADREPORT_F(LengthCompositionExpected, this->of);
+      ADREPORT_F(AgeCompositionProportion, this->of);
+      ADREPORT_F(LengthCompositionProportion, this->of);
+      
+    #endif
   }
 };
 

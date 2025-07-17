@@ -915,10 +915,9 @@ initialize_fims <- function(parameters, data) {
   )
 
   # Set-up TMB
-  # TODO: Fix this when more families come online
   # Hard code to be a catch-at-age model
-  # caa <- methods::new(CatchAtAge)
-  # caa$AddPopulation(population$get_id())
+  caa <- methods::new(CatchAtAge)
+  caa$AddPopulation(population$get_id())
 
   CreateTMBModel()
   # Create parameter list from Rcpp modules
@@ -984,58 +983,65 @@ set_param_vector <- function(field, module, module_input) {
   )
 
 
+  # Turn off this check as it causes problems due to added surplus production 
+  # fields not used in caa
+  # # Check if both value and estimation information are present
+  # if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
+  #   cli::cli_abort(c(
+  #     "Missing value or estimation information for {.var field}."
+  #   ))
+  # }
 
-  # Check if both value and estimation information are present
+
   if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
-    cli::cli_abort(c(
-      "Missing value or estimation information for {.var field}."
-    ))
-  }
+      # If the field is not present in module_input, skip to next field
+      return(invisible(NULL))
+  } else {
+    # Extract the value of the parameter vector
+    field_value <- module_input[[field_value_name]]
+    estimation_type_value <- module_input[[field_estimation_name]]
 
-  # Extract the value of the parameter vector
-  field_value <- module_input[[field_value_name]]
-  estimation_type_value <- module_input[[field_estimation_name]]
+    # Resize the field in the module if it has multiple values
+    if (length(field_value) > 1) module[[field]]$resize(length(field_value))
+    if (length(field_value) > 1 && length(estimation_type_value) > 1) {
+      if (length(field_value) != length(estimation_type_value)) {
+        cli::cli_abort(c(
+          "The length of {.var field_value} ({length(field_value)}) does not match
+          the length of {.var estimation_type_value} ({length(estimation_type_value)})."
+        ))
+      }
+    }
 
-  # Resize the field in the module if it has multiple values
-  if (length(field_value) > 1) module[[field]]$resize(length(field_value))
-  if (length(field_value) > 1 && length(estimation_type_value) > 1) {
-    if (length(field_value) != length(estimation_type_value)) {
-      cli::cli_abort(c(
-        "The length of {.var field_value} ({length(field_value)}) does not match
-        the length of {.var estimation_type_value} ({length(estimation_type_value)})."
-      ))
+    # Assign each value to the corresponding position in the parameter vector
+    for (i in seq_along(field_value)) {
+      module[[field]][i][["value"]] <- field_value[i]
+      if (length(estimation_type_value) == 1) {
+        # If there is only one estimation type value, set it for all elements
+        module[[field]][i][["estimation_type"]]$set(estimation_type_value)
+      } else {
+        # If there are multiple estimation type values, set them individually
+        module[[field]][i][["estimation_type"]]$set(estimation_type_value[i])
+      }
     }
-  }
 
-  # Assign each value to the corresponding position in the parameter vector
-  for (i in seq_along(field_value)) {
-    module[[field]][i][["value"]] <- field_value[i]
-    if (length(estimation_type_value) == 1) {
-      # If there is only one estimation type value, set it for all elements
-      module[[field]][i][["estimation_type"]]$set(estimation_type_value)
-    } else {
-      # If there are multiple estimation type values, set them individually
-      module[[field]][i][["estimation_type"]]$set(estimation_type_value[i])
-    }
-  }
-
-  # Set the estimation information for the entire parameter vector when estimation_type is scalar
-  estimation_type_names <- c("constant", "fixed_effects", "random_effects")
-  if (length(module_input[[field_estimation_name]]) == 1) {
-    if (!(module_input[[field_estimation_name]] %in% estimation_type_names)) {
-      cli::cli_abort(c(
-        "x" = "You entered {.val {module_input[[field_estimation_name]]}}",
-        "i" = "The available options are {estimation_type_names}"
-      ))
-    }
-    if (module_input[[field_estimation_name]] == "constant") {
-      module[[field]]$set_all_estimable(FALSE)
-    }
-    if (module_input[[field_estimation_name]] == "random_effects") {
-      module[[field]]$set_all_random(TRUE)
-    }
-    if (module_input[[field_estimation_name]] == "fixed_effects") {
-      module[[field]]$set_all_estimable(TRUE)
+    # Set the estimation information for the entire parameter vector when estimation_type is scalar
+    estimation_type_names <- c("constant", "fixed_effects", "random_effects")
+    if (length(module_input[[field_estimation_name]]) == 1) {
+      if (!(module_input[[field_estimation_name]] %in% estimation_type_names)) {
+        cli::cli_abort(c(
+          "x" = "You entered {.val {module_input[[field_estimation_name]]}}",
+          "i" = "The available options are {estimation_type_names}"
+        ))
+      }
+      if (module_input[[field_estimation_name]] == "constant") {
+        module[[field]]$set_all_estimable(FALSE)
+      }
+      if (module_input[[field_estimation_name]] == "random_effects") {
+        module[[field]]$set_all_random(TRUE)
+      }
+      if (module_input[[field_estimation_name]] == "fixed_effects") {
+        module[[field]]$set_all_estimable(TRUE)
+      }
     }
   }
 }

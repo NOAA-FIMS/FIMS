@@ -3,6 +3,7 @@
 #' @export BevertonHoltRecruitment
 #' @export LogDevsRecruitmentProcess
 #' @export LogRRecruitmentProcess
+#' @export CatchAtAge
 #' @export clear
 #' @export CreateTMBModel
 #' @export DlnormDistribution
@@ -34,11 +35,13 @@
 #' @export Parameter
 #' @export ParameterVector
 #' @export Population
+#' @export PTDepletion
 #' @export RealVector
 #' @export set_log_throw_on_error
 #' @export SharedInt
 #' @export SharedReal
 #' @export SharedString
+#' @export SurplusProduction
 #' @import methods
 #' @import stats
 #' @importFrom ggplot2 .data

@@ -475,6 +475,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     return fims::JsonParser::PrettyFormatJSON(ss.str());
   }
 
+  //TODO: Should these be moved to rcpp_interface_base to make usable for all classes?
   /**
    * @brief Sum method to calculate the sum of an array or vector of doubles.
    *
@@ -837,46 +838,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           model->population_derived_quantities[(*it)];
 
-      derived_quantities["total_landings_weight"] =
-          fims::Vector<Type>(population->nyears.get());
-
-      derived_quantities["total_landings_numbers"] =
-          fims::Vector<Type>(population->nyears.get());
-
-      derived_quantities["mortality_F"] = fims::Vector<Type>(
-          population->nyears.get() * population->nages.get());
-
-      derived_quantities["mortality_Z"] = fims::Vector<Type>(
-          population->nyears.get() * population->nages.get());
-
-      derived_quantities["weight_at_age"] = fims::Vector<Type>(
-          population->nyears.get() * population->nages.get());
-
-      derived_quantities["numbers_at_age"] = fims::Vector<Type>(
-          (population->nyears.get() + 1) * population->nages.get());
-
-      derived_quantities["unfished_numbers_at_age"] = fims::Vector<Type>(
-          (population->nyears.get() + 1) * population->nages.get());
-      derived_quantities["biomass"] =
-          fims::Vector<Type>((population->nyears.get() + 1));
-
-      derived_quantities["spawning_biomass"] =
-          fims::Vector<Type>((population->nyears.get() + 1));
-
-      derived_quantities["unfished_biomass"] =
-          fims::Vector<Type>((population->nyears.get() + 1));
-
-      derived_quantities["unfished_spawning_biomass"] =
-          fims::Vector<Type>((population->nyears.get() + 1));
-
-      derived_quantities["proportion_mature_at_age"] = fims::Vector<Type>(
-          (population->nyears.get() + 1) * population->nages.get());
-
-      derived_quantities["expected_recruitment"] =
-          fims::Vector<Type>((population->nyears.get() + 1));
-
-      derived_quantities["sum_selectivity"] = fims::Vector<Type>(
-          population->nyears.get() * population->nages.get());
       // replace elements in the variable map
       info->variable_map[population->numbers_at_age.id_m] =
           &(derived_quantities["numbers_at_age"]);
@@ -1004,5 +965,144 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
 #endif
 };
+
+/**
+ * @brief The SurplusProduction class is used to interface with the 
+ * SurplusProduction model. It inherits from the FisheryModelInterfaceBase class.
+ */
+class SurplusProductionInterface : public FisheryModelInterfaceBase {
+  std::shared_ptr<std::set<uint32_t>> population_ids;
+  typedef typename std::set<uint32_t>::iterator population_id_iterator;
+
+ public:
+  /**
+   * @brief The constructor.
+   */
+  SurplusProductionInterface() : FisheryModelInterfaceBase() {
+    this->population_ids = std::make_shared<std::set<uint32_t>>();
+    std::shared_ptr<SurplusProductionInterface> surplus_production =
+        std::make_shared<SurplusProductionInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(surplus_production);
+    FisheryModelInterfaceBase::live_objects[this->id] = surplus_production;
+  }
+
+  /**
+   * @brief Construct a new Surplus Production Interface object
+   *
+   * @param other
+   */
+  SurplusProductionInterface(const SurplusProductionInterface &other)
+      : FisheryModelInterfaceBase(other),
+        population_ids(other.population_ids) {}
+
+  /**
+   * Method to add a population id to the set of population ids.
+   */
+  void AddPopulation(uint32_t id) {
+    this->population_ids->insert(id);
+
+    std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
+    pit = PopulationInterfaceBase::live_objects.find(id);
+    if (pit != PopulationInterfaceBase::live_objects.end()) {
+      std::shared_ptr<PopulationInterfaceBase> &pop = (*pit).second;
+      pop->initialize_surplus_production.set(true);
+    } else {
+      FIMS_ERROR_LOG("Population with id " + fims::to_string(id) +
+                     " not found.");
+    }
+  }
+
+  /**
+   * @brief Method to get the population id.
+   */
+  virtual uint32_t get_id() {
+    typename std::map<uint32_t,
+                      std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
+    return this->id;
+  }
+
+  /**
+   * @brief Method to get the population ids.
+   */
+  void Show() {
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+
+    fims_popdy::SurplusProduction<double> *model =
+        (fims_popdy::SurplusProduction<double> *)info->models_map[this->get_id()]
+            .get();
+    model->Show();
+  }
+
+  /**
+   *
+   */
+  virtual void finalize() {}
+
+  //TODO: implement population_to_json(), fleet_to_json()
+  // and to_json() methods
+
+  #ifdef TMB_MODEL
+    template <typename Type>
+    bool add_to_fims_tmb_internal() {
+      std::shared_ptr<fims_info::Information<Type>> info =
+          fims_info::Information<Type>::GetInstance();
+
+      std::shared_ptr<fims_popdy::SurplusProduction<Type>> model =
+          std::make_shared<fims_popdy::SurplusProduction<Type>>();
+
+      population_id_iterator it;
+
+      for (it = this->population_ids->begin(); it != this->population_ids->end();
+           ++it) {
+        model->AddPopulation((*it));
+      }
+
+      std::set<uint32_t> fleet_ids;  // all fleets in the model
+      typedef typename std::set<uint32_t>::iterator fleet_ids_iterator;
+
+      // add to Information
+      info->models_map[this->get_id()] = model;
+
+      for (it = this->population_ids->begin(); it != this->population_ids->end();
+           ++it) {
+        std::shared_ptr<PopulationInterface> population =
+            std::dynamic_pointer_cast<PopulationInterface>(
+                PopulationInterfaceBase::live_objects[(*it)]);
+
+        std::map<std::string, fims::Vector<Type>> &derived_quantities =
+            model->population_derived_quantities[(*it)];
+            
+        derived_quantities["biomass"] =
+            fims::Vector<Type>(population->nyears.get() + 1);
+
+        derived_quantities["expected_depletion"] =
+            fims::Vector<Type>(population->nyears.get() *
+            population->nfleets.get());
+        
+        derived_quantities["observed_catch"] =
+            fims::Vector<Type>(population->nyears.get() *
+            population->nfleets.get());
+      }
+
+      return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+#endif
+    return true;
+  }
+
+#endif
+};
+
 
 #endif
