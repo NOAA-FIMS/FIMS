@@ -594,3 +594,230 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   # Return the results as a list
   return(fit)
 }
+
+setup_and_run_sp <- function(estimation_mode = TRUE,
+                             map = list()) {
+  # path to download the surplus prooduction test data
+  path_sp_data <- test_path("fixtures", "integration_test_data_sp.RData")
+  download.file(
+    "https://github.com/iagomosqueira/simtest_SP/raw/main/data/sims.RData",
+    path_sp_data
+  )
+  # remotes::install_github("flr/FLCore")
+  load(path_sp_data)
+
+  # Simulated data and other information (e.g., number of iteration, end year, and start year)
+  args <- list(it = dim(om)[6], ay = 2020, y0 = 1951)
+  tracking <- FLCore::FLQuant(dimnames = list(
+    metric = "conv.est",
+    year = 1951:2020,
+    iter = seq(args$it)
+  ))
+  # OM
+  rom <- FLCore::FLQuants(
+    B = tsb(om),
+    Bstatus = tsb(om) / refpts(om)$Btgt,
+    Bdepletion = tsb(om) / refpts(om)$B0
+  )
+  res <- lapply(
+    setNames(names(rom), nm = c("B", "B/B[MSY]", "B/B[0]")),
+    function(x) FLCore::FLQuants(lapply(list(rom), "[[", x))
+  )
+  
+  # Life history parameters from FishLife (https://github.com/James-Thorson-NOAA/FishLife)
+  # More examples can be found at https://github.com/iagomosqueira/simtest_SP/blob/main/data.R
+  # remotes::install_github("James-Thorson-NOAA/FishLife")
+  # remotes::install_github("Henning-Winker/SPMpriors")
+  # remotes::install_github( 'ropensci/rfishbase@fb-21.06', force=TRUE )
+library(FishLife)
+alb <- SPMpriors::flmvn_traits(
+    Genus="Thunnus", 
+    Species="alalunga",
+    h=c(0.6,0.9), 
+    Plot=FALSE
+  )$traits
+
+  lh <- list(
+    linf = alb[alb$trait=="Loo","mu.stk"],
+    k =  alb[alb$trait=="K","mu.stk"],
+    t0 = -0.5,
+    tm = alb[alb$trait=="tm","mu.stk"],
+    a = 0.00001,
+    b = 3.04,
+    tmax =  ceiling(alb[alb$trait=="tmax","mu.stk"]),
+    s = alb[alb$trait=="h","mu.stk"]
+  )
+
+  # Load om survey indices
+  om_survey_indices <- lapply(FLCore::FLIndices(A = idx), index)
+  om_survey_indices_se <- rep(0.2, length(FLCore::FLIndices(A = idx)))
+  # Load om landings data
+  om_landings <- FLCore::catch(om)
+  # HANDLE NAs in catch
+  om_landings[is.na(om_landings)] <- 0
+
+  # Extract args and SET dims
+  # end year: 2020
+  ay <- args$ay
+  # number of iterations: 100
+  it <- args$it
+  # start year:1951
+  y0 <- args$y0
+  # number of years:70
+  ny <- dim(om_landings)[2]
+
+  # Create ouput
+  empty <- om_landings %=% 0
+  out <- list(
+    ind = FLQuants(lapply(
+      setNames(nm = c("F", "Fstatus", "B", "Bstatus", "Bdepletion")),
+      function(x) propagate(empty, it)
+    )),
+    rps = FLPar(NA, dimnames = list(
+      params = c("FMSY", "BMSY", "MSY", "K", "B0"),
+      iter = seq(it)
+    ), units = c("f", "t", "t", "t", "t")),
+    conv = rep(NA, it)
+  )
+
+  # Extract the 1st iter landings data for the fishing fleet
+  iter_id <- 1
+  fishing_fleet_landings <- as.data.frame(
+    iter(om_landings, iter_id),
+    drop = TRUE
+  )
+  survey_fleet_index <- model.frame(
+    window(iter(om_survey_indices, iter_id), start = y0),
+    drop = TRUE
+  )
+  se <- survey_fleet_index
+  # Assign indx.se
+  se[, -1] <- as.list(om_survey_indices_se)
+
+  # JABBA (needs to install JABBA, rjags, and R2jags)
+  # need to run the following in ubuntu before installing rjags:
+  # sudo apt-get update
+  # sudo apt-get install -y jags
+  # install.packages("rjags")
+  # install.packages("R2jags")
+  # remotes::install_github("jabbamodel/JABBA")
+  # TODO: It appears the model is run using default priors, what are these?
+  
+  inp <- JABBA::build_jabba(
+    catch = fishing_fleet_landings,
+    cpue = survey_fleet_index,
+    se = se,
+    assessment = "STK",
+    scenario = "jabba.sa",
+    model.type = "Schaefer",
+    sigma.est = TRUE,
+    fixed.obsE = 0.05,
+    verbose = FALSE
+  )
+  JABBA::mp_jabba(inp)
+
+  # FIMS
+  # create index module
+  survey_fleet_index <- methods::new(Index, om_input[["nyr"]])
+  purrr::walk(
+    1:om_input[["nyr"]],
+    \(x) survey_fleet_index$index_data$set(x - 1, survey_index[x])
+  )
+
+  # create catch module
+  methods::new(Landings, nyears)
+  purrr::walk(
+    1:nyears,
+    \(x) fishing_fleet_landings$landings_data$set(x - 1, fishing_fleet_landings[x])
+  )
+
+  # Survey and Fishery Fleet modules
+  # Initialize the fishing fleet module
+  fishing_fleet <- methods::new(Fleet)
+  # Set number of years
+  fishing_fleet$nyears$set(om_input[["nyr"]])
+  # Set number of age classes
+  fishing_fleet$nages$set(om_input[["nages"]])
+  # Set number of length bins
+  fishing_fleet$nlengths$set(om_input[["nlengths"]])
+  fishing_fleet$log_q[1]$value <- log(1.0)
+  fishing_fleet$log_q[1]$estimation_type <- "constant"
+  fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
+  survey_fleet <- methods::new(Fleet)
+  survey_fleet$nages$set(om_input[["nages"]])
+  survey_fleet$nyears$set(om_input[["nyr"]])
+  survey_fleet$nlengths$set(om_input[["nlengths"]])
+  # Estimate q
+  survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
+  survey_fleet$log_q[1]$estimation_type <- "fixed_effects"
+  survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
+
+  # setup distributions for fleet and survey
+  # Set up fishery index data using the lognormal
+  fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
+  # lognormal observation error transformed on the log scale
+  fishing_fleet_landings_distribution$log_sd$resize(om_input[["nyr"]])
+  for (y in 1:om_input[["nyr"]]) {
+    # Compute lognormal SD from OM coefficient of variation (CV)
+    fishing_fleet_landings_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
+  }
+  fishing_fleet_landings_distribution$log_sd$set_all_estimable(FALSE)
+  # Set Data using the IDs from the modules defined above
+  fishing_fleet_landings_distribution$set_observed_data(fishing_fleet$GetObservedLandingsDataID())
+  fishing_fleet_landings_distribution$set_distribution_links("data", fishing_fleet$log_landings_expected$get_id())
+  survey_fleet_index_distribution <- methods::new(DlnormDistribution)
+
+  # lognormal observation error transformed on the log scale
+  # sd = sqrt(log(cv^2 + 1)), sd is log transformed
+  survey_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
+  for (y in 1:om_input$nyr) {
+    survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)))
+  }
+  survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+  # Set Data using the IDs from the modules defined above
+  survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
+  survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
+
+  # create depletion module
+  production <- new(PTDepletion)
+  # estimate log r and K
+  # TODO: what are good input values for log_r and log_K?
+  production$log_r[1]$value <- log(0.1)  # Example value, adjust as needed
+  production$log_K[1]$value <- log(100)  # Example value, adjust as needed
+  # Fix to get Shaefer model
+  production$log_m[1]$value <- log(1)
+
+  production_distribution <- initialize_process_distribution(
+    module = "production",
+    par = "log_expected_depletion",
+    family = gaussian(),
+    sd = list(value = 0,  estimated = TRUE),
+    is_random_effect = FALSE)
+
+  #Setup Priors
+  log_r_Prior <- new(DNormDistribution)
+  log_r_Prior$expected_values[1]$value <- #prior mean
+  log_r_Prior$log_sd[1]$value <- #prior sd
+  log_r_Prior$set_distribution_links("prior", production$log_r$get_id())
+
+  log_K_Prior <- new(DNormDistribution)
+  log_K_Prior$expected_values[1]$value <- #prior mean
+  log_K_Prior$log_sd[1]$value <- #prior sd
+  log_K_Prior$set_distribution_links("prior", production$log_K$get_id())
+
+  # create population module
+  population <- new(Population)
+  population$nyears
+  population$nages
+  # Fix init depletion
+  population$log_init_depletion[1]$value <- 1
+  population$SetDepletion(production$get_id())
+
+  # TODO: Set up distributions for Depletion
+
+  #create TMB Model
+  p <- get_parameters()
+  re <- get_random_effects()
+  obj <- MakeADFun(parameters = list(p = p, re = re))
+  fims_stan <- tmbstan::tmbstan(obj)
+}
