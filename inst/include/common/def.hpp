@@ -62,7 +62,7 @@
 
 #ifdef FIMS_WINDOWS
 #include <Windows.h>
-#include <Lmcons.h> // for UNLEN
+#include <Lmcons.h>  // for UNLEN
 #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
 #include <unistd.h>
 #include <pwd.h>
@@ -174,31 +174,31 @@ class FIMSLog {
    * @return username.
    */
   std::string get_user() {
-   #ifdef FIMS_WINDOWS
-        char username[UNLEN + 1];
-        DWORD username_len = UNLEN + 1;
-        if (GetUserNameA(username, &username_len)) {
-            return std::string(username);
-        } else {
-            return "[unknown user]";
-        }
-
-    #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
-        const char* user_env = getenv("USER");
-        if (user_env) return std::string(user_env);
-
-        uid_t uid = getuid();
-        struct passwd* pw = getpwuid(uid);
-        if (pw && pw->pw_name) {
-            return std::string(pw->pw_name);
-        } else {
-            return "[unknown user]";
-        }
-
-    #else
-        return "[unsupported platform]";
-    #endif
+#ifdef FIMS_WINDOWS
+    char username[UNLEN + 1];
+    DWORD username_len = UNLEN + 1;
+    if (GetUserNameA(username, &username_len)) {
+      return std::string(username);
+    } else {
+      return "[unknown user]";
     }
+
+#elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
+    const char* user_env = getenv("USER");
+    if (user_env) return std::string(user_env);
+
+    uid_t uid = getuid();
+    struct passwd* pw = getpwuid(uid);
+    if (pw && pw->pw_name) {
+      return std::string(pw->pw_name);
+    } else {
+      return "[unknown user]";
+    }
+
+#else
+    return "[unsupported platform]";
+#endif
+  }
 
  public:
   bool write_on_exit = true;                /*!<TODO: Document>*/
