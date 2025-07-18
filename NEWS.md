@@ -1,3 +1,7 @@
+# FIMS 0.6.1
+
+* Fixes FIMS log file where the user was not known on certain operating systems.
+
 # FIMS 0.6.0
 
 * Initializes backend code to support model families.
