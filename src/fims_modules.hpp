@@ -376,6 +376,26 @@ RCPP_MODULE(fims) {
       .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
       .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
 
+  Rcpp::class_<DoubleNormalSelectivityInterface>(
+      "DoubleNormalSelectivity",
+      "See "
+      "https://noaa-fims.github.io/doxygen/"
+      "classDoubleNormalSelectivityInterface.html.")
+      .constructor()
+      //.field("max_age", &DoubleNormalSelectivityInterface::max_age) //Option C
+      .field("age_peak_sel_start",
+             &DoubleNormalSelectivityInterface::age_peak_sel_start)
+      .field("width_peak_sel", 
+             &DoubleNormalSelectivityInterface::width_peak_sel)
+      .field("slope_asc", &DoubleNormalSelectivityInterface::slope_asc)
+      .field("slope_desc", &DoubleNormalSelectivityInterface::slope_desc)
+      .field("sel_age_zero_logit", 
+             &DoubleNormalSelectivityInterface::sel_age_zero_logit)
+      .field("sel_age_A_logit", 
+             &DoubleNormalSelectivityInterface::sel_age_A_logit)
+      .method("get_id", &DoubleNormalSelectivityInterface::get_id)
+      .method("evaluate", &DoubleNormalSelectivityInterface::evaluate);
+
   Rcpp::class_<EWAAGrowthInterface>(
       "EWAAGrowth",
       "See https://noaa-fims.github.io/doxygen/classEWAAGrowthInterface.html.")

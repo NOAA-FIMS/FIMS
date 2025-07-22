@@ -327,7 +327,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 };
 
 /**
- * @brief Rcpp interface for logistic selectivity as an S4 object. To
+ * @brief Rcpp interface for double logistic selectivity as an S4 object. To
  * instantiate from R: logistic_selectivity <-
  * methods::new(logistic_selectivity)
  */
@@ -653,6 +653,409 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     }
 
     info->variable_map[this->slope_desc.id_m] = &(selectivity)->slope_desc;
+
+    // add to Information
+    info->selectivity_models[selectivity->id] = selectivity;
+
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+#endif
+
+    return true;
+  }
+
+#endif
+};
+
+
+/**
+ * @brief Rcpp interface for double normal selectivity as an S4 object. To
+ * instantiate from R: selectivity <- methods::new(DoubleNormalSelectivity)
+ */
+class DoubleNormalSelectivityInterface : public SelectivityInterfaceBase {
+ public:
+  //SharedInt max_age = 10; // Option C for double-normal
+  ParameterVector age_peak_sel_start; /**< Age at which selectivity=1 
+                                      starts (p1) */
+  ParameterVector width_peak_sel; /**< Width of peak selectivity (in which 
+                                      selectivity=1), which determines the age 
+                                      at which selectivity=1 ends (p2) */
+  ParameterVector slope_asc; /**< Slope of the ascending limb (p3) */
+  ParameterVector slope_desc; /**< Slope of the descending limb (p4) */
+  ParameterVector sel_age_zero_logit; /** Selectivity at age0 (parameterized in 
+                                      logit space; p5) */
+  ParameterVector sel_age_A_logit; /** Selectivity at age A (parameterized in 
+                                      logit space; p6) */
+
+  DoubleNormalSelectivityInterface() : SelectivityInterfaceBase() {
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<DoubleNormalSelectivityInterface>(*this));
+  }
+
+  /**
+   * @brief Construct a new Double Normal Selectivity Interface object
+   *
+   * @param other
+   */
+  DoubleNormalSelectivityInterface(
+      const DoubleNormalSelectivityInterface& other)
+      : SelectivityInterfaceBase(other),
+        //max_age(other.max_age), # Option C for dbl-norm
+        age_peak_sel_start(other.age_peak_sel_start),
+        width_peak_sel(other.width_peak_sel),
+        slope_asc(other.slope_asc),
+        slope_desc(other.slope_desc),
+        sel_age_zero_logit(other.sel_age_zero_logit),
+        sel_age_A_logit(other.sel_age_A_logit) {}
+
+  virtual ~DoubleNormalSelectivityInterface() {}
+
+  /** @brief returns the id for the double normal selectivity interface */
+  virtual uint32_t get_id() { return this->id; }
+
+  /** @brief evaluate the double normal selectivity function
+   *   @param x  The independent variable in the logistic function (e.g., age or
+   * size in selectivity).
+   */
+  virtual double evaluate(double x) {
+    fims_popdy::DoubleNormalSelectivity<double> DoubleNormalSel;
+    DoubleNormalSel.age_peak_sel_start.resize(1);
+    DoubleNormalSel.age_peak_sel_start[0] =
+        this->age_peak_sel_start[0].initial_value_m;
+    DoubleNormalSel.width_peak_sel.resize(1);
+    DoubleNormalSel.width_peak_sel[0] = 
+        this->width_peak_sel[0].initial_value_m;
+    DoubleNormalSel.slope_asc.resize(1);
+    DoubleNormalSel.slope_asc[0] =
+        this->slope_asc[0].initial_value_m;
+    DoubleNormalSel.slope_desc.resize(1);
+    DoubleNormalSel.slope_desc[0] = 
+        this->slope_desc[0].initial_value_m;
+    DoubleNormalSel.sel_age_zero_logit.resize(1);
+    DoubleNormalSel.sel_age_zero_logit[0] =
+        this->sel_age_zero_logit[0].initial_value_m;
+    DoubleNormalSel.sel_age_A_logit.resize(1);
+    DoubleNormalSel.sel_age_A_logit[0] = 
+        this->sel_age_A_logit[0].initial_value_m;
+    return DoubleNormalSel.evaluate(x);
+  }
+  /**
+   * @brief finalize function. Extracts derived quantities back to
+   * the Rcpp interface object from the Information object.
+   */
+  virtual void finalize() {
+    if (this->finalized) {
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Double Normal Selectivity  " +
+                       fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
+
+    this->finalized = true;  // indicate this has been called already
+
+    std::shared_ptr<fims_info::Information<double> > info =
+        fims_info::Information<double>::GetInstance();
+
+    fims_info::Information<double>::selectivity_models_iterator it;
+
+    // search for maturity in Information
+    it = info->selectivity_models.find(this->id);
+    // if not found, just return
+    if (it == info->selectivity_models.end()) {
+      FIMS_WARNING_LOG("Double Normal Selectivity " +
+                       fims::to_string(this->id) +
+                       " not found in Information.");
+      return;
+    } else {
+      std::shared_ptr<fims_popdy::DoubleNormalSelectivity<double> > sel =
+          std::dynamic_pointer_cast<
+              fims_popdy::DoubleNormalSelectivity<double> >(it->second);
+
+      for (size_t i = 0; i < age_peak_sel_start.size(); i++) {
+        if (this->age_peak_sel_start[i].estimation_type_m.get() ==
+            "constant") {
+          this->age_peak_sel_start[i].final_value_m =
+              this->age_peak_sel_start[i].initial_value_m;
+        } else {
+          this->age_peak_sel_start[i].final_value_m =
+              sel->age_peak_sel_start[i];
+        }
+      }
+
+      for (size_t i = 0; i < width_peak_sel.size(); i++) {
+        if (this->width_peak_sel[i].estimation_type_m.get() == 
+            "constant") {
+          this->width_peak_sel[i].final_value_m = 
+              this->width_peak_sel[i].initial_value_m;
+        } else {
+          this->width_peak_sel[i].final_value_m = 
+              sel->width_peak_sel[i];
+        }
+      }
+
+      for (size_t i = 0; i < slope_asc.size(); i++) {
+        if (this->slope_asc[i].estimation_type_m.get() ==
+            "constant") {
+          this->slope_asc[i].final_value_m =
+              this->slope_asc[i].initial_value_m;
+        } else {
+          this->slope_asc[i].final_value_m =
+              sel->slope_asc[i];
+        }
+      }
+
+      for (size_t i = 0; i < slope_desc.size(); i++) {
+        if (this->slope_desc[i].estimation_type_m.get() == 
+            "constant") {
+          this->slope_desc[i].final_value_m =
+              this->slope_desc[i].initial_value_m;
+        } else {
+          this->slope_desc[i].final_value_m = 
+              sel->slope_desc[i];
+        }
+      }
+
+      for (size_t i = 0; i < sel_age_zero_logit.size(); i++) {
+        if (this->sel_age_zero_logit[i].estimation_type_m.get() == 
+            "constant") {
+          this->sel_age_zero_logit[i].final_value_m =
+              this->sel_age_zero_logit[i].initial_value_m;
+        } else {
+          this->sel_age_zero_logit[i].final_value_m = 
+              sel->sel_age_zero_logit[i];
+        }
+      }
+
+       for (size_t i = 0; i < sel_age_A_logit.size(); i++) {
+        if (this->sel_age_A_logit[i].estimation_type_m.get() == 
+            "constant") {
+          this->sel_age_A_logit[i].final_value_m =
+              this->sel_age_A_logit[i].initial_value_m;
+        } else {
+          this->sel_age_A_logit[i].final_value_m = 
+              sel->sel_age_A_logit[i];
+        }
+      }
+    }
+  }
+
+  /**
+   * @brief Convert the data to json representation for the output.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"name\": \"selectivity\",\n";
+    ss << " \"type\": \"DoubleNormal\",\n";
+    ss << " \"id\": " << this->id << ",\n";
+
+    ss << " \"parameters\":[\n{\n";
+    ss << "   \"name\": \"age_peak_sel_start\",\n";
+    ss << "   \"id\":" << this->age_peak_sel_start.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->age_peak_sel_start << "\n},\n";
+
+    ss << "{\n";
+    ss << "   \"name\": \"width_peak_sel\",\n";
+    ss << "   \"id\":" << this->width_peak_sel.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->width_peak_sel << "\n},\n";
+
+    ss << " {\n";
+    ss << "   \"name\": \"slope_asc\",\n";
+    ss << "   \"id\":" << this->slope_asc.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->slope_asc << "\n},\n";
+
+    ss << "{\n";
+    ss << "   \"name\": \"slope_desc\",\n";
+    ss << "   \"id\":" << this->slope_desc.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->slope_desc << "\n},\n";
+
+    ss << "{\n";
+    ss << "   \"name\": \"sel_age_zero_logit\",\n";
+    ss << "   \"id\":" << this->sel_age_zero_logit.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->sel_age_zero_logit << "\n},\n";
+
+    ss << "{\n";
+    ss << "   \"name\": \"sel_age_A_logit\",\n";
+    ss << "   \"id\":" << this->sel_age_A_logit.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"values\":" << this->sel_age_A_logit << "\n}]\n";
+
+    ss << "}";
+
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type> > info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_popdy::DoubleNormalSelectivity<Type> > selectivity =
+        std::make_shared<fims_popdy::DoubleNormalSelectivity<Type> >();
+
+    std::stringstream ss;
+    // set relative info
+    selectivity->id = this->id;
+    //selectivity->max_age = this->max_age.get(); //Option C
+    selectivity->age_peak_sel_start.resize(this->age_peak_sel_start.size());
+    for (size_t i = 0; i < this->age_peak_sel_start.size(); i++) {
+      selectivity->age_peak_sel_start[i] =
+          this->age_peak_sel_start[i].initial_value_m;
+      if (this->age_peak_sel_start[i].estimation_type_m.get() ==
+          "fixed_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".age_peak_sel_start."
+           << this->age_peak_sel_start[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->age_peak_sel_start[i]);
+      }
+      if (this->age_peak_sel_start[i].estimation_type_m.get() ==
+          "random_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".age_peak_sel_start."
+           << this->age_peak_sel_start[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->age_peak_sel_start[i]);
+      }
+    }
+    info->variable_map[this->age_peak_sel_start.id_m] =
+        &(selectivity)->age_peak_sel_start;
+
+    selectivity->width_peak_sel.resize(this->width_peak_sel.size());
+    for (size_t i = 0; i < this->width_peak_sel.size(); i++) {
+      selectivity->width_peak_sel[i] = this->width_peak_sel[i].initial_value_m;
+
+      if (this->width_peak_sel[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".width_peak_sel."
+           << this->width_peak_sel[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->width_peak_sel[i]);
+      }
+      if (this->width_peak_sel[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".width_peak_sel."
+           << this->width_peak_sel[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->width_peak_sel[i]);
+      }
+    }
+    info->variable_map[this->width_peak_sel.id_m] = 
+        &(selectivity)->width_peak_sel;
+
+    selectivity->slope_asc.resize(
+        this->slope_asc.size());
+    for (size_t i = 0; i < this->slope_asc.size(); i++) {
+      selectivity->slope_asc[i] =
+          this->slope_asc[i].initial_value_m;
+
+      if (this->slope_asc[i].estimation_type_m.get() ==
+          "fixed_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".slope_asc."
+           << this->slope_asc[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->slope_asc[i]);
+      }
+      if (this->slope_asc[i].estimation_type_m.get() ==
+          "random_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".slope_asc."
+           << this->slope_asc[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->slope_asc[i]);
+      }
+    }
+    info->variable_map[this->slope_asc.id_m] =
+        &(selectivity)->slope_asc;
+
+    selectivity->slope_desc.resize(this->slope_desc.size());
+    for (size_t i = 0; i < this->slope_desc.size(); i++) {
+      selectivity->slope_desc[i] = this->slope_desc[i].initial_value_m;
+
+      if (this->slope_desc[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".slope_desc."
+           << this->slope_desc[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->slope_desc[i]);
+      }
+      if (this->slope_desc[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".slope_desc."
+           << this->slope_desc[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->slope_desc[i]);
+      }
+    }
+    info->variable_map[this->slope_desc.id_m] = 
+        &(selectivity)->slope_desc;
+
+    selectivity->sel_age_zero_logit.resize(this->sel_age_zero_logit.size());
+    for (size_t i = 0; i < this->sel_age_zero_logit.size(); i++) {
+      selectivity->sel_age_zero_logit[i] = this->sel_age_zero_logit[i].initial_value_m;
+
+      if (this->sel_age_zero_logit[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".sel_age_zero_logit."
+           << this->sel_age_zero_logit[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->sel_age_zero_logit[i]);
+      }
+      if (this->sel_age_zero_logit[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".sel_age_zero_logit."
+           << this->sel_age_zero_logit[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->sel_age_zero_logit[i]);
+      }
+    }
+    info->variable_map[this->sel_age_zero_logit.id_m] = 
+        &(selectivity)->sel_age_zero_logit;
+
+    selectivity->sel_age_A_logit.resize(this->sel_age_A_logit.size());
+    for (size_t i = 0; i < this->sel_age_A_logit.size(); i++) {
+      selectivity->sel_age_A_logit[i] = this->sel_age_A_logit[i].initial_value_m;
+
+      if (this->sel_age_A_logit[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".sel_age_A_logit."
+           << this->sel_age_A_logit[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->sel_age_A_logit[i]);
+      }
+      if (this->sel_age_A_logit[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "selectivity." << this->id << ".sel_age_A_logit."
+           << this->sel_age_A_logit[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->sel_age_A_logit[i]);
+      }
+    }
+    info->variable_map[this->sel_age_A_logit.id_m] = 
+        &(selectivity)->sel_age_A_logit;    
 
     // add to Information
     info->selectivity_models[selectivity->id] = selectivity;

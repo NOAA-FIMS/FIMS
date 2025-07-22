@@ -12,6 +12,7 @@
 #ifndef FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP
 #define FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP
 
+#include "functors/double_normal.hpp"
 #include "functors/double_logistic.hpp"
 #include "functors/logistic.hpp"
 #include "functors/selectivity_base.hpp"

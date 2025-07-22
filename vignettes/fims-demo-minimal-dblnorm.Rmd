@@ -1,0 +1,190 @@
+---
+title: "Minimal Example for Running a FIMS Model"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Minimal Example for Running a FIMS Model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This vignette provides the minimal steps needed to run a Fisheries Integrated Modeling System (FIMS) model.
+
+## Setup
+
+Load the FIMS package and clear memory:
+```{r memory, warning=FALSE, message=FALSE}
+library(FIMS)
+
+# clear memory
+clear()
+```
+
+## Data and parameters
+
+First, load the available data and create a FIMS data frame to create a model with. Then create a set of default parameters.
+```{r data}
+# Load sample data
+data("data1")
+# Prepare data for FIMS model
+data_4_model <- FIMSFrame(data1)
+
+# Define fleet specifications
+fleet1 <- list(
+  selectivity = list(form = "DoubleNormalSelectivity"),
+  data_distribution = c(
+    Landings = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution",
+    LengthComp = "DmultinomDistribution"
+  )
+)
+survey1 <- list(
+  selectivity = list(form = "DoubleNormalSelectivity"),
+  data_distribution = c(
+    Index = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution",
+    LengthComp = "DmultinomDistribution"
+  )
+)
+
+# Create parameters
+parameters <- data_4_model |>
+  create_default_parameters(
+    fleets = list(fleet1 = fleet1, survey1 = survey1)
+  )
+
+# Modify double normal selectivity parameters
+parameters <- parameters |>
+  update_parameters(
+    modified_parameters = list(
+      survey1 = list(
+        DoubleNormalSelectivity.width_peak_sel.value = 2,
+        DoubleNormalSelectivity.width_peak_sel.estimation_type = "constant",
+        DoubleNormalSelectivity.slope_desc.value = 2,
+        DoubleNormalSelectivity.slope_desc.estimation_type = "constant",
+        DoubleNormalSelectivity.sel_age_zero_logit.value = -10,
+        DoubleNormalSelectivity.sel_age_zero_logit.estimation_type = "constant",
+        DoubleNormalSelectivity.sel_age_A_logit.value = 10,
+        DoubleNormalSelectivity.sel_age_A_logit.estimation_type = "constant"
+      ),
+      fleet1 = list(
+        DoubleNormalSelectivity.width_peak_sel.value = 2,
+        DoubleNormalSelectivity.width_peak_sel.estimation_type = "constant",
+        DoubleNormalSelectivity.slope_desc.value = 2,
+        DoubleNormalSelectivity.slope_desc.estimation_type = "constant",
+        DoubleNormalSelectivity.sel_age_zero_logit.value = -10,
+        DoubleNormalSelectivity.sel_age_zero_logit.estimation_type = "constant",
+        DoubleNormalSelectivity.sel_age_A_logit.value = 10,
+        DoubleNormalSelectivity.sel_age_A_logit.estimation_type = "constant"
+      )
+    )
+  )
+```
+
+## Initialize and Fit
+
+Initialize the FIMS modules and fit the model.
+```{r fit, max.height='100px', attr.output='.numberLines', eval=TRUE}
+# Run the  model with optimization
+fit <- parameters |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+input <- parameters |>
+  initialize_fims(data = data_4_model)
+control = list(
+           eval.max = 10000,
+           iter.max = 10000,
+           trace = 0
+)
+obj <- TMB::MakeADFun(
+    data = list(),
+    parameters = input$parameters,
+    map = input$map,
+    random = "re",
+    DLL = "FIMS",
+    silent = TRUE
+)
+opt <- with(
+obj,
+   nlminb(
+     start = par,
+     objective = fn,
+     gradient = gr,
+     control = control
+   )
+)
+maxgrad0 <- maxgrad <- max(abs(obj$gr(opt$par)))
+opt <- with(
+        obj,
+        nlminb(
+          start = opt[["par"]],
+          objective = fn,
+          gradient = gr,
+          control = control
+        )
+)
+sdreport <- TMB::sdreport(obj)
+n_total <- length(obj[["env"]][["last.par.best"]])
+n_fixed_effects <- length(obj[["par"]])
+n_random_effects <- length(obj[["env"]][["parList()"]][["re"]])
+number_of_parameters <- c(
+    total = n_total,
+    fixed_effects = n_fixed_effects,
+    random_effects = n_random_effects
+)
+rm(n_total, n_fixed_effects, n_random_effects)
+
+    # Calculate the maximum gradient
+max_gradient <- if (length(opt) > 0) {
+    max(abs(obj[["gr"]](opt[["par"]])))
+} else {
+    NA_real_
+}
+
+# Rename parameters instead of "p"
+parameter_names <- names(get_parameter_names(obj[["par"]]))
+names(obj[["par"]]) <- parameter_names
+random_effects_names <- names(get_random_names(obj[["env"]][["parList()"]][["re"]]))
+
+# Get the report
+report <- if (length(opt) == 0) {
+  obj[["report"]](obj[["env"]][["last.par.best"]])
+} else {
+  obj[["report"]]()
+}
+
+if (length(sdreport) > 0) {
+  # rename the sdreport
+  names(sdreport[["par.fixed"]]) <- parameter_names
+  dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
+}
+
+# Reshape the TMB estimates
+# If the model is not optimized, opt is an empty list and is not used in
+# reshape_tmb_estimates().
+tmb_estimates <- reshape_tmb_estimates(
+  obj = obj,
+  sdreport = sdreport,
+  opt = opt,
+  parameter_names = parameter_names
+)
+
+# Create JSON output for FIMS run
+# TODO: turn on get_output()
+# finalized_fims <- input[["model"]]$get_output()
+finalized_fims <- finalize(
+  # Use par from obj if the model is not optimized; otherwise, use par from opt.
+  if (length(sdreport) > 0) opt[["par"]] else obj[["par"]],
+  obj[["fn"]],
+  obj[["gr"]]
+)
+
+# Clear memory post-run
+clear()
+```
