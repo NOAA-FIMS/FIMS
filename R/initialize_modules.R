@@ -820,15 +820,6 @@ initialize_fims <- function(parameters, data) {
         data_type = "landings"
       )
     }
-    # TODO (Matthew): Determine if the "dims" field is required for DmultinomDistribution.
-    # We need to decide whether to:
-    # 1. Remove the "dims" field to maintain consistency with other distributions, or
-    # 2. Update all relevant R functions (e.g., initialize_data_distribution())
-    #    that call DmultinomDistribution to set the "dims" field.
-    # AMH comment:
-    # 1. dims field is needed to track the dimension of multivariate input
-    # 2. the pattern for multinomial is different because it is a multivariate distribution.
-    #  Other multivariate distributions (e.g. MVNORM) will likely also need a dims field
 
     if ("age" %in% fleet_types &&
       "AgeComp" %in% data_distribution_names_for_fleet_i) {

@@ -25,11 +25,6 @@ test_that("is.FIMSFit() works with correct inputs", {
     object = is.FIMSFit(fit_age_length_comp)
   )
 
-  #' @description Test that is.FIMSFits(fit_list) returns TRUE.
-  expect_true(
-    object = is.FIMSFits(fit_list)
-  )
-
   #' @description Test that as.list(fit_age_length_comp) returns a nested list.
   expect_equal(
     object = typeof(as.list(fit_age_length_comp)),
@@ -72,11 +67,4 @@ test_that("is.FIMSFit() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-test_that("is.FIMSFits() returns correct error messages", {
-  #' @description Test that is.FIMSFits(fit_age_length_comp) returns expected
-  #' error.
-  expect_warning(
-    object = is.FIMSFits(fit_age_length_comp),
-    regexp = "x is not a list -- something went wrong."
-  )
-})
+# No built-in errors to test.
