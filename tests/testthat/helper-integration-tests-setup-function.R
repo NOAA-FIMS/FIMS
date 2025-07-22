@@ -271,10 +271,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
   # TODO: Check that the dimensions of the matrix of age_to_length_conversion matrix
   #       is rows = length() and columns = length()
-  # TODO: Fix code below to not use 1:x and instead use seq_along() where this
-  #       doesn't currently break because we are only testing models with both
-  #       age and length data but it would break for only age data.
-  for (i in 1:length(em_input[["age_to_length_conversion"]])) {
+  for (i in seq_along(em_input[["age_to_length_conversion"]])) {
     # Transposing the below will have NO impact on the results if the object is
     # already a vector. Additionally, c() ensures that the result is a vector
     # to be consistent but a matrix would be okay.
