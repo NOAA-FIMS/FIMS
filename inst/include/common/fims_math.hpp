@@ -358,6 +358,76 @@ T sum(const fims::Vector<T> &v) {
   return ret;
 }
 
+/**
+ * @brief The double normal function for selectivity
+ *
+ *
+ * @param age_peak_sel_start age at which selectivity=1 starts, or p1
+ * @param width_peak_sel width of "top" in which selectivity=1, or p2; 
+ * determines the age at which selectivity=1 ends
+ * @param slope_asc slope of the ascending section, or p3
+ * @param slope_desc slope of the descending seciton, or p4
+ * @param sel_age_zero_logit selectivity at age-0 (parameterized in logit 
+ * space), or p5
+ * @param sel_age_A_logit selectivity at age A (parameterized in logit space), 
+ * or p6
+ * @param x the index the logistic function should be evaluated at
+ * @return
+ */
+
+template <class Type>
+inline const Type double_normal(//const Type nages, //Option B
+                              const Type &age_peak_sel_start,
+                              const Type &width_peak_sel,
+                              const Type &slope_asc,
+                              const Type &slope_desc,
+                              const Type &sel_age_zero_logit,
+                              const Type &sel_age_A_logit,
+                              const Type &x) {
+  // Creating a bunch of placeholder variables for convenience;
+    // Plan to remove and improve code efficiency later
+  // ?s:
+    // Am I using static_cast correctly? Trying to specify fixed value of 1, etc
+      // Do I need static_cast for Type<2.0>?
+    // Should use fims_math::inv_logit here instead, w/ a=0 and b=1
+    // Am I using fims_math::pow() correctly?
+  const Type max_age = Type(12.0); // Option A
+  //const Type max_age = nages // - static_cast<Type>(1.0); // Option B 
+  const Type sel_age_zero = static_cast<Type>(1.0) / 
+    (static_cast<Type>(1.0) + exp(Type(-1.0) * sel_age_zero_logit));
+  const Type sel_age_A = static_cast<Type>(1.0) / 
+    (static_cast<Type>(1.0) + exp(Type(-1.0) * sel_age_A_logit));
+  const Type gamma = age_peak_sel_start + static_cast<Type>(1.0) + 
+    (Type(0.99) * max_age - age_peak_sel_start - static_cast<Type>(1.0)) / 
+    (static_cast<Type>(1.0) + exp(Type(-1.0) * width_peak_sel));
+  const Type alpha_a = sel_age_zero +
+    (static_cast<Type>(1.0) - sel_age_zero) *
+    (exp(Type(-1.0) * pow<Type>((x - age_peak_sel_start), Type(2.0)) / 
+      exp(slope_asc)) - 
+      exp(Type(-1.0) * fims_math::pow<Type>(age_peak_sel_start, Type(2.0)) / 
+      exp(slope_asc))) / 
+    (static_cast<Type>(1.0) - exp(Type(-1.0) * 
+      pow<Type>(age_peak_sel_start, Type(2.0)) / 
+      exp(slope_asc)));
+  const Type beta_a = static_cast<Type>(1.0) + 
+    (sel_age_A - static_cast<Type>(1.0)) * 
+    (exp(Type(-1.0) * (pow((x - gamma), Type(2.0))) / 
+      exp(slope_desc)) - static_cast<Type>(1.0)) / 
+    (exp(Type(-1.0) * (pow((max_age - gamma), Type(2.0))) / 
+      exp(slope_desc)) - static_cast<Type>(1.0));
+  const Type j_one_a = pow((static_cast<Type>(1.0) + 
+    exp(Type(-20.0) * (x - age_peak_sel_start) / 
+      (static_cast<Type>(1.0) + fims_math::ad_fabs(x - age_peak_sel_start)))), 
+    Type(-1.0));
+  const Type j_two_a = pow((static_cast<Type>(1.0) + 
+    exp(Type(-20.0) * (x - gamma) / 
+      (static_cast<Type>(1.0) + fims_math::ad_fabs(x - gamma)))), 
+    Type(-1.0));
+  return alpha_a * (static_cast<Type>(1.0) - j_one_a) +
+    j_one_a * ((static_cast<Type>(1.0) - j_two_a) +
+    j_two_a * beta_a);
+}
+
 }  // namespace fims_math
 
 #endif /* FIMS_MATH_HPP */

@@ -368,7 +368,34 @@ RCPP_MODULE(fims) {
               "Evaluates the double logistic selectivity given input value "
               "(e.g., age or size in selectivity).");
 
-  Rcpp::class_<EWAAGrowthInterface>("EWAAGrowth")
+  Rcpp::class_<DoubleNormalSelectivityInterface>("DoubleNormalSelectivity")
+      .constructor()
+      //.field("max_age", &DoubleNormalSelectivityInterface::max_age, 
+      //       "maximum age") //Option C
+      .field("age_peak_sel_start",
+             &DoubleNormalSelectivityInterface::age_peak_sel_start,
+             "Age at which selectivity=1 starts (p1).")
+      .field("width_peak_sel", 
+             &DoubleNormalSelectivityInterface::width_peak_sel,
+             "Width of peak selectivity  (in which selectivity=1), " 
+             "which determines the age at which selectivity=1 ends (p2).")
+      .field("slope_asc", &DoubleNormalSelectivityInterface::slope_asc,
+             "Slope of the ascending limb (p3).")
+      .field("slope_desc", &DoubleNormalSelectivityInterface::slope_desc,
+             "Slope of the descending limb (p4).")
+      .field("sel_age_zero_logit", 
+             &DoubleNormalSelectivityInterface::sel_age_zero_logit,
+             "Selectivity at age0 (parameterized in logit space; p5).")
+      .field("sel_age_A_logit", 
+             &DoubleNormalSelectivityInterface::sel_age_A_logit,
+             "Selectivity at age A (parameterized in logit space; p6)")
+      .method("get_id", &DoubleNormalSelectivityInterface::get_id,
+              "Returns a unique ID for the selectivity class.")
+      .method("evaluate", &DoubleNormalSelectivityInterface::evaluate,
+              "Evaluates the double normal selectivity given input value "
+              "(e.g., age or size in selectivity).");
+
+  Rcpp::class_<EWAAGrowthInterface>("EWAAgrowth")
       .constructor()
       .field("ages", &EWAAGrowthInterface::ages, "Ages for each age class.")
       .field("weights", &EWAAGrowthInterface::weights,

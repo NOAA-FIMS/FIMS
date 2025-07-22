@@ -329,6 +329,39 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
     )
 }
 
+#' Create default double normal parameters
+#'
+#' @description
+#' This function sets up default parameters for a double normal function.
+#' There are six specified parameters: one for the initial age of peak
+#' selectivity, one for the width of peak selectivity, two for slope
+#' (ascending and descending limbs), one for selectivity at age-0, and one
+#' for selectivity at the maximum age.
+#' @return
+#' A list containing the default double logistic parameters,
+#' age_peak_sel_start, width_peak_sel, slope_asc, slope_desc,
+#' sel_age_zero_logit, and sel_age_A_logit.
+#' values and their estimation status.
+#' @noRd
+create_default_DoubleNormal <- function() {
+  default <- list(
+    age_peak_sel_start.value = 1, # consider making this a function of nages
+    age_peak_sel_start.estimation_type = "fixed_effects",
+    width_peak_sel.value = 1, # consider making this a function of nages
+    width_peak_sel.estimation_type = "fixed_effects",
+    slope_asc.value = 1,
+    slope_asc.estimation_type = "fixed_effects",
+    slope_desc.value = 1,
+    slope_desc.estimation_type = "fixed_effects",
+    sel_age_zero_logit.value = 0, # equivalent to selectivity = 0.5 at age 0
+    sel_age_zero_logit.estimation_type = "fixed_effects",
+    sel_age_A_logit.value = 0, # equivalent to selectivity = 0.5 at max age
+    sel_age_A_logit.estimation_type = "fixed_effects"
+  )
+
+  return(default)
+}
+
 #' Create default selectivity parameters
 #'
 #' @description
@@ -342,8 +375,8 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
 #' of selectivity.
 #' @noRd
 create_default_selectivity <- function(
-  form = c("Logistic", "DoubleLogistic")
-) {
+    form = c("LogisticSelectivity", "DoubleLogisticSelectivity",
+             "DoubleNormalSelectivity")) {
   # Input checks
   form <- rlang::arg_match(form)
   # NOTE: All new forms of selectivity must be placed in the vector of default
@@ -351,7 +384,8 @@ create_default_selectivity <- function(
   # `switch`
   default <- switch(form,
     "Logistic" = create_default_Logistic(),
-    "DoubleLogistic" = create_default_DoubleLogistic()
+    "DoubleLogistic" = create_default_DoubleLogistic(),
+    "DoubleNormal" = create_default_DoubleNormal()
   ) |>
     dplyr::mutate(
       module_name = "Selectivity"
