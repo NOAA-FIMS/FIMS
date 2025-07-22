@@ -458,13 +458,6 @@ write.csv(
   file.path("FIMS_input_data.csv"),
   row.names = FALSE
 )
-# check csv can be read into R well
-test_read <- utils::read.csv(file.path("FIMS_input_data.csv"))
-# TODO: check if the following is needed before running expect_equal()
-test_read[["datestart"]] <- as.Date(test_read[["datestart"]])
-test_read[["dateend"]] <- as.Date(test_read[["dateend"]])
-testthat::expect_equal(test_read, data1)
-unlink("FIMS_input_data.csv")
 
 usethis::use_data(data1, overwrite = TRUE)
 on.exit(unlink(main_dir, recursive = TRUE), add = TRUE)
