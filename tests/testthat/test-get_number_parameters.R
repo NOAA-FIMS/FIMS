@@ -30,7 +30,6 @@ test_that("get_number_of_parameters() works with correct inputs", {
     expected_n_random_effects <- length(fit_data@obj[["env"]][["parList()"]][["re"]])
     number_of_parameters <- get_number_of_parameters(fit_data)
     expected_vector <- c(
-      total = expected_n_total,
       fixed_effects = expected_n_fixed_effects,
       random_effects = expected_n_random_effects
     )
