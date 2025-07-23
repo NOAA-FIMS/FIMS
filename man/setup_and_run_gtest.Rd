@@ -16,7 +16,7 @@ test suite from R.
 }
 \examples{
 \dontrun{
-  setup_and_run_gtest("--rerun-failed --output-on-failure")
+setup_and_run_gtest("--rerun-failed --output-on-failure")
 }
 }
 \keyword{developer}
