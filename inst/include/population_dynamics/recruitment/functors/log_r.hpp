@@ -1,6 +1,6 @@
 /**
  * @file log_r.hpp
- * @brief Encorporates error using the log recruitment approach.
+ * @brief Incorporates error using the log recruitment approach.
  * @details This function inherits from recruitment base.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source

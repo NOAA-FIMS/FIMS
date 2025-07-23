@@ -54,7 +54,6 @@ reference:
   contents:
   - has_keyword("developer")
   - has_keyword("set_methods")
-  - use_testthat_template
   - starts_with("reshape_")
 
 news:

@@ -104,7 +104,7 @@ test_that("initialize_process_distribution() works with correct inputs", {
   expect_equal(length(recruitment$log_devs), length(recruitment_distribution$x))
 
   #' @description Test that [initialize_process_distribution()] matches
-  #' the dimesnions of x and expected values.
+  #' the dimensions of x and expected values.
   expect_equal(
     length(recruitment_distribution$x),
     length(recruitment_distribution$expected_values)
