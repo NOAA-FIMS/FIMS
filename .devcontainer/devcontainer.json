@@ -5,12 +5,16 @@
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "ghcr.io/rocker-org/devcontainer/r-ver:4.3", //commma needed if other sections are used.
 
+  // Add capAdd and securityOpt to allow debugging with lldb
+  "capAdd": ["SYS_PTRACE"],
+  "securityOpt": ["seccomp=unconfined"],
+
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		// if we want to install r packages using pak
 		// more info: https://github.com/rocker-org/devcontainer-features/blob/main/src/r-packages/README.md
 		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "clang,clang-format,clang-tidy,cmake,doxygen,g++,gcc,libxt6,libxtst6,make,ninja-build,gdb,valgrind",
+			"packages": "clang,clang-format,clang-tidy,cmake,doxygen,g++,gcc,libxt6,libxtst6,lldb,make,ninja-build,gdb,valgrind",
 			"updatePackages": true			
 		},
 		 "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
