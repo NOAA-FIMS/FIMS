@@ -89,7 +89,7 @@
     `update_parameters()`, and `initialize_*()`;
   * adding -999 to the missing fleet, year, age, length, etc. combinations;
   * running the model with a user-supplied argument of n_of_loops, where the
-    default is three, to restart the optimizer from the previous run of nlmimb;
+    default is three, to restart the optimizer from the previous run of nlminb;
   * summarizing the output with the `FIMSFit()` function and class.
 * Implements a switch for global verbosity within FIMS through the use
   of {cli} messages and warnings.

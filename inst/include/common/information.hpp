@@ -132,7 +132,7 @@ class Information {
 
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
-      models_map; /**<hash map of fishery models, eg. CAA, GMACS, Spatial, etc*/
+      models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial, etc*/
   typedef typename std::unordered_map<
       uint32_t, std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>::iterator
       model_map_iterator; /**< iterator for variable map>*/
