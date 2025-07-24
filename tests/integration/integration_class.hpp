@@ -207,7 +207,7 @@ public:
                                             }
                                         }
 
-                                        f->selectivity = selectivity;
+                                        f->selectivity_age = selectivity;
                                         // f->selectivity_units = "age"; // default to age selectivity
 
                                     } else if (sel_pattern[0].GetInt() == 2) {//double logistic
@@ -255,7 +255,7 @@ public:
                                                 std::cout << "slope desc " << selectivity->slope_desc[0] << "\n";
                                             }
                                         }
-                                        f->selectivity = selectivity;
+                                        f->selectivity_age = selectivity;
                                         // f->selectivity_units = "age"; // default to age selectivity
                                     }
 
