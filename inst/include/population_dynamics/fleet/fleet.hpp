@@ -491,8 +491,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                       this->selectivity_length->evaluate(l) *
                       this->age_to_length_conversion[i_length_age];
               }
-          }else
-          {
           }
       }
   }
