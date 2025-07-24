@@ -350,7 +350,7 @@ public:
                                             selectivity->slope[0] = slope[0].GetDouble();
                                         }
 
-                                        s->selectivity = selectivity;
+                                        s->selectivity_age = selectivity;
                                         // s->selectivity_units = "age"; // default to age selectivity
 
 
@@ -385,7 +385,7 @@ public:
                                             selectivity->slope_desc.resize(1);
                                             selectivity->slope_desc[0] = slope[0].GetDouble();
                                         }
-                                        s->selectivity = selectivity;
+                                        s->selectivity_age = selectivity;
                                         // s->selectivity_units = "age"; // default to age selectivity
                                     }
 
