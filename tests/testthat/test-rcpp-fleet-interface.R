@@ -36,7 +36,7 @@ test_that("rcpp fleet works with correct inputs", {
   # expect_equal(fleet1$GetSelectivityUnits(), "age")
 
   expect_silent(fleet1$SetSelectivityLengthID(2))
-  expect_equal(fleet1$GetSelectivityID(), 2)
+  expect_equal(fleet1$GetSelectivityLengthID(), 2)
   # expect_equal(fleet1$GetSelectivityUnits(), "length")
 
   #' @description Test that setting and getting the age-composition ID works
