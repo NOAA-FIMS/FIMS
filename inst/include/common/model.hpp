@@ -81,6 +81,8 @@ class Model {  // may need singleton
     // vector< vector<Type> > creates a nested vector structure where
     // each vector can be a different dimension. Does not work with ADREPORT
     // fleets
+    vector<vector<Type> > selectivity_age(n_fleets);
+    vector<vector<Type> > selectivity_length(n_fleets);
     vector<vector<Type>> landings_w(n_fleets);
     vector<vector<Type>> landings_n(n_fleets);
     vector<vector<Type>> landings_exp(n_fleets);
@@ -255,6 +257,8 @@ class Model {  // may need singleton
          f_it != this->fims_information->fleets.end(); ++f_it) {
       std::shared_ptr<fims_popdy::Fleet<Type>> f = (*f_it).second;
 #ifdef TMB_MODEL
+      selectivity_age(fleet_idx) = f->selectivity_at_age;
+      selectivity_length(fleet_idx) = f->selectivity_at_length;
       landings_w(fleet_idx) = f->landings_weight;
       landings_n(fleet_idx) = f->landings_numbers;
       landings_exp(fleet_idx) = f->landings_expected;
@@ -290,6 +294,8 @@ class Model {  // may need singleton
       FIMS_REPORT_F(recruitment, of);
       FIMS_REPORT_F(biomass, of);
       FIMS_REPORT_F(M, of);
+      FIMS_REPORT_F(selectivity_age, of);
+      FIMS_REPORT_F(selectivity_length, of);
       FIMS_REPORT_F(total_landings_w, of);
       FIMS_REPORT_F(total_landings_n, of);
       FIMS_REPORT_F(landings_w, of);
@@ -321,6 +327,8 @@ class Model {  // may need singleton
       vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
       vector<Type> FMort = ADREPORTvector(F_mort);
       vector<Type> Q = ADREPORTvector(q);
+      vector<Type> SectivityAge = ADREPORTvector(selectivity_age);
+      vector<Type> SelectivityLength = ADREPORTvector(selectivity_length);
       vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
       vector<Type> IndexExpected = ADREPORTvector(index_exp);
       vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
@@ -339,6 +347,8 @@ class Model {  // may need singleton
       ADREPORT_F(LogRecDev, of);
       ADREPORT_F(FMort, of);
       ADREPORT_F(Q, of);
+      ADREPORT_F(SelectivityAge, of);
+      ADREPORT_F(SelectivityLength, of);
       ADREPORT_F(LandingsExpected, of);
       ADREPORT_F(IndexExpected, of);
       ADREPORT_F(LandingsNumberAtAge, of);

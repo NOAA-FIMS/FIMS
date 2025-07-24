@@ -80,6 +80,9 @@ initialize_module <- function(parameters, data, module_name) {
       "landings_expected",
       "agecomp_expected",
       "agecomp_proportion",
+      # "selectivity_units",
+      "selectivity_at_age",
+      "selectivity_at_length",
       "observed_index_units",
       "observed_landings_units"
     ))
@@ -410,7 +413,8 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
     module_name = setNames(fleet_name, "Fleet")
   )
 
-  module$SetSelectivityID(linked_ids["selectivity"])
+  # TODO: Add ability to set SetSelectivityLengthID()
+  module$SetSelectivityAgeID(linked_ids["selectivity"])
 
   fleet_types <- get_data(data) |>
     dplyr::filter(name == fleet_name) |>

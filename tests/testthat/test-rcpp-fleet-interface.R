@@ -28,8 +28,16 @@ test_that("rcpp fleet works with correct inputs", {
   # Add selectivity to fleet
   fleet1 <- methods::new(Fleet)
   fleet2 <- methods::new(Fleet)
-  expect_silent(fleet1$SetSelectivityID(selectivity_fleet1$get_id()))
-  expect_silent(fleet2$SetSelectivityID(selectivity_fleet2$get_id()))
+  expect_silent(fleet1$SetSelectivityAgeID(selectivity_fleet1$get_id()))
+  expect_silent(fleet2$SetSelectivityAgeID(selectivity_fleet2$get_id()))
+
+  expect_silent(fleet1$SetSelectivityAgeID(1))
+  expect_equal(fleet1$GetSelectivityID(), 1)
+  # expect_equal(fleet1$GetSelectivityUnits(), "age")
+
+  expect_silent(fleet1$SetSelectivityLengthID(2))
+  expect_equal(fleet1$GetSelectivityID(), 2)
+  # expect_equal(fleet1$GetSelectivityUnits(), "length")
 
   #' @description Test that setting and getting the age-composition ID works
   #' within the fleet module.

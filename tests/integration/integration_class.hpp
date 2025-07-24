@@ -208,7 +208,7 @@ public:
                                         }
 
                                         f->selectivity = selectivity;
-
+                                        // f->selectivity_units = "age"; // default to age selectivity
 
                                     } else if (sel_pattern[0].GetInt() == 2) {//double logistic
                                         if (print_statements) {
@@ -256,6 +256,7 @@ public:
                                             }
                                         }
                                         f->selectivity = selectivity;
+                                        // f->selectivity_units = "age"; // default to age selectivity
                                     }
 
                                 }
@@ -350,6 +351,7 @@ public:
                                         }
 
                                         s->selectivity = selectivity;
+                                        // s->selectivity_units = "age"; // default to age selectivity
 
 
 
@@ -384,6 +386,7 @@ public:
                                             selectivity->slope_desc[0] = slope[0].GetDouble();
                                         }
                                         s->selectivity = selectivity;
+                                        // s->selectivity_units = "age"; // default to age selectivity
                                     }
 
                                 }

@@ -91,6 +91,7 @@ class PopulationEvaluateTestFixture : public testing::Test {
       fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
       fleet->selectivity = selectivity;
+      // fleet->selectivity_units = "age";
       fleet->log_q[0] = log_q_distribution(generator);
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
@@ -260,6 +261,7 @@ class PopulationPrepareTestFixture : public testing::Test {
       fleet->log_q.resize(1);
       fleet->Initialize(nyears, nages);
       fleet->selectivity = selectivity;
+      // fleet->selectivity_units = "age";
       fleet->log_q[0] = log_q_distribution(generator);
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);

@@ -70,7 +70,7 @@ test_that("prior predictive check", {
   }
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
+  fishing_fleet$SetSelectivityAgeID(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())

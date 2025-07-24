@@ -94,7 +94,7 @@ init_fims <- function(i) {
   fishing_fleet$log_q[1]$value <- log(1.0)
   fishing_fleet$estimate_q <- FALSE
   fishing_fleet$random_q <- FALSE
-  fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
+  fishing_fleet$SetSelectivityAgeID(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   # fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
