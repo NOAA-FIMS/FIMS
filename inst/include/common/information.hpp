@@ -438,26 +438,50 @@ class Information {
    */
   void SetFleetSelectivityModel(bool &valid_model,
                                 std::shared_ptr<fims_popdy::Fleet<Type>> f) {
-    if (f->fleet_selectivity_id_m != static_cast<Type>(-999)) {
+    if (f->fleet_selectivity_age_id_m != static_cast<Type>(-999)) {
       uint32_t sel_id = static_cast<uint32_t>(
-          f->fleet_selectivity_id_m);  // cast as unsigned integer
+          f->fleet_selectivity_age_id_m);  // cast as unsigned integer
       selectivity_models_iterator it = this->selectivity_models.find(
           sel_id);  // if find, set it, otherwise invalid
 
       if (it != this->selectivity_models.end()) {
-        f->selectivity = (*it).second;  // elements in container held in pair
-        FIMS_INFO_LOG("Selectivity model " +
-                      fims::to_string(f->fleet_selectivity_id_m) +
+        f->selectivity_age = (*it).second;  // elements in container held in pair
+        FIMS_INFO_LOG("Age selectivity model " +
+                      fims::to_string(f->fleet_selectivity_age_id_m) +
                       " successfully set to fleet " + fims::to_string(f->id));
       } else {
         valid_model = false;
-        FIMS_ERROR_LOG("Expected selectivity pattern not defined for fleet " +
+        FIMS_ERROR_LOG("Expected age selectivity pattern not defined for fleet " +
                        fims::to_string(f->id) + ", selectivity pattern " +
                        fims::to_string(sel_id));
       }
     } else {
       valid_model = false;
       FIMS_ERROR_LOG("Error: No selectivity pattern defined for fleet " +
+                     fims::to_string(f->id) +
+                     ". FIMS requires selectivity be defined for all fleets.");
+    }
+
+      if (f->fleet_selectivity_length_id_m != static_cast<Type>(-999)) {
+      uint32_t sel_id = static_cast<uint32_t>(
+          f->fleet_selectivity_length_id_m);  // cast as unsigned integer
+      selectivity_models_iterator it = this->selectivity_models.find(
+          sel_id);  // if find, set it, otherwise invalid
+
+      if (it != this->selectivity_models.end()) {
+        f->selectivity_length = (*it).second;  // elements in container held in pair
+        FIMS_INFO_LOG("Length selectivity model " +
+                      fims::to_string(f->fleet_selectivity_length_id_m) +
+                      " successfully set to fleet " + fims::to_string(f->id));
+      } else {
+        valid_model = false;
+        FIMS_ERROR_LOG("Expected lengthselectivity pattern not defined for fleet " +
+                       fims::to_string(f->id) + ", selectivity pattern " +
+                       fims::to_string(sel_id));
+      }
+    } else {
+      valid_model = false;
+      FIMS_ERROR_LOG("Error: No length selectivity pattern defined for fleet " +
                      fims::to_string(f->id) +
                      ". FIMS requires selectivity be defined for all fleets.");
     }

@@ -31,9 +31,13 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<double> lengths; /*!< vector of the ages for referencing*/
 
   // selectivity
-  int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
+  int fleet_selectivity_age_id_m = -999; /*!< id of selectivity component*/
+  int fleet_selectivity_length_id_m = -999; /*!< id of selectivity component*/
   std::shared_ptr<SelectivityBase<Type>>
-  selectivity; /*!< selectivity component*/
+  selectivity_age; /*!< selectivity at age component*/
+
+  std::shared_ptr<SelectivityBase<Type>>
+  selectivity_length; /*!< selectivity at length component*/
 
   // std::string selectivity_units; /*!< units for fleet selectivity (age or length)*/
 
@@ -223,10 +227,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     static_cast<Type>(0)); /**<initialize selectivity with zeros before filling*/
 
     // fill selectivity at age and length
-    if(selectivity_units == "age"){
+    if(this->fleet_selectivity_age_id_m != -999){
         for (size_t a = 0; a < this->nages; a++)
         {
-            this->selectivity_at_age[a] = this->selectivity->evaluate(ages[a]);
+            this->selectivity_at_age[a] = this->selectivity_age->evaluate(ages[a]);
 
             if(this->nlengths > 0){
                 for (size_t l = 0; l < this->nlengths; l++)
@@ -241,12 +245,12 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                 }
             }
         }
-    }else if(selectivity_units == "length"){
+    }else if(this->fleet_selectivity_length_id_m != -999){
         for (size_t a = 0; a < this->nages; a++)
         {
             for (size_t l = 0; l < this->nlengths; l++)
             {
-                this->selectivity_at_length[l] = this->selectivity->evaluate(lengths[l]);
+                this->selectivity_at_length[l] = this->selectivity_length->evaluate(lengths[l]);
                 // iterate through all lengths within an age and sum the selectivity
                 // to get a selectivity at age
                 size_t i_length_age = a * this->nlengths + l;
@@ -255,8 +259,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                     this->selectivity_at_length[l];
             }
         }
-    }else{
-        FIMS_ERROR_LOG("Fleet selectivity units must be either 'age' or 'length', not " + selectivity_units);
     }
 
     // derived quantities
@@ -477,16 +479,16 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       // not always start at zero but this will change in model families
       for (size_t i = 0; i < this->selectivity_at_age.size(); i++)
       {
-          if (this->selectivity_units == "age")
+          if (this->fleet_selectivity_age_id_m != -999)
           {
-              this->selectivity_at_age[i] = this->selectivity->evaluate(i);
-          }else if (this->selectivity_units == "length")
+              this->selectivity_at_age[i] = this->selectivity_age->evaluate(ages[i]);
+          }else if (this->fleet_selectivity_length_id_m != -999)
           {
               for (size_t l = 0; l < this->nlengths; l++)
               {
                   size_t i_length_age = i * this->nlengths + l;
                   this->selectivity_at_age[i] +=
-                      this->selectivity->evaluate(l) *
+                      this->selectivity_length->evaluate(l) *
                       this->age_to_length_conversion[i_length_age];
               }
           }else

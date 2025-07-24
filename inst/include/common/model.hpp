@@ -327,7 +327,7 @@ class Model {  // may need singleton
       vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
       vector<Type> FMort = ADREPORTvector(F_mort);
       vector<Type> Q = ADREPORTvector(q);
-      vector<Type> SectivityAge = ADREPORTvector(selectivity_age);
+      vector<Type> SelectivityAge = ADREPORTvector(selectivity_age);
       vector<Type> SelectivityLength = ADREPORTvector(selectivity_length);
       vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
       vector<Type> IndexExpected = ADREPORTvector(index_exp);

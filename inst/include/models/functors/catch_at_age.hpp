@@ -519,7 +519,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       size_t i_age_year, size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
       // evaluate is a member function of the selectivity class
-      Type s = population->fleets[fleet_]->selectivity->evaluate(
+      Type s = population->fleets[fleet_]->selectivity_age->evaluate(
           population->ages[age]);
 
       this->population_derived_quantities[population->GetId()]["mortality_F"]
@@ -798,7 +798,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]
                                     ["landings_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->Fmort[year] *
-           population->fleets[fleet_]->selectivity->evaluate(
+           population->fleets[fleet_]->selectivity_age->evaluate(
                population->ages[age])) /
           this->population_derived_quantities[population->GetId()]
                                              ["mortality_Z"][i_age_year] *
@@ -849,7 +849,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       this->fleet_derived_quantities[population->fleets[fleet_]->GetId()]
                                     ["index_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->q.get_force_scalar(year) *
-           population->fleets[fleet_]->selectivity->evaluate(
+           population->fleets[fleet_]->selectivity_age->evaluate(
                population->ages[age])) *
           this->population_derived_quantities[population->GetId()]
                                              ["numbers_at_age"][i_age_year];
