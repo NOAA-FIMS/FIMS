@@ -161,6 +161,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     }
 
     std::fill(biomass.begin(), biomass.end(), static_cast<Type>(0.0));
+    std::fill(unfished_biomass.begin(),
+              unfished_biomass.end(), static_cast<Type>(0.0));
     std::fill(unfished_spawning_biomass.begin(),
               unfished_spawning_biomass.end(), static_cast<Type>(0.0));
     std::fill(spawning_biomass.begin(), spawning_biomass.end(),
