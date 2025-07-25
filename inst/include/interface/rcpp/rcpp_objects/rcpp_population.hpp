@@ -254,6 +254,25 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   void AddFleet(uint32_t fleet_id) { this->fleet_ids->insert(fleet_id); }
 
+void show(){
+    Rcpp::Rcout << "PopulationInterface: (" << this << "){\n";
+    Rcpp::Rcout << "\tPopulationInterface ID: " << this->id << "\n";
+    Rcpp::Rcout << "\tNumber of ages: " << this->nages.get() << "\n";
+    Rcpp::Rcout << "\tNumber of fleets: " << this->nfleets.get() << "\n";
+    Rcpp::Rcout << "\tNumber of seasons: " << this->nseasons.get() << "\n";
+    Rcpp::Rcout << "\tNumber of years: " << this->nyears.get() << "\n";
+    Rcpp::Rcout << "\tNumber of lengths: " << this->nlengths.get() << "\n";
+    Rcpp::Rcout << "\tMaturity ID: " << this->maturity_id.get() << "\n";
+    Rcpp::Rcout << "\tGrowth ID: " << this->growth_id.get() << "\n";
+    Rcpp::Rcout << "\tRecruitment ID: " << this->recruitment_id.get() << "\n";
+    Rcpp::Rcout << "\tLog M size " << this->log_M.size() << "\n";
+    Rcpp::Rcout << "\tLog Init NAA size " << this->log_init_naa.size() << "\n";
+    Rcpp::Rcout << "\tLog R size " << this->log_r.size() << "\n";
+    Rcpp::Rcout << "\tAges size " << this->ages.size() << "\n";
+    Rcpp::Rcout << "}\n";
+  }
+
+
   /**
    * @brief Extracts derived quantities back to the Rcpp interface object from
    * the Information object.
