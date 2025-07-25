@@ -55,7 +55,7 @@ struct DistributionElementObject {
       return (*re)[i];
     }
     if (this->input_type == "prior") {
-      return (*(priors[i]))[0];
+      return (*(priors[0]))[i];
     }
     return x[i];
   }

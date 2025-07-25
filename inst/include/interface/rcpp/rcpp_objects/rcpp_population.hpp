@@ -130,6 +130,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   ParameterVector log_M;
   /**
+   * @brief The population spawning biomass for each year.
+   */
+  ParameterVector spawning_biomass;
+  /**
    * @brief The natural log of the initial numbers at age.
    */
   ParameterVector log_init_naa;
@@ -198,6 +202,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         growth_id(other.growth_id),
         recruitment_id(other.recruitment_id),
         log_M(other.log_M),
+        spawning_biomass(other.spawning_biomass),
         log_init_naa(other.log_init_naa),
         numbers_at_age(other.numbers_at_age),
         ages(other.ages),
@@ -495,6 +500,10 @@ class PopulationInterface : public PopulationInterfaceBase {
     info->variable_map[this->numbers_at_age.id_m] =
         &(population)->numbers_at_age;
 
+    population->spawning_biomass.resize(nyears + 1);
+    info->variable_map[this->spawning_biomass.id_m] =
+        &(population)->spawning_biomass;
+      
     // add to Information
     info->populations[population->id] = population;
 

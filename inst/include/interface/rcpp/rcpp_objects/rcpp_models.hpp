@@ -206,7 +206,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"growth_id\": " << population_interface->growth_id << ",\n";
       ss << " \"maturity_id\": " << population_interface->maturity_id << ",\n";
 
-      ss << " \"parameters\": [\n{\n";
+      ss << " \"parameters\": [\n";
+
+      ss << "{\n";
+
       for (size_t i = 0; i < pop->log_M.size(); i++) {
         population_interface_ptr->log_M[i].final_value_m = pop->log_M[i];
       }
@@ -880,6 +883,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       // replace elements in the variable map
       info->variable_map[population->numbers_at_age.id_m] =
           &(derived_quantities["numbers_at_age"]);
+
+      info->variable_map[population->spawning_biomass.id_m] =
+          &(derived_quantities["spawning_biomass"]);
 
       for (fleet_ids_iterator fit = population->fleet_ids->begin();
            fit != population->fleet_ids->end(); ++fit) {

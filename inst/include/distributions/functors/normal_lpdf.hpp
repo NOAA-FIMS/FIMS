@@ -50,6 +50,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     lpdf = static_cast<Type>(0);
 
     // Dimension checks
+    //TODO: Add dimension checks for priors and random effects
     if (n_x != this->expected_values.size()) {
       throw std::invalid_argument(
           "NormalLPDF::Vector index out of bounds. The size of observed data "

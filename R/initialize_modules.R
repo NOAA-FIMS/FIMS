@@ -72,6 +72,11 @@ initialize_module <- function(parameters, data, module_name) {
   module <- methods::new(module_class)
   module_input <- parameters[["parameters"]][[module_name]]
 
+  if(module_class_name == "Population") {
+    module_fields <- setdiff(module_fields, c(
+      "spawning_biomass"
+    ))
+  }
   if (module_class_name == "Fleet") {
     module_fields <- setdiff(module_fields, c(
       "log_index_expected",

@@ -254,12 +254,12 @@ class Information {
         for (size_t i = 0; i < d->key.size(); i++) {
           FIMS_INFO_LOG("Link prior from distribution " +
                         fims::to_string(d->id) + " to parameter " +
-                        fims::to_string(d->key[0]));
+                        fims::to_string(d->key[0]));//TODO: should this be d->key[i]?
           vmit = this->variable_map.find(d->key[i]);
           d->priors[i] = (*vmit).second;
         }
         FIMS_INFO_LOG("Prior size for distribution " + fims::to_string(d->id) +
-                      "is: " + fims::to_string(d->x.size()));
+                      " is: " + fims::to_string(d->x.size()));
       }
     }
   }

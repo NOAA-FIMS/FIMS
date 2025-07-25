@@ -301,6 +301,8 @@ RCPP_MODULE(fims) {
       .field("nlengths", &PopulationInterface::nlengths, "number of lengths")
       .field("log_M", &PopulationInterface::log_M,
              "natural log of the natural mortality of the population")
+      .field("spawning_biomass", &PopulationInterface::spawning_biomass,
+             "population spawning biomass for each year")
       .field("log_init_naa", &PopulationInterface::log_init_naa,
              "natural log of the initial numbers at age")
       .field("ages", &PopulationInterface::ages,
