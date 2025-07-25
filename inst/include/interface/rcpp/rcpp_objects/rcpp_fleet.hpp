@@ -449,7 +449,7 @@ public:
 void show() const
   {
     Rcpp::Rcout << "FleetInterface Object: "<<(this)<<" {\n";
-    Rcpp::Rcout << "FleetInterface ID: " << this->id << "\n";
+    Rcpp::Rcout << "\tFleetInterface ID: " << this->id << "\n";
     Rcpp::Rcout << "\tName: " << this->name << "\n";
     Rcpp::Rcout << "\tNumber of ages: " << this->nages.get() << "\n";
     Rcpp::Rcout << "\tNumber of lengths: " << this->nlengths.get() << "\n";
