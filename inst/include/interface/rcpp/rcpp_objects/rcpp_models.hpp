@@ -144,13 +144,20 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @brief Method to get the population ids.
    */
   void Show() {
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    // std::shared_ptr<fims_info::Information<double>> info =
+    //     fims_info::Information<double>::GetInstance();
 
-    fims_popdy::CatchAtAge<double> *model =
-        (fims_popdy::CatchAtAge<double> *)info->models_map[this->get_id()]
-            .get();
-    model->Show();
+    // fims_popdy::CatchAtAge<double> *model =
+    //     (fims_popdy::CatchAtAge<double> *)info->models_map[this->get_id()]
+    //         .get();
+    // model->Show();
+    Rcpp::Rcout << "CatchAtAgeInterface: (" << this << "){\n";
+    Rcpp::Rcout << "\tCatchAtAgeInterface ID: " << this->id << "\n";
+    Rcpp::Rcout << "\tPopulation IDs: [";
+    for (const auto &pop_id : *this->population_ids) {
+      Rcpp::Rcout << pop_id << " ";
+    }
+    Rcpp::Rcout << "]}\n";
   }
 
   /**
