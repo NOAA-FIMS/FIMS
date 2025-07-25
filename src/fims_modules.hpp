@@ -275,7 +275,8 @@ RCPP_MODULE(fims) {
       .method("SetSelectivityAgeID", &FleetInterface::SetSelectivityAgeID)
       .method("SetSelectivityLengthID", &FleetInterface::SetSelectivityLengthID)
       .method("GetSelectivityAgeID", &FleetInterface::GetSelectivityAgeID)
-      .method("GetSelectivityLengthID", &FleetInterface::GetSelectivityLengthID);
+      .method("GetSelectivityLengthID", &FleetInterface::GetSelectivityLengthID)
+      .method("show", &FleetInterface::show);
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
       .constructor<int, int>()

@@ -47,10 +47,6 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <table>
 
 <tr>
-<td align="center">
-<a href="https://github.com/ChristineStawitz-NOAA">
-<img src="https://avatars.githubusercontent.com/u/47904621?v=4" width="100px;" alt=""/>
-</a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=ChristineStawitz-NOAA">ChristineStawitz-NOAA</a>
 </td>
 <td align="center">
@@ -86,6 +82,10 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <td align="center">
 <a href="https://github.com/nathanvaughan-NOAA">
 <img src="https://avatars.githubusercontent.com/u/53061482?v=4" width="100px;" alt=""/>
+</a><br>
+<td align="center">
+<a href="https://github.com/ChristineStawitz-NOAA">
+<img src="https://avatars.githubusercontent.com/u/47904621?v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=nathanvaughan-NOAA">nathanvaughan-NOAA</a>
 </td>

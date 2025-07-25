@@ -445,6 +445,53 @@ public:
   {
     return interface_observed_landings_data_id_m.get();
   }
+
+void show() const
+  {
+    Rcpp::Rcout << "FleetInterface Object: "<<(this)<<"\n";
+    Rcpp::Rcout << "FleetInterface ID: " << this->id << "\n";
+    Rcpp::Rcout << "Name: " << this->name << "\n";
+    Rcpp::Rcout << "Number of ages: " << this->nages.get() << "\n";
+    Rcpp::Rcout << "Number of lengths: " << this->nlengths.get() << "\n";
+    Rcpp::Rcout << "Number of years: " << this->nyears.get() << "\n";
+    Rcpp::Rcout << "Observed Landings Units: " << this->observed_landings_units.get() << "\n";
+    Rcpp::Rcout << "Observed Index Units: " << this->observed_index_units.get() << "\n";
+    Rcpp::Rcout << "Selectivity at Age ID: "
+                << this->interface_selectivity_age_id_m.get() << "\n";
+    Rcpp::Rcout << "Selectivity at Length ID: "
+                << this->interface_selectivity_length_id_m.get() << "\n";
+    Rcpp::Rcout << "Observed Age Comp Data ID: "
+                << this->interface_observed_agecomp_data_id_m.get() << "\n";
+    Rcpp::Rcout << "Observed Length Comp Data ID: "
+                << this->interface_observed_lengthcomp_data_id_m.get() << "\n";
+    Rcpp::Rcout << "Observed Index Data ID: "
+                << this->interface_observed_index_data_id_m.get() << "\n";
+    Rcpp::Rcout << "Observed Landings Data ID: "
+                << this->interface_observed_landings_data_id_m.get() << "\n";
+    Rcpp::Rcout << "Log Q: size = " << this->log_q.storage_m->size() << "\n";
+    Rcpp::Rcout << "Log Fmort: size = " << this->log_Fmort.storage_m->size() << "\n";
+    Rcpp::Rcout << "Log Index Expected: size = "
+                << this->log_index_expected.storage_m->size() << "\n";
+    Rcpp::Rcout << "Log Landings Expected: size = "
+                << this->log_landings_expected.storage_m->size() << "\n";
+    Rcpp::Rcout << "Agecomp Expected: size = "
+                << this->agecomp_expected.storage_m->size() << "\n";
+    Rcpp::Rcout << "Lengthcomp Expected: size = "
+                << this->lengthcomp_expected.storage_m->size() << "\n";
+    Rcpp::Rcout << "Agecomp Proportion: size = "
+                << this->agecomp_proportion.storage_m->size() << "\n";
+    Rcpp::Rcout << "Lengthcomp Proportion: size = "
+                << this->lengthcomp_proportion.storage_m->size() << "\n";
+    Rcpp::Rcout << "Age to Length Conversion: size = "
+                << this->age_to_length_conversion.storage_m->size() << "\n";
+    Rcpp::Rcout << "Selectivity at Age: size = "
+                << this->selectivity_at_age.storage_m->size() << "\n";
+    Rcpp::Rcout << "Selectivity at Length: size = "
+                << this->selectivity_at_length.storage_m->size() << "\n"; 
+    Rcpp::Rcout << "\n";
+  }
+
+
   /**
    * @brief Extracts the derived quantities from `Information` to the Rcpp
    * object.
