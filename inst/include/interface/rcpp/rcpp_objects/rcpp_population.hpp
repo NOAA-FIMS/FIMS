@@ -266,7 +266,7 @@ public:
     Rcpp::Rcout << "PopulationInterface: (" << this << "){\n";
     Rcpp::Rcout << "\tPopulationInterface ID: " << this->id << "\n";
     Rcpp::Rcout << "\tNumber of ages: " << this->nages.get() << "\n";
-    Rcpp::Rcout << "\tNumber of fleets: " << this->nfleets.get() << "\n";
+    Rcpp::Rcout << "\tNumber of fleets: " << this->fleet_ids->size() << "\n";
     Rcpp::Rcout << "\tNumber of seasons: " << this->nseasons.get() << "\n";
     Rcpp::Rcout << "\tNumber of years: " << this->nyears.get() << "\n";
     Rcpp::Rcout << "\tNumber of lengths: " << this->nlengths.get() << "\n";
@@ -286,7 +286,7 @@ public:
       }
       Rcpp::Rcout << *it;
     }
-    Rcpp::Rcout << "]}\n";
+    Rcpp::Rcout << "]\n}\n";
   }
 
   /**
