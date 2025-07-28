@@ -579,7 +579,21 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   parameters <- default_parameters |>
     update_parameters(
       modified_parameters = modified_parameters[[iter_id]]
-    )
+    ) 
+
+  # The model will not always run when log_q is very small. 
+  # We will need to make sure log_q is the true value for deterministic runs but 
+  # then reset to log(1.0) for estimation runs.
+  if (estimation_mode == TRUE) {
+    parameters <- parameters |>
+      update_parameters(
+        modified_parameters = list(
+          survey1 = list(
+            Fleet.log_q.value = log(1.0)
+          )
+        )
+      )
+  }
 
   parameter_list <- initialize_fims(
     parameters = parameters,
