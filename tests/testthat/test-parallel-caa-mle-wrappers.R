@@ -48,7 +48,7 @@ for (i in 1:sim_num) {
     survey1 = list(
       LogisticSelectivity.inflection_point.value = 1.5,
       LogisticSelectivity.slope.value = 2,
-      Fleet.log_q.value = log(om_output_list[[i]][["survey_q"]][["survey1"]])
+      Fleet.log_q.value = log(1.0)
     ),
     recruitment = list(
       BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[i]][["R0"]]),

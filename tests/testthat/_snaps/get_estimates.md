@@ -1615,7 +1615,7 @@
       309          315 <NA>          NA     NA    NA -6.94e- 1       NA          NA
       310          352 <NA>          NA     NA    NA  1.5 e+ 0       NA          NA
       311          353 <NA>          NA     NA    NA  2   e+ 0       NA          NA
-      312          354 <NA>          NA     NA    NA -1.49e+ 1       NA          NA
+      312          354 <NA>          NA     NA    NA  0              NA          NA
       313          355 <NA>          NA     NA    NA -2   e+ 2       NA          NA
       314          362 <NA>          NA     NA    NA  1.26e-16       NA          NA
       315          363 <NA>          NA     NA    NA  8.39e-11       NA          NA
