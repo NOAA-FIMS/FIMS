@@ -26,7 +26,7 @@ namespace fims_distributions {
 template <typename Type>
 struct DistributionElementObject {
   std::string input_type; /**< string classifies the type of the negative
-                             log-likelihood; options are: "priors",
+                             log-likelihood; options are: "extended_prior", "priors",
                              "random_effects", and "data" */
   std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_values; /**< observed data*/
@@ -37,6 +37,18 @@ struct DistributionElementObject {
       NULL; /**< expected value of random effects*/
   std::vector<fims::Vector<Type>*>
       priors; /**< vector of pointers where each points to a prior parameter */
+  std::vector<fims::Vector<Type>*>
+      prior_observed = NULL; /**< vector of pointers where 
+      each points to a parameter representing the observed value */
+  std::vector<fims::Vector<Type>*>
+      prior_expected = NULL; /**< vector of pointers where 
+      each points to a parameter representing the expected value */
+  std::vector<fims::Vector<Type>>
+      prior_observed_index = NULL; /**< vector of vectors indexing the values
+      to use from the observed prior vectors */
+  std::vector<fims::Vector<Type>>
+      prior_expected_index = NULL; /**< vector of vectors indexing the values
+      to use from the expected prior vectors */
   fims::Vector<Type> x; /**< input value of distribution function for priors or
                            random effects*/
   // std::shared_ptr<DistributionElementObject<Type>> expected; /**< expected
@@ -56,13 +68,48 @@ struct DistributionElementObject {
     }
     if (this->input_type == "prior") {
       if(priors.size() == 0) {
-        throw std::runtime_error("No priors defined for this distribution.");
+        throw std::runtime_error("No priors defined.");
       }
       if(priors.size() == 1) {
         return (*(priors[0]))[i];
       }
       if(priors.size() > 1) {
         return (*(priors[i]))[0];
+      }
+    }
+    if (this->input_type == "extended_prior") {
+      if(prior_observed.size() == 0) {
+        if(prior_observed_index.size() == 0) {
+          return observed_values.get_force_scalar(i);
+        }
+        if(prior_observed_index.size() == 1) {
+          return observed_values.get_force_scalar(prior_observed_index[0][i]);
+        }
+        if(prior_observed_index.size() > 1) {
+          return observed_values.get_force_scalar(prior_observed_index[i][0]);
+        }
+      }
+      if(prior_observed.size() == 1) {
+        if(prior_observed_index.size() == 0) {
+          return (*(prior_observed[0])).get_force_scalar(i);
+        }
+        if(prior_observed_index.size() == 1) {
+          return (*(prior_observed[0])).get_force_scalar(prior_observed_index[0][i]);
+        }
+        if(prior_observed_index.size() > 1) {
+          return (*(prior_observed[0])).get_force_scalar(prior_observed_index[i][0]);
+        }
+      }
+      if(prior_observed.size() > 1) {
+        if(prior_observed_index.size() == 0) {
+          return (*(prior_observed[i]))->at(0);
+        }
+        if(prior_observed_index.size() == 1) {
+          return (*(prior_observed[prior_observed_index[0][i]]))->at(0);
+        }
+        if(prior_observed_index.size() > 1) {
+          return (*(prior_observed[prior_observed_index[i][0]]))->at(0);
+        }
       }
     }
     return x[i];
@@ -104,7 +151,41 @@ struct DistributionElementObject {
   inline Type& get_expected(size_t i) {
     if (this->input_type == "random_effects") {
       return (*re_expected_values)[i];
-    } else {
+    } else if (this->input_type == "extended_prior") {
+      if(prior_expected.size() == 0) {
+        if(prior_expected_index.size() == 0) {
+          return expected_values.get_force_scalar(i);
+        }
+        if(prior_expected_index.size() == 1) {
+          return expected_values.get_force_scalar(prior_expected_index[0][i]);
+        }
+        if(prior_expected_index.size() > 1) {
+          return expected_values.get_force_scalar(prior_expected_index[i][0]);
+        }
+      }
+      if(prior_expected.size() == 1) {
+        if(prior_expected_index.size() == 0) {
+          return (*(prior_expected[0])).get_force_scalar(i);
+        }
+        if(prior_expected_index.size() == 1) {
+          return (*(prior_expected[0])).get_force_scalar(prior_expected_index[0][i]);
+        }
+        if(prior_expected_index.size() > 1) {
+          return (*(prior_expected[0])).get_force_scalar(prior_expected_index[i][0]);
+        }
+      }
+      if(prior_expected.size() > 1) {
+        if(prior_expected_index.size() == 0) {
+          return (*(prior_expected[i]))->at(0);
+        }
+        if(prior_expected_index.size() == 1) {
+          return (*(prior_expected[prior_expected_index[0][i]]))->at(0);
+        }
+        if(prior_expected_index.size() > 1) {
+          return (*(prior_expected[prior_expected_index[i][0]]))->at(0);
+        }
+      }
+    }else {
       return this->expected_values.get_force_scalar(i);
     }
   }
@@ -122,6 +203,15 @@ struct DistributionElementObject {
     }
     if (this->input_type == "prior") {
       return this->expected_values.size();
+    }
+    if (this->input_type == "extended_prior") {
+      if(prior_expected.size() > 1) {
+        return prior_expected.size();
+      }else if(prior_expected.size() == 1) {
+        return (*(prior_expected[0])).size();
+      } else if(prior_expected.size() == 0) {
+        return this->expected_values.size();
+      }
     }
     return x.size();
   }
