@@ -55,7 +55,15 @@ struct DistributionElementObject {
       return (*re)[i];
     }
     if (this->input_type == "prior") {
-      return (*(priors[0]))[i];
+      if(priors.size() == 0) {
+        throw std::runtime_error("No priors defined for this distribution.");
+      }
+      if(priors.size() == 1) {
+        return (*(priors[0]))[i];
+      }
+      if(priors.size() > 1) {
+        return (*(priors[i]))[0];
+      }
     }
     return x[i];
   }
@@ -71,10 +79,19 @@ struct DistributionElementObject {
       return observed_values->at(i, j);
     }
     if (this->input_type == "random_effects") {
-      return (*re)[i, j];
+      return (*re)[i, j]; //TODO: This is wrong but need to figure out how to handle
+                          // 2D random effects properly. Either:
+                          // a) a single pointer to a matrix
+                          // b) a vector pointers to vectors
+                          // c) a 2D array or dimension folder vector of pointers 
     }
     if (this->input_type == "prior") {
-      return (*(priors[i, j]))[0];
+      if(priors.size() == 1) {
+        return (*(priors[0]))[i, j];
+      }
+      if(priors.size() > 1) {
+        return (*(priors[i]))[j];
+      }
     }
     return x[i];
   }
