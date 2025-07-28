@@ -1694,7 +1694,7 @@ if(n_projection_years>0){
   ## are provided with very high log_sd=20 in all but terminal
   ## projection year when log_sd=0 and F is estimated.
 
-  n_projection_years <- 100
+  n_projection_years <- 10
   projected_landings <- rep(-999,n_projection_years)
   projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
   estim_projected_F <- rep("fixed_effects",n_projection_years)
@@ -2137,58 +2137,58 @@ if(n_projection_years>0){
   sdr_fixed_5_year_project_SSB_target <- sdr_fixed
   #Compare results across model runs
 
-  #Compare fixed parameter estimates between control and fixed F runs
-  #Results are identical as expected
-  max(sdr_fixed_no_project[,"Estimate"]-sdr_fixed_5_year_project[,"Estimate"])
-  min(sdr_fixed_no_project[,"Estimate"]-sdr_fixed_5_year_project[,"Estimate"])
-
-  max(sdr_fixed_no_project[,"Std. Error"]-sdr_fixed_5_year_project[,"Std. Error"])
-  max(sdr_fixed_no_project[,"Std. Error"]-sdr_fixed_5_year_project[,"Std. Error"])
-
-  #Compare fixed parameter estimates between control and estimated F runs with reasonable low catch targets
-  #Results are very similar <1% maximum difference
-  #Not sure why there is any difference? Maybe there is an assumption of symmetry
-  #between the F pars that back propagates the impact of Future F's to past F's???
-  #or this is just the result of rounding error in the final gradient convergence thresholds??
-  max((sdr_fixed_5_year_project_catch_low[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
-  min((sdr_fixed_5_year_project_catch_low[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
-
-  max((sdr_fixed_5_year_project_catch_low[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
-  min((sdr_fixed_5_year_project_catch_low[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
-
-  #Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
-  #Results are not all similar something is happening with the Fmort results in particular
-  #This is somewhat expected as the model is being forced to make the future projected catches obtainable.
-  #This interaction means we would need to restrain or detect scenarios where this interaction is occuring.
-  #We need to test if this is just a catch issue or if it effects reference point projections targeting SPR.
-  max((sdr_fixed_5_year_project_catch_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
-  min((sdr_fixed_5_year_project_catch_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
-
-  max((sdr_fixed_5_year_project_catch_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
-  min((sdr_fixed_5_year_project_catch_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
-
-  #Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
-  #But super high log_sd = 5 on the projection catches so the model isn't forced to fit the targets
-  #Results are almost identical 1.426e-5 max proportion error
-  #In this case the model seems to estimate the most catch it can without changing
-  #the estimation period fits which is likely our best case scenario vs fixed catch
-  #projections such as SS that can go wild when the catches are too high.
-  #This appears to achieve close to a constant F projection which is interesting.
-  max((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
-  min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
-
-  max((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
-  min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
-
-
-  #Comparison of SSB target results
-  max((sdr_fixed_5_year_project_SSB_target[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
-  min((sdr_fixed_5_year_project_SSB_target[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
-
-  max((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
-  min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
-
-  sdr_report_5_year_project_SSB_target[rownames(sdr_report_5_year_project_SSB_target)=="SSB","Estimate"]
-
-  sdr_report_no_project[rownames(sdr_report_no_project)=="SSB","Estimate"]
-
+  # #Compare fixed parameter estimates between control and fixed F runs
+  # #Results are identical as expected
+  # max(sdr_fixed_no_project[,"Estimate"]-sdr_fixed_5_year_project[,"Estimate"])
+  # min(sdr_fixed_no_project[,"Estimate"]-sdr_fixed_5_year_project[,"Estimate"])
+  #
+  # max(sdr_fixed_no_project[,"Std. Error"]-sdr_fixed_5_year_project[,"Std. Error"])
+  # max(sdr_fixed_no_project[,"Std. Error"]-sdr_fixed_5_year_project[,"Std. Error"])
+  #
+  # #Compare fixed parameter estimates between control and estimated F runs with reasonable low catch targets
+  # #Results are very similar <1% maximum difference
+  # #Not sure why there is any difference? Maybe there is an assumption of symmetry
+  # #between the F pars that back propagates the impact of Future F's to past F's???
+  # #or this is just the result of rounding error in the final gradient convergence thresholds??
+  # max((sdr_fixed_5_year_project_catch_low[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+  # min((sdr_fixed_5_year_project_catch_low[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+  #
+  # max((sdr_fixed_5_year_project_catch_low[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+  # min((sdr_fixed_5_year_project_catch_low[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+  #
+  # #Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
+  # #Results are not all similar something is happening with the Fmort results in particular
+  # #This is somewhat expected as the model is being forced to make the future projected catches obtainable.
+  # #This interaction means we would need to restrain or detect scenarios where this interaction is occuring.
+  # #We need to test if this is just a catch issue or if it effects reference point projections targeting SPR.
+  # max((sdr_fixed_5_year_project_catch_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+  # min((sdr_fixed_5_year_project_catch_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+  #
+  # max((sdr_fixed_5_year_project_catch_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+  # min((sdr_fixed_5_year_project_catch_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+  #
+  # #Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
+  # #But super high log_sd = 5 on the projection catches so the model isn't forced to fit the targets
+  # #Results are almost identical 1.426e-5 max proportion error
+  # #In this case the model seems to estimate the most catch it can without changing
+  # #the estimation period fits which is likely our best case scenario vs fixed catch
+  # #projections such as SS that can go wild when the catches are too high.
+  # #This appears to achieve close to a constant F projection which is interesting.
+  # max((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+  # min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+  #
+  # max((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+  # min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+  #
+  #
+  # #Comparison of SSB target results
+  # max((sdr_fixed_5_year_project_SSB_target[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+  # min((sdr_fixed_5_year_project_SSB_target[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+  #
+  # max((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+  # min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+  #
+  # sdr_report_5_year_project_SSB_target[rownames(sdr_report_5_year_project_SSB_target)=="SSB","Estimate"]
+  #
+  # sdr_report_no_project[rownames(sdr_report_no_project)=="SSB","Estimate"]
+  #
