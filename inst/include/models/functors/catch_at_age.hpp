@@ -83,6 +83,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::stringstream ss;
     ss << "caa_" << this->GetId() << "_";
     this->name_m = ss.str();
+    this->model_type_m = "caa";
   }
 
   /**

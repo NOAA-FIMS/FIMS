@@ -11,12 +11,19 @@ namespace fims_popdy {
     class SurplusProduction : public FisheryModelBase<Type> {
 
     public:
+     /**
+         * @brief The name of the model.
+         *
+         */
+        std::string name_m;
+
         size_t nyears = 0; //max of all populations
         size_t nages = 0; //max of all populations
         std::set<uint32_t> population_ids;
         std::vector<std::shared_ptr<fims_popdy::Population<Type> > > populations;
 
         SurplusProduction() : fims_popdy::FisheryModelBase<Type>() {
+            this->model_type_m = "sp";
         }
 
         virtual void Initialize() {
@@ -104,7 +111,7 @@ namespace fims_popdy {
                     index_ = fims_math::exp(this->populations[p]->depletion->log_depletion[i_year] + 
                         this->populations[p]->fleets[fleet_]->log_q.get_force_scalar(i_year) );
                 
-                    this->populations[p]->fleets[fleet_]->expected_index[i_year] += index_;
+                    this->populations[p]->fleets[fleet_]->index_expected[i_year] += index_;
                 }
             }
         }
@@ -113,7 +120,7 @@ namespace fims_popdy {
             for (size_t p = 0; p < this->populations.size(); p++) {  
                 this->populations[p]->derived_quantities["biomass"][i_year] =
                     this->populations[p]->derived_quantities["expected_depletion"][i_year] *
-                    this->populations[p]->depletion->K;
+                    fims_math::exp(this->populations[p]->depletion->log_K);
             }
 
         }

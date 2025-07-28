@@ -57,6 +57,7 @@ bool CreateTMBModel() {
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
   info0->CreateModel();
+  info0->CheckModel();
 
   std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
       fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
@@ -66,6 +67,7 @@ bool CreateTMBModel() {
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
   info0->CreateModel();
+  info0->CheckModel();
 
   // first-order derivative
   std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> info1 =
