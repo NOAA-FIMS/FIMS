@@ -38,16 +38,16 @@ struct DistributionElementObject {
   std::vector<fims::Vector<Type>*>
       priors; /**< vector of pointers where each points to a prior parameter */
   std::vector<fims::Vector<Type>*>
-      prior_observed = NULL; /**< vector of pointers where 
+      prior_observed; /**< vector of pointers where 
       each points to a parameter representing the observed value */
   std::vector<fims::Vector<Type>*>
-      prior_expected = NULL; /**< vector of pointers where 
+      prior_expected; /**< vector of pointers where 
       each points to a parameter representing the expected value */
   std::vector<fims::Vector<Type>>
-      prior_observed_index = NULL; /**< vector of vectors indexing the values
+      prior_observed_index; /**< vector of vectors indexing the values
       to use from the observed prior vectors */
   std::vector<fims::Vector<Type>>
-      prior_expected_index = NULL; /**< vector of vectors indexing the values
+      prior_expected_index; /**< vector of vectors indexing the values
       to use from the expected prior vectors */
   fims::Vector<Type> x; /**< input value of distribution function for priors or
                            random effects*/
@@ -56,10 +56,11 @@ struct DistributionElementObject {
 
   /**
    * Retrieve element from observed data set, random effect, or prior.
-   * @param i index referencing vector or pointer
+   * @param pt_idx index referencing pointer
+   * @param v_idx index referencing vector, only used for priors
    * @return the reference to the value of the vector or pointer at position i
    */
-  inline Type& get_observed(size_t i) {
+  inline Type& get_observed(size_t pt_idx, size_t v_idx = 0) {
     if (this->input_type == "data") {
       return observed_values->at(i);
     }
@@ -67,16 +68,9 @@ struct DistributionElementObject {
       return (*re)[i];
     }
     if (this->input_type == "prior") {
-      if(priors.size() == 0) {
-        throw std::runtime_error("No priors defined.");
-      }
-      if(priors.size() == 1) {
-        return (*(priors[0]))[i];
-      }
-      if(priors.size() > 1) {
-        return (*(priors[i]))[0];
-      }
+      return (*(priors[pt_idx]))[v_idx];
     }
+    /* get_force_scalar is a property of fims::Vector but observed_values is a std::vector
     if (this->input_type == "extended_prior") {
       if(prior_observed.size() == 0) {
         if(prior_observed_index.size() == 0) {
@@ -112,6 +106,7 @@ struct DistributionElementObject {
         }
       }
     }
+        */
     return x[i];
   }
 
@@ -151,7 +146,7 @@ struct DistributionElementObject {
   inline Type& get_expected(size_t i) {
     if (this->input_type == "random_effects") {
       return (*re_expected_values)[i];
-    } else if (this->input_type == "extended_prior") {
+    } /*else if (this->input_type == "extended_prior") {
       if(prior_expected.size() == 0) {
         if(prior_expected_index.size() == 0) {
           return expected_values.get_force_scalar(i);
@@ -176,16 +171,17 @@ struct DistributionElementObject {
       }
       if(prior_expected.size() > 1) {
         if(prior_expected_index.size() == 0) {
-          return (*(prior_expected[i]))->at(0);
+          return (*(prior_expected[i]))[0];
         }
         if(prior_expected_index.size() == 1) {
-          return (*(prior_expected[prior_expected_index[0][i]]))->at(0);
+          return (*(prior_expected[prior_expected_index[0][i]]))[0];
         }
         if(prior_expected_index.size() > 1) {
-          return (*(prior_expected[prior_expected_index[i][0]]))->at(0);
+          return (*(prior_expected[prior_expected_index[i][0]]))[0];
         }
       }
-    }else {
+    } */
+    else {
       return this->expected_values.get_force_scalar(i);
     }
   }
@@ -202,6 +198,8 @@ struct DistributionElementObject {
       return this->expected_values.size();
     }
     if (this->input_type == "prior") {
+      // number of pointers associated with the prior
+      pt_size = this->key.size();
       return this->expected_values.size();
     }
     if (this->input_type == "extended_prior") {

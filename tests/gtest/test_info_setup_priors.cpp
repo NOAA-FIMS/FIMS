@@ -15,16 +15,18 @@ namespace
     std::shared_ptr<fims_popdy::LogisticSelectivity<double> > selectivity1 =
       std::make_shared<fims_popdy::LogisticSelectivity<double> >();
     selectivity1->inflection_point.resize(1);
-    selectivity1->slope.resize(1);
+    selectivity1->slope.resize(2);
     selectivity1->inflection_point[0] = 19.7;
     selectivity1->slope[0] = 0.21;
+    selectivity1->slope[1] = 0.25;
 
     std::shared_ptr<fims_popdy::LogisticSelectivity<double> > selectivity2 =
       std::make_shared<fims_popdy::LogisticSelectivity<double> >();
     selectivity2->inflection_point.resize(1);
-    selectivity2->slope.resize(1);
+    selectivity2->slope.resize(2);
     selectivity2->inflection_point[0] = 22.3;
     selectivity2->slope[0] = 0.18;
+    selectivity2->slope[1] = 0.2;
     
     // Set up variable map to point to selectivity parameters
     info->variable_map[1] = &(selectivity1)->inflection_point;
@@ -58,7 +60,9 @@ namespace
     EXPECT_EQ((*normal_inflection_point->priors[0])[0], selectivity1->inflection_point[0]);
     EXPECT_EQ((*normal_inflection_point->priors[1])[0], selectivity2->inflection_point[0]);
     EXPECT_EQ((*lognormal_slope->priors[0])[0], selectivity1->slope[0]);
+    EXPECT_EQ((*lognormal_slope->priors[0])[1], selectivity1->slope[1]);
     EXPECT_EQ((*lognormal_slope->priors[1])[0], selectivity2->slope[0]);
+    EXPECT_EQ((*lognormal_slope->priors[1])[1], selectivity2->slope[1]);
     EXPECT_EQ((normal_inflection_point->get_observed(0)), selectivity1->inflection_point[0]);
     EXPECT_EQ((normal_inflection_point->get_observed(1)), selectivity2->inflection_point[0]);
     EXPECT_EQ((lognormal_slope->get_observed(0)), selectivity1->slope[0]);
