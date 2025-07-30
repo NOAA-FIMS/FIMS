@@ -18,8 +18,9 @@
  * FIMSRcppInterfaceBase.
  *
  */
-class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase
+{
+public:
   /**
    * @brief The static id of the FleetInterfaceBase object.
    */
@@ -39,7 +40,8 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The constructor.
    */
-  FisheryModelInterfaceBase() {
+  FisheryModelInterfaceBase()
+  {
     this->id = FisheryModelInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     FleetInterfaceBase */
@@ -59,7 +61,8 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual ~FisheryModelInterfaceBase() {}
 
-  virtual std::string to_json() {
+  virtual std::string to_json()
+  {
     return "std::string to_json() not yet implemented.";
   }
 
@@ -68,7 +71,8 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @return Rcpp::List
    */
-  virtual Rcpp::List calculate_reference_points() {
+  virtual Rcpp::List calculate_reference_points()
+  {
     Rcpp::List result;
     return result;
   }
@@ -89,15 +93,17 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
  * @brief The CatchAtAgeInterface class is used to interface with the
  * CatchAtAge model. It inherits from the FisheryModelInterfaceBase class.
  */
-class CatchAtAgeInterface : public FisheryModelInterfaceBase {
+class CatchAtAgeInterface : public FisheryModelInterfaceBase
+{
   std::shared_ptr<std::set<uint32_t>> population_ids;
   typedef typename std::set<uint32_t>::iterator population_id_iterator;
 
- public:
+public:
   /**
    * @brief The constructor.
    */
-  CatchAtAgeInterface() : FisheryModelInterfaceBase() {
+  CatchAtAgeInterface() : FisheryModelInterfaceBase()
+  {
     this->population_ids = std::make_shared<std::set<uint32_t>>();
     std::shared_ptr<CatchAtAgeInterface> caa =
         std::make_shared<CatchAtAgeInterface>(*this);
@@ -117,15 +123,19 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * Metthod to add a population id to the set of population ids.
    */
-  void AddPopulation(uint32_t id) {
+  void AddPopulation(uint32_t id)
+  {
     this->population_ids->insert(id);
 
     std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
     pit = PopulationInterfaceBase::live_objects.find(id);
-    if (pit != PopulationInterfaceBase::live_objects.end()) {
+    if (pit != PopulationInterfaceBase::live_objects.end())
+    {
       std::shared_ptr<PopulationInterfaceBase> &pop = (*pit).second;
       pop->initialize_catch_at_age.set(true);
-    } else {
+    }
+    else
+    {
       FIMS_ERROR_LOG("Population with id " + fims::to_string(id) +
                      " not found.");
     }
@@ -134,7 +144,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * @brief Method to get the population id.
    */
-  virtual uint32_t get_id() {
+  virtual uint32_t get_id()
+  {
     typename std::map<uint32_t,
                       std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
     return this->id;
@@ -143,7 +154,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * @brief Method to get the population ids.
    */
-  void Show() {
+  void Show()
+  {
     // std::shared_ptr<fims_info::Information<double>> info =
     //     fims_info::Information<double>::GetInstance();
 
@@ -154,7 +166,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     Rcpp::Rcout << "CatchAtAgeInterface: (" << this << "){\n";
     Rcpp::Rcout << "\tCatchAtAgeInterface ID: " << this->id << "\n";
     Rcpp::Rcout << "\tPopulation IDs: [";
-    for (const auto &pop_id : *this->population_ids) {
+    for (const auto &pop_id : *this->population_ids)
+    {
       Rcpp::Rcout << pop_id << " ";
     }
     Rcpp::Rcout << "]}\n";
@@ -168,19 +181,21 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * @brief Method to convert a population to a JSON string.
    */
-  std::string population_to_json(PopulationInterface *population_interface) {
+  std::string population_to_json(PopulationInterface *population_interface)
+  {
     std::stringstream ss;
 
     typename std::map<uint32_t,
                       std::shared_ptr<PopulationInterfaceBase>>::iterator
-        pi_it;  // population interface iterator
+        pi_it; // population interface iterator
     pi_it = PopulationInterfaceBase::live_objects.find(
         population_interface->get_id());
-    if (pi_it == PopulationInterfaceBase::live_objects.end()) {
+    if (pi_it == PopulationInterfaceBase::live_objects.end())
+    {
       FIMS_ERROR_LOG("Population with id " +
                      fims::to_string(population_interface->get_id()) +
                      " not found in live objects.");
-      return "{}";  // Return empty JSON
+      return "{}"; // Return empty JSON
     }
 
     std::shared_ptr<PopulationInterface> population_interface_ptr =
@@ -199,7 +214,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
     pit = info->populations.find(population_interface->get_id());
 
-    if (pit != info->populations.end()) {
+    if (pit != info->populations.end())
+    {
       std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
       // ToDo: add list of fleet ids operating on this population
       ss << "{\n";
@@ -214,7 +230,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"maturity_id\": " << population_interface->maturity_id << ",\n";
 
       ss << " \"parameters\": [\n{\n";
-      for (size_t i = 0; i < pop->log_M.size(); i++) {
+      for (size_t i = 0; i < pop->log_M.size(); i++)
+      {
         population_interface_ptr->log_M[i].final_value_m = pop->log_M[i];
       }
 
@@ -225,7 +242,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
       ss << "{\n";
 
-      for (size_t i = 0; i < pop->log_init_naa.size(); i++) {
+      for (size_t i = 0; i < pop->log_init_naa.size(); i++)
+      {
         population_interface_ptr->log_init_naa[i].final_value_m =
             pop->log_init_naa[i];
       }
@@ -240,12 +258,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       cit = model_ptr->population_derived_quantities.find(
           population_interface->get_id());
 
-      if (cit != model_ptr->population_derived_quantities.end()) {
+      if (cit != model_ptr->population_derived_quantities.end())
+      {
         ss << model_ptr->population_derived_quantities_to_json(cit) << "]}\n";
-      } else {
+      }
+      else
+      {
         ss << " ]}\n";
       }
-    } else {
+    }
+    else
+    {
       ss << "{\n";
       ss << " \"name\" : \"Population\",\n";
 
@@ -267,27 +290,30 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * @brief Method to convert a fleet to a JSON string.
    */
-  std::string fleet_to_json(FleetInterface *fleet_interface) {
+  std::string fleet_to_json(FleetInterface *fleet_interface)
+  {
     std::stringstream ss;
 
     typename std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>::iterator
-        fi_it;  // fleet interface iterator
+        fi_it; // fleet interface iterator
     fi_it = FleetInterfaceBase::live_objects.find(fleet_interface->get_id());
-    if (fi_it == FleetInterfaceBase::live_objects.end()) {
+    if (fi_it == FleetInterfaceBase::live_objects.end())
+    {
       FIMS_ERROR_LOG("Fleet with id " +
                      fims::to_string(fleet_interface->get_id()) +
                      " not found in live objects.");
-      return "{}";  // Return empty JSON
+      return "{}"; // Return empty JSON
     }
 
     std::shared_ptr<FleetInterface> fleet_interface_ptr =
         std::dynamic_pointer_cast<FleetInterface>((*fi_it).second);
 
-    if (!fleet_interface_ptr) {
+    if (!fleet_interface_ptr)
+    {
       FIMS_ERROR_LOG("Fleet with id " +
                      fims::to_string(fleet_interface->get_id()) +
                      " not found in live objects.");
-      return "{}";  // Return empty JSON
+      return "{}"; // Return empty JSON
     }
 
     std::shared_ptr<fims_info::Information<double>> info =
@@ -303,7 +329,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
     fit = info->fleets.find(fleet_interface->get_id());
 
-    if (fit != info->fleets.end()) {
+    if (fit != info->fleets.end())
+    {
       std::shared_ptr<fims_popdy::Fleet<double>> &fleet = (*fit).second;
 
       ss << "{\n";
@@ -316,7 +343,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"nlengths\": " << fleet_interface->nlengths.get() << ",\n";
       ss << "\"parameters\": [\n";
       ss << "{\n";
-      for (size_t i = 0; i < fleet_interface->log_Fmort.size(); i++) {
+      for (size_t i = 0; i < fleet_interface->log_Fmort.size(); i++)
+      {
         fleet_interface->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
       }
 
@@ -326,17 +354,20 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"values\": " << fleet_interface->log_Fmort << "\n},\n";
 
       ss << " {\n";
-      for (size_t i = 0; i < fleet->log_q.size(); i++) {
+      for (size_t i = 0; i < fleet->log_q.size(); i++)
+      {
         fleet_interface->log_q[i].final_value_m = fleet->log_q[i];
       }
       ss << " \"name\": \"log_q\",\n";
       ss << " \"id\":" << fleet_interface->log_q.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"values\": " << fleet_interface->log_q << "\n},\n";
-      if (fleet_interface->nlengths > 0) {
+      if (fleet_interface->nlengths > 0)
+      {
         ss << " {\n";
         for (size_t i = 0; i < fleet_interface->age_to_length_conversion.size();
-             i++) {
+             i++)
+        {
           fleet_interface->age_to_length_conversion[i].final_value_m =
               fleet->age_to_length_conversion[i];
         }
@@ -352,12 +383,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       fims_popdy::CatchAtAge<double>::fleet_derived_quantities_iterator fit;
       fit = model_ptr->fleet_derived_quantities.find(fleet_interface->get_id());
 
-      if (fit != model_ptr->fleet_derived_quantities.end()) {
+      if (fit != model_ptr->fleet_derived_quantities.end())
+      {
         ss << model_ptr->fleet_derived_quantities_to_json(fit) << "]}\n";
-      } else {
+      }
+      else
+      {
         ss << " ]}\n";
       }
-    } else {
+    }
+    else
+    {
       ss << "{\n";
       ss << " \"name\" : \"Fleet\",\n";
       ss << " \"type\" : \"fleet\",\n";
@@ -371,7 +407,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * @brief Method to convert the model to a JSON string.
    */
-  virtual std::string to_json() {
+  virtual std::string to_json()
+  {
     std::set<uint32_t> fleet_ids;
     // typename std::set<uint32_t>::iterator fleet_it;
     std::shared_ptr<fims_info::Information<double>> info =
@@ -390,9 +427,11 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     ss << " \"population_ids\": [";
     typename std::set<uint32_t>::iterator pit;
     for (pit = this->population_ids->begin();
-         pit != this->population_ids->end(); pit++) {
+         pit != this->population_ids->end(); pit++)
+    {
       ss << *pit;
-      if (std::next(pit) != this->population_ids->end()) {
+      if (std::next(pit) != this->population_ids->end())
+      {
         ss << ", ";
       }
     }
@@ -402,45 +441,57 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     typename std::set<uint32_t>::iterator pop_end_it;
     pop_end_it = this->population_ids->end();
     typename std::set<uint32_t>::iterator pop_second_to_last_it;
-    if (pop_end_it != this->population_ids->begin()) {
+    if (pop_end_it != this->population_ids->begin())
+    {
       pop_second_to_last_it = std::prev(pop_end_it);
-    } else {
+    }
+    else
+    {
       pop_second_to_last_it = pop_end_it;
     }
 
     for (pop_it = this->population_ids->begin();
-         pop_it != pop_second_to_last_it; pop_it++) {
+         pop_it != pop_second_to_last_it; pop_it++)
+    {
       std::shared_ptr<PopulationInterface> population_interface =
           std::dynamic_pointer_cast<PopulationInterface>(
               PopulationInterfaceBase::live_objects[*pop_it]);
-      if (population_interface) {
+      if (population_interface)
+      {
         std::set<uint32_t>::iterator fids;
         for (fids = population_interface->fleet_ids->begin();
-             fids != population_interface->fleet_ids->end(); fids++) {
+             fids != population_interface->fleet_ids->end(); fids++)
+        {
           fleet_ids.insert(*fids);
         }
         ss << this->population_to_json(population_interface.get()) << ",";
-      } else {
+      }
+      else
+      {
         FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
                        " not found in live objects.");
-        ss << "{}";  // Return empty JSON for this population
+        ss << "{}"; // Return empty JSON for this population
       }
     }
 
     std::shared_ptr<PopulationInterface> population_interface =
         std::dynamic_pointer_cast<PopulationInterface>(
             PopulationInterfaceBase::live_objects[*pop_second_to_last_it]);
-    if (population_interface) {
+    if (population_interface)
+    {
       std::set<uint32_t>::iterator fids;
       for (fids = population_interface->fleet_ids->begin();
-           fids != population_interface->fleet_ids->end(); fids++) {
+           fids != population_interface->fleet_ids->end(); fids++)
+      {
         fleet_ids.insert(*fids);
       }
       ss << this->population_to_json(population_interface.get());
-    } else {
+    }
+    else
+    {
       FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
                      " not found in live objects.");
-      ss << "{}";  // Return empty JSON for this population
+      ss << "{}"; // Return empty JSON for this population
     }
 
     ss << "]";
@@ -450,32 +501,40 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     typename std::set<uint32_t>::iterator fleet_end_it;
     fleet_end_it = fleet_ids.end();
     typename std::set<uint32_t>::iterator fleet_second_to_last_it;
-    if (fleet_end_it != fleet_ids.begin()) {
+    if (fleet_end_it != fleet_ids.begin())
+    {
       fleet_second_to_last_it = std::prev(fleet_end_it);
     }
 
     for (fleet_it = fleet_ids.begin(); fleet_it != fleet_second_to_last_it;
-         fleet_it++) {
+         fleet_it++)
+    {
       std::shared_ptr<FleetInterface> fleet_interface =
           std::dynamic_pointer_cast<FleetInterface>(
               FleetInterfaceBase::live_objects[*fleet_it]);
-      if (fleet_interface) {
+      if (fleet_interface)
+      {
         ss << this->fleet_to_json(fleet_interface.get()) << ",";
-      } else {
+      }
+      else
+      {
         FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*fleet_it) +
                        " not found in live objects.");
-        ss << "{}";  // Return empty JSON for this fleet
+        ss << "{}"; // Return empty JSON for this fleet
       }
     }
     std::shared_ptr<FleetInterface> fleet_interface =
         std::dynamic_pointer_cast<FleetInterface>(
             FleetInterfaceBase::live_objects[*fleet_second_to_last_it]);
-    if (fleet_interface) {
+    if (fleet_interface)
+    {
       ss << this->fleet_to_json(fleet_interface.get());
-    } else {
+    }
+    else
+    {
       FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*fleet_it) +
                      " not found in live objects.");
-      ss << "{}";  // Return empty JSON for this fleet
+      ss << "{}"; // Return empty JSON for this fleet
     }
 
     ss << "]\n}";
@@ -488,9 +547,11 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param v
    * @return double
    */
-  double sum(const std::valarray<double> &v) {
+  double sum(const std::valarray<double> &v)
+  {
     double sum = 0.0;
-    for (size_t i = 0; i < v.size(); i++) {
+    for (size_t i = 0; i < v.size(); i++)
+    {
       sum += v[i];
     }
     return sum;
@@ -502,9 +563,11 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param v
    * @return double
    */
-  double sum(const std::vector<double> &v) {
+  double sum(const std::vector<double> &v)
+  {
     double sum = 0.0;
-    for (size_t i = 0; i < v.size(); i++) {
+    for (size_t i = 0; i < v.size(); i++)
+    {
       sum += v[i];
     }
     return sum;
@@ -517,10 +580,13 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param v
    * @return double
    */
-  double min(const std::valarray<double> &v) {
+  double min(const std::valarray<double> &v)
+  {
     double min = v[0];
-    for (size_t i = 1; i < v.size(); i++) {
-      if (v[i] < min) {
+    for (size_t i = 1; i < v.size(); i++)
+    {
+      if (v[i] < min)
+      {
         min = v[i];
       }
     }
@@ -532,9 +598,11 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param v
    * @return std::valarray<double>
    */
-  std::valarray<double> fabs(const std::valarray<double> &v) {
+  std::valarray<double> fabs(const std::valarray<double> &v)
+  {
     std::valarray<double> result(v.size());
-    for (size_t i = 0; i < v.size(); i++) {
+    for (size_t i = 0; i < v.size(); i++)
+    {
       result[i] = std::fabs(v[i]);
     }
     return result;
@@ -550,7 +618,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   Rcpp::List calculate_reference_points_population(
       PopulationInterface *population_interface, double maxF = 1.0,
-      double step = 0.01) {
+      double step = 0.01)
+  {
     //         //note: this algoritm is ported from the Meta-population
     //         assessment system project and
     //         //needs review
@@ -795,16 +864,19 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * @brief Method to calculate reference points for the model.
    */
-  virtual Rcpp::List calculate_reference_points() {
+  virtual Rcpp::List calculate_reference_points()
+  {
     Rcpp::List result;
     // loop through populations for this model
     std::vector<uint32_t> pop_ids(this->population_ids->begin(),
                                   this->population_ids->end());
-    for (size_t p = 0; p < pop_ids.size(); p++) {
+    for (size_t p = 0; p < pop_ids.size(); p++)
+    {
       typename std::map<uint32_t,
                         std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
       pit = PopulationInterfaceBase::live_objects.find(pop_ids[p]);
-      if (pit != PopulationInterfaceBase::live_objects.end()) {
+      if (pit != PopulationInterfaceBase::live_objects.end())
+      {
         PopulationInterface *pop = (PopulationInterface *)(*pit).second.get();
         result.push_back(this->calculate_reference_points_population(pop));
       }
@@ -815,7 +887,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 #ifdef TMB_MODEL
 
   template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  bool add_to_fims_tmb_internal()
+  {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -825,18 +898,20 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     population_id_iterator it;
 
     for (it = this->population_ids->begin(); it != this->population_ids->end();
-         ++it) {
+         ++it)
+    {
       model->AddPopulation((*it));
     }
 
-    std::set<uint32_t> fleet_ids;  // all fleets in the model
+    std::set<uint32_t> fleet_ids; // all fleets in the model
     typedef typename std::set<uint32_t>::iterator fleet_ids_iterator;
 
     // add to Information
     info->models_map[this->get_id()] = model;
 
     for (it = this->population_ids->begin(); it != this->population_ids->end();
-         ++it) {
+         ++it)
+    {
       std::shared_ptr<PopulationInterface> population =
           std::dynamic_pointer_cast<PopulationInterface>(
               PopulationInterfaceBase::live_objects[(*it)]);
@@ -889,13 +964,15 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           &(derived_quantities["numbers_at_age"]);
 
       for (fleet_ids_iterator fit = population->fleet_ids->begin();
-           fit != population->fleet_ids->end(); ++fit) {
+           fit != population->fleet_ids->end(); ++fit)
+      {
         fleet_ids.insert(*fit);
       }
     }
 
     for (fleet_ids_iterator it = fleet_ids.begin(); it != fleet_ids.end();
-         ++it) {
+         ++it)
+    {
       std::shared_ptr<FleetInterface> fleet_interface =
           std::dynamic_pointer_cast<FleetInterface>(
               FleetInterfaceBase::live_objects[(*it)]);
@@ -968,7 +1045,14 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       derived_quantities["lengthcomp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
 
-      if (fleet_interface->nlengths.get() > 0) {
+      derived_quantities["selectivity_at_age"] = fims::Vector<Type>(
+          fleet_interface->nages.get());
+
+      derived_quantities["selectivity_at_length"] = fims::Vector<Type>(
+          fleet_interface->nlengths.get());
+
+      if (fleet_interface->nlengths.get() > 0)
+      {
         derived_quantities["age_to_length_conversion"] = fims::Vector<Type>(
             fleet_interface->nyears.get() * fleet_interface->nlengths.get());
       }
@@ -983,7 +1067,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           &(derived_quantities["agecomp_proportion"]);
       info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
           &(derived_quantities["lengthcomp_expected"]);
-      if (fleet_interface->nlengths.get() > 0) {
+
+      if (fleet_interface->nlengths.get() > 0)
+      {
         info->variable_map[fleet_interface->age_to_length_conversion.id_m] =
             &(derived_quantities["age_to_length_conversion"]);
       }
@@ -996,7 +1082,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     return true;
   }
 
-  virtual bool add_to_fims_tmb() {
+  virtual bool add_to_fims_tmb()
+  {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
 #ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();

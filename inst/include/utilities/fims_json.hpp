@@ -48,6 +48,8 @@ enum JsonValueType {
  */
 class JsonValue {
  public:
+ static std::string NaN_Representation;
+
   /** Default constructor, initializes to Null value. */
   JsonValue() : type(JsonValueType::Null) {}
 
@@ -98,6 +100,8 @@ class JsonValue {
   JsonObject object;  /**< JSON object. */
   JsonArray array;    /**< JSON array. */
 };
+
+std::string JsonValue::NaN_Representation = "-999"; /**< Default representation for NaN in JSON. */
 
 /**
  * Parses JSON strings and generates JSON values.
@@ -180,10 +184,24 @@ class JsonParser {
           break;
       }
     }
+    this->replaceNaN(result);
     return result;
   }
 
  private:
+
+ void replaceNaN(std::string& s) {
+    const std::string target = "NaN";
+    const std::string replacement = JsonValue::NaN_Representation;
+    size_t pos = 0;
+    
+    while ((pos = s.find(target, pos)) != std::string::npos) {
+        s.replace(pos, target.length(), replacement);
+        pos += replacement.length(); // move past the replacement
+    }
+}
+
+
   /** Skip whitespace characters in the input string. */
   void SkipWhitespace();
   /** Parse a JSON value. */
