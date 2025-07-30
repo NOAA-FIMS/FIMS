@@ -84,7 +84,12 @@ prepare_test_data <- function() {
     index_data,
     age_data,
     weightatage_data
-  )
+  ) |>
+    dplyr::mutate(
+      length = NA,
+      .after = "age"
+    ) |>
+    rbind(length_comp_data, length_age_data)
   data_age_length_comp_na <- data_age_length_comp_raw |>
     dplyr::filter(
       !(name == "survey1" & type %in% c("age") & datestart == na_index)
@@ -99,6 +104,20 @@ prepare_test_data <- function() {
   saveRDS(
     data_age_length_comp_na,
     file = testthat::test_path("fixtures", "data_age_length_comp_na.RDS")
+  )
+  
+  # Generate dataset with missing index, length composition, age composition, 
+  # and age-to-length-conversion data for the same year
+  data_index_age_length_comp_na <- data_age_length_comp_raw |>
+    dplyr::filter(
+      !(type %in% c("index", "age", "length", "age-to-length-conversion") & 
+        datestart == length_na_index
+      )
+    )|>
+    FIMS::FIMSFrame()
+  saveRDS(
+    data_index_age_length_comp_na,
+    file = testthat::test_path("fixtures", "data_index_age_length_comp_na.RDS")
   )
 
   # Set up FIMS deterministic and estimation runs results ----
@@ -304,6 +323,11 @@ prepare_test_data <- function() {
   )
 
   ## Estimation run with age and length comp with NAs ----
+  # TODO: add a warning (or error?) in the wrapper function to remind users that the data
+  # need to align with the specified data_distribution. Previously,
+  # fit_age_length_comp_na runs as an age comp only model because the input data
+  # does not contain length comp data and the age-to-length-conversion data,
+  # even though LengthComp was specified in the data_distribution.
   # Load test data with both age and length composition data, which contains missing values
   data_age_length_comp_na <- readRDS(test_path("fixtures", "data_age_length_comp_na.RDS"))
   # Define fleet1 and survey1 specifications
@@ -328,6 +352,19 @@ prepare_test_data <- function() {
     ) |>
     update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
     initialize_fims(data = data_age_length_comp_na) |>
+    fit_fims(optimize = TRUE)
+
+  clear()
+
+  ## Estimation run with index, age and length comp with NAs ----
+  # Load test data with both age and length composition data, which contains missing values
+  data_index_age_length_comp_na <- readRDS(test_path("fixtures", "data_index_age_length_comp_na.RDS"))
+  fit_index_age_length_comp_na <- data_index_age_length_comp_na |>
+    create_default_parameters(
+      fleets = list(fleet1 = fleet1, survey1 = survey1)
+    ) |>
+    update_parameters(modified_parameters = modified_parameters[[iter_id]]) |>
+    initialize_fims(data = data_index_age_length_comp_na) |>
     fit_fims(optimize = TRUE)
 
   clear()
