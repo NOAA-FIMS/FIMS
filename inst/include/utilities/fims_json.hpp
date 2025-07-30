@@ -197,33 +197,33 @@ namespace fims
           break;
         }
       }
-      this->replaceNaN(result);
+      JsonParser::replaceNaN(result);
       return result;
     }
 
-  private:
-    void replaceNaN(std::string &s)
+ 
+    static void replaceNaN(std::string &s)
     {
-      const std::string target = "NaN";
-      const std::string replacement = JsonValue::NaN_Representation;
+      std::string target = "NaN";
+      std::string replacement = JsonValue::NaN_Representation;
       size_t pos = 0;
 
       while ((pos = s.find(target, pos)) != std::string::npos)
       {
-        s.replace(pos, target.length(), replacement);
-        pos += replacement.length(); // move past the replacement
+        s.replace(pos, target.size(), replacement);
+        pos += replacement.size(); // move past the replacement
       }
 
       target = "nan";
-      size_t pos = 0;
+      pos = 0;
 
       while ((pos = s.find(target, pos)) != std::string::npos)
       {
-        s.replace(pos, target.length(), replacement);
-        pos += replacement.length(); // move past the replacement
+        s.replace(pos, target.size(), replacement);
+        pos += replacement.size(); // move past the replacement
       }
     }
-
+ private:
     /** Skip whitespace characters in the input string. */
     void SkipWhitespace();
     /** Parse a JSON value. */

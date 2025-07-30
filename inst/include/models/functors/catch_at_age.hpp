@@ -909,6 +909,7 @@ namespace fims_popdy
           }
         }
       }
+    }
 
       /**
        * @brief Calculate the index for a population.
