@@ -1209,8 +1209,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
      code for initial structure and recruitment 0 loops. Could also have started
      loops at 1 with initial structure and recruitment setup outside the loops.
 
-     year loop is extended to <= nyears because SSB is calculated as the start of
-     the year value and by extending one extra year we get estimates of the
+     year loop is extended to <= nyears because SSB is calculated as the start
+     of the year value and by extending one extra year we get estimates of the
      population structure at the end of the final year. An alternative approach
      would be to keep initial numbers at age in it's own vector and each year to
      include the population structure at the end of the year. This is likely a
