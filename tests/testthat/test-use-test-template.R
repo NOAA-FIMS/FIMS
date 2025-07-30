@@ -65,7 +65,7 @@ test_that("use_gtest_template() works with correct inputs", {
   suppressMessages(FIMS:::use_gtest_template(
     name = "FIMSMath_ClassName_FunctionName"
   ))
-  
+
   # Search for the expected lines in the CMakeLists.txt file
   first_entry <- grepl(
     "test_FIMSMath_ClassName_Logistic.cpp",
@@ -77,7 +77,7 @@ test_that("use_gtest_template() works with correct inputs", {
   )
   #' @description Test that use_gtest_template() appends the correct lines to
   #' CMakeLists.txt when an additional test is added rather than writing over
-  #' it. 
+  #' it.
   expect_true(any(first_entry))
   expect_true(any(second_entry))
   #' @description Test that use_gtest_template() appends the new test after the
