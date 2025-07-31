@@ -76,13 +76,10 @@ inline const Type lgamma(const Type &x) {
  */
 template <class Type>
 inline const Type exp(const Type &x) {
-  using ::exp;
+  // using std::exp brings std::exp into scope for Argument-Dependent lookup.
+  // This will use std::exp for double type but then look for TMB version of exp if AD type
+  using std::exp;
   return exp(x);
-}
-
-template <>
-inline const double exp(const double &x) {
-  return std::exp(x);
 }
 
 /**
@@ -95,53 +92,32 @@ inline const double exp(const double &x) {
  */
 template <class Type>
 inline const Type log(const Type &x) {
+  using std::log;
   return log(x);
-}
-
-template <>
-inline const double log(const double &x) {
-  return std::log(x);
 }
 
 template <class Type>
 inline const Type cos(const Type &x) {
+  using std::cos;
   return cos(x);
-}
-
-template <>
-inline const double cos(const double &x) {
-  return std::cos(x);
 }
 
 template <class Type>
 inline const Type sqrt(const Type &x) {
+  using std::sqrt;
   return sqrt(x);
-}
-
-template <>
-inline const double sqrt(const double &x) {
-  return std::sqrt(x);
 }
 
 template <class Type>
 inline const Type pow(const Type &x, const Type &y) {
+  using std::pow;
   return pow(x, y);
-}
-
-template <>
-inline const double pow(const double &x, const double &y) {
-  return std::pow(x, y);
 }
 
 template <class Type>
 inline const Type lgamma(const Type &x) {
-  using ::lgamma;
+  using std::lgamma;
   return lgamma(x);
-}
-
-template <>
-inline const double lgamma(const double &x) {
-  return std::lgamma(x);
 }
 
 #endif
