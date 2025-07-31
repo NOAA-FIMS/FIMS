@@ -66,82 +66,123 @@ inline const Type lgamma(const Type &x) {
 
 #ifdef TMB_MODEL
 
+// Add the following line to CMakeLists.txt to enable documentation of TMB_MODEL
+// in doxygen or none of the following is rendered.
+// set(DOXYGEN_PREDEFINED "TMB_MODEL=1" "ENABLE_TMB_CODE")
+
 /**
- * @brief The exponential function.
- * The code cannot be tested using the compilation flag
- * -DTMB_MODEL through CMake and Google Test
- * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is
- * an integer.
- * @return the exponentiated value
+ * @brief The exponential function for a TMB model. The function specifically
+ * uses std::exp, defined in cmath header, instead of ::exp because the
+ * standard library function works with TMBad library, which is designed to
+ * recognize and apply its automatic differentiation capabilities to functions
+ * from the standard library. Also note that this function cannot be tested
+ * using the compilation flag -DTMB_MODEL through CMake and Google Test.
+ * @param x The value to exponentiate. Please use fims_math::exp<double>(x) if
+ * x is an integer.
+ * @return The exponentiated value of x.
  */
 template <class Type>
 inline const Type exp(const Type &x) {
-  using ::exp;
+  // use std::exp for double type, look for TMB version of exp if AD type
+  using std::exp;
   return exp(x);
 }
 
-template <>
-inline const double exp(const double &x) {
-  return std::exp(x);
-}
-
 /**
- * @brief The natural log function (base e)
- * The code cannot be tested using the compilation flag
- * -DTMB_MODEL through CMake and Google Test.
- * @param x the value to take the log of. Please use fims_math::log<double>(x)
- * if x is an integer.
- * @return The natural log of the value.
+ * @brief The natural log function (base e) for a TMB model. The function
+ * specifically uses std::log, defined in cmath header, instead of ::log
+ * because the standard library function works with TMBad library, which is
+ * designed to recognize and apply its automatic differentiation capabilities
+ * to functions from the standard library. Also note that this function cannot
+ * be tested using the compilation flag -DTMB_MODEL through CMake and Google
+ * Test.
+ * @param x The value to log. Please use fims_math::log<double>(x) if x is an
+ * integer.
+ * @return The natural log of x.
  */
 template <class Type>
 inline const Type log(const Type &x) {
+  // use std::log for double type, look for TMB version of log if AD type
+  using std::log;
   return log(x);
 }
 
-template <>
-inline const double log(const double &x) {
-  return std::log(x);
-}
-
+/**
+ * @brief The cosine of an angle function for a TMB model. The function
+ * specifically uses std::cos, defined in cmath header, instead of ::cos
+ * because the standard library function works with TMBad library, which is
+ * designed to recognize and apply its automatic differentiation capabilities
+ * to functions from the standard library. Also note that this function cannot
+ * be tested using the compilation flag -DTMB_MODEL through CMake and Google
+ * Test.
+ * @param x The value to take the cosine of. Please use
+ * fims_math::cos<double>(x) if x is an integer.
+ * @return The cosine of the angle x.
+ */
 template <class Type>
 inline const Type cos(const Type &x) {
+  // use std::cos for double type, look for TMB version of cos if AD type
+  using std::cos;
   return cos(x);
 }
 
-template <>
-inline const double cos(const double &x) {
-  return std::cos(x);
-}
-
+/**
+ * @brief The square root function for a TMB model. The function specifically
+ * uses std::sqrt, defined in cmath header, instead of ::sqrt because the
+ * standard library function works with TMBad library, which is designed to
+ * recognize and apply its automatic differentiation capabilities to functions
+ * from the standard library. Also note that this function cannot be tested
+ * using the compilation flag -DTMB_MODEL through CMake and Google Test.
+ * @param x The value to take the square root of. Please use
+ * fims_math::sqrt<double>(x) if x is an integer.
+ * @return The square root of x.
+ */
 template <class Type>
 inline const Type sqrt(const Type &x) {
+  // use std::std for double type, look for TMB version of std if AD type
+  using std::sqrt;
   return sqrt(x);
 }
 
-template <>
-inline const double sqrt(const double &x) {
-  return std::sqrt(x);
-}
-
+/**
+ * @brief The power function for a TMB model. The function specifically uses
+ * std::pow, defined in cmath header, instead of ::pow because the standard
+ * library function works with TMBad library, which is designed to recognize
+ * and apply its automatic differentiation capabilities to functions from the
+ * standard library. Also note that this function cannot be tested using the
+ * compilation flag -DTMB_MODEL through CMake and Google Test.
+ * @param x The value to take the power of. Please use
+ * fims_math::pow<double>(x) if x is an integer.
+ * @param y The exponent to raise x to.
+ * @return The power of x.
+ */
 template <class Type>
 inline const Type pow(const Type &x, const Type &y) {
+  // use std::pow for double type, look for TMB version of pow if AD type
+  using std::pow;
   return pow(x, y);
 }
 
-template <>
-inline const double pow(const double &x, const double &y) {
-  return std::pow(x, y);
-}
-
+/**
+ * @brief Computes the natural logarithm of the absolute value of the [gamma
+ * function](https://en.wikipedia.org/wiki/Gamma_function) of x for a TMB
+ * model. The function specifically uses std::lgamma, defined in cmath header,
+ * instead of ::lgamma because the standard library function works with TMBad
+ * library, which is designed to recognize and apply its automatic
+ * differentiation capabilities to functions from the standard library. Also
+ * note that this function cannot be tested using the compilation flag
+ * -DTMB_MODEL through CMake and Google Test.
+ * @param x The value to take the natural logarithm of the absolute value of
+ * the gamma function of. Please use fims_math::lgamma<double>(x) if x is an
+ * integer.
+ * @return The natural logarithm of the absolute value of the gamma function of
+ * x.
+ */
 template <class Type>
 inline const Type lgamma(const Type &x) {
-  using ::lgamma;
+  // use std::lgamma for double type, look for TMB version of lgamma if AD type
+  using std::lgamma;
   return lgamma(x);
-}
-
-template <>
-inline const double lgamma(const double &x) {
-  return std::lgamma(x);
 }
 
 #endif
