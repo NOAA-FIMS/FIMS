@@ -32,7 +32,7 @@ test_that("rcpp fleet works with correct inputs", {
   expect_silent(fleet2$SetSelectivityAgeID(selectivity_fleet2$get_id()))
 
   expect_silent(fleet1$SetSelectivityAgeID(1))
-  expect_equal(fleet1$GetSelectivityID(), 1)
+  expect_equal(fleet1$GetSelectivityAgeID(), 1)
   # expect_equal(fleet1$GetSelectivityUnits(), "age")
 
   expect_silent(fleet1$SetSelectivityLengthID(2))

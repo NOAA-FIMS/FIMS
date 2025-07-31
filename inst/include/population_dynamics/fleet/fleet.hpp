@@ -429,6 +429,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       }
         for (size_t l = 0; l < this->nlengths; l++) {
           size_t i_length_year = y * this->nlengths + l;
+          if(sum == 0) {
+            FIMS_WARNING_LOG("Sum of lengthcomp_expected is zero for year " +
+                             std::to_string(y));
+          }
           this->lengthcomp_proportion[i_length_year] =
               this->lengthcomp_expected[i_length_year] / sum;
           // robust_add + robust_sum * this->lengthcomp_expected[i_length_year]
