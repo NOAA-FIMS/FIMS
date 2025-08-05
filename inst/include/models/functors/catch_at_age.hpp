@@ -337,7 +337,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   virtual void Prepare() {
     for (size_t p = 0; p < this->populations.size(); p++) {
-      this->populations[p]->Prepare();
+      //this->populations[p]->Prepare();
 
       auto derived_quantities =
           this->population_derived_quantities[this->populations[p]->GetId()];
@@ -362,10 +362,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
           size_t i_age_year = age * population->nyears + year;
           population->M[i_age_year] =
               fims_math::exp(population->log_M[i_age_year]);
+          // TODO: is this still needed now that derived quantities are filled with ResetVector?
           // mortality_F is a fims::Vector and therefore needs to be filled
           // within a loop
-          derived_quantities["mortality_F"][i_age_year] = 0.0;
-          derived_quantities["weight_at_age"][i_age_year] =
+          // derived_quantities["mortality_F"][i_age_year] = 0.0;
+          derived_quantities["weight_at_age"][age] =
               population->growth->evaluate(population->ages[age]);
         }
       }
@@ -381,6 +382,15 @@ class CatchAtAge : public FisheryModelBase<Type> {
            it++) {
         fims::Vector<Type> &dq = (*it).second;
         this->ResetVector(dq);
+      }
+
+      // Transformation Section
+      for (size_t i = 0; i < fleet->log_q.size(); i++) {
+        fleet->q[i] = fims_math::exp(fleet->log_q[i]);
+      }
+
+      for (size_t year = 0; year < fleet->nyears; year++) {
+        fleet->Fmort[year] = fims_math::exp(fleet->log_Fmort[year]);
       }
 
       for (size_t i_length_age = 0;
