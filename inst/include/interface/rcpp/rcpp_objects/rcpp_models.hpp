@@ -850,7 +850,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           population->nyears.get() * population->nages.get());
 
       derived_quantities["weight_at_age"] = fims::Vector<Type>(
-          population->nyears.get() * population->nages.get());
+          population->nages.get();
 
       derived_quantities["numbers_at_age"] = fims::Vector<Type>(
           (population->nyears.get() + 1) * population->nages.get());
