@@ -20,7 +20,6 @@ namespace fims_popdy {
 template <typename Type>
 struct PellaTomlinsonDepletion : public DepletionBase<Type> {
     fims::Vector<Type> log_r; /**< Instrinsic growth rate. */
-    fims::Vector<Type> log_K; /**< Carrying capacity of the population. */
     fims::Vector<Type> log_m; /**< Shape parameter that adjusts the curvature of the growth function */
 
     PellaTomlinsonDepletion() : DepletionBase<Type>()

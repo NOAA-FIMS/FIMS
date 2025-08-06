@@ -39,6 +39,11 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    *
    */
   SharedBoolean initialize_catch_at_age;
+   /**
+   * @brief Initialize the surplus production model.
+   *
+   */
+  SharedBoolean initialize_surplus_production;
   /**
    * @brief The constructor.
    */
@@ -138,6 +143,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   ParameterVector log_init_naa;
   /**
+   * @brief The natural log of the initial depletion.
+   */
+  ParameterVector log_init_depletion;
+  /**
    * @brief Numbers at age.
    */
   ParameterVector numbers_at_age;
@@ -204,6 +213,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         depletion_id(other.depletion_id),
         log_M(other.log_M),
         log_init_naa(other.log_init_naa),
+        log_init_depletion(other.log_init_depletion),
         numbers_at_age(other.numbers_at_age),
         ages(other.ages),
         derived_ssb(other.derived_ssb),
@@ -273,6 +283,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * the Information object.
    */
   virtual void finalize() {
+    //TODO: add log_init_depletion to finalize
     if (this->finalized) {
       // log warning that finalize has been called more than once.
       FIMS_WARNING_LOG("Population " + fims::to_string(this->id) +
@@ -375,6 +386,12 @@ class PopulationInterface : public PopulationInterfaceBase {
     ss << "  \"type\": \"vector\",\n";
     ss << "  \"values\":" << this->log_init_naa << " \n}],\n";
 
+    ss << "{\n";
+    ss << "  \"name\": \"log_init_depletion\",\n";
+    ss << "  \"id\":" << this->log_init_depletion.id_m << ",\n";
+    ss << "  \"type\": \"vector\",\n";
+    ss << "  \"values\":" << this->log_init_depletion << " \n}],\n";
+
     ss << " \"derived_quantities\": [{\n";
     ss << "  \"name\": \"SSB\",\n";
     ss << "  \"values\":[";
@@ -468,6 +485,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->maturity_id = this->maturity_id.get();
     population->log_M.resize(this->log_M.size());
     population->log_init_naa.resize(this->log_init_naa.size());
+    population->log_init_depletion.resize(this->log_init_depletion.size());
     for (size_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].initial_value_m;
       if (this->log_M[i].estimation_type_m.get() == "fixed_effects") {
@@ -503,6 +521,26 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
+
+    for (size_t i = 0; i < log_init_depletion.size(); i++) {
+      population->log_init_depletion[i] = this->log_init_depletion[i].initial_value_m;
+      if (this->log_init_depletion[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".log_init_depletion."
+           << this->log_init_depletion[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(population->log_init_depletion[i]);
+      }
+      if (this->log_init_depletion[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".log_init_depletion."
+           << this->log_init_depletion[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(population->log_init_depletion[i]);
+      }
+    }
+    info->variable_map[this->log_init_depletion.id_m] = &(population)->log_init_depletion;
+
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }

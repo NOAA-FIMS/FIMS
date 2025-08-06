@@ -31,6 +31,7 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
       id_g; /**< The ID of the instance of the DepletionBase class */
   fims::Vector<Type> log_depletion; /**< Natural log of the depletion used for random effects. */
   fims::Vector<Type> log_expected_depletion; /**< Expectation of the depletion process. */
+  fims::Vector<Type> log_K; /**< Carrying capacity of the population. */
   /** @brief Constructor.
    */
   DepletionBase() {
