@@ -1,1 +1,0 @@
-LogNormalLPDF constructor called.
