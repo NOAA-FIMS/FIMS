@@ -5,4 +5,4 @@
 # Save the current verbosity setting
 option_verbosity <- getOption("rlib_message_verbosity")
 # Set verbosity to quiet for testing
-options(rlib_message_verbosity = "quiet")
+#options(rlib_message_verbosity = "quiet")

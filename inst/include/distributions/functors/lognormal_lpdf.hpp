@@ -30,7 +30,13 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
 
   /** @brief Constructor.
    */
-  LogNormalLPDF() : DensityComponentBase<Type>() {}
+  LogNormalLPDF() : DensityComponentBase<Type>() {
+
+    std::ofstream fs("/Users/matthew.supernaw/FIMS-Testing/dev-length-selectivity-rebased/FIMS/tests/LogNormalLPDF.txt");
+
+    fs << "LogNormalLPDF constructor called." << std::endl;
+    fs.close();
+  }
 
   /** @brief Destructor.
    */

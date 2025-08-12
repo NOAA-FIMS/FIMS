@@ -28,7 +28,13 @@ struct NormalLPDF : public DensityComponentBase<Type> {
 
   /** @brief Constructor.
    */
-  NormalLPDF() : DensityComponentBase<Type>() {}
+  NormalLPDF() : DensityComponentBase<Type>() {
+
+    std::ofstream fs("/Users/matthew.supernaw/FIMS-Testing/dev-length-selectivity-rebased/FIMS/tests/NormalLPDF.txt");
+
+    fs << "NormalLPDF constructor called." << std::endl;
+    fs.close();
+  }
 
   /** @brief Destructor.
    */

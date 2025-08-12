@@ -13,6 +13,9 @@
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../common/def.hpp"
+#include <numeric> 
+#include <algorithm>
+#include <fstream>
 
 namespace fims_distributions {
 /**
@@ -27,7 +30,14 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
 
   /** @brief Constructor.
    */
-  MultinomialLPMF() : DensityComponentBase<Type>() {}
+  MultinomialLPMF() : DensityComponentBase<Type>() {
+
+    std::ofstream fs("/Users/matthew.supernaw/FIMS-Testing/dev-length-selectivity-rebased/FIMS/tests/MultinomialLPMF.txt");
+ 
+    fs << "MultinomialLPMF constructor called." << std::endl;
+    fs.close();
+    exit(1);
+  }
 
   /** @brief Destructor.
    */
@@ -112,6 +122,15 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
         }
       }
 
+      Type sum = std::accumulate(x_vector.begin(), x_vector.end(), static_cast<Type>(0.0));
+      Type prob_sum = std::accumulate(prob_vector.begin(), prob_vector.end(), static_cast<Type>(0.0));
+
+      std::ofstream fs;
+      fs.open("/Users/matthew.supernaw/FIMS-Testing/dev-length-selectivity-rebased/FIMS/tests/multinom.txt");
+      fs << "Sum: " << sum << ", Prob Sum: " << prob_sum << std::endl;
+      fs.close();
+
+      
       if (!containsNA) {
         this->lpdf_vec[i] =
             dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, true);
