@@ -3,8 +3,9 @@
 #' Necessary tests include input and output (IO) correctness [IO
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
-#' information. Every test should have a @description tag that takes up just
-#' one line, which will be used in the bookdown report of {testthat} results.
+#' information. Every test should have a @description tag, which can span
+#' multiple lines, that will be used in the bookdown report of the results from
+#' {testthat}.
 
 # fims_frame ----
 ## Setup ----
@@ -68,7 +69,7 @@ test_that("fims_frame() works with the correct inputs", {
 
   #' @description Test that the `show()` method works as expected on a FIMSFrame
   #' object.
-  expect_output(show(fims_frame))
+  expect_output(suppressMessages(show(fims_frame)))
 })
 
 ## Edge handling ----

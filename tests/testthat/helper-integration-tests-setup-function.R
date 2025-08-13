@@ -13,7 +13,7 @@
 #' @param p A numeric non-negative vector of length K, specifying the probability
 #' for the K classes; must sum 1.
 #'
-#' @return The log of the probability mass function for the multinomal.
+#' @return The log of the probability mass function for the multinomial.
 FIMS_dmultinom <- function(x, p) {
   xp1 <- x + 1
   log_pmf <- lgamma(sum(x) + 1) - sum(lgamma(xp1)) + sum(x * log(p))
@@ -271,10 +271,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
   # TODO: Check that the dimensions of the matrix of age_to_length_conversion matrix
   #       is rows = length() and columns = length()
-  # TODO: Fix code below to not use 1:x and instead use seq_along() where this
-  #       doesn't currently break because we are only testing models with both
-  #       age and length data but it would break for only age data.
-  for (i in 1:length(em_input[["age_to_length_conversion"]])) {
+  for (i in seq_along(em_input[["age_to_length_conversion"]])) {
     # Transposing the below will have NO impact on the results if the object is
     # already a vector. Additionally, c() ensures that the result is a vector
     # to be consistent but a matrix would be okay.
@@ -445,7 +442,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
-    silent = FALSE, map = map, random = "re"
+    silent = TRUE, map = map, random = "re"
   )
 
   # Optimization with nlminb
@@ -459,6 +456,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Call report using MLE parameter values, or
   # the initial values if optimization is skipped
   report <- obj[["report"]](obj[["env"]][["last.par.best"]])
+
 
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
@@ -582,6 +580,20 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
     update_parameters(
       modified_parameters = modified_parameters[[iter_id]]
     )
+
+  # The model will not always run when log_q is very small.
+  # We will need to make sure log_q is the true value for deterministic runs but
+  # then reset to log(1.0) for estimation runs.
+  if (estimation_mode == TRUE) {
+    parameters <- parameters |>
+      update_parameters(
+        modified_parameters = list(
+          survey1 = list(
+            Fleet.log_q.value = log(1.0)
+          )
+        )
+      )
+  }
 
   parameter_list <- initialize_fims(
     parameters = parameters,

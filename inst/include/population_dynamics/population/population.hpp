@@ -64,9 +64,9 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       biomass; /*!< Derived quantity: total population biomass in each year*/
   fims::Vector<Type> spawning_biomass; /*!< Derived quantity: Spawning_biomass*/
-  fims::Vector<Type> unfished_biomass; /*!< Derived quanity
+  fims::Vector<Type> unfished_biomass; /*!< Derived quantity
                                   biomass assuming unfished*/
-  fims::Vector<Type> unfished_spawning_biomass; /*!< Derived quanity Spawning
+  fims::Vector<Type> unfished_spawning_biomass; /*!< Derived quantity Spawning
                                            biomass assuming unfished*/
   fims::Vector<Type> proportion_mature_at_age; /*!< Derived quantity: Proportion
                                           mature at age */
@@ -529,14 +529,14 @@ struct Population : public fims_model_object::FIMSObject<Type> {
      code for initial structure and recruitment 0 loops. Could also have started
      loops at 1 with initial structure and recruitment setup outside the loops.
 
-     year loop is extended to <= nyears because SSB is calculted as the start of
-     the year value and by extending one extra year we get estimates of the
+     year loop is extended to <= nyears because SSB is calculated as the start
+     of the year value and by extending one extra year we get estimates of the
      population structure at the end of the final year. An alternative approach
      would be to keep initial numbers at age in it's own vector and each year to
      include the population structure at the end of the year. This is likely a
      null point given that we are planning to modify to an event/stanza based
-     structure in later milestones which will elimitate this confusion by
-     explicity referencing the exact date (or period of averaging) at which any
+     structure in later milestones which will eliminate this confusion by
+     explicitly referencing the exact date (or period of averaging) at which any
      calculation or output is being made.
      */
     for (size_t y = 0; y <= this->nyears; y++) {

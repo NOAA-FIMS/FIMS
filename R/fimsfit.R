@@ -22,11 +22,6 @@ utils::globalVariables(c(
 # TODO: Fix "no metadata object found to revise superClass" in sdreportOrList
 # TODO: Write more validity checks for FIMSFit
 # TODO: Better document the return of [get_estimates()], i.e., columns
-# TODO: Decide if the error from is.FIMSFits should be a single FALSE or stop
-# TODO: Decide if "total" should be a part of number_of_parameters because it
-#       can be calculated from fixed_effects + random_effects and would need to
-#       be calculated in print.FITFims()
-# TODO: Determine if report should always use last.par.best
 # TODO: Make a helper function to add lower and upper CI for users in estimates
 
 # methods::setClass: ----
@@ -95,6 +90,12 @@ methods::setMethod(
       x@number_of_parameters,
       sep = "="
     )
+    total_parameters <- sum(x@number_of_parameters)
+    all_parameters_info <- c(number_of_parameters, paste(
+      "total",
+      total_parameters,
+      sep = "="
+    ))
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
     terminal_ssb <- sapply(
       x@report[["ssb"]],
@@ -103,7 +104,7 @@ methods::setMethod(
     cli::cli_inform(c(
       "i" = "FIMS model version: {.val {x@version}}",
       "i" = "Total run time was {.val {rt}} {ru}",
-      "i" = "Number of parameters: {number_of_parameters}",
+      "i" = "Number of parameters: {all_parameters_info}",
       "i" = "Maximum gradient= {.val {x@max_gradient}}",
       "i" = "Negative log likelihood (NLL):",
       "*" = "Marginal NLL= {.val {x@opt$objective}}",
@@ -343,21 +344,6 @@ is.FIMSFit <- function(x) {
   inherits(x, "FIMSFit")
 }
 
-#' Check if an object is a list of FIMSFit objects
-#'
-#' @param x List of fits returned from multiple calls to [fit_fims()].
-#' @keywords fit_fims
-#' @export
-is.FIMSFits <- function(x) {
-  if (!is.list(x)) {
-    cli::cli_warn(
-      message = c("x" = "{.par x} is not a list -- something went wrong.")
-    )
-    return(FALSE)
-  }
-  all(sapply(x, function(i) inherits(i, "FIMSFit")))
-}
-
 # Constructors ----
 
 #' Class constructors for class `FIMSFit` and associated child classes
@@ -431,7 +417,6 @@ FIMSFit <- function(
   n_fixed_effects <- length(obj[["par"]])
   n_random_effects <- length(obj[["env"]][["parList()"]][["re"]])
   number_of_parameters <- c(
-    total = n_total,
     fixed_effects = n_fixed_effects,
     random_effects = n_random_effects
   )
@@ -712,6 +697,13 @@ fit_fims <- function(input,
                        trace = 0
                      ),
                      filename = NULL) {
+  # See issue 455 of sdmTMB to see what should be used.
+  # https://github.com/pbs-assess/sdmTMB/issues/455
+  # NOTE: When we add implementation for newton step we need to
+  # review the above github issue to make sure we maintain continuity
+  # between outputs as last.par may not equal last.par.best due to
+  # the smallest newton gradient solution not matching the smallest
+  # likelihood value. This can cause sanity issues in output reporting.
   if (number_of_newton_steps > 0) {
     cli::cli_abort("Newton steps not implemented yet.")
   }

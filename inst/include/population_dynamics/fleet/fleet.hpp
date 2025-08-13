@@ -128,7 +128,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   virtual ~Fleet() {}
 
   /**
-   * @brief Intialize Fleet Class
+   * @brief Initialize Fleet Class
    * @param nyears The number of years in the model.
    * @param nages The number of ages in the model.
    * @param nlengths The number of lengths in the model.
@@ -246,7 +246,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     for (size_t y = 0; y < this->nyears; y++) {
       Type sum = static_cast<Type>(0.0);
       Type sum_obs = static_cast<Type>(0.0);
-      // robust_add is a small value to add to expected compostion
+      // robust_add is a small value to add to expected composition
       // proportions at age to stabilize likelihood calculations
       // when the expected proportions are close to zero.
       // Type robust_add = static_cast<Type>(0.0); // zeroed out before testing
@@ -261,7 +261,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         // should be calculated from the retained landings or
         // the total population. These values are slightly different.
         // In the future this will have more impact as we implement
-        // timing rather than everything occuring at the start of
+        // timing rather than everything occurring at the start of
         // the year.
         if (this->fleet_observed_landings_data_id_m == -999) {
           this->agecomp_expected[i_age_year] =
@@ -309,7 +309,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       for (size_t y = 0; y < this->nyears; y++) {
         Type sum = static_cast<Type>(0.0);
         Type sum_obs = static_cast<Type>(0.0);
-        // robust_add is a small value to add to expected compostion
+        // robust_add is a small value to add to expected composition
         // proportions at age to stabilize likelihood calculations
         // when the expected proportions are close to zero.
         // Type robust_add = static_cast<Type>(0.0); // 0.0001; zeroed out

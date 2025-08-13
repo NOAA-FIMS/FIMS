@@ -3,8 +3,9 @@
 #' Necessary tests include input and output (IO) correctness [IO
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
-#' information. Every test should have a @description tag that takes up just
-#' one line, which will be used in the bookdown report of {testthat} results.
+#' information. Every test should have a @description tag, which can span
+#' multiple lines, that will be used in the bookdown report of the results from
+#' {testthat}.
 
 # Deterministic test ----
 ## Setup ----
@@ -47,9 +48,9 @@ test_that("deterministic run returns correct nlls", {
   )
 
   test_that("deterministic run results correct number of parameters and random effects", {
-    #' @description Veryify the number of parameters are correct
+    #' @description Verify the number of parameters are correct
     expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 77)
-    #' @description Veryify the number of random effects are correct
+    #' @description Verify the number of random effects are correct
     expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 0)
   })
 })

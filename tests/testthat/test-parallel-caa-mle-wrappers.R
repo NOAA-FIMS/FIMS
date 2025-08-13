@@ -3,8 +3,9 @@
 #' Necessary tests include input and output (IO) correctness [IO
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
-#' information. Every test should have a @description tag that takes up just
-#' one line, which will be used in the bookdown report of {testthat} results.
+#' information. Every test should have a @description tag, which can span
+#' multiple lines, that will be used in the bookdown report of the results from
+#' {testthat}.
 
 # Run FIMS in serial and parallel ----
 # This test demonstrates how to run the FIMS model in both serial and parallel
@@ -47,7 +48,7 @@ for (i in 1:sim_num) {
     survey1 = list(
       LogisticSelectivity.inflection_point.value = 1.5,
       LogisticSelectivity.slope.value = 2,
-      Fleet.log_q.value = log(om_output_list[[i]][["survey_q"]][["survey1"]])
+      Fleet.log_q.value = log(1.0)
     ),
     recruitment = list(
       BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[i]][["R0"]]),

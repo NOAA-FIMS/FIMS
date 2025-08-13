@@ -3,8 +3,9 @@
 #' Necessary tests include input and output (IO) correctness [IO
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
-#' information. Every test should have a @description tag that takes up just
-#' one line, which will be used in the bookdown report of {testthat} results.
+#' information. Every test should have a @description tag, which can span
+#' multiple lines, that will be used in the bookdown report of the results from
+#' {testthat}.
 
 # FIMSFit ----
 ## Setup ----
@@ -23,11 +24,6 @@ test_that("is.FIMSFit() works with correct inputs", {
   #' @description Test that is.FIMSFit(fit_age_length_comp) returns TRUE.
   expect_true(
     object = is.FIMSFit(fit_age_length_comp)
-  )
-
-  #' @description Test that is.FIMSFits(fit_list) returns TRUE.
-  expect_true(
-    object = is.FIMSFits(fit_list)
   )
 
   #' @description Test that as.list(fit_age_length_comp) returns a nested list.
@@ -72,11 +68,4 @@ test_that("is.FIMSFit() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-test_that("is.FIMSFits() returns correct error messages", {
-  #' @description Test that is.FIMSFits(fit_age_length_comp) returns expected
-  #' error.
-  expect_warning(
-    object = is.FIMSFits(fit_age_length_comp),
-    regexp = "x is not a list -- something went wrong."
-  )
-})
+# No built-in errors to test.

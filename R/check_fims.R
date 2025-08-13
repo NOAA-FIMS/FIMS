@@ -66,8 +66,7 @@ setup_gtest <- function() {
 #' @keywords developer
 #' @examples
 #' \dontrun{
-#' # TODO: add examples of strings passed to `...`
-#' setup_and_run_gtest()
+#' setup_and_run_gtest("--rerun-failed --output-on-failure")
 #' }
 setup_and_run_gtest <- function(...) {
   setup_gtest()

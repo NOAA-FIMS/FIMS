@@ -3,8 +3,9 @@
 #' Necessary tests include input and output (IO) correctness [IO
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
-#' information. Every test should have a @description tag that takes up just
-#' one line, which will be used in the bookdown report of {testthat} results.
+#' information. Every test should have a @description tag, which can span
+#' multiple lines, that will be used in the bookdown report of the results from
+#' {testthat}.
 
 # get_number_of_parameters ----
 ## Setup ----
@@ -30,7 +31,6 @@ test_that("get_number_of_parameters() works with correct inputs", {
     expected_n_random_effects <- length(fit_data@obj[["env"]][["parList()"]][["re"]])
     number_of_parameters <- get_number_of_parameters(fit_data)
     expected_vector <- c(
-      total = expected_n_total,
       fixed_effects = expected_n_fixed_effects,
       random_effects = expected_n_random_effects
     )

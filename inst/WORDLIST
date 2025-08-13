@@ -1,6 +1,8 @@
 Arith
 Beverton
 BevertonHoltRecruitment
+CMake
+CMakeLists
 CMD
 CppAD
 CPUE
@@ -11,6 +13,7 @@ EWAAgrowth
 FIMSFit
 FIMSFrame
 Fmort
+GoogleTest
 JSON
 Lifecycle
 LogEntry
@@ -36,6 +39,7 @@ cli
 cmake
 codebase
 cov
+cpp
 cv
 cyclomatic
 dateend
@@ -53,6 +57,7 @@ ggplot
 github
 googletest
 grey
+gtest
 hpp
 init
 json

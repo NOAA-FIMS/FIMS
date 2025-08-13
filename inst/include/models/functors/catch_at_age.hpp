@@ -975,7 +975,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       for (size_t y = 0; y < fleet->nyears; y++) {
         Type sum = static_cast<Type>(0.0);
         Type sum_obs = static_cast<Type>(0.0);
-        // robust_add is a small value to add to expected compostion
+        // robust_add is a small value to add to expected composition
         // proportions at age to stabilize likelihood calculations
         // when the expected proportions are close to zero.
         // Type robust_add = static_cast<Type>(0.0); // zeroed out before
@@ -989,7 +989,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           // should be calculated from the retained landings or
           // the total population. These values are slightly different.
           // In the future this will have more impact as we implement
-          // timing rather than everything occuring at the start of
+          // timing rather than everything occurring at the start of
           // the year.
           if (fleet->fleet_observed_landings_data_id_m == -999) {
             this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"]
@@ -1056,7 +1056,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         for (size_t y = 0; y < fleet->nyears; y++) {
           Type sum = static_cast<Type>(0.0);
           Type sum_obs = static_cast<Type>(0.0);
-          // robust_add is a small value to add to expected compostion
+          // robust_add is a small value to add to expected composition
           // proportions at age to stabilize likelihood calculations
           // when the expected proportions are close to zero.
           // Type robust_add = static_cast<Type>(0.0); // 0.0001; zeroed out
@@ -1209,14 +1209,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
      code for initial structure and recruitment 0 loops. Could also have started
      loops at 1 with initial structure and recruitment setup outside the loops.
 
-     year loop is extended to <= nyears because SSB is calculted as the start of
-     the year value and by extending one extra year we get estimates of the
+     year loop is extended to <= nyears because SSB is calculated as the start
+     of the year value and by extending one extra year we get estimates of the
      population structure at the end of the final year. An alternative approach
      would be to keep initial numbers at age in it's own vector and each year to
      include the population structure at the end of the year. This is likely a
      null point given that we are planning to modify to an event/stanza based
-     structure in later milestones which will elimitate this confusion by
-     explicity referencing the exact date (or period of averaging) at which any
+     structure in later milestones which will eliminate this confusion by
+     explicitly referencing the exact date (or period of averaging) at which any
      calculation or output is being made.
      */
     for (size_t p = 0; p < this->populations.size(); p++) {
