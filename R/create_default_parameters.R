@@ -166,7 +166,8 @@ create_default_parameters <- function(
     recruitment_temp,
     maturity_temp,
     population_temp
-  )
+  ) |>
+    tidyr::nest(detail = c(age:distribution))
 }
 
 #' Create default parameters for a FIMS model
@@ -270,13 +271,13 @@ create_default_Population <- function(data, log_rzero) {
 #' A list containing the default logistic parameters, with inflection_point and
 #' slope values and their estimation status.
 #' @noRd
-create_default_Logistic <- function(module_name = NA_character_) {
+create_default_Logistic <- function(current_module_name = NA_character_) {
 
   # Create a template for default parameters
   default <- create_default_parameters_template(n_parameters = 2) |>
     # Add the module type, label, value, and estimation type
     dplyr::mutate(
-      module_name = module_name,
+      module_name = current_module_name,
       module_type = "Logistic",
       label = c("inflection_point", "slope"),
       value = c(2, 1),
@@ -295,10 +296,10 @@ create_default_Logistic <- function(module_name = NA_character_) {
 #' inflection_point_asc, slope_asc, inflection_point_desc, and slope_desc
 #' values and their estimation status.
 #' @noRd
-create_default_DoubleLogistic <- function(module_name) {
+create_default_DoubleLogistic <- function(current_module_name = NA_character_) {
   default <- create_default_parameters_template(n_parameters = 4) |>
     dplyr::mutate(
-      module_name = module_name,
+      module_name = current_module_name,
       module_type = "DoubleLogistic",
       label = c("inflection_point_asc", "slope_asc", "inflection_point_desc", "slope_desc"),
       # TODO: Determine if inflection_point_desc should really be 4?
@@ -327,8 +328,8 @@ create_default_selectivity <- function(
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
   default <- switch(form,
-    "LogisticSelectivity" = create_default_Logistic(module_name = "Selectivity"),
-    "DoubleLogisticSelectivity" = create_default_DoubleLogistic(module_name = "Selectivity")
+    "LogisticSelectivity" = create_default_Logistic(current_module_name = "Selectivity"),
+    "DoubleLogisticSelectivity" = create_default_DoubleLogistic(current_module_name = "Selectivity")
   )
 }
 
@@ -408,17 +409,17 @@ create_default_fleet <- function(fleets,
 
     index_distribution_default <- switch(index_distribution,
       "DnormDistribution" = create_default_DnormDistribution(
-        module_name = "Data",
-        module_type = "Index",
-        distribution_link = "Index",
+        current_module_name = "Data",
+        current_module_type = "Index",
+        current_distribution_link = "Index",
         value = index_uncertainty,
         input_type = "data",
         data = data
       ),
       "DlnormDistribution" = create_default_DlnormDistribution(
-        module_name = "Data",
-        module_type = "Index",
-        distribution_link = "Index",
+        current_module_name = "Data",
+        current_module_type = "Index",
+        current_distribution_link = "Index",
         value = index_uncertainty,
         input_type = "data",
         data = data
@@ -462,17 +463,17 @@ create_default_fleet <- function(fleets,
 
     landings_distribution_default <- switch(landings_distribution,
       "DnormDistribution" = create_default_DnormDistribution(
-        module_name = "Data",
-        module_type = "Landings",
-        distribution_link = "Landings",
+        current_module_name = "Data",
+        current_module_type = "Landings",
+        current_distribution_link = "Landings",
         value = landings_uncertainty,
         input_type = "data",
         data = data
       ),
       "DlnormDistribution" = create_default_DlnormDistribution(
-        module_name = "Data",
-        module_type = "Landings",
-        distribution_link = "Landings",
+        current_module_name = "Data",
+        current_module_type = "Landings",
+        current_distribution_link = "Landings",
         value = landings_uncertainty,
         input_type = "data",
         data = data
@@ -526,8 +527,12 @@ create_default_maturity <- function(form = c("LogisticMaturity")) {
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
   default <- switch(form,
-    "LogisticMaturity" = create_default_Logistic(module_name = "Maturity")
-  )
+    "LogisticMaturity" = create_default_Logistic(current_module_name = "Maturity")
+  ) |>
+  # We don't have an option to input maturity data into FIMS, so the maturity 
+  # parameters aren't really estimable. The parameters should be constant for now.
+  # See more details from https://github.com/orgs/NOAA-FIMS/discussions/944.
+  dplyr::mutate(estimation_type = "constant")
 }
 
 #' Create default Beverton--Holt recruitment parameters
@@ -620,9 +625,9 @@ create_default_BevertonHoltRecruitment <- function(data) {
 #' A list of default parameters for DnormDistribution.
 #' @noRd
 create_default_DnormDistribution <- function(
-    module_name = NA_character_,
-    module_type = NA_character_,
-    distribution_link = NA_character_,
+    current_module_name = NA_character_,
+    current_module_type = NA_character_,
+    current_distribution_link = NA_character_,
     value = 0.1,
     data,
     input_type = c("data", "process", "prior")) {
@@ -635,9 +640,9 @@ create_default_DnormDistribution <- function(
   ) |>
     # Add the module type and label
     dplyr::mutate(
-      module_name = module_name,
-      module_type = module_type,
-      distribution_link = distribution_link,
+      module_name = current_module_name,
+      module_type = current_module_type,
+      distribution_link = current_distribution_link,
       label = "log_sd",
       value = value,
       estimation_type = "constant",
@@ -656,9 +661,9 @@ create_default_DnormDistribution <- function(
         value = rep(0, get_n_years(data))
       ) |>
       dplyr::mutate(
-        module_name = module_name,
-        module_type = module_type,
-        distribution_link = distribution_link,
+        module_name = current_module_name,
+        module_type = current_module_type,
+        distribution_link = current_distribution_link,
         estimation_type = "constant",
         distribution_type = input_type,
         distribution = "DnormDistribution"
@@ -687,9 +692,9 @@ create_default_DnormDistribution <- function(
 #' A list of default parameters for DlnormDistribution.
 #' @noRd
 create_default_DlnormDistribution <- function(
-    module_name = NA_character_,
-    module_type = NA_character_,
-    distribution_link = NA_character_,
+    current_module_name = NA_character_,
+    current_module_type = NA_character_,
+    current_distribution_link = NA_character_,
     value = 0.1,
     data,
     input_type = c("data", "process")) {
@@ -725,9 +730,9 @@ create_default_DlnormDistribution <- function(
 
   default <- default |>
     dplyr::mutate(
-      module_name = module_name,
-      module_type = module_type,
-      distribution_link = distribution_link,
+      module_name = current_module_name,
+      module_type = current_module_type,
+      distribution_link = current_distribution_link,
       estimation_type = "constant",
       distribution_type = input_type,
       distribution = "DlnormDistribution"
@@ -775,9 +780,9 @@ create_default_recruitment <- function(
   if (!is.null(distribution_input)) {
     distribution_default <- switch(distribution_input,
       "DnormDistribution" = create_default_DnormDistribution(
-        module_name = "Recruitment",
-        module_type = form,
-        distribution_link = names(distribution_input),
+        current_module_name = "Recruitment",
+        current_module_type = "Beverton--Holt",
+        current_distribution_link = names(distribution_input),
         data = data,
         input_type = "process"
       )

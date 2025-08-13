@@ -178,4 +178,5 @@ default_parameters <- data |>
       ),
       growth = list(form = "EWAAgrowth"),
       maturity = list(form = "LogisticMaturity")
-    )
+    ) |>
+    tidyr::unnest(cols = detail)
