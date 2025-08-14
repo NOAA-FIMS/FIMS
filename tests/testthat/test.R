@@ -180,3 +180,16 @@ default_parameters <- data |>
       maturity = list(form = "LogisticMaturity")
     ) |>
     tidyr::unnest(cols = detail)
+
+
+config <- FIMS::use_config_template()
+updated_config <- config |>
+  dplyr::filter(fleet_name == "fleet1") |>
+  dplyr::mutate(fleet_name = "fleet2") |>
+  dplyr::bind_rows(config) |>
+  dplyr::arrange(fleet_name)
+updated_config |> tidyr::unnest(cols = "data")
+
+
+
+  

@@ -131,10 +131,10 @@ create_default_parameters <- function(
   # Create fleet parameters
   fleet_temp <- purrr::map(
     names(fleets),
-    function(current_fleet_name) {
+    function(fleet_name_i) {
       create_default_fleet(
         fleets = fleets,
-        fleet_name = current_fleet_name,
+        current_fleet_name = fleet_name_i,
         data = data
       )
     }
@@ -347,45 +347,45 @@ create_default_selectivity <- function(
 #' A list with default parameters for the fleet.
 #' @noRd
 create_default_fleet <- function(fleets,
-                                 fleet_name,
+                                 current_fleet_name,
                                  data) {
   # Input checks
-  if (length(fleet_name) > 1) {
+  if (length(current_fleet_name) > 1) {
     cli::cli_abort(c(
-      "i" = "{.var fleet_name} should have a length of 1.",
-      "x" = "{.var fleet_name} has a length of {length(fleet_name)}."
+      "i" = "{.var current_fleet_name} should have a length of 1.",
+      "x" = "{.var current_fleet_name} has a length of {length(current_fleet_name)}."
     ))
   }
-  if (!inherits(fleet_name, "character")) {
+  if (!inherits(current_fleet_name, "character")) {
     cli::cli_abort(c(
-      "i" = "{.var fleet_name} should be a string.",
-      "x" = "{.var fleet_name} is a {class(fleet_name)}."
+      "i" = "{.var current_fleet_name} should be a string.",
+      "x" = "{.var current_fleet_name} is a {class(current_fleet_name)}."
     ))
   }
-  if (!fleet_name %in% names(fleets)) {
+  if (!current_fleet_name %in% names(fleets)) {
     cli::cli_abort(c(
-      "i" = "{.var fleet_name} should be present in the names of {.var fleets}.",
-      "x" = "{.var {fleet_name}} is not in {names(fleets)}."
+      "i" = "{.var current_fleet_name} should be present in the names of {.var fleets}.",
+      "x" = "{.var {current_fleet_name}} is not in {names(fleets)}."
     ))
   }
 
   # Create default selectivity parameters
   selectivity_default <- create_default_selectivity(
-    form = fleets[[fleet_name]][["selectivity"]][["form"]]
+    form = fleets[[current_fleet_name]][["selectivity"]][["form"]]
   ) |>
     # Add fleet name 
     dplyr::mutate(
-      fleet_name = fleet_name
+      fleet_name = current_fleet_name
     )
 
   # Get types of data for this fleet from the data object
   data_types_present <- get_data(data) |>
-    dplyr::filter(name == fleet_name) |>
+    dplyr::filter(name == current_fleet_name) |>
     dplyr::pull(type) |>
     unique()
 
   # Get data likelihood distributions assigned for this fleet
-  distribution_names_for_fleet <- names(fleets[[fleet_name]][["data_distribution"]])
+  distribution_names_for_fleet <- names(fleets[[current_fleet_name]][["data_distribution"]])
 
   # Determine default fleet parameters based on types of data present
   if ("index" %in% data_types_present &&
@@ -395,15 +395,15 @@ create_default_fleet <- function(fleets,
         module_name = "Fleet",
         module_type = "Fleet",
         label = "log_q",
-        fleet_name = fleet_name,
+        fleet_name = current_fleet_name,
         value = 0,
         estimation_type = "fixed_effects"
       )
 
-    index_distribution <- fleets[[fleet_name]][["data_distribution"]]["Index"]
+    index_distribution <- fleets[[current_fleet_name]][["data_distribution"]]["Index"]
 
     index_uncertainty <- get_data(data) |>
-      dplyr::filter(name == fleet_name, type %in% c("index")) |>
+      dplyr::filter(name == current_fleet_name, type %in% c("index")) |>
       dplyr::arrange(dplyr::desc(type)) |>
       dplyr::pull(uncertainty)
 
@@ -432,7 +432,7 @@ create_default_fleet <- function(fleets,
         module_name = "Fleet",
         module_type = "Fleet",
         label = "log_q",
-        fleet_name = fleet_name,
+        fleet_name = current_fleet_name,
         value = 0,
         estimation_type = "constant"
       )
@@ -448,16 +448,16 @@ create_default_fleet <- function(fleets,
         module_name = "Fleet",
         module_type = "Fleet",
         label = "log_Fmort",
-        fleet_name = fleet_name,
+        fleet_name = current_fleet_name,
         # TODO: add get_years() to get time info for log_Fmort?
         value = -3,
         estimation_type = "fixed_effects"
       )
 
-    landings_distribution <- fleets[[fleet_name]][["data_distribution"]]["Landings"]
+    landings_distribution <- fleets[[current_fleet_name]][["data_distribution"]]["Landings"]
 
     landings_uncertainty <- get_data(data) |>
-      dplyr::filter(name == fleet_name, type %in% c("landings")) |>
+      dplyr::filter(name == current_fleet_name, type %in% c("landings")) |>
       dplyr::arrange(dplyr::desc(type)) |>
       dplyr::pull(uncertainty)
 
@@ -480,7 +480,7 @@ create_default_fleet <- function(fleets,
       )
     ) |>
       dplyr::mutate(
-        fleet_name = fleet_name
+        fleet_name = current_fleet_name
       )
 
   } else {
@@ -491,7 +491,7 @@ create_default_fleet <- function(fleets,
         module_name = "Fleet",
         module_type = "Fleet",
         label = "log_Fmort",
-        fleet_name = fleet_name,
+        fleet_name = current_fleet_name,
         # TODO: add get_years() to get time info for log_Fmort?
         value = -200,
         estimation_type = "constant"
