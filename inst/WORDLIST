@@ -155,6 +155,7 @@ cstdlib
 cstring
 csv
 ctest
+CTest
 ctime
 cummax
 cumprod
@@ -163,6 +164,7 @@ cv
 cwaa
 cwd
 CXX
+CXXFLAGS
 cyclomatic
 CYGWIN
 dat
@@ -203,6 +205,8 @@ DistributionsInterfaceBase
 DL
 dll
 DllInfo
+dlognorm
+dlognormTest
 dlnorm
 Dlnorm
 DlnormDistribution
@@ -223,10 +227,12 @@ doi
 dontrun
 DoozyX
 DoubleAgeInput
+DoubleInput
 DoubleLogistic
 DoubleLogisticSel
 DoubleLogisticSelectivity
 DoubleLogisticSelectivityInterface
+dox
 doxygen
 dplyr
 dq
@@ -368,6 +374,7 @@ HandlesCorrectInput
 HandlesEdgeCase
 HardwareConcurrency
 holt
+hotfix
 hpp
 hpux
 HPUX
@@ -400,6 +407,7 @@ instantiations
 IntegerAgeInput
 IntegerVector
 IntegrationTest
+IntInput
 inv
 InvLogit
 InvLogitLogit
@@ -491,6 +499,7 @@ MACOS
 maindir
 MakeADFun
 MakeAvailable
+Makevars
 mapply
 MATHJAX
 mathrm
@@ -511,6 +520,7 @@ minimizer
 minimizR
 mkdir
 mkString
+modelTest
 ModularTMBExample
 mort
 mpi
@@ -680,6 +690,7 @@ readLines
 README
 readRDS
 RealVector
+rebasing
 recr
 RecruitmentBase
 RecruitmentDeviations
@@ -720,6 +731,7 @@ roxygenize
 Rscript
 Rslaves
 rstan
+rstream
 RStudio
 ru
 RunModelLoop
@@ -865,8 +877,10 @@ th
 tibble
 tidyr
 tidyselect
+tidyverse
 timediff
 timingfishery
+TLDR
 tmb
 TMB
 TMB's
@@ -928,6 +942,7 @@ Wb
 wd
 wgt
 wikipedia
+withr
 wordlist
 WORDLIST
 WriteAtExit

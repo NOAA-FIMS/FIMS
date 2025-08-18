@@ -5,8 +5,8 @@ home:
   links:
   - text: Documentation of C++ Code
     href: https://noaa-fims.github.io/FIMS-docs/
-  - text: FIMS Developer Handbook
-    href: https://noaa-fims.github.io/collaborative_workflow/
+  - text: FIMS Developer Workflow
+    href: https://noaa-fims.github.io/about/workflow.html
 
 authors:
   FIMS implementation team:
@@ -19,7 +19,6 @@ template:
 articles:
 - title: Fisheries Integrated Modeling System (FIMS)
   contents:
-  - fims-documentation
   - fims-demo
   - fims-demo-minimal
   - fims-logging
@@ -58,5 +57,5 @@ reference:
 
 news:
   releases:
-  - text: "Version 0.1.0"
-    href: https://github.com/NOAA-FIMS/FIMS/releases/tag/v0.1.0
+  - text: "Latest release"
+    href: https://github.com/NOAA-FIMS/FIMS/releases/latest
