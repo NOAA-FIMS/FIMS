@@ -8,7 +8,8 @@ setup_and_run_gtest(...)
 }
 \arguments{
 \item{...}{Additional arguments to \verb{ctest --test-dir build} such as
-\code{"--rerun-failed --output-on-failure"}.}
+\code{"--rerun-failed --output-on-failure"} or \verb{--parallel 16} if you want it to
+run on multiple cores.}
 }
 \description{
 Intended for developers to set up their local environment and run the google

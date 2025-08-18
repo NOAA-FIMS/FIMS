@@ -1,11 +1,39 @@
 {
+    "files.associations": {
+      "*.rmd": "markdown",
+      "*.Rmd": "markdown",
+      "vector": "cpp"
+    },
     "githubPullRequests.ignoredPullRequestBranches": [
         "main"
     ],
+    // Set where the rulers are, needed for Rewrap. 
     "editor.rulers": [
         80
     ],
-    "files.associations": {
-        "vector": "cpp"
-    }
+    // Should the editor suggest inline edits?
+    // "editor.inlineSuggest.enabled": true,
+    // For diffs under version control, should whitespace be ignored?
+    // "diffEditor.ignoreTrimWhitespace": false,
+    // Max number of lines that are printed as output to the terminal?
+    // "terminal.integrated.scrollback": 10000,
+    // Potential R settings
+    // sending R code from the editor to the terminal
+    // "r.alwaysUseActiveTerminal": true,
+    // Needed to send large chunks of code to the r terminal when using radian
+    // "r.bracketedPaste": true,
+    // Needed to use httpgd for plotting in vscode
+    // "r.plot.useHttpgd": true,
+    // path to the r terminal (in this case, radian) for Windows
+    // "r.rterm.windows": "C://Users//my.name//AppData//Local//Programs//Python//Python310//Scripts//radian.exe", 
+    // options for the r terminal
+    // "r.rterm.option": [
+    //     "--no-save",
+    //     "--no-restore",
+    //     "max.print=500"
+    // ],
+    // Setting for whether to allow linting of documents or not
+    // "r.lsp.diagnostics": true,
+    // Potential CMake settings
+    // "cmake.configureOnOpen": true,
 }

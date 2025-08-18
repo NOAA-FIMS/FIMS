@@ -78,8 +78,57 @@ setup_and_run_gtest <- function(...) {
 #'
 #' Intended for developers to run the google test suite from R.
 #'
+#' @details
+#' The output from running the tests should look something like the following:
+#' ```bash
+#' Internal ctest changing into directory: C:/github/NOAA-FIMS/FIMS/build
+#' Test project C:/github_repos/NOAA-FIMS_org/FIMS/build
+#'     Start 1: dlognorm.use_double_inputs
+#' 1/5 Test #1: dlognorm.use_double_inputs .......   Passed    0.04 sec
+#'     Start 2: dlognorm.use_int_inputs
+#' 2/5 Test #2: dlognorm.use_int_inputs ..........   Passed    0.04 sec
+#'     Start 3: modelTest.eta
+#' 3/5 Test #3: modelTest.eta ....................   Passed    0.04 sec
+#'     Start 4: modelTest.nll
+#' 4/5 Test #4: modelTest.nll ....................   Passed    0.04 sec
+#'     Start 5: modelTest.evaluate
+#' 5/5 Test #5: modelTest.evaluate ...............   Passed    0.04 sec
+#'
+#' 100% tests passed, 0 tests failed out of 5
+#' ```
+#'
+#' If a test fails, the output will look something like the following:
+#' ```bash
+#' Internal ctest changing into directory: C:/github/NOAA-FIMS/FIMS/build
+#' Test project C:/github/NOAA-FIMS/FIMS/build
+#'     Start 1: dlognorm.use_double_inputs
+#' 1/7 Test #1: dlognorm.use_double_inputs .......   Passed    0.04 sec
+#'     Start 2: dlognorm.use_int_inputs
+#' 2/7 Test #2: dlognorm.use_int_inputs ..........   Passed    0.04 sec
+#'     Start 3: modelTest.eta
+#' 3/7 Test #3: modelTest.eta ....................   Passed    0.04 sec
+#'     Start 4: modelTest.nll
+#' 4/7 Test #4: modelTest.nll ....................   Passed    0.04 sec
+#'     Start 5: modelTest.evaluate
+#' 5/7 Test #5: modelTest.evaluate ...............   Passed    0.04 sec
+#'     Start 6: dlognormTest.DoubleInput
+#' 6/7 Test #6: dlognormTest.DoubleInput .........   Passed    0.04 sec
+#'     Start 7: dlognormTest.IntInput
+#' 7/7 Test #7: dlognormTest.IntInput ............***Failed    0.04 sec
+#'
+#' 86% tests passed, 1 tests failed out of 7
+#'
+#' Total Test time (real) =   0.28 sec
+#'
+#' The following tests FAILED:
+#'           7 - dlognormTest.IntInput (Failed)
+#' Errors while running CTest
+#' Output from these tests are in: C:/github/NOAA-FIMS/FIMS/build/Testing/Temporary/LastTest.log
+#' Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.
+#' ```
 #' @param ... Additional arguments to `ctest --test-dir build` such as
-#'   `"--rerun-failed --output-on-failure"`.
+#'   `"--rerun-failed --output-on-failure"` or `--parallel 16` if you want it to
+#'   run on multiple cores.
 #'
 #' @keywords developer
 run_gtest <- function(...) {
@@ -166,141 +215,4 @@ remove_test_data <- function() {
     recursive = TRUE,
     force = TRUE
   )
-}
-
-#' Style the C++ files
-#'
-#' Style the C++ files using clang. This function is currently in development.
-#' @keywords developer
-#' @examples
-#' \dontrun{
-#' style_cpp()
-#' }
-# TODO: add a function to style the C++ files using clang-format
-style_cpp <- function() {
-  # Does not currently work
-}
-
-
-#' Run all styling, documentation, and testing for FIMS repository
-#'
-#' FIMS consists of both C++ and R code but no function exists to style,
-#' document, and test both file types. This function first works with the C++
-#' code and then moves onto the R code. For each file type it styles the files,
-#' e.g., puts in appropriate spacing between brackets; then it build the
-#' documentation, e.g., [roxygen2::roxygenize()]; and then it tests the
-#' functions.
-#'
-#' @return
-#' An invisible list is returned with the following four items:
-#' \itemize{
-#'   \item{`style_r`: Contains the report from [styler::style_pkg()].}
-#'   \item{`spelling_code`: Contains a 2-column data frame of words that are
-#'   spelled incorrectly in the code but not in the excluded word list.}
-#'   \item{`spelling_package`: Contains a 2-column data frame of words that need
-#'   to be added to the WORDLIST file. This will be an empty data frame if no
-#'   words are spelled incorrectly.}
-#'   \item{`spelling_word_list`: A vector of strings indicating the words that
-#'   are included in the WORDLIST file and are ignored when performing a spell
-#'   check.}
-#' }
-#' @keywords developer
-#' @examples
-#' \dontrun{
-#' check_results <- check_fims()
-#' }
-check_fims <- function() {
-  # Check you are actually in the FIMS directory
-  directory <- getwd()
-  if (basename(directory) != "FIMS") {
-    cli::cli_abort(c(
-      "Did you mean to run this function outside of the FIMS clone?",
-      i = "Your working directory is {.var {directory}}.",
-      x = "Your working directory does not end in FIMS.",
-      i = "You must be in a clone of FIMS to run this function."
-    ))
-  }
-
-  # Get the word list to run spelling::spell_check_files() later
-  word_list <- spelling::get_wordlist()
-
-  # C++
-  ## spelling
-  # These results are included in the general spell check for all code below
-  # and is not separated between C++ and R like the other sections.
-
-  ## style
-  style_cpp()
-
-  ## document
-  # This is done in `setup_and_run_gtest()`
-
-  ## test
-  setup_and_run_gtest()
-
-  # R
-  ## style
-  results_style_r <- styler::style_pkg()
-
-  ## document
-  ### spelling
-  # Need to exclude non-code files like pdf and data
-  code_files <- list.files(
-    c("R", "tests", file.path("inst", "include")),
-    recursive = TRUE,
-    full.names = TRUE,
-    pattern = "\\.cpp|\\.hpp|\\.md|\\.R$|\\.Rmd|\\.txt"
-  )
-  results_spelling <- spelling::spell_check_files(
-    code_files,
-    ignore = word_list
-  )
-
-  md_vignette_files <- dir(
-    file.path("vignettes"),
-    pattern = "\\.md$",
-    full.names = TRUE
-  )
-  if (length(md_vignette_files) > 0) {
-    # Cannot spell check the package with vignettes turned on because you have
-    # a markdown file in the vignettes directory. This is a known issue with the
-    # spelling package when one of the FIMS vignettes is rendered because it
-    # cannot spell check the special characters printed via cli when printing a
-    # tibble like the "i" and checkmarks.
-    cli::cli_alert_info("Skipping spell check for vignettes.")
-    cli::cli_alert_info(
-      "Remove {.var {md_vignette_files}} to run spell check on vignettes."
-    )
-  }
-  results_spelling_package <- spelling::spell_check_package(
-    pkg = ".",
-    vignettes = !(length(md_vignette_files) > 0),
-    use_wordlist = TRUE
-  )
-
-  ### man
-  # You have to generate new manual files before building the website otherwise
-  # it might fail.
-  devtools::document()
-
-  ### pkgdown
-  # TODO: think about adding the arguments devel, new_process, and install
-  #       because the package will already be installed
-  pkgdown::build_site()
-
-  # The following steps are printed to the screen for the user to do themselves
-  # because it was too buggy to include them in the function.
-  cli::cli_bullets(c(
-    "i" = "You still need to run the following commands to finish the check:",
-    "*" = "{.code devtools::test()}, which is shorter than running CRAN checks",
-    "*" = "{.code devtools::check()} to test building the package for CRAN",
-    "*" = "{.code report <- covr::report()}"
-  ))
-
-  invisible(list(
-    style_r = results_style_r,
-    spelling_code = results_spelling,
-    spelling_package = results_spelling_package,
-    spelling_word_list = word_list
-  ))
 }
