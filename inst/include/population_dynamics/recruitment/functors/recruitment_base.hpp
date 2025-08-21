@@ -82,9 +82,9 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
 
   /** @brief Prepare constrained recruitment deviations.
    *  Based on ADMB sum-to-zero constraint implementation. We still
-   *  need to adde an additional penalty to the PrepareConstrainedDeviations
+   *  need to add an additional penalty to the PrepareConstrainedDeviations
    *  method. More discussion can be found here:
-   *  https://groups.google.com/a/admb-project.org/g/users/c/63YJmYGEPuE
+   *  https://groups.google.com/a/ADMB-project.org/g/users/c/63YJmYGEPuE
    */
   void PrepareConstrainedDeviations() {
     if (!this->constrain_deviations) {

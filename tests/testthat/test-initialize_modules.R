@@ -140,10 +140,10 @@ test_that("initialize_fims returns correct error messages", {
   expect_error(
     initialize_comp(
       data = data,
-      fleet_name = "unknownfleet",
+      fleet_name = "unknown_fleet",
       type = "AgeComp"
     ),
-    "Fleet `unknownfleet` not found in the data object."
+    "Fleet `unknown_fleet` not found in the data object."
   )
   clear()
 

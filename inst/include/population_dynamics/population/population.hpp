@@ -23,7 +23,7 @@ namespace fims_popdy {
 
 /**
  * @brief Population class. Contains subpopulations
- * that are divided into generic partitions (eg. sex, area).
+ * that are divided into generic partitions (e.g., sex, area).
  */
 template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
