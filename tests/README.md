@@ -8,7 +8,7 @@
 
 - Calling [`FIMS:::use_testthat_template()`](https://noaa-fims.github.io/FIMS/reference/use_testthat_template.html) will create a new R test file, e.g., `tests/testthat/test-function_name.R`, for {testthat}.
 
-### 🛢️ Prepare test data for the new test
+### :floppy_disk: Prepare test data for the new test
 
 Prepare the test data in the new file or in a separate file if you plan on reusing the data in multiple test files.
 

@@ -243,7 +243,7 @@ load(
 )
 
 # Return the loaded data
-returnedom <- list(
+returned_om <- list(
   om_input = om_input,
   om_output = om_output,
   em_input = em_input
@@ -256,19 +256,19 @@ landings_data <- data.frame(
   # TODO: Should there be a type that are not removed but just noted,
   #       where obviously in this instance they are removed.
   type = "landings",
-  name = names(returnedom[["om_output"]][["L.mt"]])[1],
+  name = names(returned_om[["om_output"]][["L.mt"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
   datestart = as.Date(
-    paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+    paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
     format = "%Y-%m-%d"
   ),
   dateend = as.Date(
-    paste(returnedom[["om_input"]][["year"]], 12, 31, sep = "-"),
+    paste(returned_om[["om_input"]][["year"]], 12, 31, sep = "-"),
     format = "%Y-%m-%d"
   ),
-  value = returnedom[["em_input"]][["L.obs"]][[1]],
+  value = returned_om[["em_input"]][["L.obs"]][[1]],
   unit = "mt", # metric tons
-  uncertainty = cv_2_sd(returnedom[["em_input"]][["cv.L"]][[1]])
+  uncertainty = cv_2_sd(returned_om[["em_input"]][["cv.L"]][[1]])
 )
 
 ###############################################################################
@@ -276,19 +276,19 @@ landings_data <- data.frame(
 ###############################################################################
 index_data <- data.frame(
   type = "index",
-  name = names(returnedom[["om_output"]][["survey_index"]])[1],
+  name = names(returned_om[["om_output"]][["survey_index"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
   datestart = as.Date(
-    paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+    paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
     format = "%Y-%m-%d"
   ),
   dateend = as.Date(
-    paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+    paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
     format = "%Y-%m-%d"
   ),
-  value = returnedom[["em_input"]][["surveyB.obs"]][[1]],
+  value = returned_om[["em_input"]][["surveyB.obs"]][[1]],
   unit = "mt",
-  uncertainty = cv_2_sd(returnedom[["em_input"]][["cv.survey"]][[1]])
+  uncertainty = cv_2_sd(returned_om[["em_input"]][["cv.survey"]][[1]])
 )
 
 ###############################################################################
@@ -296,30 +296,30 @@ index_data <- data.frame(
 ###############################################################################
 age_data <- rbind(
   data.frame(
-    name = names(returnedom[["em_input"]][["n.L"]]),
-    returnedom[["em_input"]][["L.age.obs"]][["fleet1"]],
+    name = names(returned_om[["em_input"]][["n.L"]]),
+    returned_om[["em_input"]][["L.age.obs"]][["fleet1"]],
     unit = "proportion",
-    uncertainty = returnedom[["em_input"]][["n.L"]][["fleet1"]],
+    uncertainty = returned_om[["em_input"]][["n.L"]][["fleet1"]],
     datestart = as.Date(
-      paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+      paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
       "%Y-%m-%d"
     ),
     dateend = as.Date(
-      paste(returnedom[["om_input"]][["year"]], 12, 31, sep = "-"),
+      paste(returned_om[["om_input"]][["year"]], 12, 31, sep = "-"),
       "%Y-%m-%d"
     )
   ),
   data.frame(
-    name = names(returnedom[["om_output"]][["survey_age_comp"]])[1],
-    returnedom[["em_input"]][["survey.age.obs"]][[1]],
+    name = names(returned_om[["om_output"]][["survey_age_comp"]])[1],
+    returned_om[["em_input"]][["survey.age.obs"]][[1]],
     unit = "proportion",
-    uncertainty = returnedom[["om_input"]][["n.survey"]][["survey1"]],
+    uncertainty = returned_om[["om_input"]][["n.survey"]][["survey1"]],
     datestart = as.Date(
-      paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+      paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
       "%Y-%m-%d"
     ),
     dateend = as.Date(
-      paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+      paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
       "%Y-%m-%d"
     )
   )
@@ -341,29 +341,29 @@ age_data <- rbind(
 ###############################################################################
 timingfishery <- data.frame(
   datestart = as.Date(
-    paste(returnedom[["om_input"]][["year"]], 1, 1, sep = "-"),
+    paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
     "%Y-%m-%d"
   ),
   dateend = as.Date(
-    paste(returnedom[["om_input"]][["year"]], 12, 31, sep = "-"),
+    paste(returned_om[["om_input"]][["year"]], 12, 31, sep = "-"),
     "%Y-%m-%d"
   )
 )
-weightsfishery <- data.frame(
+weights_fishery <- data.frame(
   type = "weight-at-age",
-  name = names(returnedom[["em_input"]][["n.L"]]),
-  age = seq_along(returnedom[["om_input"]][["W.kg"]]),
-  value = returnedom[["om_input"]][["W.mt"]],
+  name = names(returned_om[["em_input"]][["n.L"]]),
+  age = seq_along(returned_om[["om_input"]][["W.kg"]]),
+  value = returned_om[["om_input"]][["W.mt"]],
   uncertainty = NA,
   unit = "mt"
 )
-weightatage_data <- merge(timingfishery, weightsfishery)
+weight_at_age_data <- merge(timingfishery, weights_fishery)
 
 ###############################################################################
 # {FIMS} data
 ###############################################################################
 # Add new column for length values and set to NA for all milestone 1 data
-data1 <- rbind(landings_data, index_data, age_data, weightatage_data) |>
+data1 <- rbind(landings_data, index_data, age_data, weight_at_age_data) |>
   dplyr::mutate(
     length = NA,
     .after = "age"
@@ -400,7 +400,7 @@ length_age_data <- data.frame(
     each = length(len_bins) * length(ages) * length(observers)
   ),
   value = rep(
-    c(t(returnedom[["em_input"]][["age_to_length_conversion"]])),
+    c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
     length(observers) * length(start_date)
   ),
   unit = "proportion",
@@ -423,8 +423,8 @@ length_comp_data <- data.frame(
   datestart = rep(rep(start_date, each = length(len_bins)), length(observers)),
   dateend = rep(rep(end_date, each = length(len_bins)), length(observers)),
   value = c(
-    c(t(returnedom[["em_input"]][["L.length.obs"]][["fleet1"]])),
-    c(t(returnedom[["em_input"]][["survey.length.obs"]][["survey1"]]))
+    c(t(returned_om[["em_input"]][["L.length.obs"]][["fleet1"]])),
+    c(t(returned_om[["em_input"]][["survey.length.obs"]][["survey1"]]))
   ),
   unit = "proportion",
   uncertainty = rep(
@@ -441,7 +441,7 @@ save(
   landings_data,
   index_data,
   age_data,
-  weightatage_data,
+  weight_at_age_data,
   length_comp_data,
   length_age_data,
   file = testthat::test_path(
