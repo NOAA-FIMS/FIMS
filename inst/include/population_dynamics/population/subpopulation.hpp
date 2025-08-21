@@ -11,7 +11,7 @@ namespace fims_popdy {
 
 /**
  * Subpopulation class. This class represents a generic partition
- * of a population (eg., sex, area).
+ * of a population (e.g., sex, area).
  */
 template <typename Type>
 class Subpopulation {};

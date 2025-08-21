@@ -28,7 +28,7 @@ prepare_test_data <- function() {
     landings_data,
     index_data,
     age_data,
-    weightatage_data
+    weight_at_age_data
   )
   data_age_comp <- FIMS::FIMSFrame(data_age_comp_raw)
   saveRDS(
@@ -37,7 +37,7 @@ prepare_test_data <- function() {
   )
 
   # Generate dataset with only length composition data
-  data_length_comp_raw <- rbind(landings_data, index_data, weightatage_data) |>
+  data_length_comp_raw <- rbind(landings_data, index_data, weight_at_age_data) |>
     dplyr::mutate(
       length = NA,
       .after = "age"
@@ -83,7 +83,7 @@ prepare_test_data <- function() {
     landings_data,
     index_data,
     age_data,
-    weightatage_data
+    weight_at_age_data
   )
   data_age_length_comp_na <- data_age_length_comp_raw |>
     dplyr::filter(

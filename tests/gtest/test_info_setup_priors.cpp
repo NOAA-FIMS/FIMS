@@ -45,7 +45,7 @@ namespace
     normal_inflection_point->key[0] = 1;
     normal_inflection_point->key[1] = 3;
     normal_inflection_point->input_type = "prior";
-    // Set up slope key. Keys 2 and 4 will reference variable map 2 adn 4
+    // Set up slope key. Keys 2 and 4 will reference variable map 2 and 4
     lognormal_slope->key.resize(2);
     lognormal_slope->key[0] = 2;
     lognormal_slope->key[1] = 4;
