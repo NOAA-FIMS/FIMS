@@ -212,7 +212,8 @@ RCPP_MODULE(fims) {
       .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
       .field("log_r", &BevertonHoltRecruitmentInterface::log_r,
              "recruitment as a random effect on the natural log scale")
-      .field("log_expected_recruitment", &BevertonHoltRecruitmentInterface::log_expected_recruitment,
+      .field("log_expected_recruitment",
+             &BevertonHoltRecruitmentInterface::log_expected_recruitment,
              "expected recruitment as a random effect on the natural log scale")
       .field("nyears", &BevertonHoltRecruitmentInterface::nyears,
              "Number of years")
@@ -377,10 +378,10 @@ RCPP_MODULE(fims) {
       .field("log_r", &PellaTomlinsonInterface::log_r)
       .field("log_K", &PellaTomlinsonInterface::log_K)
       .field("log_m", &PellaTomlinsonInterface::log_m)
-      .field("log_depletion",
-             &PellaTomlinsonInterface::log_depletion,
+      .field("log_depletion", &PellaTomlinsonInterface::log_depletion,
              "Log expectation of the depletion process")
-      .field("log_expected_depletion", &PellaTomlinsonInterface::log_expected_depletion,
+      .field("log_expected_depletion",
+             &PellaTomlinsonInterface::log_expected_depletion,
              "expected depletion as a random effect on the natural log scale")
       .field("nyears", &PellaTomlinsonInterface::nyears, "number of years")
       .method("get_id", &PellaTomlinsonInterface::get_id)

@@ -34,7 +34,8 @@ class CAAInitializeTestFixture : public testing::Test {
       fleet->nlengths = nlengths;
       fleet->log_q.resize(1);
       population->fleets.push_back(fleet);
-      catch_at_age_model->fleets[fleet->GetId()] = fleet; // Add to CatchAtAge model's fleets map
+      catch_at_age_model->fleets[fleet->GetId()] =
+          fleet;  // Add to CatchAtAge model's fleets map
     }
     catch_at_age_model->populations.push_back(population);
   }
@@ -58,12 +59,12 @@ class CAAInitializeTestFixture : public testing::Test {
 
 class CAAEvaluateTestFixture : public testing::Test {
  protected:
-    // Declare population here as a member, and initialize it in SetUp
-    std::shared_ptr<fims_popdy::Population<double>> population; 
-    std::shared_ptr<fims_popdy::CatchAtAge<double>> catch_at_age_model; // New member for the model
+  // Declare population here as a member, and initialize it in SetUp
+  std::shared_ptr<fims_popdy::Population<double>> population;
+  std::shared_ptr<fims_popdy::CatchAtAge<double>>
+      catch_at_age_model;  // New member for the model
 
   void SetUp() override {
-
     // C++ code to set up true values for log_naa, log_M,
     // log_Fmort, and log_q:
     int seed = 1234;
@@ -93,8 +94,8 @@ class CAAEvaluateTestFixture : public testing::Test {
     std::uniform_real_distribution<double> log_q_distribution(log_q_min,
                                                               log_q_max);
 
-    //Initialize fleet parameters needed for catch_at_age model->Prepare()
-     for (int i = 0; i < nfleets; i++) {
+    // Initialize fleet parameters needed for catch_at_age model->Prepare()
+    for (int i = 0; i < nfleets; i++) {
       auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
       fleet->nyears = nyears;
       fleet->nages = nages;
@@ -105,7 +106,7 @@ class CAAEvaluateTestFixture : public testing::Test {
       for (int year = 0; year < nyears; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
-       auto selectivity =
+      auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point.resize(1);
       selectivity->inflection_point[0] = 7;
@@ -113,17 +114,18 @@ class CAAEvaluateTestFixture : public testing::Test {
       selectivity->slope[0] = 0.5;
       fleet->selectivity = selectivity;
 
-      //Push fleet to population and catch_at_age_model
+      // Push fleet to population and catch_at_age_model
       population->fleets.push_back(fleet);
-      catch_at_age_model->fleets[fleet->GetId()] = fleet; // Add to CatchAtAge model's fleets map
+      catch_at_age_model->fleets[fleet->GetId()] =
+          fleet;  // Add to CatchAtAge model's fleets map
     }
 
-    //Push population to catch_at_age_model
+    // Push population to catch_at_age_model
     catch_at_age_model->populations.push_back(population);
-    //Initialize derived quantities
+    // Initialize derived quantities
     catch_at_age_model->Initialize();
-    
-    //Setup population parameters needed for catch_at_age model->Prepare()
+
+    // Setup population parameters needed for catch_at_age model->Prepare()
     catch_at_age_model->populations[0]->ages.resize(nages);
     catch_at_age_model->populations[0]->log_init_naa.resize(nages);
     catch_at_age_model->populations[0]->log_M.resize(nyears * nages);
@@ -143,25 +145,27 @@ class CAAEvaluateTestFixture : public testing::Test {
     }
 
     catch_at_age_model->populations[0]->growth = growth;
-     // log_M
+    // log_M
     double log_M_min = fims_math::log(0.1);
     double log_M_max = fims_math::log(0.3);
     std::uniform_real_distribution<double> log_M_distribution(log_M_min,
                                                               log_M_max);
     for (int i = 0; i < nyears * nages; i++) {
-      catch_at_age_model->populations[0]->log_M[i] = log_M_distribution(generator);
+      catch_at_age_model->populations[0]->log_M[i] =
+          log_M_distribution(generator);
     }
-  
+
     // Set initialized values for derived quantities
     catch_at_age_model->Prepare();
-   
+
     // log_naa
     double log_init_naa_min = 10.0;
     double log_init_naa_max = 12.0;
     std::uniform_real_distribution<double> log_naa_distribution(
         log_init_naa_min, log_init_naa_max);
     for (int i = 0; i < nages; i++) {
-      catch_at_age_model->populations[0]->log_init_naa[i] = log_naa_distribution(generator);
+      catch_at_age_model->populations[0]->log_init_naa[i] =
+          log_naa_distribution(generator);
     }
 
     // prop_female
@@ -170,7 +174,8 @@ class CAAEvaluateTestFixture : public testing::Test {
     std::uniform_real_distribution<double> prop_female_distribution(
         prop_female_min, prop_female_max);
     for (int i = 0; i < nages; i++) {
-      catch_at_age_model->populations[0]->proportion_female[i] = prop_female_distribution(generator);
+      catch_at_age_model->populations[0]->proportion_female[i] =
+          prop_female_distribution(generator);
     }
 
     // numbers_at_age
@@ -179,8 +184,9 @@ class CAAEvaluateTestFixture : public testing::Test {
     std::uniform_real_distribution<double> numbers_at_age_distribution(
         numbers_at_age_min, numbers_at_age_max);
     for (int i = 0; i < (nyears + 1) * nages; i++) {
-      catch_at_age_model->population_derived_quantities[0]["numbers_at_age"][i] =
-        numbers_at_age_distribution(generator);
+      catch_at_age_model
+          ->population_derived_quantities[0]["numbers_at_age"][i] =
+          numbers_at_age_distribution(generator);
     }
 
     auto maturity = std::make_shared<fims_popdy::LogisticMaturity<double>>();
@@ -215,9 +221,10 @@ class CAAEvaluateTestFixture : public testing::Test {
     int age = 6;
     int i_age_year = year * population->nages + age;
     int i_agem1_yearm1 = (year - 1) * population->nages + age - 1;
-    
+
     catch_at_age_model->CalculateMortality(population, i_age_year, year, age);
-    catch_at_age_model->CalculateNumbersAA(population, i_age_year, i_agem1_yearm1, age);
+    catch_at_age_model->CalculateNumbersAA(population, i_age_year,
+                                           i_agem1_yearm1, age);
   }
 
   virtual void TearDown() {}
@@ -237,8 +244,8 @@ class CAAEvaluateTestFixture : public testing::Test {
 
 class CAAPrepareTestFixture : public testing::Test {
  protected:
- std::shared_ptr<fims_popdy::Population<double>> population;
- std::shared_ptr<fims_popdy::CatchAtAge<double>> catch_at_age_model;
+  std::shared_ptr<fims_popdy::Population<double>> population;
+  std::shared_ptr<fims_popdy::CatchAtAge<double>> catch_at_age_model;
   void SetUp() override {
     population = std::make_shared<fims_popdy::Population<double>>();
     population->id_g = id_g;
@@ -251,7 +258,7 @@ class CAAPrepareTestFixture : public testing::Test {
     int seed = 1234;
     std::default_random_engine generator(seed);
 
-     // Declare CatchAtAge model
+    // Declare CatchAtAge model
     catch_at_age_model = std::make_shared<fims_popdy::CatchAtAge<double>>();
 
     // log_Fmort
@@ -263,8 +270,7 @@ class CAAPrepareTestFixture : public testing::Test {
     // age_to_length_conversiondouble log_Fmort_min = fims_math::log(0.1);
     double alc_min = 0.0;
     double alc_max = 1.0;
-    std::uniform_real_distribution<double> alc_distribution(
-        alc_min, alc_max);
+    std::uniform_real_distribution<double> alc_distribution(alc_min, alc_max);
 
     // log_q
     double log_q_min = fims_math::log(0.1);
@@ -291,20 +297,20 @@ class CAAPrepareTestFixture : public testing::Test {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
       fleet->age_to_length_conversion.resize(nages * nlengths);
-      for(int j = 0; j < nages * nlengths; j++){
+      for (int j = 0; j < nages * nlengths; j++) {
         fleet->age_to_length_conversion[j] = alc_distribution(generator);
       }
-       auto selectivity =
+      auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point.resize(1);
       selectivity->inflection_point[0] = 7;
       selectivity->slope.resize(1);
       selectivity->slope[0] = 0.5;
       fleet->selectivity = selectivity;
-    
 
       population->fleets.push_back(fleet);
-      catch_at_age_model->fleets[fleet->GetId()] = fleet; // Add to CatchAtAge model's fleets map
+      catch_at_age_model->fleets[fleet->GetId()] =
+          fleet;  // Add to CatchAtAge model's fleets map
     }
 
     population->ages.resize(nages);
@@ -312,8 +318,8 @@ class CAAPrepareTestFixture : public testing::Test {
       population->ages[i] = i + 1;
     }
 
-    catch_at_age_model->populations.push_back(population); 
-    //Initialize derived quantities
+    catch_at_age_model->populations.push_back(population);
+    // Initialize derived quantities
     catch_at_age_model->Initialize();
 
     // log_M
@@ -323,7 +329,8 @@ class CAAPrepareTestFixture : public testing::Test {
                                                               log_M_max);
     catch_at_age_model->populations[0]->log_M.resize(nyears * nages);
     for (int i = 0; i < nyears * nages; i++) {
-      catch_at_age_model->populations[0]->log_M[i] = log_M_distribution(generator);
+      catch_at_age_model->populations[0]->log_M[i] =
+          log_M_distribution(generator);
     }
 
     // weight_at_age
@@ -335,12 +342,12 @@ class CAAPrepareTestFixture : public testing::Test {
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
     for (int i = 0; i < nages; i++) {
-      growth->ewaa[static_cast<double>(catch_at_age_model->populations[0]->ages[i])] =
+      growth->ewaa[static_cast<double>(
+          catch_at_age_model->populations[0]->ages[i])] =
           weight_at_age_distribution(generator);
     }
 
     catch_at_age_model->populations[0]->growth = growth;
-
   }
 
   virtual void TearDown() {}

@@ -29,9 +29,11 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
   // all the instances of the DepletionBase class.
   static uint32_t
       id_g; /**< The ID of the instance of the DepletionBase class */
-  fims::Vector<Type> log_depletion; /**< Natural log of the depletion used for random effects. */
-  fims::Vector<Type> log_expected_depletion; /**< Expectation of the depletion process. */
-  fims::Vector<Type> log_K; /**< Carrying capacity of the population. */
+  fims::Vector<Type> log_depletion; /**< Natural log of the depletion used for
+                                       random effects. */
+  fims::Vector<Type>
+      log_expected_depletion; /**< Expectation of the depletion process. */
+  fims::Vector<Type> log_K;   /**< Carrying capacity of the population. */
   /** @brief Constructor.
    */
   DepletionBase() {
@@ -43,13 +45,12 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Calculates the depletion.
-   * 
+   *
    * @param depletion_ym1 Expected depletion from previous time step.
    * @param catch_ym1 Catch from previous time step.
    */
-  virtual const Type evaluate_mean(const Type& depletion_ym1, const Type& catch_ym1) = 0;
-
-  
+  virtual const Type evaluate_mean(const Type& depletion_ym1,
+                                   const Type& catch_ym1) = 0;
 };
 
 // default id of the singleton depletion class

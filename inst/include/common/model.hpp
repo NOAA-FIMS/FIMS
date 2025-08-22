@@ -74,11 +74,11 @@ class Model {  // may need singleton
       m->Evaluate();
     }
 
-    // Create vector for reporting out nll components
-    #ifdef TMB_MODEL
-      vector<Type> nll_components(
-          this->fims_information->density_components.size());
-    #endif
+// Create vector for reporting out nll components
+#ifdef TMB_MODEL
+    vector<Type> nll_components(
+        this->fims_information->density_components.size());
+#endif
 
     // Loop over densities and evaluate joint negative log densities for priors
     typename fims_info::Information<Type>::density_components_iterator d_it;
@@ -124,7 +124,7 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       p->of = this->of;
 #endif
-    }   
+    }
 
     // Loop over densities and evaluate joint negative log-likelihoods for
     // random effects
@@ -168,15 +168,15 @@ class Model {  // may need singleton
       }
     }
 
-    //report out nll components
-    #ifdef TMB_MODEL
-      FIMS_REPORT_F(nll_components, this->of);
-      FIMS_REPORT_F(jnll, this->of);
-    #endif
+// report out nll components
+#ifdef TMB_MODEL
+    FIMS_REPORT_F(nll_components, this->of);
+    FIMS_REPORT_F(jnll, this->of);
+#endif
 
-    //report out model family objects
+    // report out model family objects
     for (m_it = this->fims_information->models_map.begin();
-      m_it != this->fims_information->models_map.end(); ++m_it) {
+         m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->Report();

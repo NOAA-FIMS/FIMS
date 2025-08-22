@@ -39,7 +39,7 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    *
    */
   SharedBoolean initialize_catch_at_age;
-   /**
+  /**
    * @brief Initialize the surplus production model.
    *
    */
@@ -130,7 +130,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief The ID of the recruitment process module.
    */
   SharedInt recruitment_err_id;
-     /**
+  /**
    * @brief The ID of the depletion module.
    */
   SharedInt depletion_id;
@@ -259,8 +259,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Set the unique ID for the depletion object.
    * @param depletion_id Unique ID for the depletion object.
    */
-  void SetDepletionID(uint32_t depletion_id)
-  {
+  void SetDepletionID(uint32_t depletion_id) {
     this->depletion_id.set(depletion_id);
   }
 
@@ -283,7 +282,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * the Information object.
    */
   virtual void finalize() {
-    //TODO: add log_init_depletion to finalize
+    // TODO: add log_init_depletion to finalize
     if (this->finalized) {
       // log warning that finalize has been called more than once.
       FIMS_WARNING_LOG("Population " + fims::to_string(this->id) +
@@ -467,8 +466,8 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->nyears = this->nyears.get();
     population->nfleets = this->nfleets.get();
     population->nseasons = this->nseasons.get();
-    //only define ages if nages greater than 0
-    if(this->nages.get() > 0){
+    // only define ages if nages greater than 0
+    if (this->nages.get() > 0) {
       population->nages = this->nages.get();
       if (this->nages.get() == this->ages.size()) {
         population->ages.resize(this->nages.get());
@@ -526,15 +525,18 @@ class PopulationInterface : public PopulationInterfaceBase {
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
 
     for (size_t i = 0; i < log_init_depletion.size(); i++) {
-      population->log_init_depletion[i] = this->log_init_depletion[i].initial_value_m;
-      if (this->log_init_depletion[i].estimation_type_m.get() == "fixed_effects") {
+      population->log_init_depletion[i] =
+          this->log_init_depletion[i].initial_value_m;
+      if (this->log_init_depletion[i].estimation_type_m.get() ==
+          "fixed_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_init_depletion."
            << this->log_init_depletion[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_depletion[i]);
       }
-      if (this->log_init_depletion[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_init_depletion[i].estimation_type_m.get() ==
+          "random_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_init_depletion."
            << this->log_init_depletion[i].id_m;
@@ -542,7 +544,8 @@ class PopulationInterface : public PopulationInterfaceBase {
         info->RegisterRandomEffect(population->log_init_depletion[i]);
       }
     }
-    info->variable_map[this->log_init_depletion.id_m] = &(population)->log_init_depletion;
+    info->variable_map[this->log_init_depletion.id_m] =
+        &(population)->log_init_depletion;
 
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
