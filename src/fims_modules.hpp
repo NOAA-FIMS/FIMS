@@ -301,8 +301,12 @@ RCPP_MODULE(fims) {
       .field("nlengths", &PopulationInterface::nlengths, "number of lengths")
       .field("log_M", &PopulationInterface::log_M,
              "natural log of the natural mortality of the population")
+      .field("log_f_multiplier", &PopulationInterface::log_f_multiplier,
+             "natural log of the annual fishing mortality multiplier of the population")
       .field("spawning_biomass", &PopulationInterface::spawning_biomass,
              "population spawning biomass for each year")
+      .field("spawning_biomass_ratio", &PopulationInterface::spawning_biomass_ratio,
+             "population spawning biomass ratio for each year")
       .field("log_init_naa", &PopulationInterface::log_init_naa,
              "natural log of the initial numbers at age")
       .field("ages", &PopulationInterface::ages,
@@ -381,6 +385,10 @@ RCPP_MODULE(fims) {
               &DnormDistributionsInterface::set_observed_data,
               "Accepts a unique ID for a given Data Object class to link the "
               "data with the distribution.")
+      .method("set_distribution_mean",
+              &DnormDistributionsInterface::set_distribution_mean,
+              "Accepts a value for the expected distribution mean "
+              "creates a fixed effect estimated mean.")
       .method("set_distribution_links",
               &DnormDistributionsInterface::set_distribution_links,
               "Accepts a unique ID for a given parameter to link the parameter "
@@ -390,6 +398,8 @@ RCPP_MODULE(fims) {
              "random effect.")
       .field("expected_values", &DnormDistributionsInterface::expected_values,
              "Mean of the distribution.")
+      .field("expected_mean", &DnormDistributionsInterface::expected_mean,
+             "The expected mean of the distribution.")
       .field("log_sd", &DnormDistributionsInterface::log_sd,
              "The natural log of the standard deviation.");
 

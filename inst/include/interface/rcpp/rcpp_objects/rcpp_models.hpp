@@ -221,6 +221,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
       ss << "{\n";
 
+      for (size_t i = 0; i < pop->log_f_multiplier.size(); i++) {
+        population_interface_ptr->log_f_multiplier[i].final_value_m = pop->log_f_multiplier[i];
+      }
+
+      ss << " \"name\": \"log_f_multiplier\",\n";
+      ss << " \"id\":" << population_interface->log_f_multiplier.id_m << ",\n";
+      ss << " \"type\": \"vector\",\n";
+      ss << " \"values\": " << population_interface->log_f_multiplier << "\n},\n";
+
+      ss << "{\n";
+
       for (size_t i = 0; i < pop->log_init_naa.size(); i++) {
         population_interface_ptr->log_init_naa[i].final_value_m =
             pop->log_init_naa[i];
@@ -849,6 +860,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       derived_quantities["mortality_F"] = fims::Vector<Type>(
           population->nyears.get() * population->nages.get());
 
+      derived_quantities["M"] = fims::Vector<Type>(
+          population->nyears.get() * population->nages.get());
+
       derived_quantities["mortality_Z"] = fims::Vector<Type>(
           population->nyears.get() * population->nages.get());
 
@@ -872,6 +886,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       derived_quantities["unfished_spawning_biomass"] =
           fims::Vector<Type>((population->nyears.get() + 1));
 
+      derived_quantities["spawning_biomass_ratio"] =
+          fims::Vector<Type>((population->nyears.get() + 1));
+
       derived_quantities["proportion_mature_at_age"] = fims::Vector<Type>(
           (population->nyears.get() + 1) * population->nages.get());
 
@@ -881,11 +898,15 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       derived_quantities["sum_selectivity"] = fims::Vector<Type>(
           population->nyears.get() * population->nages.get());
       // replace elements in the variable map
+
       info->variable_map[population->numbers_at_age.id_m] =
           &(derived_quantities["numbers_at_age"]);
 
       info->variable_map[population->spawning_biomass.id_m] =
           &(derived_quantities["spawning_biomass"]);
+
+      info->variable_map[population->spawning_biomass_ratio.id_m] =
+          &(derived_quantities["spawning_biomass_ratio"]);
 
       for (fleet_ids_iterator fit = population->fleet_ids->begin();
            fit != population->fleet_ids->end(); ++fit) {

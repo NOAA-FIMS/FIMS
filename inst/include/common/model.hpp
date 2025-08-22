@@ -101,40 +101,21 @@ class Model {  // may need singleton
     // populations
     vector<vector<Type>> naa(n_pops);
     vector<vector<Type>> ssb(n_pops);
+    vector<vector<Type>> ssb_ratio(n_pops);
+    vector<vector<Type>> f_mult(n_pops);
     vector<vector<Type>> total_landings_w(n_pops);
     vector<vector<Type>> total_landings_n(n_pops);
     vector<vector<Type>> biomass(n_pops);
     vector<vector<Type>> log_recruit_dev(n_pops);
     vector<vector<Type>> log_r(n_pops);
     vector<vector<Type>> recruitment(n_pops);
-    vector<vector<Type>> M(n_pops);
+    vector<vector<Type>> M_pop(n_pops);
+    vector<vector<Type>> Z_pop(n_pops);
+    vector<vector<Type>> F_pop(n_pops);
     vector<Type> nll_components(
         this->fims_information->density_components.size());
 #endif
-    // Loop over densities and evaluate joint negative log densities for priors
-    typename fims_info::Information<Type>::density_components_iterator d_it;
-    nll_components.fill(0);
-    int nll_components_idx = 0;
-    size_t n_priors = 0;
-    FIMS_INFO_LOG("Begin evaluating prior densities.")
-    for (d_it = this->fims_information->density_components.begin();
-         d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*d_it).second;
-#ifdef TMB_MODEL
-      d->of = this->of;
-#endif
-      if (d->input_type == "prior") {
-        nll_components[nll_components_idx] = -d->evaluate();
-        jnll += nll_components[nll_components_idx];
-        n_priors += 1;
-        nll_components_idx += 1;
-      }
-    }
-    FIMS_INFO_LOG(
-        "Model: Finished evaluating prior distributions. The jnll after "
-        "evaluating " +
-        fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
+    
 
     // Loop over populations and evaluate recruitment component
 
@@ -188,6 +169,31 @@ class Model {  // may need singleton
       f->evaluate_index();
     }
 
+    // Loop over densities and evaluate joint negative log densities for priors
+    typename fims_info::Information<Type>::density_components_iterator d_it;
+    nll_components.fill(0);
+    int nll_components_idx = 0;
+    size_t n_priors = 0;
+    FIMS_INFO_LOG("Begin evaluating prior densities.")
+    for (d_it = this->fims_information->density_components.begin();
+         d_it != this->fims_information->density_components.end(); ++d_it) {
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+          (*d_it).second;
+#ifdef TMB_MODEL
+      d->of = this->of;
+#endif
+      if (d->input_type == "prior") {
+        nll_components[nll_components_idx] = -d->evaluate();
+        jnll += nll_components[nll_components_idx];
+        n_priors += 1;
+        nll_components_idx += 1;
+      }
+    }
+    FIMS_INFO_LOG(
+        "Model: Finished evaluating prior distributions. The jnll after "
+        "evaluating " +
+        fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
+        
     // Loop over densities and evaluate joint negative log-likelihoods for
     // random effects
     size_t n_random_effects = 0;
@@ -238,13 +244,17 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       naa(pop_idx) = vector<Type>(p->numbers_at_age);
       ssb(pop_idx) = vector<Type>(p->spawning_biomass);
+      ssb_ratio(pop_idx) = vector<Type>(p->spawning_biomass_ratio);
       total_landings_w(pop_idx) = vector<Type>(p->total_landings_weight);
       total_landings_n(pop_idx) = vector<Type>(p->total_landings_numbers);
       log_recruit_dev(pop_idx) = vector<Type>(p->recruitment->log_recruit_devs);
       log_r(pop_idx) = vector<Type>(p->recruitment->log_r);
       recruitment(pop_idx) = vector<Type>(p->expected_recruitment);
       biomass(pop_idx) = vector<Type>(p->biomass);
-      M(pop_idx) = vector<Type>(p->M);
+      M_pop(pop_idx) = vector<Type>(p->M);
+      Z_pop(pop_idx) = vector<Type>(p->mortality_Z);
+      F_pop(pop_idx) = vector<Type>(p->mortality_F);
+      f_mult(pop_idx) = vector<Type>(p->f_multiplier);
 #endif
       pop_idx += 1;
     }
@@ -285,11 +295,15 @@ class Model {  // may need singleton
       FIMS_REPORT_F(jnll, of);
       FIMS_REPORT_F(naa, of);
       FIMS_REPORT_F(ssb, of);
+      FIMS_REPORT_F(ssb_ratio, of);
       FIMS_REPORT_F(log_recruit_dev, of);
       FIMS_REPORT_F(log_r, of);
       FIMS_REPORT_F(recruitment, of);
       FIMS_REPORT_F(biomass, of);
-      FIMS_REPORT_F(M, of);
+      FIMS_REPORT_F(M_pop, of);
+      FIMS_REPORT_F(Z_pop, of);
+      FIMS_REPORT_F(F_pop, of);
+      FIMS_REPORT_F(f_mult, of);
       FIMS_REPORT_F(total_landings_w, of);
       FIMS_REPORT_F(total_landings_n, of);
       FIMS_REPORT_F(landings_w, of);
@@ -318,9 +332,11 @@ class Model {  // may need singleton
       vector<Type> NAA = ADREPORTvector(naa);
       vector<Type> Biomass = ADREPORTvector(biomass);
       vector<Type> SSB = ADREPORTvector(ssb);
+      vector<Type> SSB_ratio = ADREPORTvector(ssb_ratio);
       vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
       vector<Type> FMort = ADREPORTvector(F_mort);
       vector<Type> Q = ADREPORTvector(q);
+      vector<Type> F_MULT = ADREPORTvector(f_mult);
       vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
       vector<Type> IndexExpected = ADREPORTvector(index_exp);
       vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
@@ -336,9 +352,11 @@ class Model {  // may need singleton
       ADREPORT_F(NAA, of);
       ADREPORT_F(Biomass, of);
       ADREPORT_F(SSB, of);
+      ADREPORT_F(SSB_ratio, of);
       ADREPORT_F(LogRecDev, of);
       ADREPORT_F(FMort, of);
       ADREPORT_F(Q, of);
+      ADREPORT_F(F_MULT, of);
       ADREPORT_F(LandingsExpected, of);
       ADREPORT_F(IndexExpected, of);
       ADREPORT_F(LandingsNumberAtAge, of);

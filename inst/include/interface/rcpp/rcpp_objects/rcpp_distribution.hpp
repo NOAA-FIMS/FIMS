@@ -128,6 +128,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   ParameterVector expected_values;
   /**
+   * @brief The expected mean, which would be the mean of x for this
+   * distribution.
+   */
+  ParameterVector expected_mean;
+  /**
    * @brief The uncertainty, which would be the standard deviation of x for the
    * normal distribution.
    */
@@ -136,6 +141,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The vector. TODO: document this more.
    */
   RealVector lpdf_vec; /**< The vector*/
+  /**
+   * @brief Should expected_mean be used over expected values.
+   */
+  bool use_mean = false;
 
   /**
    * @brief The constructor.
@@ -155,6 +164,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         x(other.x),
         expected_values(other.expected_values),
         log_sd(other.log_sd),
+        expected_mean(other.expected_mean),
         lpdf_vec(other.lpdf_vec) {}
 
   /**
@@ -174,6 +184,17 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual bool set_observed_data(int observed_data_id) {
     this->interface_observed_data_id_m.set(observed_data_id);
+    return true;
+  }
+
+  /**
+   * @brief Set expected mean for distribution.
+   * @param input_value Distribution mean.
+   */
+  virtual bool set_distribution_mean(double input_value) {
+    this->expected_mean[0].initial_value_m = static_cast<double>(input_value);
+    this->expected_mean[0].estimation_type_m.set("fixed_effects");
+    this->use_mean = true;
     return true;
   }
 
@@ -206,6 +227,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     dnorm.x.resize(this->x.size());
     dnorm.expected_values.resize(this->expected_values.size());
     dnorm.log_sd.resize(this->log_sd.size());
+    dnorm.expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < x.size(); i++) {
       dnorm.x[i] = this->x[i].initial_value_m;
     }
@@ -215,6 +237,12 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < log_sd.size(); i++) {
       dnorm.log_sd[i] = this->log_sd[i].initial_value_m;
     }
+    for (size_t i = 0; i < expected_mean.size(); i++) {
+      dnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
+    }
+    
+    dnorm.use_mean = this->use_mean;
+    
     return dnorm.evaluate();
   }
 
@@ -253,6 +281,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
           this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
           this->log_sd[i].final_value_m = dnorm->log_sd[i];
+        }
+      }
+
+      for (size_t i = 0; i < this->expected_mean.size(); i++) {
+        if (this->expected_mean[i].estimation_type_m.get() == "constant") {
+          this->expected_mean[i].final_value_m = this->expected_mean[i].initial_value_m;
+        } else {
+          this->expected_mean[i].final_value_m = dnorm->expected_mean[i];
         }
       }
 
@@ -376,6 +412,22 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
+    distribution->use_mean = this->use_mean;
+    distribution->expected_mean.resize(this->expected_mean.size());
+    for (size_t i = 0; i < this->expected_mean.size(); i++){
+      distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
+      if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "dnorm." << this->id_m << ".expected_mean." << this->expected_mean[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->expected_mean[i]);
+      }
+      if (this->expected_mean[i].estimation_type_m.get() == "random_effects") {
+        FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
+      }
+    }
+    info->variable_map[this->expected_mean.id_m] = &(distribution)->expected_mean;
+    
     info->density_components[distribution->id] = distribution;
 
     return true;

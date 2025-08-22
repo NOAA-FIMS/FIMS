@@ -359,7 +359,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       for (size_t age = 0; age < population->nages; age++) {
         for (size_t year = 0; year < population->nyears; year++) {
           size_t i_age_year = age * population->nyears + year;
-          population->M[i_age_year] =
+           derived_quantities["M"][i_age_year] =
               fims_math::exp(population->log_M[i_age_year]);
           // mortality_F is a fims::Vector and therefore needs to be filled
           // within a loop
@@ -367,6 +367,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
           derived_quantities["weight_at_age"][i_age_year] =
               population->growth->evaluate(population->ages[age]);
         }
+      }
+      
+      for (size_t year = 0; year < population->nyears; year++) {
+          population->f_multiplier[year] = 
+          fims_math::exp(population->log_f_multiplier[year]);
       }
     }
 
@@ -524,7 +529,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       this->population_derived_quantities[population->GetId()]["mortality_F"]
                                          [i_age_year] +=
-          population->fleets[fleet_]->Fmort[year] * s;
+          population->fleets[fleet_]->Fmort[year] *
+          population->f_multiplier[year] * s;
 
       this->population_derived_quantities[population->GetId()]
                                          ["sum_selectivity"][i_age_year] += s;
@@ -626,6 +632,24 @@ class CatchAtAge : public FisheryModelBase<Type> {
                                            [i_age_year] *
         this->population_derived_quantities[population->GetId()]
                                            ["weight_at_age"][age];
+  }
+
+  /**
+   * This method is used to calculate spawning biomass ratio 
+   * for a specified population and year
+   * 
+   * @param population
+   * @param year the year of spawning biomass ratio to calculate
+   */
+  void CalculateSpawningBiomassRatio(
+    std::shared_ptr<fims_popdy::Population<Type>> &population,
+    size_t year) {
+      this->population_derived_quantities[population->GetId()]
+                                       ["spawning_biomass_ratio"][year] =
+        this->population_derived_quantities[population->GetId()]["spawning_biomass"]
+                                       [year]  /
+        this->population_derived_quantities[population->GetId()]
+                                       ["unfished_spawning_biomass"][0];
   }
 
   /**
@@ -1263,6 +1287,17 @@ class CatchAtAge : public FisheryModelBase<Type> {
             CalculateInitialNumbersAA(population, i_age_year, a);
 
             if (a == 0) {
+              /*
+              Expected recruitment in year 0 is numbers at age 0 in year 0.
+              */
+
+              this->population_derived_quantities[population->GetId()]
+                                                 ["expected_recruitment"]
+                                                 [i_age_year] =
+              this->population_derived_quantities[population->GetId()]
+                                                 ["numbers_at_age"]
+                                                 [i_age_year];
+
               this->population_derived_quantities[population->GetId()]
                                                  ["unfished_numbers_at_age"]
                                                  [i_age_year] =
@@ -1290,16 +1325,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
             CalculateUnfishedSpawningBiomass(population, i_age_year, y, a);
 
-            /*
-             Expected recruitment in year 0 is numbers at age 0 in year 0.
-             */
-
-            this->population_derived_quantities[population->GetId()]
-                                               ["expected_recruitment"]
-                                               [i_age_year] =
-                this->population_derived_quantities[population->GetId()]
-                                                   ["numbers_at_age"]
-                                                   [i_age_year];
           } else {
             if (a == 0) {
               // Set the nrecruits for age a=0 year y (use pointers instead of
@@ -1338,6 +1363,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             CalculateIndex(population, i_age_year, y, a);
           }
         }
+        /* Calculate spawning biomass depletion ratio */
+        CalculateSpawningBiomassRatio(population, y);
       }
     }
     evaluate_age_comp();

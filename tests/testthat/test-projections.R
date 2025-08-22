@@ -365,6 +365,13 @@
     population$log_M[i]$value <- (log(om_input[["M.age"]][1]))
   }
   population$log_M$set_all_estimable(FALSE)
+
+   # population$log_f_multiplier$resize((om_input[["nyr"]] + n_projection_years))
+   # for (i in 1:(om_input[["nyr"]] + n_projection_years)) {
+   #   population$log_f_multiplier[i]$value <- (0.0)
+   # }
+   # population$log_f_multiplier$set_all_estimable(FALSE)
+
   population$log_init_naa$resize(om_input[["nages"]])
   for (i in 1:om_input$nages) {
     population$log_init_naa[i]$value <- (log(om_output[["N.age"]][1, i]))
@@ -1694,10 +1701,10 @@ if(n_projection_years>0){
   ## are provided with very high log_sd=20 in all but terminal
   ## projection year when log_sd=0 and F is estimated.
 
-  n_projection_years <- 10
+  n_projection_years <- 20
   projected_landings <- rep(-999,n_projection_years)
   projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
-  estim_projected_F <- rep("fixed_effects",n_projection_years)
+  estim_projected_F <- rep("constant",n_projection_years)
   projected_index <- rep(-999,n_projection_years)
 
   # Clear any previous FIMS settings
@@ -2077,24 +2084,64 @@ if(n_projection_years>0){
   population$AddFleet(fishing_fleet$get_id())
   population$AddFleet(survey_fleet$get_id())
 
+  #Setup f_multiplier to allow F in the projection period to be scaled to achieve
+  population$log_f_multiplier$resize(om_input[["nyr"]] + n_projection_years)
+  for (i in 1:(om_input[["nyr"]]) ) {
+    population$log_f_multiplier[i]$value <- 0.0
+    population$log_f_multiplier[i]$estimation_type$set("constant")
+  }
+  if(n_projection_years>0){
+    for (i in (om_input[["nyr"]]+1):(om_input[["nyr"]] + n_projection_years) ) {
+      population$log_f_multiplier[i]$value <- -0.6931472
+      population$log_f_multiplier[i]$estimation_type$set("fixed_effects")
+    }
+
+    # F_mult_distribution <- methods::new(DnormDistribution)
+    #
+    # F_mult_distribution$log_sd$resize(1)
+    # F_mult_distribution$log_sd[1]$value <- -1
+    # F_mult_distribution$log_sd[1]$estimation_type$set("constant")
+    #
+    # F_mult_distribution$set_distribution_mean(-0.6931472)
+    # F_mult_distribution$expected_mean[1]$estimation_type$set("fixed_effects")
+    #
+    # F_mult_distribution$x$resize(n_projection_years)
+    # F_mult_distribution$expected_values$resize(n_projection_years)
+    # for (i in 1:n_projection_years) {
+    #   F_mult_distribution$x[i]$value <- -0.6931472
+    #   F_mult_distribution$expected_values[i]$value <- -0.6931472
+    # }
+    #
+    # F_mult_distribution$set_distribution_links("random_effects", population$log_f_multiplier$get_id())
+
+  }
+
+
+
   #Setup projection prior target
-  SSB_prior <- methods::new(DnormDistribution)
-  SSB_prior$expected_values$resize((om_input[["nyr"]] + n_projection_years + 1))
-  SSB_prior$x$resize((om_input[["nyr"]] + n_projection_years + 1))
-  SSB_prior$log_sd$resize((om_input[["nyr"]] + n_projection_years + 1))
+  SSB_ratio_prior <- methods::new(DnormDistribution)
+  SSB_ratio_prior$expected_values$resize((om_input[["nyr"]] + n_projection_years + 1))
+  SSB_ratio_prior$x$resize((om_input[["nyr"]] + n_projection_years + 1))
+  SSB_ratio_prior$log_sd$resize((om_input[["nyr"]] + n_projection_years + 1))
   for(y in 1:(om_input[["nyr"]] + 1)){
-    SSB_prior$x[y]$value <- 3000
-    SSB_prior$expected_values[y]$value <- 3000
-    SSB_prior$log_sd[y]$value <- 20
+    SSB_ratio_prior$x[y]$value <- .3
+    SSB_ratio_prior$expected_values[y]$value <- .3
+    SSB_ratio_prior$log_sd[y]$value <- 200
   }
   if(n_projection_years>0){
     for(y in (om_input[["nyr"]] + 2):(om_input[["nyr"]] + 1 + n_projection_years)){
-      SSB_prior$x[y]$value <- 3000
-      SSB_prior$expected_values[y]$value <- 3000
-      SSB_prior$log_sd[y]$value <- -1
+      SSB_ratio_prior$x[y]$value <- .3
+      SSB_ratio_prior$expected_values[y]$value <- .3
+      SSB_ratio_prior$log_sd[y]$value <- 200
+    }
+
+    for(y in (om_input[["nyr"]] + 1 + n_projection_years)){
+      SSB_ratio_prior$x[y]$value <- .3
+      SSB_ratio_prior$expected_values[y]$value <- .3
+      SSB_ratio_prior$log_sd[y]$value <- -5
     }
   }
-  SSB_prior$set_distribution_links("prior", population$spawning_biomass$get_id())
+  SSB_ratio_prior$set_distribution_links("prior", population$spawning_biomass_ratio$get_id())
 
   # Set up catch at age model
   # caa <- methods::new(CatchAtAge)
@@ -2107,6 +2154,15 @@ if(n_projection_years>0){
     p = get_fixed(),
     re = get_random()
   )
+
+  # map$p <- seq_along(parameters$p)
+  # map$p[32:82] <- 32
+  # map$p[83:149] <- (seq_along(83:149)+32)
+  # map$p[88:137] <- 38
+  # map$p[138:149] <- (seq_along(138:149)+38)
+  # map<-list(p=factor(map$p))
+
+  map=list()
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
     silent = TRUE, map = map, random = "re"
