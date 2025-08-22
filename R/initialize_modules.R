@@ -983,7 +983,7 @@ set_param_vector <- function(field, module, module_input) {
   )
 
 
-  # Turn off this check as it causes problems due to added surplus production 
+  # Turn off this check as it causes problems due to added surplus production
   # fields not used in caa
   # # Check if both value and estimation information are present
   # if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
@@ -994,8 +994,8 @@ set_param_vector <- function(field, module, module_input) {
 
 
   if (length(field_value_name) == 0 || length(field_estimation_name) == 0) {
-      # If the field is not present in module_input, skip to next field
-      return(invisible(NULL))
+    # If the field is not present in module_input, skip to next field
+    return(invisible(NULL))
   } else {
     # Extract the value of the parameter vector
     field_value <- module_input[[field_value_name]]
