@@ -374,6 +374,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
             info->models_map[this->get_id()]);
 
     std::stringstream ss;
+    ss.str("");
 
     ss << "{\n";
     ss << " \"name\" : \"CatchAtAge\",\n";
