@@ -22,10 +22,10 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
   uint32_t id;
 
  public:
- /**
-  * @brief A string specifying the model type.
-  * 
-  */
+  /**
+   * @brief A string specifying the model type.
+   *
+   */
   std::string model_type_m;
   /**
    * @brief Unique identifier for the fishery model.

@@ -10,7 +10,7 @@ namespace fims_popdy {
 template <typename Type>
 /**
  * @brief SurplusProduction is a surplus production fishery model in FIMS.
- * 
+ *
  */
 class SurplusProduction : public FisheryModelBase<Type> {
  public:
