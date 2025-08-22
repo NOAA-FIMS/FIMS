@@ -1037,6 +1037,8 @@ public:
     for (fleet_ids_iterator it = fleet_ids.begin(); it != fleet_ids.end();
          ++it)
     {
+      std::stringstream ss;
+
       std::shared_ptr<FleetInterface> fleet_interface =
           std::dynamic_pointer_cast<FleetInterface>(
               FleetInterfaceBase::live_objects[(*it)]);
@@ -1044,75 +1046,153 @@ public:
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           model->fleet_derived_quantities[fleet_interface->id];
 
+      std::map<std::string, std::string> &derived_quantities_dim_strings =
+          model->fleet_derived_quantities_dim_strings[fleet_interface->id];
+
       // initialize derive quantities
       // landings
       derived_quantities["landings_numbers_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
+      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
+         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
+      derived_quantities_dim_strings["landings_numbers_at_age"] = ss.str();
+      ss.str("");
 
       derived_quantities["landings_weight_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
+      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
+         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
+      derived_quantities_dim_strings["landings_weight_at_age"] = ss.str();
+      ss.str("");
 
       derived_quantities["landings_numbers_at_length"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
+      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
+         << this->make_dimensions(1, fleet_interface->nlengths.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
+      derived_quantities_dim_strings["landings_numbers_at_length"] = ss.str();
+      ss.str("");
 
       derived_quantities["landings_weight"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["landings_weight"] = ss.str();
+      ss.str("");
 
       derived_quantities["landings_numbers"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["landings_numbers"] = ss.str();
+      ss.str("");
 
       derived_quantities["landings_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["landings_expected"] = ss.str();
+      ss.str("");
 
       derived_quantities["log_landings_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["log_landings_expected"] = ss.str();
+      ss.str("");
 
       derived_quantities["agecomp_proportion"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
+      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
+         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
+      derived_quantities_dim_strings["agecomp_proportion"] = ss.str();
+      ss.str("");
 
       derived_quantities["lengthcomp_proportion"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
+      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
+         << this->make_dimensions(1, fleet_interface->nlengths.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
+      derived_quantities_dim_strings["lengthcomp_proportion"] = ss.str();
+      ss.str("");
+
       // index
       derived_quantities["index_numbers_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
+      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
+         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
+      derived_quantities_dim_strings["index_numbers_at_age"] = ss.str();
+      ss.str("");
 
       derived_quantities["index_weight_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
+      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
+         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
+      derived_quantities_dim_strings["index_weight_at_age"] = ss.str();
+      ss.str("");
 
       derived_quantities["index_numbers_at_length"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
+      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
+         << this->make_dimensions(1, fleet_interface->nlengths.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
+      derived_quantities_dim_strings["index_numbers_at_length"] = ss.str();
+      ss.str("");
 
       derived_quantities["index_weight"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["index_weight"] = ss.str();
+      ss.str("");
 
       derived_quantities["index_numbers"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["index_numbers"] = ss.str();
+      ss.str("");
 
       derived_quantities["index_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["index_expected"] = ss.str();
+      ss.str("");
 
       derived_quantities["log_index_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      //
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["log_index_expected"] = ss.str();
+      ss.str("");
+
       derived_quantities["catch_index"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["catch_index"] = ss.str();
+      ss.str("");
 
       derived_quantities["expected_catch"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["expected_catch"] = ss.str();
+      ss.str("");
 
       derived_quantities["expected_index"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
+      derived_quantities_dim_strings["expected_index"] = ss.str();
+      ss.str("");
 
       derived_quantities["agecomp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1, fleet_interface->nages.get() + 1) << "]";
+      derived_quantities_dim_strings["agecomp_expected"] = ss.str();
+      ss.str("");
 
       derived_quantities["lengthcomp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
+      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1, fleet_interface->nlengths.get() + 1) << "]";
+      derived_quantities_dim_strings["lengthcomp_expected"] = ss.str();
+      ss.str("");
 
       if (fleet_interface->nlengths.get() > 0)
       {
         derived_quantities["age_to_length_conversion"] = fims::Vector<Type>(
             fleet_interface->nyears.get() * fleet_interface->nlengths.get());
+        ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1, fleet_interface->nlengths.get() + 1) << "]";
+        derived_quantities_dim_strings["age_to_length_conversion"] = ss.str();
+        ss.str("");
       }
       // replace elements in the variable map
       info->variable_map[fleet_interface->log_landings_expected.id_m] =
