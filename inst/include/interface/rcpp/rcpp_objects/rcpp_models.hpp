@@ -928,7 +928,7 @@ public:
           model->population_derived_quantities[(*it)];
 
       std::map<std::string, std::string> &derived_quantities_dim_strings =
-          model->population_derived_quantities_dim_strings[(*it)];
+          this->population_derived_quantities_dim_strings[(*it)];
 
       std::stringstream ss;
 
@@ -1047,7 +1047,7 @@ public:
           model->fleet_derived_quantities[fleet_interface->id];
 
       std::map<std::string, std::string> &derived_quantities_dim_strings =
-          model->fleet_derived_quantities_dim_strings[fleet_interface->id];
+          this->fleet_derived_quantities_dim_strings[fleet_interface->id];
 
       // initialize derive quantities
       // landings

@@ -468,9 +468,9 @@ RCPP_MODULE(fims) {
       .method("calculate_reference_points",
               &CatchAtAgeInterface::calculate_reference_points);
 
-  Rcpp::class_<SurplusProductionInterface>("SurplusProduction")
-      .constructor()
-      .method("AddPopulation", &SurplusProductionInterface::AddPopulation);
+//   Rcpp::class_<SurplusProductionInterface>("SurplusProduction")
+//       .constructor()
+//       .method("AddPopulation", &SurplusProductionInterface::AddPopulation);
 }
 
 #endif /* SRC_FIMS_MODULES_HPP */
