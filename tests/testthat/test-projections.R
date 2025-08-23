@@ -2092,27 +2092,33 @@ if(n_projection_years>0){
   }
   if(n_projection_years>0){
     for (i in (om_input[["nyr"]]+1):(om_input[["nyr"]] + n_projection_years) ) {
-      population$log_f_multiplier[i]$value <- -0.6931472
-      population$log_f_multiplier[i]$estimation_type$set("fixed_effects")
+      population$log_f_multiplier[i]$value <- 0.0
+      population$log_f_multiplier[i]$estimation_type$set("random_effects")
     }
 
-    # F_mult_distribution <- methods::new(DnormDistribution)
-    #
-    # F_mult_distribution$log_sd$resize(1)
-    # F_mult_distribution$log_sd[1]$value <- -1
-    # F_mult_distribution$log_sd[1]$estimation_type$set("constant")
-    #
-    # F_mult_distribution$set_distribution_mean(-0.6931472)
-    # F_mult_distribution$expected_mean[1]$estimation_type$set("fixed_effects")
-    #
-    # F_mult_distribution$x$resize(n_projection_years)
-    # F_mult_distribution$expected_values$resize(n_projection_years)
-    # for (i in 1:n_projection_years) {
-    #   F_mult_distribution$x[i]$value <- -0.6931472
-    #   F_mult_distribution$expected_values[i]$value <- -0.6931472
-    # }
-    #
-    # F_mult_distribution$set_distribution_links("random_effects", population$log_f_multiplier$get_id())
+    F_mult_distribution <- methods::new(DnormDistribution)
+
+
+    F_mult_distribution$set_distribution_mean(-2)
+    #F_mult_distribution$set_distribution_mean(-0.6931472)
+    #F_mult_distribution$expected_mean[1]$estimation_type$set("random_effects")
+
+    F_mult_distribution$x$resize(om_input[["nyr"]] + n_projection_years)
+    F_mult_distribution$expected_values$resize(om_input[["nyr"]] + n_projection_years)
+    F_mult_distribution$log_sd$resize(om_input[["nyr"]] + n_projection_years)
+    for (i in 1:(om_input[["nyr"]])) {
+      F_mult_distribution$x[i]$value <- 0
+      F_mult_distribution$expected_values[i]$value <- 0
+      F_mult_distribution$log_sd[i]$value <- 20
+      F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+    }
+    for (i in (om_input[["nyr"]] + 1):n_projection_years) {
+      F_mult_distribution$x[i]$value <- 0
+      F_mult_distribution$expected_values[i]$value <- 0
+      F_mult_distribution$log_sd[i]$value <- -5
+      F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+    }
+    F_mult_distribution$set_distribution_links("random_effects", population$log_f_multiplier$get_id())
 
   }
 
@@ -2189,8 +2195,8 @@ if(n_projection_years>0){
 
   #Save results for comparison
 
-  sdr_report_5_year_project_SSB_target <- sdr_report
-  sdr_fixed_5_year_project_SSB_target <- sdr_fixed
+  sdr_report_20_year_project_SSB_target <- sdr_report
+  sdr_fixed_20_year_project_SSB_target <- sdr_fixed
   #Compare results across model runs
 
   # #Compare fixed parameter estimates between control and fixed F runs

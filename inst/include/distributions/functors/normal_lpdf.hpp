@@ -23,10 +23,6 @@ template <typename Type>
 struct NormalLPDF : public DensityComponentBase<Type> {
   fims::Vector<Type> log_sd; /**< the natural log of the standard deviation of
                                 the distribution; can be a vector or scalar */
-  fims::Vector<Type> expected_mean; /**< the expected mean of the
-                                distribution, overrides expected values */
-  
-  bool use_mean; /**< should expected_mean be used over expected values */
 
   Type lpdf = static_cast<Type>(0.0); /**< total log probability density
                                          contribution of the distribution */
@@ -87,10 +83,6 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         }
         // if not data (i.e. prior or process), use x vector instead of
         // observed_values
-      } else if (use_mean == true) {
-        this->lpdf_vec[i] =
-            dnorm(this->get_observed(i), expected_mean.get_force_scalar(i),
-                  fims_math::exp(log_sd.get_force_scalar(i)), true);
       } else {
         this->lpdf_vec[i] =
             dnorm(this->get_observed(i), this->get_expected(i),

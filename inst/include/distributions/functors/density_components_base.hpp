@@ -39,8 +39,11 @@ struct DistributionElementObject {
       priors; /**< vector of pointers where each points to a prior parameter */
   fims::Vector<Type> x; /**< input value of distribution function for priors or
                            random effects*/
-  // std::shared_ptr<DistributionElementObject<Type>> expected; /**< expected
-  // value of distribution function */
+  fims::Vector<Type> expected_mean; /**< the expected mean of the
+                                distribution, overrides expected values */
+  std::string  use_mean = fims::to_string("no"); /**< should expected_mean 
+                                           be used over expected values */
+
 
   /**
    * Retrieve element from observed data set, random effect, or prior.
@@ -102,7 +105,11 @@ struct DistributionElementObject {
    * @return the reference to the value of the vector or pointer at position i
    */
   inline Type& get_expected(size_t i) {
-    if (this->input_type == "random_effects") {
+    if (this->input_type == "data") {
+      return this->expected_values.get_force_scalar(i);
+    } else if (this->use_mean == "yes") {
+      return this->expected_mean.get_force_scalar(i);
+    } else if (this->input_type == "random_effects") {
       return (*re_expected_values)[i];
     } else {
       return this->expected_values.get_force_scalar(i);

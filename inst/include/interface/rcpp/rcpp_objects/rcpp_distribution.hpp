@@ -36,6 +36,10 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   SharedString input_type_m;
   /**
+   * @brief Shared string indicating whether to use the mean.
+   */
+  SharedString use_mean_m = fims::to_string("no");
+  /**
    * @brief The map associating the ID of the DistributionsInterfaceBase to the
      DistributionsInterfaceBase objects. This is a live object, which is an
      object that has been created and lives in memory.
@@ -66,6 +70,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
       : id_m(other.id_m),
         key_m(other.key_m),
         input_type_m(other.input_type_m),
+        use_mean_m(other.use_mean_m),
         interface_observed_data_id_m(other.interface_observed_data_id_m) {}
 
   /**
@@ -88,6 +93,15 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual bool set_distribution_links(std::string input_type,
                                       Rcpp::IntegerVector ids) {
+    return false;
+  }
+
+  /**
+   * @brief Set mean expected value for distribution.
+   *
+   * @param input_value Value to use for the distribution mean.
+   */
+  virtual bool set_distribution_mean(double input_value) {
     return false;
   }
 
@@ -141,10 +155,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The vector. TODO: document this more.
    */
   RealVector lpdf_vec; /**< The vector*/
-  /**
-   * @brief Should expected_mean be used over expected values.
-   */
-  bool use_mean = false;
 
   /**
    * @brief The constructor.
@@ -192,9 +202,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @param input_value Distribution mean.
    */
   virtual bool set_distribution_mean(double input_value) {
-    this->expected_mean[0].initial_value_m = static_cast<double>(input_value);
+    this->expected_mean[0].initial_value_m = input_value;
     this->expected_mean[0].estimation_type_m.set("fixed_effects");
-    this->use_mean = true;
+    this->use_mean_m.set(fims::to_string("yes"));
     return true;
   }
 
@@ -241,7 +251,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       dnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
     }
     
-    dnorm.use_mean = this->use_mean;
+    dnorm.use_mean = this->use_mean_m;
     
     return dnorm.evaluate();
   }
@@ -412,7 +422,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
-    distribution->use_mean = this->use_mean;
+    distribution->use_mean = this->use_mean_m.get();
     distribution->expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < this->expected_mean.size(); i++){
       distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
