@@ -106,12 +106,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   // Define objective function object to be able to REPORT and ADREPORT
 
-#ifdef TMB_MODEL
-  ::objective_function<Type>
-      *of;  // :: references global namespace, defined in src/FIMS.cpp,
-            // available anywhere in the R package
-#endif
-
   std::map<std::string, fims::Vector<Type>>
       derived_quantities; /*!< derived quantities for specific model type, i.e.
                              caa, surplus production, etc */

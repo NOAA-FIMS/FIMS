@@ -462,50 +462,52 @@ class CatchAtAge : public FisheryModelBase<Type> {
   // return ss.str();
   // }
 
-  /**
-   * This function is used to reset the derived quantities of a population or
-   * fleet to a given value.
-   */
-  virtual void Prepare() {
-    for (size_t p = 0; p < this->populations.size(); p++) {
-      auto derived_quantities =
-          this->population_derived_quantities[this->populations[p]->GetId()];
-
-      // Reset the derived quantities for the population
-      typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-      for (it = derived_quantities.begin(); it != derived_quantities.end();
-           it++) {
-        fims::Vector<Type> &dq = (*it).second;
-        this->ResetVector(dq);
-      }
-    }
-
-    for (size_t p = 0; p < this->populations.size(); p++) {
-      std::shared_ptr<fims_popdy::Population<Type>> &population =
+    /**
+     * This function is used to reset the derived quantities of a population or
+     * fleet to a given value.
+     */
+    virtual void Prepare()
+    {
+      for (size_t p = 0; p < this->populations.size(); p++)
+      {
+        std::shared_ptr<fims_popdy::Population<Type>> &population =
           this->populations[p];
-      std::map<std::string, fims::Vector<Type>> &derived_quantities =
-          this->population_derived_quantities[population->GetId()];
+        auto &derived_quantities =
+            this->population_derived_quantities[this->populations[p]->GetId()];
 
-      // Prepare proportion_female
-      for (size_t age = 0; age < population->nages; age++) {
-        population->proportion_female[age] = 0.5;
-      }
+        // Reset the derived quantities for the population
+        typename fims_popdy::Population<Type>::derived_quantities_iterator it;
+        for (it = derived_quantities.begin(); it != derived_quantities.end();
+             it++)
+        {
+          fims::Vector<Type> &dq = (*it).second;
+          this->ResetVector(dq);
+        }
 
-      // Transformation Section
-      for (size_t age = 0; age < population->nages; age++) {
-        for (size_t year = 0; year < population->nyears; year++) {
-          size_t i_age_year = age * population->nyears + year;
-          population->M[i_age_year] =
-              fims_math::exp(population->log_M[i_age_year]);
-          // TODO: is this still needed now that derived quantities are filled
-          // with ResetVector? mortality_F is a fims::Vector and therefore needs
-          // to be filled within a loop
-          // derived_quantities["mortality_F"][i_age_year] = 0.0;
+        // Prepare proportion_female
+        for (size_t age = 0; age < population->nages; age++)
+        {
+          population->proportion_female[age] = 0.5;
           derived_quantities["weight_at_age"][age] =
               population->growth->evaluate(population->ages[age]);
         }
+
+        // Transformation Section
+        for (size_t age = 0; age < population->nages; age++)
+        {
+          for (size_t year = 0; year < population->nyears; year++)
+          {
+            size_t i_age_year = age * population->nyears + year;
+            population->M[i_age_year] =
+                fims_math::exp(population->log_M[i_age_year]);
+            // TODO: is this still needed now that derived quantities are filled
+            // with ResetVector? 
+            // mortality_F is a fims::Vector and therefore needs
+            // to be filled within a loop
+            // derived_quantities["mortality_F"][i_age_year] = 0.0;
+          }
+        }
       }
-    }
 
     for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
          ++fit) {
@@ -1321,41 +1323,47 @@ class CatchAtAge : public FisheryModelBase<Type> {
     for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-      for (size_t i = 0; i < fleet->landings_weight.size(); i++) {
-        if (fleet->observed_landings_units == "number") {
-          this->fleet_derived_quantities[fleet->GetId()]["landings_expected"]
+        for (size_t i = 0; i < ; 
+        i < this->fleet_derived_quantities[fleet->GetId()]["landings_weight"].size(); 
+        i++) {
+          if (fleet->observed_landings_units == "number")
+          {
+            this->fleet_derived_quantities[fleet->GetId()]["landings_expected"]
+                                          [i] =
+                this->fleet_derived_quantities[fleet->GetId()]["landings_numbers"]
+                                              [i];
+          }
+          else
+          {
+            this->fleet_derived_quantities[fleet->GetId()]["landings_expected"]
+                                          [i] =
+                this->fleet_derived_quantities[fleet->GetId()]["landings_weight"]
+                                              [i];
+          }
+          this->fleet_derived_quantities[fleet->GetId()]["log_landings_expected"]
                                         [i] =
-              this->fleet_derived_quantities[fleet->GetId()]["landings_numbers"]
-                                            [i];
-        } else {
-          this->fleet_derived_quantities[fleet->GetId()]["landings_expected"]
-                                        [i] =
-              this->fleet_derived_quantities[fleet->GetId()]["landings_weight"]
-                                            [i];
+              log(this->fleet_derived_quantities[fleet->GetId()]
+                                                ["landings_expected"][i]);
         }
-        this->fleet_derived_quantities[fleet->GetId()]["log_landings_expected"]
-                                      [i] =
-            log(this->fleet_derived_quantities[fleet->GetId()]
-                                              ["landings_expected"][i]);
       }
     }
-  }
-  /**
-   * * This method is used to evaluate the population dynamics model.
-   */
-  virtual void Evaluate() {
-    /*
-               Sets derived vectors to zero
-               Performs parameters transformations
-               Sets recruitment deviations to mean 0.
+    /**
+     * * This method is used to evaluate the population dynamics model.
      */
-    Prepare();
-    /*
-     start at year=0, age=0;
-     here year 0 is the estimated initial population structure and age 0 are
-     recruits loops start at zero with if statements inside to specify unique
-     code for initial structure and recruitment 0 loops. Could also have started
-     loops at 1 with initial structure and recruitment setup outside the loops.
+    virtual void Evaluate()
+    {
+      /*
+                 Sets derived vectors to zero
+                 Performs parameters transformations
+                 Sets recruitment deviations to mean 0.
+       */
+      Prepare();
+      /*
+       start at year=0, age=0;
+       here year 0 is the estimated initial population structure and age 0 are
+       recruits loops start at zero with if statements inside to specify unique
+       code for initial structure and recruitment 0 loops. Could also have started
+       loops at 1 with initial structure and recruitment setup outside the loops.
 
      year loop is extended to <= nyears because SSB is calculated as the start
      of the year value and by extending one extra year we get estimates of the
