@@ -630,7 +630,9 @@ derived_quantities_dims["sum_selectivity"] =
     {
       for (size_t p = 0; p < this->populations.size(); p++)
       {
-        auto derived_quantities =
+        std::shared_ptr<fims_popdy::Population<Type>> &population =
+          this->populations[p];
+        auto &derived_quantities =
             this->population_derived_quantities[this->populations[p]->GetId()];
 
         // Reset the derived quantities for the population
@@ -641,19 +643,13 @@ derived_quantities_dims["sum_selectivity"] =
           fims::Vector<Type> &dq = (*it).second;
           this->ResetVector(dq);
         }
-      }
-
-      for (size_t p = 0; p < this->populations.size(); p++)
-      {
-        std::shared_ptr<fims_popdy::Population<Type>> &population =
-            this->populations[p];
-        std::map<std::string, fims::Vector<Type>> &derived_quantities =
-            this->population_derived_quantities[population->GetId()];
 
         // Prepare proportion_female
         for (size_t age = 0; age < population->nages; age++)
         {
           population->proportion_female[age] = 0.5;
+          derived_quantities["weight_at_age"][age] =
+              population->growth->evaluate(population->ages[age]);
         }
 
         // Transformation Section
@@ -665,11 +661,10 @@ derived_quantities_dims["sum_selectivity"] =
             population->M[i_age_year] =
                 fims_math::exp(population->log_M[i_age_year]);
             // TODO: is this still needed now that derived quantities are filled
-            // with ResetVector? mortality_F is a fims::Vector and therefore needs
+            // with ResetVector? 
+            // mortality_F is a fims::Vector and therefore needs
             // to be filled within a loop
             // derived_quantities["mortality_F"][i_age_year] = 0.0;
-            derived_quantities["weight_at_age"][age] =
-                population->growth->evaluate(population->ages[age]);
           }
         }
       }
@@ -1564,8 +1559,9 @@ derived_quantities_dims["sum_selectivity"] =
       {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-        for (size_t i = 0; i < fleet->landings_weight.size(); i++)
-        {
+        for (size_t i = 0; i < ; 
+        i < this->fleet_derived_quantities[fleet->GetId()]["landings_weight"].size(); 
+        i++) {
           if (fleet->observed_landings_units == "number")
           {
             this->fleet_derived_quantities[fleet->GetId()]["landings_expected"]

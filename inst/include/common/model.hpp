@@ -65,25 +65,22 @@ class Model {  // may need singleton
       return jnll;
     }
     
+     // Create vector for reporting out nll components
+    fims::Vector<Type> nll_vec(
+          this->fims_information->density_components.size(), 0.0);
+
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->of = this->of;  // link to TMB objective function
       m->Prepare();
-      m->Evaluate();
     }
     
-    // Create vector for reporting out nll components
-#ifdef TMB_MODEL
-    vector<Type> nll_components(
-        this->fims_information->density_components.size());
-#endif
     
     // Loop over densities and evaluate joint negative log densities for priors
     typename fims_info::Information<Type>::density_components_iterator d_it;
-    nll_components.fill(0);
-    int nll_components_idx = 0;
+    int nll_vec_idx = 0;
     size_t n_priors = 0;
     FIMS_INFO_LOG("Begin evaluating prior densities.")
       for (d_it = this->fims_information->density_components.begin();
@@ -94,10 +91,10 @@ class Model {  // may need singleton
         d->of = this->of;
 #endif
         if (d->input_type == "prior") {
-          nll_components[nll_components_idx] = -d->evaluate();
-          jnll += nll_components[nll_components_idx];
+          nll_vec[nll_vec_idx] = -d->evaluate();
+          jnll += nll_vec[nll_vec_idx];
           n_priors += 1;
-          nll_components_idx += 1;
+          nll_vec_idx += 1;
         }
       }
       FIMS_INFO_LOG(
@@ -105,26 +102,6 @@ class Model {  // may need singleton
         "evaluating " +
           fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
     
-    // Loop over populations and evaluate recruitment component
-    
-    typename fims_info::Information<Type>::population_iterator p_it;
-    
-    for (p_it = this->fims_information->populations.begin();
-         p_it != this->fims_information->populations.end(); ++p_it) {
-      //(*p_it).second points to the Population module
-      std::shared_ptr<fims_popdy::Population<Type>> p = (*p_it).second;
-    }
-    
-    // Loop over and evaluate populations
-    for (p_it = this->fims_information->populations.begin();
-         p_it != this->fims_information->populations.end(); ++p_it) {
-      //(*p_it).second points to the Population module
-      std::shared_ptr<fims_popdy::Population<Type>> p = (*p_it).second;
-      // link to TMB objective function
-#ifdef TMB_MODEL
-      p->of = this->of;
-#endif
-    }
     
     // Loop over densities and evaluate joint negative log-likelihoods for
     // random effects
@@ -137,10 +114,10 @@ class Model {  // may need singleton
       d->of = this->of;
 #endif
       if (d->input_type == "random_effects") {
-        nll_components[nll_components_idx] = -d->evaluate();
-        jnll += nll_components[nll_components_idx];
+        nll_vec[nll_vec_idx] = -d->evaluate();
+        jnll += nll_vec[nll_vec_idx];
         n_random_effects += 1;
-        nll_components_idx += 1;
+        nll_vec_idx += 1;
       }
     }
     FIMS_INFO_LOG(
@@ -149,6 +126,15 @@ class Model {  // may need singleton
         fims::to_string(n_random_effects) +
         " random_effects is: " + fims::to_string(jnll));
     
+    //evaluate model
+    for (m_it = this->fims_information->models_map.begin();
+         m_it != this->fims_information->models_map.end(); ++m_it) {
+      //(*m_it).second points to the Model module
+      std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
+      m->of = this->of;  // link to TMB objective function
+      m->Evaluate();
+    }
+
     this->fims_information->SetupData();
     // Loop over and evaluate data joint negative log-likelihoods
     int n_data = 0;
@@ -161,16 +147,17 @@ class Model {  // may need singleton
       // d->keep = this->keep;
 #endif
       if (d->input_type == "data") {
-        nll_components[nll_components_idx] = -d->evaluate();
-        jnll += nll_components[nll_components_idx];
+        nll_vec[nll_vec_idx] = -d->evaluate();
+        jnll += nll_vec[nll_vec_idx];
         n_data += 1;
-        nll_components_idx += 1;
+        nll_vec_idx += 1;
       }
     }
     
     // report out nll components
 #ifdef TMB_MODEL
-    FIMS_REPORT_F(nll_components, this->of);
+    vector<Type> nll_components = nll_vec;
+    FIMS_REPORT_F(nll_vec, this->of);
     FIMS_REPORT_F(jnll, this->of);
 #endif
     
