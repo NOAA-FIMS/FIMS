@@ -100,9 +100,13 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
 
   std::map<uint32_t, std::map<std::string, std::string>>
       fleet_derived_quantities_dim_strings;
+  typedef typename std::map<uint32_t, std::map<std::string, std::string>>::iterator
+      fleet_derived_quantities_dim_strings_iterator;
 
   std::map<uint32_t, std::map<std::string, std::string>>
       population_derived_quantities_dim_strings;
+  typedef typename std::map<uint32_t, std::map<std::string, std::string>>::iterator
+      population_derived_quantities_dim_strings_iterator;
 
 public:
   /**
@@ -294,6 +298,150 @@ public:
   }
 
   /**
+   * This function is used to convert the derived quantities of a population or
+   * fleet to a JSON string. This function is used to create the JSON output for
+   * the CatchAtAge model.
+   */
+  std::string DerivedQuantityToJSON(
+      typename fims_popdy::CatchAtAge<double>::derived_quantities_iterator it,
+      std::string dims = "\"dimensions\" : []")
+  {
+    fims::Vector<double> &dq = (*it).second;
+    std::stringstream ss;
+    // ss << std::fixed;
+    ss << "{\n";
+    ss << "\"name\":\"" << (*it).first << "\",\n";
+    ss << "\"values\":[";
+
+    if (dq.size() > 0)
+    {
+      for (size_t i = 0; i < dq.size() - 1; i++)
+      {
+        if (dq[i] != dq[i]) // check for NaN
+        {
+          ss << "\"nan\", ";
+        }
+        else
+        {
+          ss << dq[i] << ", ";
+        }
+      }
+      if (dq[dq.size() - 1] != dq[dq.size() - 1]) // check for NaN
+      {
+        ss << "\"nan\"";
+      }
+      else
+      {
+        ss << dq[dq.size() - 1] << "],\n";
+      }
+    }
+    else
+    {
+      ss << "],\n";
+    }
+    ss << dims << "\n";
+    ss << "}";
+    
+    return ss.str();
+  }
+
+  /**
+   * @brief Send the fleet-based derived quantities to the json file.
+   * @return std::string
+   */
+  std::string fleet_derived_quantities_to_json(
+      typename fims_popdy::CatchAtAge<double>::fleet_derived_quantities_iterator fdqit)
+  {
+    std::stringstream ss;
+
+    std::map<std::string, fims::Vector<double>>::iterator it;
+    std::map<std::string, fims::Vector<double>>::iterator end_it;
+    end_it = (*fdqit).second.end();
+    typename std::map<std::string, fims::Vector<double>>::iterator second_to_last;
+    second_to_last = (*fdqit).second.end();
+    if (it != end_it)
+    {
+      second_to_last--;
+    }
+
+    std::string dims;
+    it = (*fdqit).second.begin();
+    for (; it != second_to_last; ++it)
+    {
+      dims = "\"dimensions\" : []";
+      // if (str_it != this->fleet_derived_quantities_dim_strings.end())
+      // {
+      //   std::map<std::string, std::string>::iterator str_it2;
+      //   str_it2 = str_it->second.find(it->first);
+      //   if (str_it2 != str_it->second.end())
+      //   {
+      //     dims = str_it2->second;
+      //   }
+        
+      // }
+      ss << this->DerivedQuantityToJSON(it, dims) << ",\n";
+    }
+
+    dims = "\"dimensions\" : []";
+    // if (str_it != this->fleet_derived_quantities_dim_strings.end())
+    // {
+    //   std::map<std::string, std::string>::iterator str_it2;
+    //   str_it2 = str_it->second.find(second_to_last->first);
+    //   if (str_it2 != str_it->second.end())
+    //   {
+    //     dims = str_it2->second;
+    //   }
+      
+    // }
+    ss << this->DerivedQuantityToJSON(second_to_last, dims) << "\n";
+    return ss.str();
+  }
+  /**
+   * @brief Send the population-based derived quantities to the json file.
+   * @return std::string
+   */
+  std::string population_derived_quantities_to_json(
+      typename fims_popdy::CatchAtAge<double>::population_derived_quantities_iterator pdqit)
+  {
+    std::stringstream ss;
+    // ss << std::fixed;
+    // ss << "{\n";
+    // ss << "\"id\": " << (*pdqit).first << ",\n";
+    // ss << "\"derived_quantities\": [\n";
+    population_derived_quantities_dim_strings_iterator str_it = this->population_derived_quantities_dim_strings.find((*pdqit).first);
+
+    typename std::map<std::string, fims::Vector<double>>::iterator it;
+    typename std::map<std::string, fims::Vector<double>>::iterator end_it;
+    end_it = (*pdqit).second.end();
+    typename std::map<std::string, fims::Vector<double>>::iterator second_to_last;
+    second_to_last = (*pdqit).second.end();
+    if (it != end_it)
+    {
+      second_to_last--;
+    }
+
+    std::string dims;
+    it = (*pdqit).second.begin();
+    for (; it != second_to_last; ++it)
+    {
+      dims = "\"dimensions\" : []";
+      if (str_it != this->fleet_derived_quantities_dim_strings.end())
+      {
+        dims = str_it->second[it->first];
+        ss << this->DerivedQuantityToJSON(it, dims) << ",\n";
+      }
+    }
+
+    dims = "\"dimensions\" : []";
+    if (str_it != this->fleet_derived_quantities_dim_strings.end())
+    {
+      dims = str_it->second[second_to_last->first];
+      ss << this->DerivedQuantityToJSON(second_to_last, dims) << "\n";
+    }
+    return ss.str();
+  }
+
+  /**
    * @brief Method to convert a fleet to a JSON string.
    */
   std::string
@@ -392,7 +540,7 @@ public:
 
       if (fit != model_ptr->fleet_derived_quantities.end())
       {
-        ss << model_ptr->fleet_derived_quantities_to_json(fit) << "]}\n";
+        ss << this->fleet_derived_quantities_to_json(fit) << "]}\n";
       }
       else
       {
