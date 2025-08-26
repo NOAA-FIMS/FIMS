@@ -13,6 +13,14 @@
 namespace fims_popdy
 {
 
+struct DimensionInfo{
+  std::string name;
+  int ndims;
+  fims::Vector<int> dims;
+  fims::Vector<std::string> dim_names;
+};
+
+
   template <typename Type>
   /**
    * @brief FisheryModelBase is a base class for fishery models in FIMS.
@@ -57,7 +65,11 @@ namespace fims_popdy
     typedef typename DerivedQuantitiesMap::iterator DerivedQuantitiesMapIterator;
     std::shared_ptr<DerivedQuantitiesMap> fleet_derived_quantities;
     std::shared_ptr<DerivedQuantitiesMap> population_derived_quantities;
-    
+
+    typedef typename std::map<uint32_t,std::map<std::string, DimensionInfo>> DimensionInfoMap;
+    std::shared_ptr<DimensionInfoMap> fleet_dimension_info;
+    std::shared_ptr<DimensionInfoMap> population_dimension_info;
+
 #ifdef TMB_MODEL
     ::objective_function<Type> *of;
 #endif
@@ -69,6 +81,8 @@ namespace fims_popdy
     {
       fleet_derived_quantities = std::make_shared<DerivedQuantitiesMap>();
       population_derived_quantities = std::make_shared<DerivedQuantitiesMap>();
+      fleet_dimension_info = std::make_shared<DimensionInfoMap>();
+      population_dimension_info = std::make_shared<DimensionInfoMap>();
     }
 
     /**
@@ -80,11 +94,14 @@ namespace fims_popdy
                                                       population_ids(other.population_ids),
                                                       populations(other.populations),
                                                       fleet_derived_quantities(other.fleet_derived_quantities),
-                                                      population_derived_quantities(other.population_derived_quantities)
+                                                      population_derived_quantities(other.population_derived_quantities),
+                                                      fleet_dimension_info(other.fleet_dimension_info),
+                                                      population_dimension_info(other.population_dimension_info)
     {
-   
+
     }
 
+    
     /**
      * @brief Destroy the Fishery Model Base object.
      *
