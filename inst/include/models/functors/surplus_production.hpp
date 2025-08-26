@@ -68,9 +68,12 @@ class SurplusProduction : public FisheryModelBase<Type> {
   typedef
       typename std::map<std::string, fims::Vector<Type>>::iterator dq_iterator;
 
-  size_t nyears = 0;  // max of all populations
-  size_t nages = 0;   // max of all populations
-  std::set<uint32_t> population_ids;
+  size_t nyears = 0;  /*!< max years of all populations */
+  size_t nages = 0;   /*!< max ages of all populations */
+  std::set<uint32_t> population_ids; /*!< list of population ids  */
+  /**
+   * @brief Vector of shared pointers that contains all populations in the model.
+   */
   std::vector<std::shared_ptr<fims_popdy::Population<Type>>> populations;
 
   SurplusProduction() : fims_popdy::FisheryModelBase<Type>() {
@@ -132,14 +135,30 @@ class SurplusProduction : public FisheryModelBase<Type> {
     }
   }
 
+  /**
+   * This function is used to add a population id to the set of population ids.
+   */
   void AddPopulation(uint32_t id) { this->population_ids.insert(id); }
 
+    /**
+   * @brief Get the population ids of the model.
+   */
   std::set<uint32_t> &GetPopulationIds() { return population_ids; }
 
+  /**
+   * This function is used to get the populations of the model. It returns a
+   * vector of shared pointers to the populations.
+   * @return std::vector<std::shared_ptr<fims_popdy::Population<Type>>>&
+   */
   std::vector<std::shared_ptr<fims_popdy::Population<Type>>> &GetPopulations() {
     return populations;
   }
 
+/**
+ * @brief Sum over the observed catch for a given population and year.
+ * @param population A shared pointer to the population object.
+ * @param year The year for which to calculate the catch.
+ */
   void CalculateCatch(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t year) {
     for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
@@ -151,50 +170,70 @@ class SurplusProduction : public FisheryModelBase<Type> {
     }
   }
 
+  /**
+   * @brief Evaluate the expected depletion for a given population and year.
+   * @copydoc CalculateCatch()
+   */
   void CalculateDepletion(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_year) {
-    if (i_year == 0) {
+      size_t year) {
+    if (year == 0) {
       population->depletion->log_expected_depletion[0] =
           population->log_init_depletion[0];
     } else {
-      population->depletion->log_expected_depletion[i_year] =
+      population->depletion->log_expected_depletion[year] =
           population->depletion->evaluate_mean(
               fims_math::exp(
-                  population->depletion->log_expected_depletion[i_year - 1]),
+                  population->depletion->log_expected_depletion[year - 1]),
               this->population_derived_quantities[population->GetId()]
                                                  ["observed_catch"]
-                                                 [i_year - 1]);
+                                                 [year - 1]);
     }
     this->population_derived_quantities[population->GetId()]
-                                       ["expected_depletion"][i_year] =
-        fims_math::exp(population->depletion->log_depletion[i_year]);
+                                       ["expected_depletion"][year] =
+        fims_math::exp(population->depletion->log_depletion[year]);
   }
 
+  /**
+   * @brief Evaluate the population index for a given population and year.
+   * @copydoc CalculateCatch()
+   */
   void CalculateIndex(std::shared_ptr<fims_popdy::Population<Type>> &population,
-                      size_t i_year) {
+                      size_t year) {
     Type index_;
     for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
       // reference depletion->log_depletion here, where
       // log_depletion ~ LN(log_expected_depletion, sigma)
       index_ = fims_math::exp(
-          population->depletion->log_depletion[i_year] +
-          population->fleets[fleet_]->log_q.get_force_scalar(i_year));
+          population->depletion->log_depletion[year] +
+          population->fleets[fleet_]->log_q.get_force_scalar(year));
 
-      population->fleets[fleet_]->index_expected[i_year] += index_;
+      population->fleets[fleet_]->index_expected[year] += index_;
     }
+    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+      population->fleets[fleet_]->log_index_expected[year] =
+          fims_math::log(population->fleets[fleet_]->index_expected[year]);
+    }
+
   }
 
+  /**
+   * @brief Evaluate the population biomass for a given population and year.
+   * @copydoc CalculateCatch()
+   */
   void CalculateBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_year) {
+      size_t year) {
     this->population_derived_quantities[population->GetId()]["biomass"]
-                                       [i_year] =
+                                       [year] =
         this->population_derived_quantities[population->GetId()]
-                                           ["expected_depletion"][i_year] *
+                                           ["expected_depletion"][year] *
         fims_math::exp(population->depletion->log_K[0]);
   }
 
+  /**
+  * @brief This method is used to evaluate the surplus production model.
+  */
   virtual void Evaluate() {
     Prepare();
     for (size_t p = 0; p < this->populations.size(); p++) {
@@ -210,6 +249,9 @@ class SurplusProduction : public FisheryModelBase<Type> {
     }
   }
 
+  /**
+   * @brief This method is used to report the results of the surplus production model.
+   */
   virtual void Report() {
     int n_pops = this->populations.size();
 #ifdef TMB_MODEL
