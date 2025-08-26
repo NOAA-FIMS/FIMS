@@ -110,6 +110,14 @@ namespace fims
 #endif
 
     /**
+     * @brief Initialization constructor from std::initializer_list<Type> type.
+     */
+    Vector(std::initializer_list<Type> init)
+    {
+      this->vec_m = std::vector<Type>(init);
+    }
+
+    /**
      * The following are std::vector functions copied over from the standard
      * library. While some of these may not be called explicitly in FIMS, they may
      * be required to run other std library functions.
@@ -119,7 +127,11 @@ namespace fims
      * @brief Returns a reference to the element at specified location pos. No
      * bounds checking is performed.
      */
-    inline Type &operator[](size_t pos) { return this->vec_m[pos]; }
+    inline Type &
+    operator[](size_t pos)
+    {
+      return this->vec_m[pos];
+    }
 
     /**
      * @brief Returns a constant  reference to the element at specified location

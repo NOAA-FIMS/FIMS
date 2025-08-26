@@ -18,6 +18,11 @@ struct DimensionInfo{
   int ndims;
   fims::Vector<int> dims;
   fims::Vector<std::string> dim_names;
+
+  DimensionInfo() : ndims(0) {}
+
+  DimensionInfo(const std::string &name, const fims::Vector<int> &dims, const fims::Vector<std::string> &dim_names)
+      : name(name), ndims(dims.size()), dims(dims), dim_names(dim_names) {}
 };
 
 
@@ -148,7 +153,7 @@ struct DimensionInfo{
      *
      * @return std::map<uint32_t, std::map<std::string, DimensionInfo>>
      */
-    std::map<uint32_t, std::map<std::string, DimensionInfo>> GetFleetDimensionInfo() const
+    std::map<uint32_t, std::map<std::string, DimensionInfo>>& GetFleetDimensionInfo() 
     {
       return *fleet_dimension_info;
     }
@@ -158,7 +163,7 @@ struct DimensionInfo{
      *
      * @return std::map<uint32_t, std::map<std::string, DimensionInfo>>
      */
-    std::map<uint32_t, std::map<std::string, DimensionInfo>> GetPopulationDimensionInfo() const
+    std::map<uint32_t, std::map<std::string, DimensionInfo>>& GetPopulationDimensionInfo() 
     {
       return *population_dimension_info;
     }
@@ -168,7 +173,7 @@ struct DimensionInfo{
      *
      * @return DerivedQuantitiesMap
      */
-    DerivedQuantitiesMap GetFleetDerivedQuantities() const
+    DerivedQuantitiesMap& GetFleetDerivedQuantities() 
     {
       return *fleet_derived_quantities;
     }
@@ -178,7 +183,7 @@ struct DimensionInfo{
      *
      * @return DerivedQuantitiesMap
      */
-    DerivedQuantitiesMap GetPopulationDerivedQuantities() const
+    DerivedQuantitiesMap& GetPopulationDerivedQuantities() 
     {
       return *population_derived_quantities;
     }
@@ -189,7 +194,7 @@ struct DimensionInfo{
      * @param fleet_id The ID of the fleet.
      * @return std::map<std::string, fims::Vector<Type>>&
      */
-    std::map<std::string, fims::Vector<Type>>& GetFleetDerivedQuantities(uint32_t fleet_id) const
+    std::map<std::string, fims::Vector<Type>>& GetFleetDerivedQuantities(uint32_t fleet_id) 
     {
       return (*fleet_derived_quantities)[fleet_id];
     }
@@ -200,7 +205,7 @@ struct DimensionInfo{
      * @param population_id The ID of the population.
      * @return std::map<std::string, fims::Vector<Type>>&
      */
-    std::map<std::string, fims::Vector<Type>>& GetPopulationDerivedQuantities(uint32_t population_id) const
+    std::map<std::string, fims::Vector<Type>>& GetPopulationDerivedQuantities(uint32_t population_id) 
     {
       return (*population_derived_quantities)[population_id];
     }
@@ -211,7 +216,7 @@ struct DimensionInfo{
      * @param fleet_id The ID of the fleet.
      * @return std::map<std::string, DimensionInfo>
      */
-    std::map<std::string, DimensionInfo> GetFleetDimensionInfo(uint32_t fleet_id) const
+    std::map<std::string, DimensionInfo>& GetFleetDimensionInfo(uint32_t fleet_id) 
     {
       return (*fleet_dimension_info)[fleet_id];
     } 
@@ -222,7 +227,7 @@ struct DimensionInfo{
      * @param population_id The ID of the population.
      * @return std::map<std::string, DimensionInfo>
      */
-    std::map<std::string, DimensionInfo> GetPopulationDimensionInfo(uint32_t population_id) const
+    std::map<std::string, DimensionInfo>& GetPopulationDimensionInfo(uint32_t population_id) 
     {
       return (*population_dimension_info)[population_id];
     }
