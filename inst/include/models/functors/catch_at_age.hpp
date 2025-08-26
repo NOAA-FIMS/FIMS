@@ -1559,8 +1559,7 @@ derived_quantities_dims["sum_selectivity"] =
       {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-        for (size_t i = 0; i < ; 
-        i < this->fleet_derived_quantities[fleet->GetId()]["landings_weight"].size(); 
+        for (size_t i = 0; i < this->fleet_derived_quantities[fleet->GetId()]["landings_weight"].size(); 
         i++) {
           if (fleet->observed_landings_units == "number")
           {
