@@ -341,7 +341,7 @@ public:
     }
     ss << dims << "\n";
     ss << "}";
-    
+
     return ss.str();
   }
 
@@ -377,7 +377,7 @@ public:
       //   {
       //     dims = str_it2->second;
       //   }
-        
+
       // }
       ss << this->DerivedQuantityToJSON(it, dims) << ",\n";
     }
@@ -391,7 +391,7 @@ public:
     //   {
     //     dims = str_it2->second;
     //   }
-      
+
     // }
     ss << this->DerivedQuantityToJSON(second_to_last, dims) << "\n";
     return ss.str();
@@ -764,282 +764,6 @@ public:
     return result;
   }
 
-  /**
-   * @brief Method to calculate reference points for a population.
-   * @param population_interface
-   * @param maxF The maximum fishing mortality to calculate reference points
-   * for.
-   * @param step The step size for the fishing mortality.
-   * @return A list of reference points for the population.
-   */
-  Rcpp::List calculate_reference_points_population(
-      PopulationInterface *population_interface, double maxF = 1.0,
-      double step = 0.01)
-  {
-    //         //note: this algorithm is ported from the Meta-population
-    //         assessment system project and
-    //         //needs review
-
-    Rcpp::List result;
-    //         double spawning_season_offset = 0.0;
-    //         std::shared_ptr<fims_info::Information<double>> info =
-    //             fims_info::Information<double>::GetInstance();
-
-    //         typename fims_info::Information<double>::population_iterator pit;
-
-    //         pit = info->populations.find(population_interface->get_id());
-
-    //         if (pit != info->populations.end())
-    //         {
-    //             std::shared_ptr<fims_popdy::Population<double>> &pop =
-    //             (*pit).second;
-
-    //             size_t year = pop->nyears - 1;
-    //             size_t season = pop->nseasons - 1;
-    //             size_t nages = pop->ages.size();
-
-    //             std::vector<double> F;
-    //             for (double f = 0.0; f <= maxF; f += step)
-    //             {
-    //                 F.push_back(f);
-    //             }
-
-    //             std::valarray<double> spr(F.size());       // equilibrium spr
-    //             at F std::valarray<double> spr_ratio(F.size()); //
-    //             equilibrium spr at F std::vector<double> S_eq(F.size()); //
-    //             equilibrium SSB at F std::vector<double> R_eq(F.size()); //
-    //             equilibrium recruitment at F std::vector<double>
-    //             B_eq(F.size());        // equilibrium biomass at F
-    //             std::vector<double> L_eq(F.size());        // equilibrium
-    //             landings at F std::vector<double> D_eq(F.size());        //
-    //             equilibrium dead discards at F std::vector<double>
-    //             E_eq(F.size());        // equilibrium exploitation rate at F
-    //             (landings only) std::valarray<double> L_eq_knum(F.size());
-    //             std::valarray<double> SSB_eq(F.size());
-    //             double spr_F0 = 0.0;
-
-    //             std::vector<double> N0(pop->ages.size(), 1.0);
-    //             for (int iage = 1; iage < nages; iage++)
-    //             {
-    //                 N0[iage] = N0[iage - 1] * std::exp(-1.0 * pop->M[iage -
-    //                 1]);
-    //             }
-    //             N0[nages - 1] = N0[nages - 2] * std::exp(-1.0 * pop->M[nages
-    //             - 2]) / (1.0 - std::exp(-1.0 * pop->M[nages - 1]));
-
-    //             std::valarray<double> reprod(nages);
-    //             std::valarray<double> selL(nages);
-    //             std::valarray<double> selZ(nages);
-    //             std::valarray<double> selD(nages);
-    //             std::valarray<double> M_age(nages);
-    //             std::valarray<double> wgt(nages);
-
-    //             for (int a = 0; a < pop->ages.size(); a++)
-    //             {
-    //                 // dimension folded index
-    //                 size_t index = year * pop->ages.size() + a;
-
-    //                 // is this ssb_unfished?
-    //                 reprod[a] =
-    //                 pop->derived_quantities["weight_at_age"][index] *
-    //                 (pop->derived_quantities["proportion_mature_at_age"][index]
-    //                 * pop->proportion_female[0]); spr_F0 += N0[a] *
-    //                 reprod[a]; selL[a] =
-    //                 pop->derived_quantities["sum_selectivity"][index];
-    //                 selZ[a] =
-    //                 pop->derived_quantities["sum_selectivity"][index];
-    //                 M_age[a] = pop->M[a];
-    //                 wgt[a] = pop->derived_quantities["weight_at_age"][a];
-    //             }
-
-    //             std::valarray<double> L_age(nages); // #landings at age
-    //             std::valarray<double> D_age(nages); // #dead discards at age
-    //             std::valarray<double> F_age(nages); // #F at age
-    //             std::valarray<double> Z_age(nages); // #Z at age
-
-    //             // BEGIN ALGORITHM
-    //             for (int i = 0; i < F.size(); i++)
-    //             {
-
-    //                 std::valarray<double> FL_age = F[i] * selL;
-    //                 // std::valarray<REAL_T> FD_age = F[i] * selD;
-    //                 std::valarray<double> Z_age = M_age + F[i] * selZ;
-
-    //                 std::valarray<double> N_age(nages);
-    //                 std::valarray<double> N_age_spawn(nages);
-
-    //                 N_age[0] = 1.0;
-
-    //                 for (int iage = 1; iage < nages; iage++)
-    //                 {
-    //                     N_age[iage] = N_age[iage - 1] * std::exp(-1.0 *
-    //                     Z_age[iage - 1]);
-    //                 }
-
-    //                 // last age is pooled
-    //                 N_age[nages - 1] = N_age[nages - 2] * std::exp(-1.0 *
-    //                 Z_age[nages - 2]) /
-    //                                    (1.0 - std::exp(-1.0 * Z_age[nages -
-    //                                    1]));
-
-    //                 N_age_spawn = (N_age *
-    //                                std::exp((-1.0 * Z_age *
-    //                                spawning_season_offset)));
-
-    //                 N_age_spawn[nages - 1] = (N_age_spawn[nages - 2] *
-    //                 (std::exp(-1. * (Z_age[nages - 2] * (1.0 -
-    //                 spawning_season_offset) +
-    //                                                                                     Z_age[nages - 1] * spawning_season_offset)))) /
-    //                                          (1.0 - std::exp(-1. *
-    //                                          Z_age[nages - 1]));
-
-    //                 spr[i] = sum(N_age * reprod);
-    // #warning This is probably not correct
-    //                 R_eq[i] = pop->recruitment->evaluate(spr[i], spr_F0);
-    //                 // R_eq[i] = (R0 / ((5.0 * steep - 1.0) * spr[i])) *
-    //                 //           (BC * 4.0 * steep * spr[i] - spr_F0 * (1.0 -
-    //                 steep));
-    //                 // R_eq[i] =
-    //                 this->recruitment_model->CalculateEquilibriumRecruitment(
-    //                 //
-    //                 this->recruitment_model->CalculateEquilibriumSpawningBiomass(spr[i]));
-    //                 //*1000*this->sex_fraction_value;
-
-    //                 if (R_eq[i] < 0.0000001)
-    //                 {
-    //                     R_eq[i] = 0.0000001;
-    //                 }
-
-    //                 N_age *= R_eq[i];
-    //                 N_age_spawn *= R_eq[i];
-
-    //                 S_eq[i] = sum(N_age * reprod);
-    //                 B_eq[i] = sum(N_age * wgt);
-
-    //                 for (int iage = 0; iage < nages; iage++)
-    //                 {
-    //                     L_age[iage] = N_age[iage] *
-    //                                   (FL_age[iage] / Z_age[iage]) * (1. -
-    //                                   std::exp(-1.0 * Z_age[iage]));
-    //                     // D_age[iage] = N_age[iage] *
-    //                     //               (FD_age[iage] / Z_age[iage]) * (1. -
-    //                     exp(-1.0 * Z_age[iage]))
-    //                 }
-    //                 SSB_eq[i] = sum((N_age_spawn * reprod));
-    //                 L_eq[i] = sum(L_age * wgt);
-    //                 E_eq[i] = sum(L_age) / sum(N_age);
-    //                 L_eq_knum[i] = (sum(L_age) / 1000.0);
-    //             }
-
-    //             int max_index = 0;
-    //             double max = std::numeric_limits<double>::min();
-    //             spr_ratio = spr / spr_F0;
-    //             double F01_dum = min(fabs(spr_ratio - 0.001));
-    //             double F30_dum = min(fabs(spr_ratio - 0.3));
-    //             double F35_dum = min(fabs(spr_ratio - 0.35));
-    //             double F40_dum = min(fabs(spr_ratio - 0.4));
-    //             size_t F01_out;
-    //             size_t F30_out = 0;
-    //             size_t F35_out = 0;
-    //             size_t F40_out = 0;
-
-    //             for (int i = 0; i < L_eq.size(); i++)
-    //             {
-
-    //                 if (L_eq[i] >= max)
-    //                 {
-    //                     max = L_eq[i];
-    //                     max_index = i;
-    //                 }
-
-    //                 //                if (std::fabs(spr_ratio[i] - 0.001) ==
-    //                 F01_dum) {
-    //                 //                    F01_out = F[i];
-    //                 //                }
-
-    //                 if (std::fabs(spr_ratio[i] - 0.3) == F30_dum)
-    //                 {
-    //                     F30_out = i;
-    //                 }
-    //                 if (std::fabs(spr_ratio[i] - 0.35) == F35_dum)
-    //                 {
-    //                     F35_out = i;
-    //                 }
-    //                 if (std::fabs(spr_ratio[i] - 0.4) == F40_dum)
-    //                 {
-    //                     F40_out = i;
-    //                 }
-    //             }
-    //             double msy_mt_out = max; // msy in whole weight
-    //             double SSB_msy_out;
-    //             double B_msy_out;
-    //             double R_msy_out;
-    //             double msy_knum_out;
-    //             double F_msy_out;
-    //             double spr_msy_out;
-    //             int index_m = 0;
-    //             for (int i = 0; i < F.size(); i++)
-    //             {
-    //                 if (L_eq[i] == msy_mt_out)
-    //                 {
-
-    //                     SSB_msy_out = SSB_eq[i];
-    //                     B_msy_out = B_eq[i] * pop->proportion_female[0];
-    //                     R_msy_out = R_eq[i] * 1000.0 *
-    //                     pop->proportion_female[0]; msy_knum_out =
-    //                     L_eq_knum[i]; F_msy_out = F[i]; spr_msy_out = spr[i];
-    //                     index_m = i;
-    //                 }
-    //             }
-
-    //             std::cout << std::fixed;
-    //             //
-    //             std::cout << "\n\nFmax: " << maxF << "\n";
-    //             std::cout << "Step: " << step << "\n";
-    //             std::cout << "\n\nF_msy: " << F[max_index] << "\n";
-    //             std::cout << "spr_30: " << spr_ratio[F30_out] << "\n";
-    //             std::cout << "spr_35: " << spr_ratio[F35_out] << "\n";
-    //             std::cout << "spr_40: " << spr_ratio[F40_out] << "\n";
-    //             std::cout << "F30: " << F[F30_out] << "\n";
-    //             std::cout << "F35: " << F[F35_out] << "\n";
-    //             std::cout << "F40: " << F[F40_out] << "\n";
-    //             spr_msy_out = spr[max_index];
-    //             std::cout << "msy: " << F_msy_out * pop->proportion_female[0]
-    //             << "\n"; std::cout << "spr_msy: " << spr[max_index] << "\n";
-    //             std::cout << "SR_msy: " << spr_msy_out / spr_F0 << "\n";
-    //             //                        std::cout << "D_msy_out" <<
-    //             D_eq[max_index] << "\n"; std::cout << "R_msy: " <<
-    //             R_eq[max_index] << "\n"; std::cout << "SSB_msy: " <<
-    //             SSB_msy_out << "\n"; std::cout << "B_msy: " << B_msy_out <<
-    //             "\n"; std::cout << "E_msy: " << E_eq[max_index] << "\n";
-    //         }
-
-    return result;
-  }
-
-  /**
-   * @brief Method to calculate reference points for the model.
-   */
-  virtual Rcpp::List calculate_reference_points()
-  {
-    Rcpp::List result;
-    // loop through populations for this model
-    std::vector<uint32_t> pop_ids(this->population_ids->begin(),
-                                  this->population_ids->end());
-    for (size_t p = 0; p < pop_ids.size(); p++)
-    {
-      typename std::map<uint32_t,
-                        std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
-      pit = PopulationInterfaceBase::live_objects.find(pop_ids[p]);
-      if (pit != PopulationInterfaceBase::live_objects.end())
-      {
-        PopulationInterface *pop = (PopulationInterface *)(*pit).second.get();
-        result.push_back(this->calculate_reference_points_population(pop));
-      }
-    }
-    return result;
-  }
-
 #ifdef TMB_MODEL
 
   template <typename Type>
@@ -1072,104 +796,112 @@ public:
           std::dynamic_pointer_cast<PopulationInterface>(
               PopulationInterfaceBase::live_objects[(*it)]);
 
-      std::map<std::string, fims::Vector<Type>> &derived_quantities =
-          model->population_derived_quantities[(*it)];
+      std::map<std::string, fims::Vector<Typec>> &derived_quantities =
+          model->GetPopulationDerivedQuantities((*it));
 
-      std::map<std::string, std::string> &derived_quantities_dim_strings =
-          this->population_derived_quantities_dim_strings[(*it)];
+      std::map<std::string, DimensionInfo> &derived_quantities_dim_info =
+          model->GetPopulationDimensionInfo((*it));
 
       std::stringstream ss;
 
       derived_quantities["total_landings_weight"] =
           fims::Vector<Type>(population->nyears.get());
-
-      ss << "\"dimensions\": [" << this->make_dimensions(1, population->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["total_landings_weight"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["total_landings_weight"] =
+          DimensionInfo("total_landings_weight",
+                        fims::Vector<int>{population->nyears.get() + 1},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["total_landings_numbers"] =
           fims::Vector<Type>(population->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, population->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["total_landings_numbers"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["total_landings_numbers"] =
+          DimensionInfo("total_landings_numbers",
+                        fims::Vector<int>{population->nyears.get() + 1},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["mortality_F"] = fims::Vector<Type>(
           population->nyears.get() * population->nages.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, population->nages.get() + 1) << "]";
-      derived_quantities_dim_strings["mortality_F"] = ss.str();
+      derived_quantities_dim_info["mortality_F"] =
+          DimensionInfo("mortality_F",
+                        fims::Vector<int>{population->nyears.get() + 1, population->nages.get() + 1},
+                        fims::Vector<std::string>{"year", "age"});
       ss.str("");
 
       derived_quantities["mortality_Z"] = fims::Vector<Type>(
           population->nyears.get() * population->nages.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, population->nages.get() + 1) << "]";
-      derived_quantities_dim_strings["mortality_Z"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["mortality_Z"] =
+          DimensionInfo("mortality_Z",
+                        fims::Vector<int>{population->nyears.get() + 1, population->nages.get() + 1},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["weight_at_age"] = fims::Vector<Type>(
           population->nyears.get() * population->nages.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, population->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, population->nages.get() + 1, population->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["weight_at_age"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["weight_at_age"] =
+          DimensionInfo("weight_at_age",
+                        fims::Vector<int>{population->nyears.get() + 1, population->nages.get() + 1},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["numbers_at_age"] = fims::Vector<Type>(
           (population->nyears.get() + 1) * population->nages.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, population->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, population->nages.get() + 1, population->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["numbers_at_age"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["numbers_at_age"] =
+          DimensionInfo("numbers_at_age",
+                        fims::Vector<int>{(population->nyears.get() + 1), population->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["unfished_numbers_at_age"] = fims::Vector<Type>(
           (population->nyears.get() + 1) * population->nages.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, population->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, population->nages.get() + 1, population->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["unfished_numbers_at_age"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["unfished_numbers_at_age"] =
+          DimensionInfo("unfished_numbers_at_age",
+                        fims::Vector<int>{(population->nyears.get() + 1), population->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["biomass"] =
           fims::Vector<Type>((population->nyears.get() + 1));
-      ss << "\"dimensions\": [" << this->make_dimensions(1, population->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["biomass"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["biomass"] =
+          DimensionInfo("biomass",
+                        fims::Vector<int>{(population->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["spawning_biomass"] =
           fims::Vector<Type>((population->nyears.get() + 1));
-      ss << "\"dimensions\": [" << this->make_dimensions(1, population->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["spawning_biomass"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["spawning_biomass"] =
+          DimensionInfo("spawning_biomass",
+                        fims::Vector<int>{(population->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["unfished_biomass"] =
           fims::Vector<Type>((population->nyears.get() + 1));
-      ss << "\"dimensions\": [" << this->make_dimensions(1, population->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["unfished_biomass"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["unfished_biomass"] =
+          DimensionInfo("unfished_biomass",
+                        fims::Vector<int>{(population->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["unfished_spawning_biomass"] =
           fims::Vector<Type>((population->nyears.get() + 1));
-      ss << "\"dimensions\": [" << this->make_dimensions(1, population->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["unfished_spawning_biomass"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["unfished_spawning_biomass"] =
+          DimensionInfo("unfished_spawning_biomass",
+                        fims::Vector<int>{(population->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["proportion_mature_at_age"] = fims::Vector<Type>(
           (population->nyears.get() + 1) * population->nages.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, population->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, population->nages.get() + 1, population->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["proportion_mature_at_age"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["proportion_mature_at_age"] =
+          DimensionInfo("proportion_mature_at_age",
+                        fims::Vector<int>{(population->nyears.get() + 1), population->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["expected_recruitment"] =
           fims::Vector<Type>((population->nyears.get() + 1));
-      ss << "\"dimensions\": [" << this->make_dimensions(1, population->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["expected_recruitment"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["expected_recruitment"] =
+          DimensionInfo("expected_recruitment",
+                        fims::Vector<int>{(population->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["sum_selectivity"] = fims::Vector<Type>(
           population->nyears.get() * population->nages.get());
-
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, population->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, population->nages.get() + 1, population->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["sum_selectivity"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["sum_selectivity"] =
+          DimensionInfo("sum_selectivity",
+                        fims::Vector<int>{population->nyears.get(), population->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
 
       // replace elements in the variable map
       info->variable_map[population->numbers_at_age.id_m] =
@@ -1185,162 +917,182 @@ public:
     for (fleet_ids_iterator it = fleet_ids.begin(); it != fleet_ids.end();
          ++it)
     {
-      std::stringstream ss;
 
       std::shared_ptr<FleetInterface> fleet_interface =
           std::dynamic_pointer_cast<FleetInterface>(
               FleetInterfaceBase::live_objects[(*it)]);
 
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
-          model->fleet_derived_quantities[fleet_interface->id];
+          model->GetFleetDerivedQuantities(fleet_interface->id);
 
-      std::map<std::string, std::string> &derived_quantities_dim_strings =
-          this->fleet_derived_quantities_dim_strings[fleet_interface->id];
+      std::map<std::string, DimensionInfo> &derived_quantities_dim_info =
+          morel->GetFleetDimensionInfo(fleet_interface->id);
 
       // initialize derive quantities
       // landings
       derived_quantities["landings_numbers_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["landings_numbers_at_age"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["landings_numbers_at_age"] =
+          DimensionInfo("landings_numbers_at_age",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["landings_weight_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["landings_weight_at_age"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["landings_weight_at_age"] =
+          DimensionInfo("landings_weight_at_age",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["landings_numbers_at_length"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, fleet_interface->nlengths.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["landings_numbers_at_length"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["landings_numbers_at_length"] =
+          DimensionInfo("landings_numbers_at_length",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nlengths.get()},
+                        fims::Vector<std::string>{"year", "length"});
 
       derived_quantities["landings_weight"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["landings_weight"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["landings_weight"] =
+          DimensionInfo("landings_weight",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["landings_numbers"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["landings_numbers"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["landings_numbers"] =
+          DimensionInfo("landings_numbers",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["landings_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["landings_expected"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["landings_expected"] =
+          DimensionInfo("landings_expected",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["log_landings_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["log_landings_expected"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["log_landings_expected"] =
+          DimensionInfo("log_landings_expected",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["agecomp_proportion"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["agecomp_proportion"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["agecomp_proportion"] =
+          DimensionInfo("agecomp_proportion",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["lengthcomp_proportion"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, fleet_interface->nlengths.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["lengthcomp_proportion"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["lengthcomp_proportion"] =
+          DimensionInfo("lengthcomp_proportion",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nlengths.get()},
+                        fims::Vector<std::string>{"year", "length"});
 
       // index
       derived_quantities["index_numbers_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["index_numbers_at_age"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["index_numbers_at_age"] =
+          DimensionInfo("index_numbers_at_age",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["index_weight_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, fleet_interface->nages.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["index_weight_at_age"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["index_weight_at_age"] =
+          DimensionInfo("index_weight_at_age",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
+      derived_quantities["index_weight_at_age"] = fims::Vector<Type>(
+          fleet_interface->nyears.get() * fleet_interface->nages.get());
+      derived_quantities_dim_info["index_weight_at_age"] =
+          DimensionInfo("index_weight_at_age",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["index_numbers_at_length"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
-      ss << "\"dimensions\": [[" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "],["
-         << this->make_dimensions(1, fleet_interface->nlengths.get() + 1, fleet_interface->nyears.get() + 1) << "]]";
-      derived_quantities_dim_strings["index_numbers_at_length"] = ss.str();
-      ss.str("");
-
+      derived_quantities_dim_info["index_numbers_at_length"] =
+          DimensionInfo("index_numbers_at_length",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nlengths.get()},
+                        fims::Vector<std::string>{"year", "length"});
       derived_quantities["index_weight"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["index_weight"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["index_weight"] =
+          DimensionInfo("index_weight",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["index_numbers"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["index_numbers"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["index_numbers"] =
+          DimensionInfo("index_numbers",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["index_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["index_expected"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["index_expected"] =
+          DimensionInfo("index_expected",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["log_index_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["log_index_expected"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["log_index_expected"] =
+          DimensionInfo("log_index_expected",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["catch_index"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["catch_index"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["catch_index"] =
+          DimensionInfo("catch_index",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
 
       derived_quantities["expected_catch"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["expected_catch"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["expected_catch"] =
+          DimensionInfo("expected_catch",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
+
 
       derived_quantities["expected_index"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1) << "]";
-      derived_quantities_dim_strings["expected_index"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["expected_index"] =
+          DimensionInfo("expected_index",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+                        fims::Vector<std::string>{"year"});
+     
 
       derived_quantities["agecomp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1, fleet_interface->nages.get() + 1) << "]";
-      derived_quantities_dim_strings["agecomp_expected"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["agecomp_expected"] =
+          DimensionInfo("agecomp_expected",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), (fleet_interface->nages.get() + 1)},
+                        fims::Vector<std::string>{"year", "age"});
 
       derived_quantities["lengthcomp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
-      ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1, fleet_interface->nlengths.get() + 1) << "]";
-      derived_quantities_dim_strings["lengthcomp_expected"] = ss.str();
-      ss.str("");
+      derived_quantities_dim_info["lengthcomp_expected"] =
+          DimensionInfo("lengthcomp_expected",
+                        fims::Vector<int>{(fleet_interface->nyears.get() + 1), (fleet_interface->nlengths.get() + 1)},
+                        fims::Vector<std::string>{"year", "length"});
 
       if (fleet_interface->nlengths.get() > 0)
       {
         derived_quantities["age_to_length_conversion"] = fims::Vector<Type>(
             fleet_interface->nyears.get() * fleet_interface->nlengths.get());
-        ss << "\"dimensions\": [" << this->make_dimensions(1, fleet_interface->nyears.get() + 1, fleet_interface->nlengths.get() + 1) << "]";
-        derived_quantities_dim_strings["age_to_length_conversion"] = ss.str();
-        ss.str("");
+       derived_quantities_dim_info["age_to_length_conversion"] =
+           DimensionInfo("age_to_length_conversion",
+                         fims::Vector<int>{(fleet_interface->nyears.get() + 1), (fleet_interface->nlengths.get() + 1)},
+                         fims::Vector<std::string>{"year", "length"});
       }
       // replace elements in the variable map
       info->variable_map[fleet_interface->log_landings_expected.id_m] =
