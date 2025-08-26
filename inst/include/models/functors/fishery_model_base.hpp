@@ -101,7 +101,7 @@ struct DimensionInfo{
 
     }
 
-    
+
     /**
      * @brief Destroy the Fishery Model Base object.
      *
@@ -141,6 +141,90 @@ struct DimensionInfo{
       {
         this->ShowPopulation(this->populations[p]);
       }
+    }
+
+    /**
+     * @brief Get the fleet dimension information.
+     *
+     * @return std::map<uint32_t, std::map<std::string, DimensionInfo>>
+     */
+    std::map<uint32_t, std::map<std::string, DimensionInfo>> GetFleetDimensionInfo() const
+    {
+      return *fleet_dimension_info;
+    }
+
+    /**
+     * @brief Get the population dimension information.
+     *
+     * @return std::map<uint32_t, std::map<std::string, DimensionInfo>>
+     */
+    std::map<uint32_t, std::map<std::string, DimensionInfo>> GetPopulationDimensionInfo() const
+    {
+      return *population_dimension_info;
+    }
+
+    /**
+     * @brief Get the fleet derived quantities.
+     *
+     * @return DerivedQuantitiesMap
+     */
+    DerivedQuantitiesMap GetFleetDerivedQuantities() const
+    {
+      return *fleet_derived_quantities;
+    }
+
+    /**
+     * @brief Get the population derived quantities.
+     *
+     * @return DerivedQuantitiesMap
+     */
+    DerivedQuantitiesMap GetPopulationDerivedQuantities() const
+    {
+      return *population_derived_quantities;
+    }
+
+    /**
+     * @brief Get the fleet derived quantities for a specified fleet.
+     *
+     * @param fleet_id The ID of the fleet.
+     * @return std::map<std::string, fims::Vector<Type>>&
+     */
+    std::map<std::string, fims::Vector<Type>>& GetFleetDerivedQuantities(uint32_t fleet_id) const
+    {
+      return (*fleet_derived_quantities)[fleet_id];
+    }
+
+    /**
+     * @brief Get the population derived quantities for a specified population.
+     *
+     * @param population_id The ID of the population.
+     * @return std::map<std::string, fims::Vector<Type>>&
+     */
+    std::map<std::string, fims::Vector<Type>>& GetPopulationDerivedQuantities(uint32_t population_id) const
+    {
+      return (*population_derived_quantities)[population_id];
+    }
+
+    /**
+     * @brief Get the fleet dimension information for a specified fleet.
+     *
+     * @param fleet_id The ID of the fleet.
+     * @return std::map<std::string, DimensionInfo>
+     */
+    std::map<std::string, DimensionInfo> GetFleetDimensionInfo(uint32_t fleet_id) const
+    {
+      return (*fleet_dimension_info)[fleet_id];
+    } 
+
+    /**
+     * @brief Get the population dimension information for a specified population.
+     *
+     * @param population_id The ID of the population.
+     * @return std::map<std::string, DimensionInfo>
+     */
+    std::map<std::string, DimensionInfo> GetPopulationDimensionInfo(uint32_t population_id) const
+    {
+      return (*population_dimension_info)[population_id];
     }
 
     /**
