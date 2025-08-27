@@ -467,6 +467,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       // Baranov Catch Equation
       this->fleets[fleet_]->landings_numbers_at_age[i_age_year] +=
           (this->fleets[fleet_]->Fmort[year] *
+          this->f_multiplier[year] *
            this->fleets[fleet_]->selectivity->evaluate(ages[age])) /
           this->mortality_Z[i_age_year] * this->numbers_at_age[i_age_year] *
           (1 - fims_math::exp(-(this->mortality_Z[i_age_year])));
