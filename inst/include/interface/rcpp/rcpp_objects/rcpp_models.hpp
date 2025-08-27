@@ -309,91 +309,129 @@ public:
     std::stringstream ss;
     std::string name = (*it).first;
     fims::Vector<double> &dq = (*it).second;
-    std::string dim_entry;
+    std::stringstream dim_entry;
 
-    switch (dim_info.ndims){
-      case 1:
-        //dim_entry = "\"dimensions\": [\"age\"]";
-        break;
-      case 2:
-        //dim_entry = "\"dimensions\": [\"age\", \"length\"]";
-        break;
-      case 3:
-        //dim_entry = "\"dimensions\": [\"age\", \"length\", \"time\"]";
-        break;
-      default:
-       // dim_entry = "\"dimensions\": []";
-        break;
+    //gather dimension information
+    switch (dim_info.ndims)
+    {
+    case 1:
+      dim_entry << "\"dimensionality\": {\n";
+      dim_entry << "  \"header\": [\"" << dim_info.dim_names[0] << "\"],\n";
+      dim_entry << "  \"dimensions\": [";
+      for (size_t i = 0; i < dq.size(); ++i)
+      {
+        if (i > 0)
+          dim_entry << ", ";
+        dim_entry << dq[i];
+      }
+      dim_entry << "]\n";
+      dim_entry << "}";
+      break;
+    case 2:
+      dim_entry << "\"dimensionality\": {\n";
+      dim_entry << "  \"header\": [\"" << dim_info.dim_names[0] << "\", \"" << dim_info.dim_names[1] << "\"],\n";
+      dim_entry << "  \"dimensions\": [";
+      for (size_t i = 0; i < dq.size(); ++i)
+      {
+        if (i > 0)
+          dim_entry << ", ";
+        dim_entry << dq[i];
+      }
+      dim_entry << "]\n";
+      dim_entry << "}";
+      break;
+    case 3:
+      dim_entry << "\"dimensionality\": {\n";
+      dim_entry << "  \"header\": [\"" << dim_info.dim_names[0] << "\", \"" << dim_info.dim_names[1] << "\", \"" << dim_info.dim_names[2] << "\"],\n";
+      dim_entry << "  \"dimensions\": [";
+      for (size_t i = 0; i < dq.size(); ++i)
+      {
+        if (i > 0)
+          dim_entry << ", ";
+        dim_entry << dq[i];
+      }
+      dim_entry << "]\n";
+      dim_entry << "}";
+      break;
+    default:
+       dim_entry << "\"dimensionality\": {\n";
+       dim_entry << "  \"header\": [],\n";
+       dim_entry << "  \"dimensions\": []\n";
+       dim_entry << "}";
+      break;
     }
 
-    // fims::Vector<double> &dq = (*it).second;
-    // std::stringstream ss;
-    // // ss << std::fixed;
-    // ss << "{\n";
-    // ss << "\"name\":\"" << (*it).first << "\",\n";
-    // ss << "\"values\":[";
+    //build JSON string
+    ss << "{\n";
+    ss << "\"name\":\"" << (*it).first << "\",\n";
+    ss << dim_entry.str() << ",\n";
+    ss << "\"values\":[";
 
-    // if (dq.size() > 0)
-    // {
-    //   for (size_t i = 0; i < dq.size() - 1; i++)
-    //   {
-    //     if (dq[i] != dq[i]) // check for NaN
-    //     {
-    //       ss << "\"nan\", ";
-    //     }
-    //     else
-    //     {
-    //       ss << dq[i] << ", ";
-    //     }
-    //   }
-    //   if (dq[dq.size() - 1] != dq[dq.size() - 1]) // check for NaN
-    //   {
-    //     ss << "\"nan\"";
-    //   }
-    //   else
-    //   {
-    //     ss << dq[dq.size() - 1] << "],\n";
-    //   }
-    // }
-    // else
-    // {
-    //   ss << "],\n";
-    // }
-    // ss << dims << "\n";
-    // ss << "}";
+    if (dq.size() > 0)
+    {
+      for (size_t i = 0; i < dq.size() - 1; i++)
+      {
+        if (dq[i] != dq[i]) // check for NaN
+        {
+          ss << "\"nan\", ";
+        }
+        else
+        {
+          ss << dq[i] << ", ";
+        }
+      }
+      if (dq[dq.size() - 1] != dq[dq.size() - 1]) // check for NaN
+      {
+        ss << "\"nan\"";
+      }
+      else
+      {
+        ss << dq[dq.size() - 1] << "],\n";
+      }
+    }
+    else
+    {
+      ss << "],\n";
+    }
+    ss << "}";
 
-    // return ss.str();
+    return ss.str();
   }
 
   /**
    * @brief Send the fleet-based derived quantities to the json file.
    * @return std::string
    */
-  std::string fleet_derived_quantities_to_json(
+  std::string derived_quantities_component_to_json(
       std::map<std::string, fims::Vector<double>> &dqs,
-      std::map<std::string, DimensionInfo> &dim_info)
+      std::map<std::string, fims_popdy::DimensionInfo> &dim_info)
   {
 
     std::stringstream ss;
-    std::map<std::string, DimensionInfo>::iterator dim_info_it;
+    std::map<std::string, fims_popdy::DimensionInfo>::iterator dim_info_it;
     std::map<std::string, fims::Vector<double>>::iterator it;
     std::map<std::string, fims::Vector<double>>::iterator end_it;
-    end_it = (*fdqit).second.end();
+    end_it = dqs.end();
     typename std::map<std::string, fims::Vector<double>>::iterator second_to_last;
-    second_to_last = (*fdqit).second.end();
+    second_to_last = dqs.end();
     if (it != end_it)
     {
       second_to_last--;
     }
 
-    it = (*fdqit).second.begin();
+    it = dqs.begin();
     for (; it != second_to_last; ++it)
     {
       dim_info_it = dim_info.find(it->first);
       // ss << this->DerivedQuantityToJSON(it, dims) << ",\n";
     }
     dim_info_it = dim_info.find(second_to_last->first);
-    // ss << this->DerivedQuantityToJSON(second_to_last, dims) << "\n";
+    if (dim_info_it != dim_info.end())
+    {
+      // ss << this->DerivedQuantityToJSON(second_to_last, dims) << "\n";
+    }else{
+      // Handle case where dimension info is not found
+    }
     return ss.str();
   }
   /**
@@ -428,7 +466,7 @@ public:
       if (str_it != this->fleet_derived_quantities_dim_strings.end())
       {
         dims = str_it->second[it->first];
-        ss << this->DerivedQuantityToJSON(it, dims) << ",\n";
+       // ss << this->DerivedQuantityToJSON(it, dims) << ",\n";
       }
     }
 
@@ -436,7 +474,7 @@ public:
     if (str_it != this->fleet_derived_quantities_dim_strings.end())
     {
       dims = str_it->second[second_to_last->first];
-      ss << this->DerivedQuantityToJSON(second_to_last, dims) << "\n";
+  //    ss << this->DerivedQuantityToJSON(second_to_last, dims) << "\n";
     }
     return ss.str();
   }
@@ -536,11 +574,12 @@ public:
 
       ss << "], \"derived_quantities\": [";
       fims_popdy::CatchAtAge<double>::fleet_derived_quantities_iterator fit;
+
       fit = model_ptr->fleet_derived_quantities.find(fleet_interface->get_id());
 
       if (fit != model_ptr->fleet_derived_quantities.end())
       {
-        ss << this->fleet_derived_quantities_to_json(fit) << "]}\n";
+        //ss << this->fleet_derived_quantities_to_json(fit) << "]}\n";
       }
       else
       {
