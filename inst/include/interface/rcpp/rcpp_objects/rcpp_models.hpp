@@ -348,7 +348,7 @@ public:
       {
         if (i > 0)
           dim_entry << ", ";
-          dim_entry << dim_info.dims[i];
+        dim_entry << dim_info.dims[i];
       }
       dim_entry << "]\n";
       dim_entry << "}";
@@ -423,12 +423,12 @@ public:
     for (; it != second_to_last; ++it)
     {
       dim_info_it = dim_info.find(it->first);
-       ss << this->DerivedQuantityToJSON(it, dim_info_it->second) << ",\n";
+      ss << this->DerivedQuantityToJSON(it, dim_info_it->second) << ",\n";
     }
     dim_info_it = dim_info.find(second_to_last->first);
     if (dim_info_it != dim_info.end())
     {
-       ss << this->DerivedQuantityToJSON(second_to_last, dim_info_it->second) << "\n";
+      ss << this->DerivedQuantityToJSON(second_to_last, dim_info_it->second) << "\n";
     }
     else
     {
