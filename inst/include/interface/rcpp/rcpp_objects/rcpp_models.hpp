@@ -29,6 +29,10 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   uint32_t id;
   /**
+   * @brief The set of population IDs associated with the fishery model.
+   */
+  std::shared_ptr<std::set<uint32_t>> population_ids;
+  /**
    * @brief The map associating the IDs of FleetInterfaceBase to the objects.
    * This is a live object, which is an object that has been created and lives
    * in memory.
@@ -52,7 +56,8 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    * @param other
    */
   FisheryModelInterfaceBase(const FisheryModelInterfaceBase &other)
-      : id(other.id) {}
+      : id(other.id),
+      population_ids(other.population_ids) {}
 
   /**
    * @brief The destructor.
@@ -90,7 +95,6 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
  * CatchAtAge model. It inherits from the FisheryModelInterfaceBase class.
  */
 class CatchAtAgeInterface : public FisheryModelInterfaceBase {
-  std::shared_ptr<std::set<uint32_t>> population_ids;
   typedef typename std::set<uint32_t>::iterator population_id_iterator;
 
  public:
@@ -111,8 +115,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param other
    */
   CatchAtAgeInterface(const CatchAtAgeInterface &other)
-      : FisheryModelInterfaceBase(other),
-        population_ids(other.population_ids) {}
+      : FisheryModelInterfaceBase(other) {}
 
   /**
    * Method to add a population id to the set of population ids.
@@ -817,6 +820,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     std::shared_ptr<fims_popdy::CatchAtAge<Type>> model =
         std::make_shared<fims_popdy::CatchAtAge<Type>>();
 
+    model->id = this->id;
     population_id_iterator it;
 
     for (it = this->population_ids->begin(); it != this->population_ids->end();
@@ -973,7 +977,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
  * class.
  */
 class SurplusProductionInterface : public FisheryModelInterfaceBase {
-  std::shared_ptr<std::set<uint32_t>> population_ids;
   typedef typename std::set<uint32_t>::iterator population_id_iterator;
 
  public:
@@ -994,15 +997,14 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
    * @param other
    */
   SurplusProductionInterface(const SurplusProductionInterface &other)
-      : FisheryModelInterfaceBase(other),
-        population_ids(other.population_ids) {}
+      : FisheryModelInterfaceBase(other) {}
 
   /**
    * Method to add a population id to the set of population ids.
    */
   void AddPopulation(uint32_t id) {
     this->population_ids->insert(id);
-
+    Rcout << "Added population ID " << id << " to SurplusProductionInterface" << std::endl;
     std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
     pit = PopulationInterfaceBase::live_objects.find(id);
     if (pit != PopulationInterfaceBase::live_objects.end()) {
@@ -1053,9 +1055,8 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
 
     std::shared_ptr<fims_popdy::SurplusProduction<Type>> model =
         std::make_shared<fims_popdy::SurplusProduction<Type>>();
-
+    model->id = this->id;
     population_id_iterator it;
-
     for (it = this->population_ids->begin(); it != this->population_ids->end();
          ++it) {
       model->AddPopulation((*it));

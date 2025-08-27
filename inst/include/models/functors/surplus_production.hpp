@@ -70,8 +70,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
 
   size_t nyears = 0;  /*!< max years of all populations */
   size_t nages = 0;   /*!< max ages of all populations */
-  std::set<uint32_t> population_ids; /*!< list of population ids  */
-  /**
+   /**
    * @brief Vector of shared pointers that contains all populations in the model.
    */
   std::vector<std::shared_ptr<fims_popdy::Population<Type>>> populations;
@@ -143,7 +142,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     /**
    * @brief Get the population ids of the model.
    */
-  std::set<uint32_t> &GetPopulationIds() { return population_ids; }
+  std::set<uint32_t> &GetPopulationIds() { return this->population_ids; }
 
   /**
    * This function is used to get the populations of the model. It returns a

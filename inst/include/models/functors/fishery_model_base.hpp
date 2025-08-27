@@ -18,8 +18,7 @@ template <typename Type>
  *
  */
 class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
-  static uint32_t id_g;
-  uint32_t id;
+  static uint32_t id_g; /**< The ID of the instance of the FisheryModelBase class */
 
  public:
   /**
@@ -58,14 +57,17 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @brief Construct a new Fishery Model Base object.
    *
    */
-  FisheryModelBase() : id(FisheryModelBase::id_g++) {}
+  FisheryModelBase()  {
+    this->id = FisheryModelBase::id_g++;
+  }
 
   /**
    * @brief Construct a new Fishery Model Base object.
    *
    * @param other
    */
-  FisheryModelBase(const FisheryModelBase &other) : id(other.id) {
+  FisheryModelBase(const FisheryModelBase &other) {
+    this->id = other.id;
     this->population_ids = other.population_ids;
     this->populations = other.populations;
   }
