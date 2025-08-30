@@ -231,36 +231,36 @@ public:
       ss << " \"growth_id\": " << population_interface->growth_id << ",\n";
       ss << " \"maturity_id\": " << population_interface->maturity_id << ",\n";
 
-      ss << " \"parameters\": [\n{\n";
+      ss << " \"parameters\": [\n";
       for (size_t i = 0; i < pop->log_M.size(); i++)
       {
         population_interface_ptr->log_M[i].final_value_m = pop->log_M[i];
       }
 
-      ss << " \"name\": \"log_M\",\n";
+      ss << "{\n \"name\": \"log_M\",\n";
       ss << " \"id\":" << population_interface->log_M.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
-      ss << " \"values\": " << population_interface->log_M << "\n},\n";
+      ss << " \"values\": " << population_interface->log_M << "\n,\n";
       ss << " \"uncertainty\": {\n";
-      ss << "\"tmb\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << "\n";
-      ss << "\"stan\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << "\n";
-      ss << "\"fims\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << "\n";
-      ss << "},\n";
+      // ss << "\"tmb\" : " << fims::Vector<double>(5, -999) << ",\n";
+      // ss << "\"stan\" : " << fims::Vector<double>(5, -999) << ",\n";
+      ss << "\"tmb\" : " << fims::Vector<double>(5, -999) << "\n";
+      ss << "}},\n";
 
       for (size_t i = 0; i < pop->log_init_naa.size(); i++)
       {
         population_interface_ptr->log_init_naa[i].final_value_m =
             pop->log_init_naa[i];
       }
-      ss << "  \"name\": \"log_init_naa\",\n";
+      ss << " {\n\"name\": \"log_init_naa\",\n";
       ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
       ss << "  \"type\": \"vector\",\n";
-      ss << "  \"values\":" << population_interface->log_init_naa << " \n";
+      ss << "  \"values\":" << population_interface->log_init_naa << ",\n";
       ss << " \"uncertainty\": {\n";
-      ss << "\"tmb\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << "\n";
-      ss << "\"stan\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << "\n";
-      ss << "\"fims\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << "\n";
-      ss << "}],\n";
+      // ss << "\"tmb\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << ",\n";
+      // ss << "\"stan\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << ",\n";
+      ss << "\"tmb\" : " << fims::Vector<double>(5, -999) << "\n";
+      ss << "}}],\n";
 
       fims_popdy::CatchAtAge<double>::population_derived_quantities_iterator
           cit;
@@ -386,12 +386,12 @@ public:
       }
       else
       {
-        ss << dq[dq.size() - 1] << "],\n";
+        ss << dq[dq.size() - 1] << "]\n";
       }
     }
     else
     {
-      ss << "],\n";
+      ss << "]\n";
     }
     ss << "}";
 
@@ -627,66 +627,66 @@ public:
       }
     }
     ss << "],\n";
-    ss << "\"populations\": [\n";
-    typename std::set<uint32_t>::iterator pop_it;
-    typename std::set<uint32_t>::iterator pop_end_it;
-    pop_end_it = this->population_ids->end();
-    typename std::set<uint32_t>::iterator pop_second_to_last_it;
-    if (pop_end_it != this->population_ids->begin())
-    {
-      pop_second_to_last_it = std::prev(pop_end_it);
-    }
-    else
-    {
-      pop_second_to_last_it = pop_end_it;
-    }
+    // ss << "\"populations\": [\n";
+    // typename std::set<uint32_t>::iterator pop_it;
+    // typename std::set<uint32_t>::iterator pop_end_it;
+    // pop_end_it = this->population_ids->end();
+    // typename std::set<uint32_t>::iterator pop_second_to_last_it;
+    // if (pop_end_it != this->population_ids->begin())
+    // {
+    //   pop_second_to_last_it = std::prev(pop_end_it);
+    // }
+    // else
+    // {
+    //   pop_second_to_last_it = pop_end_it;
+    // }
 
-    for (pop_it = this->population_ids->begin();
-         pop_it != pop_second_to_last_it; pop_it++)
-    {
-      std::shared_ptr<PopulationInterface> population_interface =
-          std::dynamic_pointer_cast<PopulationInterface>(
-              PopulationInterfaceBase::live_objects[*pop_it]);
-      if (population_interface)
-      {
-        std::set<uint32_t>::iterator fids;
-        for (fids = population_interface->fleet_ids->begin();
-             fids != population_interface->fleet_ids->end(); fids++)
-        {
-          fleet_ids.insert(*fids);
-        }
-        ss << this->population_to_json(population_interface.get()) << ",";
-      }
-      else
-      {
-        FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
-                       " not found in live objects.");
-        ss << "{}"; // Return empty JSON for this population
-      }
-    }
+    // for (pop_it = this->population_ids->begin();
+    //      pop_it != pop_second_to_last_it; pop_it++)
+    // {
+    //   std::shared_ptr<PopulationInterface> population_interface =
+    //       std::dynamic_pointer_cast<PopulationInterface>(
+    //           PopulationInterfaceBase::live_objects[*pop_it]);
+    //   if (population_interface)
+    //   {
+    //     std::set<uint32_t>::iterator fids;
+    //     for (fids = population_interface->fleet_ids->begin();
+    //          fids != population_interface->fleet_ids->end(); fids++)
+    //     {
+    //       fleet_ids.insert(*fids);
+    //     }
+    //     ss << this->population_to_json(population_interface.get()) << ",";
+    //   }
+    //   else
+    //   {
+    //     FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
+    //                    " not found in live objects.");
+    //     ss << "{}"; // Return empty JSON for this population
+    //   }
+    // }
 
-    std::shared_ptr<PopulationInterface> population_interface =
-        std::dynamic_pointer_cast<PopulationInterface>(
-            PopulationInterfaceBase::live_objects[*pop_second_to_last_it]);
-    if (population_interface)
-    {
-      std::set<uint32_t>::iterator fids;
-      for (fids = population_interface->fleet_ids->begin();
-           fids != population_interface->fleet_ids->end(); fids++)
-      {
-        fleet_ids.insert(*fids);
-      }
-      ss << this->population_to_json(population_interface.get());
-    }
-    else
-    {
-      FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
-                     " not found in live objects.");
-      ss << "{}"; // Return empty JSON for this population
-    }
+    // std::shared_ptr<PopulationInterface> population_interface =
+    //     std::dynamic_pointer_cast<PopulationInterface>(
+    //         PopulationInterfaceBase::live_objects[*pop_second_to_last_it]);
+    // if (population_interface)
+    // {
+    //   std::set<uint32_t>::iterator fids;
+    //   for (fids = population_interface->fleet_ids->begin();
+    //        fids != population_interface->fleet_ids->end(); fids++)
+    //   {
+    //     fleet_ids.insert(*fids);
+    //   }
+    //   ss << this->population_to_json(population_interface.get());
+    // }
+    // else
+    // {
+    //   FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
+    //                  " not found in live objects.");
+    //   ss << "{}"; // Return empty JSON for this population
+    // }
 
-    ss << "]";
-    ss << ",\n";
+    // ss << "]";
+    // ss << ",\n";
     ss << "\"fleets\": [\n";
     typename std::set<uint32_t>::iterator fleet_it;
     typename std::set<uint32_t>::iterator fleet_end_it;
