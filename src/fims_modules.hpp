@@ -63,7 +63,7 @@ RCPP_MODULE(fims) {
   Rcpp::function("get_random_names", &get_random_names,
                  "Gets the random effects names object.");
   Rcpp::function("clear", clear,
-                 "Clears all pointers/references of a FIMS model");
+                 "Clears all pointers/references of a FIMS model.");
   Rcpp::function("get_log", get_log,
                  "Gets the log entries as a string in JSON format.");
   Rcpp::function(

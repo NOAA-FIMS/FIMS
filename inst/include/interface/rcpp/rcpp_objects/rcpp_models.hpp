@@ -267,15 +267,20 @@ public:
       ss << " \"derived_quantities\": [\n";
       cit = model_ptr->population_derived_quantities.find(
           population_interface->get_id());
+      std::map<std::string, fims::Vector<double>> dqs =
+          model_ptr->GetPopulationDerivedQuantities(population_interface->get_id());
 
-      if (cit != model_ptr->population_derived_quantities.end())
-      {
-        ss << model_ptr->population_derived_quantities_to_json(cit) << "]}\n";
-      }
-      else
-      {
-        ss << " ]}\n";
-      }
+      std::map<std::string, fims_popdy::DimensionInfo> dim_info =
+          model_ptr->GetPopulationDimensionInfo(population_interface->get_id());
+      ss << this->derived_quantities_component_to_json(dqs, dim_info)<< " ]}\n";
+      // if (cit != model_ptr->population_derived_quantities.end())
+      // {
+      //   ss << model_ptr->population_derived_quantities_to_json(cit) << "]}\n";
+      // }
+      // else
+      // {
+      //   ss << " ]}\n";
+      // }
     }
     else
     {
@@ -489,21 +494,21 @@ public:
   {
     std::stringstream ss;
 
-    typename std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>::iterator
-        fi_it; // fleet interface iterator
-    fi_it = FleetInterfaceBase::live_objects.find(fleet_interface->get_id());
-    if (fi_it == FleetInterfaceBase::live_objects.end())
-    {
-      FIMS_ERROR_LOG("Fleet with id " +
-                     fims::to_string(fleet_interface->get_id()) +
-                     " not found in live objects.");
-      return "{}"; // Return empty JSON
-    }
+    // typename std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>::iterator
+    //     fi_it; // fleet interface iterator
+    // fi_it = FleetInterfaceBase::live_objects.find(fleet_interface->get_id());
+    // if (fi_it == FleetInterfaceBase::live_objects.end())
+    // {
+    //   FIMS_ERROR_LOG("Fleet with id " +
+    //                  fims::to_string(fleet_interface->get_id()) +
+    //                  " not found in live objects.");
+    //   return "{}"; // Return empty JSON
+    // }
 
-    std::shared_ptr<FleetInterface> fleet_interface_ptr =
-        std::dynamic_pointer_cast<FleetInterface>((*fi_it).second);
+    // std::shared_ptr<FleetInterface> fleet_interface_ptr =
+    //     std::dynamic_pointer_cast<FleetInterface>((*fi_it).second);
 
-    if (!fleet_interface_ptr)
+    if (!fleet_interface)
     {
       FIMS_ERROR_LOG("Fleet with id " +
                      fims::to_string(fleet_interface->get_id()) +
@@ -580,7 +585,8 @@ public:
           model_ptr->GetFleetDerivedQuantities(fleet_interface->get_id());
       std::map<std::string, fims_popdy::DimensionInfo> dim_info =
           model_ptr->GetFleetDimensionInfo(fleet_interface->get_id());
-      ss << this->derived_quantities_component_to_json(dqs, dim_info);
+      ss << this->derived_quantities_component_to_json(dqs, dim_info)<<"]}\n";
+
     }
     else
     {
@@ -627,71 +633,72 @@ public:
       }
     }
     ss << "],\n";
-    // ss << "\"populations\": [\n";
-    // typename std::set<uint32_t>::iterator pop_it;
-    // typename std::set<uint32_t>::iterator pop_end_it;
-    // pop_end_it = this->population_ids->end();
-    // typename std::set<uint32_t>::iterator pop_second_to_last_it;
-    // if (pop_end_it != this->population_ids->begin())
-    // {
-    //   pop_second_to_last_it = std::prev(pop_end_it);
-    // }
-    // else
-    // {
-    //   pop_second_to_last_it = pop_end_it;
-    // }
+    ss << "\"populations\": [\n";
+    typename std::set<uint32_t>::iterator pop_it;
+    typename std::set<uint32_t>::iterator pop_end_it;
+    pop_end_it = this->population_ids->end();
+    typename std::set<uint32_t>::iterator pop_second_to_last_it;
+    if (pop_end_it != this->population_ids->begin())
+    {
+      pop_second_to_last_it = std::prev(pop_end_it);
+    }
+    else
+    {
+      pop_second_to_last_it = pop_end_it;
+    }
 
-    // for (pop_it = this->population_ids->begin();
-    //      pop_it != pop_second_to_last_it; pop_it++)
-    // {
-    //   std::shared_ptr<PopulationInterface> population_interface =
-    //       std::dynamic_pointer_cast<PopulationInterface>(
-    //           PopulationInterfaceBase::live_objects[*pop_it]);
-    //   if (population_interface)
-    //   {
-    //     std::set<uint32_t>::iterator fids;
-    //     for (fids = population_interface->fleet_ids->begin();
-    //          fids != population_interface->fleet_ids->end(); fids++)
-    //     {
-    //       fleet_ids.insert(*fids);
-    //     }
-    //     ss << this->population_to_json(population_interface.get()) << ",";
-    //   }
-    //   else
-    //   {
-    //     FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
-    //                    " not found in live objects.");
-    //     ss << "{}"; // Return empty JSON for this population
-    //   }
-    // }
+    for (pop_it = this->population_ids->begin();
+         pop_it != pop_second_to_last_it; pop_it++)
+    {
+      std::shared_ptr<PopulationInterface> population_interface =
+          std::dynamic_pointer_cast<PopulationInterface>(
+              PopulationInterfaceBase::live_objects[*pop_it]);
+      if (population_interface)
+      {
+        std::set<uint32_t>::iterator fids;
+        for (fids = population_interface->fleet_ids->begin();
+             fids != population_interface->fleet_ids->end(); fids++)
+        {
+          fleet_ids.insert(*fids);
+        }
+        ss << this->population_to_json(population_interface.get()) << ",";
+      }
+      else
+      {
+        FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
+                       " not found in live objects.");
+        ss << "{}"; // Return empty JSON for this population
+      }
+    }
 
-    // std::shared_ptr<PopulationInterface> population_interface =
-    //     std::dynamic_pointer_cast<PopulationInterface>(
-    //         PopulationInterfaceBase::live_objects[*pop_second_to_last_it]);
-    // if (population_interface)
-    // {
-    //   std::set<uint32_t>::iterator fids;
-    //   for (fids = population_interface->fleet_ids->begin();
-    //        fids != population_interface->fleet_ids->end(); fids++)
-    //   {
-    //     fleet_ids.insert(*fids);
-    //   }
-    //   ss << this->population_to_json(population_interface.get());
-    // }
-    // else
-    // {
-    //   FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
-    //                  " not found in live objects.");
-    //   ss << "{}"; // Return empty JSON for this population
-    // }
+    std::shared_ptr<PopulationInterface> population_interface =
+        std::dynamic_pointer_cast<PopulationInterface>(
+            PopulationInterfaceBase::live_objects[*pop_second_to_last_it]);
+    if (population_interface)
+    {
+      std::set<uint32_t>::iterator fids;
+      for (fids = population_interface->fleet_ids->begin();
+           fids != population_interface->fleet_ids->end(); fids++)
+      {
+        fleet_ids.insert(*fids);
+      }
+      ss << this->population_to_json(population_interface.get());
+    }
+    else
+    {
+      FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
+                     " not found in live objects.");
+      ss << "{}"; // Return empty JSON for this population
+    }
 
-    // ss << "]";
-    // ss << ",\n";
+    ss << "]";
+    ss << ",\n";
     ss << "\"fleets\": [\n";
     typename std::set<uint32_t>::iterator fleet_it;
     typename std::set<uint32_t>::iterator fleet_end_it;
     fleet_end_it = fleet_ids.end();
     typename std::set<uint32_t>::iterator fleet_second_to_last_it;
+    std::cout << "fleet id size: " << fleet_ids.size() << std::endl;
     if (fleet_end_it != fleet_ids.begin())
     {
       fleet_second_to_last_it = std::prev(fleet_end_it);
