@@ -1133,15 +1133,15 @@ public:
                                     fims::Vector<int>{(fleet_interface->nyears.get() + 1), (fleet_interface->nlengths.get() + 1)},
                                     fims::Vector<std::string>{"year", "length"});
 
-      if (fleet_interface->nlengths.get() > 0)
-      {
-        derived_quantities["age_to_length_conversion"] = fims::Vector<Type>(
-            fleet_interface->nyears.get() * fleet_interface->nlengths.get());
-        derived_quantities_dim_info["age_to_length_conversion"] =
-            fims_popdy::DimensionInfo("age_to_length_conversion",
-                                      fims::Vector<int>{(fleet_interface->nyears.get() + 1), (fleet_interface->nlengths.get() + 1)},
-                                      fims::Vector<std::string>{"year", "length"});
-      }
+      // if (fleet_interface->nlengths.get() > 0)
+      // {
+      //   derived_quantities["age_to_length_conversion"] = fims::Vector<Type>(
+      //       fleet_interface->nyears.get() * fleet_interface->nlengths.get());
+      //   derived_quantities_dim_info["age_to_length_conversion"] =
+      //       fims_popdy::DimensionInfo("age_to_length_conversion",
+      //                                 fims::Vector<int>{(fleet_interface->nyears.get() + 1), (fleet_interface->nlengths.get() + 1)},
+      //                                 fims::Vector<std::string>{"year", "length"});
+      // }
       // replace elements in the variable map
       info->variable_map[fleet_interface->log_landings_expected.id_m] =
           &(derived_quantities["log_landings_expected"]);

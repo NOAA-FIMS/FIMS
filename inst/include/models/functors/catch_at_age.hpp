@@ -692,15 +692,15 @@ namespace fims_popdy
           fleet->Fmort[year] = fims_math::exp(fleet->log_Fmort[year]);
         }
 
-        // TODO: does this age_length_to_conversion need to be a dq and parameter
-        // of fleet?
-        for (size_t i_length_age = 0;
-             i_length_age < fleet->age_to_length_conversion.size();
-             i_length_age++)
-        {
-          derived_quantities["age_to_length_conversion"][i_length_age] =
-              fleet->age_to_length_conversion[i_length_age];
-        }
+        // // TODO: does this age_length_to_conversion need to be a dq and parameter
+        // // of fleet?
+        // for (size_t i_length_age = 0;
+        //      i_length_age < fleet->age_to_length_conversion.size();
+        //      i_length_age++)
+        // {
+        //   derived_quantities["age_to_length_conversion"][i_length_age] =
+        //       fleet->age_to_length_conversion[i_length_age];
+        // }
       }
     }
     /**
@@ -1420,9 +1420,7 @@ namespace fims_popdy
                     this->fleet_derived_quantities[fleet->GetId()]
                                                   ["agecomp_expected"]
                                                   [i_age_year] *
-                    this->fleet_derived_quantities[fleet->GetId()]
-                                                  ["age_to_length_conversion"]
-                                                  [i_length_age];
+                    fleet->age_to_length_conversion[i_length_age];
 
                 this->fleet_derived_quantities[fleet->GetId()]
                                               ["landings_numbers_at_length"]
@@ -1430,9 +1428,7 @@ namespace fims_popdy
                     this->fleet_derived_quantities[fleet->GetId()]
                                                   ["landings_numbers_at_age"]
                                                   [i_age_year] *
-                    this->fleet_derived_quantities[fleet->GetId()]
-                                                  ["age_to_length_conversion"]
-                                                  [i_length_age];
+                    fleet->age_to_length_conversion[i_length_age];
 
                 this->fleet_derived_quantities[fleet->GetId()]
                                               ["index_numbers_at_length"]
@@ -1440,9 +1436,7 @@ namespace fims_popdy
                     this->fleet_derived_quantities[fleet->GetId()]
                                                   ["index_numbers_at_age"]
                                                   [i_age_year] *
-                    this->fleet_derived_quantities[fleet->GetId()]
-                                                  ["age_to_length_conversion"]
-                                                  [i_length_age];
+                    fleet->age_to_length_conversion[i_length_age];
               }
 
               sum += this->fleet_derived_quantities[fleet->GetId()]
