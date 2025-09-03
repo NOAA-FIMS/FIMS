@@ -584,7 +584,7 @@ public:
         ss << " \"type\": \"vector\",\n";
         ss << " \"values\": " << fleet_interface->age_to_length_conversion
            << ",\n";
-        ss << "\"uncertainty\" : " << fims::Vector<double>(fleet_interface->age_to_length_conversion.size(), -999) << "},\n";
+        ss << "\"uncertainty\" : " << fims::Vector<double>(fleet_interface->age_to_length_conversion.size(), -999) << "\n";
 
         ss << "\n}\n";
       }
