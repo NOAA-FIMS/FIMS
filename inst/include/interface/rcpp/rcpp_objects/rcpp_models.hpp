@@ -1153,11 +1153,11 @@ public:
           &(derived_quantities["agecomp_proportion"]);
       info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
           &(derived_quantities["lengthcomp_expected"]);
-      if (fleet_interface->nlengths.get() > 0)
-      {
-        info->variable_map[fleet_interface->age_to_length_conversion.id_m] =
-            &(derived_quantities["age_to_length_conversion"]);
-      }
+      // if (fleet_interface->nlengths.get() > 0)
+      // {
+      //   info->variable_map[fleet_interface->age_to_length_conversion.id_m] =
+      //       &(derived_quantities["age_to_length_conversion"]);
+      // }
       info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
           &(derived_quantities["lengthcomp_expected"]);
       info->variable_map[fleet_interface->lengthcomp_proportion.id_m] =
