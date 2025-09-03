@@ -241,11 +241,8 @@ public:
       ss << " \"id\":" << population_interface->log_M.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"values\": " << population_interface->log_M << "\n,\n";
-      ss << " \"uncertainty\": {\n";
-      // ss << "\"tmb\" : " << fims::Vector<double>(5, -999) << ",\n";
-      // ss << "\"stan\" : " << fims::Vector<double>(5, -999) << ",\n";
-      ss << "\"tmb\" : " << fims::Vector<double>(5, -999) << "\n";
-      ss << "}},\n";
+      ss << "\"uncertainty\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << "\n";
+      ss << "},\n";
 
       for (size_t i = 0; i < pop->log_init_naa.size(); i++)
       {
@@ -256,11 +253,8 @@ public:
       ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
       ss << "  \"type\": \"vector\",\n";
       ss << "  \"values\":" << population_interface->log_init_naa << ",\n";
-      ss << " \"uncertainty\": {\n";
-      // ss << "\"tmb\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << ",\n";
-      // ss << "\"stan\" : " << fims::Vector<double>(population_interface->log_M.size(), -999) << ",\n";
-      ss << "\"tmb\" : " << fims::Vector<double>(5, -999) << "\n";
-      ss << "}}],\n";
+      ss << "\"uncertainty\" : " << fims::Vector<double>(population_interface->log_init_naa.size(), -999) << "\n";
+      ss << "}],\n";
 
       fims_popdy::CatchAtAge<double>::population_derived_quantities_iterator
           cit;
@@ -272,7 +266,7 @@ public:
 
       std::map<std::string, fims_popdy::DimensionInfo> dim_info =
           model_ptr->GetPopulationDimensionInfo(population_interface->get_id());
-      ss << this->derived_quantities_component_to_json(dqs, dim_info)<< " ]}\n";
+      ss << this->derived_quantities_component_to_json(dqs, dim_info) << " ]}\n";
       // if (cit != model_ptr->population_derived_quantities.end())
       // {
       //   ss << model_ptr->population_derived_quantities_to_json(cit) << "]}\n";
@@ -391,13 +385,23 @@ public:
       }
       else
       {
-        ss << dq[dq.size() - 1] << "]\n";
+        ss << dq[dq.size() - 1] << "],\n";
       }
     }
     else
     {
-      ss << "]\n";
+      ss << "],\n";
     }
+    ss << "\"uncertainty\": [";
+    for (size_t i = 0; i < dq.size(); ++i)
+    {
+      ss << "-999.0"; // Placeholder for uncertainty values
+      if (i < dq.size() - 1)
+      {
+        ss << ", ";
+      }
+    }
+    ss << "]\n";
     ss << "}";
 
     return ss.str();
@@ -551,7 +555,8 @@ public:
       ss << " \"name\": \"log_Fmort\",\n";
       ss << " \"id\":" << fleet_interface->log_Fmort.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
-      ss << " \"values\": " << fleet_interface->log_Fmort << "\n},\n";
+      ss << " \"values\": " << fleet_interface->log_Fmort << ",\n";
+      ss << "\"uncertainty\" : " << fims::Vector<double>(fleet_interface->log_Fmort.size(), -999) << "},\n";
 
       ss << " {\n";
       for (size_t i = 0; i < fleet->log_q.size(); i++)
@@ -561,7 +566,9 @@ public:
       ss << " \"name\": \"log_q\",\n";
       ss << " \"id\":" << fleet_interface->log_q.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
-      ss << " \"values\": " << fleet_interface->log_q << "\n},\n";
+      ss << " \"values\": " << fleet_interface->log_q << ",\n";
+      ss << "\"uncertainty\" : " << fims::Vector<double>(fleet_interface->log_q.size(), -999) << "},\n";
+
       if (fleet_interface->nlengths > 0)
       {
         ss << " {\n";
@@ -576,7 +583,10 @@ public:
            << ",\n";
         ss << " \"type\": \"vector\",\n";
         ss << " \"values\": " << fleet_interface->age_to_length_conversion
-           << "\n}\n";
+           << ",\n";
+        ss << "\"uncertainty\" : " << fims::Vector<double>(fleet_interface->age_to_length_conversion.size(), -999) << "},\n";
+
+        ss << "\n}\n";
       }
 
       ss << "], \"derived_quantities\": [";
@@ -585,8 +595,7 @@ public:
           model_ptr->GetFleetDerivedQuantities(fleet_interface->get_id());
       std::map<std::string, fims_popdy::DimensionInfo> dim_info =
           model_ptr->GetFleetDimensionInfo(fleet_interface->get_id());
-      ss << this->derived_quantities_component_to_json(dqs, dim_info)<<"]}\n";
-
+      ss << this->derived_quantities_component_to_json(dqs, dim_info) << "]}\n";
     }
     else
     {
@@ -698,7 +707,7 @@ public:
     typename std::set<uint32_t>::iterator fleet_end_it;
     fleet_end_it = fleet_ids.end();
     typename std::set<uint32_t>::iterator fleet_second_to_last_it;
-    std::cout << "fleet id size: " << fleet_ids.size() << std::endl;
+
     if (fleet_end_it != fleet_ids.begin())
     {
       fleet_second_to_last_it = std::prev(fleet_end_it);
