@@ -1004,7 +1004,6 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
    */
   void AddPopulation(uint32_t id) {
     this->population_ids->insert(id);
-    Rcout << "Added population ID " << id << " to SurplusProductionInterface" << std::endl;
     std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
     pit = PopulationInterfaceBase::live_objects.find(id);
     if (pit != PopulationInterfaceBase::live_objects.end()) {

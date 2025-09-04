@@ -122,9 +122,12 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
    */
   PellaTomlinsonInterface(const PellaTomlinsonInterface& other)
       : DepletionInterfaceBase(other),
+        nyears(other.nyears),
         log_r(other.log_r),
         log_K(other.log_K),
-        log_m(other.log_m) {}
+        log_m(other.log_m),
+        log_depletion(other.log_depletion),
+        log_expected_depletion(other.log_expected_depletion) {}
 
   /**
    * @brief The destructor.
@@ -351,7 +354,6 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     // add to Information
     info->depletion_models[depletion->id] = depletion;
 
-    Rcpp::Rcout << "end depletion rcpp" << std::endl;
     return true;
   }
 

@@ -79,6 +79,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       total_landings_numbers; /*!< Derived quantity: Total landings in numbers*/
   fims::Vector<Type> expected_recruitment; /*!< Expected recruitment */
   fims::Vector<Type> sum_selectivity;      /*!< TODO: add documentation */
+  fims::Vector<Type> observed_catch;      /*!< TODO: add documentation */
+  fims::Vector<Type> expected_depletion;      /*!< TODO: add documentation */
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>

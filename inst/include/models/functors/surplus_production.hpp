@@ -70,39 +70,64 @@ class SurplusProduction : public FisheryModelBase<Type> {
 
   size_t nyears = 0;  /*!< max years of all populations */
   size_t nages = 0;   /*!< max ages of all populations */
-   /**
-   * @brief Vector of shared pointers that contains all populations in the model.
-   */
-  std::vector<std::shared_ptr<fims_popdy::Population<Type>>> populations;
 
   SurplusProduction() : fims_popdy::FisheryModelBase<Type>() {
     this->model_type_m = "sp";
   }
 
+    /**
+   * @brief Destroy the Surplus Production object.
+   *
+   */
+  virtual ~SurplusProduction() {}
+
   virtual void Initialize() {
     this->nyears = 0;
     this->nages = 0;
 
-    for (size_t i = 0; i < this->populations.size(); i++) {
-      this->nyears = std::max(this->nyears, this->populations[i]->nyears);
-      this->nages = std::max(this->nages, this->populations[i]->nages);
+    for (size_t p = 0; p < this->populations.size(); p++) {
+        std::shared_ptr<fims_popdy::Population<Type>> &population =
+          this->populations[p];
+      this->nyears = std::max(this->nyears, population->nyears);
+      this->nages = std::max(this->nages, population->nages);
+      //TODO: remove setting population nfleets through the interface and add 
+      //change intialization in caa
+      population->nfleets = population->fleets.size();
 
-      this->populations[i]->derived_quantities["biomass"] =
-          fims::Vector<Type>((this->populations[i]->nyears + 1));
+      auto &derived_quantities =
+          this->population_derived_quantities[population->GetId()];
 
-      this->populations[i]->derived_quantities["expected_depletion"] =
-          fims::Vector<Type>(this->populations[i]->nyears *
-                             this->populations[i]->nfleets);
+      derived_quantities["biomass"] =
+          fims::Vector<Type>((this->nyears + 1));
+    
+      derived_quantities["expected_depletion"] =
+          fims::Vector<Type>(this->nyears);
+      
+      derived_quantities["observed_catch"] =
+          fims::Vector<Type>(this->nyears);
+    }
 
-      this->populations[i]->derived_quantities["observed_catch"] =
-          fims::Vector<Type>(this->populations[i]->nyears *
-                             this->populations[i]->nfleets);
+    for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
+         ++fit) {
+      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+      std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          this->fleet_derived_quantities[fleet->GetId()];
+
+      derived_quantities["index_expected"] = fims::Vector<Type>(fleet->nyears);
+      derived_quantities["log_index_expected"] =
+          fims::Vector<Type>(fleet->nyears);
+      if (fleet->log_q.size() == 0) {
+        fleet->log_q.resize(1);
+        fleet->log_q[0] = static_cast<Type>(0.0);
+      }
+      fleet->q.resize(fleet->log_q.size());
+
     }
   }
 
   void Prepare() {
     for (size_t p = 0; p < this->populations.size(); p++) {
-      auto derived_quantities =
+      auto &derived_quantities =
           this->population_derived_quantities[this->populations[p]->GetId()];
 
       typename fims_popdy::Population<Type>::derived_quantities_iterator it;
@@ -113,23 +138,22 @@ class SurplusProduction : public FisheryModelBase<Type> {
       }
     }
 
-    for (size_t p = 0; p < this->populations.size(); p++) {
-      std::shared_ptr<fims_popdy::Population<Type>> &population =
-          this->populations[p];
-      std::map<std::string, fims::Vector<Type>> &derived_quantities =
-          this->population_derived_quantities[this->populations[p]->GetId()];
-    }
-
     for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
          ++fit) {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           this->fleet_derived_quantities[fleet->GetId()];
       typename fims_popdy::Population<Type>::derived_quantities_iterator it;
+
       for (it = derived_quantities.begin(); it != derived_quantities.end();
            it++) {
         fims::Vector<Type> &dq = (*it).second;
         this->ResetVector(dq);
+      }
+
+      // Transformation Section
+      for (size_t i = 0; i < fleet->log_q.size(); i++) {
+        fleet->q[i] = fims_math::exp(fleet->log_q[i]);
       }
     }
   }
@@ -150,7 +174,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
    * @return std::vector<std::shared_ptr<fims_popdy::Population<Type>>>&
    */
   std::vector<std::shared_ptr<fims_popdy::Population<Type>>> &GetPopulations() {
-    return populations;
+    return this->populations;
   }
 
 /**
@@ -161,11 +185,16 @@ class SurplusProduction : public FisheryModelBase<Type> {
   void CalculateCatch(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t year) {
     for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
-      size_t index_yf = year * population->nfleets +
-                        fleet_;  // index by fleet and years to dimension fold
-      this->population_derived_quantities[population->GetId()]["observed_catch"]
-                                         [year] +=
-          population->fleets[fleet_]->observed_landings_data->at(year);
+      //if fleet_observed landings data exists for the fleet:
+      if (population->fleets[fleet_]->fleet_observed_landings_data_id_m != -999) {
+        //if the observed landings data is not -999:
+        if(population->fleets[fleet_]->observed_landings_data->at(year) !=
+          population->fleets[fleet_]->observed_landings_data->na_value){
+            this->population_derived_quantities[population->GetId()]["observed_catch"]
+                                              [year] +=
+                population->fleets[fleet_]->observed_landings_data->at(year);
+          }
+      }
     }
   }
 
@@ -190,7 +219,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     }
     this->population_derived_quantities[population->GetId()]
                                        ["expected_depletion"][year] =
-        fims_math::exp(population->depletion->log_depletion[year]);
+        fims_math::exp(population->depletion->log_expected_depletion[year]);
   }
 
   /**
@@ -200,20 +229,24 @@ class SurplusProduction : public FisheryModelBase<Type> {
   void CalculateIndex(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t year) {
     Type index_;
-    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+    fleet_iterator fit;
+    for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
+      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
       // reference depletion->log_depletion here, where
       // log_depletion ~ LN(log_expected_depletion, sigma)
+      //TODO: calculate using transformed q instead of log_q?
       index_ = fims_math::exp(
           population->depletion->log_depletion[year] +
-          population->fleets[fleet_]->log_q.get_force_scalar(year));
+          fleet->log_q.get_force_scalar(year));
 
-      population->fleets[fleet_]->index_expected[year] += index_;
+      this->fleet_derived_quantities[fleet->GetId()]["index_expected"][year] += 
+        index_;
     }
-    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
-      population->fleets[fleet_]->log_index_expected[year] =
-          fims_math::log(population->fleets[fleet_]->index_expected[year]);
+    for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
+      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+      this->fleet_derived_quantities[fleet->GetId()]["log_index_expected"][year] =
+          fims_math::log(this->fleet_derived_quantities[fleet->GetId()]["index_expected"][year]);
     }
-
   }
 
   /**
@@ -239,7 +272,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Population<Type>> &population =
           this->populations[p];
 
-      for (size_t y = 0; y <= this->nyears; y++) {
+      for (size_t y = 0; y < this->nyears; y++) {
         CalculateCatch(population, y);
         CalculateDepletion(population, y);
         CalculateIndex(population, y);
