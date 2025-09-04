@@ -22,10 +22,12 @@ test_that("create_default_parameters() works with correct inputs", {
     configurations = default_configurations,
     data = data
   )
+  result_unnested <- result |>
+    tidyr::unnest(cols = data)
 
   expect_s3_class(result, "tbl_df")
   expect_equal(
-    colnames(result), 
+    colnames(result),
     c("model_family", "module_name", "fleet_name", "data")
   )
   expect_true(is.list(result[["data"]]))
@@ -37,6 +39,8 @@ test_that("create_default_parameters() works with correct inputs", {
       "value", "estimation_type", "distribution_type", "distribution"
     )
   )
+  #' @description Test that create_default_parameters() returns correct outputs.
+  expect_snapshot_file(save_csv(result_unnested), "default_parameters.csv")
 })
 
 ## Edge handling ----

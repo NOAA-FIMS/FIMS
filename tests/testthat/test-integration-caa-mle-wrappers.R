@@ -153,4 +153,45 @@ test_that("estimation test with age and length comp with NAs", {
 })
 
 ## Error handling ----
-# No built-in errors to test.
+test_that("FIMS returns an error when there are no estimated parameters for optimization", {
+  # Load data
+  data_age_length_comp <- FIMSFrame(data1)
+  # Load pre-configured parameters
+  parameters <- readRDS(
+    test_path("fixtures", "parameters_model_comparison_project.RDS")
+  )
+  # Set all non-NA estimation types to "constant" and initialize the model
+  initialized_model <- parameters |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        !is.na(estimation_type),
+        "constant",
+        estimation_type
+      )
+    ) |>
+    initialize_fims(
+      data = data_age_length_comp
+    )
+  # Fit model without optimization and get output from a deterministic run
+  deterministic_output <- initialized_model |>
+    fit_fims(optimize = FALSE) |>
+    get_estimates() |>
+    dplyr::filter(!is.na(initial))
+
+  #' @description Test that estimate column should match initial column when 
+  #' not optimized
+  expect_equal(
+    deterministic_output[["estimate"]],
+    deterministic_output[["initial"]]
+  )
+  clear()
+
+  #' @description Test that FIMS returns an error when there are no estimated 
+  #' parameters for optimization.
+  expect_error(
+    object = initialized_model |>
+      fit_fims(optimize = TRUE),
+    regexp = "FIMS must have at least one parameter to optimize."
+  )
+  clear()
+})
