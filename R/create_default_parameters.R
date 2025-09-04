@@ -193,7 +193,7 @@ create_default_parameters <- function(
 #' A tibble template for a FIMS model.
 #' @noRd
 #' @examples
-#' FIMS:::reate_default_parameters_template(n_parameters = 3)
+#' FIMS:::create_default_parameters_template(n_parameters = 3)
 create_default_parameters_template <- function(n_parameters = 1) {
   template <- dplyr::tibble(
     model_family = NA_character_,
