@@ -17,6 +17,7 @@
 #include "../../../common/information.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
+#include <limits>
 
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
@@ -647,6 +648,19 @@ class FIMSRcppInterfaceBase {
     return "{\"name\" : \"not yet implemented\"}";
   }
 
+  std::string value_to_string(double value) {
+    std::stringstream ss;
+    if (value == std::numeric_limits<double>::infinity()) {
+      ss << "\"Infinity\"";
+    } else if (value == -std::numeric_limits<double>::infinity()) {
+      ss << "\"-Infinity\"";
+    } else if (value != value) {
+      ss << "\"NaN\"";
+    } else {
+      ss << value;
+    }
+    return ss.str();
+  }
   /**
    * @brief Make a string of dimensions for the model.
    */

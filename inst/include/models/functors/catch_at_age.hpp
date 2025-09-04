@@ -642,12 +642,12 @@ namespace fims_popdy
         }
 
         // Prepare proportion_female
-        for (size_t age = 0; age < population->nages; age++)
-        {
-          population->proportion_female[age] = 0.5;
-          derived_quantities["weight_at_age"][age] =
-              population->growth->evaluate(population->ages[age]);
-        }
+        // for (size_t age = 0; age < population->nages; age++)
+        // {
+        //   population->proportion_female[age] = 0.5;
+        //   derived_quantities["weight_at_age"][age] =
+        //       population->growth->evaluate(population->ages[age]);
+        // }
 
         // Transformation Section
         for (size_t age = 0; age < population->nages; age++)
@@ -868,7 +868,7 @@ namespace fims_popdy
 
       dq_["biomass"][year] +=
           dq_["numbers_at_age"][i_age_year] *
-          dq_["weight_at_age"][age];
+         population->growth->evaluate(population->ages[age]);
     }
 
     /**
@@ -889,7 +889,7 @@ namespace fims_popdy
 
       dq_["unfished_biomass"][year] +=
           dq_["unfished_numbers_at_age"][i_age_year] *
-          dq_["weight_at_age"][age];
+          population->growth->evaluate(population->ages[age]);
     }
 
     /**
@@ -912,7 +912,7 @@ namespace fims_popdy
           population->proportion_female[age] *
           dq_["numbers_at_age"][i_age_year] *
           dq_["proportion_mature_at_age"][i_age_year] *
-          dq_["weight_at_age"][age];
+          population->growth->evaluate(population->ages[age]);
     }
 
     /**
@@ -935,7 +935,7 @@ namespace fims_popdy
           population->proportion_female[age] *
           dq_["unfished_numbers_at_age"][i_age_year] *
           dq_["proportion_mature_at_age"][i_age_year] *
-          dq_["weight_at_age"][age];
+          population->growth->evaluate(population->ages[age]);
     }
 
     /**
@@ -1090,7 +1090,6 @@ namespace fims_popdy
         std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
         size_t age)
     {
-      std::map<std::string, fims::Vector<Type>> &pdq_ = this->GetPopulationDerivedQuantities(population->GetId());
 
       int i_age_year = year * population->nages + age;
       for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
@@ -1099,7 +1098,7 @@ namespace fims_popdy
 
         fdq_["landings_weight_at_age"][i_age_year] =
             fdq_["landings_numbers_at_age"][i_age_year] *
-            pdq_["weight_at_age"][age];
+            population->growth->evaluate(population->ages[age]);
       }
     }
 
@@ -1194,7 +1193,6 @@ namespace fims_popdy
         std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
         size_t age)
     {
-      std::map<std::string, fims::Vector<Type>> &pdq_ = this->GetPopulationDerivedQuantities(population->GetId());
 
       int i_age_year = year * population->nages + age;
       for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++)
@@ -1203,7 +1201,7 @@ namespace fims_popdy
 
         fdq_["index_weight_at_age"][i_age_year] =
             fdq_["index_numbers_at_age"][i_age_year] *
-            pdq_["weight_at_age"][age];
+            population->growth->evaluate(population->ages[age]);
       }
     }
 
@@ -1238,7 +1236,7 @@ namespace fims_popdy
             for (size_t age = 0; age < population->nages; age++)
             {
               size_t i_age_year = year * population->nages + age;
-              fdq_["agecomp_proportion"][i_age_year] =
+              fdq_["age_comp_proportion"][i_age_year] =
                   fdq_["landings_numbers_at_age"][i_age_year] /
                   sum_age;
             }
@@ -1249,7 +1247,7 @@ namespace fims_popdy
               {
                 fims::Vector<Type> &landings_numbers_at_length = fdq_["landings_numbers_at_length"];
                 fims::Vector<Type> &landings_numbers_at_age = fdq_["landings_numbers_at_age"];
-                fims::Vector<Type> &proportion_landings_numbers_at_length = fdq_["lengthcomp_proportion"];
+                fims::Vector<Type> &proportion_landings_numbers_at_length = fdq_["length_comp_proportion"];
 
                 sum_length = 0.0;
                 for (size_t l = 0; l < population->fleets[fleet_]->nlengths;
@@ -1274,7 +1272,7 @@ namespace fims_popdy
                 {
                   size_t i_length_year =
                       y * population->fleets[fleet_]->nlengths + l;
-                  fdq_["lengthcomp_proportion"][i_length_year] =
+                  fdq_["length_comp_proportion"][i_length_year] =
                       fdq_["landings_numbers_at_length"][i_length_year] /
                       sum_length;
                 }
@@ -1283,7 +1281,7 @@ namespace fims_popdy
                 {
                   size_t i_length_year =
                       y * population->fleets[fleet_]->nlengths + l;
-                  fdq_["lengthcomp_proportion"][i_length_year] =
+                  fdq_["length_comp_proportion"][i_length_year] =
                       fdq_["landings_numbers_at_length"][i_length_year] /
                       sum_length;
                 }
@@ -1326,7 +1324,7 @@ namespace fims_popdy
             // the year.
             if (fleet->fleet_observed_landings_data_id_m == -999)
             {
-              this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"]
+              this->fleet_derived_quantities[fleet->GetId()]["age_comp_expected"]
                                             [i_age_year] =
                   this->fleet_derived_quantities[fleet->GetId()]
                                                 ["index_numbers_at_age"]
@@ -1334,14 +1332,14 @@ namespace fims_popdy
             }
             else
             {
-              this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"]
+              this->fleet_derived_quantities[fleet->GetId()]["age_comp_expected"]
                                             [i_age_year] =
                   this->fleet_derived_quantities[fleet->GetId()]
                                                 ["landings_numbers_at_age"]
                                                 [i_age_year];
             }
             sum += this->fleet_derived_quantities[fleet->GetId()]
-                                                 ["agecomp_expected"][i_age_year];
+                                                 ["age_comp_expected"][i_age_year];
             // robust_sum -= robust_add;
 
             // This sums over the observed age composition data so that
@@ -1363,19 +1361,19 @@ namespace fims_popdy
           for (size_t a = 0; a < fleet->nages; a++)
           {
             size_t i_age_year = y * fleet->nages + a;
-            this->fleet_derived_quantities[fleet->GetId()]["agecomp_proportion"]
+            this->fleet_derived_quantities[fleet->GetId()]["age_comp_proportion"]
                                           [i_age_year] =
-                this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"]
+                this->fleet_derived_quantities[fleet->GetId()]["age_comp_expected"]
                                               [i_age_year] /
                 sum;
             // robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
 
             if (fleet->fleet_observed_agecomp_data_id_m != -999)
             {
-              this->fleet_derived_quantities[fleet->GetId()]["agecomp_expected"]
+              this->fleet_derived_quantities[fleet->GetId()]["age_comp_expected"]
                                             [i_age_year] =
                   this->fleet_derived_quantities[fleet->GetId()]
-                                                ["agecomp_proportion"]
+                                                ["age_comp_proportion"]
                                                 [i_age_year] *
                   sum_obs;
             }
@@ -1415,10 +1413,10 @@ namespace fims_popdy
                 size_t i_age_year = y * fleet->nages + a;
                 size_t i_length_age = a * fleet->nlengths + l;
                 this->fleet_derived_quantities[fleet->GetId()]
-                                              ["lengthcomp_expected"]
+                                              ["length_comp_expected"]
                                               [i_length_year] +=
                     this->fleet_derived_quantities[fleet->GetId()]
-                                                  ["agecomp_expected"]
+                                                  ["age_comp_expected"]
                                                   [i_age_year] *
                     fleet->age_to_length_conversion[i_length_age];
 
@@ -1440,14 +1438,14 @@ namespace fims_popdy
               }
 
               sum += this->fleet_derived_quantities[fleet->GetId()]
-                                                   ["lengthcomp_expected"]
+                                                   ["length_comp_expected"]
                                                    [i_length_year];
               // robust_sum -= robust_add;
 
               if (fleet->fleet_observed_lengthcomp_data_id_m != -999)
               {
-                if (fleet->observed_lengthcomp_data->at(i_length_year) !=
-                    fleet->observed_lengthcomp_data->na_value)
+                if (fleet->observed_length_comp_data->at(i_length_year) !=
+                    fleet->observed_length_comp_data->na_value)
                 {
                   sum_obs += fleet->observed_lengthcomp_data->at(i_length_year);
                 }
@@ -1457,10 +1455,10 @@ namespace fims_popdy
             {
               size_t i_length_year = y * fleet->nlengths + l;
               this->fleet_derived_quantities[fleet->GetId()]
-                                            ["lengthcomp_proportion"]
+                                            ["length_comp_proportion"]
                                             [i_length_year] =
                   this->fleet_derived_quantities[fleet->GetId()]
-                                                ["lengthcomp_expected"]
+                                                ["length_comp_expected"]
                                                 [i_length_year] /
                   sum;
               // robust_add + robust_sum *
@@ -1468,10 +1466,10 @@ namespace fims_popdy
               if (fleet->fleet_observed_lengthcomp_data_id_m != -999)
               {
                 this->fleet_derived_quantities[fleet->GetId()]
-                                              ["lengthcomp_expected"]
+                                              ["length_comp_expected"]
                                               [i_length_year] =
                     this->fleet_derived_quantities[fleet->GetId()]
-                                                  ["lengthcomp_proportion"]
+                                                  ["length_comp_proportion"]
                                                   [i_length_year] *
                     sum_obs;
               }

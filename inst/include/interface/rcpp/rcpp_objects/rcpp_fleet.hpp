@@ -344,6 +344,11 @@ public:
     interface_selectivity_id_m.set(selectivity_id);
   }
 
+  uint32_t GetSelectivityID()
+  {
+    return interface_selectivity_id_m.get();
+  } 
+
   /**
    * @brief Get the unique ID for the observed age-composition data object.
    */

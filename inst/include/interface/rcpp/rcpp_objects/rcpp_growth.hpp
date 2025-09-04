@@ -179,7 +179,9 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"type\" : \"EWAA\",\n";
     ss << " \"id\":" << this->id << ",\n";
     ss << " \"rank\": " << 1 << ",\n";
-    ss << " \"dimensions\": [" << this->weights.size() << "],\n";
+     ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [\"nages\"],\n";
+    ss << "  \"dimensions\": [" << this->ages.size() << "]\n},\n";
 
     ss << " \"ages\": [";
     for (size_t i = 0; i < ages.size() - 1; i++) {
@@ -191,7 +193,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     for (size_t i = 0; i < weights.size() - 1; i++) {
       ss << weights[i] << ", ";
     }
-    ss << weights[weights.size() - 1] << "]\n";
+    ss << weights[weights.size() - 1] << "],\n";
+     ss << "\"uncertainty\" : " << fims::Vector<double>(ages.size(), -999);// << "\n}]\n";
     ss << "}";
     return ss.str();
   }

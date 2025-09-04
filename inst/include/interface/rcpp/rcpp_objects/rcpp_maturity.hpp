@@ -193,18 +193,26 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     ss << " \"id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
-    ss << "   \"name\": \"inflection_point\",\n";
+     ss << "   \"name\": \"inflection_point\",\n";
     ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->inflection_point << "},\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [\"na\"],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->inflection_point << ",\n ";
+    ss << "\"uncertainty\" : " << fims::Vector<double>(1, -999) << "},\n";
 
     ss << "{\n";
     ss << "   \"name\": \"slope\",\n";
     ss << "   \"id\":" << this->slope.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->slope << "}\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [\"na\"],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->slope << ",\n";
+    ss << "\"uncertainty\" : " << fims::Vector<double>(1, -999) << "\n}]\n";
 
-    ss << "]}";
+    ss << "}";
 
     return ss.str();
   }
