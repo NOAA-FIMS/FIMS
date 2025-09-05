@@ -1299,19 +1299,19 @@ public:
                                     fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
                                     fims::Vector<std::string>{"nyears+1"});
 
-      derived_quantities["expected_catch"] =
-          fims::Vector<Type>(fleet_interface->nyears.get());
-      derived_quantities_dim_info["expected_catch"] =
-          fims_popdy::DimensionInfo("expected_catch",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+      // derived_quantities["expected_catch"] =
+      //     fims::Vector<Type>(fleet_interface->nyears.get());
+      // derived_quantities_dim_info["expected_catch"] =
+      //     fims_popdy::DimensionInfo("expected_catch",
+      //                               fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+      //                               fims::Vector<std::string>{"nyears+1"});
 
-      derived_quantities["expected_index"] =
-          fims::Vector<Type>(fleet_interface->nyears.get());
-      derived_quantities_dim_info["expected_index"] =
-          fims_popdy::DimensionInfo("expected_index",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+      // derived_quantities["expected_index"] =
+      //     fims::Vector<Type>(fleet_interface->nyears.get());
+      // derived_quantities_dim_info["expected_index"] =
+      //     fims_popdy::DimensionInfo("expected_index",
+      //                               fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
+      //                               fims::Vector<std::string>{"nyears+1"});
 
       derived_quantities["age_comp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
