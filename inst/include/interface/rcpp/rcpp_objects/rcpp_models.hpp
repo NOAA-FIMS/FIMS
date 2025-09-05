@@ -89,7 +89,7 @@ public:
 };
 // static id of the FleetInterfaceBase object
 uint32_t FisheryModelInterfaceBase::id_g = 1;
-// local id of the FleetInterfaceBase object map relating the ID of the
+
 // FleetInterfaceBase to the FleetInterfaceBase objects
 std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
     FisheryModelInterfaceBase::live_objects;
@@ -157,12 +157,10 @@ public:
   }
 
   /**
-   * @brief Method to get the population id.
+   * @brief Method to get this id.
    */
   virtual uint32_t get_id()
   {
-    typename std::map<uint32_t,
-                      std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
     return this->id;
   }
 
@@ -224,10 +222,8 @@ public:
     if (pit != info->populations.end())
     {
       std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
-      // ToDo: add list of fleet ids operating on this population
       ss << "{\n";
-      // ss << " \"name\" : \"Population\",\n";
-      // ss << " \"type\" : \"population\",\n";
+  
       ss << " \"name\" : \"" << population_interface->name << "\",\n";
       ss << " \"id\": " << population_interface->id << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
@@ -484,11 +480,8 @@ public:
       std::shared_ptr<fims_popdy::Fleet<double>> &fleet = (*fit).second;
 
       ss << "{\n";
-      // ss << " \"name\" : \"Fleet\",\n";
-      // ss << " \"type\" : \"fleet\",\n";
       ss << " \"name\" : \"" << fleet_interface->name << "\",\n";
       ss << " \"id\": " << fleet_interface->id << ",\n";
-      // ss << " \"is_survey\": " << fleet_interface->is_survey << ",\n";
       ss << " \"nages\": " << fleet_interface->nages.get() << ",\n";
       ss << " \"nyears\": " << fleet_interface->nyears.get() << ",\n";
       ss << " \"nlengths\": " << fleet_interface->nlengths.get() << ",\n";
