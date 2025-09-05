@@ -633,7 +633,7 @@ public:
     ss << "{\n";
     ss << " \"name\" : \"CatchAtAge\",\n";
     ss << " \"type\" : \"model\",\n";
-    ss << " \"framework\" : ";
+    ss << " \"estimation_framework\" : ";
 #ifdef TMB_MODEL
     ss << "\"TMB\",";
 #else
