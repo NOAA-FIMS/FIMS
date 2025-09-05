@@ -687,11 +687,18 @@ public:
     // typename std::set<uint32_t>::iterator fleet_it;
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
+
     std::shared_ptr<fims_popdy::CatchAtAge<double>> model =
         std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(
             info->models_map[this->get_id()]);
 
+    std::shared_ptr<fims_model::Model<double>> model_internal =
+        fims_model::Model<double>::GetInstance();
+
+    double value = model_internal->Evaluate();
+
     std::stringstream ss;
+
     ss.str("");
 
     ss << "{\n";
@@ -705,7 +712,7 @@ public:
 #endif
     // ss << " \"tag\" : \"" << model->name << "\",\n";
     ss << " \"id\": " << this->get_id() << ",\n";
-
+    ss << " \"objective_function_value\": " << value << ",\n";
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end(); module_id_it++)
     {

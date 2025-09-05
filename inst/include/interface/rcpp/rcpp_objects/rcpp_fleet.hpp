@@ -100,7 +100,7 @@ public:
   /**
    * @brief The name of the fleet.
    */
-  SharedString name = "NA";
+  SharedString name = fims::to_string("NA");
   /**
    * @brief The number of age bins in the fleet data.
    */
