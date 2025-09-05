@@ -311,7 +311,7 @@ public:
 
     ss << "{\n";
     ss << " \"name\": \"recruitment\",\n";
-    ss << " \"type\": \"Beverton--Holt\",\n";
+    ss << " \"type\": \"Beverton-Holt\",\n";
     ss << " \"id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";

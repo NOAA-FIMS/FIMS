@@ -614,7 +614,6 @@ public:
       }
     }
 
-    // typename std::set<uint32_t>::iterator fleet_it;
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
