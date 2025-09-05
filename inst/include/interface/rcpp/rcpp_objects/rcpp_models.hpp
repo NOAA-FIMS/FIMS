@@ -278,14 +278,7 @@ public:
       std::map<std::string, fims_popdy::DimensionInfo> dim_info =
           model_ptr->GetPopulationDimensionInfo(population_interface->get_id());
       ss << this->derived_quantities_component_to_json(dqs, dim_info) << " ]}\n";
-      // if (cit != model_ptr->population_derived_quantities.end())
-      // {
-      //   ss << model_ptr->population_derived_quantities_to_json(cit) << "]}\n";
-      // }
-      // else
-      // {
-      //   ss << " ]}\n";
-      // }
+ 
     }
     else
     {
@@ -456,50 +449,6 @@ public:
     }
     return ss.str();
   }
-  /**
-   * @brief Send the population-based derived quantities to the json file.
-   * @return std::string
-   */
-  std::string population_derived_quantities_to_json(
-      typename fims_popdy::CatchAtAge<double>::population_derived_quantities_iterator pdqit)
-  {
-    std::stringstream ss;
-    // ss << std::fixed;
-    // ss << "{\n";
-    // ss << "\"id\": " << (*pdqit).first << ",\n";
-    // ss << "\"derived_quantities\": [\n";
-    population_derived_quantities_dim_strings_iterator str_it = this->population_derived_quantities_dim_strings.find((*pdqit).first);
-
-    typename std::map<std::string, fims::Vector<double>>::iterator it;
-    typename std::map<std::string, fims::Vector<double>>::iterator end_it;
-    end_it = (*pdqit).second.end();
-    typename std::map<std::string, fims::Vector<double>>::iterator second_to_last;
-    second_to_last = (*pdqit).second.end();
-    if (it != end_it)
-    {
-      second_to_last--;
-    }
-
-    std::string dims;
-    it = (*pdqit).second.begin();
-    for (; it != second_to_last; ++it)
-    {
-      dims = "\"dimensions\" : []";
-      if (str_it != this->fleet_derived_quantities_dim_strings.end())
-      {
-        dims = str_it->second[it->first];
-        // ss << this->DerivedQuantityToJSON(it, dims) << ",\n";
-      }
-    }
-
-    dims = "\"dimensions\" : []";
-    if (str_it != this->fleet_derived_quantities_dim_strings.end())
-    {
-      dims = str_it->second[second_to_last->first];
-      //    ss << this->DerivedQuantityToJSON(second_to_last, dims) << "\n";
-    }
-    return ss.str();
-  }
 
   /**
    * @brief Method to convert a fleet to a JSON string.
@@ -508,20 +457,6 @@ public:
   fleet_to_json(FleetInterface *fleet_interface)
   {
     std::stringstream ss;
-
-    // typename std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>::iterator
-    //     fi_it; // fleet interface iterator
-    // fi_it = FleetInterfaceBase::live_objects.find(fleet_interface->get_id());
-    // if (fi_it == FleetInterfaceBase::live_objects.end())
-    // {
-    //   FIMS_ERROR_LOG("Fleet with id " +
-    //                  fims::to_string(fleet_interface->get_id()) +
-    //                  " not found in live objects.");
-    //   return "{}"; // Return empty JSON
-    // }
-
-    // std::shared_ptr<FleetInterface> fleet_interface_ptr =
-    //     std::dynamic_pointer_cast<FleetInterface>((*fi_it).second);
 
     if (!fleet_interface)
     {
@@ -1309,20 +1244,6 @@ public:
                                     fims::Vector<int>{(fleet_interface->nyears.get())},
                                     fims::Vector<std::string>{"nyears"});
 
-      // derived_quantities["expected_catch"] =
-      //     fims::Vector<Type>(fleet_interface->nyears.get());
-      // derived_quantities_dim_info["expected_catch"] =
-      //     fims_popdy::DimensionInfo("expected_catch",
-      //                               fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-      //                               fims::Vector<std::string>{"nyears+1"});
-
-      // derived_quantities["expected_index"] =
-      //     fims::Vector<Type>(fleet_interface->nyears.get());
-      // derived_quantities_dim_info["expected_index"] =
-      //     fims_popdy::DimensionInfo("expected_index",
-      //                               fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-      //                               fims::Vector<std::string>{"nyears+1"});
-
       derived_quantities["age_comp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
       derived_quantities_dim_info["age_comp_expected"] =
@@ -1337,15 +1258,7 @@ public:
                                     fims::Vector<int>{(fleet_interface->nyears.get()), (fleet_interface->nlengths.get())},
                                     fims::Vector<std::string>{"nyears", "nlengths"});
 
-      // if (fleet_interface->nlengths.get() > 0)
-      // {
-      //   derived_quantities["age_to_length_conversion"] = fims::Vector<Type>(
-      //       fleet_interface->nyears.get() * fleet_interface->nlengths.get());
-      //   derived_quantities_dim_info["age_to_length_conversion"] =
-      //       fims_popdy::DimensionInfo("age_to_length_conversion",
-      //                                 fims::Vector<int>{(fleet_interface->nyears.get() + 1), (fleet_interface->nlengths.get() + 1)},
-      //                                 fims::Vector<std::string>{"year", "length"});
-      // }
+     
       // replace elements in the variable map
       info->variable_map[fleet_interface->log_landings_expected.id_m] =
           &(derived_quantities["log_landings_expected"]);
