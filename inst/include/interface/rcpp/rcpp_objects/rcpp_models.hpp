@@ -555,6 +555,12 @@ public:
       ss << " \"id\": " << fleet_interface->id << ",\n";
       // ss << " \"is_survey\": " << fleet_interface->is_survey << ",\n";
       ss << " \"nlengths\": " << fleet_interface->nlengths.get() << ",\n";
+      ss << "\"data\" : [\n";
+      ss << "{\"interface_observed_agecomp_data_id_m\": " << fleet_interface->GetObservedAgeCompDataID() << "},\n";
+      ss << "{\"interface_observed_lengthcomp_data_id_m\": " << fleet_interface->GetObservedLengthCompDataID() << "},\n";
+      ss << "{\"interface_observed_index_data_id_m\": " << fleet_interface->GetObservedIndexDataID() << "},\n";
+      ss << "{\"interface_observed_landings_data_id_m\": " << fleet_interface->GetObservedLandingsDataID() << "}\n";
+      ss << "],\n";
       ss << "\"parameters\": [\n";
       ss << "{\n";
       for (size_t i = 0; i < fleet_interface->log_Fmort.size(); i++)
@@ -759,7 +765,7 @@ public:
           SelectivityInterfaceBase::live_objects[*module_id_it];
       if (selectivity_interface)
       {
-          selectivity_interface->finalize();
+        selectivity_interface->finalize();
         ss << selectivity_interface->to_json();
         if (std::next(module_id_it) != selectivity_ids.end())
         {
@@ -776,6 +782,18 @@ public:
     {
       ss << *pit;
       if (std::next(pit) != this->population_ids->end())
+      {
+        ss << ", ";
+      }
+    }
+    ss << "],\n";
+    ss << " \"fleet_ids\": [";
+
+    for (fids = fleet_ids.begin();
+         fids != fleet_ids.end(); fids++)
+    {
+      ss << *fids;
+      if (std::next(fids) != fleet_ids.end())
       {
         ss << ", ";
       }

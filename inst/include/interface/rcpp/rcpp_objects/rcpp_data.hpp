@@ -16,8 +16,9 @@
  * @brief Rcpp interface that serves as the parent class for Rcpp data
  * interfaces. This type should be inherited and not called from R directly.
  */
-class DataInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+class DataInterfaceBase : public FIMSRcppInterfaceBase
+{
+public:
   /**
    * @brief The vector of data that is being passed from R.
    */
@@ -36,12 +37,13 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    * This is a live object, which is an object that has been created and lives
    * in memory.
    */
-  static std::map<uint32_t, DataInterfaceBase*> live_objects;
+  static std::map<uint32_t, DataInterfaceBase *> live_objects;
 
   /**
    * @brief The constructor.
    */
-  DataInterfaceBase() {
+  DataInterfaceBase()
+  {
     this->id = DataInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DataInterfaceBase */
@@ -53,7 +55,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  DataInterfaceBase(const DataInterfaceBase& other)
+  DataInterfaceBase(const DataInterfaceBase &other)
       : observed_data(other.observed_data), id(other.id) {}
 
   /**
@@ -75,14 +77,15 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t DataInterfaceBase::id_g = 1;
 // local id of the DataInterfaceBase object map relating the ID of the
 // DataInterfaceBase to the DataInterfaceBase objects
-std::map<uint32_t, DataInterfaceBase*> DataInterfaceBase::live_objects;
+std::map<uint32_t, DataInterfaceBase *> DataInterfaceBase::live_objects;
 
 /**
  * @brief  The Rcpp interface for AgeComp to instantiate the object from R:
  * acomp <- methods::new(AgeComp).
  */
-class AgeCompDataInterface : public DataInterfaceBase {
- public:
+class AgeCompDataInterface : public DataInterfaceBase
+{
+public:
   /**
    * @brief The first dimension of the data, which relates to the number of age
    * bins.
@@ -101,7 +104,8 @@ class AgeCompDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase() {
+  AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase()
+  {
     this->amax = amax;
     this->ymax = ymax;
     this->age_comp_data.resize(amax * ymax);
@@ -115,7 +119,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  AgeCompDataInterface(const AgeCompDataInterface& other)
+  AgeCompDataInterface(const AgeCompDataInterface &other)
       : DataInterfaceBase(other),
         amax(other.amax),
         ymax(other.ymax),
@@ -139,20 +143,25 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * of 2, the dimensions by printing ymax and amax, followed by the data values
    * themselves. This string is formatted for a json file.
    */
-  virtual std::string to_json() {
+  virtual std::string to_json()
+  {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"data\",\n";
-    ss << " \"type\" : \"AgeComp\",\n";
+    ss << " \"name\": \"AgeComp\",\n";
     ss << " \"id\":" << this->id << ",\n";
-    ss << " \"rank\": " << 2 << ",\n";
-    ss << " \"dimensions\": [" << this->ymax << "," << this->amax << "],\n";
+    ss << " \"type\" : \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [" << "\"nages\", \"nyears\"" << "],\n";
+    ss << "  \"dimensions\": [" << amax << ", " << ymax << "]\n},\n";
     ss << " \"values\": [";
-    for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++) {
+    for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++)
+    {
       ss << age_comp_data[i] << ", ";
     }
-    ss << age_comp_data[age_comp_data.size() - 1] << "]\n";
+    ss << age_comp_data[age_comp_data.size() - 1] << "],\n";
+    ss << "\"uncertainty\" : " << fims::Vector<double>(age_comp_data.size(), -999) << "\n";
+
     ss << "}";
     return ss.str();
   }
@@ -160,14 +169,17 @@ class AgeCompDataInterface : public DataInterfaceBase {
 #ifdef TMB_MODEL
 
   template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  bool add_to_fims_tmb_internal()
+  {
     std::shared_ptr<fims_data_object::DataObject<Type>> age_comp_data =
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
                                                              this->amax);
 
     age_comp_data->id = this->id;
-    for (int y = 0; y < ymax; y++) {
-      for (int a = 0; a < amax; a++) {
+    for (int y = 0; y < ymax; y++)
+    {
+      for (int a = 0; a < amax; a++)
+      {
         int i_age_year = y * amax + a;
         age_comp_data->at(y, a) = this->age_comp_data[i_age_year];
       }
@@ -185,7 +197,8 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
-  virtual bool add_to_fims_tmb() {
+  virtual bool add_to_fims_tmb()
+  {
 #ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
@@ -206,8 +219,9 @@ class AgeCompDataInterface : public DataInterfaceBase {
  * @brief The Rcpp interface for LengthComp to instantiate the object from R:
  * lcomp <- methods::new(LengthComp).
  */
-class LengthCompDataInterface : public DataInterfaceBase {
- public:
+class LengthCompDataInterface : public DataInterfaceBase
+{
+public:
   /**
    * @brief The first dimension of the data, which relates to the number of
    * length bins.
@@ -226,7 +240,8 @@ class LengthCompDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LengthCompDataInterface(int ymax = 0, int lmax = 0) : DataInterfaceBase() {
+  LengthCompDataInterface(int ymax = 0, int lmax = 0) : DataInterfaceBase()
+  {
     this->lmax = lmax;
     this->ymax = ymax;
     this->length_comp_data.resize(lmax * ymax);
@@ -240,7 +255,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  LengthCompDataInterface(const LengthCompDataInterface& other)
+  LengthCompDataInterface(const LengthCompDataInterface &other)
       : DataInterfaceBase(other),
         lmax(other.lmax),
         ymax(other.ymax),
@@ -264,33 +279,41 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * rank of 2, the dimensions by printing ymax and lmax, followed by the data
    * values themselves. This string is formatted for a json file.
    */
-  virtual std::string to_json() {
+  virtual std::string to_json()
+  {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"data\",\n";
-    ss << " \"type\" : \"LengthComp\",\n";
+    ss << " \"name\": \"LengthComp\",\n";
     ss << " \"id\":" << this->id << ",\n";
-    ss << " \"rank\": " << 2 << ",\n";
-    ss << " \"dimensions\": [" << this->ymax << "," << this->lmax << "],\n";
+    ss << " \"type\" : \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [" << "\"nlengths\", \"nyears\"" << "],\n";
+    ss << "  \"dimensions\": [" << lmax << ", " << ymax << "]\n},\n";
     ss << " \"values\": [";
-    for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++) {
+    for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++)
+    {
       ss << length_comp_data[i] << ", ";
     }
-    ss << length_comp_data[length_comp_data.size() - 1] << "]\n";
+    ss << length_comp_data[length_comp_data.size() - 1] << "],\n";
+    ss << "\"uncertainty\" : " << fims::Vector<double>(length_comp_data.size(), -999) << "\n";
+
     ss << "}";
     return ss.str();
   }
 
 #ifdef TMB_MODEL
   template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  bool add_to_fims_tmb_internal()
+  {
     std::shared_ptr<fims_data_object::DataObject<Type>> length_comp_data =
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
                                                              this->lmax);
     length_comp_data->id = this->id;
-    for (int y = 0; y < ymax; y++) {
-      for (int l = 0; l < lmax; l++) {
+    for (int y = 0; y < ymax; y++)
+    {
+      for (int l = 0; l < lmax; l++)
+      {
         int i_length_year = y * lmax + l;
         length_comp_data->at(y, l) = this->length_comp_data[i_length_year];
       }
@@ -305,7 +328,8 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
-  virtual bool add_to_fims_tmb() {
+  virtual bool add_to_fims_tmb()
+  {
 #ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
@@ -325,8 +349,9 @@ class LengthCompDataInterface : public DataInterfaceBase {
  * @brief  The Rcpp interface for Index to instantiate the object from R:
  * fleet <- methods::new(Index).
  */
-class IndexDataInterface : public DataInterfaceBase {
- public:
+class IndexDataInterface : public DataInterfaceBase
+{
+public:
   /**
    * @brief An integer that specifies the second dimension of the data.
    */
@@ -339,7 +364,8 @@ class IndexDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  IndexDataInterface(int ymax = 0) : DataInterfaceBase() {
+  IndexDataInterface(int ymax = 0) : DataInterfaceBase()
+  {
     this->ymax = ymax;
     this->index_data.resize(ymax);
 
@@ -352,7 +378,7 @@ class IndexDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  IndexDataInterface(const IndexDataInterface& other)
+  IndexDataInterface(const IndexDataInterface &other)
       : DataInterfaceBase(other),
         ymax(other.ymax),
         index_data(other.index_data) {}
@@ -375,20 +401,24 @@ class IndexDataInterface : public DataInterfaceBase {
    * dimensions by printing ymax, followed by the data values themselves. This
    * string is formatted for a json file.
    */
-  virtual std::string to_json() {
+  virtual std::string to_json()
+  {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"data\",\n";
-    ss << " \"type\": \"Index\",\n";
+    ss << " \"name\": \"Index\",\n";
     ss << " \"id\": " << this->id << ",\n";
-    ss << " \"rank\": " << 1 << ",\n";
-    ss << " \"dimensions\": [" << this->ymax << "],\n";
+    ss << " \"type\": \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [" << "\"nyears\"" << "],\n";
+    ss << "  \"dimensions\": [" << ymax << "]\n},\n";
     ss << " \"values\": [";
-    for (R_xlen_t i = 0; i < index_data.size() - 1; i++) {
+    for (R_xlen_t i = 0; i < index_data.size() - 1; i++)
+    {
       ss << index_data[i] << ", ";
     }
-    ss << index_data[index_data.size() - 1] << "]\n";
+    ss << index_data[index_data.size() - 1] << "],\n";
+    ss << " \"uncertainty\": " << fims::Vector<double>(index_data.size(), -999) << "\n";
     ss << "}";
     return ss.str();
   }
@@ -396,13 +426,15 @@ class IndexDataInterface : public DataInterfaceBase {
 #ifdef TMB_MODEL
 
   template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  bool add_to_fims_tmb_internal()
+  {
     std::shared_ptr<fims_data_object::DataObject<Type>> data =
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
 
-    for (int y = 0; y < ymax; y++) {
+    for (int y = 0; y < ymax; y++)
+    {
       data->at(y) = this->index_data[y];
     }
 
@@ -417,7 +449,8 @@ class IndexDataInterface : public DataInterfaceBase {
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
-  virtual bool add_to_fims_tmb() {
+  virtual bool add_to_fims_tmb()
+  {
 #ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
@@ -438,8 +471,9 @@ class IndexDataInterface : public DataInterfaceBase {
  * @brief  The Rcpp interface for Landings to instantiate the object from R:
  * fleet <- methods::new(Landings).
  */
-class LandingsDataInterface : public DataInterfaceBase {
- public:
+class LandingsDataInterface : public DataInterfaceBase
+{
+public:
   /**
    * @brief An integer that specifies the second dimension of the data.
    */
@@ -452,7 +486,8 @@ class LandingsDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LandingsDataInterface(int ymax = 0) : DataInterfaceBase() {
+  LandingsDataInterface(int ymax = 0) : DataInterfaceBase()
+  {
     this->ymax = ymax;
     this->landings_data.resize(ymax);
 
@@ -465,7 +500,7 @@ class LandingsDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  LandingsDataInterface(const LandingsDataInterface& other)
+  LandingsDataInterface(const LandingsDataInterface &other)
       : DataInterfaceBase(other),
         ymax(other.ymax),
         landings_data(other.landings_data) {}
@@ -488,20 +523,24 @@ class LandingsDataInterface : public DataInterfaceBase {
    * the dimensions by printing ymax, followed by the data values themselves.
    * This string is formatted for a json file.
    */
-  virtual std::string to_json() {
+  virtual std::string to_json()
+  {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"data\",\n";
-    ss << " \"type\": \"Landings\",\n";
+    ss << " \"name\": \"Landings\",\n";
     ss << " \"id\": " << this->id << ",\n";
-    ss << " \"rank\": " << 1 << ",\n";
-    ss << " \"dimensions\": [" << this->ymax << "],\n";
+    ss << " \"type\": \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [" << "\"nyears\"" << "],\n";
+    ss << "  \"dimensions\": [" << ymax << "]\n},\n";
     ss << " \"values\": [";
-    for (R_xlen_t i = 0; i < landings_data.size() - 1; i++) {
+    for (R_xlen_t i = 0; i < landings_data.size() - 1; i++)
+    {
       ss << landings_data[i] << ", ";
     }
-    ss << landings_data[landings_data.size() - 1] << "]\n";
+    ss << landings_data[landings_data.size() - 1] << "],\n";
+    ss << " \"uncertainty\": " << fims::Vector<double>(landings_data.size(), -999) << "\n";
     ss << "}";
     return ss.str();
   }
@@ -509,13 +548,15 @@ class LandingsDataInterface : public DataInterfaceBase {
 #ifdef TMB_MODEL
 
   template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  bool add_to_fims_tmb_internal()
+  {
     std::shared_ptr<fims_data_object::DataObject<Type>> data =
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
 
-    for (int y = 0; y < ymax; y++) {
+    for (int y = 0; y < ymax; y++)
+    {
       data->at(y) = this->landings_data[y];
     }
 
@@ -530,7 +571,8 @@ class LandingsDataInterface : public DataInterfaceBase {
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
-  virtual bool add_to_fims_tmb() {
+  virtual bool add_to_fims_tmb()
+  {
 #ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();

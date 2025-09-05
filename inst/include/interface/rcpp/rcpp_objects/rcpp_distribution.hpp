@@ -310,9 +310,9 @@ public:
 
     ss << "{\n";
     ss << " \"name\": \"DnormDistribution\",\n";
-    ss << " \"type\": \"normal\",\n";
     ss << " \"id\": " << this->id_m << ",\n";
-
+    ss << " \"type\": \"normal\",\n";
+    ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"values\":[";
@@ -649,9 +649,9 @@ public:
 
     ss << "{\n";
     ss << " \"name\": \"LogNormalLPDF\",\n";
-    ss << " \"type\": \"log_normal\",\n";
     ss << " \"id\": " << this->id_m << ",\n";
-
+    ss << " \"type\": \"log_normal\",\n";
+    ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"values\":[";
@@ -996,9 +996,9 @@ public:
 
     ss << "{\n";
     ss << " \"name\": \"Dmultinom\",\n";
-    ss << " \"type\": \"Dmultinom\",\n";
     ss << " \"id\": " << this->id_m << ",\n";
-    ss << " \"note\": \"" << this->notes.get() << "\",\n";
+    ss << " \"type\": \"multinomial\",\n";
+    ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"values\":[";
@@ -1031,10 +1031,10 @@ public:
       for (R_xlen_t i = 0; i < this->expected_values.size() - 1; i++)
       {
 
-          ss << this->value_to_string(this->expected_values[i].final_value_m) << ", ";
+        ss << this->value_to_string(this->expected_values[i].final_value_m) << ", ";
       }
       ss << this->value_to_string(this->expected_values[this->expected_values.size() - 1]
-                  .final_value_m);
+                                      .final_value_m);
 
       ss << "]\n";
     }
