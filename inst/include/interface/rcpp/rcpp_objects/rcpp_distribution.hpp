@@ -48,6 +48,10 @@ public:
   SharedInt interface_observed_data_id_m = -999;
 
   /**
+   * @brief The log probability density function value.
+   */
+  double lpdf_value = 0;
+  /**
    * @brief The constructor.
    */
   DistributionsInterfaceBase()
@@ -265,6 +269,8 @@ public:
           std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double>>(
               it->second);
 
+      this->lpdf_value = dnorm->lpdf;
+
       for (size_t i = 0; i < this->log_sd.size(); i++)
       {
         if (this->log_sd[i].estimation_type_m.get() == "constant")
@@ -315,6 +321,7 @@ public:
     ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
+    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"values\":[";
     if (this->lpdf_vec.size() == 0)
     {
@@ -605,6 +612,8 @@ public:
           std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double>>(
               it->second);
 
+      this->lpdf_value = dlnorm->lpdf;
+
       for (size_t i = 0; i < this->log_sd.size(); i++)
       {
         if (this->log_sd[i].estimation_type_m.get() == "constant")
@@ -654,6 +663,7 @@ public:
     ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
+    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"values\":[";
     if (this->lpdf_vec.size() == 0)
     {
@@ -947,6 +957,8 @@ public:
           std::dynamic_pointer_cast<
               fims_distributions::MultinomialLPMF<double>>(it->second);
 
+      this->lpdf_value = dmultinom->lpdf;
+
       size_t nx = dmultinom->report_lpdf_vec.size();
       this->lpdf_vec = Rcpp::NumericVector(nx);
       if (this->expected_values.size() != nx)
@@ -1001,6 +1013,7 @@ public:
     ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
+    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"values\":[";
     if (this->lpdf_vec.size() == 0)
     {

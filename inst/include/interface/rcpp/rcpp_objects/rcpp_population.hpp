@@ -181,7 +181,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief The name.
    * TODO: Document name better.
    */
-  std::string name;
+  SharedString name = fims::to_string("NA");
 
   /**
    * @brief The constructor.
@@ -232,6 +232,18 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Sets the name of the population.
+   * @param name The name to set.
+   */
+  void SetName(const std::string &name) { this->name.set(name); }
+
+  /**
+   * @brief Gets the name of the population.
+   * @return The name.
+   */
+  std::string GetName() const { return this->name.get(); }
 
   /**
    * @brief Sets the unique ID for the Maturity object.

@@ -345,6 +345,7 @@ maturity$slope[1]$estimation_type$set("constant")
 
 # Population
 population <- methods::new(Population)
+population$SetName("Population 1")
 population$log_M$resize(om_input[["nyr"]] * om_input[["nages"]])
 for (i in 1:(om_input[["nyr"]] * om_input[["nages"]])) {
   population$log_M[i]$value <- log(om_input[["M.age"]][1])

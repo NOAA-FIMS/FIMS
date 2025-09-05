@@ -554,8 +554,10 @@ public:
       ss << " \"name\" : \"" << fleet_interface->name << "\",\n";
       ss << " \"id\": " << fleet_interface->id << ",\n";
       // ss << " \"is_survey\": " << fleet_interface->is_survey << ",\n";
+      ss << " \"nages\": " << fleet_interface->nages.get() << ",\n";
+      ss << " \"nyears\": " << fleet_interface->nyears.get() << ",\n";
       ss << " \"nlengths\": " << fleet_interface->nlengths.get() << ",\n";
-      ss << "\"data\" : [\n";
+      ss << "\"data_ids\" : [\n";
       ss << "{\"interface_observed_agecomp_data_id_m\": " << fleet_interface->GetObservedAgeCompDataID() << "},\n";
       ss << "{\"interface_observed_lengthcomp_data_id_m\": " << fleet_interface->GetObservedLengthCompDataID() << "},\n";
       ss << "{\"interface_observed_index_data_id_m\": " << fleet_interface->GetObservedIndexDataID() << "},\n";
@@ -1185,126 +1187,127 @@ public:
           fleet_interface->nyears.get() * fleet_interface->nages.get());
       derived_quantities_dim_info["landings_numbers_at_age"] =
           fims_popdy::DimensionInfo("landings_numbers_at_age",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
-                                    fims::Vector<std::string>{"nyears+1", "nages"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nages.get()},
+                                    fims::Vector<std::string>{"nyears", "nages"});
 
       derived_quantities["landings_weight_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
       derived_quantities_dim_info["landings_weight_at_age"] =
           fims_popdy::DimensionInfo("landings_weight_at_age",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
-                                    fims::Vector<std::string>{"nyears+1", "nages"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nages.get()},
+                                    fims::Vector<std::string>{"nyears", "nages"});
 
       derived_quantities["landings_numbers_at_length"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
       derived_quantities_dim_info["landings_numbers_at_length"] =
           fims_popdy::DimensionInfo("landings_numbers_at_length",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nlengths.get()},
-                                    fims::Vector<std::string>{"nyears+1", "nlengths"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nlengths.get()},
+                                    fims::Vector<std::string>{"nyears", "nlengths"});
 
       derived_quantities["landings_weight"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
       derived_quantities_dim_info["landings_weight"] =
           fims_popdy::DimensionInfo("landings_weight",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get())},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["landings_numbers"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
       derived_quantities_dim_info["landings_numbers"] =
           fims_popdy::DimensionInfo("landings_numbers",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get())},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["landings_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
       derived_quantities_dim_info["landings_expected"] =
           fims_popdy::DimensionInfo("landings_expected",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get())},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["log_landings_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
       derived_quantities_dim_info["log_landings_expected"] =
           fims_popdy::DimensionInfo("log_landings_expected",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get())},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["age_comp_proportion"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
       derived_quantities_dim_info["age_comp_proportion"] =
           fims_popdy::DimensionInfo("age_comp_proportion",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
-                                    fims::Vector<std::string>{"nyears+1", "nages"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nages.get()},
+                                    fims::Vector<std::string>{"nyears", "nages"});
 
       derived_quantities["length_comp_proportion"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
       derived_quantities_dim_info["length_comp_proportion"] =
           fims_popdy::DimensionInfo("length_comp_proportion",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nlengths.get()},
-                                    fims::Vector<std::string>{"nyears+1", "nlengths"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nlengths.get()},
+                                    fims::Vector<std::string>{"nyears", "nlengths"});
 
       // index
       derived_quantities["index_numbers_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
       derived_quantities_dim_info["index_numbers_at_age"] =
           fims_popdy::DimensionInfo("index_numbers_at_age",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
-                                    fims::Vector<std::string>{"nyears+1", "nages"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nages.get()},
+                                    fims::Vector<std::string>{"nyears", "nages"});
 
       derived_quantities["index_weight_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
       derived_quantities_dim_info["index_weight_at_age"] =
           fims_popdy::DimensionInfo("index_weight_at_age",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
-                                    fims::Vector<std::string>{"nyears+1", "nages"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nages.get()},
+                                    fims::Vector<std::string>{"nyears", "nages"});
+
       derived_quantities["index_weight_at_age"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
       derived_quantities_dim_info["index_weight_at_age"] =
           fims_popdy::DimensionInfo("index_weight_at_age",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nages.get()},
-                                    fims::Vector<std::string>{"nyears+1", "nages"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nages.get()},
+                                    fims::Vector<std::string>{"nyears", "nages"});
 
       derived_quantities["index_numbers_at_length"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
       derived_quantities_dim_info["index_numbers_at_length"] =
           fims_popdy::DimensionInfo("index_numbers_at_length",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), fleet_interface->nlengths.get()},
-                                    fims::Vector<std::string>{"nyears+1", "nlengths"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nlengths.get()},
+                                    fims::Vector<std::string>{"nyears", "nlengths"});
       derived_quantities["index_weight"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
       derived_quantities_dim_info["index_weight"] =
           fims_popdy::DimensionInfo("index_weight",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get())},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["index_numbers"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
       derived_quantities_dim_info["index_numbers"] =
           fims_popdy::DimensionInfo("index_numbers",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get())},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["index_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
       derived_quantities_dim_info["index_expected"] =
           fims_popdy::DimensionInfo("index_expected",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get())},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["log_index_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
       derived_quantities_dim_info["log_index_expected"] =
           fims_popdy::DimensionInfo("log_index_expected",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get())},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["catch_index"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
       derived_quantities_dim_info["catch_index"] =
           fims_popdy::DimensionInfo("catch_index",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get())},
+                                    fims::Vector<std::string>{"nyears"});
 
       // derived_quantities["expected_catch"] =
       //     fims::Vector<Type>(fleet_interface->nyears.get());
@@ -1324,15 +1327,15 @@ public:
           fleet_interface->nyears.get() * fleet_interface->nages.get());
       derived_quantities_dim_info["age_comp_expected"] =
           fims_popdy::DimensionInfo("age_comp_expected",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), (fleet_interface->nages.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1", "nages+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), (fleet_interface->nages.get())},
+                                    fims::Vector<std::string>{"nyears", "nages"});
 
       derived_quantities["length_comp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
       derived_quantities_dim_info["length_comp_expected"] =
           fims_popdy::DimensionInfo("length_comp_expected",
-                                    fims::Vector<int>{(fleet_interface->nyears.get() + 1), (fleet_interface->nlengths.get() + 1)},
-                                    fims::Vector<std::string>{"nyears+1", "nlengths+1"});
+                                    fims::Vector<int>{(fleet_interface->nyears.get()), (fleet_interface->nlengths.get())},
+                                    fims::Vector<std::string>{"nyears", "nlengths"});
 
       // if (fleet_interface->nlengths.get() > 0)
       // {
