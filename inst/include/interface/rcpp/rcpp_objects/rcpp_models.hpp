@@ -635,11 +635,10 @@ public:
     ss << " \"type\" : \"model\",\n";
     ss << " \"estimation_framework\" : ";
 #ifdef TMB_MODEL
-    ss << "\"TMB\",";
+    ss << "\"Template_Model_Builder (TMB)\",";
 #else
     ss << "\"FIMS\",";
 #endif
-    // ss << " \"tag\" : \"" << model->name << "\",\n";
     ss << " \"id\": " << this->get_id() << ",\n";
     ss << " \"objective_function_value\": " << value << ",\n";
     ss << "\"growth\":[\n";

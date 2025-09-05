@@ -13,7 +13,9 @@
 #' @export EWAAgrowth
 #' @export finalize
 #' @export Fleet
+#' @export set_fixed
 #' @export get_fixed
+#' @export set_random
 #' @export get_random
 #' @export get_parameter_names
 #' @export get_random_names

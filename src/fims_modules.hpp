@@ -55,8 +55,12 @@ RCPP_MODULE(fims)
         Rcpp::function("finalize", &finalize_fims,
                        "Extracts the derived quantities from `Information` to the "
                        "Rcpp object and returns a JSON string as the output.");
+        Rcpp::function("set_fixed", &set_fixed_parameters,
+                       "Sets the fixed parameters vector object.");
         Rcpp::function("get_fixed", &get_fixed_parameters_vector,
                        "Gets the fixed parameters vector object.");
+        Rcpp::function("set_random", &set_random_parameters,
+                       "Sets the random parameters vector object.");
         Rcpp::function("get_random", &get_random_parameters_vector,
                        "Gets the random parameters vector object.");
         Rcpp::function("get_parameter_names", &get_parameter_names,

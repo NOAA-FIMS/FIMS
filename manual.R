@@ -394,5 +394,6 @@ if (estimation_mode == TRUE) {
     control = list(eval.max = 10000, iter.max = 10000, trace = 0)
   )
 }
-
+opt
+set_fixed(opt$par)
 write(caa$get_output(), "caa_output.json")

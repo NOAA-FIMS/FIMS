@@ -175,6 +175,22 @@ std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn,
 }
 
 /**
+ * @brief Sets the fixed parameters vector object.
+ *
+ * @param par A vector of parameter values.
+ */
+void set_fixed_parameters(Rcpp::NumericVector par) {
+  // base model
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+  for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++) {
+    *info0->fixed_effects_parameters[i] = par[i];
+  }
+}
+
+
+/**
  * @brief Gets the fixed parameters vector object.
  *
  * @return Rcpp::NumericVector
@@ -191,6 +207,22 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
   }
 
   return p;
+}
+
+
+/**
+ * @brief Sets the random parameters vector object.
+ *
+ * @param par A vector of parameter values.
+ */
+void set_random_parameters(Rcpp::NumericVector par) {
+  // base model
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+  for (size_t i = 0; i < info0->random_effects_parameters.size(); i++) {
+    *info0->random_effects_parameters[i] = par[i];
+  }
 }
 
 /**
