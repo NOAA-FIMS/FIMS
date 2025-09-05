@@ -238,7 +238,6 @@ RCPP_MODULE(fims) {
   Rcpp::class_<FleetInterface>("Fleet")
       .constructor()
       .field("log_q", &FleetInterface::log_q)
-      .field("name", &FleetInterface::name)
       .field("log_Fmort", &FleetInterface::log_Fmort)
       .field("nages", &FleetInterface::nages)
       .field("nyears", &FleetInterface::nyears)
@@ -257,6 +256,8 @@ RCPP_MODULE(fims) {
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
       .method("get_id", &FleetInterface::get_id)
+      .method("SetName", &FleetInterface::SetName)
+      .method("GetName", &FleetInterface::GetName)
       .method("SetObservedAgeCompDataID",
               &FleetInterface::SetObservedAgeCompDataID)
       .method("GetObservedAgeCompDataID",

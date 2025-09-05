@@ -72,7 +72,7 @@ fishing_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
 # Initialize the fishing fleet module
 fishing_fleet <- methods::new(Fleet)
-fishing_fleet$name <- "Fishing Fleet 1"
+fishing_fleet$SetName("Fishing Fleet 1")
 # Set number of years
 fishing_fleet$nyears$set(om_input[["nyr"]])
 # Set number of age classes
@@ -169,7 +169,7 @@ survey_fleet_selectivity$slope[1]$value <- om_input[["sel_survey"]][["survey1"]]
 survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
 survey_fleet <- methods::new(Fleet)
-survey_fleet$name <- "Survey Fleet 1"
+survey_fleet$SetName("Survey Fleet 1")
 survey_fleet$nages$set(om_input[["nages"]])
 survey_fleet$nyears$set(om_input[["nyr"]])
 survey_fleet$nlengths$set(om_input[["nlengths"]])

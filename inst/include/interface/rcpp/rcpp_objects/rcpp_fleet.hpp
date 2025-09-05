@@ -100,7 +100,7 @@ public:
   /**
    * @brief The name of the fleet.
    */
-  std::string name = "NA";
+  SharedString name = "NA";
   /**
    * @brief The number of age bins in the fleet data.
    */
@@ -301,6 +301,18 @@ public:
   virtual uint32_t get_id() { return this->id; }
 
   /**
+   * @brief Sets the name of the fleet.
+   * @param name The name to set.
+   */
+  void SetName(const std::string &name) { this->name.set(name); }
+
+  /**
+   * @brief Gets the name of the fleet.
+   * @return The name.
+   */
+  std::string GetName() const { return this->name.get(); }
+
+  /**
    * @brief Set the unique ID for the observed age-composition data object.
    * @param observed_agecomp_data_id Unique ID for the observed data object.
    */
@@ -347,7 +359,7 @@ public:
   uint32_t GetSelectivityID()
   {
     return interface_selectivity_id_m.get();
-  } 
+  }
 
   /**
    * @brief Get the unique ID for the observed age-composition data object.
@@ -582,7 +594,7 @@ public:
     ss << " \"name\" : \"Fleet\",\n";
 
     ss << " \"type\" : \"fleet\",\n";
-    ss << " \"tag\" : \"" << this->name << "\",\n";
+    ss << " \"tag\" : \"" << this->name.get() << "\",\n";
     ss << " \"id\": " << this->id << ",\n";
     ss << " \"nlengths\": " << this->nlengths.get() << ",\n";
     ss << "\"parameters\": [\n";
