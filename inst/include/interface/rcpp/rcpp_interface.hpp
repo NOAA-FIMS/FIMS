@@ -175,7 +175,16 @@ std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn,
 }
 
 /**
- * @brief Sets the fixed parameters vector object.
+ * @brief Sets the fixed parameters vector object. 
+ * Updates the internal parameter values for the model base
+ * of type TMB_FIMS_REAL_TYPE. Typically called before
+ * finalize or get_output to ensure the correct values are used.
+ * 
+ * Usage example:
+ * \code{.R}
+ * set_fixed_parameters(c(1, 2, 3))
+ * catch_at_age$get_output()
+ * \endcode
  *
  * @param par A vector of parameter values.
  */
@@ -212,6 +221,15 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
 
 /**
  * @brief Sets the random parameters vector object.
+ * Updates the internal random effects parameter values for
+ * the model base of TMB_FIMS_REAL_TYPE. Typically called before
+ * finalize or get_output to ensure the correct values are used.
+ * 
+ * Usage example:
+ * \code{.R}
+ * set_random_parameters(c(1, 2, 3))
+ * catch_at_age$get_output()
+ * \endcode
  *
  * @param par A vector of parameter values.
  */
