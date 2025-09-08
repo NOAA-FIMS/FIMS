@@ -40,7 +40,7 @@ jobs:
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |
         mv build/html ./
-        mv ./html ./docs
+        mv ./html ./doxygen
 
     - name: Push docs to FIMS-docs repo
       if: ${{ github.ref == 'refs/heads/main' }}
@@ -48,9 +48,8 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: 'docs'
+        source_file: 'doxygen'
         destination_repo: 'NOAA-FIMS/noaa-fims.github.io'
-        destination_folder: 'doxygen'
         destination_branch: 'main'
         user_email: 'kelli.johnson@noaa.gov' # your email
         user_name: 'Kelli Johnson'           # your login
