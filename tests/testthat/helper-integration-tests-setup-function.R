@@ -607,8 +607,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   return(fit)
 }
 
-setup_and_run_sp <- function(deterministic_mode = TRUE,
-                             estimation_mode = TRUE,
+setup_and_run_sp <- function(estimation_mode = TRUE,
                              map = list()) {
    
   # TODO: add ability to create FIMSFrame from data_sp (doesn't work because of age)
@@ -616,7 +615,12 @@ setup_and_run_sp <- function(deterministic_mode = TRUE,
   # load jabba output 
   jabba_output <- readRDS("tests/testthat/fixtures/jabba_output.RDS")
   jabba_pars <- jabba_output$pars
-
+  jabba_biomass <- jabba_output$flqs |> 
+    dplyr::filter(qname == "biomass") |> dplyr::select(data) |> as.vector()
+  jabba_expect_depletion <- (jabba_biomass |> unlist() |> unname()) / 
+    (jabba_pars |>
+      dplyr::filter(rownames(jabba_pars) == "K") |> 
+      dplyr::select(Median) |> unlist() |> unname())
   nyears <- 70
   survey_index <- data_sp |> dplyr::filter(type == "index")
   landings <- data_sp |> dplyr::filter(type == "landings")
@@ -647,10 +651,10 @@ setup_and_run_sp <- function(deterministic_mode = TRUE,
   survey_fleet <- methods::new(Fleet)
   survey_fleet$nyears$set(nyears)
   # Estimate q
-  if(deterministic_mode == TRUE) {
-    survey_fleet$log_q[1]$value <- log(
+  if(estimation_mode == FALSE) {
+    survey_fleet$log_q[1]$value <- 
       jabba_pars |> dplyr::filter(rownames(jabba_pars) == "q") |> 
-      dplyr::select(Median))
+      dplyr::select(Median) |> log() |> unlist()
   } else {
     survey_fleet$log_q[1]$value <- log(1.0)
     survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
@@ -662,10 +666,10 @@ setup_and_run_sp <- function(deterministic_mode = TRUE,
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
   survey_fleet_index_distribution$log_sd$resize(nyears)
   for (y in 1:nyears) {
-    survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(
+    survey_fleet_index_distribution$log_sd[y]$value <- 
       jabba_pars |> dplyr::filter(rownames(jabba_pars) == "sigma2") |> 
-        dplyr::select(Median)
-    ))
+        dplyr::select(Median) |> sqrt() |> log() |> unlist()
+  
   }
   survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
@@ -675,30 +679,36 @@ setup_and_run_sp <- function(deterministic_mode = TRUE,
   # create depletion module
   production <- new(PTDepletion)
   # estimate log r and K
-  if(deterministic_mode == TRUE) {
-    production$log_r[1]$value <- log(
+  if(estimation_mode == FALSE) {
+    production$log_r[1]$value <- 
       jabba_pars |> dplyr::filter(rownames(jabba_pars) == "r") |> 
-        dplyr::select(Median))
-    production$log_K[1]$value <- log(
-      jabba_pars |> dplyr::filter(rownames(jabba_pars) == "K") |> 
-        dplyr::select(Median))
-  } else {
-    production$log_r[1]$value <- log(rnorm(1, 0.2, 0.5)) # random draw from prior
+        dplyr::select(Median) |> log() |> unlist()
     production$log_r[1]$estimation_type$set("fixed_effects")
-    production$log_K[1]$value <- log(rnorm(1, 8 * max(landings$value), 1)) # random draw from prior
+    production$log_K[1]$value <- 
+      jabba_pars |> dplyr::filter(rownames(jabba_pars) == "K") |> 
+        dplyr::select(Median) |> log() |> unlist()
+    production$log_K[1]$estimation_type$set("fixed_effects")
+  } else {
+    production$log_r[1]$value <- rlnorm(1, log(0.2), 0.5) # random draw from prior
+    production$log_r[1]$estimation_type$set("fixed_effects")
+    production$log_K[1]$value <- rlnorm(1, log(8 * max(landings$value)), 1) # random draw from prior
     production$log_K[1]$estimation_type$set("fixed_effects")
   }
   # Fix to get Schaefer model
   production$log_m[1]$value <- log(2)
   production$log_depletion$resize(nyears)
   for (i in 1:nyears) {
-    production$log_depletion[i]$value <- 1
+    if(estimation_mode == FALSE){
+      production$log_depletion[i]$value <- log(jabba_expect_depletion[i])
+    } else {
+      production$log_depletion[i]$value <- 1
+    }
   }
   production$log_depletion$set_all_random(TRUE)
   production$nyears$set(nyears)
 
   production_distribution <- new(DnormDistribution)
-  production_distribution$log_sd[1]$value <- log(1)
+  production_distribution$log_sd[1]$value <- log(0.109) # from jabba output
   production_distribution$set_distribution_links(
     "random_effects",
     c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
@@ -706,12 +716,12 @@ setup_and_run_sp <- function(deterministic_mode = TRUE,
 
 
   # Setup Priors USING jabba DEFAULTS
-  log_r_Prior <- new(DlnormDistribution)
+  log_r_Prior <- new(DnormDistribution)
   log_r_Prior$expected_values[1]$value <- log(0.2)
   log_r_Prior$log_sd[1]$value <- log(0.5)
   log_r_Prior$set_distribution_links("prior", production$log_r$get_id())
 
-  log_K_Prior <- new(DlnormDistribution)
+  log_K_Prior <- new(DnormDistribution)
   log_K_Prior$expected_values[1]$value <- log(8 * max(landings$value))
   log_K_Prior$log_sd[1]$value <- log(1.0)
   log_K_Prior$set_distribution_links("prior", production$log_K$get_id())
@@ -723,11 +733,10 @@ setup_and_run_sp <- function(deterministic_mode = TRUE,
   population$ages$resize(1)
   population$ages$set(0, 0) # only one age in surplus production
   # Fix init depletion
-  if(deterministic_mode == TRUE) {
-    population$log_init_depletion[1]$value <- log(
+  if(estimation_mode == FALSE) {
+    population$log_init_depletion[1]$value <- 
       jabba_pars |> dplyr::filter(rownames(jabba_pars) == "psi") |> 
-        dplyr::select(Median) 
-    )
+        dplyr::select(Median) |> log() |> unlist()
   } else {
     population$log_init_depletion[1]$value <- 1
     population$log_init_depletion[1]$estimation_type$set("fixed_effects")
@@ -755,13 +764,32 @@ setup_and_run_sp <- function(deterministic_mode = TRUE,
 
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
-    re = "re",
+    random = "re", 
     #silent = TRUE, map = list()
   )
-  opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-    control = list(eval.max = 10000, iter.max = 10000, trace = 0)
-  )
+  if(estimation_mode == TRUE) {
+    # Optimization with nlminb
+    opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
+      control = list(eval.max = 10000, iter.max = 10000, trace = TRUE)
+    )
+  }
+  
   obj$report()$biomass
+  jabba_biomass
+
+  obj$report()$fmsy
+  jabba_output$estimates |> 
+    dplyr::filter(rownames(jabba_output$estimates) == "Hmsy") |> 
+    dplyr::select(mu) |> as.vector() |> unlist() |> unname()
+  obj$report()$bmsy 
+  jabba_output$estimates |> 
+    dplyr::filter(rownames(jabba_output$estimates) == "SBmsy") |> 
+    dplyr::select(mu) |> as.vector() |> unlist() |> unname()
+  obj$report()$msy
+  jabba_output$estimates |> 
+    dplyr::filter(rownames(jabba_output$estimates) == "MSY") |> 
+    dplyr::select(mu) |> as.vector() |> unlist() |> unname()
+
 
   fit <- tmbstan::tmbstan(obj, init =  "best.last.par")
   postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
