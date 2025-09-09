@@ -779,16 +779,6 @@ namespace fims_popdy
 
     /**
      * This method is used to calculate the unfished numbers at age for a
-                                               [i_agem1_yearm1 + 1] *
-                (fims_math::exp(
-                    -this->population_derived_quantities[population->GetId()]
-                                                        ["mortality_Z"]
-                                                        [i_agem1_yearm1 + 1]));
-      }
-    }
-
-    /**
-     * This method is used to calculate the unfished numbers at age for a
      * population. It takes a population object, the index of the age
      * in the current year, the index of the age in the previous year,
      * and the age as input and calculates the unfished numbers at age
