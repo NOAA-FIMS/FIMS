@@ -178,16 +178,9 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"name\": \"growth\",\n";
     ss << " \"type\" : \"EWAA\",\n";
     ss << " \"id\":" << this->id << ",\n";
-    ss << " \"rank\": " << 1 << ",\n";
-     ss << " \"dimensionality\": {\n";
+    ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [\"nages\"],\n";
     ss << "  \"dimensions\": [" << this->ages.size() << "]\n},\n";
-
-    ss << " \"ages\": [";
-    for (size_t i = 0; i < ages.size() - 1; i++) {
-      ss << ages[i] << ", ";
-    }
-    ss << ages[ages.size() - 1] << "],\n";
 
     ss << " \"values\": [";
     for (size_t i = 0; i < weights.size() - 1; i++) {
