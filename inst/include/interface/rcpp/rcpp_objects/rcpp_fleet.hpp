@@ -356,6 +356,11 @@ public:
     interface_selectivity_id_m.set(selectivity_id);
   }
 
+  /**
+   * @brief Get the unique ID for the selectivity object.
+   * 
+   * @return uint32_t 
+   */
   uint32_t GetSelectivityID()
   {
     return interface_selectivity_id_m.get();
