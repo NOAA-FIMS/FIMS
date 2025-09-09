@@ -124,7 +124,7 @@ reshape_tmb_estimates <- function(obj,
   # has started adding information to the JSON output in the dev-model-families branch.
   # We can populate these columns once the dev-model-families branch is merged
   # into dev.
-  estimates_outline <- dplyr::tibble(
+  estimates_outline <- tibble::tibble(
     # The FIMS Rcpp module
     module_name = character(),
     # The unique ID of the module

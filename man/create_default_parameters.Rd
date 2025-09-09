@@ -79,7 +79,7 @@ default_parameters <- create_default_parameters(
 # Update selectivity parameters for survey1
 updated_parameters <- default_parameters |>
   dplyr::rows_update(
-    dplyr::tibble(
+    tibble::tibble(
       fleet_name = "survey1",
       label = c("inflection_point", "slope"),
       value = c(1.5, 2)
@@ -93,7 +93,7 @@ updated_parameters <- default_parameters |>
 parameters_with_double_logistic <- default_configurations |>
   tidyr::unnest(cols = data) |>
   dplyr::rows_update(
-    dplyr::tibble(
+    tibble::tibble(
       module_name = "Selectivity",
       fleet_name = "fleet1",
       module_type = "DoubleLogistic"

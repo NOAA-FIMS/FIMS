@@ -9,7 +9,7 @@
 initialize_data_distribution(
   module,
   family = NULL,
-  sd = dplyr::tibble(value = 1, estimation_type = "constant"),
+  sd = tibble::tibble(value = 1, estimation_type = "constant"),
   data_type = c("landings", "index", "agecomp", "lengthcomp")
 )
 
@@ -17,7 +17,7 @@ initialize_process_distribution(
   module,
   par,
   family = NULL,
-  sd = dplyr::tibble(value = 1, estimation_type = "constant"),
+  sd = tibble::tibble(value = 1, estimation_type = "constant"),
   is_random_effect = FALSE
 )
 

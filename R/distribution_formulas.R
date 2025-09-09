@@ -265,7 +265,7 @@ initialize_data_distribution <- function(
     module,
     family = NULL,
     # Create a tibble with value and estiamtion_type column for sd
-    sd = dplyr::tibble(
+    sd = tibble::tibble(
       value = 1,
       estimation_type = "constant"
     ),
@@ -360,7 +360,7 @@ initialize_process_distribution <- function(
     module,
     par,
     family = NULL,
-    sd = dplyr::tibble(
+    sd = tibble::tibble(
       value = 1,
       estimation_type = "constant"
     ),
