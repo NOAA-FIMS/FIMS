@@ -341,7 +341,7 @@ GetDouble
 getenv
 GetFixedEffectsParameters
 GetFleetDerivedQuantities
-GetFleedDimensionInfo
+GetFleetDimensionInfo
 GetId
 GetInstance
 GetInt
