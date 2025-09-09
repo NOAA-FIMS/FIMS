@@ -75,7 +75,7 @@ default_configurations_unnest <- default_configurations |>
 # Model fleet1 with double logistic selectivity
 configurations_double_logistic <- default_configurations_unnest |>
   dplyr::rows_update(
-    dplyr::tibble(
+    tibble::tibble(
       module_name = "Selectivity",
       fleet_name = "fleet1",
       module_type = "DoubleLogistic"

@@ -73,7 +73,7 @@
 #' # Update selectivity parameters for survey1
 #' updated_parameters <- default_parameters |>
 #'   dplyr::rows_update(
-#'     dplyr::tibble(
+#'     tibble::tibble(
 #'       fleet_name = "survey1",
 #'       label = c("inflection_point", "slope"),
 #'       value = c(1.5, 2)
@@ -87,7 +87,7 @@
 #' parameters_with_double_logistic <- default_configurations |>
 #'   tidyr::unnest(cols = data) |>
 #'   dplyr::rows_update(
-#'     dplyr::tibble(
+#'     tibble::tibble(
 #'       module_name = "Selectivity",
 #'       fleet_name = "fleet1",
 #'       module_type = "DoubleLogistic"
@@ -195,7 +195,7 @@ create_default_parameters <- function(
 #' @examples
 #' FIMS:::create_default_parameters_template(n_parameters = 3)
 create_default_parameters_template <- function(n_parameters = 1) {
-  template <- dplyr::tibble(
+  template <- tibble::tibble(
     model_family = NA_character_,
     module_name = NA_character_,
     module_type = NA_character_,

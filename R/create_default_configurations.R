@@ -68,7 +68,7 @@
 #' # Model fleet1 with double logistic selectivity
 #' configurations_double_logistic <- default_configurations_unnest |>
 #'   dplyr::rows_update(
-#'     dplyr::tibble(
+#'     tibble::tibble(
 #'       module_name = "Selectivity",
 #'       fleet_name = "fleet1",
 #'       module_type = "DoubleLogistic"
@@ -125,8 +125,8 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
     dplyr::left_join(data_config_template, by = "module_type")
 
   # Initialize placeholders for conditional configurations.
-  selectivity_config <- dplyr::tibble()
-  other_config <- dplyr::tibble()
+  selectivity_config <- tibble::tibble()
+  other_config <- tibble::tibble()
 
   # If model_family is "catch_at_age", create selectivity configurations for
   # fleets and other configurations for population dynamics.

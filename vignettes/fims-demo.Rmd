@@ -141,7 +141,7 @@ parameters_4_model <- default_parameters |>
   tidyr::unnest(cols = data) |>
   # Update log_Fmort initial values for Fleet1
   dplyr::rows_update(
-    dplyr::tibble(
+    tibble::tibble(
       fleet_name = "fleet1",
       label = "log_Fmort",
       time = 1:30,
@@ -162,7 +162,7 @@ parameters_4_model <- default_parameters |>
   ) |>
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
-    dplyr::tibble(
+    tibble::tibble(
       fleet_name = "survey1",
       label = c("inflection_point", "slope", "log_q"),
       value = c(1.5, 2, log(3.315143e-07))
@@ -171,7 +171,7 @@ parameters_4_model <- default_parameters |>
   ) |>
   # Update log_devs in the Recruitment module (time steps 2–30)
   dplyr::rows_update(
-    dplyr::tibble(
+    tibble::tibble(
       label = "log_devs",
       time = 2:30,
       value = c(
@@ -187,7 +187,7 @@ parameters_4_model <- default_parameters |>
   ) |>
   # Update log_sd for log_devs in the Recruitment module
   dplyr::rows_update(
-    dplyr::tibble(
+    tibble::tibble(
       module_name = "Recruitment",
       label = "log_sd",
       value = 0.4
@@ -196,7 +196,7 @@ parameters_4_model <- default_parameters |>
   ) |>
   # Update inflection point and slope parameters in the Maturity module
   dplyr::rows_update(
-    dplyr::tibble(
+    tibble::tibble(
       module_name = "Maturity",
       label = c("inflection_point", "slope"),
       value = c(2.25, 3)
@@ -205,7 +205,7 @@ parameters_4_model <- default_parameters |>
   ) |>
   # Update log_init_naa values in the Population module
   dplyr::rows_update(
-    dplyr::tibble(
+    tibble::tibble(
       label = "log_init_naa",
       age = 1:12,
       value = c(
