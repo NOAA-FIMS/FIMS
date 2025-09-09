@@ -189,7 +189,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
       for (int a = 0; a < amax; a++) {
         int i_age_year = y * amax + a;
         age_comp_data->at(y, a) = this->age_comp_data[i_age_year];
-        data->uncertainty[i_age_year] = this->uncertainty[i_age_year];
+        age_comp_data->uncertainty[i_age_year] = this->uncertainty[i_age_year];
       }
     }
 
@@ -327,7 +327,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
       for (int l = 0; l < lmax; l++) {
         int i_length_year = y * lmax + l;
         length_comp_data->at(y, l) = this->length_comp_data[i_length_year];
-        data->uncertainty[i_length_year] = this->uncertainty[i_length_year];
+        length_comp_data->uncertainty[i_length_year] = this->uncertainty[i_length_year];
       }
     }
     std::shared_ptr<fims_info::Information<Type>> info =
