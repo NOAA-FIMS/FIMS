@@ -13,14 +13,26 @@
 namespace fims_popdy
 {
 
-struct DimensionInfo{
+  /**
+   * @brief Structure to hold dimension information for derived quantities.
+   */
+  struct DimensionInfo{
   std::string name;
   int ndims;
   fims::Vector<int> dims;
   fims::Vector<std::string> dim_names;
 
+  /**
+   * @brief Default constructor for dimension information.
+   */
   DimensionInfo() : ndims(0) {}
 
+  /**
+   * @brief Constructor with parameters.
+   * @param name The name of the derived quantity.
+   * @param dims A vector of integers representing the dimensions.
+   * @param dim_names A vector of strings representing the names of the dimensions.
+   */
   DimensionInfo(const std::string &name, const fims::Vector<int> &dims, const fims::Vector<std::string> &dim_names)
       : name(name), ndims(dims.size()), dims(dims), dim_names(dim_names) {}
 };
