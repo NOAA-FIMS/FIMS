@@ -547,7 +547,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   # The model will not always run when log_q is very small.
   # We will need to make sure log_q is the true value for deterministic runs but
   # then reset to log(1.0) for estimation runs.
-  if (estimation_mode == TRUE){
+  if (estimation_mode == TRUE) {
     parameters <- parameters |>
       dplyr::mutate(
         value = dplyr::if_else(

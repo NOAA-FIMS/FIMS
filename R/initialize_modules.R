@@ -23,7 +23,6 @@ utils::globalVariables(c(
 #' The initialized module as an object.
 #' @noRd
 initialize_module <- function(parameters, data, module_name, fleet_name = NA_character_) {
-
   module_input <- parameters |>
     # Using !! to unquote the variables
     dplyr::filter(module_name == !!module_name)

@@ -15,7 +15,7 @@
 #' default set of parameters. For example, if a fleet's selectivity is configured
 #' as `"Logistic"`, it generates initial values for `"inflection_point"` and
 #' `"slope"`.
-#' 
+#'
 #' @param configurations A tibble of model configurations. Typically created
 #'   by [create_default_configurations()]. Users can modify this tibble
 #'   to customize the model structure before generating default parameters.
@@ -62,7 +62,7 @@
 #'
 #' # Create default configurations
 #' default_configurations <- create_default_configurations(fims_frame)
-#' 
+#'
 #' # Create default parameters
 #' default_parameters <- create_default_parameters(
 #'   configurations = default_configurations,
@@ -92,7 +92,7 @@
 #'       fleet_name = "fleet1",
 #'       module_type = "DoubleLogistic"
 #'     ),
-#'   by = c("module_name", "fleet_name")
+#'     by = c("module_name", "fleet_name")
 #'   ) |>
 #'   create_default_parameters(
 #'     data = fims_frame
@@ -100,20 +100,19 @@
 #' }
 create_default_parameters <- function(
     configurations,
-    data
-) {
+    data) {
   # FIXME: use default values if there are no fleets info passed into the
   # function or a fleet is not present but it has data? Maybe we don't want the
   # latter because it could be that we want to drop a fleet from a model but we
   # don't want to alter the data?
-  
+
   # Check if configurations is a nested tibble. If so, unnest configurations
   if ("data" %in% names(configurations)) {
     unnested_configurations <- tidyr::unnest(configurations, cols = data)
   } else {
     unnested_configurations <- configurations
   }
-  
+
   # Create fleet parameters
   fleet_names <- unnested_configurations |>
     dplyr::pull(fleet_name) |>
@@ -149,7 +148,7 @@ create_default_parameters <- function(
   log_rzero <- recruitment_temp |>
     dplyr::filter(label == "log_rzero") |>
     dplyr::pull(value)
-    
+
   population_temp <- create_default_Population(
     unnested_configurations = unnested_configurations,
     data,
@@ -166,7 +165,7 @@ create_default_parameters <- function(
   # Merge with configuration_unnest
   expanded_configurations <- dplyr::full_join(
     temp,
-    unnested_configurations, 
+    unnested_configurations,
     by = c("module_name", "fleet_name", "module_type", "distribution_link")
   ) |>
     dplyr::mutate(
@@ -232,8 +231,7 @@ create_default_parameters_template <- function(n_parameters = 1) {
 create_default_Population <- function(
     unnested_configurations,
     data,
-    log_rzero
-) {
+    log_rzero) {
   # Input checks
   # Check if log_rzero is numeric
   if (!is.numeric(log_rzero) || length(log_rzero) != 1) {
@@ -289,7 +287,6 @@ create_default_Population <- function(
 #' slope values and their estimation status.
 #' @noRd
 create_default_Logistic <- function() {
-
   # Create a template for default parameters
   default <- create_default_parameters_template(n_parameters = 2) |>
     # Add the module type, label, value, and estimation type
@@ -410,8 +407,7 @@ create_default_fleet <- function(unnested_configurations,
   # Determine default fleet parameters based on types of data present
   if ("index" %in% data_types_present &&
     "Index" %in% distribution_names_for_fleet) {
-
-    fleet_index <- get_data(data) |> 
+    fleet_index <- get_data(data) |>
       dplyr::filter(type == "index" & name == current_fleet_name)
 
     q_default <- create_default_parameters_template(n_parameters = 1) |>
@@ -467,7 +463,6 @@ create_default_fleet <- function(unnested_configurations,
 
   if ("landings" %in% data_types_present &&
     "Landings" %in% distribution_names_for_fleet) {
-
     fleet_landings <- get_data(data) |>
       dplyr::filter(type == "landings" & name == current_fleet_name)
 
@@ -483,7 +478,7 @@ create_default_fleet <- function(unnested_configurations,
         estimation_type = "fixed_effects"
       )
 
-    landings_distribution <-  unnested_configurations |>
+    landings_distribution <- unnested_configurations |>
       dplyr::filter(fleet_name == current_fleet_name & module_name == "Data" & module_type == "Landings") |>
       dplyr::pull(distribution)
 
@@ -511,7 +506,6 @@ create_default_fleet <- function(unnested_configurations,
         fleet_name = current_fleet_name,
         time = fleet_landings[["year"]]
       )
-
   } else {
     fleet_index <- get_data(data) |>
       dplyr::filter(type == "index" & name == current_fleet_name)
@@ -552,13 +546,12 @@ create_default_fleet <- function(unnested_configurations,
 #' @noRd
 create_default_maturity <- function(
     unnested_configurations,
-    data
-) {
+    data) {
   # Input checks
   available_forms <- c("Logistic")
   form <- unnested_configurations |>
-      dplyr::filter(module_name == "Maturity") |>
-      dplyr::pull(module_type)
+    dplyr::filter(module_name == "Maturity") |>
+    dplyr::pull(module_type)
   if (!form %in% available_forms) {
     cli::cli_abort(c(
       "Invalid `module_type`` for Maturity: {.var {form}}",
@@ -572,13 +565,13 @@ create_default_maturity <- function(
   default <- switch(form,
     "Logistic" = create_default_Logistic()
   ) |>
-  # We don't have an option to input maturity data into FIMS, so the maturity 
-  # parameters aren't really estimable. The parameters should be constant for now.
-  # See more details from https://github.com/orgs/NOAA-FIMS/discussions/944.
-  dplyr::mutate(
-    estimation_type = "constant",
-    module_name = "Maturity"
-  )
+    # We don't have an option to input maturity data into FIMS, so the maturity
+    # parameters aren't really estimable. The parameters should be constant for now.
+    # See more details from https://github.com/orgs/NOAA-FIMS/discussions/944.
+    dplyr::mutate(
+      estimation_type = "constant",
+      module_name = "Maturity"
+    )
 }
 
 #' Create default Beverton--Holt recruitment parameters
@@ -611,7 +604,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
       value = -log(1.0 - 0.75) + log(0.75 - 0.2),
       estimation_type = "constant"
     )
-  
+
   # TODO: Revisit the settings for log_r. Do we must set up log_r when
   # it is not random effect parameters?
   log_r <- create_default_parameters_template(
@@ -624,7 +617,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
       time = (get_start_year(data) + 1):get_end_year(data),
       estimation_type = "constant"
     )
-  
+
   log_devs <- create_default_parameters_template(
     n_parameters = get_n_years(data) - 1
   ) |>
@@ -745,7 +738,7 @@ create_default_DlnormDistribution <- function(
     ))
   }
   input_type <- rlang::arg_match(input_type)
-  
+
   log_value <- log(value)
   # Create the default list with log standard deviation
   default <- create_default_parameters_template(

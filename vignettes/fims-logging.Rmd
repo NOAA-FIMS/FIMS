@@ -21,7 +21,6 @@ data_4_model <- FIMSFrame(data1)
 
 default_parameters <- create_default_configurations(data = data_4_model) |>
   create_default_parameters(data = data_4_model)
-
 ```
 
 ## Importance of Logging 
