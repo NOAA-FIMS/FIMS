@@ -134,7 +134,7 @@ prepare_test_data <- function() {
     tidyr::unnest(cols = data) |>
     # Update log_Fmort initial values for Fleet1
     dplyr::rows_update(
-      dplyr::tibble(
+      tibble::tibble(
         fleet_name = "fleet1",
         label = "log_Fmort",
         time = 1:30,
@@ -144,7 +144,7 @@ prepare_test_data <- function() {
     ) |>
     # Update selectivity parameters and log_q for survey1
     dplyr::rows_update(
-      dplyr::tibble(
+      tibble::tibble(
         fleet_name = "survey1",
         label = c("inflection_point", "slope", "log_q"),
         value = c(1.5, 2, log(om_output_list[[iter_id]][["survey_q"]][["survey1"]]))
@@ -153,7 +153,7 @@ prepare_test_data <- function() {
     ) |>
     # Update log_devs in the Recruitment module (time steps 2–30)
     dplyr::rows_update(
-      dplyr::tibble(
+      tibble::tibble(
         label = "log_devs",
         time = 2:30,
         value = om_input_list[[iter_id]][["logR.resid"]][-1],
@@ -165,7 +165,7 @@ prepare_test_data <- function() {
     ) |>
     # Update log_sd for log_devs in the Recruitment module
     dplyr::rows_update(
-      dplyr::tibble(
+      tibble::tibble(
         module_name = "Recruitment",
         label = "log_sd",
         value = om_input_list[[iter_id]][["logR_sd"]]
@@ -174,7 +174,7 @@ prepare_test_data <- function() {
     ) |>
     # Update inflection point and slope parameters in the Maturity module
     dplyr::rows_update(
-      dplyr::tibble(
+      tibble::tibble(
         module_name = "Maturity",
         label = c("inflection_point", "slope"),
         value = c(
@@ -186,7 +186,7 @@ prepare_test_data <- function() {
     ) |>
     # Update log_init_naa values in the Population module
     dplyr::rows_update(
-      dplyr::tibble(
+      tibble::tibble(
         label = "log_init_naa",
         age = 1:12,
         value = log(om_output_list[[iter_id]][["N.age"]][1, ])
