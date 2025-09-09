@@ -19,7 +19,7 @@
 #'   \item **Growth:** An empirical weight-at-age (EWAA) growth module.
 #'   \item **Maturity:** A logistic maturity module.
 #' }
-#' The final output is a nested tibble, which serves as a starting point for 
+#' The final output is a nested tibble, which serves as a starting point for
 #' building a complete FIMS model configuration.
 #'
 #' @param data An S4 object of class `FIMSFrame`. FIMS input data.
@@ -59,12 +59,12 @@
 #'
 #' # Create the default model configuration tibble
 #' default_configurations <- create_default_configurations(data = fims_frame)
-#' 
+#'
 #' # Unnest the data column to see detailed configurations
 #' default_configurations_unnest <- default_configurations |>
 #'   tidyr::unnest(cols = data) |>
 #'   print()
-#' 
+#'
 #' # Model fleet1 with double logistic selectivity
 #' configurations_double_logistic <- default_configurations_unnest |>
 #'   dplyr::rows_update(
@@ -73,7 +73,7 @@
 #'       fleet_name = "fleet1",
 #'       module_type = "DoubleLogistic"
 #'     ),
-#'   by = c("module_name", "fleet_name")
+#'     by = c("module_name", "fleet_name")
 #'   ) |>
 #'   print()
 create_default_configurations <- function(data, model_family = c("catch_at_age")) {
@@ -101,7 +101,7 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
     # Set module_type to NA for weight-at-age and age-to-length-conversion
     dplyr::mutate(module_type = dplyr::case_when(
       type == "weight-at-age" ~ NA_character_,
-      type == "age-to-length-conversion"  ~ NA_character_,
+      type == "age-to-length-conversion" ~ NA_character_,
       TRUE ~ module_type
     )) |>
     # Remove any combinations where the type did not match a known module.
@@ -113,9 +113,9 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
   # This specifies the default distribution for each type of data.
   data_config_template <- dplyr::tribble(
     ~module_name, ~module_type, ~distribution_link, ~distribution_type, ~distribution,
-    "Data", "Landings",   "Landings", "Data", "Dlnorm",
-    "Data", "Index",      "Index",    "Data", "Dlnorm",
-    "Data", "AgeComp",    "AgeComp",  "Data", "Dmultinom",
+    "Data", "Landings", "Landings", "Data", "Dlnorm",
+    "Data", "Index", "Index", "Data", "Dlnorm",
+    "Data", "AgeComp", "AgeComp", "Data", "Dmultinom",
     "Data", "LengthComp", "LengthComp", "Data", "Dmultinom"
   )
 
@@ -172,7 +172,7 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
 
 #' Convert snake_case strings to PascalCase
 #'
-#' This function takes a vector of strings in snake_case format and converts 
+#' This function takes a vector of strings in snake_case format and converts
 #' them to PascalCase.
 #'
 #' @param snake_strings A vector of strings in snake_case format.

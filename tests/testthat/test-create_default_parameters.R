@@ -33,7 +33,7 @@ test_that("create_default_parameters() works with correct inputs", {
   expect_true(is.list(result[["data"]]))
   expect_s3_class(result[["data"]][[1]], "tbl_df")
   expect_equal(
-    colnames(result[["data"]][[1]]), 
+    colnames(result[["data"]][[1]]),
     c(
       "module_type", "label", "distribution_link", "age", "length", "time",
       "value", "estimation_type", "distribution_type", "distribution"

@@ -178,7 +178,7 @@ test_that("FIMS returns an error when there are no estimated parameters for opti
     get_estimates() |>
     dplyr::filter(!is.na(initial))
 
-  #' @description Test that estimate column should match initial column when 
+  #' @description Test that estimate column should match initial column when
   #' not optimized
   expect_equal(
     deterministic_output[["estimate"]],
@@ -186,7 +186,7 @@ test_that("FIMS returns an error when there are no estimated parameters for opti
   )
   clear()
 
-  #' @description Test that FIMS returns an error when there are no estimated 
+  #' @description Test that FIMS returns an error when there are no estimated
   #' parameters for optimization.
   expect_error(
     object = initialized_model |>

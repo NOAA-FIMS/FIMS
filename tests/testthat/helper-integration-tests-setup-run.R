@@ -227,7 +227,7 @@ prepare_test_data <- function() {
         estimation_type
       )
     )
-  
+
   saveRDS(
     modified_parameters,
     file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
@@ -342,14 +342,14 @@ prepare_test_data <- function() {
   # Load test data with both age and length composition data, which contains missing values
   data_age_length_comp_na <- readRDS(test_path("fixtures", "data_age_length_comp_na.RDS"))
   # Define fleet1 and survey1 specifications
-  
+
   # Run FIMS model with the following steps:
   # * Create default parameters with fleet1 and survey1 specifications
   # * Update parameters if any modifications are provided
   # * Initialize FIMS with the provided data (age and length composition with missing values)
   # * Fit the FIMS model with optimization enabled
   fit_age_length_comp_na <- initialize_fims(
-    parameters = modified_parameters, 
+    parameters = modified_parameters,
     data = data_age_length_comp_na
   ) |>
     fit_fims(optimize = TRUE)

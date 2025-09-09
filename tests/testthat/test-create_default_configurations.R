@@ -83,7 +83,7 @@ test_that("create_default_configurations() returns correct outputs for edge case
         unique()
       #' @description Test that AgeComp exists in the age only data configurations.
       expect_true("AgeComp" %in% module_types)
-      
+
       #' @description Test that LengthComp does not exist in the age only data configurations.
       expect_true(!("LengthComp" %in% module_types))
     }

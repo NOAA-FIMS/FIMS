@@ -4,7 +4,7 @@
 \alias{create_default_configurations}
 \title{Create a default FIMS configuration tibble}
 \usage{
-create_default_configurations(data, model_family = "catch_at_age")
+create_default_configurations(data, model_family = c("catch_at_age"))
 }
 \arguments{
 \item{data}{An S4 object of class \code{FIMSFrame}. FIMS input data.}

@@ -111,7 +111,7 @@ To run a FIMS model, more modules than just a maturity module need to be linked 
 population <- create_default_configurations(fims_frame) |>
   tidyr::unnest(cols = data) |>
   FIMS:::create_default_Population(data = fims_frame, log_rzero = log(1000000)) |>
-  dplyr::mutate(model_family = "catch_at_age") |> 
+  dplyr::mutate(model_family = "catch_at_age") |>
   dplyr::bind_rows(parameters) |>
   FIMS:::initialize_population(
     data = fims_frame,
@@ -361,7 +361,7 @@ The `maturity_id` was set from R using the `SetMaturity()` method from the `Popu
 population <- create_default_configurations(fims_frame) |>
   tidyr::unnest(cols = data) |>
   FIMS:::create_default_Population(data = fims_frame, log_rzero = log(1000000)) |>
-  dplyr::mutate(model_family = "catch_at_age") |> 
+  dplyr::mutate(model_family = "catch_at_age") |>
   dplyr::bind_rows(parameters) |>
   FIMS:::initialize_population(
     data = fims_frame,
