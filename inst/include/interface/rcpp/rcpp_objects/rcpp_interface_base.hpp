@@ -647,7 +647,12 @@ class FIMSRcppInterfaceBase {
     FIMS_WARNING_LOG("Method not yet defined.");
     return "{\"name\" : \"not yet implemented\"}";
   }
-
+  /**
+   * @brief Report the parameter value as a string.
+   * 
+   * @param value 
+   * @return std::string 
+   */
   std::string value_to_string(double value) {
     std::stringstream ss;
     if (value == std::numeric_limits<double>::infinity()) {
