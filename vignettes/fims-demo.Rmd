@@ -99,7 +99,6 @@ updated_configurations <- default_configurations_unnested |>
 # Nest updated_configurations
 updated_configurations_nested <- updated_configurations |>
   tidyr::nest(.by = c(model_family, module_name, fleet_name))
-
 ```
 
 ## Parameters
