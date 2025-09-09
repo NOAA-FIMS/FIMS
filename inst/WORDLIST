@@ -193,6 +193,8 @@ DepletionExpected
 DepletionInterfaceBase
 dependabot
 Dereference
+DerivedQuantitiesMap
+DerivedQuantitiesMapIterator
 DerivedQuantityToJSON
 Deroba
 desc
@@ -209,9 +211,12 @@ DFL
 DGTEST
 difftime
 digamma
+DimensionInfo
+DimensionInfoMap
 dir
 DistributionElementObject
 DistributionsInterfaceBase
+dit
 DL
 dll
 DllInfo
@@ -256,6 +261,7 @@ ELT
 emplace
 emptyDoubleLogistic
 emptyLogistic
+endcode
 endcond
 endif
 ENDIF
@@ -334,11 +340,14 @@ GetBool
 GetDouble
 getenv
 GetFixedEffectsParameters
+GetFleetDerivedQuantities
+GetFleedDimensionInfo
 GetId
 GetInstance
 GetInt
 getline
 GetNages
+GetName
 GetNseasons
 GetNyears
 GetObject
@@ -348,10 +357,13 @@ GetObservedLandingsDataID
 GetObservedLengthCompDataID
 getOption
 GetParameters
+GetPopulationDerivedQuantities
+GetPopulationDimensionInfo
 GetPopulationIds
 GetPopulations
 getpwuid
 GetRandomEffectsParameters
+GetSelectivityID
 GetString
 Getter
 GetType
@@ -556,6 +568,7 @@ nchar
 ncol
 NCOL
 nd
+ndims
 NetBSD
 newpage
 nF
@@ -639,6 +652,7 @@ ParseVector
 passwd
 pbs
 pdHess
+pdq
 pdqit
 pella
 Pella
@@ -790,6 +804,7 @@ SetMaturity
 SetMaturityID
 setMethod
 SetNages
+SetName
 setNames
 SetNseasons
 SetNyears
