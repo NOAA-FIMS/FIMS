@@ -223,7 +223,7 @@ public:
     {
       std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
       ss << "{\n";
-  
+
       ss << " \"name\" : \"" << population_interface->name << "\",\n";
       ss << " \"id\": " << population_interface->id << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
@@ -274,7 +274,6 @@ public:
       std::map<std::string, fims_popdy::DimensionInfo> dim_info =
           model_ptr->GetPopulationDimensionInfo(population_interface->get_id());
       ss << this->derived_quantities_component_to_json(dqs, dim_info) << " ]}\n";
- 
     }
     else
     {
@@ -1235,6 +1234,18 @@ public:
                                     fims::Vector<int>{(fleet_interface->nyears.get()), (fleet_interface->nages.get())},
                                     fims::Vector<std::string>{"nyears", "nages"});
 
+      derived_quantities["selectivity_at_age"] = fims::Vector<Type>(fleet_interface->nages.get());
+      derived_quantities_dim_info["selectivity_at_age"] =
+          fims_popdy::DimensionInfo("selectivity_at_age",
+                                    fims::Vector<int>{(fleet_interface->nages.get())},
+                                    fims::Vector<std::string>{"nages"});
+
+      derived_quantities["selectivity_at_length"] = fims::Vector<Type>(fleet_interface->nlengths.get());
+      derived_quantities_dim_info["selectivity_at_length"] =
+          fims_popdy::DimensionInfo("selectivity_at_length",
+                                    fims::Vector<int>{(fleet_interface->nlengths.get())},
+                                    fims::Vector<std::string>{"nlengths"});
+
       derived_quantities["length_comp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
       derived_quantities_dim_info["length_comp_expected"] =
@@ -1242,7 +1253,6 @@ public:
                                     fims::Vector<int>{(fleet_interface->nyears.get()), (fleet_interface->nlengths.get())},
                                     fims::Vector<std::string>{"nyears", "nlengths"});
 
-     
       // replace elements in the variable map
       info->variable_map[fleet_interface->log_landings_expected.id_m] =
           &(derived_quantities["log_landings_expected"]);

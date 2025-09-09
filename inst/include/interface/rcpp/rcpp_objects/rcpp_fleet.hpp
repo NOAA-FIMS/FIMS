@@ -91,6 +91,17 @@ class FleetInterface : public FleetInterfaceBase
    * @brief The ID of the observed landings data object.
    */
   SharedInt interface_observed_landings_data_id_m = -999;
+
+    /**
+   * @brief The ID of the selectivity at age object.
+   */
+  SharedInt interface_selectivity_age_id_m = -999;
+
+  /**
+   * @brief The ID of the selectivity at length object.
+   */
+  SharedInt interface_selectivity_length_id_m = -999;
+  #warning selectivity below is deprecated and will be removed in future releases
   /**
    * @brief The ID of the selectivity object.
    */
@@ -347,6 +358,24 @@ public:
   {
     interface_observed_landings_data_id_m.set(observed_landings_data_id);
   }
+
+
+    /**
+   * @brief Get the unique ID for the selectivity at age object.
+   */
+  int GetSelectivityAgeID()
+  {
+    return interface_selectivity_age_id_m.get();
+  }
+
+  /**
+   * @brief Get the unique ID for the selectivity at length object.
+   */
+  int GetSelectivityLengthID()
+  {
+    return interface_selectivity_length_id_m.get();
+  }
+  #warning selectivity SetSelectivityID below is deprecated and will be removed in future releases
   /**
    * @brief Set the unique ID for the selectivity object.
    * @param selectivity_id Unique ID for the observed object.
