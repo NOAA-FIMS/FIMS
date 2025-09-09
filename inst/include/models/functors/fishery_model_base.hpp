@@ -17,10 +17,10 @@ namespace fims_popdy
    * @brief Structure to hold dimension information for derived quantities.
    */
   struct DimensionInfo{
-  std::string name;
-  int ndims;
-  fims::Vector<int> dims;
-  fims::Vector<std::string> dim_names;
+  std::string name;   /*!< name of the derived quantity */  
+  int ndims;         /*!< number of dimensions */
+  fims::Vector<int> dims;        /*!< vector of dimensions */
+  fims::Vector<std::string> dim_names; /*!< vector of dimension names */
 
   /**
    * @brief Default constructor for dimension information.
@@ -45,8 +45,8 @@ namespace fims_popdy
    */
   class FisheryModelBase : public fims_model_object::FIMSObject<Type>
   {
-    static uint32_t id_g;
-    uint32_t id;
+    static uint32_t id_g;/*!< global id where unique id is drawn from for fishery model object*/
+    uint32_t id; /*!< unique identifier assigned for fishery model object */
 
   public:
     /**
@@ -78,13 +78,34 @@ namespace fims_popdy
                               std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator
         fleet_iterator;
 
-    typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> DerivedQuantitiesMap;
+        /**
+         * @brief Type definitions for derived quantities and dimension information maps.
+         */
+        typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> DerivedQuantitiesMap;
+        /**
+         * @brief Iterator for the derived quantities map.
+         */
     typedef typename DerivedQuantitiesMap::iterator DerivedQuantitiesMapIterator;
+    /**
+     * @brief Shared pointer for the fleet derived quantities map.
+     */
     std::shared_ptr<DerivedQuantitiesMap> fleet_derived_quantities;
+    /**
+     * @brief Shared pointer for the population derived quantities map.
+     */
     std::shared_ptr<DerivedQuantitiesMap> population_derived_quantities;
 
+    /**
+     * @brief Type definitions for dimension information maps.
+     */
     typedef typename std::map<uint32_t,std::map<std::string, DimensionInfo>> DimensionInfoMap;
+    /**
+     * @brief Shared pointer for the fleet dimension information map.
+     */
     std::shared_ptr<DimensionInfoMap> fleet_dimension_info;
+    /**
+     * @brief Shared pointer for the population dimension information map.
+     */
     std::shared_ptr<DimensionInfoMap> population_dimension_info;
 
 #ifdef TMB_MODEL

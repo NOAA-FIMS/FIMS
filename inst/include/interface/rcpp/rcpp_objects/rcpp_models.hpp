@@ -263,11 +263,8 @@ public:
       ss << "\"uncertainty\" : " << fims::Vector<double>(population_interface->log_init_naa.size(), -999) << "\n";
       ss << "}],\n";
 
-      fims_popdy::CatchAtAge<double>::population_derived_quantities_iterator
-          cit;
       ss << " \"derived_quantities\": [\n";
-      cit = model_ptr->population_derived_quantities.find(
-          population_interface->get_id());
+     
       std::map<std::string, fims::Vector<double>> dqs =
           model_ptr->GetPopulationDerivedQuantities(population_interface->get_id());
 

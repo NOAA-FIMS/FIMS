@@ -416,7 +416,16 @@ namespace fims
 
 #endif
 
+    /**
+     * @brief Gets the tag for the vector. A tag can represent anything
+     * and is not used internally by FIMS. 
+     * @return The tag.
+     */
     std::string get_tag() const { return this->tag_m; }
+    /**
+     * @brief Sets the tag for the vector. A tag can be set to
+     * any string value and is not used internally by FIMS.
+     */
     void set_tag(const std::string &tag) { this->tag_m = tag; }
 
   private:

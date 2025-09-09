@@ -34,38 +34,34 @@ namespace fims_popdy
     typedef typename std::map<std::string, fims::Vector<Type>>::iterator
         derived_quantities_iterator;
 
+  
     /**
-     * @brief The derived quantities for all fleets, indexed by fleet id.
-     *
+     * @brief The dimension information of the derived quantities for all fleets, indexed by fleet id.
      */
-    std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>
-        fleet_derived_quantities;
-
     std::map<uint32_t, std::map<std::string, fims::Vector<size_t>>>
         fleet_derived_quantities_dims;
 
     /**
-     * @brief The derived quantities for all populations, indexed by
+     * @brief The dimension information of the derived quantities for all populations, indexed by
      * population id.
-     *
      */
-    std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>
-        population_derived_quantities;
-
     std::map<uint32_t, std::map<std::string, fims::Vector<size_t>>>
         population_derived_quantities_dims;
     /**
-     * @brief Iterate through fleet-based derived quantities.
+     * @brief Used to iterate through fleet-based derived quantities.
      *
      */
     typedef typename std::map<uint32_t,
                               std::map<std::string, fims::Vector<Type>>>::iterator
         fleet_derived_quantities_iterator;
 
+    /**
+     * @brief Used to iterate through fleet-based derived quantities dimensions.
+     */
     typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<size_t>>>::iterator
         fleet_derived_quantities_dims_iterator;
     /**
-     * @brief Iterate through population-based derived quantities.
+     * @brief Used to iterate through population-based derived quantities.
      *
      */
     typedef typename std::map<uint32_t,
