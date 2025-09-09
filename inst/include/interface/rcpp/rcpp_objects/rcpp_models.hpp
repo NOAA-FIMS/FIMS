@@ -988,36 +988,29 @@ public:
           fims::Vector<Type>(population->nyears.get());
       derived_quantities_dim_info["total_landings_weight"] =
           fims_popdy::DimensionInfo("total_landings_weight",
-                                    fims::Vector<int>{(int)population->nyears.get() + 1},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{(int)population->nyears.get()},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["total_landings_numbers"] =
           fims::Vector<Type>(population->nyears.get());
       derived_quantities_dim_info["total_landings_numbers"] =
           fims_popdy::DimensionInfo("total_landings_numbers",
-                                    fims::Vector<int>{population->nyears.get() + 1},
-                                    fims::Vector<std::string>{"nyears+1"});
+                                    fims::Vector<int>{population->nyears.get()},
+                                    fims::Vector<std::string>{"nyears"});
 
       derived_quantities["mortality_F"] = fims::Vector<Type>(
           population->nyears.get() * population->nages.get());
       derived_quantities_dim_info["mortality_F"] =
           fims_popdy::DimensionInfo("mortality_F",
-                                    fims::Vector<int>{population->nyears.get() + 1, population->nages.get() + 1},
-                                    fims::Vector<std::string>{"nyears+1", "nages+1"});
+                                    fims::Vector<int>{population->nyears.get(), population->nages.get()},
+                                    fims::Vector<std::string>{"nyears", "nages"});
 
       derived_quantities["mortality_Z"] = fims::Vector<Type>(
           population->nyears.get() * population->nages.get());
       derived_quantities_dim_info["mortality_Z"] =
           fims_popdy::DimensionInfo("mortality_Z",
-                                    fims::Vector<int>{population->nyears.get() + 1, population->nages.get() + 1},
-                                    fims::Vector<std::string>{"nyears+1", "nages+1"});
-
-      // derived_quantities["weight_at_age"] = fims::Vector<Type>(
-      //     population->nyears.get() * population->nages.get());
-      // derived_quantities_dim_info["weight_at_age"] =
-      //     fims_popdy::DimensionInfo("weight_at_age",
-      //                               fims::Vector<int>{population->nyears.get() + 1, population->nages.get() + 1},
-      //                               fims::Vector<std::string>{"nyears+1", "nages+1"});
+                                    fims::Vector<int>{population->nyears.get(), population->nages.get()},
+                                    fims::Vector<std::string>{"nyears", "nages"});
 
       derived_quantities["numbers_at_age"] = fims::Vector<Type>(
           (population->nyears.get() + 1) * population->nages.get());
