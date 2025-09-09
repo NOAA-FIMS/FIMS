@@ -11,8 +11,9 @@
 #include <exception>
 #include <vector>
 
-#include "fims_vector.hpp"
 #include "model_object.hpp"
+#include "fims_vector.hpp"
+
 
 namespace fims_data_object {
 
@@ -25,7 +26,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> data;                 /**< vector of the data >*/
   fims::Vector<Type> uncertainty;          /**< vector of the data >*/
   size_t dimensions;                       /**< dimension of the Data object >*/
-  size_t imax;                             /**<1st dimension of data object >*/
+  size_t imax;                             /**< 1st dimension of data object >*/
   size_t jmax;                             /**< 2nd dimension of data object>*/
   size_t kmax;                             /**< 3rd dimension of data object>*/
   size_t lmax;                             /**< 4th dimension of data object>*/

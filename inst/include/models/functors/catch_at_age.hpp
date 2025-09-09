@@ -34,7 +34,6 @@ namespace fims_popdy
     typedef typename std::map<std::string, fims::Vector<Type>>::iterator
         derived_quantities_iterator;
 
-  
     /**
      * @brief The dimension information of the derived quantities for all fleets, indexed by fleet id.
      */
@@ -68,6 +67,9 @@ namespace fims_popdy
                               std::map<std::string, fims::Vector<Type>>>::iterator
         population_derived_quantities_iterator;
 
+    /**
+     * @brief Used to iterate through population-based derived quantities dimensions.
+     */
     typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<size_t>>>::iterator
         population_derived_quantities_dims_iterator;
 
@@ -347,25 +349,6 @@ namespace fims_popdy
       }
     }
 
-    std::string make_dims_string(
-        const fims::Vector<size_t> &dims_vector) const
-    {
-      std::stringstream ss;
-      ss << "\"dimensions\" : [";
-      if (dims_vector.size() > 0)
-      {
-        for (size_t i = 0; i < dims_vector.size() - 1; i++)
-        {
-          ss << dims_vector[i] << ", ";
-        }
-        ss << dims_vector[dims_vector.size() - 1] << "]";
-      }
-      else
-      {
-        ss << "]";
-      }
-      return ss.str();
-    }
 
     /**
      * This function is used to convert the derived quantities of a population or
