@@ -974,6 +974,14 @@ public:
 
       std::stringstream ss;
 
+
+      derived_quantities["weight_at_age"] =
+          fims::Vector<Type>(population->nages.get());
+      derived_quantities_dim_info["weight_at_age"] =
+          fims_popdy::DimensionInfo("weight_at_age",
+                                    fims::Vector<int>{(int)population->nages.get()},
+                                    fims::Vector<std::string>{"nages"});
+
       derived_quantities["total_landings_weight"] =
           fims::Vector<Type>(population->nyears.get());
       derived_quantities_dim_info["total_landings_weight"] =
