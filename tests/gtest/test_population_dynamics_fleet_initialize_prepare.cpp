@@ -12,7 +12,7 @@ namespace
         for (auto fit = catch_at_age_model->fleets.begin(); 
             fit != catch_at_age_model->fleets.end(); ++fit) {
             auto &fleet = (*fit).second;
-            auto& dq = catch_at_age_model->fleet_derived_quantities[fleet->GetId()];
+            auto& dq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
             EXPECT_EQ(dq["landings_numbers_at_age"].size(), nyears * nages);
             EXPECT_EQ(dq["landings_weight_at_age"].size(), nyears * nages);
             EXPECT_EQ(dq["landings_numbers_at_length"].size(), nyears * nlengths);
@@ -45,7 +45,7 @@ namespace
         for (auto fit = catch_at_age_model->fleets.begin(); 
             fit != catch_at_age_model->fleets.end(); ++fit) {
             auto &fleet = (*fit).second;
-            auto& dq = catch_at_age_model->fleet_derived_quantities[fleet->GetId()];
+            auto& dq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
 
             EXPECT_EQ(dq["landings_numbers_at_age"], 
                 fims::Vector(nyears * nages, 0.0));

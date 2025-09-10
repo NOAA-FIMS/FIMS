@@ -1,0 +1,97 @@
+[1/9] Linking CXX executable tests/gtest/population_Catch
+[2/9] Linking CXX executable tests/gtest/population_NumbersAtAge
+[3/9] Building documentation with Doxygen.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/common/data_object.hpp:209: warning: Member DataObject< Type >::id_g (variable) of namespace fims_data_object is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/common/information.hpp:1028: warning: Member Information< Type >::fims_information (variable) of namespace fims_info is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/common/model.hpp:178: warning: Member Model< Type >::fims_model (variable) of namespace fims_model is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/population_dynamics/depletion/functors/depletion_base.hpp:58: warning: Member DepletionBase< Type >::id_g (variable) of namespace fims_popdy is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/population_dynamics/fleet/fleet.hpp:390: warning: Member Fleet< Type >::id_g (variable) of namespace fims_popdy is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/population_dynamics/growth/functors/growth_base.hpp:46: warning: Member GrowthBase< Type >::id_g (variable) of namespace fims_popdy is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/population_dynamics/maturity/functors/maturity_base.hpp:55: warning: Member MaturityBase< Type >::id_g (variable) of namespace fims_popdy is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/population_dynamics/population/population.hpp:654: warning: Member Population< Type >::id_g (variable) of namespace fims_popdy is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/population_dynamics/recruitment/functors/recruitment_base.hpp:107: warning: Member RecruitmentBase< Type >::id_g (variable) of namespace fims_popdy is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/population_dynamics/selectivity/functors/selectivity_base.hpp:59: warning: Member SelectivityBase< Type >::id_g (variable) of namespace fims_popdy is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/fishery_model_base.hpp:316: warning: Member FisheryModelBase< Type >::id_g (variable) of namespace fims_popdy is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:135: warning: Member AddPopulation(uint32_t id) (function) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:137: warning: Member GetPopulationIds() (function) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:139: warning: Member GetPopulations() (function) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:143: warning: Member CalculateCatch(std::shared_ptr< fims_popdy::Population< Type > > &population, size_t year) (function) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:154: warning: Member CalculateDepletion(std::shared_ptr< fims_popdy::Population< Type > > &population, size_t i_year) (function) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:174: warning: Member CalculateIndex(std::shared_ptr< fims_popdy::Population< Type > > &population, size_t i_year) (function) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:188: warning: Member CalculateBiomass(std::shared_ptr< fims_popdy::Population< Type > > &population, size_t i_year) (function) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:71: warning: Member nyears (variable) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:72: warning: Member nages (variable) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:73: warning: Member population_ids (variable) of class fims_popdy::SurplusProduction is not documented.
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/inst/include/models/functors/surplus_production.hpp:74: warning: Member populations (variable) of class fims_popdy::SurplusProduction is not documented.
+[4/9] Building CXX object tests/gtest/CMakeFiles/population_MaturityAtAge.dir/test_population_MaturityAtAge.cpp.o
+In file included from /Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/test_population_MaturityAtAge.cpp:3:
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/../../tests/gtest/test_population_test_fixture.hpp:46:16: warning: 'TearDown' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+   46 |   virtual void TearDown() {}
+      |                ^
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/build/_deps/googletest-src/googletest/include/gtest/gtest.h:315:16: note: overridden virtual function is here
+  315 |   virtual void TearDown();
+      |                ^
+In file included from /Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/test_population_MaturityAtAge.cpp:3:
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/../../tests/gtest/test_population_test_fixture.hpp:230:16: warning: 'TearDown' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+  230 |   virtual void TearDown() {}
+      |                ^
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/build/_deps/googletest-src/googletest/include/gtest/gtest.h:315:16: note: overridden virtual function is here
+  315 |   virtual void TearDown();
+      |                ^
+In file included from /Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/test_population_MaturityAtAge.cpp:3:
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/../../tests/gtest/test_population_test_fixture.hpp:354:16: warning: 'TearDown' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+  354 |   virtual void TearDown() {}
+      |                ^
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/build/_deps/googletest-src/googletest/include/gtest/gtest.h:315:16: note: overridden virtual function is here
+  315 |   virtual void TearDown();
+      |                ^
+3 warnings generated.
+[5/9] Building CXX object tests/gtest/CMakeFiles/population_Index.dir/test_population_Index.cpp.o
+In file included from /Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/test_population_Index.cpp:3:
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/../../tests/gtest/test_population_test_fixture.hpp:46:16: warning: 'TearDown' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+   46 |   virtual void TearDown() {}
+      |                ^
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/build/_deps/googletest-src/googletest/include/gtest/gtest.h:315:16: note: overridden virtual function is here
+  315 |   virtual void TearDown();
+      |                ^
+In file included from /Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/test_population_Index.cpp:3:
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/../../tests/gtest/test_population_test_fixture.hpp:230:16: warning: 'TearDown' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+  230 |   virtual void TearDown() {}
+      |                ^
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/build/_deps/googletest-src/googletest/include/gtest/gtest.h:315:16: note: overridden virtual function is here
+  315 |   virtual void TearDown();
+      |                ^
+In file included from /Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/test_population_Index.cpp:3:
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/../../tests/gtest/test_population_test_fixture.hpp:354:16: warning: 'TearDown' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+  354 |   virtual void TearDown() {}
+      |                ^
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/build/_deps/googletest-src/googletest/include/gtest/gtest.h:315:16: note: overridden virtual function is here
+  315 |   virtual void TearDown();
+      |                ^
+3 warnings generated.
+[6/9] Building CXX object tests/gtest/CMakeFiles/population_B_and_SB.dir/test_population_B_and_SB.cpp.o
+In file included from /Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/test_population_B_and_SB.cpp:3:
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/../../tests/gtest/test_population_test_fixture.hpp:46:16: warning: 'TearDown' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+   46 |   virtual void TearDown() {}
+      |                ^
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/build/_deps/googletest-src/googletest/include/gtest/gtest.h:315:16: note: overridden virtual function is here
+  315 |   virtual void TearDown();
+      |                ^
+In file included from /Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/test_population_B_and_SB.cpp:3:
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/../../tests/gtest/test_population_test_fixture.hpp:230:16: warning: 'TearDown' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+  230 |   virtual void TearDown() {}
+      |                ^
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/build/_deps/googletest-src/googletest/include/gtest/gtest.h:315:16: note: overridden virtual function is here
+  315 |   virtual void TearDown();
+      |                ^
+In file included from /Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/test_population_B_and_SB.cpp:3:
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/tests/gtest/../../tests/gtest/test_population_test_fixture.hpp:354:16: warning: 'TearDown' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+  354 |   virtual void TearDown() {}
+      |                ^
+/Users/matthew.supernaw/FIMS-Testing/json_demo_error/new_pull/FIMS/build/_deps/googletest-src/googletest/include/gtest/gtest.h:315:16: note: overridden virtual function is here
+  315 |   virtual void TearDown();
+      |                ^
+3 warnings generated.
+[7/9] Linking CXX executable tests/gtest/population_MaturityAtAge
+[8/9] Linking CXX executable tests/gtest/population_B_and_SB
+[9/9] Linking CXX executable tests/gtest/population_Index

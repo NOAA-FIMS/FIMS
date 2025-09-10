@@ -9,7 +9,7 @@ namespace
     {
         catch_at_age_model->Prepare();
         size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
         for (int year = 0; year < population->nyears; year++)
         {
@@ -52,8 +52,8 @@ namespace
     {
 
         size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
-        
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
+
         std::vector<double> numbers_at_age(nyears * nages, 0);
 
         for (int year = 0; year < population->nyears; year++)
@@ -76,7 +76,7 @@ namespace
         std::vector<double> test_unfished_spawning_biomass(nyears+1, 0);
         
         size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
         for (int year = 0; year < (population->nyears + 1); year++)
         {

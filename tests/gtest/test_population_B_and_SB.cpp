@@ -16,7 +16,7 @@ namespace
         std::vector<double> test_SB(nyears + 1, 0);
         std::vector<double> test_B(nyears + 1, 0);
 
-        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
         test_SB[year] += dq["numbers_at_age"][i_age_year] *
             catch_at_age_model->populations[0]->proportion_female[age] *
             dq["proportion_mature_at_age"][i_age_year] *
@@ -46,8 +46,8 @@ namespace
 
         std::vector<double> test_SSB(nyears + 1, 0);
 
-        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
-        test_SSB[nyears] += dq["numbers_at_age"][i_age_year] * 
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
+        test_SSB[nyears] += dq["numbers_at_age"][i_age_year] *
             catch_at_age_model->populations[0]->proportion_female[age] *
             dq["proportion_mature_at_age"][i_age_year] *
             catch_at_age_model->populations[0]->growth->evaluate(population->ages[age]);

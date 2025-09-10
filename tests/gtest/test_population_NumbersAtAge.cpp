@@ -11,7 +11,7 @@ namespace
         std::vector<double> test_naa((nyears + 1) * nages, 0);
 
         size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
         for (int i = 0; i < (nyears + 1) * nages; i++)
         {
@@ -33,7 +33,7 @@ namespace
         int i_agem1_yearm1 = (year - 1) * population->nages + age - 1;
 
         size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
         catch_at_age_model->CalculateMortality(population, i_age_year, year, age);
         catch_at_age_model->CalculateNumbersAA(population, i_age_year, i_agem1_yearm1, age);

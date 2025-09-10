@@ -8,7 +8,7 @@ namespace
     {
         
         size_t pop_id = population->GetId();
-        auto& dq_pop = catch_at_age_model->population_derived_quantities[pop_id];
+        auto& dq_pop = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
         // calculate landings numbers at age in population module
         catch_at_age_model->CalculateLandingsNumbersAA(population, i_age_year, year, age);
@@ -38,7 +38,7 @@ namespace
               age * population->nfleets + fleet_index;
 
             uint32_t fleet_id = population->fleets[fleet_index]->GetId();
-            auto& dq_fleet = catch_at_age_model->fleet_derived_quantities[fleet_id];
+            auto& dq_fleet = catch_at_age_model->GetFleetDerivedQuantities(fleet_id);
 
             // Baranov Landings Equation adapted from 
             // \inst\include\population_dynamics\population\population.hpp

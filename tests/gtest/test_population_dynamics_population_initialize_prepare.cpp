@@ -18,7 +18,7 @@ namespace
     TEST_F(CAAInitializeTestFixture, Initialize_works)
     {
         catch_at_age_model->Initialize();
-        auto& dq = catch_at_age_model->population_derived_quantities[0];
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(0);
         EXPECT_EQ(dq["mortality_F"].size(), nyears * nages);
         EXPECT_EQ(dq["mortality_Z"].size(), nyears * nages);
         EXPECT_EQ(dq["proportion_mature_at_age"].size(), (nyears+1) * nages);
@@ -39,9 +39,9 @@ namespace
 
     TEST_F(CAAPrepareTestFixture, Prepare_works)
     {
-        catch_at_age_model->Prepare();  
-        auto &dq = catch_at_age_model->population_derived_quantities[1];
-        
+        catch_at_age_model->Prepare();
+        auto &dq = catch_at_age_model->GetPopulationDerivedQuantities(1);
+
         // vector size type = nyears and vector value = 0
         EXPECT_EQ(dq["total_landings_weight"],
             fims::Vector<double>(nyears, 0)

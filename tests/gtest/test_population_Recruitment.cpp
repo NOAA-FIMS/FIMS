@@ -15,7 +15,7 @@ namespace
         int sb_i_agem1_yearm1 = (sb_year - 1) * population->nages + sb_age - 1;
 
         size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
         catch_at_age_model->CalculateMortality(population, sb_i_age_year, sb_year, sb_age);
         catch_at_age_model->CalculateNumbersAA(population, sb_i_age_year, sb_i_agem1_yearm1, sb_age);

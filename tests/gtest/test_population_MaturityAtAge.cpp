@@ -18,7 +18,7 @@ namespace
            }
         }
         size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->population_derived_quantities[pop_id];
+        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
         EXPECT_NEAR(dq["proportion_mature_at_age"][10], expect_maturity[10], 0.0001);
    }
 }

@@ -19,7 +19,7 @@ namespace
         {
             int index_yf = year * population->nfleets + fleet_;
             uint32_t fleet_id = population->fleets[fleet_]->GetId();
-            auto& dq_fleet = catch_at_age_model->fleet_derived_quantities[fleet_id];
+            auto& dq_fleet = catch_at_age_model->GetFleetDerivedQuantities(fleet_id);
 
             landings_expected[index_yf] += dq_fleet["landings_weight_at_age"][i_age_year];
 

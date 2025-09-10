@@ -183,10 +183,10 @@ class CAAEvaluateTestFixture : public testing::Test {
     double numbers_at_age_max = fims_math::exp(12.0);
     std::uniform_real_distribution<double> numbers_at_age_distribution(
         numbers_at_age_min, numbers_at_age_max);
+    std::map<std::string, fims::Vector<double>> &pop_dq =
+        catch_at_age_model->GetPopulationDerivedQuantities(0);
     for (int i = 0; i < (nyears + 1) * nages; i++) {
-      catch_at_age_model
-          ->population_derived_quantities[0]["numbers_at_age"][i] =
-          numbers_at_age_distribution(generator);
+      pop_dq["numbers_at_age"][i] = numbers_at_age_distribution(generator);
     }
 
     auto maturity = std::make_shared<fims_popdy::LogisticMaturity<double>>();
