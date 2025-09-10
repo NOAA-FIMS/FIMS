@@ -16,27 +16,27 @@ namespace fims_popdy
   /**
    * @brief Structure to hold dimension information for derived quantities.
    */
-  struct DimensionInfo{
-  std::string name;   /*!< name of the derived quantity */  
-  int ndims;         /*!< number of dimensions */
-  fims::Vector<int> dims;        /*!< vector of dimensions */
-  fims::Vector<std::string> dim_names; /*!< vector of dimension names */
+  struct DimensionInfo
+  {
+    std::string name;                    /*!< name of the derived quantity */
+    int ndims;                           /*!< number of dimensions */
+    fims::Vector<int> dims;              /*!< vector of dimensions */
+    fims::Vector<std::string> dim_names; /*!< vector of dimension names */
 
-  /**
-   * @brief Default constructor for dimension information.
-   */
-  DimensionInfo() : ndims(0) {}
+    /**
+     * @brief Default constructor for dimension information.
+     */
+    DimensionInfo() : ndims(0) {}
 
-  /**
-   * @brief Constructor with parameters.
-   * @param name The name of the derived quantity.
-   * @param dims A vector of integers representing the dimensions.
-   * @param dim_names A vector of strings representing the names of the dimensions.
-   */
-  DimensionInfo(const std::string &name, const fims::Vector<int> &dims, const fims::Vector<std::string> &dim_names)
-      : name(name), ndims(dims.size()), dims(dims), dim_names(dim_names) {}
-};
-
+    /**
+     * @brief Constructor with parameters.
+     * @param name The name of the derived quantity.
+     * @param dims A vector of integers representing the dimensions.
+     * @param dim_names A vector of strings representing the names of the dimensions.
+     */
+    DimensionInfo(const std::string &name, const fims::Vector<int> &dims, const fims::Vector<std::string> &dim_names)
+        : name(name), ndims(dims.size()), dims(dims), dim_names(dim_names) {}
+  };
 
   template <typename Type>
   /**
@@ -45,8 +45,8 @@ namespace fims_popdy
    */
   class FisheryModelBase : public fims_model_object::FIMSObject<Type>
   {
-    static uint32_t id_g;/*!< global id where unique id is drawn from for fishery model object*/
-    uint32_t id; /*!< unique identifier assigned for fishery model object */
+    static uint32_t id_g; /*!< global id where unique id is drawn from for fishery model object*/
+    uint32_t id;          /*!< unique identifier assigned for fishery model object */
 
   public:
     /**
@@ -78,18 +78,21 @@ namespace fims_popdy
                               std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator
         fleet_iterator;
 
-        /**
-         * @brief Type definitions for derived quantities and dimension information maps.
-         */
-        typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> DerivedQuantitiesMap;
-        /**
-         * @brief Iterator for the derived quantities map.
-         */
+    /**
+     * @brief Type definitions for derived quantities and dimension information maps.
+     */
+    typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>> DerivedQuantitiesMap;
+
+    /**
+     * @brief Iterator for the derived quantities map.
+     */
     typedef typename DerivedQuantitiesMap::iterator DerivedQuantitiesMapIterator;
+
     /**
      * @brief Shared pointer for the fleet derived quantities map.
      */
     std::shared_ptr<DerivedQuantitiesMap> fleet_derived_quantities;
+
     /**
      * @brief Shared pointer for the population derived quantities map.
      */
@@ -98,11 +101,13 @@ namespace fims_popdy
     /**
      * @brief Type definitions for dimension information maps.
      */
-    typedef typename std::map<uint32_t,std::map<std::string, DimensionInfo>> DimensionInfoMap;
+    typedef typename std::map<uint32_t, std::map<std::string, DimensionInfo>> DimensionInfoMap;
+
     /**
      * @brief Shared pointer for the fleet dimension information map.
      */
     std::shared_ptr<DimensionInfoMap> fleet_dimension_info;
+    
     /**
      * @brief Shared pointer for the population dimension information map.
      */
@@ -136,9 +141,7 @@ namespace fims_popdy
                                                       fleet_dimension_info(other.fleet_dimension_info),
                                                       population_dimension_info(other.population_dimension_info)
     {
-
     }
-
 
     /**
      * @brief Destroy the Fishery Model Base object.
@@ -186,7 +189,7 @@ namespace fims_popdy
      *
      * @return std::map<uint32_t, std::map<std::string, DimensionInfo>>
      */
-    std::map<uint32_t, std::map<std::string, DimensionInfo>>& GetFleetDimensionInfo() 
+    std::map<uint32_t, std::map<std::string, DimensionInfo>> &GetFleetDimensionInfo()
     {
       return *fleet_dimension_info;
     }
@@ -196,7 +199,7 @@ namespace fims_popdy
      *
      * @return std::map<uint32_t, std::map<std::string, DimensionInfo>>
      */
-    std::map<uint32_t, std::map<std::string, DimensionInfo>>& GetPopulationDimensionInfo() 
+    std::map<uint32_t, std::map<std::string, DimensionInfo>> &GetPopulationDimensionInfo()
     {
       return *population_dimension_info;
     }
@@ -206,7 +209,7 @@ namespace fims_popdy
      *
      * @return DerivedQuantitiesMap
      */
-    DerivedQuantitiesMap& GetFleetDerivedQuantities() 
+    DerivedQuantitiesMap &GetFleetDerivedQuantities()
     {
       return *fleet_derived_quantities;
     }
@@ -216,7 +219,7 @@ namespace fims_popdy
      *
      * @return DerivedQuantitiesMap
      */
-    DerivedQuantitiesMap& GetPopulationDerivedQuantities() 
+    DerivedQuantitiesMap &GetPopulationDerivedQuantities()
     {
       return *population_derived_quantities;
     }
@@ -227,7 +230,7 @@ namespace fims_popdy
      * @param fleet_id The ID of the fleet.
      * @return std::map<std::string, fims::Vector<Type>>&
      */
-    std::map<std::string, fims::Vector<Type>>& GetFleetDerivedQuantities(uint32_t fleet_id) 
+    std::map<std::string, fims::Vector<Type>> &GetFleetDerivedQuantities(uint32_t fleet_id)
     {
       return (*fleet_derived_quantities)[fleet_id];
     }
@@ -238,7 +241,7 @@ namespace fims_popdy
      * @param population_id The ID of the population.
      * @return std::map<std::string, fims::Vector<Type>>&
      */
-    std::map<std::string, fims::Vector<Type>>& GetPopulationDerivedQuantities(uint32_t population_id) 
+    std::map<std::string, fims::Vector<Type>> &GetPopulationDerivedQuantities(uint32_t population_id)
     {
       return (*population_derived_quantities)[population_id];
     }
@@ -249,10 +252,10 @@ namespace fims_popdy
      * @param fleet_id The ID of the fleet.
      * @return std::map<std::string, DimensionInfo>
      */
-    std::map<std::string, DimensionInfo>& GetFleetDimensionInfo(uint32_t fleet_id) 
+    std::map<std::string, DimensionInfo> &GetFleetDimensionInfo(uint32_t fleet_id)
     {
       return (*fleet_dimension_info)[fleet_id];
-    } 
+    }
 
     /**
      * @brief Get the population dimension information for a specified population.
@@ -260,7 +263,7 @@ namespace fims_popdy
      * @param population_id The ID of the population.
      * @return std::map<std::string, DimensionInfo>
      */
-    std::map<std::string, DimensionInfo>& GetPopulationDimensionInfo(uint32_t population_id) 
+    std::map<std::string, DimensionInfo> &GetPopulationDimensionInfo(uint32_t population_id)
     {
       return (*population_dimension_info)[population_id];
     }

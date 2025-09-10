@@ -100,18 +100,14 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
  */
 class CatchAtAgeInterface : public FisheryModelInterfaceBase
 {
+  /**
+   * @brief The set of population ids that this catch at age model operates on.
+   */
   std::shared_ptr<std::set<uint32_t>> population_ids;
+  /**
+   * @brief Iterator for population ids.
+   */
   typedef typename std::set<uint32_t>::iterator population_id_iterator;
-
-  std::map<uint32_t, std::map<std::string, std::string>>
-      fleet_derived_quantities_dim_strings;
-  typedef typename std::map<uint32_t, std::map<std::string, std::string>>::iterator
-      fleet_derived_quantities_dim_strings_iterator;
-
-  std::map<uint32_t, std::map<std::string, std::string>>
-      population_derived_quantities_dim_strings;
-  typedef typename std::map<uint32_t, std::map<std::string, std::string>>::iterator
-      population_derived_quantities_dim_strings_iterator;
 
 public:
   /**
@@ -223,7 +219,7 @@ public:
     {
       std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
       ss << "{\n";
-  
+
       ss << " \"name\" : \"" << population_interface->name << "\",\n";
       ss << " \"id\": " << population_interface->id << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
@@ -264,14 +260,13 @@ public:
       ss << "}],\n";
 
       ss << " \"derived_quantities\": [\n";
-     
+
       std::map<std::string, fims::Vector<double>> dqs =
           model_ptr->GetPopulationDerivedQuantities(population_interface->get_id());
 
       std::map<std::string, fims_popdy::DimensionInfo> dim_info =
           model_ptr->GetPopulationDimensionInfo(population_interface->get_id());
       ss << this->derived_quantities_component_to_json(dqs, dim_info) << " ]}\n";
- 
     }
     else
     {
@@ -641,7 +636,7 @@ public:
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end(); module_id_it++)
     {
-      
+
       GrowthInterfaceBase *growth_interface =
           GrowthInterfaceBase::live_objects[*module_id_it];
       if (growth_interface)
@@ -1237,7 +1232,6 @@ public:
                                     fims::Vector<int>{(fleet_interface->nyears.get()), (fleet_interface->nlengths.get())},
                                     fims::Vector<std::string>{"nyears", "nlengths"});
 
-     
       // replace elements in the variable map
       info->variable_map[fleet_interface->log_landings_expected.id_m] =
           &(derived_quantities["log_landings_expected"]);
