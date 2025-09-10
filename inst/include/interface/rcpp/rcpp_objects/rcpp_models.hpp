@@ -641,6 +641,7 @@ public:
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end(); module_id_it++)
     {
+      
       GrowthInterfaceBase *growth_interface =
           GrowthInterfaceBase::live_objects[*module_id_it];
       if (growth_interface)
@@ -708,7 +709,6 @@ public:
     ss << "],\n";
 
     ss << " \"population_ids\": [";
-
     for (pit = this->population_ids->begin();
          pit != this->population_ids->end(); pit++)
     {
@@ -802,7 +802,6 @@ public:
     {
       fleet_second_to_last_it = std::prev(fleet_end_it);
     }
-
     for (fleet_it = fleet_ids.begin(); fleet_it != fleet_second_to_last_it;
          fleet_it++)
     {
@@ -870,7 +869,6 @@ public:
       }
     }
     ss << "\n]}\n";
-
     return fims::JsonParser::PrettyFormatJSON(ss.str());
   }
 

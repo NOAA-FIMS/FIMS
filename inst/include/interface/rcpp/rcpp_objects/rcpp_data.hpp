@@ -167,7 +167,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
       ss << age_comp_data[i] << ", ";
     }
     ss << age_comp_data[age_comp_data.size() - 1] << "],\n";
-    ss << "\"uncertainty\" [: ";
+    ss << "\"uncertainty\" :[ ";
     for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
@@ -306,12 +306,11 @@ class LengthCompDataInterface : public DataInterfaceBase {
       ss << length_comp_data[i] << ", ";
     }
     ss << length_comp_data[length_comp_data.size() - 1] << "],\n";
-    ss << "\"uncertainty\" [: ";
+    ss << "\"uncertainty\" : [ ";
     for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
     ss << uncertainty[uncertainty.size() - 1] << "]\n";
-    ss << "}";
     ss << "}";
     return ss.str();
   }
@@ -432,12 +431,11 @@ class IndexDataInterface : public DataInterfaceBase {
       ss << index_data[i] << ", ";
     }
     ss << index_data[index_data.size() - 1] << "],\n";
-    ss << "\"uncertainty\" [: ";
+    ss << "\"uncertainty\" : [ ";
     for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
     ss << uncertainty[uncertainty.size() - 1] << "]\n";
-    ss << "}\n";
     ss << "}";
     return ss.str();
   }
@@ -560,12 +558,11 @@ class LandingsDataInterface : public DataInterfaceBase {
       ss << landings_data[i] << ", ";
     }
     ss << landings_data[landings_data.size() - 1] << "],\n";
-    ss << "\"uncertainty\" [: ";
+    ss << "\"uncertainty\" : [ ";
     for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
     ss << uncertainty[uncertainty.size() - 1] << "]\n";
-    ss << "}";
     ss << "}";
     return ss.str();
   }
