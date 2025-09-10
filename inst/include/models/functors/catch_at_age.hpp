@@ -102,6 +102,21 @@ namespace fims_popdy
     }
 
     /**
+     * @brief Copy constructor for the CatchAtAge class.
+     *
+     * @param other The other CatchAtAge object to copy from.
+     */
+    CatchAtAge(const CatchAtAge &other)
+        : FisheryModelBase<Type>(other), name_m(other.name_m),
+          ages(other.ages),
+          fleet_derived_quantities_dims(other.fleet_derived_quantities_dims),
+          population_derived_quantities_dims(
+              other.population_derived_quantities_dims)
+    {
+      this->model_type_m = "caa";
+    }
+
+    /**
      * @brief Destroy the Catch At Age object.
      *
      */
