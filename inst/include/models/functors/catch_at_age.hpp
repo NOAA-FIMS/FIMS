@@ -376,10 +376,7 @@ void InitializeCAA(){
 
                  derived_quantities["mortality_Z"] = fims::Vector<Type>(
                      this->populations[p]->nyears * this->populations[p]->nages);
-
-                 derived_quantities["weight_at_age"] =
-                     fims::Vector<Type>(this->populations[p]->nages);
-
+                     
                 // TODO: numbers_at_age are resized in rcpp_population, should this be
                 // removed?
                 derived_quantities["numbers_at_age"] = fims::Vector<Type>(
