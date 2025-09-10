@@ -84,11 +84,7 @@ namespace
             fims::Vector<double>(nyears * nages, 0) 
         );
         
-       fims::Vector<double> waa(nages, 0);
-        for (size_t i = 0; i < nages; i++) {
-            waa[i] = catch_at_age_model->populations[0]->growth->evaluate(catch_at_age_model->populations[0]->ages[i]);
-            EXPECT_EQ(dq["weight_at_age"][i], waa[i]);
-        }
+      
 
         // Test population.M
         fims::Vector<double> M(nyears * nages, 0);

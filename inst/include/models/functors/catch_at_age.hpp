@@ -806,8 +806,6 @@ void InitializeCAA(){
         for (size_t age = 0; age < population->nages; age++)
         {
           population->proportion_female[age] = 0.5;
-          derived_quantities["weight_at_age"][age] =
-              population->growth->evaluate(population->ages[age]);
         }
 
         // Transformation Section
