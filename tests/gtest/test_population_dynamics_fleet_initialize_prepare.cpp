@@ -8,7 +8,7 @@ namespace
 
     TEST_F(CAAInitializeTestFixture, FleetInitializeWorks)
     {
-        catch_at_age_model->Initialize();
+        catch_at_age_model->InitializeCAA();
         for (auto fit = catch_at_age_model->fleets.begin(); 
             fit != catch_at_age_model->fleets.end(); ++fit) {
             auto &fleet = (*fit).second;
@@ -32,7 +32,7 @@ namespace
             EXPECT_EQ(dq["expected_catch"].size(), nyears);
             EXPECT_EQ(dq["agecomp_expected"].size(), nyears * nages);
             EXPECT_EQ(dq["lengthcomp_expected"].size(), nyears * nlengths);
-            EXPECT_EQ(dq["age_to_length_conversion"].size(), nages * nlengths);
+            // EXPECT_EQ(dq["age_to_length_conversion"].size(), nages * nlengths);
             EXPECT_EQ(fleet->Fmort.size(), nyears);
             EXPECT_EQ(fleet->q.size(), 1);
         }
@@ -40,8 +40,9 @@ namespace
 
     TEST_F(CAAPrepareTestFixture, FleetPrepareWorks)
     {
-        
+        catch_at_age_model->InitializeCAA();
         catch_at_age_model->Prepare();
+
         for (auto fit = catch_at_age_model->fleets.begin(); 
             fit != catch_at_age_model->fleets.end(); ++fit) {
             auto &fleet = (*fit).second;

@@ -6,7 +6,7 @@ namespace
    
     TEST_F(CAAInitializeTestFixture, input_data_are_specified)
     { 
-        catch_at_age_model->Initialize();
+        catch_at_age_model->InitializeCAA();
         EXPECT_EQ(catch_at_age_model->populations[0]->id_g, id_g);
         EXPECT_EQ(catch_at_age_model->populations[0]->nyears, nyears);
         EXPECT_EQ(catch_at_age_model->populations[0]->nseasons, nseasons);
@@ -17,7 +17,7 @@ namespace
 
     TEST_F(CAAInitializeTestFixture, Initialize_works)
     {
-        catch_at_age_model->Initialize();
+        catch_at_age_model->InitializeCAA();
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(0);
         EXPECT_EQ(dq["mortality_F"].size(), nyears * nages);
         EXPECT_EQ(dq["mortality_Z"].size(), nyears * nages);
@@ -39,6 +39,7 @@ namespace
 
     TEST_F(CAAPrepareTestFixture, Prepare_works)
     {
+        catch_at_age_model->InitializeCAA();
         catch_at_age_model->Prepare();
         auto &dq = catch_at_age_model->GetPopulationDerivedQuantities(1);
 

@@ -57,6 +57,9 @@ class CAAInitializeTestFixture : public testing::Test {
   int nlengths = 23;
 };
 
+
+
+
 class CAAEvaluateTestFixture : public testing::Test {
  protected:
   // Declare population here as a member, and initialize it in SetUp
@@ -123,7 +126,7 @@ class CAAEvaluateTestFixture : public testing::Test {
     // Push population to catch_at_age_model
     catch_at_age_model->populations.push_back(population);
     // Initialize derived quantities
-    catch_at_age_model->Initialize();
+    catch_at_age_model->InitializeCAA();
 
     // Setup population parameters needed for catch_at_age model->Prepare()
     catch_at_age_model->populations[0]->ages.resize(nages);
