@@ -39,7 +39,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       log_init_naa; /*!< estimated parameter: natural log of numbers at age*/
   fims::Vector<Type>
-      log_init_depletion; /*!< estimated parameter: natural log of depletion*/
+      logit_init_depletion; /*!< estimated parameter: natural log of depletion*/
   fims::Vector<Type>
       log_M; /*!< estimated parameter: natural log of Natural Mortality*/
   fims::Vector<Type> proportion_female = fims::Vector<Type>(
@@ -80,7 +80,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> expected_recruitment; /*!< Expected recruitment */
   fims::Vector<Type> sum_selectivity;      /*!< TODO: add documentation */
   fims::Vector<Type> observed_catch;      /*!< TODO: add documentation */
-  fims::Vector<Type> expected_depletion;      /*!< TODO: add documentation */
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
