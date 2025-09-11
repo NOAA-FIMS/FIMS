@@ -304,7 +304,7 @@ RCPP_MODULE(fims) {
              "natural log of the natural mortality of the population")
       .field("log_init_naa", &PopulationInterface::log_init_naa,
              "natural log of the initial numbers at age")
-      .field("log_init_depletion", &PopulationInterface::log_init_depletion,
+      .field("logit_init_depletion", &PopulationInterface::logit_init_depletion,
              "natural log of the initial depletion level")
       .field("ages", &PopulationInterface::ages,
              "vector of ages in the population; length nages")
@@ -378,8 +378,10 @@ RCPP_MODULE(fims) {
       .field("log_r", &PellaTomlinsonInterface::log_r)
       .field("log_K", &PellaTomlinsonInterface::log_K)
       .field("log_m", &PellaTomlinsonInterface::log_m)
-      .field("log_depletion", &PellaTomlinsonInterface::log_depletion,
-             "Log expectation of the depletion process")
+      .field("depletion", &PellaTomlinsonInterface::pop_depletion,
+             "The depletion process")
+      .field("logit_depletion", &PellaTomlinsonInterface::logit_depletion,
+             "The logit-transformed depletion process")
       .field("log_expected_depletion",
              &PellaTomlinsonInterface::log_expected_depletion,
              "expected depletion as a random effect on the natural log scale")

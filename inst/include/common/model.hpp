@@ -74,7 +74,8 @@ class Model {  // may need singleton
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->of = this->of;  // link to TMB objective function
-      m->Prepare();
+      m->Prepare(); 
+      m->Evaluate();
     }
     
     
@@ -126,14 +127,7 @@ class Model {  // may need singleton
         fims::to_string(n_random_effects) +
         " random_effects is: " + fims::to_string(jnll));
     
-    //evaluate model
-    for (m_it = this->fims_information->models_map.begin();
-         m_it != this->fims_information->models_map.end(); ++m_it) {
-      //(*m_it).second points to the Model module
-      std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
-      m->of = this->of;  // link to TMB objective function
-      m->Evaluate();
-    }
+
 
     this->fims_information->SetupData();
     // Loop over and evaluate data joint negative log-likelihoods

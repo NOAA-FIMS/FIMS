@@ -96,9 +96,13 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
    */
   ParameterVector log_m;
   /**
-   * @brief The log of the depletion level
+   * @brief The depletion level
    */
-  ParameterVector log_depletion;
+  ParameterVector pop_depletion;
+  /**
+   * @brief The logit of the depletion level
+   */
+  ParameterVector logit_depletion;
   /**
    * @brief The log of the expected depletion level
    */
@@ -126,7 +130,8 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
         log_r(other.log_r),
         log_K(other.log_K),
         log_m(other.log_m),
-        log_depletion(other.log_depletion),
+        pop_depletion(other.pop_depletion),
+        logit_depletion(other.logit_depletion),
         log_expected_depletion(other.log_expected_depletion) {}
 
   /**
@@ -319,35 +324,40 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     }
     info->variable_map[this->log_m.id_m] = &(depletion)->log_m;
 
-    // set log_depletion
-    depletion->log_depletion.resize(this->log_depletion.size());
-    for (size_t i = 0; i < log_depletion.size(); i++) {
-      depletion->log_depletion[i] = this->log_depletion[i].initial_value_m;
+    // set logit_depletion
+    depletion->logit_depletion.resize(this->nyears.get()-1);
+    for (size_t i = 0; i < this->nyears.get()-1; i++) {
+      depletion->logit_depletion[i] = this->logit_depletion[i].initial_value_m;
 
-      if (this->log_depletion[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->logit_depletion[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "depletion." << this->id << ".log_depletion."
-           << this->log_depletion[i].id_m;
+        ss << "depletion." << this->id << ".logit_depletion."
+           << this->logit_depletion[i].id_m;
         info->RegisterParameterName(ss.str());
-        info->RegisterParameter(depletion->log_depletion[i]);
+        info->RegisterParameter(depletion->logit_depletion[i]);
       }
-      if (this->log_depletion[i].estimation_type_m.get() == "random_effects") {
+      if (this->logit_depletion[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "depletion." << this->id << ".log_depletion."
-           << this->log_depletion[i].id_m;
+        ss << "depletion." << this->id << ".logit_depletion."
+           << this->logit_depletion[i].id_m;
         info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(depletion->log_depletion[i]);
+        info->RegisterRandomEffect(depletion->logit_depletion[i]);
       }
     }
+    info->variable_map[this->logit_depletion.id_m] = &(depletion)->logit_depletion;
 
-    info->variable_map[this->log_depletion.id_m] = &(depletion)->log_depletion;
+    // set depletion
+    depletion->depletion.resize(this->nyears.get());
+    for (size_t i = 0; i < this->nyears.get(); i++) {
+      depletion->depletion[i] = 0.5;  // initial depletion value
+    }
+    info->variable_map[this->pop_depletion.id_m] = &(depletion)->depletion;
 
     // set log_expected_depletion
     depletion->log_expected_depletion.resize(this->nyears.get());
     for (size_t i = 0; i < this->nyears.get(); i++) {
-      depletion->log_expected_depletion[i] = 0;
+      depletion->log_expected_depletion[i] = log(0.5);
     }
-
     info->variable_map[this->log_expected_depletion.id_m] =
         &(depletion)->log_expected_depletion;
 

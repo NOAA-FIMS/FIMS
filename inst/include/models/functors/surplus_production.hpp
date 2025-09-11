@@ -99,9 +99,6 @@ class SurplusProduction : public FisheryModelBase<Type> {
 
       derived_quantities["biomass"] =
           fims::Vector<Type>((this->nyears + 1));
-    
-      derived_quantities["expected_depletion"] =
-          fims::Vector<Type>(this->nyears);
       
       derived_quantities["observed_catch"] =
           fims::Vector<Type>(this->nyears);
@@ -205,28 +202,40 @@ class SurplusProduction : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Evaluate the expected depletion for a given population and year.
+   * @brief Evaluate the log expected depletion for a given population and year.
    * @copydoc CalculateCatch()
    */
   void CalculateDepletion(
-      std::shared_ptr<fims_popdy::Population<Type>> &population,
+    //depletion ~ LN(log_expected_depletion, sigma)
+    std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t year) {
+    // in first year, set log_expected_depletion to initial depletion 
     if (year == 0) {
       population->depletion->log_expected_depletion[0] =
-          population->log_init_depletion[0];
+      fims_math::log(fims_math::inv_logit(
+        static_cast<Type>(0.0),static_cast<Type>(1.0),
+        population->logit_init_depletion[0]
+      ));
+
+    // for rest of time series, evaluation log_expected_depltion based on 
+    // user-defined function
+    // depletion[year+1] is the inv-logit of logit_depletion where depletion[year=0]
+    // is estimated based off of log_expected_depletion[0] = init_depletion
     } else {
       population->depletion->log_expected_depletion[year] =
           fims_math::log(population->depletion->evaluate_mean( 
-            fims_math::exp(
-              population->depletion->log_depletion[year - 1]),
-              this->population_derived_quantities[population->GetId()]
-                                                 ["observed_catch"]
-                                                 [year - 1] )
-              );
+            population->depletion->depletion[year-1],
+            this->population_derived_quantities[population->GetId()]
+                                               ["observed_catch"]
+                                               [year - 1])
+          );
+        population->depletion->depletion[year] =
+          fims_math::inv_logit(static_cast<Type>(0.0), static_cast<Type>(1.0),
+          population->depletion->logit_depletion[year-1]);
     }
-    this->population_derived_quantities[population->GetId()]
-                                       ["expected_depletion"][year] =
-        fims_math::exp(population->depletion->log_expected_depletion[year]);
+      
+  
+    
   }
 
   /**
@@ -238,12 +247,12 @@ class SurplusProduction : public FisheryModelBase<Type> {
     fleet_iterator fit;
     for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-      // reference depletion->log_depletion here, where
-      // log_depletion ~ LN(log_expected_depletion, sigma)
+      // reference depletion->logit_depletion here, where
+      // depletion ~ LN(log_expected_depletion, sigma)
       //TODO: calculate using transformed q instead of log_q?
       this->fleet_derived_quantities[fleet->GetId()]["log_index_expected"][year] = 
-          population->depletion->log_depletion[year] +
-          fleet->log_q.get_force_scalar(year);
+          fims_math::log(population->depletion->depletion[year] +
+          fleet->log_q.get_force_scalar(year));
 
       this->fleet_derived_quantities[fleet->GetId()]["index_expected"][year] =
           fims_math::exp(this->fleet_derived_quantities[fleet->GetId()]["log_index_expected"][year]);
@@ -260,8 +269,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
       size_t year) {
     this->population_derived_quantities[population->GetId()]["biomass"]
                                        [year] =
-        fims_math::exp(
-          population->depletion->log_depletion[year]) *
+        population->depletion->depletion[year] *
         fims_math::exp(population->depletion->log_K[0]);
   }
 
@@ -311,8 +319,9 @@ class SurplusProduction : public FisheryModelBase<Type> {
     // each vector can be a different dimension. Does not work with ADREPORT
 
     vector<vector<Type>> biomass(n_pops);
-    vector<vector<Type>> expected_depletion(n_pops);
     vector<vector<Type>> observed_catch(n_pops);
+    vector<vector<Type>> pop_depletion(n_pops);
+    vector<vector<Type>> log_depletion_expected(n_pops);
     vector<vector<Type>> fmsy(n_pops);
     vector<vector<Type>> bmsy(n_pops);
     vector<vector<Type>> msy(n_pops);
@@ -322,8 +331,10 @@ class SurplusProduction : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           this->population_derived_quantities[this->populations[p]->GetId()];
       biomass(pop_idx) = vector<Type>(derived_quantities["biomass"]);
-      expected_depletion(pop_idx) =
-          vector<Type>(derived_quantities["expected_depletion"]);
+      pop_depletion(pop_idx) =
+          vector<Type>(this->populations[p]->depletion->depletion);
+      log_depletion_expected(pop_idx) =
+          vector<Type>(this->populations[p]->depletion->log_expected_depletion);
       observed_catch(pop_idx) =
           vector<Type>(derived_quantities["observed_catch"]);
       fmsy(pop_idx) = vector<Type>(derived_quantities["fmsy"]);
@@ -333,7 +344,8 @@ class SurplusProduction : public FisheryModelBase<Type> {
       pop_idx += 1;
     }
     FIMS_REPORT_F(biomass, this->of);
-    FIMS_REPORT_F(expected_depletion, this->of);
+    FIMS_REPORT_F(pop_depletion, this->of);
+    FIMS_REPORT_F(log_depletion_expected, this->of);
     FIMS_REPORT_F(observed_catch, this->of);
     FIMS_REPORT_F(fmsy, this->of);
     FIMS_REPORT_F(bmsy, this->of);
@@ -344,14 +356,14 @@ class SurplusProduction : public FisheryModelBase<Type> {
      * function collapses the nested vector into a single vector
      */
     vector<Type> Biomass = ADREPORTvector(biomass);
-    vector<Type> DepletionExpected = ADREPORTvector(expected_depletion);
+    vector<Type> Depletion = ADREPORTvector(pop_depletion);
     vector<Type> ObservedCatch = ADREPORTvector(observed_catch);
     vector<Type> Fmsy = ADREPORTvector(fmsy);
     vector<Type> Bmsy = ADREPORTvector(bmsy);
     vector<Type> Msy = ADREPORTvector(msy);
 
     ADREPORT_F(Biomass, this->of);
-    ADREPORT_F(DepletionExpected, this->of);
+    ADREPORT_F(Depletion, this->of);
     ADREPORT_F(ObservedCatch, this->of);
     ADREPORT_F(Fmsy, this->of);
     ADREPORT_F(Bmsy, this->of);

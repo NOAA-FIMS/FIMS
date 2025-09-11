@@ -101,7 +101,7 @@ struct DistributionElementObject {
       return this->observed_values->data.size();
     }
     if (this->input_type == "random_effects") {
-      return this->expected_values.size();
+      return (*re).size();
     }
     if (this->input_type == "prior") {
       return this->expected_values.size();
