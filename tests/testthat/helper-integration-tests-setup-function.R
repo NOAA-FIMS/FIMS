@@ -655,6 +655,7 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
     survey_fleet$log_q[1]$value <- 
       jabba_pars |> dplyr::filter(rownames(jabba_pars) == "q") |> 
       dplyr::select(Median) |> log() |> unlist()
+    survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   } else {
     survey_fleet$log_q[1]$value <- log(1.0)
     survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
@@ -663,7 +664,7 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
 
   survey_fleet_index_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
-  # sd = sqrt(log(cv^2 + 1)), sd is log transformed
+  # Fix sd as currently FIMS does not have prior distribution
   survey_fleet_index_distribution$log_sd$resize(nyears)
   for (y in 1:nyears) {
     survey_fleet_index_distribution$log_sd[y]$value <- 
@@ -696,22 +697,26 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
   }
   # Fix to get Schaefer model
   production$log_m[1]$value <- log(2)
-  production$log_depletion$resize(nyears)
-  for (i in 1:nyears) {
+  production$logit_depletion$resize(nyears-1)
+  for (i in 1:(nyears-1)) {
     if(estimation_mode == FALSE){
-      production$log_depletion[i]$value <- log(jabba_expect_depletion[i])
+      production$logit_depletion[i]$value <- 
+        log(jabba_expect_depletion[i+1]/(1 - jabba_expect_depletion[i+1]))
     } else {
-      production$log_depletion[i]$value <- 1
+      production$logit_depletion[i]$value <- 0
     }
   }
-  production$log_depletion$set_all_random(TRUE)
+  production$logit_depletion$set_all_estimable(TRUE)
   production$nyears$set(nyears)
 
-  production_distribution <- new(DnormDistribution)
+  production_distribution <- new(DlnormDistribution)
+  #Fix sd to jabba value as currently FIMS does not have prior distribution
   production_distribution$log_sd[1]$value <- log(0.109) # from jabba output
+  production_distribution$expected_values$resize(nyears)
+  # depletion ~ LNormal(log_expected_depletion, sd))
   production_distribution$set_distribution_links(
     "random_effects",
-    c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
+    c(production$depletion$get_id(), production$log_expected_depletion$get_id())
   )
 
 
@@ -723,7 +728,7 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
 
   log_K_Prior <- new(DnormDistribution)
   log_K_Prior$expected_values[1]$value <- log(8 * max(landings$value))
-  log_K_Prior$log_sd[1]$value <- log(1.0)
+  log_K_Prior$log_sd[1]$value <- log(sqrt(log(1^2+1))) # CV prior = 1
   log_K_Prior$set_distribution_links("prior", production$log_K$get_id())
 
   # create population module
@@ -732,23 +737,17 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
   population$nages$set(1) # only one age in surplus production
   population$ages$resize(1)
   population$ages$set(0, 0) # only one age in surplus production
-  # Fix init depletion
-  if(estimation_mode == FALSE) {
-    population$log_init_depletion[1]$value <- 
-      jabba_pars |> dplyr::filter(rownames(jabba_pars) == "psi") |> 
-        dplyr::select(Median) |> log() |> unlist()
-  } else {
-    population$log_init_depletion[1]$value <- 1
-    population$log_init_depletion[1]$estimation_type$set("fixed_effects")
-  }
+  # Fix init depletion to jabba value as currently FIMS does not have prior distribution
+    init_depletion <- jabba_pars |> dplyr::filter(rownames(jabba_pars) == "psi") |> 
+      dplyr::select(Median) |> unlist()
+    population$logit_init_depletion[1]$value <- log(init_depletion/(1 - init_depletion))
+ 
   population$SetDepletionID(production$get_id())
   population$AddFleet(fishing_fleet$get_id())
   population$AddFleet(survey_fleet$get_id())
 
 
-  # TODO: setup prior on init_depletion even though fixed?
-
-  # Set up catch at age model
+  # Set up surplus production model
   surplus_production <- methods::new(SurplusProduction)
   surplus_production$AddPopulation(population$get_id())
 
@@ -764,16 +763,16 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
 
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
-    random = "re", 
+    random = "re" 
     #silent = TRUE, map = list()
   )
   if(estimation_mode == TRUE) {
     # Optimization with nlminb
     opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-      control = list(eval.max = 10000, iter.max = 10000, trace = TRUE)
+      control = list(eval.max = 10000, iter.max = 10000, trace = 1)
     )
   }
-  
+
   obj$report()$biomass
   jabba_biomass
 
