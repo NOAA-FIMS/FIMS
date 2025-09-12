@@ -7,7 +7,7 @@ namespace
 
     TEST_F(CAAPrepareTestFixture, CalculateMortality_works)
     {
-        catch_at_age_model->InitializeCAA();
+        this->InitializeCAA();
         catch_at_age_model->Prepare();
         size_t pop_id = population->GetId();
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);

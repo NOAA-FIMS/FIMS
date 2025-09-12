@@ -8,7 +8,8 @@ namespace
 
     TEST_F(CAAInitializeTestFixture, FleetInitializeWorks)
     {
-        catch_at_age_model->InitializeCAA();
+
+        this->InitializeCAA();
         for (auto fit = catch_at_age_model->fleets.begin(); 
             fit != catch_at_age_model->fleets.end(); ++fit) {
             auto &fleet = (*fit).second;
@@ -40,7 +41,7 @@ namespace
 
     TEST_F(CAAPrepareTestFixture, FleetPrepareWorks)
     {
-        catch_at_age_model->InitializeCAA();
+        this->InitializeCAA();
         catch_at_age_model->Prepare();
 
         for (auto fit = catch_at_age_model->fleets.begin(); 
