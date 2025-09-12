@@ -103,10 +103,17 @@ class SurplusProduction : public FisheryModelBase<Type> {
       derived_quantities["observed_catch"] =
           fims::Vector<Type>(this->nyears);
 
+      //TODO: does this derived quantity need to be added to population?
+      derived_quantities["harvest_rate"] =
+          fims::Vector<Type>(this->nyears);
+      
+      //TODO: does this derived quantity need to be added to population?
       derived_quantities["fmsy"] = fims::Vector<Type>(1);
 
+      //TODO: does this derived quantity need to be added to population?
       derived_quantities["bmsy"] = fims::Vector<Type>(1);
 
+      //TODO: does this derived quantity need to be added to population?
       derived_quantities["msy"] = fims::Vector<Type>(1);
     }
 
@@ -289,6 +296,16 @@ class SurplusProduction : public FisheryModelBase<Type> {
       this->population_derived_quantities[population->GetId()]["bmsy"][0];
   }
 
+  void CalculateHarvestRate(std::shared_ptr<fims_popdy::Population<Type>> &population,
+                      size_t year) {
+ this->population_derived_quantities[population->GetId()]["harvest_rate"]
+                                       [year] =
+        this->population_derived_quantities[population->GetId()]["observed_catch"]
+                                       [year] /
+        this->population_derived_quantities[population->GetId()]["biomass"]
+                                       [year];
+  }
+
   /**
   * @brief This method is used to evaluate the surplus production model.
   */
@@ -303,6 +320,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
         CalculateDepletion(population, y);
         CalculateIndex(population, y);
         CalculateBiomass(population, y);
+        CalculateHarvestRate(population, y);
       }
       CalculateReferencePoints(population);
     }
@@ -325,6 +343,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     vector<vector<Type>> fmsy(n_pops);
     vector<vector<Type>> bmsy(n_pops);
     vector<vector<Type>> msy(n_pops);
+    vector<vector<Type>> harvest_rate(n_pops);
     // initiate population index for structuring report out objects
     int pop_idx = 0;
     for (size_t p = 0; p < this->populations.size(); p++) {
@@ -337,6 +356,8 @@ class SurplusProduction : public FisheryModelBase<Type> {
           vector<Type>(this->populations[p]->depletion->log_expected_depletion);
       observed_catch(pop_idx) =
           vector<Type>(derived_quantities["observed_catch"]);
+      harvest_rate(pop_idx) =
+          vector<Type>(derived_quantities["harvest_rate"]);
       fmsy(pop_idx) = vector<Type>(derived_quantities["fmsy"]);
       bmsy(pop_idx) = vector<Type>(derived_quantities["bmsy"]);
       msy(pop_idx) = vector<Type>(derived_quantities["msy"]);
@@ -347,6 +368,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     FIMS_REPORT_F(pop_depletion, this->of);
     FIMS_REPORT_F(log_depletion_expected, this->of);
     FIMS_REPORT_F(observed_catch, this->of);
+    FIMS_REPORT_F(harvest_rate, this->of);
     FIMS_REPORT_F(fmsy, this->of);
     FIMS_REPORT_F(bmsy, this->of);
     FIMS_REPORT_F(msy, this->of);
@@ -358,6 +380,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     vector<Type> Biomass = ADREPORTvector(biomass);
     vector<Type> Depletion = ADREPORTvector(pop_depletion);
     vector<Type> ObservedCatch = ADREPORTvector(observed_catch);
+    vector<Type> HarvestRate = ADREPORTvector(harvest_rate);
     vector<Type> Fmsy = ADREPORTvector(fmsy);
     vector<Type> Bmsy = ADREPORTvector(bmsy);
     vector<Type> Msy = ADREPORTvector(msy);
@@ -365,6 +388,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     ADREPORT_F(Biomass, this->of);
     ADREPORT_F(Depletion, this->of);
     ADREPORT_F(ObservedCatch, this->of);
+    ADREPORT_F(HarvestRate, this->of);
     ADREPORT_F(Fmsy, this->of);
     ADREPORT_F(Bmsy, this->of);
     ADREPORT_F(Msy, this->of);
