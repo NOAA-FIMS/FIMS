@@ -293,7 +293,7 @@ public:
    * fleet to a JSON string. This function is used to create the JSON output for
    * the CatchAtAge model.
    */
-  std::string DerivedQuantityToJSON(
+  std::string derived_quantity_to_json(
       std::map<std::string, fims::Vector<double>>::iterator it,
       const fims_popdy::DimensionInfo &dim_info)
   {
@@ -424,12 +424,12 @@ public:
     for (; it != second_to_last; ++it)
     {
       dim_info_it = dim_info.find(it->first);
-      ss << this->DerivedQuantityToJSON(it, dim_info_it->second) << ",\n";
+      ss << this->derived_quantity_to_json(it, dim_info_it->second) << ",\n";
     }
     dim_info_it = dim_info.find(second_to_last->first);
     if (dim_info_it != dim_info.end())
     {
-      ss << this->DerivedQuantityToJSON(second_to_last, dim_info_it->second) << "\n";
+      ss << this->derived_quantity_to_json(second_to_last, dim_info_it->second) << "\n";
     }
     else
     {
