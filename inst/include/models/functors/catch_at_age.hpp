@@ -117,89 +117,7 @@ namespace fims_popdy
       //       //   numbers_at_age, log_Fmort, log_q
       for (size_t p = 0; p < this->populations.size(); p++)
       {
-        //         std::map<std::string, fims::Vector<Type>> &derived_quantities =
-        //             this->population_derived_quantities[this->populations[p]->GetId()];
-
-        //         std::map<std::string, fims::Vector<size_t>> &derived_quantities_dims =
-        //             this->population_derived_quantities_dims[this->populations[p]->GetId()];
-
-        //         derived_quantities["total_landings_weight"] =
-        //             fims::Vector<Type>(this->populations[p]->nyears);
-        //         derived_quantities_dims["total_landings_weight"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears)};
-
-        //         derived_quantities["total_landings_numbers"] =
-        //             fims::Vector<Type>(this->populations[p]->nyears);
-        //         derived_quantities_dims["total_landings_numbers"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears)};
-
-        //         derived_quantities["mortality_F"] = fims::Vector<Type>(
-        //             this->populations[p]->nyears * this->populations[p]->nages);
-
-        //         derived_quantities_dims["mortality_F"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears),
-        //              static_cast<size_t>(this->populations[p]->nages)};
-
-        //         derived_quantities["mortality_Z"] = fims::Vector<Type>(
-        //             this->populations[p]->nyears * this->populations[p]->nages);
-
-        //         derived_quantities_dims["mortality_Z"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears),
-        //              static_cast<size_t>(this->populations[p]->nages)};
-        //         derived_quantities["weight_at_age"] =
-        //             fims::Vector<Type>(this->populations[p]->nages);
-
-        //         // TODO: numbers_at_age are resized in rcpp_population, should this be
-        //         // removed?
-        //         derived_quantities["numbers_at_age"] = fims::Vector<Type>(
-        //             (this->populations[p]->nyears + 1) * this->populations[p]->nages);
-
-        //         derived_quantities_dims["numbers_at_age"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears + 1),
-        //              static_cast<size_t>(this->populations[p]->nages)};
-
-        //         derived_quantities["unfished_numbers_at_age"] = fims::Vector<Type>(
-        //             (this->populations[p]->nyears + 1) * this->populations[p]->nages);
-        //         derived_quantities_dims["unfished_numbers_at_age"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears + 1),
-        //              static_cast<size_t>(this->populations[p]->nages)};
-
-        //         derived_quantities["biomass"] =
-        //             fims::Vector<Type>(this->populations[p]->nyears + 1);
-        //         derived_quantities_dims["biomass"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears + 1)};
-
-        //         derived_quantities["spawning_biomass"] =
-        //             fims::Vector<Type>(this->populations[p]->nyears + 1);
-        //         derived_quantities_dims["spawning_biomass"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears + 1)};
-
-        //         derived_quantities["unfished_biomass"] =
-        //             fims::Vector<Type>(this->populations[p]->nyears + 1);
-        //         derived_quantities_dims["unfished_biomass"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears + 1)};
-
-        //         derived_quantities["unfished_spawning_biomass"] =
-        //             fims::Vector<Type>(this->populations[p]->nyears + 1);
-        //         derived_quantities_dims["unfished_spawning_biomass"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears + 1)};
-
-        //         derived_quantities["proportion_mature_at_age"] = fims::Vector<Type>(
-        //             (this->populations[p]->nyears + 1) * this->populations[p]->nages);
-        // derived_quantities_dims["proportion_mature_at_age"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears + 1),
-        //              static_cast<size_t>(this->populations[p]->nages)};
-
-        //         derived_quantities["expected_recruitment"] =
-        //             fims::Vector<Type>(this->populations[p]->nyears + 1);
-        //             derived_quantities_dims["expected_recruitment"] =
-        //                 {static_cast<size_t>(this->populations[p]->nyears + 1)};
-
-        //         derived_quantities["sum_selectivity"] = fims::Vector<Type>(
-        //             this->populations[p]->nyears * this->populations[p]->nages);
-        // derived_quantities_dims["sum_selectivity"] =
-        //             {static_cast<size_t>(this->populations[p]->nyears),
-        //              static_cast<size_t>(this->populations[p]->nages)};
+        
 
         this->populations[p]->proportion_female.resize(
             this->populations[p]->nages);
@@ -212,133 +130,7 @@ namespace fims_popdy
            ++fit)
       {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-        //         std::map<std::string, fims::Vector<Type>> &derived_quantities =
-        //             this->fleet_derived_quantities[fleet->GetId()];
-
-        //             std::map<std::string, fims::Vector<size_t>> &derived_quantities_dims =
-        //                 this->fleet_derived_quantities_dims[fleet->GetId()];
-
-        //         // initialize derive quantities
-        //         // landings
-        //         derived_quantities["landings_numbers_at_age"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nages);
-        //         derived_quantities_dims["landings_numbers_at_age"] =
-        //             {static_cast<size_t>(fleet->nyears),
-        //              static_cast<size_t>(fleet->nages)};
-
-        //         derived_quantities["landings_weight_at_age"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nages);
-        //         derived_quantities_dims["landings_weight_at_age"] =
-        //             {static_cast<size_t>(fleet->nyears),
-        //              static_cast<size_t>(fleet->nages)};
-
-        //         derived_quantities["landings_numbers_at_length"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nlengths);
-        //         derived_quantities_dims["landings_numbers_at_length"] =
-        //             {static_cast<size_t>(fleet->nyears),
-        //              static_cast<size_t>(fleet->nlengths)};
-
-        //         derived_quantities["landings_weight"] = fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["landings_weight"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["landings_numbers"] =
-        //             fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["landings_numbers"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["landings_expected"] =
-        //             fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["landings_expected"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["log_landings_expected"] =
-        //             fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["log_landings_expected"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["agecomp_proportion"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nages);
-        //         derived_quantities_dims["agecomp_proportion"] =
-        //             {static_cast<size_t>(fleet->nyears),
-        //              static_cast<size_t>(fleet->nages)};
-
-        //         derived_quantities["lengthcomp_proportion"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nlengths);
-        //         derived_quantities_dims["lengthcomp_proportion"] =
-        //             {static_cast<size_t>(fleet->nyears),
-        //              static_cast<size_t>(fleet->nlengths)};
-
-        //         // index
-        //         derived_quantities["index_numbers_at_age"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nages);
-        //             derived_quantities_dims["index_numbers_at_age"] =
-        //                 {static_cast<size_t>(fleet->nyears),
-        //                  static_cast<size_t>(fleet->nages)};
-
-        //         derived_quantities["index_weight_at_age"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nages);
-        //             derived_quantities_dims["index_weight_at_age"] =
-        //                 {static_cast<size_t>(fleet->nyears),
-        //                  static_cast<size_t>(fleet->nages)};
-
-        //         derived_quantities["index_numbers_at_length"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nlengths);
-        //         derived_quantities_dims["index_numbers_at_length"] =
-        //             {static_cast<size_t>(fleet->nyears),
-        //              static_cast<size_t>(fleet->nlengths)};
-
-        //         derived_quantities["index_weight"] = fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["index_weight"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["index_numbers"] = fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["index_numbers"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["index_expected"] = fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["index_expected"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["log_index_expected"] =
-        //             fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["log_index_expected"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         //
-        //         derived_quantities["catch_index"] = fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["catch_index"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["expected_catch"] = fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["expected_catch"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["expected_index"] = fims::Vector<Type>(fleet->nyears);
-        //         derived_quantities_dims["expected_index"] =
-        //             {static_cast<size_t>(fleet->nyears)};
-
-        //         derived_quantities["agecomp_expected"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nages);
-        //         derived_quantities_dims["agecomp_expected"] =
-        //             {static_cast<size_t>(fleet->nyears),
-        //              static_cast<size_t>(fleet->nages)};
-
-        //         derived_quantities["lengthcomp_expected"] =
-        //             fims::Vector<Type>(fleet->nyears * fleet->nlengths);
-        //         derived_quantities_dims["lengthcomp_expected"] =
-        //             {static_cast<size_t>(fleet->nyears),
-        //              static_cast<size_t>(fleet->nlengths)};
-
-        //         if (fleet->nlengths > 0)
-        //         {
-        //           derived_quantities["age_to_length_conversion"] =
-        //               fims::Vector<Type>(fleet->nages * fleet->nlengths);
-        //           derived_quantities_dims["age_to_length_conversion"] =
-        //               {static_cast<size_t>(fleet->nages),
-        //                static_cast<size_t>(fleet->nlengths)};
-        //         }
-
+     
         if (fleet->log_q.size() == 0)
         {
           fleet->log_q.resize(1);
@@ -349,255 +141,6 @@ namespace fims_popdy
       }
     }
 
-
-
-    /**
-     * This function is used to convert the derived quantities of a population or
-     * fleet to a JSON string. This function is used to create the JSON output for
-     * the CatchAtAge model.
-     */
-    std::string DerivedQuantityToJSON(derived_quantities_iterator it)
-    {
-      fims::Vector<Type> &dq = (*it).second;
-      std::stringstream ss;
-      // ss << std::fixed;
-      ss << "{\n";
-      ss << "\"name\":\"" << (*it).first << "\",\n";
-      ss << "\"value\":[";
-
-      if (dq.size() > 0)
-      {
-        for (size_t i = 0; i < dq.size() - 1; i++)
-        {
-          if (dq[i] != dq[i]) // check for NaN
-          {
-            ss << "\"nan\", ";
-          }
-          else
-          {
-            ss << dq[i] << ", ";
-          }
-        }
-        if (dq[dq.size() - 1] != dq[dq.size() - 1]) // check for NaN
-        {
-          ss << "\"nan\"";
-        }
-        else
-        {
-          ss << dq[dq.size() - 1] << "]\n";
-        }
-      }
-      else
-      {
-        ss << "]\n";
-      }
-
-      ss << "}";
-      return ss.str();
-    }
-
-    /**
-     * @brief Send the fleet-based derived quantities to the json file.
-     * @return std::string
-     */
-    std::string fleet_derived_quantities_to_json(
-        fleet_derived_quantities_iterator fdqit)
-    {
-      std::stringstream ss;
-      // ss << std::fixed;
-
-      // ss << "\"derived_quantities\": [\n";
-
-      typename std::map<std::string, fims::Vector<Type>>::iterator it;
-      typename std::map<std::string, fims::Vector<Type>>::iterator end_it;
-      end_it = (*fdqit).second.end();
-      typename std::map<std::string, fims::Vector<Type>>::iterator second_to_last;
-      second_to_last = (*fdqit).second.end();
-      if (it != end_it)
-      {
-        second_to_last--;
-      }
-
-      it = (*fdqit).second.begin();
-      for (; it != second_to_last; ++it)
-      {
-        ss << this->DerivedQuantityToJSON(it) << ",\n";
-      }
-      //                    ++it;
-      ss << this->DerivedQuantityToJSON(second_to_last) << "\n";
-
-      return ss.str();
-    }
-    /**
-     * @brief Send the population-based derived quantities to the json file.
-     * @return std::string
-     */
-    std::string population_derived_quantities_to_json(
-        population_derived_quantities_iterator pdqit)
-    {
-      std::stringstream ss;
-      // ss << std::fixed;
-      // ss << "{\n";
-      // ss << "\"id\": " << (*pdqit).first << ",\n";
-      // ss << "\"derived_quantities\": [\n";
-
-      typename std::map<std::string, fims::Vector<Type>>::iterator it;
-      typename std::map<std::string, fims::Vector<Type>>::iterator end_it;
-      end_it = (*pdqit).second.end();
-      typename std::map<std::string, fims::Vector<Type>>::iterator second_to_last;
-      second_to_last = (*pdqit).second.end();
-      if (it != end_it)
-      {
-        second_to_last--;
-      }
-
-      it = (*pdqit).second.begin();
-      for (; it != second_to_last; ++it)
-      {
-        ss << this->DerivedQuantityToJSON(it) << ",\n";
-      }
-      //                    ++it;
-      ss << this->DerivedQuantityToJSON(second_to_last) << "\n";
-
-      return ss.str();
-    }
-
-    // /**
-    //  * This function is used to convert the derived quantities of a
-    //  * population or fleet to a JSON string.
-    //  */
-    // std::string ToJSON()
-    // {
-
-    // typename std::map<uint32_t, std::map<std::string,
-    // fims::Vector<Type>>>::iterator pit; typename std::map<uint32_t,
-    // std::map<std::string, fims::Vector<Type>>>::iterator end_pit; end_pit =
-    // this->population_derived_quantities.end(); typename std::map<uint32_t,
-    // std::map<std::string, fims::Vector<Type>>>::iterator second_to_last_pit;
-    // second_to_last_pit = this->population_derived_quantities.end();
-    // if (pit != end_pit)
-    // {
-    //     second_to_last_pit--;
-    // }
-
-    // std::stringstream ss;
-    // ss << "{\n";
-    // ss << "\"Populations\":[\n";
-    // pit = this->population_derived_quantities.begin();
-    // for (; pit != second_to_last_pit; pit++)
-    // {
-    //     ss << "{\n";
-    //     ss << "\"id\": " << (*pit).first << ",\n";
-    //     ss << "\"derived_quantities\": [\n";
-
-    //     typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-    //     typename fims_popdy::Population<Type>::derived_quantities_iterator
-    //     end_it; typename
-    //     fims_popdy::Population<Type>::derived_quantities_iterator
-    //     second_to_last;
-
-    //     it = (*pit).second.begin();
-    //     end_it = (*pit).second.end();
-    //     second_to_last = (*pit).second.end();
-    //     if (it != end_it)
-    //     {
-    //         second_to_last--;
-    //     }
-
-    //     for (; it != second_to_last; ++it)
-    //     {
-    //         ss << this->DerivedQuantityToJSON(it) << ",\n";
-    //     }
-    //     //                    ++it;
-    //     ss << this->DerivedQuantityToJSON(second_to_last) << "\n]},\n";
-    // }
-
-    // ss << "{\n";
-    // ss << "\"id\": " << (*second_to_last_pit).first << ",\n";
-    // ss << "\"derived_quantities\": [\n";
-
-    // typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-    // typename fims_popdy::Population<Type>::derived_quantities_iterator end_it;
-    // typename fims_popdy::Population<Type>::derived_quantities_iterator
-    // second_to_last;
-
-    // it = (*second_to_last_pit).second.begin();
-    // end_it = (*second_to_last_pit).second.end();
-    // second_to_last = (*second_to_last_pit).second.end();
-    // if (it != end_it)
-    // {
-    //     second_to_last--;
-    // }
-
-    // for (; it != second_to_last; ++it)
-    // {
-    //     ss << this->DerivedQuantityToJSON(it) << ",\n";
-    // }
-    // //                    ++it;
-    // ss << this->DerivedQuantityToJSON(second_to_last) << "\n]}\n";
-
-    // ss << "],\n";
-
-    // typename std::map<uint32_t, std::map<std::string,
-    // fims::Vector<Type>>>::iterator fit; typename std::map<uint32_t,
-    // std::map<std::string, fims::Vector<Type>>>::iterator end_fit; end_fit =
-    // this->fleet_derived_quantities.end(); typename std::map<uint32_t,
-    // std::map<std::string, fims::Vector<Type>>>::iterator second_to_last_fit;
-    // second_to_last_fit = this->fleet_derived_quantities.end();
-    // if (fit != end_fit)
-    // {
-    //     second_to_last_fit--;
-    // }
-    // ss << "\"Fleets\":[\n";
-
-    // fit = this->fleet_derived_quantities.begin();
-    // for (; fit != second_to_last_fit; fit++)
-    // {
-    //     ss << "{\n";
-    //     ss << "\"id\": " << (*fit).first << ",\n";
-    //     ss << "\"derived_quantities\": [\n";
-    //     typename fims_popdy::Fleet<Type>::derived_quantities_iterator it;
-    //     typename fims_popdy::Fleet<Type>::derived_quantities_iterator end_it;
-    //     typename fims_popdy::Fleet<Type>::derived_quantities_iterator
-    //     second_to_last; it = (*fit).second.begin(); end_it =
-    //     (*fit).second.end(); second_to_last = (*fit).second.end(); if (it !=
-    //     end_it)
-    //     {
-    //         second_to_last--;
-    //     }
-
-    //     for (; it != second_to_last; ++it)
-    //     {
-    //         ss << this->DerivedQuantityToJSON(it) << ",\n";
-    //     }
-    //     //                    ++it;
-    //     ss << this->DerivedQuantityToJSON(second_to_last) << "\n]},\n";
-    // }
-
-    // ss << "{\n";
-    // ss << "\"id\": " << (*second_to_last_fit).first << ",\n";
-    // ss << "\"derived_quantities\": [\n";
-    // typename fims_popdy::Fleet<Type>::derived_quantities_iterator it_;
-    // typename fims_popdy::Fleet<Type>::derived_quantities_iterator end_it_;
-    // typename fims_popdy::Fleet<Type>::derived_quantities_iterator
-    // second_to_last_; it_ = (*second_to_last_fit).second.begin(); end_it_ =
-    // (*second_to_last_fit).second.end(); second_to_last_ =
-    // (*second_to_last_fit).second.end(); if (it_ != end_it_)
-    // {
-    //     second_to_last--;
-    // }
-
-    // for (; it_ != second_to_last_; ++it_)
-    // {
-    //     ss << this->DerivedQuantityToJSON(it) << ",\n";
-    // }
-    // //                    ++it;
-    // ss << this->DerivedQuantityToJSON(second_to_last_) << "\n]}\n";
-    // ss << "]\n";
-    // ss << "}\n";
-
-    // return ss.str();
-    // }
 
     /**
      * This function is used to reset the derived quantities of a population or
@@ -1650,156 +1193,156 @@ namespace fims_popdy
       int n_pops = this->populations.size();
 #ifdef TMB_MODEL
 
-      // // Create vector lists to store output for reporting
-      // // vector< vector<Type> > creates a nested vector structure where
-      // // each vector can be a different dimension. Does not work with ADREPORT
-      // // fleets
-      // vector<vector<Type>> landings_w(n_fleets);
-      // vector<vector<Type>> landings_n(n_fleets);
-      // vector<vector<Type>> landings_exp(n_fleets);
-      // vector<vector<Type>> landings_naa(n_fleets);
-      // vector<vector<Type>> landings_waa(n_fleets);
-      // vector<vector<Type>> landings_nal(n_fleets);
-      // vector<vector<Type>> index_w(n_fleets);
-      // vector<vector<Type>> index_n(n_fleets);
-      // vector<vector<Type>> index_exp(n_fleets);
-      // vector<vector<Type>> index_naa(n_fleets);
-      // vector<vector<Type>> index_nal(n_fleets);
-      // vector<vector<Type>> agecomp_exp(n_fleets);
-      // vector<vector<Type>> lengthcomp_exp(n_fleets);
-      // vector<vector<Type>> agecomp_prop(n_fleets);
-      // vector<vector<Type>> lengthcomp_prop(n_fleets);
-      // vector<vector<Type>> F_mort(n_fleets);
-      // vector<vector<Type>> q(n_fleets);
-      // // populations
-      // vector<vector<Type>> naa(n_pops);
-      // vector<vector<Type>> ssb(n_pops);
-      // vector<vector<Type>> total_landings_w(n_pops);
-      // vector<vector<Type>> total_landings_n(n_pops);
-      // vector<vector<Type>> biomass(n_pops);
-      // vector<vector<Type>> log_recruit_dev(n_pops);
-      // vector<vector<Type>> log_r(n_pops);
-      // vector<vector<Type>> recruitment(n_pops);
-      // vector<vector<Type>> M(n_pops);
-      // // initiate population index for structuring report out objects
-      // int pop_idx = 0;
-      // for (size_t p = 0; p < this->populations.size(); p++) {
-      //   std::shared_ptr<fims_popdy::Population<Type>> &population =
-      //       this->populations[p];
-      //   std::map<std::string, fims::Vector<Type>> &derived_quantities =
-      //       this->population_derived_quantities[this->populations[p]->GetId()];
-      //   naa(pop_idx) = vector<Type>(derived_quantities["numbers_at_age"]);
-      //   ssb(pop_idx) = vector<Type>(derived_quantities["spawning_biomass"]);
-      //   total_landings_w(pop_idx) =
-      //       vector<Type>(derived_quantities["total_landings_weight"]);
-      //   total_landings_n(pop_idx) =
-      //       vector<Type>(derived_quantities["total_landings_numbers"]);
-      //   log_recruit_dev(pop_idx) =
-      //       vector<Type>(population->recruitment->log_recruit_devs);
-      //   log_r(pop_idx) = vector<Type>(derived_quantities["log_r"]);
-      //   recruitment(pop_idx) =
-      //       vector<Type>(derived_quantities["expected_recruitment"]);
-      //   biomass(pop_idx) = vector<Type>(derived_quantities["biomass"]);
-      //   M(pop_idx) = vector<Type>(population->M);
+      // Create vector lists to store output for reporting
+      // vector< vector<Type> > creates a nested vector structure where
+      // each vector can be a different dimension. Does not work with ADREPORT
+      // fleets
+      vector<vector<Type>> landings_w(n_fleets);
+      vector<vector<Type>> landings_n(n_fleets);
+      vector<vector<Type>> landings_exp(n_fleets);
+      vector<vector<Type>> landings_naa(n_fleets);
+      vector<vector<Type>> landings_waa(n_fleets);
+      vector<vector<Type>> landings_nal(n_fleets);
+      vector<vector<Type>> index_w(n_fleets);
+      vector<vector<Type>> index_n(n_fleets);
+      vector<vector<Type>> index_exp(n_fleets);
+      vector<vector<Type>> index_naa(n_fleets);
+      vector<vector<Type>> index_nal(n_fleets);
+      vector<vector<Type>> agecomp_exp(n_fleets);
+      vector<vector<Type>> lengthcomp_exp(n_fleets);
+      vector<vector<Type>> agecomp_prop(n_fleets);
+      vector<vector<Type>> lengthcomp_prop(n_fleets);
+      vector<vector<Type>> F_mort(n_fleets);
+      vector<vector<Type>> q(n_fleets);
+      // populations
+      vector<vector<Type>> naa(n_pops);
+      vector<vector<Type>> ssb(n_pops);
+      vector<vector<Type>> total_landings_w(n_pops);
+      vector<vector<Type>> total_landings_n(n_pops);
+      vector<vector<Type>> biomass(n_pops);
+      vector<vector<Type>> log_recruit_dev(n_pops);
+      vector<vector<Type>> log_r(n_pops);
+      vector<vector<Type>> recruitment(n_pops);
+      vector<vector<Type>> M(n_pops);
+      // initiate population index for structuring report out objects
+      int pop_idx = 0;
+      for (size_t p = 0; p < this->populations.size(); p++) {
+        std::shared_ptr<fims_popdy::Population<Type>> &population =
+            this->populations[p];
+        std::map<std::string, fims::Vector<Type>> &derived_quantities =
+            this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
+        naa(pop_idx) = vector<Type>(derived_quantities["numbers_at_age"]);
+        ssb(pop_idx) = vector<Type>(derived_quantities["spawning_biomass"]);
+        total_landings_w(pop_idx) =
+            vector<Type>(derived_quantities["total_landings_weight"]);
+        total_landings_n(pop_idx) =
+            vector<Type>(derived_quantities["total_landings_numbers"]);
+        log_recruit_dev(pop_idx) =
+            vector<Type>(population->recruitment->log_recruit_devs);
+        log_r(pop_idx) = vector<Type>(derived_quantities["log_r"]);
+        recruitment(pop_idx) =
+            vector<Type>(derived_quantities["expected_recruitment"]);
+        biomass(pop_idx) = vector<Type>(derived_quantities["biomass"]);
+        M(pop_idx) = vector<Type>(population->M);
 
-      //   pop_idx += 1;
-      // }
+        pop_idx += 1;
+      }
 
-      // // initiate fleet index for structuring report out objects
-      // int fleet_idx = 0;
-      // fleet_iterator fit;
-      // for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
-      //   std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-      //   std::map<std::string, fims::Vector<Type>> &derived_quantities =
-      //       this->fleet_derived_quantities[fleet->GetId()];
-      //   landings_w(fleet_idx) = derived_quantities["landings_weight"];
-      //   landings_n(fleet_idx) = derived_quantities["landings_numbers"];
-      //   landings_exp(fleet_idx) = derived_quantities["landings_expected"];
-      //   landings_naa(fleet_idx) = derived_quantities["landings_numbers_at_age"];
-      //   landings_waa(fleet_idx) = derived_quantities["landings_weight_at_age"];
-      //   landings_nal(fleet_idx) =
-      //       derived_quantities["landings_numbers_at_length"];
-      //   index_w(fleet_idx) = derived_quantities["index_weight"];
-      //   index_n(fleet_idx) = derived_quantities["index_numbers"];
-      //   index_exp(fleet_idx) = derived_quantities["index_expected"];
-      //   index_naa(fleet_idx) = derived_quantities["index_numbers_at_age"];
-      //   index_nal(fleet_idx) = derived_quantities["index_numbers_at_length"];
-      //   agecomp_exp(fleet_idx) = derived_quantities["agecomp_expected"];
-      //   lengthcomp_exp(fleet_idx) = derived_quantities["lengthcomp_expected"];
-      //   agecomp_prop(fleet_idx) = derived_quantities["agecomp_proportion"];
-      //   lengthcomp_prop(fleet_idx) = derived_quantities["lengthcomp_proportion"];
-      //   F_mort(fleet_idx) = derived_quantities["Fmort"];
-      //   q(fleet_idx) = derived_quantities["q"];
-      //   fleet_idx += 1;
-      // }
+      // initiate fleet index for structuring report out objects
+      int fleet_idx = 0;
+      fleet_iterator fit;
+      for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
+        std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+        std::map<std::string, fims::Vector<Type>> &derived_quantities =
+            this->GetFleetDerivedQuantities(fleet->GetId());
+        landings_w(fleet_idx) = derived_quantities["landings_weight"];
+        landings_n(fleet_idx) = derived_quantities["landings_numbers"];
+        landings_exp(fleet_idx) = derived_quantities["landings_expected"];
+        landings_naa(fleet_idx) = derived_quantities["landings_numbers_at_age"];
+        landings_waa(fleet_idx) = derived_quantities["landings_weight_at_age"];
+        landings_nal(fleet_idx) =
+            derived_quantities["landings_numbers_at_length"];
+        index_w(fleet_idx) = derived_quantities["index_weight"];
+        index_n(fleet_idx) = derived_quantities["index_numbers"];
+        index_exp(fleet_idx) = derived_quantities["index_expected"];
+        index_naa(fleet_idx) = derived_quantities["index_numbers_at_age"];
+        index_nal(fleet_idx) = derived_quantities["index_numbers_at_length"];
+        agecomp_exp(fleet_idx) = derived_quantities["agecomp_expected"];
+        lengthcomp_exp(fleet_idx) = derived_quantities["lengthcomp_expected"];
+        agecomp_prop(fleet_idx) = derived_quantities["agecomp_proportion"];
+        lengthcomp_prop(fleet_idx) = derived_quantities["lengthcomp_proportion"];
+        F_mort(fleet_idx) = derived_quantities["Fmort"];
+        q(fleet_idx) = derived_quantities["q"];
+        fleet_idx += 1;
+      }
 
-      // // FIMS_REPORT_F(rec_nll, this->of);
-      // // FIMS_REPORT_F(age_comp_nll, this->of);
-      // // FIMS_REPORT_F(index_nll, this->of);
-      // FIMS_REPORT_F(naa, this->of);
-      // FIMS_REPORT_F(ssb, this->of);
-      // FIMS_REPORT_F(log_recruit_dev, this->of);
-      // FIMS_REPORT_F(log_r, this->of);
-      // FIMS_REPORT_F(recruitment, this->of);
-      // FIMS_REPORT_F(biomass, this->of);
-      // FIMS_REPORT_F(M, this->of);
-      // FIMS_REPORT_F(total_landings_w, this->of);
-      // FIMS_REPORT_F(total_landings_n, this->of);
-      // FIMS_REPORT_F(landings_w, this->of);
-      // FIMS_REPORT_F(landings_n, this->of);
-      // FIMS_REPORT_F(landings_exp, this->of);
-      // FIMS_REPORT_F(landings_naa, this->of);
-      // FIMS_REPORT_F(landings_waa, this->of);
-      // FIMS_REPORT_F(landings_nal, this->of);
-      // FIMS_REPORT_F(index_w, this->of);
-      // FIMS_REPORT_F(index_n, this->of);
-      // FIMS_REPORT_F(index_exp, this->of);
-      // FIMS_REPORT_F(index_naa, this->of);
-      // FIMS_REPORT_F(index_nal, this->of);
-      // FIMS_REPORT_F(agecomp_exp, this->of);
-      // FIMS_REPORT_F(lengthcomp_exp, this->of);
-      // FIMS_REPORT_F(agecomp_prop, this->of);
-      // FIMS_REPORT_F(lengthcomp_prop, this->of);
-      // FIMS_REPORT_F(F_mort, this->of);
-      // FIMS_REPORT_F(q, this->of);
+      // FIMS_REPORT_F(rec_nll, this->of);
+      // FIMS_REPORT_F(age_comp_nll, this->of);
+      // FIMS_REPORT_F(index_nll, this->of);
+      FIMS_REPORT_F(naa, this->of);
+      FIMS_REPORT_F(ssb, this->of);
+      FIMS_REPORT_F(log_recruit_dev, this->of);
+      FIMS_REPORT_F(log_r, this->of);
+      FIMS_REPORT_F(recruitment, this->of);
+      FIMS_REPORT_F(biomass, this->of);
+      FIMS_REPORT_F(M, this->of);
+      FIMS_REPORT_F(total_landings_w, this->of);
+      FIMS_REPORT_F(total_landings_n, this->of);
+      FIMS_REPORT_F(landings_w, this->of);
+      FIMS_REPORT_F(landings_n, this->of);
+      FIMS_REPORT_F(landings_exp, this->of);
+      FIMS_REPORT_F(landings_naa, this->of);
+      FIMS_REPORT_F(landings_waa, this->of);
+      FIMS_REPORT_F(landings_nal, this->of);
+      FIMS_REPORT_F(index_w, this->of);
+      FIMS_REPORT_F(index_n, this->of);
+      FIMS_REPORT_F(index_exp, this->of);
+      FIMS_REPORT_F(index_naa, this->of);
+      FIMS_REPORT_F(index_nal, this->of);
+      FIMS_REPORT_F(agecomp_exp, this->of);
+      FIMS_REPORT_F(lengthcomp_exp, this->of);
+      FIMS_REPORT_F(agecomp_prop, this->of);
+      FIMS_REPORT_F(lengthcomp_prop, this->of);
+      FIMS_REPORT_F(F_mort, this->of);
+      FIMS_REPORT_F(q, this->of);
 
-      // /*ADREPORT using ADREPORTvector defined in
-      //  * inst/include/interface/interface.hpp:
-      //  * function collapses the nested vector into a single vector
-      //  */
-      // vector<Type> NAA = ADREPORTvector(naa);
-      // vector<Type> Biomass = ADREPORTvector(biomass);
-      // vector<Type> SSB = ADREPORTvector(ssb);
-      // vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
-      // vector<Type> FMort = ADREPORTvector(F_mort);
-      // vector<Type> Q = ADREPORTvector(q);
-      // vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
-      // vector<Type> IndexExpected = ADREPORTvector(index_exp);
-      // vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
-      // vector<Type> LandingsNumberAtLength = ADREPORTvector(landings_nal);
-      // vector<Type> IndexNumberAtAge = ADREPORTvector(index_naa);
-      // vector<Type> IndexNumberAtLength = ADREPORTvector(index_nal);
-      // vector<Type> AgeCompositionExpected = ADREPORTvector(agecomp_exp);
-      // vector<Type> LengthCompositionExpected = ADREPORTvector(lengthcomp_exp);
-      // vector<Type> AgeCompositionProportion = ADREPORTvector(agecomp_prop);
-      // vector<Type> LengthCompositionProportion = ADREPORTvector(lengthcomp_prop);
+      /*ADREPORT using ADREPORTvector defined in
+       * inst/include/interface/interface.hpp:
+       * function collapses the nested vector into a single vector
+       */
+      vector<Type> NAA = ADREPORTvector(naa);
+      vector<Type> Biomass = ADREPORTvector(biomass);
+      vector<Type> SSB = ADREPORTvector(ssb);
+      vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
+      vector<Type> FMort = ADREPORTvector(F_mort);
+      vector<Type> Q = ADREPORTvector(q);
+      vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
+      vector<Type> IndexExpected = ADREPORTvector(index_exp);
+      vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
+      vector<Type> LandingsNumberAtLength = ADREPORTvector(landings_nal);
+      vector<Type> IndexNumberAtAge = ADREPORTvector(index_naa);
+      vector<Type> IndexNumberAtLength = ADREPORTvector(index_nal);
+      vector<Type> AgeCompositionExpected = ADREPORTvector(agecomp_exp);
+      vector<Type> LengthCompositionExpected = ADREPORTvector(lengthcomp_exp);
+      vector<Type> AgeCompositionProportion = ADREPORTvector(agecomp_prop);
+      vector<Type> LengthCompositionProportion = ADREPORTvector(lengthcomp_prop);
 
-      // ADREPORT_F(NAA, this->of);
-      // ADREPORT_F(Biomass, this->of);
-      // ADREPORT_F(SSB, this->of);
-      // ADREPORT_F(LogRecDev, this->of);
-      // ADREPORT_F(FMort, this->of);
-      // ADREPORT_F(Q, this->of);
-      // ADREPORT_F(LandingsExpected, this->of);
-      // ADREPORT_F(IndexExpected, this->of);
-      // ADREPORT_F(LandingsNumberAtAge, this->of);
-      // ADREPORT_F(LandingsNumberAtLength, this->of);
-      // ADREPORT_F(IndexNumberAtAge, this->of);
-      // ADREPORT_F(IndexNumberAtLength, this->of);
-      // ADREPORT_F(AgeCompositionExpected, this->of);
-      // ADREPORT_F(LengthCompositionExpected, this->of);
-      // ADREPORT_F(AgeCompositionProportion, this->of);
-      // ADREPORT_F(LengthCompositionProportion, this->of);
+      ADREPORT_F(NAA, this->of);
+      ADREPORT_F(Biomass, this->of);
+      ADREPORT_F(SSB, this->of);
+      ADREPORT_F(LogRecDev, this->of);
+      ADREPORT_F(FMort, this->of);
+      ADREPORT_F(Q, this->of);
+      ADREPORT_F(LandingsExpected, this->of);
+      ADREPORT_F(IndexExpected, this->of);
+      ADREPORT_F(LandingsNumberAtAge, this->of);
+      ADREPORT_F(LandingsNumberAtLength, this->of);
+      ADREPORT_F(IndexNumberAtAge, this->of);
+      ADREPORT_F(IndexNumberAtLength, this->of);
+      ADREPORT_F(AgeCompositionExpected, this->of);
+      ADREPORT_F(LengthCompositionExpected, this->of);
+      ADREPORT_F(AgeCompositionProportion, this->of);
+      ADREPORT_F(LengthCompositionProportion, this->of);
 
 #endif
     }
