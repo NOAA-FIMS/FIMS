@@ -476,10 +476,6 @@ RCPP_MODULE(fims)
             .constructor()
             .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
             .method("get_output", &CatchAtAgeInterface::to_json);
-
-        //   Rcpp::class_<SurplusProductionInterface>("SurplusProduction")
-        //       .constructor()
-        //       .method("AddPopulation", &SurplusProductionInterface::AddPopulation);
 }
 
 #endif /* SRC_FIMS_MODULES_HPP */
