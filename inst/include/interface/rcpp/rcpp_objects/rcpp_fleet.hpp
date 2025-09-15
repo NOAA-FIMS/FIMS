@@ -626,7 +626,7 @@ public:
     ss << "\n],\n \"derived_quantities\":[\n";
     ss << "{\n";
     ss << "  \"name\": \"landings_naa\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_landings_naa.size() == 0)
     {
       ss << "]\n";
@@ -644,7 +644,7 @@ public:
 
     ss << " {\n";
     ss << "  \"name\": \"landings_nal\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_landings_nal.size() == 0)
     {
       ss << "]\n";
@@ -662,7 +662,7 @@ public:
 
     ss << " {\n";
     ss << "  \"name\": \"landings_waa\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_landings_waa.size() == 0)
     {
       ss << "]\n";
@@ -680,7 +680,7 @@ public:
 
     ss << " {\n";
     ss << "  \"name\": \"index_naa\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_index_naa.size() == 0)
     {
       ss << "]\n";
@@ -698,7 +698,7 @@ public:
 
     ss << " {\n";
     ss << "  \"name\": \"index_nal\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_index_nal.size() == 0)
     {
       ss << "]\n";
@@ -716,7 +716,7 @@ public:
 
     ss << " {\n";
     ss << "  \"name\": \"index_waa\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_index_waa.size() == 0)
     {
       ss << "]\n";
@@ -734,7 +734,7 @@ public:
 
     ss << "{\n";
     ss << "  \"name\": \"agecomp_expected \",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_agecomp_expected.size() == 0)
     {
       ss << "]\n";
@@ -753,7 +753,7 @@ public:
 
     ss << " {\n";
     ss << "  \"name\": \"lengthcomp_expected \",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_lengthcomp_expected.size() == 0)
     {
       ss << "]\n";
@@ -773,7 +773,7 @@ public:
 
     ss << "{\n";
     ss << "  \"name\": \"agecomp_proportion \",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_agecomp_proportion.size() == 0)
     {
       ss << "]\n";
@@ -793,7 +793,7 @@ public:
 
     ss << " {\n";
     ss << "  \"name\": \"lengthcomp_proportion \",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_lengthcomp_proportion.size() == 0)
     {
       ss << "]\n";
@@ -813,7 +813,7 @@ public:
 
     ss << "{\n";
     ss << "  \"name\": \"index_expected\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_index_expected.size() == 0)
     {
       ss << "]\n";
@@ -832,7 +832,7 @@ public:
 
     ss << "{\n";
     ss << "  \"name\": \"index_weight\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_index_w.size() == 0)
     {
       ss << "]\n";
@@ -849,7 +849,7 @@ public:
 
     ss << "{\n";
     ss << "  \"name\": \"index_numbers\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_index_n.size() == 0)
     {
       ss << "]\n";
@@ -866,7 +866,7 @@ public:
 
     ss << "{\n";
     ss << "  \"name\": \"landings_expected\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_landings_expected.size() == 0)
     {
       ss << "]\n";
@@ -886,7 +886,7 @@ public:
 
     ss << "{\n";
     ss << "  \"name\": \"landings_weight\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_landings_w.size() == 0)
     {
       ss << "]\n";
@@ -904,7 +904,7 @@ public:
 
     ss << "{\n";
     ss << "  \"name\": \"landings_numbers\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_landings_n.size() == 0)
     {
       ss << "]\n";

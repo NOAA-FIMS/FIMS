@@ -405,7 +405,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     ss << " \"derived_quantities\": [{\n";
     ss << "  \"name\": \"SSB\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->derived_ssb.size() == 0) {
       ss << "]\n";
     } else {
@@ -418,7 +418,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     ss << "{\n";
     ss << "   \"name\": \"NAA\",\n";
-    ss << "   \"values\":[";
+    ss << "   \"value\":[";
     if (this->derived_naa.size() == 0) {
       ss << "]\n";
     } else {
@@ -431,7 +431,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     ss << "{\n";
     ss << "   \"name\": \"Biomass\",\n";
-    ss << "   \"values\":[";
+    ss << "   \"value\":[";
     if (this->derived_biomass.size() == 0) {
       ss << "]\n";
     } else {
@@ -444,7 +444,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     ss << "{\n";
     ss << "   \"name\": \"Recruitment\",\n";
-    ss << "   \"values\":[";
+    ss << "   \"value\":[";
     if (this->derived_recruitment.size() == 0) {
       ss << "]\n";
     } else {

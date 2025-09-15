@@ -1,11 +1,10 @@
-# To remove the NOTE
-# no visible binding for global variable
+# This file contains many functions to reshape output from get_output()
+# To remove the NOTE `no visible binding for global variable`
 utils::globalVariables(c(
   "module_name", "module_id", "module_type",
   "parameter_min", "parameter_max", "label", "label_splits"
 ))
 
-# A list of functions to reshape output from finalize()
 #' Reshape JSON estimates
 #'
 #' @description
@@ -13,12 +12,22 @@ utils::globalVariables(c(
 #' parameter estimates into a structured tibble for easier analysis and
 #' manipulation.
 #'
-#' @param finalized_fims A JSON object containing the finalized FIMS output.
+#' @param finalized_fims A JSON object containing the finalized FIMS output as
+#'   returned from `get_output()`, which is an internal function to each model
+#'   family.
 #' @param opt An object returned from an optimizer, typically from
 #'   [stats::nlminb()], used to fit a TMB model.
 #' @return A tibble containing the reshaped parameter estimates.
 reshape_json_estimates <- function(finalized_fims, opt = list()) {
   json_list <- jsonlite::fromJSON(finalized_fims)
+  read_list <- purrr::map(
+    json_list[-c(1:5, 10, 11)],
+    \(x) tidyr::unnest_wider(tibble::tibble(json = x), json)
+  )
+
+  # Process the fleet-level information
+
+
   # Identify the index of the "modules" element in `json_list` by matching its name.
   # This is used to locate the relevant part of the JSON structure for further processing.
   modules_id <- which(names(json_list) == "modules")
@@ -413,4 +422,75 @@ reshape_json_fits <- function(finalized_fims) {
       .before = tidyselect::everything()
     ) |>
     tibble::as_tibble()
+}
+
+#TODO: document
+dimension_folded_to_tibble <- function(section) {
+  if (length(section) == 0) {
+    return(NA)
+  }
+  while (length(section) == 1) {
+    unlist(section, recursive = FALSE)
+  }
+  temp <- dimensions_to_tibble(section[["dimensionality"]]) |>
+    dplyr::mutate(name = section[["name"]])
+  if ("type" %in% names(section)) {
+    temp |>
+      dplyr::mutate(
+        module_id = section[["id"]],
+        type = section[["type"]]
+      ) |>
+      dplyr::bind_cols(
+        tibble::tibble(data = section[["values"]]) |>
+          tidyr::unnest_wider(data)
+      ) |>
+      dplyr::select(-min, -max)
+  } else {
+    temp |>
+      dplyr::bind_cols(
+        values = unlist(section[["values"]]),
+        uncertainty = unlist(section[["uncertainty"]]),
+        estimationtypeis = "derived_quantity"
+      )
+  }
+}
+
+#' Covert the dimension information from a FIMS json output into a tibble
+#'
+#' Dimensions in the json output are stored as a list of length two, with the
+#' header information containing the name of the dimension and the dimensions
+#' containing integers specifying the length for each dimension. The result
+#' helps interpret how the FIMS output is structured given it is dimension
+#' folded into a single vector in the json output.
+#'
+#' @param data A list containing the header and dimensions information from a
+#'   FIMS json output object.
+#' @return
+#' A tibble containing ordered rows for each combination of the dimensions.
+#' @examples
+#' dummy_dimensions <- list(
+#'   header = list("nyears", "nages"),
+#'   dimensions = list(30L, 12L)
+#' )
+#' dimensions_to_tibble(dummy_dimensions)
+#' Example with nyears+1
+#' dummy_dimensions <- list(
+#'   header = list("nyears+1", "nages"),
+#'   dimensions = list(31L, 12L)
+#' )
+#' dimensions_to_tibble(dummy_dimensions)
+dimensions_to_tibble <- function(data) {
+  better_names <- unlist(data[["header"]]) |>
+    gsub(pattern = "^n(.+)s(\\+\\d+)?$", replacement = "\\1_i")
+  names(data[["dimensions"]]) <- better_names
+  if (length(better_names) == 1 && is.na(better_names)) {
+    browser()
+    return(tibble::tibble())
+  }
+  # Create the returned tibble by first sequencing from 1:n for each dimension
+  data[["dimensions"]] |>
+    purrr::map(seq) |>
+    expand.grid() |>
+    tibble::as_tibble() |>
+    dplyr::arrange(!!! rlang::syms(better_names))
 }

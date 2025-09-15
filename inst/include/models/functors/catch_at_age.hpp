@@ -363,7 +363,7 @@ namespace fims_popdy
       // ss << std::fixed;
       ss << "{\n";
       ss << "\"name\":\"" << (*it).first << "\",\n";
-      ss << "\"values\":[";
+      ss << "\"value\":[";
 
       if (dq.size() > 0)
       {

@@ -219,9 +219,9 @@ public:
     {
       std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
       ss << "{\n";
-
-      ss << " \"name\" : \"" << population_interface->name << "\",\n";
-      ss << " \"id\": " << population_interface->id << ",\n";
+  
+      ss << " \"population\" : \"" << population_interface->name << "\",\n";
+      ss << " \"population_id\": " << population_interface->id << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
          << ",\n";
       ss << " \"growth_id\": " << population_interface->growth_id << ",\n";
@@ -356,7 +356,7 @@ public:
     ss << "{\n";
     ss << "\"name\":\"" << (*it).first << "\",\n";
     ss << dim_entry.str() << ",\n";
-    ss << "\"values\":[";
+    ss << "\"value\":[";
 
     if (dq.size() > 0)
     {
@@ -472,16 +472,16 @@ public:
       std::shared_ptr<fims_popdy::Fleet<double>> &fleet = (*fit).second;
 
       ss << "{\n";
-      ss << " \"name\" : \"" << fleet_interface->name << "\",\n";
-      ss << " \"id\": " << fleet_interface->id << ",\n";
+      ss << " \"fleet\" : \"" << fleet_interface->name << "\",\n";
+      ss << " \"fleet_id\": " << fleet_interface->id << ",\n";
       ss << " \"nages\": " << fleet_interface->nages.get() << ",\n";
       ss << " \"nyears\": " << fleet_interface->nyears.get() << ",\n";
       ss << " \"nlengths\": " << fleet_interface->nlengths.get() << ",\n";
       ss << "\"data_ids\" : [\n";
-      ss << "{\"interface_observed_agecomp_data_id_m\": " << fleet_interface->GetObservedAgeCompDataID() << "},\n";
-      ss << "{\"interface_observed_lengthcomp_data_id_m\": " << fleet_interface->GetObservedLengthCompDataID() << "},\n";
-      ss << "{\"interface_observed_index_data_id_m\": " << fleet_interface->GetObservedIndexDataID() << "},\n";
-      ss << "{\"interface_observed_landings_data_id_m\": " << fleet_interface->GetObservedLandingsDataID() << "}\n";
+      ss << "{\"age_comp\": " << fleet_interface->GetObservedAgeCompDataID() << "},\n";
+      ss << "{\"length_comp\": " << fleet_interface->GetObservedLengthCompDataID() << "},\n";
+      ss << "{\"index\": " << fleet_interface->GetObservedIndexDataID() << "},\n";
+      ss << "{\"landings\": " << fleet_interface->GetObservedLandingsDataID() << "}\n";
       ss << "],\n";
       ss << "\"parameters\": [\n";
       ss << "{\n";

@@ -188,12 +188,12 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
     ss << "{\n";
-    ss << " \"name\": \"maturity\",\n";
-    ss << " \"type\": \"logistic\",\n";
-    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"module_name\": \"maturity\",\n";
+    ss << " \"module_type\": \"logistic\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
-     ss << "   \"name\": \"inflection_point\",\n";
+    ss << "   \"name\": \"inflection_point\",\n";
     ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";

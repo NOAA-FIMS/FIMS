@@ -228,19 +228,19 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     ss << "   \"name\": \"log_r\",\n";
     ss << "   \"id\":" << this->log_r.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->log_r << "},\n";
+    ss << "   \"value\":" << this->log_r << "},\n";
 
     ss << "{\n";
     ss << "   \"name\": \"log_K\",\n";
     ss << "   \"id\":" << this->log_K.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->log_K << "}\n";
+    ss << "   \"value\":" << this->log_K << "}\n";
 
     ss << "{\n";
     ss << "   \"name\": \"log_m\",\n";
     ss << "   \"id\":" << this->log_m.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->log_m << "}\n";
+    ss << "   \"value\":" << this->log_m << "}\n";
 
     ss << "]}";
 

@@ -211,9 +211,9 @@ public:
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\":\"selectivity\",\n";
-    ss << " \"type\": \"Logistic\",\n";
-    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"module_name\":\"selectivity\",\n";
+    ss << " \"module_type\": \"Logistic\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
     ss << "   \"name\": \"inflection_point\",\n";
@@ -491,9 +491,9 @@ public:
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"selectivity\",\n";
-    ss << " \"type\": \"DoubleLogistic\",\n";
-    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"module_name\": \"selectivity\",\n";
+    ss << " \"module_type\": \"DoubleLogistic\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\":[\n{\n";
     ss << "   \"name\": \"inflection_point_asc\",\n";

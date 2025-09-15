@@ -322,10 +322,10 @@ public:
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0)
     {
-      ss << "]\n";
+      ss << "],\n";
     }
     else
     {
@@ -337,16 +337,12 @@ public:
       }
       ss << this->value_to_string(this->lpdf_vec[this->lpdf_vec.size() - 1]);
 
-      ss << "]\n";
+      ss << "],\n";
     }
-    ss << " },\n";
-
-    ss << " \"expected_values\": {\n";
-    ss << "  \"name\": \"expected_values\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"expected_values\":[";
     if (this->expected_values.size() == 0)
     {
-      ss << "]\n";
+      ss << "],\n";
     }
     else
     {
@@ -357,12 +353,9 @@ public:
       }
       ss << this->value_to_string(this->expected_values[this->expected_values.size() - 1]
                                       .final_value_m);
-      ss << "]\n";
+      ss << "],\n";
     }
-    ss << " },\n";
-    ss << " \"observed_values\": {\n";
-    ss << "  \"name\": \"x\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"observed_values\":[";
     if (this->x.size() == 0)
     {
       ss << "]\n";
@@ -664,7 +657,7 @@ public:
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0)
     {
       ss << "]\n";
@@ -677,16 +670,12 @@ public:
       }
       ss << this->value_to_string(this->lpdf_vec[this->lpdf_vec.size() - 1]);
 
-      ss << "]\n";
+      ss << "],\n";
     }
-    ss << " },\n";
-
-    ss << " \"expected_values\": {\n";
-    ss << "  \"name\": \"expected_values\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"expected_values\":[";
     if (this->expected_values.size() == 0)
     {
-      ss << "]\n";
+      ss << "],\n";
     }
     else
     {
@@ -698,12 +687,9 @@ public:
       ss << this->value_to_string(this->expected_values[this->expected_values.size() - 1]
                                       .final_value_m);
 
-      ss << "]\n";
+      ss << "],\n";
     }
-    ss << " },\n";
-    ss << " \"observed_values\": {\n";
-    ss << "  \"name\": \"x\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"observed_values\":[";
     if (this->x.size() == 0)
     {
       ss << "]\n";
@@ -1014,10 +1000,10 @@ public:
     ss << " \"density_component\": {\n";
     ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
-    ss << "  \"values\":[";
+    ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0)
     {
-      ss << "]\n";
+      ss << "],\n";
     }
     else
     {
@@ -1028,16 +1014,12 @@ public:
       }
       ss << this->value_to_string(this->lpdf_vec[this->lpdf_vec.size() - 1]);
 
-      ss << "]\n";
+      ss << "],\n";
     }
-    ss << " },\n";
-
-    ss << " \"expected_values\": {\n";
-    ss << "  \"name\": \"expected_values\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"expected_values\":[";
     if (this->expected_values.size() == 0)
     {
-      ss << "]\n";
+      ss << "],\n";
     }
     else
     {
@@ -1049,12 +1031,9 @@ public:
       ss << this->value_to_string(this->expected_values[this->expected_values.size() - 1]
                                       .final_value_m);
 
-      ss << "]\n";
+      ss << "],\n";
     }
-    ss << " },\n";
-    ss << " \"observed_values\": {\n";
-    ss << "  \"name\": \"x\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"observed_values\":[";
     if (this->x.size() == 0)
     {
       ss << "]\n";

@@ -175,20 +175,36 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
     ss << "{\n";
-    ss << " \"name\": \"growth\",\n";
-    ss << " \"type\" : \"EWAA\",\n";
-    ss << " \"id\":" << this->id << ",\n";
+    ss << " \"module_name\": \"growth\",\n";
+    ss << " \"module_type\" : \"EWAA\",\n";
+    ss << " \"module_id\":" << this->id << ",\n";
+    ss << " \"parameters\": [\n{\n";
+    ss << " \"name\": \"EWAA\",\n";
+    ss << " \"id\": -999,\n";
+    ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [\"nages\"],\n";
     ss << "  \"dimensions\": [" << this->ages.size() << "]\n},\n";
 
-    ss << " \"values\": [";
+    ss << " \"values\": [\n";
     for (size_t i = 0; i < weights.size() - 1; i++) {
-      ss << weights[i] << ", ";
+      ss << "{\n";
+      ss << "\"id\": -999,\n";
+      ss << "\"value\": " << weights[i] << ",\n";
+      ss << "\"min\": \"-Infinity\",\n";
+      ss << "\"max\": \"Infinity\",\n";
+      ss << "\"estimationtypeis\": \"constant\"\n";
+      ss << "},\n";
     }
-    ss << weights[weights.size() - 1] << "],\n";
-     ss << "\"uncertainty\" : " << fims::Vector<double>(ages.size(), -999);// << "\n}]\n";
-    ss << "}";
+    ss << "{\n";
+    ss << "\"id\": -999,\n";
+    ss << "\"value\": " << weights[weights.size() - 1] << ",\n";
+    ss << "\"min\": \"-Infinity\",\n";
+    ss << "\"max\": \"Infinity\",\n";
+    ss << "\"estimationtypeis\": \"constant\"\n";
+    ss << "}\n],\n";
+    ss << "\"uncertainty\" : " << fims::Vector<double>(ages.size(), -999);
+    ss << "}\n]\n}\n";
     return ss.str();
   }
 

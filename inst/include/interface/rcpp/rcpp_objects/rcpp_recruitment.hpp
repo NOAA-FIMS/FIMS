@@ -310,9 +310,9 @@ public:
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"recruitment\",\n";
-    ss << " \"type\": \"Beverton-Holt\",\n";
-    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"module_name\": \"recruitment\",\n";
+    ss << " \"module_type\": \"Beverton-Holt\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
     ss << "  \"name\": \"logit_steep\",\n";
@@ -339,7 +339,7 @@ public:
     ss << "   \"id\":" << this->log_devs.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [\"na\"],\n";
+    ss << "  \"header\": [\"nyears-1\"],\n";
     ss << "  \"dimensions\": [" << this->log_devs.size() << "]\n},\n";
     ss << "   \"values\":" << this->log_devs << ",\n";
     ss << "\"uncertainty\" : " << fims::Vector<double>(this->log_devs.size(), -999) << "}]\n";
