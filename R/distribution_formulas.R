@@ -264,7 +264,7 @@ get_expected_name <- function(family, data_type) {
 initialize_data_distribution <- function(
     module,
     family = NULL,
-    # Create a tibble with value and estiamtion_type column for sd
+    # Create a tibble with value and estimation_type column for sd
     sd = tibble::tibble(
       value = 1,
       estimation_type = "constant"

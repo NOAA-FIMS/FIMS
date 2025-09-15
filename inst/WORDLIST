@@ -136,6 +136,7 @@ CheckDimensions
 checkmarks
 CheckModelOutput
 choco
+chr
 chrono
 ci
 ClangFormat
@@ -143,6 +144,7 @@ clangFormatVersion
 ClassName
 clearup
 cli
+cls
 cmake
 CMake
 CMakeFiles
@@ -657,6 +659,7 @@ ParseStatus
 ParseString
 ParseValue
 ParseVector
+PascalCase
 passwd
 pbs
 pdHess
@@ -925,8 +928,10 @@ ToDo
 ToJSON
 toRVector
 toString
+toupper
 tparam
 traceback
+tribble
 trigamma
 trunc
 tryCatch
@@ -949,6 +954,7 @@ unlink
 unlist
 unname
 unnest
+unnested
 UNPROTECT
 UseDoubleValues
 useDynamicSymbols
