@@ -1,5 +1,5 @@
-#ifndef TEST_POPULATION_TEST_FIXTURE_HPP
-#define TEST_POPULATION_TEST_FIXTURE_HPP
+#ifndef TEST_CAA_TEST_FIXTURE_HPP
+#define TEST_CAA_TEST_FIXTURE_HPP
 #include <random>
 
 #include "../../inst/include/models/functors/catch_at_age.hpp"

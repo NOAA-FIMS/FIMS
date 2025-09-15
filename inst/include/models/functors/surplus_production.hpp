@@ -216,13 +216,13 @@ class SurplusProduction : public FisheryModelBase<Type> {
     //depletion ~ LN(log_expected_depletion, sigma)
     std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t year) {
-    // in first year, set log_expected_depletion to initial depletion 
+    // in first year, set depletion to initial depletion 
     if (year == 0) {
-      population->depletion->log_expected_depletion[0] =
-      fims_math::log(fims_math::inv_logit(
-        static_cast<Type>(0.0),static_cast<Type>(1.0),
-        population->logit_init_depletion[0]
-      ));
+      population->depletion->depletion[0] =
+      fims_math::inv_logit(
+          static_cast<Type>(0.0), static_cast<Type>(1.0),
+          population->logit_init_depletion[0]
+      );
 
     // for rest of time series, evaluation log_expected_depltion based on 
     // user-defined function
@@ -236,6 +236,9 @@ class SurplusProduction : public FisheryModelBase<Type> {
                                                ["observed_catch"]
                                                [year - 1])
           );
+        //first year depletion is initialized in rcpp interface at 0.5
+        //subsequent years are calculated based on inv_logit of logit_depletion
+        //logit_depletion is nyears-1 as first year depletion is informed by init_logit_depletion
         population->depletion->depletion[year] =
           fims_math::inv_logit(static_cast<Type>(0.0), static_cast<Type>(1.0),
           population->depletion->logit_depletion[year-1]);
@@ -258,8 +261,8 @@ class SurplusProduction : public FisheryModelBase<Type> {
       // depletion ~ LN(log_expected_depletion, sigma)
       //TODO: calculate using transformed q instead of log_q?
       this->fleet_derived_quantities[fleet->GetId()]["log_index_expected"][year] = 
-          fims_math::log(population->depletion->depletion[year] +
-          fleet->log_q.get_force_scalar(year));
+          fims_math::log(population->depletion->depletion[year]) +
+          fleet->log_q.get_force_scalar(year) + population->depletion->log_K[0];
 
       this->fleet_derived_quantities[fleet->GetId()]["index_expected"][year] =
           fims_math::exp(this->fleet_derived_quantities[fleet->GetId()]["log_index_expected"][year]);

@@ -326,3 +326,101 @@ target_link_libraries(FIMSJson_JsonParser_WriteToFile
 )
 
 gtest_discover_tests(FIMSJson_JsonParser_WriteToFile)
+
+
+# test_surplus_production_population.cpp
+add_executable(surplus_production_population_initialize_prepare
+  test_surplus_production_population_initialize_prepare.cpp
+)
+
+target_link_libraries(surplus_production_population_initialize_prepare
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_population_initialize_prepare)
+
+# test_surplus_production_fleet.cpp
+add_executable(surplus_production_fleet_initialize_prepare
+  test_surplus_production_fleet_initialize_prepare.cpp
+)
+
+target_link_libraries(surplus_production_fleet_initialize_prepare
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_fleet_initialize_prepare)
+
+# test_population_dynamics_depletion_pella_tomlinson.cpp
+add_executable(population_dynamics_depletion_pella_tomlinson
+  test_population_dynamics_depletion_pella_tomlinson.cpp
+)
+
+target_link_libraries(population_dynamics_depletion_pella_tomlinson
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_dynamics_depletion_pella_tomlinson)
+
+# test_surplus_production_Catch.cpp
+add_executable(surplus_production_Catch
+  test_surplus_production_Catch.cpp
+)
+
+target_link_libraries(surplus_production_Catch
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_Catch)
+
+# test_surplus_production_CalculateDepletion.cpp
+add_executable(surplus_production_CalculateDepletion
+  test_surplus_production_CalculateDepletion.cpp
+)
+
+target_link_libraries(surplus_production_CalculateDepletion
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_CalculateDepletion)
+
+# test_surplus_production_CalculateIndex.cpp
+add_executable(surplus_production_CalculateIndex
+  test_surplus_production_CalculateIndex.cpp
+)
+
+target_link_libraries(surplus_production_CalculateIndex
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_CalculateIndex)
+
+# test_surplus_production_CalculateBiomass.cpp
+add_executable(surplus_production_CalculateBiomass
+  test_surplus_production_CalculateBiomass.cpp
+)
+
+target_link_libraries(surplus_production_CalculateBiomass
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_CalculateBiomass)
+
+# test_surplus_production_CalculateRPs.cpp
+add_executable(surplus_production_CalculateRPs
+  test_surplus_production_CalculateRPs.cpp
+)
+
+target_link_libraries(surplus_production_CalculateRPs
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_CalculateRPs)
+

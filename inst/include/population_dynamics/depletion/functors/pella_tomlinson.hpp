@@ -10,6 +10,7 @@
 #define POPULATION_DYNAMICS_DEPLETION_PELLA_TOMLINSON_HPP
 
 #include "../../../common/fims_vector.hpp"
+#include "../../../common/fims_math.hpp"
 #include "depletion_base.hpp"
 
 namespace fims_popdy {
