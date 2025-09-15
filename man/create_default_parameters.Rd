@@ -98,7 +98,7 @@ parameters_with_double_logistic <- default_configurations |>
       fleet_name = "fleet1",
       module_type = "DoubleLogistic"
     ),
-  by = c("module_name", "fleet_name")
+    by = c("module_name", "fleet_name")
   ) |>
   create_default_parameters(
     data = fims_frame
