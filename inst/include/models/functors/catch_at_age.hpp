@@ -1191,7 +1191,7 @@ namespace fims_popdy
     {
       int n_fleets = this->fleets.size();
       int n_pops = this->populations.size();
-#ifdef TMB_MODEL
+#ifdef TMB_MODEL__
 
       // Create vector lists to store output for reporting
       // vector< vector<Type> > creates a nested vector structure where

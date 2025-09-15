@@ -512,11 +512,11 @@ public:
       ss << "  \"dimensions\": [" << fleet->log_q.size() << "]\n},\n";
 
       ss << " \"values\": " << fleet_interface->log_q << ",\n";
-      ss << "\"uncertainty\" : " << fims::Vector<double>(fleet_interface->log_q.size(), -999) << "},\n";
+      ss << "\"uncertainty\" : " << fims::Vector<double>(fleet_interface->log_q.size(), -999) << "}\n";
 
       if (fleet_interface->nlengths > 0)
       {
-        ss << " {\n";
+        ss << " ,{\n";
         for (size_t i = 0; i < fleet_interface->age_to_length_conversion.size();
              i++)
         {
