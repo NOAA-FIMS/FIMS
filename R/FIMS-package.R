@@ -43,7 +43,6 @@
 #' @export SharedInt
 #' @export SharedReal
 #' @export SharedString
-#' @export SurplusProduction
 #' @import methods
 #' @import stats
 #' @importFrom ggplot2 .data

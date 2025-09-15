@@ -637,9 +637,10 @@ public:
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end(); module_id_it++)
     {
 
-      GrowthInterfaceBase *growth_interface =
+      std::shared_ptr<GrowthInterfaceBase> growth_interface =
           GrowthInterfaceBase::live_objects[*module_id_it];
-      if (growth_interface)
+
+      if (growth_interface != NULL)
       {
         growth_interface->finalize();
         ss << growth_interface->to_json();
@@ -655,7 +656,7 @@ public:
     ss << "\"recruitment\": [\n";
     for (module_id_it = recruitment_ids.begin(); module_id_it != recruitment_ids.end(); module_id_it++)
     {
-      RecruitmentInterfaceBase *recruitment_interface =
+      std::shared_ptr<RecruitmentInterfaceBase> recruitment_interface =
           RecruitmentInterfaceBase::live_objects[*module_id_it];
       if (recruitment_interface)
       {
@@ -672,7 +673,7 @@ public:
     ss << "\"maturity\": [\n";
     for (module_id_it = maturity_ids.begin(); module_id_it != maturity_ids.end(); module_id_it++)
     {
-      MaturityInterfaceBase *maturity_interface =
+      std::shared_ptr<MaturityInterfaceBase> maturity_interface =
           MaturityInterfaceBase::live_objects[*module_id_it];
       if (maturity_interface)
       {
@@ -689,7 +690,7 @@ public:
     ss << "\"selectivity\": [\n";
     for (module_id_it = selectivity_ids.begin(); module_id_it != selectivity_ids.end(); module_id_it++)
     {
-      SelectivityInterfaceBase *selectivity_interface =
+      std::shared_ptr<SelectivityInterfaceBase> selectivity_interface =
           SelectivityInterfaceBase::live_objects[*module_id_it];
       if (selectivity_interface)
       {
@@ -833,10 +834,10 @@ public:
 
     ss << "\"density_components\" : [\n";
 
-    typename std::map<uint32_t, DistributionsInterfaceBase *>::iterator dit;
+    typename std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>::iterator dit;
     for (dit = DistributionsInterfaceBase::live_objects.begin(); dit != DistributionsInterfaceBase::live_objects.end(); ++dit)
     {
-      DistributionsInterfaceBase *dist_interface = (*dit).second;
+      std::shared_ptr<DistributionsInterfaceBase> dist_interface = (*dit).second;
       if (dist_interface)
       {
         dist_interface->finalize();
@@ -849,10 +850,10 @@ public:
     }
     ss << "\n],\n";
     ss << "\"data\": [\n";
-    typename std::map<uint32_t, DataInterfaceBase *>::iterator d_it;
+    typename std::map<uint32_t, std::shared_ptr<DataInterfaceBase>>::iterator d_it;
     for (d_it = DataInterfaceBase::live_objects.begin(); d_it != DataInterfaceBase::live_objects.end(); ++d_it)
     {
-      DataInterfaceBase *data_interface = (*d_it).second;
+      std::shared_ptr<DataInterfaceBase> data_interface = (*d_it).second;
       if (data_interface)
       {
         data_interface->finalize();

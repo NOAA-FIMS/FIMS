@@ -40,7 +40,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    * This is a live object, which is an object that has been created and lives
    * in memory.
    */
-  static std::map<uint32_t, DataInterfaceBase *> live_objects;
+  static std::map<uint32_t, std::shared_ptr<DataInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
@@ -49,7 +49,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
     this->id = DataInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DataInterfaceBase */
-    DataInterfaceBase::live_objects[this->id] = this;
+    // DataInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -81,7 +81,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t DataInterfaceBase::id_g = 1;
 // local id of the DataInterfaceBase object map relating the ID of the
 // DataInterfaceBase to the DataInterfaceBase objects
-std::map<uint32_t, DataInterfaceBase *> DataInterfaceBase::live_objects;
+std::map<uint32_t, std::shared_ptr<DataInterfaceBase>> DataInterfaceBase::live_objects;
 
 /**
  * @brief  The Rcpp interface for AgeComp to instantiate the object from R:
@@ -117,9 +117,10 @@ class AgeCompDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->age_comp_data.resize(amax * ymax);
     this->uncertainty.resize(amax * ymax);
-
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<AgeCompDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<AgeCompDataInterface>(*this));
+        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -257,9 +258,10 @@ class LengthCompDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->length_comp_data.resize(lmax * ymax);
     this->uncertainty.resize(lmax * ymax);
-
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<LengthCompDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LengthCompDataInterface>(*this));
+        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -384,9 +386,10 @@ class IndexDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->index_data.resize(ymax);
     this->uncertainty.resize(ymax);
-
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<IndexDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<IndexDataInterface>(*this));
+        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -512,9 +515,10 @@ class LandingsDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->landings_data.resize(ymax);
     this->uncertainty.resize(ymax);
-
+DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<LandingsDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LandingsDataInterface>(*this));
+        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**

@@ -32,7 +32,7 @@ public:
    * objects. This is a live object, which is an object that has been created
    * and lives in memory.
    */
-  static std::map<uint32_t, SelectivityInterfaceBase *> live_objects;
+  static std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
@@ -42,7 +42,7 @@ public:
     this->id = SelectivityInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     SelectivityInterfaceBase */
-    SelectivityInterfaceBase::live_objects[this->id] = this;
+    // SelectivityInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -73,7 +73,7 @@ public:
 uint32_t SelectivityInterfaceBase::id_g = 1;
 // local id of the SelectivityInterfaceBase object map relating the ID of the
 // SelectivityInterfaceBase to the SelectivityInterfaceBase objects
-std::map<uint32_t, SelectivityInterfaceBase *>
+std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
     SelectivityInterfaceBase::live_objects;
 
 /**
@@ -98,8 +98,10 @@ public:
    */
   LogisticSelectivityInterface() : SelectivityInterfaceBase()
   {
+    SelectivityInterfaceBase::live_objects[this->id] =
+        std::make_shared<LogisticSelectivityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LogisticSelectivityInterface>(*this));
+        SelectivityInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -348,8 +350,10 @@ public:
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase()
   {
+    SelectivityInterfaceBase::live_objects[this->id] =
+        std::make_shared<DoubleLogisticSelectivityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<DoubleLogisticSelectivityInterface>(*this));
+        SelectivityInterfaceBase::live_objects[this->id]);
   }
 
   /**

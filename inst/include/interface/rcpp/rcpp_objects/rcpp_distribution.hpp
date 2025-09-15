@@ -41,7 +41,7 @@ public:
      DistributionsInterfaceBase objects. This is a live object, which is an
      object that has been created and lives in memory.
    */
-  static std::map<uint32_t, DistributionsInterfaceBase *> live_objects;
+  static std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>> live_objects;
   /**
    * @brief The ID of the observed data object, which is set to -999.
    */
@@ -60,7 +60,7 @@ public:
     this->id_m = DistributionsInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DistributionsInterfaceBase */
-    DistributionsInterfaceBase::live_objects[this->id_m] = this;
+    // DistributionsInterfaceBase::live_objects[this->id_m] = this;
   }
 
   /**
@@ -116,7 +116,7 @@ public:
 uint32_t DistributionsInterfaceBase::id_g = 1;
 // local id of the DistributionsInterfaceBase object map relating the ID of the
 // DistributionsInterfaceBase to the DistributionsInterfaceBase objects
-std::map<uint32_t, DistributionsInterfaceBase *>
+std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
     DistributionsInterfaceBase::live_objects;
 
 /**
@@ -150,8 +150,10 @@ public:
    */
   DnormDistributionsInterface() : DistributionsInterfaceBase()
   {
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<DnormDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<DnormDistributionsInterface>(*this));
+        DistributionsInterfaceBase::live_objects[this->id_m]);
   }
 
   /**
@@ -486,8 +488,10 @@ public:
    */
   DlnormDistributionsInterface() : DistributionsInterfaceBase()
   {
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<DlnormDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<DlnormDistributionsInterface>(*this));
+        DistributionsInterfaceBase::live_objects[this->id_m]);
   }
 
   /**
@@ -822,8 +826,10 @@ public:
    */
   DmultinomDistributionsInterface() : DistributionsInterfaceBase()
   {
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<DmultinomDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<DmultinomDistributionsInterface>(*this));
+        DistributionsInterfaceBase::live_objects[this->id_m]);
   }
 
   /**

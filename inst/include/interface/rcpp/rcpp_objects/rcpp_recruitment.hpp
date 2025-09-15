@@ -37,7 +37,7 @@ public:
    * objects. This is a live object, which is an object that has been created
    * and lives in memory.
    */
-  static std::map<uint32_t, RecruitmentInterfaceBase *> live_objects;
+  static std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
@@ -47,7 +47,7 @@ public:
     this->id = RecruitmentInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     RecruitmentInterfaceBase */
-    RecruitmentInterfaceBase::live_objects[this->id] = this;
+    // RecruitmentInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -85,7 +85,7 @@ public:
 uint32_t RecruitmentInterfaceBase::id_g = 1;
 // local id of the RecruitmentInterfaceBase object map relating the ID of the
 // RecruitmentInterfaceBase to the RecruitmentInterfaceBase objects
-std::map<uint32_t, RecruitmentInterfaceBase *>
+std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
     RecruitmentInterfaceBase::live_objects;
 
 /**
@@ -139,8 +139,10 @@ public:
    */
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase()
   {
+    RecruitmentInterfaceBase::live_objects[this->id] =
+        std::make_shared<BevertonHoltRecruitmentInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<BevertonHoltRecruitmentInterface>(*this));
+        RecruitmentInterfaceBase::live_objects[this->id]);
   }
 
   /**

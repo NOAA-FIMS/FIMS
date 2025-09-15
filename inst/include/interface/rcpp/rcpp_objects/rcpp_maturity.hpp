@@ -31,7 +31,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
    * This is a live object, which is an object that has been created and lives
    * in memory.
    */
-  static std::map<uint32_t, MaturityInterfaceBase*> live_objects;
+  static std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
@@ -40,7 +40,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
     this->id = MaturityInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     MaturityInterfaceBase */
-    MaturityInterfaceBase::live_objects[this->id] = this;
+    // MaturityInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -70,7 +70,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t MaturityInterfaceBase::id_g = 1;
 // local id of the MaturityInterfaceBase object map relating the ID of the
 // MaturityInterfaceBase to the MaturityInterfaceBase objects
-std::map<uint32_t, MaturityInterfaceBase*> MaturityInterfaceBase::live_objects;
+std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>> MaturityInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for logistic maturity to instantiate the object from R:
@@ -91,8 +91,10 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * @brief The constructor.
    */
   LogisticMaturityInterface() : MaturityInterfaceBase() {
+    MaturityInterfaceBase::live_objects[this->id] =
+        std::make_shared<LogisticMaturityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LogisticMaturityInterface>(*this));
+         MaturityInterfaceBase::live_objects[this->id]);
   }
 
   /**
