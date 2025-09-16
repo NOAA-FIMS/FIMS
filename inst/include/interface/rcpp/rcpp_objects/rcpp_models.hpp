@@ -558,6 +558,87 @@ public:
     return ss.str();
   }
 
+  Rcpp::NumericVector get_fixed_parameters_vector()
+  {
+    // base model
+    std::shared_ptr<fims_info::Information<double>> info0 =
+        fims_info::Information<double>::GetInstance();
+
+    Rcpp::NumericVector p;
+
+    for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++)
+    {
+      p.push_back(*info0->fixed_effects_parameters[i]);
+    }
+
+    return p;
+  }
+
+  Rcpp::NumericVector get_random_parameters_vector()
+  {
+    // base model
+    std::shared_ptr<fims_info::Information<double>> d0 =
+        fims_info::Information<double>::GetInstance();
+
+    Rcpp::NumericVector p;
+
+    for (size_t i = 0; i < d0->random_effects_parameters.size(); i++)
+    {
+      p.push_back(*d0->random_effects_parameters[i]);
+    }
+
+    return p;
+  }
+
+  Rcpp::List get_report()
+  {
+    Rcpp::Environment base = Rcpp::Environment::base_env();
+    Rcpp::Function summary = base["summary"];
+
+    // Grab needed R functions
+    Rcpp::Environment TMB = Rcpp::Environment::namespace_env("TMB");
+    Rcpp::Function MakeADFun = TMB["MakeADFun"];
+    Rcpp::Function sdreport = TMB["sdreport"];
+    // Grab your helpers from R global environment
+    Rcpp::Environment global = Rcpp::Environment::global_env();
+    // Build parameters list
+    Rcpp::List parameters = Rcpp::List::create(
+        Rcpp::Named("p") = this->get_fixed_parameters_vector(),
+        Rcpp::Named("re") = this->get_random_parameters_vector());
+    // Call MakeADFun with map = NULL
+    Rcpp::List obj = MakeADFun(
+        Rcpp::Named("data") = Rcpp::List::create(),
+        Rcpp::Named("parameters") = parameters,
+        Rcpp::Named("DLL") = "FIMS",
+        Rcpp::Named("silent") = true,
+        Rcpp::Named("map") = R_NilValue,
+        Rcpp::Named("random") = "re");
+    // Call obj$report()
+    Rcpp::Function report = obj["report"];
+    Rcpp::List rep = report();
+    // // Standard deviations
+    SEXP sdr = sdreport(obj);
+    Rcpp::RObject sdr_summary = summary(sdr, "report");
+    // return Rcpp::List::create(
+    //     Rcpp::Named("report") = rep,
+    //     Rcpp::Named("sdr_summary") = sdr_summary);
+
+    Rcpp::NumericMatrix mat(sdr_summary);
+    Rcpp::List dimnames = mat.attr("dimnames");
+    Rcpp::CharacterVector rownames = dimnames[0];
+    Rcpp::CharacterVector colnames = dimnames[1];
+
+    // Example: grab "Estimate" for first row
+    double first_est = mat(0, 0);
+
+    return Rcpp::List::create(
+        Rcpp::Named("report") = rep,
+        Rcpp::Named("sdr_summary") = sdr_summary,
+        Rcpp::Named("first_est") = first_est,
+        Rcpp::Named("rownames") = rownames,
+        Rcpp::Named("colnames") = colnames);
+  }
+
   /**
    * @brief Method to convert the model to a JSON string.
    */

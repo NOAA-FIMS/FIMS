@@ -472,7 +472,8 @@ RCPP_MODULE(fims)
         Rcpp::class_<CatchAtAgeInterface>("CatchAtAge")
             .constructor()
             .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
-            .method("get_output", &CatchAtAgeInterface::to_json);
+            .method("get_output", &CatchAtAgeInterface::to_json)
+            .method("get_tmb_report", &CatchAtAgeInterface::get_report);
 }
 
 #endif /* SRC_FIMS_MODULES_HPP */
