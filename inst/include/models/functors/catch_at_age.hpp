@@ -1273,7 +1273,7 @@ namespace fims_popdy
           agecomp_prop(fleet_idx) = derived_quantities["agecomp_proportion"];
           lengthcomp_prop(fleet_idx) = derived_quantities["lengthcomp_proportion"];
           F_mort(fleet_idx) = derived_quantities["Fmort"];
-          q(fleet_idx) = derived_quantities["q"];
+       //   q(fleet_idx) = derived_quantities["q"];
           fleet_idx += 1;
         }
 

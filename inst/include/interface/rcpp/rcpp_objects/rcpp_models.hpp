@@ -426,6 +426,8 @@ public:
       dim_info_it = dim_info.find(it->first);
       ss << this->derived_quantity_to_json(it, dim_info_it->second) << ",\n";
     }
+
+
     dim_info_it = dim_info.find(second_to_last->first);
     if (dim_info_it != dim_info.end())
     {
@@ -433,6 +435,8 @@ public:
     }
     else
     {
+      std::cout<<"Missing dimension info for derived quantity: "<<second_to_last->first<<std::endl;
+      ss << "{}";
       // Handle case where dimension info is not found
     }
     return ss.str();
