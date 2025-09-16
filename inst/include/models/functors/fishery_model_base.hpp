@@ -49,6 +49,9 @@ namespace fims_popdy
     uint32_t id;          /*!< unique identifier assigned for fishery model object */
 
   public:
+#ifdef TMB_MODEL
+    bool do_reporting = true; /*!< flag to control reporting of derived quantities */
+#endif
     /**
      * @brief A string specifying the model type.
      *
@@ -107,7 +110,7 @@ namespace fims_popdy
      * @brief Shared pointer for the fleet dimension information map.
      */
     std::shared_ptr<DimensionInfoMap> fleet_dimension_info;
-    
+
     /**
      * @brief Shared pointer for the population dimension information map.
      */

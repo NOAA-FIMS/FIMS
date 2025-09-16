@@ -219,7 +219,7 @@ public:
     {
       std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
       ss << "{\n";
-  
+
       ss << " \"population\" : \"" << population_interface->name << "\",\n";
       ss << " \"population_id\": " << population_interface->id << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
@@ -616,6 +616,10 @@ public:
     std::shared_ptr<fims_model::Model<double>> model_internal =
         fims_model::Model<double>::GetInstance();
 
+#ifdef TMB_MODEL
+    model->do_reporting = false;
+#endif
+
     double value = model_internal->Evaluate();
 
     std::stringstream ss;
@@ -865,6 +869,9 @@ public:
       }
     }
     ss << "\n]}\n";
+#ifdef TMB_MODEL
+    model->do_reporting = true;
+#endif
     return fims::JsonParser::PrettyFormatJSON(ss.str());
   }
 
