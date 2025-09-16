@@ -52,9 +52,6 @@ RCPP_MODULE(fims)
         Rcpp::function(
             "CreateTMBModel", &CreateTMBModel,
             "Creates the TMB model object and adds interface objects to it.");
-        Rcpp::function("finalize", &finalize_fims,
-                       "Extracts the derived quantities from `Information` to the "
-                       "Rcpp object and returns a JSON string as the output.");
         Rcpp::function("set_fixed", &set_fixed_parameters,
                        "Sets the fixed parameters vector object.");
         Rcpp::function("get_fixed", &get_fixed_parameters_vector,
