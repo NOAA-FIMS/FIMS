@@ -11,7 +11,6 @@
 #' @export DnormDistribution
 #' @export DoubleLogisticSelectivity
 #' @export EWAAgrowth
-#' @export finalize
 #' @export Fleet
 #' @export set_fixed
 #' @export get_fixed
