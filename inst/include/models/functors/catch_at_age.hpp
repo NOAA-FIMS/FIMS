@@ -1331,7 +1331,7 @@ namespace fims_popdy
         ADREPORT_F(NAA, this->of);
         ADREPORT_F(Biomass, this->of);
         ADREPORT_F(SSB, this->of);
-        ADREPORT_F(LogRecDev, this->of);
+        //ADREPORT_F(LogRecDev, this->of);
         ADREPORT_F(FMort, this->of);
         ADREPORT_F(Q, this->of);
         ADREPORT_F(LandingsExpected, this->of);

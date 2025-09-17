@@ -38,6 +38,32 @@ namespace fims_popdy
         : name(name), ndims(dims.size()), dims(dims), dim_names(dim_names) {}
   };
 
+  /**
+   * TMB SDreports are returned as a single vector, if there are multiple
+   * populations or fleets then the report vectors are concatenated together.
+   * This struct is used to store the name, id, and length of each report
+   * vector so that they can be extracted from the single report vector.
+   */
+  struct UncertaintyReportInfo
+  {
+    /**
+     * * name of the report vector
+     */
+    std::string name;
+    /**
+     * * id of the population or fleet the report is associated with
+     */
+    uint32_t id;
+    /**
+     * * starting index of the report vector in the overall report vector
+     */
+    size_t start;
+    /**
+     * * length of the report vector
+     */
+    size_t length;
+  };
+
   template <typename Type>
   /**
    * @brief FisheryModelBase is a base class for fishery models in FIMS.
@@ -115,6 +141,21 @@ namespace fims_popdy
      * @brief Shared pointer for the population dimension information map.
      */
     std::shared_ptr<DimensionInfoMap> population_dimension_info;
+
+    /**
+     * @brief Type definition for the uncertainty report information map.
+     */
+    typedef typename std::map<uint32_t, std::map<std::string, UncertaintyReportInfo>> UncertaintyReportInfoMap;
+
+    /**
+     * @brief Shared pointer for the uncertainty report information map.
+     */
+    std::shared_ptr<UncertaintyReportInfoMap> fleet_uncertainty_report_info;
+
+    /**
+     * @brief Shared pointer for the population uncertainty report information map.
+     */
+    std::shared_ptr<UncertaintyReportInfoMap> population_uncertainty_report_info;
 
 #ifdef TMB_MODEL
     ::objective_function<Type> *of;

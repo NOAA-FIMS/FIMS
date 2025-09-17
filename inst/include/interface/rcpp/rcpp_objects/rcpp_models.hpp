@@ -638,6 +638,7 @@ public:
     return Rcpp::List::create(
         Rcpp::Named("report") = rep,
         Rcpp::Named("sdr_summary") = sdr_summary,
+        Rcpp::Named("sdr_summary_matrix") = mat,
         Rcpp::Named("first_est") = first_est,
         Rcpp::Named("rownames") = rownames,
         Rcpp::Named("colnames") = colnames);
