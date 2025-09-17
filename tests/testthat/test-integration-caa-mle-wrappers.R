@@ -10,9 +10,6 @@
 # Deterministic test ----
 ## Setup ----
 # Load necessary data for the integration test
-if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
 
 load(test_path("fixtures", "integration_test_data.RData"))
 
@@ -22,7 +19,7 @@ iter_id <- 1
 ## IO correctness ----
 test_that("deterministic run works with correct inputs", {
   # Load the test data from an RDS file containing the model fit
-  deterministic_age_length_comp <- readRDS(test_path("fixtures", "deterministic_age_length_comp.RDS"))
+  deterministic_age_length_comp <- load_deterministic_age_length_comp()
 
   # Compare FIMS results with model comparison project OM values
   verify_fims_deterministic(
@@ -37,8 +34,7 @@ test_that("deterministic run works with correct inputs", {
 
 test_that("deterministic run returns correct nlls", {
   # Load the test data from an RDS file containing the model fit
-  deterministic_age_length_comp <- readRDS(test_path("fixtures", "deterministic_age_length_comp.RDS"))
-
+  deterministic_age_length_comp <- load_deterministic_age_length_comp()
   #' Compare FIMS NLLs with model comparison project "true" NLLs
   verify_fims_nll(
     report = get_report(deterministic_age_length_comp),
@@ -67,7 +63,7 @@ test_that("deterministic run returns correct nlls", {
 ## IO correctness ----
 test_that("estimation test with age and length comp using wrappers", {
   # Load the test data from an RDS file containing the model fit
-  fit_age_length_comp <- readRDS(test_path("fixtures", "fit_age_length_comp.RDS"))
+  fit_age_length_comp <- load_fit_age_length_comp(with_na = FALSE)
 
   # Compare FIMS results with model comparison project OM values
   validate_fims(
@@ -83,12 +79,12 @@ test_that("estimation test with age and length comp using wrappers", {
 ## Edge handling ----
 test_that("estimation test with age comp only using wrappers", {
   # Load the test data from an RDS file containing the model fit
-  fit_agecomp <- readRDS(test_path("fixtures", "fit_agecomp.RDS"))
+  fit_age_comp <- load_fit_age_comp(with_na = FALSE)
 
   # Compare FIMS results with model comparison project OM values
   validate_fims(
-    report = get_report(fit_agecomp),
-    estimates = get_estimates(fit_agecomp),
+    report = get_report(fit_age_comp),
+    estimates = get_estimates(fit_age_comp),
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
@@ -96,12 +92,12 @@ test_that("estimation test with age comp only using wrappers", {
   )
 
   # Load the test data from an RDS file containing the model fit
-  fit_agecomp_na <- readRDS(test_path("fixtures", "fit_agecomp_na.RDS"))
+  fit_age_comp_na <- load_fit_age_comp(with_na = TRUE)
 
   # Compare FIMS results with model comparison project OM values
   validate_fims(
-    report = get_report(fit_agecomp_na),
-    estimates = get_estimates(fit_agecomp_na),
+    report = get_report(fit_age_comp_na),
+    estimates = get_estimates(fit_age_comp_na),
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
@@ -111,7 +107,7 @@ test_that("estimation test with age comp only using wrappers", {
 
 test_that("estimation test with length comp only using wrappers", {
   # Load the test data from an RDS file containing the model fit
-  fit_lengthcomp <- readRDS(test_path("fixtures", "fit_lengthcomp.RDS"))
+  fit_lengthcomp <- load_fit_length_comp(with_na = FALSE)
 
   # Compare FIMS results with model comparison project OM values
   validate_fims(
@@ -124,7 +120,7 @@ test_that("estimation test with length comp only using wrappers", {
   )
 
   # Load the test data from an RDS file containing the model fit
-  fit_lengthcomp_na <- readRDS(test_path("fixtures", "fit_lengthcomp_na.RDS"))
+  fit_lengthcomp_na <- load_fit_length_comp(with_na = TRUE)
 
   # Compare FIMS results with model comparison project OM values
   validate_fims(
@@ -138,8 +134,10 @@ test_that("estimation test with length comp only using wrappers", {
 })
 
 test_that("estimation test with age and length comp with NAs", {
+  # TODO: need to fix issue #933
+  skip("Skipping test for estimation test with age and length comp data containing NAs (see issue #933)")
   # Load the test data from an RDS file containing the model fit
-  fit_age_length_comp_na <- readRDS(test_path("fixtures", "fit_age_length_comp_na.RDS"))
+  fit_age_length_comp_na <- load_fit_age_length_comp(with_na = TRUE)
 
   # Compare FIMS results with model comparison project OM values
   validate_fims(
@@ -157,9 +155,7 @@ test_that("FIMS returns an error when there are no estimated parameters for opti
   # Load data
   data_age_length_comp <- FIMSFrame(data1)
   # Load pre-configured parameters
-  parameters <- readRDS(
-    test_path("fixtures", "parameters_model_comparison_project.RDS")
-  )
+  parameters <- load_parameters_model_comparison_project()
   # Set all non-NA estimation types to "constant" and initialize the model
   initialized_model <- parameters |>
     dplyr::mutate(

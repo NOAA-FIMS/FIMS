@@ -52,14 +52,11 @@ test_that("create_default_configurations() works with correct inputs", {
 ## Edge handling ----
 # Please remove/comment out the test template below if no edge cases are being tested.
 test_that("create_default_configurations() returns correct outputs for edge cases", {
-  # Load the test data from an RDS file containing model fits.
-  if (!file.exists(test_path("fixtures", "data_length_comp.RDS"))) {
-    prepare_test_data()
-  }
+  load_all_data()
 
   # List all RDS files in the fixtures directory that match the pattern "data*_.RDS"
   data_files <- list.files(
-    path = test_path("fixtures"),
+    path = testthat::test_path("fixtures"),
     pattern = "^data.*\\.RDS$",
     full.names = TRUE
   )
@@ -77,7 +74,7 @@ test_that("create_default_configurations() returns correct outputs for edge case
       expected = expected_names
     )
 
-    if (data_file == test_path("fixtures", "data_age_comp_na.RDS")) {
+    if (data_file == testthat::test_path("fixtures", "data_age_comp_na.RDS")) {
       module_types <- configurations |>
         dplyr::pull(module_type) |>
         unique()
@@ -88,7 +85,7 @@ test_that("create_default_configurations() returns correct outputs for edge case
       expect_true(!("LengthComp" %in% module_types))
     }
 
-    if (data_file == test_path("fixtures", "data_length_comp_na.RDS")) {
+    if (data_file == testthat::test_path("fixtures", "data_length_comp_na.RDS")) {
       module_types <- configurations |>
         dplyr::pull(module_type) |>
         unique()
