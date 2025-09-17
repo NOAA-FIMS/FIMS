@@ -192,12 +192,14 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     }
   }
 
-  /**
-   * life history calculations
-   */
 
   /**
    * @brief Calculates initial numbers at age for index and age
+   *
+   * The formula used is:
+   * \f[
+   * N_{a,0} = \exp(\log N_{a,0})
+   * \f]
    *
    * @param i_age_year dimension folded index for age and year
    * @param a age index
@@ -209,6 +211,27 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Calculates total mortality at an index, year, and age
+   *
+   * This function calculates total mortality \f$Z\f$ for a specific
+   * age and year, combining natural mortality \f$M\f$ and fishing
+   * mortality \f$F\f$ from all fleets.
+   *
+   * The fishing mortality \f$F_{f,a,y}\f$ for each fleet \f$f\f$ is computed
+   * using age-specific selectivity \f$S_f(a)\f$ and fleet-specific, annual
+   * fishing mortality \f$F_{f,y}\f$:
+   * \f[
+   * F_{f,a,y} = F_{f,y} \times S_f(a)
+   * \f]
+   *
+   * Total fishing mortality at age \f$a\f$ and year \f$y\f$ is the sum over fleets:
+   * \f[
+   * F_{a,y} = \sum_{f=1}^{N_{fleets}} F_{f,a,y}
+   * \f]
+   *
+   * Total mortality \f$Z_{f,a,y}\f$ is the sum of natural and fishing mortality:
+   * \f[
+   * Z_{a,y} = M_{a,y} + F_{a,y}
+   * \f]
    *
    * @param i_age_year dimension folded index for age and year
    * @param year year index
@@ -228,6 +251,20 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Calculates numbers at age at year and age specific indices
+   *
+   * This function calculates numbers at age by applying total mortality \f$Z\f$
+   * to individuals from the previous time step. It also handles the
+   * accumulation of a plus group.
+   *
+   * Standard update:
+   * \f[
+   * N_{a,y} = N_{a-1,y-1} * \exp(-Z_{a-1,y-1})
+   * \f]
+   *
+   * Plus group update (if \f$a = A\f$):
+   * \f[
+   * N_{A,y} = N_{A,y} + N_{A,y-1} * \exp(-Z_{A,y-1})
+   * \f]
    *
    * @param i_age_year dimension folded index for age and year
    * @param i_agem1_yearm1 dimension folded index for age-1 and year-1
@@ -251,6 +288,20 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Calculates unfished numbers at age at year and age specific indices
+   *
+   * This function computes unfished numbers at age by applying survival
+   * through time using only natural mortality, without any fishing pressure.
+   * It also accounts for accumulation of the plus group.
+   *
+   * Standard update:
+   * \f[
+   * N^U_{a,y} = N^U_{a-1,y-1} * \exp(-M_{a-1,y-1})
+   * \f]
+   *
+   * Plus group update (if \f$a = A\f$):
+   * \f[
+   * N^U_{A,y} = N^U_{A,y} + N^U_{A,y-1} * \exp(-M_{A,y-1})
+   * \f]
    *
    * @param i_age_year dimension folded index for age and year
    * @param i_agem1_yearm1 dimension folded index for age-1 and year-1
@@ -276,9 +327,16 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Calculates biomass
    *
+   * Adds the biomass at age to the total biomass for a given year \f$y\f$ by
+   * multiplying numbers at age \f$a\f$ by weight at age \f$w_a\f$:
+   *
+   * \f[
+   * B_y += N_{a,y} * w_a
+   * \f]
+   *
    * @param i_age_year dimension folded index for age and year
    * @param year the year biomass is being aggregated for
-   * @param age the age who's biomass is being added into total biomass
+   * @param age the age whose biomass is being added into total biomass
    */
   void CalculateBiomass(size_t i_age_year, size_t year, size_t age) {
     this->biomass[year] +=
@@ -288,6 +346,13 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Adds to existing yearly unfished biomass estimates the
    *  biomass for a specified year and age
+   *
+   * Updates unfished biomass \f$B^U_y\f$ by adding the biomass
+   * of age \f$a\f$ in year \f$y\f$, calculated as:
+   *
+   * \f[
+   * B^U_y += N^U_{a,y} * w_a
+   * \f]
    *
    * @param i_age_year dimension folded index for age and year
    * @param year the year of unfished biomass to add
@@ -301,9 +366,17 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Calculates spawning biomass
    *
+   * This function computes yearly \f$y\f$ spawning biomass \f$SB_y\f$ by
+   * summing the contributions from each age \f$a\f$, accounting for the
+   * proportion female, proportion mature, and weight at age \f$w_a\f$:
+   *
+   * \f[
+   * SB_y += N_{a,y} * w_a * p_{female,a} * p_{mature,a}
+   * \f]
+   *
    * @param i_age_year dimension folded index for age and year
    * @param year the year spawning biomass is being aggregated for
-   * @param age the age who's biomass is being added into total spawning biomass
+   * @param age the age whose biomass is being added into total spawning biomass
    */
   void CalculateSpawningBiomass(size_t i_age_year, size_t year, size_t age) {
     this->spawning_biomass[year] +=
@@ -314,6 +387,14 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Adds to existing yearly unfished spawning biomass estimates the
    *  biomass for a specified year and age
+   *
+   * Updates the unfished spawning biomass \f$SB^U_y\f$ by adding the
+   * biomass of age \f$a\f$ in year \f$y\f$, accounting for proportion
+   * female, maturity, and weight at age \f$w_a\f$:
+   *
+   * \f[
+   * SB^U_y += N^U_{a,y} * w_a * p_{female,a} * p_{mature,a}
+   * \f]
    *
    * @param i_age_year dimension folded index for age and year
    * @param year the year of unfished spawning biomass to add
@@ -329,6 +410,24 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Calculates equilibrium spawning biomass per recruit
+   *
+   * This function calculates the spawning biomass per recruit \f$\phi_0\f$
+   * at equilibrium, assuming an unfished stock. The biomass is calculated as
+   * the sum of the biomass contributions from each age \f$a\f$:
+   *
+   * \f[
+   * \phi_0 = \sum_{a=0}^{A} N_a * p_{female,a} * p_{mature,a} * w_a
+   * \f]
+   *
+   * The numbers at age \f$N_a\f$ are calculated recursively with natural mortality:
+   * \f[
+   * N_a = N_{a-1} * \exp(-M_a) \quad \text{for } a = 1, \ldots, A-1
+   * \f]
+   *
+   * Plus group update:
+   * \f[
+   * N_A = \frac{N_{A-1} * \exp(-M_{A-1})}{1 - \exp(-M_A)}
+   * \f]
    *
    * @return Type
    */
@@ -358,6 +457,21 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Calculates expected recruitment for a given year
    *
+   * Calculates expected recruitment as a function of spawning biomass and
+   * equilibrium spawning biomass per recruit \f$\phi_0\f$.
+   *
+   * The expected recruitment \f$R_y\f$ in year \f$y\f$ is given by:
+   * \f[
+   * R_y =
+   * \begin{cases}
+   * f(SB_{y-1}, \phi_0), & \text{if } i_{dev} = n_{years} \\
+   * \exp(g(y-1)), & \text{otherwise}
+   * \end{cases}
+   * \f]
+   *
+   * Where \f$f()\f$ evaluates mean recruitment based on spawning biomass
+   * and \f$\phi_0\f$, and \f$g(y-1)\f$ evaluates recruitment deviations.
+   *
    * @param i_age_year dimension folded index for age and year
    * @param year the year recruitment is being calculated for
    * @param i_dev index to log_recruit_dev of vector length nyears-1
@@ -385,8 +499,14 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
-   * @brief Calculates expected proportion of individuals mature at a selected
-   * ageage
+   * @brief Calculates expected proportion of individuals mature at a selected age
+   *
+   * This function evaluates the maturity ogive at the specified age
+   * to estimate the proportion of individuals that are mature:
+   *
+   * \f[
+   * p_{mature,a} = \text{maturity}(a)
+   * \f]
    *
    * @param i_age_year dimension folded index for age and year
    * @param age the age of maturity
@@ -401,6 +521,10 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Adds to existing expected total landings by fleet
+   *
+   * This function updates fleet specific and total expected landings
+   * for a given year and age by using age specific landings from each
+   * fleet and summing over ages.
    *
    * @param year the year of expected total landings
    * @param age the age of landings that is being added into total landings
@@ -425,12 +549,25 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Calculates landings in numbers at age for each fleet for a given
-   * year and age, then adds the value to the expected landings in numbers at
-   * age for each fleet
+   * year and age
+   *
+   * This function uses the Baranov Catch Equation to calculate expected
+   * landings in numbers at age for each fleet:
+   *
+   * \f[
+   * C_{f,a,y} = \frac{F_{f,y} * S_f(a)}{Z_{a,y}} * N_{a,y} *
+   * \left( 1 - \exp(-Z_{a,y}) \right)
+   * \f]
+   *
+   * where:
+   * - \f$C_{f,a,y}\f$ is the catch (landings) for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
+   * - \f$F_{f,y}\f$ is the fleet-specific fishing mortality in year \f$y\f$
+   * - \f$S_f(a)\f$ is the selectivity at age \f$a\f$ for fleet \f$f\f$
+   * - \f$Z_{a,y}\f$ is the total mortality at age \f$a\f$ and year \f$y\f$
+   * - \f$N_{a,y}\f$ is the number of individuals at age \f$a\f$ and year \f$y\f$
    *
    * @param i_age_year dimension folded index for age and year
-   * @param year the year of expected landings composition is being calculated
-   * for
+   * @param year the year expected landings composition is being calculated for
    * @param age the age composition is being calculated for
    */
   void CalculateLandingsNumbersAA(size_t i_age_year, size_t year, size_t age) {
@@ -445,8 +582,18 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
-   * @brief Calculates expected landings weight at age for each fleet for a
-   * given year and age
+   * @brief Calculates expected landings weight at age for each fleet
+   *
+   * This function computes the expected landings at age in weight by
+   * multiplying the expected landings numbers at age by the corresponding
+   * weight at age:
+   *
+   * \f[
+   * CW_{f,a,y} = C_{f,a,y} \times w_a
+   * \f]
+   *
+   * where \f$CW_{f,a,y}\f$ is the catch weight for fleet \f$f\f$ at age
+   * \f$a\f$ in year \f$y\f$.
    *
    * @param year the year of expected landings weight at age
    * @param age the age of expected landings weight at age
@@ -463,9 +610,27 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Adds to the expected population indices by fleet
    *
-   * @param i_age_year dimension folded index for age and year
+   * This function updates the population indices for each fleet by adding the
+   * age- and year-specific index weights and numbers to the corresponding
+   * annual totals. The updated index weight and index numbers for a given
+   * fleet and year are calculated as:
+   *
+   * \f[
+   * IW_{f,y} += IWAA_{a,y}
+   * \f]
+   * \f[
+   * IN_{f,y} += INAA_{a,y}
+   * \f]
+   *
+   * where:
+   * - \f$IW_{f,y}\f$ is the total index weight for fleet \f$f\f$ in year \f$y\f$
+   * - \f$IN_{f,y}\f$ is the total index numbers for fleet \f$f\f$ in year \f$y\f$
+   * - \f$IWAA_{a,y}\f$ is the index weight at age \f$a\f$ in year \f$y\f$
+   * - \f$INAA_{a,y}\f$ is the index numbers at age \f$a\f$ in year \f$y\f$
+   *
+   * @param i_age_year dimension-folded index for age and year
    * @param year the year of the population index
-   * @param age the age of the index that is added into population index
+   * @param age the age of the index being added to the population index
    */
   void CalculateIndex(size_t i_age_year, size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
@@ -478,9 +643,20 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
-   * @brief Calculates index sample in numbers at age for each fleet for
-   * a given year and age, then adds the value to the expected index in
-   * numbers at age for each fleet
+   * @brief Calculates index sample in numbers at age for each fleet
+   *
+   * This function calculates the expected index in numbers at age for each
+   * fleet, using catchability, selectivity, and population numbers at age:
+   *
+   * \f[
+   * I_{f,a,y} += q_{f,y} \times S_f(a) \times N_{a,y}
+   * \f]
+   *
+   * where:
+   * - \f$I_{f,a,y}\f$ is the index numbers for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
+   * - \f$q_{f,y}\f$ is the catchability coefficient for fleet \f$f\f$ at year \f$y\f$
+   * - \f$S_f(a)\f$ is the selectivity at age \f$a\f$ for fleet \f$f\f$
+   * - \f$N_{a,y}\f$ is the population numbers at age \f$a\f$ and year \f$y\f$
    *
    * @param i_age_year dimension folded index for age and year
    * @param year the year the expected index is being calculated for
@@ -496,8 +672,16 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
-   * @brief Calculates expected index weight at age for each fleet for
-   * a given year and age
+   * @brief Calculates expected index weight at age for each fleet
+   *
+   * This function computes the expected index weight at age by multiplying the
+   * expected index numbers at age by the corresponding weight at age:
+   *
+   * \f[
+   * IWAA_{f,a,y} = I_{f,a,y} \times w_a
+   * \f]
+   *
+   * where \f$IWAA_{f,a,y}\f$ is the index weight for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$.
    *
    * @param year the year of expected index weight at age
    * @param age the age of expected index weight at age
@@ -529,7 +713,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
      code for initial structure and recruitment 0 loops. Could also have started
      loops at 1 with initial structure and recruitment setup outside the loops.
 
-     year loop is extended to <= nyears because SSB is calculated as the start
+     year loop is extended to <= nyears because SB is calculated as the start
      of the year value and by extending one extra year we get estimates of the
      population structure at the end of the final year. An alternative approach
      would be to keep initial numbers at age in it's own vector and each year to
@@ -562,7 +746,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
            to inform the subsequent landings and change in numbers at age
            calculations. This is only calculated for years < nyears as these are
            the model estimated years with data. The year loop extends to
-           y=nyears so that population numbers at age and SSB can be calculated
+           y=nyears so that population numbers at age and SB can be calculated
            at the end of the last year of the model
            */
           CalculateMortality(i_age_year, y, a);
