@@ -142,7 +142,7 @@ std::ostream& operator<<(std::ostream& out, const Parameter& p) {
     out << p.max_m;
   }
 
-  out << ",\n\"estimation type is\": \"" << p.estimation_type_m << "\"\n}";
+  out << ",\n\"estimation_type\": \"" << p.estimation_type_m << "\"\n}";
 
   return out;
 }

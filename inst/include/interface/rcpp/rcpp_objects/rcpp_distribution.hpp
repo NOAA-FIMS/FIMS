@@ -317,12 +317,11 @@ public:
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"DnormDistribution\",\n";
-    ss << " \"id\": " << this->id_m << ",\n";
-    ss << " \"type\": \"normal\",\n";
-    ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
+    ss << " \"module_name\": \"density\",\n";
+    ss << " \"module_id\": " << this->id_m << ",\n";
+    ss << " \"module_type\": \"normal\",\n";
+    ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0)
@@ -654,12 +653,11 @@ public:
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"LogNormalLPDF\",\n";
-    ss << " \"id\": " << this->id_m << ",\n";
-    ss << " \"type\": \"log_normal\",\n";
-    ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
+    ss << " \"module_name\": \"density\",\n";
+    ss << " \"module_id\": " << this->id_m << ",\n";
+    ss << " \"module_type\": \"log_normal\",\n";
+    ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0)
@@ -999,12 +997,11 @@ public:
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"Dmultinom\",\n";
-    ss << " \"id\": " << this->id_m << ",\n";
-    ss << " \"type\": \"multinomial\",\n";
+    ss << " \"module_name\": \"density\",\n";
+    ss << " \"module_id\": " << this->id_m << ",\n";
+    ss << " \"module_type\": \"multinomial\",\n";
     ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"name\": \"lpdf_vec\",\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0)

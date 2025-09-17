@@ -220,8 +220,9 @@ public:
       std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
       ss << "{\n";
 
+      ss << " \"module_name\" : \"population\",\n";
       ss << " \"population\" : \"" << population_interface->name << "\",\n";
-      ss << " \"population_id\": " << population_interface->id << ",\n";
+      ss << " \"module_id\": " << population_interface->id << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
          << ",\n";
       ss << " \"growth_id\": " << population_interface->growth_id << ",\n";
@@ -476,8 +477,9 @@ public:
       std::shared_ptr<fims_popdy::Fleet<double>> &fleet = (*fit).second;
 
       ss << "{\n";
+      ss << " \"module_name\" : \"fleet\",\n";
       ss << " \"fleet\" : \"" << fleet_interface->name << "\",\n";
-      ss << " \"fleet_id\": " << fleet_interface->id << ",\n";
+      ss << " \"module_id\": " << fleet_interface->id << ",\n";
       ss << " \"nages\": " << fleet_interface->nages.get() << ",\n";
       ss << " \"nyears\": " << fleet_interface->nyears.get() << ",\n";
       ss << " \"nlengths\": " << fleet_interface->nlengths.get() << ",\n";

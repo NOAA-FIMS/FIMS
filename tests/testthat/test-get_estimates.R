@@ -18,9 +18,10 @@ if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
-  "parameter_id", "fleet_name", "age", "length", "time",
-  "initial", "estimate", "uncertainty", "log_like", "log_like_cv",
-  "gradient", "estimation_type"
+  "parameter_id", "fleet", "age_i", "length_i", "year_i",
+  "value", "estimated_value", "lpdf_value", "estimation_type", "uncertainty", 
+  "distribution", "likelihood", "expected_values", "observed_values",
+  "log_like_cv", "gradient"
 )
 
 test_that("get_estimates() works with deterministic run", {

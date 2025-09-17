@@ -207,7 +207,7 @@ public:
       ss << "\"value\": " << weights[i] << ",\n";
       ss << "\"min\": \"-Infinity\",\n";
       ss << "\"max\": \"Infinity\",\n";
-      ss << "\"estimationtypeis\": \"constant\"\n";
+      ss << "\"estimation_type\": \"constant\"\n";
       ss << "},\n";
     }
     ss << "{\n";
@@ -215,7 +215,7 @@ public:
     ss << "\"value\": " << weights[weights.size() - 1] << ",\n";
     ss << "\"min\": \"-Infinity\",\n";
     ss << "\"max\": \"Infinity\",\n";
-    ss << "\"estimationtypeis\": \"constant\"\n";
+    ss << "\"estimation_type\": \"constant\"\n";
     ss << "}\n],\n";
     ss << "\"uncertainty\" : " << fims::Vector<double>(ages.size(), -999);
     ss << "}\n]\n}\n";
