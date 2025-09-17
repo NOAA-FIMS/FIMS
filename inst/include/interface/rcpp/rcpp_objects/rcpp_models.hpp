@@ -318,7 +318,6 @@ public:
     {
       has_se = true;
     }
-    std::cout << __LINE__ << std::endl;
     // gather dimension information
     switch (dim_info.ndims)
     {
@@ -737,13 +736,11 @@ public:
       grouped_cpp[key] = vec_std;
     }
     this->se_values = grouped_cpp;
-    std::cout << __LINE__ << std::endl;
     std::set<uint32_t> recruitment_ids;
     std::set<uint32_t> growth_ids;
     std::set<uint32_t> maturity_ids;
     std::set<uint32_t> selectivity_ids;
     std::set<uint32_t> fleet_ids;
-    std::cout << __LINE__ << std::endl;
     // gather sub-module info from population and fleets
     typename std::set<uint32_t>::iterator module_id_it; // generic
     typename std::set<uint32_t>::iterator pit;
