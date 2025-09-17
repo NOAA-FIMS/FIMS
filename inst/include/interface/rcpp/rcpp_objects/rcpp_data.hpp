@@ -1,5 +1,5 @@
 /**
- * @file rcpp_fleet.hpp
+ * @file rcpp_data.hpp
  * @brief The Rcpp interface to declare different types of data, e.g.,
  * age-composition and index data. Allows for the use of methods::new() in R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service

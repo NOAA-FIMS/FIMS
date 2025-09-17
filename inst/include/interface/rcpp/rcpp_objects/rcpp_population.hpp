@@ -160,13 +160,11 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   Rcpp::NumericVector derived_biomass;
   /**
-   * @brief Derived recruitment.
-   * TODO: document the unit.
+   * @brief Derived recruitment in numbers.
    */
   Rcpp::NumericVector derived_recruitment;
   /**
-   * @brief The name.
-   * TODO: Document name better.
+   * @brief The name for the population.
    */
   std::string name;
 

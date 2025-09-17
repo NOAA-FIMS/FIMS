@@ -133,7 +133,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   ParameterVector log_sd;
   /**
-   * @brief The vector. TODO: document this more.
+   * @brief Vector that records the individual log probability function for each
+   * observation.
    */
   RealVector lpdf_vec; /**< The vector*/
 
@@ -426,7 +427,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   ParameterVector log_sd;
   /**
-   * @brief The vector. TODO: document this more.
+   * @brief Vector that records the individual log probability function for each
+   * observation.
    */
   RealVector lpdf_vec; /**< The vector */
 
@@ -714,7 +716,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   RealVector dims;
   /**
-   * @brief The vector. TODO: document this more.
+   * @brief Vector that records the individual log probability function for each
+   * observation.
    */
   RealVector lpdf_vec; /**< The vector */
 
