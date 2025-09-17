@@ -1,5 +1,6 @@
 /**
  * @file subpopulation.hpp
+ * @brief Defines the Subpopulation class and its fields and methods.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.

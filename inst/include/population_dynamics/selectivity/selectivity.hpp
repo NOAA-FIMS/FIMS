@@ -1,7 +1,8 @@
 /**
  * @file selectivity.hpp
  * @brief Includes any .hpp files within the subfolders so that only this file
- * needs to included in the model.hpp file.
+ * needs to included in include statements to use all functions within this
+ * folder.
  * @details Defines guards for selectivity module outline to define the
  * selectivity hpp file if not already defined.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service

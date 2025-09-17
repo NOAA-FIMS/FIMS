@@ -1,6 +1,8 @@
 /**
  * @file information.hpp
- * @brief TODO: provide a brief description.
+ * @brief Code to store all objects that are created in FIMS because FIMS uses
+ * integer representation. Code loops over all model components and sets them
+ * up based on unique identifiers.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.

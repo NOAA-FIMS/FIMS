@@ -1,5 +1,5 @@
 /**
- * @file logistic.hpp
+ * @file double_logistic.hpp
  * @brief Declares the DoubleLogisticSelectivity class which implements the
  * logistic function from fims_math in the selectivity module.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service

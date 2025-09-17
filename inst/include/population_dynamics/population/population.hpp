@@ -16,10 +16,6 @@
 #include "../maturity/maturity.hpp"
 
 namespace fims_popdy {
-/*TODO:
- Review, add functions to evaluate, push vectors back to fleet (or point to
- fleet directly?)
- */
 
 /**
  * @brief Population class. Contains subpopulations

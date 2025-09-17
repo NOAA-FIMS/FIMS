@@ -1,3 +1,11 @@
+/**
+ * @file fishery_model_base.hpp
+ * @brief Defines the base class for all fishery models within the FIMS
+ * framework.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
+ */
 #ifndef FIMS_MODELS_FISHERY_MODEL_BASE_HPP
 #define FIMS_MODELS_FISHERY_MODEL_BASE_HPP
 

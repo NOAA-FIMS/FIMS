@@ -1,6 +1,7 @@
 /**
  * @file def.hpp
- * @brief TODO: provide a brief description.
+ * @brief Creates pre-processing macros such as what type of machine you are on
+ * and creates the log information.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -201,12 +202,29 @@ class FIMSLog {
   }
 
  public:
-  bool write_on_exit = true;                /*!<TODO: Document>*/
-  bool throw_on_error = false;              /*!<TODO: Document>*/
-  static std::shared_ptr<FIMSLog> fims_log; /*!<TODO: Document>*/
+  /**
+   * @brief A boolean specifying if the log file is written when the session is
+   * terminated. The default is TRUE.
+   *
+   */
+  bool write_on_exit = true;
+  /**
+   * @brief A boolean specifying if the program is stopped upon the first
+   * error, where the default is FALSE. This allows you go through an entire
+   * program to collect all error messages.
+   *
+   */
+  bool throw_on_error = false;
+  /**
+   * @brief A singleton instance of the log, i.e., where there is only one
+   * log. The object is created when the .dll is loaded and it will never
+   * be recreated while the .dll is loaded.
+   *
+   */
+  static std::shared_ptr<FIMSLog> fims_log;
 
   /**
-   * Default constructor.
+   * Default constructor for FIMSLog.
    */
   FIMSLog() {}
 

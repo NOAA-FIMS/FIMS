@@ -1,7 +1,8 @@
 /**
  * @file recruitment.hpp
  * @brief Includes any .hpp files within the subfolders so that only this file
- * needs to included in the model.hpp file.
+ * needs to included in include statements to use all functions within this
+ * folder.
  * @details Defines guards for recruitment module outline to define the
  * recruitment hpp file if not already defined.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service

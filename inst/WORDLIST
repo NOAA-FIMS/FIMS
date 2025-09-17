@@ -90,6 +90,7 @@ bookdown
 bool
 Bool
 BOOL
+boolean's
 byrow
 caa
 CAA
@@ -212,11 +213,13 @@ DBENCHMARK
 DBUILD
 DCMAKE
 DDOXYGEN
+deallocated
 defineVar
 deliverables
 dellog
 DensityComponentBase
 dependabot
+dereference
 Dereference
 DerivedQuantityToJSON
 Deroba
@@ -379,6 +382,7 @@ GetPopulations
 getpwuid
 GetRandomEffectsParameters
 GetString
+getter
 Getter
 GetType
 getuid
@@ -687,6 +691,7 @@ PopulationInterface
 PopulationInterfaceBase
 PopulationPrepareTestFixture
 pos
+postfix
 Postfix
 postmle
 pre
@@ -844,9 +849,11 @@ sfLibrary
 sfStop
 sgi
 SharedBoolean
+SharedBoolean's
 SharedInt
 SharedPrimitive
 SharedReal
+SharedReal's
 SharedString
 showClass
 ShowPopulation

@@ -1,6 +1,8 @@
 /**
  * @file data_object.hpp
- * @brief TODO: provide a brief description.
+ * @brief Sets up a data class to create a generic data object with up to five
+ * dimensions. The class contains internal vector for data elements and
+ * uncertainty values.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.

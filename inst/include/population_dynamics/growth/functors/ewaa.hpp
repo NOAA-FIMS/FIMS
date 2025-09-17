@@ -1,7 +1,7 @@
 /**
  * @file ewaa.hpp
- * @brief Declares the growth functor class which is the base class for all
- * growth functors.
+ * @brief Defines the EWAAGrowth class, which inherits from the GrowthBase
+ * class.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
