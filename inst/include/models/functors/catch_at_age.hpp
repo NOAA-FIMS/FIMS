@@ -1212,7 +1212,7 @@ namespace fims_popdy
         vector<vector<Type>> agecomp_prop(n_fleets);
         vector<vector<Type>> lengthcomp_prop(n_fleets);
         vector<vector<Type>> F_mort(n_fleets);
-        vector<vector<Type>> q(n_fleets);
+        // vector<vector<Type>> q(n_fleets);
         // populations
         vector<vector<Type>> naa(n_pops);
         vector<vector<Type>> ssb(n_pops);
@@ -1272,7 +1272,7 @@ namespace fims_popdy
           lengthcomp_exp(fleet_idx) = derived_quantities["lengthcomp_expected"];
           agecomp_prop(fleet_idx) = derived_quantities["agecomp_proportion"];
           lengthcomp_prop(fleet_idx) = derived_quantities["lengthcomp_proportion"];
-          F_mort(fleet_idx) = derived_quantities["Fmort"];
+          // F_mort(fleet_idx) = derived_quantities["Fmort"];
        //   q(fleet_idx) = derived_quantities["q"];
           fleet_idx += 1;
         }
@@ -1304,8 +1304,8 @@ namespace fims_popdy
         FIMS_REPORT_F(lengthcomp_exp, this->of);
         FIMS_REPORT_F(agecomp_prop, this->of);
         FIMS_REPORT_F(lengthcomp_prop, this->of);
-        FIMS_REPORT_F(F_mort, this->of);
-        FIMS_REPORT_F(q, this->of);
+        // FIMS_REPORT_F(F_mort, this->of);
+       // FIMS_REPORT_F(q, this->of);
 
         /*ADREPORT using ADREPORTvector defined in
          * inst/include/interface/interface.hpp:
@@ -1316,7 +1316,7 @@ namespace fims_popdy
         vector<Type> SSB = ADREPORTvector(ssb);
         vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
         vector<Type> FMort = ADREPORTvector(F_mort);
-        vector<Type> Q = ADREPORTvector(q);
+        // vector<Type> Q = ADREPORTvector(q);
         vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
         vector<Type> IndexExpected = ADREPORTvector(index_exp);
         vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
@@ -1333,7 +1333,7 @@ namespace fims_popdy
         ADREPORT_F(SSB, this->of);
         //ADREPORT_F(LogRecDev, this->of);
         ADREPORT_F(FMort, this->of);
-        ADREPORT_F(Q, this->of);
+        // ADREPORT_F(Q, this->of);
         ADREPORT_F(LandingsExpected, this->of);
         ADREPORT_F(IndexExpected, this->of);
         ADREPORT_F(LandingsNumberAtAge, this->of);
