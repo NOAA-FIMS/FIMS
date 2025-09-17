@@ -17,6 +17,8 @@ AgeCompositionExpected
 AgeCompositionProportion
 Allocator
 AloadModule
+Anders
+ar
 Args
 Arith
 AtoL
@@ -24,6 +26,7 @@ AtoLSchnute
 BEOS
 BH
 BOOL
+babySAM
 Baranov
 BasedOnStyle
 Benchmarking
@@ -255,6 +258,7 @@ JsonObject
 JsonParser
 JsonValue
 JsonValueType
+Kristensen
 LIBPFM
 LPMF
 LandingsDataInterface
@@ -334,6 +338,9 @@ ParseString
 ParseValue
 ParseVector
 PascalCase
+Pdev
+phiTrans
+plogis
 PlusGroup
 Polymorphism
 PopulationEvaluateTestFixture
@@ -369,6 +376,7 @@ RegisterParameter
 RegisterParameterName
 RegisterRandomEffect
 RegisterRandomEffectName
+Reparameterization
 ResetVector
 Ricker
 Rmd
@@ -376,6 +384,7 @@ Rmpi
 Robj
 Rscript
 Rslaves
+RTMB
 RunModelLoop
 SBPR
 SDreports
@@ -471,6 +480,7 @@ WORDLIST
 WSL
 Wa
 Wb
+widehat
 WriteAtExit
 WriteJsonValue
 WriteToFile

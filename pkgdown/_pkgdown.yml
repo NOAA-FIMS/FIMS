@@ -38,6 +38,10 @@ articles:
   - training-intro-cpp
   - training-intro-rcpp
 
+- title: Research and development
+  contents:
+  - RD-re-sparsity
+
 reference:
 - title: Data
   desc: >
