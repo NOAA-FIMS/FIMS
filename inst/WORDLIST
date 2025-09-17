@@ -131,6 +131,7 @@ cbind
 CCALLABLES
 cctype
 cdf
+cdot
 cerr
 CheckDimensions
 checkmarks
@@ -316,6 +317,7 @@ fileext
 FileName
 filesystem
 fims
+FIMS
 fimsfit
 FIMSFit
 fimsframe
@@ -410,6 +412,7 @@ HardwareConcurrency
 holt
 hotfix
 hpp
+HPP
 hpux
 HPUX
 href
@@ -425,6 +428,7 @@ ilist
 imax
 img
 importFrom
+INAA
 indentLevel
 IndexDataInterface
 IndexExpected
@@ -455,6 +459,8 @@ isspace
 istringstream
 iter
 itewaa
+IW
+IWAA
 JArray
 jmax
 jnll
@@ -481,6 +487,7 @@ LandingsNumberAtAge
 LandingsNumberAtLength
 LastTest
 lcomp
+ldots
 len
 lengthcomp
 LengthComp
@@ -629,6 +636,7 @@ Nyears
 nyr
 objs
 ofstream
+ogive
 onLoad
 onUnload
 OpenBSD
@@ -774,6 +782,7 @@ rzero
 sapply
 saveRDS
 sb
+SBPR
 sbzero
 sd
 sdlog
@@ -869,6 +878,7 @@ SRC
 ss
 ssb
 SSB
+SSBy
 ssbzero
 sstream
 stackoverflow
