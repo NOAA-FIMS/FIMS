@@ -1,7 +1,7 @@
 /**
  * @file growth_base.hpp
- * @brief Includes any .hpp files within the subfolders so that only this file
- * needs to included in the model.hpp file.
+ * @brief Declares the GrowthBase class which is the base class for all growth
+ * functors.
  * @details Defines guards for growth module outline to define the
  * module_name_base hpp file if not already defined.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service

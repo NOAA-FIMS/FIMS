@@ -1,6 +1,6 @@
 /**
  * @file fims_vector.hpp
- * @brief TODO: provide a brief description.
+ * @brief Establishes the FIMS Vector class.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.

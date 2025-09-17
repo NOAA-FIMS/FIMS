@@ -1,3 +1,10 @@
+/**
+ * @file catch_at_age.hpp
+ * @brief Code to specify the catch-at-age model.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
+ */
 #ifndef FIMS_MODELS_CATCH_AT_AGE_HPP
 #define FIMS_MODELS_CATCH_AT_AGE_HPP
 
@@ -8,7 +15,6 @@
 
 namespace fims_popdy {
 
-// TODO: add a function to compute length composition
 template <typename Type>
 /**
  * @brief CatchAtAge is a class containing a catch-at-age model, which is

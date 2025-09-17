@@ -1,3 +1,11 @@
+/**
+ * @file rcpp_models.hpp
+ * @brief The Rcpp interface to declare different types of models. Allows
+ * for the use of methods::new() in R.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
+ */
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 
@@ -194,7 +202,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
     if (pit != info->populations.end()) {
       std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
-      // ToDo: add list of fleet ids operating on this population
       ss << "{\n";
       ss << " \"name\" : \"Population\",\n";
 
@@ -520,9 +527,11 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     return min;
   }
   /**
-   * @brief TODO: document this method.
+   * @brief A function to compute the absolute value of a value array of
+   * floating-point values. It is a wrapper around std::fabs.
    *
-   * @param v
+   * @param v A value array of floating-point values, where floating-point
+   * values is anything with decimals.
    * @return std::valarray<double>
    */
   std::valarray<double> fabs(const std::valarray<double> &v) {

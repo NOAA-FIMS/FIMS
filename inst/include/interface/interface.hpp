@@ -1,6 +1,7 @@
 /**
  * @file interface.hpp
- * @brief An interface to the modeling platforms, e.g., TMB.
+ * @brief An interface to different estimation engines, e.g., TMB, such that
+ * a FIMS model can be optimized using different platforms.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -57,15 +58,15 @@ vector<Type> ADREPORTvector(vector<vector<Type> > x) {
 
 #ifndef TMB_MODEL
 /**
- * @brief TODO: provide a brief description.
+ * @brief TMB macro that simulates data.
  */
 #define FIMS_SIMULATE_F(F)
 /**
- * @brief TODO: provide a brief description.
+ * @brief TMB macro that reports variables.
  */
 #define FIMS_REPORT_F(name, F)
 /**
- * @brief TODO: provide a brief description.
+ * @brief TMB macro that reports variables and uncertainties.
  */
 #define ADREPORT_F(name, F)
 #endif

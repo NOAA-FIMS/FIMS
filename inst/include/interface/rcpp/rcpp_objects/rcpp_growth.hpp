@@ -88,8 +88,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    */
   RealVector ages;
   /**
-   * @brief A map of empirical weight-at-age values. TODO: describe this
-   * parameter better.
+   * @brief A map of empirical weight-at-age values allowing multiple modules to
+   * access and modify the weights without copying values between modules.
    */
   std::shared_ptr<std::map<double, double> > ewaa;
   /**
@@ -146,7 +146,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
   /**
    * @brief Evaluate the growth using empirical weight at age.
-   * @param age Age. TODO: Document this better.
+   * @param age The age at of the individual to evaluate weight.
    * @details This can be called from R using ewaagrowth.evaluate(age).
    */
   virtual double evaluate(double age) {
