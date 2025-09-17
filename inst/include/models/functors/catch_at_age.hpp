@@ -1192,6 +1192,237 @@ namespace fims_popdy
 #ifdef TMB_MODEL
       if (this->do_reporting == true)
       {
+
+        // initialize population vectors
+        vector<vector<Type>> biomass_p(n_pops);
+        vector<vector<Type>> expected_recruitment_p(n_pops);
+        vector<vector<Type>> mortality_F_p(n_pops);
+        vector<vector<Type>> mortality_Z_p(n_pops);
+        vector<vector<Type>> numbers_at_age_p(n_pops);
+        vector<vector<Type>> proportion_mature_at_age_p(n_pops);
+        vector<vector<Type>> spawning_biomass_p(n_pops);
+        vector<vector<Type>> sum_selectivity_p(n_pops);
+        vector<vector<Type>> total_landings_numbers_p(n_pops);
+        vector<vector<Type>> total_landings_weight_p(n_pops);
+        vector<vector<Type>> unfished_biomass_p(n_pops);
+        vector<vector<Type>> unfished_numbers_at_age_p(n_pops);
+        vector<vector<Type>> unfished_spawning_biomass_p(n_pops);
+
+        // initialize fleet vectors
+        vector<vector<Type>> age_comp_expected_f(n_fleets);
+        vector<vector<Type>> age_comp_proportion_f(n_fleets);
+        vector<vector<Type>> agecomp_expected_f(n_fleets);
+        vector<vector<Type>> agecomp_proportion_f(n_fleets);
+        vector<vector<Type>> catch_index_f(n_fleets);
+        vector<vector<Type>> index_expected_f(n_fleets);
+        vector<vector<Type>> index_numbers_f(n_fleets);
+        vector<vector<Type>> index_numbers_at_age_f(n_fleets);
+        vector<vector<Type>> index_numbers_at_length_f(n_fleets);
+        vector<vector<Type>> index_weight_f(n_fleets);
+        vector<vector<Type>> index_weight_at_age_f(n_fleets);
+        vector<vector<Type>> landings_expected_f(n_fleets);
+        vector<vector<Type>> landings_numbers_f(n_fleets);
+        vector<vector<Type>> landings_numbers_at_age_f(n_fleets);
+        vector<vector<Type>> landings_numbers_at_length_f(n_fleets);
+        vector<vector<Type>> landings_weight_f(n_fleets);
+        vector<vector<Type>> landings_weight_at_age_f(n_fleets);
+        vector<vector<Type>> length_comp_expected_f(n_fleets);
+        vector<vector<Type>> length_comp_proportion_f(n_fleets);
+        vector<vector<Type>> lengthcomp_expected_f(n_fleets);
+        vector<vector<Type>> lengthcomp_proportion_f(n_fleets);
+        vector<vector<Type>> log_index_expected_f(n_fleets);
+        vector<vector<Type>> log_landings_expected_f(n_fleets);
+
+        // initiate population index for structuring report out objects
+        int pop_idx = 0;
+        for (size_t p = 0; p < this->populations.size(); p++)
+        {
+          std::shared_ptr<fims_popdy::Population<Type>> &population =
+              this->populations[p];
+          std::map<std::string, fims::Vector<Type>> &derived_quantities =
+              this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
+
+          biomass_p(pop_idx) = derived_quantities["biomass"];
+          expected_recruitment_p(pop_idx) = derived_quantities["expected_recruitment"];
+          mortality_F_p(pop_idx) = derived_quantities["mortality_F"];
+          mortality_Z_p(pop_idx) = derived_quantities["mortality_Z"];
+          numbers_at_age_p(pop_idx) = derived_quantities["numbers_at_age"];
+          proportion_mature_at_age_p(pop_idx) = derived_quantities["proportion_mature_at_age"];
+          spawning_biomass_p(pop_idx) = derived_quantities["spawning_biomass"];
+          sum_selectivity_p(pop_idx) = derived_quantities["sum_selectivity"];
+          total_landings_numbers_p(pop_idx) = derived_quantities["total_landings_numbers"];
+          total_landings_weight_p(pop_idx) = derived_quantities["total_landings_weight"];
+          unfished_biomass_p(pop_idx) = derived_quantities["unfished_biomass"];
+          unfished_numbers_at_age_p(pop_idx) = derived_quantities["unfished_numbers_at_age"];
+          unfished_spawning_biomass_p(pop_idx) = derived_quantities["unfished_spawning_biomass"];
+          pop_idx += 1;
+        }
+
+        // initiate fleet index for structuring report out objects
+        int fleet_idx = 0;
+        fleet_iterator fit;
+        for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit)
+        {
+          std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+          std::map<std::string, fims::Vector<Type>> &derived_quantities =
+              this->GetFleetDerivedQuantities(fleet->GetId());
+
+          age_comp_expected_f(fleet_idx) = derived_quantities["age_comp_expected"];
+          age_comp_proportion_f(fleet_idx) = derived_quantities["age_comp_proportion"];
+          agecomp_expected_f(fleet_idx) = derived_quantities["agecomp_expected"];
+          agecomp_proportion_f(fleet_idx) = derived_quantities["agecomp_proportion"];
+          catch_index_f(fleet_idx) = derived_quantities["catch_index"];
+          index_expected_f(fleet_idx) = derived_quantities["index_expected"];
+          index_numbers_f(fleet_idx) = derived_quantities["index_numbers"];
+          index_numbers_at_age_f(fleet_idx) = derived_quantities["index_numbers_at_age"];
+          index_numbers_at_length_f(fleet_idx) = derived_quantities["index_numbers_at_length"];
+          index_weight_f(fleet_idx) = derived_quantities["index_weight"];
+          index_weight_at_age_f(fleet_idx) = derived_quantities["index_weight_at_age"];
+          landings_expected_f(fleet_idx) = derived_quantities["landings_expected"];
+          landings_numbers_f(fleet_idx) = derived_quantities["landings_numbers"];
+          landings_numbers_at_age_f(fleet_idx) = derived_quantities["landings_numbers_at_age"];
+          landings_numbers_at_length_f(fleet_idx) = derived_quantities["landings_numbers_at_length"];
+          landings_weight_f(fleet_idx) = derived_quantities["landings_weight"];
+          landings_weight_at_age_f(fleet_idx) = derived_quantities["landings_weight_at_age"];
+          length_comp_expected_f(fleet_idx) = derived_quantities["length_comp_expected"];
+          length_comp_proportion_f(fleet_idx) = derived_quantities["length_comp_proportion"];
+          lengthcomp_expected_f(fleet_idx) = derived_quantities["lengthcomp_expected"];
+          lengthcomp_proportion_f(fleet_idx) = derived_quantities["lengthcomp_proportion"];
+          log_index_expected_f(fleet_idx) = derived_quantities["log_index_expected"];
+          log_landings_expected_f(fleet_idx) = derived_quantities["log_landings_expected"];
+          fleet_idx += 1;
+        }
+
+        vector<Type> biomass = ADREPORTvector(biomass_p);
+        vector<Type> expected_recruitment = ADREPORTvector(expected_recruitment_p);
+        vector<Type> mortality_F = ADREPORTvector(mortality_F_p);
+        vector<Type> mortality_Z = ADREPORTvector(mortality_Z_p);
+        vector<Type> numbers_at_age = ADREPORTvector(numbers_at_age_p);
+        vector<Type> proportion_mature_at_age = ADREPORTvector(proportion_mature_at_age_p);
+        vector<Type> spawning_biomass = ADREPORTvector(spawning_biomass_p);
+        vector<Type> sum_selectivity = ADREPORTvector(sum_selectivity_p);
+        vector<Type> total_landings_numbers = ADREPORTvector(total_landings_numbers_p);
+        vector<Type> total_landings_weight = ADREPORTvector(total_landings_weight_p);
+        vector<Type> unfished_biomass = ADREPORTvector(unfished_biomass_p);
+        vector<Type> unfished_numbers_at_age = ADREPORTvector(unfished_numbers_at_age_p);
+        vector<Type> unfished_spawning_biomass = ADREPORTvector(unfished_spawning_biomass_p);
+
+        vector<Type> age_comp_expected = ADREPORTvector(age_comp_expected_f);
+        vector<Type> age_comp_proportion = ADREPORTvector(age_comp_proportion_f);
+        vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
+        vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
+        vector<Type> catch_index = ADREPORTvector(catch_index_f);
+        vector<Type> index_expected = ADREPORTvector(index_expected_f);
+        vector<Type> index_numbers = ADREPORTvector(index_numbers_f);
+        vector<Type> index_numbers_at_age = ADREPORTvector(index_numbers_at_age_f);
+        vector<Type> index_numbers_at_length = ADREPORTvector(index_numbers_at_length_f);
+        vector<Type> index_weight = ADREPORTvector(index_weight_f);
+        vector<Type> index_weight_at_age = ADREPORTvector(index_weight_at_age_f);
+        vector<Type> landings_expected = ADREPORTvector(landings_expected_f);
+        vector<Type> landings_numbers = ADREPORTvector(landings_numbers_f);
+        vector<Type> landings_numbers_at_age = ADREPORTvector(landings_numbers_at_age_f);
+        vector<Type> landings_numbers_at_length = ADREPORTvector(landings_numbers_at_length_f);
+        vector<Type> landings_weight = ADREPORTvector(landings_weight_f);
+        vector<Type> landings_weight_at_age = ADREPORTvector(landings_weight_at_age_f);
+        vector<Type> length_comp_expected = ADREPORTvector(length_comp_expected_f);
+        vector<Type> length_comp_proportion = ADREPORTvector(length_comp_proportion_f);
+        vector<Type> lengthcomp_expected = ADREPORTvector(lengthcomp_expected_f);
+        vector<Type> lengthcomp_proportion = ADREPORTvector(lengthcomp_proportion_f);
+        vector<Type> log_index_expected = ADREPORTvector(log_index_expected_f);
+        vector<Type> log_landings_expected = ADREPORTvector(log_landings_expected_f);
+
+        // populations
+        // report
+        FIMS_REPORT_F(biomass_p, this->of);
+        FIMS_REPORT_F(expected_recruitment_p, this->of);
+        FIMS_REPORT_F(mortality_F_p, this->of);
+        FIMS_REPORT_F(mortality_Z_p, this->of);
+        FIMS_REPORT_F(numbers_at_age_p, this->of);
+        FIMS_REPORT_F(proportion_mature_at_age_p, this->of);
+        FIMS_REPORT_F(spawning_biomass_p, this->of);
+        FIMS_REPORT_F(sum_selectivity_p, this->of);
+        FIMS_REPORT_F(total_landings_numbers_p, this->of);
+        FIMS_REPORT_F(total_landings_weight_p, this->of);
+        FIMS_REPORT_F(unfished_biomass_p, this->of);
+        FIMS_REPORT_F(unfished_numbers_at_age_p, this->of);
+        FIMS_REPORT_F(unfished_spawning_biomass_p, this->of);
+
+        // adreport
+        ADREPORT_F(biomass, this->of);
+        ADREPORT_F(expected_recruitment, this->of);
+        ADREPORT_F(mortality_F, this->of);
+        ADREPORT_F(mortality_Z, this->of);
+        ADREPORT_F(numbers_at_age, this->of);
+        ADREPORT_F(proportion_mature_at_age, this->of);
+        ADREPORT_F(spawning_biomass, this->of);
+        ADREPORT_F(sum_selectivity, this->of);
+        ADREPORT_F(total_landings_numbers, this->of);
+        ADREPORT_F(total_landings_weight, this->of);
+        ADREPORT_F(unfished_biomass, this->of);
+        ADREPORT_F(unfished_numbers_at_age, this->of);
+        ADREPORT_F(unfished_spawning_biomass, this->of);
+
+        // fleets
+        // report
+        FIMS_REPORT_F(age_comp_expected_f, this->of);
+        FIMS_REPORT_F(age_comp_proportion_f, this->of);
+        FIMS_REPORT_F(agecomp_expected_f, this->of);
+        FIMS_REPORT_F(agecomp_proportion_f, this->of);
+        FIMS_REPORT_F(catch_index_f, this->of);
+        FIMS_REPORT_F(index_expected_f, this->of);
+        FIMS_REPORT_F(index_numbers_f, this->of);
+        FIMS_REPORT_F(index_numbers_at_age_f, this->of);
+        FIMS_REPORT_F(index_numbers_at_length_f, this->of);
+        FIMS_REPORT_F(index_weight_f, this->of);
+        FIMS_REPORT_F(index_weight_at_age_f, this->of);
+        FIMS_REPORT_F(landings_expected_f, this->of);
+        FIMS_REPORT_F(landings_numbers_f, this->of);
+        FIMS_REPORT_F(landings_numbers_at_age_f, this->of);
+        FIMS_REPORT_F(landings_numbers_at_length_f, this->of);
+        FIMS_REPORT_F(landings_weight_f, this->of);
+        FIMS_REPORT_F(landings_weight_at_age_f, this->of);
+        FIMS_REPORT_F(length_comp_expected_f, this->of);
+        FIMS_REPORT_F(length_comp_proportion_f, this->of);
+        FIMS_REPORT_F(lengthcomp_expected_f, this->of);
+        FIMS_REPORT_F(lengthcomp_proportion_f, this->of);
+        FIMS_REPORT_F(log_index_expected_f, this->of);
+        FIMS_REPORT_F(log_landings_expected_f, this->of);
+
+        // adreport
+        ADREPORT_F(age_comp_expected, this->of);
+        ADREPORT_F(age_comp_proportion, this->of);
+        ADREPORT_F(agecomp_expected, this->of);
+        ADREPORT_F(agecomp_proportion, this->of);
+        ADREPORT_F(catch_index, this->of);
+        ADREPORT_F(index_expected, this->of);
+        ADREPORT_F(index_numbers, this->of);
+        ADREPORT_F(index_numbers_at_age, this->of);
+        ADREPORT_F(index_numbers_at_length, this->of);
+        ADREPORT_F(index_weight, this->of);
+        ADREPORT_F(index_weight_at_age, this->of);
+        ADREPORT_F(landings_expected, this->of);
+        ADREPORT_F(landings_numbers, this->of);
+        ADREPORT_F(landings_numbers_at_age, this->of);
+        ADREPORT_F(landings_numbers_at_length, this->of);
+        ADREPORT_F(landings_weight, this->of);
+        ADREPORT_F(landings_weight_at_age, this->of);
+        ADREPORT_F(length_comp_expected, this->of);
+        ADREPORT_F(length_comp_proportion, this->of);
+        ADREPORT_F(lengthcomp_expected, this->of);
+        ADREPORT_F(lengthcomp_proportion, this->of);
+        ADREPORT_F(log_index_expected, this->of);
+        ADREPORT_F(log_landings_expected, this->of);
+      }
+#endif
+    }
+
+    virtual void Report_old()
+    {
+      int n_fleets = this->fleets.size();
+      int n_pops = this->populations.size();
+#ifdef TMB_MODEL
+      if (this->do_reporting == true)
+      {
         // Create vector lists to store output for reporting
         // vector< vector<Type> > creates a nested vector structure where
         // each vector can be a different dimension. Does not work with ADREPORT
@@ -1243,7 +1474,7 @@ namespace fims_popdy
           recruitment(pop_idx) =
               vector<Type>(derived_quantities["expected_recruitment"]);
           biomass(pop_idx) = vector<Type>(derived_quantities["biomass"]);
-          M(pop_idx) = vector<Type>(population->M);
+          // M(pop_idx) = vector<Type>(population->M);
 
           pop_idx += 1;
         }
@@ -1256,8 +1487,8 @@ namespace fims_popdy
           std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
           std::map<std::string, fims::Vector<Type>> &derived_quantities =
               this->GetFleetDerivedQuantities(fleet->GetId());
-          landings_w(fleet_idx) = derived_quantities["landings_weight"];
-          landings_n(fleet_idx) = derived_quantities["landings_numbers"];
+          // landings_w(fleet_idx) = derived_quantities["total_landings_weight"];
+          // landings_n(fleet_idx) = derived_quantities["total_landings_numbers"];
           landings_exp(fleet_idx) = derived_quantities["landings_expected"];
           landings_naa(fleet_idx) = derived_quantities["landings_numbers_at_age"];
           landings_waa(fleet_idx) = derived_quantities["landings_weight_at_age"];
@@ -1273,7 +1504,7 @@ namespace fims_popdy
           agecomp_prop(fleet_idx) = derived_quantities["agecomp_proportion"];
           lengthcomp_prop(fleet_idx) = derived_quantities["lengthcomp_proportion"];
           // F_mort(fleet_idx) = derived_quantities["Fmort"];
-       //   q(fleet_idx) = derived_quantities["q"];
+          //   q(fleet_idx) = derived_quantities["q"];
           fleet_idx += 1;
         }
 
@@ -1305,7 +1536,7 @@ namespace fims_popdy
         FIMS_REPORT_F(agecomp_prop, this->of);
         FIMS_REPORT_F(lengthcomp_prop, this->of);
         // FIMS_REPORT_F(F_mort, this->of);
-       // FIMS_REPORT_F(q, this->of);
+        // FIMS_REPORT_F(q, this->of);
 
         /*ADREPORT using ADREPORTvector defined in
          * inst/include/interface/interface.hpp:
@@ -1331,7 +1562,7 @@ namespace fims_popdy
         ADREPORT_F(NAA, this->of);
         ADREPORT_F(Biomass, this->of);
         ADREPORT_F(SSB, this->of);
-        //ADREPORT_F(LogRecDev, this->of);
+        // ADREPORT_F(LogRecDev, this->of);
         ADREPORT_F(FMort, this->of);
         // ADREPORT_F(Q, this->of);
         ADREPORT_F(LandingsExpected, this->of);

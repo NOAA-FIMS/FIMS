@@ -353,6 +353,8 @@ public:
       break;
     }
 
+ 
+
     // build JSON string
     ss << "{\n";
     ss << "\"name\":\"" << (*it).first << "\",\n";
@@ -428,7 +430,6 @@ public:
       ss << this->derived_quantity_to_json(it, dim_info_it->second) << ",\n";
     }
 
-
     dim_info_it = dim_info.find(second_to_last->first);
     if (dim_info_it != dim_info.end())
     {
@@ -436,7 +437,7 @@ public:
     }
     else
     {
-      std::cout<<"Missing dimension info for derived quantity: "<<second_to_last->first<<std::endl;
+      std::cout << "Missing dimension info for derived quantity: " << second_to_last->first << std::endl;
       ss << "{}";
       // Handle case where dimension info is not found
     }
@@ -621,13 +622,22 @@ public:
         Rcpp::Named("random") = "re");
     // Call obj$report()
     Rcpp::Function report = obj["report"];
+    Rcpp::Function func = obj["fn"];
+    Rcpp::Function gradient = obj["gr"];
+    Rcpp::NumericVector grad = gradient(this->get_fixed_parameters_vector());
+    double maxgc = -999;
+    for (R_xlen_t i = 0; i < grad.size(); i++)
+    {
+      if (std::fabs(grad[i]) > maxgc)
+      {
+        maxgc = std::fabs(grad[i]);
+      }
+    }
+    double of_value = Rcpp::as<double>(func(this->get_fixed_parameters_vector()));
     Rcpp::List rep = report();
     // // Standard deviations
     SEXP sdr = sdreport(obj);
     Rcpp::RObject sdr_summary = summary(sdr, "report");
-    // return Rcpp::List::create(
-    //     Rcpp::Named("report") = rep,
-    //     Rcpp::Named("sdr_summary") = sdr_summary);
 
     Rcpp::NumericMatrix mat(sdr_summary);
     Rcpp::List dimnames = mat.attr("dimnames");
@@ -638,6 +648,9 @@ public:
     double first_est = mat(0, 0);
 
     return Rcpp::List::create(
+        Rcpp::Named("objective_function_value") = of_value,
+        Rcpp::Named("gradient") = grad,
+        Rcpp::Named("max_gradient_component") = maxgc,
         Rcpp::Named("report") = rep,
         Rcpp::Named("sdr_summary") = sdr_summary,
         Rcpp::Named("sdr_summary_matrix") = mat,
@@ -881,6 +894,7 @@ public:
     ss << "]";
     ss << ",\n";
     ss << "\"fleets\": [\n";
+   
     typename std::set<uint32_t>::iterator fleet_it;
     typename std::set<uint32_t>::iterator fleet_end_it;
     fleet_end_it = fleet_ids.end();
