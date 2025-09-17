@@ -109,6 +109,13 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase
    */
   typedef typename std::set<uint32_t>::iterator population_id_iterator;
 
+  /**
+   * @brief A private working map of standard error values for all
+   * concatenated derived quantities. Elements are extracted in the
+   * to_json method.
+   */
+  std::map<std::string, std::vector<double>> se_values;
+
 public:
   /**
    * @brief The constructor.
@@ -303,6 +310,15 @@ public:
     fims::Vector<double> &dq = (*it).second;
     std::stringstream dim_entry;
 
+    bool has_se = false;
+    typename std::map<std::string, std::vector<double>>::iterator se_vals =
+        this->se_values.find(name);
+
+    if (se_vals != this->se_values.end())
+    {
+      has_se = true;
+    }
+    std::cout << __LINE__ << std::endl;
     // gather dimension information
     switch (dim_info.ndims)
     {
@@ -353,8 +369,6 @@ public:
       break;
     }
 
- 
-
     // build JSON string
     ss << "{\n";
     ss << "\"name\":\"" << (*it).first << "\",\n";
@@ -387,16 +401,29 @@ public:
     {
       ss << "],\n";
     }
-    ss << "\"uncertainty\": [";
-    for (size_t i = 0; i < dq.size(); ++i)
+    if (has_se)
     {
-      ss << "-999.0"; // Placeholder for uncertainty values
-      if (i < dq.size() - 1)
-      {
-        ss << ", ";
-      }
+
+      std::vector<double> &se_vals_vector = (*se_vals).second;
+      std::vector<double> uncertainty_std(se_vals_vector.begin(), se_vals_vector.begin() + dq.size());
+      std::vector<double> temp(se_vals_vector.begin() + dq.size(), se_vals_vector.end());
+      se_vals_vector = temp;
+      fims::Vector<double> uncertainty(uncertainty_std);
+      ss << "\"uncertainty\": " << uncertainty << "\n";
     }
-    ss << "]\n";
+    else
+    {
+      ss << "\"uncertainty\": [";
+      for (size_t i = 0; i < dq.size(); ++i)
+      {
+        ss << "-999.0"; // Placeholder for uncertainty values
+        if (i < dq.size() - 1)
+        {
+          ss << ", ";
+        }
+      }
+      ss << "]\n";
+    }
     ss << "}";
 
     return ss.str();
@@ -485,8 +512,8 @@ public:
       ss << " \"nyears\": " << fleet_interface->nyears.get() << ",\n";
       ss << " \"nlengths\": " << fleet_interface->nlengths.get() << ",\n";
       ss << "\"data_ids\" : [\n";
-      ss << "{\"age_comp\": " << fleet_interface->GetObservedAgeCompDataID() << "},\n";
-      ss << "{\"length_comp\": " << fleet_interface->GetObservedLengthCompDataID() << "},\n";
+      ss << "{\"agecomp\": " << fleet_interface->GetObservedAgeCompDataID() << "},\n";
+      ss << "{\"lengthcomp\": " << fleet_interface->GetObservedLengthCompDataID() << "},\n";
       ss << "{\"index\": " << fleet_interface->GetObservedIndexDataID() << "},\n";
       ss << "{\"landings\": " << fleet_interface->GetObservedLandingsDataID() << "}\n";
       ss << "],\n";
@@ -644,6 +671,23 @@ public:
     Rcpp::CharacterVector rownames = dimnames[0];
     Rcpp::CharacterVector colnames = dimnames[1];
 
+    // ---- Group into map ----
+    std::map<std::string, std::vector<double>> grouped;
+    int nrow = mat.nrow();
+    for (int i = 0; i < nrow; i++)
+    {
+      std::string key = Rcpp::as<std::string>(rownames[i]);
+      double val = mat(i, 1); // col 1 = "Std. Error"
+      grouped[key].push_back(val);
+    }
+
+    // ---- Convert map -> R list ----
+    Rcpp::List grouped_out;
+    for (auto const &kv : grouped)
+    {
+      grouped_out[kv.first] = Rcpp::wrap(kv.second);
+    }
+
     // Example: grab "Estimate" for first row
     double first_est = mat(0, 0);
 
@@ -656,7 +700,8 @@ public:
         Rcpp::Named("sdr_summary_matrix") = mat,
         Rcpp::Named("first_est") = first_est,
         Rcpp::Named("rownames") = rownames,
-        Rcpp::Named("colnames") = colnames);
+        Rcpp::Named("colnames") = colnames,
+        Rcpp::Named("grouped_se") = grouped_out);
   }
 
   /**
@@ -665,12 +710,40 @@ public:
   virtual std::string to_json()
   {
 
+    Rcpp::List report = get_report();
+
+    Rcpp::List grouped_out = report["grouped_se"];
+    double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
+    Rcpp::NumericVector grad = report["gradient"];
+    double of_value = Rcpp::as<double>(report["objective_function_value"]);
+
+    fims::Vector<double> gradient(grad.size());
+    for (int i = 0; i < grad.size(); i++)
+    {
+      gradient[i] = grad[i];
+    }
+    // Assume grouped_out is an Rcpp::List
+    std::map<std::string, std::vector<double>> grouped_cpp;
+    Rcpp::CharacterVector names = grouped_out.names();
+    for (int i = 0; i < grouped_out.size(); i++)
+    {
+      std::string key = Rcpp::as<std::string>(names[i]);
+      Rcpp::NumericVector vec = grouped_out[i]; // each element is a numeric vector
+      std::vector<double> vec_std(vec.size());
+      for (int j = 0; j < vec.size(); j++)
+      {
+        vec_std[j] = vec[j];
+      }
+      grouped_cpp[key] = vec_std;
+    }
+    this->se_values = grouped_cpp;
+    std::cout << __LINE__ << std::endl;
     std::set<uint32_t> recruitment_ids;
     std::set<uint32_t> growth_ids;
     std::set<uint32_t> maturity_ids;
     std::set<uint32_t> selectivity_ids;
     std::set<uint32_t> fleet_ids;
-
+    std::cout << __LINE__ << std::endl;
     // gather sub-module info from population and fleets
     typename std::set<uint32_t>::iterator module_id_it; // generic
     typename std::set<uint32_t>::iterator pit;
@@ -738,6 +811,8 @@ public:
 #endif
     ss << " \"id\": " << this->get_id() << ",\n";
     ss << " \"objective_function_value\": " << value << ",\n";
+    ss << " \"max_gradient_component\": " << max_gc << ",\n";
+    ss << " \"gradient\": " << gradient << ",\n";
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end(); module_id_it++)
     {
@@ -894,7 +969,7 @@ public:
     ss << "]";
     ss << ",\n";
     ss << "\"fleets\": [\n";
-   
+
     typename std::set<uint32_t>::iterator fleet_it;
     typename std::set<uint32_t>::iterator fleet_end_it;
     fleet_end_it = fleet_ids.end();
@@ -1251,17 +1326,17 @@ public:
                                     fims::Vector<int>{(fleet_interface->nyears.get())},
                                     fims::Vector<std::string>{"nyears"});
 
-      derived_quantities["age_comp_proportion"] = fims::Vector<Type>(
+      derived_quantities["agecomp_proportion"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
-      derived_quantities_dim_info["age_comp_proportion"] =
-          fims_popdy::DimensionInfo("age_comp_proportion",
+      derived_quantities_dim_info["agecomp_proportion"] =
+          fims_popdy::DimensionInfo("agecomp_proportion",
                                     fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nages.get()},
                                     fims::Vector<std::string>{"nyears", "nages"});
 
-      derived_quantities["length_comp_proportion"] = fims::Vector<Type>(
+      derived_quantities["lengthcomp_proportion"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
-      derived_quantities_dim_info["length_comp_proportion"] =
-          fims_popdy::DimensionInfo("length_comp_proportion",
+      derived_quantities_dim_info["lengthcomp_proportion"] =
+          fims_popdy::DimensionInfo("lengthcomp_proportion",
                                     fims::Vector<int>{(fleet_interface->nyears.get()), fleet_interface->nlengths.get()},
                                     fims::Vector<std::string>{"nyears", "nlengths"});
 
@@ -1328,17 +1403,17 @@ public:
                                     fims::Vector<int>{(fleet_interface->nyears.get())},
                                     fims::Vector<std::string>{"nyears"});
 
-      derived_quantities["age_comp_expected"] = fims::Vector<Type>(
+      derived_quantities["agecomp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nages.get());
-      derived_quantities_dim_info["age_comp_expected"] =
-          fims_popdy::DimensionInfo("age_comp_expected",
+      derived_quantities_dim_info["agecomp_expected"] =
+          fims_popdy::DimensionInfo("agecomp_expected",
                                     fims::Vector<int>{(fleet_interface->nyears.get()), (fleet_interface->nages.get())},
                                     fims::Vector<std::string>{"nyears", "nages"});
 
-      derived_quantities["length_comp_expected"] = fims::Vector<Type>(
+      derived_quantities["lengthcomp_expected"] = fims::Vector<Type>(
           fleet_interface->nyears.get() * fleet_interface->nlengths.get());
-      derived_quantities_dim_info["length_comp_expected"] =
-          fims_popdy::DimensionInfo("length_comp_expected",
+      derived_quantities_dim_info["lengthcomp_expected"] =
+          fims_popdy::DimensionInfo("lengthcomp_expected",
                                     fims::Vector<int>{(fleet_interface->nyears.get()), (fleet_interface->nlengths.get())},
                                     fims::Vector<std::string>{"nyears", "nlengths"});
 
@@ -1348,20 +1423,20 @@ public:
       info->variable_map[fleet_interface->log_index_expected.id_m] =
           &(derived_quantities["log_index_expected"]);
       info->variable_map[fleet_interface->agecomp_expected.id_m] =
-          &(derived_quantities["age_comp_expected"]);
+          &(derived_quantities["agecomp_expected"]);
       info->variable_map[fleet_interface->agecomp_proportion.id_m] =
-          &(derived_quantities["age_comp_proportion"]);
+          &(derived_quantities["agecomp_proportion"]);
       info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
-          &(derived_quantities["length_comp_expected"]);
+          &(derived_quantities["lengthcomp_expected"]);
       // if (fleet_interface->nlengths.get() > 0)
       // {
       //   info->variable_map[fleet_interface->age_to_length_conversion.id_m] =
       //       &(derived_quantities["age_to_length_conversion"]);
       // }
-      info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
-          &(derived_quantities["length_comp_expected"]);
+      // info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
+      //     &(derived_quantities["length_comp_expected"]);
       info->variable_map[fleet_interface->lengthcomp_proportion.id_m] =
-          &(derived_quantities["length_comp_proportion"]);
+          &(derived_quantities["lengthcomp_proportion"]);
     }
 
     return true;

@@ -745,7 +745,7 @@ namespace fims_popdy
             for (size_t age = 0; age < population->nages; age++)
             {
               size_t i_age_year = year * population->nages + age;
-              fdq_["age_comp_proportion"][i_age_year] =
+              fdq_["agecomp_proportion"][i_age_year] =
                   fdq_["landings_numbers_at_age"][i_age_year] /
                   sum_age;
             }
@@ -756,7 +756,7 @@ namespace fims_popdy
               {
                 fims::Vector<Type> &landings_numbers_at_length = fdq_["landings_numbers_at_length"];
                 fims::Vector<Type> &landings_numbers_at_age = fdq_["landings_numbers_at_age"];
-                fims::Vector<Type> &proportion_landings_numbers_at_length = fdq_["length_comp_proportion"];
+                fims::Vector<Type> &proportion_landings_numbers_at_length = fdq_["lengthcomp_proportion"];
 
                 sum_length = 0.0;
                 for (size_t l = 0; l < population->fleets[fleet_]->nlengths;
@@ -781,7 +781,7 @@ namespace fims_popdy
                 {
                   size_t i_length_year =
                       y * population->fleets[fleet_]->nlengths + l;
-                  fdq_["length_comp_proportion"][i_length_year] =
+                  fdq_["lengthcomp_proportion"][i_length_year] =
                       fdq_["landings_numbers_at_length"][i_length_year] /
                       sum_length;
                 }
@@ -790,7 +790,7 @@ namespace fims_popdy
                 {
                   size_t i_length_year =
                       y * population->fleets[fleet_]->nlengths + l;
-                  fdq_["length_comp_proportion"][i_length_year] =
+                  fdq_["lengthcomp_proportion"][i_length_year] =
                       fdq_["landings_numbers_at_length"][i_length_year] /
                       sum_length;
                 }
@@ -835,15 +835,15 @@ namespace fims_popdy
             // the year.
             if (fleet->fleet_observed_landings_data_id_m == -999)
             {
-              fdq_["age_comp_expected"][i_age_year] =
+              fdq_["agecomp_expected"][i_age_year] =
                   fdq_["index_numbers_at_age"][i_age_year];
             }
             else
             {
-              fdq_["age_comp_expected"][i_age_year] =
+              fdq_["agecomp_expected"][i_age_year] =
                   fdq_["landings_numbers_at_age"][i_age_year];
             }
-            sum += fdq_["age_comp_expected"][i_age_year];
+            sum += fdq_["agecomp_expected"][i_age_year];
             // robust_sum -= robust_add;
 
             // This sums over the observed age composition data so that
@@ -865,15 +865,15 @@ namespace fims_popdy
           for (size_t a = 0; a < fleet->nages; a++)
           {
             size_t i_age_year = y * fleet->nages + a;
-            fdq_["age_comp_proportion"][i_age_year] =
-                fdq_["age_comp_expected"][i_age_year] /
+            fdq_["agecomp_proportion"][i_age_year] =
+                fdq_["agecomp_expected"][i_age_year] /
                 sum;
             // robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
 
             if (fleet->fleet_observed_agecomp_data_id_m != -999)
             {
-              fdq_["age_comp_expected"][i_age_year] =
-                  fdq_["age_comp_proportion"][i_age_year] *
+              fdq_["agecomp_expected"][i_age_year] =
+                  fdq_["agecomp_proportion"][i_age_year] *
                   sum_obs;
             }
           }
@@ -913,8 +913,8 @@ namespace fims_popdy
               {
                 size_t i_age_year = y * fleet->nages + a;
                 size_t i_length_age = a * fleet->nlengths + l;
-                fdq_["length_comp_expected"][i_length_year] +=
-                    fdq_["age_comp_expected"][i_age_year] *
+                fdq_["lengthcomp_expected"][i_length_year] +=
+                    fdq_["agecomp_expected"][i_age_year] *
                     fleet->age_to_length_conversion[i_length_age];
 
                 fdq_["landings_numbers_at_length"][i_length_year] +=
@@ -926,7 +926,7 @@ namespace fims_popdy
                     fleet->age_to_length_conversion[i_length_age];
               }
 
-              sum += fdq_["length_comp_expected"][i_length_year];
+              sum += fdq_["lengthcomp_expected"][i_length_year];
               // robust_sum -= robust_add;
 
               if (fleet->fleet_observed_lengthcomp_data_id_m != -999)
@@ -941,15 +941,15 @@ namespace fims_popdy
             for (size_t l = 0; l < fleet->nlengths; l++)
             {
               size_t i_length_year = y * fleet->nlengths + l;
-              fdq_["length_comp_proportion"][i_length_year] =
-                  fdq_["length_comp_expected"][i_length_year] /
+              fdq_["lengthcomp_proportion"][i_length_year] =
+                  fdq_["lengthcomp_expected"][i_length_year] /
                   sum;
               // robust_add + robust_sum *
               // this->lengthcomp_expected[i_length_year] / sum;
               if (fleet->fleet_observed_lengthcomp_data_id_m != -999)
               {
-                fdq_["length_comp_expected"][i_length_year] =
-                    fdq_["length_comp_proportion"][i_length_year] *
+                fdq_["lengthcomp_expected"][i_length_year] =
+                    fdq_["lengthcomp_proportion"][i_length_year] *
                     sum_obs;
               }
             }
@@ -1192,6 +1192,11 @@ namespace fims_popdy
 #ifdef TMB_MODEL
       if (this->do_reporting == true)
       {
+        // std::shared_ptr<UncertaintyReportInfoMap> population_uncertainty_report_info_map =
+        //     this->GetPopulationUncertaintyReportInfoMap();
+
+        // std::shared_ptr<UncertaintyReportInfoMap> fleet_uncertainty_report_info_map =
+        //     this->GetFleetUncertaintyReportInfoMap();
 
         // initialize population vectors
         vector<vector<Type>> biomass_p(n_pops);
@@ -1209,8 +1214,8 @@ namespace fims_popdy
         vector<vector<Type>> unfished_spawning_biomass_p(n_pops);
 
         // initialize fleet vectors
-        vector<vector<Type>> age_comp_expected_f(n_fleets);
-        vector<vector<Type>> age_comp_proportion_f(n_fleets);
+        // vector<vector<Type>> agecomp_expected_f(n_fleets);
+        // vector<vector<Type>> agecomp_proportion_f(n_fleets);
         vector<vector<Type>> agecomp_expected_f(n_fleets);
         vector<vector<Type>> agecomp_proportion_f(n_fleets);
         vector<vector<Type>> catch_index_f(n_fleets);
@@ -1225,9 +1230,9 @@ namespace fims_popdy
         vector<vector<Type>> landings_numbers_at_age_f(n_fleets);
         vector<vector<Type>> landings_numbers_at_length_f(n_fleets);
         vector<vector<Type>> landings_weight_f(n_fleets);
-        vector<vector<Type>> landings_weight_at_age_f(n_fleets);
-        vector<vector<Type>> length_comp_expected_f(n_fleets);
-        vector<vector<Type>> length_comp_proportion_f(n_fleets);
+         vector<vector<Type>> landings_weight_at_age_f(n_fleets);
+        // vector<vector<Type>> length_comp_expected_f(n_fleets);
+        // vector<vector<Type>> length_comp_proportion_f(n_fleets);
         vector<vector<Type>> lengthcomp_expected_f(n_fleets);
         vector<vector<Type>> lengthcomp_proportion_f(n_fleets);
         vector<vector<Type>> log_index_expected_f(n_fleets);
@@ -1237,8 +1242,8 @@ namespace fims_popdy
         int pop_idx = 0;
         for (size_t p = 0; p < this->populations.size(); p++)
         {
-          std::shared_ptr<fims_popdy::Population<Type>> &population =
-              this->populations[p];
+          // std::shared_ptr<fims_popdy::Population<Type>> &population =
+          //     this->populations[p];
           std::map<std::string, fims::Vector<Type>> &derived_quantities =
               this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
 
@@ -1267,8 +1272,6 @@ namespace fims_popdy
           std::map<std::string, fims::Vector<Type>> &derived_quantities =
               this->GetFleetDerivedQuantities(fleet->GetId());
 
-          age_comp_expected_f(fleet_idx) = derived_quantities["age_comp_expected"];
-          age_comp_proportion_f(fleet_idx) = derived_quantities["age_comp_proportion"];
           agecomp_expected_f(fleet_idx) = derived_quantities["agecomp_expected"];
           agecomp_proportion_f(fleet_idx) = derived_quantities["agecomp_proportion"];
           catch_index_f(fleet_idx) = derived_quantities["catch_index"];
@@ -1284,8 +1287,8 @@ namespace fims_popdy
           landings_numbers_at_length_f(fleet_idx) = derived_quantities["landings_numbers_at_length"];
           landings_weight_f(fleet_idx) = derived_quantities["landings_weight"];
           landings_weight_at_age_f(fleet_idx) = derived_quantities["landings_weight_at_age"];
-          length_comp_expected_f(fleet_idx) = derived_quantities["length_comp_expected"];
-          length_comp_proportion_f(fleet_idx) = derived_quantities["length_comp_proportion"];
+          // length_comp_expected_f(fleet_idx) = derived_quantities["length_comp_expected"];
+          // length_comp_proportion_f(fleet_idx) = derived_quantities["length_comp_proportion"];
           lengthcomp_expected_f(fleet_idx) = derived_quantities["lengthcomp_expected"];
           lengthcomp_proportion_f(fleet_idx) = derived_quantities["lengthcomp_proportion"];
           log_index_expected_f(fleet_idx) = derived_quantities["log_index_expected"];
@@ -1307,8 +1310,7 @@ namespace fims_popdy
         vector<Type> unfished_numbers_at_age = ADREPORTvector(unfished_numbers_at_age_p);
         vector<Type> unfished_spawning_biomass = ADREPORTvector(unfished_spawning_biomass_p);
 
-        vector<Type> age_comp_expected = ADREPORTvector(age_comp_expected_f);
-        vector<Type> age_comp_proportion = ADREPORTvector(age_comp_proportion_f);
+     
         vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
         vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
         vector<Type> catch_index = ADREPORTvector(catch_index_f);
@@ -1324,8 +1326,8 @@ namespace fims_popdy
         vector<Type> landings_numbers_at_length = ADREPORTvector(landings_numbers_at_length_f);
         vector<Type> landings_weight = ADREPORTvector(landings_weight_f);
         vector<Type> landings_weight_at_age = ADREPORTvector(landings_weight_at_age_f);
-        vector<Type> length_comp_expected = ADREPORTvector(length_comp_expected_f);
-        vector<Type> length_comp_proportion = ADREPORTvector(length_comp_proportion_f);
+        // vector<Type> length_comp_expected = ADREPORTvector(length_comp_expected_f);
+        // vector<Type> length_comp_proportion = ADREPORTvector(length_comp_proportion_f);
         vector<Type> lengthcomp_expected = ADREPORTvector(lengthcomp_expected_f);
         vector<Type> lengthcomp_proportion = ADREPORTvector(lengthcomp_proportion_f);
         vector<Type> log_index_expected = ADREPORTvector(log_index_expected_f);
@@ -1333,19 +1335,19 @@ namespace fims_popdy
 
         // populations
         // report
-        FIMS_REPORT_F(biomass_p, this->of);
-        FIMS_REPORT_F(expected_recruitment_p, this->of);
-        FIMS_REPORT_F(mortality_F_p, this->of);
-        FIMS_REPORT_F(mortality_Z_p, this->of);
-        FIMS_REPORT_F(numbers_at_age_p, this->of);
-        FIMS_REPORT_F(proportion_mature_at_age_p, this->of);
-        FIMS_REPORT_F(spawning_biomass_p, this->of);
-        FIMS_REPORT_F(sum_selectivity_p, this->of);
-        FIMS_REPORT_F(total_landings_numbers_p, this->of);
-        FIMS_REPORT_F(total_landings_weight_p, this->of);
-        FIMS_REPORT_F(unfished_biomass_p, this->of);
-        FIMS_REPORT_F(unfished_numbers_at_age_p, this->of);
-        FIMS_REPORT_F(unfished_spawning_biomass_p, this->of);
+        FIMS_REPORT_F_("biomass", biomass_p, this->of);
+        FIMS_REPORT_F_("expected_recruitment", expected_recruitment_p, this->of);
+        FIMS_REPORT_F_("mortality_F", mortality_F_p, this->of);
+        FIMS_REPORT_F_("mortality_Z", mortality_Z_p, this->of);
+        FIMS_REPORT_F_("numbers_at_age", numbers_at_age_p, this->of);
+        FIMS_REPORT_F_("proportion_mature_at_age", proportion_mature_at_age_p, this->of);
+        FIMS_REPORT_F_("spawning_biomass", spawning_biomass_p, this->of);
+        FIMS_REPORT_F_("sum_selectivity", sum_selectivity_p, this->of);
+        FIMS_REPORT_F_("total_landings_numbers", total_landings_numbers_p, this->of);
+        FIMS_REPORT_F_("total_landings_weight", total_landings_weight_p, this->of);
+        FIMS_REPORT_F_("unfished_biomass", unfished_biomass_p, this->of);
+        FIMS_REPORT_F_("unfished_numbers_at_age", unfished_numbers_at_age_p, this->of);
+        FIMS_REPORT_F_("unfished_spawning_biomass", unfished_spawning_biomass_p, this->of);
 
         // adreport
         ADREPORT_F(biomass, this->of);
@@ -1364,33 +1366,33 @@ namespace fims_popdy
 
         // fleets
         // report
-        FIMS_REPORT_F(age_comp_expected_f, this->of);
-        FIMS_REPORT_F(age_comp_proportion_f, this->of);
-        FIMS_REPORT_F(agecomp_expected_f, this->of);
-        FIMS_REPORT_F(agecomp_proportion_f, this->of);
-        FIMS_REPORT_F(catch_index_f, this->of);
-        FIMS_REPORT_F(index_expected_f, this->of);
-        FIMS_REPORT_F(index_numbers_f, this->of);
-        FIMS_REPORT_F(index_numbers_at_age_f, this->of);
-        FIMS_REPORT_F(index_numbers_at_length_f, this->of);
-        FIMS_REPORT_F(index_weight_f, this->of);
-        FIMS_REPORT_F(index_weight_at_age_f, this->of);
-        FIMS_REPORT_F(landings_expected_f, this->of);
-        FIMS_REPORT_F(landings_numbers_f, this->of);
-        FIMS_REPORT_F(landings_numbers_at_age_f, this->of);
-        FIMS_REPORT_F(landings_numbers_at_length_f, this->of);
-        FIMS_REPORT_F(landings_weight_f, this->of);
-        FIMS_REPORT_F(landings_weight_at_age_f, this->of);
-        FIMS_REPORT_F(length_comp_expected_f, this->of);
-        FIMS_REPORT_F(length_comp_proportion_f, this->of);
-        FIMS_REPORT_F(lengthcomp_expected_f, this->of);
-        FIMS_REPORT_F(lengthcomp_proportion_f, this->of);
-        FIMS_REPORT_F(log_index_expected_f, this->of);
-        FIMS_REPORT_F(log_landings_expected_f, this->of);
+        // FIMS_REPORT_F_("age_comp_expected", age_comp_expected_f, this->of);
+        // FIMS_REPORT_F_("age_comp_proportion", age_comp_proportion_f, this->of);
+        FIMS_REPORT_F_("agecomp_expected", agecomp_expected_f, this->of);
+        FIMS_REPORT_F_("agecomp_proportion", agecomp_proportion_f, this->of);
+        FIMS_REPORT_F_("catch_index", catch_index_f, this->of);
+        FIMS_REPORT_F_("index_expected", index_expected_f, this->of);
+        FIMS_REPORT_F_("index_numbers", index_numbers_f, this->of);
+        FIMS_REPORT_F_("index_numbers_at_age", index_numbers_at_age_f, this->of);
+        FIMS_REPORT_F_("index_numbers_at_length", index_numbers_at_length_f, this->of);
+        FIMS_REPORT_F_("index_weight", index_weight_f, this->of);
+        FIMS_REPORT_F_("index_weight_at_age", index_weight_at_age_f, this->of);
+        FIMS_REPORT_F_("landings_expected", landings_expected_f, this->of);
+        FIMS_REPORT_F_("landings_numbers", landings_numbers_f, this->of);
+        FIMS_REPORT_F_("landings_numbers_at_age", landings_numbers_at_age_f, this->of);
+        FIMS_REPORT_F_("landings_numbers_at_length", landings_numbers_at_length_f, this->of);
+        FIMS_REPORT_F_("landings_weight", landings_weight_f, this->of);
+        FIMS_REPORT_F_("landings_weight_at_age", landings_weight_at_age_f, this->of);
+        // FIMS_REPORT_F_("length_comp_expected", length_comp_expected_f, this->of);
+        // FIMS_REPORT_F_("length_comp_proportion", length_comp_proportion_f, this->of);
+        FIMS_REPORT_F_("lengthcomp_expected", lengthcomp_expected_f, this->of);
+        FIMS_REPORT_F_("lengthcomp_proportion", lengthcomp_proportion_f, this->of);
+        FIMS_REPORT_F_("log_index_expected", log_index_expected_f, this->of);
+        FIMS_REPORT_F_("log_landings_expected", log_landings_expected_f, this->of);
 
         // adreport
-        ADREPORT_F(age_comp_expected, this->of);
-        ADREPORT_F(age_comp_proportion, this->of);
+        // ADREPORT_F(age_comp_expected, this->of);
+        // ADREPORT_F(age_comp_proportion, this->of);
         ADREPORT_F(agecomp_expected, this->of);
         ADREPORT_F(agecomp_proportion, this->of);
         ADREPORT_F(catch_index, this->of);
@@ -1406,8 +1408,8 @@ namespace fims_popdy
         ADREPORT_F(landings_numbers_at_length, this->of);
         ADREPORT_F(landings_weight, this->of);
         ADREPORT_F(landings_weight_at_age, this->of);
-        ADREPORT_F(length_comp_expected, this->of);
-        ADREPORT_F(length_comp_proportion, this->of);
+        // ADREPORT_F(length_comp_expected, this->of);
+        // ADREPORT_F(length_comp_proportion, this->of);
         ADREPORT_F(lengthcomp_expected, this->of);
         ADREPORT_F(lengthcomp_proportion, this->of);
         ADREPORT_F(log_index_expected, this->of);

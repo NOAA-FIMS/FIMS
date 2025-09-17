@@ -22,6 +22,7 @@ namespace fims_popdy
     int ndims;                           /*!< number of dimensions */
     fims::Vector<int> dims;              /*!< vector of dimensions */
     fims::Vector<std::string> dim_names; /*!< vector of dimension names */
+    fims::Vector<double> se_values_m;    /*!< final values of the report vector */
 
     /**
      * @brief Default constructor for dimension information.
@@ -53,15 +54,39 @@ namespace fims_popdy
     /**
      * * id of the population or fleet the report is associated with
      */
-    uint32_t id;
+    uint32_t id_m;
     /**
      * * starting index of the report vector in the overall report vector
      */
-    size_t start;
+    size_t start_m;
     /**
      * * length of the report vector
      */
-    size_t length;
+    size_t length_m;
+    
+    
+
+    /**
+     * @brief Default constructor for UncertaintyReportInfo.
+     */
+    UncertaintyReportInfo() : id_m(0), start_m(0), length_m(0) {}
+
+    /**
+     * @brief Constructor with parameters.
+     * @param name The name of the report vector.
+     * @param id The id of the population or fleet the report is associated with.
+     * @param start The starting index of the report vector in the overall report vector.
+     * @param length The length of the report vector.
+     */
+    UncertaintyReportInfo(const std::string &name, uint32_t id, size_t start, size_t length)
+        : name(name), id_m(id), start_m(start), length_m(length) {}
+
+    /**
+     * @brief Copy constructor.
+     * @param other The UncertaintyReportInfo object to copy from.
+     */
+    UncertaintyReportInfo(const UncertaintyReportInfo &other)
+        : name(other.name), id_m(other.id_m), start_m(other.start_m), length_m(other.length_m) {}
   };
 
   template <typename Type>
@@ -311,6 +336,45 @@ namespace fims_popdy
     {
       return (*population_dimension_info)[population_id];
     }
+
+    /**
+     * @brief Get the fleet uncertainty report information.
+     */
+    UncertaintyReportInfoMap &GetFleetUncertaintyReportInfo()
+    {
+      return *fleet_uncertainty_report_info;
+    }
+
+    /**
+     * @brief Get the population uncertainty report information.
+     */
+    UncertaintyReportInfoMap &GetPopulationUncertaintyReportInfo()
+    {
+      return *population_uncertainty_report_info;
+    }
+
+    /**
+     * @brief Get the fleet uncertainty report information for a specified fleet.
+     *
+     * @param fleet_id The ID of the fleet.
+     * @return std::map<std::string, UncertaintyReportInfo>&
+     */
+    std::map<std::string, UncertaintyReportInfo> &GetFleetUncertaintyReportInfo(uint32_t fleet_id)
+    {
+      return (*fleet_uncertainty_report_info)[fleet_id];
+    }
+
+    /**
+     * @brief Get the population uncertainty report information for a specified population.
+     *
+     * @param population_id The ID of the population.
+     * @return std::map<std::string, UncertaintyReportInfo>&
+     */
+    std::map<std::string, UncertaintyReportInfo> &GetPopulationUncertaintyReportInfo(uint32_t population_id)
+    {
+      return (*population_uncertainty_report_info)[population_id];
+    }
+
 
     /**
      * @brief Initialize a model.
