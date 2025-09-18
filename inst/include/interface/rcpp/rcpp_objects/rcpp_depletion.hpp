@@ -325,8 +325,8 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     info->variable_map[this->log_m.id_m] = &(depletion)->log_m;
 
     // set logit_depletion
-    depletion->logit_depletion.resize(this->nyears.get()-1);
-    for (size_t i = 0; i < this->nyears.get()-1; i++) {
+    depletion->logit_depletion.resize(this->nyears.get());
+    for (size_t i = 0; i < this->nyears.get(); i++) {
       depletion->logit_depletion[i] = this->logit_depletion[i].initial_value_m;
 
       if (this->logit_depletion[i].estimation_type_m.get() == "fixed_effects") {
@@ -347,15 +347,15 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     info->variable_map[this->logit_depletion.id_m] = &(depletion)->logit_depletion;
 
     // set depletion
-    depletion->depletion.resize(this->nyears.get());
-    for (size_t i = 0; i < this->nyears.get(); i++) {
+    depletion->depletion.resize(this->nyears.get()+1);
+    for (size_t i = 0; i < (this->nyears.get()+1); i++) {
       depletion->depletion[i] = 0.5;  // initial depletion value
     }
     info->variable_map[this->pop_depletion.id_m] = &(depletion)->depletion;
 
     // set log_expected_depletion
-    depletion->log_expected_depletion.resize(this->nyears.get());
-    for (size_t i = 0; i < this->nyears.get(); i++) {
+    depletion->log_expected_depletion.resize(this->nyears.get()+1);
+    for (size_t i = 0; i < (this->nyears.get()+1); i++) {
       depletion->log_expected_depletion[i] = log(0.5);
     }
     info->variable_map[this->log_expected_depletion.id_m] =

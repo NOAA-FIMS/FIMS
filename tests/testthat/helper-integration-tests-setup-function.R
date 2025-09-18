@@ -607,7 +607,8 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   return(fit)
 }
 
-setup_and_run_sp <- function(estimation_mode = TRUE,
+setup_and_run_sp <- function(bayesian_mode = FALSE,
+                             estimation_mode = TRUE,
                              map = list()) {
    
   # TODO: add ability to create FIMSFrame from data_sp (doesn't work because of age)
@@ -621,9 +622,15 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
     (jabba_pars |>
       dplyr::filter(rownames(jabba_pars) == "K") |> 
       dplyr::select(Median) |> unlist() |> unname())
-  nyears <- 70
-  survey_index <- data_sp |> dplyr::filter(type == "index")
-  landings <- data_sp |> dplyr::filter(type == "landings")
+  # nyears <- 70
+  # survey_index <- data_sp |> dplyr::filter(type == "index")
+  # landings <- data_sp |> dplyr::filter(type == "landings")
+  survey_index_data <- data_sp |> dplyr::filter(type == "index")
+  idx <- which(survey_index_data$value != -999)
+  survey_index <- survey_index_data[idx, ]
+  landings_data <- data_sp |> dplyr::filter(type == "landings")
+  landings <- landings_data[idx, ]
+  nyears <- length(idx)
 
   clear()
   # create index module
@@ -645,8 +652,6 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
   fishing_fleet <- methods::new(Fleet)
   # Set number of years
   fishing_fleet$nyears$set(nyears)
-  fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$log_q[1]$estimation_type$set("constant")
   fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
   survey_fleet <- methods::new(Fleet)
   survey_fleet$nyears$set(nyears)
@@ -657,7 +662,7 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
       dplyr::select(Median) |> log() |> unlist()
     survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   } else {
-    survey_fleet$log_q[1]$value <- log(1.0)
+    survey_fleet$log_q[1]$value <- log(0.5)
     survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   }
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
@@ -690,28 +695,38 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
         dplyr::select(Median) |> log() |> unlist()
     production$log_K[1]$estimation_type$set("fixed_effects")
   } else {
-    production$log_r[1]$value <- rlnorm(1, log(0.2), 0.5) # random draw from prior
+    r.init <- rlnorm(1, log(0.2), 0.5) # random draw from prior
+    production$log_r[1]$value <- log(r.init)
     production$log_r[1]$estimation_type$set("fixed_effects")
-    production$log_K[1]$value <- rlnorm(1, log(8 * max(landings$value)), 1) # random draw from prior
+    K.init <- rlnorm(1, log(8 * max(landings$value)), 
+      (log(1^2+1))) # random draw from prior
+    production$log_K[1]$value <- log(K.init)
     production$log_K[1]$estimation_type$set("fixed_effects")
   }
   # Fix to get Schaefer model
   production$log_m[1]$value <- log(2)
-  production$logit_depletion$resize(nyears-1)
-  for (i in 1:(nyears-1)) {
+  production$logit_depletion$resize(nyears)
+  idx_depletion <- c(idx, 71)
+  input_depletion <- jabba_expect_depletion[idx_depletion]
+  for (i in 1:(nyears)) {
     if(estimation_mode == FALSE){
       production$logit_depletion[i]$value <- 
-        log(jabba_expect_depletion[i+1]/(1 - jabba_expect_depletion[i+1]))
+        log(input_depletion[i+1]/(1 - input_depletion[i+1]))
     } else {
       production$logit_depletion[i]$value <- 0
     }
   }
-  production$logit_depletion$set_all_estimable(TRUE)
+
+  if(bayesian_mode == TRUE) {
+    production$logit_depletion$set_all_estimable(TRUE)
+  } else {
+    production$logit_depletion$set_all_random(TRUE)
+  }
   production$nyears$set(nyears)
 
   production_distribution <- new(DlnormDistribution)
   #Fix sd to jabba value as currently FIMS does not have prior distribution
-  production_distribution$log_sd[1]$value <- log(0.109) # from jabba output
+  production_distribution$log_sd[1]$value <- log(sqrt(3.387369e-02)) # from jabba output
   production_distribution$expected_values$resize(nyears)
   # depletion ~ LNormal(log_expected_depletion, sd))
   production_distribution$set_distribution_links(
@@ -720,27 +735,27 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
   )
 
 
-  # Setup Priors USING jabba DEFAULTS
-  log_r_Prior <- new(DnormDistribution)
-  log_r_Prior$expected_values[1]$value <- log(0.2)
-  log_r_Prior$log_sd[1]$value <- log(0.5)
-  log_r_Prior$set_distribution_links("prior", production$log_r$get_id())
+  if(bayesian_mode == TRUE) {
+    # Setup Priors USING jabba DEFAULTS
+    log_r_Prior <- new(DnormDistribution)
+    log_r_Prior$expected_values[1]$value <- log(0.2)
+    log_r_Prior$log_sd[1]$value <- log(1/0.5^2)
+    log_r_Prior$set_distribution_links("prior", production$log_r$get_id())
 
-  log_K_Prior <- new(DnormDistribution)
-  log_K_Prior$expected_values[1]$value <- log(8 * max(landings$value))
-  log_K_Prior$log_sd[1]$value <- log(sqrt(log(1^2+1))) # CV prior = 1
-  log_K_Prior$set_distribution_links("prior", production$log_K$get_id())
-
+    log_K_Prior <- new(DnormDistribution)
+    log_K_Prior$expected_values[1]$value <- log(8 * max(landings$value))
+    log_K_Prior$log_sd[1]$value <- log(1/(log(1^2+1))) # CV prior = 1
+    log_K_Prior$set_distribution_links("prior", production$log_K$get_id())
+  }
   # create population module
   population <- new(Population)
   population$nyears$set(nyears)
   population$nages$set(1) # only one age in surplus production
   population$ages$resize(1)
   population$ages$set(0, 0) # only one age in surplus production
-  # Fix init depletion to jabba value as currently FIMS does not have prior distribution
-    init_depletion <- jabba_pars |> dplyr::filter(rownames(jabba_pars) == "psi") |> 
-      dplyr::select(Median) |> unlist()
-    population$logit_init_depletion[1]$value <- log(init_depletion/(1 - init_depletion))
+  init_depletion <- jabba_expect_depletion[1] #jabba_pars |> dplyr::filter(rownames(jabba_pars) == "psi") |> 
+    #   dplyr::select(Median) |> unlist()
+  population$logit_init_depletion[1]$value <- log(init_depletion/(1 - init_depletion))
  
   population$SetDepletionID(production$get_id())
   population$AddFleet(fishing_fleet$get_id())
@@ -766,34 +781,52 @@ setup_and_run_sp <- function(estimation_mode = TRUE,
     random = "re" 
     #silent = TRUE, map = list()
   )
+  obj$env$tracepar = TRUE
   if(estimation_mode == TRUE) {
-    # Optimization with nlminb
-    opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-      control = list(eval.max = 10000, iter.max = 10000, trace = 1)
+    if(bayesian_mode == TRUE) {
+      fit <- tmbstan::tmbstan(obj, init =  "best.last.par", iter = 8000)
+      postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
+      ret <- list(
+        parameters = parameters,
+        obj = obj,
+        postmle = postmle
+      )
+
+    } else {
+      # Optimization with nlminb
+      opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
+        control = list(eval.max = 10000, iter.max = 10000, trace = 1)
+      )
+        # Call report using MLE parameter values, or
+      # the initial values if optimization is skipped
+      report <- obj[["report"]](obj[["env"]][["last.par.best"]])
+      sdr <- TMB::sdreport(obj)
+      sdr_report <- summary(sdr, "report")
+      sdr_fixed <- summary(sdr, "fixed")
+      row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
+
+       # Return the results as a list
+      ret <- list(
+        parameters = parameters,
+        obj = obj,
+        opt = opt,
+        report = report,
+        sdr_report = sdr_report,
+        sdr_fixed = sdr_fixed,
+        sdr = sdr
+      )
+    }
+  } else {
+    ret <- list(
+      parameters = parameters,
+      obj = obj,
+      report = obj[["report"]](obj[["env"]][["last.par.best"]])
     )
   }
 
-  obj$report()$biomass
-  jabba_biomass
+  clear()
 
-  obj$report()$fmsy
-  jabba_output$estimates |> 
-    dplyr::filter(rownames(jabba_output$estimates) == "Hmsy") |> 
-    dplyr::select(mu) |> as.vector() |> unlist() |> unname()
-  obj$report()$bmsy 
-  jabba_output$estimates |> 
-    dplyr::filter(rownames(jabba_output$estimates) == "SBmsy") |> 
-    dplyr::select(mu) |> as.vector() |> unlist() |> unname()
-  obj$report()$msy
-  jabba_output$estimates |> 
-    dplyr::filter(rownames(jabba_output$estimates) == "MSY") |> 
-    dplyr::select(mu) |> as.vector() |> unlist() |> unname()
-
-
-  fit <- tmbstan::tmbstan(obj, init =  "best.last.par")
-  postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
-apply(postmle, 2, mean)
-
-  
+  # Return the results as a list
+  return(ret)
 
 }

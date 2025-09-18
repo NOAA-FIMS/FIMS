@@ -128,8 +128,6 @@ class Model {  // may need singleton
         " random_effects is: " + fims::to_string(jnll));
     
 
-
-    this->fims_information->SetupData();
     // Loop over and evaluate data joint negative log-likelihoods
     int n_data = 0;
     for (d_it = this->fims_information->density_components.begin();

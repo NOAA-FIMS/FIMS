@@ -1055,26 +1055,27 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
     std::shared_ptr<fims_popdy::SurplusProduction<Type>> model =
         std::make_shared<fims_popdy::SurplusProduction<Type>>();
     model->id = this->id;
-    population_id_iterator it;
-    for (it = this->population_ids->begin(); it != this->population_ids->end();
-         ++it) {
-      model->AddPopulation((*it));
+    population_id_iterator pit;
+    for (pit = this->population_ids->begin(); pit != this->population_ids->end();
+         ++pit) {
+      model->AddPopulation((*pit));
     }
 
     std::set<uint32_t> fleet_ids;  // all fleets in the model
     typedef typename std::set<uint32_t>::iterator fleet_ids_iterator;
+    fleet_ids_iterator fit;
 
     // add to Information
     info->models_map[this->get_id()] = model;
 
-    for (it = this->population_ids->begin(); it != this->population_ids->end();
-         ++it) {
+    for (pit = this->population_ids->begin(); pit != this->population_ids->end();
+         ++pit) {
       std::shared_ptr<PopulationInterface> population =
           std::dynamic_pointer_cast<PopulationInterface>(
-              PopulationInterfaceBase::live_objects[(*it)]);
+              PopulationInterfaceBase::live_objects[(*pit)]);
 
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
-          model->population_derived_quantities[(*it)];
+          model->population_derived_quantities[(*pit)];
 
       derived_quantities["biomass"] =
           fims::Vector<Type>(population->nyears.get() + 1);
@@ -1084,7 +1085,27 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
 
       derived_quantities["observed_catch"] = fims::Vector<Type>(
           population->nyears.get() * population->nfleets.get());
+
+       for (fit = population->fleet_ids->begin();
+           fit != population->fleet_ids->end(); ++fit) {
+        fleet_ids.insert(*fit);
+      }
     }
+
+    for (fit = fleet_ids.begin(); fit != fleet_ids.end();
+         ++fit) {
+      std::shared_ptr<FleetInterface> fleet_interface =
+          std::dynamic_pointer_cast<FleetInterface>(
+              FleetInterfaceBase::live_objects[(*fit)]);
+
+      std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          model->fleet_derived_quantities[(*fit)];
+      
+      info->variable_map[fleet_interface->log_index_expected.id_m] =
+          &(derived_quantities["log_index_expected"]);
+    }
+
+
 
     return true;
   }
