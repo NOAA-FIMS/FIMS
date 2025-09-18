@@ -1366,8 +1366,6 @@ namespace fims_popdy
 
         // fleets
         // report
-        // FIMS_REPORT_F_("age_comp_expected", age_comp_expected_f, this->of);
-        // FIMS_REPORT_F_("age_comp_proportion", age_comp_proportion_f, this->of);
         FIMS_REPORT_F_("agecomp_expected", agecomp_expected_f, this->of);
         FIMS_REPORT_F_("agecomp_proportion", agecomp_proportion_f, this->of);
         FIMS_REPORT_F_("catch_index", catch_index_f, this->of);
@@ -1383,16 +1381,12 @@ namespace fims_popdy
         FIMS_REPORT_F_("landings_numbers_at_length", landings_numbers_at_length_f, this->of);
         FIMS_REPORT_F_("landings_weight", landings_weight_f, this->of);
         FIMS_REPORT_F_("landings_weight_at_age", landings_weight_at_age_f, this->of);
-        // FIMS_REPORT_F_("length_comp_expected", length_comp_expected_f, this->of);
-        // FIMS_REPORT_F_("length_comp_proportion", length_comp_proportion_f, this->of);
         FIMS_REPORT_F_("lengthcomp_expected", lengthcomp_expected_f, this->of);
         FIMS_REPORT_F_("lengthcomp_proportion", lengthcomp_proportion_f, this->of);
         FIMS_REPORT_F_("log_index_expected", log_index_expected_f, this->of);
         FIMS_REPORT_F_("log_landings_expected", log_landings_expected_f, this->of);
 
         // adreport
-        // ADREPORT_F(age_comp_expected, this->of);
-        // ADREPORT_F(age_comp_proportion, this->of);
         ADREPORT_F(agecomp_expected, this->of);
         ADREPORT_F(agecomp_proportion, this->of);
         ADREPORT_F(catch_index, this->of);
@@ -1408,8 +1402,6 @@ namespace fims_popdy
         ADREPORT_F(landings_numbers_at_length, this->of);
         ADREPORT_F(landings_weight, this->of);
         ADREPORT_F(landings_weight_at_age, this->of);
-        // ADREPORT_F(length_comp_expected, this->of);
-        // ADREPORT_F(length_comp_proportion, this->of);
         ADREPORT_F(lengthcomp_expected, this->of);
         ADREPORT_F(lengthcomp_proportion, this->of);
         ADREPORT_F(log_index_expected, this->of);
@@ -1418,168 +1410,6 @@ namespace fims_popdy
 #endif
     }
 
-    virtual void Report_old()
-    {
-      int n_fleets = this->fleets.size();
-      int n_pops = this->populations.size();
-#ifdef TMB_MODEL
-      if (this->do_reporting == true)
-      {
-        // Create vector lists to store output for reporting
-        // vector< vector<Type> > creates a nested vector structure where
-        // each vector can be a different dimension. Does not work with ADREPORT
-        // fleets
-        vector<vector<Type>> landings_w(n_fleets);
-        vector<vector<Type>> landings_n(n_fleets);
-        vector<vector<Type>> landings_exp(n_fleets);
-        vector<vector<Type>> landings_naa(n_fleets);
-        vector<vector<Type>> landings_waa(n_fleets);
-        vector<vector<Type>> landings_nal(n_fleets);
-        vector<vector<Type>> index_w(n_fleets);
-        vector<vector<Type>> index_n(n_fleets);
-        vector<vector<Type>> index_exp(n_fleets);
-        vector<vector<Type>> index_naa(n_fleets);
-        vector<vector<Type>> index_nal(n_fleets);
-        vector<vector<Type>> agecomp_exp(n_fleets);
-        vector<vector<Type>> lengthcomp_exp(n_fleets);
-        vector<vector<Type>> agecomp_prop(n_fleets);
-        vector<vector<Type>> lengthcomp_prop(n_fleets);
-        vector<vector<Type>> F_mort(n_fleets);
-        // vector<vector<Type>> q(n_fleets);
-        // populations
-        vector<vector<Type>> naa(n_pops);
-        vector<vector<Type>> ssb(n_pops);
-        vector<vector<Type>> total_landings_w(n_pops);
-        vector<vector<Type>> total_landings_n(n_pops);
-        vector<vector<Type>> biomass(n_pops);
-        vector<vector<Type>> log_recruit_dev(n_pops);
-        vector<vector<Type>> log_r(n_pops);
-        vector<vector<Type>> recruitment(n_pops);
-        vector<vector<Type>> M(n_pops);
-        // initiate population index for structuring report out objects
-        int pop_idx = 0;
-        for (size_t p = 0; p < this->populations.size(); p++)
-        {
-          std::shared_ptr<fims_popdy::Population<Type>> &population =
-              this->populations[p];
-          std::map<std::string, fims::Vector<Type>> &derived_quantities =
-              this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
-          naa(pop_idx) = vector<Type>(derived_quantities["numbers_at_age"]);
-          ssb(pop_idx) = vector<Type>(derived_quantities["spawning_biomass"]);
-          total_landings_w(pop_idx) =
-              vector<Type>(derived_quantities["total_landings_weight"]);
-          total_landings_n(pop_idx) =
-              vector<Type>(derived_quantities["total_landings_numbers"]);
-          log_recruit_dev(pop_idx) =
-              vector<Type>(population->recruitment->log_recruit_devs);
-          // log_r(pop_idx) = vector<Type>(derived_quantities["log_r"]);
-          recruitment(pop_idx) =
-              vector<Type>(derived_quantities["expected_recruitment"]);
-          biomass(pop_idx) = vector<Type>(derived_quantities["biomass"]);
-          // M(pop_idx) = vector<Type>(population->M);
-
-          pop_idx += 1;
-        }
-
-        // initiate fleet index for structuring report out objects
-        int fleet_idx = 0;
-        fleet_iterator fit;
-        for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit)
-        {
-          std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-          std::map<std::string, fims::Vector<Type>> &derived_quantities =
-              this->GetFleetDerivedQuantities(fleet->GetId());
-          // landings_w(fleet_idx) = derived_quantities["total_landings_weight"];
-          // landings_n(fleet_idx) = derived_quantities["total_landings_numbers"];
-          landings_exp(fleet_idx) = derived_quantities["landings_expected"];
-          landings_naa(fleet_idx) = derived_quantities["landings_numbers_at_age"];
-          landings_waa(fleet_idx) = derived_quantities["landings_weight_at_age"];
-          landings_nal(fleet_idx) =
-              derived_quantities["landings_numbers_at_length"];
-          index_w(fleet_idx) = derived_quantities["index_weight"];
-          index_n(fleet_idx) = derived_quantities["index_numbers"];
-          index_exp(fleet_idx) = derived_quantities["index_expected"];
-          index_naa(fleet_idx) = derived_quantities["index_numbers_at_age"];
-          index_nal(fleet_idx) = derived_quantities["index_numbers_at_length"];
-          agecomp_exp(fleet_idx) = derived_quantities["agecomp_expected"];
-          lengthcomp_exp(fleet_idx) = derived_quantities["lengthcomp_expected"];
-          agecomp_prop(fleet_idx) = derived_quantities["agecomp_proportion"];
-          lengthcomp_prop(fleet_idx) = derived_quantities["lengthcomp_proportion"];
-          // F_mort(fleet_idx) = derived_quantities["Fmort"];
-          //   q(fleet_idx) = derived_quantities["q"];
-          fleet_idx += 1;
-        }
-
-        // FIMS_REPORT_F(rec_nll, this->of);
-        // FIMS_REPORT_F(age_comp_nll, this->of);
-        // FIMS_REPORT_F(index_nll, this->of);
-        FIMS_REPORT_F(naa, this->of);
-        FIMS_REPORT_F(ssb, this->of);
-        FIMS_REPORT_F(log_recruit_dev, this->of);
-        // FIMS_REPORT_F(log_r, this->of);
-        FIMS_REPORT_F(recruitment, this->of);
-        FIMS_REPORT_F(biomass, this->of);
-        FIMS_REPORT_F(M, this->of);
-        FIMS_REPORT_F(total_landings_w, this->of);
-        FIMS_REPORT_F(total_landings_n, this->of);
-        FIMS_REPORT_F(landings_w, this->of);
-        FIMS_REPORT_F(landings_n, this->of);
-        FIMS_REPORT_F(landings_exp, this->of);
-        FIMS_REPORT_F(landings_naa, this->of);
-        FIMS_REPORT_F(landings_waa, this->of);
-        FIMS_REPORT_F(landings_nal, this->of);
-        FIMS_REPORT_F(index_w, this->of);
-        FIMS_REPORT_F(index_n, this->of);
-        FIMS_REPORT_F(index_exp, this->of);
-        FIMS_REPORT_F(index_naa, this->of);
-        FIMS_REPORT_F(index_nal, this->of);
-        FIMS_REPORT_F(agecomp_exp, this->of);
-        FIMS_REPORT_F(lengthcomp_exp, this->of);
-        FIMS_REPORT_F(agecomp_prop, this->of);
-        FIMS_REPORT_F(lengthcomp_prop, this->of);
-        // FIMS_REPORT_F(F_mort, this->of);
-        // FIMS_REPORT_F(q, this->of);
-
-        /*ADREPORT using ADREPORTvector defined in
-         * inst/include/interface/interface.hpp:
-         * function collapses the nested vector into a single vector
-         */
-        vector<Type> NAA = ADREPORTvector(naa);
-        vector<Type> Biomass = ADREPORTvector(biomass);
-        vector<Type> SSB = ADREPORTvector(ssb);
-        vector<Type> LogRecDev = ADREPORTvector(log_recruit_dev);
-        vector<Type> FMort = ADREPORTvector(F_mort);
-        // vector<Type> Q = ADREPORTvector(q);
-        vector<Type> LandingsExpected = ADREPORTvector(landings_exp);
-        vector<Type> IndexExpected = ADREPORTvector(index_exp);
-        vector<Type> LandingsNumberAtAge = ADREPORTvector(landings_naa);
-        vector<Type> LandingsNumberAtLength = ADREPORTvector(landings_nal);
-        vector<Type> IndexNumberAtAge = ADREPORTvector(index_naa);
-        vector<Type> IndexNumberAtLength = ADREPORTvector(index_nal);
-        vector<Type> AgeCompositionExpected = ADREPORTvector(agecomp_exp);
-        vector<Type> LengthCompositionExpected = ADREPORTvector(lengthcomp_exp);
-        vector<Type> AgeCompositionProportion = ADREPORTvector(agecomp_prop);
-        vector<Type> LengthCompositionProportion = ADREPORTvector(lengthcomp_prop);
-
-        ADREPORT_F(NAA, this->of);
-        ADREPORT_F(Biomass, this->of);
-        ADREPORT_F(SSB, this->of);
-        // ADREPORT_F(LogRecDev, this->of);
-        ADREPORT_F(FMort, this->of);
-        // ADREPORT_F(Q, this->of);
-        ADREPORT_F(LandingsExpected, this->of);
-        ADREPORT_F(IndexExpected, this->of);
-        ADREPORT_F(LandingsNumberAtAge, this->of);
-        ADREPORT_F(LandingsNumberAtLength, this->of);
-        ADREPORT_F(IndexNumberAtAge, this->of);
-        ADREPORT_F(IndexNumberAtLength, this->of);
-        ADREPORT_F(AgeCompositionExpected, this->of);
-        ADREPORT_F(LengthCompositionExpected, this->of);
-        ADREPORT_F(AgeCompositionProportion, this->of);
-        ADREPORT_F(LengthCompositionProportion, this->of);
-      }
-#endif
-    }
   };
 
 } // namespace fims_popdy
