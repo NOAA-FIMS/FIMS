@@ -9,7 +9,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_SHARED_PRIMITIVE_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_SHARED_PRIMITIVE_HPP
 
-#include <memory> 
+#include <memory>
 
 /**
  * @class SharedInt
@@ -90,8 +90,8 @@ class SharedInt {
    * Transfers ownership of the shared integer from `other` to the new object.
    * This is a non-throwing operation that is more efficient than a copy.
    *
-   * @param other The temporary `SharedInt` object to move from. After this call,
-   * `other` will no longer own the resource.
+   * @param other The temporary `SharedInt` object to move from. After this
+   * call, `other` will no longer own the resource.
    */
   SharedInt(SharedInt&& other) noexcept : value(std::move(other.value)) {}
 
@@ -145,8 +145,8 @@ class SharedInt {
    * @brief Overloads the dereference operator.
    *
    * @details Provides a convenient way to access the integer value held by the
-   * shared pointer. This function is `const`, meaning it provides read-only access
-   * and does not modify the object's state.
+   * shared pointer. This function is `const`, meaning it provides read-only
+   * access and does not modify the object's state.
    *
    * @return The integer value managed by the shared pointer.
    */
@@ -786,7 +786,6 @@ class SharedReal {
   std::shared_ptr<int> value;
 
  public:
-
   /**
    * @brief Constructs a new `SharedReal` object with a default value.
    *
@@ -983,9 +982,11 @@ class SharedReal {
    * @brief Overloads the prefix decrement operator (`--`).
    *
    * @details Decrements the integer value managed by the shared pointer.
-   * As a prefix operator, it decrements the value *before* returning the result.
+   * As a prefix operator, it decrements the value *before* returning the
+   * result.
    *
-   * @return A reference to the current object (`*this`) after the decrement has occurred.
+   * @return A reference to the current object (`*this`) after the decrement has
+   * occurred.
    */
   SharedReal& operator--() {
     --(*value);
@@ -1665,9 +1666,7 @@ class SharedString {
    * @return A `const` raw pointer to the string managed by the shared
    * pointer.
    */
-  const std::string* operator->() const {
-    return value.get();
-  }
+  const std::string* operator->() const { return value.get(); }
 
   /**
    * @brief Overloads the stream insertion operator (`<<`) for
@@ -1767,7 +1766,8 @@ class SharedBoolean {
    * @brief Constructs a new SharedBoolean object by moving resources.
    *
    * @details Transfers ownership of the shared boolean from `other` to the new
-   * object. This is a non-throwing operation that is more efficient than a copy.
+   * object. This is a non-throwing operation that is more efficient than a
+   * copy.
    *
    * @param other The temporary SharedBoolean object to move from. After this
    * call, `other` will no longer own the resource.
@@ -1858,9 +1858,7 @@ class SharedBoolean {
    * @return A `const` raw pointer to the boolean managed by the shared
    * pointer.
    */
-  const bool* operator->() const {
-    return value.get();
-  }
+  const bool* operator->() const { return value.get(); }
 
   /**
    * @brief Overloads the equality operator (`==`).

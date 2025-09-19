@@ -1,6 +1,7 @@
 /**
  * @file model.hpp
- * @brief : Loops over model components and returns the negative log-likelihood function.
+ * @brief : Loops over model components and returns the negative log-likelihood
+ * function.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
