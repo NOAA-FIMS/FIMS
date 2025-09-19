@@ -192,7 +192,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
     }
   }
 
-
   /**
    * @brief Calculates initial numbers at age for index and age
    *
@@ -223,15 +222,11 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * F_{f,a,y} = F_{f,y} \times S_f(a)
    * \f]
    *
-   * Total fishing mortality at age \f$a\f$ and year \f$y\f$ is the sum over fleets:
-   * \f[
-   * F_{a,y} = \sum_{f=1}^{N_{fleets}} F_{f,a,y}
-   * \f]
+   * Total fishing mortality at age \f$a\f$ and year \f$y\f$ is the sum over
+   * fleets: \f[ F_{a,y} = \sum_{f=1}^{N_{fleets}} F_{f,a,y} \f]
    *
-   * Total mortality \f$Z_{f,a,y}\f$ is the sum of natural and fishing mortality:
-   * \f[
-   * Z_{a,y} = M_{a,y} + F_{a,y}
-   * \f]
+   * Total mortality \f$Z_{f,a,y}\f$ is the sum of natural and fishing
+   * mortality: \f[ Z_{a,y} = M_{a,y} + F_{a,y} \f]
    *
    * @param i_age_year dimension folded index for age and year
    * @param year year index
@@ -419,10 +414,9 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * \phi_0 = \sum_{a=0}^{A} N_a * p_{female,a} * p_{mature,a} * w_a
    * \f]
    *
-   * The numbers at age \f$N_a\f$ are calculated recursively with natural mortality:
-   * \f[
-   * N_a = N_{a-1} * \exp(-M_a) \quad \text{for } a = 1, \ldots, A-1
-   * \f]
+   * The numbers at age \f$N_a\f$ are calculated recursively with natural
+   * mortality: \f[ N_a = N_{a-1} * \exp(-M_a) \quad \text{for } a = 1, \ldots,
+   * A-1 \f]
    *
    * Plus group update:
    * \f[
@@ -499,7 +493,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
-   * @brief Calculates expected proportion of individuals mature at a selected age
+   * @brief Calculates expected proportion of individuals mature at a selected
+   * age
    *
    * This function evaluates the maturity ogive at the specified age
    * to estimate the proportion of individuals that are mature:
@@ -560,11 +555,13 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * \f]
    *
    * where:
-   * - \f$C_{f,a,y}\f$ is the catch (landings) for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
+   * - \f$C_{f,a,y}\f$ is the catch (landings) for fleet \f$f\f$ at age \f$a\f$
+   * in year \f$y\f$
    * - \f$F_{f,y}\f$ is the fleet-specific fishing mortality in year \f$y\f$
    * - \f$S_f(a)\f$ is the selectivity at age \f$a\f$ for fleet \f$f\f$
    * - \f$Z_{a,y}\f$ is the total mortality at age \f$a\f$ and year \f$y\f$
-   * - \f$N_{a,y}\f$ is the number of individuals at age \f$a\f$ and year \f$y\f$
+   * - \f$N_{a,y}\f$ is the number of individuals at age \f$a\f$ and year
+   * \f$y\f$
    *
    * @param i_age_year dimension folded index for age and year
    * @param year the year expected landings composition is being calculated for
@@ -623,8 +620,10 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * \f]
    *
    * where:
-   * - \f$IW_{f,y}\f$ is the total index weight for fleet \f$f\f$ in year \f$y\f$
-   * - \f$IN_{f,y}\f$ is the total index numbers for fleet \f$f\f$ in year \f$y\f$
+   * - \f$IW_{f,y}\f$ is the total index weight for fleet \f$f\f$ in year
+   * \f$y\f$
+   * - \f$IN_{f,y}\f$ is the total index numbers for fleet \f$f\f$ in year
+   * \f$y\f$
    * - \f$IWAA_{a,y}\f$ is the index weight at age \f$a\f$ in year \f$y\f$
    * - \f$INAA_{a,y}\f$ is the index numbers at age \f$a\f$ in year \f$y\f$
    *
@@ -653,8 +652,10 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * \f]
    *
    * where:
-   * - \f$I_{f,a,y}\f$ is the index numbers for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
-   * - \f$q_{f,y}\f$ is the catchability coefficient for fleet \f$f\f$ at year \f$y\f$
+   * - \f$I_{f,a,y}\f$ is the index numbers for fleet \f$f\f$ at age \f$a\f$ in
+   * year \f$y\f$
+   * - \f$q_{f,y}\f$ is the catchability coefficient for fleet \f$f\f$ at year
+   * \f$y\f$
    * - \f$S_f(a)\f$ is the selectivity at age \f$a\f$ for fleet \f$f\f$
    * - \f$N_{a,y}\f$ is the population numbers at age \f$a\f$ and year \f$y\f$
    *
@@ -681,7 +682,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * IWAA_{f,a,y} = I_{f,a,y} \times w_a
    * \f]
    *
-   * where \f$IWAA_{f,a,y}\f$ is the index weight for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$.
+   * where \f$IWAA_{f,a,y}\f$ is the index weight for fleet \f$f\f$ at age
+   * \f$a\f$ in year \f$y\f$.
    *
    * @param year the year of expected index weight at age
    * @param age the age of expected index weight at age
