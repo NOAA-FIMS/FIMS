@@ -34,7 +34,16 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
   virtual ~MultinomialLPMF() {}
 
   /**
-   * @brief Evaluates the multinomial probability mass function
+   * @brief Evaluates the multinomial probability mass function.
+   * 
+   * For \f$k\f$ categories and a sample size of \f$n\f$,
+   * \f[f(\underline{y}) = \frac{n!}{y_{1}!...
+   * y_{k}!}p^{y_{1}}_{1}...p^{y_{k}}_{k}\f]
+   * where \f$\sum^{k}_{i=1}y_{i} = n\f$, \f$p_{i} > 0\f$, and
+   * \f$\sum^{k}_{i=1}p_{i} = 1\f$.
+   * The mean and variance of \f$y_{i}\f$ are respectively, \f$\mu_{i} =
+   * np_{i}\f$ and \f$\sigma^{2}_{i} = np_{i}(1-p_{i})\f$. The implementation
+   * of this function is through TMB and its `dmultinom` function.
    */
   virtual const Type evaluate() {
     // set dims using observed_values if no user input

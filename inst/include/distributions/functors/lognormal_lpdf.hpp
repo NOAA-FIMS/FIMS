@@ -37,7 +37,10 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
   virtual ~LogNormalLPDF() {}
 
   /**
-   * @brief Evaluates the lognormal probability density function
+   * @brief Evaluates the lognormal probability density function.
+   * 
+   * \f[f(x) = \frac{1.0}{ x\sigma\sqrt{2\pi} }\mathrm{exp}\Bigg(-\frac{(\mathrm{ln}(x) - \mu)^{2}}{2\sigma^{2}}\Bigg)\f]
+   * where \f$\mu\f$ is the mean of the distribution of \f$\mathrm{ln(x)}\f$ and \f$\sigma^2\f$ is the variance of \f$\mathrm{ln}(x)\f$.
    */
   virtual const Type evaluate() {
     // set vector size based on input type (prior, process, or data)

@@ -35,7 +35,13 @@ struct NormalLPDF : public DensityComponentBase<Type> {
   virtual ~NormalLPDF() {}
 
   /**
-   * @brief Evaluates the normal probability density function
+   * @brief Evaluates the normal probability density function.
+   * 
+   * \f[f(x) =
+   * \frac{1}{\sigma\sqrt{2\pi}}\mathrm{exp}\Bigg(-\frac{(x-\mu)^2}{2\sigma^2}
+   * \Bigg)\f] as currently implemented in TMB with the `dnorm` function, where
+   * where \f$\mu\f$ is the mean of the distribution and \f$\sigma^2\f$ is the
+   * variance.
    */
   virtual const Type evaluate() {
     // set vector size based on input type (prior, process, or data)
