@@ -39,10 +39,31 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
 
   /** @brief Beverton--Holt implementation of the stock--recruitment function.
    *
-   * The Beverton--Holt stock--recruitment implementation:
-   * \f$ \frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h -
-   * 0.2)} \f$
-   *
+   * The Beverton--Holt stock--recruitment is implemented as follows
+   * \f[R_t(S_{t-1})  = \frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h -
+   * 0.2)} \f]
+   * where \f$R_t\f$ and \f$S_t\f$ are mean recruitment and spawning biomass at
+   * time \f$t\f$, \f$h\f$ is steepness, and \f$\phi_0\f$ is the unfished
+   * spawning biomass per recruit. The initial FIMS model implements a static
+   * spawning biomass-per-recruit function, with the ability to overload the
+   * method in the future to allow for time-variation in spawning biomass per
+   * recruit that results from variation in life-history characteristics (e.g.,
+   * natural mortality, maturity, or weight-at-age). Recruitment deviations
+   * (\f$r_t\f$) are assumed to be normally distributed in log space with
+   * standard deviation \f$\sigma_R\f$, \f$r_t \sim N(0,\sigma_R^2)\f$. Because
+   * \f$r_t\f$ are applied as multiplicative, lognormal deviations, predictions
+   * of realized recruitment include a term for bias correction
+   * (\f$\sigma^2_R/2\f$). However, true \f$r_t\f$ values are not known, but
+   * rather estimated (\f$\hat{r}_t\f$), and thus the bias correction applies
+   * an adjustment factor, \f$b_t=\frac{E[SD(\hat{r}_{t})]^2}{\sigma_R^2}\f$
+   * (Methot and Taylor, 2011). The adjusted bias correction, mean recruitment,
+   * and recruitment deviations are then used to compute realized recruitment
+   * (\f$R^*_t\f$),
+   * \f[R^*_t=R_t\cdot\mathrm{exp}\Bigg(\hat{r}_{t}-b_t\frac{\sigma_R^2}{2}\Bigg)\f]
+   * The recruitment function should take as input the values of \f$S_t\f$,
+   * \f$h\f$, \f$R_0\f$, \f$\phi_0\f$, \f$\sigma_R\f$, and \f$\hat{r}_{t}\f$,
+   * and return mean-unbiased (\f$R_t\f$) and realized (\f$R^*_t\f$)
+   * recruitment.
    * @param spawners A measure of spawning output.
    * @param phi_0 Number of spawners per recruit of an unfished population
    */

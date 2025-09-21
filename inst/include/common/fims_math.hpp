@@ -188,14 +188,28 @@ inline const Type lgamma(const Type &x) {
 #endif
 
 /**
- * @brief The general logistic function
+ * @brief Calculates a single logistic function.
  *
- * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection_point))} \f$
+ * @details This function computes a logistic growth curve, which is
+ * commonly used to model S-shaped growth in various systems. The formula
+ * for the logistic function is:
  *
- * @param inflection_point the inflection point of the logistic function
- * @param slope the slope of the logistic function
- * @param x the index the logistic function should be evaluated at
- * @return
+ * \f[
+ * f(x) = \frac{1}{1 + e^{-k(x - x_0)}}
+ * \f]
+ *
+ * where \f$v\f$ is the inflection point and \f$k\f$ is the slope of
+ * the curve.
+ *
+ * @tparam Type The numeric type of the function's arguments.
+ * @param inflection_point The inflection point of the logistic curve
+ * (\f$v\f$).
+ * @param slope The slope of the logistic curve (\f$k\f$).
+ * @param x The independent variable.
+ * @return The result of the logistic function.
+ *
+ * @note This function is declared `inline` for potential performance
+ * benefits.
  */
 template <class Type>
 inline const Type logistic(const Type &inflection_point, const Type &slope,
@@ -206,13 +220,13 @@ inline const Type logistic(const Type &inflection_point, const Type &slope,
 }
 
 /**
- * @brief A logit function for bounding of parameters
+ * @brief Calculates the logit function for bounding of parameters.
  *
- * \f$ -\mathrm{log}(b-x) + \mathrm{log}(x-a) \f$
- * @param a lower bound
- * @param b upper bound
- * @param x the parameter in bounded space
- * @return the parameter in real space
+ * \f[ -\mathrm{log}(b-x) + \mathrm{log}(x-a) \f]
+ * @param a The lower bound \f$a\f$.
+ * @param b The upper bound \f$b\f$.
+ * @param x The parameter in bounded space.
+ * @return The parameter in real space.
  *
  */
 template <class Type>
@@ -221,13 +235,13 @@ inline const Type logit(const Type &a, const Type &b, const Type &x) {
 }
 
 /**
- * @brief An inverse logit function for bounding of parameters
+ * @brief Calculates the inverse logit function for bounding of parameters.
  *
  * \f$ a+\frac{b-a}{1+\mathrm{exp}(-\mathrm{logit}(x))}\f$
- * @param a lower bound
- * @param b upper bound
- * @param logit_x the parameter in real space
- * @return the parameter in bounded space
+ * @param a The lower bound \f$a\f$.
+ * @param b The upper bound \f$b\f$.
+ * @param logit_x The parameter in real space.
+ * @return The parameter in bounded space.
  *
  */
 template <class Type>
@@ -235,26 +249,35 @@ inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
   return a + (b - a) / (static_cast<Type>(1.0) + fims_math::exp(-logit_x));
 }
 
-/**
- * @brief The general double logistic function
+ /**
+ * @brief Calculates a double logistic function.
  *
- * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - inflection_point_{asc}))}
- * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x -
- * inflection_point_{desc}))} \right)\f$
+ * @details This function computes a double logistic curve, which can
+ * be used to model processes that rise and then fall. It is composed
+ * of two logistic functions, one for the ascending phase and one for
+ * the descending phase. The formulation is as follows:
  *
- * @param inflection_point_asc the inflection point of the ascending limb of the
- * double logistic function
- * @param slope_asc the slope of the ascending limb of the double logistic
- * function
- * @param inflection_point_desc the inflection point of the descending limb of
- * the double logistic function, where inflection_point_desc >
- * inflection_point_asc
- * @param slope_desc the slope of the descending limb of the double logistic
- * function
- * @param x the index the logistic function should be evaluated at
- * @return
+ * \f[
+ * f(x) = \frac{1}{1 + e^{-k_1(x - v_1)}} \cdot
+ * \left( 1 - \frac{1}{1 + e^{-k_2(x - v_2)}} \right)
+ * \f]
+ * where \f$k_1\f$ and \f$v_1\f$ are the slope and inflection point of
+ * the ascending curve, and \f$k_2\f$ and \f$v_2\f$ are for the
+ * descending curve.
+ *
+ * @tparam Type The numeric type of the function's arguments.
+ * @param inflection_point_asc The inflection point of the ascending
+ * logistic curve (\f$v_1\f$).
+ * @param slope_asc The slope of the ascending logistic curve (\f$k_1\f$).
+ * @param inflection_point_desc The inflection point of the descending logistic
+ * curve (\f$v_2\f$), where `inflection_point_desc` > `inflection_point_asc`.
+ * @param slope_desc The slope of the descending logistic curve (\f$k_2\f$).
+ * @param x The independent variable.
+ * @return The result of the double logistic function.
+ *
+ * @note This function is declared `inline` for potential performance
+ * benefits.
  */
-
 template <class Type>
 inline const Type double_logistic(const Type &inflection_point_asc,
                                   const Type &slope_asc,
@@ -270,17 +293,29 @@ inline const Type double_logistic(const Type &inflection_point_asc,
 }
 
 /**
+ * @brief Calculates a smooth approximation of the absolute value.
  *
- * Used when x could evaluate to zero, which will result in a NaN for
- * derivative values.
+ * @details This function computes a differentiable approximation of the
+ * absolute value using a squared Euclidean norm, which avoids the
+ * non-differentiable point at zero. This is particularly useful in
+ * optimization algorithms where a smooth, continuous derivative is
+ * required. The formula used is:
  *
- * Evaluates:
+ * \f[
+ * \text{ad_fabs}(x) = \sqrt{x^2 + C}
+ * \f]
  *
- * \f$ (x^2+C)^.5 \f$
+ * where \f$C\f$ is a small constant to prevent the derivative from
+ * becoming infinite at zero. A common choice for \f$C\f$ is a small
+ * positive value like \f$10^{-5}\f$. As \f$C\f$ approaches zero, the
+ * function approaches the true absolute value, \f$|x|\f$.
  *
- * @param x value to keep positive
- * @param C default = 1e-5
- * @return
+ * @tparam Type The numeric type of the function's arguments.
+ * @param x The value for which to calculate the pseudo-absolute value, i.e.,
+ * the value you want to keep positive.
+ * @param C A small constant to ensure differentiability at zero. The
+ * default value is 1e-5.
+ * @return The smooth, differentiable pseudo-absolute value of `x`.
  */
 template <class Type>
 const Type ad_fabs(const Type &x, Type C = 1e-5) {
@@ -288,36 +323,57 @@ const Type ad_fabs(const Type &x, Type C = 1e-5) {
 }
 
 /**
+ * @brief Calculates a smooth approximation of the minimum of two values.
  *
- * Returns the minimum between a and b in a continuous manner using:
+ * @details This function computes a differentiable approximation of the
+ * minimum of two values, `a` and `b`. This is useful in optimization
+ * algorithms where a smooth, continuous derivative is required. The
+ * formula is derived from the property that the minimum of two numbers
+ * can be expressed using the absolute value:
  *
- * (a + b - fims_math::ad_fabs(a - b))*.5;
- * Reference: \ref fims_math::ad_fabs()
+ * \f[
+ * \min(a, b) = \frac{1}{2} (a + b - |a - b|)
+ * \f]
  *
- * This is an approximation with minimal error.
+ * This function substitutes the non-differentiable `abs()` function with \ref
+ * fims_math::ad_fabs(), a smooth approximation of the absolute value, to
+ * ensure differentiability at all points.
  *
- * @param a
- * @param b
- * @param C default = 1e-5
- * @return
+ * @tparam Type The numeric type of the function's arguments.
+ * @param a The first value.
+ * @param b The second value.
+ * @param C A small constant to ensure differentiability, passed to
+ * \ref fims_math::ad_fabs().
+ * @return A smooth, differentiable approximation of the minimum of `a` and `b`.
  */
-
 template <typename Type>
 inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
   return (a + b - fims_math::ad_fabs(a - b, C)) * static_cast<Type>(0.5);
 }
 
 /**
- * Returns the maximum between a and b in a continuous manner using:
+ * @brief Calculates a smooth approximation of the maximum of two values.
  *
- * (a + b + fims_math::ad_fabs(a - b)) *.5;
- * Reference: \ref fims_math::ad_fabs()
- * This is an approximation with minimal error.
+ * @details This function computes a differentiable approximation of the
+ * maximum of two values, `a` and `b`. This is useful in optimization
+ * algorithms where a smooth, continuous derivative is required. The
+ * formula is derived from the property that the maximum of two numbers
+ * can be expressed using the absolute value:
  *
- * @param a
- * @param b
- * @param C default = 1e-5
- * @return
+ * \f[
+ * \max(a, b) = \frac{1}{2} (a + b + |a - b|)
+ * \f]
+ *
+ * This function substitutes the non-differentiable `abs()` function with \ref
+ * fims_math::ad_fabs(), a smooth approximation of the absolute value, to
+ * ensure differentiability at all points.
+ *
+ * @tparam Type The numeric type of the function's arguments.
+ * @param a The first value.
+ * @param b The second value.
+ * @param C A small constant to ensure differentiability, passed to \ref
+ * fims_math::ad_fabs().
+ * @return A smooth, differentiable approximation of the maximum of `a` and `b`.
  */
 template <typename Type>
 inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
@@ -325,12 +381,15 @@ inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
 }
 
 /**
- * Sum elements of a vector
+ * @brief Calculates the sum of elements in a vector.
  *
- * @brief
+ * @details This function iterates through a vector of any numeric
+ * type and calculates the sum of all its elements. The result is
+ * returned as the same type as the elements in the input vector.
  *
- * @param v A vector of constants.
- * @return A single numeric value.
+ * @tparam T The numeric type of the elements in the vector.
+ * @param v The input vector whose elements are to be summed.
+ * @return The sum of all elements in the vector `v`.
  */
 template <class T>
 T sum(const std::vector<T> &v) {
@@ -342,12 +401,15 @@ T sum(const std::vector<T> &v) {
 }
 
 /**
- * Sum elements of a vector
+ * @brief Calculates the sum of elements in a vector.
  *
- * @brief
+ * @details This function iterates through a vector of any numeric
+ * type and calculates the sum of all its elements. The result is
+ * returned as the same type as the elements in the input vector.
  *
- * @param v A vector of constants.
- * @return A single numeric value.
+ * @tparam T The numeric type of the elements in the vector.
+ * @param v The input vector whose elements are to be summed.
+ * @return The sum of all elements in the vector `v`.
  */
 template <class T>
 T sum(const fims::Vector<T> &v) {

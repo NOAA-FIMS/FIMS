@@ -654,6 +654,10 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * \f$y\f$
    * - \f$S_f(a)\f$ is the selectivity at age \f$a\f$ for fleet \f$f\f$
    * - \f$N_{a,y}\f$ is the population numbers at age \f$a\f$ and year \f$y\f$
+   * 
+   * When timing is accounted for within FIMS the equation will include the
+   * the fraction of the year when the survey was conducted \f$f_y\f$,
+   * \f[ I_{f,a,y} += S_{f,y}(a) \times N_{a,y} \times e^{(-f_{y}Z_{a,y})}.\f]
    *
    * @param i_age_year dimension folded index for age and year
    * @param year the year the expected index is being calculated for
