@@ -27,7 +27,7 @@ jobs:
     # Format hpp and cpp files under inst/include, src/, and test/gtest
     # We use Google style to format code.
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: DoozyX/clang-format-lint-action@v0.20
       with:
         source: './inst/include ./src ./tests/gtest'
