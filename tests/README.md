@@ -17,13 +17,8 @@ Prepare the test data in the new file or in a separate file if you plan on reusi
 - In-line test data: make the data directly in the new test file within the `setup` section.
 - C++ reusable test data: create a fixture file, e.g., `tests/gtest/test_XXX_test_fixture.hpp`, to prepare reusable unit-test data, or create an integration file, e.g., `tests/gtest/integration/XXX.hpp`, to set up integration-test data for C++ tests.
 - If you used a test fixture from GoogleTest to use the same data configuration for multiple tests, `TearDown()` can be used to clean up the test and then the test fixture will be deleted. See [GoogleTest user's guide](https://google.github.io/googletest/primer.html#same-data-multiple-tests) for more details.
-- R reusable test data: add code to the `prepare_test_data()` function in [`tests/testthat/helper-integration-tests-setup-run.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-setup-run.R), including code to save the new data object, e.g., `base::saveRDS(object, file = testthat::test_path("fixtures", "data_name.RDS"))`, and call `prepare_test_data()` in the `setup` section of the new test file to load the data using
-  ```r
-  if (!file.exists(test_path("fixtures", "data_name.RDS"))) {
-    prepare_test_data()
-  }
-  ```
-- Use pre-existing integration data, e.g., `tests/testthat/fixtures/integration_test_data_components.RData` and `tests/testthat/fixtures/integration_test_data.RData`, by loading them within the `setup` section, e.g., `load(test_path("fixtures", "integration_test_data.RData"))` or within `prepare_test_data()`, where these data objects can be updated by running `R/data1.R`.
+- R reusable test data: add code to the [`tests/testthat/helper-integration-tests-setup-wrappers.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-setup-wrappers.R) file, including code to save a new data or fit object for tests that use wrapper functions, e.g., `base::saveRDS(object, file = testthat::test_path("fixtures", "data_name.RDS"))` or `base::saveRDS(object, file = testthat::test_path("fixtures", "fit_name.RDS"))`, and call `load_fit_*()` in the `setup` section of the new test file to load the data.
+- Use pre-existing integration data, e.g., `tests/testthat/fixtures/integration_test_data_components.RData` and `tests/testthat/fixtures/integration_test_data.RData`, by loading them within the `setup` section, e.g., `load(test_path("fixtures", "integration_test_data.RData"))`, where these data objects can be updated by running `R/data1.R`.
 
 ### :pencil: Edit the code in the new test file
 
@@ -33,8 +28,8 @@ Follow the structure of the new test file to write appropriate correctness, edge
 
 The following :hammer: helper functions are available to assist with writing integration tests in R.
 
-- `setup_and_run_FIMS_without_wrappers()`: Set up a FIMS model without wrappers (in [`tests/testthat/helper-integration-tests-setup-run.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-setup-run.R)).
-- `setup_and_run_FIMS_with_wrappers()`: Set up a FIMS model with wrappers (in [`tests/testthat/helper-integration-tests-setup-run.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-setup-run.R)).
+- `setup_and_run_FIMS_without_wrappers()`: Set up a FIMS model without wrappers (in [`tests/testthat/helper-integration-tests-setup-without-wrappers.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-setup-without-wrappers.R)).
+- `load_*()`: Load or create data for a FIMS model run, or run a FIMS model with wrappers to save the fit output (in [tests/testthat/helper-integration-tests-setup-wrappers.R](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-setup-wrappers.R)).
 - `verify_fims_deterministic()`: Compare the model output from a FIMS deterministic run against the expected "truth" from an operating model (in [`tests/testthat/helper-integration-tests-validation.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-validation.R)).
 - `verify_fims_nll()`: Compare the negative log likelihood (NLL) from a FIMS model against the expected NLL calculated from an operating model (in [`tests/testthat/helper-integration-tests-validation.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-validation.R)).
 - `validate_fims()`: Compare the output from a FIMS model where parameters are estimated against the expected "truth" from an operating model (in [`tests/testthat/helper-integration-tests-validation.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-validation.R)).

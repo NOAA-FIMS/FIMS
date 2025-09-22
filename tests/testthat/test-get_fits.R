@@ -10,10 +10,6 @@
 # get_fits ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-# Borrowed functionality from test-get_estimates.R, in case this is called first
-if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
 
 ## IO correctness ----
 # Define the expected column names for the fits tibble
@@ -26,7 +22,7 @@ expected_colnames <- c(
 
 test_that("get_fits() works with deterministic run", {
   # Read the RDS file containing the deterministic run results
-  deterministic_results <- readRDS(test_path("fixtures", "deterministic_age_length_comp.RDS"))
+  deterministic_results <- load_deterministic_age_length_comp()
   deterministic_colnames <- get_fits(deterministic_results) |> colnames()
   #' @description Test that [get_fits()] returns correct colnames from a
   #' deterministic run.
@@ -37,20 +33,19 @@ test_that("get_fits() works with deterministic run", {
 
   #' @description Test that [get_fits()] returns correct snapshot from a
   #' deterministic run.
-  expect_snapshot(
-    get_fits(deterministic_results) |>
-      # Remove the expected and log_like columns, as they
-      # may change between runs
-      dplyr::select(-expected, -log_like) |>
-      print(n = 320, width = Inf)
-  )
+  deterministic_fits <- get_fits(deterministic_results) |>
+    # Remove the expected and log_like columns, as they
+    # may change between runs
+    dplyr::select(-expected, -log_like)
+  expect_snapshot_file(save_csv(deterministic_fits), "deterministic_fits.csv")
 })
 
 test_that("get_fits() works with estimation run", {
   # Load the test data from an RDS file containing model fits.
+  load_all_fits()
   # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
   fit_files <- list.files(
-    path = test_path("fixtures"),
+    path = testthat::test_path("fixtures"),
     pattern = "^fit.*\\.RDS$",
     full.names = TRUE
   )
@@ -79,15 +74,12 @@ test_that("get_fits() works with estimation run", {
 
   #' @description Test that [get_fits()] returns correct snapshot for an
   #' estimation run.
-  expect_snapshot(
-    # Read the first RDS file, get estimates, and print a snapshot
-    readRDS(fit_files[[1]]) |>
-      get_fits() |>
-      # Remove the expected and log_like columns, as they
-      # may change between runs
-      dplyr::select(-expected, -log_like) |>
-      print(n = 320, width = Inf)
-  )
+  estimation_fits <- readRDS(fit_files[[1]]) |>
+    get_fits() |>
+    # Remove the expected and log_like columns, as they
+    # may change between runs
+    dplyr::select(-expected, -log_like)
+  expect_snapshot_file(save_csv(estimation_fits), "estimation_fits.csv")
 })
 
 ## Edge handling ----

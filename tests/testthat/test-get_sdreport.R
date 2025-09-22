@@ -10,15 +10,14 @@
 # get_sdreport ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+
 ## IO correctness ----
 test_that("get_sdreport() works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
+  load_all_fits()
   # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
   fit_files <- list.files(
-    path = test_path("fixtures"),
+    path = testthat::test_path("fixtures"),
     pattern = "^fit.*\\.RDS$",
     full.names = TRUE
   )
