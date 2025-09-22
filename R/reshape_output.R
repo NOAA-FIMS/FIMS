@@ -19,10 +19,14 @@ utils::globalVariables(c(
 reshape_json_estimates <- function(finalized_fims) {
   json_list <- jsonlite::fromJSON(finalized_fims, simplifyVector = FALSE)
   read_list <- purrr::map(
-    json_list[-c(1:5, 10, 11)],
+    json_list[!names(json_list) %in% c(
+      "name", "type", "estimation_framework", "id", "objective_function_value",
+      "max_gradient_component", "gradient",
+      "population_ids", "fleet_ids"
+    )],
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), json)
   )
-
+  
   # Process the module parameters
   module_information <- purrr::map_df(
     read_list[
@@ -152,9 +156,6 @@ reshape_json_estimates <- function(finalized_fims) {
       dplyr::ends_with("value"),
       dplyr::ends_with("values"),
       dplyr::everything()
-    ) |>
-    dplyr::mutate(
-      log_like_cv = NA_real_
     )
 }
 

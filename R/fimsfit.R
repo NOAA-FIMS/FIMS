@@ -412,12 +412,17 @@ FIMSFit <- function(
   # TODO: Need uncertainty from TMB for derived quantities
   # TODO: change order of columns
   estimates <- dplyr::left_join(
-    json_estimates |>
-      dplyr::select(-uncertainty),
+    json_estimates,
     tmb_estimates |>
+      dplyr::filter(!is.na(parameter_id)) |>
       dplyr::select(-initial, -module_name, -module_id, -estimate, -label),
     by = c("parameter_id")
-  )
+  ) |>
+    dplyr::mutate(
+      uncertainty = dplyr::coalesce(uncertainty.x, uncertainty.y),
+      .after = "estimation_type"
+    ) |>
+    dplyr::select(-uncertainty.x, -uncertainty.y)
 
   fit <- methods::new(
     "FIMSFit",
