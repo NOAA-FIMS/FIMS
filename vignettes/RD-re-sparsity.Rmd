@@ -1,0 +1,87 @@
+---
+title: "RE Sparsity"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{RE Sparsity}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Many stock assessment models in the US have historically used an annual 
+deviations approach when estimating time varying process variability in 
+model parameters such as recruitment. In this approach a mean parameter value 
+$\tilde{P}$ and annual devation values $Pdev_{y}$ are estimated and combined 
+to produce annual parameter estimates $P_{y}$ with deviations often being 
+additive or multiplicative of the mean. Models utilizing this approach have 
+predominantly implemented deviations as fixed effects with a positive definite 
+hessian commonly ensured though a penalized likelihood such as imposing a sum 
+to zero constraint. A fixed effect vector of deviation parameters does not 
+require second order partial derivatives to be estimated until model 
+optimization is complete and variance is estimated. 
+
+Following statistical best practices, FIMS incorporates the use of random 
+effects to model process variability in time-varying parameters. Random effect
+uncertainty is itegrated out during parameter optimization in TMB using the 
+laplace approximation. This integration requires the calculation of second order 
+partial derivatives and hessian inversion at each optimization step. While 
+simple to interpret and implement, the deviations approach results in a dense 
+convariance matrix of correlations between the mean and each annual devation 
+estimate. Due to this difference, using the deviations approach in a random
+effects model has much larger computational penalty than when only fixed effects
+were considered in historic modeling platforms.
+
+To quantify the magnitude of this penalty we investigate the performance and
+optimization time of a simple random effects model under equivalent sparse vs
+dense parameterizations. For this example we utilize three simple proxy models;
+1) a moving average MA1 function, 2) an auto regressive AR1 function, and 3) a
+simple stock assessment model based on babySAM. These proxies should reflect
+the relative performance gains expected in the real-world correlated time 
+varying processes modeled in stock assessments such as recruitment. Each of 
+these time-series models can be parameterized as a dense matrix, representing 
+the traditional parameter deviations as random effects approach, or as a sparse 
+matrix, as would be achieved by directly estimating annual parameter values 
+as random effects.
+
+These two approaches are anticipated to produce mathematically equivalent 
+results while differing in their computational overhead. Confirming this
+equivalency and quantifying the runtime improvement will provide support for 
+the change in approach relative to previous assessment models.
+
+
+
+## Methods
+
+We evaluated a simple time series model with an AR1 process, 
+$\lambda_{t} = p * \lambda_{t-1} + \epsilon_{t}$, $\lambda_t$ is the AR1 process 
+at time $t$ and where $p$ is the AR1 correlation parameter, using two parameterizations:
+
+1. process approach: $\lambda_{t} \sim N(p * \lambda_{t-1}, \sigma^{2}_{\lambda})$
+2. deviations approach: $\lambda_{t} = p * \lambda_{t-1} + \sigma * z_{t}, z_{t} \sim N(0,1)$
+
+Under a random effects model, the process approach puts the random effect on $\lambda_{t}$, while in
+the deviations approach, the random effect is applied to $z_{t}$. [Text on why the process approach is 
+sparse and why this matters for the Laplace approximation]. 
+
+We also compared these two parameterization in a simple catch-at-age stock assessment
+by modifying the software package, babySAM. [Text descibing babySAM and the modifications]
+
+We compared model results and looked at computational speed.  
+
+## Results
+
+This analysis looked at both a simple AR1 time series and a simple catch-at-age 
+stock assessment model with an AR1 process in recruitment. Both analyses demonstrate 
+that model results are the same despite the parameterization used, however, the 
+sparce approach results in computational efficiency gains. While speed up 
+for a single AR1 process is minimal, more complex stock assessments currently 
+include AR1 random effects in multiple processes (e.g. numbers at age, maturity, 
+mortality, etc.). The computational cost of fitting the centered approach scales 
+significantly, warranting the need to adopt the more computationally efficient 
+non-centered parameterization
