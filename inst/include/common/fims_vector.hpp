@@ -418,7 +418,7 @@ namespace fims
 
     /**
      * @brief Gets the tag for the vector. A tag can represent anything
-     * and is not used internally by FIMS. 
+     * and is not used internally by FIMS.
      * @return The tag.
      */
     std::string get_tag() const { return this->tag_m; }
@@ -462,10 +462,23 @@ std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v)
   }
   for (size_t i = 0; i < v.size() - 1; i++)
   {
-    out << v[i] << ",";
+    if (v[i] != v[i])
+    {
+      out << "null"<< ",";
+    }
+    else
+    {
+      out << v[i] << ",";
+    }
   }
-
-  out << v[v.size() - 1] << "]";
+  if (v[v.size() - 1] != v[v.size() - 1])
+  {
+     out << "null";
+  }
+  else
+  {
+    out << v[v.size() - 1] << "]";
+  }
   return out;
 }
 

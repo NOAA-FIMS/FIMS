@@ -135,7 +135,7 @@ class Model {  // may need singleton
       m->Evaluate();
     }
 
-    this->fims_information->SetupData();
+    // this->fims_information->SetupData();
     // Loop over and evaluate data joint negative log-likelihoods
     int n_data = 0;
     for (d_it = this->fims_information->density_components.begin();

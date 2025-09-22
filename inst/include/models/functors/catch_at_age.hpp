@@ -176,11 +176,6 @@ namespace fims_popdy
             size_t i_age_year = age * population->nyears + year;
             population->M[i_age_year] =
                 fims_math::exp(population->log_M[i_age_year]);
-            // TODO: is this still needed now that derived quantities are filled
-            // with ResetVector?
-            // mortality_F is a fims::Vector and therefore needs
-            // to be filled within a loop
-            // derived_quantities["mortality_F"][i_age_year] = 0.0;
           }
         }
       }
@@ -1214,8 +1209,6 @@ namespace fims_popdy
         vector<vector<Type>> unfished_spawning_biomass_p(n_pops);
 
         // initialize fleet vectors
-        // vector<vector<Type>> agecomp_expected_f(n_fleets);
-        // vector<vector<Type>> agecomp_proportion_f(n_fleets);
         vector<vector<Type>> agecomp_expected_f(n_fleets);
         vector<vector<Type>> agecomp_proportion_f(n_fleets);
         vector<vector<Type>> catch_index_f(n_fleets);
@@ -1230,9 +1223,7 @@ namespace fims_popdy
         vector<vector<Type>> landings_numbers_at_age_f(n_fleets);
         vector<vector<Type>> landings_numbers_at_length_f(n_fleets);
         vector<vector<Type>> landings_weight_f(n_fleets);
-         vector<vector<Type>> landings_weight_at_age_f(n_fleets);
-        // vector<vector<Type>> length_comp_expected_f(n_fleets);
-        // vector<vector<Type>> length_comp_proportion_f(n_fleets);
+        vector<vector<Type>> landings_weight_at_age_f(n_fleets);
         vector<vector<Type>> lengthcomp_expected_f(n_fleets);
         vector<vector<Type>> lengthcomp_proportion_f(n_fleets);
         vector<vector<Type>> log_index_expected_f(n_fleets);
@@ -1310,7 +1301,6 @@ namespace fims_popdy
         vector<Type> unfished_numbers_at_age = ADREPORTvector(unfished_numbers_at_age_p);
         vector<Type> unfished_spawning_biomass = ADREPORTvector(unfished_spawning_biomass_p);
 
-     
         vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
         vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
         vector<Type> catch_index = ADREPORTvector(catch_index_f);
@@ -1409,7 +1399,6 @@ namespace fims_popdy
       }
 #endif
     }
-
   };
 
 } // namespace fims_popdy

@@ -321,10 +321,10 @@ class Information {
                       fims::to_string(d->id) + " to derived value " +
                       fims::to_string(d->key[0]));
         vmit = this->variable_map.find(d->key[0]);
-        d->expected_values = *(*vmit).second;
+        d->data_expected_values = (*vmit).second;
         FIMS_INFO_LOG("Expected value size for distribution " +
                       fims::to_string(d->id) +
-                      " is: " + fims::to_string(d->expected_values.size()));
+                      " is: " + fims::to_string((*d->data_expected_values).size()));
       }
     }
   }
@@ -853,6 +853,7 @@ class Information {
     // setup priors, random effect, and data density components
     SetupPriors();
     SetupRandomEffects();
+    SetupData();
 
     return valid_model;
   }

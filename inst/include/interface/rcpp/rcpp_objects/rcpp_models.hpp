@@ -159,6 +159,43 @@ public:
     }
   }
 
+  void DoReporting(bool report)
+  {
+#ifdef TMB_MODEL
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();  
+    typename fims_info::Information<double>::model_map_iterator model_it;
+    model_it = info->models_map.find(this->get_id());
+    if (model_it != info->models_map.end())
+    {
+      std::shared_ptr<fims_popdy::CatchAtAge<double>> model_ptr =
+          std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(
+              (*model_it).second);
+      model_ptr->do_reporting = report;
+    }
+#endif
+  }
+
+  bool IsReporting()
+  {
+#ifdef TMB_MODEL
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();  
+    typename fims_info::Information<double>::model_map_iterator model_it;
+    model_it = info->models_map.find(this->get_id());
+    if (model_it != info->models_map.end())
+    {
+      std::shared_ptr<fims_popdy::CatchAtAge<double>> model_ptr =
+          std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(
+              (*model_it).second);
+      return model_ptr->do_reporting;
+    }
+    return false;
+#else
+    return false;
+#endif
+  } 
+
   /**
    * @brief Method to get this id.
    */
@@ -693,7 +730,7 @@ public:
     return Rcpp::List::create(
         Rcpp::Named("objective_function_value") = of_value,
         Rcpp::Named("gradient") = grad,
-        Rcpp::Named("max_gradient_component") = maxgc,
+        // Rcpp::Named("max_gradient_component") = maxgc,
         Rcpp::Named("report") = rep,
         Rcpp::Named("sdr_summary") = sdr_summary,
         Rcpp::Named("sdr_summary_matrix") = mat,
@@ -712,15 +749,15 @@ public:
     Rcpp::List report = get_report();
 
     Rcpp::List grouped_out = report["grouped_se"];
-    double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
-    Rcpp::NumericVector grad = report["gradient"];
+    // double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
+    // Rcpp::NumericVector grad = report["gradient"];
     double of_value = Rcpp::as<double>(report["objective_function_value"]);
 
-    fims::Vector<double> gradient(grad.size());
-    for (int i = 0; i < grad.size(); i++)
-    {
-      gradient[i] = grad[i];
-    }
+    // fims::Vector<double> gradient(grad.size());
+    // for (int i = 0; i < grad.size(); i++)
+    // {
+    //   gradient[i] = grad[i];
+    // }
     // Assume grouped_out is an Rcpp::List
     std::map<std::string, std::vector<double>> grouped_cpp;
     Rcpp::CharacterVector names = grouped_out.names();
@@ -808,8 +845,8 @@ public:
 #endif
     ss << " \"id\": " << this->get_id() << ",\n";
     ss << " \"objective_function_value\": " << value << ",\n";
-    ss << " \"max_gradient_component\": " << max_gc << ",\n";
-    ss << " \"gradient\": " << gradient << ",\n";
+    // ss << " \"max_gradient_component\": " << max_gc << ",\n";
+    // ss << " \"gradient\": " << gradient << ",\n";
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end(); module_id_it++)
     {

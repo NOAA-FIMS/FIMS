@@ -404,7 +404,7 @@ FIMSFit <- function(
   )
 
   # Create JSON output for FIMS run
-  set_fixed(opt$par)
+  #FIMS::set_fixed(opt$par)
   finalized_fims <- input[["model"]]$get_output()
   # Reshape the JSON estimates
   json_estimates <- reshape_json_estimates(finalized_fims)
