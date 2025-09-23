@@ -1233,7 +1233,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         vector<vector<Type>> lengthcomp_proportion_f(n_fleets);
         vector<vector<Type>> log_index_expected_f(n_fleets);
         vector<vector<Type>> log_landings_expected_f(n_fleets);
-
+        vector<vector<Type>> f_mort_f(n_fleets);
         // initiate population index for structuring report out objects
         int pop_idx = 0;
         for (size_t p = 0; p < this->populations.size(); p++)
@@ -1289,6 +1289,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           lengthcomp_proportion_f(fleet_idx) = derived_quantities["lengthcomp_proportion"];
           log_index_expected_f(fleet_idx) = derived_quantities["log_index_expected"];
           log_landings_expected_f(fleet_idx) = derived_quantities["log_landings_expected"];
+          f_mort_f(fleet_idx) = fleet->Fmort;
           fleet_idx += 1;
         }
 
@@ -1327,7 +1328,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         vector<Type> lengthcomp_proportion = ADREPORTvector(lengthcomp_proportion_f);
         vector<Type> log_index_expected = ADREPORTvector(log_index_expected_f);
         vector<Type> log_landings_expected = ADREPORTvector(log_landings_expected_f);
-
+        vector<Type> F_mort = ADREPORTvector(f_mort_f);
         // populations
         // report
         FIMS_REPORT_F_("biomass", biomass_p, this->of);
@@ -1380,7 +1381,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         FIMS_REPORT_F_("lengthcomp_proportion", lengthcomp_proportion_f, this->of);
         FIMS_REPORT_F_("log_index_expected", log_index_expected_f, this->of);
         FIMS_REPORT_F_("log_landings_expected", log_landings_expected_f, this->of);
-
+        FIMS_REPORT_F_("F_mort", f_mort_f, this->of);
         // adreport
         ADREPORT_F(agecomp_expected, this->of);
         ADREPORT_F(agecomp_proportion, this->of);
@@ -1401,6 +1402,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         ADREPORT_F(lengthcomp_proportion, this->of);
         ADREPORT_F(log_index_expected, this->of);
         ADREPORT_F(log_landings_expected, this->of);
+        ADREPORT_F(F_mort, this->of);
       }
 #endif
     }
