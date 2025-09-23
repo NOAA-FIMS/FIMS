@@ -38,7 +38,7 @@ test_that("get_input() works with correct inputs", {
     #' slot.
     expect_equal(
       object = names(input),
-      expected = "parameters"
+      expected = c("parameters", "model")
     )
   }
 

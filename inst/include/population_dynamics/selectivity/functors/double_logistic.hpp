@@ -75,6 +75,25 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
         inflection_point_desc.get_force_scalar(pos),
         slope_desc.get_force_scalar(pos), x);
   }
+
+  /**
+   * @brief Create a map of report vectors for the selectivity object.
+   */
+ virtual void create_report_vectors(
+    std::map<std::string, fims::Vector<fims::Vector<Type>> >& report_vectors){
+    report_vectors["inflection_point_asc"].emplace_back(inflection_point_asc.to_tmb());
+    report_vectors["slope_asc"].emplace_back(slope_asc.to_tmb());
+    report_vectors["inflection_point_desc"].emplace_back(inflection_point_desc.to_tmb());
+    report_vectors["slope_desc"].emplace_back(slope_desc.to_tmb());
+    }
+
+    virtual void get_report_vector_count(
+    std::map<std::string, size_t>& report_vector_count){
+      report_vector_count["inflection_point_asc"] += 1;
+      report_vector_count["slope_asc"] += 1;
+      report_vector_count["inflection_point_desc"] += 1;
+      report_vector_count["slope_desc"] += 1;
+    } 
 };
 
 }  // namespace fims_popdy

@@ -40,16 +40,18 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
    * @brief Evaluates the lognormal probability density function
    */
   virtual const Type evaluate() {
+    
     // set vector size based on input type (prior, process, or data)
     size_t n_x = this->get_n_x();
     // setup vector for recording the log probability density function values
     this->lpdf_vec.resize(n_x);
     this->report_lpdf_vec.resize(n_x);
-    std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
-    std::fill(this->report_lpdf_vec.begin(), this->report_lpdf_vec.end(), 0);
-    lpdf = static_cast<Type>(0);
+    std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), static_cast<Type>(0));
+    std::fill(this->report_lpdf_vec.begin(), this->report_lpdf_vec.end(), static_cast<Type>(0));
+    this->lpdf = static_cast<Type>(0);
 
     // Dimension checks
+    /* TODO: fix dimension check as expected values no longer used for data
     if (n_x != this->expected_values.size()) {
       throw std::invalid_argument(
           "LognormalLPDF::Vector index out of bounds. The size of observed "
@@ -57,7 +59,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
           "vector is of size " +
           fims::to_string(n_x) + " and the expected vector is of size " +
           fims::to_string(this->expected_values.size()));
-    }
+    }*/
     if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
       throw std::invalid_argument(
           "LognormalLPDF::Vector index out of bounds. The size of observed "
@@ -82,13 +84,20 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         } else {
           this->lpdf_vec[i] = 0;
         }
-        // if not data (i.e. prior or process), use x vector instead of
-        // observed_values and no lognormal constant needs to be applied
       } else {
+         if(this->input_type == "random_effects") {
+        // if random effects, no lognormal constant needs to be applied
         this->lpdf_vec[i] =
-            dnorm(log(this->x[i]), this->expected_values.get_force_scalar(i),
+            dnorm(log(this->get_observed(i)), this->get_expected(i),
                   fims_math::exp(log_sd.get_force_scalar(i)), true);
+      } else {
+            this->lpdf_vec[i] =
+              dnorm(log(this->get_observed(i)), this->get_expected(i),
+                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
+              log(this->get_observed(i));
       }
+      }
+     
       this->report_lpdf_vec[i] = this->lpdf_vec[i];
       lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
@@ -114,7 +123,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
 #endif
     }
 #ifdef TMB_MODEL
-    vector<Type> lognormal_x = this->x;
+    vector<Type> lognormal_x = this->x.to_tmb();
     //  FIMS_REPORT_F(lognormal_x, this->of);
 #endif
     return (lpdf);

@@ -1,7 +1,6 @@
 /**
  * @file interface.hpp
- * @brief An interface to different estimation engines, e.g., TMB, such that
- * a FIMS model can be optimized using different platforms.
+ * @brief An interface to the modeling platforms, e.g., TMB.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -31,6 +30,14 @@
     Rf_defineVar(Rf_install(#name), PROTECT(asSEXP(name)), F->report); \
     UNPROTECT(1);                                                      \
   }
+
+#define FIMS_REPORT_F_(name, obj, F)                                         \
+  if (isDouble<Type>::value &&                                         \
+      F->current_parallel_region < static_cast<Type>(0)) {             \
+    Rf_defineVar(Rf_install(name), PROTECT(asSEXP(obj)), F->report); \
+    UNPROTECT(1);                                                      \
+  }
+
 #define ADREPORT_F(name, F) F->reportvector.push(name, #name);
 
 template <typename Type>

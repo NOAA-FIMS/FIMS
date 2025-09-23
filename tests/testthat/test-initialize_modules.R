@@ -23,8 +23,8 @@ test_that("initialize_fims works with correct inputs", {
   #' element named parameters.
   result <- initialize_fims(parameters = default_parameters, data = data)
   expect_type(result, "list")
-  expect_named(result, "parameters")
-  expect_equal(length(result), 1)
+  expect_named(result, c("parameters", "model"))
+  expect_equal(length(result), 2)
   clear()
 
   #' @description Test that [initialize_comp()] works for AgeComp and returns

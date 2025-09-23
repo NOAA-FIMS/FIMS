@@ -17,6 +17,7 @@
 #include "../../../common/information.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
+#include <limits>
 
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
@@ -45,6 +46,12 @@ class Parameter {
    * @brief The final value of the parameter.
    */
   double final_value_m = 0.0;
+
+  /**
+   * @brief The standard error of the parameter estimate, where the default is
+   * -999.0.
+   */
+  double uncertainty_m = -999.0;
   /**
    * @brief The minimum possible parameter value, where the default is negative
    * infinity.
@@ -128,8 +135,11 @@ uint32_t Parameter::id_g = 0;
  */
 std::ostream& operator<<(std::ostream& out, const Parameter& p) {
   out << "{\"id\": " << p.id_m << ",\n\"value\": " << p.initial_value_m
-      << ",\n\"estimated_value\": " << p.final_value_m << ",\n\"min\": ";
-  if (p.min_m == -std::numeric_limits<double>::infinity()) {
+      << ",\n\"estimated_value\": " << p.final_value_m
+      << ",\n\"uncertainty\": " << p.uncertainty_m
+      << ",\n\"min\": ";
+  if (p.min_m == -std::numeric_limits<double>::infinity())
+  {
     out << "\"-Infinity\"";
   } else {
     out << p.min_m;
@@ -141,7 +151,7 @@ std::ostream& operator<<(std::ostream& out, const Parameter& p) {
     out << p.max_m;
   }
 
-  out << ",\n\"estimation type is\": \"" << p.estimation_type_m << "\"\n}";
+  out << ",\n\"estimation_type\": \"" << p.estimation_type_m << "\"\n}";
 
   return out;
 }
@@ -646,7 +656,64 @@ class FIMSRcppInterfaceBase {
     FIMS_WARNING_LOG("Method not yet defined.");
     return "{\"name\" : \"not yet implemented\"}";
   }
+  /**
+   * @brief Method to extract standard error values from the se_values
+   * working map.
+   */
+  void get_se_values(std::string name,
+                     std::map<std::string, std::vector<double>> &se_values,
+                     fims::Vector<double> &values)
+  {
+    auto se_vals = se_values.find(name);
+    if (se_vals != se_values.end())
+    {
+      std::vector<double> &se_vals_vector = (*se_vals).second;
+      std::vector<double> uncertainty_std(se_vals_vector.begin(), se_vals_vector.begin() + values.size());
+      std::vector<double> temp(se_vals_vector.begin() + values.size(), se_vals_vector.end());
+      se_vals_vector = temp;
+      fims::Vector<double> uncertainty(uncertainty_std);
+      values = uncertainty;
+    }
+    else
+    {
+      std::fill(values.begin(), values.end(), -999);
+    }
+  }
 
+  /**
+   * @brief Set uncertainty values for the interface object.
+   *
+   * @details This virtual method is intended to be overridden in derived
+   * classes to set uncertainty (standard error) values
+   * for model parameters or quantities using the provided map of standard
+   * error values. The default implementation logs a warning.
+   *
+   * @param se_values A map from parameter names to vectors of standard error
+   * values.
+   */
+  virtual void set_uncertainty(std::map<std::string, std::vector<double>> &se_values){
+    FIMS_WARNING_LOG("Method not yet defined.");
+  }
+
+  /**
+   * @brief Report the parameter value as a string.
+   *
+   * @param value
+   * @return std::string
+   */
+  std::string value_to_string(double value) {
+    std::stringstream ss;
+    if (value == std::numeric_limits<double>::infinity()) {
+      ss << "\"Infinity\"";
+    } else if (value == -std::numeric_limits<double>::infinity()) {
+      ss << "\"-Infinity\"";
+    } else if (value != value) {
+      ss << "\"NaN\"";
+    } else {
+      ss << value;
+    }
+    return ss.str();
+  }
   /**
    * @brief Make a string of dimensions for the model.
    */
