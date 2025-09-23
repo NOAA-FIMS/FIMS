@@ -46,8 +46,7 @@ test_that("deterministic run works with correct inputs", {
 
   #' @description Verify the number of parameters is correct for deterministic
   #' run.
-  #' TODO: change parameter number to 77 after fixing log_devs estimation error
-  expect_equal(length(result[["obj"]][["par"]]), 48)
+  expect_equal(length(result[["obj"]][["par"]]), 77)
 })
 
 ## Edge handling ----
