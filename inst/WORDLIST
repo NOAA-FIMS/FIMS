@@ -102,7 +102,6 @@ calc
 CalculateB
 CalculateBiomass
 CalculateCatch
-CalculateDepletion
 CalculateEquilibriumRecruitment
 CalculateEquilibriumSpawningBiomass
 CalculateIndex
@@ -225,9 +224,6 @@ deliverables
 dellog
 DensityComponentBase
 dep
-DepletionBase
-DepletionExpected
-DepletionInterfaceBase
 dependabot
 dereference
 Dereference
@@ -700,10 +696,6 @@ pbs
 pdHess
 pdq
 pdqit
-pella
-Pella
-PellaTomlinsonDepletion
-PellaTomlinsonInterface
 pkgdown
 pkgload
 pkgname
@@ -837,8 +829,6 @@ SetAgeCompositionData
 setClass
 setClassUnion
 SetDataObjects
-SetDepletion
-SetDepletionID
 setdiff
 setequal
 SetFleetIndexData

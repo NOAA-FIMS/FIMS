@@ -12,7 +12,6 @@
 #include "../fleet/fleet.hpp"
 #include "../growth/growth.hpp"
 #include "../recruitment/recruitment.hpp"
-#include "../depletion/depletion.hpp"
 #include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
 
@@ -77,11 +76,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   int recruitment_id = -999; /*!< id of recruitment model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
       recruitment; /*!< shared pointer to recruitment module */
-
-  // depletion
-  int depletion_id = -999; /*!< id of depletion model object*/
-  std::shared_ptr<fims_popdy::DepletionBase<Type>>
-      depletion; /*!< shared pointer to recruitment module */
 
   // growth
   int growth_id = -999; /*!< id of growth model object*/

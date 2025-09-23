@@ -17,7 +17,6 @@
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_depletion.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
@@ -318,8 +317,6 @@ RCPP_MODULE(fims)
                     "Set the unique id for the growth object")
             .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID,
                     "Set the unique id for the Recruitment object")
-            .method("SetDepletionID", &PopulationInterface::SetDepletionID,
-                    "Set the unique id for the Depletion object")
             .method("AddFleet", &PopulationInterface::AddFleet,
                     "Set a unique fleet id to the list of fleets operating on this "
                     "population")
@@ -378,20 +375,6 @@ RCPP_MODULE(fims)
                    "Weights for each age class.")
             .method("get_id", &EWAAGrowthInterface::get_id)
             .method("evaluate", &EWAAGrowthInterface::evaluate);
-
-        Rcpp::class_<PellaTomlinsonInterface>("PTDepletion")
-            .constructor()
-            .field("log_r", &PellaTomlinsonInterface::log_r)
-            .field("log_K", &PellaTomlinsonInterface::log_K)
-            .field("log_m", &PellaTomlinsonInterface::log_m)
-            .field("log_depletion", &PellaTomlinsonInterface::log_depletion,
-                   "Log expectation of the depletion process")
-            .field("log_expected_depletion",
-                   &PellaTomlinsonInterface::log_expected_depletion,
-                   "expected depletion as a random effect on the natural log scale")
-            .field("nyears", &PellaTomlinsonInterface::nyears, "number of years")
-            .method("get_id", &PellaTomlinsonInterface::get_id)
-            .method("evaluate_mean", &PellaTomlinsonInterface::evaluate_mean);
 
         Rcpp::class_<DnormDistributionsInterface>("DnormDistribution")
             .constructor()

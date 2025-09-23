@@ -36,7 +36,6 @@
 #' @export Parameter
 #' @export ParameterVector
 #' @export Population
-#' @export PTDepletion
 #' @export RealVector
 #' @export set_log_throw_on_error
 #' @export SharedInt

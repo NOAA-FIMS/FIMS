@@ -131,10 +131,6 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   SharedInt recruitment_err_id;
   /**
-   * @brief The ID of the depletion module.
-   */
-  SharedInt depletion_id;
-  /**
    * @brief The natural log of the natural mortality for each year.
    */
   ParameterVector log_M;
@@ -204,7 +200,6 @@ class PopulationInterface : public PopulationInterfaceBase {
         maturity_id(other.maturity_id),
         growth_id(other.growth_id),
         recruitment_id(other.recruitment_id),
-        depletion_id(other.depletion_id),
         log_M(other.log_M),
         log_init_naa(other.log_init_naa),
         numbers_at_age(other.numbers_at_age),
@@ -258,14 +253,6 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   void SetRecruitmentID(uint32_t recruitment_id) {
     this->recruitment_id.set(recruitment_id);
-  }
-
-  /**
-   * @brief Set the unique ID for the depletion object.
-   * @param depletion_id Unique ID for the depletion object.
-   */
-  void SetDepletionID(uint32_t depletion_id) {
-    this->depletion_id.set(depletion_id);
   }
 
   /**
@@ -373,7 +360,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     ss << " \"tag\" : \"" << this->name << "\",\n";
     ss << " \"id\": " << this->id << ",\n";
     ss << " \"recruitment_id\": " << this->recruitment_id << ",\n";
-    ss << " \"depletion_id\": " << this->depletion_id << ",\n";
     ss << " \"growth_id\": " << this->growth_id << ",\n";
     ss << " \"maturity_id\": " << this->maturity_id << ",\n";
 
@@ -481,7 +467,6 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     population->growth_id = this->growth_id.get();
     population->recruitment_id = this->recruitment_id.get();
-    population->depletion_id = this->depletion_id.get();
     population->maturity_id = this->maturity_id.get();
     population->log_M.resize(this->log_M.size());
     population->log_init_naa.resize(this->log_init_naa.size());
