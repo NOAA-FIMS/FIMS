@@ -425,7 +425,7 @@ public:
       {
         if (dq[i] != dq[i]) // check for NaN
         {
-          ss << "\"nan\", ";
+          ss << "\"-999\", ";
         }
         else
         {
@@ -434,7 +434,7 @@ public:
       }
       if (dq[dq.size() - 1] != dq[dq.size() - 1]) // check for NaN
       {
-        ss << "\"nan\"";
+        ss << "\"-999\"";
       }
       else
       {
