@@ -18,3 +18,4 @@ fims.log
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^assets$
