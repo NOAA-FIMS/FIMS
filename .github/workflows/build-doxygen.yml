@@ -22,6 +22,8 @@ jobs:
     steps:
     - name: Get repository
       uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
 
     - name: Installing build dependencies
       run: |
@@ -32,6 +34,7 @@ jobs:
     # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
     # FIX? run cmake --build build --parallel 16
       run: |
+        cp -r assets/* ./
         cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=FAIL_ON_WARNINGS
         cmake --build build
     
@@ -40,7 +43,13 @@ jobs:
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |
         mv build/html ./
-        mv ./html ./doxygen
+        rm -rf ./doxygen/*
+        mv ./html/* ./doxygen/
+        rm custom.css
+        rm doxygen-awesome.css
+        rm FIMS_logo3.png
+        rm header.html
+        rm DoxygenLayout.xml
 
     - name: Push docs to FIMS-docs repo
       if: ${{ github.ref == 'refs/heads/main' }}
