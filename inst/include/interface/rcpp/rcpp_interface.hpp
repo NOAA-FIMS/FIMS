@@ -310,6 +310,9 @@ void clear() {
   DmultinomDistributionsInterface::id_g = 1;
   DmultinomDistributionsInterface::live_objects.clear();
 
+  FisheryModelInterfaceBase::id_g = 1;
+  FisheryModelInterfaceBase::live_objects.clear();
+
 #ifdef TMBAD_FRAMEWORK
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMBAD_FIMS_TYPE>();
