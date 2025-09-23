@@ -58,21 +58,121 @@ the change in approach relative to previous assessment models.
 
 ## Methods
 
-We evaluated a simple time series model with an AR1 process, 
-$\lambda_{t} = p * \lambda_{t-1} + \epsilon_{t}$, $\lambda_t$ is the AR1 process 
-at time $t$ and where $p$ is the AR1 correlation parameter, using two parameterizations:
+### Time Series Model 
 
-1. process approach: $\lambda_{t} \sim N(p * \lambda_{t-1}, \sigma^{2}_{\lambda})$
-2. deviations approach: $\lambda_{t} = p * \lambda_{t-1} + \sigma * z_{t}, z_{t} \sim N(0,1)$
+We evaluated a simple time series model where the latent state, $\lambda_{t}$,
+at time $t$ follows an AR1 process defined as: 
+$\lambda_{t} = \phi * \lambda_{t-1} + \epsilon_{t}$, using two parameterizations:
+
+1. process approach: $\lambda_{t} \sim N(\phi * \lambda_{t-1}, \sigma^{2}_{\lambda})$
+2. deviations approach: $\lambda_{t} = \phi * \lambda_{t-1} + \sigma * z_{t}, z_{t} \sim N(0,1)$
+
+-   $\phi$ is the autoregressive coefficient, transformed as: $$
+    \phi=2*\text{plogis}(\text{phiTrans})-1
+    $$ which ensures $\phi$ remains in the range (-1,1).
+
+-   $\sigma$ is the process standard deviation.
+
+-   The stationary variance of the process is $$
+    \text{Var}(\gamma)=\frac{\sigma^2}{(1-\phi^2)}
+    $$
 
 Under a random effects model, the process approach puts the random effect on $\lambda_{t}$, while in
-the deviations approach, the random effect is applied to $z_{t}$. [Text on why the process approach is 
-sparse and why this matters for the Laplace approximation]. 
+the deviations approach, the random effect is applied to $z_{t}$. The joint negative
+log-likelihood for this process is computed in state space form where the process
+of the current time step is dependent on the previous one and observations, $y$
+are *iid* normal:
+```{r, eval = FALSE}
+ # deviations approach
+  nll <- nll -dnorm(z[1],0,sqrt(sd*sd/(1-phi*phi)),log=TRUE)
+  nll <- nll -sum(dnorm(z[-1],0,sd,log=TRUE))
+  lamda <- numeric(length(z))
+  lamda[1] <- 0+z[1]
+  for(i in 2:timeSteps){
+    lamda[i] <- phi*lamda[i-1]+z[i]
+  }
+  nll <- nll - sum(dnorm(y, lamda[oi], sdo, TRUE))
+  
 
-We also compared these two parameterization in a simple catch-at-age stock assessment
-by modifying the software package, babySAM. [Text descibing babySAM and the modifications]
+  # process approach
+  nll <- nll -dnorm(lambda[1],0,sqrt(sd*sd/(1-phi*phi)),log=TRUE)
+  for(i in 2:timeSteps){
+    nll <- nll -dnorm(lambda[i],phi*lambda[i-1],sd,log=TRUE)
+  }
+  nll <- nll - sum(dnorm(y, lambda[oi], sdo, TRUE))
 
-We compared model results and looked at computational speed.  
+```
+
+Under this formulation, the process approach results in a sparse precision matrix, 
+or the Hessian which is the inverse of the covariance matrix, while the deviations 
+approach results in a dense precision matrix (Fig 1). Models are evaluated with 
+RTMB (Kristensen, 2019) using the TMB package (Kristensen et al., 2016) in R (R Core Team, 2024).
+TMB relies on the Laplace approximation to intergrate out random effects during an inner 
+optimization step, afterwhich, the joint negative log-likelihood is minimized with respect to
+the fixed effects. The Laplace approximation requires up to the third order partial 
+derivatives of the joint negative log-likelihood with respect to the random effects 
+to be evaluated at each inner optimization step. The computation cost of the Lapace 
+approximation is primarily determined by the cost of inverting the hessian, which is $O(N^3)$ 
+for N-dimensional parameter space. As the number of random effects increases, 
+the computational cost of inverting the dense hessian from the deviations approach
+increases rapidly, while the cost of inverting the sparse hessian from the process
+approach increases much more slowly.
+
+![](figures/ar1hess_deviations.jpg) ![](figures/ar1hess_process.jpg)
+**Figure 1.** Hessian matrix for AR1 process using deviations approach (left)
+and process approach (right).
+
+### Catch-at-age Model 
+
+We compared the deviation and process approaches in a simple catch-at-age stock assessment
+model by modifying the software package, babySAM. The babySAM model structures recruitment,
+numbers at age, and fishing mortality as AR1 processes. We modified the model to 
+structure recruitment under both the deviation and process approaches. The main structure 
+for recruitment for years 2 and greater was applied to the numbers at age parameter, $N_{y, a=1}$ 
+for year $y$ and for age 1 and written as the following:
+
+<!--  TODO: fix deviations approach equation -->
+1. deviations approach: $log(N_{y,1}) = \hat{r} + z_{y}, \quad where z_{y} \sim N(z_{y-1},\sigma^{2}_{r})$
+2. process approach: $N_{pred} = log(N_{y-1, 1}), \quad where log(N_{y, 1}) \sim N(\hat{r} + \phi*(N_{pred} - \hat{r}))$
+
+The joint negative log-likelihood for recruitment under each approach was computed using
+state space form as:
+
+```{r, eval = FALSE}
+  # deviations approach
+  # AR1 for standard normal innovations at initial condition
+  jnll <- jnll - dnorm(z[1], 0, sqrt(sdR*sdR/(1-phi*phi)), log=TRUE)
+  # AR1 standard normal innovations for remaining years
+  jnll <- jnll - sum(dnorm(z[-1], 0, sdR, log=TRUE))
+  # transform innovations (z) to get recruitment deviations
+  rec_dev <- numeric(nrow)
+  rec_dev[1] <- z[1]  # initial condition
+  for(i in 2:nrow){
+    rec_dev[i] <- phi * rec_dev[i-1] + z[i]
+  }
+  # 3. Set recruitment as random walk + transformed deviations
+  for(y in 1:nrow){
+    # Random walk with optional intercept
+    logN[y,1] <- rec_intercept + rec_dev[y]
+  }
+
+  # process approach
+  # AR1 init conditions
+  jnll <- jnll - dnorm(logN[1,1], rec_intercept, sdR/sqrt(1-phi^2), log=TRUE)
+  # AR1 for remaining years
+  for(y in 2:nrow){
+     predN <- logN[y-1,1]
+  }
+  jnll <- jnll - dnorm(logN[y,1], rec_intercept + phi*(predN - rec_intercept), sdR, TRUE)
+```
+
+Catch-at-age models compared recruitment with and without the recruitment intercept
+term to compare model parameterizations common in Europe (without intercept) and
+the US (with intercept) to ensure the intercept did not influence the sparsity of the 
+Hessian. 
+
+<!--  TODO: flush this out more or just skip to results? -->
+Results compared model parameter estimates and computational times. 
 
 ## Results
 
