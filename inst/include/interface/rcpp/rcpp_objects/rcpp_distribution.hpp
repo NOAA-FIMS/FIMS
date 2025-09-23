@@ -558,6 +558,7 @@ public:
     dlnorm.x.resize(this->x.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_sd.resize(this->log_sd.size());
+    // dlnorm.input_type = "prior";
     for (size_t i = 0; i < x.size(); i++)
     {
       dlnorm.x[i] = this->x[i].initial_value_m;
@@ -625,7 +626,7 @@ public:
       this->lpdf_vec = Rcpp::NumericVector(dlnorm->report_lpdf_vec.size());
       if (this->expected_values.size() == 1)
       {
-        this->expected_values.resize(dlnorm->expected_values.size());
+        this->expected_values.resize(this->lpdf_vec.size());//dlnorm->expected_values.size());
       }
       if (this->x.size() == 1)
       {
