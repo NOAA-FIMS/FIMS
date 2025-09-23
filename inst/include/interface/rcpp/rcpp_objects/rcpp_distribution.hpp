@@ -321,6 +321,7 @@ public:
     ss << " \"module_id\": " << this->id_m << ",\n";
     ss << " \"module_type\": \"normal\",\n";
     ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
+     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";
@@ -626,7 +627,7 @@ public:
       this->lpdf_vec = Rcpp::NumericVector(dlnorm->report_lpdf_vec.size());
       if (this->expected_values.size() == 1)
       {
-        this->expected_values.resize(this->lpdf_vec.size());//dlnorm->expected_values.size());
+        this->expected_values.resize(this->lpdf_vec.size()); // dlnorm->expected_values.size());
       }
       if (this->x.size() == 1)
       {
@@ -658,6 +659,7 @@ public:
     ss << " \"module_id\": " << this->id_m << ",\n";
     ss << " \"module_type\": \"log_normal\",\n";
     ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
+     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";
@@ -1002,6 +1004,7 @@ public:
     ss << " \"module_id\": " << this->id_m << ",\n";
     ss << " \"module_type\": \"multinomial\",\n";
     ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
+    ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";

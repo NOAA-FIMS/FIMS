@@ -464,7 +464,7 @@ std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v)
   {
     if (v[i] != v[i])
     {
-      out << "null"<< ",";
+      out << "-999"<< ",";
     }
     else
     {
@@ -473,7 +473,7 @@ std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v)
   }
   if (v[v.size() - 1] != v[v.size() - 1])
   {
-     out << "null";
+     out << "-999]";
   }
   else
   {
