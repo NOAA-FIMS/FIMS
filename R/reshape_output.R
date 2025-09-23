@@ -1,11 +1,10 @@
-# To remove the NOTE
-# no visible binding for global variable
+# This file contains many functions to reshape output from get_output()
+# To remove the NOTE `no visible binding for global variable`
 utils::globalVariables(c(
   "module_name", "module_id", "module_type",
   "parameter_min", "parameter_max", "label", "label_splits"
 ))
 
-# A list of functions to reshape output from finalize()
 #' Reshape JSON estimates
 #'
 #' @description
@@ -13,91 +12,151 @@ utils::globalVariables(c(
 #' parameter estimates into a structured tibble for easier analysis and
 #' manipulation.
 #'
-#' @param finalized_fims A JSON object containing the finalized FIMS output.
-#' @param opt An object returned from an optimizer, typically from
-#'   [stats::nlminb()], used to fit a TMB model.
+#' @param finalized_fims A JSON object containing the finalized FIMS output as
+#'   returned from `get_output()`, which is an internal function to each model
+#'   family.
 #' @return A tibble containing the reshaped parameter estimates.
-reshape_json_estimates <- function(finalized_fims, opt = list()) {
-  json_list <- jsonlite::fromJSON(finalized_fims)
-  # Identify the index of the "modules" element in `json_list` by matching its name.
-  # This is used to locate the relevant part of the JSON structure for further processing.
-  modules_id <- which(names(json_list) == "modules")
-
-  # Extract and process the "parameters" from each module in `json_list`
-  parameter_estimates <- purrr::map(seq_along(json_list[[modules_id]][["parameters"]]), ~ {
-    # If the current module's "parameters" is NULL, return NULL to skip processing.
-    if (is.null(json_list[[modules_id]][["parameters"]][[.x]])) {
-      NULL
-    } else {
-      # Convert the current module's "parameters" into a tibble for easier manipulation.
-      temp <- tibble::as_tibble(json_list[[modules_id]][["parameters"]][[.x]]) |>
-        # Rename the columns of the tibble.
-        dplyr::rename_with(~ c("label", "type_id", "type", "parameter")) |>
-        # Expand the "parameter" column into multiple rows if it has more than one parameter.
-        tidyr::unnest_longer(parameter) |>
-        # Expand the nested structure in the "parameter" column into multiple columns,
-        # using an underscore (`_`) as a separator for the new column names.
-        tidyr::unnest_wider(
-          parameter,
-          names_sep = "_"
-        ) |>
-        # Rename the columns of the expanded "parameter" column.
-        dplyr::rename(
-          initial = parameter_value,
-          estimate = parameter_estimated_value,
-          estimation_type = parameter_estimationtypeis
-        )
-      # If the `opt` has a length of 0, set the `estimated` column to FALSE.
-      # TODO: ask Matthew if we can set estimated (in JSON) to FALSE when optimization = 0
-      if (length(opt) == 0) {
-        temp <- temp |>
-          dplyr::mutate(estimation_type = "constant")
-      }
-
-      temp <- temp |>
-        dplyr::rowwise() |>
-        # if estimated == FALSE, then copy initial value to estimate
-        dplyr::mutate(
-          estimate = ifelse(estimation_type == "constant", initial, estimate)
-        ) |>
-        dplyr::ungroup()
-    }
-  })
-
-  # Expand the parameter estimates with additional information from the json output
-  estimates <- purrr::pmap(
-    # Combine the parameter estimates with the module name, ID, and type from
-    # `json_list`.
-    list(
-      parameter_estimates,
-      json_list[[modules_id]][["name"]],
-      json_list[[modules_id]][["id"]],
-      json_list[[modules_id]][["type"]]
-    ),
-    ~ {
-      # Skip processing if the current estimate is NULL.
-      if (is.null(..1)) {
-        NULL
-      } else {
-        ..1 |>
-          dplyr::mutate(
-            # Add the module name from `json_list` as a new column of the current estimates.
-            module_name = ..2,
-            # Add the module ID from `json_list` as a new column.
-            module_id = ..3,
-            # Add the module type from `json_list` as a new column.
-            module_type = ..4
-          )
-      }
-    }
+reshape_json_estimates <- function(finalized_fims) {
+  json_list <- jsonlite::fromJSON(finalized_fims, simplifyVector = FALSE)
+  read_list <- purrr::map(
+    json_list[!names(json_list) %in% c(
+      "name", "type", "estimation_framework", "id", "objective_function_value",
+      "max_gradient_component", "gradient",
+      "population_ids", "fleet_ids"
+    )],
+    \(x) tidyr::unnest_wider(tibble::tibble(json = x), json)
+  )
+  
+  # Process the module parameters
+  module_information <- purrr::map_df(
+    read_list[
+      !names(read_list) %in%
+      c(
+        "name", "type", "estimation_framework", "id",
+        "objective_function_value", "populations", "fleets", "data",
+        "density_components", "population_ids", "fleet_ids"
+      )
+    ],
+    .f = \(y) dplyr::mutate(
+      y,
+      parameters = purrr::map(
+        parameters,
+        \(x) purrr::map_df(x, dimension_folded_to_tibble)
+      )
+    )
   ) |>
-    # Combine all the processed tibbles into a single tibble by stacking rows.
-    dplyr::bind_rows() |>
-    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
-    dplyr::relocate(module_name, module_id, module_type, .before = tidyselect::everything()) |>
-    # Remove columns `parameter_min` and `parameter_max` as we currently don't
-    # have bounds on parameters.
-    dplyr::select(-c(parameter_min, parameter_max))
+    tidyr::unnest(parameters)
+
+  # Process the fleet-level information
+  fleet_density_data <- read_list[["fleets"]] |>
+    dplyr::select(module_id, data_ids) |>
+    dplyr::mutate(
+      data_ids = purrr::map(
+        data_ids,
+        \(y) tibble::enframe(unlist(y), name = "data_type", value = "data_id")
+      )
+    ) |>
+    tidyr::unnest(data_ids) |>
+    dplyr::filter(data_id != -999) |>
+    dplyr::mutate(
+      name = paste(data_type, "expected", sep = "_")
+    ) |>
+    dplyr::left_join(
+      y = read_list[["density_components"]] |>
+        dplyr::filter(
+          observed_data_id != -999
+        ) |>
+        dplyr::rename(distribution = "module_type") |>
+        dplyr::select(-dplyr::starts_with("module")),
+      by = c("data_id" = "observed_data_id")
+    ) |>
+    dplyr::mutate(
+      density_component = purrr::map(density_component, density_to_tibble)
+    ) |>
+    tidyr::unnest(density_component) |>
+    dplyr::select(-dplyr::starts_with("data_")) |>
+    dplyr::group_by(module_id, name) |>
+    dplyr::mutate(join_by = dplyr::row_number()) |>
+    dplyr::ungroup()
+
+  fleet_information <- read_list[["fleets"]] |>
+    tidyr::pivot_longer(
+      cols = c(parameters, derived_quantities),
+      names_to = "delete_me",
+      values_to = "parameters"
+    ) |>
+    dplyr::select(-delete_me, -data_ids) |>
+    # Remove column ids that are not currently needed
+    dplyr::select(-dplyr::matches("^n.+s$")) |>
+    dplyr::mutate(
+      parameters = purrr::map(
+        parameters,
+        \(x) purrr::map_df(x, dimension_folded_to_tibble)
+      )
+    ) |>
+    tidyr::unnest(parameters) |>
+    dplyr::group_by(module_id, name) |>
+    dplyr::mutate(join_by = dplyr::row_number()) |>
+    dplyr::ungroup() |>
+    dplyr::left_join(
+      fleet_density_data,
+      by = c("module_id", "name", "join_by"),
+      suffix = c("", "_density")
+    ) |>
+    dplyr::select(-join_by)
+
+  # Process the data components
+  # TODO: Data component needs actual uncertainty instead of 0
+  data_information <- read_list[["data"]] |>
+    dplyr::mutate(
+      dimensionality = purrr::map(dimensionality, \(x) dimensions_to_tibble(x))
+    ) |>
+    tidyr::unnest(c(dimensionality, value, uncertainty)) |>
+    dplyr::mutate(value = unlist(value), uncertainty = unlist(uncertainty))
+
+  # Process the density components
+  # This is done above for fleet information but we will need to do it for
+  # parameter-level information once we have a link to the parameter id
+  density_information <- read_list[["density_components"]] |>
+    dplyr::mutate(
+      density_component = purrr::map(density_component, density_to_tibble)
+    ) |>
+    tidyr::unnest(density_component)
+    
+  # Process the population data
+  population_information <- read_list[["populations"]] |>
+    tidyr::pivot_longer(
+      cols = c(parameters, derived_quantities),
+      names_to = "delete_me",
+      values_to = "parameters"
+    ) |>
+    # TODO: Think about these ids when we have more than one population
+    dplyr::select(-delete_me, -dplyr::ends_with("_id"), -population) |>
+    dplyr::mutate(
+      parameters = purrr::map(
+        parameters,
+        \(x) purrr::map_df(x, dimension_folded_to_tibble)
+      )
+    ) |>
+    tidyr::unnest(parameters)
+
+  #TODO: Bring in TMB estimates
+  #TODO: Change some column names
+  # Bring everything together
+  out <- dplyr::bind_rows(
+    # density_information,
+    fleet_information,
+    module_information,
+    population_information
+  ) |>
+    dplyr::select(
+      module_name, module_id, module_type, "label" = name,
+      type, type_id, "parameter_id" = id,
+      fleet, dplyr::ends_with("_i"),
+      dplyr::ends_with("value"),
+      dplyr::ends_with("values"),
+      dplyr::everything()
+    )
 }
 
 #' Reshape TMB estimates
@@ -120,10 +179,6 @@ reshape_tmb_estimates <- function(obj,
                                   opt = NULL,
                                   parameter_names) {
   # Outline for the estimates table
-  # TODO: The fleet_name, age, length, and time columns are currently empty. Matthew
-  # has started adding information to the JSON output in the dev-model-families branch.
-  # We can populate these columns once the dev-model-families branch is merged
-  # into dev.
   estimates_outline <- tibble::tibble(
     # The FIMS Rcpp module
     module_name = character(),
@@ -133,14 +188,6 @@ reshape_tmb_estimates <- function(obj,
     label = character(),
     # The unique ID of the parameter
     parameter_id = integer(),
-    # The fleet name associated with the parameter or derived quantity
-    fleet_name = character(),
-    # The age associated with the parameter or derived quantity
-    age = numeric(),
-    # The length associated with the parameter or derived quantity
-    length = numeric(),
-    # The modeled time period that the value pertains to
-    time = integer(),
     # The initial value use to start the optimization procedure
     initial = numeric(),
     # The estimated parameter value, which would be the MLE estimate or the value
@@ -153,10 +200,7 @@ reshape_tmb_estimates <- function(obj,
     # The pointwise log-likelihood used for the test or holdout data
     log_like_cv = numeric(),
     # The gradient component for that parameter, NA for derived quantities
-    gradient = numeric(),
-    # A TRUE/FALSE indicator of whether the parameter was estimated (and not fixed),
-    # with NA for derived quantities
-    estimation_type = character()
+    gradient = numeric()
   )
 
   if (length(sdreport) > 0) {
@@ -180,10 +224,6 @@ reshape_tmb_estimates <- function(obj,
         gradient = c(
           obj[["gr"]](opt[["par"]]),
           rep(NA_real_, derived_quantity_nrow)
-        ),
-        estimation_type = c(
-          rep("fixed_effects", length(parameter_names)),
-          rep(NA, derived_quantity_nrow)
         )
       )
   } else {
@@ -191,8 +231,7 @@ reshape_tmb_estimates <- function(obj,
       tibble::add_row(
         label = names(obj[["par"]]),
         initial = obj[["env"]][["parameters"]][["p"]],
-        estimate = obj[["env"]][["parameters"]][["p"]],
-        estimation_type = "constant"
+        estimate = obj[["env"]][["parameters"]][["p"]]
       )
   }
 
@@ -214,203 +253,120 @@ reshape_tmb_estimates <- function(obj,
     dplyr::ungroup()
 }
 
-#' Reshape JSON derived quantities
-#'
-#' This function processes the finalized FIMS JSON output and reshapes the derived
-#' quantities into a structured tibble for easier analysis and manipulation.
-#'
-#' @param finalized_fims A JSON object containing the finalized FIMS output.
-#' @return A tibble containing the reshaped parameter estimates.
-reshape_json_derived_quantities <- function(finalized_fims) {
-  json_list <- jsonlite::fromJSON(finalized_fims)
-  # Identify the index of the "modules" element in `json_list` by matching its name.
-  # This is used to locate the relevant part of the JSON structure for further processing.
-  modules_id <- which(names(json_list) == "modules")
-
-  derived_quantities <- purrr::map(seq_along(json_list[[modules_id]][["derived_quantities"]]), ~ {
-    # If the current module's "derived_quantities" is NULL, return NULL to skip processing.
-    if (is.null(json_list[[modules_id]][["derived_quantities"]][[.x]])) {
-      NULL
-    } else {
-      # Convert the current module's "derived_quantities" into a tibble for easier manipulation.
-      tibble::as_tibble(json_list[[modules_id]][["derived_quantities"]][[.x]]) |>
-        # Expand the "values" column into multiple rows.
-        tidyr::unnest_longer(values)
-    }
-  })
-
-  expanded_derived_quantities <- purrr::pmap(
-    list(
-      derived_quantities,
-      json_list[[modules_id]][["name"]],
-      json_list[[modules_id]][["id"]],
-      json_list[[modules_id]][["type"]]
-    ),
-    ~ {
-      # Skip processing if the current derived_quantity is NULL.
-      if (is.null(..1)) {
-        NULL
-      } else {
-        ..1 |>
-          dplyr::mutate(
-            # Add the module name from `json_list` as a new column of the current estimates.
-            module_name = ..2,
-            # Add the module ID from `json_list` as a new column.
-            module_id = ..3,
-            # Add the module type from `json_list` as a new column.
-            module_type = ..4
-          )
-      }
-    }
-  ) |>
-    # Combine all the processed tibbles into a single tibble by stacking rows.
-    dplyr::bind_rows() |>
-    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
-    dplyr::relocate(module_name, module_id, module_type, .before = tidyselect::everything())
+#TODO: document
+dimension_folded_to_tibble <- function(section) {
+  if (length(section) == 0) {
+    return(NA)
+  }
+  while (length(section) == 1) {
+    unlist(section, recursive = FALSE)
+  }
+  temp <- dimensions_to_tibble(section[["dimensionality"]]) |>
+    dplyr::mutate(name = section[["name"]])
+  if ("type" %in% names(section)) {
+    temp |>
+      dplyr::mutate(
+        #TODO: Need to rename
+        type_id = section[["id"]],
+        type = section[["type"]]
+      ) |>
+      dplyr::bind_cols(
+        tibble::tibble(data = section[["values"]]) |>
+          tidyr::unnest_wider(data)
+      ) |>
+      dplyr::select(-min, -max)
+  } else {
+    temp |>
+      dplyr::bind_cols(
+        estimated_value = unlist(section[["value"]]),
+        uncertainty = unlist(section[["uncertainty"]]),
+        estimation_type = "derived_quantity"
+      )
+  }
 }
 
-#' Reshape JSON 'values' components
+#' Covert the dimension information from a FIMS json output into a tibble
 #'
-#' This function processes the model input from FIMS JSON output ('values') and
-#' reshapes the initial values for data inputs into a structured tibble.
+#' Dimensions in the json output are stored as a list of length two, with the
+#' header information containing the name of the dimension and the dimensions
+#' containing integers specifying the length for each dimension. The result
+#' helps interpret how the FIMS output is structured given it is dimension
+#' folded into a single vector in the json output.
 #'
-#' @param finalized_fims A JSON object containing the finalized FIMS output.
-#' @return A tibble containing the reshaped initial data values.
-#'
-reshape_json_values <- function(finalized_fims) {
-  json_list <- jsonlite::fromJSON(finalized_fims)
-  # Identify the index of the "modules" element in `json_list` by matching its name.
-  # This is used to locate the relevant part of the JSON structure for further processing.
-  modules_id <- which(names(json_list) == "modules")
-
-  values <- purrr::map(seq_along(json_list[[modules_id]][["values"]]), ~ {
-    # If the current module's "values" is NULL, return NULL to skip processing.
-    if (is.null(json_list[[modules_id]][["values"]][[.x]])) {
-      NULL
-    } else {
-      # Convert the current module's "values" into a tibble for easier manipulation.
-      tibble::as_tibble(json_list[[modules_id]][["values"]][[.x]])
-    }
-  })
-
-  expanded_values <- purrr::pmap(
-    list(
-      values,
-      json_list[[modules_id]][["name"]],
-      json_list[[modules_id]][["id"]],
-      json_list[[modules_id]][["type"]]
-    ),
-    ~ {
-      # Skip processing if the current derived_quantity is NULL.
-      if (is.null(..1)) {
-        NULL
-      } else {
-        ..1 |>
-          dplyr::mutate(
-            # Add the module name from `json_list` as a new column of the current estimates.
-            module_name = ..2,
-            # Add the module ID from `json_list` as a new column.
-            module_id = ..3,
-            # Add the module type from `json_list` as a new column.
-            module_type = ..4
-          )
-      }
-    }
-  ) |>
-    # Combine all the processed tibbles into a single tibble by stacking rows.
-    dplyr::bind_rows() |>
-    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
-    dplyr::relocate(
-      module_name, module_id, module_type,
-      .before = tidyselect::everything()
-    )
+#' @details
+#' The dimension index is returned not the actual year of the model. For
+#' example, if the model starts in year 1900, then year_i of 1, which is what
+#' is returned from this function will need to map to 1900 and that will need
+#' to be done externally.
+#' This function will accommodate dimensions of year-1 and year+1 where the
+#' indexing of the former will start at 2 instead of 1.
+#' @param data A list containing the header and dimensions information from a
+#'   FIMS json output object.
+#' @return
+#' A tibble containing ordered rows for each combination of the dimensions.
+#' @examples
+#' dummy_dimensions <- list(
+#'   header = list("nyears", "nages"),
+#'   dimensions = list(30L, 12L)
+#' )
+#' dimensions_to_tibble(dummy_dimensions)
+#' Example with nyears+1
+#' dummy_dimensions <- list(
+#'   header = list("nyears+1", "nages"),
+#'   dimensions = list(31L, 12L)
+#' )
+#' dimensions_to_tibble(dummy_dimensions)
+dimensions_to_tibble <- function(data) {
+  better_names <- unlist(data[["header"]]) |>
+    gsub(pattern = "^n(.+)s([-\\+]\\d+)?$", replacement = "\\1_i")
+  names(data[["dimensions"]]) <- better_names
+  if ("na" %in% better_names && length(better_names) == 1) {
+    # When the dimensions are na because there is no associated indexing
+    return(tibble::add_row(tibble::tibble()))
+  }
+  # Accommodate any -1 by creating a different start value
+  test <- grepl("-\\d", data[["header"]])
+  addition <- gsub(".+-(\\d)", "\\1", data[["header"]])
+  addition[!test] <- 0
+  start <- 1 + as.numeric(addition)
+  data[["dimensions"]][test] <- as.numeric(data[["dimensions"]][test]) +
+    as.numeric(addition)
+  # Create the returned tibble by first sequencing from 1:n for each dimension
+  purrr::map2(start, data[["dimensions"]], seq) |>
+    purrr::set_names(names(data[["dimensions"]])) |>
+    expand.grid() |>
+    tibble::as_tibble() |>
+    dplyr::arrange(!!! rlang::syms(better_names))
 }
 
-
-#' Reshape JSON 'fits' components
+#' Convert the density component information into a tibble
 #'
-#' This function processes the finalized FIMS JSON output and extracts/formats
-#' log_like, distribution, init, and expected from
-#' density_components, observed_values, and expected_values
-#' into a structured tibble for easier analysis and manipulation. Values are
-#' subsequently used to generate the 'fits' tibble from get_fits().
+#' The density component information is stored in a single column but contains
+#' a list of five elements. This function helps to widen that list into a
+#' tibble and expand the `values`, `expected_values`, and `observed_values`
+#' into long columns because they are all of the same length.
 #'
-#' @param finalized_fims A JSON object containing the finalized FIMS output.
-#' @return A tibble containing the reshaped data fitting values.
+#' @param data A list of lists from the json output that is titled
+#'   `density_component`.
 #'
-reshape_json_fits <- function(finalized_fims) {
-  json_list <- jsonlite::fromJSON(finalized_fims)
-  # Identify the index of the "modules" element in `json_list`.
-  # This is used to locate the relevant part of the JSON structure.
-  modules_id <- which(names(json_list) == "modules")
-
-  log_like <- purrr::map(seq_along(json_list[[modules_id]][["density_component"]][["values"]]), ~ {
-    # If the current module's "density_component" is NULL, return NULL to skip processing.
-    if (is.null(json_list[[modules_id]][["density_component"]][["values"]][[.x]])) {
-      NULL
-    } else {
-      # Convert the current module's "density_component" into a tibble for easier manipulation.
-      tibble::as_tibble(json_list[[modules_id]][["density_component"]][["values"]][[.x]])
-    }
-  })
-
-  init <- purrr::map(seq_along(json_list[[modules_id]][["observed_values"]][["values"]]), ~ {
-    # If the current module's "observed_values" is NULL, return NULL to skip processing.
-    if (is.null(json_list[[modules_id]][["observed_values"]][["values"]][[.x]])) {
-      NULL
-    } else {
-      # Convert the current module's "observed_values" into a tibble for easier manipulation.
-      tibble::as_tibble(json_list[[modules_id]][["observed_values"]][["values"]][[.x]])
-    }
-  })
-
-  expected <- purrr::map(seq_along(json_list[[modules_id]][["expected_values"]][["values"]]), ~ {
-    # If the current module's "expected_values" is NULL, return NULL to skip processing.
-    if (is.null(json_list[[modules_id]][["expected_values"]][["values"]][[.x]])) {
-      NULL
-    } else {
-      # Convert the current module's "expected_values" into a tibble for easier manipulation.
-      tibble::as_tibble(json_list[[modules_id]][["expected_values"]][["values"]][[.x]])
-    }
-  })
-
-  prelim_fits <- purrr::pmap(
-    list(
-      log_like,
-      init,
-      expected,
-      json_list[[modules_id]][["name"]],
-      json_list[[modules_id]][["id"]],
-      json_list[[modules_id]][["type"]]
-    ),
-    ~ {
-      # Skip processing if the current log_like is NULL.
-      if (is.null(..1)) {
-        NULL
-      } else {
-        ..1 |>
-          dplyr::rename(log_like = value) |>
-          cbind(..2) |>
-          dplyr::rename(init = value) |>
-          cbind(..3) |>
-          dplyr::rename(expected = value) |>
-          dplyr::mutate(
-            # Add the module name from `json_list` as a new column of the current estimates.
-            module_name = ..4,
-            # Add the module ID from `json_list` as a new column.
-            module_id = ..5,
-            # Add the module type from `json_list` as a new column.
-            module_type = ..6
-          )
-      }
-    }
-  ) |>
-    # Combine all the processed tibbles into a single tibble by stacking rows.
-    dplyr::bind_rows() |>
-    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
-    dplyr::relocate(
-      module_name, module_id, module_type,
-      .before = tidyselect::everything()
-    ) |>
-    tibble::as_tibble()
+#' @examples
+#' dummy_density <- list(
+#'   name = "lpdf_vec",
+#'   lpdf_value = -102.079,
+#'   values = list(
+#'     -1.39915, -2.44735, -2.93024, -3.21848, -2.95698, -3.51745
+#'   ),
+#'   expected_values = list(
+#'     5.0854, 6.13354, 6.61636, 6.90467, 6.64311, 7.20302
+#'   ),
+#'   observed_values = list(
+#'     161.646, 461.089, 747.29, 996.971, 767.548, 1343.86
+#'   )
+#' )
+#' density_to_tibble(dummy_density)
+density_to_tibble <- function(data) {
+  data |>
+    tibble::as_tibble() |>
+    tidyr::unnest(c(value, expected_values, observed_values)) |>
+    dplyr::rename(likelihood = value)
 }

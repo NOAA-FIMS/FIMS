@@ -430,8 +430,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   population$AddFleet(survey_fleet$get_id())
 
   # Set up catch at age model
-  # caa <- methods::new(CatchAtAge)
-  # caa$AddPopulation(population$get_id())
+  caa <- methods::new(CatchAtAge)
+  caa$AddPopulation(population$get_id())
 
   # Set-up TMB
   CreateTMBModel()
@@ -451,6 +451,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
       control = list(eval.max = 10000, iter.max = 10000, trace = 0)
     )
+    FIMS::set_fixed(opt$par)
+    write(caa$get_output(), "/Users/matthew.supernaw/FIMS-Testing/dev-json-caa/9_12/9_15/9_16/9_17/FIMScaa_setup_and_run_FIMS_without_wrappers_output.json")
   }
 
   # Call report using MLE parameter values, or

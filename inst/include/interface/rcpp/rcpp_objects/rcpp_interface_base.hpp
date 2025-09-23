@@ -17,6 +17,7 @@
 #include "../../../common/information.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
+#include <limits>
 
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
@@ -141,7 +142,7 @@ std::ostream& operator<<(std::ostream& out, const Parameter& p) {
     out << p.max_m;
   }
 
-  out << ",\n\"estimation type is\": \"" << p.estimation_type_m << "\"\n}";
+  out << ",\n\"estimation_type\": \"" << p.estimation_type_m << "\"\n}";
 
   return out;
 }
@@ -646,7 +647,25 @@ class FIMSRcppInterfaceBase {
     FIMS_WARNING_LOG("Method not yet defined.");
     return "{\"name\" : \"not yet implemented\"}";
   }
-
+  /**
+   * @brief Report the parameter value as a string.
+   * 
+   * @param value 
+   * @return std::string 
+   */
+  std::string value_to_string(double value) {
+    std::stringstream ss;
+    if (value == std::numeric_limits<double>::infinity()) {
+      ss << "\"Infinity\"";
+    } else if (value == -std::numeric_limits<double>::infinity()) {
+      ss << "\"-Infinity\"";
+    } else if (value != value) {
+      ss << "\"NaN\"";
+    } else {
+      ss << value;
+    }
+    return ss.str();
+  }
   /**
    * @brief Make a string of dimensions for the model.
    */

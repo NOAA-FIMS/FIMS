@@ -12,6 +12,7 @@
 #include "../fleet/fleet.hpp"
 #include "../growth/growth.hpp"
 #include "../recruitment/recruitment.hpp"
+#include "../depletion/depletion.hpp"
 #include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
 
@@ -71,10 +72,16 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       total_landings_numbers; /*!< Derived quantity: Total landings in numbers*/
   fims::Vector<Type> expected_recruitment; /*!< Expected recruitment */
+  fims::Vector<Type> sum_selectivity;      /*!< TODO: add documentation */
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
       recruitment; /*!< shared pointer to recruitment module */
+
+  // depletion
+  int depletion_id = -999; /*!< id of depletion model object*/
+  std::shared_ptr<fims_popdy::DepletionBase<Type>>
+      depletion; /*!< shared pointer to recruitment module */
 
   // growth
   int growth_id = -999; /*!< id of growth model object*/
@@ -92,12 +99,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       fleets; /*!< shared pointer to fleet module */
 
   // Define objective function object to be able to REPORT and ADREPORT
-
-#ifdef TMB_MODEL
-  ::objective_function<Type>
-      *of;  // :: references global namespace, defined in src/FIMS.cpp,
-            // available anywhere in the R package
-#endif
 
   std::map<std::string, fims::Vector<Type>>
       derived_quantities; /*!< derived quantities for specific model type, i.e.

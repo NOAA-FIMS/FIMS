@@ -16,6 +16,7 @@
 #include "model_object.hpp"
 #include "fims_vector.hpp"
 
+
 namespace fims_data_object {
 
 /**
@@ -25,8 +26,9 @@ template <typename Type>
 struct DataObject : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g;                    /**< id of the Data Object >*/
   fims::Vector<Type> data;                 /**< vector of the data >*/
+  fims::Vector<Type> uncertainty;          /**< vector of the data >*/
   size_t dimensions;                       /**< dimension of the Data object >*/
-  size_t imax;                             /**<1st dimension of data object >*/
+  size_t imax;                             /**< 1st dimension of data object >*/
   size_t jmax;                             /**< 2nd dimension of data object>*/
   size_t kmax;                             /**< 3rd dimension of data object>*/
   size_t lmax;                             /**< 4th dimension of data object>*/
@@ -37,7 +39,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    */
   DataObject(size_t imax) : dimensions(1), imax(imax) {
     data.resize(imax);
-
+    uncertainty.resize(imax);
     this->id = DataObject<Type>::id_g++;
   }
 
@@ -46,6 +48,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    */
   DataObject(size_t imax, size_t jmax) : dimensions(2), imax(imax), jmax(jmax) {
     data.resize(imax * jmax);
+    uncertainty.resize(imax * jmax);
     this->id = DataObject<Type>::id_g++;
   }
 
@@ -55,6 +58,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
   DataObject(size_t imax, size_t jmax, size_t kmax)
       : dimensions(3), imax(imax), jmax(jmax), kmax(kmax) {
     data.resize(imax * jmax * kmax);
+    uncertainty.resize(imax * jmax * kmax);
     this->id = DataObject<Type>::id_g++;
   }
 
@@ -64,6 +68,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
   DataObject(size_t imax, size_t jmax, size_t kmax, size_t lmax)
       : dimensions(4), imax(imax), jmax(jmax), kmax(kmax), lmax(lmax) {
     data.resize(imax * jmax * kmax * lmax);
+    uncertainty.resize(imax * jmax * kmax * lmax);
     this->id = DataObject<Type>::id_g++;
   }
 
