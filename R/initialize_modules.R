@@ -915,6 +915,7 @@ initialize_fims <- function(parameters, data) {
   fims_model$AddPopulation(population$get_id())
 
   CreateTMBModel()
+  
   # Create parameter list from Rcpp modules
   parameter_list <- list(
     parameters = list(

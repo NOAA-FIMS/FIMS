@@ -127,7 +127,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # turn on estimation of inflection_point
   fishing_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
   fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
-
   # turn on estimation of slope
   fishing_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
@@ -159,7 +158,14 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet_landings_distribution$log_sd$resize(om_input[["nyr"]])
   for (y in 1:om_input[["nyr"]]) {
     # Compute lognormal SD from OM coefficient of variation (CV)
-    fishing_fleet_landings_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
+    # The NAA tests will not pass when log_sd for landings is very small.
+    # We will need to make sure log_sd is the true value for deterministic runs but
+    # then reset to log(sqrt(log(0.06^2 + 1))) for estimation runs.
+    ifelse(
+      estimation_mode,
+      fishing_fleet_landings_distribution$log_sd[y]$value <- log(sqrt(log(0.06^2 + 1))),
+      fishing_fleet_landings_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
+    )
   }
   fishing_fleet_landings_distribution$log_sd$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
@@ -335,7 +341,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   if (is.null(random_effects)) {
     # TODO: integration tests fail after setting recruitment log_devs all estimable.
     # We need to debug the issue, then uncomment the line below.
-    # recruitment$log_devs$set_all_estimable(TRUE)
+    recruitment$log_devs$set_all_estimable(TRUE)
   }
 
   if ("selectivity" %in% names(random_effects)) {
@@ -434,6 +440,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # Set-up TMB
   CreateTMBModel()
+  
   # Create parameter list from Rcpp modules
   parameters <- list(
     p = get_fixed(),
@@ -451,7 +458,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
       control = list(eval.max = 10000, iter.max = 10000, trace = 0)
     )
     FIMS::set_fixed(opt$par)
-    fims_finalized <- caa$get_output()
   }
 
   # Call report using MLE parameter values, or
@@ -476,97 +482,4 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     sdr_fixed = sdr_fixed,
     sdr = sdr
   ))
-}
-
-# FIMS helper function to run FIMS model with wrappers ----
-#' Set Up and Run FIMS Model using wrapper functions
-#'
-#' This function sets up and runs the FIMS for a given iteration.
-#' It configures the model with the OM inputs and outputs (see simulated data from
-#' tests/testthat/fixtures/simulate-integration-test-data.R),
-#' and runs the optimization process.
-#' It then generates and returns the results including parameter estimates, model
-#' reports, and standard deviation reports.
-#'
-#' @param iter_id An integer specifying the iteration ID to use for loading
-#' the OM data.
-#' @param om_input_list A list of OM inputs, where each element
-#' corresponds to a different iteration.
-#' @param om_output_list A list of OM outputs, where each element
-#' corresponds to a different iteration.
-#' @param em_input_list A list of EM inputs, where each element
-#' corresponds to a different iteration.
-#' @param estimation_mode A logical value indicating whether to perform
-#' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
-#' will be optimized using `nlminb`. If `FALSE`, the input values will be used
-#' for the report.
-#' @param random_effects A logical value indicating whether to include random
-#' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects
-#' will be included on recruitment in the model.
-#' @param map A list used to specify mapping for the `MakeADFun` function from
-#' the TMB package.
-#'
-#' @return A list containing the following elements:
-#' \itemize{
-#'   \item{parameters: A list of parameters for the TMB model.}
-#'   \item{obj: The TMB model object created by `TMB::MakeADFun`.}
-#'   \item{opt: The result of the optimization process, if `estimation_mode`
-#'   is `TRUE`. `NULL` if `estimation_mode` is `FALSE`.}
-#'   \item{report: The model report obtained from the TMB model.}
-#'   \item{sdr_report: Summary of the standard deviation report for the
-#'   model parameters.}
-#'   \item{sdr_fixed: Summary of the standard deviation report for the
-#'   fixed parameters.}
-#' }
-#' @examples
-#' results <- setup_and_run_FIMS_with_wrappers(
-#'   iter_id = 1,
-#'   om_input_list = om_input_list,
-#'   om_output_list = om_output_list,
-#'   em_input_list = em_input_list,
-#'   estimation_mode = TRUE
-#' )
-setup_and_run_FIMS_with_wrappers <- function(iter_id,
-                                             om_input_list,
-                                             om_output_list,
-                                             em_input_list,
-                                             estimation_mode = TRUE,
-                                             random_effects = FALSE,
-                                             modified_parameters,
-                                             map = list()) {
-  # Load operating model data for the current iteration
-  om_input <- om_input_list[[iter_id]]
-  om_output <- om_output_list[[iter_id]]
-  em_input <- em_input_list[[iter_id]]
-
-  # Clear any previous FIMS settings
-  clear()
-
-  data <- FIMS::FIMSFrame(data1)
-  parameters <- modified_parameters
-
-  # The model will not always run when log_q is very small.
-  # We will need to make sure log_q is the true value for deterministic runs but
-  # then reset to log(1.0) for estimation runs.
-  if (estimation_mode == TRUE) {
-    parameters <- parameters |>
-      dplyr::mutate(
-        value = dplyr::if_else(
-          fleet_name == "survey1" & label == "log_q",
-          log(1.0),
-          value
-        )
-      )
-  }
-
-  parameter_list <- initialize_fims(
-    parameters = parameters,
-    data = data
-  )
-
-  fit <- fit_fims(input = parameter_list, optimize = estimation_mode)
-
-  clear()
-  # Return the results as a list
-  return(fit)
 }

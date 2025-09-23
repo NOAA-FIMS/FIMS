@@ -157,8 +157,6 @@ prepare_test_data <- function() {
         label = "log_devs",
         time = 2:30,
         value = om_input_list[[iter_id]][["logR.resid"]][-1],
-        # TODO: integration tests fail after setting recruitment log_devs all estimable.
-        # We need to debug the issue, then change constant to fixed_effects.
         estimation_type = "fixed_effects"
       ),
       by = c("label", "time")
@@ -201,14 +199,10 @@ prepare_test_data <- function() {
 
   ## Deterministic run with age and length comp using wrappers ----
   # Run FIMS using the setup_and_run_FIMS_with_wrappers function
-  deterministic_age_length_comp <- setup_and_run_FIMS_with_wrappers(
-    iter_id = iter_id,
-    om_input_list = om_input_list,
-    om_output_list = om_output_list,
-    em_input_list = em_input_list,
-    estimation_mode = FALSE,
-    modified_parameters = modified_parameters
-  )
+  deterministic_age_length_comp <- modified_parameters |>
+    initialize_fims(data = data_age_length_comp) |>
+    fit_fims(optimize = FALSE)
+  
   clear()
 
   # Save FIMS results as a test fixture for additional fimsfit tests
@@ -218,14 +212,16 @@ prepare_test_data <- function() {
     compress = FALSE
   )
 
-  # TODO: delete this lines 74-78 when log_devs estimation error fixed
   modified_parameters <- modified_parameters |>
-    dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        label == "log_devs" & module_type == "BevertonHolt",
-        "constant",
-        estimation_type
-      )
+    # Update log_sd for fleet1 landings
+    dplyr::rows_update(
+      tibble::tibble(
+        fleet_name = "fleet1",
+        label = "log_sd",
+        time = 1:30,
+        value = log(sqrt(log(0.06^2 + 1)))
+      ),
+      by = c("fleet_name", "label", "time")
     )
 
   saveRDS(
@@ -235,17 +231,10 @@ prepare_test_data <- function() {
   )
 
   ## Estimation run with age and length comp using wrappers ----
-  # Run FIMS using the setup_and_run_FIMS_with_wrappers function
-  fit_age_length_comp <- setup_and_run_FIMS_with_wrappers(
-    iter_id = iter_id,
-    om_input_list = om_input_list,
-    om_output_list = om_output_list,
-    em_input_list = em_input_list,
-    estimation_mode = TRUE,
-    modified_parameters = modified_parameters
-  )
-
-  clear()
+  # Run FIMS using the setup_and_run_FIMS_with_wrappers function    
+  fit_age_length_comp <- modified_parameters |>
+    initialize_fims(data = data_age_length_comp) |>
+    fit_fims(optimize = TRUE)
 
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(

@@ -10,10 +10,6 @@
 # Deterministic test ----
 ## Setup ----
 # Load necessary data for the integration test
-if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
-
 load(test_path("fixtures", "integration_test_data.RData"))
 
 # Set the iteration ID to 1 for accessing specific input/output list
@@ -28,7 +24,7 @@ result <- setup_and_run_FIMS_without_wrappers(
   estimation_mode = FALSE
 )
 
-## IO correctness ----
+# ## IO correctness ----
 test_that("catch-at-age model (deterministic MLE without wrappers) works with correct inputs", {
   #' @description Test that the output from FIMS run matches the model comparison project OM values.
   verify_fims_deterministic(
@@ -48,9 +44,9 @@ test_that("catch-at-age model (deterministic MLE without wrappers) works with co
     em_input = em_input_list[[iter_id]]
   )
 
-  # TODO: change parameter number to 77 after fixing log_devs estimation error
-  #' @description Test that the number of parameters is correct for deterministic run.
-  expect_equal(length(result[["obj"]][["par"]]), 48)
+  #' @description Verify the number of parameters is correct for deterministic
+  #' run.
+  expect_equal(length(result[["obj"]][["par"]]), 77)
 })
 
 ## Edge handling ----
@@ -94,6 +90,7 @@ test_that("catch-at-age model (estimation MLE without wrappers) works with corre
     nrow()
   #' @description Test that the 95% of the parameter estimates fall within 2*SE.
   expect_equal(out_of_tolerance_parameters, 0)
+
 })
 
 ## Edge handling ----

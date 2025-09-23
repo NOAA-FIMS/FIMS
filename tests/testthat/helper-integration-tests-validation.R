@@ -183,18 +183,6 @@ validate_fims <- function(
         !is.na(uncertainty),
         estimation_type == "fixed_effects"
       ) |>
-      # Restore the "true" log_q value for testing
-      dplyr::mutate(
-        input = dplyr::if_else(
-          label == "log_q",
-          # The model will not always run when log_q is very small.
-          # We reset log_q to log(1.0) for estimation runs. For testing, restore
-          # the input value to the original "true" log_q.
-          log(om_output[["survey_q"]][["survey1"]]),
-          # keep original otherwise
-          input
-        )
-      ) |>
       # Check if estimate is within 2 standard errors (95% confidence)
       dplyr::mutate(
         within_2SE = abs(estimated - input) <= qnorm(.975) * uncertainty
