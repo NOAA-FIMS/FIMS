@@ -58,9 +58,6 @@ A list containing the model report from \code{obj[["report"]]()}.
 An object with the \code{sdreport} class containing the output from
 \code{TMB::sdreport(obj)}.
 }
-\item{\code{estimates}:}{
-A table of parameter values and their uncertainty.
-}
 \item{\code{timing}:}{
 The length of time it took to run the model if it was optimized.
 }
@@ -68,6 +65,9 @@ The length of time it took to run the model if it was optimized.
 The package version of FIMS used to fit the model or at least the
 version used to create this output, which will not always be the same
 if you are running this function yourself.
+}
+\item{\code{model_output}:}{
+The FIMS model output as a JSON string.
 }
 }
 }

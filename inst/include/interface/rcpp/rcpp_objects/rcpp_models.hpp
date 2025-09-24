@@ -265,8 +265,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::shared_ptr<fims_popdy::Population<double>> &pop = (*pit).second;
       ss << "{\n";
 
-      ss << " \"module_name\" : \"population\",\n";
-      ss << " \"population\" : \"" << population_interface->name << "\",\n";
+      ss << " \"module_name\": \"Population\",\n";
+      ss << " \"population\": \"" << population_interface->name << "\",\n";
       ss << " \"module_id\": " << population_interface->id << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
          << ",\n";
@@ -324,10 +324,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
          << " ]}\n";
     } else {
       ss << "{\n";
-      ss << " \"name\" : \"Population\",\n";
+      ss << " \"name\": \"Population\",\n";
 
-      ss << " \"type\" : \"population\",\n";
-      ss << " \"tag\" : \"" << population_interface->get_id()
+      ss << " \"type\": \"population\",\n";
+      ss << " \"tag\": \"" << population_interface->get_id()
          << " not found in Information.\",\n";
       ss << " \"id\": " << population_interface->get_id() << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
@@ -531,8 +531,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::shared_ptr<fims_popdy::Fleet<double>> &fleet = (*fit).second;
 
       ss << "{\n";
-      ss << " \"module_name\" : \"fleet\",\n";
-      ss << " \"fleet\" : \"" << fleet_interface->name << "\",\n";
+      ss << " \"module_name\": \"Fleet\",\n";
+      ss << " \"fleet\": \"" << fleet_interface->name << "\",\n";
       ss << " \"module_id\": " << fleet_interface->id << ",\n";
       ss << " \"nages\": " << fleet_interface->nages.get() << ",\n";
       ss << " \"nyears\": " << fleet_interface->nyears.get() << ",\n";
@@ -617,9 +617,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << this->derived_quantities_component_to_json(dqs, dim_info) << "]}\n";
     } else {
       ss << "{\n";
-      ss << " \"name\" : \"Fleet\",\n";
-      ss << " \"type\" : \"fleet\",\n";
-      ss << " \"tag\" : \"" << fleet_interface->get_id()
+      ss << " \"name\": \"Fleet\",\n";
+      ss << " \"type\": \"fleet\",\n";
+      ss << " \"tag\": \"" << fleet_interface->get_id()
          << " not found in Information.\",\n";
       ss << " \"derived_quantities\": []}\n";
     }
@@ -830,9 +830,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     ss.str("");
 
     ss << "{\n";
-    ss << " \"name\" : \"CatchAtAge\",\n";
-    ss << " \"type\" : \"model\",\n";
-    ss << " \"estimation_framework\" : ";
+    ss << " \"name\": \"CatchAtAge\",\n";
+    ss << " \"type\": \"model\",\n";
+    ss << " \"estimation_framework\": ";
 #ifdef TMB_MODEL
     ss << "\"Template_Model_Builder (TMB)\",";
 #else
@@ -1009,7 +1009,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
     ss << "],\n";
 
-    ss << "\"density_components\" : [\n";
+    ss << "\"density_components\": [\n";
 
     typename std::map<
         uint32_t, std::shared_ptr<DistributionsInterfaceBase>>::iterator dit;
@@ -1042,10 +1042,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     }
     ss << "\n],\n";
     // add log
-    ss << " \"log\" : {\n";
-    ss << "\"info\" : " << fims::FIMSLog::fims_log->get_info() << ","
-       << "\"warnings\" : " << fims::FIMSLog::fims_log->get_warnings() << ","
-       << "\"errors\" : " << fims::FIMSLog::fims_log->get_errors() << "}}";
+    ss << " \"log\": {\n";
+    ss << "\"info\": " << fims::FIMSLog::fims_log->get_info() << ","
+       << "\"warnings\": " << fims::FIMSLog::fims_log->get_warnings() << ","
+       << "\"errors\": " << fims::FIMSLog::fims_log->get_errors() << "}}";
 #ifdef TMB_MODEL
     model->do_reporting = true;
 #endif

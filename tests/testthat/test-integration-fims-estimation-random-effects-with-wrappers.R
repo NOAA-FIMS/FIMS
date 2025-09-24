@@ -98,8 +98,8 @@ test_that("deterministic test of fims with recruitment re", {
     expect_equal(report[["recruitment"]][[1]][i], om_output_list[[iter_id]][["N.age"]][i, 1])
   }
 
-  # recruitment log_devs (fixed at initial "true" values)
-  # the initial value of om_input[["logR.resid"]] is dropped from the model
+  # recruitment log_devs (fixed at input "true" values)
+  # the input value of om_input[["logR.resid"]] is dropped from the model
   expect_equal(report[["log_recruit_dev"]][[1]], om_input_list[[iter_id]][["logR.resid"]][-1])
   # check input to ensure log_devs are being read in as random effects
   expect_equal(length(obj[["env"]][["parList"]]()[["p"]]), 49)

@@ -12,12 +12,12 @@ utils::globalVariables(c(
 #' parameter estimates into a structured tibble for easier analysis and
 #' manipulation.
 #'
-#' @param finalized_fims A JSON object containing the finalized FIMS output as
+#' @param model_output A JSON object containing the finalized FIMS output as
 #'   returned from `get_output()`, which is an internal function to each model
 #'   family.
 #' @return A tibble containing the reshaped parameter estimates.
-reshape_json_estimates <- function(finalized_fims) {
-  json_list <- jsonlite::fromJSON(finalized_fims, simplifyVector = FALSE)
+reshape_json_estimates <- function(model_output) {
+  json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
   read_list <- purrr::map(
     json_list[!names(json_list) %in% c(
       "name", "type", "estimation_framework", "id", "objective_function_value",
@@ -343,6 +343,10 @@ dimensions_to_tibble <- function(data) {
   better_names <- unlist(data[["header"]]) |>
     gsub(pattern = "^n(.+)s([-\\+]\\d+)?$", replacement = "\\1_i")
   names(data[["dimensions"]]) <- better_names
+  if (length(better_names) == 0) {
+    # When the header is NULL
+    return(tibble::add_row(tibble::tibble()))
+  }
   if ("na" %in% better_names && length(better_names) == 1) {
     # When the dimensions are na because there is no associated indexing
     return(tibble::add_row(tibble::tibble()))
