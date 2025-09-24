@@ -1089,9 +1089,9 @@ public:
     }
     ss << "\n],\n";
     //add log
-    ss<<" \"log\" : [\"info\" :"<<fims::FIMSLog::fims_log->get_info()<<","
+    ss<<" \"log\" : {\"info\" :"<<fims::FIMSLog::fims_log->get_info()<<","
     <<"\"warinings\" :"<<fims::FIMSLog::fims_log->get_warnings()<<","
-    <<"\"errors\" :"<<fims::FIMSLog::fims_log->get_errors()<<"]}";
+    <<"\"errors\" :"<<fims::FIMSLog::fims_log->get_errors()<<"}}";
 
 #ifdef TMB_MODEL
     model->do_reporting = true;
