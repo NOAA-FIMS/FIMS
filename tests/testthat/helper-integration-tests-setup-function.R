@@ -41,7 +41,7 @@ FIMS_dmultinom <- function(x, p) {
 #' corresponds to a different iteration.
 #' @param estimation_mode A logical value indicating whether to perform
 #' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
-#' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
+#' will be optimized using `nlminb`. If `FALSE`, the input values will be used
 #' for the report.
 #' @param random_effects A logical value indicating whether to include random
 #' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects
@@ -456,7 +456,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
 
   # Call report using MLE parameter values, or
-  # the initial values if optimization is skipped
+  # the input values if optimization is skipped
   report <- obj[["report"]](obj[["env"]][["last.par.best"]])
 
 
@@ -499,7 +499,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 #' corresponds to a different iteration.
 #' @param estimation_mode A logical value indicating whether to perform
 #' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
-#' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
+#' will be optimized using `nlminb`. If `FALSE`, the input values will be used
 #' for the report.
 #' @param random_effects A logical value indicating whether to include random
 #' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects

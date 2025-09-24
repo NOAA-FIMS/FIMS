@@ -72,7 +72,7 @@ result <- setup_and_run_FIMS_without_wrappers(
 ## IO correctness ----
 # Compare FIMS results with model comparison project OM values
 ## IO correctness ----
-test_that("deterministic run works with correct inputs", {
+test_that("estimation run works with correct inputs", {
   #' @description Compare FIMS results with model comparison project OM values
   #' in a non-deterministic run with age- and length-composition data.
   validate_fims(
@@ -82,6 +82,20 @@ test_that("deterministic run works with correct inputs", {
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
   )
+
+  out_of_tolerance_parameters <- cbind(
+    result[["parameters"]][["p"]],
+    result[["sdr_fixed"]]
+  ) |>
+    as.data.frame() |>
+    setNames(c("input", "estimate", "uncertainty")) |>
+    dplyr::mutate(
+      within_2SE = abs(estimate - input) <= qnorm(.975) * uncertainty
+    ) |>
+    dplyr::filter(!within_2SE) |>
+    nrow()
+  #' @description Test that the 95% of the parameter estimates fall within 2*SE
+  expect_equal(out_of_tolerance_parameters, 0)
 })
 
 ## Edge handling ----

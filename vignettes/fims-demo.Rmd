@@ -21,9 +21,6 @@ Calling `library(FIMS)` loads the R package and Rcpp functions and modules into 
 ```{r memory, warning=FALSE, message=FALSE}
 library(FIMS)
 library(ggplot2)
-if (!"stockplotr" %in% rownames(installed.packages())) {
-  remotes::install_github("nmfs-ost/stockplotr@revamped-baseline-plot")
-}
 library(stockplotr)
 
 # Use the {stockplotr} theme for all figures

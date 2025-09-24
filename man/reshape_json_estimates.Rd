@@ -4,10 +4,10 @@
 \alias{reshape_json_estimates}
 \title{Reshape JSON estimates}
 \usage{
-reshape_json_estimates(finalized_fims)
+reshape_json_estimates(model_output)
 }
 \arguments{
-\item{finalized_fims}{A JSON object containing the finalized FIMS output as
+\item{model_output}{A JSON object containing the finalized FIMS output as
 returned from \code{get_output()}, which is an internal function to each model
 family.}
 }

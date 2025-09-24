@@ -160,7 +160,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
     ss << "{\n";
     ss << " \"name\": \"AgeComp\",\n";
     ss << " \"id\":" << this->id << ",\n";
-    ss << " \"type\" : \"data\",\n";
+    ss << " \"type\": \"data\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [" << "\"nages\", \"nyears\"" << "],\n";
     ss << "  \"dimensions\": [" << amax << ", " << ymax << "]\n},\n";
@@ -169,7 +169,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
       ss << age_comp_data[i] << ", ";
     }
     ss << age_comp_data[age_comp_data.size() - 1] << "],\n";
-    ss << "\"uncertainty\" :[ ";
+    ss << "\"uncertainty\":[ ";
     for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
@@ -300,7 +300,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     ss << "{\n";
     ss << " \"name\": \"LengthComp\",\n";
     ss << " \"id\":" << this->id << ",\n";
-    ss << " \"type\" : \"data\",\n";
+    ss << " \"type\": \"data\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [" << "\"nlengths\", \"nyears\"" << "],\n";
     ss << "  \"dimensions\": [" << lmax << ", " << ymax << "]\n},\n";
@@ -309,7 +309,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
       ss << length_comp_data[i] << ", ";
     }
     ss << length_comp_data[length_comp_data.size() - 1] << "],\n";
-    ss << "\"uncertainty\" : [ ";
+    ss << "\"uncertainty\": [ ";
     for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
@@ -436,7 +436,7 @@ class IndexDataInterface : public DataInterfaceBase {
       ss << index_data[i] << ", ";
     }
     ss << index_data[index_data.size() - 1] << "],\n";
-    ss << "\"uncertainty\" : [ ";
+    ss << "\"uncertainty\": [ ";
     for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
@@ -564,7 +564,7 @@ class LandingsDataInterface : public DataInterfaceBase {
       ss << landings_data[i] << ", ";
     }
     ss << landings_data[landings_data.size() - 1] << "],\n";
-    ss << "\"uncertainty\" : [ ";
+    ss << "\"uncertainty\": [ ";
     for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }

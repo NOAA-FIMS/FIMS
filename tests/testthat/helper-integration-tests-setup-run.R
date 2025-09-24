@@ -132,7 +132,7 @@ prepare_test_data <- function() {
 
   modified_parameters <- default_parameters |>
     tidyr::unnest(cols = data) |>
-    # Update log_Fmort initial values for Fleet1
+    # Update log_Fmort input values for Fleet1
     dplyr::rows_update(
       tibble::tibble(
         fleet_name = "fleet1",
