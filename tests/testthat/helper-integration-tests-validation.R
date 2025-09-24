@@ -120,7 +120,7 @@ validate_fims <- function(
   }
 
   # Recruitment log deviations
-  # The initial value of om_input[["logR.resid"]] is dropped from the model
+  # The input value of om_input[["logR.resid"]] is dropped from the model
   # TODO: the estimates table contains fixed "true" values for LogRecDev, causing
   # the test below to pass even when recruitment log_devs are fixed. Need to add
   # additional checks to verify that real estimates are being extracted?
@@ -169,6 +169,41 @@ validate_fims <- function(
     use_fimsfit = use_fimsfit,
     estimates = estimates
   )
+
+  # Statistical validation for parameters
+  if (use_fimsfit) {
+    out_of_tolerance_parameters <- estimates |>
+      # Filter estimates for fixed effects that have all necessary values
+      # (input, estimate, and uncertainty)
+      dplyr::filter(
+        !is.na(input),
+        !is.na(estimated),
+        !is.na(uncertainty),
+        estimation_type == "fixed_effects"
+      ) |>
+      # Restore the "true" log_q value for testing
+      dplyr::mutate(
+        input = dplyr::if_else(
+          label == "log_q",
+          # The model will not always run when log_q is very small.
+          # We reset log_q to log(1.0) for estimation runs. For testing, restore
+          # the input value to the original "true" log_q.
+          log(om_output[["survey_q"]][["survey1"]]),
+          # keep original otherwise
+          input
+        )
+      ) |>
+      # Check if estimate is within 2 standard errors (95% confidence)
+      dplyr::mutate(
+        within_2SE = abs(estimated - input) <= qnorm(.975) * uncertainty
+      ) |>
+      # Count the number of estimates outside 2*SE tolerance
+      dplyr::filter(!within_2SE) |>
+      nrow()
+    
+    #' @description Test that the 95% of the parameter estimates fall within 2*SE
+    expect_equal(out_of_tolerance_parameters, 0)
+  }
 }
 
 #' Verify FIMS Deterministic Run Output
@@ -256,7 +291,7 @@ verify_fims_deterministic <- function(
     fims_naa[, 1]
   )
 
-  #' @description Test that the recruitment log_devs (fixed at initial "true" values) from report are equal to the true values
+  #' @description Test that the recruitment log_devs (fixed at input "true" values) from report are equal to the true values
   if (!is.null(report[["log_recruit_dev"]])) {
     expect_equal(
       report[["log_recruit_dev"]][[1]],

@@ -44,6 +44,7 @@ reference:
   - starts_with("initialize_")
   - has_keyword("fit_fims")
   - is_fims_verbose
+  - FIMSFit
 
 - title: Package development
   desc: Primary functions used when developing FIMS package.

@@ -145,15 +145,15 @@ struct LogEntry {
    */
   std::string to_string() {
     std::stringstream ss;
-    ss << "\"timestamp\" : " << "\"" << this->timestamp << "\"" << ",\n";
-    ss << "\"level\" : " << "\"" << this->level << "\",\n";
-    ss << "\"message\" : " << "\"" << this->message << "\",\n";
-    ss << "\"id\" : " << "\"" << this->rank << "\",\n";
-    ss << "\"user\" : " << "\"" << this->user << "\",\n";
-    ss << "\"wd\" : " << "\"" << this->wd << "\",\n";
-    ss << "\"file\" : " << "\"" << this->file << "\",\n";
-    ss << "\"routine\" : " << "\"" << this->routine << "\",\n";
-    ss << "\"line\" : " << "\"" << this->line << "\"\n";
+    ss << "\"timestamp\": " << "\"" << this->timestamp << "\"" << ",\n";
+    ss << "\"level\": " << "\"" << this->level << "\",\n";
+    ss << "\"message\": " << "\"" << this->message << "\",\n";
+    ss << "\"id\": " << "\"" << this->rank << "\",\n";
+    ss << "\"user\": " << "\"" << this->user << "\",\n";
+    ss << "\"wd\": " << "\"" << this->wd << "\",\n";
+    ss << "\"file\": " << "\"" << this->file << "\",\n";
+    ss << "\"routine\": " << "\"" << this->routine << "\",\n";
+    ss << "\"line\": " << "\"" << this->line << "\"\n";
     return ss.str();
   }
 };

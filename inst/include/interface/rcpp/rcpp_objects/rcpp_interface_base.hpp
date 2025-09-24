@@ -652,7 +652,7 @@ class FIMSRcppInterfaceBase {
    */
   virtual std::string to_json() {
     FIMS_WARNING_LOG("Method not yet defined.");
-    return "{\"name\" : \"not yet implemented\"}";
+    return "{\"name\": \"not yet implemented\"}";
   }
   /**
    * @brief Method to extract standard error values from the se_values

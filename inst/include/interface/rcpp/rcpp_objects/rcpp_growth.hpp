@@ -179,12 +179,12 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
     ss << "{\n";
-    ss << " \"module_name\": \"growth\",\n";
-    ss << " \"module_type\" : \"EWAA\",\n";
+    ss << " \"module_name\": \"Growth\",\n";
+    ss << " \"module_type\": \"EWAA\",\n";
     ss << " \"module_id\":" << this->id << ",\n";
     ss << " \"parameters\": [\n{\n";
-    ss << " \"name\": \"EWAA\",\n";
-    ss << " \"id\": -999,\n";
+    ss << " \"name\": null,\n";
+    ss << " \"id\": null,\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [\"nages\"],\n";
@@ -193,7 +193,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"values\": [\n";
     for (size_t i = 0; i < weights.size() - 1; i++) {
       ss << "{\n";
-      ss << "\"id\": -999,\n";
+      ss << "\"id\": null,\n";
       ss << "\"value\": " << weights[i] << ",\n";
       ss << "\"estimated_value\": " << weights[i] << ",\n";
       ss << "\"uncertainty\": " << 0 << ",\n";
@@ -203,7 +203,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
       ss << "},\n";
     }
     ss << "{\n";
-    ss << "\"id\": -999,\n";
+    ss << "\"id\": null,\n";
     ss << "\"value\": " << weights[weights.size() - 1] << ",\n";
     ss << "\"estimated_value\": " << weights[weights.size() - 1] << ",\n";
     ss << "\"uncertainty\": " << 0 << ",\n";
