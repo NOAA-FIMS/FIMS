@@ -61,8 +61,8 @@ class Model {  // may need singleton
     // Check if fims_information is set
     if (this->fims_information == nullptr) {
       FIMS_ERROR_LOG(
-        "fims_information is not set. Please set fims_information before "
-        "calling Evaluate().");
+          "fims_information is not set. Please set fims_information before "
+          "calling Evaluate().");
       return jnll;
     }
     
@@ -75,7 +75,7 @@ class Model {  // may need singleton
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->of = this->of;  // link to TMB objective function
-      m->Prepare();
+      m->Prepare(); 
       m->Evaluate();
     }
     
@@ -85,12 +85,12 @@ class Model {  // may need singleton
     int nll_vec_idx = 0;
     size_t n_priors = 0;
     FIMS_INFO_LOG("Begin evaluating prior densities.")
-      for (d_it = this->fims_information->density_components.begin();
-           d_it != this->fims_information->density_components.end(); ++d_it) {
-        std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+    for (d_it = this->fims_information->density_components.begin();
+         d_it != this->fims_information->density_components.end(); ++d_it) {
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*d_it).second;
 #ifdef TMB_MODEL
-        d->of = this->of;
+      d->of = this->of;
 #endif
         if (d->input_type == "prior") {
           nll_vec[nll_vec_idx] = -d->evaluate();
@@ -99,7 +99,7 @@ class Model {  // may need singleton
           nll_vec_idx += 1;
         }
       }
-      FIMS_INFO_LOG(
+    FIMS_INFO_LOG(
         "Model: Finished evaluating prior distributions. The jnll after "
         "evaluating " +
           fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
@@ -111,7 +111,7 @@ class Model {  // may need singleton
     for (d_it = this->fims_information->density_components.begin();
          d_it != this->fims_information->density_components.end(); ++d_it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-        (*d_it).second;
+          (*d_it).second;
 #ifdef TMB_MODEL
       d->of = this->of;
 #endif
@@ -123,18 +123,18 @@ class Model {  // may need singleton
       }
     }
     FIMS_INFO_LOG(
-      "Model: Finished evaluating random effect distributions. The jnll "
-      "after evaluating priors and " +
+        "Model: Finished evaluating random effect distributions. The jnll "
+        "after evaluating priors and " +
         fims::to_string(n_random_effects) +
         " random_effects is: " + fims::to_string(jnll));
     
-    // this->fims_information->SetupData();
+
     // Loop over and evaluate data joint negative log-likelihoods
     int n_data = 0;
     for (d_it = this->fims_information->density_components.begin();
          d_it != this->fims_information->density_components.end(); ++d_it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-        (*d_it).second;
+          (*d_it).second;
 #ifdef TMB_MODEL
       d->of = this->of;
       // d->keep = this->keep;
@@ -146,14 +146,14 @@ class Model {  // may need singleton
         nll_vec_idx += 1;
       }
     }
-    
-    // report out nll components
+
+// report out nll components
 #ifdef TMB_MODEL
     vector<Type> nll_components = nll_vec;
     FIMS_REPORT_F(nll_components, this->of);
     FIMS_REPORT_F(jnll, this->of);
 #endif
-    
+
     // report out model family objects
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
@@ -161,7 +161,7 @@ class Model {  // may need singleton
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->Report();
     }
-    
+
     return jnll;
   }
 };
