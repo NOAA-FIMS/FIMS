@@ -22,7 +22,7 @@ reshape_json_estimates <- function(finalized_fims) {
     json_list[!names(json_list) %in% c(
       "name", "type", "estimation_framework", "id", "objective_function_value",
       "max_gradient_component", "gradient",
-      "population_ids", "fleet_ids"
+      "population_ids", "fleet_ids", "log"
     )],
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), json)
   )
@@ -153,8 +153,9 @@ reshape_json_estimates <- function(finalized_fims) {
       module_name, module_id, module_type, "label" = name,
       type, type_id, "parameter_id" = id,
       fleet, dplyr::ends_with("_i"),
-      dplyr::ends_with("value"),
-      dplyr::ends_with("values"),
+      "input" = value, estimated = "estimated_value", "expected" = expected_values,
+      "observed" = observed_values, uncertainty, estimation_type,
+      distribution, input_type, lpdf = "lpdf_value", likelihood,
       dplyr::everything()
     )
 }

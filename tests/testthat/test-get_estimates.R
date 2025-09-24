@@ -18,10 +18,11 @@ if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
-  "parameter_id", "fleet", "age_i", "length_i", "year_i",
-  "value", "estimated_value", "lpdf_value", "estimation_type", "uncertainty", 
-  "distribution", "likelihood", "expected_values", "observed_values",
-  "log_like_cv", "gradient"
+  "parameter_id", "fleet", "year_i", "age_i", "length_i",
+  "input", "estimated", "expected", "observed",
+  "estimation_type", "uncertainty",
+  "distribution", "input_type",
+  "lpdf", "likelihood", "log_like", "log_like_cv", "gradient"
 )
 
 test_that("get_estimates() works with deterministic run", {
@@ -41,7 +42,7 @@ test_that("get_estimates() works with deterministic run", {
     get_estimates(deterministic_results) |>
       # Remove the estimate, uncertainty, and gradient columns, as they
       # may change between runs
-      dplyr::select(-estimate, -uncertainty, -gradient) |>
+      dplyr::select(-estimated, -uncertainty, -gradient) |>
       print(n = 320, width = Inf)
   )
 })
