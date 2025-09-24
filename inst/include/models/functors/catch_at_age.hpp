@@ -466,14 +466,6 @@ namespace fims_popdy
             dq_["proportion_mature_at_age"][a] *
             population->growth->evaluate(population->ages[a]);
       }
-      for (size_t a = 1; a < (population->nages - 1); a++)
-      {
-        numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
-        phi_0 +=
-            numbers_spr[a] * population->proportion_female[a] *
-            dq_["proportion_mature_at_age"][a] *
-            population->growth->evaluate(population->ages[a]);
-      }
 
       numbers_spr[population->nages - 1] =
           (numbers_spr[population->nages - 2] *
