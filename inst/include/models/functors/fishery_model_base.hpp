@@ -45,6 +45,12 @@ namespace fims_popdy
      */
     DimensionInfo(const std::string &name, const fims::Vector<int> &dims, const fims::Vector<std::string> &dim_names)
         : name(name), ndims(dims.size()), dims(dims), dim_names(dim_names) {}
+
+    /**
+     * Copy constructor
+     */
+    DimensionInfo(const DimensionInfo &other)
+        : name(other.name), ndims(other.dims.size()), dims(other.dims), dim_names(other.dim_names) {}
   };
 
   /**
@@ -71,8 +77,6 @@ namespace fims_popdy
      * * length of the report vector
      */
     size_t length_m;
-    
-    
 
     /**
      * @brief Default constructor for UncertaintyReportInfo.
@@ -382,7 +386,6 @@ namespace fims_popdy
     {
       return (*population_uncertainty_report_info)[population_id];
     }
-
 
     /**
      * @brief Initialize a model.
