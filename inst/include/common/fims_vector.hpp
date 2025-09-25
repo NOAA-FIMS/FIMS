@@ -87,6 +87,18 @@ namespace fims
       }
     }
 
+    Vector &operator=(const Vector &other)
+    {
+      if (this != &other)
+      {
+        // clean up existing
+        this->~Vector();
+        // copy construct into *this
+        new (this) Vector(other);
+      }
+      return *this;
+    }
+
     /**
      * @brief Initialization constructor from std::vector<Type> type.
      */
@@ -130,6 +142,10 @@ namespace fims
     inline Type &
     operator[](size_t pos)
     {
+      if (pos >= this->size())
+      {
+        throw std::invalid_argument("fims::Vector out of bounds");
+      }
       return this->vec_m[pos];
     }
 
@@ -137,7 +153,14 @@ namespace fims
      * @brief Returns a constant  reference to the element at specified location
      * pos. No bounds checking is performed.
      */
-    inline const Type &operator[](size_t n) const { return this->vec_m[n]; }
+    inline const Type &operator[](size_t n) const
+    {
+      if (n >= this->size())
+      {
+        throw std::invalid_argument("fims::Vector out of bounds");
+      }
+      return this->vec_m[n];
+    }
 
     /**
      * @brief Returns a reference to the element at specified location pos. Bounds
@@ -464,7 +487,7 @@ std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v)
   {
     if (v[i] != v[i])
     {
-      out << "-999"<< ",";
+      out << "-999" << ",";
     }
     else
     {
@@ -473,7 +496,7 @@ std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v)
   }
   if (v[v.size() - 1] != v[v.size() - 1])
   {
-     out << "-999]";
+    out << "-999]";
   }
   else
   {
