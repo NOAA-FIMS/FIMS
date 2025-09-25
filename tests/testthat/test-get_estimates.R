@@ -61,12 +61,7 @@ test_that("get_estimates() works with estimation run", {
     fit_data <- readRDS(fit_file)
     estimates <- get_estimates(fit_data)
     estimates_colnames <- colnames(estimates)
-    #' @description Test that [get_estimates()] returns correct output for the
-    #' estimates slot.
-    expect_equal(
-      object = estimates,
-      expected = fit_data@estimates
-    )
+   
     #' @description Test that [get_estimates()] returns correct column names
     #' for the estimates tibble.
     expect_equal(

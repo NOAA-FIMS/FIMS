@@ -645,7 +645,7 @@ class FIMSRcppInterfaceBase {
    */
   virtual std::string to_json() {
     FIMS_WARNING_LOG("Method not yet defined.");
-    return "{\"name\" : \"not yet implemented\"}";
+    return "{\"name\": \"not yet implemented\"}";
   }
   /**
    * @brief Report the parameter value as a string.

@@ -321,8 +321,8 @@ public:
     ss << " \"module_name\": \"density\",\n";
     ss << " \"module_id\": " << this->id_m << ",\n";
     ss << " \"module_type\": \"normal\",\n";
-    ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
-     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    ss << " \"observed_data_id\": " << this->interface_observed_data_id_m << ",\n";
+     ss << " \"input_type\": \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";
@@ -660,8 +660,8 @@ public:
     ss << " \"module_name\": \"density\",\n";
     ss << " \"module_id\": " << this->id_m << ",\n";
     ss << " \"module_type\": \"log_normal\",\n";
-    ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
-     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    ss << " \"observed_data_id\": " << this->interface_observed_data_id_m << ",\n";
+     ss << " \"input_type\": \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";
@@ -1006,8 +1006,8 @@ public:
     ss << " \"module_name\": \"density\",\n";
     ss << " \"module_id\": " << this->id_m << ",\n";
     ss << " \"module_type\": \"multinomial\",\n";
-    ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m << ",\n";
-    ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    ss << "\"observed_data_id\": " << this->interface_observed_data_id_m << ",\n";
+    ss << " \"input_type\": \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";

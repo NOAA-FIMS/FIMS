@@ -187,12 +187,12 @@ public:
   {
     std::stringstream ss;
     ss << "{\n";
-    ss << " \"module_name\": \"growth\",\n";
-    ss << " \"module_type\" : \"EWAA\",\n";
+    ss << " \"module_name\": \"Growth\",\n";
+    ss << " \"module_type\": \"EWAA\",\n";
     ss << " \"module_id\":" << this->id << ",\n";
     ss << " \"parameters\": [\n{\n";
-    ss << " \"name\": \"EWAA\",\n";
-    ss << " \"id\": -999,\n";
+    ss << " \"name\": null,\n";
+    ss << " \"id\": null,\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [\"nages\"],\n";
@@ -202,7 +202,7 @@ public:
     for (size_t i = 0; i < weights.size() - 1; i++)
     {
       ss << "{\n";
-      ss << "\"id\": -999,\n";
+      ss << "\"id\": null,\n";
       ss << "\"value\": " << weights[i] << ",\n";
       ss << "\"min\": \"-Infinity\",\n";
       ss << "\"max\": \"Infinity\",\n";
@@ -210,13 +210,13 @@ public:
       ss << "},\n";
     }
     ss << "{\n";
-    ss << "\"id\": -999,\n";
+    ss << "\"id\": null,\n";
     ss << "\"value\": " << weights[weights.size() - 1] << ",\n";
     ss << "\"min\": \"-Infinity\",\n";
     ss << "\"max\": \"Infinity\",\n";
     ss << "\"estimation_type\": \"constant\"\n";
     ss << "}\n],\n";
-    ss << "\"uncertainty\" : " << fims::Vector<double>(ages.size(), -999);
+    ss << "\"uncertainty\": " << fims::Vector<double>(ages.size(), -999);
     ss << "}\n]\n}\n";
     return ss.str();
   }
