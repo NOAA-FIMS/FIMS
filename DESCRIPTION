@@ -81,6 +81,7 @@ Suggests:
     rmarkdown,
     snowfall,
     spelling,
+    stockplotr,
     styler,
     testthat (>= 3.0.0),
     tidyr,
@@ -98,6 +99,8 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 NeedsCompilation: yes
+Remotes: 
+    github::nmfs-ost/stockplotr@revamped-baseline-plot
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 SystemRequirements: GNU make

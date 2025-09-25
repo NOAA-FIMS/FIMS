@@ -21,6 +21,14 @@ Calling `library(FIMS)` loads the R package and Rcpp functions and modules into 
 ```{r memory, warning=FALSE, message=FALSE}
 library(FIMS)
 library(ggplot2)
+if (!"stockplotr" %in% rownames(installed.packages())) {
+  remotes::install_github("nmfs-ost/stockplotr@revamped-baseline-plot")
+}
+library(stockplotr)
+
+# Use the {stockplotr} theme for all figures
+# ggplot2::theme_set(stockplotr::theme_noaa())
+
 
 # clear memory
 clear()
@@ -241,19 +249,17 @@ fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 clear()
-# finalize is not working, you get the following error when you do this code
-# Error: basic_string::_M_create
-# if you run clear() ahead of the following line the error will go away
-# fit_output <- finalize(fit@opt$par, fit@obj$fn, fit@obj$gr)
 
 # Get information about the model and print a few characters to the screen
 recruitment_log <- get_log_module("information")
 substr(recruitment_log, 1, 100)
 ```
 
-The results can be plotted with either base R or using {ggplot2}.
+The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where, we reccommend using {stockplotr} where possible.
 
 ```{r fit-plots}
+# Temporary manipulation to the returned estimates to get them
+# to work with stockplotr
 output <- get_estimates(fit) |>
   dplyr::mutate(
     sex = NA,
@@ -266,7 +272,11 @@ output <- get_estimates(fit) |>
     estimate = estimated
   )
 
-stockplotr::plot_spawning_biomass(output)
+# Plot spawning biomass
+stockplotr::plot_spawning_biomass(
+  dplyr::filter(output, label == "spawning_biomass")
+) +
+  stockplotr::theme_noaa()
 
 # Plot of log fishing mortality
 stockplotr::plot_timeseries(
@@ -276,24 +286,33 @@ stockplotr::plot_timeseries(
     geom = "line"
   ),
   x = "year",
-  y = "estimate"
+  y = "estimate",
+  ylab = "natural log of Fishing Mortality"
 ) +
   stockplotr::theme_noaa()
 
-index_results <- data.frame(
-  observed = m_index(data_4_model, "survey1"),
-  expected = get_report(fit)[["index_exp"]][[2]],
-  years = get_start_year(data_4_model):get_end_year(data_4_model)
-)
-print(index_results)
+# Plot the index of abundance against the observed values
+stockplotr::plot_timeseries(
+  stockplotr::prepare_data(
+    output |> dplyr::filter(module_id == 2), 
+    label_name = "^index_expected$",
+    geom = "line"
+  ),
+  x = "year",
+  y = "estimate",
+  ylab = "Relative Index of Abundance"
+) +
+  ggplot2::geom_point(
+    data = data.frame(
+      observed = m_index(data_4_model, "survey1"),
+      expected = get_report(fit)[["index_expected"]][[2]],
+      year = get_start_year(data_4_model):get_end_year(data_4_model)
+    ),
+    aes(x = year, y = observed)
+  ) +
+  stockplotr::theme_noaa()
 
-ggplot2::ggplot(index_results, ggplot2::aes(x = years, y = observed)) +
-  ggplot2::geom_point() +
-  ggplot2::xlab("Year") +
-  ggplot2::ylab("Index (mt)") +
-  ggplot2::geom_line(ggplot2::aes(x = years, y = expected), color = "blue") +
-  ggplot2::theme_bw()
-
+# Plot the landings estimates
 stockplotr::plot_timeseries(
   stockplotr::prepare_data(
     output |> dplyr::filter(module_id == 1), 
@@ -301,7 +320,8 @@ stockplotr::plot_timeseries(
     geom = "line"
   ),
   x = "year",
-  y = "estimate"
+  y = "estimate",
+  ylab = "Expected Landings (mt)"
 ) +
   stockplotr::theme_noaa()
 ```
@@ -353,16 +373,16 @@ clear()
 
 #### Age only
 
-The same model can be fit to just the age data, removing the length data.
+The same model can be fit to just the age data, removing the length-composition configurations.
 
 ```{r age}
 # Create default parameters, update with modified values, initialize FIMS,
 # and fit the model
-age_only_fit <- data_4_model |>
-  create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
+age_only_fit <- parameters_4_model |>
+  # remove rows that have module_type == LengthComp
+  dplyr::rows_delete(
+    y = tibble::tibble(module_type = "LengthComp")
   ) |>
-  # update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
@@ -371,7 +391,7 @@ clear()
 
 #### Length
 
-The same model can be fit to just the length data, removing the age composition configurations.
+The same model can be fit to just the length data, removing the age-composition configurations.
 
 ```{r length}
 # Create default parameters, update with modified values, initialize FIMS,
@@ -383,9 +403,32 @@ length_only_fit <- parameters_4_model |>
   ) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-
-stockplotr::plot_biomass(
-  list("age" = age_only_fit, "length" = length_only_fit)
-)
 clear()
+
+# Plot spawning biomass for each sensitivity model
+stockplotr::plot_biomass(
+  list("age" = get_estimates(age_only_fit) |>
+      dplyr::mutate(
+        sex = NA,
+        season = 1,
+        era = "time",
+        area = NA,
+        growth_pattern = NA,
+        uncertainty_label = "se",
+        year = year_i,
+        estimate = estimated
+      ),
+    "length" = get_estimates(length_only_fit)  |>
+      dplyr::mutate(
+        sex = NA,
+        season = 1,
+        era = "time",
+        area = NA,
+        growth_pattern = NA,
+        uncertainty_label = "se",
+        year = year_i,
+        estimate = estimated
+      )
+  )
+)
 ```
