@@ -254,6 +254,32 @@ substr(recruitment_log, 1, 100)
 The results can be plotted with either base R or using {ggplot2}.
 
 ```{r fit-plots}
+output <- get_estimates(fit) |>
+  dplyr::mutate(
+    sex = NA,
+    season = 1,
+    era = "time",
+    area = NA,
+    growth_pattern = NA,
+    uncertainty_label = "se",
+    year = year_i,
+    estimate = estimated
+  )
+
+stockplotr::plot_spawning_biomass(output)
+
+# Plot of log fishing mortality
+stockplotr::plot_timeseries(
+  stockplotr::prepare_data(
+    output |> dplyr::filter(module_id == 1), 
+    label_name = "log_Fmort$",
+    geom = "line"
+  ),
+  x = "year",
+  y = "estimate"
+) +
+  stockplotr::theme_noaa()
+
 index_results <- data.frame(
   observed = m_index(data_4_model, "survey1"),
   expected = get_report(fit)[["index_exp"]][[2]],
@@ -268,19 +294,16 @@ ggplot2::ggplot(index_results, ggplot2::aes(x = years, y = observed)) +
   ggplot2::geom_line(ggplot2::aes(x = years, y = expected), color = "blue") +
   ggplot2::theme_bw()
 
-landings_results <- data.frame(
-  observed = m_landings(data_4_model, fleet = "fleet1"),
-  expected = get_report(fit)[["landings_exp"]][[1]],
-  years = get_start_year(data_4_model):get_end_year(data_4_model)
-)
-print(landings_results)
-
-ggplot2::ggplot(landings_results, ggplot2::aes(x = years, y = observed)) +
-  ggplot2::geom_point() +
-  ggplot2::xlab("Year") +
-  ggplot2::ylab("Index (mt)") +
-  ggplot2::geom_line(ggplot2::aes(x = years, y = expected), color = "blue") +
-  ggplot2::theme_bw()
+stockplotr::plot_timeseries(
+  stockplotr::prepare_data(
+    output |> dplyr::filter(module_id == 1), 
+    label_name = "^landings_expected$",
+    geom = "line"
+  ),
+  x = "year",
+  y = "estimate"
+) +
+  stockplotr::theme_noaa()
 ```
 
 ### Sensitivities
@@ -330,16 +353,16 @@ clear()
 
 #### Age only
 
-The same model can be fit to just the age data, removing the length composition configurations.
+The same model can be fit to just the age data, removing the length data.
 
 ```{r age}
 # Create default parameters, update with modified values, initialize FIMS,
 # and fit the model
-age_only_fit <- parameters_4_model |>
-  # remove rows that have module_type == LengthComp
-  dplyr::rows_delete(
-    y = tibble::tibble(module_type = "LengthComp")
+age_only_fit <- data_4_model |>
+  create_default_parameters(
+    fleets = list(fleet1 = fleet1, survey1 = survey1)
   ) |>
+  # update_parameters(modified_parameters = parameters$parameters) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
@@ -360,5 +383,9 @@ length_only_fit <- parameters_4_model |>
   ) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
+
+stockplotr::plot_biomass(
+  list("age" = age_only_fit, "length" = length_only_fit)
+)
 clear()
 ```
