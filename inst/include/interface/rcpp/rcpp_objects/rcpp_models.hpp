@@ -817,33 +817,33 @@ public:
   virtual std::string to_json()
   {
 
-    Rcpp::List report = get_report();
+    // // Rcpp::List report = get_report();
 
-    Rcpp::List grouped_out = report["grouped_se"];
-    double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
-    Rcpp::NumericVector grad = report["gradient"];
-    double of_value = Rcpp::as<double>(report["objective_function_value"]);
+    // Rcpp::List grouped_out = report["grouped_se"];
+    // double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
+    // Rcpp::NumericVector grad = report["gradient"];
+    // double of_value = Rcpp::as<double>(report["objective_function_value"]);
 
-    fims::Vector<double> gradient(grad.size());
-    for (int i = 0; i < grad.size(); i++)
-    {
-      gradient[i] = grad[i];
-    }
-    // Assume grouped_out is an Rcpp::List
-    std::map<std::string, std::vector<double>> grouped_cpp;
-    Rcpp::CharacterVector names = grouped_out.names();
-    for (int i = 0; i < grouped_out.size(); i++)
-    {
-      std::string key = Rcpp::as<std::string>(names[i]);
-      Rcpp::NumericVector vec = grouped_out[i]; // each element is a numeric vector
-      std::vector<double> vec_std(vec.size());
-      for (int j = 0; j < vec.size(); j++)
-      {
-        vec_std[j] = vec[j];
-      }
-      grouped_cpp[key] = vec_std;
-    }
-    this->se_values = grouped_cpp;
+    // fims::Vector<double> gradient(grad.size());
+    // for (int i = 0; i < grad.size(); i++)
+    // {
+    //   gradient[i] = grad[i];
+    // }
+    // // Assume grouped_out is an Rcpp::List
+    // std::map<std::string, std::vector<double>> grouped_cpp;
+    // Rcpp::CharacterVector names = grouped_out.names();
+    // for (int i = 0; i < grouped_out.size(); i++)
+    // {
+    //   std::string key = Rcpp::as<std::string>(names[i]);
+    //   Rcpp::NumericVector vec = grouped_out[i]; // each element is a numeric vector
+    //   std::vector<double> vec_std(vec.size());
+    //   for (int j = 0; j < vec.size(); j++)
+    //   {
+    //     vec_std[j] = vec[j];
+    //   }
+    //   grouped_cpp[key] = vec_std;
+    // }
+    // this->se_values = grouped_cpp;
     std::set<uint32_t> recruitment_ids;
     std::set<uint32_t> growth_ids;
     std::set<uint32_t> maturity_ids;
@@ -916,8 +916,8 @@ public:
 #endif
     ss << " \"id\": " << this->get_id() << ",\n";
     ss << " \"objective_function_value\": " << value << ",\n";
-    ss << " \"max_gradient_component\": " << max_gc << ",\n";
-    ss << " \"gradient\": " << gradient << ",\n";
+    // ss << " \"max_gradient_component\": " << max_gc << ",\n";
+    // ss << " \"gradient\": " << gradient << ",\n";
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end(); module_id_it++)
     {
@@ -1271,6 +1271,7 @@ public:
 
       derived_quantities["total_landings_weight"] =
           fims::Vector<Type>(population->nyears.get());
+
       derived_quantities_dim_info["total_landings_weight"] =
           fims_popdy::DimensionInfo("total_landings_weight",
                                     fims::Vector<int>{(int)population->nyears.get()},
@@ -1278,6 +1279,7 @@ public:
 
       derived_quantities["total_landings_numbers"] =
           fims::Vector<Type>(population->nyears.get());
+          
       derived_quantities_dim_info["total_landings_numbers"] =
           fims_popdy::DimensionInfo("total_landings_numbers",
                                     fims::Vector<int>{population->nyears.get()},

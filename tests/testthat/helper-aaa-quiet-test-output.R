@@ -6,3 +6,4 @@
 option_verbosity <- getOption("rlib_message_verbosity")
 # Set verbosity to quiet for testing
 options(rlib_message_verbosity = "quiet")
+

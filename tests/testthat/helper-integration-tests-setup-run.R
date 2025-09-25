@@ -1,3 +1,5 @@
+
+write("helper-integration-tests-setup-run.R", file = "debug_log.txt", append = TRUE)
 # This file generates multiple test datasets for use in tests located in
 # tests/testthat.
 

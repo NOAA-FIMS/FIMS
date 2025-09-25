@@ -1,3 +1,5 @@
+write("test-integration-fims-bayesian-prior-predictive.R", file = "debug_log.txt", append = TRUE)
+
 load(test_path("fixtures", "integration_test_data.RData"))
 
 # Set the iteration ID to 1 for accessing specific input/output list

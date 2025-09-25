@@ -121,7 +121,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
 #endif
     }
 #ifdef TMB_MODEL
-    vector<Type> lognormal_x = this->x;
+    vector<Type> lognormal_x = this->x.to_tmb();
     //  FIMS_REPORT_F(lognormal_x, this->of);
 #endif
     return (this->lpdf);

@@ -7,6 +7,7 @@ options(rlib_message_verbosity = "quiet")
 
 library(testthat)
 library(FIMS)
+write("----testthat files called----", file = "testthat/debug_log.txt")
 
 safe_test_check <- function() {
   tryCatch(

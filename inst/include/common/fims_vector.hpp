@@ -410,12 +410,26 @@ namespace fims
 #ifdef TMB_MODEL
 
     /**
-     * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>const
+     * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>
+     *
+     * We provide both:
+     *  1. An explicit conversion operator (requires static_cast)
+     *  2. A named method `to_tmb()` for clarity
      */
-    operator tmbutils::vector<Type>() const
+    explicit operator tmbutils::vector<Type>() const
     {
-      tmbutils::vector<Type> ret;
-      ret.resize(this->vec_m.size());
+      tmbutils::vector<Type> ret(this->vec_m.size());
+      for (size_t i = 0; i < this->vec_m.size(); i++)
+      {
+        ret[i] = this->vec_m[i];
+      }
+      return ret;
+    }
+
+    // Preferred: explicit named method
+    tmbutils::vector<Type> to_tmb() const
+    {
+      tmbutils::vector<Type> ret(this->vec_m.size());
       for (size_t i = 0; i < this->vec_m.size(); i++)
       {
         ret[i] = this->vec_m[i];
@@ -425,11 +439,25 @@ namespace fims
 
     /**
      * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>
+     *
+     * We provide both:
+     *  1. An explicit conversion operator (requires static_cast)
+     *  2. A named method `to_tmb()` for clarity
      */
-    operator tmbutils::vector<Type>()
+    explicit operator tmbutils::vector<Type>()
     {
-      tmbutils::vector<Type> ret;
-      ret.resize(this->vec_m.size());
+      tmbutils::vector<Type> ret(this->vec_m.size());
+      for (size_t i = 0; i < this->vec_m.size(); i++)
+      {
+        ret[i] = this->vec_m[i];
+      }
+      return ret;
+    }
+
+    // Preferred: explicit named method
+    tmbutils::vector<Type> to_tmb()
+    {
+      tmbutils::vector<Type> ret(this->vec_m.size());
       for (size_t i = 0; i < this->vec_m.size(); i++)
       {
         ret[i] = this->vec_m[i];

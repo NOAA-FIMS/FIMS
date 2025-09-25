@@ -1,7 +1,10 @@
+write("test-integration-fims-estimation-random-effects-with-wrappers.R", file = "debug_log.txt", append = TRUE)
+
 load(test_path("fixtures", "integration_test_data.RData"))
 
 # Set the iteration ID to 1 for accessing specific input/output list
 iter_id <- 1
+write("test-integration-fims-estimation-random-effects-with-wrappers.R:7", file = "debug_log.txt", append = TRUE)
 
 # Extract model input and output data for the specified iteration
 om_input <- om_input_list[[iter_id]]
@@ -34,6 +37,7 @@ modified_parameters[[iter_id]] <- list(
     Population.log_init_naa.value = log(om_output_list[[iter_id]][["N.age"]][1, ])
   )
 )
+write("test-integration-fims-estimation-random-effects-with-wrappers.R:40", file = "debug_log.txt", append = TRUE)
 
 test_that("deterministic test of fims with recruitment re", {
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")
@@ -181,6 +185,7 @@ test_that("deterministic test of fims with recruitment re", {
     expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
 })
+write("test-integration-fims-estimation-random-effects-with-wrappers.R:188", file = "debug_log.txt", append = TRUE)
 
 test_that("nll test of fims", {
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")
@@ -282,6 +287,7 @@ test_that("nll test of fims", {
   expect_equal(jnll, expected_jnll)
 })
 
+write("test-integration-fims-estimation-random-effects-with-wrappers.R:290", file = "debug_log.txt", append = TRUE)
 
 test_that("estimation test of fims using wrapper functions", {
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")
@@ -306,6 +312,7 @@ test_that("estimation test of fims using wrapper functions", {
   #   use_fimsfit = TRUE
   # )
 })
+write("test-integration-fims-estimation-random-effects-with-wrappers.R:315", file = "debug_log.txt", append = TRUE)
 
 test_that("estimation test with recruitment re on logr", {
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")

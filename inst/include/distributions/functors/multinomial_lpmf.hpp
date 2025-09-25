@@ -135,7 +135,7 @@ namespace fims_distributions
         if (!containsNA)
         {
           this->lpdf_vec[i] =
-              dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, true);
+              dmultinom(x_vector.to_tmb(), prob_vector.to_tmb(), true);
         }
         else
         {
