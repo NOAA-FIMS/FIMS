@@ -171,7 +171,7 @@ public:
   {
 #ifdef TMB_MODEL
     std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+        fims_info::Information<double>::GetInstance();  
     typename fims_info::Information<double>::model_map_iterator model_it;
     model_it = info->models_map.find(this->get_id());
     if (model_it != info->models_map.end())
@@ -188,7 +188,7 @@ public:
   {
 #ifdef TMB_MODEL
     std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+        fims_info::Information<double>::GetInstance();  
     typename fims_info::Information<double>::model_map_iterator model_it;
     model_it = info->models_map.find(this->get_id());
     if (model_it != info->models_map.end())
@@ -202,7 +202,7 @@ public:
 #else
     return false;
 #endif
-  }
+  } 
 
   /**
    * @brief Method to get this id.
@@ -677,46 +677,25 @@ public:
     Rcpp::Environment TMB = Rcpp::Environment::namespace_env("TMB");
     Rcpp::Function MakeADFun = TMB["MakeADFun"];
     Rcpp::Function sdreport = TMB["sdreport"];
-
+    // Grab your helpers from R global environment
+    Rcpp::Environment global = Rcpp::Environment::global_env();
     // Build parameters list
     Rcpp::List parameters = Rcpp::List::create(
         Rcpp::Named("p") = this->get_fixed_parameters_vector(),
         Rcpp::Named("re") = this->get_random_parameters_vector());
-
     // Call MakeADFun with map = NULL
-    Rcpp::List obj;
-    try
-    {
-      obj = MakeADFun(
-          Rcpp::Named("data") = Rcpp::List::create(),
-          Rcpp::Named("parameters") = parameters,
-          Rcpp::Named("DLL") = "FIMS",
-          Rcpp::Named("silent") = true,
-          Rcpp::Named("map") = R_NilValue,
-          Rcpp::Named("random") = "re");
-    }
-    catch (std::exception &ex)
-    {
-      Rcpp::stop("MakeADFun failed: %s", ex.what());
-    }
-
-    // Extract functions
+    Rcpp::List obj = MakeADFun(
+        Rcpp::Named("data") = Rcpp::List::create(),
+        Rcpp::Named("parameters") = parameters,
+        Rcpp::Named("DLL") = "FIMS",
+        Rcpp::Named("silent") = true,
+        Rcpp::Named("map") = R_NilValue,
+        Rcpp::Named("random") = "re");
+    // Call obj$report()
     Rcpp::Function report = obj["report"];
     Rcpp::Function func = obj["fn"];
     Rcpp::Function gradient = obj["gr"];
-
-    // Gradient
-    Rcpp::NumericVector grad;
-    try
-    {
-      grad = gradient(this->get_fixed_parameters_vector());
-    }
-    catch (...)
-    {
-      Rcpp::Rcerr << "Gradient evaluation failed\n";
-      grad = Rcpp::NumericVector::create(NA_REAL);
-    }
-
+    Rcpp::NumericVector grad = gradient(this->get_fixed_parameters_vector());
     double maxgc = -999;
     for (R_xlen_t i = 0; i < grad.size(); i++)
     {
@@ -725,72 +704,25 @@ public:
         maxgc = std::fabs(grad[i]);
       }
     }
+    double of_value = Rcpp::as<double>(func(this->get_fixed_parameters_vector()));
+    Rcpp::List rep = report();
+    // // Standard deviations
+    SEXP sdr = sdreport(obj);
+    Rcpp::RObject sdr_summary = summary(sdr, "report");
 
-    // Objective function value
-    double of_value = NA_REAL;
-    try
-    {
-      of_value = Rcpp::as<double>(func(this->get_fixed_parameters_vector()));
-    }
-    catch (...)
-    {
-      Rcpp::Rcerr << "Objective function evaluation failed\n";
-    }
-
-    // Report
-    Rcpp::List rep;
-    try
-    {
-      rep = report();
-    }
-    catch (...)
-    {
-      Rcpp::Rcerr << "Report failed\n";
-      rep = R_NilValue;
-    }
-
-    // sdreport + summary
-    SEXP sdr = R_NilValue;
-    Rcpp::DataFrame df;
-    Rcpp::CharacterVector rownames;
-    Rcpp::NumericVector estimates, stderrs;
-
-    try
-    {
-      sdr = sdreport(obj);
-      Rcpp::RObject sdr_summary = summary(sdr, "report");
-      df = Rcpp::as<Rcpp::DataFrame>(sdr_summary);
-
-      // Extract standard columns
-      if (df.containsElementNamed("Estimate"))
-      {
-        estimates = df["Estimate"];
-      }
-      if (df.containsElementNamed("Std. Error"))
-      {
-        stderrs = df["Std. Error"];
-      }
-
-      rownames = df.attr("row.names");
-    }
-    catch (std::exception &ex)
-    {
-      Rcpp::Rcerr << "sdreport/summary failed: " << ex.what() << "\n";
-      df = Rcpp::DataFrame::create();
-      estimates = Rcpp::NumericVector();
-      stderrs = Rcpp::NumericVector();
-      rownames = Rcpp::CharacterVector();
-    }
+    Rcpp::NumericMatrix mat(sdr_summary);
+    Rcpp::List dimnames = mat.attr("dimnames");
+    Rcpp::CharacterVector rownames = dimnames[0];
+    Rcpp::CharacterVector colnames = dimnames[1];
 
     // ---- Group into map ----
     std::map<std::string, std::vector<double>> grouped;
-    if (rownames.size() == stderrs.size())
+    int nrow = mat.nrow();
+    for (int i = 0; i < nrow; i++)
     {
-      for (int i = 0; i < rownames.size(); i++)
-      {
-        std::string key = Rcpp::as<std::string>(rownames[i]);
-        grouped[key].push_back(stderrs[i]);
-      }
+      std::string key = Rcpp::as<std::string>(rownames[i]);
+      double val = mat(i, 1); // col 1 = "Std. Error"
+      grouped[key].push_back(val);
     }
 
     // ---- Convert map -> R list ----
@@ -800,22 +732,19 @@ public:
       grouped_out[kv.first] = Rcpp::wrap(kv.second);
     }
 
-    double first_est = NA_REAL;
-    if (estimates.size() > 0)
-    {
-      first_est = estimates[0];
-    }
+    // Example: grab "Estimate" for first row
+    double first_est = mat(0, 0);
 
     return Rcpp::List::create(
         Rcpp::Named("objective_function_value") = of_value,
         Rcpp::Named("gradient") = grad,
         Rcpp::Named("max_gradient_component") = maxgc,
         Rcpp::Named("report") = rep,
-        Rcpp::Named("sdr_summary") = df, // return as DataFrame
-        Rcpp::Named("estimates") = estimates,
-        Rcpp::Named("std_errors") = stderrs,
+        Rcpp::Named("sdr_summary") = sdr_summary,
+        Rcpp::Named("sdr_summary_matrix") = mat,
         Rcpp::Named("first_est") = first_est,
         Rcpp::Named("rownames") = rownames,
+        Rcpp::Named("colnames") = colnames,
         Rcpp::Named("grouped_se") = grouped_out);
   }
 
@@ -829,7 +758,7 @@ public:
 
     Rcpp::List grouped_out = report["grouped_se"];
     double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
-    Rcpp::NumericVector grad = report["gradient"];
+     Rcpp::NumericVector grad = report["gradient"];
     double of_value = Rcpp::as<double>(report["objective_function_value"]);
 
     fims::Vector<double> gradient(grad.size());
@@ -1159,11 +1088,11 @@ public:
       }
     }
     ss << "\n],\n";
-    // add log
-    ss << " \"log\" : {\n";
-    ss << "\"info\" : " << fims::FIMSLog::fims_log->get_info() << ","
-       << "\"warinings\" : " << fims::FIMSLog::fims_log->get_warnings() << ","
-       << "\"errors\" : " << fims::FIMSLog::fims_log->get_errors() << "}}";
+    //add log
+    ss<<" \"log\" : {\"info\" :"<<fims::FIMSLog::fims_log->get_info()<<","
+    <<"\"warinings\" :"<<fims::FIMSLog::fims_log->get_warnings()<<","
+    <<"\"errors\" :"<<fims::FIMSLog::fims_log->get_errors()<<"}}";
+
 #ifdef TMB_MODEL
     model->do_reporting = true;
 #endif
