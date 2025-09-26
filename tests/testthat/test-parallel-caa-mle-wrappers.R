@@ -103,11 +103,11 @@ test_that("Run FIMS in parallel using {snowfall}", {
   expect_setequal(
     purrr::map(
       results_parallel,
-      \(x) x@estimates[x@estimates$label == "SSB", "estimate"]
+      \(x) x@estimates[x@estimates$label == "SSB", "estimated"]
     ),
     purrr::map(
       estimation_results_serial,
-      \(x) x@estimates[x@estimates$label == "SSB", "estimate"]
+      \(x) x@estimates[x@estimates$label == "SSB", "estimated"]
     )
   )
 
@@ -116,11 +116,11 @@ test_that("Run FIMS in parallel using {snowfall}", {
   expect_setequal(
     purrr::map(
       results_parallel,
-      \(x) x@estimates[x@estimates$label == "p", "estimate"]
+      \(x) x@estimates[x@estimates$label == "p", "estimated"]
     ),
     purrr::map(
       estimation_results_serial,
-      \(x) x@estimates[x@estimates$label == "p", "estimate"]
+      \(x) x@estimates[x@estimates$label == "p", "estimated"]
     )
   )
 

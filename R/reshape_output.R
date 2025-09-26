@@ -254,7 +254,30 @@ reshape_tmb_estimates <- function(obj,
     dplyr::ungroup()
 }
 
-#TODO: document
+#' Converts a dimension-folder section into a tibble
+#'
+#' This is an internal helper function that processes a complex list
+#' structure read in from a json file containing dimensionality information, a
+#' name, and either explicit values with a type or estimated values with
+#' uncertainty.
+#'
+#' @param section A section of the json file represented as a list.
+#' @return
+#' A tibble containing the json output in a formatted structure listing the
+#' dimensionality as columns rather than just row and column lengths.
+#' @noRd
+#'
+#' @examples
+#' # A simple example for a value with uncertainty:
+#' section_derived <- list(
+#'   name = "derived_quantity_name",
+#'   dimensionality = list(
+#'     unit = "m", symbol = "L", scale = 1.0, type = "length"
+#'   ),
+#'   value = 10.5,
+#'   uncertainty = 0.5
+#' )
+#' dimension_folded_to_tibble(section_derived)
 dimension_folded_to_tibble <- function(section) {
   if (length(section) == 0) {
     return(NA)
@@ -305,6 +328,7 @@ dimension_folded_to_tibble <- function(section) {
 #'   FIMS json output object.
 #' @return
 #' A tibble containing ordered rows for each combination of the dimensions.
+#' @noRd
 #' @examples
 #' dummy_dimensions <- list(
 #'   header = list("nyears", "nages"),
@@ -349,6 +373,9 @@ dimensions_to_tibble <- function(data) {
 #'
 #' @param data A list of lists from the json output that is titled
 #'   `density_component`.
+#' @return
+#' A tibble is returned.
+#' @noRd
 #'
 #' @examples
 #' dummy_density <- list(
@@ -365,6 +392,7 @@ dimensions_to_tibble <- function(data) {
 #'   )
 #' )
 #' density_to_tibble(dummy_density)
+#' @noRd
 density_to_tibble <- function(data) {
   data |>
     tibble::as_tibble() |>
