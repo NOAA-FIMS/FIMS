@@ -14,32 +14,39 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-Many stock assessment models in the US have historically used an annual 
-deviations approach when estimating time varying process variability in 
+Many stock assessment models in the U.S. have historically used a hierarchical 
+approach when estimating time varying process variability in 
 model parameters such as recruitment. In this approach a mean parameter value 
-$\tilde{P}$ and annual devation values $Pdev_{y}$ are estimated and combined 
+$\tilde{P}$ and annual deviation values $Pdev_{y}$ are estimated and combined 
 to produce annual parameter estimates $P_{y}$ with deviations often being 
 additive or multiplicative of the mean. Models utilizing this approach have 
-predominantly implemented deviations as fixed effects with a positive definite 
-hessian commonly ensured though a penalized likelihood such as imposing a sum 
-to zero constraint. A fixed effect vector of deviation parameters does not 
-require second order partial derivatives to be estimated until model 
-optimization is complete and variance is estimated. 
+predominantly implemented deviations as fixed effects; in several tools, such
+as Stock Synthesis, sum to zero contraints have been applied to ensure that
+Hessian matrices are positive definite. A fixed effect vector of deviation 
+parameters does not require second order partial derivatives to be estimated 
+until model optimization is complete and variance is estimated. 
 
 Following statistical best practices, FIMS incorporates the use of random 
 effects to model process variability in time-varying parameters. Random effect
-uncertainty is itegrated out during parameter optimization in TMB using the 
-laplace approximation. This integration requires the calculation of second order 
-partial derivatives and hessian inversion at each optimization step. While 
+uncertainty is integrated out during parameter optimization in TMB using the 
+Laplace approximation. This integration requires the calculation of second order 
+partial derivatives and Hessian inversion at each optimization step. While 
 simple to interpret and implement, the deviations approach results in a dense 
-convariance matrix of correlations between the mean and each annual devation 
+covariance matrix of correlations between the mean and each annual deviation 
 estimate. Due to this difference, using the deviations approach in a random
-effects model has much larger computational penalty than when only fixed effects were considered in historic modeling platforms.
+effects model has much larger computational penalty than when only fixed 
+effects were considered in historic modeling platforms.
 
 To quantify the magnitude of this penalty we investigate the performance and
 optimization time of a simple random effects model under equivalent sparse vs
 dense parameterizations. For this example we utilize two simple proxy models;
-an auto regressive AR1 function, and a simple stock assessment model based on babySAM. These proxies should reflect the relative performance gains expected in the real-world correlated time varying processes modeled in stock assessments such as recruitment. Each of these time-series models can be parameterized as a dense matrix, representing the traditional parameter deviations as random effects approach, or as a sparse matrix, as would be achieved by directly estimating annual parameter values as random effects.
+an auto regressive AR1 function, and a simple stock assessment model based on 
+babySAM. These proxies should reflect the relative performance gains expected 
+in the real-world correlated time varying processes modeled in stock 
+assessments such as recruitment. Each of these time-series models can be 
+parameterized as a dense matrix, representing the traditional parameter 
+deviations as random effects approach, or as a sparse matrix, as would be 
+achieved by directly estimating annual parameter values as random effects.
 
 These two approaches are anticipated to produce mathematically equivalent 
 results while differing in their computational overhead. Confirming this
@@ -73,10 +80,13 @@ $\lambda_{t} = \phi * \lambda_{t-1} + \epsilon_{t}$, using two parameterizations
     $$
 
 Under a random effects model, the process approach puts the random effect on $\lambda_{t}$, while in
-the deviations approach, the random effect is applied to $z_{t}$. The joint negative
-log-likelihood for this process is computed in state space form where the process
-of the current time step is dependent on the previous one and observations, $y$
-are *iid* normal:
+the deviations approach, the random effect is applied to $z_{t}$. Though we use
+the process and deviations terminology to contrast these approaches, the statistical 
+literature often refers to these as centered and non-centered parameterizations, 
+respectively (Stan User's Guide 2025; Reparameterization and Change of Variables). 
+The joint negative log-likelihood for this process is computed in state space 
+form where the process of the current time step is dependent on the previous 
+one and observations, $y$ are *iid* Normal:
 ```{r, eval = FALSE}
  # deviations approach
   nll <- nll -dnorm(z[1],0,sqrt(sd*sd/(1-phi*phi)),log=TRUE)
@@ -102,15 +112,15 @@ Under this formulation, the process approach results in a sparse precision matri
 or the Hessian which is the inverse of the covariance matrix, while the deviations 
 approach results in a dense precision matrix (Fig 1). Models are evaluated with 
 RTMB (Kristensen, 2019) using the TMB package (Kristensen et al., 2016) in R (R Core Team, 2024).
-TMB relies on the Laplace approximation to intergrate out random effects during an inner 
-optimization step, afterwhich, the joint negative log-likelihood is minimized with respect to
+TMB relies on the Laplace approximation to integrate out random effects during an inner 
+optimization step, and afterwards, the joint negative log-likelihood is minimized with respect to
 the fixed effects. The Laplace approximation requires up to the second order partial 
 derivatives of the joint negative log-likelihood with respect to the random effects 
-to be evaluated at each inner optimization step. The computation cost of the Lapace 
-approximation is primarily determined by the cost of inverting the hessian, which is $O(N^3)$ 
+to be evaluated at each inner optimization step. The computation cost of the Laplace 
+approximation is primarily determined by the cost of inverting the Hessian, which is $O(N^3)$ 
 for N-dimensional parameter space. As the number of random effects increases, 
-the computational cost of inverting the dense hessian from the deviations approach
-increases rapidly, while the cost of inverting the sparse hessian from the process
+the computational cost of inverting the dense Hessian from the deviations approach
+increases rapidly, while the cost of inverting the sparse Hessian from the process
 approach increases much more slowly.
 
 ![](figures/ar1hess_deviations.jpg) ![](figures/ar1hess_process.jpg)
