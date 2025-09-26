@@ -105,7 +105,7 @@ validate_fims <- function(
   naa1_id <- seq(1, (om_input[["nyr"]] * om_input[["nages"]]), by = om_input[["nages"]])
   if (use_fimsfit) {
     expect_equal(
-      report[["recruitment"]][[1]][1:om_input[["nyr"]]],
+      report[["expected_recruitment"]][[1]][1:om_input[["nyr"]]],
       estimates |>
         dplyr::filter(
           label == "NAA"
@@ -116,7 +116,7 @@ validate_fims <- function(
     )
   } else {
     expect_equal(
-      report[["recruitment"]][[1]][1:om_input[["nyr"]]],
+      report[["expected_recruitment"]][[1]][1:om_input[["nyr"]]],
       as.numeric(estimates[rownames(estimates) == "NAA", "Estimate"][naa1_id])
     )
   }
@@ -246,7 +246,7 @@ verify_fims_deterministic <- function(
 
   #' @description Test that the numbers at age from report are equal to the true values
   expect_equal(
-    report[["naa"]][[1]][1:dim],
+    report[["numbers_at_age"]][[1]][1:dim],
     c(t(om_output[["N.age"]]))
   )
 
@@ -258,18 +258,18 @@ verify_fims_deterministic <- function(
 
   #' @description Test that the spawning biomass values from report are equal to the true values
   expect_equal(
-    report[["ssb"]][[1]][1:nyears],
+    report[["spawning_biomass"]][[1]][1:nyears],
     c(t(om_output[["SSB"]]))
   )
 
   fims_naa <- matrix(
-    report[["naa"]][[1]][1:(om_input[["nyr"]] * om_input[["nages"]])],
+    report[["numbers_at_age"]][[1]][1:(om_input[["nyr"]] * om_input[["nages"]])],
     nrow = om_input[["nyr"]],
     byrow = TRUE
   )
   #' @description Test that the recruitment values from report are equal to the true values
   expect_equal(
-    report[["recruitment"]][[1]][1:nyears],
+    report[["expected_recruitment"]][[1]][1:nyears],
     fims_naa[, 1]
   )
 
@@ -287,7 +287,7 @@ verify_fims_deterministic <- function(
     om_output[["f"]]
   )
 
-  fims_landings <- report[["landings_exp"]]
+  fims_landings <- report[["landings_expected"]]
   #' @description Test that the expected landings values from report are equal to the true values
   expect_equal(
     fims_landings[[1]],
@@ -306,13 +306,13 @@ verify_fims_deterministic <- function(
 
   #' @description Test that the expected landings number at age from report are equal to the true values
   expect_equal(
-    report[["landings_naa"]][[1]],
+    report[["landings_numbers_at_age"]][[1]],
     c(t(om_output[["L.age"]][["fleet1"]]))
   )
 
   # Expected landings number at age in proportion
   # QUESTION: Isn't this redundant with the non-proportion test above?
-  fims_landings_naa <- matrix(report[["landings_naa"]][[1]][1:(om_input[["nyr"]] * om_input[["nages"]])],
+  fims_landings_naa <- matrix(report[["landings_numbers_at_age"]][[1]][1:(om_input[["nyr"]] * om_input[["nages"]])],
     nrow = om_input[["nyr"]], byrow = TRUE
   )
   fims_landings_naa_proportion <- fims_landings_naa / rowSums(fims_landings_naa)
@@ -325,7 +325,7 @@ verify_fims_deterministic <- function(
   )
 
   # Expected survey index.
-  fims_index <- report[["index_exp"]]
+  fims_index <- report[["index_expected"]]
   # # Using [[2]] because the survey is the 2nd fleet.
   # landings_waa <- matrix(report[["landings_waa"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
   #   nrow = om_input[["nyr"]], byrow = TRUE
@@ -355,7 +355,7 @@ verify_fims_deterministic <- function(
   )
 
   # Expected landings number at age in proportion
-  fims_cnaa <- matrix(report[["landings_naa"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
+  fims_cnaa <- matrix(report[["landings_numbers_at_age"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
     nrow = om_input[["nyr"]], byrow = TRUE
   )
   fims_index_naa <- matrix(report[["index_naa"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
@@ -366,7 +366,7 @@ verify_fims_deterministic <- function(
   #   expect_lt(abs(report[["index_waa"]][[2]][i]-c(t(om_output[["survey_age_comp"]][["survey1"]]))[i]),0.0000000001)
   # }
 
-  fims_cnaa_proportion <- matrix(report[["agecomp_prop"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
+  fims_cnaa_proportion <- matrix(report[["agecomp_proportion"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
     nrow = om_input[["nyr"]], byrow = TRUE
   )
 

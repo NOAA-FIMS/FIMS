@@ -15,7 +15,7 @@ write("test-integration-caa-mle.R", file = "debug_log.txt", append = TRUE)
 library(FIMS)
 library(testthat)
 load(test_path("fixtures", "integration_test_data.RData"))
-source("tests/testthat/helper-integration-tests-setup-function.R")
+#source("tests/testthat/helper-integration-tests-setup-function.R")
 
 # Set the iteration ID to 1 for accessing specific input/output list
 iter_id <- 1
