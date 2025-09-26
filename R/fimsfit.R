@@ -404,7 +404,6 @@ FIMSFit <- function(
   )
 
   # Create JSON output for FIMS run
-  #FIMS::set_fixed(opt$par)
   finalized_fims <- input[["model"]]$get_output()
   # Reshape the JSON estimates
   json_estimates <- reshape_json_estimates(finalized_fims)
@@ -564,6 +563,7 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
+  FIMS::set_fixed(opt$par)
 
   time_sdreport <- NA
   if (get_sd) {
