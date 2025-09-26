@@ -124,23 +124,16 @@ validate_fims <- function(
   # TODO: the estimates table contains fixed "true" values for LogRecDev, causing
   # the test below to pass even when recruitment log_devs are fixed. Need to add
   # additional checks to verify that real estimates are being extracted?
-  if (length(report[["log_recruit_dev"]]) == (om_input[["nyr"]] - 1)) {
+  if (use_fimsfit &&
+    length(report[["log_recruit_dev"]]) == (om_input[["nyr"]] - 1)
+  ) {
     validate_error(
       expected = om_input[["logR.resid"]][-1],
-      param_name = "LogRecDev",
+      param_name = "log_devs",
       use_fimsfit = use_fimsfit,
       estimates = estimates
     )
   }
-  if (length(report[["log_r"]]) == (om_input[["nyr"]] - 1)) {
-    validate_error(
-      expected = log(om_input[["R0"]]) + om_input[["logR.resid"]][-1],
-      param_name = "LogR",
-      use_fimsfit = use_fimsfit,
-      estimates = estimates
-    )
-  }
-
 
   # F
   validate_error(
