@@ -173,7 +173,15 @@ standard deviation of 0.03. We compared computational times from the speed test 
 
 This analysis looked at both a simple AR1 time series and a simple catch-at-age stock assessment model with an AR1 process in recruitment. Both analyses demonstrate that model results are the same despite the parameterization used. 
 
-The process approach resulted in a sparse Hessian while the deviations approach resulted in a Hessian that was dense in recruitment (Fig. 2). Results from the speed test indicated the process approach was approximately xx times faster than the deviations approach when an intercept was estimated and xx times faster without an intercept. While speed up for a single AR1 process is minimal, more complex stock assessments currently include AR1 random effects in multiple processes (e.g. numbers at age, maturity, mortality, etc.). The computational cost of fitting the centered approach scales significantly, warranting the need to adopt the more computationally efficient non-centered parameterization when estimating AR1 processes as random effects.
+The process approach resulted in a sparse Hessian while the deviations approach resulted in a Hessian that was dense in recruitment (Fig. 2). Results from the speed test indicated the process approach was approximately 2x times faster than the deviations approach both with and without an estimated intercept (Table 1). While speed up for a single AR1 process is minimal, more complex stock assessments currently include AR1 random effects in multiple processes (e.g. numbers at age, maturity, mortality, etc.). The computational cost of fitting the centered approach scales significantly, warranting the need to adopt the more computationally efficient non-centered parameterization when estimating AR1 processes as random effects.
+
+Table 1. Results from speed test (in seconds) from running models 25 times. Results are from a Windows operating system with 1.80 GHz Processor and 16 GB RAM. Note that absolute results are machine dependent but relative results will be consistent across systems.
+
+|           |Without Intercept|With Intercept |
+|-----------|-----------------|---------------|
+|process    |155.3            |162.88         |
+|deviations |334.77           |327.45         |
+ 
 
 ![](figures/devs_intercept.png) ![](figures/process_intercept.png)
 **Figure 1.** Hessian matrix for random effects model with an AR1 process on recruitment in a catch-at-age model using deviations approach (top) and process approach (bottom).
