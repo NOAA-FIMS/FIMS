@@ -6,22 +6,82 @@ test-check_fims.R
 test-create_default_parameters.R
 test-distribution-formulas.R
 test-fimsfit.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x121210c18 ]
+Initializing populations : [ 0x12112da18 ]
 test-fimsframe.R
 test-get_estimates.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x1369e5618 ]
+Initializing populations : [ 0x136959e18 ]
 test-get_fixed.R
 test-get_input.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x106fffa18 ]
+Initializing populations : [ 0x10647be18 ]
 test-get_input.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x136123018 ]
+Initializing populations : [ 0x1219e1018 ]
 test-get_number_parameters.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x121422418 ]
+Initializing populations : [ 0x121535a18 ]
 test-get_obj.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x10708b018 ]
+Initializing populations : [ 0x1070a7c18 ]
 test-get_opt.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x136288618 ]
+Initializing populations : [ 0x126fccc18 ]
 test-get_random.R
 test-get_sdreport.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x121248218 ]
+Initializing populations : [ 0x1212b0018 ]
 test-get_timing.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x1212b5c18 ]
+Initializing populations : [ 0x12103c218 ]
 test-get_version.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x12000a218 ]
+Initializing populations : [ 0x120042418 ]
 test-initialize_modules.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x14392da18 ]
+Initializing populations : [ 0x143c31e18 ]
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x1166d2e18 ]
+Initializing populations : [ 0x113ed6418 ]
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x1066d0a18 ]
+Initializing populations : [ 0x1437f1a18 ]
 test-integration-caa-mle-wrappers.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x1371b9818 ]
+Initializing populations : [ 0x137264a18 ]
 test-integration-caa-mle.R
 test-integration-fims-bayesian-prior-predictive.R
+adding population 1 to CAA!
+adding population 1 to CAA!
+Initializing populations : [ 0x107153c18 ]
+Initializing populations : [ 0x107121618 ]
 test-integration-fims-estimation-random-effects-with-wrappers.R
 test-integration-fims-estimation-random-effects-with-wrappers.R:2
 test-integration-fims-estimation-random-effects-with-wrappers.R:7

@@ -43,6 +43,38 @@ void init_logging() {
 bool CreateTMBModel() {
   init_logging();
 
+  //clear first
+    // base model
+#ifdef TMBAD_FRAMEWORK
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  info0->Clear();
+
+  std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
+      fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+  info->Clear();
+
+#else
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  info0->Clear()
+
+  // first-order derivative
+  std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> info1 =
+      fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+  info1->Clear();
+
+  // second-order derivative
+  std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> info2 =
+      fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+  info2->Clear();
+
+  // third-order derivative
+  std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> info3 =
+      fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+  info3->Clear();
+#endif
+
   FIMS_INFO_LOG(
       "Adding FIMS objects to TMB, " +
       fims::to_string(FIMSRcppInterfaceBase::fims_interface_objects.size()) +
@@ -54,34 +86,26 @@ bool CreateTMBModel() {
 
   // base model
 #ifdef TMBAD_FRAMEWORK
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
   info0->CreateModel();
   info0->CheckModel();
 
-  std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
-      fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
   info->CreateModel();
 
 #else
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
   info0->CreateModel();
   info0->CheckModel();
 
-  // first-order derivative
-  std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> info1 =
-      fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+
   info1->CreateModel();
 
   // second-order derivative
-  std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> info2 =
-      fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+ 
   info2->CreateModel();
 
   // third-order derivative
-  std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> info3 =
-      fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+
   info3->CreateModel();
 #endif
 

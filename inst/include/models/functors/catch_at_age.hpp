@@ -113,11 +113,13 @@ namespace fims_popdy
      */
     virtual void Initialize()
     {
+    
+
       //       // The following are initialized in the rcpp interface: ages, log_init_naa,
       //       //   numbers_at_age, log_Fmort, log_q
       for (size_t p = 0; p < this->populations.size(); p++)
       {
-
+       
         this->populations[p]->proportion_female.resize(
             this->populations[p]->nages);
 
@@ -150,15 +152,18 @@ namespace fims_popdy
       {
         std::shared_ptr<fims_popdy::Population<Type>> &population =
             this->populations[p];
-        auto &derived_quantities =
-            this->GetPopulationDerivedQuantities(population->GetId());
 
-        // Reset the derived quantities for the population
-        typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-        for (auto &kv : derived_quantities)
-        {
-          this->ResetVector(kv.second);
-        }
+       
+          auto &derived_quantities =
+              this->GetPopulationDerivedQuantities(population->GetId());
+
+          // Reset the derived quantities for the population
+          typename fims_popdy::Population<Type>::derived_quantities_iterator it;
+          for (auto &kv : derived_quantities)
+          {
+            this->ResetVector(kv.second);
+          }
+    
 
         // Prepare proportion_female
         for (size_t age = 0; age < population->nages; age++)
@@ -187,7 +192,6 @@ namespace fims_popdy
         typename fims_popdy::Population<Type>::derived_quantities_iterator it;
         for (auto &kv : derived_quantities)
         {
-          std::cout << fleet->id << " " << kv.first << std::endl;
           this->ResetVector(kv.second);
         }
 

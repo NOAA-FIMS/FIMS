@@ -1234,6 +1234,7 @@ public:
   template <typename Type>
   bool add_to_fims_tmb_internal()
   {
+    
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -1263,7 +1264,7 @@ public:
         throw std::runtime_error("Population ID " + std::to_string(*it) + " not found in live_objects");
       }
       auto population = std::dynamic_pointer_cast<PopulationInterface>(it2->second);
-
+      model->InitializePopulationDerivedQuantities(population->id);
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           model->GetPopulationDerivedQuantities(population->id);
 
@@ -1383,7 +1384,7 @@ public:
       std::shared_ptr<FleetInterface> fleet_interface =
           std::dynamic_pointer_cast<FleetInterface>(
               FleetInterfaceBase::live_objects[(*it)]);
-
+      model->InitializeFleetDerivedQuantities(fleet_interface->id);
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           model->GetFleetDerivedQuantities(fleet_interface->id);
 
