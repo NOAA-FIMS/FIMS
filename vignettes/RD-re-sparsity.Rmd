@@ -34,20 +34,12 @@ partial derivatives and hessian inversion at each optimization step. While
 simple to interpret and implement, the deviations approach results in a dense 
 convariance matrix of correlations between the mean and each annual devation 
 estimate. Due to this difference, using the deviations approach in a random
-effects model has much larger computational penalty than when only fixed effects
-were considered in historic modeling platforms.
+effects model has much larger computational penalty than when only fixed effects were considered in historic modeling platforms.
 
 To quantify the magnitude of this penalty we investigate the performance and
 optimization time of a simple random effects model under equivalent sparse vs
-dense parameterizations. For this example we utilize three simple proxy models;
-1) a moving average MA1 function, 2) an auto regressive AR1 function, and 3) a
-simple stock assessment model based on babySAM. These proxies should reflect
-the relative performance gains expected in the real-world correlated time 
-varying processes modeled in stock assessments such as recruitment. Each of 
-these time-series models can be parameterized as a dense matrix, representing 
-the traditional parameter deviations as random effects approach, or as a sparse 
-matrix, as would be achieved by directly estimating annual parameter values 
-as random effects.
+dense parameterizations. For this example we utilize two simple proxy models;
+an auto regressive AR1 function, and a simple stock assessment model based on babySAM. These proxies should reflect the relative performance gains expected in the real-world correlated time varying processes modeled in stock assessments such as recruitment. Each of these time-series models can be parameterized as a dense matrix, representing the traditional parameter deviations as random effects approach, or as a sparse matrix, as would be achieved by directly estimating annual parameter values as random effects.
 
 These two approaches are anticipated to produce mathematically equivalent 
 results while differing in their computational overhead. Confirming this
@@ -67,13 +59,16 @@ $\lambda_{t} = \phi * \lambda_{t-1} + \epsilon_{t}$, using two parameterizations
 1. process approach: $\lambda_{t} \sim N(\phi * \lambda_{t-1}, \sigma^{2}_{\lambda})$
 2. deviations approach: $\lambda_{t} = \phi * \lambda_{t-1} + \sigma * z_{t}, z_{t} \sim N(0,1)$
 
--   $\phi$ is the autoregressive coefficient, transformed as: $$
+-   $\phi$ is the autoregressive coefficient, transformed as: 
+    $$
     \phi=2*\text{plogis}(\text{phiTrans})-1
-    $$ which ensures $\phi$ remains in the range (-1,1).
+    $$ 
+    which ensures $\phi$ remains in the range (-1,1).
 
 -   $\sigma$ is the process standard deviation.
 
--   The stationary variance of the process is $$
+-   The stationary variance of the process is:
+    $$
     \text{Var}(\gamma)=\frac{\sigma^2}{(1-\phi^2)}
     $$
 
@@ -91,7 +86,7 @@ are *iid* normal:
   for(i in 2:timeSteps){
     lamda[i] <- phi*lamda[i-1]+z[i]
   }
-  nll <- nll - sum(dnorm(y, lamda[oi], sdo, TRUE))
+  nll <- nll - sum(dnorm(y, lamda, sdo, TRUE))
   
 
   # process approach
@@ -99,7 +94,7 @@ are *iid* normal:
   for(i in 2:timeSteps){
     nll <- nll -dnorm(lambda[i],phi*lambda[i-1],sd,log=TRUE)
   }
-  nll <- nll - sum(dnorm(y, lambda[oi], sdo, TRUE))
+  nll <- nll - sum(dnorm(y, lambda, sdo, TRUE))
 
 ```
 
@@ -109,7 +104,7 @@ approach results in a dense precision matrix (Fig 1). Models are evaluated with
 RTMB (Kristensen, 2019) using the TMB package (Kristensen et al., 2016) in R (R Core Team, 2024).
 TMB relies on the Laplace approximation to intergrate out random effects during an inner 
 optimization step, afterwhich, the joint negative log-likelihood is minimized with respect to
-the fixed effects. The Laplace approximation requires up to the third order partial 
+the fixed effects. The Laplace approximation requires up to the second order partial 
 derivatives of the joint negative log-likelihood with respect to the random effects 
 to be evaluated at each inner optimization step. The computation cost of the Lapace 
 approximation is primarily determined by the cost of inverting the hessian, which is $O(N^3)$ 
@@ -119,8 +114,8 @@ increases rapidly, while the cost of inverting the sparse hessian from the proce
 approach increases much more slowly.
 
 ![](figures/ar1hess_deviations.jpg) ![](figures/ar1hess_process.jpg)
-**Figure 1.** Hessian matrix for AR1 process using deviations approach (left)
-and process approach (right).
+**Figure 1.** Hessian matrix for AR1 process using deviations approach (top)
+and process approach (bottom).
 
 ### Catch-at-age Model 
 
@@ -129,11 +124,11 @@ model by modifying the software package, babySAM. The babySAM model structures r
 numbers at age, and fishing mortality as AR1 processes. We modified the model to 
 structure recruitment under both the deviation and process approaches. The main structure 
 for recruitment for years 2 and greater was applied to the numbers at age parameter, $N_{y, a=1}$ 
-for year $y$ and for age 1 and written as the following:
+for year $y$ and for age 1 with mean recruitment $\hat{r}$, written as the following:
 
 <!--  TODO: fix deviations approach equation -->
-1. deviations approach: $log(N_{y,1}) = \hat{r} + z_{y}, \quad where z_{y} \sim N(z_{y-1},\sigma^{2}_{r})$
-2. process approach: $N_{pred} = log(N_{y-1, 1}), \quad where log(N_{y, 1}) \sim N(\hat{r} + \phi*(N_{pred} - \hat{r}))$
+1. deviations approach: $log(N_{y,1}) = \hat{r} + z_{y}, \quad where \quad z_{y} \sim N(z_{y-1},\sigma^{2}_{r})$
+2. process approach: $N_{pred} = log(N_{y-1, 1}), \quad where \quad log(N_{y, 1}) \sim N(\hat{r} + \phi*(N_{pred} - \hat{r}))$
 
 The joint negative log-likelihood for recruitment under each approach was computed using
 state space form as:
@@ -171,17 +166,14 @@ term to compare model parameterizations common in Europe (without intercept) and
 the US (with intercept) to ensure the intercept did not influence the sparsity of the 
 Hessian. 
 
-<!--  TODO: flush this out more or just skip to results? -->
-Results compared model parameter estimates and computational times. 
+We ran a speed test by repeating model runs on the catch-at-age model 25 times, each time modifying the observation variance parameter using random noise from a normal distribution with 
+standard deviation of 0.03. We compared computational times from the speed test and compared parameter estimates, including recruitment from the first model run.. 
 
 ## Results
 
-This analysis looked at both a simple AR1 time series and a simple catch-at-age 
-stock assessment model with an AR1 process in recruitment. Both analyses demonstrate 
-that model results are the same despite the parameterization used, however, the 
-sparce approach results in computational efficiency gains. While speed up 
-for a single AR1 process is minimal, more complex stock assessments currently 
-include AR1 random effects in multiple processes (e.g. numbers at age, maturity, 
-mortality, etc.). The computational cost of fitting the centered approach scales 
-significantly, warranting the need to adopt the more computationally efficient 
-non-centered parameterization
+This analysis looked at both a simple AR1 time series and a simple catch-at-age stock assessment model with an AR1 process in recruitment. Both analyses demonstrate that model results are the same despite the parameterization used. 
+
+The process approach resulted in a sparse Hessian while the deviations approach resulted in a Hessian that was dense in recruitment (Fig. 2). Results from the speed test indicated the process approach was approximately xx times faster than the deviations approach when an intercept was estimated and xx times faster without an intercept. While speed up for a single AR1 process is minimal, more complex stock assessments currently include AR1 random effects in multiple processes (e.g. numbers at age, maturity, mortality, etc.). The computational cost of fitting the centered approach scales significantly, warranting the need to adopt the more computationally efficient non-centered parameterization when estimating AR1 processes as random effects.
+
+![](figures/devs_intercept.png) ![](figures/process_intercept.png)
+**Figure 1.** Hessian matrix for random effects model with an AR1 process on recruitment in a catch-at-age model using deviations approach (top) and process approach (bottom).
