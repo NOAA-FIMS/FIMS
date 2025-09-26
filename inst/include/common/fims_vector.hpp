@@ -10,6 +10,8 @@
 
 #include "../interface/interface.hpp"
 #include <ostream>
+#include <iomanip>
+
 namespace fims
 {
 
@@ -504,6 +506,8 @@ namespace fims
 template <typename Type>
 std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v)
 {
+
+  out << std::fixed << std::setprecision(10);
   out << "[";
 
   if (v.size() == 0)
