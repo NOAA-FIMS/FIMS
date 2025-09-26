@@ -54,7 +54,7 @@ validate_fims <- function(
     if (use_fimsfit) {
       object <- estimates |>
         dplyr::filter(label == param_name) |>
-        dplyr::select(label, estimate, uncertainty)
+        dplyr::select(label, estimated, uncertainty)
       # Extract estimate
       object_estimate <- object[1:length(expected), "estimate"]
       # Extract uncertainty
@@ -233,7 +233,7 @@ verify_fims_deterministic <- function(
   if (use_fimsfit) {
     fims_logR0 <- estimates |>
       dplyr::filter(label == "log_rzero") |>
-      dplyr::pull(estimate)
+      dplyr::pull(estimated)
   } else {
     fims_logR0 <- estimates[36, "Estimate"]
   }

@@ -34,7 +34,7 @@ dummy_dimensions <- list(
   dimensions = list(30L, 12L)
 )
 dimensions_to_tibble(dummy_dimensions)
-Example with nyears+1
+# Example with nyears+1
 dummy_dimensions <- list(
   header = list("nyears+1", "nages"),
   dimensions = list(31L, 12L)

@@ -950,7 +950,6 @@ testthat
 th
 tibble
 tidyr
-tidyselect
 tidyverse
 timediff
 timingfishery

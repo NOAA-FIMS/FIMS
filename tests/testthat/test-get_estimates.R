@@ -84,9 +84,9 @@ test_that("get_estimates() works with estimation run", {
     # Read the first RDS file, get estimates, and print a snapshot
     readRDS(fit_files[[1]]) |>
       get_estimates() |>
-      # Remove the estimate, uncertainty, and gradient columns, as they
+      # Remove the estimated, uncertainty, and gradient columns, as they
       # may change between runs
-      dplyr::select(-estimate, -uncertainty, -gradient) |>
+      dplyr::select(-estimated, -uncertainty, -gradient) |>
       print(n = 320, width = Inf)
   )
 })
