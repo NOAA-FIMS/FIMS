@@ -266,54 +266,102 @@ SPMs combine all aspects of a population's growth, recruitment, and mortality in
 
 #### Equations
 
-The goal is to estimate the unobserved quantity of the total population biomass for a given year. To do this, we rely on observed fishery catch data and indices of abundance, such as catch-per-unit-effort from a fishery or a relative index of abundance from a fishery-independent survey. There is a strong assumption that the indices of abundance provide a good idea of how the population responds to fishing pressure over time so the trend of the indices should represent the trend of the population's biomass over time. While indices of abundance inform the trend of the population over time, catch data informs the scale of the population. In a surplus production model, the total population biomass in year *t* is calculated by:
-B0 \= Binit                                                                  *t \= 0*  
-Bt+1 \= Bt \+ rBt(1-BtK)-Ct                                      *t \= 1…T*     
-where *t* \= year, *B* \= biomass, *Binit* \= initial biomass, *K* \= carrying capacity, *r* \= intrinsic growth rate of the population, and *C* \= catch. Biomass in year *t+1* is dependent on biomass in year *t*, the amount of production (recruitment, growth, and death) in year *t*, and catch in year *t*. If data is available from the assumed start of the fishery, *Binit* \= *K*, otherwise, initial biomass can be estimated based on initial depletion ():
-Binit=K\*
+The goal is to estimate the unobserved quantity of the total population biomass for a given year. To do this, we rely on observed fishery catch data and indices of abundance, such as catch-per-unit-effort from a fishery or a relative index of abundance from a fishery-independent survey. There is a strong assumption that the indices of abundance provide a good idea of how the population responds to fishing pressure over time so the trend of the indices should represent the trend of the population’s biomass over time. While indices of abundance inform the trend of the population over time, catch data informs the scale of the population. In a surplus production model, the total population biomass in year \f$t\f$ is calculated by:
+\f[
+\begin{align}   
+\nonumber B_{0} &= B_{init},\quad t = 0  \\
+\nonumber B_{t+1} &= B_{t} + rB_{t}(1-\frac{B_{t}}{K})-C_{t},\quad t = 1…T     
+\end{align}
+\f]
+where \f$t\f$ \= year, \f$B\f$ \= biomass, \f$B_{init}\f$ \= initial biomass, \f$K\f$ \= carrying capacity, \f$r\f$ \= intrinsic growth rate of the population, and \f$C\f$ \= catch. Biomass in year \f$t+1\f$ is dependent on biomass in year \f$t\f$, the amount of production (recruitment, growth, and death) in year \f$t\f$, and catch in year \f$t\f$. If data is available from the assumed start of the fishery, \f$B_{init} = K\f$, otherwise, initial biomass can be estimated based on initial depletion (\f$\psi\f$): 
+\f[  
+B_{init} = K\psi
+\f]
+To estimate the unobserved quantity of biomass, we can fit the model to the indices of abundance. Based on the assumptions of the model, biomass is related to the indices of abundance by a catchability, \f$q\f$, parameter:   
+\f[
+\hat{I}_{t,f} = \frac{C_{t,f}}{E_{t,f}} = q_{f}B_{t}  
+\f]
+where \f$\hat{I}_{t,f}\f$, is the predicted index of abundance in year \f$t\f$ for fleet \f$f\f$, and \f$q_{f}\f$ is the catchability coefficient (the amount of biomass or catch taken/one unit of effort) for fleet \f$f\f$. It is assumed that the index of abundance is a good representation of the population’s trend and response to fishing pressure over the timeseries. Therefore, the model tries to minimize the difference between the observed index values (\f$I_{t,f}\f$) and the predicted index values (\f$\hat{I}_{t,f}\f$) by finding the values for \f$B_{t}\f$ and \f$q_{f}\f$ that best fit the observed index values.   
+The production function (represented by \f$rB_{t}(1-B_{t}K\f$) in the biomass equation) can be parameterized in several ways. 
 
-To estimate the unobserved quantity of biomass, we can fit the model to the indices of abundance. Based on the assumptions of the model, biomass is related to the indices of abundance by a catchability, *q*, parameter:
-It,f \= Ct,fEt,f \= qfBt  
-where It,f, is the predicted  index of abundance in year *t* for fleet *f*, and *qf* is the catchability coefficient (the amount of biomass or catch taken/one unit of effort) for fleet *f*. It is assumed that the index of abundance is a good representation of the population's trend and response to fishing pressure over the timeseries. Therefore, the model tries to minimize the difference between the observed index values (It,f) and the predicted index values (It,f) by finding the values for Bt and qf that best fit the observed index values.
-The production function (represented by rBt(1-BtK) in the biomass equation) can be parameterized in several ways.
 
-##### Schaefer model
+### Schaefer model 
+### Schaefer model 
+\f$
+f(B_{t}) = rB_{t}(1-\frac{B_{t}}{K})
+\f$
+### Fox model
+\f$
+f(B_{t}) = log(K)rB_{t}(1-\frac{log(B_{t})}{log(K)})
+\f$
+### **Pella-Tomlinson model**
+\f$
+f(B_{t}) = \frac{r}{m-1}B_{t}(1-(\frac{B_{t}}{K})^{m-1})  
+\f$
+f(B_{t}) = rB_{t}(1-\frac{B_{t}}{K})
+\f$
+### Fox model
+\f$
+f(B_{t}) = log(K)rB_{t}(1-\frac{log(B_{t})}{log(K)})
+\f$
+### **Pella-Tomlinson model**
+\f$
+f(B_{t}) = \frac{r}{m-1}B_{t}(1-(\frac{B_{t}}{K})^{m-1})  
+\f$
 
-f(Bt) \= rBt(1-BtK)
+where \f$m\f$ is the shape parameter that determines the \f$B/K\f$ ratio where maximum surplus production is attained at. If \f$m = 2\f$, the model reduces down to the Schaefer model, if \f$m \approx 1\f$, the model reduces to the Fox model but there is no exact solution if \f$m = 1\f$. **We decided to use the Pella-Tomlinson implementation of the production function because it is the most flexible model, the shape parameter at 2 will give a Schaefer model and at 1 will give the Fox.**
 
-##### Fox model
-
-f(Bt) \= log(K)rBt(1-log(Bt)log(K))
-
-##### **Pella-Tomlinson model**
-
-f(Bt) \= rm-1Bt(1-(BtK)m-1)  
-where *m* is the shape parameter that determines the *B/K* ratio where maximum surplus production is attained at. If *m* \= 2, the model reduces down to the Schaefer model, if *m*  1, the model reduces to the Fox model but there is no exact solution if *m* \= 1\. **We decided to use the Pella-Tomlinson implementation of the production function because it is the most flexible model, the shape parameter at 2 will give a Schaefer model and at 1 will give the Fox.**
 
 ##### State-space formulation
 
-State-space models are a type of hierarchical model that allows the natural variability in the environment (process error, 2\) to be modeled separately from the error associated with observed data (observation error, 2). To help with computational estimation, the model can be re-written in terms of depletion, Pt, where Pt \= BtK is an unobserved state. A Bayesian state-space formulation (Meyer and Millar, 1999) can be written as:  
-P0=  
-Pt+1 \= Pt+rm-1Pt(1-Ptm-1)-CtK   t=1,...T  
-Pt |Pt, 2 \~ lognormal(ln(Pt), t2)   t=0,....T  
-and the depletion is then fit to index of abundance assuming a lognormal distribution  
-It,f| Pt,K,qf,2 \~ lognormal(ln\[qfPtK\], t2)  t=1,...T  
-where  is initial depletion (can be assumed to be 1 or estimated), and depletion in year *t* (Pt) is log-normally distributed with a mean of ln(Pt) and log-normal process error variance (t2) and the expected index of abundance value is lognormally distributed with a mean of ln\[qfPtK\] and log-normal observation variance of t2. Annual biomass can then be calculated as:
-Bt= PtK
+State-space models are a type of hierarchical model that allows the natural variability in the environment (process error, \f$\sigma^_{2}\f$) to be modeled separately from the error associated with observed data (observation error, \f$\tau^{2}\f$). To help with computational estimation, the model can be re-written in terms of depletion, \f$P_{t}\f$,  where \f$P_{t} = B_{t}K\f$ is an unobserved state. A Bayesian state-space formulation (Meyer and Millar, 1999) can be written as:  
+\f[
+\begin{align}
+\nonumber P_{0} &= \psi, \quad t = 0\\  
+\nonumber P_{t+1} &= P_{t}+\frac{r}{m-1}P_{t}(1-P_{t}^{m-1}) - \frac{C_{t}}{K}, \quad   t=1,...T \\ 
+\nonumber P_{t} | P_{t}, \sigma^{2} &\sim lognormal(ln(P_{t}), \sigma_{t}^{2}), \quad   t=0,....T  
+\end{align}
+\f]
+
+and the depletion is then fit to index of abundance assuming a lognormal distribution:
+\f[ 
+I_{t,f}| P_{t},K,q_{f},\sigma^{2} \sim lognormal(ln[q_{f}P_{t}K], \tau^{2}) \quad  t=1,...T  
+\f]
+where \f$\psi\f$ is initial depletion (can be assumed to be 1 or estimated), and depletion in year \f$t\f$ (\f$P_{t}\f$) is log-normally distributed with a mean of \f$ln(P_{t})\f$ and log-normal process error variance (\f$\sigma^{2}\f$) and the expected index of abundance value is lognormally distributed with a mean of \f$ln[q_{f}P_{t}K]\f$ and log-normal observation variance of \f$\tau^{2}\f$. Annual biomass can then be calculated as:   
+\f[
+B_{t}= P_{t}K
+\f]
 
 ##### Derived Quantities and Reference Points
 
-Annual harvest rate (Ht ) is calculated by:
-Ht \= CtBt  
-A penalty should be added to ensure that harvest rate does not go above 1.0, because while this may be possible mathematically, it is not possible biologically (cannot have more catch than biomass in a given year).
-In the Pella-Tomlinson parameterization, the shape parameter, *m* can be directly linked to biomass at maximum sustainable yield, BMSY, by the ratio of BMSYK by:  
-BMSYK=m-1m-1,  
-therefore BMSY can be calculated as:  
-BMSY=Km-1m-1.  
+Annual harvest rate ($H_{t}$) is calculated by:   
+\f$
+H_{t} = \frac{C_{t}}{B_{t}}  
+\f$
+A penalty should be added to ensure that harvest rate does not go above 1.0, because while this may be possible mathematically, it is not possible biologically (cannot have more catch than biomass in a given year).   
+In the Pella-Tomlinson parameterization, the shape parameter, \f$m\f$ can be directly linked to biomass at maximum sustainable yield, \f$B_{MSY}\f$, by the ratio of \f$\frac{B_{MSY}}{K}\f$ by:
+
+\f$  
+\frac{B_{MSY}}{K} = m^{\frac{-1}{m-1}},  
+\f$
+
+therefore $B_{MSY}$ can be calculated as:
+
+\f$  
+B_{MSY} = Km^{\frac{-1}{m-1}}.  
+\f$
+
 The fishing mortality at maximum sustainable yield (MSY) can be calculated as:  
-FMSY=rm-1(1-1m).  
-And MSY is given as:
-MSY=FMSYBMSY
+
+\f$
+F_{MSY}=\frac{r}{m-1}(1-\frac{1}{m}).  
+\f$
+
+And MSY is given as: 
+
+\f$  
+MSY=F_{MSY}B_{MSY}
+\f$
 
 #### Input Requirements
 
@@ -723,40 +771,214 @@ Management reference points, often based on policy objectives, will also be deri
 
 1. How do you specify a projection without any catch because starting with Stock Synthesis v.3.30.16 users are able to specify future dynamics without any catch. 
 
-## Random effects
+## Random effects and Bayesian estimation
+
+### Background
+
+FIMS, while developed to be portable between statistical optimization software, is currently depending on the software, Template Model Builder (Kristensen et. al. 2015), otherwise known as TMB. This package evaluates the Laplace approximation to integrate out random effects, after which, optimization of the marginal likelihood occurs outside of TMB in R using available minimization software packages. The current dependency on TMB allows for fast random effects estimation, and due to its associated R package tmbstan, allows for easy integration with Bayesian modeling via STAN.  
 
 FIMS architecture needs to be expanded to include State Space and Bayesian capabilities. This expansion requires a refactor of the architecture underlying the distribution components of the model that are summed to produce the negative log-likelihood (nll). In general, the proposed expansion will allow a generalized framework for time-varying parameters allowing for random effects, and the ability to include Bayesian priors on parameters.
 
 This development will also structure the distribution functions so that it is straightforward for the user to select from a choice of distributions for a given dataset, random effect, or Bayesian prior. Development will allow for a library of probability distributions that can be used across FIMS. Each distribution will contain a method for calculating one-step-ahead residuals and a method for simulating from the distribution.
 
+#### Review of prior options in other software and their uses
+
+Stock Synthesis priors:
+- Many options for all parameters, see current options [here](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html#parameter-priors).
+
+ASAP priors:
+- Aggregate catch and indices, lognormal
+- Deviations from SR curve (BH assumed, although often set with steepness=1), lognormal
+- Fmult in first year, lognormal
+- Fmult deviations, lognormal random walk, typically unconstrained
+- Catchability, lognormal
+- Catchability deviations, lognormal random walk, not used very often
+- N at age in first year, lognormal from input guesses or an exponential decline using M and F from first year
+- Selectivity parameters, lognormal, from either values at age or parameters of logistic or double logistic (note, this doesn’t totally make sense because selectivity can only be between zero and one)
+- Catch and indices at age assume multinomial with input ESS (not sure if this counts as a prior or not)
+- No priors are linked to create multivariate priors (e.g., prior on catch and catchability are independent with no covariance)
+- M is input as a matrix, no estimation of M allowed in ASAP
+- Weights at age are empirical and input as matrices, no estimation of growth allowed in ASAP
+
+WHAM generally does not use priors. It estimates a fixed parameter on a scale from negative to positive infinity and uses transformations to get a desired constraint, estimates a random effect, or treats the parameter as known. There are many more options for dealing with age composition in WHAM than in ASAP: e.g., multinomial, Dirichlet-multinomial, logistic-normal, and multivariate-tweedie, with variations for handling year, age combinations with observed zeros. WHAM has multiple ways to estimate linkages among random effects: e.g., IID, autoregressive across age, year, or both, and mixed with autoregressive across year for recruitment and 2dar1 for remaining ages in NAA. WHAm allows estimation of M. WHAM also allows incorporation of environmental covariates in a statistically sound manner using random effects.
+
+SAM does not use priors. It also does not use age composition estimation generally. It treats indices at age and catch at age as multivariate log-normal random variables. It also estimates F at age over time as a multivariate log-normal randomwalk with covariances among the ages and over time. 
+
+FIMS should allow the use of priors for cases where random effects are not desired or possible, e.g., due to large blocks of missing data. A model without priors is a priori preferable to one with priors, but sometimes priors are needed in order to produce reasonable results.
+
 ### Architecture & Organization
 
-Architectural changes will be grouped into four stages: . 1. The development of a hierarchical class structure for distributions (complete); 2. A generalized framework for adding random effects and Bayesian priors (complete); 3. Building up capacity which will add new distributions, osa residuals, and simulation functionality; and 4. Adding multivariate functionality for random effects and Bayesian priors.
+Architectural changes will be grouped into four stages: 
+
+1. The development of a hierarchical class structure for distributions (**complete**)
+2. A generalized framework for adding random effects and Bayesian priors (**complete**) 
+3. Building up capacity which will add new distributions, osa residuals, and simulation functionality (wip)
+4. Adding multivariate functionality for random effects and Bayesian priors.
 
 ### Decision Points
 
-* Needs and Priorities
-    * Time variation (AR1, RW, 2d AR1, Ecov linkages, etc.)
-        * Generic framework on R side to specify on any parameter\
-    * Priors on parameters, flexible options w/ Jacobians\
-    * Library of likelihoods to pull from for indices, comps etc.\
-    * Need ability to compare and select best likelihoods from a set. Not always so simple b/c some likelihoods are not comparable e.g with AIC\
-    * Full state space capabilities\
-    * Bayesian capabilities
-        * Key steps are the ability to add priors and improved output/reporting.\
-    * OSA structure
-        * Flexible format for assembling the data vector going into osa component, needs to work as users add/remove data or even add "ghost" data.
-            * Choose bin to drop for multivariate constrained likelihoods (multinomial, D-M, Dirichlet, etc.)\
-        * \*Observations need to made random for osa.\
-    * Simulation\
-    * [Project board](https://github.com/orgs/NOAA-FIMS/projects/17/views/1)
-        * 10 issues scoped out\
-        * 11 in ToDo list\
-    * [FIMS requirements table](https://docs.google.com/spreadsheets/d/1impCdPPob8IPdoiFDpJpe7-Nbdjbz_Uq05_4BWooY4g/edit#gid=1133225771)
-        * 33 issues scoped out\
-        * 20 issues left for M2 but lots of overlap in issues\
-* [FIMS NLL Examples](https://docs.google.com/document/d/1X1NwjQlLrKGIXZgkMfJ29Kp1lFreKiiTTQxyoicgqxc/edit)
-    * User case studies helped guide proposed development tasks below:
+FIMS will develop a library of likelihoods so that multiple distributions will be available, not only for random effect processes, but also for data components, such as indices and compositions. Given this flexibility, FIMS will require the ability to compare and select best likelihoods from a set. Such a comparision is not always straightforward as some lieklihoods are not caparable, e.g. with AIC. FIMS will initially depend on TMB distribution functions but will eventually expand the fims math section to include explicitly written distributions. 
+
+FIMS will implement full state space capabiliities, which will allow processes such as recruitment, selectivity, numbers at age, etc. to be time varying. This will be accomplished by relying on an autoregressive distributions, such as AR1 and randomwalk, or by depending on environmental linkages. Correlation between two dimensional processes (e.g. correlation between age and year in maturity, etc.) will be captured using 2dAR1 distributions. Time variation will require a general framework on the R side to specify processes on any parameter. Initial development will focus on adding an AR1 process on recruitment, afterwhich, the framework will be applied to other proccesses requiring time variation. 
+
+FIMS will also implement fully Bayesian models. A key step to accomplishing this will be the ability to add both univariate and multivariate priors to any parameter or parameter set. Multivariate priors will allow for the handling of correlations between parameters. Priors will need to be flexible with the option to handlge Jacobian transformations. The R interface will need to be developed to handle a generalized framework for adding priors to parameters and improvements will be needed in the output to handle reporting and accessing other stan R libraries for visualizing Bayesian output.   
+
+FIMS will add additional features to likelihood functions for calculating one-step-ahead (osa) residuals and for simulating data. OSA structure will require a flexible format for assembling the data vector going into the the osa component as this framework will need to work as users add or remove data, include unobserved data entries (i.e. NAs), or add "ghost" data. Additionally, users will need to choose which composition bin to drop for multivariate constrained likelihoods (e.g. multinomial, Dirichlet-Multinomial, Dirichlet, etc.). Data will need to be defined using the "Type" specifier so that values can be added to the tape. This definition is needed as TMB estimates data as random effects in osa calculations. Simulation will rely initially on TMB defined random distribution functions and TMB specific code macros. 
+
+The following user case studies are provided to help guide developers in the architecture and design of a generic framework for random effects and bayesian priors. 
+
+#### Univariate priors
+
+```{r, eval = FALSE}
+## Basic normal prior on M
+population$SetPriors(pars='logM', mu=log(.2), sigma=.1,
+                     family='normal', log=FALSE)
+
+## Process errors when we have random effects also could have priors
+
+## process error priors: half-normal
+population$SetPriors(pars='sigmaR', mu=0, sigma=1,
+                     family='normal', log=FALSE)
+## or gamma to keep it away from boundary
+population$SetPriors(pars='sigmaR', shape=2.15, scale=0.17,
+                     family='gamma', log=FALSE)
+```
+
+In addition to population-level parameters there are those indexed by fleet (and later space or other sub-unit)
+
+```{r, eval = FALSE}
+## fleet specific ones like Q or selex
+population$SetPriors(pars='log_q', mu=0, sigma=.5,
+                     family='normal', fleet=1,
+                     log=FALSE)
+population$SetPriors(pars='log_q', mu=0, sigma=1,
+                     family='normal', fleet=2,
+                     log=FALSE)
+```
+
+#### Multivariate priors
+
+The most likely source for multivariate priors is from meta-analyses. E.g., one could pull priors from the FishLife package for two growth parameters. This could include other things like M and steepness as well.
+
+```{r, eval = FALSE}
+
+library(FishLife)
+library(mvtnorm)
+params <- matrix(c('Loo', 'K'), ncol=2)
+x <- Search_species(Genus="Hippoglossoides")$match_taxonomy
+y <- Plot_taxa(x, params=params)
+
+## multivariate normal in log space for two growth parameters
+mu <- y[[1]]$Mean_pred[params]
+Sigma <- y[[1]]$Cov_pred[params, params]
+
+## log density in R
+dmvnorm(x=c(3,-2), mean=mu, sigma=Sigma, log=TRUE)
+
+## Would look something like this, specify which parameter names,
+## the mean and covariance, and that it's in log space
+
+population$SetGrowth(ewaa_growth$get_id())
+population$SetPriors( pars=params, mu=mu, Sigma=Sigma,
+        family=’multivariate_normal’, log=TRUE)
+```
+
+Jacobian adjustments during integration, see this [comment](https://github.com/NOAA-FIMS/FIMS/issues/431#issuecomment-1930450473) for links and background
+
+```{r, eval = FALSE}
+## how to deal with Jacobians?
+success <- CreateTMBModel(optimization=TRUE)
+parameters <- list(p = get_fixed())
+obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", silent = TRUE)
+obj$fn() ## does not include Jacobian adjustments from priors
+
+## can still be optimized but will include Jacobians so the MLE
+## is really the posterior mode
+success <- CreateTMBModel(optimization=FALSE)
+parameters <- list(p = get_fixed())
+obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", silent = TRUE)
+obj$fn() ## does include Jacobian adjustments from priors
+```
+
+MCMC integration of a model
+The R package ‘tmbstan’ provides the most straightforward way to generate posterior samples for a FIMS model. It is demonstrated briefly below.
+```{r, eval = FALSE}
+## Try MCMC integration with tmbstan. Also see new package
+
+## StanEstimators which may work better
+library(tmbstan)
+library(shinystan)
+obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", silent=TRUE, map=map)
+opt <- fit_tmb(obj, getsd=FALSE, newtonsteps=0, control=list(trace=0))
+fit <- tmbstan(obj, init='last.par.best', control=list(max_treedepth=10))
+launch_shinystan(fit)
+
+## get posterior samples from parameters
+df <- as.data.frame(fit)
+df <- df[,-ncol(df)] # drop lp__
+## for each posterior draw, report to get SSB
+postreps <- list()
+for(ii in 1:nrow(df)){
+  if(ii %% 10==0) print(ii)
+  postreps[[ii]] <- obj$rep(df[ii,])
+}
+## This is the posterior distribution of SSB
+ssbpost <- lapply(postreps, function(x) data.frame(year=years, ssb=x$ssb[[1]][-55]))%>%
+  bind_rows %>% mutate(rep=rep(1:nrow(df), each=54))
+```
+
+#### Cross validation for model selection
+
+Cross validation techniques require the model to report the log-likelihoods for each data point, even when left out of the model (e.g., by setting it to NA). One example is PSIS-LOO for Bayesian models, as demonstrated below. But the fundamental need here is for the report function to return all individual log-likelihood values for a given set of parameters. Exact cross validation means to leave out sets of data and rerun the model. How to choose which groupings of data to leave out depends on the goals. See examples of frequentist versions in papers that do it randomly, or leave out a whole year [here](https://doi.org/10.1016/j.fishres.2011.04.017) and [here](https://doi.org/10.1016/j.fishres.2021.106071). A Bayesian implementation is done in [this paper](https://doi.org/10.1093/icesjms/fsab165).
+
+```{r, eval = FALSE}
+## for each posterior draw, get point-wise log-likelihoods from
+## the report
+df <- as.data.frame(fit)
+postreps <- list()
+for(ii in 1:nrow(df)){
+  if(ii %% 10==0) print(ii)
+  loglikes[[ii]] <- get_pointwise_loglikelihoods(obj$rep(df[ii,]))
+}
+
+## drop empty columns, and the cols with only zeroes
+loglikes <- loglikes[,-ncol(loglikes)] %>% as.matrix
+loglikes <- loglikes[,-which(apply(loglikes,2, max)==0)]
+stopifnot(!any(is.na(loglikes)))
+library(loo)
+id <- rep(1:cores,each=nrow(tmp)/cores)
+neff <- relative_eff(loglikes, chain_id=id)
+loo1 <- loo(x=loglikes, r_eff=neff)
+print(loo1)
+plot(loo1)
+```
+
+#### Process errors for hierarchical models
+
+A variety of types of random effects structures can be applied to different components of the FIMS model. 
+
+Types to consider:
+1. iid standard normal: recruitment
+2. AR(1), random-walk: univariate smoothers on parameters (selectivity, M, etc.), or data inputted for covariate smoothing in covariate-linked assessments.
+3. 2D AR(1), age-cohort-year 2D AR(1) [see [this paper](https://doi.org/10.1016/j.fishres.2023.106755)], SPDE spatial
+
+```{r, eval = FALSE}
+## Need to specify which components have random effects, the
+## structure type, initialize them, and whether they're esitmated
+recruitment$logit_steep$is_random_effect <- FALSE
+recruitment$logit_steep$random_effect_type <- "AR1"
+recruitment$logit_steep$process_pars_init <- c(1,0)
+## E.g., estimate correlation but not variance term
+recruitment$logit_steep$process_pars_estimated <- c(FALSE,TRUE)
+
+## multivariate on a single population process
+population$estimate_M <- TRUE
+population$add_random_effects(par='log_M', type='2d-AR1',
+                              init=c(1,0,0), estimated=c(0,1,1))
+```
+
+
+
 
 ### Hierarchical Class Structure for Distributions
 
