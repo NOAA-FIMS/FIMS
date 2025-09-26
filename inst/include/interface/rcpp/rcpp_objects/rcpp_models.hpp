@@ -1257,15 +1257,18 @@ public:
     for (it = this->population_ids->begin(); it != this->population_ids->end();
          ++it)
     {
-      std::shared_ptr<PopulationInterface> population =
-          std::dynamic_pointer_cast<PopulationInterface>(
-              PopulationInterfaceBase::live_objects[(*it)]);
+      auto it2 = PopulationInterfaceBase::live_objects.find(*it);
+      if (it2 == PopulationInterfaceBase::live_objects.end())
+      {
+        throw std::runtime_error("Population ID " + std::to_string(*it) + " not found in live_objects");
+      }
+      auto population = std::dynamic_pointer_cast<PopulationInterface>(it2->second);
 
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
-          model->GetPopulationDerivedQuantities((*it));
+          model->GetPopulationDerivedQuantities(population->id);
 
       std::map<std::string, fims_popdy::DimensionInfo> &derived_quantities_dim_info =
-          model->GetPopulationDimensionInfo((*it));
+          model->GetPopulationDimensionInfo(population->id);
 
       std::stringstream ss;
 
@@ -1279,7 +1282,7 @@ public:
 
       derived_quantities["total_landings_numbers"] =
           fims::Vector<Type>(population->nyears.get());
-          
+
       derived_quantities_dim_info["total_landings_numbers"] =
           fims_popdy::DimensionInfo("total_landings_numbers",
                                     fims::Vector<int>{population->nyears.get()},

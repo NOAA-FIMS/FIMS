@@ -22,6 +22,13 @@ test-initialize_modules.R
 test-integration-caa-mle-wrappers.R
 test-integration-caa-mle.R
 test-integration-fims-bayesian-prior-predictive.R
+test-integration-fims-estimation-random-effects-with-wrappers.R
+test-integration-fims-estimation-random-effects-with-wrappers.R:2
+test-integration-fims-estimation-random-effects-with-wrappers.R:7
+test-integration-fims-estimation-random-effects-with-wrappers.R:40
+test-integration-fims-estimation-random-effects-with-wrappers.R:188
+test-integration-fims-estimation-random-effects-with-wrappers.R:290
+test-integration-fims-estimation-random-effects-with-wrappers.R:315
 test-is_fims_verbose.R
 test-logit.R
 test-parallel-caa-mle-wrappers.R

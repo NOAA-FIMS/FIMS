@@ -155,11 +155,9 @@ namespace fims_popdy
 
         // Reset the derived quantities for the population
         typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-        for (it = derived_quantities.begin(); it != derived_quantities.end();
-             it++)
+        for (auto &kv : derived_quantities)
         {
-          fims::Vector<Type> &dq = (*it).second;
-          this->ResetVector(dq);
+          this->ResetVector(kv.second);
         }
 
         // Prepare proportion_female
@@ -184,15 +182,13 @@ namespace fims_popdy
            ++fit)
       {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-        std::map<std::string, fims::Vector<Type>> &derived_quantities =
+        auto &derived_quantities =
             this->GetFleetDerivedQuantities(fleet->GetId());
         typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-
-        for (it = derived_quantities.begin(); it != derived_quantities.end();
-             it++)
+        for (auto &kv : derived_quantities)
         {
-          fims::Vector<Type> &dq = (*it).second;
-          this->ResetVector(dq);
+          std::cout << fleet->id << " " << kv.first << std::endl;
+          this->ResetVector(kv.second);
         }
 
         // Transformation Section

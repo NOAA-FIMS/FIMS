@@ -305,126 +305,152 @@ namespace fims_popdy
      */
     std::map<std::string, fims::Vector<Type>> &GetFleetDerivedQuantities(uint32_t fleet_id)
     {
-      return (*fleet_derived_quantities)[fleet_id];
+      if (!fleet_derived_quantities)
+      {
+        throw std::runtime_error("GetFleetDerivedQuantities: fleet_derived_quantities is null");
+      }
+      auto &outer = *fleet_derived_quantities;
+      auto it = outer.find(fleet_id);
+      if (it == outer.end())
+      {
+        std::ostringstream ss;
+        ss << "GetFleetDerivedQuantities: fleet_id " << fleet_id << " not found in fleet_derived_quantities";
+        throw std::out_of_range(ss.str());
+      }
+      return it->second;
     }
+  
 
-    /**
-     * @brief Get the population derived quantities for a specified population.
-     *
-     * @param population_id The ID of the population.
-     * @return std::map<std::string, fims::Vector<Type>>&
-     */
-    std::map<std::string, fims::Vector<Type>> &GetPopulationDerivedQuantities(uint32_t population_id)
+  /**
+   * @brief Get the population derived quantities for a specified population.
+   *
+   * @param population_id The ID of the population.
+   * @return std::map<std::string, fims::Vector<Type>>&
+   */
+  std::map<std::string, fims::Vector<Type>> &
+  GetPopulationDerivedQuantities(uint32_t population_id)
+  {
+    if (!population_derived_quantities)
     {
-      return (*population_derived_quantities)[population_id];
+      throw std::runtime_error("GetPopulationDerivedQuantities: population_derived_quantities is null");
     }
-
-    /**
-     * @brief Get the fleet dimension information for a specified fleet.
-     *
-     * @param fleet_id The ID of the fleet.
-     * @return std::map<std::string, DimensionInfo>
-     */
-    std::map<std::string, DimensionInfo> &GetFleetDimensionInfo(uint32_t fleet_id)
+    auto &outer = *population_derived_quantities;
+    auto it = outer.find(population_id);
+    if (it == outer.end())
     {
-      return (*fleet_dimension_info)[fleet_id];
+      std::ostringstream ss;
+      ss << "GetPopulationDerivedQuantities: population_id " << population_id << " not found in population_derived_quantities";
+      throw std::out_of_range(ss.str());
     }
+    return it->second;
+  }
 
-    /**
-     * @brief Get the population dimension information for a specified population.
-     *
-     * @param population_id The ID of the population.
-     * @return std::map<std::string, DimensionInfo>
-     */
-    std::map<std::string, DimensionInfo> &GetPopulationDimensionInfo(uint32_t population_id)
-    {
-      return (*population_dimension_info)[population_id];
-    }
+  /**
+   * @brief Get the fleet dimension information for a specified fleet.
+   *
+   * @param fleet_id The ID of the fleet.
+   * @return std::map<std::string, DimensionInfo>
+   */
+  std::map<std::string, DimensionInfo> &GetFleetDimensionInfo(uint32_t fleet_id)
+  {
+    return (*fleet_dimension_info)[fleet_id];
+  }
 
-    /**
-     * @brief Get the fleet uncertainty report information.
-     */
-    UncertaintyReportInfoMap &GetFleetUncertaintyReportInfo()
-    {
-      return *fleet_uncertainty_report_info;
-    }
+  /**
+   * @brief Get the population dimension information for a specified population.
+   *
+   * @param population_id The ID of the population.
+   * @return std::map<std::string, DimensionInfo>
+   */
+  std::map<std::string, DimensionInfo> &GetPopulationDimensionInfo(uint32_t population_id)
+  {
+    return (*population_dimension_info)[population_id];
+  }
 
-    /**
-     * @brief Get the population uncertainty report information.
-     */
-    UncertaintyReportInfoMap &GetPopulationUncertaintyReportInfo()
-    {
-      return *population_uncertainty_report_info;
-    }
+  /**
+   * @brief Get the fleet uncertainty report information.
+   */
+  UncertaintyReportInfoMap &GetFleetUncertaintyReportInfo()
+  {
+    return *fleet_uncertainty_report_info;
+  }
 
-    /**
-     * @brief Get the fleet uncertainty report information for a specified fleet.
-     *
-     * @param fleet_id The ID of the fleet.
-     * @return std::map<std::string, UncertaintyReportInfo>&
-     */
-    std::map<std::string, UncertaintyReportInfo> &GetFleetUncertaintyReportInfo(uint32_t fleet_id)
-    {
-      return (*fleet_uncertainty_report_info)[fleet_id];
-    }
+  /**
+   * @brief Get the population uncertainty report information.
+   */
+  UncertaintyReportInfoMap &GetPopulationUncertaintyReportInfo()
+  {
+    return *population_uncertainty_report_info;
+  }
 
-    /**
-     * @brief Get the population uncertainty report information for a specified population.
-     *
-     * @param population_id The ID of the population.
-     * @return std::map<std::string, UncertaintyReportInfo>&
-     */
-    std::map<std::string, UncertaintyReportInfo> &GetPopulationUncertaintyReportInfo(uint32_t population_id)
-    {
-      return (*population_uncertainty_report_info)[population_id];
-    }
+  /**
+   * @brief Get the fleet uncertainty report information for a specified fleet.
+   *
+   * @param fleet_id The ID of the fleet.
+   * @return std::map<std::string, UncertaintyReportInfo>&
+   */
+  std::map<std::string, UncertaintyReportInfo> &GetFleetUncertaintyReportInfo(uint32_t fleet_id)
+  {
+    return (*fleet_uncertainty_report_info)[fleet_id];
+  }
 
-    /**
-     * @brief Initialize a model.
-     *
-     */
-    virtual void Initialize() {}
+  /**
+   * @brief Get the population uncertainty report information for a specified population.
+   *
+   * @param population_id The ID of the population.
+   * @return std::map<std::string, UncertaintyReportInfo>&
+   */
+  std::map<std::string, UncertaintyReportInfo> &GetPopulationUncertaintyReportInfo(uint32_t population_id)
+  {
+    return (*population_uncertainty_report_info)[population_id];
+  }
 
-    /**
-     * @brief Prepare the model.
-     *
-     */
-    virtual void Prepare() {}
+  /**
+   * @brief Initialize a model.
+   *
+   */
+  virtual void Initialize() {}
 
-    /**
-     * @brief Reset a vector from start to end with a value.
-     *
-     * @param v A vector to reset.
-     * @param value The value you want to use for all elements in the
-     * vector. The default is 0.0.
-     */
-    virtual void ResetVector(fims::Vector<Type> &v, Type value = 0.0)
-    {
-      std::fill(v.begin(), v.end(), value);
-    }
+  /**
+   * @brief Prepare the model.
+   *
+   */
+  virtual void Prepare() {}
 
-    /**
-     * @brief Evaluate the model.
-     *
-     */
-    virtual void Evaluate() {}
+  /**
+   * @brief Reset a vector from start to end with a value.
+   *
+   * @param v A vector to reset.
+   * @param value The value you want to use for all elements in the
+   * vector. The default is 0.0.
+   */
+  virtual void ResetVector(fims::Vector<Type> &v, Type value = 0.0)
+  {
+    std::fill(v.begin(), v.end(), value);
+  }
 
-    /**
-     * @brief Report the model results via TMB.
-     *
-     */
-    virtual void Report() {}
+  /**
+   * @brief Evaluate the model.
+   *
+   */
+  virtual void Evaluate() {}
 
-    /**
-     * @brief Get the Id object.
-     *
-     * @return uint32_t
-     */
-    uint32_t GetId() { return this->id; }
-  };
+  /**
+   * @brief Report the model results via TMB.
+   *
+   */
+  virtual void Report() {}
 
-  template <typename Type>
-  uint32_t FisheryModelBase<Type>::id_g = 0;
+  /**
+   * @brief Get the Id object.
+   *
+   * @return uint32_t
+   */
+  uint32_t GetId() { return this->id; }
+};
+
+template <typename Type>
+uint32_t FisheryModelBase<Type>::id_g = 0;
 
 } // namespace fims_popdy
 #endif

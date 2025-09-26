@@ -1,4 +1,5 @@
 write("test-integration-fims-estimation-random-effects-with-wrappers.R", file = "debug_log.txt", append = TRUE)
+write("test-integration-fims-estimation-random-effects-with-wrappers.R:2", file = "debug_log.txt", append = TRUE)
 
 load(test_path("fixtures", "integration_test_data.RData"))
 
