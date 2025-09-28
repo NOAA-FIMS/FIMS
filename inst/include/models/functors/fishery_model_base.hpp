@@ -13,7 +13,7 @@
 #include "../../common/fims_math.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../population_dynamics/population/population.hpp"
-
+#include "../../common/information.hpp"
 /**
  * @brief The population dynamics of FIMS.
  *
@@ -45,6 +45,12 @@ namespace fims_popdy
      */
     DimensionInfo(const std::string &name, const fims::Vector<int> &dims, const fims::Vector<std::string> &dim_names)
         : name(name), ndims(dims.size()), dims(dims), dim_names(dim_names) {}
+
+    /**
+     * Copy constructor
+     */
+    DimensionInfo(const DimensionInfo &other)
+        : name(other.name), ndims(other.dims.size()), dims(other.dims), dim_names(other.dim_names) {}
   };
 
   /**
@@ -309,7 +315,59 @@ namespace fims_popdy
      */
     std::map<std::string, fims::Vector<Type>> &GetFleetDerivedQuantities(uint32_t fleet_id)
     {
-      return (*fleet_derived_quantities)[fleet_id];
+      if (!fleet_derived_quantities)
+      {
+
+        throw std::runtime_error("GetFleetDerivedQuantities: fleet_derived_quantities is null");
+      }
+      auto &outer = *fleet_derived_quantities;
+      auto it = outer.find(fleet_id);
+      if (it == outer.end())
+      {
+        std::stringstream ss;
+
+        ss << "GetFleetDerivedQuantities: fleet_id " << fleet_id << " not found in fleet_derived_quantities";
+        throw std::out_of_range(ss.str());
+      }
+      return it->second;
+    }
+
+    void InitializeFleetDerivedQuantities(uint32_t fleet_id)
+    {
+      // Ensure the shared_ptr exists
+      if (!fleet_derived_quantities)
+      {
+        fleet_derived_quantities = std::make_shared<
+            std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>>();
+      }
+
+      auto &outer = *fleet_derived_quantities;
+
+      // Insert only if not already present
+      if (outer.find(fleet_id) == outer.end())
+      {
+        outer.emplace(fleet_id,
+                      std::map<std::string, fims::Vector<Type>>{});
+      }
+    }
+
+    void InitializePopulationDerivedQuantities(uint32_t population_id)
+    {
+      // Ensure the shared_ptr exists
+      if (!population_derived_quantities)
+      {
+        population_derived_quantities = std::make_shared<
+            std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>>();
+      }
+
+      auto &outer = *population_derived_quantities;
+
+      // Insert only if not already present
+      if (outer.find(population_id) == outer.end())
+      {
+        outer.emplace(population_id,
+                      std::map<std::string, fims::Vector<Type>>{});
+      }
     }
 
     /**
@@ -318,9 +376,23 @@ namespace fims_popdy
      * @param population_id The ID of the population.
      * @return std::map<std::string, fims::Vector<Type>>&
      */
-    std::map<std::string, fims::Vector<Type>> &GetPopulationDerivedQuantities(uint32_t population_id)
+    std::map<std::string, fims::Vector<Type>> &
+    GetPopulationDerivedQuantities(uint32_t population_id)
     {
-      return (*population_derived_quantities)[population_id];
+
+      if (!population_derived_quantities)
+      {
+        throw std::runtime_error("GetPopulationDerivedQuantities: population_derived_quantities is null");
+      }
+      auto &outer = *population_derived_quantities;
+      auto it = outer.find(population_id);
+      if (it == outer.end())
+      {
+        std::ostringstream ss;
+        ss << "GetPopulationDerivedQuantities: population_id " << population_id << " not found in population_derived_quantities";
+        throw std::out_of_range(ss.str());
+      }
+      return it->second;
     }
 
     /**

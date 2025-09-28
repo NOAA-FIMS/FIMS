@@ -171,7 +171,7 @@ public:
   {
 #ifdef TMB_MODEL
     std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();  
+        fims_info::Information<double>::GetInstance();
     typename fims_info::Information<double>::model_map_iterator model_it;
     model_it = info->models_map.find(this->get_id());
     if (model_it != info->models_map.end())
@@ -188,7 +188,7 @@ public:
   {
 #ifdef TMB_MODEL
     std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();  
+        fims_info::Information<double>::GetInstance();
     typename fims_info::Information<double>::model_map_iterator model_it;
     model_it = info->models_map.find(this->get_id());
     if (model_it != info->models_map.end())
@@ -202,7 +202,7 @@ public:
 #else
     return false;
 #endif
-  } 
+  }
 
   /**
    * @brief Method to get this id.
@@ -677,25 +677,46 @@ public:
     Rcpp::Environment TMB = Rcpp::Environment::namespace_env("TMB");
     Rcpp::Function MakeADFun = TMB["MakeADFun"];
     Rcpp::Function sdreport = TMB["sdreport"];
-    // Grab your helpers from R global environment
-    Rcpp::Environment global = Rcpp::Environment::global_env();
+
     // Build parameters list
     Rcpp::List parameters = Rcpp::List::create(
         Rcpp::Named("p") = this->get_fixed_parameters_vector(),
         Rcpp::Named("re") = this->get_random_parameters_vector());
+
     // Call MakeADFun with map = NULL
-    Rcpp::List obj = MakeADFun(
-        Rcpp::Named("data") = Rcpp::List::create(),
-        Rcpp::Named("parameters") = parameters,
-        Rcpp::Named("DLL") = "FIMS",
-        Rcpp::Named("silent") = true,
-        Rcpp::Named("map") = R_NilValue,
-        Rcpp::Named("random") = "re");
-    // Call obj$report()
+    Rcpp::List obj;
+    try
+    {
+      obj = MakeADFun(
+          Rcpp::Named("data") = Rcpp::List::create(),
+          Rcpp::Named("parameters") = parameters,
+          Rcpp::Named("DLL") = "FIMS",
+          Rcpp::Named("silent") = true,
+          Rcpp::Named("map") = R_NilValue,
+          Rcpp::Named("random") = "re");
+    }
+    catch (std::exception &ex)
+    {
+      Rcpp::stop("MakeADFun failed: %s", ex.what());
+    }
+
+    // Extract functions
     Rcpp::Function report = obj["report"];
     Rcpp::Function func = obj["fn"];
     Rcpp::Function gradient = obj["gr"];
-    Rcpp::NumericVector grad = gradient(this->get_fixed_parameters_vector());
+
+    // Gradient
+    Rcpp::NumericVector grad;
+    try
+    {
+      grad = gradient(this->get_fixed_parameters_vector());
+    }
+    catch (...)
+    {
+      Rcpp::Rcerr << "Gradient evaluation failed\n";
+      grad = Rcpp::NumericVector::create(NA_REAL);
+    }
+
     double maxgc = -999;
     for (R_xlen_t i = 0; i < grad.size(); i++)
     {
@@ -704,25 +725,72 @@ public:
         maxgc = std::fabs(grad[i]);
       }
     }
-    double of_value = Rcpp::as<double>(func(this->get_fixed_parameters_vector()));
-    Rcpp::List rep = report();
-    // // Standard deviations
-    SEXP sdr = sdreport(obj);
-    Rcpp::RObject sdr_summary = summary(sdr, "report");
 
-    Rcpp::NumericMatrix mat(sdr_summary);
-    Rcpp::List dimnames = mat.attr("dimnames");
-    Rcpp::CharacterVector rownames = dimnames[0];
-    Rcpp::CharacterVector colnames = dimnames[1];
+    // Objective function value
+    double of_value = NA_REAL;
+    try
+    {
+      of_value = Rcpp::as<double>(func(this->get_fixed_parameters_vector()));
+    }
+    catch (...)
+    {
+      Rcpp::Rcerr << "Objective function evaluation failed\n";
+    }
+
+    // Report
+    Rcpp::List rep;
+    try
+    {
+      rep = report();
+    }
+    catch (...)
+    {
+      Rcpp::Rcerr << "Report failed\n";
+      rep = R_NilValue;
+    }
+
+    // sdreport + summary
+    SEXP sdr = R_NilValue;
+    Rcpp::DataFrame df;
+    Rcpp::CharacterVector rownames;
+    Rcpp::NumericVector estimates, stderrs;
+
+    try
+    {
+      sdr = sdreport(obj);
+      Rcpp::RObject sdr_summary = summary(sdr, "report");
+      df = Rcpp::as<Rcpp::DataFrame>(sdr_summary);
+
+      // Extract standard columns
+      if (df.containsElementNamed("Estimate"))
+      {
+        estimates = df["Estimate"];
+      }
+      if (df.containsElementNamed("Std. Error"))
+      {
+        stderrs = df["Std. Error"];
+      }
+
+      rownames = df.attr("row.names");
+    }
+    catch (std::exception &ex)
+    {
+      Rcpp::Rcerr << "sdreport/summary failed: " << ex.what() << "\n";
+      df = Rcpp::DataFrame::create();
+      estimates = Rcpp::NumericVector();
+      stderrs = Rcpp::NumericVector();
+      rownames = Rcpp::CharacterVector();
+    }
 
     // ---- Group into map ----
     std::map<std::string, std::vector<double>> grouped;
-    int nrow = mat.nrow();
-    for (int i = 0; i < nrow; i++)
+    if (rownames.size() == stderrs.size())
     {
-      std::string key = Rcpp::as<std::string>(rownames[i]);
-      double val = mat(i, 1); // col 1 = "Std. Error"
-      grouped[key].push_back(val);
+      for (int i = 0; i < rownames.size(); i++)
+      {
+        std::string key = Rcpp::as<std::string>(rownames[i]);
+        grouped[key].push_back(stderrs[i]);
+      }
     }
 
     // ---- Convert map -> R list ----
@@ -732,19 +800,22 @@ public:
       grouped_out[kv.first] = Rcpp::wrap(kv.second);
     }
 
-    // Example: grab "Estimate" for first row
-    double first_est = mat(0, 0);
+    double first_est = NA_REAL;
+    if (estimates.size() > 0)
+    {
+      first_est = estimates[0];
+    }
 
     return Rcpp::List::create(
         Rcpp::Named("objective_function_value") = of_value,
         Rcpp::Named("gradient") = grad,
         Rcpp::Named("max_gradient_component") = maxgc,
         Rcpp::Named("report") = rep,
-        Rcpp::Named("sdr_summary") = sdr_summary,
-        Rcpp::Named("sdr_summary_matrix") = mat,
+        Rcpp::Named("sdr_summary") = df, // return as DataFrame
+        Rcpp::Named("estimates") = estimates,
+        Rcpp::Named("std_errors") = stderrs,
         Rcpp::Named("first_est") = first_est,
         Rcpp::Named("rownames") = rownames,
-        Rcpp::Named("colnames") = colnames,
         Rcpp::Named("grouped_se") = grouped_out);
   }
 
@@ -754,33 +825,6 @@ public:
   virtual std::string to_json()
   {
 
-    Rcpp::List report = get_report();
-
-    Rcpp::List grouped_out = report["grouped_se"];
-    double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
-     Rcpp::NumericVector grad = report["gradient"];
-    double of_value = Rcpp::as<double>(report["objective_function_value"]);
-
-    fims::Vector<double> gradient(grad.size());
-    for (int i = 0; i < grad.size(); i++)
-    {
-      gradient[i] = grad[i];
-    }
-    // Assume grouped_out is an Rcpp::List
-    std::map<std::string, std::vector<double>> grouped_cpp;
-    Rcpp::CharacterVector names = grouped_out.names();
-    for (int i = 0; i < grouped_out.size(); i++)
-    {
-      std::string key = Rcpp::as<std::string>(names[i]);
-      Rcpp::NumericVector vec = grouped_out[i]; // each element is a numeric vector
-      std::vector<double> vec_std(vec.size());
-      for (int j = 0; j < vec.size(); j++)
-      {
-        vec_std[j] = vec[j];
-      }
-      grouped_cpp[key] = vec_std;
-    }
-    this->se_values = grouped_cpp;
     std::set<uint32_t> recruitment_ids;
     std::set<uint32_t> growth_ids;
     std::set<uint32_t> maturity_ids;
@@ -853,8 +897,6 @@ public:
 #endif
     ss << " \"id\": " << this->get_id() << ",\n";
     ss << " \"objective_function_value\": " << value << ",\n";
-    ss << " \"max_gradient_component\": " << max_gc << ",\n";
-    ss << " \"gradient\": " << gradient << ",\n";
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end(); module_id_it++)
     {
@@ -1088,11 +1130,11 @@ public:
       }
     }
     ss << "\n],\n";
-    //add log
-    ss<<" \"log\" : {\"info\" :"<<fims::FIMSLog::fims_log->get_info()<<","
-    <<"\"warinings\" :"<<fims::FIMSLog::fims_log->get_warnings()<<","
-    <<"\"errors\" :"<<fims::FIMSLog::fims_log->get_errors()<<"}}";
-
+    // add log
+    ss << " \"log\" : {\n";
+    ss << "\"info\" : " << fims::FIMSLog::fims_log->get_info() << ","
+       << "\"warnings\" : " << fims::FIMSLog::fims_log->get_warnings() << ","
+       << "\"errors\" : " << fims::FIMSLog::fims_log->get_errors() << "}}";
 #ifdef TMB_MODEL
     model->do_reporting = true;
 #endif
@@ -1173,6 +1215,7 @@ public:
   template <typename Type>
   bool add_to_fims_tmb_internal()
   {
+    
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -1196,20 +1239,24 @@ public:
     for (it = this->population_ids->begin(); it != this->population_ids->end();
          ++it)
     {
-      std::shared_ptr<PopulationInterface> population =
-          std::dynamic_pointer_cast<PopulationInterface>(
-              PopulationInterfaceBase::live_objects[(*it)]);
-
+      auto it2 = PopulationInterfaceBase::live_objects.find(*it);
+      if (it2 == PopulationInterfaceBase::live_objects.end())
+      {
+        throw std::runtime_error("Population ID " + std::to_string(*it) + " not found in live_objects");
+      }
+      auto population = std::dynamic_pointer_cast<PopulationInterface>(it2->second);
+      model->InitializePopulationDerivedQuantities(population->id);
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
-          model->GetPopulationDerivedQuantities((*it));
+          model->GetPopulationDerivedQuantities(population->id);
 
       std::map<std::string, fims_popdy::DimensionInfo> &derived_quantities_dim_info =
-          model->GetPopulationDimensionInfo((*it));
+          model->GetPopulationDimensionInfo(population->id);
 
       std::stringstream ss;
 
       derived_quantities["total_landings_weight"] =
           fims::Vector<Type>(population->nyears.get());
+
       derived_quantities_dim_info["total_landings_weight"] =
           fims_popdy::DimensionInfo("total_landings_weight",
                                     fims::Vector<int>{(int)population->nyears.get()},
@@ -1217,6 +1264,7 @@ public:
 
       derived_quantities["total_landings_numbers"] =
           fims::Vector<Type>(population->nyears.get());
+
       derived_quantities_dim_info["total_landings_numbers"] =
           fims_popdy::DimensionInfo("total_landings_numbers",
                                     fims::Vector<int>{population->nyears.get()},
@@ -1317,7 +1365,7 @@ public:
       std::shared_ptr<FleetInterface> fleet_interface =
           std::dynamic_pointer_cast<FleetInterface>(
               FleetInterfaceBase::live_objects[(*it)]);
-
+      model->InitializeFleetDerivedQuantities(fleet_interface->id);
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           model->GetFleetDerivedQuantities(fleet_interface->id);
 

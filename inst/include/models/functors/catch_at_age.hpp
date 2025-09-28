@@ -155,17 +155,18 @@ class CatchAtAge : public FisheryModelBase<Type> {
       {
         std::shared_ptr<fims_popdy::Population<Type>> &population =
             this->populations[p];
-        auto &derived_quantities =
-            this->GetPopulationDerivedQuantities(population->GetId());
 
-        // Reset the derived quantities for the population
-        typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-        for (it = derived_quantities.begin(); it != derived_quantities.end();
-             it++)
-        {
-          fims::Vector<Type> &dq = (*it).second;
-          this->ResetVector(dq);
-        }
+       
+          auto &derived_quantities =
+              this->GetPopulationDerivedQuantities(population->GetId());
+
+          // Reset the derived quantities for the population
+          typename fims_popdy::Population<Type>::derived_quantities_iterator it;
+          for (auto &kv : derived_quantities)
+          {
+            this->ResetVector(kv.second);
+          }
+    
 
         // Prepare proportion_female
         for (size_t age = 0; age < population->nages; age++)
@@ -189,15 +190,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
            ++fit)
       {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-        std::map<std::string, fims::Vector<Type>> &derived_quantities =
+        auto &derived_quantities =
             this->GetFleetDerivedQuantities(fleet->GetId());
         typename fims_popdy::Population<Type>::derived_quantities_iterator it;
-
-        for (it = derived_quantities.begin(); it != derived_quantities.end();
-             it++)
+        for (auto &kv : derived_quantities)
         {
-          fims::Vector<Type> &dq = (*it).second;
-          this->ResetVector(dq);
+          this->ResetVector(kv.second);
         }
 
         // Transformation Section
@@ -1235,19 +1233,19 @@ class CatchAtAge : public FisheryModelBase<Type> {
           std::map<std::string, fims::Vector<Type>> &derived_quantities =
               this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
 
-          biomass_p(pop_idx) = derived_quantities["biomass"];
-          expected_recruitment_p(pop_idx) = derived_quantities["expected_recruitment"];
-          mortality_F_p(pop_idx) = derived_quantities["mortality_F"];
-          mortality_Z_p(pop_idx) = derived_quantities["mortality_Z"];
-          numbers_at_age_p(pop_idx) = derived_quantities["numbers_at_age"];
-          proportion_mature_at_age_p(pop_idx) = derived_quantities["proportion_mature_at_age"];
-          spawning_biomass_p(pop_idx) = derived_quantities["spawning_biomass"];
-          sum_selectivity_p(pop_idx) = derived_quantities["sum_selectivity"];
-          total_landings_numbers_p(pop_idx) = derived_quantities["total_landings_numbers"];
-          total_landings_weight_p(pop_idx) = derived_quantities["total_landings_weight"];
-          unfished_biomass_p(pop_idx) = derived_quantities["unfished_biomass"];
-          unfished_numbers_at_age_p(pop_idx) = derived_quantities["unfished_numbers_at_age"];
-          unfished_spawning_biomass_p(pop_idx) = derived_quantities["unfished_spawning_biomass"];
+          biomass_p(pop_idx) = derived_quantities["biomass"].to_tmb();
+          expected_recruitment_p(pop_idx) = derived_quantities["expected_recruitment"].to_tmb();
+          mortality_F_p(pop_idx) = derived_quantities["mortality_F"].to_tmb();
+          mortality_Z_p(pop_idx) = derived_quantities["mortality_Z"].to_tmb();
+          numbers_at_age_p(pop_idx) = derived_quantities["numbers_at_age"].to_tmb();
+          proportion_mature_at_age_p(pop_idx) = derived_quantities["proportion_mature_at_age"].to_tmb();
+          spawning_biomass_p(pop_idx) = derived_quantities["spawning_biomass"].to_tmb();
+          sum_selectivity_p(pop_idx) = derived_quantities["sum_selectivity"].to_tmb();
+          total_landings_numbers_p(pop_idx) = derived_quantities["total_landings_numbers"].to_tmb();
+          total_landings_weight_p(pop_idx) = derived_quantities["total_landings_weight"].to_tmb();
+          unfished_biomass_p(pop_idx) = derived_quantities["unfished_biomass"].to_tmb();
+          unfished_numbers_at_age_p(pop_idx) = derived_quantities["unfished_numbers_at_age"].to_tmb();
+          unfished_spawning_biomass_p(pop_idx) = derived_quantities["unfished_spawning_biomass"].to_tmb();
           pop_idx += 1;
         }
 
@@ -1260,28 +1258,28 @@ class CatchAtAge : public FisheryModelBase<Type> {
           std::map<std::string, fims::Vector<Type>> &derived_quantities =
               this->GetFleetDerivedQuantities(fleet->GetId());
 
-          agecomp_expected_f(fleet_idx) = derived_quantities["agecomp_expected"];
-          agecomp_proportion_f(fleet_idx) = derived_quantities["agecomp_proportion"];
-          catch_index_f(fleet_idx) = derived_quantities["catch_index"];
-          index_expected_f(fleet_idx) = derived_quantities["index_expected"];
-          index_numbers_f(fleet_idx) = derived_quantities["index_numbers"];
-          index_numbers_at_age_f(fleet_idx) = derived_quantities["index_numbers_at_age"];
-          index_numbers_at_length_f(fleet_idx) = derived_quantities["index_numbers_at_length"];
-          index_weight_f(fleet_idx) = derived_quantities["index_weight"];
-          index_weight_at_age_f(fleet_idx) = derived_quantities["index_weight_at_age"];
-          landings_expected_f(fleet_idx) = derived_quantities["landings_expected"];
-          landings_numbers_f(fleet_idx) = derived_quantities["landings_numbers"];
-          landings_numbers_at_age_f(fleet_idx) = derived_quantities["landings_numbers_at_age"];
-          landings_numbers_at_length_f(fleet_idx) = derived_quantities["landings_numbers_at_length"];
-          landings_weight_f(fleet_idx) = derived_quantities["landings_weight"];
-          landings_weight_at_age_f(fleet_idx) = derived_quantities["landings_weight_at_age"];
+          agecomp_expected_f(fleet_idx) = derived_quantities["agecomp_expected"].to_tmb();
+          agecomp_proportion_f(fleet_idx) = derived_quantities["agecomp_proportion"].to_tmb();
+          catch_index_f(fleet_idx) = derived_quantities["catch_index"].to_tmb();
+          index_expected_f(fleet_idx) = derived_quantities["index_expected"].to_tmb();
+          index_numbers_f(fleet_idx) = derived_quantities["index_numbers"].to_tmb();
+          index_numbers_at_age_f(fleet_idx) = derived_quantities["index_numbers_at_age"].to_tmb();
+          index_numbers_at_length_f(fleet_idx) = derived_quantities["index_numbers_at_length"].to_tmb();
+          index_weight_f(fleet_idx) = derived_quantities["index_weight"].to_tmb();
+          index_weight_at_age_f(fleet_idx) = derived_quantities["index_weight_at_age"].to_tmb();
+          landings_expected_f(fleet_idx) = derived_quantities["landings_expected"].to_tmb();
+          landings_numbers_f(fleet_idx) = derived_quantities["landings_numbers"].to_tmb();
+          landings_numbers_at_age_f(fleet_idx) = derived_quantities["landings_numbers_at_age"].to_tmb();
+          landings_numbers_at_length_f(fleet_idx) = derived_quantities["landings_numbers_at_length"].to_tmb();
+          landings_weight_f(fleet_idx) = derived_quantities["landings_weight"].to_tmb();
+          landings_weight_at_age_f(fleet_idx) = derived_quantities["landings_weight_at_age"].to_tmb();
           // length_comp_expected_f(fleet_idx) = derived_quantities["length_comp_expected"];
           // length_comp_proportion_f(fleet_idx) = derived_quantities["length_comp_proportion"];
-          lengthcomp_expected_f(fleet_idx) = derived_quantities["lengthcomp_expected"];
-          lengthcomp_proportion_f(fleet_idx) = derived_quantities["lengthcomp_proportion"];
-          log_index_expected_f(fleet_idx) = derived_quantities["log_index_expected"];
-          log_landings_expected_f(fleet_idx) = derived_quantities["log_landings_expected"];
-          f_mort_f(fleet_idx) = fleet->Fmort;
+          lengthcomp_expected_f(fleet_idx) = derived_quantities["lengthcomp_expected"].to_tmb();
+          lengthcomp_proportion_f(fleet_idx) = derived_quantities["lengthcomp_proportion"].to_tmb();
+          log_index_expected_f(fleet_idx) = derived_quantities["log_index_expected"].to_tmb();
+          log_landings_expected_f(fleet_idx) = derived_quantities["log_landings_expected"].to_tmb();
+          f_mort_f(fleet_idx) = fleet->Fmort.to_tmb();
           fleet_idx += 1;
         }
 

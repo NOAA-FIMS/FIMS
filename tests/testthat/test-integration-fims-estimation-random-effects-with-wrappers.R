@@ -466,10 +466,11 @@ test_that("estimation test with recruitment re on logr", {
   )
   fit_log_devs <- fit_fims(parameter_list, optimize = TRUE)
 
-  clear()
 
   expect_equal(fit_log_r@report[["nll_components"]], fit_log_devs@report[["nll_components"]], tolerance = .001)
-  expect_equal(fit_log_r@report[["recruitment"]], fit_log_devs@report[["recruitment"]], tolerance = .001)
+  expect_equal(fit_log_r@report[["expected_recruitment"]], fit_log_devs@report[["expected_recruitment"]], tolerance = .001)
   expect_lte(fit_log_r@timing[["time_optimization"]], fit_log_devs@timing[["time_optimization"]])
   expect_lte(fit_log_r@timing[["time_sdreport"]], fit_log_devs@timing[["time_sdreport"]])
+
+  clear()
 })

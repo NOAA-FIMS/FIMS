@@ -40,6 +40,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
    * @brief Evaluates the lognormal probability density function
    */
   virtual const Type evaluate() {
+    
     // set vector size based on input type (prior, process, or data)
     size_t n_x = this->get_n_x();
     // setup vector for recording the log probability density function values
@@ -121,7 +122,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
 #endif
     }
 #ifdef TMB_MODEL
-    vector<Type> lognormal_x = this->x;
+    vector<Type> lognormal_x = this->x.to_tmb();
     //  FIMS_REPORT_F(lognormal_x, this->of);
 #endif
     return (lpdf);
