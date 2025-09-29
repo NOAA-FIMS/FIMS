@@ -45,8 +45,8 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     // setup vector for recording the log probability density function values
     this->lpdf_vec.resize(n_x);
     this->report_lpdf_vec.resize(n_x);
-    std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
-    std::fill(this->report_lpdf_vec.begin(), this->report_lpdf_vec.end(), 0);
+    std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), static_cast<Type>(0));
+    std::fill(this->report_lpdf_vec.begin(), this->report_lpdf_vec.end(), static_cast<Type>(0));
     this->lpdf = static_cast<Type>(0);
 
     // Dimension checks
@@ -97,7 +97,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
                   fims_math::exp(log_sd.get_force_scalar(i)), true);
       }
       this->report_lpdf_vec[i] = this->lpdf_vec[i];
-      this->lpdf += this->lpdf_vec[i];
+      lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {  // preprocessor definition in interface.hpp
                                      // this simulates data that is mean biased
@@ -124,7 +124,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     vector<Type> lognormal_x = this->x;
     //  FIMS_REPORT_F(lognormal_x, this->of);
 #endif
-    return (this->lpdf);
+    return (lpdf);
   }
 };
 }  // namespace fims_distributions

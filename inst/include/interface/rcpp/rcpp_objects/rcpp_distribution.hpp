@@ -626,7 +626,7 @@ public:
         }
       }
 
-      this->lpdf_vec = Rcpp::NumericVector(dlnorm->report_lpdf_vec.size());
+      this->lpdf_vec = RealVector(dlnorm->report_lpdf_vec.size());
       if (this->expected_values.size() == 1)
       {
         this->expected_values.resize(this->lpdf_vec.size()); // dlnorm->expected_values.size());
