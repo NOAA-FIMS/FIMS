@@ -134,7 +134,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
             dplyr::pull(fleet_name) |>
             unique() |>
             length(),
-            # Or we can use get_n_fleets(data),
+          # Or we can use get_n_fleets(data),
           "nlengths" = get_n_lengths(data),
           "nseasons" = 1,
           "nyears" = get_n_years(data)
