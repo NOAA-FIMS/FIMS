@@ -418,7 +418,7 @@ public:
     ss << "\"name\":\"" << (*it).first << "\",\n";
     ss << dim_entry.str() << ",\n";
     ss << "\"value\":[";
-
+    ss << std::fixed << std::setprecision(10);
     if (dq.size() > 0)
     {
       for (size_t i = 0; i < dq.size() - 1; i++)
@@ -1215,7 +1215,7 @@ public:
   template <typename Type>
   bool add_to_fims_tmb_internal()
   {
-    
+
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
