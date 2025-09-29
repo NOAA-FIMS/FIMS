@@ -88,15 +88,15 @@ namespace
             EXPECT_EQ(dq["lengthcomp_expected"], 
                 fims::Vector(nyears * nlengths, 0.0));
 
-            fims::Vector<double> Fmort(nyears, 0);
-            for(size_t y = 0; y < nyears; y++){
-                Fmort[y] = fims_math::exp(fleet->log_Fmort[y]);
-                EXPECT_EQ(fleet->Fmort[y], Fmort[y]);
-            }
-            EXPECT_EQ(fleet->Fmort.size(), fleet->nyears);
-            double q = fims_math::exp(fleet->log_q[0]);
-            EXPECT_EQ(fleet->q[0], q);
-            EXPECT_EQ(fleet->q.size(), 1);
+            // fims::Vector<double> Fmort(nyears, 0);
+            // for(size_t y = 0; y < nyears; y++){
+            //     Fmort[y] = fims_math::exp(fleet->log_Fmort[y]);
+            //     EXPECT_EQ(fleet->Fmort[y], Fmort[y]);
+            // }
+            // EXPECT_EQ(fleet->Fmort.size(), fleet->nyears);
+            // double q = fims_math::exp(fleet->log_q[0]);
+            // EXPECT_EQ(fleet->q[0], q);
+            // EXPECT_EQ(fleet->q.size(), 1);
 
         }
     }

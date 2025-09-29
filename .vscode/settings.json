@@ -1,8 +1,9 @@
 {
     "files.associations": {
-      "*.rmd": "markdown",
-      "*.Rmd": "markdown",
-      "vector": "cpp"
+        "*.rmd": "markdown",
+        "*.Rmd": "markdown",
+        "vector": "cpp",
+        "map": "cpp"
     },
     "githubPullRequests.ignoredPullRequestBranches": [
         "main"

@@ -13,7 +13,6 @@
 #include "../../common/fims_math.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../population_dynamics/population/population.hpp"
-#include "../../common/information.hpp"
 /**
  * @brief The population dynamics of FIMS.
  *
@@ -77,8 +76,6 @@ namespace fims_popdy
      * * length of the report vector
      */
     size_t length_m;
-    
-    
 
     /**
      * @brief Default constructor for UncertaintyReportInfo.
@@ -103,11 +100,11 @@ namespace fims_popdy
         : name(other.name), id_m(other.id_m), start_m(other.start_m), length_m(other.length_m) {}
   };
 
-  template <typename Type>
   /**
    * @brief FisheryModelBase is a base class for fishery models in FIMS.
    *
    */
+  template <typename Type>
   class FisheryModelBase : public fims_model_object::FIMSObject<Type>
   {
     static uint32_t id_g; /*!< global id where unique id is drawn from for fishery model object*/
@@ -454,7 +451,6 @@ namespace fims_popdy
     {
       return (*population_uncertainty_report_info)[population_id];
     }
-
 
     /**
      * @brief Initialize a model.
