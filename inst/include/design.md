@@ -6,6 +6,18 @@ TODO: add doi links to all citations
 
 Design choices for the Fisheries Integrated Modeling System (FIMS) are collaborative and often involve tradeoffs. The path to these decisions are documented below to help both current and future developers understand why things are the way they are. In the beginning, FIMS was designed to have enough complexity to adequately test a very standard population model. For this reason, we implemented the minimum structure needed to run the model described in [Li et al. 2021](https://spo.nmfs.noaa.gov/content/fishery-bulletin/comparison-4-primary-age-structured-stock-assessment-models-used-united). Thus, the single model available in FIMS could run an age-structured integrated assessment model with two fleets (one survey, one fishery), where each fleet provided data aggregated across sexes. Since then, FIMS has evolved to be true to its name, i.e., "System", where the back-end code can accommodate more models than just a catch-at-age model and the estimation of random effects is possible.
 
+## Software languages
+
+FIMS is available as an R package with compiled C++ code. Rcpp, an R package, helps to link the two languages together. The choice to use R was a natural one given that almost every assessment platform currently in use within the United States interacts with R in some way and almost all assessment scientists are trained in R. The choice to use C++ as the core coding language for the back-end population-dynamics code was decided upon after a comprehensive analysis of available platforms and their performance, speed, usability (with respect to both the user and developer), and software features that meet FIMS requirements under consideration.
+
+The cross-comparison study focused on a state-space and spatial model developed and implemented across the following software platforms: ADMB, TMB, C++, Julia, and Stan. Additionally, a hybrid modular C++ case study was developed to explore the implementation of a portable framework. Pathways for both frequentist and Bayesian inference were considered. TMB with templated C++ functions was seen as the optimum path going forward.
+
+C++ is a compiled programming language that is advanced in its development cycle with an established user and development community. A number of platforms currently used in fisheries and nonlinear statistical modeling are either directly written in or compiled into C++ (e.g.m ADMB, TMB, Stan, etc.). The language features and functionality of the combination of TMB and C++ best met the criteria set forward by FIMS requirements. The disadvantages of TMB are its tight coupling with R and a small development team. But, the modular C++ templated framework with a TMB interface allows for increased portability to other software platforms. This portability increases the ease of transferring FIMS to another C++ interfaced platform if a new, more improved platform emerges.
+
+TMB provides several key advantages with respect to statistical inference compared to the other platforms. First and most importantly, the Laplace approximation used by TMB is flexible and efficient and consequently the most powerful frequentist software for mixed effects models of those compared. TMB's Laplace-approximation framework is mature and proven in existing state-space models like the Woods Hole Assessment Model and the Stock Assessment Model, while the other platforms capabilities are non-existent or currently limited (predominantly in their flexibility). Notably, for purely fixed effects models (e.g., penalized likelihood) TMB is equivalent to ADMB in speed and accuracy. These powerful capabilities are an especially compelling argument for TMB because the majority of statistical catch-at-age assessments use frequentist inference. Despite this, Bayesian inference has some clear advantages over frequentists approaches and may grow in popularity with FIMS users if it is easy to implement and has fast run times. Stan is the most advanced Bayesian software option, with a large development and user base, and is expected to serve as crucible for future advances in statistical algorithms. TMB can take advantage of the Stan framework via the tmbstan R package which links TMB models to the underlying Stan statistical algorithms (bypassing Stan's modeling language). So, we expect that any current and future algorithms can be trivially leveraged for any TMB model, with approximately equivalent MCMC efficiencies (i.e., run times). TMB and tmbstan thus provides modern Bayesian integration while only losing the advantages of the Stan model language (e.g., sophisticated parameterizations with automatic Jacobian adjustment which are unlikely to be large in the context of FIMS). In summary, by utilizing TMB's statistical capabilities FIMS will have state-of-the-art frequentist and Bayesian inference.
+
+As recommended by the [Writing R Extensions manual](https://cran.r-project.org/doc/manuals/r-release/R-exts.html), the C++ is structured using a main .cpp file, i.e., `FIMS.cpp`, that is located in the src/ directory and a number of modules in the inst/include/.
+
 ## Model families
 
 In FIMS, we refer to different model types as "model families" where a catch-at-age model is one model family. A surplus production model is an example of a different model family. Each of the available model families in FIMS are described below.
@@ -27,10 +39,10 @@ There are several approaches available to fit length data in an assessment model
 | Approach | FIMS version | Pros | Cons |
 |----------------|----------------|----------------|------------------------|
 | Empirical length at age | NA | Fast, allows functional forms of length selection | No uncertainty in length at age and no fishery impacts on length-at-age structure |
-| Age–to-length transition matrix | 0.3.0 | Allows for length-based selectivity | Does not allow for internal estimation of growth or fishery impact on length-at-age structure |
+| Age-to-length transition matrix | 0.3.0 | Allows for length-based selectivity | Does not allow for internal estimation of growth or fishery impact on length-at-age structure |
 | State-space |  | State-space flexibility | Current practices in USA is focused on parametric modeling, SAM does not incorporate length in current form |
-| Estimated age–length transition matrix |  | Allows for selectivity at length, tracks numbers- and age-at-length information | Slow due to dense matrices, does not track length-specific fishing impacts |
-| Full age–length structure |  | Does not assume fixed age-length key with a potential to scale complexity/runtime | Could be computationally intensive based on bin size |
+| Estimated age-length transition matrix |  | Allows for selectivity at length, tracks numbers- and age-at-length information | Slow due to dense matrices, does not track length-specific fishing impacts |
+| Full age-length structure |  | Does not assume fixed age-length key with a potential to scale complexity/runtime | Could be computationally intensive based on bin size |
 Table: Potential methods for fitting to length data in an assessment model.
 
 ##### Empirical length at age
@@ -51,7 +63,7 @@ Caveats
 * Assumes no variability in length-at-age processes.
 * Does not allow length-based mortality to influence the length structure of the population.
 
-##### Age–to-length transition matrix
+##### Age-to-length transition matrix
 
 The use of an age-to-length transition matrix to fit length data within an age-structured assessment model is commonly used for models presented to the North Pacific Fisheries Management Council and is sometimes referred to as the Alaska Method.
 
@@ -75,7 +87,7 @@ For a fishing fleet, the predicted proportions at age (i.e., marginal age compos
 
 \f[ \hat{p}_{y,f,a}=\frac{\hat{C}_{y,f,a}}{\sum\limits_{a}{\hat{C}_{y,f,a}}} \f]
 
-Predicted proportions at age are converted to predicted proportions at length (i.e., marginal length compositions) using the dot product of \f$ \hat{p}_{y,f,a} \f$ and the age-to-length transition matrix \f$ \phi_{a,l} \f$:
+Predicted proportions at age are converted to predicted proportions at length (i.e., marginal length compositions) using the dot product of \f$\hat{p}_{y,f,a}\f$ and the age-to-length transition matrix \f$\phi_{a,l}\f$:
 
 \f[ \hat{p}_{y,f,l}=\hat{p}_{y,f,a}\cdot\phi_{y,f,l,a} \f]
 
@@ -109,7 +121,7 @@ Caveats
 
 ##### Estimated age-to-length transition matrix
 
-The age–to-length transition matrix can be estimated within the assessment model instead of specified as a fixed input. This method has a proven track record for estimating growth (TODO: citation) by fitting to numerous types of size-based data (e.g., marginal length-composition and conditional age-at-length data) and allowing for the estimation of length-based and/or age-based selectivity functions. The capacity to model length- and age-based selectivity effects simultaneously has been found to significantly improve fits to the composition data for red snapper in the southeast U.S.A. This method of being able to estimate the age–to-length transition matrix can be found in Stock Synthesis 3 (SS3; Methot and Wetzel, 2013) and was recently implemented in the ["growth"](https://github.com/GiancarloMCorrea/wham/tree/growth) branch of the Wood's Hole Assessment Model (WHAM; Stock and Miller, 2021; Correa et al., 2023).
+The age-to-length transition matrix can be estimated within the assessment model instead of specified as a fixed input. This method has a proven track record for estimating growth (TODO: citation) by fitting to numerous types of size-based data (e.g., marginal length-composition and conditional age-at-length data) and allowing for the estimation of length-based and/or age-based selectivity functions. The capacity to model length- and age-based selectivity effects simultaneously has been found to significantly improve fits to the composition data for red snapper in the southeast U.S.A. This method of being able to estimate the age-to-length transition matrix can be found in Stock Synthesis 3 (SS3; Methot and Wetzel, 2013) and was recently implemented in the ["growth"](https://github.com/GiancarloMCorrea/wham/tree/growth) branch of the Wood's Hole Assessment Model (WHAM; Stock and Miller, 2021; Correa et al., 2023).
 
 Internally estimating the age-to-length transition matrix will also allow us to include a range of parametric, semi-parametric, and non-parametric growth functions using random effects (Correa et al., 2023).
 
@@ -176,10 +188,10 @@ An alternate path for FIMS could be to specify abundance at age and length allow
 \hat{C}_{y,f,l,a}=S_{y,f,l}S_{y,f,a}F_{y,f}N_{y,a,l}\frac{(1-\text{exp}(-Z_{y,a,l}))}{Z_{y,a,l}}
 \f]
 
-It will instead require abundance at size and age to be incorporated through a transfer array \f$tran_{a1,l1,a2,l2}\f$ used to specify the proportional movement between length bins for each age step.
+It will instead require abundance at size and age to be incorporated through a transfer array \f$\text{transfer array}_{a1,l1,a2,l2}\f$ used to specify the proportional movement between length bins for each age step.
 
 \f[
-\ N_{y+1,a2,l2}={\sum\limits_{{l}}} tran_{a1,l1,l2}S_{y,f,l}S_{y,f,a}F_{y,f}N_{y,a,l}\frac{\text{exp}(-Z_{y,a,l})}{Z_{y,a,l}}
+\ N_{y+1,a2,l2}={\sum\limits_{{l}}} \text{transfer array}_{a1,l1,l2}S_{y,f,l}S_{y,f,a}F_{y,f}N_{y,a,l}\frac{\text{exp}(-Z_{y,a,l})}{Z_{y,a,l}}
 \f]
 
 This transfer array would specify the source of individuals for every length and age bin that is tracked. These values could be input as a fixed empirical array or calculated based on a parametric rule. A dense formulation assuming all possible transfer combinations between length bins at each age would likely be too slow for practical implementation requiring \f$\text{n_length_bins} \times \text{n_length_bins} \times \text{n_age_bins}\f$ computations. Computational efficiency could then be achieved by reducing the number of tracked bins and the number of bins between which abundance transfers occur to achieve sparsity. As an example, a Stock Synthesis growth-morph style could be used by having a limited number of length bins at each age representing different growth curves where individuals only grow along their growth curve, and thus, the transfer proportion between bins would be 1 for a single pair and zero for all others, which could be ignored, producing a sparse calculation of \f$\text{n_length_bins} \times \text{n_age_bins}\f$ calculations. If only a limited number of length bins are tracked in the population module, an interpolation approach will be needed to calculate abundance by length at age in composition bins that do not match the population bins. If growth is not estimated, then many functions could be used but if growth is estimated a dynamic approach adaptable to variable population bin values will be needed that does not require if statements. Bezier curve interpolation may work for this but needs investigation. <!-- Research Idea -->
@@ -199,7 +211,7 @@ This method has the benefit of being able to represent true age and length speci
 As the complexity of the catch-at-age model in FIMS grows so will the number of system components that need indexed and how each component interacts. The following three goals should be kept in mind while reading this section
 
 * FIMS Needs to allow for a multi-sex population structure that includes hermaphrodites.
-* The structure needs to be easily generalizable to new levels of modeling complexity, including multiple areas.
+* The structure needs to be easily generalized to new levels of modeling complexity, including multiple areas.
 * FIMS needs to maintain maximum sparsity as dimensionality increases to optimize performance.
 
 Some use cases that have been thought of include using subpopulations to allow for predators and prey in the same model, males and females to be separate sub-populations, density-dependent mortality between age groups, sub-populations within an area, etc. Additional thought needs to be put into what would happen if each sup-population or data source has different years of data, would the extra years be filled with NAs or would we allow vector lengths to differ? There would also need to be some way to specify the type of link between sub-populations and method to operate on a one-step lag.
@@ -215,7 +227,7 @@ Table: Potential methods for indexing system components in an assessment model.
 
 ##### Populations as subpopulations
 
-In this scenario the existing population module becomes a sub-population. In this case each sub-population contains age/time structure with its own class. Sub-populations would be generalizable to different partitions, such as sex, area, and species, with a common set of functions that govern (1) interactions between sub-populations and (2) movement between sub-populations. Currently, each population within FIMS has members unique to each population. These members include parameters, derived quantities, and fixed values such as year and age dimensions.
+In this scenario the existing population module becomes a sub-population. In this case each sub-population contains age/time structure with its own class. Sub-populations would be generalized to different partitions, such as sex, area, and species, with a common set of functions that govern (1) interactions between sub-populations and (2) movement between sub-populations. Currently, each population within FIMS has members unique to each population. These members include parameters, derived quantities, and fixed values such as year and age dimensions.
 
 If this were to be implemented in FIMS, the following would be requirements of the implementation:
 
@@ -241,7 +253,7 @@ In this scenario a sub-population would be created for every unique sub-unit of 
 
 A standard age structured model would have \f$n+1\f$ subpopulations for the number of ages in the population and a plus group. Transition dynamics would then be 100% movement of individuals from one age bin to the next at each annual time step with the age zero bin being filled via a recruitment function and the plus group applying mortality and 1 year of aging to the plus group and then averaging that age and size with the incoming individuals from the last tracked age bin based on their relative abundances.
 
-A purely length structured model could be produced by using \f$n\f$ lengths subpopulations and defining transition dynamics between those length bins at each time step. From these a fully age/length specific model could be expanded if desired and sparsity maintained by only having length bins for the reasonably abundance lengths at each age. Using this type of structure it may also be possible to represent fishing and survey fleets as subpopulations as their interactions are analogous to predation in a multispecies model.
+A purely length structured model could be produced by using \f$n\f$ lengths subpopulations and defining transition dynamics between those length bins at each time step. From these a fully age/length specific model could be expanded if desired and sparsity maintained by only having length bins for the reasonably abundance lengths at each age. Using this type of structure it may also be possible to represent fishing and survey fleets as subpopulations as their interactions are analogous to predation in a multi-species model.
 
 Once could even explicitly model mature and immature individuals as separate subpopulations to enable different growth and fishery selectivity impacts. [Berger et al. (2024)](https://doi.org/10.1016/j.fishres.2024.107008) shows how this method breaks down because areas implemented as a population can be too restrictive if there is much adult movement.
 
@@ -253,100 +265,100 @@ Alternatively in FIMS, growth could be area-specific and, when fish move between
 
 ### Surplus production model
 
-Surplus production models (SPMs) are used for the management of many data-moderate populations and as a diagnostic tool for age-structured assessment models. **The goal is to be able to use FIMS to run an SPM using the same data input structure as a statistical catch-at-age FIMS model (FIMSframe) and a new SPM module, to produce estimates of biomass, harvest rate, and management reference points.** Current best practice recommendations for SPMs ([Kokkalis et al. 2024](https://doi.org/10.1016/j.fishres.2024.107010)) include the use of
+Surplus production models (SPMs) are used for the management of many data-moderate populations and as a diagnostic tool for age-structured assessment models. **The goal is to be able to use FIMS to run a surplus production model using the same data input structure as a statistical catch-at-age FIMS model (FIMSFrame) and a new surplus production model module, to produce estimates of biomass, harvest rate, and management reference points.** Current best practice recommendations for surplus production models ([Kokkalis et al. 2024](https://doi.org/10.1016/j.fishres.2024.107010)) include the use of
 
 1. state-space models (e.g., [SPiCT](https://github.com/DTUAqua/spict) and [JABBA](https://github.com/jabbamodel/JABBA/tree/master))  
 2. Bayesian frameworks or penalized likelihood with priors for MLE
-3. no priors on stock-specific model parameters (carrying capacity and maximum sustainable yield) when fitting data to an SPM using MLE  
-4. uninformative priors when fitting data to an SPM using Bayesian methods  
-5. convergence checks, residuals, prior-posterior distribution comparisons, retrospective analysis, hindcasting analysis (sequentially removing data and testing the model's predictive ability for removed data), and jitter analysis as diagnostics  
+3. no priors on stock-specific model parameters (carrying capacity and maximum sustainable yield) when fitting data to an surplus production model using MLE  
+4. uninformative priors when fitting data to a surplus production model using Bayesian methods  
+5. convergence checks, residuals, prior-posterior distribution comparisons, retrospective analysis, hind-cast analysis (sequentially removing data and testing the model's predictive ability for removed data), and jitter analysis as diagnostics  
 6. stochastic reference points that include correction factors that depend on estimated error from biomass process when shape parameter is \> 1 (if m \< 1, use deterministic reference points)
 
-SPMs combine all aspects of a population's growth, recruitment, and mortality into one production function and assume that the effect is the same on all parts of the modeled population. This is a major difference between SPMs and statistical-catch-at-age models, which separate population dynamic relationships and age-classes. Note, because there is no age- or size-specific information, there are no age- or size-dependent processes in the model and the portion of the population that is being modeled is the portion that is reflected by the indices of abundance. SPMs strive to describe the population dynamics over time based on the stock's response to fishing pressure (reflected in the index of abundance or catch per unit effort, CPUE, trends) and the historical catches, which provide an indication of the scale of the population.
+Surplus production models combine all aspects of a population's growth, recruitment, and mortality into one production function and assume that the effect is the same on all parts of the modeled population. This is a major difference between surplus production models and statistical-catch-at-age models, which separate population dynamic relationships and age-classes. Note, because there is no age- or size-specific information, there are no age- or size-dependent processes in the model and the portion of the population that is being modeled is the portion that is reflected by the indices of abundance. Surplus production models strive to describe the population dynamics over time based on the stock's response to fishing pressure (reflected in the index of abundance or catch per unit effort, CPUE, trends) and the historical catches, which provide an indication of the scale of the population.
 
 #### Equations
 
-The goal is to estimate the unobserved quantity of the total population biomass for a given year. To do this, we rely on observed fishery catch data and indices of abundance, such as catch-per-unit-effort from a fishery or a relative index of abundance from a fishery-independent survey. There is a strong assumption that the indices of abundance provide a good idea of how the population responds to fishing pressure over time so the trend of the indices should represent the trend of the population’s biomass over time. While indices of abundance inform the trend of the population over time, catch data informs the scale of the population. In a surplus production model, the total population biomass in year \f$t\f$ is calculated by:
+The goal is to estimate the unobserved quantity of the total population biomass for a given year. To do this, we rely on observed fishery catch data and indices of abundance, such as catch-per-unit-effort from a fishery or a relative index of abundance from a fishery-independent survey. There is a strong assumption that the indices of abundance provide a good idea of how the population responds to fishing pressure over time so the trend of the indices should represent the trend of the population's biomass over time. While indices of abundance inform the trend of the population over time, catch data informs the scale of the population. In a surplus production model, the total population biomass in year \f$t\f$ is calculated by
 \f[
-\begin{align}   
+\begin{align}
 \nonumber B_{0} &= B_{init},\quad t = 0  \\
-\nonumber B_{t+1} &= B_{t} + rB_{t}(1-\frac{B_{t}}{K})-C_{t},\quad t = 1…T     
+\nonumber B_{t+1} &= B_{t} + rB_{t}(1-\frac{B_{t}}{K})-C_{t},\quad t = 1...T
 \end{align}
 \f]
-where \f$t\f$ \= year, \f$B\f$ \= biomass, \f$B_{init}\f$ \= initial biomass, \f$K\f$ \= carrying capacity, \f$r\f$ \= intrinsic growth rate of the population, and \f$C\f$ \= catch. Biomass in year \f$t+1\f$ is dependent on biomass in year \f$t\f$, the amount of production (recruitment, growth, and death) in year \f$t\f$, and catch in year \f$t\f$. If data is available from the assumed start of the fishery, \f$B_{init} = K\f$, otherwise, initial biomass can be estimated based on initial depletion (\f$\psi\f$): 
+where \f$t\f$ \= year, \f$B\f$ \= biomass, \f$B_{init}\f$ \= initial biomass, \f$K\f$ \= carrying capacity, \f$r\f$ \= intrinsic growth rate of the population, and \f$C\f$ \= catch. Biomass in year \f$t+1\f$ is dependent on biomass in year \f$t\f$, the amount of production (recruitment, growth, and death) in year \f$t\f$, and catch in year \f$t\f$. If data is available from the assumed start of the fishery, \f$B_{init} = K\f$, otherwise, initial biomass can be estimated based on initial depletion (\f$\psi\f$)
 \f[  
 B_{init} = K\psi
 \f]
-To estimate the unobserved quantity of biomass, we can fit the model to the indices of abundance. Based on the assumptions of the model, biomass is related to the indices of abundance by a catchability, \f$q\f$, parameter:   
+To estimate the unobserved quantity of biomass, we can fit the model to the indices of abundance. Based on the assumptions of the model, biomass is related to the indices of abundance by a catchability, \f$q\f$, parameter
 \f[
 \hat{I}_{t,f} = \frac{C_{t,f}}{E_{t,f}} = q_{f}B_{t}  
 \f]
-where \f$\hat{I}_{t,f}\f$, is the predicted index of abundance in year \f$t\f$ for fleet \f$f\f$, and \f$q_{f}\f$ is the catchability coefficient (the amount of biomass or catch taken/one unit of effort) for fleet \f$f\f$. It is assumed that the index of abundance is a good representation of the population’s trend and response to fishing pressure over the timeseries. Therefore, the model tries to minimize the difference between the observed index values (\f$I_{t,f}\f$) and the predicted index values (\f$\hat{I}_{t,f}\f$) by finding the values for \f$B_{t}\f$ and \f$q_{f}\f$ that best fit the observed index values.   
-The production function (represented by \f$rB_{t}(1-B_{t}K\f$) in the biomass equation) can be parameterized in several ways. 
+where \f$\hat{I}_{t,f}\f$, is the predicted index of abundance in year \f$t\f$ for fleet \f$f\f$, and \f$q_{f}\f$ is the catchability coefficient (the amount of biomass or catch taken/one unit of effort) for fleet \f$f\f$. It is assumed that the index of abundance is a good representation of the population's trend and response to fishing pressure over the timeseries. Therefore, the model tries to minimize the difference between the observed index values (\f$I_{t,f}\f$) and the predicted index values (\f$\hat{I}_{t,f}\f$) by finding the values for \f$B_{t}\f$ and \f$q_{f}\f$ that best fit the observed index values. The production function (represented by \f$rB_{t}(1-B_{t}K\f$) in the biomass equation) can be parameterized in several ways. Where \f$m\f$ is the shape parameter that determines the \f$B/K\f$ ratio where maximum surplus production is attained. If \f$m = 2\f$, the model reduces down to the Schaefer model, if \f$m \approx 1\f$, the model reduces to the Fox model but there is no exact solution if \f$m = 1\f$. **We decided to use the Pella-Tomlinson implementation of the production function because it is the most flexible model, a shape parameter of 2 will give a Schaefer model and 1 will give the Fox model.** See below for the biomass equation for each model.
 
+##### Schaefer model
 
-### Schaefer model 
-### Schaefer model 
-\f$
+\f[
 f(B_{t}) = rB_{t}(1-\frac{B_{t}}{K})
-\f$
-### Fox model
+\f]
+
+##### Fox model
+
+\f[
+f(B_{t}) = log(K)rB_{t}(1-\frac{log(B_{t})}{log(K)})
+\f]
+
+##### **Pella-Tomlinson model**
+
+\f[
+f(B_{t}) = \frac{r}{m-1}B_{t}(1-(\frac{B_{t}}{K})^{m-1})  
+\f]
+\f[
+f(B_{t}) = rB_{t}(1-\frac{B_{t}}{K})
+\f]
+
+##### Fox model
+
 \f$
 f(B_{t}) = log(K)rB_{t}(1-\frac{log(B_{t})}{log(K)})
 \f$
-### **Pella-Tomlinson model**
+
+##### **Pella-Tomlinson model**
+
 \f$
 f(B_{t}) = \frac{r}{m-1}B_{t}(1-(\frac{B_{t}}{K})^{m-1})  
 \f$
-f(B_{t}) = rB_{t}(1-\frac{B_{t}}{K})
-\f$
-### Fox model
-\f$
-f(B_{t}) = log(K)rB_{t}(1-\frac{log(B_{t})}{log(K)})
-\f$
-### **Pella-Tomlinson model**
-\f$
-f(B_{t}) = \frac{r}{m-1}B_{t}(1-(\frac{B_{t}}{K})^{m-1})  
-\f$
-
-where \f$m\f$ is the shape parameter that determines the \f$B/K\f$ ratio where maximum surplus production is attained at. If \f$m = 2\f$, the model reduces down to the Schaefer model, if \f$m \approx 1\f$, the model reduces to the Fox model but there is no exact solution if \f$m = 1\f$. **We decided to use the Pella-Tomlinson implementation of the production function because it is the most flexible model, the shape parameter at 2 will give a Schaefer model and at 1 will give the Fox.**
-
 
 ##### State-space formulation
 
-State-space models are a type of hierarchical model that allows the natural variability in the environment (process error, \f$\sigma^_{2}\f$) to be modeled separately from the error associated with observed data (observation error, \f$\tau^{2}\f$). To help with computational estimation, the model can be re-written in terms of depletion, \f$P_{t}\f$,  where \f$P_{t} = B_{t}K\f$ is an unobserved state. A Bayesian state-space formulation (Meyer and Millar, 1999) can be written as:  
+State-space models are a type of hierarchical model that allows the natural variability in the environment (process error, \f$\sigma^{2}\f$) to be modeled separately from the error associated with observed data (observation error, \f$\tau^{2}\f$). To help with computational estimation, the model can be re-written in terms of depletion, \f$P_{t}\f$, where \f$P_{t} = B_{t}K\f$ is an unobserved state. A Bayesian state-space formulation (Meyer and Millar, 1999) can be written as:  
 \f[
 \begin{align}
 \nonumber P_{0} &= \psi, \quad t = 0\\  
-\nonumber P_{t+1} &= P_{t}+\frac{r}{m-1}P_{t}(1-P_{t}^{m-1}) - \frac{C_{t}}{K}, \quad   t=1,...T \\ 
+\nonumber P_{t+1} &= P_{t}+\frac{r}{m-1}P_{t}(1-P_{t}^{m-1}) - \frac{C_{t}}{K}, \quad   t=1,...T \\
 \nonumber P_{t} | P_{t}, \sigma^{2} &\sim lognormal(ln(P_{t}), \sigma_{t}^{2}), \quad   t=0,....T  
 \end{align}
 \f]
 
 and the depletion is then fit to index of abundance assuming a lognormal distribution:
-\f[ 
+\f[
 I_{t,f}| P_{t},K,q_{f},\sigma^{2} \sim lognormal(ln[q_{f}P_{t}K], \tau^{2}) \quad  t=1,...T  
 \f]
-where \f$\psi\f$ is initial depletion (can be assumed to be 1 or estimated), and depletion in year \f$t\f$ (\f$P_{t}\f$) is log-normally distributed with a mean of \f$ln(P_{t})\f$ and log-normal process error variance (\f$\sigma^{2}\f$) and the expected index of abundance value is lognormally distributed with a mean of \f$ln[q_{f}P_{t}K]\f$ and log-normal observation variance of \f$\tau^{2}\f$. Annual biomass can then be calculated as:   
+where \f$\psi\f$ is initial depletion (can be assumed to be 1 or estimated), and depletion in year \f$t\f$ (\f$P_{t}\f$) is distributed using a lognormal distribution with a mean of \f$ln(P_{t})\f$ and lognormal process error variance (\f$\sigma^{2}\f$) and the expected index of abundance value is distributed using a lognormal distribution with a mean of \f$ln[q_{f}P_{t}K]\f$ and lognormal observation variance of \f$\tau^{2}\f$. Annual biomass can then be calculated as
 \f[
 B_{t}= P_{t}K
 \f]
 
 ##### Derived Quantities and Reference Points
 
-Annual harvest rate ($H_{t}$) is calculated by:   
+Annual harvest rate ($H_{t}$) is calculated using
 \f$
 H_{t} = \frac{C_{t}}{B_{t}}  
 \f$
-A penalty should be added to ensure that harvest rate does not go above 1.0, because while this may be possible mathematically, it is not possible biologically (cannot have more catch than biomass in a given year).   
-In the Pella-Tomlinson parameterization, the shape parameter, \f$m\f$ can be directly linked to biomass at maximum sustainable yield, \f$B_{MSY}\f$, by the ratio of \f$\frac{B_{MSY}}{K}\f$ by:
-
+A penalty should be added to ensure that harvest rate does not go above 1.0; because, while this may be possible mathematically, it is not possible biologically (cannot have more catch than biomass in a given year). In the Pella-Tomlinson parameterization, the shape parameter, \f$m\f$ can be directly linked to biomass at maximum sustainable yield, \f$B_{MSY}\f$, by the ratio of \f$\frac{B_{MSY}}{K}\f$ by
 \f$  
 \frac{B_{MSY}}{K} = m^{\frac{-1}{m-1}},  
 \f$
-
-therefore $B_{MSY}$ can be calculated as:
-
+therefore $B_{MSY}$ can be calculated as
 \f$  
 B_{MSY} = Km^{\frac{-1}{m-1}}.  
 \f$
@@ -357,8 +369,7 @@ The fishing mortality at maximum sustainable yield (MSY) can be calculated as:
 F_{MSY}=\frac{r}{m-1}(1-\frac{1}{m}).  
 \f$
 
-And MSY is given as: 
-
+And MSY is given as
 \f$  
 MSY=F_{MSY}B_{MSY}
 \f$
@@ -368,7 +379,7 @@ MSY=F_{MSY}B_{MSY}
 ##### Data
 
 * Time series of catch (as complete as possible)
-* Time series of index of relative abundance (fishery-independent or CPUE) with measure of uncertainty (annual CVs)
+* Time series of index of relative abundance (fishery-independent or CPUE) with measurements of uncertainty (annual coefficient of variations)
 
 ##### Parameters
 
@@ -384,7 +395,7 @@ In a Bayesian framework, priors for all parameters are needed. Basic parameters 
 |  | Process error | Inverse gamma | year |
 |  | Observation error | Inverse gamma | fleet and year |
 
-Note: Here is a running [list of parameters](https://docs.google.com/spreadsheets/d/1SnlXcfL90w6lEbPx1eRVRBXAEP3_97tzE1Oa_n2ivpM/edit?gid=2063265688#gid=2063265688) (names and abbreviations) that are currently in FIMS. Naming conventions and names are currently being discussed and will be modified after M2.
+Note: Here is a running [list of parameters](https://docs.google.com/spreadsheets/d/1SnlXcfL90w6lEbPx1eRVRBXAEP3_97tzE1Oa_n2ivpM/edit?gid=2063265688#gid=2063265688) (names and abbreviations) that are currently in FIMS. Naming conventions and names are currently being discussed and will be modified before version 1.0.
 
 ##### Model Setup
 
@@ -399,9 +410,9 @@ To run in a Bayesian framework, users will also need to specify some settings fo
 
 All sampling functionality will be done using `tmbstan()` or some other sampling function from a separate R package.
 
-#### SPM modules added to code base
+#### Modules added to code base
 
-The code for running an SPM will be added into surplus\_production\_model.hpp and include the following method calls.
+The code for running a surplus production model will be added into `surplus_production_model.hpp` and include the following method calls.
 
 ```c
 
@@ -429,7 +440,7 @@ The code for running an SPM will be added into surplus\_production\_model.hpp an
   // number of years and fleets. (N.B. This will be done in
   // nlimb() or in tmbStan.)
   calculateEstimatedParameters(
-num_years, num_fleets,
+       num_years, num_fleets,
        abundance_observed_I, abundance_expected_I,
        sample_r, sample_K, sample_m, sample_psi, sample_q,
        process_error_sigma, observation_error_tau,
@@ -452,15 +463,15 @@ TODO: The following 3 modules need to work on every draw.
 
 ```
 
-#### Proposed wrapper functions for running an SPM with FIMS
+#### Running a surplus production model
 
-We propose to create wrapper functions (currently being implemented by FIMS Wrapper Function group for SCAA) that the user can call to build and fit a surplus production model.
+##### Proposed wrapper functions
 
-Proposed FIMS SPM usage (similar to JABBA):
+The same wrapper functions used to fit a statistical catch-at-age model will be used to fit a surplus production model, i.e., `fit_fims()`. Additional helper functions will be available to set the model up similar to the workflow available in JABBA.
 
 ```r
 # User knows what's required (and appropriate units/scale) by running: ?FIMS::build_spm
-?FIMS::fit_spm
+?FIMS::fit_fims
 
 # Define inputs here
 fishery_catch <- x
@@ -480,7 +491,7 @@ initial_values_[1..num_chains] <- list(
 initial_values_full <- list(
   initial_values_1,
   initial_values_2,
-  …
+  ...
   initial_values_[num_chains]
 )
 
@@ -502,15 +513,8 @@ mcmc_settings <- list(
   seed
 )
 
-# Combine fishing and survey fleet data in the same tables.
-# Formatted as FIMSframe with, for example, first column "Fleet" 
-# denoting "Fishing" or "Survey".
-indices_of_abundance:
-    fishing_fleet_indices = …,
-    survey_fleet_indices = …,
-
-# Build the SPM object from the previously defined inputs
-spm_object = FIMS::build_spm(
+# Build the surplus production model object from the previously defined inputs
+spm_object <- FIMS::build_spm(
   catch = fishery_catch,
   indices_of_abundance = indices_of_abundance,
   initial_values = initial_values,
@@ -518,14 +522,14 @@ spm_object = FIMS::build_spm(
 )
 
 # Run the model
-spm_output = FIMS::fit_spm(
-  spm_object = spm_object,
-  optimization = BAYESIAN | MLE,
+spm_output <- FIMS::fit_spm(
+  spm_object,
+  optimization = c("Bayesian", "MLE")[1],
   markov_chain_monte_carlo = mcmc_settings
 )
 ```
 
-#### Running an SPM
+##### Using tmbstan
 
 Based on the current [GOA Pollock case study](https://github.com/NOAA-FIMS/case-studies/blob/3e8f058d636ccc1737e17a063e7df4ec03c8106e/content/AFSC-GOA-pollock.qmd#L229), running a FIMS model with `tmbstan()` can be done as follows. Note that code for implementing priors is under development and can be added once it is complete.
 
@@ -551,26 +555,24 @@ fit <- tmbstan(
 
 #### Outputs
 
-The current output of FIMS is a JSON file with all parameter estimates. The R interface group is currently working on writing R code to take the output and separate it into 2 "tibbles", one with "estimates" and one with "fits" (R code can be written later so no need to focus too much on that now). SPM output should follow the same format, making sure to include all information that would be needed. Expected outputs from an SPM would include: 
+FIMS output for all model families is structured using json, which contains information about the model fit and estimates. The estimates are easily read into a long table in R using helper functions, i.e., `get_estimates()`. Output for the surplus production model will be in the same format as all of the other models and will contain information on
 
-* "Estimates" tibble:   
-  * Posterior distributions of annual biomass and harvest rate  
-  * Posterior distributions of all parameters   
-  * Posterior distributions of reference points   
-* "Fits" tibble:   
-  * Expected values for CPUE/indices of abundance 
+* Posterior distributions of annual biomass and harvest rates
+* Posterior distributions of all parameters
+* Posterior distributions of reference points
+* Expected values for CPUE/indices of abundance
 
-Additional information to include with the values for bookkeeping would include: 
+Additional information stored in the estimates tibble includes
 
 * Time  
 * Prior (for MLE format we use initial value)  
 * Label (for estimates, e.g. b, f, etc.)  
-* Unit   
-* Distribution   
+* Unit
+* Distribution
 * Type  
-* Name (for fits, e.g. "survey1")
+* Name (for fits, e.g., "survey1")
 
-FIMS uses tables in a "long" format, so for each parameter (or year of a timeseries), there would be the same number of rows as draws that were saved in the output. For example, if a user ran a model with the following settings: 
+FIMS uses tables in a "long" format, so for each parameter (or year of a timeseries), there would be the same number of rows as draws that were saved in the output. For example, if a user ran a model with the following settings:
 
 * 3 chains  
 * 1,000 burn-in (or sometimes called warmup)  
@@ -578,16 +580,16 @@ FIMS uses tables in a "long" format, so for each parameter (or year of a timeser
 * 10 thinning interval
 
 ((10,000-1,000)/10)*3 = 2,700,  
-they would have a total of 2,700 draws. An example of what the output table would look like is: 
+they would have a total of 2,700 draws. An example of what the output table would look like is
 
-| Label | Time | Initial  | Estimate  | … (additional columns) |
+| Label | Time | Initial  | Estimate  | ... (additional columns) |
 | :---- | :---- | :---- | :---- | :---- |
 | biomass | 2000 | NA | 12000 |  |
 | biomass | 2000 | NA | 12002 |  |
-| …row 2,700 | 2000 | NA | 12010 |  |
+| ...row 2,700 | 2000 | NA | 12010 |  |
 | biomass | 2001 | NA | 11800 |  |
 | biomass | 2001 | NA | 11950 |  |
-| …row 5,400 | 2001 | NA | 11865 |  |
+| ...row 5,400 | 2001 | NA | 11865 |  |
 
 #### Comparison of requirements for models along the continuum
 
@@ -618,6 +620,7 @@ they would have a total of 2,700 draws. An example of what the output table woul
 
 ### Future models
 
+As more models are added to FIMS their specifications will go here. A sized-based model and a delay-difference model are planned for late 2026 or 2027.
 
 ## Projections
 
@@ -629,10 +632,7 @@ Successful fisheries management depends upon the implementation of regulations t
 
 Many approaches to (2) have been developed and implemented in current platforms used to conduct stock assessments. These approaches differ based on the extent of the simplifying assumptions made for future catches, fleet dynamics, environmental conditions, and biological parameters. Increasing the number of assumptions may speed up the calculations but estimates may suffer in their accuracy. Common simplifying assumptions include assuming constant selectivity and relative fishing mortality rate between fleets, which often allows an analytical solution to equilibrium yield without running long \~100 year projections.
 
-While useful in some cases, these analytical solutions given simplifying assumptions often perform poorly in cases where nonstationarity is likely, such as multi-area models or when management actions induce changes in selectivity over time. In these cases, reference points can be more accurately estimated by projecting future fishing effort subject to management constraints for enough years that an equilibrium population status is achieved. Future fishing effort can then be scaled to a level that achieves the targeted population status, i.e., (3).  
-The approach of projecting forward to an equilibrium state for estimating reference points and catch limits will be accomplished in FIMS by extending the model forward in time with assumed environmental conditions and priors that constrain parameters of interest such as future fishing mortality rates. This generalized structure will enable flexibility for the diversity of projection concerns posed by regional fishery management councils.
-
-### Projections
+While useful in some cases, these analytical solutions given simplifying assumptions often perform poorly in cases where non-stationarity is likely, such as multi-area models or when management actions induce changes in selectivity over time. In these cases, reference points can be more accurately estimated by projecting future fishing effort subject to management constraints for enough years that an equilibrium population status is achieved. Future fishing effort can then be scaled to a level that achieves the targeted population status, i.e., (3). The approach of projecting forward to an equilibrium state for estimating reference points and catch limits will be accomplished in FIMS by extending the model forward in time with assumed environmental conditions and priors that constrain parameters of interest such as future fishing mortality rates. This generalized structure will enable flexibility for the diversity of projection concerns posed by regional fishery management councils.
 
 The equations and C++ code that specify the population dynamics in FIMS for the model-fitting process are the same code that specifies the projections. Using the same code for projections decreases the amount of code that must be maintained and minimizes the chances for inconsistencies between the fitting and projection processes. Historically, this has not always been the default for assessment software; many platforms had limited functionality such that users had to write their own projection modules to meet management needs or did not offer projections at all (see examples of this in the Background section). Users can either extend their time series for projections during the fitting process or they can use `predict()` on a fitted model to get information about future scenarios. The `predict()` function can be more efficient than refitting the model from initial values for each future scenario that managers wish to gain information about. Additionally, users can set up multiple calls to `predict()` using {purrr} or a similar package like {furrr} to run several future scenarios at once in parallel or run the same scenario on more than one fitted model.
 
@@ -640,10 +640,10 @@ The equations and C++ code that specify the population dynamics in FIMS for the 
 
 Several assessment methods that predate FIMS have projection modules that are implemented externally to the main code base. The following list is just a subset of those that are available:
 
-* SSfuture was written in C++ to perform projections for models fit using Stock Synthesis because the functionality provided within the forecast file does not allow for the flexibility needed for the management of ISC Albacore and IATTC Bigeye.  
+* SSfuture was written in C++ to perform projections for models fit using Stock Synthesis because the functionality provided within the forecast file does not allow for the flexibility needed for the management of International Scientific Committee albacore and Inter-American Tropical Tuna Commission bigeye.  
 * [Decision Support Tool](https://github.com/nathanvaughan1/DST) was written by Nathan Vaughan to allow for future patterns to be different from historical patterns to overcome a limitation of Stock Synthesis.  
 * [SSMSE](https://github.com/nmfs-ost/SSMSE) was written by Kathryn Doering and Nathan Vaughan to facilitate manipulating the forecast file of Stock Synthesis to allow for management strategy evaluations (MSEs)
-* AFSC [standard projection model](https://github.com/afsc-assessments/spmR) was written by Jim Ianelli and accounts for uncertainty through recruitment draws; the framework can look at correlations between population processes and projects that forward   
+* Alaska Fishery Science Center [standard projection model](https://github.com/afsc-assessments/spmR) was written by Jim Ianelli and accounts for uncertainty through recruitment draws; the framework can look at correlations between population processes and projects that forward   
 * [AGEPRO](https://github.com/PIFSCstockassessments/AGEPRO) was written by Jon Brodziak
 
 Projections in FIMS were designed to limit the need for users to write external models to project a fitted FIMS model. Additionally, the following limitations of other platforms were key in decisions that were made for FIMS:
@@ -679,19 +679,8 @@ Below is pseudo code on how predict could be used for FIMS.
 
 ```r
 # Create parameters
-fleet1 <- survey1 <- list(
-  selectivity = list(form = "LogisticSelectivity"),
-  data_distribution = c(
-    Landings = "DlnormDistribution",
-    AgeComp = "DmultinomDistribution",
-    LengthComp = "DmultinomDistribution"
-  )
-)
-names(survey1[["data_distribution"]])[1] <- "Index"
 parameters <- FIMSFrame(data1) |>
-  create_default_parameters(
-    fleets = list(fleet1 = fleet1, survey1 = survey1)
-  )
+  create_default_parameters()
 
 # Run the  model with optimization
 fit <- parameters |>
@@ -699,15 +688,16 @@ fit <- parameters |>
   fit_fims(optimize = TRUE)
 
 # Project the model
-
-newparams <- parameters |> 
-  modify_parameters() |> 
-  modify_priors()
+new_data <- get_data(data1) |>
+  dplyr::full_join(projection_data) |>
+  FIMS::FIMSFrame()
+new_params <- parameters |> 
+  dplyr::rows_update()
 
 predict(
   fit,
-  newdata,# could include future catch
-  newparams, # includes parameters and prior specs
+  new_data,# could include future catch
+  new_params, # includes parameters and prior specs
   type = c('link', 'response')[2],
   se.fit = FALSE,
   do.bias.correct = FALSE,
@@ -715,26 +705,28 @@ predict(
 ) 
 ```
 
-* TODO(Today): what should be arguments in predict versus modifiers using |\>, e.g., modify\_priors()  
-* Number of arguments \- combine configuration into a tibble? Example from [indexwc](https://github.com/pfmc-assessments/indexwc/blob/main/data-raw/configuration.csv)  
-* Set years where take out removals in projection years, functionality for years specific percentages (e.g. OFL out each year)  
-* Arguments related to running MCMC sampling (e.g. in sdmTMB mcmc\_samples argument)  
-* Consider time-varying with respect to reference points, how would be address these?  
-* Re form flexible for speed and turning random effects on/off \- not high priority  
-* Se.fit can capture a lot of options, eg. CI and prediction intervals, data model uncertainty  
-* Object that shows what options were in predict functions so they can be saved \- can this be added to the JSON output?  
-* In sdmtmb, tmb object reinitialized with parameters, redo model configuration settings, use simulate function  
-* tinyvast has a more efficient way to set up predictions  
-  * Here's the prediction in tinyvast R: [https://github.com/vast-lib/tinyVAST/blob/50580ec2cc77e9becfaef80f516688f9a01dd7e1/R/predict.R\#L63](https://github.com/vast-lib/tinyVAST/blob/50580ec2cc77e9becfaef80f516688f9a01dd7e1/R/predict.R#L63)  
-  * Here's the TMB side: [https://github.com/vast-lib/tinyVAST/blob/50580ec2cc77e9becfaef80f516688f9a01dd7e1/src/tinyVAST.cpp\#L1139](https://github.com/vast-lib/tinyVAST/blob/50580ec2cc77e9becfaef80f516688f9a01dd7e1/src/tinyVAST.cpp#L1139)  
-* Need to consider period of biology, selectivity period, recruitment regimes to base projections off of
-
 ##### Predict functions from other R packages:
 
 * [lme4:](https://rdrr.io/cran/lme4/man/predict.merMod.html)
 * [glmmTMB:](https://www.rdocumentation.org/packages/glmmTMB/versions/1.1.11/topics/predict.glmmTMB)  
 * [sdmTMB](https://rdrr.io/github/seananderson/sdmTMB/man/predict.sdmTMB.html):  
 * [WHAM](https://github.com/timjmiller/wham/blob/47506172e9a55376137501608e645ddae8a574e9/vignettes/ex03_projections.Rmd#L144):  
+
+
+##### Thoughts
+
+* Number of arguments \- combine configuration into a tibble? Example from [indexwc](https://github.com/pfmc-assessments/indexwc/blob/main/data-raw/configuration.csv)  
+* Set years where take out removals in projection years, functionality for years specific percentages (e.g. OFL out each year)  
+* Arguments related to running MCMC sampling (e.g. in sdmTMB mcmc\_samples argument)  
+* Consider time-varying with respect to reference points, how would be address these?  
+* Re form flexible for speed and turning random effects on/off \- not high priority  
+* Se.fit can capture a lot of options, e.g., CI and prediction intervals, data model uncertainty  
+* Object that shows what options were in predict functions so they can be saved \- can this be added to the JSON output?  
+* In sdmtmb, tmb object reinitialized with parameters, redo model configuration settings, use simulate function  
+* tinyvast has a more efficient way to set up predictions
+  * Here's the prediction in tinyvast R: [https://github.com/vast-lib/tinyVAST/blob/50580ec2cc77e9becfaef80f516688f9a01dd7e1/R/predict.R\#L63](https://github.com/vast-lib/tinyVAST/blob/50580ec2cc77e9becfaef80f516688f9a01dd7e1/R/predict.R#L63)  
+  * Here's the TMB side: [https://github.com/vast-lib/tinyVAST/blob/50580ec2cc77e9becfaef80f516688f9a01dd7e1/src/tinyVAST.cpp\#L1139](https://github.com/vast-lib/tinyVAST/blob/50580ec2cc77e9becfaef80f516688f9a01dd7e1/src/tinyVAST.cpp#L1139)  
+* Need to consider period of biology, selectivity period, recruitment regimes to base projections off of
 
 ##### Extending the input data
 
@@ -769,7 +761,7 @@ Management reference points, often based on policy objectives, will also be deri
 
 ### Questions
 
-1. How do you specify a projection without any catch because starting with Stock Synthesis v.3.30.16 users are able to specify future dynamics without any catch. 
+1. How do you specify a projection without any catch because starting with Stock Synthesis v.3.30.16 users are able to specify future dynamics without any catch.
 
 ## Random effects and Bayesian estimation
 
@@ -784,48 +776,48 @@ This development will also structure the distribution functions so that it is st
 #### Review of prior options in other software and their uses
 
 Stock Synthesis priors:
-- Many options for all parameters, see current options [here](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html#parameter-priors).
+* Many options for all parameters, see current options [here](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html#parameter-priors).
 
 ASAP priors:
-- Aggregate catch and indices, lognormal
-- Deviations from SR curve (BH assumed, although often set with steepness=1), lognormal
-- Fmult in first year, lognormal
-- Fmult deviations, lognormal random walk, typically unconstrained
-- Catchability, lognormal
-- Catchability deviations, lognormal random walk, not used very often
-- N at age in first year, lognormal from input guesses or an exponential decline using M and F from first year
-- Selectivity parameters, lognormal, from either values at age or parameters of logistic or double logistic (note, this doesn’t totally make sense because selectivity can only be between zero and one)
-- Catch and indices at age assume multinomial with input ESS (not sure if this counts as a prior or not)
-- No priors are linked to create multivariate priors (e.g., prior on catch and catchability are independent with no covariance)
-- M is input as a matrix, no estimation of M allowed in ASAP
-- Weights at age are empirical and input as matrices, no estimation of growth allowed in ASAP
+* Aggregate catch and indices, lognormal
+* Deviations from SR curve (BH assumed, although often set with steepness=1), lognormal
+* Fmult in first year, lognormal
+* Fmult deviations, lognormal random walk, typically unconstrained
+* Catchability, lognormal
+* Catchability deviations, lognormal random walk, not used very often
+* N at age in first year, lognormal from input guesses or an exponential decline using M and F from first year
+* Selectivity parameters, lognormal, from either values at age or parameters of logistic or double logistic (note, this doesn't totally make sense because selectivity can only be between zero and one)
+* Catch and indices at age assume multinomial with input ESS (not sure if this counts as a prior or not)
+* No priors are linked to create multivariate priors (e.g., prior on catch and catchability are independent with no covariance)
+* M is input as a matrix, no estimation of M allowed in ASAP
+* Weights at age are empirical and input as matrices, no estimation of growth allowed in ASAP
 
-WHAM generally does not use priors. It estimates a fixed parameter on a scale from negative to positive infinity and uses transformations to get a desired constraint, estimates a random effect, or treats the parameter as known. There are many more options for dealing with age composition in WHAM than in ASAP: e.g., multinomial, Dirichlet-multinomial, logistic-normal, and multivariate-tweedie, with variations for handling year, age combinations with observed zeros. WHAM has multiple ways to estimate linkages among random effects: e.g., IID, autoregressive across age, year, or both, and mixed with autoregressive across year for recruitment and 2dar1 for remaining ages in NAA. WHAm allows estimation of M. WHAM also allows incorporation of environmental covariates in a statistically sound manner using random effects.
+WHAM generally does not use priors. It estimates a fixed parameter on a scale from negative to positive infinity and uses transformations to get a desired constraint, estimates a random effect, or treats the parameter as known. There are many more options for dealing with age composition in WHAM than in ASAP, e.g., multinomial, Dirichlet-multinomial, logistic-normal, and multivariate-Tweedie, with variations for handling year, age combinations with observed zeros. WHAM has multiple ways to estimate linkages among random effects, e.g., IID, autoregressive across age, year, or both, and mixed with autoregressive across year for recruitment and 2d-AR1 for remaining ages in NAA. WHAM allows estimation of M. WHAM also allows incorporation of environmental covariates in a statistically sound manner using random effects.
 
-SAM does not use priors. It also does not use age composition estimation generally. It treats indices at age and catch at age as multivariate log-normal random variables. It also estimates F at age over time as a multivariate log-normal randomwalk with covariances among the ages and over time. 
+SAM does not use priors. It also does not use age composition estimation generally. It treats indices at age and catch at age as multivariate lognormal random variables. It also estimates F at age over time as a multivariate lognormal random walk with covariances among the ages and over time.
 
 FIMS should allow the use of priors for cases where random effects are not desired or possible, e.g., due to large blocks of missing data. A model without priors is a priori preferable to one with priors, but sometimes priors are needed in order to produce reasonable results.
 
 ### Architecture & Organization
 
-Architectural changes will be grouped into four stages: 
+Architectural changes will be grouped into the following four stages:
 
 1. The development of a hierarchical class structure for distributions (**complete**)
-2. A generalized framework for adding random effects and Bayesian priors (**complete**) 
-3. Building up capacity which will add new distributions, osa residuals, and simulation functionality (wip)
-4. Adding multivariate functionality for random effects and Bayesian priors.
+2. A generalized framework for adding random effects and Bayesian priors (**complete**)
+3. Building up capacity which will add new distributions, osa residuals, and simulation functionality (work in progress)
+4. Adding multivariate functionality for random effects and Bayesian priors
 
 ### Decision Points
 
-FIMS will develop a library of likelihoods so that multiple distributions will be available, not only for random effect processes, but also for data components, such as indices and compositions. Given this flexibility, FIMS will require the ability to compare and select best likelihoods from a set. Such a comparision is not always straightforward as some lieklihoods are not caparable, e.g. with AIC. FIMS will initially depend on TMB distribution functions but will eventually expand the fims math section to include explicitly written distributions. 
+FIMS will develop a library of likelihoods so that multiple distributions will be available, not only for random effect processes, but also for data components, such as indices and compositions. Given this flexibility, FIMS will require the ability to compare and select best likelihoods from a set. Such a comparison is not always straightforward as some likelihoods are not comparable, e.g., with AIC. FIMS will initially depend on TMB distribution functions but will eventually expand the fims math section to include explicitly written distributions.
 
-FIMS will implement full state space capabiliities, which will allow processes such as recruitment, selectivity, numbers at age, etc. to be time varying. This will be accomplished by relying on an autoregressive distributions, such as AR1 and randomwalk, or by depending on environmental linkages. Correlation between two dimensional processes (e.g. correlation between age and year in maturity, etc.) will be captured using 2dAR1 distributions. Time variation will require a general framework on the R side to specify processes on any parameter. Initial development will focus on adding an AR1 process on recruitment, afterwhich, the framework will be applied to other proccesses requiring time variation. 
+FIMS will implement full state space capabilities, which will allow processes such as recruitment, selectivity, numbers at age, etc. to be time varying. This will be accomplished by relying on an autoregressive distributions, such as AR1 and random walk, or by depending on environmental linkages. Correlation between two dimensional processes (e.g. correlation between age and year in maturity, etc.) will be captured using 2d-AR1 distributions. Time variation will require a general framework on the R side to specify processes on any parameter. Initial development will focus on adding an AR1 process on recruitment, after which, the framework will be applied to other processes requiring time variation.
 
-FIMS will also implement fully Bayesian models. A key step to accomplishing this will be the ability to add both univariate and multivariate priors to any parameter or parameter set. Multivariate priors will allow for the handling of correlations between parameters. Priors will need to be flexible with the option to handlge Jacobian transformations. The R interface will need to be developed to handle a generalized framework for adding priors to parameters and improvements will be needed in the output to handle reporting and accessing other stan R libraries for visualizing Bayesian output.   
+FIMS will also implement fully Bayesian models. A key step to accomplishing this will be the ability to add both univariate and multivariate priors to any parameter or parameter set. Multivariate priors will allow for the handling of correlations between parameters. Priors will need to be flexible with the option to handle Jacobian transformations. The R interface will need to be developed to handle a generalized framework for adding priors to parameters and improvements will be needed in the output to handle reporting and accessing other stan R libraries for visualizing Bayesian output.
 
-FIMS will add additional features to likelihood functions for calculating one-step-ahead (osa) residuals and for simulating data. OSA structure will require a flexible format for assembling the data vector going into the the osa component as this framework will need to work as users add or remove data, include unobserved data entries (i.e. NAs), or add "ghost" data. Additionally, users will need to choose which composition bin to drop for multivariate constrained likelihoods (e.g. multinomial, Dirichlet-Multinomial, Dirichlet, etc.). Data will need to be defined using the "Type" specifier so that values can be added to the tape. This definition is needed as TMB estimates data as random effects in osa calculations. Simulation will rely initially on TMB defined random distribution functions and TMB specific code macros. 
+FIMS will add additional features to likelihood functions for calculating one-step-ahead (osa) residuals and for simulating data. OSA structure will require a flexible format for assembling the data vector going into the the osa component as this framework will need to work as users add or remove data, include unobserved data entries (i.e. NAs), or add "ghost" data. Additionally, users will need to choose which composition bin to drop for multivariate constrained likelihoods (e.g. multinomial, Dirichlet-Multinomial, Dirichlet, etc.). Data will need to be defined using the "Type" specifier so that values can be added to the tape. This definition is needed as TMB estimates data as random effects in osa calculations. Simulation will rely initially on TMB defined random distribution functions and TMB specific code macros.
 
-The following user case studies are provided to help guide developers in the architecture and design of a generic framework for random effects and bayesian priors. 
+The following user case studies are provided to help guide developers in the architecture and design of a generic framework for random effects and bayesian priors.
 
 #### Univariate priors
 
@@ -880,7 +872,7 @@ dmvnorm(x=c(3,-2), mean=mu, sigma=Sigma, log=TRUE)
 
 population$SetGrowth(ewaa_growth$get_id())
 population$SetPriors( pars=params, mu=mu, Sigma=Sigma,
-        family=’multivariate_normal’, log=TRUE)
+        family='multivariate_normal', log=TRUE)
 ```
 
 Jacobian adjustments during integration, see this [comment](https://github.com/NOAA-FIMS/FIMS/issues/431#issuecomment-1930450473) for links and background
@@ -900,8 +892,10 @@ obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", silent = TRUE)
 obj$fn() ## does include Jacobian adjustments from priors
 ```
 
-MCMC integration of a model
-The R package ‘tmbstan’ provides the most straightforward way to generate posterior samples for a FIMS model. It is demonstrated briefly below.
+#### MCMC integration of a model
+
+The R package tmbstan provides the most straightforward way to generate posterior samples for a FIMS model. It is demonstrated briefly below.
+
 ```{r, eval = FALSE}
 ## Try MCMC integration with tmbstan. Also see new package
 
@@ -977,9 +971,6 @@ population$add_random_effects(par='log_M', type='2d-AR1',
                               init=c(1,0,0), estimated=c(0,1,1))
 ```
 
-
-
-
 ### Hierarchical Class Structure for Distributions
 
 Build library of probability distributions and necessary architecture to connect to FIMS
@@ -997,37 +988,30 @@ Build library of probability distributions and necessary architecture to connect
 
 ### A generalized framework for adding random effects and Bayesian priors
 
-1.  Build infrastructure to include priors and random effects using a generalized framework
+1. Build infrastructure to include priors and random effects using a generalized framework
 
-* Rcpp interface links user input with members of nll functions for the following three cases. The goal is to develop a generic interface that can handle all three cases:\
+* Rcpp interface links user input with members of nll functions for the following three cases. The goal is to develop a generic interface that can handle all three of the following cases:
 
-1. Data Case: Rcpp interface links user input to ***observed_value*** in Distribution functions and points the ***expected_value*** to the correct derived value in the model. User sets initial values of parameters and Rcpp interface adds the parameters to the list of parameters estimated by the model
-2. Prior Case: Rcpp interface links the ***observed_value*** in Distribution functions to a parameter/s in the model. User sets ***expected_value*** and Distribution specific parameters and fixes values so they are not estimated by the model
-3. Random Case: Rcpp interface links the ***observed_value*** in Distribution functions to a process in the model and fixes the ***expected value*** at 0. User sets the initial value of Distribution specific parameters and these get added to the list of parameters estimated by the model
+1. Data Case: Rcpp interface links user input to **observed_value** in Distribution functions and points the **expected_value** to the correct derived value in the model. User sets initial values of parameters and Rcpp interface adds the parameters to the list of parameters estimated by the model
+2. Prior Case: Rcpp interface links the **observed_value** in Distribution functions to a parameter/s in the model. User sets **expected_value** and Distribution specific parameters and fixes values so they are not estimated by the model
+3. Random Case: Rcpp interface links the **observed_value** in Distribution functions to a process in the model and fixes the **expected value** at 0. User sets the initial value of Distribution specific parameters and these get added to the list of parameters estimated by the model
     * Functions are designed to be generic to handle the following cases (see [FIMS NLL Examples](https://docs.google.com/document/d/1X1NwjQlLrKGIXZgkMfJ29Kp1lFreKiiTTQxyoicgqxc/edit))
         * Scalar prior
-
         * Multivariate prior for multiple parameters within the same module (e.g., Multivariate prior on Linf and K)
-
         * Univariate random effect
-
         * Multivariate random effect for a single process (e.g., log_M across years and ages)
-
         * Multivariate prior for two parameters across different modules - doesn't need to be constrained to two (e.g., mortality and steepness)
-
         * Multivariate random effect for two processes within the same module\
-
         * Multivariate random effect for two processes across different modules
-
             
-3. Discussion Points
+2. Discussion Points
 
 * One class per distribution with flags for osa and simulation flags for data and re/priors
 * wrt simulations, order matters and needs to follow the natural hierarchy of the model (i.e., 1. Priors 2. Random effects 3. Data)
 * Interface - generic approach but be mindful of different use cases
     * Multivariate where each parameter/process comes from a different module
     * Varying data types (i.e., scalar sd vs vector of cvs for dnorm)
-* From WHAM: 2dAR1 with recruitment and NAA - these should **not** be linked; solution was to apply 2dAR1 to ages 2+ and recruitment treated differently - consider if NAA should be an additional module on top of recruitment
+* From WHAM: 2d-AR1 with recruitment and NAA - these should **not** be linked; solution was to apply 2d-AR1 to ages 2+ and recruitment treated differently - consider if NAA should be an additional module on top of recruitment
     * What complexities occur with NAA (random effect, movement) - if more than two use cases then justification to create new module
 * OSA requires a lot of input code on the R side to prepare for OSA wrt multinomial
     * Need to throw out one of the age/year bins - need to set NA so the osa calculation skips this value ([WHAM approach](https://github.com/timjmiller/wham/blob/master/R/set_osa_obs.R#L280))
@@ -1036,7 +1020,7 @@ Build library of probability distributions and necessary architecture to connect
     * Can this be done internally in C++?
 * Need to be mindful of sparsity - e.g., Recruitment with an AR1 process is dense if the random effect is the devs but is sparse if the random effect is logR.
 
-1. Proposed Tests:
+3. Proposed Tests:
 
 * RE test
 * tmbstan test
@@ -1052,192 +1036,55 @@ UnivariateBase
 
 * Normal(x, mu, sd) **completed**
 * LogNormal: often written as Normal(log(x), mu, sd) - log(x) **completed**
-* Gamma(x, 1/cv^2, cv^2mean), cv: coefficient of variation, mean > 0, typically use a exp() to keep the mean positive
+* Gamma(x, \f$1/cv^2\f$, \f$cv^2mean\f$), cv: coefficient of variation, mean > 0, typically use a exp() to keep the mean positive
 * NegativeBinomial: used for tagging data - parameterization can be a bit tricky, research best one to use for tagging data; discrete data
-* Tweedie(x, mean, disp, power), mean >0 (typically exp()), disp > 0 (typically exp()), 1 < power < 2 (scaled logit transformed); used for zero-inflated continuous data (hurdle data)
+* Tweedie(x, mean, dispersion, power), mean >0 (typically exp()), dispersion > 0 (typically exp()), 1 < power < 2 (scaled logit transformed); used for zero-inflated continuous data (hurdle data)
 
 MultivariateBase
 
 * Multinomial **completed**
-    * If calculating OSA residual, data need to be true counts
-* Dirichlet Multinomial
-* Logistic Normal - performs better than DM at large sample sizes and DM performs better than LN at small sample sizes
-    * Relies on the multivariate normal (e.g., [here](https://github.com/timjmiller/wham/blob/master/src/age_comp_osa.hpp#L271))
-    * Will work better with OSA compared to multinomial - often comp data are not true integers
+  * If calculating OSA residual, data need to be true counts
+* Dirichlet-multinomial
+* Logistic Normal - performs better than Dirichlet-multinomial at large sample sizes and Dirichlet-multinomial performs better than LN at small sample sizes
+  * Relies on the multivariate normal (e.g., [here](https://github.com/timjmiller/wham/blob/master/src/age_comp_osa.hpp#L271))
+  * Will work better with OSA compared to multinomial - often comp data are not true integers
 * Multivariate Tweedie
 * AR1
 * Multivariate Normal - required to implement the Logistic Normal
-* 2dAR1
-* GMRF
+* 2d-AR1
+* Gaussian Markov Random Fields
 
 Highest priority
 Mid priority
 Low priority
-
-#### R User Interface {#r-user-interface}
-
-**Generic SetNLL()**
-
-**Case: Univariate Prior (e.g. Normal prior on M)**
-
-```r
-
-logM_nll <- new(NormalNLL)
-logM_nll$type <- "prior" # (choices are random_effect, prior, or data) 
-logM_nllf$ mu f$value <- log(0.2) 
-logM_nllf$ mu f$is_estimated <- FALSE 
-logM_nll$log_sd <- log(0.1)
-logM_nllf$ sd f$is_estimated <- FALSE
-
-SetNLL(module = 'population', module_id = population\$get_id(),\
-member_name = log_M, nll = logM_nll)
-
-# Alternate approach or higher level helper function:
-population$SetPriors(
-  pars = "log_M",
-  mu = log(0.2),
-  sigma = 0.1,
-  family = "normal",
-  log = FALSE
-)
-SetPriors(
-  module = "population",
-  module_id = population$get_id(),
-  pars = 'log_M',
-  mu = log(0.2),
-  sigma = 0.1,
-  family = 'normal',
-  log = FALSE
-) {
-new_nll <- lookup_function(
-  #looks up family and returns new() based on NLL call from family argument
-new_nll$type <- "prior"
-new_nllf$ mu f$value <- mu
-new_nllf$ mu f$is_estimated <- FALSE
-new_nll$log_sd <- log(sigma)
-new_nllf$ sd f$is_estimated <- FALSE
-new_nll$module_name <- module
-new_nll$module_id <- module_id
-new_nll$member_name <- pars
-}
-```
-
-**Case: Univariate Random Effect**\
-
-```r
-# AR1 random effect
-
-logitSteep_nll <- new(AR1NLL)
-
-logitSteep_nll$type <- random_effect
-logitSteep_nllf$ logit_phi f$value <- 0 
-logitSteep_nllf$ logit_phi f$is_estimated <- TRUE 
-logitSteep_nllf$ log_var f$value <- 1 
-logitSteep_nllf$ log_var f$is_estimated <- FALSE
-
-recruitment <- new(BevertonHolt)
-SetNLL(recruitment, logit_steep, logitSteep_nll)
-
-#or recruitment itself can be a random effect
-
-recruitment <- new(AR1NLL)
-```
-
-**Case: Multivariate Prior - Single Parameter**
-
-```r
-# 2dAR1 on M, multivariate dimensions match parameter dimensions\
-logM_nll <- new(2dAR1NLL)
-logM_nll$type <- "random_effect"
-logM_nll$logit_phi1 <- 1
-logM_nll$logit_phi2 <- 0
-logM_nll$log_var <- 0
-logM_nll$logit_phi1$is_estimated <- FALSE
-logM_nll$logit_phi2$is_estimated <- TRUE
-logM_nllf$ log_var f$is_estimated <- TRUE
-
-population <- new(Population)
-SetNLL(population, logM, logM_nll) - or - population$SetNLL(logM, logM_nll)
-```
-
-**Case: Multivariate Prior - Multiple Parameters**\
-library(FishLife)\
-library(mvtnorm)\
-params \<- matrix(c('Loo', 'K'), ncol=2)\
-x \<- Search_species(Genus="Hippoglossoides")$match\_taxonomy y \<- Plot\_taxa(x, params=params) \#\# multivariate normal in log space for two growth parameters mu \<- y\[\[1\]\]\f$ Mean_pred \f$\f$ params \f$$\
-Sigma \<- y$$\[1$$]$Cov\_pred\[params, params\] \#\# log density in R dmvnorm(x=c(3,-2), mean=mu, sigma=Sigma, log=TRUE) \>growth\_nll \<- new(MVnormMLL) \>growth\_nll$type \<- 'prior'\
-\>growth_nll$mean \<- mu \>growth\_nll$Cov \<- Sigma\
-\>growth_nll\f$ mean \f$is_estimated \<- FALSE\
-\>growth_nll\f$ Cov \f$is_estimated \<- FALSE
-
-\>growth \<- new(EWAA)\
-\> SetNLL(list(growth), list(L_inf, K), growth_nll)
-
-**Case: Multivariate Random Effect - Different Modules**
-
-**Case: Data**\
-catch_nll \<- new(LognormalNLL)\
-catch_nll\$log_sd \<- cv_vector\
-catch_at_age_nll \<- new(MultinomialNLL)
-
-SetNLL(fleet, catch, catch_nll)\
-SetNLL(fleet, catch_at_age, catch_at_age_nll)
-
-#### Rcpp
-
-//Cases:\
-single module, x is scalar\
-single module, x is vector\
-single module, x is matrix\
-multiple modules, x is vector\
-multiple modules, x is matrix
-
-SetNLL(module_id, x, nll){\
-module$\f$ module\_id \f$$ -\> name_same_as(x) = x\
-nll -\> x = module$\f$ module\_id \f$$ -\> name_same_as(x)\
-}
-
-SetMVNLL(list(m1id, m2id), )
 
 #### C++ Classes
 
 UnivariateBase
 
 * Observed_value:
-
-    * Data: input by the user\
-    * Random effect: calculated within a module\
-    * Prior: set to a parameter in the model\
-    * Needs to be able to handle both scalar and vector\
-
+  * Data: input by the user\
+  * Random effect: calculated within a module\
+  * Prior: set to a parameter in the model\
+  * Needs to be able to handle both scalar and vector\
 * expected_value:
-
-    * Data: calculated within population\
-    * Random effect: fixed at zero\
-    * Prior: set and fixed by the user\
-
+  * Data: calculated within population\
+  * Random effect: fixed at zero\
+  * Prior: set and fixed by the user\
 * evaluate(observed_value, expected_value, do_log = true)
-
-    NormalPDF
-
 * sd: initiated through user interface\
-
 * osa_flag: if data, implements the osa calculate\
-
 * simulation_flag\
-
 * evaluate()
-
-    * Loop over the length of observed_value and evaluate the nll for dnorm\
-    * Calculate osa residuals\
-    * Need to implement the cdf method for all distributions?
+  * Loop over the length of observed_value and evaluate the nll for dnorm\
+  * Calculate osa residuals\
+  * Need to implement the cdf method for all distributions?
 
 Notes
 
 * NLL-Population linkage unclear
-    * Setting random effect or prior on parameters that are already in population will be somewhat straightforward\
-    * Setting random effects/priors on values in population that are set up as derived quantities are less clear. For example, does NAA need to become its own module? [This calculation](https://github.com/NOAA-FIMS/FIMS/blob/18f96a81d02021a55c9f91a66485e7250a20cb5a/inst/include/population_dynamics/population/population.hpp#L240) gets confusing if NAA is an AR1 or 2dAR1.
-
+  * Setting random effect or prior on parameters that are already in population will be somewhat straightforward\
+  * Setting random effects/priors on values in population that are set up as derived quantities are less clear. For example, does NAA need to become its own module? [This calculation](https://github.com/NOAA-FIMS/FIMS/blob/18f96a81d02021a55c9f91a66485e7250a20cb5a/inst/include/population_dynamics/population/population.hpp#L240) gets confusing if NAA is an AR1 or 2d-AR1.
 
 ## R output
 
@@ -1247,7 +1094,7 @@ The following sections explain the (1) current state of FIMS model output, (2) f
 
 #### Current output from a FIMS model
 
-FIMS lacks a wrapper function to run a FIMS model and the user must call makeADFUN and an optimizer.  
+FIMS lacks a wrapper function to run a FIMS model and the user must call `TMB::MakeADFun` and an optimizer.  
 Questions (to ponder SILENTLY):
 
 1. Will users always manually call `TMB::MakeADFun()`?  
@@ -1288,34 +1135,9 @@ Columns
 * gradient: the gradient component for that parameter, NA for derived quantities  
 * estimated: TRUE/FALSE indicator of if the parameter was estimated (and not fixed), with NA for derived quantities
 
-##### fits (tibble)
-
-A tibble with all of the information needed to calculate residuals, such as the data used to fit the model, expected values, likelihoods, data weighting metric, and distribution used.  
-Columns:
-
-* All utilized columns from the input data, e.g., type, name, value, …  
-* expected: the expected value based on model fits  
-* likelihood: the likelihood component for that data point  
-* weight: the weight applied to the data point  
-* distribution: the distribution used to fit the data point
-
-An example [tibble](https://tibble.tidyverse.org/) returned in the model fits slot, where four additional columns are added onto the input  FIMSFrame object. Note that some columns of FIMSFrame (age, datastart, and dateend) are not shown in the image below just for brevity of this document but will be in the actual model object.  
-   **type  name    value unit  uncertainty … expected likelihood weight distribution**  
-   **\<chr\> \<chr\>    \<dbl\> \<chr\> \<dbl\>  …   \<dbl\>      \<dbl\>    \<dbl\> \<chr\>**        
- **1 index survey1 0.00680 ""   0.2  …    0.00680      0.001      1 lognormal**    
- **2 index survey1 0.00617 ""   0.2  …    0.00617      0.001      1 lognormal**    
- **3 index survey1 0.00598 ""   0.2  …    0.00598      0.001      1 lognormal**    
- **4 index survey1 0.00591 ""   0.2  …    0.00591      0.001      1 lognormal**    
- **5 index survey1 0.00721 ""   0.2  …    0.00721      0.001      1 lognormal**  
-**\# i 200 more rows**  
-**\# i Use \`print(n \= ...)\` to see more rows**
-
 ##### tmb
 
 The returned object from `TMB::MakeADFun()`. 
-
-* **names(obj)**  
-*  **\[1\] "par"  "fn" "gr" "he" "hessian" "method" "retape" "env" "report" "simulate"** 	 
 
 ##### sdreport (list)
 
@@ -1326,15 +1148,19 @@ The returned object from `TMB::sdreport()`.
 The returned object from `match.call()`, which specifies the full name and specifications of all of the arguments passed to the function call allowing for repeatability of the model-fitting process.
 
 Example of returned call from running a linear model via the `lm()` command in R.  
-**lm(weight \~ age, method \= "qr")$call**  
-**\# lm(formula \= weight \~ age, method \= "qr")**
+```r
+lm(weight ~ age, method = "qr")$call
+# lm(formula = weight ~ age, method = "qr")
+```
 
 ##### timestamp (vector)
 
-A vector of length two with the start and end timestamps of when the model was started and when the model was done fitting to allow for calculating run times. All timestamps are in UTC. The timestamps will be overwritten if the model is updated. Each element of the returned object is generated using `as.POSIXlt(Sys.time(), tz = "UTC")`. 
+A vector of length two with the start and end timestamps of when the model was started and when the model was done fitting to allow for calculating run times. All timestamps are in UTC. The timestamps will be overwritten if the model is updated. Each element of the returned object is generated using `as.POSIXlt(Sys.time(), tz = "UTC")`.
 
-Example of the timestamp vector in the returned object  
-**\[1\] "2024-03-19 11:42:26 UTC" "2024-03-19 13:42:26 UTC"**
+Example of the timestamp vector in the returned object
+```r
+[1] "2024-03-19 11:42:26 UTC" "2024-03-19 13:42:26 UTC"
+```
 
 ##### version (list)
 
@@ -1342,7 +1168,7 @@ The package version (package\_version; numeric\_version) for FIMS. A hidden list
 
 #### Functions for working with FIMS output
 
-There will be multiple helper functions that can work with the returned object to provide things such as calculated residuals and figures. These functions will be a combination of FIMS-specific functions and general methods written to augment existing functions such as `tidy()` and `summary()`. Many of the functions will be inspired by [tidy models](https://www.tidymodels.org). Additional useful resources for tidy models include: [broom](https://broom.tidymodels.org) and [tmwr workflows](https://www.tmwr.org/workflows).
+There will be multiple helper functions that can work with the returned object to provide things such as calculated residuals and figures. These functions will be a combination of FIMS-specific functions and general methods written to augment existing functions such as `tidy()` and `summary()`. Many of the functions will be inspired by [tidy models](https://www.tidymodels.org). Additional useful resources for tidy models include: [broom](https://broom.tidymodels.org) and [Tidy Modeling With R workflows](https://www.tmwr.org/workflows).
 
 * `summary()`  
 * `tidy()`  
@@ -1358,7 +1184,7 @@ From [FIMS Requirements Full](https://docs.google.com/spreadsheets/d/1impCdPPob8
 | Topic | Topic details | Feature | How this is incorporated in the design document |
 | :---- | :---- | :---- | :---- |
 | Output | Format | Consistent formatting & output as a table | We are developing consistent output formatting as part of the output design. Helper functions can be used to reformat output results.  |
-| Output Products | Executive summary of key assessment results | Executive summary of key assessment results (See Appendix B of Next Gen SAIP for an example) which Tables and Figures don't pertain to the management. | This can be created using a helper function with the output object. Discuss this with Sam Schiano (contractor in OST), who is working on a project to standardize assessment reporting. |
+| Output Products | Executive summary of key assessment results | Executive summary of key assessment results (See Appendix B of Next Generation Stock Assessment Improvement Plan for an example) which Tables and Figures don't pertain to the management. | This can be created using a helper function with the output object. Discuss this with Sam Schiano (contractor in OST), who is working on a project to standardize assessment reporting. |
 | User experience | Ease of use | save inputs and outputs | A common output object including the model call made will help users save inputs and outputs. |
 | User experience | Ease of use | rapidly explore outputs | A common output object formatting with helper functions will help rapidly exploring the output. |
 | Model Comparison | Tabular summaries of parameter estimates and derived quantities | User-defined reporting of parameter estimates, derived quantities, likelihood components for comparison of alternative model configurations | The output object will attempt to report everything the user needs rather than having user-defined outputs. Helper functions can allow users to structure the output in a particular way. If creating this output takes too long, we can consider user-defined reporting in the future to speed up model running and development. |
@@ -1366,19 +1192,3 @@ From [FIMS Requirements Full](https://docs.google.com/spreadsheets/d/1impCdPPob8
 | model convergence | Tests of convergence for optimization algorithms | Hessian, plots of parameter estimates and bounds, final gradient, parameter estimates | Much of this is included in the \`estimates\`, \`fits\`, and \`tmb\` objects within the returned output. There are no such things as bounds within a FIMS model and thus they are not reported. |
 | Output Products | Raw model output (e.g. numbers at age for all years/areas/etc., all parameters with variances and covariances) | Output files required by analyst to produce management advice, including input for forecasting analyses | All parameters and derived quantities are included in the `estimates` section of the output along with their variances if calculated. |
 | Output Products | Timestamped | Timestamped \- Versions easily identifiable, changes between versions transparent | The time that the model was started and stopped is available in `timestamp` and the package version used to estimate the model is in `version`. |
-
-## References
-
-Berger, A. M., Barceló, C., Goethel, D. R., Hoyle, S. D., Lynch, P. D., McKenzie, J., Dunn, A., Punt, A. E., Methot, R. D., Hampton, J., Porch, C. E., McGarvey, R., Thorson, J. T., A'mar, A. T., Deroba, J. J., Þór Elvarsson, B., Holmes, S. J., Howell, D., Langseth, B. J., Marsh, C., Maunder, M. N., Mormede, S., and Rasmussen, S. 2024. Synthesizing the spatial functionality of contemporary stock assessment software to identify future needs for next generation assessment platforms. *Fisheries Research*, 275, 107008. 10.1016/j.fishres.2024.107008.
-
-Correa, G. M., Monnahan, C. C., Sullivan, J. Y., Thorson, J. T., and Punt, A. E. 2023. Modelling time-varying growth in state-space stock assessments. *ICES Journal of Marine Science*, 80(7), 2036--2049.
-
-Francis, R. I. C. C. 2016. Growth in age-structured stock assessment models. *Fisheries Research*, 180, 77--86.
-
-Kraak, S. B. M., Haase, S., Minto, C., and Santos, J. 2019. The Rosa Lee phenomenon and its consequences for fisheries advice on changes in fishing mortality or gear selectivity. *ICES Journal of Marine Science*, 76(7), 2179--2192.
-
-Methot, R. D., and Wetzel, C. R. 2013. Stock synthesis: a biological and statistical framework for fish stock assessment and fishery management. *Fisheries Research*, 142: 86--99.
-
-Þór Elvarsson, B., Woods, P. J., Björnsson, H., Lentin, J., and Thordarson, G. 2018. Pushing the limits of a data challenged stock: A size- and age-structured assessment of ling (*Molva molva*) in Icelandic waters using Gadget. *Fisheries Research*, 207 95--109.
-
-Punt, A. E., Dunn, A., Þór Elvarsson, B., Hampton, J., Hoyle, S. D., Maunder, M. N., Methot, R. D., and Nielsen, A. 2020. Essential features of the next-generation integrated fisheries stock assessment package: A perspective. *Fisheries Research*, 229, 105617.
