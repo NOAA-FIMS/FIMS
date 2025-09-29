@@ -129,7 +129,12 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       module[[field]]$set(
         switch(field,
           "nages" = get_n_ages(data),
-          "nfleets" = length(parameters[["modules"]][["fleets"]]),
+          "nfleets" = parameters |>
+            dplyr::filter(module_name == "Fleet") |>
+            dplyr::pull(fleet_name) |>
+            unique() |>
+            length(),
+            # Or we can use get_n_fleets(data),
           "nlengths" = get_n_lengths(data),
           "nseasons" = 1,
           "nyears" = get_n_years(data)
