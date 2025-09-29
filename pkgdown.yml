@@ -4,10 +4,9 @@ pkgdown_sha: ~
 articles:
   fims-demo-minimal: fims-demo-minimal.html
   fims-demo: fims-demo.html
-  fims-documentation: fims-documentation.html
   fims-logging: fims-logging.html
   fims-path-maturity: fims-path-maturity.html
-last_built: 2025-08-21T21:47Z
+last_built: 2025-09-29T14:33Z
 urls:
   reference: https://NOAA-FIMS.github.io/FIMS/reference
   article: https://NOAA-FIMS.github.io/FIMS/articles

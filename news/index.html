@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,7 +20,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-news"><li><h6 class="dropdown-header" data-toc-skip>Releases</h6></li>
-    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/tag/v0.1.0">Version 0.1.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">Latest release</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
   </ul></li>
@@ -39,6 +39,11 @@
       <small>Source: <a href="https://github.com/noaa-fims/fims/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.0" id="fims-070">FIMS 0.7.0<a class="anchor" aria-label="anchor" href="#fims-070"></a></h2>
+<ul><li>Converts nested list of lists used for model control to a tibble with one line per parameter that can be un-nested and nested.</li>
+<li>Increased the documentation of FIMS by using formulas in doxygen, building the doxygen on the NOAA-FIMS github.io site instead of its own web page, writing more information in the testing README, etc.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.3" id="fims-063">FIMS 0.6.3<a class="anchor" aria-label="anchor" href="#fims-063"></a></h2>
 <ul><li>Fixes bugs in fims_math.hpp when using TMBad library to use the standard library functions (exp, log, cos, sqrt, pow) when necessary.</li>
@@ -112,9 +117,9 @@
 <ul><li>Fits to length data using an age-to-length-conversion matrix, <code>data1</code> includes the necessary information needed to fit to both ages and lengths.</li>
 <li>Adds C++ ParameterVector to allow for the estimation of time-varying parameters.</li>
 <li>Implements R wrapper functions to facilitate
-<ul><li>creating the input model specifications with <code>create_default_*()</code>, <code><a href="../reference/create_default_parameters.html">update_parameters()</a></code>, and <code>initialize_*()</code>;</li>
+<ul><li>creating the input model specifications with <code>create_default_*()</code>, <code>update_parameters()</code>, and <code>initialize_*()</code>;</li>
 <li>adding -999 to the missing fleet, year, age, length, etc. combinations;</li>
-<li>running the model with a user-supplied argument of n_of_loops, where the default is three, to restart the optimizer from the previous run of nlmimb;</li>
+<li>running the model with a user-supplied argument of n_of_loops, where the default is three, to restart the optimizer from the previous run of nlminb;</li>
 <li>summarizing the output with the <code><a href="../reference/FIMSFit.html">FIMSFit()</a></code> function and class.</li>
 </ul></li>
 <li>Implements a switch for global verbosity within FIMS through the use of {cli} messages and warnings.</li>

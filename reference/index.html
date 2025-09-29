@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,7 +20,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-news"><li><h6 class="dropdown-header" data-toc-skip>Releases</h6></li>
-    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/tag/v0.1.0">Version 0.1.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">Latest release</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
   </ul></li>
@@ -86,7 +86,13 @@
         <dd>Get a vector of data to be passed to a FIMS module from a FIMSFrame object</dd>
       </dl><dl><dt>
 
-          <code><a href="create_default_parameters.html">create_default_parameters()</a></code> <code><a href="create_default_parameters.html">update_parameters()</a></code>
+          <code><a href="create_default_configurations.html">create_default_configurations()</a></code>
+
+        </dt>
+        <dd>Create a default FIMS configuration tibble</dd>
+      </dl><dl><dt>
+
+          <code><a href="create_default_parameters.html">create_default_parameters()</a></code>
 
         </dt>
         <dd>Create default parameters for a FIMS model</dd>
@@ -134,12 +140,6 @@
         <dd>Check if an object is of class FIMSFit</dd>
       </dl><dl><dt>
 
-          <code><a href="is.FIMSFits.html">is.FIMSFits()</a></code>
-
-        </dt>
-        <dd>Check if an object is a list of FIMSFit objects</dd>
-      </dl><dl><dt>
-
           <code><a href="is_fims_verbose.html">is_fims_verbose()</a></code>
 
         </dt>
@@ -156,12 +156,6 @@
 
 
       <dl><dt>
-
-          <code><a href="check_fims.html">check_fims()</a></code>
-
-        </dt>
-        <dd>Run all styling, documentation, and testing for FIMS repository</dd>
-      </dl><dl><dt>
 
           <code><a href="remove_test_data.html">remove_test_data()</a></code>
 
@@ -199,10 +193,16 @@
         <dd>Set up your local environment to run the google tests locally</dd>
       </dl><dl><dt>
 
-          <code><a href="style_cpp.html">style_cpp()</a></code>
+          <code><a href="use_gtest_template.html">use_gtest_template()</a></code>
 
         </dt>
-        <dd>Style the C++ files</dd>
+        <dd>Create tests/gtest/test_*.cpp test file and register it in CMakeLists.txt</dd>
+      </dl><dl><dt>
+
+          <code><a href="use_testthat_template.html">use_testthat_template()</a></code>
+
+        </dt>
+        <dd>Create tests/testthat/test-*.R test file</dd>
       </dl><dl><dt>
 
           <code><a href="Rcpp_Math.html">Ops(<i>&lt;Rcpp_Parameter&gt;</i>,<i>&lt;Rcpp_Parameter&gt;</i>)</a></code> <code><a href="Rcpp_Math.html">Ops(<i>&lt;Rcpp_Parameter&gt;</i>,<i>&lt;numeric&gt;</i>)</a></code> <code><a href="Rcpp_Math.html">Ops(<i>&lt;numeric&gt;</i>,<i>&lt;Rcpp_Parameter&gt;</i>)</a></code> <code><a href="Rcpp_Math.html">Ops(<i>&lt;Rcpp_ParameterVector&gt;</i>,<i>&lt;Rcpp_ParameterVector&gt;</i>)</a></code> <code><a href="Rcpp_Math.html">Ops(<i>&lt;Rcpp_ParameterVector&gt;</i>,<i>&lt;numeric&gt;</i>)</a></code> <code><a href="Rcpp_Math.html">Ops(<i>&lt;numeric&gt;</i>,<i>&lt;Rcpp_ParameterVector&gt;</i>)</a></code> <code><a href="Rcpp_Math.html">Math(<i>&lt;Rcpp_ParameterVector&gt;</i>)</a></code>
@@ -215,12 +215,6 @@
 
         </dt>
         <dd>Setter for <code>Rcpp_ParameterVector</code></dd>
-      </dl><dl><dt>
-
-          <code><a href="use_testthat_template.html">use_testthat_template()</a></code>
-
-        </dt>
-        <dd>Create tests/testthat/test-*.R test file</dd>
       </dl><dl><dt>
 
           <code><a href="reshape_json_derived_quantities.html">reshape_json_derived_quantities()</a></code>

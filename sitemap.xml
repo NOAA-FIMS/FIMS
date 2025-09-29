@@ -4,7 +4,6 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/LICENSE-text.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-demo-minimal.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-documentation.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-logging.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-path-maturity.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/index.html</loc></url>
@@ -15,7 +14,7 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/check_fims.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/data1.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.html</loc></url>
@@ -25,7 +24,6 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/initialize_data_distribution.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/is.FIMSFit.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/is.FIMSFits.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/is_fims_verbose.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/lognormal.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/m_.html</loc></url>
@@ -40,7 +38,7 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/run_r_unit_tests.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_and_run_gtest.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_gtest.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/style_cpp.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/use_gtest_template.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/use_testthat_template.html</loc></url>
 </urlset>
 

@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-news">
 <li><h6 class="dropdown-header" data-toc-skip>Releases</h6></li>
-    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/tag/v0.1.0">Version 0.1.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">Latest release</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
   </ul>
@@ -131,65 +131,39 @@ wrapper function.</p>
 <span><span class="va">fims_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create default maturity parameters using internal function</span></span>
-<span><span class="va">default_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  parameters <span class="op">=</span> <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">create_default_maturity</span><span class="op">(</span>form <span class="op">=</span> <span class="st">"LogisticMaturity"</span><span class="op">)</span>,</span>
-<span>  modules <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maturity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>form <span class="op">=</span> <span class="st">"LogisticMaturity"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">default_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">create_default_maturity</span><span class="op">(</span>data <span class="op">=</span> <span class="va">fims_frame</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">show</span><span class="op">(</span><span class="va">default_parameters</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $parameters</span></span>
-<span><span class="co">#&gt; $parameters$maturity</span></span>
-<span><span class="co">#&gt; $parameters$maturity$LogisticMaturity.inflection_point.value</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $parameters$maturity$LogisticMaturity.inflection_point.estimation_type</span></span>
-<span><span class="co">#&gt; [1] "fixed_effects"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $parameters$maturity$LogisticMaturity.slope.value</span></span>
-<span><span class="co">#&gt; [1] 1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $parameters$maturity$LogisticMaturity.slope.estimation_type</span></span>
-<span><span class="co">#&gt; [1] "fixed_effects"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $modules</span></span>
-<span><span class="co">#&gt; $modules$maturity</span></span>
-<span><span class="co">#&gt; $modules$maturity$form</span></span>
-<span><span class="co">#&gt; [1] "LogisticMaturity"</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 13</span></span></span>
+<span><span class="co">#&gt;   model_family module_name module_type label  distribution_link fleet_name   age</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="color: #BB0000;">NA</span>           Maturity    Logistic    infle… <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> <span style="color: #BB0000;">NA</span>           Maturity    Logistic    slope  <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: length &lt;dbl&gt;, time &lt;int&gt;, value &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   estimation_type &lt;chr&gt;, distribution_type &lt;chr&gt;, distribution &lt;chr&gt;</span></span></span>
 <span></span>
 <span><span class="co"># The default maturity parameters can be updated</span></span>
 <span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">default_parameters</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/create_default_parameters.html">update_parameters</a></span><span class="op">(</span></span>
-<span>    modified_parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      maturity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>        LogisticMaturity.inflection_point.value <span class="op">=</span> <span class="fl">2.25</span>,</span>
-<span>        LogisticMaturity.inflection_point.estimation_type <span class="op">=</span> <span class="st">"constant"</span>,</span>
-<span>        LogisticMaturity.slope.value <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>        LogisticMaturity.slope.estimation_type <span class="op">=</span> <span class="st">"constant"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
+<span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>      model_family <span class="op">=</span> <span class="st">"catch_at_age"</span>,</span>
+<span>      module_name <span class="op">=</span> <span class="st">"Maturity"</span>,</span>
+<span>      label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inflection_point"</span>, <span class="st">"slope"</span><span class="op">)</span>,</span>
+<span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.25</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>    <span class="op">)</span>,</span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"module_name"</span>, <span class="st">"label"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
+<span></span>
 <span><span class="fu">show</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $parameters</span></span>
-<span><span class="co">#&gt; $parameters$maturity</span></span>
-<span><span class="co">#&gt; $parameters$maturity$LogisticMaturity.inflection_point.value</span></span>
-<span><span class="co">#&gt; [1] 2.25</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $parameters$maturity$LogisticMaturity.inflection_point.estimation_type</span></span>
-<span><span class="co">#&gt; [1] "constant"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $parameters$maturity$LogisticMaturity.slope.value</span></span>
-<span><span class="co">#&gt; [1] 3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $parameters$maturity$LogisticMaturity.slope.estimation_type</span></span>
-<span><span class="co">#&gt; [1] "constant"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $modules</span></span>
-<span><span class="co">#&gt; $modules$maturity</span></span>
-<span><span class="co">#&gt; $modules$maturity$form</span></span>
-<span><span class="co">#&gt; [1] "LogisticMaturity"</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 13</span></span></span>
+<span><span class="co">#&gt;   model_family module_name module_type label  distribution_link fleet_name   age</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> catch_at_age Maturity    Logistic    infle… <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> catch_at_age Maturity    Logistic    slope  <span style="color: #BB0000;">NA</span>                <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: length &lt;dbl&gt;, time &lt;int&gt;, value &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   estimation_type &lt;chr&gt;, distribution_type &lt;chr&gt;, distribution &lt;chr&gt;</span></span></span>
 <span></span>
 <span><span class="co"># Initialize maturity module based on the list of parameters</span></span>
 <span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">initialize_maturity</span><span class="op">(</span></span>
@@ -206,9 +180,9 @@ functions. The following code also creates the same maturity module.</p>
 <span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/new.html" class="external-link">new</a></span><span class="op">(</span><span class="va">LogisticMaturity</span><span class="op">)</span></span>
 <span><span class="co"># Populate the maturity module with parameter values.</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
-<span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">$</span><span class="va">estimation_type</span> <span class="op">&lt;-</span> <span class="st">"constant"</span></span>
+<span><span class="va">maturity</span><span class="op">$</span><span class="va">inflection_point</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">$</span><span class="va">estimation_type</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="st">"constant"</span><span class="op">)</span></span>
 <span><span class="va">maturity</span><span class="op">$</span><span class="va">slope</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fl">0.2</span></span>
-<span><span class="va">maturity</span><span class="op">$</span><span class="va">slope</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">$</span><span class="va">estimation_type</span> <span class="op">&lt;-</span> <span class="st">"constant"</span></span></code></pre></div>
+<span><span class="va">maturity</span><span class="op">$</span><span class="va">slope</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">$</span><span class="va">estimation_type</span><span class="op">$</span><span class="fu">set</span><span class="op">(</span><span class="st">"constant"</span><span class="op">)</span></span></code></pre></div>
 <p>To run a FIMS model, more modules than just a maturity module need to
 be linked to a population module. But, this example only includes a
 maturity module so the code below is just pseudo code showing how to
@@ -218,14 +192,18 @@ been set up.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Initialize the population module and link the maturity module</span></span>
 <span><span class="co"># The IDs of the growth and recruitment modules are pseudo code and don't exist</span></span>
-<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">initialize_population</span><span class="op">(</span></span>
-<span>  parameters <span class="op">=</span> <span class="va">parameters</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">fims_frame</span>,</span>
-<span>  linked_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">maturity</span><span class="op">$</span><span class="fu">get_id</span><span class="op">(</span><span class="op">)</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maturity"</span>, <span class="st">"growth"</span>, <span class="st">"recruitment"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">create_default_Population</span><span class="op">(</span>data <span class="op">=</span> <span class="va">fims_frame</span>, log_rzero <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1000000</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>model_family <span class="op">=</span> <span class="st">"catch_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">initialize_population</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">fims_frame</span>,</span>
+<span>    linked_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">maturity</span><span class="op">$</span><span class="fu">get_id</span><span class="op">(</span><span class="op">)</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maturity"</span>, <span class="st">"growth"</span>, <span class="st">"recruitment"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p>For power users, the methods package can be used to call Rcpp and
 create the population module without using lists of parameters or any
 wrapper functions.</p>
@@ -521,14 +499,18 @@ be done by hand with <code>SetMaturity</code>. Where both options are
 shown, again, below.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Helper function</span></span>
-<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">initialize_population</span><span class="op">(</span></span>
-<span>  parameters <span class="op">=</span> <span class="va">parameters</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">fims_frame</span>,</span>
-<span>  linked_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">maturity</span><span class="op">$</span><span class="fu">get_id</span><span class="op">(</span><span class="op">)</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maturity"</span>, <span class="st">"growth"</span>, <span class="st">"recruitment"</span><span class="op">)</span></span>
+<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">create_default_Population</span><span class="op">(</span>data <span class="op">=</span> <span class="va">fims_frame</span>, log_rzero <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1000000</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>model_family <span class="op">=</span> <span class="st">"catch_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">initialize_population</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">fims_frame</span>,</span>
+<span>    linked_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">maturity</span><span class="op">$</span><span class="fu">get_id</span><span class="op">(</span><span class="op">)</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maturity"</span>, <span class="st">"growth"</span>, <span class="st">"recruitment"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Manual</span></span>
 <span><span class="va">population</span><span class="op">$</span><span class="fu">SetMaturity</span><span class="op">(</span><span class="va">maturity</span><span class="op">$</span><span class="fu">get_id</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>

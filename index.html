@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-news">
 <li><h6 class="dropdown-header" data-toc-skip>Releases</h6></li>
-    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/tag/v0.1.0">Version 0.1.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">Latest release</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="news/index.html">Changelog</a></li>
   </ul>
@@ -56,29 +56,24 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><p><!-- badges: start --> <a href="https://noaa-fims.r-universe.dev/FIMS" class="external-link"><img src="https://noaa-fims.r-universe.dev/badges/FIMS" alt="FIMS status badge"></a> <a href="https://github.com/NOAA-FIMS/FIMS/actions" class="external-link"><img src="https://github.com/NOAA-FIMS/FIMS/workflows/call-r-cmd-check/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/NOAA-FIMS/FIMS?branch=main" class="external-link"><img src="https://codecov.io/gh/NOAA-FIMS/FIMS/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a> <!-- badges: end --></p>
+  <main id="main" class="col-md-9"><p><!-- badges: start --> <a href="https://noaa-fims.r-universe.dev/FIMS" class="external-link"><img src="https://noaa-fims.r-universe.dev/badges/FIMS" alt="FIMS status badge"></a> <a href="https://github.com/NOAA-FIMS/FIMS/actions/workflows/call-r-cmd-check.yml" class="external-link"><img src="https://github.com/NOAA-FIMS/FIMS/actions/workflows/call-r-cmd-check.yml/badge.svg?branch=main" alt="R-CMD-check badge"></a> <a href="https://app.codecov.io/gh/NOAA-FIMS/FIMS?branch=main" class="external-link"><img src="https://codecov.io/gh/NOAA-FIMS/FIMS/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a> <!-- badges: end --></p>
 <div class="section level1">
 <div class="page-header"><h1 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h1></div>
-<p>The NOAA Fisheries Integrated Modeling System (FIMS) is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. A team of experts within NOAA Fisheries is designing and developing the system, and we are advised by the FIMS Council, which includes academic, industry, and international partners. The roles of internal and external collaborators are outlined in the <a href="https://noaa-fims.github.io/collaborative_workflow/fims-governance.html" class="external-link">governance section</a> of our <a href="https://noaa-fims.github.io/collaborative_workflow/" class="external-link">Developer Guide</a>. Our software is currently operational for estimation purposes and we plan for it to be operational for management in late 2025.</p>
-<p>Users and developers are welcome to submit ideas or questions using the <a href="https://github.com/NOAA-FIMS/FIMS/discussions" class="external-link">GitHub Discussion Board</a> and bug reports using GitHub Issues. The <a href="https://github.com/NOAA-FIMS/FIMS/discussions" class="external-link">Discussion Board</a> is a place for <strong>all</strong> members of the assessment and open-source software community to ask and answer questions, share updates, have open-ended conversations, and follow along on decisions affecting FIMS. If you happen to find a bug, please report it in the appropriate repository, for example use <a href="https://github.com/NOAA-FIMS/collaborative_workflow/issues" class="external-link">issues in the collaborative workflow repository</a> to make suggestions about the <a href="https://noaa-fims.github.io/collaborative_workflow/" class="external-link">developer guide</a> and <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">issues in the FIMS repository</a> for bugs in the software design.</p>
+<p>The NOAA Fisheries Integrated Modeling System (FIMS) is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. A <a href="https://noaa-fims.github.io/about/contributors.html" class="external-link">team of experts</a> within NOAA Fisheries is designing and developing the system, and we are advised by the <a href="https://noaa-fims.github.io/about/contributors.html#fims-council" class="external-link">FIMS Council</a>, which includes academic, industry, and international partners. Our software is currently operational for estimation purposes and we plan for it to be operational for management in late 2025.</p>
 <div class="section level2">
 <h2 id="installing-fims">Installing FIMS<a class="anchor" aria-label="anchor" href="#installing-fims"></a>
 </h2>
-<p>Install the latest <a href="https://noaa-fims.r-universe.dev/FIMS" class="external-link">precompiled version of FIMS</a> from <a href="https://noaa-fims.r-universe.dev" class="external-link">R universe</a> within R using the following code:</p>
+<p>A <a href="https://noaa-fims.r-universe.dev/FIMS" class="external-link">precompiled version of the latest release of FIMS</a> is available from <a href="https://noaa-fims.r-universe.dev" class="external-link">R universe</a> by running the following code within R:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"FIMS"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://noaa-fims.r-universe.dev"</span>, <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Or, you can follow the instructions in the <a href="https://noaa-fims.github.io/collaborative_workflow/developer-software-and-installation-guide.html" class="external-link">Collaborative Workflow</a> to install FIMS from GitHub or a local clone.</p>
+<p>Users can also compile it themselves, like any other TMB package by running <code>devtools::install_github("NOAA-FIMS/FIMS")</code>. This workflow allows for the specification of a particular branch or tag using the <code>ref</code> argument.</p>
+<p>Developers who are interested in building FIMS can clone this repository, e.g., <code>git clone https://github.com/NOAA-FIMS/FIMS.git</code> and build it with <code><a href="https://devtools.r-lib.org/reference/install.html" class="external-link">devtools::install()</a></code>, which builds the package from the cloned files and installs the R library. Installing with <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code> is not recommended because it uses shim files for things like <code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code>, which can cause FIMS to not function as expected. For example, if you try to optimize the same model twice, you will more than likely not get estimates of uncertainty from the second model run. Additionally, <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code> adds the debugger flag <code>-O0 -g</code> which leads to Windows users seeing <code>Fatal error: can't write &lt;xxx&gt; bytes to section .text of FIMS.o: 'file too big</code>. Thus, Windows users need to run <code>withr::local_options(pkg.build_extra_flags = FALSE)</code> at the beginning of every R session before calling <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code>. If you want to compile FIMS with the debugger turned on you will need to run the {withr} function in addition to manually modifying the call to PKG_CXXFLAGS in the <a href="https://github.com/NOAA-FIMS/FIMS/blob/doc-install/src/Makevars.win" class="external-link">Makevars.win</a> file in <code>src</code> to <code>PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS -O1 -g</code>. For a <a href="https://github.com/nmfs-ost/on-off-boarding/blob/211d3895afb892ac2fba919935eb27d933e4d048/.github/workflows/onboard-fims.yml#L22" class="external-link">list of development tools needed to build, test, and document FIMS</a> see the <a href="https://github.com/nmfs-ost/on-off-boarding" class="external-link">on- and off-boarding repository for NOAA Fisheries Office of Science &amp; Technology</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h2>
-<p>Please report bugs along with a minimal reproducible example on the FIMS <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">GitHub Issues page</a>.</p>
-</div>
-<div class="section level2">
-<h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
-</h2>
-<p>All contributors participating and contributing to the FIMS project are expected to adhere to the <a href="https://noaa-fims.github.io/collaborative_workflow/code-of-conduct.html#code-of-conduct" class="external-link">FIMS Code of Conduct</a>.</p>
+<p>If you encounter a clear <span class="emoji" data-emoji="bug">🐛</span>, please file an <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">Issue</a> with a minimal reproducible example on GitHub. If you are uncertain if you have actually encountered a <span class="emoji" data-emoji="bug">🐛</span>, are looking for more information, or want to talk about some new ideas please use the <a href="https://github.com/orgs/NOAA-FIMS/discussions" class="external-link">Discussion Board</a> to post your thoughts. Users, developers, lurkers, and anyone else interested in our project are welcome to join the discussions, this is a place for <strong>all</strong> members of the assessment and open-source software community to ask and answer questions, share updates, have open-ended conversations, and follow along on decisions affecting FIMS. Also, feel free to introduce yourself <span class="emoji" data-emoji="wave">👋</span> on the <a href="https://github.com/orgs/NOAA-FIMS/discussions/801" class="external-link">FIMS Discussion Board</a>.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -140,7 +135,13 @@
 </tr>
 <tr>
 <td align="center">
+<a href="https://github.com/abhinav-1305" class="external-link"> <img src="https://avatars.githubusercontent.com/u/113254225?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=abhinav-1305" class="external-link">abhinav-1305</a>
+</td>
+<td align="center">
 <a href="https://github.com/KyleShertzer-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/81244856?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=KyleShertzer-NOAA" class="external-link">KyleShertzer-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/alexjensen-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/168662602?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=alexjensen-NOAA" class="external-link">alexjensen-NOAA</a>
 </td>
 <td align="center">
 <a href="https://github.com/mciechanumich" class="external-link"> <img src="https://avatars.githubusercontent.com/u/110423309?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=mciechanumich" class="external-link">mciechanumich</a>
@@ -150,9 +151,6 @@
 </td>
 <td align="center">
 <a href="https://github.com/Srajald" class="external-link"> <img src="https://avatars.githubusercontent.com/u/99940237?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=Srajald" class="external-link">Srajald</a>
-</td>
-<td align="center">
-<a href="https://github.com/alexjensen-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/168662602?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=alexjensen-NOAA" class="external-link">alexjensen-NOAA</a>
 </td>
 </tr>
 </table>
@@ -249,7 +247,6 @@
 <li><a href="https://github.com/noaa-fims/fims/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/noaa-fims/fims/issues" class="external-link">Report a bug</a></li>
 <li><a href="https://noaa-fims.github.io/FIMS-docs/" class="external-link">Documentation of C++ Code</a></li>
-<li><a href="https://noaa-fims.github.io/collaborative_workflow/" class="external-link">FIMS Developer Handbook</a></li>
 </ul>
 </div>
 

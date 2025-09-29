@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,7 +20,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-news"><li><h6 class="dropdown-header" data-toc-skip>Releases</h6></li>
-    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/tag/v0.1.0">Version 0.1.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">Latest release</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
   </ul></li>
@@ -55,9 +55,55 @@
 
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments to <code>ctest --test-dir build</code> such as
-<code>"--rerun-failed --output-on-failure"</code>.</p></dd>
+<code>"--rerun-failed --output-on-failure"</code> or <code>--parallel 16</code> if you want it to
+run on multiple cores.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The output from running the tests should look something like the following:</p>
+<p></p><div class="sourceCode bash"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">Internal</span> ctest changing into directory: C:/github/NOAA-FIMS/FIMS/build</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="ex">Test</span> project C:/github_repos/NOAA-FIMS_org/FIMS/build</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>    <span class="ex">Start</span> 1: dlognorm.use_double_inputs</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="ex">1/5</span> Test <span class="co">#1: dlognorm.use_double_inputs .......   Passed    0.04 sec</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>    <span class="ex">Start</span> 2: dlognorm.use_int_inputs</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="ex">2/5</span> Test <span class="co">#2: dlognorm.use_int_inputs ..........   Passed    0.04 sec</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    <span class="ex">Start</span> 3: modelTest.eta</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="ex">3/5</span> Test <span class="co">#3: modelTest.eta ....................   Passed    0.04 sec</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>    <span class="ex">Start</span> 4: modelTest.nll</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="ex">4/5</span> Test <span class="co">#4: modelTest.nll ....................   Passed    0.04 sec</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>    <span class="ex">Start</span> 5: modelTest.evaluate</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="ex">5/5</span> Test <span class="co">#5: modelTest.evaluate ...............   Passed    0.04 sec</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="ex">100%</span> tests passed, 0 tests failed out of 5</span></code></pre><p></p></div>
+<p>If a test fails, the output will look something like the following:</p>
+<p></p><div class="sourceCode bash"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">Internal</span> ctest changing into directory: C:/github/NOAA-FIMS/FIMS/build</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="ex">Test</span> project C:/github/NOAA-FIMS/FIMS/build</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>    <span class="ex">Start</span> 1: dlognorm.use_double_inputs</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="ex">1/7</span> Test <span class="co">#1: dlognorm.use_double_inputs .......   Passed    0.04 sec</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>    <span class="ex">Start</span> 2: dlognorm.use_int_inputs</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="ex">2/7</span> Test <span class="co">#2: dlognorm.use_int_inputs ..........   Passed    0.04 sec</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    <span class="ex">Start</span> 3: modelTest.eta</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="ex">3/7</span> Test <span class="co">#3: modelTest.eta ....................   Passed    0.04 sec</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>    <span class="ex">Start</span> 4: modelTest.nll</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="ex">4/7</span> Test <span class="co">#4: modelTest.nll ....................   Passed    0.04 sec</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>    <span class="ex">Start</span> 5: modelTest.evaluate</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="ex">5/7</span> Test <span class="co">#5: modelTest.evaluate ...............   Passed    0.04 sec</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>    <span class="ex">Start</span> 6: dlognormTest.DoubleInput</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="ex">6/7</span> Test <span class="co">#6: dlognormTest.DoubleInput .........   Passed    0.04 sec</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>    <span class="ex">Start</span> 7: dlognormTest.IntInput</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="ex">7/7</span> Test <span class="co">#7: dlognormTest.IntInput ............***Failed    0.04 sec</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="ex">86%</span> tests passed, 1 tests failed out of 7</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="ex">Total</span> Test time <span class="er">(</span><span class="ex">real</span><span class="kw">)</span> <span class="ex">=</span>   0.28 sec</span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="ex">The</span> following tests FAILED:</span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>          <span class="ex">7</span> <span class="at">-</span> dlognormTest.IntInput <span class="er">(</span><span class="ex">Failed</span><span class="kw">)</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="ex">Errors</span> while running CTest</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="ex">Output</span> from these tests are in: C:/github/NOAA-FIMS/FIMS/build/Testing/Temporary/LastTest.log</span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="ex">Use</span> <span class="st">"--rerun-failed --output-on-failure"</span> to re-run the failed cases verbosely.</span></code></pre><p></p></div>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
