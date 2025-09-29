@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #include "../distributions/distributions.hpp"
-#include "../models/fisheries_models.hpp"
+#include "../models/functors/fishery_model_base.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/population/population.hpp"

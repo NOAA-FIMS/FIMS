@@ -84,19 +84,20 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         } else {
           this->lpdf_vec[i] = 0;
         }
-      }
-      if(this->input_type == "prior") {
-         this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
-              log(this->get_observed(i));
-      }
-      if(this->input_type == "random_effects") {
+      } else {
+         if(this->input_type == "random_effects") {
         // if random effects, no lognormal constant needs to be applied
         this->lpdf_vec[i] =
             dnorm(log(this->get_observed(i)), this->get_expected(i),
                   fims_math::exp(log_sd.get_force_scalar(i)), true);
+      } else {
+            this->lpdf_vec[i] =
+              dnorm(log(this->get_observed(i)), this->get_expected(i),
+                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
+              log(this->get_observed(i));
       }
+      }
+     
       this->report_lpdf_vec[i] = this->lpdf_vec[i];
       lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
