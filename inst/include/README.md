@@ -1,5 +1,7 @@
 # C++ Directory Structure
 
+[TOC]
+
 The C++ code for FIMS is stored in two location, src/ and inst/include/. The files stored in src/ contain the details necessary for implementation so the code can be compiled into a shared library, i.e., a .dll on Windows or a .so on Linux. The files stored in inst/include/ contain header files (.hpp files) that contain class and struct definitions, function prototypes, template declarations and definitions, inline function definitions, and constants and macros. We use .hpp extension instead of .h because .h declares a file a header file but not necessarily a header file that contains C++ code; though the extensions can be used interchangeably. Header files are essential for modular programming in C++, serving as interfaces, declaring functions, classes, and other entities that are defined in the corresponding ../source/*.cpp files or directly within the header itself (for templates and inline functions). They allow the compiler to understand the structure of the code and ensure that different parts of the program can interact correctly. When a .cpp file includes a .hpp file, the compiler gains access to the declarations within the header, enabling it to compile the code that uses those declarations.
 
 ## inst/include/
