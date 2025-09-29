@@ -111,10 +111,10 @@ Modules that are available in FIMS are known as reference classes in the C++ cod
 
 By just passing the configurations and the data to `create_default_parameters()`, the default values for parameters that relate to fleet(s), recruitment, growth, and maturity modules can be created. For example,
 
-  - "BevertonHolt" for the recruitment module
-  - "Dnorm" distribution for recruitment deviations (log_devs)
-  - "EWAA" for the Growth module, and
-  - "Logistic" for Maturity module.
+- "BevertonHolt" for the recruitment module
+- "Dnorm" distribution for recruitment deviations (log_devs)
+- "EWAA" for the Growth module, and
+- "Logistic" for Maturity module.
 
 ```{r parameters, max.height='100px', attr.output='.numberLines'}
 # Create default parameters based on default_configurations and data
@@ -168,7 +168,7 @@ parameters_4_model <- default_parameters |>
     ),
     by = c("fleet_name", "label")
   ) |>
-  # Update log_devs in the Recruitment module (time steps 2–30)
+  # Update log_devs in the Recruitment module (time steps 2-30)
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
