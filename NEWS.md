@@ -1,3 +1,11 @@
+# FIMS 0.7.0
+
+* Converts nested list of lists used for model control to a tibble with one line
+  per parameter that can be un-nested and nested.
+* Increased the documentation of FIMS by using formulas in doxygen, building the
+  doxygen on the NOAA-FIMS github.io site instead of its own web page, writing
+  more information in the testing README, etc.
+
 # FIMS 0.6.3
 
 * Fixes bugs in fims_math.hpp when using TMBad library to use the standard
