@@ -108,9 +108,9 @@ one and observations, $y$ are *iid* Normal:
 
 ```
 
-Under this formulation, the process approach results in a sparse precision matrix, 
-or the Hessian which is the inverse of the covariance matrix, while the deviations 
-approach results in a dense precision matrix (Fig 1). Models are evaluated with 
+Under this formulation, the process approach results in a sparse Hessian which is 
+a functions of the inverted covariance matrix, while the deviations approach 
+results in a dense Hessian (Fig 1). Models are evaluated with 
 RTMB (Kristensen, 2019) using the TMB package (Kristensen et al., 2016) in R (R Core Team, 2024).
 TMB relies on the Laplace approximation to integrate out random effects during an inner 
 optimization step, and afterwards, the joint negative log-likelihood is minimized with respect to
@@ -129,16 +129,85 @@ and process approach (bottom).
 
 ### Catch-at-age Model 
 
-We compared the deviation and process approaches in a simple catch-at-age stock assessment
-model by modifying the software package, babySAM. The babySAM model structures recruitment,
-numbers at age, and fishing mortality as AR1 processes. We modified the model to 
-structure recruitment under both the deviation and process approaches. The main structure 
+We compared the deviation and process approaches in a simple catch-at-age stock assessment model by extending an RTMB version of SAM, originally written by Anders Nielsen. The SAM model structures recruitment, numbers at age, and fishing mortality as AR1 processes. 
+
+The case study is built off of an existing SAM model and the data list (`dat`) can be updated for RTMB as follows
+
+```{r datsection, echo=TRUE}
+library(RTMB)
+library(stockassessment)
+library(tictoc)
+
+load("../fit.RData")
+dat <- list()
+dat$logobs <- fit$data$logobs
+dat$aux <- fit$data$aux
+dat$idx1 <- fit$data$idx1
+dat$idx2 <- fit$data$idx2
+dat$minYear <- min(fit$data$years)
+dat$minAge <- min(fit$data$minAgePerFleet)
+dat$fleetTypes <- fit$data$fleetTypes
+dat$sampleTimes <- fit$data$sampleTimes
+dat$year <- fit$data$years
+dat$age <-  min(fit$data$minAgePerFleet):max(fit$data$maxAgePerFleet)
+dat$M <- fit$data$natMor
+dat$SW <- fit$data$stockMeanWeight
+dat$MO <- fit$data$propMat
+dat$PF <- fit$data$propF
+dat$PM <- fit$data$propM
+
+dat$srmode <- 0
+dat$fcormode <- 2
+dat$keyF <- fit$conf$keyLogFsta[1,]
+dat$keyQ <- fit$conf$keyLogFpar
+dat$keySd <- fit$conf$keyVarObs
+dat$keySd[dat$keySd<(-.1)] <- NA
+dat$covType <- c(0,1,2)
+dat$keyIGAR <- fit$conf$keyCorObs
+dat$keyIGAR[fit$conf$keyCorObs==-1] <- NA
+dat$keyIGAR[is.na(fit$conf$keyCorObs)] <- -1
+dat$keyIGAR[2, 1:4]<-0
+dat$noParUS <- sapply(1:length(dat$fleetTypes),
+                      function(f){
+                        A <- sum(!is.na(dat$keySd[f,]))
+                        ifelse(dat$covType[f]==2, (A*A-A)/2, 0)
+                      })
+```
+
+#### Parameter Section
+
+We modified the model to structure recruitment under both the deviation and process approaches. The main structure 
 for recruitment for years 2 and greater was applied to the numbers at age parameter, $N_{y, a=1}$ 
 for year $y$ and for age 1 with mean recruitment $\hat{r}$, written as the following:
 
-<!--  TODO: fix deviations approach equation -->
 1. deviations approach: $log(N_{y,1}) = \hat{r} + z_{y}, \quad where \quad z_{y} \sim N(z_{y-1},\sigma^{2}_{r})$
 2. process approach: $N_{pred} = log(N_{y-1, 1}), \quad where \quad log(N_{y, 1}) \sim N(\hat{r} + \phi*(N_{pred} - \hat{r}))$
+
+The parameters estimated in the RTMB code appear below; the parameters that matter most between implementations of the deviations and process approaches  of recruitment deviations are the last two (`z` and `rec_intercept`).
+
+```{r parsection, echo=TRUE}
+# Parameter section
+par <- list()
+par$logsdR <- 0
+par$logsdS <- 0
+par$logsdF <- numeric(max(dat$keyF)+1)
+par$rickerpar <- if(dat$srmode==1){c(1,1)}else{numeric(0)}
+par$transRhoF <- if(dat$fcormode==0){numeric(0)}else{0.1}
+par$bhpar <- if(dat$srmode==2){c(1,1)}else{numeric(0)}
+par$logQ <- numeric(max(dat$keyQ, na.rm=TRUE)+1)
+par$logsd <- numeric(max(dat$keySd, na.rm=TRUE)+1)
+par$logIGARdist <- numeric(max(dat$keyIGAR, na.rm=TRUE)+1)
+par$parUS <- numeric(sum(dat$noParUS))
+par$logN <- matrix(0, nrow=length(dat$year), ncol=length(dat$age))
+par$logF <- matrix(0, nrow=length(dat$year), ncol=max(dat$keyF)+1)
+par$missing <- numeric(sum(is.na(dat$logobs)))
+par$tPhi <- 1  # AR phi for recruitment
+par$z <- rep(0, length(dat$year))  # Standard normal innovations
+par$rec_intercept <- 0 # mapped off if not estimated
+
+```
+
+#### Code
 
 The joint negative log-likelihood for recruitment under each approach was computed using
 state space form as:
@@ -150,25 +219,27 @@ state space form as:
   # AR1 standard normal innovations for remaining years
   jnll <- jnll - sum(dnorm(z[-1], 0, sdR, log=TRUE))
   # transform innovations (z) to get recruitment deviations
+ # transform innovations (z) to get recruitment deviations
   rec_dev <- numeric(nrow)
   rec_dev[1] <- z[1]  # initial condition
-  for(i in 2:nrow){
-    rec_dev[i] <- phi * rec_dev[i-1] + z[i]
-  }
-  # 3. Set recruitment as random walk + transformed deviations
-  for(y in 1:nrow){
+  # Set recruitment as random walk + transformed deviations
+  for(y in 2:nrow){
+    rec_dev[y] <- phi * rec_dev[y-1] + z[y]
     # Random walk with optional intercept
-    logN[y,1] <- rec_intercept + rec_dev[y]
+    predR <- rec_intercept
+    logN[y,1] <- predR + rec_dev[y]
   }
 
   # process approach
   # AR1 init conditions
   jnll <- jnll - dnorm(logN[1,1], rec_intercept, sdR/sqrt(1-phi^2), log=TRUE)
   # AR1 for remaining years
+  indR <- 0
   for(y in 2:nrow){
-     predN <- logN[y-1,1]
+    indR <- indR + 1
+    predR[indR] <- rec_intercept
   }
-  jnll <- jnll - dnorm(logN[y,1], rec_intercept + phi*(predN - rec_intercept), sdR, TRUE)
+  jnll <- jnll - sum(dnorm(logN[-1,1], predR + phi*(logN[-nrow,1] - predR), sdR, TRUE))
 ```
 
 Catch-at-age models compared recruitment with and without the recruitment intercept
@@ -181,17 +252,20 @@ standard deviation of 0.03. We compared computational times from the speed test 
 
 ## Results
 
-This analysis looked at both a simple AR1 time series and a simple catch-at-age stock assessment model with an AR1 process in recruitment. Both analyses demonstrate that model results are the same despite the parameterization used. 
+For each group of models (ar1 and catch-at-age with and without the fixed effect recruitment mean), we can compare models with the deviations and process parameterization. We compared (1) likelihoods, (2) fixed effect parameter means, (3) fixed effect parameter variances, and (4) estimated recruitment deviation mean and variances. For all comparisons, we found parameters to be perfectly correlated between the deviations and process approaches.
 
-The process approach resulted in a sparse Hessian while the deviations approach resulted in a Hessian that was dense in recruitment (Fig. 2). Results from the speed test indicated the process approach was approximately 2x times faster than the deviations approach both with and without an estimated intercept (Table 1). While speed up for a single AR1 process is minimal, more complex stock assessments currently include AR1 random effects in multiple processes (e.g. numbers at age, maturity, mortality, etc.). The computational cost of fitting the centered approach scales significantly, warranting the need to adopt the more computationally efficient non-centered parameterization when estimating AR1 processes as random effects.
+The process approach resulted in a sparse Hessian while the deviations approach resulted in a Hessian that was dense in recruitment (Fig. 2). Results from the speed test indicated the process approach was approximately 2x times faster than the deviations approach both with and without an estimated intercept (Table 1). While speed up for a single AR1 process is minimal, more complex stock assessments currently include AR1 random effects in multiple processes (e.g. numbers at age, maturity, mortality, etc.). The computational cost of fitting the deviations approach scales significantly, warranting the need to adopt the more computationally efficient process parameterization when estimating AR1 processes as random effects.
 
-Table 1. Results from speed test (in seconds) from running models 25 times. Results are from a Windows operating system with 1.80 GHz Processor and 16 GB RAM. Note that absolute results are machine dependent but relative results will be consistent across systems.
+Table 1. Results from speed test (in seconds) from running models 25 times. Note that absolute results are machine dependent but relative results will be consistent across operating systems and machine specifications.
 
-|           |Without Intercept|With Intercept |
-|-----------|-----------------|---------------|
-|process    |155.3            |162.88         |
-|deviations |334.77           |327.45         |
+|Intercept|Model      |Average time (sec) | SD   | Min  | Max |
+|---------|-----------|-------------------|------|------|-----|
+|Y        |process    |1.381              |0.642 |0.957 |3.635|
+|N        |process    |1.561              |0.620 |1.163 |4.473|
+|Y        |deviations |2.976              |1.695 |2.070 |9.903|
+|N        |deviations |3.372              |1.324 |2.614 |9.613|
  
 
 ![](figures/devs_intercept.png) ![](figures/process_intercept.png)
-**Figure 1.** Hessian matrix for random effects model with an AR1 process on recruitment in a catch-at-age model using deviations approach (top) and process approach (bottom).
+
+**Figure 2.** Hessian matrix for random effects model with an AR1 process on recruitment in a catch-at-age model using deviations approach (top) and process approach (bottom).
