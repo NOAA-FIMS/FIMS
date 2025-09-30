@@ -390,10 +390,10 @@ In a Bayesian framework, priors for all parameters are needed. Basic parameters 
 | r | Intrinsic population growth rate | Lognormal | run |
 | K | Population carrying capacity | Lognormal | run |
 | m | Pella-Tomlinson shape | Lognormal | run |
-|  | Initial depletion | Lognormal or Beta | run |
+| \f$\psi\f$   | Initial depletion | Lognormal or Beta | run |
 | q | Catchability | Lognormal | fleet |
-|  | Process error | Inverse gamma | year |
-|  | Observation error | Inverse gamma | fleet and year |
+| \f$\sigma^{2}\f$  | Process error | Inverse gamma | year |
+| \f$\tau^{2}\f$  | Observation error | Inverse gamma | fleet and year |
 
 Note: Here is a running [list of parameters](https://docs.google.com/spreadsheets/d/1SnlXcfL90w6lEbPx1eRVRBXAEP3_97tzE1Oa_n2ivpM/edit?gid=2063265688#gid=2063265688) (names and abbreviations) that are currently in FIMS. Naming conventions and names are currently being discussed and will be modified before version 1.0.
 
@@ -776,48 +776,48 @@ This development will also structure the distribution functions so that it is st
 #### Review of prior options in other software and their uses
 
 Stock Synthesis priors:
-* Many options for all parameters, see current options [here](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html#parameter-priors).
+- Many options for all parameters, see current options [here](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html#parameter-priors).
 
 ASAP priors:
-* Aggregate catch and indices, lognormal
-* Deviations from SR curve (BH assumed, although often set with steepness=1), lognormal
-* Fmult in first year, lognormal
-* Fmult deviations, lognormal random walk, typically unconstrained
-* Catchability, lognormal
-* Catchability deviations, lognormal random walk, not used very often
-* N at age in first year, lognormal from input guesses or an exponential decline using M and F from first year
-* Selectivity parameters, lognormal, from either values at age or parameters of logistic or double logistic (note, this doesn't totally make sense because selectivity can only be between zero and one)
-* Catch and indices at age assume multinomial with input ESS (not sure if this counts as a prior or not)
-* No priors are linked to create multivariate priors (e.g., prior on catch and catchability are independent with no covariance)
-* M is input as a matrix, no estimation of M allowed in ASAP
-* Weights at age are empirical and input as matrices, no estimation of growth allowed in ASAP
+- Aggregate catch and indices, lognormal
+- Deviations from SR curve (BH assumed, although often set with steepness=1), lognormal
+- Fmult in first year, lognormal
+- Fmult deviations, lognormal random walk, typically unconstrained
+- Catchability, lognormal
+- Catchability deviations, lognormal random walk, not used very often
+- N at age in first year, lognormal from input guesses or an exponential decline using M and F from first year
+- Selectivity parameters, lognormal, from either values at age or parameters of logistic or double logistic (note, this doesn’t totally make sense because selectivity can only be between zero and one)
+- Catch and indices at age assume multinomial with input ESS (not sure if this counts as a prior or not)
+- No priors are linked to create multivariate priors (e.g., prior on catch and catchability are independent with no covariance)
+- M is input as a matrix, no estimation of M allowed in ASAP
+- Weights at age are empirical and input as matrices, no estimation of growth allowed in ASAP
 
-WHAM generally does not use priors. It estimates a fixed parameter on a scale from negative to positive infinity and uses transformations to get a desired constraint, estimates a random effect, or treats the parameter as known. There are many more options for dealing with age composition in WHAM than in ASAP, e.g., multinomial, Dirichlet-multinomial, logistic-normal, and multivariate-Tweedie, with variations for handling year, age combinations with observed zeros. WHAM has multiple ways to estimate linkages among random effects, e.g., IID, autoregressive across age, year, or both, and mixed with autoregressive across year for recruitment and 2d-AR1 for remaining ages in NAA. WHAM allows estimation of M. WHAM also allows incorporation of environmental covariates in a statistically sound manner using random effects.
+WHAM generally does not use priors. It estimates a fixed parameter on a scale from negative to positive infinity and uses transformations to get a desired constraint, estimates a random effect, or treats the parameter as known. There are many more options for dealing with age composition in WHAM than in ASAP: e.g., multinomial, Dirichlet-multinomial, logistic-normal, and multivariate-tweedie, with variations for handling year, age combinations with observed zeros. WHAM has multiple ways to estimate linkages among random effects: e.g., IID, autoregressive across age, year, or both, and mixed with autoregressive across year for recruitment and 2dar1 for remaining ages in NAA. WHAM allows estimation of M. WHAM also allows incorporation of environmental covariates in a statistically sound manner using random effects.
 
-SAM does not use priors. It also does not use age composition estimation generally. It treats indices at age and catch at age as multivariate lognormal random variables. It also estimates F at age over time as a multivariate lognormal random walk with covariances among the ages and over time.
+SAM does not use priors. It also does not use age composition estimation generally. It treats indices at age and catch at age as multivariate log-normal random variables. It also estimates F at age over time as a multivariate log-normal randomwalk with covariances among the ages and over time. 
 
 FIMS should allow the use of priors for cases where random effects are not desired or possible, e.g., due to large blocks of missing data. A model without priors is a priori preferable to one with priors, but sometimes priors are needed in order to produce reasonable results.
 
 ### Architecture & Organization
 
-Architectural changes will be grouped into the following four stages:
+Architectural changes will be grouped into four stages: 
 
 1. The development of a hierarchical class structure for distributions (**complete**)
-2. A generalized framework for adding random effects and Bayesian priors (**complete**)
-3. Building up capacity which will add new distributions, osa residuals, and simulation functionality (work in progress)
-4. Adding multivariate functionality for random effects and Bayesian priors
+2. A generalized framework for adding random effects and Bayesian priors (**complete**) 
+3. Building up capacity which will add new distributions, osa residuals, and simulation functionality (wip)
+4. Adding multivariate functionality for random effects and Bayesian priors.
 
 ### Decision Points
 
-FIMS will develop a library of likelihoods so that multiple distributions will be available, not only for random effect processes, but also for data components, such as indices and compositions. Given this flexibility, FIMS will require the ability to compare and select best likelihoods from a set. Such a comparison is not always straightforward as some likelihoods are not comparable, e.g., with AIC. FIMS will initially depend on TMB distribution functions but will eventually expand the fims math section to include explicitly written distributions.
+FIMS will develop a library of likelihoods so that multiple distributions will be available, not only for random effect processes and priors, but also for data components, such as indices and compositions. Given this flexibility, FIMS will require the ability to compare and select best likelihoods from a set. Such a comparision is not always straightforward as some likelihoods are not comparable, e.g. with AIC. FIMS will initially depend on TMB distribution functions but will eventually expand the fims math section to include explicitly written functions. 
 
-FIMS will implement full state space capabilities, which will allow processes such as recruitment, selectivity, numbers at age, etc. to be time varying. This will be accomplished by relying on an autoregressive distributions, such as AR1 and random walk, or by depending on environmental linkages. Correlation between two dimensional processes (e.g. correlation between age and year in maturity, etc.) will be captured using 2d-AR1 distributions. Time variation will require a general framework on the R side to specify processes on any parameter. Initial development will focus on adding an AR1 process on recruitment, after which, the framework will be applied to other processes requiring time variation.
+FIMS will implement full state space capabiliities, which will allow processes such as recruitment, selectivity, numbers at age, etc. to be time varying. This will be accomplished by relying on autoregressive distributions, such as AR1 and randomwalk, or by depending on environmental linkages. Correlation between two dimensional processes (e.g. correlation between age and year in maturity, etc.) will be captured using 2dAR1 distributions. Time variation will require a general framework on the R side to specify processes on any parameter. Initial development will focus on adding an AR1 process on recruitment, afterwhich, the framework will be applied to other proccesses requiring time variation. 
 
-FIMS will also implement fully Bayesian models. A key step to accomplishing this will be the ability to add both univariate and multivariate priors to any parameter or parameter set. Multivariate priors will allow for the handling of correlations between parameters. Priors will need to be flexible with the option to handle Jacobian transformations. The R interface will need to be developed to handle a generalized framework for adding priors to parameters and improvements will be needed in the output to handle reporting and accessing other stan R libraries for visualizing Bayesian output.
+FIMS will also implement fully Bayesian models. A key step to accomplishing this will be the ability to add both univariate and multivariate priors to any parameter or parameter set. Multivariate priors will allow for the handling of correlations between parameters. Priors will need to be flexible with the option to handle Jacobian transformations. The R interface will need to be developed to handle a generalized framework for adding priors to parameters and improvements will be needed in the output to handle reporting and accessing other stan R libraries for visualizing Bayesian output.   
 
-FIMS will add additional features to likelihood functions for calculating one-step-ahead (osa) residuals and for simulating data. OSA structure will require a flexible format for assembling the data vector going into the the osa component as this framework will need to work as users add or remove data, include unobserved data entries (i.e. NAs), or add "ghost" data. Additionally, users will need to choose which composition bin to drop for multivariate constrained likelihoods (e.g. multinomial, Dirichlet-Multinomial, Dirichlet, etc.). Data will need to be defined using the "Type" specifier so that values can be added to the tape. This definition is needed as TMB estimates data as random effects in osa calculations. Simulation will rely initially on TMB defined random distribution functions and TMB specific code macros.
+FIMS will add additional features to likelihood functions for calculating one-step-ahead (OSA) residuals and for simulating data. OSA structure will require a flexible format for assembling the data vector going into the the OSA component as this framework will need to work as users add or remove data, include unobserved data entries (i.e. NAs), or add "ghost" data. Additionally, users will need to choose which composition bin to drop for multivariate constrained likelihoods (e.g. multinomial, Dirichlet-Multinomial, Dirichlet, etc.). Data will need to be defined using the "Type" specifier so that values can be added to the tape. This definition is needed as TMB estimates data as random effects in OSA calculations. Simulation will rely initially on TMB defined random distribution functions and TMB specific code macros. 
 
-The following user case studies are provided to help guide developers in the architecture and design of a generic framework for random effects and bayesian priors.
+The following user case studies provide pseudo code to help guide developers in the architecture and design of a generic framework for random effects and bayesian priors. 
 
 #### Univariate priors
 
@@ -872,7 +872,7 @@ dmvnorm(x=c(3,-2), mean=mu, sigma=Sigma, log=TRUE)
 
 population$SetGrowth(ewaa_growth$get_id())
 population$SetPriors( pars=params, mu=mu, Sigma=Sigma,
-        family='multivariate_normal', log=TRUE)
+        family=’multivariate_normal’, log=TRUE)
 ```
 
 Jacobian adjustments during integration, see this [comment](https://github.com/NOAA-FIMS/FIMS/issues/431#issuecomment-1930450473) for links and background
@@ -892,10 +892,8 @@ obj <- MakeADFun(data = list(), parameters, DLL = "FIMS", silent = TRUE)
 obj$fn() ## does include Jacobian adjustments from priors
 ```
 
-#### MCMC integration of a model
-
-The R package tmbstan provides the most straightforward way to generate posterior samples for a FIMS model. It is demonstrated briefly below.
-
+MCMC integration of a model
+The R package ‘tmbstan’ provides the most straightforward way to generate posterior samples for a FIMS model. It is demonstrated briefly below.
 ```{r, eval = FALSE}
 ## Try MCMC integration with tmbstan. Also see new package
 
@@ -971,120 +969,201 @@ population$add_random_effects(par='log_M', type='2d-AR1',
                               init=c(1,0,0), estimated=c(0,1,1))
 ```
 
+
 ### Hierarchical Class Structure for Distributions
 
-Build library of probability distributions and necessary architecture to connect to FIMS
+FIMS will build a library of probability distributions along with the necessary architecture to connect these distributions with C++ distribution classes. The architecture will include a distribution parent class, DistributionBase, with multiple univariate and multivariate child distribution classes (e.g. NormalLPDF, NormalLPDF, MultinomialLPMF, MvnormLPDF, etc.), where LPDF is the log probability density function for continuous distributions and LPMF is the log probability mass function for discrete distributions. This naming convention, *log PDF/PMF* is preferred over *log-likelihood* as it is more generic, i.e. in a Bayesian context, a prior is conceptually different from a likelihood. 
 
-* UnivariateDistributionBase and MultivariateDistributionBase each with child Distribution classes (e.g. NormalLPDF, MultinomialLPMF, MvnormLPDF, etc.)
-    * LPDF: log probability density function (continuous distributions)\
-    * LPMF: log probability mass function (discrete distributions)\
-    * Base classes will have an evaluate function which takes input ***observed_value*** (can be data, parameters, or random effects) and ***expected_value*** (can be a derived value in the model, fixed or estimated)\
-    * Naming convention: prefer log PDF/PMF over "log-likelihood" as it is more generic. In a Bayesian context, a prior is conceptually different from a likelihood\
-* Each child Distribution class will have an evaluate function which takes local parameters and returns a log PDF/PMF.\
-* The child class evaluate functions will also includes code to calculate the OSA residual and simulation function available through TMB\
-* model.hpp is modified to loop over all instantiated Distribution classes and sum the negative values together to produce a joint negative log likelihood
-    * Note: When simulating from a model, simulation needs to happen in the order of model hierarchy (i.e. priors first, then random effects, then data).\
-    * Functions need to report out an nll value for each data point
+Base classes will have an evaluate function which takes input *observed_value* (can be data, parameters, or random effects) and *expected_value* (can be a derived value in the model, fixed or estimated). Each child distribution class will have an evaluate function which takes local parameters and returns a log PDF/PMF. The child class evaluate functions will also includes code to calculate the OSA residual and simulation function available through TMB. The model.hpp file will be modified to loop over all instantiated Distribution classes and sum the negative values together to produce a joint negative log likelihood. When simulating from a model, simulation needs to happen in the order of model hierarchy (i.e. priors first, then random effects, then data). Evaluate functions will report out an nll value for each data point.
 
-### A generalized framework for adding random effects and Bayesian priors
+* observed_value:
+    * Data: input by the user
+    * Random effect: calculated as a derived quantity within a module
+    * Prior: set to a parameter in the model
+    * Needs to be able to handle both scalar and vector scenarios
 
-1. Build infrastructure to include priors and random effects using a generalized framework
+* expected_value:
+    * Data: calculated as a derived quantity within a module
+    * Random effect: fixed at zero or calculated as a derived quantity within a module
+    * Prior: set and fixed by the user
 
-* Rcpp interface links user input with members of nll functions for the following three cases. The goal is to develop a generic interface that can handle all three of the following cases:
+* sd: set by user through the R interface
 
-1. Data Case: Rcpp interface links user input to **observed_value** in Distribution functions and points the **expected_value** to the correct derived value in the model. User sets initial values of parameters and Rcpp interface adds the parameters to the list of parameters estimated by the model
-2. Prior Case: Rcpp interface links the **observed_value** in Distribution functions to a parameter/s in the model. User sets **expected_value** and Distribution specific parameters and fixes values so they are not estimated by the model
-3. Random Case: Rcpp interface links the **observed_value** in Distribution functions to a process in the model and fixes the **expected value** at 0. User sets the initial value of Distribution specific parameters and these get added to the list of parameters estimated by the model
-    * Functions are designed to be generic to handle the following cases (see [FIMS NLL Examples](https://docs.google.com/document/d/1X1NwjQlLrKGIXZgkMfJ29Kp1lFreKiiTTQxyoicgqxc/edit))
-        * Scalar prior
-        * Multivariate prior for multiple parameters within the same module (e.g., Multivariate prior on Linf and K)
-        * Univariate random effect
-        * Multivariate random effect for a single process (e.g., log_M across years and ages)
-        * Multivariate prior for two parameters across different modules - doesn't need to be constrained to two (e.g., mortality and steepness)
-        * Multivariate random effect for two processes within the same module\
-        * Multivariate random effect for two processes across different modules
-            
-2. Discussion Points
+* evaluate()
 
-* One class per distribution with flags for osa and simulation flags for data and re/priors
-* wrt simulations, order matters and needs to follow the natural hierarchy of the model (i.e., 1. Priors 2. Random effects 3. Data)
-* Interface - generic approach but be mindful of different use cases
-    * Multivariate where each parameter/process comes from a different module
-    * Varying data types (i.e., scalar sd vs vector of cvs for dnorm)
-* From WHAM: 2d-AR1 with recruitment and NAA - these should **not** be linked; solution was to apply 2d-AR1 to ages 2+ and recruitment treated differently - consider if NAA should be an additional module on top of recruitment
-    * What complexities occur with NAA (random effect, movement) - if more than two use cases then justification to create new module
-* OSA requires a lot of input code on the R side to prepare for OSA wrt multinomial
-    * Need to throw out one of the age/year bins - need to set NA so the osa calculation skips this value ([WHAM approach](https://github.com/timjmiller/wham/blob/master/R/set_osa_obs.R#L280))
-    * Is this something we develop during M2?
-    * What does SAM do?
-    * Can this be done internally in C++?
-* Need to be mindful of sparsity - e.g., Recruitment with an AR1 process is dense if the random effect is the devs but is sparse if the random effect is logR.
+    * Loop over the length of observed_value and evaluate the log-likelihood
+    * Calculate osa residuals
+    * Implement the cdf method for all distributions
 
-3. Proposed Tests:
-
-* RE test
-* tmbstan test
-* MLE test with penalties
-
-### Model Specification
-
-Ideas are being explored using the [ModularTMBExample](https://github.com/NOAA-FIMS/ModularTMBExample/tree/FIMS-v0100-nll-refactor-2)
 
 #### Negative Log Density Functions
 
 UnivariateBase
 
-* Normal(x, mu, sd) **completed**
-* LogNormal: often written as Normal(log(x), mu, sd) - log(x) **completed**
-* Gamma(x, \f$1/cv^2\f$, \f$cv^2mean\f$), cv: coefficient of variation, mean > 0, typically use a exp() to keep the mean positive
-* NegativeBinomial: used for tagging data - parameterization can be a bit tricky, research best one to use for tagging data; discrete data
-* Tweedie(x, mean, dispersion, power), mean >0 (typically exp()), dispersion > 0 (typically exp()), 1 < power < 2 (scaled logit transformed); used for zero-inflated continuous data (hurdle data)
+* \f$^{*}\f$ Normal(x, mu, sd) **completed**
+* \f$^{*}\f$ LogNormal: often written as Normal(log(x), mu, sd) - log(x) **completed**
+* \f$^{**}\f$ Gamma(x, 1/cv^2, cv^2mean), cv: coefficient of variation, mean > 0, typically use a exp() to keep the mean positive
+* \f$^{**}\f$ Beta: used as prior for logit transformed parameters.
+* \f$^{***}\f$ NegativeBinomial: used for tagging data - parameterization can be a bit tricky, research best one to use for tagging data; discrete data
+* \f$^{***}\f$ Tweedie(x, mean, disp, power), mean >0 (typically exp()), disp > 0 (typically exp()), 1 < power < 2 (scaled logit transformed); used for zero-inflated continuous data (hurdle data)
 
 MultivariateBase
 
-* Multinomial **completed**
-  * If calculating OSA residual, data need to be true counts
-* Dirichlet-multinomial
-* Logistic Normal - performs better than Dirichlet-multinomial at large sample sizes and Dirichlet-multinomial performs better than LN at small sample sizes
-  * Relies on the multivariate normal (e.g., [here](https://github.com/timjmiller/wham/blob/master/src/age_comp_osa.hpp#L271))
-  * Will work better with OSA compared to multinomial - often comp data are not true integers
-* Multivariate Tweedie
-* AR1
-* Multivariate Normal - required to implement the Logistic Normal
-* 2d-AR1
-* Gaussian Markov Random Fields
+* \f$^{*}\f$Multinomial **completed**
+    * If calculating OSA residual, data need to be true counts
+* \f$^{**}\f$Dirichlet Multinomial
+* \f$^{**}\f$Logistic Normal - performs better than DM at large sample sizes and DM performs better than LN at small sample sizes
+    * Relies on the multivariate normal (e.g., [here](https://github.com/timjmiller/wham/blob/master/src/age_comp_osa.hpp#L271))
+    * Will work better with OSA compared to multinomial - often comp data are not true integers
+* \f$^{***}\f$Multivariate Tweedie
+* \f$^{*}\f$AR1
+* \f$^{**}\f$Multivariate Normal - required to implement the Logistic Normal
+* \f$^{**}\f$2dAR1
+* \f$^{***}\f$GMRF
 
-Highest priority
-Mid priority
-Low priority
+\f$^{*}\f$ Highest priority\
+\f$^{**}\f$ Mid priority\
+\f$^{***}\f$ Low priority
 
-#### C++ Classes
+### A generalized framework for adding random effects and Bayesian priors
 
-UnivariateBase
+FIMS infrastructure will include priors and random effects using a generalized framework. To meet this goal, the Rcpp interface will be used to link user input with members of nll functions for the following three cases:
 
-* Observed_value:
-  * Data: input by the user\
-  * Random effect: calculated within a module\
-  * Prior: set to a parameter in the model\
-  * Needs to be able to handle both scalar and vector\
-* expected_value:
-  * Data: calculated within population\
-  * Random effect: fixed at zero\
-  * Prior: set and fixed by the user\
-* evaluate(observed_value, expected_value, do_log = true)
-* sd: initiated through user interface\
-* osa_flag: if data, implements the osa calculate\
-* simulation_flag\
-* evaluate()
-  * Loop over the length of observed_value and evaluate the nll for dnorm\
-  * Calculate osa residuals\
-  * Need to implement the cdf method for all distributions?
+1. **Data Case**: Rcpp interface links user input to *observed_value* in Distribution functions and points the *expected_value* to the correct derived quantity in the model. User sets initial values of parameters and Rcpp interface adds the parameters to the list of parameters estimated by the model.
+2. **Prior Case**: Rcpp interface links the *observed_value* in Distribution functions to a parameter/s in the model. User sets *expected_value* and Distribution specific parameters and fixes values so they are not estimated by the model.
+3. **Random Case**: Rcpp interface links the *observed_value* in Distribution functions to a process in the model and fixes the *expected value* at 0 or sets it to another derived quantity in the model. User sets the initial value of Distribution specific parameters and these get added to the list of parameters estimated by the model.
 
-Notes
+Functions will be designed to be generic in order to handle the following cases:
+  * Scalar prior
 
+  * Multivariate prior for multiple parameters within the same module (e.g., Multivariate prior on Linf and K)
+
+  * Univariate random effect
+
+  * Multivariate random effect for a single process (e.g., log_M across years and ages)
+
+  * \f$^{*}\f$Multivariate prior for two parameters across different modules - doesn't need to be constrained to two (e.g., mortality and steepness)
+
+  * Multivariate random effect for two processes within the same module
+
+  * Multivariate random effect for two processes across different modules
+
+\f$^{*}\f$ Low priority\
+\f$^{**}\f$ Requires research
+
+The Rcpp interface will link parameters and derived quantities set from the user interface to the backend using C++ maps, which act as lookup tables and consist of a value and key pair. This object will be termed *variable_map* in the C++ code where the value is a C++ pointer to the parameter or derived quantity of interest and the key (i.e. lookup value) is the parameter or derived quantity's unique ID. Under this framework, distributions will be able to access any parameter or derived quantity as either an observed or expected value. 
+
+### Model Specification
+
+Ideas are being explored using the [ModularTMBExample](https://github.com/NOAA-FIMS/ModularTMBExample/tree/FIMS-v0100-nll-refactor-2)
+
+#### Rcpp interface 
+
+*Generic set_distribution_links() in rcpp_distribution.hpp*
+
+FIMS specifies a *set_distribution_links()* function that takes as arguments the *input_type* (i.e. prior, random_effects, or data) and parameter/derived quantity unique ID. The function is set up for each Rcpp distribution interface class, for example, in the DnormDistributionsInterface [here](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp#L189). 
+
+*Setup variable_map for slope parameter in rcpp_selectivity.hpp*
+
+Within the Rcpp interface, each parameter and derived quantities is set up to have a uniques entry in the *variable_map* object defined in [information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/inst/include/common/information.hpp#L143). For example, in the LogisticSelectivityInterface, the *variable_map* entry for slope is set [here](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp#L268), where the ID is used as the variable map key and the assigned value is the pointer to the slope parameter in the LogisticSelectivity C++ class. 
+
+#### R User Interface
+
+*Case: Univariate Prior*
+
+FIMS currently has an example of a Normal prior on the selectivity slope parameter in the the test file [here](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/test-integration-fims-bayesian-prior-predictive.R), with prior specification starting on [line 147](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/tests/testthat/test-integration-fims-bayesian-prior-predictive.R#L147) 
+
+*Case: Univariate Random Effect* 
+
+FIMS currently has an example in the test file [here](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-setup-function.R). The following links point out key aspects of setting up a random effects model in recruitment:
+
+- set up recruitment module ([link](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/tests/testthat/helper-integration-tests-setup-function.R#L289))
+
+- set up process to be on log deviations ([link](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/tests/testthat/helper-integration-tests-setup-function.R#L291))
+
+- set up log deviations initial values ([link](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/tests/testthat/helper-integration-tests-setup-function.R#L320))
+
+- turn on random effects on log deviations ([link](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/tests/testthat/helper-integration-tests-setup-function.R#L325))
+
+- set up recruitment distribution ([link](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/tests/testthat/helper-integration-tests-setup-function.R#L357))
+
+- call *set_distribution_links* and pass in log deviations unique ID ([link](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/tests/testthat/helper-integration-tests-setup-function.R#L372))
+
+
+*Case: Data*
+
+When setting up data for a FIMS model run, the *set_distrubtion_links function, takes the argements, "data" as input type, and the ID of the expected derived quantitiy. For example, see [here](https://github.com/NOAA-FIMS/FIMS/blob/51adea8f25c3539442986544d9e045e342f97103/tests/testthat/helper-integration-tests-setup-function.R#L167). 
+
+#### Additional R User Cases
+
+*Case: Multivariate Random Effect - Single Parameter* 
+
+Pseudo code, not implemented yet.
+```{r, eval = FALSE}
+#set up population module and parameters
+population <- methods::new(Population)
+...
+
+# 2dAR1 on M, multivariate dimensions match parameter dimensions
+logM_nll <- methods::new(2dAR1NLL)
+logM_nll$logit_phi1$value <- 1
+logM_nll$logit_phi2$value <- 0
+logM_nll$log_var$value <- 0
+logM_nll$logit_phi1$estimation_type$set("constant")
+logM_nll$logit_phi2$estimation_type$set("fixed_effect")
+logM_nll$log_var$estimation_type$set("fixed_effect")
+
+logM_nll$set_distribution_links("random_effects", population$log_M$get_id())
+```
+
+*Case: Multivariate Prior - Multiple Parameters* 
+
+Pseudo code, not implemented yet.
+```{r, eval = FALSE}
+library(FishLife)
+library(mvtnorm)
+params <- matrix(c('Loo', 'K'), ncol=2)\
+x <- Search_species(Genus="Hippoglossoides")$match_taxonomy 
+y <- Plot_taxa(x, params=params) 
+## multivariate normal in log space for two growth parameters
+mu <- y[[1]]$Mean_pred[params]
+Sigma <- y[[1]]$Cov_pred[params, params]
+## log density in R
+dmvnorm(x=c(3,-2), mean=mu, sigma=Sigma, log=TRUE)
+
+growth_nll$mean <- mu 
+growth_nll$Cov <- Sigma
+growth_nll$mean$estimation_type$set("constant")
+growth_nll$Cov$estimation_type$set("constant")
+# pass in IDs for two parameters: log_inf and log_k
+growth_nll$set_distribution_links("prior", c(growth$log_inf$get_id(), growth$log_K$get_id()))
+```
+
+#### Additional Features
+
+*One-Step-Ahead Residuals*
+
+FIMS will provide functionality to calculate one-step-ahead residuals. This will require several additions to the code base. Data will need to become an input to the TMB *MakeADFun* function, which will require generating C++ code that loops over all the Rcpp modules and extracts data input into a single long vector. This data vector will be added to the FIMS.cpp file as an input value, along with a new data indicator term called *keep*. This *keep* vector is multiplied by the likelihood calculations and keeps track of which data inputs are predicted in one-step-ahead calculations. The Dmultinom function will need to be modified as an evaluation of a series of binomials in order to work with one-step-ahead calculations. Code will also need to be developed to bookkeep which data observations are related to which section of the keep vector. 
+
+
+### Discussion Points
+
+* One class shoud set up per distribution with flags for osa and simulation flags for data and re/priors
+* Interface - generic approach but be mindful of different use cases
+* Multivariate where each parameter/process comes from a different module
+* Varying data types (i.e., scalar sd vs vector of cvs for dnorm)
+* From WHAM: 2dAR1 with recruitment and Numbers at Age (NAA) - these should **not** be linked; solution was to apply 2dAR1 to ages 2+ and recruitment treated differently - consider if NAA should be an additional module on top of recruitment
+  * What complexities occur with NAA (random effect, movement) - if more than two use cases then justification to create new module
+* OSA requires a lot of input code on the R side to prepare for OSA wrt multinomial
+    * Need to throw out one of the age/year bins - need to set NA so the osa calculation skips this value ([WHAM approach](https://github.com/timjmiller/wham/blob/master/R/set_osa_obs.R#L280))
+    * What does SAM do?
+    * Can this be done internally in C++?
+* Need to be mindful of sparsity - e.g., Recruitment with an AR1 process is dense if the random effect is the devs but is sparse if the random effect is logR.
 * NLL-Population linkage unclear
-  * Setting random effect or prior on parameters that are already in population will be somewhat straightforward\
-  * Setting random effects/priors on values in population that are set up as derived quantities are less clear. For example, does NAA need to become its own module? [This calculation](https://github.com/NOAA-FIMS/FIMS/blob/18f96a81d02021a55c9f91a66485e7250a20cb5a/inst/include/population_dynamics/population/population.hpp#L240) gets confusing if NAA is an AR1 or 2d-AR1.
+    * Setting random effect or prior on parameters that are already in population will be somewhat straightforward\
+    * Setting random effects/priors on values in population that are set up as derived quantities are less clear. For example, does NAA need to become its own module? [This calculation](https://github.com/NOAA-FIMS/FIMS/blob/18f96a81d02021a55c9f91a66485e7250a20cb5a/inst/include/population_dynamics/population/population.hpp#L240) gets confusing if NAA is an AR1 or 2dAR1.
+
+
 
 ## R output
 
