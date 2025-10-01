@@ -31,7 +31,8 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
    * This is a live object, which is an object that has been created and lives
    * in memory.
    */
-  static std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>> live_objects;
+  static std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
+      live_objects;
 
   /**
    * @brief The constructor.
@@ -70,7 +71,8 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t MaturityInterfaceBase::id_g = 1;
 // local id of the MaturityInterfaceBase object map relating the ID of the
 // MaturityInterfaceBase to the MaturityInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>> MaturityInterfaceBase::live_objects;
+std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
+    MaturityInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for logistic maturity to instantiate the object from R:
@@ -94,7 +96,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     MaturityInterfaceBase::live_objects[this->id] =
         std::make_shared<LogisticMaturityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-         MaturityInterfaceBase::live_objects[this->id]);
+        MaturityInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -145,7 +147,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double> > info =
+    std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::maturity_models_iterator it;
@@ -158,8 +160,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::LogisticMaturity<double> > mat =
-          std::dynamic_pointer_cast<fims_popdy::LogisticMaturity<double> >(
+      std::shared_ptr<fims_popdy::LogisticMaturity<double>> mat =
+          std::dynamic_pointer_cast<fims_popdy::LogisticMaturity<double>>(
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
@@ -189,10 +191,13 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * @param se_values A map from parameter names to vectors of standard error
    * values.
    */
-  virtual void set_uncertainty(std::map<std::string, std::vector<double>> &se_values) {
-    fims::Vector<double> inflection_point_uncertainty(this->inflection_point.size(), -999);
+  virtual void set_uncertainty(
+      std::map<std::string, std::vector<double>>& se_values) {
+    fims::Vector<double> inflection_point_uncertainty(
+        this->inflection_point.size(), -999);
     fims::Vector<double> slope_uncertainty(this->slope.size(), -999);
-    this->get_se_values("inflection_point", se_values, inflection_point_uncertainty);
+    this->get_se_values("inflection_point", se_values,
+                        inflection_point_uncertainty);
     this->get_se_values("slope", se_values, slope_uncertainty);
 
     for (size_t i = 0; i < this->inflection_point.size(); i++) {
@@ -243,11 +248,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogisticMaturity<Type> > maturity =
-        std::make_shared<fims_popdy::LogisticMaturity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticMaturity<Type>> maturity =
+        std::make_shared<fims_popdy::LogisticMaturity<Type>>();
 
     // set relative info
     maturity->id = this->id;

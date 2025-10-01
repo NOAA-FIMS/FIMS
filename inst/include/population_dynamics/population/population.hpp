@@ -823,16 +823,16 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       }
     }
   }
-   virtual void create_report_vectors(
-    std::map<std::string, fims::Vector<fims::Vector<Type>> >& report_vectors){
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
     report_vectors["log_init_naa"].emplace_back(this->log_init_naa);
     report_vectors["log_M"].emplace_back(this->log_M);
-    }
-    virtual void get_report_vector_count(
-    std::map<std::string, size_t>& report_vector_count){
-      report_vector_count["log_init_naa"] += 1;
-      report_vector_count["log_M"] += 1;
-    }
+  }
+  virtual void get_report_vector_count(
+      std::map<std::string, size_t>& report_vector_count) {
+    report_vector_count["log_init_naa"] += 1;
+    report_vector_count["log_M"] += 1;
+  }
 };
 template <class Type>
 uint32_t Population<Type>::id_g = 0;

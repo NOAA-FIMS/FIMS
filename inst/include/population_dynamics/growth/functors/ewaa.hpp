@@ -53,7 +53,7 @@ struct EWAAGrowth : public GrowthBase<Type> {
    * @brief Create a map of report vectors for the growth object.
    */
   virtual void create_report_vectors(
-    std::map<std::string, fims::Vector<fims::Vector<Type>> >& report_vectors){
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
     // fims::Vector<Type> ewaa_vector;
     // for (auto const& pair : ewaa) {
     //   ewaa_vector.push_back(pair.second);

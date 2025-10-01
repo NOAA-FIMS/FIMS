@@ -384,17 +384,18 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     }
   }
 
-   virtual void create_report_vectors(
-    std::map<std::string, fims::Vector<fims::Vector<Type>> >& report_vectors){
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
     report_vectors["log_Fmort"].emplace_back(this->log_Fmort.to_tmb());
     report_vectors["log_q"].emplace_back(this->log_q.to_tmb());
-    report_vectors["age_to_length_conversion"].emplace_back(this->age_to_length_conversion.to_tmb());
-    }
-    virtual void get_report_vector_count(
-    std::map<std::string, size_t>& report_vector_count){
-      report_vector_count["log_Fmort"] +=1;
-      report_vector_count["log_q"] += 1;
-    }
+    report_vectors["age_to_length_conversion"].emplace_back(
+        this->age_to_length_conversion.to_tmb());
+  }
+  virtual void get_report_vector_count(
+      std::map<std::string, size_t>& report_vector_count) {
+    report_vector_count["log_Fmort"] += 1;
+    report_vector_count["log_q"] += 1;
+  }
 };
 
 // default id of the singleton fleet class

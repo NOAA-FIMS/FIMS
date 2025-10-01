@@ -65,21 +65,20 @@ class Model {  // may need singleton
           "calling Evaluate().");
       return jnll;
     }
-    
-     // Create vector for reporting out nll components
+
+    // Create vector for reporting out nll components
     fims::Vector<Type> nll_vec(
-          this->fims_information->density_components.size(), 0.0);
+        this->fims_information->density_components.size(), 0.0);
 
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->of = this->of;  // link to TMB objective function
-      m->Prepare(); 
+      m->Prepare();
       m->Evaluate();
     }
-    
-    
+
     // Loop over densities and evaluate joint negative log densities for priors
     typename fims_info::Information<Type>::density_components_iterator d_it;
     int nll_vec_idx = 0;
@@ -92,19 +91,18 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       d->of = this->of;
 #endif
-        if (d->input_type == "prior") {
-          nll_vec[nll_vec_idx] = -d->evaluate();
-          jnll += nll_vec[nll_vec_idx];
-          n_priors += 1;
-          nll_vec_idx += 1;
-        }
+      if (d->input_type == "prior") {
+        nll_vec[nll_vec_idx] = -d->evaluate();
+        jnll += nll_vec[nll_vec_idx];
+        n_priors += 1;
+        nll_vec_idx += 1;
       }
+    }
     FIMS_INFO_LOG(
         "Model: Finished evaluating prior distributions. The jnll after "
         "evaluating " +
-          fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
-    
-    
+        fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
+
     // Loop over densities and evaluate joint negative log-likelihoods for
     // random effects
     size_t n_random_effects = 0;
@@ -127,7 +125,6 @@ class Model {  // may need singleton
         "after evaluating priors and " +
         fims::to_string(n_random_effects) +
         " random_effects is: " + fims::to_string(jnll));
-    
 
     // Loop over and evaluate data joint negative log-likelihoods
     int n_data = 0;

@@ -43,8 +43,8 @@ void init_logging() {
 bool CreateTMBModel() {
   init_logging();
 
-  //clear first
-    // base model
+  // clear first
+  //  base model
 #ifdef TMBAD_FRAMEWORK
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
@@ -59,9 +59,9 @@ bool CreateTMBModel() {
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
   info0->Clear()
 
-  // first-order derivative
-  std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> info1 =
-      fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+      // first-order derivative
+      std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>>
+          info1 = fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
   info1->Clear();
 
   // second-order derivative
@@ -97,11 +97,10 @@ bool CreateTMBModel() {
   info0->CreateModel();
   info0->CheckModel();
 
-
   info1->CreateModel();
 
   // second-order derivative
- 
+
   info2->CreateModel();
 
   // third-order derivative
@@ -116,13 +115,12 @@ bool CreateTMBModel() {
   return true;
 }
 
-
 /**
- * @brief Sets the fixed parameters vector object. 
+ * @brief Sets the fixed parameters vector object.
  * Updates the internal parameter values for the model base
  * of type TMB_FIMS_REAL_TYPE. Typically called before
  * finalize or get_output to ensure the correct values are used.
- * 
+ *
  * Usage example:
  * \code{.R}
  * set_fixed_parameters(c(1, 2, 3))
@@ -140,7 +138,6 @@ void set_fixed_parameters(Rcpp::NumericVector par) {
     *info0->fixed_effects_parameters[i] = par[i];
   }
 }
-
 
 /**
  * @brief Gets the fixed parameters vector object.
@@ -161,13 +158,12 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
   return p;
 }
 
-
 /**
  * @brief Sets the random parameters vector object.
  * Updates the internal random effects parameter values for
  * the model base of TMB_FIMS_REAL_TYPE. Typically called before
  * finalize or get_output to ensure the correct values are used.
- * 
+ *
  * Usage example:
  * \code{.R}
  * set_random_parameters(c(1, 2, 3))

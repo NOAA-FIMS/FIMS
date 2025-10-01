@@ -62,16 +62,16 @@ interest (x); e.g. age at which 50 percent of the fish are mature */
   /**
    * @brief Create a map of report vectors for the maturity object.
    */
-   virtual void create_report_vectors(
-    std::map<std::string, fims::Vector<fims::Vector<Type>> >& report_vectors){
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
     report_vectors["inflection_point"].emplace_back(inflection_point);
     report_vectors["slope"].emplace_back(slope);
   }
   virtual void get_report_vector_count(
-    std::map<std::string, size_t>& report_vector_count){
-      report_vector_count["inflection_point"] += 1;
-      report_vector_count["slope"] += 1;
-    }
+      std::map<std::string, size_t>& report_vector_count) {
+    report_vector_count["inflection_point"] += 1;
+    report_vector_count["slope"] += 1;
+  }
 };
 
 }  // namespace fims_popdy

@@ -16,7 +16,6 @@
 #include "model_object.hpp"
 #include "fims_vector.hpp"
 
-
 namespace fims_data_object {
 
 /**
