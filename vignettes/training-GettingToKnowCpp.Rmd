@@ -1,0 +1,134 @@
+---
+title: "Getting Started with C++"
+author: "Andrea Havron"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## About C++
+
+- Created by Bjarne Stroustrup as an extension of the C language
+
+- One of the world's most popular programming language (lots of development resources online)
+
+- Allows for object-oriented programming
+
+- C++ is strongly typed, meaning the variable type must be defined before it is used
+
+
+## C++ Preliminaries
+
+- Lines end in semi-colons
+
+- Everything must be declared first, even functions
+
+- Indexing starts at 0!!
+
+- Basic math operators the same as R (=,+,-,/,*)
+
+- Code must first be compiled before it is run
+
+## Basic Program
+
+```{Rcpp eval=FALSE}
+#include <iostream>
+using namespace std;
+
+int main() {
+  cout << "Hello World!";
+  return 0;
+}
+```
+
+- `include <iostream>`: allows the program to access the iostream library 
+- `using namespace std`: allows access to objects and variables from the standard library
+    - if `using namespace std` not included, the user would need to specify `std::cout`
+- `int main`: 
+    - `int` declares the type of the function named `main`
+    - the type of the return (in this case, integer), must match the type of the function
+- `cout`: prints a messages directly to the screen when the program is run
+
+If a function is not expected to return a value, then `void` can be used. The above program can be re-written:
+```{Rcpp eval=FALSE}
+#include <iostream>
+using namespace std;
+
+void main() {
+  cout << "Hello World!";
+}
+```
+
+## C++ Types
+
+- `bool`: Boolean (lowercase: `true` or `false`)
+- `char`: Character
+- `int`: Integer
+- `float`: Floating point
+- `double`: Double floating point
+- `void`: No return value
+ 
+## Simple Addition Program
+
+The following program takes two integers as inputs and return an integer output:
+```{Rcpp eval=FALSE}
+int add(int x, int y) {
+  x = 1;
+  y = 2;
+  return x + y;
+}
+```
+
+The above program will fail if inputs are decimals. An additional program is needed to handle the different data type. The following will return a floating point output:
+```{Rcpp eval=FALSE}
+double add(double x, double y) {
+  x = 1.2;
+  y = 2.4;
+  return x + y;
+}
+```
+
+## Vector Type 
+`std::vector`: vector from standard library 
+
+- The type is specified using the basic C++ types, i.e. std::vector<int> is a vector of integers
+- `std::vector` has a number of member functions that can be used to operate on the vector
+    - `begin`: return iterator to beginning
+    - `end`: return iterator to end
+    - `size`: returns vector size
+    - `resize`: changes the vector size
+    - `[]`: access element
+    - `front`: access first element
+    - `back`: access last element
+    - `push_back`: append element to end
+    - `pop_back`: delete last element
+    - `clear`: clear content
+    - for a more detailed list see [here](https://cplusplus.com/reference/vector/vector/)
+
+The following program initializes a vector, resizes it, adds elements, and returns the vector:
+```{Rcpp eval=FALSE}
+#include <iostream>
+
+std::vector<double> create_vector() {
+  std::vector<double> x;
+  x.resize(3);
+  x[0] = 1.3;
+  for(int i=1; i<3; i++){
+    x[i] = x[i-1] + 1.3;
+  }
+  x.push_back(8.1);
+  
+  return x;
+}
+```
+The above program returns the following vector of four: `1.3 2.6 3.9 8.1`
+
+## Constants
+
+If you don't want a value to change throughout the program, you can assign constant
+```{Rcpp eval=FALSE}
+const int MinutesPerHour = 60;
+const double pi = 3.14159;
+```

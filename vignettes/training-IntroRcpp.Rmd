@@ -1,0 +1,182 @@
+---
+title: "Intro to Rcpp"
+author: "Christine Stawitz"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Sources
+- "Advanced `R`"  by Hadley Wickham (http://adv-r.had.co.nz/Rcpp.html)
+- "`Rcpp`: Seamless `R` and `C++` integration" by Dirk Eddelbuttel and Romain Francois, Journal of Statistical Software (https://www.jstatsoft.org/article/view/v040i08)
+- "`Rcpp` for everyone" by Masaki E. Tsuda (https://teuder.github.io/rcpp4everyone_en/)
+- "`Rcpp` Modules" vignette by Eddelbuttel and Francois (https://cran.rstudio.com/web/packages/Rcpp/vignettes/Rcpp-modules.pdf)
+
+
+# What is `RCpp` and why should I care?
+
+## Definition
+"The `RCpp` package provides a consistent API for seamlessly accessing, extending or modifying R objects at the C++ level" - Eddelbuttel and Francois.
+
+## API
+a set of functions and procedures allowing the creation of applications that access the features or data of an operating system, application, or other service.
+
+* One of the most widely used `R` extensions (over 1000 packages)
+* With very minimal knowledge of `C++` you can speed up function runs A LOT
+* The most efficient `R` functions are written in `C++` and called from `R`
+
+
+# Writing `C++` functions in `R`
+
+* You can write `C++` functions inline in your R code using `cppFunction`
+* You can also compile single lines of code directly using `evalCpp`
+
+In R script or console:
+```{r}
+library(Rcpp)
+cppFunction('int add(int x, int y, int z) {
+  int sum = x + y + z;
+  return sum;
+}')
+# add works like a regular R function
+add
+add(1, 2, 3)
+
+evalCpp( "std::numeric_limits<double>::max()" )
+```
+
+
+# Calling `C++` from `R`
+
+mean.cpp
+```{Rcpp meanC}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double meanC(NumericVector x) {
+  int n = x.size();
+  double total = 0;
+
+  for(int i = 0; i < n; ++i) {
+    total += x[i];
+  }
+  return total / n;
+}
+
+```
+
+
+* `#include <Rcpp.h>` allows you to call `Rcpp` syntax in the file. You can omit `using namespace Rcpp` if you use `::` i.e. `Rcpp::NumericVector` 
+* `// [[Rcpp::export]]` - put this above any function you want to make available in `R`
+* `NumericVector, .size()` useful type, function implemented in `Rcpp`
+
+
+```{r}
+# code can be saved in .cpp file and sourced:
+# sourceCpp("mean.cpp")
+
+# code can be sourced directly
+src <- 
+"#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double meanC(NumericVector x) {
+  int n = x.size();
+  double total = 0;
+
+  for(int i = 0; i < n; ++i) {
+    total += x[i];
+  }
+  return total / n;
+}
+"
+sourceCpp(code = src)
+```
+
+
+```{r microbench}
+library(microbenchmark)
+x <- runif(1e5)
+microbenchmark(
+  mean(x),
+  meanC(x)
+)
+
+```
+
+* `sourceCpp` compiles the file
+* More `Rcpp` syntax [here](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-quickref.pdf)
+
+
+# Typing and methods
+
+## Rcpp Types
+
+- Scalar classes
+    * `int`
+    * `double`
+    * `bool`
+    * `String`
+- Vector classes
+    * `IntegerVector`
+    * `NumericVector`
+    * `LogicalVector`
+    * `CharacterVector`
+
+
+## Rcpp methods
+
+- Static methods (called with `::` on class) 
+- Member functions or methods (called with `.` on object)
+
+```{r}
+src <- 
+  "#include <Rcpp.h>
+  using namespace Rcpp; 
+
+  // [[Rcpp::export]]
+  NumericVector fun(){
+    //create new vector of size 3
+    NumericVector v = NumericVector::create(1,2,3);
+    Rcout << NumericVector::get_na() << std::endl;
+    
+    //operate on object v
+    Rcout << v.size() << std::endl;
+    //append a new value to the vector
+    v.push_back(4);
+  
+    return v;
+  }
+"
+
+sourceCpp(code = src)
+fun()
+```
+
+
+# `Rcpp` modules
+
+
+```{Rcpp eval=FALSE}
+RCPP_MODULE(unif_module) {
+class_<Uniform>("Uniform")
+.constructor<double,double>()
+.field("min", &Uniform::min, "minimum value")
+.field("max", &Uniform::max, "maximum value")
+.method("draw", &Uniform::draw)
+;
+}
+```
+
+* You can expose these using the `Rcpp` macro `RCPP_MODULE`
+* the `class_<Uniform>` constructor argument is what we will call the class from `R`
+* `.field`, `.constructor`, `.method`, `.property` 
+* `.field` can be used with two or three arguments
+* `.field_readonly` prevents it from being modified from `R` 
+
+
+
