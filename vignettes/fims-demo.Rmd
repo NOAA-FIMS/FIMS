@@ -148,7 +148,7 @@ default_parameters_unnested
 
 ### Update parameters
 
-Functions (e.g., `rows_*()`) from `{dplyr}` can be used to update the default parameters as needed. 
+Functions (e.g., `rows_*()`) from `{dplyr}` can be used to update the default parameters as needed.
 
 In the code below, `rows_update()` is used to adjust the fishing mortality, selectivity, maturity, and population parameters from their default values.
 
@@ -286,7 +286,7 @@ stockplotr::plot_spawning_biomass(
   stockplotr::theme_noaa()
 ```
 
-```{r fit-plot-log-fishing-mortality} 
+```{r fit-plot-log-fishing-mortality}
 #| fig.alt: >
 #|   Plot of log fishing mortality.
 stockplotr::plot_timeseries(
