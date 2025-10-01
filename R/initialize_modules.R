@@ -2,7 +2,7 @@
 # no visible binding for global variable
 utils::globalVariables(c(
   "type", "name", "value", "unit", "uncertainty",
-  "datestart", "dateend", "age", "length", "year",
+  "timing", "age", "length", "year",
   # Used in initialize_comp dplyr code
   "valid_n"
 ))
@@ -592,9 +592,9 @@ initialize_comp <- function(data,
         name == fleet_name,
         type == comp[["name"]]
       ) |>
-      dplyr::count(datestart) |>
+      dplyr::count(timing) |>
       dplyr::filter(n != get_function(data)) |>
-      dplyr::pull(datestart)
+      dplyr::pull(timing)
 
     cli::cli_abort(c(
       "The length of the `{comp[['name']]}`-composition data for fleet

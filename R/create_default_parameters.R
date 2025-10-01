@@ -408,7 +408,8 @@ create_default_fleet <- function(unnested_configurations,
   if ("index" %in% data_types_present &&
     "Index" %in% distribution_names_for_fleet) {
     fleet_index <- get_data(data) |>
-      dplyr::filter(type == "index" & name == current_fleet_name)
+      dplyr::filter(type == "index" & name == current_fleet_name) |>
+      dplyr::rename(time = timing)
 
     q_default <- create_default_parameters_template(n_parameters = 1) |>
       dplyr::mutate(
@@ -447,7 +448,7 @@ create_default_fleet <- function(unnested_configurations,
         module_type = "Index",
         distribution_link = "Index",
         fleet_name = current_fleet_name,
-        time = fleet_index[["year"]]
+        time = fleet_index[["time"]]
       )
   } else {
     q_default <- create_default_parameters_template(n_parameters = 1) |>
@@ -464,7 +465,8 @@ create_default_fleet <- function(unnested_configurations,
   if ("landings" %in% data_types_present &&
     "Landings" %in% distribution_names_for_fleet) {
     fleet_landings <- get_data(data) |>
-      dplyr::filter(type == "landings" & name == current_fleet_name)
+      dplyr::filter(type == "landings" & name == current_fleet_name) |>
+      dplyr::rename(time = timing)
 
     log_Fmort_default <- create_default_parameters_template(
       n_parameters = get_n_years(data)
@@ -504,7 +506,7 @@ create_default_fleet <- function(unnested_configurations,
         module_type = "Landings",
         distribution_link = "Landings",
         fleet_name = current_fleet_name,
-        time = fleet_landings[["year"]]
+        time = fleet_landings[["time"]]
       )
   } else {
     fleet_index <- get_data(data) |>
