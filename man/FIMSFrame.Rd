@@ -9,7 +9,7 @@ FIMSFrame(data)
 \arguments{
 \item{data}{A \code{data.frame} that contains the necessary columns to construct
 a \code{FIMSFrame-class} object. Currently, those columns are
-type, name, age, length, datestart, dateend, value, unit, and uncertainty. See
+type, name, age, length, timing, value, unit, and uncertainty. See
 the data1 object in FIMS, e.g., \code{data(data1, package = "FIMS")}.}
 }
 \value{
@@ -41,20 +41,20 @@ first in the alphabet. All other types will follow according to their order
 in the alphabet.
 Next, within each type, data are organized by fleet. So, age-composition
 information for fleet1 will come before survey1. Next, all data within type
-and fleet are arranged by datestart, e.g., by year. That is the end of the
+and fleet are arranged by timing, e.g., by year. That is the end of the
 sorting for time series data like landings and indices.
 The biological data are further sorted by bin. Thus, age-composition
 information will be arranged as follows:\tabular{lcccr}{
-   type \tab name \tab datestart \tab age \tab value \cr
-   age \tab fleet1 \tab 2022-01-01 \tab 1 \tab 0.3 \cr
-   age \tab fleet1 \tab 2022-01-01 \tab 2 \tab 0.7 \cr
-   age \tab fleet1 \tab 2023-01-01 \tab 1 \tab 0.5 \cr
+   type \tab name \tab timing \tab age \tab value \cr
+   age \tab fleet1 \tab 2022 \tab 1 \tab 0.3 \cr
+   age \tab fleet1 \tab 2022 \tab 2 \tab 0.7 \cr
+   age \tab fleet1 \tab 2023 \tab 1 \tab 0.5 \cr
 }
 
 
 Length composition-data are sorted the same way but by length bin instead of
 by age bin. It becomes more complicated for the age-to-length-conversion
-data, which are sorted by type, name, datestart, age, and then length. So, a
+data, which are sorted by type, name, timing, age, and then length. So, a
 full set of length, e.g., length 10, length 20, length 30, etc., is placed
 together for a given age. After that age, another entire set of length
 information will be provided for that next age. Once the year is complete

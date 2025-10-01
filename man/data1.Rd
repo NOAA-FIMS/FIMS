@@ -5,7 +5,7 @@
 \alias{data1}
 \title{FIMS input data frame}
 \format{
-A data frame with 19080 observations of 9
+A data frame with 19080 observations of 8
 variables:
 \describe{ \item{type}{The type of data the row contains. Allowed types
 include \code{age}, \code{length}, \code{index}, \code{landings}, \code{age-to-length-conversion},
@@ -16,9 +16,7 @@ that the data was collected from, e.g., \code{"Trawl fishery"}.}
 multiple ages, e.g., total landings rather than landings of age-4 fish.}
 \item{length}{A numeric length. Entry can be \code{NA} if information doesn't
 pertain to length.}
-\item{datestart,dateend}{Start and end dates of the data collection period.
-Format all dates using \code{yyyy-mm-dd}, which can accommodate fake years
-such as \code{0001-01-01}.}
+\item{timing}{The timing, i.e., year the data was collected.}
 \item{value}{The measurement of interest.}
 \item{unit}{A character string specifying the units of \code{value}. Allowed
 units for each data type are as follows. \code{mt} is used for \code{index},
