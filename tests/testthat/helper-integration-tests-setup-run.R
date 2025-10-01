@@ -52,11 +52,11 @@ prepare_test_data <- function() {
   )
 
   # Missing year for all data sets is year 0002, i.e., yyyy-mm-dd
-  na_index <- as.Date("2-01-01")
+  na_index <- 2
 
   # Generate dataset with missing age composition for fleet1
   data_age_comp_na <- data_age_comp_raw |>
-    dplyr::filter(!(name == "fleet1" & type == "age_comp" & datestart == na_index)) |>
+    dplyr::filter(!(name == "fleet1" & type == "age_comp" & timing == na_index)) |>
     FIMS::FIMSFrame()
   saveRDS(
     data_age_comp_na,
@@ -70,7 +70,7 @@ prepare_test_data <- function() {
     dplyr::filter(
       !(name == "survey1" &
         type %in% c("index", "length_comp", "age-to-length-conversion") &
-        datestart == na_index
+        timing == na_index
       )
     ) |>
     FIMS::FIMSFrame()
@@ -82,7 +82,7 @@ prepare_test_data <- function() {
 
   # Generate dataset with missing values in age composition for survey1
   # Missing values for length composition for fleet1 year 0012
-  length_na_index <- as.Date("12-01-01")
+  length_na_index <- 2
   data_age_length_comp_raw <- rbind(
     landings_data,
     index_data,
@@ -91,12 +91,12 @@ prepare_test_data <- function() {
   )
   data_age_length_comp_na <- data_age_length_comp_raw |>
     dplyr::filter(
-      !(name == "survey1" & type %in% c("age_comp") & datestart == na_index)
+      !(name == "survey1" & type %in% c("age_comp") & timing == na_index)
     ) |>
     dplyr::filter(
       !(name == "fleet1" &
         type %in% c("length_comp", "age-to-length-conversion") &
-        datestart == length_na_index
+        timing == length_na_index
       )
     ) |>
     FIMS::FIMSFrame()

@@ -66,9 +66,15 @@ get_version(x)
 
 \S4method{get_version}{FIMSFit}(x)
 
+<<<<<<< HEAD
 get_model_output(x)
 
 \S4method{get_model_output}{FIMSFit}(x)
+=======
+get_finalized_fims(x)
+
+\S4method{get_finalized_fims}{FIMSFit}(x)
+>>>>>>> 9a0bc21 (doc: Forgot to run devtools::document())
 }
 \arguments{
 \item{x}{Output returned from \code{\link[=fit_fims]{fit_fims()}}.}
@@ -103,7 +109,11 @@ seconds as a \code{difftime} object.
 \code{\link[=get_version]{get_version()}} returns the \code{package_version} of FIMS that was used to fit
 the model.
 
+<<<<<<< HEAD
 \code{\link[=get_model_output]{get_model_output()}} returns the finalized FIMS output as a JSON list.
+=======
+\code{\link[=get_finalized_fims]{get_finalized_fims()}} returns the finalized FIMS output as a JSON list.
+>>>>>>> 9a0bc21 (doc: Forgot to run devtools::document())
 }
 \description{
 There is an accessor function for each slot in the S4 class \code{FIMSFit}, where

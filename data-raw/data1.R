@@ -258,14 +258,7 @@ landings_data <- data.frame(
   type = "landings",
   name = names(returned_om[["om_output"]][["L.mt"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
-  datestart = as.Date(
-    paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
-    format = "%Y-%m-%d"
-  ),
-  dateend = as.Date(
-    paste(returned_om[["om_input"]][["year"]], 12, 31, sep = "-"),
-    format = "%Y-%m-%d"
-  ),
+  timing = returned_om[["om_input"]][["year"]],
   value = returned_om[["em_input"]][["L.obs"]][[1]],
   unit = "mt", # metric tons
   uncertainty = cv_2_sd(returned_om[["em_input"]][["cv.L"]][[1]])
@@ -278,14 +271,7 @@ index_data <- data.frame(
   type = "index",
   name = names(returned_om[["om_output"]][["survey_index"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
-  datestart = as.Date(
-    paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
-    format = "%Y-%m-%d"
-  ),
-  dateend = as.Date(
-    paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
-    format = "%Y-%m-%d"
-  ),
+  timing = returned_om[["om_input"]][["year"]],
   value = returned_om[["em_input"]][["surveyB.obs"]][[1]],
   unit = "mt",
   uncertainty = cv_2_sd(returned_om[["em_input"]][["cv.survey"]][[1]])
@@ -300,28 +286,14 @@ age_data <- rbind(
     returned_om[["em_input"]][["L.age.obs"]][["fleet1"]],
     unit = "proportion",
     uncertainty = returned_om[["em_input"]][["n.L"]][["fleet1"]],
-    datestart = as.Date(
-      paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
-      "%Y-%m-%d"
-    ),
-    dateend = as.Date(
-      paste(returned_om[["om_input"]][["year"]], 12, 31, sep = "-"),
-      "%Y-%m-%d"
-    )
+    timing = returned_om[["om_input"]][["year"]]
   ),
   data.frame(
     name = names(returned_om[["om_output"]][["survey_age_comp"]])[1],
     returned_om[["em_input"]][["survey.age.obs"]][[1]],
     unit = "proportion",
     uncertainty = returned_om[["om_input"]][["n.survey"]][["survey1"]],
-    datestart = as.Date(
-      paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
-      "%Y-%m-%d"
-    ),
-    dateend = as.Date(
-      paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
-      "%Y-%m-%d"
-    )
+    timing = returned_om[["om_input"]][["year"]]
   )
 ) |>
   dplyr::mutate(
@@ -340,14 +312,7 @@ age_data <- rbind(
 # Weight-at-age data
 ###############################################################################
 timingfishery <- data.frame(
-  datestart = as.Date(
-    paste(returned_om[["om_input"]][["year"]], 1, 1, sep = "-"),
-    "%Y-%m-%d"
-  ),
-  dateend = as.Date(
-    paste(returned_om[["om_input"]][["year"]], 12, 31, sep = "-"),
-    "%Y-%m-%d"
-  )
+  timing = returned_om[["om_input"]][["year"]]
 )
 weights_fishery <- data.frame(
   type = "weight-at-age",
@@ -369,39 +334,30 @@ data1 <- rbind(landings_data, index_data, age_data, weight_at_age_data) |>
     .after = "age"
   )
 
-# Extract years and fleets from milestone 1 data
-start_date <- timingfishery[["datestart"]]
-end_date <- timingfishery[["dateend"]]
+# Extract timing and fleets from milestone 1 data
 observers <- c("fleet1", "survey1")
 
-# Create data frame for new fleet and year specific length at age conversion
-# proportions. These are identical across years and fleets in this default
+# Create data frame for new fleet and year-specific length at age conversion
+# proportions. These are identical across timing and fleets in this default
 # example.
 length_age_data <- data.frame(
   type = "age-to-length-conversion",
   name = rep(
     sort(rep(observers, length(len_bins) * length(ages))),
-    length(start_date)
+    length(timingfishery[["timing"]])
   ),
   age = rep(
     sort(rep(ages, length(len_bins))),
-    length(observers) * length(start_date)
+    length(observers) * length(timingfishery[["timing"]])
   ),
   length = rep(
     len_bins,
-    length(ages) * length(observers) * length(start_date)
+    length(ages) * length(observers) * length(timingfishery[["timing"]])
   ),
-  datestart = rep(
-    start_date,
-    each = length(len_bins) * length(ages) * length(observers)
-  ),
-  dateend = rep(
-    end_date,
-    each = length(len_bins) * length(ages) * length(observers)
-  ),
+  timing = timingfishery[["timing"]],
   value = rep(
     c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
-    length(observers) * length(start_date)
+    length(observers) * length(timingfishery[["timing"]])
   ),
   unit = "proportion",
   uncertainty = rep(
@@ -409,7 +365,7 @@ length_age_data <- data.frame(
       em_input[["n.L.lengthcomp"]][["fleet1"]],
       em_input[["n.survey.lengthcomp"]][["survey1"]]
     ),
-    length(len_bins) * length(ages) * length(start_date)
+    length(len_bins) * length(ages) * length(timingfishery[["timing"]])
   )
 )
 
@@ -417,11 +373,10 @@ length_age_data <- data.frame(
 # the age composition data
 length_comp_data <- data.frame(
   type = "length_comp",
-  name = sort(rep(observers, length(len_bins) * length(start_date))),
+  name = sort(rep(observers, length(len_bins) * length(timingfishery[["timing"]]))),
   age = NA,
-  length = rep(len_bins, length(start_date) * length(observers)),
-  datestart = rep(rep(start_date, each = length(len_bins)), length(observers)),
-  dateend = rep(rep(end_date, each = length(len_bins)), length(observers)),
+  length = rep(len_bins, length(timingfishery[["timing"]]) * length(observers)),
+  timing = timingfishery[["timing"]],
   value = c(
     c(t(returned_om[["em_input"]][["L.length.obs"]][["fleet1"]])),
     c(t(returned_om[["em_input"]][["survey.length.obs"]][["survey1"]]))
@@ -432,7 +387,7 @@ length_comp_data <- data.frame(
       em_input[["n.L.lengthcomp"]][["fleet1"]],
       em_input[["n.survey.lengthcomp"]][["survey1"]]
     ),
-    length(len_bins) * length(start_date)
+    length(len_bins) * length(timingfishery[["timing"]])
   )
 )
 
@@ -452,12 +407,6 @@ save(
 
 # Add the conversion matrix and length composition data to dataframe
 data1 <- rbind(data1, length_comp_data, length_age_data)
-
-write.csv(
-  data1,
-  file.path("FIMS_input_data.csv"),
-  row.names = FALSE
-)
 
 usethis::use_data(data1, overwrite = TRUE)
 on.exit(unlink(main_dir, recursive = TRUE), add = TRUE)
