@@ -136,10 +136,8 @@ uint32_t Parameter::id_g = 0;
 std::ostream& operator<<(std::ostream& out, const Parameter& p) {
   out << "{\"id\": " << p.id_m << ",\n\"value\": " << p.initial_value_m
       << ",\n\"estimated_value\": " << p.final_value_m
-      << ",\n\"uncertainty\": " << p.uncertainty_m
-      << ",\n\"min\": ";
-  if (p.min_m == -std::numeric_limits<double>::infinity())
-  {
+      << ",\n\"uncertainty\": " << p.uncertainty_m << ",\n\"min\": ";
+  if (p.min_m == -std::numeric_limits<double>::infinity()) {
     out << "\"-Infinity\"";
   } else {
     out << p.min_m;
@@ -171,7 +169,7 @@ class ParameterVector {
   /**
    * @brief Parameter storage.
    */
-  std::shared_ptr<std::vector<Parameter> > storage_m;
+  std::shared_ptr<std::vector<Parameter>> storage_m;
   /**
    * @brief The local ID of the Parameter object.
    */
@@ -182,7 +180,7 @@ class ParameterVector {
    */
   ParameterVector() {
     this->id_m = ParameterVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<Parameter> >();
+    this->storage_m = std::make_shared<std::vector<Parameter>>();
     this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
   }
 
@@ -197,7 +195,7 @@ class ParameterVector {
    */
   ParameterVector(size_t size) {
     this->id_m = ParameterVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<Parameter> >();
+    this->storage_m = std::make_shared<std::vector<Parameter>>();
     this->storage_m->resize(size);
     for (size_t i = 0; i < size; i++) {
       storage_m->at(i) = Parameter();
@@ -216,7 +214,7 @@ class ParameterVector {
           "size): x.size() < size argument.");
     } else {
       this->id_m = ParameterVector::id_g++;
-      this->storage_m = std::make_shared<std::vector<Parameter> >();
+      this->storage_m = std::make_shared<std::vector<Parameter>>();
       this->storage_m->resize(size);
       for (size_t i = 0; i < size; i++) {
         storage_m->at(i).initial_value_m = x[i];
@@ -230,7 +228,7 @@ class ParameterVector {
    */
   ParameterVector(const fims::Vector<double>& v) {
     this->id_m = ParameterVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<Parameter> >();
+    this->storage_m = std::make_shared<std::vector<Parameter>>();
     this->storage_m->resize(v.size());
     for (size_t i = 0; i < v.size(); i++) {
       storage_m->at(i).initial_value_m = v[i];
@@ -425,7 +423,7 @@ class RealVector {
   /**
    * @brief real storage.
    */
-  std::shared_ptr<std::vector<double> > storage_m;
+  std::shared_ptr<std::vector<double>> storage_m;
   /**
    * @brief The local ID of the RealVector object.
    */
@@ -436,7 +434,7 @@ class RealVector {
    */
   RealVector() {
     this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double> >();
+    this->storage_m = std::make_shared<std::vector<double>>();
     this->storage_m->resize(1);
   }
 
@@ -451,7 +449,7 @@ class RealVector {
    */
   RealVector(size_t size) {
     this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double> >();
+    this->storage_m = std::make_shared<std::vector<double>>();
     this->storage_m->resize(size);
   }
 
@@ -462,7 +460,7 @@ class RealVector {
    */
   RealVector(Rcpp::NumericVector x, size_t size) {
     this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double> >();
+    this->storage_m = std::make_shared<std::vector<double>>();
     this->resize(x.size());
     for (size_t i = 0; i < x.size(); i++) {
       storage_m->at(i) = x[i];
@@ -475,7 +473,7 @@ class RealVector {
    */
   RealVector(const fims::Vector<double>& v) {
     this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double> >();
+    this->storage_m = std::make_shared<std::vector<double>>();
     this->storage_m->resize(v.size());
     for (size_t i = 0; i < v.size(); i++) {
       storage_m->at(i) = v[i];
@@ -631,7 +629,7 @@ class FIMSRcppInterfaceBase {
   /**
    * @brief FIMS interface object vectors.
    */
-  static std::vector<std::shared_ptr<FIMSRcppInterfaceBase> >
+  static std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
       fims_interface_objects;
 
   /**
@@ -661,21 +659,19 @@ class FIMSRcppInterfaceBase {
    * working map.
    */
   void get_se_values(std::string name,
-                     std::map<std::string, std::vector<double>> &se_values,
-                     fims::Vector<double> &values)
-  {
+                     std::map<std::string, std::vector<double>>& se_values,
+                     fims::Vector<double>& values) {
     auto se_vals = se_values.find(name);
-    if (se_vals != se_values.end())
-    {
-      std::vector<double> &se_vals_vector = (*se_vals).second;
-      std::vector<double> uncertainty_std(se_vals_vector.begin(), se_vals_vector.begin() + values.size());
-      std::vector<double> temp(se_vals_vector.begin() + values.size(), se_vals_vector.end());
+    if (se_vals != se_values.end()) {
+      std::vector<double>& se_vals_vector = (*se_vals).second;
+      std::vector<double> uncertainty_std(
+          se_vals_vector.begin(), se_vals_vector.begin() + values.size());
+      std::vector<double> temp(se_vals_vector.begin() + values.size(),
+                               se_vals_vector.end());
       se_vals_vector = temp;
       fims::Vector<double> uncertainty(uncertainty_std);
       values = uncertainty;
-    }
-    else
-    {
+    } else {
       std::fill(values.begin(), values.end(), -999);
     }
   }
@@ -691,7 +687,8 @@ class FIMSRcppInterfaceBase {
    * @param se_values A map from parameter names to vectors of standard error
    * values.
    */
-  virtual void set_uncertainty(std::map<std::string, std::vector<double>> &se_values){
+  virtual void set_uncertainty(
+      std::map<std::string, std::vector<double>>& se_values) {
     FIMS_WARNING_LOG("Method not yet defined.");
   }
 
@@ -733,7 +730,7 @@ class FIMSRcppInterfaceBase {
     return ss.str();
   }
 };
-std::vector<std::shared_ptr<FIMSRcppInterfaceBase> >
+std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
     FIMSRcppInterfaceBase::fims_interface_objects;
 
 #endif

@@ -12,5 +12,4 @@
 
 #include "functors/catch_at_age.hpp"
 
-
 #endif

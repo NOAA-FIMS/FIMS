@@ -50,7 +50,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    * @param x  The independent variable in the double logistic function (e.g.,
    * age or size in selectivity).
    */
-  virtual const Type evaluate(const Type &x) {
+  virtual const Type evaluate(const Type& x) {
     return fims_math::double_logistic<Type>(
         inflection_point_asc[0], slope_asc[0], inflection_point_desc[0],
         slope_desc[0], x);
@@ -68,7 +68,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    * age or size in selectivity).
    * @param pos Position index, e.g., which year.
    */
-  virtual const Type evaluate(const Type &x, size_t pos) {
+  virtual const Type evaluate(const Type& x, size_t pos) {
     return fims_math::double_logistic<Type>(
         inflection_point_asc.get_force_scalar(pos),
         slope_asc.get_force_scalar(pos),
@@ -79,21 +79,23 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
   /**
    * @brief Create a map of report vectors for the selectivity object.
    */
- virtual void create_report_vectors(
-    std::map<std::string, fims::Vector<fims::Vector<Type>> >& report_vectors){
-    report_vectors["inflection_point_asc"].emplace_back(inflection_point_asc.to_tmb());
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
+    report_vectors["inflection_point_asc"].emplace_back(
+        inflection_point_asc.to_tmb());
     report_vectors["slope_asc"].emplace_back(slope_asc.to_tmb());
-    report_vectors["inflection_point_desc"].emplace_back(inflection_point_desc.to_tmb());
+    report_vectors["inflection_point_desc"].emplace_back(
+        inflection_point_desc.to_tmb());
     report_vectors["slope_desc"].emplace_back(slope_desc.to_tmb());
-    }
+  }
 
-    virtual void get_report_vector_count(
-    std::map<std::string, size_t>& report_vector_count){
-      report_vector_count["inflection_point_asc"] += 1;
-      report_vector_count["slope_asc"] += 1;
-      report_vector_count["inflection_point_desc"] += 1;
-      report_vector_count["slope_desc"] += 1;
-    } 
+  virtual void get_report_vector_count(
+      std::map<std::string, size_t>& report_vector_count) {
+    report_vector_count["inflection_point_asc"] += 1;
+    report_vector_count["slope_asc"] += 1;
+    report_vector_count["inflection_point_desc"] += 1;
+    report_vector_count["slope_desc"] += 1;
+  }
 };
 
 }  // namespace fims_popdy

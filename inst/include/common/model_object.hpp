@@ -16,7 +16,6 @@
 #include "def.hpp"
 #include "fims_vector.hpp"
 
-
 namespace fims_model_object {
 
 /**
@@ -58,15 +57,16 @@ struct FIMSObject {
    * @brief Create a map of report vectors for the object.
    * used to populate the report_vectors map in FisheryModelBase.
    */
-   virtual void create_report_vectors(
-    std::map<std::string, fims::Vector<fims::Vector<Type>> >& report_vectors){} 
-    /**
-     * @brief Get the report vector count object.
-     * used to get the length of each report vector for populating the
-     * UncertaintyReportInfo struct in FisheryModelBase.
-     */
-    virtual void get_report_vector_count(
-    std::map<std::string, size_t>& report_vector_count){} 
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
+  }
+  /**
+   * @brief Get the report vector count object.
+   * used to get the length of each report vector for populating the
+   * UncertaintyReportInfo struct in FisheryModelBase.
+   */
+  virtual void get_report_vector_count(
+      std::map<std::string, size_t>& report_vector_count) {}
 };
 
 }  // namespace fims_model_object

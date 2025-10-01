@@ -16,9 +16,8 @@
  * @brief Rcpp interface that serves as the parent class for Rcpp growth
  * interfaces. This type should be inherited and not called from R directly.
  */
-class GrowthInterfaceBase : public FIMSRcppInterfaceBase
-{
-public:
+class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
+ public:
   /**
    * @brief The static id of the GrowthInterfaceBase object.
    */
@@ -37,12 +36,12 @@ public:
   /**
    * @brief The constructor.
    */
-  GrowthInterfaceBase()
-  {
+  GrowthInterfaceBase() {
     this->id = GrowthInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     GrowthInterfaceBase */
-    // GrowthInterfaceBase::live_objects[this->id] = std::make_shared<GrowthInterfaceBase>(*this);
+    // GrowthInterfaceBase::live_objects[this->id] =
+    // std::make_shared<GrowthInterfaceBase>(*this);
   }
 
   /**
@@ -72,16 +71,16 @@ public:
 uint32_t GrowthInterfaceBase::id_g = 1;
 // local id of the GrowthInterfaceBase object map relating the ID of the
 // GrowthInterfaceBase to the GrowthInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<GrowthInterfaceBase>> GrowthInterfaceBase::live_objects;
+std::map<uint32_t, std::shared_ptr<GrowthInterfaceBase>>
+    GrowthInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for EWAAGrowth to instantiate the object from R:
  * ewaa <- methods::new(EWAAGrowth). Where, EWAA stands for empirical weight at
  * age and growth is not actually estimated.
  */
-class EWAAGrowthInterface : public GrowthInterfaceBase
-{
-public:
+class EWAAGrowthInterface : public GrowthInterfaceBase {
+ public:
   /**
    * @brief Weights (mt) for each age class.
    */
@@ -103,10 +102,10 @@ public:
   /**
    * @brief The constructor.
    */
-  EWAAGrowthInterface() : GrowthInterfaceBase()
-  {
+  EWAAGrowthInterface() : GrowthInterfaceBase() {
     this->ewaa = std::make_shared<std::map<double, double>>();
-    GrowthInterfaceBase::live_objects[this->id] = std::make_shared<EWAAGrowthInterface>(*this);
+    GrowthInterfaceBase::live_objects[this->id] =
+        std::make_shared<EWAAGrowthInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
         std::make_shared<EWAAGrowthInterface>(*this));
   }
@@ -141,11 +140,9 @@ public:
    * @return std::map<T, T>.
    */
   inline std::map<double, double> make_map(RealVector ages,
-                                           RealVector weights)
-  {
+                                           RealVector weights) {
     std::map<double, double> mymap;
-    for (uint32_t i = 0; i < ages.size(); i++)
-    {
+    for (uint32_t i = 0; i < ages.size(); i++) {
       mymap.insert(std::pair<double, double>(ages[i], weights[i]));
     }
     return mymap;
@@ -159,18 +156,14 @@ public:
   virtual double evaluate(double age) {
     fims_popdy::EWAAGrowth<double> EWAAGrowth;
 
-    if (initialized == false)
-    {
+    if (initialized == false) {
       // Check that ages and weights vector are the same length
-      if (this->ages.size() != this->weights.size())
-      {
+      if (this->ages.size() != this->weights.size()) {
         Rcpp::stop("ages and weights must be the same length");
       }
       EWAAGrowth.ewaa = make_map(this->ages, this->weights);
       initialized = true;
-    }
-    else
-    {
+    } else {
       Rcpp::stop("this empirical weight at age object is already initialized");
     }
     return EWAAGrowth.evaluate(age);
@@ -183,8 +176,7 @@ public:
    * rank of 1, the dimensions, age bins, and the calculated values themselves.
    * This string is formatted for a json file.
    */
-  virtual std::string to_json()
-  {
+  virtual std::string to_json() {
     std::stringstream ss;
     ss << "{\n";
     ss << " \"module_name\": \"growth\",\n";
@@ -199,8 +191,7 @@ public:
     ss << "  \"dimensions\": [" << this->ages.size() << "]\n},\n";
 
     ss << " \"values\": [\n";
-    for (size_t i = 0; i < weights.size() - 1; i++)
-    {
+    for (size_t i = 0; i < weights.size() - 1; i++) {
       ss << "{\n";
       ss << "\"id\": -999,\n";
       ss << "\"value\": " << weights[i] << ",\n";
@@ -227,17 +218,16 @@ public:
 #ifdef TMB_MODEL
 
   template <typename Type>
-  bool add_to_fims_tmb_internal()
-  {
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::EWAAGrowth<Type> > ewaa_growth =
-        std::make_shared<fims_popdy::EWAAGrowth<Type> >();
+    std::shared_ptr<fims_popdy::EWAAGrowth<Type>> ewaa_growth =
+        std::make_shared<fims_popdy::EWAAGrowth<Type>>();
 
     // set relative info
     ewaa_growth->id = this->id;
-    ewaa_growth->ewaa = make_map(this->ages, this->weights); // this->ewaa;
+    ewaa_growth->ewaa = make_map(this->ages, this->weights);  // this->ewaa;
     // add to Information
     info->growth_models[ewaa_growth->id] = ewaa_growth;
 
@@ -248,8 +238,7 @@ public:
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
-  virtual bool add_to_fims_tmb()
-  {
+  virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
 #ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();

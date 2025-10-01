@@ -81,7 +81,8 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t DataInterfaceBase::id_g = 1;
 // local id of the DataInterfaceBase object map relating the ID of the
 // DataInterfaceBase to the DataInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<DataInterfaceBase>> DataInterfaceBase::live_objects;
+std::map<uint32_t, std::shared_ptr<DataInterfaceBase>>
+    DataInterfaceBase::live_objects;
 
 /**
  * @brief  The Rcpp interface for AgeComp to instantiate the object from R:
@@ -164,8 +165,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
     ss << "  \"header\": [" << "\"nages\", \"nyears\"" << "],\n";
     ss << "  \"dimensions\": [" << amax << ", " << ymax << "]\n},\n";
     ss << " \"value\": [";
-    for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++)
-    {
+    for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++) {
       ss << age_comp_data[i] << ", ";
     }
     ss << age_comp_data[age_comp_data.size() - 1] << "],\n";
@@ -305,8 +305,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     ss << "  \"header\": [" << "\"nlengths\", \"nyears\"" << "],\n";
     ss << "  \"dimensions\": [" << lmax << ", " << ymax << "]\n},\n";
     ss << " \"value\": [";
-    for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++)
-    {
+    for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++) {
       ss << length_comp_data[i] << ", ";
     }
     ss << length_comp_data[length_comp_data.size() - 1] << "],\n";
@@ -330,7 +329,8 @@ class LengthCompDataInterface : public DataInterfaceBase {
       for (int l = 0; l < lmax; l++) {
         int i_length_year = y * lmax + l;
         length_comp_data->at(y, l) = this->length_comp_data[i_length_year];
-        length_comp_data->uncertainty[i_length_year] = this->uncertainty[i_length_year];
+        length_comp_data->uncertainty[i_length_year] =
+            this->uncertainty[i_length_year];
       }
     }
     std::shared_ptr<fims_info::Information<Type>> info =
@@ -432,8 +432,7 @@ class IndexDataInterface : public DataInterfaceBase {
     ss << "  \"header\": [" << "\"nyears\"" << "],\n";
     ss << "  \"dimensions\": [" << ymax << "]\n},\n";
     ss << " \"value\": [";
-    for (R_xlen_t i = 0; i < index_data.size() - 1; i++)
-    {
+    for (R_xlen_t i = 0; i < index_data.size() - 1; i++) {
       ss << index_data[i] << ", ";
     }
     ss << index_data[index_data.size() - 1] << "],\n";
@@ -515,7 +514,7 @@ class LandingsDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->landings_data.resize(ymax);
     this->uncertainty.resize(ymax);
-DataInterfaceBase::live_objects[this->id] =
+    DataInterfaceBase::live_objects[this->id] =
         std::make_shared<LandingsDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
         DataInterfaceBase::live_objects[this->id]);
@@ -561,8 +560,7 @@ DataInterfaceBase::live_objects[this->id] =
     ss << "  \"header\": [" << "\"nyears\"" << "],\n";
     ss << "  \"dimensions\": [" << ymax << "]\n},\n";
     ss << " \"value\": [";
-    for (R_xlen_t i = 0; i < landings_data.size() - 1; i++)
-    {
+    for (R_xlen_t i = 0; i < landings_data.size() - 1; i++) {
       ss << landings_data[i] << ", ";
     }
     ss << landings_data[landings_data.size() - 1] << "],\n";

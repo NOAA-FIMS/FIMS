@@ -44,7 +44,7 @@ struct LogDevs : public RecruitmentBase<Type> {
    * @brief Create a map of report vectors for the recruitment object.
    */
   virtual std::map<std::string, fims::Vector<Type>>
-      create_report_vectors_map(){
+  create_report_vectors_map() {
     std::map<std::string, fims::Vector<Type>> report_vectors;
     return report_vectors;
   }
