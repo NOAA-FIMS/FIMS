@@ -489,7 +489,7 @@ methods::setMethod(
     ggplot2::ggplot(
       data = x@data,
       mapping = ggplot2::aes(
-        x = as.Date(.data[["datestart"]]),
+        x = .data[["timing"]],
         y = .data[["value"]],
         col = .data[["name"]]
       )
@@ -559,22 +559,16 @@ methods::setValidity(
 
     errors <- c(errors, validate_data_colnames(object@data))
 
-    # Add checks for other slots
-    # Check the format for acceptable variants of the ideal yyyy-mm-dd
-    grepl_datestart <- grepl(
-      "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      object@data[["datestart"]]
-    )
-    grepl_dateend <- grepl(
-      "[0-9]{1,4}-[0-9]{1,2}-[0-9]{1-2}",
-      object@data[["dateend"]]
-    )
-    if (!all(grepl_datestart)) {
-      errors <- c(errors, "datestart must be in 'yyyy-mm-dd' format")
+    # Check the format for acceptable variants of the ideal numeric
+    if (!all(is.numeric(object@data[["timing"]]))) {
+      errors <- c(errors, "timing must be in numeric format")
     }
-    if (!all(grepl_dateend)) {
-      errors <- c(errors, "dateend must be in 'yyyy-mm-dd' format")
+    if (!all(as.integer(object@data[["timing"]]) -
+      object@data[["timing"]] == 0)) {
+      errors <- c(errors, "timing can only handle years right now")
     }
+
+    # TODO: Add checks for other slots
 
     # Return
     if (length(errors) == 0) {
@@ -594,20 +588,14 @@ validate_data_colnames <- function(data) {
   if (!"name" %in% the_column_names) {
     errors <- c(errors, "data must contain 'name'")
   }
-  if (!"datestart" %in% the_column_names) {
-    errors <- c(errors, "data must contain 'datestart'")
+  if (!"timing" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'timing'")
   }
-  if (!"dateend" %in% the_column_names) {
-    errors <- c(errors, "data must contain 'dateend'")
-  }
-  if (!"dateend" %in% the_column_names) {
+  if (!"value" %in% the_column_names) {
     errors <- c(errors, "data must contain 'value'")
   }
-  if (!"dateend" %in% the_column_names) {
+  if (!"unit" %in% the_column_names) {
     errors <- c(errors, "data must contain 'unit'")
-  }
-  if (!"dateend" %in% the_column_names) {
-    errors <- c(errors, "data must contain 'uncertainty'")
   }
   if (!any(c("age", "length") %in% the_column_names)) {
     errors <- c(errors, "data must contain 'ages' and/or 'lengths'")
@@ -641,20 +629,20 @@ validate_data_colnames <- function(data) {
 #' in the alphabet.
 #' Next, within each type, data are organized by fleet. So, age-composition
 #' information for fleet1 will come before survey1. Next, all data within type
-#' and fleet are arranged by datestart, e.g., by year. That is the end of the
+#' and fleet are arranged by timing, e.g., by year. That is the end of the
 #' sorting for time series data like landings and indices.
 #' The biological data are further sorted by bin. Thus, age-composition
 #' information will be arranged as follows:
 #'
-#' | type | name     | datestart  | age  | value  |
-#' |:---- |:--------:|:----------:|:----:|-------:|
-#' | age  | fleet1   | 2022-01-01 | 1    | 0.3    |
-#' | age  | fleet1   | 2022-01-01 | 2    | 0.7    |
-#' | age  | fleet1   | 2023-01-01 | 1    | 0.5    |
+#' | type | name     | timing  | age  | value  |
+#' |:---- |:--------:|:-------:|:----:|-------:|
+#' | age  | fleet1   | 2022    | 1    | 0.3    |
+#' | age  | fleet1   | 2022    | 2    | 0.7    |
+#' | age  | fleet1   | 2023    | 1    | 0.5    |
 #'
 #' Length composition-data are sorted the same way but by length bin instead of
 #' by age bin. It becomes more complicated for the age-to-length-conversion
-#' data, which are sorted by type, name, datestart, age, and then length. So, a
+#' data, which are sorted by type, name, timing, age, and then length. So, a
 #' full set of length, e.g., length 10, length 20, length 30, etc., is placed
 #' together for a given age. After that age, another entire set of length
 #' information will be provided for that next age. Once the year is complete
@@ -682,23 +670,10 @@ FIMSFrame <- function(data) {
       paste(errors, sep = "\n", collapse = "\n")
     )
   }
-  # datestart and dateend need to be date classes so leading zeros are present
-  # but writing and reading from csv file removes the classes so they must be
-  # enforced here
-  # e.g., 0004-01-01 for January 01 0004
-  date_formats <- c("%Y-%m-%d")
-  data[["datestart"]] <- as.Date(data[["datestart"]], tryFormats = date_formats)
-  data[["dateend"]] <- as.Date(data[["dateend"]], tryFormats = date_formats)
 
-  # Get the earliest and latest year formatted as a string of 4 integers
-  start_year <- as.integer(format(
-    as.Date(min(data[["datestart"]], na.rm = TRUE), tryFormats = date_formats),
-    "%Y"
-  ))
-  end_year <- as.integer(format(
-    as.Date(max(data[["dateend"]], na.rm = TRUE), tryFormats = date_formats),
-    "%Y"
-  ))
+  # Get the earliest and latest year formatted as integers
+  start_year <- as.integer(floor(min(data[["timing"]], na.rm = TRUE)))
+  end_year <- as.integer(floor(max(data[["timing"]], na.rm = TRUE)))
   n_years <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
 
@@ -729,19 +704,16 @@ FIMSFrame <- function(data) {
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with m_*() are correct.
-  formatted_data <- tibble::as_tibble(data) |>
-    dplyr::mutate(
-      year = as.numeric(format(datestart, "%Y"))
-    )
+  formatted_data <- tibble::as_tibble(data) 
   missing_time_series <- create_missing_data(
     data = formatted_data,
-    years = years
+    timing = years
   )
   if ("age" %in% colnames(formatted_data)) {
     missing_ages <- create_missing_data(
       data = formatted_data,
       bins = ages,
-      years = years,
+      timing = years,
       column = age,
       types = c("weight-at-age", "age_comp")
     )
@@ -752,7 +724,7 @@ FIMSFrame <- function(data) {
     missing_lengths <- create_missing_data(
       data = formatted_data,
       bins = lengths,
-      years = years,
+      timing = years,
       column = length,
       types = "length_comp"
     )
@@ -766,18 +738,16 @@ FIMSFrame <- function(data) {
     missing_age_to_length <- temp_age_to_length_data |>
       dplyr::group_by(type, name) |>
       dplyr::filter(type %in% "age-to-length-conversion") |>
-      tidyr::expand(unit, year = years, age = ages, length = lengths) |>
+      tidyr::expand(unit, timing = years, age = ages, length = lengths) |>
       dplyr::anti_join(
         y = dplyr::select(
           temp_age_to_length_data,
-          type, name, unit, year, age, length
+          type, name, unit, timing, age, length
         ),
-        by = dplyr::join_by(type, name, unit, year, age, length)
+        by = dplyr::join_by(type, name, unit, timing, age, length)
       ) |>
       dplyr::mutate(
-        value = 0,
-        datestart = as.Date(sprintf("%04.0f-01-01", year), date_formats),
-        dateend = as.Date(sprintf("%04.0f-12-31", year), date_formats)
+        value = 0
       ) |>
       dplyr::ungroup()
   } else {
@@ -790,7 +760,7 @@ FIMSFrame <- function(data) {
     missing_age_to_length
   )
   sort_order <- intersect(
-    c("name", "type", "datestart", "age", "length"),
+    c("name", "type", "timing", "age", "length"),
     colnames(formatted_data)
   )
   complete_data <- dplyr::full_join(
@@ -819,7 +789,7 @@ FIMSFrame <- function(data) {
 create_missing_data <- function(
     data,
     bins,
-    years,
+    timings,
     column,
     types = c("landings", "index")) {
   use_this_data <- data |>
@@ -828,27 +798,24 @@ create_missing_data <- function(
     # This only pertains to annual data without bins
     use_this_data |>
       dplyr::filter(type %in% types) |>
-      tidyr::expand(unit, year = years) |>
+      tidyr::expand(unit, timing = timings) |>
       dplyr::anti_join(
-        y = dplyr::select(use_this_data, type, name, unit, year),
-        by = dplyr::join_by(type, name, unit, year)
+        y = dplyr::select(use_this_data, type, name, unit, timing),
+        by = dplyr::join_by(type, name, unit, timing)
       )
   } else {
     use_this_data |>
       dplyr::group_by(type, name) |>
       dplyr::filter(type %in% types) |>
-      tidyr::expand(unit, year = years, {{ column }} := bins) |>
+      tidyr::expand(unit, timing = timings, {{ column }} := bins) |>
       dplyr::anti_join(
-        y = dplyr::select(use_this_data, type, name, unit, year, {{ column }}),
-        by = dplyr::join_by(type, name, unit, year, {{ column }})
+        y = dplyr::select(use_this_data, type, name, unit, timing, {{ column }}),
+        by = dplyr::join_by(type, name, unit, timing, {{ column }})
       )
   }
-  date_formats <- c("%Y-%m-%d")
   out_data |>
     dplyr::mutate(
-      value = -999,
-      datestart = as.Date(sprintf("%04.0f-01-01", year), date_formats),
-      dateend = as.Date(sprintf("%04.0f-12-31", year), date_formats)
+      value = -999
     ) |>
     dplyr::ungroup()
 }

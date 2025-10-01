@@ -183,8 +183,6 @@ CYGWIN
 dat
 DataInterfaceBase
 DataObject
-dateend
-datestart
 dbcceb
 DBENCHMARK
 DBUILD
@@ -952,7 +950,9 @@ tibble
 tidyr
 tidyverse
 timediff
+timing
 timingfishery
+timings
 TLDR
 tmb
 TMB
