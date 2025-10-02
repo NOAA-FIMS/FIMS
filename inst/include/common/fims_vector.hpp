@@ -10,6 +10,8 @@
 
 #include "../interface/interface.hpp"
 #include <ostream>
+#include <iomanip>
+
 namespace fims {
 
 /**
@@ -24,14 +26,13 @@ namespace fims {
 template <typename Type>
 class Vector {
   std::vector<Type> vec_m;
-
   /**
    * @brief friend comparison operator. Allows the operator to see private
    * members of fims::Vector<Type>.
    */
   template <typename T>
-  friend bool operator==(const fims::Vector<T>& lhs,
-                         const fims::Vector<T>& rhs);
+  friend bool operator==(const fims::Vector<T> &lhs,
+                         const fims::Vector<T> &rhs);
 
  public:
   // Member Types
@@ -69,14 +70,14 @@ class Vector {
    * @brief Constructs a Vector of length "size" and sets the elements with the
    * value from input "value".
    */
-  Vector(size_t size, const Type& value = Type()) {
+  Vector(size_t size, const Type &value = Type()) {
     this->vec_m.resize(size, value);
   }
 
   /**
    * @brief Copy constructor.
    */
-  Vector(const Vector<Type>& other) {
+  Vector(const Vector<Type> &other) {
     this->vec_m.resize(other.size());
     for (size_t i = 0; i < this->vec_m.size(); i++) {
       this->vec_m[i] = other[i];
@@ -84,9 +85,28 @@ class Vector {
   }
 
   /**
+   * @brief Assignment operator for fims::Vector.
+   *
+   * @details Assigns the contents of another fims::Vector to this
+   * vector. Cleans up existing contents and performs a deep copy.
+   *
+   * @param other The vector to assign from.
+   * @return Reference to this vector.
+   */
+  Vector &operator=(const Vector &other) {
+    if (this != &other) {
+      // clean up existing
+      this->~Vector();
+      // copy construct into *this
+      new (this) Vector(other);
+    }
+    return *this;
+  }
+
+  /**
    * @brief Initialization constructor from std::vector<Type> type.
    */
-  Vector(const std::vector<Type>& other) { this->vec_m = other; }
+  Vector(const std::vector<Type> &other) { this->vec_m = other; }
 
   // TMB specific constructor
 #ifdef TMB_MODEL
@@ -94,7 +114,7 @@ class Vector {
   /**
    * @brief Initialization constructor from tmbutils::vector<Type> type.
    */
-  Vector(const tmbutils::vector<Type>& other) {
+  Vector(const tmbutils::vector<Type> &other) {
     this->vec_m.resize(other.size());
     for (size_t i = 0; i < this->vec_m.size(); i++) {
       this->vec_m[i] = other[i];
@@ -102,6 +122,13 @@ class Vector {
   }
 
 #endif
+
+  /**
+   * @brief Initialization constructor from std::initializer_list<Type> type.
+   */
+  Vector(std::initializer_list<Type> init) {
+    this->vec_m = std::vector<Type>(init);
+  }
 
   /**
    * The following are std::vector functions copied over from the standard
@@ -113,25 +140,35 @@ class Vector {
    * @brief Returns a reference to the element at specified location pos. No
    * bounds checking is performed.
    */
-  inline Type& operator[](size_t pos) { return this->vec_m[pos]; }
+  inline Type &operator[](size_t pos) {
+    if (pos >= this->size()) {
+      throw std::invalid_argument("fims::Vector out of bounds");
+    }
+    return this->vec_m[pos];
+  }
 
   /**
    * @brief Returns a constant  reference to the element at specified location
    * pos. No bounds checking is performed.
    */
-  inline const Type& operator[](size_t n) const { return this->vec_m[n]; }
+  inline const Type &operator[](size_t n) const {
+    if (n >= this->size()) {
+      throw std::invalid_argument("fims::Vector out of bounds");
+    }
+    return this->vec_m[n];
+  }
 
   /**
    * @brief Returns a reference to the element at specified location pos. Bounds
    * checking is performed.
    */
-  inline Type& at(size_t n) { return this->vec_m.at(n); }
+  inline Type &at(size_t n) { return this->vec_m.at(n); }
 
   /**
    * @brief Returns a constant reference to the element at specified location
    * pos. Bounds checking is performed.
    */
-  inline const Type& at(size_t n) const { return this->vec_m.at(n); }
+  inline const Type &at(size_t n) const { return this->vec_m.at(n); }
 
   /**
    *  @brief  If this vector is size 1 and pos is greater than zero,
@@ -142,7 +179,7 @@ class Vector {
    * @param pos
    * @return a constant reference to the element at specified location
    */
-  inline Type& get_force_scalar(size_t pos) {
+  inline Type &get_force_scalar(size_t pos) {
     if (this->size() == 1 && pos > 0) {
       return this->at(0);
     } else if (this->size() > 1 && pos >= this->size()) {
@@ -266,7 +303,7 @@ class Vector {
   /**
    * @brief Inserts value before pos.
    */
-  inline iterator insert(const_iterator pos, const Type& value) {
+  inline iterator insert(const_iterator pos, const Type &value) {
     return this->vec_m.insert(pos, value);
   }
 
@@ -274,7 +311,7 @@ class Vector {
    * @brief Inserts count copies of the value before pos.
    */
   inline iterator insert(const_iterator pos, size_type count,
-                         const Type& value) {
+                         const Type &value) {
     return this->vec_m.insert(pos, count, value);
   }
 
@@ -298,7 +335,7 @@ class Vector {
    * @brief Constructs element in-place.
    */
   template <class... Args>
-  iterator emplace(const_iterator pos, Args&&... args) {
+  iterator emplace(const_iterator pos, Args &&...args) {
     return this->vec_m.emplace(pos, std::forward<Args>(args)...);
   }
 
@@ -317,13 +354,13 @@ class Vector {
   /**
    * @brief Adds an element to the end.
    */
-  inline void push_back(const Type&& value) { this->vec_m.push_back(value); }
+  inline void push_back(const Type &&value) { this->vec_m.push_back(value); }
 
   /**
    * @brief Constructs an element in-place at the end.
    */
   template <class... Args>
-  void emplace_back(Args&&... args) {
+  void emplace_back(Args &&...args) {
     this->vec_m.emplace_back(std::forward<Args>(args)...);
   }
 
@@ -340,7 +377,7 @@ class Vector {
   /**
    * @brief Swaps the contents.
    */
-  inline void swap(Vector& other) { this->vec_m.swap(other.vec_m); }
+  inline void swap(Vector &other) { this->vec_m.swap(other.vec_m); }
 
   // end std::vector functions
 
@@ -356,11 +393,14 @@ class Vector {
 #ifdef TMB_MODEL
 
   /**
-   * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>const
+   * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>
+   *
+   * We provide both:
+   *  1. An explicit conversion operator (requires static_cast)
+   *  2. A named method `to_tmb()` for clarity
    */
-  operator tmbutils::vector<Type>() const {
-    tmbutils::vector<Type> ret;
-    ret.resize(this->vec_m.size());
+  explicit operator tmbutils::vector<Type>() const {
+    tmbutils::vector<Type> ret(this->vec_m.size());
     for (size_t i = 0; i < this->vec_m.size(); i++) {
       ret[i] = this->vec_m[i];
     }
@@ -370,25 +410,85 @@ class Vector {
   /**
    * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>
    */
-  operator tmbutils::vector<Type>() {
-    tmbutils::vector<Type> ret;
-    ret.resize(this->vec_m.size());
+  tmbutils::vector<Type> to_tmb() const {
+    tmbutils::vector<Type> ret(this->vec_m.size());
     for (size_t i = 0; i < this->vec_m.size(); i++) {
       ret[i] = this->vec_m[i];
     }
     return ret;
   }
 
+  /**
+   * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>
+   *
+   * We provide both:
+   *  1. An explicit conversion operator (requires static_cast)
+   *  2. A named method `to_tmb()` for clarity
+   */
+  explicit operator tmbutils::vector<Type>() {
+    tmbutils::vector<Type> ret(this->vec_m.size());
+    for (size_t i = 0; i < this->vec_m.size(); i++) {
+      ret[i] = this->vec_m[i];
+    }
+    return ret;
+  }
+
+  /**
+   * @brief Converts fims::Vector<Type> to tmbutils::vector<Type>
+   */
+  tmbutils::vector<Type> to_tmb() {
+    tmbutils::vector<Type> ret(this->vec_m.size());
+    for (size_t i = 0; i < this->vec_m.size(); i++) {
+      ret[i] = this->vec_m[i];
+    }
+    return ret;
+  }
+
+#else
+
+  /**
+   * @brief Convert fims::Vector to std::vector.
+   *
+   * @details Returns a standard vector containing the same elements
+   * as the fims::Vector.
+   *
+   * @return std::vector<Type> with the same elements.
+   */
+  std::vector<Type> to_std() const { return this->vec_m; }
+
+  /**
+   * @brief Convert fims::Vector to TMB vector type.
+   *
+   * @details Returns a TMB-compatible vector containing the same
+   * elements as the fims::Vector. Only available if compiled with
+   * TMB_MODEL.
+   *
+   * @return TMB vector type with the same elements.
+   */
+  std::vector<Type> to_tmb() const { return this->vec_m; }
 #endif
 
+  /**
+   * @brief Gets the tag for the vector. A tag can represent anything
+   * and is not used internally by FIMS.
+   * @return The tag.
+   */
+  std::string get_tag() const { return this->tag_m; }
+  /**
+   * @brief Sets the tag for the vector. A tag can be set to
+   * any string value and is not used internally by FIMS.
+   */
+  void set_tag(const std::string &tag) { this->tag_m = tag; }
+
  private:
+  std::string tag_m; /*!< The tag for the vector. */
 };  // end fims::Vector class
 
 /**
  * @brief Comparison operator.
  */
 template <class T>
-bool operator==(const fims::Vector<T>& lhs, const fims::Vector<T>& rhs) {
+bool operator==(const fims::Vector<T> &lhs, const fims::Vector<T> &rhs) {
   return lhs.vec_m == rhs.vec_m;
 }
 
@@ -402,7 +502,8 @@ bool operator==(const fims::Vector<T>& lhs, const fims::Vector<T>& rhs) {
  * @return std::ostream&
  */
 template <typename Type>
-std::ostream& operator<<(std::ostream& out, const fims::Vector<Type>& v) {
+std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v) {
+  out << std::fixed << std::setprecision(10);
   out << "[";
 
   if (v.size() == 0) {
@@ -410,10 +511,17 @@ std::ostream& operator<<(std::ostream& out, const fims::Vector<Type>& v) {
     return out;
   }
   for (size_t i = 0; i < v.size() - 1; i++) {
-    out << v[i] << ",";
+    if (v[i] != v[i]) {
+      out << "-999" << ",";
+    } else {
+      out << v[i] << ",";
+    }
   }
-
-  out << v[v.size() - 1] << "]";
+  if (v[v.size() - 1] != v[v.size() - 1]) {
+    out << "-999]";
+  } else {
+    out << v[v.size() - 1] << "]";
+  }
   return out;
 }
 

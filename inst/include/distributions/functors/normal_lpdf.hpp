@@ -117,7 +117,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         } */
     }
 #ifdef TMB_MODEL
-    vector<Type> normal_x = this->x;
+    vector<Type> normal_x = this->x.to_tmb();
 #endif
     return (lpdf);
   }

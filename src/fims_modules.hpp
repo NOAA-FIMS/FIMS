@@ -50,11 +50,12 @@ RCPP_MODULE(fims) {
   Rcpp::function(
       "CreateTMBModel", &CreateTMBModel,
       "Creates the TMB model object and adds interface objects to it.");
-  Rcpp::function("finalize", &finalize_fims,
-                 "Extracts the derived quantities from `Information` to the "
-                 "Rcpp object and returns a JSON string as the output.");
+  Rcpp::function("set_fixed", &set_fixed_parameters,
+                 "Sets the fixed parameters vector object.");
   Rcpp::function("get_fixed", &get_fixed_parameters_vector,
                  "Gets the fixed parameters vector object.");
+  Rcpp::function("set_random", &set_random_parameters,
+                 "Sets the random parameters vector object.");
   Rcpp::function("get_random", &get_random_parameters_vector,
                  "Gets the random parameters vector object.");
   Rcpp::function("get_parameter_names", &get_parameter_names,
@@ -62,7 +63,7 @@ RCPP_MODULE(fims) {
   Rcpp::function("get_random_names", &get_random_names,
                  "Gets the random effects names object.");
   Rcpp::function("clear", clear,
-                 "Clears all pointers/references of a FIMS model");
+                 "Clears all pointers/references of a FIMS model.");
   Rcpp::function("get_log", get_log,
                  "Gets the log entries as a string in JSON format.");
   Rcpp::function(
@@ -211,11 +212,11 @@ RCPP_MODULE(fims) {
       .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
       .field("log_r", &BevertonHoltRecruitmentInterface::log_r,
              "recruitment as a random effect on the natural log scale")
-      .field("nyears", &BevertonHoltRecruitmentInterface::nyears,
-             "Number of years")
       .field("log_expected_recruitment",
              &BevertonHoltRecruitmentInterface::log_expected_recruitment,
-             "Log expectation of the recruitment process")
+             "expected recruitment as a random effect on the natural log scale")
+      .field("nyears", &BevertonHoltRecruitmentInterface::nyears,
+             "Number of years")
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
       .method("SetRecruitmentProcessID",
               &BevertonHoltRecruitmentInterface::SetRecruitmentProcessID,
@@ -255,6 +256,8 @@ RCPP_MODULE(fims) {
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
       .method("get_id", &FleetInterface::get_id)
+      .method("SetName", &FleetInterface::SetName)
+      .method("GetName", &FleetInterface::GetName)
       .method("SetObservedAgeCompDataID",
               &FleetInterface::SetObservedAgeCompDataID)
       .method("GetObservedAgeCompDataID",
@@ -316,6 +319,10 @@ RCPP_MODULE(fims) {
       .method("AddFleet", &PopulationInterface::AddFleet,
               "Set a unique fleet id to the list of fleets operating on this "
               "population")
+      .method("SetName", &PopulationInterface::SetName,
+              "Set the name of the population")
+      .method("GetName", &PopulationInterface::GetName,
+              "Get the name of the population")
       .method("evaluate", &PopulationInterface::evaluate,
               "evaluate the population function");
 
@@ -446,8 +453,10 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
       .method("get_output", &CatchAtAgeInterface::to_json)
-      .method("calculate_reference_points",
-              &CatchAtAgeInterface::calculate_reference_points);
+      .method("GetReport", &CatchAtAgeInterface::get_report)
+      .method("GetId", &CatchAtAgeInterface::get_id)
+      .method("DoReporting", &CatchAtAgeInterface::DoReporting)
+      .method("IsReporting", &CatchAtAgeInterface::IsReporting);
 }
 
 #endif /* SRC_FIMS_MODULES_HPP */

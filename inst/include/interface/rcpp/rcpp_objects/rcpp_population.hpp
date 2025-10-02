@@ -40,6 +40,11 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    */
   SharedBoolean initialize_catch_at_age;
   /**
+   * @brief Initialize the surplus production model.
+   *
+   */
+  SharedBoolean initialize_surplus_production;
+  /**
    * @brief The constructor.
    */
   PopulationInterfaceBase() {
@@ -83,7 +88,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The number of age bins.
    */
-  SharedInt nages;
+  SharedInt nages = 0;
   /**
    * @brief The number of fleets.
    */
@@ -166,7 +171,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The name for the population.
    */
-  std::string name;
+  SharedString name = fims::to_string("NA");
 
   /**
    * @brief The constructor.
@@ -215,6 +220,18 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Sets the name of the population.
+   * @param name The name to set.
+   */
+  void SetName(const std::string &name) { this->name.set(name); }
+
+  /**
+   * @brief Gets the name of the population.
+   * @return The name.
+   */
+  std::string GetName() const { return this->name.get(); }
 
   /**
    * @brief Sets the unique ID for the Maturity object.
@@ -326,96 +343,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
   }
 
-  /**
-   * @brief Converts the data to json representation for the output.
-   * @return A string is returned specifying that the module relates to the
-   * population interface. It also returns the ID for each associated module
-   * and the values associated with that module. Then it returns several
-   * derived quantities. This string is formatted for a json file.
-   */
-  virtual std::string to_json() {
-    std::stringstream ss;
-
-    ss << "{\n";
-    ss << " \"name\" : \"Population\",\n";
-
-    ss << " \"type\" : \"population\",\n";
-    ss << " \"tag\" : \"" << this->name << "\",\n";
-    ss << " \"id\": " << this->id << ",\n";
-    ss << " \"recruitment_id\": " << this->recruitment_id << ",\n";
-    ss << " \"growth_id\": " << this->growth_id << ",\n";
-    ss << " \"maturity_id\": " << this->maturity_id << ",\n";
-
-    ss << " \"parameters\": [\n{\n";
-    ss << " \"name\": \"log_M\",\n";
-    ss << " \"id\":" << this->log_M.id_m << ",\n";
-    ss << " \"type\": \"vector\",\n";
-    ss << " \"values\": " << this->log_M << "\n},\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"log_init_naa\",\n";
-    ss << "  \"id\":" << this->log_init_naa.id_m << ",\n";
-    ss << "  \"type\": \"vector\",\n";
-    ss << "  \"values\":" << this->log_init_naa << " \n}],\n";
-
-    ss << " \"derived_quantities\": [{\n";
-    ss << "  \"name\": \"SSB\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_ssb.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_ssb.size() - 1; i++) {
-        ss << this->derived_ssb[i] << ", ";
-      }
-      ss << this->derived_ssb[this->derived_ssb.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "   \"name\": \"NAA\",\n";
-    ss << "   \"values\":[";
-    if (this->derived_naa.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_naa.size() - 1; i++) {
-        ss << this->derived_naa[i] << ", ";
-      }
-      ss << this->derived_naa[this->derived_naa.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "   \"name\": \"Biomass\",\n";
-    ss << "   \"values\":[";
-    if (this->derived_biomass.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_biomass.size() - 1; i++) {
-        ss << this->derived_biomass[i] << ", ";
-      }
-      ss << this->derived_biomass[this->derived_biomass.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "   \"name\": \"Recruitment\",\n";
-    ss << "   \"values\":[";
-    if (this->derived_recruitment.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_recruitment.size() - 1; i++) {
-        ss << this->derived_recruitment[i] << ", ";
-      }
-      ss << this->derived_recruitment[this->derived_recruitment.size() - 1]
-         << "]\n";
-    }
-    ss << " }\n]\n";
-
-    ss << "}";
-
-    return ss.str();
-  }
-
 #ifdef TMB_MODEL
 
   template <typename Type>
@@ -433,11 +360,14 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->nyears = this->nyears.get();
     population->nfleets = this->nfleets.get();
     population->nseasons = this->nseasons.get();
-    population->nages = this->nages.get();
-    if (this->nages.get() == this->ages.size()) {
-      population->ages.resize(this->nages.get());
-    } else {
-      warning("The ages vector is not of size nages.");
+    // only define ages if nages greater than 0
+    if (this->nages.get() > 0) {
+      population->nages = this->nages.get();
+      if (this->nages.get() == this->ages.size()) {
+        population->ages.resize(this->nages.get());
+      } else {
+        warning("The ages vector is not of size nages.");
+      }
     }
 
     fleet_ids_iterator it;
@@ -485,6 +415,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
+
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }

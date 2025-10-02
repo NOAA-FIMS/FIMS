@@ -53,13 +53,16 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
 
     // Dimension checks
     if (this->input_type == "data") {
-      if (dims[0] * dims[1] != this->expected_values.size()) {
-        throw std::invalid_argument(
-            "MultinomialLPDF: Vector index out of bounds. The dimension of the "
-            "number of rows times the number of columns is of size " +
-            fims::to_string(dims[0] * dims[1]) +
-            " and the expected vector is of size " +
-            fims::to_string(this->expected_values.size()));
+      if (this->data_expected_values) {
+        if (dims[0] * dims[1] != this->data_expected_values->size()) {
+          throw std::invalid_argument(
+              "MultinomialLPDF: Vector index out of bounds. The dimension of "
+              "the "
+              "number of rows times the number of columns is of size " +
+              fims::to_string(dims[0] * dims[1]) +
+              " and the expected vector is of size " +
+              fims::to_string(this->data_expected_values->size()));
+        }
       }
     } else {
       if (dims[0] * dims[1] != this->x.size()) {
@@ -114,8 +117,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
 
       if (!containsNA) {
         this->lpdf_vec[i] =
-            dmultinom((vector<Type>)x_vector, (vector<Type>)prob_vector, true);
-
+            dmultinom(x_vector.to_tmb(), prob_vector.to_tmb(), true);
       } else {
         this->lpdf_vec[i] = 0;
       }

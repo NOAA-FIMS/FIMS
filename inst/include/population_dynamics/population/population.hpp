@@ -71,6 +71,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       total_landings_numbers; /*!< Derived quantity: Total landings in numbers*/
   fims::Vector<Type> expected_recruitment; /*!< Expected recruitment */
+  fims::Vector<Type> sum_selectivity;      /*!< TODO: add documentation */
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
@@ -92,12 +93,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       fleets; /*!< shared pointer to fleet module */
 
   // Define objective function object to be able to REPORT and ADREPORT
-
-#ifdef TMB_MODEL
-  ::objective_function<Type>
-      *of;  // :: references global namespace, defined in src/FIMS.cpp,
-            // available anywhere in the R package
-#endif
 
   std::map<std::string, fims::Vector<Type>>
       derived_quantities; /*!< derived quantities for specific model type, i.e.
@@ -827,6 +822,16 @@ struct Population : public fims_model_object::FIMSObject<Type> {
         }
       }
     }
+  }
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
+    report_vectors["log_init_naa"].emplace_back(this->log_init_naa);
+    report_vectors["log_M"].emplace_back(this->log_M);
+  }
+  virtual void get_report_vector_count(
+      std::map<std::string, size_t>& report_vector_count) {
+    report_vector_count["log_init_naa"] += 1;
+    report_vector_count["log_M"] += 1;
   }
 };
 template <class Type>
