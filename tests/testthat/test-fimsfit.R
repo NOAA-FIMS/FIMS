@@ -35,7 +35,7 @@ test_that("is.FIMSFit() works with correct inputs", {
   #' @description Test that as.list(fit_age_length_comp) contains correct components.
   expected_names <- c(
     "input", "obj", "opt", "max_gradient", "report", "sdreport", "estimates",
-    "fits", "number_of_parameters", "timing", "version"
+    "number_of_parameters", "timing", "version"
   )
   expect_equal(
     object = names(as.list(fit_age_length_comp)),

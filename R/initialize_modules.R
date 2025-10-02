@@ -912,10 +912,9 @@ initialize_fims <- function(parameters, data) {
   )
 
   # Set-up TMB
-  # TODO: Fix this when more families come online
   # Hard code to be a catch-at-age model
-  # caa <- methods::new(CatchAtAge)
-  # caa$AddPopulation(population$get_id())
+  fims_model <- methods::new(CatchAtAge)
+  fims_model$AddPopulation(population$get_id())
 
   CreateTMBModel()
   # Create parameter list from Rcpp modules
@@ -923,10 +922,8 @@ initialize_fims <- function(parameters, data) {
     parameters = list(
       p = get_fixed(),
       re = get_random()
-      # TODO: Add the model to this list
-      # ),
-      # model = caa
-    )
+    ),
+    model = fims_model
   )
 
   return(parameter_list)

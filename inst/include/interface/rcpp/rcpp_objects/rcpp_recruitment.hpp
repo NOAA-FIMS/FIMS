@@ -30,13 +30,14 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The process id of the RecruitmentInterfaceBase object.
    */
-  SharedInt process_id;
+  SharedInt process_id = -999;
   /**
    * @brief The map associating the IDs of RecruitmentInterfaceBase to the
    * objects. This is a live object, which is an object that has been created
    * and lives in memory.
    */
-  static std::map<uint32_t, RecruitmentInterfaceBase*> live_objects;
+  static std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
+      live_objects;
 
   /**
    * @brief The constructor.
@@ -45,7 +46,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
     this->id = RecruitmentInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     RecruitmentInterfaceBase */
-    RecruitmentInterfaceBase::live_objects[this->id] = this;
+    // RecruitmentInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -53,7 +54,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  RecruitmentInterfaceBase(const RecruitmentInterfaceBase& other)
+  RecruitmentInterfaceBase(const RecruitmentInterfaceBase &other)
       : id(other.id), process_id(other.process_id) {}
 
   /**
@@ -83,7 +84,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t RecruitmentInterfaceBase::id_g = 1;
 // local id of the RecruitmentInterfaceBase object map relating the ID of the
 // RecruitmentInterfaceBase to the RecruitmentInterfaceBase objects
-std::map<uint32_t, RecruitmentInterfaceBase*>
+std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
     RecruitmentInterfaceBase::live_objects;
 
 /**
@@ -135,8 +136,10 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief The constructor.
    */
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {
+    RecruitmentInterfaceBase::live_objects[this->id] =
+        std::make_shared<BevertonHoltRecruitmentInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<BevertonHoltRecruitmentInterface>(*this));
+        RecruitmentInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -145,7 +148,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param other The passed object to copy.
    */
   BevertonHoltRecruitmentInterface(
-      const BevertonHoltRecruitmentInterface& other)
+      const BevertonHoltRecruitmentInterface &other)
       : RecruitmentInterfaceBase(other),
         nyears(other.nyears),
         logit_steep(other.logit_steep),
@@ -218,7 +221,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double> > info =
+    std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::recruitment_models_iterator it;
@@ -231,8 +234,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::SRBevertonHolt<double> > recr =
-          std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double> >(
+      std::shared_ptr<fims_popdy::SRBevertonHolt<double>> recr =
+          std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double>>(
               it->second);
 
       for (size_t i = 0; i < this->logit_steep.size(); i++) {
@@ -269,6 +272,33 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
   }
+  /**
+   * @brief Sets the uncertainty values for the parameters from the standard
+   * error values passed from R.
+   * @param se_values A map of parameter names and their associated standard
+   * error values.
+   */
+  virtual void set_uncertainty(
+      std::map<std::string, std::vector<double>> &se_values) {
+    fims::Vector<double> logit_steep_uncertainty(this->logit_steep.size(),
+                                                 -99999999);
+    this->get_se_values("logit_steep", se_values, logit_steep_uncertainty);
+    fims::Vector<double> log_rzero_uncertainty(this->log_rzero.size(),
+                                               -999999999);
+    this->get_se_values("log_rzero", se_values, log_rzero_uncertainty);
+    fims::Vector<double> log_devs_uncertainty(this->log_devs.size(),
+                                              -999999999);
+    this->get_se_values("log_devs", se_values, log_devs_uncertainty);
+    for (size_t i = 0; i < this->logit_steep.size(); i++) {
+      this->logit_steep[i].uncertainty_m = logit_steep_uncertainty[i];
+    }
+    for (size_t i = 0; i < this->log_rzero.size(); i++) {
+      this->log_rzero[i].uncertainty_m = log_rzero_uncertainty[i];
+    }
+    for (size_t i = 0; i < this->log_devs.size(); i++) {
+      this->log_devs[i].uncertainty_m = log_devs_uncertainty[i];
+    }
+  }
 
   /**
    * @brief Converts the data to json representation for the output.
@@ -281,28 +311,37 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"recruitment\",\n";
-    ss << " \"type\": \"Beverton--Holt\",\n";
-    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"module_name\": \"recruitment\",\n";
+    ss << " \"module_type\": \"Beverton-Holt\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
     ss << "  \"name\": \"logit_steep\",\n";
     ss << "  \"id\":" << this->logit_steep.id_m << ",\n";
     ss << "  \"type\": \"vector\",\n";
-    ss << "  \"values\":" << this->logit_steep << "\n},\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [\"na\"],\n";
+    ss << "  \"dimensions\": [" << this->logit_steep.size() << "]\n},\n";
+    ss << "  \"values\":" << this->logit_steep << "},\n";
 
     ss << "{\n";
     ss << "   \"name\": \"log_rzero\",\n";
     ss << "   \"id\":" << this->log_rzero.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->log_rzero << "\n },\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [\"na\"],\n";
+    ss << "  \"dimensions\": [" << this->log_rzero.size() << "]\n},\n";
+    ss << "   \"values\":" << this->log_rzero << "},\n";
 
     ss << "{\n";
     ss << "   \"name\": \"log_devs\",\n";
     ss << "   \"id\":" << this->log_devs.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->log_devs << "\n }]\n}";
-
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [\"nyears-1\"],\n";
+    ss << "  \"dimensions\": [" << this->log_devs.size() << "]\n},\n";
+    ss << "   \"values\":" << this->log_devs << "}]\n";
+    ss << "}";
     return ss.str();
   }
 
@@ -310,11 +349,11 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::SRBevertonHolt<Type> > recruitment =
-        std::make_shared<fims_popdy::SRBevertonHolt<Type> >();
+    std::shared_ptr<fims_popdy::SRBevertonHolt<Type>> recruitment =
+        std::make_shared<fims_popdy::SRBevertonHolt<Type>>();
 
     std::stringstream ss;
 
@@ -488,11 +527,11 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogDevs<Type> > recruitment_process =
-        std::make_shared<fims_popdy::LogDevs<Type> >();
+    std::shared_ptr<fims_popdy::LogDevs<Type>> recruitment_process =
+        std::make_shared<fims_popdy::LogDevs<Type>>();
 
     recruitment_process->id = this->id;
 
@@ -570,11 +609,11 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogR<Type> > recruitment_process =
-        std::make_shared<fims_popdy::LogR<Type> >();
+    std::shared_ptr<fims_popdy::LogR<Type>> recruitment_process =
+        std::make_shared<fims_popdy::LogR<Type>>();
 
     recruitment_process->id = this->id;
 
