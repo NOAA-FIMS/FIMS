@@ -130,6 +130,18 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   ParameterVector log_M;
   /**
+   * @brief The population spawning biomass for each year.
+   */
+  ParameterVector spawning_biomass;
+  /**
+   * @brief The population spawning biomass ratio for each year.
+   */
+  ParameterVector spawning_biomass_ratio;
+  /**
+   * @brief Log of the population annual fishing mortality multiplier.
+   */
+  ParameterVector log_f_multiplier;
+  /**
    * @brief The natural log of the initial numbers at age.
    */
   ParameterVector log_init_naa;
@@ -151,6 +163,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    * TODO: This should be sb not ssb if left as an acronym.
    */
   Rcpp::NumericVector derived_ssb;
+  /**
+   * @brief Derived spawning biomass ratio.
+   */
+  Rcpp::NumericVector derived_spawning_biomass_ratio;
   /**
    * @brief Derived numbers at age.
    */
@@ -195,10 +211,14 @@ class PopulationInterface : public PopulationInterfaceBase {
         growth_id(other.growth_id),
         recruitment_id(other.recruitment_id),
         log_M(other.log_M),
+        log_f_multiplier(other.log_f_multiplier),
+        spawning_biomass(other.spawning_biomass),
+        spawning_biomass_ratio(other.spawning_biomass_ratio),
         log_init_naa(other.log_init_naa),
         numbers_at_age(other.numbers_at_age),
         ages(other.ages),
         derived_ssb(other.derived_ssb),
+        derived_spawning_biomass_ratio(other.derived_spawning_biomass_ratio),
         derived_naa(other.derived_naa),
         derived_biomass(other.derived_biomass),
         derived_recruitment(other.derived_recruitment),
@@ -291,6 +311,14 @@ class PopulationInterface : public PopulationInterfaceBase {
         }
       }
 
+      for (size_t i = 0; i < this->log_f_multiplier.size(); i++) {
+        if (this->log_f_multiplier[i].estimation_type_m.get() == "constant") {
+          this->log_f_multiplier[i].final_value_m = this->log_f_multiplier[i].initial_value_m;
+        } else {
+          this->log_f_multiplier[i].final_value_m = pop->log_f_multiplier[i];
+        }
+      }
+
       for (size_t i = 0; i < this->log_init_naa.size(); i++) {
         if (this->log_init_naa[i].estimation_type_m.get() == "constant") {
           this->log_init_naa[i].final_value_m =
@@ -337,6 +365,17 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->recruitment_id = this->recruitment_id.get();
     population->maturity_id = this->maturity_id.get();
     population->log_M.resize(this->log_M.size());
+    if(this->log_f_multiplier.size() == (this->nyears.get())){
+      population->log_f_multiplier.resize(this->log_f_multiplier.size());
+    } else {
+      warning("The log_f_multiplier vector is not of size nyears. Filling with zeros.");
+      this->log_f_multiplier.resize((this->nyears.get()));
+      for (size_t i = 0; i < log_f_multiplier.size(); i++){
+        this->log_f_multiplier[i].initial_value_m = static_cast<double>(0.0);
+        this->log_f_multiplier[i].estimation_type_m.set("constant");
+      }
+      population->log_f_multiplier.resize(this->log_f_multiplier.size());
+    }
     population->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].initial_value_m;
@@ -354,6 +393,24 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
+
+    for (size_t i = 0; i < log_f_multiplier.size(); i++) {
+      population->log_f_multiplier[i] = this->log_f_multiplier[i].initial_value_m;
+      if (this->log_f_multiplier[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".log_f_multiplier." << this->log_f_multiplier[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(population->log_f_multiplier[i]);
+      }
+      if (this->log_f_multiplier[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".log_f_multiplier." << this->log_f_multiplier[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(population->log_f_multiplier[i]);
+      }
+    }
+    info->variable_map[this->log_f_multiplier.id_m] = &(population)->log_f_multiplier;
+
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;

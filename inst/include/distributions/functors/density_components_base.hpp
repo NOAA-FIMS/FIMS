@@ -40,6 +40,10 @@ struct DistributionElementObject {
       priors; /**< vector of pointers where each points to a prior parameter */
   fims::Vector<Type> x; /**< input value of distribution function for priors or
                            random effects*/
+  fims::Vector<Type> expected_mean; /**< the expected mean of the
+                                distribution, overrides expected values */
+  std::string  use_mean = fims::to_string("no"); /**< should expected_mean 
+                                           be used over expected values */
   // std::shared_ptr<DistributionElementObject<Type>> expected; /**< expected
   // value of distribution function */
 
@@ -56,7 +60,13 @@ struct DistributionElementObject {
       return (*re)[i];
     }
     if (this->input_type == "prior") {
-      return (*(priors[i]))[0];
+      if(priors.size() == 0) {
+        throw std::runtime_error("No priors defined for this distribution.");
+      } else if(priors.size() == 1) {
+        return (*(priors[0]))[i];
+      } else if(priors.size() > 1) {
+        return (*(priors[i]))[0];
+      }
     }
     return x[i];
   }
@@ -88,8 +98,9 @@ struct DistributionElementObject {
   inline Type& get_expected(size_t i) {
     if (this->input_type == "data") {
       return (*data_expected_values)[i];
-    }
-    if (this->input_type == "random_effects") {
+    } else if (this->use_mean == "yes") {
+      return this->expected_mean.get_force_scalar(i);
+    } else if (this->input_type == "random_effects") {
       return (*re_expected_values)[i];
     } else {
       return this->expected_values.get_force_scalar(i);

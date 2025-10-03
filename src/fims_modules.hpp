@@ -303,10 +303,18 @@ RCPP_MODULE(fims) {
       .field("n_lengths", &PopulationInterface::n_lengths, "number of lengths")
       .field("log_M", &PopulationInterface::log_M,
              "natural log of the natural mortality of the population")
+      .field("log_f_multiplier", &PopulationInterface::log_f_multiplier,
+       "natural log of the annual fishing mortality multiplier of the population")
+      .field("spawning_biomass", &PopulationInterface::spawning_biomass,
+             "spawning biomass of the population for each year")
+      .field("spawning_biomass_ratio", &PopulationInterface::spawning_biomass_ratio,
+             "population spawning biomass ratio for each year")
       .field("log_init_naa", &PopulationInterface::log_init_naa,
              "natural log of the initial numbers at age")
       .field("ages", &PopulationInterface::ages,
-             "vector of ages in the population; length n_ages")
+             "vector of ages in the population; length nages")
+      .method("evaluate", &PopulationInterface::evaluate,
+              "evaluate the population function")
       .method("SetMaturityID", &PopulationInterface::SetMaturityID,
               "Set the unique id for the Maturity object")
       .method("SetGrowthID", &PopulationInterface::SetGrowthID,
@@ -319,7 +327,9 @@ RCPP_MODULE(fims) {
       .method("SetName", &PopulationInterface::SetName,
               "Set the name of the population")
       .method("GetName", &PopulationInterface::GetName,
-              "Get the name of the population");
+              "Get the name of the population")
+      .method("evaluate", &PopulationInterface::evaluate,
+              "evaluate the population function");
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
@@ -370,28 +380,34 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
-  Rcpp::class_<DnormDistributionsInterface>("DnormDistribution")
-      .constructor()
-      .method("get_id", &DnormDistributionsInterface::get_id,
-              "Returns a unique ID for the Dnorm distribution class.")
-      .method("evaluate", &DnormDistributionsInterface::evaluate,
-              "Evaluates the normal distribution given input data and "
-              "parameter values.")
-      .method("set_observed_data",
-              &DnormDistributionsInterface::set_observed_data,
-              "Accepts a unique ID for a given Data Object class to link the "
-              "data with the distribution.")
-      .method("set_distribution_links",
-              &DnormDistributionsInterface::set_distribution_links,
-              "Accepts a unique ID for a given parameter to link the parameter "
-              "with the distribution.")
-      .field("x", &DnormDistributionsInterface::x,
-             "Input for distribution when not observations, e.g., prior or "
-             "random effect.")
-      .field("expected_values", &DnormDistributionsInterface::expected_values,
-             "Mean of the distribution.")
-      .field("log_sd", &DnormDistributionsInterface::log_sd,
-             "The natural log of the standard deviation.");
+        Rcpp::class_<DnormDistributionsInterface>("DnormDistribution")
+            .constructor()
+            .method("get_id", &DnormDistributionsInterface::get_id,
+                    "Returns a unique ID for the Dnorm distribution class.")
+            .method("evaluate", &DnormDistributionsInterface::evaluate,
+                    "Evaluates the normal distribution given input data and "
+                    "parameter values.")
+            .method("set_observed_data",
+                    &DnormDistributionsInterface::set_observed_data,
+                    "Accepts a unique ID for a given Data Object class to link the "
+                    "data with the distribution.")
+            .method("set_distribution_mean",
+                    &DnormDistributionsInterface::set_distribution_mean,
+                    "Accepts a value for the expected distribution mean "
+                    "creates a fixed effect estimated mean.")
+            .method("set_distribution_links",
+                    &DnormDistributionsInterface::set_distribution_links,
+                    "Accepts a unique ID for a given parameter to link the parameter "
+                    "with the distribution.")
+            .field("x", &DnormDistributionsInterface::x,
+                   "Input for distribution when not observations, e.g., prior or "
+                   "random effect.")
+            .field("expected_values", &DnormDistributionsInterface::expected_values,
+                   "Mean of the distribution.")
+            .field("expected_mean", &DnormDistributionsInterface::expected_mean,
+                   "The expected mean of the distribution.")
+            .field("log_sd", &DnormDistributionsInterface::log_sd,
+                   "The natural log of the standard deviation.");
 
   Rcpp::class_<DlnormDistributionsInterface>("DlnormDistribution")
       .constructor()
