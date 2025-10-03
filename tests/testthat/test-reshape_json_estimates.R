@@ -29,12 +29,12 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
   fit <- readRDS(model_fit_path)
   # Extract the core TMB components (object, sdreport, optimization result)
   # from the fit object.
-  obj  <- get_obj(fit)
+  obj <- get_obj(fit)
   sdreport <- get_sdreport(fit)
   opt <- get_opt(fit)
   parameter_names <- get_obj(fit)[["par"]] |>
     names()
-  
+
   # Reshape the TMB output into a standardized data frame.
   # This serves as the "expected" result to compare against.
   tmb_output <- FIMS:::reshape_tmb_estimates(
@@ -53,12 +53,12 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
     # output includes the label "log_r," which is not present in the JSON output.
     # For now, manually remove `log_r` here and create a new issue to track this.
     dplyr::filter(label != "log_r")
- 
+
   # Extract the model_output, which contains the JSON-like structure.
   model_output <- get_model_output(fit)
   # Reshape the output from the JSON structure into a data frame.
-  json_output <- reshape_json_estimates(model_output) 
-  
+  json_output <- reshape_json_estimates(model_output)
+
   # Check for any duplicated parameter_id entries in the JSON output, which
   # would indicate a problem in the reshaping logic.
   # Use a tryCatch block to provide a more informative error message if the
@@ -86,14 +86,14 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
       )
     }
   )
-  
+
   # Compare the structure of the JSON output against the TMB output.
   # Prepare the JSON summary for comparison by selecting, filtering, and sorting
   # it in the same way as the TMB summary.
   json_output <- json_output |>
     dplyr::select(module_name, label) |>
     dplyr::distinct()
- 
+
   # Find module names that are present in TMB output but missing in JSON output.
   # anti_join() returns rows in the first data frame that do not have a match
   # in the second data frame based on the specified column.

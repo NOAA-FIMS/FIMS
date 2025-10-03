@@ -26,16 +26,16 @@ reshape_json_estimates <- function(model_output) {
     )],
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), json)
   )
-  
+
   # Process the module parameters
   module_information <- purrr::map_df(
     read_list[
       !names(read_list) %in%
-      c(
-        "name", "type", "estimation_framework", "id",
-        "objective_function_value", "populations", "fleets", "data",
-        "density_components", "population_ids", "fleet_ids"
-      )
+        c(
+          "name", "type", "estimation_framework", "id",
+          "objective_function_value", "populations", "fleets", "data",
+          "density_components", "population_ids", "fleet_ids"
+        )
     ],
     .f = \(y) dplyr::mutate(
       y,
@@ -122,7 +122,7 @@ reshape_json_estimates <- function(model_output) {
       density_component = purrr::map(density_component, density_to_tibble)
     ) |>
     tidyr::unnest(density_component)
-    
+
   # Process the population data
   population_information <- read_list[["populations"]] |>
     tidyr::pivot_longer(
@@ -140,8 +140,8 @@ reshape_json_estimates <- function(model_output) {
     ) |>
     tidyr::unnest(parameters)
 
-  #TODO: Bring in TMB estimates
-  #TODO: Change some column names
+  # TODO: Bring in TMB estimates
+  # TODO: Change some column names
   # Bring everything together
   out <- dplyr::bind_rows(
     # density_information,
@@ -150,7 +150,8 @@ reshape_json_estimates <- function(model_output) {
     population_information
   ) |>
     dplyr::select(
-      module_name, module_id, module_type, "label" = name,
+      module_name, module_id, module_type,
+      "label" = name,
       type, type_id, "parameter_id" = id,
       fleet, dplyr::ends_with("_i"),
       "input" = value, estimated = "estimated_value", "expected" = expected_values,
@@ -288,7 +289,7 @@ dimension_folded_to_tibble <- function(section) {
   if ("type" %in% names(section)) {
     temp |>
       dplyr::mutate(
-        #TODO: Need to rename
+        # TODO: Need to rename
         type_id = section[["id"]],
         type = section[["type"]]
       ) |>
@@ -363,7 +364,7 @@ dimensions_to_tibble <- function(data) {
     purrr::set_names(names(data[["dimensions"]])) |>
     expand.grid() |>
     tibble::as_tibble() |>
-    dplyr::arrange(!!! rlang::syms(better_names))
+    dplyr::arrange(!!!rlang::syms(better_names))
 }
 
 #' Convert the density component information into a tibble
