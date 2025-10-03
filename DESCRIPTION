@@ -92,14 +92,14 @@ LinkingTo:
     TMB
 VignetteBuilder:
     knitr
+Remotes: 
+    github::nmfs-ost/stockplotr
 Config/testthat/edition: 3
 Config/testthat/parallel: false
 Encoding: UTF-8
 Language: en-US
 LazyData: true
 NeedsCompilation: yes
-Remotes: 
-    github::nmfs-ost/stockplotr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 SystemRequirements: GNU make

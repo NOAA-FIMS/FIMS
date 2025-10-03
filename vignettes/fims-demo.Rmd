@@ -278,7 +278,7 @@ stockplotr::plot_spawning_biomass(
 # Plot of log fishing mortality
 stockplotr::plot_timeseries(
   stockplotr::prepare_data(
-    output |> dplyr::filter(module_id == 1), 
+    output |> dplyr::filter(module_id == 1),
     label_name = "log_Fmort$",
     geom = "line"
   ),
@@ -291,7 +291,7 @@ stockplotr::plot_timeseries(
 # Plot the index of abundance against the observed values
 stockplotr::plot_timeseries(
   stockplotr::prepare_data(
-    output |> dplyr::filter(module_id == 2), 
+    output |> dplyr::filter(module_id == 2),
     label_name = "^index_expected$",
     geom = "line"
   ),
@@ -312,7 +312,7 @@ stockplotr::plot_timeseries(
 # Plot the landings estimates
 stockplotr::plot_timeseries(
   stockplotr::prepare_data(
-    output |> dplyr::filter(module_id == 1), 
+    output |> dplyr::filter(module_id == 1),
     label_name = "^landings_expected$",
     geom = "line"
   ),
@@ -404,7 +404,8 @@ clear()
 
 # Plot spawning biomass for each sensitivity model
 stockplotr::plot_biomass(
-  list("age" = get_estimates(age_only_fit) |>
+  list(
+    "age" = get_estimates(age_only_fit) |>
       dplyr::mutate(
         sex = NA,
         season = 1,
@@ -415,7 +416,7 @@ stockplotr::plot_biomass(
         year = year_i,
         estimate = estimated
       ),
-    "length" = get_estimates(length_only_fit)  |>
+    "length" = get_estimates(length_only_fit) |>
       dplyr::mutate(
         sex = NA,
         season = 1,
