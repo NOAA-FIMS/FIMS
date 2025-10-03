@@ -212,12 +212,12 @@ methods::setMethod(
   function(x) {
     # Extract the core TMB components (object, sdreport, optimization result)
     # from the fit object.
-    obj  <- get_obj(x)
+    obj <- get_obj(x)
     sdreport <- get_sdreport(x)
     opt <- get_opt(x)
     parameter_names <- get_obj(x)[["par"]] |>
       names()
-    
+
     # Reshape the TMB output into a standardized data frame.
     # This serves as the "expected" result to compare against.
     tmb_output <- FIMS:::reshape_tmb_estimates(
@@ -245,7 +245,7 @@ methods::setMethod(
         .after = "estimation_type"
       ) |>
       dplyr::select(-uncertainty.x, -uncertainty.y)
-    }
+  }
 )
 
 #' @return
@@ -407,7 +407,6 @@ FIMSFit <- function(
     sdreport = list(),
     timing = c("time_total" = as.difftime(0, units = "secs")),
     version = utils::packageVersion("FIMS")) {
-  
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
@@ -452,7 +451,7 @@ FIMSFit <- function(
     opt = opt,
     parameter_names = parameter_names
   )
-  
+
   # Create JSON output for FIMS run
   model_output <- input[["model"]]$get_output()
   # Reshape the JSON estimates

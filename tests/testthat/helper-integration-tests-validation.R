@@ -200,7 +200,7 @@ validate_fims <- function(
       # Count the number of estimates outside 2*SE tolerance
       dplyr::filter(!within_2SE) |>
       nrow()
-    
+
     #' @description Test that the 95% of the parameter estimates fall within 2*SE
     expect_equal(out_of_tolerance_parameters, 0)
   }
