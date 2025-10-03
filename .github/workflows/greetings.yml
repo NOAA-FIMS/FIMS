@@ -15,11 +15,11 @@ jobs:
     steps:
     - uses: actions/first-interaction@v3
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: >
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        issue_message: >
           Thank you for contributing to FIMS and opening your first issue here!
           We are happy to have your contributions. We encourage you to introduce yourself to the community on the [introduction thread in our Discussions](https://github.com/orgs/NOAA-FIMS/discussions/801).
-        pr-message: >
+        pr_message: >
           Thank you for contributing to FIMS and opening your first PR here!
           We are happy to have your contributions. Please ensure that the PR
           is made to the dev branch and let us know if you need any help! Also,
