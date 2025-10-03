@@ -704,7 +704,7 @@ FIMSFrame <- function(data) {
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with m_*() are correct.
-  formatted_data <- tibble::as_tibble(data) 
+  formatted_data <- tibble::as_tibble(data)
   missing_time_series <- create_missing_data(
     data = formatted_data,
     timing = years
