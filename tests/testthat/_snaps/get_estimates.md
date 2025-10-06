@@ -1,4 +1,4 @@
-# get_estimates() works with deterministic run
+# `get_estimates()` works with deterministic run
 
     Code
       print(dplyr::select(get_estimates(deterministic_results), -estimated, -expected,
@@ -973,7 +973,7 @@
       320 multinomial  data       -836.
       # i 13,506 more rows
 
-# get_estimates() works with estimation run
+# `get_estimates()` works with estimation run
 
     Code
       print(dplyr::select(get_estimates(readRDS(fit_files[[1]])), -estimated,

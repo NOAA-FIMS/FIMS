@@ -6,7 +6,6 @@
 #' information. Every test should have a @description tag, which can span
 #' multiple lines, that will be used in the bookdown report of the results from
 #' {testthat}.
-
 # Deterministic test ----
 ## Setup ----
 # Load necessary data for the integration test
@@ -27,7 +26,7 @@ result <- setup_and_run_FIMS_without_wrappers(
 
 ## IO correctness ----
 test_that("deterministic run works with correct inputs", {
-  # Compare FIMS results with model comparison project OM values
+  #' @description Test that the output from FIMS run matches the model comparison project OM values.
   verify_fims_deterministic(
     report = result[["report"]],
     estimates = result[["sdr_fixed"]],
@@ -39,7 +38,7 @@ test_that("deterministic run works with correct inputs", {
 })
 
 test_that("deterministic run returns correct nlls", {
-  #' Compare FIMS NLLs with model comparison project "true" NLLs
+  #' @description Test that the NLLs from FIMS match the "true" NLLs from the model comparison project.
   verify_fims_nll(
     report = result[["report"]],
     om_input = om_input_list[[iter_id]],
@@ -49,9 +48,9 @@ test_that("deterministic run returns correct nlls", {
 })
 
 test_that("deterministic run results correct number of parameters and random effects", {
-  #' @description Verify the number of parameters are correct
+  #' @description Test that the number of parameters are correct.
   expect_equal(length(result[["obj"]][["par"]]), 49)
-  #' @description Verify the number of random effects are correct
+  #' @description Test that the number of random effects are correct.
   expect_equal(length(result[["obj"]][["env"]][["random"]]), 29)
 })
 
@@ -86,7 +85,9 @@ result_log_r <- setup_and_run_FIMS_without_wrappers(
 test_that("estimation test with recruitment re on log devs", {
   # Compare FIMS results with model comparison project OM values
   # Tests currently don't pass when log devs are estimated
-  testthat::skip()
+  #' @description Skip test due to current issues with log devs estimation.
+  testthat::skip("Skipping test for log devs estimation until issues are resolved.")
+  #' @description Test that the output from FIMS matches the model comparison project OM values.
   validate_fims(
     report = result_log_devs[["report"]],
     estimates = result_log_devs[["sdr_report"]],
@@ -99,7 +100,9 @@ test_that("estimation test with recruitment re on log devs", {
 test_that("estimation test with recruitment re on logr", {
   # Compare FIMS results with model comparison project OM values
   # Tests currently don't pass when log devs are estimated
-  testthat::skip()
+  #' @description Skip test due to current issues with log r estimation.
+  testthat::skip("Skipping test for log r estimation until issues are resolved.")
+  #' @description Test that the output from FIMS matches the model comparison project OM values.
   validate_fims(
     report = result_log_r[["report"]],
     estimates = result_log_r[["sdr_report"]],
@@ -108,9 +111,9 @@ test_that("estimation test with recruitment re on logr", {
     em_input = em_input_list[[iter_id]]
   )
 
-  #' @description Verify the log_devs and log_r approach result in comparable negative log-likelihoods
+  #' @description Verify the log_devs and log_r approach result in comparable negative log-likelihoods.
   expect_equal(result_log_r$report[["nll_components"]], result_log_devs$report[["nll_components"]], tolerance = 1e-4)
-  #' @description Verify the log_devs and log_r approach result in comparable expected recruitment
+  #' @description Verify the log_devs and log_r approach result in comparable expected recruitment.
   expect_equal(result_log_r$report[["recruitment"]], result_log_devs$report[["recruitment"]], tolerance = 1e-4)
 
   clear()

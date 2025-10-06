@@ -12,10 +12,8 @@
 
 # get_fixed ----
 ## IO correctness ----
-test_that("get_fixed() works with correct inputs", {
-  #' @description Test that [get_fixed()] works with a logistic selectivity
-  #' curve returns the correct number of parameters with their specified
-  #' inputs.
+test_that("`get_fixed()` works with correct inputs", {
+  
   clear()
   # Create selectivity
   selectivity <- methods::new(LogisticSelectivity)
@@ -25,27 +23,25 @@ test_that("get_fixed() works with correct inputs", {
   selectivity$slope[1]$estimation_type$set("fixed_effects")
 
   CreateTMBModel()
+  #' @description Test that `get_fixed()` works with a logistic selectivity curve returns the correct number of parameters with their specified inputs.
   expect_equal(
     c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value),
     get_fixed()
   )
   clear()
 
-  #' @description Test that setting a selectivity parameter to FALSE in a
-  #' previously defined module changes the number of parameters.
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0
   selectivity$slope[1]$value <- 0.2
   selectivity$slope[1]$estimation_type$set("fixed_effects")
   CreateTMBModel()
+  #' @description Test that setting a selectivity parameter to FALSE in a previously defined module changes the number of parameters.
   expect_equal(
     selectivity$slope[1]$value,
     get_fixed()
   )
   clear()
 
-  #' @description Test that the correct number of parameters are returned for a
-  #' double logistic selectivity curve.
   fish_selex <- methods::new(DoubleLogisticSelectivity)
   fish_selex$inflection_point_asc[1]$value <- 2
   fish_selex$inflection_point_asc[1]$estimation_type$set("fixed_effects")
@@ -62,11 +58,10 @@ test_that("get_fixed() works with correct inputs", {
     fish_selex$inflection_point_desc[1]$value,
     fish_selex$slope_desc[1]$value
   )
+  #' @description Test that the correct number of parameters are returned for a double logistic selectivity curve.
   expect_equal(get_fixed(), sel_parm)
   clear()
 
-  #' @description Test the counting of parameters when multiple modules are
-  #' involved, e.g., selectivity and recruitment.
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 11.0
   selectivity$inflection_point[1]$min <- 8.0
@@ -89,6 +84,7 @@ test_that("get_fixed() works with correct inputs", {
   rec_parm <- c(-log(1.0 - h) + log(h - 0.2), log(r0))
 
   CreateTMBModel()
+  #' @description Test the counting of parameters when multiple modules are involved, e.g., selectivity and recruitment.
   expect_equal(c(sel_parm, rec_parm), get_fixed())
   clear()
 })
@@ -96,12 +92,12 @@ test_that("get_fixed() works with correct inputs", {
 
 ## Edge handling ----
 # No edge cases to test for this interface.
-test_that("get_fixed() returns correct outputs for edge cases", {
-  #' @description Test that zero parameters are registered after using clear
-  #' even if [CreateTMBModel()] is called.
+test_that("`get_fixed()` returns correct outputs for edge cases", {
   clear()
+  #' @description Test that zero parameters are registered after using `clear()`.
   expect_equal(numeric(0), get_fixed())
   CreateTMBModel()
+  #' @description Test that zero parameters are registered after using `clear()` even if `CreateTMBModel()` is called.
   expect_equal(numeric(0), get_fixed())
   clear()
 })

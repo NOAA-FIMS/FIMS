@@ -13,7 +13,6 @@
 
 ## IO correctness ----
 test_that("rcpp logistic selectivity works with correct inputs", {
-  #' @description Test that logistic selectivity works with correct inputs.
   # Create selectivity1
   selectivity1 <- methods::new(LogisticSelectivity)
 
@@ -22,24 +21,30 @@ test_that("rcpp logistic selectivity works with correct inputs", {
   selectivity1$inflection_point[1]$max <- 12.0
   selectivity1$inflection_point[1]$estimation_type$set("random_effects")
   selectivity1$slope[1]$value <- 0.2
-
+  #' @description Test that `get_id()` for `LogisticSelectivity` works.
   expect_equal(selectivity1$get_id(), 1)
+  #' @description Test that the `inflection_point` value is set to 10.0.
   expect_equal(selectivity1$inflection_point[1]$value, 10.0)
+  #' @description Test that the `inflection_point` min is set to 8.0.
   expect_equal(selectivity1$inflection_point[1]$min, 8.0)
+  #' @description Test that the `inflection_point` max is set to 12.0.
   expect_equal(selectivity1$inflection_point[1]$max, 12.0)
+  #' @description Test that the `inflection_point` estimation type is set to "random_effects".
   expect_equal(selectivity1$inflection_point[1]$estimation_type$get(), "random_effects")
+  #' @description Test that the `slope` value is set to 0.2.
   expect_equal(selectivity1$slope[1]$value, 0.2)
+  #' @description Test that the `evaluate()` works for `LogisticSelectivity`.
   expect_equal(selectivity1$evaluate(10.0), 0.5)
 
   # Create selectivity2
   selectivity2 <- methods::new(LogisticSelectivity)
+  #' @description Test that `get_id()` for `LogisticSelectivity` works when a second object is created.
   expect_equal((selectivity2$get_id()), 2)
 
   clear()
 })
 
 test_that("rcpp double logistic selectivity works with correct inputs", {
-  #' @description Test that selectivity works with correct inputs.
   # Create selectivity1
   selectivity1 <- methods::new(DoubleLogisticSelectivity)
 
@@ -49,9 +54,13 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   selectivity1$inflection_point_desc[1]$value <- 15.0
   selectivity1$slope_desc[1]$value <- 0.05
 
+  #' @description Test that `get_id()` for `DoubleLogisticSelectivity` works.
   expect_equal(selectivity1$get_id(), 1)
+  #' @description Test that the `inflection_point_asc` value is set to 10.5.
   expect_equal(selectivity1$inflection_point_asc[1]$value, 10.5)
+  #' @description Test that the `slope_asc` value is set to 0.2.
   expect_equal(selectivity1$slope_asc[1]$value, 0.2)
+  #' @description Test that `evaluate()` works for `DoubleLogisticSelectivity`.
   expect_equal(
     selectivity1$evaluate(34.5),
     # Line below equals 0.2716494
@@ -71,14 +80,22 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   selectivity2$inflection_point_desc[1]$estimation_type$set("random_effects")
   selectivity2$slope_asc[1]$estimation_type$set("random_effects")
   selectivity2$slope_desc[1]$estimation_type$set("random_effects")
-
+  
+  #' @description Test that `get_id()` for `DoubleLogisticSelectivity` works when a second object is created.
   expect_equal(selectivity2$get_id(), 2)
+  #' @description Test that the `inflection_point_asc` value is set to 10.5.
   expect_equal(selectivity2$inflection_point_asc[1]$value, 10.5)
+  #' @description Test that the `slope_asc` value is set to 0.2.
   expect_equal(selectivity2$slope_asc[1]$value, 0.2)
+  #' @description Test that the `inflection_point_asc` estimation type is set to "random_effects".
   expect_equal(selectivity2$inflection_point_asc[1]$estimation_type$get(), "random_effects")
+  #' @description Test that the `inflection_point_desc` estimation type is set to "random_effects".
   expect_equal(selectivity2$inflection_point_desc[1]$estimation_type$get(), "random_effects")
+  #' @description Test that the `slope_asc` estimation type is set to "random_effects".
   expect_equal(selectivity2$slope_asc[1]$estimation_type$get(), "random_effects")
+  #' @description Test that the `slope_desc` estimation type is set to "random_effects".
   expect_equal(selectivity2$slope_desc[1]$estimation_type$get(), "random_effects")
+  #' @description Test that `evaluate()` works for `DoubleLogisticSelectivity` when all parameters are set to "random_effects".
   expect_equal(
     selectivity2$evaluate(34.5),
     # Line below equals 0.2716494
@@ -90,11 +107,9 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
 
 ## Edge handling ----
 test_that("rcpp selectivity returns correct outputs for edge cases", {
-  #' @description Test that rcpp selectivity returns default values when no
-  #' parameters are set for input values of 20.
-
   # emptyLogistic
   emptyLogistic <- methods::new(LogisticSelectivity)
+  #' @description Test that rcpp selectivity returns default values when no parameters are set for input values of 20.
   expect_equal(
     object = emptyLogistic$evaluate(20),
     expected = 0.5
@@ -102,6 +117,7 @@ test_that("rcpp selectivity returns correct outputs for edge cases", {
 
   # emptyDoubleLogistic
   emptyDoubleLogistic <- methods::new(DoubleLogisticSelectivity)
+  #' @description Test that rcpp double selectivity returns default values when no parameters are set for input values of 20.
   expect_equal(
     object = emptyDoubleLogistic$evaluate(20),
     expected = 0.25

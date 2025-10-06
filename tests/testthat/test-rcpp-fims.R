@@ -18,21 +18,31 @@ test_that("Rcpp interface works for modules", {
 
   #' @description Test that Rcpp interface works for recruitment module.
   expect_no_error(beverton_holt <- methods::new(BevertonHoltRecruitment))
+  #' @description Test that `get_id()` method works for `BevertonHoltRecruitment` module.
   expect_equal(beverton_holt$get_id(), 1)
 
   #' @description Test that Rcpp interface works for selectivity module.
   expect_no_error(logistic_selectivity <- methods::new(LogisticSelectivity))
   logistic_selectivity$slope[1]$value <- .7
   logistic_selectivity$inflection_point[1]$value <- 5.0
+  #' @description Test that value for `slope` is set correctly in `LogisticSelectivity` module.
   expect_equal(logistic_selectivity$slope[1]$value, 0.7)
+  #' @description Test that value for `inflection_point` is set correctly in `LogisticSelectivity` module.
   expect_equal(logistic_selectivity$inflection_point[1]$value, 5.0)
+  #' @description Test that `get_id()` method works for `LogisticSelectivity` module.
   expect_equal(logistic_selectivity$get_id(), 1)
 
   #' @description Test that Rcpp interface works for growth module.
   expect_no_error(ewaa_growth <- methods::new(EWAAGrowth))
+  #' @description Test that ages can be set correctly in `EWAAGrowth` module.
   ewaa_growth$ages$set(0, 1.0)
+  #' @description Test that weights can be set correctly in `EWAAGrowth` module.
   ewaa_growth$weights$set(0, 2.5)
+  #' @description Test that value for the first age is set correctly in `EWAAGrowth` module.
   expect_equal(ewaa_growth$ages$get(0), 1.0)
+  #' @description Test that value for the first weight is set correctly in `EWAAGrowth` module.
+  expect_equal(ewaa_growth$weights$get(0), 2.5)
+  #' @description Test that `get_id()` method works for `EWAAGrowth` module.
   expect_equal(ewaa_growth$get_id(), 1)
 
   clear()
@@ -42,22 +52,22 @@ test_that("Rcpp interface works for modules", {
 
 ## Error handling ----
 test_that("Rcpp interface returns correct error messages", {
-  #' @description Test that Rcpp Parameter interface returns an error when
-  #' given a string rather than a number.
+  #' @description Test that Rcpp Parameter interface returns an error when given incorrect input.
   expect_error(
     methods::new(Parameter, "a"),
     regexp = "Not compatible with requested type"
   )
-  #' @description Test that Rcpp interfaces returns an error when
-  #' given incorrect input.
+  #' @description Test that `BevertonHoltRecruitment` module returns an error when given incorrect input.
   expect_error(
     methods::new(BevertonHoltRecruitment, "a"),
     regexp = "no valid constructor available for the argument list"
   )
+  #' @description Test that `LogisticSelectivity` module returns an error when given incorrect input.
   expect_error(
     methods::new(LogisticSelectivity, "a"),
     regexp = "no valid constructor available for the argument list"
   )
+  #' @description Test that `EWAAGrowth` module returns an error when given incorrect input.
   expect_error(
     methods::new(EWAAGrowth, "a"),
     regexp = "no valid constructor available for the argument list"

@@ -70,8 +70,7 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
 
   tryCatch(
     {
-      #' @description Test that [reshape_json_estimates()] does not produce
-      #' duplicated `parameter_id`s.
+      #' @description Test that `reshape_json_estimates()` does not produce duplicated `parameter_id`s.
       expect_equal(nrow(duplicated_parameter_ids), 0)
     },
     error = function(e) {
@@ -118,8 +117,7 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
   # a more user-friendly and informative error message.
   tryCatch(
     {
-      #' @description Test that all `module_name` values in the TMB output
-      #' are found in the JSON output for a given model fit.
+      #' @description Test that all `module_name` values in the TMB output are found in the JSON output for a given model fit.
       expect_equal(nrow(missing_module_name_in_json), 0)
     },
     error = function(e) {
@@ -137,8 +135,7 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
 
   tryCatch(
     {
-      #' @description Test that all `label` values in the TMB output
-      #' are found in the JSON output for a given model fit.
+      #' @description Test that all `label` values in the TMB output are found in the JSON output for a given model fit.
       expect_equal(nrow(missing_label_in_json), 0)
     },
     error = function(e) {
@@ -156,17 +153,18 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
 }
 
 ## IO correctness ----
-test_that("reshape_json_estimates() output matches TMB for a deterministic run", {
+test_that("`reshape_json_estimates()` output matches TMB for a deterministic run", {
   # Define the path to the deterministic model run fixture.
   deterministic_path <- test_path(
     "fixtures",
     "deterministic_age_length_comp.RDS"
   )
-  # Run the comparison function, which will throw an error if checks fail.
+
+  #' @description Test that `reshape_json_estimates()` produces output matching TMB.
   compare_tmb_and_json_outputs(deterministic_path)
 })
 
-test_that("reshape_json_estimates() output matches TMB for an estimation run", {
+test_that("`reshape_json_estimates()` output matches TMB for an estimation run", {
   # Load the test data from an RDS file containing model fits.
   # List all RDS files in the fixtures directory that match the pattern "fit_*.RDS"
   fit_files <- list.files(
@@ -175,7 +173,7 @@ test_that("reshape_json_estimates() output matches TMB for an estimation run", {
     full.names = TRUE
   )
 
-  # Use purrr::map to apply the function to each file
+  #' @description Test that `reshape_json_estimates()` produces output matching TMB.
   result <- purrr::map(fit_files, compare_tmb_and_json_outputs)
 })
 ## Edge handling ----

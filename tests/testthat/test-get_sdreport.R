@@ -14,7 +14,7 @@ if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
 ## IO correctness ----
-test_that("get_sdreport() works with correct inputs", {
+test_that("`get_sdreport()` works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
   # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
   fit_files <- list.files(
@@ -32,14 +32,12 @@ test_that("get_sdreport() works with correct inputs", {
   check_sdreport <- function(fit_file) {
     fit_data <- readRDS(fit_file)
     sdreport <- get_sdreport(fit_data)
-    #' @description Test that [get_sdreport()] returns correct output for the
-    #' sdreport slot.
+    #' @description Test that `get_sdreport()` returns correct output for the `sdreport` slot.
     expect_equal(
       object = sdreport,
       expected = fit_data@sdreport
     )
-    #' @description Test that [get_sdreport()] returns correct names for the
-    #' sdreport slot.
+    #' @description Test that `get_sdreport()` returns correct names for the `sdreport` slot.
     expect_equal(
       object = names(sdreport),
       expected = expected_names
@@ -51,9 +49,8 @@ test_that("get_sdreport() works with correct inputs", {
 })
 
 ## Edge handling ----
-test_that("get_sdreport() returns correct outputs for edge cases", {
-  #' @description Test that [get_sdreport()] returns an error when given invalid
-  #' input.
+test_that("`get_sdreport()` returns correct outputs for edge cases", {
+  #' @description Test that `get_sdreport()` returns an error when given invalid input.
   expect_error(
     object = get_sdreport("invalid_input")
   )

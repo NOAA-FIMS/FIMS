@@ -12,10 +12,7 @@
 
 # get_random ----
 ## IO correctness ----
-test_that("get_random() works with correct inputs", {
-  #' @description Test that [get_random()] works with a logistic selectivity
-  #' curve returns the correct number of random effects parameters with their
-  #' specified inputs.
+test_that("`get_random()` works with correct inputs", {
   clear()
   # Create selectivity
   selectivity <- methods::new(LogisticSelectivity)
@@ -25,27 +22,25 @@ test_that("get_random() works with correct inputs", {
   selectivity$slope[1]$estimation_type$set("random_effects")
 
   CreateTMBModel()
+  #' @description Test that `get_random()` works with a logistic selectivity curve and returns the correct number of random effects parameters with their specified inputs.
   expect_equal(
     c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value),
     get_random()
   )
   clear()
 
-  #' @description Test that setting a selectivity parameter to 'constant' in a
-  #' previously defined module changes the number of random effects parameters.
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 10.0
   selectivity$slope[1]$value <- 0.2
   selectivity$slope[1]$estimation_type$set("random_effects")
   CreateTMBModel()
+  #' @description Test that setting a selectivity parameter to `constant` in a previously defined module changes the number of random effects parameters.
   expect_equal(
     selectivity$slope[1]$value,
     get_random()
   )
   clear()
 
-  #' @description Test that the correct number of random effects parameters are
-  #' returned for a double logistic selectivity curve.
   fish_selex <- methods::new(DoubleLogisticSelectivity)
   fish_selex$inflection_point_asc[1]$value <- 2
   fish_selex$inflection_point_asc[1]$estimation_type$set("random_effects")
@@ -62,11 +57,10 @@ test_that("get_random() works with correct inputs", {
     fish_selex$inflection_point_desc[1]$value,
     fish_selex$slope_desc[1]$value
   )
+  #' @description Test that the correct number of random effects parameters are returned for a double logistic selectivity curve.
   expect_equal(get_random(), sel_parm)
   clear()
 
-  #' @description Test the counting of random effects parameters when multiple
-  #' modules are involved, e.g., selectivity and recruitment.
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 11.0
   selectivity$inflection_point[1]$min <- 8.0
@@ -89,6 +83,7 @@ test_that("get_random() works with correct inputs", {
   rec_parm <- c(-log(1.0 - h) + log(h - 0.2), log(r0))
 
   CreateTMBModel()
+  #' @description Test the counting of random effects parameters when multiple modules are involved, e.g., selectivity and recruitment.
   expect_equal(c(sel_parm, rec_parm), get_random())
   clear()
 })
@@ -96,12 +91,13 @@ test_that("get_random() works with correct inputs", {
 
 ## Edge handling ----
 # No edge cases to test for this interface.
-test_that("get_random() returns correct outputs for edge cases", {
-  #' @description Test that zero parameters are registered after using clear
-  #' even if [CreateTMBModel()] is called.
+test_that("`get_random()` returns correct outputs for edge cases", {
+  
   clear()
+  #' @description Test that zero parameters are registered after using `clear()`.
   expect_equal(numeric(0), get_random())
   CreateTMBModel()
+  #' @description Test that zero parameters are registered after using `clear()` even if `CreateTMBModel()` is called.
   expect_equal(numeric(0), get_random())
   clear()
 })
