@@ -70,7 +70,7 @@ validate_fims <- function(
     # Validate errors against 2*SE threshold
     absolute_error <- abs(object_estimate - expected)
     threshold <- qnorm(.975) * object_uncertainty
-    #' @description Test that the 95% of the estimates fall within 2*SE
+    #' @description Test that the 95% of the estimates fall within 2*SE.
     expect_lte(sum(absolute_error > threshold), 0.05 * length(expected))
   }
 
@@ -102,6 +102,7 @@ validate_fims <- function(
   # Expect recruitment from report equal to number at age 1 from estimates
   naa1_id <- seq(1, (om_input[["nyr"]] * om_input[["nages"]]), by = om_input[["nages"]])
   if (use_fimsfit) {
+    #' @description Test that the expected recruitment from report are equal to the numbers at age 1 from estimates.
     expect_equal(
       report[["expected_recruitment"]][[1]][1:om_input[["nyr"]]],
       estimates |>
@@ -113,6 +114,7 @@ validate_fims <- function(
         as.numeric()
     )
   } else {
+    #' @description Test that the expected recruitment from report are equal to the numbers at age 1 from estimates.
     expect_equal(
       report[["expected_recruitment"]][[1]][1:om_input[["nyr"]]],
       as.numeric(estimates[rownames(estimates) == "numbers_at_age", "Estimate"][naa1_id])
@@ -201,7 +203,7 @@ validate_fims <- function(
       dplyr::filter(!within_2SE) |>
       nrow()
 
-    #' @description Test that the 95% of the parameter estimates fall within 2*SE
+    #' @description Test that the 95% of the parameter estimates fall within 2*SE.
     expect_equal(out_of_tolerance_parameters, 0)
   }
 }
@@ -257,24 +259,26 @@ verify_fims_deterministic <- function(
   } else {
     fims_logR0 <- estimates[36, "Estimate"]
   }
-
+  
+  #' @description Test that the log(R0) from FIMS is greater than 0.0.
   expect_gt(fims_logR0, 0.0)
   # TODO: fims_logR0 is 13.8155 and log(om_input[["R0"]]) is 13.81551 causing this to error out. Fixing with tolerance temporarily.
+  #' @description Test that the log(R0) from FIMS is equal to the true value.
   expect_equal(fims_logR0, log(om_input[["R0"]]), tolerance = 1e-4)
 
-  #' @description Test that the numbers at age from report are equal to the true values
+  #' @description Test that the numbers-at-age from report are equal to the true values.
   expect_equal(
     report[["numbers_at_age"]][[1]][1:dim],
     c(t(om_output[["N.age"]]))
   )
 
-  #' @description Test that the biomass values from report are equal to the true values
+  #' @description Test that the biomass values from report are equal to the true values.
   expect_equal(
     report[["biomass"]][[1]][1:nyears],
     c(t(om_output[["biomass.mt"]]))
   )
 
-  #' @description Test that the spawning biomass values from report are equal to the true values
+  #' @description Test that the spawning biomass values from report are equal to the true values.
   expect_equal(
     report[["spawning_biomass"]][[1]][1:nyears],
     c(t(om_output[["SSB"]]))
@@ -285,14 +289,14 @@ verify_fims_deterministic <- function(
     nrow = om_input[["nyr"]],
     byrow = TRUE
   )
-  #' @description Test that the recruitment values from report are equal to the true values
+  #' @description Test that the recruitment values from report are equal to the true values.
   expect_equal(
     report[["expected_recruitment"]][[1]][1:nyears],
     fims_naa[, 1]
   )
 
-  #' @description Test that the recruitment log_devs (fixed at input "true" values) from report are equal to the true values
   if (!is.null(report[["log_recruit_dev"]])) {
+    #' @description Test that the recruitment log_devs (fixed at input "true" values) from report are equal to the true values.
     expect_equal(
       report[["log_recruit_dev"]][[1]],
       om_input[["logR.resid"]][-1]
@@ -313,10 +317,10 @@ verify_fims_deterministic <- function(
     fims_object_are[i] <- abs(fims_landings[[1]][i] - em_input[["L.obs"]][["fleet1"]][i]) / em_input[["L.obs"]][["fleet1"]][i]
   }
 
-  #' @description Test that the 95% of relative error in landings is within 2*cv
+  #' @description Test that the 95% of relative error in landings is within 2*cv.
   expect_lte(sum(fims_object_are > om_input[["cv.L"]][["fleet1"]] * 2.0), length(em_input[["L.obs"]][["fleet1"]]) * 0.05)
 
-  #' @description Test that the expected landings number at age from report are equal to the true values
+  #' @description Test that the expected landings number at age from report are equal to the true values.
   expect_equal(
     report[["landings_numbers_at_age"]][[1]],
     c(t(om_output[["L.age"]][["fleet1"]]))
@@ -330,7 +334,7 @@ verify_fims_deterministic <- function(
   fims_landings_naa_proportion <- fims_landings_naa / rowSums(fims_landings_naa)
   om_landings_naa_proportion <- om_output[["L.age"]][["fleet1"]] / rowSums(om_output[["L.age"]][["fleet1"]])
 
-  #' @description Test that the expected landings number at age in proportion from report are equal to the true values
+  #' @description Test that the expected landings number at age in proportion from report are equal to the true values.
   expect_equal(
     c(t(fims_landings_naa_proportion)),
     c(t(om_landings_naa_proportion))
@@ -349,7 +353,7 @@ verify_fims_deterministic <- function(
   #   apply(landings_waa, 1, sum)
   # )
 
-  #' @description Test that the expected survey index values from report are equal to the true values
+  #' @description Test that the expected survey index values from report are equal to the true values.
   expect_equal(
     fims_index[[2]],
     om_output[["survey_index_biomass"]][["survey1"]]
@@ -360,7 +364,7 @@ verify_fims_deterministic <- function(
   for (i in 1:length(em_input[["survey.obs"]][["survey1"]])) {
     fims_object_are[i] <- abs(fims_index[[2]][i] - em_input[["surveyB.obs"]][["survey1"]][i]) / em_input[["surveyB.obs"]][["survey1"]][i]
   }
-  #' @description Test that the 95% of relative error in survey index is within 2*cv
+  #' @description Test that the 95% of relative error in survey index is within 2*cv.
   expect_lte(
     sum(fims_object_are > om_input[["cv.survey"]][["survey1"]] * 2.0),
     length(em_input[["surveyB.obs"]][["survey1"]]) * 0.05
@@ -384,7 +388,7 @@ verify_fims_deterministic <- function(
 
   om_cnaa_proportion <- 0.0 + (1.0 - 0.0 * om_input[["nages"]]) * om_output[["survey_age_comp"]][["survey1"]] / rowSums(om_output[["survey_age_comp"]][["survey1"]])
 
-  #' @description Test that the expected survey number at age in proportion from report almost equal to the true values
+  #' @description Test that the expected survey number at age in proportion from report almost equal to the true values.
   expect_equal(
     abs(c(t(fims_cnaa_proportion))),
     c(t(om_cnaa_proportion))
@@ -493,20 +497,20 @@ verify_fims_nll <- function(report,
 
   expected_jnll <- rec_nll + landings_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
-  #' @description Test that the recruitment jnll is equal to the expected jnll
+  #' @description Test that the recruitment jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][1], rec_nll)
-  #' @description Test that the landings jnll is equal to the expected jnll
+  #' @description Test that the landings jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][2], landings_nll_fleet)
-  #' @description Test that the fishing fleet age comp jnll is equal to the expected jnll
+  #' @description Test that the fishing fleet age comp jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
-  #' @description Test that the fishing fleet length comp jnll is equal to the expected jnll
+  #' @description Test that the fishing fleet length comp jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
-  #' @description Test that the survey index jnll is equal to the expected jnll
+  #' @description Test that the survey index jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][5], index_nll_survey)
-  #' @description Test that the survey age comp jnll is equal to the expected jnll
+  #' @description Test that the survey age comp jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][6], age_comp_nll_survey)
-  #' @description Test that the survey length comp jnll is equal to the expected jnll
+  #' @description Test that the survey length comp jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
-  #' @description Test that the total jnll is equal to the expected jnll
+  #' @description Test that the total jnll is equal to the expected jnll.
   expect_equal(jnll, expected_jnll)
 }

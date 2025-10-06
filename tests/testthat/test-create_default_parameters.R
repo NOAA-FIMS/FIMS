@@ -15,9 +15,7 @@ default_configurations <- create_default_configurations(data)
 
 # create_default_parameters ----
 ## IO correctness ----
-test_that("create_default_parameters() works with correct inputs", {
-  #' @description Test that [create_default_parameters()] returns correct
-  #' structure.
+test_that("`create_default_parameters()` works with correct inputs", {
   result <- create_default_parameters(
     configurations = default_configurations,
     data = data
@@ -25,13 +23,18 @@ test_that("create_default_parameters() works with correct inputs", {
   result_unnested <- result |>
     tidyr::unnest(cols = data)
 
+  #' @description Test that the main output is a `tbl_df`.
   expect_s3_class(result, "tbl_df")
+  #' @description Test that the main output table has the correct column structure.
   expect_equal(
     colnames(result),
     c("model_family", "module_name", "fleet_name", "data")
   )
+  #' @description Test that the `data` column is structured to hold nested information.
   expect_true(is.list(result[["data"]]))
+  #' @description Test that the nested information within the `data` column is also a `tbl_df`.
   expect_s3_class(result[["data"]][[1]], "tbl_df")
+  #' @description Test that the nested data table has the correct column structure.
   expect_equal(
     colnames(result[["data"]][[1]]),
     c(
@@ -39,7 +42,7 @@ test_that("create_default_parameters() works with correct inputs", {
       "value", "estimation_type", "distribution_type", "distribution"
     )
   )
-  #' @description Test that create_default_parameters() returns correct outputs.
+  #' @description Test that the generated parameter values have not changed from the accepted snapshot.
   expect_snapshot_file(save_csv(result_unnested), "default_parameters.csv")
 })
 

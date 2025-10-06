@@ -30,27 +30,26 @@ fleet_names_index <- dplyr::filter(
 n_index <- length(fleet_names_index)
 
 ## IO correctness ----
-test_that("rcpp data() works with correct inputs", {
-  #' @description Test that adding index data to a model is possible.
+test_that("rcpp data works with correct inputs", {
   index_dat <- vector(mode = "list", length = n_index)
   names(index_dat) <- fleet_names_index
 
   for (index_i in 1:n_index) {
     index <- Index
     index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
+    #' @description Test that adding index data to a model is possible.
     expect_silent(index_dat[[fleet_names_index[index_i]]] <-
       m_index(fims_frame, fleet_names_index[index_i]))
   }
 
   clear()
 
-  #' @description Test that adding age-composition data to a model is
-  #' possible.
   age_comp_dat <- vector(mode = "list", length = n_age_comp)
   names(age_comp_dat) <- fleet_names_age_comp
 
   for (fleet_f in 1:n_age_comp) {
     age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- methods::new(AgeComp, n_years, n_ages)
+    #' @description Test that adding age-composition data to a model is possible.
     expect_silent(
       purrr::walk(
         1:(n_years * n_ages),

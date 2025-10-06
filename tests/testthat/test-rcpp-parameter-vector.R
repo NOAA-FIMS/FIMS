@@ -17,197 +17,173 @@ test_that("rcpp ParameterVector works as expected", {
   v1_value <- 1.0
   v2_value <- 2.0
 
-  #' @description Test that at method works.
   # Test that default constructor works
   v0 <- methods::new(ParameterVector)
+  #' @description Test that default constructor creates a vector of size 1.
   expect_equal(length(v0), 1)
+  #' @description Test that `at()` method works.
   expect_equal(v0$at(1)$value, 0)
 
-  #' @description Test that constructor that initializes based on size works.
   v1 <- methods::new(ParameterVector, v_size)
   v1$fill(v1_value)
   for (i in 1:v_size) {
+    #' @description Test that `fill()` and `get()` methods work for `ParameterVector`.
     expect_equal(v1$get(i - 1)$value, v1_value)
   }
 
-  #' @description Test that constructor that takes vector and size works.
   v2 <- methods::new(ParameterVector, rep(v2_value, v_size), v_size)
   for (i in 1:v_size) {
+    #' @description Test that constructor that takes vector and size works.
     expect_equal(v2$get(i - 1)$value, v2_value)
   }
 
-
-  #' @description Test plus operator works.
   v_plus_test <- v1 + v2
   for (i in 1:v_size) {
+    #' @description Test that plus operator works.
     expect_equal(v_plus_test$get(i - 1)$value, (v1[i]$value + v2[i]$value))
   }
-
-
-  #' @description Test minus operator works.
+ 
   v_minus_test <- v1 - v2
   for (i in 1:v_size) {
+    #' @description Test minus operator works.
     expect_equal(v_minus_test$get(i - 1)$value, (v1[i]$value - v2[i]$value))
   }
 
-
-  #' @description Test multiplier operator works.
   v_mult_test <- v1 * v2
   for (i in 1:v_size) {
+    #' @description Test multiplier operator works.
     expect_equal(v_mult_test$get(i - 1)$value, (v1[i]$value * v2[i]$value))
   }
 
-
-  #' @description Test division operator works.
   v_div_test <- v1 / v2
   for (i in 1:v_size) {
+    #' @description Test division operator works.
     expect_equal(v_div_test$get(i - 1)$value, (v1[i]$value / v2[i]$value))
   }
 
-
-  #' @description Test pre scalar plus operator works.
   v_plus_test_scalar <- v2_value + v1
   for (i in 1:v_size) {
+    #' @description Test pre scalar plus operator works.
     expect_equal(v_plus_test_scalar$get(i - 1)$value, (v2_value + v1[i]$value))
   }
 
-
-  #' @description Test pre scalar minus operator works.
   v_minus_test_scalar <- v2_value - v1
   for (i in 1:v_size) {
+    #' @description Test pre scalar minus operator works.
     expect_equal(v_minus_test_scalar$get(i - 1)$value, (v2_value - v1[i]$value))
   }
 
-
-  #' @description Test pre scalar mult operator works.
   v_mult_test_scalar <- v2_value * v1
   for (i in 1:v_size) {
+    #' @description Test pre scalar mult operator works.
     expect_equal(v_mult_test_scalar$get(i - 1)$value, (v2_value * v1[i]$value))
   }
 
-
-  #' @description Test pre scalar div operator works.
   v_div_test_scalar <- v2_value / v1
   for (i in 1:v_size) {
+    #' @description Test pre scalar div operator works.
     expect_equal(v_div_test_scalar$get(i - 1)$value, (v2_value / v1[i]$value))
   }
 
-
-  #' @description Test post scalar plus operator works.
   v_plus_test_scalar <- v1 + v2_value
   for (i in 1:v_size) {
+    #' @description Test post scalar plus operator works.
     expect_equal(v_plus_test_scalar$get(i - 1)$value, (v1[i]$value + v2_value))
   }
 
-
-  #' @description Test post scalar minus operator works.
   v_minus_test_scalar <- v1 - v2_value
   for (i in 1:v_size) {
+    #' @description Test post scalar minus operator works.
     expect_equal(v_minus_test_scalar$get(i - 1)$value, (v1[i]$value - v2_value))
   }
 
-
-  #' @description Test post scalar mult operator works.
   v_mult_test_scalar <- v1 * v2_value
   for (i in 1:v_size) {
+    #' @description Test post scalar mult operator works.
     expect_equal(v_mult_test_scalar$get(i - 1)$value, (v1[i]$value * v2_value))
   }
 
-
-  #' @description Test post scalar div operator works.
   v_div_test_scalar <- v1 / v2_value
   for (i in 1:v_size) {
+    #' @description Test post scalar div operator works.
     expect_equal(v_div_test_scalar$get(i - 1)$value, (v1[i]$value / v2_value))
   }
 
-
-  #' @description Test acos function works.
   v_acos_test <- acos(v1)
   for (i in 1:v_size) {
+    #' @description Test acos function works.
     expect_equal(v_acos_test$get(i - 1)$value, acos(v1_value))
   }
 
-
-  #' @description Test asin function works.
   v_asin_test <- asin(v1)
   for (i in 1:v_size) {
+    #' @description Test asin function works.
     expect_equal(v_asin_test$get(i - 1)$value, asin(v1_value))
   }
 
-
-  #' @description Test atan function works.
   v_atan_test <- atan(v1)
   for (i in 1:v_size) {
+    #' @description Test atan function works.
     expect_equal(v_atan_test$get(i - 1)$value, atan(v1_value))
   }
 
-
-  #' @description Test cos function works.
   v_cos_test <- cos(v1)
   for (i in 1:v_size) {
+    #' @description Test cos function works.
     expect_equal(v_cos_test$get(i - 1)$value, cos(v1_value))
   }
 
-
-  #' @description Test cosh function works.
   v_cosh_test <- cosh(v1)
   for (i in 1:v_size) {
+    #' @description Test cosh function works.
     expect_equal(v_cosh_test$get(i - 1)$value, cosh(v1_value))
   }
 
-
-  #' @description Test sin function works.
   v_sin_test <- sin(v1)
   for (i in 1:v_size) {
+    #' @description Test sin function works.
     expect_equal(v_sin_test$get(i - 1)$value, sin(v1_value))
   }
 
-
-  #' @description Test sinh function works.
   v_sinh_test <- sinh(v1)
   for (i in 1:v_size) {
+    #' @description Test sinh function works.
     expect_equal(v_sinh_test$get(i - 1)$value, sinh(v1_value))
   }
 
-
-  #' @description Test tan function works.
   v_tan_test <- tan(v1)
   for (i in 1:v_size) {
+    #' @description Test tan function works.
     expect_equal(v_tan_test$get(i - 1)$value, tan(v1_value))
   }
 
-
-  #' @description Test tanh function works.
   v_tanh_test <- tanh(v1)
   for (i in 1:v_size) {
+    #' @description Test tanh function works.
     expect_equal(v_tanh_test$get(i - 1)$value, tanh(v1_value))
   }
 
-
-  #' @description Test exp function works.
   v_exp_test <- exp(v1)
   for (i in 1:v_size) {
+    #' @description Test exp function works.
     expect_equal(v_exp_test$get(i - 1)$value, exp(v1_value))
   }
 
-
-  #' @description Test log10 function works.
   v_log10_test <- log10(v1)
   for (i in 1:v_size) {
+    #' @description Test log10 function works.
     expect_equal(v_log10_test$get(i - 1)$value, log10(v1_value))
   }
 
-
-  #' @description Test sqrt function works.
   v_sqrt_test <- sqrt(v1)
   for (i in 1:v_size) {
+    #' @description Test sqrt function works.
     expect_equal(v_sqrt_test$get(i - 1)$value, sqrt(v1_value))
   }
 
-
-  #' @description Test log function works.
   v_log_test <- log(v1)
   for (i in 1:v_size) {
+    #' @description Test log function works.
     expect_equal(v_log_test$get(i - 1)$value, log(v1_value))
   }
 
@@ -219,15 +195,14 @@ test_that("rcpp ParameterVector works as expected", {
 
 ## Error handling ----
 test_that("ParameterVector returns correct error messages", {
-  #' @description Test that at method returns expected error.
   v0 <- methods::new(ParameterVector)
+  #' @description Test that at method returns expected error.
   expect_error(v0$at(10)$value, regexp = "ParameterVector: Index out of range")
 
   #' @description Test that get method returns expected error.
   expect_error(v0$get(10)$value, regexp = "ParameterVector: Index out of range")
 
-  #' @description Test that ParameterVector returns an error message when
-  #' trying to make a vector that has dimensions larger than specified in x.
+  #' @description Test that ParameterVector returns an error message when trying to make a vector that has dimensions larger than specified in x.
   expect_error(
     methods::new(ParameterVector, 1:3, 5),
     "Error in call to ParameterVector"

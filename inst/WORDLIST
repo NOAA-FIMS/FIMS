@@ -533,6 +533,7 @@ LogR
 LogRecDev
 LogRRecruitmentInterface
 LogRRecruitmentProcess
+lozen
 lpdf
 lpmf
 LPMF
@@ -619,6 +620,8 @@ NOAA
 NOAA's
 noexcept
 noRd
+noreply
+normalizePath
 NormalLPDF
 npos
 nRecruitment
@@ -661,6 +664,7 @@ ostream
 ostringstream
 outputFile
 packageVersion
+pandoc
 parallelize
 param
 ParameterVector
@@ -683,6 +687,7 @@ pbs
 pdHess
 pdq
 pdqit
+peaceiris
 pkgdown
 pkgload
 pkgname
@@ -788,6 +793,7 @@ roxygen
 roxygenize
 Rscript
 Rslaves
+rspm
 rstan
 rstream
 RStudio
@@ -900,6 +906,8 @@ SRBevertonHolt
 SrBevertonHoltEvaluate
 src
 SRC
+srcfile
+srcref
 ss
 ssb
 SSB
@@ -944,6 +952,8 @@ TearDown
 tempdir
 tempfile
 templated
+testdown
+TESTDOWN
 testthat
 th
 tibble

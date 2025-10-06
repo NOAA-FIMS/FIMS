@@ -12,7 +12,7 @@
 # Load or prepare any necessary data for testing
 
 ## IO correctness ----
-test_that("test_rcpp_population_interface() works with correct inputs", {
+test_that("rcpp population interface works with correct inputs", {
   # setup population to create test values
   population <- methods::new(Population)
   nyears <- 10
