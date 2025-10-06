@@ -14,12 +14,11 @@ data("data1")
 data_age_length <- FIMSFrame(data1)
 
 ## IO correctness ----
-test_that("create_default_configurations() works with correct inputs", {
+test_that("`create_default_configurations()` works with correct inputs", {
   expected_names <- c("model_family", "module_name", "fleet_name", "data")
   default_configurations <- create_default_configurations(data_age_length)
 
-  #' @description Test that create_default_configurations(data_age_length)
-  #' returns a tibble with correct column names.
+  #' @description Test that the function creates a configuration table with the expected column structure.
   expect_equal(
     object = colnames(default_configurations),
     expected = expected_names
@@ -32,26 +31,25 @@ test_that("create_default_configurations() works with correct inputs", {
   default_configurations_unnested <- default_configurations |>
     tidyr::unnest(cols = data)
 
-  #' @description Test that unnested default_configurations
-  #' has correct column names.
+  #' @description Test that the detailed configuration table has the correct column structure.
   expect_equal(
     object = colnames(default_configurations_unnested),
     expected = expected_names_unnested
   )
 
-  #' @description Test that create_default_configurations(data_age_length)
-  #' returns a tibble with "catch_at_age" as model_family.
+  #' @description Test that the generated configuration correctly identifies the model family as `catch_at_age`.
   expect_equal(
     object = unique(default_configurations_unnested[["model_family"]]),
     expected = "catch_at_age"
   )
 
+  #' @description Test that the function produces a consistent output by comparing to a stored snapshot.
   expect_snapshot_file(save_csv(default_configurations_unnested), "default_configurations.csv")
 })
 
 ## Edge handling ----
 # Please remove/comment out the test template below if no edge cases are being tested.
-test_that("create_default_configurations() returns correct outputs for edge cases", {
+test_that("`create_default_configurations()` returns correct outputs for edge cases", {
   # Load the test data from an RDS file containing model fits.
   if (!file.exists(test_path("fixtures", "data_length_comp.RDS"))) {
     prepare_test_data()
@@ -70,8 +68,7 @@ test_that("create_default_configurations() returns correct outputs for edge case
     configurations <- create_default_configurations(data) |>
       tidyr::unnest(cols = data)
     expected_names <- colnames(configurations)
-    #' @description Test that [create_default_configurations()] returns correct
-    #' column names.
+    #' @description Test that configurations for various special data cases have the correct column structure.
     expect_equal(
       object = colnames(configurations),
       expected = expected_names
@@ -81,10 +78,10 @@ test_that("create_default_configurations() returns correct outputs for edge case
       module_types <- configurations |>
         dplyr::pull(module_type) |>
         unique()
-      #' @description Test that AgeComp exists in the age only data configurations.
+      #' @description Test that for data containing only age information, the `AgeComp` module is correctly included.
       expect_true("AgeComp" %in% module_types)
 
-      #' @description Test that LengthComp does not exist in the age only data configurations.
+      #' @description Test that for data containing only age information, the `LengthComp` module is correctly excluded.
       expect_true(!("LengthComp" %in% module_types))
     }
 
@@ -92,10 +89,10 @@ test_that("create_default_configurations() returns correct outputs for edge case
       module_types <- configurations |>
         dplyr::pull(module_type) |>
         unique()
-      #' @description Test that LengthComp exists in the length only data configurations.
+      #' @description Test that for data containing only length information, the `LengthComp` module is correctly included.
       expect_true("LengthComp" %in% module_types)
 
-      #' @description Test that AgeComp does not exist in the length only data configurations.
+      #' @description Test that for data containing only length information, the `AgeComp` module is correctly excluded.
       expect_true(!("AgeComp" %in% module_types))
     }
   }
@@ -106,17 +103,14 @@ test_that("create_default_configurations() returns correct outputs for edge case
 
 ## Error handling ----
 # Please remove/comment out the test template below if there are no built-in errors/warnings.
-test_that("create_default_configurations() returns correct error messages", {
-  #' @description Test that the function aborts with a specific error message
-  #' if the input object is not a `FIMSFrame`. Using a standard data frame
-  #' to trigger the error.
+test_that("`create_default_configurations()` returns correct error messages", {
+  #' @description Test that the function aborts and provides a clear error message if the input data is in the wrong format.
   expect_error(
     create_default_configurations(data = data.frame(a = 1)),
     regexp = "`data` must be a"
   )
 
-  #' @description Test that the function aborts with a specific error message
-  #' if the model_family is not valid.
+  #' @description Test that the function aborts and provides a clear error message if an invalid `model_family` is specified.
   expect_error(
     create_default_configurations(
       data = data_age_length,

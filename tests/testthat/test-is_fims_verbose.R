@@ -12,30 +12,28 @@
 # Load or prepare any necessary data for testing
 
 ## IO correctness ----
-test_that("is_fims_verbose() works with correct inputs", {
-  #' @description Test that is_fims_verbose() returns a boolean.
+test_that("`is_fims_verbose()` works with correct inputs", {
+  #' @description Test that `is_fims_verbose()` returns a boolean.
   expect_type(object = is_fims_verbose(), "logical")
 
-  #' @description Test that is_fims_verbose() returns FALSE by default because
-  #' of the settings in the helper-quiet-test-output.R file.
+  #' @description Test that `is_fims_verbose()` returns FALSE by default because of the settings in the helper-quiet-test-output.R file.
   expect_false(is_fims_verbose())
 })
 
 ## Edge handling ----
-test_that("is_fims_verbose() returns correct outputs for edge cases", {
+test_that("`is_fims_verbose()` returns correct outputs for edge cases", {
   # Save the current verbosity setting
   current_verbosity <- getOption("rlib_message_verbosity")
   options("rlib_message_verbosity" = "verbose")
   # Restore the original verbosity setting on exit
   on.exit(options("rlib_message_verbosity" = current_verbosity), add = TRUE)
-  #' @description Test that "verbose" works for setting the verbosity.
+  #' @description Test that `verbose` works for setting the verbosity.
   expect_true(is_fims_verbose())
 })
 
 ## Error handling ----
-test_that("is_fims_verbose() returns correct error messages", {
-  #' @description Test that is_fims_verbose("x") returns error because the
-  #' function does not take any arguments.
+test_that("`is_fims_verbose()` returns correct error messages", {
+  #' @description Test that `is_fims_verbose("x")` returns error because the function does not take any arguments.
   expect_error(
     object = is_fims_verbose("x"),
     regexp = "unused argument."

@@ -266,7 +266,9 @@ test_that("prior predictive check", {
   inflection_point_out <- opt$par[grep(names(opt$par), pattern = "inflection_point")]
   slope_out <- opt$par[grep(names(opt$par), pattern = "slope")]
   for (i in 1:2) {
+    #' @description Test that the posterior means for inflection point match the prior means within tolerance of 1e-4.
     expect_equal(unname(inflection_point_out[i]), unname(inflection_point_mean), tolerance = 1e-4)
+    #' @description Test that the posterior means for slope match the prior means within tolerance of 1e-4.
     expect_equal(unname(slope_out[i]), unname(slope_mean), tolerance = 1e-4)
   }
 

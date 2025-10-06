@@ -85,8 +85,7 @@ test_that("EWAAGrowth evaluate() returns expected error for mismatched input len
     seq_along(weights),
     \(x) ewaa_growth$weights$set(x - 1, weights[x])
   )
-  #' @description Test that EWAAGrowth evaluate() throws an error when the
-  #' lengths of ages and weights don't match.
+  #' @description Test that EWAAGrowth evaluate() throws an error when the lengths of ages and weights don't match.
   expect_error(
     ewaa_growth$evaluate(1),
     regexp = "ages and weights must be the same length",

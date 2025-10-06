@@ -15,7 +15,7 @@ if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
 }
 
 ## IO correctness ----
-test_that("get_model_output() works with correct inputs", {
+test_that("`get_model_output()` works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
   # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
   # or "deterministic*.RDS"
@@ -37,8 +37,7 @@ test_that("get_model_output() works with correct inputs", {
     fit_data <- readRDS(fit_file)
     model_output <- get_model_output(fit_data)
     json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
-    #' @description Test that [get_model_output()] returns correct names for
-    #' the model_output slot.
+    #' @description Test that `get_model_output()` returns correct names for the `model_output` slot.
     expect_equal(
       object = names(json_list),
       expected = expected_names
