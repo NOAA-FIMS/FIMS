@@ -26,7 +26,7 @@ template:
 articles:
 - title: Fisheries Integrated Modeling System (FIMS)
   contents:
-  - fims-documentation
+  # - fims-documentation
   - fims-demo
   - fims-demo-minimal
   - fims-logging
@@ -82,3 +82,4 @@ navbar:
     github:
       icon: fa-brands fa-github fa-lg
       href: https://github.com/noaa-fims/fims/
+
