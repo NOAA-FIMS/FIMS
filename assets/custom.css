@@ -1,4 +1,5 @@
 html {
+    --toc-width: 300px;
     /* primary theme color. This will affect the entire websites color scheme: links, arrows, labels, ... */
     --primary-color: #0e6876;
     --primary-dark-color: #0e6876;
@@ -10,7 +11,6 @@ html {
     --page-foreground-color: #213f4b;
     --page-secondary-foreground-color: #6f7e8e;
 }
-
 
 #projectname {
     color: #51595d;
@@ -87,4 +87,68 @@ html {
 
 .navbar .nav-link.active .menu-text::after {
     width: 100%;
+}
+
+#nav-tree {
+    background: #ffffff;
+}
+
+#nav-tree .label {
+    font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+}
+
+div.toc li, div.toc h3 {
+    font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+}
+
+div.contents .toc {
+    border-left: none !important;
+}
+
+div.toc li a {
+    /* Ensures the entire area is responsive and clickable and has a minimum height */
+    display: block !important;
+    padding: 4px 6px; /* Increased padding slightly */
+    min-height: 1.5em; /* Ensures a good touch target size */
+    border-radius: var(--border-radius-small);
+    text-decoration: none; /* Ensure no underline */
+    
+    /* Default link color */
+    color: var(--primary-color) !important;
+}
+
+/* Hover/Focus style for ALL links */
+div.toc li a:hover,
+div.toc li a:focus {
+    /* Use a slightly transparent version of the active color as the hover background */
+    background-color: rgba(14, 104, 118, 0.1) !important; 
+    color: #0e6270cc !important; /* Slightly dimmed primary color */
+}
+
+/* Active Link Style (for scrolling highlight) */
+/* This targets the 'active' class which is the definitive indicator. */
+div.toc li a.aboveActive {
+  background-color: transparent !important;
+  color: var(--primary-color) !important; /* or inherit if you want */
+  font-weight: normal !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+div.toc li a.active {
+  background-color: var(--primary-color) !important;
+  color: var(--on-primary-color) !important;
+  font-weight: bold !important;
+}
+div.toc li {
+    white-space: normal;
+    word-break: break-all;
+}
+
+div.contents .toc {
+    overflow-y: auto;
+}
+
+a.anchor {
+  scroll-margin-top: 120px; /* increase if header is tall */
 }

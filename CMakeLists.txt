@@ -67,6 +67,8 @@ IF(BUILD_DOC)
   set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "inst/include/common/MAIN.md")
   set(DOXYGEN_HTML_HEADER "header.html")
   set(DOXYGEN_LAYOUT_FILE "DoxygenLayout.xml")
+  set(DOXYGEN_MARKDOWN_SUPPORT YES)
+  set(DOXYGEN_AUTOLINK_SUPPORT YES)
 
   doxygen_add_docs(fims_doxygen
     inst/include
