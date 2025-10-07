@@ -43,6 +43,7 @@ AtoL
 AtoLSchnute
 attr
 aug
+AUTOLINK
 Baranov
 BasedOnStyle
 bcast
@@ -412,6 +413,7 @@ gtest
 HandlesCorrectInput
 HandlesEdgeCase
 HardwareConcurrency
+hexlogo
 holt
 hotfix
 hpp
@@ -507,6 +509,7 @@ lgamma
 libname
 libpath
 LIBPFM
+libs
 Lifecycle
 Linf
 linux
@@ -536,6 +539,7 @@ LogR
 LogRecDev
 LogRRecruitmentInterface
 LogRRecruitmentProcess
+lookahead
 lozen
 lpdf
 lpmf
@@ -646,6 +650,7 @@ Nyears
 nyr
 objs
 ObservedCatch
+oE
 ofstream
 ogive
 onLoad
@@ -814,6 +819,7 @@ sdreport
 sdreportOrList
 SDreports
 se
+sed
 seealso
 sel
 selD
