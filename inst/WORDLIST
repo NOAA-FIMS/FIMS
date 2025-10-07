@@ -137,6 +137,7 @@ codebase
 codebasics
 codecov
 Codecov
+COLORSTYLE
 ComputeProportions
 cond
 config
@@ -150,6 +151,7 @@ conversiondouble
 cout
 cov
 covr
+cp
 cpp
 CppAD
 CPUE
@@ -164,6 +166,7 @@ CreatePopulationObjects
 CreateTMBModel
 crt
 csignal
+css
 cstdlib
 cstring
 csv
@@ -254,6 +257,7 @@ DoubleLogisticSelectivity
 DoubleLogisticSelectivityInterface
 dox
 doxygen
+DoxygenLayout
 dplyr
 dq
 DragonFly
@@ -544,6 +548,7 @@ macos
 macOS
 MACOS
 maindir
+MAINPAGE
 MakeADFun
 MakeAvailable
 Makevars
@@ -561,6 +566,7 @@ maxit
 MCP
 MCPC
 md
+MDFILE
 meanlog
 mget
 minimizer
@@ -770,6 +776,7 @@ ResetVector
 resid
 ret
 retape
+rf
 Ricker
 rlang
 rlib
@@ -924,6 +931,7 @@ strsplit
 strtok
 struct
 styler
+STYLESHEET
 subfolder
 subfolders
 submodule
@@ -975,6 +983,7 @@ toString
 toupper
 tparam
 traceback
+TREEVIEW
 tribble
 trigamma
 trunc
