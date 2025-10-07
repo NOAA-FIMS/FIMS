@@ -165,6 +165,7 @@ CreateModelingObjects
 CreateObject
 CreatePopulationObjects
 CreateTMBModel
+crossorigin
 crt
 csignal
 css
@@ -399,6 +400,7 @@ GlobalEnv
 globalVariables
 GMACS
 GNUC
+googleapis
 googlebenchmark
 googletest
 GoogleTest
@@ -408,6 +410,7 @@ growthBase
 GrowthBase
 GrowthEvaluate
 GrowthInterfaceBase
+gstatic
 gsub
 gtest
 HandlesCorrectInput
@@ -597,6 +600,8 @@ nal
 nan
 NaN
 nathanvaughan
+navbar
+navlogo
 nCAA
 ncases
 nchar
@@ -712,6 +717,7 @@ Postfix
 postmle
 pre
 precompiled
+preconnect
 PrepareCAA
 PrepareConstrainedDeviations
 preprocessor
@@ -938,6 +944,7 @@ strtok
 struct
 styler
 STYLESHEET
+stylesheet
 subfolder
 subfolders
 submodule
@@ -1043,6 +1050,7 @@ waa
 Wb
 wd
 wgt
+wght
 wikipedia
 withr
 wordlist
