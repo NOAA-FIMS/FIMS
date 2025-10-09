@@ -219,20 +219,20 @@ prepare_test_data <- function() {
   )
 
   # TODO: delete this lines 74-78 when log_devs estimation error fixed
-  modified_parameters <- modified_parameters |>
-    dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        label == "log_devs" & module_type == "BevertonHolt",
-        "constant",
-        estimation_type
-      )
-    )
+  # modified_parameters <- modified_parameters |>
+  #   dplyr::mutate(
+  #     estimation_type = dplyr::if_else(
+  #       label == "log_devs" & module_type == "BevertonHolt",
+  #       "constant",
+  #       estimation_type
+  #     )
+  #   )
 
-  saveRDS(
-    modified_parameters,
-    file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
-    compress = FALSE
-  )
+  # saveRDS(
+  #   modified_parameters,
+  #   file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
+  #   compress = FALSE
+  # )
 
   ## Estimation run with age and length comp using wrappers ----
   # Run FIMS using the setup_and_run_FIMS_with_wrappers function
