@@ -1,0 +1,64 @@
+name: Quarterly review of tests
+on:
+  schedule:
+    # Runs at 8:00 AM ET on the first Monday of January, April, July, and October
+    # The code club meeting will be on Tuesday, so this will give us one day to
+    # modify the issue and update Google Calendar if needed
+    - cron: '0 12 1-7 1,4,7,10 1'
+  # Run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Dynamic name for the entire workflow run for better visibility in the Actions list
+run-name: Quarterly Tests Review (${{ github.event_name }})
+
+jobs:
+  create_issue:
+    name: Create quarterly review of tests issue
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    # Environment variables are available to all steps in this job
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      TITLE: Quarterly review of tests
+      ASSIGNEES: Bai-Li-NOAA
+      LABELS: "kind: test case"
+      BODY: |
+        ## 📦 Quarterly review of tests
+
+        - [ ] Schedule a Code Club to go over tests 
+        - [ ] Review the {testdown} reports and check time that it takes to run the tests
+        - [ ] Review the GitHub actions to determine if any tests are notorious for being buggy
+        - [ ] Review the code coverage reports to identify missing tests and ensure code coverage is >= 80%
+        - [ ] Identify bottlenecks or challenges encountered during local test runs
+        - [ ] Update the minimum version of dependencies and ensure that the tests still pass
+        - [ ] Update devcontainer.json to include the required dependencies for developers
+        - [ ] Update the test README.md
+        - [ ] Review the ability to perform the tests as a new developer
+        - [ ] Triage open issues related to testing
+        - [ ] Discuss the need for future tests and make an issue that lays out the plan
+        
+        ### Notes
+        Add any notes or additional action items here.
+
+        _Generated automatically by [quarterly-review-of-tests.yml][1]_
+
+        [1]: https://github.com/NOAA-FIMS/${{ github.repository }}/blob/main/.github/workflows/quarterly-review-of-tests.yml
+
+    steps:
+      - name: Generate dynamic issue title
+        id: date
+        run: echo "title=Quarterly review of tests - $(date +'%Y-%m')" >> $GITHUB_OUTPUT
+
+      - name: Create new issue
+        id: new_issue
+        run: |
+          # Use step outputs to pass the URL to the next step
+          issue_url=$(gh issue create \
+            --title "${{ steps.date.outputs.title }}" \
+            --body "$BODY" \
+            --assignee "$ASSIGNEES" \
+            --label "$LABELS")
+          echo "url=$issue_url" >> $GITHUB_OUTPUT
+          echo "Created issue: $issue_url"
