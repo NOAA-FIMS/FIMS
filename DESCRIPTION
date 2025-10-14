@@ -95,7 +95,8 @@ VignetteBuilder:
 Remotes: 
     github::nmfs-ost/stockplotr
 Config/testthat/edition: 3
-Config/testthat/parallel: false
+Config/testthat/parallel: true
+Config/testthat/start-first: *-random-effects-without-wrappers, integration-caa-mle* 
 Encoding: UTF-8
 Language: en-US
 LazyData: true
