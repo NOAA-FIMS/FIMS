@@ -70,7 +70,9 @@ test_that("fims_frame() works with the correct inputs", {
   #' @description Test that the `show()` method works as expected on a FIMSFrame
   #' object.
   expect_output(suppressMessages(show(fims_frame)))
-})
+  #' @description Test that 'FIMSFrame()' succeeds cleanly with valid inputs.
+  expect_no_error(FIMS::FIMSFrame(data1))
+})  
 
 ## Edge handling ----
 # No edge cases to test.
@@ -208,4 +210,20 @@ test_that("get_n_fleets() works with correct inputs", {
 # No edge cases to test.
 
 ## Error handling ----
-# No built-in errors to test.
+
+## Check that FIMSFrame warns on unexpected data types
+test_that("FIMSFrame() warns on unexpected data types", {
+  bad <- dplyr::mutate(
+    data1,
+    type = ifelse(type == "index", "indexes", type)  # Introduce an unsupported type
+  )
+  #' @description Test that 'FIMSFrame()' warns on unexpected data types.
+  expect_warning(
+    ff <- FIMS::FIMSFrame(bad),
+    regexp = "unexpected type\\(s\\)"
+  )
+  expect_s4_class(ff, "FIMSFrame")
+})
+
+
+
