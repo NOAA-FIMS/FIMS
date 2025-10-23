@@ -571,10 +571,10 @@ methods::setValidity(
     # TODO: Add checks for other slots
     # Add validity check for types
     allowed_types <- c(
-  "landings", "index", "age_comp", "length_comp",
-  "weight-at-age", "age-to-length-conversion"
-)
-present_types <- unique(object@data[["type"]])
+      "landings", "index", "age_comp", "length_comp",
+      "weight-at-age", "age-to-length-conversion"
+    )
+    present_types <- unique(object@data[["type"]])
 
     # Issues warning if there are any unrecognized types
     unknown_types <- setdiff(present_types, allowed_types)
@@ -582,11 +582,12 @@ present_types <- unique(object@data[["type"]])
       cli::cli_warn(c(
         "!" = "Data contains unexpected type(s): {paste(sort(unknown_types), collapse = ', ')}",
         "i" = "Allowed types are: {paste(allowed_types, collapse = ', ')}",
-        "i" = paste("Model will continue to run," ,
-                    "but check that data types are correct."
-                    )
-  ))
-}
+        "i" = paste(
+          "Model will continue to run,",
+          "but check that data types are correct."
+        )
+      ))
+    }
     # Return
     if (length(errors) == 0) {
       return(TRUE)
@@ -721,7 +722,7 @@ FIMSFrame <- function(data) {
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with m_*() are correct.
-  formatted_data <- tibble::as_tibble(data) 
+  formatted_data <- tibble::as_tibble(data)
   missing_time_series <- create_missing_data(
     data = formatted_data,
     timing = years
@@ -804,11 +805,12 @@ FIMSFrame <- function(data) {
 
 # Unexported functions ----
 create_missing_data <- function(
-    data,
-    bins,
-    timings,
-    column,
-    types = c("landings", "index")) {
+  data,
+  bins,
+  timings,
+  column,
+  types = c("landings", "index")
+) {
   use_this_data <- data |>
     dplyr::group_by(type, name)
   out_data <- if (missing(bins)) {
