@@ -25,6 +25,10 @@ articles:
   contents:
   - fims-path-maturity
 
+- title: Research and development
+  contents:
+  - RD-re-sparsity
+
 reference:
 - title: Data
   desc: >
