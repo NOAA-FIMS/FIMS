@@ -261,7 +261,7 @@ verify_fims_deterministic <- function(
   } else {
     fims_logR0 <- estimates[36, "Estimate"]
   }
-  
+
   #' @description Test that the log(R0) from FIMS is greater than 0.0.
   expect_gt(fims_logR0, 0.0)
   # TODO: fims_logR0 is 13.8155 and log(om_input[["R0"]]) is 13.81551 causing this to error out. Fixing with tolerance temporarily.

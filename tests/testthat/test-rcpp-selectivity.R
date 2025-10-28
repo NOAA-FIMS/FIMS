@@ -80,7 +80,7 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   selectivity2$inflection_point_desc[1]$estimation_type$set("random_effects")
   selectivity2$slope_asc[1]$estimation_type$set("random_effects")
   selectivity2$slope_desc[1]$estimation_type$set("random_effects")
-  
+
   #' @description Test that `get_id()` for `DoubleLogisticSelectivity` works when a second object is created.
   expect_equal(selectivity2$get_id(), 2)
   #' @description Test that the `inflection_point_asc` value is set to 10.5.

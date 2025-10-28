@@ -92,7 +92,6 @@ test_that("`get_random()` works with correct inputs", {
 ## Edge handling ----
 # No edge cases to test for this interface.
 test_that("`get_random()` returns correct outputs for edge cases", {
-  
   clear()
   #' @description Test that zero parameters are registered after using `clear()`.
   expect_equal(numeric(0), get_random())

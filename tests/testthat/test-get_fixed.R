@@ -13,7 +13,6 @@
 # get_fixed ----
 ## IO correctness ----
 test_that("`get_fixed()` works with correct inputs", {
-  
   clear()
   # Create selectivity
   selectivity <- methods::new(LogisticSelectivity)
