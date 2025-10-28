@@ -101,15 +101,15 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief The number of age bins in the fleet data.
    */
-  SharedInt nages = 0;
+  SharedInt n_ages = 0;
   /**
    * @brief The number of length bins in the fleet data.
    */
-  SharedInt nlengths = 0;
+  SharedInt n_lengths = 0;
   /**
    * @brief The number of years in the fleet data.
    */
-  SharedInt nyears = 0;
+  SharedInt n_years = 0;
   /**
    * @brief What units are the observed landings for this fleet measured in.
    * Options are weight or numbers, default is weight.
@@ -257,9 +257,9 @@ class FleetInterface : public FleetInterfaceBase {
             other.interface_observed_landings_data_id_m),
         interface_selectivity_id_m(other.interface_selectivity_id_m),
         name(other.name),
-        nages(other.nages),
-        nlengths(other.nlengths),
-        nyears(other.nyears),
+        n_ages(other.n_ages),
+        n_lengths(other.n_lengths),
+        n_years(other.n_years),
         log_q(other.log_q),
         log_Fmort(other.log_Fmort),
         log_index_expected(other.log_index_expected),
@@ -549,9 +549,9 @@ class FleetInterface : public FleetInterfaceBase {
 
     // set relative info
     fleet->id = this->id;
-    fleet->nages = this->nages.get();
-    fleet->nlengths = this->nlengths.get();
-    fleet->nyears = this->nyears.get();
+    fleet->n_ages = this->n_ages.get();
+    fleet->n_lengths = this->n_lengths.get();
+    fleet->n_years = this->n_years.get();
     fleet->observed_landings_units = this->observed_landings_units;
     fleet->observed_index_units = this->observed_index_units;
 
@@ -609,37 +609,37 @@ class FleetInterface : public FleetInterfaceBase {
 
     // exp_landings
     fleet->log_landings_expected.resize(
-        nyears);  // assume landings is for all ages.
+        n_years);  // assume landings is for all ages.
     info->variable_map[this->log_landings_expected.id_m] =
         &(fleet)->log_landings_expected;
-    fleet->log_index_expected.resize(nyears);  // assume index is for all ages.
+    fleet->log_index_expected.resize(n_years);  // assume index is for all ages.
     info->variable_map[this->log_index_expected.id_m] =
         &(fleet)->log_index_expected;
 
-    fleet->agecomp_expected.resize(nyears.get() * nages.get());
-    fleet->agecomp_proportion.resize(nyears.get() * nages.get());
+    fleet->agecomp_expected.resize(n_years.get() * n_ages.get());
+    fleet->agecomp_proportion.resize(n_years.get() * n_ages.get());
     info->variable_map[this->agecomp_expected.id_m] =
         &(fleet)->agecomp_expected;
     info->variable_map[this->agecomp_proportion.id_m] =
         &(fleet)->agecomp_proportion;
-    FIMS_INFO_LOG(fims::to_string(this->nyears.get()) + " " +
-                  fims::to_string(this->nages.get()));
+    FIMS_INFO_LOG(fims::to_string(this->n_years.get()) + " " +
+                  fims::to_string(this->n_ages.get()));
     FIMS_INFO_LOG(" adding Fleet length object to TMB");
 
-    if (this->nlengths.get() > 0) {
-      fleet->lengthcomp_expected.resize(this->nyears.get() *
-                                        this->nlengths.get());
-      fleet->lengthcomp_proportion.resize(this->nyears.get() *
-                                          this->nlengths.get());
+    if (this->n_lengths.get() > 0) {
+      fleet->lengthcomp_expected.resize(this->n_years.get() *
+                                        this->n_lengths.get());
+      fleet->lengthcomp_proportion.resize(this->n_years.get() *
+                                          this->n_lengths.get());
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
       if (this->age_to_length_conversion.size() !=
-          (this->nages.get() * this->nlengths.get())) {
+          (this->n_ages.get() * this->n_lengths.get())) {
         FIMS_ERROR_LOG(
             "age_to_length_conversion don't match, " +
             fims::to_string(this->age_to_length_conversion.size()) + " != " +
-            fims::to_string((this->nages.get() * this->nlengths.get())));
+            fims::to_string((this->n_ages.get() * this->n_lengths.get())));
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {

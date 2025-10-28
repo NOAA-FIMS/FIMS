@@ -8,7 +8,7 @@ namespace
     TEST_F(CAAEvaluateTestFixture, CalculateIndex_works)
     {
         
-        std::vector<double> index_expected(nyears * nfleets, 0);
+        std::vector<double> index_expected(n_years * n_fleets, 0);
        
         // calculate index numbers at age in population module
         catch_at_age_model->CalculateIndexNumbersAA(population, i_age_year, year, age);
@@ -20,9 +20,9 @@ namespace
         // the integration test loops over all ages to test the index.
         uint32_t pop_id = population->GetId();
         auto& dq_pop = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
-        for (int fleet_ = 0; fleet_ < catch_at_age_model->populations[pop_id]->nfleets; fleet_++)
+        for (int fleet_ = 0; fleet_ < catch_at_age_model->populations[pop_id]->n_fleets; fleet_++)
         {
-            int index_yf = year * catch_at_age_model->populations[pop_id]->nfleets + fleet_;
+            int index_yf = year * catch_at_age_model->populations[pop_id]->n_fleets + fleet_;
             auto &pop = catch_at_age_model->populations[pop_id];
 
             // Currently q is not a vector and not changing over years. 

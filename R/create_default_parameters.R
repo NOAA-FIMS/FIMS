@@ -99,9 +99,8 @@
 #'   )
 #' }
 create_default_parameters <- function(
-  configurations,
-  data
-) {
+    configurations,
+    data) {
   # FIXME: use default values if there are no fleets info passed into the
   # function or a fleet is not present but it has data? Maybe we don't want the
   # latter because it could be that we want to drop a fleet from a model but we
@@ -230,10 +229,9 @@ create_default_parameters_template <- function(n_parameters = 1) {
 #' age and natural mortality rate.
 #' @noRd
 create_default_Population <- function(
-  unnested_configurations,
-  data,
-  log_rzero
-) {
+    unnested_configurations,
+    data,
+    log_rzero) {
   # Input checks
   # Check if log_rzero is numeric
   if (!is.numeric(log_rzero) || length(log_rzero) != 1) {
@@ -336,8 +334,7 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
 #' of selectivity.
 #' @noRd
 create_default_selectivity <- function(
-  form = c("Logistic", "DoubleLogistic")
-) {
+    form = c("Logistic", "DoubleLogistic")) {
   # Input checks
   form <- rlang::arg_match(form)
   # NOTE: All new forms of selectivity must be placed in the vector of default
@@ -550,9 +547,8 @@ create_default_fleet <- function(unnested_configurations,
 #' A tibble containing the default maturity parameters.
 #' @noRd
 create_default_maturity <- function(
-  unnested_configurations,
-  data
-) {
+    unnested_configurations,
+    data) {
   # Input checks
   available_forms <- c("Logistic")
   form <- unnested_configurations |>
@@ -674,10 +670,9 @@ create_default_BevertonHoltRecruitment <- function(data) {
 #' A tibble of default parameters for Dnorm distribution.
 #' @noRd
 create_default_DnormDistribution <- function(
-  value = 0.1,
-  data,
-  input_type = c("data", "process", "prior")
-) {
+    value = 0.1,
+    data,
+    input_type = c("data", "process", "prior")) {
   # Input checks
   input_type <- rlang::arg_match(input_type)
 
@@ -733,10 +728,9 @@ create_default_DnormDistribution <- function(
 #' A tibble of default parameters for Dlnorm distribution.
 #' @noRd
 create_default_DlnormDistribution <- function(
-  value = 0.1,
-  data,
-  input_type = c("data", "process")
-) {
+    value = 0.1,
+    data,
+    input_type = c("data", "process")) {
   # Input checks
   # TODO: Determine if value can be a vector?
   if (!is.numeric(value) || any(value <= 0, na.rm = TRUE)) {
@@ -788,9 +782,8 @@ create_default_DlnormDistribution <- function(
 #' A tibble with the default parameters for recruitment.
 #' @noRd
 create_default_recruitment <- function(
-  unnested_configurations,
-  data
-) {
+    unnested_configurations,
+    data) {
   # Input checks
   available_forms <- c("BevertonHolt")
   form <- unnested_configurations |>
