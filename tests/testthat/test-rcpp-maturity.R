@@ -15,7 +15,7 @@
 test_that("rcpp maturity works with correct inputs", {
   # Create maturity1
   maturity1 <- methods::new(LogisticMaturity)
-  
+
   maturity1$inflection_point[1]$value <- 10.0
   maturity1$inflection_point[1]$min <- 8.0
   maturity1$inflection_point[1]$max <- 12.0

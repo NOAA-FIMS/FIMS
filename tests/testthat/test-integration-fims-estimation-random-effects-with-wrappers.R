@@ -92,7 +92,7 @@ test_that("deterministic test of fims with recruitment re", {
     #' @description Test that the recruitment values from FIMS match the "true" values from the operating model.
     expect_equal(fims_naa[i, 1], om_output_list[[iter_id]][["N.age"]][i, 1])
   }
-  
+
   # confirm that recruitment matches the numbers in the first age
   # by comparing to fims_naa (what's reported from FIMS)
   n_year <- om_input_list[[iter_id]][["nyr"]]

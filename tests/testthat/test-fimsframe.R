@@ -33,13 +33,13 @@ test_that("`fims_frame()` works with the correct inputs", {
 
   #' @description Test that `get_fleets()` retrieves the fleet names as a character vector.
   expect_vector(get_fleets(fims_frame), ptype = character())
-  
+
   #' @description Test that `get_n_years()` retrieves the number of years as an integer.
   expect_type(get_n_years(fims_frame), "integer")
 
   #' @description Test that `get_start_year()` retrieves the start year as a single value.
   expect_length(get_n_years(fims_frame), 1)
-  
+
   #' @description Test that `get_start_year()` retrieves the start year as an integer.
   expect_type(get_start_year(fims_frame), "integer")
 
@@ -58,12 +58,12 @@ test_that("`fims_frame()` works with the correct inputs", {
 
   #' @description Test that `get_ages()` retrieves the ages as an integer vector.
   expect_vector(get_ages(fims_frame), ptype = integer())
-  
+
   #' @description Test that `get_n_ages()` retrieves the number of ages as an integer.
   expect_type(get_n_ages(fims_frame), "integer")
   #' @description Test that `get_n_ages()` retrieves the number of ages as a single value.
   expect_length(get_n_ages(fims_frame), 1)
-  
+
   #' @description Test that `m_landings()` retrieves landings data as a numeric vector.
   expect_vector(m_landings(fims_frame, fleet_names), ptype = numeric())
 
@@ -101,7 +101,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
   # TODO: Add error handling tests for FIMSFrame class and methods
   #' @description Validators for `FIMSFrame` work as expected.
   expect_error(FIMSFrame(bad_input))
-  
+
   #' @description Test that the `m_landings()` returns an error when a fleet is not supplied.
   expect_error(
     m_landings(fims_frame),
@@ -216,7 +216,6 @@ data_files <- list.files(
 
 ## IO correctness ----
 test_that("`get_n_fleets()` works with correct inputs", {
-  
   # Function to read the RDS file and get input
   check_input <- function(data_file) {
     data <- readRDS(data_file)
