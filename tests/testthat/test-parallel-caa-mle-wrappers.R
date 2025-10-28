@@ -103,7 +103,7 @@ test_that("Run FIMS in parallel using {snowfall}", {
     results_parallel,
     \(x) x@estimates[x@estimates$label == "SSB", "estimated"]
   )
-  
+
   ssb_serial <- purrr::map(
     estimation_results_serial,
     \(x) x@estimates[x@estimates$label == "SSB", "estimated"]
@@ -121,7 +121,7 @@ test_that("Run FIMS in parallel using {snowfall}", {
   )
   #' @description Test that parameter estimates from parallel runs equal those from serial runs.
   expect_setequal(parameters_parallel, parameters_serial)
-  
+
   jnll_parallel <- purrr::map(
     results_parallel,
     \(x) x@report[["jnll"]]

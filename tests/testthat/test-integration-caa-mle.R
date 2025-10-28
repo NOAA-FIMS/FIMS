@@ -39,7 +39,7 @@ test_that("catch-at-age model (deterministic MLE without wrappers) works with co
     em_input = em_input_list[[iter_id]],
     use_fimsfit = FALSE
   )
-  
+
   #' @description Test that the NLLs from FIMS match the "true" NLLs from the model comparison project.
   verify_fims_nll(
     report = result[["report"]],
@@ -47,7 +47,7 @@ test_that("catch-at-age model (deterministic MLE without wrappers) works with co
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
   )
-  
+
   # TODO: change parameter number to 77 after fixing log_devs estimation error
   #' @description Test that the number of parameters is correct for deterministic run.
   expect_equal(length(result[["obj"]][["par"]]), 48)

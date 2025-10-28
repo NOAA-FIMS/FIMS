@@ -19,7 +19,7 @@
 # leads to errors like: In normalizePath(attr(result$srcref, "srcfile")$filename) :
 # path[1]="test-use-test-template.R": No such file or directory. To fix the issue,
 # we need to skip the test file when generating {testdown} reports.
-if (Sys.getenv("INPUT_TESTDOWN") == 'true') {
+if (Sys.getenv("INPUT_TESTDOWN") == "true") {
   #' @description Skip the test in {testdown} reports generation.
   skip("Skipping test in {testdown} reports generation.")
 }
@@ -70,7 +70,7 @@ test_that("`use_gtest_template()` works with correct inputs", {
       suppressMessages(FIMS:::use_gtest_template(
         name = "FIMSMath_ClassName_Logistic"
       ))
-      
+
       object <- file.exists(file.path(
         temp_path, "tests", "gtest", "test_FIMSMath_ClassName_Logistic.cpp"
       ))
@@ -155,7 +155,7 @@ test_that("`use_gtest_template()` returns correct error messages", {
       )
       #' @description Test that `use_gtest_template()` throws an error when the file already exists.
       expect_equal(error, "An error occurred.")
-      
+
       file.rename(
         from = file.path(temp_path, "tests", "gtest", "renamed.txt"),
         to = file.path(temp_path, cmakelist_path)

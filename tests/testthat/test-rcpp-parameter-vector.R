@@ -42,7 +42,7 @@ test_that("rcpp ParameterVector works as expected", {
     #' @description Test that plus operator works.
     expect_equal(v_plus_test$get(i - 1)$value, (v1[i]$value + v2[i]$value))
   }
- 
+
   v_minus_test <- v1 - v2
   for (i in 1:v_size) {
     #' @description Test minus operator works.
