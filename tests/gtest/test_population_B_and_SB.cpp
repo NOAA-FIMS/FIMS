@@ -13,8 +13,8 @@ namespace
         catch_at_age_model->CalculateSpawningBiomass(population, i_age_year, year, age);
         catch_at_age_model->CalculateBiomass(population, i_age_year, year, age);
 
-        std::vector<double> test_SB(nyears + 1, 0);
-        std::vector<double> test_B(nyears + 1, 0);
+        std::vector<double> test_SB(n_years + 1, 0);
+        std::vector<double> test_B(n_years + 1, 0);
 
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
         test_SB[year] += dq["numbers_at_age"][i_age_year] *
@@ -34,20 +34,20 @@ namespace
     TEST_F(CAAEvaluateTestFixture, CalculateSpawningBiomass_ExtraYear_works)
     {
         uint32_t pop_id = population->GetId();
-        int year = population->nyears;
+        int year = population->n_years;
         int age = 6;
-        int i_age_year = year * population->nages + age;
-        int i_agem1_yearm1 = (year - 1) * population->nages + age - 1;
+        int i_age_year = year * population->n_ages + age;
+        int i_agem1_yearm1 = (year - 1) * population->n_ages + age - 1;
 
         catch_at_age_model->CalculateMortality(population, i_agem1_yearm1, year-1, age-1);
         catch_at_age_model->CalculateMaturityAA(population, i_age_year, age);
         catch_at_age_model->CalculateNumbersAA(population, i_age_year, i_agem1_yearm1, age);
         catch_at_age_model->CalculateSpawningBiomass(population, i_age_year, year, age);
 
-        std::vector<double> test_SSB(nyears + 1, 0);
+        std::vector<double> test_SSB(n_years + 1, 0);
 
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
-        test_SSB[nyears] += dq["numbers_at_age"][i_age_year] *
+        test_SSB[n_years] += dq["numbers_at_age"][i_age_year] *
             catch_at_age_model->populations[0]->proportion_female[age] *
             dq["proportion_mature_at_age"][i_age_year] *
             catch_at_age_model->populations[0]->growth->evaluate(population->ages[age]);

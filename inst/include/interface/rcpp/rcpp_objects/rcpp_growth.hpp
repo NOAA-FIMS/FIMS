@@ -187,7 +187,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"id\": null,\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [\"nages\"],\n";
+    ss << "  \"header\": [\"n_ages\"],\n";
     ss << "  \"dimensions\": [" << this->ages.size() << "]\n},\n";
 
     ss << " \"values\": [\n";

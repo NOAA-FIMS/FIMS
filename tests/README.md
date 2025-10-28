@@ -87,9 +87,9 @@ q // to quit
 
 - Write print statements in the desired .hpp file and view them in `FIMS/build/tests/gtest/debug.txt` after you run `cmake` and `ctest`.
 ```cpp
-nfleets = fleets.size();
+n_fleets = fleets.size();
 std::ofstream out("debug.txt");
-out <<"number of fleets: "<<nfleets<<"\n";
+out <<"number of fleets: "<<n_fleets<<"\n";
 ```
 
 - Start the debugger using `R -d gdb` and then type `R` to start R. See detailed instructions [here](https://webhomes.maths.ed.ac.uk/~swood34/RCdebug/RCdebug.html).

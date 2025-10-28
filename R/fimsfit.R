@@ -401,13 +401,12 @@ is.FIMSFit <- function(x) {
 #' @keywords fit_fims
 #' @export
 FIMSFit <- function(
-  input,
-  obj,
-  opt = list(),
-  sdreport = list(),
-  timing = c("time_total" = as.difftime(0, units = "secs")),
-  version = utils::packageVersion("FIMS")
-) {
+    input,
+    obj,
+    opt = list(),
+    sdreport = list(),
+    timing = c("time_total" = as.difftime(0, units = "secs")),
+    version = utils::packageVersion("FIMS")) {
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])

@@ -12,11 +12,11 @@ namespace
         size_t pop_id = population->GetId();
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
-        for (int year = 0; year < population->nyears; year++)
+        for (int year = 0; year < population->n_years; year++)
         {
-            for (int age = 0; age < population->nages; age++)
+            for (int age = 0; age < population->n_ages; age++)
             {
-                int i_age_year = year * population->nages + age;
+                int i_age_year = year * population->n_ages + age;
                 // Call FIMS CalculateMortality() function to compare FIMS mortality values with "true" values later
                 catch_at_age_model->CalculateMortality(population, i_age_year, year, age);
 
@@ -24,15 +24,15 @@ namespace
             }
         }
 
-        std::vector<double> mortality_F(population->nages * population->nyears, 0.0); // n_ages should be defined appropriately
-        std::vector<double> mortality_Z(population->nages * population->nyears, 0.0);
-        for (int year = 0; year < population->nyears; year++)
+        std::vector<double> mortality_F(population->n_ages * population->n_years, 0.0); // n_ages should be defined appropriately
+        std::vector<double> mortality_Z(population->n_ages * population->n_years, 0.0);
+        for (int year = 0; year < population->n_years; year++)
         {
-            for (int age = 0; age < population->nages; age++)
+            for (int age = 0; age < population->n_ages; age++)
             {
-                int i_age_year = year * population->nages + age;
+                int i_age_year = year * population->n_ages + age;
 
-                for (int fleet_index = 0; fleet_index < population->nfleets; fleet_index++)
+                for (int fleet_index = 0; fleet_index < population->n_fleets; fleet_index++)
                 {
                     // Known values were used to generate "true" value and test CalculateMortality()
                     mortality_F[i_age_year] += population->fleets[fleet_index]->Fmort[year] *
@@ -55,13 +55,13 @@ namespace
         size_t pop_id = population->GetId();
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
-        std::vector<double> numbers_at_age(nyears * nages, 0);
+        std::vector<double> numbers_at_age(n_years * n_ages, 0);
 
-        for (int year = 0; year < population->nyears; year++)
+        for (int year = 0; year < population->n_years; year++)
         {
-            for (int age = 0; age < population->nages; age++)
+            for (int age = 0; age < population->n_ages; age++)
             {
-                int i_age_year = year * population->nages + age;
+                int i_age_year = year * population->n_ages + age;
 
                 catch_at_age_model->CalculateInitialNumbersAA(population, i_age_year, age);
 
@@ -73,17 +73,17 @@ namespace
 
     TEST_F(CAAEvaluateTestFixture, CalculateUnfishedNumbersAAandUnfishedSpawningBiomass_works)
     {
-        std::vector<double> test_unfished_numbers_at_age((nyears + 1) * nages, 0);
-        std::vector<double> test_unfished_spawning_biomass(nyears+1, 0);
+        std::vector<double> test_unfished_numbers_at_age((n_years + 1) * n_ages, 0);
+        std::vector<double> test_unfished_spawning_biomass(n_years+1, 0);
         
         size_t pop_id = population->GetId();
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
-        for (int year = 0; year < (population->nyears + 1); year++)
+        for (int year = 0; year < (population->n_years + 1); year++)
         {
-            for (int age = 0; age < population->nages; age++)
+            for (int age = 0; age < population->n_ages; age++)
             {
-                int i_age_year = year * population->nages + age;
+                int i_age_year = year * population->n_ages + age;
 
                 if (age == 0)
                 {            
@@ -104,7 +104,7 @@ namespace
 
                 if (year>0 && age > 0)
                 {
-                    int i_agem1_yearm1 = (year - 1) * population->nages + (age - 1);
+                    int i_agem1_yearm1 = (year - 1) * population->n_ages + (age - 1);
                     EXPECT_GT(population->M[i_agem1_yearm1], 0.0);
                     // values from FIMS
                     catch_at_age_model->CalculateUnfishedNumbersAA(population,i_age_year, i_agem1_yearm1, age);
@@ -115,12 +115,12 @@ namespace
                         fims_math::exp(-fims_math::exp(population->log_M[i_agem1_yearm1]));
                 }
 
-                if(age==(population->nages-1)){
+                if(age==(population->n_ages-1)){
                     int i_agem1_yearm1 = 0;
                     if(year == 0){
                         i_agem1_yearm1 = (age - 1);
                     } else{
-                        i_agem1_yearm1 = (year - 1) * population->nages + (age - 1);
+                        i_agem1_yearm1 = (year - 1) * population->n_ages + (age - 1);
                     }
                         test_unfished_numbers_at_age[i_age_year] = 
                         test_unfished_numbers_at_age[i_age_year] +

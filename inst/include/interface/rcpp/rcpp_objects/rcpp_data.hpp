@@ -162,7 +162,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
     ss << " \"id\":" << this->id << ",\n";
     ss << " \"type\": \"data\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [" << "\"nages\", \"nyears\"" << "],\n";
+    ss << "  \"header\": [" << "\"n_ages\", \"n_years\"" << "],\n";
     ss << "  \"dimensions\": [" << amax << ", " << ymax << "]\n},\n";
     ss << " \"value\": [";
     for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++) {
@@ -302,7 +302,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     ss << " \"id\":" << this->id << ",\n";
     ss << " \"type\": \"data\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [" << "\"nlengths\", \"nyears\"" << "],\n";
+    ss << "  \"header\": [" << "\"n_lengths\", \"n_years\"" << "],\n";
     ss << "  \"dimensions\": [" << lmax << ", " << ymax << "]\n},\n";
     ss << " \"value\": [";
     for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++) {
@@ -429,7 +429,7 @@ class IndexDataInterface : public DataInterfaceBase {
     ss << " \"id\": " << this->id << ",\n";
     ss << " \"type\": \"data\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [" << "\"nyears\"" << "],\n";
+    ss << "  \"header\": [" << "\"n_years\"" << "],\n";
     ss << "  \"dimensions\": [" << ymax << "]\n},\n";
     ss << " \"value\": [";
     for (R_xlen_t i = 0; i < index_data.size() - 1; i++) {
@@ -557,7 +557,7 @@ class LandingsDataInterface : public DataInterfaceBase {
     ss << " \"id\": " << this->id << ",\n";
     ss << " \"type\": \"data\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [" << "\"nyears\"" << "],\n";
+    ss << "  \"header\": [" << "\"n_years\"" << "],\n";
     ss << "  \"dimensions\": [" << ymax << "]\n},\n";
     ss << " \"value\": [";
     for (R_xlen_t i = 0; i < landings_data.size() - 1; i++) {

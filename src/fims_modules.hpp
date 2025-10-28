@@ -215,7 +215,7 @@ RCPP_MODULE(fims) {
       .field("log_expected_recruitment",
              &BevertonHoltRecruitmentInterface::log_expected_recruitment,
              "expected recruitment as a random effect on the natural log scale")
-      .field("nyears", &BevertonHoltRecruitmentInterface::nyears,
+      .field("n_years", &BevertonHoltRecruitmentInterface::n_years,
              "Number of years")
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
       .method("SetRecruitmentProcessID",
@@ -239,9 +239,9 @@ RCPP_MODULE(fims) {
       .constructor()
       .field("log_q", &FleetInterface::log_q)
       .field("log_Fmort", &FleetInterface::log_Fmort)
-      .field("nages", &FleetInterface::nages)
-      .field("nyears", &FleetInterface::nyears)
-      .field("nlengths", &FleetInterface::nlengths)
+      .field("n_ages", &FleetInterface::n_ages)
+      .field("n_years", &FleetInterface::n_years)
+      .field("n_lengths", &FleetInterface::n_lengths)
       .field("observed_landings_units",
              &FleetInterface::observed_landings_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
@@ -297,16 +297,16 @@ RCPP_MODULE(fims) {
   Rcpp::class_<PopulationInterface>("Population")
       .constructor()
       .method("get_id", &PopulationInterface::get_id, "get population ID")
-      .field("nages", &PopulationInterface::nages, "number of ages")
-      .field("nfleets", &PopulationInterface::nfleets, "number of fleets")
-      .field("nyears", &PopulationInterface::nyears, "number of years")
-      .field("nlengths", &PopulationInterface::nlengths, "number of lengths")
+      .field("n_ages", &PopulationInterface::n_ages, "number of ages")
+      .field("n_fleets", &PopulationInterface::n_fleets, "number of fleets")
+      .field("n_years", &PopulationInterface::n_years, "number of years")
+      .field("n_lengths", &PopulationInterface::n_lengths, "number of lengths")
       .field("log_M", &PopulationInterface::log_M,
              "natural log of the natural mortality of the population")
       .field("log_init_naa", &PopulationInterface::log_init_naa,
              "natural log of the initial numbers at age")
       .field("ages", &PopulationInterface::ages,
-             "vector of ages in the population; length nages")
+             "vector of ages in the population; length n_ages")
       .method("evaluate", &PopulationInterface::evaluate,
               "evaluate the population function")
       .method("SetMaturityID", &PopulationInterface::SetMaturityID,

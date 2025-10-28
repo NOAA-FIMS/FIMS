@@ -96,7 +96,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   /**
    * @brief The number of years.
    */
-  SharedInt nyears;
+  SharedInt n_years;
   /**
    * @brief The logistic transformation of steepness (h; productivity of the
    * population), where the parameter is transformed to constrain it between
@@ -150,7 +150,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   BevertonHoltRecruitmentInterface(
       const BevertonHoltRecruitmentInterface &other)
       : RecruitmentInterfaceBase(other),
-        nyears(other.nyears),
+        n_years(other.n_years),
         logit_steep(other.logit_steep),
         log_rzero(other.log_rzero),
         log_devs(other.log_devs),
@@ -338,7 +338,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     ss << "   \"id\":" << this->log_devs.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [\"nyears-1\"],\n";
+    ss << "  \"header\": [\"n_years-1\"],\n";
     ss << "  \"dimensions\": [" << this->log_devs.size() << "]\n},\n";
     ss << "   \"values\":" << this->log_devs << "}]\n";
     ss << "}";
@@ -447,8 +447,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
     // set log_expected_recruitment
-    recruitment->log_expected_recruitment.resize(this->nyears.get() + 1);
-    for (size_t i = 0; i < this->nyears.get() + 1; i++) {
+    recruitment->log_expected_recruitment.resize(this->n_years.get() + 1);
+    for (size_t i = 0; i < this->n_years.get() + 1; i++) {
       recruitment->log_expected_recruitment[i] = 0;
     }
     info->variable_map[this->log_expected_recruitment.id_m] =

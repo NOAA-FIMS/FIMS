@@ -39,13 +39,12 @@
 #' )
 #' }
 validate_fims <- function(
-  report,
-  estimates,
-  om_input,
-  om_output,
-  em_input,
-  use_fimsfit = FALSE
-) {
+    report,
+    estimates,
+    om_input,
+    om_output,
+    em_input,
+    use_fimsfit = FALSE) {
   # Helper function to validate estimates against expected values
   validate_error <- function(expected,
                              param_name,
@@ -243,16 +242,15 @@ validate_fims <- function(
 #' )
 #' }
 verify_fims_deterministic <- function(
-  report,
-  estimates,
-  om_input,
-  om_output,
-  em_input,
-  use_fimsfit = FALSE
-) {
-  nyears <- om_input[["nyr"]]
-  nages <- om_input[["nages"]]
-  dim <- nyears * nages
+    report,
+    estimates,
+    om_input,
+    om_output,
+    em_input,
+    use_fimsfit = FALSE) {
+  n_years <- om_input[["nyr"]]
+  n_ages <- om_input[["nages"]]
+  dim <- n_years * n_ages
   # Compare log(R0) to true value
   if (use_fimsfit) {
     fims_logR0 <- estimates |>
@@ -276,13 +274,13 @@ verify_fims_deterministic <- function(
 
   #' @description Test that the biomass values from report are equal to the true values.
   expect_equal(
-    report[["biomass"]][[1]][1:nyears],
+    report[["biomass"]][[1]][1:n_years],
     c(t(om_output[["biomass.mt"]]))
   )
 
   #' @description Test that the spawning biomass values from report are equal to the true values.
   expect_equal(
-    report[["spawning_biomass"]][[1]][1:nyears],
+    report[["spawning_biomass"]][[1]][1:n_years],
     c(t(om_output[["SSB"]]))
   )
 
@@ -293,7 +291,7 @@ verify_fims_deterministic <- function(
   )
   #' @description Test that the recruitment values from report are equal to the true values.
   expect_equal(
-    report[["expected_recruitment"]][[1]][1:nyears],
+    report[["expected_recruitment"]][[1]][1:n_years],
     fims_naa[, 1]
   )
 

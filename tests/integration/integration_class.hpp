@@ -93,7 +93,7 @@ public:
             fims::JsonValue &output) {
 
         std::cout << input.GetType() << "\n";
-        size_t nfleets, nsurveys, nages, nyears;
+        size_t n_fleets, nsurveys, n_ages, n_years;
 
         std::cout << input.GetDouble() << "\n";
         if (input.GetType() == fims::JsonValueType::Object && output.GetType() == fims::JsonValueType::Object) {
@@ -108,12 +108,12 @@ public:
                 fims::JsonValue e = (*it).second;
                 if (e.GetType() == fims::JsonValueType::JArray) {
                     fims::JsonArray a = e.GetArray();
-                    nyears = a[0].GetInt();
+                    n_years = a[0].GetInt();
                 }
 
 
                 if (print_statements) {
-                    std::cout << "nyr " << nyears << std::endl;
+                    std::cout << "nyr " << n_years << std::endl;
                 }
             } else {
                 if (print_statements) {
@@ -123,21 +123,21 @@ public:
 
             //            typename JsonObject::iterator it;
 
-            it = obj.find("nages");
+            it = obj.find("n_ages");
             if (it != obj.end()) {
                 fims::JsonValue e = (*it).second;
                 if (e.GetType() == fims::JsonValueType::JArray) {
                     fims::JsonArray a = e.GetArray();
-                    nages = a[0].GetInt();
+                    n_ages = a[0].GetInt();
                 }
 
 
                 if (print_statements) {
-                    std::cout << "nages " << nages << std::endl;
+                    std::cout << "n_ages " << n_ages << std::endl;
                 }
             } else {
                 if (print_statements) {
-                    std::cout << "nages not found in input\n";
+                    std::cout << "n_ages not found in input\n";
                 }
             }
 
@@ -147,19 +147,19 @@ public:
                 fims::JsonValue e = (*it).second;
                 if (e.GetType() == fims::JsonValueType::JArray) {
                     fims::JsonArray a = e.GetArray();
-                    nfleets = a[0].GetInt();
+                    n_fleets = a[0].GetInt();
                 }
 
                 if (print_statements) {
-                    std::cout << "nfleets " << nfleets << std::endl;
+                    std::cout << "n_fleets " << n_fleets << std::endl;
                 }
 
-                for (size_t i = 0; i < nfleets; i++) {
+                for (size_t i = 0; i < n_fleets; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > f = std::make_shared<fims_popdy::Fleet<double> >();
                     f->log_q.resize(1);
-                    f->Initialize(nyears, nages);
-                  //  f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
-                  //  f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
+                    f->Initialize(n_years, n_ages);
+                  //  f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(n_years);
+                  //  f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(n_years, n_ages);
 
                     std::stringstream strs;
                     strs << "fleet" << i + 1;
@@ -288,7 +288,7 @@ public:
 
             } else {
                 if (print_statements) {
-                    std::cout << "nfleets not found in input\n";
+                    std::cout << "n_fleets not found in input\n";
                 }
             }
 
@@ -307,9 +307,9 @@ public:
                 for (size_t i = 0; i < nsurveys; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > s = std::make_shared<fims_popdy::Fleet<double> >();
                     s->log_q.resize(1);
-                    s->Initialize(nyears, nages);
-                 //   s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(nyears);
-                  //  s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(nyears, nages);
+                    s->Initialize(n_years, n_ages);
+                 //   s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(n_years);
+                  //  s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(n_years, n_ages);
 
                     std::stringstream strs;
                     strs << "survey" << i + 1;
@@ -413,7 +413,7 @@ public:
                         }
                     }
 
-                    for (int i = 0; i < nyears; i++) {
+                    for (int i = 0; i < n_years; i++) {
                         s->log_Fmort[i] = -200.0;
                         s->Fmort[i] = std::exp(-200.0);
                         
@@ -432,11 +432,11 @@ public:
                 }
             }
 
-            pop.nfleets = pop.fleets.size();
+            pop.n_fleets = pop.fleets.size();
 
             // initialize population
-            pop.numbers_at_age.resize((nyears + 1) * nages);
-            pop.Initialize(nyears, 1, nages);
+            pop.numbers_at_age.resize((n_years + 1) * n_ages);
+            pop.Initialize(n_years, 1, n_ages);
 
             // Set initial size to value from MCP C0
             it = obj2.find("N.age");
@@ -445,7 +445,7 @@ public:
                     fims::JsonArray n = (*it).second.GetArray();
                     if (n[0].GetType() == fims::JsonValueType::JArray) {
                         fims::JsonArray init_n = n[0].GetArray();
-                        for (size_t i = 0; i < pop.nages; i++) {
+                        for (size_t i = 0; i < pop.n_ages; i++) {
                             pop.log_init_naa[i] = std::log(init_n[i].GetDouble());
                         }
                     }
@@ -566,10 +566,10 @@ public:
 
             it = obj.find("logR.resid");
             /*the log_recruit_dev vector does not include a value for year == 0
-              and is of length nyears - 1 where the first position of the vector
+              and is of length n_years - 1 where the first position of the vector
               corresponds to the second year of the time series.*/
-            rec->log_recruit_devs.resize(nyears);           
-            rec->log_expected_recruitment.resize(nyears+1);
+            rec->log_recruit_devs.resize(n_years);           
+            rec->log_expected_recruitment.resize(n_years+1);
             std::fill(rec->log_recruit_devs.begin(), rec->log_recruit_devs.end(), 0.0);
             std::fill(rec->log_expected_recruitment.begin(), rec->log_expected_recruitment.end(), 0.0);
             if (it != obj.end()) {
@@ -682,12 +682,12 @@ public:
         if (print_statements) {
             std::cout << "Numbers at age:\n";
         }
-        for (int i = 0; i < pop.nyears; i++) {
-            for (int j = 0; j < pop.nages; j++) {
+        for (int i = 0; i < pop.n_years; i++) {
+            for (int j = 0; j < pop.n_ages; j++) {
                 if (print_statements) {
-                    std::cout << pop.numbers_at_age[i * pop.nages + j] << " ";
+                    std::cout << pop.numbers_at_age[i * pop.n_ages + j] << " ";
                 }
-                array.push_back(pop.numbers_at_age[i * pop.nages + j]);
+                array.push_back(pop.numbers_at_age[i * pop.n_ages + j]);
             }
             if (print_statements) {
                 std::cout << std::endl;

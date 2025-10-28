@@ -262,17 +262,16 @@ get_expected_name <- function(family, data_type) {
 #' )
 #' }
 initialize_data_distribution <- function(
-  module,
-  family = NULL,
-  # Create a tibble with value and estimation_type column for sd
-  sd = tibble::tibble(
-    value = 1,
-    estimation_type = "constant"
-  ),
-  # FIXME: Move this argument to second to match where par is in
-  # initialize_process_distribution
-  data_type = c("landings", "index", "agecomp", "lengthcomp")
-) {
+    module,
+    family = NULL,
+    # Create a tibble with value and estimation_type column for sd
+    sd = tibble::tibble(
+      value = 1,
+      estimation_type = "constant"
+    ),
+    # FIXME: Move this argument to second to match where par is in
+    # initialize_process_distribution
+    data_type = c("landings", "index", "agecomp", "lengthcomp")) {
   data_type <- rlang::arg_match(data_type)
   # FIXME: Make the available families a data object
   # Could also make the matrix of distributions available per type as a
@@ -358,15 +357,14 @@ initialize_data_distribution <- function(
 #' @keywords distribution
 #' @export
 initialize_process_distribution <- function(
-  module,
-  par,
-  family = NULL,
-  sd = tibble::tibble(
-    value = 1,
-    estimation_type = "constant"
-  ),
-  is_random_effect = FALSE
-) {
+    module,
+    par,
+    family = NULL,
+    sd = tibble::tibble(
+      value = 1,
+      estimation_type = "constant"
+    ),
+    is_random_effect = FALSE) {
   # validity check on user input
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
