@@ -8,16 +8,16 @@ namespace
     TEST_F(CAAEvaluateTestFixture, CalculateLandings_works)
     {
 
-        std::vector<double> landings_expected(nyears * nfleets, 0);
+        std::vector<double> landings_expected(n_years * n_fleets, 0);
         // calculate landings numbers at age in population module
          catch_at_age_model->CalculateLandingsNumbersAA(population, i_age_year, year, age);
 
         catch_at_age_model->CalculateLandingsWeightAA(population, year, age);
         catch_at_age_model->CalculateLandings(population, year, age);
 
-        for (int fleet_ = 0; fleet_ < population->nfleets; fleet_++)
+        for (int fleet_ = 0; fleet_ < population->n_fleets; fleet_++)
         {
-            int index_yf = year * population->nfleets + fleet_;
+            int index_yf = year * population->n_fleets + fleet_;
             uint32_t fleet_id = population->fleets[fleet_]->GetId();
             auto& dq_fleet = catch_at_age_model->GetFleetDerivedQuantities(fleet_id);
 

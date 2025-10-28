@@ -57,11 +57,11 @@ test_that("prior predictive check", {
   # Initialize the fishing fleet module
   fishing_fleet <- methods::new(Fleet)
   # Set number of years
-  fishing_fleet$nyears$set(om_input[["nyr"]])
+  fishing_fleet$n_years$set(om_input[["nyr"]])
   # Set number of age classes
-  fishing_fleet$nages$set(om_input[["nages"]])
+  fishing_fleet$n_ages$set(om_input[["nages"]])
   # Set number of length bins
-  fishing_fleet$nlengths$set(om_input[["nlengths"]])
+  fishing_fleet$n_lengths$set(om_input[["nlengths"]])
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
@@ -125,9 +125,9 @@ test_that("prior predictive check", {
   survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
   survey_fleet <- methods::new(Fleet)
-  survey_fleet$nages$set(om_input[["nages"]])
-  survey_fleet$nyears$set(om_input[["nyr"]])
-  survey_fleet$nlengths$set(om_input[["nlengths"]])
+  survey_fleet$n_ages$set(om_input[["nages"]])
+  survey_fleet$n_years$set(om_input[["nyr"]])
+  survey_fleet$n_lengths$set(om_input[["nlengths"]])
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
   survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
@@ -187,7 +187,7 @@ test_that("prior predictive check", {
     recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
   recruitment$log_devs$set_all_estimable(TRUE)
-  recruitment$nyears$set(om_input[["nyr"]])
+  recruitment$n_years$set(om_input[["nyr"]])
   recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
   recruitment_distribution <- methods::new(DnormDistribution)
   # set up logR_sd using the normal log_sd parameter
@@ -235,14 +235,14 @@ test_that("prior predictive check", {
     population$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
   }
   population$log_init_naa$set_all_estimable(TRUE)
-  population$nages$set(om_input[["nages"]])
+  population$n_ages$set(om_input[["nages"]])
   population$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
     \(x) population$ages$set(x - 1, om_input[["ages"]][x])
   )
-  population$nfleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
-  population$nyears$set(om_input[["nyr"]])
+  population$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
+  population$n_years$set(om_input[["nyr"]])
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())
   population$SetMaturityID(maturity$get_id())

@@ -330,19 +330,23 @@ dimension_folded_to_tibble <- function(section) {
 #' @noRd
 #' @examples
 #' dummy_dimensions <- list(
-#'   header = list("nyears", "nages"),
+#'   header = list("n_years", "n_ages"),
 #'   dimensions = list(30L, 12L)
 #' )
 #' dimensions_to_tibble(dummy_dimensions)
-#' # Example with nyears+1
+#' # Example with n_years+1
 #' dummy_dimensions <- list(
-#'   header = list("nyears+1", "nages"),
+#'   header = list("n_years+1", "n_ages"),
 #'   dimensions = list(31L, 12L)
 #' )
 #' dimensions_to_tibble(dummy_dimensions)
 dimensions_to_tibble <- function(data) {
+  #' Replace headers like "n_years" with "year_i".
+  #' Example: "n_ages+1" → "age_i"
+  #' This matches names starting with 'n' (with or without an underscore)
+  #' and shortens them to a simple indexed form.
   better_names <- unlist(data[["header"]]) |>
-    gsub(pattern = "^n(.+)s([-\\+]\\d+)?$", replacement = "\\1_i")
+    gsub(pattern = "^n_?(.+?)s([-\\+]\\d+)?$", replacement = "\\1_i")
   names(data[["dimensions"]]) <- better_names
   if (length(better_names) == 0) {
     # When the header is NULL

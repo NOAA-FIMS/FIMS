@@ -50,24 +50,24 @@ namespace
 
                 // declare unfished numbers at age 1, unfished spawning biomass,
                 // and unfished biomass
-                std::vector<double> expected_unfished_numbers_at_age1(pop.nyears, 0.0);
-                std::vector<double> expected_unfished_spawning_biomass(pop.nyears, 0.0);
-                std::vector<double> expected_unfished_biomass(pop.nyears, 0.0);
+                std::vector<double> expected_unfished_numbers_at_age1(pop.n_years, 0.0);
+                std::vector<double> expected_unfished_spawning_biomass(pop.n_years, 0.0);
+                std::vector<double> expected_unfished_biomass(pop.n_years, 0.0);
 
                 // declare vector of doubles to hold
                 // biomass, spawning biomass, unfished spawning biomass,
                 // expected landings in weight, expected index
-                std::vector<double> expected_biomass(pop.nyears, 0.0);
-                std::vector<double> expected_spawning_biomass(pop.nyears, 0.0);
-                std::vector<double> landings_expected(pop.nyears, 0.0);
-                std::vector<double> index_expected(pop.nyears, 0.0);
+                std::vector<double> expected_biomass(pop.n_years, 0.0);
+                std::vector<double> expected_spawning_biomass(pop.n_years, 0.0);
+                std::vector<double> landings_expected(pop.n_years, 0.0);
+                std::vector<double> index_expected(pop.n_years, 0.0);
 
                 // declare vector of doubles to hold dimension folded
                 // numbers at age,
                 // fishing mortality at age, and total mortality at age
-                std::vector<double> expected_numbers_at_age(pop.nages * pop.nyears, 0.0);
-                std::vector<double> expected_mortality_F(pop.nages * pop.nyears, 0.0);
-                std::vector<double> expected_mortality_Z(pop.nages * pop.nyears, 0.0);
+                std::vector<double> expected_numbers_at_age(pop.n_ages * pop.n_years, 0.0);
+                std::vector<double> expected_mortality_F(pop.n_ages * pop.n_years, 0.0);
+                std::vector<double> expected_mortality_Z(pop.n_ages * pop.n_years, 0.0);
 
                 // Test unfished numbers at age, unfished spawning biomass,
                 // and unfished biomass
@@ -82,11 +82,11 @@ namespace
                 fims::JsonArray &Phi0 = (*it).second.GetArray();
                 double phi_0 = Phi0[0].GetDouble();
 
-                for (int year = 0; year < pop.nyears; year++)
+                for (int year = 0; year < pop.n_years; year++)
                 {
-                    for (int age = 0; age < pop.nages; age++)
+                    for (int age = 0; age < pop.n_ages; age++)
                     {
-                        int i_age_year = year * pop.nages + age;
+                        int i_age_year = year * pop.n_ages + age;
 
                         // Expect FIMS value is greater than 0.0
                         EXPECT_GT(pop.unfished_numbers_at_age[i_age_year], 0.0)
@@ -104,18 +104,18 @@ namespace
                     }
                 }
 
-                for (int age = 0; age < pop.nages; age++)
+                for (int age = 0; age < pop.n_ages; age++)
                 {
-                    int i_age_year = pop.nyears * pop.nages + age;
+                    int i_age_year = pop.n_years * pop.n_ages + age;
                     EXPECT_GT(pop.unfished_numbers_at_age[i_age_year], 0.0)
-                        << "differ at index " << i_age_year << "; year " << pop.nyears + 1 << "; age" << age;
+                        << "differ at index " << i_age_year << "; year " << pop.n_years + 1 << "; age" << age;
                 }
 
-                EXPECT_GT(pop.unfished_spawning_biomass[pop.nyears], 0.0)
-                    << "differ at year " << pop.nyears + 1;
+                EXPECT_GT(pop.unfished_spawning_biomass[pop.n_years], 0.0)
+                    << "differ at year " << pop.n_years + 1;
 
-                EXPECT_GT(pop.unfished_biomass[pop.nyears], 0.0)
-                    << "differ at year " << pop.nyears + 1;
+                EXPECT_GT(pop.unfished_biomass[pop.n_years], 0.0)
+                    << "differ at year " << pop.n_years + 1;
 
                 // Test spawning biomass
                 // find the OM json member called "SSB"
@@ -124,7 +124,7 @@ namespace
                 if (it != output.end())
                 {
                     fims::JsonArray &e = (*it).second.GetArray();
-                    for (int year = 0; year < pop.nyears; year++)
+                    for (int year = 0; year < pop.n_years; year++)
                     {
                         expected_spawning_biomass[year] = e[year].GetDouble();
                         // Expect the difference between FIMS value and the
@@ -144,8 +144,8 @@ namespace
                             << "year " << year;
                     }
                 }
-                EXPECT_GT(pop.spawning_biomass[pop.nyears], 0.0)
-                    << "year " << pop.nyears + 1;
+                EXPECT_GT(pop.spawning_biomass[pop.n_years], 0.0)
+                    << "year " << pop.n_years + 1;
 
                 // Test biomass
                 // find the OM json member called "Biomass"
@@ -154,7 +154,7 @@ namespace
                 if (it != output.end())
                 {
                     fims::JsonArray &e = (*it).second.GetArray();
-                    for (int year = 0; year < pop.nyears; year++)
+                    for (int year = 0; year < pop.n_years; year++)
                     {
                         expected_biomass[year] = e[year].GetDouble();
 
@@ -172,8 +172,8 @@ namespace
                             << "year " << year;
                     }
                 }
-                EXPECT_GT(pop.biomass[pop.nyears], 0.0)
-                    << "year " << pop.nyears + 1;
+                EXPECT_GT(pop.biomass[pop.n_years], 0.0)
+                    << "year " << pop.n_years + 1;
 
                 // Test expected landings
                 it = output.find("L.mt");
@@ -183,7 +183,7 @@ namespace
                     typename fims::JsonObject::iterator fleet1;
                     fleet1 = it->second.GetObject().find("fleet1");
                     fims::JsonArray &fleet_landings = (*fleet1).second.GetArray();
-                    for (int year = 0; year < pop.nyears; year++)
+                    for (int year = 0; year < pop.n_years; year++)
                     {
                         landings_expected[year] = fleet_landings[year].GetDouble();
                         // Expect the difference between FIMS and OM is less than 1 mt
@@ -228,7 +228,7 @@ namespace
                     //I'm removing the is_survey check here because it is
                     //no longer a field of the fleet class. If we change the
                     //test fleets this may cause an error in the future.
-                    for (int year = 0; year < pop.nyears; year++)
+                    for (int year = 0; year < pop.n_years; year++)
                     {
                         // Expect catchability of the fishing fleet = 1.0
                         // Expect expected index of the fishing fleet to be
@@ -260,11 +260,11 @@ namespace
                                 if (it != output.end())
                 {
                     fims::JsonArray &e = (*it).second.GetArray();
-                    for (int year = 0; year < pop.nyears; year++)
+                    for (int year = 0; year < pop.n_years; year++)
                     {
-                        for (int age = 0; age < pop.nages; age++)
+                        for (int age = 0; age < pop.n_ages; age++)
                         {
-                            int i_age_year = year * pop.nages + age;
+                            int i_age_year = year * pop.n_ages + age;
                             expected_numbers_at_age[i_age_year] = e[year].GetArray()[age].GetDouble();
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
@@ -286,13 +286,13 @@ namespace
                         }
                     }
                 }
-                // Test numbers at age in year pop.nyear+1
-                for (int age = 0; age < pop.nages; age++)
+                // Test numbers at age in year pop.n_year+1
+                for (int age = 0; age < pop.n_ages; age++)
                 {
 
-                    int i_age_year = pop.nyears * pop.nages + age;
+                    int i_age_year = pop.n_years * pop.n_ages + age;
                     EXPECT_GT(pop.numbers_at_age[i_age_year], 0.0)
-                        << "differ at index " << i_age_year << "; year " << pop.nyears + 1 << "; age " << age;
+                        << "differ at index " << i_age_year << "; year " << pop.n_years + 1 << "; age " << age;
                 }
           
                 
@@ -302,11 +302,11 @@ namespace
                 if (it != output.end())
                 {
                     fims::JsonArray &e = (*it).second.GetArray();
-                    for (int year = 0; year < pop.nyears; year++)
+                    for (int year = 0; year < pop.n_years; year++)
                     {
-                        for (int age = 0; age < pop.nages; age++)
+                        for (int age = 0; age < pop.n_ages; age++)
                         {
-                            int i_age_year = year * pop.nages + age;
+                            int i_age_year = year * pop.n_ages + age;
                             expected_mortality_F[i_age_year] = e[year].GetArray()[age].GetDouble();
                             // Expect the difference between FIMS value and the
                             // expected value from the MCP OM
@@ -326,16 +326,16 @@ namespace
                 if (it != input.end())
                 {
                     fims::JsonArray &e = (*it).second.GetArray();
-                    for (int year = 0; year < pop.nyears; year++)
+                    for (int year = 0; year < pop.n_years; year++)
                     {
-                        for (int age = 0; age < pop.nages; age++)
+                        for (int age = 0; age < pop.n_ages; age++)
                         {
-                            int i_age_year = year * pop.nages + age;
-                            int i_agem1_yearm1 = (year - 1) * pop.nages + (age - 1);
+                            int i_age_year = year * pop.n_ages + age;
+                            int i_agem1_yearm1 = (year - 1) * pop.n_ages + (age - 1);
                             expected_mortality_Z[i_age_year] = expected_mortality_F[i_age_year] + e[age].GetDouble();
                             // Check numbers at age mismatch issue
                             // FIMS output
-                            if (age < (pop.nages - 1)) // Ignore plus group
+                            if (age < (pop.n_ages - 1)) // Ignore plus group
                             {
                                     integration_test_log << "year " << year << " age " << age << " i_age_year " << i_age_year << " FIMS: " << pop.numbers_at_age[i_agem1_yearm1] << "*exp(-" << pop.mortality_Z[i_agem1_yearm1] << ")=" << pop.numbers_at_age[i_agem1_yearm1] * exp(-pop.mortality_Z[i_agem1_yearm1]) << " pop.numbers_at_age[i_age_year] " << pop.numbers_at_age[i_age_year] << " MCP OM: " << expected_numbers_at_age[i_agem1_yearm1] << "*exp(-" << expected_mortality_Z[i_agem1_yearm1] << ")=" << expected_numbers_at_age[i_agem1_yearm1] * exp(-expected_mortality_Z[i_agem1_yearm1]) << " expected_numbers_at_age[i_age_year] " << expected_numbers_at_age[i_age_year] << std::endl;
                                 }

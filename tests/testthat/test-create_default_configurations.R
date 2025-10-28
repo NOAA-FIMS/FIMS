@@ -43,8 +43,13 @@ test_that("`create_default_configurations()` works with correct inputs", {
     expected = "catch_at_age"
   )
 
-  #' @description Test that the function produces a consistent output by comparing to a stored snapshot.
-  expect_snapshot_file(save_csv(default_configurations_unnested), "default_configurations.csv")
+  #' @description Test that the function produces a consistent output 
+  #' by comparing to a stored snapshot.
+  expect_snapshot_file(
+    save_csv(default_configurations_unnested),
+    "default_configurations.csv",
+    compare = compare_file_text
+  )
 })
 
 ## Edge handling ----

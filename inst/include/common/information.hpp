@@ -36,8 +36,8 @@ namespace fims_info {
 template <typename Type>
 class Information {
  public:
-  size_t nyears = 0; /**< number of years >*/
-  size_t nages = 0;  /**< number of ages>*/
+  size_t n_years = 0;   /**< number of years >*/
+  size_t n_ages = 0;    /**< number of ages>*/
 
   static std::shared_ptr<Information<Type>>
       fims_information;           /**< singleton instance >*/
@@ -168,8 +168,8 @@ class Information {
     this->recruitment_process_models.clear();
     this->selectivity_models.clear();
     this->models_map.clear();
-    this->nyears = 0;
-    this->nages = 0;
+    this->n_years = 0;
+    this->n_ages = 0;
 
     for (density_components_iterator it = density_components.begin();
          it != density_components.end(); ++it) {
@@ -220,8 +220,8 @@ class Information {
     ss << "selectivity_models: " << this->selectivity_models.size()
        << std::endl;
     ss << "models_map: " << this->models_map.size() << std::endl;
-    ss << "nyears: " << this->nyears << std::endl;
-    ss << "nages: " << this->nages << std::endl;
+    ss << "n_years: " << this->n_years << std::endl;
+    ss << "n_ages: " << this->n_ages << std::endl;
     ss << "density_components: " << this->density_components.size()
        << std::endl;
     return ss.str();
@@ -777,8 +777,8 @@ class Information {
       }
 
       // set information dimensions
-      this->nyears = std::max(this->nyears, p->nyears);
-      this->nages = std::max(this->nages, p->nages);
+      this->n_years = std::max(this->n_years, p->n_years);
+      this->n_ages = std::max(this->n_ages, p->n_ages);
 
       SetRecruitment(valid_model, p);
 
@@ -853,28 +853,28 @@ class Information {
    *
    * @return size_t
    */
-  size_t GetNages() const { return nages; }
+  size_t GetNages() const { return n_ages; }
 
   /**
    * @brief Set the Nages object
    *
-   * @param nages
+   * @param n_ages
    */
-  void SetNages(size_t nages) { this->nages = nages; }
+  void SetNages(size_t n_ages) { this->n_ages = n_ages; }
 
   /**
    * @brief Get the Nyears object
    *
    * @return size_t
    */
-  size_t GetNyears() const { return nyears; }
+  size_t GetNyears() const { return n_years; }
 
   /**
    * @brief Set the Nyears object
    *
-   * @param nyears
+   * @param n_years
    */
-  void SetNyears(size_t nyears) { this->nyears = nyears; }
+  void SetNyears(size_t n_years) { this->n_years = n_years; }
 
   /**
    * @brief Get the Parameters object

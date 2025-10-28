@@ -85,8 +85,8 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       module[["age_to_length_conversion"]]$set_all_random(FALSE)
     } else {
       module_fields <- setdiff(module_fields, c(
-        # Right now we can also remove nlengths because the default is 0
-        "nlengths"
+        # Right now we can also remove n_lengths because the default is 0
+        "n_lengths"
       ))
     }
 
@@ -111,8 +111,8 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   #     index and agecomp distributions. No input values are required.
 
   integer_fields <- c(
-    "nages", "nfleets", "nlengths",
-    "nyears"
+    "n_ages", "n_fleets", "n_lengths",
+    "n_years"
   )
 
   boolean_fields <- c(
@@ -127,15 +127,15 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     if (field %in% integer_fields) {
       module[[field]]$set(
         switch(field,
-          "nages" = get_n_ages(data),
-          "nfleets" = parameters |>
+          "n_ages" = get_n_ages(data),
+          "n_fleets" = parameters |>
             dplyr::filter(module_name == "Fleet") |>
             dplyr::pull(fleet_name) |>
             unique() |>
             length(),
           # Or we can use get_n_fleets(data),
-          "nlengths" = get_n_lengths(data),
-          "nyears" = get_n_years(data)
+          "n_lengths" = get_n_lengths(data),
+          "n_years" = get_n_years(data)
         )
       )
     } else if (field %in% c("ages", "weights")) {
@@ -180,11 +180,10 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
 #' The initialized distribution module as an object.
 #' @noRd
 initialize_distribution <- function(
-  module_input,
-  distribution_name,
-  distribution_type = c("data", "process"),
-  linked_ids
-) {
+    module_input,
+    distribution_name,
+    distribution_type = c("data", "process"),
+    linked_ids) {
   # Input checks
   # Check if distribution_name is provided
   if (is.null(distribution_name)) {

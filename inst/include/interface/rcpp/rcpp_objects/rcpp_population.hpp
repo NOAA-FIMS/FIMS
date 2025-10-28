@@ -88,11 +88,11 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The number of age bins.
    */
-  SharedInt nages = 0;
+  SharedInt n_ages = 0;
   /**
    * @brief The number of fleets.
    */
-  SharedInt nfleets;
+  SharedInt n_fleets;
   /**
    * list of fleets that operate on this population.
    */
@@ -104,11 +104,11 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The number of years.
    */
-  SharedInt nyears;
+  SharedInt n_years;
   /**
    * @brief The number of length bins.
    */
-  SharedInt nlengths;
+  SharedInt n_lengths;
   /**
    * @brief The ID of the maturity module.
    */
@@ -143,7 +143,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   ParameterVector log_r;
   /**
    * @brief Ages that are modeled in the population, the length of this vector
-   * should equal \"nages\".
+   * should equal \"n_ages\".
    */
   RealVector ages;
   /**
@@ -187,10 +187,10 @@ class PopulationInterface : public PopulationInterfaceBase {
   PopulationInterface(const PopulationInterface &other)
       : PopulationInterfaceBase(other),
         fleet_ids(other.fleet_ids),
-        nages(other.nages),
-        nfleets(other.nfleets),
-        nyears(other.nyears),
-        nlengths(other.nlengths),
+        n_ages(other.n_ages),
+        n_fleets(other.n_fleets),
+        n_years(other.n_years),
+        n_lengths(other.n_lengths),
         maturity_id(other.maturity_id),
         growth_id(other.growth_id),
         recruitment_id(other.recruitment_id),
@@ -351,15 +351,15 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     population->id = this->id;
-    population->nyears = this->nyears.get();
-    population->nfleets = this->nfleets.get();
-    // only define ages if nages greater than 0
-    if (this->nages.get() > 0) {
-      population->nages = this->nages.get();
-      if (this->nages.get() == this->ages.size()) {
-        population->ages.resize(this->nages.get());
+    population->n_years = this->n_years.get();
+    population->n_fleets = this->n_fleets.get();
+    // only define ages if n_ages greater than 0
+    if (this->n_ages.get() > 0) {
+      population->n_ages = this->n_ages.get();
+      if (this->n_ages.get() == this->ages.size()) {
+        population->ages.resize(this->n_ages.get());
       } else {
-        warning("The ages vector is not of size nages.");
+        warning("The ages vector is not of size n_ages.");
       }
     }
 
@@ -413,7 +413,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->ages[i] = this->ages[i];
     }
 
-    population->numbers_at_age.resize((nyears + 1) * nages);
+    population->numbers_at_age.resize((n_years + 1) * n_ages);
     info->variable_map[this->numbers_at_age.id_m] =
         &(population)->numbers_at_age;
 

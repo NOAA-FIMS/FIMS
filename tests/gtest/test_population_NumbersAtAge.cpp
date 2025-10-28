@@ -7,13 +7,13 @@ namespace
     TEST_F(CAAEvaluateTestFixture, CalculateNumbersAA_works)
     {
 
-        std::vector<double> mortality_F(nyears * nages, 0);
-        std::vector<double> test_naa((nyears + 1) * nages, 0);
+        std::vector<double> mortality_F(n_years * n_ages, 0);
+        std::vector<double> test_naa((n_years + 1) * n_ages, 0);
 
         size_t pop_id = population->GetId();
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
-        for (int i = 0; i < (nyears + 1) * nages; i++)
+        for (int i = 0; i < (n_years + 1) * n_ages; i++)
         {
             test_naa[i] = dq["numbers_at_age"][i];
         }
@@ -28,9 +28,9 @@ namespace
     {
 
         int year = 4;
-        int age = population->nages - 1;
-        int i_age_year = year * population->nages + age;
-        int i_agem1_yearm1 = (year - 1) * population->nages + age - 1;
+        int age = population->n_ages - 1;
+        int i_age_year = year * population->n_ages + age;
+        int i_agem1_yearm1 = (year - 1) * population->n_ages + age - 1;
 
         size_t pop_id = population->GetId();
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
@@ -38,10 +38,10 @@ namespace
         catch_at_age_model->CalculateMortality(population, i_age_year, year, age);
         catch_at_age_model->CalculateNumbersAA(population, i_age_year, i_agem1_yearm1, age);
 
-        std::vector<double> mortality_F(nyears * nages, 0);
-        std::vector<double> test_naa((nyears + 1) * nages, 0);
+        std::vector<double> mortality_F(n_years * n_ages, 0);
+        std::vector<double> test_naa((n_years + 1) * n_ages, 0);
 
-        for (int i = 0; i < (nyears + 1) * nages; i++)
+        for (int i = 0; i < (n_years + 1) * n_ages; i++)
         {
           test_naa[i] = dq["numbers_at_age"][i];
         }

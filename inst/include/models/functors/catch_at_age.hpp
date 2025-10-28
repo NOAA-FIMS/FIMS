@@ -126,10 +126,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
   virtual void Initialize() {
     for (size_t p = 0; p < this->populations.size(); p++) {
       this->populations[p]->proportion_female.resize(
-          this->populations[p]->nages);
+          this->populations[p]->n_ages);
 
-      this->populations[p]->M.resize(this->populations[p]->nyears *
-                                     this->populations[p]->nages);
+      this->populations[p]->M.resize(this->populations[p]->n_years *
+                                     this->populations[p]->n_ages);
     }
 
     for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
@@ -141,7 +141,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         fleet->log_q[0] = static_cast<Type>(0.0);
       }
       fleet->q.resize(fleet->log_q.size());
-      fleet->Fmort.resize(fleet->nyears);
+      fleet->Fmort.resize(fleet->n_years);
     }
   }
 
@@ -163,14 +163,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
       }
 
       // Prepare proportion_female
-      for (size_t age = 0; age < population->nages; age++) {
+      for (size_t age = 0; age < population->n_ages; age++) {
         population->proportion_female[age] = 0.5;
       }
 
       // Transformation Section
-      for (size_t age = 0; age < population->nages; age++) {
-        for (size_t year = 0; year < population->nyears; year++) {
-          size_t i_age_year = age * population->nyears + year;
+      for (size_t age = 0; age < population->n_ages; age++) {
+        for (size_t year = 0; year < population->n_years; year++) {
+          size_t i_age_year = age * population->n_years + year;
           population->M[i_age_year] =
               fims_math::exp(population->log_M[i_age_year]);
         }
@@ -192,7 +192,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         fleet->q[i] = fims_math::exp(fleet->log_q[i]);
       }
 
-      for (size_t year = 0; year < fleet->nyears; year++) {
+      for (size_t year = 0; year < fleet->n_years; year++) {
         fleet->Fmort[year] = fims_math::exp(fleet->log_Fmort[year]);
       }
       // // TODO: does this age_length_to_conversion need to be a dq and
@@ -268,7 +268,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         (fims_math::exp(-dq_["mortality_Z"][i_agem1_yearm1]));
 
     // Plus group calculation
-    if (age == (population->nages - 1)) {
+    if (age == (population->n_ages - 1)) {
       dq_["numbers_at_age"][i_age_year] =
           dq_["numbers_at_age"][i_age_year] +
           dq_["numbers_at_age"][i_agem1_yearm1 + 1] *
@@ -299,7 +299,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         (fims_math::exp(-population->M[i_agem1_yearm1]));
 
     // Plus group calculation
-    if (age == (population->nages - 1)) {
+    if (age == (population->n_ages - 1)) {
       dq_["unfished_numbers_at_age"][i_age_year] =
           dq_["unfished_numbers_at_age"][i_age_year] +
           dq_["unfished_numbers_at_age"][i_agem1_yearm1 + 1] *
@@ -322,7 +322,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+    for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       // evaluate is a member function of the selectivity class
       Type s = population->fleets[fleet_]->selectivity->evaluate(
           population->ages[age]);
@@ -430,27 +430,27 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    std::vector<Type> numbers_spr(population->nages, 1.0);
+    std::vector<Type> numbers_spr(population->n_ages, 1.0);
     Type phi_0 = 0.0;
     phi_0 += numbers_spr[0] * population->proportion_female[0] *
              dq_["proportion_mature_at_age"][0] *
              population->growth->evaluate(population->ages[0]);
-    for (size_t a = 1; a < (population->nages - 1); a++) {
+    for (size_t a = 1; a < (population->n_ages - 1); a++) {
       numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
       phi_0 += numbers_spr[a] * population->proportion_female[a] *
                dq_["proportion_mature_at_age"][a] *
                population->growth->evaluate(population->ages[a]);
     }
 
-    numbers_spr[population->nages - 1] =
-        (numbers_spr[population->nages - 2] *
-         fims_math::exp(-population->M[population->nages - 2])) /
-        (1 - fims_math::exp(-population->M[population->nages - 1]));
+    numbers_spr[population->n_ages - 1] =
+        (numbers_spr[population->n_ages - 2] *
+         fims_math::exp(-population->M[population->n_ages - 2])) /
+        (1 - fims_math::exp(-population->M[population->n_ages - 1]));
     phi_0 +=
-        numbers_spr[population->nages - 1] *
-        population->proportion_female[population->nages - 1] *
-        dq_["proportion_mature_at_age"][population->nages - 1] *
-        population->growth->evaluate(population->ages[population->nages - 1]);
+        numbers_spr[population->n_ages - 1] *
+        population->proportion_female[population->n_ages - 1] *
+        dq_["proportion_mature_at_age"][population->n_ages - 1] *
+        population->growth->evaluate(population->ages[population->n_ages - 1]);
 
     return phi_0;
   }
@@ -467,7 +467,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     Type phi0 = CalculateSBPR0(population);
 
-    if (i_dev == population->nyears) {
+    if (i_dev == population->n_years) {
       dq_["numbers_at_age"][i_age_year] =
           population->recruitment->evaluate_mean(
               dq_["spawning_biomass"][year - 1], phi0);
@@ -521,10 +521,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &pdq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+    for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
-      size_t i_age_year = year * population->nages + age;
+      size_t i_age_year = year * population->n_ages + age;
 
       pdq_["total_landings_weight"][year] +=
           fdq_["landings_weight_at_age"][i_age_year];
@@ -552,8 +552,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateLandingsWeightAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
       size_t age) {
-    int i_age_year = year * population->nages + age;
-    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+    int i_age_year = year * population->n_ages + age;
+    for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
@@ -577,7 +577,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &pdq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+    for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
@@ -601,7 +601,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   void CalculateIndex(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t i_age_year, size_t year, size_t age) {
-    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+    for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
@@ -625,7 +625,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &pdq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+    for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
@@ -647,8 +647,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateIndexWeightAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
       size_t age) {
-    int i_age_year = year * population->nages + age;
-    for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+    int i_age_year = year * population->n_ages + age;
+    for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
@@ -670,28 +670,28 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &pdq_ =
           this->GetPopulationDerivedQuantities(population->GetId());
 
-      for (size_t year = 0; year < population->nyears; year++) {
-        for (size_t fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+      for (size_t year = 0; year < population->n_years; year++) {
+        for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
           std::map<std::string, fims::Vector<Type>> &fdq_ =
               this->GetFleetDerivedQuantities(
                   population->fleets[fleet_]->GetId());
 
-          size_t index_yf = year * population->nfleets + fleet_;
+          size_t index_yf = year * population->n_fleets + fleet_;
           Type sum_age = 0.0;
           Type sum_length = 0.0;
-          for (size_t age = 0; age < population->nages; age++) {
-            size_t i_age_year = year * population->nages + age;
+          for (size_t age = 0; age < population->n_ages; age++) {
+            size_t i_age_year = year * population->n_ages + age;
             sum_age += fdq_["landings_numbers_at_age"][i_age_year];
           }
 
-          for (size_t age = 0; age < population->nages; age++) {
-            size_t i_age_year = year * population->nages + age;
+          for (size_t age = 0; age < population->n_ages; age++) {
+            size_t i_age_year = year * population->n_ages + age;
             fdq_["agecomp_proportion"][i_age_year] =
                 fdq_["landings_numbers_at_age"][i_age_year] / sum_age;
           }
 
-          if (population->fleets[fleet_]->nlengths > 0) {
-            for (size_t y = 0; y < population->fleets[fleet_]->nyears; y++) {
+          if (population->fleets[fleet_]->n_lengths > 0) {
+            for (size_t y = 0; y < population->fleets[fleet_]->n_years; y++) {
               fims::Vector<Type> &landings_numbers_at_length =
                   fdq_["landings_numbers_at_length"];
               fims::Vector<Type> &landings_numbers_at_age =
@@ -700,14 +700,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
                   fdq_["lengthcomp_proportion"];
 
               sum_length = 0.0;
-              for (size_t l = 0; l < population->fleets[fleet_]->nlengths;
+              for (size_t l = 0; l < population->fleets[fleet_]->n_lengths;
                    l++) {
                 size_t i_length_year =
-                    y * population->fleets[fleet_]->nlengths + l;
-                for (size_t a = 0; a < population->fleets[fleet_]->nages; a++) {
-                  size_t i_age_year = y * population->fleets[fleet_]->nages + a;
+                    y * population->fleets[fleet_]->n_lengths + l;
+                for (size_t a = 0; a < population->fleets[fleet_]->n_ages; a++) {
+                  size_t i_age_year = y * population->fleets[fleet_]->n_ages + a;
                   size_t i_length_age =
-                      a * population->fleets[fleet_]->nlengths + l;
+                      a * population->fleets[fleet_]->n_lengths + l;
                   fdq_["landings_numbers_at_length"][i_length_year] +=
                       fdq_["landings_numbers_at_age"][i_age_year] *
                       population->fleets[fleet_]
@@ -715,18 +715,18 @@ class CatchAtAge : public FisheryModelBase<Type> {
                 }
                 sum_length += fdq_["landings_numbers_at_length"][i_length_year];
               }
-              for (size_t l = 0; l < population->fleets[fleet_]->nlengths;
+              for (size_t l = 0; l < population->fleets[fleet_]->n_lengths;
                    l++) {
                 size_t i_length_year =
-                    y * population->fleets[fleet_]->nlengths + l;
+                    y * population->fleets[fleet_]->n_lengths + l;
                 fdq_["lengthcomp_proportion"][i_length_year] =
                     fdq_["landings_numbers_at_length"][i_length_year] /
                     sum_length;
               }
-              for (size_t l = 0; l < population->fleets[fleet_]->nlengths;
+              for (size_t l = 0; l < population->fleets[fleet_]->n_lengths;
                    l++) {
                 size_t i_length_year =
-                    y * population->fleets[fleet_]->nlengths + l;
+                    y * population->fleets[fleet_]->n_lengths + l;
                 fdq_["lengthcomp_proportion"][i_length_year] =
                     fdq_["landings_numbers_at_length"][i_length_year] /
                     sum_length;
@@ -748,7 +748,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           this->GetFleetDerivedQuantities((*fit).second->GetId());
 
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-      for (size_t y = 0; y < fleet->nyears; y++) {
+      for (size_t y = 0; y < fleet->n_years; y++) {
         Type sum = static_cast<Type>(0.0);
         Type sum_obs = static_cast<Type>(0.0);
         // robust_add is a small value to add to expected composition
@@ -759,8 +759,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
         // robust additions to ensure that proportions sum to 1. Type robust_sum
         // = static_cast<Type>(1.0);
 
-        for (size_t a = 0; a < fleet->nages; a++) {
-          size_t i_age_year = y * fleet->nages + a;
+        for (size_t a = 0; a < fleet->n_ages; a++) {
+          size_t i_age_year = y * fleet->n_ages + a;
           // Here we have a check to determine if the age comp
           // should be calculated from the retained landings or
           // the total population. These values are slightly different.
@@ -791,8 +791,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             }
           }
         }
-        for (size_t a = 0; a < fleet->nages; a++) {
-          size_t i_age_year = y * fleet->nages + a;
+        for (size_t a = 0; a < fleet->n_ages; a++) {
+          size_t i_age_year = y * fleet->n_ages + a;
           fdq_["agecomp_proportion"][i_age_year] =
               fdq_["agecomp_expected"][i_age_year] / sum;
           // robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
@@ -817,8 +817,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-      if (fleet->nlengths > 0) {
-        for (size_t y = 0; y < fleet->nyears; y++) {
+      if (fleet->n_lengths > 0) {
+        for (size_t y = 0; y < fleet->n_years; y++) {
           Type sum = static_cast<Type>(0.0);
           Type sum_obs = static_cast<Type>(0.0);
           // robust_add is a small value to add to expected composition
@@ -828,11 +828,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
           // before testing sum robust is used to calculate the total sum of
           // robust additions to ensure that proportions sum to 1. Type
           // robust_sum = static_cast<Type>(1.0);
-          for (size_t l = 0; l < fleet->nlengths; l++) {
-            size_t i_length_year = y * fleet->nlengths + l;
-            for (size_t a = 0; a < fleet->nages; a++) {
-              size_t i_age_year = y * fleet->nages + a;
-              size_t i_length_age = a * fleet->nlengths + l;
+          for (size_t l = 0; l < fleet->n_lengths; l++) {
+            size_t i_length_year = y * fleet->n_lengths + l;
+            for (size_t a = 0; a < fleet->n_ages; a++) {
+              size_t i_age_year = y * fleet->n_ages + a;
+              size_t i_length_age = a * fleet->n_lengths + l;
               fdq_["lengthcomp_expected"][i_length_year] +=
                   fdq_["agecomp_expected"][i_age_year] *
                   fleet->age_to_length_conversion[i_length_age];
@@ -856,8 +856,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
               }
             }
           }
-          for (size_t l = 0; l < fleet->nlengths; l++) {
-            size_t i_length_year = y * fleet->nlengths + l;
+          for (size_t l = 0; l < fleet->n_lengths; l++) {
+            size_t i_length_year = y * fleet->n_lengths + l;
             fdq_["lengthcomp_proportion"][i_length_year] =
                 fdq_["lengthcomp_expected"][i_length_year] / sum;
             // robust_add + robust_sum *
@@ -928,7 +928,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
      code for initial structure and recruitment 0 loops. Could also have started
      loops at 1 with initial structure and recruitment setup outside the loops.
 
-     year loop is extended to <= nyears because SSB is calculated as the start
+     year loop is extended to <= n_years because SSB is calculated as the start
      of the year value and by extending one extra year we get estimates of the
      population structure at the end of the final year. An alternative approach
      would be to keep initial numbers at age in it's own vector and each year to
@@ -945,13 +945,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
           this->GetPopulationDerivedQuantities(population->GetId());
       // CAAPopulationProxy<Type>& population = this->populations_proxies[p];
 
-      for (size_t y = 0; y <= population->nyears; y++) {
-        for (size_t a = 0; a < population->nages; a++) {
+      for (size_t y = 0; y <= population->n_years; y++) {
+        for (size_t a = 0; a < population->n_ages; a++) {
           /*
            index naming defines the dimensional folding structure
            i.e. i_age_year is referencing folding over years and ages.
            */
-          size_t i_age_year = y * population->nages + a;
+          size_t i_age_year = y * population->n_ages + a;
           /*
            Mortality rates are not estimated in the final year which is
            used to show expected population structure at the end of the model
@@ -962,13 +962,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
            worth exploring as later milestone changes will eliminate this
            confusion.
            */
-          if (y < population->nyears) {
+          if (y < population->n_years) {
             /*
              First thing we need is total mortality aggregated across all fleets
              to inform the subsequent catch and change in numbers at age
-             calculations. This is only calculated for years < nyears as these
+             calculations. This is only calculated for years < n_years as these
              are the model estimated years with data. The year loop extends to
-             y=nyears so that population numbers at age and SSB can be
+             y=n_years so that population numbers at age and SSB can be
              calculated at the end of the last year of the model
              */
             CalculateMortality(population, i_age_year, y, a);
@@ -1022,7 +1022,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
               pdq_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);
             } else {
-              size_t i_agem1_yearm1 = (y - 1) * population->nages + (a - 1);
+              size_t i_agem1_yearm1 = (y - 1) * population->n_ages + (a - 1);
               CalculateNumbersAA(population, i_age_year, i_agem1_yearm1, a);
               CalculateUnfishedNumbersAA(population, i_age_year, i_agem1_yearm1,
                                          a);
@@ -1036,11 +1036,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
           /*
           Here composition, total catch, and index values are calculated for all
-          years with reference data. They are not calculated for y=nyears as
+          years with reference data. They are not calculated for y=n_years as
           there is this is just to get final population structure at the end of
           the terminal year.
            */
-          if (y < population->nyears) {
+          if (y < population->n_years) {
             CalculateLandingsNumbersAA(population, i_age_year, y, a);
             CalculateLandingsWeightAA(population, y, a);
             CalculateLandings(population, y, a);

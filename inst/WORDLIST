@@ -597,7 +597,6 @@ ndims
 NetBSD
 newpage
 nF
-nfleets
 nFmax
 NilValue
 ninput
@@ -637,8 +636,6 @@ NumbersAtAge
 NumericMatrix
 NumericVector
 nx
-nyear
-nyears
 Nyears
 nyr
 objs

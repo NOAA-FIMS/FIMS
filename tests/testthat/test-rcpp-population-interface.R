@@ -15,28 +15,28 @@
 test_that("rcpp population interface works with correct inputs", {
   # setup population to create test values
   population <- methods::new(Population)
-  nyears <- 10
-  nages <- 10
-  log_M_length <- nyears * nages
+  n_years <- 10
+  n_ages <- 10
+  log_M_length <- n_years * n_ages
   population$log_M$resize(log_M_length)
   purrr::walk(
     seq_along(1:log_M_length),
     \(x) population$log_M[x]$value <- -1
   )
-  population$log_init_naa$resize(nages)
+  population$log_init_naa$resize(n_ages)
   purrr::walk(
-    seq_along(1:nages),
+    seq_along(1:n_ages),
     \(x) population$log_init_naa[x]$value <- 0
   )
   population$log_init_naa$set_all_estimable(TRUE)
-  population$nages$set(nages)
-  population$ages$resize(nages)
+  population$n_ages$set(n_ages)
+  population$ages$resize(n_ages)
   purrr::walk(
-    seq_along(1:nages),
+    seq_along(1:n_ages),
     \(x) population$ages$set(x - 1, x)
   )
-  population$nfleets$set(2)
-  population$nyears$set(nyears)
+  population$n_fleets$set(2)
+  population$n_years$set(n_years)
 
 
   #' @description Test that the population id is 1.
@@ -45,7 +45,7 @@ test_that("rcpp population interface works with correct inputs", {
     expected = 1
   )
 
-  for (i in 1:(nyears * nages)) {
+  for (i in 1:(n_years * n_ages)) {
     #' @description Test that the log_M values are all -1.
     expect_equal(
       object = population$log_M[i]$value,
@@ -57,7 +57,7 @@ test_that("rcpp population interface works with correct inputs", {
     )
   }
 
-  for (i in 1:nyears) {
+  for (i in 1:n_years) {
     #' @description Test that the log_init_naa values are all 0.
     expect_equal(
       object = population$log_init_naa[i]$value,
@@ -72,7 +72,7 @@ test_that("rcpp population interface works with correct inputs", {
   population$log_init_naa$set_all_estimable(FALSE)
   population$log_M$set_all_estimable(TRUE)
 
-  for (i in 1:(nyears * nages)) {
+  for (i in 1:(n_years * n_ages)) {
     #' @description Test that the log_M values are all -1.
     expect_equal(
       object = population$log_M[i]$value,
@@ -84,7 +84,7 @@ test_that("rcpp population interface works with correct inputs", {
     )
   }
 
-  for (i in 1:nyears) {
+  for (i in 1:n_years) {
     #' @description Test that the log_init_naa values are all 0.
     expect_equal(
       object = population$log_init_naa[i]$value,
