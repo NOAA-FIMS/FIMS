@@ -299,7 +299,6 @@ RCPP_MODULE(fims) {
       .method("get_id", &PopulationInterface::get_id, "get population ID")
       .field("nages", &PopulationInterface::nages, "number of ages")
       .field("nfleets", &PopulationInterface::nfleets, "number of fleets")
-      .field("nseasons", &PopulationInterface::nseasons, "number of seasons")
       .field("nyears", &PopulationInterface::nyears, "number of years")
       .field("nlengths", &PopulationInterface::nlengths, "number of lengths")
       .field("log_M", &PopulationInterface::log_M,

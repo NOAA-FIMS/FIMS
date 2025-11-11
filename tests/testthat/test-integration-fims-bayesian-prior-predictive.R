@@ -242,7 +242,6 @@ test_that("prior predictive check", {
     \(x) population$ages$set(x - 1, om_input[["ages"]][x])
   )
   population$nfleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
-  population$nseasons$set(1)
   population$nyears$set(om_input[["nyr"]])
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())
