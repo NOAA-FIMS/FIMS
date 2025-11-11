@@ -358,7 +358,6 @@ GetInt
 getline
 GetNages
 GetName
-GetNseasons
 GetNyears
 GetObject
 GetObservedAgeCompDataID
@@ -629,9 +628,6 @@ nrecruits
 nrow
 NROW
 ns
-nseason
-nseasons
-Nseasons
 nsims
 nslaves
 nsurveys
@@ -843,7 +839,6 @@ setMethod
 SetNages
 SetName
 setNames
-SetNseasons
 SetNyears
 SetObservedAgeCompDataID
 SetObservedIndexDataID

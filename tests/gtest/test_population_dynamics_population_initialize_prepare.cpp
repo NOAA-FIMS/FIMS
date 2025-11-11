@@ -9,7 +9,6 @@ namespace
         this->InitializeCAA();
         EXPECT_EQ(catch_at_age_model->populations[0]->id_g, id_g);
         EXPECT_EQ(catch_at_age_model->populations[0]->nyears, nyears);
-        EXPECT_EQ(catch_at_age_model->populations[0]->nseasons, nseasons);
         EXPECT_EQ(catch_at_age_model->populations[0]->nages, nages);
         EXPECT_EQ(catch_at_age_model->populations[0]->fleets.size(), nfleets);
         EXPECT_EQ(catch_at_age_model->populations[0]->nfleets, nfleets);

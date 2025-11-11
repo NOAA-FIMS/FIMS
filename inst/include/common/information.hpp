@@ -37,7 +37,6 @@ template <typename Type>
 class Information {
  public:
   size_t nyears = 0;   /**< number of years >*/
-  size_t nseasons = 1; /**< number of seasons >*/
   size_t nages = 0;    /**< number of ages>*/
 
   static std::shared_ptr<Information<Type>>
@@ -170,7 +169,6 @@ class Information {
     this->selectivity_models.clear();
     this->models_map.clear();
     this->nyears = 0;
-    this->nseasons = 0;
     this->nages = 0;
 
     for (density_components_iterator it = density_components.begin();
@@ -223,7 +221,6 @@ class Information {
        << std::endl;
     ss << "models_map: " << this->models_map.size() << std::endl;
     ss << "nyears: " << this->nyears << std::endl;
-    ss << "nseasons: " << this->nseasons << std::endl;
     ss << "nages: " << this->nages << std::endl;
     ss << "density_components: " << this->density_components.size()
        << std::endl;
@@ -782,7 +779,6 @@ class Information {
       // set information dimensions
       this->nyears = std::max(this->nyears, p->nyears);
       this->nages = std::max(this->nages, p->nages);
-      this->nseasons = std::max(this->nseasons, p->nseasons);
 
       SetRecruitment(valid_model, p);
 
@@ -865,21 +861,7 @@ class Information {
    * @param nages
    */
   void SetNages(size_t nages) { this->nages = nages; }
-
-  /**
-   * @brief Get the Nseasons object
-   *
-   * @return size_t
-   */
-  size_t GetNseasons() const { return nseasons; }
-
-  /**
-   * @brief Set the Nseasons object
-   *
-   * @param nseasons
-   */
-  void SetNseasons(size_t nseasons) { this->nseasons = nseasons; }
-
+  
   /**
    * @brief Get the Nyears object
    *
