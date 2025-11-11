@@ -25,7 +25,6 @@ template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for population object*/
   size_t nyears;        /*!< total number of years in the fishery*/
-  size_t nseasons;      /*!< total number of seasons in the fishery*/
   size_t nages;         /*!< total number of ages in the population*/
   size_t nfleets;       /*!< total number of fleets in the fishery*/
 
@@ -111,12 +110,10 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * @brief Initialize values. Called once at the start of model run.
    *
    * @param nyears number of years in the population
-   * @param nseasons number of seasons in the population
    * @param nages number of ages in the population
    */
-  void Initialize(int nyears, int nseasons, int nages) {
+  void Initialize(int nyears, int nages) {
     this->nyears = nyears;
-    this->nseasons = nseasons;
     this->nages = nages;
 
     // size all the vectors to length of nages

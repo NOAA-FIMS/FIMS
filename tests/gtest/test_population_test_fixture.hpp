@@ -23,7 +23,6 @@ class CAAInitializeTestFixture : public testing::Test {
     catch_at_age_model = std::make_shared<fims_popdy::CatchAtAge<double>>();
     population->id_g = id_g;
     population->nyears = nyears;
-    population->nseasons = nseasons;
     population->nages = nages;
     population->nfleets = nfleets;
 
@@ -207,7 +206,6 @@ class CAAInitializeTestFixture : public testing::Test {
   // https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison/blob/main/R/save_initial_input.R
   int id_g = 0;
   int nyears = 30;
-  int nseasons = 1;
   int nages = 12;
   int nfleets = 2;
   int nlengths = 23;
@@ -230,7 +228,6 @@ class CAAEvaluateTestFixture : public testing::Test {
     population = std::make_shared<fims_popdy::Population<double>>();
     population->id_g = id_g;
     population->nyears = nyears;
-    population->nseasons = nseasons;
     population->nages = nages;
     population->nfleets = nfleets;
 
@@ -546,7 +543,6 @@ class CAAEvaluateTestFixture : public testing::Test {
 
   int id_g = 0;
   int nyears = 30;
-  int nseasons = 1;
   int nages = 12;
   int nfleets = 2;
   int nlengths = 23;
@@ -565,7 +561,6 @@ class CAAPrepareTestFixture : public testing::Test {
     population = std::make_shared<fims_popdy::Population<double>>();
     population->id_g = id_g;
     population->nyears = nyears;
-    population->nseasons = nseasons;
     population->nages = nages;
     population->nfleets = nfleets;
 
@@ -830,7 +825,6 @@ class CAAPrepareTestFixture : public testing::Test {
   fims_popdy::Population<double> pop;
   int id_g = 0;
   int nyears = 30;
-  int nseasons = 1;
   int nages = 12;
   int nfleets = 2;
   int nlengths = 23;

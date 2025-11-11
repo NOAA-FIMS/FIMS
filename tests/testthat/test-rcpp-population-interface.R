@@ -36,7 +36,6 @@ test_that("rcpp population interface works with correct inputs", {
     \(x) population$ages$set(x - 1, x)
   )
   population$nfleets$set(2)
-  population$nseasons$set(1)
   population$nyears$set(nyears)
 
 

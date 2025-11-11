@@ -421,7 +421,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     \(x) population$ages$set(x - 1, om_input[["ages"]][x])
   )
   population$nfleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
-  population$nseasons$set(1)
   population$nyears$set(om_input[["nyr"]])
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())

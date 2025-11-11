@@ -102,11 +102,6 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   typedef typename std::set<uint32_t>::iterator fleet_ids_iterator;
   /**
-   * @brief The number of seasons.
-   * TODO: Remove seasons because we do not model them.
-   */
-  SharedInt nseasons;
-  /**
    * @brief The number of years.
    */
   SharedInt nyears;
@@ -194,7 +189,6 @@ class PopulationInterface : public PopulationInterfaceBase {
         fleet_ids(other.fleet_ids),
         nages(other.nages),
         nfleets(other.nfleets),
-        nseasons(other.nseasons),
         nyears(other.nyears),
         nlengths(other.nlengths),
         maturity_id(other.maturity_id),
@@ -359,7 +353,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->id = this->id;
     population->nyears = this->nyears.get();
     population->nfleets = this->nfleets.get();
-    population->nseasons = this->nseasons.get();
     // only define ages if nages greater than 0
     if (this->nages.get() > 0) {
       population->nages = this->nages.get();

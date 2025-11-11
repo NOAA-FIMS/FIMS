@@ -102,7 +102,6 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   # - Population interface
   #   - Update the Population interface to consistently use n_ages and n_years,
   #     as done in the S4 data1 object.
-  #   - Currently hard-coded `nseason` to 1 using the defaults from FIMS.
   #     Update as needed.
   #   - Add n_fleets to data1. Should n_fleets include both
   #     fishing and survey fleets? Currently, data1@fleets equals 1.
@@ -113,7 +112,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
 
   integer_fields <- c(
     "nages", "nfleets", "nlengths",
-    "nseasons", "nyears"
+    "nyears"
   )
 
   boolean_fields <- c(
@@ -136,7 +135,6 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
             length(),
           # Or we can use get_n_fleets(data),
           "nlengths" = get_n_lengths(data),
-          "nseasons" = 1,
           "nyears" = get_n_years(data)
         )
       )
