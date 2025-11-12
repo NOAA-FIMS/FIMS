@@ -36,8 +36,8 @@ namespace fims_info {
 template <typename Type>
 class Information {
  public:
-  size_t nyears = 0;   /**< number of years >*/
-  size_t nages = 0;    /**< number of ages>*/
+  size_t nyears = 0; /**< number of years >*/
+  size_t nages = 0;  /**< number of ages>*/
 
   static std::shared_ptr<Information<Type>>
       fims_information;           /**< singleton instance >*/
@@ -861,7 +861,7 @@ class Information {
    * @param nages
    */
   void SetNages(size_t nages) { this->nages = nages; }
-  
+
   /**
    * @brief Get the Nyears object
    *
