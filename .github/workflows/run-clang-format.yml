@@ -32,6 +32,9 @@ jobs:
     # We use Google style to format code.
     steps:
     - uses: actions/checkout@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
     - uses: DoozyX/clang-format-lint-action@v0.20
       with:
         source: './inst/include ./src ./tests/gtest'
