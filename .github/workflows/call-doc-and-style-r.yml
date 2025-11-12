@@ -8,10 +8,11 @@ on:
     branches:
       - dev 
       - main
+      - dev-fix-GHAs
   workflow_dispatch:
 
 jobs:
   call-workflow:
-    uses: nmfs-ost/ghactions4r/.github/workflows/doc-and-style-r.yml@main
+    uses: nmfs-ost/ghactions4r/.github/workflows/doc-and-style-r.yml@fix-setup-r-dependencies
     secrets:
       PAT: ${{ secrets.PAT }}

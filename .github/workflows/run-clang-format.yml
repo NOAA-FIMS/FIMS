@@ -18,12 +18,17 @@ on:
     branches:
       - main
       - dev
+      - dev-fix-GHAs
   workflow_dispatch:
 
 jobs:
   job:
     name: run-clang-format
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
     # Format hpp and cpp files under inst/include, src/, and test/gtest
     # We use Google style to format code.
     steps:
