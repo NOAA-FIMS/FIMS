@@ -76,7 +76,8 @@
 #'     by = c("module_name", "fleet_name")
 #'   ) |>
 #'   print()
-create_default_configurations <- function(data, model_family = c("catch_at_age")) {
+create_default_configurations <- function(
+    data, model_family = c("catch_at_age")) {
   # Check if the input object is a FIMSFrame, aborting if not.
   if (!inherits(data, "FIMSFrame")) {
     cli::cli_abort(
