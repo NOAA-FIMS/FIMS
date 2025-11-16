@@ -20,6 +20,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
    */
   std::string name_m;
 
+
   /**
    * @brief Iterate the derived quantities.
    *
@@ -310,6 +311,28 @@ class SurplusProduction : public FisheryModelBase<Type> {
                                        [year];
   }
 
+  void CalculateBiomassPenalties(std::shared_ptr<fims_popdy::Population<Type>> &population,
+                      size_t year) {
+    population->depletion->biomass_expected_penalty[year] = fims_math::smooth_piecemeal(
+        population->depletion->depletion[year],
+        fims_math::exp(population->depletion->log_K[0]),
+        //bounds are hard coded for now; should be user-defined later
+        static_cast<Type>(0.2),
+        static_cast<Type>(0.9));
+    }
+
+  void CalculateParameterPenalties(std::shared_ptr<fims_popdy::Population<Type>> &population) {
+    
+    population->depletion->K_expected_penalty[0] = fims_math::smooth_piecemeal(
+        fims_math::exp(population->depletion->log_K[0]),
+        static_cast<Type>(1.0),
+        //bounds are hard coded for now; should be user-defined later
+        static_cast<Type>(1e-02),
+        static_cast<Type>(2000.0));
+  }
+
+  
+
   /**
   * @brief This method is used to evaluate the surplus production model.
   */
@@ -330,9 +353,11 @@ class SurplusProduction : public FisheryModelBase<Type> {
         CalculateBiomass(population, y);
         if(y < nyears){
           CalculateHarvestRate(population, y);
+          CalculateBiomassPenalties(population, y);
         }
       }
       CalculateReferencePoints(population);
+      CalculateParameterPenalties(population);
     }
   }
 

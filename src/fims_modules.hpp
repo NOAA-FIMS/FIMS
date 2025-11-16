@@ -385,6 +385,14 @@ RCPP_MODULE(fims) {
       .field("log_expected_depletion",
              &PellaTomlinsonInterface::log_expected_depletion,
              "expected depletion as a random effect on the natural log scale")
+      .field("biomass_penalty", &PellaTomlinsonInterface::biomass_penalty,
+             "Penalty on biomass to keep it within bounds.")
+      .field("biomass_expected_penalty", &PellaTomlinsonInterface::biomass_expected_penalty,
+             "Expected penalty on biomass to keep it within bounds.")
+      .field("K_penalty", &PellaTomlinsonInterface::K_penalty,
+             "Penalty on K to keep it within bounds.")
+      .field("K_expected_penalty", &PellaTomlinsonInterface::K_expected_penalty,
+             "Expected penalty on K to keep it within bounds.")
       .field("nyears", &PellaTomlinsonInterface::nyears, "number of years")
       .method("get_id", &PellaTomlinsonInterface::get_id)
       .method("evaluate_mean", &PellaTomlinsonInterface::evaluate_mean);

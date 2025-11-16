@@ -108,6 +108,22 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
    */
   ParameterVector log_expected_depletion;
   /**
+   * @brief The biomass penalty to keep biomass within bounds.
+   */
+  ParameterVector biomass_penalty;
+  /**
+   * @brief The expected biomass penalty to keep biomass within bounds.
+   */
+  ParameterVector biomass_expected_penalty;
+    /**
+   * @brief The K penalty to keep K within bounds.
+   */
+  ParameterVector K_penalty;
+  /**
+   * @brief The expected K penalty to keep K within bounds.
+   */
+  ParameterVector K_expected_penalty;
+  /**
    * @brief The number of years.
    */
   SharedInt nyears;
@@ -132,7 +148,11 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
         log_m(other.log_m),
         pop_depletion(other.pop_depletion),
         logit_depletion(other.logit_depletion),
-        log_expected_depletion(other.log_expected_depletion) {}
+        log_expected_depletion(other.log_expected_depletion),
+        biomass_penalty(other.biomass_penalty),
+        biomass_expected_penalty(other.biomass_expected_penalty),
+        K_penalty(other.K_penalty),
+        K_expected_penalty(other.K_expected_penalty) {}
 
   /**
    * @brief The destructor.
@@ -360,6 +380,30 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     }
     info->variable_map[this->log_expected_depletion.id_m] =
         &(depletion)->log_expected_depletion;
+
+    // set biomass_penalty
+    depletion->biomass_penalty.resize(this->nyears.get());
+    for (size_t i = 0; i < this->nyears.get(); i++) {
+      depletion->biomass_penalty[i] = 0.0;
+    }
+    info->variable_map[this->biomass_penalty.id_m] = &(depletion)->biomass_penalty;
+
+    // set biomass_expected penalty
+    depletion->biomass_expected_penalty.resize(this->nyears.get());
+    for (size_t i = 0; i < this->nyears.get(); i++) {
+      depletion->biomass_expected_penalty[i] = 0.0;
+    }
+    info->variable_map[this->biomass_expected_penalty.id_m] = &(depletion)->biomass_expected_penalty;
+
+    // set K_penalty
+    depletion->K_penalty.resize(1);
+    depletion->K_penalty[0] = 0.0;
+    info->variable_map[this->K_penalty.id_m] = &(depletion)->K_penalty;
+
+    // set K_expected penalty
+    depletion->K_expected_penalty.resize(1);
+    depletion->K_expected_penalty[0] = 0.0;
+    info->variable_map[this->K_expected_penalty.id_m] = &(depletion)->K_expected_penalty;
 
     // add to Information
     info->depletion_models[depletion->id] = depletion;
