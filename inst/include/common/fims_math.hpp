@@ -358,6 +358,34 @@ T sum(const fims::Vector<T> &v) {
   return ret;
 }
 
+/**
+ * @brief Smoothly piecewise function to avoid discontinuities
+ *
+ * Used to create a smooth transition between three regions defined by
+ * P_bound1 and P_bound2. The function transitions from
+ * log(K*P) - log(K*P_bound1) when P < P_bound1 to 0 when
+ * P is between P_bound1 and P_bound2, and then to log(K*P) - log(K*P_bound2)
+ * when P > P_bound2. The sharpness parameter controls the steepness of the
+ * transitions.
+ *
+ * @param x The input value.
+ * @param K A scaling factor.
+ * @param bound_lower The first boundary value.
+ * @param bound_upper The second boundary value.
+ * @param sharpness Controls the steepness of the transitions (default is 10.0).
+ * @return The smoothly piecewise evaluated value.
+ */
+template <typename Type>
+Type smooth_piecemeal(const Type& x, const Type& K, const Type& bound_lower, const Type& bound_upper, Type sharpness = 50.0) {
+    Type left = log(K * x) - log(K * bound_lower);
+    Type right = log(K * x) - log(K * bound_upper);
+
+    Type s_left = 0.5 * (1.0 - tanh(sharpness * (x - bound_lower)));
+    Type s_right = 1.0 / (1.0 + exp(sharpness * (bound_upper - x)));
+
+    return left * s_left + right * s_right;
+}
+
 }  // namespace fims_math
 
 #endif /* FIMS_MATH_HPP */
