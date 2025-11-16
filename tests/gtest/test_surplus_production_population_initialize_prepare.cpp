@@ -18,7 +18,7 @@ namespace
         auto& dq = surplus_production_model->population_derived_quantities[0];
         EXPECT_EQ(dq["biomass"].size(), nyears+1);
         EXPECT_EQ(dq["observed_catch"].size(), nyears);
-        EXPECT_EQ(dq["harvest_rate"].size(), nyears);
+        EXPECT_EQ(dq["harvest_rate"].size(), nyears+1);
         EXPECT_EQ(dq["fmsy"].size(), 1);
         EXPECT_EQ(dq["bmsy"].size(), 1);
         EXPECT_EQ(dq["msy"].size(), 1);
@@ -37,7 +37,7 @@ namespace
             fims::Vector<double>(nyears, 0)
         );
         EXPECT_EQ(dq["harvest_rate"],
-            fims::Vector<double>(nyears, 0)
+            fims::Vector<double>(nyears+1, 0)
         );
         EXPECT_EQ(dq["fmsy"],
             fims::Vector<double>(1, 0)
