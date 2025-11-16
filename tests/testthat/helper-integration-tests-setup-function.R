@@ -673,8 +673,9 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
   survey_fleet_index_distribution$log_sd$resize(nyears)
   for (y in 1:nyears) {
     survey_fleet_index_distribution$log_sd[y]$value <- 
-      jabba_pars |> dplyr::filter(rownames(jabba_pars) == "sigma2") |> 
-        dplyr::select(Median) |> sqrt() |> log() |> unlist()
+      (jabba_pars |> dplyr::filter(rownames(jabba_pars) == "tau2") |> 
+        dplyr::select(Median) + jabba_output$settings$SE2[y]) |> sqrt() |> 
+        log() |> unlist()
   
   }
   survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
@@ -703,6 +704,7 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
     production$log_K[1]$value <- log(K.init)
     production$log_K[1]$estimation_type$set("fixed_effects")
   }
+ 
   # Fix to get Schaefer model
   production$log_m[1]$value <- log(2)
   production$logit_depletion$resize(nyears)
@@ -726,7 +728,7 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
 
   production_distribution <- new(DlnormDistribution)
   #Fix sd to jabba value as currently FIMS does not have prior distribution
-  production_distribution$log_sd[1]$value <- log(sqrt(3.387369e-02)) # from jabba output
+  production_distribution$log_sd[1]$value <- log(sqrt(1.177274e-02)) # from jabba output
   production_distribution$expected_values$resize(nyears)
   # depletion ~ LNormal(log_expected_depletion, sd))
   production_distribution$set_distribution_links(
@@ -739,21 +741,34 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
     # Setup Priors USING jabba DEFAULTS
     log_r_Prior <- new(DnormDistribution)
     log_r_Prior$expected_values[1]$value <- log(0.2)
-    log_r_Prior$log_sd[1]$value <- log(1/0.5^2)
+    log_r_Prior$log_sd[1]$value <- log(0.5)
     log_r_Prior$set_distribution_links("prior", production$log_r$get_id())
 
     log_K_Prior <- new(DnormDistribution)
     log_K_Prior$expected_values[1]$value <- log(8 * max(landings$value))
-    log_K_Prior$log_sd[1]$value <- log(1/(log(1^2+1))) # CV prior = 1
+    log_K_Prior$log_sd[1]$value <- log(sqrt(log(1^2+1))) # CV prior = 1
     log_K_Prior$set_distribution_links("prior", production$log_K$get_id())
   }
+
+  # add penalties
+  biomass_penalty <- new(DnormDistribution)
+  biomass_penalty$log_sd[1]$value <- log(sqrt(1/1000)) # from jabba
+  biomass_penalty$set_distribution_links(
+    "random_effects", c(production$biomass_penalty$get_id(), production$biomass_expected_penalty$get_id())
+  )
+  K_penalty <- new(DnormDistribution)
+  K_penalty$log_sd[1]$value <- log(sqrt(1/1000)) # from jabba
+  K_penalty$set_distribution_links(
+    "random_effects", c(production$K_penalty$get_id(), production$K_expected_penalty$get_id())
+  ) 
+
   # create population module
   population <- new(Population)
   population$nyears$set(nyears)
   population$nages$set(1) # only one age in surplus production
   population$ages$resize(1)
   population$ages$set(0, 0) # only one age in surplus production
-  init_depletion <- jabba_expect_depletion[1] #jabba_pars |> dplyr::filter(rownames(jabba_pars) == "psi") |> 
+  init_depletion <- input_depletion[1] #jabba_pars |> dplyr::filter(rownames(jabba_pars) == "psi") |> 
     #   dplyr::select(Median) |> unlist()
   population$logit_init_depletion[1]$value <- log(init_depletion/(1 - init_depletion))
  
