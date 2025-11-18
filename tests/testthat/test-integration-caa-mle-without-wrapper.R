@@ -24,7 +24,7 @@ result <- setup_and_run_FIMS_without_wrappers(
   estimation_mode = FALSE
 )
 
-# ## IO correctness ----
+## IO correctness ----
 test_that("catch-at-age model (deterministic MLE without wrappers) works with correct inputs", {
   #' @description Test that the output from FIMS run matches the model comparison project OM values.
   verify_fims_deterministic(

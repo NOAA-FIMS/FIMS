@@ -4,7 +4,7 @@
       print(dplyr::select(get_estimates(deterministic_results), -estimated, -expected,
       -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320, width = Inf)
     Output
-      # A tibble: 13,826 x 17
+      # A tibble: 13,826 x 18
           module_name module_id module_type label                    type   type_id
           <chr>           <int> <chr>       <chr>                    <chr>    <int>
         1 Fleet               1 <NA>        log_Fmort                vector       4
@@ -649,328 +649,328 @@
       318           NA NA         1    11       NA NA               7 derived_quantity
       319           NA NA         1    12       NA NA              25 derived_quantity
       320           NA NA         2     1       NA NA              21 derived_quantity
-          distribution input_type  lpdf
-          <chr>        <chr>      <dbl>
-        1 <NA>         <NA>         NA 
-        2 <NA>         <NA>         NA 
-        3 <NA>         <NA>         NA 
-        4 <NA>         <NA>         NA 
-        5 <NA>         <NA>         NA 
-        6 <NA>         <NA>         NA 
-        7 <NA>         <NA>         NA 
-        8 <NA>         <NA>         NA 
-        9 <NA>         <NA>         NA 
-       10 <NA>         <NA>         NA 
-       11 <NA>         <NA>         NA 
-       12 <NA>         <NA>         NA 
-       13 <NA>         <NA>         NA 
-       14 <NA>         <NA>         NA 
-       15 <NA>         <NA>         NA 
-       16 <NA>         <NA>         NA 
-       17 <NA>         <NA>         NA 
-       18 <NA>         <NA>         NA 
-       19 <NA>         <NA>         NA 
-       20 <NA>         <NA>         NA 
-       21 <NA>         <NA>         NA 
-       22 <NA>         <NA>         NA 
-       23 <NA>         <NA>         NA 
-       24 <NA>         <NA>         NA 
-       25 <NA>         <NA>         NA 
-       26 <NA>         <NA>         NA 
-       27 <NA>         <NA>         NA 
-       28 <NA>         <NA>         NA 
-       29 <NA>         <NA>         NA 
-       30 <NA>         <NA>         NA 
-       31 <NA>         <NA>         NA 
-       32 <NA>         <NA>         NA 
-       33 <NA>         <NA>         NA 
-       34 <NA>         <NA>         NA 
-       35 <NA>         <NA>         NA 
-       36 <NA>         <NA>         NA 
-       37 <NA>         <NA>         NA 
-       38 <NA>         <NA>         NA 
-       39 <NA>         <NA>         NA 
-       40 <NA>         <NA>         NA 
-       41 <NA>         <NA>         NA 
-       42 <NA>         <NA>         NA 
-       43 <NA>         <NA>         NA 
-       44 <NA>         <NA>         NA 
-       45 <NA>         <NA>         NA 
-       46 <NA>         <NA>         NA 
-       47 <NA>         <NA>         NA 
-       48 <NA>         <NA>         NA 
-       49 <NA>         <NA>         NA 
-       50 <NA>         <NA>         NA 
-       51 <NA>         <NA>         NA 
-       52 <NA>         <NA>         NA 
-       53 <NA>         <NA>         NA 
-       54 <NA>         <NA>         NA 
-       55 <NA>         <NA>         NA 
-       56 <NA>         <NA>         NA 
-       57 <NA>         <NA>         NA 
-       58 <NA>         <NA>         NA 
-       59 <NA>         <NA>         NA 
-       60 <NA>         <NA>         NA 
-       61 <NA>         <NA>         NA 
-       62 <NA>         <NA>         NA 
-       63 <NA>         <NA>         NA 
-       64 <NA>         <NA>         NA 
-       65 <NA>         <NA>         NA 
-       66 <NA>         <NA>         NA 
-       67 <NA>         <NA>         NA 
-       68 <NA>         <NA>         NA 
-       69 <NA>         <NA>         NA 
-       70 <NA>         <NA>         NA 
-       71 <NA>         <NA>         NA 
-       72 <NA>         <NA>         NA 
-       73 <NA>         <NA>         NA 
-       74 <NA>         <NA>         NA 
-       75 <NA>         <NA>         NA 
-       76 <NA>         <NA>         NA 
-       77 <NA>         <NA>         NA 
-       78 <NA>         <NA>         NA 
-       79 <NA>         <NA>         NA 
-       80 <NA>         <NA>         NA 
-       81 <NA>         <NA>         NA 
-       82 <NA>         <NA>         NA 
-       83 <NA>         <NA>         NA 
-       84 <NA>         <NA>         NA 
-       85 <NA>         <NA>         NA 
-       86 <NA>         <NA>         NA 
-       87 <NA>         <NA>         NA 
-       88 <NA>         <NA>         NA 
-       89 <NA>         <NA>         NA 
-       90 <NA>         <NA>         NA 
-       91 <NA>         <NA>         NA 
-       92 <NA>         <NA>         NA 
-       93 <NA>         <NA>         NA 
-       94 <NA>         <NA>         NA 
-       95 <NA>         <NA>         NA 
-       96 <NA>         <NA>         NA 
-       97 <NA>         <NA>         NA 
-       98 <NA>         <NA>         NA 
-       99 <NA>         <NA>         NA 
-      100 <NA>         <NA>         NA 
-      101 <NA>         <NA>         NA 
-      102 <NA>         <NA>         NA 
-      103 <NA>         <NA>         NA 
-      104 <NA>         <NA>         NA 
-      105 <NA>         <NA>         NA 
-      106 <NA>         <NA>         NA 
-      107 <NA>         <NA>         NA 
-      108 <NA>         <NA>         NA 
-      109 <NA>         <NA>         NA 
-      110 <NA>         <NA>         NA 
-      111 <NA>         <NA>         NA 
-      112 <NA>         <NA>         NA 
-      113 <NA>         <NA>         NA 
-      114 <NA>         <NA>         NA 
-      115 <NA>         <NA>         NA 
-      116 <NA>         <NA>         NA 
-      117 <NA>         <NA>         NA 
-      118 <NA>         <NA>         NA 
-      119 <NA>         <NA>         NA 
-      120 <NA>         <NA>         NA 
-      121 <NA>         <NA>         NA 
-      122 <NA>         <NA>         NA 
-      123 <NA>         <NA>         NA 
-      124 <NA>         <NA>         NA 
-      125 <NA>         <NA>         NA 
-      126 <NA>         <NA>         NA 
-      127 <NA>         <NA>         NA 
-      128 <NA>         <NA>         NA 
-      129 <NA>         <NA>         NA 
-      130 <NA>         <NA>         NA 
-      131 <NA>         <NA>         NA 
-      132 <NA>         <NA>         NA 
-      133 <NA>         <NA>         NA 
-      134 <NA>         <NA>         NA 
-      135 <NA>         <NA>         NA 
-      136 <NA>         <NA>         NA 
-      137 <NA>         <NA>         NA 
-      138 <NA>         <NA>         NA 
-      139 <NA>         <NA>         NA 
-      140 <NA>         <NA>         NA 
-      141 <NA>         <NA>         NA 
-      142 <NA>         <NA>         NA 
-      143 <NA>         <NA>         NA 
-      144 <NA>         <NA>         NA 
-      145 <NA>         <NA>         NA 
-      146 <NA>         <NA>         NA 
-      147 <NA>         <NA>         NA 
-      148 <NA>         <NA>         NA 
-      149 <NA>         <NA>         NA 
-      150 <NA>         <NA>         NA 
-      151 <NA>         <NA>         NA 
-      152 <NA>         <NA>         NA 
-      153 <NA>         <NA>         NA 
-      154 <NA>         <NA>         NA 
-      155 <NA>         <NA>         NA 
-      156 <NA>         <NA>         NA 
-      157 <NA>         <NA>         NA 
-      158 <NA>         <NA>         NA 
-      159 <NA>         <NA>         NA 
-      160 <NA>         <NA>         NA 
-      161 <NA>         <NA>         NA 
-      162 <NA>         <NA>         NA 
-      163 <NA>         <NA>         NA 
-      164 <NA>         <NA>         NA 
-      165 <NA>         <NA>         NA 
-      166 <NA>         <NA>         NA 
-      167 <NA>         <NA>         NA 
-      168 <NA>         <NA>         NA 
-      169 <NA>         <NA>         NA 
-      170 <NA>         <NA>         NA 
-      171 <NA>         <NA>         NA 
-      172 <NA>         <NA>         NA 
-      173 <NA>         <NA>         NA 
-      174 <NA>         <NA>         NA 
-      175 <NA>         <NA>         NA 
-      176 <NA>         <NA>         NA 
-      177 <NA>         <NA>         NA 
-      178 <NA>         <NA>         NA 
-      179 <NA>         <NA>         NA 
-      180 <NA>         <NA>         NA 
-      181 <NA>         <NA>         NA 
-      182 <NA>         <NA>         NA 
-      183 <NA>         <NA>         NA 
-      184 <NA>         <NA>         NA 
-      185 <NA>         <NA>         NA 
-      186 <NA>         <NA>         NA 
-      187 <NA>         <NA>         NA 
-      188 <NA>         <NA>         NA 
-      189 <NA>         <NA>         NA 
-      190 <NA>         <NA>         NA 
-      191 <NA>         <NA>         NA 
-      192 <NA>         <NA>         NA 
-      193 <NA>         <NA>         NA 
-      194 <NA>         <NA>         NA 
-      195 <NA>         <NA>         NA 
-      196 <NA>         <NA>         NA 
-      197 <NA>         <NA>         NA 
-      198 <NA>         <NA>         NA 
-      199 <NA>         <NA>         NA 
-      200 <NA>         <NA>         NA 
-      201 <NA>         <NA>         NA 
-      202 <NA>         <NA>         NA 
-      203 <NA>         <NA>         NA 
-      204 <NA>         <NA>         NA 
-      205 <NA>         <NA>         NA 
-      206 <NA>         <NA>         NA 
-      207 <NA>         <NA>         NA 
-      208 <NA>         <NA>         NA 
-      209 <NA>         <NA>         NA 
-      210 <NA>         <NA>         NA 
-      211 <NA>         <NA>         NA 
-      212 <NA>         <NA>         NA 
-      213 <NA>         <NA>         NA 
-      214 <NA>         <NA>         NA 
-      215 <NA>         <NA>         NA 
-      216 <NA>         <NA>         NA 
-      217 <NA>         <NA>         NA 
-      218 <NA>         <NA>         NA 
-      219 <NA>         <NA>         NA 
-      220 <NA>         <NA>         NA 
-      221 <NA>         <NA>         NA 
-      222 <NA>         <NA>         NA 
-      223 <NA>         <NA>         NA 
-      224 <NA>         <NA>         NA 
-      225 <NA>         <NA>         NA 
-      226 <NA>         <NA>         NA 
-      227 <NA>         <NA>         NA 
-      228 <NA>         <NA>         NA 
-      229 <NA>         <NA>         NA 
-      230 <NA>         <NA>         NA 
-      231 <NA>         <NA>         NA 
-      232 <NA>         <NA>         NA 
-      233 <NA>         <NA>         NA 
-      234 <NA>         <NA>         NA 
-      235 <NA>         <NA>         NA 
-      236 <NA>         <NA>         NA 
-      237 <NA>         <NA>         NA 
-      238 <NA>         <NA>         NA 
-      239 <NA>         <NA>         NA 
-      240 <NA>         <NA>         NA 
-      241 <NA>         <NA>         NA 
-      242 <NA>         <NA>         NA 
-      243 <NA>         <NA>         NA 
-      244 <NA>         <NA>         NA 
-      245 <NA>         <NA>         NA 
-      246 <NA>         <NA>         NA 
-      247 <NA>         <NA>         NA 
-      248 <NA>         <NA>         NA 
-      249 <NA>         <NA>         NA 
-      250 <NA>         <NA>         NA 
-      251 <NA>         <NA>         NA 
-      252 <NA>         <NA>         NA 
-      253 <NA>         <NA>         NA 
-      254 <NA>         <NA>         NA 
-      255 <NA>         <NA>         NA 
-      256 <NA>         <NA>         NA 
-      257 <NA>         <NA>         NA 
-      258 <NA>         <NA>         NA 
-      259 <NA>         <NA>         NA 
-      260 <NA>         <NA>         NA 
-      261 <NA>         <NA>         NA 
-      262 <NA>         <NA>         NA 
-      263 <NA>         <NA>         NA 
-      264 <NA>         <NA>         NA 
-      265 <NA>         <NA>         NA 
-      266 <NA>         <NA>         NA 
-      267 <NA>         <NA>         NA 
-      268 <NA>         <NA>         NA 
-      269 <NA>         <NA>         NA 
-      270 <NA>         <NA>         NA 
-      271 <NA>         <NA>         NA 
-      272 <NA>         <NA>         NA 
-      273 <NA>         <NA>         NA 
-      274 <NA>         <NA>         NA 
-      275 <NA>         <NA>         NA 
-      276 <NA>         <NA>         NA 
-      277 <NA>         <NA>         NA 
-      278 <NA>         <NA>         NA 
-      279 <NA>         <NA>         NA 
-      280 <NA>         <NA>         NA 
-      281 <NA>         <NA>         NA 
-      282 <NA>         <NA>         NA 
-      283 <NA>         <NA>         NA 
-      284 <NA>         <NA>         NA 
-      285 <NA>         <NA>         NA 
-      286 <NA>         <NA>         NA 
-      287 <NA>         <NA>         NA 
-      288 <NA>         <NA>         NA 
-      289 <NA>         <NA>         NA 
-      290 <NA>         <NA>         NA 
-      291 <NA>         <NA>         NA 
-      292 <NA>         <NA>         NA 
-      293 <NA>         <NA>         NA 
-      294 <NA>         <NA>         NA 
-      295 <NA>         <NA>         NA 
-      296 <NA>         <NA>         NA 
-      297 <NA>         <NA>         NA 
-      298 <NA>         <NA>         NA 
-      299 <NA>         <NA>         NA 
-      300 <NA>         <NA>         NA 
-      301 <NA>         <NA>         NA 
-      302 <NA>         <NA>         NA 
-      303 <NA>         <NA>         NA 
-      304 <NA>         <NA>         NA 
-      305 <NA>         <NA>         NA 
-      306 <NA>         <NA>         NA 
-      307 <NA>         <NA>         NA 
-      308 multinomial  data       -836.
-      309 multinomial  data       -836.
-      310 multinomial  data       -836.
-      311 multinomial  data       -836.
-      312 multinomial  data       -836.
-      313 multinomial  data       -836.
-      314 multinomial  data       -836.
-      315 multinomial  data       -836.
-      316 multinomial  data       -836.
-      317 multinomial  data       -836.
-      318 multinomial  data       -836.
-      319 multinomial  data       -836.
-      320 multinomial  data       -836.
+          distribution input_type  lpdf log_sd
+          <chr>        <chr>      <dbl> <list>
+        1 <NA>         <NA>         NA  <NULL>
+        2 <NA>         <NA>         NA  <NULL>
+        3 <NA>         <NA>         NA  <NULL>
+        4 <NA>         <NA>         NA  <NULL>
+        5 <NA>         <NA>         NA  <NULL>
+        6 <NA>         <NA>         NA  <NULL>
+        7 <NA>         <NA>         NA  <NULL>
+        8 <NA>         <NA>         NA  <NULL>
+        9 <NA>         <NA>         NA  <NULL>
+       10 <NA>         <NA>         NA  <NULL>
+       11 <NA>         <NA>         NA  <NULL>
+       12 <NA>         <NA>         NA  <NULL>
+       13 <NA>         <NA>         NA  <NULL>
+       14 <NA>         <NA>         NA  <NULL>
+       15 <NA>         <NA>         NA  <NULL>
+       16 <NA>         <NA>         NA  <NULL>
+       17 <NA>         <NA>         NA  <NULL>
+       18 <NA>         <NA>         NA  <NULL>
+       19 <NA>         <NA>         NA  <NULL>
+       20 <NA>         <NA>         NA  <NULL>
+       21 <NA>         <NA>         NA  <NULL>
+       22 <NA>         <NA>         NA  <NULL>
+       23 <NA>         <NA>         NA  <NULL>
+       24 <NA>         <NA>         NA  <NULL>
+       25 <NA>         <NA>         NA  <NULL>
+       26 <NA>         <NA>         NA  <NULL>
+       27 <NA>         <NA>         NA  <NULL>
+       28 <NA>         <NA>         NA  <NULL>
+       29 <NA>         <NA>         NA  <NULL>
+       30 <NA>         <NA>         NA  <NULL>
+       31 <NA>         <NA>         NA  <NULL>
+       32 <NA>         <NA>         NA  <NULL>
+       33 <NA>         <NA>         NA  <NULL>
+       34 <NA>         <NA>         NA  <NULL>
+       35 <NA>         <NA>         NA  <NULL>
+       36 <NA>         <NA>         NA  <NULL>
+       37 <NA>         <NA>         NA  <NULL>
+       38 <NA>         <NA>         NA  <NULL>
+       39 <NA>         <NA>         NA  <NULL>
+       40 <NA>         <NA>         NA  <NULL>
+       41 <NA>         <NA>         NA  <NULL>
+       42 <NA>         <NA>         NA  <NULL>
+       43 <NA>         <NA>         NA  <NULL>
+       44 <NA>         <NA>         NA  <NULL>
+       45 <NA>         <NA>         NA  <NULL>
+       46 <NA>         <NA>         NA  <NULL>
+       47 <NA>         <NA>         NA  <NULL>
+       48 <NA>         <NA>         NA  <NULL>
+       49 <NA>         <NA>         NA  <NULL>
+       50 <NA>         <NA>         NA  <NULL>
+       51 <NA>         <NA>         NA  <NULL>
+       52 <NA>         <NA>         NA  <NULL>
+       53 <NA>         <NA>         NA  <NULL>
+       54 <NA>         <NA>         NA  <NULL>
+       55 <NA>         <NA>         NA  <NULL>
+       56 <NA>         <NA>         NA  <NULL>
+       57 <NA>         <NA>         NA  <NULL>
+       58 <NA>         <NA>         NA  <NULL>
+       59 <NA>         <NA>         NA  <NULL>
+       60 <NA>         <NA>         NA  <NULL>
+       61 <NA>         <NA>         NA  <NULL>
+       62 <NA>         <NA>         NA  <NULL>
+       63 <NA>         <NA>         NA  <NULL>
+       64 <NA>         <NA>         NA  <NULL>
+       65 <NA>         <NA>         NA  <NULL>
+       66 <NA>         <NA>         NA  <NULL>
+       67 <NA>         <NA>         NA  <NULL>
+       68 <NA>         <NA>         NA  <NULL>
+       69 <NA>         <NA>         NA  <NULL>
+       70 <NA>         <NA>         NA  <NULL>
+       71 <NA>         <NA>         NA  <NULL>
+       72 <NA>         <NA>         NA  <NULL>
+       73 <NA>         <NA>         NA  <NULL>
+       74 <NA>         <NA>         NA  <NULL>
+       75 <NA>         <NA>         NA  <NULL>
+       76 <NA>         <NA>         NA  <NULL>
+       77 <NA>         <NA>         NA  <NULL>
+       78 <NA>         <NA>         NA  <NULL>
+       79 <NA>         <NA>         NA  <NULL>
+       80 <NA>         <NA>         NA  <NULL>
+       81 <NA>         <NA>         NA  <NULL>
+       82 <NA>         <NA>         NA  <NULL>
+       83 <NA>         <NA>         NA  <NULL>
+       84 <NA>         <NA>         NA  <NULL>
+       85 <NA>         <NA>         NA  <NULL>
+       86 <NA>         <NA>         NA  <NULL>
+       87 <NA>         <NA>         NA  <NULL>
+       88 <NA>         <NA>         NA  <NULL>
+       89 <NA>         <NA>         NA  <NULL>
+       90 <NA>         <NA>         NA  <NULL>
+       91 <NA>         <NA>         NA  <NULL>
+       92 <NA>         <NA>         NA  <NULL>
+       93 <NA>         <NA>         NA  <NULL>
+       94 <NA>         <NA>         NA  <NULL>
+       95 <NA>         <NA>         NA  <NULL>
+       96 <NA>         <NA>         NA  <NULL>
+       97 <NA>         <NA>         NA  <NULL>
+       98 <NA>         <NA>         NA  <NULL>
+       99 <NA>         <NA>         NA  <NULL>
+      100 <NA>         <NA>         NA  <NULL>
+      101 <NA>         <NA>         NA  <NULL>
+      102 <NA>         <NA>         NA  <NULL>
+      103 <NA>         <NA>         NA  <NULL>
+      104 <NA>         <NA>         NA  <NULL>
+      105 <NA>         <NA>         NA  <NULL>
+      106 <NA>         <NA>         NA  <NULL>
+      107 <NA>         <NA>         NA  <NULL>
+      108 <NA>         <NA>         NA  <NULL>
+      109 <NA>         <NA>         NA  <NULL>
+      110 <NA>         <NA>         NA  <NULL>
+      111 <NA>         <NA>         NA  <NULL>
+      112 <NA>         <NA>         NA  <NULL>
+      113 <NA>         <NA>         NA  <NULL>
+      114 <NA>         <NA>         NA  <NULL>
+      115 <NA>         <NA>         NA  <NULL>
+      116 <NA>         <NA>         NA  <NULL>
+      117 <NA>         <NA>         NA  <NULL>
+      118 <NA>         <NA>         NA  <NULL>
+      119 <NA>         <NA>         NA  <NULL>
+      120 <NA>         <NA>         NA  <NULL>
+      121 <NA>         <NA>         NA  <NULL>
+      122 <NA>         <NA>         NA  <NULL>
+      123 <NA>         <NA>         NA  <NULL>
+      124 <NA>         <NA>         NA  <NULL>
+      125 <NA>         <NA>         NA  <NULL>
+      126 <NA>         <NA>         NA  <NULL>
+      127 <NA>         <NA>         NA  <NULL>
+      128 <NA>         <NA>         NA  <NULL>
+      129 <NA>         <NA>         NA  <NULL>
+      130 <NA>         <NA>         NA  <NULL>
+      131 <NA>         <NA>         NA  <NULL>
+      132 <NA>         <NA>         NA  <NULL>
+      133 <NA>         <NA>         NA  <NULL>
+      134 <NA>         <NA>         NA  <NULL>
+      135 <NA>         <NA>         NA  <NULL>
+      136 <NA>         <NA>         NA  <NULL>
+      137 <NA>         <NA>         NA  <NULL>
+      138 <NA>         <NA>         NA  <NULL>
+      139 <NA>         <NA>         NA  <NULL>
+      140 <NA>         <NA>         NA  <NULL>
+      141 <NA>         <NA>         NA  <NULL>
+      142 <NA>         <NA>         NA  <NULL>
+      143 <NA>         <NA>         NA  <NULL>
+      144 <NA>         <NA>         NA  <NULL>
+      145 <NA>         <NA>         NA  <NULL>
+      146 <NA>         <NA>         NA  <NULL>
+      147 <NA>         <NA>         NA  <NULL>
+      148 <NA>         <NA>         NA  <NULL>
+      149 <NA>         <NA>         NA  <NULL>
+      150 <NA>         <NA>         NA  <NULL>
+      151 <NA>         <NA>         NA  <NULL>
+      152 <NA>         <NA>         NA  <NULL>
+      153 <NA>         <NA>         NA  <NULL>
+      154 <NA>         <NA>         NA  <NULL>
+      155 <NA>         <NA>         NA  <NULL>
+      156 <NA>         <NA>         NA  <NULL>
+      157 <NA>         <NA>         NA  <NULL>
+      158 <NA>         <NA>         NA  <NULL>
+      159 <NA>         <NA>         NA  <NULL>
+      160 <NA>         <NA>         NA  <NULL>
+      161 <NA>         <NA>         NA  <NULL>
+      162 <NA>         <NA>         NA  <NULL>
+      163 <NA>         <NA>         NA  <NULL>
+      164 <NA>         <NA>         NA  <NULL>
+      165 <NA>         <NA>         NA  <NULL>
+      166 <NA>         <NA>         NA  <NULL>
+      167 <NA>         <NA>         NA  <NULL>
+      168 <NA>         <NA>         NA  <NULL>
+      169 <NA>         <NA>         NA  <NULL>
+      170 <NA>         <NA>         NA  <NULL>
+      171 <NA>         <NA>         NA  <NULL>
+      172 <NA>         <NA>         NA  <NULL>
+      173 <NA>         <NA>         NA  <NULL>
+      174 <NA>         <NA>         NA  <NULL>
+      175 <NA>         <NA>         NA  <NULL>
+      176 <NA>         <NA>         NA  <NULL>
+      177 <NA>         <NA>         NA  <NULL>
+      178 <NA>         <NA>         NA  <NULL>
+      179 <NA>         <NA>         NA  <NULL>
+      180 <NA>         <NA>         NA  <NULL>
+      181 <NA>         <NA>         NA  <NULL>
+      182 <NA>         <NA>         NA  <NULL>
+      183 <NA>         <NA>         NA  <NULL>
+      184 <NA>         <NA>         NA  <NULL>
+      185 <NA>         <NA>         NA  <NULL>
+      186 <NA>         <NA>         NA  <NULL>
+      187 <NA>         <NA>         NA  <NULL>
+      188 <NA>         <NA>         NA  <NULL>
+      189 <NA>         <NA>         NA  <NULL>
+      190 <NA>         <NA>         NA  <NULL>
+      191 <NA>         <NA>         NA  <NULL>
+      192 <NA>         <NA>         NA  <NULL>
+      193 <NA>         <NA>         NA  <NULL>
+      194 <NA>         <NA>         NA  <NULL>
+      195 <NA>         <NA>         NA  <NULL>
+      196 <NA>         <NA>         NA  <NULL>
+      197 <NA>         <NA>         NA  <NULL>
+      198 <NA>         <NA>         NA  <NULL>
+      199 <NA>         <NA>         NA  <NULL>
+      200 <NA>         <NA>         NA  <NULL>
+      201 <NA>         <NA>         NA  <NULL>
+      202 <NA>         <NA>         NA  <NULL>
+      203 <NA>         <NA>         NA  <NULL>
+      204 <NA>         <NA>         NA  <NULL>
+      205 <NA>         <NA>         NA  <NULL>
+      206 <NA>         <NA>         NA  <NULL>
+      207 <NA>         <NA>         NA  <NULL>
+      208 <NA>         <NA>         NA  <NULL>
+      209 <NA>         <NA>         NA  <NULL>
+      210 <NA>         <NA>         NA  <NULL>
+      211 <NA>         <NA>         NA  <NULL>
+      212 <NA>         <NA>         NA  <NULL>
+      213 <NA>         <NA>         NA  <NULL>
+      214 <NA>         <NA>         NA  <NULL>
+      215 <NA>         <NA>         NA  <NULL>
+      216 <NA>         <NA>         NA  <NULL>
+      217 <NA>         <NA>         NA  <NULL>
+      218 <NA>         <NA>         NA  <NULL>
+      219 <NA>         <NA>         NA  <NULL>
+      220 <NA>         <NA>         NA  <NULL>
+      221 <NA>         <NA>         NA  <NULL>
+      222 <NA>         <NA>         NA  <NULL>
+      223 <NA>         <NA>         NA  <NULL>
+      224 <NA>         <NA>         NA  <NULL>
+      225 <NA>         <NA>         NA  <NULL>
+      226 <NA>         <NA>         NA  <NULL>
+      227 <NA>         <NA>         NA  <NULL>
+      228 <NA>         <NA>         NA  <NULL>
+      229 <NA>         <NA>         NA  <NULL>
+      230 <NA>         <NA>         NA  <NULL>
+      231 <NA>         <NA>         NA  <NULL>
+      232 <NA>         <NA>         NA  <NULL>
+      233 <NA>         <NA>         NA  <NULL>
+      234 <NA>         <NA>         NA  <NULL>
+      235 <NA>         <NA>         NA  <NULL>
+      236 <NA>         <NA>         NA  <NULL>
+      237 <NA>         <NA>         NA  <NULL>
+      238 <NA>         <NA>         NA  <NULL>
+      239 <NA>         <NA>         NA  <NULL>
+      240 <NA>         <NA>         NA  <NULL>
+      241 <NA>         <NA>         NA  <NULL>
+      242 <NA>         <NA>         NA  <NULL>
+      243 <NA>         <NA>         NA  <NULL>
+      244 <NA>         <NA>         NA  <NULL>
+      245 <NA>         <NA>         NA  <NULL>
+      246 <NA>         <NA>         NA  <NULL>
+      247 <NA>         <NA>         NA  <NULL>
+      248 <NA>         <NA>         NA  <NULL>
+      249 <NA>         <NA>         NA  <NULL>
+      250 <NA>         <NA>         NA  <NULL>
+      251 <NA>         <NA>         NA  <NULL>
+      252 <NA>         <NA>         NA  <NULL>
+      253 <NA>         <NA>         NA  <NULL>
+      254 <NA>         <NA>         NA  <NULL>
+      255 <NA>         <NA>         NA  <NULL>
+      256 <NA>         <NA>         NA  <NULL>
+      257 <NA>         <NA>         NA  <NULL>
+      258 <NA>         <NA>         NA  <NULL>
+      259 <NA>         <NA>         NA  <NULL>
+      260 <NA>         <NA>         NA  <NULL>
+      261 <NA>         <NA>         NA  <NULL>
+      262 <NA>         <NA>         NA  <NULL>
+      263 <NA>         <NA>         NA  <NULL>
+      264 <NA>         <NA>         NA  <NULL>
+      265 <NA>         <NA>         NA  <NULL>
+      266 <NA>         <NA>         NA  <NULL>
+      267 <NA>         <NA>         NA  <NULL>
+      268 <NA>         <NA>         NA  <NULL>
+      269 <NA>         <NA>         NA  <NULL>
+      270 <NA>         <NA>         NA  <NULL>
+      271 <NA>         <NA>         NA  <NULL>
+      272 <NA>         <NA>         NA  <NULL>
+      273 <NA>         <NA>         NA  <NULL>
+      274 <NA>         <NA>         NA  <NULL>
+      275 <NA>         <NA>         NA  <NULL>
+      276 <NA>         <NA>         NA  <NULL>
+      277 <NA>         <NA>         NA  <NULL>
+      278 <NA>         <NA>         NA  <NULL>
+      279 <NA>         <NA>         NA  <NULL>
+      280 <NA>         <NA>         NA  <NULL>
+      281 <NA>         <NA>         NA  <NULL>
+      282 <NA>         <NA>         NA  <NULL>
+      283 <NA>         <NA>         NA  <NULL>
+      284 <NA>         <NA>         NA  <NULL>
+      285 <NA>         <NA>         NA  <NULL>
+      286 <NA>         <NA>         NA  <NULL>
+      287 <NA>         <NA>         NA  <NULL>
+      288 <NA>         <NA>         NA  <NULL>
+      289 <NA>         <NA>         NA  <NULL>
+      290 <NA>         <NA>         NA  <NULL>
+      291 <NA>         <NA>         NA  <NULL>
+      292 <NA>         <NA>         NA  <NULL>
+      293 <NA>         <NA>         NA  <NULL>
+      294 <NA>         <NA>         NA  <NULL>
+      295 <NA>         <NA>         NA  <NULL>
+      296 <NA>         <NA>         NA  <NULL>
+      297 <NA>         <NA>         NA  <NULL>
+      298 <NA>         <NA>         NA  <NULL>
+      299 <NA>         <NA>         NA  <NULL>
+      300 <NA>         <NA>         NA  <NULL>
+      301 <NA>         <NA>         NA  <NULL>
+      302 <NA>         <NA>         NA  <NULL>
+      303 <NA>         <NA>         NA  <NULL>
+      304 <NA>         <NA>         NA  <NULL>
+      305 <NA>         <NA>         NA  <NULL>
+      306 <NA>         <NA>         NA  <NULL>
+      307 <NA>         <NA>         NA  <NULL>
+      308 multinomial  data       -836. <NULL>
+      309 multinomial  data       -836. <NULL>
+      310 multinomial  data       -836. <NULL>
+      311 multinomial  data       -836. <NULL>
+      312 multinomial  data       -836. <NULL>
+      313 multinomial  data       -836. <NULL>
+      314 multinomial  data       -836. <NULL>
+      315 multinomial  data       -836. <NULL>
+      316 multinomial  data       -836. <NULL>
+      317 multinomial  data       -836. <NULL>
+      318 multinomial  data       -836. <NULL>
+      319 multinomial  data       -836. <NULL>
+      320 multinomial  data       -836. <NULL>
       # i 13,506 more rows
 
 # `get_estimates()` works with estimation run
@@ -980,7 +980,7 @@
       -expected, -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320,
       width = Inf)
     Output
-      # A tibble: 13,826 x 17
+      # A tibble: 13,826 x 18
           module_name module_id module_type label                    type   type_id
           <chr>           <int> <chr>       <chr>                    <chr>    <int>
         1 Fleet               1 <NA>        log_Fmort                vector       4
@@ -1625,327 +1625,327 @@
       318           NA NA         1    11       NA NA               7 derived_quantity
       319           NA NA         1    12       NA NA              25 derived_quantity
       320           NA NA         2     1       NA NA              21 derived_quantity
-          distribution input_type  lpdf
-          <chr>        <chr>      <dbl>
-        1 <NA>         <NA>         NA 
-        2 <NA>         <NA>         NA 
-        3 <NA>         <NA>         NA 
-        4 <NA>         <NA>         NA 
-        5 <NA>         <NA>         NA 
-        6 <NA>         <NA>         NA 
-        7 <NA>         <NA>         NA 
-        8 <NA>         <NA>         NA 
-        9 <NA>         <NA>         NA 
-       10 <NA>         <NA>         NA 
-       11 <NA>         <NA>         NA 
-       12 <NA>         <NA>         NA 
-       13 <NA>         <NA>         NA 
-       14 <NA>         <NA>         NA 
-       15 <NA>         <NA>         NA 
-       16 <NA>         <NA>         NA 
-       17 <NA>         <NA>         NA 
-       18 <NA>         <NA>         NA 
-       19 <NA>         <NA>         NA 
-       20 <NA>         <NA>         NA 
-       21 <NA>         <NA>         NA 
-       22 <NA>         <NA>         NA 
-       23 <NA>         <NA>         NA 
-       24 <NA>         <NA>         NA 
-       25 <NA>         <NA>         NA 
-       26 <NA>         <NA>         NA 
-       27 <NA>         <NA>         NA 
-       28 <NA>         <NA>         NA 
-       29 <NA>         <NA>         NA 
-       30 <NA>         <NA>         NA 
-       31 <NA>         <NA>         NA 
-       32 <NA>         <NA>         NA 
-       33 <NA>         <NA>         NA 
-       34 <NA>         <NA>         NA 
-       35 <NA>         <NA>         NA 
-       36 <NA>         <NA>         NA 
-       37 <NA>         <NA>         NA 
-       38 <NA>         <NA>         NA 
-       39 <NA>         <NA>         NA 
-       40 <NA>         <NA>         NA 
-       41 <NA>         <NA>         NA 
-       42 <NA>         <NA>         NA 
-       43 <NA>         <NA>         NA 
-       44 <NA>         <NA>         NA 
-       45 <NA>         <NA>         NA 
-       46 <NA>         <NA>         NA 
-       47 <NA>         <NA>         NA 
-       48 <NA>         <NA>         NA 
-       49 <NA>         <NA>         NA 
-       50 <NA>         <NA>         NA 
-       51 <NA>         <NA>         NA 
-       52 <NA>         <NA>         NA 
-       53 <NA>         <NA>         NA 
-       54 <NA>         <NA>         NA 
-       55 <NA>         <NA>         NA 
-       56 <NA>         <NA>         NA 
-       57 <NA>         <NA>         NA 
-       58 <NA>         <NA>         NA 
-       59 <NA>         <NA>         NA 
-       60 <NA>         <NA>         NA 
-       61 <NA>         <NA>         NA 
-       62 <NA>         <NA>         NA 
-       63 <NA>         <NA>         NA 
-       64 <NA>         <NA>         NA 
-       65 <NA>         <NA>         NA 
-       66 <NA>         <NA>         NA 
-       67 <NA>         <NA>         NA 
-       68 <NA>         <NA>         NA 
-       69 <NA>         <NA>         NA 
-       70 <NA>         <NA>         NA 
-       71 <NA>         <NA>         NA 
-       72 <NA>         <NA>         NA 
-       73 <NA>         <NA>         NA 
-       74 <NA>         <NA>         NA 
-       75 <NA>         <NA>         NA 
-       76 <NA>         <NA>         NA 
-       77 <NA>         <NA>         NA 
-       78 <NA>         <NA>         NA 
-       79 <NA>         <NA>         NA 
-       80 <NA>         <NA>         NA 
-       81 <NA>         <NA>         NA 
-       82 <NA>         <NA>         NA 
-       83 <NA>         <NA>         NA 
-       84 <NA>         <NA>         NA 
-       85 <NA>         <NA>         NA 
-       86 <NA>         <NA>         NA 
-       87 <NA>         <NA>         NA 
-       88 <NA>         <NA>         NA 
-       89 <NA>         <NA>         NA 
-       90 <NA>         <NA>         NA 
-       91 <NA>         <NA>         NA 
-       92 <NA>         <NA>         NA 
-       93 <NA>         <NA>         NA 
-       94 <NA>         <NA>         NA 
-       95 <NA>         <NA>         NA 
-       96 <NA>         <NA>         NA 
-       97 <NA>         <NA>         NA 
-       98 <NA>         <NA>         NA 
-       99 <NA>         <NA>         NA 
-      100 <NA>         <NA>         NA 
-      101 <NA>         <NA>         NA 
-      102 <NA>         <NA>         NA 
-      103 <NA>         <NA>         NA 
-      104 <NA>         <NA>         NA 
-      105 <NA>         <NA>         NA 
-      106 <NA>         <NA>         NA 
-      107 <NA>         <NA>         NA 
-      108 <NA>         <NA>         NA 
-      109 <NA>         <NA>         NA 
-      110 <NA>         <NA>         NA 
-      111 <NA>         <NA>         NA 
-      112 <NA>         <NA>         NA 
-      113 <NA>         <NA>         NA 
-      114 <NA>         <NA>         NA 
-      115 <NA>         <NA>         NA 
-      116 <NA>         <NA>         NA 
-      117 <NA>         <NA>         NA 
-      118 <NA>         <NA>         NA 
-      119 <NA>         <NA>         NA 
-      120 <NA>         <NA>         NA 
-      121 <NA>         <NA>         NA 
-      122 <NA>         <NA>         NA 
-      123 <NA>         <NA>         NA 
-      124 <NA>         <NA>         NA 
-      125 <NA>         <NA>         NA 
-      126 <NA>         <NA>         NA 
-      127 <NA>         <NA>         NA 
-      128 <NA>         <NA>         NA 
-      129 <NA>         <NA>         NA 
-      130 <NA>         <NA>         NA 
-      131 <NA>         <NA>         NA 
-      132 <NA>         <NA>         NA 
-      133 <NA>         <NA>         NA 
-      134 <NA>         <NA>         NA 
-      135 <NA>         <NA>         NA 
-      136 <NA>         <NA>         NA 
-      137 <NA>         <NA>         NA 
-      138 <NA>         <NA>         NA 
-      139 <NA>         <NA>         NA 
-      140 <NA>         <NA>         NA 
-      141 <NA>         <NA>         NA 
-      142 <NA>         <NA>         NA 
-      143 <NA>         <NA>         NA 
-      144 <NA>         <NA>         NA 
-      145 <NA>         <NA>         NA 
-      146 <NA>         <NA>         NA 
-      147 <NA>         <NA>         NA 
-      148 <NA>         <NA>         NA 
-      149 <NA>         <NA>         NA 
-      150 <NA>         <NA>         NA 
-      151 <NA>         <NA>         NA 
-      152 <NA>         <NA>         NA 
-      153 <NA>         <NA>         NA 
-      154 <NA>         <NA>         NA 
-      155 <NA>         <NA>         NA 
-      156 <NA>         <NA>         NA 
-      157 <NA>         <NA>         NA 
-      158 <NA>         <NA>         NA 
-      159 <NA>         <NA>         NA 
-      160 <NA>         <NA>         NA 
-      161 <NA>         <NA>         NA 
-      162 <NA>         <NA>         NA 
-      163 <NA>         <NA>         NA 
-      164 <NA>         <NA>         NA 
-      165 <NA>         <NA>         NA 
-      166 <NA>         <NA>         NA 
-      167 <NA>         <NA>         NA 
-      168 <NA>         <NA>         NA 
-      169 <NA>         <NA>         NA 
-      170 <NA>         <NA>         NA 
-      171 <NA>         <NA>         NA 
-      172 <NA>         <NA>         NA 
-      173 <NA>         <NA>         NA 
-      174 <NA>         <NA>         NA 
-      175 <NA>         <NA>         NA 
-      176 <NA>         <NA>         NA 
-      177 <NA>         <NA>         NA 
-      178 <NA>         <NA>         NA 
-      179 <NA>         <NA>         NA 
-      180 <NA>         <NA>         NA 
-      181 <NA>         <NA>         NA 
-      182 <NA>         <NA>         NA 
-      183 <NA>         <NA>         NA 
-      184 <NA>         <NA>         NA 
-      185 <NA>         <NA>         NA 
-      186 <NA>         <NA>         NA 
-      187 <NA>         <NA>         NA 
-      188 <NA>         <NA>         NA 
-      189 <NA>         <NA>         NA 
-      190 <NA>         <NA>         NA 
-      191 <NA>         <NA>         NA 
-      192 <NA>         <NA>         NA 
-      193 <NA>         <NA>         NA 
-      194 <NA>         <NA>         NA 
-      195 <NA>         <NA>         NA 
-      196 <NA>         <NA>         NA 
-      197 <NA>         <NA>         NA 
-      198 <NA>         <NA>         NA 
-      199 <NA>         <NA>         NA 
-      200 <NA>         <NA>         NA 
-      201 <NA>         <NA>         NA 
-      202 <NA>         <NA>         NA 
-      203 <NA>         <NA>         NA 
-      204 <NA>         <NA>         NA 
-      205 <NA>         <NA>         NA 
-      206 <NA>         <NA>         NA 
-      207 <NA>         <NA>         NA 
-      208 <NA>         <NA>         NA 
-      209 <NA>         <NA>         NA 
-      210 <NA>         <NA>         NA 
-      211 <NA>         <NA>         NA 
-      212 <NA>         <NA>         NA 
-      213 <NA>         <NA>         NA 
-      214 <NA>         <NA>         NA 
-      215 <NA>         <NA>         NA 
-      216 <NA>         <NA>         NA 
-      217 <NA>         <NA>         NA 
-      218 <NA>         <NA>         NA 
-      219 <NA>         <NA>         NA 
-      220 <NA>         <NA>         NA 
-      221 <NA>         <NA>         NA 
-      222 <NA>         <NA>         NA 
-      223 <NA>         <NA>         NA 
-      224 <NA>         <NA>         NA 
-      225 <NA>         <NA>         NA 
-      226 <NA>         <NA>         NA 
-      227 <NA>         <NA>         NA 
-      228 <NA>         <NA>         NA 
-      229 <NA>         <NA>         NA 
-      230 <NA>         <NA>         NA 
-      231 <NA>         <NA>         NA 
-      232 <NA>         <NA>         NA 
-      233 <NA>         <NA>         NA 
-      234 <NA>         <NA>         NA 
-      235 <NA>         <NA>         NA 
-      236 <NA>         <NA>         NA 
-      237 <NA>         <NA>         NA 
-      238 <NA>         <NA>         NA 
-      239 <NA>         <NA>         NA 
-      240 <NA>         <NA>         NA 
-      241 <NA>         <NA>         NA 
-      242 <NA>         <NA>         NA 
-      243 <NA>         <NA>         NA 
-      244 <NA>         <NA>         NA 
-      245 <NA>         <NA>         NA 
-      246 <NA>         <NA>         NA 
-      247 <NA>         <NA>         NA 
-      248 <NA>         <NA>         NA 
-      249 <NA>         <NA>         NA 
-      250 <NA>         <NA>         NA 
-      251 <NA>         <NA>         NA 
-      252 <NA>         <NA>         NA 
-      253 <NA>         <NA>         NA 
-      254 <NA>         <NA>         NA 
-      255 <NA>         <NA>         NA 
-      256 <NA>         <NA>         NA 
-      257 <NA>         <NA>         NA 
-      258 <NA>         <NA>         NA 
-      259 <NA>         <NA>         NA 
-      260 <NA>         <NA>         NA 
-      261 <NA>         <NA>         NA 
-      262 <NA>         <NA>         NA 
-      263 <NA>         <NA>         NA 
-      264 <NA>         <NA>         NA 
-      265 <NA>         <NA>         NA 
-      266 <NA>         <NA>         NA 
-      267 <NA>         <NA>         NA 
-      268 <NA>         <NA>         NA 
-      269 <NA>         <NA>         NA 
-      270 <NA>         <NA>         NA 
-      271 <NA>         <NA>         NA 
-      272 <NA>         <NA>         NA 
-      273 <NA>         <NA>         NA 
-      274 <NA>         <NA>         NA 
-      275 <NA>         <NA>         NA 
-      276 <NA>         <NA>         NA 
-      277 <NA>         <NA>         NA 
-      278 <NA>         <NA>         NA 
-      279 <NA>         <NA>         NA 
-      280 <NA>         <NA>         NA 
-      281 <NA>         <NA>         NA 
-      282 <NA>         <NA>         NA 
-      283 <NA>         <NA>         NA 
-      284 <NA>         <NA>         NA 
-      285 <NA>         <NA>         NA 
-      286 <NA>         <NA>         NA 
-      287 <NA>         <NA>         NA 
-      288 <NA>         <NA>         NA 
-      289 <NA>         <NA>         NA 
-      290 <NA>         <NA>         NA 
-      291 <NA>         <NA>         NA 
-      292 <NA>         <NA>         NA 
-      293 <NA>         <NA>         NA 
-      294 <NA>         <NA>         NA 
-      295 <NA>         <NA>         NA 
-      296 <NA>         <NA>         NA 
-      297 <NA>         <NA>         NA 
-      298 <NA>         <NA>         NA 
-      299 <NA>         <NA>         NA 
-      300 <NA>         <NA>         NA 
-      301 <NA>         <NA>         NA 
-      302 <NA>         <NA>         NA 
-      303 <NA>         <NA>         NA 
-      304 <NA>         <NA>         NA 
-      305 <NA>         <NA>         NA 
-      306 <NA>         <NA>         NA 
-      307 <NA>         <NA>         NA 
-      308 multinomial  data       -835.
-      309 multinomial  data       -835.
-      310 multinomial  data       -835.
-      311 multinomial  data       -835.
-      312 multinomial  data       -835.
-      313 multinomial  data       -835.
-      314 multinomial  data       -835.
-      315 multinomial  data       -835.
-      316 multinomial  data       -835.
-      317 multinomial  data       -835.
-      318 multinomial  data       -835.
-      319 multinomial  data       -835.
-      320 multinomial  data       -835.
+          distribution input_type  lpdf log_sd
+          <chr>        <chr>      <dbl> <list>
+        1 <NA>         <NA>         NA  <NULL>
+        2 <NA>         <NA>         NA  <NULL>
+        3 <NA>         <NA>         NA  <NULL>
+        4 <NA>         <NA>         NA  <NULL>
+        5 <NA>         <NA>         NA  <NULL>
+        6 <NA>         <NA>         NA  <NULL>
+        7 <NA>         <NA>         NA  <NULL>
+        8 <NA>         <NA>         NA  <NULL>
+        9 <NA>         <NA>         NA  <NULL>
+       10 <NA>         <NA>         NA  <NULL>
+       11 <NA>         <NA>         NA  <NULL>
+       12 <NA>         <NA>         NA  <NULL>
+       13 <NA>         <NA>         NA  <NULL>
+       14 <NA>         <NA>         NA  <NULL>
+       15 <NA>         <NA>         NA  <NULL>
+       16 <NA>         <NA>         NA  <NULL>
+       17 <NA>         <NA>         NA  <NULL>
+       18 <NA>         <NA>         NA  <NULL>
+       19 <NA>         <NA>         NA  <NULL>
+       20 <NA>         <NA>         NA  <NULL>
+       21 <NA>         <NA>         NA  <NULL>
+       22 <NA>         <NA>         NA  <NULL>
+       23 <NA>         <NA>         NA  <NULL>
+       24 <NA>         <NA>         NA  <NULL>
+       25 <NA>         <NA>         NA  <NULL>
+       26 <NA>         <NA>         NA  <NULL>
+       27 <NA>         <NA>         NA  <NULL>
+       28 <NA>         <NA>         NA  <NULL>
+       29 <NA>         <NA>         NA  <NULL>
+       30 <NA>         <NA>         NA  <NULL>
+       31 <NA>         <NA>         NA  <NULL>
+       32 <NA>         <NA>         NA  <NULL>
+       33 <NA>         <NA>         NA  <NULL>
+       34 <NA>         <NA>         NA  <NULL>
+       35 <NA>         <NA>         NA  <NULL>
+       36 <NA>         <NA>         NA  <NULL>
+       37 <NA>         <NA>         NA  <NULL>
+       38 <NA>         <NA>         NA  <NULL>
+       39 <NA>         <NA>         NA  <NULL>
+       40 <NA>         <NA>         NA  <NULL>
+       41 <NA>         <NA>         NA  <NULL>
+       42 <NA>         <NA>         NA  <NULL>
+       43 <NA>         <NA>         NA  <NULL>
+       44 <NA>         <NA>         NA  <NULL>
+       45 <NA>         <NA>         NA  <NULL>
+       46 <NA>         <NA>         NA  <NULL>
+       47 <NA>         <NA>         NA  <NULL>
+       48 <NA>         <NA>         NA  <NULL>
+       49 <NA>         <NA>         NA  <NULL>
+       50 <NA>         <NA>         NA  <NULL>
+       51 <NA>         <NA>         NA  <NULL>
+       52 <NA>         <NA>         NA  <NULL>
+       53 <NA>         <NA>         NA  <NULL>
+       54 <NA>         <NA>         NA  <NULL>
+       55 <NA>         <NA>         NA  <NULL>
+       56 <NA>         <NA>         NA  <NULL>
+       57 <NA>         <NA>         NA  <NULL>
+       58 <NA>         <NA>         NA  <NULL>
+       59 <NA>         <NA>         NA  <NULL>
+       60 <NA>         <NA>         NA  <NULL>
+       61 <NA>         <NA>         NA  <NULL>
+       62 <NA>         <NA>         NA  <NULL>
+       63 <NA>         <NA>         NA  <NULL>
+       64 <NA>         <NA>         NA  <NULL>
+       65 <NA>         <NA>         NA  <NULL>
+       66 <NA>         <NA>         NA  <NULL>
+       67 <NA>         <NA>         NA  <NULL>
+       68 <NA>         <NA>         NA  <NULL>
+       69 <NA>         <NA>         NA  <NULL>
+       70 <NA>         <NA>         NA  <NULL>
+       71 <NA>         <NA>         NA  <NULL>
+       72 <NA>         <NA>         NA  <NULL>
+       73 <NA>         <NA>         NA  <NULL>
+       74 <NA>         <NA>         NA  <NULL>
+       75 <NA>         <NA>         NA  <NULL>
+       76 <NA>         <NA>         NA  <NULL>
+       77 <NA>         <NA>         NA  <NULL>
+       78 <NA>         <NA>         NA  <NULL>
+       79 <NA>         <NA>         NA  <NULL>
+       80 <NA>         <NA>         NA  <NULL>
+       81 <NA>         <NA>         NA  <NULL>
+       82 <NA>         <NA>         NA  <NULL>
+       83 <NA>         <NA>         NA  <NULL>
+       84 <NA>         <NA>         NA  <NULL>
+       85 <NA>         <NA>         NA  <NULL>
+       86 <NA>         <NA>         NA  <NULL>
+       87 <NA>         <NA>         NA  <NULL>
+       88 <NA>         <NA>         NA  <NULL>
+       89 <NA>         <NA>         NA  <NULL>
+       90 <NA>         <NA>         NA  <NULL>
+       91 <NA>         <NA>         NA  <NULL>
+       92 <NA>         <NA>         NA  <NULL>
+       93 <NA>         <NA>         NA  <NULL>
+       94 <NA>         <NA>         NA  <NULL>
+       95 <NA>         <NA>         NA  <NULL>
+       96 <NA>         <NA>         NA  <NULL>
+       97 <NA>         <NA>         NA  <NULL>
+       98 <NA>         <NA>         NA  <NULL>
+       99 <NA>         <NA>         NA  <NULL>
+      100 <NA>         <NA>         NA  <NULL>
+      101 <NA>         <NA>         NA  <NULL>
+      102 <NA>         <NA>         NA  <NULL>
+      103 <NA>         <NA>         NA  <NULL>
+      104 <NA>         <NA>         NA  <NULL>
+      105 <NA>         <NA>         NA  <NULL>
+      106 <NA>         <NA>         NA  <NULL>
+      107 <NA>         <NA>         NA  <NULL>
+      108 <NA>         <NA>         NA  <NULL>
+      109 <NA>         <NA>         NA  <NULL>
+      110 <NA>         <NA>         NA  <NULL>
+      111 <NA>         <NA>         NA  <NULL>
+      112 <NA>         <NA>         NA  <NULL>
+      113 <NA>         <NA>         NA  <NULL>
+      114 <NA>         <NA>         NA  <NULL>
+      115 <NA>         <NA>         NA  <NULL>
+      116 <NA>         <NA>         NA  <NULL>
+      117 <NA>         <NA>         NA  <NULL>
+      118 <NA>         <NA>         NA  <NULL>
+      119 <NA>         <NA>         NA  <NULL>
+      120 <NA>         <NA>         NA  <NULL>
+      121 <NA>         <NA>         NA  <NULL>
+      122 <NA>         <NA>         NA  <NULL>
+      123 <NA>         <NA>         NA  <NULL>
+      124 <NA>         <NA>         NA  <NULL>
+      125 <NA>         <NA>         NA  <NULL>
+      126 <NA>         <NA>         NA  <NULL>
+      127 <NA>         <NA>         NA  <NULL>
+      128 <NA>         <NA>         NA  <NULL>
+      129 <NA>         <NA>         NA  <NULL>
+      130 <NA>         <NA>         NA  <NULL>
+      131 <NA>         <NA>         NA  <NULL>
+      132 <NA>         <NA>         NA  <NULL>
+      133 <NA>         <NA>         NA  <NULL>
+      134 <NA>         <NA>         NA  <NULL>
+      135 <NA>         <NA>         NA  <NULL>
+      136 <NA>         <NA>         NA  <NULL>
+      137 <NA>         <NA>         NA  <NULL>
+      138 <NA>         <NA>         NA  <NULL>
+      139 <NA>         <NA>         NA  <NULL>
+      140 <NA>         <NA>         NA  <NULL>
+      141 <NA>         <NA>         NA  <NULL>
+      142 <NA>         <NA>         NA  <NULL>
+      143 <NA>         <NA>         NA  <NULL>
+      144 <NA>         <NA>         NA  <NULL>
+      145 <NA>         <NA>         NA  <NULL>
+      146 <NA>         <NA>         NA  <NULL>
+      147 <NA>         <NA>         NA  <NULL>
+      148 <NA>         <NA>         NA  <NULL>
+      149 <NA>         <NA>         NA  <NULL>
+      150 <NA>         <NA>         NA  <NULL>
+      151 <NA>         <NA>         NA  <NULL>
+      152 <NA>         <NA>         NA  <NULL>
+      153 <NA>         <NA>         NA  <NULL>
+      154 <NA>         <NA>         NA  <NULL>
+      155 <NA>         <NA>         NA  <NULL>
+      156 <NA>         <NA>         NA  <NULL>
+      157 <NA>         <NA>         NA  <NULL>
+      158 <NA>         <NA>         NA  <NULL>
+      159 <NA>         <NA>         NA  <NULL>
+      160 <NA>         <NA>         NA  <NULL>
+      161 <NA>         <NA>         NA  <NULL>
+      162 <NA>         <NA>         NA  <NULL>
+      163 <NA>         <NA>         NA  <NULL>
+      164 <NA>         <NA>         NA  <NULL>
+      165 <NA>         <NA>         NA  <NULL>
+      166 <NA>         <NA>         NA  <NULL>
+      167 <NA>         <NA>         NA  <NULL>
+      168 <NA>         <NA>         NA  <NULL>
+      169 <NA>         <NA>         NA  <NULL>
+      170 <NA>         <NA>         NA  <NULL>
+      171 <NA>         <NA>         NA  <NULL>
+      172 <NA>         <NA>         NA  <NULL>
+      173 <NA>         <NA>         NA  <NULL>
+      174 <NA>         <NA>         NA  <NULL>
+      175 <NA>         <NA>         NA  <NULL>
+      176 <NA>         <NA>         NA  <NULL>
+      177 <NA>         <NA>         NA  <NULL>
+      178 <NA>         <NA>         NA  <NULL>
+      179 <NA>         <NA>         NA  <NULL>
+      180 <NA>         <NA>         NA  <NULL>
+      181 <NA>         <NA>         NA  <NULL>
+      182 <NA>         <NA>         NA  <NULL>
+      183 <NA>         <NA>         NA  <NULL>
+      184 <NA>         <NA>         NA  <NULL>
+      185 <NA>         <NA>         NA  <NULL>
+      186 <NA>         <NA>         NA  <NULL>
+      187 <NA>         <NA>         NA  <NULL>
+      188 <NA>         <NA>         NA  <NULL>
+      189 <NA>         <NA>         NA  <NULL>
+      190 <NA>         <NA>         NA  <NULL>
+      191 <NA>         <NA>         NA  <NULL>
+      192 <NA>         <NA>         NA  <NULL>
+      193 <NA>         <NA>         NA  <NULL>
+      194 <NA>         <NA>         NA  <NULL>
+      195 <NA>         <NA>         NA  <NULL>
+      196 <NA>         <NA>         NA  <NULL>
+      197 <NA>         <NA>         NA  <NULL>
+      198 <NA>         <NA>         NA  <NULL>
+      199 <NA>         <NA>         NA  <NULL>
+      200 <NA>         <NA>         NA  <NULL>
+      201 <NA>         <NA>         NA  <NULL>
+      202 <NA>         <NA>         NA  <NULL>
+      203 <NA>         <NA>         NA  <NULL>
+      204 <NA>         <NA>         NA  <NULL>
+      205 <NA>         <NA>         NA  <NULL>
+      206 <NA>         <NA>         NA  <NULL>
+      207 <NA>         <NA>         NA  <NULL>
+      208 <NA>         <NA>         NA  <NULL>
+      209 <NA>         <NA>         NA  <NULL>
+      210 <NA>         <NA>         NA  <NULL>
+      211 <NA>         <NA>         NA  <NULL>
+      212 <NA>         <NA>         NA  <NULL>
+      213 <NA>         <NA>         NA  <NULL>
+      214 <NA>         <NA>         NA  <NULL>
+      215 <NA>         <NA>         NA  <NULL>
+      216 <NA>         <NA>         NA  <NULL>
+      217 <NA>         <NA>         NA  <NULL>
+      218 <NA>         <NA>         NA  <NULL>
+      219 <NA>         <NA>         NA  <NULL>
+      220 <NA>         <NA>         NA  <NULL>
+      221 <NA>         <NA>         NA  <NULL>
+      222 <NA>         <NA>         NA  <NULL>
+      223 <NA>         <NA>         NA  <NULL>
+      224 <NA>         <NA>         NA  <NULL>
+      225 <NA>         <NA>         NA  <NULL>
+      226 <NA>         <NA>         NA  <NULL>
+      227 <NA>         <NA>         NA  <NULL>
+      228 <NA>         <NA>         NA  <NULL>
+      229 <NA>         <NA>         NA  <NULL>
+      230 <NA>         <NA>         NA  <NULL>
+      231 <NA>         <NA>         NA  <NULL>
+      232 <NA>         <NA>         NA  <NULL>
+      233 <NA>         <NA>         NA  <NULL>
+      234 <NA>         <NA>         NA  <NULL>
+      235 <NA>         <NA>         NA  <NULL>
+      236 <NA>         <NA>         NA  <NULL>
+      237 <NA>         <NA>         NA  <NULL>
+      238 <NA>         <NA>         NA  <NULL>
+      239 <NA>         <NA>         NA  <NULL>
+      240 <NA>         <NA>         NA  <NULL>
+      241 <NA>         <NA>         NA  <NULL>
+      242 <NA>         <NA>         NA  <NULL>
+      243 <NA>         <NA>         NA  <NULL>
+      244 <NA>         <NA>         NA  <NULL>
+      245 <NA>         <NA>         NA  <NULL>
+      246 <NA>         <NA>         NA  <NULL>
+      247 <NA>         <NA>         NA  <NULL>
+      248 <NA>         <NA>         NA  <NULL>
+      249 <NA>         <NA>         NA  <NULL>
+      250 <NA>         <NA>         NA  <NULL>
+      251 <NA>         <NA>         NA  <NULL>
+      252 <NA>         <NA>         NA  <NULL>
+      253 <NA>         <NA>         NA  <NULL>
+      254 <NA>         <NA>         NA  <NULL>
+      255 <NA>         <NA>         NA  <NULL>
+      256 <NA>         <NA>         NA  <NULL>
+      257 <NA>         <NA>         NA  <NULL>
+      258 <NA>         <NA>         NA  <NULL>
+      259 <NA>         <NA>         NA  <NULL>
+      260 <NA>         <NA>         NA  <NULL>
+      261 <NA>         <NA>         NA  <NULL>
+      262 <NA>         <NA>         NA  <NULL>
+      263 <NA>         <NA>         NA  <NULL>
+      264 <NA>         <NA>         NA  <NULL>
+      265 <NA>         <NA>         NA  <NULL>
+      266 <NA>         <NA>         NA  <NULL>
+      267 <NA>         <NA>         NA  <NULL>
+      268 <NA>         <NA>         NA  <NULL>
+      269 <NA>         <NA>         NA  <NULL>
+      270 <NA>         <NA>         NA  <NULL>
+      271 <NA>         <NA>         NA  <NULL>
+      272 <NA>         <NA>         NA  <NULL>
+      273 <NA>         <NA>         NA  <NULL>
+      274 <NA>         <NA>         NA  <NULL>
+      275 <NA>         <NA>         NA  <NULL>
+      276 <NA>         <NA>         NA  <NULL>
+      277 <NA>         <NA>         NA  <NULL>
+      278 <NA>         <NA>         NA  <NULL>
+      279 <NA>         <NA>         NA  <NULL>
+      280 <NA>         <NA>         NA  <NULL>
+      281 <NA>         <NA>         NA  <NULL>
+      282 <NA>         <NA>         NA  <NULL>
+      283 <NA>         <NA>         NA  <NULL>
+      284 <NA>         <NA>         NA  <NULL>
+      285 <NA>         <NA>         NA  <NULL>
+      286 <NA>         <NA>         NA  <NULL>
+      287 <NA>         <NA>         NA  <NULL>
+      288 <NA>         <NA>         NA  <NULL>
+      289 <NA>         <NA>         NA  <NULL>
+      290 <NA>         <NA>         NA  <NULL>
+      291 <NA>         <NA>         NA  <NULL>
+      292 <NA>         <NA>         NA  <NULL>
+      293 <NA>         <NA>         NA  <NULL>
+      294 <NA>         <NA>         NA  <NULL>
+      295 <NA>         <NA>         NA  <NULL>
+      296 <NA>         <NA>         NA  <NULL>
+      297 <NA>         <NA>         NA  <NULL>
+      298 <NA>         <NA>         NA  <NULL>
+      299 <NA>         <NA>         NA  <NULL>
+      300 <NA>         <NA>         NA  <NULL>
+      301 <NA>         <NA>         NA  <NULL>
+      302 <NA>         <NA>         NA  <NULL>
+      303 <NA>         <NA>         NA  <NULL>
+      304 <NA>         <NA>         NA  <NULL>
+      305 <NA>         <NA>         NA  <NULL>
+      306 <NA>         <NA>         NA  <NULL>
+      307 <NA>         <NA>         NA  <NULL>
+      308 multinomial  data       -825. <NULL>
+      309 multinomial  data       -825. <NULL>
+      310 multinomial  data       -825. <NULL>
+      311 multinomial  data       -825. <NULL>
+      312 multinomial  data       -825. <NULL>
+      313 multinomial  data       -825. <NULL>
+      314 multinomial  data       -825. <NULL>
+      315 multinomial  data       -825. <NULL>
+      316 multinomial  data       -825. <NULL>
+      317 multinomial  data       -825. <NULL>
+      318 multinomial  data       -825. <NULL>
+      319 multinomial  data       -825. <NULL>
+      320 multinomial  data       -825. <NULL>
       # i 13,506 more rows
 

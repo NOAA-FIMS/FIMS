@@ -235,7 +235,7 @@ prepare_test_data <- function() {
   fit_age_length_comp <- modified_parameters |>
     initialize_fims(data = data_age_length_comp) |>
     fit_fims(optimize = TRUE)
-
+  clear()
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
     fit_age_length_comp,

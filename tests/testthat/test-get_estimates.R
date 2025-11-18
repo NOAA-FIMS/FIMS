@@ -22,7 +22,7 @@ expected_colnames <- c(
   "input", "estimated", "expected", "observed",
   "estimation_type", "uncertainty",
   "distribution", "input_type",
-  "lpdf", "likelihood", "log_like_cv", "gradient"
+  "lpdf", "likelihood", "log_sd", "log_like_cv", "gradient"
 )
 
 test_that("`get_estimates()` works with deterministic run", {
