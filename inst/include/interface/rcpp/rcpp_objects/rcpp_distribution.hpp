@@ -314,6 +314,20 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
       ss << "],\n";
     }
+     ss << "  \"log_sd\":[";
+    if (this->log_sd.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
+        ss << this->value_to_string(this->log_sd[i].final_value_m)
+           << ", ";
+      }
+      ss << this->value_to_string(
+          this->log_sd[this->log_sd.size() - 1]
+              .final_value_m);
+      ss << "],\n";
+    }
+  
     ss << "  \"expected_values\":[";
     if (this->expected_values.size() == 0) {
       ss << "],\n";
@@ -612,6 +626,20 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
       ss << "],\n";
     }
+         ss << "  \"log_sd\":[";
+    if (this->log_sd.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
+        ss << this->value_to_string(this->log_sd[i].final_value_m)
+           << ", ";
+      }
+      ss << this->value_to_string(
+          this->log_sd[this->log_sd.size() - 1]
+              .final_value_m);
+      ss << "],\n";
+    }
+  
     ss << "  \"expected_values\":[";
     if (this->expected_values.size() == 0) {
       ss << "],\n";
@@ -920,6 +948,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
       ss << "],\n";
     }
+ 
     ss << "  \"expected_values\":[";
     if (this->expected_values.size() == 0) {
       ss << "],\n";
