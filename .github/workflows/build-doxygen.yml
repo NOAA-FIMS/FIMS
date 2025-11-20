@@ -17,6 +17,8 @@ on:
   schedule: 
     - cron: '0 16 * * *' 
   workflow_dispatch:
+  repository_dispatch:
+    types: [file-updated]
 
 jobs:
   build-doxygen:
