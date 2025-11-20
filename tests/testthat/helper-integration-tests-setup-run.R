@@ -202,7 +202,7 @@ prepare_test_data <- function() {
   deterministic_age_length_comp <- modified_parameters |>
     initialize_fims(data = data_age_length_comp) |>
     fit_fims(optimize = FALSE)
-  
+
   clear()
 
   # Save FIMS results as a test fixture for additional fimsfit tests
@@ -212,17 +212,17 @@ prepare_test_data <- function() {
     compress = FALSE
   )
 
-  modified_parameters <- modified_parameters |>
-    # Update log_sd for fleet1 landings
-    dplyr::rows_update(
-      tibble::tibble(
-        fleet_name = "fleet1",
-        label = "log_sd",
-        time = 1:30,
-        value = log(sqrt(log(0.06^2 + 1)))
-      ),
-      by = c("fleet_name", "label", "time")
-    )
+  # modified_parameters <- modified_parameters |>
+  #   # Update log_sd for fleet1 landings
+  #   dplyr::rows_update(
+  #     tibble::tibble(
+  #       fleet_name = "fleet1",
+  #       label = "log_sd",
+  #       time = 1:30,
+  #       value = log(sqrt(log(0.01^2 + 1)))
+  #     ),
+  #     by = c("fleet_name", "label", "time")
+  #   )
 
   saveRDS(
     modified_parameters,

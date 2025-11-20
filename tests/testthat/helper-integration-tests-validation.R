@@ -69,6 +69,7 @@ validate_fims <- function(
 
     # Validate errors against 2*SE threshold
     absolute_error <- abs(object_estimate - expected)
+    print(paste("Mean Bias of ", param_name, ":", mean(absolute_error |> dplyr::pull())))
     threshold <- qnorm(.975) * object_uncertainty
     #' @description Test that the 95% of the estimates fall within 2*SE.
     expect_lte(sum(absolute_error > threshold), 0.05 * length(expected))
@@ -173,6 +174,20 @@ validate_fims <- function(
   )
 
   # Statistical validation for parameters
+  print_estimates <- estimates |>
+    dplyr::filter(
+        !is.na(input),
+        !is.na(estimated),
+        !is.na(uncertainty),
+        estimation_type == "fixed_effects"
+      ) |>
+      # Check if estimate is within 2 standard errors (95% confidence)
+      dplyr::mutate(
+        bias = abs(estimated - input)
+      ) |>
+      dplyr::select(module_name, label, input, estimated, bias)
+  knitr::kable(print_estimates)
+  print(print_estimates, n = 100)
   if (use_fimsfit) {
     out_of_tolerance_parameters <- estimates |>
       # Filter estimates for fixed effects that have all necessary values
