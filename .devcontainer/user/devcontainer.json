@@ -1,0 +1,31 @@
+{
+  "name": "FIMS User",
+  "image": "ghcr.io/rocker-org/devcontainer/r-ver:4.3",
+
+  // Run the setup script from the root
+  "postCreateCommand": "bash setup_fims.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "REditorSupport.r",
+        "redhat.vscode-xml",
+        "eamodio.gitlens",
+        "mechatroner.rainbow-csv",
+        "quarto.quarto"
+      ],
+      "settings": {
+        "r.rterm.linux": "/usr/local/bin/R",
+        "r.bracketedPaste": true,
+        "r.plot.view": "httpgd"
+      }
+    }
+  },
+
+  // capabilities needed for some R operations or Docker-in-Docker if required
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined"
+  ]
+}

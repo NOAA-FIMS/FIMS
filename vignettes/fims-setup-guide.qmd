@@ -1,0 +1,39 @@
+---
+title: "FIMS User Setup Guide"
+vignette: >
+  %\VignetteIndexEntry{FIMS User Setup Guide}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+format:
+  html:
+    toc: true
+    number-sections: true
+---
+
+# Introduction
+
+This guide covers the three methods to set up the FIMS environment.
+
+## Method 1: Google Cloud Workstations
+
+This is the fastest method for the training session.
+
+1.  Open your terminal in the Workstation.
+2.  Run the following command:
+
+```bash
+bash <(curl -sL https://raw.githubusercontent.com/NOAA-FIMS/FIMS/add-google-cloud-workstations-bash/setup_fims.sh)
+```
+
+::: {.callout-note collapse="true"}
+## Deep Dive: What does this script do? (Click to expand)
+The setup_fims.sh script performs several automated tasks:
+
+- Checks OS: Detects you are on Linux.
+
+- Installs Dependencies: checks for system libraries like libxml2.
+
+- Configures R: Sets up ~/.Renviron to use a persistent library in your Home directory.
+
+- Installs Packages: Downloads pre-compiled binaries from Posit Package Manager (PPM) to save time. 
+:::
