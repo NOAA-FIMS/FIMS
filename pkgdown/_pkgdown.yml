@@ -27,6 +27,7 @@ articles:
   - fims-demo
   - fims-demo-minimal
   - fims-logging
+  - fims-user-setup-guide
 
 - title: Developer
   contents:
