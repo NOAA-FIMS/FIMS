@@ -1,0 +1,49 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.234.0/containers/r
+{
+  "name": "FIMS User",
+  // Using the Rocker r-ver image ensures a stable, version-controlled R environment.
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile.
+  "image": "ghcr.io/rocker-org/devcontainer/r-ver:4.3", //commma needed if other sections are used.
+
+  // Run the setup script from the root to install required system dependencies
+  // and R packages.
+  // It will be cached by GitHub Codespaces Prebuilds.
+  "onCreateCommand": "bash setup_fims.sh",
+
+  "postCreateCommand": "echo 'options(repos = c(CRAN = \"https://packagemanager.posit.co/cran/latest\"))' | sudo sh -c 'cat - >>\"${R_HOME}/etc/Rprofile.site\"'",
+
+  "customizations": {
+    "vscode": {
+      // Set *default* container specific settings.json values on container create.
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        // Advanced Git visualization for collaboration
+        "eamodio.gitlens",
+        // Optimizes the connection between the local VS Code 
+        // and the remote GitHub-hosted environment for better performance
+        "GitHub.codespaces",
+        // Makes large CSV data files readable at a glance
+        "mechatroner.rainbow-csv",
+        // Enables real-time collaborative coding
+        "ms-vsliveshare.vsliveshare",
+        // The next-generation technical publishing system for R
+        "quarto.quarto",
+        // A visual debugging interface
+        "rdebugger.r-debugger",
+        // Core R language support (syntax, help, etc.)
+        "REditorSupport.r"
+      ],
+      "settings": {
+        // Pointing directly to the container's R path ensures the extension 
+        // doesn't default to a missing or incorrect system version.
+        "r.rterm.linux": "/usr/local/bin/R",
+        // 'bracketedPaste' prevents the terminal from executing code line-by-line 
+        // when pasting large blocks, avoiding common indentation/execution errors.
+        "r.bracketedPaste": true,
+        // 'httpgd' provides a high-quality, interactive SVG-based plot viewer in VS Code.
+        "r.plot.view": "httpgd"
+      }
+    }
+  }
+}

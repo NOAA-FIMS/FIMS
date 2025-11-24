@@ -1,4 +1,3 @@
-
 ADMB
 ADREPORT
 ADREPORTvector
@@ -27,7 +26,7 @@ BH
 BOOL
 Baranov
 BasedOnStyle
-Benchmarking 
+Benchmarking
 Bertalanffy
 BevHolt
 Beverton
@@ -78,7 +77,6 @@ CalculateUnfishedNumbersAAandUnfishedSpawningBiomass
 CalculateUnfishedSpawningBiomass
 CallEntries
 CallMethodDef
-callout
 CamelCase
 CaptureError
 CatchAtAge
@@ -91,6 +89,8 @@ CheckModelOutput
 ClangFormat
 ClassName
 Codecov
+Codespace
+Codespaces
 ComputeProportions
 ConfigurePopulationModel
 Const
@@ -155,6 +155,7 @@ EWAA
 EWAAGrowth
 EWAAGrowthInterface
 EXPR
+Eddelbuttel
 EvaluateRecruitmentProcess
 ExtraYear
 FIMS
@@ -302,6 +303,7 @@ MaturityInterfaceBase
 ModularTMBExample
 MultinomialLPDF
 MultinomialLPMF
+MyClass
 NCOL
 NLL
 NLLs
@@ -318,6 +320,7 @@ NumbersAtAge
 NumericMatrix
 NumericVector
 Nyears
+OSS
 ObservedCatch
 OpenBSD
 ParameterVector
@@ -333,6 +336,7 @@ ParseValue
 ParseVector
 PascalCase
 PlusGroup
+Polymorphism
 PopulationEvaluateTestFixture
 PopulationInitializeTestFixture
 PopulationInterface
@@ -433,6 +437,7 @@ ShowPopulation
 SkipWhitespace
 SortIncludes
 SrBevertonHoltEvaluate
+Stroustrup
 Subpopulation
 Sys
 TESTDOWN
@@ -448,6 +453,7 @@ TearDown
 ToDo
 ToJSON
 Tomlinson
+Tsuda
 ULPs
 UNLEN
 UNPROTECT
@@ -506,6 +512,7 @@ byrow
 caa
 calc
 callGeneric
+callout
 catchability
 cbind
 cctype
@@ -600,9 +607,9 @@ dox
 doxygen
 dplyr
 dq
+dropdown
 dum
 dynam
-Eddelbuttel
 elif
 emph
 emplace
@@ -637,6 +644,7 @@ filesystem
 fims
 fimsfit
 fimsframe
+firstname
 fishres
 fmort
 fn
@@ -666,6 +674,7 @@ gh
 gha
 ghactions
 github
+githubusercontent
 gitignore
 glm
 globalVariables
@@ -732,11 +741,13 @@ kmax
 knitr
 knum
 kv
+lastname
 lcomp
 ldots
 len
 lengthcomp
 lgamma
+libPaths
 libname
 libpath
 libs
@@ -785,7 +796,6 @@ msy
 mult
 mutex
 mv
-MyClass
 mymap
 nCAA
 nF
@@ -825,6 +835,7 @@ npos
 nrecruits
 nrow
 ns
+nsaw
 nsims
 nslaves
 nsurveys
@@ -869,7 +880,6 @@ pmap
 pmf
 png
 pnorm
-Polymorphism
 polymorphism
 popdy
 pos
@@ -919,6 +929,7 @@ repo
 reportable
 reportvector
 reprod
+requireNamespace
 rescaled
 resid
 ret
@@ -941,10 +952,12 @@ rtools
 ru
 rvit
 rzero
+sL
 sapply
 saveRDS
 sb
 sbzero
+scrollable
 sd
 sdlog
 sdmTMB
@@ -1011,7 +1024,6 @@ stockplotr
 str
 streambuf
 stringstream
-Stroustrup
 strs
 strsplit
 strtok
@@ -1033,8 +1045,8 @@ tanh
 tbl
 tempdir
 tempfile
-templating
 templated
+templating
 testdown
 testthat
 th
@@ -1060,7 +1072,6 @@ trigamma
 trunc
 tryCatch
 tryFormats
-Tsuda
 typedef
 typename
 typeof
@@ -1111,3 +1122,4 @@ ymax
 yml
 yyyy
 zzz
+️
