@@ -1,0 +1,283 @@
+---
+title: "FIMS User Setup Guide"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FIMS User Setup Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<div id="expand-collapse-buttons" style="margin-bottom: 20px;">
+  <button onclick="expandAll()" class="btn btn-primary">Expand All</button>
+  <button onclick="collapseAll()" class="btn btn-secondary">Collapse All</button>
+</div>
+
+<script>
+function expandAll() {
+  const details = document.querySelectorAll('details');
+  details.forEach((detail) => {
+    detail.setAttribute('open', 'true');
+  });
+}
+
+function collapseAll() {
+  const details = document.querySelectorAll('details');
+  details.forEach((detail) => {
+    detail.removeAttribute('open');
+  });
+}
+</script>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, functions, include=FALSE}
+# Helper function to extract remote markdown from FIMS .devcontainer/ README to reuse the materials
+extract_remote_markdown <- function(url, header_pattern) {
+  lines <- try(readLines(url, warn = FALSE), silent = TRUE)
+  tmp <- tempfile(fileext = ".md")
+
+  if (inherits(lines, "try-error")) {
+    writeLines("_Documentation temporarily unreachable._", tmp)
+    return(tmp)
+  }
+
+  # Find the starting line (e.g., the line containing "## WSL2")
+  start_idx <- grep(header_pattern, lines, ignore.case = TRUE)
+
+  if (length(start_idx) > 0) {
+    # Determine the level of the header found (count the # symbols)
+    header_line <- lines[start_idx]
+    header_level <- nchar(gsub("(^#+).*", "\\1", header_line))
+
+    # Find headers that are at the SAME level or HIGHER (fewer or equal #)
+    # We want to ignore ### if we are looking for a ## section
+    stop_pattern <- paste0("^#{1,", header_level, "} ")
+    all_potential_stops <- grep(stop_pattern, lines)
+
+    # The end index is the next header that isn't the current one
+    end_idx <- all_potential_stops[all_potential_stops > start_idx][1]
+
+    if (is.na(end_idx)) end_idx <- length(lines) else end_idx <- end_idx - 1
+
+    # Extract and add blank lines for proper RMarkdown list rendering
+    content <- c("", lines[(start_idx + 1):end_idx], "")
+    writeLines(content, tmp)
+  } else {
+    writeLines("_Section not found in remote documentation._", tmp)
+  }
+
+  return(tmp)
+}
+```
+
+## Overview
+
+This guide helps FIMS users set up a standardized Fisheries Integrated Modeling System (FIMS) environment. By using [cloud-based workstations](https://cloud.google.com/workstations?hl=en) and pre-configured software setups ([containers](https://www.ibm.com/think/topics/containers)), we make sure the system works the same for everyone and remove the need for you to manually install the dependencies FIMS requires.
+
+Please follow the section below that matches your preferred setup:
+
+| Option | Best For | Where it Runs | Setup Effort | Internet Needed |
+| :--- | :--- | :--- | :--- | :--- |
+| ☁️ **[Google Cloud Workstations](#google-cloud-workstations)** | **NOAA-internal users** interested in using Google Cloud Workstations. | Cloud Browser | **Moderate** (requires running a one-line command) | **Always** |
+| 🌐 **[GitHub Codespaces](#github-codespaces)** | Anyone with a **GitHub account** who wants a fast, browser-based environment. | Browser | **Minimal** | **Always** |
+| 🐧 **[WSL2](#wsl2)** | Windows users who want to run the **FIMS container** in a local Linux environment. | Local Machine | **Moderate** to **Complex** (if WSL2 not installed) | **Setup only** |
+| 🧑‍💻 **[Local](#local)** | **Everyone else** installing packages directly on their own operating system. | Local Machine | **Moderate** (requires running a one-line command) | **Setup only** |
+
+```{r common-setup, echo=FALSE}
+# The bash script for setting up FIMS
+common_script <- "bash <(curl -sL https://raw.githubusercontent.com/NOAA-FIMS/FIMS/main/setup_fims.sh)"
+
+# The R script to verify FIMS is ready to be used
+fims_demo_rscript <- "
+knitr::purl(
+  input = 'https://raw.githubusercontent.com/NOAA-FIMS/FIMS/refs/heads/main/vignettes/fims-demo.Rmd',
+  output = 'fims_demo.R',
+  documentation = 0
+)
+
+source('fims_demo.R')
+"
+
+# Fetch the remote R script for the GitHub setup
+github_setup_url <- "https://raw.githubusercontent.com/nmfs-opensci/CloudComputingSetup/refs/heads/main/R/github_setup.R"
+github_setup_script <- tryCatch(
+  readLines(github_setup_url, warn = FALSE),
+  error = function(e) "# Could not load remote script."
+)
+
+# Fetch the remote terminal script for mounting a data bucket
+mount_bucket_url <- "https://raw.githubusercontent.com/nmfs-opensci/CloudComputingSetup/refs/heads/main/R/mount_bucket.R"
+mount_bucket_script <- tryCatch(
+  readLines(mount_bucket_url, warn = FALSE),
+  error = function(e) "# Could not load remote script."
+)
+
+# Fetch the remote R script for the data bucket example
+readwrite_databucket_url <- "https://raw.githubusercontent.com/NOAA-FIMS/FIMS/refs/heads/main/vignettes/r_example/read_write_google_cloud_storage_bucket.R"
+readwrite_databucket_script <- tryCatch(
+  readLines(readwrite_databucket_url, warn = FALSE),
+  error = function(e) "# Could not load remote script."
+)
+
+# Define the .devcontainer README url
+devcontainer_readme_url <- "https://raw.githubusercontent.com/NOAA-FIMS/FIMS/refs/heads/main/.devcontainer/README.md"
+```
+
+## ☁️ Google Cloud Workstations
+
+NOAA Fisheries Google Cloud Workstations provide a managed RStudio, Code OSS (the open source version of Visual Studio Code), or Positron environment. For detailed visual guides (e.g., snapshots) on starting, stopping, or managing workstations, please refer to the [NOAA-internal documentation](https://docs.google.com/document/d/1nziPdPULoRWOYQ9WKzISNUgJvANACvfYpFr1z3Ro2Bc/edit?tab=t.0#heading=h.5509095bxzv7).
+
+- **NOAA internal only:** To request access to the NOAA Fisheries Cloud Compute Accelerator Program, please follow the steps [here](https://docs.google.com/document/d/1nziPdPULoRWOYQ9WKzISNUgJvANACvfYpFr1z3Ro2Bc/edit?tab=t.0#heading=h.adsdqttdaso0) to submit a [request form](https://docs.google.com/forms/d/e/1FAIpQLSc-RSmPhLV7kBuiiuAzxb2LvWG7Q6XrNbQCbhJZtvaVVtOVZQ/viewform?usp=sharing&ouid=112419493802230683932).
+
+- Navigate to the NOAA Fisheries [Google Cloud Workstations Console](https://console.cloud.google.com/workstations/list?project=ggn-nmfs-wsent-prod-1)  and click `+ create workstation`.
+
+- Provide a name for the workstation, select a configuration, and click the `Create` button.
+
+> **Note:**  Configurations with low core counts (`*-small`) will lead to failed compilation of FIMS due to insufficient memory. Use `posit-medium` or `posit-large` for workshops and rapid testing, as they have faster startup times and multiple IDE options. The `nmfs-rstudio-medium` or `nmfs-rstudio-large` options can also be used by users who prefer to work in RStudio.
+  
+- Click the `Start` and `Launch` buttons to initialize the workstation. It is normal for a workstation to take a minute or two to spin up.
+
+- Add a new session from either `Positron Pro`, `RStudio Pro`, or `VS Code` when using `posit-*` configurations, and then `Launch` the session.
+
+- Open a [bash terminal](https://www.atlassian.com/git/tutorials/git-bash) within your session and copy/paste this command below. This will automatically set up the workstation by installing all necessary system and R dependencies.
+
+```{r, echo=FALSE, results='asis'}
+cat("```bash\n")
+cat(common_script, sep = "\n")
+cat("\n```")
+```
+
+> **Note:** The dependency installation process typically takes 10 minutes. If using `Positron Pro`, a restart of the R session is required to initialize the new libraries. 
+>
+> Please run `library(FIMS)` in the R session to confirm the successful installation of FIMS. If the installation is successful, no messages or errors will appear. If it is unsuccessful, you will see an error such as: `Error in library(FIMS) : there is no package called 'FIMS'`.
+>
+> Alternatively, you can run the R script below to perform a full FIMS model run. 
+
+- To verify that FIMS is ready, run the R code below to download the FIMS demo R script:
+
+```{r, echo=FALSE, results='asis'}
+cat("```r\n")
+cat(fims_demo_rscript, sep = "\n")
+cat("\n```")
+```
+
+- To stop a workstation, close the workstation page and go to the `Overview` page of the workstations user interface to click the `■` (stop) button. Stopping a workstation does not delete it, ensuring that files and settings remain intact. 
+
+<details>
+<summary>🤿 Deep dive: R code to connect GitHub to a Google Cloud Workstation (Click to expand)</summary>
+
+A Personal Access Token (PAT) can be used to link a workstation to a GitHub Enterprise Account. Please follow GitHub's instructions ([PAT settings](https://github.com/settings/tokens) and [tutorial](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)) to generate a PAT. Then, use the R code below from [`nmfs-opensci/CloudComputingSetup`](https://github.com/nmfs-opensci/CloudComputingSetup) to link a workstation to a GitHub Enterprise account.
+
+```{r, echo=FALSE, results='asis'}
+# Wrap the script in markdown backticks manually
+cat("```bash\n")
+cat(github_setup_script, sep = "\n")
+cat("\n```")
+```
+
+</details>
+
+<details>
+<summary>🤿 Deep dive: Terminal code for mounting Google Cloud Storage Buckets (Click to expand)</summary>
+
+To mount a Google Cloud Storage Bucket, which makes the cloud storage act like a local folder on the Google Cloud Workstation for easy reading and writing of data, use the R example below from [`nmfs-opensci/CloudComputingSetup`](https://github.com/nmfs-opensci/CloudComputingSetup). 
+```{r, echo=FALSE, results='asis'}
+# Wrap the script in markdown backticks manually
+cat("```bash\n")
+cat(mount_bucket_script, sep = "\n")
+cat("\n```")
+```
+
+</details>
+
+<details>
+<summary>🤿 Deep dive: R code to read/write to Google Cloud Storage Buckets (Click to expand)</summary>
+
+Work through local IT to request a data bucket. To read/write data to a Google Cloud Storage Bucket, use the R example below:
+```{r, echo=FALSE, results='asis'}
+# Wrap the script in markdown backticks manually
+cat("```r\n")
+cat(readwrite_databucket_script, sep = "\n")
+cat("\n```")
+```
+
+</details>
+
+<details>
+<summary> 🗂️ Cloud Computing Documentation (Click to expand)</summary>
+
+- [NOAA Fisheries Cloud Program](https://docs.google.com/document/d/1nziPdPULoRWOYQ9WKzISNUgJvANACvfYpFr1z3Ro2Bc/edit?usp=sharing) began a Cloud Compute Accelerator Pilot in early 2025: Enhancing NOAA Fisheries' Mission with Google Cloud Workstations. 
+
+- Consult the Pilot Participant [Frequently Asked Questions](https://docs.google.com/document/d/1U1PzGS7G70xsXtD6F6WxkjTSCw7bwNVyZ-YnFyOLOqU/edit?usp=sharing) for support regarding access and billing.
+
+- [NOAA Fisheries Cloud Computing Setup repository](https://github.com/nmfs-opensci/CloudComputingSetup/) details cloud computing resources at NOAA Fisheries, with a focus on Google Cloud Workstations for R users. It includes instructions for linking workstations to GitHub and mounting Google Cloud Storage buckets.
+
+</details>
+
+## 🌐 GitHub Codespaces
+
+[GitHub Codespaces](https://docs.github.com/en/codespaces) offers a ["container-as-a-service"](https://www.atlassian.com/microservices/cloud-computing/containers-as-a-service) model that provides a pre-configured FIMS environment directly in your browser. 
+
+```{r, fetch-codespaces, include=FALSE}
+tmp_codespaces <- extract_remote_markdown(devcontainer_readme_url, "## .*GitHub Codespaces")
+```
+
+```{r, render-codespaces, child=tmp_codespaces}
+```
+
+- To verify that FIMS is ready, run the R code below to download the FIMS demo R script:
+
+```{r, echo=FALSE, results='asis'}
+cat("```r\n")
+cat(fims_demo_rscript, sep = "\n")
+cat("\n```")
+```
+
+## 🐧 WSL2
+
+For Windows users who prefer local execution of the FIMS user container, we recommend using WSL2 in conjunction with Docker Engine.
+
+```{r, fetch-wsl2, include=FALSE}
+tmp_wsl2 <- extract_remote_markdown(devcontainer_readme_url, "## .*WSL2")
+```
+
+```{r, render-wsl2, child=tmp_wsl2}
+```
+
+> **Note:** To verify that FIMS is ready, run the R code below to download the FIMS demo R script:
+
+```{r, echo=FALSE, results='asis'}
+cat("```r\n")
+cat(fims_demo_rscript, sep = "\n")
+cat("\n```")
+```
+
+## 🧑‍💻 Local
+
+Users wishing to install FIMS directly on their host operating system (Windows, Linux, or macOS) can do so using the `setup_fims.sh` bash script. To install, execute the following command in the bash terminal:
+
+```{r, echo=FALSE, results='asis'}
+cat("```bash\n")
+cat(common_script, sep = "\n")
+cat("\n```")
+```
+
+- To verify that FIMS is ready, run the R code below to download the FIMS demo R script:
+
+```{r, echo=FALSE, results='asis'}
+cat("```r\n")
+cat(fims_demo_rscript, sep = "\n")
+cat("\n```")
+```
+
+> **Note:** For Windows users, Git Bash is required. If you are using RStudio on Windows, make sure the terminal is configured to use Git Bash. You can do this by going to `Tools` -> `Global Options...` -> `Terminal`, and selecting `Git Bash` under `New terminals open with:`.
+
+> **Note:** This setup is designed to avoid overwriting existing FIMS installations by isolating the new environment. The script aims to create a dedicated library folder and prepend it to the R search path (`.libPaths()`). FIMS is then installed into this specific location. The setup attempts to configure R to prioritize this custom folder automatically in future R sessions. If you wish to return to your previous FIMS environment, you can typically do so by removing the custom folder path from your `.libPaths()` or deleting the folder; R is designed to then fall back to the next available path.
+
+## 🙋 Need Help?
+
+- If the instructions above do not work, please visit the FIMS [discussion page](https://github.com/orgs/NOAA-FIMS/discussions/1073) to see known issues and documented solutions. If you encounter a new error, feel free to post it there for technical assistance.
+
+- To report errors in this guide, please [open an issue](https://github.com/NOAA-FIMS/FIMS/issues) on GitHub.
