@@ -10,13 +10,13 @@ on:
     branches: 
       - dev
       - main
-  # schedule daily for when there are changes to the fims website, it pulls the 
-  # header formatting from that site and the numbers/letters at the end of that 
-  # file in that repo change whenever a change is made to the website for some
-  # reason 
-  schedule: 
-    - cron: '0 16 * * *' 
+  # schedule: 
+  #   - cron: '0 16 * * *' 
   workflow_dispatch:
+  # trigger for when there are changes to the fims website, it pulls the 
+  # header formatting from that site and the numbers/letters at the end of that 
+  # file in that repo, which change whenever a significant change is made to
+  # the website for some reason 
   repository_dispatch:
     types: [file-updated]
 
@@ -94,7 +94,6 @@ jobs:
         else
           echo "Bootstrap file hash did not change. assets/header.html remains current."
         fi
-
 
     - name: Building HTML documentation with Doxygen
     # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
