@@ -263,13 +263,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     this->depletion_id.set(depletion_id);
   }
 
-  /**
-   * @brief Evaluate the population function.
-   */
-  virtual void evaluate() {
-    fims_popdy::Population<double> population;
-    return population.Evaluate();
-  }
 
   /**
    * @brief Add a fleet id to the list of fleets

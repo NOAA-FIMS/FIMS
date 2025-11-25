@@ -308,8 +308,6 @@ RCPP_MODULE(fims) {
              "natural log of the initial depletion level")
       .field("ages", &PopulationInterface::ages,
              "vector of ages in the population; length nages")
-      .method("evaluate", &PopulationInterface::evaluate,
-              "evaluate the population function")
       .method("SetMaturityID", &PopulationInterface::SetMaturityID,
               "Set the unique id for the Maturity object")
       .method("SetGrowthID", &PopulationInterface::SetGrowthID,
@@ -320,9 +318,7 @@ RCPP_MODULE(fims) {
               "Set the unique id for the Depletion object")
       .method("AddFleet", &PopulationInterface::AddFleet,
               "Set a unique fleet id to the list of fleets operating on this "
-              "population")
-      .method("evaluate", &PopulationInterface::evaluate,
-              "evaluate the population function");
+              "population");
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()
