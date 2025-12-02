@@ -43,6 +43,38 @@ void init_logging() {
 bool CreateTMBModel() {
   init_logging();
 
+  // clear first
+  //  base model
+#ifdef TMBAD_FRAMEWORK
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  info0->Clear();
+
+  std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
+      fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+  info->Clear();
+
+#else
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  info0->Clear()
+
+      // first-order derivative
+      std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>>
+          info1 = fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+  info1->Clear();
+
+  // second-order derivative
+  std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> info2 =
+      fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+  info2->Clear();
+
+  // third-order derivative
+  std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> info3 =
+      fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+  info3->Clear();
+#endif
+
   FIMS_INFO_LOG(
       "Adding FIMS objects to TMB, " +
       fims::to_string(FIMSRcppInterfaceBase::fims_interface_objects.size()) +
@@ -54,32 +86,25 @@ bool CreateTMBModel() {
 
   // base model
 #ifdef TMBAD_FRAMEWORK
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-  info0->CreateModel();
 
-  std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
-      fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+  info0->CreateModel();
+  info0->CheckModel();
+
   info->CreateModel();
 
 #else
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
-  info0->CreateModel();
 
-  // first-order derivative
-  std::shared_ptr<fims_info::Information<TMB_FIMS_FIRST_ORDER>> info1 =
-      fims_info::Information<TMB_FIMS_FIRST_ORDER>::GetInstance();
+  info0->CreateModel();
+  info0->CheckModel();
+
   info1->CreateModel();
 
   // second-order derivative
-  std::shared_ptr<fims_info::Information<TMB_FIMS_SECOND_ORDER>> info2 =
-      fims_info::Information<TMB_FIMS_SECOND_ORDER>::GetInstance();
+
   info2->CreateModel();
 
   // third-order derivative
-  std::shared_ptr<fims_info::Information<TMB_FIMS_THIRD_ORDER>> info3 =
-      fims_info::Information<TMB_FIMS_THIRD_ORDER>::GetInstance();
+
   info3->CreateModel();
 #endif
 
@@ -91,85 +116,27 @@ bool CreateTMBModel() {
 }
 
 /**
- * Finalize a model run by populating derived quantities into the Rcpp interface
- * objects and return the output as a JSON string.
+ * @brief Sets the fixed parameters vector object.
+ * Updates the internal parameter values for the model base
+ * of type TMB_FIMS_REAL_TYPE. Typically called before
+ * finalize or get_output to ensure the correct values are used.
+ *
+ * Usage example:
+ * \code{.R}
+ * set_fixed_parameters(c(1, 2, 3))
+ * catch_at_age$get_output()
+ * \endcode
  *
  * @param par A vector of parameter values.
- * @param fn The objective function.
- * @param gr The gradient function.
- *
- * @return A JSON output string is returned.
  */
-std::string finalize_fims(Rcpp::NumericVector par, Rcpp::Function fn,
-                          Rcpp::Function gr) {
-  std::shared_ptr<fims_info::Information<double>> information =
-      fims_info::Information<double>::GetInstance();
+void set_fixed_parameters(Rcpp::NumericVector par) {
+  // base model
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-  std::shared_ptr<fims_model::Model<double>> model =
-      fims_model::Model<double>::GetInstance();
-  for (size_t i = 0; i < information->fixed_effects_parameters.size(); i++) {
-    *information->fixed_effects_parameters[i] = par[i];
+  for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++) {
+    *info0->fixed_effects_parameters[i] = par[i];
   }
-
-  bool reporting = model->do_tmb_reporting;
-  model->do_tmb_reporting = false;
-  model->Evaluate();
-
-  Rcpp::Function f = Rcpp::as<Rcpp::Function>(fn);
-  Rcpp::Function g = Rcpp::as<Rcpp::Function>(gr);
-  double val = Rcpp::as<double>(f(par));
-  Rcpp::NumericVector grad = Rcpp::as<Rcpp::NumericVector>(g(par));
-  double maxgc = -999;
-  for (R_xlen_t i = 0; i < grad.size(); i++) {
-    if (std::fabs(grad[i]) > maxgc) {
-      maxgc = std::fabs(grad[i]);
-    }
-  }
-
-  for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
-       i++) {
-    FIMSRcppInterfaceBase::fims_interface_objects[i]->finalize();
-  }
-  std::string ret;
-  auto now = std::chrono::system_clock::now();
-  std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-  std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
-  std::shared_ptr<fims_info::Information<double>> info =
-      fims_info::Information<double>::GetInstance();
-  std::stringstream ss;
-  ss << "{\n";
-  ss << "\"timestamp\": \"" << ctime_no_newline << "\",\n";
-  ss << "\"nyears\":" << info->nyears << ",\n";
-  ss << "\"nseasons\":" << info->nseasons << ",\n";
-  ss << "\"nages\":" << info->nages << ",\n";
-  ss << "\"objective_function_value\": " << val << ",\n";
-  ss << "\"max_gradient_component\": " << maxgc << ",\n";
-  ss << "\"final_gradient\": [";
-  if (grad.size() > 0) {
-    for (R_xlen_t i = 0; i < grad.size() - 1; i++) {
-      ss << grad[i] << ", ";
-    }
-    ss << grad[grad.size() - 1] << "],\n";
-  } else {
-    ss << "],";
-  }
-  ss << "\"modules\" : [\n";
-  size_t length = FIMSRcppInterfaceBase::fims_interface_objects.size();
-  if (length > 0) {
-    for (size_t i = 0; i < length - 1; i++) {
-      ss << FIMSRcppInterfaceBase::fims_interface_objects[i]->to_json()
-         << ",\n";
-    }
-
-    ss << FIMSRcppInterfaceBase::fims_interface_objects[length - 1]->to_json()
-       << "\n]\n}";
-  } else {
-    ss << "\n]\n}";
-  }
-
-  ret = fims::JsonParser::PrettyFormatJSON(ss.str());
-  model->do_tmb_reporting = reporting;
-  return ret;
 }
 
 /**
@@ -189,6 +156,30 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
   }
 
   return p;
+}
+
+/**
+ * @brief Sets the random parameters vector object.
+ * Updates the internal random effects parameter values for
+ * the model base of TMB_FIMS_REAL_TYPE. Typically called before
+ * finalize or get_output to ensure the correct values are used.
+ *
+ * Usage example:
+ * \code{.R}
+ * set_random_parameters(c(1, 2, 3))
+ * catch_at_age$get_output()
+ * \endcode
+ *
+ * @param par A vector of parameter values.
+ */
+void set_random_parameters(Rcpp::NumericVector par) {
+  // base model
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+  for (size_t i = 0; i < info0->random_effects_parameters.size(); i++) {
+    *info0->random_effects_parameters[i] = par[i];
+  }
 }
 
 /**
@@ -338,6 +329,9 @@ void clear() {
 
   DmultinomDistributionsInterface::id_g = 1;
   DmultinomDistributionsInterface::live_objects.clear();
+
+  FisheryModelInterfaceBase::id_g = 1;
+  FisheryModelInterfaceBase::live_objects.clear();
 
 #ifdef TMBAD_FRAMEWORK
   clear_internal<TMB_FIMS_REAL_TYPE>();

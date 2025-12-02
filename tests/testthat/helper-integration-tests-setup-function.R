@@ -41,7 +41,7 @@ FIMS_dmultinom <- function(x, p) {
 #' corresponds to a different iteration.
 #' @param estimation_mode A logical value indicating whether to perform
 #' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
-#' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
+#' will be optimized using `nlminb`. If `FALSE`, the input values will be used
 #' for the report.
 #' @param random_effects A logical value indicating whether to include random
 #' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects
@@ -97,7 +97,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # set fishing fleet age comp data, need to set dimensions of age comps
-  # Here the new function initializes the object with length nyr*nages
+  # Here the new function initializes the object with length nyr*n_ages
   fishing_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
 
   # Here we fill in the values for the object with the observed age comps for fleet one
@@ -134,11 +134,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Initialize the fishing fleet module
   fishing_fleet <- methods::new(Fleet)
   # Set number of years
-  fishing_fleet$nyears$set(om_input[["nyr"]])
+  fishing_fleet$n_years$set(om_input[["nyr"]])
   # Set number of age classes
-  fishing_fleet$nages$set(om_input[["nages"]])
+  fishing_fleet$n_ages$set(om_input[["nages"]])
   # Set number of length bins
-  fishing_fleet$nlengths$set(om_input[["nlengths"]])
+  fishing_fleet$n_lengths$set(om_input[["nlengths"]])
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
@@ -229,9 +229,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
   survey_fleet <- methods::new(Fleet)
-  survey_fleet$nages$set(om_input[["nages"]])
-  survey_fleet$nyears$set(om_input[["nyr"]])
-  survey_fleet$nlengths$set(om_input[["nlengths"]])
+  survey_fleet$n_ages$set(om_input[["nages"]])
+  survey_fleet$n_years$set(om_input[["nyr"]])
+  survey_fleet$n_lengths$set(om_input[["nlengths"]])
   survey_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
     # Set very low survey fishing mortality
@@ -306,7 +306,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # set up logit_steep
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
   recruitment$logit_steep[1]$estimation_type$set("constant")
-  recruitment$nyears$set(om_input[["nyr"]])
+  recruitment$n_years$set(om_input[["nyr"]])
 
   # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
@@ -414,15 +414,14 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     population$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
   }
   population$log_init_naa$set_all_estimable(TRUE)
-  population$nages$set(om_input[["nages"]])
+  population$n_ages$set(om_input[["nages"]])
   population$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
     \(x) population$ages$set(x - 1, om_input[["ages"]][x])
   )
-  population$nfleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
-  population$nseasons$set(1)
-  population$nyears$set(om_input[["nyr"]])
+  population$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
+  population$n_years$set(om_input[["nyr"]])
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())
   population$SetMaturityID(maturity$get_id())
@@ -430,8 +429,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   population$AddFleet(survey_fleet$get_id())
 
   # Set up catch at age model
-  # caa <- methods::new(CatchAtAge)
-  # caa$AddPopulation(population$get_id())
+  caa <- methods::new(CatchAtAge)
+  caa$AddPopulation(population$get_id())
 
   # Set-up TMB
   CreateTMBModel()
@@ -451,10 +450,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
       control = list(eval.max = 10000, iter.max = 10000, trace = 0)
     )
+    FIMS::set_fixed(opt$par)
+    fims_finalized <- caa$get_output()
   }
 
   # Call report using MLE parameter values, or
-  # the initial values if optimization is skipped
+  # the input values if optimization is skipped
   report <- obj[["report"]](obj[["env"]][["last.par.best"]])
 
 
@@ -497,7 +498,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 #' corresponds to a different iteration.
 #' @param estimation_mode A logical value indicating whether to perform
 #' optimization (`TRUE`) or skip it (`FALSE`). If `TRUE`, the model parameters
-#' will be optimized using `nlminb`. If `FALSE`, the initial values will be used
+#' will be optimized using `nlminb`. If `FALSE`, the input values will be used
 #' for the report.
 #' @param random_effects A logical value indicating whether to include random
 #' effects in the model (`TRUE`) or skip it (`FALSE`). If `TRUE`, random effects

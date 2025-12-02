@@ -17,34 +17,34 @@ default_parameters <- create_default_configurations(data = data) |>
   tidyr::unnest(cols = data)
 
 ## IO correctness ----
-
-test_that("initialize_fims works with correct inputs", {
-  #' @description Test that [initialize_fims()] returns a list with one
-  #' element named parameters.
+test_that("`initialize_fims()` works with correct inputs", {
   result <- initialize_fims(parameters = default_parameters, data = data)
+  #' @description Test that `initialize_fims()` returns a list.
   expect_type(result, "list")
-  expect_named(result, "parameters")
-  expect_equal(length(result), 1)
+  #' @description Test that `initialize_fims()` returns an output with correct names.
+  expect_named(result, c("parameters", "model"))
+  #' @description Test that `initialize_fims()` returns a list with two elements.
+  expect_equal(length(result), 2)
   clear()
 
-  #' @description Test that [initialize_comp()] works for AgeComp and returns
-  #' an S4 object.
   result <- initialize_comp(
     data = data,
     fleet_name = "fleet1",
     type = "AgeComp"
   )
+
+  #' @description Test that `initialize_comp()` works with `AgeComp` type and returns an S4 object.
   expect_type(result, "S4")
-  #' @description Test that [initialize_comp()] works for AgeComp and contains
-  #' the correct names inside the rcpp object.
+  #' @description Test that `initialize_comp()` works with `AgeComp` type and does not produce an error.
   expect_no_error(result[["age_comp_data"]])
+  #' @description Test that `initialize_comp()` works with `AgeComp` type and sets `length_comp_data` to NULL.
   expect_null(result[["length_comp_data"]])
+  #' @description Test that `initialize_comp()` output contains the correct structure.
   expect_true(
     all(c("age_comp_data", "initialize", "finalize", ".pointer") %in%
       names(result))
   )
-  #' @description Test that the age-composition data in the returned object from
-  #' [initialize_comp()] has the correct values.
+  #' @description Test that the age-composition data in the returned object from `initialize_comp()` has the correct values.
   expect_equal(
     result$age_comp_data$toRVector(),
     data |>
@@ -55,24 +55,23 @@ test_that("initialize_fims works with correct inputs", {
   )
   clear()
 
-  #' @description Test that [initialize_fims()] works for LengthComp and
-  #' returns an S4 object.
   result <- initialize_comp(
     data = data,
     fleet_name = "fleet1",
     type = "LengthComp"
   )
+  #' @description Test that `initialize_fims()` works with `LengthComp` type and returns an S4 object.
   expect_type(result, "S4")
-  #' @description Test that [initialize_fims()] works for LengthComp and
-  #' contains correct function.
+  #' @description Test that `initialize_fims()` works with `LengthComp` type and does not produce an error.
   expect_no_error(result[["length_comp_data"]])
+  #' @description Test that `initialize_fims()` works with `LengthComp` type and sets `age_comp_data` to NULL.
   expect_null(result[["age_comp_data"]])
+  #' @description Test that `initialize_fims()` output contains the correct structure.
   expect_true(
     all(c("length_comp_data", "initialize", "finalize", ".pointer") %in%
       names(result))
   )
-  #' @description Test that the length-composition data in the returned object
-  #' from [initialize_comp()] has the correct values.
+  #' @description Test that the length-composition data in the returned object from `initialize_comp()` has the correct values.
   expect_equal(
     result$length_comp_data$toRVector(),
     data |>
@@ -85,9 +84,7 @@ test_that("initialize_fims works with correct inputs", {
 })
 
 ## Edge handling ----
-test_that("initialize_fims works with edge cases", {
-  #' @description Test that [initialize_fims()] works with multiple
-  #' estimation types
+test_that("`initialize_fims()` works with edge cases", {
   modified_log_devs <- default_parameters |>
     dplyr::filter(label == "log_devs") |>
     # change first 10 estimation_type for label of log_devs from fixed_effects
@@ -106,40 +103,37 @@ test_that("initialize_fims works with edge cases", {
     dplyr::bind_rows(modified_log_devs)
   init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
   init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data)
+  #' @description Test that `initialize_fims()` works with multiple estimation types.
   expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)
 })
 
 ## Error handling ----
 
-test_that("initialize_fims returns correct error messages", {
-  #' @description Test that [initialize_fims()] handles missing parameters
-  #' input correctly.
+test_that("`initialize_fims()` returns correct error messages", {
+  #' @description Test that `initialize_fims()` handles missing parameters input correctly.
   expect_error(
     initialize_fims(data = data),
     "The `parameters` argument must be a tibble."
   )
   clear()
 
-  #' @description Test that [initialize_fims()] handles non-list parameters
-  #' input correctly.
+  #' @description Test that `initialize_fims()` handles non-list parameters input correctly.
   expect_error(
     initialize_fims(parameters = "not_a_list", data = data),
     "The `parameters` argument must be a tibble."
   )
   clear()
 
-  #' @description Test that [initialize_fims()] fails when no fleets are
-  #' provided.
   parameters_no_fleets <- default_parameters |>
     dplyr::filter(!(fleet_name %in% c("fleet1", "survey1")))
+  #' @description Test that `initialize_fims()` fails when no fleets are provided.
   expect_error(
     initialize_fims(parameters = parameters_no_fleets, data = data),
     "No fleets found in the provided `parameters`."
   )
   clear()
 
-  #' @description Test that [initialize_comp()] correctly returns error on
-  #' unknown fleet_name.
+  #' @description Test that `initialize_comp()` correctly returns error on unknown `fleet_name`.
   expect_error(
     initialize_comp(
       data = data,
@@ -150,8 +144,7 @@ test_that("initialize_fims returns correct error messages", {
   )
   clear()
 
-  #' @description Test that [initialize_comp()] correctly returns error on
-  #' unknown type.
+  #' @description Test that `initialize_comp()` correctly returns error on unknown `type`.
   expect_error(
     initialize_comp(
       data = data,
@@ -163,8 +156,6 @@ test_that("initialize_fims returns correct error messages", {
 
   clear()
 
-  #' @description Test that [initialize_fims()] correctly returns an error on
-  #' an unknown estimation_type
   parameters_wrong_type <- default_parameters |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
@@ -174,9 +165,10 @@ test_that("initialize_fims returns correct error messages", {
       )
     )
   parameters_wrong_type[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- "fixed.effects"
+  #' @description Test that `initialize_fims()` correctly returns an error on an unknown estimation_type.
   expect_error(
     initialize_fims(parameters = parameters_wrong_type, data = data),
-    "The `estimation_type` must be one of: constant, fixed_effects, and random_effects.",
+    "The `estimation_type` must be one of: constant, fixed_effects, and random_effects."
   )
   clear()
 })

@@ -66,8 +66,8 @@ purrr::walk(
   \(x) fishing_fleet_index$index_data$set(x - 1, catch[x])
 )
 fishing_fleet <- methods::new(Fleet)
-fishing_fleet$nages$set(om_input$nages)
-fishing_fleet$nyears$set(om_input$nyr)
+fishing_fleet$n_ages$set(om_input$nages)
+fishing_fleet$n_years$set(om_input$nyr)
 fishing_fleet$log_Fmort$resize(om_input$nyr)
 purrr::walk(
   seq_along(log(om_output$f)),
@@ -95,38 +95,32 @@ fishing_fleet_index_distribution2 <- initialize_data_distribution(
 
 
 ## IO correctness ----
-test_that("initialize_process_distribution() works with correct inputs", {
-  #' @description Test that [initialize_process_distribution()] returns
-  #' the correct log sd values when scalar.
+test_that("`initialize_process_distribution()` works with correct inputs", {
+  #' @description Test that `initialize_process_distribution()` returns the correct log sd values when scalar.
   expect_equal(log(om_input$logR_sd), recruitment_distribution$log_sd[1]$value)
 
-  #' @description Test that [initialize_process_distribution()] returns
-  #' the correct dimension for x values.
+  #' @description Test that `initialize_process_distribution()` returns the correct dimension for x values.
   expect_equal(length(recruitment$log_devs), length(recruitment_distribution$x))
 
-  #' @description Test that [initialize_process_distribution()] matches
-  #' the dimensions of x and expected values.
+  #' @description Test that `initialize_process_distribution()` matches the dimensions of x and expected values.
   expect_equal(
     length(recruitment_distribution$x),
     length(recruitment_distribution$expected_values)
   )
 })
 
-test_that("initialize_data_distribution() works with correct inputs", {
-  #' @description Test that [initialize_data_distribution()] returns
-  #' the correct log sd values when vector.
+test_that("`initialize_data_distribution()` works with correct inputs", {
+  #' @description Test that `initialize_data_distribution()` returns the correct log sd values when given a vector.
   expect_equal(
     log(fleet_sd[1]),
     fishing_fleet_index_distribution1$log_sd[1]$value
   )
-  #' @description Test that [initialize_data_distribution()] returns
-  #' the correct log sd estimation type
+  #' @description Test that `initialize_data_distribution()` returns the correct log sd estimation type.
   expect_equal(
     "constant",
     fishing_fleet_index_distribution1$log_sd[1]$estimation_type$get()
   )
-  #' @description Test that [initialize_data_distribution() returns
-  #' the correct log sd values when scalar.
+  #' @description Test that `initialize_data_distribution()` returns the correct log sd values when scalar.
   expect_equal(
     log(fleet_sd[1]),
     fishing_fleet_index_distribution2$log_sd[1]$value
@@ -134,8 +128,8 @@ test_that("initialize_data_distribution() works with correct inputs", {
 })
 
 ## Edge handling ----
-test_that("sd value must be greater than 0", {
-  #' @description Test that error is thrown when sd value is out of bounds
+test_that("`sd` value from `initialize_process_distribution()` must be greater than 0", {
+  #' @description Test that error is thrown when `sd` `value` is out of bounds.
   expect_error(
     initialize_process_distribution(
       module = recruitment,
@@ -150,9 +144,8 @@ test_that("sd value must be greater than 0", {
 
 
 ## Error handling ----
-test_that("initialize_process_distribution returns correct error messages", {
-  #' @description Test that multinomial cannot be specified as a family
-  #' in [initialize_process_distribution())
+test_that("`initialize_process_distribution()` returns correct error messages", {
+  #' @description Test that `multinomial` cannot be specified as a `family` in `initialize_process_distribution()`.
   expect_error(
     initialize_process_distribution(
       module = recruitment,
@@ -164,8 +157,7 @@ test_that("initialize_process_distribution returns correct error messages", {
     "FIMS currently does not allow the family"
   )
 
-  #' @description Test that error is thrown when incorrect family specified for
-  #' [initialize_process_distribution()]
+  #' @description Test that error is thrown when incorrect `family` specified for `initialize_process_distribution()`.
   expect_error(
     initialize_process_distribution(
       module = recruitment,
@@ -177,8 +169,7 @@ test_that("initialize_process_distribution returns correct error messages", {
     "FIMS currently does not allow the family"
   )
 
-  #' @description Test that error is thrown when vector size of sd value
-  #' and estimation_type do not match
+  #' @description Test that error is thrown when vector size of `sd` `value` and `estimation_type` do not match.
   expect_error(
     initialize_process_distribution(
       module = recruitment,
@@ -193,7 +184,7 @@ test_that("initialize_process_distribution returns correct error messages", {
     "must match"
   )
 
-  #' @description Test that error is thrown when family is not a family class
+  #' @description Test that error is thrown when `family` is not a family class.
   expect_error(
     initialize_process_distribution(
       module = recruitment,
@@ -208,7 +199,7 @@ test_that("initialize_process_distribution returns correct error messages", {
     "should be an object of class"
   )
 
-  #' @description Test that error is thrown when sd estimation type is missing
+  #' @description Test that error is thrown when `sd` `estimation_type` is missing.
   expect_error(
     initialize_process_distribution(
       module = recruitment,
@@ -222,9 +213,8 @@ test_that("initialize_process_distribution returns correct error messages", {
 })
 
 
-test_that("initialize_data_distribution returns correct error messages", {
-  #' @description Test that error is thrown when family and index data type
-  #' don't match in [initialize_data_distribution()]
+test_that("`initialize_data_distribution()` returns correct error messages", {
+  #' @description Test that error is thrown when `family` and `index` `data_type` don't match in `initialize_data_distribution()`.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
@@ -235,8 +225,7 @@ test_that("initialize_data_distribution returns correct error messages", {
     "does not allow the family to be"
   )
 
-  #' @description Test that error is thrown when family and landings data type
-  #' don't match in [initialize_data_distribution()]
+  #' @description Test that error is thrown when `family` and `landings` `data_type` don't match in `initialize_data_distribution()`.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
@@ -247,8 +236,7 @@ test_that("initialize_data_distribution returns correct error messages", {
     "does not allow the family to be"
   )
 
-  #' @description Test that error is thrown when family and agecomp data type
-  #' don't match in [initialize_data_distribution()]
+  #' @description Test that error is thrown when `family` and `agecomp` `data_type` don't match in `initialize_data_distribution()`.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
@@ -259,8 +247,7 @@ test_that("initialize_data_distribution returns correct error messages", {
     "does not allow the family to be"
   )
 
-  #' @description Test that error is thrown when family and lengthcomp data type
-  #' don't match in [initialize_data_distribution()]
+  #' @description Test that error is thrown when `family` and `lengthcomp` `data_type` don't match in `initialize_data_distribution()`.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
@@ -271,8 +258,7 @@ test_that("initialize_data_distribution returns correct error messages", {
     "does not allow the family to be"
   )
 
-  #' @description Test that error is thrown when data type is incorrect in
-  #' [initialize_data_distribution()]
+  #' @description Test that error is thrown when `data_type` is incorrect in `initialize_data_distribution()`.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
@@ -283,8 +269,7 @@ test_that("initialize_data_distribution returns correct error messages", {
     "must be one of"
   )
 
-  #' @description Test that error is thrown when sd value and estimation_type
-  #' dimensions do not match
+  #' @description Test that error is thrown when `sd` value and `estimation_type` dimensions do not match.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
@@ -295,7 +280,7 @@ test_that("initialize_data_distribution returns correct error messages", {
     "must match if more than one value"
   )
 
-  #' @description Test that error is thrown when sd value is missing
+  #' @description Test that error is thrown when `sd` value is missing.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
@@ -305,6 +290,7 @@ test_that("initialize_data_distribution returns correct error messages", {
     ),
     "need to be present"
   )
+  #' @description Test that error is thrown when `family` is missing.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,

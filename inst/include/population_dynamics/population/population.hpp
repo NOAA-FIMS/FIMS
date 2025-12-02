@@ -24,10 +24,9 @@ namespace fims_popdy {
 template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for population object*/
-  size_t nyears;        /*!< total number of years in the fishery*/
-  size_t nseasons;      /*!< total number of seasons in the fishery*/
-  size_t nages;         /*!< total number of ages in the population*/
-  size_t nfleets;       /*!< total number of fleets in the fishery*/
+  size_t n_years;        /*!< total number of years in the fishery*/
+  size_t n_ages;         /*!< total number of ages in the population*/
+  size_t n_fleets;       /*!< total number of fleets in the fishery*/
 
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
@@ -71,6 +70,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       total_landings_numbers; /*!< Derived quantity: Total landings in numbers*/
   fims::Vector<Type> expected_recruitment; /*!< Expected recruitment */
+  fims::Vector<Type> sum_selectivity;      /*!< TODO: add documentation */
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
@@ -93,12 +93,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   // Define objective function object to be able to REPORT and ADREPORT
 
-#ifdef TMB_MODEL
-  ::objective_function<Type>
-      *of;  // :: references global namespace, defined in src/FIMS.cpp,
-            // available anywhere in the R package
-#endif
-
   std::map<std::string, fims::Vector<Type>>
       derived_quantities; /*!< derived quantities for specific model type, i.e.
                              caa, surplus production, etc */
@@ -115,35 +109,33 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Initialize values. Called once at the start of model run.
    *
-   * @param nyears number of years in the population
-   * @param nseasons number of seasons in the population
-   * @param nages number of ages in the population
+   * @param n_years number of years in the population
+   * @param n_ages number of ages in the population
    */
-  void Initialize(int nyears, int nseasons, int nages) {
-    this->nyears = nyears;
-    this->nseasons = nseasons;
-    this->nages = nages;
+  void Initialize(int n_years, int n_ages) {
+    this->n_years = n_years;
+    this->n_ages = n_ages;
 
-    // size all the vectors to length of nages
-    nfleets = fleets.size();
-    total_landings_weight.resize(nyears);
-    total_landings_numbers.resize(nyears);
-    years.resize(nyears);
-    mortality_F.resize(nyears * nages);
-    mortality_Z.resize(nyears * nages);
-    proportion_mature_at_age.resize((nyears + 1) * nages);
-    proportion_female.resize(nages);
-    weight_at_age.resize(nages);
-    unfished_numbers_at_age.resize((nyears + 1) * nages);
-    biomass.resize((nyears + 1));
-    unfished_biomass.resize((nyears + 1));
-    unfished_spawning_biomass.resize((nyears + 1));
-    spawning_biomass.resize((nyears + 1));
-    expected_recruitment.resize((nyears + 1));
-    M.resize(nyears * nages);
-    ages.resize(nages);
-    log_init_naa.resize(nages);
-    log_M.resize(nyears * nages);
+    // size all the vectors to length of n_ages
+    n_fleets = fleets.size();
+    total_landings_weight.resize(n_years);
+    total_landings_numbers.resize(n_years);
+    years.resize(n_years);
+    mortality_F.resize(n_years * n_ages);
+    mortality_Z.resize(n_years * n_ages);
+    proportion_mature_at_age.resize((n_years + 1) * n_ages);
+    proportion_female.resize(n_ages);
+    weight_at_age.resize(n_ages);
+    unfished_numbers_at_age.resize((n_years + 1) * n_ages);
+    biomass.resize((n_years + 1));
+    unfished_biomass.resize((n_years + 1));
+    unfished_spawning_biomass.resize((n_years + 1));
+    spawning_biomass.resize((n_years + 1));
+    expected_recruitment.resize((n_years + 1));
+    M.resize(n_years * n_ages);
+    ages.resize(n_ages);
+    log_init_naa.resize(n_ages);
+    log_M.resize(n_years * n_ages);
   }
 
   /**
@@ -176,10 +168,10 @@ struct Population : public fims_model_object::FIMSObject<Type> {
               static_cast<Type>(0.5));
 
     // Transformation Section
-    for (size_t age = 0; age < this->nages; age++) {
+    for (size_t age = 0; age < this->n_ages; age++) {
       this->weight_at_age[age] = growth->evaluate(ages[age]);
-      for (size_t year = 0; year < this->nyears; year++) {
-        size_t i_age_year = age * this->nyears + year;
+      for (size_t year = 0; year < this->n_years; year++) {
+        size_t i_age_year = age * this->n_years + year;
         this->M[i_age_year] = fims_math::exp(this->log_M[i_age_year]);
         // mortality_F is a fims::Vector and therefore needs to be filled
         // within a loop
@@ -229,7 +221,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * @param age age index
    */
   void CalculateMortality(size_t i_age_year, size_t year, size_t age) {
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+    for (size_t fleet_ = 0; fleet_ < this->n_fleets; fleet_++) {
       this->mortality_F[i_age_year] +=
           this->fleets[fleet_]->Fmort[year] *
           // evaluate is a member function of the selectivity class
@@ -269,7 +261,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
         (fims_math::exp(-this->mortality_Z[i_agem1_yearm1]));
 
     // Plus group calculation
-    if (age == (this->nages - 1)) {
+    if (age == (this->n_ages - 1)) {
       this->numbers_at_age[i_age_year] =
           this->numbers_at_age[i_age_year] +
           this->numbers_at_age[i_agem1_yearm1 + 1] *
@@ -307,7 +299,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
         (fims_math::exp(-this->M[i_agem1_yearm1]));
 
     // Plus group calculation
-    if (age == (this->nages - 1)) {
+    if (age == (this->n_ages - 1)) {
       this->unfished_numbers_at_age[i_age_year] =
           this->unfished_numbers_at_age[i_age_year] +
           this->unfished_numbers_at_age[i_agem1_yearm1 + 1] *
@@ -422,25 +414,25 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * @return Type
    */
   Type CalculateSBPR0() {
-    std::vector<Type> numbers_spr(this->nages, 1.0);
+    std::vector<Type> numbers_spr(this->n_ages, 1.0);
     Type phi_0 = static_cast<Type>(0.0);
     phi_0 += numbers_spr[0] * this->proportion_female[0] *
              this->proportion_mature_at_age[0] *
              this->growth->evaluate(ages[0]);
-    for (size_t a = 1; a < (this->nages - 1); a++) {
+    for (size_t a = 1; a < (this->n_ages - 1); a++) {
       numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-this->M[a]);
       phi_0 += numbers_spr[a] * this->proportion_female[a] *
                this->proportion_mature_at_age[a] *
                this->growth->evaluate(ages[a]);
     }
 
-    numbers_spr[this->nages - 1] =
-        (numbers_spr[nages - 2] * fims_math::exp(-this->M[nages - 2])) /
-        (1 - fims_math::exp(-this->M[this->nages - 1]));
-    phi_0 += numbers_spr[this->nages - 1] *
-             this->proportion_female[this->nages - 1] *
-             this->proportion_mature_at_age[this->nages - 1] *
-             this->growth->evaluate(ages[this->nages - 1]);
+    numbers_spr[this->n_ages - 1] =
+        (numbers_spr[n_ages - 2] * fims_math::exp(-this->M[n_ages - 2])) /
+        (1 - fims_math::exp(-this->M[this->n_ages - 1]));
+    phi_0 += numbers_spr[this->n_ages - 1] *
+             this->proportion_female[this->n_ages - 1] *
+             this->proportion_mature_at_age[this->n_ages - 1] *
+             this->growth->evaluate(ages[this->n_ages - 1]);
     return phi_0;
   }
 
@@ -464,12 +456,12 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    *
    * @param i_age_year dimension folded index for age and year
    * @param year the year recruitment is being calculated for
-   * @param i_dev index to log_recruit_dev of vector length nyears-1
+   * @param i_dev index to log_recruit_dev of vector length n_years-1
    */
   void CalculateRecruitment(size_t i_age_year, size_t year, size_t i_dev) {
     Type phi0 = CalculateSBPR0();
 
-    if (i_dev == this->nyears) {
+    if (i_dev == this->n_years) {
       this->numbers_at_age[i_age_year] = this->recruitment->evaluate_mean(
           this->spawning_biomass[year - 1], phi0);
       /*the final year of the time series has no data to inform recruitment
@@ -479,7 +471,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
           fims_math::log(this->recruitment->evaluate_mean(
               this->spawning_biomass[year - 1], phi0));
       /*the log_recruit_err vector does not include a value for year == 0
-          and is of length nyears - 1 where the first position of the vector
+          and is of length n_years - 1 where the first position of the vector
           corresponds to the second year of the time series. The first year is
           informed by the init_naa parameter*/
       this->numbers_at_age[i_age_year] =
@@ -521,8 +513,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * @param age the age of landings that is being added into total landings
    */
   void CalculateLandings(size_t year, size_t age) {
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
-      size_t i_age_year = year * this->nages + age;
+    for (size_t fleet_ = 0; fleet_ < this->n_fleets; fleet_++) {
+      size_t i_age_year = year * this->n_ages + age;
 
       this->total_landings_weight[year] +=
           this->fleets[fleet_]->landings_weight_at_age[i_age_year];
@@ -564,7 +556,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * @param age the age composition is being calculated for
    */
   void CalculateLandingsNumbersAA(size_t i_age_year, size_t year, size_t age) {
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+    for (size_t fleet_ = 0; fleet_ < this->n_fleets; fleet_++) {
       // Baranov Catch Equation
       this->fleets[fleet_]->landings_numbers_at_age[i_age_year] +=
           (this->fleets[fleet_]->Fmort[year] *
@@ -592,8 +584,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * @param age the age of expected landings weight at age
    */
   void CalculateLandingsWeightAA(size_t year, size_t age) {
-    int i_age_year = year * this->nages + age;
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+    int i_age_year = year * this->n_ages + age;
+    for (size_t fleet_ = 0; fleet_ < this->n_fleets; fleet_++) {
       this->fleets[fleet_]->landings_weight_at_age[i_age_year] =
           this->fleets[fleet_]->landings_numbers_at_age[i_age_year] *
           this->weight_at_age[age];
@@ -628,7 +620,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * @param age the age of the index being added to the population index
    */
   void CalculateIndex(size_t i_age_year, size_t year, size_t age) {
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+    for (size_t fleet_ = 0; fleet_ < this->n_fleets; fleet_++) {
       fleets[fleet_]->index_weight[year] +=
           this->fleets[fleet_]->index_weight_at_age[i_age_year];
 
@@ -660,7 +652,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * @param age the age index is being calculated for
    */
   void CalculateIndexNumbersAA(size_t i_age_year, size_t year, size_t age) {
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+    for (size_t fleet_ = 0; fleet_ < this->n_fleets; fleet_++) {
       this->fleets[fleet_]->index_numbers_at_age[i_age_year] +=
           (this->fleets[fleet_]->q.get_force_scalar(year) *
            this->fleets[fleet_]->selectivity->evaluate(ages[age])) *
@@ -685,8 +677,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * @param age the age of expected index weight at age
    */
   void CalculateIndexWeightAA(size_t year, size_t age) {
-    int i_age_year = year * this->nages + age;
-    for (size_t fleet_ = 0; fleet_ < this->nfleets; fleet_++) {
+    int i_age_year = year * this->n_ages + age;
+    for (size_t fleet_ = 0; fleet_ < this->n_fleets; fleet_++) {
       this->fleets[fleet_]->index_weight_at_age[i_age_year] =
           this->fleets[fleet_]->index_numbers_at_age[i_age_year] *
           this->weight_at_age[age];
@@ -711,7 +703,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
      code for initial structure and recruitment 0 loops. Could also have started
      loops at 1 with initial structure and recruitment setup outside the loops.
 
-     year loop is extended to <= nyears because SB is calculated as the start
+     year loop is extended to <= n_years because SB is calculated as the start
      of the year value and by extending one extra year we get estimates of the
      population structure at the end of the final year. An alternative approach
      would be to keep initial numbers at age in it's own vector and each year to
@@ -721,13 +713,13 @@ struct Population : public fims_model_object::FIMSObject<Type> {
      explicitly referencing the exact date (or period of averaging) at which any
      calculation or output is being made.
      */
-    for (size_t y = 0; y <= this->nyears; y++) {
-      for (size_t a = 0; a < this->nages; a++) {
+    for (size_t y = 0; y <= this->n_years; y++) {
+      for (size_t a = 0; a < this->n_ages; a++) {
         /*
          index naming defines the dimensional folding structure
          i.e. i_age_year is referencing folding over years and ages.
          */
-        size_t i_age_year = y * this->nages + a;
+        size_t i_age_year = y * this->n_ages + a;
         /*
          Mortality rates are not estimated in the final year which is
          used to show expected population structure at the end of the model
@@ -738,13 +730,13 @@ struct Population : public fims_model_object::FIMSObject<Type> {
          worth exploring as later milestone changes will eliminate this
          confusion.
          */
-        if (y < this->nyears) {
+        if (y < this->n_years) {
           /*
            First thing we need is total mortality aggregated across all fleets
            to inform the subsequent landings and change in numbers at age
-           calculations. This is only calculated for years < nyears as these are
+           calculations. This is only calculated for years < n_years as these are
            the model estimated years with data. The year loop extends to
-           y=nyears so that population numbers at age and SB can be calculated
+           y=n_years so that population numbers at age and SB can be calculated
            at the end of the last year of the model
            */
           CalculateMortality(i_age_year, y, a);
@@ -799,7 +791,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
                 fims_math::exp(this->recruitment->log_rzero[0]);
 
           } else {
-            size_t i_agem1_yearm1 = (y - 1) * nages + (a - 1);
+            size_t i_agem1_yearm1 = (y - 1) * n_ages + (a - 1);
             CalculateNumbersAA(i_age_year, i_agem1_yearm1, a);
             CalculateUnfishedNumbersAA(i_age_year, i_agem1_yearm1, a);
           }
@@ -812,11 +804,11 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
         /*
         Here composition, total landings, and index values are calculated for
-        all years with reference data. They are not calculated for y=nyears as
+        all years with reference data. They are not calculated for y=n_years as
         there is this is just to get final population structure at the end of
         the terminal year.
          */
-        if (y < this->nyears) {
+        if (y < this->n_years) {
           CalculateLandingsNumbersAA(i_age_year, y, a);
           CalculateLandingsWeightAA(y, a);
           CalculateLandings(y, a);
@@ -827,6 +819,16 @@ struct Population : public fims_model_object::FIMSObject<Type> {
         }
       }
     }
+  }
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
+    report_vectors["log_init_naa"].emplace_back(this->log_init_naa);
+    report_vectors["log_M"].emplace_back(this->log_M);
+  }
+  virtual void get_report_vector_count(
+      std::map<std::string, size_t>& report_vector_count) {
+    report_vector_count["log_init_naa"] += 1;
+    report_vector_count["log_M"] += 1;
   }
 };
 template <class Type>

@@ -24,9 +24,9 @@ namespace fims_popdy {
 template <class Type>
 struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
-  size_t nyears;        /*!< the number of years in the model*/
-  size_t nages;         /*!< the number of ages in the model*/
-  size_t nlengths;      /*!< the number of lengths in the model*/
+  size_t n_years;        /*!< the number of years in the model*/
+  size_t n_ages;         /*!< the number of ages in the model*/
+  size_t n_lengths;      /*!< the number of lengths in the model*/
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
@@ -113,10 +113,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   typedef typename std::map<std::string, fims::Vector<Type>>::iterator
       derived_quantities_iterator;
 
-#ifdef TMB_MODEL
-  ::objective_function<Type> *of;
-#endif
-
   /**
    * @brief Constructor.
    */
@@ -129,46 +125,46 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Initialize Fleet Class
-   * @param nyears The number of years in the model.
-   * @param nages The number of ages in the model.
-   * @param nlengths The number of lengths in the model.
+   * @param n_years The number of years in the model.
+   * @param n_ages The number of ages in the model.
+   * @param n_lengths The number of lengths in the model.
    */
-  void Initialize(int nyears, int nages, int nlengths = 0) {
+  void Initialize(int n_years, int n_ages, int n_lengths = 0) {
     if (this->log_q.size() == 0) {
       this->log_q.resize(1);
       this->log_q[0] = static_cast<Type>(0.0);
     }
-    this->nyears = nyears;
-    this->nages = nages;
-    this->nlengths = nlengths;
+    this->n_years = n_years;
+    this->n_ages = n_ages;
+    this->n_lengths = n_lengths;
     q.resize(this->log_q.size());
-    log_Fmort.resize(nyears);
-    Fmort.resize(nyears);
+    log_Fmort.resize(n_years);
+    Fmort.resize(n_years);
 
     // landings
-    landings_numbers_at_age.resize(nyears * nages);
-    landings_weight_at_age.resize(nyears * nages);
-    landings_numbers_at_length.resize(nyears * nlengths);
-    landings_weight.resize(nyears);
-    landings_numbers.resize(nyears);
-    landings_expected.resize(nyears);
-    log_landings_expected.resize(nyears);
+    landings_numbers_at_age.resize(n_years * n_ages);
+    landings_weight_at_age.resize(n_years * n_ages);
+    landings_numbers_at_length.resize(n_years * n_lengths);
+    landings_weight.resize(n_years);
+    landings_numbers.resize(n_years);
+    landings_expected.resize(n_years);
+    log_landings_expected.resize(n_years);
 
     // index
-    index_numbers_at_age.resize(nyears * nages);
-    index_weight_at_age.resize(nyears * nages);
-    index_numbers_at_length.resize(nyears * nlengths);
-    index_weight.resize(nyears);
-    index_numbers.resize(nyears);
-    index_expected.resize(nyears);
-    log_index_expected.resize(nyears);
+    index_numbers_at_age.resize(n_years * n_ages);
+    index_weight_at_age.resize(n_years * n_ages);
+    index_numbers_at_length.resize(n_years * n_lengths);
+    index_weight.resize(n_years);
+    index_numbers.resize(n_years);
+    index_expected.resize(n_years);
+    log_index_expected.resize(n_years);
 
     // composition
-    agecomp_expected.resize(nyears * nages);
-    lengthcomp_expected.resize(nyears * nlengths);
-    agecomp_proportion.resize(nyears * nages);
-    lengthcomp_proportion.resize(nyears * nlengths);
-    age_to_length_conversion.resize(nages * nlengths);
+    agecomp_expected.resize(n_years * n_ages);
+    lengthcomp_expected.resize(n_years * n_lengths);
+    agecomp_proportion.resize(n_years * n_ages);
+    lengthcomp_proportion.resize(n_years * n_lengths);
+    age_to_length_conversion.resize(n_ages * n_lengths);
   }
 
   /**
@@ -178,14 +174,14 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    *
    */
   void Prepare() {
-    // for(size_t fleet_ = 0; fleet_ <= this->nfleets; fleet_++) {
+    // for(size_t fleet_ = 0; fleet_ <= this->n_fleets; fleet_++) {
     // this -> Fmort[fleet_] = fims_math::exp(this -> log_Fmort[fleet_]);
 
     for (size_t i = 0; i < this->log_q.size(); i++) {
       this->q[i] = fims_math::exp(this->log_q[i]);
     }
 
-    for (size_t year = 0; year < this->nyears; year++) {
+    for (size_t year = 0; year < this->n_years; year++) {
       this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
     }
 
@@ -243,7 +239,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    * Evaluate the proportion of landings numbers at age.
    */
   void evaluate_age_comp() {
-    for (size_t y = 0; y < this->nyears; y++) {
+    for (size_t y = 0; y < this->n_years; y++) {
       Type sum = static_cast<Type>(0.0);
       Type sum_obs = static_cast<Type>(0.0);
       // robust_add is a small value to add to expected composition
@@ -255,8 +251,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       // additions to ensure that proportions sum to 1.
       // Type robust_sum = static_cast<Type>(1.0);
 
-      for (size_t a = 0; a < this->nages; a++) {
-        size_t i_age_year = y * this->nages + a;
+      for (size_t a = 0; a < this->n_ages; a++) {
+        size_t i_age_year = y * this->n_ages + a;
         // Here we have a check to determine if the age comp
         // should be calculated from the retained landings or
         // the total population. These values are slightly different.
@@ -287,8 +283,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
           }
         }
       }
-      for (size_t a = 0; a < this->nages; a++) {
-        size_t i_age_year = y * this->nages + a;
+      for (size_t a = 0; a < this->n_ages; a++) {
+        size_t i_age_year = y * this->n_ages + a;
         this->agecomp_proportion[i_age_year] =
             this->agecomp_expected[i_age_year] / sum;
         // robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
@@ -305,8 +301,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    * Evaluate the proportion of landings numbers at length.
    */
   void evaluate_length_comp() {
-    if (this->nlengths > 0) {
-      for (size_t y = 0; y < this->nyears; y++) {
+    if (this->n_lengths > 0) {
+      for (size_t y = 0; y < this->n_years; y++) {
         Type sum = static_cast<Type>(0.0);
         Type sum_obs = static_cast<Type>(0.0);
         // robust_add is a small value to add to expected composition
@@ -317,11 +313,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         // sum robust is used to calculate the total sum of robust
         // additions to ensure that proportions sum to 1.
         // Type robust_sum = static_cast<Type>(1.0);
-        for (size_t l = 0; l < this->nlengths; l++) {
-          size_t i_length_year = y * this->nlengths + l;
-          for (size_t a = 0; a < this->nages; a++) {
-            size_t i_age_year = y * this->nages + a;
-            size_t i_length_age = a * this->nlengths + l;
+        for (size_t l = 0; l < this->n_lengths; l++) {
+          size_t i_length_year = y * this->n_lengths + l;
+          for (size_t a = 0; a < this->n_ages; a++) {
+            size_t i_age_year = y * this->n_ages + a;
+            size_t i_length_age = a * this->n_lengths + l;
             this->lengthcomp_expected[i_length_year] +=
                 this->agecomp_expected[i_age_year] *
                 this->age_to_length_conversion[i_length_age];
@@ -345,8 +341,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
             }
           }
         }
-        for (size_t l = 0; l < this->nlengths; l++) {
-          size_t i_length_year = y * this->nlengths + l;
+        for (size_t l = 0; l < this->n_lengths; l++) {
+          size_t i_length_year = y * this->n_lengths + l;
           this->lengthcomp_proportion[i_length_year] =
               this->lengthcomp_expected[i_length_year] / sum;
           // robust_add + robust_sum * this->lengthcomp_expected[i_length_year]
@@ -386,6 +382,19 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       }
       log_landings_expected[i] = log(this->landings_expected[i]);
     }
+  }
+
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
+    report_vectors["log_Fmort"].emplace_back(this->log_Fmort.to_tmb());
+    report_vectors["log_q"].emplace_back(this->log_q.to_tmb());
+    report_vectors["age_to_length_conversion"].emplace_back(
+        this->age_to_length_conversion.to_tmb());
+  }
+  virtual void get_report_vector_count(
+      std::map<std::string, size_t>& report_vector_count) {
+    report_vector_count["log_Fmort"] += 1;
+    report_vector_count["log_q"] += 1;
   }
 };
 

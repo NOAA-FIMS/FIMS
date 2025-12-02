@@ -10,6 +10,10 @@
 # Deterministic test ----
 ## Setup ----
 # Load necessary data for the integration test
+if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
+  prepare_test_data()
+}
+
 load(test_path("fixtures", "integration_test_data.RData"))
 
 # Set the iteration ID to 1 for accessing specific input/output list
@@ -25,8 +29,8 @@ result <- setup_and_run_FIMS_without_wrappers(
 )
 
 ## IO correctness ----
-test_that("deterministic run works with correct inputs", {
-  #' @description Compare FIMS results with model comparison project OM values.
+test_that("catch-at-age model (deterministic MLE without wrappers) works with correct inputs", {
+  #' @description Test that the output from FIMS run matches the model comparison project OM values.
   verify_fims_deterministic(
     report = result[["report"]],
     estimates = result[["sdr_fixed"]],
@@ -36,7 +40,7 @@ test_that("deterministic run works with correct inputs", {
     use_fimsfit = FALSE
   )
 
-  #' @description Compare FIMS results with model comparison project OM values.
+  #' @description Test that the NLLs from FIMS match the "true" NLLs from the model comparison project.
   verify_fims_nll(
     report = result[["report"]],
     om_input = om_input_list[[iter_id]],
@@ -44,9 +48,8 @@ test_that("deterministic run works with correct inputs", {
     em_input = em_input_list[[iter_id]]
   )
 
-  #' @description Verify the number of parameters is correct for deterministic
-  #' run.
-  #' TODO: change parameter number to 77 after fixing log_devs estimation error
+  # TODO: change parameter number to 77 after fixing log_devs estimation error
+  #' @description Test that the number of parameters is correct for deterministic run.
   expect_equal(length(result[["obj"]][["par"]]), 48)
 })
 
@@ -68,9 +71,8 @@ result <- setup_and_run_FIMS_without_wrappers(
 ## IO correctness ----
 # Compare FIMS results with model comparison project OM values
 ## IO correctness ----
-test_that("deterministic run works with correct inputs", {
-  #' @description Compare FIMS results with model comparison project OM values
-  #' in a non-deterministic run with age- and length-composition data.
+test_that("catch-at-age model (estimation MLE without wrappers) works with correct inputs", {
+  #' @description Test that the output from FIMS matches the model comparison project OM values.
   validate_fims(
     report = result[["report"]],
     estimates = result[["sdr_report"]],
@@ -78,10 +80,24 @@ test_that("deterministic run works with correct inputs", {
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
   )
+
+  out_of_tolerance_parameters <- cbind(
+    result[["parameters"]][["p"]],
+    result[["sdr_fixed"]]
+  ) |>
+    as.data.frame() |>
+    setNames(c("input", "estimate", "uncertainty")) |>
+    dplyr::mutate(
+      within_2SE = abs(estimate - input) <= qnorm(.975) * uncertainty
+    ) |>
+    dplyr::filter(!within_2SE) |>
+    nrow()
+  #' @description Test that the 95% of the parameter estimates fall within 2*SE.
+  expect_equal(out_of_tolerance_parameters, 0)
 })
 
 ## Edge handling ----
-test_that("run FIMS and return correct outputs for edge cases", {
+test_that("catch-at-age model (estimation MLE without wrappers) returns correct outputs for edge cases", {
   # Introduce a missing value in survey observations for the EM input
   na_value <- -999
   na_index <- 2
@@ -96,9 +112,7 @@ test_that("run FIMS and return correct outputs for edge cases", {
     estimation_mode = TRUE
   )
 
-  #' @description Test that FIMS runs with missing values in survey index
-  #' observations using NA (missing value) placeholder in the second value and
-  #' the report is not NULL.
+  #' @description Test that FIMS runs with missing values in survey index observations using NA (missing value) placeholder in the second value and the report is not NULL.
   expect_false(is.null(result[["report"]]))
 
   # Obtain the gradient and Hessian matrix
@@ -109,15 +123,12 @@ test_that("run FIMS and return correct outputs for edge cases", {
     gr = result[["obj"]][["gr"]]
   )
   result[["opt"]][["par"]] <- result[["opt"]][["par"]] - solve(h, g)
+  # Obtain the maximum absolute gradient to check convergence
   max_gradient <- max(abs(result[["obj"]][["gr"]](result[["opt"]][["par"]])))
 
-  #' @description Test that the maximum gradient is less than or equal to 0.0001
-  #' after running FIMS with missing values in survey index observations.
-  #'   # Obtain the maximum absolute gradient to check convergence
+  #' @description Test that the maximum gradient is less than or equal to 0.0001 after running FIMS with missing values in survey index observations.
   expect_lte(max_gradient, 0.0001)
 
-  #' @description Test that running FIMS with age compositions in proportions
-  #' works.
   # Store the original values of the number of landings observations and
   # survey observations
   n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]
@@ -144,7 +155,7 @@ test_that("run FIMS and return correct outputs for edge cases", {
     estimation_mode = TRUE
   )
 
-  # Compare FIMS results with model comparison project OM values
+  #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
   validate_fims(
     report = result[["report"]],
     estimates = result[["sdr_report"]],

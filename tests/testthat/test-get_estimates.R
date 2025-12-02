@@ -18,34 +18,37 @@ if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
-  "parameter_id", "fleet_name", "age", "length", "time",
-  "initial", "estimate", "uncertainty", "log_like", "log_like_cv",
-  "gradient", "estimation_type"
+  "parameter_id", "fleet", "year_i", "age_i", "length_i",
+  "input", "estimated", "expected", "observed",
+  "estimation_type", "uncertainty",
+  "distribution", "input_type",
+  "lpdf", "likelihood", "log_like_cv", "gradient"
 )
 
-test_that("get_estimates() works with deterministic run", {
+test_that("`get_estimates()` works with deterministic run", {
   # Read the RDS file containing the deterministic run results
   deterministic_results <- readRDS(test_path("fixtures", "deterministic_age_length_comp.RDS"))
   deterministic_colnames <- get_estimates(deterministic_results) |> colnames()
-  #' @description Test that [get_estimates()] returns correct colnames from a
-  #' deterministic run.
+  #' @description Test that `get_estimates()` returns correct colnames from a deterministic run.
   expect_equal(
     object = deterministic_colnames,
     expected = expected_colnames
   )
 
-  #' @description Test that [get_estimates()] returns correct snapshot from a
-  #' deterministic run.
+  #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot(
     get_estimates(deterministic_results) |>
       # Remove the estimate, uncertainty, and gradient columns, as they
       # may change between runs
-      dplyr::select(-estimate, -uncertainty, -gradient) |>
+      dplyr::select(
+        -estimated, -expected, -uncertainty, -gradient,
+        -likelihood, -log_like_cv, -gradient
+      ) |>
       print(n = 320, width = Inf)
   )
 })
 
-test_that("get_estimates() works with estimation run", {
+test_that("`get_estimates()` works with estimation run", {
   # Load the test data from an RDS file containing model fits.
   # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
   fit_files <- list.files(
@@ -59,14 +62,8 @@ test_that("get_estimates() works with estimation run", {
     fit_data <- readRDS(fit_file)
     estimates <- get_estimates(fit_data)
     estimates_colnames <- colnames(estimates)
-    #' @description Test that [get_estimates()] returns correct output for the
-    #' estimates slot.
-    expect_equal(
-      object = estimates,
-      expected = fit_data@estimates
-    )
-    #' @description Test that [get_estimates()] returns correct column names
-    #' for the estimates tibble.
+
+    #' @description Test that `get_estimates()` returns correct colnames from a estimation run.
     expect_equal(
       object = estimates_colnames,
       expected = expected_colnames
@@ -76,23 +73,24 @@ test_that("get_estimates() works with estimation run", {
   # Use purrr::map to apply the function to each file
   result <- purrr::map(fit_files, check_estimates_colnames)
 
-  #' @description Test that [get_estimates()] returns correct snapshot for an
-  #' estimation run.
+  #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot(
     # Read the first RDS file, get estimates, and print a snapshot
     readRDS(fit_files[[1]]) |>
       get_estimates() |>
-      # Remove the estimate, uncertainty, and gradient columns, as they
+      # Remove the estimated, uncertainty, and gradient columns, as they
       # may change between runs
-      dplyr::select(-estimate, -uncertainty, -gradient) |>
+      dplyr::select(
+        -estimated, -expected, -uncertainty, -gradient,
+        -likelihood, -log_like_cv, -gradient
+      ) |>
       print(n = 320, width = Inf)
   )
 })
 
 ## Edge handling ----
-test_that("get_estimates() returns correct outputs for edge cases", {
-  #' @description Test that [get_estimates()] returns an error when given
-  #' invalid arguments.
+test_that("`get_estimates()` returns correct outputs for edge cases", {
+  #' @description Test that an error occurs if the input is not a valid model fit object.
   expect_error(
     object = get_estimates("invalid_fit")
   )

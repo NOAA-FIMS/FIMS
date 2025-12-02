@@ -69,6 +69,25 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
    * @param pos position index
    */
   virtual const Type evaluate_process(size_t pos) { return 0; }
+
+  /**
+   * @brief Create a map of report vectors for the recruitment object.
+   */
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
+    report_vectors["logit_steep"].emplace_back(this->logit_steep);
+    report_vectors["log_rzero"].emplace_back(this->log_rzero);
+    report_vectors["log_r"].emplace_back(this->log_r);
+    report_vectors["log_devs"].emplace_back(this->log_recruit_devs);
+  }
+
+  virtual void get_report_vector_count(
+      std::map<std::string, size_t>& report_vector_count) {
+    report_vector_count["logit_steep"] += 1;
+    report_vector_count["log_rzero"] += 1;
+    report_vector_count["log_r"] += 1;
+    report_vector_count["log_recruit_devs"] += 1;
+  }
 };
 
 }  // namespace fims_popdy

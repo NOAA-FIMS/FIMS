@@ -8,7 +8,8 @@
 #' @format
 #' A data frame with `r NROW(data1)` observations of `r NCOL(data1)`
 #' variables:
-#' \describe{ \item{type}{The type of data the row contains. Allowed types
+#' \describe{
+#'   \item{type}{The type of data the row contains. Allowed types
 #'   include `age`, `length`, `index`, `landings`, `age-to-length-conversion`,
 #'     and `weight-at-age` data.}
 #'   \item{name}{A character string providing the name of the information source
@@ -17,9 +18,7 @@
 #'     multiple ages, e.g., total landings rather than landings of age-4 fish.}
 #'   \item{length}{A numeric length. Entry can be `NA` if information doesn't
 #'     pertain to length.}
-#'   \item{datestart,dateend}{Start and end dates of the data collection period.
-#'     Format all dates using `yyyy-mm-dd`, which can accommodate fake years
-#'     such as `0001-01-01`.}
+#'   \item{timing}{The timing, i.e., year the data was collected.}
 #'   \item{value}{The measurement of interest.}
 #'   \item{unit}{A character string specifying the units of `value`. Allowed
 #'     units for each data type are as follows. `mt` is used for `index`,

@@ -16,14 +16,14 @@
 \alias{get_sdreport,FIMSFit-method}
 \alias{get_estimates}
 \alias{get_estimates,FIMSFit-method}
-\alias{get_fits}
-\alias{get_fits,FIMSFit-method}
 \alias{get_number_of_parameters}
 \alias{get_number_of_parameters,FIMSFit-method}
 \alias{get_timing}
 \alias{get_timing,FIMSFit-method}
 \alias{get_version}
 \alias{get_version,FIMSFit-method}
+\alias{get_model_output}
+\alias{get_model_output,FIMSFit-method}
 \title{Get a slot in a FIMSFit object}
 \usage{
 get_input(x)
@@ -54,10 +54,6 @@ get_estimates(x)
 
 \S4method{get_estimates}{FIMSFit}(x)
 
-get_fits(x)
-
-\S4method{get_fits}{FIMSFit}(x)
-
 get_number_of_parameters(x)
 
 \S4method{get_number_of_parameters}{FIMSFit}(x)
@@ -69,6 +65,10 @@ get_timing(x)
 get_version(x)
 
 \S4method{get_version}{FIMSFit}(x)
+
+get_model_output(x)
+
+\S4method{get_model_output}{FIMSFit}(x)
 }
 \arguments{
 \item{x}{Output returned from \code{\link[=fit_fims]{fit_fims()}}.}
@@ -93,51 +93,6 @@ model.
 \code{\link[=get_estimates]{get_estimates()}} returns a tibble of parameter values and their
 uncertainties from a fitted model.
 
-\code{\link[=get_fits]{get_fits()}} returns a tibble of input data and corresponding
-expected values, likelihoods, and additional metadata from a fitted model.
-The tibble includes the following variables:
-\itemize{
-\item{module_name: Character string that describes the name of the module,
-e.g., \code{"Data"}.}
-\item{module_id: Integer that provides identifier for linking outputs.}
-\item{label: Character string that describes type of data.}
-\item{data_id: Not yet implemented/NA: Integer that will provide
-unique identifier for data.}
-\item{fleet_name: Not yet implemented/NA: Character string that
-will provide fleet name corresponding to name provided via FIMSFrame.}
-\item{unit: Not yet implemented/NA: Character string that will
-describe appropriate units for the data inputs and expected values.}
-\item{uncertainty: Not yet implemented/NA: Character string that will
-describe the uncertainty specified for the data input value.}
-\item{age: Not yet implemented/NA: Integer that will provide the age
-affiliated with a data input, where appropriate.}
-\item{length: Not yet implemented/NA: Integer that will provide the length
-affiliated with a data input, where appropriate.}
-\item{datestart: Not yet implemented/NA: Character string that will provide
-the start date for the data input, corresponding to the value provided in
-the input data.}
-\item{dateend: Not yet implemented/NA: Character string that will provide
-the end date for the data input, corresponding to the value provided in
-the input data.}
-\item{year: Not yet implemented/NA: Integer that will provide model year
-for the data input.}
-\item{init: Numeric that provides the initial value for the data input.}
-\item{expected: Numeric that provides the expected value for the data input.
-*NOTE: units for provided init and expected values need to be standardized.}
-\item{log_like: Numeric that provides log-likelihood for expected value.}
-\item{distribution: Character string that indicates the distribution used
-for the log-likelihood estimation.}
-\item{re_estimated: Logical that indicates whether any random effects were
-estimated during model fitting. Log-likelihood values should not be directly
-compared between models with and without estimation of random effects.}
-\item{log_like_cv: Not yet implemented/NA: Numeric that will indicate
-corresponding uncertainty for the log-likelihood value.}
-\item{weight: Numeric that indicates data weighting applied to each data
-value; manually fixed at 1. *NOTE: Will need to be made responsive to
-user-specified or user-estimated data weighting once data weighting is
-added to FIMS as a feature.}
-}
-
 \code{\link[=get_number_of_parameters]{get_number_of_parameters()}} returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect parameters
 in the model.
@@ -147,6 +102,8 @@ seconds as a \code{difftime} object.
 
 \code{\link[=get_version]{get_version()}} returns the \code{package_version} of FIMS that was used to fit
 the model.
+
+\code{\link[=get_model_output]{get_model_output()}} returns the finalized FIMS output as a JSON list.
 }
 \description{
 There is an accessor function for each slot in the S4 class \code{FIMSFit}, where

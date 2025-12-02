@@ -12,7 +12,7 @@
 # Load or prepare any necessary data for testing
 
 ## IO correctness ----
-test_that("test_rcpp_recruitment_interface() works with correct inputs", {
+test_that("rcpp recruitment interface works with correct inputs", {
   # Create recruitment
   recruitment <- methods::new(BevertonHoltRecruitment)
   recruitment_process <- new(LogDevsRecruitmentProcess)
@@ -83,7 +83,7 @@ test_that("test_rcpp_recruitment_interface() works with correct inputs", {
 # No Edge handling for now.
 
 ## Error handling ----
-test_that("test_rcpp_recruitment_interface() returns correct error messages", {
+test_that("test rcpp recruitment interface returns correct error messages", {
   # Create recruitment
   recruitment <- methods::new(BevertonHoltRecruitment)
   h <- 0.75

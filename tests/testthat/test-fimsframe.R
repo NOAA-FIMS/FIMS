@@ -21,90 +21,118 @@ save_png <- function(code, width = 1000, height = 1000) {
 }
 
 ## IO correctness ----
-test_that("fims_frame() works with the correct inputs", {
-  #' @description Test that [fims_frame()] creates the S4 FIMSFrame classes.
+test_that("`fims_frame()` works with the correct inputs", {
+  #' @description Test that `fims_frame()` creates the S4 `FIMSFrame` classes.
   expect_s4_class(fims_frame, "FIMSFrame")
 
-  #' @description Test that the returned object from [fims_frame()] can be
-  #' plotted using the class structure and methods.
+  #' @description Test that the returned object from `fims_frame()` can be plotted using the class structure and methods.
   expect_silent(save_png(plot(fims_frame)))
 
-  #' @description Test that the accessors functions, i.e., `get_*()`, work as
-  #' expected with the FIMSFrame class.
+  #' @description Test that `get_data()` retrieves the data slot as a data frame.
   expect_s3_class(get_data(fims_frame), "data.frame")
 
+  #' @description Test that `get_fleets()` retrieves the fleet names as a character vector.
   expect_vector(get_fleets(fims_frame), ptype = character())
 
+  #' @description Test that `get_n_years()` retrieves the number of years as an integer.
   expect_type(get_n_years(fims_frame), "integer")
+
+  #' @description Test that `get_start_year()` retrieves the start year as a single value.
   expect_length(get_n_years(fims_frame), 1)
 
+  #' @description Test that `get_start_year()` retrieves the start year as an integer.
   expect_type(get_start_year(fims_frame), "integer")
+
+  #' @description Test that `get_start_year()` retrieves the start year as a single value.
   expect_length(get_start_year(fims_frame), 1)
 
+  #' @description Test that `get_end_year()` retrieves the end year as an integer.
   expect_type(get_end_year(fims_frame), "integer")
+
+  #' @description Test that `get_end_year()` retrieves the end year as a single value.
   expect_length(get_end_year(fims_frame), 1)
 
   fleet_names <- get_fleets(fims_frame)
+  #' @description Test that `get_fleets()` retrieves the fleet names as a character vector.
   expect_vector(fleet_names, ptype = character())
 
-  expect_type(get_n_years(fims_frame), "integer")
-  expect_length(get_n_years(fims_frame), 1)
-
+  #' @description Test that `get_ages()` retrieves the ages as an integer vector.
   expect_vector(get_ages(fims_frame), ptype = integer())
 
+  #' @description Test that `get_n_ages()` retrieves the number of ages as an integer.
   expect_type(get_n_ages(fims_frame), "integer")
+  #' @description Test that `get_n_ages()` retrieves the number of ages as a single value.
   expect_length(get_n_ages(fims_frame), 1)
 
-  #' @description Test that the `m_*` functions work as expected on a FIMSFrame
-  #' object when trying to get data for a model out of the S4 class object.
+  #' @description Test that `m_landings()` retrieves landings data as a numeric vector.
   expect_vector(m_landings(fims_frame, fleet_names), ptype = numeric())
+
+  #' @description Test that `m_index()` retrieves index data as a numeric vector.
   expect_vector(m_index(fims_frame, fleet_names), ptype = numeric())
+
+  #' @description Test that `m_agecomp()` retrieves age composition data as a numeric vector.
   expect_vector(m_agecomp(fims_frame, fleet_names), ptype = numeric())
+
+  #' @description Test that `m_lengthcomp()` retrieves length composition data as a numeric vector.
   expect_vector(m_lengthcomp(fims_frame, fleet_names), ptype = numeric())
+
+  #' @description Test that `m_weight_at_age()` retrieves weight-at-age data as a numeric vector.
   expect_vector(m_weight_at_age(fims_frame), ptype = numeric())
+
+  #' @description Test that `m_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector.
   expect_vector(
     m_age_to_length_conversion(fims_frame, fleet_names),
     ptype = numeric()
   )
 
-  #' @description Test that the `show()` method works as expected on a FIMSFrame
-  #' object.
+  #' @description Test that the `show()` method works as expected on a `FIMSFrame` object.
   expect_output(suppressMessages(show(fims_frame)))
+  #' @description Test that 'FIMSFrame()' succeeds cleanly with valid inputs.
+  expect_no_error(FIMS::FIMSFrame(data1))
 })
 
 ## Edge handling ----
 # No edge cases to test.
 
 ## Error handling ----
-test_that("FIMSFrame() returns correct error messages", {
-  # TODO: Add error handling tests for FIMSFrame class and methods
-  #' @description Validators for FIMSFrame work as expected.
+test_that("`FIMSFrame()` returns correct error messages", {
   bad_input <- data.frame(test = 1, test2 = 2)
+
+  # TODO: Add error handling tests for FIMSFrame class and methods
+  #' @description Validators for `FIMSFrame` work as expected.
   expect_error(FIMSFrame(bad_input))
 
-  #' @description Test that the `m_*` functions return error when a fleet
-  #' is not supplied, except for [m_weight_at_age()] that currently does
-  #' not require the fleet name.
+  #' @description Test that the `m_landings()` returns an error when a fleet is not supplied.
   expect_error(
     m_landings(fims_frame),
     regexp = "is missing, with no default"
   )
+
+  #' @description Test that the `m_index()` returns an error when a fleet is not supplied.
   expect_error(
     m_index(fims_frame),
     regexp = "is missing, with no default"
   )
+
+  #' @description Test that the `m_agecomp()` returns an error when a fleet is not supplied.
   expect_error(
     m_agecomp(fims_frame),
     regexp = "is missing, with no default"
   )
+
+  #' @description Test that the `m_lengthcomp()` returns an error when a fleet is not supplied.
   expect_error(
     m_lengthcomp(fims_frame),
     regexp = "is missing, with no default"
   )
+
+  #' @description Test that the `m_age_to_length_conversion()` returns an error when a fleet is not supplied.
   expect_error(
     m_age_to_length_conversion(fims_frame),
     regexp = "is missing, with no default"
   )
+
+  #' @description Test that the `m_weight_at_age()` returns an error when providing an unused argument.
   expect_error(
     m_weight_at_age(fims_frame, fleet_names),
     regexp = "unused argument"
@@ -134,14 +162,14 @@ fleet_names_index <- dplyr::filter(
 n_index <- length(fleet_names_index)
 
 ## IO correctness ----
-test_that("m_index works with correct inputs", {
+test_that("`m_index()` works with correct inputs", {
   index_dat <- vector(mode = "list", length = n_index)
   names(index_dat) <- fleet_names_index
 
-  #' @description Test that m_index() works with correct inputs.
   for (index_i in 1:n_index) {
     index <- Index
     index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
+    #' @description Test that `m_index()` works with correct inputs.
     expect_silent(
       index_dat[[fleet_names_index[index_i]]] <-
         m_index(fims_frame, fleet_names_index[index_i])
@@ -151,13 +179,13 @@ test_that("m_index works with correct inputs", {
   clear()
 })
 
-test_that("m_agecomp() works with correct inputs", {
+test_that("`m_agecomp()` works with correct inputs", {
   age_comp_dat <- vector(mode = "list", length = n_age_comp)
   names(age_comp_dat) <- fleet_names_age_comp
 
-  #' @description Test that [m_index()] works with correct inputs.
   for (fleet_f in 1:n_age_comp) {
     age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- methods::new(AgeComp, n_years, n_ages)
+    #' @description Test that `m_agecomp()` works with correct inputs.
     expect_silent(
       purrr::walk(
         1:(n_years * n_ages),
@@ -187,13 +215,12 @@ data_files <- list.files(
 )
 
 ## IO correctness ----
-test_that("get_n_fleets() works with correct inputs", {
-  #' @description Test that [get_n_fleets()] returns correct output for the
-  #' input slot.
+test_that("`get_n_fleets()` works with correct inputs", {
   # Function to read the RDS file and get input
   check_input <- function(data_file) {
     data <- readRDS(data_file)
     n_fleets <- get_n_fleets(data)
+    #' @description Test that `get_n_fleets()` returns correct number of fleets.
     expect_equal(
       object = n_fleets,
       expected = 2
@@ -208,4 +235,17 @@ test_that("get_n_fleets() works with correct inputs", {
 # No edge cases to test.
 
 ## Error handling ----
-# No built-in errors to test.
+
+## Check that FIMSFrame warns on unexpected data types
+test_that("FIMSFrame() warns on unexpected data types", {
+  bad <- dplyr::mutate(
+    data1,
+    type = ifelse(type == "index", "indexes", type) # Introduce an unsupported type
+  )
+  #' @description Test that 'FIMSFrame()' warns on unexpected data types.
+  expect_warning(
+    ff <- FIMS::FIMSFrame(bad),
+    regexp = "unexpected type\\(s\\)"
+  )
+  expect_s4_class(ff, "FIMSFrame")
+})

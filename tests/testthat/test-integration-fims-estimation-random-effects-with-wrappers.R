@@ -36,6 +36,7 @@ modified_parameters[[iter_id]] <- list(
 )
 
 test_that("deterministic test of fims with recruitment re", {
+  #' @description Test that the deterministic FIMS run with recruitment random effects matches the operating model values.
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")
   result <- setup_and_run_FIMS_with_wrappers(
     iter_id = iter_id,
@@ -53,25 +54,31 @@ test_that("deterministic test of fims with recruitment re", {
   obj <- result@obj
 
   # Check random effects are turned on
+  #' @description Test that the random effects parameters are correctly set up.
   expect_equal(obj[["env"]][["parList"]]()[["re"]], om_input_list[[iter_id]][["logR.resid"]][-1])
 
   # Compare log(R0) to true value
   fims_logR0 <- as.numeric(result@obj[["par"]][36])
+  #' @description Test that the log(R0) from FIMS is greater than 0.
   expect_gt(fims_logR0, 0.0)
+  #' @description Test that the log(R0) from FIMS matches the "true" value from the operating model.
   expect_equal(fims_logR0, log(om_input_list[[iter_id]][["R0"]]))
 
   # Compare numbers at age to true value
   for (i in 1:length(c(t(om_output_list[[iter_id]][["N.age"]])))) {
+    #' @description Test that the numbers-at-age vector from FIMS match the "true" values from the operating model.
     expect_equal(report[["naa"]][[1]][i], c(t(om_output_list[[iter_id]][["N.age"]]))[i])
   }
 
   # Compare biomass to true value
   for (i in 1:length(om_output_list[[iter_id]][["biomass.mt"]])) {
+    #' @description Test that the biomass vector from FIMS matches the "true" values from the operating model.
     expect_equal(report[["biomass"]][[1]][i], om_output_list[[iter_id]][["biomass.mt"]][i])
   }
 
   # Compare spawning biomass to true value
   for (i in 1:length(om_output_list[[iter_id]][["SSB"]])) {
+    #' @description Test that the spawning biomass vector from FIMS matches the "true" values from the operating model.
     expect_equal(report[["ssb"]][[1]][i], om_output_list[[iter_id]][["SSB"]][i])
   }
 
@@ -82,39 +89,43 @@ test_that("deterministic test of fims with recruitment re", {
 
   # loop over years to compare recruitment by year
   for (i in 1:om_input_list[[iter_id]][["nyr"]]) {
+    #' @description Test that the recruitment values from FIMS match the "true" values from the operating model.
     expect_equal(fims_naa[i, 1], om_output_list[[iter_id]][["N.age"]][i, 1])
   }
 
   # confirm that recruitment matches the numbers in the first age
   # by comparing to fims_naa (what's reported from FIMS)
-  expect_equal(
-    fims_naa[1:om_input_list[[iter_id]][["nyr"]], 1],
-    report[["recruitment"]][[1]][1:om_input_list[[iter_id]][["nyr"]]]
-  )
+  n_year <- om_input_list[[iter_id]][["nyr"]]
+  #' @description Test that the recruitment values from FIMS match the numbers-at-age for age 1.
+  expect_equal(fims_naa[1:n_year, 1], report[["recruitment"]][[1]][1:n_year])
 
   # confirm that recruitment matches the numbers in the first age
   # by comparing to the true values from the OM
-  for (i in 1:om_input_list[[iter_id]][["nyr"]]) {
+  for (i in 1:n_year) {
+    #' @description Test that the recruitment values from FIMS match the "true" values from the operating model for age 1.
     expect_equal(report[["recruitment"]][[1]][i], om_output_list[[iter_id]][["N.age"]][i, 1])
   }
 
-  # recruitment log_devs (fixed at initial "true" values)
-  # the initial value of om_input[["logR.resid"]] is dropped from the model
+  # recruitment log_devs (fixed at input "true" values)
+  # the input value of om_input[["logR.resid"]] is dropped from the model
+  #' @description Test that the recruitment deviations from FIMS match the "true" values from the operating model.
   expect_equal(report[["log_recruit_dev"]][[1]], om_input_list[[iter_id]][["logR.resid"]][-1])
   # check input to ensure log_devs are being read in as random effects
+  #' @description Test that the length of the fixed effects parameters from FIMS matches the expected value.
   expect_equal(length(obj[["env"]][["parList"]]()[["p"]]), 49)
+  #' @description Test that the length of the random effects parameters from FIMS matches the expected value.
   expect_equal(length(obj[["env"]][["parList"]]()[["re"]]), 29)
+  #' @description Test that the total number of fixed effects parameters from FIMS output matches the expected value.
   expect_equal(result@number_of_parameters[["fixed_effects"]], 49)
+  #' @description Test that the total number of random effects parameters from FIMS output matches the expected value.
   expect_equal(result@number_of_parameters[["random_effects"]], 29)
+  #' @description Test that the total number of parameters from FIMS output matches the expected value.
   expect_equal(result@number_of_parameters[["total"]], 78)
-
-
-  # F (fixed at initial "true" values)
-  expect_equal(report[["F_mort"]][[1]], om_output_list[[iter_id]][["f"]])
 
   # Expected catch
   fims_index <- report[["exp_index"]]
   for (i in 1:length(om_output_list[[iter_id]][["L.mt"]][["fleet1"]])) {
+    #' @description Test that the expected landings from FIMS matches the "true" values from the operating model.
     expect_equal(fims_index[[1]][i], om_output_list[[iter_id]][["L.mt"]][["fleet1"]][i])
   }
 
@@ -125,10 +136,12 @@ test_that("deterministic test of fims with recruitment re", {
   }
 
   # Expect 95% of relative error to be within 2*cv
+  #' @description Test that 95% of the relative errors between the expected landings from FIMS and the observed landings are within 2 times the coefficient of variation.
   expect_lte(sum(fims_object_are > om_input_list[[iter_id]][["cv.L"]][["fleet1"]] * 2.0), length(em_input_list[[iter_id]][["L.obs"]][["fleet1"]]) * 0.05)
 
   # Compare expected catch number at age to true values
   for (i in 1:length(c(t(om_output_list[[iter_id]][["L.age"]][["fleet1"]])))) {
+    #' @description Test that the expected catch-at-age from FIMS matches the "true" values from the operating model.
     expect_equal(report[["cnaa"]][[1]][i], c(t(om_output_list[[iter_id]][["L.age"]][["fleet1"]]))[i])
   }
 
@@ -141,6 +154,7 @@ test_that("deterministic test of fims with recruitment re", {
   om_cnaa_proportion <- om_output_list[[iter_id]][["L.age"]][["fleet1"]] / rowSums(om_output_list[[iter_id]][["L.age"]][["fleet1"]])
 
   for (i in 1:length(c(t(om_cnaa_proportion)))) {
+    #' @description Test that the expected catch-at-age proportions from FIMS matches the "true" values from the operating model.
     expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
 
@@ -149,9 +163,11 @@ test_that("deterministic test of fims with recruitment re", {
   cwaa <- matrix(report[["cwaa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
     nrow = om_input_list[[iter_id]][["nyr"]], byrow = TRUE
   )
+  #' @description Test that the q of survey1 from FIMS matches the "true" values from the operating model.
   expect_equal(fims_index[[2]], apply(cwaa, 1, sum) * om_output_list[[iter_id]][["survey_q"]][["survey1"]])
 
   for (i in 1:length(om_output_list[[iter_id]][["survey_index_biomass"]][["survey1"]])) {
+    #' @description Test that the biomass of survey index from FIMS matches the "true" values from the operating model.
     expect_equal(fims_index[[2]][i], om_output_list[[iter_id]][["survey_index_biomass"]][["survey1"]][i])
   }
 
@@ -160,10 +176,10 @@ test_that("deterministic test of fims with recruitment re", {
     fims_object_are[i] <- abs(fims_index[[2]][i] - em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][i]) / em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][i]
   }
   # Expect 95% of relative error to be within 2*cv
-  expect_lte(
-    sum(fims_object_are > om_input_list[[iter_id]][["cv.survey"]][["survey1"]] * 2.0),
-    length(em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]]) * 0.05
-  )
+  object_fims <- sum(fims_object_are > om_input_list[[iter_id]][["cv.survey"]][["survey1"]] * 2.0)
+  expected_om <- length(em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]]) * 0.05
+  #' @description Test that 95% of the relative errors between the expected survey biomass from FIMS and the observed survey biomass are within 2 times the coefficient of variation.
+  expect_lte(object_fims, expected_om)
 
   # Expected catch number at age in proportion
   fims_cnaa <- matrix(report[["cnaa"]][[2]][1:(om_input_list[[iter_id]][["nyr"]] * om_input_list[[iter_id]][["nages"]])],
@@ -171,6 +187,7 @@ test_that("deterministic test of fims with recruitment re", {
   )
 
   for (i in 1:length(c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])))) {
+    #' @description Test that the expected survey age composition from FIMS matches the "true" values from the operating model.
     expect_equal(report[["cnaa"]][[2]][i], c(t(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]]))[i])
   }
 
@@ -178,11 +195,13 @@ test_that("deterministic test of fims with recruitment re", {
   om_cnaa_proportion <- om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]] / rowSums(om_output_list[[iter_id]][["survey_age_comp"]][["survey1"]])
 
   for (i in 1:length(c(t(om_cnaa_proportion)))) {
+    #' @description Test that the expected survey age composition proportions from FIMS matches the "true" values from the operating model.
     expect_equal(c(t(fims_cnaa_proportion))[i], c(t(om_cnaa_proportion))[i])
   }
 })
 
 test_that("nll test of fims", {
+  #' @description Test that the NLL components from deterministic FIMS with recruitment random effects match the expected values calculated from the operating model.
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")
   result <- setup_and_run_FIMS_with_wrappers(
     iter_id = iter_id,
@@ -204,6 +223,7 @@ test_that("nll test of fims", {
 
   # log(R0)
   fims_logR0 <- as.numeric(result@obj[["par"]][36])
+  #' @description Test that the log(R0) from FIMS matches the "true" value from the operating model.
   expect_equal(fims_logR0, log(om_input_list[[iter_id]][["R0"]]))
 
   # recruitment likelihood
@@ -272,18 +292,27 @@ test_that("nll test of fims", {
   expected_jnll <- rec_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
 
+  #' @description Test that the recruitment negative log-likelihood from FIMS matches the expected value calculated from the operating model.
   expect_equal(report[["nll_components"]][1], rec_nll)
+  #' @description Test that the fishing fleet index negative log-likelihood from FIMS matches the expected value calculated from the operating model.
   expect_equal(report[["nll_components"]][2], index_nll_fleet)
+  #' @description Test that the fishing fleet age composition negative log-likelihood from FIMS matches the expected value calculated from the operating model.
   expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
+  #' @description Test that the fishing fleet length composition negative log-likelihood from FIMS matches the expected value calculated from the operating model.
   expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
+  #' @description Test that the survey index negative log-likelihood from FIMS matches the expected value calculated from the operating model.
   expect_equal(report[["nll_components"]][5], index_nll_survey)
+  #' @description Test that the survey age composition negative log-likelihood from FIMS matches the expected value calculated from the operating model.
   expect_equal(report[["nll_components"]][6], age_comp_nll_survey)
+  #' @description Test that the survey length composition negative log-likelihood from FIMS matches the expected value calculated from the operating model.
   expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
+  #' @description Test that the total negative log-likelihood from FIMS matches the expected value calculated from the operating model.
   expect_equal(jnll, expected_jnll)
 })
 
 
 test_that("estimation test of fims using wrapper functions", {
+  #' @description Test that the estimation run of FIMS with recruitment random effects matches the operating model values.
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")
   result <- setup_and_run_FIMS_with_wrappers(
     iter_id = iter_id,
@@ -295,7 +324,7 @@ test_that("estimation test of fims using wrapper functions", {
     modified_parameters = modified_parameters
   )
 
-  # # TODO:: naa tests fail when log_dev estimation turned on
+  # # TODO: naa tests fail when log_dev estimation turned on and add a description before validate_fims()
   # # Compare FIMS results with model comparison project OM values
   # validate_fims(
   #   report = get_report(result),
@@ -308,6 +337,7 @@ test_that("estimation test of fims using wrapper functions", {
 })
 
 test_that("estimation test with recruitment re on logr", {
+  #' @description Test that the estimation run of FIMS with recruitment random effects on log(R0) matches the operating model values.
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")
   fims_data <- FIMS::FIMSFrame(data1)
 
@@ -387,9 +417,10 @@ test_that("estimation test with recruitment re on logr", {
   clear()
 
   # make sure random effects are turned on
+  #' @description Test that the random effects parameters are correctly set up.
   expect_equal(fit_log_r@obj[["env"]][["parameters"]][["re"]], rep(0, get_n_years(fims_data) - 1))
 
-  # # TODO:: naa tests fail when log_dev estimation turned on
+  # # TODO: naa tests fail when log_dev estimation turned on and add a description before validate_fims()
   # # Compare FIMS results with model comparison project OM values
   # validate_fims(
   #   report = fit_log_r@report,
@@ -466,10 +497,14 @@ test_that("estimation test with recruitment re on logr", {
   )
   fit_log_devs <- fit_fims(parameter_list, optimize = TRUE)
 
-  clear()
-
+  #' @description Test that the `nll_components` from both `fit_log_r` and `fit_log_devs` runs are approximately equal within a tolerance of 0.001.
   expect_equal(fit_log_r@report[["nll_components"]], fit_log_devs@report[["nll_components"]], tolerance = .001)
-  expect_equal(fit_log_r@report[["recruitment"]], fit_log_devs@report[["recruitment"]], tolerance = .001)
+  #' @description Test that the `expected_recruitment` from both `fit_log_r` and `fit_log_devs` runs are approximately equal within a tolerance of 0.001.
+  expect_equal(fit_log_r@report[["expected_recruitment"]], fit_log_devs@report[["expected_recruitment"]], tolerance = .001)
+  #' @description Test that the `time_optimization` from `fit_log_r` is less than or equal to that from `fit_log_devs`.
   expect_lte(fit_log_r@timing[["time_optimization"]], fit_log_devs@timing[["time_optimization"]])
+  #' @description Test that the `time_sdreport` from `fit_log_r` is less than or equal to that from `fit_log_devs`.
   expect_lte(fit_log_r@timing[["time_sdreport"]], fit_log_devs@timing[["time_sdreport"]])
+
+  clear()
 })

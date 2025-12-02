@@ -32,7 +32,7 @@ jobs:
     # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
     # FIX? run cmake --build build --parallel 16
       run: |
-        cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=YES
+        cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=FAIL_ON_WARNINGS
         cmake --build build
     
     - name: Deploy html documentation with Doxygen

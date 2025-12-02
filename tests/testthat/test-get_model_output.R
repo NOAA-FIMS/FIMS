@@ -7,54 +7,49 @@
 #' multiple lines, that will be used in the bookdown report of the results from
 #' {testthat}.
 
-# get_opt ----
+# get_model_output ----
 ## Setup ----
 # Load or prepare any necessary data for testing
 if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
+
 ## IO correctness ----
-test_that("`get_opt()` works with correct inputs", {
+test_that("`get_model_output()` works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
   # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
+  # or "deterministic*.RDS"
   fit_files <- list.files(
     path = test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
+    pattern = "^(fit.*|deterministic.*)\\.RDS$",
     full.names = TRUE
   )
 
   expected_names <- c(
-    "par", "objective", "convergence",
-    "iterations", "evaluations", "message"
+    "name", "type", "estimation_framework", "id", "objective_function_value",
+    "growth", "recruitment", "maturity",
+    "selectivity", "population_ids", "fleet_ids", "populations", "fleets",
+    "density_components", "data", "log"
   )
 
-  # Function to read the RDS file and get input
-  check_opt <- function(fit_file) {
+  # Function to read the RDS file and get obj
+  check_obj <- function(fit_file) {
     fit_data <- readRDS(fit_file)
-    opt <- get_opt(fit_data)
-    #' @description Test that `get_opt()` returns correct output for the `opt` slot.
+    model_output <- get_model_output(fit_data)
+    json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
+    #' @description Test that `get_model_output()` returns correct names for the `model_output` slot.
     expect_equal(
-      object = opt,
-      expected = fit_data@opt
-    )
-    #' @description Test that `get_opt()` returns correct names for the `opt` slot.
-    expect_equal(
-      object = names(opt),
+      object = names(json_list),
       expected = expected_names
     )
   }
 
   # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_opt)
+  result <- purrr::map(fit_files, check_obj)
 })
 
 ## Edge handling ----
-test_that("`get_opt()` returns correct outputs for edge cases", {
-  #' @description Test that `get_opt()` returns an error when given invalid input.
-  expect_error(
-    object = get_opt("invalid_input")
-  )
-})
+# No edge handling tests for this function.
 
 ## Error handling ----
 # No built-in errors to test.

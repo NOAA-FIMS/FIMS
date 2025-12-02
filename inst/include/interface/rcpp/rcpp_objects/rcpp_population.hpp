@@ -40,6 +40,11 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    */
   SharedBoolean initialize_catch_at_age;
   /**
+   * @brief Initialize the surplus production model.
+   *
+   */
+  SharedBoolean initialize_surplus_production;
+  /**
    * @brief The constructor.
    */
   PopulationInterfaceBase() {
@@ -83,11 +88,11 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The number of age bins.
    */
-  SharedInt nages;
+  SharedInt n_ages = 0;
   /**
    * @brief The number of fleets.
    */
-  SharedInt nfleets;
+  SharedInt n_fleets;
   /**
    * list of fleets that operate on this population.
    */
@@ -97,18 +102,13 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   typedef typename std::set<uint32_t>::iterator fleet_ids_iterator;
   /**
-   * @brief The number of seasons.
-   * TODO: Remove seasons because we do not model them.
-   */
-  SharedInt nseasons;
-  /**
    * @brief The number of years.
    */
-  SharedInt nyears;
+  SharedInt n_years;
   /**
    * @brief The number of length bins.
    */
-  SharedInt nlengths;
+  SharedInt n_lengths;
   /**
    * @brief The ID of the maturity module.
    */
@@ -143,7 +143,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   ParameterVector log_r;
   /**
    * @brief Ages that are modeled in the population, the length of this vector
-   * should equal \"nages\".
+   * should equal \"n_ages\".
    */
   RealVector ages;
   /**
@@ -166,7 +166,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The name for the population.
    */
-  std::string name;
+  SharedString name = fims::to_string("NA");
 
   /**
    * @brief The constructor.
@@ -187,11 +187,10 @@ class PopulationInterface : public PopulationInterfaceBase {
   PopulationInterface(const PopulationInterface &other)
       : PopulationInterfaceBase(other),
         fleet_ids(other.fleet_ids),
-        nages(other.nages),
-        nfleets(other.nfleets),
-        nseasons(other.nseasons),
-        nyears(other.nyears),
-        nlengths(other.nlengths),
+        n_ages(other.n_ages),
+        n_fleets(other.n_fleets),
+        n_years(other.n_years),
+        n_lengths(other.n_lengths),
         maturity_id(other.maturity_id),
         growth_id(other.growth_id),
         recruitment_id(other.recruitment_id),
@@ -215,6 +214,18 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Sets the name of the population.
+   * @param name The name to set.
+   */
+  void SetName(const std::string &name) { this->name.set(name); }
+
+  /**
+   * @brief Gets the name of the population.
+   * @return The name.
+   */
+  std::string GetName() const { return this->name.get(); }
 
   /**
    * @brief Sets the unique ID for the Maturity object.
@@ -326,96 +337,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
   }
 
-  /**
-   * @brief Converts the data to json representation for the output.
-   * @return A string is returned specifying that the module relates to the
-   * population interface. It also returns the ID for each associated module
-   * and the values associated with that module. Then it returns several
-   * derived quantities. This string is formatted for a json file.
-   */
-  virtual std::string to_json() {
-    std::stringstream ss;
-
-    ss << "{\n";
-    ss << " \"name\" : \"Population\",\n";
-
-    ss << " \"type\" : \"population\",\n";
-    ss << " \"tag\" : \"" << this->name << "\",\n";
-    ss << " \"id\": " << this->id << ",\n";
-    ss << " \"recruitment_id\": " << this->recruitment_id << ",\n";
-    ss << " \"growth_id\": " << this->growth_id << ",\n";
-    ss << " \"maturity_id\": " << this->maturity_id << ",\n";
-
-    ss << " \"parameters\": [\n{\n";
-    ss << " \"name\": \"log_M\",\n";
-    ss << " \"id\":" << this->log_M.id_m << ",\n";
-    ss << " \"type\": \"vector\",\n";
-    ss << " \"values\": " << this->log_M << "\n},\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"log_init_naa\",\n";
-    ss << "  \"id\":" << this->log_init_naa.id_m << ",\n";
-    ss << "  \"type\": \"vector\",\n";
-    ss << "  \"values\":" << this->log_init_naa << " \n}],\n";
-
-    ss << " \"derived_quantities\": [{\n";
-    ss << "  \"name\": \"SSB\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_ssb.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_ssb.size() - 1; i++) {
-        ss << this->derived_ssb[i] << ", ";
-      }
-      ss << this->derived_ssb[this->derived_ssb.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "   \"name\": \"NAA\",\n";
-    ss << "   \"values\":[";
-    if (this->derived_naa.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_naa.size() - 1; i++) {
-        ss << this->derived_naa[i] << ", ";
-      }
-      ss << this->derived_naa[this->derived_naa.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "   \"name\": \"Biomass\",\n";
-    ss << "   \"values\":[";
-    if (this->derived_biomass.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_biomass.size() - 1; i++) {
-        ss << this->derived_biomass[i] << ", ";
-      }
-      ss << this->derived_biomass[this->derived_biomass.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "   \"name\": \"Recruitment\",\n";
-    ss << "   \"values\":[";
-    if (this->derived_recruitment.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_recruitment.size() - 1; i++) {
-        ss << this->derived_recruitment[i] << ", ";
-      }
-      ss << this->derived_recruitment[this->derived_recruitment.size() - 1]
-         << "]\n";
-    }
-    ss << " }\n]\n";
-
-    ss << "}";
-
-    return ss.str();
-  }
-
 #ifdef TMB_MODEL
 
   template <typename Type>
@@ -430,14 +351,16 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     population->id = this->id;
-    population->nyears = this->nyears.get();
-    population->nfleets = this->nfleets.get();
-    population->nseasons = this->nseasons.get();
-    population->nages = this->nages.get();
-    if (this->nages.get() == this->ages.size()) {
-      population->ages.resize(this->nages.get());
-    } else {
-      warning("The ages vector is not of size nages.");
+    population->n_years = this->n_years.get();
+    population->n_fleets = this->n_fleets.get();
+    // only define ages if n_ages greater than 0
+    if (this->n_ages.get() > 0) {
+      population->n_ages = this->n_ages.get();
+      if (this->n_ages.get() == this->ages.size()) {
+        population->ages.resize(this->n_ages.get());
+      } else {
+        warning("The ages vector is not of size n_ages.");
+      }
     }
 
     fleet_ids_iterator it;
@@ -485,11 +408,12 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
+
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
 
-    population->numbers_at_age.resize((nyears + 1) * nages);
+    population->numbers_at_age.resize((n_years + 1) * n_ages);
     info->variable_map[this->numbers_at_age.id_m] =
         &(population)->numbers_at_age;
 

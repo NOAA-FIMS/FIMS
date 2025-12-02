@@ -68,20 +68,25 @@ Imports:
     scales,
     stats,
     tibble,
-    tidyselect,
     TMB (>= 1.8.0),
     utils
 Suggests:
     covr,
     devtools,
+    DT,
+    htmltools,
     knitr,
+    lozen,
+    markdown,
     parallel,
     pkgdown,
     remotes,
     rmarkdown,
     snowfall,
     spelling,
+    stockplotr,
     styler,
+    testdown,
     testthat (>= 3.0.0),
     tidyr,
     usethis,
@@ -92,6 +97,10 @@ LinkingTo:
     TMB
 VignetteBuilder:
     knitr
+Remotes: 
+    github::nmfs-ost/stockplotr,
+    github::ThinkR-open/lozen,
+    github::ThinkR-open/testdown
 Config/testthat/edition: 3
 Config/testthat/parallel: false
 Encoding: UTF-8

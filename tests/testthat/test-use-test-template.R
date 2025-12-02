@@ -7,10 +7,22 @@
 #' multiple lines, that will be used in the bookdown report of the results from
 #' {testthat}.
 
-
 # use_*_template ----
 ## setup ----
 # Set up for all of the use_*_template functions in the following section.
+
+# This is a meta-test that creates a temporary package structure to test the use
+# of the `use_gtest_template()` and `use_testthat_template()` functions. It works
+# inside the temporary environment created by the test file. However, it does not
+# work when using the reporting tool {testdown} because it cannot
+# find the path back to the original test file in the GitHub Actions runner. This
+# leads to errors like: In normalizePath(attr(result$srcref, "srcfile")$filename) :
+# path[1]="test-use-test-template.R": No such file or directory. To fix the issue,
+# we need to skip the test file when generating {testdown} reports.
+if (Sys.getenv("INPUT_TESTDOWN") == "true") {
+  #' @description Skip the test in {testdown} reports generation.
+  skip("Skipping test in {testdown} reports generation.")
+}
 
 # Create a temporary package structure with the minimal files necessary for
 # testing purposes in a temporary directory. And, ensure the temporary directory
@@ -24,107 +36,131 @@ on.exit(
   unlink(temp_path, recursive = TRUE, force = TRUE),
   add = TRUE
 )
-# Save the current working directory and set the new one for the temporary
-# package but ensure that the working directory is reset at the end
-old_wd <- getwd()
-setwd(temp_path)
-on.exit(setwd(old_wd), add = TRUE)
-# Create a new package at the specified path
-pkg <- suppressMessages(
-  invisible(capture.output(
-    usethis::create_package(temp_path),
-    type = "output"
-  ))
-)
-suppressMessages(usethis::proj_set(temp_path))
-suppressMessages(usethis::use_testthat())
-# Add a folder `gtest` for GoogleTest files
-suppressMessages(usethis::use_directory(file.path("tests", "gtest")))
-# Add a `CMakeLists.txt`` file in the `tests/gtest` directory
-cmakelist_path <- file.path("tests", "gtest", "CMakeLists.txt")
-file.create(cmakelist_path)
 
+# As a general rule, avoid using setwd() inside tests. Instead, use the {withr}
+# package, which is designed to safely set and restore state.
+withr::with_dir(
+  new = temp_path,
+  code = {
+    # Create a new package at the specified path
+    pkg <- suppressMessages(
+      invisible(capture.output(
+        usethis::create_package(temp_path),
+        type = "output"
+      ))
+    )
+    suppressMessages(usethis::proj_set(temp_path))
+    suppressMessages(usethis::use_testthat())
+    # Add a folder `gtest` for GoogleTest files
+    suppressMessages(usethis::use_directory(file.path("tests", "gtest")))
+    # Add a `CMakeLists.txt`` file in the `tests/gtest` directory
+    cmakelist_path <- file.path("tests", "gtest", "CMakeLists.txt")
+    file.create(cmakelist_path)
+  }
+)
 # use_gtest_template ----
 ## setup ----
 # No additional setup is needed.
 
 ## IO correctness ----
-test_that("use_gtest_template() works with correct inputs", {
-  suppressMessages(FIMS:::use_gtest_template(
-    name = "FIMSMath_ClassName_Logistic"
-  ))
-  #' @description Test that use_gtest_template() creates the correct test file.
-  expect_true(file.exists(file.path(
-    temp_path, "tests", "gtest", "test_FIMSMath_ClassName_Logistic.cpp"
-  )))
+test_that("`use_gtest_template()` works with correct inputs", {
+  withr::with_dir(
+    new = temp_path,
+    code = {
+      suppressMessages(FIMS:::use_gtest_template(
+        name = "FIMSMath_ClassName_Logistic"
+      ))
 
-  #' @description Test that use_gtest_template() creates the correct CMake file.
-  expect_true(file.exists(file.path(temp_path, cmakelist_path)))
+      object <- file.exists(file.path(
+        temp_path, "tests", "gtest", "test_FIMSMath_ClassName_Logistic.cpp"
+      ))
+      #' @description Test that `use_gtest_template()` creates the correct test file.
+      expect_true(object)
 
-  # TODO: Make this test live by fixing the grepl statement
-  suppressMessages(FIMS:::use_gtest_template(
-    name = "FIMSMath_ClassName_FunctionName"
-  ))
+      #' @description Test that `use_gtest_template()` creates the correct CMake file.
+      expect_true(file.exists(file.path(temp_path, cmakelist_path)))
 
-  # Search for the expected lines in the CMakeLists.txt file
-  first_entry <- grepl(
-    "test_FIMSMath_ClassName_Logistic.cpp",
-    readLines(file.path(temp_path, cmakelist_path))
+      # TODO: Make this test live by fixing the grepl statement
+      suppressMessages(FIMS:::use_gtest_template(
+        name = "FIMSMath_ClassName_FunctionName"
+      ))
+
+      # Search for the expected lines in the CMakeLists.txt file
+      first_entry <- grepl(
+        "test_FIMSMath_ClassName_Logistic.cpp",
+        readLines(file.path(temp_path, cmakelist_path))
+      )
+      second_entry <- grepl(
+        "test_FIMSMath_ClassName_FunctionName.cpp",
+        readLines(file.path(temp_path, cmakelist_path))
+      )
+      #' @description Test that `use_gtest_template()` appends the correct lines to CMakeLists.txt when an additional test is added rather than writing over it.
+      expect_true(any(first_entry))
+      #' @description Test that `use_gtest_template()` appends the correct lines to CMakeLists.txt when an additional test is added rather than writing over it.
+      expect_true(any(second_entry))
+      #' @description Test that `use_gtest_template()` appends the new test after the previous test in CMakeLists.txt.
+      expect_gt(which(second_entry)[1], which(first_entry)[1])
+    }
   )
-  second_entry <- grepl(
-    "test_FIMSMath_ClassName_FunctionName.cpp",
-    readLines(file.path(temp_path, cmakelist_path))
-  )
-  #' @description Test that use_gtest_template() appends the correct lines to
-  #' CMakeLists.txt when an additional test is added rather than writing over
-  #' it.
-  expect_true(any(first_entry))
-  expect_true(any(second_entry))
-  #' @description Test that use_gtest_template() appends the new test after the
-  #' previous test in CMakeLists.txt.
-  expect_gt(which(second_entry)[1], which(first_entry)[1])
 })
 
 ## Edge handling ----
-test_that("use_gtest_template() handles edge cases correctly", {
-  #' @description Test that use_gtest_template() throws an error when format of name is wrong.
-  expect_error(
-    object = FIMS:::use_gtest_template(
-      name = "ClassName_FunctionName"
-    ),
-    regexp = "Invalid `name` format"
+test_that("`use_gtest_template()` handles edge cases correctly", {
+  withr::with_dir(
+    new = temp_path,
+    code = {
+      error <- tryCatch(
+        FIMS:::use_gtest_template(name = "ClassName_FunctionName"),
+        error = function(e) {
+          # Return a custom error message if an error occurs
+          "Invalid `name` format"
+        }
+      )
+      #' @description Test that `use_gtest_template()` throws an error when the file already exists.
+      expect_equal(error, "Invalid `name` format")
+    }
   )
 })
 
 ## Error handling ----
-test_that("use_gtest_template() returns correct error messages", {
-  #' @description Test that use_gtest_template() throws an error when the file
-  #' already exists.
-  error <- tryCatch(
-    FIMS:::use_gtest_template(
-      name = "FIMSMath_ClassName_Logistic"
-    ),
-    error = function(e) {
-      # Return a custom error message if an error occurs
-      "An error occurred."
-    }
-  )
-  expect_equal(error, "An error occurred.")
+test_that("`use_gtest_template()` returns correct error messages", {
+  withr::with_dir(
+    new = temp_path,
+    code = {
+      error <- tryCatch(
+        FIMS:::use_gtest_template(
+          name = "FIMSMath_ClassName_Logistic"
+        ),
+        error = function(e) {
+          # Return a custom error message if an error occurs
+          "An error occurred."
+        }
+      )
+      #' @description Test that `use_gtest_template()` throws an error when the file already exists.
+      expect_equal(error, "An error occurred.")
 
-  file.rename(
-    from = file.path(temp_path, cmakelist_path),
-    to = file.path(temp_path, "tests", "gtest", "renamed.txt")
-  )
-  #' @description Test that use_gtest_template() throws an error if the
-  #' CMakeLists file does not already exist.
-  expect_error(
-    object = suppressMessages(FIMS:::use_gtest_template(
-      name = "FIMSMath_ClassName_FunctionName"
-    ))
-  )
-  file.rename(
-    from = file.path(temp_path, "tests", "gtest", "renamed.txt"),
-    to = file.path(temp_path, cmakelist_path)
+      file.rename(
+        from = file.path(temp_path, cmakelist_path),
+        to = file.path(temp_path, "tests", "gtest", "renamed.txt")
+      )
+
+      error <- tryCatch(
+        suppressMessages(
+          FIMS:::use_gtest_template(name = "FIMSMath_ClassName_FunctionName")
+        ),
+        error = function(e) {
+          # Return a custom error message if an error occurs
+          "An error occurred."
+        }
+      )
+      #' @description Test that `use_gtest_template()` throws an error when the file already exists.
+      expect_equal(error, "An error occurred.")
+
+      file.rename(
+        from = file.path(temp_path, "tests", "gtest", "renamed.txt"),
+        to = file.path(temp_path, cmakelist_path)
+      )
+    }
   )
 })
 
@@ -133,43 +169,55 @@ test_that("use_gtest_template() returns correct error messages", {
 # No additional setup is needed.
 
 ## IO correctness ----
-test_that("use_testthat_template() works with correct inputs", {
-  suppressMessages(FIMS:::use_testthat_template("individual_function"))
-  #' @description Test that use_testthat_template("individual_function")
-  #' creates the correct file.
-  expect_true(file.exists(
-    file.path(
-      temp_path, "tests", "testthat", "test-individual_function.R"
-    )
-  ))
+test_that("`use_testthat_template()` works with correct inputs", {
+  withr::with_dir(
+    new = temp_path,
+    code = {
+      suppressMessages(FIMS:::use_testthat_template("individual_function"))
+      object_individual_function <- file.exists(
+        file.path(
+          temp_path, "tests", "testthat", "test-individual_function.R"
+        )
+      )
+      #' @description Test that `use_testthat_template("individual_function")` creates the correct file.
+      expect_true(object_individual_function)
 
-  suppressMessages(FIMS:::use_testthat_template("function-group"))
-  #' @description Test that use_testthat_template("function-group") creates the
-  #' correct file.
-  expect_true(file.exists(
-    file.path(
-      temp_path, "tests", "testthat", "test-function-group.R"
-    )
-  ))
+      suppressMessages(FIMS:::use_testthat_template("function-group"))
+      object_function_group <- file.exists(
+        file.path(temp_path, "tests", "testthat", "test-function-group.R")
+      )
+      #' @description Test that `use_testthat_template("function-group")` creates the correct file.
+      expect_true(object_function_group)
+    }
+  )
 })
 
 ## Edge handling ----
-test_that("use_testthat_template() handles edge cases correctly", {
-  #' @description Test that use_testthat_template() throws an error when no input is provided.
-  expect_error(object = FIMS:::use_testthat_template())
+test_that("`use_testthat_template()` handles edge cases correctly", {
+  withr::with_dir(
+    new = temp_path,
+    code = {
+      #' @description Test that `use_testthat_template()` throws an error when no input is provided.
+      expect_error(object = FIMS:::use_testthat_template())
+    }
+  )
 })
 
 ## Error handling ----
-test_that("use_testthat_template() returns correct error messages", {
-  # Attempt to use the test template again inside a tryCatch to capture any
-  # potential errors
-  error <- tryCatch(FIMS:::use_testthat_template("individual_function"),
-    error = function(e) {
-      # Return a custom error message if an error occurs
-      "An error occurred."
+test_that("`use_testthat_template()` returns correct error messages", {
+  withr::with_dir(
+    new = temp_path,
+    code = {
+      # Attempt to use the test template again inside a tryCatch to capture any
+      # potential errors
+      error <- tryCatch(FIMS:::use_testthat_template("individual_function"),
+        error = function(e) {
+          # Return a custom error message if an error occurs
+          "An error occurred."
+        }
+      )
+      #' @description Test that `use_testthat_template("individual_function")` throws an error when the file already exists.
+      expect_equal(error, "An error occurred.")
     }
   )
-  #' @description Test that use_testthat_template("individual_function") throws
-  #' an error when the file already exists.
-  expect_equal(error, "An error occurred.")
 })

@@ -31,7 +31,8 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
    * objects. This is a live object, which is an object that has been created
    * and lives in memory.
    */
-  static std::map<uint32_t, SelectivityInterfaceBase*> live_objects;
+  static std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
+      live_objects;
 
   /**
    * @brief The constructor.
@@ -40,7 +41,7 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
     this->id = SelectivityInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     SelectivityInterfaceBase */
-    SelectivityInterfaceBase::live_objects[this->id] = this;
+    // SelectivityInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -48,7 +49,7 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  SelectivityInterfaceBase(const SelectivityInterfaceBase& other)
+  SelectivityInterfaceBase(const SelectivityInterfaceBase &other)
       : id(other.id) {}
 
   /**
@@ -71,7 +72,7 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t SelectivityInterfaceBase::id_g = 1;
 // local id of the SelectivityInterfaceBase object map relating the ID of the
 // SelectivityInterfaceBase to the SelectivityInterfaceBase objects
-std::map<uint32_t, SelectivityInterfaceBase*>
+std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
     SelectivityInterfaceBase::live_objects;
 
 /**
@@ -94,8 +95,10 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @brief The constructor.
    */
   LogisticSelectivityInterface() : SelectivityInterfaceBase() {
+    SelectivityInterfaceBase::live_objects[this->id] =
+        std::make_shared<LogisticSelectivityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LogisticSelectivityInterface>(*this));
+        SelectivityInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -103,7 +106,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    *
    * @param other
    */
-  LogisticSelectivityInterface(const LogisticSelectivityInterface& other)
+  LogisticSelectivityInterface(const LogisticSelectivityInterface &other)
       : SelectivityInterfaceBase(other),
         inflection_point(other.inflection_point),
         slope(other.slope) {}
@@ -146,7 +149,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double> > info =
+    std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::selectivity_models_iterator it;
@@ -159,8 +162,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::LogisticSelectivity<double> > sel =
-          std::dynamic_pointer_cast<fims_popdy::LogisticSelectivity<double> >(
+      std::shared_ptr<fims_popdy::LogisticSelectivity<double>> sel =
+          std::dynamic_pointer_cast<fims_popdy::LogisticSelectivity<double>>(
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
@@ -181,6 +184,29 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
     }
   }
+  /**
+   * @brief Set uncertainty values for selectivity parameters.
+   *
+   * @details Sets the standard error values for the inflection point and slope
+   * parameters using the provided map.
+   * @param se_values A map from parameter names to vectors of standard error
+   * values.
+   */
+  virtual void set_uncertainty(
+      std::map<std::string, std::vector<double>> &se_values) {
+    fims::Vector<double> inflection_point_uncertainty(
+        this->inflection_point.size(), -999);
+    this->get_se_values("inflection_point", se_values,
+                        inflection_point_uncertainty);
+    fims::Vector<double> slope_uncertainty(this->slope.size(), -999);
+    this->get_se_values("slope", se_values, slope_uncertainty);
+    for (size_t i = 0; i < this->inflection_point.size(); i++) {
+      this->inflection_point[i].uncertainty_m = inflection_point_uncertainty[i];
+    }
+    for (size_t i = 0; i < this->slope.size(); i++) {
+      this->slope[i].uncertainty_m = slope_uncertainty[i];
+    }
+  }
 
   /**
    * @brief Converts the data to json representation for the output.
@@ -192,21 +218,27 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\":\"selectivity\",\n";
-    ss << " \"type\": \"Logistic\",\n";
-    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"module_name\":\"Selectivity\",\n";
+    ss << " \"module_type\": \"Logistic\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
     ss << "   \"name\": \"inflection_point\",\n";
     ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->inflection_point << "\n },\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->inflection_point << "},\n ";
 
     ss << "{\n";
     ss << "   \"name\": \"slope\",\n";
     ss << "   \"id\":" << this->slope.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->slope << "\n}]\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->slope << "}]\n";
 
     ss << "}";
 
@@ -217,11 +249,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogisticSelectivity<Type> > selectivity =
-        std::make_shared<fims_popdy::LogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticSelectivity<Type>> selectivity =
+        std::make_shared<fims_popdy::LogisticSelectivity<Type>>();
     std::stringstream ss;
     // set relative info
     selectivity->id = this->id;
@@ -232,7 +264,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       if (this->inflection_point[i].estimation_type_m.get() ==
           "fixed_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".inflection_point."
+        ss << "Selectivity." << this->id << ".inflection_point."
            << this->inflection_point[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->inflection_point[i]);
@@ -240,7 +272,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       if (this->inflection_point[i].estimation_type_m.get() ==
           "random_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".inflection_point."
+        ss << "Selectivity." << this->id << ".inflection_point."
            << this->inflection_point[i].id_m;
         info->RegisterRandomEffect(selectivity->inflection_point[i]);
         info->RegisterRandomEffectName(ss.str());
@@ -254,13 +286,13 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       selectivity->slope[i] = this->slope[i].initial_value_m;
       if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".slope." << this->slope[i].id_m;
+        ss << "Selectivity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->slope[i]);
       }
       if (this->slope[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".slope." << this->slope[i].id_m;
+        ss << "Selectivity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(selectivity->slope[i]);
       }
@@ -311,8 +343,10 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       slope_desc; /**< the width of the curve at the inflection_point */
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
+    SelectivityInterfaceBase::live_objects[this->id] =
+        std::make_shared<DoubleLogisticSelectivityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<DoubleLogisticSelectivityInterface>(*this));
+        SelectivityInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -321,7 +355,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @param other
    */
   DoubleLogisticSelectivityInterface(
-      const DoubleLogisticSelectivityInterface& other)
+      const DoubleLogisticSelectivityInterface &other)
       : SelectivityInterfaceBase(other),
         inflection_point_asc(other.inflection_point_asc),
         slope_asc(other.slope_asc),
@@ -365,7 +399,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double> > info =
+    std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::selectivity_models_iterator it;
@@ -379,9 +413,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double> > sel =
+      std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double>> sel =
           std::dynamic_pointer_cast<
-              fims_popdy::DoubleLogisticSelectivity<double> >(it->second);
+              fims_popdy::DoubleLogisticSelectivity<double>>(it->second);
 
       for (size_t i = 0; i < inflection_point_asc.size(); i++) {
         if (this->inflection_point_asc[i].estimation_type_m.get() ==
@@ -425,39 +459,89 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   }
 
   /**
+   * @brief Set uncertainty values for double logistic selectivity parameters.
+   *
+   * @details Sets the standard error values for the ascending and descending
+   * inflection points and slopes using the provided map.
+   * @param se_values A map from parameter names to vectors of standard error
+   * values.
+   */
+  virtual void set_uncertainty(
+      std::map<std::string, std::vector<double>> &se_values) {
+    fims::Vector<double> inflection_point_asc_uncertainty(
+        this->inflection_point_asc.size(), -999);
+    this->get_se_values("inflection_point_asc", se_values,
+                        inflection_point_asc_uncertainty);
+    fims::Vector<double> slope_asc_uncertainty(this->slope_asc.size(), -999);
+    this->get_se_values("slope_asc", se_values, slope_asc_uncertainty);
+    fims::Vector<double> inflection_point_desc_uncertainty(
+        this->inflection_point_desc.size(), -999);
+    this->get_se_values("inflection_point_desc", se_values,
+                        inflection_point_desc_uncertainty);
+    fims::Vector<double> slope_desc_uncertainty(this->slope_desc.size(), -999);
+    this->get_se_values("slope_desc", se_values, slope_desc_uncertainty);
+    for (size_t i = 0; i < this->inflection_point_asc.size(); i++) {
+      this->inflection_point_asc[i].uncertainty_m =
+          inflection_point_asc_uncertainty[i];
+    }
+    for (size_t i = 0; i < this->slope_asc.size(); i++) {
+      this->slope_asc[i].uncertainty_m = slope_asc_uncertainty[i];
+    }
+    for (size_t i = 0; i < this->inflection_point_desc.size(); i++) {
+      this->inflection_point_desc[i].uncertainty_m =
+          inflection_point_desc_uncertainty[i];
+    }
+    for (size_t i = 0; i < this->slope_desc.size(); i++) {
+      this->slope_desc[i].uncertainty_m = slope_desc_uncertainty[i];
+    }
+  }
+
+  /**
    * @brief Convert the data to json representation for the output.
    */
   virtual std::string to_json() {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"selectivity\",\n";
-    ss << " \"type\": \"DoubleLogistic\",\n";
-    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"module_name\": \"Selectivity\",\n";
+    ss << " \"module_type\": \"DoubleLogistic\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\":[\n{\n";
     ss << "   \"name\": \"inflection_point_asc\",\n";
     ss << "   \"id\":" << this->inflection_point_asc.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->inflection_point_asc << "\n},\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->inflection_point_asc << "},\n";
 
     ss << "{\n";
     ss << "   \"name\": \"slope_asc\",\n";
     ss << "   \"id\":" << this->slope_asc.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->slope_asc << "\n},\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->slope_asc << "},\n";
 
     ss << " {\n";
     ss << "   \"name\": \"inflection_point_desc\",\n";
     ss << "   \"id\":" << this->inflection_point_desc.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->inflection_point_desc << "\n},\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->inflection_point_desc << "},\n";
 
     ss << "{\n";
     ss << "   \"name\": \"slope_desc\",\n";
     ss << "   \"id\":" << this->slope_desc.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->slope_desc << "\n}]\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->slope_desc << "}]\n";
 
     ss << "}";
 
@@ -468,11 +552,11 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<Type> > selectivity =
-        std::make_shared<fims_popdy::DoubleLogisticSelectivity<Type> >();
+    std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<Type>> selectivity =
+        std::make_shared<fims_popdy::DoubleLogisticSelectivity<Type>>();
 
     std::stringstream ss;
     // set relative info
@@ -484,7 +568,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       if (this->inflection_point_asc[i].estimation_type_m.get() ==
           "fixed_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".inflection_point_asc."
+        ss << "Selectivity." << this->id << ".inflection_point_asc."
            << this->inflection_point_asc[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->inflection_point_asc[i]);
@@ -492,7 +576,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       if (this->inflection_point_asc[i].estimation_type_m.get() ==
           "random_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".inflection_point_asc."
+        ss << "Selectivity." << this->id << ".inflection_point_asc."
            << this->inflection_point_asc[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(selectivity->inflection_point_asc[i]);
@@ -507,14 +591,14 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
       if (this->slope_asc[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".slope_asc."
+        ss << "Selectivity." << this->id << ".slope_asc."
            << this->slope_asc[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->slope_asc[i]);
       }
       if (this->slope_asc[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".slope_asc."
+        ss << "Selectivity." << this->id << ".slope_asc."
            << this->slope_asc[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(selectivity->slope_asc[i]);
@@ -531,7 +615,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       if (this->inflection_point_desc[i].estimation_type_m.get() ==
           "fixed_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".inflection_point_desc."
+        ss << "Selectivity." << this->id << ".inflection_point_desc."
            << this->inflection_point_desc[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->inflection_point_desc[i]);
@@ -539,7 +623,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       if (this->inflection_point_desc[i].estimation_type_m.get() ==
           "random_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".inflection_point_desc."
+        ss << "Selectivity." << this->id << ".inflection_point_desc."
            << this->inflection_point_desc[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(selectivity->inflection_point_desc[i]);
@@ -554,14 +638,14 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
       if (this->slope_desc[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".slope_desc."
+        ss << "Selectivity." << this->id << ".slope_desc."
            << this->slope_desc[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->slope_desc[i]);
       }
       if (this->slope_desc[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "selectivity." << this->id << ".slope_desc."
+        ss << "Selectivity." << this->id << ".slope_desc."
            << this->slope_desc[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(selectivity->slope_desc[i]);

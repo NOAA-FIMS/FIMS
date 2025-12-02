@@ -12,21 +12,18 @@
 # Load or prepare any necessary data for testing
 
 ## IO correctness ----
-test_that("logit() works with correct inputs", {
-  #' @description Test that `logit(0, 1, 0.5)` returns 0 because the center of
-  #' negative infinity to positive infinity is zero.
+test_that("`logit()` works with correct inputs", {
+  #' @description Test that `logit(0, 1, 0.5)` returns 0 because the center of negative infinity to positive infinity is zero.
   expect_equal(
     object = logit(0, 1, 0.5),
     expected = 0
   )
-  #' @description Test that `logit(0.2, 1.0, 0.3)`, which is relevant for the
-  #' steepness transformation, returns -1.94591015.
+  #' @description Test that `logit(0.2, 1.0, 0.3)`, which is relevant for the steepness transformation, returns -1.94591015.
   expect_equal(
     object = logit(0.2, 1.0, 0.3),
     expected = -1.94591015
   )
-  #' @description Test that the `inv_logit()` returns the input to the `logit()`
-  #' function, i.e., `0.5`, when passed the output of `logit(0.0, 1, 0.5)`.
+  #' @description Test that the `inv_logit()` returns the input to the `logit()` function, i.e., `0.5`, when passed the output of `logit(0.0, 1, 0.5)`.
   expect_equal(
     object = inv_logit(0.0, 1.0, logit(0.0, 1.0, 0.5)),
     expected = 0.5
@@ -34,18 +31,13 @@ test_that("logit() works with correct inputs", {
 })
 
 ## Edge handling ----
-test_that("logit() returns correct outputs for edge cases", {
-  #' @description Test that `logit(0, 1L, 0.5)` returns 0 even if an integer is
-  #' passed to the maximum value, i.e., `b` parameter, because the logit
-  #' function in the C++ code is typed and the Rcpp interface only exports the
-  #' double version of the function but users might pass integers.
+test_that("`logit()` returns correct outputs for edge cases", {
+  #' @description Test that `logit(0, 1L, 0.5)` returns 0 even if an integer is passed to the maximum value, i.e., `b` parameter, because the logit function in the C++ code is typed and the Rcpp interface only exports the double version of the function but users might pass integers.
   expect_equal(
     object = logit(0, 1L, 0.5),
     expected = 0
   )
-  #' @description Test that `logit()` with bounds of infinity returns not a
-  #' number, i.e., `NaN`, because we cannot transform to the real number line
-  #' if it is already in that space.
+  #' @description Test that `logit()` with bounds of infinity returns not a number, i.e., `NaN`, because we cannot transform to the real number line if it is already in that space.
   expect_equal(
     object = logit(-Inf, Inf, 1),
     expected = NaN
@@ -53,21 +45,18 @@ test_that("logit() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-test_that("logit() returns correct error messages", {
-  #' @description Test that `logit(x)` returns expected error when passed a
-  #' vector input rather than a double to `x`.
+test_that("`logit()` returns correct error messages", {
+  #' @description Test that `logit(x)` returns expected error when passed a vector input rather than a double to `x`.
   expect_error(
     object = logit(0, 1, c(0.5, 0.5)),
     regexp = "Expecting a single value"
   )
-  #' @description Test that `logit(x)` returns expected error when passed a
-  #' vector input rather than a double to `a`.
+  #' @description Test that `logit(x)` returns expected error when passed a vector input rather than a double to `a`.
   expect_error(
     object = logit(-2:-1, 1, 0.5),
     regexp = "Expecting a single value"
   )
-  #' @description Test that `logit(x)` returns expected error when passed a
-  #' vector input rather than a double to `b`.
+  #' @description Test that `logit(x)` returns expected error when passed a vector input rather than a double to `b`.
   expect_error(
     object = logit(0, 1:2, 0.5),
     regexp = "Expecting a single value"
@@ -79,15 +68,13 @@ test_that("logit() returns correct error messages", {
 # Load or prepare any necessary data for testing
 
 ## IO correctness ----
-test_that("inv_logit() works with correct inputs", {
-  #' @description Test that `inv_logit(0, 1, 0)` returns 0.5 because the center
-  #' of zero to one is 0.5.
+test_that("`inv_logit()` works with correct inputs", {
+  #' @description Test that `inv_logit(0, 1, 0)` returns 0.5 because the center of zero to one is 0.5.
   expect_equal(
     object = inv_logit(0, 1, 0.0),
     expected = 0.5
   )
-  #' @description Test that `inv_logit(0.2, 1.0, 0.3)`, which is relevant for the
-  #' steepness transformation, returns -1.94591015.
+  #' @description Test that `inv_logit(0.2, 1.0, 0.3)`, which is relevant for the steepness transformation, returns -1.94591015.
   expect_equal(
     object = inv_logit(0.2, 1.0, -1.94591015),
     expected = 0.3
@@ -95,18 +82,13 @@ test_that("inv_logit() works with correct inputs", {
 })
 
 ## Edge handling ----
-test_that("inv_logit() returns correct outputs for edge cases", {
-  #' @description Test that `inv_logit(0, 1L, 0.0)` returns 0.5 even if an
-  #' integer is passed to the maximum value, i.e., `b` parameter, because the
-  #' inv_logit function in the C++ code is typed and the Rcpp interface only
-  #' exports the double version of the function but users might pass integers.
+test_that("`inv_logit()` returns correct outputs for edge cases", {
+  #' @description Test that `inv_logit(0, 1L, 0.0)` returns 0.5 even if an integer is passed to the maximum value, i.e., `b` parameter, because the inv_logit function in the C++ code is typed and the Rcpp interface only exports the double version of the function but users might pass integers.
   expect_equal(
     object = inv_logit(0, 1L, 0.0),
     expected = 0.5
   )
-  #' @description Test that `inv_logit()` with bounds of infinity returns not a
-  #' number, i.e., `NaN`, because we cannot transform to the real number line
-  #' if it is already in that space.
+  #' @description Test that `inv_logit()` with bounds of infinity returns not a number, i.e., `NaN`, because we cannot transform to the real number line if it is already in that space.
   expect_equal(
     object = inv_logit(-Inf, Inf, 1),
     expected = NaN
@@ -114,21 +96,18 @@ test_that("inv_logit() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-test_that("inv_logit() returns correct error messages", {
-  #' @description Test that `inv_logit(x)` returns expected error when passed a
-  #' vector input rather than a double to `x`.
+test_that("`inv_logit()` returns correct error messages", {
+  #' @description Test that `inv_logit(x)` returns expected error when passed a vector input rather than a double to `x`.
   expect_error(
     object = inv_logit(0, 1, c(0.5, 0.5)),
     regexp = "Expecting a single value"
   )
-  #' @description Test that `inv_logit(x)` returns expected error when passed a
-  #' vector input rather than a double to `a`.
+  #' @description Test that `inv_logit(x)` returns expected error when passed a vector input rather than a double to `a`.
   expect_error(
     object = inv_logit(-2:-1, 1, 0.5),
     regexp = "Expecting a single value"
   )
-  #' @description Test that `inv_logit(x)` returns expected error when passed a
-  #' vector input rather than a double to `b`.
+  #' @description Test that `inv_logit(x)` returns expected error when passed a vector input rather than a double to `b`.
   expect_error(
     object = inv_logit(0, 1:2, 0.5),
     regexp = "Expecting a single value"

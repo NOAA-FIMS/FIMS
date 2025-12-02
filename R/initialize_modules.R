@@ -2,7 +2,7 @@
 # no visible binding for global variable
 utils::globalVariables(c(
   "type", "name", "value", "unit", "uncertainty",
-  "datestart", "dateend", "age", "length", "year",
+  "timing", "age", "length", "year",
   # Used in initialize_comp dplyr code
   "valid_n"
 ))
@@ -85,8 +85,8 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       module[["age_to_length_conversion"]]$set_all_random(FALSE)
     } else {
       module_fields <- setdiff(module_fields, c(
-        # Right now we can also remove nlengths because the default is 0
-        "nlengths"
+        # Right now we can also remove n_lengths because the default is 0
+        "n_lengths"
       ))
     }
 
@@ -102,7 +102,6 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   # - Population interface
   #   - Update the Population interface to consistently use n_ages and n_years,
   #     as done in the S4 data1 object.
-  #   - Currently hard-coded `nseason` to 1 using the defaults from FIMS.
   #     Update as needed.
   #   - Add n_fleets to data1. Should n_fleets include both
   #     fishing and survey fleets? Currently, data1@fleets equals 1.
@@ -112,8 +111,8 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   #     index and agecomp distributions. No input values are required.
 
   integer_fields <- c(
-    "nages", "nfleets", "nlengths",
-    "nseasons", "nyears"
+    "n_ages", "n_fleets", "n_lengths",
+    "n_years"
   )
 
   boolean_fields <- c(
@@ -128,16 +127,15 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     if (field %in% integer_fields) {
       module[[field]]$set(
         switch(field,
-          "nages" = get_n_ages(data),
-          "nfleets" = parameters |>
+          "n_ages" = get_n_ages(data),
+          "n_fleets" = parameters |>
             dplyr::filter(module_name == "Fleet") |>
             dplyr::pull(fleet_name) |>
             unique() |>
             length(),
           # Or we can use get_n_fleets(data),
-          "nlengths" = get_n_lengths(data),
-          "nseasons" = 1,
-          "nyears" = get_n_years(data)
+          "n_lengths" = get_n_lengths(data),
+          "n_years" = get_n_years(data)
         )
       )
     } else if (field %in% c("ages", "weights")) {
@@ -592,9 +590,9 @@ initialize_comp <- function(data,
         name == fleet_name,
         type == comp[["name"]]
       ) |>
-      dplyr::count(datestart) |>
+      dplyr::count(timing) |>
       dplyr::filter(n != get_function(data)) |>
-      dplyr::pull(datestart)
+      dplyr::pull(timing)
 
     cli::cli_abort(c(
       "The length of the `{comp[['name']]}`-composition data for fleet
@@ -912,10 +910,9 @@ initialize_fims <- function(parameters, data) {
   )
 
   # Set-up TMB
-  # TODO: Fix this when more families come online
   # Hard code to be a catch-at-age model
-  # caa <- methods::new(CatchAtAge)
-  # caa$AddPopulation(population$get_id())
+  fims_model <- methods::new(CatchAtAge)
+  fims_model$AddPopulation(population$get_id())
 
   CreateTMBModel()
   # Create parameter list from Rcpp modules
@@ -923,10 +920,8 @@ initialize_fims <- function(parameters, data) {
     parameters = list(
       p = get_fixed(),
       re = get_random()
-      # TODO: Add the model to this list
-      # ),
-      # model = caa
-    )
+    ),
+    model = fims_model
   )
 
   return(parameter_list)

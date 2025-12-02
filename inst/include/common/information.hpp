@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #include "../distributions/distributions.hpp"
-#include "../models/fisheries_models.hpp"
+#include "../models/functors/fishery_model_base.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/growth/growth.hpp"
 #include "../population_dynamics/population/population.hpp"
@@ -36,9 +36,8 @@ namespace fims_info {
 template <typename Type>
 class Information {
  public:
-  size_t nyears = 0;   /**< number of years >*/
-  size_t nseasons = 1; /**< number of seasons >*/
-  size_t nages = 0;    /**< number of ages>*/
+  size_t n_years = 0;   /**< number of years >*/
+  size_t n_ages = 0;    /**< number of ages>*/
 
   static std::shared_ptr<Information<Type>>
       fims_information;           /**< singleton instance >*/
@@ -169,9 +168,8 @@ class Information {
     this->recruitment_process_models.clear();
     this->selectivity_models.clear();
     this->models_map.clear();
-    this->nyears = 0;
-    this->nseasons = 0;
-    this->nages = 0;
+    this->n_years = 0;
+    this->n_ages = 0;
 
     for (density_components_iterator it = density_components.begin();
          it != density_components.end(); ++it) {
@@ -188,6 +186,45 @@ class Information {
       }
     }
     this->density_components.clear();
+  }
+
+  /**
+   * @brief Get a summary string of the Information object state.
+   *
+   * @details Returns a string containing the sizes and states of all major
+   * containers and model components in the Information object. Useful for
+   * debugging and diagnostics.
+   *
+   * @return std::string summary of the Information object state.
+   */
+  std::string State() {
+    std::stringstream ss;
+    ss << "Information object State:\n";
+    ss << "data_objects: " << this->data_objects.clear();
+    ss << "populations: " << this->populations.size() << std::endl;
+    ss << "fixed_effects_parameters: " << this->fixed_effects_parameters.size()
+       << std::endl;
+    ss << "fleets: " << this->fleets.size() << std::endl;
+    ss << "growth_models: " << this->growth_models.size() << std::endl;
+    ss << "maturity_models: " << this->maturity_models.size() << std::endl;
+    ss << "parameter_names: " << this->parameter_names.size() << std::endl;
+    ss << "parameters: " << this->parameters.size() << std::endl;
+    ss << "random_effects_names: " << this->random_effects_names.size()
+       << std::endl;
+    ss << "random_effects_parameters: "
+       << this->random_effects_parameters.size() << std::endl;
+    ss << "recruitment_models: " << this->recruitment_models.size()
+       << std::endl;
+    ss << "recruitment_process_models: "
+       << this->recruitment_process_models.size() << std::endl;
+    ss << "selectivity_models: " << this->selectivity_models.size()
+       << std::endl;
+    ss << "models_map: " << this->models_map.size() << std::endl;
+    ss << "n_years: " << this->n_years << std::endl;
+    ss << "n_ages: " << this->n_ages << std::endl;
+    ss << "density_components: " << this->density_components.size()
+       << std::endl;
+    return ss.str();
   }
 
   /**
@@ -315,10 +352,10 @@ class Information {
                       fims::to_string(d->id) + " to derived value " +
                       fims::to_string(d->key[0]));
         vmit = this->variable_map.find(d->key[0]);
-        d->expected_values = *(*vmit).second;
-        FIMS_INFO_LOG("Expected value size for distribution " +
-                      fims::to_string(d->id) +
-                      " is: " + fims::to_string(d->expected_values.size()));
+        d->data_expected_values = (*vmit).second;
+        FIMS_INFO_LOG(
+            "Expected value size for distribution " + fims::to_string(d->id) +
+            " is: " + fims::to_string((*d->data_expected_values).size()));
       }
     }
   }
@@ -459,10 +496,10 @@ class Information {
                        fims::to_string(sel_id));
       }
     } else {
-      valid_model = false;
-      FIMS_ERROR_LOG("Error: No selectivity pattern defined for fleet " +
-                     fims::to_string(f->id) +
-                     ". FIMS requires selectivity be defined for all fleets.");
+      FIMS_WARNING_LOG("Warning: No selectivity pattern defined for fleet " +
+                       fims::to_string(f->id) +
+                       ". FIMS requires selectivity be defined for all fleets "
+                       "when running a catch at age model.");
     }
   }
 
@@ -497,11 +534,11 @@ class Information {
             fims::to_string(recruitment_uint));
       }
     } else {
-      valid_model = false;
-      FIMS_ERROR_LOG("No recruitment function defined for population " +
-                     fims::to_string(p->id) +
-                     ". FIMS requires recruitment functions be defined for all "
-                     "populations.");
+      FIMS_WARNING_LOG(
+          "No recruitment function defined for population " +
+          fims::to_string(p->id) +
+          ". FIMS requires recruitment functions be defined for all "
+          "populations when running a catch at age model.");
     }
   }
 
@@ -516,32 +553,34 @@ class Information {
   void SetRecruitmentProcess(bool &valid_model,
                              std::shared_ptr<fims_popdy::Population<Type>> p) {
     std::shared_ptr<fims_popdy::RecruitmentBase<Type>> r = p->recruitment;
-    if (r->process_id != -999) {
-      uint32_t process_uint = static_cast<uint32_t>(r->process_id);
-      recruitment_process_iterator it =
-          this->recruitment_process_models.find(process_uint);
+    // if recruitment is defined
+    if (r) {
+      if (r->process_id != -999) {
+        uint32_t process_uint = static_cast<uint32_t>(r->process_id);
+        recruitment_process_iterator it =
+            this->recruitment_process_models.find(process_uint);
 
-      if (it != this->recruitment_process_models.end()) {
-        r->process = (*it).second;  // recruitment process
-        FIMS_INFO_LOG(
-            "Recruitment Process model " + fims::to_string(process_uint) +
-            " successfully set to population " + fims::to_string(p->id));
-        (*it).second->recruitment = r;
+        if (it != this->recruitment_process_models.end()) {
+          r->process = (*it).second;  // recruitment process
+          FIMS_INFO_LOG(
+              "Recruitment Process model " + fims::to_string(process_uint) +
+              " successfully set to population " + fims::to_string(p->id));
+          (*it).second->recruitment = r;
+        } else {
+          valid_model = false;
+          FIMS_ERROR_LOG(
+              "Expected recruitment process function not defined for "
+              "population " +
+              fims::to_string(p->id) + ", recruitment process function " +
+              fims::to_string(process_uint));
+        }
       } else {
-        valid_model = false;
-        FIMS_ERROR_LOG(
-            "Expected recruitment process function not defined for "
-            "population " +
-            fims::to_string(p->id) + ", recruitment process function " +
-            fims::to_string(process_uint));
+        FIMS_WARNING_LOG(
+            "No recruitment process function defined for population " +
+            fims::to_string(p->id) +
+            ". FIMS requires recruitment process functions be defined for all "
+            "recruitments when running a catch at age model.");
       }
-    } else {
-      valid_model = false;
-      FIMS_ERROR_LOG(
-          "No recruitment process function defined for population " +
-          fims::to_string(p->id) +
-          ". FIMS requires recruitment process functions be defined for all "
-          "recruitments.");
     }
   }
 
@@ -576,11 +615,10 @@ class Information {
                        fims::to_string(growth_uint));
       }
     } else {
-      valid_model = false;
-      FIMS_ERROR_LOG("No growth function defined for population " +
-                     fims::to_string(p->id) +
-                     ". FIMS requires growth functions be defined for all "
-                     "populations.");
+      FIMS_WARNING_LOG("No growth function defined for population " +
+                       fims::to_string(p->id) +
+                       ". FIMS requires growth functions be defined for all "
+                       "populations when running a catch at age model.");
     }
   }
 
@@ -612,11 +650,10 @@ class Information {
             fims::to_string(maturity_uint));
       }
     } else {
-      valid_model = false;
-      FIMS_ERROR_LOG("No maturity function defined for population " +
-                     fims::to_string(p->id) +
-                     ". FIMS requires maturity functions be defined for all "
-                     "populations.");
+      FIMS_WARNING_LOG("No maturity function defined for population " +
+                       fims::to_string(p->id) +
+                       ". FIMS requires maturity functions be defined for all "
+                       "populations when running a catch at age model.");
     }
   }
 
@@ -631,8 +668,6 @@ class Information {
          ++it) {
       std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
       FIMS_INFO_LOG("Initializing fleet " + fims::to_string(f->id));
-
-      f->Initialize(f->nyears, f->nages, f->nlengths);
 
       SetFleetLandingsData(valid_model, f);
 
@@ -740,12 +775,10 @@ class Information {
         //     p->fleets.push_back(f);
         // }
       }
-      p->Initialize(p->nyears, p->nseasons, p->nages);
 
       // set information dimensions
-      this->nyears = std::max(this->nyears, p->nyears);
-      this->nages = std::max(this->nages, p->nages);
-      this->nseasons = std::max(this->nseasons, p->nseasons);
+      this->n_years = std::max(this->n_years, p->n_years);
+      this->n_ages = std::max(this->n_ages, p->n_ages);
 
       SetRecruitment(valid_model, p);
 
@@ -810,6 +843,7 @@ class Information {
     // setup priors, random effect, and data density components
     SetupPriors();
     SetupRandomEffects();
+    SetupData();
 
     return valid_model;
   }
@@ -819,42 +853,28 @@ class Information {
    *
    * @return size_t
    */
-  size_t GetNages() const { return nages; }
+  size_t GetNages() const { return n_ages; }
 
   /**
    * @brief Set the Nages object
    *
-   * @param nages
+   * @param n_ages
    */
-  void SetNages(size_t nages) { this->nages = nages; }
-
-  /**
-   * @brief Get the Nseasons object
-   *
-   * @return size_t
-   */
-  size_t GetNseasons() const { return nseasons; }
-
-  /**
-   * @brief Set the Nseasons object
-   *
-   * @param nseasons
-   */
-  void SetNseasons(size_t nseasons) { this->nseasons = nseasons; }
+  void SetNages(size_t n_ages) { this->n_ages = n_ages; }
 
   /**
    * @brief Get the Nyears object
    *
    * @return size_t
    */
-  size_t GetNyears() const { return nyears; }
+  size_t GetNyears() const { return n_years; }
 
   /**
    * @brief Set the Nyears object
    *
-   * @param nyears
+   * @param n_years
    */
-  void SetNyears(size_t nyears) { this->nyears = nyears; }
+  void SetNyears(size_t n_years) { this->n_years = n_years; }
 
   /**
    * @brief Get the Parameters object
@@ -879,6 +899,95 @@ class Information {
    */
   std::vector<Type *> &GetRandomEffectsParameters() {
     return random_effects_parameters;
+  }
+
+  /**
+   * @brief Checks to make sure all required modules are present for specified
+   * model
+   *
+   * @return True if valid model, False if invalid model, check fims.log for
+   * errors.
+   */
+  bool CheckModel() {
+    bool valid_model = true;
+    for (model_map_iterator it = this->models_map.begin();
+         it != this->models_map.end(); ++it) {
+      std::shared_ptr<fims_popdy::FisheryModelBase<Type>> &model = (*it).second;
+      std::set<uint32_t>::iterator jt;
+
+      for (jt = model->population_ids.begin();
+           jt != model->population_ids.end(); ++jt) {
+        population_iterator pt = this->populations.find((*jt));
+
+        if (pt != this->populations.end()) {
+          std::shared_ptr<fims_popdy::Population<Type>> p = (*pt).second;
+
+          if (model->model_type_m == "caa") {
+            typename std::set<uint32_t>::iterator fleet_ids_it;
+            for (fleet_ids_it = p->fleet_ids.begin();
+                 fleet_ids_it != p->fleet_ids.end(); ++fleet_ids_it) {
+              fleet_iterator it = this->fleets.find(*fleet_ids_it);
+
+              if (it != this->fleets.end()) {
+                // Initialize fleet object
+                std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
+
+                if (f->fleet_selectivity_id_m == -999) {
+                  valid_model = false;
+                  FIMS_ERROR_LOG(
+                      "No selectivity pattern defined for fleet " +
+                      fims::to_string(f->id) +
+                      ". FIMS requires selectivity be defined for all fleets "
+                      "when running a catch at age model.");
+                }
+              }
+            }
+
+            if (p->recruitment_id == -999) {
+              valid_model = false;
+              FIMS_ERROR_LOG(
+                  "No recruitment function defined for population " +
+                  fims::to_string(p->id) +
+                  ". FIMS requires recruitment functions be defined for all "
+                  "populations when running a catch at age model.");
+            }
+
+            std::shared_ptr<fims_popdy::RecruitmentBase<Type>> r =
+                p->recruitment;
+            r = p->recruitment;
+            if (r->process_id == -999) {
+              valid_model = false;
+              FIMS_ERROR_LOG(
+                  "No recruitment process function defined for population " +
+                  fims::to_string(p->id) +
+                  ". FIMS requires recruitment process functions be defined "
+                  "for all "
+                  "recruitments when running a catch at age model.");
+            }
+
+            if (p->growth_id == -999) {
+              valid_model = false;
+              FIMS_ERROR_LOG(
+                  "No growth function defined for population " +
+                  fims::to_string(p->id) +
+                  ". FIMS requires growth functions be defined for all "
+                  "populations when running a catch at age model.");
+            }
+
+            if (p->maturity_id == -999) {
+              valid_model = false;
+
+              FIMS_WARNING_LOG(
+                  "No maturity function defined for population " +
+                  fims::to_string(p->id) +
+                  ". FIMS requires maturity functions be defined for all "
+                  "populations when running a catch at age model.");
+            }
+          }
+        }
+      }
+    }
+    return valid_model;
   }
 };
 

@@ -31,7 +31,8 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
    * This is a live object, which is an object that has been created and lives
    * in memory.
    */
-  static std::map<uint32_t, MaturityInterfaceBase*> live_objects;
+  static std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
+      live_objects;
 
   /**
    * @brief The constructor.
@@ -40,7 +41,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
     this->id = MaturityInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     MaturityInterfaceBase */
-    MaturityInterfaceBase::live_objects[this->id] = this;
+    // MaturityInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -70,7 +71,8 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t MaturityInterfaceBase::id_g = 1;
 // local id of the MaturityInterfaceBase object map relating the ID of the
 // MaturityInterfaceBase to the MaturityInterfaceBase objects
-std::map<uint32_t, MaturityInterfaceBase*> MaturityInterfaceBase::live_objects;
+std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
+    MaturityInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for logistic maturity to instantiate the object from R:
@@ -91,8 +93,10 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * @brief The constructor.
    */
   LogisticMaturityInterface() : MaturityInterfaceBase() {
+    MaturityInterfaceBase::live_objects[this->id] =
+        std::make_shared<LogisticMaturityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LogisticMaturityInterface>(*this));
+        MaturityInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -143,7 +147,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double> > info =
+    std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::maturity_models_iterator it;
@@ -156,8 +160,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::LogisticMaturity<double> > mat =
-          std::dynamic_pointer_cast<fims_popdy::LogisticMaturity<double> >(
+      std::shared_ptr<fims_popdy::LogisticMaturity<double>> mat =
+          std::dynamic_pointer_cast<fims_popdy::LogisticMaturity<double>>(
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
@@ -180,6 +184,31 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   }
 
   /**
+   * @brief Set uncertainty values for logistic maturity parameters.
+   *
+   * @details Sets the standard error values for the inflection point and slope
+   * parameters using the provided map.
+   * @param se_values A map from parameter names to vectors of standard error
+   * values.
+   */
+  virtual void set_uncertainty(
+      std::map<std::string, std::vector<double>>& se_values) {
+    fims::Vector<double> inflection_point_uncertainty(
+        this->inflection_point.size(), -999);
+    fims::Vector<double> slope_uncertainty(this->slope.size(), -999);
+    this->get_se_values("inflection_point", se_values,
+                        inflection_point_uncertainty);
+    this->get_se_values("slope", se_values, slope_uncertainty);
+
+    for (size_t i = 0; i < this->inflection_point.size(); i++) {
+      this->inflection_point[i].uncertainty_m = inflection_point_uncertainty[i];
+    }
+    for (size_t i = 0; i < this->slope.size(); i++) {
+      this->slope[i].uncertainty_m = slope_uncertainty[i];
+    }
+  }
+
+  /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
    * maturity interface with logistic maturity. It also returns the ID and the
@@ -188,23 +217,29 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
     ss << "{\n";
-    ss << " \"name\": \"maturity\",\n";
-    ss << " \"type\": \"logistic\",\n";
-    ss << " \"id\": " << this->id << ",\n";
+    ss << " \"module_name\": \"Maturity\",\n";
+    ss << " \"module_type\": \"Logistic\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
     ss << "   \"name\": \"inflection_point\",\n";
     ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->inflection_point << "},\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->inflection_point << "},\n ";
 
     ss << "{\n";
     ss << "   \"name\": \"slope\",\n";
     ss << "   \"id\":" << this->slope.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
-    ss << "   \"values\":" << this->slope << "}\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->slope << "}]\n";
 
-    ss << "]}";
+    ss << "}";
 
     return ss.str();
   }
@@ -213,11 +248,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogisticMaturity<Type> > maturity =
-        std::make_shared<fims_popdy::LogisticMaturity<Type> >();
+    std::shared_ptr<fims_popdy::LogisticMaturity<Type>> maturity =
+        std::make_shared<fims_popdy::LogisticMaturity<Type>>();
 
     // set relative info
     maturity->id = this->id;
@@ -228,7 +263,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
       if (this->inflection_point[i].estimation_type_m.get() ==
           "fixed_effects") {
         ss.str("");
-        ss << "maturity." << this->id << ".inflection_point."
+        ss << "Maturity." << this->id << ".inflection_point."
            << this->inflection_point[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->inflection_point[i]);
@@ -236,7 +271,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
       if (this->inflection_point[i].estimation_type_m.get() ==
           "random_effects") {
         ss.str("");
-        ss << "maturity." << this->id << ".inflection_point."
+        ss << "Maturity." << this->id << ".inflection_point."
            << this->inflection_point[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(maturity->inflection_point[i]);
@@ -248,13 +283,13 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
       maturity->slope[i] = this->slope[i].initial_value_m;
       if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "maturity." << this->id << ".slope." << this->slope[i].id_m;
+        ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->slope[i]);
       }
       if (this->slope[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "maturity." << this->id << ".slope." << this->slope[i].id_m;
+        ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterRandomEffect(maturity->slope[i]);
         info->RegisterRandomEffectName(ss.str());
       }

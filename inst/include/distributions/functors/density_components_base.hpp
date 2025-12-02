@@ -35,6 +35,7 @@ struct DistributionElementObject {
   fims::Vector<Type>* re = NULL; /**< pointer to random effects vector*/
   fims::Vector<Type>* re_expected_values =
       NULL; /**< expected value of random effects*/
+  fims::Vector<Type>* data_expected_values = NULL; /**< expected value of data*/
   std::vector<fims::Vector<Type>*>
       priors; /**< vector of pointers where each points to a prior parameter */
   fims::Vector<Type> x; /**< input value of distribution function for priors or
@@ -85,6 +86,9 @@ struct DistributionElementObject {
    * @return the reference to the value of the vector or pointer at position i
    */
   inline Type& get_expected(size_t i) {
+    if (this->input_type == "data") {
+      return (*data_expected_values)[i];
+    }
     if (this->input_type == "random_effects") {
       return (*re_expected_values)[i];
     } else {
@@ -101,7 +105,7 @@ struct DistributionElementObject {
       return this->observed_values->data.size();
     }
     if (this->input_type == "random_effects") {
-      return this->expected_values.size();
+      return (*re).size();
     }
     if (this->input_type == "prior") {
       return this->expected_values.size();

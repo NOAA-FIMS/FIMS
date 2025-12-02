@@ -42,16 +42,15 @@ methods::setClass(
     max_gradient = "numeric",
     report = "list",
     sdreport = "sdreportOrList",
-    estimates = "tbl_df",
-    fits = "tbl_df",
     number_of_parameters = "integer",
     timing = "difftime",
-    version = "package_version"
+    version = "package_version",
+    model_output = "character"
   )
 )
 
 # methods::setMethod: printers ----
-
+# TODO: add `get_report`, `get_opt`, etc. to the list of available slots in show()?
 methods::setMethod(
   f = "show",
   signature = "FIMSFit",
@@ -59,7 +58,7 @@ methods::setMethod(
     cli::cli_inform(c(
       "i" = "The object is of the class FIMSFit v.{get_version(object)}",
       "i" = "The slots can be accessed using {.fn get_*} functions, e.g.,",
-      "*" = "{.fn get_estimates}",
+      "*" = "{.fn get_model_output}",
       "*" = "{.fn get_obj}",
       "*" = "{.fn get_version}",
       "i" = "The following slots are available: {methods::slotNames(object)}.",
@@ -188,7 +187,6 @@ methods::setGeneric("get_max_gradient", function(x) standardGeneric("get_max_gra
 #' @keywords fit_fims
 methods::setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
 
-
 #' @return
 #' [get_sdreport()] returns the list from [TMB::sdreport()].
 #' @export
@@ -208,60 +206,47 @@ methods::setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 methods::setGeneric("get_estimates", function(x) standardGeneric("get_estimates"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-methods::setMethod("get_estimates", "FIMSFit", function(x) x@estimates)
+methods::setMethod(
+  "get_estimates",
+  "FIMSFit",
+  function(x) {
+    # Extract the core TMB components (object, sdreport, optimization result)
+    # from the fit object.
+    obj <- get_obj(x)
+    sdreport <- get_sdreport(x)
+    opt <- get_opt(x)
+    parameter_names <- get_obj(x)[["par"]] |>
+      names()
 
-#' @return
-#' [get_fits()] returns a tibble of input data and corresponding
-#'  expected values, likelihoods, and additional metadata from a fitted model.
-#'  The tibble includes the following variables:
-#' \itemize{
-#'  \item{module_name: Character string that describes the name of the module,
-#'  e.g., `"Data"`.}
-#'  \item{module_id: Integer that provides identifier for linking outputs.}
-#'  \item{label: Character string that describes type of data.}
-#'  \item{data_id: Not yet implemented/NA: Integer that will provide
-#'  unique identifier for data.}
-#'  \item{fleet_name: Not yet implemented/NA: Character string that
-#' will provide fleet name corresponding to name provided via FIMSFrame.}
-#'  \item{unit: Not yet implemented/NA: Character string that will
-#'  describe appropriate units for the data inputs and expected values.}
-#'  \item{uncertainty: Not yet implemented/NA: Character string that will
-#'  describe the uncertainty specified for the data input value.}
-#'  \item{age: Not yet implemented/NA: Integer that will provide the age
-#'  affiliated with a data input, where appropriate.}
-#'  \item{length: Not yet implemented/NA: Integer that will provide the length
-#'  affiliated with a data input, where appropriate.}
-#'  \item{datestart: Not yet implemented/NA: Character string that will provide
-#'  the start date for the data input, corresponding to the value provided in
-#'  the input data.}
-#'  \item{dateend: Not yet implemented/NA: Character string that will provide
-#'  the end date for the data input, corresponding to the value provided in
-#'  the input data.}
-#'  \item{year: Not yet implemented/NA: Integer that will provide model year
-#'  for the data input.}
-#'  \item{init: Numeric that provides the initial value for the data input.}
-#'  \item{expected: Numeric that provides the expected value for the data input.
-#'  *NOTE: units for provided init and expected values need to be standardized.}
-#'  \item{log_like: Numeric that provides log-likelihood for expected value.}
-#'  \item{distribution: Character string that indicates the distribution used
-#'  for the log-likelihood estimation.}
-#'  \item{re_estimated: Logical that indicates whether any random effects were
-#'  estimated during model fitting. Log-likelihood values should not be directly
-#'  compared between models with and without estimation of random effects.}
-#'  \item{log_like_cv: Not yet implemented/NA: Numeric that will indicate
-#'  corresponding uncertainty for the log-likelihood value.}
-#'  \item{weight: Numeric that indicates data weighting applied to each data
-#'  value; manually fixed at 1. *NOTE: Will need to be made responsive to
-#'  user-specified or user-estimated data weighting once data weighting is
-#'  added to FIMS as a feature.}
-#' }
-#' @export
-#' @rdname get_FIMSFit
-#' @keywords fit_fims
-methods::setGeneric("get_fits", function(x) standardGeneric("get_fits"))
-#' @rdname get_FIMSFit
-#' @keywords fit_fims
-methods::setMethod("get_fits", "FIMSFit", function(x) x@fits)
+    # Reshape the TMB output into a standardized data frame.
+    # This serves as the "expected" result to compare against.
+    tmb_output <- FIMS:::reshape_tmb_estimates(
+      obj = obj,
+      sdreport = sdreport,
+      opt = opt,
+      parameter_names = parameter_names
+    )
+
+    # Extract the model_output, which contains the JSON-like structure.
+    model_output <- get_model_output(x)
+    # Reshape the output from the JSON structure into a data frame.
+    json_output <- reshape_json_estimates(model_output)
+
+    # Join the two outputs on parameter_id to compare and consolidate information.
+    estimates <- dplyr::left_join(
+      json_output,
+      tmb_output |>
+        dplyr::filter(!is.na(parameter_id)) |>
+        dplyr::select(-initial, -module_name, -module_id, -estimate, -label),
+      by = c("parameter_id")
+    ) |>
+      dplyr::mutate(
+        uncertainty = dplyr::coalesce(uncertainty.x, uncertainty.y),
+        .after = "estimation_type"
+      ) |>
+      dplyr::select(-uncertainty.x, -uncertainty.y)
+  }
+)
 
 #' @return
 #' [get_number_of_parameters()] returns a vector of integers specifying the
@@ -303,6 +288,16 @@ methods::setGeneric("get_version", function(x) standardGeneric("get_version"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
 methods::setMethod("get_version", "FIMSFit", function(x) x@version)
+
+#' @return
+#' [get_model_output()] returns the finalized FIMS output as a JSON list.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_model_output", function(x) standardGeneric("get_model_output"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_model_output", "FIMSFit", function(x) x@model_output)
 
 # methods::setValidity ----
 
@@ -391,9 +386,6 @@ is.FIMSFit <- function(x) {
 #'       An object with the `sdreport` class containing the output from
 #'       `TMB::sdreport(obj)`.
 #'     }
-#'     \item{\code{estimates}:}{
-#'       A table of parameter values and their uncertainty.
-#'     }
 #'     \item{\code{timing}:}{
 #'       The length of time it took to run the model if it was optimized.
 #'     }
@@ -402,7 +394,10 @@ is.FIMSFit <- function(x) {
 #'       version used to create this output, which will not always be the same
 #'       if you are running this function yourself.
 #'     }
-#'  }
+#'     \item{\code{model_output}:}{
+#'       The FIMS model output as a JSON string.
+#'     }
+#'   }
 #' @keywords fit_fims
 #' @export
 FIMSFit <- function(
@@ -458,183 +453,24 @@ FIMSFit <- function(
   )
 
   # Create JSON output for FIMS run
-  # TODO: turn on get_output()
-  # finalized_fims <- input[["model"]]$get_output()
-  finalized_fims <- finalize(
-    # Use par from obj if the model is not optimized; otherwise, use par from opt.
-    if (length(sdreport) > 0) opt[["par"]] else obj[["par"]],
-    obj[["fn"]],
-    obj[["gr"]]
-  )
+  model_output <- input[["model"]]$get_output()
   # Reshape the JSON estimates
-  json_estimates <- reshape_json_estimates(finalized_fims, opt)
-
-  # Merge json_estimates into tmb_estimates based on common columns
-  # TODO: need to update the derived quantities section of the tibble
-  # The outputs from TMB and JSON are not the same, difficult to join them
-  estimates <- dplyr::full_join(
-    tmb_estimates,
+  json_estimates <- reshape_json_estimates(model_output)
+  # Merge json_estimates into tmb_estimates based on parameter id
+  # TODO: Need uncertainty from TMB for derived quantities
+  # TODO: change order of columns
+  estimates <- dplyr::left_join(
     json_estimates,
-    by = dplyr::join_by(
-      parameter_id,
-      module_name,
-      module_id,
-      label,
-      estimation_type
-    )
+    tmb_estimates |>
+      dplyr::filter(!is.na(parameter_id)) |>
+      dplyr::select(-initial, -module_name, -module_id, -estimate, -label),
+    by = c("parameter_id")
   ) |>
     dplyr::mutate(
-      # if estimation_type = "constant" and initial.x = NA, then set initial.x = initial.y
-      # and set estimate.x = estimate.y. Here .x represents the TMB values and .y
-      # represents the JSON values. json_estimates have values
-      # for all parameters, including constant (not estimated) parameters.
-      initial.x = ifelse(
-        estimation_type == "constant" & is.na(initial.x),
-        initial.y,
-        initial.x
-      ),
-      estimate.x = ifelse(
-        estimation_type == "constant" & is.na(estimate.x),
-        estimate.y,
-        estimate.x
-      )
+      uncertainty = dplyr::coalesce(uncertainty.x, uncertainty.y),
+      .after = "estimation_type"
     ) |>
-    # Select the relevant columns for the final output
-    # Drop the initial and estimate columns from the json_estimates and
-    # use values from tmb_estimates. The values from json_estimates are
-    # slightly different from the values from tmb_estimates, most likely
-    # due to rounding differences.
-    dplyr::select(
-      -c(initial.y, estimate.y)
-    ) |>
-    # Drop .x suffix from column names
-    dplyr::rename(
-      initial = initial.x,
-      estimate = estimate.x
-    ) |>
-    # Reorder the columns to place `module_name`, `module_id`, and `module_type` at the beginning.
-    dplyr::relocate(module_name, module_id, module_type, label, type, type_id, .before = tidyselect::everything()) |>
-    # Reorder the rows by `parameter_id`
-    dplyr::arrange(parameter_id) |>
-    # Add derived quantity IDs to the tibble for merging with the JSON output
-    # TODO: Refactor once we can reliably extract unique IDs from
-    # both the JSON and TMB outputs.
-    dplyr::group_by(label) |>
-    dplyr::mutate(
-      derived_quantity_id = ifelse(
-        is.na(parameter_id),
-        paste0(label, "_", seq_len(dplyr::n())),
-        NA_character_
-      )
-    )
-
-  # Reshape the JSON derived quantities
-  json_derived_quantities <- reshape_json_derived_quantities(finalized_fims) |>
-    # Add derived quantity IDs to the tibble for merging with the JSON output
-    # TODO: Refactor once we can reliably extract unique IDs from
-    # both the JSON and TMB outputs.
-    dplyr::group_by(name) |>
-    dplyr::mutate(
-      derived_quantity_id = paste0(name, "_", seq_len(dplyr::n()))
-    ) |>
-    # Rename the columns to match the tmb_estimates
-    dplyr::rename(
-      label = name,
-      estimate = values
-    )
-
-  # Merge json_derived_quantities into estimates based on common columns
-  estimates <- dplyr::full_join(
-    estimates,
-    json_derived_quantities,
-    by = dplyr::join_by(
-      derived_quantity_id,
-      label
-    )
-  ) |>
-    # Fill missing values in .x columns (TMB output) using corresponding values
-    # from .y columns (JSON output).
-    dplyr::mutate(
-      module_name.x = dplyr::coalesce(module_name.x, module_name.y),
-      module_id.x = dplyr::coalesce(module_id.x, module_id.y),
-      module_type.x = dplyr::coalesce(module_type.x, module_type.y),
-      estimate.x = dplyr::coalesce(estimate.x, estimate.y)
-    ) |>
-    # Drop .x suffix from column names
-    dplyr::rename(
-      module_name = module_name.x,
-      module_id = module_id.x,
-      module_type = module_type.x,
-      estimate = estimate.x
-    ) |>
-    # Select the relevant columns for the final output
-    dplyr::select(
-      -c(
-        derived_quantity_id, module_name.y, module_id.y, module_type.y,
-        estimate.y
-      )
-    ) |>
-    dplyr::ungroup()
-
-  # Create fits tibble
-  # TODO: Develop better/more reliable method for obtaining 'module_name'/'module_id'/'label' from output
-  # TODO: Standardize 'init' and 'expected' units for distributions Dlnorm, Dmultinom
-  # TODO: Develop means to provide values for remaining columns with NAs
-
-  # Obtain preliminary 'init' values for data inputs in JSON, using 'values'
-  # Necessary to obtain 'label' values (e.g., "Index", "AgeComp", etc.) for
-  # final 'init', 'expected', etc.
-  data_init_res <- reshape_json_values(finalized_fims) |>
-    dplyr::filter(module_name == "data") |> # remove EWAA
-    dplyr::rename(
-      init_values = value,
-      label = module_type,
-      module_id_init = module_id
-    ) |>
-    dplyr::arrange(module_id_init) # ensure this aligns with 'data_fits_res'
-
-  # Obtain 'log_like', 'distribution', 'init', and 'expected'
-  data_fits_res <- reshape_json_fits(finalized_fims) |>
-    dplyr::select(-module_name) |>
-    dplyr::rename(distribution = module_type) |>
-    # manually standardize distribution names
-    dplyr::mutate(
-      distribution = dplyr::case_when(
-        distribution == "log_normal" ~ "Dlnorm",
-        .default = distribution
-      )
-    ) |>
-    # remove likelihoods not affiliated with data (e.g., recruitment)
-    dplyr::filter(module_id %in% unique(data_init_res$module_id_init)) |>
-    # ensure module_id order aligns with 'data_init_res'
-    dplyr::arrange(module_id) |>
-    # assign T/F to 're_estimated' based on estimation_type == "random_effects"
-    dplyr::mutate(re_estimated = any(json_estimates$estimation_type == "random_effects"))
-
-  # Join, format data into final 'fits' tibble
-  fits <- data_init_res |>
-    cbind(data_fits_res) |> # Consider test to ensure 'init_values' = 'init'
-    # Provide blank fields for currently missing values
-    dplyr::mutate(
-      data_id = NA_integer_, # not available from JSON output
-      fleet_name = NA_character_, # not available from JSON output
-      unit = NA_character_, # not available from JSON output
-      uncertainty = NA_real_, # not available from JSON output
-      age = NA_integer_, # not available from JSON output
-      length = NA_integer_, # not available from JSON output
-      datestart = NA_character_, # not available from JSON output
-      dateend = NA_character_, # not available from JSON output
-      year = NA_integer_, # not available from JSON output
-      log_like_cv = NA_real_, # future feature
-      weight = 1.0 # future feature; fixed at 1.0 for time being
-    ) |>
-    dplyr::select(
-      "module_name", "module_id", "label", "data_id", "fleet_name",
-      "unit", "uncertainty", "age", "length", "datestart",
-      "dateend", "year", "init", "expected", "log_like",
-      "distribution", "re_estimated", "log_like_cv", "weight"
-    ) |>
-    tibble::as_tibble()
+    dplyr::select(-uncertainty.x, -uncertainty.y)
 
   fit <- methods::new(
     "FIMSFit",
@@ -644,11 +480,10 @@ FIMSFit <- function(
     max_gradient = max_gradient,
     report = report,
     sdreport = sdreport,
-    estimates = estimates,
-    fits = fits,
     number_of_parameters = number_of_parameters,
     timing = timing,
-    version = version
+    version = version,
+    model_output = model_output
   )
   fit
 }
@@ -777,6 +612,7 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
+  FIMS::set_fixed(opt$par)
 
   time_sdreport <- NA
   if (get_sd) {

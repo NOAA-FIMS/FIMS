@@ -19,6 +19,7 @@
 
 ## Setup ----
 # Skip the test if running on a local machine not in a CI environment
+#' @description Skip the test if not running in a CI environment.
 testthat::skip_if(!testthat:::env_var_is_true("CI"))
 
 # TODO: don't skip the test on CI after resolving the failed parallel tests
@@ -98,38 +99,39 @@ test_that("Run FIMS in parallel using {snowfall}", {
 
   # Comparison of results:
   # Verify that SSB values from both runs are equivalent.
-  #' @description Test that SSB values from parallel runs equal those from
-  #' serial runs.
-  expect_setequal(
-    purrr::map(
-      results_parallel,
-      \(x) x@estimates[x@estimates$label == "SSB", "estimate"]
-    ),
-    purrr::map(
-      estimation_results_serial,
-      \(x) x@estimates[x@estimates$label == "SSB", "estimate"]
-    )
+  ssb_parallel <- purrr::map(
+    results_parallel,
+    \(x) x@estimates[x@estimates$label == "SSB", "estimated"]
   )
 
-  #' @description Test that parameter estimates from parallel runs equal those
-  #' from serial runs.
-  expect_setequal(
-    purrr::map(
-      results_parallel,
-      \(x) x@estimates[x@estimates$label == "p", "estimate"]
-    ),
-    purrr::map(
-      estimation_results_serial,
-      \(x) x@estimates[x@estimates$label == "p", "estimate"]
-    )
+  ssb_serial <- purrr::map(
+    estimation_results_serial,
+    \(x) x@estimates[x@estimates$label == "SSB", "estimated"]
   )
+  #' @description Test that SSB values from parallel runs equal those from serial runs.
+  expect_setequal(ssb_parallel, ssb_serial)
 
-  #' @description Test that total NLL values from parallel runs equal those
-  #' from serial runs.
-  expect_equal(
-    purrr::map(results_parallel, \(x) x@report[["jnll"]]),
-    purrr::map(estimation_results_serial, \(x) x@report[["jnll"]])
+  parameters_parallel <- purrr::map(
+    results_parallel,
+    \(x) x@estimates[x@estimates$label == "p", "estimated"]
   )
+  parameters_serial <- purrr::map(
+    estimation_results_serial,
+    \(x) x@estimates[x@estimates$label == "p", "estimated"]
+  )
+  #' @description Test that parameter estimates from parallel runs equal those from serial runs.
+  expect_setequal(parameters_parallel, parameters_serial)
+
+  jnll_parallel <- purrr::map(
+    results_parallel,
+    \(x) x@report[["jnll"]]
+  )
+  jnll_serial <- purrr::map(
+    estimation_results_serial,
+    \(x) x@report[["jnll"]]
+  )
+  #' @description Test that total NLL values from parallel runs equal those from serial runs.
+  expect_equal(jnll_parallel, jnll_serial)
 })
 
 ## Edge handling ----

@@ -31,7 +31,7 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
    * This is a live object, which is an object that has been created and lives
    * in memory.
    */
-  static std::map<uint32_t, GrowthInterfaceBase*> live_objects;
+  static std::map<uint32_t, std::shared_ptr<GrowthInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
@@ -40,7 +40,8 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
     this->id = GrowthInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     GrowthInterfaceBase */
-    GrowthInterfaceBase::live_objects[this->id] = this;
+    // GrowthInterfaceBase::live_objects[this->id] =
+    // std::make_shared<GrowthInterfaceBase>(*this);
   }
 
   /**
@@ -48,7 +49,7 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  GrowthInterfaceBase(const GrowthInterfaceBase& other) : id(other.id) {}
+  GrowthInterfaceBase(const GrowthInterfaceBase &other) : id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -70,7 +71,8 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t GrowthInterfaceBase::id_g = 1;
 // local id of the GrowthInterfaceBase object map relating the ID of the
 // GrowthInterfaceBase to the GrowthInterfaceBase objects
-std::map<uint32_t, GrowthInterfaceBase*> GrowthInterfaceBase::live_objects;
+std::map<uint32_t, std::shared_ptr<GrowthInterfaceBase>>
+    GrowthInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for EWAAGrowth to instantiate the object from R:
@@ -91,7 +93,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @brief A map of empirical weight-at-age values allowing multiple modules to
    * access and modify the weights without copying values between modules.
    */
-  std::shared_ptr<std::map<double, double> > ewaa;
+  std::shared_ptr<std::map<double, double>> ewaa;
   /**
    * @brief Have weight and age vectors been set? The default is false.
    */
@@ -101,7 +103,9 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @brief The constructor.
    */
   EWAAGrowthInterface() : GrowthInterfaceBase() {
-    this->ewaa = std::make_shared<std::map<double, double> >();
+    this->ewaa = std::make_shared<std::map<double, double>>();
+    GrowthInterfaceBase::live_objects[this->id] =
+        std::make_shared<EWAAGrowthInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
         std::make_shared<EWAAGrowthInterface>(*this));
   }
@@ -111,7 +115,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    *
    * @param other
    */
-  EWAAGrowthInterface(const EWAAGrowthInterface& other)
+  EWAAGrowthInterface(const EWAAGrowthInterface &other)
       : GrowthInterfaceBase(other),
         weights(other.weights),
         ages(other.ages),
@@ -175,24 +179,39 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
     ss << "{\n";
-    ss << " \"name\": \"growth\",\n";
-    ss << " \"type\" : \"EWAA\",\n";
-    ss << " \"id\":" << this->id << ",\n";
-    ss << " \"rank\": " << 1 << ",\n";
-    ss << " \"dimensions\": [" << this->weights.size() << "],\n";
+    ss << " \"module_name\": \"Growth\",\n";
+    ss << " \"module_type\": \"EWAA\",\n";
+    ss << " \"module_id\":" << this->id << ",\n";
+    ss << " \"parameters\": [\n{\n";
+    ss << " \"name\": null,\n";
+    ss << " \"id\": null,\n";
+    ss << " \"type\": \"vector\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [\"n_ages\"],\n";
+    ss << "  \"dimensions\": [" << this->ages.size() << "]\n},\n";
 
-    ss << " \"ages\": [";
-    for (size_t i = 0; i < ages.size() - 1; i++) {
-      ss << ages[i] << ", ";
-    }
-    ss << ages[ages.size() - 1] << "],\n";
-
-    ss << " \"values\": [";
+    ss << " \"values\": [\n";
     for (size_t i = 0; i < weights.size() - 1; i++) {
-      ss << weights[i] << ", ";
+      ss << "{\n";
+      ss << "\"id\": null,\n";
+      ss << "\"value\": " << weights[i] << ",\n";
+      ss << "\"estimated_value\": " << weights[i] << ",\n";
+      ss << "\"uncertainty\": " << 0 << ",\n";
+      ss << "\"min\": \"-Infinity\",\n";
+      ss << "\"max\": \"Infinity\",\n";
+      ss << "\"estimation_type\": \"constant\"\n";
+      ss << "},\n";
     }
-    ss << weights[weights.size() - 1] << "]\n";
-    ss << "}";
+    ss << "{\n";
+    ss << "\"id\": null,\n";
+    ss << "\"value\": " << weights[weights.size() - 1] << ",\n";
+    ss << "\"estimated_value\": " << weights[weights.size() - 1] << ",\n";
+    ss << "\"uncertainty\": " << 0 << ",\n";
+    ss << "\"min\": \"-Infinity\",\n";
+    ss << "\"max\": \"Infinity\",\n";
+    ss << "\"estimation_type\": \"constant\"\n";
+    ss << "}\n]\n";
+    ss << "}\n]\n}\n";
     return ss.str();
   }
 
@@ -200,11 +219,11 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type> > info =
+    std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::EWAAGrowth<Type> > ewaa_growth =
-        std::make_shared<fims_popdy::EWAAGrowth<Type> >();
+    std::shared_ptr<fims_popdy::EWAAGrowth<Type>> ewaa_growth =
+        std::make_shared<fims_popdy::EWAAGrowth<Type>>();
 
     // set relative info
     ewaa_growth->id = this->id;

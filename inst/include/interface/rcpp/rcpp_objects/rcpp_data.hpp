@@ -23,6 +23,10 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    */
   Rcpp::NumericVector observed_data;
   /**
+   * @brief The vector of uncertainty that is being passed from R.
+   */
+  Rcpp::NumericVector uncertainty;
+  /**
    * @brief The static id of the DataInterfaceBase object.
    */
   static uint32_t id_g;
@@ -36,7 +40,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    * This is a live object, which is an object that has been created and lives
    * in memory.
    */
-  static std::map<uint32_t, DataInterfaceBase*> live_objects;
+  static std::map<uint32_t, std::shared_ptr<DataInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
@@ -45,7 +49,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
     this->id = DataInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DataInterfaceBase */
-    DataInterfaceBase::live_objects[this->id] = this;
+    // DataInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -53,8 +57,10 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  DataInterfaceBase(const DataInterfaceBase& other)
-      : observed_data(other.observed_data), id(other.id) {}
+  DataInterfaceBase(const DataInterfaceBase &other)
+      : observed_data(other.observed_data),
+        uncertainty(other.uncertainty),
+        id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -75,7 +81,8 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
 uint32_t DataInterfaceBase::id_g = 1;
 // local id of the DataInterfaceBase object map relating the ID of the
 // DataInterfaceBase to the DataInterfaceBase objects
-std::map<uint32_t, DataInterfaceBase*> DataInterfaceBase::live_objects;
+std::map<uint32_t, std::shared_ptr<DataInterfaceBase>>
+    DataInterfaceBase::live_objects;
 
 /**
  * @brief  The Rcpp interface for AgeComp to instantiate the object from R:
@@ -97,6 +104,11 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @brief The vector of age-composition data that is being passed from R.
    */
   RealVector age_comp_data;
+  /**
+   * @brief The vector of age-composition uncertainty that is being passed from
+   * R.
+   */
+  RealVector uncertainty;
 
   /**
    * @brief The constructor.
@@ -105,9 +117,11 @@ class AgeCompDataInterface : public DataInterfaceBase {
     this->amax = amax;
     this->ymax = ymax;
     this->age_comp_data.resize(amax * ymax);
-
+    this->uncertainty.resize(amax * ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<AgeCompDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<AgeCompDataInterface>(*this));
+        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -115,11 +129,12 @@ class AgeCompDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  AgeCompDataInterface(const AgeCompDataInterface& other)
+  AgeCompDataInterface(const AgeCompDataInterface &other)
       : DataInterfaceBase(other),
         amax(other.amax),
         ymax(other.ymax),
-        age_comp_data(other.age_comp_data) {}
+        age_comp_data(other.age_comp_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -143,16 +158,22 @@ class AgeCompDataInterface : public DataInterfaceBase {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"data\",\n";
-    ss << " \"type\" : \"AgeComp\",\n";
+    ss << " \"name\": \"AgeComp\",\n";
     ss << " \"id\":" << this->id << ",\n";
-    ss << " \"rank\": " << 2 << ",\n";
-    ss << " \"dimensions\": [" << this->ymax << "," << this->amax << "],\n";
-    ss << " \"values\": [";
+    ss << " \"type\": \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [" << "\"n_ages\", \"n_years\"" << "],\n";
+    ss << "  \"dimensions\": [" << amax << ", " << ymax << "]\n},\n";
+    ss << " \"value\": [";
     for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++) {
       ss << age_comp_data[i] << ", ";
     }
-    ss << age_comp_data[age_comp_data.size() - 1] << "]\n";
+    ss << age_comp_data[age_comp_data.size() - 1] << "],\n";
+    ss << "\"uncertainty\":[ ";
+    for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
+      ss << uncertainty[i] << ", ";
+    }
+    ss << uncertainty[uncertainty.size() - 1] << "]\n";
     ss << "}";
     return ss.str();
   }
@@ -170,6 +191,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
       for (int a = 0; a < amax; a++) {
         int i_age_year = y * amax + a;
         age_comp_data->at(y, a) = this->age_comp_data[i_age_year];
+        age_comp_data->uncertainty[i_age_year] = this->uncertainty[i_age_year];
       }
     }
 
@@ -222,6 +244,11 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @brief The vector of length-composition data that is being passed from R.
    */
   RealVector length_comp_data;
+  /**
+   * @brief The vector of length-composition uncertainty that is being passed
+   * from R.
+   */
+  RealVector uncertainty;
 
   /**
    * @brief The constructor.
@@ -230,9 +257,11 @@ class LengthCompDataInterface : public DataInterfaceBase {
     this->lmax = lmax;
     this->ymax = ymax;
     this->length_comp_data.resize(lmax * ymax);
-
+    this->uncertainty.resize(lmax * ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<LengthCompDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LengthCompDataInterface>(*this));
+        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -240,11 +269,12 @@ class LengthCompDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  LengthCompDataInterface(const LengthCompDataInterface& other)
+  LengthCompDataInterface(const LengthCompDataInterface &other)
       : DataInterfaceBase(other),
         lmax(other.lmax),
         ymax(other.ymax),
-        length_comp_data(other.length_comp_data) {}
+        length_comp_data(other.length_comp_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -268,16 +298,22 @@ class LengthCompDataInterface : public DataInterfaceBase {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"data\",\n";
-    ss << " \"type\" : \"LengthComp\",\n";
+    ss << " \"name\": \"LengthComp\",\n";
     ss << " \"id\":" << this->id << ",\n";
-    ss << " \"rank\": " << 2 << ",\n";
-    ss << " \"dimensions\": [" << this->ymax << "," << this->lmax << "],\n";
-    ss << " \"values\": [";
+    ss << " \"type\": \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [" << "\"n_lengths\", \"n_years\"" << "],\n";
+    ss << "  \"dimensions\": [" << lmax << ", " << ymax << "]\n},\n";
+    ss << " \"value\": [";
     for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++) {
       ss << length_comp_data[i] << ", ";
     }
-    ss << length_comp_data[length_comp_data.size() - 1] << "]\n";
+    ss << length_comp_data[length_comp_data.size() - 1] << "],\n";
+    ss << "\"uncertainty\": [ ";
+    for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
+      ss << uncertainty[i] << ", ";
+    }
+    ss << uncertainty[uncertainty.size() - 1] << "]\n";
     ss << "}";
     return ss.str();
   }
@@ -293,6 +329,8 @@ class LengthCompDataInterface : public DataInterfaceBase {
       for (int l = 0; l < lmax; l++) {
         int i_length_year = y * lmax + l;
         length_comp_data->at(y, l) = this->length_comp_data[i_length_year];
+        length_comp_data->uncertainty[i_length_year] =
+            this->uncertainty[i_length_year];
       }
     }
     std::shared_ptr<fims_info::Information<Type>> info =
@@ -335,6 +373,11 @@ class IndexDataInterface : public DataInterfaceBase {
    * @brief The vector of index data that is being passed from R.
    */
   RealVector index_data;
+  /**
+   * @brief The vector of index uncertainty that is being passed from
+   * R.
+   */
+  RealVector uncertainty;
 
   /**
    * @brief The constructor.
@@ -342,9 +385,11 @@ class IndexDataInterface : public DataInterfaceBase {
   IndexDataInterface(int ymax = 0) : DataInterfaceBase() {
     this->ymax = ymax;
     this->index_data.resize(ymax);
-
+    this->uncertainty.resize(ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<IndexDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<IndexDataInterface>(*this));
+        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -352,10 +397,11 @@ class IndexDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  IndexDataInterface(const IndexDataInterface& other)
+  IndexDataInterface(const IndexDataInterface &other)
       : DataInterfaceBase(other),
         ymax(other.ymax),
-        index_data(other.index_data) {}
+        index_data(other.index_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -379,16 +425,22 @@ class IndexDataInterface : public DataInterfaceBase {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"data\",\n";
-    ss << " \"type\": \"Index\",\n";
+    ss << " \"name\": \"Index\",\n";
     ss << " \"id\": " << this->id << ",\n";
-    ss << " \"rank\": " << 1 << ",\n";
-    ss << " \"dimensions\": [" << this->ymax << "],\n";
-    ss << " \"values\": [";
+    ss << " \"type\": \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [" << "\"n_years\"" << "],\n";
+    ss << "  \"dimensions\": [" << ymax << "]\n},\n";
+    ss << " \"value\": [";
     for (R_xlen_t i = 0; i < index_data.size() - 1; i++) {
       ss << index_data[i] << ", ";
     }
-    ss << index_data[index_data.size() - 1] << "]\n";
+    ss << index_data[index_data.size() - 1] << "],\n";
+    ss << "\"uncertainty\": [ ";
+    for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
+      ss << uncertainty[i] << ", ";
+    }
+    ss << uncertainty[uncertainty.size() - 1] << "]\n";
     ss << "}";
     return ss.str();
   }
@@ -404,6 +456,7 @@ class IndexDataInterface : public DataInterfaceBase {
 
     for (int y = 0; y < ymax; y++) {
       data->at(y) = this->index_data[y];
+      data->uncertainty[y] = this->uncertainty[y];
     }
 
     std::shared_ptr<fims_info::Information<Type>> info =
@@ -448,6 +501,11 @@ class LandingsDataInterface : public DataInterfaceBase {
    * @brief The vector of landings data that is being passed from R.
    */
   RealVector landings_data;
+  /**
+   * @brief The vector of landings uncertainty that is being passed from
+   * R.
+   */
+  RealVector uncertainty;
 
   /**
    * @brief The constructor.
@@ -455,9 +513,11 @@ class LandingsDataInterface : public DataInterfaceBase {
   LandingsDataInterface(int ymax = 0) : DataInterfaceBase() {
     this->ymax = ymax;
     this->landings_data.resize(ymax);
-
+    this->uncertainty.resize(ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<LandingsDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LandingsDataInterface>(*this));
+        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -465,10 +525,11 @@ class LandingsDataInterface : public DataInterfaceBase {
    *
    * @param other
    */
-  LandingsDataInterface(const LandingsDataInterface& other)
+  LandingsDataInterface(const LandingsDataInterface &other)
       : DataInterfaceBase(other),
         ymax(other.ymax),
-        landings_data(other.landings_data) {}
+        landings_data(other.landings_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -492,16 +553,22 @@ class LandingsDataInterface : public DataInterfaceBase {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"data\",\n";
-    ss << " \"type\": \"Landings\",\n";
+    ss << " \"name\": \"Landings\",\n";
     ss << " \"id\": " << this->id << ",\n";
-    ss << " \"rank\": " << 1 << ",\n";
-    ss << " \"dimensions\": [" << this->ymax << "],\n";
-    ss << " \"values\": [";
+    ss << " \"type\": \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [" << "\"n_years\"" << "],\n";
+    ss << "  \"dimensions\": [" << ymax << "]\n},\n";
+    ss << " \"value\": [";
     for (R_xlen_t i = 0; i < landings_data.size() - 1; i++) {
       ss << landings_data[i] << ", ";
     }
-    ss << landings_data[landings_data.size() - 1] << "]\n";
+    ss << landings_data[landings_data.size() - 1] << "],\n";
+    ss << "\"uncertainty\": [ ";
+    for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
+      ss << uncertainty[i] << ", ";
+    }
+    ss << uncertainty[uncertainty.size() - 1] << "]\n";
     ss << "}";
     return ss.str();
   }
@@ -517,6 +584,7 @@ class LandingsDataInterface : public DataInterfaceBase {
 
     for (int y = 0; y < ymax; y++) {
       data->at(y) = this->landings_data[y];
+      data->uncertainty[y] = this->uncertainty[y];
     }
 
     std::shared_ptr<fims_info::Information<Type>> info =

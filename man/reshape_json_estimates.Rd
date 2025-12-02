@@ -4,13 +4,12 @@
 \alias{reshape_json_estimates}
 \title{Reshape JSON estimates}
 \usage{
-reshape_json_estimates(finalized_fims, opt = list())
+reshape_json_estimates(model_output)
 }
 \arguments{
-\item{finalized_fims}{A JSON object containing the finalized FIMS output.}
-
-\item{opt}{An object returned from an optimizer, typically from
-\code{\link[stats:nlminb]{stats::nlminb()}}, used to fit a TMB model.}
+\item{model_output}{A JSON object containing the finalized FIMS output as
+returned from \code{get_output()}, which is an internal function to each model
+family.}
 }
 \value{
 A tibble containing the reshaped parameter estimates.
