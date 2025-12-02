@@ -259,11 +259,6 @@ The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where
 # to work with stockplotr
 output <- get_estimates(fit) |>
   dplyr::mutate(
-    sex = NA,
-    season = 1,
-    era = "time",
-    area = NA,
-    growth_pattern = NA,
     uncertainty_label = "se",
     year = year_i,
     estimate = estimated
@@ -277,7 +272,7 @@ stockplotr::plot_spawning_biomass(
 
 # Plot of log fishing mortality
 stockplotr::plot_timeseries(
-  stockplotr::prepare_data(
+  stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
     label_name = "log_Fmort$",
     geom = "line"
@@ -290,7 +285,7 @@ stockplotr::plot_timeseries(
 
 # Plot the index of abundance against the observed values
 stockplotr::plot_timeseries(
-  stockplotr::prepare_data(
+  stockplotr::filter_data(
     output |> dplyr::filter(module_id == 2),
     label_name = "^index_expected$",
     geom = "line"
@@ -305,13 +300,13 @@ stockplotr::plot_timeseries(
       expected = get_report(fit)[["index_expected"]][[2]],
       year = get_start_year(data_4_model):get_end_year(data_4_model)
     ),
-    aes(x = year, y = observed)
+    ggplot2::aes(x = year, y = observed)
   ) +
   stockplotr::theme_noaa()
 
 # Plot the landings estimates
 stockplotr::plot_timeseries(
-  stockplotr::prepare_data(
+  stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
     label_name = "^landings_expected$",
     geom = "line"
@@ -407,22 +402,12 @@ stockplotr::plot_biomass(
   list(
     "age" = get_estimates(age_only_fit) |>
       dplyr::mutate(
-        sex = NA,
-        season = 1,
-        era = "time",
-        area = NA,
-        growth_pattern = NA,
         uncertainty_label = "se",
         year = year_i,
         estimate = estimated
       ),
     "length" = get_estimates(length_only_fit) |>
       dplyr::mutate(
-        sex = NA,
-        season = 1,
-        era = "time",
-        area = NA,
-        growth_pattern = NA,
         uncertainty_label = "se",
         year = year_i,
         estimate = estimated
