@@ -11,10 +11,10 @@ The NOAA Fisheries Integrated Modeling System (FIMS) is a software system design
 
 ## Installing FIMS
 
-A [precompiled version of the latest release of FIMS](https://noaa-fims.r-universe.dev/FIMS) is available from [R universe](https://noaa-fims.r-universe.dev) by running the following code within R:
+A [precompiled version of the latest release of FIMS](https://noaa-fisheries-integrated-toolbox.r-universe.dev/FIMS) is available from [R universe](https://noaa-fisheries-integrated-toolbox.r-universe.dev) by running the following code within R:
 
 ```r
-install.packages("FIMS", repos = c("https://noaa-fims.r-universe.dev", "https://cloud.r-project.org"))
+install.packages("FIMS", repos = c("https://noaa-fisheries-integrated-toolbox.r-universe.dev", "https://cloud.r-project.org"))
 ```
 
 Users can also compile it themselves, like any other TMB package by running `devtools::install_github("NOAA-FIMS/FIMS")`. This workflow allows for the specification of a particular branch or tag using the `ref` argument.
