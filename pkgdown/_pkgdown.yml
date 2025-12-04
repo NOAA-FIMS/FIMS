@@ -5,6 +5,8 @@ home:
   links:
   - text: Documentation of C++ Code
     href: https://noaa-fims.github.io/FIMS-docs/
+  - text: FIMS Developer Handbook
+    href: https://noaa-fims.github.io/collaborative_workflow/
 
 authors:
   FIMS implementation team:
@@ -13,10 +15,18 @@ authors:
 
 template:
   bootstrap: 5
+  includes:
+    before_title: <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width = "60" align="left" />
+    in_header: |
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+
 
 articles:
 - title: Fisheries Integrated Modeling System (FIMS)
   contents:
+  # - fims-documentation
   - fims-demo
   - fims-demo-minimal
   - fims-logging
@@ -40,20 +50,36 @@ reference:
   - starts_with("get_FIMSFrame")
   - starts_with("m_")
   - starts_with("create_default_")
+  # - update_parameters
   - has_keyword("distribution")
   - starts_with("initialize_")
   - has_keyword("fit_fims")
   - is_fims_verbose
-  - FIMSFit
 
 - title: Package development
   desc: Primary functions used when developing FIMS package.
   contents:
   - has_keyword("developer")
   - has_keyword("set_methods")
+  - use_testthat_template
   - starts_with("reshape_")
 
 news:
   releases:
   - text: "Latest release"
     href: https://github.com/NOAA-FIMS/FIMS/releases/latest
+
+navbar:
+  structure:
+    right:
+      - website
+      - github
+      - search
+  components:
+    website:
+      text: fims website
+      href: https://noaa-fims.github.io/
+    github:
+      icon: fa-brands fa-github fa-lg
+      href: https://github.com/noaa-fims/fims/
+

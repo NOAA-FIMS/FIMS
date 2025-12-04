@@ -43,6 +43,7 @@ AtoL
 AtoLSchnute
 attr
 aug
+AUTOLINK
 Baranov
 BasedOnStyle
 bcast
@@ -137,6 +138,7 @@ codebase
 codebasics
 codecov
 Codecov
+COLORSTYLE
 ComputeProportions
 cond
 config
@@ -150,6 +152,7 @@ conversiondouble
 cout
 cov
 covr
+cp
 cpp
 CppAD
 CPUE
@@ -162,8 +165,11 @@ CreateModelingObjects
 CreateObject
 CreatePopulationObjects
 CreateTMBModel
+cron
+crossorigin
 crt
 csignal
+css
 cstdlib
 cstring
 csv
@@ -254,6 +260,7 @@ DoubleLogisticSelectivity
 DoubleLogisticSelectivityInterface
 dox
 doxygen
+DoxygenLayout
 dplyr
 dq
 DragonFly
@@ -394,6 +401,7 @@ GlobalEnv
 globalVariables
 GMACS
 GNUC
+googleapis
 googlebenchmark
 googletest
 GoogleTest
@@ -403,11 +411,13 @@ growthBase
 GrowthBase
 GrowthEvaluate
 GrowthInterfaceBase
+gstatic
 gsub
 gtest
 HandlesCorrectInput
 HandlesEdgeCase
 HardwareConcurrency
+hexlogo
 holt
 hotfix
 hpp
@@ -503,6 +513,7 @@ lgamma
 libname
 libpath
 LIBPFM
+libs
 Lifecycle
 Linf
 linux
@@ -532,6 +543,7 @@ LogR
 LogRecDev
 LogRRecruitmentInterface
 LogRRecruitmentProcess
+lookahead
 lozen
 lpdf
 lpmf
@@ -544,6 +556,7 @@ macos
 macOS
 MACOS
 maindir
+MAINPAGE
 MakeADFun
 MakeAvailable
 Makevars
@@ -561,6 +574,7 @@ maxit
 MCP
 MCPC
 md
+MDFILE
 meanlog
 mget
 minimizer
@@ -587,6 +601,8 @@ nal
 nan
 NaN
 nathanvaughan
+navbar
+navlogo
 nCAA
 ncases
 nchar
@@ -640,6 +656,7 @@ Nyears
 nyr
 objs
 ObservedCatch
+oE
 ofstream
 ogive
 onLoad
@@ -701,6 +718,7 @@ Postfix
 postmle
 pre
 precompiled
+preconnect
 PrepareCAA
 PrepareConstrainedDeviations
 preprocessor
@@ -770,6 +788,7 @@ ResetVector
 resid
 ret
 retape
+rf
 Ricker
 rlang
 rlib
@@ -807,6 +826,7 @@ sdreport
 sdreportOrList
 SDreports
 se
+sed
 seealso
 sel
 selD
@@ -924,6 +944,8 @@ strsplit
 strtok
 struct
 styler
+STYLESHEET
+stylesheet
 subfolder
 subfolders
 submodule
@@ -975,6 +997,7 @@ toString
 toupper
 tparam
 traceback
+TREEVIEW
 tribble
 trigamma
 trunc
@@ -1028,6 +1051,7 @@ waa
 Wb
 wd
 wgt
+wght
 wikipedia
 withr
 wordlist
