@@ -16,7 +16,7 @@ on:
 
 jobs:
   call-workflow:
-    uses: NOAA-FIMS/FIMS/.github/workflows/build-pkgdown.yml@dev-update-pkgdown-site
+    uses: NOAA-FIMS/FIMS/.github/workflows/build-pkgdown.yml@main
     with:
       build_testdown: true
       build_code_coverage: true
