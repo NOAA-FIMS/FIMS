@@ -6,20 +6,27 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Introducing the Fisheries Integrated Modeling System (FIMS) • FIMS</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Introducing the Fisheries Integrated Modeling System (FIMS)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;display=swap" rel="stylesheet">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
-
-    <a class="navbar-brand me-2" href="../index.html">FIMS</a>
+    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7</small>
 
@@ -41,12 +48,21 @@
     <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
   </ul>
 </li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+<li><a class="dropdown-item" href="../coverage/coverage.html">coverage</a></li>
+    <li><a class="dropdown-item" href="../coverage/codecoverage_explanation.html">coverage explained</a></li>
+    <li><a class="dropdown-item" href="../testdown/index.html">testdown</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/noaa-fims/fims/"><span class="fa fa-brands fa-github fa-lg"></span></a></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -59,8 +75,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Introducing the Fisheries Integrated Modeling System (FIMS)</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Introducing the Fisheries Integrated Modeling System (FIMS)</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/main/vignettes/fims-demo.Rmd" class="external-link"><code>vignettes/fims-demo.Rmd</code></a></small>
@@ -94,6 +109,11 @@ from any previous FIMS model run is cleared out.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/noaa-fims/fims" class="external-link">FIMS</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nmfs-ost/stockplotr" class="external-link">stockplotr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use the {stockplotr} theme for all figures</span></span>
+<span><span class="co"># ggplot2::theme_set(stockplotr::theme_noaa())</span></span>
+<span></span>
 <span></span>
 <span><span class="co"># clear memory</span></span>
 <span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -152,16 +172,15 @@ perhaps the most interesting one is the long data frame stored in the
 <span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## tbl_df of class 'FIMSFrame'</span></span></code></pre>
 <pre><code><span><span class="co">## with the following 'types': age-to-length-conversion, age_comp, landings, length_comp, weight-at-age, index</span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 6 × 10</span></span></span>
-<span><span class="co">##   type       name    age length datestart dateend    value unit      uncertainty</span></span>
-<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">1</span> age-to-le… flee…     1      0 1-01-01   1-12-31 1.26<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span> proporti…         200</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> age-to-le… flee…     1     50 1-01-01   1-12-31 8.39<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> proporti…         200</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">3</span> age-to-le… flee…     1    100 1-01-01   1-12-31 2.30<span style="color: #949494;">e</span><span style="color: #BB0000;">- 6</span> proporti…         200</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">4</span> age-to-le… flee…     1    150 1-01-01   1-12-31 2.74<span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span> proporti…         200</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">5</span> age-to-le… flee…     1    200 1-01-01   1-12-31 1.63<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> proporti…         200</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">6</span> age-to-le… flee…     1    250 1-01-01   1-12-31 6.32<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> proporti…         200</span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 1 more variable: year &lt;dbl&gt;</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
+<span><span class="co">##   type                     name     age length timing    value unit  uncertainty</span></span>
+<span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> age-to-length-conversion fleet1     1      0      1 1.26<span style="color: #949494;">e</span><span style="color: #BB0000;">-16</span> prop…         200</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> age-to-length-conversion fleet1     1     50      1 8.39<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span> prop…         200</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> age-to-length-conversion fleet1     1    100      1 2.30<span style="color: #949494;">e</span><span style="color: #BB0000;">- 6</span> prop…         200</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> age-to-length-conversion fleet1     1    150      1 2.74<span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span> prop…         200</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> age-to-length-conversion fleet1     1    200      1 1.63<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> prop…         200</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">6</span> age-to-length-conversion fleet1     1    250      1 6.32<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span> prop…         200</span></span>
 <span><span class="co">## additional slots include the following:fleets:</span></span>
 <span><span class="co">## [1] "fleet1"  "survey1"</span></span>
 <span><span class="co">## n_years:</span></span>
@@ -188,19 +207,19 @@ perhaps the most interesting one is the long data frame stored in the
 <code class="sourceCode R"><span><span class="co"># Use dplyr to subset the data for just the landings</span></span>
 <span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_data</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"landings"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 30 × 10</span></span></span>
-<span><span class="co">##    type   name    age length datestart dateend  value unit  uncertainty  year</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 1-01-01   1-12-31   162. mt        0.010<span style="text-decoration: underline;">00</span>     1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 2-01-01   2-12-31   461. mt        0.010<span style="text-decoration: underline;">00</span>     2</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 3-01-01   3-12-31   747. mt        0.010<span style="text-decoration: underline;">00</span>     3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 4-01-01   4-12-31   997. mt        0.010<span style="text-decoration: underline;">00</span>     4</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 5-01-01   5-12-31   768. mt        0.010<span style="text-decoration: underline;">00</span>     5</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 6-01-01   6-12-31  <span style="text-decoration: underline;">1</span>344. mt        0.010<span style="text-decoration: underline;">00</span>     6</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 7-01-01   7-12-31  <span style="text-decoration: underline;">1</span>319. mt        0.010<span style="text-decoration: underline;">00</span>     7</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 8-01-01   8-12-31  <span style="text-decoration: underline;">2</span>598. mt        0.010<span style="text-decoration: underline;">00</span>     8</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 9-01-01   9-12-31  <span style="text-decoration: underline;">1</span>426. mt        0.010<span style="text-decoration: underline;">00</span>     9</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> landi… flee…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span> 10-01-01  10-12-31 <span style="text-decoration: underline;">1</span>644. mt        0.010<span style="text-decoration: underline;">00</span>    10</span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 30 × 8</span></span></span>
+<span><span class="co">##    type     name     age length timing value unit  uncertainty</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>      1  162. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>      2  461. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>      3  747. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>      4  997. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>      5  768. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>      6 <span style="text-decoration: underline;">1</span>344. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>      7 <span style="text-decoration: underline;">1</span>319. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>      8 <span style="text-decoration: underline;">2</span>598. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>      9 <span style="text-decoration: underline;">1</span>426. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> landings fleet1    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     10 <span style="text-decoration: underline;">1</span>644. mt        0.010<span style="text-decoration: underline;">00</span></span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 20 more rows</span></span></span></code></pre>
 <p>The data contains the following fleets:</p>
 <ul>
@@ -371,7 +390,7 @@ modules can be created. For example,</p>
 <span id="cb21-12"><a href="#cb21-12"></a>##  [38;5;250m 9 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_…  [31mNA [39m                    [31mNA [39m</span>
 <span id="cb21-13"><a href="#cb21-13"></a>##  [38;5;250m10 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_…  [31mNA [39m                    [31mNA [39m</span>
 <span id="cb21-14"><a href="#cb21-14"></a>##  [38;5;246m# ℹ 645 more rows [39m</span>
-<span id="cb21-15"><a href="#cb21-15"></a>##  [38;5;246m# ℹ 6 more variables: length &lt;dbl&gt;, time &lt;dbl&gt;, value &lt;dbl&gt;, [39m</span>
+<span id="cb21-15"><a href="#cb21-15"></a>##  [38;5;246m# ℹ 6 more variables: length &lt;dbl&gt;, time &lt;int&gt;, value &lt;dbl&gt;, [39m</span>
 <span id="cb21-16"><a href="#cb21-16"></a>##  [38;5;246m#   estimation_type &lt;chr&gt;, distribution_type &lt;chr&gt;, distribution &lt;chr&gt; [39m</span></code></pre></div>
 </div>
 <div class="section level3">
@@ -507,121 +526,103 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00512</span> to <span style="color: #0000BB;">0.00032</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.016</span> to <span style="color: #0000BB;">0.00333</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">6.55601</span> seconds</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.22001</span> minutes</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=77, random_effects=0, and total=77</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00032</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00333</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1779.18153</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co"># finalize is not working, you get the following error when you do this code</span></span>
-<span><span class="co"># Error: basic_string::_M_create</span></span>
-<span><span class="co"># if you run clear() ahead of the following line the error will go away</span></span>
-<span><span class="co"># fit_output &lt;- finalize(fit@opt$par, fit@obj$fn, fit@obj$gr)</span></span>
 <span></span>
 <span><span class="co"># Get information about the model and print a few characters to the screen</span></span>
 <span><span class="va">recruitment_log</span> <span class="op">&lt;-</span> <span class="fu">get_log_module</span><span class="op">(</span><span class="st">"information"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">recruitment_log</span>, <span class="fl">1</span>, <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb26"><pre class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb26-1"><a href="#cb26-1"></a>## [1] "[\n]"</span></code></pre></div>
-<p>The results can be plotted with either base R or using {ggplot2}.</p>
+<p>The results can be plotted with either base R, {ggplot2}, or
+{stockplotr}. Where, we recommend using {stockplotr} where possible.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">index_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  observed <span class="op">=</span> <span class="fu"><a href="../reference/m_.html">m_index</a></span><span class="op">(</span><span class="va">data_4_model</span>, <span class="st">"survey1"</span><span class="op">)</span>,</span>
-<span>  expected <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_report</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">[[</span><span class="st">"index_exp"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>  years <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_start_year</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">index_results</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##       observed    expected years</span></span>
-<span><span class="co">## 1  0.006117418 0.006489698     1</span></span>
-<span><span class="co">## 2  0.007156588 0.006553593     2</span></span>
-<span><span class="co">## 3  0.006553376 0.006572973     3</span></span>
-<span><span class="co">## 4  0.006501745 0.006459369     4</span></span>
-<span><span class="co">## 5  0.006562572 0.006211229     5</span></span>
-<span><span class="co">## 6  0.006467796 0.006193904     6</span></span>
-<span><span class="co">## 7  0.005248220 0.006068948     7</span></span>
-<span><span class="co">## 8  0.006568311 0.005916306     8</span></span>
-<span><span class="co">## 9  0.005516030 0.005303574     9</span></span>
-<span><span class="co">## 10 0.005614254 0.005111184    10</span></span>
-<span><span class="co">## 11 0.004269091 0.004836804    11</span></span>
-<span><span class="co">## 12 0.004842784 0.004510400    12</span></span>
-<span><span class="co">## 13 0.004018395 0.004146893    13</span></span>
-<span><span class="co">## 14 0.004741539 0.003984685    14</span></span>
-<span><span class="co">## 15 0.003444776 0.003705819    15</span></span>
-<span><span class="co">## 16 0.004062555 0.003471227    16</span></span>
-<span><span class="co">## 17 0.003790370 0.003369435    17</span></span>
-<span><span class="co">## 18 0.002892876 0.002924379    18</span></span>
-<span><span class="co">## 19 0.002765623 0.002643862    19</span></span>
-<span><span class="co">## 20 0.002349581 0.002361533    20</span></span>
-<span><span class="co">## 21 0.002007219 0.002130067    21</span></span>
-<span><span class="co">## 22 0.001883646 0.001897533    22</span></span>
-<span><span class="co">## 23 0.001908972 0.001950093    23</span></span>
-<span><span class="co">## 24 0.001596426 0.001726015    24</span></span>
-<span><span class="co">## 25 0.001248675 0.001575694    25</span></span>
-<span><span class="co">## 26 0.001459593 0.001466748    26</span></span>
-<span><span class="co">## 27 0.001255182 0.001404757    27</span></span>
-<span><span class="co">## 28 0.001314476 0.001365663    28</span></span>
-<span><span class="co">## 29 0.001364266 0.001292371    29</span></span>
-<span><span class="co">## 30 0.001343069 0.001401679    30</span></span></code></pre>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">index_results</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">years</span>, y <span class="op">=</span> <span class="va">observed</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Year"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Index (mt)"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">years</span>, y <span class="op">=</span> <span class="va">expected</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="fims-demo_files/figure-html/fit-plots-1.png" width="700"></p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">landings_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  observed <span class="op">=</span> <span class="fu"><a href="../reference/m_.html">m_landings</a></span><span class="op">(</span><span class="va">data_4_model</span>, fleet <span class="op">=</span> <span class="st">"fleet1"</span><span class="op">)</span>,</span>
-<span>  expected <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_report</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">[[</span><span class="st">"landings_exp"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span>
-<span>  years <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_start_year</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">landings_results</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##     observed  expected years</span></span>
-<span><span class="co">## 1   161.6455  161.6443     1</span></span>
-<span><span class="co">## 2   461.0895  461.0768     2</span></span>
-<span><span class="co">## 3   747.2900  747.2702     3</span></span>
-<span><span class="co">## 4   996.9711  996.9800     4</span></span>
-<span><span class="co">## 5   767.5477  767.5611     5</span></span>
-<span><span class="co">## 6  1343.8609 1343.9332     6</span></span>
-<span><span class="co">## 7  1319.0663 1319.1035     7</span></span>
-<span><span class="co">## 8  2597.5051 2598.0667     8</span></span>
-<span><span class="co">## 9  1425.8608 1425.9444     9</span></span>
-<span><span class="co">## 10 1643.6742 1643.6463    10</span></span>
-<span><span class="co">## 11 1770.8245 1770.6432    11</span></span>
-<span><span class="co">## 12 1751.2628 1751.0176    12</span></span>
-<span><span class="co">## 13 1194.0655 1193.9453    13</span></span>
-<span><span class="co">## 14 1638.4036 1638.3372    14</span></span>
-<span><span class="co">## 15 1584.1855 1584.3797    15</span></span>
-<span><span class="co">## 16 1333.1820 1333.2114    16</span></span>
-<span><span class="co">## 17 2325.4425 2325.8491    17</span></span>
-<span><span class="co">## 18 1693.7841 1693.9358    18</span></span>
-<span><span class="co">## 19 1531.8238 1532.1477    19</span></span>
-<span><span class="co">## 20 1358.8162 1359.3601    20</span></span>
-<span><span class="co">## 21 1638.8798 1639.0245    21</span></span>
-<span><span class="co">## 22 1077.3713 1077.1712    22</span></span>
-<span><span class="co">## 23 1647.9104 1647.3001    23</span></span>
-<span><span class="co">## 24 1224.4634 1224.6413    24</span></span>
-<span><span class="co">## 25 1126.9182 1126.7708    25</span></span>
-<span><span class="co">## 26  956.4529  956.3227    26</span></span>
-<span><span class="co">## 27  902.1621  902.1436    27</span></span>
-<span><span class="co">## 28 1168.8217 1168.8928    28</span></span>
-<span><span class="co">## 29  852.3819  852.0580    29</span></span>
-<span><span class="co">## 30 1274.3777 1274.3621    30</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">landings_results</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">years</span>, y <span class="op">=</span> <span class="va">observed</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Year"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Index (mt)"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">years</span>, y <span class="op">=</span> <span class="va">expected</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="fims-demo_files/figure-html/fit-plots-2.png" width="700"></p>
+<code class="sourceCode R"><span><span class="co"># Temporary manipulation to the returned estimates to get them</span></span>
+<span><span class="co"># to work with stockplotr</span></span>
+<span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    uncertainty_label <span class="op">=</span> <span class="st">"se"</span>,</span>
+<span>    year <span class="op">=</span> <span class="va">year_i</span>,</span>
+<span>    estimate <span class="op">=</span> <span class="va">estimated</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Plot spawning biomass</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_spawning_biomass.html" class="external-link">plot_spawning_biomass</a></span><span class="op">(</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">output</span>, <span class="va">label</span> <span class="op">==</span> <span class="st">"spawning_biomass"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `era`.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in max(dat$year[dat$era == era_name], na.rm = TRUE): no non-missing</span></span>
+<span><span class="co">## arguments to max; returning -Inf</span></span></code></pre>
+<pre><code><span><span class="co">## Scale for <span style="color: #00BB00;">colour</span> is already present.</span></span>
+<span><span class="co">## Adding another scale for <span style="color: #00BB00;">colour</span>, which will replace the existing scale.</span></span>
+<span><span class="co">## Scale for <span style="color: #00BB00;">fill</span> is already present.</span></span>
+<span><span class="co">## Adding another scale for <span style="color: #00BB00;">fill</span>, which will replace the existing scale.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 1 row containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_hline()`).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 1 row containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_text()`).</span></span></code></pre>
+<p><img src="fims-demo_files/figure-html/fit-plots-1.png" class="r-plt" width="700"></p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot of log fishing mortality</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
+<span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    label_name <span class="op">=</span> <span class="st">"log_Fmort$"</span>,</span>
+<span>    geom <span class="op">=</span> <span class="st">"line"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  x <span class="op">=</span> <span class="st">"year"</span>,</span>
+<span>  y <span class="op">=</span> <span class="st">"estimate"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"natural log of Fishing Mortality"</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="fims-demo_files/figure-html/fit-plots-2.png" class="r-plt" width="700"></p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot the index of abundance against the observed values</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
+<span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_id</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>    label_name <span class="op">=</span> <span class="st">"^index_expected$"</span>,</span>
+<span>    geom <span class="op">=</span> <span class="st">"line"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  x <span class="op">=</span> <span class="st">"year"</span>,</span>
+<span>  y <span class="op">=</span> <span class="st">"estimate"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Relative Index of Abundance"</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>      observed <span class="op">=</span> <span class="fu"><a href="../reference/m_.html">m_index</a></span><span class="op">(</span><span class="va">data_4_model</span>, <span class="st">"survey1"</span><span class="op">)</span>,</span>
+<span>      expected <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_report</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">[[</span><span class="st">"index_expected"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>      year <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_start_year</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">observed</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="fims-demo_files/figure-html/fit-plots-3.png" class="r-plt" width="700"></p>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot the landings estimates</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
+<span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    label_name <span class="op">=</span> <span class="st">"^landings_expected$"</span>,</span>
+<span>    geom <span class="op">=</span> <span class="st">"line"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  x <span class="op">=</span> <span class="st">"year"</span>,</span>
+<span>  y <span class="op">=</span> <span class="st">"estimate"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Expected Landings (mt)"</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="fims-demo_files/figure-html/fit-plots-4.png" class="r-plt" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="sensitivities">Sensitivities<a class="anchor" aria-label="anchor" href="#sensitivities"></a>
@@ -635,7 +636,7 @@ data that is used to fit the model.</p>
 <p>For example, one could change the initial value used for the slope of
 the logistic curve for the survey to see if the terminal estimate
 changes due to changes to the initial value.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters_high_slope</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update the slope value of the logistic selectivity for the survey</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
@@ -664,18 +665,18 @@ changes due to changes to the initial value.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.04636</span> to <span style="color: #0000BB;">0.00107</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.01439</span> to <span style="color: #0000BB;">0.00073</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">6.36311</span> seconds</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.21263</span> minutes</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=77, random_effects=0, and total=77</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00107</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00073</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1779.19272</span></span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">low_slope_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_low_slope</span> <span class="op">|&gt;</span></span>
@@ -683,26 +684,26 @@ changes due to changes to the initial value.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.02164</span> to <span style="color: #0000BB;">0.00321</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.03193</span> to <span style="color: #0000BB;">0.00022</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">6.28882</span> seconds</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.20557</span> minutes</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=77, random_effects=0, and total=77</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00321</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00022</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1779.19885</span></span></span></code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="age-only">Age only<a class="anchor" aria-label="anchor" href="#age-only"></a>
 </h4>
-<p>The same model can be fit to just the age data, removing the length
-composition configurations.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<p>The same model can be fit to just the age data, removing the
+length-composition configurations.</p>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create default parameters, update with modified values, initialize FIMS,</span></span>
 <span><span class="co"># and fit the model</span></span>
 <span><span class="va">age_only_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
@@ -715,22 +716,22 @@ composition configurations.</p>
 <pre><code><span><span class="co">## Matching, by = "module_type"</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00513</span> to <span style="color: #0000BB;">0.00134</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.01395</span> to <span style="color: #0000BB;">0.00219</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span> <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">0.56636</span> seconds <span style="color: #00BBBB;">ℹ</span> Number of</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span> <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">9.54015</span> seconds <span style="color: #00BBBB;">ℹ</span> Number of</span></span>
 <span><span class="co">## parameters: fixed_effects=77, random_effects=0, and total=77 <span style="color: #00BBBB;">ℹ</span> Maximum</span></span>
-<span><span class="co">## gradient= <span style="color: #0000BB;">0.00134</span> <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL): <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">1565.4676</span> <span style="color: #00BBBB;">•</span></span></span>
-<span><span class="co">## Total NLL= <span style="color: #0000BB;">1565.4676</span> <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1724.28719</span></span></span></code></pre>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<span><span class="co">## gradient= <span style="color: #0000BB;">0.00219</span> <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL): <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">1565.4676</span> <span style="color: #00BBBB;">•</span></span></span>
+<span><span class="co">## Total NLL= <span style="color: #0000BB;">1565.4676</span> <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="length">Length<a class="anchor" aria-label="anchor" href="#length"></a>
 </h4>
-<p>The same model can be fit to just the length data, removing the age
-composition configurations.</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<p>The same model can be fit to just the length data, removing the
+age-composition configurations.</p>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create default parameters, update with modified values, initialize FIMS,</span></span>
 <span><span class="co"># and fit the model</span></span>
 <span><span class="va">length_only_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
@@ -743,15 +744,41 @@ composition configurations.</p>
 <pre><code><span><span class="co">## Matching, by = "module_type"</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.02233</span> to <span style="color: #0000BB;">0.00021</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.02853</span> to <span style="color: #0000BB;">0.00013</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span> <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">4.79269</span> seconds <span style="color: #00BBBB;">ℹ</span> Number of</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span> <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">56.51389</span> seconds <span style="color: #00BBBB;">ℹ</span> Number of</span></span>
 <span><span class="co">## parameters: fixed_effects=77, random_effects=0, and total=77 <span style="color: #00BBBB;">ℹ</span> Maximum</span></span>
-<span><span class="co">## gradient= <span style="color: #0000BB;">0.00021</span> <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL): <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">1520.03751</span> <span style="color: #00BBBB;">•</span></span></span>
-<span><span class="co">## Total NLL= <span style="color: #0000BB;">1520.03751</span> <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1706.88667</span></span></span></code></pre>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">## gradient= <span style="color: #0000BB;">0.00013</span> <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL): <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">1520.03751</span> <span style="color: #00BBBB;">•</span></span></span>
+<span><span class="co">## Total NLL= <span style="color: #0000BB;">1520.03751</span> <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Plot spawning biomass for each sensitivity model</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_biomass.html" class="external-link">plot_biomass</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"age"</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">age_only_fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        uncertainty_label <span class="op">=</span> <span class="st">"se"</span>,</span>
+<span>        year <span class="op">=</span> <span class="va">year_i</span>,</span>
+<span>        estimate <span class="op">=</span> <span class="va">estimated</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>    <span class="st">"length"</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">length_only_fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>        uncertainty_label <span class="op">=</span> <span class="st">"se"</span>,</span>
+<span>        year <span class="op">=</span> <span class="va">year_i</span>,</span>
+<span>        estimate <span class="op">=</span> <span class="va">estimated</span></span>
+<span>      <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `era`.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in max(dat$year[dat$era == era_name], na.rm = TRUE): no non-missing</span></span>
+<span><span class="co">## arguments to max; returning -Inf</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 1 row containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_hline()`).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 1 row containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_text()`).</span></span></code></pre>
+<p><img src="fims-demo_files/figure-html/length-1.png" class="r-plt" width="700"></p>
 </div>
 </div>
 </div>
@@ -766,7 +793,7 @@ composition configurations.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

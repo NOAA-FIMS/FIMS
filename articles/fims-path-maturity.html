@@ -6,20 +6,27 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>FIMS Path: Maturity • FIMS</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="FIMS Path: Maturity">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;display=swap" rel="stylesheet">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
-
-    <a class="navbar-brand me-2" href="../index.html">FIMS</a>
+    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7</small>
 
@@ -41,12 +48,21 @@
     <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
   </ul>
 </li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+<li><a class="dropdown-item" href="../coverage/coverage.html">coverage</a></li>
+    <li><a class="dropdown-item" href="../coverage/codecoverage_explanation.html">coverage explained</a></li>
+    <li><a class="dropdown-item" href="../testdown/index.html">testdown</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/noaa-fims/fims/"><span class="fa fa-brands fa-github fa-lg"></span></a></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -59,8 +75,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>FIMS Path: Maturity</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>FIMS Path: Maturity</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/main/vignettes/fims-path-maturity.Rmd" class="external-link"><code>vignettes/fims-path-maturity.Rmd</code></a></small>
@@ -100,7 +115,7 @@ simplified parts using a common color coding, where R code is in blue,
 code for the Rcpp interface that links R objects to C++ objects is in
 orange, the C++ code that acts as the core of FIMS is in green, and the
 C++ code that makes up <code>Information</code> is in grey.
-<img src="figures/fims-path-maturity-8.png" width="100%"></p>
+<img src="figures/fims-path-maturity-8.png" class="r-plt" width="100%"></p>
 <div class="section level2">
 <h2 id="modules-in-r">Modules in R<a class="anchor" aria-label="anchor" href="#modules-in-r"></a>
 </h2>
@@ -282,7 +297,7 @@ parent classes are just used in Rcpp to set the structure.</p>
 <span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  Parameter slope<span class="op">;</span></span>
 <span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="op">...</span></span>
 <span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-1.png" width="85%"></p>
+<p><img src="figures/fims-path-maturity-1.png" class="r-plt" width="85%"></p>
 <p>All Rcpp interface classes from FIMS define parameters (e.g.,
 <code>inflection_point</code>, <code>slope</code>) using the
 <code>ParameterVector</code> class defined in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp" class="external-link">rcpp_interface_base.hpp</a>
@@ -428,7 +443,7 @@ later.</p>
 <code>add_to_fims_tmb_internal</code> four times to track the estimated
 value of each parameter along with their first, second, and third
 derivatives.</p>
-<p><img src="figures/fims-path-maturity-2.png" width="100%"></p>
+<p><img src="figures/fims-path-maturity-2.png" class="r-plt" width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -473,7 +488,7 @@ but used for multiple modules.</p>
 <span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a><span class="op">};</span></span>
 <span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a></span>
 <span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="op">}</span>  <span class="co">// namespace fims</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-3.png" width="100%"></p>
+<p><img src="figures/fims-path-maturity-3.png" class="r-plt" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="population-class">Population class<a class="anchor" aria-label="anchor" href="#population-class"></a>
@@ -583,7 +598,7 @@ within population.</p>
 <span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a>    <span class="kw">this</span><span class="op">-&gt;</span>proportion_mature_at_age<span class="op">[</span>i_age_year<span class="op">]</span> <span class="op">=</span></span>
 <span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a>      <span class="kw">this</span><span class="op">-&gt;</span>maturity<span class="op">-&gt;</span>evaluate<span class="op">(</span>ages<span class="op">[</span>age<span class="op">]);</span></span>
 <span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-4.png" width="100%"></p>
+<p><img src="figures/fims-path-maturity-4.png" class="r-plt" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
@@ -624,7 +639,7 @@ or subset of populations.</p>
 <span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">uint32_t</span><span class="op">,</span> </span>
 <span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>                          <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;::</span>iterator</span>
 <span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>  maturity_models_iterator<span class="op">;</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-5.png" width="100%"></p>
+<p><img src="figures/fims-path-maturity-5.png" class="r-plt" width="100%"></p>
 <p>Next, let’s revisit the line of code that was written in the Rcpp
 <code>LogisticMaturityInterface</code> class in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp" class="external-link">inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp</a>.
 Here, we are setting the maturity_models pointer in
@@ -636,7 +651,7 @@ the <code>LogisticMaturity</code> module.</p>
 <span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">// fims_popdy::LogisticMaturity class is equal to the pointer to</span></span>
 <span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">// fims_popdy::LogisticMaturity</span></span>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>info<span class="op">-&gt;</span>maturity_models<span class="op">[</span>maturity<span class="op">-&gt;</span>id<span class="op">]</span> <span class="op">=</span> maturity<span class="op">;</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-6.png" width="100%"></p>
+<p><img src="figures/fims-path-maturity-6.png" class="r-plt" width="100%"></p>
 <p>Now we need to pass this pointer to the maturity pointer in
 population so that <code>population-&gt;maturity</code> points to the
 <code>LogisticMaturity</code> module instead of
@@ -651,7 +666,7 @@ population so that <code>population-&gt;maturity</code> points to the
 <span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a>                            <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>Population<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;::</span>iterator</span>
 <span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a>    population_iterator<span class="op">;</span></span>
 <span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co">// iterator for population objects</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-7.png" width="100%"></p>
+<p><img src="figures/fims-path-maturity-7.png" class="r-plt" width="100%"></p>
 <p>Populations are looped through with a new shared pointer,
 <code>p</code>, to reference the individual population of interest.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode cpp infochunk"><code class="sourceCode cpp"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co">// file: inst/include/common/information.hpp</span></span>
@@ -687,7 +702,7 @@ in information, passing on the information that we want to use the
 <p>Here, (*it) is referring to the <code>maturity_models</code> map in
 information and (*it).second refers to the second element of the map,
 which is the pointer to the maturity module.</p>
-<p><img src="figures/fims-path-maturity-8.png" width="100%"></p>
+<p><img src="figures/fims-path-maturity-8.png" class="r-plt" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="thinking-in-r">Thinking in R<a class="anchor" aria-label="anchor" href="#thinking-in-r"></a>
@@ -840,7 +855,7 @@ calculations.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

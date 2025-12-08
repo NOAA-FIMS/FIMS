@@ -1,0 +1,293 @@
+# Overview
+
+[![FIMS status
+badge](https://noaa-fims.r-universe.dev/badges/FIMS)](https://noaa-fims.r-universe.dev/FIMS)
+[![R-CMD-check
+badge](https://github.com/NOAA-FIMS/FIMS/actions/workflows/call-r-cmd-check.yml/badge.svg?branch=main)](https://github.com/NOAA-FIMS/FIMS/actions/workflows/call-r-cmd-check.yml)
+[![Codecov test
+coverage](https://codecov.io/gh/NOAA-FIMS/FIMS/branch/main/graph/badge.svg)](https://app.codecov.io/gh/NOAA-FIMS/FIMS?branch=main)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
+The NOAA Fisheries Integrated Modeling System (FIMS) is a software
+system designed to support next-generation fisheries stock assessment,
+ecosystem, and socioeconomic modeling. A [team of
+experts](https://noaa-fims.github.io/about/contributors.html) within
+NOAA Fisheries is designing and developing the system, and we are
+advised by the [FIMS
+Council](https://noaa-fims.github.io/about/contributors.html#fims-council),
+which includes academic, industry, and international partners. Our
+software is currently operational for estimation purposes and we plan
+for it to be operational for management in late 2025.
+
+## Installing FIMS
+
+A [precompiled version of the latest release of
+FIMS](https://noaa-fisheries-integrated-toolbox.r-universe.dev/FIMS) is
+available from [R
+universe](https://noaa-fisheries-integrated-toolbox.r-universe.dev) by
+running the following code within R:
+
+``` r
+install.packages("FIMS", repos = c("https://noaa-fisheries-integrated-toolbox.r-universe.dev", "https://cloud.r-project.org"))
+```
+
+Users can also compile it themselves, like any other TMB package by
+running `devtools::install_github("NOAA-FIMS/FIMS")`. This workflow
+allows for the specification of a particular branch or tag using the
+`ref` argument.
+
+Developers who are interested in building FIMS can clone this
+repository, e.g., `git clone https://github.com/NOAA-FIMS/FIMS.git` and
+build it with
+[`devtools::install()`](https://devtools.r-lib.org/reference/install.html),
+which builds the package from the cloned files and installs the R
+library. Installing with
+[`devtools::load_all()`](https://devtools.r-lib.org/reference/load_all.html)
+is not recommended because it uses shim files for things like
+[`system.file()`](https://rdrr.io/r/base/system.file.html), which can
+cause FIMS to not function as expected. For example, if you try to
+optimize the same model twice, you will more than likely not get
+estimates of uncertainty from the second model run. Additionally,
+[`devtools::load_all()`](https://devtools.r-lib.org/reference/load_all.html)
+adds the debugger flag `-O0 -g` which leads to Windows users seeing
+`Fatal error: can't write <xxx> bytes to section .text of FIMS.o: 'file too big`.
+Thus, Windows users need to run
+`withr::local_options(pkg.build_extra_flags = FALSE)` at the beginning
+of every R session before calling
+[`devtools::load_all()`](https://devtools.r-lib.org/reference/load_all.html).
+If you want to compile FIMS with the debugger turned on you will need to
+run the {withr} function in addition to manually modifying the call to
+PKG_CXXFLAGS in the
+[Makevars.win](https://github.com/NOAA-FIMS/FIMS/blob/doc-install/src/Makevars.win)
+file in `src` to
+`PKG_CXXFLAGS = -DTMB_MODEL -DTMB_EIGEN_DISABLE_WARNINGS -O1 -g`. For a
+[list of development tools needed to build, test, and document
+FIMS](https://github.com/nmfs-ost/on-off-boarding/blob/211d3895afb892ac2fba919935eb27d933e4d048/.github/workflows/onboard-fims.yml#L22)
+see the [on- and off-boarding repository for NOAA Fisheries Office of
+Science & Technology](https://github.com/nmfs-ost/on-off-boarding).
+
+## Getting Help
+
+If you encounter a clear 🐛, please file an
+[Issue](https://github.com/NOAA-FIMS/FIMS/issues) with a minimal
+reproducible example on GitHub. If you are uncertain if you have
+actually encountered a 🐛, are looking for more information, or want to
+talk about some new ideas please use the [Discussion
+Board](https://github.com/orgs/NOAA-FIMS/discussions) to post your
+thoughts. Users, developers, lurkers, and anyone else interested in our
+project are welcome to join the discussions, this is a place for **all**
+members of the assessment and open-source software community to ask and
+answer questions, share updates, have open-ended conversations, and
+follow along on decisions affecting FIMS. Also, feel free to introduce
+yourself 👋 on the [FIMS Discussion
+Board](https://github.com/orgs/NOAA-FIMS/discussions/801).
+
+------------------------------------------------------------------------
+
+## Contributors
+
+All contributions to this project are gratefully acknowledged using the
+[`allcontributors` package](https://github.com/ropensci/allcontributors)
+following the [all-contributors](https://allcontributors.org)
+specification. Contributions of any kind are welcome!
+
+### Code
+
+[TABLE]
+
+### Issue Authors
+
+[TABLE]
+
+### Issue Contributors
+
+[TABLE]
+
+## NOAA Disclaimer
+
+This repository is a scientific product and is not official
+communication of the National Oceanic and Atmospheric Administration, or
+the United States Department of Commerce. All NOAA GitHub project code
+is provided on an ‘as is’ basis and the user assumes responsibility for
+its use. Any claims against the Department of Commerce or Department of
+Commerce bureaus stemming from the use of this GitHub project will be
+governed by all applicable Federal law. Any reference to specific
+commercial products, processes, or services by service mark, trademark,
+manufacturer, or otherwise, does not constitute or imply their
+endorsement, recommendation or favoring by the Department of Commerce.
+The Department of Commerce seal and logo, or the seal and logo of a DOC
+bureau, shall not be used in any manner to imply endorsement of any
+commercial product or activity by DOC or the United States Government.
+
+Software code created by U.S. Government employees is not subject to
+copyright in the United States (17 U.S.C. section 105). The United
+States/Department of Commerce reserve all rights to seek and obtain
+copyright protection in countries other than the United States for
+Software authored in its entirety by the Department of Commerce. To this
+end, the Department of Commerce hereby grants to Recipient a
+royalty-free, nonexclusive license to use, copy, and create derivative
+works of the Software outside of the United States.
+
+------------------------------------------------------------------------
+
+![NOAA
+Fisheries](https://raw.githubusercontent.com/nmfs-general-modeling-tools/nmfspalette/main/man/figures/noaa-fisheries-rgb-2line-horizontal-small.png)
+
+[U.S. Department of Commerce](https://www.commerce.gov/) \| [National
+Oceanographic and Atmospheric Administration](https://www.noaa.gov) \|
+[NOAA Fisheries](https://www.fisheries.noaa.gov/)
+
+# Package index
+
+## Data
+
+FIMS comes with a selection of built-in datasets that are used in
+examples to illustrate various visualization challenges.
+
+- [`data1`](https://NOAA-FIMS.github.io/FIMS/reference/data1.md) : FIMS
+  input data frame
+
+## Run FIMS
+
+Primary functions used when setting up or running a FIMS model.
+
+- [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
+  :
+
+  Class constructors for `FIMSFrame` and associated child classes
+
+- [`get_data()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  [`get_fleets()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  [`get_n_fleets()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  [`get_n_years()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  [`get_start_year()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  [`get_end_year()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  [`get_ages()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  [`get_n_ages()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  [`get_lengths()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  [`get_n_lengths()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
+  : Get a slot in a FIMSFrame object
+
+- [`m_landings()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
+  [`m_index()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
+  [`m_agecomp()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
+  [`m_lengthcomp()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
+  [`m_weight_at_age()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
+  [`m_age_to_length_conversion()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
+  : Get a vector of data to be passed to a FIMS module from a FIMSFrame
+  object
+
+- [`create_default_configurations()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.md)
+  : Create a default FIMS configuration tibble
+
+- [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)
+  : Create default parameters for a FIMS model
+
+- [`initialize_data_distribution()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_data_distribution.md)
+  [`initialize_process_distribution()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_data_distribution.md)
+  [`initialize_process_structure()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_data_distribution.md)
+  : Set up a new distribution for a data type or a process
+
+- [`lognormal()`](https://NOAA-FIMS.github.io/FIMS/reference/lognormal.md)
+  [`multinomial()`](https://NOAA-FIMS.github.io/FIMS/reference/lognormal.md)
+  : Distributions not available in the stats package
+
+- [`initialize_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.md)
+  : Initialize FIMS modules
+
+- [`FIMSFit()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFit.md) :
+
+  Class constructors for class `FIMSFit` and associated child classes
+
+- [`fit_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.md)
+  : Fit a FIMS model (BETA)
+
+- [`get_input()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_report()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_obj()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_opt()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_max_gradient()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_sdreport()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_number_of_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_timing()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_version()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_model_output()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  : Get a slot in a FIMSFit object
+
+- [`is.FIMSFit()`](https://NOAA-FIMS.github.io/FIMS/reference/is.FIMSFit.md)
+  : Check if an object is of class FIMSFit
+
+- [`is_fims_verbose()`](https://NOAA-FIMS.github.io/FIMS/reference/is_fims_verbose.md)
+  : Should FIMS be verbose?
+
+## Package development
+
+Primary functions used when developing FIMS package.
+
+- [`remove_test_data()`](https://NOAA-FIMS.github.io/FIMS/reference/remove_test_data.md)
+  : Remove test data
+
+- [`run_gtest()`](https://NOAA-FIMS.github.io/FIMS/reference/run_gtest.md)
+  : Run the google test suite
+
+- [`run_r_integration_tests()`](https://NOAA-FIMS.github.io/FIMS/reference/run_r_integration_tests.md)
+  : Run R integration tests
+
+- [`run_r_unit_tests()`](https://NOAA-FIMS.github.io/FIMS/reference/run_r_unit_tests.md)
+  : Run R unit tests
+
+- [`setup_and_run_gtest()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_and_run_gtest.md)
+  : Setup and run the google test suite
+
+- [`setup_gtest()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_gtest.md)
+  : Set up your local environment to run the google tests locally
+
+- [`use_gtest_template()`](https://NOAA-FIMS.github.io/FIMS/reference/use_gtest_template.md)
+  : Create tests/gtest/test\_\*.cpp test file and register it in
+  CMakeLists.txt
+
+- [`use_testthat_template()`](https://NOAA-FIMS.github.io/FIMS/reference/use_testthat_template.md)
+  : Create tests/testthat/test-\*.R test file
+
+- [`Ops(`*`<Rcpp_Parameter>`*`,`*`<Rcpp_Parameter>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
+  [`Ops(`*`<Rcpp_Parameter>`*`,`*`<numeric>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
+  [`Ops(`*`<numeric>`*`,`*`<Rcpp_Parameter>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
+  [`Ops(`*`<Rcpp_ParameterVector>`*`,`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
+  [`Ops(`*`<Rcpp_ParameterVector>`*`,`*`<numeric>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
+  [`Ops(`*`<numeric>`*`,`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
+  [`Math(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
+  : Sets methods for operators under the S4 Generic Group, Ops
+
+- [`` `[<-`( ``*`<Rcpp_ParameterVector>`*`,`*`<ANY>`*`,`*`<ANY>`*`,`*`<ANY>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
+  [`` `[`( ``*`<Rcpp_ParameterVector>`*`,`*`<numeric>`*`,`*`<ANY>`*`,`*`<ANY>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
+  [`length(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
+  [`sum(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
+  [`dim(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
+  [`Summary(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
+  :
+
+  Setter for `Rcpp_ParameterVector`
+
+- [`reshape_json_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/reshape_json_estimates.md)
+  : Reshape JSON estimates
+
+- [`reshape_tmb_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/reshape_tmb_estimates.md)
+  : Reshape TMB estimates
+
+# Articles
+
+### Fisheries Integrated Modeling System (FIMS)
+
+- [Introducing the Fisheries Integrated Modeling System
+  (FIMS)](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md):
+- [Minimal Example for Running a FIMS
+  Model](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo-minimal.md):
+- [Introducing the FIMS Logging
+  System](https://NOAA-FIMS.github.io/FIMS/articles/fims-logging.md):
+
+### Developer
+
+- [FIMS Path:
+  Maturity](https://NOAA-FIMS.github.io/FIMS/articles/fims-path-maturity.md):
