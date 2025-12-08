@@ -67,51 +67,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       q; /*!< transformed parameter: the catchability of the fleet */
 
-  // derived quantities
-  // landings
-  fims::Vector<Type> landings_weight;       /*!<model landings in weight*/
-  fims::Vector<Type> landings_numbers;      /*!<model landings in numbers*/
-  fims::Vector<Type> landings_expected;     /*!<model expected landings*/
-  fims::Vector<Type> log_landings_expected; /*!<model log expected landings*/
-  fims::Vector<Type>
-      landings_numbers_at_age;               /*!<model landings numbers at age*/
-  fims::Vector<Type> landings_weight_at_age; /*!<model landings weight at age*/
-  fims::Vector<Type>
-      landings_numbers_at_length; /*!<model landings numbers at length*/
-
-  // index
-  fims::Vector<Type> index_weight;   /*!<model index of abundance in weight*/
-  fims::Vector<Type> index_numbers;  /*!<model index of abundance in numbers*/
-  fims::Vector<Type> index_expected; /*!<model expected index of abundance*/
-  fims::Vector<Type>
-      log_index_expected; /*!<model expected log index of abundance*/
-  fims::Vector<Type>
-      index_numbers_at_age; /*!<model index sampled numbers at age*/
-  fims::Vector<Type> index_weight_at_age; /*!<model index weight at age*/
-  fims::Vector<Type>
-      index_numbers_at_length; /*!<model index sampled numbers at length*/
-
-  // composition
-  fims::Vector<Type> age_to_length_conversion; /*!<derived quantity age to
+    fims::Vector<Type> age_to_length_conversion; /*!<derived quantity age to
                                                   length conversion matrix*/
-  fims::Vector<Type>
-      agecomp_expected; /*!<model expected composition numbers at age*/
-  fims::Vector<Type>
-      lengthcomp_expected; /*!<model expected composition numbers at length*/
-  fims::Vector<Type> agecomp_proportion;    /*!<model expected composition
-                                               proportion numbers at age*/
-  fims::Vector<Type> lengthcomp_proportion; /*!<model expected composition
-                                               proportion numbers at length*/
-
-  std::map<std::string, fims::Vector<Type>>
-      derived_quantities; /*!< derived quantities for specific model type, i.e.
-                             caa, surplus production, etc */
-  /**
-   * @brief Derived quantities iterator.
-   *
-   */
-  typedef typename std::map<std::string, fims::Vector<Type>>::iterator
-      derived_quantities_iterator;
 
   /**
    * @brief Constructor.
@@ -122,50 +79,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    * @brief Destructor.
    */
   virtual ~Fleet() {}
-
-  /**
-   * @brief Initialize Fleet Class
-   * @param n_years The number of years in the model.
-   * @param n_ages The number of ages in the model.
-   * @param n_lengths The number of lengths in the model.
-   */
-  void Initialize(int n_years, int n_ages, int n_lengths = 0) {
-    if (this->log_q.size() == 0) {
-      this->log_q.resize(1);
-      this->log_q[0] = static_cast<Type>(0.0);
-    }
-    this->n_years = n_years;
-    this->n_ages = n_ages;
-    this->n_lengths = n_lengths;
-    q.resize(this->log_q.size());
-    log_Fmort.resize(n_years);
-    Fmort.resize(n_years);
-
-    // landings
-    landings_numbers_at_age.resize(n_years * n_ages);
-    landings_weight_at_age.resize(n_years * n_ages);
-    landings_numbers_at_length.resize(n_years * n_lengths);
-    landings_weight.resize(n_years);
-    landings_numbers.resize(n_years);
-    landings_expected.resize(n_years);
-    log_landings_expected.resize(n_years);
-
-    // index
-    index_numbers_at_age.resize(n_years * n_ages);
-    index_weight_at_age.resize(n_years * n_ages);
-    index_numbers_at_length.resize(n_years * n_lengths);
-    index_weight.resize(n_years);
-    index_numbers.resize(n_years);
-    index_expected.resize(n_years);
-    log_index_expected.resize(n_years);
-
-    // composition
-    agecomp_expected.resize(n_years * n_ages);
-    lengthcomp_expected.resize(n_years * n_lengths);
-    agecomp_proportion.resize(n_years * n_ages);
-    lengthcomp_proportion.resize(n_years * n_lengths);
-    age_to_length_conversion.resize(n_ages * n_lengths);
-  }
 
   /**
    * @brief Prepare to run the fleet module. Called at each model
@@ -184,213 +97,22 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     for (size_t year = 0; year < this->n_years; year++) {
       this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
     }
-
-    // derived quantities
-    // landings
-    std::fill(landings_weight.begin(), landings_weight.end(),
-              static_cast<Type>(0)); /**<model landings in weight*/
-    std::fill(landings_numbers.begin(), landings_numbers.end(),
-              static_cast<Type>(0)); /**<model landings in numbers*/
-    std::fill(landings_expected.begin(), landings_expected.end(),
-              static_cast<Type>(0)); /**<model expected landings*/
-    std::fill(log_landings_expected.begin(), log_landings_expected.end(),
-              static_cast<Type>(0)); /**<model log of expected landings*/
-    std::fill(landings_numbers_at_age.begin(), landings_numbers_at_age.end(),
-              static_cast<Type>(0)); /**<model landings numbers at age*/
-    std::fill(landings_weight_at_age.begin(), landings_weight_at_age.end(),
-              static_cast<Type>(0)); /**<model landings weight at age*/
-    std::fill(landings_numbers_at_length.begin(),
-              landings_numbers_at_length.end(),
-              static_cast<Type>(0)); /**<model landings numbers at length*/
-
-    // index
-    std::fill(index_weight.begin(), index_weight.end(),
-              static_cast<Type>(0)); /**<model index of abundance in weight*/
-    std::fill(index_numbers.begin(), index_numbers.end(),
-              static_cast<Type>(0)); /**<model index of abundance in numbers*/
-    std::fill(index_expected.begin(), index_expected.end(),
-              static_cast<Type>(0)); /**<model expected index of abundance*/
-    std::fill(
-        log_index_expected.begin(), log_index_expected.end(),
-        static_cast<Type>(0)); /**<model log of expected index of abundance*/
-    std::fill(index_numbers_at_age.begin(), index_numbers_at_age.end(),
-              static_cast<Type>(0)); /**<model index numbers at age*/
-    std::fill(index_weight_at_age.begin(), index_weight_at_age.end(),
-              static_cast<Type>(0)); /**<model index weight at age*/
-    std::fill(index_numbers_at_length.begin(), index_numbers_at_length.end(),
-              static_cast<Type>(0)); /**<model index numbers at length*/
-
-    // composition
-    std::fill(agecomp_expected.begin(), agecomp_expected.end(),
-              static_cast<Type>(0)); /**<model composition numbers at age*/
-    std::fill(lengthcomp_expected.begin(), lengthcomp_expected.end(),
-              static_cast<Type>(0)); /**<model composition numbers at length*/
-    std::fill(
-        agecomp_proportion.begin(), agecomp_proportion.end(),
-        static_cast<Type>(
-            0)); /**<model expected composition proportion numbers at age*/
-    std::fill(
-        lengthcomp_proportion.begin(), lengthcomp_proportion.end(),
-        static_cast<Type>(
-            0)); /**<model expected composition proportion numbers at length*/
-  }
-
-  /**
-   * Evaluate the proportion of landings numbers at age.
-   */
-  void evaluate_age_comp() {
-    for (size_t y = 0; y < this->n_years; y++) {
-      Type sum = static_cast<Type>(0.0);
-      Type sum_obs = static_cast<Type>(0.0);
-      // robust_add is a small value to add to expected composition
-      // proportions at age to stabilize likelihood calculations
-      // when the expected proportions are close to zero.
-      // Type robust_add = static_cast<Type>(0.0); // zeroed out before testing
-      // 0.0001;
-      // sum robust is used to calculate the total sum of robust
-      // additions to ensure that proportions sum to 1.
-      // Type robust_sum = static_cast<Type>(1.0);
-
-      for (size_t a = 0; a < this->n_ages; a++) {
-        size_t i_age_year = y * this->n_ages + a;
-        // Here we have a check to determine if the age comp
-        // should be calculated from the retained landings or
-        // the total population. These values are slightly different.
-        // In the future this will have more impact as we implement
-        // timing rather than everything occurring at the start of
-        // the year.
-        if (this->fleet_observed_landings_data_id_m == -999) {
-          this->agecomp_expected[i_age_year] =
-              this->index_numbers_at_age[i_age_year];
-        } else {
-          this->agecomp_expected[i_age_year] =
-              this->landings_numbers_at_age[i_age_year];
-        }
-        sum += this->agecomp_expected[i_age_year];
-        // robust_sum -= robust_add;
-
-        // This sums over the observed age composition data so that
-        // the expected age composition can be rescaled to match the
-        // total number observed. The check for na values should not
-        // be needed as individual years should not have missing data.
-        // This is need to be re-explored if/when we modify FIMS to
-        // allow for composition bins that do not match the population
-        // bins.
-        if (this->fleet_observed_agecomp_data_id_m != -999) {
-          if (this->observed_agecomp_data->at(i_age_year) !=
-              this->observed_agecomp_data->na_value) {
-            sum_obs += this->observed_agecomp_data->at(i_age_year);
-          }
-        }
-      }
-      for (size_t a = 0; a < this->n_ages; a++) {
-        size_t i_age_year = y * this->n_ages + a;
-        this->agecomp_proportion[i_age_year] =
-            this->agecomp_expected[i_age_year] / sum;
-        // robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
-
-        if (fleet_observed_agecomp_data_id_m != -999) {
-          this->agecomp_expected[i_age_year] =
-              this->agecomp_proportion[i_age_year] * sum_obs;
-        }
-      }
     }
-  }
 
-  /**
-   * Evaluate the proportion of landings numbers at length.
-   */
-  void evaluate_length_comp() {
-    if (this->n_lengths > 0) {
-      for (size_t y = 0; y < this->n_years; y++) {
-        Type sum = static_cast<Type>(0.0);
-        Type sum_obs = static_cast<Type>(0.0);
-        // robust_add is a small value to add to expected composition
-        // proportions at age to stabilize likelihood calculations
-        // when the expected proportions are close to zero.
-        // Type robust_add = static_cast<Type>(0.0); // 0.0001; zeroed out
-        // before testing
-        // sum robust is used to calculate the total sum of robust
-        // additions to ensure that proportions sum to 1.
-        // Type robust_sum = static_cast<Type>(1.0);
-        for (size_t l = 0; l < this->n_lengths; l++) {
-          size_t i_length_year = y * this->n_lengths + l;
-          for (size_t a = 0; a < this->n_ages; a++) {
-            size_t i_age_year = y * this->n_ages + a;
-            size_t i_length_age = a * this->n_lengths + l;
-            this->lengthcomp_expected[i_length_year] +=
-                this->agecomp_expected[i_age_year] *
-                this->age_to_length_conversion[i_length_age];
-
-            this->landings_numbers_at_length[i_length_year] +=
-                this->landings_numbers_at_age[i_age_year] *
-                this->age_to_length_conversion[i_length_age];
-
-            this->index_numbers_at_length[i_length_year] +=
-                this->index_numbers_at_age[i_age_year] *
-                this->age_to_length_conversion[i_length_age];
-          }
-
-          sum += this->lengthcomp_expected[i_length_year];
-          // robust_sum -= robust_add;
-
-          if (this->fleet_observed_lengthcomp_data_id_m != -999) {
-            if (this->observed_lengthcomp_data->at(i_length_year) !=
-                this->observed_lengthcomp_data->na_value) {
-              sum_obs += this->observed_lengthcomp_data->at(i_length_year);
-            }
-          }
-        }
-        for (size_t l = 0; l < this->n_lengths; l++) {
-          size_t i_length_year = y * this->n_lengths + l;
-          this->lengthcomp_proportion[i_length_year] =
-              this->lengthcomp_expected[i_length_year] / sum;
-          // robust_add + robust_sum * this->lengthcomp_expected[i_length_year]
-          // / sum;
-          if (this->fleet_observed_lengthcomp_data_id_m != -999) {
-            this->lengthcomp_expected[i_length_year] =
-                this->lengthcomp_proportion[i_length_year] * sum_obs;
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Evaluate the natural log of the expected index.
-   */
-  void evaluate_index() {
-    for (size_t i = 0; i < this->index_weight.size(); i++) {
-      if (this->observed_index_units == "number") {
-        index_expected[i] = this->index_numbers[i];
-      } else {
-        index_expected[i] = this->index_weight[i];
-      }
-      log_index_expected[i] = log(this->index_expected[i]);
-    }
-  }
-
-  /**
-   * Evaluate the natural log of the expected landings.
-   */
-  void evaluate_landings() {
-    for (size_t i = 0; i < this->landings_weight.size(); i++) {
-      if (this->observed_landings_units == "number") {
-        landings_expected[i] = this->landings_numbers[i];
-      } else {
-        landings_expected[i] = this->landings_weight[i];
-      }
-      log_landings_expected[i] = log(this->landings_expected[i]);
-    }
-  }
-
-  virtual void create_report_vectors(
+    /**
+     * Create a map of report vectors for the object.
+     */
+    virtual void create_report_vectors(
       std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
     report_vectors["log_Fmort"].emplace_back(this->log_Fmort.to_tmb());
     report_vectors["log_q"].emplace_back(this->log_q.to_tmb());
     report_vectors["age_to_length_conversion"].emplace_back(
         this->age_to_length_conversion.to_tmb());
   }
+
+    /**
+     * Get the report vector count object.
+     */
   virtual void get_report_vector_count(
       std::map<std::string, size_t>& report_vector_count) {
     report_vector_count["log_Fmort"] += 1;

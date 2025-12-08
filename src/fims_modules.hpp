@@ -307,8 +307,6 @@ RCPP_MODULE(fims) {
              "natural log of the initial numbers at age")
       .field("ages", &PopulationInterface::ages,
              "vector of ages in the population; length n_ages")
-      .method("evaluate", &PopulationInterface::evaluate,
-              "evaluate the population function")
       .method("SetMaturityID", &PopulationInterface::SetMaturityID,
               "Set the unique id for the Maturity object")
       .method("SetGrowthID", &PopulationInterface::SetGrowthID,
@@ -321,9 +319,7 @@ RCPP_MODULE(fims) {
       .method("SetName", &PopulationInterface::SetName,
               "Set the name of the population")
       .method("GetName", &PopulationInterface::GetName,
-              "Get the name of the population")
-      .method("evaluate", &PopulationInterface::evaluate,
-              "evaluate the population function");
+              "Get the name of the population");
 
   Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
       .constructor()

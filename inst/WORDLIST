@@ -448,7 +448,9 @@ inheritParams
 init
 InitializeCAA
 InitializeFleetDerivedQuantities
+InitializeFleetObject
 InitializePopulationDerivedQuantities
+InitializePopulationObject
 initializer
 inplace
 InputIt
@@ -543,6 +545,7 @@ LogR
 LogRecDev
 LogRRecruitmentInterface
 LogRRecruitmentProcess
+
 lookahead
 lozen
 lpdf

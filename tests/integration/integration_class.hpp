@@ -88,6 +88,35 @@ public:
         return true;
     }
 
+  void InitializeFleetObject(fims_popdy::Fleet<double>& fleet, size_t n_years,
+                             size_t n_ages) {
+    if (fleet.log_q.size() == 0) {
+      fleet.log_q.resize(1);
+      fleet.log_q[0] = static_cast<double>(0.0);
+    }
+    fleet.n_years = n_years;
+    fleet.n_ages = n_ages;
+    fleet.q.resize(fleet.log_q.size());
+    fleet.log_Fmort.resize(n_years);
+    fleet.Fmort.resize(n_years);
+  }
+
+  void InitializePopulationObject(fims_popdy::Population<double>& pop,
+                                  size_t n_years, size_t n_ages,
+                                  size_t n_fleets) {
+    pop.n_years = n_years;
+    pop.n_ages = n_ages;
+    pop.n_fleets = n_fleets;
+
+    // size all the vectors to length of n_ages
+    pop.years.resize(n_years);
+    pop.proportion_female.resize(n_ages);
+    pop.M.resize(n_years * n_ages);
+    pop.ages.resize(n_ages);
+    pop.log_init_naa.resize(n_ages);
+    pop.log_M.resize(n_years * n_ages);
+  }
+
     bool ConfigurePopulationModel(fims_popdy::Population<double> &pop,
             fims::JsonValue &input,
             fims::JsonValue &output) {
@@ -157,7 +186,7 @@ public:
                 for (size_t i = 0; i < n_fleets; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > f = std::make_shared<fims_popdy::Fleet<double> >();
                     f->log_q.resize(1);
-                    f->Initialize(n_years, n_ages);
+                    this->InitializeFleetObject(*f, n_years, n_ages);
                   //  f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(n_years);
                   //  f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(n_years, n_ages);
 
@@ -307,7 +336,7 @@ public:
                 for (size_t i = 0; i < nsurveys; i++) {
                     std::shared_ptr<fims_popdy::Fleet<double> > s = std::make_shared<fims_popdy::Fleet<double> >();
                     s->log_q.resize(1);
-                    s->Initialize(n_years, n_ages);
+                    this->InitializeFleetObject(*s, n_years, n_ages);
                  //   s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(n_years);
                   //  s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(n_years, n_ages);
 
@@ -349,12 +378,12 @@ public:
                                             selectivity->slope[0] = slope[0].GetDouble();
                                         }
 
-                                        s->selectivity = selectivity;
-
-
-
-                                    } else if (sel_pattern[0].GetInt() == 2) {//double logistic
-                                        std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double> > selectivity = std::make_shared<fims_popdy::DoubleLogisticSelectivity<double> >();
+                    s->selectivity = selectivity;
+                  } else if (sel_pattern[0].GetInt() == 2) {  // double logistic
+                    std::shared_ptr<
+                        fims_popdy::DoubleLogisticSelectivity<double>>
+                        selectivity = std::make_shared<
+                            fims_popdy::DoubleLogisticSelectivity<double>>();
 
                                         it = fsel_o.find("A50.sel1");
                                         if ((*it).second.GetType() == fims::JsonValueType::JArray) {
@@ -435,8 +464,7 @@ public:
             pop.n_fleets = pop.fleets.size();
 
             // initialize population
-            pop.numbers_at_age.resize((n_years + 1) * n_ages);
-            pop.Initialize(n_years, 1, n_ages);
+      this->InitializePopulationObject(pop, n_years, n_ages, n_fleets);
 
             // Set initial size to value from MCP C0
             it = obj2.find("N.age");
@@ -675,9 +703,14 @@ public:
         fims::JsonObject output;
         fims::JsonArray array;
 
+    fims_popdy::CatchAtAge<double> model_loop;
+    model_loop.AddPopulation(pop.id);
+    model_loop.Initialize();
+    model_loop.Evaluate();
+ std::map<std::string, fims::Vector<Type>>& dq_ =
+        this->GetPopulationDerivedQuantities(population->GetId());
 
 
-        pop.Evaluate();
 
         if (print_statements) {
             std::cout << "Numbers at age:\n";
@@ -685,9 +718,9 @@ public:
         for (int i = 0; i < pop.n_years; i++) {
             for (int j = 0; j < pop.n_ages; j++) {
                 if (print_statements) {
-                    std::cout << pop.numbers_at_age[i * pop.n_ages + j] << " ";
+                    std::cout << dq_["numbers_at_age"][i * pop.n_ages + j] << " ";
                 }
-                array.push_back(pop.numbers_at_age[i * pop.n_ages + j]);
+                array.push_back(dq_["numbers_at_age"][i * pop.n_ages + j]);
             }
             if (print_statements) {
                 std::cout << std::endl;
@@ -702,7 +735,7 @@ public:
         }
 
 
-        return pop.numbers_at_age;
+        return dq_["numbers_at_age"];
     }
 
     bool CheckModelOutput(fims_popdy::Population<double> &pop,
