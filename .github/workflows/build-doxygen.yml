@@ -113,7 +113,7 @@ jobs:
         rm header.html
         rm DoxygenLayout.xml
 
-    - name: Push docs to FIMS-docs repo
+    - name: Push doxygen html files to FIMS website repo
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
