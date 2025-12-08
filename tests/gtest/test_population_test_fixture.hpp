@@ -156,7 +156,8 @@ class CAAInitializeTestFixture : public testing::Test {
 
       derived_quantities["index_weight"] = fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["index_numbers"] = fims::Vector<double>(fleet->n_years);
+      derived_quantities["index_numbers"] =
+          fims::Vector<double>(fleet->n_years);
 
       derived_quantities["index_expected"] =
           fims::Vector<double>(fleet->n_years);
@@ -500,7 +501,8 @@ class CAAEvaluateTestFixture : public testing::Test {
 
       derived_quantities["index_weight"] = fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["index_numbers"] = fims::Vector<double>(fleet->n_years);
+      derived_quantities["index_numbers"] =
+          fims::Vector<double>(fleet->n_years);
 
       derived_quantities["index_expected"] =
           fims::Vector<double>(fleet->n_years);
@@ -781,7 +783,8 @@ class CAAPrepareTestFixture : public testing::Test {
 
       derived_quantities["index_weight"] = fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["index_numbers"] = fims::Vector<double>(fleet->n_years);
+      derived_quantities["index_numbers"] =
+          fims::Vector<double>(fleet->n_years);
 
       derived_quantities["index_expected"] =
           fims::Vector<double>(fleet->n_years);

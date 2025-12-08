@@ -209,7 +209,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id; }
 
-
   /**
    *
    */
@@ -549,7 +548,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
       ss << "  \"header\": [\"" << "n_years" << "\"],\n";
-      ss << "  \"dimensions\": [" << fleet_interface->n_years.get() << "]\n},\n";
+      ss << "  \"dimensions\": [" << fleet_interface->n_years.get()
+         << "]\n},\n";
       ss << " \"values\": " << fleet_interface->log_Fmort << "},\n";
 
       ss << " {\n";
@@ -1155,22 +1155,25 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           fims::Vector<Type>(population->n_years.get());
 
       derived_quantities_dim_info["total_landings_numbers"] =
-          fims_popdy::DimensionInfo("total_landings_numbers",
-                                    fims::Vector<int>{population->n_years.get()},
-                                    fims::Vector<std::string>{"n_years"});
+          fims_popdy::DimensionInfo(
+              "total_landings_numbers",
+              fims::Vector<int>{population->n_years.get()},
+              fims::Vector<std::string>{"n_years"});
 
       derived_quantities["mortality_F"] = fims::Vector<Type>(
           population->n_years.get() * population->n_ages.get());
       derived_quantities_dim_info["mortality_F"] = fims_popdy::DimensionInfo(
           "mortality_F",
-          fims::Vector<int>{population->n_years.get(), population->n_ages.get()},
+          fims::Vector<int>{population->n_years.get(),
+                            population->n_ages.get()},
           fims::Vector<std::string>{"n_years", "n_ages"});
 
       derived_quantities["mortality_Z"] = fims::Vector<Type>(
           population->n_years.get() * population->n_ages.get());
       derived_quantities_dim_info["mortality_Z"] = fims_popdy::DimensionInfo(
           "mortality_Z",
-          fims::Vector<int>{population->n_years.get(), population->n_ages.get()},
+          fims::Vector<int>{population->n_years.get(),
+                            population->n_ages.get()},
           fims::Vector<std::string>{"n_years", "n_ages"});
 
       derived_quantities["numbers_at_age"] = fims::Vector<Type>(
