@@ -88,10 +88,14 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The ID of the observed landings data object.
    */
   SharedInt interface_observed_landings_data_id_m = -999;
-  /**
-   * @brief The ID of the selectivity object.
+   /**
+   * @brief The ID of the selectivity at age object.
    */
-  SharedInt interface_selectivity_id_m = -999;
+  SharedInt interface_selectivity_age_id_m = -999;
+  /**
+   * @brief The ID of the selectivity at length object.
+   */
+  SharedInt interface_selectivity_length_id_m = -999;
 
  public:
   /**
@@ -339,20 +343,44 @@ class FleetInterface : public FleetInterfaceBase {
   void SetObservedLandingsDataID(int observed_landings_data_id) {
     interface_observed_landings_data_id_m.set(observed_landings_data_id);
   }
-  /**
-   * @brief Set the unique ID for the selectivity object.
+ /**
+   * @brief Set the unique ID for the selectivity object and set units to age.
    * @param selectivity_id Unique ID for the observed object.
    */
-  void SetSelectivityID(int selectivity_id) {
-    interface_selectivity_id_m.set(selectivity_id);
+  void SetSelectivityAgeID(int selectivity_id)
+  {
+    interface_selectivity_age_id_m.set(selectivity_id);
+    // selectivity_units.set(fims::to_string("age"));
+    // TODO: We should, as a warning/notification, inform users that the
+    // selectivity units are set to age.
+  }
+  /**
+   * @brief Set the unique ID for the selectivity object and set units to length.
+   * @param selectivity_id Unique ID for the observed object.
+   */
+  void SetSelectivityLengthID(int selectivity_id)
+  {
+    interface_selectivity_length_id_m.set(selectivity_id);
+    // selectivity_units.set(fims::to_string("length"));
+    // TODO: We should, as a warning/notification, inform users that the
+    // selectivity units are set to length.
   }
 
   /**
-   * @brief Get the unique ID for the selectivity object.
-   *
-   * @return uint32_t
+   * @brief Get the unique ID for the selectivity at age object.
    */
-  uint32_t GetSelectivityID() { return interface_selectivity_id_m.get(); }
+  int GetSelectivityAgeID()
+  {
+    return interface_selectivity_age_id_m.get();
+  }
+
+  /**
+   * @brief Get the unique ID for the selectivity at length object.
+   */
+  int GetSelectivityLengthID()
+  {
+    return interface_selectivity_length_id_m.get();
+  }
 
   /**
    * @brief Get the unique ID for the observed age-composition data object.
@@ -470,7 +498,17 @@ class FleetInterface : public FleetInterfaceBase {
     fleet->fleet_observed_landings_data_id_m =
         interface_observed_landings_data_id_m.get();
 
-    fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
+    fleet->fleet_selectivity_age_id_m = interface_selectivity_age_id_m.get();
+    fleet->fleet_selectivity_length_id_m =
+        interface_selectivity_length_id_m.get();
+
+        if(fleet->fleet_selectivity_age_id_m == -999 &&
+           fleet->fleet_selectivity_length_id_m == -999)
+        {
+          FIMS_ERROR_LOG("Fleet " + fims::to_string(this->id) +
+                         " must have a selectivity at age or length defined.");
+        }
+
 
     fleet->log_q.resize(this->log_q.size());
     for (size_t i = 0; i < this->log_q.size(); i++) {
