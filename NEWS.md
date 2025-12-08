@@ -1,10 +1,19 @@
 # FIMS 0.7.0
 
+* Turns on the code for model families that allows for more model types in the
+  future than just the catch-at-age model that is currently implemented through
+  the use of FisheryModelBase, which is a unified parent class for all model
+  families. Moved derived quantities (e.g., numbers at age, spawning biomass,
+  catch at age) from Fleet and Population objects into FisheryModelBase.
+  Refactored Population and Fleet classes to be trait only objects
 * Converts nested list of lists used for model control to a tibble with one line
   per parameter that can be un-nested and nested.
 * Increased the documentation of FIMS by using formulas in doxygen, building the
   doxygen on the NOAA-FIMS github.io site instead of its own web page, writing
   more information in the testing README, etc.
+* Removes seasonality logic given it was not being used
+* Removes date columns in input data in exchange for timing
+* Uses {stockplotr} for the figures in the "fims-demo" vignette
 
 # FIMS 0.6.3
 
