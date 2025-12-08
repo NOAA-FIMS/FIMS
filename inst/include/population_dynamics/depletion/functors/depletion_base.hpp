@@ -38,6 +38,9 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> log_r; /**< Intrinsic growth rate. */
   fims::Vector<Type> log_m; /**< Shape parameter that adjusts the curvature of
                                the growth function */
+  fims::Vector<Type> K; /**< Carrying capacity of the population. */
+  fims::Vector<Type> r; /**< Intrinsic growth rate. */
+  fims::Vector<Type> m; /**< Shape parameter that adjusts the curvature of the growth function */
   fims::Vector<Type>
       biomass_penalty; /**< Penalty on biomass to keep it within bounds. */
   fims::Vector<Type>

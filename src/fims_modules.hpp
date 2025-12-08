@@ -25,6 +25,8 @@
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
+RCPP_EXPOSED_CLASS(NaturalParameter)
+RCPP_EXPOSED_CLASS(NaturalParameterVector)
 RCPP_EXPOSED_CLASS(RealVector)
 RCPP_EXPOSED_CLASS(SharedInt)
 RCPP_EXPOSED_CLASS(SharedString)
@@ -149,6 +151,22 @@ RCPP_MODULE(fims) {
               "provided value.")
       .method("get_id", &ParameterVector::get_id,
               "Gets the ID of the ParameterVector object.");
+
+
+  Rcpp::class_<NaturalParameter>("NaturalParameter")
+    .constructor()
+    .constructor<double>()
+    .field("initial_value", &NaturalParameter::initial_value_m)
+    .field("final_value", &NaturalParameter::final_value_m)
+    .field("id", &NaturalParameter::id_m);
+
+  Rcpp::class_<NaturalParameterVector>("NaturalParameterVector")
+    .constructor()
+    .constructor<size_t>()
+    .method("get", &NaturalParameterVector::operator[], "Get element by index (C++-style, 0-based)")
+    .method("size", &NaturalParameterVector::size, "Get vector size")
+    .method("get_id", &NaturalParameterVector::get_id, "Get the vector's unique ID");
+
   Rcpp::class_<RealVector>(
       "RealVector", "An RcppInterface class that defines the RealVector class.")
       .constructor()
@@ -374,6 +392,9 @@ RCPP_MODULE(fims) {
       .field("log_r", &PellaTomlinsonInterface::log_r)
       .field("log_K", &PellaTomlinsonInterface::log_K)
       .field("log_m", &PellaTomlinsonInterface::log_m)
+      .field("r", &PellaTomlinsonInterface::r)
+      .field("K", &PellaTomlinsonInterface::K)
+      .field("m", &PellaTomlinsonInterface::m)
       .field("depletion", &PellaTomlinsonInterface::pop_depletion,
              "The depletion process")
       .field("logit_depletion", &PellaTomlinsonInterface::logit_depletion,

@@ -96,6 +96,19 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
    */
   ParameterVector log_m;
   /**
+   * @brief The carrying capacity as a natural parameter.
+   */
+  NaturalParameterVector K;
+  /**
+   * @brief The intrinsic growth rate as a natural parameter.
+   */
+  NaturalParameterVector r;
+  /**
+   * @brief The shape parameter that adjusts the curvature of the growth
+   * function as a natural parameter.
+   */
+  NaturalParameterVector m;
+  /**
    * @brief The depletion level
    */
   ParameterVector pop_depletion;
@@ -142,17 +155,20 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
    */
   PellaTomlinsonInterface(const PellaTomlinsonInterface& other)
       : DepletionInterfaceBase(other),
-        nyears(other.nyears),
         log_r(other.log_r),
         log_K(other.log_K),
         log_m(other.log_m),
+        r(other.r),
+        K(other.K),
+        m(other.m),
         pop_depletion(other.pop_depletion),
         logit_depletion(other.logit_depletion),
         log_expected_depletion(other.log_expected_depletion),
         biomass_penalty(other.biomass_penalty),
         biomass_expected_penalty(other.biomass_expected_penalty),
         K_penalty(other.K_penalty),
-        K_expected_penalty(other.K_expected_penalty) {}
+        K_expected_penalty(other.K_expected_penalty),
+        nyears(other.nyears) {}
 
   /**
    * @brief The destructor.
@@ -343,6 +359,13 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
       }
     }
     info->variable_map[this->log_m.id_m] = &(depletion)->log_m;
+    // set K, r, m
+    depletion->K.resize(1);
+    depletion->r.resize(1);
+    depletion->m.resize(1);
+    info->variable_map[this->r.id_m] = &(depletion)->r;
+    info->variable_map[this->K.id_m] = &(depletion)->K;
+    info->variable_map[this->m.id_m] = &(depletion)->m;
 
     // set logit_depletion
     depletion->logit_depletion.resize(this->nyears.get());

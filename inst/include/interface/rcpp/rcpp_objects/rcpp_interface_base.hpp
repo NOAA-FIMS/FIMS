@@ -22,6 +22,84 @@
 #include <Rcpp.h>
 
 /**
+ * @brief An Rcpp interface that defines the Natural Parameter class.
+ *
+ * @details An Rcpp interface class that defines the interface between R and
+ * C++ for a natural parameter type. This parameter cannot be set by the user,
+ * it is only exposed for linking natural parameters to distributions (e.g. priors).
+ */
+class NaturalParameter {
+public:
+    public:
+  /**
+   * @brief The static ID of the Parameter object.
+   */
+  static uint32_t id_g;
+  /**
+   * @brief The local ID of the Parameter object.
+   */
+  uint32_t id_m;
+  /**
+   * @brief The initial value of the parameter.
+   */
+  double initial_value_m = 0.0;
+  /**
+   * @brief The final value of the parameter.
+   */
+  double final_value_m = 0.0;
+
+  // Default constructor
+    NaturalParameter() {
+        initial_value_m = 0.0;
+        final_value_m = 0.0;
+        id_m = NaturalParameter::id_g++;
+    }
+
+  /**
+   * @brief The constructor for initializing a natural parameter.
+  */
+  NaturalParameter(double value) {
+    initial_value_m = value;
+    id_m = NaturalParameter::id_g++;
+  }
+};
+/**
+ * @brief The unique ID for the variable map that points to a fims::Vector.
+ */
+uint32_t NaturalParameter::id_g = 0;
+
+/**
+ * @brief An Rcpp interface class that defines the NaturalParameterVector class.
+ *
+ * @details An Rcpp interface class that defines the interface between R and
+ * C++ for a natural parameter vector type. This parameter vector cannot be set by the user,
+ * it is only exposed for linking natural parameters to distributions (e.g. priors).
+ */
+class NaturalParameterVector {
+public:
+    static uint32_t id_g;
+    uint32_t id_m;
+    std::shared_ptr<std::vector<NaturalParameter>> storage_m;
+
+    NaturalParameterVector() {
+        id_m = id_g++;
+        storage_m = std::make_shared<std::vector<NaturalParameter>>();
+        storage_m->resize(1);
+    }
+
+    NaturalParameterVector(size_t size) {
+        id_m = id_g++;
+        storage_m = std::make_shared<std::vector<NaturalParameter>>();
+        storage_m->resize(size);
+    }
+
+    uint32_t get_id() { return id_m; }
+    size_t size() { return storage_m->size(); }
+    NaturalParameter& operator[](size_t pos) { return storage_m->at(pos); }
+};
+uint32_t NaturalParameterVector::id_g = 0;
+
+/**
  * @brief An Rcpp interface that defines the Parameter class.
  *
  * @details An Rcpp interface class that defines the interface between R and

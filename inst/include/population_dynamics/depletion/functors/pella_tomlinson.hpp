@@ -38,18 +38,11 @@ struct PellaTomlinsonDepletion : public DepletionBase<Type> {
    */
   virtual const Type evaluate_mean(const Type& depletion_ym1,
                                    const Type& catch_ym1) {
-    Type r;
-    Type K;
-    Type m;
-
-    r = fims_math::exp(this->log_r[0]);
-    K = fims_math::exp(this->log_K[0]);
-    m = fims_math::exp(this->log_m[0]);
 
     return depletion_ym1 +
-           (r / (m - 1.0)) * depletion_ym1 *
-               (1.0 - fims_math::pow(depletion_ym1, m - 1.0)) -
-           catch_ym1 / K;
+           (this->r[0] / (this->m[0] - 1.0)) * depletion_ym1 *
+               (1.0 - fims_math::pow(depletion_ym1, this->m[0] - 1.0)) -
+           catch_ym1 / this->K[0];
   }
 };
 }  // namespace fims_popdy
