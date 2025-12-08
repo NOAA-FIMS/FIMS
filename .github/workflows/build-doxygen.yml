@@ -14,7 +14,7 @@ on:
   #   - cron: '0 16 * * *' 
   workflow_dispatch:
   # below is a trigger for when there are changes to the fims website, it pulls
-  # the bootstrap file name from there which occassionally changes
+  # the bootstrap file name from there which occasionally changes
   # file in that repo, which change whenever a significant change is made to
   # the website for some reason 
   repository_dispatch:
