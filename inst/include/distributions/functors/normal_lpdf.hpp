@@ -51,6 +51,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
 
     // Dimension checks
     /* TODO: fix dimension check as expected values no longer used for data
+      //also throw std::invalid_argument() crashes R session
     if (n_x != this->expected_values.size()) {
       throw std::invalid_argument(
           "NormalLPDF::Vector index out of bounds. The size of observed data "

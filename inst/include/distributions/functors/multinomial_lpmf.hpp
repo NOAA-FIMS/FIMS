@@ -52,6 +52,9 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
     std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
 
     // Dimension checks
+    
+      /* TODO: fix dimension check as expected values no longer used for data
+      //also throw std::invalid_argument() crashes R session
     if (this->input_type == "data") {
       if (dims[0] * dims[1] != this->expected_values.size()) {
         throw std::invalid_argument(
@@ -79,6 +82,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
             fims::to_string(this->expected_values.size()));
       }
     }
+            */
 
     for (size_t i = 0; i < dims[0]; i++) {
       // for each row, create new x and prob vectors
