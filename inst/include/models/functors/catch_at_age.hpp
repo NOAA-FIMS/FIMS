@@ -658,85 +658,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
     }
   }
 
-  /**
-   * This method is used to calculate the proportions for a population. It takes
-   * a population object, the index of the age in the current year, the age as
-   * input and calculates the proportions for that population.
-   */
-  void ComputeProportions() {
-    for (size_t p = 0; p < this->populations.size(); p++) {
-      std::shared_ptr<fims_popdy::Population<Type>> &population =
-          this->populations[p];
-      std::map<std::string, fims::Vector<Type>> &pdq_ =
-          this->GetPopulationDerivedQuantities(population->GetId());
-
-      for (size_t year = 0; year < population->n_years; year++) {
-        for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
-          std::map<std::string, fims::Vector<Type>> &fdq_ =
-              this->GetFleetDerivedQuantities(
-                  population->fleets[fleet_]->GetId());
-
-          size_t index_yf = year * population->n_fleets + fleet_;
-          Type sum_age = 0.0;
-          Type sum_length = 0.0;
-          for (size_t age = 0; age < population->n_ages; age++) {
-            size_t i_age_year = year * population->n_ages + age;
-            sum_age += fdq_["landings_numbers_at_age"][i_age_year];
-          }
-
-          for (size_t age = 0; age < population->n_ages; age++) {
-            size_t i_age_year = year * population->n_ages + age;
-            fdq_["agecomp_proportion"][i_age_year] =
-                fdq_["landings_numbers_at_age"][i_age_year] / sum_age;
-          }
-
-          if (population->fleets[fleet_]->n_lengths > 0) {
-            for (size_t y = 0; y < population->fleets[fleet_]->n_years; y++) {
-              fims::Vector<Type> &landings_numbers_at_length =
-                  fdq_["landings_numbers_at_length"];
-              fims::Vector<Type> &landings_numbers_at_age =
-                  fdq_["landings_numbers_at_age"];
-              fims::Vector<Type> &proportion_landings_numbers_at_length =
-                  fdq_["lengthcomp_proportion"];
-
-              sum_length = 0.0;
-              for (size_t l = 0; l < population->fleets[fleet_]->n_lengths;
-                   l++) {
-                size_t i_length_year =
-                    y * population->fleets[fleet_]->n_lengths + l;
-                for (size_t a = 0; a < population->fleets[fleet_]->n_ages; a++) {
-                  size_t i_age_year = y * population->fleets[fleet_]->n_ages + a;
-                  size_t i_length_age =
-                      a * population->fleets[fleet_]->n_lengths + l;
-                  fdq_["landings_numbers_at_length"][i_length_year] +=
-                      fdq_["landings_numbers_at_age"][i_age_year] *
-                      population->fleets[fleet_]
-                          ->age_to_length_conversion[i_length_age];
-                }
-                sum_length += fdq_["landings_numbers_at_length"][i_length_year];
-              }
-              for (size_t l = 0; l < population->fleets[fleet_]->n_lengths;
-                   l++) {
-                size_t i_length_year =
-                    y * population->fleets[fleet_]->n_lengths + l;
-                fdq_["lengthcomp_proportion"][i_length_year] =
-                    fdq_["landings_numbers_at_length"][i_length_year] /
-                    sum_length;
-              }
-              for (size_t l = 0; l < population->fleets[fleet_]->n_lengths;
-                   l++) {
-                size_t i_length_year =
-                    y * population->fleets[fleet_]->n_lengths + l;
-                fdq_["lengthcomp_proportion"][i_length_year] =
-                    fdq_["landings_numbers_at_length"][i_length_year] /
-                    sum_length;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 
   /**
    * Evaluate the proportion of landings numbers at age.
@@ -1056,7 +977,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
     evaluate_length_comp();
     evaluate_index();
     evaluate_landings();
-    // ComputeProportions();
   }
   /**
    * * This method is used to generate TMB reports from the population dynamics
