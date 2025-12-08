@@ -92,6 +92,11 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The ID of the selectivity object.
    */
   SharedInt interface_selectivity_id_m = -999;
+  /**
+   * @brief What units is selectivity for this fleet modeled in.
+   * Options are age or length, default is age.
+   */
+  SharedString  selectivity_units = fims::to_string("age");
 
  public:
   /**
@@ -340,19 +345,40 @@ class FleetInterface : public FleetInterfaceBase {
     interface_observed_landings_data_id_m.set(observed_landings_data_id);
   }
   /**
-   * @brief Set the unique ID for the selectivity object.
+   * @brief Set the unique ID for selectivity object and set units to age.
    * @param selectivity_id Unique ID for the observed object.
    */
-  void SetSelectivityID(int selectivity_id) {
+  void SetSelectivityAgeID(int selectivity_id) {
     interface_selectivity_id_m.set(selectivity_id);
+    selectivity_units.set(fims::to_string("age"));
+    // TODO: We should as a warning/notification that this is setting selectivity
+    // units to age.
+  }
+
+  /**
+   * @brief Set the unique ID for the selectivity object and set units to length.
+   * @param selectivity_id Unique ID for the observed object.
+   */
+  void SetSelectivityLengthID(int selectivity_id) {
+    interface_selectivity_id_m.set(selectivity_id);
+    selectivity_units.set(fims::to_string("length"));
+    // TODO: We should as a warning/notification that this is setting selectivity
+    // units to length.
   }
 
   /**
    * @brief Get the unique ID for the selectivity object.
-   *
-   * @return uint32_t
    */
-  uint32_t GetSelectivityID() { return interface_selectivity_id_m.get(); }
+  int GetSelectivityID() {
+    return interface_selectivity_id_m.get();
+  }
+
+  /**
+   * @brief Get the units for the selectivity object.
+   */
+  std::string GetSelectivityUnits() {
+    return selectivity_units.get();
+  }
 
   /**
    * @brief Get the unique ID for the observed age-composition data object.
