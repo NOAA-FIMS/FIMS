@@ -6,6 +6,9 @@ on:
   pull_request:
     types: [opened]
 
+permissions:
+  contents: write
+
 jobs:
   pr-checklist:
     runs-on: ubuntu-latest

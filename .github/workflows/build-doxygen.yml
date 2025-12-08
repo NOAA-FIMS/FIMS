@@ -34,7 +34,7 @@ jobs:
         fetch-depth: 0
 
     - name: Checkout External Docs Repository (Source of bootstrap CSS)
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: NOAA-FIMS/noaa-fims.github.io
         path: external-docs
