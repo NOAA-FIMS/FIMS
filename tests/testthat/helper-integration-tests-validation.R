@@ -39,12 +39,13 @@
 #' )
 #' }
 validate_fims <- function(
-    report,
-    estimates,
-    om_input,
-    om_output,
-    em_input,
-    use_fimsfit = FALSE) {
+  report,
+  estimates,
+  om_input,
+  om_output,
+  em_input,
+  use_fimsfit = FALSE
+) {
   # Helper function to validate estimates against expected values
   validate_error <- function(expected,
                              param_name,
@@ -242,12 +243,13 @@ validate_fims <- function(
 #' )
 #' }
 verify_fims_deterministic <- function(
-    report,
-    estimates,
-    om_input,
-    om_output,
-    em_input,
-    use_fimsfit = FALSE) {
+  report,
+  estimates,
+  om_input,
+  om_output,
+  em_input,
+  use_fimsfit = FALSE
+) {
   n_years <- om_input[["nyr"]]
   n_ages <- om_input[["nages"]]
   dim <- n_years * n_ages

@@ -180,10 +180,11 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
 #' The initialized distribution module as an object.
 #' @noRd
 initialize_distribution <- function(
-    module_input,
-    distribution_name,
-    distribution_type = c("data", "process"),
-    linked_ids) {
+  module_input,
+  distribution_name,
+  distribution_type = c("data", "process"),
+  linked_ids
+) {
   # Input checks
   # Check if distribution_name is provided
   if (is.null(distribution_name)) {

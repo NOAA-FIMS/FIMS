@@ -42,7 +42,7 @@ test_that("`create_default_parameters()` works with correct inputs", {
       "value", "estimation_type", "distribution_type", "distribution"
     )
   )
-  #' @description Test that the generated parameter values have not changed 
+  #' @description Test that the generated parameter values have not changed
   #' from the accepted snapshot.
   expect_snapshot_file(
     save_csv(result_unnested),
