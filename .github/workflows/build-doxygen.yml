@@ -13,8 +13,8 @@ on:
   # schedule: 
   #   - cron: '0 16 * * *' 
   workflow_dispatch:
-  # trigger for when there are changes to the fims website, it pulls the 
-  # header formatting from that site and the numbers/letters at the end of that 
+  # below is a trigger for when there are changes to the fims website, it pulls
+  # the bootstrap file name from there which occasionally changes
   # file in that repo, which change whenever a significant change is made to
   # the website for some reason 
   repository_dispatch:
@@ -86,11 +86,6 @@ jobs:
         if [ "$OLD_FILENAME" != "$BOOTSTRAP_FILE" ]; then
           echo "Detected change in bootstrap file hash. Updating assets/header.html."
           cp "$HEADER_PATH" assets/header.html
-          # Stage the changed asset file for commit later
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/header.html
-          git commit -m " chore(build): Update bootstrap hash in assets/header.html" || true
         else
           echo "Bootstrap file hash did not change. assets/header.html remains current."
         fi
@@ -104,20 +99,21 @@ jobs:
         cmake --build build
     
     - name: Deploy html documentation with Doxygen
-    # Do not run mkdir docs and mv build/html docs locally
+    # Do not run mkdir doxygen and mv build/html doxygen locally
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |
         mv build/html ./
-        rm -rf ./docs/*
-        mv ./html/* ./docs/
-        mv FIMS_hexlogo.png ./docs/
+        mkdir -p ./doxygen
+        rm -rf ./doxygen/*
+        mv ./html/* ./doxygen/
+        mv FIMS_hexlogo.png ./doxygen/
         rm custom.css
         rm doxygen-awesome.css
         rm FIMS_logo3.png
         rm header.html
         rm DoxygenLayout.xml
 
-    - name: Push docs to FIMS-docs repo
+    - name: Push doxygen html files to FIMS website repo
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
