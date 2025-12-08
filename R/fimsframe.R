@@ -805,11 +805,12 @@ FIMSFrame <- function(data) {
 
 # Unexported functions ----
 create_missing_data <- function(
-    data,
-    bins,
-    timings,
-    column,
-    types = c("landings", "index")) {
+  data,
+  bins,
+  timings,
+  column,
+  types = c("landings", "index")
+) {
   use_this_data <- data |>
     dplyr::group_by(type, name)
   out_data <- if (missing(bins)) {
