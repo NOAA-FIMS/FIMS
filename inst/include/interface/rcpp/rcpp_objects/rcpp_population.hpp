@@ -249,13 +249,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     this->recruitment_id.set(recruitment_id);
   }
 
-  /**
-   * @brief Evaluate the population function.
-   */
-  virtual void evaluate() {
-    fims_popdy::Population<double> population;
-    return population.Evaluate();
-  }
 
   /**
    * @brief Add a fleet id to the list of fleets
@@ -306,33 +299,6 @@ class PopulationInterface : public PopulationInterfaceBase {
         } else {
           this->log_init_naa[i].final_value_m = pop->log_init_naa[i];
         }
-      }
-
-      // set the derived quantities
-      this->derived_naa = Rcpp::NumericVector(pop->numbers_at_age.size());
-      this->derived_ssb = Rcpp::NumericVector(pop->spawning_biomass.size());
-      this->derived_biomass = Rcpp::NumericVector(pop->biomass.size());
-      this->derived_recruitment =
-          Rcpp::NumericVector(pop->expected_recruitment.size());
-
-      // set naa from Information/
-      for (R_xlen_t i = 0; i < this->derived_naa.size(); i++) {
-        this->derived_naa[i] = pop->numbers_at_age[i];
-      }
-
-      // set ssb from Information/
-      for (R_xlen_t i = 0; i < this->derived_ssb.size(); i++) {
-        this->derived_ssb[i] = pop->spawning_biomass[i];
-      }
-
-      // set biomass from Information
-      for (R_xlen_t i = 0; i < this->derived_biomass.size(); i++) {
-        this->derived_biomass[i] = pop->biomass[i];
-      }
-
-      // set recruitment from Information/
-      for (R_xlen_t i = 0; i < this->derived_recruitment.size(); i++) {
-        this->derived_recruitment[i] = pop->expected_recruitment[i];
       }
     }
   }
@@ -412,10 +378,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
-
-    population->numbers_at_age.resize((n_years + 1) * n_ages);
-    info->variable_map[this->numbers_at_age.id_m] =
-        &(population)->numbers_at_age;
 
     // add to Information
     info->populations[population->id] = population;

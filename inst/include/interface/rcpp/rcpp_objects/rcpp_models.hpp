@@ -209,18 +209,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id; }
 
-  /**
-   * @brief Method to get the population ids.
-   */
-  void Show() {
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
-
-    fims_popdy::CatchAtAge<double> *model =
-        (fims_popdy::CatchAtAge<double> *)info->models_map[this->get_id()]
-            .get();
-    model->Show();
-  }
 
   /**
    *

@@ -53,6 +53,22 @@ struct DimensionInfo {
         ndims(other.dims.size()),
         dims(other.dims),
         dim_names(other.dim_names) {}
+
+    /**
+     * @brief Assignment operator for DimensionInfo.
+     */
+    DimensionInfo &operator=(const DimensionInfo &other)
+    {
+      if (this != &other)
+      {
+        name = other.name;
+        ndims = other.ndims;
+        dims = other.dims;
+        dim_names = other.dim_names;
+        se_values_m = other.se_values_m;
+      }
+      return *this;
+    }
 };
 
 /**
@@ -240,34 +256,6 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    *
    */
   virtual ~FisheryModelBase() {}
-
-  /**
-   * @brief Show the Catch At Age model derived quantities.
-   *
-   * @param p
-   */
-  void ShowPopulation(std::shared_ptr<fims_popdy::Population<double>> &p) {
-    typename fims_popdy::Population<double>::derived_quantities_iterator it;
-    for (it = p->derived_quantities.begin(); it != p->derived_quantities.end();
-         it++) {
-      fims::Vector<double> &dq = (*it).second;
-      std::cout << (*it).first << ":" << std::endl;
-      for (int i = 0; i < dq.size(); i++) {
-        std::cout << dq[i] << " ";
-      }
-      std::cout << std::endl << std::endl;
-    }
-  }
-
-  /**
-   * @brief Show the populations in the fishery model.
-   *
-   */
-  void Show() {
-    for (size_t p = 0; p < this->populations.size(); p++) {
-      this->ShowPopulation(this->populations[p]);
-    }
-  }
 
   /**
    * @brief Get the fleet dimension information.
