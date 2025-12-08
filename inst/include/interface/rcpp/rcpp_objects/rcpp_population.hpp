@@ -249,7 +249,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     this->recruitment_id.set(recruitment_id);
   }
 
-
   /**
    * @brief Add a fleet id to the list of fleets
    * operating on this population.

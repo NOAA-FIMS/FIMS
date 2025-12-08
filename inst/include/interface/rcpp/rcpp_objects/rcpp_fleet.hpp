@@ -436,7 +436,6 @@ class FleetInterface : public FleetInterfaceBase {
               fleet->age_to_length_conversion[i];
         }
       }
-
     }
   }
 
@@ -512,10 +511,7 @@ class FleetInterface : public FleetInterfaceBase {
     // add to variable_map
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
-   
-
     if (this->n_lengths.get() > 0) {
-
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
@@ -548,7 +544,7 @@ class FleetInterface : public FleetInterfaceBase {
               "age_to_length_conversion cannot be set to random effects");
         }
       }
-     
+
       info->variable_map[this->age_to_length_conversion.id_m] =
           &(fleet)->age_to_length_conversion;
     }

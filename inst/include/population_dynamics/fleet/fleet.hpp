@@ -24,9 +24,9 @@ namespace fims_popdy {
 template <class Type>
 struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
-  size_t n_years;        /*!< the number of years in the model*/
-  size_t n_ages;         /*!< the number of ages in the model*/
-  size_t n_lengths;      /*!< the number of lengths in the model*/
+  size_t n_years;       /*!< the number of years in the model*/
+  size_t n_ages;        /*!< the number of ages in the model*/
+  size_t n_lengths;     /*!< the number of lengths in the model*/
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
@@ -67,8 +67,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       q; /*!< transformed parameter: the catchability of the fleet */
 
-    fims::Vector<Type> age_to_length_conversion; /*!<derived quantity age to
-                                                  length conversion matrix*/
+  fims::Vector<Type> age_to_length_conversion; /*!<derived quantity age to
+                                                length conversion matrix*/
 
   /**
    * @brief Constructor.
@@ -97,12 +97,12 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     for (size_t year = 0; year < this->n_years; year++) {
       this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
     }
-    }
+  }
 
-    /**
-     * Create a map of report vectors for the object.
-     */
-    virtual void create_report_vectors(
+  /**
+   * Create a map of report vectors for the object.
+   */
+  virtual void create_report_vectors(
       std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
     report_vectors["log_Fmort"].emplace_back(this->log_Fmort.to_tmb());
     report_vectors["log_q"].emplace_back(this->log_q.to_tmb());
@@ -110,9 +110,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
         this->age_to_length_conversion.to_tmb());
   }
 
-    /**
-     * Get the report vector count object.
-     */
+  /**
+   * Get the report vector count object.
+   */
   virtual void get_report_vector_count(
       std::map<std::string, size_t>& report_vector_count) {
     report_vector_count["log_Fmort"] += 1;

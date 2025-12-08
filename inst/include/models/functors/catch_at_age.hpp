@@ -658,7 +658,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
     }
   }
 
-
   /**
    * Evaluate the proportion of landings numbers at age.
    */

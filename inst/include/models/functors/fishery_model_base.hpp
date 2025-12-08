@@ -54,21 +54,19 @@ struct DimensionInfo {
         dims(other.dims),
         dim_names(other.dim_names) {}
 
-    /**
-     * @brief Assignment operator for DimensionInfo.
-     */
-    DimensionInfo &operator=(const DimensionInfo &other)
-    {
-      if (this != &other)
-      {
-        name = other.name;
-        ndims = other.ndims;
-        dims = other.dims;
-        dim_names = other.dim_names;
-        se_values_m = other.se_values_m;
-      }
-      return *this;
+  /**
+   * @brief Assignment operator for DimensionInfo.
+   */
+  DimensionInfo &operator=(const DimensionInfo &other) {
+    if (this != &other) {
+      name = other.name;
+      ndims = other.ndims;
+      dims = other.dims;
+      dim_names = other.dim_names;
+      se_values_m = other.se_values_m;
     }
+    return *this;
+  }
 };
 
 /**
