@@ -155,6 +155,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   ParameterVector log_r;
   /**
+   * @brief The log ratio of the index to depletion times K.
+   */
+  ParameterVector log_index_depletionK_ratio;
+  /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"nages\".
    */
@@ -215,6 +219,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_init_naa(other.log_init_naa),
         logit_init_depletion(other.logit_init_depletion),
         numbers_at_age(other.numbers_at_age),
+        log_index_depletionK_ratio(other.log_index_depletionK_ratio),
         ages(other.ages),
         derived_ssb(other.derived_ssb),
         derived_naa(other.derived_naa),
@@ -322,7 +327,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       this->derived_biomass = Rcpp::NumericVector(pop->biomass.size());
       this->derived_recruitment =
           Rcpp::NumericVector(pop->expected_recruitment.size());
-
+     
       // set naa from Information/
       for (R_xlen_t i = 0; i < this->derived_naa.size(); i++) {
         this->derived_naa[i] = pop->numbers_at_age[i];
@@ -345,102 +350,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
   }
 
-  /**
-   * @brief Converts the data to json representation for the output.
-   * @return A string is returned specifying that the module relates to the
-   * population interface. It also returns the ID for each associated module
-   * and the values associated with that module. Then it returns several
-   * derived quantities. This string is formatted for a json file.
-   */
-  virtual std::string to_json() {
-    std::stringstream ss;
-
-    ss << "{\n";
-    ss << " \"name\" : \"Population\",\n";
-
-    ss << " \"type\" : \"population\",\n";
-    ss << " \"tag\" : \"" << this->name << "\",\n";
-    ss << " \"id\": " << this->id << ",\n";
-    ss << " \"recruitment_id\": " << this->recruitment_id << ",\n";
-    ss << " \"depletion_id\": " << this->depletion_id << ",\n";
-    ss << " \"growth_id\": " << this->growth_id << ",\n";
-    ss << " \"maturity_id\": " << this->maturity_id << ",\n";
-
-    ss << " \"parameters\": [\n{\n";
-    ss << " \"name\": \"log_M\",\n";
-    ss << " \"id\":" << this->log_M.id_m << ",\n";
-    ss << " \"type\": \"vector\",\n";
-    ss << " \"values\": " << this->log_M << "\n},\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"log_init_naa\",\n";
-    ss << "  \"id\":" << this->log_init_naa.id_m << ",\n";
-    ss << "  \"type\": \"vector\",\n";
-    ss << "  \"values\":" << this->log_init_naa << " \n}],\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"logit_init_depletion\",\n";
-    ss << "  \"id\":" << this->logit_init_depletion.id_m << ",\n";
-    ss << "  \"type\": \"vector\",\n";
-    ss << "  \"values\":" << this->logit_init_depletion << " \n}],\n";
-
-    ss << " \"derived_quantities\": [{\n";
-    ss << "  \"name\": \"SSB\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_ssb.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_ssb.size() - 1; i++) {
-        ss << this->derived_ssb[i] << ", ";
-      }
-      ss << this->derived_ssb[this->derived_ssb.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "   \"name\": \"NAA\",\n";
-    ss << "   \"values\":[";
-    if (this->derived_naa.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_naa.size() - 1; i++) {
-        ss << this->derived_naa[i] << ", ";
-      }
-      ss << this->derived_naa[this->derived_naa.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "   \"name\": \"Biomass\",\n";
-    ss << "   \"values\":[";
-    if (this->derived_biomass.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_biomass.size() - 1; i++) {
-        ss << this->derived_biomass[i] << ", ";
-      }
-      ss << this->derived_biomass[this->derived_biomass.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "   \"name\": \"Recruitment\",\n";
-    ss << "   \"values\":[";
-    if (this->derived_recruitment.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_recruitment.size() - 1; i++) {
-        ss << this->derived_recruitment[i] << ", ";
-      }
-      ss << this->derived_recruitment[this->derived_recruitment.size() - 1]
-         << "]\n";
-    }
-    ss << " }\n]\n";
-
-    ss << "}";
-
-    return ss.str();
-  }
 
 #ifdef TMB_MODEL
 
@@ -547,6 +456,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->numbers_at_age.resize((nyears + 1) * nages);
     info->variable_map[this->numbers_at_age.id_m] =
         &(population)->numbers_at_age;
+    
 
     // add to Information
     info->populations[population->id] = population;

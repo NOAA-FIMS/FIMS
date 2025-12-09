@@ -911,7 +911,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
       derived_quantities["log_index_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-      //
+      
       derived_quantities["catch_index"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
 
@@ -1075,22 +1075,26 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
               PopulationInterfaceBase::live_objects[(*pit)]);
 
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
-          model->population_derived_quantities[(*pit)];
+          model->GetPopulationDerivedQuantities(population->id);
 
       derived_quantities["biomass"] =
           fims::Vector<Type>(population->nyears.get() + 1);
 
-      derived_quantities["expected_depletion"] = fims::Vector<Type>(
-          population->nyears.get() * population->nfleets.get());
-
       derived_quantities["observed_catch"] = fims::Vector<Type>(
+          population->nyears.get());
+      
+      derived_quantities["log_index_depletionK_ratio"] = fims::Vector<Type>(
           population->nyears.get() * population->nfleets.get());
 
-       for (fit = population->fleet_ids->begin();
+      info->variable_map[population->log_index_depletionK_ratio.id_m] =
+        &(derived_quantities["log_index_depletionK_ratio"]);
+      
+      for (fleet_ids_iterator fit = population->fleet_ids->begin();
            fit != population->fleet_ids->end(); ++fit) {
         fleet_ids.insert(*fit);
       }
     }
+
 
     for (fit = fleet_ids.begin(); fit != fleet_ids.end();
          ++fit) {
@@ -1099,10 +1103,22 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
               FleetInterfaceBase::live_objects[(*fit)]);
 
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
-          model->fleet_derived_quantities[(*fit)];
+          model->GetFleetDerivedQuantities(fleet_interface->id);
+
+      derived_quantities["index_expected"] =
+          fims::Vector<Type>(fleet_interface->nyears.get());
+
+      derived_quantities["log_index_expected"] =
+          fims::Vector<Type>(fleet_interface->nyears.get());
+
+      derived_quantities["mean_log_q"] =
+          fims::Vector<Type>(1);
       
       info->variable_map[fleet_interface->log_index_expected.id_m] =
           &(derived_quantities["log_index_expected"]);
+      
+      info->variable_map[fleet_interface->mean_log_q.id_m] =
+          &(derived_quantities["mean_log_q"]);
     }
 
 

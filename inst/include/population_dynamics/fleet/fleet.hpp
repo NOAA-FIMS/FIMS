@@ -103,6 +103,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> lengthcomp_proportion; /*!<model expected composition
                                                proportion numbers at length*/
 
+
   std::map<std::string, fims::Vector<Type>>
       derived_quantities; /*!< derived quantities for specific model type, i.e.
                              caa, surplus production, etc */

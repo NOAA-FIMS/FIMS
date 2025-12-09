@@ -161,6 +161,10 @@ class FleetInterface : public FleetInterfaceBase {
    * age-to-length-conversion matrix.
    */
   ParameterVector age_to_length_conversion;
+/**
+ * @brief The mean of the log of catchability of the fleet.
+ */
+  ParameterVector mean_log_q;
 
   // derived quantities
   /**
@@ -228,6 +232,7 @@ class FleetInterface : public FleetInterfaceBase {
    */
   Rcpp::NumericVector derived_lengthcomp_expected;
 
+
   /**
    * @brief The constructor.
    */
@@ -271,6 +276,7 @@ class FleetInterface : public FleetInterfaceBase {
         age_to_length_conversion(other.age_to_length_conversion),
         observed_landings_units(other.observed_landings_units),
         observed_index_units(other.observed_index_units),
+        mean_log_q(other.mean_log_q),
         derived_landings_naa(other.derived_landings_naa),
         derived_landings_nal(other.derived_landings_nal),
         derived_landings_waa(other.derived_landings_waa),
@@ -513,280 +519,8 @@ class FleetInterface : public FleetInterfaceBase {
       for (R_xlen_t i = 0; i < this->derived_lengthcomp_expected.size(); i++) {
         this->derived_lengthcomp_expected[i] = fleet->lengthcomp_expected[i];
       }
+
     }
-  }
-
-  /**
-   * @brief Converts the data to json representation for the output.
-   * @return A string is returned specifying that the module relates to the
-   * fleet interface. It returns the name and ID as well as all derived
-   * quantities and parameter estimates. This string is formatted for a json
-   * file.
-   */
-  virtual std::string to_json() {
-    std::stringstream ss;
-
-    ss << "{\n";
-    ss << " \"name\" : \"Fleet\",\n";
-
-    ss << " \"type\" : \"fleet\",\n";
-    ss << " \"tag\" : \"" << this->name << "\",\n";
-    ss << " \"id\": " << this->id << ",\n";
-    ss << " \"nlengths\": " << this->nlengths.get() << ",\n";
-    ss << "\"parameters\": [\n";
-    ss << "{\n";
-    ss << " \"name\": \"log_Fmort\",\n";
-    ss << " \"id\":" << this->log_Fmort.id_m << ",\n";
-    ss << " \"type\": \"vector\",\n";
-    ss << " \"values\": " << this->log_Fmort << "\n},\n";
-
-    ss << " {\n";
-    ss << " \"name\": \"log_q\",\n";
-    ss << " \"id\":" << this->log_q.id_m << ",\n";
-    ss << " \"type\": \"vector\",\n";
-    ss << " \"values\": " << this->log_q << "\n}";
-    if (this->nlengths.get() > 0) {
-      ss << " ,\n";
-      ss << " {\n";
-      ss << " \"name\": \"age_to_length_conversion\",\n";
-      ss << " \"id\":" << this->age_to_length_conversion.id_m << ",\n";
-      ss << " \"type\": \"vector\",\n";
-      ss << " \"values\": " << this->age_to_length_conversion << "\n}";
-    }
-    ss << "\n],\n \"derived_quantities\":[\n";
-    ss << "{\n";
-    ss << "  \"name\": \"landings_naa\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_landings_naa.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_landings_naa.size() - 1; i++) {
-        ss << this->derived_landings_naa[i] << ", ";
-      }
-      ss << this->derived_landings_naa[this->derived_landings_naa.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << " {\n";
-    ss << "  \"name\": \"landings_nal\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_landings_nal.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_landings_nal.size() - 1; i++) {
-        ss << this->derived_landings_nal[i] << ", ";
-      }
-      ss << this->derived_landings_nal[this->derived_landings_nal.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << " {\n";
-    ss << "  \"name\": \"landings_waa\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_landings_waa.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_landings_waa.size() - 1; i++) {
-        ss << this->derived_landings_waa[i] << ", ";
-      }
-      ss << this->derived_landings_waa[this->derived_landings_waa.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << " {\n";
-    ss << "  \"name\": \"index_naa\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_index_naa.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_index_naa.size() - 1; i++) {
-        ss << this->derived_index_naa[i] << ", ";
-      }
-      ss << this->derived_index_naa[this->derived_index_naa.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << " {\n";
-    ss << "  \"name\": \"index_nal\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_index_nal.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_index_nal.size() - 1; i++) {
-        ss << this->derived_index_nal[i] << ", ";
-      }
-      ss << this->derived_index_nal[this->derived_index_nal.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << " {\n";
-    ss << "  \"name\": \"index_waa\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_index_waa.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_index_waa.size() - 1; i++) {
-        ss << this->derived_index_waa[i] << ", ";
-      }
-      ss << this->derived_index_waa[this->derived_index_waa.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"agecomp_expected \",\n";
-    ss << "  \"values\":[";
-    if (this->derived_agecomp_expected.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_agecomp_expected.size() - 1; i++) {
-        ss << this->derived_agecomp_expected[i] << ", ";
-      }
-      ss << this->derived_agecomp_expected
-                [this->derived_agecomp_expected.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << " {\n";
-    ss << "  \"name\": \"lengthcomp_expected \",\n";
-    ss << "  \"values\":[";
-    if (this->derived_lengthcomp_expected.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_lengthcomp_expected.size() - 1;
-           i++) {
-        ss << this->derived_lengthcomp_expected[i] << ", ";
-      }
-      ss << this->derived_lengthcomp_expected
-                [this->derived_lengthcomp_expected.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"agecomp_proportion \",\n";
-    ss << "  \"values\":[";
-    if (this->derived_agecomp_proportion.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_agecomp_proportion.size() - 1;
-           i++) {
-        ss << this->derived_agecomp_proportion[i] << ", ";
-      }
-      ss << this->derived_agecomp_proportion
-                [this->derived_agecomp_proportion.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << " {\n";
-    ss << "  \"name\": \"lengthcomp_proportion \",\n";
-    ss << "  \"values\":[";
-    if (this->derived_lengthcomp_proportion.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_lengthcomp_proportion.size() - 1;
-           i++) {
-        ss << this->derived_lengthcomp_proportion[i] << ", ";
-      }
-      ss << this->derived_lengthcomp_proportion
-                [this->derived_lengthcomp_proportion.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"index_expected\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_index_expected.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_index_expected.size() - 1; i++) {
-        ss << this->derived_index_expected[i] << ", ";
-      }
-      ss << this->derived_index_expected[this->derived_index_expected.size() -
-                                         1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"index_weight\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_index_w.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_index_w.size() - 1; i++) {
-        ss << this->derived_index_w[i] << ", ";
-      }
-      ss << this->derived_index_w[this->derived_index_w.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"index_numbers\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_index_n.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_index_n.size() - 1; i++) {
-        ss << this->derived_index_n[i] << ", ";
-      }
-      ss << this->derived_index_n[this->derived_index_n.size() - 1] << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"landings_expected\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_landings_expected.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_landings_expected.size() - 1;
-           i++) {
-        ss << this->derived_landings_expected[i] << ", ";
-      }
-      ss << this->derived_landings_expected
-                [this->derived_landings_expected.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"landings_weight\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_landings_w.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_landings_w.size() - 1; i++) {
-        ss << this->derived_landings_w[i] << ", ";
-      }
-      ss << this->derived_landings_w[this->derived_landings_w.size() - 1]
-         << "]\n";
-    }
-    ss << " },\n";
-
-    ss << "{\n";
-    ss << "  \"name\": \"landings_numbers\",\n";
-    ss << "  \"values\":[";
-    if (this->derived_landings_n.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->derived_landings_n.size() - 1; i++) {
-        ss << this->derived_landings_n[i] << ", ";
-      }
-      ss << this->derived_landings_n[this->derived_landings_n.size() - 1]
-         << "]\n";
-    }
-    ss << " }\n]\n}";
-
-    return ss.str();
   }
 
 #ifdef TMB_MODEL
@@ -866,7 +600,6 @@ class FleetInterface : public FleetInterfaceBase {
         nyears);  // assume landings is for all ages.
     info->variable_map[this->log_landings_expected.id_m] =
         &(fleet)->log_landings_expected;
-    fleet->log_index_expected.resize(nyears);  // assume index is for all ages.
     info->variable_map[this->log_index_expected.id_m] =
         &(fleet)->log_index_expected;
 

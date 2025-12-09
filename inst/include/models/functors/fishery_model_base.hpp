@@ -18,7 +18,9 @@ template <typename Type>
  *
  */
 class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
+  public: 
   static uint32_t id_g; /**< The ID of the instance of the FisheryModelBase class */
+  uint32_t id; /*!< unique identifier assigned for fishery model object */
 
  public:
   /**
@@ -50,6 +52,27 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
                             std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator
       fleet_iterator;
 
+  /**
+   * @brief Type definitions for derived quantities and dimension information
+   * maps.
+   */
+  typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>
+      DerivedQuantitiesMap;
+  /**
+   * @brief Iterator for the derived quantities map.
+   */
+  typedef typename DerivedQuantitiesMap::iterator DerivedQuantitiesMapIterator;
+
+  /**
+   * @brief Shared pointer for the fleet derived quantities map.
+   */
+  std::shared_ptr<DerivedQuantitiesMap> fleet_derived_quantities;
+
+  /**
+   * @brief Shared pointer for the population derived quantities map.
+   */
+  std::shared_ptr<DerivedQuantitiesMap> population_derived_quantities;
+
 #ifdef TMB_MODEL
   ::objective_function<Type> *of;
 #endif
@@ -57,8 +80,9 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @brief Construct a new Fishery Model Base object.
    *
    */
-  FisheryModelBase()  {
-    this->id = FisheryModelBase::id_g++;
+  FisheryModelBase() : id(FisheryModelBase::id_g++) {
+    fleet_derived_quantities = std::make_shared<DerivedQuantitiesMap>();
+    population_derived_quantities = std::make_shared<DerivedQuantitiesMap>();
   }
 
   /**
@@ -66,11 +90,12 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    *
    * @param other
    */
-  FisheryModelBase(const FisheryModelBase &other) {
-    this->id = other.id;
-    this->population_ids = other.population_ids;
-    this->populations = other.populations;
-  }
+  FisheryModelBase(const FisheryModelBase &other)
+      : id(other.id),
+        population_ids(other.population_ids),
+        populations(other.populations),
+        fleet_derived_quantities(other.fleet_derived_quantities),
+        population_derived_quantities(other.population_derived_quantities) {}
 
   /**
    * @brief Destroy the Fishery Model Base object.
@@ -105,6 +130,117 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
     for (size_t p = 0; p < this->populations.size(); p++) {
       this->ShowPopulation(this->populations[p]);
     }
+  }
+
+   /**
+   * @brief Get the fleet derived quantities.
+   *
+   * @return DerivedQuantitiesMap
+   */
+  DerivedQuantitiesMap &GetFleetDerivedQuantities() {
+    return *fleet_derived_quantities;
+  }
+
+  /**
+   * @brief Get the population derived quantities.
+   *
+   * @return DerivedQuantitiesMap
+   */
+  DerivedQuantitiesMap &GetPopulationDerivedQuantities() {
+    return *population_derived_quantities;
+  }
+  /**
+   * @brief Get the fleet derived quantities for a specified fleet.
+   *
+   * @param fleet_id The ID of the fleet.
+   * @return std::map<std::string, fims::Vector<Type>>&
+   */
+  std::map<std::string, fims::Vector<Type>> &GetFleetDerivedQuantities(
+      uint32_t fleet_id) {
+    if (!fleet_derived_quantities) {
+      throw std::runtime_error(
+          "GetFleetDerivedQuantities: fleet_derived_quantities is null");
+    }
+    auto &outer = *fleet_derived_quantities;
+    auto it = outer.find(fleet_id);
+    if (it == outer.end()) {
+      std::stringstream ss;
+
+      ss << "GetFleetDerivedQuantities: fleet_id " << fleet_id
+         << " not found in fleet_derived_quantities";
+      throw std::out_of_range(ss.str());
+    }
+    return it->second;
+  }
+
+  /**
+   * @brief Initialize the derived quantities map for a fleet.
+   *
+   * @details Ensures the derived quantities map for the specified fleet
+   * exists. If not, creates an empty map for the fleet ID.
+   *
+   * @param fleet_id The ID of the fleet to initialize.
+   */
+  void InitializeFleetDerivedQuantities(uint32_t fleet_id) {
+    // Ensure the shared_ptr exists
+    if (!fleet_derived_quantities) {
+      fleet_derived_quantities = std::make_shared<
+          std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>>();
+    }
+
+    auto &outer = *fleet_derived_quantities;
+
+    // Insert only if not already present
+    if (outer.find(fleet_id) == outer.end()) {
+      outer.emplace(fleet_id, std::map<std::string, fims::Vector<Type>>{});
+    }
+  }
+
+  /**
+   * @brief Initialize the derived quantities map for a population.
+   *
+   * @details Ensures the derived quantities map for the specified
+   * population exists. If not, creates an empty map for the population ID.
+   *
+   * @param population_id The ID of the population to initialize.
+   */
+  void InitializePopulationDerivedQuantities(uint32_t population_id) {
+    // Ensure the shared_ptr exists
+    if (!population_derived_quantities) {
+      population_derived_quantities = std::make_shared<
+          std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>>();
+    }
+
+    auto &outer = *population_derived_quantities;
+
+    // Insert only if not already present
+    if (outer.find(population_id) == outer.end()) {
+      outer.emplace(population_id, std::map<std::string, fims::Vector<Type>>{});
+    }
+  }
+
+  /**
+   * @brief Get the population derived quantities for a specified population.
+   *
+   * @param population_id The ID of the population.
+   * @return std::map<std::string, fims::Vector<Type>>&
+   */
+  std::map<std::string, fims::Vector<Type>> &GetPopulationDerivedQuantities(
+      uint32_t population_id) {
+    if (!population_derived_quantities) {
+      throw std::runtime_error(
+          "GetPopulationDerivedQuantities: population_derived_quantities is "
+          "null");
+    }
+    auto &outer = *population_derived_quantities;
+    auto it = outer.find(population_id);
+    if (it == outer.end()) {
+      std::ostringstream ss;
+      ss << "GetPopulationDerivedQuantities: population_id " << population_id
+         << " not found in population_derived_quantities";
+      throw std::out_of_range(ss.str());
+    }
+    return it->second;
   }
 
   /**
