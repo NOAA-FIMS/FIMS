@@ -218,7 +218,18 @@ else
             }
         }
     "
-
+    # Check the exit code of Rscript
+    R_EXIT_CODE=$?
+    if [ $R_EXIT_CODE -eq 0 ]; then
+        # Only mark complete if Rscript ran without error
+        touch "$MARKER_FILE"
+        echo ">>> Setup Complete! Marker created."
+    else
+        # Exit with error status and display warning
+        echo "!!! ERROR: R package installation failed (Exit Code: $R_EXIT_CODE). !!!"
+        echo "!!! FIMS Setup is NOT complete. Please review the log for errors. !!!"
+        exit $R_EXIT_CODE # Propagate the failure status
+    fi    
     # Only mark complete if successful
     touch "$MARKER_FILE"
     echo ">>> Setup Complete! Marker created."
