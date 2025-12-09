@@ -169,11 +169,12 @@ else
 
     Rscript -e "
         # Setup Library Path
-        # Use the path defined by the Bash script, forcing R to use it first
-        lib_loc <- .libPaths()[1]
-        message('>>> Using R Library Location (Default): ', lib_loc)
-        # lib_loc <- '$R_LIB_PATH_WIN'
-        # Check if lib_loc is a valid path string before using .libPaths
+        # Define 'lib_loc' using R_LIBS_USER (standard user writable path)
+        # Create the directory if it doesn't exist
+        # Force the current R session to use this path
+        lib_loc <- Sys.getenv('R_LIBS_USER', unset = file.path('~', 'R', paste0('lib-fims-', getRversion())))
+        dir.create(lib_loc, recursive = TRUE, showWarnings = FALSE)
+        .libPaths(c(lib_loc, .libPaths()))
 
         # Define Base Packages
         pkgs <- c(
