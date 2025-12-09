@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-12-08" />
+<meta name="date" content="2025-12-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -183,7 +183,7 @@
 <td align="left">verify_fims_deterministic( report = get_report(deterministic_age_length_comp), estimates = get_estimates(deterministic_age_length_comp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#28</td>
-<td align="left">2025-12-08 14:21:11.762711</td>
+<td align="left">2025-12-09 00:04:23.08809</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (deterministic MLE with wrappers) returns correct NLLs</td>
@@ -191,7 +191,7 @@
 <td align="left">verify_fims_nll( report = get_report(deterministic_age_length_comp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#43</td>
-<td align="left">2025-12-08 14:21:11.936248</td>
+<td align="left">2025-12-09 00:04:23.266256</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (deterministic MLE with wrappers) returns correct NLLs / catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects</td>
@@ -199,7 +199,7 @@
 <td align="left">expect_equal(get_number_of_parameters(deterministic_age_length_comp)[“fixed_effects”] |&gt; unname(), 77)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#52</td>
-<td align="left">2025-12-08 14:21:11.973204</td>
+<td align="left">2025-12-09 00:04:23.347426</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (deterministic MLE with wrappers) returns correct NLLs / catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects</td>
@@ -207,7 +207,7 @@
 <td align="left">expect_equal(get_number_of_parameters(deterministic_age_length_comp)[“random_effects”] |&gt; unname(), 0)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#54</td>
-<td align="left">2025-12-08 14:21:11.987921</td>
+<td align="left">2025-12-09 00:04:23.364832</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age and length comp</td>
@@ -215,7 +215,7 @@
 <td align="left">validate_fims( report = get_report(fit_age_length_comp), estimates = get_estimates(fit_age_length_comp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#73</td>
-<td align="left">2025-12-08 14:21:14.497859</td>
+<td align="left">2025-12-09 00:04:25.967143</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age comp only using wrappers</td>
@@ -223,7 +223,7 @@
 <td align="left">validate_fims( report = get_report(fit_agecomp), estimates = get_estimates(fit_agecomp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#89</td>
-<td align="left">2025-12-08 14:21:15.814474</td>
+<td align="left">2025-12-09 00:04:27.423024</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age comp only using wrappers</td>
@@ -231,7 +231,7 @@
 <td align="left">validate_fims( report = get_report(fit_agecomp_na), estimates = get_estimates(fit_agecomp_na), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#102</td>
-<td align="left">2025-12-08 14:21:17.386243</td>
+<td align="left">2025-12-09 00:04:28.868903</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with length comp only using wrappers</td>
@@ -239,7 +239,7 @@
 <td align="left">validate_fims( report = get_report(fit_lengthcomp), estimates = get_estimates(fit_lengthcomp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#117</td>
-<td align="left">2025-12-08 14:21:19.987189</td>
+<td align="left">2025-12-09 00:04:31.924602</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with length comp only using wrappers</td>
@@ -247,7 +247,7 @@
 <td align="left">validate_fims( report = get_report(fit_lengthcomp_na), estimates = get_estimates(fit_lengthcomp_na), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#130</td>
-<td align="left">2025-12-08 14:21:22.584679</td>
+<td align="left">2025-12-09 00:04:34.552336</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age and length comp with NAs</td>
@@ -255,7 +255,7 @@
 <td align="left">validate_fims( report = get_report(fit_age_length_comp_na), estimates = get_estimates(fit_age_length_comp_na), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#145</td>
-<td align="left">2025-12-08 14:21:23.957087</td>
+<td align="left">2025-12-09 00:04:35.919103</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization</td>
@@ -263,7 +263,7 @@
 <td align="left">expect_equal( deterministic_output[[“estimated”]], deterministic_output[[“input”]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#182</td>
-<td align="left">2025-12-08 14:21:38.549419</td>
+<td align="left">2025-12-09 00:04:50.821899</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization</td>
@@ -271,7 +271,7 @@
 <td align="left">expect_error( object = initialized_model |&gt; fit_fims(optimize = TRUE), regexp = “FIMS must have at least one parameter to optimize.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#189</td>
-<td align="left">2025-12-08 14:21:38.57708</td>
+<td align="left">2025-12-09 00:04:50.855881</td>
 </tr>
 </tbody>
 </table>

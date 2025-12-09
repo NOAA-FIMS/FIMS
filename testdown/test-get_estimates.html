@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-12-08" />
+<meta name="date" content="2025-12-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -183,7 +183,7 @@
 <td align="left">expect_equal( object = deterministic_colnames, expected = expected_colnames )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_estimates.R#33</td>
-<td align="left">2025-12-08 14:19:38.044483</td>
+<td align="left">2025-12-09 00:02:51.690629</td>
 </tr>
 <tr class="even">
 <td align="left"><code>get_estimates()</code> works with deterministic run</td>
@@ -191,7 +191,7 @@
 <td align="left">expect_snapshot( get_estimates(deterministic_results) |&gt; # Remove the estimate, uncertainty, and gradient columns, as they # may change between runs dplyr::select( -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient ) |&gt; print(n = 320, width = Inf) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_estimates.R#39</td>
-<td align="left">2025-12-08 14:19:38.777945</td>
+<td align="left">2025-12-09 00:02:52.441152</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>get_estimates()</code> works with estimation run</td>
@@ -199,7 +199,7 @@
 <td align="left">expect_equal( object = estimates_colnames, expected = expected_colnames )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_estimates.R#67</td>
-<td align="left">2025-12-08 14:19:41.241124</td>
+<td align="left">2025-12-09 00:02:54.980345</td>
 </tr>
 <tr class="even">
 <td align="left"><code>get_estimates()</code> works with estimation run</td>
@@ -207,7 +207,7 @@
 <td align="left">expect_snapshot( # Read the first RDS file, get estimates, and print a snapshot readRDS(fit_files[[1]]) |&gt; get_estimates() |&gt; # Remove the estimated, uncertainty, and gradient columns, as they # may change between runs dplyr::select( -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient ) |&gt; print(n = 320, width = Inf) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_estimates.R#77</td>
-<td align="left">2025-12-08 14:19:53.507762</td>
+<td align="left">2025-12-09 00:03:06.824398</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>get_estimates()</code> returns correct outputs for edge cases</td>
@@ -215,7 +215,7 @@
 <td align="left">expect_error( object = get_estimates(“invalid_fit”) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_estimates.R#94</td>
-<td align="left">2025-12-08 14:19:53.533264</td>
+<td align="left">2025-12-09 00:03:06.844018</td>
 </tr>
 </tbody>
 </table>
