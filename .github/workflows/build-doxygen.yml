@@ -119,7 +119,7 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: 'doxygen'
+        source_file: 'doxygen/*'
         destination_repo: 'NOAA-FIMS/noaa-fims.github.io'
         destination_folder: 'doxygen'
         destination_branch: 'main'
