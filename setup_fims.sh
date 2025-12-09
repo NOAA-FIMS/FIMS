@@ -83,7 +83,8 @@ if [ "$MACHINE" == "Linux" ]; then
         # Dependencies for {languageserver}: libcurl4-openssl-dev libssl-dev libxml2-dev
         # Dependencies for TinyTeX logic: perl xz-utils
         # Dependencies for {pdftools} which is required by {asar}: libpoppler-cpp-dev
-        DEPS="build-essential libcurl4-openssl-dev libpoppler-cpp-dev libssl-dev libxml2-dev git wget nano perl xz-utils"
+        # Dependencies for Cairo which is needed by gdtools, {flextable}, {asar}, and {stockplotr}
+        DEPS="build-essential libcairo2-dev libcurl4-openssl-dev libpoppler-cpp-dev libssl-dev libxml2-dev git wget nano perl xz-utils"
         
         # Only add 'r-base' to the install list if R is not already present
         if command -v R &> /dev/null; then
