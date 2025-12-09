@@ -334,7 +334,6 @@ public:
         s = population->fleets[fleet_]->selectivity->evaluate(
             population->growth->evaluate(population->ages[age]));
     }
-  
 
     dq_["mortality_F"][i_age_year] +=
         population->fleets[fleet_]->Fmort[year] * s;
@@ -598,6 +597,22 @@ void CalculateLandingsNumbersAA(
 }
 
 /**
+ * @brief Calculates landings in numbers at length for each fleet for a given
+ * year and length, then adds the value to the expected landings in numbers at
+ * length for each fleet
+ *
+ * @param i_age_year dimension folded index for age and year
+ * @param year the year of expected landings composition is being calculated for
+ * @param age the age composition is being calculated for
+ */
+void CalculateLandingsNumbersAL(
+    std::shared_ptr<fims_popdy::Population<Type>> &population,
+    size_t i_age_year, size_t year, size_t age) {
+  // Implementation for length-based landings numbers at age
+  // This is a placeholder for the actual implementation
+}
+
+/**
  * @brief Calculate the index for a population.
  *
  * @param population The population.
@@ -641,6 +656,22 @@ void CalculateIndexNumbersAA(
              population->ages[age])) *
         pdq_["numbers_at_age"][i_age_year];
   }
+}
+
+/**
+ * @brief Calculates index sample in numbers at length for each fleet for
+ * a given year and length, then adds the value to the expected index in
+ * numbers at length for each fleet
+ *
+ * @param i_age_year dimension folded index for age and year
+ * @param year the year the expected index is being calculated for
+ * @param age the age index is being calculated for
+ */
+void CalculateIndexNumbersAL(
+    std::shared_ptr<fims_popdy::Population<Type>> &population,
+    size_t i_age_year, size_t year, size_t age) {
+  // Implementation for length-based index numbers at age
+  // This is a placeholder for the actual implementation
 }
 
 /**
