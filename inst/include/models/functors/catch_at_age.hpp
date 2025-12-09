@@ -608,8 +608,10 @@ void CalculateLandingsNumbersAA(
 void CalculateLandingsNumbersAL(
     std::shared_ptr<fims_popdy::Population<Type>> &population,
     size_t i_age_year, size_t year, size_t age) {
-  // Implementation for length-based landings numbers at age
-  // This is a placeholder for the actual implementation
+ for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
+    std::map<std::string, fims::Vector<Type>> &fdq_ =
+        this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
+ }
 }
 
 /**
@@ -670,6 +672,10 @@ void CalculateIndexNumbersAA(
 void CalculateIndexNumbersAL(
     std::shared_ptr<fims_popdy::Population<Type>> &population,
     size_t i_age_year, size_t year, size_t age) {
+      for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
+    std::map<std::string, fims::Vector<Type>> &fdq_ =
+        this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
+  }
   // Implementation for length-based index numbers at age
   // This is a placeholder for the actual implementation
 }
