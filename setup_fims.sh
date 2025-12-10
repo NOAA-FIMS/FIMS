@@ -231,9 +231,6 @@ else
         echo "!!! FIMS Setup is NOT complete. Please review the log for errors. !!!"
         exit $R_EXIT_CODE # Propagate the failure status
     fi    
-    # Only mark complete if successful
-    touch "$MARKER_FILE"
-    echo ">>> Setup Complete! Marker created."
 fi
 
 echo ""
