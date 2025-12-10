@@ -168,58 +168,65 @@ else
         exit 1
     fi
 
-    Rscript -e "
-        # Setup Library Path
-        # Define 'lib_loc' using R_LIBS_USER (standard user writable path)
-        # Create the directory if it doesn't exist
-        # Force the current R session to use this path
-        lib_loc <- Sys.getenv('R_LIBS_USER', unset = file.path('~', 'R', paste0('lib-fims-', getRversion())))
-        dir.create(lib_loc, recursive = TRUE, showWarnings = FALSE)
-        .libPaths(c(lib_loc, .libPaths()))
+    # Define the R code as a variable to be executed (Note: NO leading spaces here)
+    R_CODE="
+# Setup Library Path
+lib_loc <- Sys.getenv('R_LIBS_USER', unset = file.path('~', 'R', paste0('lib-fims-', getRversion())))
+dir.create(lib_loc, recursive = TRUE, showWarnings = FALSE)
+.libPaths(c(lib_loc, .libPaths()))
 
-        # Define Base Packages
-        pkgs <- c(
-          'languageserver',      # Good for VS Code and others
-          'FIMS',
-          'asar',
-          'stockplotr',
-          'renv',
-          'rlang',
-          'tinytex'
-        )
+# Define Base Packages
+pkgs <- c(
+    'languageserver',
+    'FIMS',
+    'asar',
+    'stockplotr',
+    'renv',
+    'rlang',
+    'tinytex'
+)
 
-        # Define the custom repositories for R-Universe packages (FIMS, asar, stockplotr)
-        repos <- c(
-          'https://noaa-fisheries-integrated-toolbox.r-universe.dev',
-          CRAN = 'https://packagemanager.posit.co/cran/latest',
-          'https://cloud.r-project.org'
-        )
+# Define the custom repositories for R-Universe packages (FIMS, asar, stockplotr)
+repos <- c(
+    'https://noaa-fisheries-integrated-toolbox.r-universe.dev',
+    CRAN = 'https://packagemanager.posit.co/cran/latest',
+    'https://cloud.r-project.org'
+)
 
-        install.packages(pkgs, repos = repos)
-        
-        # Install {pak} if missing
-        if (!require('pak', lib.loc = lib_loc, quietly = TRUE)) {
-          install.packages('pak', lib = lib_loc, repos = 'https://cloud.r-project.org')
-        }
-        
-        # Check for VS Code and add httpgd
-        if (Sys.getenv('TERM_PROGRAM') == 'vscode') {
-          message('>>> VS Code environment detected: Adding httpgd to install list.')
-          pak::pkg_install('nx10/httpgd', lib = lib_loc)
-        }
-        
-        # TinyTex Binary Installation
-        # This installs the actual TeX Live distribution needed to compile PDFs
-        if (require('tinytex', lib.loc = lib_loc, quietly = TRUE)) {
-            if (!tinytex::is_tinytex()) {
-                message('>>> TinyTeX binary not found. Installing now...')
-                tinytex::install_tinytex(force = TRUE)
-            } else {
-                message('>>> TinyTeX binary is already present.')
-            }
-        }
-    "
-    # Check the exit code of Rscript
+install.packages(pkgs, repos = repos)
+
+# Install {pak} if missing
+if (!require('pak', lib.loc = lib_loc, quietly = TRUE)) {
+    install.packages('pak', lib = lib_loc, repos = 'https://cloud.r-project.org')
+}
+
+# Check for VS Code and add httpgd
+if (Sys.getenv('TERM_PROGRAM') == 'vscode') {
+    message('>>> VS Code environment detected: Adding httpgd to install list.')
+    pak::pkg_install('nx10/httpgd', lib = lib_loc)
+}
+
+# TinyTex Binary Installation
+if (require('tinytex', lib.loc = lib_loc, quietly = TRUE)) {
+    if (!tinytex::is_tinytex()) {
+        message('>>> TinyTeX binary not found. Installing now...')
+        tinytex::install_tinytex(force = TRUE)
+    } else {
+        message('>>> TinyTeX binary is already present.')
+    }
+}
+"
+    # --- Execute R Code based on OS ---
+    if [ "$MACHINE" == "Windows" ]; then
+        # On Windows, launch Rscript via cmd to avoid DLL/shell conflicts
+        # This prevents the Segmentation Fault in Git Bash/MinGW
+        cmd /c Rscript -e "$R_CODE"
+    else
+        # On Linux/Mac, use the standard bash execution
+        Rscript -e "$R_CODE"
+    fi
+
+    # Check the exit code of Rscript (or cmd)
     R_EXIT_CODE=$?
     if [ $R_EXIT_CODE -eq 0 ]; then
         # Only mark complete if Rscript ran without error
