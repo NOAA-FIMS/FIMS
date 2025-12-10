@@ -189,12 +189,12 @@ else
         )
 
         # Define the custom repositories for R-Universe packages (FIMS, asar, stockplotr)
-        repos_universe <- c(
+        repos <- c(
           'https://noaa-fisheries-integrated-toolbox.r-universe.dev',
-          'https://cloud.r-project.org' # Default CRAN for CRAN packages
+          'CRAN = 'https://packagemanager.posit.co/cran/latest'
         )
 
-        install.packages(pkgs, repos = repos_universe)
+        install.packages(pkgs, repos = repos)
         
         # Install {pak} if missing
         if (!require('pak', lib.loc = lib_loc, quietly = TRUE)) {
