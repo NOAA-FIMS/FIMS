@@ -119,10 +119,10 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: 'doxygen/*'
+        source_file: 'doxygen'
         destination_repo: 'NOAA-FIMS/noaa-fims.github.io'
-        destination_folder: 'doxygen'
+        destination_folder: './'
         destination_branch: 'main'
         user_email: 'kelli.johnson@noaa.gov' # your email
         user_name: 'Kelli Johnson'           # your login
-        commit_message: 'Docs: run Doxygen'    
+        commit_message: 'Docs: run Doxygen'
