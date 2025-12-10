@@ -191,7 +191,8 @@ else
         # Define the custom repositories for R-Universe packages (FIMS, asar, stockplotr)
         repos <- c(
           'https://noaa-fisheries-integrated-toolbox.r-universe.dev',
-          'CRAN = 'https://packagemanager.posit.co/cran/latest'
+          CRAN = 'https://packagemanager.posit.co/cran/latest',
+          'https://cloud.r-project.org'
         )
 
         install.packages(pkgs, repos = repos)
