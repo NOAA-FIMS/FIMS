@@ -130,30 +130,6 @@ if [ ! -f "$USER_HOME/.Rprofile" ] || ! grep -Fq "options(repos" "$USER_HOME/.Rp
     fi
 fi
 
-# Setup VS Code Specifics (httpgd) 
-# This adds a function to .Rprofile to correctly launch the httpgd graphics device 
-# for plotting when R is run inside VS Code.
-if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-    echo ">>> VS Code detected: Configuring httpgd graphics device..."
-    
-    # Check if we already added the httpgd config to avoid duplicates
-    if ! grep -Fq "httpgd" "$USER_HOME/.Rprofile"; then
-        cat <<EOT >> "$USER_HOME/.Rprofile"
-
-# VS Code Configuration (Added by FIMS setup)
-if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") {
-    if (requireNamespace("httpgd", quietly = TRUE)) {
-        options(vsc.plot = FALSE)
-        options(device = function(...) {
-            httpgd::hgd()
-            .Call("httpgd_browse", package = "httpgd")
-        })
-    }
-}
-EOT
-    fi
-fi
-
 # --- R PACKAGE INSTALLATION ---
 
 if [ -f "$MARKER_FILE" ]; then
@@ -181,6 +157,7 @@ pkgs <- c(
     'FIMS',
     'asar',
     'stockplotr',
+    'remotes',
     'renv',
     'rlang',
     'tinytex'
@@ -195,15 +172,10 @@ repos <- c(
 
 install.packages(pkgs, repos = repos)
 
-# Install {pak} if missing
-if (!require('pak', lib.loc = lib_loc, quietly = TRUE)) {
-    install.packages('pak', lib = lib_loc, repos = 'https://cloud.r-project.org')
-}
-
 # Check for VS Code and add httpgd
 if (Sys.getenv('TERM_PROGRAM') == 'vscode') {
     message('>>> VS Code environment detected: Adding httpgd to install list.')
-    pak::pkg_install('nx10/httpgd', lib = lib_loc)
+    remotes::install_github("nx10/httpgd")
 }
 
 # TinyTex Binary Installation
@@ -232,6 +204,31 @@ if (require('tinytex', lib.loc = lib_loc, quietly = TRUE)) {
         # Only mark complete if Rscript ran without error
         touch "$MARKER_FILE"
         echo ">>> Setup Complete! Marker created."
+        
+        # Set up httpgd
+        if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+            echo ">>> VS Code detected: Configuring httpgd graphics device in .Rprofile..."
+            
+            # Check if we already added the httpgd config to avoid duplicates
+            if ! grep -Fq "httpgd" "$USER_HOME/.Rprofile"; then
+                cat <<EOT >> "$USER_HOME/.Rprofile"
+
+# VS Code Configuration (Added by FIMS setup for httpgd plotting)
+# This code runs whenever R starts in a VS Code interactive session.
+if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") {
+    if (requireNamespace("httpgd", quietly = TRUE)) {
+        options(vsc.plot = FALSE)
+        # Setting the device option is what tells R to use httpgd automatically
+        options(device = function(...) {
+            httpgd::hgd()
+            .Call("httpgd_browse", package = "httpgd") # Triggers the VS Code plot viewer
+        })
+    }
+}
+EOT
+                echo ">>> .Rprofile updated successfully."
+            fi
+        fi
     else
         # Exit with error status and display warning
         echo "!!! ERROR: R package installation failed (Exit Code: $R_EXIT_CODE). !!!"
