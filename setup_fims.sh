@@ -117,17 +117,32 @@ echo "--- Configuring R Environment ---"
 # Setup CRAN mirror to Posit Package Manager (PPM)
 # PPM provides system-specific BINARY packages for Linux, Mac, and Windows, 
 # significantly speeding up installs and preventing compilation errors.
+PPM_URL="" # Initialize the variable
+
+if [ "$MACHINE" == "Linux" ]; then
+    # 1. LINUX: Requires dynamic codename for guaranteed binary compatibility.
+    LINUX_CODENAME=$(lsb_release -cs 2>/dev/null || echo "latest")
+    
+    # Use the distribution-specific binary URL (assuming Ubuntu/Debian)
+    PPM_URL="https://packagemanager.posit.co/cran/ubuntu/${LINUX_CODENAME}/latest"
+    echo ">>> Generated Binary PPM URL for Linux: $PPM_URL"
+
+elif [ "$MACHINE" == "Mac" ] || [ "$MACHINE" == "Windows" ]; then
+    # 2. MAC and WINDOWS: Use the universal 'latest' URL.
+    #    PPM handles the redirection to the correct binary path (Windows or Mac).
+    PPM_URL="https://packagemanager.posit.co/cran/latest"
+    echo ">>> Generated Binary PPM URL for $MACHINE: $PPM_URL" 
+
+else
+    # 3. UNKNOWN: Fallback to the standard generic CRAN mirror.
+    PPM_URL="https://cloud.r-project.org"
+    echo ">>> Falling back to standard CRAN URL: $PPM_URL"
+fi
+
 if [ ! -f "$USER_HOME/.Rprofile" ] || ! grep -Fq "options(repos" "$USER_HOME/.Rprofile"; then
-    # Use PPM for Linux, Mac, and Windows (MINGW/MSYS/CYGWIN detection)
-    # The default 'latest' PPM URL provides system-specific binaries.
-    if [ "$MACHINE" != "UNKNOWN:${OS}" ]; then
-        echo "options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/latest'))" >> "$USER_HOME/.Rprofile"
-        echo ">>> Configured R to use Posit Package Manager (PPM)."
-    else
-        # Fallback to standard CRAN for unknown or unsupported systems
-        echo "options(repos = c(CRAN = 'https://cloud.r-project.org'))" >> "$USER_HOME/.Rprofile"
-        echo ">>> Configured R to use standard CRAN mirror."
-    fi
+    # Use the dynamically determined URL ($PPM_URL) for R's default mirror
+    echo "options(repos = c(CRAN = '$PPM_URL'))" >> "$USER_HOME/.Rprofile"
+    echo ">>> Configured R to use Posit Package Manager (PPM)."
 fi
 
 # --- R PACKAGE INSTALLATION ---
@@ -157,7 +172,7 @@ pkgs <- c(
     'FIMS',
     'asar',
     'stockplotr',
-    'remotes',
+    'pak',
     'renv',
     'rlang',
     'tinytex'
@@ -166,7 +181,7 @@ pkgs <- c(
 # Define the custom repositories for R-Universe packages (FIMS, asar, stockplotr)
 repos <- c(
     'https://noaa-fisheries-integrated-toolbox.r-universe.dev',
-    CRAN = 'https://packagemanager.posit.co/cran/latest',
+    CRAN = '$PPM_URL',
     'https://cloud.r-project.org'
 )
 
@@ -175,7 +190,7 @@ install.packages(pkgs, repos = repos)
 # Check for VS Code and add httpgd
 if (Sys.getenv('TERM_PROGRAM') == 'vscode') {
     message('>>> VS Code environment detected: Adding httpgd to install list.')
-    remotes::install_github('nx10/httpgd')
+    pak::pkg_install('nx10/httpgd', lib = lib_loc)
 }
 
 # TinyTex Binary Installation
