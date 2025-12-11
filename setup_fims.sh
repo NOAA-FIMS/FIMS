@@ -189,14 +189,7 @@ if (require('tinytex', lib.loc = lib_loc, quietly = TRUE)) {
 }
 "
     # --- Execute R Code based on OS ---
-    if [ "$MACHINE" == "Windows" ]; then
-        # On Windows, launch Rscript via cmd to avoid DLL/shell conflicts
-        # This prevents the Segmentation Fault in Git Bash/MinGW
-        cmd /c Rscript -e "$R_CODE"
-    else
-        # On Linux/Mac, use the standard bash execution
-        Rscript -e "$R_CODE"
-    fi
+    Rscript -e "$R_CODE"
 
     # Check the exit code of Rscript (or cmd)
     R_EXIT_CODE=$?
