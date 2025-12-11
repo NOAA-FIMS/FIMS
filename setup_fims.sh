@@ -175,7 +175,7 @@ install.packages(pkgs, repos = repos)
 # Check for VS Code and add httpgd
 if (Sys.getenv('TERM_PROGRAM') == 'vscode') {
     message('>>> VS Code environment detected: Adding httpgd to install list.')
-    remotes::install_github("nx10/httpgd")
+    remotes::install_github('nx10/httpgd')
 }
 
 # TinyTex Binary Installation
