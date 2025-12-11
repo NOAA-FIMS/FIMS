@@ -172,7 +172,7 @@ pkgs <- c(
     'FIMS',
     'asar',
     'stockplotr',
-    'pak',
+    'remotes',
     'renv',
     'rlang',
     'tinytex'
@@ -190,7 +190,7 @@ install.packages(pkgs, repos = repos)
 # Check for VS Code and add httpgd
 if (Sys.getenv('TERM_PROGRAM') == 'vscode') {
     message('>>> VS Code environment detected: Adding httpgd to install list.')
-    pak::pkg_install('nx10/httpgd', lib = lib_loc)
+    remotes::install_github('nx10/httpgd')
 }
 
 # TinyTex Binary Installation
