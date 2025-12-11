@@ -221,7 +221,6 @@ if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") {
         # Setting the device option is what tells R to use httpgd automatically
         options(device = function(...) {
             httpgd::hgd()
-            .Call("httpgd_browse", package = "httpgd") # Triggers the VS Code plot viewer
         })
     }
 }
