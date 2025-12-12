@@ -1,10 +1,26 @@
-# Runs devtools::document() and styler::style_active_package(), then opens a
-# pull request to the branch that had changes in the push that triggered the
-# workflow.
+# Runs devtools::document() and styler::style_active_package() when a PR is
+# opened or updated, then opens a pull request with changes targeting the
+# feature branch.
+#
+# Workflow Trigger:
+# - This workflow runs when a pull request is opened or updated (synchronized)
+#   targeting the 'main' or 'dev' branches.
+# - The R code styling and documentation is applied to the source (head) branch
+#   of the PR, NOT to main or dev.
+# - If styling/documentation changes are needed, a new PR will be created targeting
+#   the original feature branch.
+# - Example: If PR from 'feature-branch' -> 'dev' needs styling, a new PR will be
+#   created targeting 'feature-branch'.
+# - The styling PR must be merged into the feature branch before the original
+#   PR can be merged into main/dev.
+#
+# This workflow calls a reusable workflow from nmfs-ost/ghactions4r that handles
+# the actual R code documentation and styling operations.
 name: call-doc-and-style-r
 
 on:
-  push:
+  pull_request:
+    types: [opened, reopened, synchronize]
     branches:
       - dev 
       - main
