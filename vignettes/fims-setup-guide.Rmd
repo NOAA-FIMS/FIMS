@@ -2,7 +2,7 @@
 title: "FIMS User Setup Guide"
 vignette: >
   %\VignetteIndexEntry{FIMS User Setup Guide}
-  %\VignetteEngine{quarto::html}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 format:
   html:
@@ -25,8 +25,9 @@ This is the fastest method for the training session.
 bash <(curl -sL https://raw.githubusercontent.com/NOAA-FIMS/FIMS/add-google-cloud-workstations-bash/setup_fims.sh)
 ```
 
-::: {.callout-note collapse="true"}
-## Deep Dive: What does this script do? (Click to expand)
+<details>
+<summary>Deep Dive: What does this script do? (Click to expand)</summary>
+
 The setup_fims.sh script performs several automated tasks:
 
 - Checks OS: Detects you are on Linux.
@@ -36,4 +37,4 @@ The setup_fims.sh script performs several automated tasks:
 - Configures R: Sets up ~/.Renviron to use a persistent library in your Home directory.
 
 - Installs Packages: Downloads pre-compiled binaries from Posit Package Manager (PPM) to save time. 
-:::
+</details>
