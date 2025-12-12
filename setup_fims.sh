@@ -133,4 +133,7 @@ echo ""
 echo "******************************************************************"
 echo "* FIMS Setup Complete for $MACHINE!"
 echo "* All R packages and system dependencies are verified."
+echo "* Run 'renv::init()' in the R console to create reproducible environments
+        for your R projects. Learn more about renv:
+        https://rstudio.github.io/renv/articles/renv.html"
 echo "******************************************************************"
