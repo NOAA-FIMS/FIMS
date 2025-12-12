@@ -104,7 +104,7 @@ jobs:
           cobertura-merge -o merged-coverage.xml package1=gcovr-coverage.xml package2=testthat-coverage.xml
       
       - name: Use octocov to create coverage summaries
-          uses: k1LoW/octocov-action@v1
+        uses: k1LoW/octocov-action@v1
 
       - name: Upload artifact to GitHub Action Run
         uses: actions/upload-artifact@v5
