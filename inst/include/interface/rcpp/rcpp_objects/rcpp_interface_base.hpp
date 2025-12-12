@@ -127,6 +127,20 @@ class Parameter {
 uint32_t Parameter::id_g = 0;
 
 /**
+ * @brief Sanitize a double value by replacing NaN or Inf with -999.0.
+ *
+ * @param x The input double value.
+ * @return The sanitized double value.
+ */
+inline double sanitize_val(double x) {
+    if (std::isnan(x) || std::isinf(x)) {
+        return -999.0;
+    }
+    return x;
+}
+
+
+/**
  * @brief Output for std::ostream& for a parameter.
  *
  * @param out The stream.
@@ -134,9 +148,9 @@ uint32_t Parameter::id_g = 0;
  * @return std::ostream&
  */
 std::ostream& operator<<(std::ostream& out, const Parameter& p) {
-  out << "{\"id\": " << p.id_m << ",\n\"value\": " << p.initial_value_m
-      << ",\n\"estimated_value\": " << p.final_value_m
-      << ",\n\"uncertainty\": " << p.uncertainty_m << ",\n\"min\": ";
+  out << "{\"id\": " << p.id_m << ",\n\"value\": " << sanitize_val(p.initial_value_m)
+      << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m)
+      << ",\n\"uncertainty\": " << sanitize_val(p.uncertainty_m) << ",\n\"min\": ";
   if (p.min_m == -std::numeric_limits<double>::infinity()) {
     out << "\"-Infinity\"";
   } else {
@@ -705,7 +719,7 @@ class FIMSRcppInterfaceBase {
     } else if (value == -std::numeric_limits<double>::infinity()) {
       ss << "\"-Infinity\"";
     } else if (value != value) {
-      ss << "\"NaN\"";
+      ss << "-999";
     } else {
       ss << value;
     }
