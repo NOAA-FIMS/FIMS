@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ------------------------------------------------------------------
-# NOAA FIMS User Setup Script (Production Grade)
+# NOAA FIMS User Setup Script
 # ------------------------------------------------------------------
 
 set -e  # Exit immediately if a command fails
 
-# --- 1. DETECT SYSTEM ---
+# --- DETECT SYSTEM ---
 OS="$(uname -s)"
 ARCH="$(uname -m)" 
 case "${OS}" in
@@ -18,7 +18,7 @@ esac
 
 echo ">>> Detected OS: $MACHINE ($ARCH)"
 
-# --- 2. QUARTO INSTALLATION ---
+# --- QUARTO INSTALLATION ---
 if command -v quarto &> /dev/null; then
     echo ">>> Quarto is already installed ($(quarto --version))."
 else
@@ -35,7 +35,7 @@ else
     fi
 fi
 
-# --- 3. SYSTEM DEPENDENCIES ---
+# --- SYSTEM DEPENDENCIES ---
 if [ "$MACHINE" == "Linux" ] && command -v sudo &> /dev/null; then
     echo ">>> Syncing Linux dependencies..."
     sudo apt-get update -qq
@@ -52,7 +52,7 @@ elif [ "$MACHINE" == "Mac" ]; then
     fi
 fi
 
-# --- 4. R CONFIGURATION (.Rprofile) ---
+# --- R CONFIGURATION (.Rprofile) ---
 R_PROF="$HOME/.Rprofile"
 touch "$R_PROF"
 [ -n "$(tail -c1 "$R_PROF")" ] && echo "" >> "$R_PROF"
@@ -61,7 +61,7 @@ if ! grep -Fq "packagemanager.posit.co" "$R_PROF"; then
     echo "options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/latest'))" >> "$R_PROF"
 fi
 
-# --- 5. SMART R INSTALLATION WITH ERROR HANDLING ---
+# --- R INSTALLATION WITH ERROR HANDLING ---
 echo "--- Checking R Packages ---"
 
 # This R code block performs the installation AND a final verification
@@ -78,7 +78,7 @@ repos <- c(
     CRAN = 'https://packagemanager.posit.co/cran/latest'
 )
 
-# 1. Install missing packages
+# Install missing packages
 installed_before <- installed.packages(lib.loc = lib_loc)[, 'Package']
 missing <- setdiff(pkgs, installed_before)
 
@@ -87,17 +87,17 @@ if (length(missing) > 0) {
     install.packages(missing, lib = lib_loc, repos = repos)
 }
 
-# 2. Handle VS Code httpgd
+# Handle VS Code httpgd
 if (Sys.getenv('TERM_PROGRAM') == 'vscode' && !'httpgd' %in% installed.packages()[, 'Package']) {
     remotes::install_github('nx10/httpgd', upgrade = 'never')
 }
 
-# 3. TinyTeX check
+# TinyTeX check
 if (require('tinytex', quietly = TRUE) && !tinytex::is_tinytex()) {
     tinytex::install_tinytex(force = TRUE)
 }
 
-# 4. FINAL CRITICAL VERIFICATION
+# FINAL CRITICAL VERIFICATION
 # This is where we force the script to fail if a package didn't install
 final_installed <- installed.packages(lib.loc = lib_loc)[, 'Package']
 failed <- setdiff(pkgs, final_installed)
@@ -118,7 +118,7 @@ if ! Rscript -e "$R_CODE"; then
     exit 1
 fi
 
-# --- 6. FINAL VS CODE PLOTTING CONFIG ---
+# --- FINAL VS CODE PLOTTING CONFIG ---
 if [[ "$TERM_PROGRAM" == "vscode" ]] && ! grep -Fq "httpgd::hgd()" "$R_PROF"; then
     cat <<'EOT' >> "$R_PROF"
 if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") {
