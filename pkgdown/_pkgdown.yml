@@ -4,7 +4,7 @@ home:
   title: Fisheries Integrated Modeling System (FIMS)
   links:
   - text: Documentation of C++ Code
-    href: https://noaa-fims.github.io/FIMS-docs/
+    href: https://noaa-fims.github.io/doxygen/
   - text: FIMS Developer Handbook
     href: https://noaa-fims.github.io/collaborative_workflow/
 
