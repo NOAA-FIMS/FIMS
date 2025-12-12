@@ -470,6 +470,7 @@ IRIX
 isdigit
 isDouble
 isnan
+isinf
 IsReporting
 isspace
 istringstream

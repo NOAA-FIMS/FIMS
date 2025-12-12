@@ -402,14 +402,14 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       for (size_t i = 0; i < dq.size() - 1; i++) {
         if (dq[i] != dq[i])  // check for NaN
         {
-          ss << "\"-999\", ";
+          ss << "-999" << ", ";
         } else {
           ss << dq[i] << ", ";
         }
       }
       if (dq[dq.size() - 1] != dq[dq.size() - 1])  // check for NaN
       {
-        ss << "\"-999\"";
+        ss << "-999]" << ",\n";
       } else {
         ss << dq[dq.size() - 1] << "],\n";
       }
