@@ -9,4 +9,4 @@ on:
 
 jobs:
   call-workflow:
-    uses: noaa-fims/fims/.github/workflows/dtest-coverage-summary.yml@dev-covr
+    uses: noaa-fims/fims/.github/workflows/test-coverage-summary.yml@dev-covr
