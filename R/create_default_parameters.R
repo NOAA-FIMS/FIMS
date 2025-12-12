@@ -270,7 +270,7 @@ create_default_Population <- function(
     dplyr::mutate(
       label = "log_M",
       value = log(M_value),
-      age = rep(ages, n_years), 
+      age = rep(ages, n_years),
       time = rep(years, each = n_ages),
       estimation_type = "constant"
     ) |>
