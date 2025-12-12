@@ -1,0 +1,113 @@
+# Reusable workflow to calculate coverage; don't push to code cov.
+# instead, use octocov, which allows all data to remain on github.
+
+name: test-coverage-summary
+on:
+  workflow_call:
+    inputs:
+      use-public-rspm:
+        required: false
+        type: boolean
+        default: true
+      depends_on_quarto:
+        required: false
+        type: boolean
+        default: false
+        
+
+# limits permissions to write, as the common use case is for pull requests;
+# this means certain options may not work, but makes the workflow more secure
+permissions:
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  calc-cov-summaries:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: ${{ inputs.use-public-rspm }}
+
+
+      # need: coverage allows users to put additional pkgs for coverage calculations
+      # into the description file under a field called Config/Needs/coverage
+      # For more info, see https://r-pkgs.org/dependencies-in-practice.html#sec-dependencies-nonstandard-config-needs
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::covr, any::xml2, any::DT, any::htmltools
+          needs: coverage
+
+      - name: If depends on quarto, install.
+        if: inputs.depends_on_quarto == true
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Calc. Test coverage
+        run: |
+          cov <- covr::package_coverage(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
+          )
+          print(cov)
+          covr::to_cobertura(cov, filename = "testthat_coverage.xml")
+          covr::report(cov, browse = FALSE, file = "coverage_report.html")
+        shell: Rscript {0}
+
+      - name: Install Ninja
+        run: sudo apt-get install ninja-build
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::remotes
+      - name: install local version of FIMS
+        run: remotes::install_local(upgrade= "always", force = TRUE)
+        shell: Rscript {0}
+      - name: setup for gtest
+        run: FIMS:::setup_gtest()
+        shell: Rscript {0}
+      #note: the following configure, build and test steps could instead
+      # be run from r using FIMS::setup_and_run_gtest()
+      - name: Configure
+      # Do not run -DBUILD_DOC=OFF locally. Only run cmake -S . -B build -G Ninja locally.
+        run: |
+          cmake -S . -B build -DBUILD_DOC=OFF -G Ninja 
+          
+      - name: Build
+        run: |  
+          cmake --build build --parallel 16
+          
+      - name: Test
+        run: |
+          ctest --test-dir build --parallel 16
+      
+      - name: Install gcovr
+        run: |
+          pip install gcovr
+
+      - name: Run gcovr 
+        run: |  
+          gcovr --exclude tests/ --cobertura gcovr-coverage.xml
+
+      - name: install merge tool
+        run: npm install cobertura-merge
+
+      - name: merge reports
+        run: |
+          cobertura-merge -o merged-coverage.xml package1=gcovr-coverage.xml package2=testthat-coverage.xml
+      
+      - name: Use octocov to create coverage summaries
+          uses: k1LoW/octocov-action@v1
+
+      - name: Upload artifact to GitHub Action Run
+        uses: actions/upload-artifact@v5
+        with:
+          name: merged-coverage.xml
+          path: ./merged-coverage.html

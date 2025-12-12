@@ -1,0 +1,12 @@
+# Runs devtools::document() and styler::style_active_package(), then opens a
+# pull request to the branch that had changes in the push that triggered the
+# workflow.
+name: call-test-coverage-summary
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  call-workflow:
+    uses: noaa-fims/fims/.github/workflows/dtest-coverage-summary.yml@dev-covr
