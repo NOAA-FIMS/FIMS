@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.234.0/containers/r
 {
-  "name": "R (rocker/r-ver base)",
+  "name": "FIMS Developer",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "image": "ghcr.io/rocker-org/devcontainer/r-ver:4.3", //commma needed if other sections are used.
   // Add capAdd and securityOpt to allow debugging with lldb
