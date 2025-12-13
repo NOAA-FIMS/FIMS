@@ -1,0 +1,83 @@
+---
+title: "Templated Cpp"
+author: "Andrea Havron"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Because C++ is a strongly typed language, every function must be declared with a specific types, e.g. `int`, `float`, `double`, etc.
+
+It can be repetitive to write out one function that accepts multiple types. For example, in [Getting to Know C++](https://noaa-fims.github.io/FIMS_training/articles/GettingToKnowCpp.html#simple-addition-program) vignette, we specified two separate functions for adding integers and doubles:
+
+```{Rcpp eval = FALSE}
+int add(int x, int y) {
+  x = 1;
+  y = 2;
+  return x + y;
+}
+
+double add(double x, double y) {
+  x = 1.2;
+  y = 2.4;
+  return x + y;
+}
+```
+
+A separate function is needed for each type we want to be able to return. This can get tedious and repetitive, and can also lead to more code to maintain and more potential for bugs. To simplify matters, C++ allows for templated code, which allows for a generic type.
+
+## Templates
+
+- Can be defined using **template** along with **typename** or **class**
+```cpp
+template <typename A>
+template <class A>
+
+//FIMS uses Type as the typename or class:
+template <class Type>
+Type my_add(Type x, Type y){
+  return x + y
+}
+```
+
+
+Now when we run the program, we can use the function, `my_add` with different data types:
+```cpp
+#include <iostream>
+
+template <typename Type>
+Type my_add(Type x, Type y){
+  return x + y;
+}
+
+int main(){
+  //works with integers
+  std::cout << "Type is int: " << my_add(1,2) << std::endl;
+  
+  //works with floats
+  std::cout << "Type is float: " << my_add(1.2, 3.2) << std::endl;
+  
+  //works with doubles
+  std::cout << "Type is double: " << my_add(1.52757396774, 6.83480375227) << std::endl;
+  
+  return 0;
+  
+}
+```
+Rcpp does not support C++ templating so this example can be run from your command prompt. 
+
+- You will need to navigate to the directory where the .cpp file lives (`src/my_templated_add.cpp`)
+- You will need a C++ compiler installed and on your path ([see instructions here](https://noaa-fims.github.io/collaborative_workflow/developer-software-and-installation-guide.html#c-compiler)). 
+- The following uses gcc installed for Windows users using rtools4.
+```{r eval=FALSE}
+cd local_path/FIMS_training/src
+g++ my_templated_add.cpp -o a.exe
+a.exe
+
+Type is int: 3
+Type in float: 4.4
+Type is double: 8.36238
+```
+
