@@ -39,7 +39,7 @@ fi
 if [ "$MACHINE" == "Linux" ] && command -v sudo &> /dev/null; then
     echo ">>> Syncing Linux dependencies..."
     sudo apt-get update -qq
-    sudo apt-get install -y --no-install-recommends build-essential libcairo2-dev libcurl4-openssl-dev libpoppler-cpp-dev libssl-dev libxml2-dev git wget perl xz-utils r-base
+    sudo apt-get install -y --no-install-recommends build-essential libcairo2-dev libcurl4-openssl-dev libpoppler-cpp-dev libssl-dev libxml2-dev git wget perl xz-utils r-base libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libwebp-dev liblapack-dev libblas-dev
 elif [ "$MACHINE" == "Mac" ]; then
     if ! xcode-select -p &>/dev/null; then
         echo ">>> Xcode CLI Tools not found. Starting installation..."
