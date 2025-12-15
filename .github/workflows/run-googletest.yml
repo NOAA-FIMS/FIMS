@@ -46,7 +46,7 @@ jobs:
         ctest --test-dir build --parallel 16
     
     - name: Upload log when tests failed
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       if: failure()
       with:
         name: googletest-log-${{ matrix.os }}
