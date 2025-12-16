@@ -97,7 +97,7 @@ methods::setMethod(
     ))
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
     terminal_ssb <- sapply(
-      x@report[["ssb"]],
+      x@report[["spawning_biomass"]],
       function(y) utils::tail(y, 1)
     )
     cli::cli_inform(c(
