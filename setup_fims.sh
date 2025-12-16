@@ -89,7 +89,7 @@ if (length(missing) > 0) {
 
 # Handle VS Code httpgd
 if (Sys.getenv('TERM_PROGRAM') == 'vscode' && !'httpgd' %in% installed.packages()[, 'Package']) {
-    remotes::install_github('nx10/httpgd', upgrade = 'never')
+    remotes::install_github('nx10/httpgd')
 }
 
 # TinyTeX check
