@@ -55,4 +55,4 @@ function does the translation for you so you can think in R terms.
 Methods of summary functions include \code{max}, \code{min}, \code{range}, \code{prod}, \code{sum},
 \code{any}, and \code{all}.
 }
-\keyword{set_methods}
+\keyword{internal}
