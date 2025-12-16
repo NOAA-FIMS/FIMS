@@ -111,12 +111,18 @@ if (length(failed) > 0) {
 "
 
 # Execute R and catch failure
-if ! Rscript -e "$R_CODE"; then
+R_TEMP_FILE=$(mktemp -u --suffix=.R)
+echo "$R_CODE" > "$R_TEMP_FILE"
+
+if ! Rscript "$R_TEMP_FILE"; then
+    rm "$R_TEMP_FILE" # Clean up on failure
     echo "------------------------------------------------------------------"
     echo "!!! ERROR: R Setup failed. See errors above. !!!"
     echo "------------------------------------------------------------------"
     exit 1
 fi
+
+rm "$R_TEMP_FILE" # Clean up on success
 
 # --- FINAL VS CODE PLOTTING CONFIG ---
 if [[ "$TERM_PROGRAM" == "vscode" ]] && ! grep -Fq "httpgd::hgd()" "$R_PROF"; then
