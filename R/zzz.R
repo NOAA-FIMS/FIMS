@@ -43,7 +43,7 @@
 #' @param value The value you want to set the indexed location to.
 #' @return
 #' For `[<-`, the index `i` of object `x` is set to `value`.
-#' @keywords set_methods
+#' @keywords internal
 #' @rdname Rcpp_ParameterVector
 methods::setMethod(
   f = "[<-",
@@ -66,7 +66,7 @@ methods::setMethod(
 #'   starts at one, of the vector that you wish to get information from.
 #' @return
 #' For `[`, the index `i` of object `x` is returned.
-#' @keywords set_methods
+#' @keywords internal
 #' @rdname Rcpp_ParameterVector
 methods::setMethod(
   f = "[",
@@ -81,7 +81,7 @@ methods::setMethod(
 #' @param x A numeric vector.
 #' @return
 #' For `length()`, the length of object `x` is returned as an integer.
-#' @keywords set_methods
+#' @keywords internal
 #' @rdname Rcpp_ParameterVector
 methods::setMethod(
   f = "length",
@@ -96,7 +96,7 @@ methods::setMethod(
 #' @param x A numeric vector.
 #' @return
 #' For `sum()`, the sum of object `x` is returned as a numeric value.
-#' @keywords set_methods
+#' @keywords internal
 #' @rdname Rcpp_ParameterVector
 methods::setMethod(
   f = "sum",
@@ -118,7 +118,7 @@ methods::setMethod(
 #' @return
 #' For `dim()`, the dimensions of object `x` is returned as a single integer
 #' because there is only one dimension to return for a vector.
-#' @keywords set_methods
+#' @keywords internal
 #' @rdname Rcpp_ParameterVector
 methods::setMethod(
   f = "dim",
@@ -139,7 +139,7 @@ methods::setMethod(
 #' @return
 #' A numeric or logical value(s) depending on the generic and the length of
 #' the input values.
-#' @keywords set_methods
+#' @keywords internal
 #' @export
 #' @rdname Rcpp_Math
 methods::setMethod(
@@ -248,7 +248,7 @@ methods::setMethod(
 #' @param x An Rcpp_ParameterVector class object.
 #' @return
 #' A vector of numeric values.
-#' @keywords set_methods
+#' @keywords internal
 #' @export
 #' @rdname Rcpp_Math
 methods::setMethod(
@@ -272,7 +272,7 @@ methods::setMethod(
 #' @return
 #' `Summary` returns a single or two numeric or logical values.
 #' @export
-#' @keywords set_methods
+#' @keywords internal
 #' @rdname Rcpp_ParameterVector
 methods::setMethod(
   "Summary",
