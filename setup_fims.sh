@@ -84,7 +84,7 @@ missing <- setdiff(pkgs, installed_before)
 
 if (length(missing) > 0) {
     message('>>> Installing missing: ', paste(missing, collapse = ', '))
-    install.packages(missing, lib = lib_loc, repos = repos)
+    install.packages(missing, lib = lib_loc, repos = repos, INSTALL_opts = c('--no-lock'))
 }
 
 # Handle VS Code httpgd
@@ -111,18 +111,24 @@ if (length(failed) > 0) {
 "
 
 # Execute R and catch failure
-R_TEMP_FILE=$(mktemp -u --suffix=.R)
+R_TEMP_FILE=$(mktemp)
+# Rename it to have an .R extension so Rscript is happy
+mv "$R_TEMP_FILE" "${R_TEMP_FILE}.R"
+R_TEMP_FILE="${R_TEMP_FILE}.R"
+
+cleanup() {
+  rm "$R_TEMP_FILE"
+}
+trap cleanup EXIT
+
 echo "$R_CODE" > "$R_TEMP_FILE"
 
 if ! Rscript "$R_TEMP_FILE"; then
-    rm "$R_TEMP_FILE" # Clean up on failure
     echo "------------------------------------------------------------------"
     echo "!!! ERROR: R Setup failed. See errors above. !!!"
     echo "------------------------------------------------------------------"
     exit 1
 fi
-
-rm "$R_TEMP_FILE" # Clean up on success
 
 # --- FINAL VS CODE PLOTTING CONFIG ---
 if [[ "$TERM_PROGRAM" == "vscode" ]] && ! grep -Fq "httpgd::hgd()" "$R_PROF"; then
