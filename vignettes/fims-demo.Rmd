@@ -10,6 +10,13 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# Set local options so vignette output is clean and consistent
+# (avoids color codes and subtle formatting in rendered docs)
+withr::local_options(list(
+  cli.num_colors = 1,
+  crayon.enabled = FALSE,
+  pillar.subtle = FALSE
+))
 ```
 
 ## FIMS
@@ -76,13 +83,15 @@ The `create_default_configurations()` function is designed to generate a set of 
 
 ```{r configurations, max.height='100px', attr.output='.numberLines'}
 # Create default configurations based on the data
-default_configurations <- create_default_configurations(data = data_4_model) |>
-  print()
+default_configurations <- create_default_configurations(data = data_4_model)
+
+default_configurations
 
 # The output is a nested tibble, with details in the `data` column.
 default_configurations_unnested <- default_configurations |>
-  tidyr::unnest(cols = data) |>
-  print()
+  tidyr::unnest(cols = data)
+
+default_configurations_unnested
 ```
 
 ### Update configurations
@@ -98,8 +107,9 @@ updated_configurations <- default_configurations_unnested |>
       module_type = c("DoubleLogistic")
     ),
     by = c("module_name", "fleet_name")
-  ) |>
-  print()
+  )
+  
+  updated_configurations
 
 # Nest updated_configurations
 updated_configurations_nested <- updated_configurations |>
@@ -126,12 +136,14 @@ By just passing the configurations and the data to `create_default_parameters()`
 default_parameters <- create_default_parameters(
   configurations = default_configurations,
   data = data_4_model
-) |>
-  print()
+) 
+
+default_parameters
 
 # Unnest the default_parameters to see the detailed parameters
-default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data) |>
-  print()
+default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data)
+
+default_parameters_unnested
 ```
 
 ### Update parameters
@@ -254,7 +266,7 @@ substr(recruitment_log, 1, 100)
 
 The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where, we recommend using {stockplotr} where possible.
 
-```{r fit-plots}
+```{r fit-output}
 # Temporary manipulation to the returned estimates to get them
 # to work with stockplotr
 output <- get_estimates(fit) |>
@@ -263,14 +275,20 @@ output <- get_estimates(fit) |>
     year = year_i,
     estimate = estimated
   )
+```
 
-# Plot spawning biomass
+```{r fit-plot-spawning-biomass}
+#| fig.alt: >
+#|   Plot of spawning biomass.
 stockplotr::plot_spawning_biomass(
   dplyr::filter(output, label == "spawning_biomass")
 ) +
   stockplotr::theme_noaa()
+```
 
-# Plot of log fishing mortality
+```{r fit-plot-log-fishing-mortality} 
+#| fig.alt: >
+#|   Plot of log fishing mortality.
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
@@ -282,8 +300,11 @@ stockplotr::plot_timeseries(
   ylab = "natural log of Fishing Mortality"
 ) +
   stockplotr::theme_noaa()
+```
 
-# Plot the index of abundance against the observed values
+```{r fit-plot-index-of-abundance}
+#| fig.alt: >
+#|   Plot of estimated index of abundance versus observed values.
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 2),
@@ -303,8 +324,11 @@ stockplotr::plot_timeseries(
     ggplot2::aes(x = year, y = observed)
   ) +
   stockplotr::theme_noaa()
+```
 
-# Plot the landings estimates
+```{r fit-plot-landings}
+#| fig.alt: >
+#|   Plot of estimated landings.
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
@@ -320,7 +344,7 @@ stockplotr::plot_timeseries(
 
 ### Sensitivities
 
-Multiple fits, i.e., sensitivity runs, can be set up by modifying the parameter list using `update_parameters()` or changing the data that is used to fit the model.
+Multiple fits, i.e., sensitivity runs, can be set up by modifying the parameter list using `dplyr::mutate()` or changing the data that is used to fit the model.
 
 #### Initial values
 
@@ -396,8 +420,11 @@ length_only_fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 clear()
+```
 
-# Plot spawning biomass for each sensitivity model
+```{r fit-plot-biomass}
+#| fig.alt: >
+#|   Plot of spawning biomass for each sensitivity model.
 stockplotr::plot_biomass(
   list(
     "age" = get_estimates(age_only_fit) |>

@@ -43,7 +43,7 @@ FIMS_INFO_LOG("Initializing fleet " + fims::to_string(f->id))
 
 Below is a real-world example of a log entry that was created while running a FIMS model due to `FIMS_INFO_LOG` within [selectivity in information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp#L371). The log entry specifies the line of the file with the macro that led to the log entry. The screenshot below shows what the user would see if this log entry were invoked.
 
-![](figures/selectivity_logging_entry.png)
+![Example of a log entry.](figures/selectivity_logging_entry.png)
 
 
 Additionally, if FIMS has been compiled with the `-DFIMS_DEBUG` pre-processing macro, output from the `FIMS_DEBUG_LOG` macro will also be available in the log file, allowing developers a more interactive developing experience. The output from this macro is turned off in the main branch, and thus, the macro is not available to the typical user to stop debugging statements from polluting the log file.
