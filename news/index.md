@@ -1,5 +1,13 @@
 # Changelog
 
+## FIMS 0.7.1
+
+- Fixes json output when there are non numeric values, infinity values,
+  and -999
+- Allows the output columns to be merged with reshape and dplyr when
+  character values are combined with strings
+- Fixes spawning biomass output in print method to report value
+
 ## FIMS 0.7.0
 
 - Turns on the code for model families that allows for more model types

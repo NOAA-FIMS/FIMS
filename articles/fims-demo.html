@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -526,17 +526,17 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.016</span> to <span style="color: #0000BB;">0.00333</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.04938</span> to <span style="color: #0000BB;">0.00218</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.23037</span> minutes</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7.1</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.21812</span> minutes</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=77, random_effects=0, and total=77</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00333</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00218</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1779.19104</span></span></span></code></pre>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -557,10 +557,10 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Plot spawning biomass</span></span>
-<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_spawning_biomass.html" class="external-link">plot_spawning_biomass</a></span><span class="op">(</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_spawning_biomass.html" class="external-link">plot_spawning_biomass</a></span><span class="op">(</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">output</span>, <span class="va">label</span> <span class="op">==</span> <span class="st">"spawning_biomass"</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `era`.</span></span></code></pre>
 <pre><code><span><span class="co">## Warning in max(dat$year[dat$era == era_name], na.rm = TRUE): no non-missing</span></span>
 <span><span class="co">## arguments to max; returning -Inf</span></span></code></pre>
@@ -575,8 +575,8 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <p><img src="fims-demo_files/figure-html/fit-plots-1.png" class="r-plt" width="700"></p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot of log fishing mortality</span></span>
-<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
 <span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>    label_name <span class="op">=</span> <span class="st">"log_Fmort$"</span>,</span>
 <span>    geom <span class="op">=</span> <span class="st">"line"</span></span>
@@ -585,12 +585,12 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span>  y <span class="op">=</span> <span class="st">"estimate"</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="st">"natural log of Fishing Mortality"</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="fims-demo_files/figure-html/fit-plots-2.png" class="r-plt" width="700"></p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot the index of abundance against the observed values</span></span>
-<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
 <span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_id</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span>,</span>
 <span>    label_name <span class="op">=</span> <span class="st">"^index_expected$"</span>,</span>
 <span>    geom <span class="op">=</span> <span class="st">"line"</span></span>
@@ -607,12 +607,12 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span>    <span class="op">)</span>,</span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">observed</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="fims-demo_files/figure-html/fit-plots-3.png" class="r-plt" width="700"></p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot the landings estimates</span></span>
-<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
 <span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>    label_name <span class="op">=</span> <span class="st">"^landings_expected$"</span>,</span>
 <span>    geom <span class="op">=</span> <span class="st">"line"</span></span>
@@ -621,7 +621,7 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span>  y <span class="op">=</span> <span class="st">"estimate"</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="st">"Expected Landings (mt)"</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="fims-demo_files/figure-html/fit-plots-4.png" class="r-plt" width="700"></p>
 </div>
 <div class="section level3">
@@ -665,17 +665,17 @@ changes due to changes to the initial value.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.01439</span> to <span style="color: #0000BB;">0.00073</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.01423</span> to <span style="color: #0000BB;">0.00253</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.21054</span> minutes</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7.1</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.20551</span> minutes</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=77, random_effects=0, and total=77</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00073</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00253</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1779.19104</span></span></span></code></pre>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -684,17 +684,17 @@ changes due to changes to the initial value.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.03193</span> to <span style="color: #0000BB;">0.00022</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.01142</span> to <span style="color: #0000BB;">0.00318</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.20888</span> minutes</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7.1</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.20522</span> minutes</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=77, random_effects=0, and total=77</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00022</span></span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00318</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
 <span><span class="co">## <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">3166.02383</span></span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1779.19826</span></span></span></code></pre>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -716,13 +716,13 @@ length-composition configurations.</p>
 <pre><code><span><span class="co">## Matching, by = "module_type"</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.01395</span> to <span style="color: #0000BB;">0.00219</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.01253</span> to <span style="color: #0000BB;">8e-04</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span> <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">9.02259</span> seconds <span style="color: #00BBBB;">ℹ</span> Number of</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7.1</span> <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">8.96747</span> seconds <span style="color: #00BBBB;">ℹ</span> Number of</span></span>
 <span><span class="co">## parameters: fixed_effects=77, random_effects=0, and total=77 <span style="color: #00BBBB;">ℹ</span> Maximum</span></span>
-<span><span class="co">## gradient= <span style="color: #0000BB;">0.00219</span> <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL): <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">1565.4676</span> <span style="color: #00BBBB;">•</span></span></span>
-<span><span class="co">## Total NLL= <span style="color: #0000BB;">1565.4676</span> <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
+<span><span class="co">## gradient= <span style="color: #0000BB;">8e-04</span> <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL): <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">1565.4676</span> <span style="color: #00BBBB;">•</span></span></span>
+<span><span class="co">## Total NLL= <span style="color: #0000BB;">1565.4676</span> <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1724.28921</span></span></span></code></pre>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -744,18 +744,18 @@ age-composition configurations.</p>
 <pre><code><span><span class="co">## Matching, by = "module_type"</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.02853</span> to <span style="color: #0000BB;">0.00013</span> after 3 steps.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00422</span> to <span style="color: #0000BB;">0.03063</span> after 3 steps.</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">## <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7</span> <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">56.61147</span> seconds <span style="color: #00BBBB;">ℹ</span> Number of</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.7.1</span> <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">58.09914</span> seconds <span style="color: #00BBBB;">ℹ</span> Number of</span></span>
 <span><span class="co">## parameters: fixed_effects=77, random_effects=0, and total=77 <span style="color: #00BBBB;">ℹ</span> Maximum</span></span>
-<span><span class="co">## gradient= <span style="color: #0000BB;">0.00013</span> <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL): <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">1520.03751</span> <span style="color: #00BBBB;">•</span></span></span>
-<span><span class="co">## Total NLL= <span style="color: #0000BB;">1520.03751</span> <span style="color: #00BBBB;">ℹ</span> Terminal SB=</span></span></code></pre>
+<span><span class="co">## gradient= <span style="color: #0000BB;">0.03063</span> <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL): <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">1520.03752</span> <span style="color: #00BBBB;">•</span></span></span>
+<span><span class="co">## Total NLL= <span style="color: #0000BB;">1520.03752</span> <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1706.89135</span></span></span></code></pre>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Plot spawning biomass for each sensitivity model</span></span>
-<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_biomass.html" class="external-link">plot_biomass</a></span><span class="op">(</span></span>
+<span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_biomass.html" class="external-link">plot_biomass</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="st">"age"</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">age_only_fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>

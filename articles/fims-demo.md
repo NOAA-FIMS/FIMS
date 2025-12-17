@@ -481,17 +481,17 @@ fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.016 to 0.00333 after 3 steps.
+    ## ℹ Maximum gradient went from 0.04938 to 0.00218 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.7
-    ## ℹ Total run time was 1.23037 minutes
+    ## ℹ FIMS model version: 0.7.1
+    ## ℹ Total run time was 1.21812 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
-    ## ℹ Maximum gradient= 0.00333
+    ## ℹ Maximum gradient= 0.00218
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3166.02383
     ## • Total NLL= 3166.02383
-    ## ℹ Terminal SB=
+    ## ℹ Terminal SB= 1779.19104
 
 ``` r
 clear()
@@ -645,17 +645,17 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.01439 to 0.00073 after 3 steps.
+    ## ℹ Maximum gradient went from 0.01423 to 0.00253 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.7
-    ## ℹ Total run time was 1.21054 minutes
+    ## ℹ FIMS model version: 0.7.1
+    ## ℹ Total run time was 1.20551 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
-    ## ℹ Maximum gradient= 0.00073
+    ## ℹ Maximum gradient= 0.00253
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3166.02383
     ## • Total NLL= 3166.02383
-    ## ℹ Terminal SB=
+    ## ℹ Terminal SB= 1779.19104
 
 ``` r
 clear()
@@ -667,17 +667,17 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.03193 to 0.00022 after 3 steps.
+    ## ℹ Maximum gradient went from 0.01142 to 0.00318 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.7
-    ## ℹ Total run time was 1.20888 minutes
+    ## ℹ FIMS model version: 0.7.1
+    ## ℹ Total run time was 1.20522 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
-    ## ℹ Maximum gradient= 0.00022
+    ## ℹ Maximum gradient= 0.00318
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3166.02383
     ## • Total NLL= 3166.02383
-    ## ℹ Terminal SB=
+    ## ℹ Terminal SB= 1779.19826
 
 ``` r
 clear()
@@ -703,13 +703,13 @@ age_only_fit <- parameters_4_model |>
     ## Matching, by = "module_type"
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.01395 to 0.00219 after 3 steps.
+    ## ℹ Maximum gradient went from 0.01253 to 8e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.7 ℹ Total run time was 9.02259 seconds ℹ Number of
+    ## ℹ FIMS model version: 0.7.1 ℹ Total run time was 8.96747 seconds ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
-    ## gradient= 0.00219 ℹ Negative log likelihood (NLL): • Marginal NLL= 1565.4676 •
-    ## Total NLL= 1565.4676 ℹ Terminal SB=
+    ## gradient= 8e-04 ℹ Negative log likelihood (NLL): • Marginal NLL= 1565.4676 •
+    ## Total NLL= 1565.4676 ℹ Terminal SB= 1724.28921
 
 ``` r
 clear()
@@ -735,13 +735,13 @@ length_only_fit <- parameters_4_model |>
     ## Matching, by = "module_type"
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.02853 to 0.00013 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00422 to 0.03063 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.7 ℹ Total run time was 56.61147 seconds ℹ Number of
+    ## ℹ FIMS model version: 0.7.1 ℹ Total run time was 58.09914 seconds ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
-    ## gradient= 0.00013 ℹ Negative log likelihood (NLL): • Marginal NLL= 1520.03751 •
-    ## Total NLL= 1520.03751 ℹ Terminal SB=
+    ## gradient= 0.03063 ℹ Negative log likelihood (NLL): • Marginal NLL= 1520.03752 •
+    ## Total NLL= 1520.03752 ℹ Terminal SB= 1706.89135
 
 ``` r
 clear()
