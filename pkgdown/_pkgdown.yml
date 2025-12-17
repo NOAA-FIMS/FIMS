@@ -11,7 +11,7 @@ home:
 authors:
   FIMS implementation team:
     href: https://github.com/orgs/NOAA-FIMS/teams/fims
-    html: <img src='https://github.com/NOAA-FIMS/noaa-fims.github.io/blob/main/assets/img/logo.png' alt='FIMS' width='72' />
+    html: <img src='https://github.com/NOAA-FIMS/noaa-fims.github.io/blob/main/images/FIMS_hexlogo.png' alt='FIMS' width='72' />
 
 template:
   bootstrap: 5
@@ -24,9 +24,8 @@ template:
 
 
 articles:
-- title: Fisheries Integrated Modeling System (FIMS)
+- title: FIMS
   contents:
-  # - fims-documentation
   - fims-demo
   - fims-demo-minimal
   - fims-logging
@@ -82,4 +81,5 @@ navbar:
     github:
       icon: fa-brands fa-github fa-lg
       href: https://github.com/noaa-fims/fims/
+      aria-label: GitHub repository for FIMS
 
