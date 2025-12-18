@@ -14,7 +14,10 @@
  * to interface with multiple modeling platforms.
  */
 
-// traits for interfacing with TMB
+// traits for interfacing with 
+
+
+#include <Rcpp.h>
 
 #ifdef TMB_MODEL
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
