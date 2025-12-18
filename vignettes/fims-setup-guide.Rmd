@@ -1,40 +1,109 @@
 ---
 title: "FIMS User Setup Guide"
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{FIMS User Setup Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-format:
-  html:
-    toc: true
-    number-sections: true
 ---
 
-# Introduction
-
-This guide covers the three methods to set up the FIMS environment.
-
-## Method 1: Google Cloud Workstations
-
-This is the fastest method for the training session.
-
-1.  Open your terminal in the Workstation.
-2.  Run the following command:
-
-```bash
-bash <(curl -sL https://raw.githubusercontent.com/NOAA-FIMS/FIMS/add-google-cloud-workstations-bash/setup_fims.sh)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Overview
+
+This guide facilitates the configuration of a standardized Fisheries Integrated Modeling System (FIMS) environment. By utilizing cloud-based workstations and containerized development environments, we ensure cross-platform consistency and eliminate the complexities of manual dependency management.
+
+Please follow the section below that matches how you plan to set up FIMS, i.e., ☁️[Google Cloud Workstations](#google-cloud-workstations) for managed cloud IDEs (internal NOAA), 🌐[GitHub Codespaces](#github-codespaces) for browser-based containerized environments, 🐧[Windows Subsystem for Linux 2 (WSL2)](#wsl2) for a containerized Linux environment running on Windows hardware, and 🧑‍💻[Native Local](#native-local) installation for direct deployment on your machine's primary operating system.
+
+```{r common-setup, echo=FALSE}
+common_script <- "bash <(curl -sL https://raw.githubusercontent.com/NOAA-FIMS/FIMS/main/setup_fims.sh)"
+```
+
+## ☁️ Google Cloud Workstations
+
+NOAA Fisheries Google Cloud Workstations provide a managed RStudio, Visual Studio Code (VS Code), or Positron environment. For detailed visual guides (e.g., snapshots) on starting, stopping, or managing workstations, please refer to the [Internal NOAA documentation](https://docs.google.com/document/d/1nziPdPULoRWOYQ9WKzISNUgJvANACvfYpFr1z3Ro2Bc/edit?tab=t.0#heading=h.5509095bxzv7).
+
+- Navigate to the NOAA Fisheries [Google Cloud Workstations Console](https://console.cloud.google.com/workstations/list?project=ggn-nmfs-wsent-prod-1)  and click `+ create workstation`.
+
+- Provide a name for the workstation, select a configuration, and click the `Create` button.
+  
+  - **Recommended configurations:** Use `posit-medium` or `posit-large` for workshops and rapid testing. It has faster startup times, though it carries higher cost due the Posit licensing fees. Select `nmfs-rstudio-medium` or `nmfs-rstudio-large` for long-term use as they avoid third-party licensing cost. 
+  
+  - ⚠️ Configurations (`*-small`) with low core counts will lead to failed compilation of FIMS.
+  
+- Click the `Start` and `Launch` buttons to initialize the workstation.
+
+- Add a new session from either `Positron Pro`, `RStudio Pro`, or `VS Code` when using `posit-*` configurations, and then `Launch` the session
+
+- Open a bash terminal within your session and execute the following command to install all necessary system and R dependencies. The process typically takes 15 to 30 minutes.
+
+```bash
+bash <(curl -sL https://raw.githubusercontent.com/NOAA-FIMS/FIMS/main/setup_fims.sh)
+```
+
+- If using `Positron Pro`, a restart of the R session is required to initialize the new libraries.
+
+- Run `library(FIMS)` in the R session to confirm the successful installation of FIMS.
+
 <details>
-<summary>Deep Dive: What does this script do? (Click to expand)</summary>
+<summary>🤿 Resources (Click to expand)</summary>
 
-The setup_fims.sh script performs several automated tasks:
+- [NOAA Fisheries Cloud Program](https://docs.google.com/document/d/1nziPdPULoRWOYQ9WKzISNUgJvANACvfYpFr1z3Ro2Bc/edit?usp=sharing) began a Cloud Compute Accelerator Pilot in early 2025: Enhancing NOAA Fisheries' Mission with Google Cloud Workstations. 
 
-- Checks OS: Detects you are on Linux.
+- Consult the Pilot Participant [Frequently Asked Questions](https://docs.google.com/document/d/1U1PzGS7G70xsXtD6F6WxkjTSCw7bwNVyZ-YnFyOLOqU/edit?usp=sharing) for support regarding access and billing.
 
-- Installs Dependencies: checks for system libraries like libxml2.
+- [NOAA Fisheries Cloud Computing Setup repository](https://github.com/nmfs-opensci/CloudComputingSetup/) details cloud computing resources at NOAA Fisheries, with a focus on Google Cloud Workstations for R users. It includes instructions for linking workstations to GitHub and mounting Google Cloud Storage buckets.
 
-- Configures R: Sets up ~/.Renviron to use a persistent library in your Home directory.
-
-- Installs Packages: Downloads pre-compiled binaries from Posit Package Manager (PPM) to save time. 
 </details>
+
+## 🌐 GitHub Codespaces
+
+GitHub Codespaces offers a "container-as-a-service" model that provides a pre-configured FIMS environment directly in your browser. 
+
+```{r, fetch-codespaces, include=FALSE}
+# Define the target URL
+url <- "https://raw.githubusercontent.com/NOAA-FIMS/FIMS/refs/heads/add-google-cloud-workstations-bash/.devcontainer/README.md"
+lines <- readLines(url, warn = FALSE)
+
+# Match header with flexibility for emojis/spacing
+start_idx <- grep("## .*GitHub Codespaces", lines)
+
+if (length(start_idx) > 0) {
+  next_hdrs <- grep("^## ", lines)
+  end_idx <- next_hdrs[next_hdrs > start_idx][1]
+  
+  if (is.na(end_idx)) end_idx <- length(lines) else end_idx <- end_idx - 1
+  
+  tmp_section <- tempfile(fileext = ".md")
+  writeLines(lines[(start_idx + 1):end_idx], tmp_section)
+} else {
+  tmp_section <- tempfile(fileext = ".md")
+  writeLines("_Remote documentation is currently being updated. Please consult the repository README directly._", tmp_section)
+}
+```
+
+```{r, render-codespaces, child=tmp_section}
+```
+## 🐧 WSL2
+
+For Windows users who prefer local execution, we recommend using Windows Subsystem for Linux (WSL2) in conjunction with Docker Engine. This "Dev Container" approach provides the performance of local hardware with the environment isolation of a cloud workstation.
+
+Detailed setup instructions for the local containerized environment are maintained in the Local Section of the FIMS README.
+
+## 🧑‍💻 Native Local installation
+
+Users wishing to install FIMS directly on their host operating system (macOS, Linux, or Windows) can do so using our automated bash script.
+
+Prerequisites:
+
+Windows: Must have Git Bash or a similar shell environment installed.
+
+macOS/Linux: Standard terminal access.
+
+To install, execute the following command in your terminal:
+
+## 🙋 Support
+For technical assistance or to report discrepancies in this guide, please open an issue on GitHub.
+
