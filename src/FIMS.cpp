@@ -39,8 +39,13 @@ Type objective_function<Type>::operator()() {
     }
     model -> of = this;
 
+    Type nll = 0;
     //evaluate the model objective function value
-    Type nll = model->Evaluate();
+    try{
+      nll = model->Evaluate();
+    } catch (const std::exception& e) {
+      Rf_error("Error during model evaluation: %s",  std::string(e.what()).c_str());
+    }
 
     return nll;
 
