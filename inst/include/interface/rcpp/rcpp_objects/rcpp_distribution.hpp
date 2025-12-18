@@ -258,24 +258,44 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
       this->lpdf_value = dnorm->lpdf;
 
-      for (size_t i = 0; i < this->log_sd.size(); i++) {
+      size_t n_x = dnorm->get_n_x();
+
+      if (this->log_sd.size() != n_x) {
+        // If log_sd size == 1 (scalar), repeat the entry
+        if (this->log_sd.size() == 1) {
+          auto tmp = this->log_sd[0];  // copy the one log_sd param
+          this->log_sd.resize(n_x);
+          for (size_t i = 0; i < n_x; ++i) {
+            this->log_sd[i] = tmp;  // copies all fields in Param
+          }
+        } else {
+          // Handle error
+          FIMS_WARNING_LOG(
+              "log_sd size does not match number of observations and is not "
+              "scalar.");
+        }
+      }
+      for (size_t i = 0; i < n_x; i++) {
+        size_t idx = 0;
+        if (dnorm->log_sd.size() > 1) {
+          idx = i;
+        }
         if (this->log_sd[i].estimation_type_m.get() == "constant") {
           this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
-          this->log_sd[i].final_value_m = dnorm->log_sd[i];
+          this->log_sd[i].final_value_m = dnorm->log_sd[idx];
         }
       }
 
-      this->lpdf_vec = RealVector(dnorm->report_lpdf_vec.size());
+      this->lpdf_vec = RealVector(n_x);
       if (this->expected_values.size() == 1) {
-        this->expected_values.resize(dnorm->expected_values.size());
+        this->expected_values.resize(n_x);
       }
       if (this->x.size() == 1) {
-        size_t nx = dnorm->get_n_x();
-        this->x.resize(nx);
+        this->x.resize(n_x);
       }
 
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
+      for (R_xlen_t i = 0; i < n_x; i++) {
         this->lpdf_vec[i] = dnorm->report_lpdf_vec[i];
         this->expected_values[i].final_value_m = dnorm->get_expected(i);
         this->x[i].final_value_m = dnorm->get_observed(i);
@@ -327,6 +347,17 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
               .final_value_m);
       ss << "],\n";
     }
+    ss << "  \"log_sd_values\":[";
+    if (this->log_sd.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
+        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+      }
+      ss << this->value_to_string(
+                this->log_sd[this->log_sd.size() - 1].final_value_m)
+         << "],\n";
+    }
     ss << "  \"observed_values\":[";
     if (this->x.size() == 0) {
       ss << "]\n";
@@ -337,7 +368,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       ss << this->x[this->x.size() - 1].final_value_m << "]\n";
     }
     ss << " }}\n";
-
     return ss.str();
   }
 
@@ -557,24 +587,44 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
       this->lpdf_value = dlnorm->lpdf;
 
-      for (size_t i = 0; i < this->log_sd.size(); i++) {
-        if (this->log_sd[i].estimation_type_m.get() == "constant") {
-          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
+      size_t n_x = dlnorm->get_n_x();
+
+      if (this->log_sd.size() != n_x) {
+        // If log_sd size == 1 (scalar), repeat the entry
+        if (this->log_sd.size() == 1) {
+          auto tmp = this->log_sd[0];  // copy the one log_sd param
+          this->log_sd.resize(n_x);
+          for (size_t i = 0; i < n_x; ++i) {
+            this->log_sd[i] = tmp;  // copies all fields in Param
+          }
         } else {
-          this->log_sd[i].final_value_m = dlnorm->log_sd[i];
+          // Handle error
+          FIMS_WARNING_LOG(
+              "log_sd size does not match number of observations and is not "
+              "scalar.");
         }
       }
 
-      this->lpdf_vec = RealVector(dlnorm->report_lpdf_vec.size());
+      for (size_t i = 0; i < n_x; i++) {
+        size_t idx = 0;
+        if (dlnorm->log_sd.size() > 1) {
+          idx = i;
+        }
+        if (this->log_sd[i].estimation_type_m.get() == "constant") {
+          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
+        } else {
+          this->log_sd[i].final_value_m = dlnorm->log_sd[idx];
+        }
+      }
+
+      this->lpdf_vec = RealVector(n_x);
       if (this->expected_values.size() == 1) {
-        this->expected_values.resize(
-            this->lpdf_vec.size());  // dlnorm->expected_values.size());
+        this->expected_values.resize(n_x);
       }
       if (this->x.size() == 1) {
-        size_t nx = dlnorm->get_n_x();
-        this->x.resize(nx);
+        this->x.resize(n_x);
       }
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
+      for (R_xlen_t i = 0; i < n_x; i++) {
         this->lpdf_vec[i] = dlnorm->report_lpdf_vec[i];
         this->expected_values[i].final_value_m = dlnorm->get_expected(i);
         this->x[i].final_value_m = dlnorm->get_observed(i);
@@ -625,6 +675,17 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
               .final_value_m);
 
       ss << "],\n";
+    }
+    ss << "  \"log_sd_values\":[";
+    if (this->log_sd.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
+        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+      }
+      ss << this->value_to_string(
+                this->log_sd[this->log_sd.size() - 1].final_value_m)
+         << "],\n";
     }
     ss << "  \"observed_values\":[";
     if (this->x.size() == 0) {
@@ -860,15 +921,16 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
       this->lpdf_value = dmultinom->lpdf;
 
-      size_t nx = dmultinom->report_lpdf_vec.size();
-      this->lpdf_vec = Rcpp::NumericVector(nx);
-      if (this->expected_values.size() != nx) {
-        this->expected_values.resize(nx);
+      size_t n_x = dmultinom->report_lpdf_vec.size();
+      this->lpdf_vec = Rcpp::NumericVector(n_x);
+      if (this->expected_values.size() != n_x) {
+        this->expected_values.resize(n_x);
       }
-      if (this->x.size() != nx) {
-        this->x.resize(nx);
+      if (this->x.size() != n_x) {
+        this->x.resize(n_x);
       }
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
+
+      for (R_xlen_t i = 0; i < n_x; i++) {
         this->lpdf_vec[i] = dmultinom->report_lpdf_vec[i];
         this->expected_values[i].final_value_m = dmultinom->get_expected(i);
         if (dmultinom->input_type != "data") {
@@ -877,8 +939,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       }
       if (dmultinom->input_type == "data") {
         dims.resize(2);
-        dims[0] = dmultinom->observed_values->get_imax();
-        dims[1] = dmultinom->observed_values->get_jmax();
+        dims[0] = dmultinom->dims[0];
+        dims[1] = dmultinom->dims[1];
         for (size_t i = 0; i < dims[0]; i++) {
           for (size_t j = 0; j < dims[1]; j++) {
             size_t idx = (i * dims[1]) + j;
@@ -934,6 +996,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
       ss << "],\n";
     }
+    // no log_sd_values for multinomial
     ss << "  \"observed_values\":[";
     if (this->x.size() == 0) {
       ss << "]\n";

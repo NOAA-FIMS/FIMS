@@ -139,6 +139,25 @@ check_distribution_validity <- function(args) {
     }
   }
 
+  # Check dimensions for data distributions: sd must be either length 1 (scalar) 
+  # or match data length when data_type is landings or index
+  if (!is.null(data_type) && !is.null(args[["module"]])) {
+    module <- args[["module"]]
+    if(data_type == "landings" | data_type == "index"){
+      n_obs <- module$n_years$get()
+      
+      if (length(sd[["value"]]) > 1 && length(sd[["value"]]) != n_obs) {
+        abort_bullets <- c(
+          abort_bullets,
+          "x" = "The size of {.var log_sd} does not match the size of observed data for {data_type}.",
+          "i" = "The {.var log_sd} vector is of size {length(sd[['value']])}.",
+          "i" = "The observed {data_type} data vector is of size {n_obs}.",
+          "i" = "Either provide a single {.var log_sd} value (scalar) or a vector matching the data length."
+        )
+      }
+    }
+  }
+
   # Return error messages if more than just the default is present
   if (length(abort_bullets) == 1) {
     invisible(TRUE)
@@ -282,7 +301,8 @@ initialize_data_distribution <- function(
   args <- list(
     family = family,
     sd = sd,
-    data_type = data_type
+    data_type = data_type,
+    module = module
   )
   check_distribution_validity(args)
 
