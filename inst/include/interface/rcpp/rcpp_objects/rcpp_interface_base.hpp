@@ -223,18 +223,19 @@ class ParameterVector {
    * @param size The number of elements to copy over.
    */
   ParameterVector(Rcpp::NumericVector x, size_t size) {
-    this->id_m = ParameterVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<Parameter>>();
-    // Use std::min to avoid comparing signed and unsigned types
-    size_t n = std::min(static_cast<size_t>(x.size()), size);
-    this->storage_m->resize(n);
-    for (size_t i = 0; i < n; i++) {
-      storage_m->at(i).initial_value_m = x[i];
-    }
-    if (static_cast<size_t>(x.size()) < size) {
+    if (static_cast<size_t>(x.size()) != size) {
       throw std::invalid_argument(
           "Error in call to ParameterVector(Rcpp::NumericVector x, size_t "
-          "size): x.size() < size argument.");
+          "size): x.size() != size argument.");
+    } else {
+      this->id_m = ParameterVector::id_g++;
+      this->storage_m = std::make_shared<std::vector<Parameter>>();
+      // Use std::min to avoid comparing signed and unsigned types
+      size_t n = std::min(static_cast<size_t>(x.size()), size);
+      this->storage_m->resize(n);
+      for (size_t i = 0; i < n; i++) {
+        storage_m->at(i).initial_value_m = x[i];
+      }
     }
   }
 
@@ -717,7 +718,8 @@ class FIMSRcppInterfaceBase {
     } else if (value != value) {
       ss << "-999";
     } else {
-      ss << value;
+      // Set precision (R default is 16)
+      ss << std::fixed << std::setprecision(16) << value;
     }
     return ss.str();
   }

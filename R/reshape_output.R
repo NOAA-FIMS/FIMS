@@ -154,9 +154,15 @@ reshape_json_estimates <- function(model_output) {
       "label" = name,
       type, type_id, "parameter_id" = id,
       fleet, dplyr::ends_with("_i"),
-      "input" = value, estimated = "estimated_value", "expected" = expected_values,
-      "observed" = observed_values, uncertainty, estimation_type,
-      distribution, input_type, lpdf = "lpdf_value", likelihood,
+      "input" = value,
+      estimated = "estimated_value",
+      "expected" = expected_values,
+      "observed" = observed_values,
+      uncertainty,
+      estimation_type,
+      distribution,
+      input_type, lpdf = "lpdf_value", likelihood,
+      "log_sd" = log_sd_values,
       dplyr::everything()
     )
 }
@@ -373,15 +379,36 @@ dimensions_to_tibble <- function(data) {
 
 #' Convert the density component information into a tibble
 #'
-#' The density component information is stored in a single column but contains
-#' a list of five elements. This function helps to widen that list into a
-#' tibble and expand the `values`, `expected_values`, and `observed_values`
-#' into long columns because they are all of the same length.
+#' @description
+#' The log probability density function (lpdf) information is information in
+#' the json that pertains to a distribution, which is often associated with a
+#' data stream. For example, the lognormal distribution can be associated with
+#' landings for a given fleet because those landings might be uncertain.
 #'
-#' @param data A list of lists from the json output that is titled
-#'   `density_component`.
+#' @details
+#' The raw information, i.e., `data` is a list of unknown dimensions, where the
+#' first element of the list, i.e., `lpdf_value`, is a single numeric value and
+#' the remaining list elements are lists themselves. This function converts the
+#' list to a tibble and then extracts only columns that have some derivative of
+#' "value" in their name, e.g., `lpdf_value`, `expected_values`, etc., using
+#' regular expression matching. Thus, when `data` does not have an entry for
+#' `log_sd_values` the function does not fail but will return a smaller tibble
+#' than normal.
+#'
+#' It is imperative that each list element of `data` be of length one or the
+#' exact same length as the other elements. There is an internal check in the
+#' function for this consistency.
+#'
+#' The code that writes this json information is stored in `inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp`.
+#' @param data A list of `density_components` from the json output that is a
+#'   list of lists. The first element of the list will be `lpdf_value`, a
+#'   single entry that stores the log probability density function value. The
+#'   remaining list elements have "value" in their name and are formatted as
+#'   lists themselves.
 #' @return
-#' A tibble is returned.
+#' A tibble is returned with the `lpdf_value` first and then other columns with
+#' value in their name following. The columns will be in the same order they
+#' are reported in the json output.
 #' @noRd
 #'
 #' @examples
@@ -401,8 +428,25 @@ dimensions_to_tibble <- function(data) {
 #' density_to_tibble(dummy_density)
 #' @noRd
 density_to_tibble <- function(data) {
+  # Check that each list element is of length-one or the same length otherwise
+  # the resulting tibble will not be the correct dimensions
+  element_lengths <- purrr::map_int(data, length)
+  check <- if (all(element_lengths == 1)) {
+    TRUE
+  } else {
+    length(unique(element_lengths[element_lengths != 1])) == 1
+  }
+  if (!check) {
+    cli::cli_abort(
+      "Not all elements in the density component information are equal or of
+      length 1, their lengths are as follows: {element_lengths}.
+      The lpdf_value of this element is {data[['lpdf_value']][1]}."
+    )
+  }
+
+  # Return the tibble
   data |>
     tibble::as_tibble() |>
-    tidyr::unnest(c(value, expected_values, observed_values)) |>
+    tidyr::unnest(dplyr::contains("value")) |>
     dplyr::rename(likelihood = value)
 }
