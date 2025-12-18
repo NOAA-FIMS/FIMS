@@ -491,6 +491,15 @@ class FleetInterface : public FleetInterfaceBase {
     }
 
     FIMS_INFO_LOG("adding Fleet fmort object to TMB");
+    if(this->log_Fmort.size() != this->n_years.get()){
+      FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
+                     fims::to_string(this->log_Fmort.size()) + " != " +
+                     fims::to_string(this->n_years.get()));
+      throw std::invalid_argument("Fleet log_Fmort size mismatch."
+          "Fleet log_Fmort is of size " +
+          fims::to_string(this->log_Fmort.size()) + " and the number of years is " +
+          fims::to_string(this->n_years.get()));
+    }
     fleet->log_Fmort.resize(this->log_Fmort.size());
     for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
