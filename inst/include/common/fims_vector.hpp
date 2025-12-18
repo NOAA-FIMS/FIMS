@@ -183,8 +183,7 @@ class Vector {
     if (this->size() == 1 && pos > 0) {
       return this->at(0);
     } else if (this->size() > 1 && pos >= this->size()) {
-      throw std::invalid_argument(
-          "force_get fims::Vector index out of bounds.");
+      throw std::invalid_argument("fims::Vector index out of bounds, check parameter sizes of input.");
     } else {
       return this->at(pos);
     }
