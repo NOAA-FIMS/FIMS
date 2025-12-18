@@ -11,6 +11,38 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, functions, include=FALSE}
+extract_remote_markdown <- function(url, header_pattern) {
+  lines <- try(readLines(url, warn = FALSE), silent = TRUE)
+  tmp <- tempfile(fileext = ".md")
+  
+  if (inherits(lines, "try-error")) {
+    writeLines("_Documentation temporarily unreachable._", tmp)
+    return(tmp)
+  }
+  
+  # Find the starting line
+  start_idx <- grep(header_pattern, lines, ignore.case = TRUE)
+  
+  if (length(start_idx) > 0) {
+    # Find the next header of the same or higher level (e.g., ## or #)
+    # This regex looks for any line starting with # followed by a space
+    all_hdrs <- grep("^#+ ", lines)
+    end_idx <- all_hdrs[all_hdrs > start_idx][1]
+    
+    if (is.na(end_idx)) end_idx <- length(lines) else end_idx <- end_idx - 1
+    
+    # Extract lines (excluding the header itself)
+    content <- lines[(start_idx + 1):end_idx]
+    writeLines(content, tmp)
+  } else {
+    writeLines("_Section not found in remote documentation._", tmp)
+  }
+  
+  return(tmp)
+}
+```
+
 ## Overview
 
 This guide facilitates the configuration of a standardized Fisheries Integrated Modeling System (FIMS) environment. By utilizing cloud-based workstations and containerized development environments, we ensure cross-platform consistency and eliminate the complexities of manual dependency management.
@@ -64,33 +96,22 @@ GitHub Codespaces offers a "container-as-a-service" model that provides a pre-co
 
 ```{r, fetch-codespaces, include=FALSE}
 # Define the target URL
-url <- "https://raw.githubusercontent.com/NOAA-FIMS/FIMS/refs/heads/add-google-cloud-workstations-bash/.devcontainer/README.md"
-lines <- readLines(url, warn = FALSE)
-
-# Match header with flexibility for emojis/spacing
-start_idx <- grep("## .*GitHub Codespaces", lines)
-
-if (length(start_idx) > 0) {
-  next_hdrs <- grep("^## ", lines)
-  end_idx <- next_hdrs[next_hdrs > start_idx][1]
-  
-  if (is.na(end_idx)) end_idx <- length(lines) else end_idx <- end_idx - 1
-  
-  tmp_section <- tempfile(fileext = ".md")
-  writeLines(lines[(start_idx + 1):end_idx], tmp_section)
-} else {
-  tmp_section <- tempfile(fileext = ".md")
-  writeLines("_Remote documentation is currently being updated. Please consult the repository README directly._", tmp_section)
-}
+base_url <- "https://raw.githubusercontent.com/NOAA-FIMS/FIMS/refs/heads/add-google-cloud-workstations-bash/.devcontainer/README.md"
+tmp_codespaces <- extract_remote_markdown(base_url, "## .*GitHub Codespaces")
 ```
 
-```{r, render-codespaces, child=tmp_section}
+```{r, render-codespaces, child=tmp_codespaces}
 ```
 ## 🐧 WSL2
 
 For Windows users who prefer local execution, we recommend using Windows Subsystem for Linux (WSL2) in conjunction with Docker Engine. This "Dev Container" approach provides the performance of local hardware with the environment isolation of a cloud workstation.
 
-Detailed setup instructions for the local containerized environment are maintained in the Local Section of the FIMS README.
+```{r, fetch-wsl2, include=FALSE}
+tmp_wsl2 <- extract_remote_markdown(base_url, "## .*WSL2")
+```
+
+```{r, render-codespaces, child=tmp_wsl2}
+```
 
 ## 🧑‍💻 Native Local installation
 
