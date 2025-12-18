@@ -128,6 +128,12 @@ test_that("prior predictive check", {
   survey_fleet$n_ages$set(om_input[["nages"]])
   survey_fleet$n_years$set(om_input[["nyr"]])
   survey_fleet$n_lengths$set(om_input[["nlengths"]])
+  survey_fleet$log_Fmort$resize(om_input[["nyr"]])
+  for (y in 1:om_input$nyr) {
+    # Log-transform OM fishing mortality
+    survey_fleet$log_Fmort[y]$value <- (-200)
+  }
+  survey_fleet$log_Fmort$set_all_estimable(FALSE)
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
   survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
