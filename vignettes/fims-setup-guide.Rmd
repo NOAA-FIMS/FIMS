@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, functions, include=FALSE}
+# Helper function to extract remote markdown from FIMS .devcontainer/ README to reuse the materials
 extract_remote_markdown <- function(url, header_pattern) {
   lines <- try(readLines(url, warn = FALSE), silent = TRUE)
   tmp <- tempfile(fileext = ".md")
@@ -21,18 +22,26 @@ extract_remote_markdown <- function(url, header_pattern) {
     return(tmp)
   }
   
-  # Find the starting line
+  # Find the starting line (e.g., the line containing "## WSL2")
   start_idx <- grep(header_pattern, lines, ignore.case = TRUE)
   
   if (length(start_idx) > 0) {
-    all_hdrs <- grep("^#+ ", lines)
-    end_idx <- all_hdrs[all_hdrs > start_idx][1]
+    # Determine the level of the header found (count the # symbols)
+    header_line <- lines[start_idx]
+    header_level <- nchar(gsub("(^#+).*", "\\1", header_line))
+    
+    # Find headers that are at the SAME level or HIGHER (fewer or equal #)
+    # We want to ignore ### if we are looking for a ## section
+    stop_pattern <- paste0("^#{1,", header_level, "} ")
+    all_potential_stops <- grep(stop_pattern, lines)
+    
+    # The end index is the next header that isn't the current one
+    end_idx <- all_potential_stops[all_potential_stops > start_idx][1]
     
     if (is.na(end_idx)) end_idx <- length(lines) else end_idx <- end_idx - 1
     
-    # FIX: Include a blank line at the start to ensure lists render
-    # We keep the content from after the header
-    content <- c("", lines[(start_idx + 1):end_idx]) 
+    # Extract and add blank lines for proper RMarkdown list rendering
+    content <- c("", lines[(start_idx + 1):end_idx], "") 
     writeLines(content, tmp)
   } else {
     writeLines("_Section not found in remote documentation._", tmp)
@@ -142,7 +151,7 @@ tmp_codespaces <- extract_remote_markdown(base_url, "## .*GitHub Codespaces")
 ```
 ## 🐧 WSL2
 
-For Windows users who prefer local execution, we recommend using Windows Subsystem for Linux (WSL2) in conjunction with Docker Engine. This "Dev Container" approach provides the performance of local hardware with the environment isolation of a cloud workstation.
+For Windows users who prefer local execution of the FIMS user container, we recommend using WSL2 in conjunction with Docker Engine.
 
 ```{r, fetch-wsl2, include=FALSE}
 tmp_wsl2 <- extract_remote_markdown(base_url, "## .*WSL2")
@@ -151,17 +160,9 @@ tmp_wsl2 <- extract_remote_markdown(base_url, "## .*WSL2")
 ```{r, render-wsl2, child=tmp_wsl2}
 ```
 
-## 🧑‍💻 Native Local installation
+## 🧑‍💻 Native Local
 
-Users wishing to install FIMS directly on their host operating system (macOS, Linux, or Windows) can do so using our automated bash script.
-
-Prerequisites:
-
-Windows: Must have Git Bash or a similar shell environment installed.
-
-macOS/Linux: Standard terminal access.
-
-To install, execute the following command in your terminal:
+Users wishing to install FIMS directly on their host operating system (macOS, Linux, or Windows) can do so using the `setup_fims.sh` bash script. To install, execute the following command in the bash terminal:
 
 ```{r, echo=FALSE, results='asis'}
 cat("```bash\n")
@@ -169,5 +170,8 @@ cat(common_script, sep = "\n")
 cat("\n```")
 ```
 
-## 🙋 Support
-For technical assistance or to report discrepancies in this guide, please open an issue on GitHub.
+**Note:** For Windows users, Git Bash is required. If you are using RStudio on Windows, make sure the terminal is configured to use Git Bash. You can do this by going to **Tools** -> **Global Options...** -> **Terminal**, and selecting **Git Bash** under **New terminals open with:**.
+
+## 🙋 Need Help?
+- If the instructions above do not work, please visit the FIMS [discussion page](https://github.com/orgs/NOAA-FIMS/discussions/1073) to see known issues and documented solutions. If you encounter a new error, feel free to post it there for technical assistance. 
+- To report errors discrepancies in this guide, please [open an issue](https://github.com/NOAA-FIMS/FIMS/issues) on GitHub.

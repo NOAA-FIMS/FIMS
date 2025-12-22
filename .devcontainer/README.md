@@ -31,12 +31,12 @@ To open the container on your local Windows machine using Windows Subsystem for 
 ### Clone FIMS repository (first time only)
 
 - Once connected to WSL, open a new terminal in VS Code.
-- Clone the project repository:
+- Clone the project repository inside the WSL2 file system.
 ```bash
 git clone https://github.com/NOAA-FIMS/FIMS.git
 ```
 
-> **Note for other FIMS-related projects:** Feel free to use the [example](https://github.com/NOAA-FIMS/FIMS/tree/add-google-cloud-workstations-bash/.devcontainer/user) in the `FIMS/.devcontainer/user` folder as template to set up similar devconatiner environments for your own repositories.
+> **Note:** For other FIMS-related projects, feel free to use the [example](https://github.com/NOAA-FIMS/FIMS/tree/add-google-cloud-workstations-bash/.devcontainer/user) in the `FIMS/.devcontainer/user` folder as template to set up similar devconatiner environments for your own repositories.
 
 ### Open FIMS in Dev Container
 
