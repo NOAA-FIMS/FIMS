@@ -16,7 +16,7 @@ To open the container in a Codespace using the internet browser of your choice p
 - If you plan to run a FIMS model, change the `Machine type` from the default `2-core` to at least `4-core`. The default will not allow you to compile {FIMS} and will lead to your R session unexpectedly crashing but it is set as the default because we pay for each minute used in Codespaces whether the session is actively being used or sitting idle and 2 cores is much cheaper.
 - Click the green `Create codespace` button. 
 
-> Note: The first build can take several minutes for a `FIMS developer` setup and about 15–20 minutes for a `FIMS user` setup.
+> **Note:** The first build can take several minutes for a `FIMS developer` setup and about 15–20 minutes for a `FIMS user` setup.
 
 ## 🐧 WSL2
 

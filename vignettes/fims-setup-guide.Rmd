@@ -25,15 +25,14 @@ extract_remote_markdown <- function(url, header_pattern) {
   start_idx <- grep(header_pattern, lines, ignore.case = TRUE)
   
   if (length(start_idx) > 0) {
-    # Find the next header of the same or higher level (e.g., ## or #)
-    # This regex looks for any line starting with # followed by a space
     all_hdrs <- grep("^#+ ", lines)
     end_idx <- all_hdrs[all_hdrs > start_idx][1]
     
     if (is.na(end_idx)) end_idx <- length(lines) else end_idx <- end_idx - 1
     
-    # Extract lines (excluding the header itself)
-    content <- lines[(start_idx + 1):end_idx]
+    # FIX: Include a blank line at the start to ensure lists render
+    # We keep the content from after the header
+    content <- c("", lines[(start_idx + 1):end_idx]) 
     writeLines(content, tmp)
   } else {
     writeLines("_Section not found in remote documentation._", tmp)
@@ -80,9 +79,9 @@ NOAA Fisheries Google Cloud Workstations provide a managed RStudio, Visual Studi
   
 - Click the `Start` and `Launch` buttons to initialize the workstation.
 
-- Add a new session from either `Positron Pro`, `RStudio Pro`, or `VS Code` when using `posit-*` configurations, and then `Launch` the session
+- Add a new session from either `Positron Pro`, `RStudio Pro`, or `VS Code` when using `posit-*` configurations, and then `Launch` the session.
 
-- Open a bash terminal within your session and execute the following command to install all necessary system and R dependencies. The process typically takes 15 to 30 minutes.
+- Open a bash terminal within your session and execute the following command to install all necessary system and R dependencies.
 
 ```{r, echo=FALSE, results='asis'}
 cat("```bash\n")
@@ -90,7 +89,7 @@ cat(common_script, sep = "\n")
 cat("\n```")
 ```
 
-> **Note:** If using `Positron Pro`, a restart of the R session is required to initialize the new libraries. Please run `library(FIMS)` in the R session to confirm the successful installation of FIMS.
+> **Note:** The process typically takes 15 to 30 minutes. If using `Positron Pro`, a restart of the R session is required to initialize the new libraries. Please run `library(FIMS)` in the R session to confirm the successful installation of FIMS.
 
 <details>
 <summary>🤿 Deep dive: R code to read/wrote to Google Cloud Storage Buckets (Click to expand)</summary>
@@ -119,7 +118,7 @@ cat("\n```")
 </details>
 
 <details>
-<summary>🤿 Resources (Click to expand)</summary>
+<summary> 🗂️ Resources (Click to expand)</summary>
 
 - [NOAA Fisheries Cloud Program](https://docs.google.com/document/d/1nziPdPULoRWOYQ9WKzISNUgJvANACvfYpFr1z3Ro2Bc/edit?usp=sharing) began a Cloud Compute Accelerator Pilot in early 2025: Enhancing NOAA Fisheries' Mission with Google Cloud Workstations. 
 
@@ -163,6 +162,12 @@ Windows: Must have Git Bash or a similar shell environment installed.
 macOS/Linux: Standard terminal access.
 
 To install, execute the following command in your terminal:
+
+```{r, echo=FALSE, results='asis'}
+cat("```bash\n")
+cat(common_script, sep = "\n")
+cat("\n```")
+```
 
 ## 🙋 Support
 For technical assistance or to report discrepancies in this guide, please open an issue on GitHub.
