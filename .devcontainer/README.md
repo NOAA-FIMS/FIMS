@@ -15,7 +15,8 @@ To open the container in a Codespace using the internet browser of your choice p
 - Select `FIMS User` if you want to run stock assessments using FIMS. Select `FIMS Developer` if you are contributing to the source code or maintaining the FIMS repository.
 - If you plan to run a FIMS model, change the `Machine type` from the default `2-core` to at least `4-core`. The default will not allow you to compile {FIMS} and will lead to your R session unexpectedly crashing but it is set as the default because we pay for each minute used in Codespaces whether the session is actively being used or sitting idle and 2 cores is much cheaper.
 - Click the green `Create codespace` button. 
-- Codespaces will now build the container. The first build can take several minutes for a `FIMS developer` setup and about 15–20 minutes for a `FIMS user` setup.
+
+> Note: The first build can take several minutes for a `FIMS developer` setup and about 15–20 minutes for a `FIMS user` setup.
 
 ## 🐧 WSL2
 
@@ -35,9 +36,7 @@ To open the container on your local Windows machine using Windows Subsystem for 
 git clone https://github.com/NOAA-FIMS/FIMS.git
 ```
 
-> **Note for other projects**
-> 
-> Feel free to use the [example](https://github.com/NOAA-FIMS/FIMS/tree/add-google-cloud-workstations-bash/.devcontainer/user) in the `FIMS/.devcontainer/user` folder as template to set up similar devconatiner environments for your own repositories.
+> **Note for other FIMS-related projects:** Feel free to use the [example](https://github.com/NOAA-FIMS/FIMS/tree/add-google-cloud-workstations-bash/.devcontainer/user) in the `FIMS/.devcontainer/user` folder as template to set up similar devconatiner environments for your own repositories.
 
 ### Open FIMS in Dev Container
 
