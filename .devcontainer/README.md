@@ -2,7 +2,7 @@
 
 This cheat sheet outlines the steps for setting up a consistent FIMS environment. The approach bypasses manual dependency installation and keeps everyone's setup the same.
 
-Please follow the section below that matches how you plan to open the container, i.e., follow the :globe_with_meridians:[GitHub Codespaces section](#github-codespaces) if you wish to open the container using Codespaces from your favorite web browser and the :technologist:[Windows Subsystem for Linux 2 (WSL2) section](#WSL2) if you wish to launch the container on your own machine.
+Please follow the section below that matches how you plan to open the container, i.e., follow the 🌐[GitHub Codespaces section](#github-codespaces) if you wish to open the container using Codespaces from your favorite web browser and the 🐧[Windows Subsystem for Linux 2 (WSL2) section](#WSL2) if you wish to launch the container on your own machine.
 
 ## 🌐 GitHub Codespaces
 
@@ -19,7 +19,7 @@ To open the container in a Codespace using the internet browser of your choice p
 
 ## 🐧 WSL2
 
-To open the container on your local Windows machine using Windows Subsystem for Linux 2 (WSL2), Docker Engine, and Visual Studio Code (VS Code) use the following instructions:
+To open the container on your local Windows machine using Windows Subsystem for Linux 2 (WSL2), Docker Engine, and Visual Studio Code (VS Code) use the following instructions: 
 
 ### Connect VS Code to WSL
 
@@ -35,6 +35,10 @@ To open the container on your local Windows machine using Windows Subsystem for 
 git clone https://github.com/NOAA-FIMS/FIMS.git
 ```
 
+> **Note for other projects**
+> 
+> Feel free to use the [example](https://github.com/NOAA-FIMS/FIMS/tree/add-google-cloud-workstations-bash/.devcontainer/user) in the `FIMS/.devcontainer/user` folder as template to set up similar devconatiner environments for your own repositories.
+
 ### Open FIMS in Dev Container
 
 - In VS Code and press `Ctrl + O` to open the FIMS Folder you just cloned. 
@@ -43,7 +47,7 @@ git clone https://github.com/NOAA-FIMS/FIMS.git
 - Select `FIMS User` if you want to run stock assessments using FIMS. Select `FIMS Developer` if you are contributing to the source code or maintaining the FIMS repository.
 - Docker will now build the container. The first build can take several minutes for a `FIMS developer` setup and about 15–20 minutes for a `FIMS user` setup.
 
-### :door: Close the Container
+### Close the Container
 
 When you're finished, open the Command Palette (`Ctrl + Shift +P`) and type `Remote: Close Remote Connection`.
 
