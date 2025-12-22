@@ -55,7 +55,7 @@ extract_remote_markdown <- function(url, header_pattern) {
 
 This guide facilitates the configuration of a standardized Fisheries Integrated Modeling System (FIMS) environment. By utilizing cloud-based workstations and containerized development environments, we ensure cross-platform consistency and eliminate the complexities of manual dependency management.
 
-Please follow the section below that matches how you plan to set up FIMS, i.e., ☁️[Google Cloud Workstations](#google-cloud-workstations) for managed cloud IDEs (internal NOAA), 🌐[GitHub Codespaces](#github-codespaces) for browser-based containerized environments, 🐧[Windows Subsystem for Linux 2 (WSL2)](#wsl2) for a containerized Linux environment running on Windows hardware, and 🧑‍💻[Native Local](#native-local) installation for direct deployment on your machine's primary operating system.
+Please follow the section below that matches how you plan to set up FIMS, i.e., ☁️[Google Cloud Workstations](#google-cloud-workstations) for managed cloud IDEs (internal NOAA), 🌐[GitHub Codespaces](#github-codespaces) for browser-based containerized environments, 🐧[Windows Subsystem for Linux 2 (WSL2)](#wsl2) for a containerized Linux environment running on Windows hardware, and 🧑‍💻[Local](#local) installation for direct deployment on your machine's primary operating system.
 
 ```{r common-setup, echo=FALSE}
 # The bash script for setting up FIMS
@@ -160,7 +160,7 @@ tmp_wsl2 <- extract_remote_markdown(base_url, "## .*WSL2")
 ```{r, render-wsl2, child=tmp_wsl2}
 ```
 
-## 🧑‍💻 Native Local
+## 🧑‍💻 Local
 
 Users wishing to install FIMS directly on their host operating system (macOS, Linux, or Windows) can do so using the `setup_fims.sh` bash script. To install, execute the following command in the bash terminal:
 
@@ -170,7 +170,7 @@ cat(common_script, sep = "\n")
 cat("\n```")
 ```
 
-**Note:** For Windows users, Git Bash is required. If you are using RStudio on Windows, make sure the terminal is configured to use Git Bash. You can do this by going to **Tools** -> **Global Options...** -> **Terminal**, and selecting **Git Bash** under **New terminals open with:**.
+**Note:** For Windows users, Git Bash is required. If you are using RStudio on Windows, make sure the terminal is configured to use Git Bash. You can do this by going to `Tools` -> `Global Options...` -> `Terminal`, and selecting `Git Bash` under `New terminals open with:`.
 
 ## 🙋 Need Help?
 - If the instructions above do not work, please visit the FIMS [discussion page](https://github.com/orgs/NOAA-FIMS/discussions/1073) to see known issues and documented solutions. If you encounter a new error, feel free to post it there for technical assistance. 
