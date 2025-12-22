@@ -1,0 +1,304 @@
+/*---Use template from: https://ocsdata.ncd.noaa.gov/HSRP/css/ocs-fonts.css---*/
+/*---Use template from: https://www.legislative.noaa.gov/noaa-web/css/contentFormatting.css---*/
+body {
+  font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #213f4b; /* $slate-10 (dark) */
+  background-color: #FFFFFF;
+}
+
+.fas fa-home fa-lg{
+  background-color: #FFFFFF;
+}
+
+/* Headings use Outfit and a blue color */
+h1, h2, h3, h4, h5, h6 {
+  font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #0e6876;
+  font-weight: 400;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+h1 {
+  font-size: 2.5rem; /* Closer to Quarto's h1 */
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+h3 {
+  font-size: 1.75rem;
+  font-weight: 400;
+}
+
+h4 {
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+h5 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+}
+
+h6 {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+p {
+  margin-top: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  text-align: left;
+  color: #213f4b; /* $slate-10 for body text color */
+}
+
+/* Main page title styles */
+h1.title, h1.mobile {
+  font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 3rem; /* Adjusted for modern look, closer to Quarto title */
+  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0px;
+  font-weight: 700; /* Bold weight for page title */
+  color: #0e6876; /* $blue-30 */
+}
+
+/* Link styles - using $blue-50 as the primary link color from colors.scss */
+a { font-weight: bold; }
+a:link { color: #0e6876;	}
+a:visited { color: #0e6876;	}
+a:hover { color: #0b535e; } 
+
+.leftAlignImage img, .rightAlignImage img {
+  width: 200px;
+  border: none;
+}
+
+.leftAlignImage, .rightAlignImage {
+  padding: 4px;
+  border: none;
+  width: 200px;
+  height: auto;
+}
+
+.leftAlignImage {
+  float: left;
+  margin-right: 10px;
+}
+
+.rightAlignImage {
+  float: right;
+  margin-left: 10px;
+}
+
+.rightAlignImage p:first-child, .leftAlignImage p:first-child  {
+  margin-left: 0px;
+  margin-top: 0px;
+}
+
+.rightAlignImage p, .leftAlignImage p {
+  margin-bottom: 0px;
+  margin-top: 6px;
+}
+
+#main {
+  padding-top: 20px;
+}
+
+@media (min-width: 576px) {
+    .template-home .page-header {
+        min-height: 0px;
+    }
+}
+
+@media (min-width: 576px) {
+    .page-header {
+        min-height: 0px;
+    }
+}
+
+/*---navbar ---*/
+.navbar {
+  font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin-bottom: 0;
+  margin-top: 10px;
+  border-radius: 0;
+  color: #51595d !important; /* $slate-40 for generic navbar text */
+  background-color: #FFFFFF !important;
+  width: auto;
+}
+
+#navbar.collapse.navbar-collapse {
+    display: flex !important;
+    justify-content: end !important; 
+    margin-left: 0 !important;
+}
+
+#navbar .navbar-nav:first-child {
+    margin-right: 0 !important;
+}
+
+#navbar .navbar-nav:nth-child(2) {
+    margin-left: 0 !important;
+}
+
+.navbar-container .navbar-brand-container {
+    display: flex;
+    /* align-items: center !important;  */
+    gap: 10px; 
+}
+
+.navbar-brand {
+  font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #51595d !important ; /* $slate-40 for generic navbar text */
+  font-size: 1.4rem !important;
+  font-weight: 400;
+  letter-spacing: 1px;
+  display: block;
+}
+
+.text-muted {
+  color: #51595d !important;
+}
+
+small, .small {
+    font-size: 1rem !important;
+}
+
+.navbar .container {
+    padding-top: 0px;  
+    padding-bottom: 0px; 
+    display: flex !important;
+    /* align-items: center !important; */
+    max-width: 95% !important; 
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.container .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+}
+
+.col-md-9, .col-md-3 {
+    padding-left: 10px !important; 
+    padding-right: 10px !important;
+}
+
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.navlogo {
+    margin-right: 20px !important; 
+    margin-top: auto !important;     /* Auto margin pushes it to the center */
+    margin-bottom: auto !important; /* Auto margin pushes it to the center */
+    vertical-align: middle !important; /* Keep as a fallback */
+    vertical-align: middle !important; 
+    width: 90px !important;
+    max-width: 80px !important; 
+    min-width: 80px !important;
+    height: auto; 
+    float: none !important;
+}
+
+.navbar-brand:hover, .navbar-brand:focus .navbar-brand:active {
+  color: #0e6270;
+}
+
+.navbar .nav-link {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    letter-spacing: 1px !important;
+}
+
+.nav-item .nav-link, .nav-item .nav-link:visited {
+    color: #51595d !important; 
+    text-transform: lowercase !important;
+    font-size: 1.1rem !important; 
+}
+
+.nav-item .nav-link:hover {
+    color: #0e6270cc !important; 
+    background: none !important;
+}
+
+.nav-item.active .nav-link {
+    border-bottom: 3px solid #f54f61; 
+    color: #0e6876 !important;
+    background: none !important;
+}
+
+.nav-item.dropdown .show > .dropdown-toggle {
+    color: #0e6876 !important;
+}
+
+.dropdown-header {
+    margin-top: 0 !important;
+    font-size: 1.15rem !important; 
+    color: #0e6876 !important;
+    text-transform: lowercase !important;
+}
+
+.dropdown-item {
+  color: #213f4b !important;
+  font-size: 1rem;
+  text-transform: lowercase !important;
+}
+
+.dropdown-item:hover {
+  color:#FFFFFF !important;
+  background-color: #0e6270 !important;
+}
+
+#toc>.nav a.nav-link {
+    color: #0e6876 !important;
+}
+
+#toc>.nav a.nav-link.active {
+    background-color: #0e6876 !important;
+    color: #FFFFFF !important;
+}
+
+#toc>.nav a.nav-link:not(.active):hover, #toc>.nav a.nav-link:not(.active):focus {
+    background-color: transparent !important;
+    color: #0e6270cc !important;
+}
+
+/*---footer---*/
+footer {
+  font-size: 14px;
+  color: #4a636c; /* $slate-30 */
+  background-color: #FFFFFF;
+  padding-top: 15px;
+  margin-bottom: 0;
+  border-radius: 0;
+  width: auto;
+  /* Add a top border to separate content from footer */
+  border-top: 1px solid #ebeeef; /* $slate-90 (light border) */
+}
+
+footer p {
+  margin-left: 3px;
+  margin-right: 3px;
+  text-align: Center;
+  color: #4a636c; /* $slate-30 */
+  line-height: 1.4;
+}
+
+/* Footer links - using $slate-30 to make them blend in a bit more */
+footer a:link { color: #4a636c; text-decoration: none; }
+footer a:visited { color: #4a636c; text-decoration: none; }
+footer a:hover { color: #213f4b; text-decoration: none; }
