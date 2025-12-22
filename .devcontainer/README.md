@@ -2,7 +2,7 @@
 
 This cheat sheet outlines the steps for setting up a consistent FIMS environment. The approach bypasses manual dependency installation and keeps everyone's setup the same.
 
-Please follow the section below that matches how you plan to open the container, i.e., follow the 🌐[GitHub Codespaces section](#github-codespaces) if you wish to open the container using Codespaces from your favorite web browser and the 🐧[Windows Subsystem for Linux 2 (WSL2) section](#WSL2) if you wish to launch the container on your own machine.
+Please follow the section below that matches how you plan to open the container, i.e., follow the 🌐[GitHub Codespaces section](#-github-codespaces) if you wish to open the container using Codespaces from your favorite web browser and the 🐧[Windows Subsystem for Linux 2 (WSL2) section](#-wsl2) if you wish to launch the container on your own machine.
 
 ## 🌐 GitHub Codespaces
 
@@ -50,7 +50,6 @@ git clone https://github.com/NOAA-FIMS/FIMS.git
 
 When you're finished, open the Command Palette (`Ctrl + Shift +P`) and type `Remote: Close Remote Connection`.
 
-## :raising_hand: Need help?
+## 🙋 Need help?
 
-If any of the instructions above do not work as expected, please
-[report an issue on GitHub](https://github.com/NOAA-FIMS/FIMS/issues).
+If any of the instructions above do not work as expected, please [report an issue on GitHub](https://github.com/NOAA-FIMS/FIMS/issues).
