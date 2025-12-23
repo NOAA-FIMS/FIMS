@@ -143,7 +143,7 @@ cat("\n```")
 
 ## 🌐 GitHub Codespaces
 
-GitHub Codespaces offers a "container-as-a-service" model that provides a pre-configured FIMS environment directly in your browser. 
+[GitHub Codespaces](https://docs.github.com/en/codespaces) offers a ["container-as-a-service"](https://www.atlassian.com/microservices/cloud-computing/containers-as-a-service) model that provides a pre-configured FIMS environment directly in your browser. 
 
 ```{r, fetch-codespaces, include=FALSE}
 # Define the target URL
@@ -178,4 +178,4 @@ cat("\n```")
 
 ## 🙋 Need Help?
 - If the instructions above do not work, please visit the FIMS [discussion page](https://github.com/orgs/NOAA-FIMS/discussions/1073) to see known issues and documented solutions. If you encounter a new error, feel free to post it there for technical assistance. 
-- To report errors discrepancies in this guide, please [open an issue](https://github.com/NOAA-FIMS/FIMS/issues) on GitHub.
+- To report errors in this guide, please [open an issue](https://github.com/NOAA-FIMS/FIMS/issues) on GitHub.

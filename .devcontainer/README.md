@@ -13,7 +13,7 @@ To open the container in a Codespace using the internet browser of your choice p
 - Select `New with options ...`.
 - A dropdown labeled `Dev container configuration` will appear.
 - Select `FIMS User` if you want to run stock assessments using FIMS. Select `FIMS Developer` if you are contributing to the source code or maintaining the FIMS repository.
-- If you plan to run a FIMS model, change the `Machine type` from the default `2-core` to at least `4-core`. The default will not allow you to compile {FIMS} and will lead to your R session unexpectedly crashing but it is set as the default because we pay for each minute used in Codespaces whether the session is actively being used or sitting idle and 2 cores is much cheaper.
+- If you plan to run a FIMS model, change the `Machine type` from the default `2-core` to at least `4-core`. The default `2-core` will not allow you to compile {FIMS} and will lead to your R session unexpectedly crashing but it is set as the default because we pay for each minute used in Codespaces whether the session is actively being used or sitting idle and 2 cores is much cheaper.
 - Click the green `Create codespace` button. 
 
 > **Note:** The first build can take several minutes for a `FIMS developer` setup and about 15–20 minutes for a `FIMS user` setup.
@@ -36,7 +36,7 @@ To open the container on your local Windows machine using Windows Subsystem for 
 git clone https://github.com/NOAA-FIMS/FIMS.git
 ```
 
-> **Note:** For other FIMS-related projects, feel free to use the [example](https://github.com/NOAA-FIMS/FIMS/tree/add-google-cloud-workstations-bash/.devcontainer/user) in the `FIMS/.devcontainer/user` folder as template to set up similar devconatiner environments for your own repositories.
+> **Note:** For other FIMS-related projects, feel free to use the [example](https://github.com/NOAA-FIMS/FIMS/tree/add-google-cloud-workstations-bash/.devcontainer/user) in the `FIMS/.devcontainer/user` folder as a template to set up similar devcontainer environments for your own repositories.
 
 ### Open FIMS in Dev Container
 
