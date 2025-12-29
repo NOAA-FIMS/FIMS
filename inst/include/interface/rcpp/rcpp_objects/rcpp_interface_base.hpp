@@ -133,12 +133,11 @@ uint32_t Parameter::id_g = 0;
  * @return The sanitized double value.
  */
 inline double sanitize_val(double x) {
-    if (std::isnan(x) || std::isinf(x)) {
-        return -999.0;
-    }
-    return x;
+  if (std::isnan(x) || std::isinf(x)) {
+    return -999.0;
+  }
+  return x;
 }
-
 
 /**
  * @brief Output for std::ostream& for a parameter.
@@ -148,9 +147,11 @@ inline double sanitize_val(double x) {
  * @return std::ostream&
  */
 std::ostream& operator<<(std::ostream& out, const Parameter& p) {
-  out << "{\"id\": " << p.id_m << ",\n\"value\": " << sanitize_val(p.initial_value_m)
+  out << "{\"id\": " << p.id_m
+      << ",\n\"value\": " << sanitize_val(p.initial_value_m)
       << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m)
-      << ",\n\"uncertainty\": " << sanitize_val(p.uncertainty_m) << ",\n\"min\": ";
+      << ",\n\"uncertainty\": " << sanitize_val(p.uncertainty_m)
+      << ",\n\"min\": ";
   if (p.min_m == -std::numeric_limits<double>::infinity()) {
     out << "\"-Infinity\"";
   } else {
