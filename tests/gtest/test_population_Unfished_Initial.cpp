@@ -133,7 +133,7 @@ namespace
                 catch_at_age_model->CalculateUnfishedSpawningBiomass(population,i_age_year, year, age);
                 
                 test_unfished_spawning_biomass[year] += dq["proportion_mature_at_age"][i_age_year] *
-                                                        population->proportion_female[age] *
+                                                        population->proportion_female[0] *
                                                         test_unfished_numbers_at_age[i_age_year] *
                                                         population->growth->evaluate(population->ages[age]);
 

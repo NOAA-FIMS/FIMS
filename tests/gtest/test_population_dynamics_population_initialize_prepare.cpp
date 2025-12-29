@@ -30,7 +30,7 @@ namespace
         EXPECT_EQ(dq["unfished_biomass"].size(), (n_years + 1));
         EXPECT_EQ(dq["unfished_spawning_biomass"].size(), (n_years + 1));
         EXPECT_EQ(dq["spawning_biomass"].size(), n_years + 1);
-        EXPECT_EQ(catch_at_age_model->populations[0]->proportion_female.size(), n_ages);
+        EXPECT_EQ(catch_at_age_model->populations[0]->proportion_female[0], 0.5);
         EXPECT_EQ(catch_at_age_model->populations[0]->M.size(), n_years * n_ages);
         EXPECT_EQ(dq["expected_recruitment"].size(), n_years + 1);
         EXPECT_EQ(dq["sum_selectivity"].size(), n_years * n_ages);
@@ -95,11 +95,7 @@ namespace
         EXPECT_EQ(catch_at_age_model->populations[0]->M.size(), n_years * n_ages);
 
         // Test population.proportion_female
-        fims::Vector<double> p_female(n_ages, 0.5);
-        for(int i = 0; i < n_ages; i++)
-        {
-            EXPECT_EQ(catch_at_age_model->populations[0]->proportion_female[i], p_female[i]);
-        }
+        EXPECT_EQ(catch_at_age_model->populations[0]->proportion_female[0], 0.5);
         
     }
 } // namespace

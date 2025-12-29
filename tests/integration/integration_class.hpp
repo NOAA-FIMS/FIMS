@@ -110,7 +110,6 @@ public:
 
     // size all the vectors to length of n_ages
     pop.years.resize(n_years);
-    pop.proportion_female.resize(n_ages);
     pop.M.resize(n_years * n_ages);
     pop.ages.resize(n_ages);
     pop.log_init_naa.resize(n_ages);

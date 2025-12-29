@@ -99,9 +99,6 @@ class CAAInitializeTestFixture : public testing::Test {
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
-      this->catch_at_age_model->populations[p]->proportion_female.resize(
-          this->catch_at_age_model->populations[p]->n_ages);
-
       this->catch_at_age_model->populations[p]->M.resize(
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
@@ -327,10 +324,8 @@ class CAAEvaluateTestFixture : public testing::Test {
     double prop_female_max = 0.9;
     std::uniform_real_distribution<double> prop_female_distribution(
         prop_female_min, prop_female_max);
-    for (int i = 0; i < n_ages; i++) {
-      catch_at_age_model->populations[0]->proportion_female[i] =
+      catch_at_age_model->populations[0]->proportion_female[0] =
           prop_female_distribution(generator);
-    }
 
     // numbers_at_age
     double numbers_at_age_min = fims_math::exp(10.0);
@@ -442,9 +437,6 @@ class CAAEvaluateTestFixture : public testing::Test {
 
       derived_quantities["sum_selectivity"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years *
-          this->catch_at_age_model->populations[p]->n_ages);
-
-      this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
 
       this->catch_at_age_model->populations[p]->M.resize(
@@ -724,9 +716,6 @@ class CAAPrepareTestFixture : public testing::Test {
 
       derived_quantities["sum_selectivity"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years *
-          this->catch_at_age_model->populations[p]->n_ages);
-
-      this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
 
       this->catch_at_age_model->populations[p]->M.resize(
