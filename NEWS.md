@@ -4,6 +4,7 @@
 * Allows the output columns to be merged with reshape and dplyr when character
   values are combined with strings
 * Fixes spawning biomass output in print method to report value
+* Fixes get_output() when there is no sdreport with added argument do_sd_report
 
 # FIMS 0.7.0
 

@@ -72,7 +72,24 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual ~FisheryModelInterfaceBase() {}
 
-  virtual std::string to_json() {
+  /**
+   * @brief Serialize the fishery model to a JSON string.
+   *
+   * This method provides a standardized interface for converting the state of
+   * a fishery model into a JSON-formatted string. The JSON output is intended
+   * for use in reporting, diagnostics, or data exchange between C++ and R.
+   * Derived classes should override this method to provide model-specific
+   * serialization logic.
+   *
+   * @param do_sd_report A boolean to include standard deviation report
+   * calculations in the output if true. This is typically set to false when
+   * maximum likelihood estimation optimization is not performed, to avoid
+   * unnecessary computations. Default is true.
+   * @return A JSON string representing the current state of the model. The
+   * base implementation returns a placeholder string indicating the method is
+   * not yet implemented.
+   */
+  virtual std::string to_json(bool do_sd_report = true) {
     return "std::string to_json() not yet implemented.";
   }
 
@@ -661,9 +678,12 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    *
    * @details Returns a list containing the report results for the CatchAtAge
    * model, including derived quantities and diagnostics.
+   * @param do_sd_report  A boolean indicating whether to perform sdreport 
+   * calculations, which should be skipped when MLE optimization is false. 
+   * Default is true.
    * @return Rcpp::List containing the report output.
    */
-  Rcpp::List get_report() {
+  Rcpp::List get_report(bool do_sd_report = true) {
     Rcpp::Environment base = Rcpp::Environment::base_env();
     Rcpp::Function summary = base["summary"];
 
@@ -697,31 +717,52 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     double of_value =
         Rcpp::as<double>(func(this->get_fixed_parameters_vector()));
     Rcpp::List rep = report();
-    SEXP sdr = sdreport(obj);
-    Rcpp::RObject sdr_summary = summary(sdr, "report");
+    
+    // Initialize variables for sdreport results
+    Rcpp::RObject sdr_summary;
+    Rcpp::NumericMatrix mat;
+    Rcpp::CharacterVector rownames;
+    Rcpp::CharacterVector colnames;
+    Rcpp::List grouped_out = Rcpp::List::create();
+    double first_est = 0.0;
+    
+    // Only run sdreport if do_sd_report is true
+    if (do_sd_report) {
+      SEXP sdr = sdreport(obj);
+      sdr_summary = summary(sdr, "report");
 
-    Rcpp::NumericMatrix mat(sdr_summary);
-    Rcpp::List dimnames = mat.attr("dimnames");
-    Rcpp::CharacterVector rownames = dimnames[0];
-    Rcpp::CharacterVector colnames = dimnames[1];
+      mat = Rcpp::NumericMatrix(sdr_summary);
+      Rcpp::List dimnames = mat.attr("dimnames");
+      rownames = dimnames[0];
+      colnames = dimnames[1];
 
-    // ---- Group into map ----
-    std::map<std::string, std::vector<double>> grouped;
-    int nrow = mat.nrow();
-    for (int i = 0; i < nrow; i++) {
-      std::string key = Rcpp::as<std::string>(rownames[i]);
-      double val = mat(i, 1);  // col 1 = "Std. Error"
-      grouped[key].push_back(val);
+      // ---- Group into map ----
+      std::map<std::string, std::vector<double>> grouped;
+      int nrow = mat.nrow();
+      for (int i = 0; i < nrow; i++) {
+        std::string key = Rcpp::as<std::string>(rownames[i]);
+        double val = mat(i, 1);  // col 1 = "Std. Error"
+        grouped[key].push_back(val);
+      }
+
+      // ---- Convert map -> R list ----
+      for (auto const &kv : grouped) {
+        grouped_out[kv.first] = Rcpp::wrap(kv.second);
+      }
+
+      // Example: grab "Estimate" for first row
+      if (nrow > 0) {
+        first_est = mat(0, 0);
+      }
+    } else {
+      // Return empty objects when do_sd_report is false
+      sdr_summary = R_NilValue;
+      mat = Rcpp::NumericMatrix(0, 0);
+      rownames = Rcpp::CharacterVector(0);
+      colnames = Rcpp::CharacterVector(0);
+      grouped_out = Rcpp::List::create();
+      // first_est is already initialized to 0.0
     }
-
-    // ---- Convert map -> R list ----
-    Rcpp::List grouped_out;
-    for (auto const &kv : grouped) {
-      grouped_out[kv.first] = Rcpp::wrap(kv.second);
-    }
-
-    // Example: grab "Estimate" for first row
-    double first_est = mat(0, 0);
 
     return Rcpp::List::create(
         Rcpp::Named("objective_function_value") = of_value,
@@ -734,10 +775,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         Rcpp::Named("grouped_se") = grouped_out);
   }
   /**
-   * @brief Method to convert the model to a JSON string.
+   * @copydoc FisheryModelInterfaceBase::to_json
    */
-  virtual std::string to_json() {
-    Rcpp::List report = get_report();
+  virtual std::string to_json(bool do_sd_report = true) {
+    Rcpp::List report = get_report(do_sd_report);
     Rcpp::List grouped_out = report["grouped_se"];
     double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
     Rcpp::NumericVector grad = report["gradient"];
@@ -749,16 +790,18 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     }
     // Assume grouped_out is an Rcpp::List
     std::map<std::string, std::vector<double>> grouped_cpp;
-    Rcpp::CharacterVector names = grouped_out.names();
-    for (int i = 0; i < grouped_out.size(); i++) {
-      std::string key = Rcpp::as<std::string>(names[i]);
-      Rcpp::NumericVector vec =
-          grouped_out[i];  // each element is a numeric vector
-      std::vector<double> vec_std(vec.size());
-      for (int j = 0; j < vec.size(); j++) {
-        vec_std[j] = vec[j];
+    if (grouped_out.size() > 0) {
+      Rcpp::CharacterVector names = grouped_out.names();
+      for (int i = 0; i < grouped_out.size(); i++) {
+        std::string key = Rcpp::as<std::string>(names[i]);
+        Rcpp::NumericVector vec =
+            grouped_out[i];  // each element is a numeric vector
+        std::vector<double> vec_std(vec.size());
+        for (int j = 0; j < vec.size(); j++) {
+          vec_std[j] = vec[j];
+        }
+        grouped_cpp[key] = vec_std;
       }
-      grouped_cpp[key] = vec_std;
     }
     this->se_values = grouped_cpp;
 
