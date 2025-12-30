@@ -178,7 +178,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         }
       }
 
-      for (size_t year = 0; year < population->nyears; year++) {
+      for (size_t year = 0; year < population->n_years; year++) {
           population->f_multiplier[year] = 
           fims_math::exp(population->log_f_multiplier[year]);
       }
