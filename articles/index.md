@@ -1,6 +1,6 @@
 # Articles
 
-### Fisheries Integrated Modeling System (FIMS)
+### FIMS
 
 - [Introducing the Fisheries Integrated Modeling System
   (FIMS)](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md):

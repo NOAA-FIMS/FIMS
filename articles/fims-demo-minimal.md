@@ -50,7 +50,7 @@ fit <- parameters |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.7.1
-    ## ℹ Total run time was 1.2314 minutes
+    ## ℹ Total run time was 1.22089 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00109
     ## ℹ Negative log likelihood (NLL):

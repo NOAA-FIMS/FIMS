@@ -180,46 +180,48 @@ will set up three logistic selectivity modules.
 
 ``` r
 # Create default configurations based on the data
-default_configurations <- create_default_configurations(data = data_4_model) |>
-  print()
+default_configurations <- create_default_configurations(data = data_4_model)
+
+default_configurations
 ```
 
 ``` numberSource
-##  [38;5;246m# A tibble: 7 × 4 [39m
+## # A tibble: 7 × 4
 ##   model_family module_name fleet_name data            
-##    [3m [38;5;246m<chr> [39m [23m         [3m [38;5;246m<chr> [39m [23m        [3m [38;5;246m<chr> [39m [23m       [3m [38;5;246m<list> [39m [23m          
-##  [38;5;250m1 [39m catch_at_age Data        fleet1      [38;5;246m<tibble [3 × 4]> [39m
-##  [38;5;250m2 [39m catch_at_age Selectivity fleet1      [38;5;246m<tibble [1 × 4]> [39m
-##  [38;5;250m3 [39m catch_at_age Data        survey1     [38;5;246m<tibble [3 × 4]> [39m
-##  [38;5;250m4 [39m catch_at_age Selectivity survey1     [38;5;246m<tibble [1 × 4]> [39m
-##  [38;5;250m5 [39m catch_at_age Growth       [31mNA [39m          [38;5;246m<tibble [1 × 4]> [39m
-##  [38;5;250m6 [39m catch_at_age Maturity     [31mNA [39m          [38;5;246m<tibble [1 × 4]> [39m
-##  [38;5;250m7 [39m catch_at_age Recruitment  [31mNA [39m          [38;5;246m<tibble [1 × 4]> [39m
+##   <chr>        <chr>       <chr>      <list>          
+## 1 catch_at_age Data        fleet1     <tibble [3 × 4]>
+## 2 catch_at_age Selectivity fleet1     <tibble [1 × 4]>
+## 3 catch_at_age Data        survey1    <tibble [3 × 4]>
+## 4 catch_at_age Selectivity survey1    <tibble [1 × 4]>
+## 5 catch_at_age Growth      <NA>       <tibble [1 × 4]>
+## 6 catch_at_age Maturity    <NA>       <tibble [1 × 4]>
+## 7 catch_at_age Recruitment <NA>       <tibble [1 × 4]>
 ```
 
 ``` r
 # The output is a nested tibble, with details in the `data` column.
 default_configurations_unnested <- default_configurations |>
-  tidyr::unnest(cols = data) |>
-  print()
+  tidyr::unnest(cols = data)
+
+default_configurations_unnested
 ```
 
 ``` numberSource
-##  [38;5;246m# A tibble: 11 × 7 [39m
+## # A tibble: 11 × 7
 ##    model_family module_name fleet_name module_type  distribution_link
-##     [3m [38;5;246m<chr> [39m [23m         [3m [38;5;246m<chr> [39m [23m        [3m [38;5;246m<chr> [39m [23m       [3m [38;5;246m<chr> [39m [23m         [3m [38;5;246m<chr> [39m [23m            
-##  [38;5;250m 1 [39m catch_at_age Data        fleet1     AgeComp      AgeComp          
-##  [38;5;250m 2 [39m catch_at_age Data        fleet1     Landings     Landings         
-##  [38;5;250m 3 [39m catch_at_age Data        fleet1     LengthComp   LengthComp       
-##  [38;5;250m 4 [39m catch_at_age Selectivity fleet1     Logistic      [31mNA [39m               
-##  [38;5;250m 5 [39m catch_at_age Data        survey1    AgeComp      AgeComp          
-##  [38;5;250m 6 [39m catch_at_age Data        survey1    Index        Index            
-##  [38;5;250m 7 [39m catch_at_age Data        survey1    LengthComp   LengthComp       
-##  [38;5;250m 8 [39m catch_at_age Selectivity survey1    Logistic      [31mNA [39m               
-##  [38;5;250m 9 [39m catch_at_age Growth       [31mNA [39m         EWAA          [31mNA [39m               
-##  [38;5;250m10 [39m catch_at_age Maturity     [31mNA [39m         Logistic      [31mNA [39m               
-##  [38;5;250m11 [39m catch_at_age Recruitment  [31mNA [39m         BevertonHolt log_devs         
-##  [38;5;246m# ℹ 2 more variables: distribution_type <chr>, distribution <chr> [39m
+##    <chr>        <chr>       <chr>      <chr>        <chr>            
+##  1 catch_at_age Data        fleet1     AgeComp      AgeComp          
+##  2 catch_at_age Data        fleet1     Landings     Landings         
+##  3 catch_at_age Data        fleet1     LengthComp   LengthComp       
+##  4 catch_at_age Selectivity fleet1     Logistic     <NA>             
+##  5 catch_at_age Data        survey1    AgeComp      AgeComp          
+##  6 catch_at_age Data        survey1    Index        Index            
+##  7 catch_at_age Data        survey1    LengthComp   LengthComp       
+##  8 catch_at_age Selectivity survey1    Logistic     <NA>             
+##  9 catch_at_age Growth      <NA>       EWAA         <NA>             
+## 10 catch_at_age Maturity    <NA>       Logistic     <NA>             
+## 11 catch_at_age Recruitment <NA>       BevertonHolt log_devs         
+## # ℹ 2 more variables: distribution_type <chr>, distribution <chr>
 ```
 
 ### Update configurations
@@ -239,26 +241,27 @@ updated_configurations <- default_configurations_unnested |>
       module_type = c("DoubleLogistic")
     ),
     by = c("module_name", "fleet_name")
-  ) |>
-  print()
+  )
+  
+  updated_configurations
 ```
 
 ``` numberSource
-##  [38;5;246m# A tibble: 11 × 7 [39m
+## # A tibble: 11 × 7
 ##    model_family module_name fleet_name module_type    distribution_link
-##     [3m [38;5;246m<chr> [39m [23m         [3m [38;5;246m<chr> [39m [23m        [3m [38;5;246m<chr> [39m [23m       [3m [38;5;246m<chr> [39m [23m           [3m [38;5;246m<chr> [39m [23m            
-##  [38;5;250m 1 [39m catch_at_age Data        fleet1     AgeComp        AgeComp          
-##  [38;5;250m 2 [39m catch_at_age Data        fleet1     Landings       Landings         
-##  [38;5;250m 3 [39m catch_at_age Data        fleet1     LengthComp     LengthComp       
-##  [38;5;250m 4 [39m catch_at_age Selectivity fleet1     Logistic        [31mNA [39m               
-##  [38;5;250m 5 [39m catch_at_age Data        survey1    AgeComp        AgeComp          
-##  [38;5;250m 6 [39m catch_at_age Data        survey1    Index          Index            
-##  [38;5;250m 7 [39m catch_at_age Data        survey1    LengthComp     LengthComp       
-##  [38;5;250m 8 [39m catch_at_age Selectivity survey1    DoubleLogistic  [31mNA [39m               
-##  [38;5;250m 9 [39m catch_at_age Growth       [31mNA [39m         EWAA            [31mNA [39m               
-##  [38;5;250m10 [39m catch_at_age Maturity     [31mNA [39m         Logistic        [31mNA [39m               
-##  [38;5;250m11 [39m catch_at_age Recruitment  [31mNA [39m         BevertonHolt   log_devs         
-##  [38;5;246m# ℹ 2 more variables: distribution_type <chr>, distribution <chr> [39m
+##    <chr>        <chr>       <chr>      <chr>          <chr>            
+##  1 catch_at_age Data        fleet1     AgeComp        AgeComp          
+##  2 catch_at_age Data        fleet1     Landings       Landings         
+##  3 catch_at_age Data        fleet1     LengthComp     LengthComp       
+##  4 catch_at_age Selectivity fleet1     Logistic       <NA>             
+##  5 catch_at_age Data        survey1    AgeComp        AgeComp          
+##  6 catch_at_age Data        survey1    Index          Index            
+##  7 catch_at_age Data        survey1    LengthComp     LengthComp       
+##  8 catch_at_age Selectivity survey1    DoubleLogistic <NA>             
+##  9 catch_at_age Growth      <NA>       EWAA           <NA>             
+## 10 catch_at_age Maturity    <NA>       Logistic       <NA>             
+## 11 catch_at_age Recruitment <NA>       BevertonHolt   log_devs         
+## # ℹ 2 more variables: distribution_type <chr>, distribution <chr>
 ```
 
 ``` r
@@ -300,49 +303,51 @@ growth, and maturity modules can be created. For example,
 default_parameters <- create_default_parameters(
   configurations = default_configurations,
   data = data_4_model
-) |>
-  print()
+) 
+
+default_parameters
 ```
 
 ``` numberSource
-##  [38;5;246m# A tibble: 10 × 4 [39m
+## # A tibble: 10 × 4
 ##    model_family module_name fleet_name data               
-##     [3m [38;5;246m<chr> [39m [23m         [3m [38;5;246m<chr> [39m [23m        [3m [38;5;246m<chr> [39m [23m       [3m [38;5;246m<list> [39m [23m             
-##  [38;5;250m 1 [39m catch_at_age Selectivity fleet1      [38;5;246m<tibble [2 × 10]> [39m  
-##  [38;5;250m 2 [39m catch_at_age Fleet       fleet1      [38;5;246m<tibble [31 × 10]> [39m 
-##  [38;5;250m 3 [39m catch_at_age Data        fleet1      [38;5;246m<tibble [32 × 10]> [39m 
-##  [38;5;250m 4 [39m catch_at_age Selectivity survey1     [38;5;246m<tibble [2 × 10]> [39m  
-##  [38;5;250m 5 [39m catch_at_age Fleet       survey1     [38;5;246m<tibble [31 × 10]> [39m 
-##  [38;5;250m 6 [39m catch_at_age Data        survey1     [38;5;246m<tibble [32 × 10]> [39m 
-##  [38;5;250m 7 [39m catch_at_age Recruitment  [31mNA [39m          [38;5;246m<tibble [150 × 10]> [39m
-##  [38;5;250m 8 [39m catch_at_age Maturity     [31mNA [39m          [38;5;246m<tibble [2 × 10]> [39m  
-##  [38;5;250m 9 [39m catch_at_age Population   [31mNA [39m          [38;5;246m<tibble [372 × 10]> [39m
-##  [38;5;250m10 [39m catch_at_age Growth       [31mNA [39m          [38;5;246m<tibble [1 × 10]> [39m
+##    <chr>        <chr>       <chr>      <list>             
+##  1 catch_at_age Selectivity fleet1     <tibble [2 × 10]>  
+##  2 catch_at_age Fleet       fleet1     <tibble [31 × 10]> 
+##  3 catch_at_age Data        fleet1     <tibble [32 × 10]> 
+##  4 catch_at_age Selectivity survey1    <tibble [2 × 10]>  
+##  5 catch_at_age Fleet       survey1    <tibble [31 × 10]> 
+##  6 catch_at_age Data        survey1    <tibble [32 × 10]> 
+##  7 catch_at_age Recruitment <NA>       <tibble [150 × 10]>
+##  8 catch_at_age Maturity    <NA>       <tibble [2 × 10]>  
+##  9 catch_at_age Population  <NA>       <tibble [372 × 10]>
+## 10 catch_at_age Growth      <NA>       <tibble [1 × 10]>
 ```
 
 ``` r
 # Unnest the default_parameters to see the detailed parameters
-default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data) |>
-  print()
+default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data)
+
+default_parameters_unnested
 ```
 
 ``` numberSource
-##  [38;5;246m# A tibble: 655 × 13 [39m
+## # A tibble: 655 × 13
 ##    model_family module_name fleet_name module_type label distribution_link   age
-##     [3m [38;5;246m<chr> [39m [23m         [3m [38;5;246m<chr> [39m [23m        [3m [38;5;246m<chr> [39m [23m       [3m [38;5;246m<chr> [39m [23m        [3m [38;5;246m<chr> [39m [23m  [3m [38;5;246m<chr> [39m [23m              [3m [38;5;246m<dbl> [39m [23m
-##  [38;5;250m 1 [39m catch_at_age Selectivity fleet1     Logistic    infl…  [31mNA [39m                    [31mNA [39m
-##  [38;5;250m 2 [39m catch_at_age Selectivity fleet1     Logistic    slope  [31mNA [39m                    [31mNA [39m
-##  [38;5;250m 3 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_q  [31mNA [39m                    [31mNA [39m
-##  [38;5;250m 4 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_…  [31mNA [39m                    [31mNA [39m
-##  [38;5;250m 5 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_…  [31mNA [39m                    [31mNA [39m
-##  [38;5;250m 6 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_…  [31mNA [39m                    [31mNA [39m
-##  [38;5;250m 7 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_…  [31mNA [39m                    [31mNA [39m
-##  [38;5;250m 8 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_…  [31mNA [39m                    [31mNA [39m
-##  [38;5;250m 9 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_…  [31mNA [39m                    [31mNA [39m
-##  [38;5;250m10 [39m catch_at_age Fleet       fleet1      [31mNA [39m          log_…  [31mNA [39m                    [31mNA [39m
-##  [38;5;246m# ℹ 645 more rows [39m
-##  [38;5;246m# ℹ 6 more variables: length <dbl>, time <int>, value <dbl>, [39m
-##  [38;5;246m#   estimation_type <chr>, distribution_type <chr>, distribution <chr> [39m
+##    <chr>        <chr>       <chr>      <chr>       <chr> <chr>             <dbl>
+##  1 catch_at_age Selectivity fleet1     Logistic    infl… <NA>                 NA
+##  2 catch_at_age Selectivity fleet1     Logistic    slope <NA>                 NA
+##  3 catch_at_age Fleet       fleet1     <NA>        log_q <NA>                 NA
+##  4 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
+##  5 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
+##  6 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
+##  7 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
+##  8 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
+##  9 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
+## 10 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
+## # ℹ 645 more rows
+## # ℹ 6 more variables: length <dbl>, time <int>, value <dbl>,
+## #   estimation_type <chr>, distribution_type <chr>, distribution <chr>
 ```
 
 ### Update parameters
@@ -485,7 +490,7 @@ fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.7.1
-    ## ℹ Total run time was 1.21812 minutes
+    ## ℹ Total run time was 1.22767 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00218
     ## ℹ Negative log likelihood (NLL):
@@ -517,8 +522,9 @@ output <- get_estimates(fit) |>
     year = year_i,
     estimate = estimated
   )
+```
 
-# Plot spawning biomass
+``` r
 stockplotr::plot_spawning_biomass(
   dplyr::filter(output, label == "spawning_biomass")
 ) +
@@ -541,10 +547,10 @@ stockplotr::plot_spawning_biomass(
     ## Warning: Removed 1 row containing missing values or values outside the scale range
     ## (`geom_text()`).
 
-![](fims-demo_files/figure-html/fit-plots-1.png)
+![Plot of spawning
+biomass.](fims-demo_files/figure-html/fit-plot-spawning-biomass-1.png)
 
 ``` r
-# Plot of log fishing mortality
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
@@ -558,10 +564,10 @@ stockplotr::plot_timeseries(
   stockplotr::theme_noaa()
 ```
 
-![](fims-demo_files/figure-html/fit-plots-2.png)
+![Plot of log fishing
+mortality.](fims-demo_files/figure-html/fit-plot-log-fishing-mortality-1.png)
 
 ``` r
-# Plot the index of abundance against the observed values
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 2),
@@ -583,10 +589,10 @@ stockplotr::plot_timeseries(
   stockplotr::theme_noaa()
 ```
 
-![](fims-demo_files/figure-html/fit-plots-3.png)
+![Plot of estimated index of abundance versus observed
+values.](fims-demo_files/figure-html/fit-plot-index-of-abundance-1.png)
 
 ``` r
-# Plot the landings estimates
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
@@ -600,13 +606,15 @@ stockplotr::plot_timeseries(
   stockplotr::theme_noaa()
 ```
 
-![](fims-demo_files/figure-html/fit-plots-4.png)
+![Plot of estimated
+landings.](fims-demo_files/figure-html/fit-plot-landings-1.png)
 
 ### Sensitivities
 
 Multiple fits, i.e., sensitivity runs, can be set up by modifying the
-parameter list using `update_parameters()` or changing the data that is
-used to fit the model.
+parameter list using
+[`dplyr::mutate()`](https://dplyr.tidyverse.org/reference/mutate.html)
+or changing the data that is used to fit the model.
 
 #### Initial values
 
@@ -649,7 +657,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.7.1
-    ## ℹ Total run time was 1.20551 minutes
+    ## ℹ Total run time was 1.21893 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00253
     ## ℹ Negative log likelihood (NLL):
@@ -671,7 +679,7 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.7.1
-    ## ℹ Total run time was 1.20522 minutes
+    ## ℹ Total run time was 1.2065 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00318
     ## ℹ Negative log likelihood (NLL):
@@ -706,7 +714,7 @@ age_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.01253 to 8e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.7.1 ℹ Total run time was 8.96747 seconds ℹ Number of
+    ## ℹ FIMS model version: 0.7.1 ℹ Total run time was 10.04083 seconds ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
     ## gradient= 8e-04 ℹ Negative log likelihood (NLL): • Marginal NLL= 1565.4676 •
     ## Total NLL= 1565.4676 ℹ Terminal SB= 1724.28921
@@ -738,15 +746,16 @@ length_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.00422 to 0.03063 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.7.1 ℹ Total run time was 58.09914 seconds ℹ Number of
+    ## ℹ FIMS model version: 0.7.1 ℹ Total run time was 59.39559 seconds ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
     ## gradient= 0.03063 ℹ Negative log likelihood (NLL): • Marginal NLL= 1520.03752 •
     ## Total NLL= 1520.03752 ℹ Terminal SB= 1706.89135
 
 ``` r
 clear()
+```
 
-# Plot spawning biomass for each sensitivity model
+``` r
 stockplotr::plot_biomass(
   list(
     "age" = get_estimates(age_only_fit) |>
@@ -776,4 +785,5 @@ stockplotr::plot_biomass(
     ## Warning: Removed 1 row containing missing values or values outside the scale range
     ## (`geom_text()`).
 
-![](fims-demo_files/figure-html/length-1.png)
+![Plot of spawning biomass for each sensitivity
+model.](fims-demo_files/figure-html/fit-plot-biomass-1.png)

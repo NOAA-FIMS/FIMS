@@ -59,7 +59,7 @@
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/noaa-fims/fims/"><span class="fa fa-brands fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS"><span class="fa fa-brands fa-github fa-lg"></span></a></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
@@ -115,7 +115,7 @@ simplified parts using a common color coding, where R code is in blue,
 code for the Rcpp interface that links R objects to C++ objects is in
 orange, the C++ code that acts as the core of FIMS is in green, and the
 C++ code that makes up <code>Information</code> is in grey.
-<img src="figures/fims-path-maturity-8.png" class="r-plt" width="100%"></p>
+<img src="figures/fims-path-maturity-8.png" class="r-plt" alt="Diagram showing the full path from R to C++ for the maturity module." width="100%"></p>
 <div class="section level2">
 <h2 id="modules-in-r">Modules in R<a class="anchor" aria-label="anchor" href="#modules-in-r"></a>
 </h2>
@@ -128,7 +128,7 @@ up in R and then populated with parameters.</p>
 maturity module can be created using a list. It is easiest to populate
 this list using wrapper functions that are written in R. The list that
 specifies how the module will be created can be updated from the
-defaults using [update_parameters()]. It is often easier to create the
+defaults using [dplyr::mutate()]. It is often easier to create the
 defaults and update them rather than creating the list by yourself
 because the wrapper functions will ensure the proper structure is used.
 That way you do not have to memorize what the structure is supposed to
@@ -297,7 +297,7 @@ parent classes are just used in Rcpp to set the structure.</p>
 <span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  Parameter slope<span class="op">;</span></span>
 <span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="op">...</span></span>
 <span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-1.png" class="r-plt" width="85%"></p>
+<p><img src="figures/fims-path-maturity-1.png" class="r-plt" alt="The path of the maturity module from R to LogisticMaturity and LogisticMaturityInterface." width="85%"></p>
 <p>All Rcpp interface classes from FIMS define parameters (e.g.,
 <code>inflection_point</code>, <code>slope</code>) using the
 <code>ParameterVector</code> class defined in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp" class="external-link">rcpp_interface_base.hpp</a>
@@ -443,7 +443,7 @@ later.</p>
 <code>add_to_fims_tmb_internal</code> four times to track the estimated
 value of each parameter along with their first, second, and third
 derivatives.</p>
-<p><img src="figures/fims-path-maturity-2.png" class="r-plt" width="100%"></p>
+<p><img src="figures/fims-path-maturity-2.png" class="r-plt" alt="The path of the maturity module from R and Rcpp to fims::LogisticMaturity and fims::Information using shared pointers." width="100%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -488,7 +488,7 @@ but used for multiple modules.</p>
 <span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a><span class="op">};</span></span>
 <span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a></span>
 <span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="op">}</span>  <span class="co">// namespace fims</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-3.png" class="r-plt" width="100%"></p>
+<p><img src="figures/fims-path-maturity-3.png" class="r-plt" alt="The path of the maturity module from R through Rcpp to fims::LogisticMaturity with evaluate(x) and shared pointers to fims::Information." width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="population-class">Population class<a class="anchor" aria-label="anchor" href="#population-class"></a>
@@ -598,7 +598,7 @@ within population.</p>
 <span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a>    <span class="kw">this</span><span class="op">-&gt;</span>proportion_mature_at_age<span class="op">[</span>i_age_year<span class="op">]</span> <span class="op">=</span></span>
 <span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a>      <span class="kw">this</span><span class="op">-&gt;</span>maturity<span class="op">-&gt;</span>evaluate<span class="op">(</span>ages<span class="op">[</span>age<span class="op">]);</span></span>
 <span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a>  <span class="op">}</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-4.png" class="r-plt" width="100%"></p>
+<p><img src="figures/fims-path-maturity-4.png" class="r-plt" alt="Maturity module inheritance and linkage between fims::LogisticMaturity, fims::MaturityBase, and fims::Population." width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
@@ -639,7 +639,7 @@ or subset of populations.</p>
 <span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="kw">typedef</span> <span class="kw">typename</span> <span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">uint32_t</span><span class="op">,</span> </span>
 <span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>                          <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>MaturityBase<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;::</span>iterator</span>
 <span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>  maturity_models_iterator<span class="op">;</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-5.png" class="r-plt" width="100%"></p>
+<p><img src="figures/fims-path-maturity-5.png" class="r-plt" alt="Storage and linkage of maturity models between fims::Information and fims::Population." width="100%"></p>
 <p>Next, let’s revisit the line of code that was written in the Rcpp
 <code>LogisticMaturityInterface</code> class in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp" class="external-link">inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp</a>.
 Here, we are setting the maturity_models pointer in
@@ -651,7 +651,7 @@ the <code>LogisticMaturity</code> module.</p>
 <span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">// fims_popdy::LogisticMaturity class is equal to the pointer to</span></span>
 <span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">// fims_popdy::LogisticMaturity</span></span>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>info<span class="op">-&gt;</span>maturity_models<span class="op">[</span>maturity<span class="op">-&gt;</span>id<span class="op">]</span> <span class="op">=</span> maturity<span class="op">;</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-6.png" class="r-plt" width="100%"></p>
+<p><img src="figures/fims-path-maturity-6.png" class="r-plt" alt="Maturity and population objects in fims::Information using IDs and shared pointers, with retrieval by fims::Population for evaluation." width="100%"></p>
 <p>Now we need to pass this pointer to the maturity pointer in
 population so that <code>population-&gt;maturity</code> points to the
 <code>LogisticMaturity</code> module instead of
@@ -666,7 +666,7 @@ population so that <code>population-&gt;maturity</code> points to the
 <span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a>                            <span class="bu">std::</span>shared_ptr<span class="op">&lt;</span>fims_popdy<span class="op">::</span>Population<span class="op">&lt;</span>Type<span class="op">&gt;</span> <span class="op">&gt;</span> <span class="op">&gt;::</span>iterator</span>
 <span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a>    population_iterator<span class="op">;</span></span>
 <span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co">// iterator for population objects</span></span></code></pre></div>
-<p><img src="figures/fims-path-maturity-7.png" class="r-plt" width="100%"></p>
+<p><img src="figures/fims-path-maturity-7.png" class="r-plt" alt="Registration of maturity and population objects in fims::Information using ID to shared pointer mappings, enabling linkage to the selected maturity model." width="100%"></p>
 <p>Populations are looped through with a new shared pointer,
 <code>p</code>, to reference the individual population of interest.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode cpp infochunk"><code class="sourceCode cpp"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co">// file: inst/include/common/information.hpp</span></span>
@@ -702,7 +702,7 @@ in information, passing on the information that we want to use the
 <p>Here, (*it) is referring to the <code>maturity_models</code> map in
 information and (*it).second refers to the second element of the map,
 which is the pointer to the maturity module.</p>
-<p><img src="figures/fims-path-maturity-8.png" class="r-plt" width="100%"></p>
+<p><img src="figures/fims-path-maturity-8.png" class="r-plt" alt="Assignment of the selected maturity model to fims::Population as fims::Information iterates over populations." width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="thinking-in-r">Thinking in R<a class="anchor" aria-label="anchor" href="#thinking-in-r"></a>

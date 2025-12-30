@@ -11,8 +11,9 @@ maturity module. The following sections break this diagram into
 simplified parts using a common color coding, where R code is in blue,
 code for the Rcpp interface that links R objects to C++ objects is in
 orange, the C++ code that acts as the core of FIMS is in green, and the
-C++ code that makes up `Information` is in grey.
-![](figures/fims-path-maturity-8.png)
+C++ code that makes up `Information` is in grey. ![Diagram showing the
+full path from R to C++ for the maturity
+module.](figures/fims-path-maturity-8.png)
 
 ## Modules in R
 
@@ -26,7 +27,7 @@ After loading FIMS and the default data set that comes with FIMS, a
 maturity module can be created using a list. It is easiest to populate
 this list using wrapper functions that are written in R. The list that
 specifies how the module will be created can be updated from the
-defaults using \[update_parameters()\]. It is often easier to create the
+defaults using \[dplyr::mutate()\]. It is often easier to create the
 defaults and update them rather than creating the list by yourself
 because the wrapper functions will ensure the proper structure is used.
 That way you do not have to memorize what the structure is supposed to
@@ -219,7 +220,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 }
 ```
 
-![](figures/fims-path-maturity-1.png)
+![The path of the maturity module from R to LogisticMaturity and
+LogisticMaturityInterface.](figures/fims-path-maturity-1.png)
 
 All Rcpp interface classes from FIMS define parameters (e.g.,
 `inflection_point`, `slope`) using the `ParameterVector` class defined
@@ -392,7 +394,9 @@ The `add_to_fims_tmb` function repeats `add_to_fims_tmb_internal` four
 times to track the estimated value of each parameter along with their
 first, second, and third derivatives.
 
-![](figures/fims-path-maturity-2.png)
+![The path of the maturity module from R and Rcpp to
+fims::LogisticMaturity and fims::Information using shared
+pointers.](figures/fims-path-maturity-2.png)
 
 ## `fims_popdy::LogisticMaturity` class
 
@@ -438,7 +442,9 @@ struct LogisticMaturity : public MaturityBase<Type> {
 }  // namespace fims
 ```
 
-![](figures/fims-path-maturity-3.png)
+![The path of the maturity module from R through Rcpp to
+fims::LogisticMaturity with evaluate(x) and shared pointers to
+fims::Information.](figures/fims-path-maturity-3.png)
 
 ## Population class
 
@@ -562,7 +568,9 @@ within population.
   }
 ```
 
-![](figures/fims-path-maturity-4.png)
+![Maturity module inheritance and linkage between
+fims::LogisticMaturity, fims::MaturityBase, and
+fims::Population.](figures/fims-path-maturity-4.png)
 
 ## Overview
 
@@ -606,7 +614,8 @@ typedef typename std::map<uint32_t,
   maturity_models_iterator;
 ```
 
-![](figures/fims-path-maturity-5.png)
+![Storage and linkage of maturity models between fims::Information and
+fims::Population.](figures/fims-path-maturity-5.png)
 
 Next, let’s revisit the line of code that was written in the Rcpp
 `LogisticMaturityInterface` class in
@@ -623,7 +632,9 @@ equal the `maturity` pointer to the `LogisticMaturity` module.
 info->maturity_models[maturity->id] = maturity;
 ```
 
-![](figures/fims-path-maturity-6.png)
+![Maturity and population objects in fims::Information using IDs and
+shared pointers, with retrieval by fims::Population for
+evaluation.](figures/fims-path-maturity-6.png)
 
 Now we need to pass this pointer to the maturity pointer in population
 so that `population->maturity` points to the `LogisticMaturity` module
@@ -642,7 +653,9 @@ std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > > populations;
 // iterator for population objects
 ```
 
-![](figures/fims-path-maturity-7.png)
+![Registration of maturity and population objects in fims::Information
+using ID to shared pointer mappings, enabling linkage to the selected
+maturity model.](figures/fims-path-maturity-7.png)
 
 Populations are looped through with a new shared pointer, `p`, to
 reference the individual population of interest.
@@ -687,7 +700,9 @@ Here, (\*it) is referring to the `maturity_models` map in information
 and (\*it).second refers to the second element of the map, which is the
 pointer to the maturity module.
 
-![](figures/fims-path-maturity-8.png)
+![Assignment of the selected maturity model to fims::Population as
+fims::Information iterates over
+populations.](figures/fims-path-maturity-8.png)
 
 ## Thinking in R
 
