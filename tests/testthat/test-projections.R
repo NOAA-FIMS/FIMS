@@ -339,7 +339,7 @@
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
-  ewaa_growth <- methods::new(EWAAgrowth)
+  ewaa_growth <- methods::new(EWAAGrowth)
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
@@ -759,7 +759,7 @@ if(n_projection_years>0){
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
-  ewaa_growth <- methods::new(EWAAgrowth)
+  ewaa_growth <- methods::new(EWAAGrowth)
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
@@ -1180,7 +1180,7 @@ if(n_projection_years>0){
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
-  ewaa_growth <- methods::new(EWAAgrowth)
+  ewaa_growth <- methods::new(EWAAGrowth)
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
@@ -1602,7 +1602,7 @@ if(n_projection_years>0){
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
-  ewaa_growth <- methods::new(EWAAgrowth)
+  ewaa_growth <- methods::new(EWAAGrowth)
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
@@ -2031,7 +2031,7 @@ if(n_projection_years>0){
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
-  ewaa_growth <- methods::new(EWAAgrowth)
+  ewaa_growth <- methods::new(EWAAGrowth)
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
