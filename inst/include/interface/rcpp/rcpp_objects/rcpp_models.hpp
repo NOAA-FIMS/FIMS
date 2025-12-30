@@ -72,6 +72,12 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual ~FisheryModelInterfaceBase() {}
 
+  /**
+   * @brief Convert the model to a JSON string.
+   * @param optimize A boolean indicating whether optimization was performed.
+   *   If false, sdreport calculations are skipped. Default is true.
+   * @return A JSON string representation of the model.
+   */
   virtual std::string to_json(bool optimize = true) {
     return "std::string to_json() not yet implemented.";
   }
