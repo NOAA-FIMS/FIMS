@@ -149,6 +149,7 @@ ConstraintWorks
 containsNA
 conventionalcommits
 conversiondouble
+copydoc
 cout
 cov
 covr
@@ -585,6 +586,7 @@ minimizer
 minimizR
 mkdir
 mkString
+MLE
 modelTest
 ModularTMBExample
 mort
