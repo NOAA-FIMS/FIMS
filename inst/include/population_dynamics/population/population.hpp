@@ -43,6 +43,14 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<double> ages;  /*!< vector of the ages for referencing*/
   fims::Vector<double> years; /*!< vector of years for referencing*/
 
+  fims::Vector<Type> mortality_F; /*!< vector of fishing mortality summed across
+                           fleet by year and age*/
+  fims::Vector<Type> log_f_multiplier;     /*!< estimated parameter: vector of
+                     annual fishing mortality multipliers to scale total mortality of all fleets*/
+  fims::Vector<Type> f_multiplier;     /*!< transformed parameter: vector of
+  annual fishing mortality multipliers to scale total mortality of all fleets*/
+  fims::Vector<Type> mortality_Z; /*!< vector of total mortality by year and age*/
+
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
