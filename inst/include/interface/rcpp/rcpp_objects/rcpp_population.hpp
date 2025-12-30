@@ -365,11 +365,11 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->recruitment_id = this->recruitment_id.get();
     population->maturity_id = this->maturity_id.get();
     population->log_M.resize(this->log_M.size());
-    if(this->log_f_multiplier.size() == (this->nyears.get())){
+    if(this->log_f_multiplier.size() == (this->n_years.get())){
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     } else {
       warning("The log_f_multiplier vector is not of size nyears. Filling with zeros.");
-      this->log_f_multiplier.resize((this->nyears.get()));
+      this->log_f_multiplier.resize((this->n_years.get()));
       for (size_t i = 0; i < log_f_multiplier.size(); i++){
         this->log_f_multiplier[i].initial_value_m = static_cast<double>(0.0);
         this->log_f_multiplier[i].estimation_type_m.set("constant");
