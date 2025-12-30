@@ -327,6 +327,15 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
               .final_value_m);
       ss << "],\n";
     }
+    ss << "  \"log_sd_values\":[";
+    if (this->log_sd.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
+        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+      }
+      ss << this->value_to_string(this->log_sd[this->log_sd.size() - 1].final_value_m) << "],\n";
+    }
     ss << "  \"observed_values\":[";
     if (this->x.size() == 0) {
       ss << "]\n";
@@ -337,7 +346,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       ss << this->x[this->x.size() - 1].final_value_m << "]\n";
     }
     ss << " }}\n";
-
     return ss.str();
   }
 
@@ -625,6 +633,15 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
               .final_value_m);
 
       ss << "],\n";
+    }
+    ss << "  \"log_sd_values\":[";
+    if (this->log_sd.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
+        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+      }
+      ss << this->value_to_string(this->log_sd[this->log_sd.size() - 1].final_value_m) << "],\n";
     }
     ss << "  \"observed_values\":[";
     if (this->x.size() == 0) {
@@ -934,6 +951,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
       ss << "],\n";
     }
+    // no log_sd_values for multinomial
     ss << "  \"observed_values\":[";
     if (this->x.size() == 0) {
       ss << "]\n";
