@@ -743,6 +743,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       rownames = Rcpp::CharacterVector(0);
       colnames = Rcpp::CharacterVector(0);
       grouped_out = Rcpp::List::create();
+      // first_est is already initialized to 0.0
     }
 
     return Rcpp::List::create(
