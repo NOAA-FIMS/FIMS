@@ -1,3 +1,7 @@
+# FIMS 0.8.0
+
+* Implements projections as part of the main modeling time.
+
 # FIMS 0.7.1
 
 * Fixes json output when there are non numeric values, infinity values, and -999
