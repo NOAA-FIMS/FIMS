@@ -18,7 +18,7 @@ namespace
 
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
         test_SB[year] += dq["numbers_at_age"][i_age_year] *
-            catch_at_age_model->populations[0]->proportion_female[age] *
+            catch_at_age_model->populations[0]->proportion_female[0] *
             dq["proportion_mature_at_age"][i_age_year] *
             catch_at_age_model->populations[0]->growth->evaluate(population->ages[age]);
         test_B[year] += dq["numbers_at_age"][i_age_year] *
@@ -48,7 +48,7 @@ namespace
 
         auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
         test_SSB[n_years] += dq["numbers_at_age"][i_age_year] *
-            catch_at_age_model->populations[0]->proportion_female[age] *
+            catch_at_age_model->populations[0]->proportion_female[0] *
             dq["proportion_mature_at_age"][i_age_year] *
             catch_at_age_model->populations[0]->growth->evaluate(population->ages[age]);
 

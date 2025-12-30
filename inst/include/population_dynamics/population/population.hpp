@@ -35,7 +35,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       log_M; /*!< estimated parameter: natural log of Natural Mortality*/
   fims::Vector<Type> proportion_female = fims::Vector<Type>(
-      1, static_cast<Type>(0.5)); /*!< proportion female by age */
+      1, static_cast<Type>(0.5)); /*!< proportion female, which is a fixed value of 0.5 */
 
   // Transformed values
   fims::Vector<Type> M; /*!< transformed parameter: natural mortality*/

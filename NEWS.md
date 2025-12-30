@@ -4,6 +4,7 @@
 * Allows the output columns to be merged with reshape and dplyr when character
   values are combined with strings
 * Fixes spawning biomass output in print method to report value
+* Simplifies age-specific proportion female to a single 0.5
 
 # FIMS 0.7.0
 
