@@ -951,7 +951,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
               pdq_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);
             } else {
-              size_t i_agem1_yearm1 = (y - 1) * population->nages + (a - 1);
+              size_t i_agem1_yearm1 = (y - 1) * population->n_ages + (a - 1);
               CalculateNumbersAA(population, i_age_year, i_agem1_yearm1, a);
               CalculateUnfishedNumbersAA(population, i_age_year, i_agem1_yearm1,
                                          a);
