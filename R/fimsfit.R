@@ -361,6 +361,9 @@ is.FIMSFit <- function(x) {
 #' @param version The version of FIMS that was used to optimize the model. If
 #'   [fit_fims()] was not used to optimize the model, then the default is to
 #'   use the current version of the package that is loaded.
+#' @param optimize A logical value indicating whether optimization was performed.
+#'   If `FALSE`, sdreport calculations will be skipped in the C++ code. Default
+#'   is `TRUE`.
 #'
 #' @return
 #' An object with an S4 class of `FIMSFit` is returned. The object will have the
@@ -406,7 +409,8 @@ FIMSFit <- function(
   opt = list(),
   sdreport = list(),
   timing = c("time_total" = as.difftime(0, units = "secs")),
-  version = utils::packageVersion("FIMS")
+  version = utils::packageVersion("FIMS"),
+  optimize = TRUE
 ) {
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
@@ -454,7 +458,7 @@ FIMSFit <- function(
   )
 
   # Create JSON output for FIMS run
-  model_output <- input[["model"]]$get_output()
+  model_output <- input[["model"]]$get_output(optimize)
   # Reshape the JSON estimates
   json_estimates <- reshape_json_estimates(model_output)
   # Merge json_estimates into tmb_estimates based on parameter id
@@ -564,7 +568,8 @@ fit_fims <- function(input,
     initial_fit <- FIMSFit(
       input = input,
       obj = obj,
-      timing = c("time_total" = as.difftime(0, units = "secs"))
+      timing = c("time_total" = as.difftime(0, units = "secs")),
+      optimize = FALSE
     )
     return(initial_fit)
   }
@@ -636,7 +641,8 @@ fit_fims <- function(input,
     obj = obj,
     opt = opt,
     sdreport = sdreport,
-    timing = timing
+    timing = timing,
+    optimize = TRUE
   )
   print(fit)
   if (!is.null(filename)) {

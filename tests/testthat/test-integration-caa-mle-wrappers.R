@@ -183,6 +183,12 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
     deterministic_output[["estimated"]],
     deterministic_output[["input"]]
   )
+  
+  #' @description Test that no warnings are produced when optimize = FALSE.
+  expect_no_warning(
+    initialized_model |>
+      fit_fims(optimize = FALSE)
+  )
   clear()
 
   #' @description Test that FIMS returns an error when there are no estimated parameters for optimization.
