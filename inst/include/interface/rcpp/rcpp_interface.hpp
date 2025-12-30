@@ -124,7 +124,7 @@ bool CreateTMBModel() {
  * Usage example:
  * \code{.R}
  * set_fixed_parameters(c(1, 2, 3))
- * catch_at_age$get_output()
+ * catch_at_age$get_output(FALSE)
  * \endcode
  *
  * @param par A vector of parameter values.
@@ -167,7 +167,7 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
  * Usage example:
  * \code{.R}
  * set_random_parameters(c(1, 2, 3))
- * catch_at_age$get_output()
+ * catch_at_age$get_output(FALSE)
  * \endcode
  *
  * @param par A vector of parameter values.
