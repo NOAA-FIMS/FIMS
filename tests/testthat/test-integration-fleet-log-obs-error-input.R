@@ -44,19 +44,20 @@ test_that("`log_obs_error scalar` works with correct inputs", {
       
       parameters_4_model <- default_parameters |>
         tidyr::unnest(cols = data) |>
-        # Update log_obs_sd initial values for Fleet1
+        # remove all but one log_obs_sd initial values for Fleet1
         dplyr::filter(
-          !(fleet_name == "fleet1" & label == "log_sd" & time > 1)
-        ) |>
-        dplyr::bind_rows(
-          default_parameters |>
-            tidyr::unnest(cols = data) |>
-            dplyr::filter(is.na(fleet_name))
-        )
+          !(fleet_name == "fleet1" & label == "log_sd" & time > 1) | 
+          is.na(fleet_name == "fleet1" & label == "log_sd" & time > 1)
+        ) 
+
       
       test_fit <- parameters_4_model |>
         initialize_fims(data = data_4_model) |>
         fit_fims(optimize = FALSE)
+      
+      json_estimates <- reshape_json_estimates(test_fit@model_output)
+
+      json_estimates |> dplyr::filter(module_name == "Fleet")
         
     
 
