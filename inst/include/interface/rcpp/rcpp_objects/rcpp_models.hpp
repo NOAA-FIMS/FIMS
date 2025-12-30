@@ -72,7 +72,7 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual ~FisheryModelInterfaceBase() {}
 
-  virtual std::string to_json() {
+  virtual std::string to_json(bool optimize = true) {
     return "std::string to_json() not yet implemented.";
   }
 
@@ -661,9 +661,11 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    *
    * @details Returns a list containing the report results for the CatchAtAge
    * model, including derived quantities and diagnostics.
+   * @param optimize A boolean indicating whether optimization was performed.
+   *   If false, sdreport calculations are skipped.
    * @return Rcpp::List containing the report output.
    */
-  Rcpp::List get_report() {
+  Rcpp::List get_report(bool optimize = true) {
     Rcpp::Environment base = Rcpp::Environment::base_env();
     Rcpp::Function summary = base["summary"];
 
@@ -697,31 +699,51 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     double of_value =
         Rcpp::as<double>(func(this->get_fixed_parameters_vector()));
     Rcpp::List rep = report();
-    SEXP sdr = sdreport(obj);
-    Rcpp::RObject sdr_summary = summary(sdr, "report");
-
-    Rcpp::NumericMatrix mat(sdr_summary);
-    Rcpp::List dimnames = mat.attr("dimnames");
-    Rcpp::CharacterVector rownames = dimnames[0];
-    Rcpp::CharacterVector colnames = dimnames[1];
-
-    // ---- Group into map ----
-    std::map<std::string, std::vector<double>> grouped;
-    int nrow = mat.nrow();
-    for (int i = 0; i < nrow; i++) {
-      std::string key = Rcpp::as<std::string>(rownames[i]);
-      double val = mat(i, 1);  // col 1 = "Std. Error"
-      grouped[key].push_back(val);
-    }
-
-    // ---- Convert map -> R list ----
+    
+    // Initialize variables for sdreport results
+    Rcpp::RObject sdr_summary;
+    Rcpp::NumericMatrix mat;
+    Rcpp::CharacterVector rownames;
+    Rcpp::CharacterVector colnames;
     Rcpp::List grouped_out;
-    for (auto const &kv : grouped) {
-      grouped_out[kv.first] = Rcpp::wrap(kv.second);
-    }
+    double first_est = 0.0;
+    
+    // Only run sdreport if optimize is true
+    if (optimize) {
+      SEXP sdr = sdreport(obj);
+      sdr_summary = summary(sdr, "report");
 
-    // Example: grab "Estimate" for first row
-    double first_est = mat(0, 0);
+      mat = Rcpp::NumericMatrix(sdr_summary);
+      Rcpp::List dimnames = mat.attr("dimnames");
+      rownames = dimnames[0];
+      colnames = dimnames[1];
+
+      // ---- Group into map ----
+      std::map<std::string, std::vector<double>> grouped;
+      int nrow = mat.nrow();
+      for (int i = 0; i < nrow; i++) {
+        std::string key = Rcpp::as<std::string>(rownames[i]);
+        double val = mat(i, 1);  // col 1 = "Std. Error"
+        grouped[key].push_back(val);
+      }
+
+      // ---- Convert map -> R list ----
+      for (auto const &kv : grouped) {
+        grouped_out[kv.first] = Rcpp::wrap(kv.second);
+      }
+
+      // Example: grab "Estimate" for first row
+      if (nrow > 0) {
+        first_est = mat(0, 0);
+      }
+    } else {
+      // Return empty objects when optimize is false
+      sdr_summary = R_NilValue;
+      mat = Rcpp::NumericMatrix(0, 0);
+      rownames = Rcpp::CharacterVector(0);
+      colnames = Rcpp::CharacterVector(0);
+      grouped_out = Rcpp::List::create();
+    }
 
     return Rcpp::List::create(
         Rcpp::Named("objective_function_value") = of_value,
@@ -735,9 +757,11 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   }
   /**
    * @brief Method to convert the model to a JSON string.
+   * @param optimize A boolean indicating whether optimization was performed.
+   *   If false, sdreport calculations are skipped. Default is true.
    */
-  virtual std::string to_json() {
-    Rcpp::List report = get_report();
+  virtual std::string to_json(bool optimize = true) {
+    Rcpp::List report = get_report(optimize);
     Rcpp::List grouped_out = report["grouped_se"];
     double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
     Rcpp::NumericVector grad = report["gradient"];
