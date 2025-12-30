@@ -705,7 +705,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     Rcpp::NumericMatrix mat;
     Rcpp::CharacterVector rownames;
     Rcpp::CharacterVector colnames;
-    Rcpp::List grouped_out;
+    Rcpp::List grouped_out = Rcpp::List::create();
     double first_est = 0.0;
     
     // Only run sdreport if optimize is true
