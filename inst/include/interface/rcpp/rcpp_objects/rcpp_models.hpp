@@ -774,16 +774,18 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     }
     // Assume grouped_out is an Rcpp::List
     std::map<std::string, std::vector<double>> grouped_cpp;
-    Rcpp::CharacterVector names = grouped_out.names();
-    for (int i = 0; i < grouped_out.size(); i++) {
-      std::string key = Rcpp::as<std::string>(names[i]);
-      Rcpp::NumericVector vec =
-          grouped_out[i];  // each element is a numeric vector
-      std::vector<double> vec_std(vec.size());
-      for (int j = 0; j < vec.size(); j++) {
-        vec_std[j] = vec[j];
+    if (grouped_out.size() > 0) {
+      Rcpp::CharacterVector names = grouped_out.names();
+      for (int i = 0; i < grouped_out.size(); i++) {
+        std::string key = Rcpp::as<std::string>(names[i]);
+        Rcpp::NumericVector vec =
+            grouped_out[i];  // each element is a numeric vector
+        std::vector<double> vec_std(vec.size());
+        for (int j = 0; j < vec.size(); j++) {
+          vec_std[j] = vec[j];
+        }
+        grouped_cpp[key] = vec_std;
       }
-      grouped_cpp[key] = vec_std;
     }
     this->se_values = grouped_cpp;
 
