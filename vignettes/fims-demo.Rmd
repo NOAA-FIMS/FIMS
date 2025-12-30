@@ -108,8 +108,8 @@ updated_configurations <- default_configurations_unnested |>
     ),
     by = c("module_name", "fleet_name")
   )
-  
-  updated_configurations
+
+updated_configurations
 
 # Nest updated_configurations
 updated_configurations_nested <- updated_configurations |>
@@ -136,7 +136,7 @@ By just passing the configurations and the data to `create_default_parameters()`
 default_parameters <- create_default_parameters(
   configurations = default_configurations,
   data = data_4_model
-) 
+)
 
 default_parameters
 
