@@ -32,6 +32,16 @@ articles:
   contents:
   - fims-path-maturity
 
+- title: C++ Training
+  contents:
+  - training-GettingToKnowCpp
+  - training-IntroRcpp
+  - training-CppMemory
+  - training-TemplatedCpp
+  - training-CppClassStructure
+  - training-CppInheritance
+  - training-CppPolymorphism
+
 reference:
 - title: Data
   desc: >
