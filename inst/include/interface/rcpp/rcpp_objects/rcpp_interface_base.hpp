@@ -703,10 +703,9 @@ class RealVector {
   virtual uint32_t get_id() { return this->id_m; }
 
   /**
-   * @brief
-   *
-   * @param orig
-   */
+   * @brief Sets the values of the RealVector from a R numeric vector.
+   * @param orig A numeric vector from R.
+  */
   void from_R_vector(const Rcpp::NumericVector& orig) {
     this->storage_m->resize(orig.size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
@@ -715,7 +714,7 @@ class RealVector {
   }
 
   /**
-   * @brief
+   * @brief Returns the values of the RealVector as a R numeric vector.
    *
    * @return Rcpp::NumericVector
    */
