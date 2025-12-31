@@ -13,7 +13,7 @@ namespace {
 class CAAInitializeTestFixture : public testing::Test {
   // Make members protected and they can be accessed from
   // sub-classes.
- protected:
+protected:
   // Use SetUp function to prepare the objects for each test.
   // Use override in C++11 to make sure SetUp (e.g., not Setup with
   // a lowercase u) is spelled
@@ -25,6 +25,7 @@ class CAAInitializeTestFixture : public testing::Test {
     population->n_years = n_years;
     population->n_ages = n_ages;
     population->n_fleets = n_fleets;
+    population->log_f_multiplier.resize(n_years);
 
     for (int i = 0; i < n_fleets; i++) {
       auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
@@ -34,7 +35,7 @@ class CAAInitializeTestFixture : public testing::Test {
       fleet->log_q.resize(1);
       population->fleets.push_back(fleet);
       catch_at_age_model->fleets[fleet->GetId()] =
-          fleet;  // Add to CatchAtAge model's fleets map
+          fleet; // Add to CatchAtAge model's fleets map
     }
     catch_at_age_model->populations.push_back(population);
   }
@@ -60,10 +61,6 @@ class CAAInitializeTestFixture : public testing::Test {
 
       derived_quantities["mortality_F"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years *
-          this->catch_at_age_model->populations[p]->n_ages);
-
-      derived_quantities["mortality_M"] = fims::Vector<double>(
-        this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
       derived_quantities["mortality_Z"] = fims::Vector<double>(
@@ -203,7 +200,7 @@ class CAAInitializeTestFixture : public testing::Test {
   // Virtual void TearDown() will be called after each test is
   // run. It needs to be defined if there is clearup work to
   // do. Otherwise, it does not need to be provided.
-  virtual void TearDown() override {}
+  virtual void TearDown() {}
   std::shared_ptr<fims_popdy::Population<double>> population;
   std::shared_ptr<fims_popdy::CatchAtAge<double>> catch_at_age_model;
 
@@ -217,11 +214,11 @@ class CAAInitializeTestFixture : public testing::Test {
 };
 
 class CAAEvaluateTestFixture : public testing::Test {
- protected:
+protected:
   // Declare population here as a member, and initialize it in SetUp
   std::shared_ptr<fims_popdy::Population<double>> population;
   std::shared_ptr<fims_popdy::CatchAtAge<double>>
-      catch_at_age_model;  // New member for the model
+      catch_at_age_model; // New member for the model
 
   void SetUp() override {
     // C++ code to set up true values for log_naa, log_M,
@@ -235,6 +232,7 @@ class CAAEvaluateTestFixture : public testing::Test {
     population->n_years = n_years;
     population->n_ages = n_ages;
     population->n_fleets = n_fleets;
+    population->log_f_multiplier.resize(n_years);
 
     // Initialize CatchAtAge model
     catch_at_age_model = std::make_shared<fims_popdy::CatchAtAge<double>>();
@@ -275,7 +273,7 @@ class CAAEvaluateTestFixture : public testing::Test {
       // Push fleet to population and catch_at_age_model
       population->fleets.push_back(fleet);
       catch_at_age_model->fleets[fleet->GetId()] =
-          fleet;  // Add to CatchAtAge model's fleets map
+          fleet; // Add to CatchAtAge model's fleets map
     }
 
     // Push population to catch_at_age_model
@@ -313,10 +311,6 @@ class CAAEvaluateTestFixture : public testing::Test {
           log_M_distribution(generator);
     }
 
-    for (int i = 0; i < n_years; i++) {
-      catch_at_age_model->populations[0]->log_f_multiplier[i] =
-        static_cast<double>(0.0);
-    }
     // Set initialized values for derived quantities
     catch_at_age_model->Prepare();
 
@@ -549,7 +543,7 @@ class CAAEvaluateTestFixture : public testing::Test {
 
   void PrepareCAA() { catch_at_age_model->Prepare(); }
 
-  virtual void TearDown() override {}
+  virtual void TearDown() {}
 
   int id_g = 0;
   int n_years = 30;
@@ -564,7 +558,7 @@ class CAAEvaluateTestFixture : public testing::Test {
 };
 
 class CAAPrepareTestFixture : public testing::Test {
- protected:
+protected:
   std::shared_ptr<fims_popdy::Population<double>> population;
   std::shared_ptr<fims_popdy::CatchAtAge<double>> catch_at_age_model;
   void SetUp() override {
@@ -573,7 +567,8 @@ class CAAPrepareTestFixture : public testing::Test {
     population->n_years = n_years;
     population->n_ages = n_ages;
     population->n_fleets = n_fleets;
-
+    population->log_f_multiplier.resize(n_years);
+    
     // C++ code to set up true values for log_Fmort, and log_q:
     int seed = 1234;
     std::default_random_engine generator(seed);
@@ -631,7 +626,7 @@ class CAAPrepareTestFixture : public testing::Test {
 
       population->fleets.push_back(fleet);
       catch_at_age_model->fleets[fleet->GetId()] =
-          fleet;  // Add to CatchAtAge model's fleets map
+          fleet; // Add to CatchAtAge model's fleets map
     }
 
     population->ages.resize(n_ages);
@@ -652,12 +647,6 @@ class CAAPrepareTestFixture : public testing::Test {
     for (int i = 0; i < n_years * n_ages; i++) {
       catch_at_age_model->populations[0]->log_M[i] =
           log_M_distribution(generator);
-    }
-
-    catch_at_age_model->populations[0]->log_f_multiplier.resize(n_years);
-    for (int i = 0; i < n_years; i++) {
-      catch_at_age_model->populations[0]->log_f_multiplier[i] =
-        static_cast<double>(0.0);
     }
 
     // weight_at_age
@@ -837,7 +826,7 @@ class CAAPrepareTestFixture : public testing::Test {
 
   void PrepareCAA() { catch_at_age_model->Prepare(); }
 
-  virtual void TearDown() override {}
+  virtual void TearDown() {}
 
   fims_popdy::Population<double> pop;
   int id_g = 0;
@@ -846,6 +835,6 @@ class CAAPrepareTestFixture : public testing::Test {
   int n_fleets = 2;
   int n_lengths = 23;
 };
-}  // namespace
+} // namespace
 
 #endif
