@@ -251,6 +251,10 @@ create_default_Population <- function(
   n_years <- get_n_years(data)
   n_ages <- get_n_ages(data)
 
+  # Define age and year vectors needed for the rep() calls ===
+  ages <- get_ages(data)
+  years <- get_start_year(data):get_end_year(data)
+
   # Set natural mortality rate
   M_value <- 0.2
 
@@ -266,6 +270,8 @@ create_default_Population <- function(
     dplyr::mutate(
       label = "log_M",
       value = log(M_value),
+      age = rep(ages, n_years),
+      time = rep(years, each = n_ages),
       estimation_type = "constant"
     ) |>
     dplyr::add_row(

@@ -83,7 +83,7 @@ jobs:
         shell: Rscript {0}
      
       - name: save pkgdown output
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: pkgdown-site-with-reports
           path: docs/

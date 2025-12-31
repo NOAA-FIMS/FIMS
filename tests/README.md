@@ -16,7 +16,7 @@ Prepare the test data in the new file or in a separate file if you plan on reusi
 
 - In-line test data: make the data directly in the new test file within the `setup` section.
 - C++ reusable test data: create a fixture file, e.g., `tests/gtest/test_XXX_test_fixture.hpp`, to prepare reusable unit-test data, or create an integration file, e.g., `tests/gtest/integration/XXX.hpp`, to set up integration-test data for C++ tests.
-- If you used a test fixture from GoogleTest to use the same data configuration for multiple tests, `TearDown()` can be used to clean up the test and then the test fixture will be deleted. See [GoogleTest user's guide](https://google.github.io/googletest/primer.html#same-data-multiple-tests) for more details.
+- If you used a test fixture from GoogleTest to use the same data configuration for multiple tests, `TearDown() override{}` can be used to clean up the test and then the test fixture will be deleted. See [GoogleTest user's guide](https://google.github.io/googletest/primer.html#same-data-multiple-tests) for more details.
 - R reusable test data: add code to the `prepare_test_data()` function in [`tests/testthat/helper-integration-tests-setup-run.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-setup-run.R), including code to save the new data object, e.g., `base::saveRDS(object, file = testthat::test_path("fixtures", "data_name.RDS"))`, and call `prepare_test_data()` in the `setup` section of the new test file to load the data using
   ```r
   if (!file.exists(test_path("fixtures", "data_name.RDS"))) {

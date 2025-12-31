@@ -46,4 +46,4 @@ Methods of mathematical functions include trigonometry functions, \code{abs},
 \code{log}, \code{log10}, \code{log2}, \code{log1p}, \code{exp}, \code{expm1}, \code{gamma}, \code{lgamma},
 \code{digamma}, and \code{trigamma}.
 }
-\keyword{set_methods}
+\keyword{internal}

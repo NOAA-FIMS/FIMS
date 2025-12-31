@@ -4,9 +4,7 @@ home:
   title: Fisheries Integrated Modeling System (FIMS)
   links:
   - text: Documentation of C++ Code
-    href: https://noaa-fims.github.io/FIMS-docs/
-  - text: FIMS Developer Handbook
-    href: https://noaa-fims.github.io/collaborative_workflow/
+    href: https://noaa-fims.github.io/doxygen/
 
 authors:
   FIMS implementation team:
@@ -37,8 +35,7 @@ articles:
 reference:
 - title: Data
   desc: >
-      FIMS comes with a selection of built-in datasets that are used in
-      examples to illustrate various visualization challenges.
+      Example dataset used in FIMS demonstrations and examples.
   contents:
   - data1
 
@@ -49,7 +46,6 @@ reference:
   - starts_with("get_FIMSFrame")
   - starts_with("m_")
   - starts_with("create_default_")
-  # - update_parameters
   - has_keyword("distribution")
   - starts_with("initialize_")
   - has_keyword("fit_fims")
@@ -59,7 +55,6 @@ reference:
   desc: Primary functions used when developing FIMS package.
   contents:
   - has_keyword("developer")
-  - has_keyword("set_methods")
   - use_testthat_template
   - starts_with("reshape_")
 

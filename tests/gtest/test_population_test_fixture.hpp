@@ -199,7 +199,7 @@ class CAAInitializeTestFixture : public testing::Test {
   // Virtual void TearDown() will be called after each test is
   // run. It needs to be defined if there is clearup work to
   // do. Otherwise, it does not need to be provided.
-  virtual void TearDown() {}
+  virtual void TearDown() override {}
   std::shared_ptr<fims_popdy::Population<double>> population;
   std::shared_ptr<fims_popdy::CatchAtAge<double>> catch_at_age_model;
 
@@ -541,7 +541,7 @@ class CAAEvaluateTestFixture : public testing::Test {
 
   void PrepareCAA() { catch_at_age_model->Prepare(); }
 
-  virtual void TearDown() {}
+  virtual void TearDown() override {}
 
   int id_g = 0;
   int n_years = 30;
@@ -823,7 +823,7 @@ class CAAPrepareTestFixture : public testing::Test {
 
   void PrepareCAA() { catch_at_age_model->Prepare(); }
 
-  virtual void TearDown() {}
+  virtual void TearDown() override {}
 
   fims_popdy::Population<double> pop;
   int id_g = 0;
