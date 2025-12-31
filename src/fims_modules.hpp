@@ -160,9 +160,9 @@ RCPP_MODULE(fims) {
       .method(
           "set", &RealVector::set,
           "An internal setter for setting a position of a RealVector from R.")
-      .method("fromRVector", &RealVector::fromRVector,
+      .method("from_R_vector", &RealVector::from_R_vector,
               "Initializes the RealVector from the values of a R vector.")
-      .method("toRVector", &RealVector::toRVector,
+      .method("to_R_vector", &RealVector::to_R_vector,
               "Returns values as a R vector.")
       .method("show", &RealVector::show,
               "The printing methods for a RealVector.")

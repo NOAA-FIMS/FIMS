@@ -525,7 +525,7 @@ class RealVector {
    *
    * @param orig
    */
-  void fromRVector(const Rcpp::NumericVector& orig) {
+  void from_R_vector(const Rcpp::NumericVector& orig) {
     this->storage_m->resize(orig.size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       this->storage_m->at(i) = orig[i];
@@ -537,7 +537,7 @@ class RealVector {
    *
    * @return Rcpp::NumericVector
    */
-  Rcpp::NumericVector toRVector() {
+  Rcpp::NumericVector to_R_vector() {
     Rcpp::NumericVector ret(this->storage_m->size());
     for (size_t i = 0; i < this->size(); i++) {
       ret[i] = this->storage_m->at(i);
