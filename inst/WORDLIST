@@ -58,6 +58,7 @@ BevertonHoltRecruitmentInterface
 BevHolt
 BH
 bindenv
+Bjarne
 bookdown
 bool
 Bool
@@ -97,6 +98,7 @@ CALLDEFS
 CallEntries
 callGeneric
 CallMethodDef
+callout
 CamelCase
 CaptureError
 catchability
@@ -154,7 +156,9 @@ cout
 cov
 covr
 cp
+cplusplus
 cpp
+CPP
 CppAD
 CPUE
 cpus
@@ -196,6 +200,7 @@ DBUILD
 DCMAKE
 DDOXYGEN
 deallocated
+deallocates
 defineVar
 deliverables
 dellog
@@ -269,6 +274,7 @@ DTMB
 dum
 DWORD
 dynam
+Eddelbuttel
 elif
 ELT
 emph
@@ -350,6 +356,7 @@ gcc
 Gcov
 gcovr
 gdb
+geeksforgeeks
 getAbsolutePathWithoutDotDot
 GetArray
 GetBool
@@ -415,6 +422,7 @@ GrowthInterfaceBase
 gstatic
 gsub
 gtest
+Hadley
 HandlesCorrectInput
 HandlesEdgeCase
 HardwareConcurrency
@@ -461,6 +469,8 @@ IntegerAgeInput
 IntegerVector
 IntegrationTest
 IntInput
+intro
+Intro
 inv
 InvLogit
 InvLogitLogit
@@ -547,7 +557,6 @@ LogR
 LogRecDev
 LogRRecruitmentInterface
 LogRRecruitmentProcess
-
 lookahead
 lozen
 lpdf
@@ -566,6 +575,7 @@ MakeADFun
 MakeAvailable
 Makevars
 mapply
+Masaki
 MATHJAX
 mathrm
 maturityAA
@@ -597,6 +607,7 @@ MultinomialLPDF
 MultinomialLPMF
 mutex
 mv
+MyClass
 mymap
 na
 naa
@@ -711,6 +722,8 @@ pmap
 pmf
 png
 pnorm
+Polymorphism
+polymorphism
 popdy
 PopulationEvaluateTestFixture
 PopulationInitializeTestFixture
@@ -774,6 +787,7 @@ RecruitmentBase
 RecruitmentDeviations
 RecruitmentInterfaceBase
 recruitments
+rect
 refClass
 RegisterParameter
 RegisterParameterName
@@ -804,6 +818,7 @@ rmultinom
 rnorm
 Robj
 RObject
+Romain
 rowSums
 rowwise
 roxygen
@@ -814,6 +829,7 @@ rspm
 rstan
 rstream
 RStudio
+rtools
 ru
 RunModelLoop
 rvit
@@ -930,6 +946,7 @@ ssb
 SSB
 SSBy
 ssbzero
+ssqng
 sstream
 stackoverflow
 stan
@@ -944,6 +961,7 @@ str
 STR
 streambuf
 stringstream
+Stroustrup
 strs
 strsplit
 strtok
@@ -970,6 +988,7 @@ tbl
 TearDown
 tempdir
 tempfile
+templating
 templated
 testdown
 TESTDOWN
@@ -1008,6 +1027,7 @@ trigamma
 trunc
 tryCatch
 tryFormats
+Tsuda
 typedef
 typename
 typeof
@@ -1057,6 +1077,7 @@ Wb
 wd
 wgt
 wght
+Wickham
 wikipedia
 withr
 wordlist

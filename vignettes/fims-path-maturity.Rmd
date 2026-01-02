@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 
 <style type="text/css">
 code span.co{
-  color: #8c8c8c; 
+  color: #8c8c8c;
 }
 </style>
 
@@ -189,7 +189,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 knitr::include_graphics("figures/fims-path-maturity-1.png")
 ```
 
-All Rcpp interface classes from FIMS define parameters (e.g., `inflection_point`, `slope`) using the `ParameterVector` class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) in the directory [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects). ParameterVectors allow parameters to vary with time. Whereas, the Parameter class is only used for time-invariant parameters. The fields for these classes that are accessible from R are defined in the 
+All Rcpp interface classes from FIMS define parameters (e.g., `inflection_point`, `slope`) using the `ParameterVector` class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) in the directory [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects). ParameterVectors allow parameters to vary with time. Whereas, the Parameter class is only used for time-invariant parameters. The fields for these classes that are accessible from R are defined in the
 [rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file in the directory [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp). For example,
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
@@ -212,7 +212,7 @@ Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defin
 A namespace in C++ is similar to a library in R. The core of FIMS is within the `fims` namespace and the namespace is a convenient way to differentiate between the part of the C++ code base that is portable, i.e., independent of statistical platform, and the part of the codebase that depends on platforms outside of base C++ (e.g., `{Rcpp}`, R, `{TMB}`). Any code written within:
 ```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 namespace fims{
-  
+
 }
 ```
 is considered to be a part of the `fims` namespace. C++ classes written within the `fims` namespace can be accessed within the C++ code base using `fims_popdy::`.
@@ -251,7 +251,7 @@ struct fims::ModelTraits {
 
 Each Rcpp interface object includes an `add_to_fims_tmb()` function. There are two shared pointers set up within this function, one to link each Rcpp interface object (e.g., `LogisticMaturityInterface`) to the `Information` class in the `fims` namespace defined in [inst/include/common/information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) and one to link to the matching class in the `fims` namespace. In our maturity example, this would be the `LogisticMaturity` class in the `fims` namespace defined in [inst/include/population_dynamics/maturity/functors/logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp).
 
-Within rcpp_maturity.hpp, there is a link to the `fims_info::Information` class to register maturity parameters and specify whether or not they are random effects. We do this by setting up two pointers in the interface, info that points to information, and maturity that points to the logistic maturity module. 
+Within rcpp_maturity.hpp, there is a link to the `fims_info::Information` class to register maturity parameters and specify whether or not they are random effects. We do this by setting up two pointers in the interface, info that points to information, and maturity that points to the logistic maturity module.
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 // file: rcpp_maturity.hpp
