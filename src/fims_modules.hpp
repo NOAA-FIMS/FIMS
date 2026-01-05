@@ -157,6 +157,27 @@ RCPP_MODULE(fims) {
               &ParameterVector::estimation_types_from_R_vector,
               "Sets the estimation type values of the ParameterVector from a R "
               "numeric ")
+        .method("values_to_R_vector", &ParameterVector::values_to_R_vector,
+              "Returns the initial values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("min_values_to_R_vector", &ParameterVector::min_values_to_R_vector,
+              "Returns the minimum values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("max_values_to_R_vector", &ParameterVector::max_values_to_R_vector,
+              "Returns the maximum values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("final_values_to_R_vector",
+              &ParameterVector::final_values_to_R_vector,
+              "Returns the final values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("uncertainty_values_to_R_vector",
+              &ParameterVector::uncertainty_values_to_R_vector,
+              "Returns the uncertainty values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("estimation_types_to_R_vector",
+              &ParameterVector::estimation_types_to_R_vector,
+              "Returns the estimation types of the ParameterVector as a R "
+              "character vector.")
       .method("size", &ParameterVector::size,
               "Returns the size of a ParameterVector.")
       .method("resize", &ParameterVector::resize,

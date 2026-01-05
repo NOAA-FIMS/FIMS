@@ -481,7 +481,7 @@ void values_from_R_vector(const Rcpp::NumericVector& orig) {
    * numeric vector.
    * @return Rcpp::NumericVector
    */
-  Rcpp::NumericVector uncertainties_to_R_vector() {
+  Rcpp::NumericVector uncertainty_values_to_R_vector() {
     Rcpp::NumericVector ret(this->storage_m->size());
     for (size_t i = 0; i < this->size(); i++) {
       ret[i] = this->storage_m->at(i).uncertainty_m;

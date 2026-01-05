@@ -187,6 +187,66 @@ test_that("rcpp ParameterVector works as expected", {
     expect_equal(v_log_test$get(i - 1)$value, log(v1_value))
   }
 
+  # test to/from methods
+  r_vec <- c(1.0, 2.0, 3.0, 4.0, 5.0)
+  v_values_from <- methods::new(ParameterVector, length(r_vec))
+  v_values_from$values_from_R_vector(r_vec)
+  v_to <- v_values_from$values_to_R_vector()
+  #' @description Test from and to methods work.
+  expect_equal(length(v_to), length(r_vec))
+  for (i in seq_along(r_vec)) {
+    expect_equal(v_to[i], r_vec[i])
+  }
+  # test min
+  v_values_from$min_values_from_R_vector(r_vec)
+  v_to_min <- v_values_from$min_values_to_R_vector()
+  #' @description Test min values to R vector method works.
+  expect_equal(length(v_to_min), length(r_vec))
+  for (i in seq_along(r_vec)) {
+    expect_equal(v_to_min[i], r_vec[i])
+  }
+
+  # test max
+  v_values_from$max_values_from_R_vector(r_vec)
+  v_to_max <- v_values_from$max_values_to_R_vector()
+  #' @description Test max values to R vector method works.
+  expect_equal(length(v_to_max), length(r_vec))
+  for (i in seq_along(r_vec)) {
+    expect_equal(v_to_max[i], r_vec[i])
+  }
+
+  # test uncertainity
+  v_values_from$uncertainty_values_from_R_vector(r_vec)
+  v_to_uncertainty <- v_values_from$uncertainty_values_to_R_vector()
+  #' @description Test uncertainty values to R vector method works.
+  expect_equal(length(v_to_uncertainty), length(r_vec))
+  for (i in seq_along(r_vec)) {
+    expect_equal(v_to_uncertainty[i], r_vec[i])
+  }
+
+  # test final values
+  v_values_from$final_values_from_R_vector(r_vec)
+  v_to_final <- v_values_from$final_values_to_R_vector()
+  #' @description Test final values to R vector method works.
+  expect_equal(length(v_to_final), length(r_vec))
+  for (i in seq_along(r_vec)) {
+    expect_equal(v_to_final[i], r_vec[i])
+  }
+
+  # # test estimation type
+  est_types <- c("random_effects", "constant", "random_effects", "constant", "random_effects")
+  v_values_from$estimation_types_from_R_vector(est_types)
+  est_types_from <- v_values_from$estimation_types_to_R_vector()
+  #' @description Test estimation types to R vector method works.
+  expect_equal(length(est_types_from), length(est_types))
+  for (i in seq_along(est_types)) {
+    expect_equal(est_types_from[i], est_types[i])
+  }
+
+
+
+
+
   clear()
 })
 
