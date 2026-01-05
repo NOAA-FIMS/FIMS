@@ -1039,7 +1039,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<vector<Type>> log_M_p(n_pops);
       vector<vector<Type>> log_init_naa_p(n_pops);
       vector<vector<Type>> spawning_biomass_ratio_p(n_pops);
-      vector<vector<Type>> f_multiplier_p(n_pops);
+      vector<vector<Type>> log_f_multiplier_p(n_pops);
 
       // initialize fleet vectors
       vector<vector<Type>> agecomp_expected_f(n_fleets);
@@ -1103,8 +1103,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             this->populations[pop_idx]->log_init_naa.to_tmb();
         spawning_biomass_ratio_p(pop_idx) =
             this->populations[pop_idx]->spawning_biomass_ratio.to_tmb();
-        f_multiplier_p(pop_idx) =
-            this->populations[pop_idx]->f_multiplier.to_tmb();
+        log_f_multiplier_p(pop_idx) =
+            this->populations[pop_idx]->log_f_multiplier.to_tmb();
 
         pop_idx += 1;
       }
@@ -1183,7 +1183,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<Type> unfished_spawning_biomass =
           ADREPORTvector(unfished_spawning_biomass_p);
       vector<Type> spawning_biomass_ratio = ADREPORTvector(spawning_biomass_ratio_p);
-      vector<Type> f_multiplier = ADREPORTvector(f_multiplier_p);
+      vector<Type> log_f_multiplier = ADREPORTvector(log_f_multiplier_p);
 
       vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
       vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
@@ -1238,7 +1238,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       FIMS_REPORT_F_("log_M", log_M_p, this->of);
       FIMS_REPORT_F_("log_init_naa", log_init_naa_p, this->of);
       FIMS_REPORT_F_("spawning_biomass_ratio", spawning_biomass_ratio_p, this->of);
-      FIMS_REPORT_F_("f_multiplier", f_multiplier_p, this->of);
+      FIMS_REPORT_F_("log_f_multiplier", log_f_multiplier_p, this->of);
 
       // adreport
       ADREPORT_F(biomass, this->of);
@@ -1256,7 +1256,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       ADREPORT_F(unfished_numbers_at_age, this->of);
       ADREPORT_F(unfished_spawning_biomass, this->of);
       ADREPORT_F(spawning_biomass_ratio, this->of);
-      ADREPORT_F(f_multiplier, this->of);
+      ADREPORT_F(log_f_multiplier, this->of);
 
       // fleets
       // report

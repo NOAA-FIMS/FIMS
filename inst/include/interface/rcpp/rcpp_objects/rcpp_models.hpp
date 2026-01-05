@@ -278,21 +278,38 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"values\": " << population_interface->log_M << "\n\n";
       ss << "},\n";
 
-      fims::Vector<double> log_F_multiplier_uncertainty(pop->log_f_multiplier.size(), -999);
-      this->get_se_values("log_F_multiplier", this->se_values, log_F_multiplier_uncertainty);
+      fims::Vector<double> log_f_multiplier_uncertainty(pop->log_f_multiplier.size(), -999);
+      this->get_se_values("log_f_multiplier", this->se_values, log_f_multiplier_uncertainty);
       for (size_t i = 0; i < pop->log_f_multiplier.size(); i++)
       {
         population_interface_ptr->log_f_multiplier[i].final_value_m = pop->log_f_multiplier[i];
-        population_interface_ptr->log_f_multiplier[i].uncertainty_m = log_F_multiplier_uncertainty[i];
+        population_interface_ptr->log_f_multiplier[i].uncertainty_m = log_f_multiplier_uncertainty[i];
       }
 
-      ss << "{\n \"name\": \"log_F_multiplier\",\n";
+      ss << "{\n \"name\": \"log_f_multiplier\",\n";
       ss << " \"id\":" << population_interface->log_f_multiplier.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
       ss << "  \"header\": [" << "\"n_years\"" << "],\n";
       ss << "  \"dimensions\": [" << population_interface->n_years.get() << "]\n},\n";
       ss << " \"values\": " << population_interface->log_f_multiplier << "\n\n";
+      ss << "},\n";
+
+      fims::Vector<double> spawning_biomass_ratio_uncertainty(pop->spawning_biomass_ratio.size(), -999);
+      this->get_se_values("spawning_biomass_ratio", this->se_values, spawning_biomass_ratio_uncertainty);
+      for (size_t i = 0; i < pop->spawning_biomass_ratio.size(); i++)
+      {
+        population_interface_ptr->spawning_biomass_ratio[i].final_value_m = pop->spawning_biomass_ratio[i];
+        population_interface_ptr->spawning_biomass_ratio[i].uncertainty_m = spawning_biomass_ratio_uncertainty[i];
+      }
+
+      ss << "{\n \"name\": \"spawning_biomass_ratio\",\n";
+      ss << " \"id\":" << population_interface->spawning_biomass_ratio.id_m << ",\n";
+      ss << " \"type\": \"vector\",\n";
+      ss << " \"dimensionality\": {\n";
+      ss << "  \"header\": [" << "\"n_years\"" << "],\n";
+      ss << "  \"dimensions\": [" << (population_interface->n_years.get() + 1) << "]\n},\n";
+      ss << " \"values\": " << population_interface->spawning_biomass_ratio << "\n\n";
       ss << "},\n";
 
       fims::Vector<double> log_init_naa_uncertainty(pop->log_init_naa.size(), -999);
