@@ -46,6 +46,21 @@ jobs:
           echo "issue_numbers=$ISSUE_NUMBERS" >> $GITHUB_OUTPUT
         shell: bash
 
+      - name: Get Issues from Commit Messages
+        id: get_commit_issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get all commit messages from the PR
+          COMMIT_MESSAGES=$(gh pr view ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --json commits --jq '.commits[].messageHeadline' || true)
+          
+          # Extract issue numbers from commit messages
+          ISSUE_NUMBERS=$(echo "$COMMIT_MESSAGES" | grep -o -E '#[0-9]+' | sed 's/#//' | tr '\n' ' ' || true)
+          
+          echo "Found issue numbers in commit messages: $ISSUE_NUMBERS"
+          echo "issue_numbers=$ISSUE_NUMBERS" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Update Labels on Linked Issues
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +68,7 @@ jobs:
           NEW_LABEL: "status: in dev"
         run: |
           # Combine outputs and de-duplicate issue numbers, filtering out empty values
-          ALL_ISSUE_NUMBERS=$(echo "${{ steps.get_body_issues.outputs.issue_numbers }} ${{ steps.get_graphql_issues.outputs.issue_numbers }}" | tr ' ' '\n' | grep -E '^[0-9]+$' | sort -u | tr '\n' ' ')
+          ALL_ISSUE_NUMBERS=$(echo "${{ steps.get_body_issues.outputs.issue_numbers }} ${{ steps.get_graphql_issues.outputs.issue_numbers }} ${{ steps.get_commit_issues.outputs.issue_numbers }}" | tr ' ' '\n' | grep -E '^[0-9]+$' | sort -u | tr '\n' ' ')
           
           echo "Final list of unique issue numbers: $ALL_ISSUE_NUMBERS"
           
