@@ -295,10 +295,25 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"values\": " << population_interface->log_M << "\n\n";
       ss << "},\n";
 
-      fims::Vector<double> log_init_naa_uncertainty(pop->log_init_naa.size(),
-                                                    -999);
-      this->get_se_values("log_init_naa", this->se_values,
-                          log_init_naa_uncertainty);
+      fims::Vector<double> log_F_multiplier_uncertainty(pop->log_f_multiplier.size(), -999);
+      this->get_se_values("log_F_multiplier", this->se_values, log_F_multiplier_uncertainty);
+      for (size_t i = 0; i < pop->log_f_multiplier.size(); i++)
+      {
+        population_interface_ptr->log_f_multiplier[i].final_value_m = pop->log_f_multiplier[i];
+        population_interface_ptr->log_f_multiplier[i].uncertainty_m = log_F_multiplier_uncertainty[i];
+      }
+
+      ss << "{\n \"name\": \"log_F_multiplier\",\n";
+      ss << " \"id\":" << population_interface->log_f_multiplier.id_m << ",\n";
+      ss << " \"type\": \"vector\",\n";
+      ss << " \"dimensionality\": {\n";
+      ss << "  \"header\": [" << "\"n_years\"" << "],\n";
+      ss << "  \"dimensions\": [" << population_interface->n_years.get() << "]\n},\n";
+      ss << " \"values\": " << population_interface->log_f_multiplier << "\n\n";
+      ss << "},\n";
+
+      fims::Vector<double> log_init_naa_uncertainty(pop->log_init_naa.size(), -999);
+      this->get_se_values("log_init_naa", this->se_values, log_init_naa_uncertainty);
       for (size_t i = 0; i < pop->log_init_naa.size(); i++) {
         population_interface_ptr->log_init_naa[i].final_value_m =
             pop->log_init_naa[i];
@@ -1211,6 +1226,14 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
                             population->n_ages.get()},
           fims::Vector<std::string>{"n_years", "n_ages"});
 
+      derived_quantities["mortality_M"] = fims::Vector<Type>(
+          population->n_years.get() * population->n_ages.get());
+      derived_quantities_dim_info["mortality_M"] = fims_popdy::DimensionInfo(
+          "mortality_M",
+          fims::Vector<int>{population->n_years.get(),
+                            population->n_ages.get()},
+          fims::Vector<std::string>{"n_years", "n_ages"});
+
       derived_quantities["mortality_Z"] = fims::Vector<Type>(
           population->n_years.get() * population->n_ages.get());
       derived_quantities_dim_info["mortality_Z"] = fims_popdy::DimensionInfo(
@@ -1293,8 +1316,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<std::string>{"n_years", "n_ages"});
 
       // replace elements in the variable map
-      info->variable_map[population->numbers_at_age.id_m] =
-          &(derived_quantities["numbers_at_age"]);
 
       for (fleet_ids_iterator fit = population->fleet_ids->begin();
            fit != population->fleet_ids->end(); ++fit) {
