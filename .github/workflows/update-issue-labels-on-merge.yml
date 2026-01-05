@@ -51,11 +51,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get all commit messages from the PR
-          COMMIT_MESSAGES=$(gh pr view ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --json commits --jq '.commits[].messageHeadline' || true)
+          # Get all commit messages (both headline and body) from the PR
+          COMMIT_MESSAGES=$(gh pr view ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --json commits --jq '.commits[] | .messageHeadline, .messageBody' || true)
           
-          # Extract issue numbers from commit messages
-          ISSUE_NUMBERS=$(echo "$COMMIT_MESSAGES" | grep -o -E '#[0-9]+' | sed 's/#//' | tr '\n' ' ' || true)
+          # Extract issue numbers from commit messages, filtering out null/empty lines
+          ISSUE_NUMBERS=$(echo "$COMMIT_MESSAGES" | grep -v '^null$' | grep -v '^$' | grep -o -E '#[0-9]+' | sed 's/#//' | tr '\n' ' ' || true)
           
           echo "Found issue numbers in commit messages: $ISSUE_NUMBERS"
           echo "issue_numbers=$ISSUE_NUMBERS" >> $GITHUB_OUTPUT
